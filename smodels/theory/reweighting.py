@@ -23,7 +23,7 @@ def addPromptAndDisplaced(branch):
     
     if not branch.particles: # no decays happened
         if branch.BSMparticles[0].totalwidth == 0.*GeV: 
-            branch._decayType = 'METonly'
+            branch._decayType = 'prompt'
             probabilities = [1.]
             branches = [branch]
             return probabilities, branches 

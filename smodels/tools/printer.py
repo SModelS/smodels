@@ -407,8 +407,7 @@ class TxTPrinter(BasicPrinter):
         Format data for a ResultList object.
 
         :param obj: A ResultList object to be printed.
-        """
-
+        """ 
         output = ""
         output += "   ======================================================= \n"
         output += " || \t \t\t\t\t\t\t || \n"
@@ -417,7 +416,6 @@ class TxTPrinter(BasicPrinter):
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
                 
-        
         for theoryPrediction in obj.theoryPredictions:
             expRes = theoryPrediction.expResult
             info = theoryPrediction.dataset.dataInfo
@@ -427,9 +425,10 @@ class TxTPrinter(BasicPrinter):
             output += "-------------------Txname Labels = " + str([str(txname) for txname in theoryPrediction.txnames]) + "\n"
             output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
                     "\n"
-
+            
             output += "Theory prediction: " + str(theoryPrediction.xsection.value) + "\n"
             output += "Theory conditions:"
+            
             if not theoryPrediction.conditions:
                 output += "  " + str(theoryPrediction.conditions) + "\n"
             else:
@@ -443,7 +442,7 @@ class TxTPrinter(BasicPrinter):
                 upperLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
                 upperLimitExp = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass,expected=True)
             elif expRes.datasets[0].dataInfo.dataType == 'efficiencyMap':
-                upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId)
+                upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId)              
                 upperLimitExp = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId,expected=True)
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
@@ -473,7 +472,7 @@ class TxTPrinter(BasicPrinter):
         :param obj: Uncovered object to be printed.
         """
                 
-        nprint = 20  # Number of missing topologies to be printed (ordered by cross sections)
+        nprint = 10  # Number of missing topologies to be printed (ordered by cross sections)
 
         output = ""
         output += "\nTotal missing topology cross section (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.missingTopos))
@@ -806,6 +805,7 @@ class PyPrinter(BasicPrinter):
                         'dataType' : dataType}  
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
+
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 resDict['chi2'] = theoryPrediction.chi2
                 resDict['likelihood'] = theoryPrediction.likelihood                
@@ -901,30 +901,48 @@ class PyPrinter(BasicPrinter):
             outside = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
                                 'element' : str(topo.topo)}      
             outsideGrid.append(outside)     
-        
-        longCascades = []        
-        obj.longCascade.classes = sorted(obj.longCascade.classes, 
-                                         key=lambda x: [x.getWeight(),x.motherPIDs], 
-                                         reverse=True)        
-        for cascadeEntry in obj.longCascade.classes[:nprint]:
-            longc = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV),
-                     'weight (fb)' : cascadeEntry.getWeight(), 
-                     'mother PIDs' : cascadeEntry.motherPIDs}        
-            longCascades.append(longc)
-        
-        asymmetricBranches = []
-        obj.asymmetricBranches.classes = sorted(obj.asymmetricBranches.classes, 
-                                                key=lambda x: [x.getWeight(),x.motherPIDs],
-                                                reverse=True)
-        for asymmetricEntry in obj.asymmetricBranches.classes[:nprint]:
-            asymmetric = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 
-                    'weight (fb)' : asymmetricEntry.getWeight(),
-                    'mother PIDs' : asymmetricEntry.motherPIDs}         
-            asymmetricBranches.append(asymmetric)
 
+        longLived = []
+        for topo in obj.longLived.topos:
+            if topo.value > 0.: continue
+            for el in topo.contributingElements:
+                topo.value += el.missingX
+        obj.longLived.topos = sorted(obj.longLived.topos, 
+                                       key=lambda x: [x.value,str(x.topo)], 
+                                       reverse=True)        
+        for topo in obj.longLived.topos[:nprint]:
+            long = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
+                                'element' : str(topo.topo)}      
+            longLived.append(long)
+            
+        displaced = []
+        for topo in obj.displaced.topos:
+            if topo.value > 0.: continue
+            for el in topo.contributingElements:
+                topo.value += el.missingX
+        obj.displaced.topos = sorted(obj.displaced.topos, 
+                                       key=lambda x: [x.value,str(x.topo)], 
+                                       reverse=True)        
+        for topo in obj.displaced.topos[:nprint]:
+            displ = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
+                                'element' : str(topo.topo)}      
+            displaced.append(displ)
+            
+        MET = []
+        for topo in obj.MET.topos:
+            if topo.value > 0.: continue
+            for el in topo.contributingElements:
+                topo.value += el.missingX
+        obj.MET.topos = sorted(obj.MET.topos, 
+                                       key=lambda x: [x.value,str(x.topo)], 
+                                       reverse=True)        
+        for topo in obj.MET.topos[:nprint]:
+            met = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
+                                'element' : str(topo.topo)}      
+            MET.append(met)                        
 
-        return {'Missed Topologies': missedTopos, 'Long Cascades' : longCascades,
-                     'Asymmetric Branches': asymmetricBranches, 'Outside Grid': outsideGrid}
+        return {'Missed Topologies': missedTopos, 'Long-lived' : longLived,
+                     'Displaced': displaced, 'MET': MET, 'Outside Grid': outsideGrid}
     
 class XmlPrinter(PyPrinter):
     """

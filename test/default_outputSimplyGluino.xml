@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <smodelsOutput>
-    <Asymmetric_Branches_List/>
+    <Displaced_List/>
     <ExptRes_List>
         <ExptRes>
             <AnalysisID>CMS-SUS-13-012</AnalysisID>
@@ -72,7 +72,8 @@
             <upper_limit_fb>38.1378438667</upper_limit_fb>
         </ExptRes>
     </ExptRes_List>
-    <Long_Cascades_List/>
+    <Long-lived_List/>
+    <MET_List/>
     <Missed_Topologies_List/>
     <OutputStatus>
         <database_version>unittest</database_version>

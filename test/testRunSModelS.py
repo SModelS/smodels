@@ -136,6 +136,7 @@ class RunSModelSTest(unittest.TestCase):
                     res['AnalysisID'],res['DataSetID']])
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
+        
         for i in [ './output.py', './output.pyc' ]:
             if os.path.exists ( i ): os.remove ( i )
         self.assertTrue(equals)
@@ -163,7 +164,7 @@ class RunSModelSTest(unittest.TestCase):
         
     def testGoodFileHSCP(self):
         filename = join ( iDir(), "inputFiles/slha/longLived.slha" )
-        outputfile = self.runMain(filename)
+        outputfile = self.runMain(filename, suppressStdout=False)
         shutil.copyfile(outputfile,'./outputHSCP.py')
         from longLived_default import smodelsOutputDefault
         from outputHSCP import smodelsOutput

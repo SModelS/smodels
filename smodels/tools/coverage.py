@@ -52,13 +52,12 @@ class Uncovered(object):
                     self.motherIDs.append(motherID)
                 
 
-    def fill(self, topoList, sigcut = 10**(-8)*fb):
+    def fill(self, topoList, sigcut = 0.03*fb):
         """
         Check all elements, categorise those not tested / missing, classify long cascade decays and asymmetric branches
         Fills all corresponding objects
         :ivar topoList: sms topology list
         """
-
         for element in topoList.getElements(): # loop over all elements, by construction we start with the most compressed
             if element.tested: continue  
             allElements = []       
@@ -74,8 +73,9 @@ class Uncovered(object):
                     newEl.weight *= (probability1*probability2)    
                     if newEl.weight.getMaxXsec() < sigcut: continue 
                     allElements.append(newEl) 
- 
-            for el in allElements:                           
+            
+            
+            for el in allElements:
                 if self.inPrevMothers(el): 
                     missing = False # cannot be missing if element with same mothers has already appeared
                 # this is because it can certainly be compressed further to the smaller element already seen in the loop
@@ -97,11 +97,10 @@ class Uncovered(object):
                     continue
                 
                 self.missingTopos.addToTopos(el) #keep track of all missing topologies
-
                 if self.hasLongLived(el): self.longLived.addToTopos(el)
                 elif self.hasDisplaced(el): self.displaced.addToTopos(el)
                 else: self.MET.addToTopos(el)
- 
+
 
     def inPrevMothers(self, el): #check if smaller element with same mother has already been checked
         for mEl in el.motherElements:
@@ -273,7 +272,6 @@ class UncoveredList(object):
         :parameter instr: element as string
         :returns: string of generalized element
         """
-        
         import smodels.experiment.finalStateParticles as fS
         if self.sumL: exch = [fS.WList, fS.lList, fS.tList, fS.taList, fS.nuList] 
         else: exch = [fS.WList, fS.eList, fS.muList,fS.tList, fS.taList, fS.nuList]

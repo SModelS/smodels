@@ -36,7 +36,7 @@ class ReweightingTest(unittest.TestCase):
         probabilities1, branches1 = addPromptAndDisplaced(branch1)
         self.assertEqual(len(probabilities1), 1)
         self.assertEqual(probabilities1[0], 1.)
-        self.assertEqual(branches1[0]._decayType, 'METonly')
+        self.assertEqual(branches1[0]._decayType, 'prompt')
         
         branch2 = Branch()
         branch2.BSMparticles = [gluino]
