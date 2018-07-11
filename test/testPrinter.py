@@ -8,7 +8,7 @@
 
 """
 
-import sys,os
+import sys,os,importlib
 sys.path.insert(0,"../")
 import unittest
 from smodels.installation import installDirectory as idir
@@ -155,7 +155,8 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)
            
-        from unitTestOutput.printer_output import smodelsOutput
+        smodelsOutput = importlib.import_module( "unitTestOutput.printer_output" ).smodelsOutput
+        # from unitTestOutput.printer_output import smodelsOutput
         #Test python output
         from gluino_squarks_default import smodelsOutputDefault 
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
@@ -182,8 +183,8 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)
         
-        #Test python output
-        from unitTestOutput.printer_output_simple import smodelsOutput
+        smodelsOutput = importlib.import_module( "unitTestOutput.printer_output_simple" ).smodelsOutput
+        # from unitTestOutput.printer_output_simple import smodelsOutput
         from simplyGluino_default import smodelsOutputDefault    
          
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
