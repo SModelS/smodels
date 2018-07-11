@@ -1,5 +1,5 @@
 txName: T2bbWWoff
-constraint: 3.47*([[['b','mu','nu']],[['b','jet','jet']]]+[[['b','e','nu']],[['b','jet','jet']]])
+constraint: 3.47*([[['b','l','nu']],[['b','jet','jet']]])
 condition: None
 conditionDescription: None
 figureUrl: https://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/CMS-PAS-SUS-16-052_Figure_004.png

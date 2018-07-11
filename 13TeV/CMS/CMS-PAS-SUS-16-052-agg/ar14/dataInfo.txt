@@ -1,0 +1,8 @@
+dataId: ar14
+dataType: efficiencyMap
+observedN: 11
+expectedBG: 10.5
+bgError: 1.8750999973334757
+upperLimit: 0.244700*fb
+expectedUpperLimit: 0.211652*fb
+aggregated: SR2McX
