@@ -101,7 +101,7 @@ def main():
             print ( "UL for theory prediction = ",theoryPrediction.upperLimit )
 
             # Compute the r-value
-            r = theoryPrediction.xsection.value/theoryPrediction.upperLimit
+            r = (theoryPrediction.xsection.value/theoryPrediction.upperLimit).asNumber()
             print ( "r = ",r )
             #Compute likelihhod and chi^2 for EM-type results:
             if dataset.dataInfo.dataType == 'efficiencyMap':
