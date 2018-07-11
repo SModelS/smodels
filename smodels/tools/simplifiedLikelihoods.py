@@ -381,7 +381,7 @@ class LikelihoodComputer:
             M = [0.]*len(theta)
             C = self.model.V
             if self.model.n == 1:
-               C = self.model.totalCovariance(self.nsig)
+                C = self.model.totalCovariance(self.nsig)
             if nll:
                 gaussian = stats.multivariate_normal.logpdf(theta,mean=M,cov=C)
                 ret = - gaussian - sum(poisson)
@@ -390,7 +390,7 @@ class LikelihoodComputer:
                 ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
             return ret
         except ValueError as e:
-            raise Exception("ValueError %s, %s" % ( e, self.model.totalCovariance(nsig) ))
+            raise Exception("ValueError %s, %s" % ( e, self.model.totalCovariance(self.nsig) ))
             # raise Exception("ValueError %s, %s" % ( e, self.model.V ))
 
     def nll( self, theta ):

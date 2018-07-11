@@ -14,7 +14,7 @@ from smodels.tools import crashReport
 from smodels.tools import smodelsLogging
 from smodels.tools import runtime
 from smodels import particlesLoader
-from importlib import reload
+from imp import reload
 
 def main():
     import argparse

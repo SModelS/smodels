@@ -18,7 +18,7 @@ from unitTestHelpers import equalObjs, runMain
 from smodels.tools.smodelsLogging import setLogLevel
 from smodels.tools import runtime
 from smodels import particlesLoader
-from importlib import reload
+from imp import reload
 
 setLogLevel('debug')
  

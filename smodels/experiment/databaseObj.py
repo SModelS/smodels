@@ -45,8 +45,8 @@ class Database(object):
 
     """
 
-    def __init__( self, base=None, force_load = None, discard_zeroes = True,
-                  progressbar = False, subpickle = True ):
+    def __init__(self, base=None, force_load = None, discard_zeroes = True,
+                  progressbar = False, subpickle = True):
         """
         :param base: path to the database, or pickle file (string), or http
             address. If None, or "official", use the official database.
@@ -215,7 +215,7 @@ class Database(object):
             return True
 
 
-    def createBinaryFile ( self, filename=None ):
+    def createBinaryFile(self, filename=None):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
         if self.txt_meta == None:
@@ -233,9 +233,10 @@ class Database(object):
             logger.debug (  " * write %s db version %s, format version %s, %s" % \
                     ( binfile, self.txt_meta.databaseVersion,
                       self.txt_meta.format_version, self.txt_meta.cTime() ) )
-            ptcl = serializer.HIGHEST_PROTOCOL
-            serializer.dump ( self.txt_meta, f, protocol=ptcl )
-            serializer.dump ( self.expResultList, f, protocol=ptcl )
+#           ptcl = serializer.HIGHEST_PROTOCOL
+            ptcl = 2
+            serializer.dump(self.txt_meta, f, protocol=ptcl)
+            serializer.dump(self.expResultList, f, protocol=ptcl)
             logger.info (  "%s created." % ( binfile ) )
 
     @property

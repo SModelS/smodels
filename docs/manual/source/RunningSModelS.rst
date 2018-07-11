@@ -263,7 +263,8 @@ Below we go step-by-step through this example code:
 .. literalinclude:: /examples/Example.py
    :lines: 11-20
 
-* *Set the path to the database folder*. Specify where the SModelS :ref:`database <databaseStruct>` has been installed and load the database.
+* *Set the path to the database URL*. Specify which :ref:`database <databaseStruct>` to use. It can be the path
+  to the smodels-database folder, the path to a :ref:`pickle file <databasePickle>` or (starting with v1.1.3) a URL path.
 
 .. literalinclude:: /examples/Example.py
    :lines: 21-22

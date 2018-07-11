@@ -21,7 +21,7 @@ import summaryReader
 from xml.etree import ElementTree
 from databaseLoader import database
 from unitTestHelpers import equalObjs
-from importlib import reload
+from imp import reload
 from smodels.tools import runtime
 from smodels import particlesLoader
 
