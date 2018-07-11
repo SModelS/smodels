@@ -19,7 +19,7 @@ from smodels.tools import coverage
 from smodels.tools.smodelsLogging import setLogLevel
 setLogLevel("info")
 # Set the path to the database
-database = Database("http://smodels.hephy.at/database/official113")
+database = Database("smodels-database")
 
 def main():
     """
@@ -101,7 +101,7 @@ def main():
             print ( "UL for theory prediction = ",theoryPrediction.upperLimit )
 
             # Compute the r-value
-            r = (theoryPrediction.xsection.value/theoryPrediction.upperLimit).asNumber()
+            r = theoryPrediction.getRValue()
             print ( "r = ",r )
             #Compute likelihhod and chi^2 for EM-type results:
             if dataset.dataInfo.dataType == 'efficiencyMap':

@@ -12,8 +12,6 @@
 import sys,os,imp
 sys.path.insert(0,"../")
 import unittest
-from os.path import join
-from smodels.installation import installDirectory as iDir
 from unitTestHelpers import equalObjs, runMain
 from smodels.tools.smodelsLogging import logger, setLogLevel
  
@@ -21,7 +19,7 @@ class CombinedTest(unittest.TestCase):
     def defineTest(self):
         """ define the current output as the default output.
         Use with care! """
-        filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
+        filename = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(filename,inifile="testParameters_agg.ini", suppressStdout=True )
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile, 
@@ -32,7 +30,7 @@ class CombinedTest(unittest.TestCase):
         f.close()
 
     def testCombinedResult(self):
-        filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
+        filename = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(filename,inifile="testParameters_agg.ini", suppressStdout=True )
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile, 

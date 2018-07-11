@@ -124,7 +124,7 @@ class RunPrinterTest(unittest.TestCase):
         #Define options:
         mprinter.Printers['summary'].expandedSummary = True
          
-        slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
+        slhafile = "./testFiles/slha/gluino_squarks.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)
          
@@ -151,7 +151,7 @@ class RunPrinterTest(unittest.TestCase):
         #Define options:
         mprinter.Printers['python'].addElementList = False
                
-        slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
+        slhafile = "./testFiles/slha/gluino_squarks.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)
            
@@ -178,7 +178,7 @@ class RunPrinterTest(unittest.TestCase):
         #Define options:
         mprinter.Printers['python'].addelementlist = True
          
-        slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
+        slhafile = "./testFiles/slha/simplyGluino.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)
         
@@ -207,7 +207,7 @@ class RunPrinterTest(unittest.TestCase):
         #Define options:
         mprinter.Printers['xml'].addelementlist = False                    
   
-        slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
+        slhafile = "./testFiles/slha/gluino_squarks.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)                    
                       
@@ -234,7 +234,7 @@ class RunPrinterTest(unittest.TestCase):
         #Define options:
         mprinter.Printers['xml'].addelementlist = True   
  
-        slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
+        slhafile = "./testFiles/slha/simplyGluino.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)                    
                      
