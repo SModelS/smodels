@@ -159,11 +159,11 @@ As we can see, while the curve obtained from the combination of all 44 signal re
 
 .. _combinedSRfig:
 
-+------------------------------------------------+------------------------------------------------+------------------------------------------------+
-| .. image:: images/T2bbWWoffSemiLep_bestSR.png  | .. image:: images/T2bbWWoffSemiLep_44.png      | .. image:: images/T2bbWWoffSemiLep_17.png      |
-|            :width: 300px                       |            :width: 300px                       |            :width: 300px                       |
-| Best signal region                             | 44 signal regions                              | 17 aggregate regions                           |
-+------------------------------------------------+------------------------------------------------+------------------------------------------------+
++-----------------------------------------+-----------------------------------------+-----------------------------------------+
+| .. image:: images/T2bbWWoff_bestSR.png  | .. image:: images/T2bbWWoff_44.png      | .. image:: images/T2bbWWoff_17.png      |
+|            :width: 300px                |            :width: 300px                |            :width: 300px                |
+| Best signal region                      | 44 signal regions                       | 17 aggregate regions                    |
++-----------------------------------------+-----------------------------------------+-----------------------------------------+
 
 
 Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of 17 aggregate signal regions (center), and the combination of all 44 signal regions (right).
