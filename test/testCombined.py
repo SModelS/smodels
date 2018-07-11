@@ -19,6 +19,19 @@ from unitTestHelpers import equalObjs, runMain
 from smodels.tools.smodelsLogging import logger, setLogLevel
  
 class CombinedTest(unittest.TestCase):
+    def defineTest(self):
+        """ define the current output as the default output.
+        Use with care! """
+        filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
+        outputfile = runMain(filename,inifile="testParameters_agg.ini", suppressStdout=True )
+        with open( outputfile, 'rb') as fp: ## imports file with dots in name
+            output_module = imp.load_module("output",fp,outputfile, 
+                                            ('.py', 'rb', imp.PY_SOURCE) )
+        smodelsOutput = output_module.smodelsOutput
+        f=open("gluino_squarks_default_agg.py","w")
+        f.write ( "smodelsOutputDefault = %s\n" % smodelsOutput )
+        f.close()
+
     def testCombinedResult(self):
         filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
         outputfile = runMain(filename,inifile="testParameters_agg.ini", suppressStdout=True )
