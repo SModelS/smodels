@@ -737,14 +737,14 @@ class UpperLimitComputer:
             model = copy.deepcopy(oldmodel)
             #model.observed = model.backgrounds
             for i,d in enumerate(model.backgrounds):
-                model.observed[i]=int(round(d))
+                model.observed[i]=int(NP.round(d))
         computer = LikelihoodComputer(model, toys)
         mu_hat = computer.findMuHat(model.signal_rel)
         theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
         sigma_mu = computer.getSigmaMu(model.signal_rel)
 
         aModel = copy.deepcopy(model)
-        aModel.observed = array([round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
+        aModel.observed = array([NP.round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
         #print ( "aModeldata=", aModel.observed )
         #aModel.observed = array ( [ round(x) for x in model.backgrounds ] )
         aModel.name = aModel.name + "A"
