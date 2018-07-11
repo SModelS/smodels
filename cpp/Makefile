@@ -18,9 +18,9 @@ library:
 	$(GCC) SModelS.cc -I. $(CFLAGS) $(LDFLAGS) $(libpython) -shared -fPIC -o libSModelS.so
 
 executable:
-	## run.cpp is meant as an example, tweak the code and integrate it in your framework!
+	@echo "run.cpp is meant as an example, tweak the code and integrate it in your framework!"
 	$(GCC) run.cpp -I. -Wl,-rpath,`pwd` -L. -o run -ldl -lpthread -lutil -l SModelS
-	## done. now adapt parameters.ini and execute ./run
+	@echo "done. now adapt parameters.ini and execute ./run"
 
 run: .PHONY
 	./run
