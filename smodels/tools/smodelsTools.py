@@ -29,7 +29,7 @@ def main():
     fixpermissions = subparsers.add_parser('fixpermissions', description="Fix file permissions for xseccomputer.")
     xseccomputer = subparsers.add_parser('xseccomputer', description="Compute MSSM cross sections for a SLHA file.")
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
-        help="sqrt(s) TeV. Can supply more than one value. Default is both 8 and 13.",
+        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). Default is both 8 and 13.",
         type=int, default=[])
     xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
         help="number of events to be simulated.")
