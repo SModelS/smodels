@@ -18,7 +18,6 @@ def main(args):
     status = SlhaStatus ( args.filename, maxDisplacement=args.displacement,
                  sigmacut=args.sigmacut*fb, checkLSP=args.lsp,
                  findIllegalDecays=args.illegal, checkXsec=args.xsec,
-                 findLonglived=args.longlived, 
-                 findMissingDecayBlocks=args.decayBlocks) # pylint: disable-msg=C0103
+                 findMissingDecayBlocks=args.decayBlocks) 
 
     print(status.status)

@@ -282,12 +282,11 @@ class SlhaStatus(object):
     :ivar findMissingDecayBlocks: if True add a warning for missing decay blocks
     :ivar findIllegalDecays: if True check if all decays are kinematically allowed
     :ivar checkXsec: if True check if SLHA file contains cross sections
-    :ivar findLonglived: if True find stable charged particles and displaced vertices
     
     """
     def __init__(self, filename, maxDisplacement=.01, sigmacut=.03 * fb,
                  checkLSP=False, findMissingDecayBlocks=True,
-                 findIllegalDecays=False, checkXsec=True, findLonglived=False):
+                 findIllegalDecays=False, checkXsec=True):
         self.filename = filename
         self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
@@ -306,7 +305,6 @@ class SlhaStatus(object):
             self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
             self.xsec = self.hasXsec(checkXsec)
             self.decayBlocksStatus = self.findMissingDecayBlocks(findMissingDecayBlocks)
-            self.longlived = self.findLonglivedParticles(findLonglived)
             self.status = self.evaluateStatus()
         ## except Exception,e:
         except (SModelSError,TypeError,IOError,ValueError,AttributeError) as e:
@@ -347,8 +345,7 @@ class SlhaStatus(object):
                 retMes = retMes + "#" + message + ".\n"
             elif st == 1 and not ret == -2:
                 ret = 1
-        for st, message in [self.lspStatus,
-                            self.longlived, self.illegalDecays]:
+        for st, message in [self.lspStatus, self.illegalDecays]:
             if st < 0:
                 ret = -1
                 retMes = retMes + "#" + message + "\n"
@@ -606,63 +603,6 @@ class SlhaStatus(object):
         lsp = self.findLSP()
         nlsp = self.findNLSP()
         return self.deltaMass(lsp, nlsp)
-
-
-    def findLonglivedParticles(self, findLonglived):
-        """
-        Find meta-stable particles that decay to visible particles
-        and stable charged particles.
-        
-        :returns: status flag, message
-        
-        """
-        if not findLonglived:
-            return 0, "Did not check for long lived particles"
-
-        # Get list of cross sections:
-        xsecList = crossSection.getXsecFromSLHAFile(self.filename)
-        # Check if any of particles being produced have visible displaced vertices
-        # with a weight > sigmacut
-        chargedList = []
-        missingList = []
-        ltstr = ""
-        for pid in xsecList.getPIDs():
-            if pid in SMpdgs: continue
-            if pid == self.findLSP(): continue
-            xsecmax = xsecList.getXsecsFor(pid).getMaxXsec()
-            if xsecmax < self.sigmacut: continue
-            lt = self.getLifetime(pid, ctau=True)
-            if lt < 0:
-                # error for stable charged particles
-                if self.visible(abs(pid)):
-                    if not abs(pid) in chargedList:
-                        chargedList.append(abs(pid))
-                        if not str(abs(pid)) in ltstr: ltstr += "#%s : c*tau = inf\n" % str(abs(pid))
-            if lt < self.maxDisplacement: continue
-            brvalue = 0.
-            daughters = []
-            # Sum all BRs which contain at least one visible particle
-            for decay in self.slha.decays[abs(pid)].decays:
-                for pidb in decay.ids:
-                    if self.visible(abs(pidb), decay=True):
-                        brvalue += decay.br
-                        daughters.append(decay.ids)
-                        break
-                    elif self.visible(abs(pidb), decay=True) == None:
-                        if not abs(pidb) in missingList:
-                            missingList.append(abs(pidb))
-            if xsecmax * brvalue > self.sigmacut:
-                if not abs(pid) in chargedList:
-                    chargedList.append(abs(pid))
-                    if not str(abs(pid)) in ltstr: ltstr += "#%s : c*tau = %s\n" % (str(abs(pid)), str(lt))
-        if not chargedList and not missingList: return 1, "no long lived particles found"
-        else:
-            msg = ""
-            if chargedList:
-                msg += "#Visible decays of longlived particles / stable charged particles: %s\n%s" % (str(chargedList), ltstr)
-            if missingList:
-                msg += "#Missing decay blocks of new r-Even particles appearing in displaced vertices: %s\n" % (str(missingList))
-        return -1, msg
 
     def degenerateChi(self):
         """
