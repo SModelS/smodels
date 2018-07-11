@@ -132,10 +132,11 @@ class Branch(object):
                 return comp
             
         #Compare final BSM state by Z2parity and quantum numbers:
-        comp = self.BSMparticles[-1].cmpProperties(other.BSMparticles[-1],
+        if self.BSMparticles and other.BSMparticles:
+            comp = self.BSMparticles[-1].cmpProperties(other.BSMparticles[-1],
                                                    properties=['Z2parity','colordim','eCharge'])
-        if comp:
-            return comp 
+            if comp:
+                return comp 
 
         return 0  #Branches are equal    
         

@@ -22,18 +22,20 @@ def addPromptAndDisplaced(branch):
     """
     
     if not branch.particles: # no decays happened
-        if branch.BSMparticles[0].totalwidth == 0.*GeV: 
-            branch._decayType = 'prompt'
-            probabilities = [1.]
-            branches = [branch]
-            return probabilities, branches 
+        if branch.BSMparticles[0].eCharge == 0: branch._decayType = 'METonly'
+        else: branch._decayType = 'longlived'
+        probabilities = [1.]
+        branches = [branch]
+        return probabilities, branches 
    
     F = []
     for particle in branch.BSMparticles:
         if particle.totalwidth == float('inf')*GeV:
             F_long, F_prompt, F_displaced = [0.,1.,0.]
-        else:
-            if particle.totalwidth == 0.*GeV: continue
+        elif particle.totalwidth == 0.*GeV:
+            if particle.eCharge == 0 : continue
+            else: F_long, F_prompt, F_displaced = [1.,0.,0.]
+        else:    
             F_long, F_prompt, F_displaced = calculateProbabilities(particle)
         # allow for combinations of decays and a long lived particle only if the last BSM particle is the long lived one
         if F_long and particle == branch.BSMparticles[-1]: F.append([F_long])

@@ -54,29 +54,25 @@ class ElementCluster(object):
         AND the cluster contains more than one element (assuming they differ in
         the masses), returns None.
         
-        :returns: average mass array         
-        """
-
-        def similar ( a1, a2 ):
-            if len(a1) != len(a2):
-                return False
-            for l1,l2 in zip ( a1,a2 ):
-                if len(l1) != len(l2):
-                    return False
-                for e1, e2 in zip (l1,l2 ):
-                    d=abs ( (e1-e2).asNumber(MeV) )
-                    if d>.1:
-                        return False
-            return True
+        :returns: average mass array for UL; mass of first element for EM (unless the elements have different masses, then None)     
+        """                          
         
         if self.getDataType() == 'efficiencyMap':
+            firstElMass = self.elements[0].getMasses()         
             if len(self.elements) > 1: 
-                ret = self.elements[0].getMasses()
-                for i in self.elements[1:]:
-                    if not similar ( i.getMasses(), ret ):
-                        return None
-                return ret
-            else: return self.elements[0].getMasses()
+                for el in self.elements[1:]:
+                    elMass = el.getMasses()
+                    if len(elMass) != len(firstElMass):
+                        return None     
+                    for ib,branchMasses in enumerate(elMass):
+                        if len(branchMasses) != len(firstElMass[ib]):
+                            return None 
+                        for im,mass in enumerate(branchMasses):
+                            if abs ( (mass-firstElMass[ib][im]).asNumber(MeV) ) > .1:
+                                return None
+            return firstElMass
+ 
+            
         elif self.getDataType() == 'upperLimit':
             massList = [el.getMasses() for el in self.elements]
             weights = [el.weight.getMaxXsec() / fb for el in self.elements]        

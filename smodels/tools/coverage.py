@@ -11,6 +11,7 @@
 import copy
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.reweighting import addPromptAndDisplaced
+from smodels.theory.element import Element
 
 class Uncovered(object):
     """
@@ -21,7 +22,7 @@ class Uncovered(object):
     :ivar sqrts: Center of mass energy. If defined it will only consider cross-sections
                 for this value. Otherwise the highest sqrts value will be used.
     """
-    def __init__(self, topoList, sumL=True, sumJet=True, sqrts=None):
+    def __init__(self, topoList, sigmacut, sumL=True, sumJet=True, sqrts=None):
         
         
         if sqrts is None:
@@ -38,7 +39,7 @@ class Uncovered(object):
         self.prevMothers = []
         self.outsideGridMothers = []
         self.getAllMothers(topoList)
-        self.fill(topoList)
+        self.fill(topoList, sigmacut)
 
     def getAllMothers(self, topoList):
         """
@@ -52,7 +53,7 @@ class Uncovered(object):
                     self.motherIDs.append(motherID)
                 
 
-    def fill(self, topoList, sigcut = 0.03*fb):
+    def fill(self, topoList, sigmacut):
         """
         Check all elements, categorise those not tested / missing, classify long cascade decays and asymmetric branches
         Fills all corresponding objects
@@ -71,11 +72,12 @@ class Uncovered(object):
                     newEl.branches[0]._decayType = branches1[i]._decayType
                     newEl.branches[1]._decayType = branches2[j]._decayType      
                     newEl.weight *= (probability1*probability2)    
-                    if newEl.weight.getMaxXsec() < sigcut: continue 
+                    if newEl.weight.getMaxXsec() < sigmacut: continue 
                     allElements.append(newEl) 
             
             
             for el in allElements:
+
                 if self.inPrevMothers(el): 
                     missing = False # cannot be missing if element with same mothers has already appeared
                 # this is because it can certainly be compressed further to the smaller element already seen in the loop
@@ -89,18 +91,19 @@ class Uncovered(object):
                         if not el.weight.getXsecsFor(self.sqrts): continue # remove elements that only have weight at higher sqrts                    
                         if self.inOutsideGridMothers(el): continue # if daughter element of current element is already counted skip this element                  
                         # in this way we do not double count, but always count the smallest compression that is outside the grid
-                        outsideX = self.getOutsideX(el) # as for missing topo, recursively find untested cross section
+                        outsideX = self.getMissingX(el, checkFor = 'tested') # as for missing topo, recursively find untested cross section
 
                         if outsideX: # if all mothers are tested, this is no longer outside grid contribution, otherwise add to list
                             el.missingX =  outsideX # for combined printing function, call outside grid weight missingX as well
-                            self.outsideGrid.addToTopos(el) # add to list of outsideGrid topos                        
+                            self.outsideGrid.addToGeneralElements(el) # add to list of outsideGrid topos                        
                     continue
                 
-                self.missingTopos.addToTopos(el) #keep track of all missing topologies
-                if self.hasLongLived(el): self.longLived.addToTopos(el)
-                elif self.hasDisplaced(el): self.displaced.addToTopos(el)
-                else: self.MET.addToTopos(el)
-
+                self.missingTopos.addToGeneralElements(el) #keep track of all missing topologies
+                if self.hasLongLived(el): self.longLived.addToGeneralElements(el)
+                elif self.hasDisplaced(el): self.displaced.addToGeneralElements(el)
+                else: self.MET.addToGeneralElements(el)
+                
+        
 
     def inPrevMothers(self, el): #check if smaller element with same mother has already been checked
         for mEl in el.motherElements:
@@ -137,7 +140,7 @@ class Uncovered(object):
 
     def isMissingTopo(self, el):
         """
-        A missing topology is not a mother element, not covered, and does not have mother which is covered
+        A missing topology is not a mother element, not covered, and does not have a mother which is covered
         :ivar el: Element
         """     
         if el.elID in self.motherIDs: return False # mother element can not be missing        
@@ -147,7 +150,7 @@ class Uncovered(object):
         el.missingX = missingX # missing cross section is found by adding up cross section of mothers not covered
         return True
 
-    def getMissingX(self,el):
+    def getMissingX(self,el, checkFor = 'covered'):
         """
         Calculate total missing cross section of element, by recursively checking if mothers are covered
         :ivar el: Element
@@ -164,109 +167,76 @@ class Uncovered(object):
             for mother in mothers:
                 if mother[-1].elID in alreadyChecked: continue # sanity check, to avoid double counting
                 alreadyChecked.append(mother[-1].elID) # now checking, so adding to alreadyChecked
-                if mother[-1].covered:
+                
+                if getattr(mother[-1], checkFor):
                     if not mother[-1].weight.getXsecsFor(self.sqrts): continue
                     missingX -= mother[-1].weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
                     continue # do not count cross section if mother is covered, do not continue recursion for this contribution
-                if not mother[-1].motherElements: continue # end of recursion if element has no mothers, we keep its cross section in missingX
+                
+                if all(grandmother[0] == 'original' for grandmother in mother[-1].motherElements) : continue # end of recursion if element has no mothers, we keep its cross section in missingX
                 else: newmothers += mother[-1].motherElements # if element has mother element, check also if those are covered before adding the cross section contribution
             mothers = newmothers # all new mothers will be checked until we reached the end of all recursions
         return missingX
-
-    def getOutsideX(self,el):
-        """
-        Calculate total outside grid cross section of element, by recursively checking if mothers are covered
-        :ivar el: Element
-        :returns: missing cross section in fb as number
-        """
-        #same as getMissingX, but we also keep track of the mother elements of outsideGrid contributions
-        # this is so we can find the smallest covered but not tested element in a chain of compressed elements     
-        mothers = el.motherElements
-        alreadyChecked = []
-        if not el.weight.getXsecsFor(self.sqrts): return 0.
-        missingX =  el.weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
-        if not mothers: return missingX
-        while mothers:
-            newmothers = []
-            for mother in mothers:
-                if mother[-1].elID in alreadyChecked: continue # sanity check, to avoid double counting
-                alreadyChecked.append(mother[-1].elID) # now checking, so adding to alreadyChecked
-                if mother[-1].tested:
-                    if not mother[-1].weight.getXsecsFor(self.sqrts): continue
-                    missingX -= mother[-1].weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
-                    continue
-                self.outsideGridMothers.append(mother[-1].elID) # mother element is not tested, but should no longer be considered as outside grid, because we already count its contribution here
-                if all(grandmother[0] == 'original' for grandmother in mother[-1].motherElements) : continue
-                else: newmothers += mother[-1].motherElements
-            mothers = newmothers
-           
-        return missingX
+    
 
 
 
-    def getUncoveredListXsec(self, uncoveredList, sqrts=None):
+class UncoveredList(object):
+    """
+    Object to find and collect UncoveredTopo objects, plus printout functionality
+    :ivar generalElements: missing elements, grouped by common general name using inclusive labels (e.g. jet)
+    :ivar sumL: if True sum electrons and muons to leptons
+    :ivar sumJet: if True, sum up jets
+    :ivar sqrts: sqrts, for printout
+    """
+    def __init__(self, sumL, sumJet, sqrts):
+        self.generalElements = []
+        self.sumL = sumL
+        self.sumJet = sumJet
+        self.sqrts = sqrts
+        
+        
+    def getTotalXsec(self, sqrts=None):
         """
         Calculate total missing topology cross section at sqrts. If no sqrts is given use self.sqrts
         :ivar sqrts: sqrts
         """
         xsec = 0.
         if not sqrts: sqrts = self.sqrts
-        for topo in uncoveredList.topos:
-            for el in topo.contributingElements:
+        for genEl in self.generalElements:
+            for el in genEl._contributingElements:
                 xsec += el.missingX
         return xsec
-    
-          
-class UncoveredTopo(object):
-    """
-    Object to describe one missing topology result / one topology outside the mass grid
-    :ivar topo: topology description
-    :ivar weights: weights dictionary
-    """
-    def __init__(self, topo, contributingElements=[]):
-        self.topo = topo
-        self.contributingElements = contributingElements
-        self.value = 0. # weight for sqrts set in uncoveredList, only set this in printout
+            
 
-class UncoveredList(object):
-    """
-    Object to find and collect UncoveredTopo objects, plus printout functionality
-    :ivar sumL: if true sum electrons and muons to leptons
-    :ivar sumJet: if true, sum up jets
-    :ivar sqrts: sqrts, for printout
-    """
-    def __init__(self, sumL, sumJet, sqrts):
-        self.topos = []
-        self.sumL = sumL
-        self.sumJet = sumJet
-        self.sqrts = sqrts
-
-    def addToTopos(self, el):
+    def addToGeneralElements(self, el):
         """
-        adds an element to the list of missing topologies
-        if the element contributes to a missing topology that is already
-        in the list, add weight to topology
+        Adds an element to the list of missing topologies = general elements.
+        If the element contributes to a missing topology that is already in the list, add element and weight to topology.
         :parameter el: element to be added
-        """
-        name, switchBranches = self.orderbranches(self.generalName(el.__str__()))     
-        if switchBranches: 
-            branch1 = el.branches[1]
-            branch2 = el.branches[0]
-        else: 
-            branch1 = el.branches[0]
-            branch2 = el.branches[1]  
-        name = name + '  (%s)'%(str(branch1._decayType) + ","+ str(branch2._decayType) )            
+        """        
+        
+        newEl = self.generalElement(el)
+        newEl.sortBranches()
+        
+        name = str(newEl) + '  %s'%(str( newEl.branches[0]._decayType) + ","+ str(newEl.branches[1]._decayType) )    
 
-        for topo in self.topos:
-            if name == topo.topo:
-                topo.contributingElements.append(el)
+        # Check if an element with the same generalized name has already been added
+        for genEl in self.generalElements:
+            if name == genEl._ouputDescription:
+                genEl._contributingElements.append(el)
+                genEl.missingX += el.missingX
                 return
-        self.topos.append(UncoveredTopo(name, [el]))
-        return
+            
+        newEl._ouputDescription = name           
+        newEl._contributingElements = [el]    
+        self.generalElements.append(newEl)
+        
 
-    def generalName(self, instr):
+    def generalElement(self, el):
         """
-        generalize by summing over charges
+        Creates a new element with a generalized name according to the inclusive labels. 
+        Generalization is done by summing over charges:
         sumL: e, mu are combined to l
         sumJet: quarks, g, pi are combined to jet
         :parameter instr: element as string
@@ -276,26 +246,11 @@ class UncoveredList(object):
         if self.sumL: exch = [fS.WList, fS.lList, fS.tList, fS.taList, fS.nuList] 
         else: exch = [fS.WList, fS.eList, fS.muList,fS.tList, fS.taList, fS.nuList]
         if self.sumJet: exch.append(fS.jetList)
-        for particleList in exch: 
-            particles = particleList.particles                
-            for p in particles:  
-                instr = instr.replace(p.label, particleList.label).replace("hijetjets","higgs")  # in higgs 'g' gets replaced by jet 
-        return instr
-                
-                
-    def orderbranches(self, instr):
-        """
-        unique ordering of branches
-        :parameter instr: element as string
-        :returns: string of ordered element
-        """
-        from smodels.theory.element import Element
-        li = Element(instr).getParticles()
-        for be in li:
-            for ve in be:
-                ve.sort()      
-        newLi = sorted(li)
-        if li != newLi: switchBranches = True
-        else: switchBranches = False
-        return str(newLi).replace("'", "").replace(" ", ""), switchBranches           
+        for particleList in exch:  
+            for branch in el.branches:
+                for vertex in branch.particles:
+                    for ip,particle in enumerate(vertex):
+                        if particle == particleList:
+                            vertex[ip] = particleList
+        return el 
 

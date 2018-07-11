@@ -415,6 +415,7 @@ class TxTPrinter(BasicPrinter):
         output += " || \t Experimental Constraints \t\t \t ||\n"
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
+        
                 
         for theoryPrediction in obj.theoryPredictions:
             expRes = theoryPrediction.expResult
@@ -436,6 +437,8 @@ class TxTPrinter(BasicPrinter):
                 for cond in theoryPrediction.conditions:
                     condlist.append(theoryPrediction.conditions[cond])
                 output += str(condlist) + "\n"
+                
+            
 
             #Get upper limit for the respective prediction:
             if expRes.datasets[0].dataInfo.dataType == 'upperLimit':
@@ -472,68 +475,49 @@ class TxTPrinter(BasicPrinter):
         :param obj: Uncovered object to be printed.
         """
                 
-        nprint = 10  # Number of missing topologies to be printed (ordered by cross sections)
+        nprint = 20  # Number of missing topologies to be printed (ordered by cross sections)
 
         output = ""
-        output += "\nTotal missing topology cross section (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.missingTopos))
-        output += "Total cross section where we are outside the mass grid (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.outsideGrid))
-        output += "Total cross section with longlived decays (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.longLived))
-        output += "Total cross section with displaced decays (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.displaced))
-        output += "Total cross section with MET decays (fb): %10.3E\n" %(obj.getUncoveredListXsec(obj.MET))
+        output += "\nTotal missing topology cross section (fb): %10.3E\n" %(obj.missingTopos.getTotalXsec())
+        output += "Total cross section where we are outside the mass grid (fb): %10.3E\n" %(obj.outsideGrid.getTotalXsec())
+        output += "Total cross section with longlived decays (fb): %10.3E\n" %(obj.longLived.getTotalXsec())
+        output += "Total cross section with displaced decays (fb): %10.3E\n" %(obj.displaced.getTotalXsec())
+        output += "Total cross section with MET decays (fb): %10.3E\n" %(obj.MET.getTotalXsec())
                                         
         output += "\nFull information on unconstrained cross sections\n"
         output += "================================================================================\n"
-        for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid]):
-            if len(uncovEntry.topos) == 0:
+        
+    
+        for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid, obj.longLived, obj.displaced, obj.MET]):
+            if len(uncovEntry.generalElements) == 0:
                 if ix == 0:
                     output += "No missing topologies found\n"
-                else:
+                elif ix == 1:
                     output += "No contributions outside the mass grid\n"
-            else:
-                for topo in uncovEntry.topos:
-                    if topo.value > 0.: continue
-                    for el in topo.contributingElements:
-                        topo.value += el.missingX
+            else:                    
                 if ix==0:
                     output += "Missing topologies with the highest cross sections (up to " + str(nprint) + "):\n"
-                else:
+                elif ix==1:
                     output += "Contributions outside the mass grid (up to " + str(nprint) + "):\n"
+                    
+                elif ix==2:
+                    output += "Missing topos: long lived decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
+                    
+                elif ix==3:
+                    output += "Missing topos: displaced decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
+                    
+                else:
+                    output += "Missing topos: MET decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))                
+                                
                 output += "Sqrts (TeV)   Weight (fb)                  Element description\n"        
-                for topo in sorted(uncovEntry.topos, key=lambda x: x.value, reverse=True)[:nprint]:
-                    output += "%5s         %10.3E    # %53s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),topo.value, str(topo.topo))
+                for genEl in sorted(uncovEntry.generalElements, key=lambda x: x.weight, reverse=True)[:nprint]:
+                    output += "%5s         %10.3E    # %53s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),genEl.missingX, str(genEl._ouputDescription))
                     if hasattr(self, "addcoverageid") and self.addcoverageid:
                         contributing = []
-                        for el in topo.contributingElements:
+                        for el in genEl._contributingElements:
                             contributing.append(el.elID)
                         output += "Contributing elements %s\n" % str(contributing)            
-            output += "================================================================================\n"
-       
-        for ix, uncovEntry in enumerate([obj.longLived, obj.displaced, obj.MET]):
-            if ix==0:
-                output += "Missing topos: long lived decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
-                
-            elif ix==1:
-                output += "Missing topos: displaced decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
-                
-            else:
-                output += "Missing topos: MET decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))                
-            
-            output += "Sqrts (TeV)   Weight (fb)                  Element description\n"  
-            
-            for topo in uncovEntry.topos:
-                if topo.value > 0.: continue
-                for el in topo.contributingElements:
-                    topo.value += el.missingX            
-            
-            for topo in sorted(uncovEntry.topos, key=lambda x: x.value, reverse=True)[:nprint]:
-                output += "%5s         %10.3E    # %60s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),topo.value, str(topo.topo))
-                if hasattr(self, "addcoverageid") and self.addcoverageid:
-                    contributing = []
-                    for el in topo.contributingElements:
-                        contributing.append(el.elID)
-                    output += "Contributing elements %s\n" % str(contributing)       
-                 
-            output += "================================================================================\n"         
+            output += "================================================================================\n"      
         
         return output
                       
@@ -719,7 +703,7 @@ class PyPrinter(BasicPrinter):
         allsqrts = sorted(list(set(sqrts)))
         for ssqrts in allsqrts:
             sqrts = ssqrts * TeV
-            xsecs = [xsec.value.asNumber(fb) for xsec in obj.weight.getXsecsFor(sqrts)]
+            xsecs = [xsec.weight.asNumber(fb) for xsec in obj.weight.getXsecsFor(sqrts)]
             if len(xsecs) != 1:
                 logger.warning("Element cross sections contain multiple values for %s .\
                 Only the first cross section will be printed" %str(sqrts))
@@ -783,9 +767,9 @@ class PyPrinter(BasicPrinter):
             txnamesDict = {}
             for el in cluster.elements:
                 if not el.txname.txName in txnamesDict:
-                    txnamesDict[el.txname.txName] = el.weight[0].value.asNumber(fb)
+                    txnamesDict[el.txname.txName] = el.weight[0].weight.asNumber(fb)
                 else:
-                    txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(fb)            
+                    txnamesDict[el.txname.txName] += el.weight[0].weight.asNumber(fb)            
             maxconds = theoryPrediction.getmaxCondition()
             mass = theoryPrediction.mass
             if mass:
@@ -870,75 +854,54 @@ class PyPrinter(BasicPrinter):
 
         missedTopos = []
         
-        
-        for topo in obj.missingTopos.topos:
-            if topo.value > 0.: continue
-            for el in topo.contributingElements:
-                topo.value += el.missingX
-        obj.missingTopos.topos = sorted(obj.missingTopos.topos, 
-                                        key=lambda x: [x.value,str(x.topo)], 
+        obj.missingTopos.generalElements = sorted(obj.missingTopos.generalElements, 
+                                        key=lambda x: [x.weight,str(x)], 
                                         reverse=True)        
     
-        for topo in obj.missingTopos.topos[:nprint]:
-            missed = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
-                                'element' : str(topo.topo)}           
+        for genEl in obj.missingTopos.generalElements[:nprint]:
+            missed = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.weight,
+                                'element' : str(genEl)}           
             if hasattr(self,"addelementlist") and self.addelementlist:
                 contributing = []
-                for el in topo.contributingElements:
+                for el in genEl._contributingElements:
                     contributing.append(el.elID)
                 missed["element IDs"] = contributing
             missedTopos.append(missed)
             
         outsideGrid = []
-        for topo in obj.outsideGrid.topos:
-            if topo.value > 0.: continue
-            for el in topo.contributingElements:
-                topo.value += el.missingX
-        obj.outsideGrid.topos = sorted(obj.outsideGrid.topos, 
-                                       key=lambda x: [x.value,str(x.topo)], 
+        obj.outsideGrid.generalElements = sorted(obj.outsideGrid.generalElements, 
+                                       key=lambda x: [x.weight,str(x.name)], 
                                        reverse=True)        
-        for topo in obj.outsideGrid.topos[:nprint]:
-            outside = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
-                                'element' : str(topo.topo)}      
+        for genEl in obj.outsideGrid.generalElements[:nprint]:
+            outside = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.weight,
+                                'element' : str(genEl.name)}      
             outsideGrid.append(outside)     
 
         longLived = []
-        for topo in obj.longLived.topos:
-            if topo.value > 0.: continue
-            for el in topo.contributingElements:
-                topo.value += el.missingX
-        obj.longLived.topos = sorted(obj.longLived.topos, 
-                                       key=lambda x: [x.value,str(x.topo)], 
+        obj.longLived.generalElements = sorted(obj.longLived.generalElements, 
+                                       key=lambda x: [x.weight,str(x.name)], 
                                        reverse=True)        
-        for topo in obj.longLived.topos[:nprint]:
-            long = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
-                                'element' : str(topo.topo)}      
+        for genEl in obj.longLived.generalElements[:nprint]:
+            long = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.weight,
+                                'element' : str(genEl.name)}      
             longLived.append(long)
             
         displaced = []
-        for topo in obj.displaced.topos:
-            if topo.value > 0.: continue
-            for el in topo.contributingElements:
-                topo.value += el.missingX
-        obj.displaced.topos = sorted(obj.displaced.topos, 
-                                       key=lambda x: [x.value,str(x.topo)], 
+        obj.displaced.generalElements = sorted(obj.displaced.generalElements, 
+                                       key=lambda x: [x.weight,str(x.name)], 
                                        reverse=True)        
-        for topo in obj.displaced.topos[:nprint]:
-            displ = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
-                                'element' : str(topo.topo)}      
+        for genEl in obj.displaced.generalElements[:nprint]:
+            displ = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.weight,
+                                'element' : str(genEl.name)}      
             displaced.append(displ)
             
         MET = []
-        for topo in obj.MET.topos:
-            if topo.value > 0.: continue
-            for el in topo.contributingElements:
-                topo.value += el.missingX
-        obj.MET.topos = sorted(obj.MET.topos, 
-                                       key=lambda x: [x.value,str(x.topo)], 
+        obj.MET.generalElements = sorted(obj.MET.generalElements, 
+                                       key=lambda x: [x.weight,str(x.name)], 
                                        reverse=True)        
-        for topo in obj.MET.topos[:nprint]:
-            met = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
-                                'element' : str(topo.topo)}      
+        for genEl in obj.MET.generalElements[:nprint]:
+            met = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.weight,
+                                'element' : str(genEl.name)}      
             MET.append(met)                        
 
         return {'Missed Topologies': missedTopos, 'Long-lived' : longLived,
@@ -1126,16 +1089,16 @@ class SLHAPrinter(TxTPrinter):
     def _formatUncovered(self, obj):
         output = ""
         for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid]):
-            for topo in uncovEntry.topos:
-                if topo.value > 0.: continue
-                for el in topo.contributingElements:
+            for genEl in uncovEntry.generalElements:
+                if genEl.weight > 0.: continue
+                for el in genEl._contributingElements:
                     if not el.weight.getXsecsFor(obj.missingTopos.sqrts): continue
-                    topo.value += el.missingX
+                    genEl.weight += el.missingX
             if ix==0: output += "BLOCK SModelS_Missing_Topos #sqrts[TeV] weight[fb] description\n"
             else: output += "\nBLOCK SModelS_Outside_Grid #sqrts[TeV] weight[fb] description\n"
             cter = 0
-            for t in sorted(uncovEntry.topos, key=lambda x: x.value, reverse=True):
-                output += " %d %d %10.3E %s\n" % (cter, obj.missingTopos.sqrts/TeV, t.value, str(t.topo))
+            for t in sorted(uncovEntry.generalElements, key=lambda x: x.weight, reverse=True):
+                output += " %d %d %10.3E %s\n" % (cter, obj.missingTopos.sqrts/TeV, t.weight, str(t.name))
                 cter += 1
                 if cter > 9: break
         for ix, uncovEntry in enumerate([obj.longCascade, obj.asymmetricBranches]):

@@ -16,18 +16,18 @@ smodelsOutputDefault = {'ExptRes': [{'AnalysisSqrts (TeV)': 8, 'chi2': 0.4904874
                         'Missed Topologies': [{'weight (fb)': 0.33566143994880704, 'sqrts (TeV)': 8.0, \
                                                'element': "[[[l]],[[l]]]  (prompt,prompt)"},\
                                                {'weight (fb)': 0.292726855699, 'sqrts (TeV)': 8.0, \
-                                                'element': "[[],[]]  (prompt,prompt)"}, \
+                                                'element': "[[],[]]  (METonly,METonly)"}, \
                                                {'weight (fb)': 0.20160837911741347, 'sqrts (TeV)': 8.0, \
-                                                'element': "[[],[[l]]]  (prompt,prompt)"}, \
+                                                'element': "[[],[[l]]]  (METonly,prompt)"}, \
                                                {'weight (fb)': 0.03292621519040023, 'sqrts (TeV)': 8.0, \
-                                                'element': "[[],[[jet]]]  (prompt,prompt)"}], \
+                                                'element': "[[],[[jet]]]  (METonly,prompt)"}], \
                         'MET': [{'weight (fb)': 0.33566143994880704, 'sqrts (TeV)': 8.0, \
                                                'element': "[[[l]],[[l]]]  (prompt,prompt)"},\
                                                {'weight (fb)': 0.292726855699, 'sqrts (TeV)': 8.0, \
-                                                'element': "[[],[]]  (prompt,prompt)"}, \
+                                                'element': "[[],[]]  (METonly,METonly)"}, \
                                                {'weight (fb)': 0.20160837911741347, 'sqrts (TeV)': 8.0, \
-                                                'element': "[[],[[l]]]  (prompt,prompt)"}, \
+                                                'element': "[[],[[l]]]  (METonly,prompt)"}, \
                                                {'weight (fb)': 0.03292621519040023, 'sqrts (TeV)': 8.0, \
-                                                'element': "[[],[[jet]]]  (prompt,prompt)"}], \
+                                                'element': "[[],[[jet]]]  (METonly,prompt)"}], \
                         'Outside Grid': [{'weight (fb)': 0.3697721919394868, 'sqrts (TeV)': 8.0, \
                                           'element': "[[[jet]],[[jet]]]  (prompt,prompt)"}]}
