@@ -19,7 +19,7 @@ from smodels.tools import coverage
 from smodels.tools.smodelsLogging import setLogLevel
 setLogLevel("info")
 # Set the path to the database
-database = Database("smodels-database")
+database = Database("http://smodels.hephy.at/database/official113")
 
 def main():
     """
