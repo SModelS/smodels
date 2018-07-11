@@ -15,16 +15,16 @@ from smodels.theory.model import Model
 
 #Particle groups
 eList = ParticleList('e' , [leptons[0], leptonsC[0]])
-muList = ParticleList('mu' , [leptons[2], leptonsC[2]])
-taList = ParticleList('ta' , [leptons[4], leptonsC[4]])
-lpList = ParticleList('l+' , [leptonsC[0],leptonsC[2]])
-lmList = ParticleList('l-'  , [leptons[0],leptons[2]]) 
+muList = ParticleList('mu' , [leptons[1], leptonsC[1]])
+taList = ParticleList('ta' , [leptons[2], leptonsC[2]])
+lpList = ParticleList('l+' , [leptonsC[0],leptonsC[1]])
+lmList = ParticleList('l-'  , [leptons[0],leptons[1]]) 
 lList = ParticleList('l' , lpList.particles + lmList.particles ) 
-nuList = ParticleList('nu' , [leptons[1],leptons[3],leptons[5],leptonsC[1],leptonsC[3],leptonsC[5]])
+nuList = ParticleList('nu' , [leptons[3],leptons[4],leptons[5],leptonsC[3],leptonsC[4],leptonsC[5]])
 WList = ParticleList('W'  , [gauge[2],gaugeC[2]])
 tList = ParticleList('t'  , [quarks[4],quarksC[4]])
-LpList = ParticleList('L+' , lpList.particles + [ leptonsC[4] ])
-LmList = ParticleList('L-' , lmList.particles + [ leptons[4] ])
+LpList = ParticleList('L+' , lpList.particles + [ leptonsC[2] ])
+LmList = ParticleList('L-' , lmList.particles + [ leptons[2] ])
 LList = ParticleList('L'  , LpList.particles + LmList.particles )
 jetList = ParticleList('jet' ,  quarks[0:4] + [gauge[0]] + [pip,piz] + quarksC[0:4] + [ gaugeC[0] ] 
                        + [piz.chargeConjugate('pi'),pip.chargeConjugate('pi')])

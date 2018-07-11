@@ -164,7 +164,7 @@ class RunSModelSTest(unittest.TestCase):
         
     def testGoodFileHSCP(self):
         filename = join ( iDir(), "inputFiles/slha/longLived.slha" )
-        outputfile = self.runMain(filename, suppressStdout=False)
+        outputfile = self.runMain(filename)
         shutil.copyfile(outputfile,'./outputHSCP.py')
         from longLived_default import smodelsOutputDefault
         from outputHSCP import smodelsOutput
@@ -172,7 +172,6 @@ class RunSModelSTest(unittest.TestCase):
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                     res['AnalysisID'],res['DataSetID']])
-              
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)            
         for i in [ './outputHSC.py', './outputHSCP.pyc' ]:
