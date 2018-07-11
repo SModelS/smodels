@@ -62,13 +62,13 @@ class XSecTest(unittest.TestCase):
     def testLOGlu(self):
         """ test the computation of LO cross section and compare with pythia6 """
 
-        slhafile  = "../inputFiles/slha/gluino_squarks.slha"
+        slhafile  = "./testFiles/slha/gluino_squarks.slha"
         computer6 = xsecComputer.XSecComputer(LO, Nevents, 6)
         computer8 = xsecComputer.XSecComputer(LO, Nevents, 8)
         w6 = computer6.compute(8*TeV, slhafile).getDictionary()
         w8 = computer8.compute(8*TeV, slhafile, pythiacard = './pythia8_to_pythia6.cfg').getDictionary()
         self.assertEqual(compareXSections(w6, w8,Nevents),True) 
-        slhafile  = "../inputFiles/slha/lightEWinos.slha"
+        slhafile  = "./testFiles/slha/lightEWinos.slha"
         computer6 = xsecComputer.XSecComputer(LO, Nevents, 6)
         computer8 = xsecComputer.XSecComputer(LO, Nevents, 8)
         w6 = computer6.compute(8*TeV, slhafile).getDictionary()

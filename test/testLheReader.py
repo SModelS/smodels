@@ -1,4 +1,4 @@
-#!/usr/bin/env python333
+#!/usr/bin/env python3
 
 """
 .. module:: testLheReader
@@ -17,10 +17,9 @@ class LheReaderTest(unittest.TestCase):
     def testReader(self):
         """ test the LheReader """
         from smodels.theory import lheReader, lheDecomposer, crossSection
-        from smodels.installation import installDirectory
         from smodels.tools.physicsUnits import GeV
 
-        filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory() )
+        filename = "./testFiles/lhe/simplyGluino.lhe"
         reader = lheReader.LheReader(filename)
         event = reader.next()
         element = lheDecomposer.elementFromEvent(event,

@@ -28,7 +28,7 @@ class RunSModelSTest(unittest.TestCase):
         for i in os.listdir( out ):
             if i[-8:]==".smodels":
                 os.unlink( os.path.join ( out, i ))
-        dirname = join( iDir(), "inputFiles/slha/" )
+        dirname = "./testFiles/slha/"
         runMain(dirname)
         nout = len([i for i in glob.iglob("unitTestOutput/*smodels") if not "~" in i])
         nin = len([i for i in glob.iglob("%s/*slha" % dirname) if not "~" in i])
@@ -37,7 +37,7 @@ class RunSModelSTest(unittest.TestCase):
         self.assertTrue( nout == nin )
      
     def timeoutRun(self):
-        filename = join ( iDir(), "inputFiles/slha/complicated.slha" )
+        filename = "./testFiles/slha/complicated.slha"
         outputfile = runMain(filename, timeout=1, suppressStdout=True,
                              development=True, inifile = "timeout.ini" )
      
@@ -50,7 +50,7 @@ class RunSModelSTest(unittest.TestCase):
             if os.path.exists ( i ): os.remove ( i )
   
     def testGoodFile(self):
-        filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
+        filename = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(filename)
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
@@ -66,7 +66,7 @@ class RunSModelSTest(unittest.TestCase):
       
     def testGoodFile13(self):
             
-        filename = join ( iDir(), "inputFiles/slha/simplyGluino.slha" )
+        filename = "./testFiles/slha/simplyGluino.slha"
         outputfile = runMain(filename,suppressStdout = True )
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
@@ -89,7 +89,7 @@ class RunSModelSTest(unittest.TestCase):
     
     def testBadFile(self):
         # since 112 we skip non-existing slha files!
-        filename = join (iDir(), "inputFiles/slha/I_dont_exist.slha" )
+        filename = "./testFiles/slha/I_dont_exist.slha"
         of="unitTestOutput/I_dont_exist.slha.py"
         self.removeOutputs ( of )
         outputfile = runMain(filename  )
@@ -103,7 +103,7 @@ class RunSModelSTest(unittest.TestCase):
             if os.path.exists ( i ): os.remove ( i )
     
     def testCrash(self):
-        filename = join ( iDir(), "inputFiles/slha/gluino_squarks.slha" )
+        filename = "./testFiles/slha/gluino_squarks.slha"
         ctr=0
         crash_file = None
         self.cleanUp()

@@ -19,7 +19,7 @@ class CompressionTest(unittest.TestCase):
 
     def testInvisiblePositive(self):
         """ test the invisible compression, a positive example """
-        slhafile="../inputFiles/slha/higgsinoStop.slha"
+        slhafile="./testFiles/slha/higgsinoStop.slha"
         topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, True, 5.*GeV )
         for topo in topos:
             if str(topo)!="[0][0]":
@@ -35,7 +35,7 @@ class CompressionTest(unittest.TestCase):
 
     def testInvisibleNegative(self):
         """ test the invisible compression, a negative example """
-        slhafile="../inputFiles/slha/higgsinoStop.slha"
+        slhafile="./testFiles/slha/higgsinoStop.slha"
         topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, True, 5.*GeV )
         for topo in topos:
             if str(topo)!="[1,1,0][1,1,0]":
@@ -56,7 +56,7 @@ class CompressionTest(unittest.TestCase):
 
     def testMass(self):
         """ test the mass compression, a positive example """
-        slhafile="../inputFiles/slha/higgsinoStop.slha"
+        slhafile="./testFiles/slha/higgsinoStop.slha"
         topos = slhaDecomposer.decompose ( slhafile, .1*fb, True, False, 5.*GeV )
         for topo in topos:
             if str(topo)!="[1,0][1,0]":
