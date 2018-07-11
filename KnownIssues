@@ -5,4 +5,3 @@ Known Issues, v1.1.3
    when using older versions of lapack (called by scipy).
  * Signal uncertainties are considered when computing the upper limit
    for the best signal region, but not for the combined one
- * Distinct database pickle files are required for python2 and python3

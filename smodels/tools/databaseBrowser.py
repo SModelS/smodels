@@ -18,16 +18,15 @@ class Browser(object):
 
     """Browses the database, exits if given path does not point to a valid
     smodels-database. Browser can be restricted to specified run or experiment.
-    Verbosity can be set to specified level.
-
-    :ivar database: Database object holding all the database information
-    :ivar _selectedExpResults: list of experimental results loaded in the browser.
-                       Can be used to hold a subset of results in the database.
-                       By default all results are loaded.
-
     """
+    
     def __init__(self, database, force_txt = False ):
         """
+        :ivar _selectedExpResults: list of experimental results loaded in the browser.
+                           Can be used to hold a subset of results in the database.
+                           By default all results are loaded.
+        
+        
         :param database: Path to the database or Database object
         """
 
