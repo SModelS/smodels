@@ -233,8 +233,8 @@ class Database(object):
             logger.debug (  " * write %s db version %s, format version %s, %s" % \
                     ( binfile, self.txt_meta.databaseVersion,
                       self.txt_meta.format_version, self.txt_meta.cTime() ) )
-#           ptcl = serializer.HIGHEST_PROTOCOL
-            ptcl = 2
+            ptcl = serializer.HIGHEST_PROTOCOL
+#             ptcl = 2
             serializer.dump(self.txt_meta, f, protocol=ptcl)
             serializer.dump(self.expResultList, f, protocol=ptcl)
             logger.info (  "%s created." % ( binfile ) )
