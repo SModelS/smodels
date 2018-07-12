@@ -188,7 +188,7 @@ class XSection(object):
         """
         Generate cross section information in string format.
         """
-        st = self.info.label + ':' + str(self.value)+ " " + str(self.pid)
+        st = self.info.label + ':' + str(self.value)
         return st
 
     def niceStr(self):
