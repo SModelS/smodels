@@ -59,7 +59,9 @@ class ExternalPythonTool(object):
 pythonTools = { "unum" : ExternalPythonTool("unum"),
                 "numpy": ExternalPythonTool("numpy"),
                 "pyslha": ExternalPythonTool("pyslha"),
-                "scipy": ExternalPythonTool("scipy") }
+                "scipy": ExternalPythonTool("scipy"),
+                "plotly": ExternalPythonTool("plotly"),
+                "pandas": ExternalPythonTool("pandas"), }
 
 
 if __name__ == "__main__":
