@@ -258,6 +258,10 @@ class DataHolder(object):
                                                                 outFolder,data_frame_nonexcluded,self.plot_data,
                                                                 self.plot_title)
         
+        interactivePlotsHelpers.create_main_html(outFolder,self.plot_data,self.plot_list)
+        
+        logger.info('Generation of interactive plots finished. Go to: \n %s/main.html \n to see the plots.' %outFolder)
+        
         return True
 
 
@@ -289,7 +293,5 @@ def main(args):
     loadData = dataHolder.loadData(args.npoints)
     if not loadData:
         raise SModelSError("Error loading data from folders:\n %s\n %s" %(smodelsFolder,slhaFolder))
-    
-    data_dict = dataHolder.data_dict
     
     dataHolder.makePlots(args.outputFolder) 

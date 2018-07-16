@@ -7,7 +7,6 @@
 """
 
 
-import plotly.plotly as py
 import plotly.graph_objs as go
 import plotly,imp
 import pandas as pd
@@ -52,7 +51,7 @@ def get_entry(inputDict,*keys):
     
     key = keys.pop(0)
     if not key in inputDict:
-        logger.warning('Key %s not found in input dictionary' %key)
+        logger.debug('Key %s not found in input dictionary' %key)
         return False
     else:
         return get_entry(inputDict[key],*keys)
@@ -551,8 +550,23 @@ def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_
      
             plotly.offline.plot(fig, filename = path_to_plots+'/'+disc_plot+'_non-excluded.html', auto_open=False)
     return;
- 
-def exec_main_html():
-    """ Opens main_html.py which generates main.html, with the list of all generated plots.  """
-    import interactive_plots_mainhtml
-    return;
+
+
+
+def create_main_html(path_to_plots,plot_data,plot_list):
+    """
+    Fills the main.html file with links to the interactive plots.
+    """
+    
+    main_file= open(path_to_plots+'/main.html', 'w')
+    main_file.write('<html><head><font size=6>Smodels interactive plots.</font></head>')
+    hyperlink_format = '<a href={link}>{text}</a>' 
+    for plot in plot_list:
+        plot_name=plot.split('.')[0]
+        main_file.write('<p>'+plot_name+': ')
+        for option in plot_data:   
+            plot_link=hyperlink_format.format(link=plot_name+'_'+option+'.html', text=option) 
+            main_file.write(plot_link)
+            main_file.write(' ')  
+        main_file.write('</p>')   
+    return True 
