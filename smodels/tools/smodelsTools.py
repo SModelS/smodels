@@ -77,7 +77,7 @@ def main():
     dbBrowser.add_argument('-t', '--text', help='load text database, dont even search for binary database file', action='store_true')
     
     iPlots = subparsers.add_parser('interactive-plots', description="Produces a set of interactive plots fo visualizing results from a scan.")
-    iPlots.add_argument('-p', '--parameters', help='path to the parameters file.  Default is iplots_parameters.py', required=True,
+    iPlots.add_argument('-p', '--parameters', help='path to the parameters file (default = iplots_parameters.py)', required=True,
                               default = 'iplots_parameters.py')
     iPlots.add_argument('-f', '--smodelsFolder', help='path to the smodels folder with the SModelS python or xml output files.', 
                             required=True)
@@ -87,7 +87,7 @@ def main():
                             required=True)
     
     iPlots.add_argument('-N', '--npoints', type=int, default=-1,
-        help="Number of points include in the plot. If -1 or not defined, all points will be read and included.")
+        help="Number of points included in the plot. If -1 all points will be read and included (default = -1).")
     
     iPlots.add_argument('-v', '--verbosity', type=str, default="info",
         help="Verbosity (debug, info, warning, error)")
