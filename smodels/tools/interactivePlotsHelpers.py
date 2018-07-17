@@ -149,6 +149,7 @@ def get_missed_topologies(data_dict,smodelsOuptut):
         
     missedtopo_max_xsec=0
     missedtopo_total_xsec=0
+    missed_topo = None
     for missed_topo in get_entry(smodelsOuptut, 'Missed Topologies'):
         missedtopo_xsec=missed_topo.get('weight (fb)')
         missedtopo_total_xsec=missedtopo_total_xsec+missedtopo_xsec
@@ -568,5 +569,6 @@ def create_main_html(path_to_plots,plot_data,plot_list):
             plot_link=hyperlink_format.format(link=plot_name+'_'+option+'.html', text=option) 
             main_file.write(plot_link)
             main_file.write(' ')  
-        main_file.write('</p>')   
+        main_file.write('</p>')
+    main_file.close()
     return True 

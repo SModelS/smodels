@@ -294,4 +294,6 @@ def main(args):
     if not loadData:
         raise SModelSError("Error loading data from folders:\n %s\n %s" %(smodelsFolder,slhaFolder))
     
-    dataHolder.makePlots(args.outputFolder) 
+    dataHolder.makePlots(args.outputFolder)
+    
+    return True
