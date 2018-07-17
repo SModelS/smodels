@@ -1,8 +1,10 @@
 """
-   .. module:: interactive_plots_parser
-   :synopsis: Generates the interactive plots.
+.. module:: interactivePlotsHelpers
+   :synopsis: Main functions for producing interactive plots
    
-   .. moduleauthor:: Humberto Reyes <humberto.reyes-gonzalez@lpsc.in2p3.fr>
+.. moduleauthor:: Humberto Reyes <humberto.reyes-gonzalez@lpsc.in2p3.fr>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+
    
 """
 

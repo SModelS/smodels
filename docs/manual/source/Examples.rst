@@ -39,4 +39,10 @@ Examples using the Database Browser
 
 * `How to select specific results <browserExample3.html>`_ (download the Python code :download:`here <recipes/browserExample3.py>`, IPython notebook :download:`here <recipes/browserExample3.ipynb>`)
 
+Examples using the Interactive Plots tool
+-----------------------------------------
+
+* `How to make interactive plots <interactivePlotsExample.html>`_ (download the Python code :download:`here <recipes/interactivePlotsExample.py>`, IPython notebook :download:`here <recipes/interactivePlotsExample.ipynb>`)
+
+
 .. [*] Some of the output may change depending on the database version used.

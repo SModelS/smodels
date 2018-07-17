@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
-
 """
 .. module:: interactive_plots
    :synopsis: Main module of the interactive plots.
    
-   .. moduleauthor:: Humberto Reyes <humberto.reyes-gonzalez@lpsc.in2p3.fr>
-   .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-   .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: Humberto Reyes <humberto.reyes-gonzalez@lpsc.in2p3.fr>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+   
 """
 
 from __future__ import print_function
@@ -267,9 +265,19 @@ class DataHolder(object):
 
 
 
-def main(args):
+def makePlots(smodelsFolder,slhaFolder,outputFolder,
+         parameters,npoints,verbosity):
     """
     Main interface for the interactive-plots. 
+    
+    :parameter smodelsFolder: Path to the folder containing the SModelS python output
+    :parameter slhaFolder: Path to the folder containing the SLHA files corresponding to the SModelS output
+    :parameter parameters: Path to the parameter file setting the options for the interactive plots
+    :parameter npoints: Number of points used to produce the plot. If -1, all points will be used.
+    :parameter verbosity: Verbosity of the output (debug,info,warning,error)
+    
+    :return: True if the plot creation was successfull
+    
     """
 
     try:
@@ -282,18 +290,31 @@ def main(args):
     except ImportError as e:
         raise SModelSError("Pandas is not installed. To use this tool, please install pandas")
 
-    setLogLevel(args.verbosity)
+    setLogLevel(verbosity)
 
     #Basic checks:
-    smodelsFolder = args.smodelsFolder
-    slhaFolder = args.slhaFolder
-    parFile = args.parameters
+    smodelsFolder = smodelsFolder
+    slhaFolder = slhaFolder
+    parFile = parameters
     
     dataHolder = DataHolder(smodelsFolder,slhaFolder,parFile)
-    loadData = dataHolder.loadData(args.npoints)
+    loadData = dataHolder.loadData(npoints)
     if not loadData:
         raise SModelSError("Error loading data from folders:\n %s\n %s" %(smodelsFolder,slhaFolder))
     
-    dataHolder.makePlots(args.outputFolder)
+    dataHolder.makePlots(outputFolder)
     
-    return True
+    return outputFolder
+
+def main(args):
+    """
+    Create the interactive plots using the input from argparse
+    
+    :parameter args: argparser.Namespace object containing the options for makePlots
+    """
+    
+    
+    return makePlots(args.smodelsFolder, args.slhaFolder, args.outputFolder, 
+                     args.parameters, args.npoints, args.verbosity)
+    
+    

@@ -38,8 +38,12 @@ class RunInteractivePlotSTest(unittest.TestCase):
 
         run = main(parser)
         
-        self.assertTrue(run)        
+        self.assertEqual(run,outFolder)        
         self.assertEqual(sorted(os.listdir(outFolder)), sorted(os.listdir(defaultFolder)))
+
+        if os.path.isdir(outFolder):
+            shutil.rmtree(outFolder)
+
 
 if __name__ == "__main__":
     unittest.main()
