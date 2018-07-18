@@ -20,7 +20,7 @@ available.
 Installation
 ============
 
-For instructions on how to install SModelS, see INSTALLATION.rst or
+For instructions on how to install SModelS, see 
 the section `Installation <http://smodels.readthedocs.io/en/latest/Installation.html>`_ of the `SModelS online manual`_.
 
 

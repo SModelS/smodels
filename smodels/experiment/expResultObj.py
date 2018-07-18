@@ -86,8 +86,10 @@ class ExpResult(object):
         pclfile = "%s/.%s" % ( self.path, meta.getPickleFileName() )
         logger.debug ( "writing expRes pickle file %s, mtime=%s" % (pclfile, meta.cTime() ) )
         f=open( pclfile, "wb" )
-        serializer.dump( meta, f )
-        serializer.dump( self, f )
+        ptcl = serializer.HIGHEST_PROTOCOL        
+#         ptcl = 2
+        serializer.dump(meta, f, protocol=ptcl)
+        serializer.dump(self, f, protocol=ptcl)
         f.close()
 
     def __eq__(self, other ):

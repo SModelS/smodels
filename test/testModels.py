@@ -18,7 +18,7 @@ from unitTestHelpers import equalObjs, runMain
 from smodels.tools.smodelsLogging import setLogLevel
 from smodels.tools import runtime
 from smodels import particlesLoader
-from importlib import reload
+from imp import reload
 
 # setLogLevel('debug')
  
@@ -26,7 +26,7 @@ from importlib import reload
 class ModelsTest(unittest.TestCase):
   
     def testRuntimeImport(self):
-        filename = join( iDir(), "inputFiles/slha/idm_example.slha")
+        filename = "./testFiles/slha/idm_example.slha"
         runtime.modelFile = 'idm'
         reload(particlesLoader)
         outputfile = runMain(filename,inifile='testParameters_noModel.ini',suppressStdout=True)
@@ -43,7 +43,7 @@ class ModelsTest(unittest.TestCase):
         self.removeOutputs(outputfile)
          
     def testParameterFile(self):
-        filename = join( iDir(), "inputFiles/slha/idm_example.slha")
+        filename = "./testFiles/slha/idm_example.slha"
         outputfile = runMain(filename,inifile='testParameters_idm.ini',suppressStdout=True)        
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
@@ -60,7 +60,7 @@ class ModelsTest(unittest.TestCase):
     def testWrongModel(self):
         runtime.modelFile = 'mssm'
         reload(particlesLoader)
-        filename = join( iDir(), "inputFiles/slha/idm_example.slha")
+        filename = "./testFiles/slha/idm_example.slha"
         outputfile = runMain(filename,suppressStdout=True)
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )

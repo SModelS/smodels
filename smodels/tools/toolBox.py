@@ -10,7 +10,6 @@
 
 """
 
-import argparse
 import types
 from smodels.tools import pythia6Wrapper
 from smodels.tools import pythia8Wrapper

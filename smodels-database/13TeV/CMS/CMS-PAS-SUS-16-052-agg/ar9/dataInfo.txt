@@ -1,0 +1,8 @@
+dataId: ar9
+dataType: efficiencyMap
+observedN: 16
+expectedBG: 23.1
+bgError: 4.075536774462966
+upperLimit: 0.225150*fb
+expectedUpperLimit: 0.370475*fb
+aggregated: SR1LcY

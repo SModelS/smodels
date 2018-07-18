@@ -12,7 +12,7 @@
 from __future__ import print_function
 import argparse
 from smodels.tools import xsecComputer
-from smodels.tools import slhaChecks, lheChecks, databaseBrowser, toolBox
+from smodels.tools import slhaChecks, lheChecks, databaseBrowser, toolBox, interactivePlots
 from smodels.tools import smodelsLogging
 
 
@@ -29,7 +29,7 @@ def main():
     fixpermissions = subparsers.add_parser('fixpermissions', description="Fix file permissions for xseccomputer.")
     xseccomputer = subparsers.add_parser('xseccomputer', description="Compute MSSM cross sections for a SLHA file.")
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
-        help="sqrt(s) TeV. Can supply more than one value. Default is both 8 and 13.",
+        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). Default is both 8 and 13.",
         type=int, default=[])
     xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
         help="number of events to be simulated.")
@@ -75,6 +75,23 @@ def main():
     dbBrowser = subparsers.add_parser('database-browser', description="Interface for browsing the Database.")
     dbBrowser.add_argument('-p', '--path_to_database', help='path to SModelS database', required=True)
     dbBrowser.add_argument('-t', '--text', help='load text database, dont even search for binary database file', action='store_true')
+    
+    iPlots = subparsers.add_parser('interactive-plots', description="Produces a set of interactive plots fo visualizing results from a scan.")
+    iPlots.add_argument('-p', '--parameters', help='path to the parameters file (default = iplots_parameters.py)', required=True,
+                              default = 'iplots_parameters.py')
+    iPlots.add_argument('-f', '--smodelsFolder', help='path to the smodels folder with the SModelS python or xml output files.', 
+                            required=True)
+    iPlots.add_argument('-s', '--slhaFolder', help='path to the SLHA folder with the SLHA input files.', 
+                            required=True)
+    iPlots.add_argument('-o', '--outputFolder', help='path to the output folder, where the plots will be stored.', 
+                            required=True)
+    
+    iPlots.add_argument('-N', '--npoints', type=int, default=-1,
+        help="Number of points included in the plot. If -1 all points will be read and included (default = -1).")
+    
+    iPlots.add_argument('-v', '--verbosity', type=str, default="info",
+        help="Verbosity (debug, info, warning, error)")
+
 
     toolbox = subparsers.add_parser( 'toolbox', description=
 								                     "Facility to control external dependencies")
@@ -86,7 +103,7 @@ def main():
                            action='store_true')
     args = parser.parse_args()
 
-    smodelsLogging.setLogLevel ( args.verbose )
+    smodelsLogging.setLogLevel(args.verbose)
 
     if args.subparser_name == 'fixpermissions':
         from smodels import installation
@@ -111,6 +128,8 @@ def main():
         lheChecks.main(args)
     if args.subparser_name == 'database-browser':
         databaseBrowser.main(args)
+    if args.subparser_name == 'interactive-plots':
+        interactivePlots.main(args)
 
 if __name__ == '__main__':
     main()

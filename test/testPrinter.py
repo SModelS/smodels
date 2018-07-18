@@ -8,7 +8,7 @@
 
 """
 
-import sys,os
+import sys,os,importlib
 sys.path.insert(0,"../")
 import unittest
 from smodels.installation import installDirectory as idir
@@ -21,7 +21,7 @@ import summaryReader
 from xml.etree import ElementTree
 from databaseLoader import database
 from unitTestHelpers import equalObjs
-from importlib import reload
+from imp import reload
 from smodels.tools import runtime
 from smodels import particlesLoader
 
@@ -124,7 +124,7 @@ class RunPrinterTest(unittest.TestCase):
         #Define options:
         mprinter.Printers['summary'].expandedSummary = True
          
-        slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
+        slhafile = "./testFiles/slha/gluino_squarks.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)
          
@@ -151,11 +151,12 @@ class RunPrinterTest(unittest.TestCase):
         #Define options:
         mprinter.Printers['python'].addElementList = False
                
-        slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
+        slhafile = "./testFiles/slha/gluino_squarks.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)
            
-        from unitTestOutput.printer_output import smodelsOutput
+        smodelsOutput = importlib.import_module( "unitTestOutput.printer_output" ).smodelsOutput
+        # from unitTestOutput.printer_output import smodelsOutput
         #Test python output
         from gluino_squarks_default import smodelsOutputDefault 
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
@@ -179,12 +180,12 @@ class RunPrinterTest(unittest.TestCase):
         #Define options:
         mprinter.Printers['python'].addelementlist = True
          
-        slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
+        slhafile = "./testFiles/slha/simplyGluino.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)
         
-        #Test python output
-        from unitTestOutput.printer_output_simple import smodelsOutput
+        smodelsOutput = importlib.import_module( "unitTestOutput.printer_output_simple" ).smodelsOutput
+        # from unitTestOutput.printer_output_simple import smodelsOutput
         from simplyGluino_default import smodelsOutputDefault    
          
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
@@ -208,7 +209,7 @@ class RunPrinterTest(unittest.TestCase):
         #Define options:
         mprinter.Printers['xml'].addelementlist = False                    
   
-        slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
+        slhafile = "./testFiles/slha/gluino_squarks.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)                    
                       
@@ -235,7 +236,7 @@ class RunPrinterTest(unittest.TestCase):
         #Define options:
         mprinter.Printers['xml'].addelementlist = True   
  
-        slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
+        slhafile = "./testFiles/slha/simplyGluino.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)                    
                      

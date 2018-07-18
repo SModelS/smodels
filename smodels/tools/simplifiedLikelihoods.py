@@ -54,7 +54,7 @@ class Data:
         :param deltas_rel: the assumed relative error on the signal hypotheses. 
                            The default is 20%.
         """
-        self.observed = self.convert(observed)
+        self.observed = NP.around(self.convert(observed)) #Make sure observed number of events are integers
         self.backgrounds = self.convert(backgrounds)
         self.n = len(self.observed)
         self.covariance = self._convertCov(covariance)
@@ -359,10 +359,10 @@ class LikelihoodComputer:
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     # def prob(x0, x1 )
-    def probMV(self, nll, *thetaA ):
+    def probMV(self, nll, theta ):
         """ probability, for nuicance parameters theta
         :params nll: if True, compute negative log likelihood """
-        theta = array ( thetaA )
+        # theta = array ( thetaA )
         # ntot = self.model.backgrounds + self.nsig
         # lmbda = theta + self.ntot ## the lambda for the Poissonian
         if self.model.isLinear():
@@ -378,23 +378,25 @@ class LikelihoodComputer:
             poisson = stats.poisson.pmf( self.model.observed, lmbda )
             #print ( "nonll",poisson )
         try:
+            M = [0.]*len(theta)
+            C = self.model.V
+            if self.model.n == 1:
+                C = self.model.totalCovariance(self.nsig)
             if nll:
-                gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.model.totalCovariance(self.nsig))
-                # gaussian = stats.multivariate_normal.logpdf(theta,mean=[0.]*len(theta),cov=self.model.V)
+                gaussian = stats.multivariate_normal.logpdf(theta,mean=M,cov=C)
                 ret = - gaussian - sum(poisson)
             else:
-                gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=self.model.totalCovariance(self.nsig))
-                # gaussian = stats.multivariate_normal.pdf(theta,mean=[0.]*len(theta),cov=self.model.V)
+                gaussian = stats.multivariate_normal.pdf(theta,mean=M,cov=C)
                 ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
             return ret
         except ValueError as e:
-            raise Exception("ValueError %s, %s" % ( e, self.model.totalCovariance(nsig) ))
+            raise Exception("ValueError %s, %s" % ( e, self.model.totalCovariance(self.nsig) ))
             # raise Exception("ValueError %s, %s" % ( e, self.model.V ))
 
     def nll( self, theta ):
         """ probability, for nuicance parameters theta,
         as a negative log likelihood. """
-        return self.probMV(True,*theta)
+        return self.probMV(True,theta)
 
     def nllprime( self, theta ):
         """ the derivative of nll as a function of the thetas.
@@ -492,8 +494,9 @@ class LikelihoodComputer:
             ## first step is to disregard the covariances and solve the
             ## quadratic equations
             ini = self.getThetaHat ( self.model.observed, self.model.backgrounds, nsig, self.model.covariance, 0 )
-            # self.cov_tot = self.model.covariance+ self.model.var_s(nsig)
-            self.cov_tot = self.model.totalCovariance ( nsig )
+            self.cov_tot = self.model.V
+            if self.model.n == 1:
+                self.cov_tot = self.model.totalCovariance ( nsig )
             # self.ntot = self.model.backgrounds + self.nsig
             # if not self.model.isLinear():
                 # self.cov_tot = self.model.V + self.model.var_s(nsig)
@@ -622,8 +625,8 @@ class LikelihoodComputer:
             vals=[]
             self.gammaln = special.gammaln(self.model.observed + 1)
             thetas = stats.multivariate_normal.rvs(mean=[0.]*self.model.n,
-                          cov=(self.model.totalCovariance(nsig)),
-                          # cov=(self.model.V + self.model.var_s(nsig)),
+                          # cov=(self.model.totalCovariance(nsig)),
+                          cov=self.model.V,
                           size=self.ntoys ) ## get ntoys values
             for theta in thetas :
                 if self.model.isLinear():
@@ -655,7 +658,7 @@ class LikelihoodComputer:
         # compute the profiled (not normalized) likelihood of observing
         # nsig signal events
         theta_hat,_ = self.findThetaHat ( nsig )
-        ret = self.probMV ( nll, *theta_hat )
+        ret = self.probMV ( nll, theta_hat )
 
         return ret
 
@@ -685,7 +688,7 @@ class LikelihoodComputer:
 
             """
             nsig = self.model.convert(nsig)
-            
+           
             # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
             llhd = self.likelihood(nsig, marginalize=marginalize, nll=True)
 
@@ -734,14 +737,14 @@ class UpperLimitComputer:
             model = copy.deepcopy(oldmodel)
             #model.observed = model.backgrounds
             for i,d in enumerate(model.backgrounds):
-                model.observed[i]=int(round(d))
+                model.observed[i]=int(NP.round(d))
         computer = LikelihoodComputer(model, toys)
         mu_hat = computer.findMuHat(model.signal_rel)
         theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
         sigma_mu = computer.getSigmaMu(model.signal_rel)
 
         aModel = copy.deepcopy(model)
-        aModel.observed = array([round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
+        aModel.observed = array([NP.round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
         #print ( "aModeldata=", aModel.observed )
         #aModel.observed = array ( [ round(x) for x in model.backgrounds ] )
         aModel.name = aModel.name + "A"

@@ -137,8 +137,8 @@ the likelihood for the signal hypothesis when combining signal regions is given 
 
 where the product is over all :math:`N` signal regions, :math:`\mu` is the overall signal strength, :math:`s_i^r` the relative signal strength
 in each signal region and :math:`V` represents the covariance matrix. 
-As in the case of a single signal region, we include a default 20\% uncertainty in the signal, which is added
-to the diagonal of the covariance matrix.
+Note, however, that unlike the case of a single signal region, we do not include any signal uncertainties, since this
+should correspond to a second order effect.
 
 
 Using the above likelihood we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the 
@@ -159,11 +159,11 @@ As we can see, while the curve obtained from the combination of all 44 signal re
 
 .. _combinedSRfig:
 
-+------------------------------------------------+------------------------------------------------+------------------------------------------------+
-| .. image:: images/T2bbWWoffSemiLep_bestSR.png  | .. image:: images/T2bbWWoffSemiLep_44.png      | .. image:: images/T2bbWWoffSemiLep_17.png      |
-|            :width: 300px                       |            :width: 300px                       |            :width: 300px                       |
-| Best signal region                             | 44 signal regions                              | 17 aggregate regions                           |
-+------------------------------------------------+------------------------------------------------+------------------------------------------------+
++-----------------------------------------+-----------------------------------------+-----------------------------------------+
+| .. image:: images/T2bbWWoff_bestSR.png  | .. image:: images/T2bbWWoff_44.png      | .. image:: images/T2bbWWoff_17.png      |
+|            :width: 300px                |            :width: 300px                |            :width: 300px                |
+| Best signal region                      | 44 signal regions                       | 17 aggregate regions                    |
++-----------------------------------------+-----------------------------------------+-----------------------------------------+
 
 
 Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of 17 aggregate signal regions (center), and the combination of all 44 signal regions (right).

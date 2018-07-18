@@ -26,9 +26,8 @@ import unum
 class MPrinter(object):
     """
     Master Printer class to handle the Printers (one printer/output type)
-    
-    :ivar printerList: list
     """
+    
     def __init__(self):
         
         self.name = "master"

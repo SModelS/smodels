@@ -10,11 +10,9 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-import math
 from smodels.tools import toolBox
-from smodels.tools.physicsUnits import TeV
 
-path = "../inputFiles/slha/"
+path = "./testFiles/slha/"
 
 class NllFastTest(unittest.TestCase):
     def testGluino7 (self):
@@ -34,7 +32,7 @@ class NllFastTest(unittest.TestCase):
         self.assertAlmostEqual ( o[1], 1.01 )
     def testWeakino8 (self):
         tool = toolBox.ToolBox().get("nllfast13")
-        o = tool.getKfactorsFor ( (1000022, 1000022 ), "../inputFiles/slha/complicated.slha" )
+        o = tool.getKfactorsFor ( (1000022, 1000022 ), "./testFiles/slha/complicated.slha" )
         self.assertEqual ( o[0], None )
         self.assertEqual ( o[1], None )
 

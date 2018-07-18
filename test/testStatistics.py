@@ -12,7 +12,6 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
-from smodels.tools.physicsUnits import fb
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database
 from smodels.theory import slhaDecomposer
@@ -32,7 +31,7 @@ class StatisticsTest(unittest.TestCase):
         and TheoryPrediction to the statistics tools is working correctly
         """
         expRes = database.getExpResults( analysisIDs=['CMS-SUS-13-012'] )[0]
-        slhafile="../inputFiles/slha/simplyGluino.slha"
+        slhafile= "./testFiles/slha/simplyGluino.slha"
         smstoplist = slhaDecomposer.decompose( slhafile )
         prediction = theoryPredictionsFor(expRes, smstoplist,deltas_rel=0.)[0]
         pred_signal_strength = prediction.xsection.value

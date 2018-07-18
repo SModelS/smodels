@@ -13,7 +13,7 @@ import redirector
 from smodels.tools.runSModelS import run
 from os.path import join, basename
 from smodels.installation import installDirectory as iDir
-from smodels.tools.smodelsLogging import logger, setLogLevel
+from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
 from databaseLoader import database ## to make sure the db exists
  
 def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None ):
@@ -85,6 +85,7 @@ def runMain( filename, timeout = 0, suppressStdout=True, development=False,
     :returns: printer output
     """
     to = None
+    oldlevel = getLogLevel()
     level = 'debug'
     if suppressStdout:
         level = 'error'
@@ -95,5 +96,6 @@ def runMain( filename, timeout = 0, suppressStdout=True, development=False,
         run(filename, parameterFile=join ( iDir(), "test/%s" % inifile ),
              outputDir= out, db= database, timeout = timeout,
              development = development)
+        setLogLevel ( oldlevel )
         sfile = join(iDir(),"test/unitTestOutput/%s.py" % basename(filename))
         return sfile

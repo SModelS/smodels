@@ -8,7 +8,7 @@ from __future__ import print_function
 """
 """ Import basic functions (this file must be executed in the installation folder) """
 
-from importlib import reload
+from imp import reload
 from smodels.tools import runtime
 from smodels import particlesLoader
 from smodels.theory import slhaDecomposer,lheDecomposer
@@ -18,8 +18,8 @@ from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
 from smodels.tools.smodelsLogging import setLogLevel
 setLogLevel("info")
-# Set the path to the database folder
-database = Database("./smodels-database/")
+# Set the path to the database
+database = Database("http://smodels.hephy.at/database/official113")
 
 def main():
     """
@@ -101,7 +101,7 @@ def main():
             print ( "UL for theory prediction = ",theoryPrediction.upperLimit )
 
             # Compute the r-value
-            r = theoryPrediction.xsection.value/theoryPrediction.upperLimit
+            r = theoryPrediction.getRValue()
             print ( "r = ",r )
             #Compute likelihhod and chi^2 for EM-type results:
             if dataset.dataInfo.dataType == 'efficiencyMap':
