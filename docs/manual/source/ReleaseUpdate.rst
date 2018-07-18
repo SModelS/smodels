@@ -44,6 +44,7 @@ New in Version 1.1.3:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * Support for :ref:`covariance matrices <combineSRs>` and combination of signal regions (see **options:combineSR** in |parameters|)
+  * New plotting tool added to :ref:`smodelsTools <smodelsTools>` (interactive-plots)
   * Path to particles.py can now be specified in parameters.ini file (see **particles:model** in |parameters|)
   * Wildcards allowed when selecting analyses, datasets, txnames (see example 
   * Option to show individual contribution from topologies to total theory prediction (see **python-printer:addTxWeights** in |parameters|)
