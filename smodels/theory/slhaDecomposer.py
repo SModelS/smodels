@@ -240,6 +240,6 @@ def _getPromptDecays(slhafile,brDic,l_inner=10.*mm,gb_inner=10,l_outer=10.*m,gb_
             logger.error("Sum of decay fractions > 1 for "+str(pid))
             return False
         if (Flong+Fprompt) < 0.8:
-            logger.info("Particle with PDG %i has a considerable fraction of displaced decays, which will be ignored."+pid)
+            logger.info("Particle with PDG %i has a considerable fraction of displaced decays, which will be ignored." %pid)
         
     return brDic
