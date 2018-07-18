@@ -232,7 +232,7 @@ class Branch(object):
                     return False
 
         #If the final state BSM particles have the same quantum numbers: 
-        if self.BSMparticles and other.BSMparticles: 
+        if self.BSMparticles and other.BSMparticles:  
             if not self.BSMparticles[-1].eqProperties(other.BSMparticles[-1],properties=['colordim','eCharge']):
                 return False             
         
