@@ -11,8 +11,7 @@ from math import exp
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import MeV, GeV, m, mm, fm
 from smodels.experiment.finalStateParticles import jetList, lList
-
-        
+    
 
 def addPromptAndDisplaced(branch):  
     """
@@ -33,59 +32,38 @@ def addPromptAndDisplaced(branch):
         if particle.totalwidth == float('inf')*GeV:
             F_long, F_prompt, F_displaced = [0.,1.,0.]
         elif particle.totalwidth == 0.*GeV:
-            if particle.eCharge == 0 : continue
-            else: F_long, F_prompt, F_displaced = [1.,0.,0.]
+            F_long, F_prompt, F_displaced = [1.,0.,0.]
         else:    
             F_long, F_prompt, F_displaced = calculateProbabilities(particle)
         # allow for combinations of decays and a long lived particle only if the last BSM particle is the long lived one
-        if F_long and particle == branch.BSMparticles[-1]: F.append([F_long])
+        if particle == branch.BSMparticles[-1]: F.append([F_long])
         else: F.append([F_prompt,F_displaced])
     
     # call the whole branch: 
-    # .) prompt: all decays within this branch are prompt
-    # .) longlived: at least one particle is longlived (and the last one in the decay)
-    # .) displaced: at least one decay is displaced and no longlived particle
-    # discard others
-         
-    if len(F[-1]) == 1:  # last BSM particle is long lived
-        branch._decayType = 'longlived'
-        branches = [branch]            
-        longValue = F[-1][0] 
-        
-        if len(F) > 1: 
-        # decays before can have all combinations of prompt and displaced 
-        #(only different from 1. if particle before has probability to be longlived)  
-            F.pop(-1)
-            Plist = [list(P) for P in itertools.product(*F)]
-            F = []        
-            for P in Plist:
-                value = P[0]
-                for i in range(len(P)-1):
-                    value *= P[i+1]
-                F.append(value)
-            longValue *= sum(F)
-          
-        probabilities = [longValue]
+    # .) prompt: all decays within this branch are prompt and the last particle is the LSP
+    # .) longlived: all decays within this branch are prompt and the last particle is not the LSP
+    # .) displaced: at least one decay is displaced no matter what the last particle is
+    # discard others         
+    promptValue = F[0][0]            
+    for i in range(len(F)-1):
+        promptValue *= F[i+1][0]  
     
-    elif len(F[-1]) > 1: # last BSM particle (not MET) decayed    
-        promptValue = F[0][0]            
-        for i in range(len(F)-1):
-            promptValue *= F[i+1][0]  
-        
-        displacedP = []                                                      
-        Plist = [list(P) for P in itertools.product(*F)]
-        Plist.pop(0)                
-        for P in Plist:
-            value = P[0]
-            for i in range(len(P)-1):
-                value *= P[i+1]
-            displacedP.append(value)
-        displacedValue = sum(displacedP)
-        
-        probabilities = [promptValue, displacedValue]
-        branches = labelPromptDisplaced(branch)         
-
-    else: logger.warning("No probabilities were calculated for the decay(s) in s%" %(branch))
+    
+    displacedP = []  
+    lastP = F[-1][0]
+    F.pop(-1)                                                   
+    Plist = [list(P) for P in itertools.product(*F)]
+    Plist.pop(0)                
+    for P in Plist:
+        value = P[0]
+        for i in range(len(P)-1):
+            value *= P[i+1]
+        displacedP.append(value)
+    displacedValue = sum(displacedP)
+    displacedValue *= lastP
+    
+    probabilities = [promptValue, displacedValue]
+    branches = labelPromptDisplaced(branch)         
         
     return probabilities, branches
     
@@ -126,12 +104,13 @@ def labelPromptDisplaced(branch):
     :return: branches with correct labels  
     """
     promptBranch = branch.copy()
-    promptBranch._decayType = 'prompt'
+    if branch.BSMparticles[-1].isMET(): promptBranch._decayType = 'prompt'
+    else: promptBranch._decayType = 'longlived'
     
-    displacedBranch = branch.copy()      
-    if any(particle==jetList for particle in branch.particles ):
+    displacedBranch = branch.copy()       
+    if any(particle==jetList for vertex in branch.particles for particle in vertex):
         displacedBranch._decayType = 'displacedJet'
-    elif any(particle==lList for particle in branch.particles ):           
+    elif any(particle==lList for vertex in branch.particles for particle in vertex):           
         displacedBranch._decayType = 'displacedLepton'
     else: displacedBranch._decayType = 'displaced(neither jet nor lepton)'
     

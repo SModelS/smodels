@@ -13,14 +13,16 @@ from smodels.theory.topology import TopologyList
 from smodels.tools.physicsUnits import eV, GeV, TeV, pb, fb
 from smodels.theory.element import Element
 from smodels.theory.crossSection import XSectionList, XSection, XSectionInfo
-from smodels.share.models import SMparticles
+from smodels.share.models import SMparticles, MSSMparticles
 
-n1 = Particle(Z2parity='odd', label='N1', pdg=1000022, mass=None, eCharge=0, colordim=0, spin=1./2, totalwidth=0.*GeV, branches=None) 
-st1 = Particle(Z2parity='odd', label='st_1', pdg=1000006, mass=None, eCharge=-1./3, colordim=3, spin=0, totalwidth=2.*GeV, branches=None)
-gluino = Particle(Z2parity='odd', label='gluino', pdg=1000021, mass=None, eCharge=0, colordim=8, spin=1./2, totalwidth=1.*10**(-30)*GeV, branches=None)
-st2 = Particle(Z2parity='odd', label='st_2', pdg=2000006, eCharge=-1./3, colordim=3, spin=0, totalwidth = 10**(-15)*GeV)
-
-
+n1 = MSSMparticles.n1
+n1.totalwidth = 0.*GeV
+st1 = MSSMparticles.st1
+st1.totalwidth = 2.*GeV
+st2 = MSSMparticles.st2
+st2.totalwidth = 10**(-15)*GeV
+gluino = MSSMparticles.gluino
+gluino.totalwidth = 1.*10**(-30)*GeV
 t = SMparticles.t
 b = SMparticles.b
 

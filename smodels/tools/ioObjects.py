@@ -377,9 +377,9 @@ class SlhaStatus(object):
 
     def findLSP(self):
         """
-        Find lightest particle (not in SMpdgs).
+        Find lightest particle (not in SM).
         
-        :returns: pid, mass of the lsp, if returnmass == True
+        :returns: lsp (Particle object)
         
         """
         lsp = None

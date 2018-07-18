@@ -98,9 +98,9 @@ class Uncovered(object):
                             self.outsideGrid.addToGeneralElements(el) # add to list of outsideGrid topos                        
                     continue
                 
-                self.missingTopos.addToGeneralElements(el) #keep track of all missing topologies
-                if self.hasLongLived(el): self.longLived.addToGeneralElements(el)
-                elif self.hasDisplaced(el): self.displaced.addToGeneralElements(el)
+                self.missingTopos.addToGeneralElements(el) #keep track of all missing topologies                
+                if self.hasDisplaced(el): self.displaced.addToGeneralElements(el)
+                elif self.hasLongLived(el): self.longLived.addToGeneralElements(el)
                 else: self.MET.addToGeneralElements(el)
 
     def inPrevMothers(self, el): #check if smaller element with same mother has already been checked
@@ -118,24 +118,24 @@ class Uncovered(object):
         for mEl in el.motherElements:
             self.prevMothers.append(mEl[-1].elID)
         
+    def hasDisplaced(self, el):
+        """
+        Return True if Element has at least one displaced branch 
+        :ivar el: Element
+        """  
+        if 'displaced' in el.branches[0]._decayType or 'displaced' in el.branches[1]._decayType: 
+            return True 
+        return False                    
+        
     def hasLongLived(self, el):
         """
-        Return True if Element has at least one long lived branch
+        Return True if Element has at least one long lived branch but no displaced branch
         :ivar el: Element
         """  
         if el.branches[0]._decayType == 'longlived' or el.branches[1]._decayType == 'longlived': 
             return True 
         return False     
         
-    def hasDisplaced(self, el):
-        """
-        Return True if Element has at least one displaced branch but no longlived
-        :ivar el: Element
-        """  
-        if 'displaced' in el.branches[0]._decayType or 'displaced' in el.branches[1]._decayType: 
-            return True 
-        return False                    
-
     def isMissingTopo(self, el):
         """
         A missing topology is not a mother element, not covered, and does not have a mother which is covered
