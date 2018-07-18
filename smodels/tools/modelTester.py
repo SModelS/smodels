@@ -13,6 +13,7 @@
 from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import decomposer
+from smodels.theory import theoryPrediction
 from smodels.share.models.MSSMparticles import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
@@ -132,13 +133,13 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         for theoPred in allPredictions:
             theoPred.computeStatistics()
 
-    """ Define result list that collects all theoryPrediction objects."""
-    maxcond = parser.getfloat("parameters", "maxcond")
-    results = ioObjects.ResultList(allPredictions,maxcond)
+    """ Define theory predictions list that collects all theoryPrediction objects checked against max condition."""
+    maxcond = parser.getfloat("parameters", "maxcond")           
+    theoryPredictions = theoryPrediction.TheoryPredictionList(allPredictions, maxcond)
 
-    if not results.isEmpty():
+    if not len(theoryPredictions._theoryPredictions) == 0:
         outputStatus.updateStatus(1)
-        masterPrinter.addObj(results)
+        masterPrinter.addObj(theoryPredictions)
     else:
         outputStatus.updateStatus(0) # no results after enforcing maxcond
 

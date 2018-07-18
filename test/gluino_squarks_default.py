@@ -25,28 +25,28 @@ smodelsOutputDefault = {'ExptRes': [{'AnalysisSqrts (TeV)': 8.0, 'dataType': 'ef
                      'Long-lived': [], 'Displaced': [], \
                      'Missed Topologies': [{'weight (fb)': 59.5816892, 'sqrts (TeV)': 8.0, 'element': "[[[W]],[[W]]]  (prompt,prompt)"}, \
                                            {'weight (fb)': 16.007591747903355, 'sqrts (TeV)': 8.0, 'element': "[[[jet],[W]],[[jet,jet],[W]]]  (prompt,prompt)"}, \
-                                           {'weight (fb)': 13.953395142782057, 'sqrts (TeV)': 8.0, 'element': "[[[jet],[jet,jet],[W]],[[jet,jet],[W]]]  (prompt,prompt)"}, \
+                                           {'weight (fb)': 13.953395142782057, 'sqrts (TeV)': 8.0, 'element': "[[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)"}, \
                                            {'weight (fb)': 9.20555840988438, 'sqrts (TeV)': 8.0, 'element': "[[[b,t],[W]],[[jet,jet],[W]]]  (prompt,prompt)"}, \
                                            {'weight (fb)': 9.02436619557731, 'sqrts (TeV)': 8.0, 'element': "[[[jet]],[[jet,jet],[W]]]  (prompt,prompt)"}, \
-                                           {'weight (fb)': 8.124431084297855, 'sqrts (TeV)': 8.0, 'element': "[[[b,t],[W]],[[jet],[W]]]  (prompt,prompt)"}, \
+                                           {'weight (fb)': 8.124431084297855, 'sqrts (TeV)': 8.0, 'element': "[[[jet],[W]],[[b,t],[W]]]  (prompt,prompt)"}, \
                                            {'weight (fb)': 7.607514208427665, 'sqrts (TeV)': 8.0, 'element': "[[[jet,jet],[W]],[[jet,jet],[higgs]]]  (prompt,prompt)"}, \
                                            {'weight (fb)': 7.08711270167108, 'sqrts (TeV)': 8.0, 'element': "[[[jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)"}, \
-                                           {'weight (fb)': 7.081852099605015, 'sqrts (TeV)': 8.0, 'element': "[[[jet],[b,t],[W]],[[jet,jet],[W]]]  (prompt,prompt)"}, \
+                                           {'weight (fb)': 7.081852099605015, 'sqrts (TeV)': 8.0, 'element': "[[[jet,jet],[W]],[[jet],[b,t],[W]]]  (prompt,prompt)"}, \
                                            {'weight (fb)': 7.081852099605015, 'sqrts (TeV)': 8.0, 'element': "[[[b,t],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)"}], \
                      'Outside Grid': [{'weight (fb)': 95.88423927189842, 'sqrts (TeV)': 8.0, 'element': "[[[W]],[[higgs]]]  (prompt,prompt)"}, \
                                       {'weight (fb)': 2.272413757316261, 'sqrts (TeV)': 8.0, 'element': "[[[jet]],[[jet,jet]]]  (prompt,prompt)"}, \
                                       {'weight (fb)': 0.9729993648249682, 'sqrts (TeV)': 8.0, 'element': "[[[b],[W]],[[b],[W]]]  (prompt,prompt)"}, \
                                       {'weight (fb)': 0.14400311772342284, 'sqrts (TeV)': 8.0, 'element': "[[[jet]],[[t,t]]]  (prompt,prompt)"}, \
-                                      {'weight (fb)': 0.09545060711499166, 'sqrts (TeV)': 8.0, 'element': "[[[b,b]],[[jet]]]  (prompt,prompt)"}],\
+                                      {'weight (fb)': 0.09545060711499166, 'sqrts (TeV)': 8.0, 'element': "[[[jet]],[[b,b]]]  (prompt,prompt)"}],\
                      'MET': [{'weight (fb)': 59.5816892, 'sqrts (TeV)': 8.0, 'element': "[[[W]],[[W]]]  (prompt,prompt)"}, \
                                            {'weight (fb)': 16.007591747903355, 'sqrts (TeV)': 8.0, 'element': "[[[jet],[W]],[[jet,jet],[W]]]  (prompt,prompt)"}, \
-                                           {'weight (fb)': 13.953395142782057, 'sqrts (TeV)': 8.0, 'element': "[[[jet],[jet,jet],[W]],[[jet,jet],[W]]]  (prompt,prompt)"}, \
+                                           {'weight (fb)': 13.953395142782057, 'sqrts (TeV)': 8.0, 'element': "[[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)"}, \
                                            {'weight (fb)': 9.20555840988438, 'sqrts (TeV)': 8.0, 'element': "[[[b,t],[W]],[[jet,jet],[W]]]  (prompt,prompt)"}, \
                                            {'weight (fb)': 9.02436619557731, 'sqrts (TeV)': 8.0, 'element': "[[[jet]],[[jet,jet],[W]]]  (prompt,prompt)"}, \
-                                           {'weight (fb)': 8.124431084297855, 'sqrts (TeV)': 8.0, 'element': "[[[b,t],[W]],[[jet],[W]]]  (prompt,prompt)"}, \
+                                           {'weight (fb)': 8.124431084297855, 'sqrts (TeV)': 8.0, 'element': "[[[jet],[W]],[[b,t],[W]]]  (prompt,prompt)"}, \
                                            {'weight (fb)': 7.607514208427665, 'sqrts (TeV)': 8.0, 'element': "[[[jet,jet],[W]],[[jet,jet],[higgs]]]  (prompt,prompt)"}, \
                                            {'weight (fb)': 7.08711270167108, 'sqrts (TeV)': 8.0, 'element': "[[[jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)"}, \
-                                           {'weight (fb)': 7.081852099605015, 'sqrts (TeV)': 8.0, 'element': "[[[jet],[b,t],[W]],[[jet,jet],[W]]]  (prompt,prompt)"}, \
+                                           {'weight (fb)': 7.081852099605015, 'sqrts (TeV)': 8.0, 'element': "[[[jet,jet],[W]],[[jet],[b,t],[W]]]  (prompt,prompt)"}, \
                                            {'weight (fb)': 7.081852099605015, 'sqrts (TeV)': 8.0, 'element': "[[[b,t],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)"}]}
 
 

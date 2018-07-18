@@ -30,6 +30,9 @@ class MissOutput():
 
     def __eq__(self, other):
         return fuzzycomp(self,other,self.allowedDiff)
+    
+    def describe(self):
+        return str(self.__dict__)
 
         
 class AsymmetricOutput():
@@ -55,8 +58,9 @@ class Summary():
         self.filename = filename
         self.missedTopos = []
         self.outsideTopos = []
-        self.longTopos = []
-        self.asymmetricTopos = []
+        self.longLivedTopos = []
+        self.displacedTopos = []
+        self.METTopos = []
         self.allowedDiff = allowedDiff
         self.read(filename)
         
@@ -76,8 +80,9 @@ class Summary():
         resultLines = None
         missingLines = None
         outsideLines = None
-        longLines = None
-        asymmetricLines = None
+        longLivedLines = None
+        displacedLines = None
+        METLines = None        
         signalRegion = ""
         txnames = []
         for il,l in enumerate(lines):
@@ -92,12 +97,15 @@ class Summary():
             elif "Contributions outside" in l:
                 outsideLines = True
                 continue
-            elif "Long cascade decay" in l:
-                longLines = True
+            elif "Missing topos: long-lived decays" in l:
+                longLivedLines = True
                 continue
-            elif "Asymmetric branch decay" in l:
-                asymmetricLines = True
+            elif "Missing topos: displaced decays" in l:
+                displacedLines = True
                 continue
+            elif "Missing topos: MET decays" in l:
+                METLines = True
+                continue            
             if l.startswith("#"):
                 continue
             if "----" in l:
@@ -106,15 +114,14 @@ class Summary():
                 resultLines = None
                 missingLines = None
                 outsideLines = None
-                longLines = None
-                asymmetricLines = None                
+                longLivedLines = None
+                displacedLines = None
+                METLines = None                
             if not l.strip():
                 continue
             if 'Signal Region' in l or 'Txnames' in l:
                 continue
-            if (missingLines or outsideLines)  and 'Sqrts (TeV)' in l:
-                continue
-            if (longLines or asymmetricLines)  and 'Mother1 Mother2' in l:
+            if (missingLines or outsideLines or longLivedLines or displacedLines or METLines)  and 'Sqrts (TeV)' in l:
                 continue
             
             if resultLines:
@@ -128,11 +135,12 @@ class Summary():
                 self.missedTopos.append(MissOutput(l.split(),self.allowedDiff))
             if outsideLines:
                 self.outsideTopos.append(MissOutput(l.split(),self.allowedDiff))
-            if longLines:
-                self.longTopos.append(AsymmetricOutput(l.split(),self.allowedDiff))
-            if asymmetricLines:
-                self.asymmetricTopos.append(AsymmetricOutput(l.split(),self.allowedDiff))
-
+            if longLivedLines:
+                self.longLivedTopos.append(MissOutput(l.split(),self.allowedDiff))
+            if displacedLines:
+                self.displacedTopos.append(MissOutput(l.split(),self.allowedDiff))
+            if METLines:
+                self.METTopos.append(MissOutput(l.split(),self.allowedDiff))                
         self.results = sorted(self.results, key=lambda res: [res.ana,res.signalRegion,res.tval])
 
 
@@ -143,10 +151,12 @@ class Summary():
             return False
         if not len(self.outsideTopos) == len(other.outsideTopos):
             return False
-        if not len(self.longTopos) == len(other.longTopos):
+        if not len(self.longLivedTopos) == len(other.longLivedTopos):
             return False
-        if not len(self.asymmetricTopos) == len(other.asymmetricTopos):
+        if not len(self.displacedTopos) == len(other.displacedTopos):
             return False
+        if not len(self.METTopos) == len(other.METTopos):
+            return False                
 
         if self.results != other.results:
             return False        
@@ -154,10 +164,13 @@ class Summary():
             return False
         if self.outsideTopos != other.outsideTopos:
             return False        
-        if self.longTopos != other.longTopos:
+        if self.longLivedTopos != other.longLivedTopos:
             return False        
-        if self.asymmetricTopos != other.asymmetricTopos:
+        if self.displacedTopos != other.displacedTopos:
             return False
+        if self.METTopos != other.METTopos:
+            return False
+                            
                     
         return True
 

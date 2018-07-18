@@ -26,105 +26,6 @@ from smodels.tools import runtime
 
 SMpdgs = SMparticleList.pdg
 
-class ResultList(object):
-    """
-    Class that collects a list of theory predictions plus the corresponding upper limits.
-    
-    :ivar theoryPredictions: list of TheoryPrediction objects    
-    """
-    
-    
-    def __init__(self, theoPredictionsList=[],maxcond = 1.):
-        
-        self.theoryPredictions = []
-        if theoPredictionsList:
-            for theoPred in theoPredictionsList:
-                self.addTheoPrediction(theoPred,maxcond)
-            self.sort()
-
-    def addTheoPrediction(self, theoPred, maxcond):
-        """
-        Add a result to the theoryPredictions, unless it violates maxcond.
-        
-        :parameter theoPred: a Theory Prediction object to be added to ResultList
-        :parameter maxcond: maximum condition violation
-        
-        """
-        
-        if not isinstance(theoPred,TheoryPrediction):
-            logger.error("Only TheoryPrediction objects can be added to ResultList")
-            raise SModelSError()
-                    
-        mCond = theoPred.getmaxCondition()
-        if mCond == 'N/A' or mCond > maxcond:
-            return False
-        
-        self.theoryPredictions.append(theoPred)
-        return True
-    
-    def getR(self, theoPred, expected = False):
-        """
-        Calculate R value.
-        
-        :parameter theoPredr theoPred: Theory Prediction object
-        :returns: R value = weight / upper limit        
-        """
-        
-        expResult = theoPred.expResult
-        datasetID = theoPred.dataset.dataInfo.dataId
-        dataType = expResult.datasets[0].dataInfo.dataType
-        
-        if dataType == 'upperLimit':
-            ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected = expected)
-        elif dataType == 'efficiencyMap':
-            ul = expResult.getUpperLimitFor(dataID=datasetID, expected=expected)
-        else:
-            logger.error("Unknown dataType %s" %(str(dataType)))
-        if type(ul)==bool and ul==False:
-            logger.info ( "upper limit is False. cannot compute r value." )
-            return None
-        if ul == 0. * fb:
-            logger.info ( "upper limit is 0. cannot compute r value." )
-            return None
-        #if type(ul) == bool and ul == False:
-        #    return None
-        return (theoPred.xsection.value/ul).asNumber()    
-
-    def sort(self):
-        """
-        Reverse sort theoryPredictions by R value.
-        
-        """
-        self.theoryPredictions = sorted(self.theoryPredictions, key=self.getR, reverse=True)
-
-    def getBestExpected(self):
-        """
-        Find EM result with the highest expected R vaue.
-        :returns: Theory Prediction object
-        """
-        rexpMax = -1.
-        bestExp = None
-        for tP in self.theoryPredictions:
-            expResult = tP.expResult
-            datasetID = tP.dataset.dataInfo.dataId
-            dataType = expResult.datasets[0].dataInfo.dataType
-            if dataType != 'efficiencyMap':
-                continue
-            ulExp = expResult.getUpperLimitFor(dataID=datasetID, expected = True)
-            rexp = tP.value[0].value/ulExp
-            if rexp > rexpMax:
-                rexpMax = rexp
-                bestExp = tP
-        return bestExp
-
-
-    def isEmpty(self):
-        """
-        Check if outputarray is empty.
-        
-        """
-        return len(self.theoryPredictions) == 0
-
 
 class OutputStatus(object):
     """
@@ -361,7 +262,7 @@ class SlhaStatus(object):
 
     def emptyDecay(self, pid):
         """
-        Check if any decay is listed for the particle with pid
+        Check if any decay is missing for the particle with pid
         
         :parameter pid: PID number of particle to be checked
         :returns: True if the decay block is missing or if it is empty, None otherwise
@@ -465,182 +366,25 @@ class SlhaStatus(object):
         """
         if not checkLSP:
             return 0, "Did not check for charged lsp"
-        lsp = self.model.getParticlesWith(pdg=self.lsp)[0] 
-        if lsp.pdg ==0:
-            return -1, "lsp pid " + str(self.lsp) + " is not known\n"
+        lsp = self.lsp
+        if not lsp:
+            return -1, "lsp pid " + str(self.lsp.pdg) + " is not known\n"
         if lsp.eCharge != 0 or lsp.colordim != 0:
             return -1, "lsp has 3*electrical charge = " + str(3*lsp.eCharge) + \
                        " and color dimension = " + str(lsp.colordim) + "\n"           
         return 1, "lsp is neutral"
 
 
-    def findLSP(self, returnmass=None):
+    def findLSP(self):
         """
         Find lightest particle (not in SMpdgs).
         
         :returns: pid, mass of the lsp, if returnmass == True
         
         """
-        pid = 0
-        minmass = None
-        for particle, mass in self.slha.blocks["MASS"].items():
-            if particle in SMpdgs:
-                continue
-            mass = abs(mass)
-            if minmass == None:
-                pid, minmass = particle, mass
-            if mass < minmass:
-                pid, minmass = particle, mass
-        if returnmass:
-            return pid, minmass * GeV
-        return pid
+        lsp = None
+        for particle in self.model.BSMparticles:
+            if lsp == None or particle.mass < lsp.mass:
+                lsp = particle
+        return lsp
 
-
-    def getLifetime(self, pid, ctau=False):
-        """
-        Compute lifetime from decay-width for a particle with pid.
-        
-        :parameter pid: PID of particle
-        :parameter ctau: set True to multiply lifetime by c
-        :returns: lifetime
-        
-        """
-        widths = self.getDecayWidths()
-        try:
-            if widths[abs(pid)]: lt = (1.0 / widths[abs(pid)]) / 1.51926778e24
-            else:
-                # Particle is stable
-                return -1
-            if self.emptyDecay(pid): return -1  # if decay block is empty particle is also considered stable
-            if ctau:
-                return lt * 3E8
-            else:
-                return lt
-        except KeyError:
-            logger.warning("No decay block for %s, consider it as a stable particle" % str(pid) )
-            return -1
-
-
-    def sumBR(self, pid):
-        """
-        Calculate the sum of all branching ratios for particle with pid.
-        
-        :parameter pid: PID of particle
-        :returns: sum of branching ratios as given in the decay table for pid
-        
-        """
-        decaylist = self.slha.decays[pid].decays
-        totalBR = 0.
-        for entry in decaylist:
-            totalBR += entry.br
-        return totalBR
-
-
-    def deltaMass(self, pid1, pid2):
-        """
-        Calculate mass splitting between particles with pid1 and pid2.
-        
-        :returns: mass difference
-        
-        """
-        m1 = self.slha.blocks["MASS"][pid1]
-        m2 = self.slha.blocks["MASS"][pid2]
-        dm = abs(abs(m1) - abs(m2))
-        return dm
-
-
-    def findNLSP(self, returnmass=None):
-        """
-        Find second lightest particle (not in SMpdgs).
-        
-        :returns: pid ,mass of the NLSP, if returnmass == True
-        
-        """
-        lsp = self.findLSP()
-        pid = 0
-        minmass = None
-        for particle, mass in self.slha.blocks["MASS"].items():
-            mass = abs(mass)
-            if particle == lsp or particle in SMpdgs:
-                continue
-            if minmass == None:
-                pid, minmass = particle, mass
-            if mass < minmass:
-                pid, minmass = particle, mass
-        if returnmass:
-            return pid, minmass * GeV
-        return pid
-
-
-    def getDecayWidths(self):
-        """
-        Get all decay-widths as a dictionary {pid: width}.
-        
-        """
-        widths = {}
-        for particle, block in self.slha.decays.items():
-            widths[particle] = block.totalwidth
-        return widths
-
-
-    def getDecayWidth(self, pid):
-        """
-        Get the decay-width for particle with pid, if it exists.
-        
-        """
-        widths = self.getDecayWidths()
-        try:
-            return widths[pid]
-        except KeyError:
-            print("%s is no valid PID" % pid)
-
-
-    def massDiffLSPandNLSP(self):
-        """
-        Get the mass difference between the lsp and the nlsp.
-        
-        """
-        lsp = self.findLSP()
-        nlsp = self.findNLSP()
-        return self.deltaMass(lsp, nlsp)
-
-    def degenerateChi(self):
-        """
-        Check if chi01 is lsp and chipm1 is NLSP. If so, check mass splitting.
-        This function is not used, the limit is arbitrary.
-
-        """
-        lsp, m1 = self.findLSP(returnmass=True)
-        nlsp, m2 = self.findNLSP(returnmass=True)
-        if lsp == 1000022 and nlsp == 1000024:
-            if abs(m2) - abs(m1) < 0.18:
-                return True
-        return None
-
-    def visible(self, pid, decay=None):
-        """
-        Check if pid is detectable.
-        If pid is not known, consider it as visible.
-        If pid not SM particle and decay = True, check if particle or decay products are visible.
-        
-        """
-        if pid in SMvisible: return True
-        if pid in SMinvisible: return False
-        particle = self.model.getParticlesWith(pdg=pid)[0]
-        if particle.pdg == 0:
-            return True
-        if particle.eCharge != 0 or particle.colordim != 1:
-            return True
-        if decay:
-            if not pid in self.slha.decays:
-                logger.warning("Missing decay block for pid %s" % (str(pid)))
-                return None  # Note: purposely distinguished from False so I can propagate the information to the output file
-            for decay in self.slha.decays[pid].decays:
-                for pids in decay.ids:
-                    if self.visible(abs(pids), decay=True): return True
-        return False
-
-
-
-SMvisible = [1, 2, 3, 4, 5, 6, 11, 13, 15, 21, 22, 23, 24, 25, 211, 111]
-SMinvisible = [12, 14, 16]

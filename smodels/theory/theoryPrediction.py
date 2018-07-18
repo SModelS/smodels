@@ -35,7 +35,11 @@ class TheoryPrediction(object):
         self.analysis = None
         self.xsection = None
         self.conditions = None
-        self.mass = None        
+        self.mass = None       
+                     
+    def __str__(self):
+        return "%s:%s" % ( self.analysis, self.xsection )
+
 
     def computeStatistics(self):
         """
@@ -72,10 +76,32 @@ class TheoryPrediction(object):
             if value == None: continue
             values.append ( float(value) )
         return max(values)
-        
     
-    def __str__(self):
-        return "%s:%s" % ( self.analysis, self.xsection )
+    def getR(self, expected = False):
+        """
+        Calculate R value.
+        
+        :returns: R value = weight / upper limit        
+        """
+        
+        expResult = self.expResult
+        datasetID = self.dataset.dataInfo.dataId
+        dataType = expResult.datasets[0].dataInfo.dataType
+        
+        if dataType == 'upperLimit':
+            ul = expResult.getUpperLimitFor(txname=self.txnames[0],mass=self.mass, expected = expected)
+        elif dataType == 'efficiencyMap':
+            ul = expResult.getUpperLimitFor(dataID=datasetID, expected=expected)
+        else:
+            logger.error("Unknown dataType %s" %(str(dataType)))
+        if type(ul)==bool and ul==False:
+            logger.info ( "upper limit is False. cannot compute r value." )
+            return None
+        if ul == 0. * fb:
+            logger.info ( "upper limit is 0. cannot compute r value." )
+            return None
+        return (self.xsection.value/ul).asNumber()        
+        
 
 
 
@@ -87,16 +113,26 @@ class TheoryPredictionList(object):
     :ivar _theoryPredictions: list of TheoryPrediction objects     
     """
     
-    def __init__(self, theoryPredictions=None):
+    def __init__(self, theoryPredictions=None, maxCond=None):
         """
         Initializes the list.
         
         :parameter theoryPredictions: list of TheoryPrediction objects
+        :parameter maxCond: maximum relative violation of conditions for valid results (used for printer output)
         """        
         self._theoryPredictions = []
         if theoryPredictions and isinstance(theoryPredictions,list):
-            self._theoryPredictions = theoryPredictions
-
+            
+            if not maxCond:
+                self._theoryPredictions = theoryPredictions                
+            else:
+                newPredictions = []
+                for theoPred in theoryPredictions:
+                    mCond = theoPred.getmaxCondition()
+                    if mCond == 'N/A' or mCond > maxCond: continue
+                    else: newPredictions.append(theoPred)  
+                self._theoryPredictions = newPredictions    
+                        
 
     def __iter__(self):      
         for theoryPrediction in self._theoryPredictions:
@@ -120,7 +156,16 @@ class TheoryPredictionList(object):
         if theoPredList == 0:
             return self
         else:
-            return self.__add__(theoPredList)        
+            return self.__add__(theoPredList)       
+        
+        
+    def sortTheoryPredictions(self):
+        """
+        Reverse sort theoryPredictions by R value.
+        Used for printer.
+        """
+        self._theoryPredictions = sorted(self._theoryPredictions, key=lambda theoPred: theoPred.getR(), reverse=True)    
+      
 
 def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2, useBestDataset=True):
     """

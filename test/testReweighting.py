@@ -9,15 +9,19 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.theory.particle import Particle
+from smodels.share.models import SMparticles, MSSMparticles
 from smodels.theory.branch import Branch
 from smodels.theory.reweighting import calculateProbabilities, addPromptAndDisplaced
 from smodels.tools.physicsUnits import eV, GeV
 from smodels.theory.element import Element
 
-n1 = Particle(Z2parity='odd', label='N1', pdg=1000022, mass=None, eCharge=0, colordim=0, spin=1./2, totalwidth=0.*GeV, branches=None) 
-st1 = Particle(Z2parity='odd', label='st_1', pdg=1000006, mass=None, eCharge=-1./3, colordim=3, spin=0, totalwidth=2.*GeV, branches=None)
-gluino = Particle(Z2parity='odd', label='gluino', pdg=1000021, mass=None, eCharge=0, colordim=8, spin=1./2, totalwidth=1.*10**(-30)*GeV, branches=None)
-
+n1 = MSSMparticles.n1
+n1.totalwidth = 0.*GeV
+st1 = MSSMparticles.st1
+st1.totalwidth = 2.*GeV
+gluino = MSSMparticles.gluino
+gluino.totalwidth = 1.*10**(-30)*GeV
+t = SMparticles.t
 
 class ReweightingTest(unittest.TestCase):     
    
@@ -36,7 +40,7 @@ class ReweightingTest(unittest.TestCase):
         probabilities1, branches1 = addPromptAndDisplaced(branch1)
         self.assertEqual(len(probabilities1), 1)
         self.assertEqual(probabilities1[0], 1.)
-        self.assertEqual(branches1[0]._decayType, 'prompt')
+        self.assertEqual(branches1[0]._decayType, 'METonly')
         
         branch2 = Branch()
         branch2.BSMparticles = [gluino]
@@ -46,7 +50,8 @@ class ReweightingTest(unittest.TestCase):
         self.assertEqual(branches2[0]._decayType, 'longlived')
         
         branch3 = Branch()
-        branch3.BSMparticles = [st1]
+        branch3.BSMparticles = [st1,n1]
+        branch3.particles = [[t]]
         probabilities3, branches3 = addPromptAndDisplaced(branch3)
         self.assertEqual(len(probabilities3), 2)
         self.assertEqual(probabilities3[0], 1.)

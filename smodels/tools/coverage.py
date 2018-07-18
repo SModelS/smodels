@@ -77,7 +77,7 @@ class Uncovered(object):
             
             
             for el in allElements:
-
+                                
                 if self.inPrevMothers(el): 
                     missing = False # cannot be missing if element with same mothers has already appeared
                 # this is because it can certainly be compressed further to the smaller element already seen in the loop
@@ -102,8 +102,6 @@ class Uncovered(object):
                 if self.hasLongLived(el): self.longLived.addToGeneralElements(el)
                 elif self.hasDisplaced(el): self.displaced.addToGeneralElements(el)
                 else: self.MET.addToGeneralElements(el)
-                
-        
 
     def inPrevMothers(self, el): #check if smaller element with same mother has already been checked
         for mEl in el.motherElements:
@@ -204,8 +202,7 @@ class UncoveredList(object):
         xsec = 0.
         if not sqrts: sqrts = self.sqrts
         for genEl in self.generalElements:
-            for el in genEl._contributingElements:
-                xsec += el.missingX
+            xsec += genEl.missingX
         return xsec
             
 
@@ -214,23 +211,23 @@ class UncoveredList(object):
         Adds an element to the list of missing topologies = general elements.
         If the element contributes to a missing topology that is already in the list, add element and weight to topology.
         :parameter el: element to be added
-        """        
-        
-        newEl = self.generalElement(el)
-        newEl.sortBranches()
-        
-        name = str(newEl) + '  %s'%(str( newEl.branches[0]._decayType) + ","+ str(newEl.branches[1]._decayType) )    
+        """     
+
+        newGenEl = self.generalElement(el)
+        newGenEl.sortBranches()
+
+        name = str(newGenEl) + '  (%s)'%(str( newGenEl.branches[0]._decayType) + ","+ str(newGenEl.branches[1]._decayType) )    
 
         # Check if an element with the same generalized name has already been added
         for genEl in self.generalElements:
-            if name == genEl._ouputDescription:
+            if name == genEl._outputDescription:
                 genEl._contributingElements.append(el)
                 genEl.missingX += el.missingX
                 return
             
-        newEl._ouputDescription = name           
-        newEl._contributingElements = [el]    
-        self.generalElements.append(newEl)
+        newGenEl._outputDescription = name           
+        newGenEl._contributingElements = [el]    
+        self.generalElements.append(newGenEl)
         
 
     def generalElement(self, el):
@@ -243,14 +240,28 @@ class UncoveredList(object):
         :returns: string of generalized element
         """
         import smodels.experiment.finalStateParticles as fS
+        newEl = Element()
+        newEl.branches[0]._decayType = el.branches[0]._decayType
+        newEl.branches[1]._decayType = el.branches[1]._decayType
+        for ib,branch in enumerate(el.branches):
+            newEl.branches[ib].BSMparticles = branch.BSMparticles[:]
+        newEl.missingX = el.missingX
+                 
         if self.sumL: exch = [fS.WList, fS.lList, fS.tList, fS.taList, fS.nuList] 
         else: exch = [fS.WList, fS.eList, fS.muList,fS.tList, fS.taList, fS.nuList]
         if self.sumJet: exch.append(fS.jetList)
-        for particleList in exch:  
-            for branch in el.branches:
-                for vertex in branch.particles:
-                    for ip,particle in enumerate(vertex):
+          
+        for ib,branch in enumerate(el.branches):
+            newParticles = []
+            for vertex in branch.particles:
+                newVertex = vertex[:]
+                for ip,particle in enumerate(vertex):
+                    for particleList in exch:
                         if particle == particleList:
-                            vertex[ip] = particleList
-        return el 
+                            newVertex[ip] = particleList
+                newParticles.append(newVertex)
+            newEl.branches[ib].particles = newParticles
+            newEl.branches[ib].setInfo()
+        
+        return newEl 
 
