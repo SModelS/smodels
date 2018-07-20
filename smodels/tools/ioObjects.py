@@ -289,11 +289,11 @@ class SlhaStatus(object):
             return
         try:
             self.lsp = self.findLSP()
-            self.lspStatus = self.testLSP(checkLSP)
+            self.lspStatus = self.testLSP(False)
             self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
             self.xsec = self.hasXsec(checkXsec)
             self.decayBlocksStatus = self.findMissingDecayBlocks(findMissingDecayBlocks)
-            self.longlived = self.findLonglivedParticles(findLonglived)
+            self.longlived = self.findLonglivedParticles(False)
             self.status = self.evaluateStatus()
         ## except Exception,e:
         except (SModelSError,TypeError,IOError,ValueError,AttributeError) as e:
