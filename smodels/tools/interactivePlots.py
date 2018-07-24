@@ -110,7 +110,7 @@ class DataHolder(object):
             self.BR_get_top = parameters.BR_get_top
 
         if not hasattr(parameters,'plot_title'):
-            logger.warning("plot_ttiel not defined in %s. Using default title" %parFile)
+            logger.warning("plot_title not defined in %s. Using default title" %parFile)
             self.plot_title = 'interactive-plots'
         else:
             self.plot_title = parameters.plot_title
@@ -152,6 +152,7 @@ class DataHolder(object):
             self.data_dict = interactivePlotsHelpers.get_missed_topologies(self.data_dict,smodelsDict)
             self.data_dict = interactivePlotsHelpers.get_asymmetric_branches(self.data_dict,smodelsDict)
             self.data_dict = interactivePlotsHelpers.get_outside_grid(self.data_dict,smodelsDict)
+            self.data_dict = interactivePlotsHelpers.get_long_cascades(self.data_dict,smodelsDict)
 
 
             #Fill with SLHA data:
@@ -196,7 +197,7 @@ class DataHolder(object):
                 continue
             
             #Data read successfully
-            self.data_dict['file'].append(f)       
+            self.data_dict['file'].append(f.split('/')[-1])       
             outputStatus = interactivePlotsHelpers.output_status(smodelsOutput)
             if outputStatus == -1:
                 self.fillWith(None,slhaData)

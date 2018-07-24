@@ -122,13 +122,16 @@ def get_expres(data_dict,smodelsOutput):
                 chi_2 = get_entry(expres,'chi2')
                 analysis_id = get_entry(expres,'AnalysisID')
     else:
-        Txname = None
+        Txname = 'None'
         chi_2 = None
-        analysis_id = None
+        analysis_id = 'None'
+        rmax=None
  
     if 'SmodelS_excluded' in  data_dict:
-        if rmax > 1:
-            data_dict['SmodelS_excluded'].append('Excluded')
+        if rmax ==None:
+            data_dict['SmodelS_excluded'].append('None')
+        elif rmax>1:
+            data_dict['SmodelS_excluded'].append('Excluded')  
         else:
             data_dict['SmodelS_excluded'].append('Non-excluded')  
 
@@ -148,34 +151,42 @@ def get_missed_topologies(data_dict,smodelsOuptut):
     """
     Extracts the Missed topologies info from the .py output. If requested, the data will be appended on each corresponding list
     """
-        
+    decompStatus = get_entry(smodelsOuptut,'OutputStatus','decomposition status')
     missedtopo_max_xsec=0
     missedtopo_total_xsec=0
-    missed_topo = None
-    for missed_topo in get_entry(smodelsOuptut, 'Missed Topologies'):
-        missedtopo_xsec=missed_topo.get('weight (fb)')
-        missedtopo_total_xsec=missedtopo_total_xsec+missedtopo_xsec
-        if missedtopo_xsec>missedtopo_max_xsec:
-            missedtopo_max_xsec=missedtopo_xsec
-            missed_topo=missed_topo.get('element')
+    mt_max = 'None'
+    if decompStatus >= 0:
+        for missed_topo in get_entry(smodelsOuptut, 'Missed Topologies'):
+            missedtopo_xsec=missed_topo.get('weight (fb)')
+            missedtopo_total_xsec=missedtopo_total_xsec+missedtopo_xsec
+            if missedtopo_xsec>missedtopo_max_xsec:
+                missedtopo_max_xsec=missedtopo_xsec
+                mt_max=missed_topo.get('element')       
+    else:
+        missedtopo_max_xsec=None
+        missedtopo_total_xsec=None
+        missed_topo = 'None'
     if 'MT_max' in data_dict.keys():
-        data_dict.get('MT_max').append(str(missed_topo))
+        data_dict.get('MT_max').append(str(mt_max))
     if 'MT_max_xsec' in data_dict.keys():
         data_dict.get('MT_max_xsec').append(missedtopo_max_xsec)    
     if 'MT_total_mxsec' in data_dict.keys():
-        data_dict.get('MT_total_mxsec').append(missedtopo_total_xsec)        
-                    
+        data_dict.get('MT_total_mxsec').append(missedtopo_total_xsec)     
+        
     return data_dict           
    
 def get_long_cascades(data_dict,smodelsOutput):
     """
     Extracts the Long cascade info from the .py output. If requested, the data will be appended on each corresponding list
     """
-        
-    long_cascade_total_xsec=0
-    for long_cascade in smodelsOutput.get('Long Cascades'):
-        long_cascade_xsec=long_cascade.get('weight (fb)')
-        long_cascade_total_xsec=long_cascade_total_xsec+long_cascade_xsec
+    decompStatus = get_entry(smodelsOutput,'OutputStatus','decomposition status')    
+    if decompStatus >= 0:
+        long_cascade_total_xsec=0
+        for long_cascade in smodelsOutput.get('Long Cascades'):
+            long_cascade_xsec=long_cascade.get('weight (fb)')
+            long_cascade_total_xsec=long_cascade_total_xsec+long_cascade_xsec
+    else:
+        long_cascade_total_xsec=None
     if 'MT_long_xsec' in data_dict.keys():
         data_dict.get('MT_long_xsec').append(long_cascade_total_xsec)
              
@@ -185,8 +196,11 @@ def get_asymmetric_branches(data_dict,smodelsOutput):
     """
     Extracts the asymmetric branches info from the .py output. If requested, the data will be appended on each corresponding list
     """
-        
-    asymmetric_branch_total_xsec = sum([asym_br['weight (fb)'] for asym_br in smodelsOutput['Asymmetric Branches']])
+    decompStatus = get_entry(smodelsOutput,'OutputStatus','decomposition status')
+    if decompStatus >= 0:
+        asymmetric_branch_total_xsec = sum([asym_br['weight (fb)'] for asym_br in smodelsOutput['Asymmetric Branches']])
+    else:
+        asymmetric_branch_total_xsec=None    
     if 'MT_asym_xsec' in data_dict.keys():
         data_dict.get('MT_asym_xsec').append(asymmetric_branch_total_xsec) 
     return data_dict  
@@ -195,11 +209,14 @@ def get_outside_grid(data_dict,smodelsOutput):
     """
     Extracts the outside grid info from the .py output. If requested, the data will be appended on each corresponding list.
     """    
-    
+    decompStatus = get_entry(smodelsOutput,'OutputStatus','decomposition status')
     outside_grid_total_xsec=0
-    for outside_grid in smodelsOutput.get('Outside Grid'):
-        outside_grid_xsec=outside_grid.get('weight (fb)')
-        outside_grid_total_xsec = outside_grid_total_xsec+outside_grid_xsec
+    if decompStatus >= 0:
+        for outside_grid in smodelsOutput.get('Outside Grid'):
+            outside_grid_xsec=outside_grid.get('weight (fb)')
+            outside_grid_total_xsec = outside_grid_total_xsec+outside_grid_xsec
+    else:
+        outside_grid_total_xsec = None
     if 'MT_outgrid_xsec' in data_dict.keys():
         data_dict.get('MT_outgrid_xsec').append(outside_grid_total_xsec)  
     return data_dict   
@@ -320,13 +337,15 @@ def get_xy_axis(variable_x,variable_y):
      
  
 def separate_cont_disc_plots(plot_list,data_dict):
-    """ Generate sub lists of plots with discrete and conitnuous z axis variables. """
+    ''' Generate sub lists of plots with discrete and conitnuous z axis variables. '''
     cont_plots=[]
     disc_plots=[]
-    for plot_name in plot_list:
-        if type(data_dict.get(plot_name)[1])==str:
-            disc_plots.append(plot_name)
-        else: cont_plots.append(plot_name)         
+    discrete_options=['Tx','Analysis','MT_max','file','SmodelS_excluded']
+    for plot in plot_list:
+        if plot in discrete_options:
+            disc_plots.append(plot)
+        else:
+            cont_plots.append(plot)
     return cont_plots, disc_plots;   
  
  
@@ -348,7 +367,7 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
                     text=hover_text,
                     hoverinfo='text',
                     marker=dict(
-                        size=12,
+                        size=6,
                         cmax=data_frame_all[cont_plot].max(),
                         cmin=data_frame_all[cont_plot].max(),
                         color=z,
@@ -388,7 +407,7 @@ def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_f
                     text=hover_text,
                     hoverinfo='text',
                     marker=dict(
-                        size=12,
+                        size=6,
                         cmax=data_frame_excluded[cont_plot].max(),
                         cmin=data_frame_excluded[cont_plot].max(),
                         color=z,
@@ -428,7 +447,7 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
                     text=hover_text,
                     hoverinfo='text',
                     marker=dict(
-                        size=12,
+                        size=6,
                         cmax=data_frame_nonexcluded[cont_plot].max(),
                         cmin=data_frame_nonexcluded[cont_plot].max(),
                         color=z,
@@ -467,7 +486,7 @@ def make_discrete_plots_all(disc_plots,x_axis,y_axis,path_to_plots,data_frame_al
                         'x': data_frame_all.loc[data_frame_all[disc_plot]==value][x_axis],
                         'y': data_frame_all.loc[data_frame_all[disc_plot]==value][y_axis],
                         'name': value, 'mode': 'markers',
-                        'marker':dict(size=12),
+                        'marker':dict(size=6),
                         'text':data_frame_all.loc[data_frame_all[disc_plot]==value]['hover_text'],
                         'hoverinfo':'text',
                  
@@ -502,7 +521,7 @@ def make_discrete_plots_excluded(disc_plots,x_axis,y_axis,path_to_plots,data_fra
                         'x': data_frame_excluded.loc[data_frame_excluded[disc_plot]==value][x_axis],
                         'y': data_frame_excluded.loc[data_frame_excluded[disc_plot]==value][y_axis],
                         'name': value, 'mode': 'markers',
-                        'marker':dict(size=12),
+                        'marker':dict(size=6),
                         'text':data_frame_excluded.loc[data_frame_excluded[disc_plot]==value]['hover_text'],
                         'hoverinfo':'text',
                  
@@ -536,7 +555,7 @@ def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_
                         'x': data_frame_nonexcluded.loc[data_frame_nonexcluded[disc_plot]==value][x_axis],
                         'y': data_frame_nonexcluded.loc[data_frame_nonexcluded[disc_plot]==value][y_axis],
                         'name': value, 'mode': 'markers',
-                        'marker':dict(size=12),
+                        'marker':dict(size=6),
                         'text':data_frame_nonexcluded.loc[data_frame_nonexcluded[disc_plot]==value]['hover_text'],
                         'hoverinfo':'text',
                  

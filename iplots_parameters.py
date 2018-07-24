@@ -17,7 +17,7 @@ ctau_hover_information={'ctau_suR':2000002}
 #For which particles you want to get its branching ratio. 
 BR_hover_information={'BR_gluino':1000021}
 #WARNING: Branching ratio's lists can be very long, so the may not fit in the hover,but you can tell how many branches you want to print with BR_get_top (default 'all').
-BR_get_top=5
+BR_get_top='all'
 
 
 #*Espaces are not allowed in variable's names.
@@ -37,9 +37,9 @@ BR_get_top=5
 #MT_asym_xsec -> Shows the total missing cross section in decays with asymmetric branches 
 #MT_outgrid_xsec -> Shows the total missing cross section where we are outside the mass grid 
 #file -> Shows the name of the input spectrum file 
-smodels_hover_information=['SmodelS_excluded','chi2','r_max','Tx','Analysis','MT_asym_xsec','MT_total_mxsec','MT_asym_xsec','MT_outgrid_xsec']
+smodels_hover_information=['SmodelS_excluded','chi2','r_max','Tx','Analysis','MT_asym_xsec','MT_total_mxsec','MT_outgrid_xsec','file','MT_long_xsec']
 
 #Set which plots do you want. 
 #Same options from Smodels hover information are available.
 plot_data=['all','non-excluded','excluded'] # choice: all, non-excluded, excluded points
-plot_list=['SmodelS_excluded','chi2','r_max','Tx','Analysis','MT_asym_xsec','MT_total_mxsec','MT_outgrid_xsec','MT_max']
+plot_list=['SmodelS_excluded','chi2','r_max','Tx','Analysis','MT_asym_xsec','MT_total_mxsec','MT_outgrid_xsec','MT_max','MT_long_xsec']
