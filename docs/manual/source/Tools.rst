@@ -33,9 +33,10 @@ Inside SModelS there is a number of tools that may be convenient for the user:
 
 * a :ref:`cross section calculator <xsecCalc>` based on `Pythia8 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ (or `Pythia6 <http://pythia6.hepforge.org>`_) and 
   `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_,
-* :ref:`SLHA and LHE file checkers <fileChecks>` to check your input files for completeness and sanity,
-* a :ref:`database browser <databaseBrowser>` to provide easy access to the |database| of experimental results.
-* a :ref:`file permissions fixer <permissionsFixer>` to fix a problem with file permissions for the cross section computers in system-wide installs.
+* :ref:`SLHA and LHE file checkers <fileChecks>` to check your input files for completeness and sanity, 
+* a :ref:`database browser <databaseBrowser>` to provide easy access to the |database| of experimental results, 
+* a plotting tool to make :ref:`interactive plots <interactivePlots>` based on `plotly <https://plot.ly/python/>`_ (v1.1.3 onwards),
+* a :ref:`file permissions fixer <permissionsFixer>` to fix a problem with file permissions for the cross section computers in system-wide installs, and 
 * a :ref:`toolbox <toolBox>` to quickly show the state of the external tools.
 
 .. _xsecCalc:
@@ -235,6 +236,69 @@ Further Python example codes using the functionalities of the browser
 can be found in :ref:`Howto's <Examples>`.
 
 * **The Database browser tool is implemented by the**  `Browser class <tools.html#tools.databaseBrowser.Browser>`_
+
+
+.. _interactivePlots:
+
+Interactive Plots Maker
+-----------------------
+
+This tool allows to easily produce interactive plots which relate the SModelS output with information on the user's model stored in the SLHA files. It gives 2d plots in the parameter space defined by the user, with additional user-defined information appearing in hover boxes. The output is in html format for viewing in a web browser.  NB: this needs SLHA model input and SModelS python output!
+
+**Required python packages are:** plotly, pandas, pyslha, os, decimal
+
+**The usage of the interactive plots tool is:**
+
+.. include:: InteractivePlots.rst
+
+
+A typical
+usage example is: ::
+
+   smodelsTools.py interactive-plots -f test/testFiles/scanExample/smodels-output/ -s test/testFiles/scanExample/slha -p iplots_parameters.py -o results/iplots/
+
+which will produce 3x10 plots in the gluino vs squark mass plane from a small scan example, viewable in a web browser.
+
+
+iplots parameters file
+^^^^^^^^^^^^^^^^^^^^^^
+
+The options for the inteactive plots tool are defined in a parameters file, *iplots_parameters.py* in the above example.  
+An example file, including all available parameters together with a short description, is stored in :download:`iplots_parameters.py <images/iplots_parameters.py>`.
+Since the plotting information is model dependent, there is no default setting -- the iplots parameters file is mandatory input. 
+Below we give more detailed information about each entry in this file.
+
+* *plot_title*: main overall titke for your plots, typically the model name.
+
+* *x and y axes*: SLHA block and PDG code number of the variables you want to plot, e.g. 'm_gluino':['MASS',1000021].
+
+  * **variable_x**: In a dictionary form, give the name of the x-axis variable, and the block and PDG code number to find it in the SLHA file. Example: variable_x={'m_gluino[GeV]':['MASS',1000021]}. Note that spaces are not allowed in variables names!
+  * **variable_y**: same for the y-axis. Example: variable_y={'m_suR[GeV]':['MASS',2000002]}
+
+* *spectrum hover information*: defines which information from the input SLHA file will appear in the hover box. The syntax is again a python dictonary.
+
+  * **slha_hover_information**: information from the input SLHA file, e.g. model parameters or masses. Example: slha_hover_information={'m_gluino': ['MASS',1000021],'m_suR':['MASS',2000002],'m_LSP': ['MASS',1000022]} 
+
+  * **ctau_hover_information**: displays the mean decay length in meter for the listed particle(s). Example: ctau_hover_information={'ctau_chi1+':1000024}
+
+  * **BR_hover_information**: defines for which particle(s) to display decay channels and branching ratios. Example: BR_hover_information={'BR_gluino':1000021}. **WARNING:** Lists of branching ratios can be very long, so the may not fit in the hover box. One can define the number of entries with **BR_get_top**, e.g. BR_get_top=5 (default: BR_get_top='all').
+
+* *SModelS hover information*: defines, as a list of keywords, which information to display from the SModelS output. Example: 
+smodels_hover_information=['SmodelS_excluded','r_max','Tx','Analysis','file']. The options are: 
+
+  * **SmodelS_excluded**: prints whether the point is excluded or not by SModelS 
+  * **r_max**: shows the highest r-value for each parameter point
+  * **chi2**: shows the chi^2 value, if available (if not, the output is 'none')
+  * **Tx**: shows the topology/ies which give r_max
+  * **Analysis**: shows the experimental analysis from which the strongest constraint (r_max) comes from
+  * **MT_max**: shows the missing topology with the largest cross section (in SModelS bracket notation)
+  * **MT_max_xsec**: shows the cross section of MT_max
+  * **MT_total_mxsec**: shows the total missing cross section (i.e. the sum of all missing topologies cross sections)  
+  * **MT_long_xsec**: shows the total missing cross section in long cascade decays  
+  * **MT_asym_xsec**: shows the total missing cross section in decays with asymmetric branches 
+  * **MT_outgrid_xsec**: shows the total missing cross section outside the mass grids of the experimental results
+  * **file**: shows the name of the input spectrum file 
+
 
 .. _permissionsFixer:
 
