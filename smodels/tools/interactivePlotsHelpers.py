@@ -170,8 +170,8 @@ def get_missed_topologies(data_dict,smodelsOuptut):
         data_dict.get('MT_max').append(str(mt_max))
     if 'MT_max_xsec' in data_dict.keys():
         data_dict.get('MT_max_xsec').append(missedtopo_max_xsec)    
-    if 'MT_total_mxsec' in data_dict.keys():
-        data_dict.get('MT_total_mxsec').append(missedtopo_total_xsec)     
+    if 'MT_total_xsec' in data_dict.keys():
+        data_dict.get('MT_total_xsec').append(missedtopo_total_xsec)     
         
     return data_dict           
    
@@ -241,12 +241,16 @@ def get_ctau(data_dict,slhaData,ctau_hover_information):
     for key in ctau_hover_information.keys():
         value=ctau_hover_information.get(key)
         total_width=float(str(slhaData.decays[value]).split('total width = ')[1].split(' GeV')[0])
-        mean_lifetime=(6.582119e-16)/(total_width*1e9)
-        ctau=(mean_lifetime)*(299792458)
+        if total_width == 0:
+            ctau=float('inf')
+        else:
+            mean_lifetime=(6.582119e-16)/(total_width*1e9)
+            ctau=(mean_lifetime)*(299792458)
+            
         data_dict.get(key).append(ctau)
         
     return data_dict 
-        
+
               
               
 def get_BR(data_dict,slhaData,BR_hover_information,BR_get_top):
