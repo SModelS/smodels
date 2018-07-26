@@ -127,7 +127,7 @@ class Branch(object):
                 
         #Compare BSM states by Z2parity and mass:
         for iptc,bsmParticle in enumerate(self.BSMparticles):
-            comp = bsmParticle.cmpProperties(other.BSMparticles[iptc],properties=['Z2parity','mass'])
+            comp = bsmParticle.cmpProperties(other.BSMparticles[iptc],properties=['Z2parity','mass', 'totalwidth'])
             if comp:
                 return comp
             
