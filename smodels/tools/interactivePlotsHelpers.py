@@ -119,7 +119,11 @@ def get_expres(data_dict,smodelsOutput):
             if r>rmax:
                 rmax = r
                 Txname = get_entry(expres,'TxNames')
-                chi_2 = get_entry(expres,'chi2')
+                if get_entry(expres,'chi2')==False:
+                    chi_2=None
+                else:    
+                    chi_2 = get_entry(expres,'chi2')
+
                 analysis_id = get_entry(expres,'AnalysisID')
     else:
         Txname = 'None'
@@ -142,6 +146,7 @@ def get_expres(data_dict,smodelsOutput):
         data_dict['Tx'].append(str(Txname))
         
     if 'chi2' in data_dict.keys(): 
+        print(chi_2)
         data_dict['chi2'].append(chi_2) 
     if 'Analysis' in data_dict.keys(): 
         data_dict['Analysis'].append(analysis_id)   
