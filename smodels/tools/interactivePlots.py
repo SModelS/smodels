@@ -197,8 +197,7 @@ class DataHolder(object):
                 continue
             
             #Data read successfully
-            self.data_dict['file'].append(f.split('/')[-1]) 
-            print(f.split('/')[-1])
+            self.data_dict['file'].append(f.split('/')[-1])
             outputStatus = interactivePlotsHelpers.output_status(smodelsOutput)
             if outputStatus == -1:
                 self.fillWith(None,slhaData)

@@ -146,7 +146,6 @@ def get_expres(data_dict,smodelsOutput):
         data_dict['Tx'].append(str(Txname))
         
     if 'chi2' in data_dict.keys(): 
-        print(chi_2)
         data_dict['chi2'].append(chi_2) 
     if 'Analysis' in data_dict.keys(): 
         data_dict['Analysis'].append(analysis_id)   
@@ -363,7 +362,6 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
     """ Generate plots with continuous z axis variables, using all data points """
     if 'all' in plot_data: 
         for cont_plot in cont_plots:
-             
             z=data_frame_all[cont_plot]
             y=data_frame_all[x_axis]
             x=data_frame_all[y_axis]
@@ -385,7 +383,6 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
                     colorscale='Jet'), 
                     mode='markers'  
             )
-     
                     ]
      
             layout = go.Layout(hovermode= 'closest',
@@ -446,8 +443,7 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
             z=data_frame_nonexcluded[cont_plot]
             y=data_frame_nonexcluded[x_axis]
             x=data_frame_nonexcluded[y_axis]
-            hover_text=data_frame_nonexcluded['hover_text']
-             
+            hover_text=data_frame_nonexcluded['hover_text'] 
              
             data = [
                 go.Scatter(
