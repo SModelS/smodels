@@ -243,7 +243,7 @@ can be found in :ref:`Howto's <Examples>`.
 Interactive Plots Maker
 -----------------------
 
-This tool allows to easily produce interactive plots which relate the SModelS output with information on the user's model stored in the SLHA files. It gives 2d plots in the parameter space defined by the user, with additional user-defined information appearing in hover boxes. The output is in html format for viewing in a web browser.  NB: this needs SLHA model input and SModelS python output!
+This tool allows to easily produce interactive plots which relate the SModelS output with information on the user's model stored in the SLHA files. It gives 2d plots in the parameter space defined by the user, with additional user-defined information appearing in hover boxes. The output is in html format for viewing in a web browser. The aim is not to make publication-ready plots but to facilitate getting an overview of e.g. the properties of points in a scan. NB: this needs SLHA model input and SModelS python output!
 
 **Required python packages are:** plotly, pandas, pyslha, os, decimal
 
@@ -293,7 +293,7 @@ smodels_hover_information=['SmodelS_excluded','r_max','Tx','Analysis','file']. T
   * **Analysis**: shows the experimental analysis from which the strongest constraint (r_max) comes from
   * **MT_max**: shows the missing topology with the largest cross section (in SModelS bracket notation)
   * **MT_max_xsec**: shows the cross section of MT_max
-  * **MT_total_mxsec**: shows the total missing cross section (i.e. the sum of all missing topologies cross sections)  
+  * **MT_total_xsec**: shows the total missing cross section (i.e. the sum of all missing topologies cross sections)  
   * **MT_long_xsec**: shows the total missing cross section in long cascade decays  
   * **MT_asym_xsec**: shows the total missing cross section in decays with asymmetric branches 
   * **MT_outgrid_xsec**: shows the total missing cross section outside the mass grids of the experimental results
