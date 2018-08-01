@@ -283,20 +283,30 @@ Below we give more detailed information about each entry in this file.
 
   * **BR_hover_information**: defines for which particle(s) to display decay channels and branching ratios. Example: BR_hover_information={'BR_gluino':1000021}. **WARNING:** Lists of branching ratios can be very long, so the may not fit in the hover box. One can define the number of entries with **BR_get_top**, e.g. BR_get_top=5 (default: BR_get_top='all').
 
-* *SModelS hover information*: defines, as a list of keywords, which information to display from the SModelS output. Example: 
-smodels_hover_information=['SmodelS_excluded','r_max','Tx','Analysis','file']. The options are: 
+* *SModelS hover information*: defines, as a list of keywords, which information to display from the SModelS output. Example: smodels_hover_information=['SmodelS_excluded','r_max','Tx','Analysis','file']. The options are:
 
-  * **SmodelS_excluded**: prints whether the point is excluded or not by SModelS 
+  * **SmodelS_excluded**: prints whether the point is excluded or not by SModelS
+ 
   * **r_max**: shows the highest r-value for each parameter point
+
   * **chi2**: shows the chi^2 value, if available (if not, the output is 'none')
+
   * **Tx**: shows the topology/ies which give r_max
+
   * **Analysis**: shows the experimental analysis from which the strongest constraint (r_max) comes from
+
   * **MT_max**: shows the missing topology with the largest cross section (in SModelS bracket notation)
+
   * **MT_max_xsec**: shows the cross section of MT_max
+
   * **MT_total_xsec**: shows the total missing cross section (i.e. the sum of all missing topologies cross sections)  
+
   * **MT_long_xsec**: shows the total missing cross section in long cascade decays  
+
   * **MT_asym_xsec**: shows the total missing cross section in decays with asymmetric branches 
+
   * **MT_outgrid_xsec**: shows the total missing cross section outside the mass grids of the experimental results
+
   * **file**: shows the name of the input spectrum file 
 
 
