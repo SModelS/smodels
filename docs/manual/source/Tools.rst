@@ -309,6 +309,13 @@ Below we give more detailed information about each entry in this file.
 
   * **file**: shows the name of the input spectrum file 
 
+* *Choice of plots to make*
+
+  * **plot_data**: which points you want to plot; the options are: all, non-excluded, excluded points. Example: plot_data=['all','non-excluded','excluded'] 
+
+  * **plot_list**: which quantities to plot in the x,y plane; the same options as for SModels hover information apply. Example: 
+plot_list=['r_max','chi2','Tx','Analysis','MT_max','MT_max_xsec','MT_total_xsec','MT_long_xsec','MT_asym_xsec']  
+
 
 .. _permissionsFixer:
 
