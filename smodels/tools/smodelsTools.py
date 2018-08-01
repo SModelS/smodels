@@ -79,7 +79,7 @@ def main():
     iPlots = subparsers.add_parser('interactive-plots', description="Produces a set of interactive plots fo visualizing results from a scan.")
     iPlots.add_argument('-p', '--parameters', help='path to the parameters file (default = iplots_parameters.py)', required=True,
                               default = 'iplots_parameters.py')
-    iPlots.add_argument('-f', '--smodelsFolder', help='path to the smodels folder with the SModelS python or xml output files.', 
+    iPlots.add_argument('-f', '--smodelsFolder', help='path to the smodels folder with the SModelS python output files.', 
                             required=True)
     iPlots.add_argument('-s', '--slhaFolder', help='path to the SLHA folder with the SLHA input files.', 
                             required=True)
