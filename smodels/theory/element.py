@@ -333,7 +333,7 @@ class Element(object):
 
     def getEinfo(self):
         """
-        Get topology info from particle string.
+        Get element topology info from branch topology info.
         
         :returns: dictionary containing vertices and number of final states information  
         """
@@ -341,8 +341,9 @@ class Element(object):
         vertnumb = []
         vertparts = []
         for branch in self.branches:
-            vertparts.append([len(ptcs) for ptcs in branch.particles])
-            vertnumb.append(len(branch.particles))
+            bInfo = branch.getInfo()
+            vertparts.append(bInfo['vertparts'])
+            vertnumb.append(bInfo['vertnumb'])
                 
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
 

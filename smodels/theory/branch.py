@@ -132,8 +132,22 @@ class Branch(object):
         been defined yet.
         """
 
-        self.vertnumb = len(self.particles)
-        self.vertparts = [len(v) for v in self.particles]
+        bInfo = self.getInfo()
+        self.vertnumb = bInfo['vertnumb']
+        self.vertparts = bInfo['vertparts']
+        
+    def getInfo(self):
+        """
+        Get branch topology info from particles.
+        
+        :returns: dictionary containing vertices and number of final states information  
+        """
+
+        vertnumb = len(self.particles)
+        vertparts = [len(v) for v in self.particles]
+        
+        return {"vertnumb" : vertnumb, "vertparts" : vertparts}
+        
         
     def setFinalState(self,finalState=None):
         """
@@ -358,16 +372,19 @@ class InclusiveBranch(Branch):
 
     def __ne__(self,other):
         return self.__cmp__(other) != 0
-    
-    def setInfo(self):
+        
+    def getInfo(self):
         """
-        Defines the number of vertices (vertnumb) and number of
-        particles in each vertex (vertpats) properties, if they have not
-        been defined yet.
+        Get branch topology info from particles.
+        
+        :returns: dictionary containing vertices and number of final states information  
         """
 
-        self.vertnumb = InclusiveInt()
-        self.vertparts = InclusiveList()
+        vertnumb = InclusiveInt()
+        vertparts = InclusiveList()
+        
+        return {"vertnumb" : vertnumb, "vertparts" : vertparts}
+        
         
 class InclusiveInt(int):
     """
