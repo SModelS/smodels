@@ -87,7 +87,7 @@ def main():
                             required=True)
     
     iPlots.add_argument('-N', '--npoints', type=int, default=-1,
-        help="Number of points included in the plot. If -1 all points will be read and included (default = -1).")
+        help="How many (randomly selected) points will be included in the plot. If -1 all points will be read and included (default = -1).")
     
     iPlots.add_argument('-v', '--verbosity', type=str, default="info",
         help="Verbosity (debug, info, warning, error)")

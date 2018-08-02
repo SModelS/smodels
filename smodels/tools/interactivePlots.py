@@ -17,10 +17,19 @@ import os, imp, glob
 
 class DataHolder(object):
     """
-    A simple object to store the required data for producing the interactive plots
+    A simple class to store the required data for producing the interactive plots
     """
     
     def __init__(self,smodelsFolder,slhaFolder,parameterFile):
+        """
+        Initializes the class.
+        
+        :parameter smodelsFolder: path to the folder containing the smodels (python) output files
+        :parameter slhaFolder: path to the folder containing the SLHA input files
+        :parameter parameterFile: path to the file containing the plotting definitions        
+        """
+        
+        
         self.data_dict = []
         self.smodelsFolder = smodelsFolder
         self.slhaFolder = slhaFolder
@@ -48,6 +57,9 @@ class DataHolder(object):
         self.initializeDataDict()
 
     def loadParameters(self):
+        """
+        Reads the parameters from the plotting parameter file.
+        """
         
         logger.info("Reading parameters from %s ..." %(self.parameterFile))        
         
@@ -117,6 +129,10 @@ class DataHolder(object):
 
 
     def initializeDataDict(self):
+        """
+        Initializes an empty dictionary with the plotting options.
+        """
+        
         self.data_dict = {}
         for smodels_names in self.smodels_hover_information:
             self.data_dict[smodels_names]=[]
