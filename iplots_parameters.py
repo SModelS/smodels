@@ -3,7 +3,6 @@
 plot_title= 'My interactive plot example'
 
 #Label, block and code number for the variables you want to plot, e.g. 'm_gluino':['MASS',1000021]. These will be your x and y axes.
-#Note that spaces are not allowed in variable's names. 
 
 variable_x= {'m_gluino[GeV]':['MASS',1000021]}
 variable_y= {'m_suR[GeV]':['MASS',2000002]}

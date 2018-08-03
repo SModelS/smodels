@@ -272,7 +272,7 @@ Below we give more detailed information about each entry in this file.
 
 * *x and y axes*: SLHA block and PDG code number of the variables you want to plot, e.g. 'm_gluino':['MASS',1000021].
 
-  * **variable_x**: In a dictionary form, give the name of the x-axis variable, and the block and PDG code number to find it in the SLHA file. Example: variable_x={'m_gluino[GeV]':['MASS',1000021]}. Note that spaces are not allowed in variables names!
+  * **variable_x**: In a dictionary form, give the name of the x-axis variable, and the block and PDG code number to find it in the SLHA file. Example: variable_x={'m_gluino[GeV]':['MASS',1000021]}. 
   * **variable_y**: same for the y-axis. Example: variable_y={'m_suR[GeV]':['MASS',2000002]}
 
 * *spectrum hover information*: defines which information from the input SLHA file will appear in the hover box. The syntax is again a python dictonary.
