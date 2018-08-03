@@ -268,7 +268,7 @@ An example file, including all available parameters together with a short descri
 Since the plotting information is model dependent, there is no default setting -- the iplots parameters file is mandatory input. 
 Below we give more detailed information about each entry in this file.
 
-* *plot_title*: main overall titke for your plots, typically the model name.
+* *plot_title*: main overall title for your plots, typically the model name.
 
 * *x and y axes*: SLHA block and PDG code number of the variables you want to plot, e.g. 'm_gluino':['MASS',1000021].
 
