@@ -255,7 +255,7 @@ This tool allows to easily produce interactive plots which relate the SModelS ou
 A typical
 usage example is: ::
 
-   smodelsTools.py interactive-plots -f test/testFiles/scanExample/smodels-output/ -s test/testFiles/scanExample/slha -p iplots_parameters.py -o results/iplots/
+   smodelsTools.py interactive-plots -f inputFiles/scanExample/smodels-output/ -s inputFiles/scanExample/slha -p iplots_parameters.py -o results/iplots/
 
 which will produce 3x10 plots in the gluino vs squark mass plane from a small scan example, viewable in a web browser.
 
