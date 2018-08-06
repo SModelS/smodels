@@ -9,7 +9,6 @@
 """
 
 from __future__ import print_function
-from smodels.tools.smodelsLogging import logger
 import sys
 import os
 
@@ -166,6 +165,7 @@ def banner():
 def fixpermissions():
     """ make sure that all filepermissions are such that
         we can compile the wrappers for pythia and nllfast. """
+    from smodels.tools.smodelsLogging import logger
     import os, glob
     Dir = "%ssmodels/lib/" % installDirectory()
     try:
