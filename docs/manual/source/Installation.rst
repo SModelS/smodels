@@ -38,7 +38,16 @@ requires `IPython <https://ipython.org/>`_, while the :ref:`interactive plotter 
 Installation Methods
 ^^^^^^^^^^^^^^^^^^^^
 
-1. The easiest way is probably to run directly in the source directory. Download the source, type **make install** in the top-level directory -- this essential turns the source directory into a setup meant for runtime -- and run directly there.
+1. The first installation method installs SModelS in the source directory, which can then be used for :ref:`running SModelS <runningSModelS>`.
+   After downloading the source from the `SModelS releases page <https://github.com/SModelS/smodels/releases>`_
+   and extracting it, run::
+
+     make install
+
+   in the top-level directory. The installation will remove build folders, install the required 
+   dependencies (using pip install) and compile Pythia and NLL-fast. In case the Python libraries can not be successfully
+   installed, the user can install them separately using his/her preferred method. Pythia and NLL-fast can also be compiled separately
+   running **make externaltools**.
 
 2. If Python's *setuptools* is installed in your machine, SModelS and its dependencies
    can also be installed running::
