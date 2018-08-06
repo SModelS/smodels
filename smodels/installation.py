@@ -32,16 +32,22 @@ def test_requirements():
     import importlib
     for i in requirements():
       try:
-        importlib.import_module( i )
+        pos = i.find(">" )
+        lib = i
+        if pos > -1:
+            lib = i[:pos]
+        importlib.import_module( lib )
       except:
         return False
     return True
 
-def resolve_dependencies():
+def resolve_dependencies( as_user = True ):
     """ method that is meant to resolve the SModelS dependencies, 
-    via pip install --user. Warns you if pip cannot be found. """
+    via pip install --user. Warns you if pip cannot be found. 
+    :params as_user: if False, try system-wide install.
+    """
     ck = test_requirements()
-    if True: ## nothing to be done
+    if ck == True: ## nothing to be done
         return 0
     import subprocess
     req = "%s/smodels/share/requirements.txt" % installDirectory()
@@ -53,7 +59,11 @@ def resolve_dependencies():
     p = "pip"
     if find_pip != 0:
         p = "pip3"
-    out = subprocess.call ( [ p, 'install', '--user', '--upgrade', '-r', req ] )
+    userwide = ""
+    if as_user:
+        userwide = "--user"
+
+    out = subprocess.call ( [ p, 'install', userwide, '--upgrade', '-r', req ] )
     if out == 0:
         print ( "dependencies have been installed successfully." )
         return 0
