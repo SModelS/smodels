@@ -38,7 +38,9 @@ requires `IPython <https://ipython.org/>`_.
 Installation Methods
 ^^^^^^^^^^^^^^^^^^^^
 
-1. If Python's *setuptools* is installed in your machine, SModelS and its dependencies
+1. The easiest way is probably to run directly in the source directory. Download the source, type **make install** in the top-level directory, and run directly there.
+
+2. If Python's *setuptools* is installed in your machine, SModelS and its dependencies
    can be installed running::
 
      setup.py install
@@ -54,7 +56,7 @@ Installation Methods
    For Ubuntu, SL6 machines and other platforms, a recipe is given below.
 
 
-2. If *pip3* (or *pip*) is installed in your machine, installing SModelS should be as easy as: ::
+3. If *pip3* (or *pip*) is installed in your machine, installing SModelS should be as easy as: ::
 
      pip3 install smodels
 
