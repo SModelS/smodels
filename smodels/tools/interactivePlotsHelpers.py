@@ -8,16 +8,22 @@
    
 """
 
-
-import plotly.graph_objs as go
-import plotly,imp
-import pandas as pd
+import sys
+from smodels.tools.smodelsLogging import logger
+try:
+    import plotly.graph_objs as go
+    import plotly,imp
+except ImportError as e:
+    logger.error ( "could not import plotly. Please try to install it, e.g. via:\npip install --user plotly" )
+    sys.exit()
+try:
+    import pandas as pd
+except ImportError as e:
+    logger.error ( "could not import pandas. Please try to install it, e.g. via:\npip install --user pandas" )
+    sys.exit()
 import os
 import pyslha
-from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-
-
 
 def import_python_output(smodelsFile): 
     """
@@ -580,12 +586,12 @@ def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_
 
 
 
-def create_main_html(path_to_plots,plot_data,plot_list):
+def create_index_html(path_to_plots,plot_data,plot_list):
     """
-    Fills the main.html file with links to the interactive plots.
+    Fills the index.html file with links to the interactive plots.
     """
     
-    main_file= open(path_to_plots+'/main.html', 'w')
+    main_file= open(path_to_plots+'/index.html', 'w')
     main_file.write('<html><head><font size=6>Smodels interactive plots.</font></head>')
     hyperlink_format = '<a href={link}>{text}</a>' 
     for plot in plot_list:

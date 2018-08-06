@@ -76,8 +76,8 @@ def main():
     dbBrowser.add_argument('-p', '--path_to_database', help='path to SModelS database', required=True)
     dbBrowser.add_argument('-t', '--text', help='load text database, dont even search for binary database file', action='store_true')
     
-    iPlots = subparsers.add_parser('interactive-plots', description="Produces a set of interactive plots fo visualizing results from a scan.")
-    iPlots.add_argument('-p', '--parameters', help='path to the parameters file (default = iplots_parameters.py)', required=True,
+    iPlots = subparsers.add_parser('interactive-plots', description="Produces a set of interactive plots for visualizing results from a scan.")
+    iPlots.add_argument('-p', '--parameters', help='path to the parameters file (default = iplots_parameters.py)', required=False,
                               default = 'iplots_parameters.py')
     iPlots.add_argument('-f', '--smodelsFolder', help='path to the smodels folder with the SModelS python output files.', 
                             required=True)

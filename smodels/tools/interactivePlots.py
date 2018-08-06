@@ -9,11 +9,10 @@
 
 from __future__ import print_function
 
-
 from smodels.tools import interactivePlotsHelpers 
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-import os, imp, glob
+import os, glob
 
 class DataHolder(object):
     """
@@ -64,6 +63,7 @@ class DataHolder(object):
         logger.info("Reading parameters from %s ..." %(self.parameterFile))        
         
         parFile = self.parameterFile
+        import imp
         
         try:
             with open(self.parameterFile, 'rb') as fParameters: ## imports parameter file
@@ -273,9 +273,9 @@ class DataHolder(object):
                                                                 outFolder,data_frame_nonexcluded,self.plot_data,
                                                                 self.plot_title)
         
-        interactivePlotsHelpers.create_main_html(outFolder,self.plot_data,self.plot_list)
+        interactivePlotsHelpers.create_index_html(outFolder,self.plot_data,self.plot_list)
         
-        logger.info('Generation of interactive plots finished. Go to: \n %s/main.html \n to see the plots.' %outFolder)
+        logger.info('Generation of interactive plots finished. Go to: \n %s/index.html \n to see the plots.' %outFolder)
         
         return True
 
@@ -329,7 +329,6 @@ def main(args):
     
     :parameter args: argparser.Namespace object containing the options for makePlots
     """
-    
     
     return makePlots(args.smodelsFolder, args.slhaFolder, args.outputFolder, 
                      args.parameters, args.npoints, args.verbosity)
