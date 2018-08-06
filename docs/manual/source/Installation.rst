@@ -38,10 +38,10 @@ requires `IPython <https://ipython.org/>`_, while the :ref:`interactive plotter 
 Installation Methods
 ^^^^^^^^^^^^^^^^^^^^
 
-1. The easiest way is probably to run directly in the source directory. Download the source, type **make install** in the top-level directory, and run directly there.
+1. The easiest way is probably to run directly in the source directory. Download the source, type **make install** in the top-level directory -- this essential turns the source directory into a setup meant for runtime -- and run directly there.
 
 2. If Python's *setuptools* is installed in your machine, SModelS and its dependencies
-   can be installed running::
+   can also be installed running::
 
      setup.py install
 
