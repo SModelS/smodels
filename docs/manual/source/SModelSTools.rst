@@ -270,20 +270,20 @@ Below we give more detailed information about each entry in this file.
 
 * *plot_title*: main overall title for your plots, typically the model name.
 
-* *x and y axes*: SLHA block and PDG code number of the variables you want to plot, e.g. 'm_gluino':['MASS',1000021].
+* *x and y axes*: SLHA block and PDG code number of the variables you want to plot, e.g. 'm_gluino': ['MASS', 1000021].
 
-  * **variable_x**: In a dictionary form, give the name of the x-axis variable, and the block and PDG code number to find it in the SLHA file. Example: variable_x={'m_gluino[GeV]':['MASS',1000021]}. 
-  * **variable_y**: same for the y-axis. Example: variable_y={'m_suR[GeV]':['MASS',2000002]}
+  * **variable_x**: In a dictionary form, give the name of the x-axis variable, and the block and PDG code number to find it in the SLHA file. Example: variable_x = {'m_gluino[GeV]': ['MASS', 1000021]}. 
+  * **variable_y**: same for the y-axis. Example: variable_y = {'m_suR[GeV]': ['MASS', 2000002]}
 
 * *spectrum hover information*: defines which information from the input SLHA file will appear in the hover box. The syntax is again a python dictonary.
 
-  * **slha_hover_information**: information from the input SLHA file, e.g. model parameters or masses. Example: slha_hover_information={'m_gluino': ['MASS',1000021],'m_suR':['MASS',2000002],'m_LSP': ['MASS',1000022]} 
+  * **slha_hover_information**: information from the input SLHA file, e.g. model parameters or masses. Example: slha_hover_information = {'m_gluino': ['MASS', 1000021], 'm_suR': ['MASS', 2000002], 'm_LSP': ['MASS', 1000022]} 
 
-  * **ctau_hover_information**: displays the mean decay length in meter for the listed particle(s). Example: ctau_hover_information={'ctau_chi1+':1000024}
+  * **ctau_hover_information**: displays the mean decay length in meter for the listed particle(s). Example: ctau_hover_information = {'ctau_chi1+': 1000024}
 
-  * **BR_hover_information**: defines for which particle(s) to display decay channels and branching ratios. Example: BR_hover_information={'BR_gluino':1000021}. **WARNING:** Lists of branching ratios can be very long, so the may not fit in the hover box. One can define the number of entries with **BR_get_top**, e.g. BR_get_top=5 (default: BR_get_top='all').
+  * **BR_hover_information**: defines for which particle(s) to display decay channels and branching ratios. Example: BR_hover_information = {'BR_gluino': 1000021}. **WARNING:** Lists of branching ratios can be very long, so the may not fit in the hover box. One can define the number of entries with **BR_get_top**, e.g. BR_get_top = 5 (default: BR_get_top = 'all').
 
-* *SModelS hover information*: defines, as a list of keywords, which information to display from the SModelS output. Example: smodels_hover_information=['SmodelS_excluded','r_max','Tx','Analysis','file']. The options are:
+* *SModelS hover information*: defines, as a list of keywords, which information to display from the SModelS output. Example: smodels_hover_information = ['SmodelS_excluded', 'r_max', 'Tx', 'Analysis', 'file']. The options are:
 
   * **SmodelS_excluded**: prints whether the point is excluded or not by SModelS
  
@@ -311,9 +311,9 @@ Below we give more detailed information about each entry in this file.
 
 * *Choice of plots to make*
 
-  * **plot_data**: which points you want to plot; the options are: all, non-excluded, excluded points. Example: plot_data=['all','non-excluded','excluded'] 
+  * **plot_data**: which points you want to plot; the options are: all, non-excluded, excluded points. Example: plot_data = ['all', 'non-excluded', 'excluded'] 
 
-  * **plot_list**: which quantities to plot in the x,y plane; the same options as for SModels hover information apply. Example: plot_list=['r_max','chi2','Tx','Analysis','MT_max','MT_max_xsec','MT_total_xsec','MT_long_xsec','MT_asym_xsec']  
+  * **plot_list**: which quantities to plot in the x,y plane; the same options as for SModels hover information apply. Example: plot_list = ['r_max', 'chi2', 'Tx', 'Analysis', 'MT_max', 'MT_max_xsec', 'MT_total_xsec', 'MT_long_xsec', 'MT_asym_xsec']  
 
 
 .. _permissionsFixer:
