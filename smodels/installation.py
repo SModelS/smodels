@@ -27,6 +27,26 @@ def installDirectory():
     #path = path.replace("installation.py", "")
     return path + "/"
 
+def resolve_dependencies():
+    """ method that is meant to resolve the dependencies, via pip install --user.
+    Warns you if pip cannot be found. """
+    import subprocess
+    req = "%s/smodels/share/requirements.txt" % installDirectory()
+    find_pip = subprocess.call ( [ 'which', 'pip' ], stdout=subprocess.PIPE )
+    find_pip3 = subprocess.call ( [ 'which', 'pip3' ], stdout=subprocess.PIPE )
+    if find_pip != 0 and find_pip3 != 0:
+        print ( "error: pip not found. cannot install requirements. Maybe try easy_install pip" )
+        sys.exit()
+    p = "pip"
+    if find_pip != 0:
+        p = "pip3"
+    out = subprocess.call ( [ p, 'install', '--user', '--upgrade', '-r', req ] )
+    if out == 0:
+        print ( "dependencies have been installed." )
+        return
+    else:
+        print ( "an error has occurred when resolving the dependencies." )
+        return -1
 
 def pythonDirectory():
     """
@@ -157,24 +177,26 @@ def main():
     import argparse
     ap = argparse.ArgumentParser( description= "installation helper" )
     ap.add_argument( "-i", "--installdir", help="print SModelS installation directory", action="store_true" )
-    ap.add_argument( "-p", "--pythondir", help="print SModelS python path", 
+    ap.add_argument( "-p", "--pythondir", help="print SModelS python path",
                      action="store_true" )
-    ap.add_argument( "-v", "--version", help="print SModelS version number", 
+    ap.add_argument( "-v", "--version", help="print SModelS version number",
                      action="store_true" )
-    ap.add_argument( "-b", "--banner", help="print SModelS banner", 
+    ap.add_argument( "-b", "--banner", help="print SModelS banner",
                      action="store_true" )
-    ap.add_argument( "-r", "--requirements",help="print SModelS python requirements", 
+    ap.add_argument( "-R", "--resolve_dependencies", help="try to resolve the SModelS dependencies via pip",
                      action="store_true" )
-    ap.add_argument( "-d", "--database", 
+    ap.add_argument( "-r", "--requirements",help="print SModelS python requirements",
+                     action="store_true" )
+    ap.add_argument( "-d", "--database",
                      help="print SModelS official database url for this release", action="store_true")
     ap.add_argument( "-t", "--test-database", help="print SModelS official unittest database url for this release", action="store_true" )
-    ap.add_argument( "-c", "--copyright", "--license", 
+    ap.add_argument( "-c", "--copyright", "--license",
                      help="print SModelS copyright", action="store_true" )
     args = ap.parse_args()
     funcs = { "installdir": installDirectory, "pythondir": pythonDirectory,
               "version": version, "banner": banner, "requirements": requirements,
               "database": officialDatabase, "test_database": testDatabase,
-              "copyright": license }
+              "copyright": license, "resolve_dependencies": resolve_dependencies }
     for f,v in args.__dict__.items():
         if v: print ( funcs[f]() )
 

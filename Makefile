@@ -1,6 +1,10 @@
 VER=$(shell cat smodels/version)
 
-all: externaltools
+all: resolve_deps externaltools
+
+resolve_deps: ## resolve the deps via pip
+	@echo "try to resolve the python dependencies via pip"
+	smodels/installation.py -R
 
 install: all tidy
 	@echo "done. you can now run the software directly from this source directory."
