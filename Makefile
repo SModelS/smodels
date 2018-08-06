@@ -2,6 +2,14 @@ VER=$(shell cat smodels/version)
 
 all: externaltools
 
+install: all tidy
+	@echo "done. you can now run the software directly from this source directory."
+	@echo "Try e.g. ./runSModelS.py --help"
+
+tidy:
+	# tidy up the directory, remove files not needed for users
+	yes | rm -rf build dist test
+
 version:
 	@echo $(VER)
 
