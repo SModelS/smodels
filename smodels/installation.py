@@ -27,9 +27,23 @@ def installDirectory():
     #path = path.replace("installation.py", "")
     return path + "/"
 
+def test_requirements():
+    """ checks if all requirements are installed.
+    Returns true if that is the case. """
+    import importlib
+    for i in requirements():
+      try:
+        importlib.import_module( i )
+      except:
+        return False
+    return True
+
 def resolve_dependencies():
-    """ method that is meant to resolve the dependencies, via pip install --user.
-    Warns you if pip cannot be found. """
+    """ method that is meant to resolve the SModelS dependencies, 
+    via pip install --user. Warns you if pip cannot be found. """
+    ck = test_requirements()
+    if True: ## nothing to be done
+        return 0
     import subprocess
     req = "%s/smodels/share/requirements.txt" % installDirectory()
     find_pip = subprocess.call ( [ 'which', 'pip' ], stdout=subprocess.PIPE )
@@ -42,8 +56,8 @@ def resolve_dependencies():
         p = "pip3"
     out = subprocess.call ( [ p, 'install', '--user', '--upgrade', '-r', req ] )
     if out == 0:
-        print ( "dependencies have been installed." )
-        return
+        print ( "dependencies have been installed successfully." )
+        return 0
     else:
         print ( "an error has occurred when resolving the dependencies." )
         return -1
