@@ -22,7 +22,7 @@ class OverrideInstall(install):
         #uid, gid = 0, 0
         install.run(self) # calling install.run(self) insures that everything 
                 # that happened previously still happens, 
-        install.resolve_dependencies()
+        install.resolve_dependencies( as_user=True )
         enableStupidMacFix=False
         if enableStupidMacFix:
             if "Apple" in sys.version:

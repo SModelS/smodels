@@ -32,7 +32,7 @@ requires:
 
 These tools need not be installed separately, as the SModelS build system takes care of that. The current default is that both Pythia6 and Pythia8 are installed together with NLLfast. However, the user can easily adapt the Makefile in the lib/ directory to fit his or her needs.
 Finally, the :ref:`database browser <databaseBrowser>` provided by :ref:`smodelsTools.py <smodelsTools>`
-requires `IPython <https://ipython.org/>`_.
+requires `IPython <https://ipython.org/>`_, while the :ref:`interactive plotter <interactivePlots>` require `plotly <https://plot.ly/python/>`_ and `pandas <https://pandas.pydata.org/>`_. 
 
 
 Installation Methods
