@@ -11,6 +11,9 @@
 import sys
 from smodels.tools.smodelsLogging import logger
 try:
+    import warnings ## we can ignore these warnings, see
+    # https://stackoverflow.com/questions/40845304/runtimewarning-numpy-dtype-size-changed-may-indicate-binary-incompatibility
+    warnings.filterwarnings("ignore", message="numpy.dtype size changed")
     import plotly.graph_objs as go
     import plotly,imp
 except ImportError as e:
