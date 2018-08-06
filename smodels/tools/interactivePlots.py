@@ -9,10 +9,11 @@
 
 from __future__ import print_function
 
-from smodels.tools import interactivePlotsHelpers 
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import os, glob
+        
+from smodels.tools import interactivePlotsHelpers as helpers
 
 class DataHolder(object):
     """
@@ -164,24 +165,24 @@ class DataHolder(object):
                 if key != 'file':
                     self.data_dict[key].append(None)                
         else:    
-            self.data_dict = interactivePlotsHelpers.get_expres(self.data_dict,smodelsDict)
-            self.data_dict = interactivePlotsHelpers.get_missed_topologies(self.data_dict,smodelsDict)
-            self.data_dict = interactivePlotsHelpers.get_asymmetric_branches(self.data_dict,smodelsDict)
-            self.data_dict = interactivePlotsHelpers.get_outside_grid(self.data_dict,smodelsDict)
-            self.data_dict = interactivePlotsHelpers.get_long_cascades(self.data_dict,smodelsDict)
+            self.data_dict = helpers.get_expres(self.data_dict,smodelsDict)
+            self.data_dict = helpers.get_missed_topologies(self.data_dict,smodelsDict)
+            self.data_dict = helpers.get_asymmetric_branches(self.data_dict,smodelsDict)
+            self.data_dict = helpers.get_outside_grid(self.data_dict,smodelsDict)
+            self.data_dict = helpers.get_long_cascades(self.data_dict,smodelsDict)
 
 
             #Fill with SLHA data:
-            self.data_dict =  interactivePlotsHelpers.get_slha_hover_info(self.data_dict,slhaData,
+            self.data_dict =  helpers.get_slha_hover_info(self.data_dict,slhaData,
                                                                           self.slha_hover_information)
-            self.data_dict = interactivePlotsHelpers.get_ctau(self.data_dict,slhaData,
+            self.data_dict = helpers.get_ctau(self.data_dict,slhaData,
                                                               self.ctau_hover_information)             
-            self.data_dict = interactivePlotsHelpers.get_BR(self.data_dict,slhaData,self.BR_hover_information,
+            self.data_dict = helpers.get_BR(self.data_dict,slhaData,self.BR_hover_information,
                                                             self.BR_get_top)     
             #Fill with the x and y data:
-            self.data_dict = interactivePlotsHelpers.get_variable(self.data_dict,slhaData,self.BR_hover_information,
+            self.data_dict = helpers.get_variable(self.data_dict,slhaData,self.BR_hover_information,
                                                             self.variable_x) 
-            self.data_dict = interactivePlotsHelpers.get_variable(self.data_dict,slhaData,self.BR_hover_information,
+            self.data_dict = helpers.get_variable(self.data_dict,slhaData,self.BR_hover_information,
                                                             self.variable_y) 
      
     def loadData(self,npoints=-1):
@@ -191,7 +192,6 @@ class DataHolder(object):
         
         :parameter npoints: Number of points to be plotted (int). If < 0, all points will be used.
         """
-        
         logger.info("Reading data folders %s and %s ..." %(self.smodelsFolder,self.slhaFolder))
         
         n = 0
@@ -200,21 +200,21 @@ class DataHolder(object):
             if npoints > 0 and n >= npoints:
                 break
             
-            smodelsOutput = interactivePlotsHelpers.import_python_output(f)
+            smodelsOutput = helpers.import_python_output(f)
             if not smodelsOutput:
                 continue
             
             #Get SLHA file name:
-            slhaFile = interactivePlotsHelpers.get_slha_file(smodelsOutput)
+            slhaFile = helpers.get_slha_file(smodelsOutput)
             slhaFile = os.path.join(self.slhaFolder,os.path.basename(slhaFile))
             #Get SLHA data:
-            slhaData = interactivePlotsHelpers.get_slha_data(slhaFile)
+            slhaData = helpers.get_slha_data(slhaFile)
             if not slhaData:
                 continue
             
             #Data read successfully
             self.data_dict['file'].append(f.split('/')[-1])
-            outputStatus = interactivePlotsHelpers.output_status(smodelsOutput)
+            outputStatus = helpers.output_status(smodelsOutput)
             if outputStatus == -1:
                 self.fillWith(None,slhaData)
             else:
@@ -230,50 +230,49 @@ class DataHolder(object):
         :parameter outFolder: Path to the output folder.
         """
         
-        
         if not os.path.isdir(outFolder):
             os.makedirs(outFolder)
         
         
         logger.info('Making plots...')
           
-        data_frame_all = interactivePlotsHelpers.make_data_frame(self.data_dict)
+        data_frame_all = helpers.make_data_frame(self.data_dict)
      
-        data_frame_all = interactivePlotsHelpers.fill_hover(data_frame_all,
-                                                            self.smodels_hover_information,
-                                                            self.slha_hover_information,
-                                                            self.ctau_hover_information,
-                                                            self.BR_hover_information) 
+        data_frame_all = helpers.fill_hover(data_frame_all,
+                                            self.smodels_hover_information,
+                                            self.slha_hover_information,
+                                            self.ctau_hover_information,
+                                            self.BR_hover_information) 
      
-        data_frame_excluded,data_frame_nonexcluded = interactivePlotsHelpers.data_frame_excluded_nonexcluded(data_frame_all) 
-        x_axis,y_axis = interactivePlotsHelpers.get_xy_axis(self.variable_x,self.variable_y) 
-        cont_plots,disc_plots = interactivePlotsHelpers.separate_cont_disc_plots(self.plot_list,self.data_dict) 
+        data_frame_excluded,data_frame_nonexcluded = helpers.data_frame_excluded_nonexcluded(data_frame_all) 
+        x_axis,y_axis = helpers.get_xy_axis(self.variable_x,self.variable_y) 
+        cont_plots,disc_plots = helpers.separate_cont_disc_plots(self.plot_list,self.data_dict) 
      
-        interactivePlotsHelpers.make_continuous_plots_all(cont_plots,x_axis,
+        helpers.make_continuous_plots_all(cont_plots,x_axis,
                                                           y_axis,outFolder,data_frame_all,self.plot_data,
                                                           self.plot_title)
          
-        interactivePlotsHelpers.make_continuous_plots_excluded(cont_plots,x_axis,
+        helpers.make_continuous_plots_excluded(cont_plots,x_axis,
                                                                y_axis,outFolder,data_frame_excluded,self.plot_data,
                                                                self.plot_title)
          
-        interactivePlotsHelpers.make_continuous_plots_nonexcluded(cont_plots,x_axis,
-                                                                  y_axis,outFolder,data_frame_nonexcluded,self.plot_data,
-                                                                  self.plot_title)
+        helpers.make_continuous_plots_nonexcluded(cont_plots,x_axis, y_axis,
+                                                  outFolder,data_frame_nonexcluded,
+                                                  self.plot_data, self.plot_title)
          
-        interactivePlotsHelpers.make_discrete_plots_all(disc_plots,x_axis,y_axis,
-                                                        outFolder,data_frame_all,self.plot_data,
-                                                        self.plot_title)
+        helpers.make_discrete_plots_all(disc_plots,x_axis,y_axis,
+                                        outFolder,data_frame_all,self.plot_data,
+                                        self.plot_title)
          
-        interactivePlotsHelpers.make_discrete_plots_excluded(disc_plots,x_axis,y_axis,
-                                                             outFolder,data_frame_excluded,self.plot_data,
-                                                             self.plot_title)
+        helpers.make_discrete_plots_excluded(disc_plots,x_axis,y_axis, outFolder,
+                                             data_frame_excluded,self.plot_data,
+                                             self.plot_title)
          
-        interactivePlotsHelpers.make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,
-                                                                outFolder,data_frame_nonexcluded,self.plot_data,
-                                                                self.plot_title)
+        helpers.make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis, outFolder,
+                                                data_frame_nonexcluded,
+                                                self.plot_data, self.plot_title)
         
-        interactivePlotsHelpers.create_index_html(outFolder,self.plot_data,self.plot_list)
+        helpers.create_index_html(outFolder,self.plot_data,self.plot_list)
         
         logger.info('Generation of interactive plots finished. Go to: \n %s/index.html \n to see the plots.' %outFolder)
         
