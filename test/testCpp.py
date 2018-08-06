@@ -49,8 +49,8 @@ class CppTest(unittest.TestCase):
 
     def testRun(self):
         self.compile()
+        #self.writeOutput()
         self.runExample()
-        # self.writeOutput()
 
 if __name__ == "__main__":
     unittest.main()
