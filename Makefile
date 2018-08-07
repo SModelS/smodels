@@ -7,10 +7,10 @@ all: resolve_deps externaltools
 
 check_compilers:
 ifndef HAS_FC
-	$(error "fortran compiler not found. cannot compile external tools. Note that you can still build smodels proper, via 'make install_noexternaltools'" )
+	$(error "fortran compiler not found. cannot compile external tools. Note that you can still build smodels proper, via 'make smodels_noexternaltools'" )
 endif
 ifndef HAS_CXX
-	$(error "C++ compiler not found. cannot compile external tools. Note that you can still build smodels proper, via 'make install_noexternaltools'" )
+	$(error "C++ compiler not found. cannot compile external tools. Note that you can still build smodels proper, via 'make smodels_noexternaltools'" )
 endif
 
 echo:
@@ -20,11 +20,11 @@ resolve_deps: ## resolve the deps via pip
 	@echo "try to resolve the python dependencies via pip"
 	smodels/installation.py -R
 
-install: all tidy
+smodels: all tidy
 	@echo "done. you can now run the software directly from this source directory."
 	@echo "Try e.g. ./runSModelS.py --help"
 
-install_noexternaltools: resolve_deps tidy
+smodels_noexternaltools: resolve_deps tidy
 	@echo "done. you can now run the software directly from this source directory."
 	@echo "Try e.g. ./runSModelS.py --help"
 

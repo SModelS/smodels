@@ -42,10 +42,11 @@ Installation Methods
    After downloading the source from the `SModelS releases page <https://github.com/SModelS/smodels/releases>`_
    and extracting it, run::
 
-     make install
+     make smodels
 
    in the top-level directory. The installation will remove redundant folders, install the required 
-   dependencies (using pip install) and compile Pythia and NLL-fast. In case the Python libraries can not be successfully
+   dependencies (using pip install) and compile Pythia and NLL-fast. If the cross section computer is not needed, one can replace *smodels* with *smodels_noexternaltools* in the above command.
+   In case the Python libraries can not be successfully
    installed, the user can install them separately using his/her preferred method. Pythia and NLL-fast can also be compiled separately
    running **make externaltools**.
 
