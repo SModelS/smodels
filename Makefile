@@ -37,14 +37,16 @@ builddeb: buildrpm
 	cd dist && fakeroot alien smodels-$(VER)-1.x86_64.rpm
 
 pypi:
+	rm -rf dist
 	python setup.py sdist bdist_wheel
-	twine upload dist/*
+	twine upload dist/smodels-*.tar.gz
 
 testpypi: 
 	# to install from testpypi: 
 	# pip3 install --user --upgrade --index-url https://test.pypi.org/simple/ smodels
+	rm -rf dist
 	python setup.py sdist bdist_wheel
-	twine upload -r pypitest dist/*
+	twine upload -r pypitest dist/smodels-*.tar.gz
 
 tarballs:
 	cd distribution && make tarballs
