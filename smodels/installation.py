@@ -31,14 +31,16 @@ def test_requirements():
     Returns true if that is the case. """
     import importlib
     for i in requirements():
-      try:
-        pos = i.find(">" )
-        lib = i
-        if pos > -1:
-            lib = i[:pos]
-        importlib.import_module( lib )
-      except:
-        return False
+        try:
+            pos = i.find(">" )
+            lib = i
+            if pos > -1:
+                lib = i[:pos]
+            found = importlib.util.find_spec( lib )
+            if found == None:
+                return False
+        except Exception as e:
+            return False
     return True
 
 def resolve_dependencies( as_user = True ):
