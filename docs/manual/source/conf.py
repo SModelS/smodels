@@ -111,6 +111,9 @@ pygments_style = 'sphinx'
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
 
+#Ignore documentation for python types
+nitpick_ignore = [('py:class', 'type'),('py:class', 'object')]
+
 
 # -- Options for HTML output ----------------------------------------------
 

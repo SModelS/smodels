@@ -32,40 +32,60 @@ requires:
 
 These tools need not be installed separately, as the SModelS build system takes care of that. The current default is that both Pythia6 and Pythia8 are installed together with NLLfast. However, the user can easily adapt the Makefile in the lib/ directory to fit his or her needs.
 Finally, the :ref:`database browser <databaseBrowser>` provided by :ref:`smodelsTools.py <smodelsTools>`
-requires `IPython <https://ipython.org/>`_.
+requires `IPython <https://ipython.org/>`_, while the :ref:`interactive plotter <interactivePlots>` requires `plotly <https://plot.ly/python/>`_ and `pandas <https://pandas.pydata.org/>`_. 
 
-If *pip* is installed in your machine, installing SModelS should be as easy as: ::
 
-  pip install smodels
+Installation Methods
+^^^^^^^^^^^^^^^^^^^^
 
-In this case, *gfortran* and *g++* need to be installed separately, if one
-wishes to compute cross sections with pythia6 and pythia8, respectively.
-Also, it might be necessary to perform::
+.. _phenoInstallation:
 
-  sudo smodelsTools.py fixpermissions
+1. The first installation method installs SModelS in the source directory, which can then be used for :ref:`running SModelS <runningSModelS>`.
+   After downloading the source from the `SModelS releases page <https://github.com/SModelS/smodels/releases>`_
+   and extracting it, run::
 
-in case of system-wide installs. User-specific installations on the other hand: ::
+     make smodels
 
-  pip install --user smodels
+   in the top-level directory. The installation will remove redundant folders, install the required 
+   dependencies (using pip install) and compile Pythia and NLL-fast. If the cross section computer is not needed, one can replace *smodels* with *smodels_noexternaltools* in the above command.
+   In case the Python libraries can not be successfully
+   installed, the user can install them separately using his/her preferred method. Pythia and NLL-fast can also be compiled separately
+   running **make externaltools**.
 
-will install smodels into the user's ~/.local directory. Depending on your
-platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
-(or $DYLD_LIBRARY_PATH) might have to be set appropriately.
+2. If Python's *setuptools* is installed in your machine, SModelS and its dependencies
+   can also be installed running::
 
-If Python's *setuptools* is installed in your machine, SModelS and its dependencies
-can be installed with: ::
+     setup.py install
 
-  setup.py install
+   within the main smodels directory. If the python libraries are installed in a system folder (as is the default behavior),
+   it will be necessary to run the install command with superuser privilege.
+   Alternatively, one can run setup.py with the "--user" flag: ::
 
-If the python libraries are installed in a system folder (as is the default behavior),
-it will be necessary to run the install command with superuser privilege.
-Alternatively, one can run setup.py with the "--user" flag: ::
+     setup.py install --user
 
-  setup.py install --user
+   If *setuptools* is not installed, you can try to install the external libraries
+   manually and then rerun setup.py.
+   For Ubuntu, SL6 machines and other platforms, a recipe is given below.
 
-If *setuptools* is not installed, you can try to install the external libraries
-manually and then rerun setup.py.
-For Ubuntu, SL6 machines and other platforms, a recipe is given below.
+
+3. If *pip3* (or *pip*) is installed in your machine, installing SModelS should be as easy as: ::
+
+     pip3 install smodels
+
+   In this case, *gfortran* and *g++* need to be installed separately, if one
+   wishes to compute cross sections with pythia6 and pythia8, respectively.
+   Also, it might be necessary to perform::
+
+     sudo smodelsTools.py fixpermissions
+
+   in case of system-wide installs. User-specific installations on the other hand: ::
+
+     pip3 install --user smodels
+
+   will install smodels into the user's ~/.local directory. Depending on your
+   platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
+   (or $DYLD_LIBRARY_PATH) might have to be set appropriately.
+
 
 There is also a diagnostic tool available: ::
 

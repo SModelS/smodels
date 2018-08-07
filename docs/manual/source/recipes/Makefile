@@ -1,10 +1,11 @@
 all: convert # remove_ipynb
 
 convert:
-	./convert.sh
+	./convert.py
 
 run:
-	ipython notebook
+	jupyter notebook
+#ipython notebook
 
 remove_ipynb:
 	rm -rf *.ipynb

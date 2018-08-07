@@ -13,7 +13,7 @@ import sys
 from setuptools import setup, Extension
 from setuptools.command.install import install
 sys.path.insert ( 0, "./" )
-from smodels.installation import version, authors, requirements
+from smodels.installation import version, authors, requirements, resolve_dependencies, fixpermissions
 import subprocess
 
 class OverrideInstall(install):
@@ -22,6 +22,14 @@ class OverrideInstall(install):
         #uid, gid = 0, 0
         install.run(self) # calling install.run(self) insures that everything 
                 # that happened previously still happens, 
+        install_as_user = True
+        try:
+            import getpass
+            if getpass.getuser() == "root":
+                install_as_user = False
+        except Exception as e:
+            pass
+        resolve_dependencies( as_user=install_as_user )
         enableStupidMacFix=False
         if enableStupidMacFix:
             if "Apple" in sys.version:
@@ -44,6 +52,8 @@ class OverrideInstall(install):
                 # print ("Changing permissions of %s to %s" %
                 #         ( os.path.dirname ( filepath ), oct(mode)))
                 os.chmod( os.path.dirname ( filepath ), mode )
+        if not install_as_user:
+            fixpermissions()
 
 def read(fname):
     """

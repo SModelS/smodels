@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-.. module:: tools.modelTester
+.. module:: modelTester
    :synopsis: Functions to test (a set of) points, handling decomposition,
               result and coverage checks, parallelisation.
 
@@ -14,7 +14,7 @@ from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import slhaDecomposer
 from smodels.theory import lheDecomposer
-from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
+from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut
 from smodels.tools.printer import MPrinter
@@ -109,23 +109,16 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """ Get theory prediction for each analysis and print basic output """
     allPredictions = []
     combineResults=False
-    bestSR=True
     try:
-        treatment = parser.get ("options","srTreatment").lower() ## FIXME here
-        if treatment not in [ "all", "both", "combine", "best" ]:
-            logger.error ( "options:srTreatment given in ini file is not one of: all, both, combine, best." )
-            sys.exit()
-        if treatment in [ "all", "both", "combine" ]:
-            combineResults = True
-            if treatment in [ "combine" ]:
-                bestSR=False
+        combineResults = parser.getboolean ("options","combineSRs") 
     except Exception as e:
         pass
     for expResult in listOfExpRes:
-        # logger.error ("FIXME maybe need to set useBestDataset to FALSE")
         theorypredictions = theoryPredictionsFor( expResult, smstoplist,
-                    useBestDataset=bestSR, combinedResults=combineResults )
-        if not theorypredictions: continue
+                    useBestDataset=True, combinedResults=combineResults,
+                    marginalize=False )
+        if not theorypredictions:
+            continue
         allPredictions += theorypredictions._theoryPredictions
 
     """Compute chi-square and likelihood"""
@@ -211,7 +204,9 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
             txt="[%s%d/%d] " % ( sjob, i+1, n )
             if i > 3: ## give the average time spent per point
                 txt="[%s%d/%d, t~%.1fs] " % ( sjob, i+1, n, t_tot/float(i) )
-        logger.info ( "Start testing %s%s" % (txt, os.path.relpath ( inputFile ) ) )
+        if t_tot/float(i+1)>.1 or (i+1) % 10 == 0:
+            ## if it is super fast, show only every 10th
+            logger.info ( "Start testing %s%s" % (txt, os.path.relpath ( inputFile ) ) )
         t0=time.time()
         a[inputFile] = runSingleFile(inputFile, outputDir, parser, databaseVersion,
                                   listOfExpRes, timeout, development, parameterFile)
@@ -271,7 +266,10 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         return runSingleFile ( cleanedList[0], outputDir, parser, databaseVersion,
                                listOfExpRes, timeout, development, parameterFile )
     ncpus = _determineNCPus ( parser.getint("parameters", "ncpus"), len(cleanedList) )
-    logger.info ("Running SModelS on %d cores" % ncpus )
+    if ncpus == 1:
+        logger.info ("Running SModelS in a single process" )
+    else:
+        logger.info ("Running SModelS in %d processes" % ncpus )
 
     if ncpus == 1:
         return runSetOfFiles( cleanedList, outputDir, parser, databaseVersion,
@@ -415,7 +413,7 @@ def getAllInputFiles(inFile):
     Given inFile, return list of all input files
 
     :parameter inFile: Path to input file or directory containing input files
-    :returns: List of all input files
+    :returns: List of all input files, and the directory name
 
     """
     if os.path.isdir(inFile):

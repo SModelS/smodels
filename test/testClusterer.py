@@ -19,7 +19,6 @@ class ClustererTest(unittest.TestCase):
         from smodels.theory import clusterTools
         from smodels.experiment.txnameObj import TxName, TxNameData
         from smodels.experiment.infoObj import Info
-        from smodels.installation import installDirectory
         from smodels.tools.physicsUnits import GeV, pb, fb
         import copy
         
@@ -32,7 +31,7 @@ class ClustererTest(unittest.TestCase):
         txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info)
         txname.txnameData = txnameData
 
-        filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory() )
+        filename = "./testFiles/lhe/simplyGluino.lhe"
         reader = lheReader.LheReader(filename)
         event = reader.next()
         reader.close()

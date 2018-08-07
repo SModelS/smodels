@@ -2,7 +2,8 @@
 
 """
 .. module:: databaseObj
-   :synopsis: Contains Database class that represents the database of experimental results.
+   :synopsis: Contains Database class that represents the database of
+   experimental results.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -44,10 +45,11 @@ class Database(object):
 
     """
 
-    def __init__( self, base=None, force_load = None, discard_zeroes = True,
-                  progressbar = False, subpickle = True ):
+    def __init__(self, base=None, force_load = None, discard_zeroes = True,
+                  progressbar = False, subpickle = True):
         """
-        :param base: path to the database, or pickle file (string)
+        :param base: path to the database, or pickle file (string), or http
+            address. If None, or "official", use the official database.
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
         :param discard_zeroes: discard txnames with only zeroes as entries.
@@ -59,6 +61,12 @@ class Database(object):
         self.source=""
         self.force_load = force_load
         self.subpickle = subpickle
+        if base in [ None, "official" ]:
+            from smodels.installation import officialDatabase
+            base = officialDatabase()
+        if base in [ "unittest" ]:
+            from smodels.installation import testDatabase
+            base = testDatabase()
         base, pclfile = self.checkPathName(base, discard_zeroes )
         self.pcl_meta = Meta( pclfile )
         self.expResultList = []
@@ -207,7 +215,7 @@ class Database(object):
             return True
 
 
-    def createBinaryFile ( self, filename=None ):
+    def createBinaryFile(self, filename=None):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
         if self.txt_meta == None:
@@ -226,8 +234,9 @@ class Database(object):
                     ( binfile, self.txt_meta.databaseVersion,
                       self.txt_meta.format_version, self.txt_meta.cTime() ) )
             ptcl = serializer.HIGHEST_PROTOCOL
-            serializer.dump ( self.txt_meta, f, protocol=ptcl )
-            serializer.dump ( self.expResultList, f, protocol=ptcl )
+#             ptcl = 2
+            serializer.dump(self.txt_meta, f, protocol=ptcl)
+            serializer.dump(self.expResultList, f, protocol=ptcl)
             logger.info (  "%s created." % ( binfile ) )
 
     @property
@@ -238,6 +247,20 @@ class Database(object):
         """
         return self.txt_meta.databaseVersion
 
+    def inNotebook(self):
+        """
+        Are we running within a notebook? Has an effect on the
+        progressbar we wish to use.
+        """
+        ret = False
+        try:
+            cfg = get_ipython().config 
+            if 'IPKernelApp' in cfg.keys():
+                return True
+            else:
+                return False
+        except NameError:
+            return False
 
     @property
     def base(self):
@@ -259,7 +282,12 @@ class Database(object):
             return "%.1f%s%s" % (num, 'Yi', suffix)
 
         import requests
-        r = requests.get( path )
+        try:
+            r = requests.get( path )
+        except Exception as e:
+            logger.error ( "Exception when trying to fetch database: %s" % e )
+            logger.error ( "Consider supplying a different database path in the ini file (possibly a local one)" )
+            sys.exit()
         if r.status_code != 200:
             logger.error ( "Error %d: could not fetch %s from server." % \
                            ( r.status_code, path ) )
@@ -277,14 +305,18 @@ class Database(object):
         r2=requests.get ( r.json()["url"], stream=True )
         filename= "./" + r2.url.split("/")[-1]
         with open ( filename, "wb" ) as dump:
-            print ( "         " + " "*51 + "<", end="\r" )
+            if not self.inNotebook(): ## \r doesnt work in notebook
+                print ( "         " + " "*51 + "<", end="\r" )
             print ( "loading >", end="" )
             for x in r2.iter_content(chunk_size=int ( size / 50 ) ):
                 dump.write ( x )
                 dump.flush ()
                 print ( ".", end="" )
                 sys.stdout.flush()
-            print()
+            if self.inNotebook():
+                print ( "done." )
+            else:
+                print()
             dump.close()
         logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) )
         logger.debug ( "store as %s" % filename )
@@ -561,7 +593,8 @@ class Database(object):
                         if sqrts != eval(pattern[1]):
                             hits = False
                     if hits:
-                        continue
+                        break
+                        # continue
                 if not hits:
                     continue
 
@@ -576,7 +609,8 @@ class Database(object):
                     for pattern in dataTypes:
                         hits = fnmatch.filter ( [ dataset.dataInfo.dataType ], pattern )
                         if hits:
-                            continue
+                            break
+                            #continue
                     if not hits:
                         continue
 
@@ -585,7 +619,8 @@ class Database(object):
                     for pattern in datasetIDs:
                         hits = fnmatch.filter ( [ dataset.dataInfo.dataID ], pattern )
                         if hits:
-                            continue
+                            break
+                            # continue
                     if not hits:
                         continue
 

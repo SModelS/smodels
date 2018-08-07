@@ -18,16 +18,15 @@ class Browser(object):
 
     """Browses the database, exits if given path does not point to a valid
     smodels-database. Browser can be restricted to specified run or experiment.
-    Verbosity can be set to specified level.
-
-    :ivar database: Database object holding all the database information
-    :ivar _selectedExpResults: list of experimental results loaded in the browser.
-                       Can be used to hold a subset of results in the database.
-                       By default all results are loaded.
-
     """
+    
     def __init__(self, database, force_txt = False ):
         """
+        :ivar _selectedExpResults: list of experimental results loaded in the browser.
+                           Can be used to hold a subset of results in the database.
+                           By default all results are loaded.
+        
+        
         :param database: Path to the database or Database object
         """
 
@@ -36,6 +35,8 @@ class Browser(object):
         if force_txt == True:
             load = "txt"
         if isinstance(database,str):
+            if database.endswith(".pcl"):
+                load = "pcl"
             self.database = Database(database, load )
         elif isinstance(database,Database):
             self.database = database
@@ -231,7 +232,7 @@ class Browser(object):
             return None
 
         for dataset in expres.datasets:
-            if dataset.dataInfo.dataId != datasetID:
+            if dataset.getID() != datasetID:
                 continue
             return dataset.getSRUpperLimit()
 
@@ -314,7 +315,7 @@ def main(args):
         header += "\n"
         header += "fb, pb, GeV, TeV defined.\n"
         header +=  "\nBrowser loaded for %s \n" %( args.path_to_database )
-        header += "Try 'print browser' for the list of available results.\n"
+        header += "Try 'print(browser)' for the list of available results.\n"
         header += "More examples on how to access the database can be found in the SModelS manual.\n"
         header += "\nType 'exit' to exit this session."
 

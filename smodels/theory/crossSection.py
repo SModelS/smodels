@@ -188,7 +188,7 @@ class XSection(object):
         """
         Generate cross section information in string format.
         """
-        st = self.info.label + ':' + str(self.value)+ " " + str(self.pid)
+        st = self.info.label + ':' + str(self.value)
         return st
 
     def niceStr(self):
@@ -509,7 +509,8 @@ class XSectionList(object):
                 for oldXsec in self:
                     if newXsec.info == oldXsec.info:
                         oldXsec.value = oldXsec.value + newXsec.value
-                        oldXsec.pid = (None, None)
+                        if newXsec.pid != oldXsec.pid:
+                            oldXsec.pid = (None, None)
 
 
     def removeLowerOrder(self):

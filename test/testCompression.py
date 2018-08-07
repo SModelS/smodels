@@ -19,7 +19,7 @@ class CompressionTest(unittest.TestCase):
 
     def testInvisiblePositive(self):
         """ test the invisible compression, a positive example """
-        slhafile="../inputFiles/slha/higgsinoStop.slha"
+        slhafile="./testFiles/slha/higgsinoStop.slha"
         topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, True, 5.*GeV )
         tested = False
         for topo in topos:
@@ -37,7 +37,7 @@ class CompressionTest(unittest.TestCase):
 
     def testInvisibleNegative(self):
         """ test the invisible compression, a negative example """
-        slhafile="../inputFiles/slha/higgsinoStop.slha"
+        slhafile="./testFiles/slha/higgsinoStop.slha"
         topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, True, 5.*GeV )
         tested = False
         for topo in topos:
@@ -62,7 +62,7 @@ class CompressionTest(unittest.TestCase):
     def testMass(self):
         """ test the mass compression, a positive example """
         tested = False
-        slhafile="../inputFiles/slha/higgsinoStop.slha"
+        slhafile="./testFiles/slha/higgsinoStop.slha"
         topos = slhaDecomposer.decompose ( slhafile, .1*fb, True, False, 5.*GeV )
         for topo in topos:
             if str(topo)!="[1][1]":
@@ -81,7 +81,7 @@ class CompressionTest(unittest.TestCase):
                 self.assertEqual(len(element.motherElements),24 )
                 self.assertEqual(str(element.motherElements[0][0]),"mass" )
                 self.assertTrue ( dm < 5.0 )
-                print(element.elID)
+                # print(element.elID)
         self.assertTrue(tested)
 
 if __name__ == "__main__":

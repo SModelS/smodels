@@ -9,7 +9,6 @@
 """
 
 from __future__ import print_function
-from smodels.tools.smodelsLogging import logger
 import sys
 import os
 
@@ -27,6 +26,52 @@ def installDirectory():
     #path = path.replace("installation.py", "")
     return path + "/"
 
+def test_requirements():
+    """ checks if all requirements are installed.
+    Returns true if that is the case. """
+    import importlib
+    for i in requirements():
+        try:
+            pos = i.find(">" )
+            lib = i
+            if pos > -1:
+                lib = i[:pos]
+            found = importlib.util.find_spec( lib )
+            if found == None:
+                return False
+        except Exception as e:
+            return False
+    return True
+
+def resolve_dependencies( as_user = True ):
+    """ method that is meant to resolve the SModelS dependencies, 
+    via pip install --user. Warns you if pip cannot be found. 
+    :params as_user: if False, try system-wide install.
+    """
+    ck = test_requirements()
+    if ck == True: ## nothing to be done
+        return None
+    import subprocess
+    req = "%s/smodels/share/requirements.txt" % installDirectory()
+    find_pip = subprocess.call ( [ 'which', 'pip' ], stdout=subprocess.PIPE )
+    find_pip3 = subprocess.call ( [ 'which', 'pip3' ], stdout=subprocess.PIPE )
+    if find_pip != 0 and find_pip3 != 0:
+        print ( "error: pip not found. cannot install requirements. Maybe try easy_install pip" )
+        sys.exit()
+    p = "pip"
+    if find_pip != 0:
+        p = "pip3"
+    userwide = ""
+    if as_user:
+        userwide = "--user"
+
+    out = subprocess.call ( [ p, 'install', userwide, '--upgrade', '-r', req ] )
+    if out == 0:
+        print ( "dependencies have been installed successfully." )
+        return None
+    else:
+        print ( "an error has occurred when resolving the dependencies." )
+        return -1
 
 def pythonDirectory():
     """
@@ -113,7 +158,7 @@ def license():
     Print license information of the SModelS framework.
 
     """
-    f = open(installDirectory() + "COPYING")
+    f = open(installDirectory() + "smodels/COPYING")
     lines = f.readlines()
     f.close()
     return "".join(lines)
@@ -129,24 +174,10 @@ def banner():
     f.close()
     return "".join(lines)
 
-def printHelp():
-    """
-    Print usage information of this module.
-
-    """
-    print("Usage: " + sys.argv[0] + " [--help|-h] [--installdir|-i] [--pythondir|-p]")
-    print("                      [--version|-v] [--banner|-b] [--license|--copyright|-c]:")
-    print("--help:       show this message")
-    print("--installdir: print SModelS installation directory")
-    print("--pythondir:  print SModelS python path")
-    print("--version:    print SModelS version number")
-    print("--banner:     print SModelS banner")
-    print("--copyright:  print SModelS copyright")
-    sys.exit(0)
-
 def fixpermissions():
     """ make sure that all filepermissions are such that
         we can compile the wrappers for pythia and nllfast. """
+    from smodels.tools.smodelsLogging import logger
     import os, glob
     Dir = "%ssmodels/lib/" % installDirectory()
     try:
@@ -160,34 +191,42 @@ def fixpermissions():
         print ( "chmod failed (permission error). Please try as root, i.e.:" )
         print ( "sudo smodelsTools.py fixpermissions" )
 
+def officialDatabase():
+    r="http://smodels.hephy.at/database/official%s" % version().replace(".","")
+    return r
+
+def testDatabase():
+    r="http://smodels.hephy.at/database/unittest%s" % version().replace(".","")
+    return r
+
 def main():
-    # print( banner() )
-    if len(sys.argv) < 2:
-        printHelp()
-    for i in sys.argv[1:]:
-        if i in [ "--installdir", "-i" ]:
-            print(installDirectory())
-            sys.exit(0)
-        if i in [ "--pythondir", "-p" ]:
-            print(pythonDirectory())
-            sys.exit(0)
-        if i in [ "--version", "-v" ]:
-            print(version())
-            sys.exit(0)
-        if i in [ "--banner", "-b" ]:
-            print(banner())
-            sys.exit(0)
-        if i in [ "--requirements", "-r" ]:
-            print(requirements())
-            sys.exit(0)
-        if i in [ "--help", "-h" ]:
-            printHelp()
-            sys.exit(0)
-        if i in [ "--license", "--copyright", "-c" ]:
-            print(license())
-            sys.exit(0)
-    print("Error: cannot parse %s.\n" % i )
-    printHelp()
+    import argparse
+    ap = argparse.ArgumentParser( description= "installation helper" )
+    ap.add_argument( "-i", "--installdir", help="print SModelS installation directory", action="store_true" )
+    ap.add_argument( "-p", "--pythondir", help="print SModelS python path",
+                     action="store_true" )
+    ap.add_argument( "-v", "--version", help="print SModelS version number",
+                     action="store_true" )
+    ap.add_argument( "-b", "--banner", help="print SModelS banner",
+                     action="store_true" )
+    ap.add_argument( "-R", "--resolve_dependencies", help="try to resolve the SModelS dependencies via pip",
+                     action="store_true" )
+    ap.add_argument( "-r", "--requirements",help="print SModelS python requirements",
+                     action="store_true" )
+    ap.add_argument( "-d", "--database",
+                     help="print SModelS official database url for this release", action="store_true")
+    ap.add_argument( "-t", "--test-database", help="print SModelS official unittest database url for this release", action="store_true" )
+    ap.add_argument( "-c", "--copyright", "--license",
+                     help="print SModelS copyright", action="store_true" )
+    args = ap.parse_args()
+    funcs = { "installdir": installDirectory, "pythondir": pythonDirectory,
+              "version": version, "banner": banner, "requirements": requirements,
+              "database": officialDatabase, "test_database": testDatabase,
+              "copyright": license, "resolve_dependencies": resolve_dependencies }
+    for f,v in args.__dict__.items():
+        if v: 
+            r = funcs[f]() 
+            if r != None: print ( r )
 
 if __name__ == "__main__":
     main()

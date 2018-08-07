@@ -11,8 +11,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.SimplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Model
-from smodels.tools.physicsUnits import fb
+from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database
 from smodels.theory import slhaDecomposer
@@ -22,29 +21,29 @@ import math
 
 class StatisticsTest(unittest.TestCase):
     def testUpperLimit(self):
-        m = Model ( 100., 100., 0.001, None, 1.0 )
-        comp = UpperLimitComputer ( 20. / fb )
-        re = comp.ulSigma ( m )
-        self.assertAlmostEqual ( re.asNumber ( fb ), 1.06, 1 )
+        m = Data( 100., 100., 0.001, None, 1.0,deltas_rel=0.)
+        comp = UpperLimitComputer()
+        re = comp.ulSigma(m)
+        self.assertAlmostEqual(re/(1.06*20.),1., 1)
 
     def testPredictionInterface(self):
         """ A simple test to see that the interface in datasetObj
         and TheoryPrediction to the statistics tools is working correctly
         """
         expRes = database.getExpResults( analysisIDs=['CMS-SUS-13-012'] )[0]
-        slhafile="../inputFiles/slha/simplyGluino.slha"
+        slhafile= "./testFiles/slha/simplyGluino.slha"
         smstoplist = slhaDecomposer.decompose( slhafile )
-        prediction = theoryPredictionsFor ( expRes, smstoplist )[0]
+        prediction = theoryPredictionsFor(expRes, smstoplist,deltas_rel=0.)[0]
         pred_signal_strength = prediction.xsection.value
         prediction.computeStatistics()
         ill = math.log(prediction.likelihood)
         ichi2 = prediction.chi2
         nsig = (pred_signal_strength*expRes.globalInfo.lumi).asNumber()
-        m = Model ( 4, 2.2, 1.1**2, None, efficiencies=nsig )
-        computer = LikelihoodComputer ( m )
-        dll = math.log( computer.likelihood( nsig, marginalize=False ) )
+        m = Data(4, 2.2, 1.1**2, None, nsignal=nsig,deltas_rel=0.2)
+        computer = LikelihoodComputer(m)
+        dll = math.log(computer.likelihood(nsig, marginalize=False ) )
         self.assertAlmostEqual(ill, dll, places=2)
-        dchi2 = computer.chi2( nsig, marginalize=False ) ## 0.2*nsig )
+        dchi2 = computer.chi2( nsig, marginalize=False )
         # print ( "dchi2,ichi2",dchi2,ichi2)
         self.assertAlmostEqual(ichi2, dchi2, places=2)
 
@@ -138,12 +137,11 @@ class StatisticsTest(unittest.TestCase):
             nsig = d['nsig']
             nb = d['nb']
             deltab = d['deltab']
-            deltas = 1e-4*d['nsig']
             # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
             # Chi2 as computed by statistics module:
-            m = Model ( nobs, nb, deltab**2, deltas_rel = 0.2 )
-            computer = LikelihoodComputer ( m )
-            chi2_actual = computer.chi2( nsig, marginalize=True ) ## , .2*nsig )
+            m = Data(nobs, nb, deltab**2,deltas_rel=0.2)
+            computer = LikelihoodComputer(m)
+            chi2_actual = computer.chi2(nsig, marginalize=True ) ## , .2*nsig )
             chi2_expected = d['chi2']
             if not chi2_expected==None and not np.isnan(chi2_expected):
 #                 chi2_expected = self.round_to_sign(chi2_expected, 2)

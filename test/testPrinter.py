@@ -8,76 +8,22 @@
 
 """
 
-import sys,shutil,os
+import sys,os,importlib
 sys.path.insert(0,"../")
 import unittest
 from smodels.installation import installDirectory as idir
 from smodels.theory import slhaDecomposer
-from smodels.tools.physicsUnits import fb, GeV, TeV
-from smodels.tools.smodelsLogging import logger
+from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.tools import printer, ioObjects
 from smodels.tools import coverage
 import summaryReader
 from xml.etree import ElementTree
 from databaseLoader import database
-import unum
-
-def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None ):
-    """
-    Compare two objects.
-    The numerical values are compared up to the precision defined by allowedDiff.
-    
-    :param obj1: First python object to be compared 
-    :param obj2: Second python object to be compared
-    :param allowedDiff: Allowed % difference between two numerical values 
-    :param ignore: List of keys to be ignored
-    :return: True/False    
-    """      
-
-    if type(obj1) in [ float, int ] and type ( obj2) in [ float, int ]:
-        obj1,obj2=float(obj1),float(obj2)
-    
-    if type(obj1) != type(obj2):
-        logger.info("Data types differ (%s,%s)" %(type(obj1),type(obj2)))
-        return False
-    
-    if isinstance(obj1,unum.Unum):
-        if obj1 == obj2:
-            return True
-        diff = 2.*abs(obj1-obj2)/abs(obj1+obj2)
-        return diff.asNumber() < allowedDiff
-    elif isinstance(obj1,float):        
-        if obj1 == obj2:
-            return True
-        diff = 2.*abs(obj1-obj2)/abs(obj1+obj2)
-        return diff < allowedDiff
-    elif isinstance(obj1,str):
-        return obj1 == obj2
-    elif isinstance(obj1,dict):    
-        for key in obj1:
-            if key in ignore: continue
-            if not key in obj2:
-                logger.warning("Key %s missing" %key)
-                return False
-            if not equalObjs(obj1[key],obj2[key],allowedDiff,ignore=ignore, where=key ):
-                logger.warning('Objects differ in %s:\n   %s\n and\n   %s' %(where, str(obj1[key]),str(obj2[key])))
-                return False
-    elif isinstance(obj1,list):
-        if len(obj1) != len(obj2):
-            logger.warning("Objects differ in length:\n %s (len = %i) \n and\n %s (len = %i)" 
-                            %(str(obj1),len(obj1),str(obj2),len(obj2)))
-            return False
-        for ival,val in enumerate(obj1):
-            if not equalObjs(val,obj2[ival],allowedDiff, where = where ):
-                logger.warning('Objects differ:\n   %s \n and\n   %s' %( str(val),str(obj2[ival])))
-                return False
-    else:
-        return obj1 == obj2
-            
-    return True
-
-
+from unitTestHelpers import equalObjs
+from imp import reload
+from smodels.tools import runtime
+from smodels import particlesLoader
 
 def sortXML(xmltree):
     for el in xmltree:        
@@ -122,6 +68,9 @@ class RunPrinterTest(unittest.TestCase):
         Main program. Displays basic use case.
     
         """
+        
+        runtime.modelFile = 'mssm'
+        reload(particlesLoader)
 
         #Set main options for decomposition:
         sigmacut = 0.03 * fb
@@ -136,7 +85,7 @@ class RunPrinterTest(unittest.TestCase):
         if addTopList:
             mprinter.addObj(smstoplist)
     
-        listOfExpRes = database.getExpResults()
+        listOfExpRes = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'])
         # Compute the theory predictions for each analysis
         allPredictions = []
         for expResult in listOfExpRes:
@@ -168,17 +117,17 @@ class RunPrinterTest(unittest.TestCase):
 
 
     def testTextPrinter(self):
-         
+        outputfile = os.path.join( idir(), "test/unitTestOutput/printer_output.smodels")
+        self.removeOutputs ( outputfile )
         mprinter = printer.MPrinter()
         mprinter.Printers['summary'] = printer.SummaryPrinter(output = 'file')        
         #Define options:
         mprinter.Printers['summary'].expandedSummary = True
          
-        slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
+        slhafile = "./testFiles/slha/gluino_squarks.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)
          
-        outputfile = os.path.join( idir(), "test/unitTestOutput/printer_output.smodels")
         samplefile = os.path.join( idir(), "test/gluino_squarks_default.txt")
         #Test summary output
         output = summaryReader.Summary(outputfile,allowedDiff=0.05)
@@ -188,82 +137,78 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError as e:
             msg = "%s != %s" %(sample, output) 
             raise AssertionError(msg)
+        self.removeOutputs ( outputfile )
  
+    def removeOutputs ( self, f ):
+        """ remove cruft outputfiles """
+        for i in [ f, f.replace(".py",".pyc") ]:
+            if os.path.exists ( i ): os.remove ( i )
  
     def testPythonPrinter(self):
-           
-           
+        self.removeOutputs ( './unitTestOutput/printer_output.py' )
         mprinter = printer.MPrinter()
         mprinter.Printers['python'] = printer.PyPrinter(output = 'file')
         #Define options:
         mprinter.Printers['python'].addElementList = False
                
-        slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
+        slhafile = "./testFiles/slha/gluino_squarks.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)
            
+        smodelsOutput = importlib.import_module( "unitTestOutput.printer_output" ).smodelsOutput
+        # from unitTestOutput.printer_output import smodelsOutput
         #Test python output
-        shutil.copyfile('./unitTestOutput/printer_output.py','./output.py')
         from gluino_squarks_default import smodelsOutputDefault 
-        from output import smodelsOutput
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
-                      key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
-                                       res['AnalysisID'],res['DataSetID']])
+                      key=lambda res: res['r'], reverse=True)
         equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
                             ignore=ignoreFields, where = "top" )
         try:
             self.assertTrue(equals)
         except AssertionError as e:
             print ( "Error: %s, when comparing %s \nwith %s." % (e,"output.py","gluino_squarks_default.py" ) )
-        try:
-            os.remove('./output.py')
-            os.remove('./output.pyc')
-        except OSError:
-            pass
+            raise AssertionError(e)
+        self.removeOutputs ( './unitTestOutput/printer_output.py' )
  
     def testPythonPrinterSimple(self):
+        self.removeOutputs ( './unitTestOutput/printer_output_simple.py' )
  
         mprinter = printer.MPrinter()
         mprinter.Printers['python'] = printer.PyPrinter(output = 'file')
         #Define options:
         mprinter.Printers['python'].addelementlist = True
          
-        slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
+        slhafile = "./testFiles/slha/simplyGluino.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)
         
-        #Test python output
-        shutil.copyfile('./unitTestOutput/printer_output_simple.py','./outputSimple.py')
+        smodelsOutput = importlib.import_module( "unitTestOutput.printer_output_simple" ).smodelsOutput
+        # from unitTestOutput.printer_output_simple import smodelsOutput
         from simplyGluino_default import smodelsOutputDefault    
-        from outputSimple import smodelsOutput
          
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
-                       key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
-                                        res['AnalysisID'],res['DataSetID']])
+                       key=lambda res: res['r'], reverse=True)
         equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
                             ignore=ignoreFields )
         try:
             self.assertTrue(equals)
         except AssertionError as e:
             print ( "Error: %s, when comparing %s \nwith %s." % (e,"outputSimple.py","simplyGluino_default.py" ) )
-        try:
-            os.remove('./outputSimple.py')
-            os.remove('./outputSimple.pyc')
-        except OSError:
-            pass
+            raise AssertionError(e)
+        self.removeOutputs ( './unitTestOutput/printer_output_simple.py' )
   
   
     def testXmlPrinter(self):
-          
+        self.removeOutputs ( './unitTestOutput/printer_output.xml' )  
   
         mprinter = printer.MPrinter()
         mprinter.Printers['xml'] = printer.XmlPrinter(output = 'file')
         #Define options:
         mprinter.Printers['xml'].addelementlist = False                    
   
-        slhafile = os.path.join ( idir(), "inputFiles/slha/gluino_squarks.slha" )
+        slhafile = "./testFiles/slha/gluino_squarks.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)                    
                       
@@ -280,16 +225,17 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
- 
+        self.removeOutputs ( './unitTestOutput/printer_output.xml' )  
  
     def testXmlPrinterSimple(self):
+        self.removeOutputs ( './unitTestOutput/printer_output_simple.xml' )  
  
         mprinter = printer.MPrinter()
         mprinter.Printers['xml'] = printer.XmlPrinter(output = 'file')
         #Define options:
         mprinter.Printers['xml'].addelementlist = True   
  
-        slhafile = os.path.join ( idir(), "inputFiles/slha/simplyGluino.slha" )
+        slhafile = "./testFiles/slha/simplyGluino.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)                    
                      
@@ -306,7 +252,7 @@ class RunPrinterTest(unittest.TestCase):
         except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
-         
+        self.removeOutputs ( './unitTestOutput/printer_output_simple.xml' )  
 
 
 if __name__ == "__main__":

@@ -1,0 +1,8 @@
+dataId: ar40
+dataType: efficiencyMap
+observedN: 28
+expectedBG: 27.0
+bgError: 4.775981574503821
+upperLimit: 0.428368*fb
+expectedUpperLimit: 0.406751*fb
+aggregated: t2b2MT2300__400MET250__350
