@@ -1,6 +1,18 @@
 VER=$(shell cat smodels/version)
 
-all: externaltools
+all: resolve_deps externaltools
+
+resolve_deps: ## resolve the deps via pip
+	@echo "try to resolve the python dependencies via pip"
+	smodels/installation.py -R
+
+install: all tidy
+	@echo "done. you can now run the software directly from this source directory."
+	@echo "Try e.g. ./runSModelS.py --help"
+
+tidy:
+	# tidy up the directory, remove files not needed for users
+	yes | rm -rf build dist test
 
 version:
 	@echo $(VER)

@@ -112,7 +112,7 @@ pygments_style = 'sphinx'
 #keep_warnings = False
 
 #Ignore documentation for python types
-nitpick_ignore = [('py:class', 'type')]
+nitpick_ignore = [('py:class', 'type'),('py:class', 'object')]
 
 
 # -- Options for HTML output ----------------------------------------------

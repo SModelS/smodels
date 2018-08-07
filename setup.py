@@ -13,7 +13,7 @@ import sys
 from setuptools import setup, Extension
 from setuptools.command.install import install
 sys.path.insert ( 0, "./" )
-from smodels.installation import version, authors, requirements
+from smodels.installation import version, authors, requirements, resolve_dependencies
 import subprocess
 
 class OverrideInstall(install):
@@ -22,6 +22,7 @@ class OverrideInstall(install):
         #uid, gid = 0, 0
         install.run(self) # calling install.run(self) insures that everything 
                 # that happened previously still happens, 
+        install.resolve_dependencies( as_user=True )
         enableStupidMacFix=False
         if enableStupidMacFix:
             if "Apple" in sys.version:

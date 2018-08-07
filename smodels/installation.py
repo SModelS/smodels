@@ -9,7 +9,6 @@
 """
 
 from __future__ import print_function
-from smodels.tools.smodelsLogging import logger
 import sys
 import os
 
@@ -27,6 +26,50 @@ def installDirectory():
     #path = path.replace("installation.py", "")
     return path + "/"
 
+def test_requirements():
+    """ checks if all requirements are installed.
+    Returns true if that is the case. """
+    import importlib
+    for i in requirements():
+      try:
+        pos = i.find(">" )
+        lib = i
+        if pos > -1:
+            lib = i[:pos]
+        importlib.import_module( lib )
+      except:
+        return False
+    return True
+
+def resolve_dependencies( as_user = True ):
+    """ method that is meant to resolve the SModelS dependencies, 
+    via pip install --user. Warns you if pip cannot be found. 
+    :params as_user: if False, try system-wide install.
+    """
+    ck = test_requirements()
+    if ck == True: ## nothing to be done
+        return 0
+    import subprocess
+    req = "%s/smodels/share/requirements.txt" % installDirectory()
+    find_pip = subprocess.call ( [ 'which', 'pip' ], stdout=subprocess.PIPE )
+    find_pip3 = subprocess.call ( [ 'which', 'pip3' ], stdout=subprocess.PIPE )
+    if find_pip != 0 and find_pip3 != 0:
+        print ( "error: pip not found. cannot install requirements. Maybe try easy_install pip" )
+        sys.exit()
+    p = "pip"
+    if find_pip != 0:
+        p = "pip3"
+    userwide = ""
+    if as_user:
+        userwide = "--user"
+
+    out = subprocess.call ( [ p, 'install', userwide, '--upgrade', '-r', req ] )
+    if out == 0:
+        print ( "dependencies have been installed successfully." )
+        return 0
+    else:
+        print ( "an error has occurred when resolving the dependencies." )
+        return -1
 
 def pythonDirectory():
     """
@@ -132,6 +175,7 @@ def banner():
 def fixpermissions():
     """ make sure that all filepermissions are such that
         we can compile the wrappers for pythia and nllfast. """
+    from smodels.tools.smodelsLogging import logger
     import os, glob
     Dir = "%ssmodels/lib/" % installDirectory()
     try:
@@ -157,24 +201,26 @@ def main():
     import argparse
     ap = argparse.ArgumentParser( description= "installation helper" )
     ap.add_argument( "-i", "--installdir", help="print SModelS installation directory", action="store_true" )
-    ap.add_argument( "-p", "--pythondir", help="print SModelS python path", 
+    ap.add_argument( "-p", "--pythondir", help="print SModelS python path",
                      action="store_true" )
-    ap.add_argument( "-v", "--version", help="print SModelS version number", 
+    ap.add_argument( "-v", "--version", help="print SModelS version number",
                      action="store_true" )
-    ap.add_argument( "-b", "--banner", help="print SModelS banner", 
+    ap.add_argument( "-b", "--banner", help="print SModelS banner",
                      action="store_true" )
-    ap.add_argument( "-r", "--requirements",help="print SModelS python requirements", 
+    ap.add_argument( "-R", "--resolve_dependencies", help="try to resolve the SModelS dependencies via pip",
                      action="store_true" )
-    ap.add_argument( "-d", "--database", 
+    ap.add_argument( "-r", "--requirements",help="print SModelS python requirements",
+                     action="store_true" )
+    ap.add_argument( "-d", "--database",
                      help="print SModelS official database url for this release", action="store_true")
     ap.add_argument( "-t", "--test-database", help="print SModelS official unittest database url for this release", action="store_true" )
-    ap.add_argument( "-c", "--copyright", "--license", 
+    ap.add_argument( "-c", "--copyright", "--license",
                      help="print SModelS copyright", action="store_true" )
     args = ap.parse_args()
     funcs = { "installdir": installDirectory, "pythondir": pythonDirectory,
               "version": version, "banner": banner, "requirements": requirements,
               "database": officialDatabase, "test_database": testDatabase,
-              "copyright": license }
+              "copyright": license, "resolve_dependencies": resolve_dependencies }
     for f,v in args.__dict__.items():
         if v: print ( funcs[f]() )
 

@@ -32,14 +32,25 @@ requires:
 
 These tools need not be installed separately, as the SModelS build system takes care of that. The current default is that both Pythia6 and Pythia8 are installed together with NLLfast. However, the user can easily adapt the Makefile in the lib/ directory to fit his or her needs.
 Finally, the :ref:`database browser <databaseBrowser>` provided by :ref:`smodelsTools.py <smodelsTools>`
-requires `IPython <https://ipython.org/>`_.
+requires `IPython <https://ipython.org/>`_, while the :ref:`interactive plotter <interactivePlots>` require `plotly <https://plot.ly/python/>`_ and `pandas <https://pandas.pydata.org/>`_. 
 
 
 Installation Methods
 ^^^^^^^^^^^^^^^^^^^^
 
-1. If Python's *setuptools* is installed in your machine, SModelS and its dependencies
-   can be installed running::
+1. The first installation method installs SModelS in the source directory, which can then be used for :ref:`running SModelS <runningSModelS>`.
+   After downloading the source from the `SModelS releases page <https://github.com/SModelS/smodels/releases>`_
+   and extracting it, run::
+
+     make install
+
+   in the top-level directory. The installation will remove build folders, install the required 
+   dependencies (using pip install) and compile Pythia and NLL-fast. In case the Python libraries can not be successfully
+   installed, the user can install them separately using his/her preferred method. Pythia and NLL-fast can also be compiled separately
+   running **make externaltools**.
+
+2. If Python's *setuptools* is installed in your machine, SModelS and its dependencies
+   can also be installed running::
 
      setup.py install
 
@@ -54,7 +65,7 @@ Installation Methods
    For Ubuntu, SL6 machines and other platforms, a recipe is given below.
 
 
-2. If *pip3* (or *pip*) is installed in your machine, installing SModelS should be as easy as: ::
+3. If *pip3* (or *pip*) is installed in your machine, installing SModelS should be as easy as: ::
 
      pip3 install smodels
 
