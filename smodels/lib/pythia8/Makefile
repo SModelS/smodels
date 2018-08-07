@@ -5,7 +5,6 @@
 
 PYTHIAVER := 8226
 
-CXX      := g++
 PYTHIA8HOME := pythia$(PYTHIAVER)/
 CXXFLAGS := -O3 -I$(PYTHIA8HOME)/include -I$(PYTHIA8HOME)/include/Pythia8/
 LDFLAGS  := -L$(PYTHIA8HOME)/lib/ -L$(PYTHIA8HOME)/lib -Wl,-rpath,$(PWD)/$(PYTHIA8HOME)/lib
