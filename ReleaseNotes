@@ -1,6 +1,8 @@
 Release v1.2, dd/mm 2018
 =======================================================
 
+  * Decomposition and experimental results properly handle non-MET BSM final states (e.g. HSCP)
+  * Added lifetime reweighting at decomposition for meta-stable particles
   * Added finalState property for Elements (backwards compatible)
   * Introduced inclusive branches and particles (for description of HSCP results)
   * Introduced reweighting 
