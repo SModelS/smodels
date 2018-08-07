@@ -38,6 +38,8 @@ requires `IPython <https://ipython.org/>`_, while the :ref:`interactive plotter 
 Installation Methods
 ^^^^^^^^^^^^^^^^^^^^
 
+.. _phenoInstallation:
+
 1. The first installation method installs SModelS in the source directory, which can then be used for :ref:`running SModelS <runningSModelS>`.
    After downloading the source from the `SModelS releases page <https://github.com/SModelS/smodels/releases>`_
    and extracting it, run::
