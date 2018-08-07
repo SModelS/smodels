@@ -54,6 +54,7 @@ New in Version 1.1.3:
   * Added fixpermissions to smodelsTools.py, for system-wide installs (see :ref:`Files Permissions Fixer <permissionsFixer>`)
   * Fixed small issue with pair production of even particles
   * Moved the :ref:`code documentation <CodeDocs>` to the manual
+  * Allowing also for a hep-pheno-style installation.
 
 
 New in Version 1.1.2:
