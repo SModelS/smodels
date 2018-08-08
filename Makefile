@@ -29,8 +29,8 @@ smodels: all tidy
 
 smodels_noexternaltools: resolve_deps tidy
 	@echo
-	@echo "done. you can now run the software directly from this source directory."
-	@echo "Try e.g. ./runSModelS.py --help"
+	@echo "done. you can now run the software directly from this source directory.\n"
+	@echo "Try e.g. \n\n ./runSModelS.py --help\n"
 	@echo "The latest SModelS documentation can be found at: http://smodels.readthedocs.io/en/latest/"
 	@echo "For this version documentation go to: https://smodels.readthedocs.io/en/v$(VER)"
 
