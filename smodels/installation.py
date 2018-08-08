@@ -58,9 +58,9 @@ def resolve_dependencies( as_user = True ):
     if find_pip != 0 and find_pip3 != 0:
         print ( "error: pip not found. cannot install requirements. Maybe try easy_install pip" )
         sys.exit()
-    p = "pip"
-    if find_pip != 0:
-        p = "pip3"
+    p = "pip3"
+    if find_pip3 != 0:
+        p = "pip"
     userwide = ""
     if as_user:
         userwide = "--user"
