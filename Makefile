@@ -13,9 +13,6 @@ ifndef HAS_CXX
 	$(error "C++ compiler not found. cannot compile external tools. Note that you can still build smodels proper, via 'make smodels_noexternaltools'" )
 endif
 
-echo:
-	echo "here $(CXX)"
-
 resolve_deps: ## resolve the deps via pip
 	@echo "try to resolve the python dependencies via pip"
 	smodels/installation.py -R
