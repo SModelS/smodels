@@ -50,7 +50,7 @@ class CppTest(unittest.TestCase):
             print ( "test failed. writing output to debug.txt" )
             f=open("debug.txt","w")
             for i in b:
-                f.write ( i )
+                f.write ( i+ "\n" )
             f.close()
         self.assertEqual ( len(a), len(b) )
         for x,y in zip(a,b):
