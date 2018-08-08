@@ -7,10 +7,10 @@ all: resolve_deps externaltools
 
 check_compilers:
 ifndef HAS_FC
-	$(error "fortran compiler not found. cannot compile external tools. Note that you can still build smodels proper, via 'make smodels_noexternaltools'" )
+	$(error "Fortran compiler not found. Cannot compile external tools. You may try to give the explicit path to the compiler via the FC variable (make FC=... smodels). Alternatively, you can still build smodels proper, via 'make smodels_noexternaltools'" )
 endif
 ifndef HAS_CXX
-	$(error "C++ compiler not found. cannot compile external tools. Note that you can still build smodels proper, via 'make smodels_noexternaltools'" )
+	$(error "C++ compiler not found. Cannot compile external tools. You may try to give the explicit path to the compiler via the CXX variable (make CXX=... smodels). Alternatively, you can still build smodels proper, via 'make smodels_noexternaltools'" )
 endif
 
 resolve_deps: ## resolve the deps via pip
