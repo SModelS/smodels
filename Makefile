@@ -21,12 +21,18 @@ resolve_deps: ## resolve the deps via pip
 	smodels/installation.py -R
 
 smodels: all tidy
+	@echo
 	@echo "done. you can now run the software directly from this source directory."
 	@echo "Try e.g. ./runSModelS.py --help"
+	@echo "The latest SModelS documentation can be found at: http://smodels.readthedocs.io/en/latest/"
+	@echo "For this version documentation go to: https://smodels.readthedocs.io/en/v$(VER)"
 
 smodels_noexternaltools: resolve_deps tidy
+	@echo
 	@echo "done. you can now run the software directly from this source directory."
 	@echo "Try e.g. ./runSModelS.py --help"
+	@echo "The latest SModelS documentation can be found at: http://smodels.readthedocs.io/en/latest/"
+	@echo "For this version documentation go to: https://smodels.readthedocs.io/en/v$(VER)"
 
 tidy:
 	# tidy up the directory, remove files not needed for users
