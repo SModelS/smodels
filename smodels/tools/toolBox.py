@@ -74,7 +74,7 @@ class ToolBox(object):
             ret = "%sinstallation ok!%s" % (colors.green, colors.reset)
             return ret
         ret = "%sproblem with installation" % colors.red
-        if type(ok) == types.StringType:
+        if type(ok) == str:
             ret += " (%s)" % ok
         ret += colors.reset
         return ret

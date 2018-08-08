@@ -8,7 +8,6 @@
 import sys
 import os
 import argparse
-import types
 
 argparser = argparse.ArgumentParser(description =
 'create info.txt, txname.txt, twiki.txt and sms.py')

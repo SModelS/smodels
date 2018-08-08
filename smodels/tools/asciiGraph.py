@@ -123,11 +123,11 @@ if __name__ == "__main__":
                            help="Tx name, will look up lhe file in "
                            "../regression/Tx_1.lhe. Will be overriden by the "
                            "'--lhe' argument",
-                           type=types.StringType, default='T1')
+                           type=str, default='T1')
     argparser.add_argument('-l', '--lhe', nargs='?',
                            help="LHE file name, supplied directly. Takes "
                            "precedence over '-T' argument.",
-                           type=types.StringType, default='')
+                           type=str, default='')
     argparser.add_argument('-b', '--border', action='store_true',
                            help="draw a border around the graph")
     args = argparser.parse_args()
