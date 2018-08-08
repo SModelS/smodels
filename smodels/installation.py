@@ -31,14 +31,16 @@ def test_requirements():
     Returns true if that is the case. """
     import importlib
     for i in requirements():
-      try:
-        pos = i.find(">" )
-        lib = i
-        if pos > -1:
-            lib = i[:pos]
-        importlib.import_module( lib )
-      except:
-        return False
+        try:
+            pos = i.find(">" )
+            lib = i
+            if pos > -1:
+                lib = i[:pos]
+            found = importlib.util.find_spec( lib )
+            if found == None:
+                return False
+        except Exception as e:
+            return False
     return True
 
 def resolve_dependencies( as_user = True ):
@@ -48,7 +50,7 @@ def resolve_dependencies( as_user = True ):
     """
     ck = test_requirements()
     if ck == True: ## nothing to be done
-        return 0
+        return None
     import subprocess
     req = "%s/smodels/share/requirements.txt" % installDirectory()
     find_pip = subprocess.call ( [ 'which', 'pip' ], stdout=subprocess.PIPE )
@@ -66,7 +68,7 @@ def resolve_dependencies( as_user = True ):
     out = subprocess.call ( [ p, 'install', userwide, '--upgrade', '-r', req ] )
     if out == 0:
         print ( "dependencies have been installed successfully." )
-        return 0
+        return None
     else:
         print ( "an error has occurred when resolving the dependencies." )
         return -1
@@ -222,7 +224,9 @@ def main():
               "database": officialDatabase, "test_database": testDatabase,
               "copyright": license, "resolve_dependencies": resolve_dependencies }
     for f,v in args.__dict__.items():
-        if v: print ( funcs[f]() )
+        if v: 
+            r = funcs[f]() 
+            if r != None: print ( r )
 
 if __name__ == "__main__":
     main()

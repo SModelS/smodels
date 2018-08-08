@@ -32,20 +32,23 @@ requires:
 
 These tools need not be installed separately, as the SModelS build system takes care of that. The current default is that both Pythia6 and Pythia8 are installed together with NLLfast. However, the user can easily adapt the Makefile in the lib/ directory to fit his or her needs.
 Finally, the :ref:`database browser <databaseBrowser>` provided by :ref:`smodelsTools.py <smodelsTools>`
-requires `IPython <https://ipython.org/>`_, while the :ref:`interactive plotter <interactivePlots>` require `plotly <https://plot.ly/python/>`_ and `pandas <https://pandas.pydata.org/>`_. 
+requires `IPython <https://ipython.org/>`_, while the :ref:`interactive plotter <interactivePlots>` requires `plotly <https://plot.ly/python/>`_ and `pandas <https://pandas.pydata.org/>`_. 
 
 
 Installation Methods
 ^^^^^^^^^^^^^^^^^^^^
 
+.. _phenoInstallation:
+
 1. The first installation method installs SModelS in the source directory, which can then be used for :ref:`running SModelS <runningSModelS>`.
    After downloading the source from the `SModelS releases page <https://github.com/SModelS/smodels/releases>`_
    and extracting it, run::
 
-     make install
+     make smodels
 
-   in the top-level directory. The installation will remove build folders, install the required 
-   dependencies (using pip install) and compile Pythia and NLL-fast. In case the Python libraries can not be successfully
+   in the top-level directory. The installation will remove redundant folders, install the required 
+   dependencies (using pip install) and compile Pythia and NLL-fast. If the cross section computer is not needed, one can replace *smodels* with *smodels_noexternaltools* in the above command.
+   In case the Python libraries can not be successfully
    installed, the user can install them separately using his/her preferred method. Pythia and NLL-fast can also be compiled separately
    running **make externaltools**.
 
@@ -54,7 +57,7 @@ Installation Methods
 
      setup.py install
 
-   within the main smodels directory.If the python libraries are installed in a system folder (as is the default behavior),
+   within the main smodels directory. If the python libraries are installed in a system folder (as is the default behavior),
    it will be necessary to run the install command with superuser privilege.
    Alternatively, one can run setup.py with the "--user" flag: ::
 

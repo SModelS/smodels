@@ -81,6 +81,7 @@ class CompressionTest(unittest.TestCase):
                 self.assertEqual(len(element.motherElements),24 )
                 self.assertEqual(str(element.motherElements[0][0]),"mass" )
                 self.assertTrue ( dm < 5.0 )
+                # print(element.elID)
         self.assertTrue(tested)
 
 if __name__ == "__main__":
