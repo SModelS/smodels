@@ -61,7 +61,8 @@ pythonTools = { "unum" : ExternalPythonTool("unum"),
                 "pyslha": ExternalPythonTool("pyslha"),
                 "scipy": ExternalPythonTool("scipy"),
                 "plotly": ExternalPythonTool("plotly"),
-                "pandas": ExternalPythonTool("pandas"), }
+                "pandas": ExternalPythonTool("pandas"),
+                "ipython": ExternalPythonTool("IPython"), }
 
 
 if __name__ == "__main__":

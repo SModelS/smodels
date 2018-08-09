@@ -12,7 +12,6 @@ from __future__ import print_function
 import sys
 import os
 import argparse
-import types
 from smodels import installation
 from smodels.theory import lheReader
 from smodels.theory import lheDecomposer
@@ -119,23 +118,13 @@ if __name__ == "__main__":
     argparser = argparse.ArgumentParser(description="simple tool that is "
                                         "meant to draw lessagraphs, as an "
                                         "ascii plot")
-    argparser.add_argument('-T', nargs='?',
-                           help="Tx name, will look up lhe file in "
-                           "../regression/Tx_1.lhe. Will be overriden by the "
-                           "'--lhe' argument",
-                           type=types.StringType, default='T1')
-    argparser.add_argument('-l', '--lhe', nargs='?',
-                           help="LHE file name, supplied directly. Takes "
-                           "precedence over '-T' argument.",
-                           type=types.StringType, default='')
+    argparser.add_argument('-l', '--lhe', help="LHE file name",
+                           type=str, required=True )
     argparser.add_argument('-b', '--border', action='store_true',
                            help="draw a border around the graph")
     args = argparser.parse_args()
 
-    path = os.path.join(installation.installDirectory(), "inputFiles/lhe/")
-    filename = os.path.join(path, args.T + "_1.lhe")
-    if args.lhe != "":
-        filename = args.lhe
+    filename = args.lhe
 
     reader = lheReader.LheReader(filename)
     event = reader.next()

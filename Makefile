@@ -7,26 +7,29 @@ all: resolve_deps externaltools
 
 check_compilers:
 ifndef HAS_FC
-	$(error "fortran compiler not found. cannot compile external tools. Note that you can still build smodels proper, via 'make smodels_noexternaltools'" )
+	$(error "Fortran compiler not found. Cannot compile external tools. You may try to give the explicit path to the compiler via the FC variable (make FC=... smodels). Alternatively, you can still build smodels proper, via 'make smodels_noexternaltools'" )
 endif
 ifndef HAS_CXX
-	$(error "C++ compiler not found. cannot compile external tools. Note that you can still build smodels proper, via 'make smodels_noexternaltools'" )
+	$(error "C++ compiler not found. Cannot compile external tools. You may try to give the explicit path to the compiler via the CXX variable (make CXX=... smodels). Alternatively, you can still build smodels proper, via 'make smodels_noexternaltools'" )
 endif
-
-echo:
-	echo "here $(CXX)"
 
 resolve_deps: ## resolve the deps via pip
 	@echo "try to resolve the python dependencies via pip"
 	smodels/installation.py -R
 
 smodels: all tidy
-	@echo "done. you can now run the software directly from this source directory."
-	@echo "Try e.g. ./runSModelS.py --help"
+	@echo
+	@echo "done. you can now run the software directly from this source directory.\n"
+	@echo "Try e.g. \n\n ./runSModelS.py --help\n"
+	@echo "The latest SModelS documentation can be found at: http://smodels.readthedocs.io/en/latest/"
+	@echo "For this version documentation go to: https://smodels.readthedocs.io/en/v$(VER)"
 
 smodels_noexternaltools: resolve_deps tidy
-	@echo "done. you can now run the software directly from this source directory."
-	@echo "Try e.g. ./runSModelS.py --help"
+	@echo
+	@echo "done. you can now run the software directly from this source directory.\n"
+	@echo "Try e.g. \n\n ./runSModelS.py --help\n"
+	@echo "The latest SModelS documentation can be found at: http://smodels.readthedocs.io/en/latest/"
+	@echo "For this version documentation go to: https://smodels.readthedocs.io/en/v$(VER)"
 
 tidy:
 	# tidy up the directory, remove files not needed for users

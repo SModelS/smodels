@@ -257,7 +257,7 @@ usage example is: ::
 
    smodelsTools.py interactive-plots -f inputFiles/scanExample/smodels-output/ -s inputFiles/scanExample/slha -p iplots_parameters.py -o results/iplots/
 
-which will produce 3x10 plots in the gluino vs squark mass plane from a small scan example, viewable in a web browser.
+which will produce 3x9 plots in the gluino vs squark mass plane from a small scan example, viewable in a web browser.
 
 
 iplots parameters file
@@ -321,7 +321,7 @@ Below we give more detailed information about each entry in this file.
 File Permissions Fixer
 ----------------------
 
-In case the software was installed under a different name than it is used
+In case the software was installed under a different user than it is used
 (as is the case for system-wide installs), we ship a simple tool that fixes 
 the file permissions for the cross section calculation code.
 
