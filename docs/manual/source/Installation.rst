@@ -116,8 +116,8 @@ The installation methods explained above also installs SModelS'
 in the smodels-database subdirectory.
 The first time SModelS is run, a :ref:`binary file <databasePickle>` will be built
 using the database folder, which can then be used in all subsequent runs.
-However, from v1.1.3 onwards it is recommended to provide the URL
-path to the database when running SModelS (see :ref:`path <parameterFilePath>` in |parameters|).
+However, from v1.1.3 onwards it is recommended to provide the URL of the official database as the
+database path when running SModelS (see :ref:`path <parameterFilePath>` in |parameters|).
 In this case the corresponding database version binary file will be automatically downloaded
 and used.  The available database URLs can be found in 
 the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_ .
