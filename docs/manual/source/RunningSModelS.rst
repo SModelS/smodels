@@ -94,7 +94,7 @@ file, second, it supports parallelization of this input folder.
 
 A typical usage example is: ::
 
-   runSModelS.py -f lightSquarks.slha -p parameters.ini -o ./ -v warning
+   runSModelS.py -f inputFiles/slha/simplyGluino.slha -p parameters.ini -o ./ -v warning
 
 The resulting |output| will be generated in the current folder, according to the printer options set in the
 |parameters|.
