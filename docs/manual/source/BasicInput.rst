@@ -18,6 +18,8 @@ given in the two following forms:
 The SLHA format is usually more compact and best suited for supersymmetric models. On the other hand, a LHE file can always
 be generated for any BSM model (through the use of your favorite MC generator). [*]_ In this case, however,
 the precision of the results is limited to the MC statistics used to generate the file.
+*We also point out that all the decays appearing in the LHE input are assumed to be prompt and
+this input format should no be used if the model contains meta-stable particles*.
 
 *In the case of SLHA input only*, the production cross sections for the BSM states also have to be included
 in the SLHA file as SLHA blocks, according to the :ref:`SLHA cross section format <xsecSLHA>` 

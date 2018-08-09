@@ -17,11 +17,14 @@
    
 """
 
+from smodels.tools.smodelsLogging import logger
+import os, sys
+
 def load ():
-    import os, sys
+    
     from smodels.tools.runtime import modelFile
-    from smodels.tools.smodelsLogging import logger
-    from smodels.installation import installDirectory
+    from smodels.installation import installDirectory    
+    
     fulldir = os.path.join(installDirectory(),"smodels","share","models")
     # print ( "fulldir", fulldir )
     sys.path.insert(0,installDirectory())
@@ -53,4 +56,8 @@ pM = load()
         
 rOdd = pM.rOdd
 rEven = pM.rEven
-qNumbers = pM.qNumbers
+try:
+    qNumbers = pM.qNumbers
+except:
+    logger.error("Quantum numbers have not been defined. Please add the BSM quantum numbers to the model file.")
+    sys.exit()

@@ -34,7 +34,8 @@ SLHA-based Decomposition
 ------------------------
 
 The SLHA file describing the input model is required to contain the masses of all
-the BSM states as well as their production cross sections and decay branching ratios. All the above information must follow the guidelines of the SLHA format. In particular, the cross sections also have to be included
+the BSM states as well as their production cross sections, decay widths and branching ratios.
+All the above information must follow the guidelines of the SLHA format. In particular, the cross sections also have to be included
 as SLHA blocks according to the :ref:`SLHA cross section format <xsecSLHA>`.
 
 Once the production cross sections are read from the input file, all the cross sections for *production
@@ -48,8 +49,47 @@ according to the information contained in the DECAY blocks. This procedure is re
 .. image:: images/decomp1B.png
    :width: 45%
 
+Within SModelS all the decays are assumed to be prompt and the last BSM particle appearing
+in the cascade decay decay is assumed to be stable (in detector scales).
+However, if a given BSM particle has a small (non-zero) width, its decay
+should not be considered prompt. Furthermore, it might have a non-negligible probability
+of decaying outside the detector.
+In order to deal with these cases, during decomposition each decay step is reweighted
+by the probability for the decay to be prompt (:math:`\mathcal{F}_{prompt}`). Also,
+for particles with small or zero width, an element where the particle does not decay
+is also included and reweight by the probability for the particle to decay *outside*
+the detector (:math:`\mathcal{F}_{long}`).  
+This reweighting is illustrated in the figure below:
 
-Each of the possible cascade decays for each mother corresponds to a :ref:`branch <branch>`.
+.. _decomp1b:
+
+.. image:: images/decompScheme1.png
+   :width: 90%
+ 
+The precise values of :math:`\mathcal{F}_{prompt}` and :math:`\mathcal{F}_{long}` 
+depend on the relevant detector size (:math:`L`), particle mass (:math:`M`), boost
+(:math:`\beta`) and width (:math:`\Gamma`), thus
+requiring a Monte Carlo simulation for each input model. Since this is not
+within the spirit of the simplified model approach, we approximate the prompt and
+long-lived probabilities by:
+
+.. math::
+   \mathcal{F}_{long} = \exp(- \frac{\Gamma L_{outer}}{\langle \gamma \beta \rangle}) \mbox{ and } 
+   \mathcal{F}_{prompt} = 1 - \exp(- \frac{\Gamma L_{inner}}{\langle \gamma \beta \rangle}),
+
+where :math:`L_{outer}` is the effective size of the detector (which we take to be 10 m for both ATLAS
+and CMS), :math:`L_{inner}` is the effective radius of the inner detector (which we take to be 1 mm for both ATLAS
+and CMS). Finally, we take the effective time dilation factor to be  :math:`\langle \gamma \beta \rangle = 1.3`.
+We point out that the above approximations are irrelevant if :math:`\Gamma` is very large (:math:`\mathcal{F}_{prompt} \simeq 1`
+and :math:`\mathcal{F}_{long} \simeq 0`) or close to zero (:math:`\mathcal{F}_{prompt} \simeq 0`
+and :math:`\mathcal{F}_{long} \simeq 1`). Only elements containing particles which have a considerable fraction of displaced
+decays will be sensitive to the values chosen above. 
+
+
+Following the above procedure it is possible to construct
+all cascade decay possibilities (including the stable case)
+for a given initial mother particle.
+Within the SModelS language each of the possible cascade decays corresponds to a :ref:`branch <branch>`.
 In order to finally generate :ref:`elements <element>`, all the branches are combined in pairs according to the production cross sections,
 as shown below:
 
@@ -113,6 +153,11 @@ are fully dependent on the Monte Carlo statistics used to generate the LHE file.
 Also, when generating the events it is important to ensure that no mass smearing is applied, so the events
 always contain the same mass value for a given particle.
 
+
+**Note that since all decays appearing in an LHE event are assumed to be prompt, the LHE-based
+decomposition should not be used for models with meta-stable BSM particles**.
+
+
 * **The LHE decomposition is implemented by the** `LHE decompose method <theory.html#theory.lheDecomposer.decompose>`_
 
 .. _elementComp:
@@ -171,7 +216,8 @@ The most common example is
 .. math::
    A \rightarrow \nu + B
 
-as the last step of the decay chain, where :math:`B` is an insivible particle leading to a MET signature.
+as the last step of the decay chain, where :math:`B` is an insivible particle leading to a MET signature
+(see :ref:`final state class <final stateOdd>`).
 Since both the neutrino and
 :math:`B` are invisible, for all experimental purposes the effective MET object is :math:`B + \nu = A`.
 Hence it is possible to omit the last step in the cascade decay, resulting in a compressed element.
@@ -198,10 +244,11 @@ faster element comparison.
 Elements are sorted according to their branches. Branches are compared according to
 the following properties:
 
-* Number of vertices
-* Number of final states in each vertex
-* Final state particles (particles belonging to the same vertex are alphabetically sorted)
-* Mass array
+* Number of :ref:`vertices <vertex>`
+* Number of :ref:`final states <final statesEven>` in each vertex
+* :ref:`Final state  <final statesEven>` (Z\ :sub:`2`-even) particles (particles belonging to the same vertex are alphabetically sorted)
+* :ref:`Mass array <notation>`
+* :ref:`Final state signature <final stateOdd>`
 
 As an example, consider the three elements below:
 
