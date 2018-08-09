@@ -16,9 +16,9 @@
 .. |elements| replace:: :ref:`elements <element>`
 .. |topology| replace:: :ref:`topology <topology>`
 .. |topologies| replace:: :ref:`topologies <topology>`
-.. |sigBR| replace:: :math:`\sigma \times BR`
-.. |sigBRe| replace:: :math:`\sigma \times BR \times \epsilon`
-.. |ssigBRe| replace:: :math:`\sum \sigma \times BR \times \epsilon`
+.. |sigBR| replace:: :math:`\sigma \times BR \times \mathcal{F}`
+.. |sigBRe| replace:: :math:`\sigma \times BR \times \mathcal{F} \times \epsilon`
+.. |ssigBRe| replace:: :math:`\sum \sigma \times BR \times \mathcal{F} \times \epsilon`
 
 .. _theoryPredictions:
 
@@ -41,8 +41,16 @@ for two types of experimental constraints:
 Upper Limit constraints   (see |ULrs|) and Efficiency Map constraints (see |EMrs|). 
 Each of them requires different theoretical predictions to be compared against experimental data.
 
-|ULrs| constrains the weight (|sigBR|) of one |element| or sum of |elements|.
-Therefore SModelS must compute the theoretical value of |sigBR| summing only over the |elements|
+|ULrs| constrains the weight of one |element| or sum of |elements|.
+The |element| weight is defined as |sigBR|, where :math:`\sigma` is the total
+production cross-section, :math:`BR` is the product of all branching ratios
+for the decays appearing in the element and :math:`\mathcal{F}` is the product
+of all the lifetime reweighting factors (:math:`\mathcal{F}_{long}` and :math:`\mathcal{F}_{prompt}`),
+as discussed in the :ref:`SLHA decomposition <slhaDecomp>` (for the :ref:`LHE-type decomposition <lheDecomp>`
+:math:`\mathcal{F}=1`).
+
+Therefore, in order to apply the experimental constraints, SModelS must first
+compute the theoretical value of |sigBR| summing only over the |elements|
 appearing in the respective :ref:`constraint <ULconstraint>`.
 This is done applying a 1 (zero) efficiency (:math:`\epsilon`) for the
 elements which appear (do not appear) in the :ref:`constraint <ULconstraint>`.
@@ -78,7 +86,7 @@ Once the |elements| have been selected and clustered, the theory prediction for 
 the sum of all the |element| weights (|sigBRe|) belonging to the same cluster:
 
 .. math::
-   \mbox{theory prediction } = \sum_{cluster} (\mbox{element weight}) =  \sum_{cluster} (\sigma \times BR \times \epsilon)
+   \mbox{theory prediction } = \sum_{cluster} (\mbox{element weight}) =  \sum_{cluster} (\sigma \times BR \times \mathcal{F} \times \epsilon)
 
 Below we describe in detail the *element selection* and *element clustering* 
 methods for computing the theory predictions for each type
