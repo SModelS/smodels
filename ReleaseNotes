@@ -5,7 +5,7 @@ Release v1.2, dd/mm 2018
   * Added lifetime reweighting at decomposition for meta-stable particles
   * Added finalState property for Elements (backwards compatible)
   * Introduced inclusive branches and particles (for description of HSCP results)
-  * Introduced reweighting 
+  * Inclusion of HSCP results in the database
 
 Allows for non-prompt (long-lived) BSM particles
   * Added final state definitions in particleNames.py

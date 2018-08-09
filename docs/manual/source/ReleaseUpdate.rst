@@ -39,6 +39,16 @@ Since the publication of SModelS v1.0 in December 2014, the code base
 has undergone significant structural changes. 
 The major novelties of this release are as follows:
 
+New in Version 1.2.0:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * :doc:`Decomposition <Decomposition>` and experimental results properly handle 
+    non-MET BSM :ref:`final states <finalStates>` (e.g. heavy stable charged particles or HSCP)
+  * Added :ref:`lifetime reweighting <lifetimeWeight>` at decomposition for meta-stable particles
+  * Added :ref:`finalState property <finalStates>` for Elements (backwards compatible)
+  * Introduced :ref:`inclusive branches <inclusiveBranches>` and :ref:`particles <inclusiveParticles>` (for description of HSCP results)
+  * Inclusion of HSCP results in the database
+
 New in Version 1.1.3:
 ^^^^^^^^^^^^^^^^^^^^^
 
