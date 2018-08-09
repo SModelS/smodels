@@ -183,10 +183,10 @@ The installation procedure explained above also installs SModelS'
 :ref:`database of experimental results <databaseStruct>`
 in the smodels-database subdirectory.
 The complete list of analyses and results included in the database can be
-consulted at `http://smodels.hephy.at/wiki/ListOfAnalysesv11 <http://smodels.hephy.at/wiki/ListOfAnalysesv11>`_.
+consulted at `http://smodels.hephy.at/wiki/ListOfAnalyses <http://smodels.hephy.at/wiki/ListOfAnalyses>`_.
 We note that all the results in the official database release have been
 carefully validated  and the validation material can be
-found at `http://smodels.hephy.at/wiki/Validationv11 <http://smodels.hephy.at/wiki/Validationv11>`_.
+found at `http://smodels.hephy.at/wiki/Validation <http://smodels.hephy.at/wiki/Validation>`_.
 
 The database can conveniently be updated independently from SModelS code
 updates. It suffices to unpack any new database tarball and replace the database

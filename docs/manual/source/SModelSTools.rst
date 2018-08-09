@@ -321,7 +321,7 @@ Below we give more detailed information about each entry in this file.
 File Permissions Fixer
 ----------------------
 
-In case the software was installed under a different name than it is used
+In case the software was installed under a different user than it is used
 (as is the case for system-wide installs), we ship a simple tool that fixes 
 the file permissions for the cross section calculation code.
 
