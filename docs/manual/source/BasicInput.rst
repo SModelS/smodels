@@ -30,7 +30,7 @@ as discussed in :ref:`cross section calculator <xsecCalc>`.
 *In the case of LHE input*, the total production cross section as well as 
 the center-of-mass energy should be listed in the <init></init> block, according to the standard LHE format
 (see :download:`example file <examples/example.slha>`).
-Moreover, all the Z\ :sub:`2`-even particles (see definition in :ref:`final states <final states>`) should be set as stable, since
+Moreover, all the Z\ :sub:`2`-even particles (see definition in :ref:`final states <final statesEven>`) should be set as stable, since
 in SModelS they are effectively considered as final states.
 When generating the events it is also important to ensure that no mass smearing is applied, so the mass
 values for a given particle are the same throughout the LHE file.
@@ -42,7 +42,7 @@ New Particles
 
 Besides information about the masses and branching ratios, the user must also define
 which particles are Z\ :sub:`2`-odd states (:ref:`Intermediate states <odd states>`) 
-and which are Z\ :sub:`2`-even (:ref:`Final states <final states>`).
+and which are Z\ :sub:`2`-even (:ref:`Final states <final statesEven>`).
 These definitions must be given in a model file, including
 the particle's quantum numbers, as illustrated in
 the :download:`mssm.py <images/mssm.py>` file.

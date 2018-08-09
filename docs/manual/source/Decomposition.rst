@@ -134,8 +134,8 @@ Mass Compression
 ^^^^^^^^^^^^^^^^
 
 In case of small mass differences, the decay of an :ref:`intermediate state <odd states>` to a nearly degenerate
-one will in most cases produce soft :ref:`final states <final states>`, which can not be experimentally detected.
-Consequently, it is a good approximation to neglect the soft :ref:`final states <final states>` and *compress* the respective
+one will in most cases produce soft :ref:`final states <final statesEven>`, which can not be experimentally detected.
+Consequently, it is a good approximation to neglect the soft :ref:`final states <final statesEven>` and *compress* the respective
 decay, as shown below:
 
 .. _massCompfig:
@@ -165,7 +165,7 @@ Invisible Compression
 ^^^^^^^^^^^^^^^^^^^^^
 
 Another type of compression is possible when
-the :ref:`final states <final states>` of the last decay are invisible.
+the :ref:`final states <final statesEven>` of the last decay are invisible.
 The most common example is
 
 .. math::

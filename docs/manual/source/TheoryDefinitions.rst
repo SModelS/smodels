@@ -5,7 +5,8 @@
 .. |topology| replace:: :ref:`topology <topology>`
 .. |topologies| replace:: :ref:`topologies <topology>`
 .. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
-.. |final states| replace:: :ref:`final states <final states>`
+.. |final states| replace:: :ref:`final states <final statesEven>`
+.. |parameters| replace:: :ref:`parameters file <parameterFile>`
 
 
 .. _theoryDefs:
@@ -32,16 +33,19 @@ Elements
 
 A simplified model topology representing a specific cascade decay of a pair of BSM states produced in
 the hard scattering is called an element in the SModelS language.
-Elements contain the final states (Z\ :sub:`2`-even) particles appearing in
-the cascade decay as well as the masses of the BSM (Z\ :sub:`2`-odd) states
+Elements contain the Z\ :sub:`2`-even particles appearing in
+the cascade decay and the masses of the BSM (Z\ :sub:`2`-odd) states
 which have decayed or appear in the last step of the decay.
+Furthermore, the last BSM (Z\ :sub:`2`-odd) particle is classified
+according to its quantum numbers as a specific *final state*
+class: *MET*, *HSCP*, *R-hadron*,etc. 
 A representation of an element is shown below:
 
 
 .. _elementscheme:
 
 .. image:: images/elementB.png
-   :width: 30%
+   :width: 40%
    
 An element may also hold information about its corresponding 
 weight (cross section times branching ratio times efficiency). [*]_
@@ -50,7 +54,7 @@ The overall properties of an element are illustrated in the scheme below:
 .. _topscheme:
 
 .. image:: images/topSchemeB.png
-   :width: 35%
+   :width: 40%
 
 SModelS works under the inherent assumption that, for collider purposes,
 all the essential properties of a BSM model can be encapsulated by its
@@ -59,9 +63,8 @@ Such an assumption is extremely helpful to cast the theoretical predictions of a
 specific BSM model in a model-independent framework, which can then be compared
 against the corresponding experimental limits.
 For instance, as shown in the :ref:`scheme above <elementscheme>`, only the
-masses of the BSM states are used and other properties, such as their spins or
-other quantum numbers are ignored (the PID's are, however, stored for book-keeping).
-
+masses of the BSM states and the quantum number of the last BSM state are used, while
+other properties, such as their spins are ignored (the PID's are, however, stored for book-keeping).
 
 Below we describe in more detail the element properties and their implementation
 in SModelS.
@@ -77,10 +80,10 @@ Vertices
 Each Z\ :sub:`2`-odd decay is represented by a vertex containing its final states (one Z\ :sub:`2`-odd
 state and the Z\ :sub:`2`-even particles), as shown in the :ref:`scheme above <topscheme>`.
 
-.. _final states:
+.. _final statesEven:
 
-Final States (Z\ :sub:`2`-even)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Z\ :sub:`2`-even Final States
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Final states indicate all Z\ :sub:`2`-even states coming out of a vertex (see :ref:`scheme above <topscheme>`).
 In most cases, these correspond to Standard Model particles (electrons, gauge bosons, Higgs,...).
@@ -94,15 +97,30 @@ are *not* classified as final states.
 
 .. _odd states:
 
-Intermediate States (Z\ :sub:`2`-odd)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Z\ :sub:`2`-odd Intermediate States
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The Z\ :sub:`2`-odd states are always assumed to consist of BSM particles with Z\ :sub:`2`
 conserving decays of the form: (Z\ :sub:`2`-odd state) :math:`\rightarrow`  (Z\ :sub:`2`-odd state') + |final states|.
 The only information kept from the intermediate states are their masses (see :ref:`scheme above <topscheme>`).
 If an intermediate state is stable and neutral, it is considered as a MET signal.
 
-* Z\ :sub:`2`-odd **states are defined (and can be easily modified) in** :download:`mssm.py <images/mssm.py>`
+* Z\ :sub:`2`-odd **states are defined by the input model file** (see :ref:`model <parameterFileModel>` in |parameters|)
+
+.. _final stateOdd:
+
+Z\ :sub:`2`-odd Final State Class
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Besides the intermediate Z\ :sub:`2`-odd final states, due to the assumed Z\ :sub:`2` symmetry,
+the element mulst also contain one stable Z\ :sub:`2`-odd final state (at least
+in collider scales). The quantum numbers of this final state is essential for defining which
+type of signature this element represents.
+In an element the final state quantum numbers are mapped to a final state class,
+as defined in the `particleNames module <theory.html#module-theory.particleNames>`_ .
+Some examples of final state classes are: 'MET', 'HSCP' and 'RHadronQ'.
+New final states can also be easily defined in this module.  
+
 
 .. _branch:
 
@@ -120,12 +138,12 @@ The diagram below illustrates an example of a branch.
 The structure of each branch is fully defined by its number of vertices and the number of 
 |final states| coming out of each vertex. 
 Furthermore,  the branch also holds the information about the particle labels for the |final states|
-coming out of each vertex and the masses of the :ref:`intermediate states <odd states>`,
-as shown below.
+coming out of each vertex, the masses of the :ref:`intermediate states <odd states>` 
+and the Z\ :sub:`2`-odd :ref:`final state class <final stateOdd>` (e.g. 'MET'), as shown below.
 
 
 .. image:: images/branchElB.png
-   :width: 25%
+   :width: 35%
    
 * **Branches are described by the** `Branch Class <theory.html#theory.branch.Branch>`_   
 
@@ -160,7 +178,8 @@ Schematically, for the example in the :ref:`figure above <bracketnotation>`, we 
 
 Using the above scheme it is possible to unambiguously describe each |element| with a simple list of nested brackets.
 However, in order to fully specify all the information relative to a single |element|, we must
-also include the list of :ref:`intermediate state <odd states>` masses and the element weight.
+also include the list of :ref:`intermediate state <odd states>` masses, the list of Z\ :sub:`2`-odd
+:ref:`final state types <final stateOdd>` and the element weight.
 The :ref:`intermediate state <odd states>` masses can also be represented by a mass array
 for each branch, as shown below:
 
@@ -168,6 +187,14 @@ for each branch, as shown below:
 
 .. image:: images/massNotationB.png
    :width: 65%
+   
+Finally the :ref:`final state types <final stateOdd>` can also
+be represented as a list in addition to the bracket notation:
+
+.. _bracketnotationFull:
+
+.. image:: images/bracketNotation2.png
+   :width: 70%
    
 .. _topology:
 
