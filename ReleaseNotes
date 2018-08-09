@@ -14,7 +14,7 @@ Release v1.1.3, Wed 08 Aug 2018
   * smodelsTools.py now has fixpermissions, for system-wide installs
   * fixed small issue with pair production of even particles
   * Moved the code documentation to the manual
-  * Added option for installing within the source folder.
+  * Added option for installing within the source folder
  
 Release v1.1.2, Fri 02 Mar 2018
 =======================================================
