@@ -266,8 +266,8 @@ class SlhaStatus(object):
         
     """
     def __init__(self, filename, maxDisplacement=.01, sigmacut=.03 * fb,
-                 checkLSP=True, findMissingDecayBlocks=True,
-                 findIllegalDecays=False, checkXsec=True, findLonglived=True):
+                 findMissingDecayBlocks=True,
+                 findIllegalDecays=False, checkXsec=True):
         
         """
         :parameter filename: path to input SLHA file

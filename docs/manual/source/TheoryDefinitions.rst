@@ -19,8 +19,7 @@ to compute the :ref:`theoretical prediction <theoryPredictions>` for a given :re
 
 
 The applicability of SModelS is currently restricted to models which contain a Z\ :sub:`2` 
-symmetry (R-parity in SUSY, K-parity in UED, ...) and result in a
-missing transverse energy (MET) final state at experiments. This is required in
+symmetry (R-parity in SUSY, K-parity in UED, ...). This is required in
 order to provide a clear structure for the simplified model topologies appearing
 during the :ref:`decomposition <decomposition>` of the input model.
 Below we describe the basic concepts and language used in SModelS

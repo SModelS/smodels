@@ -124,11 +124,6 @@ The SLHA file checker allows to perform quite rigorous checks of SLHA input file
 
 * the file contains cross sections according to the :ref:`SLHA format for cross sections <xsecSLHA>`,
 
-
-* the lightest :ref:`Z2-odd state <odd states>` (the LSP in supersymmetric models) is neutral,
-
-* there are no stable charged particles nor displaced vertices (no non-prompt visible decays), as currently all the analyses considered by SModelS require a prompt MET signature.
-
 In addition, one can ask that
 
 * all decays listed in the DECAY block are kinematically allowed, *i.e.* the sum of masses of the decay products may not exceed the mother mass. *This check for "illegal decays" is turned off by default.*
@@ -144,7 +139,7 @@ If any of the above tests fail (return a negative result), an error message is s
 A typical
 usage example is: ::
 
-   smodelsTools.py slhachecker -m 0.001 -s 0.01 -f inputFiles/slha/lightSquarks.slha
+   smodelsTools.py slhachecker -s 0.01 -f inputFiles/slha/lightSquarks.slha
 
 Running this will print the status flag and a message with potential warnings
 and error messages.

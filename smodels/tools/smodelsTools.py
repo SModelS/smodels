@@ -57,9 +57,6 @@ def main():
 
     slhachecker = subparsers.add_parser('slhachecker', description="Perform several checks on a SLHA file.")
     slhachecker.add_argument('-xS', '--xsec', help='turn off the check for xsection blocks', action='store_false')
-    slhachecker.add_argument('-lsp', '--lsp', help='turn off the check for charged lsp', action='store_false')
-    slhachecker.add_argument('-longlived', '--longlived', help='turn off the check for stable charged particles and visible displaced vertices', action='store_false')
-    slhachecker.add_argument('-m', '--displacement', help='give maximum c*tau in [m]', default=.001, type=float)
     slhachecker.add_argument('-s', '--sigmacut', help='give sigmacut in fb', default=.03, type=float)
     slhachecker.add_argument('-illegal', '--illegal', help='turn on check for kinematically forbidden decays', action='store_true')
     slhachecker.add_argument('-dB', '--decayBlocks', help='turn off the check for missing decay blocks', action='store_false')
