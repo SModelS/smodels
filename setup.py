@@ -86,12 +86,13 @@ def dataFiles ():
     """
     ret = []
     ret.append ( ("smodels/", [ "smodels/version", "smodels/COPYING", "smodels/README.rst", "smodels/INSTALLATION.rst" ]) )
-    for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/", 
-          "smodels/share/models/",
+    for directory in [ "smodels/share/", "smodels/share/models/",
           "smodels/etc/", "smodels/lib/nllfast/nllfast-1.2/", 
           "smodels/lib/nllfast/nllfast-2.1/", "smodels/lib/nllfast/nllfast-3.1/", 
           "smodels/lib/pythia6/", "smodels/lib/pythia8/" ]:
         ret.append ((directory, listDirectory (directory)))
+    for directory in ["inputFiles/slha/", "inputFiles/lhe/" ]:
+        ret.append (( "smodels/"+directory, listDirectory (directory)))
 
     return ret
 
