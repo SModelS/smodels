@@ -54,12 +54,10 @@ The command-line tool (:ref:`runSModelS.py <runSModelS>`) and the example Python
 code (:ref:`Example.py <exampleCode>`) are described below.
 
 
-.. note:: For non-MSSM (incl. non-SUSY) input models the user needs to write their own *particles.py*
-          and specify which BSM particles are even or odd under the assumed
+.. note:: For non-MSSM (incl. non-SUSY) input models the user needs to write their own *model.py*
+          file and specify which BSM particles are even or odd under the assumed
           Z\ :sub:`2` symmetry (see :ref:`adding new particles <newParticles>`).
-          Finally, if the user wants to check the input files for possible issues using
-          SModelS'  :ref:`SLHA and LHE file checkers <fileChecks>`, it is
-          also necessary to define the BSM particle quantum numbers in *particles.py* [#]_.
+          From version 1.2.0 onwards it is also necessary to define the BSM particle quantum numbers in the same file [#]_.
           
          
 
@@ -394,7 +392,7 @@ Below we go step-by-step through this example code:
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 2-8
+   :lines: 2-9
 
 
 * *Load the* |express| to be used to constrain the input model.
@@ -484,7 +482,7 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 325-336,344-349   
+   :lines: 333-336,343-350
 
 
 It is worth noting that SModelS does not include any statistical treatment for
@@ -506,4 +504,4 @@ Due to this, the results are claimed to be "likely excluded" in the output.
    Unfortunately, for |ULrs|, the expected limits are often not available;
    :math:`r_{exp}` is then reported as N/A in the SModelS output.   
 
-.. [#] We note that SLHA files including decay tables and cross sections, together with the corresponding *particles.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_
+.. [#] We note that SLHA files including decay tables and cross sections, together with the corresponding *model.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_

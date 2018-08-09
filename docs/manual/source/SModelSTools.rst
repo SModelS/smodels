@@ -135,26 +135,6 @@ In addition, one can ask that
 
 If any of the above tests fail (return a negative result), an error message is shown.
 
-Some more comments are in order.
-In order to check that the lightest Z\ :sub:`2`-odd state has zero electric and color charges, the quantum numbers of the BSM particles must be given in the
-``qNumbers`` dictionary in :download:`particles.py <images/particles.py>`. The format is
-
-``[2*spin, 3*electric charge, dimension of SU(3) representation]``
-
-The list of quantum numbers is also required to check for displaced vertices or heavy charged particles.
-The check for long-lived (or stable) particles first verifies if these
-appear in one of the cross section blocks and their cross section
-exceeds the minimum cross section value defined by :ref:`sigmacut <parameterFile>` (see  :ref:`Minimum Decomposition Weight <minweight>`).
-If the cross section is larger than sigmacut and the particle is stable,
-the checker verifies if it is neutral (both electric and color charges
-are zero). On the other hand, if the particle is unstable, but its lifetime (times *c*)
-is larger than a minimum value (*default = 10 mm*), the particle is considered
-as a non-prompt decay.
-For non-prompt decays, all channels are then checked for visible decay products.
-If the branching ratio to visible decays times the maximum production cross section
-for the particle exceeds :ref:`sigmacut <parameterFile>`, the particle's decay
-is considered as a displaced vertex.
-
 
 **The usage of the SLHA checker is:**
 

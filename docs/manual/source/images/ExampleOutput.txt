@@ -4,9 +4,9 @@
 	  Total number of elements = 586 
 		 3-th topology  =  [1][1] with total cross section = ['8.00E+00 [TeV]:3.64E-04 [pb] (1000025, 1000037)']
 		 0-th element from 3-th topology  =  [[[W+]],[[Z]]] 
+			with final states = ['MET','MET']
 			with cross section = ['8.00E+00 [TeV]:3.64E-04 [pb] (1000025, 1000037)'] 
 			and masses =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.66E+02 [GeV], 6.81E+01 [GeV]]]
-
  Loaded Database with 40 UL results and 18 EM results 
 
  Theory Predictions and Constraints:
@@ -331,29 +331,26 @@ Total cross section in long cascade decays (fb):  3.011E+02
 Total cross section in decays with asymmetric branches (fb):  2.368E+03
 
 Missing topologies (up to 3):
-Topology: [[],[]]
+Topology: [[],[]] ('MET', 'MET')
 Contributing elements (up to 2):
-[[],[]] cross-section (fb): 0.450694497
-Topology: [[],[[Z]]]
+[[],[]] cross-section (fb): 0.45069449699999997
+Topology: [[],[[W]]] ('MET', 'MET')
 Contributing elements (up to 2):
-[[],[[Z]]] cross-section (fb): 0.806086059351
-Topology: [[],[[jet,jet]]]
+[[],[[W+]]] cross-section (fb): 0.11376799860548632
+Topology: [[],[[Z]]] ('MET', 'MET')
 Contributing elements (up to 2):
-[[],[[c,q]]] cross-section (fb): 38.5133200055
-[[],[[q,q]]] cross-section (fb): 38.5133200055
+[[],[[Z]]] cross-section (fb): 0.8060860593513246
 
 Elements outside the grid (up to 2):
-Topology: [[[W]],[[Z]]]
+Topology: [[[W]],[[Z]]] ('MET', 'MET')
 Contributing elements (up to 4):
-[[[W+]],[[Z]]] cross-section (fb): 0.363795519075
+[[[W+]],[[Z]]] cross-section (fb): 0.3637955190752928
 	mass: [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.66E+02 [GeV], 6.81E+01 [GeV]]]
-Topology: [[[l,nu]],[[l,nu]]]
+[[[W-]],[[Z]]] cross-section (fb): 0.1418185918804444
+	mass: [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.66E+02 [GeV], 6.81E+01 [GeV]]]
+Topology: [[[b,b]],[[jet,jet]]] ('MET', 'MET')
 Contributing elements (up to 4):
-[[[e+,nu]],[[e-,nu]]] cross-section (fb): 12.9436916018
-	mass: [[1.34E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
-[[[e+,nu]],[[mu-,nu]]] cross-section (fb): 12.9436916018
-	mass: [[1.34E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
-[[[e-,nu]],[[mu+,nu]]] cross-section (fb): 12.9436916018
-	mass: [[1.34E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
-[[[mu+,nu]],[[mu-,nu]]] cross-section (fb): 12.9436916018
-	mass: [[1.34E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
+[[[b,b]],[[c,q]]] cross-section (fb): 135.50890689440874
+	mass: [[1.35E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
+[[[b,b]],[[q,q]]] cross-section (fb): 135.50890689440874
+	mass: [[1.35E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]

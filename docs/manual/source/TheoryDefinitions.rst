@@ -91,7 +91,7 @@ In contrast, stable or long-lived Z\ :sub:`2`-odd particles which might appear i
 are *not* classified as final states.
 
 
-* Z\ :sub:`2`-even **states are defined (and can be easily modified) in** :download:`particles.py <images/particles.py>` 
+* Z\ :sub:`2`-even **states are defined (and can be easily modified) in** smodels/share/default_particles.py 
 
 .. _odd states:
 
@@ -103,7 +103,7 @@ conserving decays of the form: (Z\ :sub:`2`-odd state) :math:`\rightarrow`  (Z\ 
 The only information kept from the intermediate states are their masses (see :ref:`scheme above <topscheme>`).
 If an intermediate state is stable and neutral, it is considered as a MET signal.
 
-* Z\ :sub:`2`-odd **states are defined (and can be easily modified) in** :download:`particles.py <images/particles.py>`
+* Z\ :sub:`2`-odd **states are defined (and can be easily modified) in** :download:`mssm.py <images/mssm.py>`
 
 .. _branch:
 

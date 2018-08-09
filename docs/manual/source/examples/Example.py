@@ -19,7 +19,7 @@ from smodels.tools import coverage
 from smodels.tools.smodelsLogging import setLogLevel
 setLogLevel("info")
 # Set the path to the database
-database = Database("http://smodels.hephy.at/database/official113")
+database = Database("http://smodels.hephy.at/database/official120")
 
 def main():
     """
@@ -57,7 +57,7 @@ def main():
     n = 0
     el = top.elementList[n]
     print ( "\t\t %i-th element from %i-th topology  = " %(n,m),el, end="" )
-    print ( "\n\t\t\twith cross section =",el.weight,"\n\t\t\tand masses = ",el.getMasses() )
+    print ( "\n\t\t\twith final states =",el.getFinalStates(),"\n\t\t\twith cross section =",el.weight,"\n\t\t\tand masses = ",el.getMasses() )
             
     # Load the experimental results to be used.
     # In this case, all results are employed.

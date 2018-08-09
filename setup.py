@@ -29,7 +29,6 @@ class OverrideInstall(install):
                 install_as_user = False
         except Exception as e:
             pass
-        resolve_dependencies( as_user=install_as_user )
         enableStupidMacFix=False
         if enableStupidMacFix:
             if "Apple" in sys.version:
@@ -52,6 +51,8 @@ class OverrideInstall(install):
                 # print ("Changing permissions of %s to %s" %
                 #         ( os.path.dirname ( filepath ), oct(mode)))
                 os.chmod( os.path.dirname ( filepath ), mode )
+        if install_as_user: ## FIXME doesnt work for system installs
+            resolve_dependencies( as_user=install_as_user )
         if not install_as_user:
             fixpermissions()
 
@@ -86,12 +87,13 @@ def dataFiles ():
     """
     ret = []
     ret.append ( ("smodels/", [ "smodels/version", "smodels/COPYING", "smodels/README.rst", "smodels/INSTALLATION.rst" ]) )
-    for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/", 
-          "smodels/share/models/",
+    for directory in [ "smodels/share/", "smodels/share/models/",
           "smodels/etc/", "smodels/lib/nllfast/nllfast-1.2/", 
           "smodels/lib/nllfast/nllfast-2.1/", "smodels/lib/nllfast/nllfast-3.1/", 
           "smodels/lib/pythia6/", "smodels/lib/pythia8/" ]:
         ret.append ((directory, listDirectory (directory)))
+    for directory in ["inputFiles/slha/", "inputFiles/lhe/" ]:
+        ret.append (( "smodels/"+directory, listDirectory (directory)))
 
     return ret
 

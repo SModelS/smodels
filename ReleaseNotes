@@ -7,9 +7,6 @@ Release v1.2, dd/mm 2018
   * Introduced inclusive branches and particles (for description of HSCP results)
   * Inclusion of HSCP results in the database
 
-Allows for non-prompt (long-lived) BSM particles
-  * Added final state definitions in particleNames.py
-
 Release v1.1.3, Wed 08 Aug 2018
 =======================================================
 
