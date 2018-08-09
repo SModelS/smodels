@@ -95,6 +95,9 @@ Installation Methods
    Note that this installation method will install smodels into the default system or user directory (e.g. ~/.local/lib/python3/site-packages/).
    Depending on your platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
    (or $DYLD_LIBRARY_PATH) might have to be set appropriately.
+   Be aware that the example files and the |parameters| file discussed in the manual 
+   will also be located in your default system or user directory. Furthermore the database
+   folder is not included (see :ref:`database installation <installingDB>` below).
 
 
 There is also a diagnostic tool available: ::
@@ -111,11 +114,11 @@ In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 Installing the SModelS Database
 -------------------------------
 
-The installation methods explained above also installs SModelS'
+The installation methods explained above (except for pip install) also install SModelS'
 :ref:`database of experimental results <databaseStruct>`
 in the smodels-database subdirectory.
 The first time SModelS is run, a :ref:`binary file <databasePickle>` will be built
-using the database folder, which can then be used in all subsequent runs.
+using this text database folder, which can then be used in all subsequent runs.
 However, from v1.1.3 onwards it is recommended to provide the URL of the official database as the
 database path when running SModelS (see :ref:`path <parameterFilePath>` in |parameters|).
 In this case the corresponding database version binary file will be automatically downloaded
@@ -143,8 +146,9 @@ Adding FastLim data
 ^^^^^^^^^^^^^^^^^^^
 
 The official SModelS database can be augmented with data from the
-`fastlim <http://cern.ch/fastlim>`_ database.
-A tarball with the *properly converted* fastlim-1.0 efficiency maps can be found in 
+`fastlim <http://cern.ch/fastlim>`_ results.
+For using SModelS with the text database,
+a tarball with the *properly converted* fastlim-1.0 efficiency maps can be found in 
 the smodels-database folder.
 The tarball then needs to be exploded in the top level directory of the database: ::
 
