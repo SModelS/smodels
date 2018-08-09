@@ -257,7 +257,7 @@ usage example is: ::
 
    smodelsTools.py interactive-plots -f inputFiles/scanExample/smodels-output/ -s inputFiles/scanExample/slha -p iplots_parameters.py -o results/iplots/
 
-which will produce 3x10 plots in the gluino vs squark mass plane from a small scan example, viewable in a web browser.
+which will produce 3x9 plots in the gluino vs squark mass plane from a small scan example, viewable in a web browser.
 
 
 iplots parameters file
