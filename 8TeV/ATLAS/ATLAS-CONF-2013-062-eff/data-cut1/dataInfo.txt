@@ -1,0 +1,7 @@
+dataId: SL1b_high
+dataType: efficiencyMap
+observedN: 6
+expectedBG: 4.0
+bgError: 1.1
+upperLimit: 0.39*fb
+expectedUpperLimit: 0.309*fb

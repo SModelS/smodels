@@ -1,0 +1,7 @@
+dataId: WWc
+dataType: efficiencyMap
+observedN: 9
+expectedBG: 7.4
+bgError: 1.5
+upperLimit: 0.43*fb
+expectedUpperLimit: 0.363*fb

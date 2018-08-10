@@ -1,0 +1,7 @@
+comment_by: Federico Ambrogi
+date: Jan 13 2017 14:11:30
+comment: "T2tt model uses 9 different SRs to rerive limits, labelled SRA(4 SR),SRB(2 SR) and SRC(3), where SRA are orthogonal to
+SRB and SRC, but SRB and SRC are overlapping. 
+On hepdata we find ACC and EFF for the 9 SR but the observed number of events/bkg/DeltaBkg are given, in the
+case of SRB, only for a combination of SRB1+SRB2, hence these SR cannot be implemented.
+Read also comments by Ursula regarding the validation."

@@ -1,0 +1,85 @@
+Figure      table       topology        object
+Fig7d       tb24        TChiCHipmHW     observed exclusion line
+Fig7d       tb25        TChiCHipmHW     expected exclusion line
+AuxFig1d    tb39        TChiCHipmHW     observed upper limits
+AuxFig1a    tb36        TChiChpmSlepL   observed upper limits
+AuxFig1b    tb37        TChiWZ(off?)    observed upper limits
+AuxFig1c    tb38        TChiChipmStauL  observed upper limits
+Fig7a       tb18        TSlepL          expected  exclusion line
+Fig7a       tb19        TSlepL          observed exclusion line
+Fig7b       tb21        TChiWZ(off?)    expected exclusion line
+Fig7b       tb20        TChiwz          observed exclusion line
+Fig7c       tb23        TChiChipmStauL  expected exclusion line
+Fig7c       tb22        TChiChipmStauL  observed exclusion line
+
+
+
+
+TChiChipmHW
+
+	Fig. 1d	http://hepdata.cedar.ac.uk/resource/6158/figAuxiliaryFigure1D.png
+
+	limit			TChiWh.txt		http://hepdata.cedar.ac.uk/view/ins1282905/d39/input	comment
+	expectedlimit		file	link	comment
+
+	Fig.7d	http://hepdata.cedar.ac.uk/resource/6158/figFigure7D.png
+
+	exclusion		exc_tchiwh_obs.txt	http://hepdata.cedar.ac.uk/view/ins1282905/d24/input	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	exc_tchiwh_expected.txt	http://hepdata.cedar.ac.uk/view/ins1282905/d25/input	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+TChiWZoff
+
+	Fig. 1b	http://hepdata.cedar.ac.uk/resource/6158/figAuxiliaryFigure1B.png
+
+	limit			TChiWZ.txt		http://hepdata.cedar.ac.uk/view/ins1282905/d37/input	comment
+	expectedlimit		file	link	comment
+
+	Fig.7b	http://hepdata.cedar.ac.uk/resource/6158/figFigure7B.png
+
+	exclusion		exc_tchiwz_obs.txt	http://hepdata.cedar.ac.uk/view/ins1282905/d20/input	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	exc_tchiwz_expected.txt	http://hepdata.cedar.ac.uk/view/ins1282905/d21/input	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+TChipChimSlepL050
+
+	Fig. 1a	http://hepdata.cedar.ac.uk/resource/6158/figAuxiliaryFigure1A.png
+
+	limit			TChiChipmSlepL.txt		http://hepdata.cedar.ac.uk/view/ins1282905/d36/input	comment
+	expectedlimit		file	link	comment
+
+	Fig.7a	http://hepdata.cedar.ac.uk/resource/6158/figFigure7A.png
+
+	exclusion		exc_slepL_obs.txt	http://hepdata.cedar.ac.uk/view/ins1282905/d18/input	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	exc_slepL_expected.txt	http://hepdata.cedar.ac.uk/view/ins1282905/d19/input	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+TChipChimStauL050
+
+	Fig. 1c	http://hepdata.cedar.ac.uk/resource/6158/figAuxiliaryFigure1C.png
+
+	limit			TChiChipmStauL.txt		http://hepdata.cedar.ac.uk/view/ins1282905/d38/input	comment
+	expectedlimit		file	link	comment
+
+	Fig.7c	http://hepdata.cedar.ac.uk/resource/6158/figFigure7C.png
+
+	exclusion		exc_stauL_obs.txt	http://hepdata.cedar.ac.uk/view/ins1282905/d22/input	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	exc_stauL_expected.txt	http://hepdata.cedar.ac.uk/view/ins1282905/d23/input	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+

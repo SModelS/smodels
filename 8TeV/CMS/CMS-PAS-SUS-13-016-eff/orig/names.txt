@@ -1,0 +1,17 @@
+
+
+T1tttt
+
+	Fig. 6	https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13016/XSEC_CONT_ANN_N4B2Y1_exp_obs_Madb_smoothnew_mad3fg.pdf
+
+	limit			Results_SUS13016.root/XsecANN		https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13016/Results_SUS13016.root	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		Results_SUS13016.root/GR_ns	https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13016/Results_SUS13016.root	comment
+	exclusionp1		Results_SUS13016.root/GR_ns1	https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13016/Results_SUS13016.root	comment
+	exclusionm1		Results_SUS13016.root/GR_ns0	https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13016/Results_SUS13016.root	comment
+	expectedexclusion	Results_SUS13016.root/GR_nsE	https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13016/Results_SUS13016.root	comment
+	expectedexclusionp1	Results_SUS13016.root/GR_nsE1	https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13016/Results_SUS13016.root	comment
+	expectedexclusionm1	Results_SUS13016.root/GR_nsE0	https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13016/Results_SUS13016.root	comment

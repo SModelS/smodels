@@ -1,0 +1,57 @@
+Fig12a T1bbbb 
+Fig12b T1tttt
+Fig12c T1tbtb
+####
+Fig14a T1tttt_1lepchannel
+Fig14b T1tbtb_1lepchannel
+
+
+T1bbbb
+
+	Fig. 12a	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-061/fig_12a.pdf
+
+	limit			Fig12a.txt		https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-061/fig_12a_PRELIMINARY.data	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		exclusion_T1bbbb.txt	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+T1tttt
+
+	Fig. 12b	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-061/fig_12b.pdf
+
+	limit			Fig12b.txt		https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-061/fig_12b_PRELIMINARY.data	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		exclusion_T1tttt.txt	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+T1tbtb
+
+	Fig. 12c	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-061/fig_12c.pdf
+
+	limit			Fig12c.txt		https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-061/fig_12c_PRELIMINARY.data	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		exclusion_T1tbtb.txt	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment

@@ -1,0 +1,7 @@
+dataId: mT2-120-SF
+dataType: efficiencyMap
+observedN: 5
+expectedBG: 8.9
+bgError: 2.1
+upperLimit: 0.281*fb
+expectedUpperLimit: 0.39*fb

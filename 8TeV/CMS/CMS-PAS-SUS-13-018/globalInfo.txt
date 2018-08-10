@@ -1,0 +1,9 @@
+id: CMS-PAS-SUS-13-018
+sqrts: 8*TeV
+lumi: 19.4/fb
+prettyName: 1-2 b-jets + Etmiss, M_CT
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13018
+comment: Only https://cds.cern.ch/record/1693164 document, will be superseeded by CMS-SUS-14-001
+private: False
+implementedBy: Federico A
+lastUpdate: 2016/9/29

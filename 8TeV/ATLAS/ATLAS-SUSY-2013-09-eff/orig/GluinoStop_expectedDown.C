@@ -1,0 +1,60 @@
+{
+//========= Macro generated from object: GluinoStop_expectedDown/
+//========= by ROOT version5.34/14
+   
+   graph = new TGraph(48);
+   graph->SetName("GluinoStop_expectedDown");
+   graph->SetTitle("");
+   graph->SetFillColor(1);
+   graph->SetMarkerStyle(21);
+   graph->SetMarkerSize(0.3);
+   graph->SetPoint(0,700,480);
+   graph->SetPoint(1,1070,860.232038);
+   graph->SetPoint(2,1081.810834,875.875);
+   graph->SetPoint(3,1090,887.8516555);
+   graph->SetPoint(4,1102.932019,905.125);
+   graph->SetPoint(5,1110,915.4619223);
+   graph->SetPoint(6,1130,913.4535159);
+   graph->SetPoint(7,1146.173179,934.375);
+   graph->SetPoint(8,1150,939.9717256);
+   graph->SetPoint(9,1168.602122,963.625);
+   graph->SetPoint(10,1170,965.6693961);
+   graph->SetPoint(11,1180.123109,963.625);
+   graph->SetPoint(12,1181.874984,934.375);
+   graph->SetPoint(13,1183.626859,905.125);
+   graph->SetPoint(14,1184.844585,875.875);
+   graph->SetPoint(15,1185.948838,846.625);
+   graph->SetPoint(16,1186.38658,817.375);
+   graph->SetPoint(17,1185.256299,788.125);
+   graph->SetPoint(18,1186.5299,758.875);
+   graph->SetPoint(19,1187.004379,729.625);
+   graph->SetPoint(20,1187.478859,700.375);
+   graph->SetPoint(21,1190,672.2538312);
+   graph->SetPoint(22,1190.092581,671.125);
+   graph->SetPoint(23,1190,649.0743643);
+   graph->SetPoint(24,1189.974082,641.875);
+   graph->SetPoint(25,1189.868782,612.625);
+   graph->SetPoint(26,1187.938125,583.375);
+   graph->SetPoint(27,1184.621295,554.125);
+   graph->SetPoint(28,1181.276916,524.875);
+   graph->SetPoint(29,1178.016114,495.625);
+   graph->SetPoint(30,1176.684669,466.375);
+   graph->SetPoint(31,1175.353225,437.125);
+   graph->SetPoint(32,1173.290043,407.875);
+   graph->SetPoint(33,1172.132674,378.625);
+   graph->SetPoint(34,1171.494847,349.375);
+   graph->SetPoint(35,1170,334.0895048);
+   graph->SetPoint(36,1168.237672,320.125);
+   graph->SetPoint(37,1160.268568,290.875);
+   graph->SetPoint(38,1154.756032,261.625);
+   graph->SetPoint(39,1150,245.5461186);
+   graph->SetPoint(40,1146.486879,232.375);
+   graph->SetPoint(41,1136.554496,203.125);
+   graph->SetPoint(42,1130,192.1101907);
+   graph->SetPoint(43,1114.525932,173.875);
+   graph->SetPoint(44,1110,170.5974617);
+   graph->SetPoint(45,1090,149.9449349);
+   graph->SetPoint(46,1086.033108,144.625);
+   graph->SetPoint(47,1086.033108,0);
+   graph->Draw("");
+}

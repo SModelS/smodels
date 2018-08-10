@@ -1,0 +1,7 @@
+dataId: A Medium
+dataType: efficiencyMap
+observedN: 135
+expectedBG: 122.0
+bgError: 18.0
+upperLimit: 2.52*fb
+expectedUpperLimit: 2.1*fb

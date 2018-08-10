@@ -1,0 +1,9 @@
+id: ATLAS-CONF-2013-028
+sqrts: 8.0*TeV
+lumi: 20.7/fb
+prettyName: ATLAS hadronic stau
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-028/
+comment: Will be supersededBy ATLAS-SUSY-2013-14 (at the moment cannto be implemented -Jan2017)
+private: False
+implementedBy: Federico A
+lastUpdate: 2016/9/29

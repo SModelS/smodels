@@ -1,0 +1,13 @@
+txName: T6bbWWoff
+constraint: 22*([[['b'],['l+','nu']],[['b'],['l-','nu']]])
+condition: Cgtr([[['b'],['l+','nu']],[['b'],['l-','nu']]],2*[[['b'],['e+','nu']],[['b'],['e-','nu']]])
+conditionDescription: [[['b'],['l+','nu']],[['b'],['l-','nu']]] > 2*[[['b'],['e+','nu']],[['b'],['e-','nu']]]
+susyProcess: pp --> stop stop, stop  --> bottom chargino_1^pm, chargino_1^pm --> W^* lsp
+figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-065/fig_11.png
+dataUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-065/fig_11_PRELIMINARY.data
+source: ATLAS
+validated: False
+axes: [[300.0, x, y], [300.0, x, y]]
+upperLimits: [[[[3.0000E+02*GeV,1.0000E+02*GeV,5.0000E+01*GeV],[3.0000E+02*GeV,1.0000E+02*GeV,5.0000E+01*GeV]],8.0000E-01*pb],
+[[[3.0000E+02*GeV,1.0000E+02*GeV,9.5000E+01*GeV],[3.0000E+02*GeV,1.0000E+02*GeV,9.5000E+01*GeV]],3.8440E+02*pb],
+[[[3.0000E+02*GeV,1.5000E+02*GeV,1.0000E+02*GeV],[3.0000E+02*GeV,1.5000E+02*GeV,1.0000E+02*GeV]],3.1000E+00*pb]]

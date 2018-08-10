@@ -1,0 +1,38 @@
+Fig 7a: T2tt -> T2ttOF
+Fig 7b: T2tt -> T2ttSF
+Fig 9: T6bbWW -> T6bbWW
+Fig 11: T6bbWW -> T6bbWWCombination
+
+
+T2tt
+
+	Fig. 7a	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-065/fig_07a.pdf
+
+	limit			T2ttOF.data		https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-065/fig_07a_PRELIMINARY.data	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+T6bbWW
+
+	Fig. 11	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-065/fig_11.pdf
+
+	limit			T6bbWWCombination.data		https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-065/fig_11_PRELIMINARY.data	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment

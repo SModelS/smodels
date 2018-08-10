@@ -1,0 +1,5 @@
+comment_by: Andre_lessa
+date: 05/18/2017
+comment: "Note: The efficiency maps have a gap around m_lsp = 150 GeV, making the interpolation slightly less
+reliable there. That is why there are a few points excluded for m_stop, m_lsp = 700,150. However all the results seem
+consistent with the reference cross-sections and the efficiencies and acceptances given by ATLAS."

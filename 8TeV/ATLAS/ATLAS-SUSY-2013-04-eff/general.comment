@@ -1,0 +1,7 @@
+comment_by: Andre Lessa
+date: Ter Dez 27 12:29:01 BRST 2016
+comment: "The official exclusion curves combines subsets of SRs and then
+select the best of these subsets. Hence it is expected that the SModelS excluded
+region is somewhat smaller than the official exclusion curve.
+The T5WW* and T5ZZ* maps were produced internally and do not have official exclusion
+curves (except for T5WW with x=1/2)."

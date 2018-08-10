@@ -1,0 +1,10 @@
+id: CMS-PAS-SUS-16-052
+sqrts: 13.0*TeV
+lumi: 35.9/fb
+prettyName: soft lepton, <= 2 jets
+url: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/index.html
+contact: CMS
+comment: EPS 2017. https://cds.cern.ch/record/2273394, http://inspirehep.net/record/1609006
+private: False
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2018/7/9

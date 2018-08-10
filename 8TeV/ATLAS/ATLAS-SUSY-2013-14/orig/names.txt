@@ -1,0 +1,12 @@
+TStauStau
+
+    Fig. 8b   https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-14/fig_08b.png
+    limit           limit_TStauStau.txt   http://hepdata.cedar.ac.uk/view/ins1304288/d22  only LH staus
+
+    Fig.      link
+    exclusion       file    link    comment
+    exclusionp1     file    link    comment
+    exclusionm1     file    link    comment
+    expectedexclusion   file    link    comment
+    expectedexclusionp1 file    link    comment
+    expectedexclusionm1 file    link    comment

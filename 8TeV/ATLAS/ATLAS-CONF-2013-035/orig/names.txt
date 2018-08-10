@@ -1,0 +1,34 @@
+
+
+TChiChipmSlepL050
+
+	Fig. 1a	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-035/figaux_01a.pdf
+
+	limit			TChiChipmSlepL.txt		https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-035/figaux_01a_PRELIMINARY.data	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+TChiWZ
+
+	Fig. 1b	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-035/figaux_01b.pdf
+
+	limit			TChiWZ.txt		https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-035/figaux_01b_PRELIMINARY.data	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment

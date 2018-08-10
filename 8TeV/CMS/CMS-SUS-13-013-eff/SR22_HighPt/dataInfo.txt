@@ -1,0 +1,7 @@
+dataId: SR22_HighPt
+dataType: efficiencyMap
+observedN: 1
+expectedBG: 0.96
+bgError: 0.55
+upperLimit: 2.154E-01*fb
+expectedUpperLimit: 1.549E-01*fb

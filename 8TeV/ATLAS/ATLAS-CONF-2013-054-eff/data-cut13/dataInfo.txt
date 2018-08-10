@@ -1,0 +1,7 @@
+dataId: 8j50 MJ 340
+dataType: efficiencyMap
+observedN: 69
+expectedBG: 75.0
+bgError: 19.0
+upperLimit: 1.7*fb
+expectedUpperLimit: 2.08*fb

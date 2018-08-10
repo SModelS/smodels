@@ -1,0 +1,7 @@
+dataId: SRA mCT150
+dataType: efficiencyMap
+observedN: 102
+expectedBG: 94.0
+bgError: 13.0
+upperLimit: 1.9*fb
+expectedUpperLimit: 1.63*fb

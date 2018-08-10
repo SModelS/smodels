@@ -1,0 +1,132 @@
+
+T2tt
+
+    Fig.(aux) 13  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/figaux_013.png
+    limit            limit_T2tt.txt  http://hepdata.cedar.ac.uk/view/ins1304456/d1    comment
+
+    Fig. 15  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/fig_015.png
+    exclusion        exclusion_T2tt.txt    link    comment
+    exclusionp1        file    link    comment
+    exclusionm1        file    link    comment
+    expectedexclusion    file    link    comment
+    expectedexclusionp1    file    link    comment
+    expectedexclusionm1    file    link    comment
+
+T2bbWW
+
+    Fig.(aux) 14  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/figaux_014.png
+    limit            limit_T2bbWW.txt  http://hepdata.cedar.ac.uk/view/ins1304456/d4    comment
+
+    Fig. 15  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/fig_015.png
+    exclusion        exclusion_T2bbWW.txt    link    comment
+    exclusionp1        file    link    comment
+    exclusionm1        file    link    comment
+    expectedexclusion    file    link    comment
+    expectedexclusionp1    file    link    comment
+    expectedexclusionm1    file    link    comment
+
+T2bbWWoff
+
+    Fig.(aux) 15  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/figaux_015.png
+    limit            limit_T2bbWWoff.txt  http://hepdata.cedar.ac.uk/view/ins1304456/d7    comment
+
+    Fig. 15  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/fig_015.png
+    exclusion        exclusion_T2bbWWoff.txt    link    comment
+    exclusionp1        file    link    comment
+    exclusionm1        file    link    comment
+    expectedexclusion    file    link    comment
+    expectedexclusionp1    file    link    comment
+    expectedexclusionm1    file    link    comment
+
+T6bbWWoffx200
+
+    Fig.(aux) 16  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/figaux_016.png
+    limit            limit_T6bbWWoffx200.txt  http://hepdata.cedar.ac.uk/view/ins1304456/d10    comment
+
+    Fig. 16  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/fig016.png
+    exclusion        exclusion_T6bbWWoffx200.txt    link    comment
+    exclusionp1        file    link    comment
+    exclusionm1        file    link    comment
+    expectedexclusion    file    link    comment
+    expectedexclusionp1    file    link    comment
+    expectedexclusionm1    file    link    comment
+
+T6bbWWoffC150
+
+    Fig.(aux) 17  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/figaux_017.png
+    limit            limit_T6bbWWoffC150.txt  http://hepdata.cedar.ac.uk/view/ins1304456/d13    comment
+
+    Fig. 17  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/fig_017.png
+    exclusion        exclusion_T6bbWWoffC150.txt    link    comment
+    exclusionp1        file    link    comment
+    exclusionm1        file    link    comment
+    expectedexclusion    file    link    comment
+    expectedexclusionp1    file    link    comment
+    expectedexclusionm1    file    link    comment
+
+T6bbWWoffC106
+
+    Fig.(aux) 18  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/figaux_018.png
+    limit            limit_T6bbWWoffC106.txt  http://hepdata.cedar.ac.uk/view/ins1304456/d16    comment
+
+    Fig. 18  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/fig_018.png
+    exclusion        exclusion_T6bbWWoffC106.txt    link    comment
+    exclusionp1        file    link    comment
+    exclusionm1        file    link    comment
+    expectedexclusion    file    link    comment
+    expectedexclusionp1    file    link    comment
+    expectedexclusionm1    file    link    comment
+
+T6bbWWoffD005
+
+    Fig.(aux) 19  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/figaux_019.png
+    limit            limit_T6bbWWoffD005.txt  http://hepdata.cedar.ac.uk/view/ins1304456/d19    comment
+
+    Fig. 19  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/fig_019.png
+    exclusion        exclusion_T6bbWWoffD005.txt    link    comment
+    exclusionp1        file    link    comment
+    exclusionm1        file    link    comment
+    expectedexclusion    file    link    comment
+    expectedexclusionp1    file    link    comment
+    expectedexclusionm1    file    link    comment
+
+T6bbWWoffD020
+
+    Fig.(aux) 20  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/figaux_020.png
+    limit            limit_T6bbWWoffD020.txt  http://hepdata.cedar.ac.uk/view/ins1304456/d22    comment
+
+    Fig. 20  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/fig_020.png
+    exclusion        exclusion_T6bbWWoffD020.txt    link    comment
+    exclusionp1        file    link    comment
+    exclusionm1        file    link    comment
+    expectedexclusion    file    link    comment
+    expectedexclusionp1    file    link    comment
+    expectedexclusionm1    file    link    comment
+
+T6bbWWoffD010
+
+    Fig.(aux) 21  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/figaux_021.png
+    limit           limit_T6bbWWoffD010.txt  http://hepdata.cedar.ac.uk/view/ins1304456/d25    comment
+
+    Fig. 21  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/fig_021.png
+    exclusion        exclusion_T6bbWWoffD010.txt    link    comment
+    exclusionp1        file    link    comment
+    exclusionm1        file    link    comment
+    expectedexclusion    file    link    comment
+    expectedexclusionp1    file    link    comment
+    expectedexclusionm1    file    link    comment
+
+T6bbWWoffM1300
+
+    Fig.(aux) 22  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/figaux_022.png
+    limit            limit_T6bbWWoffM1300.txt  http://hepdata.cedar.ac.uk/view/ins1304456/d28    comment
+
+    Fig. 22  https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-15/fig_022.png
+    exclusion        file    link    comment
+    exclusionp1        file    link    comment
+    exclusionm1        file    link    comment
+    expectedexclusion    file    link    comment
+    expectedexclusionp1    file    link    comment
+    expectedexclusionm1    file    link    comment
+
+

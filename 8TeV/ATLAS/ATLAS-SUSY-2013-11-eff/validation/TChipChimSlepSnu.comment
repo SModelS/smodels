@@ -1,0 +1,5 @@
+comment_by: Andre_lessa
+date: 06/02/2017
+comment: "There is some overexclusion at low chargino masses. ATLAS only provides official efficiencies and acceptances
+for one signal region, so we use MA5 efficiencies. Therefore the small differences are likely due to recasting and we keep this result."
+

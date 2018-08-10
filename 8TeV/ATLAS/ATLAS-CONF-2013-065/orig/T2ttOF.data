@@ -1,0 +1,55 @@
+# This file contains preliminary data from the ATLAS collaboration corresponding to Figure fig_07a in the auxiliary material of conference note ATLAS-CONF-2013-065. 
+# 
+# Title: Searches for direct scalar top pair production in final states with two leptons using the stransverse mass variable and a multivariate analysis technique in $\sqrt{s} = 8$ TeV pp collisions using 20.3 fb$^{-1}$ of ATLAS data
+ 
+# Reference: ATLAS-CONF-2013-065 
+# Link: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-065 
+# 
+# The ATLAS collaboration releases these data for the purpose of preliminary studies. 
+# ATLAS recommends not to use these preliminary data for publications. 
+# 
+200 1 58
+200 25 200
+225 1 11 
+225 25 18
+250 1 2.8
+250 25 3.4
+250 50 5.2
+250 75 31
+275 1 0.59
+275 25 0.92
+275 50 2.1
+275 75 4.3
+300 1 0.4
+300 50 0.5
+300 100 2.4
+300 125 14
+350 1 0.21
+350 50 0.21
+350 100 0.39
+350 150 1.8
+350 175 14
+400 1 0.13
+400 50 0.14
+400 100 0.19
+400 150 0.35
+400 200 2.1
+400 225 64
+450 1 0.092
+450 50 0.1
+450 100 0.11
+450 150 0.15
+450 200 0.21
+450 250 1
+450 275 8.5
+500 1 0.062
+500 50 0.063
+500 100 0.08
+500 200 0.14
+500 250 0.23
+550 1 0.051
+550 50 0.05
+550 100 0.055
+550 150 0.071
+550 200 0.08
+550 250 0.19

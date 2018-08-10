@@ -1,0 +1,12 @@
+id: CMS-SUS-13-011
+sqrts: 8*TeV
+lumi: 19.5/fb
+prettyName: 1 lepton + >= 4 (1b-)jets + Etmiss
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13011
+arxiv: arXiv:1308.1586v2
+publication: http://link.springer.com/article/10.1140%2Fepjc%2Fs10052-013-2677-2
+contact: Benjamin Hooberman <hooberman@gmail.com>, Mariarosaria DAlfonso <dalfonso@mail.cern.ch>
+supersedes: CMS-PAS-SUS-12-023
+private: False
+implementedBy: Andre Lessa
+lastUpdate: 2016/11/2

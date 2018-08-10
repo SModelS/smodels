@@ -1,0 +1,10 @@
+id: CMS-PAS-SUS-16-014
+sqrts: 13*TeV
+lumi: 12.9/fb
+prettyName: jets + Etmiss, HT
+url: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-014/
+supersededBy: CMS-SUS-16-033
+comment: Only CDS entry:https://cds.cern.ch/record/2205158. Superseded by CMS-SUS-16-033.
+private: False
+implementedBy: Federico Ambrogi
+lastUpdate: 2017/2/15

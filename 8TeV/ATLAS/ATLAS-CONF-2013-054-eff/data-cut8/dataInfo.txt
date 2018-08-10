@@ -1,0 +1,7 @@
+dataId: 7j80 flavor 1 b-jets
+dataType: efficiencyMap
+observedN: 17
+expectedBG: 17.0
+bgError: 6.0
+upperLimit: 0.8*fb
+expectedUpperLimit: 0.743*fb

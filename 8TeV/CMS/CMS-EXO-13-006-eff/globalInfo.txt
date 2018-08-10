@@ -1,0 +1,12 @@
+id: CMS-EXO-13-006
+sqrts: 8*TeV
+lumi: 18.8/fb
+prettyName: hscp search
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/EXO-13-006/index.html
+arxiv: https://arxiv.org/abs/1502.02522
+publication: https://cds.cern.ch/record/1987723/files/arXiv:1502.02522.pdf
+contact: Andre Lessa <lessa.a.p@gmail.com>; Jan Heisig <heisig@physik.rwth-aachen.de>; SModelS
+comment: Search for long-lived charged particles implemented in arXiv:1509.00473. For the topologies with mixed MET-HSCP branches, the MET branch is irrelevant and wildcards are used.
+private: False
+implementedBy: Andre Lessa
+lastUpdate: 2018/8/3

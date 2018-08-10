@@ -1,0 +1,6 @@
+comment_by: Andre Lessa
+date: Ter Dez 27 12:14:03 BRST 2016
+comment: "The official exclusion curves combines the 0-lepton and 1-lepton
+channels in regions where both are sensitive to the signal (only happens for T1ttt). For these points
+we expect an under-exclusion from SModelS. The UL result only considers the 0-lepton channel,
+hence the official exclusion curve is smaller in that case."

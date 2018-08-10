@@ -1,0 +1,23 @@
+txName: TRHadGM1
+constraint: [[],[]]
+condition: None
+susyProcess: pp --> gluino gluino, gluino gluino --> gluino gluino
+figureUrl: None
+dataUrl: None
+source: CMS
+validated: True
+axes: [[x], [x]]
+finalState: ['RHadronG', 'RHadronG']
+upperLimits: [[[[2.9935E+02*GeV],[2.9935E+02*GeV]],4.6075E-03*pb],
+[[[3.9926E+02*GeV],[3.9926E+02*GeV]],2.1117E-03*pb],
+[[[5.0066E+02*GeV],[5.0066E+02*GeV]],2.0986E-03*pb],
+[[[6.0060E+02*GeV],[6.0060E+02*GeV]],1.8352E-03*pb],
+[[[6.9983E+02*GeV],[6.9983E+02*GeV]],1.8361E-03*pb],
+[[[7.9978E+02*GeV],[7.9978E+02*GeV]],1.8998E-03*pb],
+[[[8.9901E+02*GeV],[8.9901E+02*GeV]],2.1168E-03*pb],
+[[[9.9968E+02*GeV],[9.9968E+02*GeV]],2.3428E-03*pb],
+[[[1.0996E+03*GeV],[1.0996E+03*GeV]],2.7921E-03*pb],
+[[[1.2003E+03*GeV],[1.2003E+03*GeV]],3.3501E-03*pb],
+[[[1.2996E+03*GeV],[1.2996E+03*GeV]],4.0467E-03*pb],
+[[[1.3995E+03*GeV],[1.3995E+03*GeV]],5.4074E-03*pb],
+[[[1.4995E+03*GeV],[1.4995E+03*GeV]],6.9866E-03*pb]]

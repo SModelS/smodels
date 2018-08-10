@@ -1,0 +1,7 @@
+dataId: SL2m
+dataType: efficiencyMap
+observedN: 7
+expectedBG: 1.6
+bgError: 1.0
+upperLimit: 0.57*fb
+expectedUpperLimit: 0.204*fb

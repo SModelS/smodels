@@ -1,0 +1,7 @@
+dataId: 6NJet8_1250HT1500_300MHT450
+dataType: efficiencyMap
+observedN: 5
+expectedBG: 9.4
+bgError: 3.6
+upperLimit: 0.349*fb
+expectedUpperLimit: 0.514*fb

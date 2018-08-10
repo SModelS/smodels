@@ -1,0 +1,4 @@
+T5WH has only one mass plane, so it cannot be used; 
+convert.py also complains about an offshell region, which I do not clearly understand from the analysis
+( h -> b bbar, but W -> ? )
+

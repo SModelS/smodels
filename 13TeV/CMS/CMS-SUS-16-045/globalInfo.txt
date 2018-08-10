@@ -1,0 +1,11 @@
+id: CMS-SUS-16-045
+sqrts: 13*TeV
+lumi: 35.9/fb
+prettyName: Sbottom searches in bHbH and H -> photon photon final states
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-045/index.html
+arxiv: http://arxiv.org/abs/1709.00384
+publication: accepted in Phys. Lett. B 
+comment: TChiWH topology has a wrong root file. The exclusion plot 5b does not match the exclusion lines in the corresponding root file. Renamed root files to CMS-SUS-16-045_Figure_005-1.root and CMS-SUS-16-045_Figure_005-2.root 
+private: False
+implementedBy: Juhi Dutta
+lastUpdate: 2018/02/15

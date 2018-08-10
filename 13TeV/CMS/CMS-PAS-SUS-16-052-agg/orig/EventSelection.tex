@@ -1,0 +1,305 @@
+\section{Event selection}\label{sec:singlelepton}
+
+The single-lepton topology is selected by requiring a single muon or electron within the acceptance described in the previous sections.
+To avoid strong variations of the lepton selection efficiency with \pt, a combined isolation criterion, $\Iabs < 5\GeV$ or $\Irel < 0.2$, is used, 
+equivalent to a transition from an absolute to a relative isolation requirement at $\pt = 25\GeV$. 
+The absolute values of the lepton impact parameters with respect to the primary collision vertex in the transverse plane (\dxy) 
+and longitudinal direction (\dz) are required to be smaller than 0.02 and 0.1\unit{cm}, respectively.
+The reconstructed vertex with the largest value of summed physics-object $\pt^2$ is taken to be the primary $\Pp\Pp$ interaction vertex. 
+The physics objects are the objects returned by a jet finding algorithm~\cite{Cacciari:2008gp,Cacciari:2011ma} applied to all charged 
+tracks associated with the vertex, plus the corresponding associated missing transverse momentum.
+Events are rejected if a $\tau$ lepton, or an additional electron or muon with $\pt > 20\GeV$ is present.
+%Furthermore, requirements are imposed on \ptmiss and on \HT.
+Background from SM dijet and multijet production is suppressed by requiring the azimuthal angle between the momentum vectors of the two leading jets to be smaller than 2.5\unit{rad} for all events with a second hard jet of $\pt>60\GeV$.
+According to simulation, the remaining sample is dominated by \Wjets and, to a lesser extent, by \ttbar production with a single prompt lepton in the final state.
+Therefore, we use the transverse mass \mt computed from the transverse components of the lepton momentum and the \ptmiss vector as a discriminant.
+
+Distributions of the lepton \pt and of \mt at this stage of the selection are presented in Fig.~\ref{fig:slPresel}.
+They show a  good agreement between the shapes of these distributions in data and simulation.  
+Small differences in the shape and normalization are taken into account in the analysis using data-driven techniques described in the following sections.
+The variation of the four-body signal shapes is illustrated with two cases of the mass splitting (10, 30\GeV).
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.45\textwidth]{figures/presel_LepPt.pdf} \hfil
+  \includegraphics[width=.45\textwidth]{figures/presel_Lepmt.pdf}
+\caption{Distributions of (left) lepton \pt and (right) \mt after the preselection.
+  Data are indicated by dots.
+  The background distributions from simulation are represented as filled, stacked histograms,
+ and the shapes for two example signal points as dashed lines.
+  The error bars and the dark, shaded bands indicate the statistical uncertainties of data and simulation, respectively. 
+  The lower panels show the ratio of data to the sum of the SM backgrounds.
+  }\label{fig:slPresel}
+\end{figure}
+
+To maintain sensitivity over a large range of \DM values, several signal regions (SR) and corresponding control regions (CR) are defined as listed in Table~\ref{tab:slSRCRdefs}.
+Since signal leptons have low \pt, we impose an upper limit of $\pt<30\GeV$ in all SR.
+Because the lepton \pt spectrum of the signal changes rapidly with \DM, the full range of lepton \pt is subdivided into three bins in the calculation of the final results: $5$--$12$, $12$--$20$, and $20$--$30\GeV$, referred to as L, M and H, respectively.
+In some muon regions, an additional lepton \pt bin 3.5-5 GeV, referred to as VL, is added in order to increase the sensitivity for the very low mass splitting.
+
+The signal regions labelled as SR1 are designed mainly for low values of \DM, where the \cPqb\ jets produced in the \sTop decays rarely pass the selection thresholds.
+A veto on \cPqb-tagged jets strongly reduces the contribution from \ttbar events.
+In addition, in parts of SR1 only events with negatively charged leptons ($Q = -1$) are accepted, using the fact that the remaining \Wjets background shows significantly more positively than negatively charged leptons while the signal is symmetric in the lepton charge.
+The acceptance for leptons is reduced to the central region, $|\eta|<1.5$.
+Since \ptmiss and \HT are correlated in the studied event topologies, a simultaneous selection is applied by using the combined variable $\ctone \equiv \min(\ptmiss,\HT-100\GeV)$. The choice of this variable is based on the correlation between \ptmiss and \HT in both main backgrounds and signal. An interval in this combined variable carves an L-shaped region in the two-dimensional space of the corresponding two variables.
+The requirements on \ptmiss and \HT from preselection, equivalent to $\ctone > 200\GeV$, are tightened to $\ctone > 300\GeV$ in SR1.
+
+The second set of signal regions (SR2) mainly targets signals with higher mass splitting, where some of the \cPqb\ jets enter the acceptance.
+Therefore, the \cPqb-jet veto in the region $30<\pt(\text{b-jet})<60\GeV$ is reversed, and at least one such jet is required.
+Events with one or more \cPqb-tagged jets with $\pt(\text{b-jet})>60\GeV$ are still rejected to reduce the \ttbar background.
+The requirement on \ctone used in SR1 is replaced with a requirement on a variable 
+$\cttwo \equiv \min(\ptmiss,\pt(\mathrm{leading\ jet})-25\unit{GeV})$ of $\cttwo > 300\GeV$ that is more effective 
+in rejecting the remaining \ttbar background enhanced by the reverted soft \cPqb-tag condition. 
+
+For signal points at low \DM, \mt is typically small, mainly due to the soft lepton \pt spectrum.
+With increasing \DM, the average \mt increases and eventually the distribution extends to values above $\mass{\PW}$.
+To cover the full range of \DM values, each SR is therefore divided into three subregions, a--c, defined by $\mt<60\GeV$, $60<\mt<95\GeV$, and $\mt>95\GeV$, respectively.
+In addition, each subregion in SR1 (SR2) is divided into two by the value of \ctone(\cttwo) of 400\GeV. 
+The letters X and Y are used to refer to the low and high \ctone and \cttwo regions, respectively.
+
+
+%The development of background and data yields after the main cuts of the analysis can be seen in Table~\ref{tab:cutflow}.
+
+
+\begin{table}
+\caption{Definition of signal regions and their corresponding control regions. The subregions of signal regions are denoted by tags in parentheses described in the text.
+For jets, the attributes ``soft'' and ``hard'' refer to the \pt ranges $30$--$60\GeV$ and $>60\GeV$, respectively.
+}\label{tab:slSRCRdefs}
+\begin{center}
+\small
+\begin{tabular}{l||c|c|c||c|c|c}
+\hline
+Variable                               & \multicolumn{6}{c}{common to all SRs}       \\ \hline
+Number of hard jets                    & \multicolumn{6}{c}{$\leq 2$}               \\
+$\Delta\phi$(hard jets) (rad)          & \multicolumn{6}{c}{$<2.5$}                \\
+\ptmiss (\GeV)                         & \multicolumn{6}{c}{$>300$}     \\
+Lepton rejection                       & \multicolumn{6}{c}{no $\tau$, or additional $\ell$ with $\pt>20\GeV$}           \\ 
+\cline{2-7}
+                                       & \multicolumn{3}{c||}{SR1}                & \multicolumn{3}{c}{SR2}           \\ 
+\cline{2-7}
+\HT (\GeV)                             & \multicolumn{3}{c||}{$>400$}                 & \multicolumn{2}{c}{$>300$}     \\
+$\pt$(ISR jet) (\GeV)                  & \multicolumn{3}{c||}{$>100$}                 & \multicolumn{2}{c}{$>325$}     \\
+Number of \cPqb\ jets                  & \multicolumn{3}{c||}{$0$}                    & \multicolumn{2}{c}{$\geq$1 soft, $0$ hard} \\
+%\multirow{3}{*}{$\pt(l)$ (\GeV)} & $[5,12][12,20][20,30]$ (SR1a--c) & $[5,12][12,20][20,30]$ (SR2a--c)  \\ 
+%                                 & $[3.5,5]$ (SR1a--b)              & $[3.5,5]$ (SR2a--b)  \\
+%                                 & $>$30 (CR1)                  & $>$30 (CR2)  \\
+$|\eta(\ell)|$                            & \multicolumn{3}{c||}{$<1.5$}                 & \multicolumn{2}{c}{$<2.4$}     \\
+\cline{2-7}
+                                       & SR1a     & SR1b              & SR1c                 & SR2a   & SR2b       & SR2c           \\ 
+\cline{2-7}
+\mt (\GeV)                             & $<60$    & $60$--$95$        & $>95$        & $<60$    & $60$--$95$        & $>95$        \\
+$Q(\ell)$                                 & $-1$     & $-1$ &            any          & any & any & any        \\
+$\pt(\mu)$ (\GeV)                      & $3.5$--$5$ (VL)      & $3.5$--$5$ (VL)      &                  -   
+                                       & $3.5$--$5$ (VL)      & $3.5$--$5$ (VL)      &                  -   \\
+$\pt(\Pe,\mu)$ (\GeV)                  & $5$--$12$ (L)          & $5$--$12$ (L)          & $5$--$12$ (L)          
+                                       & $5$--$12$ (L)          & $5$--$12$ (L)          & $5$--$12$ (L)          \\
+                                       & $12$--$20$ (M)         & $12$--$20$ (M)         & $12$--$20$ (M)         
+                                       & $12$--$20$ (M)         & $12$--$20$ (M)         & $12$--$20$ (M)         \\
+                                       & $20$--$30$ (H)         & $20$--$30$ (H)         & $20$--$30$ (H)         
+                                       & $20$--$30$ (H)         & $20$--$30$ (H)         & $20$--$30$ (H)         \\
+                                       & $>30$ (CR)         & $>30$ (CR)         & $>30$ (CR)         
+                                       & $>30$ (CR)         & $>30$ (CR)         & $>30$ (CR)         \\
+\hline
+
+
+\CT (\GeV)                             & \multicolumn{3}{c||}{$300<\ctone<400$ (X)}
+                                       & \multicolumn{3}{c}{$300<\cttwo<400$ (X)}                             \\  
+                                       & \multicolumn{3}{c||}{$\ctone>400$ (Y)}                               
+                                       & \multicolumn{3}{c}{$\cttwo>400$ (Y)}                               \\  
+
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+
+\subsection{Background estimation}\label{sec:singleleptonBkg}
+
+The following background contributions are estimated by using data: 
+\Wjets and \ttbar production with a prompt lepton in the final state, which are the dominant components in most of the signal regions,
+and backgrounds due to nonprompt leptons from
+$(\Z \to \nu\nu) \mathrm{+jets}$ and multijet production, as well as \Wjets and \ttbar events with a lost prompt lepton.
+Rare backgrounds with prompt leptons (other \Zg processes, diboson, single top quark production, 
+and production of \ttbar with an additional \W, \Z or $\gamma$ ) are predicted from simulation.
+
+The prompt \Wjets and \ttbar yields from simulation are normalized in control regions associated to each set of signal regions
+sharing the same selection except the requirement on the lepton \pt.
+Control and signal regions differ thus only by the lepton \pt range: in the CRs a lepton with $\pt>30\GeV$ is required.
+The purity of the control regions is typically between 80\% and 90\%.
+The simulation is normalized to data after subtracting nonprompt and rare backgrounds from the observed yields in the CR.
+The obtained scale factors vary from 0.86 to 1.25.
+
+Each factor is applied to all corresponding lepton \pt signal region bins as defined in Table~\ref{tab:slSRCRdefs}.
+Systematic uncertainties are assigned related to the statistical uncertainties of the factors, and to the shape of the \pt spectrum as described later in this section.
+The sample composition in the control regions as obtained from simulation is shown in Table~\ref{tab:ccbkg}.
+
+\begin{table}
+\caption{Simulated background contributions to control regions normalized to a luminosity of 35.9~\fbinv. The nonprompt contributions are estimated from data. Only statistical uncertainties are reported.
+%The last column shows the normalization scale factors obtained for \wjets and \ttbar.
+}\label{tab:ccbkg}
+\begin{center}
+\small
+\begin{tabular}{l||llll|l|l}
+\hline
+Region     & \Wjets             & \ttbar & Nonprompt & Rare & Total SM & Data \\ 
+\hline
+
+CR1aX & 2133  $\pm$20   & 226.6$\pm$ 3.5  & 44.5$\pm$6.4  & 293.2$\pm$5.9  & 2698  $\pm$22  & 2945\\
+CR1aY & 878.3 $\pm$8.6  & 65.8 $\pm$ 1.9  & 13.3$\pm$3.6  & 139.4$\pm$4.1  & 1097  $\pm$10  & 1197\\
+CR1bX & 1107  $\pm$15   & 134.5$\pm$ 2.7  & 7.8 $\pm$2.7  & 112.1$\pm$4.1  & 1361  $\pm$16  & 1462\\
+CR1bY & 438.2 $\pm$6.4  & 35.1 $\pm$ 1.4  & 1.6 $\pm$1.6  & 51.9 $\pm$2.9  & 526.8 $\pm$7.3 & 502\\
+CR1cX & 642   $\pm$11   & 103.8$\pm$ 2.3  & 12.7$\pm$3.0  & 174.3$\pm$5.5  & 932   $\pm$13  & 1051\\
+CR1cY & 278.3 $\pm$8.3  & 25.5 $\pm$ 1.2  & 6.2 $\pm$2.2  & 102.2$\pm$4.3  & 412.2 $\pm$9.6 & 432\\
+CR2aX & 171.7 $\pm$2.5  & 195.6$\pm$ 3.3  & 1.9 $\pm$1.9  & 64.2 $\pm$1.9  & 433.4 $\pm$4.9 & 451\\
+CR2aY & 74.54 $\pm$0.98 & 58.4 $\pm$ 1.7  & 0.78$\pm$0.78 & 25.6 $\pm$1.1  & 159.3 $\pm$2.4 & 145\\
+CR2bX & 104.9 $\pm$2.0  & 110.8$\pm$ 2.5  & 1.2 $\pm$1.2  & 39.2 $\pm$1.6  & 256.1 $\pm$3.8 & 226\\
+CR2bY & 42.59 $\pm$0.78 & 30.8 $\pm$ 1.3  & 0.3 $\pm$0.3  & 14.96$\pm$0.93 & 88.6  $\pm$1.8 & 79\\
+CR2cX & 17.26 $\pm$0.79 & 53.8 $\pm$ 1.7  & 1.7 $\pm$1.2  & 15.7 $\pm$1.0  & 88.4  $\pm$2.4 & 106\\
+CR2cY & 7.50  $\pm$0.84 & 12.77$\pm$ 0.81 & 0.6 $\pm$0.6  & 6.61 $\pm$0.66 & 27.5  $\pm$1.5 & 29\\
+
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+After applying the signal selection, with the exception of the requirement on lepton \pt, 
+the lepton \pt spectra of \ttbar and \Wjets events are similar. 
+A variation of the \ttbar to \Wjets cross section ratio 
+of up to 20\% is taken into account in the systematic uncertainty.
+
+The extrapolation of the correction factors from control to signal regions has been validated by comparing corrected yields from simulation to data in validation regions.
+Each of these validation regions is defined by one of the following changes with respect to the signal selection: 
+(a) replacing of the \ctone (in SR1) or \cttwo (in SR2) requirement by $200 < \CT <300\GeV$, 
+(b) replacing the conditions on \cPqb-tagged jets by requiring at least one \cPqb-tagged jet with $\pt>60\GeV$.
+The predictions in the validation regions are compatible with the observations within uncertainties.
+
+At high values of \mt, namely in the SR1c and SR2c regions, a smaller fraction of \Wjets and \ttbar events pass the selection criteria.
+In these regions, especially at low \pt, 
+the contribution of nonprompt background associated to jets but passing impact parameter and isolation requirements 
+becomes comparable to that of prompt backgrounds. This nonprompt background is estimated fully from data in all signal and control regions. 
+For this purpose, an ``application region'' is assigned to each signal or control region.
+In this application regions, the isolation and impact parameter conditions are loosened and leptons passing the tight conditions are excluded. 
+The ratio of nonprompt yields in tight and loose regions is measured in dedicated control samples
+with enhanced QCD multijet background as a function of the lepton \pt and $|\eta|$. The systematic uncertainty due to possible different flavor content of jets 
+in the samples used for the measurement of this ratio and in the application regions is assessed by varying the \cPqb-tag requirement 
+in the control samples.
+The effect of this modification varies from 20\% to 50\% from low to high \pt. 
+The nonprompt background 
+estimate in each signal and control region is obtained from the data yield in the corresponding application region, rescaled by the measured ratio, after subtracting the simulated prompt contribution. 
+The consistency of the method is confirmed using simulation.
+An additional uncertainty of 20\% to 200\% is assigned in some regions, typically dominated by prompt background, to account for any residual deviation found in this test.
+
+A summary of the expected contributions of different background processes to the signal regions is shown in Table~\ref{tab:results} together with the observed data yields.
+%http://www.hephy.at/user/nrad/T2Deg13TeV/8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v4_VVNLO_v2/LepGood_lep_lowpt_Jet_def_SF_Prompt_STXSECFIX_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/presel_base/bins_mtct_sum/AppPASv3_1__MTCTLepPtVL2/Tables/shapes_fit_b_SRTable.tex
+\begin{table}
+\small
+\caption{Summary of expected background and observed data yields in the signal regions. The uncertainties on the background prediction include the statistical and systematic sources.}
+\label{tab:results}
+\begin{center}
+\begin{tabular}{l l l l l l || l }
+\hline 
+ Region  & \Wjets & \ttbar & Nonprompt & Rare & Total SM & Data\\ 
+\hline
+SR1VLaX   &  28.8$\pm$3.4    &    2.80$\pm$0.55 &     10.7$\pm$4.4   &    3.4$\pm$1.8    &    45.7$\pm$5.9   &   64 \\ 
+SR1LaX    &  182$\pm$14     &    22.4$\pm$3.6  &     22.2$\pm$8.7   &    20.1$\pm$9.7    &    247$\pm$21     &   229 \\ 
+SR1MaX    &  230$\pm$18     &    27.2$\pm$4.2  &     1.7$\pm$2.7   &    29$\pm$14     &    288$\pm$26     &   281 \\ 
+SR1HaX    &  265$\pm$20     &    30.8$\pm$4.8  &     1.3$\pm$2.4   &    32$\pm$15     &    329$\pm$28     &   351 \\ 
+SR1VLaY   &  6.44$\pm$0.97   &    0.60$\pm$0.21 &     3.9$\pm$2.1   &    0.85$\pm$0.56   &    11.8$\pm$2.4   &   23 \\ 
+SR1LaY    &  60.0$\pm$5.7    &    5.4$\pm$1.4  &     6.9$\pm$3.4   &    8.8$\pm$4.4    &    81.2$\pm$8.4   &   68 \\ 
+SR1MaY    &  73.7$\pm$6.7    &    6.6$\pm$1.6  &     1.4$\pm$2.8   &    9.6$\pm$4.7    &    91.3$\pm$9.2   &   92 \\ 
+SR1HaY    &  92.9$\pm$8.5    &    7.2$\pm$1.7  &     0.7$\pm$1.8   &    12.5$\pm$6.1    &    113$\pm$11     &   89 \\ 
+SR1VLbX   &  18.0$\pm$2.3    &    1.48$\pm$0.35 &     17.4$\pm$5.9   &    1.9$\pm$1.0    &    38.8$\pm$6.5   &   48 \\ 
+SR1LbX    &  118.4$\pm$9.1    &    13.7$\pm$2.2  &     15.2$\pm$6.0   &    10.9$\pm$5.6    &    158$\pm$13     &   152 \\ 
+SR1MbX    &  133.2$\pm$9.7    &    15.9$\pm$2.5  &     2.1$\pm$2.2   &    14.4$\pm$7.3    &    166$\pm$14     &   163 \\ 
+SR1HbX    &  148$\pm$10     &    18.9$\pm$2.9  &     0.7$\pm$1.1   &    14.2$\pm$6.9    &    182$\pm$14     &   180 \\ 
+SR1VLbY   &  4.37$\pm$0.80   &    0.57$\pm$0.19 &     6.1$\pm$2.6   &    0.91$\pm$0.61   &    11.9$\pm$2.8   &   15 \\ 
+SR1LbY    &  25.9$\pm$2.8    &    1.97$\pm$0.53 &     2.2$\pm$1.2   &    2.6$\pm$1.5    &    32.6$\pm$3.6   &   39 \\ 
+SR1MbY    &  33.6$\pm$3.5    &    2.26$\pm$0.62 &     0.6$\pm$1.2   &    2.5$\pm$1.4    &    39.0$\pm$4.1   &   39 \\ 
+SR1HbY    &  41.0$\pm$4.0    &    2.77$\pm$0.72 &     0.25$\pm$0.53  &    4.2$\pm$2.2    &    48.3$\pm$4.8   &   56 \\ 
+SR1LcX    &  14.0$\pm$2.3    &    2.46$\pm$0.59 &     16.7$\pm$3.9   &    5.2$\pm$2.8    &    38.4$\pm$5.5   &   43 \\ 
+SR1McX    &  34.8$\pm$8.5    &    6.9$\pm$1.4  &     5.1$\pm$1.8   &    9.6$\pm$4.9    &    56$\pm$11      &   56 \\ 
+SR1HcX    &  40.5$\pm$5.5    &    10.6$\pm$2.2  &     1.66$\pm$0.69  &    14.1$\pm$6.9    &    67$\pm$10      &   72 \\ 
+SR1LcY    &  5.8$\pm$1.3    &    0.64$\pm$0.25 &     12.9$\pm$3.2   &    3.7$\pm$2.1    &    23.1$\pm$4.1   &   16 \\ 
+SR1McY    &  7.5$\pm$1.5    &    1.81$\pm$0.63 &     1.47$\pm$0.78  &    4.5$\pm$2.6    &    15.4$\pm$3.3   &   19 \\ 
+SR1HcY    &  10.0$\pm$1.9    &    2.67$\pm$0.87 &     0.41$\pm$0.27  &    6.4$\pm$3.3    &    19.5$\pm$4.1   &   29 \\ 
+SR2VLaX   &  2.74$\pm$0.43   &    2.54$\pm$0.50 &     9.5$\pm$3.2   &    0.64$\pm$0.36   &    15.4$\pm$3.3   &   12 \\ 
+SR2LaX    &  16.0$\pm$1.7    &    16.7$\pm$2.2  &     5.6$\pm$2.0   &    6.3$\pm$3.0    &    44.6$\pm$4.9   &   39 \\ 
+SR2MaX    &  21.7$\pm$2.3    &    21.0$\pm$2.6  &     1.57$\pm$0.97  &    9.3$\pm$4.4    &    53.5$\pm$6.0   &   43 \\ 
+SR2HaX    &  24.6$\pm$2.6    &    22.8$\pm$2.9  &     0.44$\pm$0.49  &    8.7$\pm$4.1    &    56.5$\pm$6.2   &   65 \\ 
+SR2VLaY   &  0.75$\pm$0.17   &    0.44$\pm$0.17 &     0.96$\pm$0.90  &    0.064$\pm$0.041  &    2.21$\pm$0.94  &   4 \\ 
+SR2LaY    &  5.09$\pm$0.83   &    4.48$\pm$0.98 &     4.2$\pm$1.7   &    1.98$\pm$0.96   &    15.8$\pm$2.5   &   11 \\ 
+SR2MaY    &  6.2$\pm$1.0    &    4.64$\pm$0.96 &     0.53$\pm$0.53  &    2.3$\pm$1.1    &    13.7$\pm$2.0   &   16 \\ 
+SR2HaY    &  6.8$\pm$1.1    &    5.3$\pm$1.1  &     0.50$\pm$0.62  &    2.5$\pm$1.2    &    15.2$\pm$2.2   &   23 \\ 
+SR2VLbX   &  1.99$\pm$0.38   &    1.03$\pm$0.27 &     2.3$\pm$1.4   &    1.05$\pm$0.58   &    6.3$\pm$1.6    &   3 \\ 
+SR2LbX    &  11.9$\pm$1.7    &    8.4$\pm$1.3  &     7.0$\pm$2.2   &    5.2$\pm$2.5    &    32.5$\pm$4.3   &   37 \\ 
+SR2MbX    &  11.7$\pm$1.6    &    8.8$\pm$1.4  &     0.84$\pm$0.55  &    4.5$\pm$2.2    &    26.0$\pm$3.5   &   35 \\ 
+SR2HbX    &  12.0$\pm$1.7    &    10.5$\pm$1.6  &     0.30$\pm$0.38  &    4.7$\pm$2.2    &    27.6$\pm$3.7   &   36 \\ 
+SR2VLbY   &  0.55$\pm$0.15   &    0.24$\pm$0.10 &     1.13$\pm$0.80  &    0.36$\pm$0.26   &    2.27$\pm$0.87  &   1 \\ 
+SR2LbY    &  2.96$\pm$0.59   &    1.63$\pm$0.47 &     0.38$\pm$0.41  &    0.73$\pm$0.38   &    5.7$\pm$1.1    &   6 \\ 
+SR2MbY    &  3.42$\pm$0.68   &    1.67$\pm$0.47 &     0.36$\pm$0.4   &    1.45$\pm$0.73   &    6.9$\pm$1.3    &   12 \\ 
+SR2HbY    &  4.05$\pm$0.81   &    2.59$\pm$0.68 &     0.20$\pm$0.21  &    1.15$\pm$0.57   &    8.0$\pm$1.4    &   8 \\ 
+SR2LcX    &  0.62$\pm$0.22   &    2.1$\pm$0.5  &     3.4$\pm$1.7   &    0.39$\pm$0.26   &    6.5$\pm$1.8    &   6 \\ 
+SR2McX    &  1.00$\pm$0.29   &    6.4$\pm$1.2  &     2.2$\pm$1.3   &    0.82$\pm$0.45   &    10.5$\pm$1.9   &   11 \\ 
+SR2HcX    &  1.41$\pm$0.43   &    7.3$\pm$1.3  &     0.23$\pm$0.21  &    1.72$\pm$0.99   &    10.7$\pm$1.8   &   12 \\ 
+SR2LcY    &  0.36$\pm$0.27   &    0.44$\pm$0.21 &     1.56$\pm$0.97  &    0.22$\pm$0.18   &    2.6$\pm$1.1    &   6 \\ 
+SR2McY    &  0.207$\pm$0.080  &    0.58$\pm$0.25 &     0.68$\pm$0.52  &    0.17$\pm$0.12   &    1.64$\pm$0.62  &   1 \\ 
+SR2HcY    &  0.31$\pm$0.12   &    1.42$\pm$0.52 &     0.31$\pm$0.24  &    0.76$\pm$0.48   &    2.81$\pm$0.79  &   3 \\ 
+
+
+
+
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\subsection{Background systematic uncertainties}\label{sec:singleleptonSyst}
+
+In addition to the systematic uncertainties described in the previous subsections, various systematic effects and associated uncertainties related to possible shortcomings in the background simulation have been evaluated. Transverse momentum distributions of W bosons and top quarks in respective production processes have been compared to simulation in very pure control samples. Based on these comparisons, the \pt spectra in the corresponding background samples were reweighted.
+To assess the sensitivity of the result to this correction the weights were varied by the size of the correction for \Wjets and 50\% of the correction for \ttbar. 
+An uncertainty of 50\% is assigned to the cross sections of all non-leading backgrounds and propagated through the full estimation procedure.
+
+%Changes in the polarization of the \PW\ boson can have an impact on the results since they change the balance between muon \pt and \ptmiss. 
+%To quantify this effect, the polarization fractions $f_{\lambda=+1}$, $f_{\lambda=-1}$, and $f_{\lambda=0}$, associated with helicity $+1$, $-1$, and $0$ amplitudes have been varied by modifying $f_{-1}-f_{+1}$ and $f_{0}$ by 10\% \cite{Chatrchyan:2011ig, ATLAS:2012au, Bern:2011ie}.
+
+An overview of all systematic uncertainties related to the background prediction is presented in Table~\ref{tab:bkgsys}. 
+The dominant uncertainties are related to the description of the \PW\ boson transverse momenta in the \Wjets background and to the uncertainties in the jet energy scale.
+
+\begin{table}
+\scriptsize
+\caption{Relative systematic uncertainties in \% on the total 
+background prediction in individual signal regions merged in \pt. 
+}\label{tab:bkgsys}
+\begin{center}
+%http://www.hephy.at/user/nrad/T2Deg13TeV/8025_mAODv2_v7/80X_postProcessing_v1/EPS17_v0/June17_v4_VVNLO_v2/LepGood_lep_lowpt_Jet_def_SF_Prompt_STXSECFIX_PU_TTIsr_Wpt_TrigEff_lepSFFix/DataBlind/SystSummaries/BkgSystCRMinusSR.tex
+\begin{tabular}{c p{0.55cm} p{0.55cm} p{0.55cm} p{0.55cm} p{0.55cm} p{0.55cm} p{0.55cm} p{0.55cm} p{0.55cm} p{0.55cm} p{0.55cm} p{0.55cm}}
+%\begin{tabular}{c c c c c c c c c c c c c}
+\hline
+Systematic Effect & SR1aX  &  SR1aY  &  SR1bX  & SR1bY & SR1cX & SR1cY & SR2aX & SR2aY & SR2bX & SR2bY & SR2cX & SR2cY\\ 
+\hline
+
+\Wjets-\pt reweighting                  & 4.5 & 4.8 & 4.9 & 4.7 & 6.2 & 10.2 & 2.3 & 3.7 & 1.9 & 1.7 & 2.2 & 4.4\\ 
+\ttbar-ISR reweighting                  & 0.2 & 0.1 & 0.2 & 0.2 & 0.4 & 0.5 & $<$0.1 & 0.2 & 0.1 & 0.1 & 0.8 & 0.7\\ 
+Pileup                                  & 0.1 & 0.2 & 0.2 & 0.5 & 1.8 & 0.7 & 0.1 & 0.2 & 0.7 & 0.7 & 2.0 & 1.5\\ 
+%\PW\ polarization                       & 2.4 & 2.68 & 1.9 & 1.56 & 0.37 & 0.32 & 0.45 & 0.3 & 0.04 & 0.38 & 0.34 & 0.11\\ 
+\cPqb-tag efficiency light jets         & $<$0.1 & $<$0.1 & $<$0.1 & $<$0.1 & 0.1 & 0.2 & $<$0.1 & 0.3 & 0.1 & 0.2 & 0.5 & 0.9\\ 
+\cPqb-tag efficiency heavy jets         & $<$0.1 & 0.1 & $<$0.1 & 0.1 & 0.1 & 0.1 & 0.1 & $<$0.1 & $<$0.1 & 0.1 & 0.2 & 0.4\\ 
+Jet energy scale                        & 2.1 & 1.2 & 1.6 & 1.6 & 2.4 & 1.6 & 0.9 & 0.9 & 1.3 & 1.4 & 1.2 & 0.1\\ 
+Jet energy resolution                   & 0.3 & 0.1 & 0.5 & 0.3 & 0.2 & 0.2 & 0.1 & 0.4 & 0.2 & 0.2 & 1.1 & 0.3\\ 
+
+%WTTPtShape          & 0.15 & 0.14 & 0.03 & 0.12 & 0.57 & 0.83 & 0.6 & 0.02 & 1.21 & 0.98 & 1.04 & 0.87\\ 
+%\Wjets-\pt reweighting          & 4.25 & 5.52 & 4.88 & 5.28 & 6.15 & 11.39 & 2.37 & 4.0 & 1.86 & 2.51 & 2.3 & 4.91\\ 
+%\ttbar-ISR reweighting          & 0.19 & 0.08 & 0.15 & 0.18 & 0.5 & 0.52 & 0.01 & 0.17 & 0.08 & 0.02 & 0.84 & 1.03\\ 
+%pileup                          & 0.1 & 0.92 & 0.16 & 0.17 & 2.06 & 3.33 & 0.0 & 0.41 & 1.0 & 0.88 & 2.21 & 0.95\\ 
+%\PW\ polarization               & 2.44 & 2.6 & 1.93 & 1.5 & 0.43 & 0.37 & 0.45 & 0.31 & 0.04 & 0.36 & 0.34 & 0.11\\ 
+%\cPqb-tag efficiency light jets & 0.01 & 0.06 & 0.01 & 0.03 & 0.07 & 0.24 & 0.03 & 0.31 & 0.13 & 0.04 & 0.46 & 0.76\\ 
+%\cPqb-tag efficiency heavy jets & 0.0 & 0.05 & 0.05 & 0.08 & 0.04 & 0.08 & 0.12 & 0.08 & 0.02 & 0.18 & 0.21 & 0.4\\ 
+%Jet energy scale                & 1.74 & 1.87 & 2.11 & 1.04 & 2.22 & 1.32 & 0.79 & 0.97 & 1.24 & 1.28 & 1.23 & 0.29\\ 
+%Jet energy resolution           & 0.17 & 0.56 & 0.32 & 0.47 & 0.54 & 0.15 & 0.1 & 0.36 & 0.18 & 0.26 & 1.16 & 0.24\\ 
+
+\end{tabular}
+\end{center}
+\end{table}
+
+

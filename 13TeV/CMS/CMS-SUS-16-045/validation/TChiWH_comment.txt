@@ -1,0 +1,3 @@
+Wrong root file from CMS for TChiWH topology (Fig. 5b); contacted CMS, waiting for reply. 
+
+Update 30-Jan-2018: corrected root file provided by CMS, implemented and validation ok. 

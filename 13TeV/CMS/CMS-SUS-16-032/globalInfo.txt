@@ -1,0 +1,12 @@
+id: CMS-SUS-16-032
+sqrts: 13*TeV
+lumi: 35.9/fb
+prettyName: Sbottom and compressed stop (jets + Etmiss)
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-032/index.html
+arxiv: https://arxiv.org/abs/1707.07274
+publication: Phys. Lett. B 778 (2018) 263, http://dx.doi.org/10.1016/j.physletb.2018.01.012
+contact: cms-phys-conveners-sus@cern.ch
+comment: Moriond 2017. The name for upper limits in the root files are: hXsec_exp_corr;1 and hXsec_exp_corr;2 with both containing same data (checked by Federico). Here used hXsec_exp_corr;2 for implementation.
+private: False
+implementedBy: Juhi Dutta
+lastUpdate: 2018/02/15

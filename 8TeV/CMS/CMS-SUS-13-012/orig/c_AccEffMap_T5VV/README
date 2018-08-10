@@ -1,0 +1,6 @@
+The c_AccEffMap_*.C files in this directory provide Acc x Eff for various search regions used in the analysis.
+
+c_combined_expLimit_T5VV.C : expected cross-section upper limits 
+c_combined_obsLimit_T5VV.C : observed cross-section upper limits 
+
+A table of "mother mass", "daughter mass" and "Acc x Eff" (or xsec upper bounds) is also listed at the end of respecive file.

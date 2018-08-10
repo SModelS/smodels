@@ -1,0 +1,1 @@
+||[[https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-025/|ATLAS-CONF-2013-025]]<<BR>>ss_by: ATLAS-SUSY-2013-08||[[SmsDictionary#T6ZZtt|T6ZZtt]]||2*Eq(mother,x)_Eq(inter0,y+1.8e+2)_Eq(lsp,y)||[[https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-025/figaux_10.png|Figure 10]]||None||None||None||

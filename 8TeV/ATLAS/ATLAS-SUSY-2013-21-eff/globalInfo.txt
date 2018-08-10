@@ -1,0 +1,10 @@
+id: ATLAS-SUSY-2013-21
+sqrts: 8*TeV
+lumi: 20.3/fb
+prettyName: monojet or c-jet + Etmiss
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-21/
+arxiv: http://arxiv.org/pdf/1407.0608v2.pdf
+publication: http://journals.aps.org/prd/abstract/10.1103/PhysRevD.90.052008
+private: False
+implementedBy: Federico A
+lastUpdate: 2016/9/29

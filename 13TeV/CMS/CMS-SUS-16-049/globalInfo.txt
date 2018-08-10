@@ -1,0 +1,12 @@
+id: CMS-SUS-16-049
+sqrts: 13*TeV
+lumi: 35.9/fb
+prettyName: All hadronic stop
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-049/index.html
+arxiv: http://arxiv.org/abs/1707.03316
+publication: J. High Energy Phys. 10 (2017) 005, http://dx.doi.org/10.1007/JHEP10(2017)005
+contact: cms-phys-conveners-sus@cern.ch
+comment: Moriond 2017. Paper contains 6 SMS interpretations, 5 of which are implemented here. Not implemented: Fig. 9 with stop -> b chi+1 on one branch and stop -> t chi01 on the other branch, because both the BRs and the chargino mass are fixed.
+private: False
+implementedBy: Juhi Dutta
+lastUpdate: 2017/12/28

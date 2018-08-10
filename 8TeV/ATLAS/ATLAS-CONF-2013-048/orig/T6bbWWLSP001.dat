@@ -1,0 +1,43 @@
+# This file contains preliminary data from the ATLAS collaboration corresponding to Figure fig_13a in the auxiliary material of conference note ATLAS-CONF-2013-048. 
+# 
+# Title: Search for direct top squark pair production in final states with two leptons in $\sqrt{s}$ = 8 TeV pp collisions using $20$fb$^{-1}$ of ATLAS data.
+ 
+# Reference: ATLAS-CONF-2013-048 
+# Link: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-048 
+# 
+# The ATLAS collaboration releases these data for the purpose of preliminary studies. 
+# ATLAS recommends not to use these preliminary data for publications. 
+# 
+# <x-coord>    <y-coord>     <95 CL cross section upper limit (pb)>
+150 100  32.526
+150 120  6.86014
+150 140  2.81006
+200 100  53.1941
+200 150  3.21673
+200 170  1.81054
+200 190  1.80868
+250 100  80.8155
+250 150  2.2146
+250 240  0.638208
+300 100  38.4551
+300 150  1.0556
+300 200  0.508235
+300 250  0.411296
+300 290  0.413881
+350 150  0.607081
+350 200  0.327097
+350 250  0.309395
+350 300  0.297974
+350 340  0.267113
+400 100  58.7438
+400 150  0.700511
+400 200  0.229613
+400 250  0.214834
+400 300  0.209209
+400 350  0.171228
+400 390  0.172758
+500 100  4.84018
+500 200  0.210348
+500 300  0.116109
+500 400  0.0683067
+500 490  0.111979

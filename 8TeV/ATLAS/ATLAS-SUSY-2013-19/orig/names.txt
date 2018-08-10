@@ -1,0 +1,126 @@
+AuxFig3a T6bbWWLSP001
+AuxFig3b T6bbWWD010
+AuxFig3c T6bbWWM1300
+AuxFig3d T6bbWWx200
+AuxFig3e T2bbWW
+AuxFig3f T6bbWWC106
+AuxFig10a T2tt
+
+
+T2tt
+
+	Fig. 10a	http://hepdata.cedar.ac.uk/resource/6175/figAuxiliaryFigure10A.png
+
+	limit			T2tt.txt		http://hepdata.cedar.ac.uk/view/ins1286444/d72/input	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+T2bbWW
+
+	Fig. 3e	http://hepdata.cedar.ac.uk/resource/6175/figAuxiliaryFigure3E.png
+
+	limit			T2bbWW.txt		http://hepdata.cedar.ac.uk/view/ins1286444/d42/input	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+T6bbWWC106
+
+	Fig. 3f	http://hepdata.cedar.ac.uk/resource/6175/figAuxiliaryFigure3F.png
+
+	limit			T6bbWWC106.txt		http://hepdata.cedar.ac.uk/view/ins1286444/d68/input	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+T6bbWWx200
+
+	Fig. 3d	http://hepdata.cedar.ac.uk/resource/6175/figAuxiliaryFigure3D.png
+
+	limit			T6bbWWx200.txt		http://hepdata.cedar.ac.uk/view/ins1286444/d39/input	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+T6bbWWD010
+
+	Fig. 3b	http://hepdata.cedar.ac.uk/resource/6175/figAuxiliaryFigure3B.png
+
+	limit			T6bbWWD010.txt		http://hepdata.cedar.ac.uk/view/ins1286444/d33/input	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+T6bbWWLSP001
+
+	Fig. 3a	http://hepdata.cedar.ac.uk/resource/6175/figAuxiliaryFigure3A.png
+
+	limit			T6bbWWLSP001.txt		http://hepdata.cedar.ac.uk/view/ins1286444/d30/input	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+T6bbWWM1300
+
+	Fig. 3c	http://hepdata.cedar.ac.uk/resource/6175/figAuxiliaryFigure3C.png
+
+	limit			T6bbWWM1300.txt		http://hepdata.cedar.ac.uk/view/ins1286444/d36/input	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment

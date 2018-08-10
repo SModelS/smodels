@@ -1,0 +1,10 @@
+id: CMS-PAS-SUS-16-019
+sqrts: 13*TeV
+lumi: 12.9/fb
+prettyName: jets + 1 lepton
+url: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-019/index.html
+supersededBy: CMS-SUS-16-037
+comment: https://cds.cern.ch/record/2204932. Superseded by CMS-SUS-16-037.
+private: False
+implementedBy: Federico Ambrogi
+lastUpdate: 2017/3/1

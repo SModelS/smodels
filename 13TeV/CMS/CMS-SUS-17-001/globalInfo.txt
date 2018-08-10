@@ -1,0 +1,11 @@
+id: CMS-SUS-17-001
+sqrts: 13*TeV
+lumi: 35.9/fb
+prettyName: Stop search in dilepton + jets + Etmiss final state
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-17-001/index.html
+arxiv: http://arxiv.org/abs/1711.00752
+publication: to appear in Phys. Rev. D 
+comment: Moriond 2017. A long cascade decay not implemented: stop -> b chargino, chargino-> slepton v, slepton -> l lsp with chargino fixed halfway between the stop and lsp and 3 mass planes provided for the intermediate slepton at x = 0.05,0.5 and 0.95 the mass of the chargino. 
+private: False
+implementedBy: Juhi Dutta
+lastUpdate: 2017/12/28

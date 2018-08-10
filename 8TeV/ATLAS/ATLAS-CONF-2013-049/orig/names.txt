@@ -1,0 +1,81 @@
+figure topology            object
+Fig13a TChipChimSlepSnu050 upperLimit
+Fig14a TSlepSlepR          upperLimit
+Fig15a TSlepSlepL          upperLimit
+Fig16a TSlepSlep           upperLimit
+
+figure topology            object
+Fig13a TChipChimSlepSnu050 upperLimit
+Fig14a TSlepSlepR          upperLimit
+Fig15a TSlepSlepL          upperLimit
+Fig16a TSlepSlep           upperLimit
+
+
+
+
+TSlepSlep
+
+	Fig. 16a	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-049/figaux_16a.pdf
+
+	limit			TSlepSlep.txt		https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-049/figaux_16a_PRELIMINARY.data	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		TSlepSlep_exc.dat	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+TSlepSlepL
+
+	Fig. 15a	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-049/figaux_15a.pdf
+
+	limit			TSlepSlepL.txt		link	"dat-file has changed"
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+TSlepSlepR
+
+	Fig. 14a	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-049/figaux_14a.pdf
+
+	limit			TSlepSlepR.txt		link	"dat-file has changed"
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+
+TChipChimSlepSnu050
+
+	Fig. 13a	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-049/figaux_13a.pdf
+
+	limit			TChipChimSlepSnu050.data		https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-049/figaux_13a_PRELIMINARY.data	comment
+	expectedlimit		file	link	comment
+
+	Fig.	link
+
+	exclusion		file	link	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
