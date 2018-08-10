@@ -1,8 +1,0 @@
-dataId: ar16
-dataType: efficiencyMap
-observedN: 3
-expectedBG: 2.81
-bgError: 0.7906958960308318
-upperLimit: 0.129778*fb
-expectedUpperLimit: 0.129778*fb
-aggregated: SR2HcY

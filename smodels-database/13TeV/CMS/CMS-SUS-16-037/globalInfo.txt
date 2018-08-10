@@ -1,9 +1,0 @@
-id: CMS-SUS-16-037
-sqrts: 13*TeV
-lumi: 35.9/fb
-url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-037/index.html
-arxiv: https://arxiv.org/abs/1705.04673
-publication: Phys. Rev. Lett. 119 (2017) 151802, http://dx.doi.org/10.1103/PhysRevLett.119.151802
-contact: cms-phys-conveners-sus@cern.ch
-implementedBy: Juhi Dutta
-lastUpdate: 2017/12/28
