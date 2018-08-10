@@ -1,8 +1,0 @@
-dataId: ar17
-dataType: efficiencyMap
-observedN: 393
-expectedBG: 382.05
-bgError: 31.71750305430741
-upperLimit: 2.463302*fb
-expectedUpperLimit: 2.146239*fb
-aggregated: SR1VLbY;SR1HbY;SR1LcX;SR1McX;SR2VLaX;SR2LaX;SR2MaX;SR2HaX;SR2VLaY;SR2LaY;SR2MaY;SR2HaY;SR2VLbX;SR2LcY;SR2McY

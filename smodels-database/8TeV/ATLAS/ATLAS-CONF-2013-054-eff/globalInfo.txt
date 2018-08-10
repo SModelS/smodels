@@ -1,9 +1,0 @@
-id: ATLAS-CONF-2013-054
-sqrts: 8*TeV
-lumi: 20.3/fb
-prettyName: 0 leptons + >= 7-10 jets + Etmiss
-url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-054/
-contact: fastlim
-comment: created from fastlim-1.0;  superseded by ATLAS-SUSY-2013-04, fastlim maps in ATLAS-CONF-2013-054 contain different topologies than ATLAS-SUSY-2013-04(MA5 maps). Topologies included here are, T1, T1bbbb, T1bbbt, T1bbqq, T1bbtt, T1btbt, T1btqq, T1bttt, T1qqtt, T1tttt, T2, T2bb, T2bt, T2tt, T5bbbb, T5bbbt, T5btbt, T5tbtb, T5tbtt, T5tttt, TGQ, TGQbbq, TGQbtq, TGQQtt.
-implementedBy: WW
-lastUpdate: 2016/08/16

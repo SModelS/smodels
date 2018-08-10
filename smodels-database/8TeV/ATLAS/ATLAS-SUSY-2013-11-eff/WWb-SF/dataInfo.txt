@@ -1,7 +1,0 @@
-dataId: WWb-SF
-dataType: efficiencyMap
-observedN: 26
-expectedBG: 30.2
-bgError: 3.5
-upperLimit: 0.558*fb
-expectedUpperLimit: 0.696*fb

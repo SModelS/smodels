@@ -1,7 +1,0 @@
-dataId: 10j50 flavor
-dataType: efficiencyMap
-observedN: 3
-expectedBG: 1.4
-bgError: 0.3
-upperLimit: 0.29*fb
-expectedUpperLimit: 0.2*fb

@@ -1,9 +1,0 @@
-id: ATLAS-CONF-2013-036
-sqrts: 8.0*TeV
-lumi: 20.7/fb
-prettyName: ATLAS multileptons
-url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-036/
-comment: Will be superseded by SUSY-2013-13 (no data available yet)
-private: False
-implementedBy: Federico A
-lastUpdate: 2016/9/29

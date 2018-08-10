@@ -1,8 +1,0 @@
-comment_by: Suchita Kulkarni
-date: Wed Dec 21 09:29:48 CET 2016
-comment: "Comment by Andre Lessa brought forward
-comment_by: AL
-date: 2015/3/23
-comment: The UL values in HEPDATA do not match the values in plot 
-(Auxiliary Figure 3C). Furthermore there are several entries with 
-negative (-1) values for the UL. Therefore we should not use this result."

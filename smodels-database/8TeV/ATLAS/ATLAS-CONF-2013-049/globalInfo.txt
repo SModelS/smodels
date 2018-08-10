@@ -1,9 +1,0 @@
-id: ATLAS-CONF-2013-049
-sqrts: 8.0*TeV
-lumi: 20.3/fb
-prettyName: 2 leptons (e,mu) + Etmiss
-url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-049/ https://cds.cern.ch/record/1547565
-supersededBy: ATLAS-SUSY-2013-11
-private: False
-implementedBy: Federico A
-lastUpdate: 2016/9/29

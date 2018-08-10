@@ -1,7 +1,0 @@
-dataId: SRAh
-dataType: efficiencyMap
-observedN: 4
-expectedBG: 5.4
-bgError: 3.1
-upperLimit: 0.34*fb
-expectedUpperLimit: 0.381*fb

@@ -1,9 +1,0 @@
-id: ATLAS-CONF-2013-093
-sqrts: 8*TeV
-lumi: 20.3/fb
-prettyName: 1 lepton + 2 b-jets + Etmiss (mbb = mH)
-url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-093/
-contact: fastlim
-comment: created from fastlim-1.0
-implementedBy: WW
-lastUpdate: 2016/10/09

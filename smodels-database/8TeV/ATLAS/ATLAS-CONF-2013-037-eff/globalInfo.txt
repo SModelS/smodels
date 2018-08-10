@@ -1,9 +1,0 @@
-id: ATLAS-CONF-2013-037
-sqrts: 8*TeV
-lumi: 20.7/fb
-prettyName: 1 lepton + >= 4(1 b-)jets + Etmiss
-url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-037/
-contact: fastlim
-comment: created from fastlim-1.0 ; superseded by ATLAS-SUSY-2013-15, fastlim maps contain more topologies for ATLAS-CONF-2013-024. Topologies included here are, T1, T1bbbb, T1bbbt, T1bbqq, T1bbtt, T1btbt, T1btqq, T1bttt, T1qqtt, T1tttt, T2, T2bb, T2bt, T2tt, T5bbbb, T5bbbt, T5btbt, T5tbtb, T5tbtt, T5tttt, TGQ, TGQbbq, TGQbtq, TGQQtt.
-implementedBy: WW
-lastUpdate: 2016/08/16

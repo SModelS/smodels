@@ -1,7 +1,0 @@
-dataId: SRnoZb
-dataType: efficiencyMap
-observedN: 32
-expectedBG: 29.0
-bgError: 6.0
-upperLimit: 0.87*fb
-expectedUpperLimit: 0.824*fb

@@ -1,6 +1,0 @@
-comment_by: Andre Lessa
-date: Sab Dez 24 11:07:14 BRST 2016
-comment: "There is a jump in the original data from  mstop = 300 GeV to 350 GeV,
-where the UL changes by an order of magnitude. As a result the interpolation in this area
-slightly undershoots and there is a small region of non-excluded points.
-Nonetheless the results seem consistent."

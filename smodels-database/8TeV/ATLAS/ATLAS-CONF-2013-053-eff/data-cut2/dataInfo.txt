@@ -1,7 +1,0 @@
-dataId: SRA mCT250
-dataType: efficiencyMap
-observedN: 14
-expectedBG: 15.8
-bgError: 2.8
-upperLimit: 0.45*fb
-expectedUpperLimit: 0.517*fb

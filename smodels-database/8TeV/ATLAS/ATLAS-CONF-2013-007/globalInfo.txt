@@ -1,9 +1,0 @@
-id: ATLAS-CONF-2013-007
-sqrts: 8.0*TeV
-lumi: 20.7/fb
-prettyName: 2 SS leptons + 0-3 b-jets + Etmiss
-url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-007/
-comment: A technical problem has been found in the pseudo-experiments used to make Table 4 in the conference note of March 1. (Partly) superseded by ATLAS-SUSY-2013-09, fastlim maps contain more topologies for ATLAS-CONF-2013-007. Topologies included here are, T1, T1bbbb, T1bbbt, T1bbqq, T1bbtt, T1btbt, T1btqq, T1bttt, T1qqtt, T1tttt, T2, T2bb, T2bt, T2tt, T5bbbb, T5bbbt, T5btbt, T5tbtb, T5tbtt, T5tttt, TGQ, TGQbbq, TGQbtq, TGQQtt.
-private: False
-implementedBy: Federico A
-lastUpdate: 2016/9/29

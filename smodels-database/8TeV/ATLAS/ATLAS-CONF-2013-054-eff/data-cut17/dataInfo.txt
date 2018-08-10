@@ -1,7 +1,0 @@
-dataId: 10j50 MJ 340
-dataType: efficiencyMap
-observedN: 1
-expectedBG: 3.2
-bgError: 3.5
-upperLimit: 0.2*fb
-expectedUpperLimit: 0.302*fb

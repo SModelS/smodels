@@ -1,9 +1,0 @@
-Used the cutbased implementation for T2tt since efficiencies are available, so for this topology we are comparing the same kind of results
-UL cutbased, EM cut based.
-Used the BDT analysis for the the T6bbWW UL (for EM, only one mass plane is available,
-so we cannot produce the maps for the other mass planes) -> the BDT gives better limits.
-
-Lines digitized by hand (FA) ,
-since they cannot be retrive directly from data files provided i.e. not a suitable format for convert.py.
-
-

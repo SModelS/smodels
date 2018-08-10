@@ -1,7 +1,0 @@
-dataId: SR M100
-dataType: efficiencyMap
-observedN: 3
-expectedBG: 4.8
-bgError: 2.2
-upperLimit: 0.27*fb
-expectedUpperLimit: 0.323*fb

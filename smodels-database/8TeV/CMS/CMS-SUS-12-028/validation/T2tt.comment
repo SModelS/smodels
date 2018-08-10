@@ -1,5 +1,0 @@
-comment_by: Suchita Kulkarni
-date: Mon Dec 19 18:54:25 CET 2016
-comment: "provided by AL: The problem here is that the exclusion curve is wrong. Looking at the official plot they have no exclusion.
-I've added a "zero" exclusion curve, which seems consistent with our results.
-Added more points to the grid.'Official exclusion curve in the database was wrong'. Verdict do not use this result"

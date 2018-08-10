@@ -1,7 +1,0 @@
-dataId: E Tight
-dataType: efficiencyMap
-observedN: 5
-expectedBG: 2.9
-bgError: 1.8
-upperLimit: 0.41*fb
-expectedUpperLimit: 0.247*fb

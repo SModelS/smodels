@@ -1,9 +1,0 @@
-id: CMS-PAS-SUS-17-004
-sqrts: 13*TeV
-lumi: 35.9/fb
-prettyName: Multilepton EWK searches
-url: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-17-004/index.html
-comment: TChiHH, TChiZZ mass planes not provided. TChiWH/Z not implemented as BR(Chi20->H Chi10) = BR(Chi20->Chi10 Z)=0.5 provided for a single mass plane.
-private: False
-implementedBy: Juhi Dutta
-lastUpdate: 2017/12/28

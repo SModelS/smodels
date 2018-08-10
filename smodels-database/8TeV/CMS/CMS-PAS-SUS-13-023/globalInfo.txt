@@ -1,9 +1,0 @@
-id: CMS-PAS-SUS-13-023
-sqrts: 8*TeV
-lumi: 18.9/fb
-prettyName: hadronic stop
-url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13023
-comment: PAS:http://inspirehep.net/record/1387812/files/SUS-13-023-pas.pdf
-private: False
-implementedBy: Andre Lessa
-lastUpdate: 2016/10/1

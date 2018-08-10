@@ -1,7 +1,0 @@
-dataId: SL3j
-dataType: efficiencyMap
-observedN: 7
-expectedBG: 5.6
-bgError: 1.6
-upperLimit: 0.4*fb
-expectedUpperLimit: 0.335*fb

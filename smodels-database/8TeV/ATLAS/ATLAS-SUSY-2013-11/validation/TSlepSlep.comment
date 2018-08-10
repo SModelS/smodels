@@ -1,5 +1,0 @@
-comment_by: Andre Lessa
-date: Sab Dez 24 19:41:40 BRST 2016
-comment: "There is one bin at (225.24,89.82) which is about 2 orders of magnitude higher
-than the surrounding bins. Correspondingly a few points around this region region are not excluded in SModelS validation.
-This point is not shown in the original plot, but is present in the data."

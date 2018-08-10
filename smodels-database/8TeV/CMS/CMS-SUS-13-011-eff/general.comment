@@ -1,8 +1,0 @@
-EM for T2tt, cubased analysis.
-
-Only one mass plane is provided for T6bbWW (x = 0.5) for cutbased analysis.
-
-Lines digitized by hand (FA) for T2tt or saved inside a .C macro for the T6bbWW,
-since they cannot be retrive directly from data files provided i.e. not a suitable format for convert.py .
-
-

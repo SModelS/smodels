@@ -1,7 +1,0 @@
-dataId: SRZb
-dataType: efficiencyMap
-observedN: 23
-expectedBG: 22.0
-bgError: 5.0
-upperLimit: 0.67*fb
-expectedUpperLimit: 0.715*fb

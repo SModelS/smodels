@@ -1,7 +1,0 @@
-dataId: E Medium
-dataType: efficiencyMap
-observedN: 41
-expectedBG: 30.0
-bgError: 8.0
-upperLimit: 1.41*fb
-expectedUpperLimit: 0.984*fb

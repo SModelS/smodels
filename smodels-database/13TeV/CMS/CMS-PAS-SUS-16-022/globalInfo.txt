@@ -1,8 +1,0 @@
-id: CMS-PAS-SUS-16-022
-sqrts: 13*TeV
-lumi: 12.9/fb
-prettyName: >= 3 leptons + Etmiss
-url: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-022/
-comment: https://cds.cern.ch/record/2205165
-implementedBy: Federico Ambrogi
-lastUpdate: 2017/2/7

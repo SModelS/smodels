@@ -1,8 +1,0 @@
-id: CMS-PAS-SUS-13-016
-sqrts: 8.0*TeV
-lumi: 19.7/fb
-prettyName: 2 OS leptons + >= 4 (2 b-)jets + Etmiss
-url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13016
-private: False
-implementedBy: Federico A
-lastUpdate: 2016/9/29

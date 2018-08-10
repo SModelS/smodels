@@ -1,4 +1,0 @@
-I (FA) changed the txname of T1tbtb to T1btbt to follow the convention used for FastLim.
-Constraints and Conditions changed on 9 Oct 2016 (Federico+Wolfgang+Ushi discussion)
-Previuos comment by Andre: There is something wrong with T5WW (fig. 13), values leads to interMass > motherMass
-( but now the T5WW data is not appearing anymore in the database so FA removed it from the comments of globalInfo.txt )

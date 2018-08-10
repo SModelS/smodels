@@ -1,6 +1,0 @@
-comment_by: Suchita Kulkarni
-date: Mon Dec 19 18:57:46 CET 2016
-comment: "Explanation: The official plot (https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2012-166//figaux_04.png) 
-has many holes in the upper limits. No upper limits for 300 GeV < other < 400 GeV and LSP  ~ > 25 GeV. 
-This causes bad interpolation, leaving us with under exclusion everywhere. 
-Same logic applies for mother < 200 GeV. verdict: Discard T6bbWW due to nonuniform upper limit map." 

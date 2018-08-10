@@ -1,5 +1,0 @@
-comment_by: Andre Lessa
-date: Sex Dez 23 23:48:15 BRST 2016
-comment: "All the plots seem ok, except for a single (over)excluded point in the inter=0.75*x+0.25*y plane.
-This is due to the bin (290,160) in the original data which has a smaller upper limit value. Hence this
-point gets excluded. Since everything is consistent, we use this result."

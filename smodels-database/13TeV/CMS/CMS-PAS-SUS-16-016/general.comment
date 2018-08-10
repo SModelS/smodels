@@ -1,5 +1,0 @@
-comment_by: Federico_Ambrogi
-date: 02/07/2017
-comment: "The exclusion curves included in the official root file have a TMultiGraph
-format, which is not handled currently by convert.py, so I digitized them
-(obs,exp) by hand."

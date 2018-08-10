@@ -1,7 +1,0 @@
-dataId: em: mT2 > 110
-dataType: efficiencyMap
-observedN: 5
-expectedBG: 4.4
-bgError: 2.0
-upperLimit: 0.35*fb
-expectedUpperLimit: 0.327*fb
