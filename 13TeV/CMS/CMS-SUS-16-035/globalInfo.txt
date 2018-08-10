@@ -1,0 +1,9 @@
+id: CMS-SUS-16-035
+sqrts: 13*TeV
+lumi: 35.9/fb
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-035/index.html
+arxiv: https://arxiv.org/abs/1704.07323
+publication: Eur.Phys.J. C77 (2017) no.9, 578, http://dx.doi.org/10.1140/epjc/s10052-017-5079-z
+contact: cms-phys-conveners-sus@cern.ch
+implementedBy: Juhi Dutta
+lastUpdate: 2017/12/28

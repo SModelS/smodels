@@ -1,0 +1,9 @@
+id: CMS-SUS-16-034
+sqrts: 13*TeV
+lumi: 35.9/fb
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-034/index.html
+arxiv: https://arxiv.org/abs/1709.08908
+publication: Submitted to J. High Energy Phys. 
+contact: cms-phys-conveners-sus@cern.ch
+implementedBy: Juhi Dutta
+lastUpdate: 2017/12/28
