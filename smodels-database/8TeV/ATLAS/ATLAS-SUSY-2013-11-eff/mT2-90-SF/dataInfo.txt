@@ -1,7 +1,0 @@
-dataId: mT2-90-SF
-dataType: efficiencyMap
-observedN: 33
-expectedBG: 38.2
-bgError: 5.1
-upperLimit: 0.664*fb
-expectedUpperLimit: 0.836*fb

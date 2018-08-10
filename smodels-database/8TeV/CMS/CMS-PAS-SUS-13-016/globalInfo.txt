@@ -1,6 +1,0 @@
-id: CMS-PAS-SUS-13-016
-sqrts: 8.0*TeV
-lumi: 19.7/fb
-url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13016
-implementedBy: Federico A
-lastUpdate: 2016/9/29

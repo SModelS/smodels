@@ -1,7 +1,0 @@
-id: ATLAS-CONF-2012-166
-sqrts: 8.0*TeV
-lumi: 13.0/fb
-url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2012-166/
-supersededBy: ATLAS-SUSY-2013-15
-implementedBy: Federico A
-lastUpdate: 2016/9/29

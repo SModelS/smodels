@@ -1,8 +1,0 @@
-dataId: ar10
-dataType: efficiencyMap
-observedN: 108
-expectedBG: 86.1
-bgError: 10.871982339941507
-upperLimit: 1.466451*fb
-expectedUpperLimit: 0.825423*fb
-aggregated: SR2LbX;SR2MbX;SR2HbX

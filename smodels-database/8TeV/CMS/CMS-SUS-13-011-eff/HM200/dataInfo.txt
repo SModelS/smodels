@@ -1,7 +1,0 @@
-dataId: HM200
-dataType: efficiencyMap
-observedN: 11
-expectedBG: 17
-bgError: 5
-upperLimit: 4.9064E-01*fb
-expectedUpperLimit: 7.1149E-01*fb

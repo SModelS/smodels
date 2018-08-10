@@ -1,8 +1,0 @@
-id: ATLAS-SUSY-2014-03
-sqrts: 8*TeV
-lumi: 20.3/fb
-url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2014-03/
-arxiv: http://arxiv.org/abs/1501.01325
-publication: http://journals.aps.org/prl/abstract/10.1103/PhysRevLett.114.161801
-implementedBy: Federico A
-lastUpdate: 2016/9/29
