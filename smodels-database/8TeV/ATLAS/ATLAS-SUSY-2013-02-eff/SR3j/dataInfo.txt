@@ -1,0 +1,7 @@
+dataId: SR3j
+dataType: efficiencyMap
+observedN: 7
+expectedBG: 5
+bgError: 1.2
+upperLimit: 4.3344E-01*fb
+expectedUpperLimit: 3.3172E-01*fb

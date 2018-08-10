@@ -1,0 +1,7 @@
+id: CMS-PAS-EXO-16-036
+sqrts: 13*TeV
+lumi: 12.9/fb
+url: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/EXO-16-036/index.html
+contact: Andre Lessa <lessa.a.p@gmail.com>; Jan Heisig <heisig@physik.rwth-aachen.de>; SModelS
+implementedBy: Andre Lessa
+lastUpdate: 2018/8/3

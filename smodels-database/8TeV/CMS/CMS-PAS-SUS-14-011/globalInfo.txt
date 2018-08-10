@@ -1,0 +1,7 @@
+id: CMS-PAS-SUS-14-011
+sqrts: 8*TeV
+lumi: 19.3/fb
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS14011
+supersededBy: CMS-SUS-13-004
+implementedBy: Federico A
+lastUpdate: 2016/9/29
