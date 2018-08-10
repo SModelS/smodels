@@ -1,0 +1,7 @@
+id: CMS-PAS-EXO-16-036
+sqrts: 13*TeV
+lumi: 12.9/fb
+url: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/EXO-16-036/index.html
+contact: cms-pag-conveners-exotica@cern.ch
+implementedBy: Andre Lessa
+lastUpdate: 2018/2/20

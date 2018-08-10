@@ -1,0 +1,9 @@
+id: CMS-SUS-16-042
+sqrts: 13*TeV
+lumi: 35.9/fb
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-042/index.html
+arxiv: http://arxiv.org/abs/1709.09814
+publication: Submitted to Phys. Lett. B
+contact: cms-phys-conveners-sus@cern.ch
+implementedBy: Juhi Dutta
+lastUpdate: 2017/12/28

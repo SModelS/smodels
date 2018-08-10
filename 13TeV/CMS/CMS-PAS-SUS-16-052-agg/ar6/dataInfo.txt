@@ -1,0 +1,8 @@
+dataId: ar6
+dataType: efficiencyMap
+observedN: 495
+expectedBG: 506.0
+bgError: 37.907782842049734
+upperLimit: 2.248646*fb
+expectedUpperLimit: 2.540469*fb
+aggregated: SR1LbX;SR1MbX;SR1HbX
