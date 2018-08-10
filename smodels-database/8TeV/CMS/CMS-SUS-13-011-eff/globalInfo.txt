@@ -1,0 +1,8 @@
+id: CMS-SUS-13-011
+sqrts: 8*TeV
+lumi: 19.5/fb
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13011
+arxiv: arXiv:1308.1586v2
+publication: Eur. Phys. J. C 73 (2013) 2677
+implementedBy: Federico A
+lastUpdate: 2016/9/29

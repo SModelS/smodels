@@ -1,0 +1,8 @@
+dataId: ar3
+dataType: efficiencyMap
+observedN: 23
+expectedBG: 11.8
+bgError: 2.4147463634924478
+upperLimit: 0.597945*fb
+expectedUpperLimit: 0.262096*fb
+aggregated: SR1VLaY
