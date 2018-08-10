@@ -394,9 +394,9 @@ class TxTPrinter(BasicPrinter):
             for dataset in obj.datasets:
                 for txname in dataset.txnameList:
                     for el in txname._topologyList.getElements():
-                        if not str(el) in listOfelements: listOfelements.append(str(el))
+                        if not el.toStr() in listOfelements: listOfelements.append(el.toStr())
             for el in listOfelements:
-                output += "\t    " + str(el) + "\n"
+                output += "\t    " + el + "\n"
 
         return output
     
@@ -698,6 +698,7 @@ class PyPrinter(BasicPrinter):
         elDic["Masses (GeV)"] = [[m.asNumber(GeV) for m in br] for br in obj.getMasses()]
         elDic["PIDs"] = obj.getPIDs()
         elDic["Weights (fb)"] = {}
+        elDic["final states"] = obj.getFinalStates()
         sqrts = [info.sqrts.asNumber(TeV) for info in obj.weight.getInfo()]
         allsqrts = sorted(list(set(sqrts)))
         for ssqrts in allsqrts:

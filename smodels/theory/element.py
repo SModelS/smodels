@@ -120,6 +120,16 @@ class Element(object):
         elStr = elStr.replace(" ", "").replace("'", "")
         return elStr
     
+    def toStr(self):
+        """
+        Returns a string with the element represented in bracket notation,
+        including the final states, e.g. [[[jet]],[[jet]] (MET,MET)
+        """
+        
+        elStr = str(self)+' '+str(tuple(self.getFinalStates())).replace("'","")
+        
+        return elStr
+    
     def sortBranches(self):
         """
         Sort branches. The smallest branch is the first one.

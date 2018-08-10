@@ -61,7 +61,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
 * a list of all the |express| considered (if **printDatabase** = True). Note that this list corresponds to all the results
   selected in the **database** options (see |parameters|). If **addAnaInfo** = True,
   for each |expres| entry a list of all the simplified models (or |elements|) constrained by the analysis
-  is also shown using the :ref:`bracket notation <bracketNotation>`:
+  is also shown using the :ref:`bracket notation <bracketNotation>` (including the :ref:`final states <final stateOdd>`):
 
 .. literalinclude:: /images/gluino_squarks.slha.log
    :lines: 10-22,769-778    
@@ -74,7 +74,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   weight, the PIDs of the :ref:`intermediate particles <odd states>` contributing to the |element| and the element ID:
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 892-937
+   :lines: 1068-1133
    
 
 * a list of all the |theory predictions| obtained and the corresponding |expres| upper limit.
@@ -89,11 +89,16 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   being constrained, such as their masses, IDs and PIDs, is also shown.
   
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 17854-17890
+   :lines: 95323-95342,95376-95388
 
-* summary information about the :ref:`missing topologies <topCoverage>`, if **testCoverage** = True. 
-  The total missing topology cross section
-  corresponds to the sum of cross sections of all |elements| which are not tested by any |expres|.
+* summary information about the :ref:`missing topologies <topCoverage>`, if **testCoverage** = True.
+  The first information corresponds to the total input cross-section considered, which corresponds
+  to the cross-section summed over all elements after decomposition. Note that this value
+  might differ from the total input model cross-section, since it includes
+  the :ref:`lifetime reweighting <lifetimeWeight>` and the effect of skipping elements
+  with a weight below the :ref:`minimum decomposition weight <minweight>`. 
+  The total missing topology cross section shown corresponds to the sum of cross sections 
+  of all |elements| which are not tested by any |expres|.
   If, however, the |element| is constrained by one or more |express|, but its mass is outside the
   efficiency or upper limit grids (see |EMrs| and |ULrs|), its cross section is included in the 
   total cross section outside the grid. Finally, the |elements| which contribute to the 
@@ -101,23 +106,23 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   long decays or with asymmetric branches (see :ref:`coverage tool <topCoverage>` for more details)
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 18223-18226
+   :lines: 96948-96952
        
 
 * detailed information about the missing topologies with highest cross sections.
   The |element| cross section (weight) as well as its description in :ref:`bracket notation <bracketNotation>`
-  is included. If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
+  and :ref:`final states <final stateOdd>` is included. If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
   These IDs can be traced back to the corresponding |elements| using the |decomposition| information
   obtained with **printDecomp** = True and **addElementInfo** = True.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 18229-18233 
+   :lines: 96955-96959 
    
 * detailed information about the topologies which are outside the  |express| grid.
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 18252-18256  
+   :lines: 96978-96982
    
 * information about the missing topologies with long cascade decays.
   The long cascade decays are classified by the initially produced mother particles.
@@ -126,7 +131,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 18259-18265     
+   :lines: 96993-96997     
 
 * information about the missing topologies with asymmetric decays.
   The asymmetric branch decays are classified by the initially produced mother particles.
@@ -135,7 +140,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 18282-18286    
+   :lines: 97016-97020    
 
    
 
@@ -178,15 +183,20 @@ Below we describe in detail the blocks contained in the summary output:
   Finally, if  **computeStatistics** = True, the :math:`\chi^2` and likelihood values (for |EMrs|) are printed:
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 10-23
+   :lines: 10-18,40-44
 
 * the maximum value for the (theory cross section)/(observed upper limit) ratio. If this value is
   higher than *1* the input model is likely excluded by one of the |express| (see :ref:`confronting predictions <confrontPredictions>`)
  
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 113-114
+   :lines: 373-374
 
 * summary information about the :ref:`missing topologies <topCoverage>`, if **testCoverage** = True. 
+  The first information corresponds to the total input cross-section considered, which corresponds
+  to the cross-section summed over all elements after decomposition. Note that this value
+  might differ from the total input model cross-section, since it includes
+  the :ref:`lifetime reweighting <lifetimeWeight>` and the effect of skipping elements
+  with a weight below the :ref:`minimum decomposition weight <minweight>`.
   The total missing topology cross section
   corresponds to the sum of all |elements| cross sections which are not tested by any |expres|.
   If, however, the |element| is constrained by one or more |express|, but its mass is outside the
@@ -196,30 +206,30 @@ Below we describe in detail the blocks contained in the summary output:
   long decays or with asymmetric branches (see :ref:`coverage tool <topCoverage>` for more details)
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 116-119
+   :lines: 376-380
        
 
 * detailed information about the missing topologies with highest cross sections.
   The |element| cross section (weight) as well as its description in :ref:`bracket notation <bracketNotation>`
-  is included.
+  and :ref:`final states <final stateOdd>`  is included.
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 122-126 
+   :lines: 383-387 
    
 * detailed information about the topologies which are outside the  |express| grid:
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 135-139
+   :lines: 396-400
    
 * information about the missing topologies with long cascade decays:
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 140-144
+   :lines: 405-409
 
 * information about the missing topologies with asymmetric decays:
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 153-157
+   :lines: 418-422
 
 
 .. _pyOut:
@@ -255,15 +265,16 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   the signal region (|dataset| ID), the *sqrts* and luminosity, the constrained simplified models (|txnames|),
   the signal cross section (theory prediction), the corresponding observed
   upper limit and the maximum condition violation (see :ref:`upper limit conditions <ULconditions>`) are shown.
-  Furthermore, the masses of the |elements| contributing to the signal cross section and the :math:`\chi^2` and
-  likelihood values (if **computeStatistics** = True) are also included.
+  The masses of the |elements| contributing to the signal cross section (if unique) and the :math:`\chi^2`
+  likelihood values (if **computeStatistics** = True) are also included. Finally, if **addTxWeights** = True,
+  the weight contribution of each txname is also included: 
   
 .. literalinclude:: /images/gluino_squarks.slha.py
    :lines: 5-9
 
 * a list of missing topologies (if **testCoverage** = True), stored under the *Missed Topologies* key.
   For each list entry, the |element| cross section (weight), the |element| IDs contributing to the topology and the |element|
-  description in :ref:`bracket notation <bracketNotation>` is included.
+  description in :ref:`bracket notation <bracketNotation>` and :ref:`final states <final stateOdd>`  is included.
 
 .. literalinclude:: /images/gluino_squarks.slha.py
    :lines: 10-11
@@ -271,7 +282,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
 * a list of topologies which are outside the  |express| grid (if **testCoverage** = True),
   stored under the *Outside Grid* key.
   For each list entry, the |element| cross section (weight)
-  and the |element| description in :ref:`bracket notation <bracketNotation>` is included.
+  and the |element| description in :ref:`bracket notation <bracketNotation>` and :ref:`final states <final stateOdd>`  is included.
 
 .. literalinclude:: /images/gluino_squarks.slha.py
    :lines: 12  
@@ -307,7 +318,7 @@ we simply show below an excerpt of the xml file to illustrate the output format:
 
 .. literalinclude:: /images/gluino_squarks.slha.xml
    :language: xml
-   :lines: 1-2,85,300-328,45077,45078-45104
+   :lines: 1-2,141-171,417458-417487
    
    
 .. _slhaOut:
@@ -344,17 +355,17 @@ Below we give a description of each block together with a sample output.
 * a list of missing topologies (up to 10) and their weights (if **testCoverage** = True):
 
 .. literalinclude:: /images/gluino_squarks.slha.smodelsslha
-   :lines: 20-23
+   :lines: 38-41
    
 * a list of topologies which are outside the |express| grid (if **testCoverage** = True):
 
 .. literalinclude:: /images/gluino_squarks.slha.smodelsslha
-   :lines: 32-34  
+   :lines: 50-52  
    
 * a list of topologies with long cascade decays (if **testCoverage** = True):
 
 .. literalinclude:: /images/gluino_squarks.slha.smodelsslha
-   :lines: 36-38 
+   :lines: 70-72 
   
 * a list of topologies with asymmetric branch decays (if **testCoverage** = True):
 

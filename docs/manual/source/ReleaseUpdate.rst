@@ -46,7 +46,7 @@ New in Version 1.2.0:
     non-MET signatures :ref:`final states <final stateOdd>` (e.g. heavy stable charged particles or HSCP)
   * Added :ref:`lifetime reweighting <lifetimeWeight>` at |decomposition| for meta-stable particles
   * Added :ref:`finalState property <final stateOdd>` for Elements
-  * Introduced :ref:`inclusive branches <inclusiveBranches>` and :ref:`particles <inclusiveParticles>` (for description of HSCP results)
+  * Introduction of :ref:`inclusive simplified models <inclusiveSMS>`
   * Inclusion of HSCP results in the database
 
 New in Version 1.1.3:
