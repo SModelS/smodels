@@ -1,0 +1,7 @@
+dataId: SRA250
+dataType: efficiencyMap
+observedN: 23
+expectedBG: 29
+bgError: 5
+upperLimit: 3.64*fb
+expectedUpperLimit: 4.91*fb

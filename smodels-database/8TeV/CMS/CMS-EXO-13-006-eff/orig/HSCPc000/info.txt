@@ -1,0 +1,68 @@
+sqrts: 8.00
+lumi: 18.8
+upperLimit: 0.984043
+exclusions: HSCPc000
+expectedexclusions: HSCPc000
+contact: Andre Lessa <lessa.a.p@gmail.com>, Jan Heisig <heisig@physik.rwth-aachen.de>
+pas: None
+prettyname: pure hscp
+url: None
+publisheddata: True
+private: 0
+order: nlonll
+comment: None
+condition: HSCPT0 -> None
+fuzzycondition: HSCPT0 -> None
+constraint: HSCPT0 -> [[],[]]
+category: HSCPT0 -> HSCP
+final states: HSCPT0 -> ['HSCP','HSCP']
+
+condition: HSCPT0M -> None
+fuzzycondition: HSCPT0M -> None
+constraint: HSCPT0M -> [[],[]]
+category: HSCPT0M -> HSCP
+final states: HSCPT0M -> ['MET','HSCP']
+
+
+condition: HSCPT1 -> None
+fuzzycondition: HSCPT1 -> None
+constraint: HSCPT1 -> [[['all','all']],[['all','all']]]
+category: HSCPT1 -> HSCP
+final states: HSCPT1 -> ['HSCP','HSCP']
+
+condition: HSCPT2 -> None
+fuzzycondition: HSCPT2 -> None
+constraint: HSCPT2 -> [[['all']],[['all']]]
+category: HSCPT2 -> HSCP
+final states: HSCPT2 -> ['HSCP','HSCP']
+
+condition: HSCPT2M -> None
+fuzzycondition: HSCPT2M -> None
+constraint: HSCPT2M -> [[['all']],[['all']]]
+category: HSCPT2M -> HSCP
+final states: HSCPT2M -> ['MET','HSCP']
+
+condition: HSCPT5 -> None
+fuzzycondition: HSCPT5 -> None
+constraint: HSCPT5 -> [[['all']],[['all'],['all']]]
+category: HSCPT5 -> HSCP
+final states: HSCPT5 -> ['HSCP','HSCP']
+
+
+condition: HSCPT5M -> None
+fuzzycondition: HSCPT5M -> None
+constraint: HSCPT5M -> [[['all']],[['all'],['all']]]
+category: HSCPT5M -> HSCP
+final states: HSCPT5M -> ['MET','HSCP']
+
+
+condition: HSCPT6 -> None
+fuzzycondition: HSCPT6 -> None
+constraint: HSCPT6 -> [[['all'],['all']],[['all'],['all']]]
+category: HSCPT6 -> HSCP
+final states: HSCPT6 -> ['HSCP','HSCP']
+
+
+
+
+analysisType: EffMap

@@ -1,0 +1,4 @@
+comment_by: Andre Lessa
+date: Sex Dez 23 08:59:23 BRST 2016
+comment: "In the original data some planes (such as Eq(mother,x)_Eq(inter0,150.00)_Eq(lsp,y)) have big gaps, making
+the interpolation unreliable. This result can not be used"

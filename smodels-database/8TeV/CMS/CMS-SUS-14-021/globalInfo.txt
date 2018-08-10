@@ -1,0 +1,10 @@
+id: CMS-SUS-14-021
+sqrts: 8*TeV
+lumi: 19.7/fb
+prettyName: soft leptons, low jet multiplicity, high ETmiss
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS14021
+arxiv: http://arxiv.org/abs/1512.08002
+comment: ISR jet. Only single lepton analysis data available and implemented.
+private: False
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2018/7/11

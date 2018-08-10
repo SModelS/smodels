@@ -1,0 +1,10 @@
+id: CMS-SUS-14-010
+sqrts: 8*TeV
+lumi: 19.5/fb
+prettyName: b-jets + 4 Ws (combination of 5 analyses, 0, 1, 2, ... leptons)
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS14010
+arxiv: http://arxiv.org/abs/arXiv:1412.4109
+publication: Phys. Lett. B 745 (2015) 5
+private: False
+implementedBy: Federico A
+lastUpdate: 2016/9/29

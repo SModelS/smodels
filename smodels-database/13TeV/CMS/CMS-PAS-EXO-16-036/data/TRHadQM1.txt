@@ -1,0 +1,23 @@
+txName: TRHadQM1
+constraint: [[],[]]
+condition: None
+susyProcess: pp --> stop stop, stop stop --> stop stop
+dataUrl: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/EXO-16-036/CMS-PAS-EXO-16-036_Figure_003-b.png
+source: CMS
+validated: True
+axes: [[x], [x]]
+finalState: ['RHadronQ', 'RHadronQ']
+upperLimits: [[[[9.9180E+01*GeV],[9.9180E+01*GeV]],1.0992E-02*pb],
+[[[1.9455E+02*GeV],[1.9455E+02*GeV]],6.4550E-03*pb],
+[[[3.9891E+02*GeV],[3.9891E+02*GeV]],4.7320E-03*pb],
+[[[6.0054E+02*GeV],[6.0054E+02*GeV]],1.4420E-03*pb],
+[[[7.9673E+02*GeV],[7.9673E+02*GeV]],1.4051E-03*pb],
+[[[9.9837E+02*GeV],[9.9837E+02*GeV]],1.4928E-03*pb],
+[[[1.2000E+03*GeV],[1.2000E+03*GeV]],1.6058E-03*pb],
+[[[1.3935E+03*GeV],[1.3935E+03*GeV]],1.7927E-03*pb],
+[[[1.5978E+03*GeV],[1.5978E+03*GeV]],2.1027E-03*pb],
+[[[1.7967E+03*GeV],[1.7967E+03*GeV]],2.4971E-03*pb],
+[[[2.0011E+03*GeV],[2.0011E+03*GeV]],3.0396E-03*pb],
+[[[2.1973E+03*GeV],[2.1973E+03*GeV]],3.7928E-03*pb],
+[[[2.3962E+03*GeV],[2.3962E+03*GeV]],5.2900E-03*pb],
+[[[2.6005E+03*GeV],[2.6005E+03*GeV]],6.0530E-03*pb]]

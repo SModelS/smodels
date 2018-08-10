@@ -1,0 +1,12 @@
+id: CMS-SUS-13-007
+sqrts: 8*TeV
+lumi: 19.3/fb
+prettyName: 1 lepton + >= 2 b-jets + Etmiss
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13007
+arxiv: http://arxiv.org/abs/arXiv:1311.4937
+publication: http://www.sciencedirect.com/science/article/pii/S037026931400255X
+contact: Loukas Gouskos <loukas.gouskos@cern.ch>, Markus Stoye <Markus.Stoye@cern.ch>
+comment: Only two mass planes for T5tttt; implemented Delta Phi method
+private: False
+implementedBy: Andre Lessa
+lastUpdate: 2016/10/11

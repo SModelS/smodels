@@ -1,0 +1,5 @@
+comment_by: Andre Lessa
+date: Sab Dez 24 00:29:45 BRST 2016
+comment: "The exclusion curve only considers left handed squarks. Therefore the plot has to be validated
+with T6WWoff_left. However, even using only left-handed squarks the plane lsp=60 still has large
+jumps (at low msquark) from bin to bin. Therefore interpolation is unreliable and we do not use this result."

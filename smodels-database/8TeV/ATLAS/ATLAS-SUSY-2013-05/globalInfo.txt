@@ -1,0 +1,12 @@
+id: ATLAS-SUSY-2013-05
+sqrts: 8.0*TeV
+lumi: 20.1/fb
+prettyName: 0 leptons + 2 b-jets + Etmiss
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-05/
+arxiv: http://arxiv.org/abs/1308.2631
+publication: http://link.springer.com/article/10.1007/JHEP10%282013%29189
+supersedes: ATLAS_CONF_2013_001;ATLAS_CONF_2013_053
+comment: upper limits for T6bbWWC150 are not public
+private: False
+implementedBy: Andre Lessa
+lastUpdate: 2017/6/6

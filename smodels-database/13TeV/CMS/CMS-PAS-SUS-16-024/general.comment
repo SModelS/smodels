@@ -1,0 +1,5 @@
+comment_by: Federico_Ambrogi
+date: 02/15/2017
+comment: "Note: TChiChipmStauStau and TChiChipmStauL do not have the case on intermediate sneutrino, since they should be heavy and decoupled.
+SLHA used for validation contains sneutrino, so might have to introduce a scale factor in the constraints ?
+From Wolfgang A. I came to know internally that there might be problems with root files, they might not be reliable. For TChiWZoff, we now require also the Z to be offshell, so with respect to the old format we have a few lines less."

@@ -1,0 +1,26 @@
+Figure      table        topology               object
+Fig4        tb. 8        T6ZZtt180              expected exclusion line
+Fig4        tb. 9        T6ZZtt180              expected exclusion line +sigma
+Fig4        tb. 10       T6ZZtt180              expected exclusion line -sigma
+Fig4        tb. 11       T6ZZtt180              observed exclusion line
+Fig4        tb. 12       T6ZZtt180              observed exclusion line +sigma
+Fig4        tb. 13       T6ZZtt180              observed exclusion line -sigma
+AuxFig6     tb. 33       T6ZZtt180              upper limit
+
+COMMENT ON NAMES: there are files with T6ttZZ and T6ZZtt the content is the same! Once we are sure about the naming convention we can delete the wrong ones.
+
+T6ZZttD180
+
+	Fig. 6	http://hepdata.cedar.ac.uk/resource/6161/figAuxiliaryFigure6.png
+
+	limit			limit_T6ZZtt.txt		http://hepdata.cedar.ac.uk/view/ins1286622/d33/input	comment
+	expectedlimit		file	link	comment
+
+	Fig.4	http://hepdata.cedar.ac.uk/resource/6161/figFigure4.png
+
+	exclusion		exclusion_T6ZZtt.txt	http://hepdata.cedar.ac.uk/view/ins1286622/d11/input	comment
+	exclusionp1		exclusionp1_T6ZZtt.txt	http://hepdata.cedar.ac.uk/view/ins1286622/d12/input	comment
+	exclusionm1		exclusionm1_T6ZZtt.txt	http://hepdata.cedar.ac.uk/view/ins1286622/d13/input	comment
+	expectedexclusion	expectexclusion_T6ZZtt.txt	http://hepdata.cedar.ac.uk/view/ins1286622/d8/input	comment
+	expectedexclusionp1	expectexclusionp1_T6ZZtt.txt	http://hepdata.cedar.ac.uk/view/ins1286622/d9/input	comment
+	expectedexclusionm1	expectexclusionm1_T6ZZtt.txt	http://hepdata.cedar.ac.uk/view/ins1286622/d10/input	comment

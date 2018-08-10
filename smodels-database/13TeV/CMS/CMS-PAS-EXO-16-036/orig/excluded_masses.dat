@@ -1,0 +1,5 @@
+#Excluded masses from the digitized plot:
+m_stau (direct production) = 368 GeV
+m_stop (direct production) = 1197 GeV
+m_gluino (direct production, 50% gluballs) = 1722 GeV
+m_gluino (direct production, 10% gluballs) = 1810 GeV

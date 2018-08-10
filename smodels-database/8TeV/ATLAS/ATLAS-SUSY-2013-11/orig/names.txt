@@ -1,0 +1,52 @@
+TSlepSlep
+
+	Fig.(aux) 20c 	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-11/figaux_20c.png
+	limit			limit_TSlepSlep.txt	http://hepdata.cedar.ac.uk/view/ins1286761/d67	comment
+
+	Fig. 8c 	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-11/fig_08c.png
+	exclusion		exclusion_TSlepSlep.txt	http://hepdata.cedar.ac.uk/view/ins1286761/d25	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	expectedexclusion_TSlepSlep.txt	http://hepdata.cedar.ac.uk/view/ins1286761/d26	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+TChiWZ
+
+	Fig.(aux) 19b 	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-11/figaux_19b.png
+	limit			limit_TChiWZ.txt	http://hepdata.cedar.ac.uk/view/ins1286761/d64	comment
+
+	Fig. 7a 	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-11/fig_07a.png
+	exclusion		exclusion_TChiWZ.txt	http://hepdata.cedar.ac.uk/view/ins1286761/d17	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	expectedexclusion_TChiWZ.txt	http://hepdata.cedar.ac.uk/view/ins1286761/d18	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+TChiWW
+
+	Fig.(aux) 18 	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-11/figaux_18.png
+	limit			limit_TChiWW.txt	http://hepdata.cedar.ac.uk/view/ins1286761/d62	comment
+
+	Fig. 6a 	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-11/fig_06a.png
+	exclusion		exclusion_TChiWW.txt	http://hepdata.cedar.ac.uk/view/ins1286761/d14	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	file	link	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+
+TChipChimSlepSnu050
+
+	Fig.(aux) 19a 	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-11/figaux_19a.png
+	limit			limit_TChipChimSlepSnu050.txt	http://hepdata.cedar.ac.uk/view/ins1286761/d63	comment
+
+	Fig. 5 	https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-11/fig_05.png
+	exclusion		exclusion_TChipChimSlepSnu050.txt	http://hepdata.cedar.ac.uk/view/ins1286761/d12	comment
+	exclusionp1		file	link	comment
+	exclusionm1		file	link	comment
+	expectedexclusion	expectedexclusion_TChipChimSlepSnu050.txt	http://hepdata.cedar.ac.uk/view/ins1286761/d13	comment
+	expectedexclusionp1	file	link	comment
+	expectedexclusionm1	file	link	comment
+

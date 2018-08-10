@@ -1,0 +1,7 @@
+dataId: incHL3j_m
+dataType: efficiencyMap
+observedN: 5
+expectedBG: 2.7
+bgError: 0.9
+upperLimit: 0.38*fb
+expectedUpperLimit: 0.235*fb

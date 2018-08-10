@@ -1,0 +1,13 @@
+id: CMS-SUS-16-050
+sqrts: 13.0*TeV
+lumi: 35.9/fb
+prettyName: 0L + top tag
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-050/index.html
+arxiv: https://arxiv.org/abs/1710.11188
+publication: Phys. Rev. D 97 (2018) 012007, http://dx.doi.org/10.1103/PhysRevD.97.012007
+contact: CMS collaboration, cms-phys-conveners-sus@cern.ch
+supersedes: CMS-PAS-SUS-16-050
+comment: no charm tagging is performed in analyses, therefore we apply the T5tctc result also to up quarks
+private: False
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2018/2/16

@@ -1,0 +1,1 @@
+validationData = [{'kfactor': 1.0, 'signal': 23.621070608856, 'axes': [603.7, 314.8], 'dataset': None, 'UL': 79.78099999999996, 'slhafile': 'T6ttWW_603_393_314_603_393_314.slha', 'condition': 0.0}, {'kfactor': 1.0, 'signal': 17.204433445300005, 'axes': [631.4, 359.6], 'dataset': None, 'UL': 104.78208000000006, 'slhafile': 'T6ttWW_631_449_359_631_449_359.slha', 'condition': 0.0}]

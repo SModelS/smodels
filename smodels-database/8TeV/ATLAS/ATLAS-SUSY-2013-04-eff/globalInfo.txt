@@ -1,0 +1,13 @@
+id: ATLAS-SUSY-2013-04
+sqrts: 8.0*TeV
+lumi: 20.3/fb
+prettyName: 0 leptons + >= 7-10 jets + Etmiss
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-04/
+arxiv: http://arxiv.org/abs/1308.1841
+publication: http://link.springer.com/article/10.1007/JHEP10%282013%29130
+contact: ATLAS collaboration for T1tttt model; SModelS for all other models.
+supersedes: ATLAS-CONF-2012-103
+comment: Erratum: JHEP01(2014)109. T1tttt official efficiency maps from ATLAS collaboration; T1bbbb,T2tt,T1btbt,T5,T6bbWW,T5WW and T5ZZ efficiency maps created by the SModelS collaboration using MadAnalysis5
+private: False
+implementedBy: Andre Lessa
+lastUpdate: 2017/6/7

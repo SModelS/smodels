@@ -1,0 +1,11 @@
+sqrts: 8.0*TeV
+lumi: 20.3/fb
+id: ATLAS-CONF-2013-062
+prettyName: ATLAS soft leptons
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-062/ http://cds.cern.ch/record/1557779
+publication: SUSY-2013-20
+comment: T5WWLSP060 and T6WWLSP060 originally have xvalue on y-axes, changed by us to M2. Will be supers. by ATLAS-SUSY-2013-20 (no data yet). Other topologies available but not with 3 mass planes.
+private: False
+implementedBy: Federico A
+lastUpdate: 2016/9/29
+

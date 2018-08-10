@@ -1,0 +1,12 @@
+comment_by: Suchita Kulkarni
+date: Wed Dec 21 09:26:36 CET 2016
+comment: "Comment by Andre Lessa brought forward
+comment_by: AL
+date: 2015/3/23
+comment: The data grid has a gap on the upper left side of 
+the exclusion curve. As a result, the interpolation in this 
+region may give UL values higher than the ones used by ATLAS. 
+Consequently there is a small band of allowed points in this region. 
+Also, the point (112.5,12.5) with UL = 930*pb increases the UL values 
+in the low x region (100 < x < 170), resulting in allowed points 
+below the excluded curve. Otherwise, the results seem consistent."

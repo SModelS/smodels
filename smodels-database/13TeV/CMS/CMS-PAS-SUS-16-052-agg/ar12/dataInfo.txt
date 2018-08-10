@@ -1,0 +1,8 @@
+dataId: ar12
+dataType: efficiencyMap
+observedN: 26
+expectedBG: 20.6
+bgError: 3.4828149534536
+upperLimit: 0.485453*fb
+expectedUpperLimit: 0.353834*fb
+aggregated: SR2LbY;SR2MbY;SR2HbY

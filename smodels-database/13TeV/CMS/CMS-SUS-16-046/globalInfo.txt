@@ -1,0 +1,12 @@
+id: CMS-SUS-16-046
+sqrts: 13*TeV
+lumi: 35.9/fb
+prettyName: Photon + Etmiss
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-046/index.html
+arxiv: http://arxiv.org/abs/1711.08008
+publication: Submitted to Phys. Lett. B 
+contact: cms-phys-conveners-sus@cern.ch
+comment: Moriond 2017. Several UL maps in the context of gauge-mediated SSB. Implemented T5gg and T6gg; others with mixed BRs are not useable. NB results only for high gluino mass.
+private: False
+implementedBy: Juhi Dutta
+lastUpdate: 2017/12/28

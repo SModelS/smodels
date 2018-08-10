@@ -1,0 +1,7 @@
+dataId: E Loose
+dataType: efficiencyMap
+observedN: 166
+expectedBG: 113.0
+bgError: 21.0
+upperLimit: 4.55*fb
+expectedUpperLimit: 2.33*fb

@@ -1,0 +1,12 @@
+id: ATLAS-SUSY-2013-09
+sqrts: 8*TeV
+lumi: 20.3/fb
+prettyName: 2 SS leptons
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-09/
+arxiv: http://arxiv.org/abs/1404.2500
+publication: http://link.springer.com/article/10.1007/JHEP06(2014)035
+contact: ATLAS collaboration
+supersedes: ATLAS-CONF-2013-007; ATLAS-CONF-2012-151
+private: False
+implementedBy: Federico A
+lastUpdate: 2016/9/29

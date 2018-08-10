@@ -1,0 +1,10 @@
+id: ATLAS-CONF-2013-047
+sqrts: 8.0*TeV
+lumi: 20.3/fb
+prettyName: 0 leptons + 2-6 jets + Etmiss
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-047/; http://cds.cern.ch/record/1547563
+supersededBy: ATLAS-SUSY-2013-02
+comment: T5WWLSP060 and T6WWLSP060 originally have xvalue on y-axes, changed by us to M2
+private: False
+implementedBy: Andre Lessa
+lastUpdate: 2016/10/13

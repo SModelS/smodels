@@ -1,0 +1,12 @@
+id: CMS-SUS-16-039
+sqrts: 13*TeV
+lumi: 35.9/fb
+prettyName: Multilepton EWK searches
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-039/index.html
+arxiv: https://arxiv.org/abs/1709.05406
+publication: Submitted to J. High Energy Phys.
+contact: cms-phys-conveners-sus@cern.ch
+comment: Moriond 2017. Negative values in TChiChipmSlepL and TChiChipmSlepStau root files. Added TChiChipmStauStau.
+private: False
+implementedBy: Juhi Dutta
+lastUpdate: 2018/1/21

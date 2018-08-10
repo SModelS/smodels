@@ -1,0 +1,6 @@
+comment_by: Andre Lessa
+date: Qua Dez 28 09:53:00 BRST 2016
+comment: "It looks like the grid values are for the *expected UL* and not
+the observed ones. The exclusion region given by SModelS agrees perfectly with
+the *expected* exclusion curve. This result has been updated with new root files which contain both expected
+and observed ULs. The current data still refers to the old version, so we do not use this result."

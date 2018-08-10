@@ -1,0 +1,11 @@
+id: ATLAS-SUSY-2015-01
+sqrts: 13*TeV
+lumi: 3.2/fb
+prettyName: 2 b-jets + Etmiss
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2015-01/
+arxiv: https://arxiv.org/abs/1606.08772v2
+publication: http://link.springer.com/article/10.1140/epjc/s10052-016-4382-4
+contact: ATLAS collaboration
+private: False
+implementedBy: Andre Lessa
+lastUpdate: 2017/5/11

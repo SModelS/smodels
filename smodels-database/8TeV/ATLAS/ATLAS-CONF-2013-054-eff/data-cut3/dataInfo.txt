@@ -1,0 +1,7 @@
+dataId: 9j50 flavor 0 b-jets
+dataType: efficiencyMap
+observedN: 5
+expectedBG: 3.3
+bgError: 0.7
+upperLimit: 0.34*fb
+expectedUpperLimit: 0.265*fb

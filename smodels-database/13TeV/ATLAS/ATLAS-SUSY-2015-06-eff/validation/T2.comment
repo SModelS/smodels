@@ -1,0 +1,5 @@
+omment_by: Andre_lessa
+date: 06/02/2017
+comment: "There is some overexclusion around msquark = 700 GeV. The cross-section and efficiencies seem consistent with the official result.
+A possible reason is that the official data grid is quite sparse, resulting in some interpolation uncertainties. Otherwise everything
+seems consistent and we use this result."

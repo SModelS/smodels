@@ -1,0 +1,74 @@
+
+*dataset:
+*location: Auxiliary Figure 14b
+*dscomment: Efficiency for SR3 in the direct stop pair production. The efficiency is the ratio between the expected signal rate calculated with simulated data passing all the reconstruction level cuts applied to reconstructed objects, and the signal rate for an ideal detector (with perfect particle identification and no measurement resolution effects).
+*reackey: P P --> STOP STOP X
+*obskey: ACC
+*qual: SQRT(S) IN GEV : 13000.0
+*yheader: SIGNAL EFFICIENCY
+*xheader: M(STOP1) IN GEV : M(NEUTRALINO1) IN GEV 
+*data: x : x : y 
+ 450; 50; 1.079;
+ 450; 150; 0.768;
+ 450; 200; 1.37;
+ 500; 0; 2.13;
+ 500; 50; 0.683;
+ 500; 100; 0.24;
+ 550; 250; 0.193;
+ 600; 0; 0.80;
+ 600; 50; 0.764;
+ 600; 100; 0.809;
+ 600; 200; 0.766;
+ 600; 250; 0.313;
+ 600; 300; 0.761;
+ 600; 400; 0.806;
+ 650; 0; 0.75;
+ 650; 50; 0.814;
+ 650; 100; 0.588;
+ 650; 200; 0.459;
+ 650; 250; 0.679;
+ 650; 300; 0.664;
+ 650; 350; 0.833;
+ 650; 400; 0.281;
+ 700; 0; 0.69;
+ 700; 50; 0.965;
+ 700; 100; 0.809;
+ 700; 200; 0.935;
+ 700; 250; 0.459;
+ 700; 300; 0.44;
+ 700; 350; 0.724;
+ 700; 400; 0.037;
+ 750; 0; 0.84;
+ 750; 50; 0.724;
+ 750; 100; 0.631;
+ 750; 200; 0.59;
+ 750; 250; 0.738;
+ 750; 300; 0.663;
+ 750; 350; 0.606;
+ 750; 400; 1.109;
+ 750; 450; 1.283;
+ 750; 500; 0.371;
+ 800; 0; 0.76;
+ 800; 50; 0.623;
+ 800; 100; 0.694;
+ 800; 200; 0.592;
+ 800; 250; 0.772;
+ 800; 300; 0.692;
+ 800; 350; 0.652;
+ 800; 400; 0.92;
+ 800; 450; 0.454;
+ 800; 500; 0.758;
+ 800; 550; 0.584;
+ 850; 0; 0.75;
+ 850; 50; 0.797;
+ 850; 100; 0.735;
+ 850; 200; 0.78;
+ 850; 300; 0.694;
+ 850; 400; 1.096;
+ 850; 500; 0.847;
+ 850; 600; 1.019;
+ 900; 0; 0.55;
+ 900; 200; 0.607;
+ 900; 400; 0.697;
+ 900; 600; 0.37;
+*dataend:

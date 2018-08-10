@@ -1,0 +1,12 @@
+id: ATLAS-SUSY-2013-23
+sqrts: 8*TeV
+lumi: 20.3/fb
+prettyName: 1 lepton + 2 b-jets (or 2 photons) + Etmiss (mbb = mH)
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-23/
+arxiv: http://arxiv.org/abs/1501.07110
+publication: http://link.springer.com/article/10.1140/epjc/s10052-015-3408-7
+supersedes: ATLAS-CONF-2013-093
+comment: Used combined limit
+private: False
+implementedBy: Federico A
+lastUpdate: 2016/9/29

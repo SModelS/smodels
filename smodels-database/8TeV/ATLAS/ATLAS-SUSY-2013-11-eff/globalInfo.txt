@@ -1,0 +1,13 @@
+id: ATLAS-SUSY-2013-11
+sqrts: 8.0*TeV
+lumi: 20.3/fb
+prettyName: 2 leptons (e,mu) + Etmiss
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-11/
+arxiv: http://arxiv.org/abs/1403.5294
+publication: http://link.springer.com/article/10.1007/JHEP05(2014)071
+contact: SModelS
+supersedes: ATLAS-CONF-2013-049
+comment: TSlepSlep,TChiWW and TChipChimSlepSnu efficiency maps created by the SModelS collaboration using MadAnalysis5
+private: False
+implementedBy: Andre Lessa
+lastUpdate: 2017/5/31

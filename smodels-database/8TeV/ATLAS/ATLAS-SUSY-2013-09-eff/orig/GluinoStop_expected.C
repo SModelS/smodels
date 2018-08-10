@@ -1,0 +1,54 @@
+{
+//========= Macro generated from object: GluinoStop_expected/
+//========= by ROOT version5.34/14
+   
+   graph = new TGraph(42);
+   graph->SetName("GluinoStop_expected");
+   graph->SetTitle("");
+   graph->SetFillColor(1);
+   graph->SetMarkerStyle(21);
+   graph->SetMarkerSize(0.3);
+   graph->SetPoint(0,700,480);
+   graph->SetPoint(1,1070,855.3634855);
+   graph->SetPoint(2,1085.912453,875.875);
+   graph->SetPoint(3,1090,881.8530373);
+   graph->SetPoint(4,1107.885981,905.125);
+   graph->SetPoint(5,1110,908.2167526);
+   graph->SetPoint(6,1127.16532,905.125);
+   graph->SetPoint(7,1127.934367,875.875);
+   graph->SetPoint(8,1119.469047,846.625);
+   graph->SetPoint(9,1110,820.6513002);
+   graph->SetPoint(10,1109.270353,817.375);
+   graph->SetPoint(11,1107.714971,788.125);
+   graph->SetPoint(12,1110,770.0637655);
+   graph->SetPoint(13,1112.813875,758.875);
+   graph->SetPoint(14,1120.125983,729.625);
+   graph->SetPoint(15,1122.416952,700.375);
+   graph->SetPoint(16,1130,672.41779);
+   graph->SetPoint(17,1130.350653,671.125);
+   graph->SetPoint(18,1137.52784,641.875);
+   graph->SetPoint(19,1139.040083,612.625);
+   graph->SetPoint(20,1137.14683,583.375);
+   graph->SetPoint(21,1133.684437,554.125);
+   graph->SetPoint(22,1130,525.579091);
+   graph->SetPoint(23,1129.908814,524.875);
+   graph->SetPoint(24,1126.491796,495.625);
+   graph->SetPoint(25,1124.824508,466.375);
+   graph->SetPoint(26,1122.212749,437.125);
+   graph->SetPoint(27,1119.600989,407.875);
+   graph->SetPoint(28,1116.713608,378.625);
+   graph->SetPoint(29,1110,355.2481356);
+   graph->SetPoint(30,1108.855276,349.375);
+   graph->SetPoint(31,1103.154205,320.125);
+   graph->SetPoint(32,1098.284141,290.875);
+   graph->SetPoint(33,1095.246847,261.625);
+   graph->SetPoint(34,1092.209553,232.375);
+   graph->SetPoint(35,1090,221.1548364);
+   graph->SetPoint(36,1086.456979,203.125);
+   graph->SetPoint(37,1070,179.8396323);
+   graph->SetPoint(38,1065.784484,173.875);
+   graph->SetPoint(39,1050,152.5679474);
+   graph->SetPoint(40,1044.060955,144.625);
+   graph->SetPoint(41,1044.060955,0);
+   graph->Draw("");
+}
