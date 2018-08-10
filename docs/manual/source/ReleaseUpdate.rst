@@ -42,10 +42,10 @@ The major novelties of this release are as follows:
 New in Version 1.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * :doc:`Decomposition <Decomposition>` and experimental results properly handle 
-    non-MET BSM :ref:`final states <finalStates>` (e.g. heavy stable charged particles or HSCP)
-  * Added :ref:`lifetime reweighting <lifetimeWeight>` at decomposition for meta-stable particles
-  * Added :ref:`finalState property <finalStates>` for Elements (backwards compatible)
+  * Decomposition and experimental results can include
+    non-MET signatures :ref:`final states <final stateOdd>` (e.g. heavy stable charged particles or HSCP)
+  * Added :ref:`lifetime reweighting <lifetimeWeight>` at |decomposition| for meta-stable particles
+  * Added :ref:`finalState property <final stateOdd>` for Elements
   * Introduced :ref:`inclusive branches <inclusiveBranches>` and :ref:`particles <inclusiveParticles>` (for description of HSCP results)
   * Inclusion of HSCP results in the database
 
