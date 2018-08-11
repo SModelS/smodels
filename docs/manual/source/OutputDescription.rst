@@ -61,7 +61,8 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
 * a list of all the |express| considered (if **printDatabase** = True). Note that this list corresponds to all the results
   selected in the **database** options (see |parameters|). If **addAnaInfo** = True,
   for each |expres| entry a list of all the simplified models (or |elements|) constrained by the analysis
-  is also shown using the :ref:`bracket notation <bracketNotation>` (including the :ref:`final states <final stateOdd>`):
+  is also shown using the :ref:`bracket notation <bracketNotation>` including 
+  the Z\ :sub:`2`-odd :ref:`final state class <final stateOdd>`:
 
 .. literalinclude:: /images/gluino_squarks.slha.log
    :lines: 10-22,769-778    
@@ -111,7 +112,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
 
 * detailed information about the missing topologies with highest cross sections.
   The |element| cross section (weight) as well as its description in :ref:`bracket notation <bracketNotation>`
-  and :ref:`final states <final stateOdd>` is included. If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
+  and :ref:`BSM final state classification <final stateOdd>` are included. If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
   These IDs can be traced back to the corresponding |elements| using the |decomposition| information
   obtained with **printDecomp** = True and **addElementInfo** = True.
 

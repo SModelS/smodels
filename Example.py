@@ -34,7 +34,7 @@ def main():
     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
 
     # Set main options for decomposition
-    sigmacut = 0.3 * fb
+    sigmacut = 0.01 * fb
     mingap = 5. * GeV
 
     # Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input)
