@@ -1,7 +1,7 @@
 .. image:: http://smodels.hephy.at/images/banner720.png
 
 ==============
-SModelS v1.1
+SModelS v1.2
 ==============
 
 **SModelS -- A tool for interpreting simplified-model results from the LHC.**
