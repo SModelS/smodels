@@ -383,25 +383,24 @@ Full information on unconstrained cross sections
 ================================================================================
 Missing topologies with the highest cross sections (up to 10):
 Sqrts (TeV)   Weight (fb)        Element description
- 13.0  1.482E+02    #  [[[jet],[W]],[[jet,jet],[W]]] ('MET', 'MET')
- 13.0  1.445E+02    # [[[jet,jet],[W]],[[jet],[jet,jet],[W]]] ('MET', 'MET')
- 13.0  1.047E+02    #  [[[b,t],[W]],[[jet,jet],[W]]] ('MET', 'MET')
- 13.0  8.754E+01    #      [[[jet]],[[jet,jet],[W]]] ('MET', 'MET')
- 13.0  8.654E+01    # [[[jet,jet],[W]],[[jet,jet],[higgs]]] ('MET', 'MET')
- 13.0  7.520E+01    #      [[[jet],[W]],[[b,t],[W]]] ('MET', 'MET')
- 13.0  7.333E+01    # [[[jet,jet],[W]],[[jet],[b,t],[W]]] ('MET', 'MET')
- 13.0  7.333E+01    # [[[b,t],[W]],[[jet],[jet,jet],[W]]] ('MET', 'MET')
- 13.0  6.576E+01    # [[[jet],[W]],[[jet],[jet,jet],[W]]] ('MET', 'MET')
- 13.0  6.214E+01    # [[[jet],[W]],[[jet,jet],[higgs]]] ('MET', 'MET')
+ 13.0  1.482E+02    #        [[[jet],[W]],[[jet,jet],[W]]](MET,MET)
+ 13.0  1.445E+02    # [[[jet,jet],[W]],[[jet],[jet,jet],[W]]](MET,MET)
+ 13.0  1.047E+02    #        [[[b,t],[W]],[[jet,jet],[W]]](MET,MET)
+ 13.0  8.754E+01    #            [[[jet]],[[jet,jet],[W]]](MET,MET)
+ 13.0  8.654E+01    # [[[jet,jet],[W]],[[jet,jet],[higgs]]](MET,MET)
+ 13.0  7.520E+01    #            [[[jet],[W]],[[b,t],[W]]](MET,MET)
+ 13.0  7.333E+01    #  [[[jet,jet],[W]],[[jet],[b,t],[W]]](MET,MET)
+ 13.0  7.333E+01    #  [[[b,t],[W]],[[jet],[jet,jet],[W]]](MET,MET)
+ 13.0  6.576E+01    #  [[[jet],[W]],[[jet],[jet,jet],[W]]](MET,MET)
+ 13.0  6.214E+01    #    [[[jet],[W]],[[jet,jet],[higgs]]](MET,MET)
 ================================================================================
 Contributions outside the mass grid (up to 10):
 Sqrts (TeV)   Weight (fb)        Element description
- 13.0  1.590E+00    #              [[[jet]],[[t,t]]] ('MET', 'MET')
- 13.0  1.438E+00    #          [[[t],[W]],[[t],[W]]] ('MET', 'MET')
- 13.0  2.871E-01    #  [[[b],[higgs]],[[b],[higgs]]] ('MET', 'MET')
- 13.0  2.921E-02    #          [[[b],[W]],[[b],[W]]] ('MET', 'MET')
- 13.0  1.872E-02    #              [[[W]],[[higgs]]] ('MET', 'MET')
- 13.0  1.335E-02    #      [[[jet],[W]],[[jet],[W]]] ('MET', 'MET')
+ 13.0  1.438E+00    #                [[[t],[W]],[[t],[W]]](MET,MET)
+ 13.0  2.871E-01    #        [[[b],[higgs]],[[b],[higgs]]](MET,MET)
+ 13.0  2.921E-02    #                [[[b],[W]],[[b],[W]]](MET,MET)
+ 13.0  1.872E-02    #                    [[[W]],[[higgs]]](MET,MET)
+ 13.0  1.335E-02    #            [[[jet],[W]],[[jet],[W]]](MET,MET)
 ================================================================================
 Missing topos: long cascade decays (up to 10 entries), sqrts = 13 TeV:
 Mother1 Mother2 Weight (fb) # allMothers

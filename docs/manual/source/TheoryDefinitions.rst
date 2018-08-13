@@ -48,7 +48,7 @@ A representation of an element is shown below:
    :width: 40%
    
 An element may also hold information about its corresponding 
-weight (cross section times branching ratio times efficiency). [*]_
+weight (cross section times branching ratio times efficiency). [#f1]_
 The overall properties of an element are illustrated in the scheme below:
 
 .. _topscheme:
@@ -77,7 +77,7 @@ in SModelS.
 
 Vertices
 ^^^^^^^^
-Each Z\ :sub:`2`-odd decay is represented by a vertex containing its final states (one Z\ :sub:`2`-odd
+Each Z\ :sub:`2`-odd decay is represented by a vertex containing the outgoing states (one Z\ :sub:`2`-odd
 state and the Z\ :sub:`2`-even particles), as shown in the :ref:`scheme above <topscheme>`.
 
 .. _final statesEven:
@@ -85,15 +85,15 @@ state and the Z\ :sub:`2`-even particles), as shown in the :ref:`scheme above <t
 Z\ :sub:`2`-even Final States
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Final states indicate all Z\ :sub:`2`-even states coming out of a vertex (see :ref:`scheme above <topscheme>`).
-In most cases, these correspond to Standard Model particles (electrons, gauge bosons, Higgs,...).
-Note that, if the input model contains BSM states which are Z\ :sub:`2`-even (such as additional Higgs bosons),
+Z\ :sub:`2`-even final states coming out of a vertex (see :ref:`scheme above <topscheme>` usually
+correspond to Standard Model particles (electrons, gauge bosons, Higgs,...).
+However, if the input model contains  Z\ :sub:`2`-even BSM states (such as additional Higgs bosons),
 these also appear as final states.
 In contrast, stable or long-lived Z\ :sub:`2`-odd particles which might appear in the detector (either as MET or charged tracks)
-are *not* classified as final states.
+are *not* classified as final states [#f2]_ .
 
 
-* Z\ :sub:`2`-even **states are defined (and can be easily modified) in** smodels/share/default_particles.py 
+* Z\ :sub:`2`-even **states are defined in** smodels/share/default_particles.py 
 
 .. _odd states:
 
@@ -112,14 +112,14 @@ If an intermediate state is stable and neutral, it is considered as a MET signal
 Z\ :sub:`2`-odd Final State Class
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Besides the intermediate Z\ :sub:`2`-odd final states, due to the assumed Z\ :sub:`2` symmetry,
+Besides the intermediate Z\ :sub:`2`-odd BSM states, due to the assumed Z\ :sub:`2` symmetry,
 the element must also contain one stable Z\ :sub:`2`-odd final state (at least
-in collider scales). The quantum numbers of this final state is essential for defining which
+in collider scales). The quantum numbers of this BSM final state is essential for defining which
 type of signature this element represents.
-In an element the final state quantum numbers are mapped to a final state class,
+In an element the  Z\ :sub:`2`-odd final state  quantum numbers are mapped to a final state class,
 as defined in the `particleNames module <theory.html#module-theory.particleNames>`_ .
 Some examples of final state classes are: 'MET', 'HSCP' and 'RHadronQ'.
-New final states can also be easily defined in this module.  
+New final state classes can also be easily defined in this module.  
 
 
 .. _branch:
@@ -137,7 +137,7 @@ The diagram below illustrates an example of a branch.
 
 The structure of each branch is fully defined by its number of vertices and the number of 
 |final states| coming out of each vertex. 
-Furthermore,  the branch also holds the information about the particle labels for the |final states|
+Furthermore,  the branch also holds the information about the particle labels for the  Z\ :sub:`2`-even |final states|
 coming out of each vertex, the masses of the :ref:`intermediate states <odd states>` 
 and the Z\ :sub:`2`-odd :ref:`final state class <final stateOdd>` (e.g. 'MET'), as shown below.
 
@@ -166,7 +166,7 @@ The brackets are ordered and nested in the following way.
 The outermost brackets correspond to the :ref:`branches <branch>` of the |element|.
 The branches are sorted according to their size (see :ref:`element sorting <elementsorting>`) 
 and each branch contains an *ordered* list of :ref:`vertices <vertex>`.
-Each vertex contains a list of the |final states| (sorted alphabetically) coming out of the vertex.
+Each vertex contains a list of the  Z\ :sub:`2`-even |final states| (sorted alphabetically) coming out of the vertex.
 Schematically, for the example in the :ref:`figure above <bracketnotation>`, we have::
 
    element = [branch1, branch2]
@@ -179,7 +179,7 @@ Schematically, for the example in the :ref:`figure above <bracketnotation>`, we 
 Using the above scheme it is possible to unambiguously describe each |element| with a simple list of nested brackets.
 However, in order to fully specify all the information relative to a single |element|, we must
 also include the list of :ref:`intermediate state <odd states>` masses, the list of Z\ :sub:`2`-odd
-:ref:`final state types <final stateOdd>` and the element weight.
+:ref:`final state classes <final stateOdd>` and the element weight.
 The :ref:`intermediate state <odd states>` masses can also be represented by a mass array
 for each branch, as shown below:
 
@@ -188,7 +188,7 @@ for each branch, as shown below:
 .. image:: images/massNotationB.png
    :width: 65%
    
-Finally the :ref:`final state types <final stateOdd>` can also
+Finally the Z\ :sub:`2`-odd :ref:`final state classes <final stateOdd>` can also
 be represented as a list in addition to the bracket notation:
 
 .. _bracketnotationFull:
@@ -204,11 +204,11 @@ Topologies
 It is often useful to classify |elements| according to their
 overall structure or topology.
 Each topology corresponds to an *undressed*
-|element|, removed of its
-|final states| and Z\ :sub:`2`-odd masses.
+|element|, removed of its  Z\ :sub:`2`-even
+|final states|,  Z\ :sub:`2`-odd final state class and Z\ :sub:`2`-odd masses.
 Therefore the topology is fully determined by its number of
 branches, number of vertices in each :ref:`branch <branch>` and number of
-|final states| coming out of each :ref:`vertex <vertex>`.
+ Z\ :sub:`2`-even |final states| coming out of each :ref:`vertex <vertex>`.
 An example of a topology is shown below:
 
 .. image:: images/globTopB.png
@@ -221,6 +221,10 @@ final states in each vertex).
 
 * **Topologies are described by the** `Topology Class <theory.html#theory.topology.Topology>`_   
 
-.. [*] In order to treat the UL and EM map results on the same footing,
+.. [#f1] In order to treat the UL and EM map results on the same footing,
    SModelS applies a trivial binary efficiency to elements for UL-type
    results as will be explained in detail later.
+   
+.. [#f2] In order to shorten the notation we sometimes refer to  Z\ :sub:`2`-even final states
+   simply as ''final states''. This should not be confused with the Z\ :sub:`2`-odd :ref:`final state
+   class <final stateOdd>`.

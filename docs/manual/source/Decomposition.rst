@@ -60,7 +60,7 @@ of decaying outside the detector.
 In order to deal with these cases, during decomposition each decay step is reweighted
 by the probability for the decay to be prompt (:math:`\mathcal{F}_{prompt}`). Also,
 for particles with small or zero width, an element where the particle does not decay
-is also included and reweight by the probability for the particle to decay *outside*
+is also included and reweighted by the probability for the particle to decay *outside*
 the detector (:math:`\mathcal{F}_{long}`).  
 This reweighting is illustrated in the figure below:
 
@@ -86,7 +86,10 @@ and CMS). Finally, we take the effective time dilation factor to be  :math:`\lan
 We point out that the above approximations are irrelevant if :math:`\Gamma` is very large (:math:`\mathcal{F}_{prompt} \simeq 1`
 and :math:`\mathcal{F}_{long} \simeq 0`) or close to zero (:math:`\mathcal{F}_{prompt} \simeq 0`
 and :math:`\mathcal{F}_{long} \simeq 1`). Only elements containing particles which have a considerable fraction of displaced
-decays will be sensitive to the values chosen above. 
+decays will be sensitive to the values chosen above.
+Furthermore, note that the above procedure discards the fraction of decays which take place within
+the detector (displaced decays). These are not considered by SModelS, since it can not currently
+handle displaced decay signatures.
 
 
 Following the above procedure it is possible to construct

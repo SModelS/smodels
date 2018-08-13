@@ -8,7 +8,7 @@ smodelsOutput = {
 'lumi (fb-1)': 35.9, 'dataType': 'upperLimit', 
 'r': 1.52127, 'r_expected': None, 'TxNames weights (fb)': {'T2': 11.687}},...] 
 'Missed Topologies': [{'sqrts (TeV)': 13.0, 'weight (fb)': 148.16, 
-'element': "[[[jet],[W]],[[jet,jet],[W]]] ('MET', 'MET')", 'element IDs': [987, 988,...]},...]
-'Outside Grid': [{'sqrts (TeV)': 13.0, 'weight (fb)': 1.58, 'element': "[[[jet]],[[t,t]]] ('MET', 'MET')"},...]
+'element': "[[[jet],[W]],[[jet,jet],[W]]](MET,MET)", 'element IDs': [987, 988,...]},...]
+'Outside Grid': [{'sqrts (TeV)': 13.0, 'weight (fb)': 1.58, 'element': "[[[jet]],[[t,t]]](MET,MET)"},...]
 'Long Cascades': [{'sqrts (TeV)': 13.0, 'weight (fb)': 369.58, 'mother PIDs': [[1000021, 2000002]]},...]
 'Asymmetric Branches': [{'sqrts (TeV)': 13.0, 'weight (fb)': 529.73, 'mother PIDs': [[1000021, 1000021]]},...]
