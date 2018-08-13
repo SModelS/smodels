@@ -359,8 +359,8 @@ class UncoveredList(object):
         #Create a new element with the general name in order to fix the branch ordering:
         newEl = Element(self.generalName(str(el)),finalState=el.getFinalStates())
         newEl.sortBranches()
-        name =str(newEl).replace("'","").replace(' ','')
-        name = name + ' (%s)'%(str(newEl.getFinalStates()).replace('[','').replace(']',''))
+        name = str(newEl) + ' (%s)'%(str(newEl.getFinalStates()).replace('[','').replace(']',''))
+        name = name.replace("'","").replace(' ','')
         for topo in self.topos:
             if name == topo.topo:
                 topo.contributingElements.append(el)
