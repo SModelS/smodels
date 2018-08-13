@@ -53,7 +53,7 @@ according to the information contained in the DECAY blocks. This procedure is re
 .. _lifetimeWeight:
 
 Within SModelS all the decays are assumed to be prompt and the last BSM particle appearing
-in the cascade decay decay is assumed to be stable (in detector scales).
+in the cascade decay is assumed to be stable (in detector scales).
 However, if a given BSM particle has a small (non-zero) width, its decay
 should not be considered prompt. Furthermore, it might have a non-negligible probability
 of decaying outside the detector.

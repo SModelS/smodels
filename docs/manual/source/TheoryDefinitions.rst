@@ -113,7 +113,7 @@ Z\ :sub:`2`-odd Final State Class
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Besides the intermediate Z\ :sub:`2`-odd final states, due to the assumed Z\ :sub:`2` symmetry,
-the element mulst also contain one stable Z\ :sub:`2`-odd final state (at least
+the element must also contain one stable Z\ :sub:`2`-odd final state (at least
 in collider scales). The quantum numbers of this final state is essential for defining which
 type of signature this element represents.
 In an element the final state quantum numbers are mapped to a final state class,
