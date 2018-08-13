@@ -387,7 +387,7 @@ Below we go step-by-step through this example code:
   and `topology  <theory.html#theory.topology.Topology>`_ objects:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 48-60
+   :lines: 47-60
 
 *output:*
 
@@ -399,7 +399,7 @@ Below we go step-by-step through this example code:
   Here, all results are used:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 64
+   :lines: 65
 
 Alternatively, the `getExpResults  <experiment.html#experiment.databaseObj.Database.getExpResults>`_ method
 can take as arguments specific results to be loaded.
@@ -408,12 +408,12 @@ can take as arguments specific results to be loaded.
   Below we show how to count the number of |ULrs| and |EMrs| loaded:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 68-75
+   :lines: 69-76
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 10
+   :lines: 11
 
 
 * *Compute the* |theory predictions| for each |expres|.
@@ -433,7 +433,7 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 14-21
+   :lines: 15-22
 
 * *Get the corresponding upper limit*. This value can
   be compared to the |theory prediction| to decide whether a model is excluded or not:
@@ -444,9 +444,9 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 22
+   :lines: 23
 
-* *Compute the r-value*, i.e. the ratio |theory prediction|/upper limit.
+* *Print the r-value*, i.e. the ratio |theory prediction|/upper limit.
   A value of :math:`r \geq 1` means that an experimental result excludes the input model.
   For |EMrs| also compute the :math:`\chi^2` and :ref:`likelihood <likelihoodCalc>`.
   Determine the most constraining result:
@@ -457,7 +457,7 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 23
+   :lines: 24-25
 
 * *Print the most constraining experimental result*. Using the largest *r*-value,
   determine if the model has been excluded or not by the selected |express|:
@@ -469,7 +469,7 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 322-323
+   :lines: 588-589
    
    
 * *Identify missing topologies*. Using the output from decomposition, identify
@@ -482,7 +482,7 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 333-336,343-350
+   :lines: 591-602,612-617
 
 
 It is worth noting that SModelS does not include any statistical treatment for
