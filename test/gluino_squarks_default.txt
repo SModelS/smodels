@@ -1,10 +1,10 @@
 Input status: 1
 Decomposition output status: 1 #decomposition was successful
-# Input File: /home/lessa/smodels-master/inputFiles/slha/gluino_squarks.slha
+# Input File: ./testFiles/slha/gluino_squarks.slha
 # maxcond = 0.2
 # minmassgap = 5.0
 # sigmacut = 0.03
-# Database version: unittest113
+# Database version: unittest120
 ================================================================================
 #Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected
 
@@ -50,7 +50,7 @@ ATLAS-CONF-2013-037  8.00E+00    0.0  7.318E-04  4.000E-01  1.830E-03  2.091E-03
 
  
 ================================================================================
-The highest r value is = 0.38759578901373026
+The highest r value is = 0.3875957890137304
 
 Total cross section considered (fb):  3.533E+03
 Total missing topology cross section (fb):  3.066E+03
@@ -62,25 +62,25 @@ Full information on unconstrained cross sections
 ================================================================================
 Missing topologies with the highest cross sections (up to 10):
 Sqrts (TeV)   Weight (fb)        Element description
- 13.0  1.482E+02    #                 [[[jet],[W]],[[jet,jet],[W]]]
- 13.0  1.446E+02    #                                 [[[W]],[[W]]]
- 13.0  1.440E+02    #       [[[jet,jet],[W]],[[jet],[jet,jet],[W]]]
- 13.0  1.047E+02    #                 [[[b,t],[W]],[[jet,jet],[W]]]
- 13.0  8.728E+01    #                     [[[jet]],[[jet,jet],[W]]]
- 13.0  8.654E+01    #         [[[jet,jet],[W]],[[jet,jet],[higgs]]]
- 13.0  7.520E+01    #                     [[[jet],[W]],[[b,t],[W]]]
- 13.0  7.309E+01    #           [[[jet,jet],[W]],[[jet],[b,t],[W]]]
- 13.0  7.309E+01    #           [[[b,t],[W]],[[jet],[jet,jet],[W]]]
- 13.0  6.466E+01    #           [[[jet],[W]],[[jet],[jet,jet],[W]]]
+ 13.0  1.482E+02    #        [[[jet],[W]],[[jet,jet],[W]]](MET,MET)
+ 13.0  1.446E+02    #                        [[[W]],[[W]]](MET,MET)
+ 13.0  1.440E+02    # [[[jet,jet],[W]],[[jet],[jet,jet],[W]]](MET,MET)
+ 13.0  1.047E+02    #        [[[b,t],[W]],[[jet,jet],[W]]](MET,MET)
+ 13.0  8.728E+01    #            [[[jet]],[[jet,jet],[W]]](MET,MET)
+ 13.0  8.654E+01    # [[[jet,jet],[W]],[[jet,jet],[higgs]]](MET,MET)
+ 13.0  7.520E+01    #            [[[jet],[W]],[[b,t],[W]]](MET,MET)
+ 13.0  7.309E+01    #  [[[jet,jet],[W]],[[jet],[b,t],[W]]](MET,MET)
+ 13.0  7.309E+01    #  [[[b,t],[W]],[[jet],[jet,jet],[W]]](MET,MET)
+ 13.0  6.466E+01    #  [[[jet],[W]],[[jet],[jet,jet],[W]]](MET,MET)
 ================================================================================
 Contributions outside the mass grid (up to 10):
 Sqrts (TeV)   Weight (fb)        Element description
- 13.0  2.071E+02    #                             [[[W]],[[higgs]]]
- 13.0  2.333E+01    #                         [[[jet]],[[jet,jet]]]
- 13.0  3.762E+00    #                         [[[b],[W]],[[b],[W]]]
- 13.0  1.532E+00    #                             [[[jet]],[[t,t]]]
- 13.0  9.944E-01    #                             [[[jet]],[[b,b]]]
- 13.0  6.802E-01    #                         [[[b,b]],[[jet,jet]]]
+ 13.0  2.071E+02    #                    [[[W]],[[higgs]]](MET,MET)
+ 13.0  2.333E+01    #                [[[jet]],[[jet,jet]]](MET,MET)
+ 13.0  3.762E+00    #                [[[b],[W]],[[b],[W]]](MET,MET)
+ 13.0  1.532E+00    #                    [[[jet]],[[t,t]]](MET,MET)
+ 13.0  9.944E-01    #                    [[[jet]],[[b,b]]](MET,MET)
+ 13.0  6.802E-01    #                [[[b,b]],[[jet,jet]]](MET,MET)
 ================================================================================
 Missing topos: long cascade decays (up to 10 entries), sqrts = 13 TeV:
 Mother1 Mother2 Weight (fb) # allMothers
