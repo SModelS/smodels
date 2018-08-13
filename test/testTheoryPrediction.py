@@ -85,18 +85,18 @@ class IntegrationTest(unittest.TestCase):
         
         #Test long-lived case:
         slhafile = './testFiles/slha/hscpTest_long.slha'
-        expValue = [0.0735]
+        expValue = [0.0743]
         self.checkPrediction(slhafile, expID, expValue)
 
         #Test displaced case:
         slhafile = './testFiles/slha/hscpTest_mid.slha'
-        expValue = [7.95e-8]
+        expValue = [2.20e-7]
         self.checkPrediction(slhafile, expID, expValue)
 
 
         #Test short-lived case:
         slhafile = './testFiles/slha/hscpTest_short.slha'
-        expValue = [1.75e-10]
+        expValue = [5.98e-10]
         self.checkPrediction(slhafile, expID, expValue)
 
 

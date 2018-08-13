@@ -200,7 +200,7 @@ def _getDictionariesFromSLHA(slhafile):
 
 
 
-def _getPromptDecays(slhafile,brDic,l_inner=1.*mm,gb_inner=1.3,l_outer=10.*m,gb_outer=1.3):
+def _getPromptDecays(slhafile,brDic,l_inner=1.*mm,gb_inner=1.3,l_outer=10.*m,gb_outer=1.43):
     """
     Using the widths in the slhafile, reweights the BR dictionary with the fraction
     of prompt decays and add the fraction of "long-lived decays".
