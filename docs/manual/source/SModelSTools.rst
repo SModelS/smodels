@@ -144,6 +144,16 @@ usage example is: ::
 Running this will print the status flag and a message with potential warnings
 and error messages.
 
+.. note:: In SModelS versions prior to 1.2, the SLHA file checker also
+          checked for the existence of displaced vertices or heavy charged
+          particles in the input file. Since the inclusion of HSCP signatures in
+          SModelS, these checks are no longer done by the SLHA file checker.
+          However, if the input model contains a considerable fraction of cross-section
+          going into displaced vertex signatures, a warning is
+          issued on the screen when running SModelS.
+          
+          
+
 .. _databaseBrowser:
 
 Database Browser
