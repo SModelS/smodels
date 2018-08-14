@@ -43,7 +43,7 @@ New in Version 1.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * Decomposition and experimental results can include
-    non-MET BSM final states :ref:`final states <final stateOdd>` (e.g. heavy stable charged particles)
+    non-MET BSM :ref:`final states <final stateOdd>` (e.g. heavy stable charged particles)
   * Added :ref:`lifetime reweighting <lifetimeWeight>` at |decomposition| for meta-stable particles
   * Added :ref:`finalState property <final stateOdd>` for Elements
   * Introduction of :ref:`inclusive simplified models <inclusiveSMS>`
