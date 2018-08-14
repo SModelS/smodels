@@ -52,16 +52,13 @@ according to the information contained in the DECAY blocks. This procedure is re
 
 .. _lifetimeWeight:
 
-Within SModelS all the decays are assumed to be prompt and the last BSM particle appearing
-in the cascade decay is assumed to be stable (in detector scales).
-However, if a given BSM particle has a small (non-zero) width, its decay
-should not be considered prompt. Furthermore, it might have a non-negligible probability
-of decaying outside the detector.
-In order to deal with these cases, during decomposition each decay step is reweighted
-by the probability for the decay to be prompt (:math:`\mathcal{F}_{prompt}`). Also,
-for particles with small or zero width, an element where the particle does not decay
-is also included and reweighted by the probability for the particle to decay *outside*
-the detector (:math:`\mathcal{F}_{long}`).  
+Within SModelS all BSM particles are assumed to either decay promptly or to be stable (in detector scales).
+To deal with BSM particles with small (non-zero) width SModelS computes the probability for prompt decay
+(:math:`\mathcal{F}_{prompt}`) as well as the probability for the particle to decay *outside*
+the detector (:math:`\mathcal{F}_{long}`). Note that decays within the detector are absent in the current description.
+The branching fraction rescaled by :math:`\mathcal{F}_{long}` describes the probability of a decay where the daughter BSM state
+traverses the detector (thus is considered stable),
+while the branching fraction rescaled by :math:`\mathcal{F}_{prompt}` will be followed by the next step in the cascade decay.
 This reweighting is illustrated in the figure below:
 
 .. _decomp1b:

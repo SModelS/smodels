@@ -85,7 +85,7 @@ state and the Z\ :sub:`2`-even particles), as shown in the :ref:`scheme above <t
 Z\ :sub:`2`-even Final States
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Z\ :sub:`2`-even final states coming out of a vertex (see :ref:`scheme above <topscheme>` usually
+Z\ :sub:`2`-even final states coming out of a vertex (see :ref:`scheme above <topscheme>`) usually
 correspond to Standard Model particles (electrons, gauge bosons, Higgs,...).
 However, if the input model contains  Z\ :sub:`2`-even BSM states (such as additional Higgs bosons),
 these also appear as final states.
@@ -100,10 +100,9 @@ are *not* classified as final states [#f2]_ .
 Z\ :sub:`2`-odd Intermediate States
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The Z\ :sub:`2`-odd states are always assumed to consist of BSM particles with Z\ :sub:`2`
+The intermediate Z\ :sub:`2`-odd states are always assumed to consist of BSM particles with prompt Z\ :sub:`2`
 conserving decays of the form: (Z\ :sub:`2`-odd state) :math:`\rightarrow`  (Z\ :sub:`2`-odd state') + |final states|.
 The only information kept from the intermediate states are their masses (see :ref:`scheme above <topscheme>`).
-If an intermediate state is stable and neutral, it is considered as a MET signal.
 
 * Z\ :sub:`2`-odd **states are defined by the input model file** (see :ref:`model <parameterFileModel>` in |parameters|)
 
@@ -114,7 +113,7 @@ Z\ :sub:`2`-odd Final State Class
 
 Besides the intermediate Z\ :sub:`2`-odd BSM states, due to the assumed Z\ :sub:`2` symmetry,
 the element must also contain one stable Z\ :sub:`2`-odd final state (at least
-in collider scales). The quantum numbers of this BSM final state is essential for defining which
+in collider scales). The quantum numbers of this BSM final state are essential for defining which
 type of signature this element represents.
 In an element the  Z\ :sub:`2`-odd final state  quantum numbers are mapped to a final state class,
 as defined in the `particleNames module <theory.html#module-theory.particleNames>`_ .
