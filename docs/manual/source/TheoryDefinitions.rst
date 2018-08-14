@@ -137,7 +137,7 @@ The diagram below illustrates an example of a branch.
 The structure of each branch is fully defined by its number of vertices and the number of 
 |final states| coming out of each vertex. 
 Furthermore,  the branch also holds the information about the particle labels for the  Z\ :sub:`2`-even |final states|
-coming out of each vertex, the masses of the :ref:`intermediate states <odd states>` 
+coming out of each vertex, the masses of the Z\ :sub:`2`-odd states
 and the Z\ :sub:`2`-odd :ref:`final state class <final stateOdd>` (e.g. 'MET'), as shown below.
 
 
@@ -177,9 +177,9 @@ Schematically, for the example in the :ref:`figure above <bracketnotation>`, we 
 
 Using the above scheme it is possible to unambiguously describe each |element| with a simple list of nested brackets.
 However, in order to fully specify all the information relative to a single |element|, we must
-also include the list of :ref:`intermediate state <odd states>` masses, the list of Z\ :sub:`2`-odd
+also include the list of masses for the Z\ :sub:`2`-odd states, the list of Z\ :sub:`2`-odd
 :ref:`final state classes <final stateOdd>` and the element weight.
-The :ref:`intermediate state <odd states>` masses can also be represented by a mass array
+The masses for the BSM (Z\ :sub:`2`-odd) states can also be represented by a mass array
 for each branch, as shown below:
 
 .. _massnotation:

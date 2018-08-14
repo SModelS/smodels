@@ -55,11 +55,12 @@ according to the information contained in the DECAY blocks. This procedure is re
 Within SModelS all BSM particles are assumed to either decay promptly or to be stable (in detector scales).
 To deal with BSM particles with small (non-zero) width SModelS computes the probability for prompt decay
 (:math:`\mathcal{F}_{prompt}`) as well as the probability for the particle to decay *outside*
-the detector (:math:`\mathcal{F}_{long}`). Note that decays within the detector are absent in the current description.
+the detector (:math:`\mathcal{F}_{long}`). Note that decays within the detector (displaced decays) are not
+included in the decomposition.
 The branching fraction rescaled by :math:`\mathcal{F}_{long}` describes the probability of a decay where the daughter BSM state
 traverses the detector (thus is considered stable),
-while the branching fraction rescaled by :math:`\mathcal{F}_{prompt}` will be followed by the next step in the cascade decay.
-This reweighting is illustrated in the figure below:
+while the branching fraction rescaled by :math:`\mathcal{F}_{prompt}` corresponds to a prompt decay which
+will be followed by the next step in the cascade decay. This reweighting is illustrated in the figure below:
 
 .. _decomp1b:
 
