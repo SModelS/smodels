@@ -5,7 +5,7 @@ Release v1.2.0, Wed 15 Aug 2018
   * Added lifetime reweighting at decomposition for meta-stable particles
   * Added finalState property for Elements (backwards compatible)
   * Introduced inclusive branches and particles (for description of HSCP results)
-  * Inclusion of HSCP results in the database
+  * Inclusion of HSCP and R-hadron results in the database
 
 Release v1.1.3, Wed 08 Aug 2018
 =======================================================

@@ -47,7 +47,7 @@ New in Version 1.2.0:
   * Added :ref:`lifetime reweighting <lifetimeWeight>` at |decomposition| for meta-stable particles
   * Added :ref:`finalState property <final stateOdd>` for Elements
   * Introduction of :ref:`inclusive simplified models <inclusiveSMS>`
-  * Inclusion of HSCP results in the database
+  * Inclusion of HSCP and R-hadron results in the database
 
 New in Version 1.1.3:
 ^^^^^^^^^^^^^^^^^^^^^
