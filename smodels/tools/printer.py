@@ -169,6 +169,7 @@ class BasicPrinter(object):
         :return: True if the object has been added to the output. If the object does not belong
                 to the pre-defined printing list toPrint, returns False.
         """
+        
         for iobj,objType in enumerate(self.printingOrder):
             if isinstance(obj,objType):
                 self.toPrint[iobj] = obj
@@ -218,6 +219,7 @@ class BasicPrinter(object):
         :param obj: A object to be printed. Must match one of the types defined in formatObj
 
         """
+
         typeStr = type(obj).__name__
         try:
             formatFunction = getattr(self,'_format'+typeStr)
@@ -225,6 +227,7 @@ class BasicPrinter(object):
         except AttributeError as e:
             logger.debug('Error formating object %s: \n %s' %(typeStr,e))
             return False
+
 
 class TxTPrinter(BasicPrinter):
     """
@@ -322,7 +325,7 @@ class TxTPrinter(BasicPrinter):
         """
         Format data for a Element object.
 
-        :param obj: An Element object to be printed.
+        :param obj: A Element object to be printed.
         """
 
         output = ""
@@ -354,7 +357,6 @@ class TxTPrinter(BasicPrinter):
         if not hasattr(self,"printdatabase") or not self.printdatabase:
             return None
 
-        
         output = ""
         
         output += "   ======================================================= \n"
@@ -362,9 +364,11 @@ class TxTPrinter(BasicPrinter):
         output += " || \t \t Selected Experimental Results \t \t ||\n"
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
+        
 
         for expRes in obj.expResultList:    
             output += self._formatExpResult(expRes)
+
         return output+"\n"
 
 
@@ -374,14 +378,14 @@ class TxTPrinter(BasicPrinter):
 
         :param obj: A ExpResult object to be printed.
         """
-        
+
         txnames = []
-        for dataset in obj.datasets:            
+        for dataset in obj.datasets:
             for txname in dataset.txnameList:
                 tx = txname.txName
                 if not tx in txnames: txnames.append(tx)
 
-
+        txnames = sorted(txnames)
         output = ""
         output += "========================================================\n"
         output += "Experimental Result ID: " + obj.globalInfo.id + '\n'
@@ -428,7 +432,6 @@ class TxTPrinter(BasicPrinter):
             
             output += "Theory prediction: " + str(theoryPrediction.xsection.value) + "\n"
             output += "Theory conditions:"
-            
             if not theoryPrediction.conditions:
                 output += "  " + str(theoryPrediction.conditions) + "\n"
             else:
@@ -436,20 +439,17 @@ class TxTPrinter(BasicPrinter):
                 for cond in theoryPrediction.conditions:
                     condlist.append(theoryPrediction.conditions[cond])
                 output += str(condlist) + "\n"
-                
-            
 
             #Get upper limit for the respective prediction:
-            if expRes.datasets[0].dataInfo.dataType == 'upperLimit':
-                upperLimit = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass)
-                upperLimitExp = expRes.getUpperLimitFor(txname=theoryPrediction.txnames[0],mass=theoryPrediction.mass,expected=True)
-            elif expRes.datasets[0].dataInfo.dataType == 'efficiencyMap':
-                upperLimit = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId)              
-                upperLimitExp = expRes.getUpperLimitFor(dataID=theoryPrediction.dataset.dataInfo.dataId,expected=True)
+            upperLimit = theoryPrediction.getUpperLimit(expected=False)
+            upperLimitExp = theoryPrediction.getUpperLimit(expected=True)
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if not upperLimitExp is None:
                 output += "Expected experimental limit: " + str(upperLimitExp) + "\n"
+            output += "Observed r-Value: %s\n" %theoryPrediction.getRValue(expected=False)
+            if not upperLimitExp is None:
+                output += "Expected r-Value: %s\n" %theoryPrediction.getRValue(expected=True)
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
                 output += "Likelihood: " + str(theoryPrediction.likelihood) + "\n"
@@ -526,6 +526,7 @@ class TxTPrinter(BasicPrinter):
         
         return output
                       
+
 class SummaryPrinter(TxTPrinter):
     """
     Printer class to handle the printing of one single summary output.
@@ -571,7 +572,6 @@ class SummaryPrinter(TxTPrinter):
         rvalues = []
         output += "#Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected"
         output += "\n\n"
-        
         for theoPred in theoPredictions:
             expResult = theoPred.expResult
             datasetID = theoPred.dataset.dataInfo.dataId
@@ -599,26 +599,26 @@ class SummaryPrinter(TxTPrinter):
             output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
             output += "%5s " % theoPred.getmaxCondition()  # condition violation
             output += "%10.3E %10.3E " % (value.asNumber(fb), ul.asNumber(fb))  # theory cross section , expt upper limit
-            
-            
             if r_expected: output += "%10.3E %10.3E" % (r, r_expected)
             else: output += "%10.3E  N/A" %r
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
             txnameStr = str([str(tx) for tx in txnames])
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
-            output += " Txnames:  " + txnameStr + "\n"            
+            output += " Txnames:  " + txnameStr + "\n"
             if hasattr(theoPred,'expectedUL') and not theoPred.expectedUL is None:
                 output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)            
             
-            if not theoPred == obj._theoryPredictions[-1]: output += 80 * "-"+ "\n"
+            if not theoPred == obj.theoryPredictions[-1]: output += 80 * "-"+ "\n"
 
         output += "\n \n"
         output += 80 * "=" + "\n"
-        output += "The highest r value is = " + str(max(rvalues)) + "\n"        
+        output += "The highest r value is = " + str(max(rvalues)) + "\n"
 
         return output
             
+
+
 class PyPrinter(BasicPrinter):
     """
     Printer class to handle the printing of one single pythonic output
@@ -626,7 +626,7 @@ class PyPrinter(BasicPrinter):
     def __init__(self, output = 'stdout', filename = None):
         BasicPrinter.__init__(self, output, filename)
         self.name = "py"
-        self.printingOrder = [OutputStatus,TopologyList,TheoryPredictionList,Uncovered]
+        self.printingOrder = [OutputStatus,TopologyList,ResultList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
         
     def setOutPutFile(self,filename,overwrite=True):
@@ -651,7 +651,7 @@ class PyPrinter(BasicPrinter):
         outputDict = {}
         for obj in self.toPrint:
             if obj is None: continue
-            output = self._formatObj(obj)   
+            output = self._formatObj(obj)                
             if not output: continue  #Skip empty output
             outputDict.update(output)
                 
@@ -742,17 +742,17 @@ class PyPrinter(BasicPrinter):
         return {'OutputStatus' : infoDict}
 
 
-    def _formatTheoryPredictionList(self, obj):
+    def _formatResultList(self, obj):
         """
         Format data of the ResultList object.
 
         :param obj: A ResultList object to be printed.
         """
 
-        obj.sortTheoryPredictions()
+        obj.sort()
         
         ExptRes = []
-        for theoryPrediction in obj._theoryPredictions:            
+        for theoryPrediction in obj.theoryPredictions:            
             expResult = theoryPrediction.expResult
             dataset = theoryPrediction.dataset
             expID = expResult.globalInfo.id
@@ -796,7 +796,6 @@ class PyPrinter(BasicPrinter):
                         'dataType' : dataType}  
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
-
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 resDict['chi2'] = theoryPrediction.chi2
                 resDict['likelihood'] = theoryPrediction.likelihood                
@@ -861,59 +860,64 @@ class PyPrinter(BasicPrinter):
 
         missedTopos = []
         
-        obj.missingTopos.generalElements = sorted(obj.missingTopos.generalElements, 
-                                        key=lambda x: [x.missingX,str(x)], 
+        
+        for topo in obj.missingTopos.topos:
+            if topo.value > 0.: continue
+            for el in topo.contributingElements:
+                topo.value += el.missingX
+        obj.missingTopos.topos = sorted(obj.missingTopos.topos, 
+                                        key=lambda x: [x.value,str(x.topo)], 
                                         reverse=True)        
     
-        for genEl in obj.missingTopos.generalElements[:nprint]:
-            missed = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}          
+        for topo in obj.missingTopos.topos[:nprint]:
+            missed = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
+                                'element' : str(topo.topo)}           
             if hasattr(self,"addelementlist") and self.addelementlist:
                 contributing = []
-                for el in genEl._contributingElements:
+                for el in topo.contributingElements:
                     contributing.append(el.elID)
                 missed["element IDs"] = contributing
             missedTopos.append(missed)
             
         outsideGrid = []
-        obj.outsideGrid.generalElements = sorted(obj.outsideGrid.generalElements, 
-                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
+        for topo in obj.outsideGrid.topos:
+            if topo.value > 0.: continue
+            for el in topo.contributingElements:
+                topo.value += el.missingX
+        obj.outsideGrid.topos = sorted(obj.outsideGrid.topos, 
+                                       key=lambda x: [x.value,str(x.topo)], 
                                        reverse=True)        
-        for genEl in obj.outsideGrid.generalElements[:nprint]:
-            outside = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}      
+        for topo in obj.outsideGrid.topos[:nprint]:
+            outside = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
+                                'element' : str(topo.topo)}      
             outsideGrid.append(outside)     
+        
+        longCascades = []        
+        obj.longCascade.classes = sorted(obj.longCascade.classes, 
+                                         key=lambda x: [x.getWeight(),x.motherPIDs], 
+                                         reverse=True)        
+        for cascadeEntry in obj.longCascade.classes[:nprint]:
+            longc = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV),
+                     'weight (fb)' : cascadeEntry.getWeight(), 
+                     'mother PIDs' : cascadeEntry.motherPIDs}        
+            longCascades.append(longc)
+        
+        asymmetricBranches = []
+        obj.asymmetricBranches.classes = sorted(obj.asymmetricBranches.classes, 
+                                                key=lambda x: [x.getWeight(),x.motherPIDs],
+                                                reverse=True)
+        for asymmetricEntry in obj.asymmetricBranches.classes[:nprint]:
+            asymmetric = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 
+                    'weight (fb)' : asymmetricEntry.getWeight(),
+                    'mother PIDs' : asymmetricEntry.motherPIDs}         
+            asymmetricBranches.append(asymmetric)
 
-        longLived = []
-        obj.longLived.generalElements = sorted(obj.longLived.generalElements, 
-                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
-                                       reverse=True)        
-        for genEl in obj.longLived.generalElements[:nprint]:
-            long = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}      
-            longLived.append(long)
-            
-        displaced = []
-        obj.displaced.generalElements = sorted(obj.displaced.generalElements, 
-                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
-                                       reverse=True)        
-        for genEl in obj.displaced.generalElements[:nprint]:
-            displ = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}      
-            displaced.append(displ)
-            
-        MET = []
-        obj.MET.generalElements = sorted(obj.MET.generalElements, 
-                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
-                                       reverse=True)        
-        for genEl in obj.MET.generalElements[:nprint]:
-            met = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}      
-            MET.append(met)                        
 
-        return {'Missed Topologies': missedTopos, 'Long-lived' : longLived,
-                     'Displaced': displaced, 'MET': MET, 'Outside Grid': outsideGrid}
+        return {'Missed Topologies': missedTopos, 'Long Cascades' : longCascades,
+                     'Asymmetric Branches': asymmetricBranches, 'Outside Grid': outsideGrid}
     
+
+
 class XmlPrinter(PyPrinter):
     """
     Printer class to handle the printing of one single XML output
@@ -921,7 +925,7 @@ class XmlPrinter(PyPrinter):
     def __init__(self, output = 'stdout', filename = None):
         PyPrinter.__init__(self, output, filename)
         self.name = "xml"
-        self.printingOrder = [OutputStatus,TopologyList,TheoryPredictionList,Uncovered]
+        self.printingOrder = [OutputStatus,TopologyList,ResultList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
         
@@ -1008,7 +1012,7 @@ class SLHAPrinter(TxTPrinter):
         TxTPrinter.__init__(self, output, filename)
         self.name = "slha"
         self.docompress = 0
-        self.printingOrder = [OutputStatus,TheoryPredictionList, Uncovered]
+        self.printingOrder = [OutputStatus,ResultList, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
 
@@ -1038,18 +1042,18 @@ class SLHAPrinter(TxTPrinter):
         output += " 5 %-25s #sigmacut [fb]\n\n" % (obj.parameters['sigmacut'])
         return output
 
-    def _formatTheoryPredictionList(self, obj):
+    def _formatResultList(self, obj):
         output = "BLOCK SModelS_Exclusion\n"
-        if len(obj._theoryPredictions)==0:
+        if obj.isEmpty():
             excluded = -1
         else:
-            firstResult = obj._theoryPredictions[0]
-            r = firstResult.getR()
+            firstResult = obj.theoryPredictions[0]
+            r = obj.getR(firstResult)
             if r > 1: excluded = 1
             else: excluded = 0
         output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n" % (excluded)
         if excluded == 0: rList = [firstResult]
-        elif excluded == 1: rList = obj._theoryPredictions
+        elif excluded == 1: rList = obj.theoryPredictions
         else: rList = []
         cter = 1
         for theoPred in rList:
@@ -1096,11 +1100,16 @@ class SLHAPrinter(TxTPrinter):
     def _formatUncovered(self, obj):
         output = ""
         for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid]):
+            for topo in uncovEntry.topos:
+                if topo.value > 0.: continue
+                for el in topo.contributingElements:
+                    if not el.weight.getXsecsFor(obj.missingTopos.sqrts): continue
+                    topo.value += el.missingX
             if ix==0: output += "BLOCK SModelS_Missing_Topos #sqrts[TeV] weight[fb] description\n"
             else: output += "\nBLOCK SModelS_Outside_Grid #sqrts[TeV] weight[fb] description\n"
             cter = 0
-            for t in sorted(uncovEntry.generalElements, key=lambda x: x.missingX, reverse=True):
-                output += " %d %d %10.3E %s\n" % (cter, obj.missingTopos.sqrts/TeV, t.weight, str(t.name))
+            for t in sorted(uncovEntry.topos, key=lambda x: x.value, reverse=True):
+                output += " %d %d %10.3E %s\n" % (cter, obj.missingTopos.sqrts/TeV, t.value, str(t.topo))
                 cter += 1
                 if cter > 9: break
         for ix, uncovEntry in enumerate([obj.longCascade, obj.asymmetricBranches]):
@@ -1112,5 +1121,3 @@ class SLHAPrinter(TxTPrinter):
                 cter += 1
                 if cter > 9: break
         return output
-
-

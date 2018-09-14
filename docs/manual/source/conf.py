@@ -20,6 +20,11 @@ import time
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../../../'))
+sys.path.insert(0, os.path.abspath('../../../smodels/'))
+sys.path.insert(0, os.path.abspath('../../../smodels/theory/'))
+sys.path.insert(0, os.path.abspath('../../../smodels/experiment/'))
+sys.path.insert(0, os.path.abspath('../smodels/tools/'))
+
 
 from smodels.installation import authors
 from smodels.installation import version as Version
@@ -105,6 +110,9 @@ pygments_style = 'sphinx'
 
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
+
+#Ignore documentation for python types
+nitpick_ignore = [('py:class', 'type'),('py:class', 'object')]
 
 
 # -- Options for HTML output ----------------------------------------------
@@ -268,4 +276,4 @@ texinfo_documents = [
 nitpicky = True
 
 #Run make whenever sphinx is built:
-os.system("cd .. && make copy_files recipes RstFilesFromHelp")
+os.system("cd .. && make update_code copy_files recipes RstFilesFromHelp")

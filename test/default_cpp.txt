@@ -1,0 +1,75 @@
+[smodels.cpp] initialising!
+INFO in modelTester.loadDatabase() in 336: database:discardZeroes is not given in config file. Defaulting to 'True'.
+INFO in databaseObj.loadBinaryFile() in 171: loading binary db file ./unittest113.pcl format version 201
+INFO in databaseObj.loadBinaryFile() in 178: Loaded database from ./unittest113.pcl in 0.1 secs.
+INFO in metaObj.printFastlimBanner() in 164: FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11
+[smodels.cpp] now running over test.slha
+WARNING in printer.setOutPutFile() in 558: Removing old output file results/test.slha.smodels
+[smodels.cpp] 8 experimental results found.
+Input status: 1
+Decomposition output status: 1 #decomposition was successful
+# Input File: test.slha
+# maxcond = 0.2
+# minmassgap = 5.
+# ncpus = 1
+# sigmacut = 0.01
+# Database version: unittest113
+================================================================================
+   ======================================================= 
+ || 	 						 || 
+ || 	 	 Topologies Table 		 	 ||
+ || 	 						 || 
+   ======================================================= 
+===================================================== 
+Topology:
+Number of vertices: [1, 1] 
+Number of vertex parts: [[2], [2]]
+Total Global topology weight :
+Sqrts: 8.00E+00 [TeV], Weight:5.72E-01 [pb]
+
+Total Number of Elements: 1
+   ======================================================= 
+ || 	 						 || 
+ || 	 Theory Predictions and 			 || 
+ || 	 Experimental Constraints 		 	 ||
+ || 	 						 || 
+   ======================================================= 
+
+---------------Analysis Label = ATLAS-SUSY-2013-02
+-------------------Dataset Label = (UL)
+-------------------Txname Labels = ['T1']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 5.72E-01 [pb]
+Theory conditions:  None
+Observed experimental limit: 3.81E-02 [pb]
+Observed r-Value: 15.002655551277467
+
+---------------Analysis Label = CMS-SUS-13-012
+-------------------Dataset Label = 6NJet8_1000HT1250_450MHTinf
+-------------------Txname Labels = ['T1']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 1.74E-03 [pb]
+Theory conditions:  None
+Observed experimental limit: 3.86E-01 [fb]
+Expected experimental limit: 2.64E-01 [fb]
+Observed r-Value: 4.5062184359756
+Expected r-Value: 6.589244963630262
+Chi2: 22.633432915475076
+Likelihood: 8.193807968109442e-07
+
+Total missing topology cross section (fb):  0.000E+00
+Total cross section where we are outside the mass grid (fb):  0.000E+00
+Total cross section in long cascade decays (fb):  0.000E+00
+Total cross section in decays with asymmetric branches (fb):  0.000E+00
+
+Full information on unconstrained cross sections
+================================================================================
+No missing topologies found
+================================================================================
+No contributions outside the mass grid
+================================================================================
+Missing topos: long cascade decays (up to 10 entries), sqrts = 8 TeV:
+Mother1 Mother2 Weight (fb) # allMothers
+================================================================================
+Missing topos: asymmetric branches (w/o long cascades, up to 10), sqrts = 8 TeV
+Mother1 Mother2 Weight (fb) # allMothers

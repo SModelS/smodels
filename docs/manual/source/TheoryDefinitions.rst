@@ -13,7 +13,7 @@
 Simplified Model Definitions
 ============================
 
-The so-called `theory module <../../../documentation/build/html/theory.html#theory>`_ contains the basic tools necessary for decomposing the input model
+The so-called `theory module <theory.html#theory>`_ contains the basic tools necessary for decomposing the input model
 (either in LHE or SLHA format) into simplified model |topologies| and using the output of the decomposition
 to compute the :ref:`theoretical prediction <theoryPredictions>` for a given :ref:`experimental result <ExpResult>`.
 
@@ -68,7 +68,7 @@ Below we describe in more detail the element properties and their implementation
 in SModelS.
 
 
-* **Elements are described by the** `Element Class <../../../documentation/build/html/theory.html#theory.element.Element>`_    
+* **Elements are described by the** `Element Class <theory.html#theory.element.Element>`_    
 
 
 .. _vertex:
@@ -128,7 +128,7 @@ as shown below.
 .. image:: images/branchElB.png
    :width: 25%
    
-* **Branches are described by the** `Branch Class <../../../documentation/build/html/theory.html#theory.branch.Branch>`_   
+* **Branches are described by the** `Branch Class <theory.html#theory.branch.Branch>`_   
 
 
 .. _notation:
@@ -193,7 +193,7 @@ topology. Hence  topologies represent a list of elements sharing a
 common basic structure (same number of branches, vertices and
 final states in each vertex).
 
-* **Topologies are described by the** `Topology Class <../../../documentation/build/html/theory.html#theory.topology.Topology>`_   
+* **Topologies are described by the** `Topology Class <theory.html#theory.topology.Topology>`_   
 
 .. [*] In order to treat the UL and EM map results on the same footing,
    SModelS applies a trivial binary efficiency to elements for UL-type

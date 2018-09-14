@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: testTheoryPrediction
@@ -12,7 +12,7 @@ from __future__ import print_function
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.physicsUnits import fb, GeV, pb
+from smodels.tools.physicsUnits import fb, GeV
 from databaseLoader import database
 import inspect
 import os
@@ -30,10 +30,11 @@ class IntegrationTest(unittest.TestCase):
 
     def predchi2(self):
         return { 'ATLAS-SUSY-2013-02': None,
-                 'CMS-SUS-13-012': 19.9647839329 }
+     #            'CMS-SUS-13-012': 19.9647839329 } ## with 20% signal error
+                 'CMS-SUS-13-012': 45.35806410622854 } ## thats with no signal error
 
     def checkAnalysis(self,expresult,smstoplist):
-        id = expresult.globalInfo.id
+        expID = expresult.globalInfo.id
         from smodels.theory.theoryPrediction import theoryPredictionsFor
         theorypredictions = theoryPredictionsFor(expresult, smstoplist)
         defpreds=self.predictions()
@@ -44,10 +45,12 @@ class IntegrationTest(unittest.TestCase):
         for pred in theorypredictions:
             m0=str(int(pred.mass[0][0]/GeV))
             predval=pred.xsection.value 
-            defpredval = defpreds[id]
-            self.assertAlmostEqual( predval.asNumber(fb), defpredval.asNumber (fb), delta=0.13 )
-            pred.computeStatistics()
-            self.assertAlmostEqual ( pred.chi2, self.predchi2()[id], delta=0.8 )
+            defpredval = defpreds[expID]
+            self.assertAlmostEqual( predval.asNumber(fb), defpredval.asNumber (fb) )
+            pred.computeStatistics( marginalize=True, deltas_rel=0. )
+            if pred.chi2 != self.predchi2()[expID]:
+                self.assertAlmostEqual(pred.chi2/self.predchi2()[expID], 1.0, 1 )
+
 
     def testIntegration(self):
         from smodels.installation import installDirectory
@@ -64,13 +67,12 @@ class IntegrationTest(unittest.TestCase):
         self.configureLogger()
         smstoplist = decomposer.decompose(model, .1*fb, doCompress=True,
                 doInvisible=True, minmassgap=5.*GeV)
-        
         listofanalyses = database.getExpResults( 
                 analysisIDs= [ "ATLAS-SUSY-2013-02", "CMS-SUS-13-012" ], 
                 txnames = [ "T1" ] )
         if type(listofanalyses) != list:
             listofanalyses= [ listofanalyses] 
-        for analysis in listofanalyses: 
+        for analysis in listofanalyses:
             self.checkAnalysis(analysis,smstoplist)
 
 if __name__ == "__main__":

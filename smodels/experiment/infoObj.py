@@ -1,7 +1,7 @@
 """
 .. module:: infoObj
-   :synopsis: Holds the classes and methods used to read and store the information in the
-              globalInfo.txt or dataInfo.txt files.
+   :synopsis: Holds the classes and methods used to read and store the
+              information in the globalInfo.txt or dataInfo.txt files.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -40,10 +40,6 @@ class Info(object):
             infoFile.close()
             
             #Get tags in info file:
-            for line in content:
-                if line.count(":") == 0:
-                    err = "found line that does not follow key:value structure in %s" % path
-                    raise SModelSError ( err )
             tags = [line.split(':', 1)[0].strip() for line in content]
             for i,tag in enumerate(tags):
                 if not tag: continue
@@ -61,6 +57,14 @@ class Info(object):
             return False
         return True
 
+    def dirName ( self, up=0 ):
+        """ directory name of path. If up>0, 
+            we step up 'up' directory levels.
+        """
+        s_up = "/".join ( [ ".." ] * up )
+        p = os.path.dirname ( self.path )
+        return os.path.abspath ( os.path.join ( p, s_up ) )
+
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )
         
@@ -71,12 +75,7 @@ class Info(object):
         :param tag: information label (string)
         :param value: value for the field in string format 
         """
-        if tag in [ "lastUpdate" ]:
-            # dont eval these fields, take them strings
-            # needed for lastUpdate, because of the slashes, they would be 
-            # interpreted as divisions.
-            setattr(self,tag,value)
-            return
+                  
         try:
             setattr(self,tag,eval(value, {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV}))
         except SyntaxError:          

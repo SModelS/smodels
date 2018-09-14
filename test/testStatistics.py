@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: testStatistics
-   :synopsis: Tests the statistics module.
+   :synopsis: Tests the statistics functionality.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 .. moduleauthor:: Jory Sonneveld <jory@opmijnfiets.nl>
@@ -26,8 +26,10 @@ import math
 
 class StatisticsTest(unittest.TestCase):
     def testUpperLimit(self):
-        re = statistics.upperLimit( 100., 100., 0., 20./fb   )
-        self.assertAlmostEqual( re.asNumber ( fb ), 1.06, 1 )
+        m = Data( 100., 100., 0.001, None, 1.0,deltas_rel=0.)
+        comp = UpperLimitComputer()
+        re = comp.ulSigma(m)
+        self.assertAlmostEqual(re/(1.06*20.),1., 1)
 
     def testPredictionInterface(self):
         """ A simple test to see that the interface in datasetObj
@@ -45,15 +47,19 @@ class StatisticsTest(unittest.TestCase):
         ill = math.log(prediction.likelihood)
         ichi2 = prediction.chi2
         nsig = (pred_signal_strength*expRes.globalInfo.lumi).asNumber()
-        dll = math.log(statistics.likelihood(nsig, 4, 2.2, 1.1, 0.2*nsig ))
-        dchi2 = statistics.chi2(nsig, 4, 2.2, 1.1, 0.2*nsig )
+        m = Data(4, 2.2, 1.1**2, None, nsignal=nsig,deltas_rel=0.2)
+        computer = LikelihoodComputer(m)
+        dll = math.log(computer.likelihood(nsig, marginalize=False ) )
         self.assertAlmostEqual(ill, dll, places=2)
+        dchi2 = computer.chi2( nsig, marginalize=False )
+        # print ( "dchi2,ichi2",dchi2,ichi2)
         self.assertAlmostEqual(ichi2, dchi2, places=2)
 
     def round_to_sign(self, x, sig=3):
         """
         Round the given number to the significant number of digits.
         """
+        if x==0.: return 0.
         rounding = sig - int(floor(log10(x))) - 1
         if rounding == 0:
             return int(x)
@@ -67,8 +73,8 @@ class StatisticsTest(unittest.TestCase):
         and expected upper limit and a theory prediction
         with the previously known result for the value of
         the chi2.
- 
- 
+
+
         All values of nobs, nsig, nb, deltab come from the
         SModelS database and are for the T1 simplified model
         from efficiency results of one of
@@ -76,9 +82,9 @@ class StatisticsTest(unittest.TestCase):
         ATLAS-CONF-2013-047
         CMS-SUS-13-012
         ATLAS-CONF-2013-054
- 
+
         """
- 
+
         expected_values = [
         # mgluino          mlsp          nsig               nobs              nb             deltab           llhd                 chi2
         # ----------       ----------    ---------------    ----------------  ----------     ----------       -------------------- ----------------
@@ -130,31 +136,21 @@ class StatisticsTest(unittest.TestCase):
         {'mgluino': 1100, 'mlsp':  800, 'nsig':   1.79622, 'nobs':  120.858, 'nb':  126.0 , 'deltab': 13.0 , 'llhd': 0.02187799 , 'chi2': 0.134012 },
         {'mgluino': 1100, 'mlsp':  900, 'nsig':   4.82397, 'nobs':  2166.20, 'nb':  2120.0, 'deltab': 110.0, 'llhd': 0.00313424 , 'chi2': 0.119045 },
         {'mgluino': 1100, 'mlsp': 1000, 'nsig':   0.1606 , 'nobs':  25.0 ,   'nb':  37.0  , 'deltab': 6.0 ,  'llhd': 0.01796058 , 'chi2': 1.9806},
-        {'mgluino': 2100, 'mlsp': 1000, 'nsig':   0.1606 , 'nobs':  2.0 ,   'nb':  0.7  , 'deltab': 6.0 ,  'llhd': 0.108669 , 'chi2': -0.161304}]
- 
- 
- 
- 
+        {'mgluino': 2100, 'mlsp': 1000, 'nsig':   0.1606 , 'nobs':  2.0 ,   'nb':  0.7  , 'deltab': 6.0 ,  'llhd': 0.108669 , 'chi2': -0.161304}
+
+
+
+
         for d in expected_values:
             nobs = d['nobs']
             nsig = d['nsig']
             nb = d['nb']
             deltab = d['deltab']
-            deltas = 0.2*d['nsig']
- 
- 
-#             logger.error("\nns="+str(nsig)+";\nnobs = "+str(nobs)+";\nnb="+str(nb)+";\ndb="+str(deltab))
+            # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
             # Chi2 as computed by statistics module:
-            chi2_actual = statistics.chi2( nsig, nobs, nb,
-                deltab, deltas)
-             
-#             logger.error("chi2= "+str(chi2_actual))
-            #print('chi2act', chi2_actual)
-#             if not chi2_actual==None and not np.isnan(chi2_actual) and chi2_actual > 1:
-#                 chi2_actual = self.round_to_sign(chi2_actual, 2)
- 
-            # The previously computed chi2:
-            # (using:ntoys=100000)
+            m = Data(nobs, nb, deltab**2,deltas_rel=0.2)
+            computer = LikelihoodComputer(m)
+            chi2_actual = computer.chi2(nsig, marginalize=True ) ## , .2*nsig )
             chi2_expected = d['chi2']
             #print('chi2exp', chi2_expected)            
             if not chi2_expected==None and not np.isnan(chi2_expected):
@@ -163,23 +159,26 @@ class StatisticsTest(unittest.TestCase):
                 self.assertAlmostEqual(abs(chi2_actual-chi2_expected)/chi2_expected,0., places=2 )
             else:
                 self.assertTrue(chi2_actual == None or np.isnan(chi2_actual))
- 
- 
+
+
             # likelihood as computed by statistics module:
-            likelihood_actual = statistics.likelihood( nsig,
-                nobs, nb, deltab, deltas)
+            # computer = LikelihoodComputer( nobs, nb, deltab**2 )
+            #likelihood_actual = statistics.likelihood( nsig,
+            #    nobs, nb, deltab, deltas)
+            likelihood_actual = computer.likelihood(nsig, marginalize=False )
+            # likelihood_actual = statistics.likelihood()
 #             logger.error("llk= "+str(likelihood_actual)+" nsig="+str(nsig)+" nobs = "+str(nobs)+" nb="+str(nb)+"+-"+str(deltab))
             #print('llhdactual', likelihood_actual)
             if not likelihood_actual==None and not np.isnan(likelihood_actual):
                 likelihood_actual = self.round_to_sign(likelihood_actual, 4)
- 
+
             # The previously computed likelihood:
             # (using: ntoys=100000)
             likelihood_expected = d['llhd']
             #print('llhdexp', likelihood_expected)
             if not likelihood_expected==None and not np.isnan(likelihood_expected):
                 likelihood_expected = self.round_to_sign(likelihood_expected, 4)
- 
+
                 # Check that likelihood values agree:
                 self.assertAlmostEqual(likelihood_actual, likelihood_expected,
                         delta=2*1e-1)

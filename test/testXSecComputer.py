@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: testXSecComputer
@@ -20,10 +20,12 @@ import unittest
 import argparse
 import logging.config
 
+
 class XSecTest(unittest.TestCase):
     # use different logging config for the unit tests.
     logging.config.fileConfig( "./logging.conf" )
-    from smodels.tools.smodelsLogging import logger, setLogLevel
+    from smodels.tools.smodelsLogging import setLogLevel,logger
+    
     setLogLevel ( "warn" )
 
     toolBox.ToolBox().compile() ## make sure the tools are compiled
@@ -31,7 +33,7 @@ class XSecTest(unittest.TestCase):
     def testLOGlu(self):
         """ test the computation of LO cross section, pythia6 """
         self.logger.info ( "test LO xsecs @ 8 TeV" )
-        slhafile="../inputFiles/slha/simplyGluino.slha"
+        slhafile= "./testFiles/slha/simplyGluino.slha"
         computer = xsecComputer.XSecComputer ( LO, 100, 6 )
         w = computer.compute(8*TeV, slhafile ).getDictionary()
         # print ( w )
@@ -41,7 +43,7 @@ class XSecTest(unittest.TestCase):
     def testNLLGlu(self):
         """ test the computation of NLL cross section """
         self.logger.info ( "test NLL xsecs @ 8 TeV" )
-        slhafile="../inputFiles/slha/simplyGluino.slha"
+        slhafile="./testFiles/slha/simplyGluino.slha"
         computer = xsecComputer.XSecComputer ( NLL, 100, 6 )
         w = computer.compute( 8*TeV, slhafile ).getDictionary()
         w8nll= w[(1000021, 1000021)]['8 TeV (NLO+NLL)'].asNumber( fb )
@@ -50,7 +52,7 @@ class XSecTest(unittest.TestCase):
     def testLOGlu13(self):
         """ test the computation of LO cross section, pythia6 """
         self.logger.info ( "test LO xsecs @ 13 TeV" )
-        slhafile="../inputFiles/slha/simplyGluino.slha"
+        slhafile="./testFiles/slha/simplyGluino.slha"
         computer = xsecComputer.XSecComputer ( LO, 100, 6 )
         w = computer.compute( 13*TeV, slhafile ).getDictionary()
         w13lo= w[(1000021, 1000021)]['13 TeV (LO)'].asNumber( fb )
@@ -59,7 +61,7 @@ class XSecTest(unittest.TestCase):
     def testNLLGlu13(self):
         """ test the computation of NLL cross section with pythia6 """
         self.logger.info ( "test NLL xsecs @ 13 TeV" )
-        slhafile="../inputFiles/slha/simplyGluino.slha"
+        slhafile="./testFiles/slha/simplyGluino.slha"
         computer = xsecComputer.XSecComputer ( NLL, 100, 6 )
         w = computer.compute( 13*TeV, slhafile ).getDictionary()
         w13nll= w[(1000021, 1000021)]['13 TeV (NLO+NLL)'].asNumber( fb )
@@ -68,7 +70,7 @@ class XSecTest(unittest.TestCase):
     def testXSecMain(self):
         """ test the main routine for computation of LO and NLL cross section for several sqrts"""
         
-        slhafile="../inputFiles/slha/simplyGluino.slha"
+        slhafile="./testFiles/slha/simplyGluino.slha"
         f = open(slhafile,'r')
         fdata = f.read()
         fdata = fdata[:fdata.find('XSECTION')]

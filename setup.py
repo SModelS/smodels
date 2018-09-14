@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: setup
@@ -12,20 +12,36 @@ import os
 import sys
 from setuptools import setup, Extension
 from setuptools.command.install import install
-from setuptools.command.install_scripts import install_scripts
 sys.path.insert ( 0, "./" )
-from smodels.installation import version, authors
+from smodels.installation import version, authors, requirements, resolve_dependencies, fixpermissions
 import subprocess
 
 class OverrideInstall(install):
 
     def run(self):
         #uid, gid = 0, 0
-        mode = 0o777
         install.run(self) # calling install.run(self) insures that everything 
                 # that happened previously still happens, 
+        install_as_user = True
+        try:
+            import getpass
+            if getpass.getuser() == "root":
+                install_as_user = False
+        except Exception as e:
+            pass
+        resolve_dependencies( as_user=install_as_user )
+        enableStupidMacFix=False
+        if enableStupidMacFix:
+            if "Apple" in sys.version:
+                # a wild attempt at fixing a problem with Mac OS X. Somehow
+                # setup.py doesnt resolve the requirements!
+                try:
+                    self.do_egg_install()
+                except Exception as e:
+                    pass
         # so the installation does not break! 
         # here we start with doing our overriding and private magic ..
+        mode = 0o777
         for filepath in self.get_outputs():
             # if self.install_scripts in filepath:
             if "smodels/lib/" in filepath:
@@ -36,6 +52,8 @@ class OverrideInstall(install):
                 # print ("Changing permissions of %s to %s" %
                 #         ( os.path.dirname ( filepath ), oct(mode)))
                 os.chmod( os.path.dirname ( filepath ), mode )
+        if not install_as_user:
+            fixpermissions()
 
 def read(fname):
     """
@@ -56,7 +74,7 @@ def listDirectory (dirname):
         extension = os.path.splitext ( file )[1]
         if os.path.isdir ( fullname ) or \
                 extension in [ ".out", ".tgz", ".1" ] or \
-                file in [ "Makefile", "README.rst", "INSTALLATION.rst" ]:
+                file in [ "Makefile", "README" ]:
             continue
         ret.append ( fullname )
     return ret
@@ -68,7 +86,8 @@ def dataFiles ():
     """
     ret = []
     ret.append ( ("smodels/", [ "smodels/version", "smodels/COPYING", "smodels/README.rst", "smodels/INSTALLATION.rst" ]) )
-    for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/",
+    for directory in ["inputFiles/slha/", "inputFiles/lhe/", "smodels/share/", 
+          "smodels/share/models/",
           "smodels/etc/", "smodels/lib/nllfast/nllfast-1.2/", 
           "smodels/lib/nllfast/nllfast-2.1/", "smodels/lib/nllfast/nllfast-3.1/", 
           "smodels/lib/pythia6/", "smodels/lib/pythia8/" ]:
@@ -83,12 +102,19 @@ def compile():
 
     """
     import sys
-    if "compile" in sys.argv:
-        sys.argv.remove ( "compile" )
-        print ( "Compiling tools!" )
-        subprocess.call(["make", "-C", "smodels/lib" ])
+    if len(sys.argv) < 2:
+        return
+    needs_build = False
+    for i in sys.argv[1:]:
+        if i in [ "build", "build_ext", "build_clib", "install", 
+                  "install_lib", "bdist", "bdist_rpm", "bdist_dumb", 
+                  "bdist_wininst", "bdist_wheel", "develop"]:
+            needs_build = True
+    if not needs_build:
+        return
+    subprocess.call(["make", "-C", "smodels/lib" ])
 
-compile() ## only compiles if "compile" is given as cmdline argument
+# compile() ## not needed anymore as we perform compilation-on-demand now
 
 setup(
     name = "smodels",
@@ -100,8 +126,7 @@ setup(
                            'runSModelS.py=smodels.tools.runSModelS:main',
                            'smodelsTools.py=smodels.tools.smodelsTools:main' ]
     },
-    install_requires=[ 'docutils>=0.3', 'scipy', 'numpy', 'scipy>=0.9.0', \
-                         'unum', 'argparse', 'pyslha>=3.1.0' ],
+    install_requires=requirements(),
     data_files=dataFiles() ,
     description=("A tool for interpreting simplified-model results from the "
                    "LHC"),
@@ -117,7 +142,7 @@ setup(
               'smodels.experiment'],
     include_package_data = True,
     test_suite='test',
-    long_description=read('README.rst'),
+    long_description=read('smodels/README.rst'),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Physics",

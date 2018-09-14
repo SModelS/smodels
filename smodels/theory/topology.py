@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: topology
@@ -402,5 +402,3 @@ class TopologyList(object):
         for element in self.getElements():
             element.elID = elID
             elID += 1
-
-

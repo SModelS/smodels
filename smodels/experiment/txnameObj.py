@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: txnameObj
@@ -13,8 +13,8 @@
 """
 
 import os,sys
-from smodels.tools import physicsUnits
-from smodels.theory.auxiliaryFunctions import elementsInStr
+from smodels.tools.physicsUnits import GeV, fb, TeV, pb
+from smodels.theory.particleNames import elementsInStr
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
 from smodels.theory.topology import TopologyList
@@ -27,7 +27,6 @@ import numpy as np
 import unum
 import copy
 import math
-import time
 from math import floor, log10
 
 #Build a dictionary with defined units. It can be used to evaluate
@@ -42,7 +41,7 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
 
-    def __init__(self, path, globalObj, infoObj, discard_zeroes ):
+    def __init__(self, path, globalObj, infoObj ):
         self.path = path
         self.globalInfo = globalObj
         self._infoObj = infoObj
@@ -50,8 +49,7 @@ class TxName(object):
         self.txnameDataExp = None ## expected Data
         self._topologyList = TopologyList()
 
-        logger.debug( '%s: creating object based on txname file: %s' % \
-                      ( time.asctime(), self.path ) )
+        logger.debug('Creating object based on txname file: %s' %self.path)
         #Open the info file and get the information:
         if not os.path.isfile(path):
             logger.error("Txname file %s not found" % path)
@@ -62,7 +60,7 @@ class TxName(object):
         if not "txName" in txdata: raise TypeError
         if not 'upperLimits' in txdata and not 'efficiencyMap' in txdata:
             raise TypeError
-        content = concatenateLines(  txdata.split("\n") )
+        content = concatenateLines (  txdata.split("\n") )
 
         #Get tags in info file:
         tags = [line.split(':', 1)[0].strip() for line in content]
@@ -76,24 +74,21 @@ class TxName(object):
             if tags.count(tag) != 1:
                 logger.info("Duplicated field %s found in file %s" \
                              % (tag, self.path))
-            if ';' in value: value = value.split(';')            
-            
+            if ';' in value: value = value.split(';')
             if tag == 'upperLimits' or tag == 'efficiencyMap':
                 data = value
                 dataType = tag
             elif tag == 'expectedUpperLimits':
                 expectedData = value
                 dataType = 'upperLimits'
-            else:          
+            else:
                 self.addInfo(tag,value)
 
         ident = self.globalInfo.id+":"+dataType[0]+":"+ str(self._infoObj.dataId)
         ident += ":" + self.txName
-        self.txnameData = TxNameData(data, dataType, ident )
+        self.txnameData = TxNameData( data, dataType, ident )
         if expectedData:
-            self.txnameDataExp = TxNameData(expectedData, dataType, ident+'_expected' )
-        if discard_zeroes and self.hasOnlyZeroes():
-            return
+            self.txnameDataExp = TxNameData( expectedData, dataType, ident )
 
         #Builds up a list of elements appearing in constraints:
         if hasattr(self,'finalState'):
@@ -116,7 +111,6 @@ class TxName(object):
         # and conditions:
         for el in elements:
             self._topologyList.addElement(el)
-
 
     def hasOnlyZeroes ( self ):
         ozs = self.txnameData.onlyZeroValues()
@@ -146,7 +140,6 @@ class TxName(object):
                           [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         :param expected: query self.txnameDataExp
         """
-        
         if not expected:
             return self.txnameData.getValueFor( massarray )
         else:
@@ -162,24 +155,21 @@ class TxName(object):
         
         :param tag: information label (string)
         :param value: value for the field in string format
-        """   
-        if tag == 'constraint' or tag == 'condition':        
+        """
+
+        if tag == 'constraint' or tag == 'condition':
             if isinstance(value,list):
                 value = [val.replace("'","") for val in value]
-            else:
-                value = value.replace("'","")
-            if value == 'None': setattr(self,tag, eval(value))                           
-            else: setattr(self,tag, value) #Make sure constraints/conditions are not evaluated
-        else:
-            try:
-                setattr(self,tag,eval(value, unitsDict))              
-            except SyntaxError:
-                setattr(self,tag,value)
-            except NameError:
-                setattr(self,tag,value)
-            except TypeError:
-                setattr(self,tag,value)               
+            else: value = value.replace("'","")
 
+        try:
+            setattr(self,tag,eval(value, unitsDict))
+        except SyntaxError:
+            setattr(self,tag,value)
+        except NameError:
+            setattr(self,tag,value)
+        except TypeError:
+            setattr(self,tag,value)
 
     def getInfo(self, infoLabel):
         """
@@ -192,7 +182,7 @@ class TxName(object):
         if hasattr(self,infoLabel): return getattr(self,infoLabel)
         else: return False
 
-    def hasElementAs(self,element, switchBranches = True):
+    def hasElementAs(self,element):
         """
         Verify if the conditions or constraint in Txname contains the element.
         Check both branch orderings.
@@ -201,17 +191,25 @@ class TxName(object):
         :return: A copy of the element on the correct branch ordering appearing
                 in the Txname constraint or condition.
         """
-        
-        for el in self._topologyList.getElements():      
-            if element.particlesMatch(el, branchOrder=True):
+
+        for el in self._topologyList.getElements():
+            if element.particlesMatch(el,branchOrder=True):
                 return element.copy()
             else:
-                if switchBranches:
-                    elementB = element.switchBranches()
-                    if elementB.particlesMatch(el, branchOrder=True): 
-                        return elementB
+                elementB = element.switchBranches()
+                if elementB.particlesMatch(el,branchOrder=True):
+                    return elementB
         return False
 
+    def hasLikelihood ( self ):
+        """ can I construct a likelihood for this map? 
+        True for all efficiency maps, and for upper limits maps
+        with expected Values. """
+        if self._infoObj.dataType == "efficiencyMap":
+            return True
+        if self.txnameDataExp != None:
+            return True
+        return False
 
     def getEfficiencyFor(self,element):
         """
@@ -224,7 +222,7 @@ class TxName(object):
         :param element: Element object or mass array
         :return: efficiency (float)
         """
-        
+
         #Check if the element appears in Txname:
         val = self.txnameData.getValueFor(element.getMasses())
         if isinstance(val,unum.Unum):
@@ -236,9 +234,6 @@ class TxName(object):
         else:
             logger.error("Unknown txnameData value: %s" % (str(type(val))))
             raise SModelSError()
-        return val
-        
-       
 
 class TxNameData(object):
     """
@@ -260,9 +255,8 @@ class TxNameData(object):
         self.dataTag = datatag
         self._id = Id
         self._accept_errors_upto=accept_errors_upto
-        self._V = None
-        self.loadData(value)
-
+        self._V = None ## rotation matrix, derived from PCA
+        self.loadData( value )
         if self._keep_values:
             self.origdata = value
 
@@ -452,7 +446,6 @@ class TxNameData(object):
         self.computeV()
         self.removeExtraZeroes()            
         self.cleanUp()
-
 
     @_memoize
     def getValueFor(self,massarray):
@@ -797,12 +790,36 @@ class TxNameData(object):
             return
         if hasattr(self, "value"):
             del self.value
+        
+    def _getMassArrayFrom(self,pt,unit=physicsUnits.GeV):
+        """
+        Transforms the point pt in the PCA space to the original mass array
+        :param pt: point with the dimentions of the data dimensionality (e.g. [x,y])
+        :param unit: Unit for returning the mass array. If None, it will be
+                     returned unitless
+        :return: Mass array (e.g. [[mass1,mass2],[mass3,mass4]])
+        """
+        
+        if self._V is None:
+            logger.error("Data has not been loaded")
+            return None
+        if len(pt) != self.dimensionality:
+            logger.error("Wrong point dimensions (%i), it should be %i" 
+                         %(len(pt),self.dimensionality))
+            return None
+        fullpt = np.append(pt,[0.]*(self.full_dimensionality-len(pt)))
+        mass = np.dot(self._V,fullpt) + self.delta_x
+        mass = mass.reshape(self.massdim).tolist()
+        if isinstance(unit,unum.Unum):
+            mass = [[m*unit for m in br] for br in mass]
+
+        return mass
 
      
 class Delaunay1D:
     """
     Uses a 1D data array to interpolate the data.
-    The attribute simplices is list of N-1 pair of ints with the indices of the points 
+    The attribute simplices is a list of N-1 pair of ints with the indices of the points 
     forming the simplices (e.g. [[0,1],[1,2],[3,4],...]).    
     """
     
@@ -841,12 +858,12 @@ class Delaunay1D:
         
         xi = self.find_index(self.points,x)
         if xi == -1:
-            if abs(x[0]-self.points[0][0]) < tol:
+            if abs(x-self.points[0]) < tol:
                 return 0
             else:
                 return -1
         elif xi == len(self.simplices):
-            if abs(x[0]-self.points[-1][0]) < tol:
+            if abs(x-self.points[-1]) < tol:
                 return xi-1
             else:
                 return -1
@@ -895,8 +912,8 @@ class Delaunay1D:
 
 
 if __name__ == "__main__":
-
-    from smodels.tools.physicsUnits import GeV,fb
+    import time
+    from smodels.tools.physicsUnits import GeV
     data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  3.*fb ],
          [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ],
          [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ],
@@ -918,4 +935,3 @@ if __name__ == "__main__":
         sm = "%.1f %.1f" % ( masses[0][0].asNumber(GeV), masses[0][1].asNumber(GeV) )
         print ( "%s %.3f fb" % ( sm, result.asNumber(fb) ) )
     print ( "%.2f ms" % ( (time.time()-t0)*1000. ) )
-        

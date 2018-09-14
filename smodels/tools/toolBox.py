@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: toolBox
@@ -10,7 +10,6 @@
 
 """
 
-import argparse
 import types
 from smodels.tools import pythia6Wrapper
 from smodels.tools import pythia8Wrapper
@@ -75,7 +74,7 @@ class ToolBox(object):
             ret = "%sinstallation ok!%s" % (colors.green, colors.reset)
             return ret
         ret = "%sproblem with installation" % colors.red
-        if type(ok) == types.StringType:
+        if type(ok) == str:
             ret += " (%s)" % ok
         ret += colors.reset
         return ret

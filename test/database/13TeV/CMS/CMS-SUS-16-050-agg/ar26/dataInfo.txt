@@ -1,0 +1,8 @@
+dataId: ar26
+dataType: efficiencyMap
+observedN: 0
+expectedBG: 1.3
+bgError: 1.2099586769803339
+upperLimit: 0.087167*fb
+expectedUpperLimit: 0.102545*fb
+aggregated: t1b>=3MT2>=1500MET>=550
