@@ -12,7 +12,7 @@ import sys,os,importlib
 sys.path.insert(0,"../")
 import unittest
 from smodels.installation import installDirectory as idir
-from smodels.theory import slhaDecomposer
+from smodels.theory import decomposer
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.tools import printer, ioObjects
@@ -24,6 +24,8 @@ from unitTestHelpers import equalObjs
 from imp import reload
 from smodels.tools import runtime
 from smodels import particlesLoader
+from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.SMparticles import SMList
 
 def sortXML(xmltree):
     for el in xmltree:        
@@ -78,7 +80,9 @@ class RunPrinterTest(unittest.TestCase):
     
         """ Decompose model (use slhaDecomposer for SLHA input or lheDecomposer
             for LHE input) """
-        smstoplist = slhaDecomposer.decompose(slhafile, sigmacut, 
+        model = Model(BSMList,SMList,slhafile)
+        model.updateParticles()
+        smstoplist = decomposer.decompose(model, sigmacut, 
                          doCompress=True, doInvisible=True, minmassgap=mingap )
     
         #Add the decomposition result to the printers

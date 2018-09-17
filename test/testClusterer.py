@@ -35,7 +35,7 @@ class ClustererTest(unittest.TestCase):
         txnameData.computeV()
         txnameData.removeExtraZeroes()
         txnameData.cleanUp()
-        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info,True)
+        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info)
         txname.txnameData = txnameData
         
         u = SMparticles.u

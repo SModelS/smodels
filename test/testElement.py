@@ -14,7 +14,7 @@ from smodels.theory.branch import Branch
 from smodels.theory.element import Element
 from smodels.tools.physicsUnits import GeV, TeV, fb
 from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList
-from smodels.share.models import SMparticles, MSSMparticles
+from smodels.share.models import SMparticles, mssm
 
 from smodels.experiment import finalStateParticles
 
@@ -30,12 +30,12 @@ L = finalStateParticles.LList
 e = finalStateParticles.eList
 
 
-gluino = MSSMparticles.gluino
-st1 = MSSMparticles.st1
-n1 = MSSMparticles.n1
-n2 = MSSMparticles.n2
-n3 = MSSMparticles.n3
-n4 = MSSMparticles.n4
+gluino = mssm.gluino
+st1 = mssm.st1
+n1 = mssm.n1
+n2 = mssm.n2
+n3 = mssm.n3
+n4 = mssm.n4
 
 class ElementTest(unittest.TestCase):
         

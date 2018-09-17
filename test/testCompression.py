@@ -10,9 +10,13 @@
 
 import sys
 sys.path.insert(0,"../")
-from smodels.theory import slhaDecomposer
+from smodels.theory import decomposer
 from smodels.tools.physicsUnits import GeV, fb
 import unittest
+from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.SMparticles import SMList
+from smodels.theory.model import Model
+
 
 class CompressionTest(unittest.TestCase):
     from smodels.tools.smodelsLogging import logger
@@ -20,7 +24,9 @@ class CompressionTest(unittest.TestCase):
     def testInvisiblePositive(self):
         """ test the invisible compression, a positive example """
         slhafile="./testFiles/slha/higgsinoStop.slha"
-        topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, True, 5.*GeV )
+        model = Model(BSMList,SMList,slhafile)
+        model.updateParticles()
+        topos = decomposer.decompose ( model, .1*fb, False, True, 5.*GeV )
         tested = False
         for topo in topos:
             if str(topo)!="[][]":
@@ -38,7 +44,9 @@ class CompressionTest(unittest.TestCase):
     def testInvisibleNegative(self):
         """ test the invisible compression, a negative example """
         slhafile="./testFiles/slha/higgsinoStop.slha"
-        topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, True, 5.*GeV )
+        model = Model(BSMList,SMList,slhafile)
+        model.updateParticles()
+        topos = decomposer.decompose ( model, .1*fb, False, True, 5.*GeV )
         tested = False
         for topo in topos:
             if str(topo)!="[1,1][1,1]":
@@ -63,7 +71,9 @@ class CompressionTest(unittest.TestCase):
         """ test the mass compression, a positive example """
         tested = False
         slhafile="./testFiles/slha/higgsinoStop.slha"
-        topos = slhaDecomposer.decompose ( slhafile, .1*fb, True, False, 5.*GeV )
+        model = Model(BSMList,SMList,slhafile)
+        model.updateParticles()        
+        topos = decomposer.decompose ( model, .1*fb, True, False, 5.*GeV )
         for topo in topos:
             if str(topo)!="[1][1]":
                 continue
