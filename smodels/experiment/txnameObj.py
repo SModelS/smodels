@@ -13,8 +13,9 @@
 """
 
 import os,sys
-from smodels.tools.physicsUnits import GeV, fb, TeV, pb
-from smodels.theory.particleNames import elementsInStr
+import time
+from smodels.tools import physicsUnits
+from smodels.theory.auxiliaryFunctions import elementsInStr 
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
 from smodels.theory.topology import TopologyList
@@ -912,7 +913,6 @@ class Delaunay1D:
 
 
 if __name__ == "__main__":
-    import time
     from smodels.tools.physicsUnits import GeV
     data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  3.*fb ],
          [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ],
