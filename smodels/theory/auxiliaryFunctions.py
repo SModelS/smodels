@@ -15,7 +15,7 @@ import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.finalStateParticles import finalStates
-from particle import Particle,ParticleList
+from smodels.theory.particle import Particle,ParticleList
 import itertools    
 
 #Get all finalStateLabels

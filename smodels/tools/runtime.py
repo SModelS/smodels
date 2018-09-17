@@ -22,7 +22,11 @@ def filetype ( filename ):
                   None if file does not exist, or filetype is unknown.
     """
     import os
+    
+    print (filename)
+    print (os.getcwd())
     if not os.path.exists ( filename ):
+        print ("not exist")
         return None
     if filename[-5:].lower() == ".slha":
         return "slha"

@@ -15,7 +15,7 @@ from smodels.theory import lheReader
 from smodels.tools.physicsUnits import MeV, GeV, fb
 from smodels import installation
 import pyslha
-from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList, SMparticleList
 from smodels.theory.model import Model
 from smodels.theory import crossSection

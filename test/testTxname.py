@@ -27,7 +27,7 @@ class TxTest(unittest.TestCase):
         f = './databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2.txt'
         gInfo = infoObj.Info('./databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        tx = TxName(f,gInfo,gInfo,True)
+        tx = TxName(f,gInfo,gInfo)
         
         el = Element(info="[[*],[]]",finalState = ['MET','HSCP'])
         
@@ -42,7 +42,7 @@ class TxTest(unittest.TestCase):
         gInfo.addInfo('dataId','c000')
         
         try:
-            tx = TxName(f,gInfo,gInfo,True)
+            tx = TxName(f,gInfo,gInfo)
             gotError = False
         except SModelSError as e:         
             gotError = e
@@ -57,7 +57,7 @@ class TxTest(unittest.TestCase):
         f = './databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2.txt'
         gInfo = infoObj.Info('./databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        tx = TxName(f,gInfo,gInfo,True)                        
+        tx = TxName(f,gInfo,gInfo)                        
         
         self.assertFalse(hasattr(tx._topologyList.getElements()[0], 'mass'))
         

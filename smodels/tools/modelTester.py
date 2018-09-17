@@ -14,7 +14,7 @@ from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import decomposer
 from smodels.theory import theoryPrediction
-from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 from smodels.theory.theoryPrediction import theoryPredictionsFor
@@ -415,12 +415,11 @@ def getParameters(parameterFile):
 def getAllInputFiles(inFile):
     """
     Given inFile, return list of all input files
-    
     :parameter inFile: Path to input file or directory containing input files
-    :returns: List of all input files
-        
+    :returns: List of all input files, and the directory name
     """
     if os.path.isdir(inFile):
         fileList = os.listdir(inFile)
-    else: fileList = [inFile]
-    return fileList
+        return fileList, inFile
+    fileList = [ os.path.basename ( inFile ) ]
+    return fileList, os.path.dirname ( inFile )

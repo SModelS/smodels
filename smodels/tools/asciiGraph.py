@@ -15,7 +15,7 @@ import argparse
 from smodels import installation
 from smodels.theory import decomposer
 from smodels.tools.smodelsLogging import logger
-from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 
