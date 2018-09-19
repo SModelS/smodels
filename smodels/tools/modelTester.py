@@ -421,5 +421,5 @@ def getAllInputFiles(inFile):
     if os.path.isdir(inFile):
         fileList = os.listdir(inFile)
         return fileList, inFile
-    fileList = [ os.path.basename ( inFile ) ]
+    fileList = [ inFile ] #os.path.basename ( inFile )
     return fileList, os.path.dirname ( inFile )

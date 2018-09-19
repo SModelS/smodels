@@ -13,15 +13,15 @@ from smodels.theory.topology import TopologyList
 from smodels.tools.physicsUnits import eV, GeV, TeV, pb, fb
 from smodels.theory.element import Element
 from smodels.theory.crossSection import XSectionList, XSection, XSectionInfo
-from smodels.share.models import SMparticles, MSSMparticles
+from smodels.share.models import SMparticles, mssm
 
-n1 = MSSMparticles.n1
+n1 = mssm.n1
 n1.totalwidth = 0.*GeV
-st1 = MSSMparticles.st1
+st1 = mssm.st1
 st1.totalwidth = 2.*GeV
-st2 = MSSMparticles.st2
+st2 = mssm.st2
 st2.totalwidth = 10**(-15)*GeV
-gluino = MSSMparticles.gluino
+gluino = mssm.gluino
 gluino.totalwidth = 1.*10**(-30)*GeV
 t = SMparticles.t
 b = SMparticles.b
@@ -86,9 +86,9 @@ class CoverageTest(unittest.TestCase):
         self.assertEqual(len(uncovered.MET.generalElements), 2)
        
         self.assertAlmostEqual(uncovered.longLived.generalElements[0]._contributingElements[0].weight.getMaxXsec()/fb, 10.)
-        self.assertAlmostEqual(uncovered.displaced.generalElements[0]._contributingElements[0].weight.getMaxXsec()/fb, 0.994945089066*10.)
+        self.assertAlmostEqual(float(uncovered.displaced.generalElements[0]._contributingElements[0].weight.getMaxXsec()/fb), 0.994945089066*10.)
         self.assertAlmostEqual(uncovered.MET.generalElements[0]._contributingElements[0].weight.getMaxXsec()/fb, 10.)
-        self.assertAlmostEqual(uncovered.MET.generalElements[1]._contributingElements[0].weight.getMaxXsec()/fb, 0.00505491093358*10.)
+        self.assertAlmostEqual(float(uncovered.MET.generalElements[1]._contributingElements[0].weight.getMaxXsec()/fb), 0.00505491093358*10.)
 
         
         

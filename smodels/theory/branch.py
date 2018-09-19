@@ -11,8 +11,8 @@ from smodels.theory.auxiliaryFunctions import elementsInStr,simParticles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
-from smodels.theory.particle import ParticleList,ParticleWildcard
-from smodels.tools.wildCards import ValueWildcard,ListWildcard
+from smodels.theory.particle import ParticleList,InclusiveParticle
+from smodels.tools.inclusiveObjects import InclusiveValue,InclusiveList
 from smodels.experiment.finalStateParticles import finalStates
 
 
@@ -85,7 +85,7 @@ class Branch(object):
         
         :returns: string representation of the branch (in bracket notation)    
         """
-        
+
         st = str([[particle.label for particle in particleList ] for particleList in self.particles ]).replace("'", "")
         st = st.replace(" ", "")
 
@@ -102,10 +102,10 @@ class Branch(object):
         """
 
 
-        if not isinstance(other,(Branch,BranchWildcard)):
+        if not isinstance(other,(Branch,InclusiveBranch)):
             return -1
         
-        elif isinstance(other,BranchWildcard):
+        elif isinstance(other,InclusiveBranch):
             return -1*other.__cmp__(self)
         
         
@@ -125,8 +125,8 @@ class Branch(object):
                 if comp:
                     return comp
                 
-        #Compare BSM states by Z2parity and mass:
-        for iptc,bsmParticle in enumerate(self.BSMparticles):
+        #Compare BSM states by Z2parity and mass (except final state particle):
+        for iptc,bsmParticle in enumerate(self.BSMparticles[:-1]):
             comp = bsmParticle.cmpProperties(other.BSMparticles[iptc],properties=['Z2parity','mass', 'totalwidth'])
             if comp:
                 return comp
@@ -247,7 +247,7 @@ class Branch(object):
         :returns: Branch object
         """
 
-        #Allows for derived classes (like wildcard classes)
+        #Allows for derived classes (like inclusive classes)
         newbranch = self.__class__()
         newbranch.particles = self.particles[:]
         newbranch.BSMparticles = self.BSMparticles[:]
@@ -367,16 +367,16 @@ class Branch(object):
 
 
 
-class BranchWildcard(Branch):
+class InclusiveBranch(Branch):
     """
-    A branch wildcard class. It will return True when compared to any other branch object
+    An inclusive branch class. It will return True when compared to any other branch object
     with the same final state.
     """
     
     def __init__(self,finalState=None):
         Branch.__init__(self)
-        self.masses = ListWildcard()
-        self.particles =  ListWildcard()
+        self.masses = InclusiveList()
+        self.particles =  InclusiveList()
         if finalState:
             bsmParticle = finalStates.getParticlesWith(label=finalState)
             if not bsmParticle:
@@ -385,9 +385,9 @@ class BranchWildcard(Branch):
                 raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)          
             self.BSMparticles = [bsmParticle[0]]
         else:
-            self.BSMparticles = [ParticleWildcard()]
-        self.vertnumb = ValueWildcard()
-        self.vertparts = ListWildcard()
+            self.BSMparticles = [InclusiveParticle()]
+        self.vertnumb = InclusiveValue()
+        self.vertparts = InclusiveList()
         
     def __cmp__(self,other):
         """
@@ -401,7 +401,7 @@ class BranchWildcard(Branch):
         """
 
 
-        if not isinstance(other,(Branch,BranchWildcard)):
+        if not isinstance(other,(Branch,InclusiveBranch)):
             return -1
         
         #If BSM particles are identical, avoid further checks                
@@ -421,7 +421,7 @@ class BranchWildcard(Branch):
     
     
     def getMasses(self):
-        return ListWildcard()
+        return InclusiveList()
     
     def setInfo(self):
         """
@@ -430,8 +430,8 @@ class BranchWildcard(Branch):
         been defined yet.
         """
 
-        self.vertnumb = ValueWildcard()
-        self.vertparts = ListWildcard()
+        self.vertnumb = InclusiveValue()
+        self.vertparts = InclusiveList()
         
     def decayDaughter(self):
         """

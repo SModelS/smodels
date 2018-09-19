@@ -12,7 +12,7 @@ sys.path.insert(0,"../")
 from smodels.theory import decomposer
 from smodels.tools import xsecComputer
 from smodels.theory.model import Model
-from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.tools.xsecComputer import NLL
 from smodels.tools.physicsUnits import GeV, fb, TeV

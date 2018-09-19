@@ -21,7 +21,7 @@ class ClustererTest(unittest.TestCase):
         from smodels.experiment.txnameObj import TxName, TxNameData
         from smodels.experiment.infoObj import Info
         from smodels.installation import installDirectory
-        from smodels.share.models import SMparticles, MSSMparticles
+        from smodels.share.models import SMparticles, mssm
         from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList        
         from smodels.tools.physicsUnits import GeV, TeV, pb, fb
         import copy
@@ -35,13 +35,13 @@ class ClustererTest(unittest.TestCase):
         txnameData.computeV()
         txnameData.removeExtraZeroes()
         txnameData.cleanUp()
-        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info)
+        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info, True)
         txname.txnameData = txnameData
         
         u = SMparticles.u
-        gluino = MSSMparticles.gluino
+        gluino = mssm.gluino
         gluino.__setattr__("mass", 675.*GeV)
-        n1 = MSSMparticles.n1
+        n1 = mssm.n1
         n1.__setattr__("mass", 200.*GeV)
         
 

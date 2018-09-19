@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.installation import installDirectory
-from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory import decomposer
 from smodels.theory.model import Model

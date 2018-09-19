@@ -270,7 +270,7 @@ def getDictionariesFrom(lheFile,nevts=None):
         massDict[pdg] = sum(masses)/len(masses)
         
     #Compute the decay dictionaries:
-    for pdg,eventDecays in decaysDict.items():
+    for pdg,eventDecays in list(decaysDict.items()):
         daughterIDs = []
         for eventDec in eventDecays:
             pids = sorted(eventDec.ids)
@@ -291,10 +291,10 @@ def getDictionariesFrom(lheFile,nevts=None):
             decaysDict[pdg] = combinedDecays
     
     #Remove anti-particle decays and masses:
-    for pdg in massDict.keys()[:]:
+    for pdg in list(massDict.keys())[:]:
         if -abs(pdg) in massDict and abs(pdg) in massDict:
             massDict.pop(-abs(pdg))
-    for pdg in decaysDict.keys()[:]:
+    for pdg in list(decaysDict.keys())[:]:
         if -abs(pdg) in decaysDict and abs(pdg) in decaysDict:
             decaysDict.pop(-abs(pdg))
             
@@ -308,6 +308,8 @@ def getDictionariesFrom(lheFile,nevts=None):
         else:
             decaysDict[pdg].totalwidth = 0.
         decaysDict[pdg].decays = decays
+
+    reader.close()
 
     return massDict,decaysDict
 

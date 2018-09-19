@@ -71,7 +71,7 @@ def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
         if not pid in pdgList:
             logger.error("PDG %i has not been defined" %int(pid))
         branchList[-1].maxWeight = maxWeight[pid]        
-
+        
     # Generate final branches (after all R-odd particles have decayed)
     finalBranchList = decayBranches(branchList, sigcut)
     
@@ -93,21 +93,22 @@ def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
                                      key=lambda br: br.maxWeight, reverse=True)        
 
     smsTopList = topology.TopologyList()
+
     # Combine pairs of branches into elements according to production
     # cross section list
     for pids in xSectionList.getPIDpairs():
         weightList = xSectionListDict[pids]
-        minBR = (sigcut/weightList.getMaxXsec()).asNumber()        
+        minBR = (sigcut/weightList.getMaxXsec()).asNumber()    
         if minBR > 1.:
             continue
         for branch1 in branchListDict[pids[0]]:
             BR1 =  branch1.maxWeight/maxWeight[pids[0]]  #Branching ratio for first branch            
             if BR1 < minBR:
                 break #Stop loop if BR1 is already too low
-            for branch2 in branchListDict[pids[1]]:                       
+            for branch2 in branchListDict[pids[1]]:   
                 BR2 =  branch2.maxWeight/maxWeight[pids[1]]  #Branching ratio for second branch                
-                if BR1 < minBR:
-                    break #Stop loop if BR1 is already too low        
+                if BR2 < minBR:
+                    break #Stop loop if BR2 is already too low        
                                      
                 finalBR = BR1*BR2                
                 if type(finalBR) == type(1.*fb):

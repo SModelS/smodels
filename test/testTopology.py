@@ -10,7 +10,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.share.models import SMparticles, MSSMparticles
+from smodels.share.models import SMparticles, mssm
 from smodels.theory.branch import Branch
 from smodels.theory.element import Element
 from smodels.theory.topology import Topology,TopologyList
@@ -29,12 +29,12 @@ g = SMparticles.g
 em = SMparticles.e
 nue = SMparticles.nue
 
-gluino = MSSMparticles.gluino
-st1 = MSSMparticles.st1
-n1 = MSSMparticles.n1
-n2 = MSSMparticles.n2
-n3 = MSSMparticles.n3
-n4 = MSSMparticles.n4
+gluino = mssm.gluino
+st1 = mssm.st1
+n1 = mssm.n1
+n2 = mssm.n2
+n3 = mssm.n3
+n4 = mssm.n4
 
 w1 = XSectionList()
 w1.xSections.append(XSection())

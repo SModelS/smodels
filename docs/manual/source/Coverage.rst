@@ -47,8 +47,9 @@ These elements are grouped into the following classes:
 
 * *missingTopos*: |elements| which are not tested by any of the |results| in the |database| (independent of the element mass). The missing topologies are further classified as:
 
-   * *longCascade*: |elements| with long cascade decays (more than one intermediate particle in one of the |branches|);
-   * *asymmetricBranches*: |elements| where the first |branch| differs from the second |branch| (but that are not considered as long cascade decays).
+   * *displaced*: |elements| with at least one displaced decay;
+   * *long-lived*: |elements| with at least one stable BSM particle other than the lightest one;
+   * *prompt*: |elements| with MET final states only
 
 * *outsideGrid*: |elements| which could be tested by one or more experimental result, but are not constrained because the mass array is outside the mass grid;
 
@@ -69,10 +70,17 @@ The *missing* topologies are then further classified (if applicable) into *longC
 
 
 The topologies for each of the four categories are then grouped according to the final state (for the *missingTopos* and
-*outsideGrid* classes) or according to the PDG ids of the initially produced motherparticles (for the *longCascade* and
-*asymmetricBranches* classes). 
+*outsideGrid* classes) or according to the PDG ids of the initially produced motherparticles (for the *displaced* , *long-lived* 
+and *prompt* classes). 
 We note that for the latter the |elements| deriving from different mother particles, but with the same |final states| and mass configuration cannot be distinguished, and are therefore combined in this grouping.
-The full list of mother PDG id pairs can be accessed in the python printout or the comment of the text printout.
+
+Since the lifetime reweighting only takes place when an element is matched to an experimental result, the *missing* or *outsideGrid* elements
+have not been reweighted accordingly.
+The reweighting done on the database side is analysis dependent and can therefore not be applied to the unmatched elements.
+Instead they are reweighted by applying some approximations:
+* for *missing topologies* the travelled distance corresponding to a displaced decay means everything outside of the inner detector and inside the effective size of detector
+* the effective time dilation factor is set to :math:`\langle \gamma \beta \rangle = 1.3`
+
 
 
 The topology coverage tool is normally called from within SModelS (e.g. when running :ref:`runSModelS.py <runSModelS>`) by setting **testCoverage=True**

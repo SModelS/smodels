@@ -90,17 +90,18 @@ class MPrinter(object):
         for prt in self.Printers.values():
             prt.addObj(obj)
             
-    def setOutPutFiles(self,filename):
+    def setOutPutFiles(self,filename,silent=False):
         """
         Set the basename for the output files. Each printer will
         use this file name appended of the respective extension 
         (i.e. .py for a python printer, .smodels for a summary printer,...)
         
         :param filename: Input file name
+        :param silent: dont comment removing old files
         """
         
         for printer in self.Printers.values():
-            printer.setOutPutFile(filename)
+            printer.setOutPutFile(filename,silent=silent)
 
 
     def flush(self):
@@ -240,19 +241,22 @@ class TxTPrinter(BasicPrinter):
                              TheoryPredictionList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)        
         
-    def setOutPutFile(self,filename,overwrite=True):
+
+    def setOutPutFile(self,filename,overwrite=True,silent=False):
         """
         Set the basename for the text printer. The output filename will be
         filename.log.
         
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
+        :param silent: dont comment removing old files
         """        
         
         self.filename = filename +'.' + self.name    
         if overwrite and os.path.isfile(self.filename):
-            logger.warning("Removing old output file " + self.filename)
-            os.remove(self.filename)
+            if not silent:
+                logger.warning("Removing old output file " + self.filename)
+            os.remove(self.filename)            
             
     def _formatDoc(self,obj):
 
@@ -407,9 +411,9 @@ class TxTPrinter(BasicPrinter):
 
     def _formatTheoryPredictionList(self, obj):
         """
-        Format data for a ResultList object.
+        Format data for a TheoryPredictionList object.
 
-        :param obj: A ResultList object to be printed.
+        :param obj: A TheoryPredictionList object to be printed.
         """ 
         output = ""
         output += "   ======================================================= \n"
@@ -539,26 +543,28 @@ class SummaryPrinter(TxTPrinter):
         self.printingOrder = [OutputStatus,TheoryPredictionList, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
         
-    
-    def setOutPutFile(self,filename,overwrite=True):
+            
+    def setOutPutFile(self,filename,overwrite=True,silent=False):
         """
         Set the basename for the text printer. The output filename will be
         filename.smodels.
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
+        :param silent: dont comment removing old files
         """        
         
         self.filename = filename +'.smodels'
         if overwrite and os.path.isfile(self.filename):
-            logger.warning("Removing old output file " + self.filename)
-            os.remove(self.filename)
+            if not silent:
+                logger.warning("Removing old output file " + self.filename)
+            os.remove(self.filename)            
             
             
     def _formatTheoryPredictionList(self, obj):
         """
-        Format data of the ResultList object.
+        Format data of the TheoryPredictionList object.
 
-        :param obj: A ResultList object to be printed.
+        :param obj: A TheoryPredictionList object to be printed.
         """
         obj.sortTheoryPredictions()
 
@@ -626,21 +632,23 @@ class PyPrinter(BasicPrinter):
     def __init__(self, output = 'stdout', filename = None):
         BasicPrinter.__init__(self, output, filename)
         self.name = "py"
-        self.printingOrder = [OutputStatus,TopologyList,ResultList,Uncovered]
+        self.printingOrder = [OutputStatus,TopologyList,TheoryPredictionList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
         
-    def setOutPutFile(self,filename,overwrite=True):
+    def setOutPutFile(self,filename,overwrite=True,silent=False):
         """
         Set the basename for the text printer. The output filename will be
         filename.py.
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
+        :param silent: dont comment removing old files
         """        
         
         self.filename = filename +'.py'
         if overwrite and os.path.isfile(self.filename):
-            logger.warning("Removing old output file " + self.filename)
-            os.remove(self.filename)
+            if not silent:
+                logger.warning("Removing old output file " + self.filename)
+            os.remove(self.filename)            
 
     def flush(self):
         """
@@ -742,11 +750,11 @@ class PyPrinter(BasicPrinter):
         return {'OutputStatus' : infoDict}
 
 
-    def _formatResultList(self, obj):
+    def _formatTheoryPredictionList(self, obj):
         """
-        Format data of the ResultList object.
+        Format data of the TheoryPredictionList object.
 
-        :param obj: A ResultList object to be printed.
+        :param obj: A TheoryPredictionList object to be printed.
         """
 
         obj.sort()
@@ -793,7 +801,8 @@ class PyPrinter(BasicPrinter):
                         'DataSetID' : datasetID,
                         'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
                         'lumi (fb-1)' : (dataset.globalInfo.lumi*fb).asNumber(),
-                        'dataType' : dataType}  
+                        'dataType' : dataType,
+                        'r' : r, 'r_expected' : r_expected}  
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
@@ -925,22 +934,23 @@ class XmlPrinter(PyPrinter):
     def __init__(self, output = 'stdout', filename = None):
         PyPrinter.__init__(self, output, filename)
         self.name = "xml"
-        self.printingOrder = [OutputStatus,TopologyList,ResultList,Uncovered]
+        self.printingOrder = [OutputStatus,TopologyList,TheoryPredictionList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
-
-        
-    def setOutPutFile(self,filename,overwrite=True):
+            
+    def setOutPutFile(self,filename,overwrite=True,silent=False):
         """
         Set the basename for the text printer. The output filename will be
         filename.xml.
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
+        :param silent: dont comment removing old files
         """        
         
         self.filename = filename +'.xml'
         if overwrite and os.path.isfile(self.filename):
-            logger.warning("Removing old output file " + self.filename)
-            os.remove(self.filename)        
+            if not silent:
+                logger.warning("Removing old output file " + self.filename)
+            os.remove(self.filename)     
 
 
     def convertToElement(self,pyObj,parent,tag=""):
@@ -1012,22 +1022,23 @@ class SLHAPrinter(TxTPrinter):
         TxTPrinter.__init__(self, output, filename)
         self.name = "slha"
         self.docompress = 0
-        self.printingOrder = [OutputStatus,ResultList, Uncovered]
+        self.printingOrder = [OutputStatus,TheoryPredictionList, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
-
-
-    def setOutPutFile(self,filename,overwrite=True):
+            
+    def setOutPutFile(self,filename,overwrite=True,silent=False):
         """
         Set the basename for the text printer. The output filename will be
         filename.smodels.
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
+        :param silent: dont comment removing old files
         """
 
         self.filename = filename +'.smodelsslha'
         if overwrite and os.path.isfile(self.filename):
-            logger.warning("Removing old output file " + self.filename)
-            os.remove(self.filename)
+            if not silent:
+                logger.warning("Removing old output file " + self.filename)
+            os.remove(self.filename)            
 
     def _formatOutputStatus(self, obj):
         
@@ -1042,7 +1053,7 @@ class SLHAPrinter(TxTPrinter):
         output += " 5 %-25s #sigmacut [fb]\n\n" % (obj.parameters['sigmacut'])
         return output
 
-    def _formatResultList(self, obj):
+    def _formatTheoryPredictionList(self, obj):
         output = "BLOCK SModelS_Exclusion\n"
         if obj.isEmpty():
             excluded = -1

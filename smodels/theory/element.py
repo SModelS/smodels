@@ -7,7 +7,7 @@
 """
 
 from smodels.theory.auxiliaryFunctions import elementsInStr
-from smodels.theory.branch import Branch, BranchWildcard
+from smodels.theory.branch import Branch, InclusiveBranch
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -73,12 +73,12 @@ class Element(object):
                         finalState = [None]*len(branches)                  
                     for ibr,branch in enumerate(branches):                        
                         if branch == '[*]':
-                            self.branches.append(BranchWildcard(finalState[ibr]))                           
+                            self.branches.append(InclusiveBranch(finalState[ibr]))                           
                         else:
                             self.branches.append(Branch(branch,finalState[ibr])) 
 
             # Create element from branch pair
-            elif isinstance(info,list) and all(isinstance(x,(Branch,BranchWildcard)) for x in info):                
+            elif isinstance(info,list) and all(isinstance(x,(Branch,InclusiveBranch)) for x in info):                
                 self.branches = [br.copy() for br in info]
             else:
                 raise SModelSError("Can not create element from input type %s" %type(info))
@@ -191,7 +191,7 @@ class Element(object):
         :returns: copy of element (Element object)   
         """
 
-        #Allows for derived classes (like wildcard classes)
+        #Allows for derived classes (like inclusive classes)
         newel = self.__class__()
         newel.branches = []
         for branch in self.branches:
@@ -474,7 +474,13 @@ class Element(object):
         #Loop over branches and look for small mass differences 
         for ibr,branch in enumerate(newelement.branches):
             #Get mass differences      
-            massDiffs = [mom.mass - branch.BSMparticles[i+1].mass for i,mom in enumerate(branch.BSMparticles[:-1])]
+     
+            massDiffs = []
+            for i,mom in enumerate(branch.BSMparticles[:-1]):
+                if isinstance(branch.BSMparticles[i+1].mass, list):
+                    pmass = min(branch.BSMparticles[i+1].mass)
+                else: pmass = branch.BSMparticles[i+1].mass
+                massDiffs.append(mom.mass - pmass)
             #Get vertices which have deltaM < minmassgap:
             removeVertices = [iv for iv,m in enumerate(massDiffs) if m < minmassgap]
             #Remove vertices till they exist:

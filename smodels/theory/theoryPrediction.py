@@ -212,7 +212,7 @@ class TheoryPredictionList(object):
     :ivar _theoryPredictions: list of TheoryPrediction objects
     """
 
-    def __init__(self, theoryPredictions=None):
+    def __init__(self, theoryPredictions=None, maxCond=None):
         """
         Initializes the list.
         
@@ -511,7 +511,7 @@ def _getElementsFrom(smsTopList, dataset):
                 newEl = txname.hasElementAs(el)  #Check if element appears in txname
                 if not newEl: continue
                 el.covered = True
-                eff = txname.getEfficiencyFor(newEl.getMasses())
+                eff = txname.getEfficiencyFor(newEl)
                 if not eff:
                     continue
                 el.tested = True
@@ -622,27 +622,20 @@ def _evalConditions(cluster):
 def _evalExpression(stringExpr,cluster):
     """
     Auxiliary method to evaluate a string expression using the weights of the elements in the cluster.
-    Replaces the elements in stringExpr (in bracket notation) by their weights and evaluate the
+    Replaces the elements in stringExpr (in bracket notation) by their weights and evaluate the 
     expression.
     e.g. computes the total weight of string expressions such as "[[[e^+]],[[e^-]]]+[[[mu^+]],[[mu^-]]]"
     or ratios of weights of string expressions such as "[[[e^+]],[[e^-]]]/[[[mu^+]],[[mu^-]]]"
-    and so on...
-
+    and so on...    
+    
     :parameter stringExpr: string containing the expression to be evaluated
     :parameter cluster: cluster of elements (ElementCluster object)
     :returns: xsection for the expression. Can be a XSection object, a float or not numerical (None,string,...)
-
+    
     """
-
+    
 #Get cross section info from cluster (to generate zero cross section values):
     infoList = cluster.elements[0].weight.getInfo()
-#Generate elements appearing in the string expression with zero cross sections:
-    elements = []
-    for elStr in elementsInStr(stringExpr):
-        el = element.Element(elStr)
-        el.weight = crossSection.XSectionList(infoList)
-        elements.append(el)
-
 #Get weights for elements appearing in stringExpr
     weightsDict = {}
     evalExpr = stringExpr.replace("'","").replace(" ","")
@@ -652,13 +645,15 @@ def _evalExpression(stringExpr,cluster):
         for el1 in cluster.elements:
             if el1.particlesMatch(el):
                 weightsDict['w%i'%i].combineWith(el1.weight)
-                el.combineMotherElements(el1)
+                el.motherElements += el1.motherElements[:]                
         evalExpr = evalExpr.replace(elStr,'w%i'%i)
 
     weightsDict.update({"Cgtr" : cGtr, "cGtr" : cGtr, "cSim" : cSim, "Csim" : cSim})
     exprvalue = eval(evalExpr, weightsDict)
+
     if type(exprvalue) == type(crossSection.XSectionList()):
         if len(exprvalue) != 1:
             logger.error("Evaluation of expression "+evalExpr+" returned multiple values.")
         return exprvalue[0] #Return XSection object
+    
     return exprvalue

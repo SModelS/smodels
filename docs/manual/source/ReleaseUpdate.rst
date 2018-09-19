@@ -39,6 +39,24 @@ Since the publication of SModelS v1.0 in December 2014, the code base
 has undergone significant structural changes. 
 The major novelties of this release are as follows:
 
+New in Version 2.0.0:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Introduction of :ref:`particle class <particleClass>`
+  * Decomposition and experimental results can include displaced signatures
+  * Added :ref:`lifetime reweighting <lifetimeWeight>` to |database| for meta-stable particles
+  * Added approximate lifetime reweighting for :ref:`missing topologies <topCoverage>` 
+
+New in Version 1.2.0:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Decomposition and experimental results can include
+    non-MET BSM :ref:`final states <final stateOdd>` (e.g. heavy stable charged particles)
+  * Added :ref:`lifetime reweighting <lifetimeWeight>` at |decomposition| for meta-stable particles
+  * Added :ref:`finalState property <final stateOdd>` for Elements
+  * Introduction of :ref:`inclusive simplified models <inclusiveSMS>`
+  * Inclusion of HSCP and R-hadron results in the database
+
 New in Version 1.1.3:
 ^^^^^^^^^^^^^^^^^^^^^
 

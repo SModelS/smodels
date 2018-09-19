@@ -240,7 +240,6 @@ def elementsInStr(instring,removeQuotes=True):
     :returns: list of elements appearing in instring in string format
     
     """
-
     outstr = ""
     if isinstance(instring,str):
         outstr = instring

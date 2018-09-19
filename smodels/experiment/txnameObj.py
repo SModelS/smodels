@@ -42,7 +42,7 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
 
-    def __init__(self, path, globalObj, infoObj ):
+    def __init__(self, path, globalObj, infoObj, discard_zeroes ):
         self.path = path
         self.globalInfo = globalObj
         self._infoObj = infoObj
@@ -158,19 +158,22 @@ class TxName(object):
         :param value: value for the field in string format
         """
 
-        if tag == 'constraint' or tag == 'condition':
+        if tag == 'constraint' or tag == 'condition':        
             if isinstance(value,list):
                 value = [val.replace("'","") for val in value]
-            else: value = value.replace("'","")
-
-        try:
-            setattr(self,tag,eval(value, unitsDict))
-        except SyntaxError:
-            setattr(self,tag,value)
-        except NameError:
-            setattr(self,tag,value)
-        except TypeError:
-            setattr(self,tag,value)
+            else:
+                value = value.replace("'","")
+            if value == 'None': setattr(self,tag, eval(value))                           
+            else: setattr(self,tag, value) #Make sure constraints/conditions are not evaluated
+        else:
+            try:
+                setattr(self,tag,eval(value, unitsDict))              
+            except SyntaxError:
+                setattr(self,tag,value)
+            except NameError:
+                setattr(self,tag,value)
+            except TypeError:
+                setattr(self,tag,value)     
 
     def getInfo(self, infoLabel):
         """
@@ -361,7 +364,7 @@ class TxNameData(object):
     def getDataShape(self,value):
         """
         Stores the data format (mass shape) and store it for future use.
-        If there are wildcards (mass or branch = None), store their positions.
+        If there are inclusive objects (mass or branch = None), store their positions.
         
         :param value: list of data points
         """
@@ -380,12 +383,12 @@ class TxNameData(object):
         in value will be ignored.
         
         :param value: Array to be formatted (e.g. [[200.,100.],[200.,100.]])
-        :param shapeArray: Array with format info (e.f. ['*',[float,float]])
+        :param shapeArray: Array with format info (e.g. ['*',[float,float]])
         
         :return: formatted array [[200.,100.]]
         
         """
-
+        
         if shapeArray == '*':
             return None
         elif isinstance(value,list):
@@ -397,7 +400,8 @@ class TxNameData(object):
         else:
             return value
         
-    def removeWildCards(self,value):
+        
+    def removeInclusives(self,value):
         """
         Remove all entries = '*' from value.
         
@@ -407,7 +411,7 @@ class TxNameData(object):
         if value == "*":
             return None
         elif isinstance(value,list):
-            return [self.removeWildCards(v) for v in value if not self.removeWildCards(v) is None]
+            return [self.removeInclusives(v) for v in value if not self.removeInclusives(v) is None]
         else:
             return value
         
@@ -426,9 +430,9 @@ class TxNameData(object):
             val = value
             
         self.units = self.getUnits(val)[0] #Store standard units
-        self.dataShape = self.getDataShape(val[0][0]) #Store the data (mass) format (useful if there are wildcards)        
+        self.dataShape = self.getDataShape(val[0][0]) #Store the data (mass) format (useful if there are inclusives)        
         self.value = self.removeUnits(val) #Remove units and store the normalization units
-        self.value = self.removeWildCards(self.value)
+        self.value = self.removeInclusives(self.value)
 
         if len(self.value) < 1 or len(self.value[0]) < 2:
                 raise SModelSError("input value not in correct format. expecting sth " \
@@ -457,9 +461,8 @@ class TxNameData(object):
         :param massarray: mass array values (with units), i.e.
                           [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
-        
         porig = self.removeUnits(massarray)
-        porig = self.formatInput(porig,self.dataShape) #Remove entries which match wildcards
+        porig = self.formatInput(porig,self.dataShape) #Remove entries which match inclusives
         porig = self.flattenArray(porig) ## flatten        
         self.massarray = massarray ## only for bookkeeping and better error msgs
         
@@ -595,9 +598,8 @@ class TxNameData(object):
             Whichever relative change is greater is reported as the expected
             extrapolation error.
         """
-        
         porig = self.removeUnits(massarray)
-        porig = self.formatInput(porig,self.dataShape) #Remove entries which match wildcards
+        porig = self.formatInput(porig,self.dataShape) #Remove entries which match inclusives
         porig = self.flattenArray(porig)
          
         p = ((np.matrix(porig)[0] - self.delta_x)).tolist()[0]

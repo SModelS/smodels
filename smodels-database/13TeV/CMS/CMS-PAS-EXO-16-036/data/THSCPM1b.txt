@@ -1,8 +1,6 @@
 txName: THSCPM1b
 constraint: [[],[]]
 condition: None
-susyProcess: pp --> stau stau, stau stau --> stau stau
-dataUrl: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/EXO-16-036/CMS-PAS-EXO-16-036_Figure_003-b.png
 source: CMS
 validated: True
 axes: [[x], [x]]

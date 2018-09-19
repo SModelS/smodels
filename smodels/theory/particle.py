@@ -50,7 +50,7 @@ class Particle(object):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """    
         
-        if not isinstance(other,(ParticleList,Particle,ParticleWildcard)):
+        if not isinstance(other,(ParticleList,Particle,InclusiveParticle)):
             return +1
         
         return self.cmpProperties(other, properties=['Z2parity','label']) 
@@ -106,7 +106,7 @@ class Particle(object):
         Check if particle has the same properties (default is spin, colordim and eCharge)
         as other. Only compares the attributes which have been defined in both objects.
         
-        :param other: a Particle, ParticleList or ParticleWildCard object
+        :param other: a Particle, ParticleList or InclusiveParticle object
         :param properties: list with properties to be compared. Default is spin, colordim and eCharge
         
         :return: True if all properties are the same, False otherwise.
@@ -125,13 +125,13 @@ class Particle(object):
         The comparison is made in hierarchical order, following the order
         defined by the properties list.
         
-        :param other: a Particle, ParticleList or ParticleWildCard object
+        :param other: a Particle, ParticleList or InclusiveParticle object
         :param properties: list with properties to be compared. Default is spin, colordim and eCharge
         
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
         """
 
-        if isinstance(other,(ParticleList,ParticleWildcard)):
+        if isinstance(other,(ParticleList,InclusiveParticle)):
             return -1*other.cmpProperties(self,properties=properties)
         
         for prop in properties:
@@ -333,13 +333,13 @@ class ParticleList(Particle):
         matches the property of other. If both properties are lists, check if the
         lists share at least one common element.
         
-        :param other: a Particle, ParticleList or ParticleWildCard object
+        :param other: a Particle, ParticleList or InclusiveParticle object
         :param properties: list with properties to be compared. Default is spin, colordim and eCharge
         
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
         """
         
-        if isinstance(other,ParticleWildcard):
+        if isinstance(other,InclusiveParticle):
             return -1*other.cmpProperties(self,properties=properties)
         
         for prop in properties:            
@@ -382,8 +382,19 @@ class ParticleList(Particle):
             
         return 0
 
+    def __getstate__(self):
+        """
+        Override getstate method. Required for pickling.
+        """  
+        return self.__dict__
 
-
+    def __setstate__(self, state):
+        """
+        Override setstate method. Required for pickling.
+        """
+          
+        self._static = False
+        self.__dict__.update(state)  
 
     def describe(self):
         return str(self.__dict__)  
@@ -431,10 +442,10 @@ class ParticleList(Particle):
 
 
 
-class ParticleWildcard(Particle):
+class InclusiveParticle(Particle):
     """
-    A particle wildcard class. It will return True when compared to any other Particle or ParticleList object.
-    The only exception is if the ParticleWildcard has a defined parity. In this case it will only be equal
+    An inclusive particle class. It will return True when compared to any other Particle or ParticleList object.
+    The only exception is if the InclusiveParticle has a defined parity. In this case it will only be equal
     to particles with the same parity.
     """
     
@@ -453,7 +464,7 @@ class ParticleWildcard(Particle):
         Returns 0 if the Z2parities match, otherwise
         -1 if self.Z2parity < other.Z2parity and 1 if self.Z2parity > other.Z2parity.
         
-        :param other: a Particle, ParticleList or ParticleWildCard object
+        :param other: a Particle, ParticleList or InclusiveParticle object
         :param properties: (dummy) list with properties to be compared. It is not used.
         
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.

@@ -15,8 +15,11 @@ from databaseLoader import database
  
 # from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.theory.theoryPrediction import theoryPredictionsFor
-from smodels.theory.slhaDecomposer import decompose
+from smodels.theory.decomposer import decompose
 from smodels.tools.physicsUnits import fb
+from smodels.share.models.mssm import BSMList
+from smodels.share.models.SMparticles import SMList
+from smodels.theory.model import Model
  
 class TopoCombTest(unittest.TestCase):
     def createSLHAFile(self,case="T1tttt"):
@@ -52,7 +55,10 @@ XSECTION  1.30E+04  2212 2212 2 1000021 1000021 # 10000 events, [pb], pythia8 fo
         predXSecs,rvalues={},{}
         for case in [ "T1", "T5", "mixed" ]:
             filename = self.createSLHAFile( case=case )
-            deco = decompose ( filename )
+            model = Model(BSMList,SMList,filename)
+            model.updateParticles()            
+            deco = decompose ( model )    
+                    
             expRes = database.getExpResults( analysisIDs = [ "CMS-SUS-16-050-agg" ] )[0]
             # print ( "Experimental result: %s" % expRes )
             tp = theoryPredictionsFor ( expRes, deco, useBestDataset=False, combinedResults=True )

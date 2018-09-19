@@ -14,7 +14,7 @@ import unittest
 from smodels.installation import installDirectory as idir
 from smodels.theory import decomposer
 from smodels.tools.physicsUnits import fb, GeV
-from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
 from smodels.tools import printer, ioObjects
 from smodels.tools import coverage
 import summaryReader
@@ -24,8 +24,9 @@ from unitTestHelpers import equalObjs
 from imp import reload
 from smodels.tools import runtime
 from smodels import particlesLoader
-from smodels.share.models.MSSMparticles import BSMList
+from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
+from smodels.theory.model import Model
 
 def sortXML(xmltree):
     for el in xmltree:        
@@ -99,11 +100,11 @@ class RunPrinterTest(unittest.TestCase):
             allPredictions += predictions._theoryPredictions
         
         maxcond = 0.2
-        results = ioObjects.ResultList(allPredictions,maxcond)
-        mprinter.addObj(results)
+        theoryPredictions = TheoryPredictionList(allPredictions, maxcond)
+        mprinter.addObj(theoryPredictions)
         
         #Add coverage information:
-        coverageInfo = coverage.Uncovered(smstoplist)
+        coverageInfo = coverage.Uncovered(smstoplist,sigmacut)
         mprinter.addObj(coverageInfo)
         
         

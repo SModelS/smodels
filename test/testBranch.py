@@ -12,7 +12,7 @@ sys.path.insert(0,"../")
 from smodels.theory.exceptions import SModelSTheoryError
 import unittest
 from smodels.theory.particle import Particle, ParticleList
-from smodels.theory.branch import Branch, decayBranches, BranchWildcard
+from smodels.theory.branch import Branch, decayBranches, InclusiveBranch
 from smodels.tools.physicsUnits import GeV, fb, MeV
 import pyslha
 import pickle
@@ -43,7 +43,7 @@ class BranchTest(unittest.TestCase):
         b3 = Branch(info = '[[e-]]')       
         b4 = Branch(info = '[[q]]')
         b4.BSMparticles = [sq1]
-        b5 = BranchWildcard()
+        b5 = InclusiveBranch()
 
         self.assertTrue( str(b1) == '[[q,q],[q],[q,q]]')
         self.assertTrue(b1 > b2)  #Larger by number of vertices

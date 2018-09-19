@@ -23,8 +23,6 @@ def filetype ( filename ):
     """
     import os
     
-    print (filename)
-    print (os.getcwd())
     if not os.path.exists ( filename ):
         print ("not exist")
         return None

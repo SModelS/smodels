@@ -9,7 +9,7 @@
 """
 import sys
 sys.path.insert(0,"../")
-from smodels.share.models import MSSMparticles
+from smodels.share.models import mssm
 from smodels.theory.element import Element
 from smodels.experiment import infoObj
 from smodels.experiment.txnameObj import TxName
@@ -17,8 +17,8 @@ from smodels.tools.physicsUnits import GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import unittest
 
-c1 = MSSMparticles.c1
-n1 = MSSMparticles.n1
+c1 = mssm.c1
+n1 = mssm.n1
 
 class TxTest(unittest.TestCase):
 
@@ -27,7 +27,7 @@ class TxTest(unittest.TestCase):
         f = './databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2.txt'
         gInfo = infoObj.Info('./databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        tx = TxName(f,gInfo,gInfo)
+        tx = TxName(f,gInfo,gInfo,True)
         
         el = Element(info="[[*],[]]",finalState = ['MET','HSCP'])
         
@@ -40,16 +40,16 @@ class TxTest(unittest.TestCase):
         f = './databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2broken.txt'
         gInfo = infoObj.Info('./databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        
         try:
-            tx = TxName(f,gInfo,gInfo)
+            print (gInfo)
+            tx = TxName(f,gInfo,gInfo,True)
+            print (tx)
             gotError = False
         except SModelSError as e:         
             gotError = e
         
         errstr = 'Final state non-MET has not been defined in finalStateParticles.py'
-        
-        self.assertEqual(e.args[0], errstr)
+        self.assertEqual(gotError.args[0], errstr)
         
         
     def testgetEffFor(self):
@@ -57,7 +57,7 @@ class TxTest(unittest.TestCase):
         f = './databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2.txt'
         gInfo = infoObj.Info('./databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        tx = TxName(f,gInfo,gInfo)                        
+        tx = TxName(f,gInfo,gInfo,True)                        
         
         self.assertFalse(hasattr(tx._topologyList.getElements()[0], 'mass'))
         

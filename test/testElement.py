@@ -261,6 +261,8 @@ class ElementTest(unittest.TestCase):
         n1.mass = 300.*GeV
         n2.mass = 300.*GeV
         n3.mass = 320.*GeV 
+        n1.totalwidth = 0.*GeV
+        n2.totalwidth = 0.*GeV #just for the sake of the example
          
         w1 = XSectionList()
         w1.xSections.append(XSection())

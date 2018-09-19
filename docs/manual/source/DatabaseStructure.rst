@@ -112,14 +112,27 @@ first few lines of CMS-SUS-12-024/data/T1tttt.txt read:
 
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 1-8
+
+If the finalState property is not provided, the simplified model is assumed to 
+contain neutral BSM final states in each branch, leading to a MET signature.
+However, if this is not the case, the non-MET final states must be explicitly listed
+in the  ``TxName.txt`` file (see :ref:`final state classes <final stateOdd>` for more details).
+An example from the CMS-EXO-12-026/data/THSCPM1b.txt file is shown below:
+
+.. literalinclude:: /literals/THSCPM1b.txt
+   :lines: 1,2,7,9,10
+
    
-The second block of data contains the upper limits as a function of the BSM masses:
+The second block of data in the  ``TxName.txt`` file contains the upper limits as a function of the BSM masses:
 
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 9-19
 
 As we can see, the UL map is given as a Python array with the structure: 
 :math:`[[\mbox{masses},\mbox{upper limit}], [\mbox{masses},\mbox{upper limit}],...]`.
+
+
+
 
 Data Set Folder: Efficiency Map Type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -146,6 +159,10 @@ information about the |element| (:math:`[[[\mbox{jet}]],[[\mbox{jet}]]]`)
 in |bracket notation| for which the
 efficiencies refers to as well as reference to the original data source and
 some additional information.
+As in the Upper Limit case, the simplified
+model is assumed to contain neutral BSM final states (MET signature).
+For non-MET final states the  finalState field must list
+the :ref:`final state signatures <final stateOdd>`.
 The second block of data contains the efficiencies as a function of the BSM masses:
 
 .. literalinclude:: /literals/T2.txt
@@ -153,6 +170,58 @@ The second block of data contains the efficiencies as a function of the BSM mass
 
 As we can see the efficiency map is given as a Python array with the structure: 
 :math:`[[\mbox{masses},\mbox{efficiency}], [\mbox{masses},\mbox{efficiency}],...]`.
+
+
+.. _inclusiveSMS:
+
+Inclusive Simplified Models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+If the analysis signal efficiencies are insensitive to
+some of the simplified model final states, it might be convenient to define
+*inclusive* simplified models. A typical case are some of the heavy stable charged
+particle searches, which only rely on the presence of a non-relativistic charged
+particle, which leads to  an anomalous charged track signature.
+In this case the signal efficiencies are highly insensitive to the remaining event
+activity and the corresponding simplified models can be very inclusive.
+In order to handle this inclusive cases in the database we allow for wildcards
+when specifying the constraints.
+For instance, the constraint for the CMS-EXO-13-006 eff/c000/THSCPM3.txt
+reads:
+
+.. literalinclude:: /literals/THSCPM3.txt
+   :lines: 1-2
+   
+and represents the (inclusive) simplified model:
+
+.. image:: images/elementInclusive.png
+   :width: 35%
+
+Note that although the final state represented by "\*" is any Z\ :sub:`2`-even :ref:`final states <final statesEven>`,
+it must still correspond to a single particle, since the topology specifies a 2-body 
+decay for the initially produced BSM particle.
+Finally, it might be useful to define even more inclusive simplified models, such
+as the one in  CMS-EXO-13-006 eff/c000/THSCPM4.txt:
+
+.. literalinclude:: /literals/THSCPM4.txt
+   :lines: 1-2,11
+
+In the above case the simplified model corresponds to an HSCP being initially produced
+in association with any BSM particle which leads to a MET signature.
+Notice that the notation "[\*]" corresponds to *any `branch*, while ["\*"] means *any particle*:
+
+
+.. image:: images/elementInclusive2.png
+   :width: 35%
+
+In such cases the mass array for the arbitrary branch must also be specified as
+using wildcards:
+
+.. literalinclude:: /literals/THSCPM4.txt
+   :lines: 12-14
+
+
 
 .. _objStruct:
 

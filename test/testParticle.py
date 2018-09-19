@@ -8,7 +8,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.theory.particle import Particle, ParticleList, ParticleWildcard
+from smodels.theory.particle import Particle, ParticleList, InclusiveParticle
 from smodels.tools.physicsUnits import GeV
 from smodels.theory.auxiliaryFunctions import elementsInStr
 
@@ -44,7 +44,7 @@ class ParticleTest(unittest.TestCase):
         self.assertGreater(LList, lList)  #Llist is longer
         self.assertNotEqual( l1 , lList) 
         self.assertTrue(l1 == p1)
-        self.assertTrue(sorted(l1.pdg) == sorted([1000021,None]))
+        self.assertTrue(l1.pdg == [None,1000021])
         
     def testChargeConjugation(self):
         p5cc = p5.chargeConjugate()
@@ -56,8 +56,8 @@ class ParticleTest(unittest.TestCase):
         self.assertEqual(p3cc.pdg, -1)
         self.assertEqual(p4.chargeConjugate(), p4a)
         
-    def testParticleWildCard(self):
-        anything = ParticleWildcard(label='anything')
+    def testInclusiveParticle(self):
+        anything = InclusiveParticle(label='anything')
         l1 = ParticleList(label='plist', particles=[p1,p2,p4])
         from smodels.experiment.finalStateParticles import anySM,anyBSM,lList
                

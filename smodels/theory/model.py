@@ -9,7 +9,7 @@ import pyslha,copy
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
 from smodels.theory import lheReader, crossSection
-from smodels.theory.particle import ParticleList,ParticleWildcard
+from smodels.theory.particle import ParticleList,InclusiveParticle
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 class Model(object):
@@ -122,7 +122,7 @@ class Model(object):
 
 
         for particle in self.BSMparticles:
-            if isinstance(particle,(ParticleList,ParticleWildcard)):
+            if isinstance(particle,(ParticleList,InclusiveParticle)):
                 continue
 
             if not hasattr(particle,'pdg') or not hasattr(particle,'Z2parity'):

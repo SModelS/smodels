@@ -42,7 +42,7 @@ class DataSet(object):
             #Get list of TxName objects:
             for txtfile in glob.iglob(os.path.join(path,"*.txt")):
                 try:
-                    txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo)
+                    txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo,discard_zeroes)
                     if discard_zeroes and txname.hasOnlyZeroes():
                         logger.debug ( "%s, %s has only zeroes. discard it." % \
                                          ( self.path, txname.txName ) )
@@ -53,25 +53,30 @@ class DataSet(object):
             self.txnameList.sort()
             self.checkForRedundancy()
 
-    def checkForRedundancy ( self ):
+    def checkForRedundancy( self ):
         """ In case of efficiency maps, check if any txnames have overlapping
             constraints. This would result in double counting, so we dont 
             allow it. """
-        if self.getType() == "upperLimit": 
+        if self.dataInfo.dataType == "upperLimit": 
             return False
         logger.debug ( "checking for redundancy" )
         datasetElements = []
         for tx in self.txnameList:
-            for el in elementsInStr(tx.constraint):
-                datasetElements.append(Element(el))
-        combos = itertools.combinations ( datasetElements, 2 )
+            if hasattr(tx, 'finalState'):
+                finalState = tx.finalState
+            else:
+                finalState = ['MET','MET']            
+            for el in elementsInStr(str(tx.constraint)):
+                newEl = Element(el,finalState)
+                datasetElements.append(newEl)
+        combos = itertools.combinations(datasetElements, 2)
         for x,y in combos:
-            if x.particlesMatch ( y ):
+            if x.particlesMatch(y, branchOrder=False):     
                 errmsg ="Constraints (%s) appearing in dataset %s, %s overlap "\
                         "(may result in double counting)." % \
-                        (x,self.getID(),self.globalInfo.id )
-                logger.error( errmsg )
-                raise SModelSError ( errmsg )
+                        (x,self.dataInfo.dataId,self.globalInfo.id )
+                logger.error(errmsg)
+                raise SModelSError (errmsg)
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )

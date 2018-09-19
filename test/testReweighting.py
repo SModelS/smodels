@@ -9,17 +9,17 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.theory.particle import Particle
-from smodels.share.models import SMparticles, MSSMparticles
+from smodels.share.models import SMparticles, mssm
 from smodels.theory.branch import Branch
 from smodels.theory.reweighting import calculateProbabilities, addPromptAndDisplaced
 from smodels.tools.physicsUnits import eV, GeV
 from smodels.theory.element import Element
 
-n1 = MSSMparticles.n1
+n1 = mssm.n1
 n1.totalwidth = 0.*GeV
-st1 = MSSMparticles.st1
+st1 = mssm.st1
 st1.totalwidth = 2.*GeV
-gluino = MSSMparticles.gluino
+gluino = mssm.gluino
 gluino.totalwidth = 1.*10**(-30)*GeV
 t = SMparticles.t
 

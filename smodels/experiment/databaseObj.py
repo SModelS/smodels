@@ -537,16 +537,16 @@ class Database(object):
         one of the Tx names in the list.
 
         :param analysisID: list of analysis ids ([CMS-SUS-13-006,...]). Can
-                            be wildcarded with usual shell wildcards: * ? [<letters>]
+                            be handled with usual shell inclusives: * ? [<letters>]
                             Furthermore, the centre-of-mass energy can be chosen
                             as suffix, e.g. ":13*TeV". Note that the asterisk
-                            in the suffix is not a wildcard.
-        :param datasetIDs: list of dataset ids ([ANA-CUT0,...]). Can be wildcarded
-                            with usual shell wildcards: * ? [<letters>]
-        :param txnames: list of txnames ([TChiWZ,...]). Can be wildcarded with
-                            usual shell wildcards: * ? [<letters>]
+                            in the suffix is not a inclusive.
+        :param datasetIDs: list of dataset ids ([ANA-CUT0,...]). Can be handled
+                            with usual shell inclusives: * ? [<letters>]
+        :param txnames: list of txnames ([TChiWZ,...]). Can be handled with
+                            usual shell inclusives: * ? [<letters>]
         :param dataTypes: dataType of the analysis (all, efficiencyMap or upperLimit)
-                            Can be wildcarded with usual shell wildcards: * ? [<letters>]
+                            Can be handled with usual shell inclusives: * ? [<letters>]
         :param useSuperseded: If False, the supersededBy results will not be included
         :param useNonValidated: If False, the results with validated = False
                                 will not be included
@@ -641,7 +641,7 @@ class Database(object):
 #                    if txname.validated is False and (not useNonValidated):
                         continue
                     if txnames != ['all']:
-                        #Replaced by wildcard-evaluation below (2018-04-06 mat)
+                        #Replaced by inclusive-evaluation below (2018-04-06 mat)
                         hits=False
                         for pattern in txnames:
                             hits = fnmatch.filter ( [ txname.txName ], pattern )

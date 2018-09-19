@@ -8,7 +8,7 @@
 
 """
 
-from smodels.theory.particle import ParticleWildcard,Particle,ParticleList
+from smodels.theory.particle import InclusiveParticle,Particle,ParticleList
 from smodels.share.models.SMparticles import *
 # from smodels.share.models.SMparticles import leptons,quarks,quarksC,leptonsC,gauge,gaugeC,pi
 from smodels.theory.model import Model
@@ -32,8 +32,8 @@ jetList = ParticleList('jet' ,  quarks[0:4] + [gauge[0]] + [pip,piz] + quarksC[0
 
 
 #Used to construct generic allParticles (z2-odd) and SM (z2-even) particles:
-anyBSM = ParticleWildcard(label='anyBSM',Z2parity='odd')
-anySM = ParticleWildcard(label='*',Z2parity='even')
+anyBSM = InclusiveParticle(label='anyBSM',Z2parity='odd')
+anySM = InclusiveParticle(label='*',Z2parity='even')
 
 
 #Used to construct BSM final states:
@@ -55,9 +55,9 @@ allFinalStates = []
 #Get all particles defined here:
 for obj in objects:
     if isinstance(obj,list):
-        allFinalStates += [ptc for ptc in obj if isinstance(ptc,(Particle,ParticleList,ParticleWildcard)) and 
+        allFinalStates += [ptc for ptc in obj if isinstance(ptc,(Particle,ParticleList,InclusiveParticle)) and 
                            not any(obj is x for x in allFinalStates)]
-    elif isinstance(obj,(Particle,ParticleList,ParticleWildcard)):
+    elif isinstance(obj,(Particle,ParticleList,InclusiveParticle)):
         if not any(obj is x for x in allFinalStates):
             allFinalStates.append(obj)
             

@@ -57,7 +57,7 @@ class RunSModelSTest(unittest.TestCase):
             smodelsOutput = output_module.smodelsOutput
         from gluino_squarks_default import smodelsOutputDefault
         from output import smodelsOutput
-        ignoreFields = ['input file','smodels version', 'ncpus']
+        ignoreFields = ['input file','smodels version', 'ncpus','database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                     res['AnalysisID'],res['DataSetID']])
@@ -93,11 +93,12 @@ class RunSModelSTest(unittest.TestCase):
 
     def testGoodFileHSCP(self):
         filename = join ( iDir(), "inputFiles/slha/longLived.slha" )
-        outputfile = self.runMain(filename)
-        shutil.copyfile(outputfile,'./outputHSCP.py')
+        outputfile = runMain(filename)
+        with open( outputfile, 'rb') as fp: ## imports file with dots in name
+            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
+            smodelsOutput = output_module.smodelsOutput        
         from longLived_default import smodelsOutputDefault
-        from outputHSCP import smodelsOutput
-        ignoreFields = ['input file','smodels version', 'ncpus']
+        ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                     res['AnalysisID'],res['DataSetID']])

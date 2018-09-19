@@ -25,6 +25,11 @@ Installation
 The database can conveniently be updated independently from `SModelS`_ code
 updates. It suffices to download or clone this repository to a local folder and
 correctly set the SModelS database path when running SModelS.
+Alternatively, from `SModelS v1.1.3 <https://github.com/SModelS/smodels/releases>`_ onwards, the database path
+can be specified as an URL, e.g. http://smodels.hephy.at/database/official113, and the binary
+database file will be automatically downloaded and used. This is often faster than
+building the binary file from the database folder and avoids possible machine dependences.
+The database URLs can be found in the `releases page <https://github.com/SModelS/smodels-database-release/releases>`_.
 For more information check the `SModelS online manual`_.
 
 
@@ -32,11 +37,11 @@ Adding FastLim data
 ^^^^^^^^^^^^^^^^^^^
 
 The official SModelS database can be augmented with data from the
-`fastlim <http://cern.ch/fastlim>`_ database.
-A tarball with the *properly converted* fastlim-1.0 efficiency maps is provided and
-needs to be exploded in the top level directory of the database.
-
-That is, the following steps need to be performed ::
+`fastlim <http://cern.ch/fastlim>`_ results.
+For using SModelS with the text database,
+a tarball with the *properly converted* fastlim-1.0 efficiency maps can be found in 
+the smodels-database folder.
+The tarball then needs to be exploded in the top level directory of the database: ::
 
  cd <smodels-database folder>
  tar -xzvf smodels-v1.1-fastlim-1.0.tgz
@@ -44,7 +49,14 @@ That is, the following steps need to be performed ::
 
 Once the fastlim folders have been added to the database,
 SModelS auto-detects fastlim results and issues an acknowledgement.
-When using these results, please properly cite the fastlim paper; for
+
+As mentioned above, from `SModelS v1.1.3 <https://github.com/SModelS/smodels/releases>`_ onwards it is also possible to
+directly download the database binary file using the URLs
+provided in the `releases page <https://github.com/SModelS/smodels-database-release/releases>`_ .
+Separate URLs are provided for the database including the Fastlim maps, so the user
+can choose which database to use.
+
+When using fastlim results, please properly cite the fastlim paper; for
 convenience, a bibtex file is provided in the smodels-fastlim tarball.
 
 
@@ -64,3 +76,4 @@ For citing the experimental analyses in the database, you can use
 
 .. _SModelS online manual: http://smodels.readthedocs.io/
 .. _SModelS: https://github.com/SModelS/smodels
+

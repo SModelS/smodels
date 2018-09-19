@@ -1,0 +1,7 @@
+dataId: WWc-SF
+dataType: efficiencyMap
+observedN: 10
+expectedBG: 20.3
+bgError: 3.5
+upperLimit: 0.305*fb
+expectedUpperLimit: 0.618*fb
