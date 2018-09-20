@@ -16,9 +16,10 @@ import unittest
 import logging.config
 import os
 
+
 class DatabaseTest(unittest.TestCase):
     # use different logging config for the unit tests.
-    #logging.config.fileConfig( "./logging.conf" )
+    logging.config.fileConfig( "./logging.conf" )
     from smodels.tools.smodelsLogging import logger
 
     def testWritePickle(self):
@@ -35,14 +36,13 @@ class DatabaseTest(unittest.TestCase):
 
     def testSelectors(self):
         from databaseLoader import database 
-
-        validated = database.getExpResults ( useNonValidated = False )
-        nonval = database.getExpResults ( useNonValidated = True )
-        #print ( "validated=",len(validated),map ( str, validated ) )
-        self.assertEqual ( len(validated), 9 )
-        self.assertEqual ( len(nonval), 10 )
-        
-
+        validated = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'],
+                                            useNonValidated = False )
+        nonval = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'],
+                                         useNonValidated = True )
+#         print ( "validated=",len(validated),map ( str, validated ) )
+        self.assertTrue(len(validated)==8)
+        self.assertTrue(len(nonval)==9)
 
 
 

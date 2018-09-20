@@ -87,8 +87,8 @@ Particles
 ^^^^^^^^^
 
 A particle represents any Z\ :sub:`2`-even and Z\ :sub:`2`-odd state appearing in an element.
-It can hold any of the following information: Z\ :sub:`2`-parity, label (a string describing the particle, e.e 'e-'),
- pdg number, mass, electric charge, color charge, spin, decay width and decays to other particles.
+It can hold any of the following information: Z\ :sub:`2`-parity, label (a string describing the particle, e.e 'e-'), 
+pdg number, mass, electric charge, color charge, spin, decay width and decays to other particles.
 However, different sub sets of these properties are used for different particles as outlined below.
 
 .. _final statesEven:
@@ -206,7 +206,7 @@ be represented as a list in addition to the bracket notation:
 
 .. _bracketnotationFull:
 
-.. image:: images/bracketNotation2.png
+.. image:: images/bracketNotationB.png
    :width: 70%
    
 .. _topology:

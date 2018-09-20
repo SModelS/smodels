@@ -467,7 +467,6 @@ class TxTPrinter(BasicPrinter):
                 for pidList in theoryPrediction.PIDs:
                     output += "PIDs:" + str(pidList) + "\n"
 
-
         return output
 
 
@@ -527,7 +526,6 @@ class TxTPrinter(BasicPrinter):
                             contributing.append(el.elID)
                         output += "Contributing elements %s\n" % str(contributing)            
             output += "================================================================================\n"      
-        
         return output
                       
 
@@ -566,15 +564,14 @@ class SummaryPrinter(TxTPrinter):
 
         :param obj: A TheoryPredictionList object to be printed.
         """
+        
         obj.sortTheoryPredictions()
-
-        if hasattr(self,"expandedsummary") and not self.expandedsummary:                       
+        if hasattr(self,"expandedsummary") and not self.expandedsummary:    
             theoPredictions = [obj._theoryPredictions[0]]
         else:
             theoPredictions = obj._theoryPredictions
 
         output = ""
-
         rvalues = []
         output += "#Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected"
         output += "\n\n"
@@ -595,7 +592,6 @@ class SummaryPrinter(TxTPrinter):
                 logger.error("Unknown dataType %s" %(str(dataType)))
                 raise SModelSError()
             value = theoPred.xsection.value
-
             r = (value/ul).asNumber()
             if type(ul_expected)==type(None): r_expected = None
             else: r_expected = (value/ul_expected).asNumber()
@@ -612,15 +608,14 @@ class SummaryPrinter(TxTPrinter):
             txnameStr = str([str(tx) for tx in txnames])
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
             output += " Txnames:  " + txnameStr + "\n"
-            if hasattr(theoPred,'expectedUL') and not theoPred.expectedUL is None:
+            if dataType == 'efficiencyMap' and hasattr(theoPred,'expectedUL') and not theoPred.expectedUL is None:
                 output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)            
-            
-            if not theoPred == obj.theoryPredictions[-1]: output += 80 * "-"+ "\n"
+            if not theoPred == obj._theoryPredictions[-1]: output += 80 * "-"+ "\n"
 
         output += "\n \n"
         output += 80 * "=" + "\n"
         output += "The highest r value is = " + str(max(rvalues)) + "\n"
-
+        
         return output
             
 
@@ -756,11 +751,9 @@ class PyPrinter(BasicPrinter):
 
         :param obj: A TheoryPredictionList object to be printed.
         """
-
-        obj.sort()
-        
+        obj.sortTheoryPredictions()
         ExptRes = []
-        for theoryPrediction in obj.theoryPredictions:            
+        for theoryPrediction in obj._theoryPredictions:           
             expResult = theoryPrediction.expResult
             dataset = theoryPrediction.dataset
             expID = expResult.globalInfo.id
@@ -775,9 +768,9 @@ class PyPrinter(BasicPrinter):
                 ulExpected = expResult.getUpperLimitFor(dataID=datasetID, expected=True).asNumber(fb)
             else:
                 logger.error("Unknown dataType %s" %(str(dataType)))
-                continue            
-            value = theoryPrediction.xsection.value
-            sqrts = dataset.globalInfo.sqrts
+                continue 
+            value = theoryPrediction.xsection.value            
+            sqrts = dataset.globalInfo.sqrts            
             cluster = theoryPrediction.cluster
             txnamesDict = {}
             for el in cluster.elements:
@@ -791,6 +784,11 @@ class PyPrinter(BasicPrinter):
                 mass = [[m.asNumber(GeV) for m in mbr] for mbr in mass]
             else:
                 mass = None
+                
+            sqrts = expResult.globalInfo.sqrts
+            
+            r = theoryPrediction.getRValue(expected=False)
+            r_expected = theoryPrediction.getRValue(expected=True)                
             
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': value.asNumber(fb),
                         'upper limit (fb)': ul.asNumber(fb),
@@ -813,7 +811,6 @@ class PyPrinter(BasicPrinter):
         ExptRes = sorted(ExptRes, key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
                                                    res['AnalysisID'],res['DataSetID']])
         
-
         return {'ExptRes' : ExptRes}
 
 
@@ -869,63 +866,58 @@ class PyPrinter(BasicPrinter):
 
         missedTopos = []
         
-        
-        for topo in obj.missingTopos.topos:
-            if topo.value > 0.: continue
-            for el in topo.contributingElements:
-                topo.value += el.missingX
-        obj.missingTopos.topos = sorted(obj.missingTopos.topos, 
-                                        key=lambda x: [x.value,str(x.topo)], 
+        obj.missingTopos.generalElements = sorted(obj.missingTopos.generalElements, 
+                                        key=lambda x: [x.missingX,str(x)], 
                                         reverse=True)        
     
-        for topo in obj.missingTopos.topos[:nprint]:
-            missed = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
-                                'element' : str(topo.topo)}           
+        for genEl in obj.missingTopos.generalElements[:nprint]:
+            missed = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
+                                'element' : str(genEl._outputDescription)}          
             if hasattr(self,"addelementlist") and self.addelementlist:
                 contributing = []
-                for el in topo.contributingElements:
+                for el in genEl._contributingElements:
                     contributing.append(el.elID)
                 missed["element IDs"] = contributing
             missedTopos.append(missed)
             
         outsideGrid = []
-        for topo in obj.outsideGrid.topos:
-            if topo.value > 0.: continue
-            for el in topo.contributingElements:
-                topo.value += el.missingX
-        obj.outsideGrid.topos = sorted(obj.outsideGrid.topos, 
-                                       key=lambda x: [x.value,str(x.topo)], 
+        obj.outsideGrid.generalElements = sorted(obj.outsideGrid.generalElements, 
+                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
                                        reverse=True)        
-        for topo in obj.outsideGrid.topos[:nprint]:
-            outside = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : topo.value,
-                                'element' : str(topo.topo)}      
+        for genEl in obj.outsideGrid.generalElements[:nprint]:
+            outside = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
+                                'element' : str(genEl._outputDescription)}      
             outsideGrid.append(outside)     
-        
-        longCascades = []        
-        obj.longCascade.classes = sorted(obj.longCascade.classes, 
-                                         key=lambda x: [x.getWeight(),x.motherPIDs], 
-                                         reverse=True)        
-        for cascadeEntry in obj.longCascade.classes[:nprint]:
-            longc = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV),
-                     'weight (fb)' : cascadeEntry.getWeight(), 
-                     'mother PIDs' : cascadeEntry.motherPIDs}        
-            longCascades.append(longc)
-        
-        asymmetricBranches = []
-        obj.asymmetricBranches.classes = sorted(obj.asymmetricBranches.classes, 
-                                                key=lambda x: [x.getWeight(),x.motherPIDs],
-                                                reverse=True)
-        for asymmetricEntry in obj.asymmetricBranches.classes[:nprint]:
-            asymmetric = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 
-                    'weight (fb)' : asymmetricEntry.getWeight(),
-                    'mother PIDs' : asymmetricEntry.motherPIDs}         
-            asymmetricBranches.append(asymmetric)
 
+        longLived = []
+        obj.longLived.generalElements = sorted(obj.longLived.generalElements, 
+                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
+                                       reverse=True)        
+        for genEl in obj.longLived.generalElements[:nprint]:
+            long = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
+                                'element' : str(genEl._outputDescription)}      
+            longLived.append(long)
+            
+        displaced = []
+        obj.displaced.generalElements = sorted(obj.displaced.generalElements, 
+                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
+                                       reverse=True)        
+        for genEl in obj.displaced.generalElements[:nprint]:
+            displ = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
+                                'element' : str(genEl._outputDescription)}      
+            displaced.append(displ)
+            
+        MET = []
+        obj.MET.generalElements = sorted(obj.MET.generalElements, 
+                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
+                                       reverse=True)        
+        for genEl in obj.MET.generalElements[:nprint]:
+            met = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
+                                'element' : str(genEl._outputDescription)}      
+            MET.append(met)                        
 
-        return {'Missed Topologies': missedTopos, 'Long Cascades' : longCascades,
-                     'Asymmetric Branches': asymmetricBranches, 'Outside Grid': outsideGrid}
-    
-
+        return {'Missed Topologies': missedTopos, 'Long-lived' : longLived,
+                     'Displaced': displaced, 'MET': MET, 'Outside Grid': outsideGrid}
 
 class XmlPrinter(PyPrinter):
     """
@@ -961,7 +953,6 @@ class XmlPrinter(PyPrinter):
         :param parent: XML Element parent
         :param tag: tag for the daughter element
         """
-
         tag = tag.replace(" ","_").replace("(","").replace(")","")
         if not isinstance(pyObj,list) and not isinstance(pyObj,dict):
             parent.text = str(pyObj).lstrip().rstrip()
@@ -988,10 +979,10 @@ class XmlPrinter(PyPrinter):
         outputDict = {}
         for obj in self.toPrint:
             if obj is None: continue
-            output = self._formatObj(obj)  # Conver to python dictionaries                        
+            output = self._formatObj(obj)  # Convert to python dictionaries                        
             if not output: continue  #Skip empty output            
             outputDict.update(output)
-
+            
         root = None
         #Convert from python dictionaries to xml:
         if outputDict:            
@@ -1123,9 +1114,10 @@ class SLHAPrinter(TxTPrinter):
                 output += " %d %d %10.3E %s\n" % (cter, obj.missingTopos.sqrts/TeV, t.value, str(t.topo))
                 cter += 1
                 if cter > 9: break
-        for ix, uncovEntry in enumerate([obj.longCascade, obj.asymmetricBranches]):
-            if ix==0: output += "\nBLOCK SModelS_Long_Cascade #Mother1 Mother2 Weight[fb] allMothers\n"
-            else: output += "\nBLOCK SModelS_Asymmetric_Branches #Mother1 Mother2 Weight[fb] allMothers\n"
+        for ix, uncovEntry in enumerate([obj.longLived, obj.displaced, obj.MET]):
+            if ix==0: output += "\nBLOCK SModelS_Long_Lived #Mother1 Mother2 Weight[fb] allMothers\n"
+            elif ix==1: output += "\nBLOCK SModelS_Displaced #Mother1 Mother2 Weight[fb] allMothers\n"
+            else: output += "\nBLOCK SModelS_MET #Mother1 Mother2 Weight[fb] allMothers\n"
             cter = 0
             for ent in uncovEntry.getSorted(obj.sqrts):
                 output += " %d %s %s %10.3E %s\n" %(cter, ent.motherPIDs[0][0], ent.motherPIDs[0][1], ent.getWeight(), str(ent.motherPIDs).replace(" ",""))

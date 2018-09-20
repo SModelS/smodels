@@ -49,7 +49,7 @@ These elements are grouped into the following classes:
 
    * *displaced*: |elements| with at least one displaced decay;
    * *long-lived*: |elements| with at least one stable BSM particle other than the lightest one;
-   * *prompt*: |elements| with MET final states only
+   * *prompt*: |elements| with MET final states only;
 
 * *outsideGrid*: |elements| which could be tested by one or more experimental result, but are not constrained because the mass array is outside the mass grid;
 
@@ -65,22 +65,53 @@ are added to the *outsideGrid* class.
 Usually the list of  *missing* or *outsideGrid* elements is considerably long.
 Hence, to compress this list, all |elements| differing only by their
 masses (with the same |final states|) or electric charges are combined. Moreover, by default, electrons and muons
-are combined to light leptons (denoted "l"): gluons and light quarks are combined into jets.
-The *missing* topologies are then further classified (if applicable) into *longCascade* or *asymmetricBranches* topologies.
+are combined to light leptons (denoted "l"), gluons and light quarks are combined into jets.
 
 
-The topologies for each of the four categories are then grouped according to the final state (for the *missingTopos* and
-*outsideGrid* classes) or according to the PDG ids of the initially produced motherparticles (for the *displaced* , *long-lived* 
-and *prompt* classes). 
-We note that for the latter the |elements| deriving from different mother particles, but with the same |final states| and mass configuration cannot be distinguished, and are therefore combined in this grouping.
+The topologies for each of the four categories are then grouped according to the final state.
+
+Life time reweighting for missing topologies
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _lifetimeWeightMissing:
 
 Since the lifetime reweighting only takes place when an element is matched to an experimental result, the *missing* or *outsideGrid* elements
 have not been reweighted accordingly.
 The reweighting done on the database side is analysis dependent and can therefore not be applied to the unmatched elements.
-Instead they are reweighted by applying some approximations:
-* for *missing topologies* the travelled distance corresponding to a displaced decay means everything outside of the inner detector and inside the effective size of detector
-* the effective time dilation factor is set to :math:`\langle \gamma \beta \rangle = 1.3`
 
+SModelS computes the probability for prompt decay (:math:`\mathcal{F}_{prompt}`), for a displaced decay (:math:`\mathcal{F}_{displaced}`) 
+as well as the probability for the particle to decay *outside* the detector (:math:`\mathcal{F}_{long}`). 
+The branching fraction rescaled by :math:`\mathcal{F}_{long}` describes the probability of a decay where the daughter BSM state
+traverses the detector (thus is considered stable),
+while the branching fraction rescaled by :math:`\mathcal{F}_{prompt}` or :math:`\mathcal{F}_{displaced}` corresponds to a prompt or displaced
+decay which will be followed by the next step in the cascade decay. This reweighting is illustrated in the figure below:
+
+.. _decomp1b:
+
+.. image:: images/decompScheme1.png
+   :width: 90%
+ 
+The precise values of :math:`\mathcal{F}_{prompt}`, :math:`\mathcal{F}_{displaced}` and :math:`\mathcal{F}_{long}` 
+depend on the relevant detector size (:math:`L`), particle mass (:math:`M`), boost
+(:math:`\beta`) and width (:math:`\Gamma`), thus
+requiring a Monte Carlo simulation for each input model. Since these are analysis dependent quantities, we approximate 
+the prompt,displaced and long-lived probabilities by:
+
+.. math::
+   \mathcal{F}_{long} = \exp(- \frac{\Gamma L_{outer}}{\langle \gamma \beta \rangle}) \mbox{ and } 
+   \mathcal{F}_{prompt} = 1 - \exp(- \frac{\Gamma L_{inner}}{\langle \gamma \beta \rangle})
+   \mathcal{F}_{displaced} = 1 - \mathcal{F}_{prompt} -\mathcal{F}_{long}
+   
+where :math:`L_{outer}` is the effective size of the detector (which we take to be 10 m for both ATLAS
+and CMS), :math:`L_{inner}` is the effective radius of the inner detector (which we take to be 1 mm for both ATLAS
+and CMS). Consequently, we call all decays taking place within :math:`L_{outer}` and outside of :math:`L_{inner}` displaced.
+
+Finally, we take the effective time dilation factor to be  :math:`\langle \gamma \beta \rangle = 1.3` when
+computing :math:`\mathcal{F}_{prompt}` and :math:`\langle \gamma \beta \rangle = 1.43` when computing :math:`\mathcal{F}_{long}`.
+We point out that the above approximations are irrelevant if :math:`\Gamma` is very large (:math:`\mathcal{F}_{prompt} \simeq 1`
+and :math:`\mathcal{F}_{long} \simeq 0`) or close to zero (:math:`\mathcal{F}_{prompt} \simeq 0`
+and :math:`\mathcal{F}_{long} \simeq 1`). Only elements containing particles which have a considerable fraction of displaced
+decays will be sensitive to the values chosen above.
 
 
 The topology coverage tool is normally called from within SModelS (e.g. when running :ref:`runSModelS.py <runSModelS>`) by setting **testCoverage=True**

@@ -120,17 +120,15 @@ class TheoryPrediction(object):
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         """
-        
-        
         if self.dataType()  == 'upperLimit':
             self.likelihood = None
             self.chi2 = None
 
-        elif self.dataType() == 'efficiencyMap':            
+        elif self.dataType() == 'efficiencyMap':   
             lumi = self.dataset.globalInfo.lumi
             nsig = (self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
-            chi2 = self.dataset.chi2(nsig,marginalize=marginalize,deltas_rel=deltas_rel)    
+            chi2 = self.dataset.chi2(nsig,marginalize=marginalize,deltas_rel=deltas_rel)   
             self.likelihood =  llhd
             self.chi2 =  chi2
             
@@ -142,7 +140,6 @@ class TheoryPrediction(object):
             self.likelihood = self.dataset.combinedLikelihood(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
             self.chi2 = self.dataset.totalChi2(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
             
-
     def getmaxCondition(self):
         """
         Returns the maximum xsection from the list conditions
@@ -208,31 +205,32 @@ class TheoryPredictionList(object):
     """
     An instance of this class represents a collection of theory prediction
     objects.
-
-    :ivar _theoryPredictions: list of TheoryPrediction objects
+    
+    :ivar _theoryPredictions: list of TheoryPrediction objects     
     """
-
+    
     def __init__(self, theoryPredictions=None, maxCond=None):
         """
         Initializes the list.
         
         :parameter theoryPredictions: list of TheoryPrediction objects
-        """
+        :parameter maxCond: maximum relative violation of conditions for valid results (used for printer output)
+        """        
         self._theoryPredictions = []
         if theoryPredictions and isinstance(theoryPredictions,list):
-            self._theoryPredictions = theoryPredictions
+            
+            if not maxCond:
+                self._theoryPredictions = theoryPredictions                
+            else:
+                newPredictions = []
+                for theoPred in theoryPredictions:
+                    mCond = theoPred.getmaxCondition()
+                    if mCond == 'N/A' or mCond > maxCond: continue
+                    else: newPredictions.append(theoPred)  
+                self._theoryPredictions = newPredictions    
+                        
 
-    def append(self,theoryPred):
-        self._theoryPredictions.append ( theoryPred )
-
-    def __str__(self):
-        if len ( self._theoryPredictions ) == 0:
-            return "no predictions."
-        ret = "%d predictions: " % len ( self._theoryPredictions )
-        ret += ", ".join ( [ str(s) for s in self._theoryPredictions ] )
-        return ret
-
-    def __iter__(self):
+    def __iter__(self):      
         for theoryPrediction in self._theoryPredictions:
             yield theoryPrediction
 
@@ -241,7 +239,7 @@ class TheoryPredictionList(object):
 
     def __len__(self):
         return len(self._theoryPredictions)
-
+    
     def __add__(self,theoPredList):
         if isinstance(theoPredList,TheoryPredictionList):
             res = TheoryPredictionList()
@@ -249,12 +247,25 @@ class TheoryPredictionList(object):
             return res
         else:
             return None
-
+        
     def __radd__(self, theoPredList):
         if theoPredList == 0:
             return self
         else:
-            return self.__add__(theoPredList)
+            return self.__add__(theoPredList)       
+        
+    def append(self,theoryPred):
+        self._theoryPredictions.append ( theoryPred )    
+        
+        
+    def sortTheoryPredictions(self):
+        """
+        Reverse sort theoryPredictions by R value.
+        Used for printer.
+        """
+        self._theoryPredictions = sorted(self._theoryPredictions, key=lambda theoPred: theoPred.getRValue(), reverse=True)    
+      
+
 
 def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
                 useBestDataset=True, combinedResults=True,
@@ -322,6 +333,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         theoPred.upperLimit = theoPred.getUpperLimit(deltas_rel=deltas_rel)
         
     return bestResults
+
 
 def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     """
@@ -478,6 +490,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.xsection = _evalConstraint(cluster)
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.elements = cluster.elements
+        theoryPrediction.cluster = cluster
         theoryPrediction.mass = cluster.getAvgMass()
         theoryPrediction.PIDs = cluster.getPIDs()
         theoryPrediction.IDs = cluster.getIDs()

@@ -250,7 +250,7 @@ class DataSet(object):
         """
         
         
-        if self.getType() == 'efficiencyMap':            
+        if self.getType() == 'efficiencyMap':   
             upperLimit =  self.getSRUpperLimit(expected=expected,alpha=alpha,compute=compute,
                                                deltas_rel=deltas_rel)
             if (upperLimit/fb).normalize()._unit:
@@ -258,8 +258,7 @@ class DataSet(object):
                               %(self.globalInfo.id,self.getID()))
                 return False
             
-            
-        elif self.getType() == 'upperLimit':            
+        elif self.getType() == 'upperLimit':        
             if not txnames or not mass:
                 logger.error("A TxName and mass array must be defined when \
                              computing ULs for upper-limit results.")
@@ -289,13 +288,13 @@ class DataSet(object):
                         else:
                             upperLimit = tx.txnameDataExp.getValueFor(mass)
                     else:
-                        upperLimit = tx.txnameData.getValueFor(mass)
-                        
-            return upperLimit        
+                        upperLimit = tx.txnameData.getValueFor(mass)       
         else:
             logger.warning("Unkown data type: %s. Data will be ignored.",
                            self.getType())
             return None        
+        
+        return upperLimit         
             
             
     def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False, deltas_rel=0.2):

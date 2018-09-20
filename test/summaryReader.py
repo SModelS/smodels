@@ -64,6 +64,7 @@ class Summary():
         self.allowedDiff = allowedDiff
         self.read(filename)
         
+        
 
     def __str__ ( self ):
         import os
@@ -105,7 +106,9 @@ class Summary():
                 continue
             elif "Missing topos: MET decays" in l:
                 METLines = True
-                continue            
+                continue  
+            elif "Chi2" in l:
+                continue          
             if l.startswith("#"):
                 continue
             if "----" in l:

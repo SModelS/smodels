@@ -18,12 +18,7 @@ class SlhaTest(unittest.TestCase):
 
         filename = "./testFiles/slha/gluino_squarks.slha"
         st=slhaChecks.SlhaStatus(filename)
-        self.assertEquals ( st.status, (1, 'Input file ok') )
+        self.assertEqual ( st.status, (1, 'Input file ok') )
         
-    def testBadFile(self):
-        filename = "./testFiles/slha/nobdecay.slha"
-        st=slhaChecks.SlhaStatus(filename)
-        self.assertEquals (st.status, (-1, '#ERROR: special signatures in this point.\n#Warnings:\n##Visible decays of longlived particles / stable charged particles: [1000005]\n#1000005 : c*tau = inf\n\n'))
-
 if __name__ == "__main__":
     unittest.main()

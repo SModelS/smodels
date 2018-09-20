@@ -67,7 +67,7 @@ for the primary mothers A and B, respectively. Then, if a production cross secti
    [b1,B1], [b1,B2], [b2,B1], [b2,B2], [b3,B1] and [b3,B2]
 
 Additional to the information in the DECAY blocks, SModelS also checks for the possibility of a particle to be stable.
-If the particle's decay width is smaller than a certain cutoff value 'promptwidth' there will be an additional "decay" 
+If the particle's decay width is smaller than a certain cutoff value 'promptwidth' there will be an additional "empty decay" 
 added to the ones coming from the DECAY blocks.
 The decomposition process either stops when the lightest neutral BSM particle or a stable particle is reached.
 Each of the :ref:`elements <element>` generated according to the procedure just described will also
@@ -105,7 +105,7 @@ LHE-reader
 
 More general models can be input through an LHE event file containing parton-level events, including the production of the primary
 mothers and their cascade decays. 
-The LHE-reader goes through the events and ny doing so creates dictionaries mapping the different particles to their masses and
+The LHE-reader goes through the events and by doing so creates dictionaries mapping the different particles to their masses and
 decays which corresponds to the DECAY and MASS blocks of the SLHA file.
 The cross sections are obtained by using `crossSection.getXsecFromLHEFile <theory.html#theory.crossSection.getXsecFromLHEFile>`_ .
 

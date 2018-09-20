@@ -71,7 +71,6 @@ class RunPrinterTest(unittest.TestCase):
         Main program. Displays basic use case.
     
         """
-        
         runtime.modelFile = 'mssm'
         reload(particlesLoader)
 
@@ -79,8 +78,7 @@ class RunPrinterTest(unittest.TestCase):
         sigmacut = 0.03 * fb
         mingap = 5. * GeV
     
-        """ Decompose model (use slhaDecomposer for SLHA input or lheDecomposer
-            for LHE input) """
+        """ Decompose model  """
         model = Model(BSMList,SMList,slhafile)
         model.updateParticles()
         smstoplist = decomposer.decompose(model, sigmacut, 
@@ -89,7 +87,6 @@ class RunPrinterTest(unittest.TestCase):
         #Add the decomposition result to the printers
         if addTopList:
             mprinter.addObj(smstoplist)
-    
         listOfExpRes = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'])
         # Compute the theory predictions for each analysis
         allPredictions = []
@@ -98,6 +95,10 @@ class RunPrinterTest(unittest.TestCase):
             if not predictions:
                 continue
             allPredictions += predictions._theoryPredictions
+        
+        for theoPred in allPredictions:
+            if theoPred.dataType() == 'efficiencyMap' and hasattr(theoPred,'expectedUL') and not theoPred.expectedUL is None:
+                theoPred.computeStatistics()
         
         maxcond = 0.2
         theoryPredictions = TheoryPredictionList(allPredictions, maxcond)
@@ -135,7 +136,7 @@ class RunPrinterTest(unittest.TestCase):
          
         samplefile = os.path.join( idir(), "test/gluino_squarks_default.txt")
         #Test summary output
-        output = summaryReader.Summary(outputfile,allowedDiff=0.05)
+        output = summaryReader.Summary(outputfile,allowedDiff=0.05)        
         sample = summaryReader.Summary(samplefile,allowedDiff=0.05)
         try:
             self.assertEqual(sample, output)
@@ -167,6 +168,8 @@ class RunPrinterTest(unittest.TestCase):
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                       key=lambda res: res['r'], reverse=True)
+        smodelsOutput['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
+                       key=lambda res: res['r'], reverse=True)        
         equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
                             ignore=ignoreFields, where = "top" )
         try:
@@ -194,6 +197,8 @@ class RunPrinterTest(unittest.TestCase):
          
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
+                       key=lambda res: res['r'], reverse=True)
+        smodelsOutput['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                        key=lambda res: res['r'], reverse=True)
         equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
                             ignore=ignoreFields )
