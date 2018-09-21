@@ -43,7 +43,6 @@ class OutputStatus(object):
         Initialize output. If one of the checks failed, exit.
         
         """
-
         try:
             filename=os.path.join ( installation.installDirectory(),
                                     'smodels/version' )

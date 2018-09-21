@@ -134,7 +134,7 @@ class Branch(object):
         #Compare final BSM state by Z2parity and quantum numbers:
         if self.BSMparticles and other.BSMparticles:
             comp = self.BSMparticles[-1].cmpProperties(other.BSMparticles[-1],
-                                                   properties=['Z2parity','colordim','eCharge'])
+                                                   properties=['Z2parity','colordim','eCharge', 'totalwidth'])
             if comp:
                 return comp 
 
@@ -157,8 +157,12 @@ class Branch(object):
         Return list with masses of the BSM particles appearing in the branch
         
         :return: List with masses
-        """          
-        bsmMasses = [bsm.mass for bsm in self.BSMparticles]
+        """      
+        bsmMasses = []    
+        for bsm in self.BSMparticles:
+            if not isinstance(bsm.mass, list): bsmMasses.append(bsm.mass)
+            else: bsmMasses.append(bsm.mass[0])
+        #bsmMasses = [bsm.mass for bsm in self.BSMparticles]
         
         return bsmMasses             
 

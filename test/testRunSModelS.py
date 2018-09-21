@@ -59,8 +59,7 @@ class RunSModelSTest(unittest.TestCase):
         from output import smodelsOutput
         ignoreFields = ['input file','smodels version', 'ncpus','database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                    key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
-                    res['AnalysisID'],res['DataSetID']])
+                    key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
         for i in [ './output.py', './output.pyc' ]:
@@ -100,8 +99,7 @@ class RunSModelSTest(unittest.TestCase):
         from longLived_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                    key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
-                    res['AnalysisID'],res['DataSetID']])
+                    key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)            
         for i in [ './outputHSC.py', './outputHSCP.pyc' ]:
@@ -114,7 +112,7 @@ class RunSModelSTest(unittest.TestCase):
         filename = "./testFiles/slha/I_dont_exist.slha"
         of="unitTestOutput/I_dont_exist.slha.py"
         self.removeOutputs ( of )
-        outputfile = runMain(filename  )
+        outputfile = runMain(filename)
         self.assertTrue ( of in outputfile )
         self.assertTrue ( not os.path.exists ( outputfile ) )
   

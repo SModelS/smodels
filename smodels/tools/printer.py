@@ -12,6 +12,7 @@
 
 from __future__ import print_function
 import sys,os
+import unum
 from smodels.theory.topology import TopologyList
 from smodels.theory.theoryPrediction import TheoryPredictionList
 from smodels.experiment.databaseObj import ExpResultList
@@ -426,14 +427,16 @@ class TxTPrinter(BasicPrinter):
         
         for theoryPrediction in obj._theoryPredictions:
             expRes = theoryPrediction.expResult
-            info = theoryPrediction.dataset.dataInfo
+            dataId = theoryPrediction.dataId()
+            txnames = [str(txname) for txname in theoryPrediction.txnames]
+            txnames = sorted(list(set(txnames)))
             output += "\n"
             output += "---------------Analysis Label = " + expRes.globalInfo.id + "\n"
-            output += "-------------------Dataset Label = " + str(info.dataId).replace("None","(UL)") + "\n"
-            output += "-------------------Txname Labels = " + str([str(txname) for txname in theoryPrediction.txnames]) + "\n"
+            output += "-------------------Dataset Label = " + str(dataId).replace("None","(UL)") + "\n"
+            output += "-------------------Txname Labels = " + str(txnames) + "\n"
             output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
                     "\n"
-            
+
             output += "Theory prediction: " + str(theoryPrediction.xsection.value) + "\n"
             output += "Theory conditions:"
             if not theoryPrediction.conditions:
@@ -466,6 +469,7 @@ class TxTPrinter(BasicPrinter):
                     output += "Contributing elements: " + str(theoryPrediction.IDs) + "\n"
                 for pidList in theoryPrediction.PIDs:
                     output += "PIDs:" + str(pidList) + "\n"
+
 
         return output
 
@@ -577,24 +581,14 @@ class SummaryPrinter(TxTPrinter):
         output += "\n\n"
         for theoPred in theoPredictions:
             expResult = theoPred.expResult
-            datasetID = theoPred.dataset.dataInfo.dataId
-            dataType = expResult.datasets[0].dataInfo.dataType
             txnames = theoPred.txnames
-            if dataType == 'upperLimit':
-                ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
-                ul_expected = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected=True)
-                signalRegion  = '(UL)'
-            elif dataType == 'efficiencyMap':
-                ul = expResult.getUpperLimitFor(dataID=datasetID)
-                ul_expected = expResult.getUpperLimitFor(dataID=datasetID, expected=True)
-                signalRegion  = theoPred.dataset.dataInfo.dataId
-            else:
-                logger.error("Unknown dataType %s" %(str(dataType)))
-                raise SModelSError()
+            ul = theoPred.getUpperLimit(expected=False)
+            signalRegion = theoPred.dataset.getID()
+            if signalRegion is None:
+                signalRegion = '(UL)'
             value = theoPred.xsection.value
-            r = (value/ul).asNumber()
-            if type(ul_expected)==type(None): r_expected = None
-            else: r_expected = (value/ul_expected).asNumber()
+            r = theoPred.getRValue(expected=False)
+            r_expected = theoPred.getRValue(expected=True)
             rvalues.append(r)
 
             output += "%19s  " % (expResult.globalInfo.id)  # ana
@@ -605,17 +599,18 @@ class SummaryPrinter(TxTPrinter):
             else: output += "%10.3E  N/A" %r
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
-            txnameStr = str([str(tx) for tx in txnames])
+            txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
             output += " Txnames:  " + txnameStr + "\n"
-            if dataType == 'efficiencyMap' and hasattr(theoPred,'expectedUL') and not theoPred.expectedUL is None:
+            if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
                 output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)            
-            if not theoPred == obj._theoryPredictions[-1]: output += 80 * "-"+ "\n"
+            
+            if not theoPred == obj.theoryPredictions[-1]: output += 80 * "-"+ "\n"
 
         output += "\n \n"
         output += 80 * "=" + "\n"
         output += "The highest r value is = " + str(max(rvalues)) + "\n"
-        
+
         return output
             
 
@@ -755,25 +750,18 @@ class PyPrinter(BasicPrinter):
         ExptRes = []
         for theoryPrediction in obj._theoryPredictions:           
             expResult = theoryPrediction.expResult
-            dataset = theoryPrediction.dataset
             expID = expResult.globalInfo.id
-            datasetID = dataset.dataInfo.dataId
-            dataType = dataset.dataInfo.dataType
-            if dataType == 'upperLimit':
-                ul = expResult.getUpperLimitFor(txname=theoryPrediction.txnames[0],
-                                                mass=theoryPrediction.mass)
-                ulExpected = None
-            elif dataType == 'efficiencyMap':
-                ul = expResult.getUpperLimitFor(dataID=datasetID)
-                ulExpected = expResult.getUpperLimitFor(dataID=datasetID, expected=True).asNumber(fb)
-            else:
-                logger.error("Unknown dataType %s" %(str(dataType)))
-                continue 
-            value = theoryPrediction.xsection.value            
-            sqrts = dataset.globalInfo.sqrts            
-            cluster = theoryPrediction.cluster
+            datasetID = theoryPrediction.dataId()
+            dataType = theoryPrediction.dataType()
+            ul = theoryPrediction.getUpperLimit()
+            ulExpected = theoryPrediction.getUpperLimit(expected = True)
+            if isinstance(ul,unum.Unum):
+                ul = ul.asNumber(fb)
+            if isinstance(ulExpected,unum.Unum):
+                ulExpected = ulExpected.asNumber(fb)
+            value = theoryPrediction.xsection.value.asNumber(fb)
             txnamesDict = {}
-            for el in cluster.elements:
+            for el in theoryPrediction.elements:
                 if not el.txname.txName in txnamesDict:
                     txnamesDict[el.txname.txName] = el.weight[0].value.asNumber(fb)
                 else:
@@ -784,21 +772,20 @@ class PyPrinter(BasicPrinter):
                 mass = [[m.asNumber(GeV) for m in mbr] for mbr in mass]
             else:
                 mass = None
-                
             sqrts = expResult.globalInfo.sqrts
             
             r = theoryPrediction.getRValue(expected=False)
-            r_expected = theoryPrediction.getRValue(expected=True)                
+            r_expected = theoryPrediction.getRValue(expected=True)
             
-            resDict = {'maxcond': maxconds, 'theory prediction (fb)': value.asNumber(fb),
-                        'upper limit (fb)': ul.asNumber(fb),
+            resDict = {'maxcond': maxconds, 'theory prediction (fb)': value,
+                        'upper limit (fb)': ul,
                         'expected upper limit (fb)': ulExpected,
                         'TxNames': sorted(txnamesDict.keys()),
                         'Mass (GeV)': mass,
                         'AnalysisID': expID,
                         'DataSetID' : datasetID,
                         'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
-                        'lumi (fb-1)' : (dataset.globalInfo.lumi*fb).asNumber(),
+                        'lumi (fb-1)' : (expResult.globalInfo.lumi*fb).asNumber(),
                         'dataType' : dataType,
                         'r' : r, 'r_expected' : r_expected}  
             if hasattr(self,"addtxweights") and self.addtxweights:
@@ -807,10 +794,8 @@ class PyPrinter(BasicPrinter):
                 resDict['chi2'] = theoryPrediction.chi2
                 resDict['likelihood'] = theoryPrediction.likelihood                
             ExptRes.append(resDict)
+       
 
-        ExptRes = sorted(ExptRes, key=lambda res: [res['theory prediction (fb)'],res['TxNames'],
-                                                   res['AnalysisID'],res['DataSetID']])
-        
         return {'ExptRes' : ExptRes}
 
 
@@ -1060,25 +1045,13 @@ class SLHAPrinter(TxTPrinter):
         cter = 1
         for theoPred in rList:
             expResult = theoPred.expResult
-            datasetID = theoPred.dataset.dataInfo.dataId
-            dataType = expResult.datasets[0].dataInfo.dataType
             txnames = theoPred.txnames
-            if dataType == 'upperLimit':
-                ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass)
-                ul_expected = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected=True)
-                signalRegion  = '(UL)'
-            elif dataType == 'efficiencyMap':
-                ul = expResult.getUpperLimitFor(dataID=datasetID)
-                ul_expected = expResult.getUpperLimitFor(dataID=datasetID, expected=True)
-                signalRegion  = theoPred.dataset.dataInfo.dataId
-            else:
-                logger.error("Unknown dataType %s" %(str(dataType)))
-                raise SModelSError()
-            value = theoPred.xsection.value
-            r = (value/ul).asNumber()
-            if type(ul_expected)==type(None): r_expected = None
-            else: r_expected = (value/ul_expected).asNumber()
-            txnameStr = str([str(tx) for tx in txnames])
+            signalRegion  = theoPred.dataId()
+            if signalRegion is None:
+                signalRegion = '(UL)'
+            r = theoPred.getRValue()
+            r_expected = theoPred.getRValue()
+            txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
 
             if r <1 and not excluded == 0: break
@@ -1089,7 +1062,7 @@ class SLHAPrinter(TxTPrinter):
             output += " %d 3 %-30.2f #condition violation\n" % (cter, theoPred.getmaxCondition())
             output += " %d 4 %-30s #analysis\n" % (cter, expResult.globalInfo.id)
             output += " %d 5 %-30s #signal region \n" %(cter, signalRegion.replace(" ","_"))
-            if hasattr(theoPred,'expectedUL') and not theoPred.expectedUL is None:
+            if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
                 output += " %d 6 %-30.3E #Chi2\n" % (cter, theoPred.chi2)
                 output += " %d 7 %-30.3E #Likelihood\n" % (cter, theoPred.likelihood)
             else:

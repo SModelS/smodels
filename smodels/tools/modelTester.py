@@ -50,7 +50,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Get run parameters and options from the parser"""
     sigmacut = parser.getfloat("parameters", "sigmacut") * fb
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
-
+    inputType = runtime.filetype ( inputFile )
 
     """Setup output printers"""
     masterPrinter = MPrinter()
@@ -67,8 +67,8 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Initialize output status and exit if there were errors in the input"""
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
             dict(parser.items("parameters")), databaseVersion)
-    masterPrinter.addObj(outputStatus)              
-    if outputStatus.status < 0:          
+    masterPrinter.addObj(outputStatus)    
+    if outputStatus.status < 0:         
         return masterPrinter.flush()
     
     """
@@ -204,6 +204,34 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
                                   listOfExpRes, timeout, development, parameterFile)
     return a
 
+def _cleanList ( fileList, inDir ):
+    """ clean up list of files """
+    cleanedList = []
+    for f in fileList:
+        tmp = os.path.join(inDir, f )
+        if not os.path.isfile ( tmp ):
+            logger.info ( "%s does not exist or is not a file. Skipping it." % tmp )
+            continue
+        cleanedList.append( tmp )
+    return cleanedList
+
+def _determineNCPus ( cpus_wanted, n_files ):
+    """ determine the number of CPUs that are to be used.
+    :param cpus_wanted: number of CPUs specified in parameter file
+    :param n_files: number of files to be run on
+    :returns: number of CPUs that are to be used
+    """
+    ncpusAll = runtime.nCPUs()
+    # ncpus = parser.getint("parameters", "ncpus")
+    ncpus = cpus_wanted
+    if ncpus == 0 or ncpus < -1:
+        logger.error ( "Weird number of ncpus given in ini file: %d" % ncpus )
+        sys.exit()
+    if ncpus == -1 or ncpus > ncpusAll: ncpus = ncpusAll
+    ncpus = min ( n_files, ncpus )
+    return ncpus
+
+
 def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
                  listOfExpRes, timeout, development, parameterFile):
     """
@@ -221,32 +249,21 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     :param parameterFile: parameter file, for crash reports
     :returns: printer(s) output, if not run in parallel mode
     """
-
     if len( fileList ) == 0:
         logger.error ( "no files given." )
         return None
-    if len(fileList ) == 1:
-        return runSingleFile ( fileList[0], outputDir, parser, databaseVersion,
+
+    cleanedList = _cleanList ( fileList, inDir )
+    if len(cleanedList) == 1:
+        return runSingleFile ( cleanedList[0], outputDir, parser, databaseVersion,
                                listOfExpRes, timeout, development, parameterFile )
+    ncpus = _determineNCPus ( parser.getint("parameters", "ncpus"), len(cleanedList) )
 
-    """ loop over input files and run SModelS """
-    ncpusAll = runtime.nCPUs()
-    ncpus = parser.getint("parameters", "ncpus")
-    if ncpus == 0 or ncpus < -1:
-        logger.error ( "Weird number of ncpus given in ini file: %d" % ncpus )
-        sys.exit()
-    if ncpus == -1: ncpus = ncpusAll
-    # if ncpus == -1 or ncpus > ncpusAll: ncpus = ncpusAll
-    logger.info ("Running SModelS on %d cores" % ncpus )
-
-    cleanedList = []
-    for f in fileList:
-        tmp = os.path.join(inDir, f )
-        if not os.path.isfile ( tmp ):
-            logger.info ( "%s does not exist or is not a file. Skipping it." % tmp )
-            continue
-        cleanedList.append( tmp )
-
+    if ncpus == 1:
+        logger.info ("Running SModelS in a single process" )
+    else:
+        logger.info ("Running SModelS in %d processes" % ncpus )
+        
     if ncpus == 1:
         return runSetOfFiles( cleanedList, outputDir, parser, databaseVersion,
                               listOfExpRes, timeout, development, parameterFile )
@@ -421,5 +438,5 @@ def getAllInputFiles(inFile):
     if os.path.isdir(inFile):
         fileList = os.listdir(inFile)
         return fileList, inFile
-    fileList = [ inFile ] #os.path.basename ( inFile )
+    fileList = [ os.path.basename ( inFile ) ]
     return fileList, os.path.dirname ( inFile )

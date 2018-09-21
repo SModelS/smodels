@@ -10,7 +10,7 @@
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
 .. |intermediate states| replace:: :ref:`intermediate states <odd states>`
-.. |final states| replace:: :ref:`final states <final states>`
+.. |final states| replace:: :ref:`final states <final statesEven>`
 .. |database| replace:: :ref:`database <Database>`
 .. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
 .. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
@@ -124,36 +124,11 @@ The SLHA file checker allows to perform quite rigorous checks of SLHA input file
 
 * the file contains cross sections according to the :ref:`SLHA format for cross sections <xsecSLHA>`,
 
-
-* the lightest :ref:`Z2-odd state <odd states>` (the LSP in supersymmetric models) is neutral,
-
-* there are no stable charged particles nor displaced vertices (no non-prompt visible decays), as currently all the analyses considered by SModelS require a prompt MET signature.
-
 In addition, one can ask that
 
 * all decays listed in the DECAY block are kinematically allowed, *i.e.* the sum of masses of the decay products may not exceed the mother mass. *This check for "illegal decays" is turned off by default.*
 
 If any of the above tests fail (return a negative result), an error message is shown.
-
-Some more comments are in order.
-In order to check that the lightest Z\ :sub:`2`-odd state has zero electric and color charges, the quantum numbers of the BSM particles must be given in the
-``qNumbers`` dictionary in :download:`particles.py <images/particles.py>`. The format is
-
-``[2*spin, 3*electric charge, dimension of SU(3) representation]``
-
-The list of quantum numbers is also required to check for displaced vertices or heavy charged particles.
-The check for long-lived (or stable) particles first verifies if these
-appear in one of the cross section blocks and their cross section
-exceeds the minimum cross section value defined by :ref:`sigmacut <parameterFile>` (see  :ref:`Minimum Decomposition Weight <minweight>`).
-If the cross section is larger than sigmacut and the particle is stable,
-the checker verifies if it is neutral (both electric and color charges
-are zero). On the other hand, if the particle is unstable, but its lifetime (times *c*)
-is larger than a minimum value (*default = 10 mm*), the particle is considered
-as a non-prompt decay.
-For non-prompt decays, all channels are then checked for visible decay products.
-If the branching ratio to visible decays times the maximum production cross section
-for the particle exceeds :ref:`sigmacut <parameterFile>`, the particle's decay
-is considered as a displaced vertex.
 
 
 **The usage of the SLHA checker is:**
@@ -164,10 +139,17 @@ is considered as a displaced vertex.
 A typical
 usage example is: ::
 
-   smodelsTools.py slhachecker -m 0.001 -s 0.01 -f inputFiles/slha/lightSquarks.slha
+   smodelsTools.py slhachecker -s 0.01 -f inputFiles/slha/lightSquarks.slha
 
 Running this will print the status flag and a message with potential warnings
 and error messages.
+
+.. note:: In SModelS versions prior to 1.2, the SLHA file checker also
+          checked for the existence of displaced vertices or heavy charged
+          particles in the input file. Since the inclusion of HSCP signatures in
+          SModelS, these checks are no longer done by the SLHA file checker.
+          
+          
 
 .. _databaseBrowser:
 

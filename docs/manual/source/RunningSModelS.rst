@@ -54,12 +54,12 @@ The command-line tool (:ref:`runSModelS.py <runSModelS>`) and the example Python
 code (:ref:`Example.py <exampleCode>`) are described below.
 
 
-.. note:: For non-MSSM (incl. non-SUSY) input models the user needs to write their own *particles.py*
+.. note:: For non-MSSM (incl. non-SUSY) input models the user needs to write their own *share/models/newmodel.py*
           and specify which BSM particles are even or odd under the assumed
           Z\ :sub:`2` symmetry (see :ref:`adding new particles <newParticles>`).
           Finally, if the user wants to check the input files for possible issues using
           SModelS'  :ref:`SLHA and LHE file checkers <fileChecks>`, it is
-          also necessary to define the BSM particle quantum numbers in *particles.py* [#]_.
+          also necessary to define the BSM particle quantum numbers in *share/models/newmodel.py* [#]_.
           
          
 

@@ -388,7 +388,7 @@ class TxNameData(object):
         :return: formatted array [[200.,100.]]
         
         """
-        
+                
         if shapeArray == '*':
             return None
         elif isinstance(value,list):

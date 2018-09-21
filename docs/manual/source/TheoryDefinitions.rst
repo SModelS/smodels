@@ -87,7 +87,7 @@ Particles
 ^^^^^^^^^
 
 A particle represents any Z\ :sub:`2`-even and Z\ :sub:`2`-odd state appearing in an element.
-It can hold any of the following information: Z\ :sub:`2`-parity, label (a string describing the particle, e.e 'e-'), 
+It can hold any of the following information: Z\ :sub:`2`-parity, label (a string describing the particle, e.g. 'e-'), 
 pdg number, mass, electric charge, color charge, spin, decay width and decays to other particles.
 However, different sub sets of these properties are used for different particles as outlined below.
 
@@ -121,8 +121,8 @@ The only information used from the intermediate states are their masses and widt
 
 .. _final stateOdd:
 
-Z\ :sub:`2`-odd Final State Class
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Z\ :sub:`2`-odd Final State Particles
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Besides the intermediate Z\ :sub:`2`-odd BSM states, due to the assumed Z\ :sub:`2` symmetry,
 the element must also contain one stable Z\ :sub:`2`-odd final state (at least
