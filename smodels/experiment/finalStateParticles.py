@@ -37,9 +37,9 @@ anySM = InclusiveParticle(label='*',Z2parity='even')
 
 
 #Used to construct BSM final states:
-MET = Particle(label='MET', Z2parity = 'odd', eCharge = 0, colordim = 0)
-HSCPp = Particle(label='HSCP+', Z2parity = 'odd', eCharge = +1, colordim = 0)
-HSCPm = Particle(label='HSCP-', Z2parity = 'odd', eCharge = -1, colordim = 0)
+MET = Particle(label='MET', Z2parity = 'odd', eCharge = 0, colordim = 1)
+HSCPp = Particle(label='HSCP+', Z2parity = 'odd', eCharge = +1, colordim = 1)
+HSCPm = Particle(label='HSCP-', Z2parity = 'odd', eCharge = -1, colordim = 1)
 HSCP = ParticleList(label='HSCP', particles = [HSCPp,HSCPm])
 
 RHadronG = Particle(label='RHadronG', Z2parity = 'odd', eCharge = 0, colordim = 8)

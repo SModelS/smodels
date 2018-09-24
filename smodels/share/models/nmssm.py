@@ -1,179 +1,91 @@
-#!/usr/bin/env python3
-
 """
-.. module:: particles
-   :synopsis: Defines the list of R-even and R-odd particles for the NMSSM.
-
+.. module:: nmssm 
+   :synopsis: Defines the BSM particles to be used
+   .
 .. moduleauthor:: Sabine Kraml <sabine.kraml@gmail.com>
+.. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 
-   :parameter rOdd: dictionary with PDG codes for the rOdd (Z2-odd) particles
-   and their respective labels
-   :parameter rEven: dictionary with PDG codes for the rEven (Z2-eveb)
-   particles and their respective labels
-   
-   HOW TO ADD NEW PARTICLES: simply add a new entry in rOdd (rEven) if the
-   particle is Z2-odd (Z2-even). For now all decays of Z2-even particles are
-   ignored. Z2-odd particles are decayed assuming Z2 conservation.
-   
-   If you want to use slhaChecks to verify your input file (in the case of SLHA input
-   only), also include the quantum numbers of the new particles in the qNumbers dictionary below.
-
+   Properties not defined here and defined by the LHE or SLHA input file 
+   (such as masses, width and BRs) are automatically added later.
 """
 
+from smodels.theory.particle import Particle, ParticleList
 
-rOdd = {1000021 : "gluino",
-        1000022 : "N1",
-        1000023 : "N2",
-        1000025 : "N3",
-        1000035 : "N4",
-        1000045 : "N5",
-        1000024 : "C1",
-        1000037 : "C2",
-        1000039 : "gravitino",
-        1000001 : "squark",
-        1000002 : "squark",
-        1000003 : "squark",
-        1000004 : "squark",
-        2000001 : "squark",
-        2000002 : "squark",
-        2000003 : "squark",
-        2000004 : "squark",
-        1000005 : "sbottom",
-        2000005 : "sbottom",
-        1000006 : "stop",
-        2000006 : "stop",
-        1000011 : "slepton",
-        1000013 : "slepton",
-        1000015 : "stau",
-        2000011 : "slepton",
-        2000013 : "slepton",
-        2000015 : "stau",
-        1000012 : "sneutrino",
-        1000014 : "sneutrino",
-        1000016 : "sneutrino",
-        2000012 : "sneutrino",
-        2000014 : "sneutrino",
-        2000016 : "sneutrino",
-       -1000021 : "gluino",
-       -1000022 : "N1",
-       -1000023 : "N2",
-       -1000025 : "N3",
-       -1000035 : "N4",
-       -1000045 : "N5",
-       -1000055 : "N6",
-       -1000024 : "C1",
-       -1000037 : "C2",
-       -1000039 : "gravitino",
-       -1000001 : "squark",
-       -1000002 : "squark",
-       -1000003 : "squark",
-       -1000004 : "squark",
-       -2000001 : "squark",
-       -2000002 : "squark",
-       -2000003 : "squark",
-       -2000004 : "squark",
-       -1000005 : "sbottom",
-       -2000005 : "sbottom",
-       -1000006 : "stop",
-       -2000006 : "stop",
-       -1000011 : "slepton",
-       -1000013 : "slepton",
-       -1000015 : "stau",
-       -2000011 : "slepton",
-       -2000013 : "slepton",
-       -2000015 : "stau",
-       -1000012 : "sneutrino",
-       -1000014 : "sneutrino",
-       -1000016 : "sneutrino",
-       -2000012 : "sneutrino",
-       -2000014 : "sneutrino",
-       -2000016 : "sneutrino"
-}
+####  R-odd   ##########
+#1st generation squarks and its conjugates:
+sdl = Particle(Z2parity='odd', label='sd_L', pdg=1000001, eCharge=-1./3, colordim=3, spin=0)
+sul = Particle(Z2parity='odd', label='su_L', pdg=1000002, eCharge=2./3, colordim=3, spin=0)
+sdr = Particle(Z2parity='odd', label='sd_R', pdg=2000001, eCharge=-1./3, colordim=3, spin=0)
+sur = Particle(Z2parity='odd', label='su_R', pdg=2000002, eCharge=2./3, colordim=3, spin=0)
 
-rEven = {25 : "higgs",
-        -25 : "higgs",
-         35 : "h2",
-        -35 : "h2",
-         45 : "h3",
-        -45 : "h3",
-         36 : "a1",
-        -36 : "a1",
-         46 : "a2",
-        -46 : "a2",
-         37 : "H+",
-        -37 : "H-",
-         23 : "Z",
-        -23 : "Z",
-         22 : "photon",
-        -22 : "photon",
-         24 : "W+",
-        -24 : "W-",
-         16 : "nu",
-        -16 : "nu",
-         15 : "ta-",
-        -15 : "ta+",
-         14 : "nu",
-        -14 : "nu",
-         13 : "mu-",
-        -13 : "mu+",
-         12 : "nu",
-        -12 : "nu",
-         11 : "e-",
-        -11 : "e+",
-         4  : "c",
-        -4  : "c",
-         5  : "b",
-        -5  : "b",
-         6  : "t+",
-        -6  : "t-",
-         1  : "q",
-         2  : "q",
-         3  : "q",
-         -1  : "q",
-         -2  : "q",
-         -3  : "q",
-         21  : "g",
-         -21  : "g",
-         111: "pi",
-         -111: "pi",
-         211: "pi",
-         -211: "pi" }
+#2nd generation squarks and its conjugates:
+ssl = Particle(Z2parity='odd', label='ss_L', pdg=1000003, eCharge=-1./3, colordim=3, spin=0)
+scl = Particle(Z2parity='odd', label='sc_L', pdg=1000004, eCharge=2./3, colordim=3, spin=0)
+ssr = Particle(Z2parity='odd', label='ss_R', pdg=2000003, eCharge=-1./3, colordim=3, spin=0)
+scr = Particle(Z2parity='odd', label='sc_R', pdg=2000004, eCharge=2./3, colordim=3, spin=0)
 
-#Quantum numbers for the new particles. Just used by tools.slhaChecks
-#PDG: (spin*2, electrical charge*3, color dimension)
-qNumbers={
- 35:[0,0,1],
- 36:[0,0,1],
- 37:[0,3,1],
- 45:[0,0,1],
- 46:[0,0,1],
- 1000024:[1,3,1],
- 1000037:[1,3,1],
- 1000022:[1,0,1],
- 1000023:[1,0,1],
- 1000025:[1,0,1],
- 1000035:[1,0,1],
- 1000045:[1,0,1],
- 1000021:[1,0,8],
- 1000011:[0,-3,1],
- 2000011:[0,-3,1],
- 1000013:[0,-3,1],
- 2000013:[0,-3,1],
- 1000015:[0,-3,1],
- 2000015:[0,-3,1],
- 1000012:[0,0,1],
- 1000014:[0,0,1],
- 1000016:[0,0,1],
- 1000002:[0,2,3],
- 2000002:[0,2,3],
- 1000001:[0,-1,3],
- 2000001:[0,-1,3],
- 1000004:[0,2,3],
- 2000004:[0,2,3],
- 1000003:[0,-1,3],
- 2000003:[0,-1,3],
- 1000006:[0,2,3],
- 2000006:[0,2,3],
- 1000005:[0,-1,3],
- 2000005:[0,-1,3],
-}
+#3rd generation squarks and its conjugates:
+sb1 = Particle(Z2parity='odd', label='sb_1', pdg=1000005, eCharge=2./3, colordim=3, spin=0)
+st1 = Particle(Z2parity='odd', label='st_1', pdg=1000006, eCharge=-1./3, colordim=3, spin=0)
+sb2 = Particle(Z2parity='odd', label='sb_2', pdg=2000005, eCharge=2./3, colordim=3, spin=0)
+st2 = Particle(Z2parity='odd', label='st_2', pdg=2000006, eCharge=-1./3, colordim=3, spin=0)
+
+#1st generation sleptons and its conjugates:
+sel = Particle(Z2parity='odd', label='se_L', pdg=1000011, eCharge=-1, colordim=1, spin=0)
+snel = Particle(Z2parity='odd', label='sne_L', pdg=1000012, eCharge=0, colordim=1, spin=0)
+ser = Particle(Z2parity='odd', label='se_R', pdg=2000011, eCharge=0, colordim=1, spin=0)
+sner = Particle(Z2parity='odd', label='sne_R', pdg=2000012, eCharge=0, colordim=1, spin=0)
+
+#2nd generation sleptons and its conjugates:
+smul = Particle(Z2parity='odd', label='smu_L', pdg=1000013, eCharge=-1, colordim=1, spin=0)
+snmul = Particle(Z2parity='odd', label='snmu_L', pdg=1000014, eCharge=0, colordim=1, spin=0)
+smur = Particle(Z2parity='odd', label='smu_R', pdg=2000013, eCharge=-1, colordim=1, spin=0)
+snmur = Particle(Z2parity='odd', label='snmu_R', pdg=2000014, eCharge=0, colordim=1, spin=0)
+
+#3rd generation sleptons and its conjugates:
+sta1 = Particle(Z2parity='odd', label='sta_1', pdg=1000015, eCharge=-1, colordim=1, spin=0)
+sntal = Particle(Z2parity='odd', label='snta_L', pdg=1000016, eCharge=0, colordim=1, spin=0)
+sta2 = Particle(Z2parity='odd', label='sta_2', pdg=2000015, eCharge=-1, colordim=1, spin=0)
+sntar = Particle(Z2parity='odd', label='snta_R', pdg=2000016, eCharge=0, colordim=1, spin=0)
+
+#Gluino:
+gluino = Particle(Z2parity='odd', label='gluino', pdg=1000021, eCharge=0, colordim=8, spin=1./2)
+#Neutralinos
+n1 = Particle(Z2parity='odd', label='N1', pdg=1000022, eCharge=0, colordim=1, spin=1./2)  
+n2 = Particle(Z2parity='odd', label='N2', pdg=1000023, eCharge=0, colordim=1, spin=1./2)  
+n3 = Particle(Z2parity='odd', label='N3', pdg=1000025, eCharge=0, colordim=1, spin=1./2)  
+n4 = Particle(Z2parity='odd', label='N4', pdg=1000035, eCharge=0, colordim=1, spin=1./2)  
+n5 = Particle(Z2parity='odd', label='N5', pdg=1000045, eCharge=0, colordim=1, spin=1./2)  
+
+#Charginos
+c1 = Particle(Z2parity='odd', label='C1+', pdg=1000024, eCharge=1, colordim=1, spin=1./2)  
+c2 = Particle(Z2parity='odd', label='C2+', pdg=1000037, eCharge=1, colordim=1, spin=1./2)  
+
+#Graviton
+gravitino = Particle(Z2parity='odd', label='G', pdg=1000039, eCharge=1, colordim=1, spin=1./2)
+
+##### R-even  ###############
+#Higgs
+H = Particle(Z2parity='even', label='H+', pdg=37, eCharge=+1, colordim=1, spin=0)    
+H2 = Particle(Z2parity='even', label='H2', pdg=35, eCharge=0, colordim=1, spin=0)  
+H3 = Particle(Z2parity='even', label='H3', pdg=45, eCharge=0, colordim=1, spin=0)  
+A1 = Particle(Z2parity='even', label='A1', pdg=36, eCharge=0, colordim=1, spin=0)
+A2 = Particle(Z2parity='even', label='A2', pdg=46, eCharge=0, colordim=1, spin=0)
+
+squarks = [sdl,sul,sdr,sur] + [ssl,scl,ssr,scr] + [sb1,st1,sb2,st2]
+sleptons = [sel,snel,ser, snelr] + [smul,snmul,smur,snmur] + [sta1,sntal,sta2,sntar]
+inos = [gluino] + [n1,n2,n3,n4,n5] + [c1,c2] + [gravitino]
+
+rOdd = squarks + sleptons + inos 
+rOddC = [p.chargeConjugate() for p in rOdd]  #Define the charge conjugates
+
+higgs = [H,H2,H3,A1,A2]
+higgsC = [p.chargeConjugate() for p in higgs]
+from smodels.share.models.SMparticles import SMList
+rEven = SMList + higgs + higgsC
+
+#Generic BSM particles:
+
+BSMList = rOdd + rOddC
+BSMparticleList = ParticleList('BSM', BSMList)
+

@@ -9,12 +9,10 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-
 from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import decomposer
 from smodels.theory import theoryPrediction
-from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 from smodels.theory.theoryPrediction import theoryPredictionsFor
@@ -46,7 +44,6 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     :parameter listOfExpRes: list of ExpResult objects to be considered
     :returns: output of printers
     """
-    
     """Get run parameters and options from the parser"""
     sigmacut = parser.getfloat("parameters", "sigmacut") * fb
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
@@ -79,6 +76,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         """
         Load the input model and  update it with the information from the input file
         """
+        from smodels.particlesLoader import BSMList
         model = Model(inputFile=inputFile, BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles()
     except SModelSError as e:

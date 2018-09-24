@@ -15,7 +15,6 @@ from smodels.theory import lheReader
 from smodels.tools.physicsUnits import MeV, GeV, fb
 from smodels import installation
 import pyslha
-from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList, SMparticleList
 from smodels.theory.model import Model
 from smodels.theory import crossSection
@@ -191,7 +190,8 @@ class SlhaStatus(object):
         self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
         self.slha = self.read()
-
+        
+        from smodels.particlesLoader import BSMList
         model = Model(BSMList,SMList,filename)
         model.updateParticles()     
         self.model = model   

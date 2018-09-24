@@ -21,7 +21,7 @@ def addPromptAndDisplaced(branch):
     """
     
     if not branch.particles: # no decays happened
-        if branch.BSMparticles[0].eCharge == 0 and branch.BSMparticles[0].colordim == 0: branch._decayType = 'METonly'
+        if branch.BSMparticles[0].eCharge == 0 and branch.BSMparticles[0].colordim == 1: branch._decayType = 'METonly'
         else: branch._decayType = 'longlived'
         probabilities = [1.]
         branches = [branch]
@@ -29,12 +29,15 @@ def addPromptAndDisplaced(branch):
    
     F = []
     for particle in branch.BSMparticles:
-        if particle.totalwidth == float('inf')*GeV:
+        if isinstance(particle.totalwidth, list):
+            width = min(particle.totalwidth)
+        else: width = particle.totalwidth
+        if width == float('inf')*GeV:
             F_long, F_prompt, F_displaced = [0.,1.,0.]
-        elif particle.totalwidth == 0.*GeV:
+        elif width == 0.*GeV:
             F_long, F_prompt, F_displaced = [1.,0.,0.]
         else:    
-            F_long, F_prompt, F_displaced = calculateProbabilities(particle)
+            F_long, F_prompt, F_displaced = calculateProbabilities(width)
         # allow for combinations of decays and a long lived particle only if the last BSM particle is the long lived one
         if particle == branch.BSMparticles[-1]: F.append([F_long])
         else: F.append([F_prompt,F_displaced])
@@ -68,7 +71,7 @@ def addPromptAndDisplaced(branch):
     return probabilities, branches
     
 
-def calculateProbabilities(particle):
+def calculateProbabilities(width):
     """
     The fraction of prompt and displaced decays are defined as:
     
@@ -89,8 +92,8 @@ def calculateProbabilities(particle):
     gb_outer = 0.6
     hc = 197.327*MeV*fm  #hbar * c
     
-    F_long = exp( -1*particle.totalwidth * l_outer /(gb_outer*hc) )    
-    F_prompt = 1. - exp( -1*particle.totalwidth * l_inner /(gb_inner*hc) )         
+    F_long = exp( -1*width * l_outer /(gb_outer*hc) )    
+    F_prompt = 1. - exp( -1*width * l_inner /(gb_inner*hc) )         
     F_displaced = 1. - F_prompt - F_long
     
     return F_long, F_prompt, F_displaced

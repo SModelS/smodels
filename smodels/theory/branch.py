@@ -134,7 +134,7 @@ class Branch(object):
         #Compare final BSM state by Z2parity and quantum numbers:
         if self.BSMparticles and other.BSMparticles:
             comp = self.BSMparticles[-1].cmpProperties(other.BSMparticles[-1],
-                                                   properties=['Z2parity','colordim','eCharge', 'totalwidth'])
+                                                   properties=['Z2parity','colordim','eCharge'])
             if comp:
                 return comp 
 
@@ -234,7 +234,7 @@ class Branch(object):
             for iv,vertex in enumerate(self.particles):
                 if not simParticles(vertex,other.particles[iv]):
                     return False
-
+            
         #If the final state BSM particles have the same quantum numbers: 
         if self.BSMparticles and other.BSMparticles:  
             if not self.BSMparticles[-1].eqProperties(other.BSMparticles[-1],properties=['colordim','eCharge']):

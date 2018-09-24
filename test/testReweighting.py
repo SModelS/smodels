@@ -18,7 +18,7 @@ from smodels.theory.element import Element
 n1 = mssm.n1
 n1.totalwidth = 0.*GeV
 st1 = mssm.st1
-st1.totalwidth = 2.*GeV
+st1.totalwidth = 2.*GeV 
 gluino = mssm.gluino
 gluino.totalwidth = 1.*10**(-30)*GeV
 t = SMparticles.t

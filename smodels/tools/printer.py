@@ -470,7 +470,6 @@ class TxTPrinter(BasicPrinter):
                 for pidList in theoryPrediction.PIDs:
                     output += "PIDs:" + str(pidList) + "\n"
 
-
         return output
 
 
@@ -568,7 +567,6 @@ class SummaryPrinter(TxTPrinter):
 
         :param obj: A TheoryPredictionList object to be printed.
         """
-        
         obj.sortTheoryPredictions()
         if hasattr(self,"expandedsummary") and not self.expandedsummary:    
             theoPredictions = [obj._theoryPredictions[0]]
@@ -590,7 +588,6 @@ class SummaryPrinter(TxTPrinter):
             r = theoPred.getRValue(expected=False)
             r_expected = theoPred.getRValue(expected=True)
             rvalues.append(r)
-
             output += "%19s  " % (expResult.globalInfo.id)  # ana
             output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
             output += "%5s " % theoPred.getmaxCondition()  # condition violation
@@ -604,13 +601,10 @@ class SummaryPrinter(TxTPrinter):
             output += " Txnames:  " + txnameStr + "\n"
             if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
                 output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)            
-            
-            if not theoPred == obj.theoryPredictions[-1]: output += 80 * "-"+ "\n"
-
+            if not theoPred == obj._theoryPredictions[-1]: output += 80 * "-"+ "\n"
         output += "\n \n"
         output += 80 * "=" + "\n"
         output += "The highest r value is = " + str(max(rvalues)) + "\n"
-
         return output
             
 

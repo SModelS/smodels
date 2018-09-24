@@ -2,7 +2,6 @@
 INFO in modelTester.loadDatabase() in 336: database:discardZeroes is not given in config file. Defaulting to 'True'.
 INFO in databaseObj.loadBinaryFile() in 171: loading binary db file ./unittest113.pcl format version 201
 INFO in databaseObj.loadBinaryFile() in 178: Loaded database from ./unittest113.pcl in 0.1 secs.
-INFO in metaObj.printFastlimBanner() in 164: FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11
 [smodels.cpp] now running over test.slha
 WARNING in printer.setOutPutFile() in 558: Removing old output file results/test.slha.smodels
 [smodels.cpp] 8 experimental results found.
@@ -41,8 +40,8 @@ Total Number of Elements: 1
 Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 5.72E-01 [pb]
 Theory conditions:  None
-Observed experimental limit: 3.81E-02 [pb]
-Observed r-Value: 15.002655551277467
+Observed experimental limit: 3.81E+01 [fb]
+Observed r-Value: 15.002655551277469
 
 ---------------Analysis Label = CMS-SUS-13-012
 -------------------Dataset Label = 6NJet8_1000HT1250_450MHTinf
@@ -59,8 +58,9 @@ Likelihood: 8.193807968109442e-07
 
 Total missing topology cross section (fb):  0.000E+00
 Total cross section where we are outside the mass grid (fb):  0.000E+00
-Total cross section in long cascade decays (fb):  0.000E+00
-Total cross section in decays with asymmetric branches (fb):  0.000E+00
+Total cross section with longlived decays (fb):  0.000E+00
+Total cross section with displaced decays (fb):  0.000E+00
+Total cross section with MET decays (fb):  0.000E+00
 
 Full information on unconstrained cross sections
 ================================================================================
@@ -68,8 +68,9 @@ No missing topologies found
 ================================================================================
 No contributions outside the mass grid
 ================================================================================
-Missing topos: long cascade decays (up to 10 entries), sqrts = 8 TeV:
-Mother1 Mother2 Weight (fb) # allMothers
+No long-lived decays
 ================================================================================
-Missing topos: asymmetric branches (w/o long cascades, up to 10), sqrts = 8 TeV
-Mother1 Mother2 Weight (fb) # allMothers
+No displaced decays
+================================================================================
+No MET decays
+================================================================================

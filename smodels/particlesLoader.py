@@ -7,13 +7,8 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Matthias Wolf <matthias.wolf@wot.at>
 
-   (Parameter descriptions taken from Andre Lessa's module particles)
-   :parameter rOdd: dictionary with PDG codes for the rOdd (Z2-odd) particles
-   and their respective labels
-   :parameter rEven: dictionary with PDG codes for the rEven (Z2-eveb)
-   particles and their respective labels
-   :parameter ptcDic: dictionary with inclusive labels to help defining group
-   of particles in the analysis database
+   :parameter rOdd: list of particle objects for the rOdd (Z2-odd) particles
+   :parameter rEven: list of particle objects for the rEven (Z2-even) particles
    
 """
 
@@ -23,7 +18,6 @@ def load ():
     from smodels.tools.smodelsLogging import logger
     from smodels.installation import installDirectory
     fulldir = os.path.join(installDirectory(),"smodels","share","models")
-    # print ( "fulldir", fulldir )
     sys.path.insert(0,installDirectory())
     sys.path.insert(0,os.path.join(installDirectory(),"smodels") )
     sys.path.insert(0,fulldir)
@@ -38,7 +32,7 @@ def load ():
         modelFile=filename
 
     if modelFile.endswith(".py"):
-        modelFile=modelFile[:-3]
+        modelFile=modelFile[:-3]  
         
     from importlib import import_module
     try:
@@ -51,5 +45,5 @@ def load ():
 
 pM = load()
         
-rOdd = pM.rOdd
+BSMList = pM.BSMList
 rEven = pM.rEven

@@ -24,7 +24,6 @@ def filetype ( filename ):
     import os
     
     if not os.path.exists ( filename ):
-        print ("not exist")
         return None
     if filename[-5:].lower() == ".slha":
         return "slha"
