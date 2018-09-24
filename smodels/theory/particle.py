@@ -200,7 +200,7 @@ class Particle(object):
         :return: True/False
         """
         
-        if self.eCharge == 0 and self.colordim == 0:
+        if self.eCharge == 0 and self.colordim == 1:
             return True
         
         return False
