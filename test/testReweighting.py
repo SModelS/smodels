@@ -27,7 +27,7 @@ class ReweightingTest(unittest.TestCase):
    
     def testcalculateProbabilities(self):
       
-        F_long, F_prompt, F_displaced = calculateProbabilities(gluino)
+        F_long, F_prompt, F_displaced = calculateProbabilities(gluino.totalwidth)
         self.assertAlmostEqual(F_long, 1.)
         self.assertEqual(F_prompt, 0.)
         self.assertAlmostEqual(F_displaced, 0.)
