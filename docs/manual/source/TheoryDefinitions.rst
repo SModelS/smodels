@@ -37,8 +37,7 @@ Elements contain the Z\ :sub:`2`-even particles appearing in
 the cascade decay and the BSM (Z\ :sub:`2`-odd) states
 which have decayed or appear in the last step of the decay.
 Furthermore, the last BSM (Z\ :sub:`2`-odd) particle is classified
-according to its quantum numbers as a specific *final state*
-class: *MET*, *HSCP*, *R-hadron*,etc. 
+according to its quantum numbers as a specific *final state particle* : *MET*, *HSCP*, *R-hadron*,etc. 
 A representation of an element is shown below:
 
 
@@ -145,7 +144,7 @@ It represents a series of cascade decays of a single initial Z\ :sub:`2`-odd
 state.
 The diagram below illustrates an example of a branch.
 
-.. image:: images/branchTopB.png
+.. image:: images/branchTop2.png
    :width: 25%
 
 The structure of each branch is fully defined by its number of vertices and the number of 
@@ -206,7 +205,7 @@ be represented as a list in addition to the bracket notation:
 
 .. _bracketnotationFull:
 
-.. image:: images/bracketNotationB.png
+.. image:: images/bracketNotation2.png
    :width: 70%
    
 .. _topology:

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 from __future__ import print_function
 """
@@ -8,15 +8,14 @@ from __future__ import print_function
 """
 """ Import basic functions (this file must be executed in the installation folder) """
 
-from imp import reload
-from smodels.tools import runtime
-from smodels import particlesLoader
-from smodels.theory import slhaDecomposer,lheDecomposer
+from smodels.theory import decomposer
 from smodels.tools.physicsUnits import fb, GeV, TeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
 from smodels.tools.smodelsLogging import setLogLevel
+from smodels.particleDefinitions import BSM
+from smodels.theory.model import Model
 setLogLevel("info")
 # Set the path to the database
 database = Database("http://smodels.hephy.at/database/official113")
@@ -25,24 +24,21 @@ def main():
     """
     Main program. Displays basic use case.
     """
-    #Define your model (list of rEven and rOdd particles)
-    runtime.modelFile = 'smodels.share.models.mssm' 
-    reload(particlesLoader) #Make sure all the model particles are up-to-date
     
     # Path to input file (either a SLHA or LHE file)
     slhafile = 'inputFiles/slha/lightEWinos.slha'
     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
+    #Define your model
+    model = Model(slhafile, BSM)
+    model.updateParticles()
+
 
     # Set main options for decomposition
     sigmacut = 0.3 * fb
     mingap = 5. * GeV
 
-    # Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input)
-    slhaInput = True
-    if slhaInput:
-        toplist = slhaDecomposer.decompose(slhafile, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
-    else:
-        toplist = lheDecomposer.decompose(lhefile, doCompress=True,doInvisible=True, minmassgap=mingap)
+    # Decompose model
+    toplist = decomposer.decompose(model, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
     
     # Access basic information from decomposition, using the topology list and topology objects:
     print ( "\n Decomposition Results: " )

@@ -172,6 +172,25 @@ As we can see the efficiency map is given as a Python array with the structure:
 :math:`[[\mbox{masses},\mbox{efficiency}], [\mbox{masses},\mbox{efficiency}],...]`.
 
 
+.. _dbReweighting:
+
+Data Set Folder: Lifetime reweighting factor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Similar to the efficiency maps, there are also maps containing the probability for each simpilified model to decay in this way.
+Since v2.0.0 SModelS is able to handle different lifetime dependent signatures. Therefore whenever an element is matched 
+to an experimental result it has to be multiplied by the probability to decay in the same combination of prompt or displaced decays and long-lived particles.
+
+The probabilities are computed by: 
+
+.. math::
+	\mathcal{F}(\tau) = \frac{(A \times \epsilon)_{\tau}}{(A \times \epsilon)_{\infty}}
+	
+	
+The lifetime reweighting map is given as a Python array with the structure: 
+:math:`[[\mbox{masses},\mbox{lifetime},\mbox{efficiency}], [\mbox{masses},\mbox{lifetime},\mbox{efficiency}],...]`.
+
+
 .. _inclusiveSMS:
 
 Inclusive Simplified Models

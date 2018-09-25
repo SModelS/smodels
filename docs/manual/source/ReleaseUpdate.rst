@@ -45,7 +45,7 @@ New in Version 2.0.0:
   * Introduction of :ref:`particle class <particleClass>`
   * Only one :ref:`decomposer <decomp>` for both SLHA and LHE files (see also :ref:`LHE-reader <lhereader>`)
   * Decomposition and experimental results can include displaced signatures
-  * Moved :ref:`lifetime reweighting <lifetimeWeight>` to |database| for meta-stable particles
+  * Moved :ref:`lifetime reweighting <dbReweighting>` to |database| for meta-stable particles
   * Added approximate lifetime reweighting for :ref:`missing topologies <topCoverage>` 
 
 New in Version 1.2.0:

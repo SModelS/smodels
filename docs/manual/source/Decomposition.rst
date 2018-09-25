@@ -25,10 +25,10 @@ The input format can be:
 * a LHE file
 
 (see :doc:`Basic Input <BasicInput>`).
-The same decomposition method is applied for both formats:
-the :ref:`decomposition <decomp>`.
+The same the :ref:`decomposition <decomp>` method is applied for both formats.
 This is possible by making use of the :ref:`LHE-reader <lhereader>` which translates the information of the LHE file into a 
-similar form as the information of the SLHA file. Therefore, the decomposition process will be described for an SLHA file.
+similar form as the information of the SLHA file. Since the decomposition procedure is similar for both types of files
+it will be described for an SLHA file.
 
 .. _decomp:
 
@@ -202,7 +202,8 @@ the following properties:
 * Number of vertices
 * Number of final states in each vertex
 * Final state particles (particles belonging to the same vertex are alphabetically sorted)
-* Mass array
+* Mass and decay width of intermediate Z\ :sub:`2`-odd states
+* Quantum numbers of Z\ :sub:`2`-odd final states
 
 As an example, consider the three elements below:
 
