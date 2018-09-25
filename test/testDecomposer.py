@@ -84,7 +84,7 @@ class DecomposerTest(unittest.TestCase):
 
     def testCompression(self):
         
-        filename = "%sinputFiles/slha/higgsinoStop.slha" %(installDirectory())
+        filename = "./testFiles/slha/higgsinoStop.slha" 
         model = Model(BSMList,SMList,filename)
         model.updateParticles(promptWidth=1e-12*GeV) #Force charginos/neutralinos to be considered as prompt
         
@@ -103,20 +103,19 @@ class DecomposerTest(unittest.TestCase):
             if str(topo)!="[1,1][1,1]":
                 continue
             for element in topo.elementList:
-                if str(element)!="[[[q],[W+]],[[t-],[t+]]]":
+                if str(element)!="[[[q],[W+]],[[t-],[t+]]]": 
                     continue
                 tested = True
                 self.assertEqual(element.motherElements[0][0],"original")
                 self.assertEqual(len(element.motherElements),1)
         self.assertTrue(tested) #Make sure the test was performed
-          
-          
+         
         tested = False
         topos = decomposer.decompose(model, sigcut=0.1*fb, doCompress=False, doInvisible=True, minmassgap=5.*GeV )
-        toposExpected = {"[][]" : 1, "[][1]" : 2, "[][2]" : 22, "[1][1]" : 4, "[1][2]" : 17, "[2][2]" : 72, 
-                         "[][2,2]" : 44, "[1][1,1]" : 4, "[1][1,2]" : 42, "[2][1,2]" : 36, "[2][2,2]" : 284, 
-                         "[1,1][1,1]" : 5, "[1,1][1,2]" : 22, "[1,2][1,2]" : 120, "[1][1,1,1]" : 2, "[1][1,2,2]" : 72, 
-                         "[1,1][1,1,1]" : 20, "[1,1][1,1,2]" : 16, "[1,2][1,2,2]" : 240, "[1,1,1][1,1,2]" : 56, 
+        toposExpected = {"[][]" : 1, "[][1]" : 2, "[][2]" : 14, "[1][1]" : 1, "[1][2]" : 17, "[2][2]" : 72, 
+                         "[][2,2]" : 44, "[1][1,1]" : 2, "[1][1,2]" : 22, "[2][1,2]" : 36, "[2][2,2]" : 284, 
+                         "[1,1][1,1]" : 5, "[1,1][1,2]" : 22, "[1,2][1,2]" : 120, "[1][1,1,1]" : 2, "[1][1,2,2]" : 64, 
+                         "[1,1][1,1,1]" : 12, "[1,1][1,1,2]" : 16, "[1,2][1,2,2]" : 240, "[1,1,1][1,1,2]" : 56, 
                          "[1,1,2][1,1,2]" : 16, "[1][1,1,1,2]" : 4, "[1,1][1,1,1,2]" : 56, "[1,1,2][1,1,1,2]" : 176}
         for topo in topos:
             self.assertEqual(len(topo.elementList),toposExpected[str(topo)])
@@ -158,32 +157,25 @@ class DecomposerTest(unittest.TestCase):
                 self.assertTrue(dm < 5.0)
         self.assertTrue(tested) #Make sure the test was performed
                         
-
         tested = False                 
         topos = decomposer.decompose(model, sigcut=0.1*fb, doCompress=True, doInvisible=True, minmassgap=5.*GeV )
-        elIDs = {24 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
-                 25 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
-                 26 : Element("[[[b]],[[t-]]]",finalState=['MET','MET']),
-                 27 : Element("[[[b]],[[t-]]]",finalState=['MET','MET']),
-                 28 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET']),
-                 29 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET']),
-                 30 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET']),
-                 31 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET'])}
-        toposExpected = {"[][]" : 2, "[][1]" : 6, "[][2]" : 14, "[1][1]" : 9, "[1][2]" : 21, "[2][2]" : 72, "[][1,2]" : 2, "[][2,2]" : 44, 
-                         "[1][1,1]" : 6, "[1][1,2]" : 44, "[2][1,2]" : 36, "[2][2,2]" : 284, "[1,1][1,1]" : 17, 
-                         "[1,1][1,2]" : 22, "[1,2][1,2]" : 120, "[1][1,1,1]" : 4, "[1][1,2,2]" : 72, "[1,1][1,1,1]" : 56, 
+        elIDs = {22 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
+                 23 : Element("[[[b]],[[t-]]]",finalState=['MET','MET']),
+                 24 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET'])}
+        toposExpected = {"[][]" : 1, "[][1]" : 5, "[][2]" : 14, "[1][1]" : 4, "[1][2]" : 21, "[2][2]" : 72, "[][1,2]" : 2, "[][2,2]" : 44, 
+                         "[1][1,1]" : 4, "[1][1,2]" : 34, "[2][1,2]" : 36, "[2][2,2]" : 284, "[1,1][1,1]" : 17, 
+                         "[1,1][1,2]" : 22, "[1,2][1,2]" : 120, "[1][1,1,1]" : 4, "[1][1,2,2]" : 64, "[1,1][1,1,1]" : 48, 
                          "[1,1][1,1,2]" : 16, "[1,2][1,2,2]" : 240, "[1,1,1][1,1,2]" : 64, "[1,1,2][1,1,2]" : 16, 
                          "[1][1,1,1,2]" : 4, "[1,1][1,1,1,2]" : 64, "[1,1,2][1,1,1,2]" : 176}
         for topo in topos:
             self.assertEqual(len(topo.elementList),toposExpected[str(topo)])
             if str(topo)!="[1][1]":
                 continue            
-            for element in topo.elementList:
+            for element in topo.elementList:              
                 if element.elID in elIDs:
                     tested = True
-                    self.assertEquals(element,elIDs[element.elID])
+                    self.assertEqual(element,elIDs[element.elID])
         self.assertTrue(tested) #Make sure the test was performed
-
-
+        
 if __name__ == "__main__":
     unittest.main()

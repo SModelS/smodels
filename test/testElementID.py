@@ -21,8 +21,8 @@ from smodels.theory.model import Model
 class ElementIdTest(unittest.TestCase):
     def testGoodFile(self):
 
-        listOfIDs = {'ATLAS-CONF-2013-037': [31, 32, 33, 34, 27, 28, 29, 30], 
-                     'ATLAS-SUSY-2013-05' : [26]}
+        listOfIDs = {'ATLAS-CONF-2013-037': [109, 112, 122], 
+                     'ATLAS-SUSY-2013-05' : [106]}
         filename = "./testFiles/slha/higgsinoStop.slha"
         model = Model(BSMList,SMList,filename)
         model.updateParticles()
@@ -35,8 +35,8 @@ class ElementIdTest(unittest.TestCase):
             if not theorypredictions: continue
             self.assertEqual(len(theorypredictions),1)
             tpIDs = theorypredictions[0].IDs 
-            self.assertEqual(sorted(tpIDs),sorted(listOfIDs[res.globalInfo.id]))
-            
+            if 'EXO' in res.globalInfo.id: continue #skip EXO searches
+            self.assertEqual(sorted(tpIDs),sorted(listOfIDs[res.globalInfo.id]))            
 
 if __name__ == "__main__":
     unittest.main()
