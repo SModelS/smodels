@@ -19,7 +19,6 @@ from smodels.experiment.databaseObj import ExpResultList
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.tools.physicsUnits import GeV, fb, TeV
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from collections import OrderedDict
 from xml.dom import minidom

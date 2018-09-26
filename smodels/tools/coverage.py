@@ -8,8 +8,8 @@
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 
 """
-import copy
-from smodels.tools.physicsUnits import fb, GeV
+
+from smodels.tools.physicsUnits import fb
 from smodels.theory.reweighting import addPromptAndDisplaced
 from smodels.theory.element import Element
 
