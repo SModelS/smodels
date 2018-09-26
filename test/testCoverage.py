@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 .. module:: testReweighting
    :synopsis: Tests the function of smodels.theory.updateParticles 

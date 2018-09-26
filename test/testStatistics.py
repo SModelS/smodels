@@ -89,7 +89,7 @@ class StatisticsTest(unittest.TestCase):
         expected_values = [
         # mgluino          mlsp          nsig               nobs              nb             deltab           llhd                 chi2
         # ----------       ----------    ---------------    ----------------  ----------     ----------       -------------------- ----------------
-        {'mgluino':  500, 'mlsp':  200, 'nsig':   384.898, 'nobs':  298.413, 'nb':  111.0 , 'deltab': 11.0 , 'llhd': 0.00024197 , 'chi2': 7.32614 },
+        {'mgluino':  500, 'mlsp':  200, 'nsig':   384.898, 'nobs':  298.413, 'nb':  111.0 , 'deltab': 11.0 , 'llhd': 0.00024197 , 'chi2': 7.32614 }]
         {'mgluino':  500, 'mlsp':  300, 'nsig':   185.166, 'nobs':  223.619, 'nb':  111.0 , 'deltab': 11.0 , 'llhd': 0.00215989 , 'chi2': 3.67088900 },
         {'mgluino':  500, 'mlsp':  400, 'nsig':   450.820, 'nobs':  2331.38, 'nb':  2120.0, 'deltab': 110.0, 'llhd': 0.00075499 , 'chi2': 2.85026 },
         {'mgluino':  600, 'mlsp':  100, 'nsig':   476.150, 'nobs':  437.874, 'nb':  126.0 , 'deltab': 13.0 , 'llhd': 0.00100575 , 'chi2': 3.52406595 },
@@ -137,7 +137,7 @@ class StatisticsTest(unittest.TestCase):
         {'mgluino': 1100, 'mlsp':  800, 'nsig':   1.79622, 'nobs':  120.858, 'nb':  126.0 , 'deltab': 13.0 , 'llhd': 0.02187799 , 'chi2': 0.134012 },
         {'mgluino': 1100, 'mlsp':  900, 'nsig':   4.82397, 'nobs':  2166.20, 'nb':  2120.0, 'deltab': 110.0, 'llhd': 0.00313424 , 'chi2': 0.119045 },
         {'mgluino': 1100, 'mlsp': 1000, 'nsig':   0.1606 , 'nobs':  25.0 ,   'nb':  37.0  , 'deltab': 6.0 ,  'llhd': 0.01796058 , 'chi2': 1.9806},
-        {'mgluino': 2100, 'mlsp': 1000, 'nsig':   0.1606 , 'nobs':  2.0 ,   'nb':  0.7  , 'deltab': 6.0 ,  'llhd': 0.108669 , 'chi2': -0.161304}]
+        {'mgluino': 2100, 'mlsp': 1000, 'nsig':   0.1606 , 'nobs':  2.0 ,   'nb':  0.7  , 'deltab': 6.0 ,  'llhd': 0.108669 , 'chi2': -0.161304}
 
 
 

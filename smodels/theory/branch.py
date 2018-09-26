@@ -484,8 +484,8 @@ def decayBranches(branchList, sigcut=0.*fb):
             newBranches = inbranch.decayDaughter()
             if newBranches:
                 # New branches were generated, add them for next iteration
-                newBranchList += [br for br in newBranches if br.maxWeight >= sigcut]
-            elif inbranch.maxWeight >= sigcut:
+                newBranchList += [br for br in newBranches if br.maxWeight > sigcut]
+            elif inbranch.maxWeight > sigcut:
                 stableBranches.append(inbranch)
 
         # Use new unstable branches (if any) for next iteration step
