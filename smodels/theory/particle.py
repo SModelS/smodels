@@ -318,7 +318,7 @@ class ParticleList(Particle):
                     return values[0]
             return values
         except:
-            raise SModelSTheoryError("Could not obtain property %s from object ParticleList %s" %(attr,str(self)))
+            raise AttributeError
 
             
     def cmpProperties(self,other, properties = ['spin','colordim','eCharge']):
@@ -342,7 +342,7 @@ class ParticleList(Particle):
         if isinstance(other,InclusiveParticle):
             return -1*other.cmpProperties(self,properties=properties)
         
-        for prop in properties:            
+        for prop in properties:    
             if not hasattr(self,prop) or not hasattr(other,prop):
                 continue
             
