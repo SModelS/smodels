@@ -21,26 +21,27 @@ from smodels.theory.model import Model
 setLogLevel("info")
 
 # Set the path to the database
-database = Database('./smodels-database')
+database = Database("./smodels-database")
 
 def main():
     """
     Main program. Displays basic use case.
     """
-       #Define your model (list of rEven and rOdd particles)
+    #Define your model (list of rEven and rOdd particles)
     runtime.modelFile = 'smodels.share.models.mssm' 
 
     # Path to input file (either a SLHA or LHE file)
+#     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
     slhafile = 'inputFiles/slha/lightEWinos.slha'
-    lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
     #Define your model
+#     model = Model(inputFile=lhefile, BSMparticles=BSMList, SMparticles=SMList)
     model = Model(inputFile=slhafile, BSMparticles=BSMList, SMparticles=SMList)
     model.updateParticles()
     
 
     # Set main options for decomposition
-    sigmacut = 0.01 * fb
-    mingap = 5. * GeV
+    sigmacut = 0.01*fb
+    mingap = 5.*GeV
 
     # Decompose model
     toplist = decomposer.decompose(model, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
