@@ -8,6 +8,7 @@ from __future__ import print_function
 """
 """ Import basic functions (this file must be executed in the installation folder) """
 
+from smodels.tools import runtime
 from smodels.theory import decomposer
 from smodels.tools.physicsUnits import fb, GeV, TeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
@@ -18,14 +19,17 @@ from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 setLogLevel("info")
+
 # Set the path to the database
-database = Database("http://smodels.hephy.at/database/official113")
+database = Database('./smodels-database')
 
 def main():
     """
     Main program. Displays basic use case.
     """
-    
+       #Define your model (list of rEven and rOdd particles)
+    runtime.modelFile = 'smodels.share.models.mssm' 
+
     # Path to input file (either a SLHA or LHE file)
     slhafile = 'inputFiles/slha/lightEWinos.slha'
     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
@@ -35,7 +39,7 @@ def main():
     
 
     # Set main options for decomposition
-    sigmacut = 0.3 * fb
+    sigmacut = 0.01 * fb
     mingap = 5. * GeV
 
     # Decompose model
@@ -47,15 +51,16 @@ def main():
     nel = sum([len(top.elementList) for top in toplist])
     print("\t  Total number of elements = %i " %nel )
     #Print information about the m-th topology:
-    m = 3
-    top = toplist[m]
-    print("\t\t %i-th topology  = " %m,top,"with total cross section =",top.getTotalWeight() )
-    #Print information about the n-th element in the m-th topology:
-    n = 0
-    el = top.elementList[n]
-    print("\t\t %i-th element from %i-th topology  = " %(n,m),el, end="" )
-    print("\n\t\t\twith cross section =",el.weight,"\n\t\t\tand masses = ",el.getMasses() )
-            
+    m = 2
+    if len(toplist) > m:
+        top = toplist[m]
+        print( "\t\t %i-th topology  = " %m,top,"with total cross section =",top.getTotalWeight() )
+        #Print information about the n-th element in the m-th topology:
+        n = 0
+        el = top.elementList[n]
+        print( "\t\t %i-th element from %i-th topology  = " %(n,m),el, end="" )
+        print( "\n\t\t\twith final states =",el.getFinalStates(),"\n\t\t\twith cross section =",el.weight,"\n\t\t\tand masses = ",el.getMasses() )
+
     # Load the experimental results to be used.
     # In this case, all results are employed.
     listOfExpRes = database.getExpResults()
@@ -142,8 +147,7 @@ def main():
             print('\tcross-section (fb):', genEl.missingX)
     else:
         print("\nNo displaced decays")
-    
-        
+      
         
 if __name__ == '__main__':
     main()
