@@ -183,9 +183,23 @@ class Branch(object):
         been defined yet.
         """
 
-        self.vertnumb = len(self.particles)
-        self.vertparts = [len(v) for v in self.particles]
+        #self.vertnumb = len(self.particles)
+        #self.vertparts = [len(v) for v in self.particles]
+        bInfo = self.getInfo()
+        self.vertnumb = bInfo['vertnumb']
+        self.vertparts = bInfo['vertparts']
         
+        
+    def getInfo(self):
+        """
+        Get branch topology info from particles.
+        
+        :returns: dictionary containing vertices and number of final states information  
+        """
+        vertnumb = len(self.particles)
+        vertparts = [len(v) for v in self.particles]
+        
+        return {"vertnumb" : vertnumb, "vertparts" : vertparts}
         
     def removeVertex(self,iv):
         """
@@ -370,6 +384,57 @@ class Branch(object):
             return newBranches
 
 
+def decayBranches(branchList, sigcut=0.*fb):
+    """
+    Decay all branches from branchList until all unstable intermediate states have decayed.
+    
+    :parameter branchList: list of Branch() objects containing the initial mothers
+    :parameter sigcut: minimum sigma*BR to be generated, by default sigcut = 0.
+                   (all branches are kept)
+    :returns: list of branches (Branch objects)    
+    """
+    
+        
+    stableBranches,unstableBranches = [],[]
+    
+    for br in branchList:
+        if br.maxWeight < sigcut:
+            continue
+        
+        if br.decayDaughter():
+            unstableBranches.append(br)
+        else:
+            stableBranches.append(br)
+    
+    while unstableBranches:        
+        # Store branches after adding one step cascade decay
+        newBranchList = []
+        for inbranch in unstableBranches:
+            if sigcut.asNumber() > 0. and inbranch.maxWeight < sigcut:
+                # Remove the branches above sigcut and with length > topmax
+                continue
+
+            #If None appear amongst the decays, add the possibility for the particle not decaying prompt
+            if any(x is None for x in inbranch.BSMparticles[-1].decays):            
+                stableBranches.append(inbranch)
+            
+            # Add all possible decays of the R-odd daughter to the original
+            # branch (if any)
+            newBranches = inbranch.decayDaughter()
+            if newBranches:
+                # New branches were generated, add them for next iteration
+                newBranchList += [br for br in newBranches if br.maxWeight > sigcut]
+            elif inbranch.maxWeight > sigcut:
+                stableBranches.append(inbranch)
+
+        # Use new unstable branches (if any) for next iteration step
+        unstableBranches = newBranchList           
+    
+    #Sort list by initial branch pdg:        
+    finalBranchList = sorted(stableBranches, key=lambda branch: branch.BSMparticles[0].pdg)      
+
+    return finalBranchList
+
 
 class InclusiveBranch(Branch):
     """
@@ -437,6 +502,19 @@ class InclusiveBranch(Branch):
         self.vertnumb = InclusiveValue()
         self.vertparts = InclusiveList()
         
+    def getInfo(self):
+        """
+        Get branch topology info from particles.
+        
+        :returns: dictionary containing vertices and number of final states information  
+        """
+
+        vertnumb = InclusiveValue()
+        vertparts = InclusiveList()
+        
+        return {"vertnumb" : vertnumb, "vertparts" : vertparts}
+        
+        
     def decayDaughter(self):
         """
         Always return False.
@@ -445,54 +523,4 @@ class InclusiveBranch(Branch):
         return False
         
 
-def decayBranches(branchList, sigcut=0.*fb):
-    """
-    Decay all branches from branchList until all unstable intermediate states have decayed.
-    
-    :parameter branchList: list of Branch() objects containing the initial mothers
-    :parameter sigcut: minimum sigma*BR to be generated, by default sigcut = 0.
-                   (all branches are kept)
-    :returns: list of branches (Branch objects)    
-    """
-    
-        
-    stableBranches,unstableBranches = [],[]
-    
-    for br in branchList:
-        if br.maxWeight < sigcut:
-            continue
-        
-        if br.decayDaughter():
-            unstableBranches.append(br)
-        else:
-            stableBranches.append(br)
-    
-    while unstableBranches:        
-        # Store branches after adding one step cascade decay
-        newBranchList = []
-        for inbranch in unstableBranches:
-            if sigcut.asNumber() > 0. and inbranch.maxWeight < sigcut:
-                # Remove the branches above sigcut and with length > topmax
-                continue
-
-            #If None appear amongst the decays, add the possibility for the particle not decaying prompt
-            if any(x is None for x in inbranch.BSMparticles[-1].decays):            
-                stableBranches.append(inbranch)
-            
-            # Add all possible decays of the R-odd daughter to the original
-            # branch (if any)
-            newBranches = inbranch.decayDaughter()
-            if newBranches:
-                # New branches were generated, add them for next iteration
-                newBranchList += [br for br in newBranches if br.maxWeight > sigcut]
-            elif inbranch.maxWeight > sigcut:
-                stableBranches.append(inbranch)
-
-        # Use new unstable branches (if any) for next iteration step
-        unstableBranches = newBranchList           
-    
-    #Sort list by initial branch pdg:        
-    finalBranchList = sorted(stableBranches, key=lambda branch: branch.BSMparticles[0].pdg)      
-
-    return finalBranchList
 

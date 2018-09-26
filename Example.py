@@ -8,33 +8,38 @@ from __future__ import print_function
 """
 """ Import basic functions (this file must be executed in the installation folder) """
 
+from smodels.tools import runtime
 from smodels.theory import decomposer
 from smodels.tools.physicsUnits import fb, GeV, TeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
 from smodels.tools.smodelsLogging import setLogLevel
-from smodels.particleDefinitions import BSM
+from smodels.particlesLoader import BSMList
+from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 setLogLevel("info")
+
 # Set the path to the database
-database = Database("http://smodels.hephy.at/database/official113")
+database = Database('./smodels-database')
 
 def main():
     """
     Main program. Displays basic use case.
     """
-    
+       #Define your model (list of rEven and rOdd particles)
+    runtime.modelFile = 'smodels.share.models.mssm' 
+
     # Path to input file (either a SLHA or LHE file)
     slhafile = 'inputFiles/slha/lightEWinos.slha'
     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
     #Define your model
-    model = Model(slhafile, BSM)
+    model = Model(BSMList,SMList,slhafile)
     model.updateParticles()
 
 
     # Set main options for decomposition
-    sigmacut = 0.3 * fb
+    sigmacut = 0.01 * fb
     mingap = 5. * GeV
 
     # Decompose model
@@ -46,15 +51,16 @@ def main():
     nel = sum([len(top.elementList) for top in toplist])
     print ( "\t  Total number of elements = %i " %nel )
     #Print information about the m-th topology:
-    m = 3
-    top = toplist[m]
-    print ( "\t\t %i-th topology  = " %m,top,"with total cross section =",top.getTotalWeight() )
-    #Print information about the n-th element in the m-th topology:
-    n = 0
-    el = top.elementList[n]
-    print ( "\t\t %i-th element from %i-th topology  = " %(n,m),el, end="" )
-    print ( "\n\t\t\twith cross section =",el.weight,"\n\t\t\tand masses = ",el.getMasses() )
-            
+    m = 2
+    if len(toplist) > m:
+       top = toplist[m]
+       print( "\t\t %i-th topology  = " %m,top,"with total cross section =",top.getTotalWeight() )
+       #Print information about the n-th element in the m-th topology:
+       n = 0
+       el = top.elementList[n]
+       print( "\t\t %i-th element from %i-th topology  = " %(n,m),el, end="" )
+       print( "\n\t\t\twith final states =",el.getFinalStates(),"\n\t\t\twith cross section =",el.weight,"\n\t\t\tand masses = ",el.getMasses() )
+
     # Load the experimental results to be used.
     # In this case, all results are employed.
     listOfExpRes = database.getExpResults()
@@ -115,30 +121,30 @@ def main():
         print ( "(The input model is not excluded by the simplified model results)" )
       
     #Find out missing topologies for sqrts=8*TeV:
-    uncovered = coverage.Uncovered(toplist,sqrts=8.*TeV)
+    uncovered = coverage.Uncovered(toplist,sigmacut,sqrts=8.*TeV)
     #Print uncovered cross-sections:
-    print ( "\nTotal missing topology cross section (fb): %10.3E\n" %(uncovered.getMissingXsec()) )
-    print ( "Total cross section where we are outside the mass grid (fb): %10.3E\n" %(uncovered.getOutOfGridXsec()) )
-    print ( "Total cross section in long cascade decays (fb): %10.3E\n" %(uncovered.getLongCascadeXsec()) )
-    print ( "Total cross section in decays with asymmetric branches (fb): %10.3E\n" %(uncovered.getAsymmetricXsec()) )
+    print ( "\nTotal missing topology cross section (fb): %10.3E\n" %(uncovered.missingTopos.getTotalXsec()) )
+    print ( "Total cross section where we are outside the mass grid (fb): %10.3E\n" %(uncovered.outsideGrid.getTotalXsec()) )
+    print ( "Total cross section in long cascade decays (fb): %10.3E\n" %(uncovered.longLived.getTotalXsec()) )
+    print ( "Total cross section in decays with asymmetric branches (fb): %10.3E\n" %(uncovered.displaced.getTotalXsec()) )
     
     #Print some of the missing topologies:
     print ( 'Missing topologies (up to 3):' )
-    for topo in uncovered.missingTopos.topos[:3]:
-        print ( 'Topology:',topo.topo )
+    for genEl in uncovered.missingTopos.generalElements[:3]:
+        print ( 'Topology:',str(genEl._outputDescription) )
         print ( 'Contributing elements (up to 2):' )
-        for el in topo.contributingElements[:2]:
+        for el in genEl._contributingElements[:2]:
             print ( el,'cross-section (fb):', el.missingX )
     
     #Print elements with long cascade decay:
     print ( '\nElements outside the grid (up to 2):' )
-    for topo in uncovered.outsideGrid.topos[:2]:
-        print ( 'Topology:',topo.topo )
+    for genEl in uncovered.outsideGrid.generalElements[:2]:
+        print ( 'Topology:',str(genEl._outputDescription) )
         print ( 'Contributing elements (up to 4):' )
-        for el in topo.contributingElements[:4]:
+        for el in genEl._contributingElements[:4]:
             print ( el,'cross-section (fb):', el.missingX )
             print ( '\tmass:',el.getMasses() )
-        
+                                
         
 if __name__ == '__main__':
     main()
