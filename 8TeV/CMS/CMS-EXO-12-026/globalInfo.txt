@@ -1,0 +1,8 @@
+id: CMS-EXO-12-026
+sqrts: 8*TeV
+lumi: 18.8/fb
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/EXO-12-026/index.html
+arxiv: https://arxiv.org/abs/1305.0491
+contact: cms-pag-conveners-exotica@cern.ch
+implementedBy: Andre Lessa
+lastUpdate: 2018/8/3

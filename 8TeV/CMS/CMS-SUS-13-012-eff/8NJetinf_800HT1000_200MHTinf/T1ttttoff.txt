@@ -1,5 +1,6 @@
 txName: T1ttttoff
 constraint: [[['b','W','b','W']],[['b','W','b','W']]]
+finalState: ['MET', 'MET']
 condition: None
 conditionDescription: None
 figureUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13012/Fig_7c.pdf

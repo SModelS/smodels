@@ -1,5 +1,6 @@
 txName: T5ZZ
 constraint: [[['jet','jet'],['Z']],[['jet','jet'],['Z']]]
+finalState: ['MET', 'MET']
 condition: None
 conditionDescription: None
 source: SModelS
