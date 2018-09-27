@@ -82,8 +82,17 @@ class DataSet(object):
         return not self.__eq__ ( other )
 
     def __str__ ( self ):
-        ret = "Dataset: %s" % ( ", ".join ( map ( str, self.txnameList ) ) )
+        if self.dataInfo.dataId:
+            ret = "Dataset %s: %s" % (self.dataInfo.dataId, ", ".join ( map ( str, self.txnameList ) ) )
+        else:
+            ret = "Dataset: %s" % (", ".join ( map ( str, self.txnameList ) ) )
         return ret
+    
+    def __repr__(self):
+        if self.dataInfo.dataId:
+            return self.dataInfo.dataId
+        else:
+            return 'Dataset'
 
     def __eq__ ( self, other ):
         if type ( other ) != type ( self ):
