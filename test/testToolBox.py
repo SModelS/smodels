@@ -17,10 +17,10 @@ class TestToolBox(unittest.TestCase):
     from smodels.tools.smodelsLogging import logger
 
     def testToolBox(self):
-        self.logger.info ( "ToolBox" )
+        self.logger.info( "ToolBox" )
         box = toolBox.ToolBox()
-        ok=box.checkInstallation ( make=True, printit=False )
-        self.assertTrue ( ok )
+        ok=box.checkInstallation( make=True, printit=False )
+        self.assertTrue( ok )
  
 if __name__ == "__main__":
     unittest.main()

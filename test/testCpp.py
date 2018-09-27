@@ -39,22 +39,23 @@ class CppTest(unittest.TestCase):
         """ now run the example """
         cmd = "cd ../cpp; ./run"
         l = CMD.getoutput ( cmd )
-        skip=8 ## skip first lines
-        la = l.split("\n")[skip:] 
-        a = [ x.strip() for x in la ]
+        l = l[l.find('Input status'):]
+        la = l.split("\n")
+        a = [ x.strip() for x in la  if x.strip() and x.strip()[0] != '#']
         with open("default_cpp.txt","r" ) as f:
-            l = f.readlines()
-            lb=l[skip:]
-            b = [ x.strip() for x in lb ]
+            l = f.read()
+            l = l[l.find('Input status'):]            
+            lb = l.split("\n")
+            b = [ x.strip() for x in lb  if x.strip() and x.strip()[0] != '#']
         if len(a) != len(b):
             print ( "test failed. writing output to debug.txt" )
             f=open("debug.txt","w")
             for i in b:
                 f.write ( i+ "\n" )
             f.close()
-        self.assertEqual ( len(a), len(b) )
+        self.assertEqual( len(a), len(b) )
         for x,y in zip(a,b):
-            self.assertEqual ( x, y )
+            self.assertEqual( x, y )
 
     def testRun(self):
         self.compile()
