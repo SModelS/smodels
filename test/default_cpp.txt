@@ -41,7 +41,7 @@ Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 5.72E-01 [pb]
 Theory conditions:  None
 Observed experimental limit: 3.81E+01 [fb]
-Observed r-Value: 15.002655551277467
+Observed r-Value: 15.002655551277469
 
 ---------------Analysis Label = CMS-SUS-13-012
 -------------------Dataset Label = 6NJet8_1000HT1250_450MHTinf
@@ -51,10 +51,10 @@ Theory prediction: 1.74E-03 [pb]
 Theory conditions:  None
 Observed experimental limit: 3.86E-01 [fb]
 Expected experimental limit: 2.64E-01 [fb]
-Observed r-Value: 4.5062184359756
-Expected r-Value: 6.589244963630262
-Chi2: 22.633432915475076
-Likelihood: 8.193807968109442e-07
+Observed r-Value: 4.506218435975599
+Expected r-Value: 6.58924496363026
+Chi2: 22.633432915475073
+Likelihood: 8.193807968109457e-07
 
 Total missing topology cross section (fb):  0.000E+00
 Total cross section where we are outside the mass grid (fb):  0.000E+00

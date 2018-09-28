@@ -7,7 +7,6 @@
 """
 
 import copy
-from smodels.theory.exceptions import SModelSTheoryError
 
 class Particle(object):
     """

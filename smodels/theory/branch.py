@@ -86,9 +86,8 @@ class Branch(object):
         :returns: string representation of the branch (in bracket notation)    
         """
 
-        st = str([[particle.label for particle in particleList ] for particleList in self.particles ]).replace("'", "")
+        st = str(self.particles).replace("'", "")
         st = st.replace(" ", "")
-
         return st
 
     def __cmp__(self,other):
@@ -183,12 +182,9 @@ class Branch(object):
         been defined yet.
         """
 
-        #self.vertnumb = len(self.particles)
-        #self.vertparts = [len(v) for v in self.particles]
         bInfo = self.getInfo()
         self.vertnumb = bInfo['vertnumb']
         self.vertparts = bInfo['vertparts']
-        
         
     def getInfo(self):
         """
@@ -196,6 +192,7 @@ class Branch(object):
         
         :returns: dictionary containing vertices and number of final states information  
         """
+
         vertnumb = len(self.particles)
         vertparts = [len(v) for v in self.particles]
         
@@ -239,7 +236,6 @@ class Branch(object):
         other.setInfo()
         if self.vertnumb != other.vertnumb:
             return False
-        
         if self.vertparts != other.vertparts:
             return False
         

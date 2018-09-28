@@ -472,7 +472,7 @@ class TxNameData(object):
                     ( len(porig), self.full_dimensionality ) )
             return None
 
-        p = ((np.matrix(porig)[0] - self.delta_x )).tolist()[0]
+        p = ((np.array([porig]) - self.delta_x )).tolist()[0]
         P = np.dot(p,self._V)  ## rotate
         #Get value for the truncated point:        
         self.projected_value = self.interpolate(P[:self.dimensionality])
@@ -602,7 +602,7 @@ class TxNameData(object):
         porig = self.formatInput(porig,self.dataShape) #Remove entries which match inclusives
         porig = self.flattenArray(porig)
          
-        p = ((np.matrix(porig)[0] - self.delta_x)).tolist()[0]
+        p = ((np.array([porig]) - self.delta_x)).tolist()[0]
         P=np.dot(p,self._V)                    ## projected point p in n dimensions
         ## P[self.dimensionality:] is project point p in m dimensions
         # m=self.countNonZeros ( P ) ## dimensionality of input
@@ -719,13 +719,13 @@ class TxNameData(object):
         
         Morig= [self.flattenArray(pt[0]) for pt in self.value]
         
-        aM = np.matrix(Morig)
+        aM = np.array(Morig)
         MT = aM.T.tolist()
-        self.delta_x = np.matrix([ sum (x)/len(Morig) for x in MT ])[0]
+        self.delta_x = np.array([[ sum (x)/len(Morig) for x in MT ]])
         M = []
 
         for Mx in Morig:
-            m=(np.matrix(Mx) - self.delta_x).tolist()[0]
+            m=(np.array([Mx]) - self.delta_x).tolist()[0]
             M.append(m)
 
         ## we dont need thousands of points for SVD
