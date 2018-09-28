@@ -56,9 +56,9 @@ class Element(object):
                     logger.error("Malformed input string. Number of elements "
                                   "is %d (expected 1) in: ``%s''", nel, info)
                     return None
-                else:                                       
+                else:
                     el = elements[0]
-                    branches = elementsInStr(el[1:-1])               
+                    branches = elementsInStr(el[1:-1])
                     if not branches or len(branches) != 2:
                         logger.error("Malformed input string. Number of "
                                       "branches is %d (expected 2) in: ``%s''",
@@ -148,7 +148,7 @@ class Element(object):
     def particlesMatch(self, other, branchOrder=False):
         """
         Compare two Elements for matching particles only.
-        Allow for inclusive particle labels (such as the ones defined in particleDefinitions.py).
+        Allow for inclusive particle labels (such as the ones defined in finalStateParticles.py).
         If branchOrder = False, check both branch orderings.
         
         :parameter other: element to be compared (Element object)
@@ -176,7 +176,7 @@ class Element(object):
             return False
         else:       
         #Now check for opposite order
-            for ib,br in enumerate(self.switchBranches().branches):                
+            for ib,br in enumerate(self.switchBranches().branches):
                 if not br.particlesMatch(other.branches[ib]):
                     return False
 
@@ -218,29 +218,25 @@ class Element(object):
 
     def getParticles(self):
         """
-        Get the array of particle labels in the element.
+        Get the array of particle objects in the element.
         
-        :returns: list of particle strings                
+        :returns: list of Particle objects                
         """
         
-        ptcarray = []
+        particles = [branch.particles for branch in self.branches]
 
-        for branch in self.branches:
-            particleNames = [[particle.label for particle in particleList ] for particleList in branch.particles ]
-            ptcarray.append(particleNames)                
-        return ptcarray
+        return particles
     
     def getFinalStates(self):
         """
-        Get the array of final state (last BSM particle) labels in the element.
+        Get the array of final state (last BSM particle) particle objects in the element.
         
-        :returns: list of particle strings                
+        :returns: list of Particle objects
         """
         
-        fsarray = []
-        for branch in self.branches:
-            fsarray.append(branch.BSMparticles[-1].label)
-        return fsarray
+        fsparticles = [branch.BSMparticles[-1] for branch in self.branches]
+
+        return fsparticles
 
 
     def getMasses(self):
@@ -413,11 +409,10 @@ class Element(object):
         """
         
         if not doCompress and not doInvisible:
-            return []            
+            return []
         
         added = True
         newElements = [self]
-          
         # Keep compressing the new topologies generated so far until no new
         # compressions can happen:
         while added:
@@ -441,7 +436,7 @@ class Element(object):
                         newElements.append(newel)
                         added = True
 
-        newElements.pop(0)  # Remove original element   
+        newElements.pop(0)  # Remove original element
         return newElements
     
     
