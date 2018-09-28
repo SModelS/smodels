@@ -8,12 +8,10 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.theory.particle import Particle
 from smodels.share.models import SMparticles, mssm
 from smodels.theory.branch import Branch
-from smodels.theory.reweighting import calculateProbabilities, addPromptAndDisplaced
+from smodels.tools.reweighting import calculateProbabilities, addPromptAndDisplaced
 from smodels.tools.physicsUnits import eV, GeV
-from smodels.theory.element import Element
 
 n1 = mssm.n1
 n1.totalwidth = 0.*GeV

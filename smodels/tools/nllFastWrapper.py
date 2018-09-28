@@ -14,7 +14,7 @@
 from __future__ import print_function
 import operator
 import pyslha
-import sys
+
 try:
     import commands as executor
 except ImportError:

@@ -10,7 +10,7 @@
 """
 
 from smodels.tools.physicsUnits import fb
-from smodels.theory.reweighting import addPromptAndDisplaced
+from smodels.tools.reweighting import addPromptAndDisplaced
 from smodels.theory.element import Element
 
 class Uncovered(object):

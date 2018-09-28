@@ -5,10 +5,8 @@
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 """
 
-import copy
 import itertools
 from math import exp
-from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import MeV, GeV, m, mm, fm
 from smodels.experiment.finalStateParticles import jetList, lList
     
