@@ -79,7 +79,7 @@ class InclusiveObjectsTest(unittest.TestCase):
         f = './database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2.txt'
         gInfo = infoObj.Info('./database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        tx = TxName(f,gInfo,gInfo,True)
+        tx = TxName(f,gInfo,gInfo)
         res = tx.txnameData.getValueFor([[100.*GeV]]*2)
         self.assertAlmostEqual(res,0.058038)
         res = tx.txnameData.getValueFor([[500.*GeV,150.*GeV,10.*GeV],[100.*GeV]])
@@ -93,7 +93,7 @@ class InclusiveObjectsTest(unittest.TestCase):
         f = './database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM6.txt'
         gInfo = infoObj.Info('./database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        tx = TxName(f,gInfo,gInfo,True)
+        tx = TxName(f,gInfo,gInfo)
         res = tx.txnameData.getValueFor([[279.*GeV,170.*GeV,100.*GeV]]*2)
         self.assertAlmostEqual(res,0.097172,6)
         res = tx.txnameData.getValueFor([[100.*GeV],[279.*GeV,170.*GeV,100.*GeV]])
@@ -110,7 +110,7 @@ class InclusiveObjectsTest(unittest.TestCase):
         f = './database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2.txt'
         gInfo = infoObj.Info('./database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        tx = TxName(f,gInfo,gInfo,True)
+        tx = TxName(f,gInfo,gInfo)
          
         el = element.Element(info="[[],[[e+]]]",finalState = ['HSCP','MET'])
         newEl = tx.hasElementAs(el)  #newEl should be equal to el, but with opposite branch ordering

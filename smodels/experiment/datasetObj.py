@@ -42,7 +42,7 @@ class DataSet(object):
             #Get list of TxName objects:
             for txtfile in glob.iglob(os.path.join(path,"*.txt")):
                 try:
-                    txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo,discard_zeroes)
+                    txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo)
                     if discard_zeroes and txname.hasOnlyZeroes():
                         logger.debug ( "%s, %s has only zeroes. discard it." % \
                                          ( self.path, txname.txName ) )
@@ -53,11 +53,11 @@ class DataSet(object):
             self.txnameList.sort()
             self.checkForRedundancy()
 
-    def checkForRedundancy( self ):
+    def checkForRedundancy ( self ):
         """ In case of efficiency maps, check if any txnames have overlapping
             constraints. This would result in double counting, so we dont 
             allow it. """
-        if self.dataInfo.dataType == "upperLimit": 
+        if self.getType() == "upperLimit": 
             return False
         logger.debug ( "checking for redundancy" )
         datasetElements = []
@@ -69,14 +69,14 @@ class DataSet(object):
             for el in elementsInStr(str(tx.constraint)):
                 newEl = Element(el,finalState)
                 datasetElements.append(newEl)
-        combos = itertools.combinations(datasetElements, 2)
+        combos = itertools.combinations( datasetElements, 2)
         for x,y in combos:
-            if x.particlesMatch(y, branchOrder=False):     
+            if x.particlesMatch(y):
                 errmsg ="Constraints (%s) appearing in dataset %s, %s overlap "\
                         "(may result in double counting)." % \
-                        (x,self.dataInfo.dataId,self.globalInfo.id )
-                logger.error(errmsg)
-                raise SModelSError (errmsg)
+                        (x,self.getID(),self.globalInfo.id )
+                logger.error( errmsg )
+                raise SModelSError ( errmsg )
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )
@@ -297,13 +297,13 @@ class DataSet(object):
                         else:
                             upperLimit = tx.txnameDataExp.getValueFor(mass)
                     else:
-                        upperLimit = tx.txnameData.getValueFor(mass)       
+                        upperLimit = tx.txnameData.getValueFor(mass)
+                        
+            return upperLimit        
         else:
             logger.warning("Unkown data type: %s. Data will be ignored.",
                            self.getType())
             return None        
-        
-        return upperLimit         
             
             
     def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False, deltas_rel=0.2):

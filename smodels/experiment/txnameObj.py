@@ -13,7 +13,6 @@
 """
 
 import os,sys
-import time
 from smodels.tools import physicsUnits
 from smodels.theory.auxiliaryFunctions import elementsInStr 
 from smodels.tools.stringTools import concatenateLines
@@ -42,7 +41,7 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
 
-    def __init__(self, path, globalObj, infoObj, discard_zeroes ):
+    def __init__(self, path, globalObj, infoObj):
         self.path = path
         self.globalInfo = globalObj
         self._infoObj = infoObj
@@ -61,7 +60,7 @@ class TxName(object):
         if not "txName" in txdata: raise TypeError
         if not 'upperLimits' in txdata and not 'efficiencyMap' in txdata:
             raise TypeError
-        content = concatenateLines (  txdata.split("\n") )
+        content = concatenateLines(txdata.split("\n"))
 
         #Get tags in info file:
         tags = [line.split(':', 1)[0].strip() for line in content]
@@ -87,7 +86,7 @@ class TxName(object):
 
         ident = self.globalInfo.id+":"+dataType[0]+":"+ str(self._infoObj.dataId)
         ident += ":" + self.txName
-        self.txnameData = TxNameData( data, dataType, ident )
+        self.txnameData = TxNameData(data, dataType, ident )
         if expectedData:
             self.txnameDataExp = TxNameData( expectedData, dataType, ident )
 
@@ -98,12 +97,12 @@ class TxName(object):
             finalState = ["MET","MET"]        
         elements = []
         if hasattr(self,'constraint'):
-            elements += [Element(el,finalState) for el in elementsInStr(self.constraint)]
+            elements += [Element(el,finalState) for el in elementsInStr(str(self.constraint))]
         if hasattr(self,'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds,list): conds = [conds]
             for cond in conds:
-                for el in elementsInStr(cond):
+                for el in elementsInStr(str(cond)):
                     newEl = Element(el,finalState)
                     if not newEl in elements:
                         elements.append(newEl)
@@ -158,22 +157,25 @@ class TxName(object):
         :param value: value for the field in string format
         """
 
-        if tag == 'constraint' or tag == 'condition':        
+        if tag == 'constraint' or tag == 'condition':
             if isinstance(value,list):
                 value = [val.replace("'","") for val in value]
             else:
                 value = value.replace("'","")
-            if value == 'None': setattr(self,tag, eval(value))                           
-            else: setattr(self,tag, value) #Make sure constraints/conditions are not evaluated
+            if value == 'None':
+                setattr(self,tag, eval(value))
+            else:
+                setattr(self,tag,value) #Make sure constraints/conditions are not evaluated
         else:
             try:
-                setattr(self,tag,eval(value, unitsDict))              
+                setattr(self,tag,eval(value, unitsDict))
             except SyntaxError:
                 setattr(self,tag,value)
             except NameError:
                 setattr(self,tag,value)
             except TypeError:
-                setattr(self,tag,value)     
+                setattr(self,tag,value)
+
 
     def getInfo(self, infoLabel):
         """
@@ -217,13 +219,13 @@ class TxName(object):
 
     def getEfficiencyFor(self,element):
         """
-        For upper limit results, checks if the input mass falls inside the
+        For upper limit results, checks if the input element mass falls inside the
         upper limit grid.  If it does, returns efficiency = 1, else returns
         efficiency = 0.  For efficiency map results, checks if the mass falls
         inside the efficiency map grid.  If it does, returns the corresponding
         efficiency value, else returns efficiency = 0.
 
-        :param element: Element object or mass array
+        :param element: Element object
         :return: efficiency (float)
         """
 
@@ -259,8 +261,8 @@ class TxNameData(object):
         self.dataTag = datatag
         self._id = Id
         self._accept_errors_upto=accept_errors_upto
-        self._V = None ## rotation matrix, derived from PCA
-        self.loadData( value )
+        self._V = None
+        self.loadData(value)
         if self._keep_values:
             self.origdata = value
 
@@ -388,7 +390,7 @@ class TxNameData(object):
         :return: formatted array [[200.,100.]]
         
         """
-                
+
         if shapeArray == '*':
             return None
         elif isinstance(value,list):
@@ -399,7 +401,6 @@ class TxNameData(object):
                     if not self.formatInput(xi,shapeArray[i]) is None]
         else:
             return value
-        
         
     def removeInclusives(self,value):
         """
@@ -431,26 +432,24 @@ class TxNameData(object):
             
         self.units = self.getUnits(val)[0] #Store standard units
         self.dataShape = self.getDataShape(val[0][0]) #Store the data (mass) format (useful if there are inclusives)        
-        self.value = self.removeUnits(val) #Remove units and store the normalization units
-        self.value = self.removeInclusives(self.value)
+        values = self.removeUnits(val) #Remove units and store the normalization units
+        values = self.removeInclusives(values)
 
-        if len(self.value) < 1 or len(self.value[0]) < 2:
+        if len(values) < 1 or len(values[0]) < 2:
                 raise SModelSError("input value not in correct format. expecting sth " \
                                "like [ [ [[ 300.*GeV,100.*GeV], "\
                                "[ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] "\
                                "for upper limits or [ [ [[ 300.*GeV,100.*GeV],"\
                                " [ 300.*GeV,100.*GeV] ], .1 ], ... ] for "\
-                               "efficiency maps. Received %s" % self.value[:80])
+                               "efficiency maps. Received %s" % values[:80])
 
                 
         if not isinstance(self.units[-1],unum.Unum) and not isinstance(self.units[-1],float):
-            raise SModelSError("Error obtaining units from value: %s " %self.value[:80])
+            raise SModelSError("Error obtaining units from value: %s " %values[:80])
 
 
-        self.y_values = np.array(self.value)[:,1]
-        self.computeV()
-        self.removeExtraZeroes()            
-        self.cleanUp()
+        self.y_values = np.array(values)[:,1]
+        self.computeV(values)
 
     @_memoize
     def getValueFor(self,massarray):
@@ -461,6 +460,7 @@ class TxNameData(object):
         :param massarray: mass array values (with units), i.e.
                           [[100*GeV,10*GeV],[100*GeV,10*GeV]]
         """
+        
         porig = self.removeUnits(massarray)
         porig = self.formatInput(porig,self.dataShape) #Remove entries which match inclusives
         porig = self.flattenArray(porig) ## flatten        
@@ -488,7 +488,7 @@ class TxNameData(object):
             return self._interpolateOutsideConvexHull(massarray)
 
         return self._returnProjectedValue()
-    
+
     def flattenArray(self, objList):
         """
         Flatten any nested list to a 1D list.
@@ -537,58 +537,6 @@ class TxNameData(object):
             ret = minXsec
         return float(ret)
 
-    def checkZeroSimplex ( self, simplex, zeroes ):
-        """ check if the simplex has zero-only vertices """
-        for idx in simplex:
-            if idx not in zeroes:
-                return False
-        return True
-
-    def zeroIndices( self ):
-        """ return list of indices for vertices with zero y_values.
-            dont consider vertices on the convex hull. """
-        zeroes = set()
-        for i,x in enumerate(self.y_values):
-            if i in self.tri.convex_hull:
-                continue
-            if x < 1.e-9:
-                zeroes.add(i)
-        return zeroes
-
-    def checkRemovableVertices ( self ):
-        """ check if any of the vertices in the triangulation
-            is removable, because all adjacent simplices are zero-only """
-            
-        t0=time.time()
-        ## first get indices of zeroes not on the hull
-        zeroes = self.zeroIndices() 
-        if len(zeroes)<2: # a single zero cannot be removable
-            return []
-        removables = set()
-        zeroSimplices = [] ## all zero-only simplices, by index
-        verticesInSimplices = { x:[] for x in zeroes }
-        for ctr,s in enumerate(self.tri.simplices):
-            if self.checkZeroSimplex ( s, zeroes ):
-                zeroSimplices.append ( ctr )
-            for vtx in s: ## remember which vertex is in which simplex
-                if not vtx in zeroes: ## only needed for zeroes though
-                    continue
-                verticesInSimplices[vtx].append ( ctr )
-
-        for vtx in zeroes: ## for all zero vertices
-            allSimplicesZero=True
-            simplices = verticesInSimplices[vtx]
-            for simplex in simplices: ## go through all simplces with our vtx
-                if not simplex in zeroSimplices: ## not a zero simplex?
-                    allSimplicesZero=False
-                    break
-            if allSimplicesZero:
-                removables.add ( vtx )
-        logger.debug( "checkRemovables spent %.3f s on %s simplices." \
-                       "We had %d zeroes. Found %d removables." % \
-                       ( time.time() - t0, ctr, len(zeroes), len(removables) ) )
-        return removables
-
     def _estimateExtrapolationError(self, massarray):
         """ when projecting a point p from n to the point P in m dimensions, we
             estimate the expected extrapolation error with the following
@@ -598,6 +546,7 @@ class TxNameData(object):
             Whichever relative change is greater is reported as the expected
             extrapolation error.
         """
+
         porig = self.removeUnits(massarray)
         porig = self.formatInput(porig,self.dataShape) #Remove entries which match inclusives
         porig = self.flattenArray(porig)
@@ -621,7 +570,6 @@ class TxNameData(object):
             P2[i]+=alpha
             pv = self.interpolate(P2[:self.dimensionality])
             g = float((pv - self.projected_value)/alpha)
-
             if math.isnan ( g ):
                 ## if we cannot compute a gradient, we return nan
                 return float("nan")
@@ -708,16 +656,18 @@ class TxNameData(object):
             return False
         return True
 
-    def computeV(self):
+    def computeV(self,values):
         """
         Compute rotation matrix _V, and triangulation self.tri
+        
+        :param values: Nested array with the data values
         
         """
         
         if not self._V is None:
             return
         
-        Morig= [self.flattenArray(pt[0]) for pt in self.value]
+        Morig= [self.flattenArray(pt[0]) for pt in values]
         
         aM = np.array(Morig)
         MT = aM.T.tolist()
@@ -728,9 +678,13 @@ class TxNameData(object):
             m=(np.array([Mx]) - self.delta_x).tolist()[0]
             M.append(m)
 
-        ## we dont need thousands of points for SVD
-        n = int(math.ceil ( len(M) / 2000. ) )
-        Vt=svd(M[::n])[2]
+        try:
+            ## we dont need thousands of points for SVD
+            n = int(math.ceil(len(M)/2000.))
+            Vt=svd(M[::n])[2]
+        except Exception as e:
+            raise SModelSError("exception caught when performing singular value decomposition: %s, %s" %(type(e), e))
+
         V=Vt.T
         self._V= V ## self.round ( V )
         Mp=[]
@@ -753,46 +707,7 @@ class TxNameData(object):
             self.tri = qhull.Delaunay(MpCut)
         else:            
             self.tri = Delaunay1D(MpCut)           
-
-    def hasNoZeroes(self):
-        """
-        Maybe we have no zeroes at all?
-        """
-        
-        for i in self.y_values:
-            if abs ( i ) < 1e-9:
-                return False
-        return True
-
-    def removeExtraZeroes(self):        
-        """
-        Remove redundant zeroes in the triangulation
-        """
-        
-        if self.hasNoZeroes():
-            return ## no zeros? return original list
-        
-        removables = self.checkRemovableVertices() # check if we can remove vertices
-        if len(removables) == 0:
-            return
-        logger.debug("We can remove %d points in %s!" % \
-                       (len(removables), self._id ))
-        newvalues = []
-        for ctr,value in enumerate(self.value):
-            if ctr not in removables:
-                newvalues.append(value)
-                
-        self._V = None
-        self.value = newvalues
-        self.y_values = np.array(self.value)[:,1]        
-        ##Recompute simplices
-        self.computeV()
-    
-    def cleanUp(self):
-        if self._keep_values:
-            return
-        if hasattr(self, "value"):
-            del self.value
+   
         
     def _getMassArrayFrom(self,pt,unit=physicsUnits.GeV):
         """
@@ -853,7 +768,7 @@ class Delaunay1D:
         """
         Find 1D data interval (simplex) to which x belongs
         
-        :param x: 1D array without units (e.g. [10.])
+        :param x: Point (float) without units
         :param tol: Tolerance. If x is outside the data range with distance < tol, extrapolate.
         
         :return: simplex index (int)
@@ -915,7 +830,8 @@ class Delaunay1D:
 
 
 if __name__ == "__main__":
-    from smodels.tools.physicsUnits import GeV
+    import time
+    from smodels.tools.physicsUnits import GeV,fb
     data = [ [ [[ 150.*GeV, 50.*GeV], [ 150.*GeV, 50.*GeV] ],  3.*fb ],
          [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ],
          [ [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ], 10.*fb ],

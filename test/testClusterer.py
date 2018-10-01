@@ -20,22 +20,18 @@ class ClustererTest(unittest.TestCase):
         from smodels.theory import clusterTools
         from smodels.experiment.txnameObj import TxName, TxNameData
         from smodels.experiment.infoObj import Info
-        from smodels.installation import installDirectory
         from smodels.share.models import SMparticles, mssm
         from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList        
-        from smodels.tools.physicsUnits import GeV, TeV, pb, fb
+        from smodels.tools.physicsUnits import GeV, TeV, fb
         import copy
         
         data = [[ [[ 674.99*GeV, 199.999*GeV], [ 674.99*GeV, 199.999*GeV] ],.03*fb ], 
                [ [[ 725.0001*GeV,200.*GeV], [ 725.0001*GeV,200.*GeV] ], .06*fb ] ,
                [ [[ 750.*GeV,250.*GeV], [ 750.*GeV,250.*GeV] ], .03*fb ] ]
         info = Info(os.path.join("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/","dataInfo.txt"))
-        globalInfo = Info(os.path.join("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/","globalInfo.txt"))
+        globalInfo = Info(os.path.join("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/","globalInfo.txt"))        
         txnameData=TxNameData(data, "efficiencyMap", Id=1)
-        txnameData.computeV()
-        txnameData.removeExtraZeroes()
-        txnameData.cleanUp()
-        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info, True)
+        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info)
         txname.txnameData = txnameData
         
         u = SMparticles.u
