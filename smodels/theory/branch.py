@@ -73,11 +73,13 @@ class Branch(object):
             self.vertparts = [len(v) for v in self.particles]
         if finalState:
             bsmParticle = finalStates.getParticlesWith(label=finalState)
-            if not bsmParticle:
-                raise SModelSError("Final state %s has not been defined in finalStateParticles.py" %finalState)
-            if len(bsmParticle) != 1:
-                raise SModelSError("Ambiguos defintion of label %s in finalStateParticles.py" %finalState)
-            self.BSMparticles.append(bsmParticle[0])
+        else:
+            bsmParticle = finalStates.getParticlesWith(label='anyBSM')
+        if not bsmParticle:
+            raise SModelSError("Final state %s has not been defined in finalStateParticles.py" %finalState)
+        if len(bsmParticle) != 1:
+            raise SModelSError("Ambiguos defintion of label %s in finalStateParticles.py" %finalState)
+        self.BSMparticles.append(bsmParticle[0])
 
     def __str__(self):
         """
