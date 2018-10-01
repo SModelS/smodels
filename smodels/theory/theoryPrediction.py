@@ -2,13 +2,13 @@
 .. module:: theoryPrediction
    :synopsis: Provides a class to encapsulate the results of the computation of
               reference cross sections and related functions.
-        
+
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-.. autofunction:: _getElementsFrom    
+.. autofunction:: _getElementsFrom
 """
 
 from smodels.theory import clusterTools, crossSection, element
-from smodels.theory.auxiliaryFunctions import cSim, cGtr, elementsInStr  #DO NOT REMOVE
+from smodels.theory.auxiliaryFunctions import cSim, cGtr, elementsInStr
 from smodels.tools.physicsUnits import TeV,fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
@@ -33,9 +33,10 @@ class TheoryPrediction(object):
 
     """
     def __init__(self):
+        self.analysis = None
         self.xsection = None
         self.conditions = None
-        self.mass = None        
+        self.mass = None
 
     def dataId(self):
         """
@@ -57,7 +58,7 @@ class TheoryPrediction(object):
         """
                 
         return self.dataset.getType()
-    
+
 
     def getUpperLimit(self, expected=False, deltas_rel=0.2):
         """
@@ -120,6 +121,8 @@ class TheoryPrediction(object):
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         """
+        
+        
         if self.dataType()  == 'upperLimit':
             self.likelihood = None
             self.chi2 = None
@@ -139,7 +142,8 @@ class TheoryPrediction(object):
             srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]                
             self.likelihood = self.dataset.combinedLikelihood(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
             self.chi2 = self.dataset.totalChi2(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
-            
+
+        
     def getmaxCondition(self):
         """
         Returns the maximum xsection from the list conditions
@@ -147,7 +151,7 @@ class TheoryPrediction(object):
         :returns: maximum condition xsection (float)
         """
 
-        if not self.conditions: return 0.
+        if not self.conditions: return 0.        
         # maxcond = 0.
         values = [ 0. ]
         for value in self.conditions.values():
@@ -186,17 +190,7 @@ class TheoryPrediction(object):
         ret += "                   datasets: %s\n" % ds
         ret += "      obs limit: %s\n" % self.getUpperLimit()
         ret += "      exp limit: %s\n" % self.getUpperLimit( expected=True )
-        # ret += "          obs limit (sigma): %s\n" % (self.getUpperLimit() / self.effectiveEff )
-        # eul_ = self.getUpperLimit( expected=True )
-        # eul = eul_
-        #if type(eul)!=type(None):
-        #    eul = eul / self.effectiveEff
-        # 
-        #ret += "          exp limit (sigma): %s\n" % ( eul )
         ret += "                      obs r: %f\n" % ( self.getRValue(expected=False) )
-        #exp_r = None
-#if type(eul_)!=type(None):
-#               exp_r = self.xsection.value / eul_
         ret += "                      exp r: %f\n" % ( self.getRValue(expected=True) )
         ret += "                       chi2: %s\n" % ( self.chi2 )
         return ret
@@ -205,17 +199,18 @@ class TheoryPredictionList(object):
     """
     An instance of this class represents a collection of theory prediction
     objects.
-    
-    :ivar _theoryPredictions: list of TheoryPrediction objects     
+
+    :ivar _theoryPredictions: list of TheoryPrediction objects
     """
-    
+
     def __init__(self, theoryPredictions=None, maxCond=None):
         """
         Initializes the list.
-        
+
         :parameter theoryPredictions: list of TheoryPrediction objects
-        :parameter maxCond: maximum relative violation of conditions for valid results (used for printer output)
-        """        
+        :parameter maxCond: maximum relative violation of conditions for valid results. If defined, it will keep only
+                            the theory predictions with condition violation < maxCond.
+        """
         self._theoryPredictions = []
         if theoryPredictions and isinstance(theoryPredictions,list):
             
@@ -230,7 +225,17 @@ class TheoryPredictionList(object):
                 self._theoryPredictions = newPredictions    
                         
 
-    def __iter__(self):      
+    def append(self,theoryPred):
+        self._theoryPredictions.append(theoryPred)
+
+    def __str__(self):
+        if len ( self._theoryPredictions ) == 0:
+            return "no predictions."
+        ret = "%d predictions: " % len ( self._theoryPredictions )
+        ret += ", ".join ( [ str(s) for s in self._theoryPredictions ] )
+        return ret
+
+    def __iter__(self):
         for theoryPrediction in self._theoryPredictions:
             yield theoryPrediction
 
@@ -239,7 +244,7 @@ class TheoryPredictionList(object):
 
     def __len__(self):
         return len(self._theoryPredictions)
-    
+
     def __add__(self,theoPredList):
         if isinstance(theoPredList,TheoryPredictionList):
             res = TheoryPredictionList()
@@ -247,16 +252,12 @@ class TheoryPredictionList(object):
             return res
         else:
             return None
-        
+
     def __radd__(self, theoPredList):
         if theoPredList == 0:
             return self
         else:
-            return self.__add__(theoPredList)       
-        
-    def append(self,theoryPred):
-        self._theoryPredictions.append ( theoryPred )    
-        
+            return self.__add__(theoPredList)
         
     def sortTheoryPredictions(self):
         """
@@ -333,7 +334,6 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         theoPred.upperLimit = theoPred.getUpperLimit(deltas_rel=deltas_rel)
         
     return bestResults
-
 
 def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     """
@@ -490,11 +490,11 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.xsection = _evalConstraint(cluster)
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.elements = cluster.elements
-        theoryPrediction.cluster = cluster
         theoryPrediction.mass = cluster.getAvgMass()
         theoryPrediction.PIDs = cluster.getPIDs()
         theoryPrediction.IDs = cluster.getIDs()
         predictionList._theoryPredictions.append(theoryPrediction)
+        
 
     if len(predictionList) == 0:
         return None
@@ -533,7 +533,20 @@ def _getElementsFrom(smsTopList, dataset):
                 newEl.txname = txname
                 elements.append(newEl) #Save element with correct branch ordering
 
-    return elements
+
+    #Remove duplicated elements:
+    allmothers = []
+    #First collect the list of all mothers:
+    for el in elements:
+        allmothers += [elMom[1].elID for elMom in el.motherElements if not elMom[0]=='original']
+    elementsClean = []
+    for el in elements:
+        #Skip the element if it is a mother of another element in the list
+        if any((elMom is el.elID) for elMom in allmothers):
+            continue
+        elementsClean.append(el)
+        
+    return elementsClean
 
 
 def _combineElements(elements, dataset, maxDist):
@@ -624,8 +637,8 @@ def _evalConditions(cluster):
             if isinstance(exprvalue,crossSection.XSection):
                 conditionVals[cond] = exprvalue.value
             else:
-                conditions[cond] = exprvalue
-
+                conditionVals[cond] = exprvalue
+    
     if not conditionVals:
         return None
     else:
@@ -635,18 +648,18 @@ def _evalConditions(cluster):
 def _evalExpression(stringExpr,cluster):
     """
     Auxiliary method to evaluate a string expression using the weights of the elements in the cluster.
-    Replaces the elements in stringExpr (in bracket notation) by their weights and evaluate the 
+    Replaces the elements in stringExpr (in bracket notation) by their weights and evaluate the
     expression.
     e.g. computes the total weight of string expressions such as "[[[e^+]],[[e^-]]]+[[[mu^+]],[[mu^-]]]"
     or ratios of weights of string expressions such as "[[[e^+]],[[e^-]]]/[[[mu^+]],[[mu^-]]]"
-    and so on...    
-    
+    and so on...
+
     :parameter stringExpr: string containing the expression to be evaluated
     :parameter cluster: cluster of elements (ElementCluster object)
     :returns: xsection for the expression. Can be a XSection object, a float or not numerical (None,string,...)
-    
+
     """
-    
+
 #Get cross section info from cluster (to generate zero cross section values):
     infoList = cluster.elements[0].weight.getInfo()
 #Get weights for elements appearing in stringExpr
@@ -657,16 +670,13 @@ def _evalExpression(stringExpr,cluster):
         weightsDict['w%i'%i] = crossSection.XSectionList(infoList)
         for el1 in cluster.elements:
             if el1.particlesMatch(el):
-                weightsDict['w%i'%i].combineWith(el1.weight)
-                el.motherElements += el1.motherElements[:]                
+                weightsDict['w%i'%i].combineWith(el1.weight)              
         evalExpr = evalExpr.replace(elStr,'w%i'%i)
 
     weightsDict.update({"Cgtr" : cGtr, "cGtr" : cGtr, "cSim" : cSim, "Csim" : cSim})
     exprvalue = eval(evalExpr, weightsDict)
-
     if type(exprvalue) == type(crossSection.XSectionList()):
         if len(exprvalue) != 1:
             logger.error("Evaluation of expression "+evalExpr+" returned multiple values.")
         return exprvalue[0] #Return XSection object
-    
     return exprvalue
