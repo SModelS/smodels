@@ -22,8 +22,8 @@ def load ():
     sys.path.insert(0,os.path.join(installDirectory(),"smodels") )
     sys.path.insert(0,fulldir)
     sys.path.insert(0,".")
-    
-    logger.debug ( "Trying to load model file: %s" % modelFile )
+
+    logger.debug("Trying to load model file: %s" % modelFile)
 
     if "/" in modelFile:
         import shutil
@@ -32,8 +32,8 @@ def load ():
         modelFile=filename
 
     if modelFile.endswith(".py"):
-        modelFile=modelFile[:-3]  
-        
+        modelFile=modelFile[:-3]
+
     from importlib import import_module
     try:
         pM=import_module (modelFile, package='smodels')
