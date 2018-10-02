@@ -130,6 +130,16 @@ class Element(object):
     def __repr__(self):
         
         return self.__str__()
+
+    def toStr(self):
+        """
+        Returns a string with the element represented in bracket notation,
+        including the final states, e.g. [[[jet]],[[jet]] (MET,MET)
+        """
+        
+        elStr = str(self)+' '+str(tuple(self.getFinalStates())).replace("'","")
+        
+        return elStr
     
     def sortBranches(self):
         """

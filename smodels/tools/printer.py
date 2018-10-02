@@ -12,7 +12,6 @@
 
 from __future__ import print_function
 import sys,os
-import unum
 from smodels.theory.topology import TopologyList
 from smodels.theory.theoryPrediction import TheoryPredictionList
 from smodels.experiment.databaseObj import ExpResultList
@@ -23,15 +22,13 @@ from smodels.tools.smodelsLogging import logger
 from collections import OrderedDict
 from xml.dom import minidom
 from xml.etree import ElementTree
-
-
+import unum
 
 class MPrinter(object):
     """
     Master Printer class to handle the Printers (one printer/output type)
-    
-    :ivar printerList: list
     """
+
     def __init__(self):
         
         self.name = "master"
@@ -47,6 +44,7 @@ class MPrinter(object):
         #Define the printer types and the printer-specific options:
         printerTypes = parser.get("printer", "outputType").split(",")        
         for prt in printerTypes:
+            prt = prt.strip() ## trailing spaces shouldnt matter
             if prt == 'python':
                 newPrinter = PyPrinter(output = 'file')                
             elif prt == 'summary':        
@@ -76,9 +74,6 @@ class MPrinter(object):
             if parser.has_section(prt+'-printer'):
                 newPrinter.setOptions(parser.items(prt+'-printer'))
             self.Printers[prt] = newPrinter
-            
-                
-
 
     def addObj(self,obj):
         """
@@ -102,7 +97,6 @@ class MPrinter(object):
         
         for printer in self.Printers.values():
             printer.setOutPutFile(filename,silent=silent)
-
 
     def flush(self):
         """
@@ -195,19 +189,19 @@ class BasicPrinter(object):
         ret=""
 
         for obj in self.toPrint:
-                if obj is None: continue
-                output = self._formatObj(obj)                
-                if not output: continue  #Skip empty output                
-                ret += output
-                if self.output == 'stdout':
-                    sys.stdout.write(output)
-                elif self.output == 'file':
-                    if not self.filename:
-                        logger.error('Filename not defined for printer')
-                        return False   
-                    with self.openOutFile(self.filename, "a") as outfile:
-                        outfile.write(output)
-                        outfile.close()
+            if obj is None: continue
+            output = self._formatObj(obj)                
+            if not output: continue  #Skip empty output                
+            ret += output
+            if self.output == 'stdout':
+                sys.stdout.write(output)
+            elif self.output == 'file':
+                if not self.filename:
+                    logger.error('Filename not defined for printer')
+                    return False   
+                with self.openOutFile(self.filename, "a") as outfile:
+                    outfile.write(output)
+                    outfile.close()
 
         self.toPrint = [None]*len(self.printingOrder)  #Reset printing objects
         return ret
@@ -229,7 +223,6 @@ class BasicPrinter(object):
             logger.debug('Error formating object %s: \n %s' %(typeStr,e))
             return False
 
-
 class TxTPrinter(BasicPrinter):
     """
     Printer class to handle the printing of one single text output
@@ -241,7 +234,6 @@ class TxTPrinter(BasicPrinter):
                              TheoryPredictionList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)        
         
-
     def setOutPutFile(self,filename,overwrite=True,silent=False):
         """
         Set the basename for the text printer. The output filename will be
@@ -256,7 +248,7 @@ class TxTPrinter(BasicPrinter):
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
-            os.remove(self.filename)            
+            os.remove(self.filename)
             
     def _formatDoc(self,obj):
 
@@ -337,8 +329,8 @@ class TxTPrinter(BasicPrinter):
         output += "\n"
         output += "\t\t Particles in element: " + str(obj.getParticles())
         output += "\n"
-#         output += "\t\t Final states in element: " + str(obj.getFinalStates())
-#         output += "\n"        
+        output += "\t\t Final states in element: " + str(obj.getFinalStates())
+        output += "\n"        
         output += "\t\t The element masses are \n"
         for i, mass in enumerate(obj.getMasses()):
             output += "\t\t Branch %i: " % i + str(mass) + "\n"
@@ -387,7 +379,8 @@ class TxTPrinter(BasicPrinter):
         for dataset in obj.datasets:
             for txname in dataset.txnameList:
                 tx = txname.txName
-                if not tx in txnames: txnames.append(tx)
+                if not tx in txnames:
+                    txnames.append(tx)
 
         txnames = sorted(txnames)
         output = ""
@@ -402,7 +395,7 @@ class TxTPrinter(BasicPrinter):
             for dataset in obj.datasets:
                 for txname in dataset.txnameList:
                     for el in txname._topologyList.getElements():
-                        if not str(el) in listOfelements: listOfelements.append(str(el))
+                        if not el.toStr() in listOfelements: listOfelements.append(el.toStr())
             for el in listOfelements:
                 output += "\t    " + str(el) + "\n"
 
@@ -487,38 +480,24 @@ class TxTPrinter(BasicPrinter):
         output += "Total cross section with longlived decays (fb): %10.3E\n" %(obj.longLived.getTotalXsec())
         output += "Total cross section with displaced decays (fb): %10.3E\n" %(obj.displaced.getTotalXsec())
         output += "Total cross section with MET decays (fb): %10.3E\n" %(obj.MET.getTotalXsec())
-                                        
+        
         output += "\nFull information on unconstrained cross sections\n"
         output += "================================================================================\n"
         
-    
+
+        notFoundMessage = ["No missing topologies found\n", "No contributions outside the mass grid\n",
+                           "No long-lived decays\n","No displaced decays\n","No MET decays\n"]
+        header = ["Missing topologies with the highest cross sections (up to " + str(nprint) + "):\n",
+                  "Contributions outside the mass grid (up to " + str(nprint) + "):\n",
+                  "Missing topos: long-lived decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV)),
+                  "Missing topos: displaced decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV)),
+                  "Missing topos: MET decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
+                  ]
         for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid, obj.longLived, obj.displaced, obj.MET]):
             if len(uncovEntry.generalElements) == 0:
-                if ix == 0:
-                    output += "No missing topologies found\n"
-                elif ix == 1:
-                    output += "No contributions outside the mass grid\n"
-                elif ix == 2:
-                    output += "No long-lived decays\n"
-                elif ix == 3:
-                    output += "No displaced decays\n"
-                elif ix == 4:
-                    output += "No MET decays\n"                      
+                output += notFoundMessage[ix] 
             else:                    
-                if ix==0:
-                    output += "Missing topologies with the highest cross sections (up to " + str(nprint) + "):\n"
-                elif ix==1:
-                    output += "Contributions outside the mass grid (up to " + str(nprint) + "):\n"
-                    
-                elif ix==2:
-                    output += "Missing topos: long-lived decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
-                    
-                elif ix==3:
-                    output += "Missing topos: displaced decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
-                    
-                else:
-                    output += "Missing topos: MET decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))                
-                                
+                output += header[ix]
                 output += "Sqrts (TeV)   Weight (fb)                  Element description\n"        
                 for genEl in sorted(uncovEntry.generalElements, key=lambda x: x.missingX, reverse=True)[:nprint]:
                     output += "%5s         %10.3E    # %53s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),genEl.missingX, str(genEl._outputDescription))
@@ -530,7 +509,6 @@ class TxTPrinter(BasicPrinter):
             output += "================================================================================\n"      
         return output
                       
-
 class SummaryPrinter(TxTPrinter):
     """
     Printer class to handle the printing of one single summary output.
@@ -543,7 +521,7 @@ class SummaryPrinter(TxTPrinter):
         self.printingOrder = [OutputStatus,TheoryPredictionList, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
         
-            
+    
     def setOutPutFile(self,filename,overwrite=True,silent=False):
         """
         Set the basename for the text printer. The output filename will be
@@ -557,7 +535,7 @@ class SummaryPrinter(TxTPrinter):
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
-            os.remove(self.filename)            
+            os.remove(self.filename)
             
             
     def _formatTheoryPredictionList(self, obj):
@@ -573,6 +551,7 @@ class SummaryPrinter(TxTPrinter):
             theoPredictions = obj._theoryPredictions
 
         output = ""
+
         rvalues = []
         output += "#Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected"
         output += "\n\n"
@@ -587,6 +566,7 @@ class SummaryPrinter(TxTPrinter):
             r = theoPred.getRValue(expected=False)
             r_expected = theoPred.getRValue(expected=True)
             rvalues.append(r)
+
             output += "%19s  " % (expResult.globalInfo.id)  # ana
             output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
             output += "%5s " % theoPred.getmaxCondition()  # condition violation
@@ -600,14 +580,15 @@ class SummaryPrinter(TxTPrinter):
             output += " Txnames:  " + txnameStr + "\n"
             if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
                 output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)            
-            if not theoPred == obj._theoryPredictions[-1]: output += 80 * "-"+ "\n"
+
+            if not theoPred == obj.theoryPredictions[-1]: output += 80 * "-"+ "\n"
+
         output += "\n \n"
         output += 80 * "=" + "\n"
         output += "The highest r value is = " + str(max(rvalues)) + "\n"
+
         return output
             
-
-
 class PyPrinter(BasicPrinter):
     """
     Printer class to handle the printing of one single pythonic output
@@ -631,7 +612,7 @@ class PyPrinter(BasicPrinter):
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
-            os.remove(self.filename)            
+            os.remove(self.filename)
 
     def flush(self):
         """
@@ -697,6 +678,7 @@ class PyPrinter(BasicPrinter):
         elDic["Masses (GeV)"] = [[m.asNumber(GeV) for m in br] for br in obj.getMasses()]
         elDic["PIDs"] = obj.getPIDs()
         elDic["Weights (fb)"] = {}
+        elDic["final states"] = obj.getFinalStates()
         sqrts = [info.sqrts.asNumber(TeV) for info in obj.weight.getInfo()]
         allsqrts = sorted(list(set(sqrts)))
         for ssqrts in allsqrts:
@@ -872,9 +854,9 @@ class PyPrinter(BasicPrinter):
                                        key=lambda x: [x.missingX,str(x._outputDescription)], 
                                        reverse=True)        
         for genEl in obj.longLived.generalElements[:nprint]:
-            long = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
+            longDict = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
                                 'element' : str(genEl._outputDescription)}      
-            longLived.append(long)
+            longLived.append(longDict)
             
         displaced = []
         obj.displaced.generalElements = sorted(obj.displaced.generalElements, 
@@ -906,7 +888,8 @@ class XmlPrinter(PyPrinter):
         self.name = "xml"
         self.printingOrder = [OutputStatus,TopologyList,TheoryPredictionList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
-            
+
+        
     def setOutPutFile(self,filename,overwrite=True,silent=False):
         """
         Set the basename for the text printer. The output filename will be
@@ -931,6 +914,7 @@ class XmlPrinter(PyPrinter):
         :param parent: XML Element parent
         :param tag: tag for the daughter element
         """
+
         tag = tag.replace(" ","_").replace("(","").replace(")","")
         if not isinstance(pyObj,list) and not isinstance(pyObj,dict):
             parent.text = str(pyObj).lstrip().rstrip()
@@ -960,7 +944,7 @@ class XmlPrinter(PyPrinter):
             output = self._formatObj(obj)  # Convert to python dictionaries                        
             if not output: continue  #Skip empty output            
             outputDict.update(output)
-            
+
         root = None
         #Convert from python dictionaries to xml:
         if outputDict:            
@@ -993,7 +977,8 @@ class SLHAPrinter(TxTPrinter):
         self.docompress = 0
         self.printingOrder = [OutputStatus,TheoryPredictionList, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
-            
+
+
     def setOutPutFile(self,filename,overwrite=True,silent=False):
         """
         Set the basename for the text printer. The output filename will be
@@ -1007,7 +992,7 @@ class SLHAPrinter(TxTPrinter):
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
-            os.remove(self.filename)            
+            os.remove(self.filename)
 
     def _formatOutputStatus(self, obj):
         

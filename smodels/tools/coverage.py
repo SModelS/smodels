@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: coverage
@@ -17,12 +17,13 @@ class Uncovered(object):
     """
     Object collecting all information of non-tested/covered elements
     :ivar topoList: sms topology list
+    :ivar sigmacut: if defined, will only keep elements with weight above sigmacut.
     :ivar sumL: if true, sum up electron and muon to lepton, for missing topos
     :ivar sumJet: if true, sum up jets, for missing topos
     :ivar sqrts: Center of mass energy. If defined it will only consider cross-sections
                 for this value. Otherwise the highest sqrts value will be used.
     """
-    def __init__(self, topoList, sigmacut, sumL=True, sumJet=True, sqrts=None):
+    def __init__(self, topoList, sigmacut=None, sumL=True, sumJet=True, sqrts=None):
         
         
         if sqrts is None:
@@ -46,6 +47,7 @@ class Uncovered(object):
         Find all IDs of mother elements, only most compressed element can be missing topology
         :ivar topoList: sms topology list
         """
+        
         for el in topoList.getElements():
             for mEl in el.motherElements:
                 motherID = mEl[-1].elID
@@ -58,9 +60,12 @@ class Uncovered(object):
         Check all elements, categorise those not tested / missing, classify long cascade decays and asymmetric branches
         Fills all corresponding objects
         :ivar topoList: sms topology list
+        :ivar sigmacut: if defined, will only keep elements with weight above sigmacut.
         """
+        
         for element in topoList.getElements(): # loop over all elements, by construction we start with the most compressed
-            if element.tested: continue  
+            if element.tested:
+                continue  
             allElements = []       
             probabilities1, branches1 = addPromptAndDisplaced(element.branches[0])
             probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])               
@@ -72,7 +77,8 @@ class Uncovered(object):
                     newEl.branches[0]._decayType = branches1[i]._decayType
                     newEl.branches[1]._decayType = branches2[j]._decayType      
                     newEl.weight *= (probability1*probability2)    
-                    if newEl.weight.getMaxXsec() < sigmacut: continue 
+                    if (not sigmacut is None) and newEl.weight.getMaxXsec() < sigmacut:
+                        continue 
                     allElements.append(newEl) 
             
             
@@ -99,19 +105,25 @@ class Uncovered(object):
                     continue
                 
                 self.missingTopos.addToGeneralElements(el) #keep track of all missing topologies                
-                if self.hasDisplaced(el): self.displaced.addToGeneralElements(el)
-                elif self.hasLongLived(el): self.longLived.addToGeneralElements(el)
-                else: self.MET.addToGeneralElements(el)
+                if self.hasDisplaced(el):
+                    self.displaced.addToGeneralElements(el)
+                elif self.hasLongLived(el):
+                    self.longLived.addToGeneralElements(el)
+                else:
+                    self.MET.addToGeneralElements(el)
 
     def inPrevMothers(self, el): #check if smaller element with same mother has already been checked
         for mEl in el.motherElements:
-            if mEl[0] != 'original' and mEl[-1].elID in self.prevMothers: return True
+            if mEl[0] != 'original' and mEl[-1].elID in self.prevMothers:
+                return True
         return False
 
     def inOutsideGridMothers(self, el): #check if this element or smaller element with same mother has already been checked
-        if el.elID in self.outsideGridMothers: return True
+        if el.elID in self.outsideGridMothers:
+            return True
         for mEl in el.motherElements:
-            if mEl[0] != 'original' and mEl[-1].elID in self.outsideGridMothers: return True
+            if mEl[0] != 'original' and mEl[-1].elID in self.outsideGridMothers:
+                return True
         return False
 
     def addPrevMothers(self, el): #add mother elements of currently tested element to previous mothers
@@ -124,8 +136,9 @@ class Uncovered(object):
         :ivar el: Element
         """  
         if 'displaced' in el.branches[0]._decayType or 'displaced' in el.branches[1]._decayType: 
-            return True 
-        return False                    
+            return True
+        else:
+            return False                    
         
     def hasLongLived(self, el):
         """
@@ -134,7 +147,8 @@ class Uncovered(object):
         """  
         if el.branches[0]._decayType == 'longlived' or el.branches[1]._decayType == 'longlived': 
             return True 
-        return False     
+        else:
+            return False     
         
     def isMissingTopo(self, el):
         """

@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-from __future__ import print_function
+
 """
 .. module:: Example
    :synopsis: Basic main file example for using SModelS.   

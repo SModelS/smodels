@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: ioObjects
@@ -26,20 +26,19 @@ SMpdgs = SMparticleList.pdg
 
 class OutputStatus(object):
     """
-    Object that holds all status information and has a predefined printout.
-    
-    :ivar status: status of input file
-    :ivar inputFile: input file name
-    :ivar parameters: input parameters
-    :ivar databaseVersion: database version (string)
-    :ivar outputfile: path to outputfile
-    
+    Object that holds all status information and has a predefined printout.    
     """
+    
     def __init__( self, status, inputFile, parameters, databaseVersion):
         """
         Initialize output. If one of the checks failed, exit.
         
+        :parameter status: status of input file
+        :parameter inputFile: input file name
+        :parameter parameters: input parameters
+        :parameter databaseVersion: database version (string)        
         """
+
         try:
             filename=os.path.join ( installation.installDirectory(),
                                     'smodels/version' )
@@ -103,11 +102,6 @@ class FileStatus(object):
     """
     Object to run several checks on the input file.
     It holds an LheStatus (SlhaStatus) object if inputType = lhe (slha)
-    
-    :ivar inputType: specify input type as SLHA or LHE
-    :ivar inputFile: path to input file
-    :ivar sigmacut: sigmacut in fb
-    
     """
 
     def __init__(self):
@@ -117,7 +111,16 @@ class FileStatus(object):
 
 
     def checkFile(self, inputFile, sigmacut=None):
-        inputType = runtime.filetype ( inputFile )
+        """
+        Run checks on the input file.
+        
+        :parameter inputFile: path to input file
+        :parameter sigmacut: sigmacut in fb        
+        """
+        
+        
+        
+        inputType = runtime.filetype( inputFile )
 
         if inputType == 'lhe':
             self.filestatus = LheStatus(inputFile)
@@ -171,21 +174,22 @@ class SlhaStatus(object):
     = 1: the check is ok
     = -1: case of a physical problem, e.g. charged LSP,
     = -2: case of formal problems, e.g. no cross sections
-    
-    :ivar filename: path to input SLHA file
-    :ivar maxDisplacement: maximum c*tau for promt decays in meters
-    :ivar sigmacut: sigmacut in fb
-    :ivar checkLSP: if True check if LSP is neutral
-    :ivar findMissingDecayBlocks: if True add a warning for missing decay blocks
-    :ivar findIllegalDecays: if True check if all decays are kinematically allowed
-    :ivar checkXsec: if True check if SLHA file contains cross sections
-    
+        
     """
-    def __init__(self, filename, maxDisplacement=.01, sigmacut=.03 * fb,
-                 checkLSP=False, findMissingDecayBlocks=True,
+    def __init__(self, filename, sigmacut=.03 * fb,
+                 findMissingDecayBlocks=True,
                  findIllegalDecays=False, checkXsec=True):
+        
+        """
+        :parameter filename: path to input SLHA file
+        :parameter sigmacut: sigmacut in fb
+        :parameter findMissingDecayBlocks: if True add a warning for missing decay blocks
+        :parameter findIllegalDecays: if True check if all decays are kinematically allowed
+        :parameter checkXsec: if True check if SLHA file contains cross sections
+        :parameter findLonglived: if True find stable charged particles and displaced vertices        
+        """
+        
         self.filename = filename
-        self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
         self.slha = self.read()
         
@@ -198,8 +202,6 @@ class SlhaStatus(object):
             self.status = -3, "Could not read input SLHA file"
             return
         try:
-            self.lsp = self.findLSP()
-            self.lspStatus = self.testLSP(checkLSP)
             self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
             self.xsec = self.hasXsec(checkXsec)
             self.decayBlocksStatus = self.findMissingDecayBlocks(findMissingDecayBlocks)
@@ -243,7 +245,7 @@ class SlhaStatus(object):
                 retMes = retMes + "#" + message + ".\n"
             elif st == 1 and not ret == -2:
                 ret = 1
-        for st, message in [self.lspStatus, self.illegalDecays]:
+        for st, message in [self.illegalDecays]:
             if st < 0:
                 ret = -1
                 retMes = retMes + "#" + message + "\n"
@@ -351,37 +353,3 @@ class SlhaStatus(object):
         msg += "\t For more options and information run: ./smodelsTools.py xseccomputer -h\n"
         logger.error(msg)
         return -1, msg
-
-
-    def testLSP(self, checkLSP):
-        """
-        Check if LSP is charged.
-        
-        :parameter checkLSP: set True to run the check
-        :returns: status flag, message
-        
-        """
-        if not checkLSP:
-            return 0, "Did not check for charged lsp"
-        lsp = self.lsp
-        if not lsp:
-            return -1, "lsp pid " + str(self.lsp.pdg) + " is not known\n"
-        if lsp.eCharge != 0 or lsp.colordim != 0:
-            return -1, "lsp has 3*electrical charge = " + str(3*lsp.eCharge) + \
-                       " and color dimension = " + str(lsp.colordim) + "\n"           
-        return 1, "lsp is neutral"
-
-
-    def findLSP(self):
-        """
-        Find lightest particle (not in SM).
-        
-        :returns: lsp (Particle object)
-        
-        """
-        lsp = None
-        for particle in self.model.BSMparticles:
-            if lsp == None or particle.mass < lsp.mass:
-                lsp = particle
-        return lsp
-

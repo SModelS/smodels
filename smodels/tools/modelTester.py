@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: tools.modelTester
@@ -9,6 +9,7 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
+
 from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import decomposer
@@ -17,12 +18,11 @@ from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.tools import crashReport, timeOut 
+from smodels.tools import crashReport, timeOut
 from smodels.tools.printer import MPrinter
 import os
 import sys
-
-
+import time
 try:
     from ConfigParser import SafeConfigParser
 except ImportError as e:
@@ -44,16 +44,18 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     :parameter listOfExpRes: list of ExpResult objects to be considered
     :returns: output of printers
     """
+
     """Get run parameters and options from the parser"""
     sigmacut = parser.getfloat("parameters", "sigmacut") * fb
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
     inputType = runtime.filetype ( inputFile )
 
+
     """Setup output printers"""
     masterPrinter = MPrinter()
     masterPrinter.setPrinterOptions(parser)
-    masterPrinter.setOutPutFiles(os.path.join(outputDir, os.path.basename(inputFile)))  
-    
+    masterPrinter.setOutPutFiles(os.path.join(outputDir, os.path.basename(inputFile)))
+
     """ Add list of analyses loaded to printer"""
     masterPrinter.addObj(ExpResultList(listOfExpRes))
 
@@ -64,8 +66,8 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Initialize output status and exit if there were errors in the input"""
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
             dict(parser.items("parameters")), databaseVersion)
-    masterPrinter.addObj(outputStatus)    
-    if outputStatus.status < 0:         
+    masterPrinter.addObj(outputStatus)
+    if outputStatus.status < 0:
         return masterPrinter.flush()
     
     """
@@ -90,9 +92,9 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     Decompose input model
     =====================
     """
-       
-    try:        
-        
+
+    try:
+
         """ Decompose the input model, store the output elements in smstoplist """
         smstoplist = decomposer.decompose(model, sigmacut,
                     doCompress=parser.getboolean("options", "doCompress"),
@@ -112,7 +114,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         return masterPrinter.flush()
 
     masterPrinter.addObj(smstoplist)
-    
+
 
     """
     Compute theory predictions
@@ -121,21 +123,29 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
     """ Get theory prediction for each analysis and print basic output """
     allPredictions = []
-    for expResult in listOfExpRes:       
-        theorypredictions = theoryPredictionsFor(expResult, smstoplist)
-        if not theorypredictions: continue
+    combineResults=False
+    try:
+        combineResults = parser.getboolean ("options","combineSRs") 
+    except Exception as e:
+        pass
+    for expResult in listOfExpRes:
+        theorypredictions = theoryPredictionsFor(expResult, smstoplist,
+                    useBestDataset=True, combinedResults=combineResults,
+                    marginalize=False )
+        if not theorypredictions:
+            continue
         allPredictions += theorypredictions._theoryPredictions
-    
+
     """Compute chi-square and likelihood"""
     if parser.getboolean("options","computeStatistics"):
         for theoPred in allPredictions:
             theoPred.computeStatistics()
 
-    """ Define theory predictions list that collects all theoryPrediction objects checked against max condition."""
+    """ Define theory predictions list that collects all theoryPrediction objects which satisfy max condition."""
     maxcond = parser.getfloat("parameters", "maxcond")           
     theoryPredictions = theoryPrediction.TheoryPredictionList(allPredictions, maxcond)
 
-    if not len(theoryPredictions._theoryPredictions) == 0:
+    if len(theoryPredictions) != 0:
         outputStatus.updateStatus(1)
         masterPrinter.addObj(theoryPredictions)
     else:
@@ -172,7 +182,7 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
                              listOfExpRes)
     except Exception as e:
         crashReportFacility = crashReport.CrashReport()
-         
+
         if development:
             print(crashReport.createStackTrace())
             raise e
@@ -183,7 +193,7 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
     return None
 
 def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
-                    timeout, development, parameterFile):
+                    timeout, development, parameterFile, jobnr ):
     """
     Loop over all input files in inputFiles with testPoint
 
@@ -194,12 +204,28 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
     :parameter listOfExpRes: list of ExpResult objects to be considered
     :parameter development: turn on development mode (e.g. no crash report)
     :parameter parameterFile: parameter file, for crash reports
+    :parameter jobnr: number of process, in parallel mode. mostly for debugging.
     :returns: printers output
     """
     a={}
-    for inputFile in inputFiles:
+    n=len(inputFiles)
+    t_tot = 0. ## total time
+    for i,inputFile in enumerate(inputFiles):
+        txt=""
+        sjob=""
+        if jobnr>0:
+            sjob="%d: " % jobnr
+        if n>5: ## tell where we are in the list, if the list has more than 5 entries
+            txt="[%s%d/%d] " % ( sjob, i+1, n )
+            if i > 3: ## give the average time spent per point
+                txt="[%s%d/%d, t~%.1fs] " % ( sjob, i+1, n, t_tot/float(i) )
+        if t_tot/float(i+1)>.1 or (i+1) % 10 == 0:
+            ## if it is super fast, show only every 10th
+            logger.info ( "Start testing %s%s" % (txt, os.path.relpath ( inputFile ) ) )
+        t0=time.time()
         a[inputFile] = runSingleFile(inputFile, outputDir, parser, databaseVersion,
                                   listOfExpRes, timeout, development, parameterFile)
+        t_tot += ( time.time() - t0 )
     return a
 
 def _cleanList ( fileList, inDir ):
@@ -229,7 +255,6 @@ def _determineNCPus ( cpus_wanted, n_files ):
     ncpus = min ( n_files, ncpus )
     return ncpus
 
-
 def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
                  listOfExpRes, timeout, development, parameterFile):
     """
@@ -255,43 +280,33 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     if len(cleanedList) == 1:
         return runSingleFile ( cleanedList[0], outputDir, parser, databaseVersion,
                                listOfExpRes, timeout, development, parameterFile )
-    ncpus = _determineNCPus ( parser.getint("parameters", "ncpus"), len(cleanedList) )
-
+    ncpus = _determineNCPus(parser.getint("parameters", "ncpus"), len(cleanedList))
     if ncpus == 1:
         logger.info ("Running SModelS in a single process" )
     else:
         logger.info ("Running SModelS in %d processes" % ncpus )
-        
+
     if ncpus == 1:
         return runSetOfFiles( cleanedList, outputDir, parser, databaseVersion,
-                              listOfExpRes, timeout, development, parameterFile )
+                              listOfExpRes, timeout, development, parameterFile, 0 )
 
-    import random
-    random.shuffle ( cleanedList ) ## shuffle them
     ### now split up for every fork
     chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
     children = []
     for (i,chunk) in enumerate(chunkedFiles):
-        if i == len(chunkedFiles)-1: ## last chunk is up to the mother
-            logger.debug("last chunk #%d: pid %d (parent %d)." %
-                    ( i, os.getpid(), os.getppid() ) )
-            logger.debug( " `-> %s" % " ".join ( chunk ) )
-            runSetOfFiles(chunk, outputDir, parser, databaseVersion, 
-                            listOfExpRes, timeout, development, parameterFile)
-            break
-        pid=os.fork() ## fork up to the last chunk
+        pid=os.fork()
         logger.debug("Forking: %s %s %s " % ( i,pid,os.getpid() ) )
-        if pid == 0: ## child
+        if pid == 0:
             logger.debug("chunk #%d: pid %d (parent %d)." %
                     ( i, os.getpid(), os.getppid() ) )
             logger.debug( " `-> %s" % " ".join ( chunk ) )
-            runSetOfFiles(chunk, outputDir, parser, databaseVersion, 
-                            listOfExpRes, timeout, development, parameterFile)
+            runSetOfFiles(chunk, outputDir, parser, databaseVersion,
+                            listOfExpRes, timeout, development, parameterFile, i )
             os._exit(0) ## not sys.exit(), return, nor continue
         if pid < 0:
             logger.error ( "fork did not succeed! Pid=%d" % pid )
             sys.exit()
-        if pid > 0: ## mother
+        if pid > 0:
             children.append ( pid )
     for child in children:
         r = os.waitpid ( child, 0 )
@@ -304,33 +319,16 @@ def checkForSemicolon ( strng, section, var ):
     if ";" in strng:
         logger.warning ( "A semicolon (;) has been found in [%s] %s, in your config file. If this was meant as comment, then please a space before it." % ( section, var) )
 
-
-def loadModelFromSLHA(inputFile, BSMparticleList):
-    """
-    Load model
-    
-    :parameter inputFile: input slha file
-    :parameter BSMparticleList: BSM particles of the model
-    
-    :returns: model object that contains all information about the model
-    """
-    
-    model = Model(inputFile, BSMparticleList)
-    updatedModel = model.updateParticles()
-    return updatedModel
-
-    
-
 def loadDatabase(parser, db):
     """
     Load database
-    
+
     :parameter parser: ConfigParser with path to database
     :parameter db: binary database object. If None, then database is loaded,
                    according to databasePath. If True, then database is loaded,
                    and text mode is forced.
     :returns: database object, database version
-        
+
     """
     try:
         dp = parser.get ( "path", "databasePath" )
@@ -360,23 +358,21 @@ def loadDatabase(parser, db):
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
         logger.error("Database not found in ``%s''" % os.path.realpath(databasePath))
-        sys.exit()                                           
-
+        sys.exit()
     return database, databaseVersion
 
 def loadDatabaseResults(parser, database):
     """
     Load database entries specified in parser
-    
+
     :parameter parser: ConfigParser, containing analysis and txnames selection
     :parameter database: Database object
     :returns: List of experimental results
-        
+
     """
-    """ In case that a list of analyses or txnames are given, retrieve list """        
-    
+    """ In case that a list of analyses or txnames are given, retrieve list """
     tmp = parser.get("database", "analyses").split(",")
-    analyses = [ x.strip() for x in tmp ]    
+    analyses = [ x.strip() for x in tmp ]
     tmp_tx = parser.get("database", "txnames").split(",")
     txnames = [ x.strip() for x in tmp_tx ]
     if parser.get("database", "dataselector") == "efficiencyMap":
@@ -389,11 +385,11 @@ def loadDatabaseResults(parser, database):
         dataTypes = ['all']
         tmp_dIDs = parser.get("database", "dataselector").split(",")
         datasetIDs = [ x.strip() for x in tmp_dIDs ]
-    
+
     useSuperseded=False
     useNonValidated=False
     if parser.has_option("database","useSuperseded"):
-        useSuperseded = parser.getboolean("database", "usesuperseded")        
+        useSuperseded = parser.getboolean("database", "usesuperseded")
     if parser.has_option("database","useNonValidated"):
         useNonValidated = parser.getboolean("database", "usenonvalidated")
     if useSuperseded:
@@ -403,19 +399,19 @@ def loadDatabaseResults(parser, database):
 
 
     """ Load analyses """
-    ret = database.getExpResults(analysisIDs=analyses, txnames=txnames, 
+
+    ret = database.getExpResults(analysisIDs=analyses, txnames=txnames,
                                  datasetIDs=datasetIDs, dataTypes=dataTypes,
-                                 useSuperseded=useSuperseded, useNonValidated=useNonValidated)                                       
-                                                                                          
+                                 useSuperseded=useSuperseded, useNonValidated=useNonValidated)
     return ret
 
 def getParameters(parameterFile):
     """
     Read parameter file, exit in case of errors
-    
+
     :parameter parameterFile: Path to parameter File
     :returns: ConfigParser read from parameterFile
-        
+
     """
     try:
         parser = ConfigParser( inline_comment_prefixes=( ';', ) )
@@ -430,8 +426,10 @@ def getParameters(parameterFile):
 def getAllInputFiles(inFile):
     """
     Given inFile, return list of all input files
+
     :parameter inFile: Path to input file or directory containing input files
     :returns: List of all input files, and the directory name
+
     """
     if os.path.isdir(inFile):
         fileList = os.listdir(inFile)

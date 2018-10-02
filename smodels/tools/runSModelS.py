@@ -104,7 +104,7 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
 
     """ Check database location and load database, exit if not found """
     database, databaseVersion = modelTester.loadDatabase(parser, db)
-    
+
     """ Get list of input files to be tested """
     fileList, inDir = modelTester.getAllInputFiles(inFile)
 
