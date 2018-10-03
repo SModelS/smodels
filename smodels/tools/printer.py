@@ -581,7 +581,8 @@ class SummaryPrinter(TxTPrinter):
             if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
                 output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)            
 
-            if not theoPred == obj.theoryPredictions[-1]: output += 80 * "-"+ "\n"
+            if not (theoPred is obj[-1]):
+                output += 80 * "-"+ "\n"
 
         output += "\n \n"
         output += 80 * "=" + "\n"
@@ -678,7 +679,7 @@ class PyPrinter(BasicPrinter):
         elDic["Masses (GeV)"] = [[m.asNumber(GeV) for m in br] for br in obj.getMasses()]
         elDic["PIDs"] = obj.getPIDs()
         elDic["Weights (fb)"] = {}
-        elDic["final states"] = obj.getFinalStates()
+        elDic["final states"] = [str(fs) for fs in obj.getFinalStates()]
         sqrts = [info.sqrts.asNumber(TeV) for info in obj.weight.getInfo()]
         allsqrts = sorted(list(set(sqrts)))
         for ssqrts in allsqrts:
