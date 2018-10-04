@@ -1,58 +1,8 @@
 BLOCK SModelS_Settings
- 0 v1.1.1                    #SModelS version
- 1 1.1.1                     #database version
+ 0 v2.0.0rc1                 #SModelS version
+ 1 2.0.0rc1                  #database version
  2 0.2                       #maximum condition violation
  3 1                         #compression (0 off, 1 on)
  4 5.                        #minimum mass gap for mass compression [GeV]
- 5 0.03                      #sigmacut [fb]
+ 5 0.01                      #sigmacut [fb]
 
-BLOCK SModelS_Exclusion
- 0 0 0                              #output status (-1 not tested, 0 not excluded, 1 excluded)
- 1 0 T2                             #txname 
- 1 1 4.713E-01                      #r value
- 1 2 N/A                            #expected r value
- 1 3 0.00                           #condition violation
- 1 4 CMS-SUS-13-019                 #analysis
- 1 5 (UL)                           #signal region 
- 1 6 N/A                            #Chi2
- 1 7 N/A                            #Likelihood
-
-BLOCK SModelS_Missing_Topos #sqrts[TeV] weight[fb] description
- 0 8  1.601E+01 [[[jet],[W]],[[jet,jet],[W]]]
- 1 8  1.395E+01 [[[jet],[jet,jet],[W]],[[jet,jet],[W]]]
- 2 8  9.206E+00 [[[b,t],[W]],[[jet,jet],[W]]]
- 3 8  9.024E+00 [[[jet]],[[jet,jet],[W]]]
- 4 8  8.124E+00 [[[b,t],[W]],[[jet],[W]]]
- 5 8  7.608E+00 [[[jet,jet],[W]],[[jet,jet],[higgs]]]
- 6 8  7.087E+00 [[[jet],[W]],[[jet],[jet,jet],[W]]]
- 7 8  7.082E+00 [[[jet],[b,t],[W]],[[jet,jet],[W]]]
- 8 8  7.082E+00 [[[b,t],[W]],[[jet],[jet,jet],[W]]]
- 9 8  6.396E+00 [[[jet],[W]],[[jet,jet],[higgs]]]
-
-BLOCK SModelS_Outside_Grid #sqrts[TeV] weight[fb] description
- 0 8  1.440E-01 [[[jet]],[[t,t]]]
- 1 8  3.203E-02 [[[t],[W]],[[t],[W]]]
-
-BLOCK SModelS_Long_Cascade #Mother1 Mother2 Weight[fb] allMothers
- 0 1000021 2000002  3.743E+01 [[1000021,2000002]]
- 1 1000002 1000021  1.626E+01 [[1000002,1000021]]
- 2 1000021 2000001  1.282E+01 [[1000021,2000001]]
- 3 2000001 2000002  9.967E+00 [[2000001,2000002]]
- 4 2000002 2000002  7.523E+00 [[2000002,2000002]]
- 5 1000002 2000002  5.408E+00 [[1000002,2000002]]
- 6 1000002 1000002  5.218E+00 [[1000002,1000002]]
- 7 1000001 1000002  4.106E+00 [[1000001,1000002]]
- 8 1000001 1000021  2.622E+00 [[1000001,1000021]]
- 9 1000002 2000001  2.600E+00 [[1000002,2000001],[1000002,2000003]]
-
-BLOCK SModelS_Asymmetric_Branches #Mother1 Mother2 Weight[fb] allMothers
- 0 1000002 1000021  4.725E+01 [[1000002,1000021]]
- 1 1000021 1000021  4.324E+01 [[1000021,1000021]]
- 2 1000021 2000002  2.215E+01 [[1000021,2000002]]
- 3 1000001 1000021  1.270E+01 [[1000001,1000021]]
- 4 1000021 1000024  6.661E+00 [[1000021,1000024]]
- 5 1000002 1000002  4.039E+00 [[1000002,1000002]]
- 6 1000001 1000002  3.609E+00 [[1000001,1000002],[1000002,1000003]]
- 7 1000002 2000002  3.330E+00 [[1000002,2000002]]
- 8 1000001 1000024  2.710E+00 [[1000001,1000024]]
- 9 1000021 2000001  2.680E+00 [[1000021,2000001]]
