@@ -21,7 +21,7 @@ from smodels.theory.model import Model
 setLogLevel("info")
 
 # Set the path to the database
-database = Database("./smodels-database")
+database = Database("http://smodels.hephy.at/database/official200rc1")
 
 def main():
     """

@@ -14,6 +14,7 @@ from smodels.experiment import metaObj
 from smodels.experiment.exceptions import SModelSExperimentError
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.stringTools import cleanWalk
+from smodels.theory.auxiliaryFunctions import getAttributesFrom,getValuesForObj
 
 try:
     import cPickle as serializer
@@ -224,46 +225,18 @@ class ExpResult(object):
             return None
 
 
-    def getValuesFor(self, attribute=None):
+    def getValuesFor(self,attribute):
         """
         Returns a list for the possible values appearing in the ExpResult
         for the required attribute (sqrts,id,constraint,...).
         If there is a single value, returns the value itself.
 
-        :param attribute: name of a field in the database (string). If not
-                          defined it will return a dictionary with all fields
-                          and their respective values
-        :return: list of values or value
+        :param attribute: name of a field in the database (string).
+        :return: list of unique values for the attribute
 
         """
-        fieldDict = list ( self.__dict__.items() )
-        valuesDict = {}
-        while fieldDict:
-            for field, value in fieldDict:
-                if not '<smodels.experiment' in str(value):
-                    if not field in valuesDict:
-                        valuesDict[field] = [value]
-                    else: valuesDict[field].append(value)
-                else:
-                    if isinstance(value, list):
-                        for entry in value:
-                            fieldDict += entry.__dict__.items()
-                    else: fieldDict += value.__dict__.items()
-                fieldDict.remove((field, value))
-
-        # Try to keep only the set of unique values
-        for key, val in valuesDict.items():
-            try:
-                valuesDict[key] = list(set(val))
-            except TypeError:
-                pass
-        if not attribute:
-            return valuesDict
-        elif not attribute in valuesDict.keys():
-            logger.warning("Could not find field %s in %s", attribute, self.path)
-            return False
-        else:
-            return valuesDict[attribute]
+        
+        return getValuesForObj(self,attribute)
 
 
     def getAttributes(self, showPrivate=False):
@@ -275,14 +248,13 @@ class ExpResult(object):
         :return: list of field names (strings)
 
         """
-        fields = self.getValuesFor().keys()
-        fields = list(set(fields))
+        
+        attributes = getAttributesFrom(self,showPrivate)        
 
         if not showPrivate:
-            for field in fields[:]:
-                if "_" == field[0]:
-                    fields.remove(field)
-        return fields
+            attributes = list(filter(lambda a: a[0] != '_', attributes))
+
+        return attributes
 
 
     def getTxnameWith(self, restrDict={}):
@@ -319,5 +291,3 @@ class ExpResult(object):
         """ experimental results are sorted alphabetically according
         to their description strings """
         return str(self) < str(other)
-
-

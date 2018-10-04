@@ -194,14 +194,14 @@ class SlhaStatus(object):
         self.slha = self.read()
         
         from smodels.particlesLoader import BSMList
-        model = Model(BSMList,SMList,filename)
-        model.updateParticles()     
-        self.model = model   
         
         if not self.slha:
             self.status = -3, "Could not read input SLHA file"
             return
         try:
+            model = Model(BSMList,SMList,filename)
+            model.updateParticles()     
+            self.model = model
             self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
             self.xsec = self.hasXsec(checkXsec)
             self.decayBlocksStatus = self.findMissingDecayBlocks(findMissingDecayBlocks)

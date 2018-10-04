@@ -102,6 +102,14 @@ class Model(object):
             massDict,decaysDict = lheReader.getDictionariesFrom(self.inputFile)
             self.xsections = crossSection.getXsecFromLHEFile(self.inputFile)
             logger.info("Using LHE input. All unstable particles will be assumed to have prompt decays.")
+            logger.info("Using LHE input. All particles not appearing in the events will be removed from the model.")
+            BSMparticlesInEvents = []
+            for particle in self.BSMparticles:
+                if not particle.pdg in massDict and not -particle.pdg in massDict:
+                    continue
+                BSMparticlesInEvents.append(particle)
+            self.BSMparticles = BSMparticlesInEvents
+                
         sys.stderr = storeErr
         
         evenPDGs = list(set([ptc.pdg for ptc in self.getParticlesWith(Z2parity='even') if isinstance(ptc.pdg,int)]))
@@ -136,8 +144,7 @@ class Model(object):
                 else:
                     particle.mass = abs(massDict[abs(pdg)])*GeV
             else:
-                logger.debug("No mass found for %i. Its mass will be set to None." %particle.pdg)
-                particle.mass = None
+                raise SModelSError("No mass found for %i in input file %s." %(particle.pdg,self.inputFile))
 
             particle.decays = []
             if not pdg in decaysDict and not -pdg in decaysDict:

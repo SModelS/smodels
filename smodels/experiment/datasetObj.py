@@ -13,6 +13,7 @@ from smodels.experiment import txnameObj,infoObj
 from smodels.tools.physicsUnits import fb
 from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from smodels.theory.auxiliaryFunctions import getAttributesFrom,getValuesForObj
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.theory.element import Element
@@ -136,44 +137,17 @@ class DataSet(object):
         if txname: return txname.getEfficiencyFor(mass)
         return None
 
-    def getValuesFor(self,attribute=None):
+    def getValuesFor(self,attribute):
         """
-        Returns a list for the possible values appearing in the DataSet
-        for the required attribute.
+        Returns a list for the possible values appearing in the ExpResult
+        for the required attribute (sqrts,id,constraint,...).
+        If there is a single value, returns the value itself.
 
-
-        :param attribute: name of a field in the database (string). If not defined
-                          it will return a dictionary with all fields and
-                          their respective values
-        :return: list of values
+        :param attribute: name of a field in the database (string).
+        :return: list of unique values for the attribute
         """
-
-
-        fieldDict = list ( self.__dict__.items() )
-        valuesDict = {}
-        while fieldDict:
-            for field,value in fieldDict[:]:
-                if not '<smodels.experiment' in str(value):
-                    if not field in valuesDict: valuesDict[field] = [value]
-                    else: valuesDict[field].append(value)
-                else:
-                    if isinstance(value,list):
-                        for entry in value: fieldDict += list ( entry.__dict__.items() )
-                    else: fieldDict += list ( value.__dict__.items() )
-                fieldDict.remove((field,value))
-
-        #Try to keep only the set of unique values
-        for key,val in valuesDict.items():
-            try:
-                valuesDict[key] = list(set(val))
-            except TypeError:
-                pass
-        if not attribute: return valuesDict
-        elif not attribute in valuesDict:
-            logger.warning("Could not find field %s in database" % attribute)
-            return False
-        else:
-            return valuesDict[attribute]
+        
+        return getValuesForObj(self,attribute)
 
     def likelihood(self, nsig, deltas_rel=0.2, marginalize=False ):
         """
@@ -219,23 +193,23 @@ class DataSet(object):
         return os.path.basename( self.path )
 
                
-    def getAttributes(self,showPrivate=False):
+    def getAttributes(self, showPrivate=False):
         """
         Checks for all the fields/attributes it contains as well as the
         attributes of its objects if they belong to smodels.experiment.
 
         :param showPrivate: if True, also returns the protected fields (_field)
         :return: list of field names (strings)
-        """
 
-        fields = self.getValuesFor().keys()
-        fields = list(set(fields))
+        """
+        
+        attributes = getAttributesFrom(self)        
 
         if not showPrivate:
-            for field in fields[:]:
-                if "_" == field[0]: fields.remove(field)
+            attributes = list(filter(lambda a: a[0] != '_', attributes))
 
-        return fields
+        return attributes
+
     
     def getUpperLimitFor(self,mass=None,expected = False, txnames = None
                          ,compute=False,alpha=0.05,deltas_rel=0.2):

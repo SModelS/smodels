@@ -17,7 +17,7 @@ from databaseLoader import database
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.decomposer import decompose
 from smodels.tools.physicsUnits import fb
-from smodels.share.models.mssm import BSMList
+from smodels.share.models.mssm import st1,gluino,n1
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
  
@@ -55,6 +55,7 @@ XSECTION  1.30E+04  2212 2212 2 1000021 1000021 # 10000 events, [pb], pythia8 fo
         predXSecs,rvalues={},{}
         for case in [ "T1", "T5", "mixed" ]:
             filename = self.createSLHAFile( case=case )
+            BSMList = [gluino,st1,n1,st1.chargeConjugate(),n1.chargeConjugate(),gluino.chargeConjugate()]
             model = Model(BSMList,SMList,filename)
             model.updateParticles()            
             deco = decompose ( model )    

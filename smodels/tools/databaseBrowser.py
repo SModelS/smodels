@@ -11,6 +11,7 @@ from smodels.experiment.databaseObj import Database,ExpResult
 import numpy, unum
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
+from smodels.theory.auxiliaryFunctions import getAttributesFrom,getValuesForObj
 
 #logger.setLevel(level=logging.INFO)
 
@@ -73,48 +74,21 @@ class Browser(object):
 
         self._selectedExpResults = self.database.expResultList[:]
 
-    def getValuesFor(self,attribute=None,expResult=None):
+    def getValuesFor(self,attribute,expResult=None):
         """
         Returns a list for the possible values appearing in the database
         for the required attribute (sqrts,id,constraint,...).
 
-        :param attribute: name of a field in the database (string). If not defined
-                          it will return a dictionary with all fields and their respective
-                          values
+        :param attribute: name of a field in the database (string).
         :param expResult: if defined, restricts the list to the corresponding expResult.
                           Must be an ExpResult object.
         :return: list of values
         """
 
-
-        fieldDict = []
-        if expResult and isinstance(expResult,ExpResult):
-            fieldDict = list(expResult.__dict__.items())   #Use only the entries for the expResult
+        if not expResult:
+            return getValuesForObj(self,attribute)
         else:
-            for expResult in self:
-                fieldDict += list(expResult.__dict__.items())     #Use all entries/expResults
-        valuesDict = {}
-        while fieldDict:
-            for field,value in fieldDict[:]:
-                if not '<smodels.experiment' in str(value):
-                    if not field in valuesDict: valuesDict[field] = [value]
-                    else: valuesDict[field].append(value)
-                else:
-                    if isinstance(value,list):
-                        for entry in value: fieldDict += list(entry.__dict__.items())
-                    else: fieldDict += list(value.__dict__.items())
-                fieldDict.remove((field,value))
-
-        #Try to keep only the set of unique values
-        for key,val in valuesDict.items():
-            try: valuesDict[key] = list(set(val))
-            except TypeError: pass
-        if not attribute: return valuesDict
-        elif not attribute in valuesDict:
-            logger.warning("Could not find field %s in database" % attribute)
-            return False
-        else:
-            return valuesDict[attribute]
+            return getValuesForObj(expResult,attribute)
 
 
     def getAttributes(self,showPrivate=False):
@@ -126,14 +100,12 @@ class Browser(object):
         :return: list of field names (strings)
         """
 
-        fields = self.getValuesFor().keys()
-        fields = list(set(fields))
+        attributes = getAttributesFrom(self,showPrivate)        
 
         if not showPrivate:
-            for field in fields[:]:
-                if "_" == field[0]: fields.remove(field)
+            attributes = list(filter(lambda a: a[0] != '_', attributes))
 
-        return fields
+        return attributes
         
     def getEfficiencyFor(self,expid,dataset,txname,massarray):
         """

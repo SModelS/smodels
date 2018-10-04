@@ -10,7 +10,7 @@ from smodels.theory import crossSection
 from smodels.tools.physicsUnits import pb, GeV, fb
 import numpy as np
 from scipy import stats
-from collections import Iterable
+from collections import Iterable, Hashable
 import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -291,60 +291,6 @@ def elementsInStr(instring,removeQuotes=True):
     return elements
 
 
-def vertInStr(instring):
-    """
-    Parses instring (or a list of strings) and returns the list of particle
-    vertices appearing in instring.
-    
-    """
-    
-   
-    if type(instring) == type('st'):
-        outstr = instring
-    elif type(instring) == type([]):
-        outstr = ""
-        for st in instring:
-            if type(st) != type('st'):
-                logger.error("Input must be a string or a list of strings")
-                raise SModelSError()
-            # Combine list of strings in a single string
-            outstr += st
-
-    vertices = []
-    outstr = outstr.replace(" ", "").replace("'", "")
-    vertStr = ""
-    nc = 0
-    # Parse the string and looks for matching ['s and ]'s, when the matching is
-    # complete, store element
-    for c in outstr:
-        delta = 0
-        if c == '[':
-            delta = -1
-        elif c == ']':
-            delta = 1
-        nc += delta
-        if c == '[':
-            vertStr = ""
-        if nc != 0 and c != '[' and c != ']':
-            vertStr += c
-        if delta > 0 and vertStr:
-            vertices.append(vertStr.split(','))
-            # Syntax checks:
-            for ptc in vertices[-1]:
-                if not ptc:
-                    continue
-                if not ptc in finalStateLabels:
-                    logger.error("Unknown particle. Add " + ptc + " to finalStateParticles.py")
-                    raise SModelSError()
-            vertStr = ""
-
-    # Check if there are not unmatched ['s and/or ]'s in the string
-    if nc != 0:
-        logger.error("Wrong input (incomplete elements?) " + instring)
-        raise SModelSError()
-
-    return vertices
-
 
 def simParticles(plist1, plist2):
     """
@@ -402,3 +348,69 @@ def sortParticleList(ptcList):
     
     newPtcList = sorted(ptcList, key=lambda x: x.label) 
     return newPtcList    
+
+
+def getValuesForObj(obj, attribute):
+    """
+    Loops over all attributes in the object and in its attributes
+    and returns a list of values for the desired attribute:
+    
+    :param obj: Any object with a __dict__ attribute
+    :param attribute: String for the desired attribute
+    
+    :return: List with unique attribute values. If the attribute is not found, returns empty list.
+    """
+    
+    values = []
+    try:
+        objDict = obj.__dict__.items()
+    except:
+        return values        
+    
+      
+    for attr,value in objDict:
+        if attribute == attr:
+            values += [value]
+        elif isinstance(value,Iterable):
+            values += [getValuesForObj(v,attribute) for v in value]
+        else:
+            values += getValuesForObj(value,attribute)
+    
+    values =  list(filter(lambda a: a != [], values))
+    values = _flattenList(values)
+    if all(isinstance(v, Hashable) for v in values):
+        values = list(set(values)) 
+    
+    return values
+
+
+def getAttributesFrom(obj):
+    """
+    Loops over all attributes in the object and return a list
+    of the attributes.
+    
+    :param obj: Any object with a __dict__ attribute
+    
+    :return: List with unique attribute labels.
+    """
+    
+    attributes = []
+    try:
+        objDict = obj.__dict__.items()
+    except:
+        return attributes        
+    
+      
+    for attr,value in objDict:
+        attributes.append(attr)
+        if isinstance(value,list):
+            attributes += [getAttributesFrom(v) for v in value]
+        elif isinstance(value,dict):
+            attributes += [getAttributesFrom(v) for v in value.values()]
+        else:
+            attributes += getAttributesFrom(value)
+    
+    attributes =  list(filter(lambda a: a != [], attributes))    
+    
+    return list(set(_flattenList(attributes)))
+
