@@ -524,7 +524,7 @@ def _getElementsFrom(smsTopList, dataset):
                 newEl = txname.hasElementAs(el)  #Check if element appears in txname
                 if not newEl: continue
                 el.covered = True
-                eff = txname.getEfficiencyFor(newEl)
+                eff = txname.getEfficiencyFor(newEl.getMasses())
                 if not eff:
                     continue
                 el.tested = True

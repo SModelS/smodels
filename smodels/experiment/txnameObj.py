@@ -217,7 +217,7 @@ class TxName(object):
             return True
         return False
 
-    def getEfficiencyFor(self,element):
+    def getEfficiencyFor(self,masses):
         """
         For upper limit results, checks if the input element mass falls inside the
         upper limit grid.  If it does, returns efficiency = 1, else returns
@@ -230,7 +230,7 @@ class TxName(object):
         """
 
         #Check if the element appears in Txname:
-        val = self.txnameData.getValueFor(element.getMasses())
+        val = self.txnameData.getValueFor(masses)
         if isinstance(val,unum.Unum):
             return 1.  #The element has an UL, return 1
         elif val is None or math.isnan(val):
