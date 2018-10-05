@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-
+from __future__ import print_function
 """
 .. module:: Example
    :synopsis: Basic main file example for using SModelS.   
    This file must be run under the installation folder.
 """
 """ Import basic functions (this file must be executed in the installation folder) """
+
 
 from smodels.tools import runtime
 from smodels.theory import decomposer
@@ -70,7 +71,7 @@ def main():
     # Count the number of loaded UL and EM experimental results:
     nUL, nEM = 0, 0
     for exp in listOfExpRes:
-        expType = exp.getValuesFor('dataType')[0]
+        expType = exp.datasets[0].dataInfo.dataType
         if expType == 'upperLimit':
             nUL += 1
         elif  expType == 'efficiencyMap':

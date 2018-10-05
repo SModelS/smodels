@@ -13,7 +13,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
 from smodels.theory.particle import ParticleList,InclusiveParticle
 from smodels.tools.inclusiveObjects import InclusiveValue,InclusiveList
-from smodels.experiment.finalStateParticles import finalStates
+from smodels.experiment.finalStateParticles import finalStates,anyBSM
 
 
 
@@ -28,6 +28,8 @@ class Branch(object):
                 to a nested list (BSMparticles = [[particle1, particle2,...],[particleA, particleB,...]])
     :ivar maxWeight: weight of the branch (XSection object)
     """
+    
+
     def __init__(self, info=None, finalState=None):
         """
         Initializes the branch. If info is defined, tries to generate
@@ -73,13 +75,16 @@ class Branch(object):
             self.vertparts = [len(v) for v in self.particles]
         if finalState:
             bsmParticle = finalStates.getParticlesWith(label=finalState)
+            if not bsmParticle:
+                raise SModelSError("Final state %s has not been defined in finalStateParticles.py" %finalState)
+            elif len(bsmParticle) != 1:
+                raise SModelSError("Ambiguos defintion of label %s in finalStateParticles.py" %finalState)
+            else:
+                bsmParticle = bsmParticle[0]
         else:
-            bsmParticle = finalStates.getParticlesWith(label='anyBSM')
-        if not bsmParticle:
-            raise SModelSError("Final state %s has not been defined in finalStateParticles.py" %finalState)
-        if len(bsmParticle) != 1:
-            raise SModelSError("Ambiguos defintion of label %s in finalStateParticles.py" %finalState)
-        self.BSMparticles.append(bsmParticle[0])
+            bsmParticle = anyBSM
+            
+        self.BSMparticles.append(bsmParticle)
 
     def __str__(self):
         """
@@ -216,7 +221,7 @@ class Branch(object):
         self.setInfo()
         
 
-    
+
     def particlesMatch(self, other):
         """
         Compare two Branches for matching particles.

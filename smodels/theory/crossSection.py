@@ -8,7 +8,7 @@
 
 """
 
-from smodels.tools.physicsUnits import TeV, pb
+from smodels.tools.physicsUnits import TeV, pb, GeV
 from smodels.theory import lheReader
 import pyslha
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -51,7 +51,7 @@ class XSectionInfo(object):
         order = self.order
         if order == None:
             order=9
-        return int(self.sqrts.asNumber( GeV )) + order
+        return int(self.sqrts.asNumber(GeV)) + order
 
     def __str__(self):
         if not self.order:
