@@ -11,7 +11,6 @@
 
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import itertools
-from smodels.particlesLoader import rEven, rOdd, qNumbers
 
 from smodels.tools.smodelsLogging import logger
 
@@ -51,6 +50,8 @@ def getName(pdg):
     :returns: particle name (e.g. gluino, mu-, ...)
     
     """
+    
+    from smodels.particlesLoader import rEven, rOdd, qNumbers
 
     p = int(pdg)
     if p in rOdd:
@@ -70,7 +71,9 @@ def getPdg(name):
     :returns: particle pdg; None, if name could not be resolved
     
     """
+    
     from smodels.particlesLoader import rEven, rOdd
+    
     for (pdg, pname) in rOdd.items():
         if name == pname:
             return abs(pdg)
@@ -92,6 +95,8 @@ def elementsInStr(instring,removeQuotes=True):
     :returns: list of elements appearing in instring in string format
     
     """
+    
+    from smodels.particlesLoader import rEven
     
     outstr = ""
     if isinstance(instring,str):
@@ -156,6 +161,9 @@ def vertInStr(instring):
     :returns: list of elements appearing in instring in string format
     
     """
+    
+    from smodels.particlesLoader import rEven
+    
     if type(instring) == type('st'):
         outstr = instring
     elif type(instring) == type([]):
@@ -217,6 +225,7 @@ def simParticles(plist1, plist2, useDict=True):
     :returns: True/False if the particles list match (ignoring order)    
     """
     
+    from smodels.particlesLoader import rEven
 
     if not isinstance(plist1,list) or type(plist1) != type(plist2):
         logger.error("Input must be a list")
@@ -278,6 +287,8 @@ def getFinalStateLabel(pid):
     :parameter pid: PDG code for particle (must appear in particles.py)
     :return: Final state string (e.g. MET, HSCP,...)
     """
+
+    from smodels.particlesLoader import qNumbers
 
     if not abs(pid) in qNumbers:
         logger.error("qNumbers are not defined for %i. Please, add it to particles.py." %pid)
