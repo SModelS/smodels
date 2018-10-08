@@ -10,7 +10,7 @@ from smodels.theory import crossSection
 from smodels.tools.physicsUnits import pb, GeV, fb
 import numpy as np
 from scipy import stats
-from collections import Iterable, Hashable
+from collections import Iterable
 import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -376,12 +376,11 @@ def getValuesForObj(obj, attribute):
         else:
             values += getValuesForObj(value,attribute)
     
-    values =  list(filter(lambda a: a != [], values))
+    values =  list(filter(lambda a: (not isinstance(a,list)) or a != [], values))
     values = _flattenList(values)
-    if all(isinstance(v, Hashable) for v in values):
-        values = list(set(values)) 
+    uniqueValues = [v for n,v in enumerate(values) if v not in values[:n]]
     
-    return values
+    return uniqueValues
 
 
 def getAttributesFrom(obj):

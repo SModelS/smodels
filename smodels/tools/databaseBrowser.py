@@ -100,7 +100,7 @@ class Browser(object):
         :return: list of field names (strings)
         """
 
-        attributes = getAttributesFrom(self,showPrivate)        
+        attributes = getAttributesFrom(self)        
 
         if not showPrivate:
             attributes = list(filter(lambda a: a[0] != '_', attributes))
@@ -234,17 +234,19 @@ class Browser(object):
 
         results = self.database.expResultList[:]
         for expRes in results[:]:
-            values = self.getValuesFor(attribute=None, expResult=expRes)
+            expAttributes = expRes.getAttributes()
             for tag in restrDict:
                 #Check if the restriction tag appears in the experimental result
-                if not tag in values:
+                if not tag in expAttributes:
                     results.remove(expRes)
                     break
-                vals = values[tag]
+                vals = expRes.getValuesFor(tag)
                 #If it does, check if any of the values in expResult match any of the values given
                 #as restrictions
-                if not isinstance(restrDict[tag],list): rvals = [restrDict[tag]]
-                else: rvals = restrDict[tag]
+                if not isinstance(restrDict[tag],list):
+                    rvals = [restrDict[tag]]
+                else:
+                    rvals = restrDict[tag]
                 #If there is a type mismatch, also remove
                 try: intersec = numpy.intersect1d(vals,rvals)
                 except unum.IncompatibleUnitsError:
