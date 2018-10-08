@@ -39,6 +39,11 @@ Since the publication of SModelS v1.0 in December 2014, the code base
 has undergone significant structural changes. 
 The major novelties of this release are as follows:
 
+New in Version 1.2.1:
+^^^^^^^^^^^^^^^^^^^^^
+
+  *  Fix in particleNames.py for non-MSSM models
+
 New in Version 1.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
