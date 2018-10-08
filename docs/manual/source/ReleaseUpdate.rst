@@ -42,7 +42,8 @@ The major novelties of this release are as follows:
 New in Version 1.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  *  Fix in particleNames.py for non-MSSM models
+  * Fix in particleNames.py for non-MSSM models
+  * Fixed the `marginalize <marginalize.html>`_ recipe
 
 New in Version 1.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
