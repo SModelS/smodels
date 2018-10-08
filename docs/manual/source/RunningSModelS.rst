@@ -17,7 +17,6 @@
 .. |output| replace:: :ref:`output <smodelsOutput>`
 .. |results| replace:: :ref:`experimental results <ExpResult>`
 .. |txnames| replace:: :ref:`txnames <TxName>`
-.. |txname| replace:: :ref:`txname <TxName>`
 .. |EM| replace:: :ref:`EM-type <EMtype>`
 .. |UL| replace:: :ref:`UL-type <ULtype>`
 .. |EMr| replace:: :ref:`EM-type result <EMtype>`
@@ -55,12 +54,10 @@ The command-line tool (:ref:`runSModelS.py <runSModelS>`) and the example Python
 code (:ref:`Example.py <exampleCode>`) are described below.
 
 
-.. note:: For non-MSSM (incl. non-SUSY) input models the user needs to write their own *particles.py*
-          and specify which BSM particles are even or odd under the assumed
+.. note:: For non-MSSM (incl. non-SUSY) input models the user needs to write their own *model.py*
+          file and specify which BSM particles are even or odd under the assumed
           Z\ :sub:`2` symmetry (see :ref:`adding new particles <newParticles>`).
-          Finally, if the user wants to check the input files for possible issues using
-          SModelS'  :ref:`SLHA and LHE file checkers <fileChecks>`, it is
-          also necessary to define the BSM particle quantum numbers in *particles.py* [#]_.
+          From version 1.2.0 onwards it is also necessary to define the BSM particle quantum numbers in the same file [#]_.
           
          
 
@@ -95,7 +92,7 @@ file, second, it supports parallelization of this input folder.
 
 A typical usage example is: ::
 
-   runSModelS.py -f lightSquarks.slha -p parameters.ini -o ./ -v warning
+   runSModelS.py -f inputFiles/slha/simplyGluino.slha -p parameters.ini -o ./ -v warning
 
 The resulting |output| will be generated in the current folder, according to the printer options set in the
 |parameters|.
@@ -116,91 +113,183 @@ If no parameter file is specified, the default parameters stored in
 Below we give more detailed information about each entry in the parameters file.
 
 
-
+.. _parameterFileOptions:
 
 * *options*: main options for turning SModelS features on or off
 
+.. _parameterFileCheckInput:
+
   * **checkInput** (True/False): if True, *runSModelS.py* will run the :ref:`file check tool <fileChecks>` on the input file and verify if the input contains all the necessary information.
+
+.. _parameterFileDoInvisible:
+
   * **doInvisible** (True/False): turns |invisible compression| on or off during the |decomposition|.
+
+.. _parameterFileDoCompress:
+
   * **doCompress** (True/False): turns |mass compression| on or off during the |decomposition|.
+
+.. _parameterFileComputeStatistics:
+
   * **computeStatistics** (True/False): turns the likelihood and :math:`\chi^2` computation on or off
     (see :ref:`likelihood calculation <likelihoodCalc>`).
     If True, the likelihood and :math:`\chi^2` values are computed for the |EMrs|.
+
+.. _parameterFileTestCoverage:
+
   * **testCoverage** (True/False): set to True to run the :ref:`coverage <topCoverage>` tool.
 
+.. _parameterFileCombineSRs:
+
+  * **combineSRs** (True/False): set to True to use, whenever available, covariance matrices to combine signal regions. NB this might take a few secs per point. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards. 
+
+.. _parameterFileParticles:
+
+* *particles*: defines the particle content of the BSM model
+ 
+.. _parameterFileModel:
+ 
+  * **model**: pathname to the Python file that defines the particle content of the BSM model, given either in Unix file notation ("/path/to/model.py") or as Python module path ("path.to.model"). Defaults to *share.models.mssm* which is a standard MSSM. See smodels/share/models folder for more examples. Directory name can be omitted; in that case, the current working directory as well as smodels/share/models are searched for.
+
+.. _parameterFileParameters:
+
 * *parameters*: basic parameter values for running SModelS
+
+.. _parameterFileSigmacut:
 
   * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>` 
     with a weight below sigmacut are neglected during the |decomposition|
     of SLHA files (see :ref:`Minimum Decomposition Weight <minweight>`).
     The default value is 0.03 fb. Note that, depending on the input model, the running time may increase considerably if sigmacut is too low, while too large values might eliminate relevant |elements|.
+
+.. _parameterFileMinmassgap:
+
   * **minmassgap** (float): maximum value of the mass difference (in GeV) for
     perfoming :ref:`mass compression <massComp>`. *Only used if doCompress = True*
+
+.. _parameterFileMaxcond:
+
   * **maxcond** (float): maximum allowed value (in the [0,1] interval) for the violation of :ref:`upper limit conditions <ULconditions>`. A zero value means the conditions are strictly enforced, while 1 means the conditions are never enforced.
     *Only relevant for printing the* :ref:`output summary <fileOut>`.
+
+.. _parameterFileNcpus:
+
   * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files,
     SModelS can run in a parallelized fashion, splitting up the input files in equal chunks.
-    *ncpus = -1* uses the total number of CPU cores of the machine.
+    *ncpus = -1* parallelizes to as many processes as number of CPU cores of the machine. Default value is 1. Warning: python already parallelizes many tasks internally.
 
-* *particles*: defines the particle content of the BSM model
- 
-  * **module**: pathname to the python file that defines the particle content of the BSM model, given either in Unix file notation ("/path/to/module.py") or as python module path ("path.to.module"). Defaults to *share.default_particles*. See inputFiles/models folder for more examples.
+.. _parameterFileDatabase:
 
 * *database*: allows for selection of a subset of :ref:`experimental results <ExpResult>` from the |database|
 
-  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Since v1.1.2, also http addresses may be given, e.g. http://smodels.hephy.at/database/official112. See `Databases <http://smodels.hephy.at/wiki/Databases>`_ for a list.
+.. _parameterFilePath:
+
+  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Since v1.1.3, also http addresses may be given, e.g. http://smodels.hephy.at/database/official113. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions.  
+
+.. _parameterFileAnalyses:
+  
   * **analyses** (list of results): set to ['all'] to use all available results. If a list of :ref:`experimental analyses <ExpResult>`
     is given, only these will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
     will only use the |results| from `CMS-PAS-SUS-13-008 <https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
     and `ATLAS-CONF-2013-024 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-024/>`_.
     Wildcards (*, ?, [<list-of-or'ed-letters>]) are expanded in the same way the shell does wildcard expansion for file names.
-    So analyses = CMS* leads to evaluation of results from the CMS-experiment only, for example.
-    Furthermore selection of analyses can be confined on their centre-of-mass energy with a suffix beginning with a colon and an energy string in unum-style, like :13*TeV. Note that the asterisk behind the colon is not a wildcard. An energy given in TeV without unit is also understood: :13
+    So analyses = CMS* leads to evaluation of results from the CMS-experiment only, for example. *SUS* selects everything containining SUS, no matter if from CMS or ATLAS.
+    Furthermore selection of analyses can be confined on their centre-of-mass energy with a suffix beginning with a colon and an energy string in unum-style, like :13*TeV. Note that the asterisk behind the colon is not a wildcard. :13, :13TeV and :13 TeV are also understood but discouraged.
+
+.. _parameterFileTxnames:
+
   * **txnames** (list of topologies): set to ['all'] to use all available simplified model |topologies|. The |topologies| are labeled according to the :ref:`txname convention <TxName>`.
     If a list of |txnames| are given, only the corresponding |topologies| will be considered. For instance, setting txnames = T2 will
     only consider |results| for :math:`pp \to \tilde{q} + \tilde{q} \to  (jet+\tilde{\chi}_1^0) + (jet+\tilde{\chi}_1^0)`
     and the |output| will only contain constraints for this topology.
     *A list of all* |topologies| *and their corresponding* |txnames| *can be found* `here <http://smodels.hephy.at/wiki/SmsDictionary>`_
-    Wildcards (*, ?, [<list-of-or'ed-letters>]) are expanded in the same way the shell does wildcard expansion for file names.
+    Wildcards (\*, ?, [<list-of-or'ed-letters>]) are expanded in the same way the shell does wildcard expansion for file names.
     So, for example, txnames = T[12]*bb* picks all txnames beginning with T1 or T2 and containg bb as of the time of writing were: T1bbbb, T1bbbt, T1bbqq, T1bbtt, T2bb, T2bbWW, T2bbWWoff
+
+.. _parameterFileDataselector:
+
   * **dataselector** (list of datasets): set to ['all'] to use all available |datasets|. If dataselector = upperLimit (efficiencyMap), only |ULrs| (|EMrs|) will be used. Furthermore, if
     a list of signal regions (|datasets|) is given, only the |results| containing these datasets will be used. For instance, if dataselector = SRA mCT150,SRA mCT200, only
     these signal regions will be used.
-    Wildcards (*, ?, [<list-of-or'ed-letters>]) are expanded in the same way the shell does wildcard expansion for file names.
-  * **dataTypes** dataType of the analysis (all, efficiencyMap or upperLimit). Can be wildcarded with usual shell wildcards: * ? [<list-of-or'ed-letters>]
+    Wildcards (\*, ?, [<list-of-or'ed-letters>]) are expanded in the same way the shell does wildcard expansion for file names. Wildcard examples are given above.
+
+.. _parameterFileDataTypes:
+
+  * **dataTypes** dataType of the analysis (all, efficiencyMap or upperLimit). Can be wildcarded with usual shell wildcards: * ? [<list-of-or'ed-letters>]. Wildcard examples are given above.
+
+.. _parameterFilePrinter:
 
 * *printer*: main options for the |output| format
+
+.. _parameterFileOutputType:
 
   * **outputType** (list of outputs): use to list all the output formats to be generated.
     Available output formats are: summary, stdout, log, python, xml, slha.
 
+.. _parameterFileStdoutprinter:
+
 * *stdout-printer*: options for the stdout or log printer
 
+.. _parameterFilePrintDatabase:
+
   * **printDatabase** (True/False): set to True to print the list of selected |results| to stdout.
+
+.. _parameterFileAddAnaInfo:
+
   * **addAnaInfo**  (True/False): set to True to include detailed information about the |txnames| tested by each :ref:`experimental result <ExpResult>`. *Only used if printDatabase=True*.
+
+.. _parameterFilePrintDecomp:
+
   * **printDecomp** (True/False): set to True to print basic information from the |decomposition| (|topologies|, total weights, ...).
+
+.. _parameterFileAddElementInfo:
+
   * **addElementInfo**  (True/False): set to True to include detailed information about the |elements| generated by the |decomposition|. *Only used if printDecomp=True*.
+
+.. _parameterFilePrintExtendedResults:
+
   * **printExtendedResults** (True/False): set to True to print extended information about the  |theory predictions|, including the PIDs of the particles
     contributing to the predicted cross section, their masses and the expected upper limit (if available).
+
+.. _parameterFileAddCoverageID:
+
   * **addCoverageID** (True/False): set to True to print the list of element IDs contributing to each missing topology (see :ref:`coverage <topCoverage>`).
     *Only used if testCoverage = True*. This option should be used along with *addElementInfo = True* so the user can precisely identify
     which elements were classified as missing.
 
+.. _parameterFileSummaryprinter:
+
 * *summary-printer*: options for the summary printer
+
+.. _parameterFileExpandedSummary:
 
   * **expandedSummary** (True/False): set True to include in the summary output all applicable |results|, False for only the strongest one.
 
+.. _parameterFilePythonprinter:
+
 * *python-printer*: options for the Python printer
+
+.. _parameterFileAddElementList:
 
   * **addElementList** (True/False): set True to include in the Python output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
 
-  * **addTxWeights** (True/False): set True to print the weights of each |txname| contributing to the total |theory prediction| value.
+.. _parameterFileAddTxWeights:
+
+  * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction. Available v1.1.3 onwards.
+
+.. _parameterFileXmlprinter:
 
 * *xml-printer*: options for the xml printer
 
+.. _parameterFileAddElementListXML:
+
   * **addElementList** (True/False): set True to include in the xml output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
+    
+.. _parameterFileAddTxWeightsXML:    
+
+  * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction. Available v1.1.3 onwards.
 
 
 
@@ -252,22 +341,32 @@ users more familiar with Python and the SModelS language may prefer to write the
 A simple example code for this purpose is provided in :download:`examples/Example.py`.
 Below we go step-by-step through this example code:
 
+
 * *Import the SModelS modules and methods*. If the example code file is not located in
   the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. Set SModelS verbosity level.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 15-21
+   :lines: 11-20
 
-* *Set the path to the database folder*. Specify where the SModelS :ref:`database <databaseStruct>` has been installed and load the database.
+* *Set the path to the database URL*. Specify which :ref:`database <databaseStruct>` to use. It can be the path
+  to the smodels-database folder, the path to a :ref:`pickle file <databasePickle>` or (starting with v1.1.3) a URL path.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 23-24
+   :lines: 21-22
+
+* *Define the input model*. By default SModelS assumes the MSSM particle content. For using SModelS
+  with a different particle content, the user must define the new particle content and set modelFile
+  to the path of the model file (see **particles:model** in :ref:`Parameter File <parameterFile>`).
+
+.. literalinclude:: /examples/Example.py
+   :lines: 29-30
+
 
 * *Path to the input file*. Specify the location of the input file. It must be a
   SLHA or LHE file (see :ref:`Basic Input <BasicInput>`).
 
 .. literalinclude:: /examples/Example.py
-   :lines: 33
+   :lines: 33-34
 
 * *Set main options for* |decomposition|.
   Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:
@@ -288,19 +387,19 @@ Below we go step-by-step through this example code:
   and `topology  <theory.html#theory.topology.Topology>`_ objects:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 48-60
+   :lines: 47-60
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 2-8
+   :lines: 2-9
 
 
 * *Load the* |express| to be used to constrain the input model.
   Here, all results are used:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 64
+   :lines: 65
 
 Alternatively, the `getExpResults  <experiment.html#experiment.databaseObj.Database.getExpResults>`_ method
 can take as arguments specific results to be loaded.
@@ -309,12 +408,12 @@ can take as arguments specific results to be loaded.
   Below we show how to count the number of |ULrs| and |EMrs| loaded:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 68-75
+   :lines: 69-76
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 10
+   :lines: 11
 
 
 * *Compute the* |theory predictions| for each |expres|.
@@ -334,7 +433,7 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 14-21
+   :lines: 15-22
 
 * *Get the corresponding upper limit*. This value can
   be compared to the |theory prediction| to decide whether a model is excluded or not:
@@ -345,9 +444,9 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 22
+   :lines: 23
 
-* *Compute the r-value*, i.e. the ratio |theory prediction|/upper limit.
+* *Print the r-value*, i.e. the ratio |theory prediction|/upper limit.
   A value of :math:`r \geq 1` means that an experimental result excludes the input model.
   For |EMrs| also compute the :math:`\chi^2` and :ref:`likelihood <likelihoodCalc>`.
   Determine the most constraining result:
@@ -358,7 +457,7 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 23
+   :lines: 24-25
 
 * *Print the most constraining experimental result*. Using the largest *r*-value,
   determine if the model has been excluded or not by the selected |express|:
@@ -370,20 +469,20 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 322-323
+   :lines: 588-589
    
    
 * *Identify missing topologies*. Using the output from decomposition, identify
   the :ref:`missing topologies <topCoverage>` and print some basic information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 125-144
+   :lines: 125-145
 
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 325-336,344-349   
+   :lines: 591-602,612-617
 
 
 It is worth noting that SModelS does not include any statistical treatment for
@@ -392,7 +491,7 @@ Due to this, the results are claimed to be "likely excluded" in the output.
 
 
 **Notes:**
- * For an SLHA :ref:`input file <BasicInput>`, the decays of :ref:`final states <final states>` 
+ * For an SLHA :ref:`input file <BasicInput>`, the decays of :ref:`final states <final statesEven>` 
    (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during
    the decomposition. Furthermore, if there are two cross sections at different
    calculation order (say LO and NLO) for the same process, only the highest order is used.
@@ -405,4 +504,4 @@ Due to this, the results are claimed to be "likely excluded" in the output.
    Unfortunately, for |ULrs|, the expected limits are often not available;
    :math:`r_{exp}` is then reported as N/A in the SModelS output.   
 
-.. [#] We note that SLHA files including decay tables and cross sections, together with the corresponding *particles.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_
+.. [#] We note that SLHA files including decay tables and cross sections, together with the corresponding *model.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_

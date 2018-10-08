@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: metaObj
@@ -15,7 +15,7 @@ import time
 from smodels.tools.smodelsLogging import logger
 
 class Meta(object):
-    current_version = 202 ## the current format version
+    current_version = 201 ## the current format version
 
     """ The Meta object holds all meta information regarding the
         database, like number of analyses, last time of modification, ...
@@ -63,7 +63,7 @@ class Meta(object):
             return self.databaseVersion
         try:
             vfile = os.path.join ( self.pathname, "version" )
-            versionFile = open( vfile, "r" )
+            versionFile = open( vfile )
             content = versionFile.readlines()
             versionFile.close()
             line = content[0].strip()
@@ -77,11 +77,11 @@ class Meta(object):
             # return 'unknown version'
 
     def __str__ ( self ):
-        ret  = "Meta: path=%s\n" % self.pathname
+        ret  = "Meta: path =%s\n" % self.pathname
         ret += "      mtime=%s" % time.ctime ( self.mtime )
         ret += ", filecount=%d" % self.filecount
-        ret += ", discard_0=%d\n" % self.discard_zeroes
-        ret += "      fl=%s" % self.hasFastLim
+        ret += ", discard_0=%d" % self.discard_zeroes
+        ret += ", fl=%s" % self.hasFastLim
         ret += ", format_version=%d" % self.format_version
         ret += ", dbVersion=%s" % self.databaseVersion
         return ret
@@ -160,6 +160,7 @@ class Meta(object):
         """ check if fastlim appears in data.
             If yes, print a statement to stdout. """
         if not self.hasFastLim: return
+        # print ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
         logger.info ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
 
     def __eq__ ( self, other ):

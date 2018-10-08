@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: physicsUnits
@@ -32,6 +32,8 @@ unum.Unum.UNIT_HIDE_EMPTY = True
 
 m = unum.Unum.unit('m')
 cm = unum.Unum.unit('cm', 0.01 * m )
+mm = unum.Unum.unit('mm', 0.001 * m )
+fm = unum.Unum.unit('fm', 1e-15 * m )
 
 fb = unum.Unum.unit('fb')
 pb = unum.Unum.unit('pb', 1000 * fb)

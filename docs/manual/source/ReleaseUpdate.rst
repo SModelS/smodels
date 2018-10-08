@@ -1,4 +1,4 @@
-.. index:: What's New in version |version|
+.. index:: What's New
 
 .. |element| replace:: :ref:`element <element>`
 .. |elements| replace:: :ref:`elements <element>`
@@ -33,22 +33,44 @@
 
 
 
-What's New in Version 1.1
-=========================
+What's New
+==========
 Since the publication of SModelS v1.0 in December 2014, the code base
-has undergone significant structural changes. Version 1.1 comes
-with many new features. The major novelties of this release are 
-as follows:
+has undergone significant structural changes. 
+The major novelties of this release are as follows:
+
+New in Version 1.2.0:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Decomposition and experimental results can include
+    non-MET BSM :ref:`final states <final stateOdd>` (e.g. heavy stable charged particles)
+  * Added :ref:`lifetime reweighting <lifetimeWeight>` at |decomposition| for meta-stable particles
+  * Added :ref:`finalState property <final stateOdd>` for Elements
+  * Introduction of :ref:`inclusive simplified models <inclusiveSMS>`
+  * Inclusion of HSCP and R-hadron results in the database
+
+New in Version 1.1.3:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Support for :ref:`covariance matrices <combineSRs>` and combination of signal regions (see :ref:`combineSR <parameterFileCombineSRs>` in |parameters|)
+  * New plotting tool added to smodelsTools (see :ref:`Interactive Plots Maker <interactivePlots>`)
+  * Path to particles.py can now be specified in parameters.ini file (see :ref:`model <parameterFileModel>` in |parameters|)
+  * Wildcards allowed when selecting analyses, datasets, txnames (see :ref:`analyses <parameterFileAnalyses>`, :ref:`txnames <parameterFileTxnames>` and :ref:`dataselector <parameterFileDataselector>`  in |parameters|) 
+  * Option to show individual contribution from topologies to total theory prediction (see :ref:`addTxWeights <parameterFileAddTxWeights>` in |parameters|)
+  * URLs are allowed as database paths (see :ref:`path <parameterFilePath>` in |parameters|)
+  * Python default changed from python2 to python3
+  * Fixed lastUpdate bug, now giving correct date 
+  * Changes in pickling (e.g. subpickling, removing redundant zeroes)
+  * Added fixpermissions to smodelsTools.py, for system-wide installs (see :ref:`Files Permissions Fixer <permissionsFixer>`)
+  * Fixed small issue with pair production of even particles
+  * Moved the :ref:`code documentation <CodeDocs>` to the manual
+  * Added :ref:`option for installing <phenoInstallation>` within the source folder
+
 
 New in Version 1.1.2:
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Changes in pickling (subpickling, redundant zeroes are now removed)
-* URLs are allowed as database paths (see **database:path** in |parameters|)
-* Small bug fixes
-* Option to show individual contribution from topologies to total theory prediction (see **python-printer:addTxWeights** in |parameters|)
-* smodelsTools.py fixpermissions, for system-wide installs (see :ref:`Files Permissions Fixer <permissionsFixer>`)
-
+* Database update only, the code is the same as v1.1.1
 
 New in Version 1.1.1:
 ^^^^^^^^^^^^^^^^^^^^^
@@ -67,14 +89,14 @@ New in Version 1.1.0:
 
 * the inclusion of efficiency maps (see |EMrs|)
 * a new and more flexible database format (see :ref:`Database structure <databaseStruct>`)
-* inclusion of likelihood and :math:`\chi^2` calculation for |EMrs| 
+* inclusion of likelihood and :math:`\chi^2` calculation for |EMrs|
   (see :ref:`likelihood calculation <likelihoodCalc>`)
-* extended information on the :ref:`topology coverage <topCoverage>` 
+* extended information on the :ref:`topology coverage <topCoverage>`
 * inclusion of a database broswer tool for easy access to the information
   stored in the database (see :ref:`database browser <databaseBrowser>`)
 * the database now supports also a more efficient :ref:`binary format <databasePickle>`
 * performance improvement for the |decomposition| of the input model
-* inclusion of new simplified results to the |database| (including a few 13 TeV results) 
+* inclusion of new simplified results to the |database| (including a few 13 TeV results)
 * |Fastlim| efficiency maps can now also be used in SModelS
 
 

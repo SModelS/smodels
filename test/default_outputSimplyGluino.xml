@@ -86,6 +86,7 @@
         <warnings>Input file ok</warnings>
     </OutputStatus>
     <Outside_Grid_List/>
+    <Total_xsec_considered_fb>4309.03465</Total_xsec_considered_fb>
     <Element_List>
         <Element>
             <ID>1</ID>

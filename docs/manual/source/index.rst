@@ -24,7 +24,8 @@ ingredients are
 
 as illustrated in the graphics below. 
 
-.. image:: images/scheme.png
+.. image:: images/smodelsScheme.png
+   :width: 70%
 
 
 Contents
@@ -36,7 +37,7 @@ Contents
    ReleaseUpdate  
    Installation
    RunningSModelS
-   Tools
+   SModelSTools
    SModelsDocs
    Examples
    CodeDocs

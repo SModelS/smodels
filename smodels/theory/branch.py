@@ -6,9 +6,9 @@
         
 """
 
-import sys
 from smodels.theory.particleNames import simParticles, elementsInStr
-from smodels.tools.physicsUnits import fb, MeV
+from smodels.tools.physicsUnits import fb
+from smodels.theory.particleNames import ptcDic, finalStates, getFinalStateLabel, InclusiveStr
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -25,22 +25,28 @@ class Branch(object):
                 to a nested list (PIDs = [[pid1,pid2,...],[pidA,pidB,...])
     :ivar maxWeight: weight of the branch (XSection object)
     """
-    def __init__(self, info=None):
+    def __init__(self, info=None, finalState=None):
         """
         Initializes the branch. If info is defined, tries to generate
         the branch using it.
         
         :parameter info: string describing the branch in bracket notation
                          (e.g. [[e+],[jet]])
+
+        :parameter finalState: final state label string for the branch
+                         (e.g. 'MET' or 'HSCP')                         
         """
+        
+        from smodels.particlesLoader import rEven
+        
         self.masses = []
         self.particles = []
         self.PIDs = []
         self.maxWeight = None
         self.vertnumb = None
         self.vertparts = None
-        from smodels.particlesLoader import rEven
-        from smodels.theory.particleNames import ptcDic
+        self.stable = False
+        self.finalState = None
         if type(info) == type(str()):
             branch = elementsInStr(info)
             if not branch or len(branch) > 1:
@@ -52,14 +58,18 @@ class Branch(object):
                 for vertex in vertices:
                     ptcs = vertex[1:-1].split(',')
                     # Syntax check:
-                    for ptc in ptcs:
+                    for i,ptc in enumerate(ptcs):
+                        if ptc == "*":
+                            ptc = InclusiveStr()
+                            ptcs[i] = ptc
                         if not ptc in rEven.values() \
-                                and not ptc in ptcDic:
-                            logger.error("Unknown particle. Add " + ptc + " to smodels/particle.py")
-                            raise SModelSError()
+                                and not ptc in list(ptcDic.keys()):
+                                raise SModelSError("Unknown particle. Add " + ptc + " to smodels/particle.py")
                     self.particles.append(ptcs)
             self.vertnumb = len(self.particles)
             self.vertparts = [len(v) for v in self.particles]
+        
+        self.setFinalState(finalState)
 
 
     def __str__(self):
@@ -81,16 +91,18 @@ class Branch(object):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
         
-        # print ( type ( self.masses[0] ) )
-        if self.vertnumb != other.vertnumb:
+        if not isinstance(other,Branch):
+            return -1
+
+        if not self.vertnumb == other.vertnumb:
             comp = self.vertnumb > other.vertnumb
             if comp: return 1
             else: return -1
-        elif self.vertparts != other.vertparts:
+        elif not self.vertparts == other.vertparts:
             comp = self.vertparts > other.vertparts
             if comp: return 1
             else: return -1
-        elif self.particles != other.particles:
+        elif not self.particles == other.particles:
             comp = self.particles > other.particles
             if comp: return 1
             else: return -1
@@ -98,6 +110,10 @@ class Branch(object):
             comp = self.masses > other.masses
             if comp: return 1
             else: return -1
+        elif not self.finalState == other.finalState:
+            comp = self.finalState > other.finalState
+            if comp: return 1
+            else: return -1            
         else:
             return 0  #Branches are equal
 
@@ -116,21 +132,73 @@ class Branch(object):
         been defined yet.
         """
 
-        self.vertnumb = len(self.particles)
-        self.vertparts = [len(v) for v in self.particles]
+        bInfo = self.getInfo()
+        self.vertnumb = bInfo['vertnumb']
+        self.vertparts = bInfo['vertparts']
+        
+    def getInfo(self):
+        """
+        Get branch topology info from particles.
+        
+        :returns: dictionary containing vertices and number of final states information  
+        """
 
+        vertnumb = len(self.particles)
+        vertparts = [len(v) for v in self.particles]
+        
+        return {"vertnumb" : vertnumb, "vertparts" : vertparts}
+        
+        
+    def setFinalState(self,finalState=None):
+        """
+        If finalState = None, define the branch final state according to the PID of the
+        last R-odd particle appearing in the cascade decay.
+        Else set the final state to the finalState given
+        :parameter finalState: String defining the final state
+        """
+        
+        if finalState:
+            if finalState == '*':
+                finalState = InclusiveStr()
+            if not finalState in list(finalStates.keys()):
+                raise SModelSError("Final state %s has not been defined. Add it to particles.py." %finalState)
+            else:
+                self.finalState = finalState
+        #If PIDs have been defined, use it:     
+        elif self.PIDs:
+            fStates = set()
+            for pidList in self.PIDs:
+                fStates.add(getFinalStateLabel(pidList[-1]))
+            
+            if len(fStates) != 1:
+                logger.error("Error obtaining the final state for branch %s" %self)
+                raise SModelSError
+            else:
+                self.finalState = list(fStates)[0]
+        #Else do nothing
+        else:
+            self.finalState = None
     
     def particlesMatch(self, other):
         """
         Compare two Branches for matching particles, 
-        allow for inclusive particle labels (such as the ones defined in particles.py)
+        allow for inclusive particle labels (such as the ones defined in particles.py).
+        Includes the final state in the comparison. 
         
         :parameter other: branch to be compared (Branch object)
         :returns: True if branches are equal (particles and masses match); False otherwise.              
         """
-        
-        if type (other) != type(self):
+
+        #First of all check final state:
+        if self.finalState != other.finalState:
             return False
+
+        #If particles are identical, avoid further checks
+        if self.particles == other.particles:
+            return True        
+       
+        if not isinstance(other,Branch):
+            return False        
         
         #Make sure number of vertices and particles have been defined
         self.setInfo()
@@ -153,10 +221,14 @@ class Branch(object):
         
         :returns: Branch object
         """
-        newbranch = Branch()
+        
+        #Allows for derived classes (like wildcard classes)
+        newbranch = self.__class__()
         newbranch.masses = self.masses[:]
         newbranch.particles = self.particles[:]
+        newbranch.finalState = self.finalState
         newbranch.PIDs = []
+        newbranch.stable = self.stable
         self.setInfo()
         newbranch.vertnumb = self.vertnumb
         newbranch.vertparts = self.vertparts[:]
@@ -192,6 +264,9 @@ class Branch(object):
         :parameter massDictionary: dictionary containing the masses for all intermediate states.
         :returns: extended branch (Branch object). False if there was an error.
         """
+        
+        from smodels.particlesLoader import rEven
+        
         newBranch = self.copy()
         newparticles = []
         newmass = []
@@ -201,7 +276,6 @@ class Branch(object):
                             not have multiple PID lists!")
             return False   
 
-        from smodels.particlesLoader import rEven
         for partID in br.ids:
             # Add R-even particles to final state
             if partID in rEven:
@@ -222,6 +296,9 @@ class Branch(object):
             newBranch.masses.append(newmass[0])
         if not self.maxWeight is None:
             newBranch.maxWeight = self.maxWeight * br.br
+        #If there are no daughters, assume branch is stable
+        if not br.ids:
+            newBranch.stable = True
 
         return newBranch
 
@@ -244,21 +321,123 @@ class Branch(object):
         if not self.PIDs[0][-1]:
             # Do nothing if there is no R-odd daughter (relevant for RPV decays
             # of the LSP)
-            return []
+            self.stable = True
+            return [self]
         #If decay table is not defined, assume daughter is stable:
-        if not self.PIDs[0][-1] in brDictionary: return []
+        if not self.PIDs[0][-1] in brDictionary:
+            self.stable = True
+            return [self]
         # List of possible decays (brs) for R-odd daughter in branch        
-        brs = brDictionary[self.PIDs[0][-1]]
-        if len(brs) == 0:
-            # Daughter is stable, there are no new branches
-            return []
+        brs = brDictionary[self.PIDs[0][-1]]       
         newBranches = []
         for br in brs:
-            if not br.br: continue  #Skip zero BRs
-            # Generate a new branch for each possible decay
+            if not br.br:
+                continue  #Skip zero BRs            
+            # Generate a new branch for each possible decay (including "stable decays")
             newBranches.append(self._addDecay(br, massDictionary))
-        return newBranches
+        
+        
+        if not newBranches:
+            # Daughter is stable, there are no new branches
+            self.stable = True
+            return [self]
+        else:                       
+            return newBranches
 
+
+
+class InclusiveBranch(Branch):
+    """
+    A branch wildcard class. It will return True when compared to any other branch object
+    with the same final state.
+    """
+    
+    def __init__(self):
+        Branch.__init__(self)
+        self.masses = InclusiveList()
+        self.particles =  InclusiveList()
+        self.PIDs = InclusiveList()
+        self.vertnumb = InclusiveInt()
+        self.vertparts = InclusiveList()
+        self.finalState = InclusiveStr()        
+        
+    def __str__(self):
+        return '[*]'
+    
+    def __repr__(self):
+        return self.__str__()
+
+    def __eq__(self,other):
+        return self.__cmp__(other) == 0
+
+    def __ne__(self,other):
+        return self.__cmp__(other) != 0
+        
+    def getInfo(self):
+        """
+        Get branch topology info from particles.
+        
+        :returns: dictionary containing vertices and number of final states information  
+        """
+
+        vertnumb = InclusiveInt()
+        vertparts = InclusiveList()
+        
+        return {"vertnumb" : vertnumb, "vertparts" : vertparts}
+        
+        
+class InclusiveInt(int):
+    """
+    A integer wildcard class. It will return True when compared to any other integer object.
+    """
+    
+    def __init__(self):
+        int.__init__(self)
+        
+    def __str__(self):
+        return '*'   
+    
+    def __repr__(self):
+        return self.__str__()
+
+    def __cmp__(self,other):
+        if isinstance(other,int):
+            return 0
+        else:
+            return -1
+
+    def __eq__(self,other):
+        return self.__cmp__(other) == 0 
+    
+    def __ne__(self,other):
+        return self.__cmp__(other) != 0
+             
+class InclusiveList(list):    
+    """
+    A list wildcard class. It will return True when compared to any other list object.
+    """
+    
+    def __init__(self):
+        int.__init__(self)
+        
+    def __str__(self):
+        return '[*]'    
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __cmp__(self,other):
+        if isinstance(other,list):
+            return 0
+        else:
+            return -1
+
+    def __eq__(self,other):
+        return self.__cmp__(other) == 0  
+    
+    def __ne__(self,other):
+        return self.__cmp__(other) != 0
+    
 
 def decayBranches(branchList, brDictionary, massDictionary,
                   sigcut=0. *fb):
@@ -267,33 +446,33 @@ def decayBranches(branchList, brDictionary, massDictionary,
     
     :parameter branchList: list of Branch() objects containing the initial mothers
     :parameter brDictionary: dictionary with the decay information
-                                 for all intermediate states (values are br objects, see pyslha)
+                             for all intermediate states (values are br objects, see pyslha).
+                            It may also contain information about long-lived particles.
     :parameter massDictionary: dictionary containing the masses for all intermediate states.
+    :parameter promptDictionary: optional dictionary with the fraction of prompt and non-prompt decays.
+                        Allows to deal with quasi-stable or long-lived particles
+                        If not given, all particles are considered to
+                        always decay promptly or to be stable.    
     :parameter sigcut: minimum sigma*BR to be generated, by default sigcut = 0.
                    (all branches are kept)
     :returns: list of branches (Branch objects)    
     """
 
-    finalBranchList = []
-    while branchList:
-        # Store branches after adding one step cascade decay
-        newBranchList = []
-        for inbranch in branchList:
-            if sigcut.asNumber() > 0. and inbranch.maxWeight < sigcut:
-                # Remove the branches above sigcut and with length > topmax
-                continue
-            # Add all possible decays of the R-odd daughter to the original
-            # branch (if any)
-            newBranches = inbranch.decayDaughter(brDictionary, massDictionary)
-            if newBranches:
-                # New branches were generated, add them for next iteration
-                newBranchList.extend(newBranches)
-            else:
-                # All particles have already decayed, store final branch
-                finalBranchList.append(inbranch)
-        # Use new branches (if any) for next iteration step
-        branchList = newBranchList
+
+    #Check for stable branches
+    stableBranches = [branch for branch in branchList if branch.stable]
+    unstableBranches = [branch for branch in branchList if not branch.stable]
         
-    #Sort list by initial branch PID:
-    finalBranchList = sorted(finalBranchList, key=lambda branch: branch.PIDs)
-    return finalBranchList
+    if not unstableBranches:
+        #All branches have been decayed:
+        finalBranches = sorted(stableBranches, key=lambda branch: branch.PIDs)
+        return finalBranches
+    else:
+        #Decayed unstable branches
+        newBranches = []
+        for branch in unstableBranches:
+            newBranches += [br for br in branch.decayDaughter(brDictionary, massDictionary) 
+                           if br.maxWeight >= sigcut]
+    
+        
+        return decayBranches(newBranches+stableBranches,brDictionary, massDictionary,sigcut)

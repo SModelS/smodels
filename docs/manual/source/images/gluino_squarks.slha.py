@@ -1,14 +1,14 @@
 smodelsOutput = {
-'OutputStatus': {'minmassgap': 5.0, 'input file': 'inputFiles/slha/gluino_squarks.slha', 'decomposition status': 1, 'warnings': 'Input file ok', 'ncpus': 1, 'maxcond': 0.2, 'smodels version': '1.1.1', 'database version': '1.1.1', 'sigmacut': 0.03, 'file status': 1}, 
-'Element': [{'Particles': '[[], []]', 'Weights (fb)': {'xsec 8.0 TeV': 0.4808}, 'PIDs': [[[1000022], [1000022]]], 'Masses (GeV)': [[129.0], [129.0]], 'ID': 1}, 
-{'Particles': "[[], [['W+']]]", 'Weights (fb)': {'xsec 8.0 TeV': 0.2404}, 'PIDs': [[[1000022], [1000024, 1000022]]], 'Masses (GeV)': [[129.0], [269.0, 129.0]], 'ID': 2},...] 
-'ExptRes': [{'AnalysisSqrts (TeV)': 8, 'chi2': 0.1204, 'dataType': 'efficiencyMap', 
-'Mass (GeV)': [[991.3, 129.0], [865.0, 129.0]], 'maxcond': 0.0, 'expected upper limit (fb)': 0.235, 
-'likelihood': 0.198453, 'AnalysisID': 'ATLAS-CONF-2013-053', 
-'upper limit (fb)': 0.26, 'theory prediction (fb)': 8.58e-05, 
-'lumi (fb-1)': 20.1, 'TxNames': ['TGQbbq'], 'TxNames weights (fb)': {'TGQbbq': 8.58e-05}, 'DataSetID': 'SRA mCT350'}, ...], 
-'Missed Topologies': [{'weight (fb)': 16.007591747903355, 'sqrts (TeV)': 8.0, 'element IDs': [270, 271, 272,...], 
-'element': '[[[jet],[W]],[[jet,jet],[W]]]'},...]
-'Outside Grid': [{'weight (fb)': 0.14400311772342284, 'sqrts (TeV)': 8.0, 'element': '[[[jet]],[[t,t]]]'},...], 
-'Long Cascades': [{'weight (fb)': 37.43420166036613, 'sqrts (TeV)': 8.0, 'mother PIDs': [[1000021, 2000002]]}, ...], 
-'Asymmetric Branches': [{'weight (fb)': 47.25308267112802, 'sqrts (TeV)': 8.0, 'mother PIDs': [[1000002, 1000021]]}, ...]}
+'OutputStatus': {'sigmacut': 0.01, 'minmassgap': 5.0, 'maxcond': 0.2, 'ncpus': 1, 'file status': 1, 'decomposition status': 1, 'warnings': 'Input fil
+ 'Element': [{'ID': 1, 'Particles': '[[], []]', 'Masses (GeV)': [[129.0], [129.0]], 'PIDs': [[[1000022], [1000022]]], 'Weights (fb)': {'xsec 8.0 TeV': 0.480, 'xsec 13.0 TeV': 1.580}, 'final states': ['MET', 'MET']}, 
+{'ID': 2, 'Particles': "[[], [['W+']]]", 'Masses (GeV)': [[129.0], [269.0,129.0]], 'PIDs': [[[1000022], [1000024, 1000022]]], 'Weights (fb)': {'xsec 8.0 TeV': 0.2404, 'xsec 13.0 TeV': 0.263}, 'final states': ['MET', 'MET']},..]
+'ExptRes': [{'maxcond': 0.0, 'theory prediction (fb)': 11.68725, 'upper limit (fb)': 7.68, 
+'expected upper limit (fb)': None, 'TxNames': ['T2'], 'Mass (GeV)': [[991.3084, 129.0], [991.4, 129.0]], 
+'AnalysisID': 'CMS-SUS-16-036', 'DataSetID': None, 'AnalysisSqrts (TeV)': 13.0, 
+'lumi (fb-1)': 35.9, 'dataType': 'upperLimit', 
+'r': 1.52127, 'r_expected': None, 'TxNames weights (fb)': {'T2': 11.687}},...] 
+'Missed Topologies': [{'sqrts (TeV)': 13.0, 'weight (fb)': 148.16, 
+'element': "[[[jet],[W]],[[jet,jet],[W]]](MET,MET)", 'element IDs': [987, 988,...]},...]
+'Outside Grid': [{'sqrts (TeV)': 13.0, 'weight (fb)': 1.58, 'element': "[[[jet]],[[t,t]]](MET,MET)"},...]
+'Long Cascades': [{'sqrts (TeV)': 13.0, 'weight (fb)': 369.58, 'mother PIDs': [[1000021, 2000002]]},...]
+'Asymmetric Branches': [{'sqrts (TeV)': 13.0, 'weight (fb)': 529.73, 'mother PIDs': [[1000021, 1000021]]},...]

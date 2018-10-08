@@ -11,7 +11,6 @@
 from smodels.tools.physicsUnits import GeV, TeV, pb
 from smodels.theory import lheReader
 import pyslha
-import sys
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -188,7 +187,7 @@ class XSection(object):
         """
         Generate cross section information in string format.
         """
-        st = self.info.label + ':' + str(self.value)+ " " + str(self.pid)
+        st = self.info.label + ':' + str(self.value)
         return st
 
     def niceStr(self):
@@ -509,7 +508,8 @@ class XSectionList(object):
                 for oldXsec in self:
                     if newXsec.info == oldXsec.info:
                         oldXsec.value = oldXsec.value + newXsec.value
-                        oldXsec.pid = (None, None)
+                        if newXsec.pid != oldXsec.pid:
+                            oldXsec.pid = (None, None)
 
 
     def removeLowerOrder(self):
@@ -556,6 +556,10 @@ class XSectionList(object):
 
         self.xSections = sorted(self.xSections, key=lambda xsec: xsec.pid)
 
+    def __lt__(self, other):
+        return self.xSections[0].pid < other.xSections[0].pid
+
+
     def sort ( self ):
         """ sort the xsecs by the values """
         self.xSections = sorted(self.xSections,
@@ -578,11 +582,12 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
     f=pyslha.readSLHAFile ( slhafile )
     from smodels.particlesLoader import rOdd
     for production in f.xsections:
-        for pid in production[2:]:
-            if not pid in rOdd.keys():
-                # ignore production of R-Even Particles
-                logger.warning("Particle %i not defined in particles.py, cross section for %s production will be ignored" %(pid,str(production)))
-                break
+        rEvenParticles = list(set(production[2:]).difference(set(rOdd.keys())))
+        if rEvenParticles:
+            # ignore production of R-Even Particles
+            logger.warning("Particles %s not defined as R-odd, cross section for %s production will be ignored" 
+                           %(rEvenParticles,str(production)))                 
+            continue
         process = f.xsections.get ( production )
         for pxsec in process.xsecs:
             csOrder = pxsec.qcd_order

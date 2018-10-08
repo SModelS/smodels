@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: ioObjects
@@ -10,7 +10,7 @@
 
 """
 
-import os, sys
+import os
 from smodels.theory import lheReader
 from smodels.tools.physicsUnits import GeV, fb
 from smodels import installation
@@ -24,12 +24,13 @@ from smodels.tools import runtime
 class ResultList(object):
     """
     Class that collects a list of theory predictions plus the corresponding upper limits.
-    
-    :ivar theoryPredictions: list of TheoryPrediction objects    
     """
     
     
     def __init__(self, theoPredictionsList=[],maxcond = 1.):
+        """
+        :parameter theoryPredictionList: list of TheoryPrediction objects
+        """
         
         self.theoryPredictions = []
         if theoPredictionsList:
@@ -61,39 +62,27 @@ class ResultList(object):
         """
         Calculate R value.
         
-        :parameter theoPredr theoPred: Theory Prediction object
+        :parameter theoPred: Theory Prediction object
         :returns: R value = weight / upper limit        
         """
         return theoPred.getRValue( expected )
-        """ FIXME is all now in theory prediction (I hope)
-        
-        expResult = theoPred.expResult
-        datasetID = theoPred.dataset.dataInfo.dataId
-        dataType = expResult.datasets[0].dataInfo.dataType
-        
-        if dataType == 'upperLimit':
-            ul = expResult.getUpperLimitFor(txname=theoPred.txnames[0],mass=theoPred.mass, expected = expected)
-        elif dataType == 'efficiencyMap':
-            ul = expResult.getUpperLimitFor(dataID=datasetID, expected=expected)
-        else:
-            logger.error("Unknown dataType %s" %(str(dataType)))
-        if type(ul)==bool and ul==False:
-            logger.info ( "upper limit is False. cannot compute r value." )
-            return None
-        if ul == 0. * fb:
-            logger.info ( "upper limit is 0. cannot compute r value." )
-            return None
-        #if type(ul) == bool and ul == False:
-        #    return None
-        return (theoPred.xsection.value/ul).asNumber()    
+
+    def _getRNone(self,theoPred, expected = False ):
         """
+        Simple helper function to sort also with None values.
+        None is replaced with -1.
+        """
+        ret = self.getR ( theoPred, expected )
+        if ret == None: return -1.
+        return ret
 
     def sort(self):
         """
         Reverse sort theoryPredictions by R value.
         
         """
-        self.theoryPredictions = sorted(self.theoryPredictions, key=self.getR, reverse=True)
+        self.theoryPredictions = sorted( self.theoryPredictions, key=self._getRNone, 
+                                         reverse=True )
 
     def getBestExpected(self):
         """
@@ -104,8 +93,8 @@ class ResultList(object):
         bestExp = None
         for tP in self.theoryPredictions:
             expResult = tP.expResult
-            datasetID = tP.dataset.dataInfo.dataId
-            dataType = expResult.datasets[0].dataInfo.dataType
+            datasetID = tP.dataset.getID()
+            dataType = expResult.datasets[0].getType()
             if dataType != 'efficiencyMap':
                 continue
             ulExp = expResult.getUpperLimitFor(dataID=datasetID, expected = True)
@@ -126,19 +115,17 @@ class ResultList(object):
 
 class OutputStatus(object):
     """
-    Object that holds all status information and has a predefined printout.
-    
-    :ivar status: status of input file
-    :ivar inputFile: input file name
-    :ivar parameters: input parameters
-    :ivar databaseVersion: database version (string)
-    :ivar outputfile: path to outputfile
-    
+    Object that holds all status information and has a predefined printout.        
     """
+    
     def __init__( self, status, inputFile, parameters, databaseVersion):
         """
         Initialize output. If one of the checks failed, exit.
         
+        :parameter status: status of input file
+        :parameter inputFile: input file name
+        :parameter parameters: input parameters
+        :parameter databaseVersion: database version (string)        
         """
 
         try:
@@ -204,11 +191,6 @@ class FileStatus(object):
     """
     Object to run several checks on the input file.
     It holds an LheStatus (SlhaStatus) object if inputType = lhe (slha)
-    
-    :ivar inputType: specify input type as SLHA or LHE
-    :ivar inputFile: path to input file
-    :ivar sigmacut: sigmacut in fb
-    
     """
 
     def __init__(self):
@@ -218,7 +200,16 @@ class FileStatus(object):
 
 
     def checkFile(self, inputFile, sigmacut=None):
-        inputType = runtime.filetype ( inputFile )
+        """
+        Run checks on the input file.
+        
+        :parameter inputFile: path to input file
+        :parameter sigmacut: sigmacut in fb        
+        """
+        
+        
+        
+        inputType = runtime.filetype( inputFile )
 
         if inputType == 'lhe':
             self.filestatus = LheStatus(inputFile)
@@ -272,20 +263,23 @@ class SlhaStatus(object):
     = 1: the check is ok
     = -1: case of a physical problem, e.g. charged LSP,
     = -2: case of formal problems, e.g. no cross sections
-    
-    :ivar filename: path to input SLHA file
-    :ivar maxDisplacement: maximum c*tau for promt decays in meters
-    :ivar sigmacut: sigmacut in fb
-    :ivar checkLSP: if True check if LSP is neutral
-    :ivar findMissingDecayBlocks: if True add a warning for missing decay blocks
-    :ivar findIllegalDecays: if True check if all decays are kinematically allowed
-    :ivar checkXsec: if True check if SLHA file contains cross sections
-    :ivar findLonglived: if True find stable charged particles and displaced vertices
-    
+        
     """
     def __init__(self, filename, maxDisplacement=.01, sigmacut=.03 * fb,
-                 checkLSP=True, findMissingDecayBlocks=True,
-                 findIllegalDecays=False, checkXsec=True, findLonglived=True):
+                 findMissingDecayBlocks=True,
+                 findIllegalDecays=False, checkXsec=True):
+        
+        """
+        :parameter filename: path to input SLHA file
+        :parameter maxDisplacement: maximum c*tau for promt decays in meters
+        :parameter sigmacut: sigmacut in fb
+        :parameter checkLSP: if True check if LSP is neutral
+        :parameter findMissingDecayBlocks: if True add a warning for missing decay blocks
+        :parameter findIllegalDecays: if True check if all decays are kinematically allowed
+        :parameter checkXsec: if True check if SLHA file contains cross sections
+        :parameter findLonglived: if True find stable charged particles and displaced vertices        
+        """
+        
         self.filename = filename
         self.maxDisplacement = maxDisplacement
         self.sigmacut = sigmacut
@@ -295,11 +289,11 @@ class SlhaStatus(object):
             return
         try:
             self.lsp = self.findLSP()
-            self.lspStatus = self.testLSP(checkLSP)
+            self.lspStatus = self.testLSP(False)
             self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
             self.xsec = self.hasXsec(checkXsec)
             self.decayBlocksStatus = self.findMissingDecayBlocks(findMissingDecayBlocks)
-            self.longlived = self.findLonglivedParticles(findLonglived)
+            self.longlived = self.findLonglivedParticles(False)
             self.status = self.evaluateStatus()
         ## except Exception,e:
         except (SModelSError,TypeError,IOError,ValueError,AttributeError) as e:

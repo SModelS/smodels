@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: testSlhaDecomposition
@@ -20,7 +20,7 @@ class SlhaDecompositionTest(unittest.TestCase):
     def test(self):
         self.logger.info ( "test decomposition, no compression" )
         """ test the decomposition with no compression """
-        slhafile="../inputFiles/slha/simplyGluino.slha"
+        slhafile="./testFiles/slha/simplyGluino.slha"
         topos = slhaDecomposer.decompose ( slhafile, .1*fb, False, False, 5.*GeV )
         self.assertEqual ( len(topos), 1 )
         #print len(topos),"topologies."

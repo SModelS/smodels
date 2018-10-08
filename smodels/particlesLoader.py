@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: particlesLoader
@@ -17,24 +17,47 @@
    
 """
 
-import os
-from smodels.tools.runtime import modelFile
 from smodels.tools.smodelsLogging import logger
+import os, sys
 
-logger.debug ( "model file: %s" % modelFile )
+def load ():
+    
+    from smodels.tools.runtime import modelFile
+    from smodels.installation import installDirectory    
+    
+    fulldir = os.path.join(installDirectory(),"smodels","share","models")
+    # print ( "fulldir", fulldir )
+    sys.path.insert(0,installDirectory())
+    sys.path.insert(0,os.path.join(installDirectory(),"smodels") )
+    sys.path.insert(0,fulldir)
+    sys.path.insert(0,".")
 
-if "/" in modelFile:
-    import shutil
-    filename=os.path.basename(modelFile)
-    shutil.copy ( modelFile, filename )
-    modelFile=filename
+    logger.debug("Trying to load model file: %s" % modelFile)
 
-if modelFile.endswith(".py"):
-    modelFile=modelFile[:-3]
+    if "/" in modelFile:
+        import shutil
+        filename=os.path.basename(modelFile)
+        shutil.copy ( modelFile, filename )
+        modelFile=filename
 
-from importlib import import_module
-pM=import_module (modelFile, package='smodels')
+    if modelFile.endswith(".py"):
+        modelFile=modelFile[:-3]
+
+    from importlib import import_module
+    try:
+        pM=import_module (modelFile, package='smodels')
+        logger.debug ( "Found model file at %s" % pM.__file__ )
+        return pM
+    except ModuleNotFoundError as e:
+        logger.error ( "Model file %s not found." % modelFile )
+        sys.exit()
+
+pM = load()
         
 rOdd = pM.rOdd
 rEven = pM.rEven
-qNumbers = pM.qNumbers
+try:
+    qNumbers = pM.qNumbers
+except:
+    logger.error("Quantum numbers have not been defined. Please add the BSM quantum numbers to the model file.")
+    sys.exit()

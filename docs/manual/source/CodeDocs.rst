@@ -1,6 +1,6 @@
 .. index:: Code Documentation
 
-
+.. _CodeDocs:
 
 SModelS Code Documentation
 ==========================

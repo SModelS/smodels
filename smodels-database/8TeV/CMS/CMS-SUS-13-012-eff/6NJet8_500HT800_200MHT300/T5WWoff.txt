@@ -1,5 +1,6 @@
 txName: T5WWoff
 constraint: 2.23*[[['jet','jet'],['jet','jet']],[['jet','jet'],['jet','jet']]]
+finalState: ['MET', 'MET']
 condition: None
 conditionDescription: None
 source: SModelS

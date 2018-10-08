@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: externalPythonTools
@@ -59,7 +59,10 @@ class ExternalPythonTool(object):
 pythonTools = { "unum" : ExternalPythonTool("unum"),
                 "numpy": ExternalPythonTool("numpy"),
                 "pyslha": ExternalPythonTool("pyslha"),
-                "scipy": ExternalPythonTool("scipy") }
+                "scipy": ExternalPythonTool("scipy"),
+                "plotly": ExternalPythonTool("plotly"),
+                "pandas": ExternalPythonTool("pandas"),
+                "ipython": ExternalPythonTool("IPython"), }
 
 
 if __name__ == "__main__":

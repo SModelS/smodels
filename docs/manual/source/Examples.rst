@@ -30,11 +30,19 @@ Below a few examples are given for how to utilize SModelS and some of the :doc:`
 
 * `How to generate ascii graphs <ascii_graph_from_lhe.html>`_ (download the Python code :download:`here <recipes/ascii_graph_from_lhe.py>`, IPython notebook :download:`here <recipes/ascii_graph_from_lhe.ipynb>`)
 
+* `How to marginalize a combined limit instead of profiling it <marginalize.html>`_ (download the Python code :download:`here <recipes/marginalize.py>`, IPython notebook :download:`here <recipes/marginalize.ipynb>`)
+
 Examples using the Database Browser
 -----------------------------------
 
 * `How to obtain upper limits <browserExample2.html>`_ (download the Python code :download:`here <recipes/browserExample2.py>`, IPython notebook :download:`here <recipes/browserExample2.ipynb>`)
 
 * `How to select specific results <browserExample3.html>`_ (download the Python code :download:`here <recipes/browserExample3.py>`, IPython notebook :download:`here <recipes/browserExample3.ipynb>`)
+
+Examples using the Interactive Plots tool
+-----------------------------------------
+
+* `How to make interactive plots <interactivePlotsExample.html>`_ (download the Python code :download:`here <recipes/interactivePlotsExample.py>`, IPython notebook :download:`here <recipes/interactivePlotsExample.ipynb>`)
+
 
 .. [*] Some of the output may change depending on the database version used.

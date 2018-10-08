@@ -1,5 +1,6 @@
 txName: T1tttt
 constraint: [[['t','t']],[['t','t']]]
+finalState: ['MET', 'MET']
 condition: None
 conditionDescription: None
 figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-04/figaux_11a.png

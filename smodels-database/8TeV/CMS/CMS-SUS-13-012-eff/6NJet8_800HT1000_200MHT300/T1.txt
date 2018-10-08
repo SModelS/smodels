@@ -1,5 +1,6 @@
 txName: T1
 constraint: [[['jet','jet']],[['jet','jet']]]
+finalState: ['MET', 'MET']
 condition: None
 conditionDescription: None
 figureUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13012/Fig_7b.pdf

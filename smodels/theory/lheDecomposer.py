@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: lheDecomposer
@@ -103,6 +103,8 @@ def elementFromEvent(event, weight=None):
             mombranch.PIDs = [[particle.pdg]]           
             if weight:
                 mombranch.maxWeight = weight.getMaxXsec()
+            else:
+                mombranch.maxWeight = 0.*fb
             # Get simple BR and Mass dictionaries for the corresponding branch
             branchBR = brDic[ip]
             branchMass = massDic[ip]

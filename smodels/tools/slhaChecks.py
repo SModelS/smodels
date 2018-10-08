@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: slhaChecks
@@ -15,10 +15,9 @@ from smodels.tools.ioObjects import SlhaStatus
 from smodels.tools.physicsUnits import fb
 
 def main(args):   
-    status = SlhaStatus ( args.filename, maxDisplacement=args.displacement,
-                 sigmacut=args.sigmacut*fb, checkLSP=args.lsp,
-                 findIllegalDecays=args.illegal, checkXsec=args.xsec,
-                 findLonglived=args.longlived, 
+    status = SlhaStatus( args.filename, 
+                 sigmacut=args.sigmacut*fb,
+                 findIllegalDecays=args.illegal, checkXsec=args.xsec, 
                  findMissingDecayBlocks=args.decayBlocks) # pylint: disable-msg=C0103
 
     print(status.status)

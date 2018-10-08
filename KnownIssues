@@ -1,5 +1,11 @@
-Known Issues, v1.1.1
+Known Issues, v1.2.0
 =======================================================
 
+ * Version 1.2.0 can not be used with database binary files built with previous versions
  * Interpolation of experimental results gives slightly different results
    when using older versions of lapack (called by scipy).
+ * Signal uncertainties are considered when computing the upper limit
+   for the best signal region, but not for the combined one.
+ * SUSYHit includes the PDG codes 4000001 and 3000001 for some
+   decays. These are not included in the SM particle definitions
+   and should be added by the user, if needed.

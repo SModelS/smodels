@@ -63,6 +63,25 @@ def getLogger ():
 
 logger = getLogger()
 
+def getLogLevel( asString=False ):
+    """ obtain the current log level. 
+    :params asString: return string, not number.
+    """
+    # return logger.level
+    ret = logger.getEffectiveLevel()
+    if not asString:
+        return ret
+    lvlNames= { logging.DEBUG: "debug", logging.INFO: "info",
+                logging.WARNING: "warning", logging.ERROR: "error",
+                logging.CRITICAL: "critical", logging.FATAL: "FATAL" }
+    lvl = list ( lvlNames.keys() )
+    lvl.sort( reverse = True)
+    for l in lvl:
+        if ret >= l:
+            return lvlNames[l]
+    return "unknown log level"
+
+
 def setLogLevel ( level ):
     """ set the log level of the central logger.
         can either be directly an integer ( e.g. logging.DEBUG ),

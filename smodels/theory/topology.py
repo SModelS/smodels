@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: topology
@@ -14,6 +14,7 @@ from smodels.theory.element import Element
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.auxiliaryFunctions import index_bisect
 from smodels.tools.smodelsLogging import logger
+import itertools
 
 
 class Topology(object):
@@ -73,7 +74,13 @@ class Topology(object):
         :param other:  topology to be compared (Topology object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
-                
+        
+        #Check for any permutation of branches:
+        for v1 in itertools.permutations(self.vertparts):
+            for v2 in itertools.permutations(other.vertparts):
+                if v1 == v2:
+                    return 0
+
         if sorted(self.vertnumb,reverse=True) != sorted(other.vertnumb,reverse=True):
             comp = sorted(self.vertnumb,reverse=True) > sorted(other.vertnumb,reverse=True)
             if comp: return 1
@@ -83,7 +90,7 @@ class Topology(object):
             if comp: return 1
             else: return -1 
         else:
-            return 0        
+            return 0 
 
 
     def checkConsistency(self):
@@ -268,6 +275,21 @@ class TopologyList(object):
             return i
         
         return None
+    
+
+    def hasTopology(self,topo):
+        """
+        Checks if topo appears in any of the topologies in the list.
+        
+        :param topo: Topology object
+        :return: True if topo appears in the list, False otherwise.
+        """
+
+        for t in self:
+            if t == topo:
+                return True
+        
+        return False    
 
     
     def add(self, newTopology):

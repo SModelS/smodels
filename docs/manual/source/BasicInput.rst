@@ -18,6 +18,8 @@ given in the two following forms:
 The SLHA format is usually more compact and best suited for supersymmetric models. On the other hand, a LHE file can always
 be generated for any BSM model (through the use of your favorite MC generator). [*]_ In this case, however,
 the precision of the results is limited to the MC statistics used to generate the file.
+*We also point out that all the decays appearing in the LHE input are assumed to be prompt and
+this input format should no be used if the model contains meta-stable particles*.
 
 *In the case of SLHA input only*, the production cross sections for the BSM states also have to be included
 in the SLHA file as SLHA blocks, according to the :ref:`SLHA cross section format <xsecSLHA>` 
@@ -30,7 +32,7 @@ as discussed in :ref:`cross section calculator <xsecCalc>`.
 *In the case of LHE input*, the total production cross section as well as 
 the center-of-mass energy should be listed in the <init></init> block, according to the standard LHE format
 (see :download:`example file <examples/example.slha>`).
-Moreover, all the Z\ :sub:`2`-even particles (see definition in :ref:`final states <final states>`) should be set as stable, since
+Moreover, all the Z\ :sub:`2`-even particles (see definition in :ref:`final states <final statesEven>`) should be set as stable, since
 in SModelS they are effectively considered as final states.
 When generating the events it is also important to ensure that no mass smearing is applied, so the mass
 values for a given particle are the same throughout the LHE file.
@@ -42,15 +44,11 @@ New Particles
 
 Besides information about the masses and branching ratios, the user must also define
 which particles are Z\ :sub:`2`-odd states (:ref:`Intermediate states <odd states>`) 
-and which are Z\ :sub:`2`-even (:ref:`Final states <final states>`).
-These definitions must be given in the :download:`particles.py <images/particles.py>` file,
-where some default values (for SM and MSSM particles) are already loaded.
-To path to the user's own particles.py can be specified in the :ref:`parameter file <parameterFile>`.
-
-
-If the user wants to check the SLHA input file for possible errors (see :ref:`SLHA Checks <slhaChecks>`), 
-it is also necessary to define some of the particle's quantum numbers, as illustrated in
-the :download:`particles.py <images/particles.py>` file.
+and which are Z\ :sub:`2`-even (:ref:`Final states <final statesEven>`).
+These definitions must be given in a model file, including
+the particle's quantum numbers, as illustrated in
+the :download:`mssm.py <images/mssm.py>` file.
+A path to a user's own model file can be specified in the :ref:`parameter file <parameterFile>`, in the *[particles]* section.
 
 .. _xsecSLHA:
 

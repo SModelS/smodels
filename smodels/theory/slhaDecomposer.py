@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: slhaDecomposer
@@ -11,11 +11,11 @@
 
 import copy
 import time
-import sys
 import pyslha
 from smodels.theory import element, topology, crossSection
 from smodels.theory.branch import Branch, decayBranches
-from smodels.tools.physicsUnits import fb, GeV
+from smodels.tools.physicsUnits import fb, GeV, mm, m, MeV,fm
+import math
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -58,6 +58,8 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     xSectionList.removeLowerOrder()
     # Order xsections by PDGs to improve performance
     xSectionList.order()
+    #Reweight decays by fraction of prompt decays and add fraction of long-lived
+    brDic = _getPromptDecays(slhafile,brDic)
 
     # Get maximum cross sections (weights) for single particles (irrespective
     # of sqrtS)
@@ -82,7 +84,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         branchList[-1].masses = [massDic[pid]]
         branchList[-1].maxWeight = maxWeight[pid]
 
-    # Generate final branches (after all R-odd particles have decayed)    
+    # Generate final branches (after all R-odd particles have decayed)
     finalBranchList = decayBranches(branchList, brDic, massDic, sigcut)
     # Generate dictionary, where keys are the PIDs and values are the list of branches for the PID (for performance)
     branchListDict = {}
@@ -138,16 +140,15 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     logger.debug("slhaDecomposer done in %.2f s." % (time.time() -t1 ) )
     return smsTopList
 
-def writeIgnoreMessage ( keys, rEven, rOdd ):
+def writeIgnoreMessage(keys, rEven, rOdd):
     msg = ""
-    from smodels.particlesLoader import rEven
     for pid in keys:
         if not pid in list(rEven) + list(rOdd):
             logger.warning("Particle %i not defined in particles.py, its decays will be ignored" %(pid))
             continue
         if pid in rEven:
             msg += "%s, " % rEven[pid]
-            continue         
+            continue
     if len(msg)>0:
             logger.debug ( "Ignoring %s decays" % msg[:-2] )
 
@@ -158,23 +159,24 @@ def _getDictionariesFromSLHA(slhafile):
 
     """
 
+    from smodels.particlesLoader import rEven, rOdd
+
     res = pyslha.readSLHAFile(slhafile)
 
+   
     # Get mass and branching ratios for all particles
     brDic = {}
-    
-    from smodels.particlesLoader import rOdd, rEven    
-    writeIgnoreMessage ( res.decays.keys(), rEven.keys(), rOdd.keys() )
+    writeIgnoreMessage(res.decays.keys(), rEven, rOdd)
 
     for pid in res.decays.keys():
-        if not pid in list(rOdd.keys()):
+        if not pid in rOdd:
             continue
         brs = []
         for decay in res.decays[pid].decays:
             nEven = nOdd = 0.
             for pidd in decay.ids:
-                if pidd in rOdd.keys(): nOdd += 1
-                elif pidd in rEven.keys(): nEven += 1
+                if pidd in rOdd: nOdd += 1
+                elif pidd in rEven: nEven += 1
                 else:
                     logger.warning("Particle %i not defined in particles.py,decay %i -> [%s] will be ignored" %(pidd,pid,decay.ids))
                     break
@@ -196,3 +198,48 @@ def _getDictionariesFromSLHA(slhafile):
  
     return brDic, massDic
 
+
+
+def _getPromptDecays(slhafile,brDic,l_inner=1.*mm,gb_inner=1.3,l_outer=10.*m,gb_outer=1.43):
+    """
+    Using the widths in the slhafile, reweights the BR dictionary with the fraction
+    of prompt decays and add the fraction of "long-lived decays".
+    The fraction of prompt decays and "long-lived decays" are defined as:
+    F_prompt = 1 - exp(-width*l_inner/gb_inner)
+    F_long = exp(-width*l_outer/gb_outer)
+    where l_inner is the inner radius of the detector, l_outer is the outer radius
+    and gb_x is the estimate for the kinematical factor gamma*beta for each case.
+    We use gb_outer = 10 and gb_inner= 0.5
+    :param widthDic: Dictionary with the widths of the particles
+    :param l_inner: Radius of the inner tracker
+    :param gb_inner: Effective gamma*beta factor to be used for prompt decays
+    :param l_outer: Radius of the outer detector
+    :param gb_outer: Effective gamma*beta factor to be used for long-lived decays
+    
+    :return: Dictionary = {pid : decay}
+    """
+    
+    hc = 197.327*MeV*fm  #hbar * c
+        
+    #Get the widths:
+    res = pyslha.readSLHAFile(slhafile)
+    decays = res.decays    
+        
+    for pid in brDic:
+        width = abs(decays[abs(pid)].totalwidth)*GeV
+        Fprompt = 1. - math.exp(-width*l_inner/(gb_inner*hc))
+        Flong = math.exp(-width*l_outer/(gb_outer*hc))
+        for decay in brDic[pid]:
+            decay.br *= Fprompt  #Reweight by prompt fraction
+            
+        #Add long-lived fraction:
+        if Flong > 1e-50:
+            stableFraction = pyslha.Decay(br=Flong,ids=[],nda=0)
+            brDic[pid].append(stableFraction) 
+        if (Flong+Fprompt) > 1.:
+            logger.error("Sum of decay fractions > 1 for "+str(pid))
+            return False
+        if (Flong+Fprompt) < 0.8:
+            logger.info("Particle with PDG %i has a considerable fraction of displaced decays, which will be ignored." %pid)
+        
+    return brDic

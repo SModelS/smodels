@@ -7,7 +7,7 @@
 """
 
 from smodels.theory.particleNames import elementsInStr
-from smodels.theory.branch import Branch
+from smodels.theory.branch import Branch,InclusiveBranch
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -25,13 +25,17 @@ class Element(object):
                           Holds a pair of (whence, mother element), where
                           whence describes what process generated the element    
     """
-    def __init__(self, info=None ):
+    def __init__(self, info=None, finalState=None):
         """
         Initializes the element. If info is defined, tries to generate
         the element using it.
         
         :parameter info: string describing the element in bracket notation
                          (e.g. [[[e+],[jet]],[[e-],[jet]]])
+                         
+        :parameter finalState: list containing the final state labels for each branch
+                         (e.g. ['MET', 'HSCP'] or ['MET','MET'])
+                         
         """
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList()
@@ -61,12 +65,19 @@ class Element(object):
                         return None
                     self.branches = []                    
                     for branch in branches:
-                        self.branches.append(Branch(branch))
+                        if branch == '[*]':
+                            self.branches.append(InclusiveBranch())
+                        else:
+                            self.branches.append(Branch(branch))
             # Create element from branch pair
             elif type(info) == type([]) and type(info[0]) == type(Branch()):
                 for ib, branch in enumerate(info):
                     self.branches[ib] = branch.copy()
         
+        if finalState is None:
+            self.setFinalState([finalState]*len(self.branches))
+        else:
+            self.setFinalState(finalState)
     
     def __cmp__(self,other):
         """
@@ -76,7 +87,10 @@ class Element(object):
         :param other:  element to be compared (Element object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
-        
+
+        if not isinstance(other,Element):
+            return -1
+                
         #Compare branches:
         if self.branches != other.branches:            
             comp = self.branches > other.branches
@@ -101,9 +115,20 @@ class Element(object):
         
         :returns: string representation of the element (in bracket notation)    
         """
-        particleString = str(self.getParticles()).replace(" ", "").\
-                replace("'", "")
-        return particleString
+        
+        elStr = "["+",".join([str(br) for br in self.branches])+"]"
+        elStr = elStr.replace(" ", "").replace("'", "")
+        return elStr
+    
+    def toStr(self):
+        """
+        Returns a string with the element represented in bracket notation,
+        including the final states, e.g. [[[jet]],[[jet]] (MET,MET)
+        """
+        
+        elStr = str(self)+' '+str(tuple(self.getFinalStates())).replace("'","")
+        
+        return elStr
     
     def sortBranches(self):
         """
@@ -117,12 +142,25 @@ class Element(object):
             br.sortParticles()
         #Now sort branches
         self.branches = sorted(self.branches)
+        
+    def setFinalState(self,finalStates):
+        """
+        If finalStates = None, define the element final states according to the PID of the
+        last R-odd particle appearing in the cascade decay.
+        Else set the final states according to the finalStates list (must
+        match the branch ordering)
+        
+        :parameter finalStates: List with final state labels (must match the branch ordering)
+        """
 
+        for i,br in enumerate(self.branches):
+            br.setFinalState(finalStates[i])
 
     def particlesMatch(self, other, branchOrder=False):
         """
         Compare two Elements for matching particles only.
-        Allow for inclusive particle labels (such as the ones defined in particles.py).
+        Allow for inclusive particle labels (such as the ones defined in particles.py)
+        and includes final state comparison.
         If branchOrder = False, check both branch orderings.
         
         :parameter other: element to be compared (Element object)
@@ -131,8 +169,7 @@ class Element(object):
         :returns: True, if particles match; False, else;        
         """
         
-        
-        if type(self) != type(other):
+        if not isinstance(other,Element):
             return False
         
         if len(self.branches) != len(other.branches):
@@ -226,6 +263,19 @@ class Element(object):
         for branch in self.branches:
             ptcarray.append(branch.particles)
         return ptcarray
+    
+    
+    def getFinalStates(self):
+        """
+        Get the array of particles in the element.
+        
+        :returns: list of particle strings                
+        """
+        
+        fsarray = []
+        for branch in self.branches:
+            fsarray.append(branch.finalState)
+        return fsarray      
 
 
     def getMasses(self):
@@ -293,7 +343,7 @@ class Element(object):
 
     def getEinfo(self):
         """
-        Get topology info from particle string.
+        Get element topology info from branch topology info.
         
         :returns: dictionary containing vertices and number of final states information  
         """
@@ -301,8 +351,9 @@ class Element(object):
         vertnumb = []
         vertparts = []
         for branch in self.branches:
-            vertparts.append([len(ptcs) for ptcs in branch.particles])
-            vertnumb.append(len(branch.particles))
+            bInfo = branch.getInfo()
+            vertparts.append(bInfo['vertparts'])
+            vertnumb.append(bInfo['vertnumb'])
                 
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
 
@@ -325,8 +376,6 @@ class Element(object):
                   and exits otherwise.
         """
         info = self.getEinfo()
-        from smodels.particlesLoader import rEven
-        from smodels.theory.particleNames import ptcDic
         for ib, branch in enumerate(self.branches):
             for iv, vertex in enumerate(branch.particles):
                 if len(vertex) != info['vertparts'][ib][iv]:

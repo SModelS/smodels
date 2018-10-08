@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: testAsciiGraph
@@ -28,9 +28,8 @@ class AsciiTest(unittest.TestCase):
         """ draw ascii graph """
         from smodels.tools import asciiGraph
         from smodels.theory import lheReader, lheDecomposer, crossSection
-        from smodels.installation import installDirectory
 
-        filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory() )
+        filename = "./testFiles/lhe/simplyGluino.lhe"
         reader = lheReader.LheReader(filename)
         event = reader.next()
         element = lheDecomposer.elementFromEvent(event,

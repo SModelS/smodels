@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 .. module:: coverage
@@ -8,8 +8,9 @@
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 
 """
-import copy, sys
+import copy
 from smodels.tools.physicsUnits import fb
+from smodels.theory.element import Element
 
 class Uncovered(object):
     """
@@ -18,7 +19,7 @@ class Uncovered(object):
     :ivar sumL: if true, sum up electron and muon to lepton, for missing topos
     :ivar sumJet: if true, sum up jets, for missing topos
     :ivar sqrts: Center of mass energy. If defined it will only consider cross-sections
-                for this value. Otherwise the highest sqrts value will be used.
+    for this value. Otherwise the highest sqrts value will be used.
     """
     def __init__(self, topoList, sumL=True, sumJet=True, sqrts=None):
         
@@ -34,6 +35,7 @@ class Uncovered(object):
         self.motherIDs = []
         self.prevMothers = []
         self.outsideGridMothers = []
+        self.uncompressedEls = []
         self.getAllMothers(topoList)
         self.fill(topoList)
         self.asymmetricBranches.combine()
@@ -56,7 +58,10 @@ class Uncovered(object):
         :ivar topoList: sms topology list
         """
         for el in topoList.getElements(): # loop over all elements, by construction we start with the most compressed
-            if self.inPrevMothers(el): missing = False # cannot be missing if element with same mothers has already appeared
+            if not el.motherElements:
+                self.uncompressedEls.append(el) #Store all compressed elements
+            if self.inPrevMothers(el):
+                missing = False # cannot be missing if element with same mothers has already appeared
             # this is because it can certainly be compressed further to the smaller element already seen in the loop
             else: #if not the case, we add mothers to previous mothers and test if the topology is missin
                 self.addPrevMothers(el)
@@ -174,6 +179,17 @@ class Uncovered(object):
             mothers = newmothers
         return missingX
 
+    def getTotalXsec(self,sqrts=None):
+        """
+        Calculate total cross-section from decomposition (excluding compressed elements)
+        :ivar sqrts: sqrts
+        """
+        xsec = 0.
+        if not sqrts:
+            sqrts = self.sqrts
+        for el in self.uncompressedEls:
+            xsec += el.weight.getXsecsFor(sqrts).getMaxXsec().asNumber(fb)
+        return xsec
 
 
     def getMissingXsec(self, sqrts=None):
@@ -236,7 +252,7 @@ class UncoveredClassifier(object):
         for pids in el.getMothers():
             cPIDs = []
             for pid in pids:
-              cPIDs.append(abs(pid))
+                cPIDs.append(abs(pid))
             cPIDs.sort()
             if not cPIDs in allPIDs:
                 allPIDs.append(cPIDs)
@@ -339,7 +355,12 @@ class UncoveredList(object):
         in the list, add weight to topology
         :parameter el: element to be added
         """
-        name = self.orderbranches(self.generalName(el.__str__()))
+        
+        #Create a new element with the general name in order to fix the branch ordering:
+        newEl = Element(self.generalName(str(el)),finalState=el.getFinalStates())
+        newEl.sortBranches()
+        name = str(newEl) + ' (%s)'%(str(newEl.getFinalStates()).replace('[','').replace(']',''))
+        name = name.replace("'","").replace(' ','')
         for topo in self.topos:
             if name == topo.topo:
                 topo.contributingElements.append(el)
@@ -364,18 +385,3 @@ class UncoveredList(object):
             for on in ptcDic[pn]:
                 instr = instr.replace(on, pn).replace("hijetjets","higgs")
         return instr
-
-    def orderbranches(self, instr):
-        """
-        unique ordering of branches
-        :parameter instr: element as string
-        :returns: string of ordered element
-        """
-        from smodels.theory.element import Element
-        li = Element(instr).getParticles()
-        for be in li:
-            for ve in be:
-                ve.sort()
-        li.sort()
-        return str(li).replace("'", "").replace(" ", "")
-
