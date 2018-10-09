@@ -18,7 +18,7 @@ htmls=glob.glob("*.html")
 def run ( nb ):
     cmd1="%s --to html %s" % ( cmd, nb )
     cmd2="%s --to python %s" % ( cmd, nb )
-    print ( "convert! %s" % cmd1 )
+    print ( "convert: %s" % cmd1 )
     subprocess.getoutput ( cmd1 )
     subprocess.getoutput ( cmd2 )
 

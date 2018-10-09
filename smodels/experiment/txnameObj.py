@@ -225,12 +225,16 @@ class TxName(object):
         inside the efficiency map grid.  If it does, returns the corresponding
         efficiency value, else returns efficiency = 0.
 
-        :param element: Element object
+        :param element: Element object or mass array
         :return: efficiency (float)
         """
 
-        #Check if the element appears in Txname:
-        val = self.txnameData.getValueFor(element.getMasses())
+        #Check if the element appears in Txname:        
+        if isinstance(element,Element):
+            mass = element.getMasses()
+        elif isinstance(element,list):
+            mass = element
+        val = self.txnameData.getValueFor(mass)
         if isinstance(val,unum.Unum):
             return 1.  #The element has an UL, return 1
         elif val is None or math.isnan(val):

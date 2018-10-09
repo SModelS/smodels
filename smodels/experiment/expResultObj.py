@@ -249,7 +249,7 @@ class ExpResult(object):
 
         """
         
-        attributes = getAttributesFrom(self,showPrivate)        
+        attributes = getAttributesFrom(self)        
 
         if not showPrivate:
             attributes = list(filter(lambda a: a[0] != '_', attributes))

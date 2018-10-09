@@ -48,6 +48,13 @@ New in Version 2.0.0:
   * Moved :ref:`lifetime reweighting <dbReweighting>` to |database| for meta-stable particles
   * Added approximate lifetime reweighting for :ref:`missing topologies <topCoverage>` 
 
+New in Version 1.2.1:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Fix in particleNames.py for non-MSSM models
+  * Fixed the `marginalize <marginalize.html>`_ recipe
+  * Fixed the T2bbWWoff 44 signal regions plots in `ConfrontPredictions <ConfrontPredictions.html>`_  in manual
+
 New in Version 1.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
 

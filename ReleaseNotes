@@ -4,6 +4,13 @@ Release v2.0.0, Nov 2018
   * Included Particle class
   * Particles are compared according to their properties
 
+Release v1.2.1, Tue 9 Oct 2018
+=======================================================
+
+  * Fix in particleNames for non-MSSM models
+  * Fixed the "marginalize" recipe
+  * Fixed the T2bbWWoff 44 signal regions plots in manual
+
 Release v1.2.0, Wed 15 Aug 2018
 =======================================================
 
