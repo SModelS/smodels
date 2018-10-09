@@ -20,6 +20,8 @@ from smodels.tools.physicsUnits import fb
 from smodels.share.models.mssm import st1,gluino,n1
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
+from smodels.theory.element import Element
+from smodels.theory.topology import Topology
  
 class TopoCombTest(unittest.TestCase):
     def createSLHAFile(self,case="T1tttt"):
@@ -77,6 +79,75 @@ XSECTION  1.30E+04  2212 2212 2 1000021 1000021 # 10000 events, [pb], pythia8 fo
         ## of the pure scenarios. The factor of two comes from the fact, that we loose 50% 
         ## to asymmetric branches
         self.assertTrue ( rvalues["T5"] < 2*rvalues["mixed"] < rvalues["T1"] )
+        
+        
+    def testTopoComparison(self):
+        
+        el1 = Element("[[*],[[e-,e+],[mu-]]]",finalState=['MET','MET'])
+        el2 = Element("[[[mu-]],[[e-,e+],[mu-]]]",finalState=['MET','MET'])
+        el3 = Element("[[[mu-,mu+],[mu-]],[[e-,e+],[mu-]]]",finalState=['HSCP','MET'])
+        el4 = Element("[[[*,*]],[[e-,e+],[mu-]]]",finalState=['HSCP','HSCP'])
+        el5 = Element("[[[*]],[[e-,e+],[mu-]]]",finalState=['MET','MET'])
+        el6 = Element("[[['mu-']],[[mu+]]]",finalState=['MET','MET'])
+        el7 = Element("[['*'],[[mu+]]]",finalState=['MET','MET'])
+        
+        el1rev = Element("[[[e-,e+],[mu-]],[*]]",finalState=['MET','MET'])
+        el2rev = Element("[[[e-,e+],[mu-]],[[mu-]]]",finalState=['MET','MET'])
+        el3rev = Element("[[[e-,e+],[mu-]],[[mu-,mu+],[mu-]]]",finalState=['MET','HSCP'])
+        el4rev = Element("[[[e-,e+],[mu-]],[[*,*]]]",finalState=['HSCP','HSCP'])
+        el5rev = Element("[[[e-,e+],[mu-]],[[*]]]",finalState=['MET','MET'])
+        el6rev = Element("[[['mu+']],[[mu-]]]",finalState=['MET','MET'])
+        el7rev = Element("[[[mu+]],['*']]",finalState=['MET','MET'])
+        
+        
+        topo1 = Topology(elements=[el1])
+        topo2 = Topology(elements=[el2])
+        topo3 = Topology(elements=[el3])
+        topo4 = Topology(elements=[el4])
+        topo5 = Topology(elements=[el5])
+        topo6 = Topology(elements=[el6])
+        topo7 = Topology(elements=[el7])
+        topo1rev = Topology(elements=[el1rev])
+        topo2rev = Topology(elements=[el2rev])
+        topo3rev = Topology(elements=[el3rev])
+        topo4rev = Topology(elements=[el4rev])
+        topo5rev = Topology(elements=[el5rev])
+        topo6rev = Topology(elements=[el6rev])
+        topo7rev = Topology(elements=[el7rev])
+
+        
+        allTopos = [topo1,topo2,topo3,topo4,topo5,topo6,topo7]
+        allToposrev = [topo1rev,topo2rev,topo3rev,topo4rev,topo5rev,topo6rev,topo7rev]
+        
+        
+        answ = [True, True, True, True, True, False, True, True, False, False, 
+        True, False, True, True, False, False, False, False, True, False, 
+        False, False, True, False, True, True, True, True]
+        
+        tests = []
+        for i,topoA in enumerate(allTopos):
+            for j,topoB in enumerate(allTopos):
+                if i > j: continue
+        #         print(i+1,j+1,topoA,topoB,topoA == topoB,topoB == topoA)
+                tests.append(topoA == topoB)
+        self.assertEqual(tests,answ)                
+
+        tests = []
+        for i,topoA in enumerate(allToposrev):
+            for j,topoB in enumerate(allToposrev):
+                if i > j: continue
+        #         print(i+1,j+1,topoA,topoB,topoA == topoB,topoB == topoA)
+                tests.append(topoA == topoB)
+        self.assertEqual(tests,answ)            
+        
+        tests = []
+        for i,topoA in enumerate(allTopos):
+            for j,topoB in enumerate(allToposrev):
+                if i > j: continue
+        #         print(i+1,j+1,topoA,topoB,topoA == topoB,topoB == topoA)
+                tests.append(topoA == topoB)
+        self.assertEqual(tests,answ)                
+            
 
  
 if __name__ == "__main__":

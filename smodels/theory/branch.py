@@ -494,16 +494,6 @@ class InclusiveBranch(Branch):
     
     def getMasses(self):
         return InclusiveList()
-    
-    def setInfo(self):
-        """
-        Defines the number of vertices (vertnumb) and number of
-        particles in each vertex (vertpats) properties, if they have not
-        been defined yet.
-        """
-
-        self.vertnumb = InclusiveValue()
-        self.vertparts = InclusiveList()
         
     def getInfo(self):
         """
@@ -516,7 +506,6 @@ class InclusiveBranch(Branch):
         vertparts = InclusiveList()
         
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
-        
         
     def decayDaughter(self):
         """
