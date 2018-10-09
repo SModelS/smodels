@@ -17,6 +17,7 @@ from smodels.theory.auxiliaryFunctions import getAttributesFrom,getValuesForObj
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.theory.element import Element
+from smodels.theory.particle import Particle
 import itertools
 
 class DataSet(object):
@@ -134,7 +135,15 @@ class DataSet(object):
         same as self.getTxName(txname).getEfficiencyFor(m)
         """
         txname = self.getTxName(txname)
-        if txname: return txname.getEfficiencyFor(mass)
+        if txname: 
+            element = Element()
+            element.branches[0].BSMparticles = []         
+            element.branches[1].BSMparticles = []  
+            for nbranch,branch in enumerate(mass):
+                for nbsm,bsmMass in enumerate(branch):
+                    particle = Particle(mass = bsmMass)
+                    element.branches[nbranch].BSMparticles.append(particle)
+            return txname.getEfficiencyFor(element)
         return None
 
     def getValuesFor(self,attribute):
