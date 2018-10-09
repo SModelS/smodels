@@ -144,7 +144,7 @@ class DataSet(object):
                     particle = Particle(mass = bsmMass)
                     element.branches[nbranch].BSMparticles.append(particle)
             return txname.getEfficiencyFor(element)
-        return None
+        return None 
 
     def getValuesFor(self,attribute):
         """
