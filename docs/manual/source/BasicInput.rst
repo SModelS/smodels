@@ -45,13 +45,13 @@ New Particles
 Besides information about the masses and branching ratios, the user must also define
 which particles are Z\ :sub:`2`-odd states (:ref:`Intermediate states <odd states>`) 
 and which are Z\ :sub:`2`-even (:ref:`Final states <final states>`).
-These definitions must be given in the *smodels/share/models/newmodel.py*, the default is :download:`default_particles.py <images/default_particles.py>`,
+These definitions must be given in the *smodels/share/models/newmodel.py*, the default is :download:`mssm.py <images/mssm.py>`,
 where some values (for SM and MSSM particles) are already loaded.
 A path to a user's own particles.py can be specified in the :ref:`parameter file <parameterFile>`, in the *[particles]* section.
 
 If the user wants to check the SLHA input file for possible errors (see :ref:`SLHA Checks <slhaChecks>`), 
 it is also necessary to define some of the particle's quantum numbers, as illustrated in
-the :download:`default_particles.py <images/default_particles.py>` file.
+the :download:`mssm.py <images/mssm.py>` file.
 
 .. _xsecSLHA:
 

@@ -78,7 +78,7 @@ rEven = SMList + higgs + higgsC
 
 #Generic BSM particles:
 
-BSMList = rOdd + rOddC
+BSMList = rOdd + rOddC + higgs + higgsC
 BSMparticleList = MultiParticle('BSM', BSMList)
 
 

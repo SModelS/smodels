@@ -86,7 +86,7 @@ sgluon1 = Particle(Z2parity='odd', label='sgluon2', pdg=3000022, eCharge=0, colo
 
 
 squarks = [sdl,sul,sdr,sur] + [ssl,scl,ssr,scr] + [sb1,st1,sb2,st2]
-sleptons = [sel,snel,ser, snelr] + [smul,snmul,smur,snmur] + [sta1,sntal,sta2,sntar]
+sleptons = [sel,snel,ser, sner] + [smul,snmul,smur,snmur] + [sta1,sntal,sta2,sntar]
 inos = [gluino1,gluino2] + [n1,n2,n3,n4,n5,n6] + [c1,c2,c3] + [gravitino]
 
 rOdd = squarks + sleptons + inos 
@@ -99,6 +99,6 @@ rEven = SMList + higgs + higgsC
 
 #Generic BSM particles:
 
-BSMList = rOdd + rOddC
+BSMList = rOdd + rOddC + higgs + higgsC
 BSMparticleList = MultiParticle('BSM', BSMList)
 

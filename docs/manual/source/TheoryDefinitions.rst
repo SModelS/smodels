@@ -104,7 +104,7 @@ In contrast, stable or long-lived Z\ :sub:`2`-odd particles which might appear i
 are *not* classified as final states [#f2]_ .
 
 
-* Z\ :sub:`2`-even **states are defined in** smodels/share/default_particles.py 
+* Z\ :sub:`2`-even **states are defined in** smodels/share/models/SMparticles.py 
 
 .. _odd states:
 

@@ -10,8 +10,8 @@
 
 """
 
-## place to keep the pointer to the model file
-modelFile="smodels.share.default_particles"
+## place to keep the pointer to the model file (default = mssm)
+modelFile="smodels.share.models.mssm"
 
 def filetype ( filename ):
     """ obtain information about the filetype of an input file,
