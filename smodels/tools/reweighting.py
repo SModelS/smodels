@@ -19,14 +19,14 @@ def addPromptAndDisplaced(branch):
     """
     
     if not branch.evenParticles: # no decays happened
-        if branch.BSMparticles[0].eCharge == 0 and branch.BSMparticles[0].colordim == 1: branch._decayType = 'METonly'
+        if branch.oddParticles[0].eCharge == 0 and branch.oddParticles[0].colordim == 1: branch._decayType = 'METonly'
         else: branch._decayType = 'longlived'
         probabilities = [1.]
         branches = [branch]
         return probabilities, branches 
    
     F = []
-    for particle in branch.BSMparticles:
+    for particle in branch.oddParticles:
         if isinstance(particle.totalwidth, list):
             width = min(particle.totalwidth)
         else: width = particle.totalwidth
@@ -37,7 +37,7 @@ def addPromptAndDisplaced(branch):
         else:    
             F_long, F_prompt, F_displaced = calculateProbabilities(width)
         # allow for combinations of decays and a long lived particle only if the last BSM particle is the long lived one
-        if particle == branch.BSMparticles[-1]: F.append([F_long])
+        if particle == branch.oddParticles[-1]: F.append([F_long])
         else: F.append([F_prompt,F_displaced])
     
     # call the whole branch: 
@@ -105,7 +105,7 @@ def labelPromptDisplaced(branch):
     :return: branches with correct labels  
     """
     promptBranch = branch.copy()
-    if branch.BSMparticles[-1].isMET(): promptBranch._decayType = 'prompt'
+    if branch.oddParticles[-1].isMET(): promptBranch._decayType = 'prompt'
     else: promptBranch._decayType = 'longlived'
     
     displacedBranch = branch.copy()       

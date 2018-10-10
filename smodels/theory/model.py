@@ -29,7 +29,7 @@ class Model(object):
         
         
         self.inputFile = inputFile
-        self.BSMparticles = [copy.deepcopy(particle) for particle in BSMparticles]
+        self.oddParticles = [copy.deepcopy(particle) for particle in BSMparticles]
         self.SMparticles = SMparticles[:]
         
     def __str__(self):
@@ -44,7 +44,7 @@ class Model(object):
         """
     
         particleList = []
-        for particle in self.BSMparticles + self.SMparticles:            
+        for particle in self.oddParticles + self.SMparticles:            
             if any(not hasattr(particle,attr) for attr in kwargs.keys()):
                 continue
             if any(getattr(particle,attr) != value for attr,value in kwargs.items()):
@@ -69,7 +69,7 @@ class Model(object):
         """
         
         valueList = []
-        for particle in self.BSMparticles+self.SMparticles:
+        for particle in self.oddParticles+self.SMparticles:
             if not hasattr(particle,attributeStr):
                 continue
             value = getattr(particle,attributeStr)
@@ -104,11 +104,11 @@ class Model(object):
             logger.info("Using LHE input. All unstable particles will be assumed to have prompt decays.")
             logger.info("Using LHE input. All particles not appearing in the events will be removed from the model.")
             BSMparticlesInEvents = []
-            for particle in self.BSMparticles:
+            for particle in self.oddParticles:
                 if not particle.pdg in massDict and not -particle.pdg in massDict:
                     continue
                 BSMparticlesInEvents.append(particle)
-            self.BSMparticles = BSMparticlesInEvents
+            self.oddParticles = BSMparticlesInEvents
                 
         sys.stderr = storeErr
         
@@ -117,7 +117,7 @@ class Model(object):
         allPDGs = list(set(evenPDGs + oddPDGs))
         
         #Remove cross-sections for even particles or particles which do not belong to the model:
-        modelPDGs = [particle.pdg for particle in self.BSMparticles if isinstance(particle.pdg,int)]
+        modelPDGs = [particle.pdg for particle in self.oddParticles if isinstance(particle.pdg,int)]
         for xsec in self.xsections.xSections[:]:
             for pid in xsec.pid:
                 if not pid in modelPDGs:
@@ -129,7 +129,7 @@ class Model(object):
         
 
 
-        for particle in self.BSMparticles:
+        for particle in self.oddParticles:
             if isinstance(particle,(ParticleList,InclusiveParticle)):
                 continue
 

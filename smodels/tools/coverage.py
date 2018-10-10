@@ -258,7 +258,7 @@ class UncoveredList(object):
         newEl.branches[0]._decayType = el.branches[0]._decayType
         newEl.branches[1]._decayType = el.branches[1]._decayType
         for ib,branch in enumerate(el.branches):
-            newEl.branches[ib].BSMparticles = branch.BSMparticles[:]
+            newEl.branches[ib].oddParticles = branch.oddParticles[:]
         newEl.missingX = el.missingX
                  
         if self.sumL: exch = [fS.WList, fS.lList, fS.tList, fS.taList, fS.nuList] 

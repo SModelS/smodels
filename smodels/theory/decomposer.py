@@ -67,7 +67,7 @@ def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
             raise SModelSError("Particle for pdg %i has not been defined.")
         if len(bsmParticle) != 1:
             raise SModelSError("Particle with pdg %i has multiple definitions.")
-        branchList[-1].BSMparticles = [bsmParticle[0]]
+        branchList[-1].oddParticles = [bsmParticle[0]]
         if not pid in pdgList:
             logger.error("PDG %i has not been defined" %int(pid))
         branchList[-1].maxWeight = maxWeight[pid]        
@@ -78,10 +78,10 @@ def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
     # Generate dictionary, where keys are the PIDs and values are the list of branches for the PID (for performance)
     branchListDict = {}
     for branch in finalBranchList:
-        if branch.BSMparticles[0].pdg in branchListDict:
-            branchListDict[branch.BSMparticles[0].pdg].append(branch)
+        if branch.oddParticles[0].pdg in branchListDict:
+            branchListDict[branch.oddParticles[0].pdg].append(branch)
         else:
-            branchListDict[branch.BSMparticles[0].pdg] = [branch]
+            branchListDict[branch.oddParticles[0].pdg] = [branch]
 
     for pid in xSectionList.getPIDs():
         if not pid in branchListDict:

@@ -137,12 +137,12 @@ class DataSet(object):
         txname = self.getTxName(txname)
         if txname: 
             element = Element()
-            element.branches[0].BSMparticles = []         
-            element.branches[1].BSMparticles = []  
+            element.branches[0].oddParticles = []         
+            element.branches[1].oddParticles = []  
             for nbranch,branch in enumerate(mass):
                 for nbsm,bsmMass in enumerate(branch):
                     particle = Particle(mass = bsmMass)
-                    element.branches[nbranch].BSMparticles.append(particle)
+                    element.branches[nbranch].oddParticles.append(particle)
             return txname.getEfficiencyFor(element)
         return None 
 

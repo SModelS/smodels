@@ -34,21 +34,21 @@ class ReweightingTest(unittest.TestCase):
     def testaddPromptAndDisplaced(self):        
     
         branch1 = Branch()
-        branch1.BSMparticles = [n1]
+        branch1.oddParticles = [n1]
         probabilities1, branches1 = addPromptAndDisplaced(branch1)
         self.assertEqual(len(probabilities1), 1)
         self.assertEqual(probabilities1[0], 1.)
         self.assertEqual(branches1[0]._decayType, 'METonly')
         
         branch2 = Branch()
-        branch2.BSMparticles = [gluino]
+        branch2.oddParticles = [gluino]
         probabilities2, branches2 = addPromptAndDisplaced(branch2)
         self.assertEqual(len(probabilities2), 1)
         self.assertAlmostEqual(probabilities2[0], 1.)
         self.assertEqual(branches2[0]._decayType, 'longlived')
         
         branch3 = Branch()
-        branch3.BSMparticles = [st1,n1]
+        branch3.oddParticles = [st1,n1]
         branch3.evenParticles = [[t]]
         probabilities3, branches3 = addPromptAndDisplaced(branch3)
         self.assertEqual(len(probabilities3), 2)

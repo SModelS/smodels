@@ -51,7 +51,7 @@ class ClustererTest(unittest.TestCase):
 
         b1 = Branch()
         b1.evenParticles = [[u,u]]
-        b1.BSMparticles = [gluino, n1]
+        b1.oddParticles = [gluino, n1]
         b2 = b1.copy()
         el1 = Element()
         el1.branches=[b1,b2]  
@@ -61,8 +61,8 @@ class ClustererTest(unittest.TestCase):
 
         ## make a second element with a slightly different gluino mass
         el2=copy.deepcopy(el1)
-        el2.branches[0].BSMparticles[0].__setattr__("mass", 725.*GeV) 
-        el2.branches[1].BSMparticles[0].__setattr__("mass", 725.*GeV)  
+        el2.branches[0].oddParticles[0].__setattr__("mass", 725.*GeV) 
+        el2.branches[1].oddParticles[0].__setattr__("mass", 725.*GeV)  
         el2.txname = txname
 
         # lets now cluster the two different gluino masses.

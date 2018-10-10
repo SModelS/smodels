@@ -64,8 +64,8 @@ class TxTest(unittest.TestCase):
         el = Element(info="[[[e+]],[]]",finalState = ['HSCP','MET'])
         setattr(n1, 'mass', 200*GeV)
         setattr(c1, 'mass', 150*GeV)
-        el.branches[0].BSMparticles = [n1]
-        el.branches[1].BSMparticles = [c1]        
+        el.branches[0].oddParticles = [n1]
+        el.branches[1].oddParticles = [c1]        
         
         self.assertEqual(tx.getEfficiencyFor(el), 0.12396)
          

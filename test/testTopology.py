@@ -48,13 +48,13 @@ w3.xSections[0].value = 2.*fb
 
 b1 = Branch()
 b1.evenParticles = [[t],[b,t]]
-b1.BSMparticles = [gluino,st1,n1]
+b1.oddParticles = [gluino,st1,n1]
 b1b = Branch()
 b1b.evenParticles = [[t],[b,t]]
-b1b.BSMparticles = [gluino,st1,n1]
+b1b.oddParticles = [gluino,st1,n1]
 b2 = Branch()
 b2.evenParticles = [[b,t]]
-b2.BSMparticles = [st1,n1]
+b2.oddParticles = [st1,n1]
 b1.setInfo()
 b2.setInfo()
  

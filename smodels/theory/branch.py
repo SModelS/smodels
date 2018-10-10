@@ -43,7 +43,7 @@ class Branch(object):
         """
         
         self.evenParticles = []
-        self.BSMparticles = []
+        self.oddParticles = []
         
         self.maxWeight = None
         self.vertnumb = None
@@ -61,7 +61,7 @@ class Branch(object):
                         raise SModelSError("Final state anyBSM has not been defined in finalStateParticles.py")
                     if len(bsmParticle) != 1:
                         raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)          
-                    self.BSMparticles.append(bsmParticle[0])
+                    self.oddParticles.append(bsmParticle[0])
                     particleNames = vertex[1:-1].split(',')
                     ptcs = []
                     for pname in particleNames:
@@ -84,7 +84,7 @@ class Branch(object):
         else:
             bsmParticle = anyBSM
             
-        self.BSMparticles.append(bsmParticle)
+        self.oddParticles.append(bsmParticle)
 
     def __str__(self):
         """
@@ -132,14 +132,14 @@ class Branch(object):
                     return comp
                 
         #Compare BSM states by Z2parity and mass (except final state particle):
-        for iptc,bsmParticle in enumerate(self.BSMparticles[:-1]):
-            comp = bsmParticle.cmpProperties(other.BSMparticles[iptc],properties=['Z2parity','mass', 'totalwidth'])
+        for iptc,bsmParticle in enumerate(self.oddParticles[:-1]):
+            comp = bsmParticle.cmpProperties(other.oddParticles[iptc],properties=['Z2parity','mass', 'totalwidth'])
             if comp:
                 return comp
             
         #Compare final BSM state by Z2parity, mass and quantum numbers:
-        if self.BSMparticles and other.BSMparticles:
-            comp = self.BSMparticles[-1].cmpProperties(other.BSMparticles[-1],
+        if self.oddParticles and other.oddParticles:
+            comp = self.oddParticles[-1].cmpProperties(other.oddParticles[-1],
                                                    properties=['Z2parity','mass','colordim','eCharge'])
             if comp:
                 return comp 
@@ -165,10 +165,10 @@ class Branch(object):
         :return: List with masses
         """      
         bsmMasses = []    
-        for bsm in self.BSMparticles:
+        for bsm in self.oddParticles:
             if not isinstance(bsm.mass, list): bsmMasses.append(bsm.mass)
             else: bsmMasses.append(bsm.mass[0])
-        #bsmMasses = [bsm.mass for bsm in self.BSMparticles]
+        #bsmMasses = [bsm.mass for bsm in self.oddParticles]
         
         return bsmMasses             
 
@@ -216,7 +216,7 @@ class Branch(object):
         
         """
         
-        self.BSMparticles = self.BSMparticles[:iv] + self.BSMparticles[iv+1:]
+        self.oddParticles = self.oddParticles[:iv] + self.oddParticles[iv+1:]
         self.evenParticles = self.evenParticles[:iv] + self.evenParticles[iv+1:]
         self.setInfo()
         
@@ -225,7 +225,7 @@ class Branch(object):
     def particlesMatch(self, other):
         """
         Compare two Branches for matching particles.
-        Only the final state particles (self.evenParticles and self.BSMparticles[-1])
+        Only the final state particles (self.evenParticles and self.oddParticles[-1])
         are used for comparison.
         Allow for inclusive particle labels (such as the ones defined in particleDefinitions.py)
 
@@ -253,8 +253,8 @@ class Branch(object):
                     return False
             
         #If the final state BSM particles have the same quantum numbers: 
-        if self.BSMparticles and other.BSMparticles:  
-            if not self.BSMparticles[-1].eqProperties(other.BSMparticles[-1],properties=['colordim','eCharge']):
+        if self.oddParticles and other.oddParticles:  
+            if not self.oddParticles[-1].eqProperties(other.oddParticles[-1],properties=['colordim','eCharge']):
                 return False             
         
         return True
@@ -271,7 +271,7 @@ class Branch(object):
         #Allows for derived classes (like inclusive classes)
         newbranch = self.__class__()
         newbranch.evenParticles = self.evenParticles[:]
-        newbranch.BSMparticles = self.BSMparticles[:]
+        newbranch.oddParticles = self.oddParticles[:]
         self.setInfo()
         newbranch.vertnumb = self.vertnumb
         newbranch.vertparts = self.vertparts[:]
@@ -287,7 +287,7 @@ class Branch(object):
         :returns: length of branch (number of odd particles)
         """
         
-        return len(self.BSMparticles)
+        return len(self.oddParticles)
     
     
     def combineWith(self,other):
@@ -303,16 +303,16 @@ class Branch(object):
         if self != other:
             raise SModelSError("Asked to combine distinct branches")
         
-        for iptc,bsm in enumerate(other.BSMparticles):
+        for iptc,bsm in enumerate(other.oddParticles):
             
-            if bsm is self.BSMparticles[iptc]:
+            if bsm is self.oddParticles[iptc]:
                 continue #Particles are the same (do nothing)
             
             #Else create a particle list with particles from both
-            if not isinstance(self.BSMparticles[iptc],ParticleList):
-                bsmList = ParticleList(label = 'BSM (combined)', particles=[self.BSMparticles[iptc]])
+            if not isinstance(self.oddParticles[iptc],ParticleList):
+                bsmList = ParticleList(label = 'BSM (combined)', particles=[self.oddParticles[iptc]])
             else:
-                bsmList = self.BSMparticles[iptc]
+                bsmList = self.oddParticles[iptc]
                 
             #Now combine even particles from both branches:
             if not isinstance(bsm,ParticleList):
@@ -328,7 +328,7 @@ class Branch(object):
                 newList.append(ptc)
             bsmList.particles = newList
             
-            self.BSMparticles[iptc] = bsmList
+            self.oddParticles[iptc] = bsmList
                         
 
 
@@ -350,7 +350,7 @@ class Branch(object):
             logger.warning("Decay %s does not preserve Z2 and will be ignored" %str(decay))
             return False
         
-        newBranch.BSMparticles.append(oddParticles[0])
+        newBranch.oddParticles.append(oddParticles[0])
         evenParticles = sorted(evenParticles, key=lambda x: x.label.lower())
         newBranch.evenParticles.append(evenParticles)
         
@@ -369,11 +369,11 @@ class Branch(object):
                   if daughterID was not defined.
         """   
         
-        if not self.BSMparticles or not self.BSMparticles[-1].decays: 
+        if not self.oddParticles or not self.oddParticles[-1].decays: 
             return False
 
         newBranches = []
-        for decay in self.BSMparticles[-1].decays:
+        for decay in self.oddParticles[-1].decays:
             if not decay or not decay.br:
                 continue  #Skip decay = None and zero BRs
             # Generate a new branch for each possible decay:
@@ -418,7 +418,7 @@ def decayBranches(branchList, sigcut=0.*fb):
                 continue
 
             #If None appear amongst the decays, add the possibility for the particle not decaying prompt
-            if any(x is None for x in inbranch.BSMparticles[-1].decays):            
+            if any(x is None for x in inbranch.oddParticles[-1].decays):            
                 stableBranches.append(inbranch)
             
             # Add all possible decays of the R-odd daughter to the original
@@ -434,7 +434,7 @@ def decayBranches(branchList, sigcut=0.*fb):
         unstableBranches = newBranchList           
     
     #Sort list by initial branch pdg:        
-    finalBranchList = sorted(stableBranches, key=lambda branch: branch.BSMparticles[0].pdg)      
+    finalBranchList = sorted(stableBranches, key=lambda branch: branch.oddParticles[0].pdg)      
 
     return finalBranchList
 
@@ -455,9 +455,9 @@ class InclusiveBranch(Branch):
                 raise SModelSError("Final state %s has not been defined in finalStateParticles.py" %finalState)
             if len(bsmParticle) != 1:
                 raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)          
-            self.BSMparticles = [bsmParticle[0]]
+            self.oddParticles = [bsmParticle[0]]
         else:
-            self.BSMparticles = [InclusiveParticle()]
+            self.oddParticles = [InclusiveParticle()]
         self.vertnumb = InclusiveValue()
         self.vertparts = InclusiveList()
         
@@ -477,9 +477,9 @@ class InclusiveBranch(Branch):
             return -1
         
         #If BSM particles are identical, avoid further checks                
-        if self.BSMparticles and other.BSMparticles:
+        if self.oddParticles and other.oddParticles:
             #Compare final BSM state by Z2parity and quantum numbers:
-            comp = self.BSMparticles[-1].cmpProperties(other.BSMparticles[-1],
+            comp = self.oddParticles[-1].cmpProperties(other.oddParticles[-1],
                                                        properties=['Z2parity','colordim','eCharge'])
             if comp:
                 return comp 

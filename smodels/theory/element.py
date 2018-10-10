@@ -244,7 +244,7 @@ class Element(object):
         :returns: list of Particle objects
         """
         
-        fsparticles = [branch.BSMparticles[-1] for branch in self.branches]
+        fsparticles = [branch.oddParticles[-1] for branch in self.branches]
 
         return fsparticles
 
@@ -270,7 +270,7 @@ class Element(object):
         
         BSMparticles = []
         for branch in self.branches:
-            BSMparticles.append([particle for particle in branch.BSMparticles])      
+            BSMparticles.append([particle for particle in branch.oddParticles])      
 
         return BSMparticles
 
@@ -300,7 +300,7 @@ class Element(object):
         
         daughterPIDs = []
         for branch in self.branches():
-            daughterPIDs.append(branch.BSMparticles[-1].pdg)
+            daughterPIDs.append(branch.oddParticles[-1].pdg)
             
         return daughterPIDs
     
@@ -315,7 +315,7 @@ class Element(object):
 
         momPIDs = []
         for branch in self.branches:
-            momPIDs.append(branch.BSMparticles[0].pdg)        
+            momPIDs.append(branch.oddParticles[0].pdg)        
         return momPIDs    
         
     def getMotherPIDs(self):
@@ -482,10 +482,10 @@ class Element(object):
             #Get mass differences      
      
             massDiffs = []
-            for i,mom in enumerate(branch.BSMparticles[:-1]):
-                if isinstance(branch.BSMparticles[i+1].mass, list):
-                    pmass = min(branch.BSMparticles[i+1].mass)
-                else: pmass = branch.BSMparticles[i+1].mass
+            for i,mom in enumerate(branch.oddParticles[:-1]):
+                if isinstance(branch.oddParticles[i+1].mass, list):
+                    pmass = min(branch.oddParticles[i+1].mass)
+                else: pmass = branch.oddParticles[i+1].mass
                 massDiffs.append(mom.mass - pmass)
             #Get vertices which have deltaM < minmassgap:
             removeVertices = [iv for iv,m in enumerate(massDiffs) if m < minmassgap]
@@ -493,7 +493,7 @@ class Element(object):
             while removeVertices:
                 newelement.removeVertex(ibr,removeVertices[0])
                 branch = newelement.branches[ibr]
-                massDiffs = [mom.mass - branch.BSMparticles[i+1].mass for i,mom in enumerate(branch.BSMparticles[:-1])]
+                massDiffs = [mom.mass - branch.oddParticles[i+1].mass for i,mom in enumerate(branch.oddParticles[:-1])]
                 removeVertices = [iv for iv,m in enumerate(massDiffs) if m < minmassgap]
                 
         for ibr,branch in enumerate(newelement.branches):
@@ -522,22 +522,22 @@ class Element(object):
                 continue
             #Check if the last decay should be removed:            
             neutralSM = all(ptc.isMET() for ptc in branch.evenParticles[-1])
-            neutralBSM = branch.BSMparticles[-2].isMET() 
+            neutralBSM = branch.oddParticles[-2].isMET() 
             if neutralBSM and neutralSM:
                 removeLastVertex = True
             else:
                 removeLastVertex = False
                 
-            while len(branch.BSMparticles) > 1 and removeLastVertex:
-                bsmMom = branch.BSMparticles[-2]
-                branch.removeVertex(len(branch.BSMparticles)-2)
+            while len(branch.oddParticles) > 1 and removeLastVertex:
+                bsmMom = branch.oddParticles[-2]
+                branch.removeVertex(len(branch.oddParticles)-2)
                 #For invisible compression, keep the mother of the vertex and not the daughter:
-                branch.BSMparticles[-1] = bsmMom
+                branch.oddParticles[-1] = bsmMom
                 #Re-check if the last decay should be removed:
                 if not branch.evenParticles:
                     continue
                 neutralSM = all(ptc.isMET() for ptc in branch.evenParticles[-1])
-                neutralBSM = branch.BSMparticles[-2].isMET()
+                neutralBSM = branch.oddParticles[-2].isMET()
                 if neutralBSM and neutralSM:
                     removeLastVertex = True
                 else:

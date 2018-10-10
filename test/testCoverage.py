@@ -36,7 +36,7 @@ class CoverageTest(unittest.TestCase):
         # prompt
         b1 = Branch()
         b1.evenParticles = [[b,t]]
-        b1.BSMparticles = [st1,n1]
+        b1.oddParticles = [st1,n1]
         b1.setInfo()
         el1 = Element()
         el1.branches=[b1,b1]
@@ -44,10 +44,10 @@ class CoverageTest(unittest.TestCase):
         # long-lived
         b3 = Branch()
         b3.evenParticles = []
-        b3.BSMparticles = [gluino]
+        b3.oddParticles = [gluino]
         b4 = Branch()
         b4.evenParticles = [[b,t]]
-        b4.BSMparticles = [st1,n1]
+        b4.oddParticles = [st1,n1]
         b3.setInfo()
         b4.setInfo()
         el2 = Element()
@@ -56,10 +56,10 @@ class CoverageTest(unittest.TestCase):
         # prompt and displaced
         b5 = Branch()
         b5.evenParticles = [[t],[b,t]]
-        b5.BSMparticles = [st2,st1,n1]
+        b5.oddParticles = [st2,st1,n1]
         b6 = Branch()
         b6.evenParticles = [[b,t]]
-        b6.BSMparticles = [st1,n1]
+        b6.oddParticles = [st1,n1]
         b5.setInfo()
         b6.setInfo()
         el3 = Element()

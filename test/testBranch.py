@@ -37,10 +37,10 @@ class BranchTest(unittest.TestCase):
         
         b1 = Branch(info = '[[q,q],[q],[q,q]]', finalState = 'MET')
         b2 = Branch(info = '[[q]]')
-        b2.BSMparticles = [g]
+        b2.oddParticles = [g]
         b3 = Branch(info = '[[e-]]')       
         b4 = Branch(info = '[[q]]')
-        b4.BSMparticles = [sq1]
+        b4.oddParticles = [sq1]
         b5 = InclusiveBranch()
 
         self.assertTrue( str(b1) == '[[q,q],[q],[q,q]]')
@@ -61,15 +61,15 @@ class BranchTest(unittest.TestCase):
     def testcombineWith(self):
         
         b6 = Branch( '[[e-],[q]]' )
-        b6.BSMparticles = [sq2]
+        b6.oddParticles = [sq2]
         b6b = Branch( '[[e-],[q]]' )
-        b6b.BSMparticles = [sq2b]
+        b6b.oddParticles = [sq2b]
         
         b6.combineWith(b6b)
         
-        self.assertTrue( isinstance(b6.BSMparticles[0],ParticleList) )
-        self.assertEqual( b6.BSMparticles[0].label, 'BSM (combined)' )
-        self.assertEqual(len(b6.BSMparticles[0].particles), 2)
+        self.assertTrue( isinstance(b6.oddParticles[0],ParticleList) )
+        self.assertEqual( b6.oddParticles[0].label, 'BSM (combined)' )
+        self.assertEqual(len(b6.oddParticles[0].particles), 2)
         
         
         
@@ -77,12 +77,12 @@ class BranchTest(unittest.TestCase):
     def testBranchDecay(self):
 
         b = Branch(info = '[[q]]', finalState = 'MET')
-        b.BSMparticles = [g]
+        b.oddParticles = [g]
         
         newBranches = b.decayDaughter()
         self.assertEqual(len(newBranches), 2)
         self.assertEqual(newBranches[0].evenParticles, [[u],[u,u]])
-        self.assertEqual(newBranches[0].BSMparticles, [g,sn1])
+        self.assertEqual(newBranches[0].oddParticles, [g,sn1])
 
         
         
@@ -92,7 +92,7 @@ class BranchTest(unittest.TestCase):
         
         b = Branch(info = '[[q]]', finalState = 'MET')
         b.maxWeight = 2.0*fb
-        b.BSMparticles = [g]
+        b.oddParticles = [g]
         
         dList = decayBranches([b])
         
