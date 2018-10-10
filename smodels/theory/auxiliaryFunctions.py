@@ -15,7 +15,7 @@ import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.finalStateParticles import finalStates
-from smodels.theory.particle import Particle,ParticleList
+from smodels.theory.particle import Particle,MultiParticle
 import itertools    
 
 #Get all finalStateLabels
@@ -298,8 +298,8 @@ def simParticles(plist1, plist2):
     (Ex: L = l, l+ = l, l = l-,...). Ignores particle ordering inside
     the list.
 
-    :param plist1: first list of Particle or ParticleList objects
-    :param plist2: first list of Particle or ParticleList objects
+    :param plist1: first list of Particle or MultiParticle objects
+    :param plist2: first list of Particle or MultiParticle objects
     :param useLists: use the particle lists, i.e. allow e to stand for
                     e+ or e-, l+ to stand for e+ or mu+, etc 
     :returns: True/False if the particles lists match (ignoring order)    
@@ -312,12 +312,12 @@ def simParticles(plist1, plist2):
         return False
     
  
-    #Expand inclusive particles (ParticleList objects) 
+    #Expand inclusive particles (MultiParticle objects) 
     extendedL1 = []    
     for p in plist1:
         if isinstance(p,Particle):
             extendedL1.append([p])
-        elif isinstance(p,ParticleList):
+        elif isinstance(p,MultiParticle):
             extendedL1.append(p.particles)
 
      
@@ -325,7 +325,7 @@ def simParticles(plist1, plist2):
     for p in plist2:
         if isinstance(p,Particle):
             extendedL2.append([p])
-        elif isinstance(p,ParticleList):
+        elif isinstance(p,MultiParticle):
             extendedL2.append(p.particles)
 
     extendedL1 = [sortParticleList(list(i)) for i in itertools.product(*extendedL1)]

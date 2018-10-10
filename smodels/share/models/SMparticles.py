@@ -8,7 +8,7 @@
 """
 
 from smodels.tools.physicsUnits import MeV , GeV
-from smodels.theory.particle import Particle, ParticleList
+from smodels.theory.particle import Particle, MultiParticle
 
 
 
@@ -56,5 +56,5 @@ SMList = SMparticles + SMparticlesC
 for ptc in SMList:
     ptc._static = True
 
-SMparticleList = ParticleList('SM', SMList)
+SMparticleList = MultiParticle('SM', SMList)
           

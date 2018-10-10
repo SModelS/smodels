@@ -21,7 +21,7 @@
    only), also include the quantum numbers of the new particles below.   
 """
 
-from smodels.theory.particle import Particle, ParticleList
+from smodels.theory.particle import Particle, MultiParticle
 
 ####  R-odd   ##########
 
@@ -40,4 +40,4 @@ rEven = SMList
 #Generic BSM particles:
 
 BSMList = rOdd + rOddC
-BSMparticleList = ParticleList('BSM', BSMList)
+BSMparticleList = MultiParticle('BSM', BSMList)

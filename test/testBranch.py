@@ -10,7 +10,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.theory.particle import Particle, ParticleList
+from smodels.theory.particle import Particle, MultiParticle
 from smodels.theory.branch import Branch, decayBranches, InclusiveBranch
 from smodels.tools.physicsUnits import GeV, fb, MeV
 import pyslha
@@ -67,7 +67,7 @@ class BranchTest(unittest.TestCase):
         
         b6.combineWith(b6b)
         
-        self.assertTrue( isinstance(b6.oddParticles[0],ParticleList) )
+        self.assertTrue( isinstance(b6.oddParticles[0],MultiParticle) )
         self.assertEqual( b6.oddParticles[0].label, 'BSM (combined)' )
         self.assertEqual(len(b6.oddParticles[0].particles), 2)
         

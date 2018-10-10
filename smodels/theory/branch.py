@@ -11,7 +11,7 @@ from smodels.theory.auxiliaryFunctions import elementsInStr,simParticles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
-from smodels.theory.particle import ParticleList,InclusiveParticle
+from smodels.theory.particle import MultiParticle,InclusiveParticle
 from smodels.tools.inclusiveObjects import InclusiveValue,InclusiveList
 from smodels.experiment.finalStateParticles import finalStates,anyBSM
 
@@ -295,7 +295,7 @@ class Branch(object):
         Combines itself with the other branch.
         Should only be used if both branches are considered equal.
         The BSM particles appearing in both branches are combined
-        into ParticleList objects.
+        into MultiParticle objects.
         
         :parameter other: branch (Branch Object)        
         """
@@ -309,13 +309,13 @@ class Branch(object):
                 continue #Particles are the same (do nothing)
             
             #Else create a particle list with particles from both
-            if not isinstance(self.oddParticles[iptc],ParticleList):
-                bsmList = ParticleList(label = 'BSM (combined)', particles=[self.oddParticles[iptc]])
+            if not isinstance(self.oddParticles[iptc],MultiParticle):
+                bsmList = MultiParticle(label = 'BSM (combined)', particles=[self.oddParticles[iptc]])
             else:
                 bsmList = self.oddParticles[iptc]
                 
             #Now combine even particles from both branches:
-            if not isinstance(bsm,ParticleList):
+            if not isinstance(bsm,MultiParticle):
                 bsmList.particles.append(bsm)
             else:
                 bsmList.particles += bsm.particles

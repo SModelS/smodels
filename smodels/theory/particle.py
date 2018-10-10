@@ -49,7 +49,7 @@ class Particle(object):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """    
         
-        if not isinstance(other,(ParticleList,Particle,InclusiveParticle)):
+        if not isinstance(other,(MultiParticle,Particle,InclusiveParticle)):
             return +1
         
         return self.cmpProperties(other, properties=['Z2parity','label']) 
@@ -105,7 +105,7 @@ class Particle(object):
         Check if particle has the same properties (default is spin, colordim and eCharge)
         as other. Only compares the attributes which have been defined in both objects.
         
-        :param other: a Particle, ParticleList or InclusiveParticle object
+        :param other: a Particle, MultiParticle or InclusiveParticle object
         :param properties: list with properties to be compared. Default is spin, colordim and eCharge
         
         :return: True if all properties are the same, False otherwise.
@@ -124,13 +124,13 @@ class Particle(object):
         The comparison is made in hierarchical order, following the order
         defined by the properties list.
         
-        :param other: a Particle, ParticleList or InclusiveParticle object
+        :param other: a Particle, MultiParticle or InclusiveParticle object
         :param properties: list with properties to be compared. Default is spin, colordim and eCharge
         
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
         """
 
-        if isinstance(other,(ParticleList,InclusiveParticle)):
+        if isinstance(other,(MultiParticle,InclusiveParticle)):
             return -1*other.cmpProperties(self,properties=properties)
         
         for prop in properties:
@@ -220,7 +220,7 @@ class Particle(object):
     
         
 
-class ParticleList(Particle):
+class MultiParticle(Particle):
 
     """ An instance of this class represents a list of particle object to allow for inclusive expresions such as jet. 
         The properties are: label, pdg, mass, electric charge, color charge, width 
@@ -242,7 +242,7 @@ class ParticleList(Particle):
     def __cmp__(self,other):
         """
         Compares the list with another list or a single particle.
-        :param other: particle list (ParticleList) or single particle (Particle) to be compared
+        :param other: particle list (MultiParticle) or single particle (Particle) to be compared
         :return: If other is a single particle, returns:
                     -1 if all particles in self < other, 
                      0 if any particle in self == other,
@@ -251,7 +251,7 @@ class ParticleList(Particle):
                 -1 if self < other, 0 if self == other, +1, if self > other.     
         """        
         
-        if isinstance(other,ParticleList):
+        if isinstance(other,MultiParticle):
             if self.particles != other.particles:
                 comp = self.particles > other.particles
                 if comp:
@@ -289,7 +289,7 @@ class ParticleList(Particle):
     
     def __getattribute__(self,attr):
         """
-        If ParticleList does not have attribute, return a list
+        If MultiParticle does not have attribute, return a list
         if the attributes of each particle in self.particles.
         If not all particles have the attribute, it will raise an exception.
         If all particles share a common attribute, a single value
@@ -301,7 +301,7 @@ class ParticleList(Particle):
         """
          
         try:
-            return super(ParticleList,self).__getattribute__(attr) #Python2
+            return super(MultiParticle,self).__getattribute__(attr) #Python2
         except:
             pass
          
@@ -328,11 +328,11 @@ class ParticleList(Particle):
         The comparison is made in hierarchical order, following the order
         defined by the properties list.
         
-        If the property in the ParticleList is a list, check if any value of the list
+        If the property in the MultiParticle is a list, check if any value of the list
         matches the property of other. If both properties are lists, check if the
         lists share at least one common element.
         
-        :param other: a Particle, ParticleList or InclusiveParticle object
+        :param other: a Particle, MultiParticle or InclusiveParticle object
         :param properties: list with properties to be compared. Default is spin, colordim and eCharge
         
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
@@ -401,8 +401,8 @@ class ParticleList(Particle):
 
     def getPdgs(self):
         """
-        pdgs appearing in ParticleList
-        :return: list of pgds of particles in the ParticleList
+        pdgs appearing in MultiParticle
+        :return: list of pgds of particles in the MultiParticle
         """
         
         pdgs = [particle.pdg for particle in self.particles]
@@ -411,8 +411,8 @@ class ParticleList(Particle):
         
     def getLabels(self):
         """
-        labels appearing in ParticleList
-        :return: list of labels of particles in the ParticleList
+        labels appearing in MultiParticle
+        :return: list of labels of particles in the MultiParticle
         """
         
         labels = [particle.label for particle in self.particles]
@@ -443,7 +443,7 @@ class ParticleList(Particle):
 
 class InclusiveParticle(Particle):
     """
-    An inclusive particle class. It will return True when compared to any other Particle or ParticleList object.
+    An inclusive particle class. It will return True when compared to any other Particle or MultiParticle object.
     The only exception is if the InclusiveParticle has a defined parity. In this case it will only be equal
     to particles with the same parity.
     """
@@ -463,7 +463,7 @@ class InclusiveParticle(Particle):
         Returns 0 if the Z2parities match, otherwise
         -1 if self.Z2parity < other.Z2parity and 1 if self.Z2parity > other.Z2parity.
         
-        :param other: a Particle, ParticleList or InclusiveParticle object
+        :param other: a Particle, MultiParticle or InclusiveParticle object
         :param properties: (dummy) list with properties to be compared. It is not used.
         
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.

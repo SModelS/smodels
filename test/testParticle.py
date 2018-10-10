@@ -2,13 +2,13 @@
 
 """
 .. module:: testParticleClass
-   :synopsis: Tests the smodels.theory.particleClass.Particles and .ParticleList class
+   :synopsis: Tests the smodels.theory.particleClass.Particles and .MultiParticle class
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>   
 """
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.theory.particle import Particle, ParticleList, InclusiveParticle
+from smodels.theory.particle import Particle, MultiParticle, InclusiveParticle
 from smodels.tools.physicsUnits import GeV
 from smodels.theory.auxiliaryFunctions import elementsInStr
 
@@ -37,7 +37,7 @@ class ParticleTest(unittest.TestCase):
          
          
     def testParticleList(self):
-        l1 = ParticleList(label='plist', particles=[p1,p2])
+        l1 = MultiParticle(label='plist', particles=[p1,p2])
         from smodels.experiment.finalStateParticles import lList, LList
  
         self.assertEqual( l1.label, 'plist')    
@@ -58,7 +58,7 @@ class ParticleTest(unittest.TestCase):
         
     def testInclusiveParticle(self):
         anything = InclusiveParticle(label='anything')
-        l1 = ParticleList(label='plist', particles=[p1,p2,p4])
+        l1 = MultiParticle(label='plist', particles=[p1,p2,p4])
         from smodels.experiment.finalStateParticles import anySM,anyBSM,lList
                
         self.assertTrue(isinstance(p1, Particle))
