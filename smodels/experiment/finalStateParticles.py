@@ -31,9 +31,9 @@ jetList = MultiParticle('jet' ,  quarks[0:4] + [gauge[0]] + [pip,piz] + quarksC[
 
 
 
-#Used to construct generic allParticles (z2-odd) and SM (z2-even) particles:
-anyBSM = InclusiveParticle(label='anyBSM',Z2parity='odd')
-anySM = InclusiveParticle(label='*',Z2parity='even')
+#Used to construct generic z2-odd and z2-even particles:
+anyOdd = InclusiveParticle(label='anyOdd',Z2parity='odd')
+anyEven = InclusiveParticle(label='*',Z2parity='even')
 
 
 #Used to construct BSM final states:

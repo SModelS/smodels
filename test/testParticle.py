@@ -59,7 +59,7 @@ class ParticleTest(unittest.TestCase):
     def testInclusiveParticle(self):
         anything = InclusiveParticle(label='anything')
         l1 = MultiParticle(label='plist', particles=[p1,p2,p4])
-        from smodels.experiment.finalStateParticles import anySM,anyBSM,lList
+        from smodels.experiment.finalStateParticles import anyEven,anyOdd,lList
                
         self.assertTrue(isinstance(p1, Particle))
         self.assertTrue(p1 == anything)
@@ -69,10 +69,10 @@ class ParticleTest(unittest.TestCase):
         self.assertTrue(anything == lList)
         self.assertTrue(lList == anything)
          
-        self.assertTrue(anything == anySM)
-        self.assertTrue(anything == anyBSM)
-        self.assertFalse(anyBSM == anySM)
-        self.assertFalse(anySM == anyBSM)
+        self.assertTrue(anything == anyEven)
+        self.assertTrue(anything == anyOdd)
+        self.assertFalse(anyOdd == anyEven)
+        self.assertFalse(anyEven == anyOdd)
         
         
     def testParticleStatic(self):

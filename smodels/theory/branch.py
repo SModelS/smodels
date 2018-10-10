@@ -13,7 +13,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
 from smodels.theory.particle import MultiParticle,InclusiveParticle
 from smodels.tools.inclusiveObjects import InclusiveValue,InclusiveList
-from smodels.experiment.finalStateParticles import finalStates,anyBSM
+from smodels.experiment.finalStateParticles import finalStates,anyOdd
 
 
 
@@ -56,9 +56,9 @@ class Branch(object):
                 branch = branch[0]
                 vertices = elementsInStr(branch[1:-1])        
                 for vertex in vertices:
-                    bsmParticle = finalStates.getParticlesWith(label='anyBSM')
+                    bsmParticle = finalStates.getParticlesWith(label='anyOdd')
                     if not bsmParticle:
-                        raise SModelSError("Final state anyBSM has not been defined in finalStateParticles.py")
+                        raise SModelSError("Final state anyOdd has not been defined in finalStateParticles.py")
                     if len(bsmParticle) != 1:
                         raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)          
                     self.oddParticles.append(bsmParticle[0])
@@ -82,7 +82,7 @@ class Branch(object):
             else:
                 bsmParticle = bsmParticle[0]
         else:
-            bsmParticle = anyBSM
+            bsmParticle = anyOdd
             
         self.oddParticles.append(bsmParticle)
 

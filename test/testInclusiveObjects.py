@@ -50,7 +50,7 @@ class InclusiveObjectsTest(unittest.TestCase):
     def testInclusiveElement(self):
          
         el1 = element.Element(info='[[[e+],[e-,mu+]],[[*],[e-,mu+]]]',finalState = ['MET','HSCP'])
-        el2 = element.Element(info='[[[e+],[e-,mu+]],[[jet],[e-,mu+]]]',finalState = ['anyBSM','HSCP'])
+        el2 = element.Element(info='[[[e+],[e-,mu+]],[[jet],[e-,mu+]]]',finalState = ['anyOdd','HSCP'])
         el3 = element.Element(info='[[[e+],[e-,mu+]],[[jet],[e-,mu+]]]',finalState = ['HSCP','HSCP'])
         el4 = element.Element(info='[[*],[[jet],[e-,mu+]]]',finalState = ['MET','HSCP'])
         el5 = element.Element(info='[[[e+],[e-,mu+]],[[jet],[e-,mu+]]]',finalState = ['MET','HSCP'])
@@ -116,7 +116,7 @@ class InclusiveObjectsTest(unittest.TestCase):
         newEl = tx.hasElementAs(el)  #newEl should be equal to el, but with opposite branch ordering
         self.assertFalse(newEl is None)
         bsmParticles = [[str(bsm) for bsm in br] for br in newEl.getBSMparticles()]        
-        self.assertTrue(bsmParticles == [['anyBSM','MET'],['HSCP']])
+        self.assertTrue(bsmParticles == [['anyOdd','MET'],['HSCP']])
         
 
 if __name__ == "__main__":
