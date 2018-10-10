@@ -50,7 +50,7 @@ class ClustererTest(unittest.TestCase):
         w1.xSections[0].value = 10.*fb
 
         b1 = Branch()
-        b1.particles = [[u,u]]
+        b1.evenParticles = [[u,u]]
         b1.BSMparticles = [gluino, n1]
         b2 = b1.copy()
         el1 = Element()

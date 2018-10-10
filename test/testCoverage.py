@@ -8,11 +8,10 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.theory.particle import Particle
 from smodels.theory.branch import Branch
 from smodels.tools.coverage import Uncovered
 from smodels.theory.topology import TopologyList
-from smodels.tools.physicsUnits import eV, GeV, TeV, pb, fb
+from smodels.tools.physicsUnits import GeV, TeV, fb
 from smodels.theory.element import Element
 from smodels.theory.crossSection import XSectionList, XSection, XSectionInfo
 from smodels.share.models import SMparticles, mssm
@@ -36,7 +35,7 @@ class CoverageTest(unittest.TestCase):
         
         # prompt
         b1 = Branch()
-        b1.particles = [[b,t]]
+        b1.evenParticles = [[b,t]]
         b1.BSMparticles = [st1,n1]
         b1.setInfo()
         el1 = Element()
@@ -44,10 +43,10 @@ class CoverageTest(unittest.TestCase):
         
         # long-lived
         b3 = Branch()
-        b3.particles = []
+        b3.evenParticles = []
         b3.BSMparticles = [gluino]
         b4 = Branch()
-        b4.particles = [[b,t]]
+        b4.evenParticles = [[b,t]]
         b4.BSMparticles = [st1,n1]
         b3.setInfo()
         b4.setInfo()
@@ -56,10 +55,10 @@ class CoverageTest(unittest.TestCase):
         
         # prompt and displaced
         b5 = Branch()
-        b5.particles = [[t],[b,t]]
+        b5.evenParticles = [[t],[b,t]]
         b5.BSMparticles = [st2,st1,n1]
         b6 = Branch()
-        b6.particles = [[b,t]]
+        b6.evenParticles = [[b,t]]
         b6.BSMparticles = [st1,n1]
         b5.setInfo()
         b6.setInfo()

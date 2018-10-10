@@ -11,7 +11,7 @@ import unittest
 from smodels.share.models import SMparticles, mssm
 from smodels.theory.branch import Branch
 from smodels.tools.reweighting import calculateProbabilities, addPromptAndDisplaced
-from smodels.tools.physicsUnits import eV, GeV
+from smodels.tools.physicsUnits import GeV
 
 n1 = mssm.n1
 n1.totalwidth = 0.*GeV
@@ -49,7 +49,7 @@ class ReweightingTest(unittest.TestCase):
         
         branch3 = Branch()
         branch3.BSMparticles = [st1,n1]
-        branch3.particles = [[t]]
+        branch3.evenParticles = [[t]]
         probabilities3, branches3 = addPromptAndDisplaced(branch3)
         self.assertEqual(len(probabilities3), 2)
         self.assertEqual(probabilities3[0], 1.)

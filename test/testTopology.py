@@ -15,9 +15,7 @@ from smodels.theory.branch import Branch
 from smodels.theory.element import Element
 from smodels.theory.topology import Topology,TopologyList
 from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList
-from smodels.theory.model import Model
-from smodels.tools.physicsUnits import GeV, TeV, fb
-import pickle
+from smodels.tools.physicsUnits import TeV, fb
 
 
 
@@ -49,13 +47,13 @@ w3 = w1.copy()
 w3.xSections[0].value = 2.*fb
 
 b1 = Branch()
-b1.particles = [[t],[b,t]]
+b1.evenParticles = [[t],[b,t]]
 b1.BSMparticles = [gluino,st1,n1]
 b1b = Branch()
-b1b.particles = [[t],[b,t]]
+b1b.evenParticles = [[t],[b,t]]
 b1b.BSMparticles = [gluino,st1,n1]
 b2 = Branch()
-b2.particles = [[b,t]]
+b2.evenParticles = [[b,t]]
 b2.BSMparticles = [st1,n1]
 b1.setInfo()
 b2.setInfo()

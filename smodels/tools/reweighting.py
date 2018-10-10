@@ -18,7 +18,7 @@ def addPromptAndDisplaced(branch):
     :return: probabilities (depending on types of decay within branch), branches (with different labels depending on type of decay)
     """
     
-    if not branch.particles: # no decays happened
+    if not branch.evenParticles: # no decays happened
         if branch.BSMparticles[0].eCharge == 0 and branch.BSMparticles[0].colordim == 1: branch._decayType = 'METonly'
         else: branch._decayType = 'longlived'
         probabilities = [1.]
@@ -109,9 +109,9 @@ def labelPromptDisplaced(branch):
     else: promptBranch._decayType = 'longlived'
     
     displacedBranch = branch.copy()       
-    if any(particle==jetList for vertex in branch.particles for particle in vertex):
+    if any(particle==jetList for vertex in branch.evenParticles for particle in vertex):
         displacedBranch._decayType = 'displacedJet'
-    elif any(particle==lList for vertex in branch.particles for particle in vertex):           
+    elif any(particle==lList for vertex in branch.evenParticles for particle in vertex):           
         displacedBranch._decayType = 'displacedLepton'
     else: displacedBranch._decayType = 'displaced(neither jet nor lepton)'
     

@@ -22,7 +22,7 @@ class Branch(object):
     An instance of this class represents a branch.    
     A branch-element can be constructed from a string (e.g., ('[b,b],[W]').
 
-    :ivar particles: list of particles (Particle objects) for the final states
+    :ivar evenParticles: list of even particles (Particle objects) for the final states
     :ivar BSMparticles: a list of the intermediate states particles appearing in the branch.
                 If the branch represents more than one possible particle list, BSMparticles will correspond
                 to a nested list (BSMparticles = [[particle1, particle2,...],[particleA, particleB,...]])
@@ -42,7 +42,7 @@ class Branch(object):
                          (e.g. 'MET' or 'HSCP')                         
         """
         
-        self.particles = []
+        self.evenParticles = []
         self.BSMparticles = []
         
         self.maxWeight = None
@@ -69,10 +69,10 @@ class Branch(object):
                         if not smParticle:
                             raise SModelSError("Final state %s has not been defined in finalStateParticles.py " %pname)
                         ptcs.append(smParticle[0])
-                    self.particles.append(ptcs)
+                    self.evenParticles.append(ptcs)
 
-            self.vertnumb = len(self.particles)
-            self.vertparts = [len(v) for v in self.particles]
+            self.vertnumb = len(self.evenParticles)
+            self.vertparts = [len(v) for v in self.evenParticles]
         if finalState:
             bsmParticle = finalStates.getParticlesWith(label=finalState)
             if not bsmParticle:
@@ -93,14 +93,14 @@ class Branch(object):
         :returns: string representation of the branch (in bracket notation)    
         """
 
-        st = str(self.particles).replace("'", "")
+        st = str(self.evenParticles).replace("'", "")
         st = st.replace(" ", "")
         return st
 
     def __cmp__(self,other):
         """
         Compares the branch with other.        
-        The comparison is made based on vertnumb, vertparts, particles, masses of BSM particles
+        The comparison is made based on vertnumb, vertparts, evenParticles, masses of BSM particles
         and the last BSM particle appearing in the cascade decay.
         OBS: The particles inside each vertex MUST BE sorted (see branch.sortParticles())         
         :param other:  branch to be compared (Branch object)
@@ -125,9 +125,9 @@ class Branch(object):
             else: return -1
             
         #Compare SM final states by label and Z2parity:
-        for iv,vertex in enumerate(self.particles):            
+        for iv,vertex in enumerate(self.evenParticles):            
             for iptc,particle in enumerate(vertex):
-                comp = particle.cmpProperties(other.particles[iv][iptc],properties=['Z2parity','label'])
+                comp = particle.cmpProperties(other.evenParticles[iv][iptc],properties=['Z2parity','label'])
                 if comp:
                     return comp
                 
@@ -178,14 +178,14 @@ class Branch(object):
         Sort the particles inside each vertex
         """
         
-        for iv,vertex in enumerate(self.particles):
-            self.particles[iv] = sorted(vertex, key=lambda x: x.label)
+        for iv,vertex in enumerate(self.evenParticles):
+            self.evenParticles[iv] = sorted(vertex, key=lambda x: x.label)
 
 
     def setInfo(self):
         """
         Defines the number of vertices (vertnumb) and number of
-        particles in each vertex (vertpats) properties, if they have not
+        even particles in each vertex (vertpats) properties, if they have not
         been defined yet.
         """
 
@@ -195,13 +195,13 @@ class Branch(object):
         
     def getInfo(self):
         """
-        Get branch topology info from particles.
+        Get branch topology info from evenParticles.
         
         :returns: dictionary containing vertices and number of final states information  
         """
 
-        vertnumb = len(self.particles)
-        vertparts = [len(v) for v in self.particles]
+        vertnumb = len(self.evenParticles)
+        vertparts = [len(v) for v in self.evenParticles]
         
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
         
@@ -217,7 +217,7 @@ class Branch(object):
         """
         
         self.BSMparticles = self.BSMparticles[:iv] + self.BSMparticles[iv+1:]
-        self.particles = self.particles[:iv] + self.particles[iv+1:]
+        self.evenParticles = self.evenParticles[:iv] + self.evenParticles[iv+1:]
         self.setInfo()
         
 
@@ -225,20 +225,20 @@ class Branch(object):
     def particlesMatch(self, other):
         """
         Compare two Branches for matching particles.
-        Only the final state particles (self.particles and self.BSMparticles[-1])
+        Only the final state particles (self.evenParticles and self.BSMparticles[-1])
         are used for comparison.
         Allow for inclusive particle labels (such as the ones defined in particleDefinitions.py)
 
         :parameter other: branch to be compared (Branch object)
         
-        :returns: True if branches are equal (particles and last BSM particle match); False otherwise.              
+        :returns: True if branches are equal (evenParticles and last BSM particle match); False otherwise.              
         """
         
        
         if not isinstance(other,Branch):
             return False        
 
-        #Make sure number of vertices and particles have been defined
+        #Make sure number of vertices and even particles have been defined
         self.setInfo()
         other.setInfo()
         if self.vertnumb != other.vertnumb:
@@ -247,9 +247,9 @@ class Branch(object):
             return False
         
         #If particles are identical, avoid further checks
-        if self.particles != other.particles:
-            for iv,vertex in enumerate(self.particles):
-                if not simParticles(vertex,other.particles[iv]):
+        if self.evenParticles != other.evenParticles:
+            for iv,vertex in enumerate(self.evenParticles):
+                if not simParticles(vertex,other.evenParticles[iv]):
                     return False
             
         #If the final state BSM particles have the same quantum numbers: 
@@ -270,7 +270,7 @@ class Branch(object):
 
         #Allows for derived classes (like inclusive classes)
         newbranch = self.__class__()
-        newbranch.particles = self.particles[:]
+        newbranch.evenParticles = self.evenParticles[:]
         newbranch.BSMparticles = self.BSMparticles[:]
         self.setInfo()
         newbranch.vertnumb = self.vertnumb
@@ -282,9 +282,9 @@ class Branch(object):
 
     def getLength(self):
         """
-        Returns the branch length (number of R-odd particles).
+        Returns the branch length (number of odd particles).
         
-        :returns: length of branch (number of R-odd particles)
+        :returns: length of branch (number of odd particles)
         """
         
         return len(self.BSMparticles)
@@ -314,7 +314,7 @@ class Branch(object):
             else:
                 bsmList = self.BSMparticles[iptc]
                 
-            #Now combine particles from both branches:
+            #Now combine even particles from both branches:
             if not isinstance(bsm,ParticleList):
                 bsmList.particles.append(bsm)
             else:
@@ -352,7 +352,7 @@ class Branch(object):
         
         newBranch.BSMparticles.append(oddParticles[0])
         evenParticles = sorted(evenParticles, key=lambda x: x.label.lower())
-        newBranch.particles.append(evenParticles)
+        newBranch.evenParticles.append(evenParticles)
         
         if not self.maxWeight is None:
             newBranch.maxWeight =  self.maxWeight*decay.br             
@@ -448,7 +448,7 @@ class InclusiveBranch(Branch):
     def __init__(self,finalState=None):
         Branch.__init__(self)
         self.masses = InclusiveList()
-        self.particles =  InclusiveList()
+        self.evenParticles =  InclusiveList()
         if finalState:
             bsmParticle = finalStates.getParticlesWith(label=finalState)
             if not bsmParticle:
@@ -465,7 +465,7 @@ class InclusiveBranch(Branch):
         """
         Always returns true. The only exception is if a final state particle has been
         defined. In this case, will include the final state in the comparison.        
-        The comparison is made based on vertnumb, vertparts, particles, masses of BSM particles
+        The comparison is made based on vertnumb, vertparts, evenParticles, masses of BSM particles
         and the last BSM particle appearing in the cascade decay.
         OBS: The particles inside each vertex MUST BE sorted (see branch.sortParticles())         
         :param other:  branch to be compared (Branch object)
@@ -497,7 +497,7 @@ class InclusiveBranch(Branch):
         
     def getInfo(self):
         """
-        Get branch topology info from particles.
+        Get branch topology info (inclusive list and int).
         
         :returns: dictionary containing vertices and number of final states information  
         """

@@ -228,12 +228,12 @@ class Element(object):
 
     def getParticles(self):
         """
-        Get the array of particle objects in the element.
+        Get the array of even particle objects in the element.
         
         :returns: list of Particle objects                
         """
         
-        particles = [branch.particles for branch in self.branches]
+        particles = [branch.evenParticles for branch in self.branches]
 
         return particles
     
@@ -398,7 +398,7 @@ class Element(object):
         """
         info = self.getEinfo()
         for ib, branch in enumerate(self.branches):
-            for iv, vertex in enumerate(branch.particles):
+            for iv, vertex in enumerate(branch.evenParticles):
                 if len(vertex) != info['vertparts'][ib][iv]:
                     logger.error("Wrong syntax")
                     raise SModelSError()
@@ -518,10 +518,10 @@ class Element(object):
 
         # Loop over branches
         for branch in newelement.branches:
-            if not branch.particles:
+            if not branch.evenParticles:
                 continue
             #Check if the last decay should be removed:            
-            neutralSM = all(ptc.isMET() for ptc in branch.particles[-1])
+            neutralSM = all(ptc.isMET() for ptc in branch.evenParticles[-1])
             neutralBSM = branch.BSMparticles[-2].isMET() 
             if neutralBSM and neutralSM:
                 removeLastVertex = True
@@ -534,9 +534,9 @@ class Element(object):
                 #For invisible compression, keep the mother of the vertex and not the daughter:
                 branch.BSMparticles[-1] = bsmMom
                 #Re-check if the last decay should be removed:
-                if not branch.particles:
+                if not branch.evenParticles:
                     continue
-                neutralSM = all(ptc.isMET() for ptc in branch.particles[-1])
+                neutralSM = all(ptc.isMET() for ptc in branch.evenParticles[-1])
                 neutralBSM = branch.BSMparticles[-2].isMET()
                 if neutralBSM and neutralSM:
                     removeLastVertex = True

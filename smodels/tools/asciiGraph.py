@@ -10,9 +10,7 @@
 
 from __future__ import print_function
 import sys
-import os
 import argparse
-from smodels import installation
 from smodels.theory import decomposer
 from smodels.tools.smodelsLogging import logger
 from smodels.share.models.mssm import BSMList
@@ -47,7 +45,7 @@ def _drawBranch(branch, upwards, htmlFormat, border, l):
         lines = [" |    ", " | ----"]
         labels = " |    "
 
-    for insertions in branch.particles:
+    for insertions in branch.evenParticles:
         if len(insertions) == 0:
             lines[0] += " "
             lines[1] += "*"

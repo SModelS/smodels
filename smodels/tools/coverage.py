@@ -267,14 +267,14 @@ class UncoveredList(object):
           
         for ib,branch in enumerate(el.branches):
             newParticles = []
-            for vertex in branch.particles:
+            for vertex in branch.evenParticles:
                 newVertex = vertex[:]
                 for ip,particle in enumerate(vertex):
                     for particleList in exch:
                         if particle == particleList:
                             newVertex[ip] = particleList
                 newParticles.append(newVertex)
-            newEl.branches[ib].particles = newParticles
+            newEl.branches[ib].evenParticles = newParticles
             newEl.branches[ib].setInfo()
         
         return newEl 

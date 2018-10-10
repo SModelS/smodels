@@ -9,13 +9,11 @@
 """
 import sys
 sys.path.insert(0,"../")
-from smodels.theory.exceptions import SModelSTheoryError
 import unittest
 from smodels.theory.particle import Particle, ParticleList
 from smodels.theory.branch import Branch, decayBranches, InclusiveBranch
 from smodels.tools.physicsUnits import GeV, fb, MeV
 import pyslha
-import pickle
 
 #Load the particle dictionaries
     
@@ -82,9 +80,8 @@ class BranchTest(unittest.TestCase):
         b.BSMparticles = [g]
         
         newBranches = b.decayDaughter()
-        nb1 = Branch()
         self.assertEqual(len(newBranches), 2)
-        self.assertEqual(newBranches[0].particles, [[u],[u,u]])
+        self.assertEqual(newBranches[0].evenParticles, [[u],[u,u]])
         self.assertEqual(newBranches[0].BSMparticles, [g,sn1])
 
         
