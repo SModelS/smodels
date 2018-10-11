@@ -194,7 +194,18 @@ def _getDictionariesFromSLHA(slhafile):
     massDic = dict(res.blocks['MASS'].items())
     for pid in list ( massDic.keys() )[:]:
         massDic[pid] = round(abs(massDic[pid]),1)*GeV
-        if not -pid in massDic: massDic[-pid] = massDic[pid]    
+        if not -pid in massDic: massDic[-pid] = massDic[pid] 
+
+    #Include proxy for displaced decays
+    if 0 in massDic or 0 in brDic:
+        logger.error("PDG = 0 is reserved for displaced decays and it can not be used for other particles. Please redefine the input model PDG assignments.")
+        raise SModelSError()
+    else:
+        dispPid = 0
+        massDic[dispPid] = 0. * GeV
+        dispDec = pyslha.Decay(br=1., ids=[], nda=0)
+        brDic[dispPid] = [dispDec]
+   
  
     return brDic, massDic
 
@@ -223,9 +234,14 @@ def _getPromptDecays(slhafile,brDic,l_inner=1.*mm,gb_inner=1.3,l_outer=10.*m,gb_
         
     #Get the widths:
     res = pyslha.readSLHAFile(slhafile)
-    decays = res.decays    
+    decays = res.decays
+
+    #PID for displaced decays:
+    dispPid = 0
         
     for pid in brDic:
+        if pid == dispPid:
+            continue
         width = abs(decays[abs(pid)].totalwidth)*GeV
         Fprompt = 1. - math.exp(-width*l_inner/(gb_inner*hc))
         Flong = math.exp(-width*l_outer/(gb_outer*hc))
@@ -239,7 +255,10 @@ def _getPromptDecays(slhafile,brDic,l_inner=1.*mm,gb_inner=1.3,l_outer=10.*m,gb_
         if (Flong+Fprompt) > 1.:
             logger.error("Sum of decay fractions > 1 for "+str(pid))
             return False
-        if (Flong+Fprompt) < 0.8:
-            logger.info("Particle with PDG %i has a considerable fraction of displaced decays, which will be ignored." %pid)
+        Fdisp = 1 - Flong - Fprompt
+        #Add displaced decay:
+        if Fdisp > 0.001:
+            displacedFraction = pyslha.Decay(br=Fdisp, ids = [dispPid], nda=1)
+            brDic[pid].append(displacedFraction)
         
     return brDic
