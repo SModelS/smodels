@@ -145,7 +145,7 @@ Running this will print the status flag and a message with potential warnings
 and error messages.
 
 .. note:: In SModelS versions prior to 1.2, the SLHA file checker also
-          checked for the existence of displaced vertices or heavy charged
+          checked for the existence of displaced vertices or heavy stable charged
           particles in the input file. Since the inclusion of HSCP signatures in
           SModelS, these checks are no longer done by the SLHA file checker.
           
@@ -245,7 +245,7 @@ which will produce 3x9 plots in the gluino vs squark mass plane from a small sca
 iplots parameters file
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The options for the inteactive plots tool are defined in a parameters file, *iplots_parameters.py* in the above example.  
+The options for the interactive plots tool are defined in a parameters file, *iplots_parameters.py* in the above example.  
 An example file, including all available parameters together with a short description, is stored in :download:`iplots_parameters.py <images/iplots_parameters.py>`.
 Since the plotting information is model dependent, there is no default setting -- the iplots parameters file is mandatory input. 
 Below we give more detailed information about each entry in this file.

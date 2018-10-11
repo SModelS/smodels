@@ -54,13 +54,10 @@ The command-line tool (:ref:`runSModelS.py <runSModelS>`) and the example Python
 code (:ref:`Example.py <exampleCode>`) are described below.
 
 
-.. note:: For non-MSSM (incl. non-SUSY) input models the user needs to write their own *share/models/newmodel.py*
+.. note:: For non-MSSM (incl. non-SUSY) input models the user needs to write their own *model.py*
           and specify which BSM particles are even or odd under the assumed
           Z\ :sub:`2` symmetry (see :ref:`adding new particles <newParticles>`).
-          Finally, if the user wants to check the input files for possible issues using
-          SModelS'  :ref:`SLHA and LHE file checkers <fileChecks>`, it is
-          also necessary to define the BSM particle quantum numbers in *share/models/newmodel.py* [#]_.
-          
+          From version 1.2.0 onwards it is also necessary to define the BSM particle quantum numbers in the same file [#]_.
          
 
 
@@ -348,60 +345,58 @@ Below we go step-by-step through this example code:
   the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. Set SModelS verbosity level.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 11-20
+   :lines: 12-22
 
 * *Set the path to the database URL*. Specify which :ref:`database <databaseStruct>` to use. It can be the path
   to the smodels-database folder, the path to a :ref:`pickle file <databasePickle>` or (starting with v1.1.3) a URL path.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 21-22
+   :lines: 24-25
 
 * *Define the input model*. By default SModelS assumes the MSSM particle content. For using SModelS
   with a different particle content, the user must define the new particle content and set modelFile
   to the path of the model file (see **particles:model** in :ref:`Parameter File <parameterFile>`).
 
 .. literalinclude:: /examples/Example.py
-   :lines: 29-30
+   :lines: 31-32
 
 
 * *Path to the input file*. Specify the location of the input file. It must be a
   SLHA or LHE file (see :ref:`Basic Input <BasicInput>`).
 
 .. literalinclude:: /examples/Example.py
-   :lines: 33-34
+   :lines: 34-36
 
 * *Set main options for* |decomposition|.
   Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 37-38
+   :lines: 43-45
 
-* |Decompose| *model*. Depending on the type
-  of input format, choose either
-  the `slhaDecomposer.decompose <theory.html#theory.slhaDecomposer.decompose>`_ or
-  `lheDecomposer.decompose <theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off.
+* |Decompose| *model*. 
+  The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 41-45
+   :lines: 47-48
 
 * *Access basic information* from decomposition, using the
   `topology list <theory.html#theory.topology.TopologyList>`_
   and `topology  <theory.html#theory.topology.Topology>`_ objects:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 48-60
+   :lines: 50-64
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 2-8
+   :lines: 2-9
 
 
 * *Load the* |express| to be used to constrain the input model.
   Here, all results are used:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 64
+   :lines: 66-68
 
 Alternatively, the `getExpResults  <experiment.html#experiment.databaseObj.Database.getExpResults>`_ method
 can take as arguments specific results to be loaded.
@@ -410,12 +405,12 @@ can take as arguments specific results to be loaded.
   Below we show how to count the number of |ULrs| and |EMrs| loaded:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 68-75
+   :lines: 70-79
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 10
+   :lines: 11
 
 
 * *Compute the* |theory predictions| for each |expres|.
@@ -424,67 +419,67 @@ can take as arguments specific results to be loaded.
   (for each |expres|):
 
 .. literalinclude:: /examples/Example.py
-   :lines: 82-83
+   :lines: 86-87
 
 * *Print the results*. For each |expres|, loop over the corresponding |theory predictions|
   and print the relevant information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 86-98
+   :lines: 90-102
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 14-21
+   :lines: 15-22
 
 * *Get the corresponding upper limit*. This value can
   be compared to the |theory prediction| to decide whether a model is excluded or not:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 101-102
-
-*output:*
-
-.. literalinclude:: /images/ExampleOutput.txt
-   :lines: 22
-
-* *Compute the r-value*, i.e. the ratio |theory prediction|/upper limit.
-  A value of :math:`r \geq 1` means that an experimental result excludes the input model.
-  For |EMrs| also compute the :math:`\chi^2` and :ref:`likelihood <likelihoodCalc>`.
-  Determine the most constraining result:
-
-.. literalinclude:: /examples/Example.py
-   :lines: 105-113
+   :lines: 104-105
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
    :lines: 23
 
+* *Print the r-value*, i.e. the ratio |theory prediction|/upper limit.
+  A value of :math:`r \geq 1` means that an experimental result excludes the input model.
+  For |EMrs| also compute the :math:`\chi^2` and :ref:`likelihood <likelihoodCalc>`.
+  Determine the most constraining result:
+
+.. literalinclude:: /examples/Example.py
+   :lines: 109-116
+
+*output:*
+
+.. literalinclude:: /images/ExampleOutput.txt
+   :lines: 24-25
+
 * *Print the most constraining experimental result*. Using the largest *r*-value,
   determine if the model has been excluded or not by the selected |express|:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 116-120
+   :lines: 120-123
 
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 322-323
+   :lines: 588-589
    
    
 * *Identify missing topologies*. Using the output from decomposition, identify
   the :ref:`missing topologies <topCoverage>` and print some basic information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 125-145
+   :lines: 128-151
 
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 325-336,344-349   
+   :lines: 591-603,613-617   
 
 
 It is worth noting that SModelS does not include any statistical treatment for
