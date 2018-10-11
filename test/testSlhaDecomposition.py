@@ -11,13 +11,14 @@
 import sys
 sys.path.insert(0,"../")
 from smodels.theory import slhaDecomposer
-from smodels.tools.physicsUnits import GeV, fb
+from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.tools.smodelsLogging import setLogLevel
 import unittest
 
-class SlhaDecompositionTest(unittest.TestCase):
-    from smodels.tools.smodelsLogging import logger
 
+class SlhaDecompositionTest(unittest.TestCase):
+    
+    from smodels.tools.smodelsLogging import logger
     def test(self):
         self.logger.info ( "test decomposition, no compression" )
         """ test the decomposition with no compression """
@@ -46,6 +47,8 @@ class SlhaDecompositionTest(unittest.TestCase):
         element=ellist[0]
         self.assertEqual(str(element), "[[],[]]")
         self.assertEqual(element.getFinalStates(), ['Displaced', 'Displaced'])
+        weight = element.weight.getXsecsFor(13*TeV)[0].value.asNumber(fb)
+        self.assertAlmostEqual(weight,0.6963,places=3)
 
 
 if __name__ == "__main__":
