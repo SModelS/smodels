@@ -55,16 +55,22 @@ according to the information contained in the DECAY blocks. This procedure is re
 Within SModelS all BSM particles are assumed to either decay promptly or to be stable (in detector scales).
 To deal with BSM particles with small (non-zero) width SModelS computes the probability for prompt decay
 (:math:`\mathcal{F}_{prompt}`) as well as the probability for the particle to decay *outside*
-the detector (:math:`\mathcal{F}_{long}`). Note that decays within the detector (displaced decays) are not
-included in the decomposition.
+the detector (:math:`\mathcal{F}_{long}`). 
+If the particle has a considerable fraction of its decays taking place inside the detector 
+(i.e :math:`\mathcal{F}_{long} + \mathcal{F}_{prompt} \ll 1`), we include a third possibility,
+which is simply labed as a *displaced decay*, with fraction given by 
+:math:`\mathcal{F}_{displaced} = 1 - \mathcal{F}_{prompt} - \mathcal{F}_{long}`. [1]_
 The branching fraction rescaled by :math:`\mathcal{F}_{long}` describes the probability of a decay where the daughter BSM state
 traverses the detector (thus is considered stable),
 while the branching fraction rescaled by :math:`\mathcal{F}_{prompt}` corresponds to a prompt decay which
-will be followed by the next step in the cascade decay. This reweighting is illustrated in the figure below:
+will be followed by the next step in the cascade decay.
+Finally, the rescaling by :math:`\mathcal{F}_{displaced}` corresponds to the fraction of displaced
+decays summed over all final states.
+This reweighting is illustrated in the figure below:
 
 .. _decomp1b:
 
-.. image:: images/decompScheme1.png
+.. image:: images/decompScheme1b.png
    :width: 90%
  
 The precise values of :math:`\mathcal{F}_{prompt}` and :math:`\mathcal{F}_{long}` 
@@ -86,9 +92,6 @@ We point out that the above approximations are irrelevant if :math:`\Gamma` is v
 and :math:`\mathcal{F}_{long} \simeq 0`) or close to zero (:math:`\mathcal{F}_{prompt} \simeq 0`
 and :math:`\mathcal{F}_{long} \simeq 1`). Only elements containing particles which have a considerable fraction of displaced
 decays will be sensitive to the values chosen above.
-Furthermore, note that the above procedure discards the fraction of decays which take place within
-the detector (displaced decays). These are not considered by SModelS, since it can not currently
-handle displaced decay signatures.
 
 
 Following the above procedure it is possible to construct
@@ -291,3 +294,6 @@ it implies
 
 
 
+.. [1] Note that the final states appearing in the displaced vertex are not stored during decomposition,
+       since SModelS can not currently constrain displaced decay signatures. As a result, all elements
+       with displaced decays will be identified as :ref:`missing topologies <topCoverage>`.
