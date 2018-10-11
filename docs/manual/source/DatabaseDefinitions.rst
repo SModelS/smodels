@@ -118,11 +118,17 @@ simplified model :math:`\tilde{q} + \tilde{q} \to \left(jet+\tilde{\chi}_1^0\rig
 Using the SModelS notation this simplified model is mapped to the
 :ref:`element<element>` :math:`[[[jet]],[[jet]]]`, using the notation defined in
 :ref:`Bracket Notation <notation>`.
+In addition to the constraint information, it is also
+possible to specificy a final state property for the simplified model,
+which corresponds to the BSM final state signature (see :ref:`Final State particles <final stateOdd>`).
+If no final state is defined, the :ref:`element<element>`
+is assumed to have a :math:`(MET,MET)` final state signature.
 Usually a single preliminary result/publication contains several UL maps, hence
 each UL-type experimental result contains several UL maps, each one constraining
 different simplified
 models (|elements| or sum of  |elements|).
 *We also point out that the exclusion curve shown in the UL map above is never used by SModelS*.
+
 
 
 .. _ULconstraint:
@@ -233,6 +239,9 @@ The efficiency map is usually a function of the BSM masses appearing in the elem
 Within SModelS the above EM map is used to compute the efficiency for the
 :ref:`element<element>` :math:`[[[jet]],[[jet]]]`, where we are using the
 notation defined in :ref:`Bracket Notation <notation>`.
+Furthermore, a final state property can also be defined (see :ref:`Final State class <final stateOdd>`).
+If no final state is given, the :ref:`element<element>`
+is assumed to have a :math:`(MET,MET)` final state signature.
 Usually there are several EM maps for a single |dataset|: one for each |element|
 or sum of  |elements|. In order to use a language similar to the one used in |ULrs|, the |element| (or |elements|)
 for which the efficiencies correspond to are still called *constraint*.
@@ -241,8 +250,9 @@ for which the efficiencies correspond to are still called *constraint*.
 Although efficiencis are most useful for |EMrs|, their concept can also be extended to
 |ULrs|. For the latter, the efficiencies for a given element are either 1, if the element
 appears in the :ref:`UL constraint <ULconstraint>`, or 0, otherwise. Atlhough trivial, this extension
-allows us to treat |EMrs| and |ULrs| in a very similar fashion 
+allows us to treat |EMrs| and |ULrs| in a very similar fashion
 (see :ref:`Theory Predictions <theoryPredictions>` for more details).
+
 
 
 .. _DataSet:

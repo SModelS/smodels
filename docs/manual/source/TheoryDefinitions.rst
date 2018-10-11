@@ -63,7 +63,7 @@ specific BSM model in a model-independent framework, which can then be compared
 against the corresponding experimental limits.
 For instance, as shown in the :ref:`scheme above <elementscheme>`, only the
 masses and the widths of the BSM states and the quantum numbers (color and electric charge) of the last BSM state are used, while
-other properties, such as their spins are ignored (all quantum numbers are, however, stored for book-keeping).
+other properties, such as their spins are ignored (all properties are, however, stored for book-keeping).
 
 Below we describe in more detail the element properties and their implementation
 in SModelS.
@@ -144,7 +144,7 @@ It represents a series of cascade decays of a single initial Z\ :sub:`2`-odd
 state.
 The diagram below illustrates an example of a branch.
 
-.. image:: images/branchTop2.png
+.. image:: images/branchTopB.png
    :width: 25%
 
 The structure of each branch is fully defined by its number of vertices and the number of 

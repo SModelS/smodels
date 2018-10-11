@@ -115,6 +115,12 @@ are fully dependent on the Monte Carlo statistics used to generate the LHE file.
 Also, when generating the events it is important to ensure that no mass smearing is applied, so the events
 always contain the same mass value for a given particle.
 
+**Note that since all decays appearing in an LHE event are assumed to be prompt, the LHE-based
+decomposition should not be used for models with meta-stable BSM particles**.
+
+* **The LHE reader is implemented by the** `LHE reader method <theory.html#theory.lheReader.getDictionariesFrom>`_
+
+
 
 .. _elementComp:
 
