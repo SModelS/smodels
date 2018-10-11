@@ -118,6 +118,8 @@ type of signature this element represents.
 In an element the  Z\ :sub:`2`-odd final state  quantum numbers are mapped to a final state class,
 as defined in the `particleNames module <theory.html#module-theory.particleNames>`_ .
 Some examples of final state classes are: 'MET', 'HSCP' and 'RHadronQ'.
+Displaced decays, which currently cannot be tested in SModelS, are tracked with a proxy final state class 'Displaced',
+and will appear only in missing topologies.
 New final state classes can also be easily defined in this module.  
 
 
