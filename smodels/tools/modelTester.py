@@ -193,6 +193,27 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
             print(crashReportFacility.createUnknownErrorMessage())
     return None
 
+def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
+                    timeout, development, parameterFile):
+    """
+    Loop over all input files in inputFiles with testPoint
+
+    :parameter inputFiles: list of input files to be tested
+    :parameter outputDir: path to directory where output is be stored
+    :parameter parser: ConfigParser storing information from parameter.ini file
+    :parameter databaseVersion: Database version (printed to output file)
+    :parameter listOfExpRes: list of ExpResult objects to be considered
+    :parameter development: turn on development mode (e.g. no crash report)
+    :parameter parameterFile: parameter file, for crash reports
+    :returns: printers output
+    """
+
+    for inputFile in inputFiles:
+        runSingleFile(inputFile, outputDir, parser, databaseVersion,
+                                  listOfExpRes, timeout, development, parameterFile)
+    return None
+
+
 def _cleanList(fileList, inDir):
     """ clean up list of files """
     cleanedList = []
@@ -237,7 +258,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     :param parameterFile: parameter file, for crash reports
     :returns: printer(s) output, if not run in parallel mode
     """
-    
+
     t0 = time.time()
     if len(fileList) == 0:
         logger.error("no files given.")
@@ -262,22 +283,30 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
             logger.removeHandler(hdlr)
         fileLog = logging.FileHandler('./smodels.log')
         logger.addHandler(fileLog)
-    
+
+        ### now split list of files
+        chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
         pool = multiprocessing.Pool(processes=ncpus)
         children = []
-        for inputFile in cleanedList:
-            p = pool.apply_async(runSingleFile, args=(inputFile, outputDir, parser, 
+        for chunkFile in chunkedFiles:
+            p = pool.apply_async(runSetOfFiles, args=(chunkFile, outputDir, parser,
                                                       databaseVersion, listOfExpRes, timeout, 
                                                   development, parameterFile,))
             children.append(p)
-    
-        for i,p in enumerate(children):
-            out = p.get()
-            logger.debug("child %i terminated: %s" %(i,out))
-            fracDone = round(100*float(i)/nFiles)
-            fracDoneNext = round(100*float(i+1)/nFiles)
-            if (fracDone%5 == 0 and not fracDoneNext%5 == 0) or i == nFiles:
-                logger.info('%i%% done in %1.2f min' %(fracDone,(time.time()-t0)/60.))
+        pool.close()
+        iprint, nprint = 5,5 #Define when to start printing and the percentage step
+        #Check process progress until they are all finished
+        while True:
+            done = sum([p.ready() for p in children])
+            fracDone = 100*float(done)/len(children)
+            if fracDone >= iprint:
+                while fracDone >= iprint:
+                    iprint += nprint
+                logger.info('%i%% done in %1.2f min' %(iprint-nprint,(time.time()-t0)/60.))
+            if done == len(children):
+                break
+            time.sleep(2)
+
         logger.debug("All children terminated")
         
     logger.info("Done in %3.2f min"%((time.time()-t0)/60.))
