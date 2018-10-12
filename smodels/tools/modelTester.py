@@ -243,19 +243,17 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         logger.error("no files given.")
         return None
 
-    cleanedList = _cleanList(fileList, inDir)[:30]
-    if not cleanedList:
-        logger.Error("No valid input files found")
-        return None
-        
+    cleanedList = _cleanList(fileList, inDir)
     ncpus = _determineNCPus(parser.getint("parameters", "ncpus"), len(cleanedList))
-    useProgressBar = False
-    pBar = None    
+    
     if len(cleanedList) == 0:
-        logger.Error("No valid input files found")
+        logger.error("No valid input files found")
         return None
     elif len(cleanedList) == 1:        
         logger.info("Running SModelS for a single file")
+        runSingleFile(cleanedList[0], outputDir, parser, 
+                        databaseVersion, listOfExpRes, timeout, 
+                        development, parameterFile)
     else:
         logger.info("Running SModelS for %i files with %i processes. Messages will be redirected to smodels.log" 
                     %(len(cleanedList),ncpus))
@@ -263,32 +261,23 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
             logger.removeHandler(hdlr)
         fileLog = logging.FileHandler('./smodels.log')
         logger.addHandler(fileLog)
-        try:
-            import progressbar as P
-            pBar = P.ProgressBar(widgets= [ "Running files ", P.Percentage()])
-            pBar.maxval = len(cleanedList)
-            pBar.start()
-            useProgressBar = True
-        except:
-            pass
     
-    pool = multiprocessing.Pool(processes=ncpus)
-    children = []
-    for inputFile in cleanedList:
-        p = pool.apply_async(runSingleFile, args=(inputFile, outputDir, parser, 
-                                                  databaseVersion, listOfExpRes, timeout, 
-                                              development, parameterFile,))
-        children.append(p)
-
-    for i,p in enumerate(children):
-        out = p.get()
-        if useProgressBar:
-            pBar.update(i+1)
-        logger.debug("child %i terminated: %s" %(i,out))
-
-
-    logger.debug("All children terminated")
+        pool = multiprocessing.Pool(processes=ncpus)
+        children = []
+        for inputFile in cleanedList:
+            p = pool.apply_async(runSingleFile, args=(inputFile, outputDir, parser, 
+                                                      databaseVersion, listOfExpRes, timeout, 
+                                                  development, parameterFile,))
+            children.append(p)
+    
+        for i,p in enumerate(children):
+            out = p.get()
+            logger.debug("child %i terminated: %s" %(i,out))
+            if float(i)/len(children)
+        logger.debug("All children terminated")
+        
     logger.info("Done in %3.2f min"%((time.time()-t0)/60.))
+    
     return None
 
 def checkForSemicolon(strng, section, var):
