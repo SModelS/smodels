@@ -245,18 +245,19 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
 
     cleanedList = _cleanList(fileList, inDir)
     ncpus = _determineNCPus(parser.getint("parameters", "ncpus"), len(cleanedList))
+    nFiles = len(cleanedList)
     
-    if len(cleanedList) == 0:
+    if nFiles == 0:
         logger.error("No valid input files found")
         return None
-    elif len(cleanedList) == 1:        
+    elif nFiles == 1:
         logger.info("Running SModelS for a single file")
         runSingleFile(cleanedList[0], outputDir, parser, 
                         databaseVersion, listOfExpRes, timeout, 
                         development, parameterFile)
     else:
         logger.info("Running SModelS for %i files with %i processes. Messages will be redirected to smodels.log" 
-                    %(len(cleanedList),ncpus))
+                    %(nFiles,ncpus))
         for hdlr in logger.handlers[:]:
             logger.removeHandler(hdlr)
         fileLog = logging.FileHandler('./smodels.log')
@@ -273,7 +274,10 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         for i,p in enumerate(children):
             out = p.get()
             logger.debug("child %i terminated: %s" %(i,out))
-            if float(i)/len(children)
+            fracDone = round(100*float(i)/nFiles)
+            fracDoneNext = round(100*float(i+1)/nFiles)
+            if (fracDone%5 == 0 and not fracDoneNext%5 == 0) or i == nFiles:
+                logger.info('%i%% done in %1.2f min' %(fracDone,(time.time()-t0)/60.))
         logger.debug("All children terminated")
         
     logger.info("Done in %3.2f min"%((time.time()-t0)/60.))
