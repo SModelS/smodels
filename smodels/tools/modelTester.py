@@ -20,6 +20,7 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut
 from smodels.tools.printer import MPrinter
+import multiprocessing
 import os
 import sys
 import time
@@ -31,6 +32,7 @@ from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.experiment.databaseObj import Database, ExpResultList
 from smodels.tools.smodelsLogging import logger
+import logging
 
 def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """
@@ -191,42 +193,6 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
             print(crashReportFacility.createUnknownErrorMessage())
     return None
 
-def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
-                    timeout, development, parameterFile, jobnr):
-    """
-    Loop over all input files in inputFiles with testPoint
-
-    :parameter inputFiles: list of input files to be tested
-    :parameter outputDir: path to directory where output is be stored
-    :parameter parser: ConfigParser storing information from parameter.ini file
-    :parameter databaseVersion: Database version (printed to output file)
-    :parameter listOfExpRes: list of ExpResult objects to be considered
-    :parameter development: turn on development mode (e.g. no crash report)
-    :parameter parameterFile: parameter file, for crash reports
-    :parameter jobnr: number of process, in parallel mode. mostly for debugging.
-    :returns: printers output
-    """
-    a={}
-    n=len(inputFiles)
-    t_tot = 0. ## total time
-    for i,inputFile in enumerate(inputFiles):
-        txt=""
-        sjob=""
-        if jobnr>0:
-            sjob="%d: " % jobnr
-        if n>5: ## tell where we are in the list, if the list has more than 5 entries
-            txt="[%s%d/%d] " %(sjob, i+1, n)
-            if i > 3: ## give the average time spent per point
-                txt="[%s%d/%d, t~%.1fs] " %(sjob, i+1, n, t_tot/float(i))
-        if t_tot/float(i+1)>.1 or(i+1) % 10 == 0:
-            ## if it is super fast, show only every 10th
-            logger.info("Start testing %s%s" %(txt, os.path.relpath(inputFile)))
-        t0=time.time()
-        a[inputFile] = runSingleFile(inputFile, outputDir, parser, databaseVersion,
-                                  listOfExpRes, timeout, development, parameterFile)
-        t_tot +=(time.time() - t0)
-    return a
-
 def _cleanList(fileList, inDir):
     """ clean up list of files """
     cleanedList = []
@@ -271,47 +237,58 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     :param parameterFile: parameter file, for crash reports
     :returns: printer(s) output, if not run in parallel mode
     """
+    
+    t0 = time.time()
     if len(fileList) == 0:
         logger.error("no files given.")
         return None
 
-    cleanedList = _cleanList(fileList, inDir)
-    if len(cleanedList) == 1:
-        return runSingleFile(cleanedList[0], outputDir, parser, databaseVersion,
-                               listOfExpRes, timeout, development, parameterFile)
+    cleanedList = _cleanList(fileList, inDir)[:30]
+    if not cleanedList:
+        logger.Error("No valid input files found")
+        return None
+        
     ncpus = _determineNCPus(parser.getint("parameters", "ncpus"), len(cleanedList))
-    if ncpus == 1:
-        logger.info("Running SModelS in a single process")
+    useProgressBar = False
+    pBar = None    
+    if len(cleanedList) == 0:
+        logger.Error("No valid input files found")
+        return None
+    elif len(cleanedList) == 1:        
+        logger.info("Running SModelS for a single file")
     else:
-        logger.info("Running SModelS in %d processes" % ncpus)
-
-    if ncpus == 1:
-        return runSetOfFiles(cleanedList, outputDir, parser, databaseVersion,
-                              listOfExpRes, timeout, development, parameterFile, 0)
-
-    ### now split up for every fork
-    chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
+        logger.info("Running SModelS for %i files with %i processes. Messages will be redirected to smodels.log" 
+                    %(len(cleanedList),ncpus))
+        for hdlr in logger.handlers[:]:
+            logger.removeHandler(hdlr)
+        fileLog = logging.FileHandler('./smodels.log')
+        logger.addHandler(fileLog)
+        try:
+            import progressbar as P
+            pBar = P.ProgressBar(widgets= [ "Running files ", P.Percentage()])
+            pBar.maxval = len(cleanedList)
+            pBar.start()
+            useProgressBar = True
+        except:
+            pass
+    
+    pool = multiprocessing.Pool(processes=ncpus)
     children = []
-    for(i,chunk) in enumerate(chunkedFiles):
-        pid=os.fork()
-        logger.debug("Forking: %s %s %s " %(i,pid,os.getpid()))
-        if pid == 0:
-            logger.debug("chunk #%d: pid %d(parent %d)." %
-                   (i, os.getpid(), os.getppid()))
-            logger.debug(" `-> %s" % " ".join(chunk))
-            runSetOfFiles(chunk, outputDir, parser, databaseVersion,
-                            listOfExpRes, timeout, development, parameterFile, i)
-            os._exit(0) ## not sys.exit(), return, nor continue
-        if pid < 0:
-            logger.error("fork did not succeed! Pid=%d" % pid)
-            sys.exit()
-        if pid > 0:
-            children.append(pid)
-    for child in children:
-        r = os.waitpid(child, 0)
-        logger.debug("child %d terminated: %s" %(child,r))
-    logger.debug("all children terminated")
-    logger.debug("returning no output, because we are in parallel mode")
+    for inputFile in cleanedList:
+        p = pool.apply_async(runSingleFile, args=(inputFile, outputDir, parser, 
+                                                  databaseVersion, listOfExpRes, timeout, 
+                                              development, parameterFile,))
+        children.append(p)
+
+    for i,p in enumerate(children):
+        out = p.get()
+        if useProgressBar:
+            pBar.update(i+1)
+        logger.debug("child %i terminated: %s" %(i,out))
+
+
+    logger.debug("All children terminated")
+    logger.info("Done in %3.2f min"%((time.time()-t0)/60.))
     return None
 
 def checkForSemicolon(strng, section, var):
