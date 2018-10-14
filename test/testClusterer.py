@@ -61,24 +61,24 @@ class ClustererTest(unittest.TestCase):
 
         ## make a second element with a slightly different gluino mass
         el2=copy.deepcopy(el1)
-        el2.branches[0].oddParticles[0].__setattr__("mass", 725.*GeV) 
-        el2.branches[1].oddParticles[0].__setattr__("mass", 725.*GeV)  
         el2.txname = txname
 
         # lets now cluster the two different gluino masses.
-        newel=clusterTools.groupAll ( [el1,el2] )
+        newel=clusterTools.groupAll([el1,el2])
         newmasses=newel.getAvgMass()
-        self.assertTrue ( newmasses==None ) ## in the case of efficiency maps the avg mass is none
+        self.assertTrue(newmasses == [[675.*GeV,200.*GeV]]*2) ## in the case of efficiency maps the avg mass is none
         ## since it makes no sense
 
         txname.txnameData.dataTag = 'upperLimits'
-        newel=clusterTools.clusterElements ( [el1,el2], 5. )
+        el2.branches[0].oddParticles[0].__setattr__("mass", 725.*GeV) 
+        el2.branches[1].oddParticles[0].__setattr__("mass", 725.*GeV)
+        newel=clusterTools.clusterElements([el1,el2], 5.)
         ## this example gives an avg cluster mass of 700 gev
-        self.assertTrue ( newel[0].getAvgMass()[0][0] == 700. * GeV )
+        self.assertTrue(newel[0].getAvgMass()[0][0] == 700.*GeV)
         
-        newel=clusterTools.clusterElements ( [el1,el2], .5 )
+        newel=clusterTools.clusterElements([el1,el2], .5)
         #in this example the distance is not in maxdist, so we dont cluster
-        self.assertTrue ( len(newel)==2 )
+        self.assertTrue(len(newel)==2)
 
 if __name__ == "__main__":
     unittest.main()

@@ -676,7 +676,7 @@ class PyPrinter(BasicPrinter):
         elDic = {}
         elDic["ID"] = obj.elID
         elDic["Particles"] = str(obj.getParticles())
-        elDic["Masses (GeV)"] = [[m.asNumber(GeV) for m in br] for br in obj.getMasses()]
+        elDic["Masses (GeV)"] = [[round(m.asNumber(GeV),2) for m in br] for br in obj.getMasses()]
         elDic["PIDs"] = obj.getPIDs()
         elDic["Weights (fb)"] = {}
         elDic["final states"] = [str(fs) for fs in obj.getFinalStates()]
@@ -745,7 +745,7 @@ class PyPrinter(BasicPrinter):
             maxconds = theoryPrediction.getmaxCondition()
             mass = theoryPrediction.mass
             if mass:
-                mass = [[m.asNumber(GeV) for m in mbr] for mbr in mass]
+                mass = [[round(m.asNumber(GeV),2) for m in mbr] for mbr in mass]
             else:
                 mass = None
             sqrts = expResult.globalInfo.sqrts

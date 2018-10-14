@@ -9,8 +9,9 @@
 
 from smodels.theory import crossSection
 from smodels.theory.auxiliaryFunctions import massAvg, massPosition, distance
-from smodels.tools.physicsUnits import fb, MeV
+from smodels.tools.physicsUnits import fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+import numpy as np
 
 from smodels.tools.smodelsLogging import logger
 
@@ -49,34 +50,21 @@ class ElementCluster(object):
 
     def getAvgMass(self):
         """
-        Return the average mass of all elements belonging to the cluster.
-        If the cluster does not refer to a TxName (i.e. in efficiency map results)
-        AND the cluster contains more than one element (assuming they differ in
-        the masses), returns None.
+        Return the average mass of all elements belonging to the cluster, weighted
+        by their individual weights.
+        If the masses have distinct shapes (e.g. for different txnames in efficiencyMap
+        results), return None.
         
-        :returns: average mass array for UL; mass of first element for EM (unless the elements have different masses, then None)     
+        :returns: average mass array appearing in the cluster     
         """                          
         
-        if self.getDataType() == 'efficiencyMap':
-            firstElMass = self.elements[0].getMasses()         
-            if len(self.elements) > 1: 
-                for el in self.elements[1:]:
-                    elMass = el.getMasses()
-                    if len(elMass) != len(firstElMass):
-                        return None     
-                    for ib,branchMasses in enumerate(elMass):
-                        if len(branchMasses) != len(firstElMass[ib]):
-                            return None 
-                        for im,mass in enumerate(branchMasses):
-                            if abs ( (mass-firstElMass[ib][im]).asNumber(MeV) ) > .1:
-                                return None
-            return firstElMass
- 
-            
-        elif self.getDataType() == 'upperLimit':
-            massList = [el.getMasses() for el in self.elements]
-            weights = [el.weight.getMaxXsec() / fb for el in self.elements]
-            return massAvg(massList,weights=weights)
+        massList = [el.getMasses() for el in self.elements]
+        if any(np.array(m).shape != np.array(massList[0]).shape for m in massList):
+            return None
+        
+        weights = [el.weight.getMaxXsec().asNumber(fb) for el in self.elements]
+        
+        return massAvg(massList,weights=weights)
 
 
     def getPIDs(self):
@@ -89,8 +77,9 @@ class ElementCluster(object):
         
         PIDs = []
         for el in self:
-            for pidList in el.getMotherPIDs():
-                if not pidList in PIDs: PIDs.append(pidList)
+            for pidList in el.getMothers():
+                if not pidList in PIDs:
+                    PIDs.append(pidList)
             
         return PIDs
     
