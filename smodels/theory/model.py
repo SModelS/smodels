@@ -180,7 +180,7 @@ class Model(object):
                 oddPids = [pid for pid in decay.ids if abs(pid) in oddPDGs]
                 evenPids = [pid for pid in decay.ids if abs(pid) in evenPDGs]
                 if len(oddPids) != 1 or len(evenPids+oddPids) != len(decay.ids):
-                    logger.info("Decay %s is not of the form Z2-odd -> Z2-odd + [Z2-even particles] and will be ignored" %(decay))
+                    logger.debug("Decay %i -> %s is not of the form Z2-odd -> Z2-odd + [Z2-even particles] and will be ignored" %(pdg,pids))
                     continue
 
                 newDecay = pyslha.Decay(br=decay.br,nda=decay.nda,parentid=decay.parentid,ids=decay.ids[:])

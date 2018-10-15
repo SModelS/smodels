@@ -20,6 +20,7 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut
 from smodels.tools.printer import MPrinter
+import multiprocessing
 import os
 import sys
 import time
@@ -31,6 +32,7 @@ from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.experiment.databaseObj import Database, ExpResultList
 from smodels.tools.smodelsLogging import logger
+import logging
 
 def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """
@@ -61,7 +63,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Check input file for errors"""
     inputStatus = ioObjects.FileStatus()
     if parser.getboolean("options", "checkInput"):
-        inputStatus.checkFile( inputFile, sigmacut)
+        inputStatus.checkFile(inputFile, sigmacut)
     """Initialize output status and exit if there were errors in the input"""
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
             dict(parser.items("parameters")), databaseVersion)
@@ -81,7 +83,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         model = Model(inputFile=inputFile, BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles()
     except SModelSError as e:
-        print ( "Exception %s %s" % ( e, type(e) ) )
+        print("Exception %s %s" %(e, type(e)))
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
         return masterPrinter.flush()        
@@ -100,7 +102,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
                     doInvisible=parser.getboolean("options", "doInvisible"),
                     minmassgap=minmassgap)
     except SModelSError as e:
-        print ( "Exception %s %s" % ( e, type(e) ) )
+        print("Exception %s %s" %(e, type(e)))
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
         return masterPrinter.flush()
@@ -124,13 +126,13 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     allPredictions = []
     combineResults=False
     try:
-        combineResults = parser.getboolean ("options","combineSRs") 
+        combineResults = parser.getboolean("options","combineSRs")
     except Exception as e:
         pass
     for expResult in listOfExpRes:
         theorypredictions = theoryPredictionsFor(expResult, smstoplist,
                     useBestDataset=True, combinedResults=combineResults,
-                    marginalize=False )
+                    marginalize=False)
         if not theorypredictions:
             continue
         allPredictions += theorypredictions._theoryPredictions
@@ -187,12 +189,12 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
             raise e
         else:
             print(crashReport.createStackTrace())
-            crashReportFacility.createCrashReportFile( inputFile, parameterFile )
+            crashReportFacility.createCrashReportFile(inputFile, parameterFile)
             print(crashReportFacility.createUnknownErrorMessage())
     return None
 
 def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
-                    timeout, development, parameterFile, jobnr ):
+                    timeout, development, parameterFile):
     """
     Loop over all input files in inputFiles with testPoint
 
@@ -203,42 +205,27 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
     :parameter listOfExpRes: list of ExpResult objects to be considered
     :parameter development: turn on development mode (e.g. no crash report)
     :parameter parameterFile: parameter file, for crash reports
-    :parameter jobnr: number of process, in parallel mode. mostly for debugging.
     :returns: printers output
     """
-    a={}
-    n=len(inputFiles)
-    t_tot = 0. ## total time
-    for i,inputFile in enumerate(inputFiles):
-        txt=""
-        sjob=""
-        if jobnr>0:
-            sjob="%d: " % jobnr
-        if n>5: ## tell where we are in the list, if the list has more than 5 entries
-            txt="[%s%d/%d] " % ( sjob, i+1, n )
-            if i > 3: ## give the average time spent per point
-                txt="[%s%d/%d, t~%.1fs] " % ( sjob, i+1, n, t_tot/float(i) )
-        if t_tot/float(i+1)>.1 or (i+1) % 10 == 0:
-            ## if it is super fast, show only every 10th
-            logger.info ( "Start testing %s%s" % (txt, os.path.relpath ( inputFile ) ) )
-        t0=time.time()
-        a[inputFile] = runSingleFile(inputFile, outputDir, parser, databaseVersion,
-                                  listOfExpRes, timeout, development, parameterFile)
-        t_tot += ( time.time() - t0 )
-    return a
 
-def _cleanList ( fileList, inDir ):
+    for inputFile in inputFiles:
+        runSingleFile(inputFile, outputDir, parser, databaseVersion,
+                                  listOfExpRes, timeout, development, parameterFile)
+    return None
+
+
+def _cleanList(fileList, inDir):
     """ clean up list of files """
     cleanedList = []
     for f in fileList:
-        tmp = os.path.join(inDir, f )
-        if not os.path.isfile ( tmp ):
-            logger.info ( "%s does not exist or is not a file. Skipping it." % tmp )
+        tmp = os.path.join(inDir, f)
+        if not os.path.isfile(tmp):
+            logger.info("%s does not exist or is not a file. Skipping it." % tmp)
             continue
-        cleanedList.append( tmp )
+        cleanedList.append(tmp)
     return cleanedList
 
-def _determineNCPus ( cpus_wanted, n_files ):
+def _determineNCPus(cpus_wanted, n_files):
     """ determine the number of CPUs that are to be used.
     :param cpus_wanted: number of CPUs specified in parameter file
     :param n_files: number of files to be run on
@@ -248,10 +235,10 @@ def _determineNCPus ( cpus_wanted, n_files ):
     # ncpus = parser.getint("parameters", "ncpus")
     ncpus = cpus_wanted
     if ncpus == 0 or ncpus < -1:
-        logger.error ( "Weird number of ncpus given in ini file: %d" % ncpus )
+        logger.error("Weird number of ncpus given in ini file: %d" % ncpus)
         sys.exit()
     if ncpus == -1 or ncpus > ncpusAll: ncpus = ncpusAll
-    ncpus = min ( n_files, ncpus )
+    ncpus = min(n_files, ncpus)
     return ncpus
 
 def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
@@ -271,52 +258,64 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     :param parameterFile: parameter file, for crash reports
     :returns: printer(s) output, if not run in parallel mode
     """
-    if len( fileList ) == 0:
-        logger.error ( "no files given." )
+
+    t0 = time.time()
+    if len(fileList) == 0:
+        logger.error("no files given.")
         return None
 
-    cleanedList = _cleanList ( fileList, inDir )
-    if len(cleanedList) == 1:
-        return runSingleFile ( cleanedList[0], outputDir, parser, databaseVersion,
-                               listOfExpRes, timeout, development, parameterFile )
+    cleanedList = _cleanList(fileList, inDir)
     ncpus = _determineNCPus(parser.getint("parameters", "ncpus"), len(cleanedList))
-    if ncpus == 1:
-        logger.info ("Running SModelS in a single process" )
+    nFiles = len(cleanedList)
+    
+    if nFiles == 0:
+        logger.error("No valid input files found")
+        return None
+    elif nFiles == 1:
+        logger.info("Running SModelS for a single file")
+        runSingleFile(cleanedList[0], outputDir, parser, 
+                        databaseVersion, listOfExpRes, timeout, 
+                        development, parameterFile)
     else:
-        logger.info ("Running SModelS in %d processes" % ncpus )
+        logger.info("Running SModelS for %i files with %i processes. Messages will be redirected to smodels.log" 
+                    %(nFiles,ncpus))
+        for hdlr in logger.handlers[:]:
+            logger.removeHandler(hdlr)
+        fileLog = logging.FileHandler('./smodels.log')
+        logger.addHandler(fileLog)
 
-    if ncpus == 1:
-        return runSetOfFiles( cleanedList, outputDir, parser, databaseVersion,
-                              listOfExpRes, timeout, development, parameterFile, 0 )
+        ### now split list of files
+        chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
+        pool = multiprocessing.Pool(processes=ncpus)
+        children = []
+        for chunkFile in chunkedFiles:
+            p = pool.apply_async(runSetOfFiles, args=(chunkFile, outputDir, parser,
+                                                      databaseVersion, listOfExpRes, timeout, 
+                                                  development, parameterFile,))
+            children.append(p)
+        pool.close()
+        iprint, nprint = 5,5 #Define when to start printing and the percentage step
+        #Check process progress until they are all finished
+        while True:
+            done = sum([p.ready() for p in children])
+            fracDone = 100*float(done)/len(children)
+            if fracDone >= iprint:
+                while fracDone >= iprint:
+                    iprint += nprint
+                logger.info('%i%% done in %1.2f min' %(iprint-nprint,(time.time()-t0)/60.))
+            if done == len(children):
+                break
+            time.sleep(2)
 
-    ### now split up for every fork
-    chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
-    children = []
-    for (i,chunk) in enumerate(chunkedFiles):
-        pid=os.fork()
-        logger.debug("Forking: %s %s %s " % ( i,pid,os.getpid() ) )
-        if pid == 0:
-            logger.debug("chunk #%d: pid %d (parent %d)." %
-                    ( i, os.getpid(), os.getppid() ) )
-            logger.debug( " `-> %s" % " ".join ( chunk ) )
-            runSetOfFiles(chunk, outputDir, parser, databaseVersion,
-                            listOfExpRes, timeout, development, parameterFile, i )
-            os._exit(0) ## not sys.exit(), return, nor continue
-        if pid < 0:
-            logger.error ( "fork did not succeed! Pid=%d" % pid )
-            sys.exit()
-        if pid > 0:
-            children.append ( pid )
-    for child in children:
-        r = os.waitpid ( child, 0 )
-        logger.debug ( "child %d terminated: %s" % (child,r) )
-    logger.debug ( "all children terminated" )
-    logger.debug ( "returning no output, because we are in parallel mode" )
+        logger.debug("All children terminated")
+        
+    logger.info("Done in %3.2f min"%((time.time()-t0)/60.))
+    
     return None
 
-def checkForSemicolon ( strng, section, var ):
+def checkForSemicolon(strng, section, var):
     if ";" in strng:
-        logger.warning ( "A semicolon (;) has been found in [%s] %s, in your config file. If this was meant as comment, then please a space before it." % ( section, var) )
+        logger.warning("A semicolon(;) has been found in [%s] %s, in your config file. If this was meant as comment, then please a space before it." %(section, var))
 
 def loadDatabase(parser, db):
     """
@@ -330,30 +329,30 @@ def loadDatabase(parser, db):
 
     """
     try:
-        dp = parser.get ( "path", "databasePath" )
-        logger.error ( "``[path] databasePath'' in ini file is deprecated; " \
-           "use ``[database] path'' instead. (See e.g. smodels/etc/parameters_default.ini)" )
-        parser.set ( "database", "path", dp )
+        dp = parser.get("path", "databasePath")
+        logger.error("``[path] databasePath'' in ini file is deprecated; " \
+           "use ``[database] path'' instead.(See e.g. smodels/etc/parameters_default.ini)")
+        parser.set("database", "path", dp)
     except Exception as e:
         ## path.databasePath not set. This is good.
         pass
     try:
         database = db
-        # logger.error ( "database=db: %s" % database )
+        # logger.error("database=db: %s" % database)
         if database in [ None, True ]:
-            databasePath = parser.get( "database", "path" )
-            checkForSemicolon ( databasePath, "database", "path" )
+            databasePath = parser.get("database", "path")
+            checkForSemicolon(databasePath, "database", "path")
             discard_zeroes = True
             try:
-                discard_zeroes = parser.getboolean( "database", "discardZeroes" )
+                discard_zeroes = parser.getboolean("database", "discardZeroes")
             except Exception as e: ## too complicated to be more specific
-                logger.info ( "database:discardZeroes is not given in config file. Defaulting to 'True'." )
+                logger.info("database:discardZeroes is not given in config file. Defaulting to 'True'.")
             force_load=None
             if database == True: force_load="txt"
-            if os.path.isfile ( databasePath ):
+            if os.path.isfile(databasePath):
                 force_load="pcl"
-            database = Database( databasePath, force_load=force_load, \
-                                 discard_zeroes = discard_zeroes )
+            database = Database(databasePath, force_load=force_load, \
+                                 discard_zeroes = discard_zeroes)
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
         logger.error("Database not found in ``%s''" % os.path.realpath(databasePath))
@@ -413,12 +412,12 @@ def getParameters(parameterFile):
 
     """
     try:
-        parser = ConfigParser( inline_comment_prefixes=( ';', ) )
+        parser = ConfigParser(inline_comment_prefixes=(';',))
     except Exception as e:
         parser = SafeConfigParser()
     ret=parser.read(parameterFile)
     if ret == []:
-        logger.error ( "No such file or directory: '%s'" % parameterFile )
+        logger.error("No such file or directory: '%s'" % parameterFile)
         sys.exit()
     return parser
 
@@ -433,5 +432,5 @@ def getAllInputFiles(inFile):
     if os.path.isdir(inFile):
         fileList = os.listdir(inFile)
         return fileList, inFile
-    fileList = [ os.path.basename ( inFile ) ]
-    return fileList, os.path.dirname ( inFile )
+    fileList = [ os.path.basename(inFile) ]
+    return fileList, os.path.dirname(inFile)

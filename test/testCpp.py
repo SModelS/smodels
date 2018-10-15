@@ -52,7 +52,7 @@ class CppTest(unittest.TestCase):
         if len(a) != len(b):
             print ( "test failed. writing output to debug.txt" )
             f=open("debug.txt","w")
-            for i in b:
+            for i in a:
                 f.write ( i+ "\n" )
             f.close()
         self.assertEqual(len(a), len(b))
