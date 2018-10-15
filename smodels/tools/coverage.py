@@ -102,9 +102,7 @@ class Uncovered(object):
                         if outsideX: # if all mothers are tested, this is no longer outside grid contribution, otherwise add to list
                             el.missingX =  outsideX # for combined printing function, call outside grid weight missingX as well
                             self.outsideGrid.addToGeneralElements(el) # add to list of outsideGrid topos                        
-                    continue
-                if checkFor=='tested':
-                    self.outsideGridMothers.append(mother[-1].elID) # mother element is not tested, but should no longer be considered as outside grid, because we already count its contribution here                
+                    continue         
                 self.missingTopos.addToGeneralElements(el) #keep track of all missing topologies                
                 if self.hasDisplaced(el):
                     self.displaced.addToGeneralElements(el)
