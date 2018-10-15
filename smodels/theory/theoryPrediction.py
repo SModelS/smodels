@@ -8,7 +8,7 @@
 """
 
 from smodels.theory import clusterTools, crossSection, element
-from smodels.theory.auxiliaryFunctions import cSim, cGtr, elementsInStr
+from smodels.theory.auxiliaryFunctions import cSim, cGtr, elementsInStr, massAvg
 from smodels.tools.physicsUnits import TeV,fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
@@ -361,6 +361,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     PIDList = []
     IDList = []
     datasetPredictions = []
+    weights = []
     for predList in dataSetResults:
         if len(predList) != 1:
             raise SModelSError("Results with multiple datasets should have a single theory prediction (EM-type)!")
@@ -372,8 +373,8 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
             totalXsec = pred.xsection
         else:
             totalXsec += pred.xsection
-        if not pred.mass in massList:
-            massList.append(pred.mass)
+        massList.append(pred.mass)
+        weights.append(pred.xsection.value.asNumber(fb))
         for pidEntry in pred.PIDs:
             if not pidEntry in PIDList:
                 PIDList.append(pidEntry)
@@ -381,10 +382,10 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
         
     txnameList = list(set(txnameList))
     IDList = list(set(IDList))
-    if len(massList) > 1:
+    if None in massList:
         mass = None
     else:
-        mass = massList[0]
+        mass = massAvg(massList,weights=weights)
     
     
     #Create a combinedDataSet object:

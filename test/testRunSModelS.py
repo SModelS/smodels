@@ -90,7 +90,7 @@ class RunSModelSTest(unittest.TestCase):
         self.removeOutputs( outputfile )
 
     def testGoodFileHSCP(self):
-        filename = join( iDir(), "inputFiles/slha/longLived.slha" )
+        filename = "./testFiles/slha/longLived.slha"
         outputfile = runMain(filename)
         with open(outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
