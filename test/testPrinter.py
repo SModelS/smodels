@@ -62,6 +62,13 @@ def compareXML(xmldefault,xmlnew,allowedDiff,ignore=[]):
 
     return True
 
+def compareSLHA(slhadefault,slhanew):
+    for i,line in enumerate(slhadefault.split("\n")):
+        if line != slhanew.split("\n")[i]:
+            print (line, " != ", slhanew.split("\n")[i])
+            return False
+    return True
+
 class RunPrinterTest(unittest.TestCase):
 
     def runPrinterMain(self, slhafile, mprinter,addTopList=False):
@@ -284,7 +291,7 @@ class RunPrinterTest(unittest.TestCase):
         slhaNewFile.close()      
            
         try:
-            self.assertEqual(slhaDefault, slhaNew)
+            self.assertTrue(compareSLHA(slhaDefault, slhaNew))
         except AssertionError as e:
             msg = "%s != %s" %(slhaDefault, slhaNew) 
             raise AssertionError(msg)
