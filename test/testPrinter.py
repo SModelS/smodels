@@ -62,8 +62,6 @@ def compareXML(xmldefault,xmlnew,allowedDiff,ignore=[]):
 
     return True
 
-
-
 class RunPrinterTest(unittest.TestCase):
 
     def runPrinterMain(self, slhafile, mprinter,addTopList=False):
@@ -264,6 +262,33 @@ class RunPrinterTest(unittest.TestCase):
             raise AssertionError(msg)
         self.removeOutputs ( './unitTestOutput/printer_output_simple.xml' )  
 
+    def testSLHAPrinter(self):    
+        self.removeOutputs ( './unitTestOutput/printer_output.smodelsslha' )  
+ 
+        mprinter = printer.MPrinter()
+        mprinter.Printers['slha'] = printer.SLHAPrinter(output = 'file')
+        #Define options:
+        mprinter.Printers['slha'].addelementlist = True   
+        mprinter.Printers['slha'].docompress = 1
+ 
+        slhafile = "./testFiles/slha/gluino_squarks.slha"
+        mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=False)
+        self.runPrinterMain(slhafile,mprinter,addTopList=True)                    
+     
+        slhaDefaultFile = open(os.path.join( idir(), "test/gluino_squarks_default.slha.smodelsslha"),'r')
+        slhaDefault = slhaDefaultFile.read()
+        slhaDefaultFile.close()
+        #Test summary output
+        slhaNewFile = open('./unitTestOutput/printer_output.smodelsslha'  ,'r')
+        slhaNew = slhaNewFile.read()
+        slhaNewFile.close()      
+           
+        try:
+            self.assertEqual(slhaDefault, slhaNew)
+        except AssertionError as e:
+            msg = "%s != %s" %(slhaDefault, slhaNew) 
+            raise AssertionError(msg)
+        self.removeOutputs ( './unitTestOutput/printer_output.smodelsslha' )  
 
 if __name__ == "__main__":
     unittest.main()

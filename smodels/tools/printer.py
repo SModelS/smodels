@@ -1010,16 +1010,17 @@ class SLHAPrinter(TxTPrinter):
 
     def _formatTheoryPredictionList(self, obj):
         output = "BLOCK SModelS_Exclusion\n"
-        if obj.isEmpty():
+        if not obj._theoryPredictions[0]:
             excluded = -1
         else:
-            firstResult = obj.theoryPredictions[0]
-            r = obj.getR(firstResult)
+            obj.sortTheoryPredictions()
+            firstResult = obj._theoryPredictions[0]
+            r = firstResult.getRValue()
             if r > 1: excluded = 1
             else: excluded = 0
         output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n" % (excluded)
         if excluded == 0: rList = [firstResult]
-        elif excluded == 1: rList = obj.theoryPredictions
+        elif excluded == 1: rList = obj._theoryPredictions
         else: rList = []
         cter = 1
         for theoPred in rList:
@@ -1053,26 +1054,16 @@ class SLHAPrinter(TxTPrinter):
 
     def _formatUncovered(self, obj):
         output = ""
-        for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid]):
-            for topo in uncovEntry.topos:
-                if topo.value > 0.: continue
-                for el in topo.contributingElements:
-                    if not el.weight.getXsecsFor(obj.missingTopos.sqrts): continue
-                    topo.value += el.missingX
+        for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid, obj.longLived, obj.displaced, obj.MET]):
             if ix==0: output += "BLOCK SModelS_Missing_Topos #sqrts[TeV] weight[fb] description\n"
-            else: output += "\nBLOCK SModelS_Outside_Grid #sqrts[TeV] weight[fb] description\n"
+            elif ix==1: output += "\nBLOCK SModelS_Outside_Grid #sqrts[TeV] weight[fb] description\n"
+            elif ix==2: output += "\nBLOCK SModelS_Long_Lived #sqrts[TeV] weight[fb] description\n"
+            elif ix==3: output += "\nBLOCK SModelS_Displaced #sqrts[TeV] weight[fb] description\n"
+            else: output += "\nBLOCK SModelS_MET #sqrts[TeV] weight[fb] description\n"
             cter = 0
-            for t in sorted(uncovEntry.topos, key=lambda x: x.value, reverse=True):
-                output += " %d %d %10.3E %s\n" % (cter, obj.missingTopos.sqrts/TeV, t.value, str(t.topo))
-                cter += 1
-                if cter > 9: break
-        for ix, uncovEntry in enumerate([obj.longLived, obj.displaced, obj.MET]):
-            if ix==0: output += "\nBLOCK SModelS_Long_Lived #Mother1 Mother2 Weight[fb] allMothers\n"
-            elif ix==1: output += "\nBLOCK SModelS_Displaced #Mother1 Mother2 Weight[fb] allMothers\n"
-            else: output += "\nBLOCK SModelS_MET #Mother1 Mother2 Weight[fb] allMothers\n"
-            cter = 0
-            for ent in uncovEntry.getSorted(obj.sqrts):
-                output += " %d %s %s %10.3E %s\n" %(cter, ent.motherPIDs[0][0], ent.motherPIDs[0][1], ent.getWeight(), str(ent.motherPIDs).replace(" ",""))
+            for genEl in sorted(uncovEntry.generalElements, key=lambda x: x.missingX, reverse=True):
+                output += " %d %d %10.3E %s\n" % (cter, obj.missingTopos.sqrts/TeV, genEl.missingX, str(genEl._outputDescription))
                 cter += 1
                 if cter > 9: break
         return output
+            
