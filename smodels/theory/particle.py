@@ -193,7 +193,7 @@ class Particle(object):
         
     def isNeutral(self):
         """
-        Return True if the particle label is MET or if it color and charge
+        Return True if the particle label is MET or if it is color and charge
         neutral.
         
         :return: True/False
@@ -217,8 +217,26 @@ class Particle(object):
             return self._isMET
         else:
             return self.isNeutral()
-    
-        
+
+    def isPrompt(self):
+        """
+        Checks if the particle decays promptly (e.g. totalwidth = inf).
+
+        :return: True/False
+        """
+
+        return self.totalwidth.asNumber() == float('inf')
+
+    def isStable(self):
+        """
+        Checks if the particle is stable (e.g. totalwidth = 0).
+
+        :return: True/False
+        """
+
+        return self.totalwidth.asNumber() == 0.
+
+
 
 class MultiParticle(Particle):
 

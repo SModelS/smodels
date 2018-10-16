@@ -371,6 +371,8 @@ class Branch(object):
         
         if not self.oddParticles or not self.oddParticles[-1].decays: 
             return False
+        if self.oddParticles[-1].isStable():
+            return False
 
         newBranches = []
         for decay in self.oddParticles[-1].decays:

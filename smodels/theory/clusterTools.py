@@ -63,7 +63,7 @@ class ElementCluster(object):
             return None
         
         weights = [el.weight.getMaxXsec().asNumber(fb) for el in self.elements]
-        
+
         return massAvg(massList,weights=weights)
 
 

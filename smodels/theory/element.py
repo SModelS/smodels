@@ -481,20 +481,22 @@ class Element(object):
         for ibr,branch in enumerate(newelement.branches):
             #Get mass differences      
      
-            massDiffs = []
+            removeVertices = []
             for i,mom in enumerate(branch.oddParticles[:-1]):
-                if isinstance(branch.oddParticles[i+1].mass, list):
-                    pmass = min(branch.oddParticles[i+1].mass)
-                else: pmass = branch.oddParticles[i+1].mass
-                massDiffs.append(mom.mass - pmass)
-            #Get vertices which have deltaM < minmassgap:
-            removeVertices = [iv for iv,m in enumerate(massDiffs) if m < minmassgap]
+                massDiff = mom.mass - branch.oddParticles[i+1].mass
+                #Get vertices which have deltaM < minmassgap and the mother is prompt:
+                if massDiff < minmassgap and mom.isPrompt():
+                    removeVertices.append(i)
             #Remove vertices till they exist:
             while removeVertices:
                 newelement.removeVertex(ibr,removeVertices[0])
                 branch = newelement.branches[ibr]
-                massDiffs = [mom.mass - branch.oddParticles[i+1].mass for i,mom in enumerate(branch.oddParticles[:-1])]
-                removeVertices = [iv for iv,m in enumerate(massDiffs) if m < minmassgap]
+                removeVertices = []
+                for i,mom in enumerate(branch.oddParticles[:-1]):
+                    massDiff = mom.mass - branch.oddParticles[i+1].mass
+                    #Get vertices which have deltaM < minmassgap and the mother is prompt:
+                    if massDiff < minmassgap and mom.isPrompt():
+                        removeVertices.append(i)
                 
         for ibr,branch in enumerate(newelement.branches):
             if branch.vertnumb != self.branches[ibr].vertnumb:
@@ -522,8 +524,10 @@ class Element(object):
                 continue
             #Check if the last decay should be removed:            
             neutralSM = all(ptc.isMET() for ptc in branch.evenParticles[-1])
-            neutralBSM = branch.oddParticles[-2].isMET() 
-            if neutralBSM and neutralSM:
+            neutralDecay = neutralSM and branch.oddParticles[-1].isMET()
+            #Check if the mother can be considered MET:
+            neutralBSM = branch.oddParticles[-2].isMET()
+            if neutralBSM and neutralDecay:
                 removeLastVertex = True
             else:
                 removeLastVertex = False
@@ -537,8 +541,9 @@ class Element(object):
                 if not branch.evenParticles:
                     continue
                 neutralSM = all(ptc.isMET() for ptc in branch.evenParticles[-1])
+                neutralDecay = neutralSM and branch.oddParticles[-1].isMET()
                 neutralBSM = branch.oddParticles[-2].isMET()
-                if neutralBSM and neutralSM:
+                if neutralBSM and neutralDecay:
                     removeLastVertex = True
                 else:
                     removeLastVertex = False

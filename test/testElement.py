@@ -139,8 +139,11 @@ class ElementTest(unittest.TestCase):
          
         #Compress gluino-stop1
         gluino.mass = 400.*GeV
+        gluino.totalwidth = float('inf')*GeV
         st1.mass = 398.*GeV
-        n1.mass = 390.*GeV        
+        st1.totalwidth = float('inf')*GeV
+        n1.mass = 390.*GeV
+        n1.totalwidth = 0.*GeV
         el1Comp = el1.massCompress(minmassgap = 5.*GeV)
         b1Comp = Branch()
         b1Comp.evenParticles = [[b,t]]
