@@ -79,7 +79,7 @@ class Model(object):
         return valueList
     
 
-    def updateParticles(self, promptWidth = 1e-8*GeV, stableWidth = 1e-25*GeV, roundMasses = 1):        
+    def updateParticles(self, promptWidth = 2e-14*GeV, stableWidth = 1e-25*GeV, roundMasses = 1):        
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file. 
             
