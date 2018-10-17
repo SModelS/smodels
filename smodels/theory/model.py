@@ -79,16 +79,23 @@ class Model(object):
         return valueList
     
 
-    def updateParticles(self, promptWidth = 2e-14*GeV, stableWidth = 1e-25*GeV, roundMasses = 1):        
+    def updateParticles(self, promptWidth = None, stableWidth = None, roundMasses = 1):
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file. 
             
-        :param promptWidth: Maximum width for considering particles as decaying prompt
-        :param stableWidth: Minimum width for considering particles as stable
+        :param promptWidth: Maximum width for considering particles as decaying prompt. If None, it
+                            will be set 1e-8 GeV.
+        :param stableWidth: Minimum width for considering particles as stable. If None, it
+                            will be set 1e-25 GeV.
         :param roundMasses: If set, it will round the masses to this number of digits (int)  
             
         """
-        
+
+        if promptWidth is None:
+            promptWidth = 1e-8*GeV
+        if stableWidth is None:
+            stableWidth = 1e-25*GeV
+
         #Trick to suppress pyslha error messages:
         import sys
         storeErr = sys.stderr
