@@ -1,17 +1,18 @@
-name: environment
+name: environment-smodels
 channels:
   - conda-forge
 dependencies:
   - python
-  - numpy
-  - matplotlib
-  - pandas
-  - fortran
-  - plotly
-  - docutils>=0.3
-  - numpy>=1.13.0
-  - scipy>=1.0.0
-  - unum>=4.0.0
-  - argparse
-  - requests>=2.0.0
-  - pyslha>=3.1.0
+  - gfortran
+  - pip:
+    - matplotlib
+    - pandas
+    - plotly
+    - numpy
+    - scipy
+    - docutils
+    - unum
+    - argparse
+    - requests
+    - pyslha
+
