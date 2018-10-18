@@ -249,6 +249,8 @@ class DataSet(object):
                 logger.error("Upper limit defined with wrong units for %s and %s"
                               %(self.globalInfo.id,self.getID()))
                 return False
+            else:
+                return upperLimit
             
         elif self.getType() == 'upperLimit':        
             if not txnames or not mass:
