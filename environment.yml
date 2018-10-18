@@ -3,7 +3,8 @@ channels:
   - conda-forge
 dependencies:
   - python
-  - gfortran
+  - gfortran_linux-64
+  - libgfortran
   - pip:
     - matplotlib
     - pandas
@@ -15,4 +16,3 @@ dependencies:
     - argparse
     - requests
     - pyslha
-
