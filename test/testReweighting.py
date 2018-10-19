@@ -13,25 +13,27 @@ from smodels.theory.branch import Branch
 from smodels.tools.reweighting import calculateProbabilities, addPromptAndDisplaced
 from smodels.tools.physicsUnits import GeV
 
-n1 = mssm.n1
-n1.totalwidth = 0.*GeV
-st1 = mssm.st1
-st1.totalwidth = 2.*GeV 
-gluino = mssm.gluino
-gluino.totalwidth = 1.*10**(-30)*GeV
-t = SMparticles.t
-
 class ReweightingTest(unittest.TestCase):     
    
     def testcalculateProbabilities(self):
-      
+
+        gluino = mssm.gluino.copy()
+        gluino.totalwidth = 1.*10**(-30)*GeV
         F_long, F_prompt, F_displaced = calculateProbabilities(gluino.totalwidth)
         self.assertAlmostEqual(F_long, 1.)
         self.assertEqual(F_prompt, 0.)
         self.assertAlmostEqual(F_displaced, 0.)
     
     
-    def testaddPromptAndDisplaced(self):        
+    def testaddPromptAndDisplaced(self):
+
+        n1 = mssm.n1.copy()
+        n1.totalwidth = 0.*GeV
+        st1 = mssm.st1.copy()
+        st1.totalwidth = 2.*GeV
+        gluino = mssm.gluino.copy()
+        gluino.totalwidth = 1.*10**(-30)*GeV
+        t = SMparticles.t
     
         branch1 = Branch()
         branch1.oddParticles = [n1]
