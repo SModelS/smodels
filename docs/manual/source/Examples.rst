@@ -1,12 +1,23 @@
 .. index:: How To's
 
+.. |binder| image::
+      https://mybinder.org/badge.svg
+      :target: https://mybinder.org/v2/gh/SModelS/smodels/master?filepath=docs%2Fmanual%2Fsource%2Frecipes%2F
+
+
 .. _Examples:
 
 How To's
 ========
 
 
-Below a few examples are given for how to utilize SModelS and some of the :doc:`SModelS tools <Tools>` as a Python library [*]_:
+
+Below we provide a few examples for using SModelS and some of the :doc:`SModelS tools <Tools>` as a Python library [*]_.
+
+
+To try out the examples in interactive mode: |binder|
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 * `How to load the database <load_database.html>`_ (download the Python code :download:`here <recipes/load_database.py>`, IPython notebook :download:`here <recipes/load_database.ipynb>`)
 
