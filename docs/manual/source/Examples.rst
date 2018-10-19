@@ -18,6 +18,9 @@ Below we provide a few examples for using SModelS and some of the :doc:`SModelS 
 To try out the examples in interactive mode: |binder|
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+* `How to run SModelS using a parameter file <runWithParameterFile.html>`_ (download the Python code :download:`here <recipes/runWithParameterFile.py>`, IPython notebook :download:`here <recipes/runWithParameterFile.ipynb>`)
+
+* `How to run SModelS as a python library <runAsLibrary.html>`_ (download the Python code :download:`here <recipes/runAsLibrary.py>`, IPython notebook :download:`here <recipes/runAsLibrary.ipynb>`)
 
 * `How to load the database <load_database.html>`_ (download the Python code :download:`here <recipes/load_database.py>`, IPython notebook :download:`here <recipes/load_database.ipynb>`)
 
