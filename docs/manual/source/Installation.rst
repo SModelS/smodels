@@ -95,7 +95,7 @@ Installation Methods
    Note that this installation method will install smodels into the default system or user directory (e.g. ~/.local/lib/python3/site-packages/).
    Depending on your platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
    (or $DYLD_LIBRARY_PATH) might have to be set appropriately.
-   Be aware that the example files and the |parameters| file discussed in the manual 
+   Be aware that the example files and the |parameters| discussed in the manual 
    will also be located in your default system or user directory. Furthermore the database
    folder is not included (see :ref:`database installation <installingDB>` below).
 

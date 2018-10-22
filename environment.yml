@@ -1,0 +1,16 @@
+name: environment-smodels
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - pip:
+    - matplotlib
+    - pandas
+    - plotly
+    - numpy
+    - scipy
+    - docutils
+    - unum
+    - argparse
+    - requests
+    - pyslha

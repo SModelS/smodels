@@ -191,8 +191,11 @@ def fixpermissions():
         print ( "chmod failed (permission error). Please try as root, i.e.:" )
         print ( "sudo smodelsTools.py fixpermissions" )
 
-def officialDatabase():
-    r="http://smodels.hephy.at/database/official%s" % version().replace(".","")
+def officialDatabase( fastlim=False ):
+    """ :param fastlim: include fastlim results """
+    v=version().replace(".","")
+    fl = "_fastlim" if fastlim else ""
+    r="http://smodels.hephy.at/database/official%s%s" % (v,fl)
     return r
 
 def testDatabase():

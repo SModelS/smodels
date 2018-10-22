@@ -81,7 +81,13 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         """
         from smodels.particlesLoader import BSMList
         model = Model(inputFile=inputFile, BSMparticles=BSMList, SMparticles=SMList)
-        model.updateParticles()
+        promptWidth = None
+        stableWidth = None
+        if parser.has_option("particles","promptWidth"):
+            promptWidth = parser.getfloat("particles", "promptWidth")*GeV
+        if parser.has_option("particles","stableWidth"):
+            stableWidth = parser.getfloat("particles", "stableWidth")*GeV
+        model.updateParticles(promptWidth=promptWidth, stableWidth=stableWidth)
     except SModelSError as e:
         print("Exception %s %s" %(e, type(e)))
         """ Update status to fail, print error message and exit """
@@ -97,6 +103,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     try:
 
         """ Decompose the input model, store the output elements in smstoplist """
+        sigmacut = parser.getfloat("parameters", "sigmacut") * fb
         smstoplist = decomposer.decompose(model, sigmacut,
                     doCompress=parser.getboolean("options", "doCompress"),
                     doInvisible=parser.getboolean("options", "doInvisible"),

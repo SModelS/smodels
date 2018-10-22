@@ -33,7 +33,7 @@ smodels_noexternaltools: resolve_deps tidy
 
 tidy:
 	# tidy up the directory, remove files not needed for users
-	yes | rm -rf build dist test docs .git .gitattributes .gitignore smodels.egg*
+	yes | rm -rf build dist test docs apt.txt environment.yml .git .gitattributes .gitignore smodels.egg*
 
 version:
 	@echo $(VER)

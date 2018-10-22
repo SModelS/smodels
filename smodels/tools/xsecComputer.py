@@ -180,6 +180,8 @@ class XSecComputer:
         if tofile:
             logger.info("Computing SLHA cross section from %s, adding to "
                         "SLHA file." % inputFile )
+            complain = True ## dont complain about already existing xsecs,
+            # if we were the ones writing them
             for s in sqrtses:
                 ss = s*TeV 
                 self.compute( ss, inputFile, unlink= unlink, 
@@ -187,10 +189,12 @@ class XSecComputer:
                 if tofile == "all":
                     comment = str(self.nevents)+" evts, pythia%d [pb]"%\
                                               self.pythiaVersion
-                    self.addXSecToFile(self.loXsecs, inputFile, comment )
+                    self.addXSecToFile(self.loXsecs, inputFile, comment, complain )
+                    complain = False
                 comment = str(self.nevents)+" events, [pb], pythia%d for LO"%\
                                               self.pythiaVersion
-                self.addXSecToFile( self.xsecs, inputFile, comment)
+                self.addXSecToFile( self.xsecs, inputFile, comment, complain)
+                complain = False
         else:
             logger.info("Computing SLHA cross section from %s." % inputFile )
             print()

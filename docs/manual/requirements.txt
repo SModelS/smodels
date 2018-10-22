@@ -6,3 +6,4 @@ pyslha
 numpy
 scipy
 sphinx_rtd_theme
+plotly

@@ -50,7 +50,8 @@ class Database(object):
                   progressbar = False, subpickle = True):
         """
         :param base: path to the database, or pickle file (string), or http
-            address. If None, or "official", use the official database.
+            address. If None, "official", or "official_fastlim",
+            use the official database (including fastlim results, if specified).
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
         :param discard_zeroes: discard txnames with only zeroes as entries.
@@ -65,6 +66,9 @@ class Database(object):
         if base in [ None, "official" ]:
             from smodels.installation import officialDatabase
             base = officialDatabase()
+        if base in [ "official_fastlim" ]:
+            from smodels.installation import officialDatabase
+            base = officialDatabase( fastlim=True )
         if base in [ "unittest" ]:
             from smodels.installation import testDatabase
             base = testDatabase()
@@ -317,7 +321,7 @@ class Database(object):
             if self.inNotebook():
                 print ( "done." )
             else:
-                print()
+                print( "" )
             dump.close()
         logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) )
         logger.debug ( "store as %s" % filename )
