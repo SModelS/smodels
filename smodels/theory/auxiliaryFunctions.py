@@ -311,23 +311,22 @@ def simParticles(plist1, plist2):
     if len(plist1) != len(plist2):
         return False
     
- 
     #Expand inclusive particles (MultiParticle objects) 
     extendedL1 = []    
     for p in plist1:
-        if isinstance(p,Particle):
+        if isinstance(p,MultiParticle):
+            extendedL1.append(p.particles)        
+        else:
             extendedL1.append([p])
-        elif isinstance(p,MultiParticle):
-            extendedL1.append(p.particles)
 
      
     extendedL2 = []    
     for p in plist2:
-        if isinstance(p,Particle):
+        if isinstance(p,MultiParticle):
+            extendedL2.append(p.particles)        
+        else:
             extendedL2.append([p])
-        elif isinstance(p,MultiParticle):
-            extendedL2.append(p.particles)
-
+            
     extendedL1 = [sortParticleList(list(i)) for i in itertools.product(*extendedL1)]
     extendedL2 = [sortParticleList(list(i)) for i in itertools.product(*extendedL2)]
 
