@@ -35,9 +35,7 @@
 
 What's New
 ==========
-Since the publication of SModelS v1.0 in December 2014, the code base
-has undergone significant structural changes. 
-The major novelties of this release are as follows:
+The major novelties of all releases since v1.0 are as follows:
 
 New in Version 1.2.2:
 ^^^^^^^^^^^^^^^^^^^^^
