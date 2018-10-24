@@ -22,12 +22,12 @@ nue = Particle(Z2parity='even', label='nu', pdg=12, mass=0.*MeV, eCharge=0, colo
 numu = Particle(Z2parity='even', label='nu', pdg=14, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, totalwidth = 0.*GeV, decays=[], _isMET=True)
 nuta = Particle(Z2parity='even', label='nu', pdg=16, mass=0.*MeV, eCharge=0, colordim=0, spin=1./2, totalwidth = 0.*GeV, decays=[], _isMET=True)
 
-d = Particle(Z2parity='even', label='q', pdg=1, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
-u = Particle(Z2parity='even', label='q', pdg=2, mass=0.*MeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
-s = Particle(Z2parity='even', label='q', pdg=3, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
-c = Particle(Z2parity='even', label='c', pdg=4, mass=0.*MeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
-b = Particle(Z2parity='even', label='b', pdg=5, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
-t = Particle(Z2parity='even', label='t+', pdg=6, mass=0.*MeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth=1.4*GeV, decays=[])
+d = Particle(Z2parity='even', label='d', pdg=1, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
+u = Particle(Z2parity='even', label='u', pdg=2, mass=0.*MeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
+s = Particle(Z2parity='even', label='s', pdg=3, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
+c = Particle(Z2parity='even', label='c', pdg=4, mass=1.28*GeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
+b = Particle(Z2parity='even', label='b', pdg=5, mass=4.7*GeV, eCharge=(-1./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
+t = Particle(Z2parity='even', label='t+', pdg=6, mass=173.1*GeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth=1.4*GeV, decays=[])
 
 g = Particle(Z2parity='even', label='g', pdg=21, mass=0.*MeV, eCharge=0, colordim=8, spin=1, totalwidth = 0.*GeV, decays=[])
 photon = Particle(Z2parity='even', label='photon',pdg=22, mass=0.*MeV, eCharge=0, colordim=0, spin=1, totalwidth = 0.*GeV, decays=[], _isMET=False)
@@ -35,8 +35,8 @@ Z = Particle(Z2parity='even', label='Z', pdg=23, mass=91.*GeV , eCharge=0, color
 W = Particle(Z2parity='even', label='W+', pdg=24, mass=80.*GeV, eCharge=1, colordim=0, spin=1, totalwidth=2.0*GeV, decays=[])
 higgs = Particle(Z2parity='even', label='higgs', pdg=25, mass=125.*GeV, eCharge=0, colordim=0, spin=0, totalwidth = 0.*GeV, decays=[], _isMET=False)
 
-pip = Particle(Z2parity='even', label='pi', pdg=211, mass=140.*MeV, eCharge=+1, colordim=0, spin=0, totalwidth = 0.*GeV, decays=[])
-piz = Particle(Z2parity='even', label='pi', pdg=111, mass=140.*MeV, eCharge=+1, colordim=0, spin=0, totalwidth = 0.*GeV, decays=[])
+pip = Particle(Z2parity='even', label='pi+', pdg=211, mass=140.*MeV, eCharge=+1, colordim=0, spin=0, totalwidth = 0.*GeV, decays=[])
+piz = Particle(Z2parity='even', label='pi0', pdg=111, mass=140.*MeV, eCharge=0, colordim=0, spin=0, totalwidth = 0.*GeV, decays=[])
 
 
 quarks = [u,d] + [c,s] + [t,b]
@@ -49,7 +49,7 @@ gauge = [g,photon,W,Z]
 gaugeC = [p.chargeConjugate() for p in gauge]
 
 SMparticles = quarks + leptons + gauge + [higgs] + [pip,piz]
-SMparticlesC = quarksC + leptonsC + gaugeC + [higgs.chargeConjugate()] + [pip.chargeConjugate('pi'),piz.chargeConjugate('pi')]
+SMparticlesC = quarksC + leptonsC + gaugeC + [higgs.chargeConjugate()] + [pip.chargeConjugate('pi-'),piz.chargeConjugate('pi0')]
 
 SMList = SMparticles + SMparticlesC
 #Protect all particles properties:

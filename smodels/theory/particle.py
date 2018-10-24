@@ -52,7 +52,7 @@ class Particle(object):
         if not isinstance(other,(MultiParticle,Particle,InclusiveParticle)):
             return +1
         
-        return self.cmpProperties(other, properties=['Z2parity','label']) 
+        return self.cmpProperties(other) 
                  
 
     def __lt__( self, p2 ):
@@ -100,7 +100,8 @@ class Particle(object):
         return str(self.__dict__)
     
 
-    def eqProperties(self,other, properties = ['spin','colordim','eCharge']):
+    def eqProperties(self,other, 
+                     properties = ['Z2parity','spin','colordim','eCharge','mass','totalwidth']):
         """
         Check if particle has the same properties (default is spin, colordim and eCharge)
         as other. Only compares the attributes which have been defined in both objects.
@@ -116,7 +117,8 @@ class Particle(object):
         else:
             return False
             
-    def cmpProperties(self,other, properties = ['spin','colordim','eCharge']):
+    def cmpProperties(self,other, 
+                      properties = ['Z2parity','spin','colordim','eCharge','mass','totalwidth']):
         """
         Compare properties (default is spin, colordim and eCharge).
         Return 0 if properties are equal, -1 if self < other and 1 if self > other.
@@ -338,7 +340,8 @@ class MultiParticle(Particle):
             raise AttributeError
 
             
-    def cmpProperties(self,other, properties = ['spin','colordim','eCharge']):
+    def cmpProperties(self,other, 
+                      properties = ['Z2parity','spin','colordim','eCharge','mass','totalwidth']):
         """
         Compares the properties in self with the ones in other (default is spin, colordim and eCharge).
         Return 0 if properties are equal, -1 if self < other and 1 if self > other.

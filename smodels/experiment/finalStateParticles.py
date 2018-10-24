@@ -28,6 +28,7 @@ LmList = MultiParticle('L-' , lmList.particles + [ leptons[2] ])
 LList = MultiParticle('L'  , LpList.particles + LmList.particles )
 jetList = MultiParticle('jet' ,  quarks[0:4] + [gauge[0]] + [pip,piz] + quarksC[0:4] + [ gaugeC[0] ] 
                        + [piz.chargeConjugate('pi'),pip.chargeConjugate('pi')])
+qList = MultiParticle('q' ,  quarks[0:4] +quarksC[0:4])
 
 
 
