@@ -58,7 +58,7 @@ To deal with BSM particles with small (non-zero) width SModelS computes the prob
 the detector (:math:`\mathcal{F}_{long}`). 
 If the particle has a considerable fraction of its decays taking place inside the detector 
 (i.e :math:`\mathcal{F}_{long} + \mathcal{F}_{prompt} \ll 1`), we include a third possibility,
-which is simply labeled as a *displaced decay*, with fraction given by 
+which is simply labeled as a *displaced decay*, with the fraction given by 
 :math:`\mathcal{F}_{displaced} = 1 - \mathcal{F}_{prompt} - \mathcal{F}_{long}`. [1]_
 The branching fraction rescaled by :math:`\mathcal{F}_{long}` describes the probability of a decay where the daughter BSM state
 traverses the detector (thus is considered stable),
@@ -81,8 +81,8 @@ within the spirit of the simplified model approach, we approximate the prompt an
 long-lived probabilities by:
 
 .. math::
-   \mathcal{F}_{long} = \exp(- \frac{\Gamma L_{outer}}{\langle \gamma \beta \rangle}) \mbox{ and } 
-   \mathcal{F}_{prompt} = 1 - \exp(- \frac{\Gamma L_{inner}}{\langle \gamma \beta \rangle}),
+   \mathcal{F}_{long} = \exp\left(- \frac{\Gamma L_{outer}}{\langle \gamma \beta \rangle}\right) \mbox{ and } 
+   \mathcal{F}_{prompt} = 1 - \exp\left(- \frac{\Gamma L_{inner}}{\langle \gamma \beta \rangle}\right),
 
 where :math:`L_{outer}` is the effective size of the detector (which we take to be 10 m for both ATLAS
 and CMS), :math:`L_{inner}` is the effective radius of the inner detector (which we take to be 1 mm for both ATLAS
