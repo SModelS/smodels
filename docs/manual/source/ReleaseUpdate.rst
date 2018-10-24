@@ -39,6 +39,14 @@ Since the publication of SModelS v1.0 in December 2014, the code base
 has undergone significant structural changes. 
 The major novelties of this release are as follows:
 
+New in Version 1.2.2:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Updated official |database|, added T3GQ eff maps, see `github database release page <https://github.com/SModelS/smodels-database-release/releases>`
+  * Database "official" now refers to a database without fastlim results, "official_fastlim", to the official database *with* fastlim
+  * List displaced signatures in :ref:`missing topologies <topCoverage>`
+  * Improved description about :ref:`lifetime reweighting <lifetimeWeight>` in doc
+
 New in Version 1.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
 

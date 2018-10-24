@@ -23,7 +23,8 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
               minmassgap=-1.*GeV, useXSecs=None):
     """
     Perform SLHA-based decomposition.
-    
+
+    :param slhafile: the slha input file. May be an URL (though http, ftp only).
     :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
     :param doCompress: turn mass compression on/off
     :param doInvisible: turn invisible compression on/off
@@ -35,6 +36,19 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
     :returns: list of topologies (TopologyList object)
 
     """
+    if slhafile.startswith("http") or slhafile.startswith("ftp"):
+        logger.info ( "asked for remote slhafile %s. will fetch it." % slhafile )
+        import requests
+        import os.path
+        r=requests.get(slhafile)
+        if r.status_code != 200:
+            logger.error ( "could not retrieve remote file %d: %s" % ( r.status_code, r.reason ) )
+            sys.exit()
+        basename = os.path.basename ( slhafile )
+        f=open ( basename, "w" )
+        f.write ( r.text )
+        f.close()
+        slhafile = basename
     t1 = time.time()
 
     if doCompress and minmassgap / GeV < 0.:

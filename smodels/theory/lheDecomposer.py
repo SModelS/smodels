@@ -22,7 +22,8 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
     """
     Perform LHE-based decomposition. 
 
-    :param lhefile: LHE file with e.g. pythia events
+    :param lhefile: LHE file with e.g. pythia events, may be given as URL
+                    (though http and ftp only)
     :param inputXsecs: xSectionList object with cross sections for the mothers
            appearing in the LHE file. If None, use information from file.
     :param nevts: (maximum) number of events used in the decomposition. If
@@ -34,6 +35,19 @@ def decompose(lhefile, inputXsecs=None, nevts=None, doCompress=False,
     :returns: list of topologies (TopologyList object) 
     
     """
+    if lhefile.startswith("http") or lhefile.startswith("ftp"):
+        logger.info ( "asked for remote lhefile %s. will fetch it." % lhefile )
+        import requests
+        import os.path
+        r=requests.get(lhefile)
+        if r.status_code != 200:
+            logger.error ( "could not retrieve remote file %d: %s" % ( r.status_code, r.reason ) )
+            sys.exit()
+        basename = os.path.basename ( lhefile )
+        f=open ( basename, "w" )
+        f.write ( r.text )
+        f.close()
+        lhefile = basename
 
     if doCompress and minmassgap < 0. * GeV:
         logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")
