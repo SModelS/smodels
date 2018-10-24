@@ -58,7 +58,7 @@ To deal with BSM particles with small (non-zero) width SModelS computes the prob
 the detector (:math:`\mathcal{F}_{long}`). 
 If the particle has a considerable fraction of its decays taking place inside the detector 
 (i.e :math:`\mathcal{F}_{long} + \mathcal{F}_{prompt} \ll 1`), we include a third possibility,
-which is simply labed as a *displaced decay*, with fraction given by 
+which is simply labeled as a *displaced decay*, with fraction given by 
 :math:`\mathcal{F}_{displaced} = 1 - \mathcal{F}_{prompt} - \mathcal{F}_{long}`. [1]_
 The branching fraction rescaled by :math:`\mathcal{F}_{long}` describes the probability of a decay where the daughter BSM state
 traverses the detector (thus is considered stable),
