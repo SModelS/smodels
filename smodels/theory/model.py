@@ -145,6 +145,21 @@ class Model(object):
         if stableWidth is None:
             stableWidth = 1e-25*GeV
 
+        #Download input file, if requested
+        if self.inputFile.startswith("http") or self.inputFile.startswith("ftp"):
+            logger.info("Asked for remote slhafile %s. Fetching it." % self.inputFile)
+            import requests
+            import os.path
+            r = requests.get(self.inputFile)
+            if r.status_code != 200:
+                logger.error("Could not retrieve remote file %d: %s" %(r.status_code, r.reason))
+                raise SModelSError()
+            basename = os.path.basename(self.inputFile)
+            f = open(basename, "w")
+            f.write(r.text)
+            f.close()
+            self.inputFile = basename
+
         #Trick to suppress pyslha error messages:
         import sys
         storeErr = sys.stderr
