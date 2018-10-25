@@ -203,7 +203,8 @@ class TxName(object):
             for branchesA in itertools.permutations(element.branches):
                 branchesA = list(branchesA)
                 if branchesA == el.branches:
-                    newEl = Element(branchesA)
+                    newEl = element.copy()
+                    newEl.branches = [br.copy() for br in branchesA]
                     return newEl
         
         #No elements matched:

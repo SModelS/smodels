@@ -348,10 +348,10 @@ def _doCluster(elements, txdata, maxDist):
         if not el.getMasses() in massMap.values():
             massMap[iel] = el.getMasses()
             posMap[iel] = massPosition(massMap[iel], txdata)
-            weightMap[iel] = el.weight.getMaxXsec() / fb
+            weightMap[iel] = el.weight.getMaxXsec().asNumber(fb)
         else:
             j = list(massMap.keys())[list(massMap.values()).index(el.getMasses())] 
-            weightMap[j] += el.weight.getMaxXsec() / fb
+            weightMap[j] += el.weight.getMaxXsec().asNumber(fb)
 
     # Start with maximal clusters
     clusterList = []

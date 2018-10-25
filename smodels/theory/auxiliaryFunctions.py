@@ -15,8 +15,7 @@ import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.finalStateParticles import finalStates
-from smodels.theory.particle import Particle,MultiParticle
-import itertools    
+
 
 #Get all finalStateLabels
 finalStateLabels = finalStates.getValuesFor('label')
@@ -29,8 +28,8 @@ def massPosition(mass, txdata):
     xmass = txdata.getValueFor(mass)
     if type(xmass) != type(1.*pb):
         return None
-    xmass = xmass / fb
-    return xmass.asNumber()
+
+    return xmass.asNumber(fb)
 
 
 def distance(xmass1, xmass2):
