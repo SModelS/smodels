@@ -670,7 +670,7 @@ def _evalExpression(stringExpr,cluster):
         el = element.Element(elStr)
         weightsDict['w%i'%i] = crossSection.XSectionList(infoList)
         for el1 in cluster.elements:
-            if el1.particlesMatch(el):
+            if el1 == el:
                 weightsDict['w%i'%i].combineWith(el1.weight)              
         evalExpr = evalExpr.replace(elStr,'w%i'%i)
 

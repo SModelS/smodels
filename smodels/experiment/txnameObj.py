@@ -26,7 +26,7 @@ import scipy.spatial.qhull as qhull
 import numpy as np
 import unum
 import copy
-import math
+import math,itertools
 from math import floor, log10
 
 #Build a dictionary with defined units. It can be used to evaluate
@@ -199,12 +199,13 @@ class TxName(object):
         """
 
         for el in self._topologyList.getElements():
-            if element.particlesMatch(el,branchOrder=True):
-                return element.copy()
-            else:
-                elementB = element.switchBranches()
-                if elementB.particlesMatch(el,branchOrder=True):
-                    return elementB
+        #Compare branches:
+            for branchesA in itertools.permutations(element.branches):
+                if branchesA == el.branches:
+                    newEl = Element(branchesA)
+                    return newEl
+        
+        #No elements matched:
         return False
 
     def hasLikelihood ( self ):

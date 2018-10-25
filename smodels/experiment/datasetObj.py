@@ -71,9 +71,9 @@ class DataSet(object):
             for el in elementsInStr(str(tx.constraint)):
                 newEl = Element(el,finalState)
                 datasetElements.append(newEl)
-        combos = itertools.combinations( datasetElements, 2)
+        combos = itertools.combinations(datasetElements, 2)
         for x,y in combos:
-            if x.particlesMatch(y):
+            if x == y:
                 errmsg ="Constraints (%s) appearing in dataset %s, %s overlap "\
                         "(may result in double counting)." % \
                         (x,self.getID(),self.globalInfo.id )

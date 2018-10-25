@@ -14,6 +14,7 @@ from smodels.tools.physicsUnits import fb
 from smodels.theory.particle import MultiParticle, Particle
 from smodels.tools.inclusiveObjects import InclusiveValue,InclusiveList
 from smodels.experiment.finalStateParticles import finalStates,anyOdd
+import itertools
 
 
 
@@ -100,9 +101,10 @@ class Branch(object):
     def __cmp__(self,other):
         """
         Compares the branch with other.        
-        The comparison is made based on vertnumb, vertparts, evenParticles, masses of BSM particles
-        and the last BSM particle appearing in the cascade decay.
-        OBS: The particles inside each vertex MUST BE sorted (see branch.sortParticles())         
+        The comparison is made based on vertnumb, vertparts, evenParticles and oddParticles.
+        The comparison allows for any ordering of the evenParticles in the vertex.
+        It relies on the particle comparison, which allows for the comparison of Particles and MultiParticles.
+        Only the properties which are defined for both particles are compared.
         :param other:  branch to be compared (Branch object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
@@ -124,25 +126,25 @@ class Branch(object):
             if comp: return 1
             else: return -1
             
-        #Compare SM final states by label and Z2parity:
-        for iv,vertex in enumerate(self.evenParticles):            
-            for iptc,particle in enumerate(vertex):
-                comp = particle.cmpProperties(other.evenParticles[iv][iptc],properties=['Z2parity','label'])
-                if comp:
-                    return comp
-                
-        #Compare BSM states by Z2parity and mass (except final state particle):
-        for iptc,bsmParticle in enumerate(self.oddParticles[:-1]):
-            comp = bsmParticle.cmpProperties(other.oddParticles[iptc],properties=['Z2parity','mass', 'totalwidth'])
-            if comp:
+        #Compare even final states irrespective of ordering:
+        for iv,particlesA in enumerate(self.evenParticles):
+            particlesB = other.evenParticles[iv]
+            equalVertex = False
+            for pListA in itertools.permutations(particlesA):
+                if pListA == particlesB:
+                    equalVertex = True
+                    break
+            if not equalVertex:
+                comp = (particlesA > particlesB) - (particlesA < particlesB)
                 return comp
-            
-        #Compare final BSM state by Z2parity, mass and quantum numbers:
-        if self.oddParticles and other.oddParticles:
-            comp = self.oddParticles[-1].cmpProperties(other.oddParticles[-1],
-                                                   properties=['Z2parity','mass','colordim','eCharge'])
-            if comp:
-                return comp 
+                
+        #Compare BSM states:
+        for iv,partA in enumerate(self.oddParticles):
+            partB = other.oddParticles[iv]
+            equalVertex = False
+            if partA != partB:
+                comp = (particlesA > particlesB) - (particlesA < particlesB)
+                return comp
 
         return 0  #Branches are equal    
         
@@ -172,15 +174,13 @@ class Branch(object):
         
         return bsmMasses             
 
-
     def sortParticles(self):
         """
         Sort the particles inside each vertex
         """
         
         for iv,vertex in enumerate(self.evenParticles):
-            self.evenParticles[iv] = sorted(vertex, key=lambda x: x.label)
-
+            self.evenParticles[iv] = sorted(vertex)
 
     def setInfo(self):
         """
@@ -219,46 +219,6 @@ class Branch(object):
         self.oddParticles = self.oddParticles[:iv] + self.oddParticles[iv+1:]
         self.evenParticles = self.evenParticles[:iv] + self.evenParticles[iv+1:]
         self.setInfo()
-        
-
-
-    def particlesMatch(self, other):
-        """
-        Compare two Branches for matching particles.
-        Only the final state particles (self.evenParticles and self.oddParticles[-1])
-        are used for comparison.
-        Allow for inclusive particle labels (such as the ones defined in particleDefinitions.py)
-
-        :parameter other: branch to be compared (Branch object)
-        
-        :returns: True if branches are equal (evenParticles and last BSM particle match); False otherwise.              
-        """
-        
-       
-        if not isinstance(other,Branch):
-            return False        
-
-        #Make sure number of vertices and even particles have been defined
-        self.setInfo()
-        other.setInfo()
-        if self.vertnumb != other.vertnumb:
-            return False
-        if self.vertparts != other.vertparts:
-            return False
-        
-        #If particles are identical, avoid further checks
-        if self.evenParticles != other.evenParticles:
-            for iv,vertex in enumerate(self.evenParticles):
-                if not simParticles(vertex,other.evenParticles[iv]):
-                    return False
-            
-        #If the final state BSM particles have the same quantum numbers: 
-        if self.oddParticles and other.oddParticles:  
-            if not self.oddParticles[-1].eqProperties(other.oddParticles[-1],properties=['colordim','eCharge']):
-                return False             
-        
-        return True
-   
 
     def copy(self):
         """

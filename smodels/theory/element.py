@@ -11,6 +11,7 @@ from smodels.theory.branch import Branch, InclusiveBranch
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
+import itertools
 
 class Element(object):
     """
@@ -88,7 +89,7 @@ class Element(object):
     
     def __cmp__(self,other):
         """
-        Compares the element with other.        
+        Compares the element with other for any branch ordering.  
         The comparison is made based on branches.
         OBS: The elements and the branches must be sorted! 
         :param other:  element to be compared (Element object)
@@ -99,12 +100,12 @@ class Element(object):
             return -1
 
         #Compare branches:
-        if self.branches != other.branches:          
-            comp = self.branches > other.branches
-            if comp: return 1
-            else: return -1
-        else:
-            return 0     
+        for branchA in itertools.permutations(self.branches):
+            if branchA == other.branches:
+                return 0
+
+        comp = (self.branches > other.branches) - (self.branches < other.branches) 
+        return comp
 
     def __eq__(self,other):
         return self.__cmp__(other)==0
@@ -153,44 +154,6 @@ class Element(object):
             br.sortParticles()
         #Now sort branches
         self.branches = sorted(self.branches)
-
-
-    def particlesMatch(self, other, branchOrder=False):
-        """
-        Compare two Elements for matching particles only.
-        Allow for inclusive particle labels (such as the ones defined in finalStateParticles.py).
-        If branchOrder = False, check both branch orderings.
-        
-        :parameter other: element to be compared (Element object)
-        :parameter branchOrder: If False, check both orderings, otherwise
-                                check the same branch ordering
-        :returns: True, if particles match; False, else;        
-        """
-
-        if not isinstance(other,Element):
-            return False
-
-        if type(self) != type(other):
-            return False
-        
-        if len(self.branches) != len(other.branches):
-            return False
-
-        #Check if particles inside each branch match in the correct order
-        branchMatches = []
-        for ib,br in enumerate(self.branches):
-            branchMatches.append(br.particlesMatch(other.branches[ib]))
-        if sum(branchMatches) == 2:
-                return True
-        elif branchOrder:
-            return False
-        else:       
-        #Now check for opposite order
-            for ib,br in enumerate(self.switchBranches().branches):
-                if not br.particlesMatch(other.branches[ib]):
-                    return False
-
-            return True
 
 
     def copy(self):

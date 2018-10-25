@@ -70,7 +70,7 @@ class ParticleTest(unittest.TestCase):
          
     def testParticleList(self):
         l1 = MultiParticle(label='plist', particles=[p1,p2])
-        from smodels.experiment.finalStateParticles import lList, LList
+        from smodels.experiment.finalStateParticles import lList
  
         self.assertEqual( l1.label, 'plist')
         self.assertNotEqual( l1 , lList) 
