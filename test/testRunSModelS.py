@@ -23,6 +23,7 @@ import time
 from smodels.tools.smodelsLogging import logger
  
 class RunSModelSTest(unittest.TestCase):
+
     def testMultipleFiles( self ):
         out = join( iDir(), "test/unitTestOutput")
         for i in os.listdir( out ):

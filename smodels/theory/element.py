@@ -441,6 +441,7 @@ class Element(object):
 
         newelement = self.copy()
         newelement.motherElements = [("mass", self)]
+
         #Loop over branches and look for small mass differences 
         for ibr,branch in enumerate(newelement.branches):
             #Get mass differences      

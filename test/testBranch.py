@@ -49,13 +49,36 @@ class BranchTest(unittest.TestCase):
         self.assertFalse(b2 < b3)  #Bigger by label of particles
         self.assertFalse(b2 < b4)  #Bigger by mass of g compared to sq1
 
+    def testBranchComp(self):
+
+        gluino = Particle(mass=500.*GeV,pdg=1000021, Z2Parity=-1, eCharge=0, colordim=8, totalwidth = 1*GeV, decays = g_decays )
+        sdR = Particle(mass=700.*GeV,pdg=2000001, Z2Parity=-1, eCharge=-1/3, colordim=3, totalwidth = 1*GeV, decays = None)
+        sdL = Particle(mass=705.*GeV,pdg=1000001, Z2Parity=-1, eCharge=-1/3, colordim=3, totalwidth = 1*GeV, decays = None)
+        ssL = Particle(mass=705.*GeV,pdg=1000003, Z2Parity=-1, eCharge=-1/3, colordim=3, totalwidth = 1*GeV, decays = None)
+        suL = Particle(mass=705.*GeV,pdg=1000002, Z2Parity=-1, eCharge=2/3, colordim=3, totalwidth = 1*GeV, decays = None)
+        C1m = Particle(mass=205.*GeV,pdg=1000003, Z2Parity=-1, eCharge=-1, colordim=1, totalwidth = 1*GeV, decays = None)
+        N1 = Particle(mass=705.*GeV,pdg=1000022, Z2Parity=-1, eCharge=0, colordim=1)
+
+        b1 = Branch('[[d], [b, t+], [W-]]')
+        b2 = Branch('[[d], [b, t+], [W-]]')
+        b3 = Branch('[[d], [b, t+], [W-]]')
+        b4 = Branch('[[d], [b, t+], [W-]]')
+        b1.oddParticles = [sdR,gluino,C1m,N1]
+        b2.oddParticles = [sdL,gluino,C1m,N1]
+        b3.oddParticles = [ssL,gluino,C1m,N1]
+        b4.oddParticles = [suL,gluino,C1m,N1]
+        
+        self.assertNotEqual(b1,b2) #Same quantum numbers distinct masses
+        self.assertEqual(b2,b3)  #Same masses and quantum numbers
+        self.assertNotEqual(b3,b4) #Same masses distinct quantum number
+
         
     def testBranchInclusive(self):
 
-        bi1 = Branch( '[[e-],[q]]' )
-        bi1b = Branch( '[[l],[jet]]' )
+        bi1 = Branch('[[e-],[q]]')
+        bi1b = Branch('[[l],[jet]]')
         
-        self.assertTrue( bi1.particlesMatch(bi1b)) #Test if inclusive label comparison works
+        self.assertTrue(bi1 == bi1b) #Test if inclusive label comparison works
 
         
     def testcombineWith(self):

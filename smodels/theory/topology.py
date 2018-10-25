@@ -167,7 +167,7 @@ class Topology(object):
         
         index = index_bisect(self.elementList,newelement)
         if index != len(self.elementList) and self.elementList[index] == newelement:
-            self.elementList[index].combineWith(newelement)     
+            self.elementList[index].combineWith(newelement)   
         else:
             self.elementList.insert(index,newelement)
 

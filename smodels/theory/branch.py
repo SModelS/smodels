@@ -142,9 +142,8 @@ class Branch(object):
         #Compare BSM states:
         for iv,partA in enumerate(self.oddParticles):
             partB = other.oddParticles[iv]
-            equalVertex = False
             if partA != partB:
-                comp = (particlesA > particlesB) - (particlesA < particlesB)
+                comp = (partA > partB) - (partA < partB)
                 return comp
 
         return 0  #Branches are equal    
@@ -265,10 +264,9 @@ class Branch(object):
             raise SModelSError("Asked to combine distinct branches")
         
         for iptc,bsm in enumerate(other.oddParticles):
-            
             if bsm is self.oddParticles[iptc]:
                 continue #Particles are the same (do nothing)
-            
+
             #Else create a particle list with particles from both
             if not isinstance(self.oddParticles[iptc],MultiParticle):
                 bsmList = MultiParticle(label = 'BSM (combined)', particles=[self.oddParticles[iptc]])
