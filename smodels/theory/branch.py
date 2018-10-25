@@ -131,6 +131,7 @@ class Branch(object):
             particlesB = other.evenParticles[iv]
             equalVertex = False
             for pListA in itertools.permutations(particlesA):
+                pListA = list(pListA)
                 if pListA == particlesB:
                     equalVertex = True
                     break

@@ -101,6 +101,7 @@ class Element(object):
 
         #Compare branches:
         for branchA in itertools.permutations(self.branches):
+            branchA = list(branchA)
             if branchA == other.branches:
                 return 0
 

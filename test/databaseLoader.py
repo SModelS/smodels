@@ -13,7 +13,7 @@ import sys
 sys.path.insert(0,"../")
 from smodels.experiment.databaseObj import Database
 from smodels.installation import version
-ver = "".join ( map ( str, version(True)[:3] ) )
+ver = "".join(map(str, version(True)))
 dbname="http://smodels.hephy.at/database/unittest%s" % ver
 database = Database(dbname, discard_zeroes = False)
 

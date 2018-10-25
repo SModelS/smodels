@@ -80,9 +80,9 @@ class Topology(object):
 
         #Check for any permutation of branches:
         for v1 in itertools.permutations(self.vertparts):
-            for v2 in itertools.permutations(other.vertparts):
-                if v1 == v2:
-                    return 0
+            v1 = list(v1)
+            if v1 == other.vertparts:
+                return 0
 
         if sorted(self.vertnumb,reverse=True) != sorted(other.vertnumb,reverse=True):
             comp = sorted(self.vertnumb,reverse=True) > sorted(other.vertnumb,reverse=True)

@@ -201,6 +201,7 @@ class TxName(object):
         for el in self._topologyList.getElements():
         #Compare branches:
             for branchesA in itertools.permutations(element.branches):
+                branchesA = list(branchesA)
                 if branchesA == el.branches:
                     newEl = Element(branchesA)
                     return newEl

@@ -328,8 +328,7 @@ class MultiParticle(Particle):
         If other is a MultiParticle object, checks if any particle in self matches
         any particle in other.
         If self and other are equal returns 0,
-        else return +1 if the largest particle in self in higher than the highest particle
-        in other (see the Particle comparison method), else return -1.
+        else returns the result of comparing the first particle of self with other.
         
         :param other: a Particle or MultiParticle object
         :param properties: list with properties to be compared. Default is spin, colordim and eCharge
@@ -340,16 +339,13 @@ class MultiParticle(Particle):
         if isinstance(other,Particle):
             otherParticles = [other]
         elif isinstance(other,MultiParticle):
-            otherParticles = [other.particles]
+            otherParticles = other.particles
             
         for otherParticle in otherParticles:
-            if any(p == otherParticle for p in self.particles):
+            if any(p.cmpProperties(otherParticle) == 0 for p in self.particles):
                 return 0
-
-        pmax = max(self.particles)
-        otherMax = max(otherParticles)
-
-        return (pmax > otherMax) - (pmax < otherMax)
+ 
+        return self.particles[0].cmpProperties(otherParticles[0])
 
     def __getstate__(self):
         """
