@@ -8,9 +8,14 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.theory.particle import Particle, MultiParticle, InclusiveParticle
+from smodels.theory.particle import Particle, MultiParticle
 from smodels.tools.physicsUnits import GeV
 from smodels.theory.auxiliaryFunctions import elementsInStr
+from smodels.particlesLoader import BSMList
+from smodels.share.models.SMparticles import SMList
+from smodels.experiment.finalStateParticles import finalStates
+from smodels.theory import model
+import numpy as np
 
 p1 = Particle(Z2parity='odd', label='p1', pdg=None, mass=100.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
 p2 = Particle(Z2parity='odd', label='p1', pdg=1000021, mass=None, eCharge=None, colordim=None, spin=None, width=None, branches=None)
@@ -27,21 +32,47 @@ p1c.pdg = 10
 
 class ParticleTest(unittest.TestCase):
     
-    def testParticle(self):     
-        #only comparisons by label for now           
-        self.assertEqual(p1.label, 'p1')
-        self.assertEqual(p1 , p2) 
-        self.assertLess(p1 , p3)     
-        self.assertFalse(p4 == p3 == p2) 
-        self.assertEqual(p1c , p1)
-         
+    def testParticleComparison(self):
+
+        slhafile = 'testFiles/slha/lightEWinos.slha'
+        bsmModel = model.Model(inputFile=slhafile, BSMparticles=BSMList, SMparticles=SMList)
+        bsmModel.updateParticles()
+        BSMparticles = bsmModel.BSMparticles
+        SMparticles = bsmModel.SMparticles
+        fStates = finalStates.SMparticles
+        allParticles = []
+        for p in SMparticles+BSMparticles+fStates:
+            if any(p is pB for pB in allParticles):
+                continue
+            allParticles.append(p)
+        allParticles = sorted(allParticles, key = lambda p: p.label)
+        compMatrixA = np.zeros((len(allParticles),len(allParticles)))
+        compMatrixDefault = np.zeros((len(allParticles),len(allParticles)))
+        for i,p1 in enumerate(allParticles):
+            for j,p2 in enumerate(allParticles):
+                compMatrixDefault[i,j] = p1.cmpProperties(p2)
+                compMatrixA[i,j] = p1.__cmp__(p2)
+
+        self.assertTrue(np.array_equal(abs(compMatrixDefault),abs(compMatrixA))) #Check if comparison is correct
+
+        compMatrixB = np.zeros((len(allParticles),len(allParticles)))
+        for i,p1 in enumerate(allParticles):
+            for j,p2 in enumerate(allParticles): #Compare again (now it should use the stored comparisons)
+                if p1 == p2:
+                    compMatrixB[i,j] = 0
+                elif p1 > p2:
+                    compMatrixB[i,j] = 1
+                else:
+                    compMatrixB[i,j] = -1
+
+        self.assertTrue(np.array_equal(compMatrixB,compMatrixA)) #Check if comparison is correct
+
          
     def testParticleList(self):
         l1 = MultiParticle(label='plist', particles=[p1,p2])
         from smodels.experiment.finalStateParticles import lList, LList
  
-        self.assertEqual( l1.label, 'plist')    
-        self.assertGreater(LList, lList)  #Llist is longer
+        self.assertEqual( l1.label, 'plist')
         self.assertNotEqual( l1 , lList) 
         self.assertTrue(l1 == p1)
         self.assertTrue(l1.pdg == [None,1000021])
@@ -57,7 +88,7 @@ class ParticleTest(unittest.TestCase):
         self.assertEqual(p4.chargeConjugate(), p4a)
         
     def testInclusiveParticle(self):
-        anything = InclusiveParticle(label='anything')
+        anything = Particle(label='anything')
         l1 = MultiParticle(label='plist', particles=[p1,p2,p4])
         from smodels.experiment.finalStateParticles import anyEven,anyOdd,lList
                

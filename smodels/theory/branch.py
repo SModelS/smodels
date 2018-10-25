@@ -11,7 +11,7 @@ from smodels.theory.auxiliaryFunctions import elementsInStr,simParticles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
-from smodels.theory.particle import MultiParticle,InclusiveParticle
+from smodels.theory.particle import MultiParticle, Particle
 from smodels.tools.inclusiveObjects import InclusiveValue,InclusiveList
 from smodels.experiment.finalStateParticles import finalStates,anyOdd
 
@@ -459,7 +459,7 @@ class InclusiveBranch(Branch):
                 raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)          
             self.oddParticles = [bsmParticle[0]]
         else:
-            self.oddParticles = [InclusiveParticle()]
+            self.oddParticles = [Particle(Z2parity='odd')]
         self.vertnumb = InclusiveValue()
         self.vertparts = InclusiveList()
         

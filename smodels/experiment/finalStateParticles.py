@@ -8,7 +8,7 @@
 
 """
 
-from smodels.theory.particle import InclusiveParticle,Particle,MultiParticle
+from smodels.theory.particle import Particle,MultiParticle
 from smodels.share.models.SMparticles import *
 # from smodels.share.models.SMparticles import leptons,quarks,quarksC,leptonsC,gauge,gaugeC,pi
 from smodels.theory.model import Model
@@ -26,15 +26,14 @@ tList = MultiParticle('t'  , [quarks[4],quarksC[4]])
 LpList = MultiParticle('L+' , lpList.particles + [ leptonsC[2] ])
 LmList = MultiParticle('L-' , lmList.particles + [ leptons[2] ])
 LList = MultiParticle('L'  , LpList.particles + LmList.particles )
-jetList = MultiParticle('jet' ,  quarks[0:4] + [gauge[0]] + [pip,piz] + quarksC[0:4] + [ gaugeC[0] ] 
-                       + [piz.chargeConjugate('pi'),pip.chargeConjugate('pi')])
+jetList = MultiParticle('jet' ,  quarks[0:4] + [gauge[0]] + [pip,piz,pim,pizz] + quarksC[0:4] + [ gaugeC[0] ])
 qList = MultiParticle('q' ,  quarks[0:4] +quarksC[0:4])
 
 
 
 #Used to construct generic z2-odd and z2-even particles:
-anyOdd = InclusiveParticle(label='anyOdd',Z2parity='odd')
-anyEven = InclusiveParticle(label='*',Z2parity='even')
+anyOdd = Particle(label='anyOdd',Z2parity='odd')
+anyEven = Particle(label='*',Z2parity='even')
 
 
 #Used to construct BSM final states:
@@ -56,9 +55,9 @@ allFinalStates = []
 #Get all particles defined here:
 for obj in objects:
     if isinstance(obj,list):
-        allFinalStates += [ptc for ptc in obj if isinstance(ptc,(Particle,MultiParticle,InclusiveParticle)) and 
+        allFinalStates += [ptc for ptc in obj if isinstance(ptc,(Particle,MultiParticle)) and 
                            not any(obj is x for x in allFinalStates)]
-    elif isinstance(obj,(Particle,MultiParticle,InclusiveParticle)):
+    elif isinstance(obj,(Particle,MultiParticle)):
         if not any(obj is x for x in allFinalStates):
             allFinalStates.append(obj)
             

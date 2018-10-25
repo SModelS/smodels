@@ -37,7 +37,8 @@ higgs = Particle(Z2parity='even', label='higgs', pdg=25, mass=125.*GeV, eCharge=
 
 pip = Particle(Z2parity='even', label='pi+', pdg=211, mass=140.*MeV, eCharge=+1, colordim=0, spin=0, totalwidth = 0.*GeV, decays=[])
 piz = Particle(Z2parity='even', label='pi0', pdg=111, mass=140.*MeV, eCharge=0, colordim=0, spin=0, totalwidth = 0.*GeV, decays=[])
-
+pim = pip.chargeConjugate()
+pizz = piz.chargeConjugate('pi0')
 
 quarks = [u,d] + [c,s] + [t,b]
 quarksC = [p.chargeConjugate(p.label) if p.label != 't+' else p.chargeConjugate() for p in quarks]
@@ -49,7 +50,7 @@ gauge = [g,photon,W,Z]
 gaugeC = [p.chargeConjugate() for p in gauge]
 
 SMparticles = quarks + leptons + gauge + [higgs] + [pip,piz]
-SMparticlesC = quarksC + leptonsC + gaugeC + [higgs.chargeConjugate()] + [pip.chargeConjugate('pi-'),piz.chargeConjugate('pi0')]
+SMparticlesC = quarksC + leptonsC + gaugeC + [higgs.chargeConjugate()] + [pim,pizz]
 
 SMList = SMparticles + SMparticlesC
 #Protect all particles properties:

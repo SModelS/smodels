@@ -32,6 +32,8 @@ class Particle(object):
         """  
 
         self._static = False
+        self._equals = [id(self)]
+        self._differs = []
         for attr,value in kwargs.items():
             if not attr == '_static':
                 setattr(self,attr,value)
@@ -46,13 +48,27 @@ class Particle(object):
         The comparison is done based only on the label.
         :param other:  particle to be compared (Particle object)
         
-        :return: -1 if self < other, 0 if self == other, +1, if self > other.
+        :return: -1 if id(self) < id(other), 0 if self == other, +1, if id(self) > id(other).
         """    
         
-        if not isinstance(other,(MultiParticle,Particle,InclusiveParticle)):
+        if not isinstance(other,(MultiParticle,Particle)):
             return +1
-        
-        return self.cmpProperties(other) 
+
+        #First check if we have already compared to this object
+        idOther = id(other)
+        idSelf = id(self)
+        if idOther in self._equals:  #Objects were already compared and are equal
+            return 0
+        elif idOther in self._differs: #Objects were already compared and differ.
+            return ((idSelf > idOther) - (idSelf < idOther))
+        else:
+            cmpProp = self.cmpProperties(other) #Objects have not been compared yet.
+            if cmpProp == 0:
+                self._equals.append(idOther)
+                return 0
+            else:
+                self._differs.append(idOther)
+                return ((idSelf > idOther) - (idSelf < idOther))
                  
 
     def __lt__( self, p2 ):
@@ -106,7 +122,7 @@ class Particle(object):
         Check if particle has the same properties (default is spin, colordim and eCharge)
         as other. Only compares the attributes which have been defined in both objects.
         
-        :param other: a Particle, MultiParticle or InclusiveParticle object
+        :param other: a Particle or MultiParticle object
         :param properties: list with properties to be compared. Default is spin, colordim and eCharge
         
         :return: True if all properties are the same, False otherwise.
@@ -126,13 +142,13 @@ class Particle(object):
         The comparison is made in hierarchical order, following the order
         defined by the properties list.
         
-        :param other: a Particle, MultiParticle or InclusiveParticle object
+        :param other: a Particle or MultiParticle object
         :param properties: list with properties to be compared. Default is spin, colordim and eCharge
         
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
         """
 
-        if isinstance(other,(MultiParticle,InclusiveParticle)):
+        if isinstance(other,(MultiParticle)):
             return -1*other.cmpProperties(self,properties=properties)
         
         for prop in properties:
@@ -172,6 +188,9 @@ class Particle(object):
         """
         
         pConjugate = self.copy()
+        pConjugate._static = False #Temporarily set it to False to change attributes
+        pConjugate._equals = [id(pConjugate)]
+        pConjugate._differs = []
                     
         if hasattr(pConjugate, 'pdg') and pConjugate.pdg:
             pConjugate.pdg *= -1       
@@ -190,6 +209,8 @@ class Particle(object):
         if not label is None:
             pConjugate.label = label
             
+        pConjugate._static = self._static #Restore the initial state
+
         return pConjugate
 
         
@@ -256,56 +277,9 @@ class MultiParticle(Particle):
         self._static = False
         self.label = label
         self.particles = particles
-        Particle.__init__(self,**kwargs)        
-        
-     
-    def __cmp__(self,other):
-        """
-        Compares the list with another list or a single particle.
-        :param other: particle list (MultiParticle) or single particle (Particle) to be compared
-        :return: If other is a single particle, returns:
-                    -1 if all particles in self < other, 
-                     0 if any particle in self == other,
-                    +1, if any particle in self > other.
-                If other is a particle list, returns 
-                -1 if self < other, 0 if self == other, +1, if self > other.     
-        """        
-        
-        if isinstance(other,MultiParticle):
-            if self.particles != other.particles:
-                comp = self.particles > other.particles
-                if comp:
-                    return 1
-                else:
-                    return -1 
-            else:
-                return 0
-        
-        if isinstance(other,Particle):
-            if other in self.particles:
-                return 0
-            else:
-                for p in self.particles:
-                    if p > other: return +1
-                return -1
-            
-    def __eq__( self, other ):
-        return self.__cmp__(other) == 0
-        
-    def __ne__( self, other ):
-        return self.__cmp__(other) != 0
-    
-    def __lt__( self, other ):
-        return self.__cmp__(other) == -1
-
-    def __gt__( self, other ):
-        return self.__cmp__(other) == 1
-
-    def __str__(self):         
-        return self.label
-    
-    def __repr__(self):
-        return self.__str__()    
+        Particle.__init__(self,**kwargs)
+        self._equals = [id(p) for p in self.particles]
+        self._differs = []
     
     def __getattribute__(self,attr):
         """
@@ -343,8 +317,8 @@ class MultiParticle(Particle):
     def cmpProperties(self,other, 
                       properties = ['Z2parity','spin','colordim','eCharge','mass','totalwidth']):
         """
-        Compares the properties in self with the ones in other (default is spin, colordim and eCharge).
-        Return 0 if properties are equal, -1 if self < other and 1 if self > other.
+        Compares the properties in self with the ones in other.
+        Return 0 if properties are equal, -1 if id(self) < id(other) and 1 if id(self) > id(other).
         Only compares the attributes which have been defined in both objects.
         The comparison is made in hierarchical order, following the order
         defined by the properties list.
@@ -353,14 +327,11 @@ class MultiParticle(Particle):
         matches the property of other. If both properties are lists, check if the
         lists share at least one common element.
         
-        :param other: a Particle, MultiParticle or InclusiveParticle object
+        :param other: a Particle or MultiParticle object
         :param properties: list with properties to be compared. Default is spin, colordim and eCharge
         
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
         """
-        
-        if isinstance(other,InclusiveParticle):
-            return -1*other.cmpProperties(self,properties=properties)
         
         for prop in properties:    
             if not hasattr(self,prop) or not hasattr(other,prop):
@@ -369,7 +340,7 @@ class MultiParticle(Particle):
             x = getattr(self,prop)
             y = getattr(other,prop)
             
-            if x == y:
+            if type(x) == type(y) and x == y:
                 continue
             
             if not isinstance(x,list) and not isinstance(y,list): #Compare single values:
@@ -460,54 +431,3 @@ class MultiParticle(Particle):
         met = all(particle.isMET() for particle in self.particles)
         return met
 
-
-
-class InclusiveParticle(Particle):
-    """
-    An inclusive particle class. It will return True when compared to any other Particle or MultiParticle object.
-    The only exception is if the InclusiveParticle has a defined parity. In this case it will only be equal
-    to particles with the same parity.
-    """
-    
-    def __init__(self,**kwargs):
-        if not kwargs or not 'label' in kwargs:
-            kwargs['label'] = '*'
-        Particle.__init__(self,**kwargs)
-        
-    def __repr__(self):
-        return self.__str__()
-
-
-
-    def cmpProperties(self,other, properties = ['Z2parity']):
-        """
-        Returns 0 if the Z2parities match, otherwise
-        -1 if self.Z2parity < other.Z2parity and 1 if self.Z2parity > other.Z2parity.
-        
-        :param other: a Particle, MultiParticle or InclusiveParticle object
-        :param properties: (dummy) list with properties to be compared. It is not used.
-        
-        :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
-        """
-        
-        prop = 'Z2parity'
-
-        if not hasattr(self,prop) or not hasattr(other,prop):
-            return 0
-        else:
-            x = getattr(self,prop)
-            y = getattr(other,prop)
-            if isinstance(y,list):
-                if x in y:
-                    return 0
-                elif any(yval > x for yval in y):
-                    return -1
-                else:
-                    return 1
-            else:
-                if x == y:
-                    return 0
-                elif x > y:
-                    return 1
-                else:
-                    return -1
