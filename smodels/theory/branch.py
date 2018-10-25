@@ -7,7 +7,7 @@
         
 """
 
-from smodels.theory.auxiliaryFunctions import elementsInStr,simParticles
+from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
