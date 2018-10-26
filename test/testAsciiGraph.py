@@ -21,12 +21,12 @@ from smodels.theory import decomposer
 class AsciiTest(unittest.TestCase):
     def orig(self):
         return """ /------------\\
- |    q  q    |
+ |    d  d    |
  |    \ /     |
  | ----*----  |
  | ----*----  |
  |    / \     |
- |    q  q    |
+ |    d  d    |
  \------------/
 """
 

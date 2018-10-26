@@ -19,7 +19,6 @@ from smodels.theory.model import Model
 
 
 class CompressionTest(unittest.TestCase):
-    from smodels.tools.smodelsLogging import logger
 
     def testInvisiblePositive(self):
         """ test the invisible compression, a positive example """
@@ -47,17 +46,17 @@ class CompressionTest(unittest.TestCase):
         slhafile="./testFiles/slha/higgsinoStop.slha"
         model = Model(BSMList,SMList,slhafile)
         model.updateParticles()
-        topos = decomposer.decompose ( model, .1*fb, False, True, 5.*GeV )
+        topos = decomposer.decompose(model, .1*fb, False, True, 5.*GeV)
         tested = False
         for topo in topos:
             if str(topo)!="[1,1][1,1]":
                 continue
             for element in topo.elementList:
-                if str(element)!="[[[q],[W+]],[[t-],[t+]]]":
+                if str(element)!="[[[d],[W+]],[[t-],[t+]]]":
                     continue
                 tested = True
                 trueMothers = [mother for mother in element.motherElements if not mother[0]=='original']
-                self.assertEqual ( len(trueMothers),0 )
+                self.assertEqual(len(trueMothers),0)
         self.assertTrue(tested)
 
     def testMass(self):
