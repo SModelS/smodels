@@ -20,9 +20,13 @@
 from smodels.tools.smodelsLogging import logger
 import os, sys
 
-def load ():
-    
-    from smodels.tools.runtime import modelFile
+def load ( modelFile = None ):
+    """ load a modelFile, if None is given, get it from runtime. """
+    if modelFile == None:
+        from smodels.tools.runtime import modelFile
+    else:
+        import smodels.tools.runtime
+        smodels.tools.runtime.modelFile = modelFile
     from smodels.installation import installDirectory    
     
     fulldir = os.path.join(installDirectory(),"smodels","share","models")
@@ -47,17 +51,16 @@ def load ():
     try:
         pM=import_module (modelFile, package='smodels')
         logger.debug ( "Found model file at %s" % pM.__file__ )
-        return pM
+        sys.modules[__name__].rOdd = pM.rOdd
+        sys.modules[__name__].rEven = pM.rEven
+        try:
+            sys.modules[__name__].qNumbers = pM.qNumbers
+        except:
+            logger.error("Quantum numbers have not been defined. Please add the BSM quantum numbers to the model file.")
+            sys.exit()
     except ModuleNotFoundError as e:
         logger.error ( "Model file %s not found." % modelFile )
         sys.exit()
 
-pM = load()
+load()
         
-rOdd = pM.rOdd
-rEven = pM.rEven
-try:
-    qNumbers = pM.qNumbers
-except:
-    logger.error("Quantum numbers have not been defined. Please add the BSM quantum numbers to the model file.")
-    sys.exit()

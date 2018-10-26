@@ -387,7 +387,7 @@ Below we go step-by-step through this example code:
   and `topology  <theory.html#theory.topology.Topology>`_ objects:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 47-60
+   :lines: 47-61
 
 *output:*
 

@@ -100,7 +100,7 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     """ Determine particles module from ini file, if necessary """
     if parser.has_option("particles","model"):
         runtime.modelFile = parser.get( "particles", "model" )
-        reload(particlesLoader)
+        particlesLoader.load ( runtime.modelFile )
 
     """ Check database location and load database, exit if not found """
     database, databaseVersion = modelTester.loadDatabase(parser, db)
