@@ -12,6 +12,7 @@
 from smodels.tools.physicsUnits import fb
 from smodels.tools.reweighting import addPromptAndDisplaced
 from smodels.theory.element import Element
+import smodels.experiment.finalStateParticles as fS
 
 class Uncovered(object):
     """
@@ -253,7 +254,7 @@ class UncoveredList(object):
         :parameter instr: element as string
         :returns: string of generalized element
         """
-        import smodels.experiment.finalStateParticles as fS
+
         newEl = Element()
         newEl.branches[0]._decayType = el.branches[0]._decayType
         newEl.branches[1]._decayType = el.branches[1]._decayType

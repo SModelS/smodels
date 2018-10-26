@@ -116,9 +116,10 @@ class Model(object):
                     continue
                 BSMparticlesInEvents.append(particle)
             self.BSMparticles = BSMparticlesInEvents
-                
-        sys.stderr = storeErr
+        finally:
+            sys.stderr = storeErr
         
+        logger.debug("Loaded %i BSM particles" %len(self.BSMparticles))
         evenPDGs = list(set([ptc.pdg for ptc in self.getParticlesWith(Z2parity='even') if isinstance(ptc.pdg,int)]))
         oddPDGs = list(set([ptc.pdg for ptc in self.getParticlesWith(Z2parity='odd') if isinstance(ptc.pdg,int)]))
         allPDGs = list(set(evenPDGs + oddPDGs))

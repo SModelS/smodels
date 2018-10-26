@@ -89,7 +89,7 @@ def main():
         print('\n %s ' %expResult.globalInfo.id)
         for theoryPrediction in predictions:
             dataset = theoryPrediction.dataset
-            datasetID = dataset.dataInfo.dataId            
+            datasetID = theoryPrediction.dataId()
             mass = theoryPrediction.mass
             txnames = [str(txname) for txname in theoryPrediction.txnames]
             PIDs =  theoryPrediction.PIDs         

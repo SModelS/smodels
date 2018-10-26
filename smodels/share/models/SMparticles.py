@@ -43,14 +43,16 @@ pizz = piz.chargeConjugate('pi0')
 quarks = [u,d] + [c,s] + [t,b]
 quarksC = [p.chargeConjugate(p.label) if p.label != 't+' else p.chargeConjugate() for p in quarks]
 chargedLeptons = [e,mu,ta]
+chargedLeptonsC = [p.chargeConjugate() for p in chargedLeptons]
 neutrinos = [nue,numu,nuta]
 leptons = chargedLeptons + neutrinos
-leptonsC = [p.chargeConjugate() for p in chargedLeptons] + [p.chargeConjugate('nu') for p in neutrinos] 
+leptonsC = chargedLeptonsC + [p.chargeConjugate('nu') for p in neutrinos]
 gauge = [g,photon,W,Z]
 gaugeC = [p.chargeConjugate() for p in gauge]
+higgsC = higgs.chargeConjugate()
 
 SMparticles = quarks + leptons + gauge + [higgs] + [pip,piz]
-SMparticlesC = quarksC + leptonsC + gaugeC + [higgs.chargeConjugate()] + [pim,pizz]
+SMparticlesC = quarksC + leptonsC + gaugeC + [higgsC] + [pim,pizz]
 
 SMList = SMparticles + SMparticlesC
 #Protect all particles properties:
