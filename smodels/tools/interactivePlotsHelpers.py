@@ -601,7 +601,7 @@ def create_index_html(path_to_plots,plot_data,plot_list):
         plot_name=plot.split('.')[0]
         main_file.write('<p>'+plot_name+': ')
         for option in plot_data:   
-            plot_link=hyperlink_format.format(link=plot_name+'_'+option+'.html', text=option) 
+            plot_link=hyperlink_format.format(link=path_to_plots + "/" + plot_name+'_'+option+'.html', text=option) 
             main_file.write(plot_link)
             main_file.write(' ')  
         main_file.write('</p>')
