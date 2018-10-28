@@ -342,10 +342,11 @@ class MultiParticle(Particle):
             otherParticles = other.particles
             
         for otherParticle in otherParticles:
-            if any(p.cmpProperties(otherParticle) == 0 for p in self.particles):
+            if any(p.cmpProperties(otherParticle,properties) == 0 for p in self.particles):
                 return 0
  
-        return self.particles[0].cmpProperties(otherParticles[0])
+        cmpv = self.particles[0].cmpProperties(otherParticles[0],properties)
+        return cmpv
 
     def __getstate__(self):
         """
@@ -401,3 +402,20 @@ class MultiParticle(Particle):
         met = all(particle.isMET() for particle in self.particles)
         return met
 
+    def contains(self,particle):
+        """
+        Check if MultiParticle contains the Particle object or MultiParticle object.
+
+        :param particle: Particle or MultiParticle object
+
+        :return: True/False
+        """
+
+        for p in self.particles:
+            if p is particle:
+                return True
+            elif isinstance(p,MultiParticle):
+                if p.contains(particle):
+                    return True
+
+        return False

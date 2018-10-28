@@ -52,7 +52,7 @@ class CompressionTest(unittest.TestCase):
             if str(topo)!="[1,1][1,1]":
                 continue
             for element in topo.elementList:
-                if str(element)!="[[[d],[W+]],[[t-],[t+]]]":
+                if str(element)!="[[[q],[W+]],[[t-],[t+]]]":
                     continue
                 tested = True
                 trueMothers = [mother for mother in element.motherElements if not mother[0]=='original']
@@ -64,8 +64,8 @@ class CompressionTest(unittest.TestCase):
         tested = False
         slhafile="./testFiles/slha/higgsinoStop.slha"
         model = Model(BSMList,SMList,slhafile)
-        model.updateParticles( promptWidth = 1e-12*GeV)    
-        topos = decomposer.decompose ( model, .1*fb, True, False, 5.*GeV )
+        model.updateParticles(promptWidth = 1e-12*GeV)
+        topos = decomposer.decompose(model, .1*fb, True, False, 5.*GeV)
         for topo in topos:
             if str(topo)!="[1][1]":
                 continue
@@ -75,9 +75,11 @@ class CompressionTest(unittest.TestCase):
                 masses=element.motherElements[0][1].getMasses()
                 tested = True
                 dm=abs(masses[0][1]-masses[0][2])/GeV
-                self.assertEqual(len(element.motherElements),24 )
-                self.assertEqual(str(element.motherElements[0][0]),"mass" )
-                self.assertTrue ( dm < 5.0 )
+                #If intermediate BSM states are compared there are two elements ([[[b],[c,q]],[[b],[q,q]]])
+                # which do not get combined because their branches differ by the charges of the intermediate states
+                self.assertEqual(len(element.motherElements),25)
+                self.assertEqual(str(element.motherElements[0][0]),"mass")
+                self.assertTrue(dm < 5.0)
         self.assertTrue(tested)
 
 if __name__ == "__main__":

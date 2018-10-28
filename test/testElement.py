@@ -57,11 +57,8 @@ class ElementTest(unittest.TestCase):
         el1B = Element()
         el1B.branches = [b2,b1]
         self.assertEqual(el1 > el2,True) #Bigger by number of vertices
-        self.assertFalse(el1 == el1B) #Just differ by branch ordering
+        self.assertEqual(el1,el1B) #Just differ by branch ordering
         el1.sortBranches()
-        el1B.sortBranches()
-        self.assertTrue(el1 == el1B) #Now elements should be equal
-         
         e1Info = {"vertnumb" : [1,2], "vertparts" : [[2],[1,2]]}
         self.assertEqual(el1.getEinfo() == e1Info, True) 
          
@@ -92,9 +89,8 @@ class ElementTest(unittest.TestCase):
         el1.branches = [b1,b2]
         el2 = Element()
         el2.branches = [b2b,b1b]
-          
-        self.assertFalse(el1 == el2) #Direct comparison should fail
-        self.assertTrue(el1.particlesMatch(el2))
+
+        self.assertTrue(el1 == el2) #Elements match (using inclusive labels)
          
     def testElementStr(self):
          
@@ -112,15 +108,11 @@ class ElementTest(unittest.TestCase):
         elstrA = Element('[[[t+],[b,t+]],[[b,t+]]]',finalState=['MET','MET'])
         elstrB = Element('[[[b,t+]],[[t+],[b,t+]]]',finalState=['MET','MET'])
         elstrC = Element('[[[b,t+]],[[t],[b,t]]]',finalState=['MET','MET'])
+
                  
         self.assertTrue(el1 == elstrA) #Elements should be equal
-        self.assertFalse(el1 == elstrB) #Elements should be equal (just switch branches)
-        elstrB.sortBranches()
-        el1.sortBranches()
-        elstrC.sortBranches()
-        self.assertTrue(el1 == elstrB) #Elements should be equal (just switch branches)
-        self.assertFalse(el1 == elstrC) #Elements should not be identical (distinct labels)
-        self.assertTrue(el1.particlesMatch(elstrC)) #Final states should be equal (inclusive labels)
+        self.assertTrue(el1 == elstrB) #Elements should be equal (only branch order differs)
+        self.assertTrue(el1 == elstrC) #Elements should be equal (inclusive labels)
          
     def testElementMassComp(self):
         

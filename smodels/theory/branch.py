@@ -60,7 +60,7 @@ class Branch(object):
                     bsmParticle = finalStates.getParticlesWith(label='anyOdd')
                     if not bsmParticle:
                         raise SModelSError("Final state anyOdd has not been defined in finalStateParticles.py")
-                    if len(bsmParticle) != 1:
+                    elif len(bsmParticle) != 1:
                         raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)          
                     self.oddParticles.append(bsmParticle[0])
                     particleNames = vertex[1:-1].split(',')
@@ -69,7 +69,10 @@ class Branch(object):
                         smParticle = finalStates.getParticlesWith(label=pname)
                         if not smParticle:
                             raise SModelSError("Final state %s has not been defined in finalStateParticles.py " %pname)
-                        ptcs.append(smParticle[0])
+                        elif len(smParticle) != 1:
+                            raise SModelSError("Ambiguos defintion of label %s in finalStates" %smParticle[0].label)
+                        else:
+                            ptcs.append(smParticle[0])
                     self.evenParticles.append(ptcs)
 
             self.vertnumb = len(self.evenParticles)

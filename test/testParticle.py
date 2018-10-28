@@ -123,7 +123,6 @@ class ParticleTest(unittest.TestCase):
         out= elementsInStr(instring)
         self.assertEqual(out, ['[[[t+],[W-]],[[t+],[W-]]]', '[[[t-],[W+]],[[t-],[W+]]]', '[[[t+],[W-]],[[t-],[W+]]]'])
          
-         
           
 if __name__ == "__main__":
     unittest.main()

@@ -316,8 +316,15 @@ class SlhaStatus(object):
                 mDau = 0.
                 for ptc in dcy.ids:
                     ptc = abs(ptc)
-                    if ptc in SMpdgs: 
-                        mDau += self.model.getParticlesWith(pdg=ptc)[0].mass/GeV                         
+                    if ptc in SMpdgs:
+                        smParticle = self.model.getParticlesWith(pdg=ptc)
+                        if not smParticle:
+                            raise SModelSError("Particle with PDG = %i could not be found." %ptc)
+                        elif len(smParticle) != 1:
+                            raise SModelSError("Multiple particles defined with PDG = %i in model" %ptc)
+                        else:
+                            smParticle = smParticle[0]
+                        mDau += smParticle.mass/GeV
                     elif ptc in self.slha.blocks["MASS"].keys(): 
                         mDau += abs(self.slha.blocks["MASS"][ptc])
                     else:

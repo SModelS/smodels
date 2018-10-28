@@ -49,6 +49,7 @@ class BranchTest(unittest.TestCase):
         self.assertFalse(b2 < b3)  #Bigger by label of particles
         self.assertFalse(b2 < b4)  #Bigger by mass of g compared to sq1
 
+
     def testBranchComp(self):
 
         gluino = Particle(mass=500.*GeV,pdg=1000021, Z2Parity=-1, eCharge=0, colordim=8, totalwidth = 1*GeV, decays = g_decays )
@@ -59,10 +60,10 @@ class BranchTest(unittest.TestCase):
         C1m = Particle(mass=205.*GeV,pdg=1000003, Z2Parity=-1, eCharge=-1, colordim=1, totalwidth = 1*GeV, decays = None)
         N1 = Particle(mass=705.*GeV,pdg=1000022, Z2Parity=-1, eCharge=0, colordim=1)
 
-        b1 = Branch('[[d], [b, t+], [W-]]')
-        b2 = Branch('[[d], [b, t+], [W-]]')
-        b3 = Branch('[[d], [b, t+], [W-]]')
-        b4 = Branch('[[d], [b, t+], [W-]]')
+        b1 = Branch('[[q], [b, t+], [W-]]')
+        b2 = Branch('[[q], [b, t+], [W-]]')
+        b3 = Branch('[[q], [b, t+], [W-]]')
+        b4 = Branch('[[q], [b, t+], [W-]]')
         b1.oddParticles = [sdR,gluino,C1m,N1]
         b2.oddParticles = [sdL,gluino,C1m,N1]
         b3.oddParticles = [ssL,gluino,C1m,N1]
@@ -93,9 +94,7 @@ class BranchTest(unittest.TestCase):
         self.assertTrue( isinstance(b6.oddParticles[0],MultiParticle) )
         self.assertEqual( b6.oddParticles[0].label, 'BSM (combined)' )
         self.assertEqual(len(b6.oddParticles[0].particles), 2)
-        
-        
-        
+
 
     def testBranchDecay(self):
 
@@ -106,9 +105,6 @@ class BranchTest(unittest.TestCase):
         self.assertEqual(len(newBranches), 2)
         self.assertEqual(newBranches[0].evenParticles, [[u],[u,u]])
         self.assertEqual(newBranches[0].oddParticles, [g,sn1])
-
-        
-        
         
         
     def testDecayBranches(self):

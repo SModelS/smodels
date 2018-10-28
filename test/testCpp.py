@@ -23,7 +23,7 @@ class CppTest(unittest.TestCase):
     def compile(self):
         """ compile the C++ interface """
         cmd = "cd ../cpp; make"
-        a = CMD.getoutput ( cmd ).split("\n" )
+        a = CMD.getoutput(cmd).split("\n" )
         ## now check if "done" appears in the last line
         self.assertTrue ( "done" in a[-1] )
 

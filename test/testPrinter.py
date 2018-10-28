@@ -282,7 +282,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=False)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)                    
      
-        slhaDefaultFile = open(os.path.join( idir(), "test/gluino_squarks_default.slha.smodelsslha"),'r')
+        slhaDefaultFile = open("./gluino_squarks_default.slha.smodelsslha",'r')
         slhaDefault = slhaDefaultFile.read()
         slhaDefaultFile.close()
         #Test summary output

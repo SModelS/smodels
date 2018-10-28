@@ -15,31 +15,31 @@ from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 from smodels.tools import asciiGraph
-from smodels.installation import installDirectory
 from smodels.theory import decomposer
 
 class AsciiTest(unittest.TestCase):
     def orig(self):
         return """ /------------\\
- |    d  d    |
+ |    q  q    |
  |    \ /     |
  | ----*----  |
  | ----*----  |
  |    / \     |
- |    d  d    |
+ |    q  q    |
  \------------/
 """
 
     def testGraph(self):
         """ draw ascii graph """
         
-        filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory() )        
+        filename = "./testFiles/lhe/simplyGluino.lhe"
         model = Model(inputFile=filename, BSMparticles = BSMList, SMparticles = SMList)
         model.updateParticles()
         
         
         topList = decomposer.decompose(model)
         element = topList.getElements()[0]
+
 
         d1=self.orig().split("\n")
         d2=asciiGraph.asciidraw(element, border=True ).split("\n")

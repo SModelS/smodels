@@ -31,7 +31,15 @@ class Model(object):
         self.inputFile = inputFile
         self.BSMparticles = [copy.deepcopy(particle) for particle in BSMparticles]
         self.SMparticles = SMparticles[:]
-        
+
+        #Check if for each PDG there is a unique particle object defined  
+        allPDGs = self.getValuesFor('pdg')
+        for pdg in allPDGs:
+            p = self.getParticlesWith(pdg=pdg)
+            if len(p) > 1:
+                raise SModelSError("PDG = %i has been defined for multiple particles (%s). Check your model definitions." %str(p))
+
+
     def __str__(self):
         
         return self.inputFile
@@ -39,25 +47,54 @@ class Model(object):
     def getParticlesWith(self,**kwargs):
         """
         Return the particle objects with the listed attributes.
+        MultiParticle objects are added if any of its particles matches the listed attributes.
+        In order to avoid double counting, MultiParticle objects are only included 
+        if they do not contain any of the particles already in the list.
+        For instance, if MP.particles = [e-,e+] and [e-] already appears in the list,
+        MP will not be added.
         
         :returns: List of particle objects 
         """
     
         particleList = []
-        for particle in self.BSMparticles + self.SMparticles:            
-            if any(not hasattr(particle,attr) for attr in kwargs.keys()):
-                continue
-            if any(getattr(particle,attr) != value for attr,value in kwargs.items()):
-                continue
+        for particle in self.BSMparticles + self.SMparticles:
+            pList = [particle]
+            if isinstance(particle,MultiParticle):
+                pList += particle.particles
+            for p in pList:
+                if any(not hasattr(p,attr) for attr in kwargs.keys()):
+                    continue
+                if any(getattr(p,attr) != value for attr,value in kwargs.items()):
+                    continue
 
-            #Avoid double counting:
-            if not any(particle is ptc for ptc in particleList):
                 particleList.append(particle)
-        
-        if not particleList:
+
+        #Remove repeated entries. If the list contains a Particle and a MultiParticle
+        #which contains the Particle, remove the MultiParticle
+        cleanList = []
+        #First include all Particle objects:
+        for particle in particleList:
+            if isinstance(particle,MultiParticle):
+                continue
+            if any(particle is ptc for ptc in cleanList):
+                continue
+            cleanList.append(particle)
+        #Now only include MultiParticle objects, if they do not contain
+        #any of the particles already in the list:
+        for particle in particleList:
+            if not isinstance(particle,MultiParticle):
+                continue
+            if any(particle is ptc for ptc in cleanList):
+                continue
+            if any((particle.contains(p) and not particle is p) for p in particleList):
+                continue
+            cleanList.append(particle)
+
+
+        if not cleanList:
             logger.warning("Particle with attributes %s not found in models" %str(kwargs))
         
-        return particleList
+        return cleanList
     
     def getValuesFor(self,attributeStr):
         """ 
@@ -73,12 +110,15 @@ class Model(object):
             if not hasattr(particle,attributeStr):
                 continue
             value = getattr(particle,attributeStr)
-            if not value in valueList:
+            if isinstance(particle,MultiParticle) and isinstance(value,list):
+                for v in value:
+                    if not v in valueList:
+                        valueList.append(v)
+            else:
                 valueList.append(value)
-        
+
         return valueList
     
-
     def updateParticles(self, promptWidth = None, stableWidth = None, roundMasses = 1):
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file. 
@@ -120,9 +160,14 @@ class Model(object):
             sys.stderr = storeErr
         
         logger.debug("Loaded %i BSM particles" %len(self.BSMparticles))
-        evenPDGs = list(set([ptc.pdg for ptc in self.getParticlesWith(Z2parity='even') if isinstance(ptc.pdg,int)]))
-        oddPDGs = list(set([ptc.pdg for ptc in self.getParticlesWith(Z2parity='odd') if isinstance(ptc.pdg,int)]))
-        allPDGs = list(set(evenPDGs + oddPDGs))
+        allPDGs = list(set(self.getValuesFor('pdg')))
+        evenPDGs = []
+        oddPDGs = []
+        for pdg in allPDGs:
+            if all(p.Z2parity == 'even' for p in self.getParticlesWith(pdg=pdg)):
+                evenPDGs.append(pdg)
+            elif all(p.Z2parity == 'odd' for p in self.getParticlesWith(pdg=pdg)):
+                oddPDGs.append(pdg)
         
         #Remove cross-sections for even particles or particles which do not belong to the model:
         modelPDGs = [particle.pdg for particle in self.BSMparticles if isinstance(particle.pdg,int)]
@@ -157,7 +202,7 @@ class Model(object):
             particle.decays = []
             if not pdg in decaysDict and not -pdg in decaysDict:
                 logger.debug("No decay found for %i. It will be considered stable" %particle.pdg)                
-                particle.width = 0.*GeV
+                particle.totalwidth = 0.*GeV
                 continue
             
             if pdg in decaysDict:
@@ -198,7 +243,16 @@ class Model(object):
                     
                     
                 #Convert PDGs to particle objects:
-                newDecay.daughters = [self.getParticlesWith(pdg=pdg)[0] for pdg in newDecay.ids]
+                newDecay.daughters = []
+                for pdg in newDecay.ids:
+                    daughter = self.getParticlesWith(pdg=pdg)
+                    if not daughter:
+                        raise SModelSError("Particle with PDG = %i was not found in model. Check the model definitions." %pdg)
+                    elif len(daughter) > 1:
+                        raise SModelSError("Multiple particles defined with PDG = %i. PDG ids must be unique." %pdg)
+                    else:
+                        daughter = daughter[0]
+                    newDecay.daughters.append(daughter)
                 particle.decays.append(newDecay)
                  
         

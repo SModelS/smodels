@@ -35,7 +35,7 @@ def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
     xSectionList = model.xsections    
     pdgList = model.getValuesFor('pdg')
 
-    if doCompress and minmassgap / GeV < 0.:
+    if doCompress and minmassgap/GeV < 0.:
         logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")        
         raise SModelSError()
 
