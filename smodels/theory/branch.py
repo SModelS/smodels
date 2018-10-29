@@ -472,7 +472,7 @@ def decayBranches(branchList, brDictionary, massDictionary,
         newBranches = []
         for branch in unstableBranches:
             newBranches += [br for br in branch.decayDaughter(brDictionary, massDictionary) 
-                           if br.maxWeight >= sigcut]
+                           if float(br.maxWeight.asNumber(fb)) >= float(sigcut.asNumber(fb)) ]
     
         
         return decayBranches(newBranches+stableBranches,brDictionary, massDictionary,sigcut)
