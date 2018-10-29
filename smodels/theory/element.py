@@ -12,6 +12,7 @@ from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 import itertools
+from smodels.theory.particle import MultiParticle
 
 class Element(object):
     """
@@ -499,9 +500,13 @@ class Element(object):
                 
             while len(branch.oddParticles) > 1 and removeLastVertex:
                 bsmMom = branch.oddParticles[-2]
+                effectiveDaughter = MultiParticle(label='inv',
+                                                        particles=[branch.oddParticles[-1]]+branch.evenParticles[-1],
+                                                        mass = bsmMom.mass)
                 branch.removeVertex(len(branch.oddParticles)-2)
-                #For invisible compression, keep the mother of the vertex and not the daughter:
-                branch.oddParticles[-1] = bsmMom
+                #For invisible compression, keep an effective mother which corresponds to the invisible
+                #daughters grouped as a single particle:
+                branch.oddParticles[-1] = effectiveDaughter
                 #Re-check if the last decay should be removed:
                 if not branch.evenParticles:
                     continue

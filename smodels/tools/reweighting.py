@@ -19,7 +19,7 @@ def addPromptAndDisplaced(branch):
     """
     
     if not branch.evenParticles: # no decays happened
-        if branch.oddParticles[0].eCharge == 0 and branch.oddParticles[0].colordim == 1: branch._decayType = 'METonly'
+        if branch.oddParticles[0].isMET(): branch._decayType = 'METonly'
         else: branch._decayType = 'longlived'
         probabilities = [1.]
         branches = [branch]

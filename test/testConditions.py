@@ -10,7 +10,6 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.installation import installDirectory
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory import decomposer
@@ -22,7 +21,7 @@ from databaseLoader import database
 class ConditionTest(unittest.TestCase):
     def testGoodFile(self):
 
-        filename = "%sinputFiles/slha/lightEWinos.slha" % (installDirectory() )
+        filename = "./testFiles/slha/lightEWinos.slha"
         model = Model(BSMList,SMList,filename)
         model.updateParticles()
                 

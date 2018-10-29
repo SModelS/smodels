@@ -36,9 +36,9 @@ class CompressionTest(unittest.TestCase):
                 tested = True
                 trueMothers = [mother for mother in element.motherElements if not mother[0]=='original']
                 if not trueMothers: continue
-                self.assertEqual ( str(trueMothers[0][1]),"[[],[[nu,nu]]]")
-                self.assertEqual ( len(trueMothers), 1) 
-                self.assertEqual ( str(trueMothers[0][0]),"invisible" )
+                self.assertEqual(str(trueMothers[0][1]),"[[],[[nu,nu]]]")
+                self.assertEqual(len(trueMothers), 1)
+                self.assertEqual(str(trueMothers[0][0]),"invisible" )
         self.assertTrue(tested)
 
     def testInvisibleNegative(self):
@@ -77,7 +77,7 @@ class CompressionTest(unittest.TestCase):
                 dm=abs(masses[0][1]-masses[0][2])/GeV
                 #If intermediate BSM states are compared there are two elements ([[[b],[c,q]],[[b],[q,q]]])
                 # which do not get combined because their branches differ by the charges of the intermediate states
-                self.assertEqual(len(element.motherElements),25)
+                self.assertEqual(len(element.motherElements),24)
                 self.assertEqual(str(element.motherElements[0][0]),"mass")
                 self.assertTrue(dm < 5.0)
         self.assertTrue(tested)

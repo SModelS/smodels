@@ -30,6 +30,10 @@ class Model(object):
         
         self.inputFile = inputFile
         self.BSMparticles = [copy.deepcopy(particle) for particle in BSMparticles]
+        #Reset equality tracking:
+        for p in self.BSMparticles:
+            p._equals = [id(p)]
+            p._differs = []
         self.SMparticles = SMparticles[:]
 
         #Check if for each PDG there is a unique particle object defined  
@@ -119,7 +123,8 @@ class Model(object):
 
         return valueList
     
-    def updateParticles(self, promptWidth = None, stableWidth = None, roundMasses = 1):
+    def updateParticles(self, promptWidth = None, stableWidth = None,
+                        roundMasses = 1, erasePrompt=['spin','eCharge','colordim']):
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file. 
             
@@ -127,7 +132,11 @@ class Model(object):
                             will be set 1e-8 GeV.
         :param stableWidth: Minimum width for considering particles as stable. If None, it
                             will be set 1e-25 GeV.
-        :param roundMasses: If set, it will round the masses to this number of digits (int)  
+        :param roundMasses: If set, it will round the masses to this number of digits (int)
+
+        :param erasePromptQNs: If set, all particles with prompt decays (totalwidth > promptWidth)
+                               will have the corresponding properties (quantum numbers). So all particles with the same
+                               mass and Z2parity will be considered as equal when combining elements.
             
         """
 
@@ -220,7 +229,11 @@ class Model(object):
 
             if particle.totalwidth > promptWidth:
                 particle.totalwidth = float('inf')*GeV  #Treat particle as prompt
-                logger.debug("Particle %s has width above the threshold and will be assumed as prompt" %particle.pdg)
+                logger.debug("Particle %s has width above the threshold and will be assumed as prompt." %particle.pdg)
+                if erasePrompt:
+                    logger.debug("Erasing quantum numbers of (prompt) particle %s." %particle.pdg)
+                    for attr in erasePrompt:
+                        delattr(particle,attr)
             else:
                 particle.decays.append(None) #Include possibility for particle being long-lived (non-prompt)
             
