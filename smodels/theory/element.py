@@ -501,11 +501,11 @@ class Element(object):
             while len(branch.oddParticles) > 1 and removeLastVertex:
                 bsmMom = branch.oddParticles[-2]
                 effectiveDaughter = MultiParticle(label='inv',
-                                                        particles=[branch.oddParticles[-1]]+branch.evenParticles[-1],
+                                                        particles=[branch.oddParticles[-1]],
                                                         mass = bsmMom.mass)
                 branch.removeVertex(len(branch.oddParticles)-2)
                 #For invisible compression, keep an effective mother which corresponds to the invisible
-                #daughters grouped as a single particle:
+                #daughter, but with the mass of the parent.
                 branch.oddParticles[-1] = effectiveDaughter
                 #Re-check if the last decay should be removed:
                 if not branch.evenParticles:

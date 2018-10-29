@@ -304,7 +304,7 @@ class MultiParticle(Particle):
             return super(MultiParticle,self).__getattribute__(attr) #Python2
         except:
             pass
-         
+
         try:
             return super().__getattribute__(attr) #Python3
         except:
@@ -336,6 +336,22 @@ class MultiParticle(Particle):
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
         """
         
+        #First tries to compare directly:
+        cmpSelf = 0
+        for prop in properties:
+            if not hasattr(self,prop) or not hasattr(other,prop):
+                continue
+            x = getattr(self,prop)
+            y = getattr(other,prop)
+            if type(x) == type(y) and x == y:
+                continue
+            else:
+                cmpSelf = 1
+
+        if cmpSelf == 0:
+            return 0
+
+        #If did not match, check if any of its particles matches other
         if isinstance(other,Particle):
             otherParticles = [other]
         elif isinstance(other,MultiParticle):
