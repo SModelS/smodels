@@ -12,7 +12,7 @@ from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 import itertools
-from smodels.theory.particle import MultiParticle
+from smodels.theory.particle import Particle
 
 class Element(object):
     """
@@ -500,9 +500,10 @@ class Element(object):
                 
             while len(branch.oddParticles) > 1 and removeLastVertex:
                 bsmMom = branch.oddParticles[-2]
-                effectiveDaughter = MultiParticle(label='inv',
-                                                        particles=[branch.oddParticles[-1]],
-                                                        mass = bsmMom.mass)
+                effectiveDaughter = Particle(label='inv', mass = bsmMom.mass,
+                                             eCharge = 0, colordim = 1,
+                                             totalwidth = branch.oddParticles[-1].totalwidth,
+                                             Z2parity = bsmMom.Z2parity)
                 branch.removeVertex(len(branch.oddParticles)-2)
                 #For invisible compression, keep an effective mother which corresponds to the invisible
                 #daughter, but with the mass of the parent.

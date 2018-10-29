@@ -284,7 +284,7 @@ class MultiParticle(Particle):
         self.label = label
         self.particles = particles
         Particle.__init__(self,**kwargs)
-        self._equals = [id(p) for p in self.particles]
+        self._equals = [id(self)]
         self._differs = []
     
     def __getattribute__(self,attr):
@@ -336,22 +336,7 @@ class MultiParticle(Particle):
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
         """
         
-        #First tries to compare directly:
-        cmpSelf = 0
-        for prop in properties:
-            if not hasattr(self,prop) or not hasattr(other,prop):
-                continue
-            x = getattr(self,prop)
-            y = getattr(other,prop)
-            if type(x) == type(y) and x == y:
-                continue
-            else:
-                cmpSelf = 1
-
-        if cmpSelf == 0:
-            return 0
-
-        #If did not match, check if any of its particles matches other
+        #Check if any of its particles matches other
         if isinstance(other,Particle):
             otherParticles = [other]
         elif isinstance(other,MultiParticle):
