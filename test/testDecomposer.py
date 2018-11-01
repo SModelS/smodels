@@ -104,7 +104,7 @@ class DecomposerTest(unittest.TestCase):
             if str(topo)!="[1,1][1,1]":
                 continue
             for element in topo.elementList:
-                if str(element)!="[[[q],[W+]],[[t-],[t+]]]": 
+                if str(element)!="[[[q],[W+]],[[t+],[t-]]]": 
                     continue
                 tested = True
                 self.assertEqual(element.motherElements[0][0],"original")
@@ -160,15 +160,15 @@ class DecomposerTest(unittest.TestCase):
                         
         tested = False                 
         topos = decomposer.decompose(model, sigcut=0.1*fb, doCompress=True, doInvisible=True, minmassgap=5.*GeV )
-        elIDs = {26 : Element("[[[b]],[[b]]]",finalState=['MET','MET']),
-                 27 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
-                 28 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
+        elIDs = {32 : Element("[[[b]],[[b]]]",finalState=['MET','MET']),
+                 33 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
+                 34 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
+                 26 : Element("[[[b]],[[t-]]]",finalState=['MET','MET']),
                  29 : Element("[[[b]],[[t-]]]",finalState=['MET','MET']),
-                 30 : Element("[[[b]],[[t-]]]",finalState=['MET','MET']),
                  31 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET']),
-                 32 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET']),
-                 33 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET']),
-                 34 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET'])}
+                 28 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET']),
+                 30 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET']),
+                 27 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET'])}
         
         toposExpected = {"[][]" : 2,"[][1]" : 9,"[][2]" : 14,"[1][1]" : 9,"[1][2]" : 29,
                          "[2][2]" : 72,"[][1,2]" : 2,"[][2,2]" : 44,"[1][1,1]" : 6,"[1][1,2]" : 44,

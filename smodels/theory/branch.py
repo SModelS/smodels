@@ -97,7 +97,9 @@ class Branch(object):
         :returns: string representation of the branch (in bracket notation)    
         """
 
-        st = str(self.evenParticles).replace("'", "")
+        sortedParticles = [sorted(vertex, key = lambda ptc: str(ptc))
+                           for vertex in self.evenParticles]
+        st = str(sortedParticles).replace("'", "")
         st = st.replace(" ", "")
         return st
 
@@ -139,6 +141,8 @@ class Branch(object):
                     equalVertex = True
                     break
             if not equalVertex:
+                particlesA = sorted(particlesA)
+                particlesB = sorted(particlesB)
                 comp = (particlesA > particlesB) - (particlesA < particlesB)
                 return comp
                 

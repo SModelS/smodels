@@ -52,7 +52,7 @@ class CompressionTest(unittest.TestCase):
             if str(topo)!="[1,1][1,1]":
                 continue
             for element in topo.elementList:
-                if str(element)!="[[[q],[W+]],[[t-],[t+]]]":
+                if str(element)!="[[[q],[W+]],[[t+],[t-]]]":
                     continue
                 tested = True
                 trueMothers = [mother for mother in element.motherElements if not mother[0]=='original']

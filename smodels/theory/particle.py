@@ -63,21 +63,17 @@ class Particle(object):
         if idOther in self._equals:  #Objects were already compared and are equal
             return 0
         elif idOther in self._differs: #Objects were already compared and differ.
-            if hasattr(self,'label') and hasattr(other,'label') and self.label != other.label:
-                return (self.label > other.label) - (self.label < other.label)
-            else:
-                return self.cmpProperties(other)
+            return 1
+        elif -idOther in self._differs:
+            return -1
         else:
             cmpProp = self.cmpProperties(other) #Objects have not been compared yet.
             if cmpProp == 0:
                 self._equals.append(idOther)
                 return 0
             else:
-                self._differs.append(idOther)
-                if hasattr(self,'label') and hasattr(other,'label') and self.label != other.label:
-                    return (self.label > other.label) - (self.label < other.label)
-                else:
-                    return cmpProp
+                self._differs.append(idOther*cmpProp)
+                return cmpProp
 
     def __lt__( self, p2 ):
         return self.__cmp__(p2) == -1
