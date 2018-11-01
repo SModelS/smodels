@@ -43,7 +43,7 @@ def decompose(slhafile, sigcut=.1 * fb, doCompress=False, doInvisible=False,
         r=requests.get(slhafile)
         if r.status_code != 200:
             logger.error ( "could not retrieve remote file %d: %s" % ( r.status_code, r.reason ) )
-            sys.exit()
+            raise SModelSError()
         basename = os.path.basename ( slhafile )
         f=open ( basename, "w" )
         f.write ( r.text )

@@ -19,7 +19,7 @@ setLogLevel("info")
 
 
 # Set the path to the database
-database = Database("http://smodels.hephy.at/database/official120")
+database = Database("official")
 
 def main():
     """
