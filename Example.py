@@ -80,7 +80,7 @@ def main():
     rmax = 0.
     bestResult = None
     for expResult in listOfExpRes:
-        predictions = theoryPredictionsFor(expResult, toplist)
+        predictions = theoryPredictionsFor(expResult, toplist, combinedResults=False, marginalize=False)
         if not predictions: continue # Skip if there are no constraints from this result
         print('\n %s ' %expResult.globalInfo.id)
         for theoryPrediction in predictions:
