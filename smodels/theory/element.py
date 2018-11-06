@@ -280,7 +280,10 @@ class Element(object):
 
         momPIDs = []
         for branch in self.branches:
-            momPIDs.append(branch.oddParticles[0].pdg)        
+            if hasattr(branch.oddParticles[0], 'pdg'):
+                momPIDs.append(branch.oddParticles[0].pdg)
+            else:
+                momPIDs.append(None)
         return momPIDs    
         
     def getMotherPIDs(self):

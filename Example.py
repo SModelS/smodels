@@ -108,7 +108,7 @@ def main():
             r = theoryPrediction.getRValue()
             print("r = ",r )
             #Compute likelihhod and chi^2 for EM-type results:
-            if dataset.dataInfo.dataType == 'efficiencyMap':
+            if dataset.getType() == 'efficiencyMap':
                 theoryPrediction.computeStatistics()
                 print('Chi2, likelihood=', theoryPrediction.chi2, theoryPrediction.likelihood )
             if r > rmax:
