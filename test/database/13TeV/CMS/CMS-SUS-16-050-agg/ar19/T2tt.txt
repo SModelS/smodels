@@ -6,7 +6,7 @@ susyProcess: pp --> stop stop, stop  --> top lsp
 figureUrl: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-050/CMS-SUS-16-050_Figure_008.png
 dataUrl: cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-050/acc_maps_T2tt.root
 source: CMS
-validated: TBD
+validated: True
 axes: [[x, y], [x, y]]
 efficiencyMap: [[[[2.1250E+02*GeV,1.2500E+01*GeV],[2.1250E+02*GeV,1.2500E+01*GeV]],1.0409e-06],
 [[[2.3750E+02*GeV,1.2500E+01*GeV],[2.3750E+02*GeV,1.2500E+01*GeV]],1.6433e-06],

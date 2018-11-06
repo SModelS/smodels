@@ -35,6 +35,8 @@ def verbose_run():
     n_tests, n_failed = 0, 0
     for series in alltests:
         for test in series:
+            if type(test)!=unittest.suite.TestSuite:
+                print ( "Error: could not import %s" % ( test ) )
             for t in test:
                 n_tests += 1
                 print ( "[#%3d] %s ... " % ( n_tests, t.id() ), end="" )

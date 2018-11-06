@@ -12,7 +12,11 @@ import sys,os,shutil
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools.interactivePlots import main
-from types import SimpleNamespace
+try:
+    from types import SimpleNamespace
+except: ## doesnt exist in python2
+    class SimpleNamespace:
+        pass
 
 
 class RunInteractivePlotSTest(unittest.TestCase):
