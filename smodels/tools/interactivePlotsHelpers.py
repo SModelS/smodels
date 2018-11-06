@@ -372,8 +372,8 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
     if 'all' in plot_data: 
         for cont_plot in cont_plots:
             z=data_frame_all[cont_plot]
-            y=data_frame_all[x_axis]
-            x=data_frame_all[y_axis]
+            x=data_frame_all[x_axis]
+            y=data_frame_all[y_axis]
             hover_text=data_frame_all['hover_text']
             
             data = [
@@ -410,8 +410,8 @@ def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_f
         for cont_plot in cont_plots:
          
             z=data_frame_excluded[cont_plot]
-            y=data_frame_excluded[x_axis]
-            x=data_frame_excluded[y_axis]
+            x=data_frame_excluded[x_axis]
+            y=data_frame_excluded[y_axis]
             hover_text=data_frame_excluded['hover_text']
              
              
@@ -450,8 +450,8 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
         for cont_plot in cont_plots:
          
             z=data_frame_nonexcluded[cont_plot]
-            y=data_frame_nonexcluded[x_axis]
-            x=data_frame_nonexcluded[y_axis]
+            x=data_frame_nonexcluded[x_axis]
+            y=data_frame_nonexcluded[y_axis]
             hover_text=data_frame_nonexcluded['hover_text'] 
              
             data = [
