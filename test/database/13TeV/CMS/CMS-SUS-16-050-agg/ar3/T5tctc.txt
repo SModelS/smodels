@@ -6,7 +6,7 @@ susyProcess: pp --> gluino gluino, gluino --> top stop, stop --> charm lsp
 figureUrl: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-050/CMS-SUS-16-050_Figure-aux_005.png
 dataUrl: cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-050/acc_maps_T5ttcc.root
 source: CMS
-validated: TBD
+validated: True
 axes: [[x, y + 20, y], [x, y + 20, y]]
 efficiencyMap: [[[[6.1250E+02*GeV,3.2500E+01*GeV,1.2500E+01*GeV],[6.1250E+02*GeV,3.2500E+01*GeV,1.2500E+01*GeV]],7.2902e-05],
 [[[6.1250E+02*GeV,1.3250E+02*GeV,1.1250E+02*GeV],[6.1250E+02*GeV,1.3250E+02*GeV,1.1250E+02*GeV]],0.00032798],
