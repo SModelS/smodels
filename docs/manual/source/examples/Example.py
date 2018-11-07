@@ -19,7 +19,7 @@ setLogLevel("info")
 
 
 # Set the path to the database
-database = Database("http://smodels.hephy.at/database/official120")
+database = Database("official")
 
 def main():
     """
@@ -80,7 +80,7 @@ def main():
     rmax = 0.
     bestResult = None
     for expResult in listOfExpRes:
-        predictions = theoryPredictionsFor(expResult, toplist)
+        predictions = theoryPredictionsFor(expResult, toplist, combinedResults=False, marginalize=False)
         if not predictions: continue # Skip if there are no constraints from this result
         print('\n %s ' %expResult.globalInfo.id)
         for theoryPrediction in predictions:
