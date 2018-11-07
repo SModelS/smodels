@@ -183,7 +183,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFilePath:
 
-  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Also http addresses may be given, e.g. http://smodels.hephy.at/database/official113. "official" refers to the official database of your SModelS version -- without fastlim; "official_fastlim" includes fastlim results. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions.  
+  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Also http addresses may be given, e.g. http://smodels.hephy.at/database/official113. The path "official" refers to the official database of your SModelS version -- without fastlim; "official_fastlim" includes fastlim results. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions.
 
 .. _parameterFileAnalyses:
   
