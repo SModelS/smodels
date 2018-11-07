@@ -49,7 +49,7 @@ New in Version 2.0.0:
 New in Version 1.2.2:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * Updated official |database|, added T3GQ eff maps, see `github database release page <https://github.com/SModelS/smodels-database-release/releases>`
+  * Updated official |database|, added T3GQ eff maps, see `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_
   * Database "official" now refers to a database without fastlim results, "official_fastlim", to the official database *with* fastlim
   * List displaced signatures in :ref:`missing topologies <topCoverage>`
   * Improved description about :ref:`lifetime reweighting <lifetimeWeight>` in doc
