@@ -369,7 +369,7 @@ def decayBranches(branchList, sigcut=0.*fb):
     stableBranches,unstableBranches = [],[]
     
     for br in branchList:
-        if br.maxWeight < sigcut:
+        if br.maxWeight.asNumber(fb) < sigcut.asNumber(fb):
             continue
         
         if br.decayDaughter():
@@ -381,7 +381,7 @@ def decayBranches(branchList, sigcut=0.*fb):
         # Store branches after adding one step cascade decay
         newBranchList = []
         for inbranch in unstableBranches:
-            if sigcut.asNumber() > 0. and inbranch.maxWeight < sigcut:
+            if sigcut.asNumber() > 0. and inbranch.maxWeight.asNumber(fb) < sigcut.asNumber(fb):
                 # Remove the branches above sigcut and with length > topmax
                 continue
 
@@ -394,8 +394,9 @@ def decayBranches(branchList, sigcut=0.*fb):
             newBranches = inbranch.decayDaughter()
             if newBranches:
                 # New branches were generated, add them for next iteration
-                newBranchList += [br for br in newBranches if br.maxWeight > sigcut]
-            elif inbranch.maxWeight > sigcut:
+                newBranchList += [br for br in newBranches 
+                                  if br.maxWeight.asNumber(fb) > sigcut.asNumber(fb)]
+            elif inbranch.maxWeight.asNumber(fb) > sigcut.asNumber(fb):
                 stableBranches.append(inbranch)
 
         # Use new unstable branches (if any) for next iteration step
