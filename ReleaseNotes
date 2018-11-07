@@ -7,7 +7,7 @@ Release v2.0.0, Nov 2018
 Release v1.2.2, Wed 24 Oct 2018
 =======================================================
 
-  * Updated database, added T3GQ eff maps
+  * Updated database, added T3GQ eff maps and a few ATLAS 13 TeV result
   * Database "official" now refers to a database without fastlim results, "official_fastlim", to the official database *with* fastlim
   * Added "official_fastlim" as official database with fastlim
   * List displaced signatures in missing topologies
