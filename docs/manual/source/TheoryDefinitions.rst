@@ -129,7 +129,7 @@ in collider scales). The quantum numbers of this BSM final state are essential f
 type of signature this element represents. 
 The only information used from the final state particles are their electric and color charge.
 In an element the  Z\ :sub:`2`-odd final state  quantum numbers are mapped to a final state particle,
-as defined in the `finalStateParticles module <experiment.html#module-experiment.finalStateParticles>`_ .
+as defined in the `finalStateParticles module <experiment.html#module-experiment.finalStateParticles>`_.
 Some examples of final state classes are: 'MET', 'HSCP' and 'RHadronQ'.
 New final state classes can also be easily defined in this module.  
 
