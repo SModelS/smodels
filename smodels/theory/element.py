@@ -13,7 +13,7 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 import itertools
 from smodels.theory.particle import Particle
-from graph_tool import Graph
+import graph_tool as gt
 
 class Element(object):
     """
@@ -40,7 +40,7 @@ class Element(object):
                          (e.g. ['MET', 'HSCP'] or ['MET','MET'])
                          
         """
-        self.graph = Graph(directed=True)
+        self.graph = gt.Graph(directed=True)
         self.weight = crossSection.XSectionList() # gives the weight for all decays promptly
         self.decayLabels = []
         self.motherElements = [("original", self)]
@@ -51,8 +51,8 @@ class Element(object):
         if info:
             if isinstance(info,str):
                 self.graph = stringToGraph(info,finalState)
-            elif isinstance(info,Graph):
-                self.graph = Graph(info) #Makes a copy of the original graph
+            elif isinstance(info,gt.Graph):
+                self.graph = gt.Graph(info) #Makes a copy of the original graph
             else:
                 raise SModelSError("Can not create element from input type %s" %type(info))
                 
@@ -88,15 +88,23 @@ class Element(object):
         if outA != outB:
             return  (outA > outB) - (outA < outB)
 
+        #Get all isomorphisms:
+        maps = gt.topology.subgraph_isomorphism(self,other)
+        if maps:
+            for m in maps:
+                particlesDiffer = False
+                for v in self.graph.vertices():
+                    if self.graph.vp.particle[v] != other.graph.vp.particle[m[v]]:
+                        particlesDiffer = True
+                        break
+                if not particlesDiffer:
+                    return 0
+            #Graphs are isomorphic, but differ
+            return -1 #FIX!!!
+        else:
+            #Graphs are not isomorphic:
+            return 1 #FIX!!!
 
-        #Compare branches:
-        for branchA in itertools.permutations(self.branches):
-            branchA = list(branchA)
-            if branchA == other.branches:
-                return 0
-
-        comp = (self.branches > other.branches) - (self.branches < other.branches) 
-        return comp
 
     def __eq__(self,other):
         return self.__cmp__(other)==0
@@ -115,8 +123,19 @@ class Element(object):
         :returns: string representation of the element (in bracket notation)    
         """
         
-        elStr = "["+",".join([str(br) for br in self.branches])+"]"
-        elStr = elStr.replace(" ", "").replace("'", "")
+        g = self.graph
+        momLabel = ""
+        elStr = ""
+        for mom,daughter in gt.search.bfs_iterator(g,g.vertex(0)):
+            if g.vp.particle[mom].label != momLabel:
+                if momLabel:
+                    elStr += '),%s->(%s' %(g.vp.particle[mom].label,g.vp.particle[daughter].label)
+                else:
+                    elStr += '%s->(%s' %(g.vp.particle[mom].label,g.vp.particle[daughter].label)
+                momLabel =  g.vp.particle[mom].label
+            else:
+                elStr += ',%s' %(g.vp.particle[daughter].label)
+        elStr += ')'
         return elStr
     
     def __repr__(self):
@@ -129,23 +148,9 @@ class Element(object):
         including the final states, e.g. [[[jet]],[[jet]] (MET,MET)
         """
         
-        elStr = str(self)+' '+str(tuple(self.getFinalStates())).replace("'","")
+        elStr = str(self)
         
         return elStr
-    
-    def sortBranches(self):
-        """
-        Sort branches. The smallest branch is the first one.
-        See the Branch object for definition of branch size and comparison
-        """
-        
-        #First make sure each branch is individually sorted 
-        #(particles in each vertex are sorted)
-        for br in self.branches:
-            br.sortParticles()
-        #Now sort branches
-        self.branches = sorted(self.branches)
-
 
     def copy(self):
         """
@@ -157,28 +162,11 @@ class Element(object):
 
         #Allows for derived classes (like inclusive classes)
         newel = self.__class__()
-        newel.branches = []
-        for branch in self.branches:
-            newel.branches.append(branch.copy())
+        newel.graph = gt.Graph(g=self.graph)
         newel.weight = self.weight.copy()
         newel.motherElements = self.motherElements[:]
         newel.elID = self.elID
         return newel
-
-
-
-    def switchBranches(self):
-        """
-        Switch branches, if the element contains a pair of them.
-        
-        :returns: element with switched branches (Element object)                
-        """
-        
-        newEl = self.copy()
-        if len(self.branches) == 2:
-            newEl.branches = [newEl.branches[1], newEl.branches[0]]
-        return newEl
-
 
     def getParticles(self):
         """
@@ -186,8 +174,16 @@ class Element(object):
         
         :returns: list of Particle objects                
         """
+
+        g = self.graph
+        particles = []
         
-        particles = [branch.evenParticles for branch in self.branches]
+        for iv,v in enumerate(g.vertices()):
+            if v.out_degree():
+                continue
+            if g.vp.particle[iv].Z2parity != 'even':
+                continue        
+            particles.append(g.vp.particle[iv])
 
         return particles
     
@@ -198,9 +194,17 @@ class Element(object):
         :returns: list of Particle objects
         """
         
-        fsparticles = [branch.oddParticles[-1] for branch in self.branches]
+        g = self.graph
+        particles = []
+        
+        for iv,v in enumerate(g.vertices()):
+            if v.out_degree():
+                continue
+            if g.vp.particle[iv].Z2parity != 'odd':
+                continue        
+            particles.append(g.vp.particle[iv])
 
-        return fsparticles
+        return particles
 
 
     def getMasses(self):
@@ -209,8 +213,8 @@ class Element(object):
         
         :returns: list of masses (mass array)            
         """        
-        
-        massarray = [branch.getMasses() for branch in self.branches]
+
+        massarray = [ptc.mass for ptc in self.getBSMparticles()]
 
         return massarray
         
@@ -222,9 +226,9 @@ class Element(object):
         :returns: list of Particle or ParticleList objects
         """    
         
-        BSMparticles = []
-        for branch in self.branches:
-            BSMparticles.append([particle for particle in branch.oddParticles])      
+
+        g = self.graph
+        BSMparticles = [g.vp.particle[v] for v in g.vertices() if g.vp.particle[v].Z2parity == 'odd']
 
         return BSMparticles
 
@@ -236,9 +240,7 @@ class Element(object):
         :returns: list of PDG ids
         """
 
-        BSMpids = []
-        for br in self.getBSMparticles():
-            BSMpids.append([particle.pdg for particle in br])
+        BSMpids = [particle.pdg for particle in self.getBSMparticles()]
 
         return BSMpids
 
@@ -252,61 +254,9 @@ class Element(object):
         :returns: list of PDG ids
         """
         
-        daughterPIDs = []
-        for branch in self.branches():
-            daughterPIDs.append(branch.oddParticles[-1].pdg)
-            
+        daughterPIDs = [particle.pdg for particle in self.getFinalStates()]
+        
         return daughterPIDs
-    
-    def getMothers(self):
-        """
-        Get list of mother PDGs.    
-        Can be a nested list, if the element combines several mothers:
-        [ [pdgMOM1,pdgMOM2],  [pdgMOM1',pdgMOM2']] 
-        
-        :returns: list of PDG ids
-        """                        
-
-        momPIDs = []
-        for branch in self.branches:
-            if hasattr(branch.oddParticles[0], 'pdg'):
-                momPIDs.append(branch.oddParticles[0].pdg)
-            else:
-                momPIDs.append(None)
-        return momPIDs    
-        
-    def getMotherPIDs(self):
-        """
-        Get PIDs of all mothers.
-        
-        :returns: list of mother PDG ids
-        """
-        
-        # get a list of all original mothers, i.e. that only consists of first generation elements
-        allmothers = self.motherElements
-        while not all(mother[0] == 'original' for mother in allmothers):                        
-            for im, mother in enumerate(allmothers):
-                if mother[0] != 'original':
-                    allmothers.extend( mother[1].motherElements )
-                    allmothers.pop(im)                                    
-
-        # get the PIDs of all mothers      
-        motherPids = []
-        for mother in allmothers:  
-            motherPids.append( mother[1].getPIDs() ) 
-
-        branch1 = []
-        branch2 = []
-        for motherPid in motherPids:
-            branch1.append(motherPid[0])
-            branch2.append(motherPid[1])
-        for pid1 in branch1:
-            for pid2 in branch2:
-                pids = [pid1,pid2]
-                if not pids in motherPids: motherPids.append(pids)  
-   
-        return motherPids     
-        
 
 
     def getEinfo(self):
@@ -315,25 +265,8 @@ class Element(object):
         
         :returns: dictionary containing vertices and number of final states information  
         """
-        
-        vertnumb = []
-        vertparts = []
-        for branch in self.branches:
-            if branch.vertnumb is None:
-                branch.setInfo()
-            bInfo = branch.getInfo()
-            vertparts.append(bInfo['vertparts'])
-            vertnumb.append(bInfo['vertnumb'])
                 
-        return {"vertnumb" : vertnumb, "vertparts" : vertparts}
-
-    def setEinfo(self):
-        """
-        Set topology info for each branch.  
-        """
-        
-        for branch in self.branches:
-            branch.setInfo()
+        return {"vertices" : self.graph.num_vertices(), "edgesout" : self.graph.degree_property_map('out').get_array()}
 
 
     def _getLength(self):
@@ -342,24 +275,7 @@ class Element(object):
         
         :returns: maximum length of the element branches (int)    
         """
-        return max(self.branches[0].getLength(), self.branches[1].getLength())
-
-
-    def checkConsistency(self):
-        """
-        Check if the particles defined in the element are consistent
-        with the element info.
-        
-        :returns: True if the element is consistent. Print error message
-                  and exits otherwise.
-        """
-        info = self.getEinfo()
-        for ib, branch in enumerate(self.branches):
-            for iv, vertex in enumerate(branch.evenParticles):
-                if len(vertex) != info['vertparts'][ib][iv]:
-                    logger.error("Wrong syntax")
-                    raise SModelSError()
-        return True
+        return len(self.getBSMparticles())
 
     
     def compressElement(self, doCompress, doInvisible, minmassgap):
