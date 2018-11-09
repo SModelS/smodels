@@ -6,13 +6,14 @@
     
 """
 
-from smodels.theory.auxiliaryFunctions import elementsInStr
+from smodels.theory.auxiliaryFunctions import stringToGraph
 from smodels.theory.branch import Branch, InclusiveBranch
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 import itertools
 from smodels.theory.particle import Particle
+from graph_tool import Graph
 
 class Element(object):
     """
@@ -39,7 +40,7 @@ class Element(object):
                          (e.g. ['MET', 'HSCP'] or ['MET','MET'])
                          
         """
-        self.branches = [Branch(), Branch()]
+        self.graph = Graph(directed=True)
         self.weight = crossSection.XSectionList() # gives the weight for all decays promptly
         self.decayLabels = []
         self.motherElements = [("original", self)]
@@ -48,42 +49,13 @@ class Element(object):
         self.tested = False
                 
         if info:
-            # Create element from particle string
-            if type(info) == type(str()):
-                elements = elementsInStr(info)
-                if not elements or len(elements) > 1:
-                    nel = 0
-                    if elements:
-                        nel = len(elements)
-                    logger.error("Malformed input string. Number of elements "
-                                  "is %d (expected 1) in: ``%s''", nel, info)
-                    return None
-                else:
-                    el = elements[0]
-                    branches = elementsInStr(el[1:-1])
-                    if not branches or len(branches) != 2:
-                        logger.error("Malformed input string. Number of "
-                                      "branches is %d (expected 2) in: ``%s''",
-                                      len(branches), info)
-                        return None
-                    self.branches = []
-                    if finalState:
-                        if len(finalState) != len(branches):
-                            raise SModelSError("Number of final states (%i) does not match number of branches (%i)" 
-                                               %(len(finalState),len(branches)))
-                    else:
-                        finalState = [None]*len(branches)                  
-                    for ibr,branch in enumerate(branches):                        
-                        if branch == '[*]':
-                            self.branches.append(InclusiveBranch(finalState[ibr]))                           
-                        else:
-                            self.branches.append(Branch(branch,finalState[ibr])) 
-
-            # Create element from branch pair
-            elif isinstance(info,list) and all(isinstance(x,(Branch,InclusiveBranch)) for x in info):                
-                self.branches = [br.copy() for br in info]
+            if isinstance(info,str):
+                self.graph = stringToGraph(info,finalState)
+            elif isinstance(info,Graph):
+                self.graph = Graph(info) #Makes a copy of the original graph
             else:
                 raise SModelSError("Can not create element from input type %s" %type(info))
+                
         
         self.setEinfo()
         
@@ -99,6 +71,23 @@ class Element(object):
 
         if not isinstance(other,Element):
             return -1
+        
+        #Compare by number of vertices:
+        nvA, nvB = self.graph.num_vertices(),other.graph.num_vertices()
+        if nvA != nvB:
+            return  (nvA > nvB) - (nvA < nvB)
+
+        #Compare by number of edges:
+        neA, neB = self.graph.num_edges(),other.graph.num_edges()
+        if neA != neB:
+            return  (neA > neB) - (neA < neB)
+        
+        #Compare by list of out degree (number of outgoing lines in each vertex):
+        outA = sorted(self.graph.degree_property_map('out').get_array())
+        outB = sorted(other.graph.degree_property_map('out').get_array())
+        if outA != outB:
+            return  (outA > outB) - (outA < outB)
+
 
         #Compare branches:
         for branchA in itertools.permutations(self.branches):

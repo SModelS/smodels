@@ -15,6 +15,8 @@ import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.finalStateParticles import finalStates
+from smodels.theory.particle import Particle
+from graph_tool import Graph, Vertex
 
 
 #Get all finalStateLabels
@@ -289,7 +291,98 @@ def elementsInStr(instring,removeQuotes=True):
 
     return elements
 
+def listToVertices(g,vList,momVertex):
+    """
+    Adds the cascade decay in a branch represented in bracket
+    notation to the Graph object g.
+    
+    :param g: Graph object
+    :param vList: Nested list with the cascade decay in bracket notation (e.g. [['e-'],['mu-','nu'],['jet']])
+    :param momVertex: Index of the parent vertex (corresponds to the branch index)
+    """
+    
+    vMom = momVertex
+    for v in vList:
+        iv = g.add_vertex()
+        if isinstance(v,list):
+            g.vp.particle[iv] = finalStates.getParticlesWith(label='anyOdd')[0]
+            g.add_edge(vMom,iv)
+            listToVertices(g,v,vMom)
+            vMom = iv            
+        elif isinstance(v,str):
+            g.vp.particle[iv] = finalStates.getParticlesWith(label=v)[0]
+            g.add_edge(vMom,iv)
+            
+def stringToGraph(info,finalState=None):
+    """
+    Creates a Graph object from a string in bracket notation.
+    
+    :parameter info: string describing the element in bracket notation
+                     (e.g. [[[e+],[jet]],[[e-],[jet]]])
+                     
+    :parameter finalState: list containing the final state labels for each branch
+                     (e.g. ['MET', 'HSCP'] or ['MET','MET']). If not defined it will
+                     be assumed to be MET for all branches
+                     
+    """
 
+
+    g = Graph(directed=True)
+    g.vertex_properties['particle'] = g.new_vertex_property("object")
+    g.vertex_properties['label'] = g.new_vertex_property("string")
+    g.vertex_properties['inclusive'] = g.new_vertex_property("bool",False)
+    v0 = g.add_vertex()
+    g.vp.particle[v0] = Particle(label='PV')
+
+    elements = elementsInStr(info,removeQuotes=False)
+    if not elements or len(elements) > 1:
+        nel = 0
+        if elements:
+            nel = len(elements)
+        logger.error("Malformed input string. Number of elements "
+                      "is %d (expected 1) in: ``%s''", nel, info)
+        return None
+    else:
+        branches = eval(elements[0])
+        if not branches or len(branches) != 2:
+            logger.error("Malformed input string. Number of "
+                          "branches is %d (expected 2) in: ``%s''",
+                          len(branches), info)
+            return None
+
+        if finalState:
+            if len(finalState) != len(branches):
+                raise SModelSError("Number of final states (%i) does not match number of branches (%i)" 
+                                   %(len(finalState),len(branches)))
+        else:
+            finalState = [None]*len(branches)                  
+        for branch in branches:            
+            iv = g.add_vertex()
+            if branch == '[*]':
+                g.vp.inclusive[iv] = True                
+            else:            
+                g.vp.particle[iv] = finalStates.getParticlesWith(label='anyOdd')[0]
+                g.add_edge(v0,iv)    
+                listToVertices(g,branch,iv)
+            
+    
+    for iv,v in enumerate(g.vertices()):
+        if v.out_degree():
+            continue
+        if g.vp.particle[iv].Z2parity != 'odd':
+            continue        
+        fs = finalState.pop(0)
+        if fs is None:
+            fs = 'MET'
+        g.vp.particle[iv] = finalStates.getParticlesWith(label=fs)[0]
+    
+    for iv in g.get_vertices():
+        g.vp.label[iv] = g.vp.particle[iv].label
+    
+    return g
+            
+            
+    
 def sortParticleList(ptcList):
     """
     sorts a list of particle or particle list objects by their label
