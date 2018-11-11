@@ -37,6 +37,9 @@ nuList  = nu
 anyOdd = Particle(label='anyOdd',Z2parity='odd')
 anyEven = Particle(label='*',Z2parity='even')
 
+#Used to represent the primary vertex in Trees:
+PV = Particle(label='PV')
+
 
 #Used to construct BSM final states:
 MET = Particle(label='MET', Z2parity = 'odd', eCharge = 0, colordim = 1)
@@ -54,7 +57,7 @@ RHadronQ = MultiParticle(label='RHadronQ', particles = [RHadronU,RHadronU.charge
 
 #Define list of inclusive final states:
 finalStates = [eList,muList,taList,lpList,lmList,lList,WList,
-               tList,LpList,LmList,LList,jetList,anyEven]
+               tList,LpList,LmList,LList,jetList,anyEven,PV]
 #Include list of exclusive final states:
 finalStates +=  SMList
 #Define list of BSM final states:

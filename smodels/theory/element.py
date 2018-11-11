@@ -7,13 +7,12 @@
 """
 
 from smodels.theory.auxiliaryFunctions import stringToGraph
-from smodels.theory.branch import Branch, InclusiveBranch
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
-import itertools
 from smodels.theory.particle import Particle
-import graph_tool as gt
+import networkx as nx
+from scipy import linalg
 
 class Element(object):
     """
@@ -40,7 +39,7 @@ class Element(object):
                          (e.g. ['MET', 'HSCP'] or ['MET','MET'])
                          
         """
-        self.graph = gt.Graph(directed=True)
+        self.tree = nx.DiGraph()
         self.weight = crossSection.XSectionList() # gives the weight for all decays promptly
         self.decayLabels = []
         self.motherElements = [("original", self)]
@@ -50,12 +49,11 @@ class Element(object):
                 
         if info:
             if isinstance(info,str):
-                self.graph = stringToGraph(info,finalState)
-            elif isinstance(info,gt.Graph):
-                self.graph = gt.Graph(info) #Makes a copy of the original graph
+                self.tree = stringToGraph(info,finalState)
+            elif isinstance(info,nx.DiGraph):
+                self.tree = info.copy() #Makes a shallow copy of the original tree
             else:
                 raise SModelSError("Can not create element from input type %s" %type(info))
-                
         
         self.setEinfo()
         
@@ -72,39 +70,53 @@ class Element(object):
         if not isinstance(other,Element):
             return -1
         
-        #Compare by number of vertices:
-        nvA, nvB = self.graph.num_vertices(),other.graph.num_vertices()
+        #Compare overall shape:
+        nvA, nvB = self.tree.number_of_nodes(),other.tree.number_of_nodes()
         if nvA != nvB:
             return  (nvA > nvB) - (nvA < nvB)
 
         #Compare by number of edges:
-        neA, neB = self.graph.num_edges(),other.graph.num_edges()
+        neA, neB = self.tree.number_of_edges(),other.tree.number_of_edges
         if neA != neB:
             return  (neA > neB) - (neA < neB)
         
-        #Compare by list of out degree (number of outgoing lines in each vertex):
-        outA = sorted(self.graph.degree_property_map('out').get_array())
-        outB = sorted(other.graph.degree_property_map('out').get_array())
-        if outA != outB:
-            return  (outA > outB) - (outA < outB)
-
-        #Get all isomorphisms:
-        maps = gt.topology.subgraph_isomorphism(self,other)
-        if maps:
-            for m in maps:
-                particlesDiffer = False
-                for v in self.graph.vertices():
-                    if self.graph.vp.particle[v] != other.graph.vp.particle[m[v]]:
-                        particlesDiffer = True
-                        break
-                if not particlesDiffer:
-                    return 0
-            #Graphs are isomorphic, but differ
-            return -1 #FIX!!!
+        #Check if the elements are isomorphic:
+        if nx.isomorphism.is_isomorphic(self.tree,other.tree):
+            if nx.isomorphism.is_isomorphic(self.tree,other.tree,node_match=self._equalnodes):
+                return 0
+            else:
         else:
-            #Graphs are not isomorphic:
-            return 1 #FIX!!!
 
+    def _compareNodes(self,n1,n2):
+        """
+        Compare particles in two nodes from the element tree.
+        Use the particle comparison method to compare nodes.
+        
+        :param n1: Dictionary with the node properties
+        :param n2: Dictionary with the node properties
+        
+        :return: 1 if particle in n1 > n2, -1 if n1 < n2 and 0 if n1 == n2 
+        """
+        
+        pA = n1['particle']
+        pB = n2['particle']
+        comp = (pA > pB) - (pA < pB)
+        
+        return comp
+    
+    def _equalnodes(self,n1,n2):
+        """
+        Return True if nodes are equal, False
+        otherwise.
+
+        :param n1: Dictionary with the node properties
+        :param n2: Dictionary with the node properties
+        
+        :return: True if n1 == n2, False otherwise.
+        """
+        
+        return self._compareNodes(n1, n2) == 0
+    
 
     def __eq__(self,other):
         return self.__cmp__(other)==0
@@ -123,7 +135,7 @@ class Element(object):
         :returns: string representation of the element (in bracket notation)    
         """
         
-        g = self.graph
+        g = self.tree
         momLabel = ""
         elStr = ""
         for mom,daughter in gt.search.bfs_iterator(g,g.vertex(0)):
@@ -162,7 +174,7 @@ class Element(object):
 
         #Allows for derived classes (like inclusive classes)
         newel = self.__class__()
-        newel.graph = gt.Graph(g=self.graph)
+        newel.tree = gt.Graph(g=self.tree)
         newel.weight = self.weight.copy()
         newel.motherElements = self.motherElements[:]
         newel.elID = self.elID
@@ -175,7 +187,7 @@ class Element(object):
         :returns: list of Particle objects                
         """
 
-        g = self.graph
+        g = self.tree
         particles = []
         
         for iv,v in enumerate(g.vertices()):
@@ -194,7 +206,7 @@ class Element(object):
         :returns: list of Particle objects
         """
         
-        g = self.graph
+        g = self.tree
         particles = []
         
         for iv,v in enumerate(g.vertices()):
@@ -227,7 +239,7 @@ class Element(object):
         """    
         
 
-        g = self.graph
+        g = self.tree
         BSMparticles = [g.vp.particle[v] for v in g.vertices() if g.vp.particle[v].Z2parity == 'odd']
 
         return BSMparticles
@@ -266,7 +278,7 @@ class Element(object):
         :returns: dictionary containing vertices and number of final states information  
         """
                 
-        return {"vertices" : self.graph.num_vertices(), "edgesout" : self.graph.degree_property_map('out').get_array()}
+        return {"vertices" : self.tree.num_vertices(), "edgesout" : self.tree.degree_property_map('out').get_array()}
 
 
     def _getLength(self):

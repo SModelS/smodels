@@ -15,9 +15,8 @@ import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.finalStateParticles import finalStates
-from smodels.theory.particle import Particle
-from graph_tool import Graph, Vertex
-
+import networkx as nx
+from string import ascii_uppercase
 
 #Get all finalStateLabels
 finalStateLabels = finalStates.getValuesFor('label')
@@ -290,29 +289,7 @@ def elementsInStr(instring,removeQuotes=True):
         raise SModelSError("Wrong input (incomplete elements?) " + instring)
 
     return elements
-
-def listToVertices(g,vList,momVertex):
-    """
-    Adds the cascade decay in a branch represented in bracket
-    notation to the Graph object g.
-    
-    :param g: Graph object
-    :param vList: Nested list with the cascade decay in bracket notation (e.g. [['e-'],['mu-','nu'],['jet']])
-    :param momVertex: Index of the parent vertex (corresponds to the branch index)
-    """
-    
-    vMom = momVertex
-    for v in vList:
-        iv = g.add_vertex()
-        if isinstance(v,list):
-            g.vp.particle[iv] = finalStates.getParticlesWith(label='anyOdd')[0]
-            g.add_edge(vMom,iv)
-            listToVertices(g,v,vMom)
-            vMom = iv            
-        elif isinstance(v,str):
-            g.vp.particle[iv] = finalStates.getParticlesWith(label=v)[0]
-            g.add_edge(vMom,iv)
-            
+           
 def stringToGraph(info,finalState=None):
     """
     Creates a Graph object from a string in bracket notation.
@@ -323,16 +300,10 @@ def stringToGraph(info,finalState=None):
     :parameter finalState: list containing the final state labels for each branch
                      (e.g. ['MET', 'HSCP'] or ['MET','MET']). If not defined it will
                      be assumed to be MET for all branches
-                     
+    :return: Tree (nerworkX DiGraph object)
+                         
     """
 
-
-    g = Graph(directed=True)
-    g.vertex_properties['particle'] = g.new_vertex_property("object")
-    g.vertex_properties['label'] = g.new_vertex_property("string")
-    g.vertex_properties['inclusive'] = g.new_vertex_property("bool",False)
-    v0 = g.add_vertex()
-    g.vp.particle[v0] = Particle(label='PV')
 
     elements = elementsInStr(info,removeQuotes=False)
     if not elements or len(elements) > 1:
@@ -342,44 +313,127 @@ def stringToGraph(info,finalState=None):
         logger.error("Malformed input string. Number of elements "
                       "is %d (expected 1) in: ``%s''", nel, info)
         return None
-    else:
-        branches = eval(elements[0])
-        if not branches or len(branches) != 2:
-            logger.error("Malformed input string. Number of "
-                          "branches is %d (expected 2) in: ``%s''",
-                          len(branches), info)
-            return None
+    
+    branches = eval(elements[0])
+    if not branches:
+        logger.error("Malformed input string. Number of "
+                      "branches is %d (expected 2) in: ``%s''",
+                      len(branches), info)
+        return None
 
-        if finalState:
-            if len(finalState) != len(branches):
-                raise SModelSError("Number of final states (%i) does not match number of branches (%i)" 
-                                   %(len(finalState),len(branches)))
+    if finalState:
+        if not isinstance(finalState,list) or len(finalState) != len(branches):
+            raise SModelSError("Number of final states (%i) does not match number of branches (%i)" 
+                               %(len(finalState),len(branches)))
+    else:
+        finalState = ['MET']*len(branches)
+
+    #Create map with all required particle objects for building the graph:
+    fstateDict = {'anyOdd' : finalStates.getParticlesWith(label='anyOdd')[0],
+                  'PV' : finalStates.getParticlesWith(label='PV')[0]}
+    for ptc in _flattenList(branches) + finalState:
+        if not ptc in fstateDict:
+            particle = finalStates.getParticlesWith(label=ptc)
+            if not particle or len(particle) != 1:
+                raise SModelSError("Error retrieving particle %s from finalStateParticles. Is this particle uniquely defined?")
+            particle = particle[0]
+            fstateDict[ptc] = particle
+    
+        
+    #Store the trees for each branch:
+    gBranches = []
+    for ib,b in enumerate(branches):
+        #Deal with inclusive branches:
+        if b == '*':
+            from smodels.theory.branch import InclusiveBranch
+            fmap = {'anyOdd' : InclusiveBranch(), 
+                    finalState[ib] : fstateDict[finalState[ib]]}
+            b = [[]]
         else:
-            finalState = [None]*len(branches)                  
-        for branch in branches:            
-            iv = g.add_vertex()
-            if branch == '[*]':
-                g.vp.inclusive[iv] = True                
-            else:            
-                g.vp.particle[iv] = finalStates.getParticlesWith(label='anyOdd')[0]
-                g.add_edge(v0,iv)    
-                listToVertices(g,branch,iv)
+            fmap = fstateDict
+        #Include final state in the branch list definition
+        b.append(finalState[ib])
+        gBranches.append(fromListToTree(b,fmap))
+    #Now combine the branches:
+    branchTags = list(ascii_uppercase)
+    newG = nx.DiGraph()    
+    for ib,gbranch in enumerate(gBranches):        
+        newG = nx.union(newG,gbranch,rename=('',branchTags[ib]))
+        nx.relabel_nodes(newG,{'%s0' %branchTags[ib] : 'PV'},copy=False)    
+    return newG
+
+
+def fromListToTree(branchList,particleDict,parentNode=0):
+    """
+    Converts a branch in bracket notation to a Tree.
+    The Tree has a parent which is not physical and
+    corresponds to the branch parent (such as the primary vertex)
+    
+    :param branchList: Branch in bracket notation. It must include the branch final state label
+                       (e.g. [ ['e-','e+'],['mu', 'MET'] ])
+    :param particleDict: Dictionary to map strings to particle objects.
+    :param parentNode: Number of the parent node.
+    
+    :return: Tree (nerworkX DiGraph object)
+    """
+    
+    anyOdd = particleDict['anyOdd']
+    #Create graph and branches
+    G = nx.DiGraph()
+    momLabel = parentNode
+    if parentNode == 0:
+        G.add_node(momLabel,particle=particleDict['PV'])
+    else:
+        G.add_node(momLabel,particle=anyOdd)
+    node = 10*parentNode #Get node level (Add digit everytime you increase one level)    
+    for vList in branchList:
+        node += 1
+        nodeLabel = node
+        if isinstance(vList,list):
+            G.add_node(nodeLabel,particle=anyOdd)
+            G.add_edge(momLabel,nodeLabel)
+            momNode = node
+            momLabel = momNode
+            subG = fromListToTree(vList,particleDict,parentNode=momNode)
+            G = nx.compose(G,subG)
+        elif isinstance(vList,str):
+            G.add_node(nodeLabel,particle=particleDict[vList])
+            G.add_edge(momLabel,nodeLabel)
+    
+    return G
+
             
+def fromTreeToList(G,node=None):
+    """
+    Convert a Tree to a nested list with the Z2 even
+    final states. The Z2 odd final states (e.g. 'MET', 'HSCP') are
+    not included.
     
-    for iv,v in enumerate(g.vertices()):
-        if v.out_degree():
-            continue
-        if g.vp.particle[iv].Z2parity != 'odd':
-            continue        
-        fs = finalState.pop(0)
-        if fs is None:
-            fs = 'MET'
-        g.vp.particle[iv] = finalStates.getParticlesWith(label=fs)[0]
+    :param G: Graph object
+    :param node: Name of node. If None it will start with the primary node
     
-    for iv in g.get_vertices():
-        g.vp.label[iv] = g.vp.particle[iv].label
+    :return: Nested list with Z2-even particle objects (e.g. [[[e-,mu],[L]],[[jet]]])
+    """
     
-    return g
+    #Get the primary vertex:
+    if node is None:
+        for n in G.nodes():
+            if not G.in_degree[n]:
+                node = n
+                break
+    if node is None:
+        raise SModelSError("Could not find primary node in graph")
+        
+    dList = []
+    if list(G.successors(node)):
+        for daughter in G.successors(node):
+            if list(G.successors(daughter)):
+                dList.append(fromTreeToList(G,daughter))
+            else:
+                if G.nodes[daughter]['particle'].Z2parity == 'even':
+                    dList.append(G.nodes[daughter]['particle'])
+
+    return dList
             
             
     
