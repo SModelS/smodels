@@ -81,7 +81,7 @@ whereas :math:`P(D)` corresponds to a counting variable and is thus
 properly described by a Poissonian. The complete likelihood thus reads:
 
 .. math::
-   \mathcal{L}(\mu,\theta|D) = \frac{(\mu + b + \theta)^{n_{obs}} e^{\mu + b + \theta}}{n_{obs}!} exp \left( -\frac{\theta^2}{2\delta^2} \right)
+   \mathcal{L}(\mu,\theta|D) = \frac{(\mu + b + \theta)^{n_{obs}} e^{-(\mu + b + \theta)}}{n_{obs}!} exp \left( -\frac{\theta^2}{2\delta^2} \right)
 
 where :math:`n_{obs}` is the number of observed events in the signal region.
 A test statistic :math:`T` can now be constructed from a likelihood ratio test:
@@ -133,7 +133,7 @@ Under the assumptions described in `CMS-NOTE-2017-001 <https://cds.cern.ch/recor
 the likelihood for the signal hypothesis when combining signal regions is given by:
 
 .. math::
-   \mathcal{L}(\mu,\theta|D) = \prod_{i=1}^{N} \frac{(\mu s_i^r + b_i + \theta_i)^{n_{obs}^i} e^{\mu s_i^r + b_i + \theta_i}}{n_{obs}^i!} exp \left( -\frac{1}{2} \vec{\theta}^T V^{-1} \vec{\theta} \right)
+   \mathcal{L}(\mu,\theta|D) = \prod_{i=1}^{N} \frac{(\mu s_i^r + b_i + \theta_i)^{n_{obs}^i} e^{-(\mu s_i^r + b_i + \theta_i)}}{n_{obs}^i!} exp \left( -\frac{1}{2} \vec{\theta}^T V^{-1} \vec{\theta} \right)
 
 where the product is over all :math:`N` signal regions, :math:`\mu` is the overall signal strength, :math:`s_i^r` the relative signal strength
 in each signal region and :math:`V` represents the covariance matrix. 
