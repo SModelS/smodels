@@ -6,7 +6,7 @@
     
 """
 
-from smodels.theory.auxiliaryFunctions import stringToGraph
+from smodels.theory.auxiliaryFunctions import stringToGraph, getCanonName, getNodeLevelDict, getTreeRoot
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -57,56 +57,66 @@ class Element(object):
         
         self.setEinfo()
         
+        
+    def setEinfo(self):
+        """
+        Compute and store the canonical name for the tree
+        topology. The canonical name can be used to compare and sort topologies.
+        The name is stored in self.tree.topologyName
+        """
+        
+        canonName = getCanonName(self.tree)
+        self.tree.graph['topologyName'] = canonName
     
     def __cmp__(self,other):
         """
-        Compares the element with other for any branch ordering.  
-        The comparison is made based on branches.
-        OBS: The elements and the branches must be sorted! 
+        Compares the element with other.
+        Uses the topology name (Tree canonincal name) to identify isomorphic topologies (trees).
+        If trees are not isomorphic, compare topologies using the topology name.
+        Else  check if nodes (particles) are equal. If particles match return 0,
+        else compare lists of particles in each tree level. 
+
         :param other:  element to be compared (Element object)
+        
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
         if not isinstance(other,Element):
             return -1
         
-        #Compare overall shape:
-        nvA, nvB = self.tree.number_of_nodes(),other.tree.number_of_nodes()
-        if nvA != nvB:
-            return  (nvA > nvB) - (nvA < nvB)
-
-        #Compare by number of edges:
-        neA, neB = self.tree.number_of_edges(),other.tree.number_of_edges
-        if neA != neB:
-            return  (neA > neB) - (neA < neB)
+        #make sure the topology names have been computed:
+        if not 'topologyName' in self.tree.graph:
+            self.setEInfo()
+        if not 'topologyName' in other.tree.graph:
+            other.setEInfo()
+            
+        tnameA = self.tree.graph['topologyName']
+        tnameB = other.tree.graph['topologyName']
+        if tnameA != tnameB:
+            return (tnameA > tnameB) - (tnameA < tnameB)
         
-        #Check if the elements are isomorphic:
-        if nx.isomorphism.is_isomorphic(self.tree,other.tree):
-            if nx.isomorphism.is_isomorphic(self.tree,other.tree,node_match=self._equalnodes):
-                return 0
-            else:
+        #Check if the elements are isomorphic including particle comparison
+        if nx.isomorphism.is_isomorphic(self.tree,other.tree,node_match=self.equalNodes):
+            return 0
         else:
-
-    def _compareNodes(self,n1,n2):
-        """
-        Compare particles in two nodes from the element tree.
-        Use the particle comparison method to compare nodes.
-        
-        :param n1: Dictionary with the node properties
-        :param n2: Dictionary with the node properties
-        
-        :return: 1 if particle in n1 > n2, -1 if n1 < n2 and 0 if n1 == n2 
-        """
-        
-        pA = n1['particle']
-        pB = n2['particle']
-        comp = (pA > pB) - (pA < pB)
-        
-        return comp
+            #Compare particles in each level of the tree:
+            #First build dictionary with nodes in each level:
+            levelNodesA = getNodeLevelDict(self.tree)                                      
+            levelNodesB = getNodeLevelDict(other.tree)
+            for nLevel in levelNodesA:
+                pListA = [self.tree.nodes[n]['particle'] for n in levelNodesA[nLevel]]
+                pListB = [other.tree.nodes[n]['particle'] for n in levelNodesB[nLevel]]
+                pListA = sorted(pListA)
+                pListB = sorted(pListB)
+                pComp = (pListA > pListB) - (pListA < pListB)
+                if pComp != 0:
+                    return pComp
+            
+            return 0 #Should never reach this point!
     
-    def _equalnodes(self,n1,n2):
+    def equalNodes(self,n1,n2):
         """
-        Return True if nodes are equal, False
+        Return True if particles in nodes are equal, False
         otherwise.
 
         :param n1: Dictionary with the node properties
@@ -115,10 +125,10 @@ class Element(object):
         :return: True if n1 == n2, False otherwise.
         """
         
-        return self._compareNodes(n1, n2) == 0
-    
-    def getTopologyName(self):
-    
+        pA = n1['particle']
+        pB = n2['particle']
+        
+        return pA == pB
 
     def __eq__(self,other):
         return self.__cmp__(other)==0
@@ -137,20 +147,13 @@ class Element(object):
         :returns: string representation of the element (in bracket notation)    
         """
         
-        g = self.tree
-        momLabel = ""
+        T = self.tree
         elStr = ""
-        for mom,daughter in gt.search.bfs_iterator(g,g.vertex(0)):
-            if g.vp.particle[mom].label != momLabel:
-                if momLabel:
-                    elStr += '),%s->(%s' %(g.vp.particle[mom].label,g.vp.particle[daughter].label)
-                else:
-                    elStr += '%s->(%s' %(g.vp.particle[mom].label,g.vp.particle[daughter].label)
-                momLabel =  g.vp.particle[mom].label
-            else:
-                elStr += ',%s' %(g.vp.particle[daughter].label)
-        elStr += ')'
-        return elStr
+        root = getTreeRoot(T)
+        for mom,daughters in nx.bfs_successors(T,root):
+            elStr += '%s->(%s),' %(T.nodes[mom]['particle'].label,
+                                   ','.join(T.nodes[n]['particle'].label for n in daughters))
+        return elStr[:-1]
     
     def __repr__(self):
         
@@ -176,7 +179,7 @@ class Element(object):
 
         #Allows for derived classes (like inclusive classes)
         newel = self.__class__()
-        newel.tree = gt.Graph(g=self.tree)
+        newel.tree = self.tree.copy()
         newel.weight = self.weight.copy()
         newel.motherElements = self.motherElements[:]
         newel.elID = self.elID

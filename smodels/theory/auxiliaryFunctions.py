@@ -434,7 +434,73 @@ def fromTreeToList(G,node=None):
                     dList.append(G.nodes[daughter]['particle'])
 
     return dList
+
+
+def getCanonName(T,node=None):
+    """
+    Recursively compute the canonical name for the Tree T.
+    Returns the name in integer form.
+    
+    :param T: Tree (networkX DiGraph object)
+    :param node: Node to get the name for. If None, it will use the root
+    
+    :return: Integer representing the Tree
+    """
+    
+    if not isinstance(T,nx.DiGraph):
+        raise SModelSError("Input must be a DiGraph object.")
+    
+    if node is None:
+        node = getTreeRoot(T)
+
+    children = list(T[node])
+    if not children:
+        return 10
+    else:
+        tp = sorted([getCanonName(T,n) for n in children])
+        tpStr = '1'+"".join(str(c) for c in tp)+'0'
+        return int(tpStr)
+    
+def getNodeLevelDict(T):
+    """
+    Return a dictionary with the nodes in each level of the tree T
+    (e.g. {0 : [PV], 1 : [A,B],...})
+    
+    :param T: DiGraph object
+    :return: Dictionary with the levels as keys and a list of nodes in each level as values.     
+    """         
+
+    if not isinstance(T,nx.DiGraph):
+        raise SModelSError("Input must be a DiGraph object.")
+
+    root = getTreeRoot(T)
+    levelNodes = {}
+    for n in T.nodes():
+        d = nx.shortest_path_length(T,root,n) #Distance to root
+        if not d in levelNodes:
+            levelNodes[d] = [n]
+        else:
+            levelNodes[d].append(n)
             
+    return levelNodes
+
+def getTreeRoot(T):
+    """
+    Get the root node (primary vertex) of a tree T.
+    
+    :param T: DiGraph object
+    :return: node
+    """
+
+    if not isinstance(T,nx.DiGraph):
+        raise SModelSError("Input must be a DiGraph object.")
+
+    root = [n for n in T.nodes() if T.in_degree[n] == 0]
+    if len(root) != 1:
+        raise SModelSError("Malformed Tree, %i root(s) have been found." %len(root))
+    
+    return root[0]
+    
             
     
 def sortParticleList(ptcList):
