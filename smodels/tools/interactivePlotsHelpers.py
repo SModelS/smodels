@@ -383,7 +383,7 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
                     text=hover_text,
                     hoverinfo='text',
                     marker=dict(
-                        size=6,
+                        size=12,
                         cmax=data_frame_all[cont_plot].max(),
                         cmin=data_frame_all[cont_plot].max(),
                         color=z,
@@ -422,7 +422,7 @@ def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_f
                     text=hover_text,
                     hoverinfo='text',
                     marker=dict(
-                        size=6,
+                        size=12,
                         cmax=data_frame_excluded[cont_plot].max(),
                         cmin=data_frame_excluded[cont_plot].max(),
                         color=z,
@@ -461,7 +461,7 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
                     text=hover_text,
                     hoverinfo='text',
                     marker=dict(
-                        size=6,
+                        size=12,
                         cmax=data_frame_nonexcluded[cont_plot].max(),
                         cmin=data_frame_nonexcluded[cont_plot].max(),
                         color=z,
@@ -500,7 +500,7 @@ def make_discrete_plots_all(disc_plots,x_axis,y_axis,path_to_plots,data_frame_al
                         'x': data_frame_all.loc[data_frame_all[disc_plot]==value][x_axis],
                         'y': data_frame_all.loc[data_frame_all[disc_plot]==value][y_axis],
                         'name': value, 'mode': 'markers',
-                        'marker':dict(size=6),
+                        'marker':dict(size=12),
                         'text':data_frame_all.loc[data_frame_all[disc_plot]==value]['hover_text'],
                         'hoverinfo':'text',
                  
@@ -535,7 +535,7 @@ def make_discrete_plots_excluded(disc_plots,x_axis,y_axis,path_to_plots,data_fra
                         'x': data_frame_excluded.loc[data_frame_excluded[disc_plot]==value][x_axis],
                         'y': data_frame_excluded.loc[data_frame_excluded[disc_plot]==value][y_axis],
                         'name': value, 'mode': 'markers',
-                        'marker':dict(size=6),
+                        'marker':dict(size=12),
                         'text':data_frame_excluded.loc[data_frame_excluded[disc_plot]==value]['hover_text'],
                         'hoverinfo':'text',
                  
@@ -569,7 +569,7 @@ def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_
                         'x': data_frame_nonexcluded.loc[data_frame_nonexcluded[disc_plot]==value][x_axis],
                         'y': data_frame_nonexcluded.loc[data_frame_nonexcluded[disc_plot]==value][y_axis],
                         'name': value, 'mode': 'markers',
-                        'marker':dict(size=6),
+                        'marker':dict(size=12),
                         'text':data_frame_nonexcluded.loc[data_frame_nonexcluded[disc_plot]==value]['hover_text'],
                         'hoverinfo':'text',
                  
@@ -594,6 +594,7 @@ def create_index_html(path_to_plots,plot_data,plot_list):
     Fills the index.html file with links to the interactive plots.
     """
     
+    print ( "create_index_html", path_to_plots )
     main_file= open(path_to_plots+'/index.html', 'w')
     main_file.write('<html><head><font size=6>Smodels interactive plots.</font></head>')
     hyperlink_format = '<a href={link}>{text}</a>' 
@@ -601,7 +602,8 @@ def create_index_html(path_to_plots,plot_data,plot_list):
         plot_name=plot.split('.')[0]
         main_file.write('<p>'+plot_name+': ')
         for option in plot_data:   
-            plot_link=hyperlink_format.format(link=path_to_plots + "/" + plot_name+'_'+option+'.html', text=option) 
+            #plot_link=hyperlink_format.format(link=path_to_plots + "/" + plot_name+'_'+option+'.html', text=option) 
+            plot_link=hyperlink_format.format(link= plot_name+'_'+option+'.html', text=option) 
             main_file.write(plot_link)
             main_file.write(' ')  
         main_file.write('</p>')
