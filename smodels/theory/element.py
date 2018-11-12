@@ -117,6 +117,8 @@ class Element(object):
         
         return self._compareNodes(n1, n2) == 0
     
+    def getTopologyName(self):
+    
 
     def __eq__(self,other):
         return self.__cmp__(other)==0
