@@ -12,7 +12,6 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.particle import Particle
 import networkx as nx
-from scipy import linalg
 
 class Element(object):
     """
@@ -168,6 +167,42 @@ class Element(object):
         elStr = str(self)
         
         return elStr
+    
+    def drawTree(self,outputFile=None,show=True,
+                 oddColor = 'lightcoral',evenColor = 'skyblue',
+                 pvColor = 'darkgray',nodeScale = 4):
+        """
+        Draws element Tree using matplotlib.
+        If outputFile is defined, it will save plot to this file.
+        """
+        
+        import matplotlib.pyplot as plt
+        
+        labels = dict([[n,self.tree.nodes[n]['particle'].label] 
+                       for n in self.tree.nodes()])
+        node_size = []
+        node_color = []
+        for n in self.tree.nodes():
+            node_size.append(nodeScale*100*len(labels[n]))
+            if 'pv' == labels[n].lower():
+                node_color.append(pvColor)
+            elif self.tree.nodes[n]['particle'].Z2parity == 'odd':
+                node_color.append(oddColor)
+            else:
+                node_color.append(evenColor)
+        pos = nx.drawing.nx_agraph.graphviz_layout(self.tree, prog='dot')
+        nx.draw(self.tree,pos,
+                with_labels=True,
+                arrows=True,
+                labels=labels,
+                node_size=node_size,
+                node_color=node_color)
+        
+        if outputFile:            
+            plt.savefig(outputFile)
+        if show:
+            plt.show()
+
 
     def copy(self):
         """
