@@ -345,21 +345,23 @@ def _doCluster(elements, txdata, maxDist):
     posMap = {}
     weightMap = {}
     for iel, el in enumerate(elements):
-        if not el.getMasses() in massMap.values():
+        if not (el.getMasses() and el.switchBranches().getMasses()) in massMap.values():
             massMap[iel] = el.getMasses()
             posMap[iel] = massPosition(massMap[iel], txdata)
             weightMap[iel] = el.weight.getMaxXsec().asNumber(fb)
         else:
-            j = list(massMap.keys())[list(massMap.values()).index(el.getMasses())] 
+            if el.getMasses() in massMap.values():
+                j = list(massMap.keys())[list(massMap.values()).index(el.getMasses())]
+            else: j = list(massMap.keys())[list(massMap.values()).index(el.switchBranches().getMasses())]
             weightMap[j] += el.weight.getMaxXsec().asNumber(fb)
 
     # Start with maximal clusters
     clusterList = []
     for iel in posMap:
         indices = [iel]
-        for jel in posMap:            
+        for jel in posMap:                     
             if distance(posMap[iel], posMap[jel]) <= maxDist:
-                indices.append(jel)        
+                indices.append(jel) 
         indexCluster = IndexCluster(massMap, posMap, weightMap, set(indices),txdata)
         #Ignore cluster which average mass falls oustide the grid:
         if indexCluster.avgPosition:
@@ -423,7 +425,7 @@ def _doCluster(elements, txdata, maxDist):
         cluster = ElementCluster()
         masses = [massMap[iel] for iel in indexCluster]
         for el in elements:
-            if el.getMasses() in masses:
+            if el.getMasses() in masses or el.switchBranches().getMasses() in masses:
                 cluster.elements.append(el)
         clusterList.append(cluster)
 
