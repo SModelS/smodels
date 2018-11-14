@@ -6,7 +6,7 @@
     
 """
 
-from smodels.theory.auxiliaryFunctions import stringToTree, getCanonName, getNodeLevelDict, getTreeRoot
+from smodels.theory.auxiliaryFunctions import stringToTree, getTopologyName, getNodeLevelDict, getTreeRoot
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -64,7 +64,7 @@ class Element(object):
         The name is stored in self.tree.topologyName
         """
         
-        canonName = getCanonName(self.tree)
+        canonName = getTopologyName(self.tree)
         self.tree.graph['topologyName'] = canonName
     
     def __cmp__(self,other):

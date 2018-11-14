@@ -15,7 +15,6 @@ import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.finalStateParticles import finalStates
-from smodels.theory.branch import InclusiveBranch
 import networkx as nx
 
 #Get all finalStateLabels
@@ -329,6 +328,7 @@ def stringToTree(info,finalState=None):
     else:
         finalState = ['MET']*len(branches)
 
+    from smodels.theory.branch import InclusiveBranch
     #Create map with all required particle objects for building the graph:
     fstateDict = {'anyOdd' : finalStates.getParticlesWith(label='anyOdd')[0],
                   'PV' : finalStates.getParticlesWith(label='PV')[0],
@@ -388,10 +388,12 @@ def branchListToTree(bList,particleDict,parentNode,parentParticle):
     #Create a sequential Tree (each entry in bList is added in a sequence of levels)
     for vList in bList:        
         if isinstance(vList,list): #entry correspond to a vertex:
-            #Each entry corresponding to an odd-particle in the vertex
-            T.add_node(node,particle=particleDict['anyOdd'])
+            #Each entry corresponding to an odd-particle in the vertex            
             if node != parentNode:
+                T.add_node(node,particle=particleDict['anyOdd'])
                 T.add_edge(momNode,node)
+            else:
+                T.add_node(node,particle=parentParticle)
             vTree = vertexListToTree(vList,particleDict,parentNode=node,
                                      parentParticle=T.nodes[node]['particle'])
             T = nx.compose(T,vTree)
@@ -404,7 +406,6 @@ def branchListToTree(bList,particleDict,parentNode,parentParticle):
             T.add_node(node,particle=ptc)
             if node != parentNode:
                 T.add_edge(momNode,node)            
-            T.add_edge(momNode,node)            
         #Every sequential node added corresponds to going one level down the tree
         #Add digit everytime you go down one level:
         node *= 10
@@ -459,42 +460,41 @@ def vertexListToTree(vList,particleDict,parentNode,parentParticle):
             T = nx.compose(T,branchTree)
     return T
             
-def fromTreeToList(G,node=None):
+def fromTreeToList(T,node=None):
     """
     Convert a Tree to a nested list with the Z2 even
     final states. The Z2 odd final states (e.g. 'MET', 'HSCP') are
     not included.
     
-    :param G: Graph object
+    :param T: DiGraph object
     :param node: Name of node. If None it will start with the primary node
     
     :return: Nested list with Z2-even particle objects (e.g. [[[e-,mu],[L]],[[jet]]])
     """
+
+    if not isinstance(T,nx.DiGraph):
+        raise SModelSError("Input must be a DiGraph object.")
     
     #Get the primary vertex:
     if node is None:
-        for n in G.nodes():
-            if not G.in_degree[n]:
-                node = n
-                break
-    if node is None:
-        raise SModelSError("Could not find primary node in graph")
+        node = getTreeRoot(T)
         
     dList = []
-    if list(G.successors(node)):
-        for daughter in G.successors(node):
-            if list(G.successors(daughter)):
-                dList.append(fromTreeToList(G,daughter))
+    children = list(T[node])
+    if children:
+        for n in children:
+            if list(T[n]):
+                dList.append(fromTreeToList(T,n))
             else:
-                if G.nodes[daughter]['particle'].Z2parity == 'even':
-                    dList.append(G.nodes[daughter]['particle'])
+                if T.nodes[n]['particle'].Z2parity == 'even':
+                    dList.append(T.nodes[n]['particle'])
 
     return dList
 
 
-def getCanonName(T,node=None):
+def getTopologyName(T,node=None):
     """
-    Recursively compute the canonical name for the Tree T.
+    Recursively compute the topology (canonical) name for the Tree T.
     Returns the name in integer form.
     
     :param T: Tree (networkX DiGraph object)
@@ -513,7 +513,7 @@ def getCanonName(T,node=None):
     if not children:
         return 10
     else:
-        tp = sorted([getCanonName(T,n) for n in children])
+        tp = sorted([getTopologyName(T,n) for n in children])
         tpStr = '1'+"".join(str(c) for c in tp)+'0'
         return int(tpStr)
     
