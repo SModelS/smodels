@@ -6,7 +6,7 @@
     
 """
 
-from smodels.theory.auxiliaryFunctions import stringToGraph, getCanonName, getNodeLevelDict, getTreeRoot
+from smodels.theory.auxiliaryFunctions import stringToTree, getCanonName, getNodeLevelDict, getTreeRoot
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
@@ -48,7 +48,7 @@ class Element(object):
                 
         if info:
             if isinstance(info,str):
-                self.tree = stringToGraph(info,finalState)
+                self.tree = stringToTree(info,finalState)
             elif isinstance(info,nx.DiGraph):
                 self.tree = info.copy() #Makes a shallow copy of the original tree
             else:
@@ -170,7 +170,8 @@ class Element(object):
     
     def drawTree(self,outputFile=None,show=True,
                  oddColor = 'lightcoral',evenColor = 'skyblue',
-                 pvColor = 'darkgray',nodeScale = 4):
+                 pvColor = 'darkgray',genericColor= 'violet',
+                 nodeScale = 4):
         """
         Draws element Tree using matplotlib.
         If outputFile is defined, it will save plot to this file.
@@ -178,20 +179,25 @@ class Element(object):
         
         import matplotlib.pyplot as plt
         
-        labels = dict([[n,self.tree.nodes[n]['particle'].label] 
-                       for n in self.tree.nodes()])
+        T = self.tree
+        
+        labels = dict([[n,str(T.nodes[n]['particle'])] 
+                       for n in T.nodes()])
         node_size = []
         node_color = []
-        for n in self.tree.nodes():
+        for n in T.nodes():
             node_size.append(nodeScale*100*len(labels[n]))
             if 'pv' == labels[n].lower():
                 node_color.append(pvColor)
-            elif self.tree.nodes[n]['particle'].Z2parity == 'odd':
-                node_color.append(oddColor)
+            elif hasattr(T.nodes[n]['particle'],'Z2parity'):
+                if T.nodes[n]['particle'].Z2parity == 'odd':
+                    node_color.append(oddColor)
+                else:
+                    node_color.append(evenColor)
             else:
-                node_color.append(evenColor)
-        pos = nx.drawing.nx_agraph.graphviz_layout(self.tree, prog='dot')
-        nx.draw(self.tree,pos,
+                node_color.append(genericColor)
+        pos = nx.drawing.nx_agraph.graphviz_layout(T, prog='dot')
+        nx.draw(T,pos,
                 with_labels=True,
                 arrows=True,
                 labels=labels,
