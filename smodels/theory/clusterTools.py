@@ -425,8 +425,10 @@ def _doCluster(elements, txdata, maxDist):
         cluster = ElementCluster()
         masses = [massMap[iel] for iel in indexCluster]
         for el in elements:
-            if el.getMasses() in masses or el.switchBranches().getMasses() in masses:
+            if el.getMasses() in masses: 
                 cluster.elements.append(el)
+            elif el.switchBranches().getMasses() in masses:
+                cluster.elements.append(el.switchBranches())
         clusterList.append(cluster)
 
     return clusterList
