@@ -345,6 +345,7 @@ def _doCluster(elements, txdata, maxDist):
     posMap = {}
     weightMap = {}
     for iel, el in enumerate(elements):
+        #print (el, el.txname)
         if not (el.getMasses() and el.switchBranches().getMasses()) in massMap.values():
             massMap[iel] = el.getMasses()
             posMap[iel] = massPosition(massMap[iel], txdata)
@@ -428,7 +429,9 @@ def _doCluster(elements, txdata, maxDist):
             if el.getMasses() in masses: 
                 cluster.elements.append(el)
             elif el.switchBranches().getMasses() in masses:
-                cluster.elements.append(el.switchBranches())
+                newel = el.switchBranches()
+                newel.txname = el.txname
+                cluster.elements.append(newel)
         clusterList.append(cluster)
 
     return clusterList
