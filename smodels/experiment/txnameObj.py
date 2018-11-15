@@ -191,24 +191,31 @@ class TxName(object):
     def hasElementAs(self,element):
         """
         Verify if the conditions or constraint in Txname contains the element.
-        Check both branch orderings.
+        Check both branch orderings. If both orderings match, returns the one
+        with the highest mass array.
         
         :param element: Element object
         :return: A copy of the element on the correct branch ordering appearing
                 in the Txname constraint or condition.
         """
 
+        #Stores all orderings of elements which matches the txname
+        matches = []
         for el in self._topologyList.getElements():
-        #Compare branches:
+            #Compare branches:
             for branchesA in itertools.permutations(element.branches):
                 branchesA = list(branchesA)
                 if branchesA == el.branches:
                     newEl = element.copy()
                     newEl.branches = [br.copy() for br in branchesA]
-                    return newEl
-        
+                    matches.append(newEl)
+
         #No elements matched:
-        return False
+        if not matches:
+            return False
+        else: #If more than one element ordering matches, return the one with largest mass (relevant for clustering)
+            matches = sorted(matches, key = lambda el: el.getMasses(),reverse=True)
+            return matches[0]
 
     def hasLikelihood ( self ):
         """ can I construct a likelihood for this map? 
