@@ -16,7 +16,7 @@ def main():
     parser = argparse.ArgumentParser(description="SModelS-tools command line tool.")
 
     parser.add_argument('-v','--verbose', help='verbosity level. '
-                        'accepted values are: debug, info, warning, error. [info].',
+                        'accepted values are: debug, info, warning, error.',
                                     default = "info", type = str )
 
     subparsers = parser.add_subparsers(dest='subparser_name')
@@ -25,14 +25,14 @@ def main():
     fixpermissions = subparsers.add_parser('fixpermissions', description="Fix file permissions for xseccomputer.")
     xseccomputer = subparsers.add_parser('xseccomputer', description="Compute MSSM cross sections for a SLHA file.")
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
-        help="sqrt(s) TeV. Can supply more than one value (as a space separated list) [default is both 8 and 13].",
+        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). Default is both 8 and 13.",
         type=int, default=[])
     xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
-        help="number of events to be simulated [10000].")
+        help="number of events to be simulated.")
     xseccomputer.add_argument('-v', '--verbosity', type=str, default="info",
-        help="Verbosity (debug, info, warning, error) [info].")
+        help="Verbosity (debug, info, warning, error)")
     xseccomputer.add_argument('-c', '--ncpus', type=int, default=-1,
-        help="number of cores to be used simultaneously. -1 means 'all' [-1].")
+        help="number of cores to be used simultaneously. -1 means 'all'. ")
     xseccomputer.add_argument('-p', '--tofile', action='store_true',
         help="write cross sections to file (only highest order)")
     xseccomputer.add_argument('-P', '--alltofile', action='store_true',
@@ -46,9 +46,9 @@ def main():
     xseccomputer.add_argument('-6', '--pythia6', action='store_true',
         help="use pythia6 for LO cross sections")
     xseccomputer.add_argument('-8', '--pythia8', action='store_true',
-        help="use pythia8 for LO cross sections [default]")
+        help="use pythia8 for LO cross sections (default)")
     xseccomputer.add_argument('-n', '--NLO', action='store_true',
-        help="compute at the NLO level [default is LO]")
+        help="compute at the NLO level (default is LO)")
     xseccomputer.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
     xseccomputer.add_argument('-O', '--LOfromSLHA', help="use LO cross sections from file to compute the NLO or NLL cross sections", action='store_true')
     xseccomputer.add_argument('-f', '--filename', required=True,
@@ -57,7 +57,7 @@ def main():
 
     slhachecker = subparsers.add_parser('slhachecker', description="Perform several checks on a SLHA file.")
     slhachecker.add_argument('-xS', '--xsec', help='turn off the check for xsection blocks', action='store_false')
-    slhachecker.add_argument('-s', '--sigmacut', help='give sigmacut in fb [.03].', default=.03, type=float)
+    slhachecker.add_argument('-s', '--sigmacut', help='give sigmacut in fb', default=.03, type=float)
     slhachecker.add_argument('-illegal', '--illegal', help='turn on check for kinematically forbidden decays', action='store_true')
     slhachecker.add_argument('-dB', '--decayBlocks', help='turn off the check for missing decay blocks', action='store_false')
     slhachecker.add_argument('-f', '--filename', help='name of input SLHA file', required=True)
@@ -76,14 +76,14 @@ def main():
     iPlots.add_argument('-s', '--slhaFolder', help='path to the SLHA folder with the SLHA input files.', 
                             required=True)
     iPlots.add_argument('-o', '--outputFolder', 
-                  help='path to the output folder, where the plots will be stored. [./plots]', 
-                  default = "./plots" )
+                  help='path to the output folder, where the plots will be stored. [./iplots]', 
+                  default = "./iplots" )
     
     iPlots.add_argument('-N', '--npoints', type=int, default=-1,
-        help="How many (randomly selected) points will be included in the plot. If -1 all points will be read and included [-1].")
+        help="How many (randomly selected) points will be included in the plot. If -1 all points will be read and included (default = -1).")
     
     iPlots.add_argument('-v', '--verbosity', type=str, default="info",
-        help="Verbosity (debug, info, warning, error) [info].")
+        help="Verbosity (debug, info, warning, error)")
 
 
     toolbox = subparsers.add_parser( 'toolbox', description=

@@ -38,7 +38,7 @@ class DataHolder(object):
         self.slha_hover_information = None 
         self.ctau_hover_information = None
         self.BR_hover_information = None
-        self.smodels_hover_information = None
+        self.SModelS_hover_information = None
         self.plot_data = None
         self.variable_x = None 
         self.variable_y = None
@@ -91,11 +91,11 @@ class DataHolder(object):
         else:
             self.BR_hover_information = parameters.BR_hover_information
     
-        if not hasattr(parameters, 'smodels_hover_information'):
-            logger.debug("smodels_hover_information dictionary was not found in %s. SModelS data will not be included in info box." %parFile)
-            self.smodels_hover_information = {}
+        if not hasattr(parameters, 'SModelS_hover_information'):
+            logger.debug("SModelS_hover_information dictionary was not found in %s. SModelS data will not be included in info box." %parFile)
+            self.SModelS_hover_information = {}
         else:
-            self.smodels_hover_information = list(set(parameters.smodels_hover_information))
+            self.SModelS_hover_information = list(set(parameters.SModelS_hover_information))
     
         if not hasattr(parameters, 'plot_data'):
             logger.debug("plot_data list was not found in %s. All points will be plotted" %parFile)
@@ -135,16 +135,18 @@ class DataHolder(object):
         """
         
         self.data_dict = {}
-        for smodels_names in self.smodels_hover_information:
+        for smodels_names in sorted(self.SModelS_hover_information):
             self.data_dict[smodels_names]=[]
         for plot_name in self.plot_list:
             self.data_dict[plot_name]=[]
         for slha_names in self.slha_hover_information:
-            self.data_dict[slha_names]=[] 
-        for variable in self.variable_x:
-            self.data_dict[variable]=[]
-        for variable in self.variable_y:
-            self.data_dict[variable]=[] 
+            self.data_dict[slha_names]=[]
+        if list(self.variable_x.keys())[0] not in self.slha_hover_information.keys():    
+            for variable in self.variable_x:
+                self.data_dict[variable]=[]
+        if list(self.variable_y.keys())[0] not in self.slha_hover_information.keys(): 
+            for variable in self.variable_y:
+                self.data_dict[variable]=[] 
         for ctau in self.ctau_hover_information:
             self.data_dict[ctau]=[] 
         for BR in self.BR_hover_information:
@@ -180,9 +182,11 @@ class DataHolder(object):
             self.data_dict = helpers.get_BR(self.data_dict,slhaData,self.BR_hover_information,
                                                             self.BR_get_top)     
             #Fill with the x and y data:
-            self.data_dict = helpers.get_variable(self.data_dict,slhaData,self.BR_hover_information,
+            if list(self.variable_x.keys())[0] not in self.slha_hover_information.keys():
+                self.data_dict = helpers.get_variable(self.data_dict,slhaData,self.BR_hover_information,
                                                             self.variable_x) 
-            self.data_dict = helpers.get_variable(self.data_dict,slhaData,self.BR_hover_information,
+            if list(self.variable_y.keys())[0] not in self.slha_hover_information.keys():                
+                self.data_dict = helpers.get_variable(self.data_dict,slhaData,self.BR_hover_information,
                                                             self.variable_y) 
      
     def loadData(self,npoints=-1):
@@ -239,7 +243,7 @@ class DataHolder(object):
         data_frame_all = helpers.make_data_frame(self.data_dict)
      
         data_frame_all = helpers.fill_hover(data_frame_all,
-                                            self.smodels_hover_information,
+                                            self.SModelS_hover_information,
                                             self.slha_hover_information,
                                             self.ctau_hover_information,
                                             self.BR_hover_information) 
@@ -247,32 +251,34 @@ class DataHolder(object):
         data_frame_excluded,data_frame_nonexcluded = helpers.data_frame_excluded_nonexcluded(data_frame_all) 
         x_axis,y_axis = helpers.get_xy_axis(self.variable_x,self.variable_y) 
         cont_plots,disc_plots = helpers.separate_cont_disc_plots(self.plot_list,self.data_dict) 
+        
+        plot_descriptions=helpers.plot_description()
      
         helpers.make_continuous_plots_all(cont_plots,x_axis,
                                                           y_axis,outFolder,data_frame_all,self.plot_data,
-                                                          self.plot_title)
+                                                          self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
          
         helpers.make_continuous_plots_excluded(cont_plots,x_axis,
                                                                y_axis,outFolder,data_frame_excluded,self.plot_data,
-                                                               self.plot_title)
+                                                               self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
          
         helpers.make_continuous_plots_nonexcluded(cont_plots,x_axis, y_axis,
                                                   outFolder,data_frame_nonexcluded,
-                                                  self.plot_data, self.plot_title)
+                                                  self.plot_data, self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
          
         helpers.make_discrete_plots_all(disc_plots,x_axis,y_axis,
                                         outFolder,data_frame_all,self.plot_data,
-                                        self.plot_title)
+                                        self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
          
         helpers.make_discrete_plots_excluded(disc_plots,x_axis,y_axis, outFolder,
                                              data_frame_excluded,self.plot_data,
-                                             self.plot_title)
+                                             self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
          
         helpers.make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis, outFolder,
                                                 data_frame_nonexcluded,
-                                                self.plot_data, self.plot_title)
+                                                self.plot_data, self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
         
-        helpers.create_index_html(outFolder,self.plot_data,self.plot_list)
+        helpers.create_index_html(outFolder,self.plot_data,self.plot_list,plot_descriptions)
         
         logger.info('Generation of interactive plots finished. Go to: \n %s/index.html \n to see the plots.' %outFolder)
         
