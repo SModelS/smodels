@@ -65,8 +65,6 @@ class Uncovered(object):
         """
         
         for element in topoList.getElements(): # loop over all elements, by construction we start with the most compressed
-            if element.tested:
-                continue  
             allElements = []       
             probabilities1, branches1 = addPromptAndDisplaced(element.branches[0])
             probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])               
@@ -92,7 +90,7 @@ class Uncovered(object):
                     self.addPrevMothers(el)
                     missing = self.isMissingTopo(el) #missing topo only if not covered, and counting only weights of non-covered mothers
                     # in addition, mother elements cannot be missing, we consider only the most compressed one                                  
-                if not missing: # any element that is not missing might be outside the grid                            
+                if not missing: # any element that is not missing might be outside the grid      
                     # outside grid should be smalles covered but not tested in compression                  
                     if el.covered and not el.tested: # verify first that element is covered but not tested                              
                         if not el.weight.getXsecsFor(self.sqrts): continue # remove elements that only have weight at higher sqrts                    
@@ -113,8 +111,12 @@ class Uncovered(object):
                     self.MET.addToGeneralElements(el)
 
     def inPrevMothers(self, el): #check if smaller element with same mother has already been checked
+        #print ("in prev mothers")
+        #print (el, el.elID)
         for mEl in el.motherElements:
+            #print (mEl[1].elID, mEl[0],mEl[1])
             if mEl[0] != 'original' and mEl[-1].elID in self.prevMothers:
+                #print ("true")
                 return True
         return False
 
