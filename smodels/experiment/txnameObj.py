@@ -213,6 +213,8 @@ class TxName(object):
         #No elements matched:
         if not matches:
             return False
+        elif len(matches) == 1:
+            return matches[0]
         else: #If more than one element ordering matches, return the one with largest mass (relevant for clustering)
             matches = sorted(matches, key = lambda el: el.getMasses(),reverse=True)
             return matches[0]
