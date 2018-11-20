@@ -44,6 +44,7 @@ New in Version 1.2.2:
   * Database "official" now refers to a database without fastlim results, "official_fastlim", to the official database *with* fastlim
   * List displaced signatures in :ref:`missing topologies <topCoverage>`
   * Improved description about :ref:`lifetime reweighting <lifetimeWeight>` in doc
+  * Fix in :ref:`cluster<ULcluster>` for asymmetric masses
 
 New in Version 1.2.1:
 ^^^^^^^^^^^^^^^^^^^^^

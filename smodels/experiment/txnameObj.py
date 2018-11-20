@@ -201,14 +201,22 @@ class TxName(object):
                 in the Txname constraint or condition.
         """
 
+        #Stores all orderings of elements which matches the txname
+        matches = []
         for el in self._topologyList.getElements():
             if element.particlesMatch(el,branchOrder=True):
-                return element.copy()
+                matches.append(element.copy())
             else:
                 elementB = element.switchBranches()
                 if elementB.particlesMatch(el,branchOrder=True):
-                    return elementB
-        return False
+                    matches.append(elementB.copy())
+        
+        #No elements matched:
+        if not matches:
+            return False
+        else: #If more than one element ordering matches, return the one with largest mass (relevant for clustering)
+            matches = sorted(matches, key = lambda el: el.getMasses(),reverse=True)
+            return matches[0]
 
     def hasLikelihood ( self ):
         """ can I construct a likelihood for this map? 
