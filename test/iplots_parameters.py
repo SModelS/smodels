@@ -2,7 +2,7 @@
 #Plot title
 plot_title = 'My interactive plot example'
 
-#Label, block and code number for the variables you want to plot, e.g. 'm_gluino': ['MASS', 1000021]. These will be your x and y axes.
+#Label*, block and code number for the variables you want to plot, e.g. 'm_gluino': ['MASS', 1000021]. These will be your x and y axes.
 
 variable_x = {'m_gluino': ['MASS', 1000021]}
 variable_y = {'m_suR': ['MASS', 2000002]}
@@ -10,6 +10,7 @@ variable_y = {'m_suR': ['MASS', 2000002]}
 #SLHA hover information: In a dictionary form, give the name* of your variable, the block and code number to find it in the SLHA file.
 slha_hover_information = {'m_gluino': ['MASS', 1000021], 'm_suR': ['MASS', 2000002], 'm_LSP': ['MASS', 1000022]} 
 
+# *html notation is allowed. You can use <sub>NAME</sub> for subscripts and <sup>NAME</sup> for superscripts.  
 #For which particles you want to get the mean decay length.
 ctau_hover_information = {'ctau_gluino': 1000021}
 #For which particles you want to display the decay channels and branching ratios. 
