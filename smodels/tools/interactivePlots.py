@@ -163,9 +163,9 @@ class DataHolder(object):
     
         #Fill with smodels data if defined
         if smodelsDict is None:
-            for key in self.data_dict:
+            for key in self.SModelS_hover_information:
                 if key != 'file':
-                    self.data_dict[key].append(None)                
+                    self.data_dict[key].append(False)                
         else:    
             self.data_dict = helpers.get_expres(self.data_dict,smodelsDict)
             self.data_dict = helpers.get_missed_topologies(self.data_dict,smodelsDict)
@@ -174,19 +174,20 @@ class DataHolder(object):
             self.data_dict = helpers.get_long_cascades(self.data_dict,smodelsDict)
 
 
-            #Fill with SLHA data:
-            self.data_dict =  helpers.get_slha_hover_info(self.data_dict,slhaData,
+             #Fill with SLHA data:
+        self.data_dict =  helpers.get_slha_hover_info(self.data_dict,slhaData,
                                                                           self.slha_hover_information)
-            self.data_dict = helpers.get_ctau(self.data_dict,slhaData,
+        self.data_dict = helpers.get_ctau(self.data_dict,slhaData,
                                                               self.ctau_hover_information)             
-            self.data_dict = helpers.get_BR(self.data_dict,slhaData,self.BR_hover_information,
+        self.data_dict = helpers.get_BR(self.data_dict,slhaData,self.BR_hover_information,
                                                             self.BR_get_top)     
-            #Fill with the x and y data:
-            if list(self.variable_x.keys())[0] not in self.slha_hover_information.keys():
-                self.data_dict = helpers.get_variable(self.data_dict,slhaData,self.BR_hover_information,
-                                                            self.variable_x) 
-            if list(self.variable_y.keys())[0] not in self.slha_hover_information.keys():                
-                self.data_dict = helpers.get_variable(self.data_dict,slhaData,self.BR_hover_information,
+             #Fill with the x and y data:
+             #print(list(self.variable_x.keys())[0])
+        if list(self.variable_x.keys())[0] not in self.slha_hover_information.keys():
+            self.data_dict = helpers.get_variable(self.data_dict,slhaData,self.BR_hover_information,
+                                                       self.variable_x) 
+        if list(self.variable_y.keys())[0] not in self.slha_hover_information.keys():   
+            self.data_dict = helpers.get_variable(self.data_dict,slhaData,self.BR_hover_information,
                                                             self.variable_y) 
      
     def loadData(self,npoints=-1):

@@ -7,7 +7,6 @@
 
    
 """
-
 import sys
 from smodels.tools.smodelsLogging import logger
 try:
@@ -113,8 +112,8 @@ def get_expres(data_dict,smodelsOutput):
     """   
     
     rmax=0
-    
     decompStatus = get_entry(smodelsOutput,'OutputStatus','decomposition status')
+    
     if decompStatus == 1:
         expResList = get_entry(smodelsOutput,'ExptRes')
         if not expResList or not isinstance(expResList,list):
@@ -128,6 +127,7 @@ def get_expres(data_dict,smodelsOutput):
             if r>rmax:
                 rmax = r
                 Txname = get_entry(expres,'TxNames')
+                Txname=','.join(Txname)
                 if get_entry(expres,'chi2')==False:
                     chi_2=False
                 else:    
@@ -135,14 +135,14 @@ def get_expres(data_dict,smodelsOutput):
 
                 analysis_id = get_entry(expres,'AnalysisID')
     else:
-        Txname = 'False'
+        Txname = False
         chi_2 = False
-        analysis_id = 'False'
+        analysis_id = False
         rmax=False
  
     if 'SModelS_status' in  data_dict:
         if rmax ==False:
-            data_dict['SModelS_status'].append('False')
+            data_dict['SModelS_status'].append(False)
         elif rmax>1:
             data_dict['SModelS_status'].append('Excluded')  
         else:
@@ -152,7 +152,7 @@ def get_expres(data_dict,smodelsOutput):
         data_dict['r_max'].append(rmax)
         
     if 'Tx' in data_dict.keys(): 
-        data_dict['Tx'].append(str(Txname))
+        data_dict['Tx'].append(Txname)
         
     if 'chi2' in data_dict.keys(): 
         data_dict['chi2'].append(chi_2) 
@@ -171,6 +171,7 @@ def get_missed_topologies(data_dict,smodelsOuptut):
     if decompStatus >= 0:
         for missed_topo in get_entry(smodelsOuptut, 'Missed Topologies'):
             missedtopo_xsec=missed_topo.get('weight (fb)')
+          #  if missedtopo_xsec==None: missedtopo_xsec=0            
             missedtopo_total_xsec=missedtopo_total_xsec+missedtopo_xsec
             if missedtopo_xsec>missedtopo_max_xsec:
                 missedtopo_max_xsec=missedtopo_xsec
@@ -178,7 +179,7 @@ def get_missed_topologies(data_dict,smodelsOuptut):
     else:
         missedtopo_max_xsec=False
         missedtopo_total_xsec=False
-        missed_topo = 'False'
+        missed_topo = False
     if 'MT_max' in data_dict.keys():
         data_dict.get('MT_max').append(str(mt_max))
     if 'MT_max_xsec' in data_dict.keys():
@@ -193,6 +194,7 @@ def get_long_cascades(data_dict,smodelsOutput):
     Extracts the Long cascade info from the .py output. If requested, the data will be appended on each corresponding list
     """
     decompStatus = get_entry(smodelsOutput,'OutputStatus','decomposition status')    
+    long_cascade_total_xsec=0
     if decompStatus >= 0:
         long_cascade_total_xsec=0
         for long_cascade in smodelsOutput.get('Long Cascades'):
@@ -200,6 +202,7 @@ def get_long_cascades(data_dict,smodelsOutput):
             long_cascade_total_xsec=long_cascade_total_xsec+long_cascade_xsec
     else:
         long_cascade_total_xsec=False
+   # if long_cascade_total_xsec==None: long_cascade_total_xsec=False      
     if 'MT_long_xsec' in data_dict.keys():
         data_dict.get('MT_long_xsec').append(long_cascade_total_xsec)
              
@@ -213,7 +216,7 @@ def get_asymmetric_branches(data_dict,smodelsOutput):
     if decompStatus >= 0:
         asymmetric_branch_total_xsec = sum([asym_br['weight (fb)'] for asym_br in smodelsOutput['Asymmetric Branches']])
     else:
-        asymmetric_branch_total_xsec=False    
+        asymmetric_branch_total_xsec=False             
     if 'MT_asym_xsec' in data_dict.keys():
         data_dict.get('MT_asym_xsec').append(asymmetric_branch_total_xsec) 
     return data_dict  
@@ -221,15 +224,16 @@ def get_asymmetric_branches(data_dict,smodelsOutput):
 def get_outside_grid(data_dict,smodelsOutput):
     """
     Extracts the outside grid info from the .py output. If requested, the data will be appended on each corresponding list.
-    """    
+    """   
     decompStatus = get_entry(smodelsOutput,'OutputStatus','decomposition status')
     outside_grid_total_xsec=0
     if decompStatus >= 0:
         for outside_grid in smodelsOutput.get('Outside Grid'):
             outside_grid_xsec=outside_grid.get('weight (fb)')
+           # if outside_grid_xsec==None: outside_grid_xsec=0 
             outside_grid_total_xsec = outside_grid_total_xsec+outside_grid_xsec
     else:
-        outside_grid_total_xsec = False
+        outside_grid_total_xsec = False      
     if 'MT_outgrid_xsec' in data_dict.keys():
         data_dict.get('MT_outgrid_xsec').append(outside_grid_total_xsec)  
     return data_dict   
@@ -285,9 +289,8 @@ def get_variable(data_dict,slhaData,slha_hover_information,variable):
     """
     Gets the variable from the slha file.
     """  
-    
     for key in variable.keys():
-        if key not in slha_hover_information.keys():
+        if str(key) not in slha_hover_information.keys():
             block=variable.get(key)[0]
             code_number=variable.get(key)[1]
             data_dict.get(key).append(slhaData.blocks[block][code_number])
@@ -300,6 +303,7 @@ def make_data_frame(data_dict):
     Transform the main dictionary in a data frame.
     """
     data_frame_all = pd.DataFrame(data=data_dict)
+    data_frame_all.to_csv('all_data_frame.txt', sep=' ', index=False,header=True)
     
     return data_frame_all
   
@@ -335,11 +339,30 @@ def fill_hover(data_frame_all,SModelS_hover_information,
                 j=j+1
             data_frame_br[column][i]=brs    
         data_frame_all['hover_text']=data_frame_all['hover_text']+column+': '+data_frame_br[column].astype('str')+'<br>'     
-    for column in sorted(SModelS_hover_information):
-        if column=='MT_max_xsec' or column=='MT_total_xsec' or column=='MT_long_xsec' or column=='MT_asym_xsec' or column=='MT_outgrid_xsec':
-            data_frame_all['hover_text']=data_frame_all['hover_text']+column+': '+data_frame_all[column].astype('str')+' fb'+'<br>'
-        else:    
-            data_frame_all['hover_text']=data_frame_all['hover_text']+column+': '+data_frame_all[column].astype('str')+'<br>'
+    if 'SModelS_status' in SModelS_hover_information:
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'SModelS_status'+': '+data_frame_all['SModelS_status'].astype('str')+'<br>'
+    if 'r_max' in SModelS_hover_information:
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'r_max'+': '+data_frame_all['r_max'].astype('str')+'<br>'
+    if 'Tx' in SModelS_hover_information: 
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'Tx'+': '+data_frame_all['Tx'].astype('str')+'<br>'
+    if 'Analysis' in SModelS_hover_information:    
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'Analysis'+': '+data_frame_all['Analysis'].astype('str')+'<br>'
+    if 'chi2' in SModelS_hover_information:    
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'chi2'+': '+data_frame_all['chi2'].astype('str')+'<br>'    
+    if 'MT_max' in SModelS_hover_information:    
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_max'+': '+data_frame_all['MT_max'].astype('str')+' fb'+'<br>'        
+    if 'MT_max_xsec' in SModelS_hover_information:    
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_max_xsec'+': '+data_frame_all['MT_max_xsec'].astype('str')+' fb'+'<br>'
+    if 'MT_total_xsec' in SModelS_hover_information:    
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_total_xsec'+': '+data_frame_all['MT_total_xsec'].astype('str')+' fb'+'<br>'
+    if 'MT_long_xsec' in SModelS_hover_information:    
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_long_xsec'+': '+data_frame_all['MT_long_xsec'].astype('str')+' fb'+'<br>' 
+    if 'MT_asym_xsec' in SModelS_hover_information:    
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_asym_xsec'+': '+data_frame_all['MT_asym_xsec'].astype('str')+' fb'+'<br>' 
+    if 'MT_outgrid_xsec' in SModelS_hover_information:    
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_outgrid_xsec'+': '+data_frame_all['MT_outgrid_xsec'].astype('str')+' fb'+'<br>'  
+    if 'file' in SModelS_hover_information:    
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'file'+': '+data_frame_all['file'].astype('str')+'<br>'          
     return data_frame_all;
  
  
@@ -391,6 +414,9 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
     if 'all' in plot_data: 
         for cont_plot in cont_plots:
             plot_desc=plot_descriptions.get(cont_plot)
+            cont_plot_legend=cont_plot
+            if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
+                cont_plot_legend=cont_plot+' (fb)'
             z=data_frame_all[cont_plot]
             x=data_frame_all[x_axis]
             y=data_frame_all[y_axis]
@@ -402,15 +428,16 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
                     y=y,
                     text=hover_text,
                     hoverinfo='text',
+                    mode='markers',
                     marker=dict(
-                        size=6,
+                        size=10,
                         cmax=data_frame_all[cont_plot].max(),
                         cmin=data_frame_all[cont_plot].max(),
                         color=z,
                         colorbar=dict(
-                            title=cont_plot), 
-                    colorscale='Jet'), 
-                    mode='markers'  
+                            title=cont_plot_legend), 
+                    colorscale='Jet')
+  
                             )
                     ]
                
@@ -488,9 +515,12 @@ def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_f
     if 'excluded' in plot_data: 
         for cont_plot in cont_plots:
             plot_desc=plot_descriptions.get(cont_plot)
+            cont_plot_legend=cont_plot
+            if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
+                cont_plot_legend=cont_plot+' (fb)'
             z=data_frame_excluded[cont_plot]
-            y=data_frame_excluded[x_axis]
-            x=data_frame_excluded[y_axis]
+            x=data_frame_excluded[x_axis]
+            y=data_frame_excluded[y_axis]
             hover_text=data_frame_excluded['hover_text']
              
              
@@ -501,12 +531,12 @@ def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_f
                     text=hover_text,
                     hoverinfo='text',
                     marker=dict(
-                        size=6,
+                        size=10,
                         cmax=data_frame_excluded[cont_plot].max(),
                         cmin=data_frame_excluded[cont_plot].max(),
                         color=z,
                         colorbar=dict(
-                            title=cont_plot), 
+                            title=cont_plot_legend), 
                     colorscale='Jet'), 
                     mode='markers'  
             )
@@ -577,9 +607,12 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
     if 'non-excluded' in plot_data: 
         for cont_plot in cont_plots:
             plot_desc=plot_descriptions.get(cont_plot)
+            cont_plot_legend=cont_plot
+            if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
+                cont_plot_legend=cont_plot+' (fb)'
             z=data_frame_nonexcluded[cont_plot]
-            y=data_frame_nonexcluded[x_axis]
-            x=data_frame_nonexcluded[y_axis]
+            x=data_frame_nonexcluded[x_axis]
+            y=data_frame_nonexcluded[y_axis]
             hover_text=data_frame_nonexcluded['hover_text'] 
              
             data = [
@@ -589,12 +622,12 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
                     text=hover_text,
                     hoverinfo='text',
                     marker=dict(
-                        size=6,
+                        size=10,
                         cmax=data_frame_nonexcluded[cont_plot].max(),
                         cmin=data_frame_nonexcluded[cont_plot].max(),
                         color=z,
                         colorbar=dict(
-                            title=cont_plot), 
+                            title=cont_plot_legend), 
                     colorscale='Jet'), 
                     mode='markers'  
             )
@@ -688,7 +721,7 @@ def make_discrete_plots_all(disc_plots,x_axis,y_axis,path_to_plots,data_frame_al
                         'x': data_frame_all.loc[data_frame_all[disc_plot]==value][x_axis],
                         'y': data_frame_all.loc[data_frame_all[disc_plot]==value][y_axis],
                         'name': value, 'mode': 'markers',
-                        'marker':dict(size=6),
+                        'marker':dict(size=10),
                         'text':data_frame_all.loc[data_frame_all[disc_plot]==value]['hover_text'],
                         'hoverinfo':'text',
                  
@@ -780,7 +813,7 @@ def make_discrete_plots_excluded(disc_plots,x_axis,y_axis,path_to_plots,data_fra
                         'x': data_frame_excluded.loc[data_frame_excluded[disc_plot]==value][x_axis],
                         'y': data_frame_excluded.loc[data_frame_excluded[disc_plot]==value][y_axis],
                         'name': value, 'mode': 'markers',
-                        'marker':dict(size=6),
+                        'marker':dict(size=10),
                         'text':data_frame_excluded.loc[data_frame_excluded[disc_plot]==value]['hover_text'],
                         'hoverinfo':'text',
                  
@@ -874,7 +907,7 @@ def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_
                         'x': data_frame_nonexcluded.loc[data_frame_nonexcluded[disc_plot]==value][x_axis],
                         'y': data_frame_nonexcluded.loc[data_frame_nonexcluded[disc_plot]==value][y_axis],
                         'name': value, 'mode': 'markers',
-                        'marker':dict(size=6),
+                        'marker':dict(size=10),
                         'text':data_frame_nonexcluded.loc[data_frame_nonexcluded[disc_plot]==value]['hover_text'],
                         'hoverinfo':'text',
                  
