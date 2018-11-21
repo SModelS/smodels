@@ -4,7 +4,7 @@
    
 .. moduleauthor:: Humberto Reyes <humberto.reyes-gonzalez@lpsc.in2p3.fr>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-
+.. moduleauthor:: Sabine Kraml <sabine.kraml@gmail.com>
    
 """
 import sys
@@ -246,7 +246,10 @@ def get_slha_hover_info(data_dict,slhaData,slha_hover_information):
         for key in slha_hover_information.keys():
             block = slha_hover_information.get(key)[0]
             code_number = slha_hover_information.get(key)[1]
-            data_dict.get(key).append(slhaData.blocks[block][code_number])
+            if block=='MASS':
+                data_dict.get(key).append(abs(slhaData.blocks[block][code_number]))
+            else:
+                data_dict.get(key).append(slhaData.blocks[block][code_number])
             
         return data_dict
         
@@ -293,7 +296,10 @@ def get_variable(data_dict,slhaData,slha_hover_information,variable):
         if str(key) not in slha_hover_information.keys():
             block=variable.get(key)[0]
             code_number=variable.get(key)[1]
-            data_dict.get(key).append(slhaData.blocks[block][code_number])
+            if block=='MASS':
+                data_dict.get(key).append(abs(slhaData.blocks[block][code_number]))
+            else:
+                data_dict.get(key).append(slhaData.blocks[block][code_number])
             
     return data_dict
     
@@ -987,13 +993,13 @@ def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_
 
 
 
-def create_index_html(path_to_plots,plot_data,plot_list,plot_descriptions):
+def create_index_html(path_to_plots,plot_data,plot_title,plot_list,plot_descriptions):
     """
     Fills the index.html file with links to the interactive plots.
     """
     
     main_file= open(path_to_plots+'/index.html', 'w')
-    main_file.write('<html><head><font size=6>SModelS interactive plots.</font></head>')
+    main_file.write('<html><head><font size=6>SModelS interactive plots: '+plot_title+'</font></head>')
     hyperlink_format = '<a href={link}>{text}</a>' 
     for plot in plot_list:
         plot_name=plot.split('.')[0]

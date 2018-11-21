@@ -4,6 +4,7 @@
    
 .. moduleauthor:: Humberto Reyes <humberto.reyes-gonzalez@lpsc.in2p3.fr>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Sabine Kraml <sabine.kraml@gmail.com>
    
 """
 
@@ -279,7 +280,7 @@ class DataHolder(object):
                                                 data_frame_nonexcluded,
                                                 self.plot_data, self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
         
-        helpers.create_index_html(outFolder,self.plot_data,self.plot_list,plot_descriptions)
+        helpers.create_index_html(outFolder,self.plot_data,self.plot_title,self.plot_list,plot_descriptions)
         
         logger.info('Generation of interactive plots finished. Go to: \n %s/index.html \n to see the plots.' %outFolder)
         
