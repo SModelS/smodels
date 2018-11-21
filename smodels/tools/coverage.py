@@ -111,12 +111,8 @@ class Uncovered(object):
                     self.MET.addToGeneralElements(el)
 
     def inPrevMothers(self, el): #check if smaller element with same mother has already been checked
-        #print ("in prev mothers")
-        #print (el, el.elID)
         for mEl in el.motherElements:
-            #print (mEl[1].elID, mEl[0],mEl[1])
             if mEl[0] != 'original' and mEl[-1].elID in self.prevMothers:
-                #print ("true")
                 return True
         return False
 
@@ -130,7 +126,8 @@ class Uncovered(object):
 
     def addPrevMothers(self, el): #add mother elements of currently tested element to previous mothers
         for mEl in el.motherElements:
-            self.prevMothers.append(mEl[-1].elID)
+            if mEl[0] != 'original': 
+                self.prevMothers.append(mEl[-1].elID)
         
     def hasDisplaced(self, el):
         """
