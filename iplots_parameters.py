@@ -1,22 +1,23 @@
+#Note: html notation like <sub>NAME</sub> for subscript and <sup>NAME</sup> for superscript 
+#can be used in axes labels and spectrum hover information (slha blocks, BRs, ctau,...), 
+#but not in the SModelS hover information.
+
 
 #Plot title
-plot_title = 'My interactive plot example'
+plot_title = 'interactive plot example from a small pMSSM scan'
 
-#Label*, block and code number for the variables you want to plot, e.g. 'm_gluino': ['MASS', 1000021]. These will be your x and y axes.
-#*html notation is allowed. You can use <sub>NAME</sub> for subscript and <sup>NAME</sup> for superscript.
-
+#Label*, block and code number for the variables you want to plot, e.g. 'm(gluino)': ['MASS', 1000021]. These will be your x and y axes.
 variable_x = {'m<sub>gluino</sub>': ['MASS', 1000021]}
-variable_y = {'m<sub>suR</sub>': ['MASS', 2000002]}
+variable_y = {'m<sub>&#967;<sub>1</sub><sup>0</sup></sub>': ['MASS', 1000022]}
+
 
 #SLHA hover information: In a dictionary form, give the name* of your variable, the block and code number to find it in the SLHA file.
-slha_hover_information = {'m<sub>gluino</sub>': ['MASS', 1000021], 'm<sub>suR</sub>': ['MASS', 2000002], 'm<sub>LSP</sub>': ['MASS', 1000022]} 
-
-
+slha_hover_information = {'m(gluino)</sub>': ['MASS', 1000021], 'm(stop1)': ['MASS', 1000006], 'm(chi10)': ['MASS', 1000022]} 
 
 #For which particles you want to get the mean decay length.
-ctau_hover_information = {'ctau<sub>gluino</sub>': 1000021}
+ctau_hover_information = {'ctau(chi1+)': 1000024}
 #For which particles you want to display the decay channels and branching ratios. 
-BR_hover_information = {'BR<sub>gluino</sub>': 1000021, 'BR<sub>suR</sub>': 2000002}
+BR_hover_information = {'BR(gluino)': 1000021, 'BR(chi1+)': 1000024}
 #The output is written in the form '.25[1000022,1,-1]',  where the first number (0.25) is the branching ratio, and the numbers in [,] are the PDG codes of the decay products.
 #WARNING: Lists of branching ratios lists can be very long, so the may not fit in the hover box. 
 #You can tell how many entries you want to print with BR_get_top, e.g. BR_get_top = 5 (default 'all').
