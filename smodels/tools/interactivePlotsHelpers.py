@@ -395,10 +395,10 @@ def separate_cont_disc_plots(plot_list,data_dict):
  
 def plot_description():
     ''' Generate a description for each plot.'''
-    plot_descriptions={'SModelS_status':'SModelS exclusion.',
-                      'r_max':'Largest r-value.',
+    plot_descriptions={'SModelS_status':'whether or not excluded by SModelS.',
+                      'r_max':'highest r-value from SModelS.',
                       'chi2':'chi^2 value associated to the highest r-value.',
-                      'Tx':'Topology/ies which give r_max.',
+                      'Tx':'Topology/ies which give the highest r-value.',
                       'Analysis':'Experimental analysis from which the highest r-value comes from.',
                       'MT_max':'Missing topologies with the largest cross section.',
                       'MT_max_xsec':'Cross section of MT_max.',
