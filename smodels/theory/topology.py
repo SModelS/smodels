@@ -396,3 +396,7 @@ class TopologyList(object):
         for element in self.getElements():
             element.elID = elID
             elID += 1
+            for mEl in element.motherElements:
+                mEl[-1].elID = elID
+                elID += 1                
+            
