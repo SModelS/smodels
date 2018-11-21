@@ -350,7 +350,7 @@ def fill_hover(data_frame_all,SModelS_hover_information,
     if 'chi2' in SModelS_hover_information:    
         data_frame_all['hover_text']=data_frame_all['hover_text']+'chi2'+': '+data_frame_all['chi2'].astype('str')+'<br>'    
     if 'MT_max' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_max'+': '+data_frame_all['MT_max'].astype('str')+' fb'+'<br>'        
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_max'+': '+data_frame_all['MT_max'].astype('str')+'<br>'        
     if 'MT_max_xsec' in SModelS_hover_information:    
         data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_max_xsec'+': '+data_frame_all['MT_max_xsec'].astype('str')+' fb'+'<br>'
     if 'MT_total_xsec' in SModelS_hover_information:    
@@ -395,7 +395,7 @@ def separate_cont_disc_plots(plot_list,data_dict):
  
 def plot_description():
     ''' Generate a description for each plot.'''
-    plot_descriptions={'SModelS_status':'whether or not excluded by SModelS.',
+    plot_descriptions={'SModelS_status':'Excluded or not excluded by SModelS.',
                       'r_max':'highest r-value from SModelS.',
                       'chi2':'chi^2 value associated to the highest r-value.',
                       'Tx':'Topology/ies which give the highest r-value.',
