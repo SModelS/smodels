@@ -126,7 +126,7 @@ class Uncovered(object):
 
     def addPrevMothers(self, el): #add mother elements of currently tested element to previous mothers
         for mEl in el.motherElements:
-            if mEl[0] != 'original': 
+            if mEl[0] != 'original' and mEl[-1].elID!=0: 
                 self.prevMothers.append(mEl[-1].elID)
         
     def hasDisplaced(self, el):
