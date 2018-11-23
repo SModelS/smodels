@@ -184,7 +184,7 @@ class Uncovered(object):
                     missingX -= mother[-1].weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
                     continue # do not count cross section if mother is covered, do not continue recursion for this contribution
                 if checkFor=='tested':
-                    self.outsideGridMothers.append(mother[-1].elID) # mother element is not tested, but should no longer be considered as outside grid, because we already count its contribution here
+                    if mother[-1].elID!=0: self.outsideGridMothers.append(mother[-1].elID) # mother element is not tested, but should no longer be considered as outside grid, because we already count its contribution here
                 if all(grandmother[0] == 'original' for grandmother in mother[-1].motherElements) : continue # end of recursion if element has no mothers, we keep its cross section in missingX
                 else: newmothers += mother[-1].motherElements # if element has mother element, check also if those are covered before adding the cross section contribution
             mothers = newmothers # all new mothers will be checked until we reached the end of all recursions
