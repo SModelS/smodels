@@ -1,0 +1,9 @@
+id: ATLAS-SUSY-2016-19
+sqrts: 13*TeV
+lumi: 36.1/fb
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2016-19/
+arxiv: https://arxiv.org/abs/1803.10178
+publication: in process of being published
+contact: ATLAS collaboration
+implementedBy: neuphi
+lastUpdate: 2018/10/17
