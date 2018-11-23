@@ -95,7 +95,8 @@ class Uncovered(object):
 
     def addPrevMothers(self, el): #add mother elements of currently tested element to previous mothers
         for mEl in el.motherElements:
-            self.prevMothers.append(mEl[-1].elID)
+            if mEl[-1].elID!=0:
+                self.prevMothers.append(mEl[-1].elID)
 
     def hasLongCascade(self, el):
         """
