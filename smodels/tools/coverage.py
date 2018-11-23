@@ -174,7 +174,8 @@ class Uncovered(object):
                     if not mother[-1].weight.getXsecsFor(self.sqrts): continue
                     missingX -= mother[-1].weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
                     continue
-                self.outsideGridMothers.append(mother[-1].elID) # mother element is not tested, but should no longer be considered as outside grid, because we already count its contribution here
+                if mother[-1].elID != 0:
+                    self.outsideGridMothers.append(mother[-1].elID) # mother element is not tested, but should no longer be considered as outside grid, because we already count its contribution here
                 if not mother[-1].motherElements: continue
                 else: newmothers += mother[-1].motherElements
             mothers = newmothers
