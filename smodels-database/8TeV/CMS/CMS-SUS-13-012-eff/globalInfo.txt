@@ -4,6 +4,6 @@ lumi: 19.5/fb
 url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13012
 arxiv: http://arxiv.org/abs/1402.4770
 publication: JHEP06(2014)055
-contact: cms-pag-conveners-sus@cern.ch, SModelS collaboration
-implementedBy: Andre Lessa
-lastUpdate: 2017/6/15
+contact: cms-pag-conveners-sus@NOSPAMcernSPAMNOT.ch, SModelS collaboration
+implementedBy: Federico Ambrogi
+lastUpdate: 2018/4/5
