@@ -45,6 +45,7 @@ New in Version 1.2.2:
   * List displaced signatures in :ref:`missing topologies <topCoverage>`
   * Improved description about :ref:`lifetime reweighting <lifetimeWeight>` in doc
   * Fix in :ref:`cluster<ULcluster>` for asymmetric masses
+  * Small improvements in the :ref:`interactive plots tool <interactivePlots>`
 
 New in Version 1.2.1:
 ^^^^^^^^^^^^^^^^^^^^^

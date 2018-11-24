@@ -1,4 +1,4 @@
-Release v1.2.2, Wed 31 Oct 2018
+Release v1.2.2, Mon 26 Nov 2018
 =======================================================
 
   * Updated database, added T3GQ eff maps and a few ATLAS 13 TeV results
@@ -6,6 +6,7 @@ Release v1.2.2, Wed 31 Oct 2018
   * List displaced signatures in missing topologies
   * Small improvements in documentation
   * Fix in clustering for asymmetric masses
+  * Small improvements in the interactive plots tool
 
 Release v1.2.1, Tue 9 Oct 2018
 =======================================================
