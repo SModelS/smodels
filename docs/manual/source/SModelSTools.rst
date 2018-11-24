@@ -268,9 +268,9 @@ Below we give more detailed information about each entry in this file.
 
   * **BR_hover_information**: defines for which particle(s) to display decay channels and branching ratios. Example: BR_hover_information = {'BR_gluino': 1000021}. **WARNING:** Lists of branching ratios can be very long, so the may not fit in the hover box. One can define the number of entries with **BR_get_top**, e.g. BR_get_top = 5 (default: BR_get_top = 'all').
 
-* *SModelS hover information*: defines, as a list of keywords, which information to display from the SModelS output. Example: smodels_hover_information = ['SmodelS_excluded', 'r_max', 'Tx', 'Analysis', 'file']. The options are:
+* *SModelS hover information*: defines, as a list of keywords, which information to display from the SModelS output. Example: smodels_hover_information = ['SmodelS_status', 'r_max', 'Tx', 'Analysis', 'file']. The options are:
 
-  * **SmodelS_excluded**: prints whether the point is excluded or not by SModelS
+  * **SmodelS_status**: prints whether the point is excluded or not by SModelS
  
   * **r_max**: shows the highest r-value for each parameter point
 
@@ -298,7 +298,7 @@ Below we give more detailed information about each entry in this file.
 
   * **plot_data**: which points you want to plot; the options are: all, non-excluded, excluded points. Example: plot_data = ['all', 'non-excluded', 'excluded'] 
 
-  * **plot_list**: which quantities to plot in the x,y plane; the same options as for SModels hover information apply. Example: plot_list = ['r_max', 'chi2', 'Tx', 'Analysis', 'MT_max', 'MT_max_xsec', 'MT_total_xsec', 'MT_long_xsec', 'MT_asym_xsec']  
+  * **plot_list**: which quantities to plot in the x,y plane; the same options as for SModels hover information apply. Example: plot_list = ['SmodelS_status','r_max', 'chi2', 'Tx', 'Analysis', 'MT_max', 'MT_max_xsec', 'MT_total_xsec', 'MT_long_xsec', 'MT_asym_xsec']  
 
 
 .. _permissionsFixer:
