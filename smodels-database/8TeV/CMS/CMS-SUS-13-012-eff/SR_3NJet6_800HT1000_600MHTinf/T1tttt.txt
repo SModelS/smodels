@@ -2,10 +2,11 @@ txName: T1tttt
 constraint: [[['t','t']],[['t','t']]]
 condition: None
 conditionDescription: None
-figureUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13012/Fig_7c.pdf
+figureUrl: None
 source: CMS
 validated: True
 axes: [[x, y], [x, y]]
+finalState: ['MET', 'MET']
 efficiencyMap: [[[[4.6250E+02*GeV,1.2500E+01*GeV],[4.6250E+02*GeV,1.2500E+01*GeV]],9.0029e-06],
 [[[4.6250E+02*GeV,2.3750E+02*GeV],[4.6250E+02*GeV,2.3750E+02*GeV]],7.2084e-06],
 [[[5.1250E+02*GeV,3.7500E+01*GeV],[5.1250E+02*GeV,3.7500E+01*GeV]],1.8268e-05],

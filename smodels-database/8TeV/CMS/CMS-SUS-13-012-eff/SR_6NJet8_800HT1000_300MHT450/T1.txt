@@ -2,10 +2,11 @@ txName: T1
 constraint: [[['jet','jet']],[['jet','jet']]]
 condition: None
 conditionDescription: None
-figureUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13012/Fig_7b.pdf
+figureUrl: None
 source: CMS
 validated: True
 axes: [[x, y], [x, y]]
+finalState: ['MET', 'MET']
 efficiencyMap: [[[[4.1250E+02*GeV,3.7500E+01*GeV],[4.1250E+02*GeV,3.7500E+01*GeV]],0.0014605],
 [[[4.1250E+02*GeV,8.7500E+01*GeV],[4.1250E+02*GeV,8.7500E+01*GeV]],0.0012435],
 [[[4.1250E+02*GeV,1.3750E+02*GeV],[4.1250E+02*GeV,1.3750E+02*GeV]],0.00090587],

@@ -2,9 +2,11 @@ txName: T5WWoff
 constraint: 2.23*[[['jet','jet'],['jet','jet']],[['jet','jet'],['jet','jet']]]
 condition: None
 conditionDescription: None
+figureUrl: None
 source: SModelS
 validated: N/A
 axes: [[x, y + 10, y], [x, y + 10, y]];[[x, 0.5*x + 0.5*y, y], [x, 0.5*x + 0.5*y, y]];[[x, 0.05*x + 0.95*y, y], [x, 0.05*x + 0.95*y, y]];[[x, 0.95*x + 0.05*y, y], [x, 0.95*x + 0.05*y, y]]
+finalState: ['MET', 'MET']
 efficiencyMap: [[[[1.4400E+03*GeV,7.1000E+02*GeV,7.0000E+02*GeV],[1.4400E+03*GeV,7.1000E+02*GeV,7.0000E+02*GeV]],0.035588],
 [[[3.6000E+02*GeV,2.6000E+02*GeV,2.5000E+02*GeV],[3.6000E+02*GeV,2.6000E+02*GeV,2.5000E+02*GeV]],0.0010168],
 [[[8.4000E+02*GeV,3.6000E+02*GeV,3.5000E+02*GeV],[8.4000E+02*GeV,3.6000E+02*GeV,3.5000E+02*GeV]],0.05114],

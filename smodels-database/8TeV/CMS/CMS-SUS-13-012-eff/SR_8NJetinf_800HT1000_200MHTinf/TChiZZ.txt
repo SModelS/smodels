@@ -2,9 +2,11 @@ txName: TChiZZ
 constraint: [[['Z']],[['Z']]]
 condition: None
 conditionDescription: None
+figureUrl: None
 source: SModelS
 validated: N/A
 axes: [[x, y], [x, y]]
+finalState: ['MET', 'MET']
 efficiencyMap: [[[[4.8000E+02*GeV,3.8000E+02*GeV],[4.8000E+02*GeV,3.8000E+02*GeV]],0.0],
 [[[6.0000E+02*GeV,4.2000E+02*GeV],[6.0000E+02*GeV,4.2000E+02*GeV]],1.47e-05],
 [[[6.0000E+02*GeV,1.0000E+00*GeV],[6.0000E+02*GeV,1.0000E+00*GeV]],1.46e-05],

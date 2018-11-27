@@ -2,9 +2,11 @@ txName: T5tttt
 constraint: [[['t'],['t']],[['t'],['t']]]
 condition: None
 conditionDescription: None
+figureUrl: None
 source: SModelS
 validated: N/A
 axes: [[x, 0.5*x + 0.5*y, y], [x, 0.5*x + 0.5*y, y]];[[x, x - 177, y], [x, x - 177, y]];[[x, y + 177, y], [x, y + 177, y]]
+finalState: ['MET', 'MET']
 efficiencyMap: [[[[1.0200E+03*GeV,5.1050E+02*GeV,1.0000E+00*GeV],[1.0200E+03*GeV,5.1050E+02*GeV,1.0000E+00*GeV]],0.012776],
 [[[1.0200E+03*GeV,5.3500E+02*GeV,5.0000E+01*GeV],[1.0200E+03*GeV,5.3500E+02*GeV,5.0000E+01*GeV]],0.012819],
 [[[1.0200E+03*GeV,5.6000E+02*GeV,1.0000E+02*GeV],[1.0200E+03*GeV,5.6000E+02*GeV,1.0000E+02*GeV]],0.012045],

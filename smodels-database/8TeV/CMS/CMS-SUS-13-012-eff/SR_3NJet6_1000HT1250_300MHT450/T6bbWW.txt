@@ -2,9 +2,11 @@ txName: T6bbWW
 constraint: [[['b'],['W']],[['b'],['W']]]
 condition: None
 conditionDescription: None
+figureUrl: None
 source: SModelS
 validated: N/A
 axes: [[x, 0.5*x + 0.5*y, y], [x, 0.5*x + 0.5*y, y]];[[x, 0.1*x + 0.9*y, y], [x, 0.1*x + 0.9*y, y]];[[x, 0.9*x + 0.1*y, y], [x, 0.9*x + 0.1*y, y]];[[x, y + 10, y], [x, y + 10, y]];[[x, y + 77, y], [x, y + 77, y]]
+finalState: ['MET', 'MET']
 efficiencyMap: [[[[1.0000E+02*GeV,5.0500E+01*GeV,1.0000E+00*GeV],[1.0000E+02*GeV,5.0500E+01*GeV,1.0000E+00*GeV]],0.0],
 [[[1.0000E+02*GeV,7.0000E+01*GeV,4.0000E+01*GeV],[1.0000E+02*GeV,7.0000E+01*GeV,4.0000E+01*GeV]],1.25e-05],
 [[[1.0000E+02*GeV,9.0000E+01*GeV,8.0000E+01*GeV],[1.0000E+02*GeV,9.0000E+01*GeV,8.0000E+01*GeV]],0.0],

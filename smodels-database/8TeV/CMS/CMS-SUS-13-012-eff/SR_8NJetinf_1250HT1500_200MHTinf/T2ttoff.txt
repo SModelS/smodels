@@ -2,10 +2,11 @@ txName: T2ttoff
 constraint: [[['W','b']],[['W','b']]]
 condition: None
 conditionDescription: None
-figureUrl: FIXME
+figureUrl: None
 source: SModelS
 validated: N/A
 axes: [[x, y], [x, y]]
+finalState: ['MET', 'MET']
 efficiencyMap: [[[[7.6000E+02*GeV,6.2000E+02*GeV],[7.6000E+02*GeV,6.2000E+02*GeV]],5.56e-05],
 [[[2.0000E+02*GeV,6.0000E+01*GeV],[2.0000E+02*GeV,6.0000E+01*GeV]],1.51e-05],
 [[[6.8000E+02*GeV,5.2000E+02*GeV],[6.8000E+02*GeV,5.2000E+02*GeV]],0.0001297],

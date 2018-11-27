@@ -6,6 +6,7 @@ figureUrl: None
 source: SModelS
 validated: N/A
 axes: [[x, y], [x, y]]
+finalState: ['MET', 'MET']
 efficiencyMap: [[[[7.6000E+02*GeV,6.2000E+02*GeV],[7.6000E+02*GeV,6.2000E+02*GeV]],3.71e-05],
 [[[6.0000E+02*GeV,2.6000E+02*GeV],[6.0000E+02*GeV,2.6000E+02*GeV]],0.000276],
 [[[9.2000E+02*GeV,5.2000E+02*GeV],[9.2000E+02*GeV,5.2000E+02*GeV]],0.0003169],
