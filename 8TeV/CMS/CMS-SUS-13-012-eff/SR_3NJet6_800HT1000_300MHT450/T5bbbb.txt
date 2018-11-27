@@ -2,9 +2,11 @@ txName: T5bbbb
 constraint: [[['b'],['b']],[['b'],['b']]]
 condition: None
 conditionDescription: None
+figureUrl: None
 source: SModelS
 validated: N/A
 axes: [[x, 0.05*x + 0.95*y, y], [x, 0.05*x + 0.95*y, y]];[[x, 0.5*x + 0.5*y, y], [x, 0.5*x + 0.5*y, y]];[[x, 0.95*x + 0.05*y, y], [x, 0.95*x + 0.05*y, y]]
+finalState: ['MET', 'MET']
 efficiencyMap: [[[[1.0200E+03*GeV,1.4600E+02*GeV,1.0000E+02*GeV],[1.0200E+03*GeV,1.4600E+02*GeV,1.0000E+02*GeV]],0.031102],
 [[[1.0200E+03*GeV,1.9350E+02*GeV,1.5000E+02*GeV],[1.0200E+03*GeV,1.9350E+02*GeV,1.5000E+02*GeV]],0.037754],
 [[[1.0200E+03*GeV,2.4100E+02*GeV,2.0000E+02*GeV],[1.0200E+03*GeV,2.4100E+02*GeV,2.0000E+02*GeV]],0.041039],

@@ -2,9 +2,11 @@ txName: T2bb
 constraint: [[['b']],[['b']]]
 condition: None
 conditionDescription: None
+figureUrl: None
 source: SModelS
 validated: N/A
 axes: [[x, y], [x, y]]
+finalState: ['MET', 'MET']
 efficiencyMap: [[[[7.6000E+02*GeV,5.4000E+02*GeV],[7.6000E+02*GeV,5.4000E+02*GeV]],0.0012434],
 [[[3.2000E+02*GeV,3.0000E+02*GeV],[3.2000E+02*GeV,3.0000E+02*GeV]],0.0001399],
 [[[6.0000E+02*GeV,6.0000E+01*GeV],[6.0000E+02*GeV,6.0000E+01*GeV]],0.0007154],

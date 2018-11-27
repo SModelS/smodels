@@ -2,9 +2,11 @@ txName: T5ZZ
 constraint: [[['jet','jet'],['Z']],[['jet','jet'],['Z']]]
 condition: None
 conditionDescription: None
+figureUrl: None
 source: SModelS
 validated: True
 axes: [[x, 0.5*x + 0.5*y, y], [x, 0.5*x + 0.5*y, y]];[[x, 0.05*x + 0.95*y, y], [x, 0.05*x + 0.95*y, y]];[[x, 0.95*x + 0.05*y, y], [x, 0.95*x + 0.05*y, y]]
+finalState: ['MET', 'MET']
 efficiencyMap: [[[[7.0000E+02*GeV,4.9000E+02*GeV,2.8000E+02*GeV],[7.0000E+02*GeV,4.9000E+02*GeV,2.8000E+02*GeV]],0.036661],
 [[[7.5000E+02*GeV,5.3500E+02*GeV,3.2000E+02*GeV],[7.5000E+02*GeV,5.3500E+02*GeV,3.2000E+02*GeV]],0.037126],
 [[[8.0000E+02*GeV,6.4000E+02*GeV,4.8000E+02*GeV],[8.0000E+02*GeV,6.4000E+02*GeV,4.8000E+02*GeV]],0.026701],
