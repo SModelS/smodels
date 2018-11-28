@@ -49,17 +49,23 @@ used to test *runSModelS.py*.
 Citation
 ========
 
-If you use this software please cite the SModelS v1.1 manual_, 
-the original SModelS publication_, as well as the programs
+If you use this software please cite both the SModelS v11_ and v12_ manuals, 
+the original_ SModelS publication, as well as the programs
 it makes use of (pythia8_/pythia6_, NLL-fast_ and pyslha_). 
+If you use specifically the long-lived particles implementation, please cite also this_ paper.
+For the Run2 database, cite the v12_ manual and the databaseUpdate_ paper.
+
 For your convenience, the relevant
 citations are provided in bibtex format in *references.bib*.
 
 For citing the experimental analyses in the database, you can use
 *smodels-database/database.bib*.
 
-.. _manual: https://arxiv.org/abs/1701.06586
-.. _publication: https://inspirehep.net/record/1269436
+.. _v12: https://inspirehep.net/record/1705426
+.. _v11: https://inspirehep.net/record/1510436
+.. _original: https://inspirehep.net/record/1269436
+.. _this: https://inspirehep.net/record/1687820
+.. _databaseUpdate: https://inspirehep.net/record/1658765
 .. _pythia6: https://pythia6.hepforge.org/
 .. _pythia8: http://home.thep.lu.se/~torbjorn/Pythia.html
 .. _pyslha: http://www.insectnation.org/projects/pyslha.html
