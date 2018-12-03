@@ -182,6 +182,7 @@ class Uncovered(object):
                 if getattr(mother[-1], checkFor):
                     if not mother[-1].weight.getXsecsFor(self.sqrts): continue
                     missingX -= mother[-1].weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
+                    if missingX<10**(-10): missingX=0.
                     continue # do not count cross section if mother is covered, do not continue recursion for this contribution
                 if checkFor=='tested':
                     if mother[-1].elID!=0: self.outsideGridMothers.append(mother[-1].elID) # mother element is not tested, but should no longer be considered as outside grid, because we already count its contribution here
