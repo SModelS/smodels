@@ -170,9 +170,12 @@ class Uncovered(object):
         mothers = el.motherElements
         alreadyChecked = [] # for sanity check
         # if element has no mothers, the full cross section is missing
-        if not el.weight.getXsecsFor(self.sqrts): return 0.
-        missingX =  el.weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
-        if not mothers: return missingX
+        if not el.weight.getXsecsFor(self.sqrts):
+            return 0.
+        missingX =  el.weight.getXsecsFor(self.sqrts)[0].value
+        if not mothers:
+            return missingX.asNumber(fb)
+        coveredX = 0.*fb
         while mothers: # recursive loop to check all mothers
             newmothers = []
             for mother in mothers:
@@ -181,15 +184,14 @@ class Uncovered(object):
                 
                 if getattr(mother[-1], checkFor):
                     if not mother[-1].weight.getXsecsFor(self.sqrts): continue
-                    missingX -= mother[-1].weight.getXsecsFor(self.sqrts)[0].value.asNumber(fb)
-                    if missingX<10**(-10): missingX=0.
-                    continue # do not count cross section if mother is covered, do not continue recursion for this contribution
+                    coveredX += mother[-1].weight.getXsecsFor(self.sqrts)[0].value
                 if checkFor=='tested':
                     if mother[-1].elID!=0: self.outsideGridMothers.append(mother[-1].elID) # mother element is not tested, but should no longer be considered as outside grid, because we already count its contribution here
                 if all(grandmother[0] == 'original' for grandmother in mother[-1].motherElements) : continue # end of recursion if element has no mothers, we keep its cross section in missingX
                 else: newmothers += mother[-1].motherElements # if element has mother element, check also if those are covered before adding the cross section contribution
             mothers = newmothers # all new mothers will be checked until we reached the end of all recursions
-        return missingX
+        missingX = missingX - coveredX
+        return missingX.asNumber(fb)
     
 
 
