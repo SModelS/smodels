@@ -1001,6 +1001,7 @@ class SLHAPrinter(TxTPrinter):
         self.docompress = 0
         self.combinesr = 0
         self.printingOrder = [OutputStatus,TheoryPredictionList, Uncovered]
+        # self.printingOrder = [OutputStatus,ResultList, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
 
