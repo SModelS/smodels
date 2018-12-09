@@ -73,6 +73,20 @@ def resolve_dependencies( as_user = True ):
         print ( "an error has occurred when resolving the dependencies." )
         return -1
 
+def cacheDirectory ( create=False ):
+    """
+    Returns the user's smodels cache directory, i.e. ~/.cache/smodels.
+    :params create: if True, create the directory if it doesnt exist.
+    """
+    home = os.environ["HOME"]
+    cacheDir = os.path.join ( home, ".cache" )
+    if create and not os.path.exists ( cacheDir ):
+        os.mkdir ( cacheDir )
+    smodelsDir = os.path.join ( cacheDir, "smodels" )
+    if create and not os.path.exists ( smodelsDir ):
+        os.mkdir ( smodelsDir )
+    return smodelsDir
+
 def pythonDirectory():
     """
     Return the python installation directory, by looking at location of this
