@@ -84,12 +84,12 @@ def main():
     rmax = 0.
     bestResult = None
     for expResult in listOfExpRes:
-        predictions = theoryPredictionsFor(expResult, toplist)
+        predictions = theoryPredictionsFor(expResult, toplist, combinedResults=False, marginalize=False)
         if not predictions: continue # Skip if there are no constraints from this result
         print('\n %s ' %expResult.globalInfo.id)
         for theoryPrediction in predictions:
             dataset = theoryPrediction.dataset
-            datasetID = dataset.dataInfo.dataId            
+            datasetID = theoryPrediction.dataId()
             mass = theoryPrediction.mass
             txnames = [str(txname) for txname in theoryPrediction.txnames]
             PIDs =  theoryPrediction.PIDs         
@@ -108,7 +108,7 @@ def main():
             r = theoryPrediction.getRValue()
             print("r = ",r )
             #Compute likelihhod and chi^2 for EM-type results:
-            if dataset.dataInfo.dataType == 'efficiencyMap':
+            if dataset.getType() == 'efficiencyMap':
                 theoryPrediction.computeStatistics()
                 print('Chi2, likelihood=', theoryPrediction.chi2, theoryPrediction.likelihood )
             if r > rmax:

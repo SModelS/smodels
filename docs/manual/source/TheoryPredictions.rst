@@ -185,7 +185,7 @@ upper limits. More explicitly:
 
    \mbox{Element } A\;  \rightarrow \mbox{ Upper Limit}(\mbox{Element} A) = x\\
    \mbox{Element } B\;  \rightarrow \mbox{ Upper Limit}(\mbox{Element} B) = y\\
-                                       & \Rightarrow \mbox{ULdistance}(A,B) = \frac{|x-y|}{(x+y)/2}
+   \Rightarrow \mbox{ULdistance}(A,B) = \frac{|x-y|}{(x+y)/2}
    
 where ULdistance is the distance in upper limit space and :math:`x,y` are the upper limits for the |elements| A and B, respectively.
 Note, however, that with the above definition two elements may have very distinct widths and masses
@@ -195,25 +195,24 @@ define the distance in *width space* and *mass space*:
 
 .. math::
 
-   \mbox{Element } A\;  \rightarrow \mbox{mass}(\mbox{Element} A) = MA\\
-   \mbox{Element } B\;  \rightarrow \mbox{mass}(\mbox{Element} B) = MB\\
-                                       & \Rightarrow \mbox{Massdistance}(A,B) = max(\frac{|MA_i-MB_i|}{(MA_i+MB_i)/2})\\
-   \mbox{Element } A\;  \rightarrow \mbox{width}(\mbox{Element} A) = \Gamma A\\
-   \mbox{Element } B\;  \rightarrow \mbox{width}(\mbox{Element} B) = \Gamma B\\
-                                       & \Rightarrow \mbox{Widthdistance}(A,B) = max(\frac{|\Gamma A_i-\Gamma B_i|}{(\Gamma A_i+\Gamma B_i)/2})
+   \mbox{Element } A\;  \rightarrow \mbox{mass}(\mbox{Element} A) = MA, \; \mbox{width}(\mbox{Element} A) = \Gamma A\\
+   \mbox{Element } B\;  \rightarrow \mbox{mass}(\mbox{Element} B) = MB, \; \mbox{width}(\mbox{Element} B) = \Gamma B\\
+   \Rightarrow \mbox{Massdistance}(A,B) = max(\frac{|MA_i-MB_i|}{(MA_i+MB_i)/2})\\
+   \Rightarrow \mbox{Widthdistance}(A,B) = max(\frac{|\Gamma A_i-\Gamma B_i|}{(\Gamma A_i+\Gamma B_i)/2})
                                        
 
-where :math:`MX_i (\GammaX_i)` is the mass (width) of the *i*-th BSM state appearing in the element *X*.
+where :math:`MX_i (\Gamma X_i)` is the mass (width) of the *i*-th BSM state appearing in the element *X*.
 
 
 Finally we define the (relative) distance between two elements as: 
 
 .. math::
-   \mbox{distance}(A,B) = max(\mbox{ULdistance),\mbox{Massdistance}\mbox{Widthdistance})   
+
+   \mbox{distance} (A,B)\; = max(\mbox{ULdistance},\mbox{Massdistance},\mbox{Widthdistance})   
 
 Notice that the above definition of distance quantifies the experimental analysis
 sensitivity to differences in masses and widths and also ensures
-that elements with very distinct mass or width values values but similar upper limits are not
+that elements with very distinct mass or width values but similar upper limits are not
 clustered together.
 
 * **The mass distance function is implemented by the** `distance <theory.html#theory.auxiliaryFunctions.distance>`_ **method**
