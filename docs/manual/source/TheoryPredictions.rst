@@ -129,25 +129,25 @@ Element Clustering
 Naively one would expect that after all the |elements| appearing in the :ref:`constraint <ULconstraint>`
 have been selected, it is trivial to compute the theory prediction: one must simply 
 sum up the weights (|sigBR|) of all the selected |elements|.
-However, the selected |elements| usually differ in their masses [*]_ and the
+However, the selected |elements| usually differ in their masses and/or lifetimes [*]_ and the
 experimental limit (see :ref:`Upper Limit constraint <ULconstraint>`) assumes that all the |elements| appearing
-in the :ref:`constraint <ULconstraint>` have the same mass (or mass array).
-As a result, the selected |elements| must be grouped into *clusters* of equal masses.
-When grouping the |elements|, however, one must allow for small mass differences, 
-since the experimental efficiencies should not be strongly sensitive to small mass
-differences. For instance, assume two |elements| contain identical mass arrays, except for the parent masses
+in the :ref:`constraint <ULconstraint>` have the same mass/width (or mass and width arrays).
+As a result, the selected |elements| must be grouped into *clusters* of equal masses/widths.
+When grouping the |elements|, however, one must allow for small mass/width differences, 
+since the experimental efficiencies should not be strongly sensitive to small changes
+in the mass of width of the particles appearing in the element.
+For instance, assume two |elements| contain identical widths and mass arrays, except for the parent masses
 which differ by 1 MeV. In this case it is obvious that for all experimental purposes the two |elements|
-have identical masses and should contribute to the same theory prediction (e.g. their weights should be
+are identical and should contribute to the same theory prediction (e.g. their weights should be
 added when computing the signal cross section). 
 Unfortunately there is no way to
-unambiguously define ''similar masses'' and the definition should depend on the |ExpRes|, since
-different results will be more or less sensitive to mass differences. SModelS uses an UL map-dependent
-measure of the distance between two |element| masses, as described in :ref:`Mass Distance <massdist>`.
+unambiguously define ''similar masses/widths'' and the definition should depend on the |ExpRes|, since
+different results will be more or less sensitive to differences in mass or widths.
+SModelS uses an UL map-dependent measure of the distance between two |elements|, as described in :ref:`distance <distance>`.
 
-
-If two of the selected |elements| have a :ref:`mass distance <massdist>` smaller
+If two of the selected |elements| have a :ref:`distance <distance>` smaller
 than a maximum value (defined by `maxDist <theory.html#theory.clusterTools.clusterElements>`_),
-they are gouped in the same mass cluster, as illustrated by the example below:
+they are gouped in the same cluster, as illustrated by the example below:
 
 
 
@@ -162,34 +162,58 @@ and compared against the experimental upper limit.
 
 * **The clustering of elements is implemented by the** `clusterElements <theory.html#theory.clusterTools.clusterElements>`_  **method**.
 
-.. _massdist:  
+.. _distance:  
 
-Mass Distance
-^^^^^^^^^^^^^
+Relative Distance between Elements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 As mentioned :ref:`above <ULcluster>`, in order to cluster the |elements| it is necessary
-to determine whether two |elements| have similar masses (see |element| and :ref:`Bracket Notation <bracketnotation>`
-for more details on |element| mass).
-Since an absolute definition of ''similar masses'' is not possible and the sensitivity to mass differences
-depends on the experimental result, SModelS uses an ''upper limit map-dependent'' definition. For each |element|'s mass array,
-the upper limit for the corresponding mass values is obtained from the UL map (see |ULr|).
-This way, each mass array is mapped to a single number (the cross section upper limit for the experimental result).
-Then the distance between the two |element|'s masses is simply given by the relative difference between their respective
+to determine whether two |elements| have similar masses/widths (see |element| and :ref:`Bracket Notation <bracketnotation>`
+for more details on |element| mass and width).
+Since an absolute definition of ''similar masses/widths'' is not possible and the sensitivity to mass differences
+depends on the experimental result, SModelS uses an ''upper limit map-dependent'' definition.
+
+For each |element|, the upper limit for the corresponding element is obtained from the UL map (see |ULr|).
+Note that this upper limit already includes the rescaling due to the widths of the intermediate and final
+state particles appearing in the element. Hence of two elements have the same mass, but distinct widths,
+their upper limits will be differ.
+This way, each element is mapped to a single number (the cross section upper limit for the experimental result).
+Then the distance between the two |elements| is simply given by the relative difference between their respective
 upper limits. More explicitly:
 
 .. math::
 
-   \mbox{Element } A\; (& M_A = [[M1,M2,...],[m1,m2,...]]) \rightarrow \mbox{ Upper Limit}(M_A) = x\\
-   \mbox{Element } B\; (& M_B = [[M1',M2',...],[m1',m2',...]]) \rightarrow \mbox{ Upper Limit}(M_B) = y\\
-                                       & \Rightarrow \mbox{mass distance}(A,B) = \frac{|x-y|}{(x+y)/2}
+   \mbox{Element } A\;  \rightarrow \mbox{ Upper Limit}(\mbox{Element} A) = x\\
+   \mbox{Element } B\;  \rightarrow \mbox{ Upper Limit}(\mbox{Element} B) = y\\
+                                       & \Rightarrow \mbox{ULdistance}(A,B) = \frac{|x-y|}{(x+y)/2}
    
-where :math:`M_A,M_B` (:math:`x,y`) are the mass arrays (upper limits) for the |elements| A and B, respectively.
-If the mass distance of two |elements| is smaller than `maxDist <theory.html#theory.clusterTools.clusterElements>`_,
-the two masses are considered similar.
+where ULdistance is the distance in upper limit space and :math:`x,y` are the upper limits for the |elements| A and B, respectively.
+Note, however, that with the above definition two elements may have very distinct widths and masses
+and still have a small value of ULdistance, since the latter usually is a complicated function of the masses
+and widths. In order to avoid clustering together elements which have very distinct masses and widths we also
+define the distance in *width space* and *mass space*:
 
-Notice that the above definition of mass distance quantifies the experimental analysis
-sensitivity to mass differences, which is the relevant parameter when :ref:`clustering elements <ULcluster>`.
-Also, a check is performed to ensure that masses with very distinct values but similar upper limits are not
+.. math::
+
+   \mbox{Element } A\;  \rightarrow \mbox{mass}(\mbox{Element} A) = MA\\
+   \mbox{Element } B\;  \rightarrow \mbox{mass}(\mbox{Element} B) = MB\\
+                                       & \Rightarrow \mbox{Massdistance}(A,B) = max(\frac{|MA_i-MB_i|}{(MA_i+MB_i)/2})\\
+   \mbox{Element } A\;  \rightarrow \mbox{width}(\mbox{Element} A) = \Gamma A\\
+   \mbox{Element } B\;  \rightarrow \mbox{width}(\mbox{Element} B) = \Gamma B\\
+                                       & \Rightarrow \mbox{Widthdistance}(A,B) = max(\frac{|\Gamma A_i-\Gamma B_i|}{(\Gamma A_i+\Gamma B_i)/2})
+                                       
+
+where :math:`MX_i (\GammaX_i)` is the mass (width) of the *i*-th BSM state appearing in the element *X*.
+
+
+Finally we define the (relative) distance between two elements as: 
+
+.. math::
+   \mbox{distance}(A,B) = max(\mbox{ULdistance),\mbox{Massdistance}\mbox{Widthdistance})   
+
+Notice that the above definition of distance quantifies the experimental analysis
+sensitivity to differences in masses and widths and also ensures
+that elements with very distinct mass or width values values but similar upper limits are not
 clustered together.
 
 * **The mass distance function is implemented by the** `distance <theory.html#theory.auxiliaryFunctions.distance>`_ **method**

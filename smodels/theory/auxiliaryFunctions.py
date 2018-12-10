@@ -20,34 +20,41 @@ from smodels.experiment.finalStateParticles import finalStates
 #Get all finalStateLabels
 finalStateLabels = finalStates.getValuesFor('label')
 
-def massPosition(mass, txdata):
-    """ Give mass position in upper limit space.    
-    Use the analysis experimental limit data. 
-    :param txdata: TxNameData object holding the data and interpolation   
+
+def distance(ul1, ul2, el1=None, el2=None):
     """
-    xmass = txdata.getValueFor(mass)
-    if type(xmass) != type(1.*pb):
-        return None
-
-    return xmass.asNumber(fb)
-
-
-def distance(xmass1, xmass2):
-    """
-    Define distance between two mass positions in upper limit space.
-    The distance is defined as d = 2*|xmass1-xmass2|/(xmass1+xmass2).
+    Define distance between two values in upper limit space.
+    The distance is defined as d = 2*|ul1-ul2|/(ul1+ul2).
+    If el1 and el2 are Element objects, the distance
+    includes the relative differences between their masses
+    and widths: d = max([d_ul,d_mass,d_width])
     
     
-    :parameter xmass1: upper limit value (in fb) for the mass1
-    :parameter xmass2: upper limit value (in fb) for the mass2
-    :returns: relative mass distance in upper limit space     
+    :parameter ul1: upper limit value (in fb) for element1
+    :parameter ul2: upper limit value (in fb) for element2
+    :parameter el1: Element1
+    :parameter el2: Element2
+
+    :returns: relative distance
     """
-    if xmass1 is None or xmass2 is None:
+    if ul1 is None or ul2 is None:
         return None
-    distanceValue = 2.*abs(xmass1 - xmass2) / (xmass1 + xmass2)
-    if distanceValue < 0.:
+    ulDistance = 2.*abs(ul1 - ul2)/(ul1 + ul2)
+    if ulDistance < 0.:
         # Skip masses without an upper limit
         return None
+    if (not el1 is None) and (not el2 is None):
+        mass1 = [x.asNumber(GeV) for x in _flattenList(el1.getMasses())]
+        mass2 = [x.asNumber(GeV) for x in _flattenList(el2.getMasses())]
+        width1 = [x.totalwidth.asNumber(GeV) for x in _flattenList(el1.getBSMparticles())]
+        width2 = [x.totalwidth.asNumber(GeV) for x in _flattenList(el1.getBSMparticles())]
+        massDistance = max([0.]+[2*abs(m1-mass2[i])/(m1+mass2[i]) for i,m1 in enumerate(mass1) if m1 != mass2[i]])
+        widthDistance = max([0.]+[2*abs(w1-width2[i])/(w1+width2[i]) for i,w1 in enumerate(width1) if w1 != width2[i]])
+    else:
+        massDistance = 0.
+        widthDistance = 0.
+
+    distanceValue = max([ulDistance,massDistance,widthDistance])
     
     return distanceValue
 

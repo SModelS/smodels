@@ -8,7 +8,7 @@
 """
 
 from smodels.theory import crossSection
-from smodels.theory.auxiliaryFunctions import massAvg, massPosition, distance
+from smodels.theory.auxiliaryFunctions import massAvg, distance
 from smodels.tools.physicsUnits import fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
@@ -126,25 +126,18 @@ class IndexCluster(object):
 
     :ivar indices: list of integers mapping the cluster elements to their position in the list
                    (1st element -> index 0, 2nd element -> index 1,...)
-    :ivar avgPosition: position in upper limit space for the cluster average mass
-    :ivar massMap: dictionary with indices as keys and the corresponding element mass as values
-    :ivar positionMap: dictionary with indices as keys and the corresponding element position
-                        in upper limit space as values
+    :ivar elementMap: dictionary with indices as keys and the corresponding element as values
+    :ivar ulMap: dictionary with indices as keys and the corresponding element upper limit as values
     :ivar weightMap: dictionary with indices as keys and the corresponding element weight
                      as values
     :ivar txdata: TxNameData object to be used for computing distances in UL space
     """
-    def __init__(self, massMap=None, posMap=None, wMap=None, indices=set([]), txdata = None):
+    def __init__(self, elementMap=None, ulMap=None, wMap=None, indices=set([]), txdata = None):
         self.indices = indices
-        self.avgPosition = None
-        self.massMap = massMap
-        self.positionMap = posMap
+        self.elementMap = elementMap
+        self.positionMap = ulMap
         self.weightMap = wMap
         self.txdata = txdata
-
-
-        if massMap and posMap and wMap and len(self.indices) > 0:
-            self.avgPosition = self._getAvgPosition()
 
 
     def __eq__(self, other):
@@ -170,13 +163,12 @@ class IndexCluster(object):
 
         newcluster = IndexCluster()
         newcluster.indices = set(list(self.indices)[:])
-        newcluster.avgPosition = self.avgPosition
         if type(self.positionMap) == type(dict()):
             newcluster.positionMap = dict(self.positionMap.items())
         else: newcluster.positionMap = None
-        if type(self.massMap) == type(dict()):
-            newcluster.massMap = dict(self.massMap.items())
-        else: newcluster.massMap = None
+        if type(self.elementMap) == type(dict()):
+            newcluster.maselementMapsMap = dict(self.elementMap.items())
+        else: newcluster.elementMap = None
         if type(self.weightMap) == type(dict()):
             newcluster.weightMap = dict(self.weightMap.items())
         else: newcluster.weightMap = None
@@ -198,8 +190,6 @@ class IndexCluster(object):
 
         indices = list(self.indices).extend(ilist)
         self.indices = set(indices)
-        self.avgPosition = self._getAvgPosition()
-
 
     def remove(self, iels):
         """
@@ -216,62 +206,39 @@ class IndexCluster(object):
         for iel in ilist:
             indices.remove(iel)
         self.indices = set(indices)
-        self.avgPosition = self._getAvgPosition()
 
 
-    def _getAvgPosition(self):
-        """
-        Return the average position in upper limit space for all indices
-        belonging to the cluster.
-
-        """
-        if len(list(self.indices)) == 1:
-            return self.positionMap[self[0]]
-        masses = [self.massMap[iel] for iel in self]
-        weights = [self.weightMap[iel] for iel in self]
-        clusterMass = massAvg(masses,weights=weights)
-        avgPos = self.txdata.getValueFor(clusterMass)
-        if avgPos is None:
-            return False
-        else:
-            return (avgPos/fb).asNumber()
-
-    def _getDistanceTo(self, obj):
+    def _getDistanceTo(self, elIndex):
         """
         Return the maximum distance between any elements belonging to the
-        cluster and the object obj.
+        cluster and the element object corresponding to the element index elIndex.
 
-        obj can be a position in upper limit space or an element index.
-
+        :parameter elIndex: Element index in elementMap.
+        :return: maximum distance (float)
         """
 
-        dmax = 0.
-        if type(obj) == type(int()) and obj >= 0:
-            pos = self.positionMap[obj]
-        elif type(obj) == type(1.):
-            pos = obj
-        else:
-            logger.error("Unknown object type (must be an element index or "
-                         "position)")
+        if not isinstance(elIndex,int):
+            logger.error("Unknown object type (must be an element index")
+            raise SModelSError()
+        elif not elIndex in self.positionMap:
+            logger.error("Element index %i not found in postion map" %elIndex)
             raise SModelSError()
 
-        for jel in self:
-            dmax = max(dmax, distance(pos, self.positionMap[jel]))
+        pos = self.positionMap[elIndex]
+        el = self.elementMap[elIndex]
+        dmax = max([distance(pos, self.positionMap[iel],el,self.elementMap[iel]) for iel in self])
+
         return dmax
 
 
     def _getMaxInternalDist(self):
         """
         Return the maximum distance between any pair of elements belonging
-        to the cluster as well as the cluster center and any element.
-
+        to the cluster.
         """
-        dmax = 0.
-        if self.avgPosition is None:
-            self.avgPosition = self._getAvgPosition()
-        for iel in self:
-            dmax = max(dmax, distance(self.positionMap[iel], self.avgPosition))
-            dmax = max(dmax, self._getDistanceTo(iel))
+
+        dmax = max([self._getDistanceTo(iel) for iel in self])
+
         return dmax
 
 
@@ -306,21 +273,22 @@ def groupAll(elements):
 
 def clusterElements(elements, maxDist):
     """
-    Cluster the original elements according to their mass distance.
+    Cluster the original elements according to their distance in mass and lifetime space.
 
     :parameter elements: list of elements (Element objects)
     :parameter txname: TxName object to be used for computing distances in UL space
-    :parameter maxDist: maximum mass distance for clustering two elements
+    :parameter maxDist: maximum distance for clustering two elements
 
     :returns: list of clusters (ElementCluster objects)
     """
-    if len(elements) == 0:  return []
+    if len(elements) == 0:
+        return []
     txnames = list(set([el.txname for el in elements]))
     if len(txnames) != 1:
         logger.error("Clustering elements with different Txnames!")
         raise SModelSError()
     txdata = txnames[0].txnameData
-    # ElementCluster elements by their mass:
+    # ElementCluster elements:
     clusters = _doCluster(elements, txdata, maxDist)
     for cluster in clusters:
         cluster.txnames = txnames
@@ -333,42 +301,34 @@ def _doCluster(elements, txdata, maxDist):
 
     :parameter elements: list of all elements to be clustered
     :parameter txdata: TxNameData object to be used for computing distances in UL space
-    :parameter maxDist: maximum mass distance for clustering two elements
+    :parameter maxDist: maximum distance for clustering two elements
 
     :returns: a list of ElementCluster objects containing the elements
-    belonging to the cluster
+              belonging to the cluster
     """
-    # First build the element:mass, element:position in UL space
+    # First build the index:element, index:upperLimit space
     # and element:maxWeight (in fb) dictionaries
     #(Combine elements with identical masses)
-    massMap = {}
-    posMap = {}
+    elementMap = {}
+    ulMap = {}
     weightMap = {}
     for iel, el in enumerate(elements):
-        #print (el, el.txname)
-        if not el.getMasses() in massMap.values():
-            massMap[iel] = el.getMasses()
-            posMap[iel] = massPosition(massMap[iel], txdata)
-            weightMap[iel] = el.weight.getMaxXsec().asNumber(fb)
-        else:
-            j = list(massMap.keys())[list(massMap.values()).index(el.getMasses())]
-            weightMap[j] += el.weight.getMaxXsec().asNumber(fb)
+        elementMap[iel] = el
+        ulMap[iel] = txdata.getValueFor(el).asNumber(fb)
+        weightMap[iel] = el.weight.getMaxXsec().asNumber(fb)
 
     # Start with maximal clusters
     clusterList = []
-    for iel in posMap:
+    for iel in ulMap:
         indices = [iel]
-        for jel in posMap:                     
-            if distance(posMap[iel], posMap[jel]) <= maxDist:
-                indices.append(jel) 
-        indexCluster = IndexCluster(massMap, posMap, weightMap, set(indices),txdata)
-        #Ignore cluster which average mass falls oustide the grid:
-        if indexCluster.avgPosition:
-            clusterList.append(indexCluster)
+        for jel in ulMap:
+            if distance(ulMap[iel], ulMap[jel], elementMap[iel], elementMap[jel]) <= maxDist:
+                indices.append(jel)
+        indexCluster = IndexCluster(elementMap, ulMap, weightMap, set(indices),txdata)
+        clusterList.append(indexCluster)
 
     #Split the maximal clusters until all elements inside each cluster are
-    #less than maxDist apart from each other and the cluster average position
-    #is less than maxDist apart from all elements
+    #less than maxDist apart from each other
     finalClusters = []
     newClusters = True
     while newClusters:
@@ -379,19 +339,15 @@ def _doCluster(elements, txdata, maxDist):
                 if not indexCluster in finalClusters:
                     finalClusters.append(indexCluster)
                 continue
-            # Distance to cluster center (average)
-            distAvg = indexCluster._getDistanceTo(indexCluster.avgPosition)
-            #Loop over cluster elements and if element distance or cluster
-            #average distance falls outside the cluster, remove element
+            #Loop over cluster elements and if element distance is greater than maxDist
+            #remove element
             for iel in indexCluster:
                 dist = indexCluster._getDistanceTo(iel)
-                if max(dist, distAvg) > maxDist:
+                if dist > maxDist:
                     newcluster = indexCluster.copy()
                     newcluster.remove(iel)
                     if not newcluster in newClusters:
-                        #Ignore cluster which average mass falls oustide the grid:
-                        if newcluster.avgPosition:
-                            newClusters.append(newcluster)
+                        newClusters.append(newcluster)
 
         clusterList = newClusters
         # Check for oversized list of indexCluster (too time consuming)
@@ -402,8 +358,8 @@ def _doCluster(elements, txdata, maxDist):
 
     # finalClusters = finalClusters + clusterList
     # Add clusters of individual masses (just to be safe)
-    for iel in massMap:
-        finalClusters.append(IndexCluster(massMap, posMap, weightMap,
+    for iel in elementMap:
+        finalClusters.append(IndexCluster(elementMap, ulMap, weightMap,
                                            set([iel])))
 
     # Clean up clusters (remove redundant clusters)
@@ -422,10 +378,7 @@ def _doCluster(elements, txdata, maxDist):
     clusterList = []
     for indexCluster in finalClusters:
         cluster = ElementCluster()
-        masses = [massMap[iel] for iel in indexCluster]
-        for el in elements:
-            if el.getMasses() in masses: 
-                cluster.elements.append(el)
+        cluster.elements = [elementMap[iel] for iel in indexCluster]
         clusterList.append(cluster)
 
     return clusterList

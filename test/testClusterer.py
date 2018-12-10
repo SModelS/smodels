@@ -37,8 +37,10 @@ class ClustererTest(unittest.TestCase):
         u = SMparticles.u
         gluino = mssm.gluino
         gluino.__setattr__("mass", 675.*GeV)
+        gluino.__setattr__('totalwidth',float('inf')*GeV)
         n1 = mssm.n1
         n1.__setattr__("mass", 200.*GeV)
+        n1.__setattr__('totalwidth',0.*GeV)
         
 
         w1 = XSectionList()
