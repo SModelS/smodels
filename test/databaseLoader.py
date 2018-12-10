@@ -15,6 +15,7 @@ from smodels.experiment.databaseObj import Database
 from smodels.installation import version
 ver = "".join(map(str, version(True)))
 dbname="http://smodels.hephy.at/database/unittest%s" % ver
+#dbname = './database'
 database = Database(dbname, discard_zeroes = False)
 
 if __name__ == "__main__":

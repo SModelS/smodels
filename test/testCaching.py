@@ -31,8 +31,8 @@ class CachingTest(unittest.TestCase):
         #    print masses,result,Cache.size()
         self.assertEquals ( Cache.size(), 7 )
         m = [ [ 270*GeV, 100*GeV], [ 270*GeV, 100*GeV ] ]
-        result=txname.txnameData.getValueFor( m )
-        self.assertAlmostEquals(result.asNumber ( fb ) , 459.658) 
+        result=txname.txnameData.getValueFor(m)
+        self.assertAlmostEqual(result.asNumber(fb) , 459.658) 
 
 if __name__ == "__main__":
     unittest.main()
