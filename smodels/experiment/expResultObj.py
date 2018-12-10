@@ -216,7 +216,7 @@ class ExpResult(object):
         
         dataset = self.getDataset(dataID)
         if dataset:
-            upperLimit = dataset.getUpperLimitFor(mass=mass,expected = expected, 
+            upperLimit = dataset.getUpperLimitFor(element=mass,expected = expected,
                                                       txnames = txname,
                                                       compute=compute,alpha=alpha)
             return upperLimit

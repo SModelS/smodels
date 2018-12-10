@@ -32,7 +32,7 @@ class Interpolation1DTest(unittest.TestCase):
                 [[[1.4098E+03*GeV],[1.4098E+03*GeV]],5.1410E-04*pb],
                 [[[1.6005E+03*GeV],[1.6005E+03*GeV]],5.8110E-04*pb]]
         
-        txnameData=TxNameData ( data, "upperLimits",
+        txnameData=TxNameData ( data, "upperLimit",
                 sys._getframe().f_code.co_name )
 
         self.assertEqual(txnameData.dimensionality,1)

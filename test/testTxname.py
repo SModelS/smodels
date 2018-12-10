@@ -67,7 +67,8 @@ class TxTest(unittest.TestCase):
         el.branches[0].oddParticles = [n1]
         el.branches[1].oddParticles = [c1]        
         
-        self.assertEqual(tx.getEfficiencyFor(el), 0.12396)
+        print(tx.txnameData.dataType)
+        self.assertEqual(tx.getEfficiencyFor(el.getMasses()), 0.12396)
          
 
 

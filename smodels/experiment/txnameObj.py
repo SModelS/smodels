@@ -79,12 +79,15 @@ class TxName(object):
                 logger.info("Duplicated field %s found in file %s" \
                              % (tag, self.path))
             if ';' in value: value = value.split(';')
-            if tag == 'upperLimits' or tag == 'efficiencyMap':
+            if tag == 'upperLimits':
                 data = value
                 dataType = 'upperLimit'
             elif tag == 'expectedUpperLimits':
                 expectedData = value
                 dataType = 'upperLimit'
+            elif tag == 'efficiencyMap':
+                data = value
+                dataType = 'efficiencyMap'
             else:
                 self.addInfo(tag,value)
 
@@ -131,6 +134,9 @@ class TxName(object):
 
     def __str__(self):
         return self.txName
+
+    def __repr__(self):
+        return self.__str__()
 
     def __lt__ ( self, other ):
         """ sort by txName """
@@ -518,6 +524,9 @@ class TxNameData(object):
             return reweightFactor
 
         val = self.getValueForMass(massarray)
+        if val is None:
+            return val
+
         val *= reweightFactor
 
         return val

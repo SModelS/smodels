@@ -35,7 +35,7 @@ class ExtrapolationTest(unittest.TestCase):
              [ [[ 200.*GeV,100.*GeV], [ 200.*GeV,100.*GeV] ],  5.*fb ],
              [ [[ 300.*GeV,200.*GeV], [ 300.*GeV,200.*GeV] ], 15.*fb ],
              [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ] ]
-        self.txnameData = TxNameData( data, "upperLimits",
+        self.txnameData = TxNameData( data, "upperLimit",
                 sys._getframe().f_code.co_name, .05 )
 
     def tryWith ( self, masses ):

@@ -11,11 +11,9 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-import math
 from smodels.experiment.txnameObj import TxNameData
-from smodels.tools.physicsUnits import GeV, TeV, pb, fb
+from smodels.tools.physicsUnits import GeV, pb, fb
 from databaseLoader import database
-from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 class InterpolationTest(unittest.TestCase):
     def testExpected(self):
@@ -23,8 +21,8 @@ class InterpolationTest(unittest.TestCase):
                     datasetIDs=[None], txnames=[ "T1tttt" ] )
         txname=expRes[0].datasets[0].txnameList[0]
         m = [[650.0*GeV, 50.0*GeV], [650.0*GeV, 50.0*GeV]]
-        observed = txname.getValueFor ( m, expected = False )
-        expected = txname.getValueFor ( m, expected = True )
+        observed = txname.getULFor( m, expected = False )
+        expected = txname.getULFor( m, expected = True )
         delta = abs ( ( ( observed - expected ) / observed ).asNumber() )
         self.assertTrue ( delta > .55 and delta < .60 )
 
@@ -33,7 +31,7 @@ class InterpolationTest(unittest.TestCase):
                     datasetIDs=[None], txnames=["T2bb" ] )
         txname=expRes[0].datasets[0].txnameList[0]
         m = [[650.0*GeV, 50.0*GeV], [650.0*GeV, 50.0*GeV]]
-        expected = txname.getValueFor ( m, expected = True )
+        expected = txname.getULFor(m, expected = True)
         self.assertTrue(expected is None)
 
     def testInterpolation(self):
@@ -91,7 +89,7 @@ class InterpolationTest(unittest.TestCase):
              [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], 15.*fb ], 
              [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ], 
              [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], 19.*fb ], ]
-        txnameData=TxNameData ( data, "upperLimits",
+        txnameData=TxNameData ( data, "upperLimit",
                 sys._getframe().f_code.co_name )
         result=txnameData.getValueFor([[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
         self.assertAlmostEqual( result.asNumber(pb),0.0115 ) 

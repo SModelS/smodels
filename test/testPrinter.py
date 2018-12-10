@@ -27,6 +27,7 @@ from smodels import particlesLoader
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
+import pyslha
 
 def sortXML(xmltree):
     for el in xmltree:        
@@ -145,7 +146,7 @@ class RunPrinterTest(unittest.TestCase):
         sample = summaryReader.Summary(samplefile,allowedDiff=0.05)
         try:
             self.assertEqual(sample, output)
-        except AssertionError as e:
+        except AssertionError:
             msg = "%s != %s" %(sample, output) 
             raise AssertionError(msg)
         self.removeOutputs ( outputfile )
@@ -292,7 +293,7 @@ class RunPrinterTest(unittest.TestCase):
            
         try:
             self.assertTrue(compareSLHA(slhaDefault, slhaNew))
-        except AssertionError as e:
+        except AssertionError:
             msg = "%s != %s" %(slhaDefault, slhaNew) 
             raise AssertionError(msg)
         self.removeOutputs ( './unitTestOutput/printer_output.smodelsslha' )  

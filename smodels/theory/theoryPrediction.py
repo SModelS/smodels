@@ -82,10 +82,10 @@ class TheoryPrediction(object):
                 self.expectedUL = self.dataset.getSRUpperLimit(expected=True,deltas_rel=deltas_rel)
                 self.upperLimit = self.dataset.getSRUpperLimit(expected=False,deltas_rel=deltas_rel)
             if self.dataType() == 'upperLimit':                
-                self.expectedUL = self.dataset.getUpperLimitFor(mass=self.mass,
+                self.expectedUL = self.dataset.getUpperLimitFor(element=self.mass,
                                                                 txnames=self.txnames,
                                                                 expected=True)
-                self.upperLimit = self.dataset.getUpperLimitFor(mass=self.mass,
+                self.upperLimit = self.dataset.getUpperLimitFor(element=self.mass,
                                                                 txnames=self.txnames,
                                                                 expected=False)
             if self.dataType() == 'combined':
