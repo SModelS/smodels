@@ -174,7 +174,7 @@ class Browser(object):
         for tx in txnames:
             if not tx.txName == txname:
                 continue
-            return tx.getValueFor(massarray,expected)
+            return tx.getULFor(massarray,expected)
 
         logger.warning( "Could not find TxName %s ." % (txname))
         return None

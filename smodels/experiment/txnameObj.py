@@ -20,6 +20,7 @@ from smodels.theory.element import Element
 from smodels.theory.topology import TopologyList
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from smodels.tools.caching import _memoize
 from smodels.tools.physicsUnits import m
 from smodels.tools.reweighting import defaultEffReweight,defaultULReweight
 from scipy.linalg import svd
@@ -29,7 +30,6 @@ import unum
 import copy
 import math,itertools
 from math import floor, log10
-from operator import isCallable
 
 
 #Build a dictionary with defined units. It can be used to evaluate
@@ -304,7 +304,7 @@ class TxNameData(object):
                 raise SModelSError("Default reweighting function not defined for data type %s" %self.dataType)
         else:
             self.reweightF = reweightF
-        if not isCallable(self.reweightF):
+        if not callable(self.reweightF):
             raise SModelSError("Reweighting for data (%s) is not defined as a function" %reweightF)
 
     def __str__ ( self ):
@@ -517,6 +517,20 @@ class TxNameData(object):
         if not reweightFactor:
             return reweightFactor
 
+        val = self.getValueForMass(massarray)
+        val *= reweightFactor
+
+        return val
+
+    @_memoize
+    def getValueForMass(self,massarray):
+        """
+        Interpolates the value and returns the UL or efficiency for the
+        respective mass array.
+
+        :param massarray: Mass array (with units)
+        """
+
         porig = self.removeUnits(massarray)
         porig = self.formatInput(porig,self.dataShape) #Remove entries which match inclusives
         porig = self.flattenArray(porig) ## flatten        
@@ -545,9 +559,8 @@ class TxNameData(object):
         else:
             val = self._returnProjectedValue()
 
-        val *= reweightFactor
-
         return val
+
 
     def flattenArray(self, objList):
         """
