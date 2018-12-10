@@ -160,9 +160,9 @@ class ExpResult(object):
         self.getDataset ( dataset ).getEfficiencyFor ( txname, mass )
         """
         
-        dataset = self.getDataset( dataset )
+        dataset = self.getDataset(dataset)
         if dataset:
-            return dataset.getEfficiencyFor( txname, mass )
+            return dataset.getEfficiencyFor(txname, mass)
         return None
 
     def hasCovarianceMatrix( self ):

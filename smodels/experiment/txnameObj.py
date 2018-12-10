@@ -20,7 +20,8 @@ from smodels.theory.element import Element
 from smodels.theory.topology import TopologyList
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from smodels.tools.caching import _memoize
+from smodels.tools.physicsUnits import m
+from smodels.tools.reweighting import defaultEffReweight,defaultULReweight
 from scipy.linalg import svd
 import scipy.spatial.qhull as qhull
 import numpy as np
@@ -28,6 +29,8 @@ import unum
 import copy
 import math,itertools
 from math import floor, log10
+from operator import isCallable
+
 
 #Build a dictionary with defined units. It can be used to evaluate
 #expressions containing units.
@@ -41,12 +44,13 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
 
-    def __init__(self, path, globalObj, infoObj):
+    def __init__(self, path, globalObj, infoObj,reweightF=None):
         self.path = path
         self.globalInfo = globalObj
         self._infoObj = infoObj
         self.txnameData = None
         self.txnameDataExp = None ## expected Data
+        self.reweightF = None
         self._topologyList = TopologyList()
 
         logger.debug('Creating object based on txname file: %s' %self.path)
@@ -77,18 +81,19 @@ class TxName(object):
             if ';' in value: value = value.split(';')
             if tag == 'upperLimits' or tag == 'efficiencyMap':
                 data = value
-                dataType = tag
+                dataType = 'upperLimit'
             elif tag == 'expectedUpperLimits':
                 expectedData = value
-                dataType = 'upperLimits'
+                dataType = 'upperLimit'
             else:
                 self.addInfo(tag,value)
 
         ident = self.globalInfo.id+":"+dataType[0]+":"+ str(self._infoObj.dataId)
         ident += ":" + self.txName
-        self.txnameData = TxNameData(data, dataType, ident )
+
+        self.txnameData = TxNameData(data, dataType, ident,reweightF=reweightF)
         if expectedData:
-            self.txnameDataExp = TxNameData( expectedData, dataType, ident )
+            self.txnameDataExp = TxNameData( expectedData, dataType, ident, reweightF=reweightF)
 
         #Builds up a list of elements appearing in constraints:
         if hasattr(self,'finalState'):
@@ -131,23 +136,30 @@ class TxName(object):
         """ sort by txName """
         return self.txName < other.txName
 
-    def getValueFor(self,massarray,expected=False ):
-        """ 
-        Access txnameData and txnameDataExp to get value for 
-        massarray.
+    def getULFor(self,element,expected=False ):
+        """
+        Returns the upper limit (or expected) for element (only for upperLimit-type).
+        Includes the lifetime reweighting (ul/reweight).
+        If called for efficiencyMap results raises an error. 
+        If a mass array is given as input, no lifetime reweighting will be applied.
 
-        :param massarray: mass array values (with units), i.e.
-                          [[100*GeV,10*GeV],[100*GeV,10*GeV]]
+        :param element: Element object or mass array (with units)
         :param expected: query self.txnameDataExp
         """
+
+        if not self.txnameData.dataType == 'upperLimit':
+            logger.error("getULFor method can only be used in UL-type data.")
+            raise SModelSError()
+
         if not expected:
-            return self.txnameData.getValueFor( massarray )
+            ul = self.txnameData.getValueFor(element)
         else:
             if not self.txnameDataExp:
                 return None
             else:
-                return self.txnameDataExp.getValueFor( massarray )
+                ul = self.txnameDataExp.getValueFor(element)
 
+        return ul
 
     def addInfo(self,tag,value):
         """
@@ -175,7 +187,6 @@ class TxName(object):
                 setattr(self,tag,value)
             except TypeError:
                 setattr(self,tag,value)
-
 
     def getInfo(self, infoLabel):
         """
@@ -219,7 +230,7 @@ class TxName(object):
             matches = sorted(matches, key = lambda el: el.getMasses(),reverse=True)
             return matches[0]
 
-    def hasLikelihood ( self ):
+    def hasLikelihood(self):
         """ can I construct a likelihood for this map? 
         True for all efficiency maps, and for upper limits maps
         with expected Values. """
@@ -231,31 +242,32 @@ class TxName(object):
 
     def getEfficiencyFor(self,element):
         """
-        For upper limit results, checks if the input element mass falls inside the
-        upper limit grid.  If it does, returns efficiency = 1, else returns
-        efficiency = 0.  For efficiency map results, checks if the mass falls
-        inside the efficiency map grid.  If it does, returns the corresponding
-        efficiency value, else returns efficiency = 0.
+        For upper limit results, checks if the input element falls inside the
+        upper limit grid and has a non-zero reweigthing factor.
+        If it does, returns efficiency = 1, else returns
+        efficiency = 0.  For efficiency map results, returns the
+        signal efficiency including the lifetime reweighting.
+        If a mass array is given as input, no lifetime reweighting will be applied.
 
-        :param element: Element object or mass array
+        :param element: Element object or mass array with units.
         :return: efficiency (float)
         """
 
-        #Check if the element appears in Txname:        
-        if isinstance(element,Element):
-            mass = element.getMasses()
-        elif isinstance(element,list):
-            mass = element
-        val = self.txnameData.getValueFor(mass)
-        if isinstance(val,unum.Unum):
-            return 1.  #The element has an UL, return 1
-        elif val is None or math.isnan(val):
-            return 0.  #The element mass is outside the data grid
-        elif isinstance(val,float):
-            return val  #The element has an eff
+        if self.txnameData.dataType == 'efficiencyMap':
+            eff = self.txnameData.getValueFor(element)
+            if not eff or math.isnan(eff):
+                eff = 0. #Element is outside the grid or has zero efficiency
+        elif self.txnameData.dataType == 'upperLimit':
+            ul = self.txnameData.getValueFor(element)
+            if ul is None:
+                eff = 0. #Element is outside the grid or the decays do not correspond to the txname
+            else:
+                eff = 1.
         else:
-            logger.error("Unknown txnameData value: %s" % (str(type(val))))
+            logger.error("Unknown txnameData type: %s" %self.txnameData.dataType)
             raise SModelSError()
+
+        return eff
 
 class TxNameData(object):
     """
@@ -263,24 +275,37 @@ class TxNameData(object):
     """
     _keep_values = False ## keep the original values, only for debugging
 
-    def __init__(self,value,datatag,Id,accept_errors_upto=.05):
+    def __init__(self,value,dataType,Id,accept_errors_upto=.05,reweightF=None):
         """
         :param value: values in string format
-        :param dataTag: the dataTag (upperLimits or efficiencyMap)
+        :param dataType: the dataType (upperLimit or efficiencyMap)
         :param Id: an identifier, must be unique for each TxNameData!
         :param _accept_errors_upto: If None, do not allow extrapolations outside of
                 convex hull.  If float value given, allow that much relative
                 uncertainty on the upper limit / efficiency
                 when extrapolating outside convex hull.
                 This method can be used to loosen the equal branches assumption.
+        :param reweightF: Function for reweighting the data grid. If not defined it will use defaultReweighting
         """
-        self.dataTag = datatag
+        self.dataType = dataType
         self._id = Id
         self._accept_errors_upto=accept_errors_upto
         self._V = None
         self.loadData(value)
         if self._keep_values:
             self.origdata = value
+            
+        if not reweightF:
+            if self.dataType == 'efficiencyMap':
+                self.reweightF = defaultEffReweight
+            elif self.dataType == 'upperLimit':
+                self.reweightF = defaultULReweight
+            else:
+                raise SModelSError("Default reweighting function not defined for data type %s" %self.dataType)
+        else:
+            self.reweightF = reweightF
+        if not isCallable(self.reweightF):
+            raise SModelSError("Reweighting for data (%s) is not defined as a function" %reweightF)
 
     def __str__ ( self ):
         """ a simple unique string identifier, mostly for _memoize """
@@ -467,16 +492,31 @@ class TxNameData(object):
         self.y_values = np.array(values)[:,1]
         self.computeV(values)
 
-    @_memoize
-    def getValueFor(self,massarray):
+    def getValueFor(self,element):
         """
         Interpolates the value and returns the UL or efficiency for the
-        respective massarray
+        respective element rescaled according to the reweighting function
+        self.reweightF. For UL-type data the default rescaling is ul -> ul/(fraction of prompt decays)
+        and for EM-type data it is eff -> eff*(fraction of prompt decays).
+        If a mass array is given as input, no lifetime reweighting will be applied.
         
-        :param massarray: mass array values (with units), i.e.
-                          [[100*GeV,10*GeV],[100*GeV,10*GeV]]
+        :param element: Element object or mass array (with units)
         """
         
+        if isinstance(element,Element):
+            reweightFactor = self.reweightF(element)
+            massarray = element.getMasses()
+        elif isinstance(element,list):
+            reweightFactor = 1.
+            massarray = element
+        else:
+            logger.error("Input of getValueFor must be an Element object or a mass array and not %s" %str(type(element)))
+            raise SModelSError()
+
+        #Returns None or zero, if reweightFactor is None or zero:
+        if not reweightFactor:
+            return reweightFactor
+
         porig = self.removeUnits(massarray)
         porig = self.formatInput(porig,self.dataShape) #Remove entries which match inclusives
         porig = self.flattenArray(porig) ## flatten        
@@ -500,10 +540,14 @@ class TxNameData(object):
                 return None
             logger.debug( "attempting to interpolate outside of convex hull "\
                     "(d=%d,dp=%d,masses=%s)" %
-                     ( self.dimensionality, dp, str(massarray) ) )            
-            return self._interpolateOutsideConvexHull(massarray)
+                     ( self.dimensionality, dp, str(massarray) ) )
+            val =  self._interpolateOutsideConvexHull(massarray)    
+        else:
+            val = self._returnProjectedValue()
 
-        return self._returnProjectedValue()
+        val *= reweightFactor
+
+        return val
 
     def flattenArray(self, objList):
         """
@@ -844,7 +888,6 @@ class Delaunay1D:
             else: hi = mid
         return lo-1     
 
-
 if __name__ == "__main__":
     import time
     from smodels.tools.physicsUnits import GeV,fb
@@ -863,9 +906,8 @@ if __name__ == "__main__":
     txnameData=TxNameData ( data, "upperLimits",  sys._getframe().f_code.co_name )
     t0=time.time()
     for masses in [ [[ 302.*GeV,123.*GeV], [ 302.*GeV,123.*GeV]],
-                    [[ 254.*GeV,171.*GeV], [ 254.*GeV,170.*GeV]],
-    ]:
-        result=txnameData.getValueFor( masses )
-        sm = "%.1f %.1f" % ( masses[0][0].asNumber(GeV), masses[0][1].asNumber(GeV) )
-        print ( "%s %.3f fb" % ( sm, result.asNumber(fb) ) )
-    print ( "%.2f ms" % ( (time.time()-t0)*1000. ) )
+                    [[ 254.*GeV,171.*GeV], [ 254.*GeV,170.*GeV]] ]:
+        result=txnameData.getValueFor(masses)
+        sm = "%.1f %.1f" % (masses[0][0].asNumber(GeV), masses[0][1].asNumber(GeV))
+        print ( "%s %.3f fb" % (sm, result.asNumber(fb)))
+    print ( "%.2f ms" % ((time.time()-t0)*1000.))

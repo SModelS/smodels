@@ -131,20 +131,14 @@ class DataSet(object):
 
     def getEfficiencyFor(self,txname,mass):
         """
-        convenience function.
-        same as self.getTxName(txname).getEfficiencyFor(m)
+        Convenience function. Get efficiency for mass
+        assuming no lifetime rescaling. Same as self.getTxName(txname).getEfficiencyFor(m)
         """
         txname = self.getTxName(txname)
         if txname: 
-            element = Element()
-            element.branches[0].oddParticles = []         
-            element.branches[1].oddParticles = []  
-            for nbranch,branch in enumerate(mass):
-                for nbsm,bsmMass in enumerate(branch):
-                    particle = Particle(mass = bsmMass)
-                    element.branches[nbranch].oddParticles.append(particle)
-            return txname.getEfficiencyFor(element)
-        return None 
+            return txname.getEfficiencyFor(mass)
+        else:
+            return None
 
     def getValuesFor(self,attribute):
         """
@@ -195,7 +189,7 @@ class DataSet(object):
         return ret
     
 
-    def folderName( self ):
+    def folderName(self):
         """
         Name of the folder in text database.
         """
@@ -220,15 +214,18 @@ class DataSet(object):
         return attributes
 
     
-    def getUpperLimitFor(self,mass=None,expected = False, txnames = None
+    def getUpperLimitFor(self,element=None,expected = False, txnames = None
                          ,compute=False,alpha=0.05,deltas_rel=0.2):
         """
-        Returns the upper limit for a given mass and txname. If
+        Returns the upper limit for a given element (or mass) and txname. If
         the dataset hold an EM map result the upper limit is independent of
         the input txname or mass.
+        For UL results if an Element object is given the corresponding upper limit
+        will be rescaled according to the lifetimes of the element intermediate particles.
+        On the other hand, if a mass is given, no rescaling will be applied.
 
         :param txname: TxName object or txname string (only for UL-type results)
-        :param mass: Mass array with units (only for UL-type results)        
+        :param element: Element object or mass array with units (only for UL-type results)        
         :param alpha: Can be used to change the C.L. value. The default value is 0.05
                       (= 95% C.L.) (only for  efficiency-map results)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.                      
@@ -252,8 +249,8 @@ class DataSet(object):
             else:
                 return upperLimit
             
-        elif self.getType() == 'upperLimit':        
-            if not txnames or not mass:
+        elif self.getType() == 'upperLimit':
+            if not txnames or not element:
                 logger.error("A TxName and mass array must be defined when \
                              computing ULs for upper-limit results.")
                 return False
@@ -270,21 +267,17 @@ class DataSet(object):
             not isinstance(txname, str):
                 logger.error("txname must be a TxName object or a string")
                 return False
-            if not isinstance(mass, list):
-                logger.error("mass must be a mass array")
+            
+            if not isinstance(element, list) and not isinstance(element,Element):
+                logger.error("Element must be an element object or a mass array")
                 return False
 
             for tx in self.txnameList: 
                 if tx == txname or tx.txName == txname:
-                    if expected:
-                        if not tx.txnameDataExp:
-                            upperLimit = None
-                        else:
-                            upperLimit = tx.txnameDataExp.getValueFor(mass)
-                    else:
-                        upperLimit = tx.txnameData.getValueFor(mass)
+                    upperLimit = tx.getULFor(element,expected)
                         
-            return upperLimit        
+            return upperLimit
+        
         else:
             logger.warning("Unkown data type: %s. Data will be ignored.",
                            self.getType())

@@ -105,16 +105,16 @@ class ElementCluster(object):
             return None
         else:
             #Check the data types
-            dataTag = list(set([txname.txnameData.dataTag for txname in self.txnames]))            
-            if len(dataTag) != 1:
+            dataType = list(set([txname.txnameData.dataType for txname in self.txnames]))            
+            if len(dataType) != 1:
                 logger.error("A single cluster contain mixed data types!")
                 raise SModelSError()
-            elif 'upperLimit' in dataTag[0]:
+            elif 'upperLimit' in dataType[0]:
                 return 'upperLimit'
-            elif 'efficiencyMap' in dataTag[0]:
+            elif 'efficiencyMap' in dataType[0]:
                 return 'efficiencyMap'
             else:
-                logger.error("Unknown data type %s" % (dataTag[0]))
+                logger.error("Unknown data type %s" % (dataType[0]))
                 raise SModelSError()
 
 

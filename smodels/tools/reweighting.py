@@ -11,6 +11,53 @@ from smodels.tools.physicsUnits import MeV, GeV, m, mm, fm
 from smodels.experiment.finalStateParticles import jetList, lList
     
 
+def defaultEffReweight(element):
+    """
+    Computes the lifetime reweighting factor for the element efficiency
+    based on the lifetimes of all intermediate particles and the last stable odd-particle
+    appearing in the element.
+    The fraction corresponds to the fraction of decays corresponding to prompt
+    decays to all intermediate BSM particles and to a long-lived decay (outside the detector)
+    to the final BSM state.
+
+    :param element: Element object
+
+    :return: Reweight factor (float)
+    """
+
+    bsmStates = element.getBSMparticles()
+    elFraction = 1.
+    for branch in bsmStates:
+        branchFraction = 1.
+        for bsm in branch[:-1]:
+            branchFraction *= calculateProbabilities(width=bsm.totalwidth)['F_prompt']
+        finalState = branch[-1]
+        branchFraction *= calculateProbabilities(width=finalState.totalwidth)['F_long']
+        elFraction *= branchFraction
+
+    return elFraction
+
+def defaultULReweight(element):
+    """
+    Computes the lifetime reweighting factor for the element upper limit
+    based on the lifetimes of all intermediate particles and the last stable odd-particle
+    appearing in the element.
+    The fraction corresponds to the fraction of decays corresponding to prompt
+    decays to all intermediate BSM particles and to a long-lived decay (outside the detector)
+    to the final BSM state.
+
+    :param element: Element object
+
+    :return: Reweight factor (float)
+    """
+
+    effFactor = defaultEffReweight(element)
+    if not effFactor:
+        return None
+    else:
+        return 1./effFactor
+
+
 def addPromptAndDisplaced(branch):  
     """
     Add probabilities and branches, reweighted and relabeled by the probability functions to be longlived or MET or to decay promptly (within inner detector) or displaced (outside of inner detector but inside of outer detector) for each decay in the branch.
@@ -35,7 +82,8 @@ def addPromptAndDisplaced(branch):
         elif width == 0.*GeV:
             F_long, F_prompt, F_displaced = [1.,0.,0.]
         else:    
-            F_long, F_prompt, F_displaced = calculateProbabilities(width)
+            probs = calculateProbabilities(width)
+            F_long, F_prompt, F_displaced = probs['F_long'],probs['F_prompt'],probs['F_displaced']
         # allow for combinations of decays and a long lived particle only if the last BSM particle is the long lived one
         if particle == branch.oddParticles[-1]: F.append([F_long])
         else: F.append([F_prompt,F_displaced])
@@ -69,7 +117,8 @@ def addPromptAndDisplaced(branch):
     return probabilities, branches
     
 
-def calculateProbabilities(width):
+def calculateProbabilities(width, l_inner = 1.*mm,
+                           gb_inner=1.3,l_outer=10.*m,gb_outer=1.43):
     """
     The fraction of prompt and displaced decays are defined as:
     
@@ -81,20 +130,16 @@ def calculateProbabilities(width):
     and gb_inner (gb_outer) is the estimate for the kinematical factor gamma*beta.
     We use l_inner=10.mm and gb_inner=10; l_outer=10.m and gb_outer=0.6.  
     :param particle: particle object for which probabilities should be calculated
-    :return: probabilities for the particle not to decay (in the detector), to decay promptly or displaced.
+    :return: Dictionary with the probabilities for the particle not to decay (in the detector), to decay promptly or displaced.
     """
     
-    l_inner = 10.*mm
-    gb_inner = 10.    
-    l_outer = 10.*m
-    gb_outer = 0.6
     hc = 197.327*MeV*fm  #hbar * c
     
-    F_long = exp( -1*width * l_outer /(gb_outer*hc) )    
-    F_prompt = 1. - exp( -1*width * l_inner /(gb_inner*hc) )         
+    F_long = exp(-width*l_outer/(gb_outer*hc))
+    F_prompt = 1. - exp(-width*l_inner/(gb_inner*hc))
     F_displaced = 1. - F_prompt - F_long
-    
-    return F_long, F_prompt, F_displaced
+
+    return {'F_long' : F_long, 'F_prompt' : F_prompt, 'F_displaced' : F_displaced}
 
 
 
