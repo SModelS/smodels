@@ -338,7 +338,7 @@ class Database(object):
 
 
     def fetchFromServer ( self, path, discard_zeroes ):
-        import requests, json
+        import requests, time, json
         self.source = "http"
         if "ftp://" in path:
             self.source = "ftp"
@@ -366,7 +366,9 @@ class Database(object):
                 sys.exit()
             logger.warning ( "I do however have a local copy of the file. I work with that." )
             self.force_load = "pcl"
-            return ( cDir, filename )
+            # return ( cDir, filename )
+            # next step: check the timestamps
+            return ( cDir, os.path.basename ( filename ) )
 
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!

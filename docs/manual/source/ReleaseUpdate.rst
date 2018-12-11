@@ -45,10 +45,7 @@ New in Version 2.0.0:
   * Decomposition and experimental results can include displaced signatures
   * Moved :ref:`lifetime reweighting <dbReweighting>` to |database| for meta-stable particles
   * Added approximate lifetime reweighting for :ref:`missing topologies <topCoverage>`
-
-New in Version 1.2.3:
-^^^^^^^^^^^^^^^^^^^^^
-
+  * downloaded db files now go to $HOME/.cache/smodels
   * Downloaded database files now stored in $HOME/.cache/smodels
 
 New in Version 1.2.2:

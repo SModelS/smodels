@@ -203,7 +203,6 @@ def fixpermissions():
 
 
 # __dbServer__ = "http://smodels.hephy.at/database"
-# __dbServer__ = "http://www.hephy.at/user/wwaltenberger/smodels"
 __dbServer__ = "https://smodels.github.io/database"
 
 def officialDatabase( fastlim=False ):

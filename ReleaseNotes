@@ -3,9 +3,6 @@ Release v2.0.0, Feb 2019
 
   * Included Particle class
   * Particles are compared according to their properties
-
-Release v1.2.3, xxx
-=======================================================
   * downloaded database files now stored in $HOME/.cache/smodels
 
 Release v1.2.2, Tue 28 Nov 2018
