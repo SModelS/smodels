@@ -205,18 +205,19 @@ def fixpermissions():
         print ( "sudo smodelsTools.py fixpermissions" )
 
 
-# __dbServer__ = "smodels.hephy.at/database"
-__dbServer__ = "www.hephy.at/user/wwaltenberger/smodels"
+# __dbServer__ = "http://smodels.hephy.at/database"
+# __dbServer__ = "http://www.hephy.at/user/wwaltenberger/smodels"
+__dbServer__ = "https://smodels.github.io/database"
 
 def officialDatabase( fastlim=False ):
     """ :param fastlim: include fastlim results """
     v=version().replace(".","")
     fl = "_fastlim" if fastlim else ""
-    r="http://%s/official%s%s" % (__dbServer__,v,fl)
+    r="%s/official%s%s" % (__dbServer__,v,fl)
     return r
 
 def testDatabase():
-    r="http://%s/unittest%s" % ( __dbServer__, version().replace(".","") )
+    r="%s/unittest%s" % ( __dbServer__, version().replace(".","") )
     return r
 
 def main():
