@@ -12,7 +12,6 @@ from __future__ import print_function
 import sys
 import os
 
-
 def installDirectory():
     """
     Return the software installation directory, by looking at location of this
@@ -205,15 +204,19 @@ def fixpermissions():
         print ( "chmod failed (permission error). Please try as root, i.e.:" )
         print ( "sudo smodelsTools.py fixpermissions" )
 
+
+# __dbServer__ = "smodels.hephy.at/database"
+__dbServer__ = "www.hephy.at/user/wwaltenberger/smodels"
+
 def officialDatabase( fastlim=False ):
     """ :param fastlim: include fastlim results """
     v=version().replace(".","")
     fl = "_fastlim" if fastlim else ""
-    r="http://smodels.hephy.at/database/official%s%s" % (v,fl)
+    r="http://%s/official%s%s" % (__dbServer__,v,fl)
     return r
 
 def testDatabase():
-    r="http://smodels.hephy.at/database/unittest%s" % version().replace(".","")
+    r="http://%s/unittest%s" % ( __dbServer__, version().replace(".","") )
     return r
 
 def main():

@@ -21,6 +21,7 @@ os.environ["OMP_NUM_THREADS"]="2"
 import sys
 import time
 from smodels.experiment import datasetObj
+from smodels.installation import cacheDirectory
 from smodels.experiment.metaObj import Meta
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
@@ -304,12 +305,15 @@ class Database(object):
             logger.error ( "cannot parse json file %s." % path )
             sys.exit()
         size = r.json()["size"]
-        logger.info ( "need to fetch %s. size is %s." % \
-                      ( r.json()["url"], sizeof_fmt ( size ) ) )
+        cDir = cacheDirectory ( create=True )
         t0=time.time()
         r2=requests.get ( r.json()["url"], stream=True )
-        filename= "./" + r2.url.split("/")[-1]
+        filename= os.path.join ( cDir, r2.url.split("/")[-1] )
+        logger.info ( "need to fetch %s and store in %s. size is %s." % \
+                      ( r.json()["url"], filename, sizeof_fmt ( size ) ) )
         with open ( filename, "wb" ) as dump:
+            import fcntl
+            fcntl.lockf ( dump, fcntl.LOCK_EX )
             if not self.inNotebook(): ## \r doesnt work in notebook
                 print ( "         " + " "*51 + "<", end="\r" )
             print ( "loading >", end="" )
@@ -322,6 +326,7 @@ class Database(object):
                 print ( "done." )
             else:
                 print( "" )
+            fcntl.lockf ( dump, fcntl.LOCK_UN )
             dump.close()
         logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) )
         logger.debug ( "store as %s" % filename )
@@ -334,17 +339,18 @@ class Database(object):
 
     def fetchFromServer ( self, path, discard_zeroes ):
         import requests, time, json
-        logger.debug ( "need to fetch from server: %s" % path )
         self.source = "http"
         if "ftp://" in path:
             self.source = "ftp"
-        store = "." + path.replace ( ":","_" ).replace( "/", "_" ).replace(".","_" )
+        cDir = cacheDirectory ( create=True )
+        store = os.path.join ( cDir, path.replace ( ":","_" ).replace( "/", "_" ).replace(".","_" ) )
+        logger.debug ( "need to fetch from server: %s and store to %s" % ( path, store ) )
         if not os.path.isfile ( store ):
             ## completely new! fetch the description and the db!
             return self.fetchFromScratch ( path, store, discard_zeroes )
         with open(store,"r") as f:
             jsn = json.load(f)
-        filename= "./" + jsn["url"].split("/")[-1]
+        filename= os.path.join ( cDir, jsn["url"].split("/")[-1] )
         class _: ## pseudo class for pseudo requests
             def __init__ ( self ): self.status_code = -1
         r=_()
@@ -361,7 +367,7 @@ class Database(object):
             logger.warning ( "I do however have a local copy of the file. I work with that." )
             self.force_load = "pcl"
             # next step: check the timestamps
-            return ( "./", filename )
+            return ( cDir, os.path.basename ( filename ) )
 
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!
