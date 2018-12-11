@@ -176,8 +176,6 @@ class Element(object):
         newel.elID = self.elID
         return newel
 
-
-
     def switchBranches(self):
         """
         Switch branches, if the element contains a pair of them.
@@ -189,7 +187,6 @@ class Element(object):
         if len(self.branches) == 2:
             newEl.branches = [newEl.branches[1], newEl.branches[0]]
         return newEl
-
 
     def getParticles(self):
         """
@@ -224,7 +221,18 @@ class Element(object):
         massarray = [branch.getMasses() for branch in self.branches]
 
         return massarray
-        
+
+    def getWidths(self):
+        """
+        Get the array of BSM widths in the element.
+
+        :returns: list of widths (array)
+        """
+
+        widtharray = [branch.getWidths() for branch in self.branches]
+
+        return widtharray
+
     def getBSMparticles(self):
         """
         Get the list of BSM particles appearing the cascade decay,

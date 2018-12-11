@@ -523,7 +523,8 @@ def _getElementsFrom(smsTopList, dataset):
             if itop is None: continue
             for el in top.getElements():
                 newEl = txname.hasElementAs(el)  #Check if element appears in txname
-                if not newEl: continue
+                if not newEl:
+                    continue
                 el.covered = True
                 eff = txname.getEfficiencyFor(newEl)
                 if not eff:

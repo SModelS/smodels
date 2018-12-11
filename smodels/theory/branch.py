@@ -175,11 +175,29 @@ class Branch(object):
         """      
         bsmMasses = []    
         for bsm in self.oddParticles:
-            if not isinstance(bsm.mass, list): bsmMasses.append(bsm.mass)
-            else: bsmMasses.append(bsm.mass[0])
-        #bsmMasses = [bsm.mass for bsm in self.oddParticles]
-        
-        return bsmMasses             
+            if not isinstance(bsm.mass, list):
+                bsmMasses.append(bsm.mass)
+            else:
+                bsmMasses.append(bsm.mass[0])
+
+        return bsmMasses
+
+    def getWidths(self):
+        """
+        Return list with widths of the BSM particles appearing in the branch
+
+        :return: List with widths
+        """      
+
+        bsmWidths = []
+        for bsm in self.oddParticles:
+            if not isinstance(bsm.totalwidth, list):
+                bsmWidths.append(bsm.totalwidth)
+            else:
+                bsmWidths.append(bsm.totalwidth[0])
+
+        return bsmWidths
+
 
     def sortParticles(self):
         """

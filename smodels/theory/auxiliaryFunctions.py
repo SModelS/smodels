@@ -7,11 +7,9 @@
 """
 
 from smodels.theory import crossSection
-from smodels.tools.physicsUnits import pb, GeV, fb
-import numpy as np
-from scipy import stats
+from smodels.tools.physicsUnits import GeV, fb
+import unum
 from collections import Iterable
-import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.finalStateParticles import finalStates
@@ -21,89 +19,26 @@ from smodels.experiment.finalStateParticles import finalStates
 finalStateLabels = finalStates.getValuesFor('label')
 
 
-def distance(ul1, ul2, el1=None, el2=None):
+def distance(ul1, ul2):
     """
     Define distance between two values in upper limit space.
     The distance is defined as d = 2*|ul1-ul2|/(ul1+ul2).
     If el1 and el2 are Element objects, the distance
     includes the relative differences between their masses
     and widths: d = max([d_ul,d_mass,d_width])
-    
-    
+
+
     :parameter ul1: upper limit value (in fb) for element1
     :parameter ul2: upper limit value (in fb) for element2
-    :parameter el1: Element1
-    :parameter el2: Element2
 
     :returns: relative distance
     """
+
     if ul1 is None or ul2 is None:
         return None
     ulDistance = 2.*abs(ul1 - ul2)/(ul1 + ul2)
-    if ulDistance < 0.:
-        # Skip masses without an upper limit
-        return None
-    if (not el1 is None) and (not el2 is None):
-        mass1 = [x.asNumber(GeV) for x in _flattenList(el1.getMasses())]
-        mass2 = [x.asNumber(GeV) for x in _flattenList(el2.getMasses())]
-        width1 = [x.totalwidth.asNumber(GeV) for x in _flattenList(el1.getBSMparticles())]
-        width2 = [x.totalwidth.asNumber(GeV) for x in _flattenList(el1.getBSMparticles())]
-        massDistance = max([0.]+[2*abs(m1-mass2[i])/(m1+mass2[i]) for i,m1 in enumerate(mass1) if m1 != mass2[i]])
-        widthDistance = max([0.]+[2*abs(w1-width2[i])/(w1+width2[i]) for i,w1 in enumerate(width1) if w1 != width2[i]])
-    else:
-        massDistance = 0.
-        widthDistance = 0.
 
-    distanceValue = max([ulDistance,massDistance,widthDistance])
-    
-    return distanceValue
-
-
-def massAvg(massList, method='weighted', weights=None):
-    """
-    Compute the average mass of massList according to method.
-
-    If method=weighted but weights were not properly defined,
-    switch method to harmonic.    
-    If massList contains a zero mass, switch method to mean.
-    
-    :parameter method: possible values: harmonic, mean, weighted
-    :parameter weights: weights of elements (only for weighted average)
-    
-    """
-    if not massList:
-        return massList
-    if massList.count(massList[0]) == len(massList):
-        return massList[0]
-
-    if method == 'weighted' and (not weights or len(weights) != len(massList)):
-        method = 'harmonic'
-    flatList = [ mass / GeV for mass in _flattenList(massList)]
-    if method == 'harmonic' and 0. in flatList:
-        method = 'mean'
-
-    for mass in massList:
-        if len(mass) != len(massList[0]) \
-                or len(mass[0]) != len(massList[0][0]) \
-                or len(mass[1]) != len(massList[0][1]):
-            logger.error('Mass shape mismatch in mass list:\n' + str(mass) +
-                         ' and ' + str(massList[0]))
-            raise SModelSError()
-
-    avgmass = copy.deepcopy(massList[0])
-    for ib, branch in enumerate(massList[0]):
-        for ival in enumerate(branch):
-            vals = [ float(mass[ib][ival[0]] / GeV) for mass in massList]
-            if method == 'mean':
-                avg = np.mean(vals)
-            elif method == 'harmonic':
-                avg = stats.hmean(vals)
-            elif method == 'weighted':
-                weights = [ float(weight) for weight in weights ]
-                avg = np.average(vals,weights=weights)                
-            avgmass[ib][ival[0]] = float(avg)*GeV
-
-    return avgmass
+    return ulDistance
 
 
 def cSim(*weights):
@@ -193,6 +128,59 @@ def cGtr(weightA, weightB):
         result.add(xsecRes)
 
     return result
+
+def removeUnits(value,standardUnits):
+    """
+    Remove units from unum objects. Uses the units defined
+    in physicsUnits.standard units to normalize the data.
+
+    :param value: Object containing units (e.g. [[100*GeV,100.*GeV],3.*pb])
+    :param standardUnits: Unum unit or Array of unum units defined to normalize the data.
+    :return: Object normalized to standard units (e.g. [[100,100],3000])
+    """
+
+    if isinstance(standardUnits,unum.Unum):
+        stdunits = [standardUnits]
+    else:
+        stdunits = standardUnits
+
+    if isinstance(value,list):
+        return [removeUnits(x,stdunits) for x in value]
+    elif isinstance(value,dict):
+        return dict([[removeUnits(x,stdunits),removeUnits(y,stdunits)] for x,y in value.items()])
+    elif isinstance(value,unum.Unum):
+        #Check if value has unit or not:
+        if not value._unit:
+            return value.asNumber()
+        #Now try to normalize it by one of the standard pre-defined units:
+        for unit in stdunits:
+            y = (value/unit).normalize()
+            if not y._unit:
+                return value.asNumber(unit)
+        raise SModelSError("Could not normalize unit value %s using the standard units: %s"
+                       %(str(value),str(standardUnits)))
+    else:
+        return value
+
+
+def addUnit(obj,unit):
+    """
+    Add unit to object. If the object is a nested list,
+    adds the unit to all of its elements.
+
+    :param obj: Object without units (e.g. [[100,100.]])
+    :param unit: Unit to be added to the object (Unum object, e.g. GeV)
+    :return: Object with units (e.g. [[100*GeV,100*GeV]])
+    """
+
+    if isinstance(obj,list):
+        return [addUnit(x) for x in obj]
+    elif isinstance(obj,dict):
+        return dict([[addUnit(x),addUnit(y)] for x,y in obj.items()])
+    elif isinstance(obj,(float,int,unum.Unum)):
+        return obj*unit
+    else:
+        return obj
 
 
 def _flattenList(inlist, dims=None):

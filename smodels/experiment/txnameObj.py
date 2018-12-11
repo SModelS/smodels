@@ -14,7 +14,7 @@
 
 import os,sys
 from smodels.tools import physicsUnits
-from smodels.theory.auxiliaryFunctions import elementsInStr 
+from smodels.theory.auxiliaryFunctions import elementsInStr, removeUnits
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
 from smodels.theory.topology import TopologyList
@@ -265,6 +265,7 @@ class TxName(object):
                 eff = 0. #Element is outside the grid or has zero efficiency
         elif self.txnameData.dataType == 'upperLimit':
             ul = self.txnameData.getValueFor(element)
+            element._upperLimit = ul #Store the upper limit for convenience
             if ul is None:
                 eff = 0. #Element is outside the grid or the decays do not correspond to the txname
             else:
@@ -379,36 +380,6 @@ class TxNameData(object):
                                %(str(value),str(stdUnits)))
         else:
             return 1.    
-
-    def removeUnits(self, value):
-        """
-        Remove units from unum objects. Uses the units defined
-        in physicsUnits.standard units to normalize the data.
-        
-        :param value: Object containing units (e.g. [[100*GeV,100.*GeV],3.*pb])
-        
-        :return: Object normalized to standard units (e.g. [[100,100],3000])
-        """
-        
-        stdUnits = physicsUnits.standardUnits
-        
-        if isinstance(value,list):
-            return [self.removeUnits(x) for x in value]
-        elif isinstance(value,dict):
-            return dict([[self.removeUnits(x),self.removeUnits(y)] for x,y in value.items()])
-        elif isinstance(value,unum.Unum):
-            #Check if value has unit or not:
-            if not value._unit:
-                return value.asNumber()
-            #Now try to normalize it by one of the standard pre-defined units:
-            for unit in stdUnits:
-                y = (value/unit).normalize()
-                if not y._unit:
-                    return value.asNumber(unit)
-            raise SModelSError("Could not normalize unit value %s using the standard units: %s" 
-                               %(str(value),str(stdUnits)))
-        else:
-            return value
         
     def getDataShape(self,value):
         """
@@ -479,7 +450,7 @@ class TxNameData(object):
             
         self.units = self.getUnits(val)[0] #Store standard units
         self.dataShape = self.getDataShape(val[0][0]) #Store the data (mass) format (useful if there are inclusives)        
-        values = self.removeUnits(val) #Remove units and store the normalization units
+        values = removeUnits(val,physicsUnits.standardUnits) #Remove units and store the normalization units
         values = self.removeInclusives(values)
 
         if len(values) < 1 or len(values[0]) < 2:
@@ -524,13 +495,13 @@ class TxNameData(object):
             return reweightFactor
 
         val = self.getValueForMass(massarray)
-        if val is None:
+        if val is None or math.isnan(val):
             return val
 
         val *= reweightFactor
 
         return val
-
+    
     @_memoize
     def getValueForMass(self,massarray):
         """
@@ -540,20 +511,8 @@ class TxNameData(object):
         :param massarray: Mass array (with units)
         """
 
-        porig = self.removeUnits(massarray)
-        porig = self.formatInput(porig,self.dataShape) #Remove entries which match inclusives
-        porig = self.flattenArray(porig) ## flatten        
         self.massarray = massarray ## only for bookkeeping and better error msgs
-        
-        if len(porig) != self.full_dimensionality:
-            logger.error ( "dimensional error. I have been asked to compare a "\
-                    "%d-dimensional mass vector with %d-dimensional data!" % \
-                    ( len(porig), self.full_dimensionality ) )
-            return None
-
-        p = ((np.array([porig]) - self.delta_x )).tolist()[0]
-        P = np.dot(p,self._V)  ## rotate
-        #Get value for the truncated point:        
+        P = self.transformMass(massarray)
         self.projected_value = self.interpolate(P[:self.dimensionality])
         
         #Check if input point has larger dimensionality:
@@ -570,6 +529,28 @@ class TxNameData(object):
 
         return val
 
+    def transformMass(self,massarray):
+        """
+        Transform the mass array to a point in the PCA coordinates.
+
+        :param massarray: Mass array (with units)
+
+        :return: Point (list)
+        """
+
+        porig = removeUnits(massarray,physicsUnits.standardUnits)
+        porig = self.formatInput(porig,self.dataShape) #Remove entries which match inclusives
+        porig = self.flattenArray(porig) ## flatten
+
+        if len(porig) != self.full_dimensionality:
+            logger.error("dimensional error. I have been asked to compare a "\
+                    "%d-dimensional mass vector with %d-dimensional data!" % \
+                    (len(porig), self.full_dimensionality ))
+            raise SModelSError()
+        p = ((np.array([porig]) - self.delta_x )).tolist()[0]
+        P = np.dot(p,self._V)  ## rotate
+
+        return P
 
     def flattenArray(self, objList):
         """
@@ -629,12 +610,7 @@ class TxNameData(object):
             extrapolation error.
         """
 
-        porig = self.removeUnits(massarray)
-        porig = self.formatInput(porig,self.dataShape) #Remove entries which match inclusives
-        porig = self.flattenArray(porig)
-         
-        p = ((np.array([porig]) - self.delta_x)).tolist()[0]
-        P=np.dot(p,self._V)                    ## projected point p in n dimensions
+        P = self.transformMass(massarray)
         ## P[self.dimensionality:] is project point p in m dimensions
         # m=self.countNonZeros ( P ) ## dimensionality of input
         ## how far are we away from the "plane": distance alpha
@@ -716,7 +692,7 @@ class TxNameData(object):
         
         return self.projected_value*self.units[-1]
 
-    def countNonZeros ( self, mp ):
+    def countNonZeros( self, mp ):
         """ count the nonzeros in a vector """
         nz=0
         for i in mp:
@@ -724,7 +700,7 @@ class TxNameData(object):
                 nz+=1
         return nz
 
-    def onlyZeroValues ( self ):
+    def onlyZeroValues( self ):
         """ check if the map is zeroes only """
         eps = sys.float_info.epsilon
         negative_values = bool ( sum ( [ x < -eps for x in self.y_values ] ) )
