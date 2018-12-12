@@ -233,7 +233,7 @@ class UncoveredList(object):
         newGenEl = self.generalElement(el)
         newGenEl.sortBranches()
 
-        name = str(newGenEl) + '  (%s)'%(str( newGenEl.branches[0]._decayType) + ","+ str(newGenEl.branches[1]._decayType) )    
+        name = str(newGenEl).replace('~','') + '  (%s)'%(str( newGenEl.branches[0]._decayType) + ","+ str(newGenEl.branches[1]._decayType) )    
 
         # Check if an element with the same generalized name has already been added
         for genEl in self.generalElements:
