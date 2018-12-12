@@ -387,8 +387,8 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
         mass = None
     else:
         massList = np.array(removeUnits(massList, [GeV]))
-        mAvg = np.average(massList,weights=weights,axis=0).tolist()
-        mAvg = addUnit(mAvg,unit=GeV)
+        mass = np.average(massList,weights=weights,axis=0).tolist()
+        mass = addUnit(mass,unit=GeV)
     
     
     #Create a combinedDataSet object:
@@ -568,19 +568,13 @@ def _combineElements(elements, dataset, maxDist):
 
     clusters = []
 
-    if dataset.getType() == 'efficiencyMap':
-        cluster = clusterTools.groupAll(elements)
-        clusters.append(cluster)
-    elif dataset.getType() == 'upperLimit':
+    if dataset.getType() == 'efficiencyMap': #cluster all elements
+        clusters += clusterTools.clusterElements(elements,maxDist,dataset)
+    elif dataset.getType() == 'upperLimit': #Cluster each txname individually
         txnames = list(set([el.txname for el in elements]))
         for txname in txnames:
-            txnameEls = []
-            for element in elements:
-                if not element.txname == txname:
-                    continue
-                else: txnameEls.append(element)
-            txnameClusters = clusterTools.clusterElements(txnameEls, maxDist)
-            clusters += txnameClusters
+            txnameEls = [el for el in elements  if el.txname == txname]
+            clusters += clusterTools.clusterElements(txnameEls, maxDist, dataset)
     else:
         logger.warning("Unkown data type: %s. Data will be ignored."
                        % dataset.getType())

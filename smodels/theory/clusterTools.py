@@ -12,9 +12,7 @@ from smodels.theory.auxiliaryFunctions import removeUnits, addUnit
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
-
 from smodels.tools.smodelsLogging import logger
-
 
 class ElementCluster(object):
     """
@@ -25,11 +23,11 @@ class ElementCluster(object):
     :ivar elements: list of elements in the cluster (Element objects)    
     """
 
-    def __init__(self, elements = [], maxDist = 0., txdata = None):
+    def __init__(self, elements = [], maxDist = 0., dataset = None):
 
         self.elements = elements
         self.maxDist = maxDist
-        self.txdata = txdata
+        self.dataset = dataset
 
     def __eq__(self, other):
 
@@ -59,9 +57,11 @@ class ElementCluster(object):
         """
     
         if not hasattr(el1,'_upperLimit'):
-            el1._upperLimit = self.txdata.getValueFor(el1)
+            el1._upperLimit = self.dataset.getUpperLimitFor(el1,
+                                                            txnames=el1.txname)
         if not hasattr(el2,'_upperLimit'):
-            el2._upperLimit = self.txdata.getValueFor(el2)
+            el2._upperLimit = self.dataset.getUpperLimitFor(el2,
+                                                            txnames=el1.txname)
 
         ul1 = el1._upperLimit
         ul2 = el2._upperLimit    
@@ -96,6 +96,21 @@ class ElementCluster(object):
             logger.error("Cluster total cross section should have a single value")
             raise SModelSError()
         return totxsec[0]
+
+    def getDataType(self):
+        """
+        Checks to which type of data (efficiency map or upper limit)
+        the cluster refers to. It uses the cluster.dataset attribute.
+        If not defined, returns None
+        :return: upperLimits or efficiencyMap (string)
+        """
+
+        if self.dataset:
+            dataType = self.dataset.getType()
+        else:
+            dataType = None
+
+        return dataType
 
     def getAvgMass(self):
         """
@@ -150,16 +165,22 @@ class ElementCluster(object):
         """
 
         avgEl = self.elements[0].copy()
-        avgMass = np.array(self.getAvgMass())
-        avgWidth = np.array(self.getAvgWidth())
+        avgEl.txname = self.elements[0].txname
+        avgMass = self.getAvgMass()
+        avgWidth = self.getAvgWidth()
         for i,br in enumerate(avgEl.branches):
             for j,ptc in enumerate(br.oddParticles):
                 avgParticle = ptc.copy()
-                avgParticle.__setattr__('mass',avgMass[i,j])
-                avgParticle.__setattr__('totalwidth',avgWidth[i,j])
+                avgParticle.__setattr__('mass',None)
+                avgParticle.__setattr__('totalwidth',None)
+                if not (avgMass is None):
+                    avgParticle.__setattr__('mass',avgMass[i][j])
+                if not (avgWidth is None):
+                    avgParticle.__setattr__('totalwidth',avgWidth[i][j])
                 avgEl.branches[i].oddParticles[j]  = avgParticle
 
-        avgEl._upperLimit = self.txdata.getValueFor(avgEl)
+        avgEl._upperLimit = self.dataset.getUpperLimitFor(avgEl,
+                                                          txnames=avgEl.txname)
 
         return avgEl
 
@@ -245,14 +266,16 @@ class ElementCluster(object):
         """
 
         if not hasattr(element, '_upperLimit'):
-            element._upperLimit = self.txdata.getValueFor(element)
+            element._upperLimit = self.dataset.getUpperLimitFor(element,
+                                                                txnames=element.txname)
         if element._upperLimit is None:
             return None
 
         dmax = 0.
         for el in self:
             if not hasattr(el, '_upperLimit'):
-                el._upperLimit = self.txdata.getValueFor(el)
+                el._upperLimit = self.dataset.getUpperLimitFor(el,
+                                                               txnames=el.txname)
             dmax = max(dmax,self.relativeDistance(element,el))
 
         return dmax
@@ -288,65 +311,38 @@ class ElementCluster(object):
         return True
 
 
-def groupAll(elements):
+
+def clusterElements(elements, maxDist, dataset):
     """
-    Create a single cluster containing all the elements.
-    Skip mother elements which contain the daughter in the list (avoids double counting).
-
-    :param elements: List of Element objects
-    :return: ElementCluster object containing all unique elements
-    """
-
-
-    cluster = ElementCluster()
-    cluster.elements = []
-    allmothers = []
-    #Collect the list of all mothers:
-    for el in elements:
-        allmothers += [elMom[1].elID for elMom in el.motherElements if not elMom[0]=='original']
-
-    for el in elements:
-        #Skip the element if it is a mother of another element in the list
-        if any((elMom is el.elID) for elMom in allmothers):
-            continue
-        cluster.elements.append(el)
-
-    #Collect the txnames appearing in the cluster
-    cluster.txnames = list(set([el.txname for el in cluster.elements]))
-    cluster.txnames.sort()
-    return cluster
-
-
-def clusterElements(elements, maxDist):
-    """
-    Cluster the original elements according to their distance in mass and lifetime space.
+    Cluster the original elements according to their distance in upper limit space.
 
     :parameter elements: list of elements (Element objects)
-    :parameter txname: TxName object to be used for computing distances in UL space
+    :parameter dataset: Dataset object to be used when computing distances in upper limit space
     :parameter maxDist: maximum distance for clustering two elements
 
     :returns: list of clusters (ElementCluster objects)
     """
     if len(elements) == 0:
         return []
+
     txnames = list(set([el.txname for el in elements]))
-    if len(txnames) != 1:
-        logger.error("Clustering elements with different Txnames!")
+    if dataset.getType() == 'upperLimit' and len(txnames) != 1 :
+        logger.error("Clustering elements with different Txnames for an UL result.")
         raise SModelSError()
-    txdata = txnames[0].txnameData
+
     # ElementCluster elements:
-    clusters = _doCluster(elements, txdata, maxDist)
+    clusters = _doCluster(elements, dataset, maxDist)
     for cluster in clusters:
         cluster.txnames = txnames
     return clusters
 
 
-def _doCluster(elements, txdata, maxDist):
+def _doCluster(elements, dataset, maxDist):
     """
     Cluster algorithm to cluster elements.
 
     :parameter elements: list of all elements to be clustered
-    :parameter txdata: TxNameData object to be used for computing distances in UL space
+    :parameter dataset: Dataset object to be used when computing distances in upper limit space
     :parameter maxDist: maximum distance for clustering two elements
 
     :returns: a list of ElementCluster objects containing the elements
@@ -356,7 +352,7 @@ def _doCluster(elements, txdata, maxDist):
     # First make sure all elements contain their upper limits
     for el in elements:
         if not hasattr(el,'._upperLimit'):
-            el._upperLimit = txdata.getValueFor(el)
+            el._upperLimit = dataset.getUpperLimitFor(el,txnames=el.txname)
         if el._upperLimit is None:
             raise SModelSError("Trying to cluster element outside the grid.")
 
@@ -368,7 +364,7 @@ def _doCluster(elements, txdata, maxDist):
     #Start building maximal clusters
     clusterList = []
     for el in elementList:
-        cluster = ElementCluster(elements=[],maxDist=maxDist,txdata=txdata)        
+        cluster = ElementCluster([],maxDist,dataset)
         for elB in elementList:
             if cluster.relativeDistance(el, elB) <= maxDist:
                 cluster.add(elB)
@@ -413,9 +409,7 @@ def _doCluster(elements, txdata, maxDist):
     # finalClusters = finalClusters + clusterList
     # Add clusters of individual masses (just to be safe)
     for el in elementList:
-        finalClusters.append(ElementCluster(elements=[el],
-                                            maxDist=maxDist,
-                                            txdata=txdata))
+        finalClusters.append(ElementCluster([el],maxDist,dataset))
 
     # Clean up clusters (remove redundant clusters)
     for ic, clusterA in enumerate(finalClusters):

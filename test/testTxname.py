@@ -75,12 +75,13 @@ class TxTest(unittest.TestCase):
         setattr(c1, 'totalwidth', 10**(-17)*GeV)
         self.assertAlmostEqual(tx.getEfficiencyFor(el), 0.08697,5)
 
-      
+
     def testGetValueFor(self):
 
-        f = './database/13TeV/CMS/CMS-PAS-EXO-16-036/data/THSCPM1b.txt'
-        gInfo = infoObj.Info('./database/13TeV/CMS/CMS-PAS-EXO-16-036/globalInfo.txt')
-        gInfo.addInfo('dataId','None')
+        f = './database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM1.txt'
+        gInfo = infoObj.Info('./database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
+        gInfo.addInfo('dataId','c000')
+        tx = TxName(f,gInfo,gInfo)
 
         el = Element(info="[[],[]]",finalState = ['HSCP','HSCP'])
         setattr(c1, 'mass', 150*GeV)
@@ -88,11 +89,11 @@ class TxTest(unittest.TestCase):
         el.branches[1].oddParticles = [c1]
 
         #test getting UL with mass only
-        self.assertEqual(tx.txnameData.getValueFor(el.getMasses()), 0.12396)
+        self.assertEqual(tx.txnameData.getValueFor(el.getMasses()), 0.21496)
 
         #test getting UL with element and reweighted efficiency
         setattr(c1, 'totalwidth', 10**(-17)*GeV)
-        self.assertAlmostEqual(tx.txnameData.getValueFor(el),0.06102,5)
+        self.assertAlmostEqual(tx.txnameData.getValueFor(el),0.49*0.21496,3)
 
       
          
