@@ -67,8 +67,34 @@ class TxTest(unittest.TestCase):
         el.branches[0].oddParticles = [n1]
         el.branches[1].oddParticles = [c1]        
         
-        print(tx.txnameData.dataType)
+        #test getting efficiency with mass only
         self.assertEqual(tx.getEfficiencyFor(el.getMasses()), 0.12396)
+
+        #test getting efficiency with element and reweighted efficiency
+        setattr(n1, 'totalwidth', 0.*GeV)
+        setattr(c1, 'totalwidth', 10**(-17)*GeV)
+        self.assertAlmostEqual(tx.getEfficiencyFor(el), 0.08697,5)
+
+      
+    def testGetValueFor(self):
+
+        f = './database/13TeV/CMS/CMS-PAS-EXO-16-036/data/THSCPM1b.txt'
+        gInfo = infoObj.Info('./database/13TeV/CMS/CMS-PAS-EXO-16-036/globalInfo.txt')
+        gInfo.addInfo('dataId','None')
+
+        el = Element(info="[[],[]]",finalState = ['HSCP','HSCP'])
+        setattr(c1, 'mass', 150*GeV)
+        el.branches[0].oddParticles = [c1]
+        el.branches[1].oddParticles = [c1]
+
+        #test getting UL with mass only
+        self.assertEqual(tx.txnameData.getValueFor(el.getMasses()), 0.12396)
+
+        #test getting UL with element and reweighted efficiency
+        setattr(c1, 'totalwidth', 10**(-17)*GeV)
+        self.assertAlmostEqual(tx.txnameData.getValueFor(el),0.06102,5)
+
+      
          
 
 
