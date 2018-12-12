@@ -111,10 +111,28 @@ class Particle(object):
         """
         Override setstate method. Required for pickling.
         """
-          
+
         self._static = False
-        self.__dict__.update(state)    
-    
+        self.__dict__.update(state)
+
+    def __add__(self, other):
+        """
+        Define addition of two Particle objects
+        or a Particle object and a MultiParticle object.
+        The result is a MultiParticle object containing
+        both particles.
+        """
+
+        if not isinstance(other,(MultiParticle,Particle)):
+            raise TypeError("Can only add particle objects")
+        elif isinstance(other,MultiParticle):
+            return other.__add__(self)
+        elif other is self:
+            return self
+        else:
+            combined = MultiParticle(label = 'multiple', particles= [self,other])
+            return combined
+
     def describe(self):
         return str(self.__dict__)
 
@@ -274,7 +292,6 @@ class MultiParticle(Particle):
         """ 
         Initializes the particle list.
         """        
-        
 
         self._static = False
         self.label = label
@@ -282,7 +299,7 @@ class MultiParticle(Particle):
         Particle.__init__(self,**kwargs)
         self._equals = [id(self)]
         self._differs = []
-    
+
     def __getattribute__(self,attr):
         """
         If MultiParticle does not have attribute, return a list
@@ -355,9 +372,33 @@ class MultiParticle(Particle):
         """
         Override setstate method. Required for pickling.
         """
-          
+
         self._static = False
-        self.__dict__.update(state)  
+        self.__dict__.update(state)
+
+    def __add__(self, other):
+        """
+        Define addition of two Particle objects
+        or a Particle object and a MultiParticle object.
+        The result is a MultiParticle object containing
+        both particles.
+        """
+
+        if not isinstance(other,(MultiParticle,Particle)):
+            raise TypeError("Can only add particle objects")
+        elif other is self:
+            return self
+        elif isinstance(other,MultiParticle):
+            addParticles = other.particles
+        elif isinstance(other,Particle):
+            addParticles = [other]
+
+        combinedParticles = [ptc for ptc in addParticles if not self.contains(ptc)]
+        combinedParticles += self.particles[:]
+
+        combined = MultiParticle(label = 'multiple', particles = combinedParticles)
+
+        return combined
 
     def getPdgs(self):
         """

@@ -91,8 +91,8 @@ class BranchTest(unittest.TestCase):
         
         b6.combineWith(b6b)
         
-        self.assertTrue( isinstance(b6.oddParticles[0],MultiParticle) )
-        self.assertEqual( b6.oddParticles[0].label, 'BSM (combined)' )
+        self.assertTrue(isinstance(b6.oddParticles[0],MultiParticle) )
+        self.assertEqual(b6.oddParticles[0].label, 'BSM (combined)' )
         self.assertEqual(len(b6.oddParticles[0].particles), 2)
 
 

@@ -288,33 +288,18 @@ class Branch(object):
         if self != other:
             raise SModelSError("Asked to combine distinct branches")
         
-        for iptc,bsm in enumerate(other.oddParticles):
-            if bsm is self.oddParticles[iptc]:
-                continue #Particles are the same (do nothing)
+        #Combine odd particles
+        for iptc,ptc in enumerate(other.oddParticles):
+            self.oddParticles[iptc] += ptc
+            if isinstance(self.oddParticles[iptc],MultiParticle):
+                self.oddParticles[iptc].label = 'BSM (combined)'
 
-            #Else create a particle list with particles from both
-            if not isinstance(self.oddParticles[iptc],MultiParticle):
-                bsmList = MultiParticle(label = 'BSM (combined)', particles=[self.oddParticles[iptc]])
-            else:
-                bsmList = self.oddParticles[iptc]
-                
-            #Now combine even particles from both branches:
-            if not isinstance(bsm,MultiParticle):
-                bsmList.particles.append(bsm)
-            else:
-                bsmList.particles += bsm.particles
-            
-            #Finally, remove duplicates:
-            newList = []
-            for ptc in bsmList.particles:
-                if any(ptc is x for x in newList):
-                    continue
-                newList.append(ptc)
-            bsmList.particles = newList
-            
-            self.oddParticles[iptc] = bsmList
-                        
-
+        #Combine even particles (if they are the same nothing changes)
+        for iv,vertex in enumerate(other.evenParticles):
+            for iptc,ptc in enumerate(vertex):
+                self.evenParticles[iv][iptc] += ptc
+                if isinstance(self.evenParticles[iv][iptc],MultiParticle):
+                    self.evenParticles[iv][iptc].label = 'SM (combined)'
 
     def _addDecay(self, decay):
         """
