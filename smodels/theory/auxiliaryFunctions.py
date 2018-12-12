@@ -7,7 +7,7 @@
 """
 
 from smodels.theory import crossSection
-from smodels.tools.physicsUnits import GeV, fb
+from smodels.tools.physicsUnits import fb
 import unum
 from collections import Iterable
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -17,28 +17,6 @@ from smodels.experiment.finalStateParticles import finalStates
 
 #Get all finalStateLabels
 finalStateLabels = finalStates.getValuesFor('label')
-
-
-def distance(ul1, ul2):
-    """
-    Define distance between two values in upper limit space.
-    The distance is defined as d = 2*|ul1-ul2|/(ul1+ul2).
-    If el1 and el2 are Element objects, the distance
-    includes the relative differences between their masses
-    and widths: d = max([d_ul,d_mass,d_width])
-
-
-    :parameter ul1: upper limit value (in fb) for element1
-    :parameter ul2: upper limit value (in fb) for element2
-
-    :returns: relative distance
-    """
-
-    if ul1 is None or ul2 is None:
-        return None
-    ulDistance = 2.*abs(ul1 - ul2)/(ul1 + ul2)
-
-    return ulDistance
 
 
 def cSim(*weights):
@@ -174,9 +152,9 @@ def addUnit(obj,unit):
     """
 
     if isinstance(obj,list):
-        return [addUnit(x) for x in obj]
+        return [addUnit(x,unit) for x in obj]
     elif isinstance(obj,dict):
-        return dict([[addUnit(x),addUnit(y)] for x,y in obj.items()])
+        return dict([[addUnit(x,unit),addUnit(y,unit)] for x,y in obj.items()])
     elif isinstance(obj,(float,int,unum.Unum)):
         return obj*unit
     else:

@@ -495,7 +495,7 @@ class TxNameData(object):
             return reweightFactor
 
         val = self.getValueForMass(massarray)
-        if val is None or math.isnan(val):
+        if not isinstance(val,(float,int,unum.Unum)):
             return val
 
         val *= reweightFactor

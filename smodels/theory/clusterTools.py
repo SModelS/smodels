@@ -8,7 +8,7 @@
 """
 
 from smodels.theory import crossSection
-from smodels.theory.auxiliaryFunctions import distance, removeUnits, addUnit
+from smodels.theory.auxiliaryFunctions import removeUnits, addUnit
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
@@ -45,6 +45,33 @@ class ElementCluster(object):
 
     def __getitem__(self, iel):
         return self.elements[iel]
+    
+    def relativeDistance(self,el1, el2):
+        """
+        Defines the relative distance between two elements according to their
+        upper limit values.
+        The distance is defined as d = 2*|ul1-ul2|/(ul1+ul2).
+       
+        :parameter el1: Element object
+        :parameter el2: Element object
+    
+        :returns: relative distance
+        """
+    
+        if not hasattr(el1,'_upperLimit'):
+            el1._upperLimit = self.txdata.getValueFor(el1)
+        if not hasattr(el2,'_upperLimit'):
+            el2._upperLimit = self.txdata.getValueFor(el2)
+
+        ul1 = el1._upperLimit
+        ul2 = el2._upperLimit    
+        
+        if ul1 is None or ul2 is None:
+            return None
+        ulDistance = 2.*abs(ul1 - ul2)/(ul1 + ul2)
+    
+        return ulDistance
+    
 
     def indices(self):
         """
@@ -86,7 +113,7 @@ class ElementCluster(object):
         
         weights = [el.weight.getMaxXsec().asNumber(fb) for el in self]
         massList = np.array(removeUnits(massList, [GeV]))
-        mAvg = np.average(massList,weights=weights,axis=0)
+        mAvg = np.average(massList,weights=weights,axis=0).tolist()
         mAvg = addUnit(mAvg,unit=GeV)
 
         return mAvg
@@ -107,10 +134,34 @@ class ElementCluster(object):
 
         weights = [el.weight.getMaxXsec().asNumber(fb) for el in self]
         widthList = np.array(removeUnits(widthList, [GeV]))
-        wAvg = np.average(widthList,weights=weights,axis=0)
+        wAvg = np.average(widthList,weights=weights,axis=0).tolist()
         wAvg = addUnit(wAvg,unit=GeV)
 
         return wAvg
+    
+    def averageElement(self):
+        """
+        Computes the average element for the cluster.
+        The average element is identical to the first element of the cluster,
+        except that the masses and widths of the oddParticles are replaced by
+        their (weighted) average values over the cluster.
+
+        :return: Element object
+        """
+
+        avgEl = self.elements[0].copy()
+        avgMass = np.array(self.getAvgMass())
+        avgWidth = np.array(self.getAvgWidth())
+        for i,br in enumerate(avgEl.branches):
+            for j,ptc in enumerate(br.oddParticles):
+                avgParticle = ptc.copy()
+                avgParticle.__setattr__('mass',avgMass[i,j])
+                avgParticle.__setattr__('totalwidth',avgWidth[i,j])
+                avgEl.branches[i].oddParticles[j]  = avgParticle
+
+        avgEl._upperLimit = self.txdata.getValueFor(avgEl)
+
+        return avgEl
 
     def getPIDs(self):
         """
@@ -202,43 +253,19 @@ class ElementCluster(object):
         for el in self:
             if not hasattr(el, '_upperLimit'):
                 el._upperLimit = self.txdata.getValueFor(el)
-            dmax = max(dmax,distance(element._upperLimit,el._upperLimit))
+            dmax = max(dmax,self.relativeDistance(element,el))
 
         return dmax
 
-    def _getMaxInternalDist(self):
+    def getMaxInternalDist(self):
         """
         Return the maximum distance between any pair of elements belonging
         to the cluster.
         """
 
-        dmax = max([self._getDistanceTo(el) for el in self])
+        dmax = max([self.getDistanceTo(el) for el in self])
 
         return dmax
-
-    def averageElement(self):
-        """
-        Computes the average element for the cluster.
-        The average element is identical to the first element of the cluster,
-        except that the masses and widths of the oddParticles are replaced by
-        their (weighted) average values over the cluster.
-
-        :return: Element object
-        """
-
-        avgEl = self.elements[0].copy()
-        avgMass = np.array(self.getAvgMass())
-        avgWidth = np.array(self.getAvgWidth())
-        for i,br in enumerate(avgEl.branches):
-            for j,ptc in enumerate(br.oddParticles):
-                avgParticle = ptc.copy()
-                avgParticle.__setattr__('mass',avgMass[i,j])
-                avgParticle.__setattr__('totalwidth',avgWidth[i,j])
-                avgEl.branches[i].oddParticle[j]  = avgParticle
-
-        avgEl._upperLimit = self.txdata.getValueFor(avgEl)
-
-        return avgEl
 
     def isConsistent(self):
         """
@@ -341,8 +368,10 @@ def _doCluster(elements, txdata, maxDist):
     #Start building maximal clusters
     clusterList = []
     for el in elementList:
-        maxels = [elB for elB in elementList if distance(elB,el) <= maxDist]
-        cluster = ElementCluster(elements=maxels,maxDist=maxDist,txdata=txdata)
+        cluster = ElementCluster(elements=[],maxDist=maxDist,txdata=txdata)        
+        for elB in elementList:
+            if cluster.relativeDistance(el, elB) <= maxDist:
+                cluster.add(elB)
         if not cluster.isConsistent():
             continue
         clusterList.append(cluster)
@@ -355,7 +384,7 @@ def _doCluster(elements, txdata, maxDist):
         newClusters = []
         for cluster in clusterList:
             #Check if maximal internal distance is below maxDist
-            if cluster._getMaxInternalDist() < maxDist:
+            if cluster.getMaxInternalDist() < maxDist:
                 if not cluster in finalClusters:
                     finalClusters.append(cluster)
 
@@ -364,7 +393,7 @@ def _doCluster(elements, txdata, maxDist):
                 #Loop over cluster elements and if element distance
                 #falls outside the cluster, remove element
                 for el in cluster:
-                    if cluster._getDistanceTo(iel) > maxDist:
+                    if cluster.getDistanceTo(iel) > maxDist:
                         newcluster = cluster.copy()
                         newcluster.remove(el)
                         if not newcluster.isConsistent():
@@ -395,7 +424,7 @@ def _doCluster(elements, txdata, maxDist):
         for jc, clusterB in enumerate(finalClusters):
             if clusterB is None:
                 continue
-            if ic != jc and clusterB.indices().issubset(clusterA.indices()):
+            if ic != jc and set(clusterB.indices()).issubset(set(clusterA.indices())):
                 finalClusters[jc] = None
     while finalClusters.count(None) > 0:
         finalClusters.remove(None)

@@ -126,15 +126,17 @@ def calculateProbabilities(width, l_inner = 1.*mm,
     F_prompt = 1 - exp(-totaltotalwidth*l_inner/gb_inner)
     F_displaced = 1 - F_prompt - F_long
     
-    where l_inner (l_outer) is the inner (outer) radius of the detector
-    and gb_inner (gb_outer) is the estimate for the kinematical factor gamma*beta.
-    We use l_inner=10.mm and gb_inner=10; l_outer=10.m and gb_outer=0.6.  
-    :param particle: particle object for which probabilities should be calculated
+    :param l_inner: is the inner radius of the detector
+    :param l_outer: is the outer radius of the detector
+    :param gb_inner: is the estimate for the kinematical factor gamma*beta for prompt decays.
+    :param gb_outer: is the estimate for the kinematical factor gamma*beta for decays outside the detector.  
+    :param width: particle width for which probabilities should be calculated
+    
     :return: Dictionary with the probabilities for the particle not to decay (in the detector), to decay promptly or displaced.
     """
     
     hc = 197.327*MeV*fm  #hbar * c
-    
+
     F_long = exp(-width*l_outer/(gb_outer*hc))
     F_prompt = 1. - exp(-width*l_inner/(gb_inner*hc))
     F_displaced = 1. - F_prompt - F_long

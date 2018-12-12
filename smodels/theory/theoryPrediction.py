@@ -8,11 +8,12 @@
 """
 
 from smodels.theory import clusterTools, crossSection, element
-from smodels.theory.auxiliaryFunctions import cSim, cGtr, elementsInStr, massAvg
-from smodels.tools.physicsUnits import TeV,fb
+from smodels.theory.auxiliaryFunctions import cSim, cGtr, elementsInStr, removeUnits,addUnit
+from smodels.tools.physicsUnits import TeV,fb,GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
+import numpy as np
 
 class TheoryPrediction(object):
     """
@@ -385,7 +386,9 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     if None in massList:
         mass = None
     else:
-        mass = massAvg(massList,weights=weights)
+        massList = np.array(removeUnits(massList, [GeV]))
+        mAvg = np.average(massList,weights=weights,axis=0).tolist()
+        mAvg = addUnit(mAvg,unit=GeV)
     
     
     #Create a combinedDataSet object:
