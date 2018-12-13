@@ -124,7 +124,11 @@ class Element(object):
         it, otherwise returns a list of values for the
         attribute appearing in each branch.
         """
-                
+
+        #If calling another special method, return default (required for pickling)
+        if name.startswith('__') and name.endswith('__'):
+            return object.__getattr__(name)
+
         try:
             return object.__getattr__(self, name)
         except AttributeError:

@@ -167,7 +167,11 @@ class Branch(object):
         return not self.__cmp__(b2) == 0
 
     def __getattr__(self, name):
-                
+
+        #If calling another special method, return default (required for pickling)
+        if name.startswith('__') and name.endswith('__'):
+            return object.__getattr__(name)
+
         try:
             return object.__getattr__(self, name)
         except AttributeError:
