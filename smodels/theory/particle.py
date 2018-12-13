@@ -133,6 +133,13 @@ class Particle(object):
             combined = MultiParticle(label = 'multiple', particles= [self,other])
             return combined
 
+    def __radd__(self,other):
+        return self.__add__(other)
+
+    def __iadd__(self,other):
+        return self.__add__(other)
+
+
     def describe(self):
         return str(self.__dict__)
 
@@ -297,7 +304,7 @@ class MultiParticle(Particle):
         self.label = label
         self.particles = particles
         Particle.__init__(self,**kwargs)
-        self._equals = [id(self)]
+        self._equals = [id(self)] + [id(ptc) for ptc in particles]
         self._differs = []
 
     def __getattribute__(self,attr):
@@ -385,7 +392,7 @@ class MultiParticle(Particle):
         """
 
         if not isinstance(other,(MultiParticle,Particle)):
-            raise TypeError("Can only add particle objects")
+            raise TypeError("Can not add a Particle object to %s" %type(other))
         elif other is self:
             return self
         elif isinstance(other,MultiParticle):
@@ -399,6 +406,23 @@ class MultiParticle(Particle):
         combined = MultiParticle(label = 'multiple', particles = combinedParticles)
 
         return combined
+    
+    def __radd__(self,other):
+        return self.__add__(other)
+    
+    def __iadd__(self,other):
+        
+        if isinstance(other,MultiParticle):
+            self.particles += [ptc for ptc in other.particles if not self.contains(ptc)]
+        elif isinstance(other,Particle):
+            if not self.contains(other):
+                self.particles.append(other)
+                if id(other) in self._differs:
+                    self._differs.remove(other)
+                if not id(other) in self._equals:
+                    self._equals.append(id(other))
+
+        return self
 
     def getPdgs(self):
         """

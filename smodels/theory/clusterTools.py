@@ -91,7 +91,7 @@ class ElementCluster(object):
         """
         totxsec = crossSection.XSectionList()
         for el in self:
-            totxsec.combineWith(el.weight)
+            totxsec += el.weight
         if len(totxsec) != 1:
             logger.error("Cluster total cross section should have a single value")
             raise SModelSError()
@@ -122,7 +122,7 @@ class ElementCluster(object):
         :returns: average mass array appearing in the cluster     
         """                          
         
-        massList = [el.getMasses() for el in self]
+        massList = [el.mass for el in self]
         if any(np.array(m).shape != np.array(massList[0]).shape for m in massList):
             return None
         
@@ -143,7 +143,7 @@ class ElementCluster(object):
         :returns: average width array appearing in the cluster
         """                          
 
-        widthList = [el.getWidths() for el in self]
+        widthList = [el.totalwidth for el in self]
         if any(np.array(w).shape != np.array(widthList[0]).shape for w in widthList):
             return None
 

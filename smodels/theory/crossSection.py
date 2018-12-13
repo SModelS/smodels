@@ -245,6 +245,7 @@ class XSectionList(object):
                 self.add(newentry)
 
     def __mul__(self, other):
+        
         newList = self.copy()
         for ixsec, xsec in enumerate(newList):
             newList[ixsec] = xsec * other
@@ -252,18 +253,45 @@ class XSectionList(object):
 
 
     def __rmul__(self, other):
-        return self * other
-
+        
+        return self*other
 
     def __add__(self,other):
+        
         newList = self.copy()
         if type(other) != type(self):
             logger.warning("Trying to add a XSectionList and a "+str(type(other)))
             return self
 
-        newList.combineWith(other)
+        newList += other
+        
         return  newList
+    
+    def __iadd__(self, newXsecs):
+        """
+        Add a new list of cross sections.
 
+        If the new cross sections already appear (have same order and sqrts),
+        add its value to the original value, otherwise append it to the list.
+        The particle IDs are ignored when adding cross sections. Hence, they
+        are set to (None, None) if any cross sections are combined.
+
+        """
+        
+        newList = newXsecs
+        if type(newXsecs) == type(XSection()):
+            newList = [newXsecs]
+        for newXsec in newList:
+            if not newXsec.info in self.getInfo():
+                self.add(newXsec)
+            else:
+                for oldXsec in self:
+                    if newXsec.info == oldXsec.info:
+                        oldXsec.value = oldXsec.value + newXsec.value
+                        if newXsec.pid != oldXsec.pid:
+                            oldXsec.pid = (None, None)
+                            
+        return self
 
     def __iter__(self):
         return iter(self.xSections)
@@ -486,31 +514,6 @@ class XSectionList(object):
                     xSecDictionary[label][xsec.pid] = xsec.value
 
         return xSecDictionary
-
-
-    def combineWith(self, newXsecs):
-        """
-        Add a new list of cross sections.
-
-        If the new cross sections already appear (have same order and sqrts),
-        add its value to the original value, otherwise append it to the list.
-        The particle IDs are ignored when adding cross sections. Hence, they
-        are set to (None, None) if any cross sections are combined.
-
-        """
-        newList = newXsecs
-        if type(newXsecs) == type(XSection()):
-            newList = [newXsecs]
-        for newXsec in newList:
-            if not newXsec.info in self.getInfo():
-                self.add(newXsec)
-            else:
-                for oldXsec in self:
-                    if newXsec.info == oldXsec.info:
-                        oldXsec.value = oldXsec.value + newXsec.value
-                        if newXsec.pid != oldXsec.pid:
-                            oldXsec.pid = (None, None)
-
 
     def removeLowerOrder(self):
         """

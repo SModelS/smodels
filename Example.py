@@ -22,7 +22,7 @@ from smodels.theory.model import Model
 setLogLevel("info")
 
 # Set the path to the database
-database = Database("official")
+database = Database("./test/database")
 
 def main():
     """
@@ -41,7 +41,7 @@ def main():
     
 
     # Set main options for decomposition
-    sigmacut = 0.01*fb
+    sigmacut = 0.03*fb
     mingap = 5.*GeV
 
     # Decompose model
@@ -61,7 +61,7 @@ def main():
         n = 0
         el = top.elementList[n]
         print( "\t\t %i-th element from %i-th topology  = " %(n,m),el, end="" )
-        print( "\n\t\t\twith final states =",el.getFinalStates(),"\n\t\t\twith cross section =",el.weight,"\n\t\t\tand masses = ",el.getMasses() )
+        print( "\n\t\t\twith final states =",el.getFinalStates(),"\n\t\t\twith cross section =",el.weight,"\n\t\t\tand masses = ",el.mass )
 
     # Load the experimental results to be used.
     # In this case, all results are employed.

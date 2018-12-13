@@ -253,7 +253,7 @@ class ElementTest(unittest.TestCase):
          
         gluino.mass = 500.*GeV
         st1.mass = 400.*GeV
-        n1.mass = 300.*GeV
+        n1.mass = 250.*GeV
         n2.mass = 300.*GeV
         n3.mass = 320.*GeV 
         n1.totalwidth = 0.*GeV
@@ -285,12 +285,14 @@ class ElementTest(unittest.TestCase):
         el2.weight = w2
         el3 = Element(info=[b1,b2])
         el3.weight = w3
-        el1.combineWith(el2)
+        el1 += el2
         self.assertEqual(el1.weight[0].value,32.*fb)
-        self.assertEqual(el1.getPIDs(),[[1000021,[1000022,1000023]],[1000021,[1000022,1000023]]])
-        el1.combineWith(el3)
+        self.assertEqual(el1.pdg,[[1000021,[1000022,1000023]],[1000021,[1000022,1000023]]])
+        self.assertEqual(el1.getAverage('mass'),[[gluino.mass,(n1.mass+n2.mass)/2.]]*2)
+        el1 += el3
         self.assertEqual(el1.weight[0].value,34.*fb)
-        self.assertEqual(el1.getPIDs(),[[1000021,[1000022,1000023]],[1000021,[1000022,1000023]]])
+        self.assertEqual(el1.pdg,[[1000021,[1000022,1000023]],[1000021,[1000022,1000023]]])
+        self.assertEqual(el1.getAverage('mass'),[[gluino.mass,(n1.mass+n2.mass)/2.]]*2)
         
         
 if __name__ == "__main__":

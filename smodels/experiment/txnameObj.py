@@ -233,7 +233,7 @@ class TxName(object):
         elif len(matches) == 1:
             return matches[0]
         else: #If more than one element ordering matches, return the one with largest mass (relevant for clustering)
-            matches = sorted(matches, key = lambda el: el.getMasses(),reverse=True)
+            matches = sorted(matches, key = lambda el: el.mass,reverse=True)
             return matches[0]
 
     def hasLikelihood(self):
@@ -482,7 +482,7 @@ class TxNameData(object):
         
         if isinstance(element,Element):
             reweightFactor = self.reweightF(element)
-            massarray = element.getMasses()
+            massarray = element.mass
         elif isinstance(element,list):
             reweightFactor = 1.
             massarray = element

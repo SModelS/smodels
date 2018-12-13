@@ -332,11 +332,11 @@ class TxTPrinter(BasicPrinter):
         output += "\t\t Final states in element: " + str(obj.getFinalStates())
         output += "\n"        
         output += "\t\t The element masses are \n"
-        for i, mass in enumerate(obj.getMasses()):
+        for i, mass in enumerate(obj.mass):
             output += "\t\t Branch %i: " % i + str(mass) + "\n"
         output += "\n"
         output += "\t\t The element PIDs are \n"
-        for pidlist in obj.getPIDs():
+        for pidlist in obj.pdg:
             output += "\t\t PIDs: "+ str(pidlist) + "\n"
         output += "\t\t The element weights are: \n \t\t " + obj.weight.niceStr().replace("\n", "\n \t\t ")
 
@@ -676,8 +676,8 @@ class PyPrinter(BasicPrinter):
         elDic = {}
         elDic["ID"] = obj.elID
         elDic["Particles"] = str(obj.getParticles())
-        elDic["Masses (GeV)"] = [[round(m.asNumber(GeV),2) for m in br] for br in obj.getMasses()]
-        elDic["PIDs"] = obj.getPIDs()
+        elDic["Masses (GeV)"] = [[round(m.asNumber(GeV),2) for m in br] for br in obj.mass]
+        elDic["PIDs"] = obj.pdg
         elDic["Weights (fb)"] = {}
         elDic["final states"] = [str(fs) for fs in obj.getFinalStates()]
         sqrts = [info.sqrts.asNumber(TeV) for info in obj.weight.getInfo()]

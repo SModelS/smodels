@@ -669,7 +669,7 @@ def _evalExpression(stringExpr,cluster):
         weightsDict['w%i'%i] = crossSection.XSectionList(infoList)
         for el1 in cluster.elements:
             if el1 == el:
-                weightsDict['w%i'%i].combineWith(el1.weight)              
+                weightsDict['w%i'%i] += el1.weight              
         evalExpr = evalExpr.replace(elStr,'w%i'%i)
 
     weightsDict.update({"Cgtr" : cGtr, "cGtr" : cGtr, "cSim" : cSim, "Csim" : cSim})

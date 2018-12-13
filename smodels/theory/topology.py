@@ -167,7 +167,7 @@ class Topology(object):
         
         index = index_bisect(self.elementList,newelement)
         if index != len(self.elementList) and self.elementList[index] == newelement:
-            self.elementList[index].combineWith(newelement)   
+            self.elementList[index] += newelement   
         else:
             self.elementList.insert(index,newelement)
 
@@ -195,7 +195,7 @@ class Topology(object):
 
         sumw = crossSection.XSectionList()
         for element in self.elementList:
-            sumw.combineWith(element.weight)
+            sumw += element.weight
 
         return sumw
 
@@ -353,7 +353,7 @@ class TopologyList(object):
         for topo in self:
             topoweight = topo.getTotalWeight()
             if topoweight:
-                sumw.combineWith(topoweight)
+                sumw += topoweight
         return sumw
 
 

@@ -68,7 +68,7 @@ class TxTest(unittest.TestCase):
         el.branches[1].oddParticles = [c1]        
         
         #test getting efficiency with mass only
-        self.assertEqual(tx.getEfficiencyFor(el.getMasses()), 0.12396)
+        self.assertEqual(tx.getEfficiencyFor(el.mass), 0.12396)
 
         #test getting efficiency with element and reweighted efficiency
         setattr(n1, 'totalwidth', 0.*GeV)
@@ -89,7 +89,7 @@ class TxTest(unittest.TestCase):
         el.branches[1].oddParticles = [c1]
 
         #test getting UL with mass only
-        self.assertEqual(tx.txnameData.getValueFor(el.getMasses()), 0.21496)
+        self.assertEqual(tx.txnameData.getValueFor(el.mass), 0.21496)
 
         #test getting UL with element and reweighted efficiency
         setattr(c1, 'totalwidth', 10**(-17)*GeV)

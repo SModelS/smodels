@@ -72,7 +72,7 @@ class CompressionTest(unittest.TestCase):
             for element in topo.elementList:
                 if str(element)!="[[[b]],[[b]]]":
                     continue
-                masses=element.motherElements[0][1].getMasses()
+                masses=element.motherElements[0][1].mass
                 tested = True
                 dm=abs(masses[0][1]-masses[0][2])/GeV
                 #If intermediate BSM states are compared there are two elements ([[[b],[c,q]],[[b],[q,q]]])

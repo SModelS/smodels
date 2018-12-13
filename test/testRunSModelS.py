@@ -35,7 +35,7 @@ class RunSModelSTest(unittest.TestCase):
         nin = len([i for i in glob.iglob("%s/*slha" % dirname) if not "~" in i])
         if nout != nin:
             logger.error("Number of output file(%d) differ from number of input files(%d)" %(nout, nin))
-        self.assertTrue( nout == nin )
+        self.assertEqual(nout,nin)
      
     def timeoutRun(self):
         filename = "./testFiles/slha/complicated.slha"

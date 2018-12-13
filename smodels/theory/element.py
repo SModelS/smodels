@@ -118,6 +118,21 @@ class Element(object):
     def __hash__(self):
         return object.__hash__(self)
 
+    def __getattr__(self, name):
+        """
+        If the element contains the attribute, returns
+        it, otherwise returns a list of values for the
+        attribute appearing in each branch.
+        """
+                
+        try:
+            return object.__getattr__(self, name)
+        except AttributeError:
+            try:
+                val = [getattr(br,name) for br in self.branches]
+                return val
+            except:
+                raise AttributeError("Element nor branch has attribute %s" %name)
 
     def __str__(self):
         """
@@ -133,6 +148,67 @@ class Element(object):
     def __repr__(self):
         
         return self.__str__()
+    
+    def __add__(self,other):
+        """
+        Adds two elements. Should only be used if the elements
+        have the same topologies. The element weights are added and their
+        odd and even particles are combined.
+        """
+        
+        if not isinstance(other,Element):
+            raise TypeError("Can not add an Element object to %s" %type(other))
+        elif self.getEinfo() != other.getEinfo():
+            raise SModelSError("Can not add elements with distinct topologies")
+        
+        newEl = self.__class__()      
+        newEl.motherElements = self.motherElements[:] + other.motherElements[:]
+        newEl.weight = self.weight + other.weight
+        newEl.branches = []
+        for ibr,branch in enumerate(self.branches):
+            newEl.branches.append(branch + other.branches[ibr])
+        
+        return newEl
+
+    def __radd__(self,other):
+        """
+        Adds two elements. Only elements with the same
+        topology can be combined.
+        """
+        
+        return self.__add__(other)
+
+    def __iadd__(self,other):
+        """
+        Combine two elements. Should only be used if the elements
+        have the same topologies. The element weights are added and their
+        odd and even particles are combined. 
+        """
+        
+        if not isinstance(other,Element):
+            raise TypeError("Can not add an Element object to %s" %type(other))
+        elif self.getEinfo() != other.getEinfo():
+            raise SModelSError("Can not add elements with distinct topologies")
+              
+        self.motherElements += other.motherElements[:]
+        self.weight += other.weight
+        for ibr,_ in enumerate(self.branches):
+            self.branches[ibr] += other.branches[ibr]
+            
+        return self
+    
+    def getAverage(self,attr):
+        """
+        Get the average value for a given attribute appearing in 
+        the odd particles of the element branches. 
+        """
+        
+        try:
+            vals = [br.getAverage(attr) for br in self.branches]
+        except:
+            raise SModelSError("Could not compute average for %s" %attr)
+        
+        return vals
 
     def toStr(self):
         """
@@ -210,29 +286,6 @@ class Element(object):
 
         return fsparticles
 
-
-    def getMasses(self):
-        """
-        Get the array of BSM masses in the element.    
-        
-        :returns: list of masses (mass array)            
-        """        
-        
-        massarray = [branch.getMasses() for branch in self.branches]
-
-        return massarray
-
-    def getWidths(self):
-        """
-        Get the array of BSM widths in the element.
-
-        :returns: list of widths (array)
-        """
-
-        widtharray = [branch.getWidths() for branch in self.branches]
-
-        return widtharray
-
     def getBSMparticles(self):
         """
         Get the list of BSM particles appearing the cascade decay,
@@ -246,20 +299,6 @@ class Element(object):
             BSMparticles.append([particle for particle in branch.oddParticles])      
 
         return BSMparticles
-
-    def getPIDs(self):
-        """
-        Get the list of IDs (PDGs of the intermediate states appearing the cascade decay), i.e.
-        [  [[pdg1,pdg2,...],[pdg3,pdg4,...]] ].
-        
-        :returns: list of PDG ids
-        """
-
-        BSMpids = []
-        for br in self.getBSMparticles():
-            BSMpids.append([particle.pdg for particle in br])
-
-        return BSMpids
 
     def getDaughters(self):
         """
@@ -306,13 +345,13 @@ class Element(object):
         while not all(mother[0] == 'original' for mother in allmothers):                        
             for im, mother in enumerate(allmothers):
                 if mother[0] != 'original':
-                    allmothers.extend( mother[1].motherElements )
+                    allmothers.extend(mother[1].motherElements)
                     allmothers.pop(im)                                    
 
         # get the PIDs of all mothers      
         motherPids = []
         for mother in allmothers:  
-            motherPids.append( mother[1].getPIDs() ) 
+            motherPids.append(mother[1].pdg) 
 
         branch1 = []
         branch2 = []
@@ -325,8 +364,6 @@ class Element(object):
                 if not pids in motherPids: motherPids.append(pids)  
    
         return motherPids     
-        
-
 
     def getEinfo(self):
         """
@@ -539,23 +576,6 @@ class Element(object):
         return None
 
 
-    def combineWith(self, other):
-        """
-        Combine two elements. Should only be used if the elements
-        are considered as equal.
-        The elements branches and weights are combined as well as their mothers. 
-        
-        :parameter other: element (Element Object)  
-        """
-        
-        if self != other:
-            raise SModelSError("Asked to combine distinct elements")
-
-        self.motherElements += other.motherElements[:]
-        self.weight.combineWith(other.weight)
-        for ibr,branch in enumerate(self.branches):
-            branch.combineWith(other.branches[ibr])
-    
     def hasTopInList(self, elementList):
         """
         Check if the element topology matches any of the topologies in the

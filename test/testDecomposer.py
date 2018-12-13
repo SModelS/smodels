@@ -34,7 +34,7 @@ class DecomposerTest(unittest.TestCase):
         self.assertTrue(el == element)
         bsmLabels = [[bsm.label for bsm in branch] for branch in element.getBSMparticles()]
         self.assertEqual(bsmLabels,[['gluino','N1']]*2)
-        self.assertAlmostEqual(element.getMasses(),[[675.*GeV,200.*GeV]]*2)
+        self.assertAlmostEqual(element.mass,[[675.*GeV,200.*GeV]]*2)
         xsec = [xsec for xsec in element.weight if xsec.info.sqrts == 8.*TeV][0]
         xsec = xsec.value.asNumber(pb)        
         self.assertAlmostEqual(xsec,0.262,3)
@@ -53,7 +53,7 @@ class DecomposerTest(unittest.TestCase):
         self.assertTrue(el == element)
         bsmLabels = [[bsm.label for bsm in branch] for branch in element.getBSMparticles()]
         self.assertEqual(bsmLabels,[['gluino','N1']]*2)
-        self.assertAlmostEqual(element.getMasses(),[[675.*GeV,200.*GeV]]*2)
+        self.assertAlmostEqual(element.mass,[[675.*GeV,200.*GeV]]*2)
         xsec = [xsec for xsec in element.weight if xsec.info.sqrts == 8.*TeV][0]
         xsec = xsec.value.asNumber(pb)
         self.assertAlmostEqual(element.weight[0].value.asNumber(pb),0.572,3)
@@ -150,7 +150,7 @@ class DecomposerTest(unittest.TestCase):
             for element in topo.elementList:
                 if str(element)!="[[[b]],[[b]]]":
                     continue
-                masses = element.motherElements[0][1].getMasses()
+                masses = element.motherElements[0][1].mass
                 dm = abs(masses[0][1]-masses[0][2])/GeV
                 tested = True
                 self.assertEqual(len(element.motherElements),24)

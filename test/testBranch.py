@@ -89,7 +89,7 @@ class BranchTest(unittest.TestCase):
         b6b = Branch( '[[e-],[q]]' )
         b6b.oddParticles = [sq2b]
         
-        b6.combineWith(b6b)
+        b6 += b6b
         
         self.assertTrue(isinstance(b6.oddParticles[0],MultiParticle) )
         self.assertEqual(b6.oddParticles[0].label, 'BSM (combined)' )

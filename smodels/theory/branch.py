@@ -166,38 +166,109 @@ class Branch(object):
     def __ne__( self, b2 ):
         return not self.__cmp__(b2) == 0
 
+    def __getattr__(self, name):
+                
+        try:
+            return object.__getattr__(self, name)
+        except AttributeError:
+            try:
+                val = [getattr(ptc,name) for ptc in self.oddParticles]
+                return val
+            except:
+                raise AttributeError("Element nor branch has attribute %s" %name)
         
-    def getMasses(self):
+    def __add__(self,other):
         """
-        Return list with masses of the BSM particles appearing in the branch
+        Adds two branches. Should only be used if the branches
+        have the same topologies. The odd and even particles are combined.
+        """
         
-        :return: List with masses
-        """      
-        bsmMasses = []    
-        for bsm in self.oddParticles:
-            if not isinstance(bsm.mass, list):
-                bsmMasses.append(bsm.mass)
-            else:
-                bsmMasses.append(bsm.mass[0])
+        if not isinstance(other,Branch):
+            raise TypeError("Can not add a Branch object to %s" %type(other))
+        elif self.getInfo() != other.getInfo():
+            raise SModelSError("Can not add branches with distinct topologies")
+        
+        newBranch = self.__class__()
+        #Combine odd particles
+        for iptc,ptc in enumerate(self.oddParticles):
+            newBranch.oddParticles.append(ptc+other.oddParticles[iptc])
+            if isinstance(newBranch.oddParticles[iptc],MultiParticle):
+                newBranch.oddParticles[iptc].label = 'BSM (combined)'
 
-        return bsmMasses
+        #Combine even particles (if they are the same nothing changes)
+        for iv,vertex in enumerate(self.evenParticles):
+            newBranch.evenParticles.append([])
+            for iptc,ptc in enumerate(vertex):
+                newBranch.evenParticles[iv].append(ptc + other.evenParticles[iv][iptc])
+                if isinstance(newBranch.evenParticles[iv][iptc],MultiParticle):
+                    newBranch.evenParticles[iv][iptc].label = 'SM (combined)'
+        
+        if not self.maxWeight is None and not other.maxWeight is None:        
+            newBranch.maxWeight = self.maxWeight + other.maxWeight
 
-    def getWidths(self):
+        return newBranch
+
+    def __radd__(self,other):
         """
-        Return list with widths of the BSM particles appearing in the branch
+        Adds two elements. Only elements with the same
+        topology can be combined.
+        """
+        
+        return self.__add__(other)
 
-        :return: List with widths
-        """      
+    def __iadd__(self,other):
+        """
+        Combine two branches. Should only be used if the elements
+        have the same topologies. The branches
+        odd and even particles are combined. 
+        """
+        
+        if not isinstance(other,Branch):
+            raise TypeError("Can not add a Branch object to %s" %type(other))
+        elif self.getInfo() != other.getInfo():
+            raise SModelSError("Can not add branches with distinct topologies")
+        
+        #Combine odd particles
+        for iptc,ptc in enumerate(other.oddParticles):
+            self.oddParticles[iptc] += ptc
+            if isinstance(self.oddParticles[iptc],MultiParticle):
+                self.oddParticles[iptc].label = 'BSM (combined)'
 
-        bsmWidths = []
-        for bsm in self.oddParticles:
-            if not isinstance(bsm.totalwidth, list):
-                bsmWidths.append(bsm.totalwidth)
-            else:
-                bsmWidths.append(bsm.totalwidth[0])
-
-        return bsmWidths
-
+        #Combine even particles (if they are the same nothing changes)
+        for iv,vertex in enumerate(other.evenParticles):
+            for iptc,ptc in enumerate(vertex):
+                self.evenParticles[iv][iptc] += ptc
+                if isinstance(self.evenParticles[iv][iptc],MultiParticle):
+                    self.evenParticles[iv][iptc].label = 'SM (combined)'
+        
+        if not self.maxWeight is None and not other.maxWeight is None:
+            self.maxWeight += other.maxWeight
+                    
+        return self
+    
+    def getAverage(self,attr):
+        """
+        Get the average value for a given attribute appearing in 
+        the odd particles of branch. 
+        """
+        
+        try:
+            vals = []
+            for ptc in self.oddParticles:
+                v = getattr(ptc,attr)
+                if isinstance(ptc,MultiParticle) and isinstance(v,list):                    
+                    avg = v[0]
+                    for x in v[1:]:
+                        avg += x
+                    avg =avg/len(v)
+                else:
+                    avg = v
+                vals.append(avg)
+        except:
+            raise SModelSError("Could not compute average for %s" %attr)
+        
+        return vals
+    
 
     def sortParticles(self):
         """
@@ -264,7 +335,6 @@ class Branch(object):
             newbranch.maxWeight = self.maxWeight.copy()
         return newbranch
 
-
     def getLength(self):
         """
         Returns the branch length (number of odd particles).
@@ -273,33 +343,6 @@ class Branch(object):
         """
         
         return len(self.oddParticles)
-    
-    
-    def combineWith(self,other):
-        """
-        Combines itself with the other branch.
-        Should only be used if both branches are considered equal.
-        The BSM particles appearing in both branches are combined
-        into MultiParticle objects.
-        
-        :parameter other: branch (Branch Object)        
-        """
-
-        if self != other:
-            raise SModelSError("Asked to combine distinct branches")
-        
-        #Combine odd particles
-        for iptc,ptc in enumerate(other.oddParticles):
-            self.oddParticles[iptc] += ptc
-            if isinstance(self.oddParticles[iptc],MultiParticle):
-                self.oddParticles[iptc].label = 'BSM (combined)'
-
-        #Combine even particles (if they are the same nothing changes)
-        for iv,vertex in enumerate(other.evenParticles):
-            for iptc,ptc in enumerate(vertex):
-                self.evenParticles[iv][iptc] += ptc
-                if isinstance(self.evenParticles[iv][iptc],MultiParticle):
-                    self.evenParticles[iv][iptc].label = 'SM (combined)'
 
     def _addDecay(self, decay):
         """
@@ -419,7 +462,8 @@ class InclusiveBranch(Branch):
     
     def __init__(self,finalState=None):
         Branch.__init__(self)
-        self.masses = InclusiveList()
+        self.mass = InclusiveList()
+        self.totalwidth = InclusiveList()
         self.evenParticles =  InclusiveList()
         if finalState:
             bsmParticle = finalStates.getParticlesWith(label=finalState)
@@ -457,15 +501,9 @@ class InclusiveBranch(Branch):
                 return comp 
     
         return 0  #Branches are equal    
-        
-        
        
     def __str__(self):
         return '[*]'
-    
-    
-    def getMasses(self):
-        return InclusiveList()
         
     def getInfo(self):
         """

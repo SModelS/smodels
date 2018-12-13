@@ -43,7 +43,7 @@ def cSim(*weights):
                 infoList.append(info)
     zeros = crossSection.XSectionList(infoList)
     for weight in weights:
-        weight.combineWith(zeros)
+        weight += zeros
 
     # Evaluate the inequality for each cross section info
     result = crossSection.XSectionList()
@@ -89,8 +89,8 @@ def cGtr(weightA, weightB):
         # If there are no cross sections, can not evaluate
         return 'N/A'
     zeros = crossSection.XSectionList(infoList)
-    weightA.combineWith(zeros)
-    weightB.combineWith(zeros)
+    weightA += zeros
+    weightB += zeros
 
     # Evaluate the inequality for each cross section info
     result = crossSection.XSectionList()
