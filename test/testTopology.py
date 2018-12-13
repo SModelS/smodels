@@ -87,7 +87,7 @@ class TopologyTest(unittest.TestCase):
         self.assertEqual(top1.getElements()[0].weight[0].value == 32.*fb, True)
         self.assertEqual(top1.getTotalWeight()[0].value == 32.*fb, True)
         bsmparticles = [[gluino,st1,n1], [st1,n1]]
-        self.assertEqual(top1.getElements()[0].getBSMparticles() == bsmparticles, True)
+        self.assertEqual(top1.getElements()[0].oddParticles == bsmparticles, True)
 
 
     def testTopologyList(self):

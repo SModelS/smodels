@@ -263,17 +263,6 @@ class Element(object):
         if len(self.branches) == 2:
             newEl.branches = [newEl.branches[1], newEl.branches[0]]
         return newEl
-
-    def getParticles(self):
-        """
-        Get the array of even particle objects in the element.
-        
-        :returns: list of Particle objects                
-        """
-        
-        particles = [branch.evenParticles for branch in self.branches]
-
-        return particles
     
     def getFinalStates(self):
         """
@@ -285,20 +274,6 @@ class Element(object):
         fsparticles = [branch.oddParticles[-1] for branch in self.branches]
 
         return fsparticles
-
-    def getBSMparticles(self):
-        """
-        Get the list of BSM particles appearing the cascade decay,
-        including the last (stable) one.
-
-        :returns: list of Particle or ParticleList objects
-        """    
-        
-        BSMparticles = []
-        for branch in self.branches:
-            BSMparticles.append([particle for particle in branch.oddParticles])      
-
-        return BSMparticles
 
     def getDaughters(self):
         """

@@ -115,7 +115,7 @@ class InclusiveObjectsTest(unittest.TestCase):
         el = element.Element(info="[[],[[e+]]]",finalState = ['HSCP','MET'])
         newEl = tx.hasElementAs(el)  #newEl should be equal to el, but with opposite branch ordering
         self.assertFalse(newEl is None)
-        bsmParticles = [[str(bsm) for bsm in br] for br in newEl.getBSMparticles()]        
+        bsmParticles = [[str(bsm) for bsm in br] for br in newEl.oddParticles]        
         self.assertTrue(bsmParticles == [['anyOdd','MET'],['HSCP']])
         
 

@@ -157,31 +157,18 @@ class ElementCluster(object):
     def averageElement(self):
         """
         Computes the average element for the cluster.
-        The average element is identical to the first element of the cluster,
-        except that the masses and widths of the oddParticles are replaced by
-        their (weighted) average values over the cluster.
+        The average element is an empty element,
+        but with its mass and width given by the average over the cluster elements.
 
         :return: Element object
         """
 
-        avgEl = self.elements[0].copy()
+        avgEl = self.elements[0].__class__()
+        avgEl.mass = self.getAvgMass()
+        avgEl.totalwidth = self.getAvgWidth()
         avgEl.txname = self.elements[0].txname
-        avgMass = self.getAvgMass()
-        avgWidth = self.getAvgWidth()
-        for i,br in enumerate(avgEl.branches):
-            for j,ptc in enumerate(br.oddParticles):
-                avgParticle = ptc.copy()
-                avgParticle.__setattr__('mass',None)
-                avgParticle.__setattr__('totalwidth',None)
-                if not (avgMass is None):
-                    avgParticle.__setattr__('mass',avgMass[i][j])
-                if not (avgWidth is None):
-                    avgParticle.__setattr__('totalwidth',avgWidth[i][j])
-                avgEl.branches[i].oddParticles[j]  = avgParticle
-
         avgEl._upperLimit = self.dataset.getUpperLimitFor(avgEl,
                                                           txnames=avgEl.txname)
-
         return avgEl
 
     def getPIDs(self):

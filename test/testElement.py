@@ -293,7 +293,6 @@ class ElementTest(unittest.TestCase):
         self.assertEqual(el1.weight[0].value,34.*fb)
         self.assertEqual(el1.pdg,[[1000021,[1000022,1000023]],[1000021,[1000022,1000023]]])
         self.assertEqual(el1.getAverage('mass'),[[gluino.mass,(n1.mass+n2.mass)/2.]]*2)
-        
-        
+
 if __name__ == "__main__":
     unittest.main()

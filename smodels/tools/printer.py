@@ -327,7 +327,7 @@ class TxTPrinter(BasicPrinter):
         output = ""
         output +="\t\t Element ID: " + str(obj.elID)
         output += "\n"
-        output += "\t\t Particles in element: " + str(obj.getParticles())
+        output += "\t\t Particles in element: " + str(obj.evenParticles)
         output += "\n"
         output += "\t\t Final states in element: " + str(obj.getFinalStates())
         output += "\n"        
@@ -675,7 +675,7 @@ class PyPrinter(BasicPrinter):
 
         elDic = {}
         elDic["ID"] = obj.elID
-        elDic["Particles"] = str(obj.getParticles())
+        elDic["Particles"] = str(obj.evenParticles)
         elDic["Masses (GeV)"] = [[round(m.asNumber(GeV),2) for m in br] for br in obj.mass]
         elDic["PIDs"] = obj.pdg
         elDic["Weights (fb)"] = {}

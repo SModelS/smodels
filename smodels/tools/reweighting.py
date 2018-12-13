@@ -25,14 +25,13 @@ def defaultEffReweight(element):
     :return: Reweight factor (float)
     """
 
-    bsmStates = element.getBSMparticles()
+    elWidths = element.totalwidth
     elFraction = 1.
-    for branch in bsmStates:
+    for branchWidths in elWidths:
         branchFraction = 1.
-        for bsm in branch[:-1]:
-            branchFraction *= calculateProbabilities(width=bsm.totalwidth)['F_prompt']
-        finalState = branch[-1]
-        branchFraction *= calculateProbabilities(width=finalState.totalwidth)['F_long']
+        for width in branchWidths[:-1]:
+            branchFraction *= calculateProbabilities(width)['F_prompt']
+        branchFraction *= calculateProbabilities(width=branchWidths[-1])['F_long']
         elFraction *= branchFraction
 
     return elFraction

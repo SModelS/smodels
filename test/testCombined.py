@@ -16,6 +16,7 @@ from unitTestHelpers import equalObjs, runMain
 from smodels.tools.smodelsLogging import logger, setLogLevel
  
 class CombinedTest(unittest.TestCase):
+
     def defineTest(self):
         """ define the current output as the default output.
         Use with care! """

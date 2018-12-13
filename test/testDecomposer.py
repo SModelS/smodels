@@ -32,7 +32,7 @@ class DecomposerTest(unittest.TestCase):
         element = topList.getElements()[0]
         el = Element("[[[q,q]],[[q,q]]]",finalState=['MET','MET'])
         self.assertTrue(el == element)
-        bsmLabels = [[bsm.label for bsm in branch] for branch in element.getBSMparticles()]
+        bsmLabels = [[bsm.label for bsm in branch] for branch in element.oddParticles]
         self.assertEqual(bsmLabels,[['gluino','N1']]*2)
         self.assertAlmostEqual(element.mass,[[675.*GeV,200.*GeV]]*2)
         xsec = [xsec for xsec in element.weight if xsec.info.sqrts == 8.*TeV][0]
@@ -51,7 +51,7 @@ class DecomposerTest(unittest.TestCase):
         element = topList.getElements()[0]
         el = Element("[[[q,q]],[[q,q]]]",finalState=['MET','MET'])
         self.assertTrue(el == element)
-        bsmLabels = [[bsm.label for bsm in branch] for branch in element.getBSMparticles()]
+        bsmLabels = [[bsm.label for bsm in branch] for branch in element.oddParticles]
         self.assertEqual(bsmLabels,[['gluino','N1']]*2)
         self.assertAlmostEqual(element.mass,[[675.*GeV,200.*GeV]]*2)
         xsec = [xsec for xsec in element.weight if xsec.info.sqrts == 8.*TeV][0]
@@ -76,7 +76,7 @@ class DecomposerTest(unittest.TestCase):
                            str(sorted([['sta_1~','N1~'],['sta_1','N1']])).replace(' ','') : 0.065}
               
         for el in topList.getElements():
-            bsmLabels = str(sorted([[bsm.label for bsm in branch] for branch in el.getBSMparticles()]))
+            bsmLabels = str(sorted([[bsm.label for bsm in branch] for branch in el.oddParticles]))
             bsmLabels = bsmLabels.replace(' ','')
             xsec = el.weight.getXsecsFor(8.*TeV)[0].value.asNumber(fb)
             self.assertAlmostEqual(expectedWeights[bsmLabels], xsec,2)
@@ -127,7 +127,7 @@ class DecomposerTest(unittest.TestCase):
                     continue
                 tested = True
                 self.assertEqual(str(element.motherElements[0][1]),"[[],[[nu,nu]]]")
-                bsmLabels = [[bsm.label for bsm in br] for br in element.getBSMparticles()]
+                bsmLabels = [[bsm.label for bsm in br] for br in element.oddParticles]
                 self.assertEqual(bsmLabels,[['N1'],['inv']])
                 ## all neutrinos are considered as equal, so there should be a single mother:
                 self.assertEqual(len(element.motherElements), 1) 
