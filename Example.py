@@ -22,7 +22,7 @@ from smodels.theory.model import Model
 setLogLevel("info")
 
 # Set the path to the database
-database = Database("./test/database")
+database = Database("official")
 
 def main():
     """
@@ -41,7 +41,7 @@ def main():
     
 
     # Set main options for decomposition
-    sigmacut = 0.03*fb
+    sigmacut = 0.01*fb
     mingap = 5.*GeV
 
     # Decompose model
