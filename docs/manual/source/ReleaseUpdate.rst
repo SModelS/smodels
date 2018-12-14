@@ -44,15 +44,22 @@ New in Version 2.0.0:
   * Only one :ref:`decomposer <decomp>` for both SLHA and LHE files (see also :ref:`LHE-reader <lhereader>`)
   * Decomposition and experimental results can include displaced signatures
   * Moved :ref:`lifetime reweighting <dbReweighting>` to |database| for meta-stable particles
-  * Added approximate lifetime reweighting for :ref:`missing topologies <topCoverage>` 
+  * Added approximate lifetime reweighting for :ref:`missing topologies <topCoverage>`
+
+New in Version 1.2.3:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Downloaded database files now stored in $HOME/.cache/smodels
 
 New in Version 1.2.2:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * Updated official |database|, added T3GQ eff maps and a few ATLAS 13 TeV results, see `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_  
+  * Updated official |database|, added T3GQ eff maps and a few ATLAS 13 TeV results, see `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_
   * Database "official" now refers to a database without fastlim results, "official_fastlim", to the official database *with* fastlim
   * List displaced signatures in :ref:`missing topologies <topCoverage>`
   * Improved description about :ref:`lifetime reweighting <lifetimeWeight>` in doc
+  * Fix in :ref:`cluster<ULcluster>` for asymmetric masses
+  * Small improvements in the :ref:`interactive plots tool <interactivePlots>`
 
 New in Version 1.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
