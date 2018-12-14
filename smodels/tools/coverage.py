@@ -231,13 +231,11 @@ class UncoveredList(object):
         """     
 
         newGenEl = self.generalElement(el)
-        newGenEl.sortBranches()
-
         name = str(newGenEl).replace('~','') + '  (%s)'%(str( newGenEl.branches[0]._decayType) + ","+ str(newGenEl.branches[1]._decayType) )    
 
         # Check if an element with the same generalized name has already been added
         for genEl in self.generalElements:
-            if name == genEl._outputDescription:
+            if newGenEl._allEvenParticles == genEl._allEvenParticles and newGenEl._decayTypes == genEl._decayTypes:                
                 genEl._contributingElements.append(el)
                 genEl.missingX += el.missingX
                 return
@@ -280,5 +278,9 @@ class UncoveredList(object):
             newEl.branches[ib].evenParticles = newParticles
             newEl.branches[ib].setInfo()
         
+        newEl.sortBranches()
+        newEl._decayTypes = [newEl.branches[0]._decayType, newEl.branches[1]._decayType]
+        newEl._allEvenParticles = [newEl.branches[0].evenParticles, newEl.branches[1].evenParticles]
+
         return newEl 
 
