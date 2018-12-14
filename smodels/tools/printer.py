@@ -978,7 +978,7 @@ class SLHAPrinter(TxTPrinter):
         TxTPrinter.__init__(self, output, filename)
         self.name = "slha"
         self.docompress = 0
-	self.combinesr = 0
+        self.combinesr = 0
         self.printingOrder = [OutputStatus,TheoryPredictionList, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
