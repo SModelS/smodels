@@ -5,6 +5,7 @@ BLOCK SModelS_Settings
  3 1                         #compression (0 off, 1 on)
  4 5.0                       #minimum mass gap for mass compression [GeV]
  5 0.03                      #sigmacut [fb]
+ 6 0                         #signal region combination (0 off, 1 on)
 
 BLOCK SModelS_Exclusion
  0 0 0                              #output status (-1 not tested, 0 not excluded, 1 excluded)

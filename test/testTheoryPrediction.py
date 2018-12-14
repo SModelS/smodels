@@ -15,7 +15,12 @@ import unittest
 from smodels.tools.physicsUnits import fb, GeV
 from databaseLoader import database
 import inspect
-import os
+from smodels.theory import decomposer
+from smodels.share.models.mssm import BSMList
+from smodels.share.models.SMparticles import SMList
+from smodels.theory.model import Model
+from smodels.theory.theoryPrediction import theoryPredictionsFor
+
 
 class IntegrationTest(unittest.TestCase):
     def configureLogger(self):
@@ -35,15 +40,12 @@ class IntegrationTest(unittest.TestCase):
 
     def checkAnalysis(self,expresult,smstoplist):
         expID = expresult.globalInfo.id
-        from smodels.theory.theoryPrediction import theoryPredictionsFor
         theorypredictions = theoryPredictionsFor(expresult, smstoplist)
         defpreds=self.predictions()
         if not theorypredictions:
             print ( "no theory predictions for",expresult,"??" )
-            import sys
             sys.exit(-1)
         for pred in theorypredictions:
-            m0=str(int(pred.mass[0][0]/GeV))
             predval=pred.xsection.value 
             defpredval = defpreds[expID]
             self.assertAlmostEqual( predval.asNumber(fb), defpredval.asNumber (fb) )
@@ -51,14 +53,7 @@ class IntegrationTest(unittest.TestCase):
             if pred.chi2 != self.predchi2()[expID]:
                 self.assertAlmostEqual(pred.chi2/self.predchi2()[expID], 1.0, 1 )
 
-
     def testIntegration(self):
-        from smodels.installation import installDirectory
-        from smodels.tools.physicsUnits import fb, GeV
-        from smodels.theory import decomposer
-        from smodels.share.models.mssm import BSMList
-        from smodels.share.models.SMparticles import SMList
-        from smodels.theory.model import Model
         
         slhafile = '../inputFiles/slha/simplyGluino.slha'
         model = Model(BSMList,SMList,slhafile)
@@ -74,6 +69,45 @@ class IntegrationTest(unittest.TestCase):
             listofanalyses= [ listofanalyses] 
         for analysis in listofanalyses:
             self.checkAnalysis(analysis,smstoplist)
+
+    def checkPrediction(self,slhafile,expID,expectedValues):
+
+        reducedModel = [ptc for ptc in BSMList if abs(ptc.pdg) in [1000011,1000012]]
+        model = Model(reducedModel,SMList,slhafile)
+        model.updateParticles()
+
+        self.configureLogger()
+        smstoplist = decomposer.decompose(model, 0.*fb, doCompress=True,
+                doInvisible=True, minmassgap=5.*GeV)
+
+        expresults = database.getExpResults(analysisIDs= expID)
+        for expresult in expresults:
+            theorypredictions = theoryPredictionsFor(expresult, smstoplist)
+            for pred in theorypredictions:
+                predval=pred.xsection.value
+                expval = expectedValues.pop()
+                delta = expval*0.01
+                self.assertAlmostEqual(predval.asNumber(fb), expval,delta=delta)
+
+        self.assertTrue(len(expectedValues) == 0)
+
+    def testReweightPrediction(self):
+
+        expID = ["CMS-EXO-13-006"]
+        #Test long-lived case:
+        slhafile = './testFiles/slha/hscpTest_long.slha'
+        expValue = [0.0743]
+        self.checkPrediction(slhafile, expID, expValue)
+
+        #Test displaced case:
+        slhafile = './testFiles/slha/hscpTest_mid.slha'
+        expValue = [2.20e-7]
+        self.checkPrediction(slhafile, expID, expValue)
+
+        #Test short-lived case:
+        slhafile = './testFiles/slha/hscpTest_short.slha'
+        expValue = [5.98e-10]
+        self.checkPrediction(slhafile, expID, expValue)
 
 if __name__ == "__main__":
     unittest.main()

@@ -14,7 +14,6 @@ sys.path.insert(0,"../")
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
-from smodels.installation import installDirectory
 from smodels.theory import decomposer
 from smodels.theory.element import Element 
 from smodels.tools.physicsUnits import GeV,pb,TeV,fb
@@ -23,7 +22,7 @@ class DecomposerTest(unittest.TestCase):
 
     def testDecomposerLHE(self):
    
-        filename = "%sinputFiles/lhe/simplyGluino.lhe" %(installDirectory())  
+        filename = "./testFiles/lhe/simplyGluino.lhe"
         model = Model(BSMList,SMList,filename)
         model.updateParticles()
            
@@ -42,7 +41,7 @@ class DecomposerTest(unittest.TestCase):
   
     def testDecomposerSLHA(self):
   
-        filename = "%sinputFiles/slha/simplyGluino.slha" %(installDirectory())  
+        filename = "./testFiles/slha/simplyGluino.slha"
         model = Model(BSMList,SMList,filename)
         model.updateParticles()
           
@@ -61,7 +60,7 @@ class DecomposerTest(unittest.TestCase):
    
     def testDecomposerLongLived(self):
     
-        filename = "%sinputFiles/slha/longLived.slha" %(installDirectory())
+        filename = "./testFiles/slha/longLived.slha"
         #Consider a simpler model
         newModel = [ptc for ptc in BSMList if not isinstance(ptc.pdg,list) and abs(ptc.pdg) in [1000015,1000022]] 
         model = Model(newModel,SMList,filename)
@@ -80,7 +79,6 @@ class DecomposerTest(unittest.TestCase):
             bsmLabels = bsmLabels.replace(' ','')
             xsec = el.weight.getXsecsFor(8.*TeV)[0].value.asNumber(fb)
             self.assertAlmostEqual(expectedWeights[bsmLabels], xsec,2)
-
 
     def testCompression(self):
         

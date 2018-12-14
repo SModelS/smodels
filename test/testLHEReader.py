@@ -12,7 +12,6 @@
 import unittest
 import sys
 sys.path.insert(0,"../")
-from smodels.installation import installDirectory
 from smodels.theory import lheReader
 import pyslha
 import logging as logger
@@ -54,18 +53,19 @@ class LHEReaderTest(unittest.TestCase):
 
     def testReader(self):
         
-        filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory())
+        filename = "./testFiles/lhe/simplyGluino.lhe"
         reader = lheReader.LheReader(filename)
         events = [event for event in reader]
+        reader.close()
         self.assertEqual(len(events),5)
         
 
     def testEventDictionaries(self):
 
-        filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory())
+        filename = "./testFiles/lhe/simplyGluino.lhe"
         reader = lheReader.LheReader(filename)
         events = [event for event in reader]
-        
+        reader.close()
         
         massDict,decayDict = lheReader.getDictionariesFromEvent(events[0])
         self.assertEqual(massDict,{-1: [0.33], 1000021: [675.0], 1000022: [200.0], 1: [0.33]})
@@ -75,7 +75,7 @@ class LHEReaderTest(unittest.TestCase):
         
     def testDictionaries(self):
 
-        filename = "%sinputFiles/lhe/simplyGluino.lhe" % (installDirectory())
+        filename = "./testFiles/lhe/simplyGluino.lhe"
         massDict,decayDict = lheReader.getDictionariesFrom(filename)
         self.assertEqual(massDict,{1000021: 675.0, 1000022: 200.0, 1: 0.33, 2 : 0.33})
         gluinoDecs = [pyslha.Decay(br=0.3,nda=3,ids=[-1,1,1000022],parentid=1000021),
@@ -83,9 +83,9 @@ class LHEReaderTest(unittest.TestCase):
         self.assertEqual(len(decayDict[1000021].decays),len(gluinoDecs))
         self.assertTrue(compareDecays(gluinoDecs,decayDict[1000021].decays))            
         
-        re = pyslha.readSLHAFile("%sinputFiles/slha/gluino_squarks.slha" % (installDirectory()))
+        re = pyslha.readSLHAFile("./testFiles/slha/gluino_squarks.slha")
 
-        filename = "%sinputFiles/lhe/gluino_squarks.lhe" % (installDirectory())
+        filename = "./testFiles/lhe/gluino_squarks.lhe"
         massDict,decayDict = lheReader.getDictionariesFrom(filename)
         for pdg in massDict:
             if pdg < 100000:

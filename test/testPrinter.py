@@ -11,7 +11,6 @@
 import sys,os,importlib
 sys.path.insert(0,"../")
 import unittest
-from smodels.installation import installDirectory as idir
 from smodels.theory import decomposer
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
@@ -27,7 +26,6 @@ from smodels import particlesLoader
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
-import pyslha
 
 def sortXML(xmltree):
     for el in xmltree:        
@@ -129,7 +127,7 @@ class RunPrinterTest(unittest.TestCase):
 
 
     def testTextPrinter(self):
-        outputfile = os.path.join( idir(), "test/unitTestOutput/printer_output.smodels")
+        outputfile ="./unitTestOutput/printer_output.smodels"
         self.removeOutputs ( outputfile )
         mprinter = printer.MPrinter()
         mprinter.Printers['summary'] = printer.SummaryPrinter(output = 'file')        
@@ -140,7 +138,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)
          
-        samplefile = os.path.join( idir(), "test/gluino_squarks_default.txt")
+        samplefile = "gluino_squarks_default.txt"
         #Test summary output
         output = summaryReader.Summary(outputfile,allowedDiff=0.05)        
         sample = summaryReader.Summary(samplefile,allowedDiff=0.05)
@@ -228,8 +226,8 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)                    
                       
-        defFile = os.path.join ( idir(), "test/default_output.xml" )
-        outFile = os.path.join ( idir(), "test/unitTestOutput/printer_output.xml" )
+        defFile = "default_output.xml"
+        outFile = "./unitTestOutput/printer_output.xml"
            
         #Test xml output
         xmlDefault = ElementTree.parse( defFile ).getroot()
@@ -255,8 +253,8 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)                    
                      
-        defFile = os.path.join ( idir(), "test/default_outputSimplyGluino.xml" )
-        outFile = os.path.join ( idir(), "test/unitTestOutput/printer_output_simple.xml" )
+        defFile = "default_outputSimplyGluino.xml"
+        outFile = "./unitTestOutput/printer_output_simple.xml"
           
         #Test xml output
         xmlDefault = ElementTree.parse( defFile ).getroot()

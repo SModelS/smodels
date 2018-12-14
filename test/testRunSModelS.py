@@ -14,7 +14,6 @@ sys.path.insert(0,"../")
 import unittest
 import glob
 from os.path import join 
-from smodels.installation import installDirectory as iDir
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
 from unitTestHelpers import equalObjs, runMain
@@ -25,7 +24,7 @@ from smodels.tools.smodelsLogging import logger
 class RunSModelSTest(unittest.TestCase):
 
     def testMultipleFiles( self ):
-        out = join( iDir(), "test/unitTestOutput")
+        out = "./unitTestOutput"
         for i in os.listdir( out ):
             if i[-8:]==".smodels":
                 os.unlink(os.path.join(out, i))

@@ -13,7 +13,6 @@ import sys,os,imp
 sys.path.insert(0,"../")
 import unittest
 from os.path import join 
-from smodels.installation import installDirectory as iDir
 from unitTestHelpers import equalObjs, runMain
 from smodels.tools.smodelsLogging import setLogLevel
 from smodels.tools import runtime

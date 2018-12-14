@@ -20,7 +20,6 @@ from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 from databaseLoader import database
 from smodels.theory import decomposer
-from smodels.installation import installDirectory
 from math import floor, log10
 import numpy as np
 import math
@@ -38,7 +37,7 @@ class StatisticsTest(unittest.TestCase):
         """
         expRes = database.getExpResults(analysisIDs=['CMS-SUS-13-012'] )[0]
 
-        filename = "%sinputFiles/slha/simplyGluino.slha" %(installDirectory())  
+        filename = "./testFiles/slha/simplyGluino.slha"
         model = Model(BSMList,SMList,filename)
         model.updateParticles()           
         smstoplist = decomposer.decompose(model)
