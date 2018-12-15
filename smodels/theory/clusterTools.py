@@ -8,7 +8,6 @@
 """
 
 from smodels.theory import crossSection
-from smodels.theory.auxiliaryFunctions import removeUnits, addUnit
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
@@ -127,11 +126,15 @@ class ElementCluster(object):
             return None
         
         weights = [el.weight.getMaxXsec().asNumber(fb) for el in self]
-        massList = np.array(removeUnits(massList, [GeV]))
-        mAvg = np.average(massList,weights=weights,axis=0).tolist()
-        mAvg = addUnit(mAvg,unit=GeV)
+        avgmass = [[0. for m in br] for br in massList[0]]
+        for ib, branch in enumerate(massList[0]):
+            for im,_ in enumerate(branch):
+                vals = [mass[ib][im].asNumber(GeV) for mass in massList]
+                weights = [ float(weight) for weight in weights ]
+                avg = np.average(vals,weights=weights)
+                avgmass[ib][im] = avg*GeV
 
-        return mAvg
+        return avgmass
 
     def getAvgWidth(self):
         """
@@ -148,11 +151,15 @@ class ElementCluster(object):
             return None
 
         weights = [el.weight.getMaxXsec().asNumber(fb) for el in self]
-        widthList = np.array(removeUnits(widthList, [GeV]))
-        wAvg = np.average(widthList,weights=weights,axis=0).tolist()
-        wAvg = addUnit(wAvg,unit=GeV)
+        avgwidth = [[0. for w in br] for br in widthList[0]]
+        for ib, branch in enumerate(widthList[0]):
+            for im,_ in enumerate(branch):
+                vals = [mass[ib][im].asNumber(GeV) for mass in widthList]
+                weights = [ float(weight) for weight in weights ]
+                avg = np.average(vals,weights=weights)
+                avgwidth[ib][im] = avg*GeV
 
-        return wAvg
+        return avgwidth
     
     def averageElement(self):
         """
