@@ -13,7 +13,6 @@ import sys,os,imp
 sys.path.insert(0,"../")
 import unittest
 import glob
-from os.path import join 
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
 from unitTestHelpers import equalObjs, runMain

@@ -14,6 +14,10 @@ import unittest
 
 from smodels.theory.element import Element
 from smodels.theory.branch import Branch
+from smodels.theory import decomposer
+from smodels.particlesLoader import BSMList
+from smodels.share.models.SMparticles import SMList
+from smodels.theory.model import Model
 from smodels.theory import clusterTools
 from smodels.experiment.txnameObj import TxName, TxNameData
 from smodels.experiment.datasetObj import DataSet
@@ -21,12 +25,14 @@ from smodels.experiment.infoObj import Info
 from smodels.share.models import SMparticles, mssm
 from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList        
 from smodels.tools.physicsUnits import GeV, TeV, fb
+from databaseLoader import database
+from smodels.theory.clusterTools import clusterElements
 import copy
 
 
 class ClustererTest(unittest.TestCase):
     
-    def testClusterer(self):
+    def testSimpleCluster(self):
         """ test the mass clusterer """
         
         data = [[ [[ 674.99*GeV, 199.999*GeV], [ 674.99*GeV, 199.999*GeV] ],.03*fb ], 
@@ -102,6 +108,92 @@ class ClustererTest(unittest.TestCase):
         newmasses=newel.getAvgMass()
         self.assertEqual(newmasses,[[700.*GeV,200.*GeV]]*2)
 
+    def testClusteringEM(self):
+
+        slhafile = 'testFiles/slha/lightEWinos.slha'
+        model = Model(inputFile=slhafile, BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles()
+        sigmacut = 5.*fb
+        mingap = 5.*GeV
+        toplist = decomposer.decompose(model, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
+
+        #Test clustering for EM results
+        dataset = database.getExpResults(analysisIDs='CMS-SUS-13-012',
+                                         datasetIDs='3NJet6_800HT1000_300MHT450')[0].getDataset('3NJet6_800HT1000_300MHT450')
+
+
+        el1 = toplist[0].elementList[0].copy()
+        el2 = toplist[0].elementList[1].copy()
+        el3 = toplist[2].elementList[1].copy()
+        #All elements have the same UL (for EM results)
+        el1._upperLimit = el2._upperLimit = el3._upperLimit = 1.*fb
+        #Clustering should not depend on the mass, width or txname:
+        el1.txname = el2.txname = el3.txname = None
+        el1.mass = [[1000.*GeV,10*GeV]]*2
+        el2.mass = [[1500.*GeV,10*GeV]]*2
+        el3.mass = [[200.*GeV,100*GeV,90.*GeV]]*2
+        el3.totalwidth = [[1e-10*GeV,1e-15*GeV,0.*GeV]]*2
+        clusters = clusterElements([el1,el2,el3],maxDist=0.2,dataset=dataset)
+        self.assertEqual(len(clusters),1)
+        self.assertEqual(sorted(clusters[0].elements),sorted([el1,el2,el3]))
+        self.assertEqual(clusters[0].getAvgMass(),None)
+        self.assertEqual(clusters[0].getAvgWidth(),None)
+
+    def testClusteringUL(self):
+
+        slhafile = 'testFiles/slha/lightEWinos.slha'
+        model = Model(inputFile=slhafile, BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles()
+        sigmacut = 5.*fb
+        mingap = 5.*GeV
+        toplist = decomposer.decompose(model, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
+
+        #Test clustering for UL results
+        dataset = database.getExpResults(analysisIDs='ATLAS-SUSY-2013-02',datasetIDs=None)[0].getDataset(None)
+
+        el1 = toplist[1].elementList[0]
+        el2 = toplist[1].elementList[1]
+        el3 = toplist[1].elementList[2]
+        weights = [el.weight.getMaxXsec().asNumber(fb) for el in [el1,el2,el3]]
+
+        #Overwrite masses and txname label
+        el1.mass = [[1000.*GeV,100.*GeV]]*2
+        el2.mass = [[1020.*GeV,100.*GeV]]*2
+        el3.mass = [[500.*GeV,100.*GeV]]*2
+        el1.txname = el2.txname = el3.txname = 'T1'
+
+        #Check clustering with distinct elements
+        clusters = clusterElements([el1,el2,el3],maxDist=0.2,dataset=dataset)
+        self.assertEqual(len(clusters),2)
+        averageMasses = [[[(1000.*GeV*weights[0]+1020.*GeV*weights[1])/(weights[0]+weights[1]),100.*GeV]]*2, el3.mass]
+        elClusters = [[el1,el2], [el3]]
+        for ic,cluster in enumerate(clusters):
+            avgEl = cluster.averageElement()
+            self.assertEqual(sorted(cluster.elements),sorted(elClusters[ic]))
+            for ibr,br in enumerate(avgEl.mass):
+                for im,m in enumerate(br):
+                    self.assertAlmostEqual(m.asNumber(GeV),averageMasses[ic][ibr][im].asNumber(GeV))
+            self.assertEqual(avgEl.totalwidth,elClusters[ic][0].totalwidth)
+
+        #Check clustering with distinct elements but no maxDist limit
+        clusters = clusterElements([el1,el2,el3],maxDist=10.,dataset=dataset)
+        self.assertEqual(len(clusters),1)
+        cluster = clusters[0]
+        avgEl = cluster.averageElement()
+        averageMass = [[(1000.*GeV*weights[0]+1020.*GeV*weights[1] + 500.*GeV*weights[2])/sum(weights),100.*GeV]]*2
+        self.assertEqual(sorted(cluster.elements),sorted([el1,el2,el3]))
+        for ibr,br in enumerate(avgEl.mass):
+            for im,m in enumerate(br):
+                self.assertAlmostEqual(m.asNumber(GeV),averageMass[ibr][im].asNumber(GeV))
+        self.assertEqual(avgEl.totalwidth,el1.totalwidth)
+
+
+        #Check clustering where elements have same upper limits, but not the average element:
+        el1._upperLimit = 1.*fb
+        el2._upperLimit = 1.*fb
+        el3._upperLimit = 1.*fb
+        clusters = clusterElements([el1,el2,el3],maxDist=0.1,dataset=dataset)
+        self.assertEqual(len(clusters),2)
 
     def testClustererLifeTimes(self):
         """ test the clustering with distinct lifetimes"""

@@ -44,7 +44,13 @@ class ElementCluster(object):
 
     def __getitem__(self, iel):
         return self.elements[iel]
+
+    def __str__(self):
+        return str(self.elements)
     
+    def __repr__(self):
+        return str(self.elements)
+
     def relativeDistance(self,el1, el2):
         """
         Defines the relative distance between two elements according to their
@@ -123,10 +129,12 @@ class ElementCluster(object):
         :returns: average mass array appearing in the cluster     
         """                          
         
-        massList = [el.mass for el in self]
-        if any(np.array(m).shape != np.array(massList[0]).shape for m in massList):
+
+        eInfo = self.elements[0].getEinfo()
+        if any(el.getEinfo() != eInfo for el in self):
             return None
-        
+
+        massList = [el.mass for el in self]
         weights = [el.weight.getMaxXsec().asNumber(fb) for el in self]
         avgmass = [[0. for m in br] for br in massList[0]]
         for ib, branch in enumerate(massList[0]):
@@ -148,10 +156,11 @@ class ElementCluster(object):
         :returns: average width array appearing in the cluster
         """                          
 
-        widthList = [el.totalwidth for el in self]
-        if any(np.array(w).shape != np.array(widthList[0]).shape for w in widthList):
+        eInfo = self.elements[0].getEinfo()
+        if any(el.getEinfo() != eInfo for el in self):
             return None
 
+        widthList = [el.totalwidth for el in self]
         weights = [el.weight.getMaxXsec().asNumber(fb) for el in self]
         avgwidth = [[0. for w in br] for br in widthList[0]]
         for ib, branch in enumerate(widthList[0]):
@@ -369,6 +378,8 @@ def _doCluster(elements, dataset, maxDist):
         for elB in elementList:
             if cluster.relativeDistance(el, elB) <= maxDist:
                 cluster.add(elB)
+        if not cluster.elements:
+            continue
         if not cluster.isConsistent():
             continue
         clusterList.append(cluster)
