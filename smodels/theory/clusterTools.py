@@ -8,6 +8,8 @@
 """
 
 from smodels.theory import crossSection
+from smodels.theory.element import Element
+from smodels.experiment.datasetObj import DataSet,CombinedDataSet
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
@@ -209,7 +211,7 @@ class ElementCluster(object):
         Returns a copy of the index cluster (faster than deepcopy).
         """
 
-        newcluster = ElementCluster(self.elements,self.indices,self.maxDist)
+        newcluster = ElementCluster(self.elements,self.maxDist,self.dataset)
         newcluster.maxDist = self.maxDist
         return newcluster
 
@@ -319,6 +321,11 @@ def clusterElements(elements, maxDist, dataset):
     if len(elements) == 0:
         return []
 
+    if any(not isinstance(el,Element) for el in elements):
+        raise SModelSError("Asked to cluster non Element objects")
+    if not isinstance(dataset,(DataSet,CombinedDataSet)):
+        raise SModelSError("A dataset object must be defined for clustering")
+
     txnames = list(set([el.txname for el in elements]))
     if dataset.getType() == 'upperLimit' and len(txnames) != 1 :
         logger.error("Clustering elements with different Txnames for an UL result.")
@@ -383,7 +390,7 @@ def _doCluster(elements, dataset, maxDist):
                 #Loop over cluster elements and if element distance
                 #falls outside the cluster, remove element
                 for el in cluster:
-                    if cluster.getDistanceTo(iel) > maxDist:
+                    if cluster.getDistanceTo(el) > maxDist:
                         newcluster = cluster.copy()
                         newcluster.remove(el)
                         if not newcluster.isConsistent():
