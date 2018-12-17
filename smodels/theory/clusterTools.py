@@ -24,11 +24,15 @@ class ElementCluster(object):
     :ivar elements: list of elements in the cluster (Element objects)    
     """
 
-    def __init__(self, elements = [], maxDist = 0., dataset = None):
+    def __init__(self, elements = [], dataset = None, distanceMatrix = None):
 
         self.elements = elements
-        self.maxDist = maxDist
         self.dataset = dataset
+        self.maxInternalDist = 0.
+        self._distanceMatrix = distanceMatrix
+        #Compute maximal internal distance
+        if self.elements:
+            self.maxInternalDist = max([self.getDistanceTo(el) for el in self])
 
     def __eq__(self, other):
 
@@ -50,35 +54,6 @@ class ElementCluster(object):
     
     def __repr__(self):
         return str(self.elements)
-
-    def relativeDistance(self,el1, el2):
-        """
-        Defines the relative distance between two elements according to their
-        upper limit values.
-        The distance is defined as d = 2*|ul1-ul2|/(ul1+ul2).
-       
-        :parameter el1: Element object
-        :parameter el2: Element object
-    
-        :returns: relative distance
-        """
-    
-        if not hasattr(el1,'_upperLimit'):
-            el1._upperLimit = self.dataset.getUpperLimitFor(el1,
-                                                            txnames=el1.txname)
-        if not hasattr(el2,'_upperLimit'):
-            el2._upperLimit = self.dataset.getUpperLimitFor(el2,
-                                                            txnames=el1.txname)
-
-        ul1 = el1._upperLimit
-        ul2 = el2._upperLimit    
-        
-        if ul1 is None or ul2 is None:
-            return None
-        ulDistance = 2.*abs(ul1 - ul2)/(ul1 + ul2)
-    
-        return ulDistance
-    
 
     def indices(self):
         """
@@ -136,7 +111,7 @@ class ElementCluster(object):
 
         massList = [el.mass for el in self]
         weights = [el.weight.getMaxXsec().asNumber(fb) for el in self]
-        avgmass = [[0. for m in br] for br in massList[0]]
+        avgmass = [[0.]*len(br) for br in massList[0]]
         for ib, branch in enumerate(massList[0]):
             for im,_ in enumerate(branch):
                 vals = [mass[ib][im].asNumber(GeV) for mass in massList]
@@ -162,7 +137,7 @@ class ElementCluster(object):
 
         widthList = [el.totalwidth for el in self]
         weights = [el.weight.getMaxXsec().asNumber(fb) for el in self]
-        avgwidth = [[0. for w in br] for br in widthList[0]]
+        avgwidth = [[0.]*len(br) for br in widthList[0]]
         for ib, branch in enumerate(widthList[0]):
             for im,_ in enumerate(branch):
                 vals = [mass[ib][im].asNumber(GeV) for mass in widthList]
@@ -187,6 +162,7 @@ class ElementCluster(object):
         avgEl.txname = self.elements[0].txname
         avgEl._upperLimit = self.dataset.getUpperLimitFor(avgEl,
                                                           txnames=avgEl.txname)
+        avgEl._index = None
         return avgEl
 
     def getPIDs(self):
@@ -220,8 +196,8 @@ class ElementCluster(object):
         Returns a copy of the index cluster (faster than deepcopy).
         """
 
-        newcluster = ElementCluster(self.elements,self.maxDist,self.dataset)
-        newcluster.maxDist = self.maxDist
+        newcluster = ElementCluster(self.elements,self.dataset)
+        newcluster.maxInternalDist = self.maxInternalDist
         return newcluster
 
     def add(self, elements):
@@ -241,6 +217,8 @@ class ElementCluster(object):
                 continue
 
             self.elements.append(el)
+            #Update insternal distance:
+            self.maxInternalDist = max(self.maxInternalDist,self.getDistanceTo(el))
 
     def remove(self, elements):
         """
@@ -260,6 +238,9 @@ class ElementCluster(object):
                 continue
             iel = indices.index(el._index)
             self.elements.pop(iel)
+        #Update internal distance:
+        self.maxInternalDist = max([self.getDistanceTo(elB) for elB in self])
+
 
     def getDistanceTo(self, element):
         """
@@ -276,26 +257,20 @@ class ElementCluster(object):
         if element._upperLimit is None:
             return None
 
+        #Use pre-computed distances for regular (non-averge) elements
+        if not element._index is None:
+            return max([self._distanceMatrix[element._index,el._index] for el in self])
+
         dmax = 0.
         for el in self:
             if not hasattr(el, '_upperLimit'):
                 el._upperLimit = self.dataset.getUpperLimitFor(el,
                                                                txnames=el.txname)
-            dmax = max(dmax,self.relativeDistance(element,el))
+            dmax = max(dmax,relativeDistance(element,el,self.dataset))
 
         return dmax
 
-    def getMaxInternalDist(self):
-        """
-        Return the maximum distance between any pair of elements belonging
-        to the cluster.
-        """
-
-        dmax = max([self.getDistanceTo(el) for el in self])
-
-        return dmax
-
-    def isConsistent(self):
+    def isConsistent(self,maxDist):
         """
         Checks if the cluster is consistent.
         Computes an average element in the cluster
@@ -310,11 +285,38 @@ class ElementCluster(object):
             return False
 
         dmax = self.getDistanceTo(avgElement)
-        if dmax > self.maxDist:
+        if dmax > maxDist:
             return False
 
         return True
 
+def relativeDistance(el1, el2, dataset):
+    """
+    Defines the relative distance between two elements according to their
+    upper limit values.
+    The distance is defined as d = 2*|ul1-ul2|/(ul1+ul2).
+
+    :parameter el1: Element object
+    :parameter el2: Element object
+
+    :returns: relative distance
+    """
+
+    if not hasattr(el1,'_upperLimit'):
+        el1._upperLimit = dataset.getUpperLimitFor(el1,
+                                                        txnames=el1.txname)
+    if not hasattr(el2,'_upperLimit'):
+        el2._upperLimit = dataset.getUpperLimitFor(el2,
+                                                        txnames=el1.txname)
+
+    ul1 = el1._upperLimit
+    ul2 = el2._upperLimit
+
+    if ul1 is None or ul2 is None:
+        return None
+    ulDistance = 2.*abs(ul1 - ul2)/(ul1 + ul2)
+
+    return ulDistance
 
 
 def clusterElements(elements, maxDist, dataset):
@@ -366,6 +368,15 @@ def _doCluster(elements, dataset, maxDist):
         if el._upperLimit is None:
             raise SModelSError("Trying to cluster element outside the grid.")
 
+    #Pre-compute all necessary distances:
+    distanceMatrix = np.zeros((len(elements),len(elements)))
+    for iel,elA in enumerate(elements):
+        for jel,elB in enumerate(elements):
+            if jel <= iel:
+                continue
+            distanceMatrix[iel,jel] = relativeDistance(elA, elB, dataset)
+    distanceMatrix = distanceMatrix + distanceMatrix.T
+
     #Index elements:
     elementList = sorted(elements, key = lambda el: el._upperLimit)
     for iel,el in enumerate(elementList):
@@ -374,13 +385,13 @@ def _doCluster(elements, dataset, maxDist):
     #Start building maximal clusters
     clusterList = []
     for el in elementList:
-        cluster = ElementCluster([],maxDist,dataset)
+        cluster = ElementCluster([],dataset,distanceMatrix)
         for elB in elementList:
-            if cluster.relativeDistance(el, elB) <= maxDist:
+            if distanceMatrix[el._index,elB._index] <= maxDist:
                 cluster.add(elB)
         if not cluster.elements:
             continue
-        if not cluster.isConsistent():
+        if not cluster.isConsistent(maxDist):
             continue
         clusterList.append(cluster)
 
@@ -392,7 +403,7 @@ def _doCluster(elements, dataset, maxDist):
         newClusters = []
         for cluster in clusterList:
             #Check if maximal internal distance is below maxDist
-            if cluster.getMaxInternalDist() < maxDist:
+            if cluster.maxInternalDist < maxDist:
                 if not cluster in finalClusters:
                     finalClusters.append(cluster)
 
@@ -404,7 +415,7 @@ def _doCluster(elements, dataset, maxDist):
                     if cluster.getDistanceTo(el) > maxDist:
                         newcluster = cluster.copy()
                         newcluster.remove(el)
-                        if not newcluster.isConsistent():
+                        if not newcluster.isConsistent(maxDist):
                             continue
                         if newcluster in newClusters:
                             continue
@@ -421,7 +432,7 @@ def _doCluster(elements, dataset, maxDist):
     # finalClusters = finalClusters + clusterList
     # Add clusters of individual masses (just to be safe)
     for el in elementList:
-        finalClusters.append(ElementCluster([el],maxDist,dataset))
+        finalClusters.append(ElementCluster([el],dataset,distanceMatrix))
 
     # Clean up clusters (remove redundant clusters)
     for ic, clusterA in enumerate(finalClusters):
