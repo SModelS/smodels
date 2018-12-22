@@ -83,10 +83,10 @@ class TheoryPrediction(object):
                 self.expectedUL = self.dataset.getSRUpperLimit(expected=True,deltas_rel=deltas_rel)
                 self.upperLimit = self.dataset.getSRUpperLimit(expected=False,deltas_rel=deltas_rel)
             if self.dataType() == 'upperLimit':                
-                self.expectedUL = self.dataset.getUpperLimitFor(element=self.mass,
+                self.expectedUL = self.dataset.getUpperLimitFor(element=self.avgElement,
                                                                 txnames=self.txnames,
                                                                 expected=True)
-                self.upperLimit = self.dataset.getUpperLimitFor(element=self.mass,
+                self.upperLimit = self.dataset.getUpperLimitFor(element=self.avgElement,
                                                                 txnames=self.txnames,
                                                                 expected=False)
             if self.dataType() == 'combined':
@@ -494,6 +494,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.xsection = _evalConstraint(cluster)
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.elements = cluster.elements
+        theoryPrediction.avgElement = cluster.averageElement()
         theoryPrediction.mass = cluster.getAvgMass()
         theoryPrediction.PIDs = cluster.getPIDs()
         theoryPrediction.IDs = cluster.getIDs()
