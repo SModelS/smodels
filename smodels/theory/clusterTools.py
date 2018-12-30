@@ -196,7 +196,7 @@ class ElementCluster(object):
         Returns a copy of the index cluster (faster than deepcopy).
         """
 
-        newcluster = ElementCluster(self.elements,self.dataset)
+        newcluster = ElementCluster(self.elements,self.dataset,self._distanceMatrix)
         newcluster.maxInternalDist = self.maxInternalDist
         return newcluster
 
