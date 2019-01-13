@@ -318,7 +318,6 @@ def relativeDistance(el1, el2, dataset):
 
     return ulDistance
 
-
 def clusterElements(elements, maxDist, dataset):
     """
     Cluster the original elements according to their distance in upper limit space.
@@ -342,8 +341,16 @@ def clusterElements(elements, maxDist, dataset):
         logger.error("Clustering elements with different Txnames for an UL result.")
         raise SModelSError()
 
-    # ElementCluster elements:
-    clusters = _doCluster(elements, dataset, maxDist)
+    if dataset.getType() == 'upperLimit': #Group according to upper limit values
+        clusters = _doCluster(elements, dataset, maxDist)
+    elif dataset.getType() == 'efficiencyMap': #Group all elements together
+        distanceMatrix = np.zeros((len(elements),len(elements)))
+        cluster = ElementCluster(dataset=dataset,distanceMatrix=distanceMatrix)
+        for iel,el in enumerate(elements):
+            el._index = iel
+        cluster.elements = elements
+        clusters = [cluster]
+
     for cluster in clusters:
         cluster.txnames = txnames
     return clusters
