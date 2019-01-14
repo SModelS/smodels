@@ -11,7 +11,7 @@ from smodels.tools.physicsUnits import MeV, GeV, m, mm, fm
 from smodels.experiment.finalStateParticles import jetList, lList
     
 
-def defaultEffReweight(element):
+def defaultEffReweight(element,minWeight=1e-10):
     """
     Computes the lifetime reweighting factor for the element efficiency
     based on the lifetimes of all intermediate particles and the last stable odd-particle
@@ -21,6 +21,7 @@ def defaultEffReweight(element):
     to the final BSM state.
 
     :param element: Element object
+    :param minWeight: Lower cut for the reweighting factor. Any value below this will be taken to be zero.
 
     :return: Reweight factor (float)
     """
@@ -33,6 +34,9 @@ def defaultEffReweight(element):
             branchFraction *= calculateProbabilities(width)['F_prompt']
         branchFraction *= calculateProbabilities(width=branchWidths[-1])['F_long']
         elFraction *= branchFraction
+
+    if elFraction < minWeight:
+        return 0.
 
     return elFraction
 
