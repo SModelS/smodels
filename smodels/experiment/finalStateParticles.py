@@ -53,25 +53,24 @@ RHadronQ = MultiParticle(label='RHadronQ', particles = [RHadronU,RHadronU.charge
 
 
 #Define list of inclusive final states:
-finalStates = [eList,muList,taList,lpList,lmList,lList,WList,
+SMfinalStates = [eList,muList,taList,lpList,lmList,lList,WList,
                tList,LpList,LmList,LList,jetList,anyEven]
 #Include list of exclusive final states:
-finalStates +=  SMList
+SMfinalStates +=  SMList
 #Define list of BSM final states:
 BSMfinalStates = [MET,HSCP,RHadronG,RHadronQ,anyOdd]
 
+allFinalStates = SMfinalStates + BSMfinalStates
 #Avoid double counting:
-for i,ptc in enumerate(finalStates):
-    if any((ptc is p and i != j) for j,p in enumerate(finalStates)):
-        finalStates.remove(ptc)
-for i,ptc in enumerate(BSMfinalStates):
-    if any((ptc is p and i != j) for j,p in enumerate(BSMfinalStates)):
-        BSMfinalStates.remove(ptc)
-            
+for i,ptc in enumerate(allFinalStates):
+    if any((ptc is p and i != j) for j,p in enumerate(allFinalStates)):
+        allFinalStates.remove(ptc)
+
 #Protect all final state properties:
-for ptc in finalStates+BSMfinalStates:
+for ptc in allFinalStates:
     ptc._static = True
 
-finalStates = Model(SMparticles = finalStates,
-                    BSMparticles=BSMfinalStates)
+#Define a dummy model just to use the facilities for filtering particles
+finalStates = Model(SMparticles = allFinalStates,
+                    BSMparticles = [])
 

@@ -13,10 +13,11 @@ from smodels.experiment import txnameObj,infoObj
 from smodels.tools.physicsUnits import fb
 from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from smodels.theory.auxiliaryFunctions import getAttributesFrom,getValuesForObj
+from smodels.theory.auxiliaryFunctions import getAttributesFrom,getValuesForObj,_flattenList
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.theory.element import Element
+
 import itertools
 
 class DataSet(object):
@@ -53,8 +54,9 @@ class DataSet(object):
 
             self.txnameList.sort()
             self.checkForRedundancy()
+            self.eraseParticleEqualities()
 
-    def checkForRedundancy ( self ):
+    def checkForRedundancy(self):
         """ In case of efficiency maps, check if any txnames have overlapping
             constraints. This would result in double counting, so we dont 
             allow it. """
@@ -78,6 +80,24 @@ class DataSet(object):
                         (x,y,self.getID(),self.globalInfo.id )
                 logger.error( errmsg )
                 raise SModelSError ( errmsg )
+
+    def eraseParticleEqualities(self):
+        """
+        Make sure all the particles appearing in the elements from the
+        txnames do not hold any particle comparison information.
+        Since after unpickling the database the particle object IDs
+        will change, this information should be erased.
+        """
+
+        # Make sure particle equalities are erased (after unpickling the ids are modified):
+        for tx in self.txnameList:
+            for el in tx._topologyList.getElements():
+                for ptc in _flattenList(el.evenParticles)+_flattenList(el.oddParticles):
+                    ptc._static = False
+                    ptc._equals = []
+                    ptc._differs = []
+                    ptc._static = True
+
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )
