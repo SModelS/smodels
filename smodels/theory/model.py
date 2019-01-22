@@ -41,7 +41,7 @@ class Model(object):
         for pdg in allPDGs:
             p = self.getParticlesWith(pdg=pdg)
             if len(p) > 1:
-                raise SModelSError("PDG = %i has been defined for multiple particles (%s). Check your model definitions." %str(p))
+                raise SModelSError("PDG = %s has been defined for multiple particles (%s). Check your model definitions." %(pdg,p))
 
 
     def __str__(self):
