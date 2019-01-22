@@ -30,18 +30,18 @@ class Model(object):
         
         self.inputFile = inputFile
         self.BSMparticles = [copy.deepcopy(particle) for particle in BSMparticles]
+        self.SMparticles = SMparticles[:]
         #Reset equality tracking:
         for p in self.BSMparticles:
             p._equals = [id(p)]
             p._differs = []
-        self.SMparticles = SMparticles[:]
 
         #Check if for each PDG there is a unique particle object defined  
         allPDGs = self.getValuesFor('pdg')
         for pdg in allPDGs:
             p = self.getParticlesWith(pdg=pdg)
             if len(p) > 1:
-                raise SModelSError("PDG = %i has been defined for multiple particles (%s). Check your model definitions." %str(p))
+                raise SModelSError("PDG = %i has been defined for multiple particles (%s). Check your model definitions." %(pdg,p))
 
 
     def __str__(self):

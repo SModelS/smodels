@@ -21,7 +21,7 @@
    only), also include the quantum numbers of the new particles below.   
 """
 
-from smodels.theory.particle import Particle, MultiParticle
+from smodels.theory.particle import Particle
 
 ####  R-odd   ##########
 
@@ -37,7 +37,4 @@ rOddC = [p.chargeConjugate() for p in rOdd]  #Define the charge conjugates
 from smodels.share.models.SMparticles import SMList
 rEven = SMList
 
-#Generic BSM particles:
-
 BSMList = rOdd + rOddC
-BSMparticleList = MultiParticle('BSM', BSMList)
