@@ -11,7 +11,7 @@ import unittest
 
 from smodels.theory.model import Model
 from smodels.share.models.SMparticles import SMList
-from smodels.experiment.finalStateParticles import finalStates
+from smodels.experiment.databaseParticles import finalStates
 
 
 class FinalStateTest(unittest.TestCase):

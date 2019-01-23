@@ -12,7 +12,10 @@
 from smodels.tools.physicsUnits import fb
 from smodels.tools.reweighting import addPromptAndDisplaced
 from smodels.theory.element import Element
-import smodels.experiment.finalStateParticles as fS
+from smodels.theory.particle import MultiParticle
+from smodels.share.models.SMparticles import e,mu,ta,taC,eC,muC,W,WC,t,tC,q,c,g,pion,nu
+from smodels.theory import particle
+
 
 class Uncovered(object):
     """
@@ -28,15 +31,31 @@ class Uncovered(object):
     def __init__(self, topoList, sigmacut=None, sumL=True, sumJet=True, sqrts=None):
         
         
+        #Define multiparticles for conveniently grouping final states
+        eList = MultiParticle('e' , [e,eC])
+        muList = MultiParticle('mu', [mu,muC])
+        taList = MultiParticle('ta', [ta,taC])
+        lList = MultiParticle('l', [e,mu,eC,muC])
+        WList = MultiParticle('W', [W,WC])
+        tList = MultiParticle('t', [t,tC])
+        jetList = MultiParticle('jet', [q,c,g,pion])
+        nuList  = nu
+        if sumL:
+            particleGroups = [WList, lList, tList, taList, nuList]
+        else:
+            particleGroups = [WList, eList, muList,tList, taList, nuList]
+        if sumJet:
+            particleGroups.append(jetList)
+
         if sqrts is None:
             self.sqrts = max([xsec.info.sqrts for xsec in topoList.getTotalWeight()])
         else:
             self.sqrts = sqrts
-        self.missingTopos = UncoveredList(sumL, sumJet, self.sqrts)
-        self.outsideGrid = UncoveredList(sumL, sumJet, self.sqrts) 
-        self.longLived = UncoveredList(sumL, sumJet, self.sqrts)
-        self.displaced = UncoveredList(sumL, sumJet, self.sqrts)
-        self.MET = UncoveredList(sumL, sumJet, self.sqrts)
+        self.missingTopos = UncoveredList(particleGroups,self.sqrts)
+        self.outsideGrid = UncoveredList(particleGroups,self.sqrts)
+        self.longLived = UncoveredList(particleGroups,self.sqrts)
+        self.displaced = UncoveredList(particleGroups,self.sqrts)
+        self.MET = UncoveredList(particleGroups,self.sqrts)
         
         self.motherIDs = []
         self.prevMothers = []
@@ -201,14 +220,12 @@ class UncoveredList(object):
     """
     Object to find and collect UncoveredTopo objects, plus printout functionality
     :ivar generalElements: missing elements, grouped by common general name using inclusive labels (e.g. jet)
-    :ivar sumL: if True sum electrons and muons to leptons
-    :ivar sumJet: if True, sum up jets
+    :ivar particleGroups: Lists of MultiParticles used to group final states.
     :ivar sqrts: sqrts, for printout
     """
-    def __init__(self, sumL, sumJet, sqrts):
+    def __init__(self, particleGroups, sqrts):
         self.generalElements = []
-        self.sumL = sumL
-        self.sumJet = sumJet
+        self.particleGroups = particleGroups
         self.sqrts = sqrts
         
         
@@ -251,9 +268,8 @@ class UncoveredList(object):
         """
         Creates a new element with a generalized name according to the inclusive labels. 
         Generalization is done by summing over charges:
-        sumL: e, mu are combined to l
-        sumJet: quarks, g, pi are combined to jet
         :parameter instr: element as string
+
         :returns: string of generalized element
         """
 
@@ -263,17 +279,13 @@ class UncoveredList(object):
         for ib,branch in enumerate(el.branches):
             newEl.branches[ib].oddParticles = branch.oddParticles[:]
         newEl.missingX = el.missingX
-                 
-        if self.sumL: exch = [fS.WList, fS.lList, fS.tList, fS.taList, fS.nuList] 
-        else: exch = [fS.WList, fS.eList, fS.muList,fS.tList, fS.taList, fS.nuList]
-        if self.sumJet: exch.append(fS.jetList)
-          
+
         for ib,branch in enumerate(el.branches):
             newParticles = []
             for vertex in branch.evenParticles:
                 newVertex = vertex[:]
                 for ip,particle in enumerate(vertex):
-                    for particleList in exch:
+                    for particleList in self.particleGroups:
                         if particle == particleList:
                             newVertex[ip] = particleList
                 newParticles.append(newVertex)

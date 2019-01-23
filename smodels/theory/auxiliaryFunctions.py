@@ -12,7 +12,7 @@ import unum
 from collections import Iterable
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
-from smodels.experiment.finalStateParticles import finalStates
+from smodels.experiment.databaseParticles import finalStates
 
 #Get all finalStateLabels
 finalStateLabels = finalStates.getValuesFor('label')
@@ -253,7 +253,7 @@ def elementsInStr(instring,removeQuotes=True):
                 if not ptc:
                     continue          
                 if not ptc in finalStateLabels:
-                    raise SModelSError("Unknown particle. Add " + ptc + " to finalStateParticles.py")
+                    raise SModelSError("Unknown particle. Add " + ptc + " to databaseParticles.py")
 
     # Check if there are not unmatched ['s and/or ]'s in the string
     if nc != 0:
@@ -325,54 +325,3 @@ def getAttributesFrom(obj):
     
     return list(set(_flattenList(attributes)))
 
-
-def compareParticles(model=None,expResultList=[],finalStates=finalStates,reset = True):
-    """
-    Compare all particles appearing in model, final states and list of experimental
-    results. The comparison results are stored in the _equals and _differs attributes
-    of the particles (even if particle._static = True).
-    If reset = True, the _equals and _differs attributes will be first erased
-    and then replaced by the new comparison results.
-    :param model: Model object containing Particle and MultiParticle objects
-    :param finalStates: Model object containing Particle and MultiParticle objects
-    :param expResultList: List of ExptResult objects containing txnames 
-                          (which contains Particles and MultiParticle objects)
-    :param reset: If True, will erase the previous values of _equals and _differs
-    """
-    
-    allParticles = []
-    if not isinstance(expResultList,list):
-        raise SModelSError("expResultList must be a list of ExptResult objects")
-    
-    for exp in expResultList:
-        for tx in exp.getTxNames():
-            for el in tx._topologyList.getElements():
-                particles = _flattenList(el.oddParticles) + _flattenList(el.evenParticles)
-                for ptc in particles:
-                    if any(ptc is p for p in allParticles):
-                        continue
-                    allParticles.append(ptc)
-    
-    modelParticles = []
-    finalStateParticles = []
-    if not model is None:
-        modelParticles = model.SMparticles+model.BSMparticles
-    if not finalStates is None:        
-        finalStateParticles = finalStates.SMparticles+finalStates.BSMparticles
-    for ptc in modelParticles+finalStateParticles:
-        if any(ptc is p for p in allParticles):
-            continue
-        allParticles.append(ptc)
-    
-    if reset:
-        for pA in allParticles:
-            pA.__dict__['_equals'] = []
-            pA.__dict__['_differs'] = []
-    for pA in allParticles:
-        staticA = pA._static #store static property
-        for pB in allParticles:
-            staticB = pB._static #store static property
-            _ = pA == pB #Compare particles, results will be stored in pA._equals and pB._equals
-            pB._static = staticB
-        pA._static = staticA
-    

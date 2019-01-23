@@ -61,11 +61,11 @@ class Particle(object):
         #First check if we have already compared to this object
         idOther = id(other)
         idSelf = id(self)
-        if idOther in self._equals:  #Objects were already compared and are equal
+        if idOther in self._equals or idSelf in other._equals:  #Objects were already compared and are equal
             return 0
-        elif idOther in self._differs: #Objects were already compared and differ.
+        elif idOther in self._differs or -idSelf in other._differs: #Objects were already compared and differ.
             return 1
-        elif -idOther in self._differs:
+        elif -idOther in self._differs or idSelf in other._differs:
             return -1
         else:
             cmpProp = self.cmpProperties(other) #Objects have not been compared yet.

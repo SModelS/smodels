@@ -268,7 +268,6 @@ class TheoryPredictionList(object):
         self._theoryPredictions = sorted(self._theoryPredictions, key=lambda theoPred: theoPred.getRValue(), reverse=True)    
       
 
-
 def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
                 useBestDataset=True, combinedResults=True,
                 marginalize=False,deltas_rel=0.2):

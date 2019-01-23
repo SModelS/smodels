@@ -21,7 +21,7 @@ import time
 from smodels.tools.smodelsLogging import logger
  
 class RunSModelSTest(unittest.TestCase):
-
+ 
     def testMultipleFiles( self ):
         out = "./unitTestOutput"
         for i in os.listdir( out ):
@@ -34,20 +34,20 @@ class RunSModelSTest(unittest.TestCase):
         if nout != nin:
             logger.error("Number of output file(%d) differ from number of input files(%d)" %(nout, nin))
         self.assertEqual(nout,nin)
-     
+      
     def timeoutRun(self):
         filename = "./testFiles/slha/complicated.slha"
         runMain(filename, timeout=1, suppressStdout=True,
                              development=True, inifile = "timeout.ini" )
-     
+      
     def testTimeout(self):
         self.assertRaises(NoTime, self.timeoutRun)
-
+ 
     def removeOutputs( self, f ):
         """ remove cruft outputfiles """
         for i in [ f, f.replace(".py",".pyc") ]:
             if os.path.exists( i ): os.remove( i )
-  
+   
     def testGoodFile(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(filename)
@@ -64,9 +64,9 @@ class RunSModelSTest(unittest.TestCase):
             if os.path.exists( i ): os.remove( i )
         self.assertTrue(equals)
         self.removeOutputs( outputfile )
-      
+       
     def testGoodFile13(self):
-            
+             
         filename = "./testFiles/slha/simplyGluino.slha"
         outputfile = runMain(filename,suppressStdout = True )
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
@@ -82,12 +82,12 @@ class RunSModelSTest(unittest.TestCase):
             e =  "output13.py and simplyGluino_default.py differ!" 
             logger.error( e )
             # raise AssertionError( e )
-
+ 
         self.assertTrue(equals)        
-
+ 
         ## test went through, so remove the output files
         self.removeOutputs( outputfile )
-
+ 
     def testGoodFileHSCP(self):
         filename = "./testFiles/slha/longLived.slha"
         outputfile = runMain(filename)
@@ -103,8 +103,8 @@ class RunSModelSTest(unittest.TestCase):
         for i in [ './outputHSC.py', './outputHSCP.pyc' ]:
             if os.path.exists( i ): os.remove( i )
         self.assertTrue(equals)               
-
-    
+ 
+     
     def testBadFile(self):
         # since 112 we skip non-existing slha files!
         filename = "./testFiles/slha/I_dont_exist.slha"

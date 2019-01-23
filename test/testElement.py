@@ -16,7 +16,7 @@ from smodels.tools.physicsUnits import GeV, TeV, fb
 from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList
 from smodels.share.models import SMparticles, mssm
 
-from smodels.experiment import finalStateParticles
+from smodels.experiment import databaseParticles
 
 
 u = SMparticles.u
@@ -26,8 +26,8 @@ b = SMparticles.b
 g = SMparticles.g
 em = SMparticles.e
 nue = SMparticles.nue
-L = finalStateParticles.LList
-e = finalStateParticles.eList
+L = databaseParticles.LList
+e = databaseParticles.eList
 
 
 gluino = mssm.gluino

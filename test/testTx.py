@@ -19,7 +19,7 @@ import unittest
 class TxTest(unittest.TestCase):
 
     def testT1(self):
-        self.logger.info ( "T1" )
+
         """ test with the T1 slha input file """
         slhafile="./testFiles/slha/simplyGluino.slha"
         model = Model(BSMList,SMList)

@@ -118,7 +118,7 @@ class Model(object):
 
         return valueList
     
-    def updateParticles(self, inputFile, promptWidth = 1e-8*GeV, stableWidth = 1e-25*GeV,
+    def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
                         roundMasses = 1, erasePrompt=['spin','eCharge','colordim']):
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file. 
@@ -138,6 +138,10 @@ class Model(object):
         """
         
         self.inputFile = inputFile
+        if promptWidth is None:
+            promptWidth = 1e-8*GeV
+        if stableWidth is None:
+            stableWidth = 1e-25*GeV
 
         #Download input file, if requested
         if self.inputFile.startswith("http") or self.inputFile.startswith("ftp"):
@@ -278,10 +282,10 @@ class Model(object):
                     newDecay.daughters.append(daughter)
                 particle.decays.append(newDecay)
                 
-        #Erase particle equality tracking:
+        #Reset particle equality tracking:
         for p in self.SMparticles+self.BSMparticles:
             equals = [id(p)]
             if isinstance(p,MultiParticle):
                 equals += [id(ptc) for ptc in p.particles]            
-            p.__dict__['_equals'] = equals
-            p.__dict__['_differs'] = []
+            p._equals = equals
+            p._differs = []

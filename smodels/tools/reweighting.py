@@ -8,7 +8,7 @@
 import itertools
 from math import exp
 from smodels.tools.physicsUnits import MeV, GeV, m, mm, fm
-from smodels.experiment.finalStateParticles import jetList, lList
+from smodels.experiment.databaseParticles import jetList, lList
     
 
 def defaultEffReweight(element,minWeight=1e-10):

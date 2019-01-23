@@ -13,7 +13,7 @@ from smodels.tools.physicsUnits import GeV
 from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.experiment.finalStateParticles import finalStates
+from smodels.experiment.databaseParticles import finalStates
 from smodels.theory import model
 import numpy as np
 
@@ -70,7 +70,7 @@ class ParticleTest(unittest.TestCase):
          
     def testParticleList(self):
         l1 = MultiParticle(label='plist', particles=[p1,p2])
-        from smodels.experiment.finalStateParticles import lList
+        from smodels.experiment.databaseParticles import lList
  
         self.assertEqual( l1.label, 'plist')
         self.assertNotEqual( l1 , lList) 
@@ -90,7 +90,7 @@ class ParticleTest(unittest.TestCase):
     def testInclusiveParticle(self):
         anything = Particle(label='anything')
         l1 = MultiParticle(label='plist', particles=[p1,p2,p4])
-        from smodels.experiment.finalStateParticles import anyEven,anyOdd,lList
+        from smodels.experiment.databaseParticles import anyEven,anyOdd,lList
                
         self.assertTrue(isinstance(p1, Particle))
         self.assertTrue(p1 == anything)

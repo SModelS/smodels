@@ -13,7 +13,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
 from smodels.theory.particle import MultiParticle, Particle
 from smodels.tools.inclusiveObjects import InclusiveValue,InclusiveList
-from smodels.experiment.finalStateParticles import finalStates,anyOdd
+from smodels.experiment.databaseParticles import finalStates,anyOdd
 import itertools
 
 
@@ -59,7 +59,7 @@ class Branch(object):
                 for vertex in vertices:
                     bsmParticle = finalStates.getParticlesWith(label='anyOdd')
                     if not bsmParticle:
-                        raise SModelSError("Final state anyOdd has not been defined in finalStateParticles.py")
+                        raise SModelSError("Final state anyOdd has not been defined in databaseParticles.py")
                     elif len(bsmParticle) != 1:
                         raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)          
                     self.oddParticles.append(bsmParticle[0])
@@ -68,7 +68,7 @@ class Branch(object):
                     for pname in particleNames:
                         smParticle = finalStates.getParticlesWith(label=pname)
                         if not smParticle:
-                            raise SModelSError("Final state %s has not been defined in finalStateParticles.py " %pname)
+                            raise SModelSError("Final state %s has not been defined in databaseParticles.py " %pname)
                         elif len(smParticle) != 1:
                             raise SModelSError("Ambiguos defintion of label %s in finalStates" %smParticle[0].label)
                         else:
@@ -80,9 +80,9 @@ class Branch(object):
         if finalState:
             bsmParticle = finalStates.getParticlesWith(label=finalState)
             if not bsmParticle:
-                raise SModelSError("Final state %s has not been defined in finalStateParticles.py" %finalState)
+                raise SModelSError("Final state %s has not been defined in databaseParticles.py" %finalState)
             elif len(bsmParticle) != 1:
-                raise SModelSError("Ambiguos defintion of label %s in finalStateParticles.py" %finalState)
+                raise SModelSError("Ambiguos defintion of label %s in databaseParticles.py" %finalState)
             else:
                 bsmParticle = bsmParticle[0]
         else:
