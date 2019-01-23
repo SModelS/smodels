@@ -19,21 +19,16 @@ class Model(object):
     cross-sections.
     """
     
-    def __init__(self, BSMparticles, SMparticles, inputFile=None):
+    def __init__(self, BSMparticles, SMparticles):
         """
         Initializes the model
-        :parameter inputFile: input file (SLHA or LHE)
         :parameter BSMparticles: list with BSM particle objects
         :parameter SMparticles: list with SM particle objects
         """
         
         
-        self.inputFile = inputFile
+        self.inputFile = None
         self.BSMparticles = [copy.deepcopy(particle) for particle in BSMparticles]
-        #Reset equality tracking:
-        for p in self.BSMparticles:
-            p._equals = [id(p)]
-            p._differs = []
         self.SMparticles = SMparticles[:]
 
         #Check if for each PDG there is a unique particle object defined  
@@ -123,10 +118,12 @@ class Model(object):
 
         return valueList
     
-    def updateParticles(self, promptWidth = None, stableWidth = None,
+    def updateParticles(self, inputFile, promptWidth = 1e-8*GeV, stableWidth = 1e-25*GeV,
                         roundMasses = 1, erasePrompt=['spin','eCharge','colordim']):
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file. 
+
+        :param inputFile: input file (SLHA or LHE)
             
         :param promptWidth: Maximum width for considering particles as decaying prompt. If None, it
                             will be set 1e-8 GeV.
@@ -139,11 +136,8 @@ class Model(object):
                                mass and Z2parity will be considered as equal when combining elements.
             
         """
-
-        if promptWidth is None:
-            promptWidth = 1e-8*GeV
-        if stableWidth is None:
-            stableWidth = 1e-25*GeV
+        
+        self.inputFile = inputFile
 
         #Download input file, if requested
         if self.inputFile.startswith("http") or self.inputFile.startswith("ftp"):
@@ -184,6 +178,7 @@ class Model(object):
             sys.stderr = storeErr
         
         logger.debug("Loaded %i BSM particles" %len(self.BSMparticles))
+        
         allPDGs = list(set(self.getValuesFor('pdg')))
         evenPDGs = []
         oddPDGs = []
@@ -282,5 +277,3 @@ class Model(object):
                         daughter = daughter[0]
                     newDecay.daughters.append(daughter)
                 particle.decays.append(newDecay)
-                 
-        

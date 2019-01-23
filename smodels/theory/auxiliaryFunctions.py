@@ -14,7 +14,6 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.finalStateParticles import finalStates
 
-
 #Get all finalStateLabels
 finalStateLabels = finalStates.getValuesFor('label')
 
@@ -263,17 +262,6 @@ def elementsInStr(instring,removeQuotes=True):
     return elements
 
 
-def sortParticleList(ptcList):
-    """
-    sorts a list of particle or particle list objects by their label
-    :param ptcList: list to be sorted containing particle or particle list objects
-    :return: sorted list of particles
-    """
-    
-    newPtcList = sorted(ptcList, key=lambda x: x.label) 
-    return newPtcList    
-
-
 def getValuesForObj(obj, attribute):
     """
     Loops over all attributes in the object and in its attributes
@@ -337,3 +325,50 @@ def getAttributesFrom(obj):
     
     return list(set(_flattenList(attributes)))
 
+
+def compareParticles(model=None,expResultList=[],finalStates=finalStates,reset = True):
+    """
+    Compare all particles appearing in model, final states and list of experimental
+    results. The comparison results are stored in the _equals and _differs attributes
+    of the particles.
+    If reset = True, the _equals and _differs attributes will be first erased
+    and then replaced by the new comparison results.
+    :param model: Model object containing Particle and MultiParticle objects
+    :param finalStates: Model object containing Particle and MultiParticle objects
+    :param expResultList: List of ExptResult objects containing txnames 
+                          (which contains Particles and MultiParticle objects)
+    :param reset: If True, will erase the previous values of _equals and _differs
+    """
+    
+    allParticles = []
+    if not isinstance(expResultList,list):
+        raise SModelSError("expResultList must be a list of ExptResult objects")
+    
+    for exp in expResultList:
+        for tx in exp.getTxNames():
+            for el in tx._topologyList.getElements():
+                particles = _flattenList(el.oddParticles) + _flattenList(el.evenParticles)
+                for ptc in particles:
+                    if any(ptc is p for p in allParticles):
+                        continue
+                    allParticles.append(ptc)
+    
+    modelParticles = []
+    finalStateParticles = []
+    if not model is None:
+        modelParticles = model.SMparticles+model.BSMparticles
+    if not finalStates is None:        
+        finalStateParticles = finalStates.SMparticles+finalStates.BSMparticles
+    for ptc in modelParticles+finalStateParticles:
+        if any(ptc is p for p in allParticles):
+            continue
+        allParticles.append(ptc)
+    
+    if reset:
+        for pA in allParticles:
+            pA.__dict__['_equals'] = []
+            pA.__dict__['_differs'] = []
+    for pA in allParticles:
+        for pB in allParticles:
+            _ = pA == pB #Compare particles, results will be stored in pA._equals and pB._equals
+    

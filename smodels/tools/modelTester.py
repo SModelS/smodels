@@ -80,19 +80,19 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         Load the input model and  update it with the information from the input file
         """
         from smodels.particlesLoader import BSMList
-        model = Model(inputFile=inputFile, BSMparticles=BSMList, SMparticles=SMList)
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
         promptWidth = None
         stableWidth = None
         if parser.has_option("particles","promptWidth"):
             promptWidth = parser.getfloat("particles", "promptWidth")*GeV
         if parser.has_option("particles","stableWidth"):
             stableWidth = parser.getfloat("particles", "stableWidth")*GeV
-        model.updateParticles(promptWidth=promptWidth, stableWidth=stableWidth)
+        model.updateParticles(inputFile=inputFile, promptWidth=promptWidth, stableWidth=stableWidth)
     except SModelSError as e:
         print("Exception %s %s" %(e, type(e)))
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
-        return masterPrinter.flush()        
+        return masterPrinter.flush()    
 
 
     """

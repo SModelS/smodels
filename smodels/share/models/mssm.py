@@ -9,7 +9,7 @@
    (such as masses, width and BRs) are automatically added later.
 """
 
-from smodels.theory.particle import Particle, MultiParticle
+from smodels.theory.particle import Particle
 
 ####  R-odd   ##########
 #1st generation squarks and its conjugates:
@@ -79,6 +79,5 @@ rEven = SMList + higgs + higgsC
 #Generic BSM particles:
 
 BSMList = rOdd + rOddC + higgs + higgsC
-BSMparticleList = MultiParticle(label='BSM', particles=BSMList)
 
 

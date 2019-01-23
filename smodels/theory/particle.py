@@ -41,7 +41,7 @@ class Particle(object):
         #Leave the static attribute for last:
         if '_static' in kwargs:
             self._static = kwargs['_static']
-
+    @profile
     def __cmp__(self,other):
         """
         Compares particle with other.
@@ -60,6 +60,7 @@ class Particle(object):
 
         #First check if we have already compared to this object
         idOther = id(other)
+        idSelf = id(self)
         if idOther in self._equals:  #Objects were already compared and are equal
             return 0
         elif idOther in self._differs: #Objects were already compared and differ.
@@ -70,9 +71,11 @@ class Particle(object):
             cmpProp = self.cmpProperties(other) #Objects have not been compared yet.
             if cmpProp == 0:
                 self._equals.append(idOther)
+                other._equals.append(idSelf)
                 return 0
             else:
                 self._differs.append(idOther*cmpProp)
+                other._differs.append(-idSelf*cmpProp)
                 return cmpProp
 
     def __lt__( self, p2 ):
@@ -127,8 +130,10 @@ class Particle(object):
             raise TypeError("Can only add particle objects")
         elif isinstance(other,MultiParticle):
             return other.__add__(self)
-        elif other is self:
+        elif self.contains(other):
             return self
+        elif other.contains(self):
+            return other
         else:
             combined = MultiParticle(label = 'multiple', particles= [self,other])
             return combined
@@ -285,6 +290,20 @@ class Particle(object):
         """
 
         return self.totalwidth.asNumber() == 0.
+    
+    def contains(self,particle):
+        """
+        If particle is a Particle object check if self and particle are the same object.
+
+        :param particle: Particle or MultiParticle object
+
+        :return: True/False
+        """
+
+        if self is particle:
+            return True
+        else:
+            return False    
 
 
 
@@ -393,8 +412,11 @@ class MultiParticle(Particle):
 
         if not isinstance(other,(MultiParticle,Particle)):
             raise TypeError("Can not add a Particle object to %s" %type(other))
-        elif other is self:
+        elif other is self or self.contains(other): #Check if other is self or a subset of self
             return self
+        #Check if self is a subset of other
+        if other.contains(self):
+            return other        
         elif isinstance(other,MultiParticle):
             addParticles = other.particles
         elif isinstance(other,Particle):
@@ -473,11 +495,19 @@ class MultiParticle(Particle):
         :return: True/False
         """
 
-        for p in self.particles:
-            if p is particle:
-                return True
-            elif isinstance(p,MultiParticle):
-                if p.contains(particle):
-                    return True
+        if not isinstance(particle,(Particle,MultiParticle)):
+            raise False
+        elif isinstance(particle,MultiParticle):
+            checkParticles = particle.particles
+        else:
+            checkParticles = [particle]
 
-        return False
+        for otherParticle in checkParticles:
+            hasParticle = False
+            for p in self.particles:
+                if p.contains(otherParticle):
+                    hasParticle = True
+            if not hasParticle:
+                return False
+
+        return True

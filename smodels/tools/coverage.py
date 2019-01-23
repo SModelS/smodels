@@ -24,6 +24,7 @@ class Uncovered(object):
     :ivar sqrts: Center of mass energy. If defined it will only consider cross-sections
                 for this value. Otherwise the highest sqrts value will be used.
     """
+
     def __init__(self, topoList, sigmacut=None, sumL=True, sumJet=True, sqrts=None):
         
         
@@ -222,7 +223,7 @@ class UncoveredList(object):
             xsec += genEl.missingX
         return xsec
             
-
+#     @profile
     def addToGeneralElements(self, el):
         """
         Adds an element to the list of missing topologies = general elements.
@@ -235,10 +236,11 @@ class UncoveredList(object):
 
         # Check if an element with the same generalized name has already been added
         for genEl in self.generalElements:
-            if newGenEl._allEvenParticles == genEl._allEvenParticles and newGenEl._decayTypes == genEl._decayTypes:                
-                genEl._contributingElements.append(el)
-                genEl.missingX += el.missingX
-                return
+            if newGenEl._allEvenParticles == genEl._allEvenParticles:
+                if newGenEl._decayTypes == genEl._decayTypes:                
+                    genEl._contributingElements.append(el)
+                    genEl.missingX += el.missingX
+                    return
             
         newGenEl._outputDescription = name           
         newGenEl._contributingElements = [el]    

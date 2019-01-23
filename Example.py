@@ -19,6 +19,7 @@ from smodels.tools.smodelsLogging import setLogLevel
 from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
+from smodels.theory.auxiliaryFunctions import compareParticles
 setLogLevel("info")
 
 # Set the path to the database
@@ -38,6 +39,7 @@ def main():
 #     model = Model(inputFile=lhefile, BSMparticles=BSMList, SMparticles=SMList)
     model = Model(inputFile=slhafile, BSMparticles=BSMList, SMparticles=SMList)
     model.updateParticles()
+    compareAllParticles(model, database.getExpResults())
     
 
     # Set main options for decomposition
