@@ -35,8 +35,8 @@ class ParticleTest(unittest.TestCase):
     def testParticleComparison(self):
 
         slhafile = 'testFiles/slha/lightEWinos.slha'
-        bsmModel = model.Model(inputFile=slhafile, BSMparticles=BSMList, SMparticles=SMList)
-        bsmModel.updateParticles()
+        bsmModel = model.Model(BSMparticles=BSMList, SMparticles=SMList)
+        bsmModel.updateParticles(slhafile)
         BSMparticles = bsmModel.BSMparticles
         SMparticles = bsmModel.SMparticles
         fStates = finalStates.SMparticles

@@ -199,8 +199,8 @@ class SlhaStatus(object):
             self.status = -3, "Could not read input SLHA file"
             return
         try:
-            model = Model(BSMList,SMList,filename)
-            model.updateParticles()     
+            model = Model(BSMList,SMList)
+            model.updateParticles(filename)
             self.model = model
             self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
             self.xsec = self.hasXsec(checkXsec)
@@ -217,7 +217,7 @@ class SlhaStatus(object):
         
         """
         try: ret = pyslha.readSLHAFile(self.filename)
-        except (pyslha.AccessError,pyslha.ParseError,IOError): 
+        except (pyslha.ParseError,IOError): 
             return None
         if not ret.blocks["MASS"]: return None
         return ret

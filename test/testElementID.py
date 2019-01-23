@@ -24,8 +24,8 @@ class ElementIdTest(unittest.TestCase):
         listOfIDs = {'ATLAS-CONF-2013-037':  [31, 26, 33, 34, 27, 28, 29, 30],
                      'ATLAS-SUSY-2013-05' : [32]}
         filename = "./testFiles/slha/higgsinoStop.slha"
-        model = Model(BSMList,SMList,filename)
-        model.updateParticles(promptWidth = 1e-12*GeV) #Make sure C1 and N2 are treated as prompt
+        model = Model(BSMList,SMList)
+        model.updateParticles(filename,promptWidth = 1e-12*GeV) #Make sure C1 and N2 are treated as prompt
 
         topoList = decomposer.decompose(model, sigcut= 0.1*fb, doCompress=True, doInvisible=True, minmassgap= 5*GeV)
         resultlist = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'])

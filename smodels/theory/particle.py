@@ -41,7 +41,7 @@ class Particle(object):
         #Leave the static attribute for last:
         if '_static' in kwargs:
             self._static = kwargs['_static']
-    @profile
+
     def __cmp__(self,other):
         """
         Compares particle with other.
@@ -70,12 +70,16 @@ class Particle(object):
         else:
             cmpProp = self.cmpProperties(other) #Objects have not been compared yet.
             if cmpProp == 0:
-                self._equals.append(idOther)
-                other._equals.append(idSelf)
+                if not self._static:
+                    self._equals.append(idOther)
+                if not other._static:
+                    other._equals.append(idSelf)
                 return 0
             else:
-                self._differs.append(idOther*cmpProp)
-                other._differs.append(-idSelf*cmpProp)
+                if not self._static:
+                    self._differs.append(idOther*cmpProp)
+                if not other._static:
+                    other._differs.append(-idSelf*cmpProp)
                 return cmpProp
 
     def __lt__( self, p2 ):

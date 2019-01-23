@@ -20,6 +20,7 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut
 from smodels.tools.printer import MPrinter
+from smodels.theory.auxiliaryFunctions import compareParticles
 import multiprocessing
 import os
 import sys
@@ -92,7 +93,13 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         print("Exception %s %s" %(e, type(e)))
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
-        return masterPrinter.flush()    
+        return masterPrinter.flush()
+    
+    """
+    Pre-determine particle equalities (improves performance)
+    ========================================================
+    """
+    compareParticles(model, listOfExpRes)
 
 
     """

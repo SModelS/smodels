@@ -22,8 +22,8 @@ class ConditionTest(unittest.TestCase):
     def testGoodFile(self):
 
         filename = "./testFiles/slha/lightEWinos.slha"
-        model = Model(BSMList,SMList,filename)
-        model.updateParticles()
+        model = Model(BSMList,SMList)
+        model.updateParticles(filename)
                 
         topolist = decomposer.decompose(model, sigcut= 0.1*fb, doCompress=True, doInvisible=True, minmassgap = 5*GeV)
         analyses = database.getExpResults (txnames=["TChiWZoff"])

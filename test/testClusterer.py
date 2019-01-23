@@ -111,8 +111,8 @@ class ClustererTest(unittest.TestCase):
     def testClusteringEM(self):
 
         slhafile = 'testFiles/slha/lightEWinos.slha'
-        model = Model(inputFile=slhafile, BSMparticles=BSMList, SMparticles=SMList)
-        model.updateParticles()
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(slhafile)
         sigmacut = 5.*fb
         mingap = 5.*GeV
         toplist = decomposer.decompose(model, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
@@ -142,8 +142,8 @@ class ClustererTest(unittest.TestCase):
     def testClusteringUL(self):
 
         slhafile = 'testFiles/slha/lightEWinos.slha'
-        model = Model(inputFile=slhafile, BSMparticles=BSMList, SMparticles=SMList)
-        model.updateParticles()
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(slhafile)
         sigmacut = 5.*fb
         mingap = 5.*GeV
         toplist = decomposer.decompose(model, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)

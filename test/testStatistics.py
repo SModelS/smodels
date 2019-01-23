@@ -13,7 +13,6 @@ sys.path.insert(0,"../")
 import unittest
 #from smodels.tools import statistics
 from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
-from smodels.tools.physicsUnits import fb
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
@@ -38,8 +37,8 @@ class StatisticsTest(unittest.TestCase):
         expRes = database.getExpResults(analysisIDs=['CMS-SUS-13-012'] )[0]
 
         filename = "./testFiles/slha/simplyGluino.slha"
-        model = Model(BSMList,SMList,filename)
-        model.updateParticles()           
+        model = Model(BSMList,SMList)
+        model.updateParticles(filename)
         smstoplist = decomposer.decompose(model)
         prediction = theoryPredictionsFor(expRes, smstoplist)[0]
         pred_signal_strength = prediction.xsection.value

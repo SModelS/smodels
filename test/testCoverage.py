@@ -2,7 +2,7 @@
 
 """
 .. module:: testReweighting
-   :synopsis: Tests the function of smodels.theory.updateParticles 
+   :synopsis: Tests the function of coverage 
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>   
 """
 import sys

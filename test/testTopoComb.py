@@ -58,13 +58,13 @@ XSECTION  1.30E+04  2212 2212 2 1000021 1000021 # 10000 events, [pb], pythia8 fo
         for case in [ "T1", "T5", "mixed" ]:
             filename = self.createSLHAFile( case=case )
             BSMList = [gluino,st1,n1,st1.chargeConjugate(),n1.chargeConjugate(),gluino.chargeConjugate()]
-            model = Model(BSMList,SMList,filename)
-            model.updateParticles()            
-            deco = decompose ( model )    
+            model = Model(BSMList,SMList)
+            model.updateParticles(filename)
+            deco = decompose(model)
                     
             expRes = database.getExpResults( analysisIDs = [ "CMS-SUS-16-050-agg" ] )[0]
             # print ( "Experimental result: %s" % expRes )
-            tp = theoryPredictionsFor ( expRes, deco, useBestDataset=False, combinedResults=True )
+            tp = theoryPredictionsFor(expRes, deco, useBestDataset=False, combinedResults=True)
             for t in tp:
                 predXSecs[case]=t.xsection.value
                 rvalues[case]=t.getRValue(expected=True)

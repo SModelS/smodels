@@ -56,8 +56,8 @@ class IntegrationTest(unittest.TestCase):
     def testIntegration(self):
         
         slhafile = '../inputFiles/slha/simplyGluino.slha'
-        model = Model(BSMList,SMList,slhafile)
-        model.updateParticles()
+        model = Model(BSMList,SMList)
+        model.updateParticles(slhafile)
                    
         self.configureLogger()
         smstoplist = decomposer.decompose(model, .1*fb, doCompress=True,
@@ -73,8 +73,8 @@ class IntegrationTest(unittest.TestCase):
     def checkPrediction(self,slhafile,expID,expectedValues):
 
         reducedModel = [ptc for ptc in BSMList if abs(ptc.pdg) in [1000011,1000012]]
-        model = Model(reducedModel,SMList,slhafile)
-        model.updateParticles()
+        model = Model(reducedModel,SMList)
+        model.updateParticles(slhafile)
 
         self.configureLogger()
         smstoplist = decomposer.decompose(model, 0.*fb, doCompress=True,

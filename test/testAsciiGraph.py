@@ -33,8 +33,8 @@ class AsciiTest(unittest.TestCase):
         """ draw ascii graph """
         
         filename = "./testFiles/lhe/simplyGluino.lhe"
-        model = Model(inputFile=filename, BSMparticles = BSMList, SMparticles = SMList)
-        model.updateParticles()
+        model = Model(BSMparticles = BSMList, SMparticles = SMList)
+        model.updateParticles(filename)
         
         
         topList = decomposer.decompose(model)

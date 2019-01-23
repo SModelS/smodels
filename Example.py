@@ -37,9 +37,10 @@ def main():
     slhafile = 'inputFiles/slha/lightEWinos.slha'
     #Define your model
 #     model = Model(inputFile=lhefile, BSMparticles=BSMList, SMparticles=SMList)
-    model = Model(inputFile=slhafile, BSMparticles=BSMList, SMparticles=SMList)
-    model.updateParticles()
-    compareAllParticles(model, database.getExpResults())
+    model = Model(BSMparticles=BSMList, SMparticles=SMList)
+    model.updateParticles(inputFile=slhafile)
+    #Compare particles (improves performance)
+    compareParticles(model, database.getExpResults())
     
 
     # Set main options for decomposition

@@ -83,8 +83,8 @@ class RunPrinterTest(unittest.TestCase):
         mingap = 5. * GeV
     
         """ Decompose model  """
-        model = Model(BSMList,SMList,slhafile)
-        model.updateParticles()
+        model = Model(BSMList,SMList)
+        model.updateParticles(slhafile)
         smstoplist = decomposer.decompose(model, sigmacut, 
                          doCompress=True, doInvisible=True, minmassgap=mingap )
     

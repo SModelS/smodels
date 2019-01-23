@@ -277,3 +277,11 @@ class Model(object):
                         daughter = daughter[0]
                     newDecay.daughters.append(daughter)
                 particle.decays.append(newDecay)
+                
+        #Erase particle equality tracking:
+        for p in self.SMparticles+self.BSMparticles:
+            equals = [id(p)]
+            if isinstance(p,MultiParticle):
+                equals += [id(ptc) for ptc in p.particles]            
+            p.__dict__['_equals'] = equals
+            p.__dict__['_differs'] = []

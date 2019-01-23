@@ -23,8 +23,8 @@ class DecomposerTest(unittest.TestCase):
     def testDecomposerLHE(self):
    
         filename = "./testFiles/lhe/simplyGluino.lhe"
-        model = Model(BSMList,SMList,filename)
-        model.updateParticles()
+        model = Model(BSMList,SMList)
+        model.updateParticles(filename)
            
         topList = decomposer.decompose(model)
         self.assertTrue(len(topList.getElements()) == 1)
@@ -42,8 +42,8 @@ class DecomposerTest(unittest.TestCase):
     def testDecomposerSLHA(self):
   
         filename = "./testFiles/slha/simplyGluino.slha"
-        model = Model(BSMList,SMList,filename)
-        model.updateParticles()
+        model = Model(BSMList,SMList)
+        model.updateParticles(filename)
           
         topList = decomposer.decompose(model)
         self.assertTrue(len(topList.getElements()) == 1)
@@ -63,8 +63,8 @@ class DecomposerTest(unittest.TestCase):
         filename = "./testFiles/slha/longLived.slha"
         #Consider a simpler model
         newModel = [ptc for ptc in BSMList if not isinstance(ptc.pdg,list) and abs(ptc.pdg) in [1000015,1000022]] 
-        model = Model(newModel,SMList,filename)
-        model.updateParticles()
+        model = Model(newModel,SMList)
+        model.updateParticles(filename)
             
         topList = decomposer.decompose(model)
         self.assertTrue(len(topList.getElements()) == 10)
@@ -83,8 +83,8 @@ class DecomposerTest(unittest.TestCase):
     def testCompression(self):
         
         filename = "./testFiles/slha/higgsinoStop.slha" 
-        model = Model(BSMList,SMList,filename)
-        model.updateParticles(promptWidth=1e-12*GeV) #Force charginos/neutralinos to be considered as prompt
+        model = Model(BSMList,SMList)
+        model.updateParticles(filename,promptWidth=1e-12*GeV) #Force charginos/neutralinos to be considered as prompt
         
         
         tested = False

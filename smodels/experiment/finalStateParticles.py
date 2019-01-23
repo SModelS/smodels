@@ -65,6 +65,10 @@ allFinalStates = SMfinalStates + BSMfinalStates
 for i,ptc in enumerate(allFinalStates):
     if any((ptc is p and i != j) for j,p in enumerate(allFinalStates)):
         allFinalStates.remove(ptc)
+    else:
+        ptc._equals = []
+        ptc._differs = []
+        ptc._static = True #Protect particle properties
 
 #Define a dummy model just to use the facilities for filtering particles
 finalStates = Model(SMparticles = allFinalStates,

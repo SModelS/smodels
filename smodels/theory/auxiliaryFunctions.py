@@ -330,7 +330,7 @@ def compareParticles(model=None,expResultList=[],finalStates=finalStates,reset =
     """
     Compare all particles appearing in model, final states and list of experimental
     results. The comparison results are stored in the _equals and _differs attributes
-    of the particles.
+    of the particles (even if particle._static = True).
     If reset = True, the _equals and _differs attributes will be first erased
     and then replaced by the new comparison results.
     :param model: Model object containing Particle and MultiParticle objects
@@ -369,6 +369,10 @@ def compareParticles(model=None,expResultList=[],finalStates=finalStates,reset =
             pA.__dict__['_equals'] = []
             pA.__dict__['_differs'] = []
     for pA in allParticles:
+        staticA = pA._static #store static property
         for pB in allParticles:
+            staticB = pB._static #store static property
             _ = pA == pB #Compare particles, results will be stored in pA._equals and pB._equals
+            pB._static = staticB
+        pA._static = staticA
     

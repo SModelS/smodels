@@ -77,3 +77,4 @@ gauge = [g,photon,Z,W,WC]
 quarks = [q,c,b,t,tC]
 
 SMList = leptons + gauge + quarks + [higgs,pion]
+SMparticleList = MultiParticle('SM',SMList)
