@@ -26,8 +26,8 @@ class ExampleTest(unittest.TestCase):
     
         """
         slhafile = '../inputFiles/slha/lightEWinos.slha'
-        model = Model(BSMList,SMList,slhafile)
-        model.updateParticles()
+        model = Model(BSMList,SMList)
+        model.updateParticles(slhafile)
     
         #Set main options for decomposition:
         sigmacut = 0.3 * fb

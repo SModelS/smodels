@@ -35,10 +35,9 @@ def main():
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
     slhafile = 'inputFiles/slha/lightEWinos.slha'
     #Define your model
-#     model = Model(inputFile=lhefile, BSMparticles=BSMList, SMparticles=SMList)
-    model = Model(inputFile=slhafile, BSMparticles=BSMList, SMparticles=SMList)
-    model.updateParticles()
-    
+    model = Model(BSMparticles=BSMList, SMparticles=SMList)
+#    model.updateParticles(inputFile=lhefile)
+    model.updateParticles(inputFile=slhafile)
 
     # Set main options for decomposition
     sigmacut = 0.01*fb
@@ -61,7 +60,7 @@ def main():
         n = 0
         el = top.elementList[n]
         print( "\t\t %i-th element from %i-th topology  = " %(n,m),el, end="" )
-        print( "\n\t\t\twith final states =",el.getFinalStates(),"\n\t\t\twith cross section =",el.weight,"\n\t\t\tand masses = ",el.getMasses() )
+        print( "\n\t\t\twith final states =",el.getFinalStates(),"\n\t\t\twith cross section =",el.weight,"\n\t\t\tand masses = ",el.mass )
 
     # Load the experimental results to be used.
     # In this case, all results are employed.

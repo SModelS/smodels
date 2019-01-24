@@ -35,8 +35,8 @@ def main():
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
     slhafile = 'inputFiles/slha/lightEWinos.slha'
     #Define your model
-#     model = Model(inputFile=lhefile, BSMparticles=BSMList, SMparticles=SMList)
     model = Model(BSMparticles=BSMList, SMparticles=SMList)
+#    model.updateParticles(inputFile=lhefile)
     model.updateParticles(inputFile=slhafile)
 
     # Set main options for decomposition
