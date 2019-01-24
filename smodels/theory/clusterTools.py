@@ -375,6 +375,11 @@ def _doCluster(elements, dataset, maxDist):
         if el._upperLimit is None:
             raise SModelSError("Trying to cluster element outside the grid.")
 
+    #Index elements:
+    elementList = sorted(elements, key = lambda el: el._upperLimit)
+    for iel,el in enumerate(elementList):
+        el._index = iel
+
     #Pre-compute all necessary distances:
     distanceMatrix = np.zeros((len(elements),len(elements)))
     for iel,elA in enumerate(elements):
@@ -383,11 +388,6 @@ def _doCluster(elements, dataset, maxDist):
                 continue
             distanceMatrix[iel,jel] = relativeDistance(elA, elB, dataset)
     distanceMatrix = distanceMatrix + distanceMatrix.T
-
-    #Index elements:
-    elementList = sorted(elements, key = lambda el: el._upperLimit)
-    for iel,el in enumerate(elementList):
-        el._index = iel
 
     #Start building maximal clusters
     clusterList = []
