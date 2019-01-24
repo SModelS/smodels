@@ -266,10 +266,10 @@ class Particle(object):
         Checks if the particle can be considered as MET.
         If the isMET attribute has not been defined, it will return True/False is isNeutral() = True/False.
         Else it will return the isMET attribute.
-
+        
         :return: True/False
         """
-
+        
         if hasattr(self,'_isMET'):
             return self._isMET
         else:
@@ -294,19 +294,6 @@ class Particle(object):
         return self.totalwidth.asNumber() == 0.
 
 
-    def contains(self,particle):
-        """
-        If particle is a Particle object check if self and particle are the same object.
-
-        :param particle: Particle or MultiParticle object
-
-        :return: True/False
-        """
-
-        if self is particle:
-            return True
-        else:
-            return False
 
 class MultiParticle(Particle):
 
@@ -413,13 +400,9 @@ class MultiParticle(Particle):
 
         if not isinstance(other,(MultiParticle,Particle)):
             raise TypeError("Can not add a Particle object to %s" %type(other))
-        elif other is self or self.contains(other): #Check if other is self or a subset of self
+        elif other is self:
             return self
-        #Check if self is a subset of other
-        if other.contains(self):
-            return other
-
-        if isinstance(other,MultiParticle):
+        elif isinstance(other,MultiParticle):
             addParticles = other.particles
         elif isinstance(other,Particle):
             addParticles = [other]
@@ -497,19 +480,11 @@ class MultiParticle(Particle):
         :return: True/False
         """
 
-        if not isinstance(particle,(Particle,MultiParticle)):
-            return False
-        elif isinstance(particle,MultiParticle):
-            checkParticles = particle.particles
-        else:
-            checkParticles = [particle]
+        for p in self.particles:
+            if p is particle:
+                return True
+            elif isinstance(p,MultiParticle):
+                if p.contains(particle):
+                    return True
 
-        for otherParticle in checkParticles:
-            hasParticle = False
-            for p in self.particles:
-                if p.contains(otherParticle):
-                    hasParticle = True
-            if not hasParticle:
-                return False
-
-        return True
+        return False

@@ -195,19 +195,17 @@ class Branch(object):
         newBranch = self.__class__()
         #Combine odd particles
         for iptc,ptc in enumerate(self.oddParticles):
-            newParticle = ptc+other.oddParticles[iptc]
-            if not newParticle is ptc and not newParticle is other.oddParticles[iptc]:
-                newParticle.label = 'BSM (combined)'
-            newBranch.oddParticles.append(newParticle)
+            newBranch.oddParticles.append(ptc+other.oddParticles[iptc])
+            if isinstance(newBranch.oddParticles[iptc],MultiParticle):
+                newBranch.oddParticles[iptc].label = 'BSM (combined)'
 
         #Combine even particles (if they are the same nothing changes)
         for iv,vertex in enumerate(self.evenParticles):
             newBranch.evenParticles.append([])
             for iptc,ptc in enumerate(vertex):
-                newParticle = ptc + other.evenParticles[iv][iptc]
-                if not newParticle is ptc and not newParticle is other.evenParticles[iv][iptc]:
-                    newParticle.label = 'SM (combined)'
-                newBranch.evenParticles[iv].append(newParticle)
+                newBranch.evenParticles[iv].append(ptc + other.evenParticles[iv][iptc])
+                if isinstance(newBranch.evenParticles[iv][iptc],MultiParticle):
+                    newBranch.evenParticles[iv][iptc].label = 'SM (combined)'
         
         if not self.maxWeight is None and not other.maxWeight is None:        
             newBranch.maxWeight = self.maxWeight + other.maxWeight
@@ -236,18 +234,16 @@ class Branch(object):
         
         #Combine odd particles
         for iptc,ptc in enumerate(other.oddParticles):
-            newParticle = self.oddParticles[iptc] + ptc
-            if not newParticle is self.oddParticles[iptc] and not newParticle is ptc:
-                newParticle.label = 'BSM (combined)'
-            self.oddParticles[iptc] = newParticle
+            self.oddParticles[iptc] += ptc
+            if isinstance(self.oddParticles[iptc],MultiParticle):
+                self.oddParticles[iptc].label = 'BSM (combined)'
 
         #Combine even particles (if they are the same nothing changes)
         for iv,vertex in enumerate(other.evenParticles):
             for iptc,ptc in enumerate(vertex):
-                newParticle = self.evenParticles[iv][iptc] + ptc
-                if not newParticle is self.evenParticles[iv][iptc] and not newParticle is ptc:
-                    newParticle.label = 'SM (combined)'
-                self.evenParticles[iv][iptc] = newParticle
+                self.evenParticles[iv][iptc] += ptc
+                if isinstance(self.evenParticles[iv][iptc],MultiParticle):
+                    self.evenParticles[iv][iptc].label = 'SM (combined)'
         
         if not self.maxWeight is None and not other.maxWeight is None:
             self.maxWeight += other.maxWeight
