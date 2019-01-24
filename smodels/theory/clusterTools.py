@@ -385,7 +385,7 @@ def _doCluster(elements, dataset, maxDist):
     distanceMatrix = distanceMatrix + distanceMatrix.T
 
     #Index elements:
-    elementList = elements #sorted(elements, key = lambda el: el._upperLimit)
+    elementList = sorted(elements, key = lambda el: el._upperLimit)
     for iel,el in enumerate(elementList):
         el._index = iel
 
