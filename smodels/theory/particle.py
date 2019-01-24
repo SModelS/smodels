@@ -60,26 +60,19 @@ class Particle(object):
 
         #First check if we have already compared to this object
         idOther = id(other)
-        idSelf = id(self)
-        if idOther in self._equals or idSelf in other._equals:  #Objects were already compared and are equal
+        if idOther in self._equals:  #Objects were already compared and are equal
             return 0
-        elif idOther in self._differs or -idSelf in other._differs: #Objects were already compared and differ.
+        elif idOther in self._differs: #Objects were already compared and differ.
             return 1
-        elif -idOther in self._differs or idSelf in other._differs:
+        elif -idOther in self._differs:
             return -1
         else:
             cmpProp = self.cmpProperties(other) #Objects have not been compared yet.
             if cmpProp == 0:
-                if not self._static:
-                    self._equals.append(idOther)
-                if not other._static:
-                    other._equals.append(idSelf)
+                self._equals.append(idOther)
                 return 0
             else:
-                if not self._static:
-                    self._differs.append(idOther*cmpProp)
-                if not other._static:
-                    other._differs.append(-idSelf*cmpProp)
+                self._differs.append(idOther*cmpProp)
                 return cmpProp
 
     def __lt__( self, p2 ):

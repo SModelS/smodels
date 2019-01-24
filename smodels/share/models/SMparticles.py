@@ -77,5 +77,11 @@ gauge = [g,photon,Z,W,WC]
 quarks = [q,c,b,t,tC]
 
 SMList = leptons + gauge + quarks + [higgs,pion]
+#Protect all particles properties:
+for ptc in SMList:
+    ptc._static = True
+    if isinstance(ptc,MultiParticle):
+        for p in ptc.particles:
+            p._static = True
 
 SMparticleList = MultiParticle('SM',SMList)
