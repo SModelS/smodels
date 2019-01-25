@@ -381,9 +381,9 @@ def _doCluster(elements, dataset, maxDist):
         el._index = iel
 
     #Pre-compute all necessary distances:
-    distanceMatrix = np.zeros((len(elements),len(elements)))
-    for iel,elA in enumerate(elements):
-        for jel,elB in enumerate(elements):
+    distanceMatrix = np.zeros((len(elementList),len(elementList)))
+    for iel,elA in enumerate(elementList):
+        for jel,elB in enumerate(elementList):
             if jel <= iel:
                 continue
             distanceMatrix[iel,jel] = relativeDistance(elA, elB, dataset)
