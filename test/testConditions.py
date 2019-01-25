@@ -26,7 +26,7 @@ class ConditionTest(unittest.TestCase):
         model.updateParticles(filename)
                 
         topolist = decomposer.decompose(model, sigcut= 0.1*fb, doCompress=True, doInvisible=True, minmassgap = 5*GeV)
-        analyses = database.getExpResults (txnames=["TChiWZoff"])
+        analyses = database.getExpResults(txnames=["TChiWZoff"],analysisIDs='ATLAS-SUSY-2013-12')
         theoryPrediction = theoryPredictionsFor(analyses[0], topolist)[0]
         conditionViolation = theoryPrediction.conditions
         self.assertEqual(conditionViolation['Cgtr([[[mu+,mu-]],[[l,nu]]],[[[e+,e-]],[[l,nu]]])'],0.)

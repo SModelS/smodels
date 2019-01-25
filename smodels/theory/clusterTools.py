@@ -70,6 +70,8 @@ class AverageElement(Element):
 
         if not self.elements:
             return None
+        if len(self.elements) == 1:
+            return getattr(self.elements[0],attribute)
 
         values = [getattr(el,attribute) for el in self.elements]
         if weighted:
@@ -421,13 +423,13 @@ def groupElements(elements,dataset):
         if not avgEl in avgElements:
             avgElements.append(avgEl)
 
+
     #Make sure each element belongs to a average element:
     for el in elements:
         nclusters = sum([avgEl.contains(el) for avgEl in avgElements])
         if nclusters != 1:
             raise SModelSError("Error computing average elements. Element %s belongs to %i average elements." 
                                %(str(el),nclusters))
-
     return avgElements
 
 def doCluster(elements, dataset, maxDist):

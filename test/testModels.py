@@ -12,7 +12,6 @@
 import sys,os,imp
 sys.path.insert(0,"../")
 import unittest
-from os.path import join 
 from unitTestHelpers import equalObjs, runMain
 from smodels.tools.smodelsLogging import setLogLevel
 from smodels.tools import runtime
@@ -32,7 +31,7 @@ class ModelsTest(unittest.TestCase):
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
             smodelsOutput = output_module.smodelsOutput
-        from idm_example_default import smodelsOutputDefault
+        from idm_example_defaultB import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)

@@ -27,6 +27,7 @@ from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList
 from smodels.tools.physicsUnits import GeV, TeV, fb
 from databaseLoader import database
 from smodels.theory.clusterTools import clusterElements
+from smodels.theory.theoryPrediction import theoryPredictionsFor
 import copy
 
 
@@ -260,6 +261,21 @@ class ClustererTest(unittest.TestCase):
         #in this example the distance is not in maxdist, so we dont cluster
         self.assertTrue(len(newel)==2)
 
+    def testComplexCluster(self):
+        """ test the mass clusterer """
+
+        slhafile = 'testFiles/slha/416126634.slha'
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(slhafile)
+        sigmacut = 0.03*fb
+        mingap = 5.*GeV
+        toplist = decomposer.decompose(model, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
+
+        #Test clustering for UL results
+        expResult = database.getExpResults(analysisIDs='CMS-SUS-16-039',dataTypes='upperLimit')[0]
+        predictions = theoryPredictionsFor(expResult, toplist, combinedResults=False, marginalize=False)
+        clusterSizes = sorted([len(p.elements) for p in predictions])
+        self.assertEqual(clusterSizes, [1,16,24])
 
 if __name__ == "__main__":
     unittest.main()
