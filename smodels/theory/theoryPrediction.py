@@ -8,12 +8,11 @@
 """
 
 from smodels.theory import clusterTools, crossSection, element
-from smodels.theory.auxiliaryFunctions import cSim, cGtr, elementsInStr, removeUnits,addUnit
-from smodels.tools.physicsUnits import TeV,fb,GeV
+from smodels.theory.auxiliaryFunctions import cSim, cGtr, elementsInStr, average
+from smodels.tools.physicsUnits import TeV,fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
-import numpy as np
 
 class TheoryPrediction(object):
     """
@@ -385,9 +384,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     if None in massList:
         mass = None
     else:
-        massList = np.array(removeUnits(massList, [GeV]))
-        mass = np.average(massList,weights=weights,axis=0).tolist()
-        mass = addUnit(mass,unit=GeV)
+        mass = average(massList,weights=weights)
     
     
     #Create a combinedDataSet object:
@@ -494,7 +491,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.elements = cluster.elements
         theoryPrediction.avgElement = cluster.averageElement()
-        theoryPrediction.mass = cluster.getAvgMass()
+        theoryPrediction.mass = theoryPrediction.avgElement.mass
         theoryPrediction.PIDs = cluster.getPIDs()
         theoryPrediction.IDs = cluster.getIDs()
         predictionList._theoryPredictions.append(theoryPrediction)
@@ -538,19 +535,19 @@ def _getElementsFrom(smsTopList, dataset):
                 newEl.txname = txname
                 elements.append(newEl) #Save element with correct branch ordering
 
-
     #Remove duplicated elements:
     allmothers = []
     #First collect the list of all mothers:
     for el in elements:
         allmothers += [elMom[1] for elMom in el.motherElements if not elMom[0]=='original']
     elementsClean = []
+
     for el in elements:
         #Skip the element if it is a mother of another element in the list
         if any((elMom is el) for elMom in allmothers):
             continue
         elementsClean.append(el)
-        
+
     return elementsClean
 
 

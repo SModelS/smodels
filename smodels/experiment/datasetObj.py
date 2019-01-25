@@ -13,7 +13,7 @@ from smodels.experiment import txnameObj,infoObj
 from smodels.tools.physicsUnits import fb
 from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from smodels.theory.auxiliaryFunctions import getAttributesFrom,getValuesForObj,_flattenList
+from smodels.theory.auxiliaryFunctions import getAttributesFrom,getValuesForObj
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.theory.element import Element

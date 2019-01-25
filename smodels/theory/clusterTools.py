@@ -10,10 +10,88 @@
 from smodels.theory import crossSection
 from smodels.theory.element import Element
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
-from smodels.tools.physicsUnits import fb, GeV
+from smodels.tools.physicsUnits import fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.theory.auxiliaryFunctions import average
 import numpy as np
 from smodels.tools.smodelsLogging import logger
+
+
+class AverageElement(Element):
+    """
+    Represents an element or list of elements containing only
+    the basic attributes required for clustering or computing efficiencies/upper limits.
+    Its properties are given by the average properties of the elements
+    it represents and its weight is given by the total weight of
+    all elements.
+    """
+
+    def __init__(self,elements=[]):
+
+        if any(not isinstance(el,Element) for el in elements):
+            raise SModelSError("An AverageElement must be created from a list of Element objects.")
+
+        #Define relevant properties to be stored and averaged over:
+        self.properties=['mass','totalwidth','txname']
+        self.elements = elements[:]
+        if self.elements:
+            for attr in self.properties:
+                setattr(self,attr,self.getAverage(attr))
+            self.weight = self.elements[0].weight.copy()
+            for el in self.elements[1:]:
+                self.weight += el.weight
+
+    def __eq__(self,other):
+        """
+        Compare self with other using the properties defined in self.properties.
+        """
+
+        if not isinstance(other,(AverageElement,Element)):
+            return False
+
+        if any(getattr(self,attr) != getattr(other,attr) for attr in self.properties):
+            return False
+        return True
+
+    def __neq__(self,other):
+        return not self.__eq__(other)
+
+    def getAverage(self,attribute,weighted=True):
+        """
+        Compute the average value for the attribute using
+        the elements in self.elements.
+        If weighted = True, compute the weighted average
+        using the elements weights.
+
+        :param attribute: Name of attribute to be averaged over (string)
+
+        :return: Average value of attribute.
+        """
+
+        if not self.elements:
+            return None
+
+        values = [getattr(el,attribute) for el in self.elements]
+        if weighted:
+            weights = [el.weight.getMaxXsec().asNumber(fb) for el in self.elements]
+        else:
+            weights = [1.]*len(self.elements)
+
+        return average(values,weights)
+
+    def contains(self,element):
+        """
+        Check if the average element contains the element
+
+        :param element: Element object
+
+        :return: True/False
+        """
+
+        if any(el is element for el in self.elements):
+            return True
+        return False
+
 
 class ElementCluster(object):
     """
@@ -31,7 +109,7 @@ class ElementCluster(object):
         self.maxInternalDist = 0.
         self._distanceMatrix = distanceMatrix
         #Compute maximal internal distance
-        if self.elements:
+        if self.elements and not self._distanceMatrix is None:
             self.maxInternalDist = max([self.getDistanceTo(el) for el in self])
 
     def __eq__(self, other):
@@ -49,9 +127,12 @@ class ElementCluster(object):
     def __getitem__(self, iel):
         return self.elements[iel]
 
+    def __len__(self):
+        return len(self.elements)
+
     def __str__(self):
         return str(self.elements)
-    
+
     def __repr__(self):
         return str(self.elements)
 
@@ -94,59 +175,6 @@ class ElementCluster(object):
 
         return dataType
 
-    def getAvgMass(self):
-        """
-        Return the average mass of all elements belonging to the cluster, weighted
-        by their individual weights.
-        If the masses have distinct shapes (e.g. for different txnames in efficiencyMap
-        results), return None.
-        
-        :returns: average mass array appearing in the cluster     
-        """                          
-        
-
-        eInfo = self.elements[0].getEinfo()
-        if any(el.getEinfo() != eInfo for el in self):
-            return None
-
-        massList = [el.mass for el in self]
-        weights = [el.weight.getMaxXsec().asNumber(fb) for el in self]
-        avgmass = [[0.]*len(br) for br in massList[0]]
-        for ib, branch in enumerate(massList[0]):
-            for im,_ in enumerate(branch):
-                vals = [mass[ib][im].asNumber(GeV) for mass in massList]
-                weights = [ float(weight) for weight in weights ]
-                avg = np.average(vals,weights=weights)
-                avgmass[ib][im] = avg*GeV
-
-        return avgmass
-
-    def getAvgWidth(self):
-        """
-        Return the average width of all elements belonging to the cluster, weighted
-        by their individual weights.
-        If the widths have distinct shapes (e.g. for different txnames in efficiencyMap
-        results), return None.
-
-        :returns: average width array appearing in the cluster
-        """                          
-
-        eInfo = self.elements[0].getEinfo()
-        if any(el.getEinfo() != eInfo for el in self):
-            return None
-
-        widthList = [el.totalwidth for el in self]
-        weights = [el.weight.getMaxXsec().asNumber(fb) for el in self]
-        avgwidth = [[0.]*len(br) for br in widthList[0]]
-        for ib, branch in enumerate(widthList[0]):
-            for im,_ in enumerate(branch):
-                vals = [mass[ib][im].asNumber(GeV) for mass in widthList]
-                weights = [ float(weight) for weight in weights ]
-                avg = np.average(vals,weights=weights)
-                avgwidth[ib][im] = avg*GeV
-
-        return avgwidth
-    
     def averageElement(self):
         """
         Computes the average element for the cluster.
@@ -156,12 +184,11 @@ class ElementCluster(object):
         :return: Element object
         """
 
-        avgEl = self.elements[0].__class__()
-        avgEl.mass = self.getAvgMass()
-        avgEl.totalwidth = self.getAvgWidth()
-        avgEl.txname = self.elements[0].txname
-        avgEl._upperLimit = self.dataset.getUpperLimitFor(avgEl,
+        avgEl = AverageElement(self.elements[:])
+        if self.dataset:
+            avgEl._upperLimit = self.dataset.getUpperLimitFor(avgEl,
                                                           txnames=avgEl.txname)
+
         avgEl._index = None
         return avgEl
 
@@ -196,7 +223,7 @@ class ElementCluster(object):
         Returns a copy of the index cluster (faster than deepcopy).
         """
 
-        newcluster = ElementCluster(self.elements,self.dataset,self._distanceMatrix)
+        newcluster = ElementCluster(self.elements[:],self.dataset,self._distanceMatrix)
         newcluster.maxInternalDist = self.maxInternalDist
         return newcluster
 
@@ -217,7 +244,7 @@ class ElementCluster(object):
                 continue
 
             self.elements.append(el)
-            #Update insternal distance:
+            #Update internal distance:
             self.maxInternalDist = max(self.maxInternalDist,self.getDistanceTo(el))
 
     def remove(self, elements):
@@ -307,7 +334,7 @@ def relativeDistance(el1, el2, dataset):
                                                         txnames=el1.txname)
     if not hasattr(el2,'_upperLimit'):
         el2._upperLimit = dataset.getUpperLimitFor(el2,
-                                                        txnames=el1.txname)
+                                                        txnames=el2.txname)
 
     ul1 = el1._upperLimit
     ul2 = el2._upperLimit
@@ -342,7 +369,7 @@ def clusterElements(elements, maxDist, dataset):
         raise SModelSError()
 
     if dataset.getType() == 'upperLimit': #Group according to upper limit values
-        clusters = _doCluster(elements, dataset, maxDist)
+        clusters = doCluster(elements, dataset, maxDist)
     elif dataset.getType() == 'efficiencyMap': #Group all elements together
         distanceMatrix = np.zeros((len(elements),len(elements)))
         cluster = ElementCluster(dataset=dataset,distanceMatrix=distanceMatrix)
@@ -355,8 +382,55 @@ def clusterElements(elements, maxDist, dataset):
         cluster.txnames = txnames
     return clusters
 
+def groupElements(elements,dataset):
+    """
+    Group elements into groups where the average element
+    identical to all the elements in group.
+    The groups contain all elements which share the same mass,width and upper limit
+    and can be replaced by their average element when building clusters.
 
-def _doCluster(elements, dataset, maxDist):
+    :parameter elements: list of all elements to be grouped
+    :parameter dataset: Dataset object to be used when computing distances in upper limit space
+
+    :returns: a list of AverageElement objects
+              which represents a group of elements with same mass, width and upper limit.
+    """
+
+    # First make sure all elements contain their upper limits
+    for el in elements:
+        if not hasattr(el,'._upperLimit'):
+            el._upperLimit = dataset.getUpperLimitFor(el,txnames=el.txname)
+        if el._upperLimit is None:
+            raise SModelSError("Trying to cluster element outside the grid.")
+
+    #Group elements if they have the same UL
+    #and give the same average element (same mass and same width)
+    avgElements = []
+    for iA,elA in enumerate(elements):
+        avgEl = AverageElement([elA])
+        avgEl._upperLimit = elA._upperLimit
+        for iB,elB in enumerate(elements):
+            if iB <= iA:
+                continue
+            if elA._upperLimit != elB._upperLimit:
+                continue
+            if avgEl != elB:
+                continue
+            avgEl.elements.append(elB)
+            avgEl.weight += elB.weight
+        if not avgEl in avgElements:
+            avgElements.append(avgEl)
+
+    #Make sure each element belongs to a average element:
+    for el in elements:
+        nclusters = sum([avgEl.contains(el) for avgEl in avgElements])
+        if nclusters != 1:
+            raise SModelSError("Error computing average elements. Element %s belongs to %i average elements." 
+                               %(str(el),nclusters))
+
+    return avgElements
+
+def doCluster(elements, dataset, maxDist):
     """
     Cluster algorithm to cluster elements.
 
@@ -368,15 +442,11 @@ def _doCluster(elements, dataset, maxDist):
               belonging to the cluster
     """
 
-    # First make sure all elements contain their upper limits
-    for el in elements:
-        if not hasattr(el,'._upperLimit'):
-            el._upperLimit = dataset.getUpperLimitFor(el,txnames=el.txname)
-        if el._upperLimit is None:
-            raise SModelSError("Trying to cluster element outside the grid.")
+    #Get average elements:
+    averageElements = groupElements(elements,dataset)
 
-    #Index elements:
-    elementList = sorted(elements, key = lambda el: el._upperLimit)
+    #Index average elements:
+    elementList = sorted(averageElements, key = lambda el: el._upperLimit)
     for iel,el in enumerate(elementList):
         el._index = iel
 
@@ -398,9 +468,10 @@ def _doCluster(elements, dataset, maxDist):
                 cluster.add(elB)
         if not cluster.elements:
             continue
-        if not cluster.isConsistent(maxDist):
+        if cluster.averageElement()._upperLimit is None:
             continue
-        clusterList.append(cluster)
+        if not cluster in clusterList:
+            clusterList.append(cluster)
 
     #Split the maximal clusters until all elements inside each cluster are
     #less than maxDist apart from each other and the cluster average position
@@ -410,7 +481,8 @@ def _doCluster(elements, dataset, maxDist):
         newClusters = []
         for cluster in clusterList:
             #Check if maximal internal distance is below maxDist
-            if cluster.maxInternalDist < maxDist:
+            isConsistent = cluster.isConsistent(maxDist)
+            if isConsistent and cluster.maxInternalDist < maxDist:
                 if not cluster in finalClusters:
                     finalClusters.append(cluster)
 
@@ -419,14 +491,13 @@ def _doCluster(elements, dataset, maxDist):
                 #Loop over cluster elements and if element distance
                 #falls outside the cluster, remove element
                 for el in cluster:
-                    if cluster.getDistanceTo(el) > maxDist:
+                    if cluster.getDistanceTo(el) > maxDist or not isConsistent:
                         newcluster = cluster.copy()
                         newcluster.remove(el)
-                        if not newcluster.isConsistent(maxDist):
+                        if newcluster.averageElement()._upperLimit is None:
                             continue
                         if newcluster in newClusters:
                             continue
-
                         newClusters.append(newcluster)
 
         clusterList = newClusters
@@ -452,5 +523,12 @@ def _doCluster(elements, dataset, maxDist):
                 finalClusters[jc] = None
     while finalClusters.count(None) > 0:
         finalClusters.remove(None)
+
+    #Replace average elements by the original elements:
+    for cluster in finalClusters:
+        originalElements = []
+        for avgEl in cluster.elements[:]:
+            originalElements += avgEl.elements[:]
+        cluster.elements = originalElements[:]
 
     return finalClusters

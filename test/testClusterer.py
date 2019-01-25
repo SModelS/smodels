@@ -83,7 +83,7 @@ class ClustererTest(unittest.TestCase):
         #Cluster for upper limits (all elements close in upper limit should be clustered together)
         maxDist = 5. #Cluster all elements
         newel=clusterTools.clusterElements([el1,el2], maxDist, dataset)[0]
-        newmasses=newel.getAvgMass()
+        newmasses=newel.averageElement().mass
         self.assertEqual(newmasses,[[700.*GeV,200.*GeV]]*2)
         
         maxDist = 0.5 #Elements differ and should not be clustered
@@ -105,7 +105,7 @@ class ClustererTest(unittest.TestCase):
         #Cluster for efficiency maps (all elements should be clustered together independent of maxDist)
         maxDist = 0.001
         newel=clusterTools.clusterElements([el1,el2],maxDist,dataset)[0]
-        newmasses=newel.getAvgMass()
+        newmasses=newel.averageElement().mass
         self.assertEqual(newmasses,[[700.*GeV,200.*GeV]]*2)
 
     def testClusteringEM(self):
@@ -136,8 +136,8 @@ class ClustererTest(unittest.TestCase):
         clusters = clusterElements([el1,el2,el3],maxDist=0.2,dataset=dataset)
         self.assertEqual(len(clusters),1)
         self.assertEqual(sorted(clusters[0].elements),sorted([el1,el2,el3]))
-        self.assertEqual(clusters[0].getAvgMass(),None)
-        self.assertEqual(clusters[0].getAvgWidth(),None)
+        self.assertEqual(clusters[0].averageElement().mass,None)
+        self.assertEqual(clusters[0].averageElement().totalwidth,None)
 
     def testClusteringUL(self):
 
@@ -249,8 +249,8 @@ class ClustererTest(unittest.TestCase):
         
         newel=clusterTools.clusterElements([el1,el2], 5., dataset)
         ## this example gives an avg cluster mass of 700 gev
-        self.assertEqual(newel[0].getAvgMass()[0][0],675.*GeV)
-        self.assertAlmostEqual(newel[0].getAvgWidth()[0][0].asNumber(GeV)*1e15,0.95)
+        self.assertEqual(newel[0].averageElement().mass[0][0],675.*GeV)
+        self.assertAlmostEqual(newel[0].averageElement().totalwidth[0][0].asNumber(GeV)*1e15,0.95)
         
         newel=clusterTools.clusterElements([el1,el2], .5, dataset)
         #in this example the distance is in maxdist, so we cluster

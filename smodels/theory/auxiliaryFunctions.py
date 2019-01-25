@@ -325,3 +325,56 @@ def getAttributesFrom(obj):
     
     return list(set(_flattenList(attributes)))
 
+
+def average(values,weights=None):
+    """
+    Compute the weighted average of a list of objects.
+    All the objects must be of the same type.
+    If all objects are equal returns the first entry of the list.
+    Only the average of ints, floats and Unum objects or nested lists
+    of these can be computed. If the average can not be computed
+    returns None.
+
+    :param values: List of objects of the same type
+    :param weights: Weights for computing the weighted average. If None it will assume
+                    unit weights.
+    """
+
+    if weights is None:
+        weights = [1.]*len(values)
+    if not isinstance(values,list):
+        raise SModelSError("Values must be a list of objects")
+    if not isinstance(weights,list):
+        raise SModelSError("Weights must be a list of objects")
+    if any(not isinstance(w,(float,int)) for w in weights):
+        raise SModelSError("Weights must be a list of integers or floats")
+    if len(values) != len(weights):
+        return SModelSError("Values and weights must have the same length")
+
+    if any(type(v) != type(values[0]) for v in values):
+        raise SModelSError("Can not compute average of distinct types of objects")
+    if isinstance(values[0],(float,int,unum.Unum)):
+        total = values[0]*weights[0]
+        for i,v in enumerate(values[1:]):
+            total += v*weights[i+1]
+        total = total/sum(weights)
+        return total
+    elif isinstance(values[0],list):
+        ndim = len(values[0])
+        if any(len(v) != ndim for v in values):
+            raise SModelSError("Can not compute average of lists of distinct lengths")
+        res = []
+        for i in range(ndim):
+            try:
+                res.append(average([v[i] for v in values],weights))
+            except SModelSError:
+                return None
+        return res
+    else:
+        if all(values[0] is v for v in values):
+            return values[0]
+        if all(values[0] == v for v in values):
+            return values[0]
+        return None
+    
+    
