@@ -544,7 +544,7 @@ def _getElementsFrom(smsTopList, dataset):
 
     for el in elements:
         #Skip the element if it is a mother of another element in the list
-        if any((elMom is el) for elMom in allmothers):
+        if any((elMom.elID == el.elID) for elMom in allmothers):
             continue
         elementsClean.append(el)
 
