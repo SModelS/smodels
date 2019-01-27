@@ -23,6 +23,7 @@ from collections import OrderedDict
 from xml.dom import minidom
 from xml.etree import ElementTree
 import unum
+import time
 
 class MPrinter(object):
     """
@@ -118,6 +119,7 @@ class BasicPrinter(object):
 
     def __init__(self, output, filename):
         self.name = "basic"
+        self.time = time.time() # time stamps
 
         self.outputList = []
         self.filename = filename
@@ -206,6 +208,7 @@ class BasicPrinter(object):
                     outfile.close()
 
         self.toPrint = [None]*len(self.printingOrder)  #Reset printing objects
+        self.time = time.time() ## prepare next timestamp
         return ret
 
     def _formatObj(self,obj):
@@ -232,6 +235,7 @@ class TxTPrinter(BasicPrinter):
     def __init__(self, output = 'stdout', filename = None):
         BasicPrinter.__init__(self, output, filename)        
         self.name = "log"
+        self.printTimeSpent = False
         self.printingOrder = [OutputStatus,ExpResultList,TopologyList,
                              TheoryPredictionList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)        
@@ -265,6 +269,8 @@ class TxTPrinter(BasicPrinter):
 
         output = ""
         output += "Input status: " + str(obj.filestatus) + "\n"
+        if self.printTimeSpent:
+            output += "Time spent: %.2fs\n" % ( time.time() - self.time )
         output += "Decomposition output status: " + str(obj.status) + " "
         output += obj.statusStrings[obj.status] + "\n"
         if obj.filestatus < 0: output += str(obj.warnings) + "\n"
