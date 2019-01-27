@@ -235,7 +235,7 @@ class TxTPrinter(BasicPrinter):
     def __init__(self, output = 'stdout', filename = None):
         BasicPrinter.__init__(self, output, filename)        
         self.name = "log"
-        self.printTimeSpent = False
+        self.printtimespent = False
         self.printingOrder = [OutputStatus,ExpResultList,TopologyList,
                              TheoryPredictionList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)        
@@ -269,7 +269,9 @@ class TxTPrinter(BasicPrinter):
 
         output = ""
         output += "Input status: " + str(obj.filestatus) + "\n"
-        if self.printTimeSpent:
+        # hidden feature, printtimespent, turn on in ini file, e.g.
+        # [summary-printer] printtimespent = True
+        if self.printtimespent: 
             output += "Time spent: %.2fs\n" % ( time.time() - self.time )
         output += "Decomposition output status: " + str(obj.status) + " "
         output += obj.statusStrings[obj.status] + "\n"
