@@ -607,6 +607,7 @@ class PyPrinter(BasicPrinter):
     def __init__(self, output = 'stdout', filename = None):
         BasicPrinter.__init__(self, output, filename)
         self.name = "py"
+        self.printtimespent = False
         self.printingOrder = [OutputStatus,TopologyList,TheoryPredictionList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
         
@@ -723,6 +724,10 @@ class PyPrinter(BasicPrinter):
         infoDict['input file'] = obj.inputfile
         infoDict['database version'] = obj.databaseVersion
         infoDict['smodels version'] = obj.smodelsVersion
+        # hidden feature, printtimespent, turn on in ini file, e.g.
+        # [summary-printer] printtimespent = True
+        if self.printtimespent:
+            infoDict['time spent'] =  "%.2fs" %(time.time() - self.time)
         return {'OutputStatus' : infoDict}
 
 
