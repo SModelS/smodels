@@ -19,7 +19,7 @@ class Particle(object):
         
         Initializes the particle.
         Possible properties: 
-        Z2parity: str, 'even' or 'odd'
+        Z2parity: int, +1 or -1
         label: str, e.g. 'e-'
         pdg: number in pdg
         mass: mass of the particle
@@ -41,7 +41,7 @@ class Particle(object):
         #Leave the static attribute for last:
         if '_static' in kwargs:
             self._static = kwargs['_static']
-    @profile
+
     def __cmp__(self,other):
         """
         Compares particle with other.

@@ -187,9 +187,9 @@ class Model(object):
         evenPDGs = []
         oddPDGs = []
         for pdg in allPDGs:
-            if all(p.Z2parity == 'even' for p in self.getParticlesWith(pdg=pdg)):
+            if all(p.Z2parity == 1 for p in self.getParticlesWith(pdg=pdg)):
                 evenPDGs.append(pdg)
-            elif all(p.Z2parity == 'odd' for p in self.getParticlesWith(pdg=pdg)):
+            elif all(p.Z2parity == -1 for p in self.getParticlesWith(pdg=pdg)):
                 oddPDGs.append(pdg)
         
         #Remove cross-sections for even particles or particles which do not belong to the model:
@@ -244,7 +244,7 @@ class Model(object):
             if particle.totalwidth > promptWidth:
                 particle.totalwidth = float('inf')*GeV  #Treat particle as prompt
                 logger.debug("Particle %s has width above the threshold and will be assumed as prompt." %particle.pdg)
-                if erasePrompt and particle.Z2parity == 'odd':
+                if erasePrompt and particle.Z2parity == -1:
                     logger.debug("Erasing quantum numbers of (prompt) particle %s." %particle.pdg)
                     for attr in erasePrompt:
                         delattr(particle,attr)

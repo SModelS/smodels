@@ -17,13 +17,13 @@ from smodels.experiment.databaseParticles import finalStates
 from smodels.theory import model
 import numpy as np
 
-p1 = Particle(Z2parity='odd', label='p1', pdg=None, mass=100.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p2 = Particle(Z2parity='odd', label='p1', pdg=1000021, mass=None, eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p3 = Particle(Z2parity='odd', label='p3', pdg=1, mass=110.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p4 = Particle(Z2parity='odd', label='p4', pdg=None, mass=110.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p4a = Particle(Z2parity='odd', label='p4~', pdg=None, mass=110.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p5 = Particle(Z2parity='odd', label='p5+', pdg=2, mass=110.*GeV, eCharge=1., colordim=None, spin=None, width=None, branches=None)
-p5m = Particle(Z2parity='odd', label='p5-', pdg=-2, mass=110.*GeV, eCharge=-1., colordim=None, spin=None, width=None, branches=None)
+p1 = Particle(Z2parity=-1, label='p1', pdg=None, mass=100.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
+p2 = Particle(Z2parity=-1, label='p1', pdg=1000021, mass=None, eCharge=None, colordim=None, spin=None, width=None, branches=None)
+p3 = Particle(Z2parity=-1, label='p3', pdg=1, mass=110.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
+p4 = Particle(Z2parity=-1, label='p4', pdg=None, mass=110.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
+p4a = Particle(Z2parity=-1, label='p4~', pdg=None, mass=110.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
+p5 = Particle(Z2parity=-1, label='p5+', pdg=2, mass=110.*GeV, eCharge=1., colordim=None, spin=None, width=None, branches=None)
+p5m = Particle(Z2parity=-1, label='p5-', pdg=-2, mass=110.*GeV, eCharge=-1., colordim=None, spin=None, width=None, branches=None)
 
 p1c = p1.copy()
 p1c.pdg = 10

@@ -359,8 +359,8 @@ class Branch(object):
         
         newBranch = self.copy()      
         particles = [ptc for ptc in decay.daughters]
-        oddParticles = [p for p in particles if p.Z2parity == 'odd']
-        evenParticles = [p for p in particles if p.Z2parity == 'even']
+        oddParticles = [p for p in particles if p.Z2parity == -1]
+        evenParticles = [p for p in particles if p.Z2parity == 1]
         
         if len(oddParticles) != 1:
             logger.warning("Decay %s does not preserve Z2 and will be ignored" %str(decay))
@@ -477,7 +477,7 @@ class InclusiveBranch(Branch):
                 raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)          
             self.oddParticles = [bsmParticle[0]]
         else:
-            self.oddParticles = [Particle(Z2parity='odd')]
+            self.oddParticles = [Particle(Z2parity=-1)]
         self.vertnumb = InclusiveValue()
         self.vertparts = InclusiveList()
         
