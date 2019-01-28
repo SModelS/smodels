@@ -32,8 +32,8 @@ class Particle(object):
         """  
 
         self._static = False
-        self._equals = [id(self)]
-        self._differs = []
+        self._equals = set([id(self)])
+        self._differs = set([])
         for attr,value in kwargs.items():
             if not attr == '_static':
                 setattr(self,attr,value)
@@ -41,7 +41,7 @@ class Particle(object):
         #Leave the static attribute for last:
         if '_static' in kwargs:
             self._static = kwargs['_static']
-
+    @profile
     def __cmp__(self,other):
         """
         Compares particle with other.
@@ -71,15 +71,15 @@ class Particle(object):
             cmpProp = self.cmpProperties(other) #Objects have not been compared yet.
             if cmpProp == 0:
                 if not self._static:
-                    self._equals.append(idOther)
+                    self._equals.add(idOther)
                 if not other._static:
-                    other._equals.append(idSelf)
+                    other._equals.add(idSelf)
                 return 0
             else:
                 if not self._static:
-                    self._differs.append(idOther*cmpProp)
+                    self._differs.add(idOther*cmpProp)
                 if not other._static:
-                    other._differs.append(-idSelf*cmpProp)
+                    other._differs.add(-idSelf*cmpProp)
                 return cmpProp
 
     def __lt__( self, p2 ):
@@ -224,8 +224,8 @@ class Particle(object):
         
         pConjugate = self.copy()
         pConjugate._static = False #Temporarily set it to False to change attributes
-        pConjugate._equals = [id(pConjugate)]
-        pConjugate._differs = []
+        pConjugate._equals = set([id(pConjugate)])
+        pConjugate._differs = set([])
                     
         if hasattr(pConjugate, 'pdg') and pConjugate.pdg:
             pConjugate.pdg *= -1       
@@ -327,8 +327,8 @@ class MultiParticle(Particle):
         self.label = label
         self.particles = particles
         Particle.__init__(self,**kwargs)
-        self._equals = [id(self)] + [id(ptc) for ptc in particles]
-        self._differs = []
+        self._equals = set([id(self)] + [id(ptc) for ptc in particles])
+        self._differs = set([])
 
     def __getattribute__(self,attr):
         """
@@ -444,9 +444,9 @@ class MultiParticle(Particle):
             if not self.contains(other):
                 self.particles.append(other)
                 if id(other) in self._differs:
-                    self._differs.remove(other)
+                    self._differs.remove(id(other))
                 if not id(other) in self._equals:
-                    self._equals.append(id(other))
+                    self._equals.add(id(other))
 
         return self
 

@@ -287,5 +287,5 @@ class Model(object):
             equals = [id(p)]
             if isinstance(p,MultiParticle):
                 equals += [id(ptc) for ptc in p.particles]            
-            p._equals = equals
-            p._differs = []
+            p._equals = set(equals)
+            p._differs = set([])
