@@ -103,6 +103,10 @@ class Branch(object):
         st = st.replace(" ", "")
         return st
 
+    def __repr__(self):
+
+        return self.__str__()
+
     def __cmp__(self,other):
         """
         Compares the branch with other.        
@@ -121,7 +125,6 @@ class Branch(object):
         elif isinstance(other,InclusiveBranch):
             return -1*other.__cmp__(self)
         
-        
         if self.vertnumb != other.vertnumb:
             comp = self.vertnumb > other.vertnumb
             if comp: return 1
@@ -130,6 +133,14 @@ class Branch(object):
             comp = self.vertparts > other.vertparts
             if comp: return 1
             else: return -1
+
+        #Compare BSM states:
+        if self.oddParticles != other.oddParticles:
+            comp = self.oddParticles > other.oddParticles
+            if comp:
+                return 1
+            else:
+                return -1
             
         #Compare even final states irrespective of ordering:
         for iv,particlesA in enumerate(self.evenParticles):
@@ -143,16 +154,12 @@ class Branch(object):
             if not equalVertex:
                 particlesA = sorted(particlesA)
                 particlesB = sorted(particlesB)
-                comp = (particlesA > particlesB) - (particlesA < particlesB)
-                return comp
+                comp = (particlesA > particlesB)
+                if comp:
+                    return 1
+                else:
+                    return -1
                 
-        #Compare BSM states:
-        for iv,partA in enumerate(self.oddParticles):
-            partB = other.oddParticles[iv]
-            if partA != partB:
-                comp = (partA > partB) - (partA < partB)
-                return comp
-
         return 0  #Branches are equal    
         
 
@@ -471,13 +478,13 @@ class InclusiveBranch(Branch):
         self.evenParticles =  InclusiveList()
         if finalState:
             bsmParticle = finalStates.getParticlesWith(label=finalState)
-            if not bsmParticle:
-                raise SModelSError("Final state %s has not been defined in finalStateParticles.py" %finalState)
-            if len(bsmParticle) != 1:
-                raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)          
-            self.oddParticles = [bsmParticle[0]]
         else:
-            self.oddParticles = [Particle(Z2parity=-1)]
+            bsmParticle = finalStates.getParticlesWith(label='anyOdd')
+        if not bsmParticle:
+            raise SModelSError("Final state %s has not been defined in finalStateParticles.py" %finalState)
+        if len(bsmParticle) != 1:
+            raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)
+        self.oddParticles = [bsmParticle[0]]
         self.vertnumb = InclusiveValue()
         self.vertparts = InclusiveList()
         

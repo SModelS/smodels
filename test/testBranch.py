@@ -46,7 +46,7 @@ class BranchTest(unittest.TestCase):
         self.assertTrue( str(b1) == '[[q,q],[q],[q,q]]')
         self.assertTrue(b1 > b2)  #Larger by number of vertices
         self.assertEqual(b1, b5) #always true because b3 is a wildcard
-        self.assertFalse(b2 < b3)  #Bigger by label of particles
+        self.assertTrue(b2 < b3)  #Bigger by odd particles
         self.assertFalse(b2 < b4)  #Bigger by mass of g compared to sq1
 
 
