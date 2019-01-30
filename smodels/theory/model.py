@@ -9,7 +9,7 @@ import pyslha,copy
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
 from smodels.theory import lheReader, crossSection
-from smodels.theory.particle import MultiParticle
+from smodels.theory.particle import MultiParticle, ParticleList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 class Model(object):
@@ -204,7 +204,7 @@ class Model(object):
                     self.xsections.delete(xsec)
         
 
-
+        allVertices = []
         for particle in self.BSMparticles:
             if isinstance(particle,MultiParticle):
                 continue
@@ -270,7 +270,7 @@ class Model(object):
                     
                     
                 #Convert PDGs to particle objects:
-                newDecay.daughters = []
+                daughters = []
                 for pdg in newDecay.ids:
                     daughter = self.getParticlesWith(pdg=pdg)
                     if not daughter:
@@ -279,9 +279,24 @@ class Model(object):
                         raise SModelSError("Multiple particles defined with PDG = %i. PDG ids must be unique." %pdg)
                     else:
                         daughter = daughter[0]
-                    newDecay.daughters.append(daughter)
+                    daughters.append(daughter)
+                oddParticles = [p for p in daughters if p.Z2parity == -1]
+                evenParticles = ParticleList([p for p in daughters if p.Z2parity == 1])
+                evenParticles.tag = 'model'
+                ivertex = None
+                for iv,vertex in enumerate(allVertices):
+                    if evenParticles.identical(vertex):
+                        ivertex = iv
+                        break
+                if ivertex is None:
+                    allVertices.append(evenParticles)
+                    vertexParticles = evenParticles
+                else:
+                    vertexParticles = allVertices[ivertex]
+                newDecay.oddParticles = oddParticles
+                newDecay.evenParticles = vertexParticles
                 particle.decays.append(newDecay)
-                
+
         #Reset particle equality tracking:
         for p in self.SMparticles+self.BSMparticles:
             equals = [[id(p),0]]

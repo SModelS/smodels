@@ -6,7 +6,7 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 
-import copy
+import copy,itertools
 
 class Particle(object):
     """
@@ -32,7 +32,8 @@ class Particle(object):
         """  
 
         self._static = False
-        self._comp = {id(self) : 0}
+        self.id = id(self)
+        self._comp = {self.id : 0}
         for attr,value in kwargs.items():
             if not attr == '_static':
                 setattr(self,attr,value)
@@ -58,11 +59,11 @@ class Particle(object):
             return +1
 
         #First check if we have already compared to this object
-        idOther = id(other)        
+        idOther = other.id        
         if idOther in self._comp:
             return self._comp[idOther]
 
-        idSelf = id(self)
+        idSelf = self.id
         if idSelf in other._comp:
             return -other._comp[idSelf]
 
@@ -214,8 +215,9 @@ class Particle(object):
         """
         
         pConjugate = self.copy()
+        pConjugate.id = id(pConjugate)
         pConjugate._static = False #Temporarily set it to False to change attributes
-        pConjugate._comp = {id(pConjugate) : 0}
+        pConjugate._comp = {pConjugate.id : 0}
                     
         if hasattr(pConjugate, 'pdg') and pConjugate.pdg:
             pConjugate.pdg *= -1       
@@ -317,7 +319,7 @@ class MultiParticle(Particle):
         self.label = label
         self.particles = particles
         Particle.__init__(self,**kwargs)
-        self._comp = dict([[id(self),0]] + [[id(ptc),0] for ptc in particles])
+        self._comp = dict([[self.id,0]] + [[ptc.id,0] for ptc in particles])
 
     def __getattribute__(self,attr):
         """
@@ -433,7 +435,7 @@ class MultiParticle(Particle):
             if not self.contains(other):
                 self.particles.append(other)
                 if not self._static:
-                    self._comp[id(other)] = 0
+                    self._comp[other.id] = 0
 
         return self
 
@@ -502,3 +504,98 @@ class MultiParticle(Particle):
                 return False
 
         return True
+    
+    
+class ParticleList(object):
+    """
+    Simple class to store a list of particles.
+    """
+    
+    def __init__(self,particles):
+        
+        self.particles = sorted(particles[:])
+        self.id = id(self)
+        self._comp = {self.id : 0}
+        self._static = False
+        
+    def identical(self,other):        
+        if len(self) != len(other):
+            return False
+        if any((ptc is not other.particles[iptc]) for iptc,ptc in enumerate(self.particles)):
+            return False
+        
+        return True
+        
+    def __cmp__(self,other):
+        """
+        Compares two particle lists irrespective of the particle ordering.
+        
+        :param other:  particle list to be compared (ParticleList object)
+        
+        :return: -1 if self < other, 1 if self > other, 0 is self == other 
+        """    
+        
+        if not isinstance(other,ParticleList):
+            raise ValueError
+
+        #First check if we have already compared to this object
+        idOther = other.id  
+        if idOther in self._comp:
+            return self._comp[idOther]
+
+        idSelf = self.id
+        if idSelf in other._comp:
+            return -other._comp[idSelf]
+
+        #Compare even final states irrespective of ordering:
+        for particles in itertools.permutations(self.particles):
+            particles = list(particles)
+            if particles == other.particles:
+                self._comp[other.id] = 0
+                other._comp[self.id] = 0
+                return 0
+        
+        comp = self.particles > other.particles
+        if comp:
+            comp = 1
+        else:
+            comp = -1
+        if not self._static:
+            self._comp[idOther] = comp
+        if not other._static:
+            other._comp[idSelf] = -comp
+            
+        return comp
+
+    def __lt__( self, p2 ):
+        return self.__cmp__(p2) == -1
+
+    def __gt__( self, p2 ):
+        return self.__cmp__(p2) == 1
+
+    def __eq__( self, p2 ):
+        return self.__cmp__(p2) == 0
+        
+    def __ne__( self, p2 ):
+        return self.__cmp__(p2) != 0
+
+    def __iter__(self):
+        return iter(self.particles)
+
+    def __getitem__(self, i):
+        return self.particles[i]
+    
+    def __setitem__(self, i, value):
+        self.particles[i] = value
+
+    def __len__(self):
+        return len(self.particles)
+    
+    def __str__(self):
+        return str([str(ptc) for ptc in self.particles]) 
+        
+    def __repr__(self):
+        return self.__str__()        
+
+    def resetComp(self):
+        self._comp = {self.id : 0}        

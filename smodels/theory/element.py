@@ -106,8 +106,11 @@ class Element(object):
             if branchA == other.branches:
                 return 0
 
-        comp = (self.branches > other.branches) - (self.branches < other.branches) 
-        return comp
+        comp = (self.branches > other.branches)
+        if comp:
+            return 1
+        else:
+            return -1
 
     def __eq__(self,other):
         return self.__cmp__(other)==0
@@ -230,13 +233,8 @@ class Element(object):
         See the Branch object for definition of branch size and comparison
         """
         
-        #First make sure each branch is individually sorted 
-        #(particles in each vertex are sorted)
-        for br in self.branches:
-            br.sortParticles()
         #Now sort branches
         self.branches = sorted(self.branches)
-
 
     def copy(self):
         """

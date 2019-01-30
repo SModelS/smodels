@@ -11,10 +11,9 @@ from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
-from smodels.theory.particle import MultiParticle
+from smodels.theory.particle import MultiParticle,ParticleList
 from smodels.tools.inclusiveObjects import InclusiveValue,InclusiveList
 from smodels.experiment.databaseParticles import finalStates,anyOdd
-import itertools
 
 
 
@@ -73,7 +72,9 @@ class Branch(object):
                             raise SModelSError("Ambiguos defintion of label %s in finalStates" %smParticle[0].label)
                         else:
                             ptcs.append(smParticle[0])
-                    self.evenParticles.append(ptcs)
+                    vertexParticles = ParticleList(ptcs)
+                    vertexParticles.tag = 'brandAdd'
+                    self.evenParticles.append(vertexParticles)
 
             self.vertnumb = len(self.evenParticles)
             self.vertparts = [len(v) for v in self.evenParticles]
@@ -129,7 +130,7 @@ class Branch(object):
             comp = self.vertnumb > other.vertnumb
             if comp: return 1
             else: return -1
-        elif not self.vertparts == other.vertparts:
+        elif self.vertparts != other.vertparts:
             comp = self.vertparts > other.vertparts
             if comp: return 1
             else: return -1
@@ -143,18 +144,9 @@ class Branch(object):
                 return -1
             
         #Compare even final states irrespective of ordering:
-        for iv,particlesA in enumerate(self.evenParticles):
-            particlesB = other.evenParticles[iv]
-            equalVertex = False
-            for pListA in itertools.permutations(particlesA):
-                pListA = list(pListA)
-                if pListA == particlesB:
-                    equalVertex = True
-                    break
-            if not equalVertex:
-                particlesA = sorted(particlesA)
-                particlesB = sorted(particlesB)
-                comp = (particlesA > particlesB)
+        for iv,vertex in enumerate(self.evenParticles):            
+            if vertex != other.evenParticles[iv]:
+                comp = vertex > other.evenParticles[iv]
                 if comp:
                     return 1
                 else:
@@ -208,11 +200,14 @@ class Branch(object):
 
         #Combine even particles (if they are the same nothing changes)
         for iv,vertex in enumerate(self.evenParticles):
-            newBranch.evenParticles.append([])
+            vertexParticles = []
             for iptc,ptc in enumerate(vertex):
-                newBranch.evenParticles[iv].append(ptc + other.evenParticles[iv][iptc])
-                if newBranch.evenParticles[iv][iptc].label == 'multiple':
-                    newBranch.evenParticles[iv][iptc].label = 'SM (combined)'
+                vertexParticles.append(ptc + other.evenParticles[iv][iptc])
+                if vertexParticles[iptc].label == 'multiple':
+                    vertexParticles[iptc].label = 'SM (combined)'
+                
+            vertexParticles = ParticleList(vertexParticles)
+            newBranch.evenParticles.append(vertexParticles)
         
         if not self.maxWeight is None and not other.maxWeight is None:        
             newBranch.maxWeight = self.maxWeight + other.maxWeight
@@ -246,12 +241,11 @@ class Branch(object):
                 self.oddParticles[iptc].label = 'BSM (combined)'
 
         #Combine even particles (if they are the same nothing changes)
-        for iv,vertex in enumerate(other.evenParticles):
+        for iv,vertex in enumerate(self.evenParticles):
             for iptc,ptc in enumerate(vertex):
-                self.evenParticles[iv][iptc] += ptc
+                self.evenParticles[iv][iptc] += other.evenParticles[iv][iptc]
                 if self.evenParticles[iv][iptc].label == 'multiple':
                     self.evenParticles[iv][iptc].label = 'SM (combined)'
-        
         if not self.maxWeight is None and not other.maxWeight is None:
             self.maxWeight += other.maxWeight
                     
@@ -280,15 +274,6 @@ class Branch(object):
         
         return vals
     
-
-    def sortParticles(self):
-        """
-        Sort the particles inside each vertex
-        """
-        
-        for iv,vertex in enumerate(self.evenParticles):
-            self.evenParticles[iv] = sorted(vertex)
-
     def setInfo(self):
         """
         Defines the number of vertices (vertnumb) and number of
@@ -364,17 +349,15 @@ class Branch(object):
         :returns: extended branch (Branch object). False if there was an error.
         """
         
-        newBranch = self.copy()      
-        particles = [ptc for ptc in decay.daughters]
-        oddParticles = [p for p in particles if p.Z2parity == -1]
-        evenParticles = [p for p in particles if p.Z2parity == 1]
+        newBranch = self.copy()
+        oddParticles = decay.oddParticles
+        evenParticles = decay.evenParticles
         
         if len(oddParticles) != 1:
             logger.warning("Decay %s does not preserve Z2 and will be ignored" %str(decay))
             return False
         
         newBranch.oddParticles.append(oddParticles[0])
-        evenParticles = sorted(evenParticles, key=lambda x: x.label.lower())
         newBranch.evenParticles.append(evenParticles)
         
         if not self.maxWeight is None:
