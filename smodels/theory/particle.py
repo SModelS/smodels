@@ -32,8 +32,7 @@ class Particle(object):
         """  
 
         self._static = False
-        self._equals = set([id(self)])
-        self._differs = set([])
+        self._comp = {id(self) : 0}
         for attr,value in kwargs.items():
             if not attr == '_static':
                 setattr(self,attr,value)
@@ -59,28 +58,20 @@ class Particle(object):
             return +1
 
         #First check if we have already compared to this object
-        idOther = id(other)
+        idOther = id(other)        
+        if idOther in self._comp:
+            return self._comp[idOther]
+
         idSelf = id(self)
-        if idOther in self._equals or idSelf in other._equals:  #Objects were already compared and are equal
-            return 0
-        elif idOther in self._differs or -idSelf in other._differs: #Objects were already compared and differ.
-            return 1
-        elif -idOther in self._differs or idSelf in other._differs:
-            return -1
-        else:
-            cmpProp = self.cmpProperties(other) #Objects have not been compared yet.
-            if cmpProp == 0:
-                if not self._static:
-                    self._equals.add(idOther)
-                if not other._static:
-                    other._equals.add(idSelf)
-                return 0
-            else:
-                if not self._static:
-                    self._differs.add(idOther*cmpProp)
-                if not other._static:
-                    other._differs.add(-idSelf*cmpProp)
-                return cmpProp
+        if idSelf in other._comp:
+            return -other._comp[idSelf]
+
+        cmpProp = self.cmpProperties(other) #Objects have not been compared yet.
+        if not self._static:
+            self._comp[idOther] = cmpProp
+        if not other._static:
+            other._comp[idSelf] = -cmpProp
+        return cmpProp
 
     def __lt__( self, p2 ):
         return self.__cmp__(p2) == -1
@@ -224,8 +215,7 @@ class Particle(object):
         
         pConjugate = self.copy()
         pConjugate._static = False #Temporarily set it to False to change attributes
-        pConjugate._equals = set([id(pConjugate)])
-        pConjugate._differs = set([])
+        pConjugate._comp = {id(pConjugate) : 0}
                     
         if hasattr(pConjugate, 'pdg') and pConjugate.pdg:
             pConjugate.pdg *= -1       
@@ -327,8 +317,7 @@ class MultiParticle(Particle):
         self.label = label
         self.particles = particles
         Particle.__init__(self,**kwargs)
-        self._equals = set([id(self)] + [id(ptc) for ptc in particles])
-        self._differs = set([])
+        self._comp = dict([[id(self),0]] + [[id(ptc),0] for ptc in particles])
 
     def __getattribute__(self,attr):
         """
@@ -443,10 +432,8 @@ class MultiParticle(Particle):
         elif isinstance(other,Particle):
             if not self.contains(other):
                 self.particles.append(other)
-                if id(other) in self._differs:
-                    self._differs.remove(id(other))
-                if not id(other) in self._equals:
-                    self._equals.add(id(other))
+                if not self._static:
+                    self._comp[id(other)] = 0
 
         return self
 

@@ -284,8 +284,7 @@ class Model(object):
                 
         #Reset particle equality tracking:
         for p in self.SMparticles+self.BSMparticles:
-            equals = [id(p)]
+            equals = [[id(p),0]]
             if isinstance(p,MultiParticle):
-                equals += [id(ptc) for ptc in p.particles]            
-            p._equals = set(equals)
-            p._differs = set([])
+                equals += [[id(ptc),0] for ptc in p.particles]            
+            p._comp = dict(equals)
