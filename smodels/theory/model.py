@@ -28,7 +28,7 @@ class Model(object):
         
         
         self.inputFile = None
-        self.BSMparticles = [copy.deepcopy(particle) for particle in BSMparticles]
+        self.BSMparticles = [particle.copy() for particle in BSMparticles]
         self.SMparticles = SMparticles[:]
 
         #Check if for each PDG there is a unique particle object defined  
@@ -279,7 +279,7 @@ class Model(object):
                         daughter = daughter[0]
                     daughters.append(daughter)
                 oddParticles = [p for p in daughters if p.Z2parity == -1]
-                evenParticles = ParticleList.getVertex([p for p in daughters if p.Z2parity == 1])
+                evenParticles = ParticleList([p for p in daughters if p.Z2parity == 1])
                 newDecay.oddParticles = oddParticles
                 newDecay.evenParticles = evenParticles
                 particle.decays.append(newDecay)

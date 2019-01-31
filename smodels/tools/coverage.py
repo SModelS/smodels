@@ -39,14 +39,6 @@ class Uncovered(object):
         WList = MultiParticle('W', [W,WC])
         tList = MultiParticle('t', [t,tC])
         jetList = MultiParticle('jet', [q,c,g,pion])
-#         eList = MultiParticle.getMultiParticle('e' , [e,eC])
-#         muList = MultiParticle.getMultiParticle('mu', [mu,muC])
-#         taList = MultiParticle.getMultiParticle('ta', [ta,taC])
-#         lList = MultiParticle.getMultiParticle('l', [e,mu,eC,muC])
-#         WList = MultiParticle.getMultiParticle('W', [W,WC])
-#         tList = MultiParticle.getMultiParticle('t', [t,tC])
-#         jetList = MultiParticle.getMultiParticle('jet', [q,c,g,pion])
-        
         nuList  = nu
         if sumL:
             particleGroups = [WList, lList, tList, taList, nuList]
@@ -296,7 +288,7 @@ class UncoveredList(object):
                     for particleList in self.particleGroups:
                         if particle == particleList:
                             newVertex[ip] = particleList
-                newParticles.append(ParticleList.getVertex(newVertex))
+                newParticles.append(ParticleList(newVertex))
             newEl.branches[ib].evenParticles = newParticles
             newEl.branches[ib].setInfo()
         
