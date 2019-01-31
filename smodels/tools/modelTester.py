@@ -310,7 +310,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
             if fracDone >= iprint:
                 while fracDone >= iprint:
                     iprint += nprint
-                logger.info('%i%% done in %1.2f min' %(iprint-nprint,(time.time()-t0)/60.))
+                logger.info('%i%% of processes done in %1.2f min' %(iprint-nprint,(time.time()-t0)/60.))
             if done == len(children):
                 break
             time.sleep(2)
