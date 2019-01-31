@@ -13,12 +13,16 @@ class Particle(object):
     An instance of this class represents a single particle. 
     The properties are: label, pdg, mass, electric charge, color charge, width 
     """
+    
+    _instances = set()
 
     def __init__(self, **kwargs):
-        """ 
-        
+        """         
         Initializes the particle.
-        Possible properties: 
+        Assigns an ID to the isntance using the class Particle._instance
+        list. Reset the comparison dictionary.
+        
+        Possible properties for arguments.
         Z2parity: int, +1 or -1
         label: str, e.g. 'e-'
         pdg: number in pdg
@@ -26,52 +30,98 @@ class Particle(object):
         echarge: electric charge as multiples of the unit charge
         colordim: color dimension of the particle 
         spin: spin of the particle
-        width: total width
-        decays: possible decays in pyslha format e.g. [ 0.5[1000022, -1], 0.5[1000022, -2] ]
-                 
+        totalwidth: total width
         """  
-
-        self._static = False
-        self.id = id(self)
-        self._comp = {self.id : 0}
+        
         for attr,value in kwargs.items():
-            if not attr == '_static':
-                setattr(self,attr,value)
-                
-        #Leave the static attribute for last:
-        if '_static' in kwargs:
-            self._static = kwargs['_static']
+            setattr(self,attr,value)
+        self.id = Particle.getID()
+        self._comp = {self.id : 0}            
+        Particle._instances.add(weakref.ref(self))
+        
+    def __getstate__(self):
+        """
+        Override getstate method. Required for pickling.
+        """  
+        return self.__dict__
+
+    def __setstate__(self, state):
+        """
+        Override setstate method. Required for pickling.
+        It makes sure the instance is added to the list Particle._instances,
+        its ID is properly set and the comp dictionary is reset.
+        """
+        
+        self.__init__(**state)
+        
+    def __hash__(self):
+        """
+        Return the object address. Required for using weakref
+        """
+        return id(self)
+    
+    def __del__(self):
+        """
+        If the instance is deleted, make sure to remove all references to
+        it from the comparison dictionary of other Particle or MultiParticle instances.
+        """
+        
+        for obj in Particle.getinstances():            
+            obj._comp.pop(self.id,None)
+        del self
+        
+    @classmethod
+    def getParticle(cls,**kwargs):        
+        for obj in Particle.getinstances():
+            if not isinstance(obj,Particle):
+                continue
+            if any(not hasattr(obj, attr) for attr in kwargs):
+                continue
+            if any(getattr(obj, attr) != value for attr,value in kwargs.items()):
+                continue
+            return obj
+        return Particle(**kwargs)
+        
+    @classmethod
+    def getinstances(cls):
+        dead = set()
+        for ref in Particle._instances:
+            obj = ref()
+            if obj is not None:
+                yield obj
+            else:
+                dead.add(ref)
+        Particle._instances -= dead
+        
+    @classmethod
+    def getID(cls):
+        #lastID = highest id so far or 0, if there are no instances of the class
+        lastID = max([obj.id for obj in Particle.getinstances()]+[-1])
+        return lastID+1
+            
 
     def __cmp__(self,other):
         """
         Compares particle with other.
         The comparison is based on the particle properties.
-        If the particles differ they are sorted according to their label.
-        If in addition the particles differ, but have the same label, they
-        are sorted according to their properties.
         
-        :param other:  particle to be compared (Particle object)
+        :param other:  particle to be compared (Particle or MultiParticle object)
         
-        :return: -1 if self.label < other.label, 0 if self == other, +1, if self.label > other.label.
+        :return: -1 if particle < other, 1 if particle > other and 0 if particle == other
         """    
         
         if not isinstance(other,(MultiParticle,Particle)):
-            return +1
+            raise ValueError
 
-        #First check if we have already compared to this object
-        idOther = other.id        
-        if idOther in self._comp:
-            return self._comp[idOther]
-
-        idSelf = self.id
-        if idSelf in other._comp:
-            return -other._comp[idSelf]
+        #First check if we have already compared to this object        
+        if other.id in self._comp:
+            return self._comp[other.id]
+        elif self.id in other._comp:
+            return -other._comp[self.id]
 
         cmpProp = self.cmpProperties(other) #Objects have not been compared yet.
-        if not self._static:
-            self._comp[idOther] = cmpProp
-        if not other._static:
-            other._comp[idSelf] = -cmpProp
+        self._comp[other.id] = cmpProp
+        other._comp[self.id] = -cmpProp
         return cmpProp
 
     def __lt__( self, p2 ):
@@ -94,26 +144,6 @@ class Particle(object):
     def __repr__(self):
         return self.__str__()        
     
-    def __setattr__(self,attr,value):
-        """
-        Override setattr method.
-        If the _static attribute is True, will not
-        change the particle attribute.
-        """
-          
-        if attr == '_static':
-            self.__dict__[attr] = value
-        elif self._static is False:            
-            self.__dict__[attr] = value
-     
-    def __setstate__(self, state):
-        """
-        Override setstate method. Required for pickling.
-        """
-
-        self._static = False
-        self.__dict__.update(state)
-
     def __add__(self, other):
         """
         Define addition of two Particle objects
@@ -215,8 +245,7 @@ class Particle(object):
         """
         
         pConjugate = self.copy()
-        pConjugate.id = id(pConjugate)
-        pConjugate._static = False #Temporarily set it to False to change attributes
+        pConjugate.id = Particle.getID()
         pConjugate._comp = {pConjugate.id : 0}
                     
         if hasattr(pConjugate, 'pdg') and pConjugate.pdg:
@@ -236,8 +265,6 @@ class Particle(object):
         if not label is None:
             pConjugate.label = label
             
-        pConjugate._static = self._static #Restore the initial state
-
         return pConjugate
 
     def isNeutral(self):
@@ -302,7 +329,6 @@ class Particle(object):
             return False    
 
 
-
 class MultiParticle(Particle):
 
     """ An instance of this class represents a list of particle object to allow for inclusive expresions such as jet. 
@@ -314,13 +340,45 @@ class MultiParticle(Particle):
         """ 
         Initializes the particle list.
         """        
-
-        self._static = False
         self.label = label
         self.particles = particles
         Particle.__init__(self,**kwargs)
         self._comp = dict([[self.id,0]] + [[ptc.id,0] for ptc in particles])
-
+        
+    def __del__(self):
+        """
+        If the instance is deleted, make sure to remove all references to
+        it from the comparison dictionary of other Particle or MultiParticle instances.
+        """
+        for obj in Particle.getinstances():            
+            obj._comp.pop(self.id,None)
+        del self
+        
+    @classmethod
+    def getMultiParticle(cls,*args,**kwargs):
+        attrDict = {}
+        posArg = ['label','particles']
+        for i,v in enumerate(args):
+            attrDict[posArg[i]] = v
+        attrDict.update(kwargs)
+        particles = sorted(attrDict.pop('particles'))
+        label = attrDict.pop('label')
+        for obj in Particle.getinstances():
+            if not isinstance(obj,MultiParticle):
+                continue
+            if any(not hasattr(obj, attr) for attr in attrDict):
+                continue            
+            pListB = sorted(obj.particles)
+            if len(particles) != len(pListB):
+                continue            
+            if any(pA is not pListB[i] for i,pA in enumerate(particles)):
+                continue
+            if any(getattr(obj, attr) != value for attr,value in attrDict.items()):
+                continue
+            return obj
+        return MultiParticle(label=label,particles=particles,**attrDict)
+        
+        
     def __getattribute__(self,attr):
         """
         If MultiParticle does not have attribute, return a list
@@ -333,17 +391,14 @@ class MultiParticle(Particle):
          
         :return: Attribute or list with the attribute values in self.particles
         """
-         
-        try:
-            return super(MultiParticle,self).__getattribute__(attr) #Python2
-        except:
-            pass
 
+        #Try to get the attribute directly
         try:
-            return super().__getattribute__(attr) #Python3
+            return Particle.__getattribute__(self,attr)
         except:
             pass
-         
+        
+        #If not found, try to fetch it from its particles
         try:
             values = [getattr(particle,attr) for particle in self.particles]
             if all(type(x) == type(values[0]) for x in values):
@@ -383,20 +438,6 @@ class MultiParticle(Particle):
         cmpv = self.particles[0].cmpProperties(otherParticles[0],properties)
         return cmpv
 
-    def __getstate__(self):
-        """
-        Override getstate method. Required for pickling.
-        """  
-        return self.__dict__
-
-    def __setstate__(self, state):
-        """
-        Override setstate method. Required for pickling.
-        """
-
-        self._static = False
-        self.__dict__.update(state)
-
     def __add__(self, other):
         """
         Define addition of two Particle objects
@@ -413,13 +454,11 @@ class MultiParticle(Particle):
         if other.contains(self):
             return other        
         elif isinstance(other,MultiParticle):
-            addParticles = other.particles
+            addParticles = [ptc for ptc in other.particles if not self.contains(ptc)] 
         elif isinstance(other,Particle):
             addParticles = [other]
 
-        combinedParticles = [ptc for ptc in addParticles if not self.contains(ptc)]
-        combinedParticles += self.particles[:]
-
+        combinedParticles = self.particles[:] + addParticles[:]
         combined = MultiParticle(label = 'multiple', particles = combinedParticles)
 
         return combined
@@ -434,8 +473,10 @@ class MultiParticle(Particle):
         elif isinstance(other,Particle):
             if not self.contains(other):
                 self.particles.append(other)
-                if not self._static:
-                    self._comp[other.id] = 0
+        #Since the multiparticle changed, reset comparison tracking:
+        self._comp = {self.id : 0}
+        for ptc in self.particles:
+            self._comp[ptc.id] = 0
 
         return self
 
@@ -513,17 +554,30 @@ class ParticleList(object):
     
     _instances = set()
 
-    def __init__(self,particles):
+    def __init__(self,particles=[],**kwargs):
 
         self.particles = particles[:]
-        self.id = id(self)
+        self.id = ParticleList.getID()
         self._comp = {self.id : 0}
-        self._static = False
-        self._instances.add(weakref.ref(self))
+        ParticleList._instances.add(weakref.ref(self))
 
+    def __setstate__(self,state):
+        """
+        Override setstate method. Required for pickling.
+        It makes sure the instance is added to the list of instances,
+        its ID is properly set and the comp dictionary is reset.
+        """
+        
+        self.__init__(**state)
+        
     def __hash__(self):
-        return self.id
-
+        return id(self)   
+    
+    def __del__(self):
+        for obj in ParticleList.getinstances():            
+            obj._comp.pop(self.id,None)
+        del self
+    
     @classmethod
     def getVertex(cls,particles):
         pList = sorted(particles)
@@ -535,34 +589,21 @@ class ParticleList(object):
         return ParticleList(pList)
 
     @classmethod
-    def getNinstances(cls):
-        dead = set([])
-        for ref in cls._instances:
-            obj = ref()
-            if obj is None:
-                dead.add(ref)
-        cls._instances -= dead
-        return len(cls._instances)
-
-    @classmethod
     def getinstances(cls):
         dead = set()
-        for ref in cls._instances:
+        for ref in ParticleList._instances:
             obj = ref()
             if obj is not None:
                 yield obj
             else:
                 dead.add(ref)
-        cls._instances -= dead
-
-
-    def identical(self,other):        
-        if len(self) != len(other):
-            return False
-        if any((ptc is not other.particles[iptc]) for iptc,ptc in enumerate(self.particles)):
-            return False
+        ParticleList._instances -= dead
         
-        return True
+    @classmethod
+    def getID(cls):
+        #lastID = highest id so far or 0, if there are no instances of the class
+        lastID = max([obj.id for obj in ParticleList.getinstances()]+[-1])
+        return lastID+1
         
     def __cmp__(self,other):
         """
@@ -577,14 +618,19 @@ class ParticleList(object):
             raise ValueError
 
         #First check if we have already compared to this object
-        idOther = other.id  
-        if idOther in self._comp:
-            return self._comp[idOther]
-
-        idSelf = self.id
-        if idSelf in other._comp:
-            return -other._comp[idSelf]
-
+        if other.id in self._comp:
+            return self._comp[other.id]
+        
+        if len(self) != len(other):
+            comp = len(self) > len(other)
+            if comp:
+                comp = 1
+            else:
+                comp = -1
+            self._comp[other.id] = comp
+            other._comp[self.id] = comp
+            return comp
+        
         #Compare even final states irrespective of ordering:
         for particles in itertools.permutations(self.particles):
             particles = list(particles)
@@ -598,10 +644,8 @@ class ParticleList(object):
             comp = 1
         else:
             comp = -1
-        if not self._static:
-            self._comp[idOther] = comp
-        if not other._static:
-            other._comp[idSelf] = -comp
+        self._comp[other.id] = comp
+        other._comp[self.id] = -comp
             
         return comp
 
@@ -634,6 +678,3 @@ class ParticleList(object):
         
     def __repr__(self):
         return self.__str__()        
-
-    def resetComp(self):
-        self._comp = {self.id : 0}        

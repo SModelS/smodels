@@ -20,64 +20,64 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 # SM particles
 
 ##Charged leptons:
-e = Particle(Z2parity=1, label='e-', pdg=11, mass=0.5*MeV, eCharge=-1, colordim=1, spin=1./2, totalwidth = 0.*GeV, decays=[])
-mu = Particle(Z2parity=1, label='mu-', pdg=13, mass=106.*MeV, eCharge=-1, colordim=1, spin=1./2, totalwidth = 0.*GeV, decays=[])
-ta = Particle(Z2parity=1, label='ta-', pdg=15, mass=1777.*MeV, eCharge=-1, colordim=1, spin=1./2, totalwidth = 0.*GeV, decays=[])
+e = Particle.getParticle(Z2parity=1, label='e-', pdg=11, mass=0.5*MeV, eCharge=-1, colordim=1, spin=1./2, totalwidth = 0.*GeV, decays=[])
+mu = Particle.getParticle(Z2parity=1, label='mu-', pdg=13, mass=106.*MeV, eCharge=-1, colordim=1, spin=1./2, totalwidth = 0.*GeV, decays=[])
+ta = Particle.getParticle(Z2parity=1, label='ta-', pdg=15, mass=1777.*MeV, eCharge=-1, colordim=1, spin=1./2, totalwidth = 0.*GeV, decays=[])
 eC = e.chargeConjugate()
 muC = mu.chargeConjugate()
 taC = ta.chargeConjugate()
 ##-----------------------------------------------------------------------------------------------------------------------------
 ##Neutrinos
-nue = Particle(Z2parity=1, label='nue', pdg=12, mass=0.*MeV, eCharge=0, colordim=1, spin=1./2, totalwidth = 0.*GeV, decays=[], _isMET=True)
-numu = Particle(Z2parity=1, label='numu', pdg=14, mass=0.*MeV, eCharge=0, colordim=1, spin=1./2, totalwidth = 0.*GeV, decays=[], _isMET=True)
-nuta = Particle(Z2parity=1, label='nuta', pdg=16, mass=0.*MeV, eCharge=0, colordim=1, spin=1./2, totalwidth = 0.*GeV, decays=[], _isMET=True)
+nue = Particle.getParticle(Z2parity=1, label='nue', pdg=12, mass=0.*MeV, eCharge=0, colordim=1, spin=1./2, totalwidth = 0.*GeV, decays=[], _isMET=True)
+numu = Particle.getParticle(Z2parity=1, label='numu', pdg=14, mass=0.*MeV, eCharge=0, colordim=1, spin=1./2, totalwidth = 0.*GeV, decays=[], _isMET=True)
+nuta = Particle.getParticle(Z2parity=1, label='nuta', pdg=16, mass=0.*MeV, eCharge=0, colordim=1, spin=1./2, totalwidth = 0.*GeV, decays=[], _isMET=True)
 ###Group all neutrinos into a single particle:
-nu = MultiParticle('nu',[nue,numu,nuta,nue.chargeConjugate(),numu.chargeConjugate(),nuta.chargeConjugate()])
+nu = MultiParticle.getMultiParticle('nu',[nue,numu,nuta,nue.chargeConjugate(),numu.chargeConjugate(),nuta.chargeConjugate()])
 ##-----------------------------------------------------------------------------------------------------------------------------
 
 ##Light quarks:
-d = Particle(Z2parity=1, label='d', pdg=1, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
-u = Particle(Z2parity=1, label='u', pdg=2, mass=0.*MeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
-s = Particle(Z2parity=1, label='s', pdg=3, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
+d = Particle.getParticle(Z2parity=1, label='d', pdg=1, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
+u = Particle.getParticle(Z2parity=1, label='u', pdg=2, mass=0.*MeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
+s = Particle.getParticle(Z2parity=1, label='s', pdg=3, mass=0.*MeV, eCharge=(-1./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
 #Group all light quarks in a single particle
-q = MultiParticle('q', [u,d,s,u.chargeConjugate(),d.chargeConjugate(),s.chargeConjugate()])
-c = Particle(Z2parity=1, label='c', pdg=4, mass=1.28*GeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
+q = MultiParticle.getMultiParticle('q', [u,d,s,u.chargeConjugate(),d.chargeConjugate(),s.chargeConjugate()])
+c = Particle.getParticle(Z2parity=1, label='c', pdg=4, mass=1.28*GeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
 ###Group c and c* in a single particle:
-c = MultiParticle('c',[c,c.chargeConjugate('c')])
+c = MultiParticle.getMultiParticle('c',[c,c.chargeConjugate('c')])
 ##-----------------------------------------------------------------------------------------------------------------------------
 
 ##Heavy quarks:
-b = Particle(Z2parity=1, label='b', pdg=5, mass=4.7*GeV, eCharge=(-1./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
+b = Particle.getParticle(Z2parity=1, label='b', pdg=5, mass=4.7*GeV, eCharge=(-1./3.), colordim=3, spin=1./2, totalwidth = 0.*GeV, decays=[])
 ###Group b and b* in a single particle:
-b = MultiParticle('b',[b,b.chargeConjugate('b')])
+b = MultiParticle.getMultiParticle('b',[b,b.chargeConjugate('b')])
 ###(We want to be able to differentiate between t+ and t-, so we define both particles:
-t = Particle(Z2parity=1, label='t+', pdg=6, mass=173.1*GeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth=1.4*GeV, decays=[])
+t = Particle.getParticle(Z2parity=1, label='t+', pdg=6, mass=173.1*GeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth=1.4*GeV, decays=[])
 tC = t.chargeConjugate()
 ##-----------------------------------------------------------------------------------------------------------------------------
 
 ##Gauge bosons:
-g = Particle(Z2parity=1, label='g', pdg=21, mass=0.*MeV, eCharge=0, colordim=8, spin=1, totalwidth = 0.*GeV, decays=[])
-photon = Particle(Z2parity=1, label='photon',pdg=22, mass=0.*MeV, eCharge=0, colordim=1, spin=1, totalwidth = 0.*GeV, decays=[], _isMET=False)
-Z = Particle(Z2parity=1, label='Z', pdg=23, mass=91.*GeV , eCharge=0, colordim=1, spin=1, totalwidth=2.5*GeV, decays=[], _isMET=False)
+g = Particle.getParticle(Z2parity=1, label='g', pdg=21, mass=0.*MeV, eCharge=0, colordim=8, spin=1, totalwidth = 0.*GeV, decays=[])
+photon = Particle.getParticle(Z2parity=1, label='photon',pdg=22, mass=0.*MeV, eCharge=0, colordim=1, spin=1, totalwidth = 0.*GeV, decays=[], _isMET=False)
+Z = Particle.getParticle(Z2parity=1, label='Z', pdg=23, mass=91.*GeV , eCharge=0, colordim=1, spin=1, totalwidth=2.5*GeV, decays=[], _isMET=False)
 #We group each electrically neutral gauge boson with its antiparticle:
-g = MultiParticle('g',[g,g.chargeConjugate('g')])
-photon = MultiParticle('photon',[photon,photon.chargeConjugate('photon')])
-Z = MultiParticle('Z',[Z,Z.chargeConjugate('Z')])
-W = Particle(Z2parity=1, label='W+', pdg=24, mass=80.*GeV, eCharge=1, colordim=1, spin=1, totalwidth=2.0*GeV, decays=[])
+g = MultiParticle.getMultiParticle('g',[g,g.chargeConjugate('g')])
+photon = MultiParticle.getMultiParticle('photon',[photon,photon.chargeConjugate('photon')])
+Z = MultiParticle.getMultiParticle('Z',[Z,Z.chargeConjugate('Z')])
+W = Particle.getParticle(Z2parity=1, label='W+', pdg=24, mass=80.*GeV, eCharge=1, colordim=1, spin=1, totalwidth=2.0*GeV, decays=[])
 WC = W.chargeConjugate()
 ##-----------------------------------------------------------------------------------------------------------------------------
 
 ##Higgs:
-higgs = Particle(Z2parity=1, label='higgs', pdg=25, mass=125.*GeV, eCharge=0, colordim=1, spin=0, totalwidth = 0.*GeV, decays=[], _isMET=False)
+higgs = Particle.getParticle(Z2parity=1, label='higgs', pdg=25, mass=125.*GeV, eCharge=0, colordim=1, spin=0, totalwidth = 0.*GeV, decays=[], _isMET=False)
 ###Group higgs and conjugate in single particle:
-higgs = MultiParticle('higgs',[higgs,higgs.chargeConjugate('higgs')])
+higgs = MultiParticle.getMultiParticle('higgs',[higgs,higgs.chargeConjugate('higgs')])
 ##-----------------------------------------------------------------------------------------------------------------------------
 
 ##Pions
-pip = Particle(Z2parity=1, label='pi+', pdg=211, mass=140.*MeV, eCharge=+1, colordim=1, spin=0, totalwidth = 0.*GeV, decays=[])
-piz = Particle(Z2parity=1, label='pi0', pdg=111, mass=140.*MeV, eCharge=0, colordim=1, spin=0, totalwidth = 0.*GeV, decays=[])
+pip = Particle.getParticle(Z2parity=1, label='pi+', pdg=211, mass=140.*MeV, eCharge=+1, colordim=1, spin=0, totalwidth = 0.*GeV, decays=[])
+piz = Particle.getParticle(Z2parity=1, label='pi0', pdg=111, mass=140.*MeV, eCharge=0, colordim=1, spin=0, totalwidth = 0.*GeV, decays=[])
 ###Group all pions in a single particle:
-pion = MultiParticle('pion',[pip,piz,pip.chargeConjugate(),piz.chargeConjugate('pi0')])
+pion = MultiParticle.getMultiParticle('pion',[pip,piz,pip.chargeConjugate(),piz.chargeConjugate('pi0')])
 
 leptons = [e,mu,ta,eC,muC,taC,nu]
 gauge = [g,photon,Z,W,WC]
@@ -88,35 +88,36 @@ SMList = leptons + gauge + quarks + [higgs,pion]
 
 
 #Particle groups
-eList = MultiParticle('e' , [e,eC])
-muList = MultiParticle('mu' , [mu,muC])
-taList = MultiParticle('ta' , [ta,taC])
-lpList = MultiParticle('l+' , [eC,muC])
-lmList = MultiParticle('l-'  , [e,mu])
-lList = MultiParticle('l' , [e,mu,eC,muC])
-WList = MultiParticle('W'  , [W,WC])
-tList = MultiParticle('t'  , [t,tC])
-LpList = MultiParticle('L+' , [eC,muC,taC])
-LmList = MultiParticle('L-' , [e,mu,ta])
-LList = MultiParticle('L'  , [e,mu,ta,eC,muC,taC] )
-jetList = MultiParticle('jet' ,[q,c,g,pion])
+eList = MultiParticle.getMultiParticle('e' , [e,eC])
+print('DB: eList ID=',eList.id,[[ptc,ptc.id] for ptc in eList.particles])
+muList = MultiParticle.getMultiParticle('mu' , [mu,muC])
+taList = MultiParticle.getMultiParticle('ta' , [ta,taC])
+lpList = MultiParticle.getMultiParticle('l+' , [eC,muC])
+lmList = MultiParticle.getMultiParticle('l-'  , [e,mu])
+lList = MultiParticle.getMultiParticle('l' , [e,mu,eC,muC])
+WList = MultiParticle.getMultiParticle('W'  , [W,WC])
+tList = MultiParticle.getMultiParticle('t'  , [t,tC])
+LpList = MultiParticle.getMultiParticle('L+' , [eC,muC,taC])
+LmList = MultiParticle.getMultiParticle('L-' , [e,mu,ta])
+LList = MultiParticle.getMultiParticle('L'  , [e,mu,ta,eC,muC,taC] )
+jetList = MultiParticle.getMultiParticle('jet' ,[q,c,g,pion])
 nuList  = nu
 
 #Used to construct generic z2-odd and z2-even particles:
-anyOdd = Particle(label='anyOdd',Z2parity=-1)
-anyEven = Particle(label='*',Z2parity=1)
+anyOdd = Particle.getParticle(label='anyOdd',Z2parity=-1)
+anyEven = Particle.getParticle(label='*',Z2parity=1)
 
 
 #Used to construct BSM final states:
-MET = Particle(label='MET', Z2parity = -1, eCharge = 0, colordim = 1)
-HSCPp = Particle(label='HSCP+', Z2parity = -1, eCharge = +1, colordim = 1)
-HSCPm = Particle(label='HSCP-', Z2parity = -1, eCharge = -1, colordim = 1)
-HSCP = MultiParticle(label='HSCP', particles = [HSCPp,HSCPm])
+MET = Particle.getParticle(label='MET', Z2parity = -1, eCharge = 0, colordim = 1)
+HSCPp = Particle.getParticle(label='HSCP+', Z2parity = -1, eCharge = +1, colordim = 1)
+HSCPm = Particle.getParticle(label='HSCP-', Z2parity = -1, eCharge = -1, colordim = 1)
+HSCP = MultiParticle.getMultiParticle(label='HSCP', particles = [HSCPp,HSCPm])
 
-RHadronG = Particle(label='RHadronG', Z2parity = -1, eCharge = 0, colordim = 8)
-RHadronU = Particle(label='RHadronU', Z2parity = -1, eCharge = 2./3., colordim = 3)
-RHadronD = Particle(label='RHadronD', Z2parity = -1, eCharge = -1./3., colordim = 3)
-RHadronQ = MultiParticle(label='RHadronQ', particles = [RHadronU,RHadronU.chargeConjugate(),
+RHadronG = Particle.getParticle(label='RHadronG', Z2parity = -1, eCharge = 0, colordim = 8)
+RHadronU = Particle.getParticle(label='RHadronU', Z2parity = -1, eCharge = 2./3., colordim = 3)
+RHadronD = Particle.getParticle(label='RHadronD', Z2parity = -1, eCharge = -1./3., colordim = 3)
+RHadronQ = MultiParticle.getMultiParticle(label='RHadronQ', particles = [RHadronU,RHadronU.chargeConjugate(),
                                                                          RHadronD,RHadronD.chargeConjugate()])
 
 #Define list of inclusive final states:
@@ -132,12 +133,6 @@ allFinalStates = SMfinalStates + BSMfinalStates
 for i,ptc in enumerate(allFinalStates):
     if any((ptc is p and i != j) for j,p in enumerate(allFinalStates)):
         allFinalStates.remove(ptc)
-
-#Erase particle equality tracking and protect particle properties
-#(since after pickling/unpickling the database particles change id, they should never store id-dependent attributes)
-for ptc in allFinalStates:
-    ptc._comp = {}
-    ptc._static = True
 
 #Define a dummy model just to use the facilities for filtering particles
 finalStates = Model(SMparticles = allFinalStates,
