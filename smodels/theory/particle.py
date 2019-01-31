@@ -6,7 +6,7 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 
-import copy,itertools
+import copy,itertools,weakref
 
 class Particle(object):
     """
@@ -511,13 +511,51 @@ class ParticleList(object):
     Simple class to store a list of particles.
     """
     
+    _instances = set()
+
     def __init__(self,particles):
-        
-        self.particles = sorted(particles[:])
+
+        self.particles = particles[:]
         self.id = id(self)
         self._comp = {self.id : 0}
         self._static = False
-        
+        self._instances.add(weakref.ref(self))
+
+    def __hash__(self):
+        return self.id
+
+    @classmethod
+    def getVertex(cls,particles):
+        pList = sorted(particles)
+        for obj in ParticleList.getinstances():
+            if len(obj) != len(pList):
+                continue
+            if all(ptc is obj.particles[iptc] for iptc,ptc in enumerate(pList)):
+                return obj
+        return ParticleList(pList)
+
+    @classmethod
+    def getNinstances(cls):
+        dead = set([])
+        for ref in cls._instances:
+            obj = ref()
+            if obj is None:
+                dead.add(ref)
+        cls._instances -= dead
+        return len(cls._instances)
+
+    @classmethod
+    def getinstances(cls):
+        dead = set()
+        for ref in cls._instances:
+            obj = ref()
+            if obj is not None:
+                yield obj
+            else:
+                dead.add(ref)
+        cls._instances -= dead
+
+
     def identical(self,other):        
         if len(self) != len(other):
             return False

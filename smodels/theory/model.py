@@ -202,9 +202,7 @@ class Model(object):
                 if not pid in oddPDGs:
                     logger.debug("Cross-section for %s includes even particles and will be ignored" %str(xsec.pid))
                     self.xsections.delete(xsec)
-        
 
-        allVertices = []
         for particle in self.BSMparticles:
             if isinstance(particle,MultiParticle):
                 continue
@@ -281,20 +279,9 @@ class Model(object):
                         daughter = daughter[0]
                     daughters.append(daughter)
                 oddParticles = [p for p in daughters if p.Z2parity == -1]
-                evenParticles = ParticleList([p for p in daughters if p.Z2parity == 1])
-                evenParticles.tag = 'model'
-                ivertex = None
-                for iv,vertex in enumerate(allVertices):
-                    if evenParticles.identical(vertex):
-                        ivertex = iv
-                        break
-                if ivertex is None:
-                    allVertices.append(evenParticles)
-                    vertexParticles = evenParticles
-                else:
-                    vertexParticles = allVertices[ivertex]
+                evenParticles = ParticleList.getVertex([p for p in daughters if p.Z2parity == 1])
                 newDecay.oddParticles = oddParticles
-                newDecay.evenParticles = vertexParticles
+                newDecay.evenParticles = evenParticles
                 particle.decays.append(newDecay)
 
         #Reset particle equality tracking:

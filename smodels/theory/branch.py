@@ -72,8 +72,7 @@ class Branch(object):
                             raise SModelSError("Ambiguos defintion of label %s in finalStates" %smParticle[0].label)
                         else:
                             ptcs.append(smParticle[0])
-                    vertexParticles = ParticleList(ptcs)
-                    vertexParticles.tag = 'brandAdd'
+                    vertexParticles = ParticleList.getVertex(ptcs)
                     self.evenParticles.append(vertexParticles)
 
             self.vertnumb = len(self.evenParticles)
@@ -205,8 +204,8 @@ class Branch(object):
                 vertexParticles.append(ptc + other.evenParticles[iv][iptc])
                 if vertexParticles[iptc].label == 'multiple':
                     vertexParticles[iptc].label = 'SM (combined)'
-                
-            vertexParticles = ParticleList(vertexParticles)
+
+            vertexParticles = ParticleList.getVertex(vertexParticles)
             newBranch.evenParticles.append(vertexParticles)
         
         if not self.maxWeight is None and not other.maxWeight is None:        

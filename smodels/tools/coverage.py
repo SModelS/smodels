@@ -12,7 +12,7 @@
 from smodels.tools.physicsUnits import fb
 from smodels.tools.reweighting import addPromptAndDisplaced
 from smodels.theory.element import Element
-from smodels.theory.particle import MultiParticle
+from smodels.theory.particle import MultiParticle, ParticleList
 from smodels.share.models.SMparticles import e,mu,ta,taC,eC,muC,W,WC,t,tC,q,c,g,pion,nu
 from smodels.theory import particle
 
@@ -240,7 +240,7 @@ class UncoveredList(object):
             xsec += genEl.missingX
         return xsec
             
-#     @profile
+
     def addToGeneralElements(self, el):
         """
         Adds an element to the list of missing topologies = general elements.
@@ -288,7 +288,7 @@ class UncoveredList(object):
                     for particleList in self.particleGroups:
                         if particle == particleList:
                             newVertex[ip] = particleList
-                newParticles.append(newVertex)
+                newParticles.append(ParticleList.getVertex(newVertex))
             newEl.branches[ib].evenParticles = newParticles
             newEl.branches[ib].setInfo()
         
