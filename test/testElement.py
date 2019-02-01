@@ -15,6 +15,7 @@ from smodels.theory.element import Element
 from smodels.tools.physicsUnits import GeV, TeV, fb
 from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList
 from smodels.share.models import SMparticles, mssm
+from smodels.theory.particle import ParticleList
 
 from smodels.experiment import databaseParticles
 
@@ -95,10 +96,10 @@ class ElementTest(unittest.TestCase):
     def testElementStr(self):
          
         b1 = Branch()
-        b1.evenParticles = [[t],[b,t]]
+        b1.evenParticles = [ParticleList([t]),ParticleList([b,t])]
         b1.oddParticles = [gluino,st1,n1]
         b2 = Branch()
-        b2.evenParticles = [[b,t]]
+        b2.evenParticles = [ParticleList([b,t])]
         b2.oddParticles = [st1,n1]
         b1.setInfo()
         b2.setInfo()

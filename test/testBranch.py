@@ -10,7 +10,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.theory.particle import Particle, MultiParticle
+from smodels.theory.particle import Particle, MultiParticle,ParticleList
 from smodels.theory.branch import Branch, decayBranches, InclusiveBranch
 from smodels.tools.physicsUnits import GeV, fb, MeV
 import pyslha
@@ -27,8 +27,10 @@ e = Particle(Z2parity=1, label='e-', pdg=11, mass=0.5*MeV, eCharge=-1, colordim=
 
 g_decays = [pyslha.Decay(br=0.3,nda=3,ids=[-1,1,1000022],parentid=1000021),
                       pyslha.Decay(br=0.7,nda=3,ids=[-2,2,1000022],parentid=1000021)]
-g_decays[0].daughters = [u,u,sn1]
-g_decays[1].daughters = [u,u,sn1]
+g_decays[0].oddParticles = [sn1] 
+g_decays[0].evenParticles = ParticleList([u,u])
+g_decays[1].oddParticles = [sn1]
+g_decays[1].evenParticles = ParticleList([u,u])
 g = Particle(mass=500.*GeV,pdg=1000021, Z2Parity=-1, totalwidth = 1*GeV, decays = g_decays )
 
 class BranchTest(unittest.TestCase):
@@ -103,7 +105,7 @@ class BranchTest(unittest.TestCase):
         
         newBranches = b.decayDaughter()
         self.assertEqual(len(newBranches), 2)
-        self.assertEqual(newBranches[0].evenParticles, [[u],[u,u]])
+        self.assertEqual(newBranches[0].evenParticles, [ParticleList([u]),ParticleList([u,u])])
         self.assertEqual(newBranches[0].oddParticles, [g,sn1])
         
         

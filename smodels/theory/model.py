@@ -5,7 +5,7 @@
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 """
 
-import pyslha,copy
+import pyslha
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
 from smodels.theory import lheReader, crossSection

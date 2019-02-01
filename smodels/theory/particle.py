@@ -1,6 +1,6 @@
 """
 .. module:: particle
-   :synopsis: Defines the particle class and particle list class, their methods and related functions
+   :synopsis: Defines the particle, multiparticle and particle list classes, their methods and related functions
 
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -85,20 +85,21 @@ class Particle(object):
     @classmethod
     def getinstances(cls):
         dead = set()
+        instances = []
         for ref in Particle._instances:
             obj = ref()
             if obj is not None:
-                yield obj
+                instances.append(obj)
             else:
                 dead.add(ref)
         Particle._instances -= dead
+        return instances
         
     @classmethod
     def getID(cls):
         #lastID = highest id so far or 0, if there are no instances of the class
         lastID = max([obj.id for obj in Particle.getinstances()]+[-1])
         return lastID+1
-            
 
     def __cmp__(self,other):
         """
@@ -253,7 +254,7 @@ class Particle(object):
         
         particleAttr = dict(self.__dict__.items())
         for attr,value in particleAttr.items():
-            if attr in ['pdg','eCharge']:
+            if attr in ['pdg','eCharge'] and isinstance(value,(float,int)):
                 particleAttr[attr] = -1*value
             if attr == 'label':
                 if value[-1] == '+':
@@ -352,13 +353,15 @@ class MultiParticle(Particle):
         label = label
         kwargs.pop('id',None)
         kwargs.pop('_comp',None)
-        for obj in Particle.getinstances():
+        for obj in Particle.getinstances()[:]:
             if not isinstance(obj,MultiParticle):
                 continue
             #Directly compare attributes, except for particles,label,id and _comp
             objAttr = dict(obj.__dict__.items())            
             objAttr.pop('id',None)
             objAttr.pop('_comp',None)
+            objAttr.pop('label',None)
+            objAttr.pop('particles',None)
             if objAttr != kwargs:
                 continue
             pListB = obj.particles
@@ -513,16 +516,20 @@ class MultiParticle(Particle):
         return self.__add__(other)
     
     def __iadd__(self,other):
-        
+
+        addParticles = []
         if isinstance(other,MultiParticle):
-            self.particles += [ptc for ptc in other.particles if not self.contains(ptc)]
+            addParticles = [ptc for ptc in other.particles if not self.contains(ptc)]
         elif isinstance(other,Particle):
             if not self.contains(other):
-                self.particles.append(other)
-        #Since the multiparticle changed, reset comparison tracking:
-        self._comp = {self.id : 0}
-        for ptc in self.particles:
-            self._comp[ptc.id] = 0
+                addParticles = [other]
+        if addParticles:
+            self.particles += addParticles[:]
+            self.particles = sorted(self.particles)
+            #Since the multiparticle changed, reset comparison tracking:
+            self._comp = {self.id : 0}
+            for ptc in self.particles:
+                self._comp[ptc.id] = 0
 
         return self
 
