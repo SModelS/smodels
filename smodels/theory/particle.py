@@ -65,7 +65,7 @@ class Particle(object):
         """
         
         return ((),self.__dict__)
-        
+
     def __hash__(self):
         """
         Return the object address. Required for using weakref
@@ -78,7 +78,7 @@ class Particle(object):
         it from the comparison dictionary of other Particle or MultiParticle instances.
         """
         
-        for obj in Particle.getinstances():            
+        for obj in Particle.getinstances():
             obj._comp.pop(self.id,None)
         del self
         
@@ -378,7 +378,7 @@ class MultiParticle(Particle):
         newMultiParticle.label = label
         newMultiParticle.id = Particle.getID()
         newMultiParticle._comp = {newMultiParticle.id : 0}
-        newMultiParticle._comp = dict([[newMultiParticle.id,0]] + [[ptc.id,0] for ptc in particles])
+        newMultiParticle._comp.update(dict([[ptc.id,0] for ptc in particles]))
         Particle._instances.add(weakref.ref(newMultiParticle))
         return newMultiParticle
 
@@ -399,35 +399,10 @@ class MultiParticle(Particle):
         If the instance is deleted, make sure to remove all references to
         it from the comparison dictionary of other Particle or MultiParticle instances.
         """
-        for obj in Particle.getinstances():            
+        for obj in Particle.getinstances():
             obj._comp.pop(self.id,None)
         del self
-        
-    @classmethod
-    def getMultiParticle(cls,*args,**kwargs):
-        attrDict = {}
-        posArg = ['label','particles']
-        for i,v in enumerate(args):
-            attrDict[posArg[i]] = v
-        attrDict.update(kwargs)
-        particles = sorted(attrDict.pop('particles'))
-        label = attrDict.pop('label')
-        for obj in Particle.getinstances():
-            if not isinstance(obj,MultiParticle):
-                continue
-            if any(not hasattr(obj, attr) for attr in attrDict):
-                continue            
-            pListB = sorted(obj.particles)
-            if len(particles) != len(pListB):
-                continue            
-            if any(pA is not pListB[i] for i,pA in enumerate(particles)):
-                continue
-            if any(getattr(obj, attr) != value for attr,value in attrDict.items()):
-                continue
-            return obj
-        return MultiParticle(label=label,particles=particles,**attrDict)
-        
-        
+
     def __getattribute__(self,attr):
         """
         If MultiParticle does not have attribute, return a list
@@ -507,7 +482,7 @@ class MultiParticle(Particle):
         elif isinstance(other,Particle):
             addParticles = [other]
 
-        combinedParticles = self.particles[:] + addParticles[:]
+        combinedParticles = self.particles + addParticles
         combined = MultiParticle(label = 'multiple', particles = combinedParticles)
 
         return combined

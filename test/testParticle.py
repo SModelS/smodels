@@ -13,8 +13,8 @@ from smodels.tools.physicsUnits import GeV
 from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.experiment.databaseParticles import finalStates
 from smodels.theory import model
+from smodels.experiment.databaseParticles import finalStates
 import numpy as np
 
 p1 = Particle(Z2parity=-1, label='p1', pdg=None, mass=100.*GeV, 
@@ -36,7 +36,6 @@ p1c = p1.copy()
 p1c.pdg = 10
 
 
-
 class ParticleTest(unittest.TestCase):
     
     def testParticleComparison(self):
@@ -52,18 +51,16 @@ class ParticleTest(unittest.TestCase):
             if any(p is pB for pB in allParticles):
                 continue
             allParticles.append(p)
-        allParticles = sorted(allParticles, key = lambda p: p.label)
+        allParticles = sorted(allParticles, key = lambda p: p.id)
+        allIDs = [p.id for p in allParticles]
+        for pid in allIDs:
+            self.assertTrue(allIDs.count(pid) == 1)
         compMatrixA = np.zeros((len(allParticles),len(allParticles)))
         compMatrixDefault = np.zeros((len(allParticles),len(allParticles)))
         for i,p1 in enumerate(allParticles):
             for j,p2 in enumerate(allParticles):
                 compMatrixDefault[i,j] = p1.cmpProperties(p2)
                 compMatrixA[i,j] = p1.__cmp__(p2)
-                if compMatrixDefault[i,j] != compMatrixA[i,j]:
-                    print(p1,p2,'def=',compMatrixDefault[i,j],'check=',compMatrixA[i,j])
-                    print(p1,p1.id,id(p1),p1._comp)
-                    print(p2,p2.id,id(p2),p2._comp)
-
 
         self.assertTrue(np.array_equal(compMatrixDefault,compMatrixA)) #Check if comparison is correct
 
