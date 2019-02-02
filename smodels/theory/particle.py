@@ -63,8 +63,12 @@ class Particle(object):
         When loading the pickled object, it will call __new__ with the
         arguments returned by this method.
         """
-        
-        return ((),self.__dict__)
+
+        attrDict = dict(self.__dict__.items())
+        #Make sure pickled/unpickled objects do no store ID nor comparison dict
+        attrDict.pop('id',None)
+        attrDict.pop('_comp',None)
+        return ((),attrDict)
 
     def __getstate__(self):
         """
@@ -79,6 +83,13 @@ class Particle(object):
         attrDict.pop('_comp',None)
 
         return attrDict
+
+    def __setstate__(self,state):
+        """
+        Dummy function, since all the initialization and attribute
+        setting is handled by __new__.
+        """
+        pass
 
     def __hash__(self):
         """
@@ -396,6 +407,9 @@ class MultiParticle(Particle):
         attrDict = dict(self.__dict__.items())
         attrDict.pop('label',None)
         attrDict.pop('particles',None)
+        #Make sure pickled/unpickled objects do no store ID nor comparison dict
+        attrDict.pop('id',None)
+        attrDict.pop('_comp',None)
 
         return ((self.label,self.particles),attrDict)
 
@@ -412,6 +426,13 @@ class MultiParticle(Particle):
         attrDict.pop('_comp',None)
 
         return attrDict
+
+    def __setstate__(self,state):
+        """
+        Dummy function, since all the initialization and attribute
+        setting is handled by __new__.
+        """
+        pass
 
     def __getattribute__(self,attr):
         """
