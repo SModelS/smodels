@@ -9,7 +9,7 @@ import pyslha
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
 from smodels.theory import lheReader, crossSection
-from smodels.theory.particle import MultiParticle, ParticleList
+from smodels.theory.particle import Particle,MultiParticle, ParticleList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 class Model(object):
@@ -284,9 +284,13 @@ class Model(object):
                 newDecay.evenParticles = evenParticles
                 particle.decays.append(newDecay)
 
-        #Reset particle equality tracking:
-        for p in self.SMparticles+self.BSMparticles:
+        #Reset particle equality from all particles:
+        for p in Particle.getinstances():
             p._comp = {p.id : 0}
             if isinstance(p,MultiParticle):
                 for ptc in p.particles:
                     p._comp[ptc.id] = 0
+
+        #Reset particle equality from all particle lists:
+        for pL in ParticleList.getinstances():
+            pL._comp = {p.id : 0}

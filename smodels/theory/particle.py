@@ -54,7 +54,7 @@ class Particle(object):
             setattr(newParticle,attr,value)
         newParticle.id = Particle.getID()
         newParticle._comp = {newParticle.id : 0}
-        Particle._instances.add(weakref.ref(newParticle))        
+        Particle._instances.add(weakref.ref(newParticle))
         return newParticle
 
     def __getnewargs_ex__(self):
@@ -66,22 +66,26 @@ class Particle(object):
         
         return ((),self.__dict__)
 
+    def __getstate__(self):
+        """
+        Makes sure the particle ID and comparison matrix
+        are not stored in the pickle file, so they are dynamically assigned
+        when the pickle file is loaded.
+        """
+
+        attrDict = dict(self.__dict__.items())
+        #Make sure pickled objects do no store ID nor comparison dict
+        attrDict.pop('id',None)
+        attrDict.pop('_comp',None)
+
+        return attrDict
+
     def __hash__(self):
         """
         Return the object address. Required for using weakref
         """
         return id(self)
     
-    def __del__(self):
-        """
-        If the instance is deleted, make sure to remove all references to
-        it from the comparison dictionary of other Particle or MultiParticle instances.
-        """
-        
-        for obj in Particle.getinstances():
-            obj._comp.pop(self.id,None)
-        del self
-        
     @classmethod
     def getinstances(cls):
         dead = set()
@@ -110,7 +114,7 @@ class Particle(object):
         
         :return: -1 if particle < other, 1 if particle > other and 0 if particle == other
         """    
-        
+
         if not isinstance(other,(MultiParticle,Particle)):
             raise ValueError
 
@@ -392,16 +396,22 @@ class MultiParticle(Particle):
         attrDict = dict(self.__dict__.items())
         attrDict.pop('label',None)
         attrDict.pop('particles',None)
+
         return ((self.label,self.particles),attrDict)
-        
-    def __del__(self):
+
+    def __getstate__(self):
         """
-        If the instance is deleted, make sure to remove all references to
-        it from the comparison dictionary of other Particle or MultiParticle instances.
+        Makes sure the particle ID and comparison matrix
+        are not stored in the pickle file, so they are dynamically assigned
+        when the pickle file is loaded.
         """
-        for obj in Particle.getinstances():
-            obj._comp.pop(self.id,None)
-        del self
+
+        attrDict = dict(self.__dict__.items())
+        #Make sure pickled objects do no store ID nor comparison dict
+        attrDict.pop('id',None)
+        attrDict.pop('_comp',None)
+
+        return attrDict
 
     def __getattribute__(self,attr):
         """
@@ -614,13 +624,22 @@ class ParticleList(object):
         """
         return ((self.particles,),{})
 
+    def __getstate__(self):
+        """
+        Makes sure the particle list ID and comparison matrix
+        are not stored in the pickle file, so they are dynamically assigned
+        when the pickle file is loaded.
+        """
+
+        attrDict = dict(self.__dict__.items())
+        #Make sure pickled objects do no store ID nor comparison dict
+        attrDict.pop('id',None)
+        attrDict.pop('_comp',None)
+
+        return attrDict
+
     def __hash__(self):
         return id(self)
-    
-    def __del__(self):
-        for obj in ParticleList.getinstances():            
-            obj._comp.pop(self.id,None)
-        del self
     
     @classmethod
     def getinstances(cls):
