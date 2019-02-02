@@ -16,13 +16,16 @@ class Particle(object):
     
     _instances = set()
 
-    def __new__(cls, **kwargs):
+    def __new__(cls,attributesDict={}, **kwargs):
         """
         Creates a particle. If a particle with the exact same attributes have
         already been created return this particle instead.
         Assigns an ID to the isntance using the class Particle._instance
         list. Reset the comparison dictionary.
         
+        :param attributesDict: A dictionary with particle attributes (useful for pickling/unpickling).
+                               Attributes can also be directly assigned using keyword arguments.
+
         Possible properties for arguments.
         Z2parity: int, +1 or -1
         label: str, e.g. 'e-'
@@ -34,30 +37,32 @@ class Particle(object):
         totalwidth: total width
         """
 
-        if not kwargs:
+        if not kwargs and not attributesDict:
             raise ValueError("Particle object can not be created with empty attributes")
 
-        kwargs.pop('id',None)
-        kwargs.pop('_comp',None)
+        attrDict = dict(attributesDict.items())
+        attrDict.update(kwargs)
+        attrDict.pop('id',None)
+        attrDict.pop('_comp',None)
         for obj in Particle.getinstances():
             if not isinstance(obj,Particle):
                 continue
             objAttr = dict(obj.__dict__.items())
             objAttr.pop('id',None)
             objAttr.pop('_comp',None)
-            if objAttr != kwargs:
+            if objAttr != attrDict:
                 continue
             return obj
         
         newParticle = super(Particle, cls).__new__(cls)
-        for attr,value in kwargs.items():
+        for attr,value in attrDict.items():
             setattr(newParticle,attr,value)
         newParticle.id = Particle.getID()
         newParticle._comp = {newParticle.id : 0}
         Particle._instances.add(weakref.ref(newParticle))
         return newParticle
 
-    def __getnewargs_ex__(self):
+    def __getnewargs__(self):
         """
         Required for unpickling the object.
         When loading the pickled object, it will call __new__ with the
@@ -68,7 +73,7 @@ class Particle(object):
         #Make sure pickled/unpickled objects do no store ID nor comparison dict
         attrDict.pop('id',None)
         attrDict.pop('_comp',None)
-        return ((),attrDict)
+        return (attrDict,)
 
     def __getstate__(self):
         """
@@ -356,18 +361,25 @@ class MultiParticle(Particle):
         The properties are: label, pdg, mass, electric charge, color charge, width 
     """
     
-    def __new__(cls,label,particles,**kwargs):
+    def __new__(cls,label,particles,attributesDict={},**kwargs):
         """
         Creates a multiparticle. If a multiparticle with the exact same particles
         already been created return this multiparticle instead.
         Assigns an ID to the isntance using the class Particle._instance
         list. Reset the comparison dictionary.
+
+        :param label: Label for the MultiParticle (string)
+        :param particles: List of Particle or MultiParticle objects (list)
+        :param attributesDict: A dictionary with particle attributes (useful for pickling/unpickling).
+                               Attributes can also be directly assigned using keyword arguments.
         """
 
         particles = sorted(particles)
         label = label
-        kwargs.pop('id',None)
-        kwargs.pop('_comp',None)
+        attrDict = dict(attributesDict.items())
+        attrDict.update(kwargs)
+        attrDict.pop('id',None)
+        attrDict.pop('_comp',None)
         for obj in Particle.getinstances()[:]:
             if not isinstance(obj,MultiParticle):
                 continue
@@ -377,7 +389,7 @@ class MultiParticle(Particle):
             objAttr.pop('_comp',None)
             objAttr.pop('label',None)
             objAttr.pop('particles',None)
-            if objAttr != kwargs:
+            if objAttr != attrDict:
                 continue
             pListB = obj.particles
             if len(particles) != len(pListB):
@@ -387,7 +399,7 @@ class MultiParticle(Particle):
             return obj
 
         newMultiParticle = super(Particle, cls).__new__(cls)
-        for attr,value in kwargs.items():
+        for attr,value in attrDict.items():
             setattr(newMultiParticle,attr,value)
         newMultiParticle.particles = particles[:]
         newMultiParticle.label = label
@@ -397,7 +409,7 @@ class MultiParticle(Particle):
         Particle._instances.add(weakref.ref(newMultiParticle))
         return newMultiParticle
 
-    def __getnewargs_ex__(self):
+    def __getnewargs__(self):
         """
         Required for unpickling the object.
         When loading the pickled object, it will call __new__ with the
@@ -411,7 +423,7 @@ class MultiParticle(Particle):
         attrDict.pop('id',None)
         attrDict.pop('_comp',None)
 
-        return ((self.label,self.particles),attrDict)
+        return (self.label,self.particles,attrDict)
 
     def __getstate__(self):
         """
@@ -620,6 +632,8 @@ class ParticleList(object):
         already been created return this list instead.
         Assigns an ID to the instance using the class ParticleList._instance
         list. Reset the comparison dictionary.
+
+        :param particles: List of Particle or MultiParticle objects (list)
         """
 
         pList = sorted(particles)
@@ -637,13 +651,13 @@ class ParticleList(object):
         ParticleList._instances.add(weakref.ref(newList))
         return newList
 
-    def __getnewargs_ex__(self):
+    def __getnewargs__(self):
         """
         Required for unpickling the object.
         When loading the pickled object, it will call __new__ with the
         arguments returned by this method.
         """
-        return ((self.particles,),{})
+        return (self.particles,)
 
     def __getstate__(self):
         """
