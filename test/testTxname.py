@@ -41,9 +41,9 @@ class TxTest(unittest.TestCase):
         gInfo = infoObj.Info('./databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
         try:
-            print (gInfo)
+            #print (gInfo)
             tx = TxName(f,gInfo,gInfo)
-            print (tx)
+            #print (tx)
             gotError = False
         except SModelSError as e:         
             gotError = e
