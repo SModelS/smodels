@@ -10,6 +10,7 @@
 """
 
 from smodels.theory.particle import Particle, MultiParticle
+from smodels.share.models.SMparticles import SMList
 
 ####  R-odd   ##########
 #1st generation squarks and its conjugates:
@@ -81,7 +82,6 @@ rOddC = [p.chargeConjugate() for p in rOdd]  #Define the charge conjugates
 
 higgs = [H,H2,H3,A1,A2]
 higgsC = [p.chargeConjugate() for p in higgs]
-from smodels.share.models.SMparticles import SMList
 rEven = SMList + higgs + higgsC
 
 #Generic BSM particles:

@@ -22,6 +22,7 @@
 """
 
 from smodels.theory.particle import Particle, MultiParticle
+from smodels.share.models.SMparticles import SMList
 
 ####  R-odd   ##########
 
@@ -33,8 +34,6 @@ H = Particle(Z2parity=-1, label='H+', pdg=37, eCharge=+1, colordim=1, spin=0)
 rOdd = [H0, A0, H]
 rOddC = [p.chargeConjugate() for p in rOdd]  #Define the charge conjugates
 
-
-from smodels.share.models.SMparticles import SMList
 rEven = SMList
 
 #Generic BSM particles:
