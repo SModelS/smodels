@@ -139,7 +139,7 @@ class Element(object):
                 val = [getattr(br,name) for br in self.branches]
                 return val
             except:
-                raise AttributeError("Element nor branch has attribute %s" %name)
+                raise AttributeError("Neither element nor branch has attribute ``%s''" %name)
 
     def __str__(self):
         """

@@ -8,7 +8,6 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
    :parameter rOdd: list of particle objects for the rOdd (Z2-odd) particles
-   :parameter rEven: list of particle objects for the rEven (Z2-even) particles
 
    Properties not defined here and defined by the LHE or SLHA input file 
    (such as masses, width and BRs) are automatically added later.
@@ -16,13 +15,13 @@
    HOW TO ADD NEW PARTICLES: simply add a new entry in rOdd (rEven) if the
    particle is Z2-odd (Z2-even). For now all decays of Z2-even particles are
    ignored. Z2-odd particles are decayed assuming Z2 conservation.
+   FIXME this isnt correct anymore.
    
    If you want to use slhaChecks to verify your input file (in the case of SLHA input
    only), also include the quantum numbers of the new particles below.   
 """
 
 from smodels.theory.particle import Particle, MultiParticle
-from smodels.share.models.SMparticles import SMList
 
 ####  R-odd   ##########
 
@@ -33,8 +32,6 @@ H = Particle(Z2parity=-1, label='H+', pdg=37, eCharge=+1, colordim=1, spin=0)
 
 rOdd = [H0, A0, H]
 rOddC = [p.chargeConjugate() for p in rOdd]  #Define the charge conjugates
-
-rEven = SMList
 
 #Generic BSM particles:
 

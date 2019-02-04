@@ -7,9 +7,6 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Matthias Wolf <matthias.wolf@wot.at>
 
-   :parameter rOdd: list of particle objects for the rOdd (Z2-odd) particles
-   :parameter rEven: list of particle objects for the rEven (Z2-even) particles
-   
 """
 
 def load ():
@@ -46,4 +43,3 @@ def load ():
 pM = load()
         
 BSMList = pM.BSMList
-rEven = pM.rEven
