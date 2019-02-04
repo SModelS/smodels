@@ -121,25 +121,24 @@ class Element(object):
     def __hash__(self):
         return object.__hash__(self)
 
-    def __getattr__(self, name):
+    def __getattr__(self, attr):
         """
-        If the element contains the attribute, returns
-        it, otherwise returns a list of values for the
-        attribute appearing in each branch.
+        If the attribute has not been defined for the element
+        try to fetch it from its branches.
+        :param attr: Attribute name
+
+        :return: Attribute value
         """
 
         #If calling another special method, return default (required for pickling)
-        if name.startswith('__') and name.endswith('__'):
-            return object.__getattr__(name)
+        if attr.startswith('__') and attr.endswith('__'):
+            return object.__getattr__(attr)
 
         try:
-            return object.__getattr__(self, name)
-        except AttributeError:
-            try:
-                val = [getattr(br,name) for br in self.branches]
-                return val
-            except:
-                raise AttributeError("Neither element nor branch has attribute ``%s''" %name)
+            val = [getattr(br,attr) for br in self.branches]
+            return val
+        except:
+            raise AttributeError("Neither element nor branch has attribute ``%s''" %attr)
 
     def __str__(self):
         """

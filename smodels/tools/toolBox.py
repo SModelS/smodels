@@ -10,7 +10,6 @@
 
 """
 
-import types
 from smodels.tools import pythia6Wrapper
 from smodels.tools import pythia8Wrapper
 from smodels.tools import nllFastWrapper
@@ -44,9 +43,9 @@ class ToolBox(object):
         """
         self.add(pythia6Wrapper.Pythia6Wrapper())
         self.add(pythia8Wrapper.Pythia8Wrapper())
-        for(sqrts, tool) in nllFastWrapper.nllFastTools.items():
+        for tool in nllFastWrapper.nllFastTools.values():
                 self.add(tool)
-        for(name, tool) in externalPythonTools.pythonTools.items():
+        for tool in externalPythonTools.pythonTools.values():
                 self.add(tool)
         
 
@@ -70,6 +69,7 @@ class ToolBox(object):
         """
         Returns color coded string to signal installation issues.
         """
+
         if ok == True:
             ret = "%sinstallation ok!%s" % (colors.green, colors.reset)
             return ret
@@ -80,18 +80,18 @@ class ToolBox(object):
         return ret
 
 
-    def checkInstallation(self, make=False, printit=True, long=False ):
+    def checkInstallation(self, make=False, printit=True, longL=False ):
         """
         Checks if all tools listed are installed properly, 
         returns True if everything is ok, False otherwise.
         """
-        from smodels.tools.colors import colors
+
         ret = "%sThe following tools have been found in the Toolbox:%s\n" % \
                ( colors.yellow, colors.reset )
         hasMade = False
         allOk=True
         maxl = 45
-        if long: maxl=75
+        if longL: maxl=75
         for(name, instance) in self.tools.items():
             ok = instance.checkInstallation()
             if not ok:
@@ -100,13 +100,13 @@ class ToolBox(object):
             if len(exe) > maxl + 4:
                 exe = "... " + instance.pathOfExecutable()[-maxl:]
             ret += ( "%-12s [%-"+str(maxl+5)+"s]:  %s\n" ) % (name, exe,
-                                             self.installationOk(ok ))
+                                            self.installationOk(ok ))
             if not ok and make:
                 hasMade = True
                 instance.compile()
         if make and hasMade:
             ret += "Check again:\n"
-            r = self.checkInstallation(self, printit=False ) 
+            r = self.checkInstallation(make=False, printit=False)
             ret += str(r)
             return r
         if printit:

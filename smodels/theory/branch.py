@@ -164,21 +164,25 @@ class Branch(object):
     def __ne__( self, b2 ):
         return not self.__cmp__(b2) == 0
 
-    def __getattr__(self, name):
+    def __getattr__(self, attr):
+        """
+        If the attribute has not been defined for the element
+        try to fetch it from its branches.
+        :param attr: Attribute name
+
+        :return: Attribute value
+        """
 
         #If calling another special method, return default (required for pickling)
-        if name.startswith('__') and name.endswith('__'):
-            return object.__getattr__(name)
+        if attr.startswith('__') and attr.endswith('__'):
+            return object.__getattr__(attr)
 
         try:
-            return object.__getattr__(self, name)
-        except AttributeError:
-            try:
-                val = [getattr(ptc,name) for ptc in self.oddParticles]
-                return val
-            except:
-                raise AttributeError("Element nor branch has attribute %s" %name)
-        
+            val = [getattr(ptc,attr) for ptc in self.oddParticles]
+            return val
+        except:
+            raise AttributeError("Element nor branch has attribute %s" %attr)
+
     def __add__(self,other):
         """
         Adds two branches. Should only be used if the branches

@@ -155,6 +155,7 @@ class RunPrinterTest(unittest.TestCase):
             if os.path.exists ( i ): os.remove ( i )
  
     def testPythonPrinter(self):
+
         self.removeOutputs ( './unitTestOutput/printer_output.py' )
         mprinter = printer.MPrinter()
         mprinter.Printers['python'] = printer.PyPrinter(output = 'file')
@@ -164,9 +165,13 @@ class RunPrinterTest(unittest.TestCase):
         slhafile = "./testFiles/slha/gluino_squarks.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=True)
         self.runPrinterMain(slhafile,mprinter)
-           
-        smodelsOutput = importlib.import_module( "unitTestOutput.printer_output" ).smodelsOutput
-        # from unitTestOutput.printer_output import smodelsOutput
+
+        try:
+            smodelsOutput = importlib.import_module( "unitTestOutput.printer_output" ).smodelsOutput
+        except: #Python2 fallback
+            import imp
+            pM=imp.load_source("smodels","./unitTestOutput/printer_output.py")
+            smodelsOutput = pM.smodelsOutput
         #Test python output
         from gluino_squarks_default import smodelsOutputDefault 
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
@@ -194,9 +199,14 @@ class RunPrinterTest(unittest.TestCase):
         slhafile = "./testFiles/slha/simplyGluino.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)
-        
-        smodelsOutput = importlib.import_module( "unitTestOutput.printer_output_simple" ).smodelsOutput
-        # from unitTestOutput.printer_output_simple import smodelsOutput
+
+        try:
+            smodelsOutput = importlib.import_module( "unitTestOutput.printer_output_simple" ).smodelsOutput
+        except: #Python2 fallback
+            import imp
+            pM=imp.load_source("smodels","./unitTestOutput/printer_output_simple.py")
+            smodelsOutput = pM.smodelsOutput
+
         from simplyGluino_default import smodelsOutputDefault    
          
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]

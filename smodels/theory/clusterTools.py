@@ -41,20 +41,49 @@ class AverageElement(Element):
             for el in self.elements[1:]:
                 self.weight += el.weight
 
+    def __cmp__(self,other):
+        """
+        Compares the element with other. Only the properties
+        defined in self.properties are used for comparison.
+        :param other:  element to be compared (Element or AverageElement object)
+        :return: -1 if self < other, 0 if self == other, +1, if self > other.
+        """
+
+        if not isinstance(other,(Element,AverageElement)):
+            return -1
+
+        otherProperties = [getattr(other,attr) for attr in self.properties]
+        selfProperties = [getattr(self,attr) for attr in self.properties]
+        comp = (selfProperties > otherProperties) - (otherProperties > selfProperties)
+
+        return comp
+
     def __eq__(self,other):
-        """
-        Compare self with other using the properties defined in self.properties.
-        """
+        return self.__cmp__(other)==0
 
-        if not isinstance(other,(AverageElement,Element)):
-            return False
+    def __lt__(self,other):
+        return self.__cmp__(other)<0
 
-        if any(getattr(self,attr) != getattr(other,attr) for attr in self.properties):
-            return False
-        return True
+    def __gt__(self,other):
+        return self.__cmp__(other)>0
 
     def __neq__(self,other):
         return not self.__eq__(other)
+
+    def __getattr__(self, attr):
+        """
+        Returns the attribute of self (necessary to overwrite the Element
+        class method).
+
+        :param attr: Attribute name
+
+        :return: Attribute value
+        """
+
+        if not attr in self.__dict__:
+            raise AttributeError
+        else:
+            return self.__dict__[attr]
 
     def getAverage(self,attribute,weighted=True):
         """

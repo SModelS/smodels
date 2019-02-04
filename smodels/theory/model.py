@@ -9,7 +9,7 @@ import pyslha
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
 from smodels.theory import lheReader, crossSection
-from smodels.theory.particle import Particle,MultiParticle, ParticleList
+from smodels.theory.particle import Particle,MultiParticle,ParticleList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 class Model(object):

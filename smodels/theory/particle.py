@@ -446,7 +446,7 @@ class MultiParticle(Particle):
         """
         pass
 
-    def __getattribute__(self,attr):
+    def __getattr__(self,attr):
         """
         If MultiParticle does not have attribute, return a list
         if the attributes of each particle in self.particles.
@@ -459,13 +459,6 @@ class MultiParticle(Particle):
         :return: Attribute or list with the attribute values in self.particles
         """
 
-        #Try to get the attribute directly
-        try:
-            return Particle.__getattribute__(self,attr)
-        except:
-            pass
-        
-        #If not found, try to fetch it from its particles
         try:
             values = [getattr(particle,attr) for particle in self.particles]
             if all(type(x) == type(values[0]) for x in values):
