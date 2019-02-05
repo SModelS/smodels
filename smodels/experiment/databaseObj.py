@@ -289,7 +289,7 @@ class Database(object):
 
         import requests
         try:
-            r = requests.get( path )
+            r = requests.get( path, timeout=5 )
         except Exception as e:
             logger.error ( "Exception when trying to fetch database: %s" % e )
             logger.error ( "Consider supplying a different database path in the ini file (possibly a local one)" )
@@ -307,7 +307,7 @@ class Database(object):
         size = r.json()["size"]
         cDir = cacheDirectory ( create=True )
         t0=time.time()
-        r2=requests.get ( r.json()["url"], stream=True )
+        r2=requests.get ( r.json()["url"], stream=True, timeout=5 )
         filename= os.path.join ( cDir, r2.url.split("/")[-1] )
         logger.info ( "need to fetch %s and store in %s. size is %s." % \
                       ( r.json()["url"], filename, sizeof_fmt ( size ) ) )
@@ -355,7 +355,7 @@ class Database(object):
             def __init__ ( self ): self.status_code = -1
         r=_()
         try:
-            r = requests.get( path )
+            r = requests.get( path, timeout=5 )
         except Exception:
             pass
         if r.status_code != 200:
