@@ -145,4 +145,4 @@ def main ( args ):
         tmp.compile()
     if args.colors:
         colors.on = True
-    tmp.checkInstallation( printit=True, long = args.long )
+    tmp.checkInstallation( printit=True, longL = args.long )
