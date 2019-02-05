@@ -100,7 +100,7 @@ class Particle(object):
         """
         Return the object address. Required for using weakref
         """
-        return id(self)
+        return self.id
     
     @classmethod
     def getinstances(cls):
@@ -465,8 +465,8 @@ class MultiParticle(Particle):
                 if all(x == values[0] for x in values):
                     return values[0]
             return values
-        except:
-            raise AttributeError
+        except Exception as e:
+            raise AttributeError(e)
             
     def cmpProperties(self,other, 
                       properties = ['Z2parity','spin','colordim','eCharge','mass','totalwidth']):
@@ -667,7 +667,7 @@ class ParticleList(object):
         return attrDict
 
     def __hash__(self):
-        return id(self)
+        return self.id
     
     @classmethod
     def getinstances(cls):

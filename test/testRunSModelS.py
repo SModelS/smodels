@@ -22,7 +22,7 @@ from smodels.tools.smodelsLogging import logger
  
 class RunSModelSTest(unittest.TestCase):
  
-    def mestMultipleFiles( self ):
+    def testMultipleFiles( self ):
         out = "./unitTestOutput"
         for i in os.listdir( out ):
             if i[-8:]==".smodels":
@@ -35,13 +35,17 @@ class RunSModelSTest(unittest.TestCase):
             logger.error("Number of output file(%d) differ from number of input files(%d)" %(nout, nin))
         self.assertEqual(nout,nin)
       
-    def timeoutRun(self):
-        filename = "./testFiles/slha/complicated.slha"
-        runMain(filename, timeout=1, suppressStdout=True,
-                             development=True, inifile = "timeout.ini" )
-      
     def testTimeout(self):
-        self.assertRaises(NoTime, self.timeoutRun)
+        try:
+            filename = "./testFiles/slha/complicated.slha"
+            import time
+            t0=time.time()
+            runMain(filename, timeout=1, suppressStdout=True,
+                                 development=True, inifile = "timeout.ini" )
+            print ( "should never get here. time spent:%.1fs " % ( time.time()-t0 ) )
+            self.assertTrue ( False )
+        except NoTime:
+            self.assertTrue  ( True )
  
     def removeOutputs( self, f ):
         """ remove cruft outputfiles """
