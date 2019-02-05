@@ -102,8 +102,8 @@ class ToolBox(object):
             ret += ( "%-12s [%-"+str(maxl+5)+"s]:  %s\n" ) % (name, exe,
                                             self.installationOk(ok ))
             if not ok and make:
-                hasMade = True
                 instance.compile()
+                hasMade = True
         if make and hasMade:
             ret += "Check again:\n"
             r = self.checkInstallation(make=False, printit=False)
