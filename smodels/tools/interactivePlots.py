@@ -70,9 +70,10 @@ class DataHolder(object):
         try:
             with open(self.parameterFile, 'rb') as fParameters: ## imports parameter file
                 parameters = imp.load_module("parameters",fParameters,self.parameterFile,('.py', 'rb', imp.PY_SOURCE))
-        except:
-            logger.error("Error loading parameters file %s" %self.parameterFile)
-            return False
+        # except Exception as e:
+        except (FileNotFoundError,ValueError,ModuleNotFoundError,ImportError,SyntaxError) as e:
+            logger.error("Error loading parameters file %s: %s" % (self.parameterFile,e) )
+            sys.exit()
          
         if not hasattr(parameters, 'slha_hover_information'):
             logger.debug("slha_hover_information dictionary was not found in %s. SLHA data will not be included in info box." %parFile)

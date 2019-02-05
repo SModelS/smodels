@@ -27,7 +27,7 @@ class OverrideInstall(install):
             import getpass
             if getpass.getuser() == "root":
                 install_as_user = False
-        except Exception as e:
+        except ModuleNotFoundError:
             pass
         enableStupidMacFix=False
         if enableStupidMacFix:
@@ -36,7 +36,7 @@ class OverrideInstall(install):
                 # setup.py doesnt resolve the requirements!
                 try:
                     self.do_egg_install()
-                except Exception as e:
+                except NameError as e:
                     pass
         # so the installation does not break! 
         # here we start with doing our overriding and private magic ..

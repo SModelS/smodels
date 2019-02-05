@@ -276,7 +276,7 @@ def getValuesForObj(obj, attribute):
     values = []
     try:
         objDict = obj.__dict__.items()
-    except:
+    except AttributeError:
         return values        
     
       
@@ -308,7 +308,7 @@ def getAttributesFrom(obj):
     attributes = []
     try:
         objDict = obj.__dict__.items()
-    except:
+    except AttributeError:
         return attributes        
     
       

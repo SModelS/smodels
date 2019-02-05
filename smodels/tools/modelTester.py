@@ -25,9 +25,9 @@ import os
 import sys
 import time
 try:
-    from ConfigParser import SafeConfigParser
+    from ConfigParser import SafeConfigParser,NoSectionError,NoOptionError
 except ImportError as e:
-    from configparser import ConfigParser
+    from configparser import ConfigParser,NoSectionError,NoOptionError
 from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.experiment.databaseObj import Database, ExpResultList
@@ -134,7 +134,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     combineResults=False
     try:
         combineResults = parser.getboolean("options","combineSRs")
-    except Exception as e:
+    except (NoSectionError,NoOptionError) as e:
         pass
     for expResult in listOfExpRes:
         theorypredictions = theoryPredictionsFor(expResult, smstoplist,
@@ -341,7 +341,7 @@ def loadDatabase(parser, db):
         logger.error("``[path] databasePath'' in ini file is deprecated; " \
            "use ``[database] path'' instead.(See e.g. smodels/etc/parameters_default.ini)")
         parser.set("database", "path", dp)
-    except Exception as e:
+    except (NoSectionError,NoOptionError) as e:
         ## path.databasePath not set. This is good.
         pass
     try:
@@ -353,7 +353,7 @@ def loadDatabase(parser, db):
             discard_zeroes = True
             try:
                 discard_zeroes = parser.getboolean("database", "discardZeroes")
-            except Exception as e: ## too complicated to be more specific
+            except (NoSectionError,NoOptionError) as e:
                 logger.info("database:discardZeroes is not given in config file. Defaulting to 'True'.")
             force_load=None
             if database == True: force_load="txt"
@@ -421,7 +421,7 @@ def getParameters(parameterFile):
     """
     try:
         parser = ConfigParser(inline_comment_prefixes=(';',))
-    except Exception as e:
+    except NameError:
         parser = SafeConfigParser()
     ret=parser.read(parameterFile)
     if ret == []:

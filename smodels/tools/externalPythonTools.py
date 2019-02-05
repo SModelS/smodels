@@ -40,19 +40,19 @@ class ExternalPythonTool(object):
             import pip
             pip.main(["install","--user",self.name] )
             return
-        except:
+        except (ModuleNotFoundError,AttributeError):
             pass
         try:
             import pip._internal
             pip._internal.main(["install","--user",self.name] )
             return
-        except:
+        except (ModuleNotFoundError,AttributeError):
             pass
         try:
             from setuptools.command import easy_install
             easy_install.main(["-U","--user",self.name])
             return
-        except:
+        except (ModuleNotFoundError,AttributeError):
             pass
 
 

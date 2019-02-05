@@ -48,8 +48,8 @@ def verbose_run( flter ):
                     a=t.debug()
                 except Exception as e:
                     n_failed += 1
-                    print ( "%s FAILED: %s%s" % \
-                            ( colors.error, str(e), colors.reset ) )
+                    print ( "%s FAILED: %s,%s%s" % \
+                            ( colors.error, type(e), str(e), colors.reset ) )
                     continue
                 print ( "%sok%s" % ( colors.info, colors.reset ) ) 
 

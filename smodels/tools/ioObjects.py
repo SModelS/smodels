@@ -206,7 +206,6 @@ class SlhaStatus(object):
             self.xsec = self.hasXsec(checkXsec)
             self.decayBlocksStatus = self.findMissingDecayBlocks(findMissingDecayBlocks)
             self.status = self.evaluateStatus()
-        ## except Exception,e:
         except (SModelSError,TypeError,IOError,ValueError,AttributeError) as e:
             self.status = -4, "Error checking SLHA file: "+str(e)
 

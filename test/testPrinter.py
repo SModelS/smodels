@@ -168,7 +168,7 @@ class RunPrinterTest(unittest.TestCase):
 
         try:
             smodelsOutput = importlib.import_module( "unitTestOutput.printer_output" ).smodelsOutput
-        except: #Python2 fallback
+        except ImportError: #Python2 fallback
             import imp
             pM=imp.load_source("smodels","./unitTestOutput/printer_output.py")
             smodelsOutput = pM.smodelsOutput
@@ -202,7 +202,7 @@ class RunPrinterTest(unittest.TestCase):
 
         try:
             smodelsOutput = importlib.import_module( "unitTestOutput.printer_output_simple" ).smodelsOutput
-        except: #Python2 fallback
+        except ImportError: #Python2 fallback
             import imp
             pM=imp.load_source("smodels","./unitTestOutput/printer_output_simple.py")
             smodelsOutput = pM.smodelsOutput

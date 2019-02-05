@@ -119,7 +119,7 @@ class Data:
         try:
             _ = float(obj)
             return True
-        except:
+        except (ValueError,TypeError):
             pass
         return False
 
@@ -527,7 +527,7 @@ class LikelihoodComputer:
 
                 ret = ret_c[0]
                 return ret,-2
-            except Exception as e:
+            except (IndexError,ValueError) as e:
                 logger.error("exception: %s. ini[-3:]=%s" % (e,ini[-3:]) )
                 raise Exception("cov-1=%s" % (self.model.covariance+self.model.var_s(nsig))**(-1))
             return ini,-1

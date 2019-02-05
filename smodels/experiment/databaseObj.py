@@ -290,7 +290,7 @@ class Database(object):
         import requests
         try:
             r = requests.get( path, timeout=5 )
-        except Exception as e:
+        except requests.exceptions.RequestException as e:
             logger.error ( "Exception when trying to fetch database: %s" % e )
             logger.error ( "Consider supplying a different database path in the ini file (possibly a local one)" )
             sys.exit()
@@ -356,7 +356,7 @@ class Database(object):
         r=_()
         try:
             r = requests.get( path, timeout=2 )
-        except Exception:
+        except requests.exceptions.RequestException as e:
             pass
         if r.status_code != 200:
             logger.warning ( "Error %d: could not fetch %s from server." % \

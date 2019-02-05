@@ -46,6 +46,9 @@ class RunSModelSTest(unittest.TestCase):
             self.assertTrue ( False )
         except NoTime:
             self.assertTrue  ( True )
+        except Exception as e:
+            print ( "wrong exception %s %s" % ( type(e), e ) )
+            self.assertTrue ( False )
  
     def removeOutputs( self, f ):
         """ remove cruft outputfiles """

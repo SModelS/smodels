@@ -137,7 +137,7 @@ class Element(object):
         try:
             val = [getattr(br,attr) for br in self.branches]
             return val
-        except:
+        except AttributeError:
             raise AttributeError("Neither element nor branch has attribute ``%s''" %attr)
 
     def __str__(self):
@@ -211,7 +211,7 @@ class Element(object):
         
         try:
             vals = [br.getAverage(attr) for br in self.branches]
-        except:
+        except (AttributeError,ZeroDivisionError):
             raise SModelSError("Could not compute average for %s" %attr)
         
         return vals

@@ -67,7 +67,7 @@ class CppTest(unittest.TestCase):
                 try:
                     yv = eval(yv)
                     xv = eval(xv)
-                except:
+                except (SyntaxError,NameError):
                     pass
                 if isinstance(yv,float) and isinstance(xv,float):
                     self.assertAlmostEqual(xv, yv, 5)

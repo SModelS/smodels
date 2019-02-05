@@ -30,15 +30,12 @@ def test_requirements():
     Returns true if that is the case. """
     import importlib
     for i in requirements():
-        try:
-            pos = i.find(">" )
-            lib = i
-            if pos > -1:
-                lib = i[:pos]
-            found = importlib.util.find_spec( lib )
-            if found == None:
-                return False
-        except Exception as e:
+        pos = i.find(">" )
+        lib = i
+        if pos > -1:
+            lib = i[:pos]
+        found = importlib.util.find_spec( lib )
+        if found == None:
             return False
     return True
 
@@ -134,7 +131,7 @@ def _toTuple_ ( ver ):
                 minor = i[:i.find(pf)]
                 try:
                     minor = int(minor)
-                except:
+                except (ValueError,TypeError):
                     pass
                 b.append ( minor )
                 b.append ( i[i.find(pf):] )
@@ -200,7 +197,7 @@ def fixpermissions():
         for p in Dirs:
             logger.debug ( "chmod 777 %s" % (p) )
             os.chmod ( p, 0o777 )
-    except Exception as e:
+    except PermissionError as e:
         print ( "chmod failed (permission error). Please try as root, i.e.:" )
         print ( "sudo smodelsTools.py fixpermissions" )
 

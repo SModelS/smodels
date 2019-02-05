@@ -180,7 +180,7 @@ class Branch(object):
         try:
             val = [getattr(ptc,attr) for ptc in self.oddParticles]
             return val
-        except:
+        except AttributeError:
             raise AttributeError("Element nor branch has attribute %s" %attr)
 
     def __add__(self,other):
@@ -272,7 +272,7 @@ class Branch(object):
                 else:
                     avg = v
                 vals.append(avg)
-        except:
+        except (AttributeError,ZeroDivisionError):
             raise SModelSError("Could not compute average for %s" %attr)
         
         return vals
