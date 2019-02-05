@@ -355,7 +355,7 @@ class Database(object):
             def __init__ ( self ): self.status_code = -1
         r=_()
         try:
-            r = requests.get( path, timeout=5 )
+            r = requests.get( path, timeout=2 )
         except Exception:
             pass
         if r.status_code != 200:
@@ -366,8 +366,7 @@ class Database(object):
                 sys.exit()
             logger.warning ( "I do however have a local copy of the file. I work with that." )
             self.force_load = "pcl"
-            # next step: check the timestamps
-            return ( cDir, os.path.basename ( filename ) )
+            return ( cDir, filename )
 
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!
