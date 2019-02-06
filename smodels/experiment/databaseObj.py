@@ -258,7 +258,7 @@ class Database(object):
         Are we running within a notebook? Has an effect on the
         progressbar we wish to use.
         """
-        ret = False
+
         try:
             cfg = get_ipython().config 
             if 'IPKernelApp' in cfg.keys():
@@ -338,7 +338,7 @@ class Database(object):
 
 
     def fetchFromServer ( self, path, discard_zeroes ):
-        import requests, time, json
+        import requests, json
         self.source = "http"
         if "ftp://" in path:
             self.source = "ftp"

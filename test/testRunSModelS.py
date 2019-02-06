@@ -38,7 +38,6 @@ class RunSModelSTest(unittest.TestCase):
     def testTimeout(self):
         try:
             filename = "./testFiles/slha/complicated.slha"
-            import time
             t0=time.time()
             runMain(filename, timeout=1, suppressStdout=True,
                                  development=True, inifile = "timeout.ini" )

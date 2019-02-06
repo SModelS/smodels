@@ -36,7 +36,7 @@ def import_python_output(smodelsFile):
         with open(smodelsFile, 'rb') as fsmodels: ## imports smodels file
             smodelsOut = imp.load_module("smodelsOutput",fsmodels,smodelsFile,('.py', 'rb', imp.PY_SOURCE))
             smodelsOutput = smodelsOut.smodelsOutput
-    except (ImportError,AttributeError,FileNotFoundError,ValueError,IsADirectoryError):
+    except (ImportError,AttributeError,IOError,ValueError,OSError):
         logger.debug("Error loading smodels file %s. Does it contain a smodelsOutput dictionary?" %smodelsFile)
         return False
     
@@ -100,7 +100,7 @@ def get_slha_data(slhaFile):
     
     try:
         slhaData = pyslha.readSLHAFile(slhaFile)
-    except (FileNotFoundError,IsADirectoryError,pyslha.ParseError) as e:
+    except (OSError,pyslha.ParseError) as e:
         logger.warning("Error reading SLHA file %s: %s" % (slhaFile,e) )
         return False
     
@@ -170,8 +170,7 @@ def get_missed_topologies(data_dict,smodelsOuptut):
     mt_max = 'False'
     if decompStatus >= 0:
         for missed_topo in get_entry(smodelsOuptut, 'Missed Topologies'):
-            missedtopo_xsec=missed_topo.get('weight (fb)')
-          #  if missedtopo_xsec==None: missedtopo_xsec=0            
+            missedtopo_xsec=missed_topo.get('weight (fb)')            
             missedtopo_total_xsec=missedtopo_total_xsec+missedtopo_xsec
             if missedtopo_xsec>missedtopo_max_xsec:
                 missedtopo_max_xsec=missedtopo_xsec
@@ -202,7 +201,6 @@ def get_long_cascades(data_dict,smodelsOutput):
             long_cascade_total_xsec=long_cascade_total_xsec+long_cascade_xsec
     else:
         long_cascade_total_xsec=False
-   # if long_cascade_total_xsec==None: long_cascade_total_xsec=False      
     if 'MT_long_xsec' in data_dict.keys():
         data_dict.get('MT_long_xsec').append(long_cascade_total_xsec)
              
@@ -229,8 +227,7 @@ def get_outside_grid(data_dict,smodelsOutput):
     outside_grid_total_xsec=0
     if decompStatus >= 0:
         for outside_grid in smodelsOutput.get('Outside Grid'):
-            outside_grid_xsec=outside_grid.get('weight (fb)')
-           # if outside_grid_xsec==None: outside_grid_xsec=0 
+            outside_grid_xsec=outside_grid.get('weight (fb)') 
             outside_grid_total_xsec = outside_grid_total_xsec+outside_grid_xsec
     else:
         outside_grid_total_xsec = False      

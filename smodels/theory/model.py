@@ -167,7 +167,7 @@ class Model(object):
             massDict = res.blocks['MASS'] 
             decaysDict = res.decays
             self.xsections = crossSection.getXsecFromSLHAFile(self.inputFile)                        
-        except (FileNotFoundError,AttributeError,KeyError):
+        except (IOError,AttributeError,KeyError):
             massDict,decaysDict = lheReader.getDictionariesFrom(self.inputFile)
             self.xsections = crossSection.getXsecFromLHEFile(self.inputFile)
             logger.info("Using LHE input. All unstable particles will be assumed to have prompt decays.")

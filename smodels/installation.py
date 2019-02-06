@@ -188,7 +188,7 @@ def fixpermissions():
     """ make sure that all filepermissions are such that
         we can compile the wrappers for pythia and nllfast. """
     from smodels.tools.smodelsLogging import logger
-    import os, glob
+    import glob
     Dir = "%ssmodels/lib/" % installDirectory()
     try:
         Dirs = [ "%spythia6" % Dir, "%spythia8" % Dir ]
@@ -197,7 +197,7 @@ def fixpermissions():
         for p in Dirs:
             logger.debug ( "chmod 777 %s" % (p) )
             os.chmod ( p, 0o777 )
-    except PermissionError as e:
+    except OSError:
         print ( "chmod failed (permission error). Please try as root, i.e.:" )
         print ( "sudo smodelsTools.py fixpermissions" )
 
