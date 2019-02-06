@@ -293,4 +293,4 @@ class Model(object):
 
         #Reset particle equality from all particle lists:
         for pL in ParticleList.getinstances():
-            pL._comp = {p.id : 0}
+            pL._comp = {pL.id : 0}

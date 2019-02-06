@@ -15,6 +15,7 @@ class Particle(object):
     """
     
     _instances = set()
+    _lastID = 0
 
     def __new__(cls,attributesDict={}, **kwargs):
         """
@@ -117,9 +118,11 @@ class Particle(object):
         
     @classmethod
     def getID(cls):
-        #lastID = highest id so far or 0, if there are no instances of the class
-        lastID = max([obj.id for obj in Particle.getinstances()]+[-1])
-        return lastID+1
+        if len(Particle.getinstances()) == 0:
+            Particle._lastID = 0
+        else:
+            Particle._lastID += 1
+        return Particle._lastID
 
     def __cmp__(self,other):
         """
@@ -617,6 +620,7 @@ class ParticleList(object):
     """
     
     _instances = set()
+    _lastID = 0
 
 
     def __new__(cls,particles):
@@ -672,19 +676,23 @@ class ParticleList(object):
     @classmethod
     def getinstances(cls):
         dead = set()
+        instances = []
         for ref in ParticleList._instances:
             obj = ref()
             if obj is not None:
-                yield obj
+                instances.append(obj)
             else:
                 dead.add(ref)
         ParticleList._instances -= dead
+        return instances
         
     @classmethod
     def getID(cls):
-        #lastID = highest id so far or 0, if there are no instances of the class
-        lastID = max([obj.id for obj in ParticleList.getinstances()]+[-1])
-        return lastID+1
+        if len(ParticleList.getinstances()) == 0:
+            ParticleList._lastID = 0
+        else:
+            ParticleList._lastID += 1
+        return ParticleList._lastID
         
     def __cmp__(self,other):
         """
