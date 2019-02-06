@@ -36,7 +36,7 @@ def import_python_output(smodelsFile):
         with open(smodelsFile, 'rb') as fsmodels: ## imports smodels file
             smodelsOut = imp.load_module("smodelsOutput",fsmodels,smodelsFile,('.py', 'rb', imp.PY_SOURCE))
             smodelsOutput = smodelsOut.smodelsOutput
-    except (ImportError,AttributeError,IOError,ValueError,OSError):
+    except (ImportError,AttributeError,IOError,ValueError,OSError,SyntaxError):
         logger.debug("Error loading smodels file %s. Does it contain a smodelsOutput dictionary?" %smodelsFile)
         return False
     
