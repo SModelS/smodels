@@ -121,7 +121,7 @@ class Uncovered(object):
                         if outsideX: # if all mothers are tested, this is no longer outside grid contribution, otherwise add to list
                             el.missingX =  outsideX # for combined printing function, call outside grid weight missingX as well
                             self.outsideGrid.addToGeneralElements(el) # add to list of outsideGrid topos                        
-                    continue         
+                    continue
                 self.missingTopos.addToGeneralElements(el) #keep track of all missing topologies                
                 if self.hasDisplaced(el):
                     self.displaced.addToGeneralElements(el)
@@ -249,18 +249,20 @@ class UncoveredList(object):
         """     
 
         newGenEl = self.generalElement(el)
+
         name = str(newGenEl).replace('~','') + '  (%s)'%(str( newGenEl.branches[0]._decayType) + ","+ str(newGenEl.branches[1]._decayType) )    
 
         # Check if an element with the same generalized name has already been added
         for genEl in self.generalElements:
-            if newGenEl._allEvenParticles == genEl._allEvenParticles:
-                if newGenEl._decayTypes == genEl._decayTypes:                
+            if newGenEl.evenParticles == genEl.evenParticles:
+                if newGenEl._decayType == genEl._decayType:
                     genEl._contributingElements.append(el)
                     genEl.missingX += el.missingX
                     return
             
         newGenEl._outputDescription = name           
-        newGenEl._contributingElements = [el]    
+        newGenEl._contributingElements = [el]
+
         self.generalElements.append(newGenEl)
         
 
@@ -276,8 +278,6 @@ class UncoveredList(object):
         newEl = Element()
         newEl.branches[0]._decayType = el.branches[0]._decayType
         newEl.branches[1]._decayType = el.branches[1]._decayType
-        for ib,branch in enumerate(el.branches):
-            newEl.branches[ib].oddParticles = branch.oddParticles[:]
         newEl.missingX = el.missingX
 
         for ib,branch in enumerate(el.branches):
@@ -286,15 +286,12 @@ class UncoveredList(object):
                 newVertex = vertex[:]
                 for ip,particle in enumerate(vertex):
                     for particleList in self.particleGroups:
-                        if particle == particleList:
+                        if particleList.contains(particle):
                             newVertex[ip] = particleList
                 newParticles.append(ParticleList(newVertex))
             newEl.branches[ib].evenParticles = newParticles
             newEl.branches[ib].setInfo()
-        
         newEl.sortBranches()
-        newEl._decayTypes = [newEl.branches[0]._decayType, newEl.branches[1]._decayType]
-        newEl._allEvenParticles = [newEl.branches[0].evenParticles, newEl.branches[1].evenParticles]
 
         return newEl 
 

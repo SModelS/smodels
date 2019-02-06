@@ -23,7 +23,7 @@ from smodels.tools.printer import MPrinter
 import multiprocessing
 import os
 import sys
-import time
+import time,gc
 try:
     from ConfigParser import SafeConfigParser,NoSectionError,NoOptionError
 except ImportError as e:
@@ -219,6 +219,7 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
     for inputFile in inputFiles:
         runSingleFile(inputFile, outputDir, parser, databaseVersion,
                                   listOfExpRes, timeout, development, parameterFile)
+        gc.collect()
     return None
 
 
