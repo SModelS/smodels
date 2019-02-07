@@ -40,7 +40,8 @@ def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
         raise SModelSError()
 
     if type(sigcut) == type(1.):
-        sigcut = sigcut * fb
+        sigcut = sigcut*fb
+    sigcut = sigcut.asNumber(fb)
 
     xSectionList.removeLowerOrder()
     # Order xsections by PDGs to improve performance
@@ -50,7 +51,7 @@ def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
     # of sqrtS)
     maxWeight = {}
     for pid in xSectionList.getPIDs():
-        maxWeight[pid] = xSectionList.getXsecsFor(pid).getMaxXsec()   
+        maxWeight[pid] = xSectionList.getXsecsFor(pid).getMaxXsec().asNumber(fb)
 
     # Generate dictionary, where keys are the PIDs and values 
     # are the list of cross sections for the PID pair (for performance)
@@ -98,21 +99,19 @@ def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
     # cross section list
     for pids in xSectionList.getPIDpairs():
         weightList = xSectionListDict[pids]
-        minBR = (sigcut/weightList.getMaxXsec()).asNumber()    
+        minBR = (sigcut/weightList.getMaxXsec().asNumber(fb))
         if minBR > 1.:
             continue
         for branch1 in branchListDict[pids[0]]:
             BR1 =  branch1.maxWeight/maxWeight[pids[0]]  #Branching ratio for first branch            
             if BR1 < minBR:
                 break #Stop loop if BR1 is already too low
-            for branch2 in branchListDict[pids[1]]:   
+            for branch2 in branchListDict[pids[1]]:
                 BR2 =  branch2.maxWeight/maxWeight[pids[1]]  #Branching ratio for second branch                
                 if BR2 < minBR:
                     break #Stop loop if BR2 is already too low        
                                      
-                finalBR = BR1*BR2                
-                if type(finalBR) == type(1.*fb):
-                    finalBR = finalBR.asNumber()
+                finalBR = BR1*BR2
                 if finalBR < minBR:
                     continue # Skip elements with xsec below sigcut
                                        

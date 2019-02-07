@@ -331,7 +331,7 @@ class Branch(object):
         newbranch.vertnumb = self.vertnumb
         newbranch.vertparts = self.vertparts[:]
         if not self.maxWeight is None:
-            newbranch.maxWeight = self.maxWeight.copy()
+            newbranch.maxWeight = self.maxWeight
         return newbranch
 
     def getLength(self):
@@ -398,12 +398,12 @@ class Branch(object):
             return newBranches
 
 
-def decayBranches(branchList, sigcut=0.*fb):
+def decayBranches(branchList, sigcut=0.):
     """
     Decay all branches from branchList until all unstable intermediate states have decayed.
     
     :parameter branchList: list of Branch() objects containing the initial mothers
-    :parameter sigcut: minimum sigma*BR to be generated, by default sigcut = 0.
+    :parameter sigcut: minimum sigma*BR (in fb) to be generated, by default sigcut = 0.
                    (all branches are kept)
     :returns: list of branches (Branch objects)    
     """
@@ -412,7 +412,7 @@ def decayBranches(branchList, sigcut=0.*fb):
     stableBranches,unstableBranches = [],[]
     
     for br in branchList:
-        if br.maxWeight.asNumber(fb) < sigcut.asNumber(fb):
+        if br.maxWeight < sigcut:
             continue
         
         if br.decayDaughter():
@@ -424,7 +424,7 @@ def decayBranches(branchList, sigcut=0.*fb):
         # Store branches after adding one step cascade decay
         newBranchList = []
         for inbranch in unstableBranches:
-            if sigcut.asNumber() > 0. and inbranch.maxWeight.asNumber(fb) < sigcut.asNumber(fb):
+            if sigcut > 0. and inbranch.maxWeight < sigcut:
                 # Remove the branches above sigcut and with length > topmax
                 continue
 
@@ -438,8 +438,8 @@ def decayBranches(branchList, sigcut=0.*fb):
             if newBranches:
                 # New branches were generated, add them for next iteration
                 newBranchList += [br for br in newBranches 
-                                  if br.maxWeight.asNumber(fb) > sigcut.asNumber(fb)]
-            elif inbranch.maxWeight.asNumber(fb) > sigcut.asNumber(fb):
+                                  if br.maxWeight > sigcut]
+            elif inbranch.maxWeight > sigcut:
                 stableBranches.append(inbranch)
 
         # Use new unstable branches (if any) for next iteration step

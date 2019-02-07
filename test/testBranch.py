@@ -112,14 +112,14 @@ class BranchTest(unittest.TestCase):
     def testDecayBranches(self):
         
         b = Branch(info = '[[q]]', finalState = 'MET')
-        b.maxWeight = 2.0*fb
+        b.maxWeight = 2.0
         b.oddParticles = [g]
         
         dList = decayBranches([b])
         
         self.assertEqual(len(dList), 2)
-        self.assertEqual(dList[0].maxWeight, .6*fb)
-        self.assertEqual(dList[1].maxWeight, 1.4*fb)
+        self.assertEqual(dList[0].maxWeight, .6)
+        self.assertEqual(dList[1].maxWeight, 1.4)
         
         
 if __name__ == "__main__":
