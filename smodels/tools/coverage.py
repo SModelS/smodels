@@ -11,11 +11,11 @@
 
 from smodels.tools.physicsUnits import fb
 from smodels.tools.reweighting import addPromptAndDisplaced
-from smodels.theory.element import Element
+from smodels.theory.branch import Branch
 from smodels.theory.particle import MultiParticle, ParticleList
 from smodels.share.models.SMparticles import e,mu,ta,taC,eC,muC,W,WC,t,tC,q,c,g,pion,nu
 from smodels.theory import particle
-
+from smodels.theory.auxiliaryFunctions import index_bisect
 
 class Uncovered(object):
     """
@@ -248,50 +248,103 @@ class UncoveredList(object):
         :parameter el: element to be added
         """     
 
-        newGenEl = self.generalElement(el)
+        newGenEl = GeneralElement(el,self.particleGroups)
 
-        name = str(newGenEl).replace('~','') + '  (%s)'%(str( newGenEl.branches[0]._decayType) + ","+ str(newGenEl.branches[1]._decayType) )    
+        index = index_bisect(self.generalElements,newGenEl)
+        if index != len(self.generalElements) and self.generalElements[index] == newGenEl:
+            self.generalElements[index]._contributingElements.append(el)
+            self.generalElements[index].missingX += el.missingX
+        else:
+            self.generalElements.insert(index,newGenEl)
 
-        # Check if an element with the same generalized name has already been added
-        for genEl in self.generalElements:
-            if newGenEl.evenParticles == genEl.evenParticles:
-                if newGenEl._decayType == genEl._decayType:
-                    genEl._contributingElements.append(el)
-                    genEl.missingX += el.missingX
-                    return
-            
-        newGenEl._outputDescription = name           
-        newGenEl._contributingElements = [el]
+class GeneralElement(object):
+    """
+    This class represents a simplified (general) element which does
+    only holds information about its even particles and decay type.
+    The even particles are replaced/grouped by the particles defined in particleGroups.
+    """
 
-        self.generalElements.append(newGenEl)
-        
+    def __init__(self,el,particleGroups):
 
-    def generalElement(self, el):
-        """
-        Creates a new element with a generalized name according to the inclusive labels. 
-        Generalization is done by summing over charges:
-        :parameter instr: element as string
-
-        :returns: string of generalized element
-        """
-
-        newEl = Element()
-        newEl.branches[0]._decayType = el.branches[0]._decayType
-        newEl.branches[1]._decayType = el.branches[1]._decayType
-        newEl.missingX = el.missingX
+        self.branches = [Branch() for _ in el.branches]
+        self.branches[0]._decayType = el.branches[0]._decayType
+        self.branches[1]._decayType = el.branches[1]._decayType
+        self.missingX = el.missingX
 
         for ib,branch in enumerate(el.branches):
             newParticles = []
             for vertex in branch.evenParticles:
                 newVertex = vertex[:]
                 for ip,particle in enumerate(vertex):
-                    for particleList in self.particleGroups:
+                    for particleList in particleGroups:
                         if particleList.contains(particle):
                             newVertex[ip] = particleList
                 newParticles.append(ParticleList(newVertex))
-            newEl.branches[ib].evenParticles = newParticles
-            newEl.branches[ib].setInfo()
-        newEl.sortBranches()
+            self.branches[ib].evenParticles = newParticles
+            self.branches[ib].setInfo()
+        self.sortBranches()
+        self._decayType = [br._decayType for br in self.branches]
+        self._contributingElements = [el]
+        self._outputDescription = str(self)
 
-        return newEl 
+    def __cmp__(self,other):
+        """
+        Compares the element with other for any branch ordering.
+        The comparison is made based on branches.
+        OBS: The elements and the branches must be sorted!
+        :param other:  element to be compared (GeneralElement object)
+        :return: -1 if self < other, 0 if self == other, +1, if self > other.
+        """
+
+        if not isinstance(other,GeneralElement):
+            return -1
+
+        #Compare branches:
+        if self.branches != other.branches:
+            comp = (self.branches > other.branches)
+            if comp:
+                return 1
+            else:
+                return -1
+        #Compare decay type
+        if self._decayType != other._decayType:
+            comp = (self._decayType > other._decayType)
+            if comp:
+                return 1
+            else:
+                return -1
+
+        return 0
+
+    def __eq__(self,other):
+        return self.__cmp__(other)==0
+
+    def __lt__(self,other):
+        return self.__cmp__(other)<0
+
+    def __str__(self):
+        """
+        Create the element bracket notation string, e.g. [[[jet]],[[jet]],
+        including the decay type.
+
+        :returns: string representation of the element (in bracket notation)
+        """
+
+        elStr = "["+",".join([str(br) for br in self.branches])+"]"
+        elStr = elStr.replace(" ", "").replace("'", "")
+        name = elStr.replace('~','') + '  (%s)'%(','.join(self._decayType))
+        return name
+
+    def __repr__(self):
+
+        return self.__str__()
+
+    def sortBranches(self):
+        """
+        Sort branches. The smallest branch is the first one.
+        If branches are equal, sort accoding to decayType.
+        """
+
+        #Now sort branches
+        self.branches = sorted(self.branches, key = lambda br: (br,br._decayType))
 
