@@ -7,7 +7,7 @@
 
 import itertools
 from math import exp
-from smodels.tools.physicsUnits import MeV, GeV, m, mm, fm
+from smodels.tools.physicsUnits import MeV, m, mm, fm
 from smodels.experiment.databaseParticles import jetList, lList
     
 
@@ -26,7 +26,7 @@ def defaultEffReweight(element,minWeight=1e-10):
     :return: Reweight factor (float)
     """
 
-    elWidths = element.totalwidth
+    elWidths = [ [ x.asNumber(MeV) for x in L ] for L in element.totalwidth ]
     elFraction = 1.
     for branchWidths in elWidths:
         branchFraction = 1.
@@ -80,12 +80,12 @@ def addPromptAndDisplaced(branch):
         if isinstance(particle.totalwidth, list):
             width = min(particle.totalwidth)
         else: width = particle.totalwidth
-        if width == float('inf')*GeV:
+        if width == float('inf')*MeV:
             F_long, F_prompt, F_displaced = [0.,1.,0.]
-        elif width == 0.*GeV:
+        elif width == 0.*MeV:
             F_long, F_prompt, F_displaced = [1.,0.,0.]
         else:    
-            probs = calculateProbabilities(width)
+            probs = calculateProbabilities(width.asNumber(MeV))
             F_long, F_prompt, F_displaced = probs['F_long'],probs['F_prompt'],probs['F_displaced']
         # allow for combinations of decays and a long lived particle only if the last BSM particle is the long lived one
         if particle == branch.oddParticles[-1]: F.append([F_long])
@@ -133,12 +133,13 @@ def calculateProbabilities(width, l_inner = 1.*mm,
     :param l_outer: is the outer radius of the detector
     :param gb_inner: is the estimate for the kinematical factor gamma*beta for prompt decays.
     :param gb_outer: is the estimate for the kinematical factor gamma*beta for decays outside the detector.  
-    :param width: particle width for which probabilities should be calculated
+    :param width: particle width for which probabilities should be calculated (in MeV, but the unit stripped off)
     
     :return: Dictionary with the probabilities for the particle not to decay (in the detector), to decay promptly or displaced.
     """
     
-    hc = 197.327*MeV*fm  #hbar * c
+    # hc = 197.327*MeV*fm  #hbar * c
+    hc = 197.327*fm  # hbar * c / MeV, expecting the width to be in MeV
 
     F_long = exp(-width*l_outer/(gb_outer*hc))
     F_prompt = 1. - exp(-width*l_inner/(gb_inner*hc))
