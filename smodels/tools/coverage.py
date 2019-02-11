@@ -276,8 +276,6 @@ class UncoveredList(object):
         newEl = Element()
         newEl.branches[0]._decayType = el.branches[0]._decayType
         newEl.branches[1]._decayType = el.branches[1]._decayType
-        for ib,branch in enumerate(el.branches):
-            newEl.branches[ib].oddParticles = branch.oddParticles[:]
         newEl.missingX = el.missingX
 
         for ib,branch in enumerate(el.branches):
@@ -293,6 +291,8 @@ class UncoveredList(object):
             newEl.branches[ib].setInfo()
         
         newEl.sortBranches()
+        if newEl.branches[0] == newEl.branches[1]:
+            newEl.branches = sorted(newEl.branches, key = lambda br: br._decayType)
         newEl._decayTypes = [newEl.branches[0]._decayType, newEl.branches[1]._decayType]
         newEl._allEvenParticles = [newEl.branches[0].evenParticles, newEl.branches[1].evenParticles]
 
