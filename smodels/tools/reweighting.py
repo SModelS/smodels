@@ -120,8 +120,8 @@ def addPromptAndDisplaced(branch):
     return probabilities, branches
     
 
-def calculateProbabilities(width, l_inner = 1.*mm,
-                           gb_inner=1.3,l_outer=10.*m,gb_outer=1.43):
+def calculateProbabilities(width, l_inner = .001,
+                           gb_inner=1.3,l_outer=10.,gb_outer=1.43):
     """
     The fraction of prompt and displaced decays are defined as:
     
@@ -129,8 +129,8 @@ def calculateProbabilities(width, l_inner = 1.*mm,
     F_prompt = 1 - exp(-totaltotalwidth*l_inner/gb_inner)
     F_displaced = 1 - F_prompt - F_long
     
-    :param l_inner: is the inner radius of the detector
-    :param l_outer: is the outer radius of the detector
+    :param l_inner: is the inner radius of the detector, given in meters
+    :param l_outer: is the outer radius of the detector, given in meters
     :param gb_inner: is the estimate for the kinematical factor gamma*beta for prompt decays.
     :param gb_outer: is the estimate for the kinematical factor gamma*beta for decays outside the detector.  
     :param width: particle width for which probabilities should be calculated (in MeV, but the unit stripped off)
@@ -139,7 +139,7 @@ def calculateProbabilities(width, l_inner = 1.*mm,
     """
     
     # hc = 197.327*MeV*fm  #hbar * c
-    hc = 197.327*fm  # hbar * c / MeV, expecting the width to be in MeV
+    hc = 197.327*1e-15  # hbar * c * m / MeV, expecting the width to be in MeV, and lengths in m
 
     F_long = exp(-width*l_outer/(gb_outer*hc))
     F_prompt = 1. - exp(-width*l_inner/(gb_inner*hc))
