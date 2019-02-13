@@ -117,9 +117,6 @@ class Branch(object):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
-        #if not isinstance(other,(Branch,InclusiveBranch)):
-        #    return -1
-        
         if isinstance(other,InclusiveBranch):
             return -1*other.__cmp__(self)
         
@@ -187,8 +184,6 @@ class Branch(object):
         have the same topologies. The odd and even particles are combined.
         """
         
-        #if not isinstance(other,Branch):
-        #    raise TypeError("Can not add a Branch object to %s" %type(other))
         if self.getInfo() != other.getInfo():
             raise SModelSError("Can not add branches with distinct topologies")
         
@@ -230,8 +225,6 @@ class Branch(object):
         odd and even particles are combined. 
         """
         
-        #if not isinstance(other,Branch):
-        #    raise TypeError("Can not add a Branch object to %s" %type(other))
         if self.getInfo() != other.getInfo():
             raise SModelSError("Can not add branches with distinct topologies")
         
@@ -483,10 +476,6 @@ class InclusiveBranch(Branch):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
-
-        #if not isinstance(other,(Branch,InclusiveBranch)):
-        #    return -1
-        
         #If BSM particles are identical, avoid further checks                
         if self.oddParticles and other.oddParticles:
             #Compare final BSM state by Z2parity and quantum numbers:

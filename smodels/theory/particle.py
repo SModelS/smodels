@@ -134,9 +134,6 @@ class Particle(object):
         :return: -1 if particle < other, 1 if particle > other and 0 if particle == other
         """    
 
-        #if not isinstance(other,(MultiParticle,Particle)):
-        #    raise ValueError
-
         #First check if we have already compared to this object        
         if other.id in self._comp:
             return self._comp[other.id]
@@ -176,8 +173,6 @@ class Particle(object):
         both particles.
         """
 
-        #if not isinstance(other,(MultiParticle,Particle)):
-        #    raise TypeError("Can only add particle objects")
         if isinstance(other,MultiParticle):
             return other.__add__(self)
         elif self.contains(other):
@@ -509,8 +504,6 @@ class MultiParticle(Particle):
         both particles.
         """
 
-        #if not isinstance(other,(MultiParticle,Particle)):
-        #    raise TypeError("Can not add a Particle object to %s" %type(other))
         if other is self or self.contains(other): #Check if other is self or a subset of self
             return self
         #Check if self is a subset of other
@@ -596,8 +589,6 @@ class MultiParticle(Particle):
         :return: True/False
         """
 
-        #if not isinstance(particle,(Particle,MultiParticle)):
-        #    raise False
         if isinstance(particle,MultiParticle):
             checkParticles = particle.particles
         else:
@@ -703,8 +694,6 @@ class ParticleList(object):
         :return: -1 if self < other, 1 if self > other, 0 is self == other 
         """    
         
-        #if not isinstance(other,ParticleList):
-        #    raise ValueError
         #First check if we have already compared to this object
         if other.id in self._comp:
             return self._comp[other.id]
