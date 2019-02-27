@@ -67,14 +67,7 @@ def addPromptAndDisplaced(branch):
     :param branch: original branch
     :return: probabilities (depending on types of decay within branch), branches (with different labels depending on type of decay)
     """
-    
-    if not branch.evenParticles: # no decays happened
-        if branch.oddParticles[0].isMET(): branch._decayType = 'METonly'
-        else: branch._decayType = 'longlived'
-        probabilities = [1.]
-        branches = [branch]
-        return probabilities, branches 
-   
+      
     F = []
     for particle in branch.oddParticles:
         if isinstance(particle.totalwidth, list):
@@ -155,7 +148,11 @@ def labelPromptDisplaced(branch):
     :return: branches with correct labels  
     """
     promptBranch = branch.copy()
-    if branch.oddParticles[-1].isMET(): promptBranch._decayType = 'prompt'
+    if branch.oddParticles[-1].isMET():
+        if not branch.evenParticles:
+            promptBranch._decayType = 'METonly'
+        else: promptBranch._decayType = 'prompt'
+
     else: promptBranch._decayType = 'longlived'
     
     displacedBranch = branch.copy()       
