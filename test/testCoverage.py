@@ -86,11 +86,11 @@ class CoverageTest(unittest.TestCase):
         self.assertEqual(len(uncovered.displaced.generalElements), 1)
         self.assertEqual(len(uncovered.MET.generalElements), 2)
        
-        self.assertAlmostEqual(float(uncovered.longLived.generalElements[0]._contributingElements[0].weight.getMaxXsec()/fb), 10.)
-        self.assertAlmostEqual(float(uncovered.displaced.generalElements[0]._contributingElements[0].weight.getMaxXsec()/fb),
+        self.assertAlmostEqual(uncovered.longLived.generalElements[0]._contributingElements[0].weight.getMaxXsec().asNumber(fb), 10.)
+        self.assertAlmostEqual(float(uncovered.displaced.generalElements[0]._contributingElements[0].weight.getMaxXsec().asNumber(fb)),
                                9.96109334317542,places=4)
-        self.assertAlmostEqual(float(uncovered.MET.generalElements[0]._contributingElements[0].weight.getMaxXsec()/fb), 10.)
-        self.assertAlmostEqual(float(uncovered.MET.generalElements[1]._contributingElements[0].weight.getMaxXsec()/fb),
+        self.assertAlmostEqual(uncovered.MET.generalElements[0]._contributingElements[0].weight.getMaxXsec().asNumber(fb), 10.)
+        self.assertAlmostEqual(float(uncovered.MET.generalElements[1]._contributingElements[0].weight.getMaxXsec().asNumber(fb)),
                                 0.03890665682,places=6)
 
         
