@@ -39,14 +39,14 @@ class ReweightingTest(unittest.TestCase):
         branch1 = Branch()
         branch1.oddParticles = [n1]
         probabilities1, branches1 = addPromptAndDisplaced(branch1)
-        self.assertEqual(len(probabilities1), 1)
+        self.assertEqual(len(probabilities1), 2)
         self.assertEqual(probabilities1[0], 1.)
         self.assertEqual(branches1[0]._decayType, 'METonly')
         
         branch2 = Branch()
         branch2.oddParticles = [gluino]
         probabilities2, branches2 = addPromptAndDisplaced(branch2)
-        self.assertEqual(len(probabilities2), 1)
+        self.assertEqual(len(probabilities2), 2)
         self.assertAlmostEqual(probabilities2[0], 1.)
         self.assertEqual(branches2[0]._decayType, 'longlived')
         
