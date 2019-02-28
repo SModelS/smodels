@@ -7,7 +7,7 @@
 
 import itertools
 from math import exp
-from smodels.tools.physicsUnits import MeV, GeV, m, mm, fm
+from smodels.tools.physicsUnits import GeV
 from smodels.experiment.databaseParticles import jetList, lList
     
 
@@ -26,7 +26,7 @@ def defaultEffReweight(element,minWeight=1e-10):
     :return: Reweight factor (float)
     """
 
-    elWidths = element.totalwidth
+    elWidths = [ [ x.asNumber(GeV) for x in L ] for L in element.totalwidth ]
     elFraction = 1.
     for branchWidths in elWidths:
         branchFraction = 1.
@@ -78,7 +78,7 @@ def addPromptAndDisplaced(branch):
         elif width == 0.*GeV:
             F_long, F_prompt, F_displaced = [1.,0.,0.]
         else:    
-            probs = calculateProbabilities(width)
+            probs = calculateProbabilities(width.asNumber(GeV))
             F_long, F_prompt, F_displaced = probs['F_long'],probs['F_prompt'],probs['F_displaced']
         # allow for combinations of decays and a long lived particle only if the last BSM particle is the long lived one
         if particle == branch.oddParticles[-1]: F.append([F_long])
@@ -113,8 +113,8 @@ def addPromptAndDisplaced(branch):
     return probabilities, branches
     
 
-def calculateProbabilities(width, l_inner = 1.*mm,
-                           gb_inner=1.3,l_outer=10.*m,gb_outer=1.43):
+def calculateProbabilities(width, l_inner = .001,
+                           gb_inner=1.3,l_outer=10.,gb_outer=1.43):
     """
     The fraction of prompt and displaced decays are defined as:
     
@@ -122,16 +122,17 @@ def calculateProbabilities(width, l_inner = 1.*mm,
     F_prompt = 1 - exp(-totaltotalwidth*l_inner/gb_inner)
     F_displaced = 1 - F_prompt - F_long
     
-    :param l_inner: is the inner radius of the detector
-    :param l_outer: is the outer radius of the detector
+    :param l_inner: is the inner radius of the detector, given in meters
+    :param l_outer: is the outer radius of the detector, given in meters
     :param gb_inner: is the estimate for the kinematical factor gamma*beta for prompt decays.
     :param gb_outer: is the estimate for the kinematical factor gamma*beta for decays outside the detector.  
-    :param width: particle width for which probabilities should be calculated
+    :param width: particle width for which probabilities should be calculated (in GeV)
     
     :return: Dictionary with the probabilities for the particle not to decay (in the detector), to decay promptly or displaced.
     """
     
-    hc = 197.327*MeV*fm  #hbar * c
+    # hc = 197.327*GeV*fm  #hbar * c
+    hc = 197.327*1e-18  # hbar * c * m / GeV, expecting the width to be in GeV, and lengths in m
 
     F_long = exp(-width*l_outer/(gb_outer*hc))
     F_prompt = 1. - exp(-width*l_inner/(gb_inner*hc))

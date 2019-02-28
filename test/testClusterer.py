@@ -28,6 +28,7 @@ from smodels.tools.physicsUnits import GeV, TeV, fb
 from databaseLoader import database
 from smodels.theory.clusterTools import clusterElements
 from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.theory.particle import ParticleList
 import copy
 
 
@@ -76,8 +77,10 @@ class ClustererTest(unittest.TestCase):
 
 
         ## make a second element with a slightly different gluino mass
-        el2=copy.deepcopy(el1)
+        el2= el1.copy()
         el2.txname = txname
+        el2.branches[0].oddParticles = [ptc.copy() for ptc in el1.branches[0].oddParticles]
+        el2.branches[1].oddParticles = [ptc.copy() for ptc in el1.branches[1].oddParticles]        
         el2.branches[0].oddParticles[0].__setattr__("mass", 725.*GeV) 
         el2.branches[1].oddParticles[0].__setattr__("mass", 725.*GeV)
 
@@ -230,7 +233,7 @@ class ClustererTest(unittest.TestCase):
         w1.xSections[0].value = 10.*fb
 
         b1 = Branch()
-        b1.evenParticles = [[u,u]]
+        b1.evenParticles = [ParticleList([u,u])]
         b1.oddParticles = [gluino, n1]
         b2 = b1.copy()
         el1 = Element()
@@ -240,8 +243,10 @@ class ClustererTest(unittest.TestCase):
 
 
         ## make a second element with a slightly different gluino width
-        el2=copy.deepcopy(el1)
+        el2 = el1.copy()
         el2.txname = txname
+        el2.branches[0].oddParticles = [ptc.copy() for ptc in el1.branches[0].oddParticles]
+        el2.branches[1].oddParticles = [ptc.copy() for ptc in el1.branches[1].oddParticles]
 
         el2.branches[0].oddParticles[0].__setattr__("mass", 675.*GeV) 
         el2.branches[1].oddParticles[0].__setattr__("mass", 675.*GeV)

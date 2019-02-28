@@ -13,9 +13,9 @@ from smodels.tools.smodelsLogging import logger
 
 class ExternalPythonTool(object):
     """
-    An instance of this class represents the installation of unum.
-    As it is python-only, we need this only for installation,
-    not for running (contrary to nllfast or pythia).    
+    An instance of this class represents the installation of a python package.
+    As it is python-only, we need this only for installation, not for running
+    (contrary to nllfast or pythia).    
     
     """
     def __init__(self, importname, optional=False ):
@@ -36,7 +36,26 @@ class ExternalPythonTool(object):
                 logger.error("could not find %s: %s" % (importname, e))
 
     def compile ( self ):
-        pass
+        try:
+            import pip
+            pip.main(["install","--user",self.name] )
+            return
+        except (ImportError,AttributeError):
+            pass
+        try:
+            import pip._internal
+            pip._internal.main(["install","--user",self.name] )
+            return
+        except (ImportError,AttributeError):
+            pass
+        try:
+            from setuptools.command import easy_install
+            easy_install.main(["-U","--user",self.name])
+            return
+        except (ImportError,AttributeError):
+            pass
+
+
 
     def pathOfExecutable (self):
         """

@@ -2,5 +2,5 @@
 import sys, os
 try:
     import smodels ## already works; nothing needs to be done
-except:
+except ImportError:
     sys.path.append ( os.path.join ( *([".."]*4) ) )

@@ -40,11 +40,9 @@ class InclusiveObjectsTest(unittest.TestCase):
     def testInclusiveBranch(self):
          
         x = branch.Branch(info='[[e+],[e-,mu+]]',finalState = 'MET')
-        y = 1e10
         z = branch.InclusiveBranch()
          
         self.assertTrue(x == z)
-        self.assertFalse(y == z)
         self.assertTrue(str(z) == '[*]')
          
     def testInclusiveElement(self):

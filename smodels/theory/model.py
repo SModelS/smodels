@@ -5,11 +5,11 @@
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 """
 
-import pyslha,copy
+import pyslha
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
 from smodels.theory import lheReader, crossSection
-from smodels.theory.particle import MultiParticle
+from smodels.theory.particle import Particle,MultiParticle,ParticleList
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 class Model(object):
@@ -28,7 +28,7 @@ class Model(object):
         
         
         self.inputFile = None
-        self.BSMparticles = [copy.deepcopy(particle) for particle in BSMparticles]
+        self.BSMparticles = [particle.copy() for particle in BSMparticles]
         self.SMparticles = SMparticles[:]
 
         #Check if for each PDG there is a unique particle object defined  
@@ -167,7 +167,7 @@ class Model(object):
             massDict = res.blocks['MASS'] 
             decaysDict = res.decays
             self.xsections = crossSection.getXsecFromSLHAFile(self.inputFile)                        
-        except:
+        except (IOError,AttributeError,KeyError):
             massDict,decaysDict = lheReader.getDictionariesFrom(self.inputFile)
             self.xsections = crossSection.getXsecFromLHEFile(self.inputFile)
             logger.info("Using LHE input. All unstable particles will be assumed to have prompt decays.")
@@ -202,8 +202,6 @@ class Model(object):
                 if not pid in oddPDGs:
                     logger.debug("Cross-section for %s includes even particles and will be ignored" %str(xsec.pid))
                     self.xsections.delete(xsec)
-        
-
 
         for particle in self.BSMparticles:
             if isinstance(particle,MultiParticle):
@@ -270,7 +268,7 @@ class Model(object):
                     
                     
                 #Convert PDGs to particle objects:
-                newDecay.daughters = []
+                daughters = []
                 for pdg in newDecay.ids:
                     daughter = self.getParticlesWith(pdg=pdg)
                     if not daughter:
@@ -279,13 +277,20 @@ class Model(object):
                         raise SModelSError("Multiple particles defined with PDG = %i. PDG ids must be unique." %pdg)
                     else:
                         daughter = daughter[0]
-                    newDecay.daughters.append(daughter)
+                    daughters.append(daughter)
+                oddParticles = [p for p in daughters if p.Z2parity == -1]
+                evenParticles = ParticleList([p for p in daughters if p.Z2parity == 1])
+                newDecay.oddParticles = oddParticles
+                newDecay.evenParticles = evenParticles
                 particle.decays.append(newDecay)
-                
-        #Reset particle equality tracking:
-        for p in self.SMparticles+self.BSMparticles:
-            equals = [id(p)]
+
+        #Reset particle equality from all particles:
+        for p in Particle.getinstances():
+            p._comp = {p.id : 0}
             if isinstance(p,MultiParticle):
-                equals += [id(ptc) for ptc in p.particles]            
-            p._equals = set(equals)
-            p._differs = set([])
+                for ptc in p.particles:
+                    p._comp[ptc.id] = 0
+
+        #Reset particle equality from all particle lists:
+        for pL in ParticleList.getinstances():
+            pL._comp = {pL.id : 0}

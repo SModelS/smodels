@@ -19,7 +19,7 @@ class ReweightingTest(unittest.TestCase):
 
         gluino = mssm.gluino.copy()
         gluino.totalwidth = 1.*10**(-30)*GeV
-        prob = calculateProbabilities(gluino.totalwidth)
+        prob = calculateProbabilities(gluino.totalwidth.asNumber(GeV))
         F_long, F_prompt, F_displaced = prob['F_long'],prob['F_prompt'],prob['F_displaced']
         self.assertAlmostEqual(F_long, 1.)
         self.assertEqual(F_prompt, 0.)

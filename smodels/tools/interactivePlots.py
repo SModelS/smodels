@@ -70,9 +70,10 @@ class DataHolder(object):
         try:
             with open(self.parameterFile, 'rb') as fParameters: ## imports parameter file
                 parameters = imp.load_module("parameters",fParameters,self.parameterFile,('.py', 'rb', imp.PY_SOURCE))
-        except:
-            logger.error("Error loading parameters file %s" %self.parameterFile)
-            return False
+        # except Exception as e:
+        except (IOError,ValueError,ImportError,SyntaxError) as e:
+            logger.error("Error loading parameters file %s: %s" % (self.parameterFile,e) )
+            raise SModelSError()
          
         if not hasattr(parameters, 'slha_hover_information'):
             logger.debug("slha_hover_information dictionary was not found in %s. SLHA data will not be included in info box." %parFile)
@@ -175,15 +176,15 @@ class DataHolder(object):
             self.data_dict = helpers.get_long_cascades(self.data_dict,smodelsDict)
 
 
-             #Fill with SLHA data:
+        #Fill with SLHA data:
         self.data_dict =  helpers.get_slha_hover_info(self.data_dict,slhaData,
                                                                           self.slha_hover_information)
         self.data_dict = helpers.get_ctau(self.data_dict,slhaData,
                                                               self.ctau_hover_information)             
         self.data_dict = helpers.get_BR(self.data_dict,slhaData,self.BR_hover_information,
                                                             self.BR_get_top)     
-             #Fill with the x and y data:
-             #print(list(self.variable_x.keys())[0])
+        #Fill with the x and y data:
+        #print(list(self.variable_x.keys())[0])
         if list(self.variable_x.keys())[0] not in self.slha_hover_information.keys():
             self.data_dict = helpers.get_variable(self.data_dict,slhaData,self.BR_hover_information,
                                                        self.variable_x) 
@@ -306,12 +307,12 @@ def makePlots(smodelsFolder,slhaFolder,outputFolder,
 
     try:
         import plotly
-    except ImportError as e:
+    except ImportError:
         raise SModelSError("Plotly is not installed. To use this tool, please install plotly")
 
     try:
         import pandas
-    except ImportError as e:
+    except ImportError:
         raise SModelSError("Pandas is not installed. To use this tool, please install pandas")
 
     setLogLevel(verbosity)

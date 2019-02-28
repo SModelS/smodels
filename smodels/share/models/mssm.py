@@ -73,8 +73,6 @@ rOddC = [p.chargeConjugate() for p in rOdd]  #Define the charge conjugates
 
 higgs = [H,A0,H0]
 higgsC = [p.chargeConjugate() for p in higgs]
-from smodels.share.models.SMparticles import SMList
-rEven = SMList + higgs + higgsC
 
 #Generic BSM particles:
 

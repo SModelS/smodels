@@ -258,7 +258,7 @@ class Database(object):
         Are we running within a notebook? Has an effect on the
         progressbar we wish to use.
         """
-        ret = False
+
         try:
             cfg = get_ipython().config 
             if 'IPKernelApp' in cfg.keys():
@@ -289,8 +289,8 @@ class Database(object):
 
         import requests
         try:
-            r = requests.get( path )
-        except Exception as e:
+            r = requests.get( path, timeout=5 )
+        except requests.exceptions.RequestException as e:
             logger.error ( "Exception when trying to fetch database: %s" % e )
             logger.error ( "Consider supplying a different database path in the ini file (possibly a local one)" )
             sys.exit()
@@ -307,7 +307,7 @@ class Database(object):
         size = r.json()["size"]
         cDir = cacheDirectory ( create=True )
         t0=time.time()
-        r2=requests.get ( r.json()["url"], stream=True )
+        r2=requests.get ( r.json()["url"], stream=True, timeout=5 )
         filename= os.path.join ( cDir, r2.url.split("/")[-1] )
         logger.info ( "need to fetch %s and store in %s. size is %s." % \
                       ( r.json()["url"], filename, sizeof_fmt ( size ) ) )
@@ -338,7 +338,7 @@ class Database(object):
 
 
     def fetchFromServer ( self, path, discard_zeroes ):
-        import requests, time, json
+        import requests, json
         self.source = "http"
         if "ftp://" in path:
             self.source = "ftp"
@@ -355,8 +355,8 @@ class Database(object):
             def __init__ ( self ): self.status_code = -1
         r=_()
         try:
-            r = requests.get( path )
-        except Exception:
+            r = requests.get( path, timeout=2 )
+        except requests.exceptions.RequestException as e:
             pass
         if r.status_code != 200:
             logger.warning ( "Error %d: could not fetch %s from server." % \
@@ -366,8 +366,7 @@ class Database(object):
                 sys.exit()
             logger.warning ( "I do however have a local copy of the file. I work with that." )
             self.force_load = "pcl"
-            # next step: check the timestamps
-            return ( cDir, os.path.basename ( filename ) )
+            return ( cDir, filename )
 
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!

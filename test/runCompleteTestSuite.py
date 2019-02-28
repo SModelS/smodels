@@ -14,6 +14,7 @@ import sys
 sys.path.insert(0,"../")
 from smodels.tools.colors import colors
 colors.on = True
+import IPython
 
 v=sys.version_info
 if v[0] > 2 or ( v[0]==2 and v[1] > 6 ):
@@ -30,7 +31,7 @@ setLogLevel ( "error" )
 def run():
     unittest.TextTestRunner().run( unittest.TestLoader().discover("./") )
 
-def verbose_run():
+def verbose_run( flter ):
     alltests = unittest.TestLoader().discover("./") 
     n_tests, n_failed = 0, 0
     for series in alltests:
@@ -38,6 +39,8 @@ def verbose_run():
             if type(test)!=unittest.suite.TestSuite:
                 print ( "Error: could not import %s" % ( test ) )
             for t in test:
+                if flter and (not flter in str(t)):
+                    continue
                 n_tests += 1
                 print ( "[#%3d] %s ... " % ( n_tests, t.id() ), end="" )
                 sys.stdout.flush()
@@ -45,8 +48,8 @@ def verbose_run():
                     a=t.debug()
                 except Exception as e:
                     n_failed += 1
-                    print ( "%s FAILED: %s%s" % \
-                            ( colors.error, str(e), colors.reset ) )
+                    print ( "%s FAILED: %s,%s%s" % \
+                            ( colors.error, type(e), str(e), colors.reset ) )
                     continue
                 print ( "%sok%s" % ( colors.info, colors.reset ) ) 
 
@@ -80,12 +83,13 @@ if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser('runs the complete test suite')
     ap.add_argument('-v','--verbose', help='run verbosely',action='store_true')
+    ap.add_argument('-f','--filter', help='run only tests that have <FILTER> in name. Works only with verbose and not parallel. case sensitive.',type=str,default=None)
     ap.add_argument('-p','--parallel', help='run in parallel',action='store_true')
     args = ap.parse_args()
     if args.parallel:
         parallel_run ( args.verbose )
         sys.exit()
     if args.verbose:
-        verbose_run()
+        verbose_run( args.filter )
         sys.exit()
     run()

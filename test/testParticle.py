@@ -13,21 +13,27 @@ from smodels.tools.physicsUnits import GeV
 from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.experiment.databaseParticles import finalStates
 from smodels.theory import model
+from smodels.experiment.databaseParticles import finalStates
 import numpy as np
 
-p1 = Particle(Z2parity=-1, label='p1', pdg=None, mass=100.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p2 = Particle(Z2parity=-1, label='p1', pdg=1000021, mass=None, eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p3 = Particle(Z2parity=-1, label='p3', pdg=1, mass=110.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p4 = Particle(Z2parity=-1, label='p4', pdg=None, mass=110.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p4a = Particle(Z2parity=-1, label='p4~', pdg=None, mass=110.*GeV, eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p5 = Particle(Z2parity=-1, label='p5+', pdg=2, mass=110.*GeV, eCharge=1., colordim=None, spin=None, width=None, branches=None)
-p5m = Particle(Z2parity=-1, label='p5-', pdg=-2, mass=110.*GeV, eCharge=-1., colordim=None, spin=None, width=None, branches=None)
+p1 = Particle(Z2parity=-1, label='p1', pdg=None, mass=100.*GeV, 
+              eCharge=None, colordim=None, spin=None, width=None, branches=None)
+p2 = Particle(Z2parity=-1, label='p1', pdg=1000021, mass=50*GeV, 
+              eCharge=None, colordim=None, spin=None, width=None, branches=None)
+p3 = Particle(Z2parity=-1, label='p3', pdg=1, mass=110.*GeV, 
+              eCharge=None, colordim=None, spin=None, width=None, branches=None)
+p4 = Particle(Z2parity=-1, label='p4', pdg=None, mass=110.*GeV, 
+              eCharge=None, colordim=None, spin=None, width=None, branches=None)
+p4a = Particle(Z2parity=-1, label='p4~', pdg=None, mass=110.*GeV, 
+               eCharge=None, colordim=None, spin=None, width=None, branches=None)
+p5 = Particle(Z2parity=-1, label='p5+', pdg=2, mass=110.*GeV, 
+              eCharge=1., colordim=None, spin=None, width=None, branches=None)
+p5m = Particle(Z2parity=-1, label='p5-', pdg=-2, mass=110.*GeV, 
+               eCharge=-1., colordim=None, spin=None, width=None, branches=None)
 
 p1c = p1.copy()
 p1c.pdg = 10
-
 
 
 class ParticleTest(unittest.TestCase):
@@ -45,7 +51,10 @@ class ParticleTest(unittest.TestCase):
             if any(p is pB for pB in allParticles):
                 continue
             allParticles.append(p)
-        allParticles = sorted(allParticles, key = lambda p: p.label)
+        allParticles = sorted(allParticles, key = lambda p: p.id)
+        allIDs = [p.id for p in allParticles]
+        for pid in allIDs:
+            self.assertTrue(allIDs.count(pid) == 1)
         compMatrixA = np.zeros((len(allParticles),len(allParticles)))
         compMatrixDefault = np.zeros((len(allParticles),len(allParticles)))
         for i,p1 in enumerate(allParticles):
@@ -53,7 +62,7 @@ class ParticleTest(unittest.TestCase):
                 compMatrixDefault[i,j] = p1.cmpProperties(p2)
                 compMatrixA[i,j] = p1.__cmp__(p2)
 
-        self.assertTrue(np.array_equal(abs(compMatrixDefault),abs(compMatrixA))) #Check if comparison is correct
+        self.assertTrue(np.array_equal(compMatrixDefault,compMatrixA)) #Check if comparison is correct
 
         compMatrixB = np.zeros((len(allParticles),len(allParticles)))
         for i,p1 in enumerate(allParticles):
@@ -75,7 +84,7 @@ class ParticleTest(unittest.TestCase):
         self.assertEqual( l1.label, 'plist')
         self.assertNotEqual( l1 , lList) 
         self.assertTrue(l1 == p1)
-        self.assertTrue(l1.pdg == [None,1000021])
+        self.assertTrue(l1.pdg == [None,1000021] or l1.pdg == [1000021,None])
         
     def testChargeConjugation(self):
         p5cc = p5.chargeConjugate()
@@ -104,20 +113,7 @@ class ParticleTest(unittest.TestCase):
         self.assertTrue(anything == anyOdd)
         self.assertFalse(anyOdd == anyEven)
         self.assertFalse(anyEven == anyOdd)
-        
-        
-    def testParticleStatic(self):
-        ptc = Particle(label = 'p1', mass = 100.*GeV)
-        self.assertEqual(ptc.mass,100.*GeV)
-        #Change particle mass:
-        ptc.mass = 200.*GeV
-        self.assertEqual(ptc.mass,200.*GeV)
-        #Set particle as static:
-        ptc._static = True
-        ptc.mass = 300.*GeV #Particle mass should not change!
-        self.assertEqual(ptc.mass,200.*GeV)
-         
-         
+
     def testInStr(self):
         instring="[[['t+'],['W-']],[['t+'],['W-']]]+[[['t-'],['W+']],[['t-'],['W+']]]+[[['t+'],['W-']],[['t-'],['W+']]]"        
         out= elementsInStr(instring)

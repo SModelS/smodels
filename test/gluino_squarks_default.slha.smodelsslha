@@ -1,6 +1,6 @@
 BLOCK SModelS_Settings
- 0 v2.0.0rc5                 #SModelS version
- 1 unittest200rc5            #database version
+ 0 v2.0.0rc6                 #SModelS version
+ 1 unittest200rc6            #database version
  2 0.2                       #maximum condition violation
  3 1                         #compression (0 off, 1 on)
  4 5.0                       #minimum mass gap for mass compression [GeV]
@@ -22,12 +22,12 @@ BLOCK SModelS_Missing_Topos #sqrts[TeV] weight[fb] description
  0 13  1.482E+02 [[[jet],[W]],[[jet,jet],[W]]]  (prompt,prompt)
  1 13  1.446E+02 [[[W]],[[W]]]  (prompt,prompt)
  2 13  1.440E+02 [[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)
- 3 13  1.047E+02 [[[b,t],[W]],[[jet,jet],[W]]]  (prompt,prompt)
+ 3 13  1.047E+02 [[[jet,jet],[W]],[[b,t],[W]]]  (prompt,prompt)
  4 13  8.728E+01 [[[jet]],[[jet,jet],[W]]]  (prompt,prompt)
  5 13  8.654E+01 [[[jet,jet],[higgs]],[[jet,jet],[W]]]  (prompt,prompt)
  6 13  7.520E+01 [[[jet],[W]],[[b,t],[W]]]  (prompt,prompt)
- 7 13  7.309E+01 [[[b,t],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)
- 8 13  7.309E+01 [[[jet,jet],[W]],[[jet],[b,t],[W]]]  (prompt,prompt)
+ 7 13  7.309E+01 [[[jet,jet],[W]],[[jet],[b,t],[W]]]  (prompt,prompt)
+ 8 13  7.309E+01 [[[b,t],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)
  9 13  6.466E+01 [[[jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)
 
 BLOCK SModelS_Outside_Grid #sqrts[TeV] weight[fb] description
@@ -36,7 +36,7 @@ BLOCK SModelS_Outside_Grid #sqrts[TeV] weight[fb] description
  2 13  3.762E+00 [[[b],[W]],[[b],[W]]]  (prompt,prompt)
  3 13  1.532E+00 [[[jet]],[[t,t]]]  (prompt,prompt)
  4 13  9.944E-01 [[[jet]],[[b,b]]]  (prompt,prompt)
- 5 13  6.802E-01 [[[b,b]],[[jet,jet]]]  (prompt,prompt)
+ 5 13  6.802E-01 [[[jet,jet]],[[b,b]]]  (prompt,prompt)
 
 BLOCK SModelS_Long_Lived #sqrts[TeV] weight[fb] description
 
@@ -46,10 +46,10 @@ BLOCK SModelS_MET #sqrts[TeV] weight[fb] description
  0 13  1.482E+02 [[[jet],[W]],[[jet,jet],[W]]]  (prompt,prompt)
  1 13  1.446E+02 [[[W]],[[W]]]  (prompt,prompt)
  2 13  1.440E+02 [[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)
- 3 13  1.047E+02 [[[b,t],[W]],[[jet,jet],[W]]]  (prompt,prompt)
+ 3 13  1.047E+02 [[[jet,jet],[W]],[[b,t],[W]]]  (prompt,prompt)
  4 13  8.728E+01 [[[jet]],[[jet,jet],[W]]]  (prompt,prompt)
  5 13  8.654E+01 [[[jet,jet],[higgs]],[[jet,jet],[W]]]  (prompt,prompt)
  6 13  7.520E+01 [[[jet],[W]],[[b,t],[W]]]  (prompt,prompt)
- 7 13  7.309E+01 [[[b,t],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)
- 8 13  7.309E+01 [[[jet,jet],[W]],[[jet],[b,t],[W]]]  (prompt,prompt)
+ 7 13  7.309E+01 [[[jet,jet],[W]],[[jet],[b,t],[W]]]  (prompt,prompt)
+ 8 13  7.309E+01 [[[b,t],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)
  9 13  6.466E+01 [[[jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)

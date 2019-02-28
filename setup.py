@@ -10,7 +10,7 @@
 
 import os
 import sys
-from setuptools import setup, Extension
+from setuptools import setup
 from setuptools.command.install import install
 sys.path.insert ( 0, "./" )
 from smodels.installation import version, authors, requirements, resolve_dependencies, fixpermissions
@@ -27,7 +27,7 @@ class OverrideInstall(install):
             import getpass
             if getpass.getuser() == "root":
                 install_as_user = False
-        except Exception as e:
+        except ImportError:
             pass
         enableStupidMacFix=False
         if enableStupidMacFix:
@@ -36,7 +36,7 @@ class OverrideInstall(install):
                 # setup.py doesnt resolve the requirements!
                 try:
                     self.do_egg_install()
-                except Exception as e:
+                except NameError:
                     pass
         # so the installation does not break! 
         # here we start with doing our overriding and private magic ..
@@ -70,9 +70,9 @@ def listDirectory (dirname):
         dirname = dirname[:-1]
     files = os.listdir (dirname)
     ret = []
-    for file in files:
-        fullname = dirname + "/" + file
-        extension = os.path.splitext ( file )[1]
+    for filename in files:
+        fullname = dirname + "/" + filename
+        extension = os.path.splitext ( filename )[1]
         if os.path.isdir ( fullname ) or \
                 extension in [ ".out", ".tgz", ".1" ] or \
                 file in [ "Makefile", "README" ]:
@@ -103,7 +103,7 @@ def compile():
     Compile external tools by calling make
 
     """
-    import sys
+
     if len(sys.argv) < 2:
         return
     needs_build = False

@@ -35,13 +35,19 @@ class RunSModelSTest(unittest.TestCase):
             logger.error("Number of output file(%d) differ from number of input files(%d)" %(nout, nin))
         self.assertEqual(nout,nin)
       
-    def timeoutRun(self):
-        filename = "./testFiles/slha/complicated.slha"
-        runMain(filename, timeout=1, suppressStdout=True,
-                             development=True, inifile = "timeout.ini" )
-      
     def testTimeout(self):
-        self.assertRaises(NoTime, self.timeoutRun)
+        try:
+            filename = "./testFiles/slha/complicated.slha"
+            t0=time.time()
+            runMain(filename, timeout=1, suppressStdout=True,
+                                 development=True, inifile = "timeout.ini" )
+            print ( "should never get here. time spent:%.1fs " % ( time.time()-t0 ) )
+            self.assertTrue ( False )
+        except NoTime:
+            self.assertTrue  ( True )
+        except Exception as e:
+            print ( "wrong exception %s %s" % ( type(e), e ) )
+            self.assertTrue ( False )
  
     def removeOutputs( self, f ):
         """ remove cruft outputfiles """
@@ -127,13 +133,16 @@ class RunSModelSTest(unittest.TestCase):
         self.cleanUp()
         runMain(filename, timeout=1, suppressStdout=True,
                                    inifile= "timeout.ini" )
+        """
         try:
             ## trying to sync!!
             import ctypes
             libc = ctypes.CDLL("libc.so.6")
             libc.sync()
         except(OSError,AttributeError,ImportError) as e:
-            pass
+            print ( "This shouldnt throw %s" % e )
+            # pass
+        """
         time.sleep(.1)
         for f in os.listdir("."):
             if ".crash" in f:

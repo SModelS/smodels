@@ -10,11 +10,9 @@
 from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
-from smodels.tools.physicsUnits import fb
-from smodels.theory.particle import MultiParticle, Particle
+from smodels.theory.particle import MultiParticle,ParticleList
 from smodels.tools.inclusiveObjects import InclusiveValue,InclusiveList
 from smodels.experiment.databaseParticles import finalStates,anyOdd
-import itertools
 
 
 
@@ -73,7 +71,8 @@ class Branch(object):
                             raise SModelSError("Ambiguos defintion of label %s in finalStates" %smParticle[0].label)
                         else:
                             ptcs.append(smParticle[0])
-                    self.evenParticles.append(ptcs)
+                    vertexParticles = ParticleList(ptcs)
+                    self.evenParticles.append(vertexParticles)
 
             self.vertnumb = len(self.evenParticles)
             self.vertparts = [len(v) for v in self.evenParticles]
@@ -118,18 +117,14 @@ class Branch(object):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
-
-        if not isinstance(other,(Branch,InclusiveBranch)):
-            return -1
-        
-        elif isinstance(other,InclusiveBranch):
+        if isinstance(other,InclusiveBranch):
             return -1*other.__cmp__(self)
         
         if self.vertnumb != other.vertnumb:
             comp = self.vertnumb > other.vertnumb
             if comp: return 1
             else: return -1
-        elif not self.vertparts == other.vertparts:
+        elif self.vertparts != other.vertparts:
             comp = self.vertparts > other.vertparts
             if comp: return 1
             else: return -1
@@ -143,18 +138,9 @@ class Branch(object):
                 return -1
             
         #Compare even final states irrespective of ordering:
-        for iv,particlesA in enumerate(self.evenParticles):
-            particlesB = other.evenParticles[iv]
-            equalVertex = False
-            for pListA in itertools.permutations(particlesA):
-                pListA = list(pListA)
-                if pListA == particlesB:
-                    equalVertex = True
-                    break
-            if not equalVertex:
-                particlesA = sorted(particlesA)
-                particlesB = sorted(particlesB)
-                comp = (particlesA > particlesB)
+        for iv,vertex in enumerate(self.evenParticles):            
+            if vertex != other.evenParticles[iv]:
+                comp = vertex > other.evenParticles[iv]
                 if comp:
                     return 1
                 else:
@@ -173,30 +159,32 @@ class Branch(object):
     def __ne__( self, b2 ):
         return not self.__cmp__(b2) == 0
 
-    def __getattr__(self, name):
+    def __getattr__(self, attr):
+        """
+        If the attribute has not been defined for the element
+        try to fetch it from its branches.
+        :param attr: Attribute name
+
+        :return: Attribute value
+        """
 
         #If calling another special method, return default (required for pickling)
-        if name.startswith('__') and name.endswith('__'):
-            return object.__getattr__(name)
+        if attr.startswith('__') and attr.endswith('__'):
+            return object.__getattr__(attr)
 
         try:
-            return object.__getattr__(self, name)
+            val = [getattr(ptc,attr) for ptc in self.oddParticles]
+            return val
         except AttributeError:
-            try:
-                val = [getattr(ptc,name) for ptc in self.oddParticles]
-                return val
-            except:
-                raise AttributeError("Element nor branch has attribute %s" %name)
-        
+            raise AttributeError("Element nor branch has attribute %s" %attr)
+
     def __add__(self,other):
         """
         Adds two branches. Should only be used if the branches
         have the same topologies. The odd and even particles are combined.
         """
         
-        if not isinstance(other,Branch):
-            raise TypeError("Can not add a Branch object to %s" %type(other))
-        elif self.getInfo() != other.getInfo():
+        if self.getInfo() != other.getInfo():
             raise SModelSError("Can not add branches with distinct topologies")
         
         newBranch = self.__class__()
@@ -208,11 +196,14 @@ class Branch(object):
 
         #Combine even particles (if they are the same nothing changes)
         for iv,vertex in enumerate(self.evenParticles):
-            newBranch.evenParticles.append([])
+            vertexParticles = []
             for iptc,ptc in enumerate(vertex):
-                newBranch.evenParticles[iv].append(ptc + other.evenParticles[iv][iptc])
-                if newBranch.evenParticles[iv][iptc].label == 'multiple':
-                    newBranch.evenParticles[iv][iptc].label = 'SM (combined)'
+                vertexParticles.append(ptc + other.evenParticles[iv][iptc])
+                if vertexParticles[iptc].label == 'multiple':
+                    vertexParticles[iptc].label = 'SM (combined)'
+
+            vertexParticles = ParticleList(vertexParticles)
+            newBranch.evenParticles.append(vertexParticles)
         
         if not self.maxWeight is None and not other.maxWeight is None:        
             newBranch.maxWeight = self.maxWeight + other.maxWeight
@@ -234,9 +225,7 @@ class Branch(object):
         odd and even particles are combined. 
         """
         
-        if not isinstance(other,Branch):
-            raise TypeError("Can not add a Branch object to %s" %type(other))
-        elif self.getInfo() != other.getInfo():
+        if self.getInfo() != other.getInfo():
             raise SModelSError("Can not add branches with distinct topologies")
         
         #Combine odd particles
@@ -246,12 +235,11 @@ class Branch(object):
                 self.oddParticles[iptc].label = 'BSM (combined)'
 
         #Combine even particles (if they are the same nothing changes)
-        for iv,vertex in enumerate(other.evenParticles):
+        for iv,vertex in enumerate(self.evenParticles):
             for iptc,ptc in enumerate(vertex):
-                self.evenParticles[iv][iptc] += ptc
+                self.evenParticles[iv][iptc] += other.evenParticles[iv][iptc]
                 if self.evenParticles[iv][iptc].label == 'multiple':
                     self.evenParticles[iv][iptc].label = 'SM (combined)'
-        
         if not self.maxWeight is None and not other.maxWeight is None:
             self.maxWeight += other.maxWeight
                     
@@ -275,20 +263,11 @@ class Branch(object):
                 else:
                     avg = v
                 vals.append(avg)
-        except:
+        except (AttributeError,ZeroDivisionError):
             raise SModelSError("Could not compute average for %s" %attr)
         
         return vals
     
-
-    def sortParticles(self):
-        """
-        Sort the particles inside each vertex
-        """
-        
-        for iv,vertex in enumerate(self.evenParticles):
-            self.evenParticles[iv] = sorted(vertex)
-
     def setInfo(self):
         """
         Defines the number of vertices (vertnumb) and number of
@@ -343,7 +322,7 @@ class Branch(object):
         newbranch.vertnumb = self.vertnumb
         newbranch.vertparts = self.vertparts[:]
         if not self.maxWeight is None:
-            newbranch.maxWeight = self.maxWeight.copy()
+            newbranch.maxWeight = self.maxWeight
         return newbranch
 
     def getLength(self):
@@ -364,17 +343,15 @@ class Branch(object):
         :returns: extended branch (Branch object). False if there was an error.
         """
         
-        newBranch = self.copy()      
-        particles = [ptc for ptc in decay.daughters]
-        oddParticles = [p for p in particles if p.Z2parity == -1]
-        evenParticles = [p for p in particles if p.Z2parity == 1]
+        newBranch = self.copy()
+        oddParticles = decay.oddParticles
+        evenParticles = decay.evenParticles
         
         if len(oddParticles) != 1:
             logger.warning("Decay %s does not preserve Z2 and will be ignored" %str(decay))
             return False
         
         newBranch.oddParticles.append(oddParticles[0])
-        evenParticles = sorted(evenParticles, key=lambda x: x.label.lower())
         newBranch.evenParticles.append(evenParticles)
         
         if not self.maxWeight is None:
@@ -412,12 +389,12 @@ class Branch(object):
             return newBranches
 
 
-def decayBranches(branchList, sigcut=0.*fb):
+def decayBranches(branchList, sigcut=0.):
     """
     Decay all branches from branchList until all unstable intermediate states have decayed.
     
     :parameter branchList: list of Branch() objects containing the initial mothers
-    :parameter sigcut: minimum sigma*BR to be generated, by default sigcut = 0.
+    :parameter sigcut: minimum sigma*BR (in fb) to be generated, by default sigcut = 0.
                    (all branches are kept)
     :returns: list of branches (Branch objects)    
     """
@@ -426,7 +403,7 @@ def decayBranches(branchList, sigcut=0.*fb):
     stableBranches,unstableBranches = [],[]
     
     for br in branchList:
-        if br.maxWeight.asNumber(fb) < sigcut.asNumber(fb):
+        if br.maxWeight < sigcut:
             continue
         
         if br.decayDaughter():
@@ -438,7 +415,7 @@ def decayBranches(branchList, sigcut=0.*fb):
         # Store branches after adding one step cascade decay
         newBranchList = []
         for inbranch in unstableBranches:
-            if sigcut.asNumber() > 0. and inbranch.maxWeight.asNumber(fb) < sigcut.asNumber(fb):
+            if sigcut > 0. and inbranch.maxWeight < sigcut:
                 # Remove the branches above sigcut and with length > topmax
                 continue
 
@@ -452,8 +429,8 @@ def decayBranches(branchList, sigcut=0.*fb):
             if newBranches:
                 # New branches were generated, add them for next iteration
                 newBranchList += [br for br in newBranches 
-                                  if br.maxWeight.asNumber(fb) > sigcut.asNumber(fb)]
-            elif inbranch.maxWeight.asNumber(fb) > sigcut.asNumber(fb):
+                                  if br.maxWeight > sigcut]
+            elif inbranch.maxWeight > sigcut:
                 stableBranches.append(inbranch)
 
         # Use new unstable branches (if any) for next iteration step
@@ -499,10 +476,6 @@ class InclusiveBranch(Branch):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
-
-        if not isinstance(other,(Branch,InclusiveBranch)):
-            return -1
-        
         #If BSM particles are identical, avoid further checks                
         if self.oddParticles and other.oddParticles:
             #Compare final BSM state by Z2parity and quantum numbers:

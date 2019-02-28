@@ -23,7 +23,7 @@ from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
 from smodels.tools.physicsUnits import m
 from smodels.tools.reweighting import defaultEffReweight,defaultULReweight
-from scipy.linalg import svd
+from scipy.linalg import svd, LinAlgError
 import scipy.spatial.qhull as qhull
 import numpy as np
 import unum
@@ -343,7 +343,7 @@ class TxNameData(object):
         
         try:
             val = eval(value,unitsDict)
-        except:
+        except (NameError,ValueError,SyntaxError):
             raise SModelSError("data string malformed: %s" %value)
         
         return val
@@ -740,7 +740,7 @@ class TxNameData(object):
             ## we dont need thousands of points for SVD
             n = int(math.ceil(len(M)/2000.))
             Vt=svd(M[::n])[2]
-        except Exception as e:
+        except LinAlgError as e:
             raise SModelSError("exception caught when performing singular value decomposition: %s, %s" %(type(e), e))
 
         V=Vt.T

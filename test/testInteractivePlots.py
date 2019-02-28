@@ -14,7 +14,7 @@ import unittest
 from smodels.tools.interactivePlots import main
 try:
     from types import SimpleNamespace
-except: ## doesnt exist in python2
+except ImportError: ## doesnt exist in python2
     class SimpleNamespace:
         pass
 
