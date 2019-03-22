@@ -166,7 +166,7 @@ As we can see, while the curve obtained from the combination of all 44 signal re
 +-----------------------------------------+-----------------------------------------+-----------------------------------------+
 
 
-Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of 17 aggregate signal regions (center), and the combination of all 44 signal regions (right).
+Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of all 44 signal regions (center), and the combination of 17 aggregate signal regions (right).
 
 
 .. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
