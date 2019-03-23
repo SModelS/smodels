@@ -901,7 +901,7 @@ if __name__ == "__main__":
          [ [[ 400.*GeV,250.*GeV], [ 400.*GeV,250.*GeV] ], 15.*fb ],
          [ [[ 400.*GeV,300.*GeV], [ 400.*GeV,300.*GeV] ], 17.*fb ],
          [ [[ 400.*GeV,350.*GeV], [ 400.*GeV,350.*GeV] ], 19.*fb ], ]
-    txnameData=TxNameData ( data, "upperLimits",  sys._getframe().f_code.co_name )
+    txnameData=TxNameData ( data, "upperLimit",  sys._getframe().f_code.co_name )
     t0=time.time()
     for masses in [ [[ 302.*GeV,123.*GeV], [ 302.*GeV,123.*GeV]],
                     [[ 254.*GeV,171.*GeV], [ 254.*GeV,170.*GeV]] ]:
