@@ -30,9 +30,6 @@ unum.Unum.reset()
 unum.Unum.VALUE_FORMAT = "%0.2E"
 unum.Unum.UNIT_HIDE_EMPTY = True
 
-s = unum.Unum.unit('s')
-ns = unum.Unum.unit('ns',10**(-9)* s )
-
 m = unum.Unum.unit('m')
 cm = unum.Unum.unit('cm', 0.01 * m )
 mm = unum.Unum.unit('mm', 0.001 * m )
