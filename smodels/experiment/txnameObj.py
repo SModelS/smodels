@@ -21,7 +21,7 @@ from smodels.theory.topology import TopologyList
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
-from smodels.tools.physicsUnits import m
+from smodels.tools.physicsUnits import GeV
 from smodels.tools.reweighting import defaultEffReweight,defaultULReweight
 from scipy.linalg import svd, LinAlgError
 import scipy.spatial.qhull as qhull
@@ -299,6 +299,7 @@ class TxNameData(object):
         self._accept_errors_upto=accept_errors_upto
         self._V = None
         self.loadData(value)
+        self.usesWidths = "(" in value
         if self._keep_values:
             self.origdata = value
             
@@ -494,7 +495,24 @@ class TxNameData(object):
         if not reweightFactor:
             return reweightFactor
 
-        val = self.getValueForMass(massarray)
+        #print ( "Checking for %s" % self._id )
+        #print ( " massarray= %s" % massarray )
+        #print ( " widths_array= %s" % element.totalwidth )
+        #print ( " uses widths= %s" % self.usesWidths )
+        ## now weave in the widths!
+        if hasattr(self,"usesWidths") and self.usesWidths:
+            massandwidths = []
+            for brm,brw in zip ( massarray, element.totalwidth ):
+                tmp = []
+                for m,w in zip ( brm, brw ):
+                    if w.asNumber(GeV)>0.0 and w.asNumber(GeV)<1e-6:
+                        tmp.append ( tuple([m,w]))
+                    else:
+                        tmp.append ( m )
+                massandwidths.append ( tmp )
+            massarray = massandwidths
+        #print ( " mass and widths=", massarray )
+        val = self.getValueForMass(massarray )
         if not isinstance(val,(float,int,unum.Unum)):
             return val
 

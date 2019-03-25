@@ -73,7 +73,7 @@ class TheoryPrediction(object):
         
         :return: upper limit (Unum object)
         """
-        
+
         #First check if the upper-limit and expected upper-limit have already been computed.
         #If not, compute it and store them.
         if not hasattr(self, 'expectedUL') or not hasattr(self, 'upperLimit'):
