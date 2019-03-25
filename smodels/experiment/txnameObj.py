@@ -564,7 +564,7 @@ class TxNameData(object):
         ret = []
         
         for obj in objList:
-            if isinstance(obj,list):
+            if isinstance(obj,(list,tuple)):
                 ret.extend(self.flattenArray(obj))
             else:
                 ret.append(obj)

@@ -123,6 +123,8 @@ def removeUnits(value,standardUnits):
 
     if isinstance(value,list):
         return [removeUnits(x,stdunits) for x in value]
+    if isinstance(value,tuple):
+        return tuple([removeUnits(x,stdunits) for x in value])
     elif isinstance(value,dict):
         return dict([[removeUnits(x,stdunits),removeUnits(y,stdunits)] for x,y in value.items()])
     elif isinstance(value,unum.Unum):
