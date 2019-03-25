@@ -495,10 +495,6 @@ class TxNameData(object):
         if not reweightFactor:
             return reweightFactor
 
-        #print ( "Checking for %s" % self._id )
-        #print ( " massarray= %s" % massarray )
-        #print ( " widths_array= %s" % element.totalwidth )
-        #print ( " uses widths= %s" % self.usesWidths )
         ## now weave in the widths!
         if hasattr(self,"usesWidths") and self.usesWidths:
             massandwidths = []
@@ -511,7 +507,13 @@ class TxNameData(object):
                         tmp.append ( m )
                 massandwidths.append ( tmp )
             massarray = massandwidths
-        #print ( " mass and widths=", massarray )
+        else:
+            ## results is without widths? make sure we are without also
+            for br in element.totalwidth:
+                for w in br:
+                    if w.asNumber(GeV)>0.0 and w.asNumber(GeV)<1e-6:
+                        return None
+                
         val = self.getValueForMass(massarray )
         if not isinstance(val,(float,int,unum.Unum)):
             return val
