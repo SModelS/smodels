@@ -508,13 +508,20 @@ class TxNameData(object):
         ## now weave in the widths!
         if hasattr(self,"usesWidths") and self.usesWidths and isinstance(element,Element):
             massandwidths = []
+            ctr = 1 # counting to know where i have to add the width
             for brm,brw in zip ( massarray, element.totalwidth ):
                 tmp = []
                 for m,w in zip ( brm, brw ):
-                    if w.asNumber(GeV)>1e-21 and w.asNumber(GeV)<1e-9:
-                        tmp.append ( tuple([m,w]))
-                    else:
-                        tmp.append ( m )
+                    add = m
+                    if ctr in self.usesWidths:
+                        add = tuple([m,w])
+                        ctr += 1
+                    ctr += 1
+                    tmp.append ( add )
+                    #if w.asNumber(GeV)>1e-21 and w.asNumber(GeV)<1e-9:
+                    #    tmp.append ( tuple([m,w]))
+                    #else:
+                    #    tmp.append ( m )
                 massandwidths.append ( tmp )
             massarray = massandwidths
         #else:
