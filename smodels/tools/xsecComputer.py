@@ -37,6 +37,8 @@ class XSecComputer:
         :param pythiaVersion: pythia6 or pythia8 (integer)
         """
         self.maxOrder = self._checkMaxOrder ( maxOrder )
+        self.countNoXSecs = 0
+        self.countNoNLOXSecs = 0
         if nevents < 1:
             logger.error ( "Supplied nevents < 1" )
             sys.exit()
@@ -111,7 +113,11 @@ class XSecComputer:
                     xsecs.delete(xsec)
                     break
         if self.maxOrder > 0 and len(xsecs) == 0:
-            logger.warning("No NLO or NLL cross sections available.")
+            self.countNoNLOXSecs += 1
+            if self.countNoNLOXSecs < 3:
+                logger.warning("No NLO or NLL cross sections available.")
+            if self.countNoNLOXSecs == 3:
+                logger.warning("No NLO or NLL cross sections available (will quench such warnings in future).")
 
         #for i in xsecs:
         #    logger.error ( "xsec=%s (%s)" % (i,type(i)) )
@@ -232,7 +238,11 @@ class XSecComputer:
             logger.error("SLHA file not found.")
             raise SModelSError()
         if len(xsecs) == 0:
-            logger.warning("No cross sections available.")
+            self.countNoXSecs+=1
+            if self.countNoXSecs < 3:
+                logger.warning("No cross sections available.")
+            if self.countNoXSecs == 3:
+                logger.warning("No cross sections available (will quench such warnings in future).")
             return False
         # Check if file already contain cross section blocks
         xSectionList = crossSection.getXsecFromSLHAFile(slhafile)
