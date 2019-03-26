@@ -81,7 +81,7 @@ class AverageElement(Element):
         """
 
         if not attr in self.__dict__:
-            raise AttributeError
+            raise AttributeError ( "%s not in AverageElement" % attr )
         else:
             return self.__dict__[attr]
 
