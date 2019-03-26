@@ -511,7 +511,7 @@ class TxNameData(object):
             for brm,brw in zip ( massarray, element.totalwidth ):
                 tmp = []
                 for m,w in zip ( brm, brw ):
-                    if w.asNumber(GeV)>0.0 and w.asNumber(GeV)<1e-6:
+                    if w.asNumber(GeV)>1e-21 and w.asNumber(GeV)<1e-9:
                         tmp.append ( tuple([m,w]))
                     else:
                         tmp.append ( m )
