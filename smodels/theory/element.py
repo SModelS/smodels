@@ -146,7 +146,9 @@ class Element(object):
         
         :returns: string representation of the element (in bracket notation)    
         """
-        
+
+        if not hasattr(self,"branches"):
+            return "branchless element"
         elStr = "["+",".join([str(br) for br in self.branches])+"]"
         elStr = elStr.replace(" ", "").replace("'", "")
         return elStr
