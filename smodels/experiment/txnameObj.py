@@ -12,7 +12,7 @@
 
 """
 
-import os,sys
+import os,sys,re
 from smodels.tools import physicsUnits
 from smodels.theory.auxiliaryFunctions import elementsInStr, removeUnits
 from smodels.tools.stringTools import concatenateLines
@@ -298,8 +298,16 @@ class TxNameData(object):
         self._id = Id
         self._accept_errors_upto=accept_errors_upto
         self._V = None
+        self.usesWidths = False ## False, if not widths are used, the positions in the mass vector, if widths are used
+        if "(" in value:
+            tmp=value[4:value[4:].find("[[[")]
+            brackets = [ x.start() for x in  re.finditer("\(",tmp) ]
+            commas =np.array( [ x.start() for x in  re.finditer(",",tmp) ] )
+            widthpositions = []
+            for ctr,b in enumerate(brackets):
+                widthpositions.append ( len(commas[commas<b])+1 )
+            self.usesWidths = widthpositions
         self.loadData(value)
-        self.usesWidths = "(" in value
         if self._keep_values:
             self.origdata = value
             
@@ -498,7 +506,7 @@ class TxNameData(object):
             return reweightFactor
 
         ## now weave in the widths!
-        if hasattr(self,"usesWidths") and self.usesWidths:
+        if hasattr(self,"usesWidths") and self.usesWidths and isinstance(element,Element):
             massandwidths = []
             for brm,brw in zip ( massarray, element.totalwidth ):
                 tmp = []
@@ -509,14 +517,14 @@ class TxNameData(object):
                         tmp.append ( m )
                 massandwidths.append ( tmp )
             massarray = massandwidths
-        else:
+        #else:
             ## results is without widths? make sure we are without also
-            if hasattr ( element, "totalwidth" ):
-                for br in element.totalwidth:
-                    for w in br:
-                        if w.asNumber(GeV)>0.0 and w.asNumber(GeV)<1e-6:
-                            return None
-                
+            #if hasattr ( element, "totalwidth" ):
+            #    print ( element.totalwidth )
+            #    for br in element.totalwidth:
+            #        for w in br:
+            #            if w.asNumber(GeV)>0.0 and w.asNumber(GeV)<1e-6:
+            #                return None
         val = self.getValueForMass(massarray )
         if not isinstance(val,(float,int,unum.Unum)):
             return val
@@ -718,8 +726,11 @@ class TxNameData(object):
     def countNonZeros( self, mp ):
         """ count the nonzeros in a vector """
         nz=0
+        lim = 10**-4
+        #if hasattr ( self, "usesWidths" ) and self.usesWidths:
+        #   lim = 10**-20
         for i in mp:
-            if abs(i)>10**-4:
+            if abs(i)>lim:
                 nz+=1
         return nz
 
@@ -749,6 +760,10 @@ class TxNameData(object):
             return
         
         Morig= [self.flattenArray(pt[0]) for pt in values]
+        if self.usesWidths: ## for the widths take the logs
+            for i in range(len(Morig)):
+                for j in self.usesWidths:
+                    Morig[i][j] = math.log ( Morig[i][j] )
         
         aM = np.array(Morig)
         MT = aM.T.tolist()
