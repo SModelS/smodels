@@ -747,7 +747,7 @@ class PyPrinter(BasicPrinter):
             ul = theoryPrediction.getUpperLimit()
             ulExpected = theoryPrediction.getUpperLimit(expected = True)
             #Compute non-rescaled upper limit (equal to ul for EM results):
-            ulOriginal = theoryPrediction.dataset.getUpperLimitFor(element=theoryPrediction.avgElement.mass,
+            ulOriginal = theoryPrediction.dataset.getUpperLimitFor(element=theoryPrediction.avgElement,
                                                                 txnames=theoryPrediction.txnames)
             if isinstance(ul,unum.Unum):
                 ul = ul.asNumber(fb)
