@@ -511,12 +511,11 @@ class TxNameData(object):
             massarray = massandwidths
         else:
             ## results is without widths? make sure we are without also
-            if not hasattr ( element, "totalwidth" ):
-                return None
-            for br in element.totalwidth:
-                for w in br:
-                    if w.asNumber(GeV)>0.0 and w.asNumber(GeV)<1e-6:
-                        return None
+            if hasattr ( element, "totalwidth" ):
+                for br in element.totalwidth:
+                    for w in br:
+                        if w.asNumber(GeV)>0.0 and w.asNumber(GeV)<1e-6:
+                            return None
                 
         val = self.getValueForMass(massarray )
         if not isinstance(val,(float,int,unum.Unum)):
