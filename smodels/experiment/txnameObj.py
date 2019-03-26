@@ -365,6 +365,8 @@ class TxNameData(object):
         stdUnits = physicsUnits.standardUnits
         if isinstance(value,list):            
             return [self.getUnits(x) for x in value]
+        if isinstance(value,tuple):            
+            return tuple([self.getUnits(x) for x in value])
         elif isinstance(value,dict):
             return dict([[self.getUnits(x),self.getUnits(y)] 
                                   for x,y in value.items()])
@@ -372,7 +374,7 @@ class TxNameData(object):
             #Check if value has unit or not:
             if not value._unit:
                 return 1.
-            #Now try to find stadandard unit which matches:
+            #Now try to find standard unit which matches:
             for unit in stdUnits:
                 y = (value/unit).normalize()
                 if not y._unit:
@@ -509,6 +511,8 @@ class TxNameData(object):
             massarray = massandwidths
         else:
             ## results is without widths? make sure we are without also
+            if not hasattr ( element, "totalwidth" ):
+                return None
             for br in element.totalwidth:
                 for w in br:
                     if w.asNumber(GeV)>0.0 and w.asNumber(GeV)<1e-6:

@@ -112,7 +112,8 @@ def removeUnits(value,standardUnits):
     in physicsUnits.standard units to normalize the data.
 
     :param value: Object containing units (e.g. [[100*GeV,100.*GeV],3.*pb])
-    :param standardUnits: Unum unit or Array of unum units defined to normalize the data.
+    :param standardUnits: Unum unit or Array of unum units defined to 
+                          normalize the data.
     :return: Object normalized to standard units (e.g. [[100,100],3000])
     """
 
