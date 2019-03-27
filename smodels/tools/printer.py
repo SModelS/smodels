@@ -764,11 +764,19 @@ class PyPrinter(BasicPrinter):
                 else:
                     txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(fb)            
             maxconds = theoryPrediction.getmaxCondition()
-            mass = theoryPrediction.mass
+            # mass = theoryPrediction.mass ## FIXME thats the version without widths
+            mass = theoryPrediction.massAndWidth()
+
+            def roundme ( x ):
+                if type(x)==tuple:
+                    return ( round(x[0].asNumber(GeV),2), x[1].asNumber(GeV) )
+                return round(x.asNumber(GeV),2)
+
             if mass:
-                mass = [[round(m.asNumber(GeV),2) for m in mbr] for mbr in mass]
+                mass = [[roundme(m) for m in mbr] for mbr in mass]
             else:
                 mass = None
+
             sqrts = expResult.globalInfo.sqrts
             
             r = theoryPrediction.getRValue(expected=False)

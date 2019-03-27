@@ -9,7 +9,7 @@
 
 from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.auxiliaryFunctions import cSim, cGtr, elementsInStr, average
-from smodels.tools.physicsUnits import TeV,fb
+from smodels.tools.physicsUnits import TeV, fb, GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
@@ -37,26 +37,43 @@ class TheoryPrediction(object):
         self.xsection = None
         self.conditions = None
         self.mass = None
+        self.totalwidth = None
 
     def dataId(self):
         """
         Return ID of dataset
         """
-        
+
         return self.dataset.getID()
-    
+
+    def massAndWidth(self):
+        """ a convenience method to report masses and widths in the
+            [[(mass1,width1),mass2]] format. """
+        ret = []
+        if not hasattr ( self, "totalwidth" ) or self.totalwidth == None:
+            return self.mass
+        for bm,bw in zip ( self.mass, self.totalwidth ):
+            tmp = []
+            for m,w in zip(bm,bw):
+                if w.asNumber(GeV)>1e-21 and w.asNumber(GeV)<1e-6:
+                    tmp.append ( (m,w) )
+                else:
+                    tmp.append ( m )
+            ret.append ( tmp )
+        return ret
+
     def analysisId(self):
         """
         Return experimental analysis ID
         """
-        
+
         return self.dataset.globalInfo.id
 
     def dataType(self):
         """
         Return the type of dataset
         """
-                
+
         return self.dataset.getType()
 
 
@@ -66,22 +83,22 @@ class TheoryPrediction(object):
         For UL-type results, use the UL map. For EM-Type returns
         the corresponding dataset (signal region) upper limit.
         For combined results, returns the upper limit on the
-        total sigma*eff (for all signal regions/datasets). 
-        
+        total sigma*eff (for all signal regions/datasets).
+
         :param expected: return expected Upper Limit, instead of observed.
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.        
-        
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+
         :return: upper limit (Unum object)
         """
 
         #First check if the upper-limit and expected upper-limit have already been computed.
         #If not, compute it and store them.
         if not hasattr(self, 'expectedUL') or not hasattr(self, 'upperLimit'):
-            
+
             if self.dataType() == 'efficiencyMap':
                 self.expectedUL = self.dataset.getSRUpperLimit(expected=True,deltas_rel=deltas_rel)
                 self.upperLimit = self.dataset.getSRUpperLimit(expected=False,deltas_rel=deltas_rel)
-            if self.dataType() == 'upperLimit':                
+            if self.dataType() == 'upperLimit':
                 self.expectedUL = self.dataset.getUpperLimitFor(element=self.avgElement,
                                                                 txnames=self.txnames,
                                                                 expected=True)
@@ -95,7 +112,7 @@ class TheoryPrediction(object):
                 srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
                 self.expectedUL = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=True,deltas_rel=deltas_rel)
                 self.upperLimit = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=False,deltas_rel=deltas_rel)
-                          
+
         #Return the expected or observed UL:
         if expected:
             return self.expectedUL
@@ -106,9 +123,9 @@ class TheoryPrediction(object):
         """
         Get the r value = theory prediction / experimental upper limit
         """
-        
+
         upperLimit = self.getUpperLimit(expected)
-        if upperLimit is None or upperLimit.asNumber(fb)==0.:                
+        if upperLimit is None or upperLimit.asNumber(fb)==0.:
             return None
         else:
             return (self.xsection.value/upperLimit).asNumber()
@@ -121,29 +138,29 @@ class TheoryPrediction(object):
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         """
-        
-        
+
+
         if self.dataType()  == 'upperLimit':
             self.likelihood = None
             self.chi2 = None
 
-        elif self.dataType() == 'efficiencyMap':   
+        elif self.dataType() == 'efficiencyMap':
             lumi = self.dataset.globalInfo.lumi
             nsig = (self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
-            chi2 = self.dataset.chi2(nsig,marginalize=marginalize,deltas_rel=deltas_rel)   
+            chi2 = self.dataset.chi2(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
             self.likelihood =  llhd
             self.chi2 =  chi2
-            
+
         elif self.dataType() == 'combined':
             lumi = self.expResult.globalInfo.lumi
             #Create a list of signal events in each dataset/SR sorted according to datasetOrder
             srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
-            srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]                
+            srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
             self.likelihood = self.dataset.combinedLikelihood(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
             self.chi2 = self.dataset.totalChi2(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
 
-        
+
     def getmaxCondition(self):
         """
         Returns the maximum xsection from the list conditions
@@ -151,7 +168,7 @@ class TheoryPrediction(object):
         :returns: maximum condition xsection (float)
         """
 
-        if not self.conditions: return 0.        
+        if not self.conditions: return 0.
         # maxcond = 0.
         values = [ 0. ]
         for value in self.conditions.values():
@@ -186,7 +203,7 @@ class TheoryPrediction(object):
             if not "combined" in dataId:
                 fname=" (%s)" % self.dataset.folderName()
 
-            ds = "%s%s" % ( dataId, fname ) 
+            ds = "%s%s" % ( dataId, fname )
         ret += "                   datasets: %s\n" % ds
         ret += "      obs limit: %s\n" % self.getUpperLimit()
         ret += "      exp limit: %s\n" % self.getUpperLimit( expected=True )
@@ -213,18 +230,18 @@ class TheoryPredictionList(object):
         """
         self._theoryPredictions = []
         if theoryPredictions and isinstance(theoryPredictions,list):
-            
+
             if not maxCond:
-                self._theoryPredictions = theoryPredictions                
+                self._theoryPredictions = theoryPredictions
             else:
                 newPredictions = []
                 for theoPred in theoryPredictions:
                     mCond = theoPred.getmaxCondition()
                     if mCond == 'N/A' or round(mCond/maxCond,2) > 1.0:
                         continue
-                    else: newPredictions.append(theoPred)  
-                self._theoryPredictions = newPredictions    
-                        
+                    else: newPredictions.append(theoPred)
+                self._theoryPredictions = newPredictions
+
 
     def append(self,theoryPred):
         self._theoryPredictions.append(theoryPred)
@@ -259,14 +276,14 @@ class TheoryPredictionList(object):
             return self
         else:
             return self.__add__(theoPredList)
-        
+
     def sortTheoryPredictions(self):
         """
         Reverse sort theoryPredictions by R value.
         Used for printer.
         """
-        self._theoryPredictions = sorted(self._theoryPredictions, key=lambda theoPred: theoPred.getRValue(), reverse=True)    
-      
+        self._theoryPredictions = sorted(self._theoryPredictions, key=lambda theoPred: theoPred.getRValue(), reverse=True)
+
 
 def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
                 useBestDataset=True, combinedResults=True,
@@ -288,8 +305,8 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     :parameter combinedResults: add theory predictions that result from
                combining datasets.
     :parameter marginalize: If true, marginalize nuisances. If false, profile them.
-    :parameter deltas_rel: relative uncertainty in signal (float). Default value is 20%.    
-    
+    :parameter deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction
                objects
     """
@@ -317,7 +334,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
             theoPred.expResult = expResult
             theoPred.upperLimit = theoPred.getUpperLimit(deltas_rel=deltas_rel)
         return allResults
-    
+
     #Else include best signal region results, if asked for.
     bestResults = TheoryPredictionList()
     if useBestDataset:
@@ -332,7 +349,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     for theoPred in bestResults:
         theoPred.expResult = expResult
         theoPred.upperLimit = theoPred.getUpperLimit(deltas_rel=deltas_rel)
-        
+
     return bestResults
 
 def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
@@ -341,23 +358,24 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     matrices are available. Return a TheoryPrediction object
     with the signal cross-section summed over all the signal regions
     and the respective upper limit.
-    
+
     :param datasetPredictions: List of TheoryPrediction objects for each signal region
     :param expResult: ExpResult object corresponding to the experimental result
-    :parameter marginalize: If true, marginalize nuisances. If false, profile them.    
-    
+    :parameter marginalize: If true, marginalize nuisances. If false, profile them.
+
     :return: TheoryPrediction object
     """
-        
+
     if len(dataSetResults) == 1:
         return dataSetResults[0]
     elif not expResult.hasCovarianceMatrix():
         return None
-    
+
     txnameList = []
     elementList = []
     totalXsec = None
     massList = []
+    widthList = []
     PIDList = []
     IDList = []
     datasetPredictions = []
@@ -374,20 +392,23 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
         else:
             totalXsec += pred.xsection
         massList.append(pred.mass)
+        widthList.append(pred.totalwidth)
         weights.append(pred.xsection.value.asNumber(fb))
         for pidEntry in pred.PIDs:
             if not pidEntry in PIDList:
                 PIDList.append(pidEntry)
         IDList += pred.IDs
-        
+
     txnameList = list(set(txnameList))
     IDList = list(set(IDList))
     if None in massList:
         mass = None
+        totalwidth = None
     else:
         mass = average(massList,weights=weights)
-    
-    
+        totalwidth = average(massList,weights=weights)
+
+
     #Create a combinedDataSet object:
     combinedDataset = CombinedDataSet(expResult)
     combinedDataset._marginalize = marginalize
@@ -400,12 +421,13 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     theoryPrediction.conditions = None
     theoryPrediction.elements = elementList
     theoryPrediction.mass = mass
+    theoryPrediction.totalwidth = totalwidth
     theoryPrediction.PIDs = PIDList
     theoryPrediction.IDs = IDList
-    
-    
+
+
     return theoryPrediction
-    
+
 def _getBestResult(dataSetResults):
     """
     Returns the best result according to the expected upper limit
@@ -452,10 +474,10 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
     combine the masses (if needed) and compute the conditions (if existing).
 
     :parameter dataset: Data Set to be considered (DataSet object)
-    :parameter smsTopList: list of topologies containing elements 
+    :parameter smsTopList: list of topologies containing elements
                            (TopologyList object)
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
-    :returns:  a TheoryPredictionList object containing a list of TheoryPrediction 
+    :returns:  a TheoryPredictionList object containing a list of TheoryPrediction
                objects
     """
 
@@ -493,10 +515,11 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.elements = cluster.elements
         theoryPrediction.avgElement = cluster.averageElement()
         theoryPrediction.mass = theoryPrediction.avgElement.mass
+        theoryPrediction.totalwidth = theoryPrediction.avgElement.totalwidth
         theoryPrediction.PIDs = cluster.getPIDs()
         theoryPrediction.IDs = cluster.getIDs()
         predictionList._theoryPredictions.append(theoryPrediction)
-        
+
 
     if len(predictionList) == 0:
         return None
@@ -512,7 +535,7 @@ def _getElementsFrom(smsTopList, dataset):
     have their weights multiplied by their respective efficiencies.
 
     :parameter dataset:  Data Set to be considered (DataSet object)
-    :parameter smsTopList: list of topologies containing elements 
+    :parameter smsTopList: list of topologies containing elements
                            (TopologyList object)
     :returns: list of elements (Element objects)
     """
@@ -635,7 +658,7 @@ def _evalConditions(cluster):
                 conditionVals[cond] = exprvalue.value
             else:
                 conditionVals[cond] = exprvalue
-    
+
     if not conditionVals:
         return None
     else:
@@ -667,7 +690,7 @@ def _evalExpression(stringExpr,cluster):
         weightsDict['w%i'%i] = crossSection.XSectionList(infoList)
         for el1 in cluster.elements:
             if el1 == el:
-                weightsDict['w%i'%i] += el1.weight              
+                weightsDict['w%i'%i] += el1.weight
         evalExpr = evalExpr.replace(elStr,'w%i'%i)
 
     weightsDict.update({"Cgtr" : cGtr, "cGtr" : cGtr, "cSim" : cSim, "Csim" : cSim})
