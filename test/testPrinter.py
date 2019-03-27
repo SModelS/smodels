@@ -63,6 +63,8 @@ def compareXML(xmldefault,xmlnew,allowedDiff,ignore=[]):
 
 def compareSLHA(slhadefault,slhanew):
     for i,line in enumerate(slhadefault.split("\n")):
+        if "version" in line: ## the version numbers wont get checked
+            continue
         if line != slhanew.split("\n")[i]:
             print (line, " != ", slhanew.split("\n")[i])
             return False
