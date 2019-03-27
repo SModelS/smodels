@@ -577,8 +577,13 @@ class TxNameData(object):
         """
 
         porig = removeUnits(massarray,physicsUnits.standardUnits)
+            
         porig = self.formatInput(porig,self.dataShape) #Remove entries which match inclusives
         porig = self.flattenArray(porig) ## flatten
+        if self.usesWidths: ## we take the logs for widths, remember?
+            for i,p in enumerate(porig):
+                if i in self.usesWidths:
+                    porig[i]=math.log(p)
 
         if len(porig) != self.full_dimensionality:
             logger.error("dimensional error. I have been asked to compare a "\
