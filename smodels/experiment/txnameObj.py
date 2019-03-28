@@ -29,14 +29,29 @@ import numpy as np
 import unum
 import copy
 import math,itertools
-from math import floor, log10
+from math import floor, log10, log
 
 
 #Build a dictionary with defined units. It can be used to evaluate
 #expressions containing units.
-unitsDict = dict([[varname,varobj] for varname,varobj in physicsUnits.__dict__.items() 
+unitsDict = dict([[varname,varobj] for varname,varobj \
+                  in physicsUnits.__dict__.items() 
                   if isinstance(varobj,unum.Unum)])
 
+
+def widthToCoordinate ( x ):
+    """ the function that is applied to all widths to 
+        turn it into a function that can be interpolated """
+    if type(x)==type(GeV):
+        return 10.*math.log(x.asNumber(GeV))*GeV
+    return 10.*math.log(x)
+
+def coordinateToWidth ( x ):
+    """ the function that is applied to all coordinates
+        to obtain the original width """
+    if type(x)==type(GeV):
+        return math.exp(x.asNumber(GeV)/10.)*GeV
+    return math.exp(x/10.)
 
 class TxName(object):
     """
@@ -583,7 +598,7 @@ class TxNameData(object):
         if self.usesWidths: ## we take the logs for widths, remember?
             for i,p in enumerate(porig):
                 if i in self.usesWidths:
-                    porig[i]=math.log(p)
+                    porig[i]=widthToCoordinate(p)
 
         if len(porig) != self.full_dimensionality:
             logger.error("dimensional error. I have been asked to compare a "\
@@ -775,7 +790,7 @@ class TxNameData(object):
         if self.usesWidths: ## for the widths take the logs
             for i in range(len(Morig)):
                 for j in self.usesWidths:
-                    Morig[i][j] = math.log ( Morig[i][j] )
+                    Morig[i][j] = widthToCoordinate ( Morig[i][j] )
         
         aM = np.array(Morig)
         MT = aM.T.tolist()

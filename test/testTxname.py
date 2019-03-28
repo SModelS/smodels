@@ -12,7 +12,7 @@ sys.path.insert(0,"../")
 from smodels.share.models import mssm
 from smodels.theory.element import Element
 from smodels.experiment import infoObj
-from smodels.experiment.txnameObj import TxName
+from smodels.experiment.txnameObj import TxName, widthToCoordinate, coordinateToWidth
 from smodels.tools.physicsUnits import GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import unittest
@@ -21,6 +21,13 @@ c1 = mssm.c1
 n1 = mssm.n1
 
 class TxTest(unittest.TestCase):
+    def testCoordinateTrafo(self):
+        a=1e-10
+        b = coordinateToWidth(widthToCoordinate(a))
+        self.assertAlmostEqual ( b, a )
+        a=1e-15*GeV
+        b = coordinateToWidth(widthToCoordinate(a))
+        self.assertAlmostEqual ( b.asNumber(GeV), a.asNumber(GeV) )
 
     def testTxnameElements(self):
         
