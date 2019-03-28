@@ -314,7 +314,7 @@ class TxNameData(object):
         self._accept_errors_upto=accept_errors_upto
         self._V = None
         self.usesWidths = False ## False, if not widths are used, the positions in the mass vector, if widths are used
-        if "(" in value:
+        if type(value)==str and "(" in value:
             tmp=value[4:value[4:].find("[[[")]
             brackets = [ x.start() for x in  re.finditer("\(",tmp) ]
             commas =np.array( [ x.start() for x in  re.finditer(",",tmp) ] )
@@ -322,6 +322,19 @@ class TxNameData(object):
             for ctr,b in enumerate(brackets):
                 widthpositions.append ( len(commas[commas<b])+1 )
             self.usesWidths = widthpositions
+        if type(value)==list:
+            ctr=0
+            widthpositions = []
+            hasTuple=False
+            for b in value[0][0]:
+                for e in b:
+                    ctr+=1
+                    if type(e)==tuple:
+                        hasTuple=True
+                        widthpositions.append ( ctr )
+                        ctr+=1
+            if hasTuple:
+                self.usesWidths = widthpositions
         self.loadData(value)
         if self._keep_values:
             self.origdata = value
@@ -341,6 +354,18 @@ class TxNameData(object):
     def __str__ ( self ):
         """ a simple unique string identifier, mostly for _memoize """
         return str ( self._id )
+
+    def coordinatesToMasses ( self, coords ):
+        """ a function that gives you the original mass array for
+            rotated, scaled and translated coordinates, i.e. 
+            the inverse to massesToCoordinates. """
+        mass = np.dot(self._V,coords) + self.delta_x
+        mass = mass.tolist()[0]
+        if self.usesWidths:
+            for i,m in enumerate(mass):
+                if i in self.usesWidths:
+                    mass[i]=coordinateToWidth(m)
+        return mass
 
     def round_to_n ( self, x, n ):
         if x==0.0:
@@ -565,7 +590,7 @@ class TxNameData(object):
         """
 
         self.massarray = massarray ## only for bookkeeping and better error msgs
-        P = self.transformMass(massarray)
+        P = self.massesToCoordinates(massarray)
         self.projected_value = self.interpolate(P[:self.dimensionality])
         
         #Check if input point has larger dimensionality:
@@ -579,15 +604,12 @@ class TxNameData(object):
             val =  self._interpolateOutsideConvexHull(massarray)    
         else:
             val = self._returnProjectedValue()
-
         return val
 
-    def transformMass(self,massarray):
+    def massesToCoordinates(self,massarray):
         """
         Transform the mass array to a point in the PCA coordinates.
-
         :param massarray: Mass array (with units)
-
         :return: Point (list)
         """
 
@@ -668,7 +690,7 @@ class TxNameData(object):
             extrapolation error.
         """
 
-        P = self.transformMass(massarray)
+        P = self.massesToCoordinates(massarray)
         ## P[self.dimensionality:] is project point p in m dimensions
         # m=self.countNonZeros ( P ) ## dimensionality of input
         ## how far are we away from the "plane": distance alpha
