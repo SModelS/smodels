@@ -575,6 +575,8 @@ class TxNameData(object):
         val = self.getValueForMass(massarray )
         if not isinstance(val,(float,int,unum.Unum)):
             return val
+        if self.usesWidths: ## no reweighting for lifetime dependent results
+            return val
 
         val *= reweightFactor
 
