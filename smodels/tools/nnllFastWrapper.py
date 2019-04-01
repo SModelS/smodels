@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 """
-.. module:: nllFastWrapper
-   :synopsis: This module provides methods to access the nllfast grid and             
-              compute k-factors (when available) to SUSY pair                         
-              production cross sections.                                              
-                                                                                      
-.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>                       
+.. module:: nnllFastWrapper
+   :synopsis: This module provides methods to access the nnllfast grid and
+              compute k-factors (when available) to SUSY pair
+              production cross sections.
+
+.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -40,15 +40,15 @@ from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools.smodelsLogging import logger
 
 
-class NllFastWrapper(WrapperBase):
+class NnllfastWrapperWrapper(WrapperBase):
     """
-    An instance of this class represents the installation of nllfast.
+    An instance of this class represents the installation of nnllfast.
 
     """
-    def __init__(self, sqrts, nllfastVersion, testParams, testCondition):
+    def __init__(self, sqrts, nnllfastVersion, testParams, testCondition):
         """
         :param sqrts: sqrt of s, in TeV, as an integer,
-        :param nllfastVersion: version of the nllfast tool
+        :param nnllfastVersion: version of the nnllfast tool
         :param testParams: what are the test params we need to run things with?
         :param testCondition: the line that should be the last output line when
         running executable
@@ -57,12 +57,12 @@ class NllFastWrapper(WrapperBase):
         """
         WrapperBase.__init__(self)
         self.sqrts = int(sqrts)
-        self.name = "nllfast%d" % sqrts
-        self.nllfastVersion = nllfastVersion
-        path = "<install>/smodels/lib/nllfast/nllfast-"
-        location = path + self.nllfastVersion + "/"
+        self.name = "nnllfast%d" % sqrts
+        self.nnllfastVersion = nnllfastVersion
+        path = "<install>/smodels/lib/nnllfast/nnllfast-"
+        location = path + self.nnllfastVersion + "/"
         self.cdPath = self.absPath(location)
-        self.executablePath = self.cdPath + "/nllfast_%dTeV" % self.sqrts
+        self.executablePath = self.cdPath + "/nnllfast_%dTeV" % self.sqrts
         self.testParams = testParams
         self.testCondition = testCondition
         self.srcPath = self.cdPath
@@ -96,7 +96,7 @@ class NllFastWrapper(WrapperBase):
 
     def _getKfactorsFrom( self, output ):
         """
-        Read NLLfast output and return the k-factors.
+        Read NNLLfast output and return the k-factors.
 
         """
         if not output:
@@ -129,35 +129,35 @@ class NllFastWrapper(WrapperBase):
 
     def _run ( self, this ):
         """
-        Run. Code taken from nllFast.runNLLfast
-        Return the process name (in NLLfast notation) for the pair production of
+        Run. Code taken from nnllFast.runNNLLfast
+        Return the process name (in NNLLfast notation) for the pair production of
         pIDs.
 
-        :returns: None, if the particle ID pair is not contained in NLLfast
+        :returns: None, if the particle ID pair is not contained in NNLLfast
 
         """
         current_dir = os.getcwd()
         os.chdir ( self.cdPath )
-        nll_output = executor.getoutput( this )
+        nnll_output = executor.getoutput( this )
         os.chdir(current_dir)
-        return nll_output
+        return nnll_output
 
-    def _compute ( self, energy, pIDs, pdf, squarkmass, gluinomass ):
+    def _compute ( self, energy, pIDs, squarkmass, gluinomass ):
         process = self._getProcessName(pIDs)
         if process == "st":
-            nll_run = "./nllfast_" + energy + " %s %s %s" % \
-                  (process, pdf, squarkmass)
+            nnll_run = "./nnllfast_" + energy + " %s %s" % \
+                  (process, squarkmass)
         else:
-            nll_run = "./nllfast_" + energy + " %s %s %s %s" % \
-                  (process, pdf, squarkmass, gluinomass)
-        return self._run( nll_run )
+            nnll_run = "./nnllfast_" + energy + " %s %s %s" % \
+                  (process, squarkmass, gluinomass)
+        return self._run( nnll_run )
 
     def _getProcessName(self, pIDs):
         """
-        Return the process name (in NLLfast notation) for the pair production of
+        Return the process name (in NNLLfast notation) for the pair production of
         pIDs.
 
-        :returns: None, if the particle ID pair is not contained in NLLfast
+        :returns: None, if the particle ID pair is not contained in NNLLfast
         """
         pid1, pid2 = sorted(pIDs)
         process = None
@@ -182,47 +182,47 @@ class NllFastWrapper(WrapperBase):
             process = 'st'
         return process
 
-    def _getDecoupledKfactors( self, process, energy, pdf, mass ):
+    def _getDecoupledKfactors( self, process, energy, mass ):
         """
         Compute k-factors in the decoupled (squark or gluino) regime for the process.
         If a decoupled grid does not exist for the process, return None
         """
-            
+
         if process != 'sb' and process != 'gg': return None
         elif process == 'sb': process_dcpl = 'sdcpl'
-        elif process == 'gg': process_dcpl = 'gdcpl'    
-        nll_run = "./nllfast_" + energy + " %s %s %s" % \
-                          (process_dcpl, pdf, mass)
+        elif process == 'gg': process_dcpl = 'gdcpl'
+        nnll_run = "./nnllfast_" + energy + " %s %s" % \
+                          (process_dcpl, mass)
         e = energy.replace ( "TeV", "" ).replace ( "*", "" )
-        # tool = toolBox.ToolBox().get ( "nllfast%d" % int ( e ) )
-        print ( "run", nll_run )
-        nll_output = self._run(nll_run )
-        if "K_NLO" in nll_output:
-            return self._getKfactorsFrom(nll_output)
+        # tool = toolBox.ToolBox().get ( "nnllfast%d" % int ( e ) )
+        print ( "run nnllfast", nnll_run )
+        nnll_output = self._run( nnll_run )
+        if "K_NLO" in nnll_output:
+            return self._getKfactorsFrom(nnll_output)
         else: return None
 
-    def _runForDecoupled ( self, energy, nllinput ):
-        nll_run = "./nllfast_" + energy + " %s %s %s %s" % nllinput
-        return self._run ( nll_run )
+    def _runForDecoupled ( self, energy, nnllinput ):
+        nnll_run = "./nnllfast_" + energy + " %s %s %s" % nnllinput
+        return self._run ( nnll_run )
 
-    def getKfactorsFor( self, pIDs, slhafile, pdf='cteq' ):
+    def getKfactorsFor( self, pIDs, slhafile ):
         """
-        Read the NLLfast grid and returns a pair of k-factors (NLO and NLL) for 
+        Read the NNLLfast grid and returns a pair of k-factors (NNLL) for
         the PIDs pair.
 
-        :returns: k-factors = None, if NLLfast does not contain the process; uses
+        :returns: k-factors = None, if NNLLfast does not contain the process; uses
                   the slhafile to obtain the SUSY spectrum.
-        
+
         """
         if not os.path.isfile(slhafile):
             logger.error("SLHA file %s not found", slhafile)
             return False
 
         energy = str(int(self.sqrts)) + 'TeV'
-        # Get process name (in NLLfast notation)
+        # Get process name (in NNLLfast notation)
         process = self._getProcessName(pIDs)
         if not process:
-            # Return k-factors = None, if NLLfast does not have the process
+            # Return k-factors = None, if NNLLfast does not have the process
             return (None, None)
 
         # Obtain relevant masses
@@ -248,61 +248,61 @@ class NllFastWrapper(WrapperBase):
             squarkmass = abs(masses.entries[abs(pid1)])
 
         #if tool == None:
-        #    logger.warning("No NLLfast data for sqrts = " + str(sqrts))
+        #    logger.warning("No NNLLfast data for sqrts = " + str(sqrts))
         #    return (None, None)
-        nllpath = self.installDirectory()
+        nnllpath = self.installDirectory()
         # self.pathOfExecutable()
         self.checkInstallation()
-        nll_output = self._compute ( energy, pIDs, pdf, squarkmass, gluinomass )
+        nnll_output = self._compute ( energy, pIDs, squarkmass, gluinomass )
 
         # If run was successful, return k-factors:
-        if "K_NLO" in nll_output:
-            # NLLfast ran ok, try to get the k-factors
-            kFacs = self._getKfactorsFrom(nll_output)
+        if "K_NLO" in nnll_output:
+            # NNLLfast ran ok, try to get the k-factors
+            kFacs = self._getKfactorsFrom(nnll_output)
             if not kFacs or min(kFacs) <= 0.:
                 logger.warning("Error obtaining k-factors")
                 return (None, None)
             else:
                 return kFacs
         # If run was not successful, check for decoupling error messages:
-        elif not "too low/high" in nll_output.lower():
-            logger.warning("Error running NLLfast")
+        elif not "too low/high" in nnll_output.lower():
+            logger.warning("Error running NNLLfast")
             return (None, None)
 
         # Check for decoupling cases with a decoupling grid (only for sb and gg)
         doDecoupling = False
-        if "too low/high gluino" in nll_output.lower():        
-            if gluinomass > 500. and process == 'sb': 
+        if "too low/high gluino" in nnll_output.lower():
+            if gluinomass > 500. and process == 'sb':
                 doDecoupling = True
                 dcpl_mass = gluinomass
-        elif "too low/high squark" in nll_output.lower():
+        elif "too low/high squark" in nnll_output.lower():
             if squarkmass > 500. and process == 'gg':
                 doDecoupling = True
                 dcpl_mass = squarkmass
 
         # If process do not have decoupled grids, return None:
         if not doDecoupling:
-            logger.warning("Masses of (q,g)=(%s,%s) out of NLLfast grid for %s, %s" % ( squarkmass, gluinomass, process, energy ))
+            logger.warning("Masses of (q,g)=(%s,%s) out of NNLLfast grid for %s, %s" % ( squarkmass, gluinomass, process, energy ))
             return (None, None)
 
-        # Obtain k-factors from the NLLfast decoupled grid
-        kfacs = self._getDecoupledKfactors(process,energy,pdf,min(gluinomass,squarkmass))
+        # Obtain k-factors from the NNLLfast decoupled grid
+        kfacs = self._getDecoupledKfactors(process,energy,min(gluinomass,squarkmass))
         # Decoupling limit is satisfied, do not interpolate
         if not kfacs:
-            logger.warning("Error obtaining k-factors from the NLLfast decoupled grid for " + process)
+            logger.warning("Error obtaining k-factors from the NNLLfast decoupled grid for " + process)
             return (None, None)
-        elif dcpl_mass/min(gluinomass,squarkmass) > 10.:    
+        elif dcpl_mass/min(gluinomass,squarkmass) > 10.:
             return kfacs
         # Interpolate between the non-decoupled and decoupled grids
         else:
             kFacsVector = [[10.*min(gluinomass,squarkmass),kfacs]]  #First point for interpolation (decoupled grid)
-            kfacs = None        
+            kfacs = None
             while not kfacs and dcpl_mass > 500.:
-                dcpl_mass -= 100.  # Reduce decoupled mass, until NLLfast produces results
-                if process == 'sb': nllinput = (process, pdf, squarkmass, dcpl_mass)
-                else:  nllinput = (process, pdf, dcpl_mass, gluinomass)
-                nll_output = self._runForDecoupled ( energy, nllinput )
-                kfacs = self._getKfactorsFrom(nll_output)        
+                dcpl_mass -= 100.  # Reduce decoupled mass, until NNLLfast produces results
+                if process == 'sb': nnllinput = (process, squarkmass, dcpl_mass)
+                else:  nnllinput = (process, dcpl_mass, gluinomass)
+                nnll_output = self._runForDecoupled ( energy, nnllinput )
+                kfacs = self._getKfactorsFrom(nnll_output)
             kFacsVector.append([dcpl_mass, kfacs]) #Second point for interpolation (non-decoupled grid)
 
         if len(kFacsVector) < 2:
@@ -315,45 +315,20 @@ class NllFastWrapper(WrapperBase):
                             max(squarkmass, gluinomass))
         return kFacs
 
-class NllFastWrapper7(NllFastWrapper):
+class NnllfastWrapperWrapper13(NnllfastWrapperWrapper):
     """
-    An instance of this class represents the installation of nllfast 7.
+    An instance of this class represents the installation of nnllfast 13.
 
     """
     def __init__(self):
-        NllFastWrapper.__init__(self, 7, "1.2",
-                                 testParams="gg cteq 500 600",
-                                 testCondition="500.     600.    0.193E+00  "
-                                 "0.450E+00  0.497E+00")
-
-
-class NllFastWrapper8(NllFastWrapper):
-    """
-    An instance of this class represents the installation of nllfast 8.
-
-    """
-    def __init__(self):
-        NllFastWrapper.__init__(self, 8, "2.1",
-                                 testParams="gg cteq 500 600",
-                                 testCondition="500.     600.    0.406E+00  "
-                                 "0.873E+00  0.953E+00")
-
-class NllFastWrapper13(NllFastWrapper):
-    """
-    An instance of this class represents the installation of nllfast 8.
-
-    """
-    def __init__(self):
-        NllFastWrapper.__init__(self, 13, "3.1",
-                                 testParams="gg cteq 500 600",
+        NnllfastWrapperWrapper.__init__(self, 13, "1.1",
+                                 testParams="gg 500 600",
                                  testCondition="600.    0.394E+01  0.690E+01  "
                                  "0.731E+01    0.394E+00" )
 
-nllFastTools = { 7 : NllFastWrapper7(),
-                 8 : NllFastWrapper8(),
-                13 : NllFastWrapper13() }
+nnllFastTools = { 13 : NnllfastWrapperWrapper13() }
 
 
 if __name__ == "__main__":
-    for (sqrts, tool) in nllFastTools.items():
+    for (sqrts, tool) in nnllFastTools.items():
         print("%s: installed in %s" % (tool.name, tool.installDirectory()))
