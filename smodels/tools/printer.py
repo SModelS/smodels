@@ -19,6 +19,7 @@ from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.tools.smodelsLogging import logger
+import numpy as np
 from collections import OrderedDict
 from xml.dom import minidom
 from xml.etree import ElementTree
@@ -764,8 +765,14 @@ class PyPrinter(BasicPrinter):
                 else:
                     txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(fb)            
             maxconds = theoryPrediction.getmaxCondition()
-            # mass = theoryPrediction.mass ## FIXME thats the version without widths
-            mass = theoryPrediction.massAndWidth()
+            mass = np.array(theoryPrediction.mass)
+
+            #Add width information to the mass array:
+            if not hasattr(theoryPrediction, "totalwidth") or theoryPrediction.totalwidth is None:
+                totalwidth = (np.full(mass[:,:-1].shape,np.inf*GeV),np.full(mass[:,-1:].shape,0.*GeV))
+                totalwidth = np.hstack(totalwidth)
+            massWidth = np.dstack((mass,totalwidth)).tolist()
+            mass = massWidth
 
             def roundme ( x ):
                 if type(x)==tuple:

@@ -9,7 +9,7 @@
 
 from smodels.theory import clusterTools, crossSection, element
 from smodels.theory.auxiliaryFunctions import cSim, cGtr, elementsInStr, average
-from smodels.tools.physicsUnits import TeV, fb, GeV
+from smodels.tools.physicsUnits import TeV, fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
@@ -45,22 +45,6 @@ class TheoryPrediction(object):
         """
 
         return self.dataset.getID()
-
-    def massAndWidth(self):
-        """ a convenience method to report masses and widths in the
-            [[(mass1,width1),mass2]] format. """
-        ret = []
-        if not hasattr ( self, "totalwidth" ) or self.totalwidth == None:
-            return self.mass
-        for bm,bw in zip ( self.mass, self.totalwidth ):
-            tmp = []
-            for m,w in zip(bm,bw):
-                if w.asNumber(GeV)>1e-21 and w.asNumber(GeV)<1e-6:
-                    tmp.append ( (m,w) )
-                else:
-                    tmp.append ( m )
-            ret.append ( tmp )
-        return ret
 
     def analysisId(self):
         """
