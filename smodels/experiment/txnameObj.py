@@ -44,6 +44,9 @@ def widthToCoordinate ( x ):
         turn it into a function that can be interpolated """
     if type(x)==type(GeV):
         return 10.*math.log(x.asNumber(GeV))*GeV
+    if x==0.:
+        logger.error ( "zero width provided in lifetime dependent result" )
+        x=1e-26
     return 10.*math.log(x)
 
 def coordinateToWidth ( x ):

@@ -748,8 +748,9 @@ class PyPrinter(BasicPrinter):
             ul = theoryPrediction.getUpperLimit()
             ulExpected = theoryPrediction.getUpperLimit(expected = True)
             #Compute non-rescaled upper limit (equal to ul for EM results):
-            ulOriginal = theoryPrediction.dataset.getUpperLimitFor(element=theoryPrediction.avgElement,
-                                                                txnames=theoryPrediction.txnames)
+            ulOriginal = theoryPrediction.dataset.getUpperLimitFor(
+                                             element=theoryPrediction.avgElement,
+                                             txnames=theoryPrediction.txnames)
             if isinstance(ul,unum.Unum):
                 ul = ul.asNumber(fb)
             if isinstance(ulExpected,unum.Unum):
@@ -766,20 +767,22 @@ class PyPrinter(BasicPrinter):
                     txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(fb)            
             maxconds = theoryPrediction.getmaxCondition()
             mass = np.array(theoryPrediction.mass)
+            if theoryPrediction.mass  == None:
+                mass = None
 
             #Add width information to the mass array:
-            if not hasattr(theoryPrediction, "totalwidth") or theoryPrediction.totalwidth is None:
+            if not hasattr(theoryPrediction, "totalwidth") or theoryPrediction.totalwidth is None and mass is not None:
                 totalwidth = (np.full(mass[:,:-1].shape,np.inf*GeV),np.full(mass[:,-1:].shape,0.*GeV))
                 totalwidth = np.hstack(totalwidth)
-            massWidth = np.dstack((mass,totalwidth)).tolist()
-            mass = massWidth
+                massWidth = np.dstack((mass,totalwidth)).tolist()
+                mass = massWidth
 
             def roundme ( x ):
                 if type(x)==tuple:
                     return ( round(x[0].asNumber(GeV),2), x[1].asNumber(GeV) )
                 return round(x.asNumber(GeV),2)
 
-            if mass:
+            if mass is not None:
                 mass = [[roundme(m) for m in mbr] for mbr in mass]
             else:
                 mass = None
