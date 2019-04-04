@@ -747,16 +747,10 @@ class PyPrinter(BasicPrinter):
             dataType = theoryPrediction.dataType()
             ul = theoryPrediction.getUpperLimit()
             ulExpected = theoryPrediction.getUpperLimit(expected = True)
-            #Compute non-rescaled upper limit (equal to ul for EM results):
-            ulOriginal = theoryPrediction.dataset.getUpperLimitFor(
-                                             element=theoryPrediction.avgElement,
-                                             txnames=theoryPrediction.txnames)
             if isinstance(ul,unum.Unum):
                 ul = ul.asNumber(fb)
             if isinstance(ulExpected,unum.Unum):
                 ulExpected = ulExpected.asNumber(fb)
-            if isinstance(ulOriginal,unum.Unum):
-                ulOriginal = ulOriginal.asNumber(fb)
 
             value = theoryPrediction.xsection.value.asNumber(fb)
             txnamesDict = {}
@@ -805,8 +799,6 @@ class PyPrinter(BasicPrinter):
                         'r' : r, 'r_expected' : r_expected}  
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
-            if hasattr(self,"addoriginalul") and self.addoriginalul:
-                resDict['original upper limit (fb)'] =  ulOriginal
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 resDict['chi2'] = theoryPrediction.chi2
                 resDict['likelihood'] = theoryPrediction.likelihood                

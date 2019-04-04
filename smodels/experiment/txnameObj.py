@@ -14,14 +14,13 @@
 
 import os,sys,re
 from smodels.tools import physicsUnits
-from smodels.theory.auxiliaryFunctions import elementsInStr, removeUnits
+from smodels.theory.auxiliaryFunctions import elementsInStr, removeUnits, coordinateToWidth, widthToCoordinate
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
 from smodels.theory.topology import TopologyList
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
-from smodels.tools.physicsUnits import GeV
 from smodels.tools.reweighting import defaultEffReweight,defaultULReweight
 from scipy.linalg import svd, LinAlgError
 import scipy.spatial.qhull as qhull
@@ -29,7 +28,7 @@ import numpy as np
 import unum
 import copy
 import math,itertools
-from math import floor, log10, log
+from math import floor, log10
 
 
 #Build a dictionary with defined units. It can be used to evaluate
@@ -38,23 +37,6 @@ unitsDict = dict([[varname,varobj] for varname,varobj \
                   in physicsUnits.__dict__.items() 
                   if isinstance(varobj,unum.Unum)])
 
-
-def widthToCoordinate ( x ):
-    """ the function that is applied to all widths to 
-        turn it into a function that can be interpolated """
-    if type(x)==type(GeV):
-        return 10.*math.log(x.asNumber(GeV))*GeV
-    if x==0.:
-        logger.error ( "zero width provided in lifetime dependent result" )
-        x=1e-26
-    return 10.*math.log(x)
-
-def coordinateToWidth ( x ):
-    """ the function that is applied to all coordinates
-        to obtain the original width """
-    if type(x)==type(GeV):
-        return math.exp(x.asNumber(GeV)/10.)*GeV
-    return math.exp(x/10.)
 
 class TxName(object):
     """
@@ -316,14 +298,14 @@ class TxNameData(object):
         self._id = Id
         self._accept_errors_upto=accept_errors_upto
         self._V = None
-        self.usesWidths = False ## False, if not widths are used, the positions in the mass vector, if widths are used
+        self.usesWidths = False ## False if no widths are used, the positions in the mass vector, if widths are used
         if type(value)==str and "(" in value:
             tmp=value[4:value[4:].find("[[[")]
             brackets = [ x.start() for x in  re.finditer("\(",tmp) ]
             commas =np.array( [ x.start() for x in  re.finditer(",",tmp) ] )
             widthpositions = []
             for ctr,b in enumerate(brackets):
-                widthpositions.append ( len(commas[commas<b])+1 )
+                widthpositions.append(len(commas[commas<b])+1)
             self.usesWidths = widthpositions
         if type(value)==list:
             ctr=0

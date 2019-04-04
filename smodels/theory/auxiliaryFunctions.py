@@ -7,12 +7,13 @@
 """
 
 from smodels.theory import crossSection
-from smodels.tools.physicsUnits import fb
+from smodels.tools.physicsUnits import fb, GeV
 import unum
 from collections import Iterable
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.databaseParticles import finalStates
+import math
 
 #Get all finalStateLabels
 finalStateLabels = finalStates.getValuesFor('label')
@@ -380,4 +381,24 @@ def average(values,weights=None):
             return values[0]
         return None
     
-    
+
+def widthToCoordinate(x):
+    """ 
+    The function that is applied to all widths to 
+    turn it into a function that can be interpolated
+    """
+    if isinstance(x,unum.Unum):
+        return 10.*math.log(x.asNumber(GeV))*GeV
+    if x == 0.:
+        logger.error("Zero width provided in lifetime dependent result" )
+        x = 1e-26
+    return 10.*math.log(x)
+
+def coordinateToWidth(x):
+    """
+    The function that is applied to all coordinates
+    to obtain the original width
+    """
+    if isinstance(x,unum.Unum):
+        return math.exp(x.asNumber(GeV)/10.)*GeV
+    return math.exp(x/10.)
