@@ -13,7 +13,7 @@ from collections import Iterable
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.databaseParticles import finalStates
-import math
+import numpy as np
 
 #Get all finalStateLabels
 finalStateLabels = finalStates.getValuesFor('label')
@@ -382,23 +382,39 @@ def average(values,weights=None):
         return None
     
 
-def widthToCoordinate(x):
+def widthToCoordinate(width):
     """ 
     The function that is applied to all widths to 
-    turn it into a function that can be interpolated
+    map it into a better variable for interpolation.
+    It grows logarithmically from zero (for width=0.)
+    to a large number (machine dependent) for width = infinity.
+
+    :param width: Width value (in GeV) with or without units
+
+    :return x: Coordinate value (float)
     """
-    if isinstance(x,unum.Unum):
-        return 10.*math.log(x.asNumber(GeV))*GeV
-    if x == 0.:
-        logger.error("Zero width provided in lifetime dependent result" )
-        x = 1e-26
-    return 10.*math.log(x)
+
+    if isinstance(width,unum.Unum):
+        w = width.asNumber(GeV)
+    else:
+        w = width
+
+    minWidth = 1e-30 #Any width below this can be safely considered to be zero
+    w = np.nan_to_num(w/minWidth) #Normalize the width and convert it to some finite number (if not finite)
+    return np.log(1+w)
 
 def coordinateToWidth(x):
     """
-    The function that is applied to all coordinates
-    to obtain the original width
+    Maps a coordinate value back to width (with GeV unit).
+    The mapping is such that x=0->width=0 and x=very large -> width = inf.
+
+    :param x: Coordinate value (float)
+
+    :return width: Width value (in GeV) with unit
     """
-    if isinstance(x,unum.Unum):
-        return math.exp(x.asNumber(GeV)/10.)*GeV
-    return math.exp(x/10.)
+
+    minWidth = 1e-30*GeV #Any width below this can be safely considered to be zero
+    with np.errstate(over='ignore'): #Temporarily disable overflow error message
+        #The small increase in x is required to enforce coordinateToWidth(widthToCoordinae(np.inf)) = np.inf
+        width = minWidth*(np.exp(1.0001*x)-1)
+    return width

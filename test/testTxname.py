@@ -22,12 +22,9 @@ n1 = mssm.n1
 
 class TxTest(unittest.TestCase):
     def testCoordinateTrafo(self):
-        a=1e-10
+        a = 1e-10*GeV
         b = coordinateToWidth(widthToCoordinate(a))
-        self.assertAlmostEqual ( b, a )
-        a=1e-15*GeV
-        b = coordinateToWidth(widthToCoordinate(a))
-        self.assertAlmostEqual ( b.asNumber(GeV), a.asNumber(GeV) )
+        self.assertAlmostEqual(b.asNumber(GeV), a.asNumber(GeV))
 
     def testTxnameElements(self):
         
