@@ -610,10 +610,11 @@ class TxNameData(object):
                     porig[i]=widthToCoordinate(p)
 
         if len(porig) != self.full_dimensionality:
-            logger.error("dimensional error. I have been asked to compare a "\
+            err = "dimensional error. I have been asked to compare a "\
                     "%d-dimensional mass vector with %d-dimensional data!" % \
-                    (len(porig), self.full_dimensionality ))
-            raise SModelSError()
+                    (len(porig), self.full_dimensionality )
+            logger.error( err )
+            raise SModelSError( err )
         p = ((np.array([porig]) - self.delta_x )).tolist()[0]
         P = np.dot(p,self._V)  ## rotate
 

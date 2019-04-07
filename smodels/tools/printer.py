@@ -770,6 +770,22 @@ class PyPrinter(BasicPrinter):
                 totalwidth = np.hstack(totalwidth)
                 massWidth = np.dstack((mass,totalwidth)).tolist()
                 mass = massWidth
+            else:
+                totalwidth = theoryPrediction.totalwidth
+                finiteWidths = False
+                if totalwidth != None:
+                    for br in totalwidth:
+                        for m in br:
+                            if m.asNumber(GeV)>1e-26 and m.asNumber(GeV)<1e-1:
+                                finiteWidths = True
+                                break
+                            
+                if finiteWidths:
+                    massWidth = []
+                    for mbr,wbr in zip(mass,totalwidth):
+                        tmp = [ (x,y) for x,y in zip(mbr,wbr) ]
+                        massWidth.append ( tmp )
+                    mass = massWidth
 
             def roundme ( x ):
                 if type(x)==tuple:
