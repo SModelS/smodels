@@ -413,7 +413,9 @@ def coordinateToWidth(x):
     :return width: Width value (in GeV) with unit
     """
 
-    minWidth = 1e-30*GeV #Any width below this can be safely considered to be zero
+    minWidth = 1e-30
+    if type(x) == type(GeV):
+        minWidth = 1e-30*GeV #Any width below this can be safely considered to be zero
     with np.errstate(over='ignore'): #Temporarily disable overflow error message
         #The small increase in x is required to enforce coordinateToWidth(widthToCoordinae(np.inf)) = np.inf
         width = minWidth*(np.exp(1.0001*x)-1)
