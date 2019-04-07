@@ -11,6 +11,7 @@
 import sys
 sys.path.insert(0,"../")
 from smodels.tools.smodelsLogging import setLogLevel
+from databaseLoader import database
 setLogLevel ( "error" )
 
 import unittest
@@ -35,7 +36,17 @@ class CppTest(unittest.TestCase):
         f.write ( a )
         f.close()
 
+    def createIniFile(self):
+        f=open("../cpp/template.ini","r")
+        lines=f.readlines()
+        f.close()
+        f=open("../cpp/parameters.ini","w" )
+        for line in lines:
+            f.write ( line.replace("@@path@@",database.url) )
+        f.close()
+
     def runExample(self):
+        self.createIniFile()
         """ now run the example """
         cmd = "cd ../cpp; ./run"
         l = CMD.getoutput(cmd)

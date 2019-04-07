@@ -61,6 +61,7 @@ class Database(object):
         :param subpickle: produce small pickle files per exp result.
             Should only be used when working on the database.
         """
+        self.url = base
         self.source=""
         self.force_load = force_load
         self.subpickle = subpickle
