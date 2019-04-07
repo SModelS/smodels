@@ -371,6 +371,10 @@ class Database(object):
             # next step: check the timestamps
             return ( cDir, os.path.basename ( filename ) )
 
+        stats = os.stat ( filename )
+        if stats.st_size < jsn["size"]:
+            ## size doesnt match. redownload!
+            return self.fetchFromScratch ( path, store, discard_zeroes )
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!
             return self.fetchFromScratch ( path, store, discard_zeroes )
