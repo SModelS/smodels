@@ -372,8 +372,9 @@ class Database(object):
             return ( cDir, os.path.basename ( filename ) )
 
         stats = os.stat ( filename )
-        if stats.st_size < jsn["size"]:
-            ## size doesnt match. redownload!
+        if stats.st_size < jsn["size"]-2048:
+            ## size doesnt match (2048 is to allow for slightly different file
+            ## sizes reported by the OS). redownload!
             return self.fetchFromScratch ( path, store, discard_zeroes )
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!
