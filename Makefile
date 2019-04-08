@@ -1,11 +1,11 @@
 VER=$(shell cat smodels/version)
 
-HAS_FC := $(shell command -v $(FC) 2> /dev/null)
+HAS_FC := $(shell smodels/lib/check_fortran_compiler.sh 2> /dev/null)
 HAS_CXX := $(shell command -v $(CXX) 2> /dev/null)
 
 all: resolve_deps externaltools
 
-check_compilers:
+check_compilers: .PHONY
 ifndef HAS_FC
 	$(error "Fortran compiler not found. Cannot compile external tools. You may try to give the explicit path to the compiler via the FC variable (make FC=... smodels). Alternatively, you can still build smodels proper, via 'make smodels_noexternaltools'" )
 endif
@@ -39,7 +39,7 @@ version:
 	@echo $(VER)
 
 externaltools: check_compilers
-	cd smodels/lib && make
+	cd smodels/lib && make -j 4
 
 pythia6:
 	cd smodels/lib && make pythia6
