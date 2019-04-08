@@ -1,4 +1,4 @@
-FC=$(shell ./check_compiler.sh)
+FC=$(shell ../check_fortran_compiler.sh)
 
 all: pythia_lhe
 
