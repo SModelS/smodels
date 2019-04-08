@@ -393,7 +393,6 @@ def widthToCoordinate(width):
 
     :return x: Coordinate value (float)
     """
-    print ( "widthToCoordinate",width )
 
     if isinstance(width,unum.Unum):
         w = width.asNumber(GeV)
