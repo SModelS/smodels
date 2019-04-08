@@ -393,6 +393,7 @@ def widthToCoordinate(width):
 
     :return x: Coordinate value (float)
     """
+    print ( "widthToCoordinate",width )
 
     if isinstance(width,unum.Unum):
         w = width.asNumber(GeV)
@@ -401,7 +402,7 @@ def widthToCoordinate(width):
 
     minWidth = 1e-30 #Any width below this can be safely considered to be zero
     w = np.nan_to_num(w/minWidth) #Normalize the width and convert it to some finite number (if not finite)
-    return np.log(1+w)
+    return np.log(1+w)/1.0001
 
 def coordinateToWidth(x):
     """
