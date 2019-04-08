@@ -400,8 +400,9 @@ def widthToCoordinate(width):
         w = width
 
     minWidth = 1e-30 #Any width below this can be safely considered to be zero
-    w = np.nan_to_num(w/minWidth) #Normalize the width and convert it to some finite number (if not finite)
-    return np.log(1+w)/1.0001
+    maxWidth = 1e50 #Any width above this can be safely considered to be infinity
+    w = (min(w,maxWidth)/minWidth) #Normalize the width and convert it to some finite number (if not finite)
+    return np.log(1+w)
 
 def coordinateToWidth(x):
     """
@@ -413,10 +414,11 @@ def coordinateToWidth(x):
     :return width: Width value (in GeV) with unit
     """
 
-    minWidth = 1e-30
-    if isinstance(x,unum.Unum):
-        minWidth = 1e-30*GeV #Any width below this can be safely considered to be zero
+    minWidth = 1e-30 #Any width below this can be safely considered to be zero
+    maxWidth = 1e50 #Any width above this can be safely considered to be infinity
     with np.errstate(over='ignore'): #Temporarily disable overflow error message
         #The small increase in x is required to enforce coordinateToWidth(widthToCoordinae(np.inf)) = np.inf
-        width = minWidth*(np.exp(1.0001*x)-1)
-    return width
+        width = minWidth*(np.exp(x)-1)
+        if width > maxWidth:
+            width = np.inf
+    return width*GeV
