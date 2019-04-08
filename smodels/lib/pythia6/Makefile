@@ -1,3 +1,5 @@
+FC=$(shell ./check_compiler.sh)
+
 all: pythia_lhe
 
 tarball:
