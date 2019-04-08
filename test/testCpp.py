@@ -41,8 +41,13 @@ class CppTest(unittest.TestCase):
         lines=f.readlines()
         f.close()
         f=open("../cpp/parameters.ini","w" )
+        dbName = database.url
+        if dbName.startswith("./"):
+            dbName = "../test/%s" % dbName[2:]
+        if dbName.startswith("database"):
+            dbName = "../test/%s" % dbName
         for line in lines:
-            f.write ( line.replace("@@path@@",database.url) )
+            f.write ( line.replace("@@path@@",dbName ) )
         f.close()
 
     def runExample(self):
