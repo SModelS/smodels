@@ -110,6 +110,22 @@ class RunSModelSTest(unittest.TestCase):
             if os.path.exists( i ): os.remove( i )
         self.assertTrue(equals)               
  
+    def testLifeTimeDependent(self):
+        filename = "./testFiles/slha/lifetime.slha"
+        outputfile = runMain(filename)
+        with open(outputfile, 'rb') as fp: ## imports file with dots in name
+            output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
+            smodelsOutput = output_module.smodelsOutput        
+        from lifetime_default import smodelsOutputDefault
+        ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
+        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
+                    key=lambda res: res['r'], reverse=True)
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+                           ignore=ignoreFields)            
+        for i in [ './outputHSC.py', './outputHSCP.pyc' ]:
+            if os.path.exists( i ): os.remove( i )
+        self.assertTrue(equals)               
+
      
     def testBadFile(self):
         # since 112 we skip non-existing slha files!
