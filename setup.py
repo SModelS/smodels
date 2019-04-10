@@ -75,7 +75,7 @@ def listDirectory (dirname):
         extension = os.path.splitext ( filename )[1]
         if os.path.isdir ( fullname ) or \
                 extension in [ ".out", ".tgz", ".1" ] or \
-                file in [ "Makefile", "README" ]:
+                filename in [ "Makefile", "README" ]:
             continue
         ret.append ( fullname )
     return ret
