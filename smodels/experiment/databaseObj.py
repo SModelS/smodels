@@ -662,8 +662,7 @@ class Database(object):
                         #Replaced by wildcard-evaluation below (2018-04-06 mat)
                         hits=False
                         for pattern in txnames:
-                            print ( "check",txname.txName,"against",pattern )
-                            hits = fnmatch.filter ( [ txname.txName ], pattern )
+                            hits = fnmatch.filter([ txname.txName ], pattern)
                             if hits: # one match is enough
                                 break
                         if not hits:

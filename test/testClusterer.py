@@ -29,7 +29,6 @@ from databaseLoader import database
 from smodels.theory.clusterTools import clusterElements
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.particle import ParticleList
-import copy
 
 
 class ClustererTest(unittest.TestCase):

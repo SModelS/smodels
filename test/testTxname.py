@@ -12,7 +12,7 @@ sys.path.insert(0,"../")
 from smodels.share.models import mssm
 from smodels.theory.element import Element
 from smodels.experiment import infoObj
-from smodels.experiment.txnameObj import TxName, widthToCoordinate, coordinateToWidth
+from smodels.experiment.txnameObj import TxName, rescaleWidth, unscaleWidth
 from smodels.tools.physicsUnits import GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import unittest
@@ -23,22 +23,20 @@ n1 = mssm.n1
 class TxTest(unittest.TestCase):
     def testCoordinateTrafo(self):
         a = 1e-10*GeV
-        b = coordinateToWidth(widthToCoordinate(a))
+        b = unscaleWidth(rescaleWidth(a))
         self.assertAlmostEqual(b.asNumber(GeV), a.asNumber(GeV))
         a = 1e-50*GeV
-        b = coordinateToWidth(widthToCoordinate(a))
+        b = unscaleWidth(rescaleWidth(a))
         self.assertAlmostEqual(b.asNumber(GeV), a.asNumber(GeV))
         a = float('inf')*GeV
-        b = coordinateToWidth(widthToCoordinate(a))
+        b = unscaleWidth(rescaleWidth(a))
         self.assertAlmostEqual(b.asNumber(GeV), a.asNumber(GeV))
         a = 1e-25*GeV
-        b = coordinateToWidth(widthToCoordinate(a))
+        b = unscaleWidth(rescaleWidth(a))
         self.assertAlmostEqual(b.asNumber(GeV), a.asNumber(GeV))
         a = 0.*GeV
-        b = coordinateToWidth(widthToCoordinate(a))
+        b = unscaleWidth(rescaleWidth(a))
         self.assertAlmostEqual(b.asNumber(GeV), a.asNumber(GeV))
-
-
 
     def testTxnameElements(self):
         
@@ -51,7 +49,6 @@ class TxTest(unittest.TestCase):
         
         self.assertTrue(len(tx._topologyList.getElements()), 1)
         self.assertEqual(tx._topologyList.getElements()[0], el)
-        
         
     def testBrokenFinalState(self):
         
@@ -68,7 +65,6 @@ class TxTest(unittest.TestCase):
         
         errstr = 'Final state non-MET has not been defined in databaseParticles.py'
         self.assertEqual(gotError.args[0], errstr)
-        
         
     def testgetEffFor(self):
         
@@ -92,7 +88,6 @@ class TxTest(unittest.TestCase):
         setattr(n1, 'totalwidth', 0.*GeV)
         setattr(c1, 'totalwidth', 10**(-17)*GeV)
         self.assertAlmostEqual(tx.getEfficiencyFor(el), 0.08697,5)
-
 
     def testGetValueFor(self):
 

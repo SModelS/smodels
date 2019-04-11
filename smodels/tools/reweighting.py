@@ -27,7 +27,7 @@ def defaultEffReweight(element,minWeight=1e-10):
     """
 
     if isinstance(element,list):
-        elWidths = element
+        elWidths = [[w.asNumber(GeV) for w in br] for br in element]
     else:
         elWidths = [ [ x.asNumber(GeV) for x in L ] for L in element.totalwidth ]
     elFraction = 1.
