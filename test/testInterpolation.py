@@ -49,6 +49,21 @@ class InterpolationTest(unittest.TestCase):
         diff = np.sum( np.array(data) - np.array(initial) )
         self.assertAlmostEqual ( diff.asNumber(GeV), 0. )
 
+    def testCoordinateTrafoInclusive(self):
+        """ test the transformation of data into coordinates, back into data """
+        expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2016-08"], 
+                    datasetIDs=[None], txnames=["T5Disp" ] )
+        txname=expRes[0].datasets[0].txnameList[0] 
+        initial = [[ (300.*GeV,1e-16*GeV),100.*GeV], [ (300.*GeV,1e-16*GeV),100.*GeV] ]
+        coords=txname.txnameData.dataToCoordinates(
+                initial, txname.txnameData._V, txname.txnameData.delta_x )
+        print ( "coords", coords )
+        data = txname.txnameData.coordinatesToData( coords, txname.txnameData._V,
+                  txname.txnameData.delta_x )
+        import numpy as np
+        diff = np.sum( np.array(data) - np.array(initial) )
+        self.assertAlmostEqual ( diff.asNumber(GeV), 0. )
+
 
 
     def testInterpolation(self):
