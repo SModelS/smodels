@@ -14,6 +14,7 @@
 
 import os,sys
 from smodels.tools import physicsUnits
+from smodels.tools.physicsUnits import GeV
 from smodels.theory.auxiliaryFunctions import (elementsInStr, removeUnits, unscaleWidth, 
                                                rescaleWidth, flattenArray, reshapeList, 
                                                removeInclusives, addInclusives)
