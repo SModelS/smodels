@@ -388,7 +388,7 @@ class TxNameData(object):
 
         if isinstance(value,list):
             return [self.getDataShape(m) for m in value]
-        elif isinstance(value,(float,int,unum.Unum)):
+        elif isinstance(value,(float,int,unum.Unum,tuple)):
             return type(value)
         else:
             return value
@@ -495,8 +495,9 @@ class TxNameData(object):
         else:
             pointFull = np.array(point[:])
         
+        massAndWidths = pointFull
         if rotMatrix is not None:
-            massAndWidths = np.dot(rotMatrix,pointFull)
+            massAndWidths = np.dot(rotMatrix,massAndWidths)
         if transVector is not None:            
             massAndWidths = massAndWidths + transVector
             
@@ -504,17 +505,15 @@ class TxNameData(object):
         #Extract masses and transformed widths
         masses = massAndWidths[:len(massAndWidths)-len(self.widthPosition)]
         xwidths = massAndWidths[len(massAndWidths)-len(self.widthPosition):]
-        #Rescale widths:
+        #Rescale widths and add unit:
         widths = [unscaleWidth(xw) for xw in xwidths]
         #Add units (make sure it is consistent with standardUnits)
         massUnit = [unit for unit in physicsUnits.standardUnits 
                     if not (1*GeV/unit).normalize()._unit][0]
         masses = [m*massUnit for m in masses[:]]
-        widths = [w*massUnit for w in widths[:]]
-        
         #Add inclusive entries to mass 
         flatShape = flattenArray(self.dataShape)
-        if len(flatShape) - flatShape.count('*') != len(masses):
+        if len([x for x in flatShape if x is not '*']) != len(masses):
             logger.error("Error trying to add inclusive entries (%s) to flat mass array (%s)." 
                          %(flatShape,masses))
             raise SModelSError()
@@ -524,6 +523,7 @@ class TxNameData(object):
             logger.error("Number of elements in %s do not match the number of entries in %s" 
                          %(masses,self.dataShape))
             raise SModelSError()
+
         massArray = reshapeList(masses, self.dataShape)
         #Add widths to the mass array
         if len(widths) != len(self.widthPosition):
@@ -531,8 +531,15 @@ class TxNameData(object):
                          %(len(widths),len(self.widthPosition)))
             raise SModelSError()
             
-        massAndWidthArray = [[(m,widths.pop(0)) if (ibr,im) in self.widthPosition else m
-                             for im,m in enumerate(br)] for ibr,br in enumerate(massArray)] 
+        #Combine masses and widths
+        massAndWidthArray = []
+        for ibr,br in enumerate(massArray):
+            if br is not '*':
+                newBr = [(m,widths.pop(0)) if (ibr,im) in self.widthPosition else m
+                             for im,m in enumerate(br)]
+            else:
+                newBr = br
+            massAndWidthArray.append(newBr)
 
         return massAndWidthArray
 

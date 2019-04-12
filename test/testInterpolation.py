@@ -34,38 +34,6 @@ class InterpolationTest(unittest.TestCase):
         expected = txname.getULFor(m, expected = True)
         self.assertTrue(expected is None)
 
-    def testCoordinateTrafo(self):
-        """ test the transformation of data into coordinates, back into data """
-        expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], 
-                    datasetIDs=[None], txnames=["T2bb" ] )
-        #expRes=listOfExpRes[0]   # ATLAS-SUSY-2013-05
-        txname=expRes[0].datasets[0].txnameList[0] # T2bb
-        initial = [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ]
-        coords=txname.txnameData.dataToCoordinates(
-                initial, txname.txnameData._V, txname.txnameData.delta_x )
-        data = txname.txnameData.coordinatesToData( coords, txname.txnameData._V,
-                  txname.txnameData.delta_x )
-        import numpy as np
-        diff = np.sum( np.array(data) - np.array(initial) )
-        self.assertAlmostEqual ( diff.asNumber(GeV), 0. )
-
-    def testCoordinateTrafoInclusive(self):
-        """ test the transformation of data into coordinates, back into data """
-        expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2016-08"], 
-                    datasetIDs=[None], txnames=["T5Disp" ] )
-        txname=expRes[0].datasets[0].txnameList[0] 
-        initial = [[ (300.*GeV,1e-16*GeV),100.*GeV], [ (300.*GeV,1e-16*GeV),100.*GeV] ]
-        coords=txname.txnameData.dataToCoordinates(
-                initial, txname.txnameData._V, txname.txnameData.delta_x )
-        print ( "coords", coords )
-        data = txname.txnameData.coordinatesToData( coords, txname.txnameData._V,
-                  txname.txnameData.delta_x )
-        import numpy as np
-        diff = np.sum( np.array(data) - np.array(initial) )
-        self.assertAlmostEqual ( diff.asNumber(GeV), 0. )
-
-
-
     def testInterpolation(self):
         # print database
         expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], 
