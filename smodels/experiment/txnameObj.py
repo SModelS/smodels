@@ -445,7 +445,7 @@ class TxNameData(object):
         widths = [[widths[ibr][im] for im,_ in enumerate(br) 
                    if (ibr,im) in self.widthPosition] 
                    for ibr,br in enumerate(widths)]
-        if None in flattenArray(widths):
+        if None in removeUnits ( flattenArray(widths), GeV ):
             logger.error("Error obtaining widths from %s" %str(dataPoint))
             raise SModelSError()
         
