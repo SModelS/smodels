@@ -156,6 +156,8 @@ def addUnit(obj,unit):
 
     if isinstance(obj,list):
         return [addUnit(x,unit) for x in obj]
+    elif isinstance(obj,tuple):
+        return tuple([addUnit(x,unit) for x in obj])
     elif isinstance(obj,dict):
         return dict([[addUnit(x,unit),addUnit(y,unit)] for x,y in obj.items()])
     elif isinstance(obj,(float,int,unum.Unum)):
