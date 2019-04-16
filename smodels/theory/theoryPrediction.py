@@ -390,7 +390,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
         totalwidth = None
     else:
         mass = average(massList,weights=weights)
-        totalwidth = average(massList,weights=weights)
+        totalwidth = average(widthList,weights=weights)
 
 
     #Create a combinedDataSet object:
