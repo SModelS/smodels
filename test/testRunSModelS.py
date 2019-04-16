@@ -82,7 +82,7 @@ class RunSModelSTest(unittest.TestCase):
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.08,
                            ignore=ignoreFields)
         if not equals:
             e =  "output13.py and simplyGluino_default.py differ!" 

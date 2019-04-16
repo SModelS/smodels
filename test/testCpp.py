@@ -86,7 +86,8 @@ class CppTest(unittest.TestCase):
                 except (SyntaxError,NameError):
                     pass
                 if isinstance(yv,float) and isinstance(xv,float):
-                    self.assertAlmostEqual(xv, yv, 5)
+                    dlta = abs ( yv -xv ) / (yv+xv)
+                    self.assertTrue ( dlta < .1 or abs(xv-yv)<1e-6 )
                 else:
                     self.assertEqual(xv, yv)
 
