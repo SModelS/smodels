@@ -825,6 +825,8 @@ class PyPrinter(BasicPrinter):
                         'lumi (fb-1)' : (expResult.globalInfo.lumi*fb).asNumber(),
                         'dataType' : dataType,
                         'r' : r, 'r_expected' : r_expected}
+            if widths:
+                resDict["Width (GeV)"] = widths
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:

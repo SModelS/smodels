@@ -17,10 +17,13 @@ from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
 from unitTestHelpers import equalObjs, runMain
 import time
+import subprocess
  
 from smodels.tools.smodelsLogging import logger
  
 class RunSModelSTest(unittest.TestCase):
+    definingRun = False ## meant only to adapt to changes in output format
+    ## use with super great care!!
  
     def testMultipleFiles( self ):
         out = "./unitTestOutput"
@@ -32,7 +35,8 @@ class RunSModelSTest(unittest.TestCase):
         nout = len([i for i in glob.iglob("unitTestOutput/*smodels") if not "~" in i])
         nin = len([i for i in glob.iglob("%s/*slha" % dirname) if not "~" in i])
         if nout != nin:
-            logger.error("Number of output file(%d) differ from number of input files(%d)" %(nout, nin))
+            logger.error("Number of output file(%d) differ from number of input files(%d)" %
+                          (nout, nin))
         self.assertEqual(nout,nin)
       
     def testTimeout(self):
@@ -57,6 +61,11 @@ class RunSModelSTest(unittest.TestCase):
     def testGoodFile(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(filename)
+        if self.definingRun:
+            logger.error ( "This is a definition run! Know what youre doing!" )
+            default = "gluino_squarks_default.py"
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
+            a = subprocess.getoutput ( cmd )
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
             smodelsOutput = output_module.smodelsOutput
@@ -75,6 +84,11 @@ class RunSModelSTest(unittest.TestCase):
              
         filename = "./testFiles/slha/simplyGluino.slha"
         outputfile = runMain(filename,suppressStdout = True )
+        if self.definingRun:
+            logger.error ( "This is a definition run! Know what youre doing!" )
+            default = "simplyGluino_default.py"
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
+            a = subprocess.getoutput ( cmd )
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
             smodelsOutput = output_module.smodelsOutput
@@ -97,6 +111,11 @@ class RunSModelSTest(unittest.TestCase):
     def testGoodFileHSCP(self):
         filename = "./testFiles/slha/longLived.slha"
         outputfile = runMain(filename)
+        if self.definingRun:
+            logger.error ( "This is a definition run! Know what youre doing!" )
+            default = "longLived_default.py"
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
+            a = subprocess.getoutput ( cmd )
         with open(outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
             smodelsOutput = output_module.smodelsOutput        
@@ -113,6 +132,11 @@ class RunSModelSTest(unittest.TestCase):
     def testLifeTimeDependent(self):
         filename = "./testFiles/slha/lifetime.slha"
         outputfile = runMain(filename)
+        if self.definingRun:
+            logger.error ( "This is a definition run! Know what youre doing!" )
+            default = "lifetime_default.py"
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
+            a = subprocess.getoutput ( cmd )
         with open(outputfile, 'rb') as fp: ## imports file with dots in name
             output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
             smodelsOutput = output_module.smodelsOutput        
