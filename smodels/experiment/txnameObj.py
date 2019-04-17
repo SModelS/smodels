@@ -594,18 +594,21 @@ class TxNameData(object):
         #analysis require prompt decays 
         #(width=inf for intermediate particles and width=0 for the last particle)
         if isinstance(element,Element):
-            widths = element.totalwidth
             #Replaced the widths to be used for interpolation
             #with "prompt" widths (inf for intermediate particles and zero for final particles).
             #This way the reweight factor is only applied for the widths not used
             #for interpolation (since inf and zero result in no reweighting).
-            for ibr,br in enumerate(widths):
-                for im,_ in enumerate(br):
-                    if (ibr,im) in self.widthPosition:
-                        if im != len(br)-1:
-                            widths[ibr][im] = float('inf')*GeV
+            widths = []
+            for ibr,br in enumerate(element.totalwidth):
+                widths.append([])
+                for iw,w in enumerate(br):
+                    if (ibr,iw) in self.widthPosition:
+                        if iw != len(br)-1:
+                            widths[ibr].append(float('inf')*GeV)
                         else:
-                            widths[ibr][im] = 0.*GeV                            
+                            widths[ibr].append(0.*GeV)
+                    else:
+                        widths[ibr].append(w)
             reweightFactor = self.reweightF(widths)
         elif isinstance(element,list):
             reweightFactor = 1.
