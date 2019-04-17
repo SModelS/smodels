@@ -601,7 +601,7 @@ class TxNameData(object):
             #for interpolation (since inf and zero result in no reweighting).
             for ibr,br in enumerate(widths):
                 for im,_ in enumerate(br):
-                    if (ibr,im) not in self.widthPosition:
+                    if (ibr,im) in self.widthPosition:
                         if im != len(br)-1:
                             widths[ibr][im] = float('inf')*GeV
                         else:
