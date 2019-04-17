@@ -122,7 +122,7 @@ class RunSModelSTest(unittest.TestCase):
                     key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)            
-        for i in [ './outputHSC.py', './outputHSCP.pyc' ]:
+        for i in [ './outputHSCP.py', './outputHSCP.pyc' ]:
             if os.path.exists( i ): os.remove( i )
         self.assertTrue(equals)               
 
