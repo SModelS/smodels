@@ -399,7 +399,8 @@ class TxNameData(object):
         
         :param value: data point
         
-        :return: A list with the position of the widths 
+        :return: A list with the position of the widths. A position is a tuple
+                 of the form (branch-index,vertex-index).
         """
         
         widthPositions = [(ibr,im)  for ibr,br in enumerate(value) for im,m in enumerate(br) 
