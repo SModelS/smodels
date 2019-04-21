@@ -365,7 +365,7 @@ class Database(object):
             if not os.path.isfile ( filename ):
                 logger.error ( "Cant find a local copy of the pickle file. Exit." )
                 sys.exit()
-            logger.warning ( "I do however have a local copy of the file. I work with that." )
+            logger.warning ( "I do however have a local copy of the file at %s. I work with that." % filename )
             self.force_load = "pcl"
             # return ( cDir, filename )
             # next step: check the timestamps
