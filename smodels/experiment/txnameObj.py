@@ -266,7 +266,8 @@ class TxName(object):
                 eff = 0. #Element is outside the grid or has zero efficiency
         elif self.txnameData.dataType == 'upperLimit':
             ul = self.txnameData.getValueFor(element)
-            element._upperLimit = ul #Store the upper limit for convenience
+            if isinstance(element,Element):
+                element._upperLimit = ul #Store the upper limit for convenience
             if ul is None:
                 eff = 0. #Element is outside the grid or the decays do not correspond to the txname
             else:
