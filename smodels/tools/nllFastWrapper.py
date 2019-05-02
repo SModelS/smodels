@@ -281,7 +281,9 @@ class NllFastWrapper(WrapperBase):
 
         # If process do not have decoupled grids, return None:
         if not doDecoupling:
-            logger.warning("Masses of (q,g)=(%s,%s) out of NLLfast grid for %s, %s" % ( squarkmass, gluinomass, process, energy ))
+            if gluinomass < 99000. and squarkmass < 99000.:
+                ## dont warn about obviously decoupled cases
+                logger.warning("Masses of (q,g)=(%s,%s) out of NLLfast grid for %s, %s" % ( squarkmass, gluinomass, process, energy ))
             return (None, None)
 
         # Obtain k-factors from the NLLfast decoupled grid
