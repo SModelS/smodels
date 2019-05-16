@@ -146,7 +146,7 @@ class BasicPrinter(object):
         if not self.filename:
             return
         dirname = os.path.dirname ( self.filename )
-        if not os.path.exists ( dirname ):
+        if dirname != "" and not os.path.exists ( dirname ):
             os.makedirs ( dirname )
 
     def setOptions(self,options):
