@@ -289,7 +289,7 @@ class LikelihoodComputer:
         
         :param signal_rel: array with relative signal strengths 
         
-        :returns: mu_hat, the total signal yield.
+        :returns: mu_hat, the maximum likelihood estimate of mu
         """
         
         if (self.model.backgrounds == self.model.observed).all():
