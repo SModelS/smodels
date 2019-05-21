@@ -5,8 +5,7 @@
    :synopsis: Code that implements the simplified likelihoods as presented
               in CMS-NOTE-2017-001, see https://cds.cern.ch/record/2242860.
               In collaboration with Andy Buckley, Sylvain Fichet and Nickolas Wardle.
-              Additional developments will be presented in a future publication.
-             
+              Simplified likelihoods v2 (JHEP_021P_1018) are partly implemented.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 

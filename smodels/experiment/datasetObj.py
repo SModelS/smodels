@@ -152,7 +152,7 @@ class DataSet(object):
         
         return getValuesForObj(self,attribute)
 
-    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False ):
+    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False ):
         """
         Computes the likelihood to observe nobs events,
         given a predicted signal "nsig", assuming "deltas"
@@ -161,11 +161,15 @@ class DataSet(object):
         :param nsig: predicted signal (float)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
+        :param expected: Compute expected instead of observed likelihood
         :returns: likelihood to observe nobs events (float)
         """
+        obs = self.dataInfo.observedN
+        if expected:
+            obs = self.dataInfo.expectedBG
 
-        m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                 deltas_rel=deltas_rel)
+        m = Data( obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2, 
+                       deltas_rel=deltas_rel )
         computer = LikelihoodComputer(m)
         return computer.likelihood(nsig, marginalize=marginalize)
     

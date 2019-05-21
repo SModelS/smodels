@@ -331,9 +331,6 @@ class Database(object):
             dump.close()
         logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) )
         logger.debug ( "store as %s" % filename )
-        #with open( filename, "wb" ) as f:
-        #    f.write ( r2.content )
-        #    f.close()
         self.force_load = "pcl"
         return ( "./", "%s" % filename )
 
@@ -367,9 +364,8 @@ class Database(object):
                 sys.exit()
             logger.warning ( "I do however have a local copy of the file at %s. I work with that." % filename )
             self.force_load = "pcl"
-            # return ( cDir, filename )
-            # next step: check the timestamps
-            return ( cDir, os.path.basename ( filename ) )
+            return ( cDir, filename )
+            #return ( cDir, os.path.basename ( filename ) )
 
         stats = os.stat ( filename )
         if stats.st_size < jsn["size"]-2048:
@@ -383,7 +379,6 @@ class Database(object):
         if not os.path.isfile ( filename ):
             return self.fetchFromScratch ( path, store, discard_zeroes )
         self.force_load = "pcl"
-        # next step: check the timestamps
         return ( "./", filename )
 
     def checkPathName( self, path, discard_zeroes ):

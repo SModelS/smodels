@@ -26,6 +26,8 @@ from xml.etree import ElementTree
 import unum
 import time
 
+# from smodels.tools.deep_getsizeof import deep_getsizeof
+
 class MPrinter(object):
     """
     Master Printer class to handle the Printers (one printer/output type)
@@ -57,6 +59,8 @@ class MPrinter(object):
                 newPrinter = TxTPrinter(output = 'file')
             elif prt == 'xml':
                 newPrinter = XmlPrinter(output = 'file')
+            elif prt == 'pickle':
+                newPrinter = PicklePrinter(output = 'file')
             elif prt == 'slha':
                 newPrinter = SLHAPrinter(output = 'file')
                 if parser.getboolean("options", "doCompress") or parser.getboolean("options", "doInvisible"):
@@ -1138,3 +1142,52 @@ class SLHAPrinter(TxTPrinter):
                 if cter > 9: break
         return output
 
+
+class PicklePrinter(BasicPrinter):
+    """
+    Printer class to handle the printing into a pickle file
+    """
+    def __init__(self, output = 'file', filename = None):
+        BasicPrinter.__init__(self, output, filename)
+        self.name = "pickle"
+        self.printtimespent = False
+        self.printingOrder = [OutputStatus,ExpResultList,TopologyList,
+                             TheoryPredictionList,Uncovered]
+        self.toPrint = [None]*len(self.printingOrder)
+
+    def setOutPutFile(self,filename,overwrite=True,silent=False):
+        """
+        Set the basename for the text printer. The output filename will be
+        filename.pcl
+        :param filename: Base filename
+        :param overwrite: If True and the file already exists, it will be removed.
+        :param silent: dont comment removing old files
+        """
+
+        self.filename = filename
+        if not filename.endswith(".pcl"):
+            self.filename = filename + '.pcl'
+        if overwrite and os.path.isfile(self.filename):
+            if not silent:
+                logger.warning("Removing old output file " + self.filename)
+            os.remove(self.filename)
+
+    def flush(self):
+        """
+        Dump the python objects into the "sink"
+        """
+        if self.output != "file":
+            logger.error ( "pickle printer accepts only files as data sinks (%s given)" % \
+                           self.output )
+            return False
+        if not self.filename:
+            logger.error('Filename not defined for printer')
+            return False
+
+        import pickle
+        # self.toPrint = [None]*len(self.printingOrder)
+        with self.openOutFile(self.filename, "ab") as outfile:
+            for i in self.toPrint:
+                # print ( "adding %20s (size %d)" % ( str(i)[:20], deep_getsizeof(i) ) )
+                pickle.dump ( i, outfile )
+        outfile.close()

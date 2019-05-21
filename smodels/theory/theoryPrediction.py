@@ -114,6 +114,21 @@ class TheoryPrediction(object):
         else:
             return (self.xsection.value/upperLimit).asNumber()
 
+    def getLikelihood(self,mu=1.,marginalize=False,deltas_rel=.2,expected=False):
+        """
+        get the likelihood for a signal strength modifier mu 
+        :param expected: compute expected, not observed likelihood
+        """
+        if self.dataType()  == 'upperLimit':
+            # FIXME treat the case of exisiting expected upper limit
+            return None
+        if self.dataType() == 'efficiencyMap':
+            lumi = self.dataset.globalInfo.lumi
+            nsig = mu*(self.xsection.value*lumi).asNumber()
+            llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel,expected=expected)
+            return llhd
+        return None
+
     def computeStatistics(self,marginalize=False,deltas_rel=0.2):
         """
         Compute the likelihood, chi2 and expected upper limit for this theory prediction.
