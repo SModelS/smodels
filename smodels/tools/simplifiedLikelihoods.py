@@ -771,7 +771,7 @@ class UpperLimitComputer:
                                    nll=True)
         
         def root_func(mu):
-            ## the function to minimize.
+            ## the function to find the zero of (ie CLs - alpha)
             nsig = model.signals(mu)
             computer.ntot = model.backgrounds + nsig
             nll = computer.likelihood(nsig, marginalize=marginalize, nll=True )
