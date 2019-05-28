@@ -271,7 +271,7 @@ class XSecComputer:
         outfile.write ( "\n# Signal strength multipliers: " )
         tokens = []
         for k,v in ssmultipliers.items():
-            tokens.append ( "%d:%.2g" % ( k, v ) )
+            tokens.append ( "%d:%.4g" % ( k, v ) )
         outfile.write ( ", ".join ( tokens ) )
         outfile.write ( "\n" )
         outfile.close()
