@@ -843,7 +843,7 @@ class PyPrinter(BasicPrinter):
         """
         Format data of the Uncovered object containing coverage info
 
-        :param obj: A Uncovered object to be printed.
+        :param obj: An Uncovered object to be printed.
         """
 
         nprint = 10  # Number of missing topologies to be printed (ordered by cross sections)
@@ -900,8 +900,9 @@ class PyPrinter(BasicPrinter):
                                 'element' : str(genEl._outputDescription)}      
             MET.append(met)                        
 
-        return {'Missed Topologies': missedTopos, 'Long-lived' : longLived,
-                     'Displaced': displaced, 'MET': MET, 'Outside Grid': outsideGrid}
+        return {'Total missed xsec': obj.missingTopos.getTotalXsec(), 'Missed Topologies': missedTopos, 'Missed xsec long-lived': obj.longLived.getTotalXsec(), 'Long-lived' : longLived,
+                'Missed xsec displaced': obj.displaced.getTotalXsec(), 'Displaced': displaced, 'Missed xsec MET': obj.MET.getTotalXsec(), 'MET': MET, 
+                'Total outside grid xsec': obj.outsideGrid.getTotalXsec(), 'Outside Grid': outsideGrid}
 
 class XmlPrinter(PyPrinter):
     """

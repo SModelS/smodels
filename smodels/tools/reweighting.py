@@ -67,7 +67,7 @@ def addPromptAndDisplaced(branch):
     :param branch: original branch
     :return: probabilities (depending on types of decay within branch), branches (with different labels depending on type of decay)
     """
-      
+
     F = []
     for particle in branch.oddParticles:
         if isinstance(particle.totalwidth, list):
@@ -157,11 +157,7 @@ def labelPromptDisplaced(branch):
     else: promptBranch._decayType = 'longlived'
     
     displacedBranch = branch.copy()       
-    if any(particle==jetList for vertex in branch.evenParticles for particle in vertex):
-        displacedBranch._decayType = 'displacedJet'
-    elif any(particle==lList for vertex in branch.evenParticles for particle in vertex):           
-        displacedBranch._decayType = 'displacedLepton'
-    else: displacedBranch._decayType = 'displaced(neither jet nor lepton)'
+    displacedBranch._decayType = 'DisplacedDecay'
     
     branches = [promptBranch, displacedBranch]    
     return branches

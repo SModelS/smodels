@@ -58,7 +58,7 @@ class ReweightingTest(unittest.TestCase):
         self.assertEqual(probabilities3[0], 1.)
         self.assertEqual(probabilities3[1], 0.)
         self.assertEqual(branches3[0]._decayType, 'prompt') 
-        self.assertEqual(branches3[1]._decayType, 'displaced(neither jet nor lepton)')                
+        self.assertEqual(branches3[1]._decayType, 'DisplacedDecay')                
         
 
                

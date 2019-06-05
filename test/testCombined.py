@@ -38,7 +38,8 @@ class CombinedTest(unittest.TestCase):
                                             ('.py', 'rb', imp.PY_SOURCE) )
             smodelsOutput = output_module.smodelsOutput
             from gluino_squarks_default_agg import smodelsOutputDefault
-            ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
+            ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec', 
+                            'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec']
             smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                         key=lambda res: res['r'], reverse=True)
             equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,

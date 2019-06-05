@@ -174,7 +174,7 @@ class RunPrinterTest(unittest.TestCase):
             smodelsOutput = pM.smodelsOutput
         #Test python output
         from gluino_squarks_default import smodelsOutputDefault 
-        ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
+        ignoreFields = ['input file','smodels version', 'ncpus', 'database version', 'Total missed xsec','Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                       key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
@@ -209,7 +209,8 @@ class RunPrinterTest(unittest.TestCase):
 
         from simplyGluino_default import smodelsOutputDefault    
          
-        ignoreFields = ['input file','smodels version', 'ncpus', 'database version' ]
+        ignoreFields = ['input file','smodels version', 'ncpus', 'database version', 'Total missed xsec', 
+                            'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                        key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
@@ -245,7 +246,7 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         try:
-            self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus']))
+            self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus', 'Total missed xsec', 'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec']))
         except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
@@ -272,7 +273,7 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         try:
-            self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus']))
+            self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus', 'Total missed xsec', 'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec']))
         except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)

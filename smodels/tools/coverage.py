@@ -89,7 +89,9 @@ class Uncovered(object):
             probabilities1, branches1 = addPromptAndDisplaced(element.branches[0])
             probabilities2, branches2 = addPromptAndDisplaced(element.branches[1])               
             for i,probability1 in enumerate(probabilities1):
-                for j,probability2 in enumerate(probabilities2): 
+                for j,probability2 in enumerate(probabilities2):
+                    if not (probability1*probability2):
+                        continue #(Skip topologies with zero combined probability)
                     newEl = element.copy()   
                     newEl.tested = element.tested
                     newEl.covered = element.covered
@@ -100,9 +102,7 @@ class Uncovered(object):
                         continue 
                     allElements.append(newEl) 
             
-            
             for el in allElements:
-                                
                 if self.inPrevMothers(el): 
                     missing = False # cannot be missing if element with same mothers has already appeared
                 # this is because it can certainly be compressed further to the smaller element already seen in the loop
@@ -112,7 +112,7 @@ class Uncovered(object):
                     # in addition, mother elements cannot be missing, we consider only the most compressed one                                  
                 if not missing: # any element that is not missing might be outside the grid      
                     # outside grid should be smalles covered but not tested in compression                  
-                    if el.covered and not el.tested: # verify first that element is covered but not tested                              
+                    if el.covered and not el.tested: # verify first that element is covered but not tested
                         if not el.weight.getXsecsFor(self.sqrts): continue # remove elements that only have weight at higher sqrts                    
                         if self.inOutsideGridMothers(el): continue # if daughter element of current element is already counted skip this element                  
                         # in this way we do not double count, but always count the smallest compression that is outside the grid
@@ -120,8 +120,9 @@ class Uncovered(object):
 
                         if outsideX: # if all mothers are tested, this is no longer outside grid contribution, otherwise add to list
                             el.missingX =  outsideX # for combined printing function, call outside grid weight missingX as well
-                            self.outsideGrid.addToGeneralElements(el) # add to list of outsideGrid topos                        
+                            self.outsideGrid.addToGeneralElements(el) # add to list of outsideGrid topos
                     continue
+
                 self.missingTopos.addToGeneralElements(el) #keep track of all missing topologies                
                 if self.hasDisplaced(el):
                     self.displaced.addToGeneralElements(el)
@@ -154,7 +155,7 @@ class Uncovered(object):
         Return True if Element has at least one displaced branch 
         :ivar el: Element
         """  
-        if 'displaced' in el.branches[0]._decayType or 'displaced' in el.branches[1]._decayType: 
+        if 'displaced' in el.branches[0]._decayType.lower() or 'displaced' in el.branches[1]._decayType.lower():
             return True
         else:
             return False                    
