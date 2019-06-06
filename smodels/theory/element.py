@@ -42,10 +42,11 @@ class Element(object):
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList() # gives the weight for all decays promptly
         self.decayLabels = []
-        self.motherElements = [("original", self)]
+        self.motherElements = [self] #The motheElements includes self to keep track of merged elements
+        self.daughterElements = []
         self.elID = 0
-        self.covered = False
-        self.tested = False
+        self.coveredBy = set()
+        self.testedBy = set()
                 
         if info:
             # Create element from particle string
@@ -169,6 +170,7 @@ class Element(object):
         
         newEl = self.__class__()      
         newEl.motherElements = self.motherElements[:] + other.motherElements[:]
+        newEl.daughterElements = self.daughterElements[:] + other.daughterElements[:]
         newEl.weight = self.weight + other.weight
         newEl.branches = []
         for ibr,branch in enumerate(self.branches):
@@ -197,6 +199,7 @@ class Element(object):
             raise SModelSError("Can not add elements with distinct topologies")
               
         self.motherElements += other.motherElements[:]
+        self.daughterElements += other.daughterElements[:]
         self.weight += other.weight
         for ibr,_ in enumerate(self.branches):
             self.branches[ibr] += other.branches[ibr]
@@ -250,6 +253,7 @@ class Element(object):
             newel.branches.append(branch.copy())
         newel.weight = self.weight.copy()
         newel.motherElements = self.motherElements[:]
+        newel.daughterElements = self.daughterElements[:]
         newel.elID = self.elID
         return newel
 
@@ -276,22 +280,6 @@ class Element(object):
 
         return fsparticles
 
-    def getDaughters(self):
-        """
-        Get the list of daughter (last/stable BSM particle in the decay) PDGs. 
-        Can be a nested list, if the element combines several daughters:
-        [ [pdgDAUG1,pdgDAUG2],  [pdgDAUG1',pdgDAUG2']] 
-
-        
-        :returns: list of PDG ids
-        """
-        
-        daughterPIDs = []
-        for branch in self.branches():
-            daughterPIDs.append(branch.oddParticles[-1].pdg)
-            
-        return daughterPIDs
-    
     def getMothers(self):
         """
         Get list of mother PDGs.    
@@ -307,39 +295,47 @@ class Element(object):
                 momPIDs.append(branch.oddParticles[0].pdg)
             else:
                 momPIDs.append(None)
-        return momPIDs    
-        
-    def getMotherPIDs(self):
+        return momPIDs
+
+    def getAncestors(self):
         """
-        Get PIDs of all mothers.
-        
-        :returns: list of mother PDG ids
+        Get a list of all the mothers, grandmothers,... of the element
         """
         
-        # get a list of all original mothers, i.e. that only consists of first generation elements
-        allmothers = self.motherElements
-        while not all(mother[0] == 'original' for mother in allmothers):                        
-            for im, mother in enumerate(allmothers):
-                if mother[0] != 'original':
-                    allmothers.extend(mother[1].motherElements)
-                    allmothers.pop(im)                                    
+        ancestors = []
+        for mother in self.motherElements:
+            if mother is self:
+                continue
+            ancestors.append(mother)
+            ancestors += mother.getAncestors()
+        #Avoid duplicates:
+        ancestorsUnique = []
+        for mom in ancestors:
+            if any(mom is el for el in ancestorsUnique):
+                continue
+            ancestorsUnique.append(mom)
 
-        # get the PIDs of all mothers      
-        motherPids = []
-        for mother in allmothers:  
-            motherPids.append(mother[1].pdg) 
+        return ancestorsUnique
 
-        branch1 = []
-        branch2 = []
-        for motherPid in motherPids:
-            branch1.append(motherPid[0])
-            branch2.append(motherPid[1])
-        for pid1 in branch1:
-            for pid2 in branch2:
-                pids = [pid1,pid2]
-                if not pids in motherPids: motherPids.append(pids)  
-   
-        return motherPids     
+    def getDescendants(self):
+        """
+        Get a list of all the daughters, granddaughters,... of the element
+        """
+
+        descendants = []
+        for daughter in self.daughterElements:
+            if daughter is self:
+                continue
+            descendants.append(daughter)
+            descendants += daughter.getDescendants()
+        #Avoid duplicates:
+        descendantsUnique = []
+        for daughter in descendants:
+            if any(daughter is el for el in descendantsUnique):
+                continue
+            descendantsUnique.append(daughter)
+
+        return descendantsUnique
 
     def getEinfo(self):
         """
@@ -367,6 +363,35 @@ class Element(object):
         for branch in self.branches:
             branch.setInfo()
 
+    def setTestedBy(self,resultType):
+        """
+        Tag the element, all its daughter and all its mothers
+        as tested by the type of result specified.
+        It also recursively tags all granddaughters, grandmothers,...
+
+        :param resultType: String describing the type of result (e.g. 'prompt', 'displaced')
+        """
+
+        self.testedBy.add(resultType)
+        for mother in self.getAncestors():
+            mother.testedBy.add(resultType)
+        for daughter in self.getDescendants():
+            daughter.testedBy.add(resultType)
+
+    def setCoveredBy(self,resultType):
+        """
+        Tag the element, all its daughter and all its mothers
+        as covered by the type of result specified.
+        It also recursively tags all granddaughters, grandmothers,...
+
+        :param resultType: String describing the type of result (e.g. 'prompt', 'displaced')
+        """
+
+        self.coveredBy.add(resultType)
+        for mother in self.getAncestors():
+            mother.coveredBy.add(resultType)
+        for daughter in self.getDescendants():
+            daughter.coveredBy.add(resultType)
 
     def _getLength(self):
         """
@@ -375,7 +400,6 @@ class Element(object):
         :returns: maximum length of the element branches (int)    
         """
         return max(self.branches[0].getLength(), self.branches[1].getLength())
-
 
     def checkConsistency(self):
         """
@@ -436,6 +460,8 @@ class Element(object):
                         added = True
 
         newElements.pop(0)  # Remove original element
+        #Store the daughter elements:
+        self.daughterElements += newElements[:]
         return newElements
     
     
@@ -465,7 +491,7 @@ class Element(object):
         """
 
         newelement = self.copy()
-        newelement.motherElements = [("mass", self)]
+        newelement.motherElements = [self]
 
         #Loop over branches and look for small mass differences 
         for ibr,branch in enumerate(newelement.branches):
@@ -506,7 +532,7 @@ class Element(object):
         """
         
         newelement = self.copy()
-        newelement.motherElements = [("invisible", self)]
+        newelement.motherElements = [self]
 
         # Loop over branches
         for branch in newelement.branches:

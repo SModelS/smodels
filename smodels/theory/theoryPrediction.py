@@ -526,26 +526,26 @@ def _getElementsFrom(smsTopList, dataset):
                 newEl = txname.hasElementAs(el)  #Check if element appears in txname
                 if not newEl:
                     continue
-                el.covered = True
+                el.setCoveredBy(dataset.globalInfo.type)
                 eff = txname.getEfficiencyFor(newEl)
                 if not eff:
                     continue
-                el.tested = True
+                el.setTestedBy(dataset.globalInfo.type)
                 newEl.eff = eff
                 newEl.weight *= eff
                 newEl.txname = txname
                 elements.append(newEl) #Save element with correct branch ordering
 
     #Remove duplicated elements:
-    allmothers = []
+    allAncestors = []
     #First collect the list of all mothers:
     for el in elements:
-        allmothers += [elMom[1] for elMom in el.motherElements if not elMom[0]=='original']
+        allAncestors += el.getAncestors()
     elementsClean = []
 
     for el in elements:
         #Skip the element if it is a mother of another element in the list
-        if any((elMom.elID == el.elID) for elMom in allmothers):
+        if any((elMom.elID == el.elID) for elMom in allAncestors):
             continue
         elementsClean.append(el)
 
