@@ -300,6 +300,8 @@ class Element(object):
     def getAncestors(self):
         """
         Get a list of all the mothers, grandmothers,... of the element
+
+        :return: A list of Element objects containing all the ancestors
         """
         
         ancestors = []
@@ -320,6 +322,8 @@ class Element(object):
     def getDescendants(self):
         """
         Get a list of all the daughters, granddaughters,... of the element
+
+        :return: A list of Element object containing all the descendants
         """
 
         descendants = []
@@ -336,6 +340,24 @@ class Element(object):
             descendantsUnique.append(daughter)
 
         return descendantsUnique
+
+    def isRelatedTo(self,other):
+        """
+        Checks if the element has any common ancestors with other or one
+        is an ancestor of the other.
+        Returns True if self and other have at least one ancestor in common
+        or are the same element, otherwise returns False.
+
+        :return: True/False
+        """
+
+        ancestorsA = [self] + self.getAncestors()
+        ancestorsB = [other] + other.getAncestors()
+        for ancestor in ancestorsA:
+            if any(ancestor is otherAncestor for otherAncestor in ancestorsB):
+                return True
+
+        return False
 
     def getEinfo(self):
         """

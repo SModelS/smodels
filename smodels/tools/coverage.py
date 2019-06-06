@@ -112,37 +112,32 @@ class UncoveredList(object):
         #First select all elements according to the filter (type of uncovered/missing topology):
         elementList = [el for el in topoList.getElements() if self.elementFilter(el)]
         
-        #Now remove all elements which have at least one descendent in the list
-        #(in order to avoid counting the same topology twice)
-        allAncestors = [] #Collects all ancestors of the elements in elementList
-        for el in elementList:
-            allAncestors += el.getAncestors()
-        elementListClean = []
-        for el in elementList:
-            #Skip the element if it is an ancestor of another element in the list
-            if any((elMom.elID == el.elID) for elMom in allAncestors):
+        #Get missing xsections including the reweight factor:
+        missingXandEls = [[self.getMissingX(el)*self.reweightFactor(el),el] for el in elementList]
+        #Sort according to largest missingX and then smallest size
+        missingXandEls = sorted(missingXandEls, key = lambda pt: [pt[0],-pt[1]._getLength()], reverse=True)
+
+        #Split lists of elements and missingX:
+        missingXsecs = [pt[0] for pt in missingXandEls]
+        elementList = [pt[1] for pt in missingXandEls]
+        
+        #Remove all elements which are related to each other in order to avoid double counting
+        #(keep always the first appearance in the list, so we always keep the ones with largest missing xsec)
+        elementListUnique = []
+        missingXsecsUnique = []
+        for i,element in enumerate(elementList):
+            if any(element.isRelatedTo(el) for el in elementListUnique):
                 continue
-            elementListClean.append(el)
-        elementList = elementListClean[:]
-        
-        #Now remove all elements which share at least one common mother:
-        allAncestors = [] #Collects all ancestors of the elements in elementList
-        for el in elementList:
-            allAncestors += el.getAncestors()
-        elementListClean = []
+            elementListUnique.append(element)
+            missingXsecsUnique.append(missingXsecs[i])
 
-        #Get non-overlapping cross-sections (avoid double counting from compressed and merged elements):
-        missingXsecs = [self.getMissingX(el) for el in elementList]
 
-        #Rescale missing cross-sections by reweightFactor (for prompt/displaced categories):
-        missingXsecs = [xsec*self.reweightFactor(elementList[i]) for i,xsec in enumerate(missingXsecs[:])]
-        
-        #Create General Elements:
-        for i,el in enumerate(elementList):
-            missingX = missingXsecs[i]
+        #Now that we only have unique elements with their effective missing cross-sections
+        #we create General Elements out of them
+        for i,el in enumerate(elementListUnique):
+            missingX = missingXsecsUnique[i]
             if not missingX:
                 continue
-            print('adding element',el.elID,'with xsec=',missingX)
             self.addToGeneralElements(el,missingX)
 
     def getMissingX(self,element):
@@ -151,7 +146,7 @@ class UncoveredList(object):
         mothers already appear in the list.
         :param element: Element object
 
-        :returns: missing cross section with units
+        :returns: missing cross section without units (in fb)
         """
 
         ancestorList = element.getAncestors()
@@ -161,9 +156,6 @@ class UncoveredList(object):
             return 0.
         #Get the total element weight:
         missingX =  element.weight.getXsecsFor(self.sqrts)[0].value
-        # if element has no mothers, the full cross section is missing
-        if not ancestorList:
-            return missingX
         overlapXsec = 0.*fb
         for ancestor in ancestorList: # recursive loop to check all mothers
             #Skip entries which correspond to the element itself
@@ -176,14 +168,15 @@ class UncoveredList(object):
             #Check if mother passes the group filter (if it is missing or not):
             if self.elementFilter(ancestor):
                 continue
-            print('ancestor = ',ancestor.elID,'from',element.elID,'covered')
+            #Subtract the weight of the ancestor and skip checking for all older ancestors
+            #(avoid subtracting the same weight twice from mother and grandmother for instance)
+            alreadyChecked += ancestor.getAncestors()
             ancestorXsec = ancestor.weight.getXsecsFor(self.sqrts)[0]
             if not ancestorXsec:
                 continue
-            print('removing ancestor xsec=',ancestorXsec.value)
             overlapXsec += ancestorXsec.value
 
-        missingX = missingX - overlapXsec
+        missingX -= overlapXsec
 
         return missingX.asNumber(fb)
         
