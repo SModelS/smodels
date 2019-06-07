@@ -374,7 +374,7 @@ class Element(object):
         if 0 in ancestorsA:
             ancestorsA.remove(0)
         if 0 in ancestorsB:
-            ancestorsA.remove(0)
+            ancestorsB.remove(0)
 
         if set(ancestorsA).intersection(set(ancestorsB)):
             return True

@@ -180,11 +180,16 @@ class UncoveredList(object):
         #(keep always the first appearance in the list, so we always keep the ones with largest missing xsec)
         elementListUnique = []
         missingXsecsUnique = []
+        ancestors = set() #Keep track of all the ancestors of the elements in the unique list
         for i,element in enumerate(elementList):
-            if any(element.isRelatedTo(el) for el in elementListUnique):
+            ancestorsIDs = set([el.elID for el in element.getAncestors() if el.elID != 0])
+            if ancestors.intersection(ancestorsIDs):
                 continue
+#             if any(element.isRelatedTo(el) for el in elementListUnique):
+#                 continue
             elementListUnique.append(element)
             missingXsecsUnique.append(missingXsecs[i])
+            ancestors = ancestors.union(ancestorsIDs)
 
         #Now that we only have unique elements with their effective missing cross-sections
         #we create General Elements out of them
