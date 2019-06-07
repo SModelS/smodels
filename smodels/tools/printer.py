@@ -482,41 +482,35 @@ class TxTPrinter(BasicPrinter):
         
         :param obj: Uncovered object to be printed.
         """
-                
+
         nprint = 10  # Number of missing topologies to be printed (ordered by cross sections)
 
-        output = ""
-        output += "\nTotal missing topology cross section (fb): %10.3E\n" %(obj.missingTopos.getTotalXsec())
-        output += "Total cross section where we are outside the mass grid (fb): %10.3E\n" %(obj.outsideGrid.getTotalXsec())
-        output += "Total cross section with longlived decays (fb): %10.3E\n" %(obj.longLived.getTotalXsec())
-        output += "Total cross section with displaced decays (fb): %10.3E\n" %(obj.displaced.getTotalXsec())
-        output += "Total cross section with MET decays (fb): %10.3E\n" %(obj.MET.getTotalXsec())
+        #First sort groups by label
+        groups = sorted(obj.groups[:], key = lambda g: g.label)
+        #Get summary of groups:
+        output = "\n"
+        for group in groups:
+            output += "Total cross-section for %s (fb): %10.3E\n" %(group.description,group.getTotalXSec())
         
         output += "\nFull information on unconstrained cross sections\n"
         output += "================================================================================\n"
         
-
-        notFoundMessage = ["No missing topologies found\n", "No contributions outside the mass grid\n",
-                           "No long-lived decays\n","No displaced decays\n","No MET decays\n"]
-        header = ["Missing topologies with the highest cross sections (up to " + str(nprint) + "):\n",
-                  "Contributions outside the mass grid (up to " + str(nprint) + "):\n",
-                  "Missing topos: long-lived decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV)),
-                  "Missing topos: displaced decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV)),
-                  "Missing topos: MET decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
-                  ]
-        for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid, obj.longLived, obj.displaced, obj.MET]):
-            if len(uncovEntry.generalElements) == 0:
-                output += notFoundMessage[ix] 
-            else:                    
-                output += header[ix]
-                output += "Sqrts (TeV)   Weight (fb)                  Element description\n"        
-                for genEl in sorted(uncovEntry.generalElements, key=lambda x: x.missingX, reverse=True)[:nprint]:
-                    output += "%5s         %10.3E    # %53s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),genEl.missingX, str(genEl._outputDescription))
-                    if hasattr(self, "addcoverageid") and self.addcoverageid:
-                        contributing = []
-                        for el in genEl._contributingElements:
-                            contributing.append(el.elID)
-                        output += "Contributing elements %s\n" % str(contributing)            
+        #Get detailed information:
+        for group in groups:
+            description = group.description
+            sqrts = group.sqrts.asNumber(TeV)
+            if not group.generalElements:
+                output += "No %s found\n" %description
+                continue
+            output += "%s with the highest cross sections (up to %i):\n" %(description,nprint)
+            output += "Sqrts (TeV)   Weight (fb)                  Element description\n"
+            for genEl in group.generalElements[:nprint]:
+                output += "%5s         %10.3E    # %53s\n" % (str(sqrts),genEl.missingX, genEl)
+                if hasattr(self, "addcoverageid") and self.addcoverageid:
+                    contributing = []
+                    for el in genEl._contributingElements:
+                        contributing.append(el.elID)
+                    output += "Contributing elements %s\n" % str(contributing)
             output += "================================================================================\n"      
         return output
                       
@@ -831,7 +825,7 @@ class PyPrinter(BasicPrinter):
         return {'MINPAR' : MINPAR, 'chimix' : chimix, 'stopmix' : stopmix,
                 'chamix' : chamix, 'MM' : {}, 'sbotmix' : sbotmix,
                 'EXTPAR' : EXTPAR, 'mass' : mass}
-    
+
     def _formatUncovered(self, obj):
         """
         Format data of the Uncovered object containing coverage info
@@ -841,61 +835,22 @@ class PyPrinter(BasicPrinter):
 
         nprint = 10  # Number of missing topologies to be printed (ordered by cross sections)
 
-        missedTopos = []
+        uncoveredDict = {}
+        #First sort groups by label
+        groups = sorted(obj.groups[:], key = lambda g: g.label)
+        #Add summary of groups:
+        for group in groups:
+            sqrts = group.sqrts.asNumber(TeV)
+            uncoveredDict["Total xsec for %s (fb)" %group.description] = group.getTotalXSec()
+            uncoveredDict["%s" %group.description] = []
+            for genEl in group.generalElements[:nprint]:
+                genElDict = {'sqrts (TeV)' : sqrts, 'weight (fb)' : genEl.missingX,
+                                'element' : str(genEl)}
+                if hasattr(self,"addelementlist") and self.addelementlist:
+                    genElDict["element IDs"] = [el.elID for el in genEl._contributingElements]
+                uncoveredDict["%s" %group.description].append(genElDict)
         
-        obj.missingTopos.generalElements = sorted(obj.missingTopos.generalElements, 
-                                        key=lambda x: [x.missingX,str(x)], 
-                                        reverse=True)        
-    
-        for genEl in obj.missingTopos.generalElements[:nprint]:
-            missed = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}          
-            if hasattr(self,"addelementlist") and self.addelementlist:
-                contributing = []
-                for el in genEl._contributingElements:
-                    contributing.append(el.elID)
-                missed["element IDs"] = contributing
-            missedTopos.append(missed)
-            
-        outsideGrid = []
-        obj.outsideGrid.generalElements = sorted(obj.outsideGrid.generalElements, 
-                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
-                                       reverse=True)        
-        for genEl in obj.outsideGrid.generalElements[:nprint]:
-            outside = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}      
-            outsideGrid.append(outside)     
-
-        longLived = []
-        obj.longLived.generalElements = sorted(obj.longLived.generalElements, 
-                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
-                                       reverse=True)        
-        for genEl in obj.longLived.generalElements[:nprint]:
-            longDict = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}      
-            longLived.append(longDict)
-            
-        displaced = []
-        obj.displaced.generalElements = sorted(obj.displaced.generalElements, 
-                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
-                                       reverse=True)        
-        for genEl in obj.displaced.generalElements[:nprint]:
-            displ = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}      
-            displaced.append(displ)
-            
-        MET = []
-        obj.MET.generalElements = sorted(obj.MET.generalElements, 
-                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
-                                       reverse=True)        
-        for genEl in obj.MET.generalElements[:nprint]:
-            met = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}      
-            MET.append(met)                        
-
-        return {'Total missed xsec': obj.missingTopos.getTotalXsec(), 'Missed Topologies': missedTopos, 'Missed xsec long-lived': obj.longLived.getTotalXsec(), 'Long-lived' : longLived,
-                'Missed xsec displaced': obj.displaced.getTotalXsec(), 'Displaced': displaced, 'Missed xsec MET': obj.MET.getTotalXsec(), 'MET': MET, 
-                'Total outside grid xsec': obj.outsideGrid.getTotalXsec(), 'Outside Grid': outsideGrid}
+        return uncoveredDict
 
 class XmlPrinter(PyPrinter):
     """
@@ -1077,17 +1032,19 @@ class SLHAPrinter(TxTPrinter):
         return output
 
     def _formatUncovered(self, obj):
+
+        nprint = 10
+
+        #First sort groups by label
+        groups = sorted(obj.groups[:], key = lambda g: g.label)
+        #Get summary of groups:
         output = ""
-        for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid, obj.longLived, obj.displaced, obj.MET]):
-            if ix==0: output += "BLOCK SModelS_Missing_Topos #sqrts[TeV] weight[fb] description\n"
-            elif ix==1: output += "\nBLOCK SModelS_Outside_Grid #sqrts[TeV] weight[fb] description\n"
-            elif ix==2: output += "\nBLOCK SModelS_Long_Lived #sqrts[TeV] weight[fb] description\n"
-            elif ix==3: output += "\nBLOCK SModelS_Displaced #sqrts[TeV] weight[fb] description\n"
-            else: output += "\nBLOCK SModelS_MET #sqrts[TeV] weight[fb] description\n"
-            cter = 0
-            for genEl in sorted(uncovEntry.generalElements, key=lambda x: x.missingX, reverse=True):
-                output += " %d %d %10.3E %s\n" % (cter, obj.missingTopos.sqrts/TeV, genEl.missingX, str(genEl._outputDescription))
-                cter += 1
-                if cter > 9: break
+        for group in groups:
+            blockTag = group.label.replace('(',' ').replace(' ','_')
+            sqrts = group.sqrts.asNumber(TeV)
+            output += "\nBLOCK SModelS_%s #sqrts[TeV] weight[fb] description\n" %blockTag
+            for i,genEl in enumerate(group.generalElements[:nprint]):
+                output += " %d %d %10.3E %s\n" % (i, sqrts, genEl.missingX, genEl)
+
         return output
             

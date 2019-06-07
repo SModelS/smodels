@@ -28,14 +28,26 @@ filtersDefault = {'outsideGrid (prompt)' : lambda el: ('prompt' in el.coveredBy)
                 'outsideGrid (displaced)' : lambda el: ('displaced' in el.coveredBy) and not ('displaced' in el.testedBy),
                 'missing (prompt)' : lambda el: not ('prompt' in el.coveredBy),
                 'missing (displaced)' : lambda el: not ('displaced' in el.coveredBy),
-                'missing (long cascade)' : lambda el: (not el.coveredBy) and el._getLength() > 3}
+                'missing (long cascade)' : lambda el: (not el.coveredBy) and el._getLength() > 3,
+                'missing (all)' : lambda el: (not el.coveredBy),
+                'outsideGrid (all)' : lambda el: (el.coveredBy and not el.testedBy)}
+
+##Description for each group (optional and only used for printing):
+##(if not defined, the group label will be used instead)
+descriptionDefault = {'outsideGrid (prompt)' : 'topologies outside the mass grid with prompt decays',
+                'outsideGrid (displaced)' : 'topologies outside the mass grid with displaced decays',
+                'missing (prompt)' : 'missing topologies with prompt decays',
+                'missing (displaced)' : 'missing topologies with displaced decays',
+                'missing (long cascade)' : 'missing topologies with long cascade decays',
+                'missing (all)' : 'missing topologies',
+                'outsideGrid (all)' : 'topologies outside the mass grid'}
 
 ##Weight factors for each group:
 ##(it should be a function which takes an Element object as input
 ##and returns the reweighting factor to be applied to the element weight. It is relevant if only
 ##the fraction of the weight going into prompt or displaced decays is required)
 factorsDefault = {}
-for key in factorsDefault:
+for key in filtersDefault:
     if 'prompt' in key.lower():
         factorsDefault[key] = lambda el: reweightFactorFor(el,'prompt')
     elif 'displaced' in key.lower():
@@ -58,6 +70,7 @@ class Uncovered(object):
     def __init__(self,topoList, sqrts=None,
                  groupFilters = filtersDefault,
                  groupFactors = factorsDefault,
+                 groupdDescriptions = descriptionDefault,
                  smFinalStates=None,bsmFinalSates=None):
 
         #Sanity checks:
@@ -67,6 +80,8 @@ class Uncovered(object):
             raise SModelSError("groupFactors input should be a Dictionary and not %s" %type(groupFactors))
         if sorted(groupFilters.keys()) != sorted(groupFactors.keys()):
             raise SModelSError("Keys in groupFilters and groupFactors do not match")
+        if any(not hasattr(gFilter,'__call__') for gFilter in groupFilters.values()):
+            raise SModelSError("Group filters must be callable methods")
 
 
         if smFinalStates is None:
@@ -87,7 +102,6 @@ class Uncovered(object):
         else:
             sqrts = sqrts
         
-        self.topoList = topoList
         self.groups = []
         #Create each uncovered group and get the topologies from topoList
         for gLabel,gFilter in groupFilters.items():
@@ -97,9 +111,28 @@ class Uncovered(object):
                                            smFinalStates=smFinalStates,
                                            bsmFinalStates=bsmFinalStates,
                                            sqrts=sqrts)
+            if groupdDescriptions and gLabel in groupdDescriptions:
+                uncoveredTopos.description = groupdDescriptions[gLabel]
+            else:
+                uncoveredTopos.description = gLabel
             #Fill the list with the elements in topoList:
             uncoveredTopos.getToposFrom(topoList)
             self.groups.append(uncoveredTopos)
+
+    def getGroup(self,label):
+        """
+        Returns the group with the required label. If not found, returns None.
+
+        :param label: String corresponding to the specific group label
+
+        :return: UncoveredList object which matches the label
+        """
+
+        for group in self.groups:
+            if group.label == label:
+                return group
+
+        return None
 
 class UncoveredList(object):
     """
@@ -161,6 +194,9 @@ class UncoveredList(object):
                 continue
             self.addToGeneralElements(el,missingX)
 
+        #Finally sort general elements by their missing cross-section:
+        self.generalElements = sorted(self.generalElements[:], key = lambda genEl: genEl.missingX, reverse=True)
+
     def getMissingX(self,element):
         """
         Calculate total missing cross section of an element, by recursively checking if its
@@ -204,7 +240,7 @@ class UncoveredList(object):
         return missingX.asNumber(fb)
         
         
-    def getTotalXsec(self, sqrts=None):
+    def getTotalXSec(self, sqrts=None):
         """
         Calculate total missing topology cross section at sqrts. If no sqrts is given use self.sqrts
         :ivar sqrts: sqrts

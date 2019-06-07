@@ -530,7 +530,7 @@ def _getElementsFrom(smsTopList, dataset):
                 elements.append(newEl) #Save element with correct branch ordering
 
     #Sort element, so the ones with highest weights come first:
-    elements = sorted(elements, key = lambda el: el.weight.getMaxXsec().value, reverse=True)
+    elements = sorted(elements, key = lambda el: el.weight.getMaxXsec(), reverse=True)
     #Remove duplicated elements:
     elementsUnique = []
     for el in elements:
