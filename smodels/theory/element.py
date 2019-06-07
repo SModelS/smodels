@@ -297,7 +297,7 @@ class Element(object):
                 momPIDs.append(None)
         return momPIDs
 
-    def getAncestors(self,igen=None,ancestorsDictInput={}):
+    def getAncestors(self,igen=None,ancestorsDictInput=None):
         """
         Get a list of all the ancestors of the element.
         The list is ordered so the mothers appear first, then the grandmother,
@@ -316,13 +316,24 @@ class Element(object):
                  if igen is None or the ancestorsDict otherwise.
         """
 
+        if hasattr(self,'_ancestors'):
+            if igen is None:
+                return self._ancestors
+            else:
+                if not igen in ancestorsDictInput:
+                    ancestorsDictInput[igen] = self._ancestors[:]
+                else:
+                    ancestorsDictInput[igen].append(self._ancestors)
+                return ancestorsDictInput
+
         #Makes a copy of the input dictionary
         #(avoids sharing the same object between distinct elements)
-        ancestorsDict = dict(list(ancestorsDictInput.items()))
         if igen is None:
             ngen = 1
+            ancestorsDict = {}
         else:
             ngen = igen
+            ancestorsDict = ancestorsDictInput
         if not ngen in ancestorsDict:
             ancestorsDict[ngen] = []
         for mother in self.motherElements:
@@ -335,7 +346,8 @@ class Element(object):
             allAncestors = []
             for jgen in sorted(ancestorsDict.keys()):
                 allAncestors += ancestorsDict[jgen]
-            return allAncestors
+            self._ancestors = allAncestors[:]
+            return self._ancestors
         else:
             return ancestorsDict
 
@@ -349,11 +361,23 @@ class Element(object):
         :return: True/False
         """
 
-        ancestorsA = [self] + self.getAncestors()
-        ancestorsB = [other] + other.getAncestors()
-        for ancestor in ancestorsA:
-            if any(ancestor is otherAncestor for otherAncestor in ancestorsB):
-                return True
+        if not hasattr(self,'_ancestors'):
+            self.getAncestors()
+        if not hasattr(other,'_ancestors'):
+            other.getAncestors()
+
+        ancestorsA = set([self.elID]).union(set([el.elID for el in self._ancestors]))
+        ancestorsB = set([other.elID]).union(set([el.elID for el in other._ancestors]))
+
+        #If the ancestor was never included in the topologyList, it was never assigned
+        #an element ID, so it should not be considered
+        if 0 in ancestorsA:
+            ancestorsA.remove(0)
+        if 0 in ancestorsB:
+            ancestorsA.remove(0)
+
+        if set(ancestorsA).intersection(set(ancestorsB)):
+            return True
 
         return False
 

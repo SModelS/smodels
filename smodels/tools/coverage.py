@@ -168,7 +168,7 @@ class UncoveredList(object):
         elementList = [el for el in topoList.getElements() if self.elementFilter(el)]
         
         #Get missing xsections including the reweight factor:
-        missingXandEls = [[self.getMissingX(el)*self.reweightFactor(el),el] for el in elementList]
+        missingXandEls = [[self.getMissingX(el)*self.reweightFactor(el),el] for el in elementList if self.reweightFactor(el)]
         #Sort according to largest missingX, smallest size and largest ID
         missingXandEls = sorted(missingXandEls, key = lambda pt: [pt[0],-pt[1]._getLength(),pt[1].elID], reverse=True)
 
