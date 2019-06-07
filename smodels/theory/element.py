@@ -297,49 +297,47 @@ class Element(object):
                 momPIDs.append(None)
         return momPIDs
 
-    def getAncestors(self):
+    def getAncestors(self,igen=None,ancestorsDictInput={}):
         """
-        Get a list of all the mothers, grandmothers,... of the element
+        Get a list of all the ancestors of the element.
+        The list is ordered so the mothers appear first, then the grandmother,
+        then the grandgrandmothers,...
 
-        :return: A list of Element objects containing all the ancestors
+        :param igen: The generation index (enumerates how far you are from the
+                     original element, e.g. 1 = mothers, 2 = grandmothers,...).
+                     If None will assume it is the first time the function
+                     is being called.
+        :param ancestorsDict: An auxiliary dictionary to collect the ancestors
+                              grouped by the generation index. The dictionary
+                              has the generation index as keys and the list of
+                              ancestors for that generation as values.
+
+        :return: A list of Element objects containing all the ancestors sorted by generation
+                 if igen is None or the ancestorsDict otherwise.
         """
-        
-        ancestors = []
+
+        #Makes a copy of the input dictionary
+        #(avoids sharing the same object between distinct elements)
+        ancestorsDict = dict(list(ancestorsDictInput.items()))
+        if igen is None:
+            ngen = 1
+        else:
+            ngen = igen
+        if not ngen in ancestorsDict:
+            ancestorsDict[ngen] = []
         for mother in self.motherElements:
             if mother is self:
                 continue
-            ancestors.append(mother)
-            ancestors += mother.getAncestors()
-        #Avoid duplicates:
-        ancestorsUnique = []
-        for mom in ancestors:
-            if any(mom is el for el in ancestorsUnique):
-                continue
-            ancestorsUnique.append(mom)
+            ancestorsDict[ngen].append(mother)
+            ancestorsDict = mother.getAncestors(ngen+1,ancestorsDict)
 
-        return ancestorsUnique
-
-    def getDescendants(self):
-        """
-        Get a list of all the daughters, granddaughters,... of the element
-
-        :return: A list of Element object containing all the descendants
-        """
-
-        descendants = []
-        for daughter in self.daughterElements:
-            if daughter is self:
-                continue
-            descendants.append(daughter)
-            descendants += daughter.getDescendants()
-        #Avoid duplicates:
-        descendantsUnique = []
-        for daughter in descendants:
-            if any(daughter is el for el in descendantsUnique):
-                continue
-            descendantsUnique.append(daughter)
-
-        return descendantsUnique
+        if igen is None:
+            allAncestors = []
+            for jgen in sorted(ancestorsDict.keys()):
+                allAncestors += ancestorsDict[jgen]
+            return allAncestors
+        else:
+            return ancestorsDict
 
     def isRelatedTo(self,other):
         """
@@ -395,10 +393,8 @@ class Element(object):
         """
 
         self.testedBy.add(resultType)
-        for mother in self.getAncestors():
-            mother.testedBy.add(resultType)
-        for daughter in self.getDescendants():
-            daughter.testedBy.add(resultType)
+        for ancestor in self.getAncestors():
+            ancestor.testedBy.add(resultType)
 
     def setCoveredBy(self,resultType):
         """
@@ -412,8 +408,6 @@ class Element(object):
         self.coveredBy.add(resultType)
         for mother in self.getAncestors():
             mother.coveredBy.add(resultType)
-        for daughter in self.getDescendants():
-            daughter.coveredBy.add(resultType)
 
     def _getLength(self):
         """

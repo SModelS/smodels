@@ -5,7 +5,7 @@
    :synopsis: Definitions of classes used to find, group and format missing topologies
     
 .. moduleauthor:: Ursula Laa <ursula.laa@lpsc.in2p3.fr>    
-.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 """
 
@@ -17,6 +17,32 @@ from smodels.share.models.SMparticles import e,mu,ta,taC,eC,muC,W,WC,t,tC,q,c,g,
 from smodels.theory import particle
 from smodels.theory.auxiliaryFunctions import index_bisect
 from smodels.experiment.databaseParticles import MET,HSCP,RHadronG,RHadronQ
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+
+
+#Default definitions for the uncovered topology categories/groups:
+##Element filters for each group:
+##(it should be a function which takes an Element object as input
+##and returns True if the element belongs to the group and False otherwise)
+filtersDefault = {'outsideGrid (prompt)' : lambda el: ('prompt' in el.coveredBy) and not ('prompt' in el.testedBy),
+                'outsideGrid (displaced)' : lambda el: ('displaced' in el.coveredBy) and not ('displaced' in el.testedBy),
+                'missing (prompt)' : lambda el: not ('prompt' in el.coveredBy),
+                'missing (displaced)' : lambda el: not ('displaced' in el.coveredBy),
+                'missing (long cascade)' : lambda el: (not el.coveredBy) and el._getLength() > 3}
+
+##Weight factors for each group:
+##(it should be a function which takes an Element object as input
+##and returns the reweighting factor to be applied to the element weight. It is relevant if only
+##the fraction of the weight going into prompt or displaced decays is required)
+factorsDefault = {}
+for key in factorsDefault:
+    if 'prompt' in key.lower():
+        factorsDefault[key] = lambda el: reweightFactorFor(el,'prompt')
+    elif 'displaced' in key.lower():
+        factorsDefault[key] = lambda el: reweightFactorFor(el,'displaced')
+    else:
+        factorsDefault[key] = lambda el: 1.
+
 
 class Uncovered(object):
     """
@@ -29,41 +55,37 @@ class Uncovered(object):
                 for this value. Otherwise the highest sqrts value will be used.
     """
 
-    def __init__(self,topoList,sumL=True, sumJet=True, sqrts=None,
-                 groupFilters = {'outsideGrid (prompt)' : lambda el: ('prompt' in el.coveredBy) and not ('prompt' in el.testedBy),
-                           'outsideGrid (displaced)' : lambda el: ('displaced' in el.coveredBy) and not ('displaced' in el.testedBy),
-                            'missing (prompt)' : lambda el: not ('prompt' in el.coveredBy),
-                            'missing (displaced)' : lambda el: not ('displaced' in el.coveredBy),
-                            'missing (long cascade)' : lambda el: (not el.coveredBy) and el._getLength() > 3},
-                 groupFactors = {'outsideGrid (prompt)' : lambda el: reweightFactorFor(el,'prompt'),
-                           'outsideGrid (displaced)' : lambda el: reweightFactorFor(el,'displaced'),
-                            'missing (prompt)' : lambda el: reweightFactorFor(el,'prompt'),
-                            'missing (displaced)' : lambda el: reweightFactorFor(el,'displaced'),
-                            'missing (long cascade)' : lambda el: 1.}):
-        
-        #Define multiparticles for conveniently grouping final states
-        eList = MultiParticle('e' , [e,eC])
-        muList = MultiParticle('mu', [mu,muC])
-        taList = MultiParticle('ta', [ta,taC])
-        lList = MultiParticle('l', [e,mu,eC,muC])
-        WList = MultiParticle('W', [W,WC])
-        tList = MultiParticle('t', [t,tC])
-        jetList = MultiParticle('jet', [q,c,g,pion])
-        nuList  = nu
-        if sumL:
-            particleGroups = [WList, lList, tList, taList, nuList]
-        else:
-            particleGroups = [WList, eList, muList,tList, taList, nuList]
-        if sumJet:
-            particleGroups.append(jetList)
+    def __init__(self,topoList, sqrts=None,
+                 groupFilters = filtersDefault,
+                 groupFactors = factorsDefault,
+                 smFinalStates=None,bsmFinalSates=None):
 
+        #Sanity checks:
+        if not isinstance(groupFilters,dict):
+            raise SModelSError("groupFilters input should be a Dictionary and not %s" %type(groupFilters))
+        if not isinstance(groupFactors,dict):
+            raise SModelSError("groupFactors input should be a Dictionary and not %s" %type(groupFactors))
+        if sorted(groupFilters.keys()) != sorted(groupFactors.keys()):
+            raise SModelSError("Keys in groupFilters and groupFactors do not match")
+
+
+        if smFinalStates is None:
+            #Define multiparticles for conveniently grouping SM final states
+            taList = MultiParticle('ta', [ta,taC])
+            lList = MultiParticle('l', [e,mu,eC,muC])
+            WList = MultiParticle('W', [W,WC])
+            tList = MultiParticle('t', [t,tC])
+            jetList = MultiParticle('jet', [q,c,g,pion])
+            nuList  = nu
+            smFinalStates = [WList, lList, tList, taList, nuList, jetList]
+        if bsmFinalSates is None:
+            #Define inclusive BSM states to group/label the last BSM states:
+            bsmFinalStates = [MET,HSCP,RHadronG,RHadronQ]
+        
         if sqrts is None:
             sqrts = max([xsec.info.sqrts for xsec in topoList.getTotalWeight()])
         else:
             sqrts = sqrts
-
-        #Define global final states to label the General Elements:
-        bsmFinalStates = [MET,HSCP,RHadronG,RHadronQ]
         
         self.topoList = topoList
         self.groups = []
@@ -72,7 +94,7 @@ class Uncovered(object):
             #Initialize the uncovered topology list:
             uncoveredTopos = UncoveredList(label=gLabel,elementFilter=gFilter,
                                            reweightFactor = groupFactors[gLabel],
-                                           particleGroups=particleGroups,
+                                           smFinalStates=smFinalStates,
                                            bsmFinalStates=bsmFinalStates,
                                            sqrts=sqrts)
             #Fill the list with the elements in topoList:
@@ -83,12 +105,12 @@ class UncoveredList(object):
     """
     Object to find and collect GeneralElement objects, plus printout functionality
     :ivar generalElements: missing elements, grouped by common general name using inclusive labels (e.g. jet)
-    :ivar particleGroups: Lists of MultiParticles used to group final states.
+    :ivar smFinalStates: Lists of MultiParticles used to group final states.
     :ivar sqrts: sqrts, for printout
     """
-    def __init__(self, label, elementFilter, reweightFactor, particleGroups, bsmFinalStates, sqrts):
+    def __init__(self, label, elementFilter, reweightFactor, smFinalStates, bsmFinalStates, sqrts):
         self.generalElements = []
-        self.particleGroups = particleGroups
+        self.smFinalStates = smFinalStates
         self.bsmFinalStates = bsmFinalStates
         self.sqrts = sqrts
         self.label = label
@@ -114,8 +136,8 @@ class UncoveredList(object):
         
         #Get missing xsections including the reweight factor:
         missingXandEls = [[self.getMissingX(el)*self.reweightFactor(el),el] for el in elementList]
-        #Sort according to largest missingX and then smallest size
-        missingXandEls = sorted(missingXandEls, key = lambda pt: [pt[0],-pt[1]._getLength()], reverse=True)
+        #Sort according to largest missingX, smallest size and largest ID
+        missingXandEls = sorted(missingXandEls, key = lambda pt: [pt[0],-pt[1]._getLength(),pt[1].elID], reverse=True)
 
         #Split lists of elements and missingX:
         missingXsecs = [pt[0] for pt in missingXandEls]
@@ -130,7 +152,6 @@ class UncoveredList(object):
                 continue
             elementListUnique.append(element)
             missingXsecsUnique.append(missingXsecs[i])
-
 
         #Now that we only have unique elements with their effective missing cross-sections
         #we create General Elements out of them
@@ -150,14 +171,14 @@ class UncoveredList(object):
         """
 
         ancestorList = element.getAncestors()
-        alreadyChecked = [] # for sanity check
+        alreadyChecked = [] # keep track of which elements have already been checked
         #If the element has no xsec for the required sqrts, return 0.
         if not element.weight.getXsecsFor(self.sqrts):
             return 0.
         #Get the total element weight:
         missingX =  element.weight.getXsecsFor(self.sqrts)[0].value
         overlapXsec = 0.*fb
-        for ancestor in ancestorList: # recursive loop to check all mothers
+        for ancestor in ancestorList: #check all ancestors (ancestorList is sorted by generation)
             #Skip entries which correspond to the element itself
             if ancestor is element:
                 continue
@@ -165,11 +186,13 @@ class UncoveredList(object):
             if any(ancestor is el for el in alreadyChecked):
                 continue
             alreadyChecked.append(ancestor)
-            #Check if mother passes the group filter (if it is missing or not):
+            #Check if ancestor passes the group filter (if it has been covered/tested or not):
             if self.elementFilter(ancestor):
                 continue
-            #Subtract the weight of the ancestor and skip checking for all older ancestors
+            #Subtract the weight of the ancestor and skip checking for all the older family tree of the ancestor
             #(avoid subtracting the same weight twice from mother and grandmother for instance)
+            #(since the ancestorList is sorted by generation, the mother always
+            #appears before the grandmother in the list)
             alreadyChecked += ancestor.getAncestors()
             ancestorXsec = ancestor.weight.getXsecsFor(self.sqrts)[0]
             if not ancestorXsec:
@@ -201,7 +224,7 @@ class UncoveredList(object):
         :parameter missingX: missing cross-section for the element (in fb)
         """     
 
-        newGenEl = GeneralElement(el,missingX,self.particleGroups,self.bsmFinalStates)
+        newGenEl = GeneralElement(el,missingX,self.smFinalStates,self.bsmFinalStates)
 
         index = index_bisect(self.generalElements,newGenEl)
         if index != len(self.generalElements) and self.generalElements[index] == newGenEl:
@@ -215,10 +238,10 @@ class GeneralElement(object):
     """
     This class represents a simplified (general) element which does
     only holds information about its even particles and decay type.
-    The even particles are replaced/grouped by the particles defined in particleGroups.
+    The even particles are replaced/grouped by the particles defined in smFinalStates.
     """
 
-    def __init__(self,el,missingX,particleGroups,bsmFinalStates):
+    def __init__(self,el,missingX,smFinalStates,bsmFinalStates):
 
         self.branches = [Branch() for _ in el.branches]
         self.missingX = missingX
@@ -229,7 +252,7 @@ class GeneralElement(object):
             for vertex in branch.evenParticles:
                 newVertex = vertex[:]
                 for ip,particle in enumerate(vertex):
-                    for particleList in particleGroups:
+                    for particleList in smFinalStates:
                         if particleList.contains(particle):
                             newVertex[ip] = particleList
                 newParticles.append(ParticleList(newVertex))

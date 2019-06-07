@@ -530,8 +530,7 @@ class SummaryPrinter(TxTPrinter):
         self.name = "summary"
         self.printingOrder = [OutputStatus,TheoryPredictionList, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
-        
-    
+
     def setOutPutFile(self,filename,overwrite=True,silent=False):
         """
         Set the basename for the text printer. The output filename will be
@@ -546,8 +545,7 @@ class SummaryPrinter(TxTPrinter):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
-            
-            
+
     def _formatTheoryPredictionList(self, obj):
         """
         Format data of the TheoryPredictionList object.
@@ -655,7 +653,6 @@ class PyPrinter(BasicPrinter):
         ## that we also return the output dictionary
         return outputDict
 
-
     def _formatTopologyList(self, obj):
         """
         Format data for a TopologyList object.
@@ -675,7 +672,6 @@ class PyPrinter(BasicPrinter):
                 
         
         return {"Element": elements}
-
 
     def _formatElement(self, obj):
         """
@@ -704,7 +700,6 @@ class PyPrinter(BasicPrinter):
             elDic["Weights (fb)"][sqrtsStr] = xsecs
         return elDic
 
-
     def _formatOutputStatus(self, obj):
         """
         Format data for a OutputStatus object.
@@ -729,7 +724,6 @@ class PyPrinter(BasicPrinter):
         if self.printtimespent:
             infoDict['time spent'] =  "%.2fs" %(time.time() - self.time)
         return {'OutputStatus' : infoDict}
-
 
     def _formatTheoryPredictionList(self, obj):
         """
@@ -797,7 +791,6 @@ class PyPrinter(BasicPrinter):
 
         return {'ExptRes' : ExptRes}
 
-
     def _formatDoc(self, obj):
         """
         Format a pyslha object to be printed as a dictionary
@@ -837,7 +830,6 @@ class PyPrinter(BasicPrinter):
         return {'MINPAR' : MINPAR, 'chimix' : chimix, 'stopmix' : stopmix,
                 'chamix' : chamix, 'MM' : {}, 'sbotmix' : sbotmix,
                 'EXTPAR' : EXTPAR, 'mass' : mass}
-
     
     def _formatUncovered(self, obj):
         """
@@ -1003,7 +995,6 @@ class SLHAPrinter(TxTPrinter):
         self.combinesr = 0
         self.printingOrder = [OutputStatus,TheoryPredictionList, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
-
 
     def setOutPutFile(self,filename,overwrite=True,silent=False):
         """

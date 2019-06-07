@@ -337,7 +337,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
 
 def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     """
-    Compute the compbined result for all datasets, if covariance
+    Compute the combined result for all datasets, if covariance
     matrices are available. Return a TheoryPrediction object
     with the signal cross-section summed over all the signal regions
     and the respective upper limit.
@@ -536,20 +536,17 @@ def _getElementsFrom(smsTopList, dataset):
                 newEl.txname = txname
                 elements.append(newEl) #Save element with correct branch ordering
 
+    #Sort element, so the ones with highest weights come first:
+    elements = sorted(elements, key = lambda el: el.weight.getMaxXsec().value, reverse=True)
     #Remove duplicated elements:
-    allAncestors = []
-    #First collect the list of all mothers:
-    for el in elements:
-        allAncestors += el.getAncestors()
-    elementsClean = []
-
+    elementsUnique = []
     for el in elements:
         #Skip the element if it is a mother of another element in the list
-        if any((elMom.elID == el.elID) for elMom in allAncestors):
+        if any(el.isRelatedTo(elB) for elB in elementsUnique):
             continue
-        elementsClean.append(el)
+        elementsUnique.append(el)
 
-    return elementsClean
+    return elementsUnique
 
 
 def _combineElements(elements, dataset, maxDist):
