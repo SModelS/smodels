@@ -366,18 +366,12 @@ class Element(object):
         if not hasattr(other,'_ancestors'):
             other.getAncestors()
 
-        ancestorsA = set([self.elID]).union(set([el.elID for el in self._ancestors]))
-        ancestorsB = set([other.elID]).union(set([el.elID for el in other._ancestors]))
+        ancestorsA = [self] + self._ancestors
+        ancestorsB = [other] + other._ancestors
 
-        #If the ancestor was never included in the topologyList, it was never assigned
-        #an element ID, so it should not be considered
-        if 0 in ancestorsA:
-            ancestorsA.remove(0)
-        if 0 in ancestorsB:
-            ancestorsB.remove(0)
-
-        if set(ancestorsA).intersection(set(ancestorsB)):
-            return True
+        for elA in ancestorsA:
+            if any(elA is elB for elB in ancestorsB):
+                return True
 
         return False
 

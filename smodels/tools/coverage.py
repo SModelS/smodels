@@ -183,10 +183,10 @@ class UncoveredList(object):
         ancestors = set() #Keep track of all the ancestors of the elements in the unique list
         for i,element in enumerate(elementList):
             ancestorsIDs = set([el.elID for el in element.getAncestors() if el.elID != 0])
+            #If the element has any common ancestor with any of the previous elements,
+            #skip it to avoid double counting
             if ancestors.intersection(ancestorsIDs):
                 continue
-#             if any(element.isRelatedTo(el) for el in elementListUnique):
-#                 continue
             elementListUnique.append(element)
             missingXsecsUnique.append(missingXsecs[i])
             ancestors = ancestors.union(ancestorsIDs)
