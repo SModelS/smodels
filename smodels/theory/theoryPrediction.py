@@ -359,7 +359,6 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     totalXsec = None
     massList = []
     PIDList = []
-    IDList = []
     datasetPredictions = []
     weights = []
     for predList in dataSetResults:
@@ -378,10 +377,8 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
         for pidEntry in pred.PIDs:
             if not pidEntry in PIDList:
                 PIDList.append(pidEntry)
-        IDList += pred.IDs
         
     txnameList = list(set(txnameList))
-    IDList = list(set(IDList))
     if None in massList:
         mass = None
     else:
@@ -401,8 +398,6 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     theoryPrediction.elements = elementList
     theoryPrediction.mass = mass
     theoryPrediction.PIDs = PIDList
-    theoryPrediction.IDs = IDList
-    
     
     return theoryPrediction
     
@@ -494,9 +489,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.avgElement = cluster.averageElement()
         theoryPrediction.mass = theoryPrediction.avgElement.mass
         theoryPrediction.PIDs = cluster.getPIDs()
-        theoryPrediction.IDs = cluster.getIDs()
         predictionList._theoryPredictions.append(theoryPrediction)
-        
 
     if len(predictionList) == 0:
         return None

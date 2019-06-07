@@ -466,9 +466,10 @@ class TxTPrinter(BasicPrinter):
             if hasattr(self,"printextendedresults") and self.printextendedresults:
                 if theoryPrediction.mass:
                     for ibr, br in enumerate(theoryPrediction.mass):
-                        output += "Masses in branch %i: " % ibr + str(br) + "\n"                
-                if not theoryPrediction.IDs[0]==0:
-                    output += "Contributing elements: " + str(theoryPrediction.IDs) + "\n"
+                        output += "Masses in branch %i: " % ibr + str(br) + "\n"
+                IDList = list(set([el.elID for el in theoryPrediction.elements]))     
+                if IDList:
+                    output += "Contributing elements: " + str(IDList) + "\n"
                 for pidList in theoryPrediction.PIDs:
                     output += "PIDs:" + str(pidList) + "\n"
 

@@ -239,16 +239,6 @@ class ElementCluster(object):
             
         return PIDs
     
-    def getIDs(self):
-        """
-        Return list of all element IDs appearing in the cluster
-        :return: list of element IDs
-        """
-        IDs = []
-        for el in self:
-            if not el.elID in IDs: IDs.append(el.elID)
-        return IDs
-
     def copy(self):
         """
         Returns a copy of the index cluster (faster than deepcopy).
