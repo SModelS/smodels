@@ -24,21 +24,17 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 ##Element filters for each group:
 ##(it should be a function which takes an Element object as input
 ##and returns True if the element belongs to the group and False otherwise)
-filtersDefault = {'outsideGrid (prompt)' : lambda el: ('prompt' in el.coveredBy) and not ('prompt' in el.testedBy),
-                'outsideGrid (displaced)' : lambda el: ('displaced' in el.coveredBy) and not ('displaced' in el.testedBy),
-                'missing (prompt)' : lambda el: not ('prompt' in el.coveredBy),
+filtersDefault = {'missing (prompt)' : lambda el: not ('prompt' in el.coveredBy),
                 'missing (displaced)' : lambda el: not ('displaced' in el.coveredBy),
-                'missing (long cascade)' : lambda el: (not el.coveredBy) and el._getLength() > 3,
+#                 'missing (long cascade)' : lambda el: (not el.coveredBy) and el._getLength() > 3,
                 'missing (all)' : lambda el: (not el.coveredBy),
                 'outsideGrid (all)' : lambda el: (el.coveredBy and not el.testedBy)}
 
 ##Description for each group (optional and only used for printing):
 ##(if not defined, the group label will be used instead)
-descriptionDefault = {'outsideGrid (prompt)' : 'topologies outside the mass grid with prompt decays',
-                'outsideGrid (displaced)' : 'topologies outside the mass grid with displaced decays',
-                'missing (prompt)' : 'missing topologies with prompt decays',
+descriptionDefault = {'missing (prompt)' : 'missing topologies with prompt decays',
                 'missing (displaced)' : 'missing topologies with displaced decays',
-                'missing (long cascade)' : 'missing topologies with long cascade decays',
+#                 'missing (long cascade)' : 'missing topologies with long cascade decays',
                 'missing (all)' : 'missing topologies',
                 'outsideGrid (all)' : 'topologies outside the mass grid'}
 
@@ -102,6 +98,14 @@ class Uncovered(object):
         else:
             sqrts = sqrts
         
+        #Store the relevant element cross-sections to improve performance:
+        for el in topoList.getElements():
+            xsec = el.weight.getXsecsFor(sqrts)
+            if xsec:
+                el._totalXsec = xsec[0].value.asNumber(fb)
+            else:
+                el._totalXsec = 0.
+
         self.groups = []
         #Create each uncovered group and get the topologies from topoList
         for gLabel,gFilter in groupFilters.items():
@@ -182,8 +186,9 @@ class UncoveredList(object):
         missingXsecsUnique = []
         ancestors = set() #Keep track of all the ancestors of the elements in the unique list
         for i,element in enumerate(elementList):
-            ancestorsIDs = set([el.elID for el in element.getAncestors() if el.elID != 0])
-            #If the element has any common ancestor with any of the previous elements,
+            ancestorsIDs = set([element.elID]+[el.elID for el in element.getAncestors() if el.elID != 0])
+            #If the element has any common ancestor with any of the previous elements
+            #or if it is an ancestor of any of the previous elements
             #skip it to avoid double counting
             if ancestors.intersection(ancestorsIDs):
                 continue
@@ -213,12 +218,11 @@ class UncoveredList(object):
 
         ancestorList = element.getAncestors()
         alreadyChecked = [] # keep track of which elements have already been checked
-        #If the element has no xsec for the required sqrts, return 0.
-        if not element.weight.getXsecsFor(self.sqrts):
+        #Get the (pre-loaded) total element weight in fb:
+        missingX =  element._totalXsec
+        if not missingX:
             return 0.
-        #Get the total element weight:
-        missingX =  element.weight.getXsecsFor(self.sqrts)[0].value
-        overlapXsec = 0.*fb
+        overlapXsec = 0.
         for ancestor in ancestorList: #check all ancestors (ancestorList is sorted by generation)
             #Skip entries which correspond to the element itself
             if ancestor is element:
@@ -235,14 +239,9 @@ class UncoveredList(object):
             #(since the ancestorList is sorted by generation, the mother always
             #appears before the grandmother in the list)
             alreadyChecked += ancestor.getAncestors()
-            ancestorXsec = ancestor.weight.getXsecsFor(self.sqrts)[0]
-            if not ancestorXsec:
-                continue
-            overlapXsec += ancestorXsec.value
+            overlapXsec += ancestor._totalXsec
 
-        missingX -= overlapXsec
-
-        return missingX.asNumber(fb)
+        return missingX-overlapXsec
         
         
     def getTotalXSec(self, sqrts=None):
@@ -255,7 +254,6 @@ class UncoveredList(object):
         for genEl in self.generalElements:
             xsec += genEl.missingX
         return xsec
-            
 
     def addToGeneralElements(self, el, missingX):
         """
