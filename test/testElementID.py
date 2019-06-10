@@ -36,7 +36,7 @@ class ElementIdTest(unittest.TestCase):
             theorypredictions = theoryPredictionsFor(res, topoList)
             if not theorypredictions: continue
             self.assertEqual(len(theorypredictions),1)
-            tpIDs = theorypredictions[0].IDs 
+            tpIDs = [el.elID for el in theorypredictions[0].elements] 
             self.assertEqual(sorted(tpIDs),sorted(listOfIDs[res.globalInfo.id]))            
 
 if __name__ == "__main__":

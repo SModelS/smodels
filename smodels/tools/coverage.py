@@ -36,7 +36,7 @@ descriptionDefault = {'missing (prompt)' : 'missing topologies with prompt decay
                 'missing (displaced)' : 'missing topologies with displaced decays',
 #                 'missing (long cascade)' : 'missing topologies with long cascade decays',
                 'missing (all)' : 'missing topologies',
-                'outsideGrid (all)' : 'topologies outside the mass grid'}
+                'outsideGrid (all)' : 'topologies outside the grid'}
 
 ##Weight factors for each group:
 ##(it should be a function which takes an Element object as input

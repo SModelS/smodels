@@ -501,6 +501,7 @@ class TxTPrinter(BasicPrinter):
             sqrts = group.sqrts.asNumber(TeV)
             if not group.generalElements:
                 output += "No %s found\n" %description
+                output += "================================================================================\n"
                 continue
             output += "%s with the highest cross sections (up to %i):\n" %(description,nprint)
             output += "Sqrts (TeV)   Weight (fb)                  Element description\n"
@@ -1040,7 +1041,9 @@ class SLHAPrinter(TxTPrinter):
         #Get summary of groups:
         output = ""
         for group in groups:
-            blockTag = group.label.replace('(',' ').replace(' ','_')
+            #Format blockTag using only the alphanumeric characters plus space and _:
+            blockTag = ''.join([xc for xc in group.label if (xc.isalnum() or xc in [' ','_'])])
+            blockTag = blockTag.replace(' ', '_')
             sqrts = group.sqrts.asNumber(TeV)
             output += "\nBLOCK SModelS_%s #sqrts[TeV] weight[fb] description\n" %blockTag
             for i,genEl in enumerate(group.generalElements[:nprint]):

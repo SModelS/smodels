@@ -15,6 +15,7 @@ from smodels.tools.physicsUnits import GeV, TeV, fb
 from smodels.theory.element import Element
 from smodels.theory.crossSection import XSectionList, XSection, XSectionInfo
 from smodels.share.models import SMparticles, mssm
+from smodels.tools.reweighting import reweightFactorFor
 
 n1 = mssm.n1
 n1.totalwidth = 0.*GeV
@@ -26,6 +27,31 @@ gluino = mssm.gluino
 gluino.totalwidth = 1.*10**(-30)*GeV
 t = SMparticles.t
 b = SMparticles.b
+
+
+#Default definitions for the uncovered topology categories/groups:
+##Element filters for each group:
+##(it should be a function which takes an Element object as input
+##and returns True if the element belongs to the group and False otherwise)
+filters = {'missing MET (prompt)' : lambda el: (not ('prompt' in el.coveredBy)) and (el.branches[0].oddParticles[-1].isMET()
+                                                                                     and el.branches[1].oddParticles[-1].isMET()),
+            'missing non-MET (prompt)' : lambda el: (not ('prompt' in el.coveredBy)) and (not el.branches[0].oddParticles[-1].isMET()
+                                                                                     or not el.branches[1].oddParticles[-1].isMET()),
+                'missing (displaced)' : lambda el: not ('displaced' in el.coveredBy)}
+
+##Weight factors for each group:
+##(it should be a function which takes an Element object as input
+##and returns the reweighting factor to be applied to the element weight. It is relevant if only
+##the fraction of the weight going into prompt or displaced decays is required)
+factors = {}
+for key in filters:
+    if 'prompt' in key.lower():
+        factors[key] = lambda el: reweightFactorFor(el,'prompt')
+    elif 'displaced' in key.lower():
+        factors[key] = lambda el: reweightFactorFor(el,'displaced')
+    else:
+        factors[key] = lambda el: 1.
+
 
 class CoverageTest(unittest.TestCase):     
    
@@ -80,18 +106,22 @@ class CoverageTest(unittest.TestCase):
         topolist.addElement(el1)
         topolist.addElement(el2)
         topolist.addElement(el3)
-        uncovered = Uncovered(topolist, sigmacut = 0.0*fb)
-               
-        self.assertEqual(len(uncovered.longLived.generalElements), 1)
-        self.assertEqual(len(uncovered.displaced.generalElements), 1)
-        self.assertEqual(len(uncovered.MET.generalElements), 2)
+        topolist._setElementIds()
+        uncovered = Uncovered(topolist,groupFilters=filters,groupFactors=factors)
+        longLived = uncovered.getGroup('missing non-MET (prompt)')
        
-        self.assertAlmostEqual(uncovered.longLived.generalElements[0]._contributingElements[0].weight.getMaxXsec().asNumber(fb), 10.)
-        self.assertAlmostEqual(float(uncovered.displaced.generalElements[0]._contributingElements[0].weight.getMaxXsec().asNumber(fb)),
-                               9.96109334317542,places=4)
-        self.assertAlmostEqual(uncovered.MET.generalElements[0]._contributingElements[0].weight.getMaxXsec().asNumber(fb), 10.)
-        self.assertAlmostEqual(float(uncovered.MET.generalElements[1]._contributingElements[0].weight.getMaxXsec().asNumber(fb)),
-                                0.03890665682,places=6)
+        
+        MET = uncovered.getGroup('missing MET (prompt)')
+        displaced = uncovered.getGroup('missing (displaced)')
+               
+        self.assertEqual(len(longLived.generalElements), 1)
+        self.assertEqual(len(displaced.generalElements), 1)
+        self.assertEqual(len(MET.generalElements), 2)
+       
+        self.assertAlmostEqual(longLived.generalElements[0].missingX, 10.)
+        self.assertAlmostEqual(displaced.generalElements[0].missingX, 9.96109334317542,places=4)
+        self.assertAlmostEqual(MET.generalElements[0].missingX, 10.)
+        self.assertAlmostEqual(MET.generalElements[1].missingX, 0.03890665682,places=6)
 
         
         

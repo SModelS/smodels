@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <smodelsOutput>
-    <Displaced_List/>
+    <missing_topologies_with_displaced_decays_List/>
     <ExptRes_List>
         <ExptRes>
             <AnalysisID>CMS-SUS-13-012</AnalysisID>
@@ -72,12 +72,10 @@
             <upper_limit_fb>38.1378438667</upper_limit_fb>
         </ExptRes>
     </ExptRes_List>
-    <Long-lived_List/>
-    <MET_List/>
-    <Missed_Topologies_List/>
-    <Missed_xsec_MET>0.0</Missed_xsec_MET>
-    <Missed_xsec_displaced>0.0</Missed_xsec_displaced>
-    <Missed_xsec_long-lived>0.0</Missed_xsec_long-lived>
+    <missing_topologies_with_prompt_decays_List/>
+    <missing_topologies_List/>
+    <Total_xsec_for_missing_topologies_with_prompt_decays_fb>0.0</Total_xsec_for_missing_topologies_with_prompt_decays_fb>
+    <Total_xsec_for_missing_topologies_with_displaced_decays_fb>0.0</Total_xsec_for_missing_topologies_with_displaced_decays_fb>
     <OutputStatus>
         <database_version>unittest</database_version>
         <decomposition_status>1</decomposition_status>
@@ -89,7 +87,7 @@
         <smodels_version>1.0.93</smodels_version>
         <warnings>Input file ok</warnings>
     </OutputStatus>
-    <Outside_Grid_List/>
+    <topologies_outside_the_grid_List/>
     <Element_List>
         <Element>
             <ID>1</ID>
@@ -122,6 +120,6 @@
             </Weights_fb>
         </Element>
     </Element_List>
-    <Total_missed_xsec>0.0</Total_missed_xsec>
-    <Total_outside_grid_xsec>0.0</Total_outside_grid_xsec>
+    <Total_xsec_for_missing_topologies_fb>0.0</Total_xsec_for_missing_topologies_fb>
+    <Total_xsec_for_topologies_outside_the_grid_fb>0.0</Total_xsec_for_topologies_outside_the_grid_fb>
 </smodelsOutput>
