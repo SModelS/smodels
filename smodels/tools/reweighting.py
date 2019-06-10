@@ -5,7 +5,6 @@
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 """
 
-import itertools
 from math import exp
 from smodels.tools.physicsUnits import GeV
 from smodels.theory.element import Element
@@ -63,7 +62,7 @@ def defaultULReweight(element):
         return 1./effFactor
 
 
-def reweightFactorFor(element,resultType='prompt'):
+def reweightFactorFor(element,resType='prompt'):
     """
     Computer the reweighting factor for the element according to the experimental result type.
     Currently only two result types are supported: 'prompt' and 'displaced'.
@@ -73,16 +72,16 @@ def reweightFactorFor(element,resultType='prompt'):
     to be displaced and the last odd particle to be stable.
 
     :param element: Element object
-    :param resultType: Type of result to compute the reweight factor for (either 'prompt' or 'displaced')
+    :param resType: Type of result to compute the reweight factor for (either 'prompt' or 'displaced')
     :return: probabilities (depending on types of decay within branch), branches (with different labels depending on type of decay)
     """
 
     if not isinstance(element,Element):
         logger.error('element should be an Element object and not %s' %type(element))
         raise SModelSError()
-    rType = resultType.lower()
+    rType = resType.lower()
     if not rType in ['prompt', 'displaced']:
-        logger.error('resultType should be prompt or displaced and not %s' %str(resultType))
+        logger.error('resultType should be prompt or displaced and not %s' %str(resType))
         raise SModelSError()
     
     Fprompt = 1. #Keep track of the probability of all decays being prompt
