@@ -529,17 +529,7 @@ def _getElementsFrom(smsTopList, dataset):
                 newEl.txname = txname
                 elements.append(newEl) #Save element with correct branch ordering
 
-    #Sort element, so the ones with highest weights come first:
-    elements = sorted(elements, key = lambda el: el.weight.getMaxXsec(), reverse=True)
-    #Remove duplicated elements:
-    elementsUnique = []
-    for el in elements:
-        #Skip the element if it is a mother of another element in the list
-        if any(el.isRelatedTo(elB) for elB in elementsUnique):
-            continue
-        elementsUnique.append(el)
-
-    return elementsUnique
+    return elements
 
 
 def _combineElements(elements, dataset, maxDist):
