@@ -47,30 +47,27 @@ Observed r-Value: 15.002655551277469
 -------------------Dataset Label = 6NJet8_1000HT1250_450MHTinf
 -------------------Txname Labels = ['T1']
 Analysis sqrts: 8.00E+00 [TeV]
-Theory prediction: 1.74E-03 [pb]
+Theory prediction: 1.62E-03 [pb]
 Theory conditions:  None
 Observed experimental limit: 3.86E-01 [fb]
 Expected experimental limit: 2.64E-01 [fb]
-Observed r-Value: 4.506218435975599
-Expected r-Value: 6.58924496363026
-Chi2: 22.633432915475073
+Observed r-Value: 4.20976357763319
+Expected r-Value: 6.155752067085059
+Chi2: 21.874862507567137
 Likelihood: 8.193807968109457e-07
 
-Total missing topology cross section (fb):  0.000E+00
-Total cross section where we are outside the mass grid (fb):  0.000E+00
-Total cross section with longlived decays (fb):  0.000E+00
-Total cross section with displaced decays (fb):  0.000E+00
-Total cross section with MET decays (fb):  0.000E+00
+Total cross-section for missing topologies (fb):  0.000E+00
+Total cross-section for missing topologies with displaced decays (fb):  0.000E+00
+Total cross-section for missing topologies with prompt decays (fb):  0.000E+00
+Total cross-section for topologies outside the grid (fb):  0.000E+0
 
 Full information on unconstrained cross sections
 ================================================================================
 No missing topologies found
 ================================================================================
-No contributions outside the mass grid
+No missing topologies with displaced decays found
 ================================================================================
-No long-lived decays
+No missing topologies with prompt decays found
 ================================================================================
-No displaced decays
-================================================================================
-No MET decays
+No topologies outside the grid found
 ================================================================================
