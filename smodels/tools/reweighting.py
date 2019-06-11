@@ -69,7 +69,10 @@ def reweightFactorFor(element,resType='prompt'):
     If resultType = 'prompt', returns the reweighting factor for all decays in the element
     to be prompt and the last odd particle to be stable.
     If resultType = 'displaced', returns the reweighting factor for ANY decay in the element
-    to be displaced and the last odd particle to be stable.
+    to be displaced and no long-lived decays and the last odd particle to be stable.
+    Not that the fraction of "long-lived (meta-stable) decays" is usually included
+    in topologies where the meta-stable particle appears in the final state. Hence
+    it should not be included in the prompt or displaced fractions.
 
     :param element: Element object
     :param resType: Type of result to compute the reweight factor for (either 'prompt' or 'displaced')
@@ -84,8 +87,8 @@ def reweightFactorFor(element,resType='prompt'):
         logger.error('resultType should be prompt or displaced and not %s' %str(resType))
         raise SModelSError()
     
-    Fprompt = 1. #Keep track of the probability of all decays being prompt
-    Fdisp = 1. #Keep track of the probability of AT LEAST one decay being displaced
+    FpromptTotal = 1. #Keep track of the probability of all decays being prompt
+    FlongTotal = 1. #Keep track of the probability for at least one decay being long-lived
     for branch in element.branches:
         for particle in branch.oddParticles[:-1]:
             if isinstance(particle.totalwidth, list):
@@ -93,16 +96,21 @@ def reweightFactorFor(element,resType='prompt'):
             else:
                 width = particle.totalwidth
             if width == float('inf')*GeV:
-                Fprompt *= 1.
-                Fdisp *= 1.
+                Fprompt = 1.
+                Fdisp = 0.
             elif width == 0.*GeV:
-                Fprompt *= 0.
-                Fdisp *= 1.
+                Fprompt = 0.
+                Fdisp = 0.
             else:
                 probs = calculateProbabilities(width.asNumber(GeV))
-                Fprompt *= probs['F_prompt']
-                Fdisp *= (probs['F_prompt'] + probs['F_long'])
-    Fdisp = 1. - Fdisp #Prob(any decay being displaced) = 1 - Prob(all decays being either prompt or long-lived)
+                Fprompt = probs['F_prompt']
+                Fdisp = probs['F_displaced']
+            FlongTotal *= (Fprompt+Fdisp)
+            FpromptTotal *= Fprompt
+    #Prob(at least one decay being long-lived) = 1 - Prob(all decays being either prompt or displaced)
+    FlongTotal = 1. - FlongTotal
+    #Prob(at least one displaced decay and no long-lived decays) = 1 -Prob(at least one long-lived) - Prob(all prompt)
+    FdispTotal = 1. - FlongTotal - FpromptTotal
     #Include Flong factor for final BSM states:
     for branch in element.branches:
         width = branch.oddParticles[-1].totalwidth
@@ -112,13 +120,13 @@ def reweightFactorFor(element,resType='prompt'):
             Flong = 1.
         else:
             Flong = calculateProbabilities(width.asNumber(GeV))['F_long']
-        Fdisp *= Flong
-        Fprompt *= Flong
+        FdispTotal *= Flong
+        FpromptTotal *= Flong
         
     if rType == 'prompt':
-        return Fprompt
+        return FpromptTotal
     if rType == 'displaced':
-        return Fdisp
+        return FdispTotal
 
 def calculateProbabilities(width, l_inner = .001,
                            gb_inner=1.3,l_outer=10.,gb_outer=1.43):

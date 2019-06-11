@@ -49,7 +49,12 @@ for key in filtersDefault:
     elif 'displaced' in key.lower():
         factorsDefault[key] = lambda el: reweightFactorFor(el,'displaced')
     else:
-        factorsDefault[key] = lambda el: 1.
+        #If not specified assumed all fractions
+        #(note that we have can not include any long-lived fraction since this is already included in
+        #the topologies where the meta-stable particle appears as a final state,
+        #so the total is = (fraction of all decays being prompt)
+        #+ (fraction of at least one displaced decay and no long-lived decays)
+        factorsDefault[key] = lambda el: reweightFactorFor(el,'prompt') + reweightFactorFor(el,'displaced')
 
 
 class Uncovered(object):
