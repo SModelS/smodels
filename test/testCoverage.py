@@ -10,12 +10,14 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.theory.branch import Branch
 from smodels.tools.coverage import Uncovered
-from smodels.theory.topology import TopologyList
+from smodels.theory.topology import TopologyList, Topology
 from smodels.tools.physicsUnits import GeV, TeV, fb
 from smodels.theory.element import Element
 from smodels.theory.crossSection import XSectionList, XSection, XSectionInfo
 from smodels.share.models import SMparticles, mssm
 from smodels.tools.reweighting import reweightFactorFor
+from smodels.theory.particle import Particle
+import random
 
 n1 = mssm.n1
 n1.totalwidth = 0.*GeV
@@ -55,10 +57,10 @@ for key in filters:
 
 class CoverageTest(unittest.TestCase):     
    
-    def testFill(self):
-       
+    def testUncovered(self):
+
         topolist = TopologyList()
-        
+
         # prompt
         b1 = Branch()
         b1.evenParticles = [[b,t]]
@@ -66,7 +68,7 @@ class CoverageTest(unittest.TestCase):
         b1.setInfo()
         el1 = Element()
         el1.branches=[b1,b1]
-        
+
         # long-lived
         b3 = Branch()
         b3.evenParticles = []
@@ -78,7 +80,7 @@ class CoverageTest(unittest.TestCase):
         b4.setInfo()
         el2 = Element()
         el2.branches=[b3,b4]
-        
+
         # prompt and displaced
         b5 = Branch()
         b5.evenParticles = [[t],[b,t]]
@@ -90,8 +92,7 @@ class CoverageTest(unittest.TestCase):
         b6.setInfo()
         el3 = Element()
         el3.branches=[b5,b6]
-        
-        
+
         w1 = XSectionList()
         w1.xSections.append(XSection())
         w1.xSections[0].info = XSectionInfo()
@@ -102,30 +103,137 @@ class CoverageTest(unittest.TestCase):
         el1.weight = w1
         el2.weight = w1
         el3.weight = w1
-        
+
         topolist.addElement(el1)
         topolist.addElement(el2)
         topolist.addElement(el3)
         topolist._setElementIds()
         uncovered = Uncovered(topolist,groupFilters=filters,groupFactors=factors)
         longLived = uncovered.getGroup('missing non-MET (prompt)')
-       
-        
+
         MET = uncovered.getGroup('missing MET (prompt)')
         displaced = uncovered.getGroup('missing (displaced)')
-               
+
         self.assertEqual(len(longLived.generalElements), 1)
         self.assertEqual(len(displaced.generalElements), 1)
         self.assertEqual(len(MET.generalElements), 2)
-       
+
         self.assertAlmostEqual(longLived.generalElements[0].missingX, 10.)
         self.assertAlmostEqual(displaced.generalElements[0].missingX, 9.96109334317542,places=4)
         self.assertAlmostEqual(MET.generalElements[0].missingX, 10.)
         self.assertAlmostEqual(MET.generalElements[1].missingX, 0.03890665682,places=6)
 
-        
-        
-    
-    
+
+    def testUncoveredTree(self):
+
+        p1 = Particle(Z2parity=-1, label='p1', pdg=10001, mass=100.*GeV,
+              eCharge=0., colordim=1, totalwidth=0*GeV)
+        p2 = Particle(Z2parity=-1, label='p2', pdg=10002, mass=200.*GeV,
+              eCharge=0., colordim=1, totalwidth=1e-15*GeV)
+        xsecA = XSection()
+        xsecA.value = 10.*fb
+        xsecA.info.sqrts = 13.*TeV
+        xsecA.info.label = 'wA'
+        xsecA.info.order = 0
+        xsecB = XSection()
+        xsecB.value = 5.*fb
+        xsecB.info.sqrts = 13.*TeV
+        xsecB.info.label = 'wb'
+        xsecB.info.order = 0
+
+        #Element family-tree: A0->A1+B1, A1->A2
+        #Mother A
+        elA = Element()
+        elA.label = 'A0'
+        elA.testedBy = ['prompt','displaced']
+        elA.coveredBy = ['prompt','displaced']
+        elA.weight.add(xsecA)
+        elA.motherElements = [elA]
+
+        #Daughters:
+        elA1 = Element()
+        elA1.label = 'A1'
+        elA1.testedBy = []
+        elA1.coveredBy = []
+        elA1.weight.add(xsecA)
+        elA1.motherElements = [elA1,elA]
+        elB1 = Element()
+        elB1.label = 'B1'
+        elB1.testedBy = []
+        elB1.coveredBy = []
+        elB1.weight.add(xsecA)
+        elB1.motherElements = [elB1,elA]
+        elA2 = Element()
+        elA2.label = 'A2'
+        elA2.testedBy = []
+        elA2.coveredBy = []
+        elA2.weight.add(xsecA)
+        elA2.motherElements = [elA2,elA1]
+
+        #Element family-tree: a0->a1+b1
+        #Mother B
+        ela = Element()
+        ela.label = 'a0'
+        ela.testedBy = []
+        ela.coveredBy = []
+        ela.weight.add(xsecB)
+        ela.motherElements = [ela]
+        #Daughters:
+        ela1 = Element()
+        ela1.label = 'a1'
+        ela1.testedBy = []
+        ela1.coveredBy = []
+        ela1.weight.add(xsecB)
+        ela1.motherElements = [ela1,ela]
+        elb1 = Element()
+        elb1.label = 'b1'
+        elb1.testedBy = []
+        elb1.coveredBy = []
+        elb1.weight.add(xsecB)
+        elb1.motherElements = [elb1,ela]
+
+        #Merged element = (A2+b1)
+        elCombined = Element()
+        xsec = XSection()
+        xsec.value = 15.*fb
+        xsec.info.sqrts = 13.*TeV
+        xsec.info.label = 'wA+wB'
+        xsec.info.order = 0
+        elCombined.label = 'A2+b1'
+        elCombined.testedBy = []
+        elCombined.coveredBy = []
+        elCombined.weight.add(xsec)
+        elCombined.motherElements = [elCombined,elA2,elb1]
+
+        topoList = TopologyList()
+        topoList.topos.append(Topology())
+        elList = [elA,elA1,elA2,elB1,ela,elb1,ela1,elCombined]
+        #Set odd particles (important for sorting the elements)
+        for el in elList:
+            for branch in el.branches:
+                branch.oddParticles = [p1]
+        elB1.branches[0].oddParticles = [p2,p1]
+        ela1.branches[1].oddParticles = [p2,p1]
+        elb1.branches[1].oddParticles = [p2,p1]
+        ela.branches[0].oddParticles = [p2,p2,p1]
+
+        #make sure the ordering in elList is not important:
+        random.shuffle(elList)
+        topoList.topos[0].elementList = elList[:]
+        topoList._setElementIds()
+
+        #Test if the family tree is being retrieved correctly and in the correct ordering (mother before grandmother,...):
+        elListAncestors = {'A0' : [], 'A1' : ['A0'], 'A2' : ['A1','A0'], 'B1' : ['A0'],'A2+b1' : ['A2','b1','A1','a0','A0'],
+                           'b1' : ['a0'], 'a1' : ['a0'] , 'a0' : []}
+        for el in elList:
+            ancestors = [mom.label for mom in el.getAncestors()]
+            self.assertEqual(ancestors,elListAncestors[el.label])
+        # A2+b1--> b1 is not tested, A2 is tested because its grandmother is tested
+        missingTopos = Uncovered(topoList).getGroup('missing (all)')
+        self.assertEqual(len(missingTopos.generalElements),1) #Only elCombined should appear (it is smaller than a1)
+        self.assertAlmostEqual(missingTopos.generalElements[0].missingX,5.) #Only the fraction of the cross-section from elB is not missing
+        self.assertEqual(len(missingTopos.generalElements[0]._contributingElements),1) #Only elCombined should appear
+        self.assertTrue(missingTopos.generalElements[0]._contributingElements[0] is elCombined)
+
 if __name__ == "__main__":
     unittest.main()       

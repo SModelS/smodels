@@ -297,59 +297,54 @@ class Element(object):
                 momPIDs.append(None)
         return momPIDs
 
-    def getAncestors(self,igen=None,ancestorsDictInput=None):
+    def _getAncestorsDict(self,igen=0):
+        """
+        Returns a dictionary with all the ancestors
+        of the element. The dictionary keys are integers
+        labeling the generation (number of generations away from self)
+        and the values are a list of Element objects (ancestors) for that generation.
+        igen is used as the counter for the initial generation.
+        The output is also stored in self._ancestorsDict for future use.
+
+        :param igen: Auxiliair integer indicating to which generation self belongs.
+
+        :return: Dictionary with generation index as key and ancestors as values
+                 (e.g. {igen+1 : [mother1, mother2], igen+2 : [grandmother1,..],...})
+        """
+
+        ancestorsDict = {igen+1 : []}
+        for mother in self.motherElements:
+            if mother is self:
+                continue
+            ancestorsDict[igen+1].append(mother)
+            for jgen,elList in mother._getAncestorsDict(igen+1).items():
+                if not jgen in ancestorsDict:
+                    ancestorsDict[jgen] = []
+                ancestorsDict[jgen] += elList
+
+        #Store the result
+        self._ancestorsDict = dict([[key,val] for key,val in ancestorsDict.items()])
+
+        return self._ancestorsDict
+
+    def getAncestors(self):
         """
         Get a list of all the ancestors of the element.
         The list is ordered so the mothers appear first, then the grandmother,
         then the grandgrandmothers,...
 
-        :param igen: The generation index (enumerates how far you are from the
-                     original element, e.g. 1 = mothers, 2 = grandmothers,...).
-                     If None will assume it is the first time the function
-                     is being called.
-        :param ancestorsDict: An auxiliary dictionary to collect the ancestors
-                              grouped by the generation index. The dictionary
-                              has the generation index as keys and the list of
-                              ancestors for that generation as values.
-
-        :return: A list of Element objects containing all the ancestors sorted by generation
-                 if igen is None or the ancestorsDict otherwise.
+        :return: A list of Element objects containing all the ancestors sorted by generation.
         """
 
-        if hasattr(self,'_ancestors'):
-            if igen is None:
-                return self._ancestors
-            else:
-                if not igen in ancestorsDictInput:
-                    ancestorsDictInput[igen] = self._ancestors[:]
-                else:
-                    ancestorsDictInput[igen].append(self._ancestors)
-                return ancestorsDictInput
+        #Check if the ancestors have already been obtained (performance gain)
+        if not hasattr(self,'_ancestorsDict'):
+            self._getAncestorsDict()
 
-        #Makes a copy of the input dictionary
-        #(avoids sharing the same object between distinct elements)
-        if igen is None:
-            ngen = 1
-            ancestorsDict = {}
-        else:
-            ngen = igen
-            ancestorsDict = ancestorsDictInput
-        if not ngen in ancestorsDict:
-            ancestorsDict[ngen] = []
-        for mother in self.motherElements:
-            if mother is self:
-                continue
-            ancestorsDict[ngen].append(mother)
-            ancestorsDict = mother.getAncestors(ngen+1,ancestorsDict)
+        orderedAncestors = []
+        for jgen in sorted(self._ancestorsDict.keys()):
+            orderedAncestors += self._ancestorsDict[jgen]
 
-        if igen is None:
-            allAncestors = []
-            for jgen in sorted(ancestorsDict.keys()):
-                allAncestors += ancestorsDict[jgen]
-            self._ancestors = allAncestors[:]
-            return self._ancestors
-        else:
-            return ancestorsDict
+        return orderedAncestors
 
     def isRelatedTo(self,other):
         """
@@ -361,13 +356,8 @@ class Element(object):
         :return: True/False
         """
 
-        if not hasattr(self,'_ancestors'):
-            self.getAncestors()
-        if not hasattr(other,'_ancestors'):
-            other.getAncestors()
-
-        ancestorsA = [self] + self._ancestors
-        ancestorsB = [other] + other._ancestors
+        ancestorsA = [self] + self.getAncestors()
+        ancestorsB = [other] + other.getAncestors()
 
         for elA in ancestorsA:
             if any(elA is elB for elB in ancestorsB):
