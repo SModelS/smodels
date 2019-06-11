@@ -68,7 +68,7 @@ class Uncovered(object):
                 for this value. Otherwise the highest sqrts value will be used.
     """
 
-    def __init__(self,topoList, sqrts=None,
+    def __init__(self,topoList, sqrts=None, sigmacut=0*fb,
                  groupFilters = filtersDefault,
                  groupFactors = factorsDefault,
                  groupdDescriptions = descriptionDefault,
@@ -119,7 +119,7 @@ class Uncovered(object):
                                            reweightFactor = groupFactors[gLabel],
                                            smFinalStates=smFinalStates,
                                            bsmFinalStates=bsmFinalStates,
-                                           sqrts=sqrts)
+                                           sqrts=sqrts, sigmacut=sigmacut.asNumber(fb))
             if groupdDescriptions and gLabel in groupdDescriptions:
                 uncoveredTopos.description = groupdDescriptions[gLabel]
             else:
@@ -149,12 +149,16 @@ class UncoveredList(object):
     :ivar generalElements: missing elements, grouped by common general name using inclusive labels (e.g. jet)
     :ivar smFinalStates: Lists of MultiParticles used to group final states.
     :ivar sqrts: sqrts, for printout
+    :ivar sigmacut: Minimum cross-section/weight value (after applying the reweight factor)
+                   for an element to be included. The value should in fb (unitless)
     """
-    def __init__(self, label, elementFilter, reweightFactor, smFinalStates, bsmFinalStates, sqrts):
+    def __init__(self, label, elementFilter, reweightFactor,
+                 smFinalStates, bsmFinalStates, sqrts, sigmacut=0.):
         self.generalElements = []
         self.smFinalStates = smFinalStates
         self.bsmFinalStates = bsmFinalStates
         self.sqrts = sqrts
+        self.sigmacut = sigmacut
         self.label = label
         self.elementFilter = elementFilter
         self.reweightFactor = reweightFactor
@@ -177,9 +181,14 @@ class UncoveredList(object):
         elementList = [el for el in topoList.getElements() if self.elementFilter(el)]
         
         #Get missing xsections including the reweight factor:
-        missingXandEls = [[self.getMissingX(el)*self.reweightFactor(el),el] for el in elementList if self.reweightFactor(el)]
+        missingXandEls = [[self.getMissingX(el)*self.reweightFactor(el),el] for el in elementList]
+        #Only keep the ones elements sigmacut:
+        if self.sigmacut:
+            missingXandEls = [x for x in missingXandEls[:] if x[0] > self.sigmacut]
+        else:
+            missingXandEls = [x for x in missingXandEls[:] if x[0] > 0.]
         #Sort according to largest missingX, smallest size and largest ID
-        missingXandEls = sorted(missingXandEls, key = lambda pt: [pt[0],-pt[1]._getLength(),pt[1].elID], reverse=True)
+        missingXandEls = sorted(missingXandEls, key = lambda pt: [pt[0],-pt[1]._getLength(),-pt[1].elID], reverse=True)
 
         #Split lists of elements and missingX:
         missingXsecs = [pt[0] for pt in missingXandEls]

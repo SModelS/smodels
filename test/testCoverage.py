@@ -50,7 +50,7 @@ for key in filters:
     elif 'displaced' in key.lower():
         factors[key] = lambda el: reweightFactorFor(el,'displaced')
     else:
-        factors[key] = lambda el: 1.
+        factors[key] = lambda el: reweightFactorFor(el,'prompt')+reweightFactorFor(el,'displaced')
 
 
 class CoverageTest(unittest.TestCase):     
