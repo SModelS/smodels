@@ -465,7 +465,9 @@ def main(args):
     inputFiles = canonizer.getInputFiles ( args )
     ncpus = canonizer.checkNCPUs ( args.ncpus, inputFiles )
     pythiaVersion = canonizer.getPythiaVersion ( args )
-    ssmultipliers = canonizer.getSSMultipliers ( args.ssmultipliers )
+    ssmultipliers = None
+    if hasattr ( args, "ssmultipliers" ):
+        ssmultipliers = canonizer.getSSMultipliers ( args.ssmultipliers )
 
     pythiacard = None
     if hasattr(args, 'pythiacard'):
