@@ -280,23 +280,6 @@ class Element(object):
 
         return fsparticles
 
-    def getMothers(self):
-        """
-        Get list of mother PDGs.    
-        Can be a nested list, if the element combines several mothers:
-        [ [pdgMOM1,pdgMOM2],  [pdgMOM1',pdgMOM2']] 
-        
-        :returns: list of PDG ids
-        """                        
-
-        momPIDs = []
-        for branch in self.branches:
-            if hasattr(branch.oddParticles[0], 'pdg'):
-                momPIDs.append(branch.oddParticles[0].pdg)
-            else:
-                momPIDs.append(None)
-        return momPIDs
-
     def _getAncestorsDict(self,igen=0):
         """
         Returns a dictionary with all the ancestors
@@ -576,7 +559,7 @@ class Element(object):
                 effectiveDaughter = Particle(label='inv', mass = bsmMom.mass,
                                              eCharge = 0, colordim = 1,
                                              totalwidth = branch.oddParticles[-1].totalwidth,
-                                             Z2parity = bsmMom.Z2parity)
+                                             Z2parity = bsmMom.Z2parity, pdg = bsmMom.pdg)
                 branch.removeVertex(len(branch.oddParticles)-2)
                 #For invisible compression, keep an effective mother which corresponds to the invisible
                 #daughter, but with the mass of the parent.

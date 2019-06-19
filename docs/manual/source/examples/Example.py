@@ -122,29 +122,29 @@ def main():
         print("(The input model is not excluded by the simplified model results)" )
       
     #Find out missing topologies for sqrts=8*TeV:
-    uncovered = coverage.Uncovered(toplist,sigmacut,sqrts=8.*TeV)
+    uncovered = coverage.Uncovered(toplist,sqrts=8.*TeV)
+    #First sort coverage groups by label
+    groups = sorted(uncovered.groups[:], key = lambda g: g.label)
     #Print uncovered cross-sections:
-    print("\nTotal missing topology cross section (fb): %10.3E\n" %(uncovered.missingTopos.getTotalXsec()))
-    print("Total cross section where we are outside the mass grid (fb): %10.3E\n" %(uncovered.outsideGrid.getTotalXsec()))
-    print("Total cross section with longlived decays (fb): %10.3E\n" %(uncovered.longLived.getTotalXsec()))
-    print("Total cross section with displaced decays (fb): %10.3E\n" %(uncovered.displaced.getTotalXsec()))
-    print("Total cross section with MET decays (fb): %10.3E\n" %(uncovered.MET.getTotalXsec()))
-    
-    
+    for group in groups:
+        print("\nTotal cross-section for %s (fb): %10.3E\n" %(group.description,group.getTotalXSec()))
+
+    missingTopos = uncovered.getGroup('missing (prompt)')
     #Print some of the missing topologies:
-    if uncovered.missingTopos.generalElements:
+    if missingTopos.generalElements:
         print('Missing topologies (up to 3):' )
-        for genEl in sorted(uncovered.missingTopos.generalElements, key=lambda x: x.missingX, reverse=True)[:3]:
-            print('Element:', str(genEl._outputDescription))
+        for genEl in missingTopos.generalElements[:3]:
+            print('Element:', genEl)
             print('\tcross-section (fb):', genEl.missingX)
     else:
         print("No missing topologies found\n")
     
+    missingDisplaced = uncovered.getGroup('missing (displaced)')
     #Print elements with displaced decays:
-    if uncovered.displaced.generalElements:
+    if missingDisplaced.generalElements:
         print('\nElements with displaced vertices (up to 2):' )    
-        for genEl in sorted(uncovered.displaced.generalElements, key=lambda x: x.missingX, reverse=True)[:2]:
-            print('Element:', str(genEl._outputDescription))
+        for genEl in missingDisplaced.generalElements[:2]:
+            print('Element:', genEl)
             print('\tcross-section (fb):', genEl.missingX)
     else:
         print("\nNo displaced decays")

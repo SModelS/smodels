@@ -223,22 +223,6 @@ class ElementCluster(object):
         avgEl._index = None
         return avgEl
 
-    def getPIDs(self):
-        """
-        Return the list of all PIDs appearing in all elements in the cluster,
-        i.e. [ [[pdg1, pdg2,...],[pdg3,pdg4,...]], [[pdg1', pdg2',...],[pdg3',pdg4',...]]
-
-        :returns: list of PIDs
-        """
-        
-        PIDs = []
-        for el in self:
-            for pidList in el.getMothers():
-                if not pidList in PIDs:
-                    PIDs.append(pidList)
-            
-        return PIDs
-    
     def copy(self):
         """
         Returns a copy of the index cluster (faster than deepcopy).

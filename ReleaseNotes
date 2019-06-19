@@ -4,6 +4,9 @@ Release v2.0.0, Mar 2019
   * Included Particle class
   * Particles are compared according to their properties
   * downloaded database files now stored in $HOME/.cache/smodels
+  * Database now accepts lifetime dependent results
+  * Simplified missing topologies algorithm and output
+  * Added field "type" to the experimental results in the database ('prompt' or 'displaced')
 
 Release v1.2.2, Tue 28 Nov 2018
 =======================================================

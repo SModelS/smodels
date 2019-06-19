@@ -13,6 +13,7 @@ from smodels.tools.physicsUnits import TeV,fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
+import itertools
 
 class TheoryPrediction(object):
     """
@@ -374,9 +375,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
             totalXsec += pred.xsection
         massList.append(pred.mass)
         weights.append(pred.xsection.value.asNumber(fb))
-        for pidEntry in pred.PIDs:
-            if not pidEntry in PIDList:
-                PIDList.append(pidEntry)
+        PIDList += pred.PIDs
         
     txnameList = list(set(txnameList))
     if None in massList:
@@ -397,7 +396,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     theoryPrediction.conditions = None
     theoryPrediction.elements = elementList
     theoryPrediction.mass = mass
-    theoryPrediction.PIDs = PIDList
+    theoryPrediction.PIDs = [pdg for pdg,_ in itertools.groupby(PIDList)] #Remove duplicates
     
     return theoryPrediction
     
@@ -488,7 +487,8 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.elements = cluster.elements
         theoryPrediction.avgElement = cluster.averageElement()
         theoryPrediction.mass = theoryPrediction.avgElement.mass
-        theoryPrediction.PIDs = cluster.getPIDs()
+        PIDs = [el.pdg for el in cluster.elements]
+        theoryPrediction.PIDs = [pdg for pdg,_ in itertools.groupby(PIDs)] #Remove duplicates
         predictionList._theoryPredictions.append(theoryPrediction)
 
     if len(predictionList) == 0:
