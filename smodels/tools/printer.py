@@ -1034,20 +1034,13 @@ class SLHAPrinter(TxTPrinter):
 
     def _formatUncovered(self, obj):
 
-        nprint = 10
-
         #First sort groups by label
         groups = sorted(obj.groups[:], key = lambda g: g.label)
         #Get summary of groups:
-        output = ""
-        for group in groups:
-            #Format blockTag using only the alphanumeric characters plus space and _:
-            blockTag = ''.join([xc for xc in group.label if (xc.isalnum() or xc in [' ','_'])])
-            blockTag = blockTag.replace(' ', '_')
-            sqrts = group.sqrts.asNumber(TeV)
-            output += "\nBLOCK SModelS_%s #sqrts[TeV] weight[fb] description\n" %blockTag
-            for i,genEl in enumerate(group.generalElements[:nprint]):
-                output += " %d %d %10.3E %s\n" % (i, sqrts, genEl.missingX, genEl)
-
+        output = "\nBLOCK SModelS_Missing_and_Outside_the_Grid_CrossSections"
+        for i,group in enumerate(sorted(groups, key = lambda g: g.label)):
+            output += "\n %d 0 %-30s      # %s" %(i,group.label,group.description)
+            output += "\n %d 1 %-30.3E      # %s" %(i,group.getTotalXSec(),"Total cross-section (fb)")
+        output += "\n"
         return output
             

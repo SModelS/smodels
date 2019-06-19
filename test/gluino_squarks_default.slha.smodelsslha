@@ -18,36 +18,13 @@ BLOCK SModelS_Exclusion
  1 6 N/A                            #Chi2
  1 7 N/A                            #Likelihood
 
-BLOCK SModelS_missing_all #sqrts[TeV] weight[fb] description
- 0 13  1.482E+02 [[[jet],[W]],[[jet,jet],[W]]]  (MET,MET)
- 1 13  1.446E+02 [[[W]],[[W]]]  (MET,MET)
- 2 13  1.440E+02 [[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)
- 3 13  1.047E+02 [[[jet,jet],[W]],[[b,t],[W]]]  (MET,MET)
- 4 13  8.728E+01 [[[jet]],[[jet,jet],[W]]]  (MET,MET)
- 5 13  8.654E+01 [[[jet,jet],[higgs]],[[jet,jet],[W]]]  (MET,MET)
- 6 13  7.520E+01 [[[jet],[W]],[[b,t],[W]]]  (MET,MET)
- 7 13  7.309E+01 [[[jet,jet],[W]],[[jet],[b,t],[W]]]  (MET,MET)
- 8 13  7.309E+01 [[[b,t],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)
- 9 13  6.466E+01 [[[jet],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)
+BLOCK SModelS_Missing_and_Outside_the_Grid_CrossSections
+ 0 0 missing (all)                       # missing topologies
+ 0 1 3.066E+03                           # Total cross-section (fb)
+ 1 0 missing (displaced)                 # missing topologies with displaced decays
+ 1 1 0.000E+00                           # Total cross-section (fb)
+ 2 0 missing (prompt)                    # missing topologies with prompt decays
+ 2 1 3.066E+03                           # Total cross-section (fb)
+ 3 0 outsideGrid (all)                   # topologies outside the grid
+ 3 1 2.374E+02                           # Total cross-section (fb)
 
-BLOCK SModelS_outsideGrid_all #sqrts[TeV] weight[fb] description
- 0 13  2.071E+02 [[[higgs]],[[W]]]  (MET,MET)
- 1 13  2.333E+01 [[[jet]],[[jet,jet]]]  (MET,MET)
- 2 13  3.762E+00 [[[b],[W]],[[b],[W]]]  (MET,MET)
- 3 13  1.532E+00 [[[jet]],[[t,t]]]  (MET,MET)
- 4 13  9.944E-01 [[[jet]],[[b,b]]]  (MET,MET)
- 5 13  6.802E-01 [[[jet,jet]],[[b,b]]]  (MET,MET)
-
-BLOCK SModelS_missing_displaced #sqrts[TeV] weight[fb] description
-
-BLOCK SModelS_missing_prompt #sqrts[TeV] weight[fb] description
- 0 13  1.482E+02 [[[jet],[W]],[[jet,jet],[W]]]  (MET,MET)
- 1 13  1.446E+02 [[[W]],[[W]]]  (MET,MET)
- 2 13  1.440E+02 [[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)
- 3 13  1.047E+02 [[[jet,jet],[W]],[[b,t],[W]]]  (MET,MET)
- 4 13  8.728E+01 [[[jet]],[[jet,jet],[W]]]  (MET,MET)
- 5 13  8.654E+01 [[[jet,jet],[higgs]],[[jet,jet],[W]]]  (MET,MET)
- 6 13  7.520E+01 [[[jet],[W]],[[b,t],[W]]]  (MET,MET)
- 7 13  7.309E+01 [[[jet,jet],[W]],[[jet],[b,t],[W]]]  (MET,MET)
- 8 13  7.309E+01 [[[b,t],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)
- 9 13  6.466E+01 [[[jet],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)
