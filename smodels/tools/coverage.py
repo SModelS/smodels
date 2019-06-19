@@ -253,6 +253,9 @@ class UncoveredList(object):
             #(since the ancestorList is sorted by generation, the mother always
             #appears before the grandmother in the list)
             alreadyChecked += ancestor.getAncestors()
+            if not hasattr(ancestor,'_totalXsec'):
+                xsec = ancestor.weight.getXsecsFor(self.sqrts)
+                ancestor._totalXsec = xsec[0].value.asNumber(fb)            
             overlapXsec += ancestor._totalXsec
 
         return missingX-overlapXsec
