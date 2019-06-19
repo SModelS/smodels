@@ -356,14 +356,13 @@ class Element(object):
         :return: True/False
         """
 
-        ancestorsA = [self] + self.getAncestors()
-        ancestorsB = [other] + other.getAncestors()
+        ancestorsA = set([id(self)] + [id(el) for el in self.getAncestors()])
+        ancestorsB = set([id(other)] + [id(el) for el in other.getAncestors()])
 
-        for elA in ancestorsA:
-            if any(elA is elB for elB in ancestorsB):
-                return True
-
-        return False
+        if ancestorsA.intersection(ancestorsB):
+            return True
+        else:
+            return False
 
     def getEinfo(self):
         """

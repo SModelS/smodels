@@ -115,7 +115,7 @@ class Uncovered(object):
         #Create each uncovered group and get the topologies from topoList
         for gLabel,gFilter in groupFilters.items():
             #Initialize the uncovered topology list:
-            uncoveredTopos = UncoveredList(label=gLabel,elementFilter=gFilter,
+            uncoveredTopos = UncoveredGroup(label=gLabel,elementFilter=gFilter,
                                            reweightFactor = groupFactors[gLabel],
                                            smFinalStates=smFinalStates,
                                            bsmFinalStates=bsmFinalStates,
@@ -134,7 +134,7 @@ class Uncovered(object):
 
         :param label: String corresponding to the specific group label
 
-        :return: UncoveredList object which matches the label
+        :return: UncoveredGroup object which matches the label
         """
 
         for group in self.groups:
@@ -143,7 +143,7 @@ class Uncovered(object):
 
         return None
 
-class UncoveredList(object):
+class UncoveredGroup(object):
     """
     Object to find and collect GeneralElement objects, plus printout functionality
     :ivar generalElements: missing elements, grouped by common general name using inclusive labels (e.g. jet)
@@ -198,9 +198,12 @@ class UncoveredList(object):
         #(keep always the first appearance in the list, so we always keep the ones with largest missing xsec)
         elementListUnique = []
         missingXsecsUnique = []
-        ancestors = set() #Keep track of all the ancestors of the elements in the unique list
+        ancestors = set() #Keep track of all the ancestor ids of the elements in the unique list
         for i,element in enumerate(elementList):
-            ancestorsIDs = set([element.elID]+[el.elID for el in element.getAncestors() if el.elID != 0])
+            #Get ancestor object ids
+            #(safer than element.elID since some elements can share elID = 0 if they
+            #were never directly inserted in the TopologyList)
+            ancestorsIDs = set([id(element)] + [id(el) for el in element.getAncestors()])
             #If the element has any common ancestor with any of the previous elements
             #or if it is an ancestor of any of the previous elements
             #skip it to avoid double counting
