@@ -13,6 +13,9 @@ from smodels.tools.physicsUnits import TeV, fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
+from scipy.special import erf
+from scipy import optimize, stats
+import numpy as np
 
 class TheoryPrediction(object):
     """
@@ -140,6 +143,43 @@ class TheoryPrediction(object):
 
 
         if self.dataType()  == 'upperLimit':
+            eul = self.dataset.getUpperLimitFor(element=self.avgElement,
+                                                txnames=self.txnames,
+                                                expected=True)
+            if type(eul) == type(None):
+                self.likelihood = None
+                self.chi2 = None
+            else:
+                ul = self.dataset.getUpperLimitFor(element=self.avgElement,
+                                                    txnames=self.txnames,
+                                                    expected=True)
+                lumi = self.dataset.globalInfo.lumi
+                sigma_exp = float(eul * lumi) / 1.96
+                ulN = float(ul * lumi) ## upper limit on yield
+                eulN = float(eul * lumi) ## upper limit on yield
+                denominator = np.sqrt(2.) * sigma_exp
+                nsig = (self.xsection.value*lumi).asNumber()
+
+                def root_func ( mu ):
+                    return (erf((ulN-mu)/denominator)+erf(mu/denominator)) / ( 1. + erf(mu/denominator)) - .95
+                #logger.error ( "trying to find mumax" )
+                fA,fB = root_func ( 0. ), root_func ( max(eulN,ulN) )
+                if np.sign(fA*fB) > 0.:
+                    ## the have the same sign
+                    logger.error ( "when computing likelihood for %s: fA and fB have same sign" % self.analysisId() )
+                    self.likelihood = None
+                    self.chi2 = None
+                    return
+                    
+                mumax = optimize.brentq ( root_func, 0., max(eulN,ulN), rtol=1e-03, xtol=1e-06 )
+                #logger.error ( "mumax=%s" % mumax )
+
+                # expected sigma on yield
+                #logger.error ( "implement ul/eul llhd computation!!! sigma=%.2f" % sigma_exp )
+                self.likelihood = stats.norm.pdf ( nsig, mumax, sigma_exp )
+                #logger.error ( "llhd=%s" % self.likelihood )
+                self.chi2 = 0. ## FIXME need to compute still
+
             self.likelihood = None
             self.chi2 = None
 
