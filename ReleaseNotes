@@ -1,12 +1,14 @@
 Release v2.0.0, Mar 2019
 =======================================================
 
-  * Included Particle class
+  * Introduction of Particle class
   * Particles are compared according to their properties
-  * downloaded database files now stored in $HOME/.cache/smodels
-  * Database now accepts lifetime dependent results
+  * Unified treatment of SLHA and LHE input files
+  * Decomposition and experimental results can include displaced signatures
+  * Database can now handle lifetime dependent results
   * Simplified missing topologies algorithm and output
   * Added field "type" to the experimental results in the database ('prompt' or 'displaced')
+  * Downloaded database files now stored in $HOME/.cache/smodels
 
 Release v1.2.2, Tue 28 Nov 2018
 =======================================================

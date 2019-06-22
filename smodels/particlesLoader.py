@@ -2,14 +2,14 @@
 
 """
 .. module:: particlesLoader
-   :synopsis: Loads the file Defining the list of R-even and R-odd particles to be used.
+   :synopsis: Loads the file Defining the list of Z2-even and Z2-odd particles to be used.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Matthias Wolf <matthias.wolf@wot.at>
 
 """
 
-def load ():
+def load():
     import os, sys
     from smodels.tools.runtime import modelFile
     from smodels.tools.smodelsLogging import logger
@@ -33,7 +33,7 @@ def load ():
 
     from importlib import import_module
     try:
-        pM=import_module (modelFile, package='smodels')
+        pM=import_module(modelFile, package='smodels')
         logger.debug ( "Found model file at %s" % pM.__file__ )
         return pM
     except ModuleNotFoundError as e:

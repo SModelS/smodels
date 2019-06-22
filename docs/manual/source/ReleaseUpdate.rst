@@ -41,11 +41,12 @@ New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * Introduction of :ref:`particle class <particleClass>`
-  * Only one :ref:`decomposer <decomp>` for both SLHA and LHE files (see also :ref:`LHE-reader <lhereader>`)
+  * Particles are compared according to their properties
+  * Unified treatment of SLHA and LHE input files (see :ref:`decomposer <decomp>` and :ref:`LHE-reader <lhereader>`)
   * Decomposition and experimental results can include displaced signatures
-  * Moved :ref:`lifetime reweighting <dbReweighting>` to |database| for meta-stable particles
-  * Added approximate lifetime reweighting for :ref:`missing topologies <topCoverage>`
-  * downloaded db files now go to $HOME/.cache/smodels
+  * :ref:`Database <Database>` can now handle lifetime dependent results
+  * Simplified missing topologies algorithm and output (see :ref:`missing topologies <topCoverage>`)
+  * Added :ref:`field "type" <typeProperty>` to the experimental results in the database ('prompt' or 'displaced')
   * Downloaded database files now stored in $HOME/.cache/smodels
 
 New in Version 1.2.2:

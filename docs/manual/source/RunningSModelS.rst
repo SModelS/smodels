@@ -489,7 +489,7 @@ Due to this, the results are claimed to be "likely excluded" in the output.
 
 
 **Notes:**
- * For an SLHA :ref:`input file <BasicInput>`, the decays of :ref:`final states <final states>` 
+ * For an SLHA :ref:`input file <BasicInput>`, the decays of :ref:`final states <final statesEven>` 
    (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during
    the decomposition. Furthermore, if there are two cross sections at different
    calculation order (say LO and NLO) for the same process, only the highest order is used.
