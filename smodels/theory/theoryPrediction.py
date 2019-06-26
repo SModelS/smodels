@@ -146,7 +146,8 @@ class TheoryPrediction(object):
             logger.error ( "when computing likelihood for %s: fA and fB have same sign" % self.analysisId() )
             return None
         mumax = optimize.brentq ( root_func, 0., max(eulN,ulN), rtol=1e-03, xtol=1e-06 )
-        likelihood = stats.norm.pdf ( nsig, mu*mumax, sigma_exp )
+        likelihood = stats.norm.pdf ( mu*nsig, mumax, sigma_exp )
+        # print ( ">>> mu=%.2f, mumax=%.3f llhd = %.5g" % ( mu, mumax, likelihood ),"ul=",ul,"eul=",eul )
         return likelihood
 
     def getLikelihood(self,mu=1.,marginalize=False,deltas_rel=.2,expected=False):

@@ -39,10 +39,9 @@ class StatisticsTest(unittest.TestCase):
         smstoplist = decomposer.decompose(model)
         prediction = theoryPredictionsFor(expRes[0], smstoplist)[0]
         prediction.computeStatistics()
-        #print ( "llhd", prediction.getLikelihood(2.) )
-        #print ( "llhd", prediction.getLikelihood(1.) )
-        #print ( "llhd", prediction.getLikelihood(0.) )
-        #print ( "llhd x", prediction.likelihood )
+        import numpy
+        #for i in numpy.arange(0.,.01,.001):
+        #    print ( "llhd %.2f %.5g" % ( i, prediction.getLikelihood(i) ) )
         self.assertAlmostEqual ( prediction.likelihood, 1.563288e-35, 3 )
 
     def testPredictionInterface(self):
