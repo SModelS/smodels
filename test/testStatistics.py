@@ -30,6 +30,21 @@ class StatisticsTest(unittest.TestCase):
         re = comp.ulSigma(m)
         self.assertAlmostEqual(re/(1.06*20.),1., 1)
 
+    def testApproxGaussian(self):
+        expRes = database.getExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
+        self.assertTrue(len(expRes),1)
+        filename = "./testFiles/slha/T1tttt.slha"
+        model = Model(BSMList,SMList)
+        model.updateParticles(filename)
+        smstoplist = decomposer.decompose(model)
+        prediction = theoryPredictionsFor(expRes[0], smstoplist)[0]
+        prediction.computeStatistics()
+        #print ( "llhd", prediction.getLikelihood(2.) )
+        #print ( "llhd", prediction.getLikelihood(1.) )
+        #print ( "llhd", prediction.getLikelihood(0.) )
+        #print ( "llhd x", prediction.likelihood )
+        self.assertAlmostEqual ( prediction.likelihood, 1.563288e-35, 3 )
+
     def testPredictionInterface(self):
         """ A simple test to see that the interface in datasetObj
         and TheoryPrediction to the statistics tools is working correctly
