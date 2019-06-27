@@ -55,7 +55,7 @@ class XSecComputer:
             raise SModelSError()
         try:
             f=pyslha.readSLHAFile(slhafile)
-        except pyslha.ParseError as e:
+        except (pyslha.ParseError,ValueError) as e:
             logger.error("File cannot be parsed as SLHA file: %s" % e )
             raise SModelSError()
 
