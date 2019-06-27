@@ -179,9 +179,10 @@ class TheoryPrediction(object):
             llhd = self.likelihoodFromLimits ( 1., marginalize, deltas_rel )
             self.likelihood = llhd
             self.chi2 = None
-            if type(llhd) != type(None):
+            if type(llhd) != type(None) and llhd > 0.:
                 llhdh0 = self.likelihoodFromLimits ( 0., marginalize, deltas_rel )
-                self.chi2 = +2. * np.log ( llhd ) - 2. * np.log ( llhdh0 )
+                if llhdh0 > 0.:
+                    self.chi2 = +2. * np.log ( llhd ) - 2. * np.log ( llhdh0 )
 
         elif self.dataType() == 'efficiencyMap':
             lumi = self.dataset.globalInfo.lumi
