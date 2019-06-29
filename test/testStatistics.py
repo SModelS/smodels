@@ -40,8 +40,14 @@ class StatisticsTest(unittest.TestCase):
         prediction = theoryPredictionsFor(expRes[0], smstoplist)[0]
         prediction.computeStatistics()
         import numpy
-        #for i in numpy.arange(0.,.01,.001):
-        #    print ( "llhd %.2f %.5g" % ( i, prediction.getLikelihood(i) ) )
+        tot=0.
+        for i in numpy.arange(0.,.2 ,.02 ):
+            tot+=prediction.getLikelihood(i)
+        c=0.
+        for i in numpy.arange(0.,.2 ,.02 ):
+            l=prediction.getLikelihood(i)
+            c+=l
+            # print ( "llhd %.2f %.5g c=%.2f" % ( i, l,c/tot ) )
         self.assertAlmostEqual ( prediction.likelihood, 1.563288e-35, 3 )
 
     def testPredictionInterface(self):

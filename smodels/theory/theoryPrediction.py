@@ -13,9 +13,7 @@ from smodels.tools.physicsUnits import TeV, fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
-from scipy.special import erf
-from scipy import optimize, stats
-import numpy as np
+from smodels.tools.statistics import likelihoodFromLimits, chi2FromLlhd
 
 class TheoryPrediction(object):
     """
@@ -131,24 +129,11 @@ class TheoryPrediction(object):
                                             txnames=self.txnames,
                                             expected=True)
         lumi = self.dataset.globalInfo.lumi
-        sigma_exp = float(eul * lumi) / 1.96
         ulN = float(ul * lumi) ## upper limit on yield
         eulN = float(eul * lumi) ## upper limit on yield
-        denominator = np.sqrt(2.) * sigma_exp
         nsig = (self.xsection.value*lumi).asNumber()
-
-        def root_func ( x ):
-            return (erf((ulN-x)/denominator)+erf(x/denominator)) / ( 1. + erf(x/denominator)) - .95
-        #logger.error ( "trying to find mumax" )
-        fA,fB = root_func ( 0. ), root_func ( max(eulN,ulN) )
-        if np.sign(fA*fB) > 0.:
-            ## the have the same sign
-            logger.error ( "when computing likelihood for %s: fA and fB have same sign" % self.analysisId() )
-            return None
-        mumax = optimize.brentq ( root_func, 0., max(eulN,ulN), rtol=1e-03, xtol=1e-06 )
-        likelihood = stats.norm.pdf ( mu*nsig, mumax, sigma_exp )
-        # print ( ">>> mu=%.2f, mumax=%.3f llhd = %.5g" % ( mu, mumax, likelihood ),"ul=",ul,"eul=",eul )
-        return likelihood
+        llhd = likelihoodFromLimits ( ulN, eulN, nsig )
+        return llhd
 
     def getLikelihood(self,mu=1.,marginalize=False,deltas_rel=.2,expected=False):
         """
@@ -180,9 +165,9 @@ class TheoryPrediction(object):
             self.likelihood = llhd
             self.chi2 = None
             if type(llhd) != type(None) and llhd > 0.:
-                llhdh0 = self.likelihoodFromLimits ( 0., marginalize, deltas_rel )
-                if llhdh0 > 0.:
-                    self.chi2 = +2. * np.log ( llhd ) - 2. * np.log ( llhdh0 )
+                llhd0 = self.likelihoodFromLimits ( 0., marginalize, deltas_rel )
+                if llhd0 > 0.:
+                    self.chi2 = chi2FromLlhd ( llhd0 ) - chi2FromLlhd ( llhd )
 
         elif self.dataType() == 'efficiencyMap':
             lumi = self.dataset.globalInfo.lumi
