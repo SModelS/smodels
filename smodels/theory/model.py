@@ -261,11 +261,10 @@ class Model(object):
                     logger.debug("Decay %i -> %s is not of the form Z2-odd -> Z2-odd + [Z2-even particles] and will be ignored" %(pdg,pids))
                     continue
 
-                newDecay = pyslha.Decay(br=decay.br,nda=decay.nda,parentid=decay.parentid,ids=decay.ids[:])
-                #Conjugated decays if needed:
-                if chargeConj == -1:
-                    newDecay.ids = [pid*chargeConj if pid in allPDGs else pid for pid in decay.ids] 
-                    
+                #Conjugated decays if needed
+                #(if pid*chargeConj is not in model, assume the particle is its own anti-particle)
+                decayIDs = [pid*chargeConj if pid*chargeConj in allPDGs else pid for pid in decay.ids]
+                newDecay = pyslha.Decay(br=decay.br,nda=decay.nda,parentid=decay.parentid,ids=decayIDs)
                     
                 #Convert PDGs to particle objects:
                 daughters = []

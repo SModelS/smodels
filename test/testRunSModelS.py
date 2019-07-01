@@ -74,7 +74,30 @@ class RunSModelSTest(unittest.TestCase):
             if os.path.exists( i ): os.remove( i )
         self.assertTrue(equals)
         self.removeOutputs( outputfile )
-       
+
+
+    def testGoodFileWithModelFromSLHA(self):
+        filename = "./testFiles/slha/gluino_squarks.slha"
+        outputfile = runMain(filename,inifile='testParametersB.ini')
+        with open( outputfile, 'rb') as fp: ## imports file with dots in name
+            output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
+            smodelsOutput = output_module.smodelsOutput
+        from gluino_squarks_default import smodelsOutputDefault
+        ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec',
+                            'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
+                            'Total xsec for missing topologies (fb)','Total xsec for missing topologies with displaced decays (fb)',
+                            'Total xsec for missing topologies with prompt decays (fb)',
+                            'Total xsec for topologies outside the grid (fb)']
+        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
+                    key=lambda res: res['r'], reverse=True)
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+                           ignore=ignoreFields)
+        for i in [ './output.py', './output.pyc' ]:
+            if os.path.exists( i ): os.remove( i )
+        self.assertTrue(equals)
+        self.removeOutputs( outputfile )
+
+
     def testGoodFile13(self):
              
         filename = "./testFiles/slha/simplyGluino.slha"
