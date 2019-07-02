@@ -180,7 +180,7 @@ class Particle(object):
         elif other.contains(self):
             return other
         else:
-            combined = MultiParticle(label = 'multiple', particles= [self,other])
+            combined = MultiParticle(particles= [self,other])
             return combined
 
     def __radd__(self,other):
@@ -359,7 +359,7 @@ class MultiParticle(Particle):
         The properties are: label, pdg, mass, electric charge, color charge, width 
     """
     
-    def __new__(cls,label,particles,attributesDict={},**kwargs):
+    def __new__(cls,label=None,particles=[],attributesDict={},**kwargs):
         """
         Creates a multiparticle. If a multiparticle with the exact same particles
         already been created return this multiparticle instead.
@@ -373,7 +373,8 @@ class MultiParticle(Particle):
         """
 
         particles = sorted(particles)
-        label = label
+        if not label:
+            label = "/".join([p.label for p in particles])
         attrDict = dict(attributesDict.items())
         attrDict.update(kwargs)
         attrDict.pop('id',None)
@@ -515,7 +516,7 @@ class MultiParticle(Particle):
             addParticles = [other]
 
         combinedParticles = self.particles + addParticles
-        combined = MultiParticle(label = 'multiple', particles = combinedParticles)
+        combined = MultiParticle(particles = combinedParticles)
 
         return combined
     
