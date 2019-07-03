@@ -43,7 +43,6 @@ class Element(object):
         self.weight = crossSection.XSectionList() # gives the weight for all decays promptly
         self.decayLabels = []
         self.motherElements = [self] #The motheElements includes self to keep track of merged elements
-        self.daughterElements = []
         self.elID = 0
         self.coveredBy = set()
         self.testedBy = set()
@@ -170,7 +169,6 @@ class Element(object):
         
         newEl = self.__class__()      
         newEl.motherElements = self.motherElements[:] + other.motherElements[:]
-        newEl.daughterElements = self.daughterElements[:] + other.daughterElements[:]
         newEl.weight = self.weight + other.weight
         newEl.branches = []
         for ibr,branch in enumerate(self.branches):
@@ -199,7 +197,6 @@ class Element(object):
             raise SModelSError("Can not add elements with distinct topologies")
               
         self.motherElements += other.motherElements[:]
-        self.daughterElements += other.daughterElements[:]
         self.weight += other.weight
         for ibr,_ in enumerate(self.branches):
             self.branches[ibr] += other.branches[ibr]
@@ -253,7 +250,6 @@ class Element(object):
             newel.branches.append(branch.copy())
         newel.weight = self.weight.copy()
         newel.motherElements = self.motherElements[:]
-        newel.daughterElements = self.daughterElements[:]
         newel.elID = self.elID
         return newel
 
@@ -466,8 +462,6 @@ class Element(object):
                         added = True
 
         newElements.pop(0)  # Remove original element
-        #Store the daughter elements:
-        self.daughterElements += newElements[:]
         return newElements
     
     
