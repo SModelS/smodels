@@ -21,8 +21,8 @@ from smodels.theory.model import Model
 class ElementIdTest(unittest.TestCase):
     def testGoodFile(self):
 
-        listOfIDs = {'ATLAS-CONF-2013-037':  [31, 26, 33, 34, 27, 28, 30, 32],
-                     'ATLAS-SUSY-2013-05' : [29]}
+        listOfIDs = {'ATLAS-CONF-2013-037':  [31+8, 26+8, 33+8, 34+8, 27+8, 28+8, 30+8, 32+8],
+                     'ATLAS-SUSY-2013-05' : [29+8]}
         filename = "./testFiles/slha/higgsinoStop.slha"
         model = Model(BSMList,SMList)
         model.updateParticles(filename,promptWidth = 1e-12*GeV) #Make sure C1 and N2 are treated as prompt

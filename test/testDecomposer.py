@@ -155,18 +155,18 @@ class DecomposerTest(unittest.TestCase):
                         
         tested = False                 
         topos = decomposer.decompose(model, sigcut=0.1*fb, doCompress=True, doInvisible=True, minmassgap=5.*GeV )
-        elIDs = {29 : Element("[[[b]],[[b]]]",finalState=['MET','MET']),
-                 30 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
-                 32 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
-                 26 : Element("[[[t-]],[[b]]]",finalState=['MET','MET']),
-                 31 : Element("[[[b]],[[t-]]]",finalState=['MET','MET']),
-                 33 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET']),
-                 28 : Element("[[[t-]],[[t+]]]",finalState=['MET','MET']),
-                 34 : Element("[[[t-]],[[t+]]]",finalState=['MET','MET']),
-                 27 : Element("[[[t-]],[[t+]]]",finalState=['MET','MET'])}
+        elIDs = {29+8 : Element("[[[b]],[[b]]]",finalState=['MET','MET']),
+                 30+8 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
+                 32+8 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
+                 26+8 : Element("[[[t-]],[[b]]]",finalState=['MET','MET']),
+                 31+8 : Element("[[[b]],[[t-]]]",finalState=['MET','MET']),
+                 33+8 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET']),
+                 28+8 : Element("[[[t-]],[[t+]]]",finalState=['MET','MET']),
+                 34+8 : Element("[[[t-]],[[t+]]]",finalState=['MET','MET']),
+                 27+8 : Element("[[[t-]],[[t+]]]",finalState=['MET','MET'])}
         
-        toposExpected = {"[][]" : 2,"[][1]" : 9,"[][2]" : 14,"[1][1]" : 9,"[1][2]" : 29,
-                         "[2][2]" : 72,"[][1,2]" : 2,"[][2,2]" : 44,"[1][1,1]" : 6,"[1][1,2]" : 44,
+        toposExpected = {"[][]" : 2,"[][1]" : 9,"[][2]" : 22,"[1][1]" : 9,"[1][2]" : 29,
+                         "[2][2]" : 72,"[][1,2]" : 2,"[][2,2]" : 44,"[1][1,1]" : 6,"[1][1,2]" : 54,
                          "[2][1,2]" : 48,"[2][2,2]" : 284,"[1,1][1,1]" : 17,"[1,1][1,2]" : 22,
                          "[1,2][1,2]" : 120,"[1][1,1,1]" : 4,"[1][1,2,2]" : 72,"[1,1][1,1,1]" : 56,
                          "[1,1][1,1,2]" : 16,"[1,2][1,2,2]" : 240,"[1,1,1][1,1,2]" : 64,

@@ -446,8 +446,9 @@ class Element(object):
             if doCompress:
                 for element in newElements:
                     newel = element.massCompress(minmassgap)
-                    # Avoids double counting (conservative)
-                    if newel and not newel.hasTopInList(newElements):
+                    # Avoids double counting
+                    #(elements sharing the same parent are removed during clustering)
+                    if newel and not any(newel == el for el in newElements[:]):
                         newElements.append(newel)
                         added = True
 
@@ -456,8 +457,9 @@ class Element(object):
             if doInvisible:
                 for element in newElements:
                     newel = element.invisibleCompress()
-                    # Avoids double counting (conservative)
-                    if newel and not newel.hasTopInList(newElements):
+                    # Avoids double counting
+                    #(elements sharing the same parent are removed during clustering)
+                    if newel and not any(newel == el for el in newElements[:]):
                         newElements.append(newel)
                         added = True
 
