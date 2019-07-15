@@ -28,7 +28,7 @@ squarks = [1000001,
            2000003,
            1000004,
            2000004]
-antisquarks = map(operator.neg, squarks)
+antisquarks = list(map(operator.neg, squarks))
 third = [1000005,
          2000005,
          1000006,
