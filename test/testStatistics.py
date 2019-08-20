@@ -13,6 +13,7 @@ sys.path.insert(0,"../")
 import unittest
 #from smodels.tools import statistics
 from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
+from smodels.tools.statistics import likelihoodFromLimits, chi2FromLimits
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
@@ -24,6 +25,64 @@ import numpy as np
 import math
 
 class StatisticsTest(unittest.TestCase):
+
+    def lLHDFromLimits(self):
+        """ to do some statistics on the chi2 """
+        nsig = 1.0
+        nobs, nbg = 100, 100.
+        m = Data( nobs, nbg, 0.001, None, nsig, deltas_rel=0.)
+        ulcomp = UpperLimitComputer()
+        ulobs = ulcomp.ulSigma(m)
+        ulexp = ulcomp.ulSigma(m,expected=True)
+        print ( "ulobs", ulobs )
+        print ( "ulexp", ulexp )
+        f=open("llhds.csv","wt")
+        dx=.5
+        totdir,totlim,totmarg=0.,0.,0.
+        for nsig in np.arange ( 0.1, 100., dx ):
+            print ( )
+            print ( "nsig=", nsig )
+            m = Data( nobs, nbg, 0.001, None, nsig, deltas_rel=0.)
+            llhdcomp = LikelihoodComputer ( m )
+            llhddir = llhdcomp.likelihood ( nsig )
+            chi2dir = llhdcomp.chi2 ( nsig )
+            llhdmarg = llhdcomp.likelihood ( nsig, marginalize=True )
+            chi2marg = llhdcomp.chi2 ( nsig, marginalize=True )
+            print ( "llhd direct", llhddir, chi2dir )
+            print ( "llhd marg", llhdmarg, chi2marg )
+            llhdlim = likelihoodFromLimits ( ulobs, ulexp, nsig )
+            chi2lim = chi2FromLimits ( llhdlim, ulexp )
+            print ( "llhd from limits", llhdlim, chi2lim )
+            totdir+=llhddir*dx
+            totlim+=llhdlim*dx
+            totmarg+=llhdmarg*dx
+            f.write ( "%s,%s,%s,%s\n" % ( nsig, llhddir, llhdlim, llhdmarg ) )
+        print ( "total direct", totdir )
+        print ( "total limit", totlim )
+        print ( "total marg", totmarg )
+        f.close()
+
+    def testChi2FromLimits(self):
+        """ test the chi2 value that we obtain from limits """
+        nsig = 35.0
+        nobs, nbg = 110, 100.
+        m = Data( nobs, nbg, 0.001, None, nsig, deltas_rel=0.)
+        ulcomp = UpperLimitComputer()
+        ulobs = ulcomp.ulSigma(m)
+        ulexp = ulcomp.ulSigma(m,expected=True)
+        dx=.5
+        m = Data( nobs, nbg, 0.001, None, nsig, deltas_rel=0.)
+        llhdcomp = LikelihoodComputer ( m )
+        llhddir = llhdcomp.likelihood ( nsig )
+        chi2dir = llhdcomp.chi2 ( nsig )
+        llhdmarg = llhdcomp.likelihood ( nsig, marginalize=True )
+        chi2marg = llhdcomp.chi2 ( nsig, marginalize=True )
+        llhdlim = likelihoodFromLimits ( ulobs, ulexp, nsig )
+        chi2lim = chi2FromLimits ( llhdlim, ulexp )
+        ## relative error on chi2, for this example is about 4% 
+        rel = abs (chi2lim - chi2marg ) / chi2marg
+        self.assertAlmostEqual ( rel, 0.04, 1 )
+
     def testUpperLimit(self):
         m = Data( 100., 100., 0.001, None, 1.0,deltas_rel=0.)
         comp = UpperLimitComputer()
@@ -47,7 +106,6 @@ class StatisticsTest(unittest.TestCase):
         for i in numpy.arange(0.,.2 ,.02 ):
             l=prediction.getLikelihood(i)
             c+=l
-            # print ( "llhd %.2f %.5g c=%.2f" % ( i, l,c/tot ) )
         self.assertAlmostEqual ( prediction.likelihood, 1.563288e-35, 3 )
 
     def testPredictionInterface(self):
@@ -171,10 +229,10 @@ class StatisticsTest(unittest.TestCase):
             computer = LikelihoodComputer(m)
             chi2_actual = computer.chi2(nsig, marginalize=True ) ## , .2*nsig )
             chi2_expected = d['chi2']
-            #print('chi2exp', chi2_expected)            
+            #print('chi2exp', chi2_expected)
             if not chi2_expected==None and not np.isnan(chi2_expected):
 #                 chi2_expected = self.round_to_sign(chi2_expected, 2)
-                # Check that chi2 values agree:                                
+                # Check that chi2 values agree:
                 self.assertAlmostEqual(abs(chi2_actual-chi2_expected)/chi2_expected,0., places=2 )
             else:
                 self.assertTrue(chi2_actual == None or np.isnan(chi2_actual))

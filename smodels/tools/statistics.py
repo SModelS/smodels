@@ -15,11 +15,12 @@ from scipy import stats, optimize, integrate, special
 from scipy.special import erf
 import numpy as np
 
-def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig ):
+def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
     """ computes the likelihood from an expected and an observed upper limit.
     :param upperLimit: observed upper limit, as a yield (i.e. unitless)
     :param expectedUpperLimit: expected upper limit, also as a yield
     :param nSig: number of signal events
+    :param nll: if True, return negative log likelihood
 
     :returns: likelihood
     """
@@ -34,11 +35,17 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig ):
         logger.error ( "when computing likelihood for %s: fA and fB have same sign" % self.analysisId() )
         return None
     mumax = optimize.brentq ( root_func, 0., max(upperLimit, expectedUpperLimit), rtol=1e-03, xtol=1e-06 )
-    likelihood = stats.norm.pdf ( nsig, mumax, sigma_exp )
-    # print ( ">>> mu=%.2f, mumax=%.3f llhd = %.5g" % ( mu, mumax, likelihood ),"ul=",ul,"eul=",eul )
-    return likelihood
+    if nll:
+        return - stats.norm.logpdf ( nsig, mumax, sigma_exp )
+    return stats.norm.pdf ( nsig, mumax, sigma_exp )
 
-def chi2FromLlhd ( likelihood ):
-    """ compute the chi2 value from a likelihood (convenience function) """
+def deltaChi2FromLlhd ( likelihood ):
+    """ compute the delta chi2 value from a likelihood (convenience function) """
     return -2. * np.log ( likelihood )
 
+def chi2FromLimits ( likelihood, expectedUpperLimit ):
+    """ compute the chi2 value from a likelihood (convenience function). 
+    """
+    sigma_exp = expectedUpperLimit / 1.96 # the expected scale
+    l0 = 2. * stats.norm.logpdf ( 0., 0., sigma_exp )
+    return deltaChi2FromLlhd ( likelihood ) + l0

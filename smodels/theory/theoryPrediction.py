@@ -13,7 +13,7 @@ from smodels.tools.physicsUnits import TeV, fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
-from smodels.tools.statistics import likelihoodFromLimits, chi2FromLlhd
+from smodels.tools.statistics import likelihoodFromLimits, chi2FromLimits
 
 class TheoryPrediction(object):
     """
@@ -115,15 +115,19 @@ class TheoryPrediction(object):
         else:
             return (self.xsection.value/upperLimit).asNumber()
 
-    def likelihoodFromLimits(self,mu=1.,marginalize=False,deltas_rel=.2,expected=False):
+    def likelihoodFromLimits( self, mu=1., marginalize=False, deltas_rel=.2,
+                              expected=False, chi2also=False ):
         """ compute the likelihood from expected and observed upper limits.
         :param expected: compute expected, not observed likelihood
+        :param chi2also: if true, return also chi2
         :returns: likelihood; none if no expected upper limit is defined.
         """
         eul = self.dataset.getUpperLimitFor(element=self.avgElement,
                                             txnames=self.txnames,
                                             expected=True)
         if type(eul) == type(None):
+            if chi2also:
+                return ( None, None )
             return None
         ul = self.dataset.getUpperLimitFor(element=self.avgElement,
                                             txnames=self.txnames,
@@ -133,11 +137,13 @@ class TheoryPrediction(object):
         eulN = float(eul * lumi) ## upper limit on yield
         nsig = (self.xsection.value*lumi).asNumber()
         llhd = likelihoodFromLimits ( ulN, eulN, nsig )
+        if chi2also:
+            return ( llhd, chi2FromLimits ( llhd, eulN ) )
         return llhd
 
     def getLikelihood(self,mu=1.,marginalize=False,deltas_rel=.2,expected=False):
         """
-        get the likelihood for a signal strength modifier mu 
+        get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood
         """
         if self.dataType()  == 'upperLimit':
@@ -161,13 +167,9 @@ class TheoryPrediction(object):
 
 
         if self.dataType()  == 'upperLimit':
-            llhd = self.likelihoodFromLimits ( 1., marginalize, deltas_rel )
+            llhd, chi2 = self.likelihoodFromLimits ( 1., marginalize, deltas_rel, chi2also=True )
             self.likelihood = llhd
-            self.chi2 = None
-            if type(llhd) != type(None) and llhd > 0.:
-                llhd0 = self.likelihoodFromLimits ( 0., marginalize, deltas_rel )
-                if llhd0 > 0.:
-                    self.chi2 = chi2FromLlhd ( llhd0 ) - chi2FromLlhd ( llhd )
+            self.chi2 = chi2
 
         elif self.dataType() == 'efficiencyMap':
             lumi = self.dataset.globalInfo.lumi
