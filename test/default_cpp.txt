@@ -14,25 +14,25 @@ Decomposition output status: 1 #decomposition was successful
 # sigmacut = 0.01
 # Database version: unittest113
 ================================================================================
-   ======================================================= 
- || 	 						 || 
+   =======================================================
+ || 	 						 ||
  || 	 	 Topologies Table 		 	 ||
- || 	 						 || 
-   ======================================================= 
-===================================================== 
+ || 	 						 ||
+   =======================================================
+=====================================================
 Topology:
-Number of vertices: [1, 1] 
+Number of vertices: [1, 1]
 Number of vertex parts: [[2], [2]]
 Total Global topology weight :
 Sqrts: 8.00E+00 [TeV], Weight:5.72E-01 [pb]
 
 Total Number of Elements: 1
-   ======================================================= 
- || 	 						 || 
- || 	 Theory Predictions and 			 || 
+   =======================================================
+ || 	 						 ||
+ || 	 Theory Predictions and 			 ||
  || 	 Experimental Constraints 		 	 ||
- || 	 						 || 
-   ======================================================= 
+ || 	 						 ||
+   =======================================================
 
 ---------------Analysis Label = ATLAS-SUSY-2013-02
 -------------------Dataset Label = (UL)
@@ -53,8 +53,8 @@ Observed experimental limit: 3.86E-01 [fb]
 Expected experimental limit: 2.64E-01 [fb]
 Observed r-Value: 4.506218435975599
 Expected r-Value: 6.58924496363026
-Chi2: 22.633432915475073
-Likelihood: 8.193807968109457e-07
+Chi2: 45.63444029563222
+Likelihood: 8.729218694582548e-12
 
 Total missing topology cross section (fb):  0.000E+00
 Total cross section where we are outside the mass grid (fb):  0.000E+00

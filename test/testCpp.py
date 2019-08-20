@@ -87,6 +87,8 @@ class CppTest(unittest.TestCase):
                     pass
                 if isinstance(yv,float) and isinstance(xv,float):
                     dlta = abs ( yv -xv ) / (yv+xv)
+                    if dlta > .1:
+                        print ( "error, delta is", dlta )
                     self.assertTrue ( dlta < .1 or abs(xv-yv)<1e-6 )
                 else:
                     self.assertEqual(xv, yv)

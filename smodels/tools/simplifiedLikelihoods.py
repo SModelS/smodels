@@ -389,7 +389,8 @@ class LikelihoodComputer:
                 ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
             return ret
         except ValueError as e:
-            raise Exception("ValueError %s, %s" % ( e, self.model.totalCovariance(self.nsig) ))
+            raise Exception("ValueError %s, %s" % ( e, self.model.V ))
+            #raise Exception("ValueError %s, %s" % ( e, self.model.totalCovariance(self.nsig) ))
             # raise Exception("ValueError %s, %s" % ( e, self.model.V ))
 
     def nll( self, theta ):
@@ -494,8 +495,8 @@ class LikelihoodComputer:
             ## quadratic equations
             ini = self.getThetaHat ( self.model.observed, self.model.backgrounds, nsig, self.model.covariance, 0 )
             self.cov_tot = self.model.V
-            if self.model.n == 1:
-                self.cov_tot = self.model.totalCovariance ( nsig )
+            #if self.model.n == 1:
+            #    self.cov_tot = self.model.totalCovariance ( nsig )
             # self.ntot = self.model.backgrounds + self.nsig
             # if not self.model.isLinear():
                 # self.cov_tot = self.model.V + self.model.var_s(nsig)
