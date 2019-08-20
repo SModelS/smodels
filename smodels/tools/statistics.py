@@ -42,7 +42,7 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
 def deltaChi2FromLlhd ( likelihood ):
     """ compute the delta chi2 value from a likelihood (convenience function) """
     if likelihood == 0.:
-        return 1e10. ## a very high number is good
+        return 1e10 ## a very high number is good
     return -2. * np.log ( likelihood )
 
 def chi2FromLimits ( likelihood, expectedUpperLimit ):
