@@ -9,7 +9,8 @@
  
 """
  
-import sys,os,imp
+import sys,os
+import importlib
 sys.path.insert(0,"../")
 import unittest
 import glob
@@ -66,9 +67,10 @@ class RunSModelSTest(unittest.TestCase):
             default = "gluino_squarks_default.py"
             cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
             a = subprocess.getoutput ( cmd )
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
         from gluino_squarks_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus','database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
@@ -89,9 +91,10 @@ class RunSModelSTest(unittest.TestCase):
             default = "simplyGluino_default.py"
             cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
             a = subprocess.getoutput ( cmd )
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
         from simplyGluino_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
@@ -116,9 +119,10 @@ class RunSModelSTest(unittest.TestCase):
             default = "longLived_default.py"
             cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
             a = subprocess.getoutput ( cmd )
-        with open(outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput        
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
         from longLived_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
@@ -137,9 +141,10 @@ class RunSModelSTest(unittest.TestCase):
             default = "lifetime_default.py"
             cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
             a = subprocess.getoutput ( cmd )
-        with open(outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput        
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
         from lifetime_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],

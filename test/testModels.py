@@ -9,7 +9,8 @@
  
 """
  
-import sys,os,imp
+import sys,os
+import importlib
 sys.path.insert(0,"../")
 import unittest
 from unitTestHelpers import equalObjs, runMain
@@ -36,9 +37,10 @@ class ModelsTest(unittest.TestCase):
             default = "idm_example_defaultB.py"
             cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
             a = subprocess.getoutput ( cmd )
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
         from idm_example_defaultB import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
@@ -56,9 +58,10 @@ class ModelsTest(unittest.TestCase):
             default = "idm_example_default.py"
             cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
             a = subprocess.getoutput ( cmd )
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
         from idm_example_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
@@ -73,9 +76,10 @@ class ModelsTest(unittest.TestCase):
         reload(particlesLoader)
         filename = "./testFiles/slha/idm_example.slha"
         outputfile = runMain(filename,suppressStdout=True)
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
         self.assertTrue(smodelsOutput['OutputStatus']['decomposition status'] < 0)  
         self.removeOutputs(outputfile)
 
