@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <smodelsOutput>
-    <Displaced_List/>
+    <missing_topologies_with_displaced_decays_List/>
     <ExptRes_List>
         <ExptRes>
             <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
@@ -265,114 +265,112 @@
             <upper_limit_fb>330.646383677</upper_limit_fb>
         </ExptRes>
     </ExptRes_List>
-    <Long-lived_List/>
-    <MET_List>
-        <MET>
+    <missing_topologies_with_prompt_decays_List>
+        <missing_topologies_with_prompt_decays>
             <element>[[[jet],[W]],[[jet,jet],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>148.1633751063934</weight_fb>
-        </MET>
-        <MET>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
             <element>[[[W]],[[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>144.584475</weight_fb>
-        </MET>
-        <MET>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
             <element>[[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>144.00164614134306</weight_fb>
-        </MET>
-        <MET>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
             <element>[[[b,t],[W]],[[jet,jet],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>104.7136623191279</weight_fb>
-        </MET>
-        <MET>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
             <element>[[[jet]],[[jet,jet],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>87.27848831460226</weight_fb>
-        </MET>
-        <MET>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
             <element>[[[jet,jet],[W]],[[jet,jet],[higgs]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>86.53583394288269</weight_fb>
-        </MET>
-        <MET>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
             <element>[[[jet],[W]],[[b,t],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>75.19826524977003</weight_fb>
-        </MET>
-        <MET>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
             <element>[[[jet,jet],[W]],[[jet],[b,t],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>73.08603745807194</weight_fb>
-        </MET>
-        <MET>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
             <element>[[[b,t],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>73.08603745807193</weight_fb>
-        </MET>
-        <MET>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
             <element>[[[jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>64.66376430463636</weight_fb>
-        </MET>
-    </MET_List>
-    <Missed_Topologies_List>
-        <Missed_Topologies>
+        </missing_topologies_with_prompt_decays>
+    </missing_topologies_with_prompt_decays_List>
+    <missing_topologies_List>
+        <missing_topologies>
             <element>[[[jet],[W]],[[jet,jet],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>148.1633751063934</weight_fb>
-        </Missed_Topologies>
-        <Missed_Topologies>
+        </missing_topologies>
+        <missing_topologies>
             <element>[[[W]],[[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>144.584475</weight_fb>
-        </Missed_Topologies>
-        <Missed_Topologies>
+        </missing_topologies>
+        <missing_topologies>
             <element>[[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>144.00164614134306</weight_fb>
-        </Missed_Topologies>
-        <Missed_Topologies>
+        </missing_topologies>
+        <missing_topologies>
             <element>[[[b,t],[W]],[[jet,jet],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>104.7136623191279</weight_fb>
-        </Missed_Topologies>
-        <Missed_Topologies>
+        </missing_topologies>
+        <missing_topologies>
             <element>[[[jet]],[[jet,jet],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>87.27848831460226</weight_fb>
-        </Missed_Topologies>
-        <Missed_Topologies>
+        </missing_topologies>
+        <missing_topologies>
             <element>[[[jet,jet],[W]],[[jet,jet],[higgs]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>86.53583394288269</weight_fb>
-        </Missed_Topologies>
-        <Missed_Topologies>
+        </missing_topologies>
+        <missing_topologies>
             <element>[[[jet],[W]],[[b,t],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>75.19826524977003</weight_fb>
-        </Missed_Topologies>
-        <Missed_Topologies>
+        </missing_topologies>
+        <missing_topologies>
             <element>[[[jet,jet],[W]],[[jet],[b,t],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>73.08603745807194</weight_fb>
-        </Missed_Topologies>
-        <Missed_Topologies>
+        </missing_topologies>
+        <missing_topologies>
             <element>[[[b,t],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>73.08603745807193</weight_fb>
-        </Missed_Topologies>
-        <Missed_Topologies>
+        </missing_topologies>
+        <missing_topologies>
             <element>[[[jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>64.66376430463636</weight_fb>
-        </Missed_Topologies>
-    </Missed_Topologies_List>
-    <Missed_xsec_MET>3065.779582621469</Missed_xsec_MET>
-    <Missed_xsec_displaced>0.0</Missed_xsec_displaced>
-    <Missed_xsec_long-lived>0.0</Missed_xsec_long-lived>
+        </missing_topologies>
+    </missing_topologies_List>
+    <Total_xsec_for_missing_topologies_with_prompt_decays_fb>3065.779582621469</Total_xsec_for_missing_topologies_with_prompt_decays_fb>
+    <Total_xsec_for_missing_topologies_with_displaced_decays_fb>0.0</Total_xsec_for_missing_topologies_with_displaced_decays_fb>
     <OutputStatus>
         <database_version>unittest113</database_version>
         <decomposition_status>1</decomposition_status>
@@ -384,38 +382,38 @@
         <smodels_version>1.2.0rc1</smodels_version>
         <warnings>Input file ok</warnings>
     </OutputStatus>
-    <Outside_Grid_List>
-        <Outside_Grid>
+    <topologies_outside_the_grid_List>
+        <topologies_outside_the_grid>
             <element>[[[W]],[[higgs]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>207.13027034006157</weight_fb>
-        </Outside_Grid>
-        <Outside_Grid>
+        </topologies_outside_the_grid>
+        <topologies_outside_the_grid>
             <element>[[[jet]],[[jet,jet]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>23.326420455104515</weight_fb>
-        </Outside_Grid>
-        <Outside_Grid>
+        </topologies_outside_the_grid>
+        <topologies_outside_the_grid>
             <element>[[[b],[W]],[[b],[W]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>3.761818871968151</weight_fb>
-        </Outside_Grid>
-        <Outside_Grid>
+        </topologies_outside_the_grid>
+        <topologies_outside_the_grid>
             <element>[[[jet]],[[t,t]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>1.531994448312818</weight_fb>
-        </Outside_Grid>
-        <Outside_Grid>
+        </topologies_outside_the_grid>
+        <topologies_outside_the_grid>
             <element>[[[jet]],[[b,b]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>0.9943976550748556</weight_fb>
-        </Outside_Grid>
-        <Outside_Grid>
+        </topologies_outside_the_grid>
+        <topologies_outside_the_grid>
             <element>[[[b,b]],[[jet,jet]]]  (prompt,prompt)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>0.6801837428273678</weight_fb>
-        </Outside_Grid>
-    </Outside_Grid_List>
-    <Total_missed_xsec>3065.779582621469</Total_missed_xsec>
-    <Total_outside_grid_xsec>237.4250855133493</Total_outside_grid_xsec>
+        </topologies_outside_the_grid>
+    </topologies_outside_the_grid_List>
+    <Total_xsec_for_missing_topologies_fb>3065.779582621469</Total_xsec_for_missing_topologies_fb>
+    <Total_xsec_for_topologies_outside_the_grid_fb>237.4250855133493</Total_xsec_for_topologies_outside_the_grid_fb>
 </smodelsOutput>

@@ -12,7 +12,7 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.theory.particle import Particle, MultiParticle,ParticleList
 from smodels.theory.branch import Branch, decayBranches, InclusiveBranch
-from smodels.tools.physicsUnits import GeV, fb, MeV
+from smodels.tools.physicsUnits import GeV, MeV
 import pyslha
 
 #Load the particle dictionaries
@@ -94,7 +94,7 @@ class BranchTest(unittest.TestCase):
         b6 += b6b
         
         self.assertTrue(isinstance(b6.oddParticles[0],MultiParticle) )
-        self.assertEqual(b6.oddParticles[0].label, 'BSM (combined)' )
+        self.assertEqual(b6.oddParticles[0].label, 'sq2/sq2b' )
         self.assertEqual(len(b6.oddParticles[0].particles), 2)
 
 

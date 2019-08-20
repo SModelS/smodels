@@ -165,7 +165,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
             sqrts = parser.getfloat("options", "coverageSqrts")*TeV
         else:
             sqrts = None
-        uncovered = coverage.Uncovered(smstoplist,sigmacut,sqrts=sqrts)
+        uncovered = coverage.Uncovered(smstoplist,sigmacut=sigmacut,sqrts=sqrts)
         masterPrinter.addObj(uncovered)
 
     return masterPrinter.flush()

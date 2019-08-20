@@ -5,10 +5,11 @@
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 """
 
-import itertools
 from math import exp
 from smodels.tools.physicsUnits import GeV
-from smodels.experiment.databaseParticles import jetList, lList
+from smodels.theory.element import Element
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.tools.smodelsLogging import logger
     
 
 def defaultEffReweight(element,minWeight=1e-10):
@@ -61,57 +62,71 @@ def defaultULReweight(element):
         return 1./effFactor
 
 
-def addPromptAndDisplaced(branch):  
+def reweightFactorFor(element,resType='prompt'):
     """
-    Add probabilities and branches, reweighted and relabeled by the probability functions to be longlived or MET or to decay promptly (within inner detector) or displaced (outside of inner detector but inside of outer detector) for each decay in the branch.
-    :param branch: original branch
+    Computer the reweighting factor for the element according to the experimental result type.
+    Currently only two result types are supported: 'prompt' and 'displaced'.
+    If resultType = 'prompt', returns the reweighting factor for all decays in the element
+    to be prompt and the last odd particle to be stable.
+    If resultType = 'displaced', returns the reweighting factor for ANY decay in the element
+    to be displaced and no long-lived decays and the last odd particle to be stable.
+    Not that the fraction of "long-lived (meta-stable) decays" is usually included
+    in topologies where the meta-stable particle appears in the final state. Hence
+    it should not be included in the prompt or displaced fractions.
+
+    :param element: Element object
+    :param resType: Type of result to compute the reweight factor for (either 'prompt' or 'displaced')
     :return: probabilities (depending on types of decay within branch), branches (with different labels depending on type of decay)
     """
 
-    F = []
-    for particle in branch.oddParticles:
-        if isinstance(particle.totalwidth, list):
-            width = min(particle.totalwidth)
-        else: width = particle.totalwidth
+    if not isinstance(element,Element):
+        logger.error('element should be an Element object and not %s' %type(element))
+        raise SModelSError()
+    rType = resType.lower()
+    if not rType in ['prompt', 'displaced']:
+        logger.error('resultType should be prompt or displaced and not %s' %str(resType))
+        raise SModelSError()
+    
+    FpromptTotal = 1. #Keep track of the probability of all decays being prompt
+    FlongTotal = 1. #Keep track of the probability for at least one decay being long-lived
+    for branch in element.branches:
+        for particle in branch.oddParticles[:-1]:
+            if isinstance(particle.totalwidth, list):
+                width = min(particle.totalwidth)
+            else:
+                width = particle.totalwidth
+            if width == float('inf')*GeV:
+                Fprompt = 1.
+                Fdisp = 0.
+            elif width == 0.*GeV:
+                Fprompt = 0.
+                Fdisp = 0.
+            else:
+                probs = calculateProbabilities(width.asNumber(GeV))
+                Fprompt = probs['F_prompt']
+                Fdisp = probs['F_displaced']
+            FlongTotal *= (Fprompt+Fdisp)
+            FpromptTotal *= Fprompt
+    #Prob(at least one decay being long-lived) = 1 - Prob(all decays being either prompt or displaced)
+    FlongTotal = 1. - FlongTotal
+    #Prob(at least one displaced decay and no long-lived decays) = 1 -Prob(at least one long-lived) - Prob(all prompt)
+    FdispTotal = 1. - FlongTotal - FpromptTotal
+    #Include Flong factor for final BSM states:
+    for branch in element.branches:
+        width = branch.oddParticles[-1].totalwidth
         if width == float('inf')*GeV:
-            F_long, F_prompt, F_displaced = [0.,1.,0.]
-        elif width == 0.*GeV:
-            F_long, F_prompt, F_displaced = [1.,0.,0.]
-        else:    
-            probs = calculateProbabilities(width.asNumber(GeV))
-            F_long, F_prompt, F_displaced = probs['F_long'],probs['F_prompt'],probs['F_displaced']
-        # allow for combinations of decays and a long lived particle only if the last BSM particle is the long lived one
-        if particle == branch.oddParticles[-1]: F.append([F_long])
-        else: F.append([F_prompt,F_displaced])
-    
-    # call the whole branch: 
-    # .) prompt: all decays within this branch are prompt and the last particle is the LSP
-    # .) longlived: all decays within this branch are prompt and the last particle is not the LSP
-    # .) displaced: at least one decay is displaced no matter what the last particle is
-    # discard others         
-    promptValue = F[0][0]            
-    for i in range(len(F)-1):
-        promptValue *= F[i+1][0]  
-    
-    
-    displacedP = []  
-    lastP = F[-1][0]
-    F.pop(-1)                                                   
-    Plist = [list(P) for P in itertools.product(*F)]
-    Plist.pop(0)                
-    for P in Plist:
-        value = P[0]
-        for i in range(len(P)-1):
-            value *= P[i+1]
-        displacedP.append(value)
-    displacedValue = sum(displacedP)
-    displacedValue *= lastP
-    
-    probabilities = [promptValue, displacedValue]
-    branches = labelPromptDisplaced(branch)         
+            Flong = 0.
+        elif width == 0*GeV:
+            Flong = 1.
+        else:
+            Flong = calculateProbabilities(width.asNumber(GeV))['F_long']
+        FdispTotal *= Flong
+        FpromptTotal *= Flong
         
-    return probabilities, branches
-    
+    if rType == 'prompt':
+        return FpromptTotal
+    if rType == 'displaced':
+        return FdispTotal
 
 def calculateProbabilities(width, l_inner = .001,
                            gb_inner=1.3,l_outer=10.,gb_outer=1.43):
@@ -139,27 +154,3 @@ def calculateProbabilities(width, l_inner = .001,
     F_displaced = 1. - F_prompt - F_long
 
     return {'F_long' : F_long, 'F_prompt' : F_prompt, 'F_displaced' : F_displaced}
-
-
-
-def labelPromptDisplaced(branch):
-    """
-    Label displaced and prompt decays 
-    :param branch: original branch
-    :return: branches with correct labels  
-    """
-    promptBranch = branch.copy()
-    if branch.oddParticles[-1].isMET():
-        if not branch.evenParticles:
-            promptBranch._decayType = 'METonly'
-        else: promptBranch._decayType = 'prompt'
-
-    else: promptBranch._decayType = 'longlived'
-    
-    displacedBranch = branch.copy()       
-    displacedBranch._decayType = 'DisplacedDecay'
-    
-    branches = [promptBranch, displacedBranch]    
-    return branches
-        
-

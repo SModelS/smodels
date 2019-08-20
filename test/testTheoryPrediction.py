@@ -31,12 +31,12 @@ class IntegrationTest(unittest.TestCase):
 
     def predictions(self):
         return { 'ATLAS-SUSY-2013-02': 572.168935 * fb,
-                 'CMS-SUS-13-012': 1.73810052766 * fb }
+                 'CMS-SUS-13-012': 1.62375 * fb }
 
     def predchi2(self):
         return { 'ATLAS-SUSY-2013-02': None,
      #            'CMS-SUS-13-012': 19.9647839329 } ## with 20% signal error
-                 'CMS-SUS-13-012': 45.35806410622854 } ## thats with no signal error
+                 'CMS-SUS-13-012': 41.42533308488771 } ## thats with no signal error
 
     def checkAnalysis(self,expresult,smstoplist):
         expID = expresult.globalInfo.id
@@ -48,7 +48,7 @@ class IntegrationTest(unittest.TestCase):
         for pred in theorypredictions:
             predval=pred.xsection.value 
             defpredval = defpreds[expID]
-            self.assertAlmostEqual( predval.asNumber(fb), defpredval.asNumber (fb) )
+            self.assertAlmostEqual( predval.asNumber(fb), defpredval.asNumber(fb), places=4 )
             pred.computeStatistics( marginalize=True, deltas_rel=0. )
             if pred.chi2 != self.predchi2()[expID]:
                 self.assertAlmostEqual(pred.chi2/self.predchi2()[expID], 1.0, 1 )

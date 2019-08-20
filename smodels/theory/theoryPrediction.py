@@ -13,6 +13,7 @@ from smodels.tools.physicsUnits import TeV,fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
+import itertools
 
 class TheoryPrediction(object):
     """
@@ -337,7 +338,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
 
 def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     """
-    Compute the compbined result for all datasets, if covariance
+    Compute the combined result for all datasets, if covariance
     matrices are available. Return a TheoryPrediction object
     with the signal cross-section summed over all the signal regions
     and the respective upper limit.
@@ -359,7 +360,6 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     totalXsec = None
     massList = []
     PIDList = []
-    IDList = []
     datasetPredictions = []
     weights = []
     for predList in dataSetResults:
@@ -375,13 +375,9 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
             totalXsec += pred.xsection
         massList.append(pred.mass)
         weights.append(pred.xsection.value.asNumber(fb))
-        for pidEntry in pred.PIDs:
-            if not pidEntry in PIDList:
-                PIDList.append(pidEntry)
-        IDList += pred.IDs
+        PIDList += pred.PIDs
         
     txnameList = list(set(txnameList))
-    IDList = list(set(IDList))
     if None in massList:
         mass = None
     else:
@@ -400,9 +396,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     theoryPrediction.conditions = None
     theoryPrediction.elements = elementList
     theoryPrediction.mass = mass
-    theoryPrediction.PIDs = PIDList
-    theoryPrediction.IDs = IDList
-    
+    theoryPrediction.PIDs = [pdg for pdg,_ in itertools.groupby(PIDList)] #Remove duplicates
     
     return theoryPrediction
     
@@ -493,10 +487,9 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.elements = cluster.elements
         theoryPrediction.avgElement = cluster.averageElement()
         theoryPrediction.mass = theoryPrediction.avgElement.mass
-        theoryPrediction.PIDs = cluster.getPIDs()
-        theoryPrediction.IDs = cluster.getIDs()
+        PIDs = [el.pdg for el in cluster.elements]
+        theoryPrediction.PIDs = [pdg for pdg,_ in itertools.groupby(PIDs)] #Remove duplicates
         predictionList._theoryPredictions.append(theoryPrediction)
-        
 
     if len(predictionList) == 0:
         return None
@@ -526,30 +519,17 @@ def _getElementsFrom(smsTopList, dataset):
                 newEl = txname.hasElementAs(el)  #Check if element appears in txname
                 if not newEl:
                     continue
-                el.covered = True
+                el.setCoveredBy(dataset.globalInfo.type)
                 eff = txname.getEfficiencyFor(newEl)
                 if not eff:
                     continue
-                el.tested = True
+                el.setTestedBy(dataset.globalInfo.type)
                 newEl.eff = eff
                 newEl.weight *= eff
                 newEl.txname = txname
                 elements.append(newEl) #Save element with correct branch ordering
 
-    #Remove duplicated elements:
-    allmothers = []
-    #First collect the list of all mothers:
-    for el in elements:
-        allmothers += [elMom[1] for elMom in el.motherElements if not elMom[0]=='original']
-    elementsClean = []
-
-    for el in elements:
-        #Skip the element if it is a mother of another element in the list
-        if any((elMom.elID == el.elID) for elMom in allmothers):
-            continue
-        elementsClean.append(el)
-
-    return elementsClean
+    return elements
 
 
 def _combineElements(elements, dataset, maxDist):

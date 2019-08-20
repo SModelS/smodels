@@ -191,16 +191,12 @@ class Branch(object):
         #Combine odd particles
         for iptc,ptc in enumerate(self.oddParticles):
             newBranch.oddParticles.append(ptc+other.oddParticles[iptc])
-            if newBranch.oddParticles[iptc].label == 'multiple':
-                newBranch.oddParticles[iptc].label = 'BSM (combined)'
 
         #Combine even particles (if they are the same nothing changes)
         for iv,vertex in enumerate(self.evenParticles):
             vertexParticles = []
             for iptc,ptc in enumerate(vertex):
                 vertexParticles.append(ptc + other.evenParticles[iv][iptc])
-                if vertexParticles[iptc].label == 'multiple':
-                    vertexParticles[iptc].label = 'SM (combined)'
 
             vertexParticles = ParticleList(vertexParticles)
             newBranch.evenParticles.append(vertexParticles)
@@ -231,15 +227,11 @@ class Branch(object):
         #Combine odd particles
         for iptc,ptc in enumerate(other.oddParticles):
             self.oddParticles[iptc] += ptc
-            if self.oddParticles[iptc].label == 'multiple':
-                self.oddParticles[iptc].label = 'BSM (combined)'
 
         #Combine even particles (if they are the same nothing changes)
         for iv,vertex in enumerate(self.evenParticles):
             for iptc,ptc in enumerate(vertex):
                 self.evenParticles[iv][iptc] += other.evenParticles[iv][iptc]
-                if self.evenParticles[iv][iptc].label == 'multiple':
-                    self.evenParticles[iv][iptc].label = 'SM (combined)'
         if not self.maxWeight is None and not other.maxWeight is None:
             self.maxWeight += other.maxWeight
                     

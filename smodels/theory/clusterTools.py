@@ -223,32 +223,6 @@ class ElementCluster(object):
         avgEl._index = None
         return avgEl
 
-    def getPIDs(self):
-        """
-        Return the list of all PIDs appearing in all elements in the cluster,
-        i.e. [ [[pdg1, pdg2,...],[pdg3,pdg4,...]], [[pdg1', pdg2',...],[pdg3',pdg4',...]]
-
-        :returns: list of PIDs
-        """
-        
-        PIDs = []
-        for el in self:
-            for pidList in el.getMothers():
-                if not pidList in PIDs:
-                    PIDs.append(pidList)
-            
-        return PIDs
-    
-    def getIDs(self):
-        """
-        Return list of all element IDs appearing in the cluster
-        :return: list of element IDs
-        """
-        IDs = []
-        for el in self:
-            if not el.elID in IDs: IDs.append(el.elID)
-        return IDs
-
     def copy(self):
         """
         Returns a copy of the index cluster (faster than deepcopy).
@@ -399,14 +373,25 @@ def clusterElements(elements, maxDist, dataset):
         logger.error("Clustering elements with different Txnames for an UL result.")
         raise SModelSError()
 
+    #Make sure only unique elements are clustered together (avoids double counting weights)
+    #Sort element, so the ones with highest contribution (weight*eff) come first:
+    elementList = sorted(elements, key = lambda el: el.weight.getMaxXsec()*el.eff, reverse=True)
+    #Remove duplicated elements:
+    elementsUnique = []
+    for el in elementList:
+        #Skip the element if it is related to any another element in the list
+        if any(el.isRelatedTo(elB) for elB in elementsUnique):
+            continue
+        elementsUnique.append(el)
+
     if dataset.getType() == 'upperLimit': #Group according to upper limit values
-        clusters = doCluster(elements, dataset, maxDist)
+        clusters = doCluster(elementsUnique, dataset, maxDist)
     elif dataset.getType() == 'efficiencyMap': #Group all elements together
-        distanceMatrix = np.zeros((len(elements),len(elements)))
+        distanceMatrix = np.zeros((len(elementsUnique),len(elementsUnique)))
         cluster = ElementCluster(dataset=dataset,distanceMatrix=distanceMatrix)
-        for iel,el in enumerate(elements):
+        for iel,el in enumerate(elementsUnique):
             el._index = iel
-        cluster.elements = elements
+        cluster.elements = elementsUnique
         clusters = [cluster]
 
     for cluster in clusters:

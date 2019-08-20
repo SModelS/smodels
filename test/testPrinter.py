@@ -26,6 +26,7 @@ from smodels import particlesLoader
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
+import pyslha
 
 def sortXML(xmltree):
     for el in xmltree:        
@@ -62,11 +63,21 @@ def compareXML(xmldefault,xmlnew,allowedDiff,ignore=[]):
     return True
 
 def compareSLHA(slhadefault,slhanew):
-    for i,line in enumerate(slhadefault.split("\n")):
-        if line != slhanew.split("\n")[i]:
-            print (line, " != ", slhanew.split("\n")[i])
+    
+    newData = pyslha.read(slhanew,ignorenomass=True,ignorenobr=True)
+    defaultData = pyslha.read(slhadefault,ignorenomass=True,ignorenobr=True)
+    defaultBlocks = sorted([defaultData.blocks[b].name for b in defaultData.blocks])
+    newBlocks = sorted([newData.blocks[b].name for b in newData.blocks])
+    if defaultBlocks != newBlocks:
+        print('Blocks differ')
+        return False
+    
+    for b in defaultData.blocks:
+        if defaultData.blocks[b].entries != newData.blocks[b].entries:
+            print('Entries in block %s differ' %(defaultData.blocks[b].name))
             return False
     return True
+
 
 class RunPrinterTest(unittest.TestCase):
 
@@ -109,7 +120,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.addObj(theoryPredictions)
         
         #Add coverage information:
-        coverageInfo = coverage.Uncovered(smstoplist,sigmacut)
+        coverageInfo = coverage.Uncovered(smstoplist)
         mprinter.addObj(coverageInfo)
         
         
@@ -174,7 +185,12 @@ class RunPrinterTest(unittest.TestCase):
             smodelsOutput = pM.smodelsOutput
         #Test python output
         from gluino_squarks_default import smodelsOutputDefault 
-        ignoreFields = ['input file','smodels version', 'ncpus', 'database version', 'Total missed xsec','Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec']
+        ignoreFields = ['input file','smodels version', 'ncpus', 'database version', 
+                        'Total missed xsec','Missed xsec long-lived', 'Missed xsec displaced', 
+                        'Missed xsec MET', 'Total outside grid xsec',
+                        'Total xsec for missing topologies (fb)','Total xsec for missing topologies with displaced decays (fb)',
+                        'Total xsec for missing topologies with prompt decays (fb)', 
+                        'Total xsec for topologies outside the grid (fb)']                        
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                       key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
@@ -210,7 +226,10 @@ class RunPrinterTest(unittest.TestCase):
         from simplyGluino_default import smodelsOutputDefault    
          
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version', 'Total missed xsec', 
-                            'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec']
+                            'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
+                            'Total xsec for missing topologies (fb)','Total xsec for missing topologies with displaced decays (fb)',
+                            'Total xsec for missing topologies with prompt decays (fb)', 
+                            'Total xsec for topologies outside the grid (fb)']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                        key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
@@ -246,7 +265,16 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         try:
-            self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus', 'Total missed xsec', 'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec']))
+            self.assertTrue(compareXML(xmlDefault,xmlNew,
+                                       allowedDiff=0.05,
+                                       ignore=['input_file','smodels_version', 'ncpus', 
+                                              'Total missed xsec', 'Missed xsec long-lived', 
+                                              'Missed xsec displaced', 'Missed xsec MET', 
+                                              'Total outside grid xsec',
+                                              'Total xsec for missing topologies (fb)',
+                                              'Total xsec for missing topologies with displaced decays (fb)',
+                                              'Total xsec for missing topologies with prompt decays (fb)', 
+                                              'Total xsec for topologies outside the grid (fb)']))
         except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
@@ -273,7 +301,14 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         try:
-            self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=0.05,ignore=['input_file','smodels_version', 'ncpus', 'Total missed xsec', 'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec']))
+            self.assertTrue(compareXML(xmlDefault,xmlNew,allowedDiff=0.05,
+                                       ignore=['input_file','smodels_version', 'ncpus', 'Total missed xsec', 
+                                               'Missed xsec long-lived', 'Missed xsec displaced', 
+                                               'Missed xsec MET', 'Total outside grid xsec',
+                                               'Total xsec for missing topologies (fb)',
+                                               'Total xsec for missing topologies with displaced decays (fb)',
+                                               'Total xsec for missing topologies with prompt decays (fb)', 
+                                               'Total xsec for topologies outside the grid (fb)']))
         except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
@@ -292,18 +327,12 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.setOutPutFiles('./unitTestOutput/printer_output',silent=False)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)                    
      
-        slhaDefaultFile = open("./gluino_squarks_default.slha.smodelsslha",'r')
-        slhaDefault = slhaDefaultFile.read()
-        slhaDefaultFile.close()
-        #Test summary output
-        slhaNewFile = open('./unitTestOutput/printer_output.smodelsslha'  ,'r')
-        slhaNew = slhaNewFile.read()
-        slhaNewFile.close()      
-           
+        slhaDefaultFile = "./gluino_squarks_default.slha.smodelsslha"
+        slhaNewFile = './unitTestOutput/printer_output.smodelsslha'
         try:
-            self.assertTrue(compareSLHA(slhaDefault, slhaNew))
+            self.assertTrue(compareSLHA(slhaDefaultFile, slhaNewFile))
         except AssertionError:
-            msg = "%s != %s" %(slhaDefault, slhaNew) 
+            msg = "%s != %s" %(slhaDefaultFile, slhaNewFile) 
             raise AssertionError(msg)
         self.removeOutputs ( './unitTestOutput/printer_output.smodelsslha' )  
 

@@ -15,15 +15,15 @@ import time
 from smodels.tools.smodelsLogging import logger
 
 class Meta(object):
-    current_version = 211 ## the current format version
+    current_version = 213 ## the current format version
 
     """ The Meta object holds all meta information regarding the
         database, like number of analyses, last time of modification, ...
         This info is needed to understand if we have to re-pickle. """
 
-    def __init__ ( self, pathname, discard_zeroes=None, mtime=None, filecount=None,
+    def __init__(self, pathname, discard_zeroes=None, mtime=None, filecount=None,
                    hasFastLim=None, databaseVersion=None, format_version=current_version,
-                   python=sys.version ):
+                   python=sys.version):
         """
         :param pathname: filename of pickle file, or dirname of text files
         :param discard_zeroes: do we discard zeroes?

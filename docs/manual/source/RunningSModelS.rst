@@ -348,7 +348,8 @@ Below we go step-by-step through this example code:
    :lines: 12-22
 
 * *Set the path to the database URL*. Specify which :ref:`database <databaseStruct>` to use. It can be the path
-  to the smodels-database folder, the path to a :ref:`pickle file <databasePickle>` or (starting with v1.1.3) a URL path.
+  to the smodels-database folder, the path to a :ref:`pickle file <databasePickle>`, (starting with v1.1.3) a URL path
+  or (starting with v1.2.2) the tags "official" and "official_fastlim".
 
 .. literalinclude:: /examples/Example.py
    :lines: 24-25
@@ -479,7 +480,7 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 591-603,613-617   
+   :lines: 591-611
 
 
 It is worth noting that SModelS does not include any statistical treatment for
@@ -488,7 +489,7 @@ Due to this, the results are claimed to be "likely excluded" in the output.
 
 
 **Notes:**
- * For an SLHA :ref:`input file <BasicInput>`, the decays of :ref:`final states <final states>` 
+ * For an SLHA :ref:`input file <BasicInput>`, the decays of :ref:`final states <final statesEven>` 
    (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during
    the decomposition. Furthermore, if there are two cross sections at different
    calculation order (say LO and NLO) for the same process, only the highest order is used.

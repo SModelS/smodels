@@ -29,7 +29,6 @@ from databaseLoader import database
 from smodels.theory.clusterTools import clusterElements
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.particle import ParticleList
-import copy
 
 
 class ClustererTest(unittest.TestCase):
@@ -73,16 +72,19 @@ class ClustererTest(unittest.TestCase):
         el1 = Element()
         el1.branches=[b1,b2]  
         el1.weight = w1       
-        el1.txname = txname           
+        el1.txname = txname
+        el1.eff = 1. #(Used in clustering)
 
 
         ## make a second element with a slightly different gluino mass
         el2= el1.copy()
+        el2.motherElements = [el2] #Enforce el2 and el1 not to be related
         el2.txname = txname
         el2.branches[0].oddParticles = [ptc.copy() for ptc in el1.branches[0].oddParticles]
         el2.branches[1].oddParticles = [ptc.copy() for ptc in el1.branches[1].oddParticles]        
         el2.branches[0].oddParticles[0].__setattr__("mass", 725.*GeV) 
         el2.branches[1].oddParticles[0].__setattr__("mass", 725.*GeV)
+        el2.eff = 1. #(Used in clustering)
 
         #Cluster for upper limits (all elements close in upper limit should be clustered together)
         maxDist = 5. #Cluster all elements
@@ -129,6 +131,9 @@ class ClustererTest(unittest.TestCase):
         el1 = toplist[0].elementList[0].copy()
         el2 = toplist[0].elementList[1].copy()
         el3 = toplist[2].elementList[1].copy()
+        el1.eff = 1. #(Used in clustering)
+        el2.eff = 1. #(Used in clustering)
+        el3.eff = 1. #(Used in clustering)
         #All elements have the same UL (for EM results)
         el1._upperLimit = el2._upperLimit = el3._upperLimit = 1.*fb
         #Clustering should not depend on the mass, width or txname:
@@ -165,6 +170,9 @@ class ClustererTest(unittest.TestCase):
         el2.mass = [[1020.*GeV,100.*GeV]]*2
         el3.mass = [[500.*GeV,100.*GeV]]*2
         el1.txname = el2.txname = el3.txname = 'T1'
+        el1.eff = 1. #(Used in clustering)
+        el2.eff = 1. #(Used in clustering)
+        el3.eff = 1. #(Used in clustering)
 
         #Check clustering with distinct elements
         clusters = clusterElements([el1,el2,el3],maxDist=0.2,dataset=dataset)
@@ -239,14 +247,17 @@ class ClustererTest(unittest.TestCase):
         el1 = Element()
         el1.branches=[b1,b2]  
         el1.weight = w1       
-        el1.txname = txname           
+        el1.txname = txname
+        el1.eff = 1. #(Used in clustering)
 
 
         ## make a second element with a slightly different gluino width
         el2 = el1.copy()
+        el2.motherElements = [el2]  #Enforce el2 and el1 not to be related
         el2.txname = txname
         el2.branches[0].oddParticles = [ptc.copy() for ptc in el1.branches[0].oddParticles]
         el2.branches[1].oddParticles = [ptc.copy() for ptc in el1.branches[1].oddParticles]
+        el2.eff = 1. #(Used in clustering)
 
         el2.branches[0].oddParticles[0].__setattr__("mass", 675.*GeV) 
         el2.branches[1].oddParticles[0].__setattr__("mass", 675.*GeV)

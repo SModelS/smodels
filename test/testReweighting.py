@@ -10,7 +10,8 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.share.models import SMparticles, mssm
 from smodels.theory.branch import Branch
-from smodels.tools.reweighting import calculateProbabilities, addPromptAndDisplaced
+from smodels.theory.element import Element
+from smodels.tools.reweighting import calculateProbabilities,reweightFactorFor
 from smodels.tools.physicsUnits import GeV
 
 class ReweightingTest(unittest.TestCase):     
@@ -25,43 +26,36 @@ class ReweightingTest(unittest.TestCase):
         self.assertEqual(F_prompt, 0.)
         self.assertAlmostEqual(F_displaced, 0.)
     
-    
-    def testaddPromptAndDisplaced(self):
-
+    def testreweightFactorFor(self):
+        
         n1 = mssm.n1.copy()
         n1.totalwidth = 0.*GeV
         st1 = mssm.st1.copy()
-        st1.totalwidth = 2.*GeV
+        st1.totalwidth = 1e-13*GeV
+        F_prompt = 0.3228249017964917
+        Fdisp = 0.6771750982035083
         gluino = mssm.gluino.copy()
         gluino.totalwidth = 1.*10**(-30)*GeV
         t = SMparticles.t
     
         branch1 = Branch()
         branch1.oddParticles = [n1]
-        probabilities1, branches1 = addPromptAndDisplaced(branch1)
-        self.assertEqual(len(probabilities1), 2)
-        self.assertEqual(probabilities1[0], 1.)
-        self.assertEqual(branches1[0]._decayType, 'METonly')
-        
         branch2 = Branch()
         branch2.oddParticles = [gluino]
-        probabilities2, branches2 = addPromptAndDisplaced(branch2)
-        self.assertEqual(len(probabilities2), 2)
-        self.assertAlmostEqual(probabilities2[0], 1.)
-        self.assertEqual(branches2[0]._decayType, 'longlived')
+        el1 = Element([branch1,branch2])
+        f = reweightFactorFor(el1, 'prompt')
+        self.assertAlmostEqual(f,1.,places=3)
+        f = reweightFactorFor(el1, 'displaced')
+        self.assertAlmostEqual(f,0.,places=3)
         
         branch3 = Branch()
         branch3.oddParticles = [st1,n1]
         branch3.evenParticles = [[t]]
-        probabilities3, branches3 = addPromptAndDisplaced(branch3)
-        self.assertEqual(len(probabilities3), 2)
-        self.assertEqual(probabilities3[0], 1.)
-        self.assertEqual(probabilities3[1], 0.)
-        self.assertEqual(branches3[0]._decayType, 'prompt') 
-        self.assertEqual(branches3[1]._decayType, 'DisplacedDecay')                
-        
-
-               
+        el2 = Element([branch1,branch3])
+        f = reweightFactorFor(el2, resType='prompt')
+        self.assertEqual(f,F_prompt)
+        f = reweightFactorFor(el2, resType='displaced')
+        self.assertEqual(f,Fdisp)
         
 if __name__ == "__main__":
     unittest.main()        

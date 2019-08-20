@@ -42,10 +42,10 @@ class Element(object):
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList() # gives the weight for all decays promptly
         self.decayLabels = []
-        self.motherElements = [("original", self)]
+        self.motherElements = [self] #The motheElements includes self to keep track of merged elements
         self.elID = 0
-        self.covered = False
-        self.tested = False
+        self.coveredBy = set()
+        self.testedBy = set()
                 
         if info:
             # Create element from particle string
@@ -276,70 +276,72 @@ class Element(object):
 
         return fsparticles
 
-    def getDaughters(self):
+    def _getAncestorsDict(self,igen=0):
         """
-        Get the list of daughter (last/stable BSM particle in the decay) PDGs. 
-        Can be a nested list, if the element combines several daughters:
-        [ [pdgDAUG1,pdgDAUG2],  [pdgDAUG1',pdgDAUG2']] 
+        Returns a dictionary with all the ancestors
+        of the element. The dictionary keys are integers
+        labeling the generation (number of generations away from self)
+        and the values are a list of Element objects (ancestors) for that generation.
+        igen is used as the counter for the initial generation.
+        The output is also stored in self._ancestorsDict for future use.
 
-        
-        :returns: list of PDG ids
-        """
-        
-        daughterPIDs = []
-        for branch in self.branches():
-            daughterPIDs.append(branch.oddParticles[-1].pdg)
-            
-        return daughterPIDs
-    
-    def getMothers(self):
-        """
-        Get list of mother PDGs.    
-        Can be a nested list, if the element combines several mothers:
-        [ [pdgMOM1,pdgMOM2],  [pdgMOM1',pdgMOM2']] 
-        
-        :returns: list of PDG ids
-        """                        
+        :param igen: Auxiliair integer indicating to which generation self belongs.
 
-        momPIDs = []
-        for branch in self.branches:
-            if hasattr(branch.oddParticles[0], 'pdg'):
-                momPIDs.append(branch.oddParticles[0].pdg)
-            else:
-                momPIDs.append(None)
-        return momPIDs    
-        
-    def getMotherPIDs(self):
+        :return: Dictionary with generation index as key and ancestors as values
+                 (e.g. {igen+1 : [mother1, mother2], igen+2 : [grandmother1,..],...})
         """
-        Get PIDs of all mothers.
-        
-        :returns: list of mother PDG ids
+
+        ancestorsDict = {igen+1 : []}
+        for mother in self.motherElements:
+            if mother is self:
+                continue
+            ancestorsDict[igen+1].append(mother)
+            for jgen,elList in mother._getAncestorsDict(igen+1).items():
+                if not jgen in ancestorsDict:
+                    ancestorsDict[jgen] = []
+                ancestorsDict[jgen] += elList
+
+        #Store the result
+        self._ancestorsDict = dict([[key,val] for key,val in ancestorsDict.items()])
+
+        return self._ancestorsDict
+
+    def getAncestors(self):
         """
-        
-        # get a list of all original mothers, i.e. that only consists of first generation elements
-        allmothers = self.motherElements
-        while not all(mother[0] == 'original' for mother in allmothers):                        
-            for im, mother in enumerate(allmothers):
-                if mother[0] != 'original':
-                    allmothers.extend(mother[1].motherElements)
-                    allmothers.pop(im)                                    
+        Get a list of all the ancestors of the element.
+        The list is ordered so the mothers appear first, then the grandmother,
+        then the grandgrandmothers,...
 
-        # get the PIDs of all mothers      
-        motherPids = []
-        for mother in allmothers:  
-            motherPids.append(mother[1].pdg) 
+        :return: A list of Element objects containing all the ancestors sorted by generation.
+        """
 
-        branch1 = []
-        branch2 = []
-        for motherPid in motherPids:
-            branch1.append(motherPid[0])
-            branch2.append(motherPid[1])
-        for pid1 in branch1:
-            for pid2 in branch2:
-                pids = [pid1,pid2]
-                if not pids in motherPids: motherPids.append(pids)  
-   
-        return motherPids     
+        #Check if the ancestors have already been obtained (performance gain)
+        if not hasattr(self,'_ancestorsDict'):
+            self._getAncestorsDict()
+
+        orderedAncestors = []
+        for jgen in sorted(self._ancestorsDict.keys()):
+            orderedAncestors += self._ancestorsDict[jgen]
+
+        return orderedAncestors
+
+    def isRelatedTo(self,other):
+        """
+        Checks if the element has any common ancestors with other or one
+        is an ancestor of the other.
+        Returns True if self and other have at least one ancestor in common
+        or are the same element, otherwise returns False.
+
+        :return: True/False
+        """
+
+        ancestorsA = set([id(self)] + [id(el) for el in self.getAncestors()])
+        ancestorsB = set([id(other)] + [id(el) for el in other.getAncestors()])
+
+        if ancestorsA.intersection(ancestorsB):
+            return True
+        else:
+            return False
 
     def getEinfo(self):
         """
@@ -367,6 +369,31 @@ class Element(object):
         for branch in self.branches:
             branch.setInfo()
 
+    def setTestedBy(self,resultType):
+        """
+        Tag the element, all its daughter and all its mothers
+        as tested by the type of result specified.
+        It also recursively tags all granddaughters, grandmothers,...
+
+        :param resultType: String describing the type of result (e.g. 'prompt', 'displaced')
+        """
+
+        self.testedBy.add(resultType)
+        for ancestor in self.getAncestors():
+            ancestor.testedBy.add(resultType)
+
+    def setCoveredBy(self,resultType):
+        """
+        Tag the element, all its daughter and all its mothers
+        as covered by the type of result specified.
+        It also recursively tags all granddaughters, grandmothers,...
+
+        :param resultType: String describing the type of result (e.g. 'prompt', 'displaced')
+        """
+
+        self.coveredBy.add(resultType)
+        for mother in self.getAncestors():
+            mother.coveredBy.add(resultType)
 
     def _getLength(self):
         """
@@ -375,7 +402,6 @@ class Element(object):
         :returns: maximum length of the element branches (int)    
         """
         return max(self.branches[0].getLength(), self.branches[1].getLength())
-
 
     def checkConsistency(self):
         """
@@ -420,8 +446,9 @@ class Element(object):
             if doCompress:
                 for element in newElements:
                     newel = element.massCompress(minmassgap)
-                    # Avoids double counting (conservative)
-                    if newel and not newel.hasTopInList(newElements):
+                    # Avoids double counting
+                    #(elements sharing the same parent are removed during clustering)
+                    if newel and not any(newel == el for el in newElements[:]):
                         newElements.append(newel)
                         added = True
 
@@ -430,8 +457,9 @@ class Element(object):
             if doInvisible:
                 for element in newElements:
                     newel = element.invisibleCompress()
-                    # Avoids double counting (conservative)
-                    if newel and not newel.hasTopInList(newElements):
+                    # Avoids double counting
+                    #(elements sharing the same parent are removed during clustering)
+                    if newel and not any(newel == el for el in newElements[:]):
                         newElements.append(newel)
                         added = True
 
@@ -465,7 +493,7 @@ class Element(object):
         """
 
         newelement = self.copy()
-        newelement.motherElements = [("mass", self)]
+        newelement.motherElements = [self]
 
         #Loop over branches and look for small mass differences 
         for ibr,branch in enumerate(newelement.branches):
@@ -506,7 +534,7 @@ class Element(object):
         """
         
         newelement = self.copy()
-        newelement.motherElements = [("invisible", self)]
+        newelement.motherElements = [self]
 
         # Loop over branches
         for branch in newelement.branches:
@@ -527,7 +555,7 @@ class Element(object):
                 effectiveDaughter = Particle(label='inv', mass = bsmMom.mass,
                                              eCharge = 0, colordim = 1,
                                              totalwidth = branch.oddParticles[-1].totalwidth,
-                                             Z2parity = bsmMom.Z2parity)
+                                             Z2parity = bsmMom.Z2parity, pdg = bsmMom.pdg)
                 branch.removeVertex(len(branch.oddParticles)-2)
                 #For invisible compression, keep an effective mother which corresponds to the invisible
                 #daughter, but with the mass of the parent.

@@ -105,7 +105,6 @@ class DecomposerTest(unittest.TestCase):
                 if str(element)!="[[[t+],[t-]],[[q],[W+]]]": 
                     continue
                 tested = True
-                self.assertEqual(element.motherElements[0][0],"original")
                 self.assertEqual(len(element.motherElements),1)
         self.assertTrue(tested) #Make sure the test was performed
          
@@ -124,12 +123,11 @@ class DecomposerTest(unittest.TestCase):
                 if str(element) != "[[],[]]":
                     continue
                 tested = True
-                self.assertEqual(str(element.motherElements[0][1]),"[[],[[nu,nu]]]")
+                self.assertEqual(str(element.motherElements[0]),"[[],[[nu,nu]]]")
                 bsmLabels = [[bsm.label for bsm in br] for br in element.oddParticles]
                 self.assertEqual(bsmLabels,[['N1'],['inv']])
                 ## all neutrinos are considered as equal, so there should be a single mother:
                 self.assertEqual(len(element.motherElements), 1) 
-                self.assertEqual(str(element.motherElements[0][0]),"invisible" )
         self.assertTrue(tested) #Make sure the test was performed
          
          
@@ -148,28 +146,27 @@ class DecomposerTest(unittest.TestCase):
             for element in topo.elementList:
                 if str(element)!="[[[b]],[[b]]]":
                     continue
-                masses = element.motherElements[0][1].mass
+                masses = element.motherElements[0].mass
                 dm = abs(masses[0][1]-masses[0][2])/GeV
                 tested = True
                 self.assertEqual(len(element.motherElements),24)
-                self.assertEqual(str(element.motherElements[0][0]),"mass" )
                 self.assertTrue(dm < 5.0)
         self.assertTrue(tested) #Make sure the test was performed
                         
         tested = False                 
         topos = decomposer.decompose(model, sigcut=0.1*fb, doCompress=True, doInvisible=True, minmassgap=5.*GeV )
-        elIDs = {29 : Element("[[[b]],[[b]]]",finalState=['MET','MET']),
-                 30 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
-                 32 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
-                 26 : Element("[[[t-]],[[b]]]",finalState=['MET','MET']),
-                 31 : Element("[[[b]],[[t-]]]",finalState=['MET','MET']),
-                 33 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET']),
-                 28 : Element("[[[t-]],[[t+]]]",finalState=['MET','MET']),
-                 34 : Element("[[[t-]],[[t+]]]",finalState=['MET','MET']),
-                 27 : Element("[[[t-]],[[t+]]]",finalState=['MET','MET'])}
+        elIDs = {29+8 : Element("[[[b]],[[b]]]",finalState=['MET','MET']),
+                 30+8 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
+                 32+8 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
+                 26+8 : Element("[[[t-]],[[b]]]",finalState=['MET','MET']),
+                 31+8 : Element("[[[b]],[[t-]]]",finalState=['MET','MET']),
+                 33+8 : Element("[[[t+]],[[t-]]]",finalState=['MET','MET']),
+                 28+8 : Element("[[[t-]],[[t+]]]",finalState=['MET','MET']),
+                 34+8 : Element("[[[t-]],[[t+]]]",finalState=['MET','MET']),
+                 27+8 : Element("[[[t-]],[[t+]]]",finalState=['MET','MET'])}
         
-        toposExpected = {"[][]" : 2,"[][1]" : 9,"[][2]" : 14,"[1][1]" : 9,"[1][2]" : 29,
-                         "[2][2]" : 72,"[][1,2]" : 2,"[][2,2]" : 44,"[1][1,1]" : 6,"[1][1,2]" : 44,
+        toposExpected = {"[][]" : 2,"[][1]" : 9,"[][2]" : 22,"[1][1]" : 9,"[1][2]" : 29,
+                         "[2][2]" : 72,"[][1,2]" : 2,"[][2,2]" : 44,"[1][1,1]" : 6,"[1][1,2]" : 54,
                          "[2][1,2]" : 48,"[2][2,2]" : 284,"[1,1][1,1]" : 17,"[1,1][1,2]" : 22,
                          "[1,2][1,2]" : 120,"[1][1,1,1]" : 4,"[1][1,2,2]" : 72,"[1,1][1,1,1]" : 56,
                          "[1,1][1,1,2]" : 16,"[1,2][1,2,2]" : 240,"[1,1,1][1,1,2]" : 64,

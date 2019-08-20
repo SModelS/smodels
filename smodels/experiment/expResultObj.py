@@ -49,19 +49,23 @@ class ExpResult(object):
             logger.error("globalInfo.txt file not found in " + path)
             raise TypeError
         self.globalInfo = infoObj.Info(os.path.join(path, "globalInfo.txt"))
+        #Add type of experimental result (if not defined)
+        if not hasattr(self.globalInfo,'type'):
+            self.globalInfo.type = 'prompt'
+
         datasets = {}
         folders=[]
         for root, _, files in cleanWalk(path):
             folders.append ( (root, files) )
         folders.sort()
         self.datasets = []
-        hasOrder = hasattr ( self.globalInfo, "datasetOrder" )
+        hasOrder = hasattr(self.globalInfo, "datasetOrder")
         for root, files in folders:
             if 'dataInfo.txt' in files:  # data folder found
                 # Build data set
                 try:
                     dataset = datasetObj.DataSet(root, self.globalInfo,
-                            discard_zeroes = discard_zeroes )
+                            discard_zeroes = discard_zeroes)
                     if hasOrder:
                         datasets[dataset.dataInfo.dataId]=dataset
                     else:
