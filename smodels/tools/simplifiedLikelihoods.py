@@ -379,8 +379,8 @@ class LikelihoodComputer:
         try:
             M = [0.]*len(theta)
             C = self.model.V
-            if self.model.n == 1:
-                C = self.model.totalCovariance(self.nsig)
+            #if self.model.n == 1: I think not a good idea
+            #    C = self.model.totalCovariance(self.nsig)
             if nll:
                 gaussian = stats.multivariate_normal.logpdf(theta,mean=M,cov=C)
                 ret = - gaussian - sum(poisson)
