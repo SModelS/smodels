@@ -5,8 +5,7 @@
    :synopsis: Code that implements the simplified likelihoods as presented
               in CMS-NOTE-2017-001, see https://cds.cern.ch/record/2242860.
               In collaboration with Andy Buckley, Sylvain Fichet and Nickolas Wardle.
-              Additional developments will be presented in a future publication.
-             
+              Simplified likelihoods v2 (JHEP_021P_1018) are partly implemented.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -290,7 +289,7 @@ class LikelihoodComputer:
         
         :param signal_rel: array with relative signal strengths 
         
-        :returns: mu_hat, the total signal yield.
+        :returns: mu_hat, the maximum likelihood estimate of mu
         """
         
         if (self.model.backgrounds == self.model.observed).all():
@@ -380,8 +379,8 @@ class LikelihoodComputer:
         try:
             M = [0.]*len(theta)
             C = self.model.V
-            if self.model.n == 1:
-                C = self.model.totalCovariance(self.nsig)
+            #if self.model.n == 1: I think not a good idea
+            #    C = self.model.totalCovariance(self.nsig)
             if nll:
                 gaussian = stats.multivariate_normal.logpdf(theta,mean=M,cov=C)
                 ret = - gaussian - sum(poisson)
@@ -390,7 +389,8 @@ class LikelihoodComputer:
                 ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
             return ret
         except ValueError as e:
-            raise Exception("ValueError %s, %s" % ( e, self.model.totalCovariance(self.nsig) ))
+            raise Exception("ValueError %s, %s" % ( e, self.model.V ))
+            #raise Exception("ValueError %s, %s" % ( e, self.model.totalCovariance(self.nsig) ))
             # raise Exception("ValueError %s, %s" % ( e, self.model.V ))
 
     def nll( self, theta ):
@@ -495,8 +495,8 @@ class LikelihoodComputer:
             ## quadratic equations
             ini = self.getThetaHat ( self.model.observed, self.model.backgrounds, nsig, self.model.covariance, 0 )
             self.cov_tot = self.model.V
-            if self.model.n == 1:
-                self.cov_tot = self.model.totalCovariance ( nsig )
+            #if self.model.n == 1:
+            #    self.cov_tot = self.model.totalCovariance ( nsig )
             # self.ntot = self.model.backgrounds + self.nsig
             # if not self.model.isLinear():
                 # self.cov_tot = self.model.V + self.model.var_s(nsig)
@@ -772,7 +772,7 @@ class UpperLimitComputer:
                                    nll=True)
         
         def root_func(mu):
-            ## the function to minimize.
+            ## the function to find the zero of (ie CLs - alpha)
             nsig = model.signals(mu)
             computer.ntot = model.backgrounds + nsig
             nll = computer.likelihood(nsig, marginalize=marginalize, nll=True )

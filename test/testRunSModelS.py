@@ -9,7 +9,8 @@
  
 """
  
-import sys,os,imp
+import sys,os
+import importlib
 sys.path.insert(0,"../")
 import unittest
 import glob
@@ -17,10 +18,13 @@ from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
 from unitTestHelpers import equalObjs, runMain
 import time
+import subprocess
  
 from smodels.tools.smodelsLogging import logger
  
 class RunSModelSTest(unittest.TestCase):
+    definingRun = False ## meant only to adapt to changes in output format
+    ## use with super great care!!
  
     def testMultipleFiles( self ):
         out = "./unitTestOutput"
@@ -32,7 +36,8 @@ class RunSModelSTest(unittest.TestCase):
         nout = len([i for i in glob.iglob("unitTestOutput/*smodels") if not "~" in i])
         nin = len([i for i in glob.iglob("%s/*slha" % dirname) if not "~" in i])
         if nout != nin:
-            logger.error("Number of output file(%d) differ from number of input files(%d)" %(nout, nin))
+            logger.error("Number of output file(%d) differ from number of input files(%d)" %
+                          (nout, nin))
         self.assertEqual(nout,nin)
       
     def testTimeout(self):
@@ -57,9 +62,15 @@ class RunSModelSTest(unittest.TestCase):
     def testGoodFile(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(filename)
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput
+        if self.definingRun:
+            logger.error ( "This is a definition run! Know what youre doing!" )
+            default = "gluino_squarks_default.py"
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
+            a = subprocess.getoutput ( cmd )
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
         from gluino_squarks_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec', 
                             'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
@@ -102,9 +113,15 @@ class RunSModelSTest(unittest.TestCase):
              
         filename = "./testFiles/slha/simplyGluino.slha"
         outputfile = runMain(filename,suppressStdout = True )
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput
+        if self.definingRun:
+            logger.error ( "This is a definition run! Know what youre doing!" )
+            default = "simplyGluino_default.py"
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
+            a = subprocess.getoutput ( cmd )
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
         from simplyGluino_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec', 
                             'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
@@ -113,7 +130,7 @@ class RunSModelSTest(unittest.TestCase):
                             'Total xsec for topologies outside the grid (fb)']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.08,
                            ignore=ignoreFields)
         if not equals:
             e =  "output13.py and simplyGluino_default.py differ!" 
@@ -128,9 +145,15 @@ class RunSModelSTest(unittest.TestCase):
     def testGoodFileHSCP(self):
         filename = "./testFiles/slha/longLived.slha"
         outputfile = runMain(filename)
-        with open(outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile,('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput        
+        if self.definingRun:
+            logger.error ( "This is a definition run! Know what youre doing!" )
+            default = "longLived_default.py"
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
+            a = subprocess.getoutput ( cmd )
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
         from longLived_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec', 
                         'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
@@ -145,6 +168,28 @@ class RunSModelSTest(unittest.TestCase):
             if os.path.exists( i ): os.remove( i )
         self.assertTrue(equals)               
  
+    def testLifeTimeDependent(self):
+        filename = "./testFiles/slha/lifetime.slha"
+        outputfile = runMain(filename)
+        if self.definingRun:
+            logger.error ( "This is a definition run! Know what youre doing!" )
+            default = "lifetime_default.py"
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
+            a = subprocess.getoutput ( cmd )
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
+        from lifetime_default import smodelsOutputDefault
+        ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
+        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
+                    key=lambda res: res['r'], reverse=True)
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+                           ignore=ignoreFields)            
+        for i in [ './outputHSCP.py', './outputHSCP.pyc' ]:
+            if os.path.exists( i ): os.remove( i )
+        self.assertTrue(equals)               
+
      
     def testBadFile(self):
         # since 112 we skip non-existing slha files!

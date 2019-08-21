@@ -7,12 +7,13 @@
 """
 
 from smodels.theory import crossSection
-from smodels.tools.physicsUnits import fb
+from smodels.tools.physicsUnits import fb, GeV
 import unum
 from collections import Iterable
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.databaseParticles import finalStates
+import numpy as np
 
 #Get all finalStateLabels
 finalStateLabels = finalStates.getValuesFor('label')
@@ -112,7 +113,8 @@ def removeUnits(value,standardUnits):
     in physicsUnits.standard units to normalize the data.
 
     :param value: Object containing units (e.g. [[100*GeV,100.*GeV],3.*pb])
-    :param standardUnits: Unum unit or Array of unum units defined to normalize the data.
+    :param standardUnits: Unum unit or Array of unum units defined to 
+                          normalize the data.
     :return: Object normalized to standard units (e.g. [[100,100],3000])
     """
 
@@ -144,8 +146,8 @@ def removeUnits(value,standardUnits):
 
 def addUnit(obj,unit):
     """
-    Add unit to object. If the object is a nested list,
-    adds the unit to all of its elements.
+    Add unit to object.
+    If the object is a nested list, adds the unit to all of its elements.
 
     :param obj: Object without units (e.g. [[100,100.]])
     :param unit: Unit to be added to the object (Unum object, e.g. GeV)
@@ -154,6 +156,8 @@ def addUnit(obj,unit):
 
     if isinstance(obj,list):
         return [addUnit(x,unit) for x in obj]
+    elif isinstance(obj,tuple):
+        return tuple([addUnit(x,unit) for x in obj])
     elif isinstance(obj,dict):
         return dict([[addUnit(x,unit),addUnit(y,unit)] for x,y in obj.items()])
     elif isinstance(obj,(float,int,unum.Unum)):
@@ -161,27 +165,41 @@ def addUnit(obj,unit):
     else:
         return obj
 
-
-def _flattenList(inlist, dims=None):
+def flattenArray(objList):
     """
-    Flatten a multi-dimensional nested list.
+    Flatten any nested list to a 1D list.
     
-    Output ordering: [first level objects, second level objects, ...].    
+    :param objList: Any list or nested list of objects (e.g. [[[(100.,1e-10),100.],1.],[[200.,200.],2.],..]
     
-    If dims == [], include dimensions of nested list to it. This is useful when
-    comparing lists).
-    
+    :return: 1D list (e.g. [100.,1e-10,100.,1.,200.,200.,2.,..])
     """
-    flat = []
-    for item in inlist:
-        if isinstance(item, Iterable) and not isinstance(item, str ):
-            if not dims is None:
-                dims.append(len(item))
-            for x in _flattenList(item, dims):
-                flat.append(x)
+    
+    ret = []
+    
+    for obj in objList:
+        if isinstance(obj, Iterable) and not isinstance(obj, str):
+            ret.extend(flattenArray(obj))
         else:
-            flat.append(item)
-    return flat
+            ret.append(obj)
+    return ret 
+
+def reshapeList(objList,shapeArray):
+    """
+    Reshape a flat list according to the shape of shapeArray.
+    The number of elements in shapeArray should equal the length of objList.
+    
+    :param objList: 1D list of objects (e.g. [200,100,'*',50,'*'])
+    :param shapeArray: Nested array (e.g. [[float,float,'*',float],'*'])
+    
+    :return: Array with elements from objList shaped according to shapeArray
+             (e.g. [[200.,100.,'*',50],'*'])
+    """
+    
+    if isinstance(shapeArray,list):
+        return [reshapeList(objList,v) for v in shapeArray]
+    else:
+        return objList.pop(0)
+
     
 def index_bisect(inlist, el):
     """
@@ -199,7 +217,6 @@ def index_bisect(inlist, el):
         if inlist[mid] < el: lo = mid+1
         else: hi = mid
     return lo
-
 
 def elementsInStr(instring,removeQuotes=True):
     """
@@ -263,7 +280,6 @@ def elementsInStr(instring,removeQuotes=True):
 
     return elements
 
-
 def getValuesForObj(obj, attribute):
     """
     Loops over all attributes in the object and in its attributes
@@ -291,11 +307,10 @@ def getValuesForObj(obj, attribute):
             values += getValuesForObj(value,attribute)
     
     values =  list(filter(lambda a: (not isinstance(a,list)) or a != [], values))
-    values = _flattenList(values)
+    values = flattenArray(values)
     uniqueValues = [v for n,v in enumerate(values) if v not in values[:n]]
     
     return uniqueValues
-
 
 def getAttributesFrom(obj):
     """
@@ -325,8 +340,7 @@ def getAttributesFrom(obj):
     
     attributes =  list(filter(lambda a: a != [], attributes))    
     
-    return list(set(_flattenList(attributes)))
-
+    return list(set(flattenArray(attributes)))
 
 def average(values,weights=None):
     """
@@ -378,5 +392,89 @@ def average(values,weights=None):
         if all(values[0] == v for v in values):
             return values[0]
         return None
+
+def rescaleWidth(width):
+    """ 
+    The function that is applied to all widths to 
+    map it into a better variable for interpolation.
+    It grows logarithmically from zero (for width=0.)
+    to a large number (machine dependent) for width = infinity.
+
+    :param width: Width value (in GeV) with or without units
+
+    :return x: Coordinate value (float)
+    """
+
+    if isinstance(width,unum.Unum):
+        w = width.asNumber(GeV)
+    else:
+        w = width
+
+    minWidth = 1e-30 #Any width below this can be safely considered to be zero
+    maxWidth = 1e50 #Any width above this can be safely considered to be infinity
+    w = (min(w,maxWidth)/minWidth) #Normalize the width and convert it to some finite number (if not finite)
+    return np.log(1+w)
+
+def unscaleWidth(x):
+    """
+    Maps a coordinate value back to width (with GeV unit).
+    The mapping is such that x=0->width=0 and x=very large -> width = inf.
+
+    :param x: Coordinate value (float)
+
+    :return width: Width value (in GeV) with unit
+    """
+
+    minWidth = 1e-30 #Any width below this can be safely considered to be zero
+    maxWidth = 1e50 #Any width above this can be safely considered to be infinity
+    with np.errstate(over='ignore'): #Temporarily disable overflow error message
+        #The small increase in x is required to enforce unscaleWidth(widthToCoordinae(np.inf)) = np.inf
+        width = minWidth*(np.exp(x)-1)
+        if width > maxWidth:
+            width = np.inf
+    return width*GeV
+
+def removeInclusives(massArray,shapeArray):
+    """
+    Remove all entries corresponding to '*' in shapeArray.
+    If shapeArray contains entries = *, the corresponding entries
+    in value will be removed from the output.
     
+    :param massArray: Array to be formatted (e.g. [[200.,100.],[200.,100.]] or [[200.,'*'],'*'],0.4])
+    :param shapeArray: Array with format info (e.g. ['*',[float,float]])
     
+    :return: formatted array (e.g. [[200.,100.]] or [[200.]],0.4])
+    """
+    
+    if shapeArray == '*':
+        return None
+    elif isinstance(massArray,list):
+        if len(shapeArray) != len(massArray): 
+            raise SModelSError("Input value and data shape mismatch (%s,%s)" 
+                               %(len(shapeArray),len(massArray)))
+        else:
+            return [removeInclusives(xi,shapeArray[i]) for i,xi in enumerate(massArray) 
+                    if not removeInclusives(xi,shapeArray[i]) is None]
+    else:
+        return massArray
+        
+def addInclusives(massList,shapeArray):
+    """
+    Add entries corresponding to '*' in shapeArray.
+    If shapeArray contains entries = *, the corresponding entries
+    in value will be added from the output.
+
+    :param massList: 1D array of floats. Its dimension should be equal to the number
+                  of non "*" items in shapeArray (e.g. [200.0,100.0])
+    :param shapeArray: 1D array containing the data type and '*'. The
+                       values of data type are ignored (e.g. [float,'*',float,'*','*']).
+
+    :return: original array with '*' inserted at the correct entries.
+    """
+    
+    if isinstance(shapeArray,list):
+        return [addInclusives(massList,v) for v in shapeArray]
+    elif shapeArray != '*':
+        return massList.pop(0)
+    else:
+        return shapeArray

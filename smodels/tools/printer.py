@@ -19,11 +19,14 @@ from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.tools.smodelsLogging import logger
+import numpy as np
 from collections import OrderedDict
 from xml.dom import minidom
 from xml.etree import ElementTree
 import unum
 import time
+
+# from smodels.tools.deep_getsizeof import deep_getsizeof
 
 class MPrinter(object):
     """
@@ -31,31 +34,33 @@ class MPrinter(object):
     """
 
     def __init__(self):
-        
+
         self.name = "master"
         self.Printers = {}
-    
+
     def setPrinterOptions(self,parser):
         """
         Define the printer types and their options.
-        
+
         :param parser: ConfigParser storing information from the parameters file
         """
-        
+
         #Define the printer types and the printer-specific options:
-        printerTypes = parser.get("printer", "outputType").split(",")        
+        printerTypes = parser.get("printer", "outputType").split(",")
         for prt in printerTypes:
             prt = prt.strip() ## trailing spaces shouldnt matter
             if prt == 'python':
-                newPrinter = PyPrinter(output = 'file')                
-            elif prt == 'summary':        
+                newPrinter = PyPrinter(output = 'file')
+            elif prt == 'summary':
                 newPrinter = SummaryPrinter(output = 'file')
             elif prt == 'stdout':
                 newPrinter = TxTPrinter(output = 'stdout')
             elif prt == 'log':
                 newPrinter = TxTPrinter(output = 'file')
             elif prt == 'xml':
-                newPrinter = XmlPrinter(output = 'file')           
+                newPrinter = XmlPrinter(output = 'file')
+            elif prt == 'pickle':
+                newPrinter = PicklePrinter(output = 'file')
             elif prt == 'slha':
                 newPrinter = SLHAPrinter(output = 'file')
                 if parser.getboolean("options", "doCompress") or parser.getboolean("options", "doInvisible"):
@@ -65,14 +70,14 @@ class MPrinter(object):
             else:
                 logger.warning("Unknown printer format: %s" %str(prt))
                 continue
-            
+
             #Copy stdout options to log options:
             if 'log' in printerTypes:
                 if parser.has_section('stdout-printer') and not parser.has_section('log-printer'):
                     parser.add_section('log-printer')
                     for option,val in parser.items('stdout-printer'):
                         parser.set('log-printer',option,val)
-            
+
             #Set printer-specific options:
             if parser.has_section(prt+'-printer'):
                 newPrinter.setOptions(parser.items(prt+'-printer'))
@@ -81,30 +86,30 @@ class MPrinter(object):
     def addObj(self,obj):
         """
         Adds the object to all its Printers:
-        
+
         :param obj: An object which can be handled by the Printers.
         """
-        
+
         for prt in self.Printers.values():
             prt.addObj(obj)
-            
+
     def setOutPutFiles(self,filename,silent=False):
         """
         Set the basename for the output files. Each printer will
-        use this file name appended of the respective extension 
+        use this file name appended of the respective extension
         (i.e. .py for a python printer, .smodels for a summary printer,...)
-        
+
         :param filename: Input file name
         :param silent: dont comment removing old files
         """
-        
+
         for printer in self.Printers.values():
             printer.setOutPutFile(filename,silent=silent)
 
     def flush(self):
         """
         Ask all printers to write the output and clear their cache.
-        If the printers return anything other than None, 
+        If the printers return anything other than None,
         we pass it on.
         """
         ret = {}
@@ -145,30 +150,30 @@ class BasicPrinter(object):
         if not self.filename:
             return
         dirname = os.path.dirname ( self.filename )
-        if not os.path.exists ( dirname ):
+        if dirname != "" and not os.path.exists ( dirname ):
             os.makedirs ( dirname )
-            
+
     def setOptions(self,options):
         """
         Store the printer specific options to control the output of each printer.
         Each option is stored as a printer attribute.
-        
+
         :param options: a list of (option,value) for the printer.
         """
-        
+
         for opt,value in options:
-            setattr(self,opt,eval(value))        
-            
+            setattr(self,opt,eval(value))
+
     def addObj(self,obj):
         """
-        Adds object to the Printer. 
-        
+        Adds object to the Printer.
+
         :param obj: A object to be printed. Must match one of the types defined in formatObj
 
         :return: True if the object has been added to the output. If the object does not belong
                 to the pre-defined printing list toPrint, returns False.
         """
-        
+
         for iobj,objType in enumerate(self.printingOrder):
             if isinstance(obj,objType):
                 self.toPrint[iobj] = obj
@@ -176,7 +181,7 @@ class BasicPrinter(object):
         return False
 
     def openOutFile(self, filename, mode ):
-        """ creates and opens a data sink, 
+        """ creates and opens a data sink,
             creates path if needed """
         d = os.path.dirname ( filename )
         if not os.path.exists ( d ):
@@ -194,15 +199,15 @@ class BasicPrinter(object):
 
         for obj in self.toPrint:
             if obj is None: continue
-            output = self._formatObj(obj)                
-            if not output: continue  #Skip empty output                
+            output = self._formatObj(obj)
+            if not output: continue  #Skip empty output
             ret += output
             if self.output == 'stdout':
                 sys.stdout.write(output)
             elif self.output == 'file':
                 if not self.filename:
                     logger.error('Filename not defined for printer')
-                    return False   
+                    return False
                 with self.openOutFile(self.filename, "a") as outfile:
                     outfile.write(output)
                     outfile.close()
@@ -215,7 +220,7 @@ class BasicPrinter(object):
         """
         Method for formatting the output depending on the type of object
         and output.
-        
+
         :param obj: A object to be printed. Must match one of the types defined in formatObj
 
         """
@@ -233,29 +238,29 @@ class TxTPrinter(BasicPrinter):
     Printer class to handle the printing of one single text output
     """
     def __init__(self, output = 'stdout', filename = None):
-        BasicPrinter.__init__(self, output, filename)        
+        BasicPrinter.__init__(self, output, filename)
         self.name = "log"
         self.printtimespent = False
         self.printingOrder = [OutputStatus,ExpResultList,TopologyList,
                              TheoryPredictionList,Uncovered]
-        self.toPrint = [None]*len(self.printingOrder)        
-        
+        self.toPrint = [None]*len(self.printingOrder)
+
     def setOutPutFile(self,filename,overwrite=True,silent=False):
         """
         Set the basename for the text printer. The output filename will be
         filename.log.
-        
+
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
         :param silent: dont comment removing old files
-        """        
-        
-        self.filename = filename +'.' + self.name    
+        """
+
+        self.filename = filename +'.' + self.name
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
-            
+
     def _formatDoc(self,obj):
 
         return False
@@ -271,7 +276,7 @@ class TxTPrinter(BasicPrinter):
         output += "Input status: " + str(obj.filestatus) + "\n"
         # hidden feature, printtimespent, turn on in ini file, e.g.
         # [summary-printer] printtimespent = True
-        if self.printtimespent: 
+        if self.printtimespent:
             output += "Time spent: %.2fs\n" % ( time.time() - self.time )
         output += "Decomposition output status: " + str(obj.status) + " "
         output += obj.statusStrings[obj.status] + "\n"
@@ -340,7 +345,7 @@ class TxTPrinter(BasicPrinter):
         output += "\t\t Particles in element: " + str(obj.evenParticles)
         output += "\n"
         output += "\t\t Final states in element: " + str(obj.getFinalStates())
-        output += "\n"        
+        output += "\n"
         output += "\t\t The element masses are \n"
         for i, mass in enumerate(obj.mass):
             output += "\t\t Branch %i: " % i + str(mass) + "\n"
@@ -359,20 +364,20 @@ class TxTPrinter(BasicPrinter):
 
         :param obj: A ExpResultList object to be printed.
         """
-        
+
         if not hasattr(self,"printdatabase") or not self.printdatabase:
             return None
 
         output = ""
-        
+
         output += "   ======================================================= \n"
         output += " || \t \t\t\t\t\t\t || \n"
         output += " || \t \t Selected Experimental Results \t \t ||\n"
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
-        
 
-        for expRes in obj.expResultList:    
+
+        for expRes in obj.expResultList:
             output += self._formatExpResult(expRes)
 
         return output+"\n"
@@ -410,14 +415,14 @@ class TxTPrinter(BasicPrinter):
                 output += "\t    " + str(el) + "\n"
 
         return output
-    
+
 
     def _formatTheoryPredictionList(self, obj):
         """
         Format data for a TheoryPredictionList object.
 
         :param obj: A TheoryPredictionList object to be printed.
-        """ 
+        """
         output = ""
         output += "   ======================================================= \n"
         output += " || \t \t\t\t\t\t\t || \n"
@@ -425,8 +430,8 @@ class TxTPrinter(BasicPrinter):
         output += " || \t Experimental Constraints \t\t \t ||\n"
         output += " || \t \t\t\t\t\t\t || \n"
         output += "   ======================================================= \n"
-                
-        
+
+
         for theoryPrediction in obj._theoryPredictions:
             expRes = theoryPrediction.expResult
             dataId = theoryPrediction.dataId()
@@ -479,7 +484,7 @@ class TxTPrinter(BasicPrinter):
     def _formatUncovered(self, obj):
         """
         Format all uncovered data.
-        
+
         :param obj: Uncovered object to be printed.
         """
 
@@ -514,7 +519,7 @@ class TxTPrinter(BasicPrinter):
                     output += "Contributing elements %s\n" % str(contributing)
             output += "================================================================================\n"      
         return output
-                      
+
 class SummaryPrinter(TxTPrinter):
     """
     Printer class to handle the printing of one single summary output.
@@ -534,8 +539,8 @@ class SummaryPrinter(TxTPrinter):
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
         :param silent: dont comment removing old files
-        """        
-        
+        """
+
         self.filename = filename +'.smodels'
         if overwrite and os.path.isfile(self.filename):
             if not silent:
@@ -549,7 +554,7 @@ class SummaryPrinter(TxTPrinter):
         :param obj: A TheoryPredictionList object to be printed.
         """
         obj.sortTheoryPredictions()
-        if hasattr(self,"expandedsummary") and not self.expandedsummary:    
+        if hasattr(self,"expandedsummary") and not self.expandedsummary:
             theoPredictions = [obj._theoryPredictions[0]]
         else:
             theoPredictions = obj._theoryPredictions
@@ -583,7 +588,7 @@ class SummaryPrinter(TxTPrinter):
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
             output += " Txnames:  " + txnameStr + "\n"
             if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
-                output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)            
+                output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)
 
             if not (theoPred is obj[-1]):
                 output += 80 * "-"+ "\n"
@@ -593,7 +598,7 @@ class SummaryPrinter(TxTPrinter):
         output += "The highest r value is = " + str(max(rvalues)) + "\n"
 
         return output
-            
+
 class PyPrinter(BasicPrinter):
     """
     Printer class to handle the printing of one single pythonic output
@@ -604,7 +609,7 @@ class PyPrinter(BasicPrinter):
         self.printtimespent = False
         self.printingOrder = [OutputStatus,TopologyList,TheoryPredictionList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
-        
+
     def setOutPutFile(self,filename,overwrite=True,silent=False):
         """
         Set the basename for the text printer. The output filename will be
@@ -612,8 +617,8 @@ class PyPrinter(BasicPrinter):
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
         :param silent: dont comment removing old files
-        """        
-        
+        """
+
         self.filename = filename +'.py'
         if overwrite and os.path.isfile(self.filename):
             if not silent:
@@ -625,22 +630,22 @@ class PyPrinter(BasicPrinter):
         Write the python dictionaries generated by the object formatting
         to the defined output
         """
-        
+
         outputDict = {}
         for obj in self.toPrint:
             if obj is None: continue
-            output = self._formatObj(obj)                
+            output = self._formatObj(obj)
             if not output: continue  #Skip empty output
             outputDict.update(output)
-                
-        output = 'smodelsOutput = '+str(outputDict)      
+
+        output = 'smodelsOutput = '+str(outputDict)
         if self.output == 'stdout':
             sys.stdout.write(output)
         elif self.output == 'file':
             if not self.filename:
                 logger.error('Filename not defined for printer')
                 return False
-            with open(self.filename, "a") as outfile:                
+            with open(self.filename, "a") as outfile:
                 outfile.write(output)
                 outfile.close()
 
@@ -655,7 +660,7 @@ class PyPrinter(BasicPrinter):
 
         :param obj: A TopologyList object to be printed.
         """
-                
+
         if not hasattr(self,'addelementlist') or not self.addelementlist:
             return None
 
@@ -665,8 +670,8 @@ class PyPrinter(BasicPrinter):
             for el in topo.elementList:
                 thisEl = self._formatElement(el)
                 if thisEl: elements.append(thisEl)
-                
-        
+
+
         return {"Element": elements}
 
     def _formatElement(self, obj):
@@ -708,7 +713,7 @@ class PyPrinter(BasicPrinter):
             try:
                 infoDict[key] = eval(val)
             except (NameError,TypeError):
-                infoDict[key] = val        
+                infoDict[key] = val
         infoDict['file status'] = obj.filestatus
         infoDict['decomposition status'] = obj.status
         infoDict['warnings'] = obj.warnings
@@ -729,22 +734,17 @@ class PyPrinter(BasicPrinter):
         """
         obj.sortTheoryPredictions()
         ExptRes = []
-        for theoryPrediction in obj._theoryPredictions:           
+        for theoryPrediction in obj._theoryPredictions:
             expResult = theoryPrediction.expResult
             expID = expResult.globalInfo.id
             datasetID = theoryPrediction.dataId()
             dataType = theoryPrediction.dataType()
             ul = theoryPrediction.getUpperLimit()
             ulExpected = theoryPrediction.getUpperLimit(expected = True)
-            #Compute non-rescaled upper limit (equal to ul for EM results):
-            ulOriginal = theoryPrediction.dataset.getUpperLimitFor(element=theoryPrediction.avgElement.mass,
-                                                                txnames=theoryPrediction.txnames)
             if isinstance(ul,unum.Unum):
                 ul = ul.asNumber(fb)
             if isinstance(ulExpected,unum.Unum):
                 ulExpected = ulExpected.asNumber(fb)
-            if isinstance(ulOriginal,unum.Unum):
-                ulOriginal = ulOriginal.asNumber(fb)
 
             value = theoryPrediction.xsection.value.asNumber(fb)
             txnamesDict = {}
@@ -752,18 +752,62 @@ class PyPrinter(BasicPrinter):
                 if not el.txname.txName in txnamesDict:
                     txnamesDict[el.txname.txName] = el.weight[0].value.asNumber(fb)
                 else:
-                    txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(fb)            
+                    txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(fb)
             maxconds = theoryPrediction.getmaxCondition()
-            mass = theoryPrediction.mass
-            if mass:
-                mass = [[round(m.asNumber(GeV),2) for m in mbr] for mbr in mass]
+            mass = np.array(theoryPrediction.mass)
+            if theoryPrediction.mass  == None:
+                mass = None
+
+            #Add width information to the mass array:
+            if not hasattr(theoryPrediction, "totalwidth") or theoryPrediction.totalwidth is None and mass is not None:
+                totalwidth = (np.full(mass[:,:-1].shape,np.inf*GeV),np.full(mass[:,-1:].shape,0.*GeV))
+                totalwidth = np.hstack(totalwidth)
+                #massWidth = np.dstack((mass,totalwidth)).tolist()
+                #mass = massWidth
+            else:
+                totalwidth = theoryPrediction.totalwidth
+                finiteWidths = False
+                if totalwidth != None:
+                    for br in totalwidth:
+                        for m in br:
+                            if m.asNumber(GeV)>1e-26 and m.asNumber(GeV)<1e-1:
+                                finiteWidths = True
+                                break
+
+                #if finiteWidths:
+                #    massWidth = []
+                #    for mbr,wbr in zip(mass,totalwidth):
+                #        tmp = [ (x,y) for x,y in zip(mbr,wbr) ]
+                #        massWidth.append ( tmp )
+                #    mass = massWidth
+
+            def _convWidth ( x ):
+                if type(x) == type(GeV):
+                    x=float(x.asNumber(GeV))
+                if x == float("inf"):
+                    x="prompt"
+                if x == 0.:
+                    x="stable"
+                return x
+            widths = None
+            if totalwidth != None:
+                widths = [ [ _convWidth(x) for x in br ] for br in totalwidth ]
+
+            def roundme ( x ):
+                if type(x)==tuple:
+                    return ( round(x[0].asNumber(GeV),2), x[1].asNumber(GeV) )
+                return round(x.asNumber(GeV),2)
+
+            if mass is not None:
+                mass = [[roundme(m) for m in mbr] for mbr in mass]
             else:
                 mass = None
+
             sqrts = expResult.globalInfo.sqrts
-            
+
             r = theoryPrediction.getRValue(expected=False)
             r_expected = theoryPrediction.getRValue(expected=True)
-            
+
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': value,
                         'upper limit (fb)': ul,
                         'expected upper limit (fb)': ulExpected,
@@ -774,16 +818,16 @@ class PyPrinter(BasicPrinter):
                         'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
                         'lumi (fb-1)' : (expResult.globalInfo.lumi*fb).asNumber(),
                         'dataType' : dataType,
-                        'r' : r, 'r_expected' : r_expected}  
+                        'r' : r, 'r_expected' : r_expected}
+            if widths:
+                resDict["Width (GeV)"] = widths
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
-            if hasattr(self,"addoriginalul") and self.addoriginalul:
-                resDict['original upper limit (fb)'] =  ulOriginal
             if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
                 resDict['chi2'] = theoryPrediction.chi2
-                resDict['likelihood'] = theoryPrediction.likelihood                
+                resDict['likelihood'] = theoryPrediction.likelihood
             ExptRes.append(resDict)
-       
+
 
         return {'ExptRes' : ExptRes}
 
@@ -863,7 +907,7 @@ class XmlPrinter(PyPrinter):
         self.printingOrder = [OutputStatus,TopologyList,TheoryPredictionList,Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
-        
+
     def setOutPutFile(self,filename,overwrite=True,silent=False):
         """
         Set the basename for the text printer. The output filename will be
@@ -871,13 +915,13 @@ class XmlPrinter(PyPrinter):
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
         :param silent: dont comment removing old files
-        """        
-        
+        """
+
         self.filename = filename +'.xml'
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
-            os.remove(self.filename)     
+            os.remove(self.filename)
 
 
     def convertToElement(self,pyObj,parent,tag=""):
@@ -915,17 +959,17 @@ class XmlPrinter(PyPrinter):
         outputDict = {}
         for obj in self.toPrint:
             if obj is None: continue
-            output = self._formatObj(obj)  # Convert to python dictionaries                        
-            if not output: continue  #Skip empty output            
+            output = self._formatObj(obj)  # Convert to python dictionaries
+            if not output: continue  #Skip empty output
             outputDict.update(output)
 
         root = None
         #Convert from python dictionaries to xml:
-        if outputDict:            
+        if outputDict:
             root = ElementTree.Element('smodelsOutput')
             self.convertToElement(outputDict,root)
             rough_xml = ElementTree.tostring(root, 'utf-8')
-            nice_xml = minidom.parseString(rough_xml).toprettyxml(indent="    ")                        
+            nice_xml = minidom.parseString(rough_xml).toprettyxml(indent="    ")
             if self.output == 'stdout':
                 sys.stdout.write(nice_xml)
             elif self.output == 'file':
@@ -969,7 +1013,7 @@ class SLHAPrinter(TxTPrinter):
             os.remove(self.filename)
 
     def _formatOutputStatus(self, obj):
-        
+
         smodelsversion = obj.smodelsVersion
         if not smodelsversion.startswith("v"): smodelsversion = "v" + smodelsversion
         output = "BLOCK SModelS_Settings\n"
@@ -1043,4 +1087,53 @@ class SLHAPrinter(TxTPrinter):
             output += "\n %d 1 %-30.3E      # %s" %(i,group.getTotalXSec(),"Total cross-section (fb)")
         output += "\n"
         return output
-            
+
+
+class PicklePrinter(BasicPrinter):
+    """
+    Printer class to handle the printing into a pickle file
+    """
+    def __init__(self, output = 'file', filename = None):
+        BasicPrinter.__init__(self, output, filename)
+        self.name = "pickle"
+        self.printtimespent = False
+        self.printingOrder = [OutputStatus,ExpResultList,TopologyList,
+                             TheoryPredictionList,Uncovered]
+        self.toPrint = [None]*len(self.printingOrder)
+
+    def setOutPutFile(self,filename,overwrite=True,silent=False):
+        """
+        Set the basename for the text printer. The output filename will be
+        filename.pcl
+        :param filename: Base filename
+        :param overwrite: If True and the file already exists, it will be removed.
+        :param silent: dont comment removing old files
+        """
+
+        self.filename = filename
+        if not filename.endswith(".pcl"):
+            self.filename = filename + '.pcl'
+        if overwrite and os.path.isfile(self.filename):
+            if not silent:
+                logger.warning("Removing old output file " + self.filename)
+            os.remove(self.filename)
+
+    def flush(self):
+        """
+        Dump the python objects into the "sink"
+        """
+        if self.output != "file":
+            logger.error ( "pickle printer accepts only files as data sinks (%s given)" % \
+                           self.output )
+            return False
+        if not self.filename:
+            logger.error('Filename not defined for printer')
+            return False
+
+        import pickle
+        # self.toPrint = [None]*len(self.printingOrder)
+        with self.openOutFile(self.filename, "ab") as outfile:
+            for i in self.toPrint:
+                # print ( "adding %20s (size %d)" % ( str(i)[:20], deep_getsizeof(i) ) )
+                pickle.dump ( i, outfile )
+        outfile.close()

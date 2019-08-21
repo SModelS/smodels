@@ -8,7 +8,7 @@
 
 """
 
-import sys,os,importlib
+import sys,os,importlib,subprocess
 sys.path.insert(0,"../")
 import unittest
 from smodels.theory import decomposer
@@ -80,6 +80,8 @@ def compareSLHA(slhadefault,slhanew):
 
 
 class RunPrinterTest(unittest.TestCase):
+    definingRun = False ## meant only to adapt to changes in output format
+    ## use with super great care!!
 
     def runPrinterMain(self, slhafile, mprinter,addTopList=False):
         """
@@ -215,6 +217,14 @@ class RunPrinterTest(unittest.TestCase):
         slhafile = "./testFiles/slha/simplyGluino.slha"
         mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)
+        
+        if self.definingRun:
+            from smodels.tools.smodelsLogging import logger
+            logger.error ( "This is a definition run! Know what youre doing!" )
+            default = "simplyGluino_default.py"
+            outputfile = './unitTestOutput/printer_output_simple.py'
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
+            a = subprocess.getoutput ( cmd )
 
         try:
             smodelsOutput = importlib.import_module( "unitTestOutput.printer_output_simple" ).smodelsOutput

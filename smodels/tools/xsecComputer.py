@@ -37,6 +37,8 @@ class XSecComputer:
         :param pythiaVersion: pythia6 or pythia8 (integer)
         """
         self.maxOrder = self._checkMaxOrder ( maxOrder )
+        self.countNoXSecs = 0
+        self.countNoNLOXSecs = 0
         if nevents < 1:
             logger.error ( "Supplied nevents < 1" )
             sys.exit()
@@ -45,7 +47,7 @@ class XSecComputer:
             logger.error ( "Unknown pythia version %s. Allowed values: 6, 8" % \
                             ( pythiaVersion ) )
             sys.exit()
-        self.pythiaVersion = pythiaVersion 
+        self.pythiaVersion = pythiaVersion
 
     def _checkSLHA ( self, slhafile ):
         if not os.path.isfile(slhafile):
@@ -53,7 +55,7 @@ class XSecComputer:
             raise SModelSError()
         try:
             f=pyslha.readSLHAFile(slhafile)
-        except pyslha.ParseError as e:
+        except (pyslha.ParseError,ValueError) as e:
             logger.error("File cannot be parsed as SLHA file: %s" % e )
             raise SModelSError()
 
@@ -111,28 +113,48 @@ class XSecComputer:
                     xsecs.delete(xsec)
                     break
         if self.maxOrder > 0 and len(xsecs) == 0:
-            logger.warning("No NLO or NLL cross sections available.")
+            self.countNoNLOXSecs += 1
+            if self.countNoNLOXSecs < 3:
+                logger.warning("No NLO or NLL cross sections available.")
+            if self.countNoNLOXSecs == 3:
+                logger.warning("No NLO or NLL cross sections available (will quench such warnings in future).")
 
         #for i in xsecs:
         #    logger.error ( "xsec=%s (%s)" % (i,type(i)) )
         return xsecs
 
-    def compute ( self, sqrts, slhafile,  lhefile=None, unlink=True, loFromSlha=None, 
-                  pythiacard=None ):
+    def applyMultipliers ( self, xsecs, ssmultipliers ):
+        """
+        apply the given multipliers to the cross sections """
+        for i in ssmultipliers.keys():
+            if i < 1000000 or i > 3000000:
+                logger.warning ( "signal strength multiplier for pid %d supplied. what does that mean?" % i ) 
+        for x in xsecs:
+            for pid in x.pid:
+                if abs(pid) in ssmultipliers.keys():
+                    x.value = x.value * ssmultipliers[abs(pid)]
+        return xsecs
+
+    def compute ( self, sqrts, slhafile,  lhefile=None, unlink=True, loFromSlha=None,
+                  pythiacard=None, ssmultipliers=None ):
         """
         Run pythia and compute SUSY cross sections for the input SLHA file.
 
         :param sqrts: sqrt{s} to run Pythia, given as a unum (e.g. 7.*TeV)
         :param slhafile: SLHA file
         :param lhefile: LHE file. If None, do not write pythia output to file. If
-                        file does not exist, write pythia output to this file name. If
-                        file exists, read LO xsecs from this file (does not run pythia).
+                     file does not exist, write pythia output to this file name. If
+                     file exists, read LO xsecs from this file (does not run pythia).
         :param unlink: Clean up temp directory after running pythia
-
-        :param loFromSlha: If True, uses the LO xsecs from the SLHA file to compute the
-                           higher order xsecs
-        :param pythiaCard: Optional path to pythia.card. If None, uses /etc/pythia.card
-
+        :param loFromSlha: If True, uses the LO xsecs from the SLHA file to
+                           compute the higher order xsecs
+        :param pythiaCard: Optional path to pythia.card. If None, uses
+                           smodels/etc/pythia.card
+        :param ssmultipliers: optionally supply signal strengh multipliers,
+                given as dictionary of the pids as keys and
+                multipliers as values, e.g { 1000001:1.1 }, production of
+                pairs then corresponds to the multiplication of two
+                numbers.
         :returns: XSectionList object
 
         """
@@ -153,7 +175,8 @@ class XSecComputer:
             for xsec in xsecsInfile:
                 if xsec.info.order == 0 and xsec.info.sqrts == sqrts:
                     loXsecs.add(xsec)
-                    
+            if ssmultipliers != None:
+                logger.warning ( "supplied signal strength multipliers, but LO xsecs are taken from file. Will not apply them" )
         else:
             logger.info("get LO cross sections from pythia%d" % self.pythiaVersion )
             tool = toolBox.ToolBox().get("pythia%d" % self.pythiaVersion )
@@ -161,6 +184,8 @@ class XSecComputer:
             tool.sqrts = sqrts / TeV
             tool.pythiacard = pythiacard
             loXsecs = tool.run( slhafile, lhefile, unlink=unlink )
+            if ssmultipliers != None:
+                loXsecs = self.applyMultipliers ( loXsecs, ssmultipliers )
         self.loXsecs = loXsecs
         self.loXsecs.sort()
         self.xsecs = self.addHigherOrders ( sqrts, slhafile )
@@ -171,11 +196,21 @@ class XSecComputer:
         return self.xsecs
 
     def computeForOneFile ( self, sqrtses, inputFile, unlink,
-                            lOfromSLHA, tofile, pythiacard=None ):
+                            lOfromSLHA, tofile, pythiacard=None,
+                            ssmultipliers = None ):
         """
         compute the cross sections for one file.
-        :param sqrtses: list of sqrt{s} tu run pythia, as a unum (e.g. 7*TeV)
-            
+        :param sqrtses: list of sqrt{s} tu run pythia, as a unum (e.g. [7*TeV])
+        :param inputFile: input SLHA file to compute xsecs for
+        :param unlink: if False, keep temporary files
+        :param tofile: write results to file
+        :param lofromSLHA: try to obtain LO xsecs from SLHA file itself
+        :param ssmultipliers: optionally supply signal strengh multipliers,
+                given as dictionary of the pids as keys and
+                multipliers as values, e.g { 1000001:1.1 }, production of
+                pairs then corresponds to the multiplication of two
+                numbers.
+        :param pythiacard: optionally supply your own runcard
         """
         if tofile:
             logger.info("Computing SLHA cross section from %s, adding to "
@@ -183,9 +218,9 @@ class XSecComputer:
             complain = True ## dont complain about already existing xsecs,
             # if we were the ones writing them
             for s in sqrtses:
-                ss = s*TeV 
-                self.compute( ss, inputFile, unlink= unlink, 
-                              loFromSlha= lOfromSLHA, pythiacard=pythiacard )
+                ss = s*TeV
+                self.compute( ss, inputFile, unlink= unlink, loFromSlha= lOfromSLHA,
+                              pythiacard=pythiacard, ssmultipliers = ssmultipliers )
                 if tofile == "all":
                     comment = str(self.nevents)+" evts, pythia%d [pb]"%\
                                               self.pythiaVersion
@@ -195,44 +230,72 @@ class XSecComputer:
                                               self.pythiaVersion
                 self.addXSecToFile( self.xsecs, inputFile, comment, complain)
                 complain = False
+            self.addMultipliersToFile ( ssmultipliers, inputFile )
         else:
             logger.info("Computing SLHA cross section from %s." % inputFile )
             print()
             print( "     Cross sections:" )
             print( "=======================" )
             for s in sqrtses:
-                ss = s*TeV 
-                self.compute( ss, inputFile, unlink=unlink, loFromSlha=lOfromSLHA )
-                for xsec in self.xsecs: 
+                ss = s*TeV
+                self.compute( ss, inputFile, unlink=unlink, loFromSlha=lOfromSLHA,
+                              ssmultipliers = ssmultipliers )
+                for xsec in self.xsecs:
                     print( "%s %20s:  %.3e pb" % \
                             ( xsec.info.label,xsec.pid,xsec.value/pb ) )
             print()
 
     def computeForBunch ( self, sqrtses, inputFiles, unlink,
-                            lOfromSLHA, tofile, pythiacard=None ):
+                          lOfromSLHA, tofile, pythiacard=None,
+                          ssmultipliers=None   ):
         """ compute xsecs for a bunch of slha files """
-        # computer = XSecComputer( order, nevents, pythiaVersion )
         for inputFile in inputFiles:
             logger.debug ( "computing xsec for %s" % inputFile )
-            self.computeForOneFile ( sqrtses, inputFile, unlink, lOfromSLHA, 
-                                     tofile, pythiacard=pythiacard )
+            self.computeForOneFile ( sqrtses, inputFile, unlink, lOfromSLHA,
+                      tofile, pythiacard=pythiacard, ssmultipliers = ssmultipliers )
+
+    def addMultipliersToFile ( self, ssmultipliers, slhaFile ):
+        """ add the signal strength multipliers to the SLHA file """
+        if ssmultipliers in [ None, {} ]:
+            return
+        if not os.path.isfile(slhaFile ):
+            logger.error("SLHA file %s not found." % slhaFile )
+            raise SModelSError()
+        r = open(slhaFile, 'r' )
+        lines = r.readlines()
+        for line in lines:
+            if "Signal strength multipliers" in line:
+                logger.warning ( "Signal strength multipliers have alread been applied?" )
+        r.close()
+        outfile = open(slhaFile, 'a')
+        outfile.write ( "\n# Signal strength multipliers: " )
+        tokens = []
+        for k,v in ssmultipliers.items():
+            tokens.append ( "%d:%.4g" % ( k, v ) )
+        outfile.write ( ", ".join ( tokens ) )
+        outfile.write ( "\n" )
+        outfile.close()
 
     def addXSecToFile( self, xsecs, slhafile, comment=None, complain=True):
         """
         Write cross sections to an SLHA file.
-        
+
         :param xsecs: a XSectionList object containing the cross sections
         :param slhafile: target file for writing the cross sections in SLHA format
         :param comment: optional comment to be added to each cross section block
         :param complain: complain if there are already cross sections in file
-        
+
         """
-        
+
         if not os.path.isfile(slhafile):
             logger.error("SLHA file not found.")
             raise SModelSError()
         if len(xsecs) == 0:
-            logger.warning("No cross sections available.")
+            self.countNoXSecs+=1
+            if self.countNoXSecs < 3:
+                logger.warning("No cross sections available.")
+            if self.countNoXSecs == 3:
+                logger.warning("No cross sections available (will quench such warnings in future).")
             return False
         # Check if file already contain cross section blocks
         xSectionList = crossSection.getXsecFromSLHAFile(slhafile)
@@ -264,7 +327,7 @@ class XSecComputer:
                        (default = 2212,2212)
 
         :param comment: is added at the end of the header as a comment
-        :param xsecUnit: unit of cross sections to be written (default is pb). 
+        :param xsecUnit: unit of cross sections to be written (default is pb).
                          Must be a Unum unit.
 
         """
@@ -292,6 +355,15 @@ class XSecComputer:
 
 class ArgsStandardizer:
     """ simple class to collect all argument manipulators """
+
+    def getSSMultipliers ( self, multipliers ):
+        if type ( multipliers ) == str:
+            if multipliers in [ "", "None", "none", "no", "{}" ]:
+                return None
+            if multipliers.count("{") != 1 or multipliers.count("}") != 1:
+                logger.error ( "need to pass signal strengh multipliers as dictionary with pids as keys" )
+            return eval(multipliers)
+        return multipliers
 
     def getInputFiles ( self, args ):
         """ geth the names of the slha files to run over """
@@ -393,6 +465,9 @@ def main(args):
     inputFiles = canonizer.getInputFiles ( args )
     ncpus = canonizer.checkNCPUs ( args.ncpus, inputFiles )
     pythiaVersion = canonizer.getPythiaVersion ( args )
+    ssmultipliers = None
+    if hasattr ( args, "ssmultipliers" ):
+        ssmultipliers = canonizer.getSSMultipliers ( args.ssmultipliers )
 
     pythiacard = None
     if hasattr(args, 'pythiacard'):
@@ -403,16 +478,17 @@ def main(args):
         pid = os.fork()
         chunk = inputFiles [ i::ncpus ]
         if pid < 0:
-            logger.error ( "fork did not succeed! Pid=%d" % pid ) 
+            logger.error ( "fork did not succeed! Pid=%d" % pid )
             sys.exit()
         if pid == 0:
-            logger.debug ( "chunk #%d: pid %d (parent %d)." % 
+            logger.debug ( "chunk #%d: pid %d (parent %d)." %
                        ( i, os.getpid(), os.getppid() ) )
             logger.debug ( " `-> %s" % " ".join ( chunk ) )
             computer = XSecComputer( order, args.nevents, pythiaVersion )
             toFile = canonizer.writeToFile ( args )
             computer.computeForBunch (  sqrtses, chunk, not args.keep,
-                                args.LOfromSLHA, toFile, pythiacard=pythiacard )
+                          args.LOfromSLHA, toFile, pythiacard=pythiacard, \
+                        ssmultipliers = ssmultipliers )
             os._exit ( 0 )
         if pid > 0:
             children.append ( pid )

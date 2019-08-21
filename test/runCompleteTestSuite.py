@@ -14,7 +14,6 @@ import sys
 sys.path.insert(0,"../")
 from smodels.tools.colors import colors
 colors.on = True
-import IPython
 
 v=sys.version_info
 if v[0] > 2 or ( v[0]==2 and v[1] > 6 ):

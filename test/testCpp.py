@@ -11,6 +11,7 @@
 import sys
 sys.path.insert(0,"../")
 from smodels.tools.smodelsLogging import setLogLevel
+from databaseLoader import database
 setLogLevel ( "error" )
 
 import unittest
@@ -35,7 +36,22 @@ class CppTest(unittest.TestCase):
         f.write ( a )
         f.close()
 
+    def createIniFile(self):
+        f=open("../cpp/template.ini","r")
+        lines=f.readlines()
+        f.close()
+        f=open("../cpp/parameters.ini","w" )
+        dbName = database.url
+        if dbName.startswith("./"):
+            dbName = "../test/%s" % dbName[2:]
+        if dbName.startswith("database"):
+            dbName = "../test/%s" % dbName
+        for line in lines:
+            f.write ( line.replace("@@path@@",dbName ) )
+        f.close()
+
     def runExample(self):
+        self.createIniFile()
         """ now run the example """
         cmd = "cd ../cpp; ./run"
         l = CMD.getoutput(cmd)
@@ -70,7 +86,10 @@ class CppTest(unittest.TestCase):
                 except (SyntaxError,NameError):
                     pass
                 if isinstance(yv,float) and isinstance(xv,float):
-                    self.assertAlmostEqual(xv, yv, 5)
+                    dlta = abs ( yv -xv ) / (yv+xv)
+                    if dlta > .1:
+                        print ( "error, delta is", dlta )
+                    self.assertTrue ( dlta < .1 or abs(xv-yv)<1e-6 )
                 else:
                     self.assertEqual(xv, yv)
 

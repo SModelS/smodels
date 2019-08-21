@@ -40,6 +40,17 @@ class AverageElement(Element):
             self.weight = self.elements[0].weight.copy()
             for el in self.elements[1:]:
                 self.weight += el.weight
+                
+    def __str__(self):
+        """
+        Simply returns "averageElement", since the element
+        has no well defined branches/final states (in general).
+        
+        :returns: averageElement (string)    
+        """
+
+        return "averageElement"
+                
 
     def __cmp__(self,other):
         """
@@ -81,7 +92,7 @@ class AverageElement(Element):
         """
 
         if not attr in self.__dict__:
-            raise AttributeError
+            raise AttributeError ( "%s not in AverageElement" % attr )
         else:
             return self.__dict__[attr]
 

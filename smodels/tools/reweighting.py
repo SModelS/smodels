@@ -21,13 +21,16 @@ def defaultEffReweight(element,minWeight=1e-10):
     decays to all intermediate BSM particles and to a long-lived decay (outside the detector)
     to the final BSM state.
 
-    :param element: Element object
+    :param element: Element object or nested list of widths
     :param minWeight: Lower cut for the reweighting factor. Any value below this will be taken to be zero.
 
     :return: Reweight factor (float)
     """
 
-    elWidths = [ [ x.asNumber(GeV) for x in L ] for L in element.totalwidth ]
+    if isinstance(element,list):
+        elWidths = [[w.asNumber(GeV) for w in br] for br in element]
+    else:
+        elWidths = [ [ x.asNumber(GeV) for x in L ] for L in element.totalwidth ]
     elFraction = 1.
     for branchWidths in elWidths:
         branchFraction = 1.

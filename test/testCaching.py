@@ -29,7 +29,7 @@ class CachingTest(unittest.TestCase):
         for masses in massesvec:
             txname.txnameData.getValueFor( [ masses, masses ])
         #    print masses,result,Cache.size()
-        self.assertEquals ( Cache.size(), 7 )
+        self.assertEqual ( Cache.size(), 7 )
         m = [ [ 270*GeV, 100*GeV], [ 270*GeV, 100*GeV ] ]
         result=txname.txnameData.getValueFor(m)
         self.assertAlmostEqual(result.asNumber(fb) , 459.658) 

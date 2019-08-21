@@ -9,7 +9,8 @@
  
 """
  
-import sys,os,imp
+import sys,os
+import importlib
 sys.path.insert(0,"../")
 import unittest
 from unitTestHelpers import equalObjs, runMain
@@ -22,9 +23,12 @@ class CombinedTest(unittest.TestCase):
         Use with care! """
         filename = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(filename,inifile="testParameters_agg.ini", suppressStdout=True )
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile, 
-                                            ('.py', 'rb', imp.PY_SOURCE) )
+        #with open( outputfile, 'rb') as fp: ## imports file with dots in name
+        #    output_module = imp.load_module("output",fp,outputfile, 
+        #                                    ('.py', 'rb', imp.PY_SOURCE) )
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
         smodelsOutput = output_module.smodelsOutput
         f=open("gluino_squarks_default_agg.py","w")
         f.write ( "smodelsOutputDefault = %s\n" % smodelsOutput )

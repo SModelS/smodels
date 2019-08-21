@@ -51,7 +51,8 @@ class IntegrationTest(unittest.TestCase):
             self.assertAlmostEqual( predval.asNumber(fb), defpredval.asNumber(fb), places=4 )
             pred.computeStatistics( marginalize=True, deltas_rel=0. )
             if pred.chi2 != self.predchi2()[expID]:
-                self.assertAlmostEqual(pred.chi2/self.predchi2()[expID], 1.0, 1 )
+                diff = abs ( pred.chi2 - self.predchi2()[expID] ) / self.predchi2()[expID]
+                self.assertTrue ( diff < .1 )
 
     def testIntegration(self):
         

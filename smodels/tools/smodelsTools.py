@@ -28,7 +28,7 @@ def main():
         help="sqrt(s) TeV. Can supply more than one value (as a space separated list). Default is both 8 and 13.",
         type=int, default=[])
     xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
-        help="number of events to be simulated.")
+        help="number of events to be simulated [10000].")
     xseccomputer.add_argument('-v', '--verbosity', type=str, default="info",
         help="Verbosity (debug, info, warning, error)")
     xseccomputer.add_argument('-c', '--ncpus', type=int, default=-1,
@@ -51,6 +51,8 @@ def main():
         help="compute at the NLO level (default is LO)")
     xseccomputer.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
     xseccomputer.add_argument('-O', '--LOfromSLHA', help="use LO cross sections from file to compute the NLO or NLL cross sections", action='store_true')
+    xseccomputer.add_argument('--ssmultipliers', type=str, default=None,
+        help="Signal strength multipliers, provided as dictionary of pids")
     xseccomputer.add_argument('-f', '--filename', required=True,
             help="SLHA file to compute cross sections for. "
             "If a directory is given, compute cross sections for all files in directory." )

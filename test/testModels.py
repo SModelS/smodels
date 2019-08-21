@@ -9,7 +9,8 @@
  
 """
  
-import sys,os,imp
+import sys,os
+import importlib
 sys.path.insert(0,"../")
 import unittest
 from unitTestHelpers import equalObjs, runMain
@@ -17,20 +18,29 @@ from smodels.tools.smodelsLogging import setLogLevel
 from smodels.tools import runtime
 from smodels import particlesLoader
 from imp import reload
+import subprocess
 
 setLogLevel('debug')
  
  
 class ModelsTest(unittest.TestCase):
+    definingRun = False ## meant only to adapt to changes in output format
+    ## use with super great care!!
   
     def testRuntimeImport(self):
         filename = "./testFiles/slha/idm_example.slha"
         runtime.modelFile = 'idm'
         reload(particlesLoader)
         outputfile = runMain(filename,inifile='testParameters_noModel.ini',suppressStdout=True)
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput
+        if self.definingRun:
+            logger.error ( "This is a definition run! Know what youre doing!" )
+            default = "idm_example_defaultB.py"
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
+            a = subprocess.getoutput ( cmd )
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
         from idm_example_defaultB import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec', 
                             'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
@@ -47,9 +57,15 @@ class ModelsTest(unittest.TestCase):
     def testParameterFile(self):
         filename = "./testFiles/slha/idm_example.slha"
         outputfile = runMain(filename,inifile='testParameters_idm.ini',suppressStdout=True)        
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput
+        if self.definingRun:
+            logger.error ( "This is a definition run! Know what youre doing!" )
+            default = "idm_example_default.py"
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
+            a = subprocess.getoutput ( cmd )
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
         from idm_example_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec', 
                             'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
@@ -104,9 +120,10 @@ class ModelsTest(unittest.TestCase):
         reload(particlesLoader)
         filename = "./testFiles/slha/idm_example.slha"
         outputfile = runMain(filename,suppressStdout=True)
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput
+        spec = importlib.util.spec_from_file_location( "output", outputfile)
+        output_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(output_module)
+        smodelsOutput = output_module.smodelsOutput
         self.assertTrue(smodelsOutput['OutputStatus']['decomposition status'] < 0)  
         self.removeOutputs(outputfile)
 

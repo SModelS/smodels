@@ -34,7 +34,7 @@ try:
     import cPickle as serializer
 except ImportError as e:
     import pickle as serializer
-    
+
 
 class Database(object):
     """
@@ -61,6 +61,7 @@ class Database(object):
         :param subpickle: produce small pickle files per exp result.
             Should only be used when working on the database.
         """
+        self.url = base
         self.source=""
         self.force_load = force_load
         self.subpickle = subpickle
@@ -260,7 +261,7 @@ class Database(object):
         """
 
         try:
-            cfg = get_ipython().config 
+            cfg = get_ipython().config
             if 'IPKernelApp' in cfg.keys():
                 return True
             else:
@@ -330,9 +331,6 @@ class Database(object):
             dump.close()
         logger.info ( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) )
         logger.debug ( "store as %s" % filename )
-        #with open( filename, "wb" ) as f:
-        #    f.write ( r2.content )
-        #    f.close()
         self.force_load = "pcl"
         return ( "./", "%s" % filename )
 
@@ -364,12 +362,16 @@ class Database(object):
             if not os.path.isfile ( filename ):
                 logger.error ( "Cant find a local copy of the pickle file. Exit." )
                 sys.exit()
-            logger.warning ( "I do however have a local copy of the file. I work with that." )
+            logger.warning ( "I do however have a local copy of the file at %s. I work with that." % filename )
             self.force_load = "pcl"
-            # return ( cDir, filename )
-            # next step: check the timestamps
-            return ( cDir, os.path.basename ( filename ) )
+            return ( cDir, filename )
+            #return ( cDir, os.path.basename ( filename ) )
 
+        stats = os.stat ( filename )
+        if stats.st_size < jsn["size"]-2048:
+            ## size doesnt match (2048 is to allow for slightly different file
+            ## sizes reported by the OS). redownload!
+            return self.fetchFromScratch ( path, store, discard_zeroes )
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!
             return self.fetchFromScratch ( path, store, discard_zeroes )
@@ -377,7 +379,6 @@ class Database(object):
         if not os.path.isfile ( filename ):
             return self.fetchFromScratch ( path, store, discard_zeroes )
         self.force_load = "pcl"
-        # next step: check the timestamps
         return ( "./", filename )
 
     def checkPathName( self, path, discard_zeroes ):
@@ -656,9 +657,9 @@ class Database(object):
                         #Replaced by wildcard-evaluation below (2018-04-06 mat)
                         hits=False
                         for pattern in txnames:
-                            hits = fnmatch.filter ( [ txname.txName ], pattern )
-                            if hits:
-                                continue
+                            hits = fnmatch.filter([ txname.txName ], pattern)
+                            if hits: # one match is enough
+                                break
                         if not hits:
                             continue
 
