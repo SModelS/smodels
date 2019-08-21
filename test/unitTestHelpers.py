@@ -58,7 +58,7 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None, fname=None ):
         for key in obj1:
             if key in ignore: continue
             if not key in obj2:
-                logger.warning("Key ``%s'' missing" %key)
+                logger.warning("Key ``%s'' missing in %s:%s" % (key, where, fname ) )
                 return False
             if not equalObjs(obj1[key],obj2[key],allowedDiff, ignore=ignore, where=key, fname = fname ):
                 return False

@@ -47,7 +47,7 @@ class CombinedTest(unittest.TestCase):
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
-                           ignore=ignoreFields)
+                           ignore=ignoreFields, fname = outputfile )
         if equals != True:
             logger.error ( "%s differs from %s!" % ( "gluino_squarks_default_agg.py", outputfile) ) 
         self.assertTrue(equals)

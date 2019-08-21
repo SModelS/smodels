@@ -198,7 +198,8 @@ class RunPrinterTest(unittest.TestCase):
         smodelsOutput['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                        key=lambda res: res['r'], reverse=True)        
         equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
-                            ignore=ignoreFields, where = "top" )
+                            ignore=ignoreFields, where = "top", 
+                            fname="./unitTestOutput/printer_output.py" )
         try:
             self.assertTrue(equals)
         except AssertionError as e:
@@ -245,7 +246,7 @@ class RunPrinterTest(unittest.TestCase):
         smodelsOutput['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'], 
                        key=lambda res: res['r'], reverse=True)
         equals = equalObjs( smodelsOutput,smodelsOutputDefault,allowedDiff=0.05,
-                            ignore=ignoreFields )
+                            ignore=ignoreFields, fname="./unitTestOutput/printer_output_simple.py" )
         try:
             self.assertTrue(equals)
         except AssertionError as e:

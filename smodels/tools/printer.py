@@ -790,7 +790,7 @@ class PyPrinter(BasicPrinter):
                     x="stable"
                 return x
             widths = None
-            if False: # totalwidth != None: ## FIXME only for backwars comp!!!
+            if totalwidth is not None:
                 widths = [ [ _convWidth(x) for x in br ] for br in totalwidth ]
 
             def roundme ( x ):
@@ -803,7 +803,7 @@ class PyPrinter(BasicPrinter):
             else:
                 mass = None
             if dataType in [ "combined", "efficiencyMap" ]: 
-                ## FIXME only for backwards compatibility
+                ## FIXME do we want it this way?
                 mass = None
 
             sqrts = expResult.globalInfo.sqrts
@@ -822,7 +822,7 @@ class PyPrinter(BasicPrinter):
                         'lumi (fb-1)' : (expResult.globalInfo.lumi*fb).asNumber(),
                         'dataType' : dataType,
                         'r' : r, 'r_expected' : r_expected}
-            if False: # widths: FIXME only for backwards comp!!!
+            if widths: 
                 resDict["Width (GeV)"] = widths
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
