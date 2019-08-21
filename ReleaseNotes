@@ -1,7 +1,6 @@
-Release v2.0.0, Apr 2019
+Release v2.0.0, Sep 2019
 =======================================================
 
-  * Can handle lifetime-dependent maps, i.e. displaced signatures
   * Introduction of Particle class
   * Particles are compared according to their properties
   * Unified treatment of SLHA and LHE input files
