@@ -31,7 +31,7 @@ class IntegrationTest(unittest.TestCase):
 
     def predictions(self):
         return { 'ATLAS-SUSY-2013-02': 572.168935 * fb,
-                 'CMS-SUS-13-012': 1.62375 * fb }
+                 'CMS-SUS-13-012': 1.73810052766 * fb }
 
     def predchi2(self):
         return { 'ATLAS-SUSY-2013-02': None,

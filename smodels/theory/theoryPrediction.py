@@ -13,6 +13,7 @@ from smodels.tools.physicsUnits import TeV, fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
+from smodels.tools.statistics import likelihoodFromLimits, chi2FromLimits
 import itertools
 
 class TheoryPrediction(object):

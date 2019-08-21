@@ -16,7 +16,7 @@ from smodels.installation import installDirectory as iDir
 from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
 from databaseLoader import database ## to make sure the db exists
  
-def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None ):
+def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None, fname=None ):
     """
     Compare two objects.
     The numerical values are compared up to the precision defined by allowedDiff.
@@ -26,13 +26,16 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None ):
     :param allowedDiff: Allowed % difference between two numerical values
     :param ignore: List of keys to be ignored
     :param where: keep track of where we are, for easier debugging.
+    :param fname: the filename of obj1
     :return: True/False
     """
+    if type(fname)==str:
+        fname = fname.replace( os.getcwd(), "." )
     if type(obj1) in [ float, int ] and type ( obj2) in [ float, int ]:
         obj1,obj2=float(obj1),float(obj2)
  
     if type(obj1) != type(obj2):
-        logger.warning("Data types differ (%s,%s)" %(type(obj1),type(obj2)))
+        logger.warning("Data types differ: (%s,%s) <-> (%s,%s) in %s:%s" %(obj1,type(obj1),obj2,type(obj2),where,fname))
         return False
  
     if isinstance(obj1,unum.Unum):
@@ -44,23 +47,20 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None ):
         if obj1 == obj2:
             return True
         diff = 2.*abs(obj1-obj2)/abs(obj1+obj2)
+        if diff > allowedDiff:
+            logger.error ( "values %s and %s differ by %s in %s:%s" % ( obj1, obj2, diff, where, fname) )
         return diff < allowedDiff
     elif isinstance(obj1,str):
+        if obj1 != obj2:
+            logger.error ( "strings ``%s'' and ``%s'' differ in %s:%s" % ( obj1, obj2, where, fname ) )
         return obj1 == obj2
     elif isinstance(obj1,dict):
         for key in obj1:
             if key in ignore: continue
             if not key in obj2:
-                logger.warning("Key %s missing" %key)
+                logger.warning("Key ``%s'' missing" %key)
                 return False
-            if not equalObjs(obj1[key],obj2[key],allowedDiff, ignore=ignore, where=key ):
-                logger.warning('Objects differ in %s:\n   %s\n and\n   %s' %(where, str(obj1[key]),str(obj2[key])))
-                #s1,s2 = str(obj1[key]),str(obj2[key]) 
-                #if False: # len(s1) + len(s2) > 200:
-                #    logger.warning ( "The values are too long to print." )
-                #else:
-                #    logger.warning( 'The values are: >>%s<< (this run) versus >>%s<< (default)'%\
-                #                ( s1[:20],s2[:20] ) )
+            if not equalObjs(obj1[key],obj2[key],allowedDiff, ignore=ignore, where=key, fname = fname ):
                 return False
     elif isinstance(obj1,list):
         if len(obj1) != len(obj2):
@@ -68,9 +68,9 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None ):
                                 (len(obj1),len(obj2)))
             return False
         for ival,val in enumerate(obj1):
-            if not equalObjs(val,obj2[ival],allowedDiff):
-                logger.warning('Lists differ:\n   %s (this run)\n and\n   %s (default)' %\
-                                (str(val),str(obj2[ival])))
+            if not equalObjs(val,obj2[ival],allowedDiff, fname = fname ):
+                #logger.warning('Lists differ:\n   %s (this run)\n and\n   %s (default)' %\
+                #                (str(val),str(obj2[ival])))
                 return False
     else:
         return obj1 == obj2

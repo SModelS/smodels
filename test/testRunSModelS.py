@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
- 
+
 """
 .. module:: testRunSModelS
    :synopsis: Tests runSModelS
- 
+
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
- 
+
 """
- 
-import sys,os
+
+import sys,os,imp
 import importlib
 sys.path.insert(0,"../")
 import unittest
@@ -19,13 +19,13 @@ from smodels.tools.timeOut import NoTime
 from unitTestHelpers import equalObjs, runMain
 import time
 import subprocess
- 
+
 from smodels.tools.smodelsLogging import logger
- 
+
 class RunSModelSTest(unittest.TestCase):
     definingRun = False ## meant only to adapt to changes in output format
     ## use with super great care!!
- 
+
     def testMultipleFiles( self ):
         out = "./unitTestOutput"
         for i in os.listdir( out ):
@@ -39,7 +39,7 @@ class RunSModelSTest(unittest.TestCase):
             logger.error("Number of output file(%d) differ from number of input files(%d)" %
                           (nout, nin))
         self.assertEqual(nout,nin)
-      
+
     def testTimeout(self):
         try:
             filename = "./testFiles/slha/complicated.slha"
@@ -53,12 +53,12 @@ class RunSModelSTest(unittest.TestCase):
         except Exception as e:
             print ( "wrong exception %s %s" % ( type(e), e ) )
             self.assertTrue ( False )
- 
+
     def removeOutputs( self, f ):
         """ remove cruft outputfiles """
         for i in [ f, f.replace(".py",".pyc") ]:
             if os.path.exists( i ): os.remove( i )
-   
+
     def testGoodFile(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(filename)
@@ -72,15 +72,15 @@ class RunSModelSTest(unittest.TestCase):
         spec.loader.exec_module(output_module)
         smodelsOutput = output_module.smodelsOutput
         from gluino_squarks_default import smodelsOutputDefault
-        ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec', 
+        ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec',
                             'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
                             'Total xsec for missing topologies (fb)','Total xsec for missing topologies with displaced decays (fb)',
-                            'Total xsec for missing topologies with prompt decays (fb)', 
+                            'Total xsec for missing topologies with prompt decays (fb)',
                             'Total xsec for topologies outside the grid (fb)']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
-                           ignore=ignoreFields)
+                           ignore=ignoreFields, fname = outputfile )
         for i in [ './output.py', './output.pyc' ]:
             if os.path.exists( i ): os.remove( i )
         self.assertTrue(equals)
@@ -102,7 +102,7 @@ class RunSModelSTest(unittest.TestCase):
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
-                           ignore=ignoreFields)
+                           ignore=ignoreFields, fname = outputfile )
         for i in [ './output.py', './output.pyc' ]:
             if os.path.exists( i ): os.remove( i )
         self.assertTrue(equals)
@@ -110,7 +110,7 @@ class RunSModelSTest(unittest.TestCase):
 
 
     def testGoodFile13(self):
-             
+
         filename = "./testFiles/slha/simplyGluino.slha"
         outputfile = runMain(filename,suppressStdout = True )
         if self.definingRun:
@@ -123,25 +123,25 @@ class RunSModelSTest(unittest.TestCase):
         spec.loader.exec_module(output_module)
         smodelsOutput = output_module.smodelsOutput
         from simplyGluino_default import smodelsOutputDefault
-        ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec', 
+        ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec',
                             'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
                             'Total xsec for missing topologies (fb)','Total xsec for missing topologies with displaced decays (fb)',
-                            'Total xsec for missing topologies with prompt decays (fb)', 
+                            'Total xsec for missing topologies with prompt decays (fb)',
                             'Total xsec for topologies outside the grid (fb)']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.08,
-                           ignore=ignoreFields)
+                           ignore=ignoreFields, fname = outputfile )
         if not equals:
-            e =  "output13.py and simplyGluino_default.py differ!" 
+            e =  "output13.py and simplyGluino_default.py differ!"
             logger.error( e )
             # raise AssertionError( e )
- 
-        self.assertTrue(equals)        
- 
+
+        self.assertTrue(equals)
+
         ## test went through, so remove the output files
         self.removeOutputs( outputfile )
- 
+
     def testGoodFileHSCP(self):
         filename = "./testFiles/slha/longLived.slha"
         outputfile = runMain(filename)
@@ -155,19 +155,19 @@ class RunSModelSTest(unittest.TestCase):
         spec.loader.exec_module(output_module)
         smodelsOutput = output_module.smodelsOutput
         from longLived_default import smodelsOutputDefault
-        ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec', 
+        ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec',
                         'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
                         'Total xsec for missing topologies (fb)','Total xsec for missing topologies with displaced decays (fb)',
-                        'Total xsec for missing topologies with prompt decays (fb)', 
+                        'Total xsec for missing topologies with prompt decays (fb)',
                         'Total xsec for topologies outside the grid (fb)']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
-                           ignore=ignoreFields)            
+                           ignore=ignoreFields, fname = outputfile )
         for i in [ './outputHSCP.py', './outputHSCP.pyc' ]:
             if os.path.exists( i ): os.remove( i )
-        self.assertTrue(equals)               
- 
+        self.assertTrue(equals)
+
     def testLifeTimeDependent(self):
         filename = "./testFiles/slha/lifetime.slha"
         outputfile = runMain(filename)
@@ -185,12 +185,12 @@ class RunSModelSTest(unittest.TestCase):
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
-                           ignore=ignoreFields)            
+                           ignore=ignoreFields, fname=outputfile )
         for i in [ './outputHSCP.py', './outputHSCP.pyc' ]:
             if os.path.exists( i ): os.remove( i )
-        self.assertTrue(equals)               
+        self.assertTrue(equals)
 
-     
+
     def testBadFile(self):
         # since 112 we skip non-existing slha files!
         filename = "./testFiles/slha/I_dont_exist.slha"
@@ -199,13 +199,13 @@ class RunSModelSTest(unittest.TestCase):
         outputfile = runMain(filename)
         self.assertTrue( of in outputfile )
         self.assertTrue( not os.path.exists( outputfile ) )
-  
+
     def cleanUp( self ):
         for f in os.listdir("."):
             if ".crash" in f: os.remove(f)
         for i in [ "crash_report_parameter", "crash_report_input" ]:
             if os.path.exists( i ): os.remove( i )
-  
+
     def testCrash(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
         ctr=0
@@ -230,7 +230,7 @@ class RunSModelSTest(unittest.TestCase):
                 ctr+=1
         self.assertEqual( ctr, 1 )
         inp, par = crashReport.readCrashReportFile(crash_file)
-   
+
         with open(filename) as f:
             with open(inp) as g:
                 self.assertEqual(f.readlines(), g.readlines())

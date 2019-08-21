@@ -72,7 +72,7 @@ class CppTest(unittest.TestCase):
                 f.write ( i+ "\n" )
             f.close()
         self.assertEqual(len(a), len(b))
-        for x,y in zip(a,b):
+        for linenr,(x,y) in enumerate(zip(a,b)):
             if x == y:
                 continue
             xvals = [v.strip() for v in x.split()]
@@ -86,9 +86,11 @@ class CppTest(unittest.TestCase):
                 except (SyntaxError,NameError):
                     pass
                 if isinstance(yv,float) and isinstance(xv,float):
+                    if yv + xv == 0.:
+                        print ( "error, ``%s'' is not ``%s'' in line %d" % (x,y,linenr) )
                     dlta = abs ( yv -xv ) / (yv+xv)
                     if dlta > .1:
-                        print ( "error, delta is", dlta )
+                        print ( "error, delta is %.2f (x=%s,y=%s)" % (dlta,x,y) )
                     self.assertTrue ( dlta < .1 or abs(xv-yv)<1e-6 )
                 else:
                     self.assertEqual(xv, yv)
