@@ -129,6 +129,12 @@ class TheoryPrediction(object):
             if chi2also:
                 return ( None, None )
             return None
+        if not hasattr ( self, "avgElement" ):
+            logger.error ( "theory prediction %s has no average element! why??" % self.analysisId() )
+            if chi2also:
+                return ( None, None )
+            return None
+
         eul = self.dataset.getUpperLimitFor(element=self.avgElement,
                                             txnames=self.txnames,
                                             expected=True)
