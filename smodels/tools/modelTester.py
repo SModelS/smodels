@@ -428,7 +428,15 @@ def getParameters(parameterFile):
     if ret == []:
         logger.error("No such file or directory: '%s'" % parameterFile)
         sys.exit()
+    setExperimentalFlag ( parser )
     return parser
+
+def setExperimentalFlag ( parser ):
+    """ set the experimental flag, if options:experimental = True """
+    if parser.has_option("options", "experimental"):
+        if parser.getboolean("options", "experimental"):
+            from smodels.tools import runtime
+            runtime._experimental = True
 
 def getAllInputFiles(inFile):
     """

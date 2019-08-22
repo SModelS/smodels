@@ -14,6 +14,7 @@ import os
 
 ## place to keep the pointer to the model file (default = mssm)
 modelFile="smodels.share.models.mssm"
+_experimental = False
 
 def filetype ( filename ):
     """ obtain information about the filetype of an input file,
@@ -42,11 +43,9 @@ def filetype ( filename ):
 
 def experimentalFeatures():
     """ a simple boolean flag to turn experimental features on/off,
-    can be turn on via the environment variable SMODELS_EXPERIMENTAL.
+    can be turned on and off via options:experimental in parameters.ini.
     """
-    if "SMODELS_EXPERIMENTAL" in os.environ:
-        return True
-    return False
+    return _experimental
 
 def nCPUs():
     """ obtain the number of CPU cores on the machine, for several
