@@ -123,6 +123,12 @@ class TheoryPrediction(object):
         :param chi2also: if true, return also chi2
         :returns: likelihood; none if no expected upper limit is defined.
         """
+        ## marked as experimental feature
+        from smodels.tools.runtime import experimentalFeatures
+        if not experimentalFeatures():
+            if chi2also:
+                return ( None, None )
+            return None
         eul = self.dataset.getUpperLimitFor(element=self.avgElement,
                                             txnames=self.txnames,
                                             expected=True)
@@ -165,7 +171,6 @@ class TheoryPrediction(object):
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         """
-
 
         if self.dataType()  == 'upperLimit':
             llhd, chi2 = self.likelihoodFromLimits ( 1., marginalize, deltas_rel, chi2also=True )

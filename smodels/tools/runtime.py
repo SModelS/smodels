@@ -10,6 +10,8 @@
 
 """
 
+import os
+
 ## place to keep the pointer to the model file (default = mssm)
 modelFile="smodels.share.models.mssm"
 
@@ -37,6 +39,14 @@ def filetype ( filename ):
             if "block " in line.lower():
                 return "slha"
     return None
+
+def experimentalFeatures():
+    """ a simple boolean flag to turn experimental features on/off,
+    can be turn on via the environment variable SMODELS_EXPERIMENTAL.
+    """
+    if "SMODELS_EXPERIMENTAL" in os.environ:
+        return True
+    return False
 
 def nCPUs():
     """ obtain the number of CPU cores on the machine, for several

@@ -90,6 +90,9 @@ class StatisticsTest(unittest.TestCase):
         self.assertAlmostEqual(re/(1.06*20.),1., 1)
 
     def testApproxGaussian(self):
+        ## turn experimental features on
+        import os
+        os.environ["SMODELS_EXPERIMENTAL"]="1"
         expRes = database.getExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
         self.assertTrue(len(expRes),1)
         filename = "./testFiles/slha/T1tttt.slha"
