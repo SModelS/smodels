@@ -757,27 +757,7 @@ class PyPrinter(BasicPrinter):
                 mass = None
 
             #Add width information to the mass array:
-            if not hasattr(theoryPrediction, "totalwidth") or theoryPrediction.totalwidth is None and mass is not None:
-                totalwidth = (np.full(mass[:,:-1].shape,np.inf*GeV),np.full(mass[:,-1:].shape,0.*GeV))
-                totalwidth = np.hstack(totalwidth)
-                #massWidth = np.dstack((mass,totalwidth)).tolist()
-                #mass = massWidth
-            else:
-                totalwidth = theoryPrediction.totalwidth
-                finiteWidths = False
-                if totalwidth != None:
-                    for br in totalwidth:
-                        for m in br:
-                            if m.asNumber(GeV)>1e-26 and m.asNumber(GeV)<1e-1:
-                                finiteWidths = True
-                                break
-
-                #if finiteWidths:
-                #    massWidth = []
-                #    for mbr,wbr in zip(mass,totalwidth):
-                #        tmp = [ (x,y) for x,y in zip(mbr,wbr) ]
-                #        massWidth.append ( tmp )
-                #    mass = massWidth
+            totalwidth = theoryPrediction.totalwidth
 
             def _convWidth ( x ):
                 if type(x) == type(GeV):
@@ -789,7 +769,7 @@ class PyPrinter(BasicPrinter):
                 return x
             widths = None
             if totalwidth is not None:
-                widths = [ [ _convWidth(x) for x in br ] for br in totalwidth ]
+                widths = [ [_convWidth(x) for x in br] for br in totalwidth ]
 
             def roundme ( x ):
                 if type(x)==tuple:

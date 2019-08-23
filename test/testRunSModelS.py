@@ -10,7 +10,6 @@
 """
 
 import sys,os
-import importlib
 sys.path.insert(0,"../")
 import unittest
 import glob

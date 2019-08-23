@@ -455,6 +455,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     theoryPrediction.conditions = None
     theoryPrediction.elements = elementList
     theoryPrediction.mass = mass
+    theoryPrediction.totalwidth = totalwidth
     theoryPrediction.PIDs = [pdg for pdg,_ in itertools.groupby(PIDList)] #Remove duplicates
     
     return theoryPrediction
@@ -546,6 +547,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
         theoryPrediction.elements = cluster.elements
         theoryPrediction.avgElement = cluster.averageElement()
         theoryPrediction.mass = theoryPrediction.avgElement.mass
+        theoryPrediction.totalwidth = theoryPrediction.avgElement.totalwidth
         PIDs = [el.pdg for el in cluster.elements]
         theoryPrediction.PIDs = [pdg for pdg,_ in itertools.groupby(PIDs)] #Remove duplicates
         predictionList._theoryPredictions.append(theoryPrediction)
