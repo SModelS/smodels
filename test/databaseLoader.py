@@ -12,7 +12,8 @@
 import sys
 sys.path.insert(0,"../")
 from smodels.experiment.databaseObj import Database
-# database = Database("./database", discard_zeroes = False)
+#database = Database("./database", discard_zeroes = False)
+# database = Database("../../smodels-database", discard_zeroes = False)
 database = Database( "unittest", discard_zeroes = False)
 
 if __name__ == "__main__":

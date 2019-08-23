@@ -13,7 +13,7 @@ import sys,os
 import importlib
 sys.path.insert(0,"../")
 import unittest
-from unitTestHelpers import equalObjs, runMain
+from unitTestHelpers import equalObjs, runMain, importModule
 from smodels.tools.smodelsLogging import setLogLevel
 from smodels.tools import runtime
 from smodels import particlesLoader
@@ -37,10 +37,7 @@ class ModelsTest(unittest.TestCase):
             default = "idm_example_defaultB.py"
             cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
             a = subprocess.getoutput ( cmd )
-        spec = importlib.util.spec_from_file_location( "output", outputfile)
-        output_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(output_module)
-        smodelsOutput = output_module.smodelsOutput
+        smodelsOutput = importModule ( outputfile )
         from idm_example_defaultB import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 
                     'database version', 'Total missed xsec',
@@ -65,10 +62,7 @@ class ModelsTest(unittest.TestCase):
             default = "idm_example_default.py"
             cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
             a = subprocess.getoutput ( cmd )
-        spec = importlib.util.spec_from_file_location( "output", outputfile)
-        output_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(output_module)
-        smodelsOutput = output_module.smodelsOutput
+        smodelsOutput = importModule ( outputfile )
         from idm_example_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec', 
                             'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
@@ -86,10 +80,7 @@ class ModelsTest(unittest.TestCase):
         filename = "./testFiles/slha/idm_example.slha"
         #Test the case where the BSM particles are defined by the SLHA file:
         outputfile = runMain(filename,inifile='testParameters_idmB.ini',suppressStdout=True)
-        spec = importlib.util.spec_from_file_location( "output", outputfile)
-        output_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(output_module)
-        smodelsOutput = output_module.smodelsOutput
+        smodelsOutput = importModule ( outputfile )
         from idm_example_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec',
                             'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
@@ -124,10 +115,7 @@ class ModelsTest(unittest.TestCase):
         reload(particlesLoader)
         filename = "./testFiles/slha/idm_example.slha"
         outputfile = runMain(filename,suppressStdout=True)
-        spec = importlib.util.spec_from_file_location( "output", outputfile)
-        output_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(output_module)
-        smodelsOutput = output_module.smodelsOutput
+        smodelsOutput = importModule ( outputfile )
         self.assertTrue(smodelsOutput['OutputStatus']['decomposition status'] < 0)  
         self.removeOutputs(outputfile)
 
