@@ -302,8 +302,8 @@ def getValuesForObj(obj, attribute):
         if attribute == attr:
             values += [value]
         elif isinstance(value,Iterable):
-            values += [getValuesForObj(v,attribute) for v in value]
-        else:
+            values += [getValuesForObj(v,attribute) for v in value if not v is obj]
+        elif not value is obj:
             values += getValuesForObj(value,attribute)
     
     values =  list(filter(lambda a: (not isinstance(a,list)) or a != [], values))
