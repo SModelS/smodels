@@ -16,7 +16,7 @@ import unittest
 import glob
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
-from unitTestHelpers import equalObjs, runMain
+from unitTestHelpers import equalObjs, runMain, importModule
 import time
 import subprocess
 
@@ -67,10 +67,7 @@ class RunSModelSTest(unittest.TestCase):
             default = "gluino_squarks_default.py"
             cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
             a = subprocess.getoutput ( cmd )
-        spec = importlib.util.spec_from_file_location( "output", outputfile)
-        output_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(output_module)
-        smodelsOutput = output_module.smodelsOutput
+        smodelsOutput = importModule ( outputfile )
         from gluino_squarks_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec',
                             'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
@@ -90,10 +87,7 @@ class RunSModelSTest(unittest.TestCase):
     def testGoodFileWithModelFromSLHA(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(filename,inifile='testParametersB.ini')
-        spec = importlib.util.spec_from_file_location( "output", outputfile)
-        output_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(output_module)
-        smodelsOutput = output_module.smodelsOutput
+        smodelsOutput = importModule ( outputfile )
         from gluino_squarks_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec',
                             'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
@@ -119,10 +113,7 @@ class RunSModelSTest(unittest.TestCase):
             default = "simplyGluino_default.py"
             cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
             a = subprocess.getoutput ( cmd )
-        spec = importlib.util.spec_from_file_location( "output", outputfile)
-        output_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(output_module)
-        smodelsOutput = output_module.smodelsOutput
+        smodelsOutput = importModule ( outputfile )
         from simplyGluino_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec',
                             'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
@@ -151,10 +142,7 @@ class RunSModelSTest(unittest.TestCase):
             default = "longLived_default.py"
             cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
             a = subprocess.getoutput ( cmd )
-        spec = importlib.util.spec_from_file_location( "output", outputfile)
-        output_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(output_module)
-        smodelsOutput = output_module.smodelsOutput
+        smodelsOutput = importModule ( outputfile )
         from longLived_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec',
                         'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
@@ -177,10 +165,7 @@ class RunSModelSTest(unittest.TestCase):
             default = "lifetime_default.py"
             cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
             a = subprocess.getoutput ( cmd )
-        spec = importlib.util.spec_from_file_location( "output", outputfile)
-        output_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(output_module)
-        smodelsOutput = output_module.smodelsOutput
+        smodelsOutput = importModule ( outputfile )
         from lifetime_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],

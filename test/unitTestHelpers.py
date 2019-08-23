@@ -7,7 +7,7 @@
  
 """
 
-import os
+import os, sys
 import unum
 import redirector
 from smodels.tools.runSModelS import run
@@ -77,6 +77,21 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None, fname=None ):
  
     return True
  
+def importModule ( filename ):
+    """ import a module, but giving the filename """
+    if sys.version_info[0]==2:
+        import imp
+        ## python2, use imp
+        with open( filename, 'rb') as fp: ## imports file with dots in name
+            output_module = imp.load_module("output",fp, filename, \
+                    ('.py', 'rb', imp.PY_SOURCE) )
+        return output_module.smodelsOutput
+    ### python3, use importlib
+    import importlib
+    spec = importlib.util.spec_from_file_location( "output", filename )
+    output_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(output_module)
+    return output_module.smodelsOutput
  
 def runMain( filename, timeout = 0, suppressStdout=True, development=False,
              inifile = "testParameters.ini" ):

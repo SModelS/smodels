@@ -48,8 +48,7 @@ This tool computes LHC production cross sections for *MSSM particles*
 and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be 
 convenient for adding cross sections to SLHA input files, see :doc:`Basic Input <BasicInput>`. 
 The calculation is done at LO with `Pythia8 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ or `Pythia6.4 <http://pythia6.hepforge.org>`_ ; K-factors 
-for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ .
-
+for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_. Signal strength multipliers can optionally be supplied for each "mother" particle. 
 
 **The usage of the cross section calculator is:**
 
@@ -63,16 +62,17 @@ or :download:`smodels/etc/pythia.card </images/pythia.card>` (for Pythia 6).
 A typical
 usage example is: ::
 
-   smodelsTools.py xseccomputer -s 8 13 -e 10000 -p -f inputFiles/slha/higgsinoStop.slha
+   smodelsTools.py xseccomputer -s 8 13 -e 10000 --ssmultipliers "{1000021: 2.0}" -p -f inputFiles/slha/higgsinoStop.slha
 
-which will compute 8 TeV and 13 TeV LO cross sections (at the LHC) for all MSSM processes using 10k MC events.
+which will compute 8 TeV and 13 TeV LO cross sections (at the LHC) for all MSSM processes using 10k MC events. Production cross sections of gluinos (pid 1000021) get enhanced by a factor of two per particle; pair production of gluinos thus gets multiplied
+by a factor of 2*2=4.
 If, *after* the LO cross sections have been computed, one wants to add the NLO+NLL cross sections for gluinos and squarks: ::
 
    smodelsTools.py xseccomputer -s 8 13 -p -N -O -f inputFiles/slha/higgsinoStop.slha
 
 The resulting file will then contain LO cross sections for all MSSM processes and NLO+NLL cross sections for 
 the available processes in `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_  
-(gluino and squark production).
+(gluino and squark production). In this mode, signal strength multipliers will be ignored.
 When reading the input file, SModelS will then use only the highest order cross sections available for each process.
 
 * **The cross section calculation is implemented by the** `computeXSec function <tools.html#tools.xsecComputer.computeXSec>`_
