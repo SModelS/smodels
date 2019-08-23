@@ -19,7 +19,7 @@ from smodels.tools import runtime
 from smodels import particlesLoader
 from imp import reload
 import subprocess
-
+from smodels.tools.smodelsLogging import logger
 setLogLevel('debug')
  
  

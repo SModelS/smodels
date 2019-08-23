@@ -26,8 +26,6 @@ from xml.etree import ElementTree
 import unum
 import time
 
-# from smodels.tools.deep_getsizeof import deep_getsizeof
-
 class MPrinter(object):
     """
     Master Printer class to handle the Printers (one printer/output type)
@@ -151,7 +149,7 @@ class BasicPrinter(object):
             return
         dirname = os.path.dirname ( self.filename )
         if dirname != "" and not os.path.exists ( dirname ):
-            os.makedirs ( dirname )
+            os.makedirs(dirname)
 
     def setOptions(self,options):
         """

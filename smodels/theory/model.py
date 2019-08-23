@@ -285,11 +285,11 @@ class Model(object):
 
         #Reset particle equality from all particles:
         for p in Particle.getinstances():
-            p._comp = {p.id : 0}
+            p._comp = {p._id : 0}
             if isinstance(p,MultiParticle):
                 for ptc in p.particles:
-                    p._comp[ptc.id] = 0
+                    p._comp[ptc._id] = 0
 
         #Reset particle equality from all particle lists:
         for pL in ParticleList.getinstances():
-            pL._comp = {pL.id : 0}
+            pL._comp = {pL._id : 0}

@@ -295,7 +295,7 @@ def getValuesForObj(obj, attribute):
     try:
         objDict = obj.__dict__.items()
     except AttributeError:
-        return values        
+        return values
     
       
     for attr,value in objDict:

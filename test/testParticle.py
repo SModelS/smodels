@@ -51,8 +51,8 @@ class ParticleTest(unittest.TestCase):
             if any(p is pB for pB in allParticles):
                 continue
             allParticles.append(p)
-        allParticles = sorted(allParticles, key = lambda p: p.id)
-        allIDs = [p.id for p in allParticles]
+        allParticles = sorted(allParticles, key = lambda p: p._id)
+        allIDs = [p._id for p in allParticles]
         for pid in allIDs:
             self.assertTrue(allIDs.count(pid) == 1)
         compMatrixA = np.zeros((len(allParticles),len(allParticles)))

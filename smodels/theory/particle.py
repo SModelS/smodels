@@ -21,7 +21,7 @@ class Particle(object):
         """
         Creates a particle. If a particle with the exact same attributes have
         already been created return this particle instead.
-        Assigns an ID to the isntance using the class Particle._instance
+        Assigns an ID to the instance using the class Particle._instance
         list. Reset the comparison dictionary.
         
         :param attributesDict: A dictionary with particle attributes (useful for pickling/unpickling).
@@ -43,13 +43,13 @@ class Particle(object):
 
         attrDict = dict(attributesDict.items())
         attrDict.update(kwargs)
-        attrDict.pop('id',None)
+        attrDict.pop('_id',None)
         attrDict.pop('_comp',None)
         for obj in Particle.getinstances():
             if not isinstance(obj,Particle):
                 continue
             objAttr = dict(obj.__dict__.items())
-            objAttr.pop('id',None)
+            objAttr.pop('_id',None)
             objAttr.pop('_comp',None)
             if objAttr != attrDict:
                 continue
@@ -58,8 +58,8 @@ class Particle(object):
         newParticle = super(Particle, cls).__new__(cls)
         for attr,value in attrDict.items():
             setattr(newParticle,attr,value)
-        newParticle.id = Particle.getID()
-        newParticle._comp = {newParticle.id : 0}
+        newParticle._id = Particle.getID()
+        newParticle._comp = {newParticle._id : 0}
         Particle._instances.add(weakref.ref(newParticle))
         return newParticle
 
@@ -72,7 +72,7 @@ class Particle(object):
 
         attrDict = dict(self.__dict__.items())
         #Make sure pickled/unpickled objects do no store ID nor comparison dict
-        attrDict.pop('id',None)
+        attrDict.pop('_id',None)
         attrDict.pop('_comp',None)
         return (attrDict,)
 
@@ -85,7 +85,7 @@ class Particle(object):
 
         attrDict = dict(self.__dict__.items())
         #Make sure pickled objects do no store ID nor comparison dict
-        attrDict.pop('id',None)
+        attrDict.pop('_id',None)
         attrDict.pop('_comp',None)
 
         return attrDict
@@ -101,7 +101,7 @@ class Particle(object):
         """
         Return the object address. Required for using weakref
         """
-        return self.id
+        return self._id
     
     @classmethod
     def getinstances(cls):
@@ -135,14 +135,14 @@ class Particle(object):
         """    
 
         #First check if we have already compared to this object        
-        if other.id in self._comp:
-            return self._comp[other.id]
-        elif self.id in other._comp:
-            return -other._comp[self.id]
+        if other._id in self._comp:
+            return self._comp[other._id]
+        elif self._id in other._comp:
+            return -other._comp[self._id]
 
         cmpProp = self.cmpProperties(other) #Objects have not been compared yet.
-        self._comp[other.id] = cmpProp
-        other._comp[self.id] = -cmpProp
+        self._comp[other._id] = cmpProp
+        other._comp[self._id] = -cmpProp
         return cmpProp
 
     def __lt__( self, p2 ):
@@ -252,8 +252,8 @@ class Particle(object):
         newParticle = object.__new__(Particle)
         for attr,value in self.__dict__.items():
             setattr(newParticle,attr,value)
-        newParticle.id = Particle.getID()
-        newParticle._comp = {newParticle.id : 0}
+        newParticle._id = Particle.getID()
+        newParticle._comp = {newParticle._id : 0}
         Particle._instances.add(weakref.ref(newParticle))
 
         return newParticle
@@ -377,14 +377,14 @@ class MultiParticle(Particle):
             label = "/".join([p.label for p in particles])
         attrDict = dict(attributesDict.items())
         attrDict.update(kwargs)
-        attrDict.pop('id',None)
+        attrDict.pop('_id',None)
         attrDict.pop('_comp',None)
         for obj in Particle.getinstances()[:]:
             if not isinstance(obj,MultiParticle):
                 continue
             #Directly compare attributes, except for particles,label,id and _comp
             objAttr = dict(obj.__dict__.items())            
-            objAttr.pop('id',None)
+            objAttr.pop('_id',None)
             objAttr.pop('_comp',None)
             objAttr.pop('label',None)
             objAttr.pop('particles',None)
@@ -402,9 +402,9 @@ class MultiParticle(Particle):
             setattr(newMultiParticle,attr,value)
         newMultiParticle.particles = particles[:]
         newMultiParticle.label = label
-        newMultiParticle.id = Particle.getID()
-        newMultiParticle._comp = {newMultiParticle.id : 0}
-        newMultiParticle._comp.update(dict([[ptc.id,0] for ptc in particles]))
+        newMultiParticle._id = Particle.getID()
+        newMultiParticle._comp = {newMultiParticle._id : 0}
+        newMultiParticle._comp.update(dict([[ptc._id,0] for ptc in particles]))
         Particle._instances.add(weakref.ref(newMultiParticle))
         return newMultiParticle
 
@@ -419,7 +419,7 @@ class MultiParticle(Particle):
         attrDict.pop('label',None)
         attrDict.pop('particles',None)
         #Make sure pickled/unpickled objects do no store ID nor comparison dict
-        attrDict.pop('id',None)
+        attrDict.pop('_id',None)
         attrDict.pop('_comp',None)
 
         return (self.label,self.particles,attrDict)
@@ -433,7 +433,7 @@ class MultiParticle(Particle):
 
         attrDict = dict(self.__dict__.items())
         #Make sure pickled objects do no store ID nor comparison dict
-        attrDict.pop('id',None)
+        attrDict.pop('_id',None)
         attrDict.pop('_comp',None)
 
         return attrDict
@@ -535,9 +535,9 @@ class MultiParticle(Particle):
             self.particles += addParticles[:]
             self.particles = sorted(self.particles)
             #Since the multiparticle changed, reset comparison tracking:
-            self._comp = {self.id : 0}
+            self._comp = {self._id : 0}
             for ptc in self.particles:
-                self._comp[ptc.id] = 0
+                self._comp[ptc._id] = 0
 
         return self
 
@@ -635,8 +635,8 @@ class ParticleList(object):
 
         newList = super(ParticleList, cls).__new__(cls)
         newList.particles = pList[:]
-        newList.id = ParticleList.getID()
-        newList._comp = {newList.id : 0}
+        newList._id = ParticleList.getID()
+        newList._comp = {newList._id : 0}
         ParticleList._instances.add(weakref.ref(newList))
         return newList
 
@@ -657,13 +657,13 @@ class ParticleList(object):
 
         attrDict = dict(self.__dict__.items())
         #Make sure pickled objects do no store ID nor comparison dict
-        attrDict.pop('id',None)
+        attrDict.pop('_id',None)
         attrDict.pop('_comp',None)
 
         return attrDict
 
     def __hash__(self):
-        return self.id
+        return self._id
     
     @classmethod
     def getinstances(cls):
@@ -696,8 +696,8 @@ class ParticleList(object):
         """    
         
         #First check if we have already compared to this object
-        if other.id in self._comp:
-            return self._comp[other.id]
+        if other._id in self._comp:
+            return self._comp[other._id]
         
         if len(self) != len(other):
             comp = len(self) > len(other)
@@ -705,16 +705,16 @@ class ParticleList(object):
                 comp = 1
             else:
                 comp = -1
-            self._comp[other.id] = comp
-            other._comp[self.id] = comp
+            self._comp[other._id] = comp
+            other._comp[self._id] = comp
             return comp
         
         #Compare even final states irrespective of ordering:
         for particles in itertools.permutations(self.particles):
             particles = list(particles)
             if particles == other.particles:
-                self._comp[other.id] = 0
-                other._comp[self.id] = 0
+                self._comp[other._id] = 0
+                other._comp[self._id] = 0
                 return 0
         
         comp = self.particles > other.particles
@@ -722,8 +722,8 @@ class ParticleList(object):
             comp = 1
         else:
             comp = -1
-        self._comp[other.id] = comp
-        other._comp[self.id] = -comp
+        self._comp[other._id] = comp
+        other._comp[self._id] = -comp
             
         return comp
 
