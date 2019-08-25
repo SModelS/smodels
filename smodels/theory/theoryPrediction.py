@@ -55,10 +55,18 @@ class TheoryPrediction(object):
 
         return self.dataset.globalInfo.id
 
-    def dataType(self):
+    def dataType(self, short=False ):
         """
         Return the type of dataset
+        :param: short, if True, return abbreviation (ul,em,comb)
         """
+        if short:
+            t = self.dataset.getType()
+            D = { "upperLimit": "ul", "efficiencyMap": "em", 
+                  "combined": "comb" }
+            if t in D.keys():
+                return D[t]
+            return "??"
 
         return self.dataset.getType()
 
