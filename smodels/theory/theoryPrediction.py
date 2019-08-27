@@ -128,6 +128,7 @@ class TheoryPrediction(object):
                               expected=False, chi2also=False ):
         """ compute the likelihood from expected and observed upper limits.
         :param expected: compute expected, not observed likelihood
+        :param mu: signal strength multiplier, applied to theory prediction
         :param chi2also: if true, return also chi2
         :returns: likelihood; none if no expected upper limit is defined.
         """
@@ -156,7 +157,7 @@ class TheoryPrediction(object):
         lumi = self.dataset.globalInfo.lumi
         ulN = float(ul * lumi) ## upper limit on yield
         eulN = float(eul * lumi) ## upper limit on yield
-        nsig = (self.xsection.value*lumi).asNumber()
+        nsig = mu*(self.xsection.value*lumi).asNumber()
         llhd = likelihoodFromLimits ( ulN, eulN, nsig )
         if chi2also:
             return ( llhd, chi2FromLimits ( llhd, eulN ) )
