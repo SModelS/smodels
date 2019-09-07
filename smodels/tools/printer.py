@@ -601,6 +601,7 @@ class PyPrinter(BasicPrinter):
     """
     Printer class to handle the printing of one single pythonic output
     """
+
     def __init__(self, output = 'stdout', filename = None):
         BasicPrinter.__init__(self, output, filename)
         self.name = "py"
@@ -781,8 +782,10 @@ class PyPrinter(BasicPrinter):
             else:
                 mass = None
             if dataType in [ "combined", "efficiencyMap" ]: 
-                ## FIXME do we want it this way?
+                ## FIXME what do we want for this? None, or masses?
                 mass = None
+                if False: ## needed for validation
+                    mass = [[roundme(m) for m in mbr] for mbr in mass]
 
             sqrts = expResult.globalInfo.sqrts
 
