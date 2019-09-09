@@ -283,7 +283,7 @@ simplices defined during triangulation are then used for linearly interpolating
 the data grid, thus allowing SModelS to compute efficiencies or upper limits
 for arbitrary mass values (as long as they fall inside the data grid).
 Width parameters are taken logarithmically before linearly interpolating, which
-effectively corresponds to an exponential interpolation in these variables.
+effectively corresponds to an exponential interpolation in the widths.
 This procedure provides an efficient and numerically robust way of dealing with
 generic data grids, including arbitrary parametrizations of the mass parameter
 space, irregular data grids and asymmetric branches.
