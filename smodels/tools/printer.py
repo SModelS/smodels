@@ -753,9 +753,10 @@ class PyPrinter(BasicPrinter):
                 else:
                     txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(fb)
             maxconds = theoryPrediction.getmaxCondition()
-            mass = np.array(theoryPrediction.mass)
-            if theoryPrediction.mass  == None:
+            if theoryPrediction.mass  is None:
                 mass = None
+            else:
+                mass = np.array(theoryPrediction.mass)
 
             #Add width information to the mass array:
             totalwidth = theoryPrediction.totalwidth
@@ -779,13 +780,6 @@ class PyPrinter(BasicPrinter):
 
             if mass is not None:
                 mass = [[roundme(m) for m in mbr] for mbr in mass]
-            else:
-                mass = None
-            if dataType in [ "combined", "efficiencyMap" ]: 
-                ## FIXME what do we want for this? None, or masses?
-                mass = None
-                if False: ## needed for validation
-                    mass = [[roundme(m) for m in mbr] for mbr in mass]
 
             sqrts = expResult.globalInfo.sqrts
 
