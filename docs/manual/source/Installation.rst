@@ -127,10 +127,10 @@ the `SModelS Database releases page <https://github.com/SModelS/smodels-database
 
 
 The complete list of analyses and results included in the database can be
-consulted at `http://smodels.hephy.at/wiki/ListOfAnalyses <http://smodels.hephy.at/wiki/ListOfAnalyses>`_.
+consulted at `http://smodels.github.io/docs/ListOfAnalyses <http://smodels.github.io/docs/ListOfAnalyses>`_.
 We note that all the results in the official database release have been
 carefully validated  and the validation material can be
-found at `http://smodels.hephy.at/wiki/Validation <http://smodels.hephy.at/wiki/Validation>`_.
+found at `http://smodels.github.io/docs/Validation <http://smodels.github.io/docs/Validation>`_.
 
 The database can conveniently be updated independently from SModelS code
 updates. It suffices to unpack any new database tarball and replace the database

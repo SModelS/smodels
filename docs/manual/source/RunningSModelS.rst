@@ -183,7 +183,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFilePath:
 
-  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Also http addresses may be given, e.g. http://smodels.hephy.at/database/official113. The path "official" refers to the official database of your SModelS version -- without fastlim; "official_fastlim" includes fastlim results. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions. The remote database pickle files are cached in $HOME/.cache/smodels.
+  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Also http addresses may be given, e.g. http://smodels.github.io/database/official113. The path "official" refers to the official database of your SModelS version -- without fastlim; "official_fastlim" includes fastlim results. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions. The remote database pickle files are cached in $HOME/.cache/smodels.
 
 .. _parameterFileAnalyses:
   
@@ -201,7 +201,7 @@ Below we give more detailed information about each entry in the parameters file.
     If a list of |txnames| are given, only the corresponding |topologies| will be considered. For instance, setting txnames = T2 will
     only consider |results| for :math:`pp \to \tilde{q} + \tilde{q} \to  (jet+\tilde{\chi}_1^0) + (jet+\tilde{\chi}_1^0)`
     and the |output| will only contain constraints for this topology.
-    *A list of all* |topologies| *and their corresponding* |txnames| *can be found* `here <http://smodels.hephy.at/wiki/SmsDictionary>`_
+    *A list of all* |topologies| *and their corresponding* |txnames| *can be found* `here <http://smodels.github.io/docs/SmsDictionary>`_
     Wildcards (\*, ?, [<list-of-or'ed-letters>]) are expanded in the same way the shell does wildcard expansion for file names.
     So, for example, txnames = T[12]*bb* picks all txnames beginning with T1 or T2 and containg bb as of the time of writing were: T1bbbb, T1bbbt, T1bbqq, T1bbtt, T2bb, T2bbWW, T2bbWWoff
 

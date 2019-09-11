@@ -240,6 +240,7 @@ def _determineNCPus(cpus_wanted, n_files):
     :param n_files: number of files to be run on
     :returns: number of CPUs that are to be used
     """
+
     ncpusAll = runtime.nCPUs()
     # ncpus = parser.getint("parameters", "ncpus")
     ncpus = cpus_wanted
@@ -435,7 +436,6 @@ def setExperimentalFlag ( parser ):
     """ set the experimental flag, if options:experimental = True """
     if parser.has_option("options", "experimental"):
         if parser.getboolean("options", "experimental"):
-            from smodels.tools import runtime
             runtime._experimental = True
 
 def getAllInputFiles(inFile):

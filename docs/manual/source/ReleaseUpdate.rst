@@ -41,14 +41,17 @@ New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * Introduction of :ref:`particle class <particleClass>`
-  * Particles are compared according to their properties
   * Unified treatment of SLHA and LHE input files (see :ref:`decomposer <decomp>` and :ref:`LHE-reader <lhereader>`)
   * Decomposition and experimental results can include displaced signatures
   * :ref:`Database <Database>` can now handle lifetime dependent results
-  * Simplified missing topologies algorithm and output (see :ref:`missing topologies <topCoverage>`)
+  * New :ref:`missing topologies <topCoverage>` algorithm and output
   * Added :ref:`field "type" <typeProperty>` to the experimental results in the database ('prompt' or 'displaced')
+  * Input model can now be defined by a SLHA file with QNUMBERS  
   * Downloaded database files now stored in $HOME/.cache/smodels
-
+  * Small bug fix in :ref:`likelihood computation <likelihoodCalc>`
+  * Width information added to output
+  * Added pickle output
+  
 New in Version 1.2.2:
 ^^^^^^^^^^^^^^^^^^^^^
 

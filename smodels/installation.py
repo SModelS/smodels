@@ -201,8 +201,6 @@ def fixpermissions():
         print ( "chmod failed (permission error). Please try as root, i.e.:" )
         print ( "sudo smodelsTools.py fixpermissions" )
 
-
-# __dbServer__ = "http://smodels.hephy.at/database"
 __dbServer__ = "https://smodels.github.io/database"
 
 def officialDatabase( fastlim=False ):

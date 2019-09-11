@@ -10,7 +10,6 @@ command -v nproc && NCORES=`nproc`
 TARBALL="pythia$VER.tgz"
 URL=http://home.thep.lu.se/~torbjorn/pythia8/$TARBALL
 #TARBALL="pythia${VER}_fixed.tgz"
-#URL=http://smodels.hephy.at/.hidden/$TARBALL
 
 test -e .$TARBALL && { echo "[installer] tarball $TARBALL exists"; } || { echo "[installer] getting $TARBALL"; wget $URL 2>/dev/null || curl -O $URL; mv $TARBALL .$TARBALL; };
 

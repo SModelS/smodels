@@ -10,8 +10,6 @@
 
 """
 
-import os
-
 ## place to keep the pointer to the model file (default = mssm)
 modelFile="smodels.share.models.mssm"
 _experimental = False
@@ -53,18 +51,18 @@ def nCPUs():
     try:
         import multiprocessing
         return multiprocessing.cpu_count()
-    except ImportError as e:
+    except ImportError:
         pass
     try:
         import psutil
         return psutil.NUM_CPUS
-    except ImportError as e:
+    except ImportError:
         pass
     try:
         import os
         res = int(os.sysconf('SC_NPROCESSORS_ONLN'))
         if res>0: return res
-    except ImportError as e:
+    except ImportError:
         pass
     return None
 
