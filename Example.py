@@ -22,22 +22,23 @@ from smodels.theory.model import Model
 setLogLevel("info")
 
 # Set the path to the database
-database = Database("official")
+database = Database("./smodels-database")
 
 def main():
     """
     Main program. Displays basic use case.
     """
-    #Define your model (list of rEven and rOdd particles)
-    runtime.modelFile = 'smodels.share.models.mssm' 
+    #Define your model (list of BSM particles)
+    runtime.modelFile = 'smodels.share.models.mssm'
+#     runtime.modelFile = 'mssmQNumbers.slha'
+    model = Model(BSMparticles=BSMList, SMparticles=SMList)
 
     # Path to input file (either a SLHA or LHE file)
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
     slhafile = 'inputFiles/slha/lightEWinos.slha'
-    #Define your model
-    model = Model(BSMparticles=BSMList, SMparticles=SMList)
-#    model.updateParticles(inputFile=lhefile)
+#     model.updateParticles(inputFile=lhefile)
     model.updateParticles(inputFile=slhafile)
+
 
     # Set main options for decomposition
     sigmacut = 0.01*fb

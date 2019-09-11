@@ -388,14 +388,14 @@ Below we go step-by-step through this example code:
   to the path of the model file (see **particles:model** in :ref:`Parameter File <parameterFile>`).
 
 .. literalinclude:: /examples/Example.py
-   :lines: 31-32
+   :lines: 31-34
 
 
 * *Path to the input file*. Specify the location of the input file. It must be a
   SLHA or LHE file (see :ref:`Basic Input <BasicInput>`).
 
 .. literalinclude:: /examples/Example.py
-   :lines: 34-36
+   :lines: 36-40
 
 * *Set main options for* |decomposition|.
   Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:
@@ -490,20 +490,20 @@ can take as arguments specific results to be loaded.
   determine if the model has been excluded or not by the selected |express|:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 120-123
+   :lines: 119-123
 
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 588-589
+   :lines: 589-590
    
    
 * *Identify missing topologies*. Using the output from decomposition, identify
   the :ref:`missing topologies <topCoverage>` and print some basic information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 128-151
+   :lines: 126-151
 
 
 *output:*
