@@ -188,31 +188,31 @@ A simple example is given below:
    In [2]: browser.selectExpResultsWith(txName = 'T1tttt', dataType = 'upperLimit') #Select only the UL results with the topology T1tttt
    
    In [3]: print ( browser ) #Print all experimental results in the browser (after selection)
-   ['ATLAS-SUSY-2015-09', 'CMS-PAS-SUS-15-002', 'CMS-PAS-SUS-16-014', 'CMS-PAS-SUS-16-015', ...
+   ['ATLAS-SUSY-2015-09', 'CMS-SUS-15-002', 'CMS-PAS-SUS-16-014', 'CMS-PAS-SUS-16-015', ...
    
    In [4]: gluinoMass, LSPmass = 800.*GeV, 100.*GeV  #Define masses for the T1tttt topology
    
-   In [5]: browser.getULFor('CMS-PAS-SUS-15-002','T1tttt',[[gluinoMass,LSPmass],[gluinoMass,LSPmass]]) #Get UL for a specific experimental result
-   Out[5]: 5.03E-02 [pb]
+   In [5]: browser.getULFor('CMS-SUS-15-002','T1tttt',[[gluinoMass,LSPmass],[gluinoMass,LSPmass]]) #Get UL for a specific experimental result
+   Out[5]: 2.23E+01 [fb]
      
    In [6]: for expResult in browser[:5]:  #Get the upper limits for the first five of the selected results for the given topology and mass
       ...:     print ( expResult.getValuesFor('id'),'UL = ',expResult.getUpperLimitFor(txname='T1tttt',mass=[[gluinoMass,LSPmass],[gluinoMass,LSPmass]]) )
       ...:     
       ['ATLAS-SUSY-2015-09'] UL =  None
-      ['CMS-PAS-SUS-15-002'] UL =  5.03E-02 [pb]
-      ['CMS-PAS-SUS-16-014'] UL =  4.10E-02 [pb]
-      ['CMS-PAS-SUS-16-015'] UL =  1.80E-02 [pb]
-      ['CMS-PAS-SUS-16-016'] UL =  5.76E-02 [pb]
+      ['CMS-PAS-SUS-16-014'] UL =  4.10E+01 [fb]
+      ['CMS-PAS-SUS-16-015'] UL =  1.80E+01 [fb]
+      ['CMS-PAS-SUS-16-016'] UL =  5.76E+01 [fb]
+      ['CMS-PAS-SUS-16-019'] UL =  1.37E+01 [fb]
 
       
    In [7]: for expResult in browser[:5]:  #Print the luminosities for the first five selected experimental results
       ...:     print ( expResult.getValuesFor('id'),expResult.getValuesFor('lumi') )
       ...:     
       ['ATLAS-SUSY-2015-09'] [3.20E+00 [1/fb]]
-      ['CMS-PAS-SUS-15-002'] [2.20E+00 [1/fb]]
       ['CMS-PAS-SUS-16-014'] [1.29E+01 [1/fb]]
       ['CMS-PAS-SUS-16-015'] [1.29E+01 [1/fb]]
       ['CMS-PAS-SUS-16-016'] [1.29E+01 [1/fb]]
+      ['CMS-PAS-SUS-16-019'] [1.29E+01 [1/fb]]
 
 
 Further Python example codes using the functionalities of the browser

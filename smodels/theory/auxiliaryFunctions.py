@@ -327,7 +327,7 @@ def getAttributesFrom(obj,skipIDs=[]):
     if id(obj) in skipIDs or isinstance(obj,(tuple,list,float,int,unum.Unum)):
         return []
     else:
-        skipIDs.append(id(obj))
+        newSkipIDs = skipIDs[:] + [id(obj)]
     attributes = []
     try:
         objDict = obj.__dict__.items()
@@ -338,11 +338,11 @@ def getAttributesFrom(obj,skipIDs=[]):
     for attr,value in objDict:
         attributes.append(attr)
         if isinstance(value,list):
-            attributes += [getAttributesFrom(v,skipIDs) for v in value]
+            attributes += [getAttributesFrom(v,newSkipIDs) for v in value]
         elif isinstance(value,dict):
-            attributes += [getAttributesFrom(v,skipIDs) for v in value.values()]
+            attributes += [getAttributesFrom(v,newSkipIDs) for v in value.values()]
         else:
-            attributes += getAttributesFrom(value,skipIDs)
+            attributes += getAttributesFrom(value,newSkipIDs)
     
     attributes =  list(filter(lambda a: a != [], attributes))    
     

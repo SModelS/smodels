@@ -124,10 +124,10 @@ class Browser(object):
         #First select the experimental results matching the id and the result type:
         expres = None
         for expResult in self:
-            if expResult.getValuesFor('id')[0] != expid:
+            if expResult.globalInfo.id != expid:
                 continue
             else:
-                if 'efficiencyMap' in expResult.getValuesFor('dataType'):
+                if 'efficiencyMap' in [ds.dataInfo.dataType for ds in expResult.datasets]:
                     expres = expResult
                     break
 
@@ -158,10 +158,10 @@ class Browser(object):
         #First select the experimental results matching the id and the result type:
         expres = None
         for expResult in self:
-            if expResult.getValuesFor('id')[0] != expid:
+            if expResult.globalInfo.id != expid:
                 continue
             else:
-                if 'upperLimit' in expResult.getValuesFor('dataType'):
+                if 'upperLimit' in [ds.dataInfo.dataType for ds in expResult.datasets]:
                     expres = expResult
                     break
 
@@ -191,10 +191,10 @@ class Browser(object):
         #First select the experimental results matching the id and the result type:
         expres = None
         for expResult in self:
-            if expResult.getValuesFor('id')[0] != expid:
+            if expResult.globalInfo.id != expid:
                 continue
             else:
-                if 'efficiencyMap' in expResult.getValuesFor('dataType'):
+                if 'efficiencyMap' in [ds.dataInfo.dataType for ds in expResult.datasets]:
                     expres = expResult
                     break
 
@@ -269,9 +269,9 @@ def main(args):
 
     try:
         import IPython
-    except ImportError as e:
-        print ( "IPython is not installed. ", )
-        print ( "To use this script, please install ipython." )
+    except ImportError:
+        print("IPython is not installed.")
+        print("To use this script, please install ipython.")
         import sys
         sys.exit()
 
