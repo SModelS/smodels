@@ -46,18 +46,19 @@ on the SMS |decomposition| and |theory predictions| in several :ref:`output form
 
 For users more familiar with Python and the SModelS basics, an example
 code :ref:`Example.py <exampleCode>` is provided showing how to access
-the main SModelS functionalities: :ref:`decomposition <Decomposition>`, the |database|
-and :ref:`computation of theory predictions <TheoryPredictions>`.
+the main SModelS functionalities: :ref:`decomposition <Decomposition>`, the |database|, 
+:ref:`computation of theory predictions <TheoryPredictions>` and :ref:`limits <confrontPredictions>`.
 
 
 The command-line tool (:ref:`runSModelS.py <runSModelS>`) and the example Python
 code (:ref:`Example.py <exampleCode>`) are described below.
 
 
-.. note:: For non-MSSM (incl. non-SUSY) input models the user needs to write their own *model.py*
-          and specify which BSM particles are even or odd under the assumed
-          Z\ :sub:`2` symmetry (see :ref:`adding new particles <newParticles>`).
-          From version 1.2.0 onwards it is also necessary to define the BSM particle quantum numbers in the same file [#]_.
+.. note:: For non-MSSM (incl. non-SUSY) input models the user needs to provide information
+          about the new BSM states appearing in the input file. From version 2.0 onwards
+          a SLHA file with QNUMBER blocks for the BSM states can be used to define the model.
+          The user can also write their own python module (*model.py*) with the BSM particle definitions 
+          (see :ref:`Basic Input <basicInput>`) [#]_.
          
 
 
@@ -69,8 +70,7 @@ runSModelS.py
 
 
 *runSModelS.py* covers several different applications of the SModelS functionality,
-with the option of turning various features on or off, as well as
-setting the :ref:`basic parameters <parameterFile>`.
+with the option of turning various features on or off through the :ref:`parameters file <parameterFile>`.
 These functionalities include detailed checks of input SLHA files,
 running the |decomposition|,
 evaluating the :doc:`theory predictions <TheoryPredictions>` and comparing them to the experimental
@@ -80,7 +80,7 @@ in several available formats.
 
 Starting on v1.1, *runSModelS.py* is equipped with two additional
 functionalities. First, it can process a folder containing a set of SLHA or LHE
-file, second, it supports parallelization of this input folder.
+files, second, it supports parallelization of this input folder.
 
 
 
@@ -148,7 +148,22 @@ Below we give more detailed information about each entry in the parameters file.
  
 .. _parameterFileModel:
  
-  * **model**: pathname to the Python file that defines the particle content of the BSM model, given either in Unix file notation ("/path/to/model.py") or as Python module path ("path.to.model"). Defaults to *share.models.mssm* which is a standard MSSM. See smodels/share/models folder for more examples. Directory name can be omitted; in that case, the current working directory as well as smodels/share/models are searched for.
+  * **model**: pathname to the Python or SLHA file specifying the particle content of the BSM model. 
+    For the Python file, the path may be given either in Unix file notation ("/path/to/model.py") 
+    or as Python module path ("path.to.model").
+    The default is *share.models.mssm* which is the standard MSSM.
+    See smodels/share/models folder for more examples.
+    The directory name can be omitted; in that case, the current working directory 
+    as well as smodels/share/models are searched for.
+
+  * **promptWidth**: option to specify the smallest particle width (in GeV) for which particles will be considered as prompt.
+    All particles with widths larger than the value specified will be assumed to have prompt decays (infinite width).
+
+  * **stableWidth**: option to specify the largest particle width (in GeV) for which particles will be considered as stable.
+    All particles with widths smaller than the value specified will be assumed to be stable (zero width). The width dependence
+    for particles with width values smaller than *promptWidth* and larger than *stableWidth* will be correctly
+    taken into account.
+
 
 .. _parameterFileParameters:
 
@@ -223,7 +238,7 @@ Below we give more detailed information about each entry in the parameters file.
 .. _parameterFileOutputType:
 
   * **outputType** (list of outputs): use to list all the output formats to be generated.
-    Available output formats are: summary, stdout, log, python, xml, slha.
+    Available output formats are: summary, stdout, log, python, xml, slha, pickle.
 
 .. _parameterFileStdoutprinter:
 
@@ -290,6 +305,16 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction. Available v1.1.3 onwards.
 
+* *pickle-printer*: options for the pickle printer (availble on v2.0 onwards)
+
+.. _parameterFileAddElementListPickle:
+
+  * **addElementList** (True/False): set True to include in the xml output all information about all |elements| generated in the |decomposition|. If set to True the
+    output file can be quite large.
+    
+.. _parameterFileAddTxWeightsPickle:    
+
+  * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction.
 
 
 
@@ -325,6 +350,10 @@ The following formats are available:
  * a :ref:`SLHA file <slhaOut>` containing information about the 
    |theory predictions| and the :ref:`missing topologies <topCoverage>`. The output follows a SLHA-type
    format and contains a summary of the most constraining results and the missed topologies.
+
+ * a :ref:`pickle file <pyOut>` containing all the python objects generated by |decomposition| and
+   |theory predictions|. The output file can be significantly large.
+ 
 
 A detailed explanation of the information contained in each type of output is given
 in :ref:`SModels Output <outputDescription>`.

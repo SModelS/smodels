@@ -356,7 +356,7 @@ def loadDatabase(parser, db):
             try:
                 discard_zeroes = parser.getboolean("database", "discardZeroes")
             except (NoSectionError,NoOptionError) as e:
-                logger.info("database:discardZeroes is not given in config file. Defaulting to 'True'.")
+                logger.debug("database:discardZeroes is not given in config file. Defaulting to 'True'.")
             force_load=None
             if database == True: force_load="txt"
             if os.path.isfile(databasePath):

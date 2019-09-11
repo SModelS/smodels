@@ -1112,6 +1112,9 @@ class PicklePrinter(BasicPrinter):
         # self.toPrint = [None]*len(self.printingOrder)
         with self.openOutFile(self.filename, "ab") as outfile:
             for i in self.toPrint:
+                try:
                 # print ( "adding %20s (size %d)" % ( str(i)[:20], deep_getsizeof(i) ) )
-                pickle.dump ( i, outfile )
+                    pickle.dump(i, outfile)
+                except pickle.PicklingError:
+                    pass
         outfile.close()
