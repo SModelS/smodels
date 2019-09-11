@@ -72,7 +72,8 @@ If, *after* the LO cross sections have been computed, one wants to add the NLO+N
 
 The resulting file will then contain LO cross sections for all MSSM processes and NLO+NLL cross sections for 
 the available processes in `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_  
-(gluino and squark production). In this mode, signal strength multipliers will be ignored.
+(gluino and squark production). Although in this mode the signal strength multipliers option is ignored,
+if multipliers have been applied to LO cross sections, these will be automatically included in the NLO+NLL values.
 When reading the input file, SModelS will then use only the highest order cross sections available for each process.
 
 * **The cross section calculation is implemented by the** `computeXSec function <tools.html#tools.xsecComputer.computeXSec>`_
@@ -109,7 +110,7 @@ For a LHE input file only very basic checks are performed, namely that
 A typical
 usage example is: ::
 
-   smodelsTools.py lhechecker -f inputFiles/slha/gluino_squarks.lhe
+   smodelsTools.py lhechecker -f inputFiles/lhe/gluino_squarks.lhe
 
 .. _slhaChecks:
 
@@ -139,14 +140,14 @@ If any of the above tests fail (return a negative result), an error message is s
 A typical
 usage example is: ::
 
-   smodelsTools.py slhachecker -s 0.01 -f inputFiles/slha/lightSquarks.slha
+   smodelsTools.py slhachecker -f inputFiles/slha/gluino_squarks.slha
 
 Running this will print the status flag and a message with potential warnings
 and error messages.
 
 .. note:: In SModelS versions prior to 1.2, the SLHA file checker also
           checked for the existence of displaced vertices or heavy stable charged
-          particles in the input file. Since the inclusion of HSCP signatures in
+          particles in the input file. Since the inclusion of long lived signatures in
           SModelS, these checks are no longer done by the SLHA file checker.
           
           

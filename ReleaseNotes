@@ -12,6 +12,7 @@ Release v2.0.0, Sep 2019
   * Small bug fix in likelihood computation
   * Width information added to output
   * Added pickle output
+  * Added option for signal strength multipliers in cross section calculator
 
 Release v1.2.2, Tue 28 Nov 2018
 =======================================================

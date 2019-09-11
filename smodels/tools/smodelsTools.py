@@ -21,8 +21,8 @@ def main():
 
     subparsers = parser.add_subparsers(dest='subparser_name')
 
-    installation = subparsers.add_parser('installation', description="Print installation setup and exit.")
-    fixpermissions = subparsers.add_parser('fixpermissions', description="Fix file permissions for xseccomputer.")
+    subparsers.add_parser('installation', description="Print installation setup and exit.")
+    subparsers.add_parser('fixpermissions', description="Fix file permissions for xseccomputer.")
     xseccomputer = subparsers.add_parser('xseccomputer', description="Compute MSSM cross sections for a SLHA file.")
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
         help="sqrt(s) TeV. Can supply more than one value (as a space separated list). Default is both 8 and 13.",
@@ -59,7 +59,6 @@ def main():
 
     slhachecker = subparsers.add_parser('slhachecker', description="Perform several checks on a SLHA file.")
     slhachecker.add_argument('-xS', '--xsec', help='turn off the check for xsection blocks', action='store_false')
-    slhachecker.add_argument('-s', '--sigmacut', help='give sigmacut in fb', default=.03, type=float)
     slhachecker.add_argument('-illegal', '--illegal', help='turn on check for kinematically forbidden decays', action='store_true')
     slhachecker.add_argument('-dB', '--decayBlocks', help='turn off the check for missing decay blocks', action='store_false')
     slhachecker.add_argument('-f', '--filename', help='name of input SLHA file', required=True)
@@ -101,18 +100,17 @@ def main():
     from smodels.tools import smodelsLogging
     smodelsLogging.setLogLevel(args.verbose)
 
-    if args.subparser_name == 'fixpermissions':
-        from smodels import installation
+    from smodels import installation
+    if args.subparser_name == 'fixpermissions':    
         installation.fixpermissions()
 
     if args.subparser_name == 'installation':
-        from smodels import installation
         import sys, os
-        print ( installation.banner() )
-        print ( "SModelS version:", installation.version() )
-        print ( "Installation directory:",installation.installDirectory() )
+        print(installation.banner())
+        print("SModelS version:", installation.version())
+        print("Installation directory:",installation.installDirectory())
         path = os.path.abspath(os.path.realpath(__file__))
-        print ( "This binary:",path )
+        print("This binary:",path )
         sys.exit()
     if args.subparser_name == 'toolbox':
         from smodels.tools import toolBox

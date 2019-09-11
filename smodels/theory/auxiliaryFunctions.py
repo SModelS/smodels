@@ -312,16 +312,22 @@ def getValuesForObj(obj, attribute):
     
     return uniqueValues
 
-def getAttributesFrom(obj):
+def getAttributesFrom(obj,skipIDs=[]):
     """
     Loops over all attributes in the object and return a list
     of the attributes.
     
     :param obj: Any object with a __dict__ attribute
+    :param skipIDs: List of object ids. Any object which has its id on the list
+                    will be ignored (useful to avoid recursion).
     
     :return: List with unique attribute labels.
     """
-    
+
+    if id(obj) in skipIDs or isinstance(obj,(tuple,list,float,int,unum.Unum)):
+        return []
+    else:
+        skipIDs.append(id(obj))
     attributes = []
     try:
         objDict = obj.__dict__.items()
@@ -332,11 +338,11 @@ def getAttributesFrom(obj):
     for attr,value in objDict:
         attributes.append(attr)
         if isinstance(value,list):
-            attributes += [getAttributesFrom(v) for v in value]
+            attributes += [getAttributesFrom(v,skipIDs) for v in value]
         elif isinstance(value,dict):
-            attributes += [getAttributesFrom(v) for v in value.values()]
+            attributes += [getAttributesFrom(v,skipIDs) for v in value.values()]
         else:
-            attributes += getAttributesFrom(value)
+            attributes += getAttributesFrom(value,skipIDs)
     
     attributes =  list(filter(lambda a: a != [], attributes))    
     

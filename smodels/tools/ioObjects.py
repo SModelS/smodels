@@ -54,7 +54,6 @@ class OutputStatus(object):
         self.warnings = status[1]
         self.databaseVersion = databaseVersion
         self.statusStrings = {-1: "#could not run the decomposition",
-                              - 3: "#no cross sections above sigmacut found",
                               - 4: "#database not found",
                               - 2: "#bad input file, did not run decomposition",
                                0: "#no matching experimental results",
@@ -110,15 +109,12 @@ class FileStatus(object):
         self.status = 0, "File not checked\n"
 
 
-    def checkFile(self, inputFile, sigmacut=None):
+    def checkFile(self, inputFile):
         """
         Run checks on the input file.
         
-        :parameter inputFile: path to input file
-        :parameter sigmacut: sigmacut in fb        
+        :parameter inputFile: path to input file   
         """
-        
-        
         
         inputType = runtime.filetype( inputFile )
 
@@ -126,7 +122,7 @@ class FileStatus(object):
             self.filestatus = LheStatus(inputFile)
             self.status = self.filestatus.status
         elif inputType == 'slha':
-            self.filestatus = SlhaStatus(inputFile, sigmacut=sigmacut)
+            self.filestatus = SlhaStatus(inputFile)
             self.status = self.filestatus.status
         else:
             self.filestatus = None
@@ -176,13 +172,12 @@ class SlhaStatus(object):
     = -2: case of formal problems, e.g. no cross sections
         
     """
-    def __init__(self, filename, sigmacut=.03 * fb,
+    def __init__(self, filename,
                  findMissingDecayBlocks=True,
                  findIllegalDecays=False, checkXsec=True):
         
         """
         :parameter filename: path to input SLHA file
-        :parameter sigmacut: sigmacut in fb
         :parameter findMissingDecayBlocks: if True add a warning for missing decay blocks
         :parameter findIllegalDecays: if True check if all decays are kinematically allowed
         :parameter checkXsec: if True check if SLHA file contains cross sections
@@ -190,7 +185,6 @@ class SlhaStatus(object):
         """
         
         self.filename = filename
-        self.sigmacut = sigmacut
         self.slha = self.read()
         
         from smodels.particlesLoader import BSMList
