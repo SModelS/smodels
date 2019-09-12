@@ -50,7 +50,6 @@ New in Version 2.0.0:
   * Downloaded database files now stored in $HOME/.cache/smodels
   * Small bug fix in :ref:`likelihood computation <likelihoodCalc>`
   * Width information added to output
-  * Added pickle output
   * Added option for signal strength multipliers in cross section calculator  
   
 New in Version 1.2.2:

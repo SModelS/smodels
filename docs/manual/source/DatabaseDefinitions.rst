@@ -25,7 +25,7 @@ Database Definitions
 The so-called `experiment module <experiment.html#experiment>`_ 
 contains the basic tools necessary for handling the database of experimental results.
 The SModelS database collects experimental
-results of SUSY searches from both ATLAS and CMS, which are used to compute the
+results of searches from both ATLAS and CMS, which are used to compute the
 experimental constraints on specific models.
 Starting with version 1.1, the SModelS database includes two types of experimental constraints:
 
@@ -42,18 +42,22 @@ simutaneously handle both |UL| and |EM| results.
 Therefore, for both |UL| and |EM| constraints, the database obeys the following structure:
 
 * :ref:`Database <Database>`: collects a list of |ExpRess|.
-   * |ExpRes|: each |ExpRes| corresponds to an experimental preliminary result (i.e. a CONF-NOTE or PAS) or publication and contains a list of |Datasets| as well as general information about the result (luminosity, publication reference,...).
+  
+  * |ExpRes|: each |ExpRes| corresponds to an experimental preliminary result (i.e. a CONF-NOTE or PAS) or publication and contains a list of |Datasets| as well as general information about the result (luminosity, publication reference,...).
 
       * |Dataset|:
         a single |Dataset| corresponds to one signal region of the experimental
         note or publication [*]_. In case of |ULrs| there is a single |Dataset|, usually corresponding to the best signal
-        region (for more details see |Dataset|). For |EMrs|, there is one |Dataset| for each signal region.
+        region or a combination of signal regions (for more details see |Dataset|). For |EMrs|, there is one |Dataset| for each signal region.
         Each |Dataset| contains the Upper Limit maps for :ref:`Upper Limit results <ULtype>` *or* the Efficiency maps for :ref:`Efficiency Map results <EMtype>`. 
 
-            * Upper Limit map: contains the upper limit constraints for |ULrs|. Each map refers to a single 
-              simplified model (or more precisely to a single |element| or sum of |elements|).
-            * Efficiency map: contains the efficiencies for |EMrs|. Each map refers to a single 
-              simplified model (or more precisely to a single |element| or sum of |elements|).
+            * Upper Limit map: contains the upper limit constraints for |ULrs|. Each map contains
+              upper limits for the signal cross-section for a single simplified model 
+              (or more precisely to a single |element| or sum of |elements|)
+              as a function of the simplified model parameters.
+            * Efficiency map: contains the efficiencies for |EMrs|. Each map contains efficiencies
+              for the signal for a single simplified model (or more precisely to a single |element| or sum of |elements|)
+              as a function of the simplified model paramters.
 
 A schematic summary of the above structure can be seen below:
 
@@ -102,9 +106,8 @@ the cross section times branching ratio
 result. These constraints are typically given in the format of Upper Limit maps,
 which correspond to 95% confidence level (C.L.) upper limit values on :math:`\sigma \times BR`
 as a function of the respective parameter space (usually BSM masses
-or slices over mass planes). The UL values usually assume the best signal region
-(for a given point in parameter space), a combination of signal regions or
-more involved limits from other methods.
+or slices over mass planes). The UL values typically refer to the best signal region
+(for a given point in parameter space) or a combination of signal regions.
 Hence, for UL results there is a single |Dataset|, containing one
 or more UL maps. An example of a UL map is shown below:
 
