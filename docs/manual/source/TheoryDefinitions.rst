@@ -1,7 +1,7 @@
 .. index:: Theory Definitions
 
-.. |particle| replace:: :ref:`particle <_particleClass>`
-.. |particles| replace:: :ref:`particles <_particleClass>`
+.. |particle| replace:: :ref:`particle <particleClass>`
+.. |particles| replace:: :ref:`particles <particleClass>`
 .. |element| replace:: :ref:`element <element>`
 .. |elements| replace:: :ref:`elements <element>`
 .. |topology| replace:: :ref:`topology <topology>`

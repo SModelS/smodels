@@ -16,6 +16,9 @@
 .. |elements| replace:: :ref:`elements <element>`
 .. |topology| replace:: :ref:`topology <topology>`
 .. |topologies| replace:: :ref:`topologies <topology>`
+.. |particle| replace:: :ref:`particle <particleClass>`
+.. |particles| replace:: :ref:`particles <particleClass>`
+
 
 .. _databaseDefs:
 
@@ -121,11 +124,14 @@ simplified model :math:`\tilde{q} + \tilde{q} \to \left(jet+\tilde{\chi}_1^0\rig
 Using the SModelS notation this simplified model is mapped to the
 :ref:`element<element>` :math:`[[[jet]],[[jet]]]`, using the notation defined in
 :ref:`Bracket Notation <notation>`.
-In addition to the constraint information, it is also
-possible to specificy a final state property for the simplified model,
-which corresponds to the BSM final state signature (see :ref:`Final State particles <final stateOdd>`).
+The specific BSM states appearing in the simplified model are replaced by
+generic Z\ :sub:`2`-even |particles| which have no attributes, except for its
+Z\ :sub:`2` parity. The only exception are the last BSM states appearing in the cascade
+decay, which signature can be specified through the final state property.
 If no final state is defined, the :ref:`element<element>`
 is assumed to have a :math:`(MET,MET)` final state signature.
+However, other signatures are also possible, such as *HSCP* (heavy stable charged particle),
+*R-hadrons*, etc. A list of all possible database BSM states (or |particles|) can be found in smodels/experiment/databaseParticles.py.
 Usually a single preliminary result/publication contains several UL maps, hence
 each UL-type experimental result contains several UL maps, each one constraining
 different simplified
@@ -232,7 +238,7 @@ Another important difference between |ULrs| and |EMrs| is the existence of sever
 are mapped to |Datasets|.  While |ULrs| contain a single |Dataset| (''signal region''), EM results hold several |Datasets|,
 one for each signal region (see the :ref:`database scheme<databaseScheme>` above).
 Each |Dataset| contains one or more efficiency maps, one for each |element| or sum of |elements|. 
-The efficiency map is usually a function of the BSM masses appearing in the element, as shown by the example below:
+The efficiency map is usually a function of the BSM masses (or masses and widths) appearing in the element, as shown by the example below:
 
 .. _EMplot:
 
@@ -242,9 +248,14 @@ The efficiency map is usually a function of the BSM masses appearing in the elem
 Within SModelS the above EM map is used to compute the efficiency for the
 :ref:`element<element>` :math:`[[[jet]],[[jet]]]`, where we are using the
 notation defined in :ref:`Bracket Notation <notation>`.
-Furthermore, a final state property can also be defined (see :ref:`Final State class <final stateOdd>`).
-If no final state is given, the :ref:`element<element>`
+As in the case of |ULrs|, the specific BSM states appearing in the simplified model are replaced by
+generic Z\ :sub:`2`-even |particles| which have no attributes, except for its
+Z\ :sub:`2` parity. The only exception are the last BSM states appearing in the cascade
+decay, which signature can be specified through the final state property.
+If no final state is defined, the :ref:`element<element>`
 is assumed to have a :math:`(MET,MET)` final state signature.
+However, other signatures are also possible, such as *HSCP* (heavy stable charged particle),
+*R-hadrons*, etc. A list of all possible database BSM states (or |particles|) can be found in smodels/experiment/databaseParticles.py.
 Usually there are several EM maps for a single |dataset|: one for each |element|
 or sum of  |elements|. In order to use a language similar to the one used in |ULrs|, the |element| (or |elements|)
 for which the efficiencies correspond to are still called *constraint*.
@@ -253,7 +264,7 @@ for which the efficiencies correspond to are still called *constraint*.
 Although efficiencis are most useful for |EMrs|, their concept can also be extended to
 |ULrs|. For the latter, the efficiencies for a given element are either 1, if the element
 appears in the :ref:`UL constraint <ULconstraint>`, or 0, otherwise. Atlhough trivial, this extension
-allows us to treat |EMrs| and |ULrs| in a very similar fashion
+allows for a unified treatment of |EMrs| and |ULrs|
 (see :ref:`Theory Predictions <theoryPredictions>` for more details).
 
 
