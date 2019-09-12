@@ -63,7 +63,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """Check input file for errors"""
     inputStatus = ioObjects.FileStatus()
     if parser.getboolean("options", "checkInput"):
-        inputStatus.checkFile(inputFile, sigmacut)
+        inputStatus.checkFile(inputFile)
     """Initialize output status and exit if there were errors in the input"""
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
             dict(parser.items("parameters")), databaseVersion)

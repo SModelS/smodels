@@ -22,7 +22,7 @@ from smodels.theory.model import Model
 setLogLevel("info")
 
 # Set the path to the database
-database = Database("./smodels-database")
+database = Database("official")
 
 def main():
     """
