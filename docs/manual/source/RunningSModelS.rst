@@ -56,7 +56,7 @@ code (:ref:`Example.py <exampleCode>`) are described below.
 
 .. note:: For non-MSSM (incl. non-SUSY) input models the user needs to provide information
           about the new BSM states appearing in the input file. From version 2.0 onwards
-          a SLHA file with QNUMBER blocks for the BSM states can be used to define the model.
+          a SLHA file with QNUMBERS blocks for the BSM states can be used to define the model.
           The user can also write their own python module (*model.py*) with the BSM particle definitions 
           (see :ref:`Basic Input <basicInput>`) [#]_.
          

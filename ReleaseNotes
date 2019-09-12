@@ -7,7 +7,7 @@ Release v2.0.0, Sep 2019
   * Database can now handle lifetime dependent results
   * New simplified missing topologies algorithm and output
   * Added field "type" to the experimental results in the database ('prompt' or 'displaced')
-  * Input model can now be defined by a SLHA file with QNUMBERS
+  * Input model can now be defined by a SLHA file with QNUMBERS blocks
   * Downloaded database files now stored in $HOME/.cache/smodels
   * Small bug fix in likelihood computation
   * Width information added to output

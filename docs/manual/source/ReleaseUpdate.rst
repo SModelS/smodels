@@ -46,7 +46,7 @@ New in Version 2.0.0:
   * :ref:`Database <Database>` can now handle lifetime dependent results
   * New :ref:`missing topologies <topCoverage>` algorithm and output
   * Added :ref:`field "type" <typeProperty>` to the experimental results in the database ('prompt' or 'displaced')
-  * Input model can now be defined by a SLHA file with QNUMBERS  
+  * Input model can now be defined by a SLHA file with :ref:`QNUMBERS blocks <qnumberSLHA>`
   * Downloaded database files now stored in $HOME/.cache/smodels
   * Small bug fix in :ref:`likelihood computation <likelihoodCalc>`
   * Width information added to output

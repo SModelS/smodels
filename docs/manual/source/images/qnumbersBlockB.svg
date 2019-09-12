@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="joinedLines" id="id24161184">
+            <polyline points="180.0,120.0 126.0,68.0 " stroke-width="3.0" stroke="black" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-24161184)"/>
+        </g>
+        <g latexdraw:type="text" id="id1590736934" fill="black" latexdraw:position="bl">
+            <text x="20.0" y="60.0">\textcolor{red}{\large Block identifier}</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1899736860">
+            <polyline points="314.45843743622,117.35705615913824 278.54156256377973,59.642943840862245 " stroke-width="3.0" stroke="black" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-1899736860)"/>
+        </g>
+        <g latexdraw:type="text" id="id770743490" fill="black" latexdraw:position="bl">
+            <text x="220.0" y="60.0">\textcolor{red}{\large 
+particle PDG
+}</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id18842927">
+            <polyline points="419.3178274005739,134.02735140764491 480.68217259942634,65.97264859235547 " stroke-width="3.0" stroke="black" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-18842927)"/>
+        </g>
+        <g latexdraw:type="text" id="id1895281499" fill="black" latexdraw:position="bl">
+            <text x="80.0" y="267.0">\large 
+\begin{tabular}{l}
+BLOCK QNUMBERS 1000022   \# n1\\
+ \hspace{45pt}  1 \hspace{5pt} 0 \hspace{5pt} \# 3 times electric charge\\
+ \hspace{45pt}  2 \hspace{5pt} 2 \hspace{5pt} \# number of spin states (2s+1)\\
+ \hspace{45pt}  3 \hspace{5pt} 1 \hspace{5pt} \# colour rep (1: singlet, 3: triplet, 8: octet)\\
+ \hspace{45pt}  4 \hspace{5pt} 0 \hspace{5pt} \# particle/antiparticle distinction (0=own anti)\\
+ \hspace{45pt}  \textcolor{red}{5 \hspace{5pt}-1 \hspace{5pt} \# $Z_2$ parity  (1: even, -1:  odd) }
+\end{tabular}</text>
+        </g>
+        <g latexdraw:type="text" id="id140992605" fill="black" latexdraw:position="bl">
+            <text x="420.0" y="60.0">\textcolor{red}{\large 
+particle label (optional)
+}</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id279374399">
+            <polyline points="73.2907138717701,206.02303230382896 153.70928612822945,249.97696769617096 " stroke-width="3.0" stroke="black" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-279374399)"/>
+        </g>
+        <g latexdraw:type="text" id="id3561547" fill="black" latexdraw:position="bl">
+            <text x="-61.0" y="222.0">\textcolor{red}{\large 
+\begin{tabular}{c}
+SModelS specific\\
+(optional)
+\end{tabular}
+}</text>
+        </g>
+    </g>
+    <defs>
+        <marker overflow="visible" orient="auto" id="arrow0-24161184">
+            <path d="M 0.0 0.0 L 4.034722222222222 1.4409722222222223 L 4.034722222222222 0.0 L 4.034722222222222 -1.4409722222222223 z " latexdraw:arrSizeNum="2.0" fill="black"/>
+        </marker>
+        <marker overflow="visible" orient="auto" id="arrow0-1899736860">
+            <path d="M 0.0 0.0 L 4.034722222222222 1.4409722222222223 L 4.034722222222222 0.0 L 4.034722222222222 -1.4409722222222223 z " latexdraw:arrSizeNum="2.0" fill="black"/>
+        </marker>
+        <marker overflow="visible" orient="auto" id="arrow0-18842927">
+            <path d="M 0.0 0.0 L 4.034722222222222 1.4409722222222223 L 4.034722222222222 0.0 L 4.034722222222222 -1.4409722222222223 z " latexdraw:arrSizeNum="2.0" fill="black"/>
+        </marker>
+        <marker overflow="visible" orient="auto" id="arrow1-279374399">
+            <path d="M 0.0 0.0 L -4.034722222222222 1.4409722222222223 L -4.034722222222222 0.0 L -4.034722222222222 -1.4409722222222223 z " latexdraw:arrSizeNum="2.0" fill="black"/>
+        </marker>
+    </defs>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:latexIncludes/>
+            <latexdraw:displayXScale>true</latexdraw:displayXScale>
+            <latexdraw:displayYScale>true</latexdraw:displayYScale>
+            <latexdraw:unit>CM</latexdraw:unit>
+            <latexdraw:zoom>1.0</latexdraw:zoom>
+            <latexdraw:magneticGridStyle>CUSTOMISED</latexdraw:magneticGridStyle>
+            <latexdraw:gridGap>20</latexdraw:gridGap>
+            <latexdraw:magneticGrid>false</latexdraw:magneticGrid>
+            <latexdraw:version>3.3.8</latexdraw:version>
+            <latexdraw:size>
+                <latexdraw:width>1535</latexdraw:width>
+                <latexdraw:height>876</latexdraw:height>
+            </latexdraw:size>
+            <latexdraw:position>
+                <latexdraw:x>274.0</latexdraw:x>
+                <latexdraw:y>69.0</latexdraw:y>
+            </latexdraw:position>
+        </latexdraw:metadata>
+    </metadata>
+</svg>
