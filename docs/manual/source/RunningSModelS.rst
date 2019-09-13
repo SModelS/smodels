@@ -55,9 +55,9 @@ code (:ref:`Example.py <exampleCode>`) are described below.
 
 
 .. note:: For non-MSSM (incl. non-SUSY) input models the user needs to provide information
-          about the new BSM states appearing in the input file. From version 2.0 onwards
-          a SLHA file with QNUMBERS blocks for the BSM states can be used to define the model.
-          The user can also write their own python module (*model.py*) with the BSM particle definitions 
+          about the new BSM states appearing in the input model. From version 2.0 onwards
+          a SLHA file with :ref:`QNUMBERS blocks <qnumbersblock>` for the BSM states can be used to define the model.
+          The user can also write their own :ref:`python module <newParticles>` (*model.py*) with the BSM particle definitions 
           (see :ref:`Basic Input <basicInput>`) [#]_.
          
 
@@ -71,7 +71,7 @@ runSModelS.py
 
 *runSModelS.py* covers several different applications of the SModelS functionality,
 with the option of turning various features on or off through the :ref:`parameters file <parameterFile>`.
-These functionalities include detailed checks of input SLHA files,
+These functionalities include :ref:`detailed checks of input files <fileChecks>`,
 running the |decomposition|,
 evaluating the :doc:`theory predictions <TheoryPredictions>` and comparing them to the experimental
 limits available in the |database|,
@@ -140,7 +140,10 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileCombineSRs:
 
-  * **combineSRs** (True/False): set to True to use, whenever available, covariance matrices to combine signal regions. NB this might take a few secs per point. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards. 
+  * **combineSRs** (True/False): set to True to use (whenever available) 
+    covariance matrices to :ref:`combine signal regions <combineSRs>`.
+    NB this might take a few secs per point. Set to False to use only the most sensitive signal region (faster!). 
+    Available v1.1.3 onwards. 
 
 .. _parameterFileParticles:
 
@@ -148,7 +151,7 @@ Below we give more detailed information about each entry in the parameters file.
  
 .. _parameterFileModel:
  
-  * **model**: pathname to the Python or SLHA file specifying the particle content of the BSM model. 
+  * **model**: pathname to the Python or SLHA file specifying the :ref:`particle content <newParticles>` of the BSM model. 
     For the Python file, the path may be given either in Unix file notation ("/path/to/model.py") 
     or as Python module path ("path.to.model").
     The default is *share.models.mssm* which is the standard MSSM.
@@ -157,12 +160,12 @@ Below we give more detailed information about each entry in the parameters file.
     as well as smodels/share/models are searched for.
 
   * **promptWidth**: option to specify the smallest particle width (in GeV) for which particles will be considered as prompt.
-    All particles with widths larger than the value specified will be assumed to have prompt decays (infinite width).
+    All particles with widths larger than the value specified will be assumed to have prompt decays and be assigned an infinite width.
 
   * **stableWidth**: option to specify the largest particle width (in GeV) for which particles will be considered as stable.
-    All particles with widths smaller than the value specified will be assumed to be stable (zero width). The width dependence
-    for particles with width values smaller than *promptWidth* and larger than *stableWidth* will be correctly
-    taken into account.
+    All particles with widths smaller than the value specified will be assumed to be stable and
+    be assigned a zero width. Particles with width values smaller than *promptWidth* and larger than *stableWidth* 
+    will be considered as meta-stable and their width will be correctly taken into account.
 
 
 .. _parameterFileParameters:
@@ -173,8 +176,10 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>` 
     with a weight below sigmacut are neglected during the |decomposition|
-    of SLHA files (see :ref:`Minimum Decomposition Weight <minweight>`).
-    The default value is 0.03 fb. Note that, depending on the input model, the running time may increase considerably if sigmacut is too low, while too large values might eliminate relevant |elements|.
+    (see :ref:`Minimum Decomposition Weight <minweight>`).
+    The default value is 0.01 fb.
+    Note that, depending on the input model, the running time may increase 
+    considerably if sigmacut is too low, while too large values might eliminate relevant |elements|.
 
 .. _parameterFileMinmassgap:
 

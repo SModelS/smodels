@@ -11,7 +11,7 @@ Basic Model Input
 SModelS requires two types of input from the user:
 
  * the :ref:`particle content <newParticles>` of the BSM model (BSM states and their quantum numbers) and
- * :ref:`specific particle and model parameters <modelParameters>`, such as masses, branching ratios and cross-sections
+ * the :ref:`model parameters <modelParameters>`, such as masses, widths, branching ratios and cross-sections.
 
 Below we describe how this information should be provided. 
 
