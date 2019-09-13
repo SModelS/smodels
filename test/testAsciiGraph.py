@@ -37,7 +37,7 @@ class AsciiTest(unittest.TestCase):
         model.updateParticles(filename)
         
         
-        topList = decomposer.decompose(model)
+        topList = decomposer.decompose(model, sigmacut=0)
         element = topList.getElements()[0]
 
 

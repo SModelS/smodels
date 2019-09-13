@@ -98,7 +98,7 @@ class StatisticsTest(unittest.TestCase):
         filename = "./testFiles/slha/T1tttt.slha"
         model = Model(BSMList,SMList)
         model.updateParticles(filename)
-        smstoplist = decomposer.decompose(model)
+        smstoplist = decomposer.decompose(model, sigmacut=0)
         prediction = theoryPredictionsFor(expRes[0], smstoplist)[0]
         prediction.computeStatistics()
         import numpy
@@ -120,7 +120,7 @@ class StatisticsTest(unittest.TestCase):
         filename = "./testFiles/slha/simplyGluino.slha"
         model = Model(BSMList,SMList)
         model.updateParticles(filename)
-        smstoplist = decomposer.decompose(model)
+        smstoplist = decomposer.decompose(model, sigmacut=0)
         prediction = theoryPredictionsFor(expRes, smstoplist)[0]
         pred_signal_strength = prediction.xsection.value
         prediction.computeStatistics()

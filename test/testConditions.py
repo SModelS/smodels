@@ -25,7 +25,7 @@ class ConditionTest(unittest.TestCase):
         model = Model(BSMList,SMList)
         model.updateParticles(filename)
                 
-        topolist = decomposer.decompose(model, sigcut= 0.1*fb, doCompress=True, doInvisible=True, minmassgap = 5*GeV)
+        topolist = decomposer.decompose(model, sigmacut= 0.1*fb, doCompress=True, doInvisible=True, minmassgap = 5*GeV)
         analyses = database.getExpResults(txnames=["TChiWZoff"],analysisIDs='ATLAS-SUSY-2013-12')
         theoryPrediction = theoryPredictionsFor(analyses[0], topolist)[0]
         conditionViolation = theoryPrediction.conditions

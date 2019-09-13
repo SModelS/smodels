@@ -544,7 +544,8 @@ class Element(object):
             neutralSM = all(ptc.isMET() for ptc in branch.evenParticles[-1])
             neutralDecay = neutralSM and branch.oddParticles[-1].isMET()
             #Check if the mother can be considered MET:
-            neutralBSM = branch.oddParticles[-2].isMET()
+            neutralBSM = (branch.oddParticles[-2].isMET()  
+                            or branch.oddParticles[-2].isPrompt())
             if neutralBSM and neutralDecay:
                 removeLastVertex = True
             else:

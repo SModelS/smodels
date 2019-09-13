@@ -17,12 +17,12 @@ from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
-def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
+def decompose(model, sigmacut= 0.1*fb, doCompress=True, doInvisible=True,
               minmassgap= 0*GeV):
     """
     Perform decomposition using the information stored in model.
     
-    :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
+    :param sigmacut: minimum sigma*BR to be generated, by default sigmacut = 0.1 fb
     :param doCompress: turn mass compression on/off
     :param doInvisible: turn invisible compression on/off
     :param minmassgap: maximum value (in GeV) for considering two R-odd particles
@@ -39,9 +39,9 @@ def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
         logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")        
         raise SModelSError()
 
-    if type(sigcut) == type(1.):
-        sigcut = sigcut*fb
-    sigcut = sigcut.asNumber(fb)
+    if isinstance(sigmacut,(float,int)):
+        sigmacut = sigmacut*fb
+    sigmacut = sigmacut.asNumber(fb)
 
     xSectionList.removeLowerOrder()
     # Order xsections by PDGs to improve performance
@@ -74,7 +74,7 @@ def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
         branchList[-1].maxWeight = maxWeight[pid]        
         
     # Generate final branches (after all R-odd particles have decayed)
-    finalBranchList = decayBranches(branchList, sigcut)
+    finalBranchList = decayBranches(branchList, sigmacut)
     
     # Generate dictionary, where keys are the PIDs and values are the list of branches for the PID (for performance)
     branchListDict = {}
@@ -99,7 +99,7 @@ def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
     # cross section list
     for pids in xSectionList.getPIDpairs():
         weightList = xSectionListDict[pids]
-        minBR = (sigcut/weightList.getMaxXsec().asNumber(fb))
+        minBR = (sigmacut/weightList.getMaxXsec().asNumber(fb))
         if minBR > 1.:
             continue
         for branch1 in branchListDict[pids[0]]:
@@ -113,7 +113,7 @@ def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
                                      
                 finalBR = BR1*BR2
                 if finalBR < minBR:
-                    continue # Skip elements with xsec below sigcut
+                    continue # Skip elements with xsec below sigmacut
                                        
                 newElement = element.Element([branch1, branch2])
                 newElement.weight = weightList*finalBR

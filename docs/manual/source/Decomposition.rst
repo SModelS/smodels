@@ -11,6 +11,8 @@
 .. |theory prediction| replace:: :doc:`theory prediction <TheoryPredictions>`
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
+.. |particle| replace:: :ref:`particle <particleClass>`
+.. |particles| replace:: :ref:`particles <particleClass>`
 
 .. _decomposition:
 
@@ -25,18 +27,19 @@ The input format can be:
 * a LHE file
 
 (see :doc:`Basic Input <BasicInput>`).
-The same the :ref:`decomposition <decomp>` method is applied for both formats.
-This is possible by making use of the :ref:`LHE-reader <lhereader>` which translates the information of the LHE file into a 
-similar form as the information of the SLHA file. Since the decomposition procedure is similar for both types of files
-it will be described for an SLHA file.
+The same :ref:`decomposition <decomp>` method is applied for both formats.
+This is possible by making use of the :ref:`LHE-reader <lhereader>`, which translates the information of the LHE file into a 
+format similar to the SLHA input. Since the decomposition procedure is identical for both types of files
+it will only be described for the SLHA file input.
 
 .. _decomp:
 
 Decomposition
-------------------------
+-------------
 
-The SLHA file describing the input model is required to contain the masses of all
-the BSM states as well as their production cross sections and decay branching ratios. All the above information must follow the guidelines of the SLHA format. In particular, the cross sections also have to be included
+The SLHA file describing the :ref:`input model parameters <modelParameters>` is required to contain the masses of all
+the BSM states as well as their production cross sections, decay branching ratios and total widths.
+All this information must follow the guidelines of the SLHA format. In particular, the cross sections also have to be included
 as SLHA blocks according to the :ref:`SLHA cross section format <xsecSLHA>`.
 
 Once the production cross sections are read from the input file, all the cross sections for *production
@@ -65,16 +68,20 @@ For instance, assume [b1,b2,b3] and [B1,B2] represent all possible branches (or 
 for the primary mothers A and B, respectively. Then, if a production cross section for :math:`pp \rightarrow A+B` is given in the input file, the following elements will be generated:
 
    [b1,B1], [b1,B2], [b2,B1], [b2,B2], [b3,B1] and [b3,B2]
+   
+The decomposition process either stops when the lightest neutral BSM particle or a stable (or meta-stable) particle is reached.
+Meta-stable particles are the ones with a total decay width smaller than a certain cutoff value 
+(set by :ref:`promptWidth in the parameters file <parameterFileModel>`).
+For these states, in addition to the :ref:`branches <branch>` where this particle decays, 
+the decomposition will generate :ref:`branches <branch>` where this particle
+appears as a final state (undecayed).
 
-Additional to the information in the DECAY blocks, SModelS also checks for the possibility of a particle to be stable.
-If the particle's decay width is smaller than a certain cutoff value 'promptwidth' there will be an additional "empty decay" 
-added to the ones coming from the DECAY blocks.
-The decomposition process either stops when the lightest neutral BSM particle or a stable particle is reached.
 Each of the :ref:`elements <element>` generated according to the procedure just described will also
 store its weight, which equals its production cross section times all the branching ratios appearing in it.
 In order to avoid a too large number of elements, only those satisfying a :ref:`minimum weight <minweight>` requirement are kept.
 Furthermore, the elements are grouped according to their :ref:`topologies <topology>`. The final output of the
-SLHA decomposition is a list of such topologies, where each topology contains a list of the elements generated during the decomposition.
+SLHA decomposition is a list of such topologies, where each topology contains a list of the 
+elements generated during the decomposition.
 
 * **The decomposition is implemented by the** `decompose method <theory.html#theory.decomposer.decompose>`_
 
@@ -90,32 +97,33 @@ may become too large, and the computing time too long.
 For most practical purposes, however, elements with extremely small weights (cross section times BRs)
 can be discarded, since they will fall well below the experimental limits. Therefore, during the SLHA decomposition,
 whenever an element is generated with a weight below some minimum value, this element (and all elements derived from it) is ignored.
-The minimum weight to be considered is given by the `sigcut <theory.html#theory.decomposer.decompose>`_ parameter
-and is easily adjustable
-(see `decomposer.decompose <theory.html#theory.decomposer.decompose>`_).
+The minimum weight to be considered is set by the :ref:`sigmacut parameter in the parameters file <parameterFileSigmacut>`
+and is easily adjustable (see `decomposer.decompose <theory.html#theory.decomposer.decompose>`_).
 
 Note that, when computing the |theory predictions|, the weight of several |elements| can be combined together. Hence
-it is recommended to set the value of `sigcut <theory.html#theory.decomposer.decompose>`_
+it is recommended to set the value of :ref:`sigmacut <parameterFileSigmacut>`
 approximately one order of magnitude below the minimum signal cross sections the experimental data can constrain.
 
 .. _lhereader:
 
 LHE-reader
------------------------
+----------
 
 More general models can be input through an LHE event file containing parton-level events, including the production of the primary
 mothers and their cascade decays. 
 The LHE-reader goes through the events and by doing so creates dictionaries mapping the different particles to their masses and
 decays which corresponds to the DECAY and MASS blocks of the SLHA file.
-The cross sections are obtained by using `crossSection.getXsecFromLHEFile <theory.html#theory.crossSection.getXsecFromLHEFile>`_ .
+The pair production cross sections are obtained by adding up the weights
+of all events with a the same pair of mother particles 
+(see `crossSection.getXsecFromLHEFile <theory.html#theory.crossSection.getXsecFromLHEFile>`_ ).
 
-Notice that, for the LHE decomposition, the :ref:`elements <element>` generated are restricted to the events in the input file. Hence,
-the uncertainties on the elements weights (and which elements are actually generated by the model)
+Notice that, for the LHE decomposition, the |elements| generated are restricted to the events in the input file. Hence,
+the uncertainties on the elements weights (and which |elements| are actually generated by the model)
 are fully dependent on the Monte Carlo statistics used to generate the LHE file.
 Also, when generating the events it is important to ensure that no mass smearing is applied, so the events
 always contain the same mass value for a given particle.
 
-**Note that since all decays appearing in an LHE event are assumed to be prompt, the LHE-based
+**Note that since all decays appearing in an LHE event are assumed to be prompt and the LHE-based
 decomposition should not be used for models with meta-stable BSM particles**.
 
 * **The LHE reader is implemented by the** `LHE reader method <theory.html#theory.lheReader.getDictionariesFrom>`_
@@ -129,7 +137,7 @@ Compression of Elements
 
 
 During the decomposition process it is possible to perform several simplifications on
-the :ref:`elements <element>` generated. In both the :ref:`LHE <lheDecomp>` and :ref:`SLHA <slhaDecomp>`-based decompositions, two useful
+the :ref:`elements <element>` generated. Two useful
 simplifications are possible: :ref:`Mass Compression <massComp>` and :ref:`Invisible Compression <invComp>`.
 The main advantage of performing these compressions is that the simplified :ref:`element <element>` is
 always shorter (has fewer cascade decay steps), which makes it more likely to be constrained by experimental
@@ -140,9 +148,9 @@ results. The details behind the compression methods are as follows:
 Mass Compression
 ^^^^^^^^^^^^^^^^
 
-In case of small mass differences, the decay of an :ref:`intermediate state <odd states>` to a nearly degenerate
-one will in most cases produce soft :ref:`final states <final states>`, which can not be experimentally detected.
-Consequently, it is a good approximation to neglect the soft :ref:`final states <final states>` and *compress* the respective
+In case of small mass differences, the *prompt* decay [#]_ of a BSM |particle| to a nearly degenerate
+one will in most cases produce soft final states, which can not be experimentally detected.
+Consequently, it is a good approximation to neglect the soft final states and *compress* the respective
 decay, as shown below:
 
 .. _massCompfig:
@@ -151,7 +159,7 @@ decay, as shown below:
    :width: 80%
 
 After the compression, only the lightest of the two near-degenerate masses are kept in the element, as shown :ref:`above <massCompfig>`.
-The main parameter which controls the compression is `minmassgap <theory.html#theory.element.Element.massCompress>`_,
+The main parameter which controls the compression is :ref:`minmassgap <parameterFileMinmassgap>`,
 which corresponds to the maximum value of :math:`\epsilon`
 in the :ref:`figure above <massCompfig>` to which the compression is performed:
 
@@ -161,24 +169,25 @@ in the :ref:`figure above <massCompfig>` to which the compression is performed:
 
 Note that the compression is an approximation since the final
 states, depending on the boost of the parent state, may not always be soft.
-It is recommended to choose values of `minmassgap <theory.html#theory.element.Element.massCompress>`_
+It is recommended to choose values of :ref:`minmassgap <parameterFileMinmassgap>`
 between 1-10 GeV; the default value is 5 GeV.
 
-* **Mass compression is implemented by the** `massCompress <theory.html#theory.element.Element.massCompress>`_ **method** and can be easily turned on/off by the flag *doCompress* in the :ref:`SLHA <slhaDecomp>` or :ref:`LHE <lheDecomp>` decompositions.
+* **Mass compression is implemented by the** `massCompress <theory.html#theory.element.Element.massCompress>`_ **method** 
+  and can be easily turned on/off by the :ref:`doCompress parameter in the parameters file <parameterFileDoCompress>`.
 
 .. _invComp:
 
 Invisible Compression
 ^^^^^^^^^^^^^^^^^^^^^
 
-Another type of compression is possible when
-the :ref:`final states <final states>` of the last decay are invisible.
+Another type of compression is possible when the last BSM decay appearing in a :ref:`branch <branch>` is invisible.
 The most common example is
 
 .. math::
    A \rightarrow \nu + B
 
-as the last step of the decay chain, where :math:`B` is an insivible particle leading to a MET signature.
+as the last step of the decay chain, where :math:`A` is a neutral particle
+and/or decays promptly and :math:`B` is an insivible particle leading to a MET signature.
 Since both the neutrino and
 :math:`B` are invisible, for all experimental purposes the effective MET object is :math:`B + \nu = A`.
 Hence it is possible to omit the last step in the cascade decay, resulting in a compressed element.
@@ -192,7 +201,13 @@ contain only invisible final states:
    :width: 80%
 
 
-* **Invisible compression is implemented by the** `invisibleCompress <theory.html#theory.element.Element.invisibleCompress>`_ **method** and can be easily turned on/off by the flag *doInvisible* in the :ref:`SLHA <slhaDecomp>` or :ref:`LHE <lheDecomp>` decompositions.
+After the compression, the last BSM state appearing in the compressed |element| is
+replaced by an effective |particle| with no electric or color charge, with label "inv" and with the mass of the parent 
+(:math:`A` in the example above). Furthermore since the original neutral final state (:math:`B`)
+can in principle be meta-stable, the new effective final state inherits its width.
+
+* **Invisible compression is implemented by the** `invisibleCompress <theory.html#theory.element.Element.invisibleCompress>`_ **method**
+  and can be easily turned on/off by the :ref:`doInvisible parameter in the parameters file <parameterFileDoInvisible>`.
 
 
 Element Sorting
@@ -203,15 +218,24 @@ sharing a commong |topology| are sorted.
 Sorting allows for an easy ordering of the elements belonging to a topology and
 faster element comparison.
 Elements are sorted according to their branches. Branches are compared according to
-the following properties:
+the following order of properties:
 
 * Number of vertices
 * Number of final states in each vertex
-* Final state particles (particles belonging to the same vertex are alphabetically sorted)
-* Mass and decay width of intermediate Z\ :sub:`2`-odd states
-* Quantum numbers of Z\ :sub:`2`-odd final states
+* BSM (Z\ :sub:`2`-odd) particles
+* Z\ :sub:`2`-even final state particles in each vertex
 
-As an example, consider the three elements below:
+Finally, particles are compared according to the following order of properties (if defined):
+
+* Z\ :sub:`2` parity
+* Spin
+* Color representation
+* Electric charge
+* Mass
+* Total width
+
+As an example, consider the three elements below where all BSM (Z\ :sub:`2`-odd) particles
+only differ by their mass:
 
 
 .. _elementsorting:
@@ -225,8 +249,9 @@ Element 3 < Element 2 < Element 1
 
 
 Element 1 is 'larger' than the other two since it has a larger number of vertices.
-Elements 2 and 3  are identical, except for their masses. Since the mass array of
-Element 3 is smaller than the one in Element 2, the former is 'smaller' than the latter.
+Elements 2 and 3  are identical, except for their masses. Since the last BSM particle
+appearing in the lower branch of Element 3 has a smaller mass than the corresponding
+particle in Element 2, the former is 'smaller' than the latter.
 Finally if all the branch features listed above are identical for both branches, the
 elements being compared are considered to be equal.
 Futhermore, the branches belonging to the same element are also sorted. Hence, if an element
@@ -246,4 +271,8 @@ it implies
 * **Branch sorting is implemented by the** `sortBranches <theory.html#theory.element.Element.sortBranches>`_ **method**
 
 
+
+.. [#] Decays of meta-stable particles should not be compressed, even if soft, since they might result in
+       distinct signatures depending on the quantum numbers of the decaying particle. Particles are assumed
+       to be meta-stable if their width is below the value set by the :ref:`promptWidth parameter <parameterFileModel>`.
 

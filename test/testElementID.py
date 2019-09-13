@@ -28,7 +28,7 @@ class ElementIdTest(unittest.TestCase):
         model.updateParticles(filename,promptWidth = 1e-12*GeV) #Make sure C1 and N2 are treated as prompt
         ## model.describe()
 
-        topoList = decomposer.decompose(model, sigcut= 0.1*fb, doCompress=True, doInvisible=True, minmassgap= 5*GeV)
+        topoList = decomposer.decompose(model, sigmacut= 0.1*fb, doCompress=True, doInvisible=True, minmassgap= 5*GeV)
         resultlist = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'])
         
         for res in resultlist:

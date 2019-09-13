@@ -109,7 +109,7 @@ class Branch(object):
     def __cmp__(self,other):
         """
         Compares the branch with other.        
-        The comparison is made based on vertnumb, vertparts, evenParticles and oddParticles.
+        The comparison is made based on vertnumb, vertparts, oddParticles and evenParticles.
         The comparison allows for any ordering of the evenParticles in the vertex.
         It relies on the particle comparison, which allows for the comparison of Particles and MultiParticles.
         Only the properties which are defined for both particles are compared.
@@ -137,7 +137,8 @@ class Branch(object):
             else:
                 return -1
             
-        #Compare even final states irrespective of ordering:
+        #Compare even final states (ParticleLists)
+        #The comparison of ParticleList objects is made irrespective of ordering
         for iv,vertex in enumerate(self.evenParticles):            
             if vertex != other.evenParticles[iv]:
                 comp = vertex > other.evenParticles[iv]

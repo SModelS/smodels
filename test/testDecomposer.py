@@ -26,7 +26,7 @@ class DecomposerTest(unittest.TestCase):
         model = Model(BSMList,SMList)
         model.updateParticles(filename)
            
-        topList = decomposer.decompose(model)
+        topList = decomposer.decompose(model, sigmacut=0*fb)
         self.assertTrue(len(topList.getElements()) == 1)
         element = topList.getElements()[0]
         el = Element("[[[q,q]],[[q,q]]]",finalState=['MET','MET'])
@@ -45,7 +45,7 @@ class DecomposerTest(unittest.TestCase):
         model = Model(BSMList,SMList)
         model.updateParticles(filename)
           
-        topList = decomposer.decompose(model)
+        topList = decomposer.decompose(model, sigmacut=0*fb)
         self.assertTrue(len(topList.getElements()) == 1)
         element = topList.getElements()[0]
         el = Element("[[[q,q]],[[q,q]]]",finalState=['MET','MET'])
@@ -66,7 +66,7 @@ class DecomposerTest(unittest.TestCase):
         model = Model(newModel,SMList)
         model.updateParticles(filename)
             
-        topList = decomposer.decompose(model)
+        topList = decomposer.decompose(model, sigmacut=0*fb)
         self.assertTrue(len(topList.getElements()) == 10)
         expectedWeights = {str(sorted([['N1'],['N1']])).replace(' ','') : 0.020,
                            str(sorted([['sta_1'],['sta_1~']])).replace(' ','') : 0.26,
@@ -88,7 +88,7 @@ class DecomposerTest(unittest.TestCase):
         
         
         tested = False
-        topos = decomposer.decompose(model, sigcut=0.1*fb, doCompress=False, doInvisible=False, minmassgap=5.*GeV )
+        topos = decomposer.decompose(model, sigmacut=0.1*fb, doCompress=False, doInvisible=False, minmassgap=5.*GeV )
         toposExpected = {'[][1]' : 1,'[][2]' : 14,'[1][1]' : 1,'[1][2]' : 25,'[2][2]' : 72,
                          '[][2,2]' : 44,'[1][1,1]' : 2,'[1][1,2]' : 22,'[2][1,2]' : 48,
                          '[2][2,2]' : 284,'[1,1][1,1]' : 5,'[1,1][1,2]' : 22,'[1,2][1,2]' : 120,
@@ -109,7 +109,7 @@ class DecomposerTest(unittest.TestCase):
         self.assertTrue(tested) #Make sure the test was performed
          
         tested = False
-        topos = decomposer.decompose(model, sigcut=0.1*fb, doCompress=False, doInvisible=True, minmassgap=5.*GeV )
+        topos = decomposer.decompose(model, sigmacut=0.1*fb, doCompress=False, doInvisible=True, minmassgap=5.*GeV )
         toposExpected = {"[][]" : 1,"[][1]" : 2,"[][2]" : 22,"[1][1]" : 4,"[1][2]" : 25,"[2][2]" : 72,
                          "[][2,2]" : 44,"[1][1,1]" : 4,"[1][1,2]" : 42,"[2][1,2]" : 48,"[2][2,2]" : 284,
                          "[1,1][1,1]" : 5,"[1,1][1,2]" : 22,"[1,2][1,2]" : 120,"[1][1,1,1]" : 2,"[1][1,2,2]" : 72,
@@ -132,7 +132,7 @@ class DecomposerTest(unittest.TestCase):
          
          
         tested = False                 
-        topos = decomposer.decompose(model, sigcut=0.1*fb, doCompress=True, doInvisible=False, minmassgap=5.*GeV)
+        topos = decomposer.decompose(model, sigmacut=0.1*fb, doCompress=True, doInvisible=False, minmassgap=5.*GeV)
         toposExpected = {"[][]" : 1,"[][1]" : 8,"[][2]" : 14,"[1][1]" : 4,"[1][2]" : 29,"[2][2]" : 72,
                         "[][1,2]" : 2,"[][2,2]" : 44,"[1][1,1]" : 4,"[1][1,2]" : 34,"[2][1,2]" : 48,
                         "[2][2,2]" : 284,"[1,1][1,1]" : 17,"[1,1][1,2]" : 22,"[1,2][1,2]" : 120,
@@ -154,7 +154,7 @@ class DecomposerTest(unittest.TestCase):
         self.assertTrue(tested) #Make sure the test was performed
                         
         tested = False                 
-        topos = decomposer.decompose(model, sigcut=0.1*fb, doCompress=True, doInvisible=True, minmassgap=5.*GeV )
+        topos = decomposer.decompose(model, sigmacut=0.1*fb, doCompress=True, doInvisible=True, minmassgap=5.*GeV )
         elIDs = {29+8 : Element("[[[b]],[[b]]]",finalState=['MET','MET']),
                  30+8 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
                  32+8 : Element("[[[b]],[[t+]]]",finalState=['MET','MET']),
