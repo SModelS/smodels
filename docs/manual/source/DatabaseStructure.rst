@@ -18,6 +18,7 @@
 .. |element| replace:: :ref:`element <element>`
 .. |elements| replace:: :ref:`elements <element>`
 .. |particles| replace:: :ref:`particles <particleClass>`
+.. |particle| replace:: :ref:`particle <particleClass>`
 .. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
 
 
@@ -301,7 +302,7 @@ and represents the (inclusive) simplified model:
 .. image:: images/elementInclusive.png
    :width: 35%
 
-Note that although the final state represented by "\*" is any Z\ :sub:`2`-even :ref:`final states <final statesEven>`,
+Note that although the final state represented by "\*" is any Z\ :sub:`2`-even |particle|,
 it must still correspond to a single particle, since the topology specifies a 2-body
 decay for the initially produced BSM particle.
 Finally, it might be useful to define even more inclusive simplified models, such
@@ -345,7 +346,7 @@ For convenience, below we explicitly list the main database folders/files and
 the Python objects they are mapped to:
 
 * |Database| folder :math:`\rightarrow` `Database Class <experiment.html#experiment.databaseObj.Database>`_
-* |ExpRes| folder :math:`\rightarrow` `ExpResult Class <experiment.html#experiment.databaseObj.ExpResult>`_
+* |ExpRes| folder :math:`\rightarrow` `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
 * |Dataset| folder :math:`\rightarrow` `DataSet Class <experiment.html#experiment.datasetObj.DataSet>`_
 * ``globalInfo.txt`` file  :math:`\rightarrow` `Info Class <experiment.html#experiment.infoObj.Info>`_
 * ``dataInfo.txt`` file  :math:`\rightarrow` `Info Class <experiment.html#experiment.infoObj.Info>`_
