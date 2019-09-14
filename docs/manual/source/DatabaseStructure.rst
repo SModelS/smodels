@@ -1,7 +1,5 @@
 .. index:: Database Structure
 
-.. _databaseStruct:
-
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
 .. |conditions| replace:: :ref:`conditions <ULconditions>`
 .. |fb-1| replace:: :math:`\mathrm{fb}^{-1}`
@@ -12,14 +10,18 @@
 .. |ULr| replace:: :ref:`UL-type result <ULtype>`
 .. |EMrs| replace:: :ref:`EM-type results <EMtype>`
 .. |ULrs| replace:: :ref:`UL-type results <ULtype>`
-.. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
-.. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
+.. |ExpRes| replace:: :ref:`Experimental Result <ExpResult>`
+.. |ExpRess| replace:: :ref:`Experimental Results <ExpResult>`
 .. |Dataset| replace:: :ref:`DataSet<DataSet>`
 .. |Datasets| replace:: :ref:`DataSets<DataSet>`
 .. |Database| replace:: :ref:`Database <Database>`
 .. |element| replace:: :ref:`element <element>`
 .. |elements| replace:: :ref:`elements <element>`
+.. |particles| replace:: :ref:`particles <particleClass>`
 .. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
+
+
+.. _databaseStruct:
 
 Database of Experimental Results
 ================================
@@ -94,6 +96,8 @@ Each |Dataset| folder (e.g. ``data``) contains:
 * **TxName files are described by the** `TxName Class <experiment.html#experiment.txnameObj.TxName>`_
 * **dataInfo files are described by the** `Info Class <experiment.html#experiment.infoObj.Info>`_
 
+.. _datasetUL:
+
 Data Set Folder: Upper Limit Type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -116,23 +120,43 @@ first few lines of CMS-SUS-12-024/data/T1tttt.txt read:
 If the finalState property is not provided, the simplified model is assumed to
 contain neutral BSM final states in each branch, leading to a MET signature.
 However, if this is not the case, the non-MET final states must be explicitly listed
-in the  ``TxName.txt`` file (see :ref:`final state classes <final stateOdd>` for more details).
+in the  ``TxName.txt`` file (see |UL| for more details).
 An example from the CMS-EXO-12-026/data/THSCPM1b.txt file is shown below:
 
 .. literalinclude:: /literals/THSCPM1b.txt
    :lines: 1,2,7,9,10
 
 
-The second block of data in the  ``TxName.txt`` file contains the upper limits as a function of the BSM masses:
+The second block of data in the  ``TxName.txt`` file contains the upper limits as a function of the relevant
+simplified model parameters:
 
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 9-19
+   
+.. _widthGrid:   
 
 As we can see, the UL map is given as a Python array with the structure:
 :math:`[[\mbox{masses},\mbox{upper limit}], [\mbox{masses},\mbox{upper limit}],...]`.
+For prompt analyses, the relevant parameters are usually the BSM masses, since
+all decays are assumed to be prompt. On the other hand, results for long-lived
+or meta-stable particles may depend on the BSM widths as well.
+The width dependence can be easily included through the
+following generalization:
 
+.. math::
+   [[M_1,M_2...],[M_A,M_B,...]] \to [[(M_1,\Gamma_1),(M_2,\Gamma_2)...],[(M_A,\Gamma_A),(M_B,\Gamma_B),...]]
 
+In order to make the notation more compact, whenever the width dependence is not included,
+the corresponding decay will be assumed to be prompt and an effective :ref:`lifetime reweigthing factor <dbReweighting>`
+will be applied to the upper limits. For instance, a *mixed type* data grid is also allowed:
 
+.. math::
+   [\; [[M_1,(M_2,\Gamma_2)],[M_1,(M_2,\Gamma_2)]],\mbox{UL}\; ],\;\; [\; [[M_1',(M_2',\Gamma_2')],[M_1',(M_2',\Gamma_2')]],\mbox{UL'}\; ], \;\; ...
+
+The example above represents a simplified model where the decay of the mother is prompt,
+while the daughter does not have to be stable, hence the dependence on :math:`\Gamma_2`.
+In this case, the :ref:`lifetime reweigthing factor <dbReweighting>`
+is applied only for the mother decay.
 
 Data Set Folder: Efficiency Map Type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -162,33 +186,93 @@ some additional information.
 As in the Upper Limit case, the simplified
 model is assumed to contain neutral BSM final states (MET signature).
 For non-MET final states the  finalState field must list
-the :ref:`final state signatures <final stateOdd>`.
+the last BSM |particles| appearing in the cascade decay (see |EM|).
 The second block of data contains the efficiencies as a function of the BSM masses:
 
 .. literalinclude:: /literals/T2.txt
-   :lines: 9-15
+   :lines: 9-13
 
 As we can see the efficiency map is given as a Python array with the structure:
 :math:`[[\mbox{masses},\mbox{efficiency}], [\mbox{masses},\mbox{efficiency}],...]`.
+For non-prompt results the data can also include the dependence on the width
+in exactly the same way as for :ref:`upper limit-type results <widthGrid>`.
 
 
 .. _dbReweighting:
 
-Data Set Folder: Lifetime reweighting factor
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Lifetime Reweighting
+~~~~~~~~~~~~~~~~~~~~
 
-Similar to the efficiency maps, there are also maps containing the probability for each simpilified model to decay in this way.
-Since v2.0.0 SModelS is able to handle different lifetime dependent signatures. Therefore whenever an element is matched
-to an experimental result it has to be multiplied by the probability to decay in the same combination of prompt or displaced decays and long-lived particles.
+From v2.0 onwards SModelS allows to include width dependent efficiencies and upper limits.
+However most experimental results do not provide upper limits (or efficiencies) as a function
+of the BSM particles' widths, since usually all the decays are assumed to be prompt
+and the last BSM particle appearing in the cascade decay is assumed to be stable. [#]_
+In order to apply these results to models which may contain meta-stable
+particles, it is possible to approximate the dependence on the widths for the case in which
+all BSM decays must be prompt and the last BSM particle should decay *outside* the detector.
+In SModelS this is done through a reweighting factor which corresponds to the fraction
+of prompt decays (for intermediate states) and decays *outside* the detector (for final BSM states)
+for a given set of widths.
+For instance, asumme an |EMr| only provides efficiencies (:math:`\epsilon_{prompt}`)
+for prompt decays:
 
-The probabilities are computed by:
+.. _widthExample:
+
+.. image:: images/elementC.png
+   :width: 45%
+
+
+Then, for other values of the widths, an effective efficiency (:math:`\epsilon_{eff}`) can be
+approximated by:
 
 .. math::
-	\mathcal{F}(\tau) = \frac{(A \times \epsilon)_{\tau}}{(A \times \epsilon)_{\infty}}
+
+    \epsilon_{eff} = \mathcal{r} \times \epsilon_{prompt} \mbox{ , where }\mathcal{r} = \mathcal{F}_{prompt} \left( \Gamma_{X_1} \right) \times \mathcal{F}_{prompt} \left( \Gamma_{X_2} \right) \times \mathcal{F}_{long} \left( \Gamma_{Y_1} \right) \times \mathcal{F}_{long} \left( \Gamma_{Y_2} \right)
+
+In the expression above :math:`\mathcal{F}_{prompt}(\Gamma)` is the probability for the decay to be prompt 
+given a width :math:`\Gamma` and :math:`\mathcal{F}_{long}(\Gamma)` is the probability for the decay to
+take place *outside* the detector.
+The precise values of :math:`\mathcal{F}_{prompt}` and :math:`\mathcal{F}_{long}` 
+depend on the relevant detector size (:math:`L`), particle mass (:math:`M`), boost
+(:math:`\beta`) and width (:math:`\Gamma`), thus
+requiring a Monte Carlo simulation for each input model. Since this is not
+within the spirit of the simplified model approach, we approximate the prompt and
+long-lived probabilities by:
+
+.. math::
+   \mathcal{F}_{long} = \exp\left(- \frac{\Gamma L_{outer}}{\langle \gamma \beta \rangle}\right) \mbox{ and } 
+   \mathcal{F}_{prompt} = 1 - \exp\left(- \frac{\Gamma L_{inner}}{\langle \gamma \beta \rangle}\right),
+
+where :math:`L_{outer}` is the effective size of the detector (which we take to be 10 m for both ATLAS
+and CMS), :math:`L_{inner}` is the effective radius of the inner detector (which we take to be 1 mm for both ATLAS
+and CMS). Finally, we take the effective time dilation factor to be  :math:`\langle \gamma \beta \rangle = 1.3` when
+computing :math:`\mathcal{F}_{prompt}` and :math:`\langle \gamma \beta \rangle = 1.43` when computing :math:`\mathcal{F}_{long}`.
+We point out that the above approximations are irrelevant if :math:`\Gamma` is very large (:math:`\mathcal{F}_{prompt} \simeq 1`
+and :math:`\mathcal{F}_{long} \simeq 0`) or close to zero (:math:`\mathcal{F}_{prompt} \simeq 0`
+and :math:`\mathcal{F}_{long} \simeq 1`). Only elements containing particles which have a considerable fraction of displaced
+decays will be sensitive to the values chosen above.
+Also, a precise treatment of lifetimes is possible if the experimental result
+(or a theory group) explicitly provides the efficiencies as a function of the widths, as :ref:`discussed above <widthGrid>`.
 
 
-The lifetime reweighting map is given as a Python array with the structure:
-:math:`[[\mbox{masses},\mbox{lifetime},\mbox{efficiency}], [\mbox{masses},\mbox{lifetime},\mbox{efficiency}],...]`.
+
+The above expressions allows the generalization of the efficiencies computed assuming
+prompt decays to models with meta-stable particles. 
+For |ULrs| the same arguments apply with one important distinction.
+While efficiencies are reduced for displaced decays (:math:`\mathcal{r} < 1`), upper limits are enhanced, since they
+are roughly inversely proportional to signal efficiencies. Therefore, for |ULrs|, we have:
+
+.. math::
+
+    \sigma_{eff}^{UL} = \sigma_{prompt}^{UL}/\mathcal{r}
+
+
+Finally, we point out that for the experimental results which provide 
+efficiencies or upper limits as a function of some (but not all) BSM widths appearing
+in the simplified model (see the :ref:`discussion above <widthGrid>`), 
+the reweighting factor :math:`\mathcal{r}` is computed using only the widths not present
+in the grid.
+
 
 
 .. _inclusiveSMS:
@@ -328,3 +412,6 @@ in the constructor of
  `Database <experiment.html#experiment.databaseObj.Database>`_ .
 
 * The pickle file is created by the `createBinaryFile method <experiment.html#experiment.databaseObj.Database.createBinaryFile>`_
+
+
+.. [#] An obvious exception are searches for long-lived particles with displaced decays.
