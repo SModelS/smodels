@@ -29,7 +29,8 @@ Database of Experimental Results
 
 SModelS stores all the information about the experimental results in the
 |Database|.
-Below we describe both the :ref:`directory <folderStruct>` and :ref:`object <objStruct>` structure of the  |Database|.
+Below we describe both the :ref:`directory <folderStruct>`, :ref:`object <objStruct>` structure of the  |Database|
+and :ref:`how the information in stored in the database is used within SModelS <interpolationDB>`.
 
 .. _folderStruct:
 
@@ -110,33 +111,59 @@ example:
 .. literalinclude:: /literals/dataInfo.txt
    :lines: 1-2
 
-For |ULrs|, each ``TxName.txt`` file contains the UL map for a given simplified model
-(|element| or sum of |elements|) as well as some meta information,
-including the corresponding |constraint| and |conditions|.  The
-first few lines of CMS-SUS-12-024/data/T1tttt.txt read:
+Data Set Folder: Efficiency Map Type
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For |EMrs| the ``dataInfo.txt`` contains relevant information, such as an id to
+identify the |dataset| (signal region), the number of observed and expected
+background events for the corresponding signal region and the respective signal
+upper limits.  Here is the content of
+CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/dataInfo.txt as an example:
+
+.. literalinclude:: /literals/dataInfo-eff.txt
+   :lines: 1-7
+
+.. _txnameFile:
+
+TxName Files
+^^^^^^^^^^^^
+
+Each |DataSet| contains one or more ``TxName.txt`` file storing
+the bulk of the experimental result data.
+For |ULrs|, the TxName file contains the UL maps for a given simplified model
+(|element| or sum of |elements|), while for |EMrs| the file contains
+the simplified model efficiencies.
+In addition, the TxName files also store some meta information, such
+as the source of the data.
+For instance, the first few lines of CMS-SUS-12-024/data/T1tttt.txt read:
 
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 1-8
 
-If the finalState property is not provided, the simplified model is assumed to
-contain neutral BSM final states in each branch, leading to a MET signature.
-However, if this is not the case, the non-MET final states must be explicitly listed
-in the  ``TxName.txt`` file (see |UL| for more details).
+As seen above, the first block of data in the 
+file contains information about the |element|
+or simplified model ([[['t','t']],[['t','t']]])
+in |bracket notation| for which the data refers to as well as 
+reference to the original data source and some additional information.
+The simplified model is assumed to contain neutral BSM final states (MET signature)
+and arbitrary intermediate BSM states.
+For non-MET final states the finalState field must list the type of
+BSM :ref:`particles <particleClass>` (see |UL| for more details).
 An example from the CMS-EXO-12-026/data/THSCPM1b.txt file is shown below:
 
 .. literalinclude:: /literals/THSCPM1b.txt
    :lines: 1,2,7,9,10
 
 
-The second block of data in the  ``TxName.txt`` file contains the upper limits as a function of the relevant
-simplified model parameters:
+The second block of data in the  ``TxName.txt`` file contains the upper limits or efficiencies
+as a function of the relevant simplified model parameters:
 
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 9-19
    
 .. _widthGrid:   
 
-As we can see, the UL map is given as a Python array with the structure:
+As we can see, the data grid is given as a Python array with the structure:
 :math:`[[\mbox{masses},\mbox{upper limit}], [\mbox{masses},\mbox{upper limit}],...]`.
 For prompt analyses, the relevant parameters are usually the BSM masses, since
 all decays are assumed to be prompt. On the other hand, results for long-lived
@@ -159,122 +186,6 @@ while the daughter does not have to be stable, hence the dependence on :math:`\G
 In this case, the :ref:`lifetime reweigthing factor <dbReweighting>`
 is applied only for the mother decay.
 
-Data Set Folder: Efficiency Map Type
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For |EMrs| the ``dataInfo.txt`` contains relevant information, such as an id to
-identify the |dataset| (signal region), the number of observed and expected
-background events for the corresponding signal region and the respective signal
-upper limits.  Here is the content of
-CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/dataInfo.txt as an example:
-
-.. literalinclude:: /literals/dataInfo-eff.txt
-   :lines: 1-7
-
-For |EMrs|, each ``TxName.txt`` file contains the efficiency map for a given
-simplified model (|element| or sum of |elements|) as well as some meta
-information.
-Here is the first few lines of CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/T2.txt:
-
-.. literalinclude:: /literals/T2.txt
-   :lines: 1-8
-
-As seen above, the first block of data in the ``T2.txt`` file contains
-information about the |element| (:math:`[[[\mbox{jet}]],[[\mbox{jet}]]]`)
-in |bracket notation| for which the
-efficiencies refers to as well as reference to the original data source and
-some additional information.
-As in the Upper Limit case, the simplified
-model is assumed to contain neutral BSM final states (MET signature).
-For non-MET final states the  finalState field must list
-the last BSM |particles| appearing in the cascade decay (see |EM|).
-The second block of data contains the efficiencies as a function of the BSM masses:
-
-.. literalinclude:: /literals/T2.txt
-   :lines: 9-13
-
-As we can see the efficiency map is given as a Python array with the structure:
-:math:`[[\mbox{masses},\mbox{efficiency}], [\mbox{masses},\mbox{efficiency}],...]`.
-For non-prompt results the data can also include the dependence on the width
-in exactly the same way as for :ref:`upper limit-type results <widthGrid>`.
-
-
-.. _dbReweighting:
-
-Lifetime Reweighting
-~~~~~~~~~~~~~~~~~~~~
-
-From v2.0 onwards SModelS allows to include width dependent efficiencies and upper limits.
-However most experimental results do not provide upper limits (or efficiencies) as a function
-of the BSM particles' widths, since usually all the decays are assumed to be prompt
-and the last BSM particle appearing in the cascade decay is assumed to be stable. [#]_
-In order to apply these results to models which may contain meta-stable
-particles, it is possible to approximate the dependence on the widths for the case in which
-all BSM decays must be prompt and the last BSM particle should decay *outside* the detector.
-In SModelS this is done through a reweighting factor which corresponds to the fraction
-of prompt decays (for intermediate states) and decays *outside* the detector (for final BSM states)
-for a given set of widths.
-For instance, asumme an |EMr| only provides efficiencies (:math:`\epsilon_{prompt}`)
-for prompt decays:
-
-.. _widthExample:
-
-.. image:: images/elementC.png
-   :width: 45%
-
-
-Then, for other values of the widths, an effective efficiency (:math:`\epsilon_{eff}`) can be
-approximated by:
-
-.. math::
-
-    \epsilon_{eff} = \mathcal{r} \times \epsilon_{prompt} \mbox{ , where }\mathcal{r} = \mathcal{F}_{prompt} \left( \Gamma_{X_1} \right) \times \mathcal{F}_{prompt} \left( \Gamma_{X_2} \right) \times \mathcal{F}_{long} \left( \Gamma_{Y_1} \right) \times \mathcal{F}_{long} \left( \Gamma_{Y_2} \right)
-
-In the expression above :math:`\mathcal{F}_{prompt}(\Gamma)` is the probability for the decay to be prompt 
-given a width :math:`\Gamma` and :math:`\mathcal{F}_{long}(\Gamma)` is the probability for the decay to
-take place *outside* the detector.
-The precise values of :math:`\mathcal{F}_{prompt}` and :math:`\mathcal{F}_{long}` 
-depend on the relevant detector size (:math:`L`), particle mass (:math:`M`), boost
-(:math:`\beta`) and width (:math:`\Gamma`), thus
-requiring a Monte Carlo simulation for each input model. Since this is not
-within the spirit of the simplified model approach, we approximate the prompt and
-long-lived probabilities by:
-
-.. math::
-   \mathcal{F}_{long} = \exp\left(- \frac{\Gamma L_{outer}}{\langle \gamma \beta \rangle}\right) \mbox{ and } 
-   \mathcal{F}_{prompt} = 1 - \exp\left(- \frac{\Gamma L_{inner}}{\langle \gamma \beta \rangle}\right),
-
-where :math:`L_{outer}` is the effective size of the detector (which we take to be 10 m for both ATLAS
-and CMS), :math:`L_{inner}` is the effective radius of the inner detector (which we take to be 1 mm for both ATLAS
-and CMS). Finally, we take the effective time dilation factor to be  :math:`\langle \gamma \beta \rangle = 1.3` when
-computing :math:`\mathcal{F}_{prompt}` and :math:`\langle \gamma \beta \rangle = 1.43` when computing :math:`\mathcal{F}_{long}`.
-We point out that the above approximations are irrelevant if :math:`\Gamma` is very large (:math:`\mathcal{F}_{prompt} \simeq 1`
-and :math:`\mathcal{F}_{long} \simeq 0`) or close to zero (:math:`\mathcal{F}_{prompt} \simeq 0`
-and :math:`\mathcal{F}_{long} \simeq 1`). Only elements containing particles which have a considerable fraction of displaced
-decays will be sensitive to the values chosen above.
-Also, a precise treatment of lifetimes is possible if the experimental result
-(or a theory group) explicitly provides the efficiencies as a function of the widths, as :ref:`discussed above <widthGrid>`.
-
-
-
-The above expressions allows the generalization of the efficiencies computed assuming
-prompt decays to models with meta-stable particles. 
-For |ULrs| the same arguments apply with one important distinction.
-While efficiencies are reduced for displaced decays (:math:`\mathcal{r} < 1`), upper limits are enhanced, since they
-are roughly inversely proportional to signal efficiencies. Therefore, for |ULrs|, we have:
-
-.. math::
-
-    \sigma_{eff}^{UL} = \sigma_{prompt}^{UL}/\mathcal{r}
-
-
-Finally, we point out that for the experimental results which provide 
-efficiencies or upper limits as a function of some (but not all) BSM widths appearing
-in the simplified model (see the :ref:`discussion above <widthGrid>`), 
-the reweighting factor :math:`\mathcal{r}` is computed using only the widths not present
-in the grid.
-
-
 
 .. _inclusiveSMS:
 
@@ -282,7 +193,7 @@ Inclusive Simplified Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-If the analysis signal efficiencies are insensitive to
+If the analysis signal efficiencies or upper limits are insensitive to
 some of the simplified model final states, it might be convenient to define
 *inclusive* simplified models. A typical case are some of the heavy stable charged
 particle searches, which only rely on the presence of a non-relativistic charged
@@ -355,29 +266,16 @@ the Python objects they are mapped to:
 
 .. _databasePickle:
 
+
 Database: Binary (Pickle) Format
---------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 At the first time of instantiating the
 `Database <experiment.html#experiment.databaseObj.Database>`_
 class, the text files in *<database-path>* are loaded and parsed, and the
 corresponding data objects are built. The efficiency and upper limit maps
 themselves are subjected to standard preprocessing steps such as a principal
-component analysis and Delaunay triangulation (see Figure below).  The
-simplices defined during triangulation are then used for linearly interpolating
-the data grid, thus allowing SModelS to compute efficiencies or upper limits
-for arbitrary mass values (as long as they fall inside the data grid).
-Width parameters are taken logarithmically before linearly interpolating, which
-effectively corresponds to an exponential interpolation in the widths.
-This procedure provides an efficient and numerically robust way of dealing with
-generic data grids, including arbitrary parametrizations of the mass parameter
-space, irregular data grids and asymmetric branches.
-
-.. image:: images/delaunay.png
-
-..
- %\caption{Delaunay triangulation of an upper limit map with three mass                                                                        %parameters. The colors show the upper limit values.}
-
+component analysis and Delaunay triangulation (see :ref:`below <interpolationDB>`).
 For the sake of efficiency, the entire database -- including the Delaunay
 triangulation -- is then serialized into a pickle
 file (*<database-path>/database.pcl*), which will be read directly the next time the database is loaded.
@@ -388,31 +286,146 @@ If desired, the pickling process can be skipped using the option *force_load = `
 in the constructor of
 `Database <experiment.html#experiment.databaseObj.Database>`_ .
 
-
 ..
- Due to the large number of experimental results contained in the SModelS
- |Database|, parsing the :ref:`database folders <folderStruct>` and building the
- corresponding :ref:`database objects <objStruct>` may require a non-negligible
- CPU time. In some cases this may be the most time consuming task when
- testing a single input file.  Furthermore this procedure does not have to be
- repeated every time SModelS is run.
- In order to avoid these issues, SModelS serializes the
- `database object <experiment.html#experiment.databaseObj.Database>`_
- into a pickle file (*<database-path>/database.pcl*), which can then be read
- directly when loading the database.
- Since reading the pickle file is much faster than parsing the :ref:`database folders <folderStruct>`,
- there is a considerable speed improvement when using the pickle file.
- If any changes in the :ref:`database folder structure <folderStruct>`
- are detected or the SModelS version has changed,
- SModelS will automatically re-build the pickle file.
- This action may take a few minutes, but it is only performed once.
- SModelS automatically builds (if necessary) and loads the binary database when a
- `Database object <experiment.html#experiment.databaseObj.Database>`_
- is created. Nonetheless, the user can enforce loading (parsing) the *text
- database* using the option *force_load = 'txt'* in the constructor of
- `Database <experiment.html#experiment.databaseObj.Database>`_ .
+ %\caption{Delaunay triangulation of an upper limit map with three mass                                                                        %parameters. The colors show the upper limit values.}
 
 * The pickle file is created by the `createBinaryFile method <experiment.html#experiment.databaseObj.Database.createBinaryFile>`_
+
+.. _interpolationDB:
+
+Database: Data Processing
+-------------------------
+
+All the information contained in the :ref:`database files <folderStruct>`
+is stored in the :ref:`database objects <objStruct>`.
+Within SModelS the information in the |Database| is mostly used for constraining
+the simplified models generated by the :ref:`decomposition <decomposition>` of the input model.
+Each simplified model (or :ref:`element <element>`) generated is compared to the
+simplified models contrained by the database and specified by the *contraint* and *finalStates* entries
+in the  :ref:`TxName files <txnameFile>`.
+The comparison allows to identify which results can be used to test the input model.
+Once a matching result is found the upper limit or efficiency must be computed
+for the given input |element|. As :ref:`described above <txnameFile>`, the
+upper limits or efficiencies are provided as function of masses and widths in the form
+of a discrete grid.
+In order to compute values for any given input |element|, the data has to be
+processed as decribed below.
+
+
+
+The efficiency and upper limit maps are subjected to a few
+standard preprocessing steps.
+First all the units are removed, the shape of the grid is stored and
+the relevant width dependence is identified (see :ref:`discussion above <txnameFile>`).
+Then the masses and widths are transformed into a flat array: 
+
+.. _dataTransf:
+
+.. math::
+   [[M_1,(M_2,\Gamma_2)],[M_A,(M_B,\Gamma_B)]] \to [M_1,M_2,M_A,M_B,\log(1+\Gamma_2),\log(1+\Gamma_B)]
+
+ 
+Finally a principal component analysis and Delaunay triangulation (see :ref:`figure below <delaunay>`)
+is applied over the new coordinates.
+The simplices defined during triangulation are then used for linearly interpolating
+the transformed data grid, thus allowing SModelS to compute efficiencies or upper limits
+for arbitrary mass and width values (as long as they fall inside the data grid).
+As seen above, 
+the width parameters are taken logarithmically before interpolation, which
+effectively corresponds to an exponential interpolation.
+If the data grid does not explicitly provide a dependence on all the widths
+(as in the :ref:`example above <dataTransf>`), the computed upper limit or efficiency
+is then reweighted imposing the requirement of prompt
+decays (see :ref:`lifetime reweighting <dbReweighting>` for more details). 
+This procedure provides an efficient and numerically robust way of dealing with
+generic data grids, including arbitrary parametrizations of the mass parameter
+space, irregular data grids and asymmetric branches.
+
+.. _delaunay:
+
+.. image:: images/delaunay.png
+
+..
+ %\caption{Delaunay triangulation of an upper limit map with three mass                                                                        %parameters. The colors show the upper limit values.}
+
+
+
+.. _dbReweighting:
+
+Lifetime Reweighting
+^^^^^^^^^^^^^^^^^^^^
+
+From v2.0 onwards SModelS allows to include width dependent efficiencies and upper limits.
+However most experimental results do not provide upper limits (or efficiencies) as a function
+of the BSM particles' widths, since usually all the decays are assumed to be prompt
+and the last BSM particle appearing in the cascade decay is assumed to be stable. [#]_
+In order to apply these results to models which may contain meta-stable
+particles, it is possible to approximate the dependence on the widths for the case in which
+the experimental result requires all BSM decays to be prompt and the last BSM particle to be stable or decay *outside* the dector. 
+In SModelS this is done through a reweighting factor which corresponds to the fraction
+of prompt decays (for intermediate states) and decays *outside* the detector (for final BSM states)
+for a given set of widths.
+For instance, asumme an |EMr| only provides efficiencies (:math:`\epsilon_{prompt}`)
+for prompt decays:
+
+.. _widthExample:
+
+.. image:: images/elementC.png
+   :width: 45%
+
+
+Then, for other values of the widths, an effective efficiency (:math:`\epsilon_{eff}`) can be
+approximated by:
+
+.. math::
+
+    \epsilon_{eff} = \mathcal{r} \times \epsilon_{prompt} \mbox{ , where }\mathcal{r} = \mathcal{F}_{prompt} \left( \Gamma_{X_1} \right) \times \mathcal{F}_{prompt} \left( \Gamma_{X_2} \right) \times \mathcal{F}_{long} \left( \Gamma_{Y_1} \right) \times \mathcal{F}_{long} \left( \Gamma_{Y_2} \right)
+
+In the expression above :math:`\mathcal{F}_{prompt}(\Gamma)` is the probability for the decay to be prompt 
+given a width :math:`\Gamma` and :math:`\mathcal{F}_{long}(\Gamma)` is the probability for the decay to
+take place *outside* the detector.
+The precise values of :math:`\mathcal{F}_{prompt}` and :math:`\mathcal{F}_{long}` 
+depend on the relevant detector size (:math:`L`), particle mass (:math:`M`), boost
+(:math:`\beta`) and width (:math:`\Gamma`), thus
+requiring a Monte Carlo simulation for each input model. Since this is not
+within the spirit of the simplified model approach, we approximate the prompt and
+long-lived probabilities by:
+
+.. math::
+   \mathcal{F}_{long} = \exp\left(- \frac{\Gamma L_{outer}}{\langle \gamma \beta \rangle}\right) \mbox{ and } 
+   \mathcal{F}_{prompt} = 1 - \exp\left(- \frac{\Gamma L_{inner}}{\langle \gamma \beta \rangle}\right),
+
+where :math:`L_{outer}` is the effective size of the detector (which we take to be 10 m for both ATLAS
+and CMS), :math:`L_{inner}` is the effective radius of the inner detector (which we take to be 1 mm for both ATLAS
+and CMS). Finally, we take the effective time dilation factor to be  :math:`\langle \gamma \beta \rangle = 1.3` when
+computing :math:`\mathcal{F}_{prompt}` and :math:`\langle \gamma \beta \rangle = 1.43` when computing :math:`\mathcal{F}_{long}`.
+We point out that the above approximations are irrelevant if :math:`\Gamma` is very large (:math:`\mathcal{F}_{prompt} \simeq 1`
+and :math:`\mathcal{F}_{long} \simeq 0`) or close to zero (:math:`\mathcal{F}_{prompt} \simeq 0`
+and :math:`\mathcal{F}_{long} \simeq 1`). Only elements containing particles which have a considerable fraction of displaced
+decays will be sensitive to the values chosen above.
+Also, a precise treatment of lifetimes is possible if the experimental result
+(or a theory group) explicitly provides the efficiencies as a function of the widths, as :ref:`discussed above <widthGrid>`.
+
+
+
+The above expressions allows the generalization of the efficiencies computed assuming
+prompt decays to models with meta-stable particles. 
+For |ULrs| the same arguments apply with one important distinction.
+While efficiencies are reduced for displaced decays (:math:`\mathcal{r} < 1`), upper limits are enhanced, since they
+are roughly inversely proportional to signal efficiencies. Therefore, for |ULrs|, we have:
+
+.. math::
+
+    \sigma_{eff}^{UL} = \sigma_{prompt}^{UL}/\mathcal{r}
+
+
+Finally, we point out that for the experimental results which provide 
+efficiencies or upper limits as a function of some (but not all) BSM widths appearing
+in the simplified model (see the :ref:`discussion above <widthGrid>`), 
+the reweighting factor :math:`\mathcal{r}` is computed using only the widths not present
+in the grid.
+
+
 
 
 .. [#] An obvious exception are searches for long-lived particles with displaced decays.
