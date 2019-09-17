@@ -384,4 +384,4 @@ Below we give a description of each block together with a sample output.
    
    
 
-.. [*] Some of the output may change depending on the database version used.
+.. [*] Some of the output may change depending on the code and database versions used.

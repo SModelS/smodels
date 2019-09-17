@@ -44,9 +44,8 @@ class MPrinter(object):
         """
 
         #Define the printer types and the printer-specific options:
-        printerTypes = parser.get("printer", "outputType").split(",")
+        printerTypes = [prt.strip() for prt in parser.get("printer", "outputType").split(",")]
         for prt in printerTypes:
-            prt = prt.strip() ## trailing spaces shouldnt matter
             if prt == 'python':
                 newPrinter = PyPrinter(output = 'file')
             elif prt == 'summary':
@@ -301,12 +300,15 @@ class TxTPrinter(BasicPrinter):
             return None
 
         old_vertices = ""
+        slabel = "Topologies Table"
         output = ""
-        output += "   ======================================================= \n"
-        output += " || \t \t\t\t\t\t\t || \n"
-        output += " || \t \t Topologies Table \t\t \t ||\n"
-        output += " || \t \t\t\t\t\t\t || \n"
-        output += "   ======================================================= \n"
+        output += "  " + "="*56+ "  \n"
+        output += "||" + " "*56+ "||\n"
+        xspace = int((56-len(slabel))/2.)
+        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"
+        output += "||" + " "*56+ "||\n"
+        output += "  " + "="*56+ "  \n"
+
         for topo in obj:
             if old_vertices == str(topo.vertnumb):
                 output += "\t .................................................. \n"
@@ -364,14 +366,14 @@ class TxTPrinter(BasicPrinter):
         if not hasattr(self,"printdatabase") or not self.printdatabase:
             return None
 
+        slabel = "Selected Experimental Results"
         output = ""
-
-        output += "   ======================================================= \n"
-        output += " || \t \t\t\t\t\t\t || \n"
-        output += " || \t \t Selected Experimental Results \t \t ||\n"
-        output += " || \t \t\t\t\t\t\t || \n"
-        output += "   ======================================================= \n"
-
+        output += "  " + "="*56+ "  \n"
+        output += "||" + " "*56+ "||\n"
+        xspace = int((56-len(slabel))/2.)
+        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"
+        output += "||" + " "*56+ "||\n"
+        output += "  " + "="*56+ "  \n"
 
         for expRes in obj.expResultList:
             output += self._formatExpResult(expRes)
@@ -419,13 +421,17 @@ class TxTPrinter(BasicPrinter):
 
         :param obj: A TheoryPredictionList object to be printed.
         """
+        slabel = "Theory Predictions and"
         output = ""
-        output += "   ======================================================= \n"
-        output += " || \t \t\t\t\t\t\t || \n"
-        output += " || \t Theory Predictions and \t\t\t || \n"
-        output += " || \t Experimental Constraints \t\t \t ||\n"
-        output += " || \t \t\t\t\t\t\t || \n"
-        output += "   ======================================================= \n"
+        output += "  " + "="*56+ "  \n"
+        output += "||" + " "*56+ "||\n"
+        xspace = int((56-len(slabel))/2.)
+        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"
+        slabel = "Experimental Constraints"
+        xspace = int((56-len(slabel))/2.)
+        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"        
+        output += "||" + " "*56+ "||\n"
+        output += "  " + "="*56+ "  \n"
 
 
         for theoryPrediction in obj._theoryPredictions:
