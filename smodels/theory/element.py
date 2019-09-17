@@ -183,6 +183,9 @@ class Element(object):
         
         labels = dict([[n,str(T.nodes[n]['particle'])] 
                        for n in T.nodes()])
+        for key in labels:
+            if labels[key] == 'anyOdd':
+                labels[key] = 'BSM'
         node_size = []
         node_color = []
         for n in T.nodes():
