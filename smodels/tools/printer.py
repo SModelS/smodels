@@ -1063,7 +1063,7 @@ class SLHAPrinter(TxTPrinter):
         #First sort groups by label
         groups = sorted(obj.groups[:], key = lambda g: g.label)
         #Get summary of groups:
-        output = "\nBLOCK SModelS_Missing_and_Outside_the_Grid_CrossSections"
+        output = "\nBLOCK SModelS_Coverage"
         for i,group in enumerate(sorted(groups, key = lambda g: g.label)):
             output += "\n %d 0 %-30s      # %s" %(i,group.label,group.description)
             output += "\n %d 1 %-30.3E      # %s" %(i,group.getTotalXSec(),"Total cross-section (fb)")

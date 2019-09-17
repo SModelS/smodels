@@ -1,16 +1,17 @@
 BLOCK SModelS_Settings
- 0 v2.0.0rc2                 #SModelS version
- 1 2.0.0rc1                  #database version
+ 0 v2.0.0                    #SModelS version
+ 1 2.0.0                     #database version
  2 0.2                       #maximum condition violation
  3 1                         #compression (0 off, 1 on)
  4 5.                        #minimum mass gap for mass compression [GeV]
- 5 0.01                      #sigmacut [fb]
+ 5 0.1                       #sigmacut [fb]
+ 6 0                         #signal region combination (0 off, 1 on)
 
 BLOCK SModelS_Exclusion
  0 0 1                              #output status (-1 not tested, 0 not excluded, 1 excluded)
  1 0 T2                             #txname 
- 1 1 1.521E+00                      #r value
- 1 2 1.521E+00                      #expected r value
+ 1 1 1.435E+00                      #r value
+ 1 2 1.435E+00                      #expected r value
  1 3 0.00                           #condition violation
  1 4 CMS-SUS-16-036                 #analysis
  1 5 (UL)                           #signal region 
@@ -18,8 +19,8 @@ BLOCK SModelS_Exclusion
  1 7 N/A                            #Likelihood
 
  2 0 T2                             #txname 
- 2 1 1.353E+00                      #r value
- 2 2 1.353E+00                      #expected r value
+ 2 1 1.277E+00                      #r value
+ 2 2 1.277E+00                      #expected r value
  2 3 0.00                           #condition violation
  2 4 CMS-SUS-16-033                 #analysis
  2 5 (UL)                           #signal region 
@@ -27,44 +28,21 @@ BLOCK SModelS_Exclusion
  2 7 N/A                            #Likelihood
 
  3 0 T1                             #txname 
- 3 1 1.110E+00                      #r value
- 3 2 1.110E+00                      #expected r value
+ 3 1 1.111E+00                      #r value
+ 3 2 1.111E+00                      #expected r value
  3 3 0.00                           #condition violation
  3 4 CMS-SUS-16-033                 #analysis
  3 5 (UL)                           #signal region 
  3 6 N/A                            #Chi2
  3 7 N/A                            #Likelihood
 
-BLOCK SModelS_Missing_Topos #sqrts[TeV] weight[fb] description
- 0 13  1.482E+02 [[[jet],[W]],[[jet,jet],[W]]]  (prompt,prompt)
- 1 13  1.445E+02 [[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)
- 2 13  1.047E+02 [[[b,t],[W]],[[jet,jet],[W]]]  (prompt,prompt)
- 3 13  8.754E+01 [[[jet]],[[jet,jet],[W]]]  (prompt,prompt)
- 4 13  8.654E+01 [[[jet,jet],[W]],[[jet,jet],[higgs]]]  (prompt,prompt)
- 5 13  7.520E+01 [[[jet],[W]],[[b,t],[W]]]  (prompt,prompt)
- 6 13  7.333E+01 [[[jet,jet],[W]],[[jet],[b,t],[W]]]  (prompt,prompt)
- 7 13  7.333E+01 [[[b,t],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)
- 8 13  6.576E+01 [[[jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)
- 9 13  6.214E+01 [[[jet],[W]],[[jet,jet],[higgs]]]  (prompt,prompt)
 
-BLOCK SModelS_Outside_Grid #sqrts[TeV] weight[fb] description
- 0 13  1.438E+00 [[[t],[W]],[[t],[W]]]  (prompt,prompt)
- 1 13  2.921E-02 [[[b],[W]],[[b],[W]]]  (prompt,prompt)
- 2 13  1.872E-02 [[[W]],[[higgs]]]  (prompt,prompt)
- 3 13  1.335E-02 [[[jet],[W]],[[jet],[W]]]  (prompt,prompt)
-
-BLOCK SModelS_Long_Lived #sqrts[TeV] weight[fb] description
-
-BLOCK SModelS_Displaced #sqrts[TeV] weight[fb] description
-
-BLOCK SModelS_MET #sqrts[TeV] weight[fb] description
- 0 13  1.482E+02 [[[jet],[W]],[[jet,jet],[W]]]  (prompt,prompt)
- 1 13  1.445E+02 [[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)
- 2 13  1.047E+02 [[[b,t],[W]],[[jet,jet],[W]]]  (prompt,prompt)
- 3 13  8.754E+01 [[[jet]],[[jet,jet],[W]]]  (prompt,prompt)
- 4 13  8.654E+01 [[[jet,jet],[W]],[[jet,jet],[higgs]]]  (prompt,prompt)
- 5 13  7.520E+01 [[[jet],[W]],[[b,t],[W]]]  (prompt,prompt)
- 6 13  7.333E+01 [[[jet,jet],[W]],[[jet],[b,t],[W]]]  (prompt,prompt)
- 7 13  7.333E+01 [[[b,t],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)
- 8 13  6.576E+01 [[[jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)
- 9 13  6.214E+01 [[[jet],[W]],[[jet,jet],[higgs]]]  (prompt,prompt)
+BLOCK SModelS_Coverage
+ 0 0 missing (all)                       # missing topologies
+ 0 1 2.742E+03                           # Total cross-section (fb)
+ 1 0 missing (displaced)                 # missing topologies with displaced decays
+ 1 1 0.000E+00                           # Total cross-section (fb)
+ 2 0 missing (prompt)                    # missing topologies with prompt decays
+ 2 1 2.742E+03                           # Total cross-section (fb)
+ 3 0 outsideGrid (all)                   # topologies outside the grid
+ 3 1 1.658E+00                           # Total cross-section (fb)
