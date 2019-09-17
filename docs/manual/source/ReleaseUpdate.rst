@@ -42,15 +42,15 @@ New in Version 2.0.0:
 
   * Introduction of :ref:`particle class <particleClass>`
   * Unified treatment of SLHA and LHE input files (see :ref:`decomposer <decomp>` and :ref:`LHE-reader <lhereader>`)
-  * Decomposition and experimental results can include displaced signatures
-  * :ref:`Database <Database>` can now handle lifetime dependent results
+  * :ref:`Decomposition <decomposition>`  and |ExpRess| can now include displaced signatures (see :ref:`Database Structure <databaseStruct>`)
+  * :ref:`Database <widthGrid>` can now handle lifetime dependent results
   * New :ref:`missing topologies <topCoverage>` algorithm and output
-  * Added :ref:`field "type" <typeProperty>` to the experimental results in the database ('prompt' or 'displaced')
+  * Added :ref:`field "type" <txnameFile>` to the experimental results in the database
   * Input model can now be defined by a SLHA file with :ref:`QNUMBERS blocks <qnumberSLHA>`
-  * Downloaded database files now stored in $HOME/.cache/smodels
+  * :ref:`Downloaded database files <parameterFilePath>` now stored in $HOME/.cache/smodels
   * Small bug fix in :ref:`likelihood computation <likelihoodCalc>`
-  * Width information added to output
-  * Added option for signal strength multipliers in cross section calculator  
+  * Changes in output: :ref:`width values added <pyOut>`, :ref:`coverage groups <coverageGroups>` and others (see :ref:`output description <outputDescription>` for details)
+  * Added option for signal strength multipliers in :ref:`cross section calculator <xsecCalc>`
   
 New in Version 1.2.2:
 ^^^^^^^^^^^^^^^^^^^^^
@@ -58,7 +58,7 @@ New in Version 1.2.2:
   * Updated official |database|, added T3GQ eff maps and a few ATLAS 13 TeV results, see `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_
   * Database "official" now refers to a database without fastlim results, "official_fastlim", to the official database *with* fastlim
   * List displaced signatures in :ref:`missing topologies <topCoverage>`
-  * Improved description about :ref:`lifetime reweighting <lifetimeWeight>` in doc
+  * Improved description about lifetime reweighting in doc
   * Fix in :ref:`cluster<ULcluster>` for asymmetric masses
   * Small improvements in the :ref:`interactive plots tool <interactivePlots>`
 
@@ -73,9 +73,9 @@ New in Version 1.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * Decomposition and experimental results can include
-    non-MET BSM :ref:`final states <final stateOdd>` (e.g. heavy stable charged particles)
-  * Added :ref:`lifetime reweighting <lifetimeWeight>` at |decomposition| for meta-stable particles
-  * Added :ref:`finalState property <final stateOdd>` for Elements
+    non-MET BSM final states (e.g. heavy stable charged particles)
+  * Added lifetime reweighting at |decomposition| for meta-stable particles
+  * Added finalState property for Elements
   * Introduction of :ref:`inclusive simplified models <inclusiveSMS>`
   * Inclusion of HSCP and R-hadron results in the database
 

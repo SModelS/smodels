@@ -134,7 +134,8 @@ For |ULrs|, the TxName file contains the UL maps for a given simplified model
 (|element| or sum of |elements|), while for |EMrs| the file contains
 the simplified model efficiencies.
 In addition, the TxName files also store some meta information, such
-as the source of the data.
+as the source of the data and the *type* of result (*prompt* or *displaced*).
+If not specified, the type will be assumed to be prompt. [*]_
 For instance, the first few lines of CMS-SUS-12-024/data/T1tttt.txt read:
 
 .. literalinclude:: /literals/T1tttt.txt
@@ -358,7 +359,7 @@ Lifetime Reweighting
 From v2.0 onwards SModelS allows to include width dependent efficiencies and upper limits.
 However most experimental results do not provide upper limits (or efficiencies) as a function
 of the BSM particles' widths, since usually all the decays are assumed to be prompt
-and the last BSM particle appearing in the cascade decay is assumed to be stable. [#]_
+and the last BSM particle appearing in the cascade decay is assumed to be stable. [*]_
 In order to apply these results to models which may contain meta-stable
 particles, it is possible to approximate the dependence on the widths for the case in which
 the experimental result requires all BSM decays to be prompt and the last BSM particle to be stable or decay *outside* the dector. 
@@ -426,6 +427,9 @@ the reweighting factor :math:`\mathcal{r}` is computed using only the widths not
 in the grid.
 
 
+.. [*] Prompt results are all those which assumes all decays to be prompt and the last BSM particle to be stable (or decay outside the detector).
+       Searches for heavy stable charged particles (HSCPs), for instance, are classified as *prompt*, since the HSCP is assumed to decay
+       outside the detector. Displaced results on the other hand require at least one decay to take place inside the detector.
 
+.. [*] An obvious exception are searches for long-lived particles with displaced decays.
 
-.. [#] An obvious exception are searches for long-lived particles with displaced decays.
