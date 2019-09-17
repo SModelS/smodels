@@ -50,7 +50,7 @@ for key in filtersDefault:
         factorsDefault[key] = lambda el: reweightFactorFor(el,'displaced')
     else:
         #If not specified assumed all fractions
-        #(note that we have can not include any long-lived fraction since this is already included in
+        #(note that we can not include any long-lived fraction since this is already included in
         #the topologies where the meta-stable particle appears as a final state,
         #so the total is = (fraction of all decays being prompt)
         #+ (fraction of at least one displaced decay and no long-lived decays)
@@ -59,13 +59,24 @@ for key in filtersDefault:
 
 class Uncovered(object):
     """
-    Object collecting all information of non-tested/covered elements
-    :ivar topoList: sms topology list
-    :ivar sigmacut: if defined, will only keep elements with weight above sigmacut.
-    :ivar sumL: if true, sum up electron and muon to lepton, for missing topos
-    :ivar sumJet: if true, sum up jets, for missing topos
-    :ivar sqrts: Center of mass energy. If defined it will only consider cross-sections
-                for this value. Otherwise the highest sqrts value will be used.
+    Wrapper object for defining and holding a list of coverage groups
+    (UncoveredGroup objects )
+
+    :ivar topoList: TopologyList object used to select elements from.
+    :ivar sqrts: Value (with units) for the center of mass energy used to compute the missing cross sections.
+                 If not specified the largest value available will be used.
+    :ivar sigmacut: Minimum cross-section/weight value (after applying the reweight factor)
+                   for an element to be included. The value should in fb (unitless)
+    :ivar groupFilters: Dictionary containing the groups' labels and the method for selecting
+                        elements.
+    :ivar groupFactors: Dictionary containing the groups' labels and the method for reweighting
+                        cross sections.
+    :ivar groupdDescriptions: Dictionary containing the groups' labels and strings describing the group
+                              (used for printout)
+    :ivar smFinalStates: List of (inclusive) Particle or MultiParticle objects used for grouping Z2-even
+                         particles when creating GeneralElements.
+    :ivar bsmFinalSates: List of (inclusive) Particle or MultiParticle objects used for grouping Z2-odd
+                         particles when creating GeneralElements.
     """
 
     def __init__(self,topoList, sqrts=None, sigmacut=0*fb,
@@ -145,10 +156,20 @@ class Uncovered(object):
 
 class UncoveredGroup(object):
     """
-    Object to find and collect GeneralElement objects, plus printout functionality
-    :ivar generalElements: missing elements, grouped by common general name using inclusive labels (e.g. jet)
-    :ivar smFinalStates: Lists of MultiParticles used to group final states.
-    :ivar sqrts: sqrts, for printout
+    Holds information about a single coverage group: criteria for selecting and grouping elements,
+    function for reweighting cross sections, etc.
+
+    :ivar label: Group label
+    :ivar elementFilter: Function which takes an element as argument and returns True (False) if
+                         the element should (not) be selected.
+    :ivar reweightFactor: Function which takes an element as argument and returns the reweighting
+                          factor to be applied to the element weight.
+    :ivar smFinalStates: List of Particle/MultiParticle objects used to group Z2-even particles appearing
+                        in the final state
+    :ivar bsmFinalStates: List of Particle/MultiParticle objects used to group Z2-odd particles appearing
+                        in the final state
+    :ivar sqrts: Value (with units) for the center of mass energy used to compute the missing cross sections.
+                 If not specified the largest value available will be used.
     :ivar sigmacut: Minimum cross-section/weight value (after applying the reweight factor)
                    for an element to be included. The value should in fb (unitless)
     """
