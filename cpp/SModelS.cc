@@ -8,14 +8,15 @@ using namespace std;
 // https://docs.python.org/2/extending/embedding.html
 // http://stackoverflow.com/questions/3286448/calling-a-python-method-from-c-c-and-extracting-its-return-value
 
-SModelS::SModelS( const string & parameterfile, const string & installdir ) 
+SModelS::SModelS( const string & parameterfile, const string & smodelsdir ) 
 {
-  initialize ( parameterfile, installdir, "info" );
+  initialize ( parameterfile, smodelsdir, "info" );
 }
 
-SModelS::SModelS( const string & parameterfile, const string & installdir, const string & verbose )
+SModelS::SModelS( const string & parameterfile, const string & smodelsdir, 
+                  const string & verbose )
 {
-  initialize ( parameterfile, installdir, verbose );
+  initialize ( parameterfile, smodelsdir, verbose );
 }
 
 SModelS::~SModelS ()
@@ -23,7 +24,7 @@ SModelS::~SModelS ()
   Py_Finalize();
 }
 
-void SModelS::initialize ( const string & parameterfile, const string & installdir, 
+void SModelS::initialize ( const string & parameterfile, const string & smodelsdir, 
                            const string & verbose )
 {
   cout << "[smodels.cpp] initialising!" << endl;
@@ -34,12 +35,12 @@ void SModelS::initialize ( const string & parameterfile, const string & installd
   PyRun_SimpleString("import sys");
   PyRun_SimpleString("import os");
 	ostringstream check_path;
-  check_path << "if not os.path.exists('" << installdir << "/smodels/version'): print "
-             << "('WARNING: installation directory " << installdir << " does not point"
+  check_path << "if not os.path.exists('" << smodelsdir << "/smodels/version'): print "
+             << "('WARNING: installation directory " << smodelsdir << " does not point"
              << " to a SModelS installation!')";
   PyRun_SimpleString( check_path.str().c_str() );
 	ostringstream set_path;
-	set_path << "sys.path.insert(0,'" << installdir << "') ";
+	set_path << "sys.path.insert(0,'" << smodelsdir << "') ";
   PyRun_SimpleString( set_path.str().c_str() );
   PyRun_SimpleString("import time");
   PyRun_SimpleString("t0=time.time()");
