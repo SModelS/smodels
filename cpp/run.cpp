@@ -15,6 +15,6 @@ int main( int argc, char * argv[] )
   SModelS smodels ( "./parameters.ini", "../" ); 
   /** run over one single file or directory */
   int ret = smodels.run ( "test.slha" );
-  /* return value, zero if succesful */
+  /* return value, zero if successful */
   return ret;
 }
