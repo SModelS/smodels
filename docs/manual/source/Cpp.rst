@@ -11,6 +11,7 @@ the *smodels/cpp* directory in the source code.
 
 Its usage is documented in run.cpp:
 
+.. highlight:: C++
 .. literalinclude:: /examples/run.cpp
 
 A sample Makefile is also provided in the same directory. The python header
