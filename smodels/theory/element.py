@@ -285,7 +285,7 @@ class Element(object):
         igen is used as the counter for the initial generation.
         The output is also stored in self._ancestorsDict for future use.
 
-        :param igen: Auxiliair integer indicating to which generation self belongs.
+        :param igen: Auxiliary integer indicating to which generation self belongs.
 
         :return: Dictionary with generation index as key and ancestors as values
                  (e.g. {igen+1 : [mother1, mother2], igen+2 : [grandmother1,..],...})
