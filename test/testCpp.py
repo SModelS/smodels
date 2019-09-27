@@ -93,6 +93,9 @@ class CppTest(unittest.TestCase):
                         print ( "error, delta is %.2f (x=%s,y=%s)" % (dlta,x,y) )
                     self.assertTrue ( dlta < .1 or abs(xv-yv)<1e-6 )
                 else:
+                    if "="*10 in xv and "="*10 in yv:
+                        ## not interesting to check
+                        continue
                     self.assertEqual(xv, yv)
 
     def testRun(self):
