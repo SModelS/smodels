@@ -70,11 +70,11 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     masterPrinter.addObj(outputStatus)
     if outputStatus.status < 0:
         return masterPrinter.flush()
-    
+
     """
     Load the input model
-    ==================== 
-    """    
+    ====================
+    """
     try:
         """
         Load the input model and  update it with the information from the input file
@@ -150,7 +150,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
             theoPred.computeStatistics()
 
     """ Define theory predictions list that collects all theoryPrediction objects which satisfy max condition."""
-    maxcond = parser.getfloat("parameters", "maxcond")           
+    maxcond = parser.getfloat("parameters", "maxcond")
     theoryPredictions = theoryPrediction.TheoryPredictionList(allPredictions, maxcond)
 
     if len(theoryPredictions) != 0:
@@ -277,17 +277,17 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     cleanedList = _cleanList(fileList, inDir)
     ncpus = _determineNCPus(parser.getint("parameters", "ncpus"), len(cleanedList))
     nFiles = len(cleanedList)
-    
+
     if nFiles == 0:
         logger.error("No valid input files found")
         return None
     elif nFiles == 1:
         logger.info("Running SModelS for a single file")
-        runSingleFile(cleanedList[0], outputDir, parser, 
-                        databaseVersion, listOfExpRes, timeout, 
+        runSingleFile(cleanedList[0], outputDir, parser,
+                        databaseVersion, listOfExpRes, timeout,
                         development, parameterFile)
     else:
-        logger.info("Running SModelS for %i files with %i processes. Messages will be redirected to smodels.log" 
+        logger.info("Running SModelS for %i files with %i processes. Messages will be redirected to smodels.log"
                     %(nFiles,ncpus))
         for hdlr in logger.handlers[:]:
             logger.removeHandler(hdlr)
@@ -300,7 +300,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         children = []
         for chunkFile in chunkedFiles:
             p = pool.apply_async(runSetOfFiles, args=(chunkFile, outputDir, parser,
-                                                      databaseVersion, listOfExpRes, timeout, 
+                                                      databaseVersion, listOfExpRes, timeout,
                                                   development, parameterFile,))
             children.append(p)
         pool.close()
@@ -318,9 +318,9 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
             time.sleep(2)
 
         logger.debug("All children terminated")
-        
+
     logger.info("Done in %3.2f min"%((time.time()-t0)/60.))
-    
+
     return None
 
 def checkForSemicolon(strng, section, var):
@@ -430,6 +430,11 @@ def getParameters(parameterFile):
         logger.error("No such file or directory: '%s'" % parameterFile)
         sys.exit()
     setExperimentalFlag ( parser )
+    try:
+        from smodels.tools import runtime
+        runtime.modelFile = parser.get("particles","model" )
+    except:
+        pass
     return parser
 
 def setExperimentalFlag ( parser ):
