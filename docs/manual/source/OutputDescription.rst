@@ -44,7 +44,7 @@ Output Description
 A detailed description of the possible output formats generated
 by :ref:`running SModelS <runningSModelS>` and their content is given below.
 For simplicity we will assume that all printer options
-in the |parameters| are set to True, so the output information is maximal [*]_.
+in the |parameters| are set to True, so the output information is maximal.\ [#f1]_
 
 .. _screenOut:
 
@@ -89,7 +89,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   If  **computeStatistics** = True, the :math:`\chi^2` and likelihood values are printed 
   (see :ref:`likelihood calculation <likelihoodCalc>`).
   Finally, if **printExtendedResults** = True, basic information about the |elements|
-  being constrained, such as their masses [*]_, IDs and PIDs, is also shown.
+  being constrained, such as their masses\ [#f2]_, IDs and PIDs, is also shown.
   
 .. literalinclude:: /images/gluino_squarks.slha.log
    :lines: 96691-96752
@@ -227,7 +227,7 @@ Python Output
 
 The Python-type output is similar to the :ref:`screen output <screenOut>`, however
 converted to a Python dictionary. If all options are set to True,
-it includes information about the |decomposition|, the list of |theory predictions| and model :ref:`simplfied model coverage <topCoverage>`. 
+it includes information about the |decomposition|, the list of |theory predictions| and :ref:`simplified model coverage <topCoverage>`. 
 The output is printed to the file <input file>.py and stored in the output folder
 (see the :ref:`runSModelS options <runSModelS>`).
 
@@ -253,7 +253,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   the signal region (|dataset| ID), the *sqrts* and luminosity, the constrained simplified models (|txnames|),
   the signal cross section (theory prediction), the corresponding observed
   upper limit and the maximum condition violation (see :ref:`upper limit conditions <ULconditions>`) are shown.
-  Furthermore, the masses and widths [*]_ of the |elements| contributing to the signal cross section, the
+  Furthermore, the masses and widths\ [#f3]_ of the |elements| contributing to the signal cross section, the
   individual contribution of each |txname| (if **addTxWeights** = True) and the :math:`\chi^2` and
   likelihood values (if **computeStatistics** = True) are also included.
   
@@ -324,13 +324,13 @@ Below we give a description of each block together with a sample output.
    
    
 
-.. [*] Some of the output may change depending on the code and database versions used.
+.. [#f1] Some of the output may change depending on the code and database versions used.
 
-.. [*] The mass shown corresponds to an average mass over all the |elements| contributing
+.. [#f2] The mass shown corresponds to an average mass over all the |elements| contributing
        to the theory prediction. In the case where the |elements| have distinct |topologies|
        no mass is shown.
        
-.. [*] For particles considered with prompt decays (see :ref:`promptWidth parameter <parameterFileModel>`), the width is replaced by 'prompt',
+.. [#f3] For particles considered with prompt decays (see :ref:`promptWidth parameter <parameterFileModel>`), the width is replaced by 'prompt',
        while for particles considered stable (see see :ref:`stableWidth parameter <parameterFileModel>`), the width is replaced by 'stable'.
        If more than one |element| contributes to the theory prediction, the average widths and masses of the BSM states
        are shown.

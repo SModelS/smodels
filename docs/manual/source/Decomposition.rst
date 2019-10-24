@@ -186,7 +186,7 @@ The most common example is
 .. math::
    A \rightarrow \nu + B
 
-as the last step of the decay chain, where :math:`A` is a neutral particle
+as the last step of the decay chain, where :math:`\nu` is a SM neutrino, :math:`A` is a neutral particle
 and/or decays promptly and :math:`B` is an insivible particle leading to a MET signature.
 Since both the neutrino and
 :math:`B` are invisible, for all experimental purposes the effective MET object is :math:`B + \nu = A`.
@@ -214,8 +214,8 @@ Element Sorting
 ---------------
 
 In order to improve the code performance, |elements| created during |decomposition| and
-sharing a commong |topology| are sorted.
-Sorting allows for an easy ordering of the elements belonging to a topology and
+sharing a common |topology| are sorted.
+Sorting allows for an convenient ordering of the elements belonging to a topology and
 faster element comparison.
 Elements are sorted according to their branches. Branches are compared according to
 the following order of properties:
@@ -263,7 +263,9 @@ has two branches:
 it implies
 
 .. math::
-   branch1 < branch2.
+   branch1 < branch2
+   
+regarding their ordering.
 
 
 

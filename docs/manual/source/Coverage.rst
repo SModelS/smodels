@@ -46,7 +46,7 @@ During the computation of the |theory predictions|, each |element|
 from the |decomposition| which matches at least one of the simplified
 models in the |database| is marked as "covered by" the corresponding type
 of |ExpRes|. Currently the |ExpRess| are either of type *prompt* 
-or *displaced*. [#f1]_ If the same |element| is *covered* by both types of |ExpRess|,
+or *displaced*.\ [#f1]_ If the same |element| is *covered* by both types of |ExpRess|,
 it will be marked as covered by displaced *and* prompt results.
 If, in addition to being covered, the |element| also has a non-zero efficiency
 or upper limit (i.e. its properties fall inside the data grid for any result),
@@ -64,7 +64,7 @@ Coverage Groups
 ---------------
 
 The coverage algorithm groups all the |elements| into *coverage groups*
-which can be easily defined by the user (see the `coverage module <tools.html#tools.coverage>`_).
+which can be easily defined by the user (see the `coverage module <tools.html#tools.coverage.GeneralElement>`_).
 Each group must define a criterium for selecting |elements| after the |theory predictions|
 have been computed.
 The default *coverage groups* implemented in SModelS are:
@@ -99,10 +99,10 @@ to the selected |elements| in order to extract the desirable fraction of signal
 cross section for the group. For instance, for the default groups listed 
 above, the following reweighint functions are defined:
 
-* *missing (prompt)*: :math:`\sigma \to \mathcal{r} \times \sigma,\;\; \mathcal{r} = \prod_{i=1,N-2} \mathcal{F}_{prompt}^{i} \times \prod_{i=N-2,N} \mathcal{F}_{long}^{i}`
-* *missing (displaced)*: :math:`\sigma \to \mathcal{r} \times \sigma,\;\; \mathcal{r} = \mathcal{F}_{displaced}(any) \times \prod_{i=N-2,N} \mathcal{F}_{long}^{i}`
-* *missing (all)*: :math:`\sigma \to \mathcal{r} \times \sigma,\;\; \mathcal{r} = 1`
-* *outsideGrid (all)*: :math:`\sigma \to \mathcal{r} \times \sigma,\;\; \mathcal{r} = 1`
+* *missing (prompt)*: :math:`\sigma \to \xi \times \sigma,\;\; \xi = \prod_{i=1,N-2} \mathcal{F}_{prompt}^{i} \times \prod_{i=N-2,N} \mathcal{F}_{long}^{i}`
+* *missing (displaced)*: :math:`\sigma \to \xi \times \sigma,\;\; \xi = \mathcal{F}_{displaced}(any) \times \prod_{i=N-2,N} \mathcal{F}_{long}^{i}`
+* *missing (all)*: :math:`\sigma \to \xi \times \sigma,\;\; \xi = 1`
+* *outsideGrid (all)*: :math:`\sigma \to \xi \times \sigma,\;\; \xi = 1`
  
 The definition for the fraction of long-lived (:math:`\mathcal{F}_{long}`) and prompt (:math:`\mathcal{F}_{prompt}`) decays 
 can be found in :ref:`lifetime reweighting <dbReweighting>`.

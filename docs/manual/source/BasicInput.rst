@@ -21,7 +21,7 @@ Particle Content
 ^^^^^^^^^^^^^^^^
 
 The definition of the BSM states and their quantum numbers can be 
-provided either in two formats:
+provided in either of the following two formats:
 
 * as a python module, as illustrated in :download:`mssm.py <images/mssm.py>`,
 * or as a SLHA file containing :ref:`QNUMBERS blocks <qnumberSLHA>` (see :download:`mssmQNumbers.slha <images/mssmQNumbers.slha>`).
@@ -46,7 +46,7 @@ given in the two following forms:
   (see an example file :download:`here <examples/example.lhe>`)
 
 The SLHA format is usually more compact and best suited for supersymmetric models. On the other hand, a LHE file can always
-be generated for any BSM model (through the use of your favorite MC generator). [*]_ In this case, however,
+be generated for any BSM model (through the use of your favorite MC generator).\ [#f1]_ In this case, however,
 the precision of the results is limited to the MC statistics used to generate the file.
 *We also point out that all the decays appearing in the LHE input are assumed to be prompt and
 this input format should not be used if the model contains meta-stable particles*.
@@ -76,7 +76,7 @@ SLHA Format for Cross Sections
 """"""""""""""""""""""""""""""
 
 A list of cross section blocks (one for each production process)
-must be included in the SLHA file for the SLHA-based Decomposition. 
+must be included in the SLHA file for the SLHA-based decomposition. 
 The SLHA format for each cross section block is shown below
 (see the `Les Houches note <http://phystev.cnrs.fr/wiki/2013:groups:tools:slha>`_):
 
@@ -85,7 +85,7 @@ The SLHA format for each cross section block is shown below
 .. image:: images/xsecBlock.png
    :width: 100% 
 
-The above example shows the cross section for :math:`pp \rightarrow \tilde{\tau}_1^- + \tilde{\nu}_{\tau}`
+The above example shows the cross section for :math:`pp \rightarrow \tilde{u}_L^* + \tilde{g}`
 at a center-of-mass energy of 8 TeV and at leading order.
 The only information used by SModelS are the center-of-mass energy, the outgoing particle PDGs, the cross section value
 and the QCD order. *If the input file contains two cross sections for the same process  but at different QCD orders, only 
@@ -119,6 +119,6 @@ Finally, if the particle is not its own anti-particle (specified by entry number
 a second particle will be added to the model with the opposite electric charge
 and minus the PDG number.
 
-.. [*] SModelS can easily be used for non-SUSY models as long as they present a  Z\ :sub:`2`-type symmetry.
+.. [#f1] SModelS can easily be used for non-SUSY models as long as they present a  Z\ :sub:`2`-type symmetry.
    However, it is the responsibility of the user to make sure that the SMS results
    in the database actually apply to the model under consideration.

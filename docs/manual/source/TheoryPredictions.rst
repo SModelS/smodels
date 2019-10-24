@@ -46,8 +46,8 @@ Each of them requires different theoretical predictions to be compared against e
 |ULrs| constrains the weight (|sigBR|) of one |element| or sum of |elements|.
 Therefore SModelS must compute the theoretical value of |sigBR| summing only over the |elements|
 appearing in the respective :ref:`constraint <ULconstraint>`.
-This is done applying a 1 (zero) efficiency (:math:`\epsilon`) for the
-elements which appear (do not appear) in the :ref:`constraint <ULconstraint>`.
+This is done by assigning an efficiency equal to 1 (0) to each element,
+if the element appears (does not appear) in the :ref:`constraint <ULconstraint>`.
 Then the final theoretical prediction is the sum over all
 |elements| with a non-zero value of |ssigBRe|. This value can then be compared with the
 respective 95% C.L. upper limit extracted from the UL map (see |ULrs|).
@@ -65,7 +65,7 @@ In this case the final theory prediction corresponds to the sum of |sigBRe| over
 and the upper limit is computed for this sum.
 
 Although the details of the theoretical prediction computation differ depending on the type
-of |ExpRes| (|ULrs| or |EMrs|), the overall procedure is common for both type of results. Below we schematically
+of |ExpRes| (|ULrs| or |EMrs|), the overall procedure is common for both types of results. Below we schematically
 show the main steps of the theory prediction calculation:
 
 .. _theoPredScheme:
@@ -131,7 +131,7 @@ Element Clustering
 Naively one would expect that after all the |elements| appearing in the :ref:`constraint <ULconstraint>`
 have been selected, it is trivial to compute the theory prediction: one must simply 
 sum up the weights (|sigBR|) of all the selected |elements|.
-However, the selected |elements| usually differ in their masses and/or widths [*]_ and the
+However, the selected |elements| usually differ in their masses and/or widths\ [#f1]_ and the
 experimental limit (see :ref:`Upper Limit constraint <ULconstraint>`) assumes that all the |elements| appearing
 in the :ref:`constraint <ULconstraint>` have the same efficiency, which typically
 implies that the distinct elements have the same mass arrays and widths.
@@ -150,7 +150,7 @@ In the simplest case where the upper limit result corresponds to a single signal
 proportional to its upper limit.
 Hence the distance between two |elements| can be defined as the relative
 difference between their upper limits, as described in :ref:`element distance <distance>`.
-Then , if the :ref:`distance <distance>` between two selected |elements| is smaller
+Then, if the :ref:`distance <distance>` between two selected |elements| is smaller
 than a maximum value (defined by `maxDist <theory.html#theory.clusterTools.clusterElements>`_),
 they are gouped in the same cluster and their cross-sections
 will be combined, as illustrated by the example below:
@@ -214,10 +214,10 @@ Theory Predictions for Efficiency Map Results
 In order to compute the signal cross sections for a given |EMr|, so it can be compared
 to the signal region limits, it is first necessary to apply the efficiencies (see |EMr|) to all the |elements| generated
 by the model :doc:`decomposition <Decomposition>`.
-Notice that typically a single  |EMr| contains several signal regions (|Datasets|) and there will be a set of efficiencies
+Notice that typically a single |EMr| contains several signal regions (|Datasets|) and there will be a set of efficiencies
 (or efficiency maps) for each |dataset|. As a result, several theory predictions (one for each |dataset|) will be computed.
 This procedure is similar (in nature) to 
-the :ref:`Element Selection<ULselection>` applied in the case of an |ULr|, except that now it must be repeated 
+the :ref:`Element Selection<ULselection>` applied in the case of a |ULr|, except that now it must be repeated 
 for several |datasets| (signal regions).
 
 
@@ -232,12 +232,12 @@ case and will be discussed in more detail.
 Element Selection
 ^^^^^^^^^^^^^^^^^
 
-The element selection for the case of a |EMr| consists of rescaling all the |elements|
+The element selection for the case of an |EMr| consists of rescaling all the |elements|
 weights by their efficiencies, according to the efficiency map of the corresponding |Dataset|.
 The efficiency for a given |Dataset| depends both on the |element| topology and its |particle| content. 
 In practice the efficiencies for most of the |elements| will be extremely small (or zero), hence only a subset effectively
-contributes after the element selection  [*]_.
-In the figure below we illustrate the element selection for the case of  a |EMr|/|Dataset|:
+contributes after the element selection\ [#f2]_.
+In the figure below we illustrate the element selection for the case of an |EMr|/|Dataset|:
 
 .. _EMselectionfig:
 
@@ -270,9 +270,9 @@ will trivially group together all the selected |elements| into a single cluster:
 
 * **The clustering of elements is implemented by the** `clusterElements <theory.html#theory.clusterTools.clusterElements>`_  **method**.
 
-.. [*] When refering to an |element| mass or width, we mean all the masses
+.. [#f1] When refering to an |element| mass or width, we mean all the masses
    and widths of the Z\ :sub:`2`-odd |particles| appearing in the |element|. Two |elements| are considered to have identical
    masses and widths if their mass arrays and width arrays are identical.
-.. [*] The number of |elements| passing the selection also depends on the availability of efficiency maps
-   for the |elements| generated by the decomposition. Whenever there are no efficiencies available for a
+.. [#f2] The number of |elements| passing the selection also depends on the availability of efficiency maps
+   for the |elements| generated by the decomposition. Whenever there are no efficiencies available for an
    element, the efficiency is taken to be zero.

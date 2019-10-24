@@ -143,7 +143,7 @@ Below we give more detailed information about each entry in the parameters file.
   * **combineSRs** (True/False): set to True to use (whenever available) 
     covariance matrices to :ref:`combine signal regions <combineSRs>`.
     NB this might take a few secs per point. Set to False to use only the most sensitive signal region (faster!). 
-    Available v1.1.3 onwards. 
+    Available from v1.1.3 onwards. 
 
 .. _parameterFileParticles:
 
@@ -217,8 +217,8 @@ Below we give more detailed information about each entry in the parameters file.
     is given, only these will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
     will only use the |results| from `CMS-PAS-SUS-13-008 <https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
     and `ATLAS-CONF-2013-024 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-024/>`_.
-    Wildcards (*, ?, [<list-of-or'ed-letters>]) are expanded in the same way the shell does wildcard expansion for file names.
-    So analyses = CMS* leads to evaluation of results from the CMS-experiment only, for example. *SUS* selects everything containining SUS, no matter if from CMS or ATLAS.
+    Wildcards (\*, ?, [<list-of-or'ed-letters>]) are expanded in the same way the shell does wildcard expansion for file names.
+    So analyses = CMS\* leads to evaluation of results from the CMS-experiment only, for example. \*SUS\* selects everything containining SUS, no matter if from CMS or ATLAS.
     Furthermore selection of analyses can be confined on their centre-of-mass energy with a suffix beginning with a colon and an energy string in unum-style, like :13*TeV. Note that the asterisk behind the colon is not a wildcard. :13, :13TeV and :13 TeV are also understood but discouraged.
 
 .. _parameterFileTxnames:
@@ -240,7 +240,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileDataTypes:
 
-  * **dataTypes** dataType of the analysis (all, efficiencyMap or upperLimit). Can be wildcarded with usual shell wildcards: * ? [<list-of-or'ed-letters>]. Wildcard examples are given above.
+  * **dataTypes** (all, efficiencyMap or upperLimit): dataType of the analysis. Can be wildcarded with usual shell wildcards (\*, ?, [<list-of-or'ed-letters>]). Wildcard examples are given above.
 
 .. _parameterFilePrinter:
 
@@ -301,7 +301,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileAddTxWeights:
 
-  * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction. Available v1.1.3 onwards.
+  * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction. Available from v1.1.3 onwards.
 
 .. _parameterFileXmlprinter:
 
@@ -314,7 +314,7 @@ Below we give more detailed information about each entry in the parameters file.
     
 .. _parameterFileAddTxWeightsXML:    
 
-  * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction. Available v1.1.3 onwards.
+  * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction. Available from v1.1.3 onwards.
 
 
 
@@ -367,10 +367,14 @@ Below we go step-by-step through this example code:
 
 
 * *Import the SModelS modules and methods*. If the example code file is not located in
-  the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. Set SModelS verbosity level.
+  the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. 
 
 .. literalinclude:: /examples/Example.py
-   :lines: 12-22
+   :lines: 12-21
+
+* *Set SModelS verbosity level.*
+.. literalinclude:: /examples/Example.py
+   :lines: 22-22
 
 * *Set the path to the database URL*. Specify which :ref:`database <databaseStruct>` to use. It can be the path
   to the smodels-database folder, the path to a :ref:`pickle file <databasePickle>`, (starting with v1.1.3) a URL path

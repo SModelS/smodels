@@ -46,7 +46,7 @@ A representation of an element is shown below:
    :width: 40%
    
 An element may also hold information about its corresponding 
-weight (cross section times branching ratio times efficiency). [#f1]_
+weight (cross section times branching ratio times efficiency).\ [#f1]_
 The overall properties of an element are illustrated in the scheme below:
 
 .. _topscheme:

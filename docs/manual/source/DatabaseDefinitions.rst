@@ -50,7 +50,7 @@ Therefore, for both |UL| and |EM| constraints, the database obeys the following 
 
       * |Dataset|:
         a single |Dataset| corresponds to one signal region of the experimental
-        note or publication [*]_. In case of |ULrs| there is a single |Dataset|, usually corresponding to the best signal
+        note or publication.\ [#f1]_ In case of |ULrs| there is a single |Dataset|, usually corresponding to the best signal
         region or a combination of signal regions (for more details see |Dataset|). For |EMrs|, there is one |Dataset| for each signal region.
         Each |Dataset| contains the Upper Limit maps for :ref:`Upper Limit results <ULtype>` *or* the Efficiency maps for :ref:`Efficiency Map results <EMtype>`. 
 
@@ -167,13 +167,13 @@ In this case the UL constraint is simply:
 .. math::
     [[[e^+]],[[e^-]]] + [[[\mu^+]],[[\mu^-]]]
     
-where it is understood that the sum is over the weights of the respective |elements|
+where it is understood that the sum runs over the weights of the respective |elements|
 and not over the |elements| themselves.    
 
 Note that the sum can be over particle charges, flavors or more complex combinations of elements.
 However, almost all experimental results sum only over elements sharing a common |topology|.
 
-Finally, in some cases the UL constraint assumes specific constributions from each |element|.
+Finally, in some cases the UL constraint assumes specific contributions from each |element|.
 For instance, in the :ref:`example above <constraintplot>` it is implicitly assumed that
 both the electron and muon |elements| contribute equally to the total cross section.
 Hence these conditions must also be specified along with the constraint, as described in :ref:`UL conditions<ULconditions>`.
@@ -215,7 +215,7 @@ Concretely, SModelS computes for each condition a number between 0 and 1, where
 0 means the condition is exactly satisfied and 1 means it is maximally violated.
 Allowing for a :math:`20\%` violation of a condition corresponds approximately to 
 a ''condition violation value'' (or simply condition value) of 0.2.
-The condition values  are given as an output of SModelS, so the user can decide what are the
+The condition values are given as an output of SModelS, so the user can decide what are the
 maximum acceptable values.
 
 
@@ -232,7 +232,7 @@ Efficiency maps correspond to a grid of simulated acceptance times efficiency
 ( :math:`A \times \epsilon` ) values for a specific signal region. In the following we will refer to 
 :math:`A \times \epsilon` simply as *efficiency* and denote it by :math:`\epsilon`. 
 Furthermore, additional information, such as the luminosity, number of observed and expected events, etc is also
-stored in a EM-type result.
+stored in an EM-type result.
 
 Another important difference between |ULrs| and |EMrs| is the existence of several signal regions, which in SModelS
 are mapped to |Datasets|.  While |ULrs| contain a single |Dataset| (''signal region''), EM results hold several |Datasets|,
@@ -312,6 +312,6 @@ A complete list of TxNames can be found `here <http://smodels.github.io/docs/Sms
 *More details about the database folder structure and object
 structure can be found in* :ref:`Database of Experimental Results<databaseStruct>`. 
 
-.. [*] The name *Data Set* is used instead of signal region because its concept is slightly more general. For instance,
+.. [#f1] The name *Data Set* is used instead of signal region because its concept is slightly more general. For instance,
    in the case of |ULrs|, a |Dataset| may not correspond to a single signal region, but to a combination of signal regions.
  

@@ -76,7 +76,7 @@ the available processes in `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllw
 if multipliers have been applied to LO cross sections, these will be automatically included in the NLO+NLL values.
 When reading the input file, SModelS will then use only the highest order cross sections available for each process.
 
-* **The cross section calculation is implemented by the** `computeXSec function <tools.html#tools.xsecComputer.computeXSec>`_
+* **The cross section calculation is implemented by the** `xsecComputer function <tools.html#tools.xsecComputer.XSecComputer>`_
 
 
 .. _fileChecks:
