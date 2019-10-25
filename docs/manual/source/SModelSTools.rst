@@ -72,8 +72,7 @@ If, *after* the LO cross sections have been computed, one wants to add the NLO+N
 
 The resulting file will then contain LO cross sections for all MSSM processes and NLO+NLL cross sections for 
 the available processes in `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_  
-(gluino and squark production). Although in this mode the signal strength multipliers option is ignored,
-if multipliers have been applied to LO cross sections, these will be automatically included in the NLO+NLL values.
+(gluino and squark production). If signal strength multipliers are supplied by the user (via the **--ssmultipliers** argument), they are ignored, since signal strength multipliers always only get applied to LO cross sections. If, however, signal strength multipliers were applied when calculating the LO cross sections given in the input file, they are naturally also propagated to the NLO and NLL cross sections.
 When reading the input file, SModelS will then use only the highest order cross sections available for each process.
 
 * **The cross section calculation is implemented by the** `xsecComputer function <tools.html#tools.xsecComputer.XSecComputer>`_
