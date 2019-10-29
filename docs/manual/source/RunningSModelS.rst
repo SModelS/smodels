@@ -189,8 +189,7 @@ Below we give more detailed information about each entry in the parameters file.
 .. _parameterFileMaxcond:
 
   * **maxcond** (float): maximum allowed value (in the [0,1] interval) for the violation of :ref:`upper limit conditions <ULconditions>`. A zero value means the conditions are strictly enforced, while 1 means the conditions are never enforced.
-    *Only relevant for printing the* :ref:`output summary <fileOut>`.
-
+    
 .. _parameterFileNcpus:
 
   * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files,

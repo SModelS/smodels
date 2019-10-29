@@ -241,7 +241,7 @@ Then perform the steps listed under ``Installation on SL6``.
 
 
 Installation on other platforms or without superuser privileges using Anaconda
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Another easy and platform independent way of installing SModelS
 without superuser priviledges is via Anaconda (https://www.continuum.io/downloads).

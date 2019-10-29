@@ -216,7 +216,7 @@ Concretely, SModelS computes for each condition a number between 0 and 1, where
 Allowing for a :math:`20\%` violation of a condition corresponds approximately to 
 a ''condition violation value'' (or simply condition value) of 0.2.
 The condition values are given as an output of SModelS, so the user can decide what are the
-maximum acceptable values.
+maximum acceptable values (see :ref:`maxcond <parameterFileMaxcond>` in the parameters file).
 
 
 
