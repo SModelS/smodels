@@ -56,7 +56,7 @@ class XSecTest(unittest.TestCase):
         computer = xsecComputer.XSecComputer ( LO, 3000, 6 )
         w = computer.compute( 13*TeV, slhafile ).getDictionary()
         w13lo= w[(1000021, 1000021)]['13 TeV (LO)'].asNumber( fb )
-        self.assertAlmostEqual(w13lo / 2237., 1., 2 )
+        self.assertAlmostEqual(w13lo / 2237., 1., 1 )
 
     def testNLLGlu13(self):
         """ test the computation of NLL cross section with pythia6 """
