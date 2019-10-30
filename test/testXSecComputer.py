@@ -53,19 +53,19 @@ class XSecTest(unittest.TestCase):
         """ test the computation of LO cross section, pythia6 """
         self.logger.info ( "test LO xsecs @ 13 TeV" )
         slhafile="./testFiles/slha/simplyGluino.slha"
-        computer = xsecComputer.XSecComputer ( LO, 2000, 6 )
+        computer = xsecComputer.XSecComputer ( LO, 3000, 6 )
         w = computer.compute( 13*TeV, slhafile ).getDictionary()
         w13lo= w[(1000021, 1000021)]['13 TeV (LO)'].asNumber( fb )
-        self.assertAlmostEqual(w13lo / 2230., 1., 2 )
+        self.assertAlmostEqual(w13lo / 2237., 1., 2 )
 
     def testNLLGlu13(self):
         """ test the computation of NLL cross section with pythia6 """
         self.logger.info ( "test NLL xsecs @ 13 TeV" )
         slhafile="./testFiles/slha/simplyGluino.slha"
-        computer = xsecComputer.XSecComputer ( NLL, 2000, 6 )
+        computer = xsecComputer.XSecComputer ( NLL, 3000, 6 )
         w = computer.compute( 13*TeV, slhafile ).getDictionary()
         w13nll= w[(1000021, 1000021)]['13 TeV (NLO+NLL)'].asNumber( fb )
-        self.assertAlmostEqual(w13nll / 4308. , 1., 2 )
+        self.assertAlmostEqual(w13nll / 4320. , 1., 2 )
         
     def testXSecMain(self):
         """ test the main routine for computation of LO and NLL cross section for several sqrts"""
@@ -119,8 +119,8 @@ class XSecTest(unittest.TestCase):
         #Check 13 TeV xsecs:
         lo = xsecsInfile.getXsecsFor('13 TeV (LO)')[0].value.asNumber(fb)
         nll = xsecsInfile.getXsecsFor('13 TeV (NLL)')[0].value.asNumber(fb)
-        self.assertAlmostEqual(lo / 2230., 1., 2 )
-        self.assertAlmostEqual(nll / 4308., 1.,2)
+        self.assertAlmostEqual(lo / 2230., 1., 1 )
+        self.assertAlmostEqual(nll / 4308., 1., 1 )
 
     def testSSMultipliers(self):
         """ test the signal strength multipliers """
@@ -175,7 +175,7 @@ class XSecTest(unittest.TestCase):
         lo = xsecsInfile.getXsecsFor('13 TeV (LO)')[0].value.asNumber(fb)
         nll = xsecsInfile.getXsecsFor('13 TeV (NLL)')[0].value.asNumber(fb)
         self.assertAlmostEqual(lo/8962.,1.,2 )
-        self.assertAlmostEqual(nll/17234., 1.,2)
+        self.assertAlmostEqual(nll/17234., 1.,1)
         
 
 if __name__ == "__main__":
