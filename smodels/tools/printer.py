@@ -274,7 +274,10 @@ class TxTPrinter(BasicPrinter):
         if self.printtimespent:
             output += "Time spent: %.2fs\n" % ( time.time() - self.time )
         output += "Decomposition output status: " + str(obj.status) + " "
-        output += obj.statusStrings[obj.status] + "\n"
+        st = "unknown status"
+        if obj.status in obj.statusStrings:
+            st = obj.statusStrings[obj.status]
+        output += st + "\n"
         if obj.filestatus < 0: output += str(obj.warnings) + "\n"
         output += "# Input File: " + obj.inputfile + "\n"
         labels = list ( obj.parameters.keys() )
