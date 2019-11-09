@@ -473,13 +473,14 @@ def main(args):
     ssmultipliers = None
     if hasattr ( args, "ssmultipliers" ):
         ssmultipliers = canonizer.getSSMultipliers ( args.ssmultipliers )
-        for pids,multiplier in ssmultipliers.items():
-            if type(pids) != tuple:
-                logger.error ( "keys of ssmultipliers need to be supplied as tuples" )
-                sys.exit()
-            if type(multiplier) not in [ int, float ]:
-                logger.error ( "values of ssmultipliers need to be supplied as ints or floats" )
-                sys.exit()
+        if ssmultipliers != None:
+            for pids,multiplier in ssmultipliers.items():
+                if type(pids) != tuple:
+                    logger.error ( "keys of ssmultipliers need to be supplied as tuples" )
+                    sys.exit()
+                if type(multiplier) not in [ int, float ]:
+                    logger.error ( "values of ssmultipliers need to be supplied as ints or floats" )
+                    sys.exit()
 
     pythiacard = None
     if hasattr(args, 'pythiacard'):
