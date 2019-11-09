@@ -126,13 +126,20 @@ class XSecComputer:
     def applyMultipliers ( self, xsecs, ssmultipliers ):
         """
         apply the given multipliers to the cross sections """
-        for i in ssmultipliers.keys():
-            if i < 1000000 or i > 3000000:
-                logger.warning ( "signal strength multiplier for pid %d supplied. what does that mean?" % i ) 
+        for pids in ssmultipliers.keys():
+            if type(pids) not in [ list, tuple ]:
+                logger.error ( "signal strength multipliers need to be supplied as a dictionary, with the keys being tuples of the mothers' pids, e.g. { (1000021, -1000001 ): 0.9, .... }" )
+                sys.exit()
+            if len(pids) != 2:
+                logger.warning ( "currently we always only have two mothers, so why are the signal strength multipliers given for %d mothers?" % len(pids) )
+            for pid in pids:
+                if abs(pid) < 1000000 or abs(pid) > 3000000:
+                    logger.warning ( "signal strength multiplier for pid %d supplied. what does that mean?" % pid ) 
         for x in xsecs:
-            for pid in x.pid:
-                if abs(pid) in ssmultipliers.keys():
-                    x.value = x.value * ssmultipliers[abs(pid)]
+            for pids, multiplier in ssmultipliers.items():
+                if set(pids) == set ( x.pid ):
+                    x.value = x.value * ssmultipliers[pids]
+                    break
         return xsecs
 
     def compute ( self, sqrts, slhafile,  lhefile=None, unlink=True, loFromSlha=None,
@@ -151,10 +158,8 @@ class XSecComputer:
         :param pythiaCard: Optional path to pythia.card. If None, uses
                            smodels/etc/pythia.card
         :param ssmultipliers: optionally supply signal strengh multipliers,
-                given as dictionary of the pids as keys and
-                multipliers as values, e.g { 1000001:1.1 }, production of
-                pairs then corresponds to the multiplication of two
-                numbers.
+                given as dictionary of the tuple of the mothers' pids as keys and
+                multipliers as values, e.g { (1000001,1000021):1.1 }.
         :returns: XSectionList object
 
         """
@@ -206,10 +211,8 @@ class XSecComputer:
         :param tofile: write results to file
         :param lofromSLHA: try to obtain LO xsecs from SLHA file itself
         :param ssmultipliers: optionally supply signal strengh multipliers,
-                given as dictionary of the pids as keys and
-                multipliers as values, e.g { 1000001:1.1 }, production of
-                pairs then corresponds to the multiplication of two
-                numbers.
+                given as dictionary of the tuple of the mothers' pids as keys and
+                multipliers as values, e.g { (1000001,1000021):1.1 }.
         :param pythiacard: optionally supply your own runcard
         """
         if tofile:
@@ -271,7 +274,7 @@ class XSecComputer:
         outfile.write ( "\n# Signal strength multipliers: " )
         tokens = []
         for k,v in ssmultipliers.items():
-            tokens.append ( "%d:%.4g" % ( k, v ) )
+            tokens.append ( "%s:%.4g" % ( k, v ) )
         outfile.write ( ", ".join ( tokens ) )
         outfile.write ( "\n" )
         outfile.close()
@@ -361,7 +364,9 @@ class ArgsStandardizer:
             if multipliers in [ "", "None", "none", "no", "{}" ]:
                 return None
             if multipliers.count("{") != 1 or multipliers.count("}") != 1:
-                logger.error ( "need to pass signal strengh multipliers as dictionary with pids as keys" )
+                logger.error ( "need to pass signal strengh multipliers as dictionary with tuple of pids as keys" )
+            if multipliers.count("(") != multipliers.count(")"):
+                logger.error ( "need to pass signal strengh multipliers as dictionary with tuple of pids as keys" )
             return eval(multipliers)
         return multipliers
 
@@ -468,6 +473,13 @@ def main(args):
     ssmultipliers = None
     if hasattr ( args, "ssmultipliers" ):
         ssmultipliers = canonizer.getSSMultipliers ( args.ssmultipliers )
+        for pids,multiplier in ssmultipliers.items():
+            if type(pids) != tuple:
+                logger.error ( "keys of ssmultipliers need to be supplied as tuples" )
+                sys.exit()
+            if type(multiplier) not in [ int, float ]:
+                logger.error ( "values of ssmultipliers need to be supplied as ints or floats" )
+                sys.exit()
 
     pythiacard = None
     if hasattr(args, 'pythiacard'):

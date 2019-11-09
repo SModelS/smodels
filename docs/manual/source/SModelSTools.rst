@@ -62,10 +62,9 @@ or :download:`smodels/etc/pythia.card </images/pythia.card>` (for Pythia 6).
 A typical
 usage example is: ::
 
-   smodelsTools.py xseccomputer -s 8 13 -e 10000 --ssmultipliers "{1000021: 2.0}" -p -f inputFiles/slha/higgsinoStop.slha
+   smodelsTools.py xseccomputer -s 8 13 -e 10000 --ssmultipliers "{ (1000021,1000021): 4.0, (1000001,-10000001): 2.0 }" -p -f inputFiles/slha/higgsinoStop.slha
 
-which will compute 8 TeV and 13 TeV LO cross sections (at the LHC) for all MSSM processes using 10k MC events. Production cross sections of gluinos (pid 1000021) get enhanced by a factor of two per particle; pair production of gluinos thus gets multiplied
-by a factor of 2*2=4.
+which will compute 8 TeV and 13 TeV LO cross sections (at the LHC) for all MSSM processes using 10k MC events. Production cross section of gluino pairs (pid 1000021) gets enhanced by a factor of 4, squark-anti-squark production gets an enhancement of 2.
 If, *after* the LO cross sections have been computed, one wants to add the NLO+NLL cross sections for gluinos and squarks: ::
 
    smodelsTools.py xseccomputer -s 8 13 -p -N -O -f inputFiles/slha/higgsinoStop.slha
