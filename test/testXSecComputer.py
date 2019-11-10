@@ -178,6 +178,61 @@ class XSecTest(unittest.TestCase):
         self.assertAlmostEqual(lo/8962.,1.,2 )
         self.assertAlmostEqual(nll/17234., 1.,1)
         
+    def testSSJokers(self):
+        """ test the signal strength multipliers, with jokers """
+        
+        slhafile="./testFiles/slha/simplyGluino.slha"
+        f = open(slhafile,'r')
+        fdata = f.read()
+        fdata = fdata[:fdata.find('XSECTION')]
+        f.close()
+        fnew = tempfile.mkstemp()
+        os.close(fnew[0])
+        tmpfile = fnew[1]
+        fnew = open(tmpfile,'w')
+        fnew.write(fdata)
+        fnew.close()        
+        self.logger.info ("test NLL xsecs @ 8 and 13 TeV" )
+        #Set overall options:
+        #Options for cross section calculation:
+        xargs = argparse.Namespace()
+        xargs.sqrts = [[8.,13.]]
+        xargs.ncpus = 1
+        xargs.nevents = 2000
+        #Compute LO xsecs:
+        xargs.query = False
+        xargs.NLL = False
+        xargs.NLO = False
+        xargs.LOfromSLHA = False
+        xargs.keep = False
+        xargs.tofile = True
+        xargs.alltofile = False
+        xargs.pythia6 = True
+        xargs.filename = tmpfile
+        xargs.colors = False
+        xargs.ssmultipliers = { ('*100002?','*1000021'): 4. }
+        # xargs.ssmultipliers = { 1000021: 2. }
+        xargs.verbosity = "warning"
+        #Compute LO cross sections
+        xsecComputer.main(xargs)
+        #Compute NLL cross sections
+        xargs.NLL = True
+        xargs.LOfromSLHA = True
+        xsecComputer.main(xargs)
+        #Read xsecs:
+        xsecsInfile = crossSection.getXsecFromSLHAFile(tmpfile)
+        os.remove(tmpfile)
+        
+        #Check 8 TeV xsecs:
+        lo = xsecsInfile.getXsecsFor('8 TeV (LO)')[0].value.asNumber(fb)
+        nll = xsecsInfile.getXsecsFor('8 TeV (NLL)')[0].value.asNumber(fb)
+        self.assertAlmostEqual(lo/1056.,1.,2)
+        self.assertAlmostEqual(nll/2294.,1.,2)
+        #Check 13 TeV xsecs:
+        lo = xsecsInfile.getXsecsFor('13 TeV (LO)')[0].value.asNumber(fb)
+        nll = xsecsInfile.getXsecsFor('13 TeV (NLL)')[0].value.asNumber(fb)
+        self.assertAlmostEqual(lo/8962.,1.,2 )
+        self.assertAlmostEqual(nll/17234., 1.,1)
 
 if __name__ == "__main__":
     unittest.main()

@@ -123,6 +123,49 @@ class XSecComputer:
         #    logger.error ( "xsec=%s (%s)" % (i,type(i)) )
         return xsecs
 
+    def match ( self, pids, theorypid ):
+        """ do the pids given by the user match the 
+            pids of the theorypred? """
+        spids = list(pids)
+        stpids = list(theorypid)
+        if len(spids)!=len(stpids):
+            return False
+        jokerpids = []
+        for spid in spids:
+            if type(spid)==int:
+                if not spid in stpids:
+                    return False
+                else:
+                    stpids.remove(spid)
+            else:
+                if type(spid)!=str:
+                    logger.error ( "I have a pid of type %s. Dont know what to do." % \
+                                    type(spid) )
+                    sys.exit()
+                jokerpids.append ( spid )
+        jokerpids.sort( key=len, reverse=True ) # the longer, the more constraining
+        if stpids == []: # no wildcards
+            #print ( "tpid", theorypid, "matched", pids, "no wildcards" )
+            return True
+        import fnmatch
+        for jpid in jokerpids:
+            nomatch=[]
+            hasMatched = False ## one jpid should match only one
+            for i,stpid in enumerate(stpids):
+                if not fnmatch.fnmatch ( str(stpid), jpid ):
+                    nomatch.append ( stpid )
+                else:
+                    for j in stpids[i+1:]:
+                        nomatch.append ( j )
+                    break
+            #print ( "jpid", jpid," no matches", nomatch )
+            stpids = nomatch
+        if len(stpids)>0:
+            return False
+        #print ( "tpid", theorypid, "matched", pids )
+        return True
+                    
+
     def applyMultipliers ( self, xsecs, ssmultipliers ):
         """
         apply the given multipliers to the cross sections """
@@ -133,14 +176,19 @@ class XSecComputer:
             if len(pids) != 2:
                 logger.warning ( "currently we always only have two mothers, so why are the signal strength multipliers given for %d mothers?" % len(pids) )
             for pid in pids:
-                if abs(pid) < 1000000 or abs(pid) > 3000000:
+                if type(pid)==int and (abs(pid) < 1000000 or abs(pid) > 3000000):
                     logger.warning ( "signal strength multiplier for pid %d supplied. what does that mean?" % pid ) 
         for x in xsecs:
             for pids, multiplier in ssmultipliers.items():
-                if set(pids) == set ( x.pid ):
-                    x.value = x.value * ssmultipliers[pids]
+                if self.match ( pids, x.pid ):
+                    x.value = x.value * multiplier
                     break
-        return xsecs
+        # return xsecs
+        newx = crossSection.XSectionList()
+        for x in xsecs:
+            if x.value.asNumber(pb)>0.:
+                newx.add(x)
+        return newx
 
     def compute ( self, sqrts, slhafile,  lhefile=None, unlink=True, loFromSlha=None,
                   pythiacard=None, ssmultipliers=None ):
