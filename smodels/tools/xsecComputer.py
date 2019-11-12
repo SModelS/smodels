@@ -268,6 +268,7 @@ class XSecComputer:
                         "SLHA file." % inputFile )
             complain = True ## dont complain about already existing xsecs,
             # if we were the ones writing them
+            nXSecs = 0 ## count the xsecs we are adding
             for s in sqrtses:
                 ss = s*TeV
                 self.compute( ss, inputFile, unlink= unlink, loFromSlha= lOfromSLHA,
@@ -275,13 +276,14 @@ class XSecComputer:
                 if tofile == "all":
                     comment = str(self.nevents)+" evts, pythia%d [pb]"%\
                                               self.pythiaVersion
-                    self.addXSecToFile(self.loXsecs, inputFile, comment, complain )
+                    nXSecs += self.addXSecToFile(self.loXsecs, inputFile, comment, complain )
                     complain = False
                 comment = str(self.nevents)+" events, [pb], pythia%d for LO"%\
                                               self.pythiaVersion
-                self.addXSecToFile( self.xsecs, inputFile, comment, complain)
+                nXSecs += self.addXSecToFile( self.xsecs, inputFile, comment, complain)
                 complain = False
-            self.addMultipliersToFile ( ssmultipliers, inputFile )
+            if nXSecs > 0: ## only add if we actually added xsecs
+                self.addMultipliersToFile ( ssmultipliers, inputFile )
         else:
             logger.info("Computing SLHA cross section from %s." % inputFile )
             print()
@@ -357,6 +359,7 @@ class XSecComputer:
         # Write cross sections to file, if they do not overlap any cross section in
         # the file
         outfile = open(slhafile, 'a')
+        nxsecs = 0
         for xsec in xsecs:
             writeXsec = True
             for oldxsec in xSectionList:
@@ -364,10 +367,11 @@ class XSecComputer:
                     writeXsec = False
                     break
             if writeXsec:
+                nxsecs += 1
                 outfile.write( self.xsecToBlock(xsec, (2212, 2212), comment) + "\n")
         outfile.close()
 
-        return True
+        return nxsecs
 
     def xsecToBlock( self, xsec, inPDGs=(2212, 2212), comment=None, xsecUnit = pb):
         """
