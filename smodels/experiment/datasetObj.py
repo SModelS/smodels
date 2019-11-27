@@ -20,6 +20,9 @@ from smodels.theory.element import Element
 
 import itertools
 
+# if on, will check for overlapping constraints
+_complainAboutOverlappingConstraints = True
+
 class DataSet(object):
     """
     Holds the information to a data set folder (TxName objects, dataInfo,...)
@@ -73,7 +76,7 @@ class DataSet(object):
                 datasetElements.append(newEl)
         combos = itertools.combinations(datasetElements, 2)
         for x,y in combos:
-            if x == y:
+            if x == y and _complainAboutOverlappingConstraints:
                 errmsg ="Constraints (%s) and (%s) appearing in dataset %s:%s overlap "\
                         "(may result in double counting)." % \
                         (x,y,self.getID(),self.globalInfo.id )
