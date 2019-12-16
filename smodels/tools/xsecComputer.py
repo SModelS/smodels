@@ -249,19 +249,20 @@ class XSecComputer:
         return self.xsecs
 
     def computeForOneFile ( self, sqrtses, inputFile, unlink,
-                            lOfromSLHA, tofile, pythiacard=None,
-                            ssmultipliers = None ):
+                            lOfromSLHA, tofile, pythiacard = None,
+                            ssmultipliers = None, comment = None ):
         """
         compute the cross sections for one file.
         :param sqrtses: list of sqrt{s} tu run pythia, as a unum (e.g. [7*TeV])
         :param inputFile: input SLHA file to compute xsecs for
         :param unlink: if False, keep temporary files
-        :param tofile: write results to file
         :param lofromSLHA: try to obtain LO xsecs from SLHA file itself
+        :param tofile: write results to file
+        :param pythiacard: optionally supply your own runcard
         :param ssmultipliers: optionally supply signal strengh multipliers,
                 given as dictionary of the tuple of the mothers' pids as keys and
                 multipliers as values, e.g { (1000001,1000021):1.1 }.
-        :param pythiacard: optionally supply your own runcard
+        :param comment: an optional comment that gets added to the slha file.
         """
         if tofile:
             logger.info("Computing SLHA cross section from %s, adding to "
@@ -274,16 +275,17 @@ class XSecComputer:
                 self.compute( ss, inputFile, unlink= unlink, loFromSlha= lOfromSLHA,
                               pythiacard=pythiacard, ssmultipliers = ssmultipliers )
                 if tofile == "all":
-                    comment = str(self.nevents)+" evts, pythia%d [pb]"%\
+                    xcomment = str(self.nevents)+" evts, pythia%d [pb]"%\
                                               self.pythiaVersion
-                    nXSecs += self.addXSecToFile(self.loXsecs, inputFile, comment, complain )
+                    nXSecs += self.addXSecToFile(self.loXsecs, inputFile, xcomment, complain )
                     complain = False
-                comment = str(self.nevents)+" events, [pb], pythia%d for LO"%\
+                xcomment = str(self.nevents)+" events, [pb], pythia%d for LO"%\
                                               self.pythiaVersion
-                nXSecs += self.addXSecToFile( self.xsecs, inputFile, comment, complain)
+                nXSecs += self.addXSecToFile( self.xsecs, inputFile, xcomment, complain)
                 complain = False
             if nXSecs > 0: ## only add if we actually added xsecs
                 self.addMultipliersToFile ( ssmultipliers, inputFile )
+            self.addCommentToFile ( comment, inputFile )
         else:
             logger.info("Computing SLHA cross section from %s." % inputFile )
             print()
@@ -306,6 +308,17 @@ class XSecComputer:
             logger.debug ( "computing xsec for %s" % inputFile )
             self.computeForOneFile ( sqrtses, inputFile, unlink, lOfromSLHA,
                       tofile, pythiacard=pythiacard, ssmultipliers = ssmultipliers )
+
+    def addCommentToFile ( self, comment, slhaFile ):
+        """ add the optional comment to file """
+        if comment in [ None, "" ]:
+            return
+        if not os.path.isfile(slhaFile ):
+            logger.error("SLHA file %s not found." % slhaFile )
+            raise SModelSError()
+        outfile = open(slhaFile, 'a')
+        outfile.write ( "# %s\n" % comment )
+        outfile.close()
 
     def addMultipliersToFile ( self, ssmultipliers, slhaFile ):
         """ add the signal strength multipliers to the SLHA file """
