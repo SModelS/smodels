@@ -263,6 +263,7 @@ class XSecComputer:
                 given as dictionary of the tuple of the mothers' pids as keys and
                 multipliers as values, e.g { (1000001,1000021):1.1 }.
         :param comment: an optional comment that gets added to the slha file.
+        :returns: number of xsections that have been computed
         """
         if tofile:
             logger.info("Computing SLHA cross section from %s, adding to "
@@ -291,14 +292,17 @@ class XSecComputer:
             print()
             print( "     Cross sections:" )
             print( "=======================" )
+            nXsecs = 0
             for s in sqrtses:
                 ss = s*TeV
                 self.compute( ss, inputFile, unlink=unlink, loFromSlha=lOfromSLHA,
                               ssmultipliers = ssmultipliers )
                 for xsec in self.xsecs:
+                    nXsecs += 1
                     print( "%s %20s:  %.3e pb" % \
                             ( xsec.info.label,xsec.pid,xsec.value/pb ) )
             print()
+        return nXSecs
 
     def computeForBunch ( self, sqrtses, inputFiles, unlink,
                           lOfromSLHA, tofile, pythiacard=None,
