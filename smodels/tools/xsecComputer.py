@@ -257,7 +257,8 @@ class XSecComputer:
         :param inputFile: input SLHA file to compute xsecs for
         :param unlink: if False, keep temporary files
         :param lofromSLHA: try to obtain LO xsecs from SLHA file itself
-        :param tofile: write results to file
+        :param tofile: False, True, "all": write results to file, if "all" also write 
+                       lower xsecs to file.
         :param pythiacard: optionally supply your own runcard
         :param ssmultipliers: optionally supply signal strengh multipliers,
                 given as dictionary of the tuple of the mothers' pids as keys and
@@ -282,8 +283,9 @@ class XSecComputer:
                     complain = False
                 xcomment = str(self.nevents)+" events, [pb], pythia%d for LO"%\
                                               self.pythiaVersion
-                nXSecs += self.addXSecToFile( self.xsecs, inputFile, xcomment, complain)
-                complain = False
+                if tofile != False:
+                    nXSecs += self.addXSecToFile( self.xsecs, inputFile, xcomment, complain)
+                    complain = False
             if nXSecs > 0: ## only add if we actually added xsecs
                 self.addMultipliersToFile ( ssmultipliers, inputFile )
             self.addCommentToFile ( comment, inputFile )
