@@ -333,18 +333,31 @@ class XSecComputer:
         if not os.path.isfile(slhaFile ):
             logger.error("SLHA file %s not found." % slhaFile )
             raise SModelSError()
-        r = open(slhaFile, 'r' )
-        lines = r.readlines()
-        for line in lines:
-            if "Signal strength multipliers" in line:
-                logger.warning ( "Signal strength multipliers have alread been applied?" )
-        r.close()
-        outfile = open(slhaFile, 'a')
-        outfile.write ( "\n# Signal strength multipliers: " )
         tokens = []
         for k,v in ssmultipliers.items():
             tokens.append ( "%s:%.4g" % ( k, v ) )
-        outfile.write ( ", ".join ( tokens ) )
+        newline = "# Signal strength multipliers: " + ", ".join ( tokens )
+        with open(slhaFile, 'r' ) as r:
+            lines = r.readlines()
+            r.close()
+
+        rewrite = []
+        for line in lines:
+            if "Signal strength multipliers" in line:
+                if ( line.strip() == newline ):
+                    logger.debug ( "Signal strength multipliers have alread been applied." )
+                else:
+                    logger.error ( "Different signal strength multipliers have alread been applied!!!" )
+                    rewrite.append ( line+" ERROR inconsistent!" )
+            else:
+                if not "produced at step" in line:
+                    rewrite.append ( line )
+        outfile = open(slhaFile, 'w')
+        for line in rewrite:
+            outfile.write ( line )
+        if line != "\n": ## last line not an empty newline?
+            outfile.write ( "\n" )
+        outfile.write ( newline )
         outfile.write ( "\n" )
         outfile.close()
 
