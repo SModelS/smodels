@@ -1,10 +1,10 @@
 """
 .. module:: branch
    :synopsis: Module holding the branch class and methods.
-        
+
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
-        
+
 """
 
 from smodels.theory.auxiliaryFunctions import elementsInStr
@@ -18,7 +18,7 @@ from smodels.experiment.databaseParticles import finalStates,anyOdd
 
 class Branch(object):
     """
-    An instance of this class represents a branch.    
+    An instance of this class represents a branch.
     A branch-element can be constructed from a string (e.g., ('[b,b],[W]').
 
     :ivar evenParticles: list of even particles (Particle objects) for the final states
@@ -27,48 +27,48 @@ class Branch(object):
                 to a nested list (BSMparticles = [[particle1, particle2,...],[particleA, particleB,...]])
     :ivar maxWeight: weight of the branch (XSection object)
     """
-    
+
 
     def __init__(self, info=None, finalState=None):
         """
         Initializes the branch. If info is defined, tries to generate
         the branch using it.
-        
+
         :parameter info: string describing the branch in bracket notation
                          (e.g. [[e+],[jet]])
 
         :parameter finalState: final state label string for the branch
-                         (e.g. 'MET' or 'HSCP')                         
+                         (e.g. 'MET' or 'HSCP')
         """
-        
+
         self.evenParticles = []
         self.oddParticles = []
-        
+
         self.maxWeight = None
         self.vertnumb = None
         self.vertparts = None
         if isinstance(info,str):
-            branch = elementsInStr(info)      
+            branch = elementsInStr(info)
             if not branch or len(branch) > 1:
                 raise SModelSError("Wrong input string " + info)
-            else:                
+            else:
                 branch = branch[0]
-                vertices = elementsInStr(branch[1:-1])        
+                vertices = elementsInStr(branch[1:-1])
                 for vertex in vertices:
                     bsmParticle = finalStates.getParticlesWith(label='anyOdd')
                     if not bsmParticle:
-                        raise SModelSError("Final state anyOdd has not been defined in databaseParticles.py")
+                        raise SModelSError("Final state particle ``anyOdd'' has not been defined in databaseParticles.py")
                     elif len(bsmParticle) != 1:
-                        raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)          
+                        raise SModelSError("Ambiguous definition of label ``%s'' in finalStates" %bsmParticle[0].label)
                     self.oddParticles.append(bsmParticle[0])
                     particleNames = vertex[1:-1].split(',')
                     ptcs = []
                     for pname in particleNames:
                         smParticle = finalStates.getParticlesWith(label=pname)
                         if not smParticle:
-                            raise SModelSError("Final state %s has not been defined in databaseParticles.py " %pname)
+                            raise SModelSError("Final state SM particle ``%s'' has not been defined in databaseParticles.py " %pname)
                         elif len(smParticle) != 1:
-                            raise SModelSError("Ambiguos defintion of label %s in finalStates" %smParticle[0].label)
+                            raise SModelSError("Ambiguous definition of label ``%s'' in finalStates" %smParticle[0].label)
                         else:
                             ptcs.append(smParticle[0])
                     vertexParticles = ParticleList(ptcs)
@@ -79,21 +79,21 @@ class Branch(object):
         if finalState:
             bsmParticle = finalStates.getParticlesWith(label=finalState)
             if not bsmParticle:
-                raise SModelSError("Final state %s has not been defined in databaseParticles.py" %finalState)
+                raise SModelSError("Final state BSM particle ``%s'' has not been defined in databaseParticles.py" %finalState)
             elif len(bsmParticle) != 1:
-                raise SModelSError("Ambiguos defintion of label %s in databaseParticles.py" %finalState)
+                raise SModelSError("Ambiguous definition of label ``%s'' in databaseParticles.py" %finalState)
             else:
                 bsmParticle = bsmParticle[0]
         else:
             bsmParticle = anyOdd
-            
+
         self.oddParticles.append(bsmParticle)
 
     def __str__(self):
         """
         Create the branch bracket notation string, e.g. [[e+],[jet]].
-        
-        :returns: string representation of the branch (in bracket notation)    
+
+        :returns: string representation of the branch (in bracket notation)
         """
 
         sortedParticles = [sorted(vertex, key = lambda ptc: str(ptc))
@@ -108,7 +108,7 @@ class Branch(object):
 
     def __cmp__(self,other):
         """
-        Compares the branch with other.        
+        Compares the branch with other.
         The comparison is made based on vertnumb, vertparts, oddParticles and evenParticles.
         The comparison allows for any ordering of the evenParticles in the vertex.
         It relies on the particle comparison, which allows for the comparison of Particles and MultiParticles.
@@ -119,7 +119,7 @@ class Branch(object):
 
         if isinstance(other,InclusiveBranch):
             return -1*other.__cmp__(self)
-        
+
         if self.vertnumb != other.vertnumb:
             comp = self.vertnumb > other.vertnumb
             if comp: return 1
@@ -136,19 +136,19 @@ class Branch(object):
                 return 1
             else:
                 return -1
-            
+
         #Compare even final states (ParticleLists)
         #The comparison of ParticleList objects is made irrespective of ordering
-        for iv,vertex in enumerate(self.evenParticles):            
+        for iv,vertex in enumerate(self.evenParticles):
             if vertex != other.evenParticles[iv]:
                 comp = vertex > other.evenParticles[iv]
                 if comp:
                     return 1
                 else:
                     return -1
-                
-        return 0  #Branches are equal    
-        
+
+        return 0  #Branches are equal
+
 
     def __lt__( self, b2 ):
         return self.__cmp__(b2) == -1
@@ -156,7 +156,7 @@ class Branch(object):
 
     def __eq__( self, b2 ):
         return self.__cmp__(b2) == 0
-          
+
     def __ne__( self, b2 ):
         return not self.__cmp__(b2) == 0
 
@@ -184,10 +184,10 @@ class Branch(object):
         Adds two branches. Should only be used if the branches
         have the same topologies. The odd and even particles are combined.
         """
-        
+
         if self.getInfo() != other.getInfo():
             raise SModelSError("Can not add branches with distinct topologies")
-        
+
         newBranch = self.__class__()
         #Combine odd particles
         for iptc,ptc in enumerate(self.oddParticles):
@@ -201,8 +201,8 @@ class Branch(object):
 
             vertexParticles = ParticleList(vertexParticles)
             newBranch.evenParticles.append(vertexParticles)
-        
-        if not self.maxWeight is None and not other.maxWeight is None:        
+
+        if not self.maxWeight is None and not other.maxWeight is None:
             newBranch.maxWeight = self.maxWeight + other.maxWeight
 
         return newBranch
@@ -212,19 +212,19 @@ class Branch(object):
         Adds two elements. Only elements with the same
         topology can be combined.
         """
-        
+
         return self.__add__(other)
 
     def __iadd__(self,other):
         """
         Combine two branches. Should only be used if the elements
         have the same topologies. The branches
-        odd and even particles are combined. 
+        odd and even particles are combined.
         """
-        
+
         if self.getInfo() != other.getInfo():
             raise SModelSError("Can not add branches with distinct topologies")
-        
+
         #Combine odd particles
         for iptc,ptc in enumerate(other.oddParticles):
             self.oddParticles[iptc] += ptc
@@ -235,20 +235,20 @@ class Branch(object):
                 self.evenParticles[iv][iptc] += other.evenParticles[iv][iptc]
         if not self.maxWeight is None and not other.maxWeight is None:
             self.maxWeight += other.maxWeight
-                    
+
         return self
-    
+
     def getAverage(self,attr):
         """
-        Get the average value for a given attribute appearing in 
-        the odd particles of branch. 
+        Get the average value for a given attribute appearing in
+        the odd particles of branch.
         """
-        
+
         try:
             vals = []
             for ptc in self.oddParticles:
                 v = getattr(ptc,attr)
-                if isinstance(ptc,MultiParticle) and isinstance(v,list):                    
+                if isinstance(ptc,MultiParticle) and isinstance(v,list):
                     avg = v[0]
                     for x in v[1:]:
                         avg += x
@@ -258,9 +258,9 @@ class Branch(object):
                 vals.append(avg)
         except (AttributeError,ZeroDivisionError):
             raise SModelSError("Could not compute average for %s" %attr)
-        
+
         return vals
-    
+
     def setInfo(self):
         """
         Defines the number of vertices (vertnumb) and number of
@@ -271,39 +271,39 @@ class Branch(object):
         bInfo = self.getInfo()
         self.vertnumb = bInfo['vertnumb']
         self.vertparts = bInfo['vertparts']
-        
+
     def getInfo(self):
         """
         Get branch topology info from evenParticles.
-        
-        :returns: dictionary containing vertices and number of final states information  
+
+        :returns: dictionary containing vertices and number of final states information
         """
 
         vertnumb = len(self.evenParticles)
         vertparts = [len(v) for v in self.evenParticles]
-        
+
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
-        
+
     def removeVertex(self,iv):
         """
         Remove vertex iv.
         The "vertex-mother" in BSMparticles and (SM) particles in the vertex
         are removed from the branch. The vertex index corresponds
         to the BSM decay (iv = 0 will remove the first BSM particle,...)
-        
+
         :parameter iv: Index of vertex in branch (int)
-        
+
         """
-        
+
         self.oddParticles = self.oddParticles[:iv] + self.oddParticles[iv+1:]
         self.evenParticles = self.evenParticles[:iv] + self.evenParticles[iv+1:]
         self.setInfo()
 
     def copy(self):
         """
-        Generate an independent copy of self.        
+        Generate an independent copy of self.
         Faster than deepcopy.
-        
+
         :returns: Branch object
         """
 
@@ -321,35 +321,35 @@ class Branch(object):
     def getLength(self):
         """
         Returns the branch length (number of odd particles).
-        
+
         :returns: length of branch (number of odd particles)
         """
-        
+
         return len(self.oddParticles)
 
     def _addDecay(self, decay):
         """
-        Generate a new branch adding a 1-step cascade decay        
+        Generate a new branch adding a 1-step cascade decay
         This is described by the br object, with particle masses given by BSMList.
-        
+
         :parameter decay: Decay object (see pyslha). Contains information about the decay.
         :returns: extended branch (Branch object). False if there was an error.
         """
-        
+
         newBranch = self.copy()
         oddParticles = decay.oddParticles
         evenParticles = decay.evenParticles
-        
+
         if len(oddParticles) != 1:
             logger.warning("Decay %s does not preserve Z2 and will be ignored" %str(decay))
             return False
-        
+
         newBranch.oddParticles.append(oddParticles[0])
         newBranch.evenParticles.append(evenParticles)
-        
+
         if not self.maxWeight is None:
-            newBranch.maxWeight =  self.maxWeight*decay.br             
-        
+            newBranch.maxWeight =  self.maxWeight*decay.br
+
         newBranch.setInfo()
         return newBranch
 
@@ -360,9 +360,9 @@ class Branch(object):
         decay of the current branch daughter.
         :returns: list of extended branches (Branch objects). Empty list if daughter is stable or
                   if daughterID was not defined.
-        """   
-        
-        if not self.oddParticles or not self.oddParticles[-1].decays: 
+        """
+
+        if not self.oddParticles or not self.oddParticles[-1].decays:
             return False
         if self.oddParticles[-1].isStable():
             return False
@@ -375,36 +375,36 @@ class Branch(object):
             newBr = self._addDecay(decay)
             if newBr:
                 newBranches.append(newBr)
-        
+
         if not newBranches:
             return False
-        else:                       
+        else:
             return newBranches
 
 
 def decayBranches(branchList, sigcut=0.):
     """
     Decay all branches from branchList until all unstable intermediate states have decayed.
-    
+
     :parameter branchList: list of Branch() objects containing the initial mothers
     :parameter sigcut: minimum sigma*BR (in fb) to be generated, by default sigcut = 0.
                    (all branches are kept)
-    :returns: list of branches (Branch objects)    
+    :returns: list of branches (Branch objects)
     """
-    
-        
+
+
     stableBranches,unstableBranches = [],[]
-    
+
     for br in branchList:
         if br.maxWeight < sigcut:
             continue
-        
+
         if br.decayDaughter():
             unstableBranches.append(br)
         else:
             stableBranches.append(br)
-    
-    while unstableBranches:        
+
+    while unstableBranches:
         # Store branches after adding one step cascade decay
         newBranchList = []
         for inbranch in unstableBranches:
@@ -413,24 +413,24 @@ def decayBranches(branchList, sigcut=0.):
                 continue
 
             #If None appear amongst the decays, add the possibility for the particle not decaying prompt
-            if any(x is None for x in inbranch.oddParticles[-1].decays):            
+            if any(x is None for x in inbranch.oddParticles[-1].decays):
                 stableBranches.append(inbranch)
-            
+
             # Add all possible decays of the R-odd daughter to the original
             # branch (if any)
             newBranches = inbranch.decayDaughter()
             if newBranches:
                 # New branches were generated, add them for next iteration
-                newBranchList += [br for br in newBranches 
+                newBranchList += [br for br in newBranches
                                   if br.maxWeight > sigcut]
             elif inbranch.maxWeight > sigcut:
                 stableBranches.append(inbranch)
 
         # Use new unstable branches (if any) for next iteration step
-        unstableBranches = newBranchList           
-    
-    #Sort list by initial branch pdg:        
-    finalBranchList = sorted(stableBranches, key=lambda branch: branch.oddParticles[0].pdg)      
+        unstableBranches = newBranchList
+
+    #Sort list by initial branch pdg:
+    finalBranchList = sorted(stableBranches, key=lambda branch: branch.oddParticles[0].pdg)
 
     return finalBranchList
 
@@ -440,7 +440,7 @@ class InclusiveBranch(Branch):
     An inclusive branch class. It will return True when compared to any other branch object
     with the same final state.
     """
-    
+
     def __init__(self,finalState=None):
         Branch.__init__(self)
         self.mass = InclusiveList()
@@ -451,55 +451,55 @@ class InclusiveBranch(Branch):
         else:
             bsmParticle = finalStates.getParticlesWith(label='anyOdd')
         if not bsmParticle:
-            raise SModelSError("Final state %s has not been defined in finalStateParticles.py" %finalState)
+            raise SModelSError("Final state BSM particle ``%s'' has not been defined in finalStateParticles.py" %finalState)
         if len(bsmParticle) != 1:
-            raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)
+            raise SModelSError("Ambiguous definition of label ``%s'' in finalStates" %bsmParticle[0].label)
         self.oddParticles = [bsmParticle[0]]
         self.vertnumb = InclusiveValue()
         self.vertparts = InclusiveList()
-        
+
     def __cmp__(self,other):
         """
         Always returns true. The only exception is if a final state particle has been
-        defined. In this case, will include the final state in the comparison.        
+        defined. In this case, will include the final state in the comparison.
         The comparison is made based on vertnumb, vertparts, evenParticles, masses of BSM particles
         and the last BSM particle appearing in the cascade decay.
-        OBS: The particles inside each vertex MUST BE sorted (see branch.sortParticles())         
+        OBS: The particles inside each vertex MUST BE sorted (see branch.sortParticles())
         :param other:  branch to be compared (Branch object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
-        #If BSM particles are identical, avoid further checks                
+        #If BSM particles are identical, avoid further checks
         if self.oddParticles and other.oddParticles:
             #Compare final BSM state by Z2parity and quantum numbers:
             comp = self.oddParticles[-1].cmpProperties(other.oddParticles[-1],
                                                        properties=['Z2parity','colordim','eCharge'])
             if comp:
-                return comp 
-    
-        return 0  #Branches are equal    
-       
+                return comp
+
+        return 0  #Branches are equal
+
     def __str__(self):
         return '[*]'
-        
+
     def getInfo(self):
         """
         Get branch topology info (inclusive list and int).
-        
-        :returns: dictionary containing vertices and number of final states information  
+
+        :returns: dictionary containing vertices and number of final states information
         """
 
         vertnumb = InclusiveValue()
         vertparts = InclusiveList()
-        
+
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
-        
+
     def decayDaughter(self):
         """
         Always return False.
         """
-        
+
         return False
-        
+
 
 
