@@ -57,18 +57,18 @@ class Branch(object):
                 for vertex in vertices:
                     bsmParticle = finalStates.getParticlesWith(label='anyOdd')
                     if not bsmParticle:
-                        raise SModelSError("Final state particle ``anyOdd'' has not been defined in databaseParticles.py")
+                        raise SModelSError("Final state anyOdd has not been defined in databaseParticles.py")
                     elif len(bsmParticle) != 1:
-                        raise SModelSError("Ambiguous definition of label ``%s'' in finalStates" %bsmParticle[0].label)
+                        raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)
                     self.oddParticles.append(bsmParticle[0])
                     particleNames = vertex[1:-1].split(',')
                     ptcs = []
                     for pname in particleNames:
                         smParticle = finalStates.getParticlesWith(label=pname)
                         if not smParticle:
-                            raise SModelSError("Final state SM particle ``%s'' has not been defined in databaseParticles.py " %pname)
+                            raise SModelSError("Final state %s has not been defined in databaseParticles.py " %pname)
                         elif len(smParticle) != 1:
-                            raise SModelSError("Ambiguous definition of label ``%s'' in finalStates" %smParticle[0].label)
+                            raise SModelSError("Ambiguos defintion of label %s in finalStates" %smParticle[0].label)
                         else:
                             ptcs.append(smParticle[0])
                     vertexParticles = ParticleList(ptcs)
@@ -79,9 +79,9 @@ class Branch(object):
         if finalState:
             bsmParticle = finalStates.getParticlesWith(label=finalState)
             if not bsmParticle:
-                raise SModelSError("Final state BSM particle ``%s'' has not been defined in databaseParticles.py" %finalState)
+                raise SModelSError("Final state %s has not been defined in databaseParticles.py" %finalState)
             elif len(bsmParticle) != 1:
-                raise SModelSError("Ambiguous definition of label ``%s'' in databaseParticles.py" %finalState)
+                raise SModelSError("Ambiguos defintion of label %s in databaseParticles.py" %finalState)
             else:
                 bsmParticle = bsmParticle[0]
         else:
@@ -451,9 +451,9 @@ class InclusiveBranch(Branch):
         else:
             bsmParticle = finalStates.getParticlesWith(label='anyOdd')
         if not bsmParticle:
-            raise SModelSError("Final state BSM particle ``%s'' has not been defined in finalStateParticles.py" %finalState)
+            raise SModelSError("Final state %s has not been defined in finalStateParticles.py" %finalState)
         if len(bsmParticle) != 1:
-            raise SModelSError("Ambiguous definition of label ``%s'' in finalStates" %bsmParticle[0].label)
+            raise SModelSError("Ambiguos defintion of label %s in finalStates" %bsmParticle[0].label)
         self.oddParticles = [bsmParticle[0]]
         self.vertnumb = InclusiveValue()
         self.vertparts = InclusiveList()
