@@ -66,7 +66,7 @@ class TxTest(unittest.TestCase):
         except SModelSError as e:         
             gotError = e
         
-        errstr = 'Final state non-MET has not been defined in databaseParticles.py'
+        errstr = "Final state BSM particle ``non-MET'' has not been defined in databaseParticles.py"
         self.assertEqual(gotError.args[0], errstr)
         
     def testgetEffFor(self):
