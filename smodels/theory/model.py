@@ -55,7 +55,7 @@ class Model(object):
         :returns: List of particle objects 
         """
     
-        particleList = set()
+        particleList = []
         for particle in self.BSMparticles + self.SMparticles:
             pList = [particle]
             if isinstance(particle,MultiParticle):
@@ -66,7 +66,7 @@ class Model(object):
                 if any(getattr(p,attr) != value for attr,value in kwargs.items()):
                     continue
 
-                particleList.add(particle)
+                particleList.append(particle)
 
         #Remove repeated entries. If the list contains a Particle and a MultiParticle
         #which contains the Particle, remove the MultiParticle
@@ -75,7 +75,7 @@ class Model(object):
         for particle in particleList:
             if isinstance(particle,MultiParticle):
                 continue
-            if any(particle == ptc for ptc in cleanList):
+            if any(particle is ptc for ptc in cleanList):
                 continue
             cleanList.append(particle)
         #Now only include MultiParticle objects, if they do not contain
@@ -85,9 +85,10 @@ class Model(object):
                 continue
             if any(particle is ptc for ptc in cleanList):
                 continue
-            if any((particle.contains(p) or particle == p) for p in cleanList):
+            if any((particle.contains(p) and not particle is p) for p in particleList):
                 continue
             cleanList.append(particle)
+
 
         if not cleanList:
             logger.warning("Particle with attributes %s not found in models" %str(kwargs))
