@@ -107,6 +107,11 @@ class TxName(object):
         elements = []
         if hasattr(self,'constraint'):
             elements += [Element(el,finalState) for el in elementsInStr(str(self.constraint))]
+
+        if any(elA == elB for iA,elA in enumerate(elements) for elB in elements[iA:]):
+            logger.error("Duplicate elements in constraint: %s" %self.constraint)
+            raise SModelSError("Duplicate elements in constraint: %s" %self.constraint)
+
         if hasattr(self,'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds,list): conds = [conds]
@@ -119,6 +124,7 @@ class TxName(object):
         # Builds up TopologyList with all the elements appearing in constraints
         # and conditions:
         for el in elements:
+            el.sortBranches()
             self._topologyList.addElement(el)
 
     def hasOnlyZeroes(self):
