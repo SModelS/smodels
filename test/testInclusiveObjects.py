@@ -110,11 +110,11 @@ class InclusiveObjectsTest(unittest.TestCase):
         gInfo.addInfo('dataId','c000')
         tx = TxName(f,gInfo,gInfo)
 
-        el = element.Element(info="[[[e+]],[]]",finalState = ['MET','HSCP'])
+        el = element.Element(info="[[],[[e+]]]",finalState = ['HSCP','MET'])
         newEl = tx.hasElementAs(el)  #newEl should be equal to el, but with opposite branch ordering
         self.assertFalse(newEl is None)
         bsmParticles = [[str(bsm) for bsm in br] for br in newEl.oddParticles]
-        self.assertTrue(bsmParticles == [['HSCP'],['anyOdd','MET']])
+        self.assertTrue(bsmParticles == [['anyOdd','MET'],['HSCP']])
         
 
 if __name__ == "__main__":
