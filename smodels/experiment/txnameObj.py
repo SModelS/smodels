@@ -109,8 +109,10 @@ class TxName(object):
             elements += [Element(el,finalState) for el in elementsInStr(str(self.constraint))]
 
         if any((elA == elB and not elA is elB) for elA in elements for elB in elements):
-            logger.error("Duplicate elements in constraint: %s" %self.constraint)
-            raise SModelSError("Duplicate elements in constraint: %s" %self.constraint)
+            txt = "Duplicate elements in constraint: %s in %s" % \
+                  ( self.constraint, self.globalInfo.id )
+            logger.error( txt )
+            raise SModelSError( txt )
 
         if hasattr(self,'condition') and self.condition:
             conds = self.condition
