@@ -266,12 +266,12 @@ class XSecComputer:
         :param comment: an optional comment that gets added to the slha file.
         :returns: number of xsections that have been computed
         """
+        nXSecs = 0 ## count the xsecs we are adding
         if tofile:
             logger.info("Computing SLHA cross section from %s, adding to "
                         "SLHA file." % inputFile )
             complain = True ## dont complain about already existing xsecs,
             # if we were the ones writing them
-            nXSecs = 0 ## count the xsecs we are adding
             for s in sqrtses:
                 ss = s*TeV
                 self.compute( ss, inputFile, unlink= unlink, loFromSlha= lOfromSLHA,
@@ -294,13 +294,12 @@ class XSecComputer:
             print()
             print( "     Cross sections:" )
             print( "=======================" )
-            nXsecs = 0
             for s in sqrtses:
                 ss = s*TeV
                 self.compute( ss, inputFile, unlink=unlink, loFromSlha=lOfromSLHA,
                               ssmultipliers = ssmultipliers )
                 for xsec in self.xsecs:
-                    nXsecs += 1
+                    nXSecs += 1
                     print( "%s %20s:  %.3e pb" % \
                             ( xsec.info.label,xsec.pid,xsec.value/pb ) )
             print()
