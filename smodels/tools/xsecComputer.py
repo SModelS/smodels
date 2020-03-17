@@ -175,8 +175,9 @@ class XSecComputer:
                 sys.exit()
             if len(pids) != 2:
                 logger.warning ( "currently we always only have two mothers, so why are the signal strength multipliers given for %d mothers?" % len(pids) )
+            known_pids = [ 3000006 ] ## here we can define some exceptional pids
             for pid in pids:
-                if type(pid)==int and (abs(pid) < 1000000 or abs(pid) > 3000000):
+                if type(pid)==int and (abs(pid) < 1000000 or ( abs(pid) > 3000000 and abs(pid) not in known_pids) ):
                     logger.warning ( "signal strength multiplier for pid %d supplied. what does that mean?" % pid ) 
         for x in xsecs:
             for pids, multiplier in ssmultipliers.items():
