@@ -355,7 +355,7 @@ class Particle(object):
 
 class MultiParticle(Particle):
 
-    """ An instance of this class represents a list of particle object to allow for inclusive expresions such as jet. 
+    """ An instance of this class represents a list of particle object to allow for inclusive expressions such as jets. 
         The properties are: label, pdg, mass, electric charge, color charge, width 
     """
     
