@@ -75,7 +75,7 @@ Particles
 ^^^^^^^^^
 
 The basic building block of simplified model |elements| are particles,
-which can be both SM (e.g. :math:`l^+,l^-,nu`  in the :ref:`figure above <elementscheme>`) 
+which can be both SM (e.g. :math:`l^+,l^-,\nu`  in the :ref:`figure above <elementscheme>`) 
 or BSM states (e.g. :math:`X1,X2,Y1,Y2,Z1` in the :ref:`figure above <elementscheme>`).
 The BSM particles are defined by the input model (see :ref:`model <parameterFileModel>` in |parameters|),
 while the SM particles are defined in SMparticles.py.
@@ -86,7 +86,17 @@ are equal. *Inclusive* or *generic* particles can then be defined if some
 of its properties are left undefined. For instance, a particle with electric
 charge -1, spin 1/2 but without a defined mass will be matched
 to electrons, muons and taus. This is useful when defining generic simplified models
-(|elements|) in the :ref:`Database <databaseDefs>`.
+(|elements|) in the :ref:`Database <databaseDefs>`. 
+Examples for such inclusive definitions are:
+
+ - 'l' for electrons, and muons, 
+ - 'L' for electrons, muons, and taus, 
+ - 'q' for u-, d-, and s-quarks, 
+ - 'jet' for u-, d-, s-, c-quarks and gluons 
+ - 'anyOdd' for any Z\ :sub:`2`-odd particle
+ - '*' for any \ :sub:`2`-even particle
+
+For all definitions, see the smodels/experiment/databaseParticles.py file.
 
 * **Particles are described by the** `Particle Class <theory.html#theory.particle.Particle>`_ 
 
