@@ -492,8 +492,9 @@ def _getBestResult(dataSetResults):
             raise SModelSError()
         dataset = predList[0].dataset
         if dataset.getType() != 'efficiencyMap':
-            logger.error("Multiple data sets should only exist for efficiency map results!")
-            raise SModelSError()
+            txt = "Multiple data sets should only exist for efficiency map results, but we have them for %s?" % (predList[0].analysisId())
+            logger.error( txt )
+            raise SModelSError( txt )
         pred = predList[0]
         xsec = pred.xsection
         expectedR = (xsec.value/dataset.getSRUpperLimit(0.05,True,False) ).asNumber()
