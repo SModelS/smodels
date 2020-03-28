@@ -248,7 +248,7 @@ class TheoryPrediction(object):
         else:
             dataId = self.dataset.getID()
             fname="" ## folder name
-            if not "combined" in dataId:
+            if dataId != None and not "combined" in dataId:
                 fname=" (%s)" % self.dataset.folderName()
 
             ds = "%s%s" % ( dataId, fname )
@@ -256,7 +256,11 @@ class TheoryPrediction(object):
         ret += "      obs limit: %s\n" % self.getUpperLimit()
         ret += "      exp limit: %s\n" % self.getUpperLimit( expected=True )
         ret += "                      obs r: %f\n" % ( self.getRValue(expected=False) )
-        ret += "                      exp r: %f\n" % ( self.getRValue(expected=True) )
+        expr = self.getRValue(expected=True)
+        sexpr = "%s" % expr
+        if expr != None:
+            sexpr= "%f" % expr
+        ret += "                      exp r: %s\n" % ( sexpr )
         ret += "                       chi2: %s\n" % ( self.chi2 )
         return ret
 
