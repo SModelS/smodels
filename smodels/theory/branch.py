@@ -29,7 +29,7 @@ class Branch(object):
     """
 
 
-    def __init__(self, info=None, finalState=None):
+    def __init__(self, info=None, finalState=None, intermediateState=None):
         """
         Initializes the branch. If info is defined, tries to generate
         the branch using it.
@@ -39,6 +39,9 @@ class Branch(object):
 
         :parameter finalState: final state label string for the branch
                          (e.g. 'MET' or 'HSCP')
+        :parameter intermediateState: list containing intermediate state labels
+                                      (e.g. ['gluino','C1+'])
+
         """
 
         self.evenParticles = []
@@ -55,12 +58,6 @@ class Branch(object):
                 branch = branch[0]
                 vertices = elementsInStr(branch[1:-1])
                 for vertex in vertices:
-                    bsmParticle = finalStates.getParticlesWith(label='anyOdd')
-                    if not bsmParticle:
-                        raise SModelSError("Final state ``anyOdd'' has not been defined in databaseParticles.py")
-                    elif len(bsmParticle) != 1:
-                        raise SModelSError("Ambiguous definition of label ``%s'' in finalStates" %bsmParticle[0].label)
-                    self.oddParticles.append(bsmParticle[0])
                     particleNames = vertex[1:-1].split(',')
                     ptcs = []
                     for pname in particleNames:
@@ -76,18 +73,28 @@ class Branch(object):
 
             self.vertnumb = len(self.evenParticles)
             self.vertparts = [len(v) for v in self.evenParticles]
-        if finalState:
-            bsmParticle = finalStates.getParticlesWith(label=finalState)
-            if not bsmParticle:
-                raise SModelSError("Final state BSM particle ``%s'' has not been defined in databaseParticles.py" %finalState)
-            elif len(bsmParticle) != 1:
-                raise SModelSError("Ambiguous definition of label ``%s'' in databaseParticles.py" %finalState)
-            else:
-                bsmParticle = bsmParticle[0]
-        else:
-            bsmParticle = anyOdd
 
-        self.oddParticles.append(bsmParticle)
+            #Get labels of intermediate states (default is [anyOdd,anyOdd,...,MET])
+            if intermediateState:
+                if not isinstance(intermediateState,list):
+                    raise SModelSError("Intermediate state (``%s'') should be a list)" %intermediateState)
+                bsmLabels = intermediateState[:]
+            else:
+                bsmLabels = ['anyOdd']*self.vertnumb
+            if finalState:
+                bsmLabels.append(finalState)
+            else:
+                bsmLabels.append('MET')
+            if len(bsmLabels) != self.vertnumb+1:
+                raise SModelSError("Number of intermediate states (``%s'') is not consistent)" %intermediateState)
+            for bsmLabel in bsmLabels:
+                bsmParticle = finalStates.getParticlesWith(label=bsmLabel)
+                if not bsmParticle:
+                    raise SModelSError("BSM particle ``%s'' has not been defined in databaseParticles.py" %bsmLabel)
+                elif len(bsmParticle) != 1:
+                    raise SModelSError("Ambiguous definition of label ``%s'' in databaseParticles.py" %bsmLabel)
+                else:
+                    self.oddParticles.append(bsmParticle[0])
 
     def __str__(self):
         """
@@ -500,6 +507,3 @@ class InclusiveBranch(Branch):
         """
 
         return False
-
-
-

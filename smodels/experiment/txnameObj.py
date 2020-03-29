@@ -15,8 +15,8 @@
 import os,sys
 from smodels.tools import physicsUnits
 from smodels.tools.physicsUnits import GeV
-from smodels.theory.auxiliaryFunctions import (elementsInStr, removeUnits, unscaleWidth, 
-                                               rescaleWidth, flattenArray, reshapeList, 
+from smodels.theory.auxiliaryFunctions import (elementsInStr, removeUnits, unscaleWidth,
+                                               rescaleWidth, flattenArray, reshapeList,
                                                removeInclusives, addInclusives)
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
@@ -36,7 +36,7 @@ from math import floor, log10
 #Build a dictionary with defined units. It can be used to evaluate
 #expressions containing units.
 unitsDict = dict([[varname,varobj] for varname,varobj \
-                  in physicsUnits.__dict__.items() 
+                  in physicsUnits.__dict__.items()
                   if isinstance(varobj,unum.Unum)])
 
 
@@ -100,13 +100,17 @@ class TxName(object):
             self.txnameDataExp = TxNameData( expectedData, dataType, ident)
 
         #Builds up a list of elements appearing in constraints:
+        if hasattr(self,'intermediateState'):
+            intermediateState = self.intermediateState
+        else:
+            intermediateState = None
         if hasattr(self,'finalState'):
             finalState = self.finalState
         else:
-            finalState = ["MET","MET"]        
+            finalState = ["MET","MET"]
         elements = []
         if hasattr(self,'constraint'):
-            elements += [Element(el,finalState) for el in elementsInStr(str(self.constraint))]
+            elements += [Element(el,finalState,intermediateState) for el in elementsInStr(str(self.constraint))]
 
         if any((elA == elB and not elA is elB) for elA in elements for elB in elements):
             txt = "Duplicate elements in constraint: %s in %s" % \
@@ -119,7 +123,7 @@ class TxName(object):
             if not isinstance(conds,list): conds = [conds]
             for cond in conds:
                 for el in elementsInStr(str(cond)):
-                    newEl = Element(el,finalState)
+                    newEl = Element(el,finalState,intermediateState)
                     if not newEl in elements:
                         elements.append(newEl)
 
@@ -154,7 +158,7 @@ class TxName(object):
         """
         Returns the upper limit (or expected) for element (only for upperLimit-type).
         Includes the lifetime reweighting (ul/reweight).
-        If called for efficiencyMap results raises an error. 
+        If called for efficiencyMap results raises an error.
         If a mass array is given as input, no lifetime reweighting will be applied.
 
         :param element: Element object or mass array (with units)
@@ -178,7 +182,7 @@ class TxName(object):
     def addInfo(self,tag,value):
         """
         Adds the info field labeled by tag with value value to the object.
-        
+
         :param tag: information label (string)
         :param value: value for the field in string format
         """
@@ -205,7 +209,7 @@ class TxName(object):
     def getInfo(self, infoLabel):
         """
         Returns the value of info field.
-        
+
         :param infoLabel: label of the info field (string). It must be an attribute of
                           the TxNameInfo object
         """
@@ -218,7 +222,7 @@ class TxName(object):
         Verify if the conditions or constraint in Txname contains the element.
         Check both branch orderings. If both orderings match, returns the one
         with the highest mass array.
-        
+
         :param element: Element object
         :return: A copy of the element on the correct branch ordering appearing
                 in the Txname constraint or condition.
@@ -245,7 +249,7 @@ class TxName(object):
             return matches[0]
 
     def hasLikelihood(self):
-        """ can I construct a likelihood for this map? 
+        """ can I construct a likelihood for this map?
         True for all efficiency maps, and for upper limits maps
         with expected Values. """
         if self._infoObj.dataType == "efficiencyMap":
@@ -309,7 +313,7 @@ class TxNameData(object):
         self.loadData(value)
         if self._keep_values:
             self.origdata = value
-            
+
         if self.dataType == 'efficiencyMap':
             self.reweightF = defaultEffReweight
         elif self.dataType == 'upperLimit':
@@ -337,40 +341,40 @@ class TxNameData(object):
     def evaluateString(self, value):
         """
         Evaluate string.
-        
+
         :param value: String expression.
         """
-        
+
         if not isinstance(value,str):
             raise SModelSError("Data should be in string format. Format %s found" %type(value))
-        
+
         try:
             val = eval(value,unitsDict)
         except (NameError,ValueError,SyntaxError):
             raise SModelSError("data string malformed: %s" %value)
-        
+
         return val
-    
+
     def getUnits(self, value):
         """
         Get standard units for the input object.
         Uses the units defined in physicsUnits.standardUnits.
         (e.g. [[100*GeV,100.*GeV],3.*pb] -> returns [[GeV,GeV],fb]
         [[100*GeV,3.],[200.*GeV,2.*pb]] -> returns [[GeV,1.],[GeV,fb]] )
-        
+
         :param value: Object containing units (e.g. [[100*GeV,100.*GeV],3.*pb])
-        
+
         :return: Object with same structure containing the standard units used to
                  normalize the data.
         """
-        
+
         stdUnits = physicsUnits.standardUnits
-        if isinstance(value,list):            
+        if isinstance(value,list):
             return [self.getUnits(x) for x in value]
-        if isinstance(value,tuple):            
+        if isinstance(value,tuple):
             return tuple([self.getUnits(x) for x in value])
         elif isinstance(value,dict):
-            return dict([[self.getUnits(x),self.getUnits(y)] 
+            return dict([[self.getUnits(x),self.getUnits(y)]
                                   for x,y in value.items()])
         elif isinstance(value,unum.Unum):
             #Check if value has unit or not:
@@ -381,16 +385,16 @@ class TxNameData(object):
                 y = (value/unit).normalize()
                 if not y._unit:
                     return unit
-            raise SModelSError("Could not find standard unit which matches %s. Using the standard units: %s" 
+            raise SModelSError("Could not find standard unit which matches %s. Using the standard units: %s"
                                %(str(value),str(stdUnits)))
         else:
-            return 1.    
-        
+            return 1.
+
     def getDataShape(self,value):
         """
         Stores the data format (mass shape) and store it for future use.
         If there are inclusive objects (mass or branch = None), store their positions.
-        
+
         :param value: list of data points
         """
 
@@ -404,18 +408,18 @@ class TxNameData(object):
     def getWidthPosition(self,value):
         """
         Gets the positions of the widths to be used for interpolation.
-        
+
         :param value: data point
-        
+
         :return: A list with the position of the widths. A position is a tuple
                  of the form (branch-index,vertex-index).
         """
-        
-        widthPositions = [(ibr,im)  for ibr,br in enumerate(value) for im,m in enumerate(br) 
+
+        widthPositions = [(ibr,im)  for ibr,br in enumerate(value) for im,m in enumerate(br)
                           if isinstance(m,tuple)]
 
         return widthPositions
-    
+
     def dataToCoordinates(self,dataPoint,rotMatrix=None,
                              transVector=None):
         """
@@ -424,19 +428,19 @@ class TxNameData(object):
         and widths are combined in a flat array.
         The input can be an Element object or a massAndWidth nested arrays
         (with tuples to store the relevant widths).
-        
+
         :param dataPoint: Element object from which the mass and width arrays will be extracted or
-                          a nested mass array from the database, which contain tuples to include 
+                          a nested mass array from the database, which contain tuples to include
                           the width values
-                          
-        :param rotMatrix: Rotation matrix for PCA (e.g. self._V). 
+
+        :param rotMatrix: Rotation matrix for PCA (e.g. self._V).
                           If None, no rotation is performed.
-        :param transVector: Translation vector for PCA (e.g. self.delta_x). 
+        :param transVector: Translation vector for PCA (e.g. self.delta_x).
                             If None no translation is performed
-        
+
         :return: Point (list of floats)
         """
-        
+
         #Collect the data
         if isinstance(dataPoint,Element):
             masses = dataPoint.mass
@@ -451,65 +455,65 @@ class TxNameData(object):
         #Select the required masses (remove entries corresponding to inclusive entries in data)
         masses = removeInclusives(masses, self.dataShape)
         #Select the required widths (remove widths not used in interpolation)
-        widths = [[widths[ibr][im] for im,_ in enumerate(br) 
-                   if (ibr,im) in self.widthPosition] 
+        widths = [[widths[ibr][im] for im,_ in enumerate(br)
+                   if (ibr,im) in self.widthPosition]
                    for ibr,br in enumerate(widths)]
         if None in removeUnits ( flattenArray(widths), GeV ):
             logger.error("Error obtaining widths from %s" %str(dataPoint))
             raise SModelSError()
-        
-        #Remove units and flatten arrays:        
+
+        #Remove units and flatten arrays:
         masses = flattenArray(masses)
         masses = removeUnits(masses,physicsUnits.standardUnits)
         widths = flattenArray(widths)
-        widths = removeUnits(widths,physicsUnits.standardUnits)        
+        widths = removeUnits(widths,physicsUnits.standardUnits)
         #Rescale widths:
         xwidths = [rescaleWidth(w) for w in widths]
-        
+
         #Combine masses and rescaled widths in a single point
         point = masses + xwidths
 
-        #Now transform to PCA coordinates (if rotMatrix and transVector are defined:        
+        #Now transform to PCA coordinates (if rotMatrix and transVector are defined:
         if transVector is not None:
             point = np.array([point])
             point = ((point - transVector)).tolist()[0] #Translate
         if rotMatrix is not None:
             point = np.dot(point,rotMatrix)  # Rotate
             point = point.tolist()
-        
+
         return point
 
     def coordinatesToData(self,point,rotMatrix=None,transVector=None):
         """
         A function that return the original mass and width array (including the widths
         as tuples) for a given point in PCA space (inverse of dataToCoordinates).
-        
+
         :param point: Point in PCA space (1D list with size equal
                       to self.full_dimensionality or self.dimensionality)
-                          
-        :param rotMatrix: Rotation matrix for PCA (e.g. self._V). 
+
+        :param rotMatrix: Rotation matrix for PCA (e.g. self._V).
                           If None, no rotation is performed.
-        :param transVector: Translation vector for PCA (e.g. self.delta_x). 
+        :param transVector: Translation vector for PCA (e.g. self.delta_x).
                             If None no translation is performed
-        
+
         :return: nested mass array including the widths as tuples (e.g. [[(200,1e-10),100],[(200,1e-10),100]])
         """
-        
+
         if len(point) != self.full_dimensionality and len(point) != self.dimensionality:
-            logger.error("Wrong point dimensions (%i), it should be %i (reduced dimensions) or %i (full dimensionts)" 
+            logger.error("Wrong point dimensions (%i), it should be %i (reduced dimensions) or %i (full dimensionts)"
                          %(len(point),self.dimensionality, self.full_dimensionality))
         elif len(point) != self.full_dimensionality:
             pointFull = np.array(point[:])
             pointFull = np.append(pointFull,[0.]*(self.full_dimensionality-len(point)))
         else:
             pointFull = np.array(point[:])
-        
+
         massAndWidths = pointFull
         if rotMatrix is not None:
             massAndWidths = np.dot(rotMatrix,massAndWidths)
-        if transVector is not None:            
+        if transVector is not None:
             massAndWidths = massAndWidths + transVector
-            
+
         massAndWidths = massAndWidths.tolist()[0]
         #Extract masses and transformed widths
         masses = massAndWidths[:len(massAndWidths)-len(self.widthPosition)]
@@ -517,19 +521,19 @@ class TxNameData(object):
         #Rescale widths and add unit:
         widths = [unscaleWidth(xw) for xw in xwidths]
         #Add units (make sure it is consistent with standardUnits)
-        massUnit = [unit for unit in physicsUnits.standardUnits 
+        massUnit = [unit for unit in physicsUnits.standardUnits
                     if not (1*GeV/unit).normalize()._unit][0]
         masses = [m*massUnit for m in masses[:]]
-        #Add inclusive entries to mass 
+        #Add inclusive entries to mass
         flatShape = flattenArray(self.dataShape)
         if len([x for x in flatShape if x is not '*']) != len(masses):
-            logger.error("Error trying to add inclusive entries (%s) to flat mass array (%s)." 
+            logger.error("Error trying to add inclusive entries (%s) to flat mass array (%s)."
                          %(flatShape,masses))
             raise SModelSError()
         masses = addInclusives(masses, flatShape)
         #Reshape masses according to dataShape:
         if len(masses) != len(flatShape):
-            logger.error("Number of elements in %s do not match the number of entries in %s" 
+            logger.error("Number of elements in %s do not match the number of entries in %s"
                          %(masses,self.dataShape))
             raise SModelSError()
 
@@ -539,7 +543,7 @@ class TxNameData(object):
             logger.error("The number of converted widths (%i) is not the expected (%i)"
                          %(len(widths),len(self.widthPosition)))
             raise SModelSError()
-            
+
         #Combine masses and widths
         massAndWidthArray = []
         for ibr,br in enumerate(massArray):
@@ -552,7 +556,7 @@ class TxNameData(object):
 
         return massAndWidthArray
 
-            
+
     def loadData(self,value):
         """
         Uses the information in value to generate the data grid used for
@@ -561,15 +565,15 @@ class TxNameData(object):
 
         if self._V:
             return
-        
+
         if isinstance(value,str):
             val = self.evaluateString(value)
         else:
             val = value
-            
+
         self.units = self.getUnits(val)[0] #Store standard units
         self.dataShape = self.getDataShape(val[0][0]) #Store the data (mass) format (useful if there are inclusives)
-        self.widthPosition = self.getWidthPosition(val[0][0]) #Store the position of the required widths    
+        self.widthPosition = self.getWidthPosition(val[0][0]) #Store the position of the required widths
         values = removeUnits(val,physicsUnits.standardUnits) #Remove units and store the normalization units
 
         if len(values) < 1 or len(values[0]) < 2:
@@ -579,7 +583,7 @@ class TxNameData(object):
                                "for upper limits or [ [ [[ 300.*GeV,100.*GeV],"\
                                " [ 300.*GeV,100.*GeV] ], .1 ], ... ] for "\
                                "efficiency maps. Received %s" % values[:80])
-                
+
         if not isinstance(self.units[-1],unum.Unum) and not isinstance(self.units[-1],float):
             raise SModelSError("Error obtaining units from value: %s " %values[:80])
 
@@ -594,13 +598,13 @@ class TxNameData(object):
         self.reweightF. For UL-type data the default rescaling is ul -> ul/(fraction of prompt decays)
         and for EM-type data it is eff -> eff*(fraction of prompt decays).
         If a mass array is given as input, no lifetime reweighting will be applied.
-        
+
         :param element: Element object or mass array (with units)
         """
 
         #Compute reweight factor according to lifetime/widths
         #For the widths not used in interpolation we assume that the
-        #analysis require prompt decays 
+        #analysis require prompt decays
         #(width=inf for intermediate particles and width=0 for the last particle)
         if isinstance(element,Element):
             #Replaced the widths to be used for interpolation
@@ -629,33 +633,33 @@ class TxNameData(object):
         if not reweightFactor:
             return reweightFactor
 
-        #Extract the mass and width of the element 
+        #Extract the mass and width of the element
         #and convert it to the PCA coordinates (len(point) = self.full_dimensionality):
         point = self.dataToCoordinates(element,rotMatrix=self._V,
                                           transVector=self.delta_x)
         val = self.getValueForPoint(point)
         if not isinstance(val,(float,int,unum.Unum)):
             return val
-        
-        #Apply reweightFactor (if data has no width or partial width dependence) 
+
+        #Apply reweightFactor (if data has no width or partial width dependence)
         val *= reweightFactor
 
         return val
-    
+
     @_memoize
     def getValueForPoint(self,point):
         """
         Returns the UL or efficinecy for the point (in coordinates) using interpolation
 
         :param point: Point in coordinate space (length = self.full_dimensionality)
-        
+
         :return: Value of UL or efficiency (float) without units
         """
-        
+
         #Make sure the point is a numpy array
         point = np.array(point)
         self.projected_value = self.interpolate(point[:self.dimensionality])
-        
+
         #Check if input point has larger dimensionality:
         dp = self.countNonZeros(point)
         if dp > self.dimensionality: ## we have data in different dimensions
@@ -664,7 +668,7 @@ class TxNameData(object):
             logger.debug( "attempting to interpolate outside of convex hull "\
                     "(d=%d,dp=%d,point=%s)" %
                      ( self.dimensionality, dp, str(point) ) )
-            val =  self._interpolateOutsideConvexHull(point)    
+            val =  self._interpolateOutsideConvexHull(point)
         else:
             val = self._returnProjectedValue()
         return val
@@ -674,17 +678,17 @@ class TxNameData(object):
         Returns the interpolated value for the point (in coordinates)
 
         :param point: Point in coordinate space (length = self.dimensionality)
-        
+
         :return: Value for point without units
         """
-        
-        
+
+
         tol = 1e-6
         # tol = sys.float_info.epsilon * 1e10
         simplex = self.tri.find_simplex(point, tol=tol)
         if simplex==-1: ## not inside any simplex?
             return fill_value
-        
+
         #Transformation matrix for the simplex:
         simplexTrans = np.take(self.tri.transform, simplex, axis=0)
         #Space dimension:
@@ -694,8 +698,8 @@ class TxNameData(object):
         rot = simplexTrans[:d,:]
         bary = np.dot(rot,point-delta_x) #Point coordinates in the baryocentric system
         #Weights for the vertices:
-        wts = np.append(bary, 1. - bary.sum())        
-        #Vertex indices:        
+        wts = np.append(bary, 1. - bary.sum())
+        #Vertex indices:
         vertices = np.take(self.tri.simplices, simplex, axis=0)
         #Compute the value:
         values = np.array(self.y_values)
@@ -715,13 +719,13 @@ class TxNameData(object):
         the direction of the greatest ascent, and the opposite direction.
         Whichever relative change is greater is reported as the expected
         extrapolation error.
-            
-        :param point: Point in coordinate space (length = self.full_dimensionality)            
+
+        :param point: Point in coordinate space (length = self.full_dimensionality)
         """
-        
-        
+
+
         #Make sure the point is a numpy array
-        point = np.array(point)        
+        point = np.array(point)
         ## how far are we away from the "plane": distance alpha
         alpha = float(np.sqrt(np.dot(point[self.dimensionality:],
                         point[self.dimensionality:])))
@@ -774,17 +778,17 @@ class TxNameData(object):
         """
         Experimental routine, meant to check if we can interpolate outside
         convex hull
-        
+
         :param point: Point in coordinate space (length = self.full_dimensionality)
         """
 
         #Make sure the point is a numpy array
-        point = np.array(point)            
+        point = np.array(point)
         de = self._estimateExtrapolationError(point)
-        
+
         if de < self._accept_errors_upto:
             return self._returnProjectedValue()
-        
+
         if not math.isnan(de):
             logger.debug ( "Expected propagation error of %f too large to " \
                            "propagate." % de )
@@ -794,16 +798,16 @@ class TxNameData(object):
         """
         Return interpolation result with the appropriate units.
         """
-        
-        ## None is returned without units'        
+
+        ## None is returned without units'
         if self.projected_value is None or math.isnan(self.projected_value):
             logger.debug("Projected value is None. Projected point not in convex hull?")
             return None
-        
+
         #Set value to zero if it is lower than machine precision (avoids fake negative values)
         if abs(self.projected_value) < 100.*sys.float_info.epsilon:
             self.projected_value = 0.
-        
+
         return self.projected_value*self.units[-1]
 
     def countNonZeros(self, mp):
@@ -832,20 +836,20 @@ class TxNameData(object):
     def computeV(self,values):
         """
         Compute rotation matrix _V, and triangulation self.tri
-        
+
         :param values: Nested array with the data values without units
-        
+
         """
-        
+
         if not self._V is None:
             return
-        
+
         #Convert nested mass arrays (with width tuples) to coordinates
         #(remove entries in mass corresponding to inclusive values,
         #select the required widths and combine masses and widths
         #in a flat array where the widths are the last entries)
         Morig= [self.dataToCoordinates(pt[0]) for pt in values]
-        
+
         aM = np.array(Morig)
         MT = aM.T.tolist()
         self.delta_x = np.array([[sum(x)/len(Morig) for x in MT ]])
@@ -882,26 +886,26 @@ class TxNameData(object):
 
         if self.dimensionality > 1:
             self.tri = qhull.Delaunay(MpCut)
-        else:            
-            self.tri = Delaunay1D(MpCut)           
+        else:
+            self.tri = Delaunay1D(MpCut)
 
-     
+
 class Delaunay1D:
     """
     Uses a 1D data array to interpolate the data.
-    The attribute simplices is a list of N-1 pair of ints with the indices of the points 
-    forming the simplices (e.g. [[0,1],[1,2],[3,4],...]).    
+    The attribute simplices is a list of N-1 pair of ints with the indices of the points
+    forming the simplices (e.g. [[0,1],[1,2],[3,4],...]).
     """
-    
+
     def __init__(self,data):
-        
+
         self.points = None
         self.simplices = None
         self.transform = None
-        if data and self.checkData(data):            
+        if data and self.checkData(data):
             self.points = sorted(data)
             #Create simplices as the point intervals (using the sorted data)
-            self.simplices = np.array([[data.index(self.points[i+1]),data.index(pt)] 
+            self.simplices = np.array([[data.index(self.points[i+1]),data.index(pt)]
                                        for i,pt in enumerate(self.points[:-1])])
             transform = []
             #Create trivial transformation to the baryocentric coordinates:
@@ -909,20 +913,20 @@ class Delaunay1D:
                 xmax,xmin = data[simplex[0]][0],data[simplex[1]][0]
                 transform.append([[1./(xmax-xmin)],[xmin]])
             self.transform = np.array(transform)
-            
+
             #Store convex hull (first and last point):
             self.convex_hull = np.array([data.index(self.points[0]),data.index(self.points[-1])])
-            
+
         else:
             raise SModelSError()
-        
+
     def find_simplex(self,x,tol=0.):
         """
         Find 1D data interval (simplex) to which x belongs
-        
+
         :param x: Point (float) without units
         :param tol: Tolerance. If x is outside the data range with distance < tol, extrapolate.
-        
+
         :return: simplex index (int)
         """
 
@@ -938,8 +942,8 @@ class Delaunay1D:
             else:
                 return -1
         else:
-            return xi    
-    
+            return xi
+
     def checkData(self,data):
         """
         Define the simplices according to data. Compute and store
@@ -953,8 +957,8 @@ class Delaunay1D:
                 logger.error("Input data for 1D Delaunay is in wrong format. It should be [[x1],[x2],..]")
                 return False
         return True
-    
-    
+
+
     def find_index(self,xlist, x):
         """
         Efficient way to find x in a list.
@@ -972,13 +976,13 @@ class Delaunay1D:
         :return: Index of the list such that xlist[i] < x <= xlist[i+1].
         """
 
-        lo = 0    
+        lo = 0
         hi = len(xlist)
         while lo < hi:
             mid = (lo+hi)//2
             if xlist[mid] < x: lo = mid+1
             else: hi = mid
-        return lo-1     
+        return lo-1
 
 if __name__ == "__main__":
     import time

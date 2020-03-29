@@ -141,19 +141,30 @@ For instance, the first few lines of CMS-SUS-12-024/data/T1tttt.txt read:
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 1-8
 
-As seen above, the first block of data in the 
+As seen above, the first block of data in the
 file contains information about the |element|
 or simplified model ([[['t','t']],[['t','t']]])
-in |bracket notation| for which the data refers to as well as 
+in |bracket notation| for which the data refers to as well as
 reference to the original data source and some additional information.
 The simplified model is assumed to contain neutral BSM final states (MET signature)
-and arbitrary intermediate BSM states.
-For non-MET final states the finalState field must list the type of
+and arbitrary ( Z\ :sub:`2`-odd |particles|) intermediate BSM states.
+If the experimental result refers to non-MET final states,
+the finalState field must list the type of
 BSM :ref:`particles <particleClass>` (see |UL| for more details).
 An example from the CMS-EXO-12-026/data/THSCPM1b.txt file is shown below:
 
 .. literalinclude:: /literals/THSCPM1b.txt
    :lines: 1,2,7,9,10
+
+In addition, if specific BSM intermediate states are required,
+the intermediateState field must include a nested list (one for each branch)
+specifying the labels of the intermediate BSM states.\ [#f3]_
+If the intermediateState field is specified, the corresponding result will only
+be applied to simplified models containing intermediate BSM particles
+with the same quantum numbers. One example is shown below:
+
+.. literalinclude:: /literals/TxIntermediate.txt
+   :lines: 1,2,10,11
 
 
 The second block of data in the  ``TxName.txt`` file contains the upper limits or efficiencies
@@ -161,8 +172,8 @@ as a function of the relevant simplified model parameters:
 
 .. literalinclude:: /literals/T1tttt.txt
    :lines: 9-19
-   
-.. _widthGrid:   
+
+.. _widthGrid:
 
 As we can see, the data grid is given as a Python array with the structure:
 :math:`[[\mbox{masses},\mbox{upper limit}], [\mbox{masses},\mbox{upper limit}],...]`.
@@ -318,26 +329,26 @@ The efficiency and upper limit maps are subjected to a few
 standard preprocessing steps.
 First all the units are removed, the shape of the grid is stored and
 the relevant width dependence is identified (see :ref:`discussion above <txnameFile>`).
-Then the masses and widths are transformed into a flat array: 
+Then the masses and widths are transformed into a flat array:
 
 .. _dataTransf:
 
 .. math::
    [[M_1,(M_2,\Gamma_2)],[M_A,(M_B,\Gamma_B)]] \to [M_1,M_2,M_A,M_B,\log(1+\Gamma_2),\log(1+\Gamma_B)]
 
- 
+
 Finally a principal component analysis and Delaunay triangulation (see :ref:`figure below <delaunay>`)
 is applied over the new coordinates.
 The simplices defined during triangulation are then used for linearly interpolating
 the transformed data grid, thus allowing SModelS to compute efficiencies or upper limits
 for arbitrary mass and width values (as long as they fall inside the data grid).
-As seen above, 
+As seen above,
 the width parameters are taken logarithmically before interpolation, which
 effectively corresponds to an exponential interpolation.
 If the data grid does not explicitly provide a dependence on all the widths
 (as in the :ref:`example above <dataTransf>`), the computed upper limit or efficiency
 is then reweighted imposing the requirement of prompt
-decays (see :ref:`lifetime reweighting <dbReweighting>` for more details). 
+decays (see :ref:`lifetime reweighting <dbReweighting>` for more details).
 This procedure provides an efficient and numerically robust way of dealing with
 generic data grids, including arbitrary parametrizations of the mass parameter
 space, irregular data grids and asymmetric branches.
@@ -362,7 +373,7 @@ of the BSM particles' widths, since usually all the decays are assumed to be pro
 and the last BSM particle appearing in the cascade decay is assumed to be stable.\ [#f2]_
 In order to apply these results to models which may contain meta-stable
 particles, it is possible to approximate the dependence on the widths for the case in which
-the experimental result requires all BSM decays to be prompt and the last BSM particle to be stable or decay *outside* the dector. 
+the experimental result requires all BSM decays to be prompt and the last BSM particle to be stable or decay *outside* the dector.
 In SModelS this is done through a reweighting factor which corresponds to the fraction
 of prompt decays (for intermediate states) and decays *outside* the detector (for final BSM states)
 for a given set of widths.
@@ -382,10 +393,10 @@ approximated by:
 
     \epsilon_{eff} = \xi \times \epsilon_{prompt} \mbox{ , where }\xi = \mathcal{F}_{prompt} \left( \Gamma_{X_1} \right) \times \mathcal{F}_{prompt} \left( \Gamma_{X_2} \right) \times \mathcal{F}_{long} \left( \Gamma_{Y_1} \right) \times \mathcal{F}_{long} \left( \Gamma_{Y_2} \right)
 
-In the expression above :math:`\mathcal{F}_{prompt}(\Gamma)` is the probability for the decay to be prompt 
+In the expression above :math:`\mathcal{F}_{prompt}(\Gamma)` is the probability for the decay to be prompt
 given a width :math:`\Gamma` and :math:`\mathcal{F}_{long}(\Gamma)` is the probability for the decay to
 take place *outside* the detector.
-The precise values of :math:`\mathcal{F}_{prompt}` and :math:`\mathcal{F}_{long}` 
+The precise values of :math:`\mathcal{F}_{prompt}` and :math:`\mathcal{F}_{long}`
 depend on the relevant detector size (:math:`L`), particle mass (:math:`M`), boost
 (:math:`\beta`) and width (:math:`\Gamma`), thus
 requiring a Monte Carlo simulation for each input model. Since this is not
@@ -393,7 +404,7 @@ within the spirit of the simplified model approach, we approximate the prompt an
 long-lived probabilities by:
 
 .. math::
-   \mathcal{F}_{long} = \exp\left(- \frac{\Gamma L_{outer}}{\langle \gamma \beta \rangle}\right) \mbox{ and } 
+   \mathcal{F}_{long} = \exp\left(- \frac{\Gamma L_{outer}}{\langle \gamma \beta \rangle}\right) \mbox{ and }
    \mathcal{F}_{prompt} = 1 - \exp\left(- \frac{\Gamma L_{inner}}{\langle \gamma \beta \rangle}\right),
 
 where :math:`L_{outer}` is the approximate size of the detector (which we take to be 10 m for both ATLAS
@@ -410,7 +421,7 @@ Also, a precise treatment of lifetimes is possible if the experimental result
 
 
 The above expressions allows the generalization of the efficiencies computed assuming
-prompt decays to models with meta-stable particles. 
+prompt decays to models with meta-stable particles.
 For |ULrs| the same arguments apply with one important distinction.
 While efficiencies are reduced for displaced decays (:math:`\xi < 1`), upper limits are enhanced, since they
 are roughly inversely proportional to signal efficiencies. Therefore, for |ULrs|, we have:
@@ -420,9 +431,9 @@ are roughly inversely proportional to signal efficiencies. Therefore, for |ULrs|
     \sigma_{eff}^{UL} = \sigma_{prompt}^{UL}/\xi
 
 
-Finally, we point out that for the experimental results which provide 
+Finally, we point out that for the experimental results which provide
 efficiencies or upper limits as a function of some (but not all) BSM widths appearing
-in the simplified model (see the :ref:`discussion above <widthGrid>`), 
+in the simplified model (see the :ref:`discussion above <widthGrid>`),
 the reweighting factor :math:`\xi` is computed using only the widths not present
 in the grid.
 
@@ -433,3 +444,4 @@ in the grid.
 
 .. [#f2] An obvious exception are searches for long-lived particles with displaced decays.
 
+.. [#f3] Although the finalState and intermediateState fields could be combined into a single entry, they are kept separate for backward compatibility.

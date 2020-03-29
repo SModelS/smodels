@@ -1,9 +1,9 @@
 """
 .. module:: element
    :synopsis: Module holding the Element class and its methods.
-    
+
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-    
+
 """
 
 from smodels.theory.auxiliaryFunctions import elementsInStr
@@ -16,28 +16,30 @@ from smodels.theory.particle import Particle
 
 class Element(object):
     """
-    An instance of this class represents an element.    
+    An instance of this class represents an element.
     This class possesses a pair of branches and the element weight
     (cross-section * BR).
-    
+
     :ivar branches: list of branches (Branch objects)
     :ivar weight: element weight (cross-section * BR)
     :ivar motherElements: only for elements generated from a parent element
                           by mass compression, invisible compression,etc.
                           Holds a pair of (whence, mother element), where
-                          whence describes what process generated the element    
+                          whence describes what process generated the element
     """
-    def __init__(self, info=None, finalState=None):
+    def __init__(self, info=None, finalState=None, intermediateState=None):
         """
         Initializes the element. If info is defined, tries to generate
         the element using it.
-        
+
         :parameter info: string describing the element in bracket notation
                          (e.g. [[[e+],[jet]],[[e-],[jet]]])
-                         
+
         :parameter finalState: list containing the final state labels for each branch
                          (e.g. ['MET', 'HSCP'] or ['MET','MET'])
-                         
+        :parameter intermediateState: nested list containing intermediate state labels
+                                     for each branch  (e.g. [['gluino'], ['gluino']])
+
         """
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList() # gives the weight for all decays promptly
@@ -46,7 +48,7 @@ class Element(object):
         self.elID = 0
         self.coveredBy = set()
         self.testedBy = set()
-                
+
         if info:
             # Create element from particle string
             if type(info) == type(str()):
@@ -67,32 +69,39 @@ class Element(object):
                                       len(branches), info)
                         return None
                     self.branches = []
+                    if intermediateState:
+                        if len(intermediateState) != len(branches):
+                            raise SModelSError("Number of intermediate states (%i) does not match number of branches (%i)"
+                                               %(len(intermediateState),len(branches)))
+                    else:
+                        intermediateState = [None]*len(branches)
+
                     if finalState:
                         if len(finalState) != len(branches):
-                            raise SModelSError("Number of final states (%i) does not match number of branches (%i)" 
+                            raise SModelSError("Number of final states (%i) does not match number of branches (%i)"
                                                %(len(finalState),len(branches)))
                     else:
-                        finalState = [None]*len(branches)                  
-                    for ibr,branch in enumerate(branches):                        
+                        finalState = [None]*len(branches)
+                    for ibr,branch in enumerate(branches):
                         if branch == '[*]':
-                            self.branches.append(InclusiveBranch(finalState[ibr]))                           
+                            self.branches.append(InclusiveBranch(finalState[ibr]))
                         else:
-                            self.branches.append(Branch(branch,finalState[ibr])) 
+                            self.branches.append(Branch(branch,finalState[ibr],intermediateState[ibr]))
 
             # Create element from branch pair
-            elif isinstance(info,list) and all(isinstance(x,(Branch,InclusiveBranch)) for x in info):                
+            elif isinstance(info,list) and all(isinstance(x,(Branch,InclusiveBranch)) for x in info):
                 self.branches = [br.copy() for br in info]
             else:
                 raise SModelSError("Can not create element from input type %s" %type(info))
-        
+
         self.setEinfo()
-        
-    
+
+
     def __cmp__(self,other):
         """
-        Compares the element with other for any branch ordering.  
+        Compares the element with other for any branch ordering.
         The comparison is made based on branches.
-        OBS: The elements and the branches must be sorted! 
+        OBS: The elements and the branches must be sorted!
         :param other:  element to be compared (Element object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
@@ -143,37 +152,37 @@ class Element(object):
     def __str__(self):
         """
         Create the element bracket notation string, e.g. [[[jet]],[[jet]].
-        
-        :returns: string representation of the element (in bracket notation)    
+
+        :returns: string representation of the element (in bracket notation)
         """
 
         elStr = "["+",".join([str(br) for br in self.branches])+"]"
         elStr = elStr.replace(" ", "").replace("'", "")
         return elStr
-    
+
     def __repr__(self):
-        
+
         return self.__str__()
-    
+
     def __add__(self,other):
         """
         Adds two elements. Should only be used if the elements
         have the same topologies. The element weights are added and their
         odd and even particles are combined.
         """
-        
+
         if not isinstance(other,Element):
             raise TypeError("Can not add an Element object to %s" %type(other))
         elif self.getEinfo() != other.getEinfo():
             raise SModelSError("Can not add elements with distinct topologies")
-        
-        newEl = self.__class__()      
+
+        newEl = self.__class__()
         newEl.motherElements = self.motherElements[:] + other.motherElements[:]
         newEl.weight = self.weight + other.weight
         newEl.branches = []
         for ibr,branch in enumerate(self.branches):
             newEl.branches.append(branch + other.branches[ibr])
-        
+
         return newEl
 
     def __radd__(self,other):
@@ -181,39 +190,39 @@ class Element(object):
         Adds two elements. Only elements with the same
         topology can be combined.
         """
-        
+
         return self.__add__(other)
 
     def __iadd__(self,other):
         """
         Combine two elements. Should only be used if the elements
         have the same topologies. The element weights are added and their
-        odd and even particles are combined. 
+        odd and even particles are combined.
         """
-        
+
         if not isinstance(other,Element):
             raise TypeError("Can not add an Element object to %s" %type(other))
         elif self.getEinfo() != other.getEinfo():
             raise SModelSError("Can not add elements with distinct topologies")
-              
+
         self.motherElements += other.motherElements[:]
         self.weight += other.weight
         for ibr,_ in enumerate(self.branches):
             self.branches[ibr] += other.branches[ibr]
-            
+
         return self
-    
+
     def getAverage(self,attr):
         """
-        Get the average value for a given attribute appearing in 
-        the odd particles of the element branches. 
+        Get the average value for a given attribute appearing in
+        the odd particles of the element branches.
         """
-        
+
         try:
             vals = [br.getAverage(attr) for br in self.branches]
         except (AttributeError,ZeroDivisionError):
             raise SModelSError("Could not compute average for %s" %attr)
-        
+
         return vals
 
     def toStr(self):
@@ -221,26 +230,26 @@ class Element(object):
         Returns a string with the element represented in bracket notation,
         including the final states, e.g. [[[jet]],[[jet]] (MET,MET)
         """
-        
+
         elStr = str(self)+' '+str(tuple(self.getFinalStates())).replace("'","")
-        
+
         return elStr
-    
+
     def sortBranches(self):
         """
         Sort branches. The smallest branch is the first one.
         See the Branch object for definition of branch size and comparison
         """
-        
+
         #Now sort branches
         self.branches = sorted(self.branches)
 
     def copy(self):
         """
-        Create a copy of self.        
-        Faster than deepcopy.     
-        
-        :returns: copy of element (Element object)   
+        Create a copy of self.
+        Faster than deepcopy.
+
+        :returns: copy of element (Element object)
         """
 
         #Allows for derived classes (like inclusive classes)
@@ -256,22 +265,22 @@ class Element(object):
     def switchBranches(self):
         """
         Switch branches, if the element contains a pair of them.
-        
-        :returns: element with switched branches (Element object)                
+
+        :returns: element with switched branches (Element object)
         """
-        
+
         newEl = self.copy()
         if len(self.branches) == 2:
             newEl.branches = [newEl.branches[1], newEl.branches[0]]
         return newEl
-    
+
     def getFinalStates(self):
         """
         Get the array of final state (last BSM particle) particle objects in the element.
-        
+
         :returns: list of Particle objects
         """
-        
+
         fsparticles = [branch.oddParticles[-1] for branch in self.branches]
 
         return fsparticles
@@ -346,10 +355,10 @@ class Element(object):
     def getEinfo(self):
         """
         Get element topology info from branch topology info.
-        
-        :returns: dictionary containing vertices and number of final states information  
+
+        :returns: dictionary containing vertices and number of final states information
         """
-        
+
         vertnumb = []
         vertparts = []
         for branch in self.branches:
@@ -358,14 +367,14 @@ class Element(object):
             bInfo = branch.getInfo()
             vertparts.append(bInfo['vertparts'])
             vertnumb.append(bInfo['vertnumb'])
-                
+
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
 
     def setEinfo(self):
         """
-        Set topology info for each branch.  
+        Set topology info for each branch.
         """
-        
+
         for branch in self.branches:
             branch.setInfo()
 
@@ -397,9 +406,9 @@ class Element(object):
 
     def _getLength(self):
         """
-        Get the maximum of the two branch lengths.    
-        
-        :returns: maximum length of the element branches (int)    
+        Get the maximum of the two branch lengths.
+
+        :returns: maximum length of the element branches (int)
         """
         return max(self.branches[0].getLength(), self.branches[1].getLength())
 
@@ -407,7 +416,7 @@ class Element(object):
         """
         Check if the particles defined in the element are consistent
         with the element info.
-        
+
         :returns: True if the element is consistent. Print error message
                   and exits otherwise.
         """
@@ -419,23 +428,23 @@ class Element(object):
                     raise SModelSError()
         return True
 
-    
+
     def compressElement(self, doCompress, doInvisible, minmassgap):
         """
         Keep compressing the original element and the derived ones till they
         can be compressed no more.
-        
+
         :parameter doCompress: if True, perform mass compression
         :parameter doInvisible: if True, perform invisible compression
-        :parameter minmassgap: value (in GeV) of the maximum 
+        :parameter minmassgap: value (in GeV) of the maximum
                                mass difference for compression
                                (if mass difference < minmassgap, perform mass compression)
-        :returns: list with the compressed elements (Element objects)        
+        :returns: list with the compressed elements (Element objects)
         """
-        
+
         if not doCompress and not doInvisible:
             return []
-        
+
         added = True
         newElements = [self]
         # Keep compressing the new topologies generated so far until no new
@@ -465,40 +474,40 @@ class Element(object):
 
         newElements.pop(0)  # Remove original element
         return newElements
-    
-    
+
+
     def removeVertex(self,ibr,iv):
         """
         Remove vertex iv located in branch ibr.
         The "vertex-mother" in BSMparticles and (SM) particles in the vertex
         are removed from the branch. The vertex index corresponds
         to the BSM decay (iv = 0 will remove the first BSM particle,...)
-        
+
         :parameter ibr: Index of branch (int)
         :parameter iv: Index of vertex in branch ibr (int)
-        
+
         """
-        
+
         self.branches[ibr].removeVertex(iv)
 
     def massCompress(self, minmassgap):
         """
         Perform mass compression.
-        
-        :parameter minmassgap: value (in GeV) of the maximum 
+
+        :parameter minmassgap: value (in GeV) of the maximum
                                mass difference for compression
                                (if mass difference < minmassgap -> perform mass compression)
         :returns: compressed copy of the element, if two masses in this
-                  element are degenerate; None, if compression is not possible;        
+                  element are degenerate; None, if compression is not possible;
         """
 
         newelement = self.copy()
         newelement.motherElements = [self]
 
-        #Loop over branches and look for small mass differences 
+        #Loop over branches and look for small mass differences
         for ibr,branch in enumerate(newelement.branches):
-            #Get mass differences      
-     
+            #Get mass differences
+
             removeVertices = []
             for i,mom in enumerate(branch.oddParticles[:-1]):
                 massDiff = mom.mass - branch.oddParticles[i+1].mass
@@ -515,24 +524,24 @@ class Element(object):
                     #Get vertices which have deltaM < minmassgap and the mother is prompt:
                     if massDiff < minmassgap and mom.isPrompt():
                         removeVertices.append(i)
-                
+
         for ibr,branch in enumerate(newelement.branches):
             if branch.vertnumb != self.branches[ibr].vertnumb:
                 newelement.sortBranches()
                 return newelement
-            
+
         #New element was not compressed, return None
         return None
-    
+
 
     def invisibleCompress(self):
         """
         Perform invisible compression.
-        
+
         :returns: compressed copy of the element, if element ends with invisible
                   particles; None, if compression is not possible
         """
-        
+
         newelement = self.copy()
         newelement.motherElements = [self]
 
@@ -540,17 +549,17 @@ class Element(object):
         for branch in newelement.branches:
             if not branch.evenParticles:
                 continue
-            #Check if the last decay should be removed:            
+            #Check if the last decay should be removed:
             neutralSM = all(ptc.isMET() for ptc in branch.evenParticles[-1])
             neutralDecay = neutralSM and branch.oddParticles[-1].isMET()
             #Check if the mother can be considered MET:
-            neutralBSM = (branch.oddParticles[-2].isMET()  
+            neutralBSM = (branch.oddParticles[-2].isMET()
                             or branch.oddParticles[-2].isPrompt())
             if neutralBSM and neutralDecay:
                 removeLastVertex = True
             else:
                 removeLastVertex = False
-                
+
             while len(branch.oddParticles) > 1 and removeLastVertex:
                 bsmMom = branch.oddParticles[-2]
                 effectiveDaughter = Particle(label='inv', mass = bsmMom.mass,
@@ -576,7 +585,7 @@ class Element(object):
             if branch.vertnumb != self.branches[ibr].vertnumb:
                 newelement.sortBranches()
                 return newelement
-            
+
         #New element was not compressed, return None
         return None
 
@@ -585,9 +594,9 @@ class Element(object):
         """
         Check if the element topology matches any of the topologies in the
         element list.
-        
+
         :parameter elementList: list of elements (Element objects)
-        :returns: True, if element topology has a match in the list, False otherwise.        
+        :returns: True, if element topology has a match in the list, False otherwise.
         """
         if type(elementList) != type([]) or len(elementList) == 0:
             return False
@@ -600,4 +609,3 @@ class Element(object):
             if info1 == info2 or info1 == info2B:
                 return True
         return False
-

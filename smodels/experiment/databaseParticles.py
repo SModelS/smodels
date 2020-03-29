@@ -1,7 +1,7 @@
 """
 .. module:: databaseParticles
    :synopsis: Defines the final state particles used in the experimental results.
-   
+
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
@@ -119,13 +119,17 @@ RHadronD = Particle(label='RHadronD', Z2parity = -1, eCharge = -1./3., colordim 
 RHadronQ = MultiParticle(label='RHadronQ', particles = [RHadronU,RHadronU.chargeConjugate(),
                                                                          RHadronD,RHadronD.chargeConjugate()])
 
+gluino = Particle(label='gluino', Z2parity = -1, eCharge = 0, colordim = 8, spin = 1./2.)
+chargino = Particle(label='C1+', Z2parity = -1, eCharge = 1, colordim = 0, spin = 1./2.)
+
 #Define list of inclusive final states:
 SMfinalStates = [eList,muList,taList,lpList,lmList,lList,WList,
                tList,LpList,LmList,LList,jetList,anyEven]
 #Include list of exclusive final states:
 SMfinalStates +=  SMList
 #Define list of BSM final states:
-BSMfinalStates = [MET,HSCP,RHadronG,RHadronQ,anyOdd]
+BSMfinalStates = [MET,HSCP,RHadronG,RHadronQ,anyOdd,
+                  gluino,chargino]
 
 allFinalStates = SMfinalStates + BSMfinalStates
 #Avoid double counting:
