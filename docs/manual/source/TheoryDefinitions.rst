@@ -16,7 +16,7 @@ Simplified Model Definitions
 ============================
 
 The so-called `theory module <theory.html#theory>`_ contains the basic tools necessary for decomposing the input model
-(either in LHE or SLHA format) into simplified model |topologies| and using the output of the decomposition
+into simplified model |topologies| and using the output of the decomposition
 to compute the :ref:`theoretical prediction <theoryPredictions>` for a given :ref:`experimental result <ExpResult>`.
 
 

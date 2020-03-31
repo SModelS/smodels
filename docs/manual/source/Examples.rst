@@ -40,6 +40,8 @@ Examples displaying several functionalities:
 
 * `How to compare theory predictions with experimental limits <compareUL.html>`_ (download the Python code :download:`here <recipes/compareUL.py>`, IPython notebook :download:`here <recipes/compareUL.ipynb>`)
 
+* `How to use a LHE input including width information <lheLLPExample.html>`_ (download the Python code :download:`here <recipes/lheLLPExample.py>`, IPython notebook :download:`here <recipes/lheLLPExample.ipynb>`)
+
 * `How to compute the likelihood and chi2 for a theory predictions <compute_likelihood.html>`_ (download the Python code :download:`here <recipes/compute_likelihood.py>`, IPython notebook :download:`here <recipes/compute_likelihood.ipynb>`)
 
 * `How to find missing topologies <missingTopologies.html>`_ (download the Python code :download:`here <recipes/missingTopologies.py>`, IPython notebook :download:`here <recipes/missingTopologies.ipynb>`)
