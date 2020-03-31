@@ -20,7 +20,7 @@ The so-called `theory module <theory.html#theory>`_ contains the basic tools nec
 to compute the :ref:`theoretical prediction <theoryPredictions>` for a given :ref:`experimental result <ExpResult>`.
 
 
-The applicability of SModelS is currently restricted to models which contain a Z\ :sub:`2` 
+The applicability of SModelS is currently restricted to models which contain a Z\ :sub:`2`
 symmetry (R-parity in SUSY, K-parity in UED, ...). This is required in
 order to provide a clear structure for the simplified model topologies appearing
 during the :ref:`decomposition <decomposition>` of the input model.
@@ -44,8 +44,8 @@ A representation of an element is shown below:
 
 .. image:: images/elementB.png
    :width: 40%
-   
-An element may also hold information about its corresponding 
+
+An element may also hold information about its corresponding
 weight (cross section times branching ratio times efficiency).\ [#f1]_
 The overall properties of an element are illustrated in the scheme below:
 
@@ -67,7 +67,7 @@ Below we describe in more detail the element properties and their implementation
 in SModelS.
 
 
-* **Elements are described by the** `Element Class <theory.html#theory.element.Element>`_    
+* **Elements are described by the** `Element Class <theory.html#theory.element.Element>`_
 
 .. _particleClass:
 
@@ -75,10 +75,10 @@ Particles
 ^^^^^^^^^
 
 The basic building block of simplified model |elements| are particles,
-which can be both SM (e.g. :math:`l^+,l^-,\nu`  in the :ref:`figure above <elementscheme>`) 
+which can be both SM (e.g. :math:`l^+,l^-,\nu`  in the :ref:`figure above <elementscheme>`)
 or BSM states (e.g. :math:`X1,X2,Y1,Y2,Z1` in the :ref:`figure above <elementscheme>`).
 The BSM particles are defined by the input model (see :ref:`model <parameterFileModel>` in |parameters|),
-while the SM particles are defined in SMparticles.py.
+while the SM particles are defined in `SMparticles.py <share.html#share.models.SMparticles>`_ .
 All particles must be assigned a Z\ :sub:`2` parity and can have a flexible
 number of attributes, such as mass, spin, electric charge, etc.
 Two particles are considered equal if all their shared properties
@@ -86,19 +86,20 @@ are equal. *Inclusive* or *generic* particles can then be defined if some
 of its properties are left undefined. For instance, a particle with electric
 charge -1, spin 1/2 but without a defined mass will be matched
 to electrons, muons and taus. This is useful when defining generic simplified models
-(|elements|) in the :ref:`Database <databaseDefs>`. 
+(|elements|) in the :ref:`Database <databaseDefs>`. All *generic* particles
+used by the :ref:`Database <databaseDefs>` are separately defined in
+`databaseParticles.py <experiment.html#experiment.databaseParticles>`_
 Examples for such inclusive definitions are:
 
- - 'l' for electrons, and muons, 
- - 'L' for electrons, muons, and taus, 
- - 'q' for u-, d-, and s-quarks, 
- - 'jet' for u-, d-, s-, c-quarks and gluons 
+ - 'l' for electrons, and muons,
+ - 'L' for electrons, muons, and taus,
+ - 'q' for u-, d-, and s-quarks,
+ - 'jet' for u-, d-, s-, c-quarks and gluons
  - 'anyOdd' for any Z\ :sub:`2`-odd particle
  - '*' for any \ :sub:`2`-even particle
 
-For all definitions, see the smodels/experiment/databaseParticles.py file.
 
-* **Particles are described by the** `Particle Class <theory.html#theory.particle.Particle>`_ 
+* **Particles are described by the** `Particle Class <theory.html#theory.particle.Particle>`_
 
 .. _vertex:
 
@@ -124,9 +125,9 @@ state. The diagram below illustrates an example of a branch.
    :width: 25%
 
 The structure of each branch is fully defined by its number of vertices and the number of
-|particles| coming out of each vertex. 
-   
-* **Branches are described by the** `Branch Class <theory.html#theory.branch.Branch>`_   
+|particles| coming out of each vertex.
+
+* **Branches are described by the** `Branch Class <theory.html#theory.branch.Branch>`_
 
 
 .. _notation:
@@ -143,9 +144,9 @@ notation. The scheme below shows how to convert between the graphical and bracke
 .. image:: images/bracketNotationB.png
    :width: 50%
 
-The brackets are ordered and nested in the following way. 
+The brackets are ordered and nested in the following way.
 The outermost brackets correspond to the :ref:`branches <branch>` of the |element|.
-The branches are sorted according to their size (see :ref:`element sorting <elementsorting>`) 
+The branches are sorted according to their size (see :ref:`element sorting <elementsorting>`)
 and each branch contains an *ordered* list of :ref:`vertices <vertex>`.
 Each vertex contains a list of the  Z\ :sub:`2`-even particles (represented by their label and sorted alphabetically) coming out of the vertex.
 Schematically, for the example in the :ref:`figure above <bracketnotation>`, we have::
@@ -170,7 +171,7 @@ For instance, all the masses of the BSM states in a given |element| can be repre
 
 Similar arrays can be built with any property (width, charge, spin, etc) of the Z\ :sub:`2`-odd particles in an |element|.
 
-   
+
 .. _topology:
 
 Topologies
@@ -193,9 +194,8 @@ topology. Hence  topologies represent a list of elements sharing a
 common basic structure (same number of branches, vertices and
 final states in each vertex).
 
-* **Topologies are described by the** `Topology Class <theory.html#theory.topology.Topology>`_   
+* **Topologies are described by the** `Topology Class <theory.html#theory.topology.Topology>`_
 
 .. [#f1] In order to treat the UL and EM map results on the same footing,
    SModelS applies a trivial binary efficiency to elements for UL-type
    results as will be explained in detail later.
-   

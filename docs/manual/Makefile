@@ -63,6 +63,7 @@ update_code:
 	sphinx-apidoc -f -T -o source/ ../../smodels/experiment/
 	sphinx-apidoc -f -T -o source/ ../../smodels/theory/
 	sphinx-apidoc -f -T -o source/ ../../smodels/tools/
+	sphinx-apidoc -f -T -o source/ ../../smodels/share/
 
 RstFilesFromHelp:
 	./rstFromHelpFiles.py

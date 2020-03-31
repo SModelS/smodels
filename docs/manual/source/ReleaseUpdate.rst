@@ -41,6 +41,7 @@ New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * Introduction of :ref:`particle class <particleClass>`
+  * Introduction of model class (see :ref:`Basic Input <basicInput>`)
   * Unified treatment of SLHA and LHE input files (see :ref:`decomposer <decomp>` and :ref:`LHE-reader <lhereader>`)
   * :ref:`Decomposition <decomposition>`  and |ExpRess| can now include displaced signatures (see :ref:`Database Structure <databaseStruct>`)
   * :ref:`Database <widthGrid>` can now handle lifetime dependent results
