@@ -28,9 +28,9 @@ muC = mu.chargeConjugate()
 taC = ta.chargeConjugate()
 ##-----------------------------------------------------------------------------------------------------------------------------
 ##Neutrinos
-nue = Particle(Z2parity=1, label='nue', pdg=12, mass=0.*MeV, eCharge=0, colordim=1, spin=1./2, totalwidth = 0.*GeV, _isMET=True)
-numu = Particle(Z2parity=1, label='numu', pdg=14, mass=0.*MeV, eCharge=0, colordim=1, spin=1./2, totalwidth = 0.*GeV, _isMET=True)
-nuta = Particle(Z2parity=1, label='nuta', pdg=16, mass=0.*MeV, eCharge=0, colordim=1, spin=1./2, totalwidth = 0.*GeV, _isMET=True)
+nue = Particle(Z2parity=1, label='nue', pdg=12, mass=0.*MeV, eCharge=0, colordim=1, spin=1./2, totalwidth = 0.*GeV)
+numu = Particle(Z2parity=1, label='numu', pdg=14, mass=0.*MeV, eCharge=0, colordim=1, spin=1./2, totalwidth = 0.*GeV)
+nuta = Particle(Z2parity=1, label='nuta', pdg=16, mass=0.*MeV, eCharge=0, colordim=1, spin=1./2, totalwidth = 0.*GeV)
 ###Group all neutrinos into a single particle:
 nu = MultiParticle('nu',[nue,numu,nuta,nue.chargeConjugate(),numu.chargeConjugate(),nuta.chargeConjugate()])
 ##-----------------------------------------------------------------------------------------------------------------------------
@@ -57,8 +57,8 @@ tC = t.chargeConjugate()
 
 ##Gauge bosons:
 g = Particle(Z2parity=1, label='g', pdg=21, mass=0.*MeV, eCharge=0, colordim=8, spin=1, totalwidth = 0.*GeV)
-photon = Particle(Z2parity=1, label='photon',pdg=22, mass=0.*MeV, eCharge=0, colordim=1, spin=1, totalwidth = 0.*GeV, _isMET=False)
-Z = Particle(Z2parity=1, label='Z', pdg=23, mass=91.*GeV , eCharge=0, colordim=1, spin=1, totalwidth=2.5*GeV, _isMET=False)
+photon = Particle(Z2parity=1, label='photon',pdg=22, mass=0.*MeV, eCharge=0, colordim=1, spin=1, totalwidth = 0.*GeV, _isInvisible=False)
+Z = Particle(Z2parity=1, label='Z', pdg=23, mass=91.*GeV , eCharge=0, colordim=1, spin=1, totalwidth=2.5*GeV, _isInvisible=False)
 #We group each electrically neutral gauge boson with its antiparticle:
 g = MultiParticle('g',[g,g.chargeConjugate('g')])
 photon = MultiParticle('photon',[photon,photon.chargeConjugate('photon')])
@@ -68,7 +68,7 @@ WC = W.chargeConjugate()
 ##-----------------------------------------------------------------------------------------------------------------------------
 
 ##Higgs:
-higgs = Particle(Z2parity=1, label='higgs', pdg=25, mass=125.*GeV, eCharge=0, colordim=1, spin=0, totalwidth = 0.*GeV, _isMET=False)
+higgs = Particle(Z2parity=1, label='higgs', pdg=25, mass=125.*GeV, eCharge=0, colordim=1, spin=0, totalwidth = 0.*GeV, _isInvisible=False)
 ###Group higgs and conjugate in single particle:
 higgs = MultiParticle('higgs',[higgs,higgs.chargeConjugate('higgs')])
 ##-----------------------------------------------------------------------------------------------------------------------------

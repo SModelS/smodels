@@ -10,10 +10,10 @@ import itertools,weakref
 
 class Particle(object):
     """
-    An instance of this class represents a single particle. 
-    The properties are: label, pdg, mass, electric charge, color charge, width 
+    An instance of this class represents a single particle.
+    The properties are: label, pdg, mass, electric charge, color charge, width
     """
-    
+
     _instances = set()
     _lastID = 0
 
@@ -23,7 +23,7 @@ class Particle(object):
         already been created return this particle instead.
         Assigns an ID to the instance using the class Particle._instance
         list. Reset the comparison dictionary.
-        
+
         :param attributesDict: A dictionary with particle attributes (useful for pickling/unpickling).
                                Attributes can also be directly assigned using keyword arguments.
 
@@ -33,7 +33,7 @@ class Particle(object):
         pdg: number in pdg
         mass: mass of the particle
         echarge: electric charge as multiples of the unit charge
-        colordim: color dimension of the particle 
+        colordim: color dimension of the particle
         spin: spin of the particle
         totalwidth: total width
         """
@@ -54,7 +54,7 @@ class Particle(object):
             if objAttr != attrDict:
                 continue
             return obj
-        
+
         newParticle = super(Particle, cls).__new__(cls)
         for attr,value in attrDict.items():
             setattr(newParticle,attr,value)
@@ -102,7 +102,7 @@ class Particle(object):
         Return the object address. Required for using weakref
         """
         return self._id
-    
+
     @classmethod
     def getinstances(cls):
         dead = set()
@@ -115,7 +115,7 @@ class Particle(object):
                 dead.add(ref)
         Particle._instances -= dead
         return instances
-        
+
     @classmethod
     def getID(cls):
         if len(Particle.getinstances()) == 0:
@@ -128,13 +128,13 @@ class Particle(object):
         """
         Compares particle with other.
         The comparison is based on the particle properties.
-        
-        :param other:  particle to be compared (Particle or MultiParticle object)
-        
-        :return: -1 if particle < other, 1 if particle > other and 0 if particle == other
-        """    
 
-        #First check if we have already compared to this object        
+        :param other:  particle to be compared (Particle or MultiParticle object)
+
+        :return: -1 if particle < other, 1 if particle > other and 0 if particle == other
+        """
+
+        #First check if we have already compared to this object
         if other._id in self._comp:
             return self._comp[other._id]
         elif self._id in other._comp:
@@ -153,18 +153,18 @@ class Particle(object):
 
     def __eq__( self, p2 ):
         return self.__cmp__(p2) == 0
-        
+
     def __ne__( self, p2 ):
         return self.__cmp__(p2) != 0
 
-    def __str__(self): 
+    def __str__(self):
         if hasattr(self, 'label'):
             return self.label
         else: return ''
-        
+
     def __repr__(self):
-        return self.__str__()        
-    
+        return self.__str__()
+
     def __add__(self, other):
         """
         Define addition of two Particle objects
@@ -193,24 +193,24 @@ class Particle(object):
     def describe(self):
         return str(self.__dict__)
 
-    def eqProperties(self,other, 
+    def eqProperties(self,other,
                      properties = ['Z2parity','spin','colordim','eCharge','mass','totalwidth']):
         """
         Check if particle has the same properties (default is spin, colordim and eCharge)
         as other. Only compares the attributes which have been defined in both objects.
-        
+
         :param other: a Particle or MultiParticle object
         :param properties: list with properties to be compared. Default is spin, colordim and eCharge
-        
+
         :return: True if all properties are the same, False otherwise.
         """
-        
+
         if self.cmpProperties(other, properties=properties) == 0:
             return True
         else:
             return False
-            
-    def cmpProperties(self,other, 
+
+    def cmpProperties(self,other,
                       properties = ['Z2parity','spin','colordim','eCharge','mass','totalwidth']):
         """
         Compare properties (default is spin, colordim and eCharge).
@@ -218,16 +218,16 @@ class Particle(object):
         Only compares the attributes which have been defined in both objects.
         The comparison is made in hierarchical order, following the order
         defined by the properties list.
-        
+
         :param other: a Particle or MultiParticle object
         :param properties: list with properties to be compared. Default is spin, colordim and eCharge
-        
+
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
         """
 
         if isinstance(other,(MultiParticle)):
             return -1*other.cmpProperties(self,properties=properties)
-        
+
         for prop in properties:
             if not hasattr(self,prop) or not hasattr(other,prop):
                 continue
@@ -239,13 +239,13 @@ class Particle(object):
                 return 1
             else:
                 return -1
-            
+
         return 0
 
     def copy(self):
         """
         Make a copy of self with a distinct ID.
-        
+
         :return: A Particle object identical to self, except for its ID and comparison dict
         """
 
@@ -260,7 +260,7 @@ class Particle(object):
 
     def chargeConjugate(self,label=None):
         """
-        Returns the charge conjugate particle (flips the sign of eCharge).        
+        Returns the charge conjugate particle (flips the sign of eCharge).
         If it has a pdg property also flips its sign.
         If label is None, the charge conjugate name is defined as the original name plus "~" or
         if the original name ends in "+" ("-"), it is replaced by "-" ("+").
@@ -269,7 +269,7 @@ class Particle(object):
 
         :return: the charge conjugate particle (Particle object)
         """
-        
+
         particleAttr = dict(self.__dict__.items())
         for attr,value in particleAttr.items():
             if attr in ['pdg','eCharge'] and isinstance(value,(float,int)):
@@ -288,35 +288,35 @@ class Particle(object):
         if label is not None:
             particleAttr['label'] = label
         pConjugate = Particle(**particleAttr)
-            
+
         return pConjugate
 
     def isNeutral(self):
         """
         Return True if the particle is electrically charged and color neutral.
         If these properties have not been defined, return True.
-        
+
         :return: True/False
         """
-        
+
         if hasattr(self,'eCharge') and self.eCharge != 0:
             return False
         if hasattr(self,'colordim') and self.colordim != 1:
             return False
-        
+
         return True
-    
+
     def isMET(self):
         """
         Checks if the particle can be considered as MET.
-        If the isMET attribute has not been defined, it will return True/False is isNeutral() = True/False.
-        Else it will return the isMET attribute.
-        
+        If the _isInvisible attribute has not been defined, it will return True/False is isNeutral() = True/False.
+        Else it will return the _isInvisible attribute.
+
         :return: True/False
         """
-        
-        if hasattr(self,'_isMET'):
-            return self._isMET
+
+        if hasattr(self,'_isInvisible'):
+            return self._isInvisible
         else:
             return self.isNeutral()
 
@@ -337,7 +337,7 @@ class Particle(object):
         """
 
         return self.totalwidth.asNumber() == 0.
-    
+
     def contains(self,particle):
         """
         If particle is a Particle object check if self and particle are the same object.
@@ -350,15 +350,15 @@ class Particle(object):
         if self is particle:
             return True
         else:
-            return False    
+            return False
 
 
 class MultiParticle(Particle):
 
-    """ An instance of this class represents a list of particle object to allow for inclusive expressions such as jets. 
-        The properties are: label, pdg, mass, electric charge, color charge, width 
+    """ An instance of this class represents a list of particle object to allow for inclusive expressions such as jets.
+        The properties are: label, pdg, mass, electric charge, color charge, width
     """
-    
+
     def __new__(cls,label=None,particles=[],attributesDict={},**kwargs):
         """
         Creates a multiparticle. If a multiparticle with the exact same particles
@@ -383,7 +383,7 @@ class MultiParticle(Particle):
             if not isinstance(obj,MultiParticle):
                 continue
             #Directly compare attributes, except for particles,label,id and _comp
-            objAttr = dict(obj.__dict__.items())            
+            objAttr = dict(obj.__dict__.items())
             objAttr.pop('_id',None)
             objAttr.pop('_comp',None)
             objAttr.pop('label',None)
@@ -452,9 +452,9 @@ class MultiParticle(Particle):
         If not all particles have the attribute, it will raise an exception.
         If all particles share a common attribute, a single value
         will be returned.
-         
+
         :parameter attr: Attribute string
-         
+
         :return: Attribute or list with the attribute values in self.particles
         """
 
@@ -466,8 +466,8 @@ class MultiParticle(Particle):
             return values
         except (AttributeError,IndexError,TypeError) as e: ## FIXME redundant?
             raise AttributeError(e)
-            
-    def cmpProperties(self,other, 
+
+    def cmpProperties(self,other,
                       properties = ['Z2parity','spin','colordim','eCharge','mass','totalwidth']):
         """
         Compares the properties in self with the ones in other.
@@ -477,23 +477,23 @@ class MultiParticle(Particle):
         any particle in other.
         If self and other are equal returns 0,
         else returns the result of comparing the first particle of self with other.
-        
+
         :param other: a Particle or MultiParticle object
         :param properties: list with properties to be compared. Default is spin, colordim and eCharge
-        
+
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
         """
-        
+
         #Check if any of its particles matches other
         if isinstance(other,Particle):
             otherParticles = [other]
         elif isinstance(other,MultiParticle):
             otherParticles = other.particles
-            
+
         for otherParticle in otherParticles:
             if any(p.cmpProperties(otherParticle,properties) == 0 for p in self.particles):
                 return 0
- 
+
         cmpv = self.particles[0].cmpProperties(otherParticles[0],properties)
         return cmpv
 
@@ -509,9 +509,9 @@ class MultiParticle(Particle):
             return self
         #Check if self is a subset of other
         if other.contains(self):
-            return other        
+            return other
         elif isinstance(other,MultiParticle):
-            addParticles = [ptc for ptc in other.particles if not self.contains(ptc)] 
+            addParticles = [ptc for ptc in other.particles if not self.contains(ptc)]
         elif isinstance(other,Particle):
             addParticles = [other]
 
@@ -519,10 +519,10 @@ class MultiParticle(Particle):
         combined = MultiParticle(particles = combinedParticles)
 
         return combined
-    
+
     def __radd__(self,other):
         return self.__add__(other)
-    
+
     def __iadd__(self,other):
 
         addParticles = []
@@ -546,38 +546,38 @@ class MultiParticle(Particle):
         pdgs appearing in MultiParticle
         :return: list of pgds of particles in the MultiParticle
         """
-        
+
         pdgs = [particle.pdg for particle in self.particles]
-        
+
         return pdgs
-        
+
     def getLabels(self):
         """
         labels appearing in MultiParticle
         :return: list of labels of particles in the MultiParticle
         """
-        
+
         labels = [particle.label for particle in self.particles]
-        
+
         return labels
-    
+
     def isNeutral(self):
         """
         Return True if ALL particles in particle list are neutral.
-        
+
         :return: True/False
         """
-        
+
         neutral = all(particle.isNeutral() for particle in self.particles)
         return neutral
 
     def isMET(self):
         """
         Checks if all the particles in self can be considered as MET.
-        
+
         :return: True/False
         """
-        
+
         met = all(particle.isMET() for particle in self.particles)
         return met
 
@@ -604,13 +604,13 @@ class MultiParticle(Particle):
                 return False
 
         return True
-    
-    
+
+
 class ParticleList(object):
     """
     Simple class to store a list of particles.
     """
-    
+
     _instances = set()
     _lastID = 0
 
@@ -664,7 +664,7 @@ class ParticleList(object):
 
     def __hash__(self):
         return self._id
-    
+
     @classmethod
     def getinstances(cls):
         dead = set()
@@ -677,7 +677,7 @@ class ParticleList(object):
                 dead.add(ref)
         ParticleList._instances -= dead
         return instances
-        
+
     @classmethod
     def getID(cls):
         if len(ParticleList.getinstances()) == 0:
@@ -685,20 +685,20 @@ class ParticleList(object):
         else:
             ParticleList._lastID += 1
         return ParticleList._lastID
-        
+
     def __cmp__(self,other):
         """
         Compares two particle lists irrespective of the particle ordering.
-        
+
         :param other:  particle list to be compared (ParticleList object)
-        
-        :return: -1 if self < other, 1 if self > other, 0 is self == other 
-        """    
-        
+
+        :return: -1 if self < other, 1 if self > other, 0 is self == other
+        """
+
         #First check if we have already compared to this object
         if other._id in self._comp:
             return self._comp[other._id]
-        
+
         if len(self) != len(other):
             comp = len(self) > len(other)
             if comp:
@@ -708,7 +708,7 @@ class ParticleList(object):
             self._comp[other._id] = comp
             other._comp[self._id] = comp
             return comp
-        
+
         #Compare even final states irrespective of ordering:
         for particles in itertools.permutations(self.particles):
             particles = list(particles)
@@ -716,7 +716,7 @@ class ParticleList(object):
                 self._comp[other._id] = 0
                 other._comp[self._id] = 0
                 return 0
-        
+
         comp = self.particles > other.particles
         if comp:
             comp = 1
@@ -724,7 +724,7 @@ class ParticleList(object):
             comp = -1
         self._comp[other._id] = comp
         other._comp[self._id] = -comp
-            
+
         return comp
 
     def __lt__( self, p2 ):
@@ -750,9 +750,9 @@ class ParticleList(object):
 
     def __len__(self):
         return len(self.particles)
-    
+
     def __str__(self):
         return str(self.particles)
-        
+
     def __repr__(self):
-        return self.__str__()        
+        return self.__str__()

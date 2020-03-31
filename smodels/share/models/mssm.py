@@ -63,8 +63,8 @@ c2 = Particle(Z2parity=-1, label='C2+', pdg=1000037, eCharge=1, colordim=1, spin
 ##### R-even  ###############
 #Higgs
 H = Particle(Z2parity=1, label='H+', pdg=37, eCharge=+1, colordim=1, spin=0)  
-A0 = Particle(Z2parity=1, label='A0', pdg=36, eCharge=0, colordim=1, spin=0, _isMET=False)  
-H0 = Particle(Z2parity=1, label='H0', pdg=35, eCharge=0, colordim=1, spin=0, _isMET=False)  
+A0 = Particle(Z2parity=1, label='A0', pdg=36, eCharge=0, colordim=1, spin=0, _isInvisible=False)  
+H0 = Particle(Z2parity=1, label='H0', pdg=35, eCharge=0, colordim=1, spin=0, _isInvisible=False)  
 
 
 squarks = [sdl,sul,sdr,sur] + [ssl,scl,ssr,scr] + [sb1,st1,sb2,st2]

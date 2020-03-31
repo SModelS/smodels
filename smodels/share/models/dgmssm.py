@@ -73,12 +73,12 @@ gravitino = Particle(Z2parity=-1, label='G', pdg=1000039, eCharge=1, colordim=1,
 H1p = Particle(Z2parity=1, label='H1+', pdg=37, eCharge=+1, colordim=1, spin=0)    
 H2p = Particle(Z2parity=1, label='H2+', pdg=47, eCharge=+1, colordim=1, spin=0)    
 H3p = Particle(Z2parity=1, label='H3+', pdg=57, eCharge=+1, colordim=1, spin=0)    
-H2 = Particle(Z2parity=1, label='H2', pdg=35, eCharge=0, colordim=1, spin=0)  
-H3 = Particle(Z2parity=1, label='H3', pdg=45, eCharge=0, colordim=1, spin=0)  
-H4 = Particle(Z2parity=1, label='H4', pdg=55, eCharge=0, colordim=1, spin=0)  
-A1 = Particle(Z2parity=1, label='A1', pdg=36, eCharge=0, colordim=1, spin=0)
-A2 = Particle(Z2parity=1, label='A2', pdg=46, eCharge=0, colordim=1, spin=0)
-A3 = Particle(Z2parity=1, label='A3', pdg=56, eCharge=0, colordim=1, spin=0)
+H2 = Particle(Z2parity=1, label='H2', pdg=35, eCharge=0, colordim=1, spin=0, _isInvisible=False)  
+H3 = Particle(Z2parity=1, label='H3', pdg=45, eCharge=0, colordim=1, spin=0, _isInvisible=False)  
+H4 = Particle(Z2parity=1, label='H4', pdg=55, eCharge=0, colordim=1, spin=0, _isInvisible=False)  
+A1 = Particle(Z2parity=1, label='A1', pdg=36, eCharge=0, colordim=1, spin=0, _isInvisible=False)
+A2 = Particle(Z2parity=1, label='A2', pdg=46, eCharge=0, colordim=1, spin=0, _isInvisible=False)
+A3 = Particle(Z2parity=1, label='A3', pdg=56, eCharge=0, colordim=1, spin=0, _isInvisible=False)
 
 #Sgluons
 sgluon1 = Particle(Z2parity=-1, label='sgluon1', pdg=3000021, eCharge=0, colordim=8, spin=1./2)
