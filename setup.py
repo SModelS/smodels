@@ -137,7 +137,7 @@ setup(
     # use_2to3 = True,
     keywords=("simplified models LHC BSM theories interpretation "
                 "supersymmetry UEDs"),
-    url="http://smodels.github.io/",
+    url="https://smodels.github.io/",
     packages=['smodels',
               'smodels.theory',
               'smodels.tools',
