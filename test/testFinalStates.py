@@ -11,7 +11,7 @@ import unittest
 
 from smodels.theory.model import Model
 from smodels.share.models.SMparticles import SMList
-from smodels.experiment.databaseParticles import finalStates
+from smodels.experiment.defaultFinalStates import finalStates
 
 
 class FinalStateTest(unittest.TestCase):
@@ -36,4 +36,3 @@ class FinalStateTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-        

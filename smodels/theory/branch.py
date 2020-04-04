@@ -12,7 +12,6 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.particle import MultiParticle,ParticleList
 from smodels.tools.inclusiveObjects import InclusiveValue,InclusiveList
-from smodels.experiment.databaseParticles import finalStates,anyOdd
 
 
 
@@ -22,14 +21,14 @@ class Branch(object):
     A branch-element can be constructed from a string (e.g., ('[b,b],[W]').
 
     :ivar evenParticles: list of even particles (Particle objects) for the final states
-    :ivar BSMparticles: a list of the intermediate states particles appearing in the branch.
+    :ivar oddParticles: a list of the intermediate states particles appearing in the branch.
                 If the branch represents more than one possible particle list, BSMparticles will correspond
                 to a nested list (BSMparticles = [[particle1, particle2,...],[particleA, particleB,...]])
     :ivar maxWeight: weight of the branch (XSection object)
     """
 
 
-    def __init__(self, info=None, finalState=None, intermediateState=None):
+    def __init__(self, info=None, finalState=None, intermediateState=None, model=None):
         """
         Initializes the branch. If info is defined, tries to generate
         the branch using it.
@@ -41,6 +40,8 @@ class Branch(object):
                          (e.g. 'MET' or 'HSCP')
         :parameter intermediateState: list containing intermediate state labels
                                       (e.g. ['gluino','C1+'])
+        :parameter model: The model (Model object) to be used when converting particle labels to
+                          particle objects (only used if info, finalState or intermediateState != None).
 
         """
 
@@ -54,6 +55,8 @@ class Branch(object):
             branch = elementsInStr(info)
             if not branch or len(branch) > 1:
                 raise SModelSError("Wrong input string " + info)
+            if not model or not hasattr(model,'getParticlesWith'):
+                raise SModelSError("A Model object has to be defined when creating branches from strings.")
             else:
                 branch = branch[0]
                 vertices = elementsInStr(branch[1:-1])
@@ -61,11 +64,11 @@ class Branch(object):
                     particleNames = vertex[1:-1].split(',')
                     ptcs = []
                     for pname in particleNames:
-                        smParticle = finalStates.getParticlesWith(label=pname)
+                        smParticle = model.getParticlesWith(label=pname)
                         if not smParticle:
-                            raise SModelSError("Final state SM particle ``%s'' has not been defined in databaseParticles.py " %pname)
+                            raise SModelSError("Final state SM particle ``%s'' has not been defined in %s" %(pname,model))
                         elif len(smParticle) != 1:
-                            raise SModelSError("Ambiguous definition of label ``%s'' in finalStates" %smParticle[0].label)
+                            raise SModelSError("Ambiguous definition of label ``%s'' in %s" %(smParticle[0].label,model))
                         else:
                             ptcs.append(smParticle[0])
                     vertexParticles = ParticleList(ptcs)
@@ -88,7 +91,7 @@ class Branch(object):
             if len(bsmLabels) != self.vertnumb+1:
                 raise SModelSError("Number of intermediate states (``%s'') is not consistent)" %intermediateState)
             for bsmLabel in bsmLabels:
-                bsmParticle = finalStates.getParticlesWith(label=bsmLabel)
+                bsmParticle = model.getParticlesWith(label=bsmLabel)
                 if not bsmParticle:
                     raise SModelSError("BSM particle ``%s'' has not been defined in databaseParticles.py" %bsmLabel)
                 elif len(bsmParticle) != 1:
@@ -448,15 +451,26 @@ class InclusiveBranch(Branch):
     with the same final state.
     """
 
-    def __init__(self,finalState=None):
+    def __init__(self,finalState=None,model=None):
+        """
+        :parameter info: string describing the branch in bracket notation
+                         (e.g. [[e+],[jet]])
+
+        :parameter finalState: final state label string for the branch
+                         (e.g. 'MET' or 'HSCP')
+        :parameter intermediateState: list containing intermediate state labels
+                                      (e.g. ['gluino','C1+'])
+        :parameter model: The model (Model object) to be used when converting particle labels to
+                          particle objects (only used if info, finalState or intermediateState != None).
+        """
         Branch.__init__(self)
         self.mass = InclusiveList()
         self.totalwidth = InclusiveList()
         self.evenParticles =  InclusiveList()
         if finalState:
-            bsmParticle = finalStates.getParticlesWith(label=finalState)
+            bsmParticle = model.getParticlesWith(label=finalState)
         else:
-            bsmParticle = finalStates.getParticlesWith(label='anyOdd')
+            bsmParticle = model.getParticlesWith(label='anyOdd')
         if not bsmParticle:
             raise SModelSError("Final state BSM particle ``%s'' has not been defined in finalStateParticles.py" %finalState)
         if len(bsmParticle) != 1:

@@ -3,15 +3,14 @@
 """
 .. module:: testDatabase
    :synopsis: performs tests with database loading, pickle writing, filtering
-    
+
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
-    
+
 """
 
 import sys
 sys.path.insert(0,"../")
 from smodels.experiment.databaseObj import Database
-from smodels.tools.smodelsLogging import setLogLevel
 import unittest
 import logging.config
 import os
@@ -31,11 +30,12 @@ class DatabaseTest(unittest.TestCase):
         writer = Database ( "./tinydb/", force_load = "txt" )
         writer.createBinaryFile ( binfile )
         reader = Database ( binfile, force_load="pcl" )
+
         os.unlink ( binfile )
         self.assertEqual( writer, reader )
 
     def testSelectors(self):
-        from databaseLoader import database 
+        from databaseLoader import database
         validated = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'],
                                             useNonValidated = False )
         nonval = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'],

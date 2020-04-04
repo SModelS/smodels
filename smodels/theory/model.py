@@ -1,6 +1,6 @@
 """
 .. module:: model
-   :synopsis: Create model from file 
+   :synopsis: Create model from file
 
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 """
@@ -18,43 +18,71 @@ class Model(object):
     This class contains the input file, the particles of the model and their production
     cross-sections.
     """
-    
-    def __init__(self, BSMparticles, SMparticles):
+
+    def __init__(self, BSMparticles, SMparticles, label=None):
         """
         Initializes the model
         :parameter BSMparticles: list with BSM particle objects
         :parameter SMparticles: list with SM particle objects
+        :parameter label: Optional string to label the model
         """
-        
-        
+
+
         self.inputFile = None
         self.BSMparticles = [particle.copy() for particle in BSMparticles]
         self.SMparticles = SMparticles[:]
+        self.label = label
 
-        #Check if for each PDG there is a unique particle object defined  
+        #Check if for each PDG there is a unique particle object defined
         allPDGs = self.getValuesFor('pdg')
         for pdg in allPDGs:
             p = self.getParticlesWith(pdg=pdg)
             if len(p) > 1:
                 raise SModelSError("PDG = %s has been defined for multiple particles (%s). Check your model definitions." %(pdg,p))
 
-
     def __str__(self):
-        
-        return self.inputFile
+        if not self.label:
+            return 'Model: %s' %self.inputFile
+        else:
+            return 'Model: %s' %self.label
+
+    def __repr__(self):
+
+        return str(self)
+
+    def __eq__(self,other):
+        """
+        Simple model comparison.
+
+        Check if all the particles are the same (including their ordering)
+        and if the model label is the same
+        """
+
+        if self.label != other.label:
+            return False
+        if len(self.SMparticles) != len(other.SMparticles):
+            return False
+        if len(self.BSMparticles) != len(other.BSMparticles):
+            return False
+        if self.SMparticles != other.SMparticles:
+            return False
+        if self.BSMparticles != other.BSMparticles:
+            return False
+
+        return True
 
     def getParticlesWith(self,**kwargs):
         """
         Return the particle objects with the listed attributes.
         MultiParticle objects are added if any of its particles matches the listed attributes.
-        In order to avoid double counting, MultiParticle objects are only included 
+        In order to avoid double counting, MultiParticle objects are only included
         if they do not contain any of the particles already in the list.
         For instance, if MP.particles = [e-,e+] and [e-] already appears in the list,
         MP will not be added.
-        
-        :returns: List of particle objects 
+
+        :returns: List of particle objects
         """
-    
+
         particleList = []
         for particle in self.BSMparticles + self.SMparticles:
             pList = [particle]
@@ -91,19 +119,19 @@ class Model(object):
 
 
         if not cleanList:
-            logger.warning("Particle with attributes %s not found in models" %str(kwargs))
-        
+            logger.warning("Particle with attributes %s not found in %s" %(str(kwargs),self))
+
         return cleanList
-    
+
     def getValuesFor(self,attributeStr):
-        """ 
+        """
         Returns a list with all the values for attribute appearing in the model.
-         
+
         :param attributeStr: String for the desired attribute
-         
+
         :returns: list of values
         """
-        
+
         valueList = []
         for particle in self.BSMparticles+self.SMparticles:
             if not hasattr(particle,attributeStr):
@@ -117,14 +145,14 @@ class Model(object):
                 valueList.append(value)
 
         return valueList
-    
+
     def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
                         roundMasses = 1, erasePrompt=['spin','eCharge','colordim']):
         """
-        Update mass, total width and branches of allParticles particles from input SLHA or LHE file. 
+        Update mass, total width and branches of allParticles particles from input SLHA or LHE file.
 
         :param inputFile: input file (SLHA or LHE)
-            
+
         :param promptWidth: Maximum width for considering particles as decaying prompt. If None, it
                             will be set 1e-8 GeV.
         :param stableWidth: Minimum width for considering particles as stable. If None, it
@@ -134,9 +162,9 @@ class Model(object):
         :param erasePromptQNs: If set, all particles with prompt decays (totalwidth > promptWidth)
                                will have the corresponding properties (quantum numbers). So all particles with the same
                                mass and Z2parity will be considered as equal when combining elements.
-            
+
         """
-        
+
         self.inputFile = inputFile
         if promptWidth is None:
             promptWidth = 1e-8*GeV
@@ -164,9 +192,9 @@ class Model(object):
         try:
             sys.stderr = None
             res = pyslha.readSLHAFile(self.inputFile)
-            massDict = res.blocks['MASS'] 
+            massDict = res.blocks['MASS']
             decaysDict = res.decays
-            self.xsections = crossSection.getXsecFromSLHAFile(self.inputFile)                        
+            self.xsections = crossSection.getXsecFromSLHAFile(self.inputFile)
         except (IOError,AttributeError,KeyError):
             massDict,decaysDict = lheReader.getDictionariesFrom(self.inputFile)
             self.xsections = crossSection.getXsecFromLHEFile(self.inputFile)
@@ -180,9 +208,9 @@ class Model(object):
             self.BSMparticles = BSMparticlesInEvents
         finally:
             sys.stderr = storeErr
-        
+
         logger.debug("Loaded %i BSM particles" %len(self.BSMparticles))
-        
+
         allPDGs = list(set(self.getValuesFor('pdg')))
         evenPDGs = []
         oddPDGs = []
@@ -191,14 +219,14 @@ class Model(object):
                 evenPDGs.append(pdg)
             elif all(p.Z2parity == -1 for p in self.getParticlesWith(pdg=pdg)):
                 oddPDGs.append(pdg)
-        
+
         #Remove cross-sections for even particles or particles which do not belong to the model:
         modelPDGs = [particle.pdg for particle in self.BSMparticles if isinstance(particle.pdg,int)]
         for xsec in self.xsections.xSections[:]:
             for pid in xsec.pid:
                 if not pid in modelPDGs:
                     logger.debug("Cross-section for %s includes particles not belonging to model and will be ignored" %str(xsec.pid))
-                    self.xsections.delete(xsec)                    
+                    self.xsections.delete(xsec)
                 if not pid in oddPDGs:
                     logger.debug("Cross-section for %s includes even particles and will be ignored" %str(xsec.pid))
                     self.xsections.delete(xsec)
@@ -210,8 +238,8 @@ class Model(object):
             if not hasattr(particle,'pdg') or not hasattr(particle,'Z2parity'):
                 raise SModelSError("PDG and/or Z2-parity for particle %s has not been defined" %particle.label)
 
-            pdg = particle.pdg  
-            
+            pdg = particle.pdg
+
             if abs(pdg) in massDict.keys():
                 if roundMasses and int(roundMasses) > 0:
                     particle.mass = round(abs(massDict[abs(pdg)]),int(roundMasses))*GeV
@@ -222,17 +250,17 @@ class Model(object):
 
             particle.decays = []
             if not pdg in decaysDict and not -pdg in decaysDict:
-                logger.debug("No decay found for %i. It will be considered stable" %particle.pdg)                
+                logger.debug("No decay found for %i. It will be considered stable" %particle.pdg)
                 particle.totalwidth = 0.*GeV
                 continue
-            
+
             if pdg in decaysDict:
                 particleData = decaysDict[pdg]
                 chargeConj = 1
             else:
                 particleData = decaysDict[-pdg]
                 chargeConj = -1
-                
+
             particle.totalwidth = abs(particleData.totalwidth)*GeV
             if particle.totalwidth < stableWidth:
                 particle.totalwidth = 0.*GeV  #Treat particle as stable
@@ -248,7 +276,7 @@ class Model(object):
                         delattr(particle,attr)
             else:
                 particle.decays.append(None) #Include possibility for particle being long-lived (non-prompt)
-            
+
             for decay in particleData.decays:
                 pids = decay.ids
                 missingIDs = set(pids).difference(set(allPDGs))
@@ -265,7 +293,7 @@ class Model(object):
                 #(if pid*chargeConj is not in model, assume the particle is its own anti-particle)
                 decayIDs = [pid*chargeConj if pid*chargeConj in allPDGs else pid for pid in decay.ids]
                 newDecay = pyslha.Decay(br=decay.br,nda=decay.nda,parentid=decay.parentid,ids=decayIDs)
-                    
+
                 #Convert PDGs to particle objects:
                 daughters = []
                 for pdg in newDecay.ids:

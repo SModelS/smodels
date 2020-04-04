@@ -12,22 +12,19 @@ import unum
 from collections import Iterable
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
-from smodels.experiment.databaseParticles import finalStates
 import numpy as np
 
-#Get all finalStateLabels
-finalStateLabels = finalStates.getValuesFor('label')
 
 
 def cSim(*weights):
     """
     Define the auxiliar similar function.
-    
+
     Return the maximum relative difference between any element weights of the
     list, normalized to [0,1].
-    
+
     :returns: XSectionList object with the values for each label.
-    
+
     """
     for weight in weights:
         if type(weight) != type(crossSection.XSectionList()):
@@ -67,12 +64,12 @@ def cSim(*weights):
 def cGtr(weightA, weightB):
     """
     Define the auxiliary greater function.
-    
+
     Return a number between 0 and 1 depending on how much it is violated
     (0 = A > B, 1 = A << B).
-    
+
     :returns: XSectioList object with the values for each label.
-    
+
     """
     if type(weightA) != type(crossSection.XSectionList()) or \
             type(weightB) != type(crossSection.XSectionList()):
@@ -113,7 +110,7 @@ def removeUnits(value,standardUnits):
     in physicsUnits.standard units to normalize the data.
 
     :param value: Object containing units (e.g. [[100*GeV,100.*GeV],3.*pb])
-    :param standardUnits: Unum unit or Array of unum units defined to 
+    :param standardUnits: Unum unit or Array of unum units defined to
                           normalize the data.
     :return: Object normalized to standard units (e.g. [[100,100],3000])
     """
@@ -168,49 +165,49 @@ def addUnit(obj,unit):
 def flattenArray(objList):
     """
     Flatten any nested list to a 1D list.
-    
+
     :param objList: Any list or nested list of objects (e.g. [[[(100.,1e-10),100.],1.],[[200.,200.],2.],..]
-    
+
     :return: 1D list (e.g. [100.,1e-10,100.,1.,200.,200.,2.,..])
     """
-    
+
     ret = []
-    
+
     for obj in objList:
         if isinstance(obj, Iterable) and not isinstance(obj, str):
             ret.extend(flattenArray(obj))
         else:
             ret.append(obj)
-    return ret 
+    return ret
 
 def reshapeList(objList,shapeArray):
     """
     Reshape a flat list according to the shape of shapeArray.
     The number of elements in shapeArray should equal the length of objList.
-    
+
     :param objList: 1D list of objects (e.g. [200,100,'*',50,'*'])
     :param shapeArray: Nested array (e.g. [[float,float,'*',float],'*'])
-    
+
     :return: Array with elements from objList shaped according to shapeArray
              (e.g. [[200.,100.,'*',50],'*'])
     """
-    
+
     if isinstance(shapeArray,list):
         return [reshapeList(objList,v) for v in shapeArray]
     else:
         return objList.pop(0)
 
-    
+
 def index_bisect(inlist, el):
     """
     Return the index where to insert item el in inlist.
     inlist is assumed to be sorted and a comparison function (lt or cmp)
     must exist for el and the other elements of the list.
     If el already appears in the list, inlist.insert(el) will
-    insert just before the leftmost el already there.  
+    insert just before the leftmost el already there.
     """
 
-    lo = 0    
+    lo = 0
     hi = len(inlist)
     while lo < hi:
         mid = (lo+hi)//2
@@ -222,13 +219,13 @@ def elementsInStr(instring,removeQuotes=True):
     """
     Parse instring and return a list of elements appearing in instring.
     instring can also be a list of strings.
-    
+
     :param instring: string containing elements (e.g. "[[['e+']],[['e-']]]+[[['mu+']],[['mu-']]]")
     :param removeQuotes: If True, it will remove the quotes from the particle labels.
                          Set to False, if one wants to run eval on the output.
-    
+
     :returns: list of elements appearing in instring in string format
-    
+
     """
     outstr = ""
     if isinstance(instring,str):
@@ -266,13 +263,11 @@ def elementsInStr(instring,removeQuotes=True):
             elStr = ""
             # Syntax checks
             ptclist = elements[-1].replace(']', ',').replace('[', ',').\
-                    split(',')       
+                    split(',')
             for ptc in ptclist:
                 ptc = ptc.replace("'","")
                 if not ptc:
-                    continue          
-                if not ptc in finalStateLabels:
-                    raise SModelSError("Unknown particle. Add " + ptc + " to databaseParticles.py")
+                    continue
 
     # Check if there are not unmatched ['s and/or ]'s in the string
     if nc != 0:
@@ -284,20 +279,20 @@ def getValuesForObj(obj, attribute):
     """
     Loops over all attributes in the object and in its attributes
     and returns a list of values for the desired attribute:
-    
+
     :param obj: Any object with a __dict__ attribute
     :param attribute: String for the desired attribute
-    
+
     :return: List with unique attribute values. If the attribute is not found, returns empty list.
     """
-    
+
     values = []
     try:
         objDict = obj.__dict__.items()
     except AttributeError:
         return values
-    
-      
+
+
     for attr,value in objDict:
         if attribute == attr:
             values += [value]
@@ -305,22 +300,22 @@ def getValuesForObj(obj, attribute):
             values += [getValuesForObj(v,attribute) for v in value if not v is obj]
         elif not value is obj:
             values += getValuesForObj(value,attribute)
-    
+
     values =  list(filter(lambda a: (not isinstance(a,list)) or a != [], values))
     values = flattenArray(values)
     uniqueValues = [v for n,v in enumerate(values) if v not in values[:n]]
-    
+
     return uniqueValues
 
 def getAttributesFrom(obj,skipIDs=[]):
     """
     Loops over all attributes in the object and return a list
     of the attributes.
-    
+
     :param obj: Any object with a __dict__ attribute
     :param skipIDs: List of object ids. Any object which has its id on the list
                     will be ignored (useful to avoid recursion).
-    
+
     :return: List with unique attribute labels.
     """
 
@@ -332,9 +327,9 @@ def getAttributesFrom(obj,skipIDs=[]):
     try:
         objDict = obj.__dict__.items()
     except AttributeError:
-        return attributes        
-    
-      
+        return attributes
+
+
     for attr,value in objDict:
         attributes.append(attr)
         if isinstance(value,list):
@@ -343,9 +338,9 @@ def getAttributesFrom(obj,skipIDs=[]):
             attributes += [getAttributesFrom(v,newSkipIDs) for v in value.values()]
         else:
             attributes += getAttributesFrom(value,newSkipIDs)
-    
-    attributes =  list(filter(lambda a: a != [], attributes))    
-    
+
+    attributes =  list(filter(lambda a: a != [], attributes))
+
     return list(set(flattenArray(attributes)))
 
 def average(values,weights=None):
@@ -400,8 +395,8 @@ def average(values,weights=None):
         return None
 
 def rescaleWidth(width):
-    """ 
-    The function that is applied to all widths to 
+    """
+    The function that is applied to all widths to
     map it into a better variable for interpolation.
     It grows logarithmically from zero (for width=0.)
     to a large number (machine dependent) for width = infinity.
@@ -445,25 +440,25 @@ def removeInclusives(massArray,shapeArray):
     Remove all entries corresponding to '*' in shapeArray.
     If shapeArray contains entries = *, the corresponding entries
     in value will be removed from the output.
-    
+
     :param massArray: Array to be formatted (e.g. [[200.,100.],[200.,100.]] or [[200.,'*'],'*'],0.4])
     :param shapeArray: Array with format info (e.g. ['*',[float,float]])
-    
+
     :return: formatted array (e.g. [[200.,100.]] or [[200.]],0.4])
     """
-    
+
     if shapeArray == '*':
         return None
     elif isinstance(massArray,list):
-        if len(shapeArray) != len(massArray): 
-            raise SModelSError("Input value and data shape mismatch (%s,%s)" 
+        if len(shapeArray) != len(massArray):
+            raise SModelSError("Input value and data shape mismatch (%s,%s)"
                                %(len(shapeArray),len(massArray)))
         else:
-            return [removeInclusives(xi,shapeArray[i]) for i,xi in enumerate(massArray) 
+            return [removeInclusives(xi,shapeArray[i]) for i,xi in enumerate(massArray)
                     if not removeInclusives(xi,shapeArray[i]) is None]
     else:
         return massArray
-        
+
 def addInclusives(massList,shapeArray):
     """
     Add entries corresponding to '*' in shapeArray.
@@ -477,7 +472,7 @@ def addInclusives(massList,shapeArray):
 
     :return: original array with '*' inserted at the correct entries.
     """
-    
+
     if isinstance(shapeArray,list):
         return [addInclusives(massList,v) for v in shapeArray]
     elif shapeArray != '*':

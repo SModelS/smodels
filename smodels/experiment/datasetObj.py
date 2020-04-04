@@ -29,7 +29,9 @@ class DataSet(object):
     """
 
     def __init__(self, path=None, info=None, createInfo=True, discard_zeroes=True):
-        """ :param discard_zeroes: discard txnames with zero-only results """
+        """
+        :param discard_zeroes: discard txnames with zero-only results
+        """
 
         self.path = path
         self.globalInfo = info
@@ -47,7 +49,8 @@ class DataSet(object):
             #Get list of TxName objects:
             for txtfile in glob.iglob(os.path.join(path,"*.txt")):
                 try:
-                    txname = txnameObj.TxName(txtfile,self.globalInfo,self.dataInfo)
+                    txname = txnameObj.TxName(txtfile,self.globalInfo,
+                                            self.dataInfo)
                     if discard_zeroes and txname.hasOnlyZeroes():
                         logger.debug ( "%s, %s has only zeroes. discard it." % \
                                          ( self.path, txname.txName ) )
@@ -60,9 +63,9 @@ class DataSet(object):
 
     def checkForRedundancy(self):
         """ In case of efficiency maps, check if any txnames have overlapping
-            constraints. This would result in double counting, so we dont 
+            constraints. This would result in double counting, so we dont
             allow it. """
-        if self.getType() == "upperLimit": 
+        if self.getType() == "upperLimit":
             return False
         logger.debug ( "checking for redundancy" )
         datasetElements = []
@@ -70,9 +73,10 @@ class DataSet(object):
             if hasattr(tx, 'finalState'):
                 finalState = tx.finalState
             else:
-                finalState = ['MET','MET']            
+                finalState = ['MET','MET']
             for el in elementsInStr(str(tx.constraint)):
-                newEl = Element(el,finalState)
+                newEl = Element(el,finalState,
+                        model=self.globalInfo._databaseParticles)
                 datasetElements.append(newEl)
         combos = itertools.combinations(datasetElements, 2)
         for x,y in combos:
@@ -92,7 +96,7 @@ class DataSet(object):
         else:
             ret = "Dataset: %s" % (", ".join ( map ( str, self.txnameList ) ) )
         return ret
-    
+
     def __repr__(self):
         if self.dataInfo.dataId:
             return self.dataInfo.dataId
@@ -107,12 +111,12 @@ class DataSet(object):
         if len(self.txnameList ) != len ( other.txnameList ):
             return False
         return True
-    
+
     def getType(self):
         """
         Return the dataset type (EM/UL)
         """
-        
+
         return self.dataInfo.dataType
 
     def getID(self):
@@ -138,7 +142,7 @@ class DataSet(object):
         assuming no lifetime rescaling. Same as self.getTxName(txname).getEfficiencyFor(m)
         """
         txname = self.getTxName(txname)
-        if txname: 
+        if txname:
             return txname.getEfficiencyFor(mass)
         else:
             return None
@@ -152,7 +156,7 @@ class DataSet(object):
         :param attribute: name of a field in the database (string).
         :return: list of unique values for the attribute
         """
-        
+
         return getValuesForObj(self,attribute)
 
     def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False ):
@@ -171,12 +175,12 @@ class DataSet(object):
         if expected:
             obs = self.dataInfo.expectedBG
 
-        m = Data( obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2, 
+        m = Data( obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
                        deltas_rel=deltas_rel )
         computer = LikelihoodComputer(m)
         return computer.likelihood(nsig, marginalize=marginalize)
-    
-    
+
+
     def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
         """
         Computes the chi2 for a given number of observed events "nobs",
@@ -187,14 +191,14 @@ class DataSet(object):
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :return: chi2 (float)
         """
-        
-        m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG, 
+
+        m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG,
                     self.dataInfo.bgError**2,deltas_rel=deltas_rel)
         computer = LikelihoodComputer(m)
         ret = computer.chi2(nsig, marginalize=marginalize)
-        
+
         return ret
-    
+
 
     def folderName(self):
         """
@@ -202,7 +206,7 @@ class DataSet(object):
         """
         return os.path.basename( self.path )
 
-               
+
     def getAttributes(self, showPrivate=False):
         """
         Checks for all the fields/attributes it contains as well as the
@@ -212,15 +216,15 @@ class DataSet(object):
         :return: list of field names (strings)
 
         """
-        
-        attributes = getAttributesFrom(self)        
+
+        attributes = getAttributesFrom(self)
 
         if not showPrivate:
             attributes = list(filter(lambda a: a[0] != '_', attributes))
 
         return attributes
 
-    
+
     def getUpperLimitFor(self,element=None,expected = False, txnames = None
                          ,compute=False,alpha=0.05,deltas_rel=0.2):
         """
@@ -232,10 +236,10 @@ class DataSet(object):
         On the other hand, if a mass is given, no rescaling will be applied.
 
         :param txname: TxName object or txname string (only for UL-type results)
-        :param element: Element object or mass array with units (only for UL-type results)        
+        :param element: Element object or mass array with units (only for UL-type results)
         :param alpha: Can be used to change the C.L. value. The default value is 0.05
                       (= 95% C.L.) (only for  efficiency-map results)
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.                      
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param expected: Compute expected limit, i.e. Nobserved = NexpectedBG
                          (only for efficiency-map results)
         :param compute: If True, the upper limit will be computed
@@ -244,9 +248,9 @@ class DataSet(object):
                         instead.
         :return: upper limit (Unum object)
         """
-        
-        
-        if self.getType() == 'efficiencyMap':   
+
+
+        if self.getType() == 'efficiencyMap':
             upperLimit =  self.getSRUpperLimit(expected=expected,alpha=alpha,compute=compute,
                                                deltas_rel=deltas_rel)
             if (upperLimit/fb).normalize()._unit:
@@ -255,7 +259,7 @@ class DataSet(object):
                 return False
             else:
                 return upperLimit
-            
+
         elif self.getType() == 'upperLimit':
             if not txnames or not element:
                 logger.error("A TxName and mass array must be defined when \
@@ -269,28 +273,28 @@ class DataSet(object):
                     txname = txnames[0]
             else:
                 txname = txnames
-                
+
             if not isinstance(txname, txnameObj.TxName) and \
             not isinstance(txname, str):
                 logger.error("txname must be a TxName object or a string")
                 return False
-            
+
             if not isinstance(element, list) and not isinstance(element,Element):
                 logger.error("Element must be an element object or a mass array")
                 return False
 
-            for tx in self.txnameList: 
+            for tx in self.txnameList:
                 if tx == txname or tx.txName == txname:
                     upperLimit = tx.getULFor(element,expected)
-                        
+
             return upperLimit
-        
+
         else:
             logger.warning("Unkown data type: %s. Data will be ignored.",
                            self.getType())
-            return None        
-            
-            
+            return None
+
+
     def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False, deltas_rel=0.2):
         """
         Computes the 95% upper limit on the signal*efficiency for a given dataset (signal region).
@@ -298,11 +302,11 @@ class DataSet(object):
 
         :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
         :param expected: Compute expected limit ( i.e. Nobserved = NexpectedBG )
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.        
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param compute: If True, the upper limit will be computed
                         from expected and observed number of events. If False, the value listed
                         in the database will be used instead.
-                        
+
 
         :return: upper limit value
         """
@@ -325,7 +329,7 @@ class DataSet(object):
         if expected:
             Nobs = self.dataInfo.expectedBG
         Nexp = self.dataInfo.expectedBG  #Number of expected BG events
-        bgError = self.dataInfo.bgError # error on BG        
+        bgError = self.dataInfo.bgError # error on BG
 
         m = Data(Nobs,Nexp,bgError,detlas_rel=deltas_rel)
         computer = UpperLimitComputer(cl=1.-alpha )
@@ -338,88 +342,88 @@ class DataSet(object):
 
 class CombinedDataSet(object):
     """
-    Holds the information for a combined dataset (used for combining multiple datasets).    
+    Holds the information for a combined dataset (used for combining multiple datasets).
     """
-    
+
     def __init__(self, expResult):
-        
+
         self.globalInfo = expResult.globalInfo
         self._datasets = expResult.datasets[:]
-        self._marginalize = False        
+        self._marginalize = False
         self.sortDataSets()
 
     def __str__(self):
         ret = "Combined Dataset (%i datasets)" %len(self._datasets)
         return ret
 
-                
-                
+
+
     def sortDataSets(self):
         """
         Sort datasets according to globalInfo.datasetOrder.
         """
-        
-        datasets = self._datasets[:]        
-        if not hasattr(self.globalInfo, "datasetOrder" ):        
+
+        datasets = self._datasets[:]
+        if not hasattr(self.globalInfo, "datasetOrder" ):
             raise SModelSError("datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
         datasetOrder = self.globalInfo.datasetOrder
         if isinstance(datasetOrder,str):
             datasetOrder = [datasetOrder]
-        
+
         if len(datasetOrder) != len(datasets):
-            raise SModelSError("Number of datasets in the datasetOrder field does not match the number of datasets for %s" 
+            raise SModelSError("Number of datasets in the datasetOrder field does not match the number of datasets for %s"
                                %self.globalInfo.id)
         for dataset in datasets:
             if not dataset.getID() in datasetOrder:
                 raise SModelSError("Dataset ID %s not found in datasetOrder" %dataset.getID())
             dsIndex = datasetOrder.index(dataset.getID())
             self._datasets[dsIndex] = dataset
-        
-        
+
+
     def getType(self):
         """
         Return the dataset type (combined)
         """
-        
+
         return 'combined'
-    
+
     def getID(self):
         """
         Return the ID for the combined dataset
         """
-        
+
         return '(combined)'
-    
+
     def getDataSet(self,datasetID):
         """
         Returns the dataset with the corresponding dataset ID.
         If the dataset is not found, returns None.
-        
+
         :param datasetID: dataset ID (string)
-        
+
         :return: DataSet object if found, otherwise None.
         """
-        
+
         for dataset in self._datasets:
             if datasetID == dataset.getID():
                 return dataset
-        
+
         return None
-    
-        
+
+
     def getCombinedUpperLimitFor(self, nsig, expected=False, deltas_rel=0.2):
         """
         Get combined upper limit.
-        
+
         :param nsig: list of signal events in each signal region/dataset. The list
                         should obey the ordering in globalInfo.datasetOrder.
         :param expected: return expected, not observed value
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.        
-        
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+
         :returns: upper limit on sigma*eff
         """
-        
-        
+
+
         if not hasattr(self.globalInfo, "covariance" ):
             logger.error ( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
             raise SModelSError( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
@@ -430,22 +434,22 @@ class CombinedDataSet(object):
             raise SModelSError( "covariance matrix has length %d." % len(cov))
 
         computer = UpperLimitComputer(ntoys=10000)
-        
+
         nobs = [x.dataInfo.observedN for x in self._datasets]
         bg = [x.dataInfo.expectedBG for x in self._datasets]
         no = nobs
-        
-        ret = computer.ulSigma(Data(observed=no, backgrounds=bg, covariance=cov, 
-                                     third_moment=None, nsignal=nsig, deltas_rel=deltas_rel), 
+
+        ret = computer.ulSigma(Data(observed=no, backgrounds=bg, covariance=cov,
+                                     third_moment=None, nsignal=nsig, deltas_rel=deltas_rel),
                                marginalize=self._marginalize,
                                expected=expected)
-        
+
         #Convert limit on total number of signal events to a limit on sigma*eff
         ret = ret/self.globalInfo.lumi
-        
+
         return ret
-        
-    
+
+
     def combinedLikelihood(self, nsig, marginalize=False, deltas_rel=0.2):
         """
         Computes the (combined) likelihood to observe nobs events, given a
@@ -454,15 +458,15 @@ class CombinedDataSet(object):
         the signal.
         :param nsig: predicted signal (list)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-        
+
         :returns: likelihood to observe nobs events (float)
         """
-        
+
         if len(self._datasets) == 1:
             if isinstance(nsig,list):
                 nsig = nsig[0]
             return self._datasets[0].likelihood(nsig,marginalize=marginalize)
-        
+
         if not hasattr(self.globalInfo, "covariance" ):
             logger.error("Asked for combined likelihood, but no covariance error given." )
             return None
@@ -470,10 +474,10 @@ class CombinedDataSet(object):
         nobs = [ x.dataInfo.observedN for x in self._datasets]
         bg = [ x.dataInfo.expectedBG for x in self._datasets]
         cov = self.globalInfo.covariance
-            
-        
+
+
         computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-        
+
         return computer.likelihood(nsig, marginalize=marginalize )
 
     def totalChi2(self, nsig, marginalize=False, deltas_rel=0.2):
@@ -484,23 +488,23 @@ class CombinedDataSet(object):
         the signal efficiency.
         :param nsig: predicted signal (list)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-        
+
         :returns: chi2 (float)
         """
-        
+
         if len(self._datasets) == 1:
             if isinstance(nsig,list):
-                nsig = nsig[0]            
+                nsig = nsig[0]
             return self._datasets[0].chi2(nsig, marginalize=marginalize)
-        
+
         if not hasattr(self.globalInfo, "covariance" ):
             logger.error("Asked for combined likelihood, but no covariance error given." )
             return None
-        
+
         nobs = [x.dataInfo.observedN for x in self._datasets ]
         bg = [x.dataInfo.expectedBG for x in self._datasets ]
         cov = self.globalInfo.covariance
-        
+
         computer = LikelihoodComputer(Data(nobs, bg, cov, deltas_rel=deltas_rel))
-        
+
         return computer.chi2(nsig, marginalize=marginalize)

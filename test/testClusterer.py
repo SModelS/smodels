@@ -23,31 +23,33 @@ from smodels.experiment.txnameObj import TxName, TxNameData
 from smodels.experiment.datasetObj import DataSet
 from smodels.experiment.infoObj import Info
 from smodels.share.models import SMparticles, mssm
-from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList        
+from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList
 from smodels.tools.physicsUnits import GeV, TeV, fb
 from databaseLoader import database
 from smodels.theory.clusterTools import clusterElements
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.particle import ParticleList
+from smodels.experiment.defaultFinalStates import finalStates
 
 
 class ClustererTest(unittest.TestCase):
-    
+
     def testSimpleCluster(self):
         """ test the mass clusterer """
-        
-        data = [[ [[ 674.99*GeV, 199.999*GeV], [ 674.99*GeV, 199.999*GeV] ],.03*fb ], 
+
+        data = [[ [[ 674.99*GeV, 199.999*GeV], [ 674.99*GeV, 199.999*GeV] ],.03*fb ],
                [ [[ 725.0001*GeV,200.*GeV], [ 725.0001*GeV,200.*GeV] ], .06*fb ] ,
                [ [[ 750.*GeV,250.*GeV], [ 750.*GeV,250.*GeV] ], .03*fb ] ]
         info = Info("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/dataInfo.txt")
         globalInfo = Info("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/globalInfo.txt")
+        globalInfo._databaseParticles = finalStates
         txnameData=TxNameData(data, "upperLimit", Id=1)
         txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info)
         txname.txnameData = txnameData
         dataset = DataSet(info = globalInfo, createInfo = False)
         dataset.dataInfo = info
         dataset.txnameList = [txname]
-        
+
         u = SMparticles.u
         gluino = mssm.gluino.copy()
         gluino.__setattr__("mass", 675.*GeV)
@@ -55,7 +57,7 @@ class ClustererTest(unittest.TestCase):
         n1 = mssm.n1.copy()
         n1.__setattr__("mass", 200.*GeV)
         n1.__setattr__('totalwidth',0.*GeV)
-        
+
 
         w1 = XSectionList()
         w1.xSections.append(XSection())
@@ -70,8 +72,8 @@ class ClustererTest(unittest.TestCase):
         b1.oddParticles = [gluino, n1]
         b2 = b1.copy()
         el1 = Element()
-        el1.branches=[b1,b2]  
-        el1.weight = w1       
+        el1.branches=[b1,b2]
+        el1.weight = w1
         el1.txname = txname
         el1.eff = 1. #(Used in clustering)
 
@@ -81,8 +83,8 @@ class ClustererTest(unittest.TestCase):
         el2.motherElements = [el2] #Enforce el2 and el1 not to be related
         el2.txname = txname
         el2.branches[0].oddParticles = [ptc.copy() for ptc in el1.branches[0].oddParticles]
-        el2.branches[1].oddParticles = [ptc.copy() for ptc in el1.branches[1].oddParticles]        
-        el2.branches[0].oddParticles[0].__setattr__("mass", 725.*GeV) 
+        el2.branches[1].oddParticles = [ptc.copy() for ptc in el1.branches[1].oddParticles]
+        el2.branches[0].oddParticles[0].__setattr__("mass", 725.*GeV)
         el2.branches[1].oddParticles[0].__setattr__("mass", 725.*GeV)
         el2.eff = 1. #(Used in clustering)
 
@@ -91,7 +93,7 @@ class ClustererTest(unittest.TestCase):
         newel=clusterTools.clusterElements([el1,el2], maxDist, dataset)[0]
         newmasses=newel.averageElement().mass
         self.assertEqual(newmasses,[[700.*GeV,200.*GeV]]*2)
-        
+
         maxDist = 0.5 #Elements differ and should not be clustered
         newel=clusterTools.clusterElements([el1,el2], maxDist, dataset)
         #in this example the distance is not in maxdist, so we dont cluster
@@ -101,6 +103,7 @@ class ClustererTest(unittest.TestCase):
 
         info = Info("./database/8TeV/CMS/CMS-SUS-13-012-eff/6NJet8_1000HT1250_200MHT300/dataInfo.txt")
         globalInfo = Info("./database/8TeV/CMS/CMS-SUS-13-012-eff/globalInfo.txt")
+        globalInfo._databaseParticles = finalStates
         txnameData=TxNameData(data, "efficiencyMap", Id=1)
         txname=TxName("./database/8TeV/CMS/CMS-SUS-13-012-eff/6NJet8_1000HT1250_200MHT300/T2.txt",globalInfo,info)
         txname.txnameData = txnameData
@@ -209,20 +212,21 @@ class ClustererTest(unittest.TestCase):
 
     def testClustererLifeTimes(self):
         """ test the clustering with distinct lifetimes"""
-        
-        
-        data = [[ [[ 674.99*GeV, 199.999*GeV], [ 674.99*GeV, 199.999*GeV] ],.03*fb ], 
+
+
+        data = [[ [[ 674.99*GeV, 199.999*GeV], [ 674.99*GeV, 199.999*GeV] ],.03*fb ],
                [ [[ 725.0001*GeV,200.*GeV], [ 725.0001*GeV,200.*GeV] ], .06*fb ] ,
                [ [[ 750.*GeV,250.*GeV], [ 750.*GeV,250.*GeV] ], .03*fb ] ]
         info = Info("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/dataInfo.txt")
         globalInfo = Info("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/globalInfo.txt")
+        globalInfo._databaseParticles = finalStates
         txnameData=TxNameData(data, "upperLimit", Id=1)
         txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info)
         txname.txnameData = txnameData
         dataset = DataSet(info = globalInfo, createInfo = False)
         dataset.dataInfo = info
         dataset.txnameList = [txname]
-        
+
         u = SMparticles.u
         gluino = mssm.gluino.copy()
         gluino.__setattr__("mass", 675.*GeV)
@@ -230,7 +234,7 @@ class ClustererTest(unittest.TestCase):
         n1 = mssm.n1.copy()
         n1.__setattr__("mass", 200.*GeV)
         n1.__setattr__('totalwidth',0.*GeV)
-        
+
 
         w1 = XSectionList()
         w1.xSections.append(XSection())
@@ -245,8 +249,8 @@ class ClustererTest(unittest.TestCase):
         b1.oddParticles = [gluino, n1]
         b2 = b1.copy()
         el1 = Element()
-        el1.branches=[b1,b2]  
-        el1.weight = w1       
+        el1.branches=[b1,b2]
+        el1.weight = w1
         el1.txname = txname
         el1.eff = 1. #(Used in clustering)
 
@@ -259,16 +263,16 @@ class ClustererTest(unittest.TestCase):
         el2.branches[1].oddParticles = [ptc.copy() for ptc in el1.branches[1].oddParticles]
         el2.eff = 1. #(Used in clustering)
 
-        el2.branches[0].oddParticles[0].__setattr__("mass", 675.*GeV) 
+        el2.branches[0].oddParticles[0].__setattr__("mass", 675.*GeV)
         el2.branches[1].oddParticles[0].__setattr__("mass", 675.*GeV)
-        el2.branches[0].oddParticles[0].__setattr__("totalwidth", 0.9e-15*GeV) 
+        el2.branches[0].oddParticles[0].__setattr__("totalwidth", 0.9e-15*GeV)
         el2.branches[1].oddParticles[0].__setattr__("totalwidth", 0.9e-15*GeV)
-        
+
         newel=clusterTools.clusterElements([el1,el2], 5., dataset)
         ## this example gives an avg cluster mass of 700 gev
         self.assertEqual(newel[0].averageElement().mass[0][0],675.*GeV)
         self.assertAlmostEqual(newel[0].averageElement().totalwidth[0][0].asNumber(GeV)*1e15,0.95)
-        
+
         newel=clusterTools.clusterElements([el1,el2], .5, dataset)
         #in this example the distance is in maxdist, so we cluster
         self.assertTrue(len(newel)==1)

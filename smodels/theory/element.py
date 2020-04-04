@@ -27,7 +27,7 @@ class Element(object):
                           Holds a pair of (whence, mother element), where
                           whence describes what process generated the element
     """
-    def __init__(self, info=None, finalState=None, intermediateState=None):
+    def __init__(self, info=None, finalState=None, intermediateState=None, model=None):
         """
         Initializes the element. If info is defined, tries to generate
         the element using it.
@@ -39,6 +39,8 @@ class Element(object):
                          (e.g. ['MET', 'HSCP'] or ['MET','MET'])
         :parameter intermediateState: nested list containing intermediate state labels
                                      for each branch  (e.g. [['gluino'], ['gluino']])
+        :parameter model: The model (Model object) to be used when converting particle labels to
+                          particle objects (only used if info, finalState or intermediateState != None).
 
         """
         self.branches = [Branch(), Branch()]
@@ -84,9 +86,10 @@ class Element(object):
                         finalState = [None]*len(branches)
                     for ibr,branch in enumerate(branches):
                         if branch == '[*]':
-                            self.branches.append(InclusiveBranch(finalState[ibr]))
+                            self.branches.append(InclusiveBranch(finalState[ibr],model=model))
                         else:
-                            self.branches.append(Branch(branch,finalState[ibr],intermediateState[ibr]))
+                            self.branches.append(Branch(branch,finalState[ibr],
+                                                    intermediateState[ibr],model=model))
 
             # Create element from branch pair
             elif isinstance(info,list) and all(isinstance(x,(Branch,InclusiveBranch)) for x in info):

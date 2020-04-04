@@ -62,7 +62,7 @@ class TheoryPrediction(object):
         """
         if short:
             t = self.dataset.getType()
-            D = { "upperLimit": "ul", "efficiencyMap": "em", 
+            D = { "upperLimit": "ul", "efficiencyMap": "em",
                   "combined": "comb" }
             if t in D.keys():
                 return D[t]
@@ -446,7 +446,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
         widthList.append(pred.totalwidth)
         weights.append(pred.xsection.value.asNumber(fb))
         PIDList += pred.PIDs
-        
+
     txnameList = list(set(txnameList))
     if None in massList:
         mass = None
@@ -470,7 +470,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     theoryPrediction.mass = mass
     theoryPrediction.totalwidth = totalwidth
     theoryPrediction.PIDs = [pdg for pdg,_ in itertools.groupby(PIDList)] #Remove duplicates
-    
+
     return theoryPrediction
 
 def _getBestResult(dataSetResults):
@@ -712,13 +712,15 @@ def _evalExpression(stringExpr,cluster):
 
     """
 
-#Get cross section info from cluster (to generate zero cross section values):
+    #Get model for final state particles (database particles):
+    model = cluster.dataset.globalInfo._databaseParticles
+    #Get cross section info from cluster (to generate zero cross section values):
     infoList = cluster.elements[0].weight.getInfo()
-#Get weights for elements appearing in stringExpr
+    #Get weights for elements appearing in stringExpr
     weightsDict = {}
     evalExpr = stringExpr.replace("'","").replace(" ","")
     for i,elStr in enumerate(elementsInStr(evalExpr)):
-        el = element.Element(elStr)
+        el = element.Element(elStr,model=model)
         weightsDict['w%i'%i] = crossSection.XSectionList(infoList)
         for el1 in cluster.elements:
             if el1 == el:

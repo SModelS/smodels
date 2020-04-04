@@ -17,6 +17,7 @@ from smodels.tools.physicsUnits import GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.auxiliaryFunctions import flattenArray
 from databaseLoader import database
+from smodels.experiment.defaultFinalStates import finalStates
 import numpy as np
 import unittest
 
@@ -46,9 +47,10 @@ class TxTest(unittest.TestCase):
         f = './databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2.txt'
         gInfo = infoObj.Info('./databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
+        gInfo._databaseParticles = finalStates
         tx = TxName(f,gInfo,gInfo)
 
-        el = Element(info="[[*],[]]",finalState = ['MET','HSCP'])
+        el = Element(info="[[*],[]]",finalState = ['MET','HSCP'], model = finalStates)
 
         self.assertTrue(len(tx._topologyList.getElements()), 1)
         self.assertEqual(tx._topologyList.getElements()[0], el)
@@ -58,6 +60,7 @@ class TxTest(unittest.TestCase):
         f = './databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2broken.txt'
         gInfo = infoObj.Info('./databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
+        gInfo._databaseParticles = finalStates
         try:
             #print (gInfo)
             TxName(f,gInfo,gInfo)
@@ -74,11 +77,12 @@ class TxTest(unittest.TestCase):
         f = './databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2.txt'
         gInfo = infoObj.Info('./databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
+        gInfo._databaseParticles = finalStates
         tx = TxName(f,gInfo,gInfo)
 
         self.assertFalse(hasattr(tx._topologyList.getElements()[0], 'mass'))
 
-        el = Element(info="[[[e+]],[]]",finalState = ['HSCP','MET'])
+        el = Element(info="[[[e+]],[]]",finalState = ['HSCP','MET'], model = finalStates)
         setattr(n1, 'mass', 200*GeV)
         setattr(c1, 'mass', 150*GeV)
         el.branches[0].oddParticles = [n1]
@@ -97,9 +101,10 @@ class TxTest(unittest.TestCase):
         f = './database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM1.txt'
         gInfo = infoObj.Info('./database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
+        gInfo._databaseParticles = finalStates
         tx = TxName(f,gInfo,gInfo)
 
-        el = Element(info="[[],[]]",finalState = ['HSCP','HSCP'])
+        el = Element(info="[[],[]]",finalState = ['HSCP','HSCP'], model = finalStates)
         setattr(c1, 'mass', 150*GeV)
         el.branches[0].oddParticles = [c1]
         el.branches[1].oddParticles = [c1]

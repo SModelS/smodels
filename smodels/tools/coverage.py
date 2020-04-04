@@ -3,8 +3,8 @@
 """
 .. module:: coverage
    :synopsis: Definitions of classes used to find, group and format missing topologies
-    
-.. moduleauthor:: Ursula Laa <ursula.laa@lpsc.in2p3.fr>    
+
+.. moduleauthor:: Ursula Laa <ursula.laa@lpsc.in2p3.fr>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 """
@@ -12,11 +12,9 @@
 from smodels.tools.physicsUnits import fb
 from smodels.tools.reweighting import reweightFactorFor
 from smodels.theory.branch import Branch
-from smodels.theory.particle import MultiParticle, ParticleList
+from smodels.theory.particle import MultiParticle, ParticleList, Particle
 from smodels.share.models.SMparticles import e,mu,ta,taC,eC,muC,W,WC,t,tC,q,c,g,pion,nu
-from smodels.theory import particle
 from smodels.theory.auxiliaryFunctions import index_bisect
-from smodels.experiment.databaseParticles import MET,HSCP,RHadronG,RHadronQ
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 
@@ -37,6 +35,20 @@ descriptionDefault = {'missing (prompt)' : 'missing topologies with prompt decay
 #                 'missing (long cascade)' : 'missing topologies with long cascade decays',
                 'missing (all)' : 'missing topologies',
                 'outsideGrid (all)' : 'topologies outside the grid'}
+
+##Default final BSM states for grouping topologies:
+#Used to construct BSM final states:
+MET = Particle(label='MET', Z2parity = -1, eCharge = 0, colordim = 1)
+HSCPp = Particle(label='HSCP+', Z2parity = -1, eCharge = +1, colordim = 1)
+HSCPm = Particle(label='HSCP-', Z2parity = -1, eCharge = -1, colordim = 1)
+HSCP = MultiParticle(label='HSCP', particles = [HSCPp,HSCPm])
+
+RHadronG = Particle(label='RHadronG', Z2parity = -1, eCharge = 0, colordim = 8)
+RHadronU = Particle(label='RHadronU', Z2parity = -1, eCharge = 2./3., colordim = 3)
+RHadronD = Particle(label='RHadronD', Z2parity = -1, eCharge = -1./3., colordim = 3)
+RHadronQ = MultiParticle(label='RHadronQ', particles = [RHadronU,RHadronU.chargeConjugate(),
+                                                        RHadronD,RHadronD.chargeConjugate()])
+bsmDefault = [MET,HSCP,RHadronG,RHadronQ]
 
 ##Weight factors for each group:
 ##(it should be a function which takes an Element object as input
@@ -59,24 +71,9 @@ for key in filtersDefault:
 
 class Uncovered(object):
     """
-    Wrapper object for defining and holding a list of coverage groups
-    (UncoveredGroup objects )
+    Wrapper object for defining and holding a list of coverage groups  (UncoveredGroup objects).
 
-    :ivar topoList: TopologyList object used to select elements from.
-    :ivar sqrts: Value (with units) for the center of mass energy used to compute the missing cross sections.
-                 If not specified the largest value available will be used.
-    :ivar sigmacut: Minimum cross-section/weight value (after applying the reweight factor)
-                   for an element to be included. The value should in fb (unitless)
-    :ivar groupFilters: Dictionary containing the groups' labels and the method for selecting
-                        elements.
-    :ivar groupFactors: Dictionary containing the groups' labels and the method for reweighting
-                        cross sections.
-    :ivar groupdDescriptions: Dictionary containing the groups' labels and strings describing the group
-                              (used for printout)
-    :ivar smFinalStates: List of (inclusive) Particle or MultiParticle objects used for grouping Z2-even
-                         particles when creating GeneralElements.
-    :ivar bsmFinalSates: List of (inclusive) Particle or MultiParticle objects used for grouping Z2-odd
-                         particles when creating GeneralElements.
+    The class builds a series of UncoveredGroup objects and stores them.
     """
 
     def __init__(self,topoList, sqrts=None, sigmacut=0*fb,
@@ -84,7 +81,25 @@ class Uncovered(object):
                  groupFactors = factorsDefault,
                  groupdDescriptions = descriptionDefault,
                  smFinalStates=None,bsmFinalSates=None):
+        """
+        Inititalize the object.
 
+        :ivar topoList: TopologyList object used to select elements from.
+        :ivar sqrts: Value (with units) for the center of mass energy used to compute the missing cross sections.
+                     If not specified the largest value available will be used.
+        :ivar sigmacut: Minimum cross-section/weight value (after applying the reweight factor)
+                       for an element to be included. The value should in fb (unitless)
+        :ivar groupFilters: Dictionary containing the groups' labels and the method for selecting
+                            elements.
+        :ivar groupFactors: Dictionary containing the groups' labels and the method for reweighting
+                            cross sections.
+        :ivar groupdDescriptions: Dictionary containing the groups' labels and strings describing the group
+                                  (used for printout)
+        :ivar smFinalStates: List of (inclusive) Particle or MultiParticle objects used for grouping Z2-even
+                             particles when creating GeneralElements.
+        :ivar bsmFinalSates: List of (inclusive) Particle or MultiParticle objects used for grouping Z2-odd
+                             particles when creating GeneralElements.
+        """
         #Sanity checks:
         if not isinstance(groupFilters,dict):
             raise SModelSError("groupFilters input should be a Dictionary and not %s" %type(groupFilters))
@@ -107,13 +122,13 @@ class Uncovered(object):
             smFinalStates = [WList, lList, tList, taList, nuList, jetList]
         if bsmFinalSates is None:
             #Define inclusive BSM states to group/label the last BSM states:
-            bsmFinalStates = [MET,HSCP,RHadronG,RHadronQ]
-        
+            bsmFinalStates = bsmDefault
+
         if sqrts is None:
             sqrts = max([xsec.info.sqrts for xsec in topoList.getTotalWeight()])
         else:
             sqrts = sqrts
-        
+
         #Store the relevant element cross-sections to improve performance:
         for el in topoList.getElements():
             xsec = el.weight.getXsecsFor(sqrts)
@@ -183,7 +198,7 @@ class UncoveredGroup(object):
         self.label = label
         self.elementFilter = elementFilter
         self.reweightFactor = reweightFactor
-        
+
     def __str__(self):
         return self.label
 
@@ -197,10 +212,10 @@ class UncoveredGroup(object):
         The GeneralElement weights corresponds to the missing cross-section
         with double counting from compressed elements already accounted for.
         """
-        
+
         #First select all elements according to the filter (type of uncovered/missing topology):
         elementList = [el for el in topoList.getElements() if self.elementFilter(el)]
-        
+
         #Get missing xsections including the reweight factor:
         missingXandEls = [[self.getMissingX(el)*self.reweightFactor(el),el] for el in elementList]
         #Only keep the ones elements sigmacut:
@@ -214,7 +229,7 @@ class UncoveredGroup(object):
         #Split lists of elements and missingX:
         missingXsecs = [pt[0] for pt in missingXandEls]
         elementList = [pt[1] for pt in missingXandEls]
-        
+
         #Remove all elements which are related to each other in order to avoid double counting
         #(keep always the first appearance in the list, so we always keep the ones with largest missing xsec)
         elementListUnique = []
@@ -279,12 +294,12 @@ class UncoveredGroup(object):
             alreadyChecked += ancestor.getAncestors()
             if not hasattr(ancestor,'_totalXsec'):
                 xsec = ancestor.weight.getXsecsFor(self.sqrts)
-                ancestor._totalXsec = xsec[0].value.asNumber(fb)            
+                ancestor._totalXsec = xsec[0].value.asNumber(fb)
             overlapXsec += ancestor._totalXsec
 
         return missingX-overlapXsec
-        
-        
+
+
     def getTotalXSec(self, sqrts=None):
         """
         Calculate total missing topology cross section at sqrts. If no sqrts is given use self.sqrts
@@ -302,7 +317,7 @@ class UncoveredGroup(object):
         If the element contributes to a missing topology that is already in the list, add element and weight to topology.
         :parameter el: element to be added
         :parameter missingX: missing cross-section for the element (in fb)
-        """     
+        """
 
         newGenEl = GeneralElement(el,missingX,self.smFinalStates,self.bsmFinalStates)
 

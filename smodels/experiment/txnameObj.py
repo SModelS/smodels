@@ -109,8 +109,14 @@ class TxName(object):
         else:
             finalState = ["MET","MET"]
         elements = []
+        if not hasattr(self.globalInfo,"_databaseParticles"):
+            raise SModelSError("Database particles have not been loaded. Can not create TxName object.")
+        elif not self.globalInfo._databaseParticles:
+            raise SModelSError("Database particles is empty. Can not create TxName object.")
+        databaseParticles = self.globalInfo._databaseParticles
         if hasattr(self,'constraint'):
-            elements += [Element(el,finalState,intermediateState) for el in elementsInStr(str(self.constraint))]
+            elements += [Element(el,finalState,intermediateState,databaseParticles)
+                    for el in elementsInStr(str(self.constraint))]
 
         if any((elA == elB and not elA is elB) for elA in elements for elB in elements):
             txt = "Duplicate elements in constraint: %s in %s" % \
@@ -123,7 +129,8 @@ class TxName(object):
             if not isinstance(conds,list): conds = [conds]
             for cond in conds:
                 for el in elementsInStr(str(cond)):
-                    newEl = Element(el,finalState,intermediateState)
+                    newEl = Element(el,finalState,intermediateState,
+                                    databaseParticles)
                     if not newEl in elements:
                         elements.append(newEl)
 

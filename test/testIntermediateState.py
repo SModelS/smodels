@@ -11,42 +11,43 @@
 import sys
 sys.path.insert(0,"../")
 from smodels.theory.element import Element
-from smodels.experiment.databaseParticles import MET,HSCP,anyOdd,gluino,chargino
 from smodels.share.models import mssm
-from smodels.experiment import infoObj
-from smodels.experiment.txnameObj import TxName, rescaleWidth, unscaleWidth
 from smodels.tools.physicsUnits import GeV
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.theory.auxiliaryFunctions import flattenArray
 from databaseLoader import database
-import numpy as np
+from smodels.experiment.defaultFinalStates import finalStates
 import unittest
 
+
+anyOdd = finalStates.getParticlesWith(label='anyOdd')[0]
+MET = finalStates.getParticlesWith(label='MET')[0]
+HSCP = finalStates.getParticlesWith(label='HSCP')[0]
+gluino = finalStates.getParticlesWith(label='gluino')[0]
+chargino = finalStates.getParticlesWith(label='C1+')[0]
 
 class IntermediateTest(unittest.TestCase):
 
     def testElement(self):
         """Test the creation of elements using intermediate states."""
         #Without intermediate or final states:
-        el = Element(info="[[[q,q]],[[q,q]]]")
+        el = Element(info="[[[q,q]],[[q,q]]]", model=finalStates)
         self.assertEqual(el.oddParticles,[[anyOdd,MET],[anyOdd,MET]])
 
         #Only with final states:
-        el = Element(info="[[[q,q]],[[q,q]]]", finalState = ['MET','HSCP'])
+        el = Element(info="[[[q,q]],[[q,q]]]", finalState = ['MET','HSCP'], model=finalStates)
         self.assertEqual(el.oddParticles,[[anyOdd,MET],[anyOdd,HSCP]])
 
         #Only with intermediate states:
-        el = Element(info="[[[q,q]],[[q,q]]]", intermediateState = [['gluino'],['C1+']])
+        el = Element(info="[[[q,q]],[[q,q]]]", intermediateState = [['gluino'],['C1+']], model=finalStates)
         self.assertEqual(el.oddParticles,[[gluino,MET],[chargino,MET]])
 
         #With intermediate and final states:
         el = Element(info="[[[q,q]],[[q,q]]]", finalState = ['HSCP','HSCP'],
-                        intermediateState = [['gluino'],['C1+']])
+                        intermediateState = [['gluino'],['C1+']], model=finalStates)
         self.assertEqual(el.oddParticles,[[gluino,HSCP],[chargino,HSCP]])
 
         #Slightly more complicated element:
         el = Element(info="[[[q],[q]],[[q,q]]]", finalState = ['HSCP','HSCP'],
-                        intermediateState = [['gluino','C1+'],['C1+']])
+                        intermediateState = [['gluino','C1+'],['C1+']], model=finalStates)
         self.assertEqual(el.oddParticles,[[gluino,chargino,HSCP],[chargino,HSCP]])
 
     def testDatabase(self):
@@ -58,8 +59,8 @@ class IntermediateTest(unittest.TestCase):
         n1.mass = 100*GeV
         g.mass = 1000*GeV
         c1.mass = 500*GeV
-        el1 = Element(info="[[[q,q]],[[q,q]]]")
-        el2 = Element(info="[[[q,q]],[[q,q]]]")
+        el1 = Element(info="[[[q,q]],[[q,q]]]", model=finalStates)
+        el2 = Element(info="[[[q,q]],[[q,q]]]", model=finalStates)
         el1.branches[0].oddParticles = [g,n1]
         el1.branches[1].oddParticles = [g,n1]
         el2.branches[0].oddParticles = [c1,n1]
@@ -84,8 +85,8 @@ class IntermediateTest(unittest.TestCase):
         n1.mass = 100*GeV
         g.mass = 1000*GeV
         c1.mass = 500*GeV
-        el1 = Element(info="[[[q,q]],[[q,q]]]")
-        el2 = Element(info="[[[q,q]],[[q,q]]]")
+        el1 = Element(info="[[[q,q]],[[q,q]]]", model=finalStates)
+        el2 = Element(info="[[[q,q]],[[q,q]]]", model=finalStates)
         el1.branches[0].oddParticles = [g,n1]
         el1.branches[1].oddParticles = [g,n1]
         el2.branches[0].oddParticles = [c1,n1]

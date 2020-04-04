@@ -31,13 +31,13 @@ class ExpResult(object):
     :ivar datasets: List of DataSet objects corresponding to the dataset folders
                     in <path>
     """
-        
-    def __init__(self, path = None, discard_zeroes = True):
+
+    def __init__(self, path = None, discard_zeroes = True, databaseParticles = None):
         """
         :param path: Path to the experimental result folder
         :param discard_zeroes: Discard maps with only zeroes
-        """ 
-        
+        """
+
         if not path:
             return
         if not os.path.isdir ( path ):
@@ -52,6 +52,8 @@ class ExpResult(object):
         #Add type of experimental result (if not defined)
         if not hasattr(self.globalInfo,'type'):
             self.globalInfo.type = 'prompt'
+        #Add database particle objects to global info:
+        self.globalInfo._databaseParticles = databaseParticles
 
         datasets = {}
         folders=[]
@@ -82,16 +84,16 @@ class ExpResult(object):
             self.datasets.append ( datasets[dsname] )
         if len(self.datasets) != len(dsOrder):
             raise SModelSExperimentError ( "lengths of datasets and datasetOrder mismatch" )
-            
+
 
     def writePickle(self, dbVersion):
         """ write the pickle file """
-        
+
         meta = metaObj.Meta ( self.path, self.discard_zeroes, databaseVersion=dbVersion )
         pclfile = "%s/.%s" % ( self.path, meta.getPickleFileName() )
         logger.debug ( "writing expRes pickle file %s, mtime=%s" % (pclfile, meta.cTime() ) )
         f=open( pclfile, "wb" )
-        ptcl = serializer.HIGHEST_PROTOCOL        
+        ptcl = serializer.HIGHEST_PROTOCOL
 #         ptcl = 2
         serializer.dump(meta, f, protocol=ptcl)
         serializer.dump(self, f, protocol=ptcl)
@@ -163,7 +165,7 @@ class ExpResult(object):
         Equivalent to:
         self.getDataset ( dataset ).getEfficiencyFor ( txname, mass )
         """
-        
+
         dataset = self.getDataset(dataset)
         if dataset:
             return dataset.getEfficiencyFor(txname, mass)
@@ -217,7 +219,7 @@ class ExpResult(object):
                         instead.
         :return: upper limit (Unum object)
         """
-        
+
         dataset = self.getDataset(dataID)
         if dataset:
             upperLimit = dataset.getUpperLimitFor(element=mass,expected = expected,
@@ -225,7 +227,7 @@ class ExpResult(object):
                                                       compute=compute,alpha=alpha)
             return upperLimit
         else:
-            logger.error("Dataset ID %s not found in experimental result %s" %(dataID,self))     
+            logger.error("Dataset ID %s not found in experimental result %s" %(dataID,self))
             return None
 
 
@@ -239,7 +241,7 @@ class ExpResult(object):
         :return: list of unique values for the attribute
 
         """
-        
+
         return getValuesForObj(self,attribute)
 
 
@@ -252,8 +254,8 @@ class ExpResult(object):
         :return: list of field names (strings)
 
         """
-        
-        attributes = getAttributesFrom(self)        
+
+        attributes = getAttributesFrom(self)
 
         if not showPrivate:
             attributes = list(filter(lambda a: a[0] != '_', attributes))
