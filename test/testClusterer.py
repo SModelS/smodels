@@ -42,9 +42,9 @@ class ClustererTest(unittest.TestCase):
                [ [[ 750.*GeV,250.*GeV], [ 750.*GeV,250.*GeV] ], .03*fb ] ]
         info = Info("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/dataInfo.txt")
         globalInfo = Info("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/globalInfo.txt")
-        globalInfo._databaseParticles = finalStates
         txnameData=TxNameData(data, "upperLimit", Id=1)
-        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info)
+        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",
+                        globalInfo,info,finalStates)
         txname.txnameData = txnameData
         dataset = DataSet(info = globalInfo, createInfo = False)
         dataset.dataInfo = info
@@ -103,9 +103,9 @@ class ClustererTest(unittest.TestCase):
 
         info = Info("./database/8TeV/CMS/CMS-SUS-13-012-eff/6NJet8_1000HT1250_200MHT300/dataInfo.txt")
         globalInfo = Info("./database/8TeV/CMS/CMS-SUS-13-012-eff/globalInfo.txt")
-        globalInfo._databaseParticles = finalStates
         txnameData=TxNameData(data, "efficiencyMap", Id=1)
-        txname=TxName("./database/8TeV/CMS/CMS-SUS-13-012-eff/6NJet8_1000HT1250_200MHT300/T2.txt",globalInfo,info)
+        txname=TxName("./database/8TeV/CMS/CMS-SUS-13-012-eff/6NJet8_1000HT1250_200MHT300/T2.txt",
+                        globalInfo,info,finalStates)
         txname.txnameData = txnameData
         dataset = DataSet(info = globalInfo, createInfo = False)
         dataset.dataInfo = info
@@ -219,9 +219,9 @@ class ClustererTest(unittest.TestCase):
                [ [[ 750.*GeV,250.*GeV], [ 750.*GeV,250.*GeV] ], .03*fb ] ]
         info = Info("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/dataInfo.txt")
         globalInfo = Info("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/globalInfo.txt")
-        globalInfo._databaseParticles = finalStates
         txnameData=TxNameData(data, "upperLimit", Id=1)
-        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",globalInfo,info)
+        txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",
+                        globalInfo,info,finalStates)        
         txname.txnameData = txnameData
         dataset = DataSet(info = globalInfo, createInfo = False)
         dataset.dataInfo = info

@@ -47,8 +47,7 @@ class TxTest(unittest.TestCase):
         f = './databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2.txt'
         gInfo = infoObj.Info('./databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        gInfo._databaseParticles = finalStates
-        tx = TxName(f,gInfo,gInfo)
+        tx = TxName(f,gInfo,gInfo,finalStates)
 
         el = Element(info="[[*],[]]",finalState = ['MET','HSCP'], model = finalStates)
 
@@ -60,10 +59,9 @@ class TxTest(unittest.TestCase):
         f = './databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2broken.txt'
         gInfo = infoObj.Info('./databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        gInfo._databaseParticles = finalStates
         try:
             #print (gInfo)
-            TxName(f,gInfo,gInfo)
+            TxName(f,gInfo,gInfo,finalStates)
             #print (tx)
             gotError = False
         except SModelSError as e:
@@ -77,8 +75,7 @@ class TxTest(unittest.TestCase):
         f = './databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2.txt'
         gInfo = infoObj.Info('./databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        gInfo._databaseParticles = finalStates
-        tx = TxName(f,gInfo,gInfo)
+        tx = TxName(f,gInfo,gInfo,finalStates)
 
         self.assertFalse(hasattr(tx._topologyList.getElements()[0], 'mass'))
 
@@ -101,8 +98,7 @@ class TxTest(unittest.TestCase):
         f = './database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM1.txt'
         gInfo = infoObj.Info('./database/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
-        gInfo._databaseParticles = finalStates
-        tx = TxName(f,gInfo,gInfo)
+        tx = TxName(f,gInfo,gInfo,finalStates)
 
         el = Element(info="[[],[]]",finalState = ['HSCP','HSCP'], model = finalStates)
         setattr(c1, 'mass', 150*GeV)

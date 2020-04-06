@@ -46,7 +46,7 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
 
-    def __init__(self, path, globalObj, infoObj):
+    def __init__(self, path, globalObj, infoObj, databaseParticles):
         self.path = path
         self.globalInfo = globalObj
         self._infoObj = infoObj
@@ -109,11 +109,8 @@ class TxName(object):
         else:
             finalState = ["MET","MET"]
         elements = []
-        if not hasattr(self.globalInfo,"_databaseParticles"):
-            raise SModelSError("Database particles have not been loaded. Can not create TxName object.")
-        elif not self.globalInfo._databaseParticles:
+        if not databaseParticles:
             raise SModelSError("Database particles is empty. Can not create TxName object.")
-        databaseParticles = self.globalInfo._databaseParticles
         if hasattr(self,'constraint'):
             elements += [Element(el,finalState,intermediateState,databaseParticles)
                     for el in elementsInStr(str(self.constraint))]

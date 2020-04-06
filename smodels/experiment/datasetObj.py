@@ -28,7 +28,8 @@ class DataSet(object):
     Holds the information to a data set folder (TxName objects, dataInfo,...)
     """
 
-    def __init__(self, path=None, info=None, createInfo=True, discard_zeroes=True):
+    def __init__(self, path=None, info=None, createInfo=True,
+                    discard_zeroes=True, databaseParticles = None):
         """
         :param discard_zeroes: discard txnames with zero-only results
         """
@@ -50,7 +51,7 @@ class DataSet(object):
             for txtfile in glob.iglob(os.path.join(path,"*.txt")):
                 try:
                     txname = txnameObj.TxName(txtfile,self.globalInfo,
-                                            self.dataInfo)
+                                            self.dataInfo, databaseParticles)
                     if discard_zeroes and txname.hasOnlyZeroes():
                         logger.debug ( "%s, %s has only zeroes. discard it." % \
                                          ( self.path, txname.txName ) )
@@ -59,9 +60,9 @@ class DataSet(object):
                 except TypeError: continue
 
             self.txnameList.sort()
-            self.checkForRedundancy()
+            self.checkForRedundancy(databaseParticles)
 
-    def checkForRedundancy(self):
+    def checkForRedundancy(self,databaseParticles):
         """ In case of efficiency maps, check if any txnames have overlapping
             constraints. This would result in double counting, so we dont
             allow it. """
@@ -76,7 +77,7 @@ class DataSet(object):
                 finalState = ['MET','MET']
             for el in elementsInStr(str(tx.constraint)):
                 newEl = Element(el,finalState,
-                        model=self.globalInfo._databaseParticles)
+                        model=databaseParticles)
                 datasetElements.append(newEl)
         combos = itertools.combinations(datasetElements, 2)
         for x,y in combos:

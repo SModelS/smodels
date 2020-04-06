@@ -52,8 +52,6 @@ class ExpResult(object):
         #Add type of experimental result (if not defined)
         if not hasattr(self.globalInfo,'type'):
             self.globalInfo.type = 'prompt'
-        #Add database particle objects to global info:
-        self.globalInfo._databaseParticles = databaseParticles
 
         datasets = {}
         folders=[]
@@ -67,7 +65,8 @@ class ExpResult(object):
                 # Build data set
                 try:
                     dataset = datasetObj.DataSet(root, self.globalInfo,
-                            discard_zeroes = discard_zeroes)
+                            discard_zeroes = discard_zeroes,
+                            databaseParticles = databaseParticles)
                     if hasOrder:
                         datasets[dataset.dataInfo.dataId]=dataset
                     else:

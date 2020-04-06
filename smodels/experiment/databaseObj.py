@@ -474,13 +474,6 @@ class Database(object):
         if databaseParticles:
             logger.debug("Setting database particles from %s" %str(databaseParticles))
             self.databaseParticles = databaseParticles
-        #If still None, try to load from ExpResults:
-        if self.databaseParticles is None:
-            if self.expResultList:
-                exptRes = self.expResultList[0]
-                if hasattr(exptRes.globalInfo,"_databaseParticles"):
-                    logger.debug("Setting database particles from %s" %exptRes.globalInfo.id)
-                    self.databaseParticles = exptRes.globalInfo._databaseParticles
 
         #If still None, fallback to default:
         if self.databaseParticles is None:
@@ -801,4 +794,3 @@ if __name__ == "__main__":
         listOfExpRes = db.getExpResults()
         for expResult in listOfExpRes:
             print(expResult)
-
