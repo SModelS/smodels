@@ -165,8 +165,8 @@ class TxTest(unittest.TestCase):
         newInitial = ['*',[300.*GeV,100.*GeV]]
         newInitial = np.array(newInitial)
         self.assertEqual(data.shape,newInitial.shape)
-        dataFlat = np.array([x.asNumber(GeV) if x is not '*' else -1 for x in flattenArray(data)])
-        initialFlat = np.array([x.asNumber(GeV) if x is not '*' else -1 for x in flattenArray(newInitial)])
+        dataFlat = np.array([x.asNumber(GeV) if str(x) != '*' else -1 for x in flattenArray(data)])
+        initialFlat = np.array([x.asNumber(GeV) if str(x) != '*' else -1 for x in flattenArray(newInitial)])
         diff = np.linalg.norm(dataFlat-initialFlat)
         self.assertAlmostEqual(diff, 0.)
 

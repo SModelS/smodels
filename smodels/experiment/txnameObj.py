@@ -530,7 +530,7 @@ class TxNameData(object):
         masses = [m*massUnit for m in masses[:]]
         #Add inclusive entries to mass
         flatShape = flattenArray(self.dataShape)
-        if len([x for x in flatShape if x is not '*']) != len(masses):
+        if len([x for x in flatShape if str(x) != '*']) != len(masses):
             logger.error("Error trying to add inclusive entries (%s) to flat mass array (%s)."
                          %(flatShape,masses))
             raise SModelSError()
@@ -551,7 +551,7 @@ class TxNameData(object):
         #Combine masses and widths
         massAndWidthArray = []
         for ibr,br in enumerate(massArray):
-            if br is not '*':
+            if str(br) != '*':
                 newBr = [(m,widths.pop(0)) if (ibr,im) in self.widthPosition else m
                              for im,m in enumerate(br)]
             else:
