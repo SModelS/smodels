@@ -42,11 +42,12 @@ def compareXML(xmldefault,xmlnew,allowedDiff,ignore=[]):
             return False                
         if len(el) == 0:
             if el.tag in ignore: continue
-            try:
-                el.text = eval(el.text)
-                newel.text = eval(newel.text)
-            except (TypeError,NameError,SyntaxError):
-                pass
+            if type(el.text) == str and not "[" in el.text:
+                try:
+                    el.text = eval(el.text)
+                    newel.text = eval(newel.text)
+                except (TypeError,NameError,SyntaxError):
+                    pass
             if isinstance(el.text,float) and isinstance(newel.text,float) \
                     and newel.text != el.text:
                 diff = 2.*abs(el.text-newel.text)/abs(el.text+newel.text)
