@@ -22,8 +22,11 @@ class LoadDBParticlesTest(unittest.TestCase):
         self.assertEqual(modelA.label,'databaseParticles.py') #Simple test to see if databaseParticles.py is being used
 
     def testFallBack(self):
-        dbOld = Database( "https://smodels.github.io/database/unittest200rc9",
-                            discard_zeroes = False, force_load ='pcl')
+        # from smodels.installation import version
+        # dbpath = "https://smodels.github.io/database/unittest%s" % version().replace(".","")
+        # dbpath = "unittest"
+        dbpath = "https://smodels.github.io/database/unittest200rc9"
+        dbOld = Database( dbpath, discard_zeroes = False, force_load ='pcl')
         model = dbOld.databaseParticles
         self.assertEqual(model.label,'DB Final States (default)') #Simple fallback test
 

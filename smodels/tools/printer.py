@@ -403,7 +403,8 @@ class TxTPrinter(BasicPrinter):
         output += "========================================================\n"
         output += "Experimental Result ID: " + obj.globalInfo.id + '\n'
         output += "Tx Labels: " + str(txnames) + '\n'
-        output += "Sqrts: " + str(obj.globalInfo.sqrts) + '\n'
+        # output += "Sqrts: " + str(obj.globalInfo.sqrts) + '\n'
+        output += "Sqrts: %2.2E\n" % obj.globalInfo.sqrts
         if hasattr(self,"addanainfo") and self.addanainfo:
             output += "\t -----------------------------\n"
             output += "\t Elements tested by analysis:\n"
@@ -582,7 +583,8 @@ class SummaryPrinter(TxTPrinter):
             rvalues.append(r)
 
             output += "%19s  " % (expResult.globalInfo.id)  # ana
-            output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
+            # output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
+            output += "%2.2E  " % (expResult.globalInfo.sqrts.asNumber(TeV))  # sqrts
             output += "%5s " % theoPred.getmaxCondition()  # condition violation
             output += "%10.3E %10.3E " % (value.asNumber(fb), ul.asNumber(fb))  # theory cross section , expt upper limit
             if r_expected: output += "%10.3E %10.3E" % (r, r_expected)

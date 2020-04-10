@@ -36,6 +36,7 @@ class ExpResult(object):
         """
         :param path: Path to the experimental result folder
         :param discard_zeroes: Discard maps with only zeroes
+        :param databaseParticles: the model, i.e. the particle content
         """
 
         if not path:

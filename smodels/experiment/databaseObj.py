@@ -92,8 +92,8 @@ class Database(object):
                 logger.warning( "progressbar requested, but python-progressbar is not installed." )
 
         if self.force_load=="txt":
-            self.loadTextDatabase()
             self._setParticles()
+            self.loadTextDatabase()
             self.txt_meta.printFastlimBanner()
             return
         if self.force_load=="pcl":
@@ -148,6 +148,26 @@ class Database(object):
             return
         logger.info( "Parsing text database at %s" % self.txt_meta.pathname )
         self.expResultList = self._loadExpResults()
+        self.createLinksToModel()
+
+    def createLinksToModel( self ):
+        """ in all globalInfo objects, create links to self.databaseParticles """
+        if not hasattr ( self, "databaseParticles" ):
+            return
+        if type(self.databaseParticles) == type(None):
+            return
+        for ctr,er in enumerate(self.expResultList):
+            if not hasattr ( er.globalInfo, "_databaseParticles" ):
+                er.globalInfo._databaseParticles = self.databaseParticles
+            elif type(er.globalInfo._databaseParticles) == type(None):
+                er.globalInfo._databaseParticles = self.databaseParticles
+
+    def removeLinksToModel ( self ):
+        """ remove the links of globalInfo._databaseParticles to the model.
+            Currently not used. """
+        for ctr,er in enumerate(self.expResultList):
+            if hasattr ( er.globalInfo, "_databaseParticles" ):
+                del er.globalInfo._databaseParticles
 
     def loadBinaryFile( self, lastm_only = False ):
         """
@@ -187,7 +207,12 @@ class Database(object):
                     t1=time.time()-t0
                     logger.info( "Loaded database from %s in %.1f secs." % \
                             ( self.pcl_meta.pathname, t1 ) )
-                    self.databaseParticles = serializer.load ( f )
+                    self.databaseParticles = None
+                    try:
+                        self.databaseParticles = serializer.load ( f )
+                    except EOFError as e:
+                        pass ## a model does not *have* to be defined
+                    self.createLinksToModel()
         except(EOFError,ValueError) as e:
             os.unlink( self.pcl_meta.pathname )
             if lastm_only:
@@ -248,8 +273,8 @@ class Database(object):
             logger.debug(  " * write %s db version %s, format version %s, %s" % \
                     ( binfile, self.txt_meta.databaseVersion,
                       self.txt_meta.format_version, self.txt_meta.cTime() ) )
-            ptcl = serializer.HIGHEST_PROTOCOL
-#             ptcl = 2
+            # ptcl = serializer.HIGHEST_PROTOCOL
+            ptcl = 4 ## 4 is default protocol in python3.8, and highest protocol in 3.7
             serializer.dump(self.txt_meta, f, protocol=ptcl)
             serializer.dump(self.expResultList, f, protocol=ptcl)
             serializer.dump(self.databaseParticles, f, protocol=ptcl )
