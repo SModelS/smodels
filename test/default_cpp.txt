@@ -54,7 +54,7 @@ Expected experimental limit: 2.64E-01 [fb]
 Observed r-Value: 4.20976357763319
 Expected r-Value: 6.155752067085059
 Chi2: 45.63444029563222
-Likelihood: 8.729218694582859e-12
+Likelihood: 6.238452556297261e-11
 
 Total cross-section for missing topologies (fb):  0.000E+00
 Total cross-section for missing topologies with displaced decays (fb):  0.000E+00
