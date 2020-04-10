@@ -187,6 +187,7 @@ class Database(object):
                     t1=time.time()-t0
                     logger.info( "Loaded database from %s in %.1f secs." % \
                             ( self.pcl_meta.pathname, t1 ) )
+                    self.databaseParticles = serializer.load ( f )
         except(EOFError,ValueError) as e:
             os.unlink( self.pcl_meta.pathname )
             if lastm_only:
@@ -228,6 +229,7 @@ class Database(object):
     def createBinaryFile(self, filename=None):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
+        ## make sure we have a model to pickle with the database!
         if self.txt_meta == None:
             logger.error("Trying to create database pickle, but no txt_meta defined." )
             raise SModelSError()
@@ -236,6 +238,9 @@ class Database(object):
         binfile = filename
         if binfile == None:
             binfile = self.pcl_meta.pathname
+        if not hasattr(self,'databaseParticles') or \
+            type(self.databaseParticles) == type(None):
+           self._setParticles(self._getParticles())
         logger.debug(  " * create %s" % binfile )
         with open( binfile, "wb" ) as f:
             logger.debug(  " * load text database" )
@@ -247,6 +252,7 @@ class Database(object):
 #             ptcl = 2
             serializer.dump(self.txt_meta, f, protocol=ptcl)
             serializer.dump(self.expResultList, f, protocol=ptcl)
+            serializer.dump(self.databaseParticles, f, protocol=ptcl )
             logger.info(  "%s created." % ( binfile ) )
 
     @property
