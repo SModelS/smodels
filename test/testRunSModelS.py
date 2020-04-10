@@ -79,6 +79,13 @@ class RunSModelSTest(unittest.TestCase):
                            ignore=ignoreFields, fname = outputfile )
         for i in [ './output.py', './output.pyc' ]:
             if os.path.exists( i ): os.remove( i )
+        if not equals:
+            p = outputfile.find ( "unitTestOutput" )
+            fname = outputfile
+            if p > 0:
+                fname = fname[p:]
+            print ( "[testRunSModelS] %s not equals %s" % \
+                    ( fname, "gluino_squarks_default.py" ) )
         self.assertTrue(equals)
         self.removeOutputs( outputfile )
 
