@@ -84,7 +84,7 @@ class RunSModelSTest(unittest.TestCase):
             fname = outputfile
             if p > 0:
                 fname = fname[p:]
-            print ( "[testRunSModelS] %s not equals %s" % \
+            print ( "[testRunSModelS] %s != %s" % \
                     ( fname, "gluino_squarks_default.py" ) )
         self.assertTrue(equals)
         self.removeOutputs( outputfile )
@@ -106,6 +106,13 @@ class RunSModelSTest(unittest.TestCase):
                            ignore=ignoreFields, fname = outputfile )
         for i in [ './output.py', './output.pyc' ]:
             if os.path.exists( i ): os.remove( i )
+        if not equals:
+            p = outputfile.find ( "unitTestOutput" )
+            fname = outputfile
+            if p > 0:
+                fname = fname[p:]
+            print ( "[testRunSModelS] %s != %s" % \
+                    ( fname, "gluino_squarks_default.py" ) )
         self.assertTrue(equals)
         self.removeOutputs( outputfile )
 
@@ -131,7 +138,7 @@ class RunSModelSTest(unittest.TestCase):
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.08,
                            ignore=ignoreFields, fname = outputfile )
         if not equals:
-            e =  "output13.py and simplyGluino_default.py differ!"
+            e =  "output13.py != simplyGluino_default.py"
             logger.error( e )
             # raise AssertionError( e )
 
