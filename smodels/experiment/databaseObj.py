@@ -239,7 +239,7 @@ class Database(object):
                     ( binfile, self.txt_meta.databaseVersion,
                       self.txt_meta.format_version, self.txt_meta.cTime() ) )
             # ptcl = serializer.HIGHEST_PROTOCOL
-            ptcl = 4
+            ptcl = min ( serializer.HIGHEST_PROTOCOL, 4 )
             serializer.dump(self.txt_meta, f, protocol=ptcl)
             serializer.dump(self.expResultList, f, protocol=ptcl)
             logger.info (  "%s created." % ( binfile ) )
