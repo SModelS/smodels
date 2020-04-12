@@ -1,4 +1,4 @@
-.. image:: http://smodels.hephy.at/images/banner720.png
+.. image:: https://smodels.github.io/images/banner720.png
 
 ==============
 SModelS v1.2

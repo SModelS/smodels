@@ -7,7 +7,7 @@ VER='8226'
 TARBALL="pythia$VER.tgz"
 URL=http://home.thep.lu.se/~torbjorn/pythia8/$TARBALL
 #TARBALL="pythia${VER}_fixed.tgz"
-#URL=http://smodels.hephy.at/.hidden/$TARBALL
+#URL=https://smodels.github.io/.hidden/$TARBALL
 
 test -e .$TARBALL && { echo "[installer] tarball $TARBALL exists"; } || { echo "[installer] getting $TARBALL"; wget $URL 2>/dev/null || curl -O $URL; mv $TARBALL .$TARBALL; };
 

@@ -195,11 +195,11 @@ def officialDatabase( fastlim=False ):
     """ :param fastlim: include fastlim results """
     v=version().replace(".","")
     fl = "_fastlim" if fastlim else ""
-    r="http://smodels.hephy.at/database/official%s%s" % (v,fl)
+    r="https://smodels.github.io/database/official%s%s" % (v,fl)
     return r
 
 def testDatabase():
-    r="http://smodels.hephy.at/database/unittest%s" % version().replace(".","")
+    r="https://smodels.github.io/database/unittest%s" % version().replace(".","")
     return r
 
 def main():

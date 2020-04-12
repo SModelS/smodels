@@ -287,7 +287,7 @@ the :ref:`constraints <ULconstraint>`. SModelS adopts a notation based on
 the CMS SMS conventions, where each specific :ref:`constraint <ULconstraint>` is
 labeled as *T<constraint name>*, which we refer as *TxName*. For instance, the TxName corresponding to 
 the constraint in the :ref:`example above <constraintplot>` is *TSlepSlep*.
-A complete list of TxNames can be found `here <http://smodels.hephy.at/wiki/SmsDictionary>`_.
+A complete list of TxNames can be found `here <https://smodels.github.io/docs/SmsDictionary>`_.
 
 
 * **Upper limit and efficiency maps are described by the** `TxName Class <experiment.html#experiment.txnameObj.TxName>`_
