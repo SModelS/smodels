@@ -274,7 +274,7 @@ class Database(object):
                     ( binfile, self.txt_meta.databaseVersion,
                       self.txt_meta.format_version, self.txt_meta.cTime() ) )
             # ptcl = serializer.HIGHEST_PROTOCOL
-            ptcl = 4 ## 4 is default protocol in python3.8, and highest protocol in 3.7
+            ptcl = min ( 4, serializer.HIGHEST_PROTOCOL ) ## 4 is default protocol in python3.8, and highest protocol in 3.7
             serializer.dump(self.txt_meta, f, protocol=ptcl)
             serializer.dump(self.expResultList, f, protocol=ptcl)
             serializer.dump(self.databaseParticles, f, protocol=ptcl )

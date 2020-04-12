@@ -93,8 +93,7 @@ class ExpResult(object):
         pclfile = "%s/.%s" % ( self.path, meta.getPickleFileName() )
         logger.debug ( "writing expRes pickle file %s, mtime=%s" % (pclfile, meta.cTime() ) )
         f=open( pclfile, "wb" )
-        ptcl = serializer.HIGHEST_PROTOCOL
-#         ptcl = 2
+        ptcl = min ( 4, serializer.HIGHEST_PROTOCOL )
         serializer.dump(meta, f, protocol=ptcl)
         serializer.dump(self, f, protocol=ptcl)
         f.close()
