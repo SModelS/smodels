@@ -130,8 +130,8 @@ class RunPrinterTest(unittest.TestCase):
          
         samplefile = os.path.join( idir(), "test/gluino_squarks_default.txt")
         #Test summary output
-        output = summaryReader.Summary(outputfile,allowedDiff=0.05)
-        sample = summaryReader.Summary(samplefile,allowedDiff=0.05)
+        output = summaryReader.Summary(outputfile,allowedDiff=0.1)
+        sample = summaryReader.Summary(samplefile,allowedDiff=0.1)
         try:
             self.assertEqual(sample, output)
         except AssertionError as e:

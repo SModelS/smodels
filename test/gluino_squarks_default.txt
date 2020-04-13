@@ -4,7 +4,7 @@ Decomposition output status: 1 #decomposition was successful
 # maxcond = 0.2
 # minmassgap = 5.0
 # sigmacut = 0.03
-# Database version: unittest120
+# Database version: unittest123rc1
 ================================================================================
 #Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected
 
@@ -20,7 +20,7 @@ Decomposition output status: 1 #decomposition was successful
  Signal Region:  (UL)
  Txnames:  T5WW
 --------------------------------------------------------------------------------
-     CMS-SUS-13-012  8.00E+00    0.0  1.562E-01  1.205E+00  1.296E-01  2.079E-01
+     CMS-SUS-13-012  8.00E+00    0.0  1.538E-01  1.205E+00  1.276E-01  2.047E-01
  Signal Region:  3NJet6_1000HT1250_600MHTinf
  Txnames:  T1, T1tttt, T2
 --------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ Decomposition output status: 1 #decomposition was successful
  Signal Region:  (UL)
  Txnames:  T1
 --------------------------------------------------------------------------------
- ATLAS-SUSY-2013-12  8.00E+00    0.0  1.847E+01  3.306E+02  5.586E-02  N/A
+ ATLAS-SUSY-2013-12  8.00E+00    0.0  1.847E+01  4.844E+02  3.813E-02  N/A
  Signal Region:  (UL)
  Txnames:  TChiWZ
 --------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ ATLAS-CONF-2013-037  8.00E+00    0.0  7.318E-04  4.000E-01  1.830E-03  2.091E-03
  Signal Region:  SRtN3
  Txnames:  T1qqtt, T1tttt
 --------------------------------------------------------------------------------
- CMS-PAS-SUS-15-002  1.30E+01    0.0  3.496E-02  4.207E+01  8.310E-04  N/A
+ CMS-PAS-SUS-15-002  1.30E+01    0.0  3.496E-02  4.206E+01  8.312E-04  N/A
  Signal Region:  (UL)
  Txnames:  T1tttt
 --------------------------------------------------------------------------------
