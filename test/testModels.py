@@ -118,10 +118,9 @@ class ModelsTest(unittest.TestCase):
         self.assertTrue(smodelsOutput['OutputStatus']['decomposition status'] < 0)
         self.removeOutputs(outputfile)
 
-
     def removeOutputs(self, f):
         """ remove cruft outputfiles """
-        for i in [ f, f.replace(".py",".pyc") ]:
+        for i in [ f, f.replace(".py",".pyc" ), f.replace(".py",".smodels") ]:
             if os.path.exists ( i ): os.remove ( i )
 
 
