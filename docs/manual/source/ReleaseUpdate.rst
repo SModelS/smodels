@@ -54,6 +54,11 @@ New in Version 2.0.0:
   * Changes in output: :ref:`width values added <pyOut>`, :ref:`coverage groups <coverageGroups>` and others (see :ref:`output description <outputDescription>` for details)
   * Added option for signal strength multipliers in :ref:`cross section calculator <xsecCalc>`
 
+New in Version 1.2.3:
+^^^^^^^^^^^^^^^^^^^^^
+  * server for databases is now smodels.github.io, not smodels.hephy.at
+  * |database| updated with results from more than 20 new analyses
+
 New in Version 1.2.2:
 ^^^^^^^^^^^^^^^^^^^^^
 
