@@ -67,13 +67,12 @@ Adding additional experimental results is a matter of copying and editing text
 files. Once the new folders and files have been added following the
 database structure format, SModelS
 automatically rebuilds the binary (Pickle) database file.
-The added results will then be available for using with the
-the SModelS tools.
+The added results will then be available for use within SModelS.
 
 
 For citing the experimental analyses in the database, you can use
 *database.bib*.
 
-.. _SModelS online manual: http://smodels.readthedocs.io/
+.. _SModelS online manual: https://smodels.readthedocs.io/
 .. _SModelS: https://github.com/SModelS/smodels
 
