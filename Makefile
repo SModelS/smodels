@@ -59,14 +59,14 @@ builddeb: buildrpm
 
 pypi:
 	rm -rf dist
-	python setup.py sdist bdist_wheel
+	python3 setup.py sdist bdist_wheel
 	twine upload dist/smodels-*.tar.gz
 
 testpypi: 
 	# to install from testpypi: 
 	# pip3 install --user --upgrade --index-url https://test.pypi.org/simple/ smodels
 	rm -rf dist
-	python setup.py sdist bdist_wheel
+	python3 setup.py sdist bdist_wheel
 	twine upload -r pypitest dist/smodels-*.tar.gz
 
 tarballs:
