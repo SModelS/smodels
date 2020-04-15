@@ -1,0 +1,9 @@
+id: ATLAS-SUSY-2016-24
+sqrts: 13*TeV
+lumi: 36.1/fb
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2016-24/
+arxiv: https://arxiv.org/abs/1803.02762
+publication: https://link.springer.com/article/10.1140/epjc/s10052-018-6423-7
+contact: atlas-phys-susy-conveners@cern.ch
+implementedBy: Philipp Neuhuber
+lastUpdate: 2020/3/30

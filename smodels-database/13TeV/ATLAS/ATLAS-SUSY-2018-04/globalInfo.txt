@@ -1,0 +1,9 @@
+id: ATLAS-SUSY-2018-04
+sqrts: 13*TeV
+lumi: 139.0/fb
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-04/
+arxiv: https://arxiv.org/abs/1911.06660
+publication: Phys.Rev. D101 (2020) no.3, 032009
+contact: atlas-phys-susy-conveners@cern.ch
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2020/3/26

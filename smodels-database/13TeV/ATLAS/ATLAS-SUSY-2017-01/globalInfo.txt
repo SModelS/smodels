@@ -1,0 +1,9 @@
+id: ATLAS-SUSY-2017-01
+sqrts: 13*TeV
+lumi: 36.1/fb
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2017-01/
+arxiv: arXiv:1812.09432
+publication: https://journals.aps.org/prd/abstract/10.1103/PhysRevD.100.012006
+contact: atlas-phys-susy-conveners@cern.ch
+implementedBy: Philipp Neuhuber
+lastUpdate: 2020/3/29

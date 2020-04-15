@@ -1,0 +1,8 @@
+dataId: tN_diag_low
+dataType: efficiencyMap
+observedN: 34
+expectedBG: 30.3
+bgError: 5.9
+upperLimit: 0.472*fb	# official number taken from ATLAS (calculated value: 0.61*fb)
+expectedUpperLimit: 0.528*fb	# official number taken from ATLAS (calculated value: 0.491*fb)
+

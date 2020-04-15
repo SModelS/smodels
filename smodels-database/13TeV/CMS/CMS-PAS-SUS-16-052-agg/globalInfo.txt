@@ -2,7 +2,7 @@ id: CMS-PAS-SUS-16-052-agg
 sqrts: 13.0*TeV
 lumi: 35.9/fb
 url: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/index.html
-contact: SModelS
+contact: smodels-users@lists.oeaw.ac.at
 implementedBy: Wolfgang Waltenberger
 lastUpdate: 2018/6/25
 datasetOrder: "ar1","ar2","ar3","ar4","ar5","ar6","ar7","ar8","ar9","ar10","ar11","ar12","ar13","ar14","ar15","ar16","ar17"

@@ -1,0 +1,9 @@
+id: ATLAS-SUSY-2016-16
+sqrts: 13*TeV
+lumi: 36/fb
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2016-16/
+arxiv: https://arxiv.org/abs/1711.11520
+publication: JHEP 06 (2018) 108
+contact: atlas-phys-susy-conveners@cern.ch
+implementedBy: Philipp Neuhuber
+lastUpdate: 2020/3/30

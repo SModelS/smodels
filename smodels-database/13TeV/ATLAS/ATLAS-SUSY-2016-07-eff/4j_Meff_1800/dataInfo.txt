@@ -1,0 +1,7 @@
+dataId: 4j_Meff_1800
+dataType: efficiencyMap
+observedN: 55.0
+expectedBG: 49.0
+bgError: 7.0
+upperLimit: 0.78*fb
+expectedUpperLimit: 0.606*fb

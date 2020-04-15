@@ -1,0 +1,7 @@
+dataId: 3j_Meff_1300
+dataType: efficiencyMap
+observedN: 429.0
+expectedBG: 390.0
+bgError: 29.0
+upperLimit: 3.21*fb
+expectedUpperLimit: 2.05*fb

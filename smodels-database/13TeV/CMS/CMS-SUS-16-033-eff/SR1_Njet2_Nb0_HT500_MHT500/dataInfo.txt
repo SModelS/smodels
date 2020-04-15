@@ -1,0 +1,7 @@
+dataId: SR1_Njet2_Nb0_HT500_MHT500
+dataType: efficiencyMap
+observedN: 7838.0
+expectedBG: 7584.0
+bgError: 433.0
+upperLimit: 33.6*fb
+expectedUpperLimit: 25.6*fb

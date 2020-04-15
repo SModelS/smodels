@@ -1,0 +1,353 @@
+#: table_doi: 10.17182/hepdata.79304.v4/t94
+#: name: Table 94
+#: description: $\textbf{Efficiency 4 } -$ Acceptance and efficiency for the higgsino LSP model with $\Delta m (\tilde{\chi}^{\pm}_{1}, \tilde{\chi}^{0}_{1}) = 5$ GeV. The model assumes large $\tan\beta$ and the $\tilde{t}_{1}$ to be mostly $\tilde{t}_{L}$. Acceptance and efficiency numbers are provided for discovery SRs even if shape fits are used for placing exclusion limits.
+#: data_file: eff_higgsinoLSP_efficiency.yaml
+#: keyword cmenergies: 13000.0
+M(NEUTRALINO) [GeV],M(STOP) [GeV],EFFICIENCY
+100.0,300.0,0.3499133288860321
+100.0,350.0,0.47757387161254883
+100.0,400.0,0.34512755274772644
+100.0,450.0,0.48035216331481934
+100.0,500.0,0.4441670775413513
+100.0,550.0,0.5415981411933899
+100.0,600.0,0.2193881720304489
+100.0,650.0,0.31066370010375977
+100.0,700.0,0.38035687804222107
+100.0,750.0,0.29993152618408203
+100.0,800.0,0.33270537853240967
+100.0,850.0,0.3063609302043915
+100.0,900.0,0.3239336311817169
+100.0,950.0,0.2829276919364929
+100.0,1000.0,0.2639840245246887
+100.0,1050.0,0.2521713078022003
+100.0,1100.0,0.26565098762512207
+100.0,1150.0,0.22992128133773804
+100.0,1200.0,0.27266138792037964
+100.0,1250.0,0.2572607696056366
+100.0,1300.0,0.22989687323570251
+150.0,350.0,0.3053372800350189
+150.0,450.0,0.39006853103637695
+150.0,500.0,0.376402884721756
+150.0,550.0,0.3289810121059418
+150.0,600.0,0.35646992921829224
+150.0,650.0,0.22100327908992767
+150.0,700.0,0.34310832619667053
+150.0,750.0,0.30887219309806824
+150.0,800.0,0.31710946559906006
+150.0,850.0,0.2462625801563263
+150.0,900.0,0.3048296868801117
+150.0,950.0,0.25951749086380005
+150.0,1000.0,0.2188202142715454
+150.0,1050.0,0.21175383031368256
+150.0,1100.0,0.20103314518928528
+150.0,1150.0,0.22717617452144623
+150.0,1200.0,0.20087933540344238
+150.0,1250.0,0.18315382301807404
+150.0,1300.0,0.18879123032093048
+200.0,450.0,0.2601272165775299
+200.0,500.0,0.39126473665237427
+200.0,550.0,0.1995728313922882
+200.0,600.0,0.30444732308387756
+200.0,650.0,0.3477567732334137
+200.0,700.0,0.3308953046798706
+200.0,750.0,0.2949005663394928
+200.0,800.0,0.31820204854011536
+200.0,850.0,0.25832822918891907
+200.0,900.0,0.2524935305118561
+200.0,950.0,0.2242344617843628
+200.0,1000.0,0.2639576494693756
+200.0,1050.0,0.26003554463386536
+200.0,1100.0,0.23582716286182404
+200.0,1150.0,0.19144600629806519
+200.0,1200.0,0.20610013604164124
+200.0,1250.0,0.19261911511421204
+200.0,1300.0,0.15949341654777527
+250.0,450.0,0.590004026889801
+250.0,500.0,0.1643388420343399
+250.0,550.0,0.42090779542922974
+250.0,600.0,0.5170179605484009
+250.0,650.0,0.27386757731437683
+250.0,700.0,0.3483768403530121
+250.0,750.0,0.24888460338115692
+250.0,800.0,0.2588750720024109
+250.0,850.0,0.271672785282135
+250.0,900.0,0.212178036570549
+250.0,950.0,0.24228252470493317
+250.0,1000.0,0.24217893183231354
+250.0,1050.0,0.25092175602912903
+250.0,1100.0,0.16205808520317078
+250.0,1150.0,0.2595798373222351
+250.0,1200.0,0.18632513284683228
+250.0,1250.0,0.1702161431312561
+250.0,1300.0,0.16510020196437836
+300.0,500.0,0.7767775058746338
+300.0,550.0,0.4401899576187134
+300.0,600.0,0.3023921549320221
+300.0,650.0,0.4335395097732544
+300.0,700.0,0.40286940336227417
+300.0,750.0,0.26127889752388
+300.0,800.0,0.4125675857067108
+300.0,850.0,0.2646538019180298
+300.0,900.0,0.3279440701007843
+300.0,950.0,0.24518808722496033
+300.0,1000.0,0.19449593126773834
+300.0,1050.0,0.2512991726398468
+300.0,1100.0,0.19202813506126404
+300.0,1150.0,0.2011595070362091
+300.0,1200.0,0.22184595465660095
+300.0,1250.0,0.1896139234304428
+300.0,1300.0,0.19173912703990936
+350.0,550.0,0.8738857507705688
+350.0,600.0,0.33592090010643005
+350.0,650.0,0.3799920976161957
+350.0,700.0,0.2929319143295288
+350.0,750.0,0.34009790420532227
+350.0,800.0,0.38901081681251526
+350.0,850.0,0.21543090045452118
+350.0,900.0,0.24097029864788055
+350.0,950.0,0.28157106041908264
+350.0,1000.0,0.23565572500228882
+350.0,1050.0,0.17267341911792755
+350.0,1100.0,0.2324664145708084
+350.0,1150.0,0.18885378539562225
+350.0,1200.0,0.16189546883106232
+350.0,1250.0,0.2514408826828003
+350.0,1300.0,0.14657320082187653
+400.0,600.0,0.6632103323936462
+400.0,650.0,0.27377569675445557
+400.0,700.0,0.2416887730360031
+400.0,750.0,0.5474082231521606
+400.0,800.0,0.28824374079704285
+400.0,850.0,0.2896093428134918
+400.0,900.0,0.30786800384521484
+400.0,950.0,0.3220207989215851
+400.0,1000.0,0.37568148970603943
+400.0,1050.0,0.21901865303516388
+400.0,1100.0,0.2138257920742035
+400.0,1150.0,0.20275261998176575
+400.0,1200.0,0.16488786041736603
+400.0,1250.0,0.18313688039779663
+400.0,1300.0,0.21020688116550446
+450.0,650.0,0.3306099772453308
+450.0,700.0,0.795620858669281
+450.0,750.0,0.3532697558403015
+450.0,800.0,0.17604567110538483
+450.0,850.0,0.32817670702934265
+450.0,900.0,0.22906319797039032
+450.0,950.0,0.21555015444755554
+450.0,1000.0,0.34022679924964905
+450.0,1050.0,0.2013930082321167
+450.0,1100.0,0.17171235382556915
+450.0,1150.0,0.18225064873695374
+450.0,1200.0,0.248241126537323
+450.0,1250.0,0.20549705624580383
+450.0,1300.0,0.19568786025047302
+500.0,700.0,0.2401575744152069
+500.0,800.0,1.1589529514312744
+500.0,850.0,0.34199240803718567
+500.0,950.0,1.751073956489563
+500.0,1000.0,0.2997130751609802
+500.0,1050.0,0.27211207151412964
+500.0,1100.0,0.3512064218521118
+500.0,1150.0,0.6070670485496521
+500.0,1200.0,0.6016368269920349
+550.0,800.0,0.5656406879425049
+550.0,900.0,0.418415904045105
+550.0,950.0,0.4021068513393402
+550.0,1000.0,0.2701485753059387
+550.0,1050.0,0.3619333803653717
+550.0,1100.0,0.4685836732387543
+550.0,1150.0,0.33898431062698364
+550.0,1200.0,0.922163724899292
+600.0,800.0,0.3204868733882904
+600.0,850.0,0.08101338893175125
+600.0,900.0,0.46157199144363403
+600.0,950.0,0.3311327397823334
+600.0,1000.0,0.4158545732498169
+600.0,1050.0,0.25144174695014954
+600.0,1100.0,0.14277780055999756
+600.0,1150.0,0.5818193554878235
+600.0,1200.0,0.32952356338500977
+650.0,850.0,0.11040221899747849
+650.0,900.0,0.9916237592697144
+650.0,950.0,0.7362117171287537
+650.0,1000.0,0.439129114151001
+650.0,1050.0,0.2545905113220215
+650.0,1100.0,0.768780529499054
+650.0,1150.0,0.3588345944881439
+650.0,1200.0,2.0321133136749268
+
+M(NEUTRALINO) [GeV],M(STOP) [GeV],SELECTED SR
+100.0,300.0,bCsoft_diag $\oplus$ tN_med
+100.0,350.0,bCsoft_diag $\oplus$ tN_med
+100.0,400.0,bCsoft_diag $\oplus$ tN_med
+100.0,450.0,bCsoft_diag $\oplus$ tN_med
+100.0,500.0,bCsoft_diag $\oplus$ tN_med
+100.0,550.0,bCsoft_diag $\oplus$ tN_med
+100.0,600.0,bCsoft_high $\oplus$ tN_med
+100.0,650.0,bCsoft_med $\oplus$ tN_med
+100.0,700.0,bCsoft_high $\oplus$ tN_med
+100.0,750.0,bCsoft_high $\oplus$ tN_med
+100.0,800.0,bCsoft_high $\oplus$ tN_med
+100.0,850.0,bCsoft_high $\oplus$ tN_med
+100.0,900.0,bCsoft_high $\oplus$ tN_med
+100.0,950.0,bCsoft_high $\oplus$ tN_med
+100.0,1000.0,bCsoft_high $\oplus$ tN_med
+100.0,1050.0,bCsoft_high $\oplus$ tN_med
+100.0,1100.0,bCsoft_high $\oplus$ tN_med
+100.0,1150.0,bCsoft_high $\oplus$ tN_med
+100.0,1200.0,bCsoft_high $\oplus$ tN_med
+100.0,1250.0,bCsoft_high $\oplus$ tN_med
+100.0,1300.0,bCsoft_high $\oplus$ tN_med
+150.0,350.0,bCsoft_diag $\oplus$ tN_med
+150.0,450.0,bCsoft_med $\oplus$ tN_med
+150.0,500.0,bCsoft_diag $\oplus$ tN_med
+150.0,550.0,bCsoft_med $\oplus$ tN_med
+150.0,600.0,bCsoft_med $\oplus$ tN_med
+150.0,650.0,bCsoft_med $\oplus$ tN_med
+150.0,700.0,bCsoft_med $\oplus$ tN_med
+150.0,750.0,bCsoft_high $\oplus$ tN_med
+150.0,800.0,bCsoft_high $\oplus$ tN_med
+150.0,850.0,bCsoft_high $\oplus$ tN_med
+150.0,900.0,bCsoft_high $\oplus$ tN_med
+150.0,950.0,bCsoft_high $\oplus$ tN_med
+150.0,1000.0,bCsoft_high $\oplus$ tN_med
+150.0,1050.0,bCsoft_high $\oplus$ tN_med
+150.0,1100.0,bCsoft_high $\oplus$ tN_med
+150.0,1150.0,bCsoft_high $\oplus$ tN_med
+150.0,1200.0,bCsoft_high $\oplus$ tN_med
+150.0,1250.0,bCsoft_high $\oplus$ tN_med
+150.0,1300.0,bCsoft_high $\oplus$ tN_med
+200.0,450.0,bCsoft_med $\oplus$ tN_med
+200.0,500.0,bCsoft_med $\oplus$ tN_med
+200.0,550.0,bCsoft_med $\oplus$ tN_med
+200.0,600.0,bCsoft_med $\oplus$ tN_med
+200.0,650.0,bCsoft_med $\oplus$ tN_med
+200.0,700.0,bCsoft_high $\oplus$ tN_med
+200.0,750.0,bCsoft_high $\oplus$ tN_med
+200.0,800.0,bCsoft_high $\oplus$ tN_med
+200.0,850.0,bCsoft_high $\oplus$ tN_med
+200.0,900.0,bCsoft_high $\oplus$ tN_med
+200.0,950.0,bCsoft_high $\oplus$ tN_med
+200.0,1000.0,bCsoft_high $\oplus$ tN_med
+200.0,1050.0,bCsoft_high $\oplus$ tN_med
+200.0,1100.0,bCsoft_high $\oplus$ tN_med
+200.0,1150.0,bCsoft_high $\oplus$ tN_med
+200.0,1200.0,bCsoft_high $\oplus$ tN_med
+200.0,1250.0,bCsoft_high $\oplus$ tN_med
+200.0,1300.0,bCsoft_high $\oplus$ tN_med
+250.0,450.0,bCsoft_diag $\oplus$ tN_med
+250.0,500.0,bCsoft_med $\oplus$ tN_med
+250.0,550.0,bCsoft_med $\oplus$ tN_med
+250.0,600.0,bCsoft_med $\oplus$ tN_med
+250.0,650.0,bCsoft_med $\oplus$ tN_med
+250.0,700.0,bCsoft_med $\oplus$ tN_med
+250.0,750.0,bCsoft_high $\oplus$ tN_med
+250.0,800.0,bCsoft_high $\oplus$ tN_med
+250.0,850.0,bCsoft_high $\oplus$ tN_med
+250.0,900.0,bCsoft_high $\oplus$ tN_med
+250.0,950.0,bCsoft_high $\oplus$ tN_med
+250.0,1000.0,bCsoft_high $\oplus$ tN_med
+250.0,1050.0,bCsoft_high $\oplus$ tN_med
+250.0,1100.0,bCsoft_high $\oplus$ tN_med
+250.0,1150.0,bCsoft_high $\oplus$ tN_med
+250.0,1200.0,bCsoft_high $\oplus$ tN_med
+250.0,1250.0,bCsoft_high $\oplus$ tN_med
+250.0,1300.0,bCsoft_high $\oplus$ tN_med
+300.0,500.0,bCsoft_med $\oplus$ tN_med
+300.0,550.0,bCsoft_med $\oplus$ tN_med
+300.0,600.0,bCsoft_med $\oplus$ tN_med
+300.0,650.0,bCsoft_med $\oplus$ tN_med
+300.0,700.0,bCsoft_high $\oplus$ tN_med
+300.0,750.0,bCsoft_high $\oplus$ tN_med
+300.0,800.0,bCsoft_high $\oplus$ tN_med
+300.0,850.0,bCsoft_high $\oplus$ tN_med
+300.0,900.0,bCsoft_high $\oplus$ tN_med
+300.0,950.0,bCsoft_high $\oplus$ tN_med
+300.0,1000.0,bCsoft_high $\oplus$ tN_med
+300.0,1050.0,bCsoft_high $\oplus$ tN_med
+300.0,1100.0,bCsoft_high $\oplus$ tN_med
+300.0,1150.0,bCsoft_high $\oplus$ tN_med
+300.0,1200.0,bCsoft_high $\oplus$ tN_med
+300.0,1250.0,bCsoft_high $\oplus$ tN_med
+300.0,1300.0,bCsoft_high $\oplus$ tN_med
+350.0,550.0,bCsoft_med $\oplus$ tN_med
+350.0,600.0,bCsoft_diag $\oplus$ tN_med
+350.0,650.0,bCsoft_med $\oplus$ tN_med
+350.0,700.0,bCsoft_med $\oplus$ tN_med
+350.0,750.0,bCsoft_med $\oplus$ tN_med
+350.0,800.0,bCsoft_high $\oplus$ tN_med
+350.0,850.0,bCsoft_high $\oplus$ tN_med
+350.0,900.0,bCsoft_high $\oplus$ tN_med
+350.0,950.0,bCsoft_high $\oplus$ tN_med
+350.0,1000.0,bCsoft_high $\oplus$ tN_med
+350.0,1050.0,bCsoft_high $\oplus$ tN_med
+350.0,1100.0,bCsoft_high $\oplus$ tN_med
+350.0,1150.0,bCsoft_high $\oplus$ tN_med
+350.0,1200.0,bCsoft_high $\oplus$ tN_med
+350.0,1250.0,bCsoft_high $\oplus$ tN_med
+350.0,1300.0,bCsoft_high $\oplus$ tN_med
+400.0,600.0,bCsoft_diag $\oplus$ tN_med
+400.0,650.0,bCsoft_med $\oplus$ tN_med
+400.0,700.0,bCsoft_med $\oplus$ tN_med
+400.0,750.0,bCsoft_med $\oplus$ tN_med
+400.0,800.0,bCsoft_med $\oplus$ tN_med
+400.0,850.0,bCsoft_high $\oplus$ tN_med
+400.0,900.0,bCsoft_high $\oplus$ tN_med
+400.0,950.0,bCsoft_high $\oplus$ tN_med
+400.0,1000.0,bCsoft_high $\oplus$ tN_med
+400.0,1050.0,bCsoft_high $\oplus$ tN_med
+400.0,1100.0,bCsoft_high $\oplus$ tN_med
+400.0,1150.0,bCsoft_high $\oplus$ tN_med
+400.0,1200.0,bCsoft_high $\oplus$ tN_med
+400.0,1250.0,bCsoft_high $\oplus$ tN_med
+400.0,1300.0,bCsoft_high $\oplus$ tN_med
+450.0,650.0,bCsoft_diag $\oplus$ tN_med
+450.0,700.0,bCsoft_high $\oplus$ tN_med
+450.0,750.0,bCsoft_med $\oplus$ tN_med
+450.0,800.0,bCsoft_med $\oplus$ tN_med
+450.0,850.0,bCsoft_med $\oplus$ tN_med
+450.0,900.0,bCsoft_med $\oplus$ tN_med
+450.0,950.0,bCsoft_high $\oplus$ tN_med
+450.0,1000.0,bCsoft_high $\oplus$ tN_med
+450.0,1050.0,bCsoft_high $\oplus$ tN_med
+450.0,1100.0,bCsoft_high $\oplus$ tN_med
+450.0,1150.0,bCsoft_high $\oplus$ tN_med
+450.0,1200.0,bCsoft_high $\oplus$ tN_med
+450.0,1250.0,bCsoft_high $\oplus$ tN_med
+450.0,1300.0,bCsoft_high $\oplus$ tN_med
+500.0,700.0,bCsoft_med $\oplus$ tN_med
+500.0,800.0,bCsoft_high $\oplus$ tN_med
+500.0,850.0,bCsoft_med $\oplus$ tN_med
+500.0,950.0,bCsoft_diag $\oplus$ tN_med
+500.0,1000.0,bCsoft_high $\oplus$ tN_med
+500.0,1050.0,bCsoft_high $\oplus$ tN_med
+500.0,1100.0,bCsoft_diag $\oplus$ tN_med
+500.0,1150.0,bCsoft_diag $\oplus$ tN_med
+500.0,1200.0,bCsoft_diag $\oplus$ tN_med
+550.0,800.0,bCsoft_med $\oplus$ tN_med
+550.0,900.0,bCsoft_diag $\oplus$ tN_med
+550.0,950.0,bCsoft_high $\oplus$ tN_med
+550.0,1000.0,bCsoft_med $\oplus$ tN_med
+550.0,1050.0,bCsoft_med $\oplus$ tN_med
+550.0,1100.0,bCsoft_high $\oplus$ tN_med
+550.0,1150.0,bCsoft_high $\oplus$ tN_med
+550.0,1200.0,bCsoft_diag $\oplus$ tN_med
+600.0,800.0,bCsoft_diag $\oplus$ tN_med
+600.0,850.0,bCsoft_med $\oplus$ tN_med
+600.0,900.0,bCsoft_high $\oplus$ tN_med
+600.0,950.0,bCsoft_high $\oplus$ tN_med
+600.0,1000.0,bCsoft_high $\oplus$ tN_med
+600.0,1050.0,bCsoft_high $\oplus$ tN_med
+600.0,1100.0,bCsoft_diag $\oplus$ tN_med
+600.0,1150.0,bCsoft_diag $\oplus$ tN_med
+600.0,1200.0,bCsoft_high $\oplus$ tN_med
+650.0,850.0,bCsoft_med $\oplus$ tN_med
+650.0,900.0,bCsoft_high $\oplus$ tN_med
+650.0,950.0,bCsoft_med $\oplus$ tN_med
+650.0,1000.0,bCsoft_med $\oplus$ tN_med
+650.0,1050.0,bCsoft_high $\oplus$ tN_med
+650.0,1100.0,bCsoft_diag $\oplus$ tN_med
+650.0,1150.0,bCsoft_diag $\oplus$ tN_med
+650.0,1200.0,bCsoft_diag $\oplus$ tN_med
+

@@ -1,0 +1,8 @@
+dataId: WZ-1Jc
+dataType: efficiencyMap
+observedN: 4
+expectedBG: 1.3
+bgError: 0.3
+upperLimit: 0.2*fb	# official number taken from ATLAS (calculated value: 0.211*fb)
+expectedUpperLimit: 0.117*fb	# official number taken from ATLAS (calculated value: 0.0935*fb)
+

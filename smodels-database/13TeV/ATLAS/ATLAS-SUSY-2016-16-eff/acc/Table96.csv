@@ -1,0 +1,67 @@
+#: table_doi: 10.17182/hepdata.79304.v4/t96
+#: name: Table 96
+#: description: $\textbf{Efficiency 5 } -$ Acceptance and efficiency for the higgsino LSP model with $\Delta m (\tilde{\chi}^{\pm}_{1}, \tilde{\chi}^{0}_{1}) = 5$ GeV, in the region where $\Delta m (\tilde{\chi}^{\pm}_{1}, \tilde{\chi}^{0}_{1}) < m_{\textrm{top}}$. Acceptance and efficiency numbers are provided for discovery SRs even if shape fits are used for placing exclusion limits.
+#: data_file: eff_higgsino_diag_efficiency.yaml
+#: keyword cmenergies: 13000.0
+M(NEUTRALINO) [GeV],M(STOP) [GeV],EFFICIENCY
+100.0,200.0,0.39199957251548767
+100.0,250.0,0.36578768491744995
+150.0,200.0,0.3551524579524994
+150.0,250.0,0.3740152418613434
+150.0,300.0,0.35505086183547974
+175.0,200.0,0.37249645590782166
+200.0,250.0,0.37149766087532043
+200.0,300.0,0.43289926648139954
+200.0,350.0,0.35390719771385193
+225.0,250.0,0.36427947878837585
+250.0,300.0,0.3981022536754608
+250.0,350.0,0.3677826523780823
+250.0,400.0,0.3945181965827942
+275.0,300.0,0.3788335919380188
+300.0,350.0,0.4046493172645569
+300.0,400.0,0.4456309378147125
+300.0,450.0,0.44727957248687744
+325.0,350.0,0.364364355802536
+350.0,400.0,0.354507178068161
+350.0,450.0,0.4245728850364685
+350.0,500.0,0.3088548183441162
+375.0,400.0,0.3337567150592804
+400.0,450.0,0.33379942178726196
+400.0,500.0,0.3537929952144623
+400.0,550.0,0.4243977665901184
+425.0,450.0,0.2852665185928345
+450.0,500.0,0.41043028235435486
+450.0,550.0,0.30773189663887024
+450.0,600.0,0.3061668276786804
+
+M(NEUTRALINO) [GeV],M(STOP) [GeV],SELECTED SR
+100.0,200.0,bCsoft_diag
+100.0,250.0,bCsoft_diag
+150.0,200.0,bCsoft_diag
+150.0,250.0,bCsoft_diag
+150.0,300.0,bCsoft_diag
+175.0,200.0,bCsoft_diag
+200.0,250.0,bCsoft_diag
+200.0,300.0,bCsoft_diag
+200.0,350.0,bCsoft_diag
+225.0,250.0,bCsoft_diag
+250.0,300.0,bCsoft_diag
+250.0,350.0,bCsoft_diag
+250.0,400.0,bCsoft_diag
+275.0,300.0,bCsoft_diag
+300.0,350.0,bCsoft_diag
+300.0,400.0,bCsoft_diag
+300.0,450.0,bCsoft_diag
+325.0,350.0,bCsoft_diag
+350.0,400.0,bCsoft_diag
+350.0,450.0,bCsoft_diag
+350.0,500.0,bCsoft_diag
+375.0,400.0,bCsoft_diag
+400.0,450.0,bCsoft_diag
+400.0,500.0,bCsoft_diag
+400.0,550.0,bCsoft_diag
+425.0,450.0,bCsoft_diag
+450.0,500.0,bCsoft_diag
+450.0,550.0,bCsoft_diag
+450.0,600.0,bCsoft_diag
+

@@ -1,0 +1,7 @@
+dataId: SR6_Njet2_Nb2_HT500_MHT500
+dataType: efficiencyMap
+observedN: 216.0
+expectedBG: 196.0
+bgError: 28.0
+upperLimit: 2.46*fb
+expectedUpperLimit: 1.85*fb
