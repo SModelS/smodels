@@ -39,7 +39,7 @@ Adding FastLim data
 The official SModelS database can be augmented with data from the
 `fastlim <http://cern.ch/fastlim>`_ results.
 For using SModelS with the text database,
-a tarball with the *properly converted* fastlim-1.0 efficiency maps can be found in 
+a tarball with the *properly converted* fastlim-1.0 efficiency maps can be found in
 the smodels-database folder.
 The tarball then needs to be exploded in the top level directory of the database: ::
 
@@ -67,7 +67,7 @@ Adding additional experimental results is a matter of copying and editing text
 files. Once the new folders and files have been added following the
 database structure format, SModelS
 automatically rebuilds the binary (Pickle) database file.
-The added results will then be available for use within SModelS.
+The added results will then be available for use with SModelS.
 
 
 For citing the experimental analyses in the database, you can use
