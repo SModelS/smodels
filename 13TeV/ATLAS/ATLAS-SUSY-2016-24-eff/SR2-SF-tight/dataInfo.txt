@@ -1,0 +1,8 @@
+dataId: SR2-SF-tight
+dataType: efficiencyMap
+observedN: 9
+expectedBG: 9.8
+bgError: 2.9
+upperLimit: 0.29*fb	# official number taken from ATLAS (calculated value: 0.253*fb)
+expectedUpperLimit: 0.331*fb	# official number taken from ATLAS (calculated value: 0.291*fb)
+

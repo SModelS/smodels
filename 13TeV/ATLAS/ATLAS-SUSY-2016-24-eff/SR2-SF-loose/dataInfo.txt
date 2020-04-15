@@ -1,0 +1,8 @@
+dataId: SR2-SF-loose
+dataType: efficiencyMap
+observedN: 153
+expectedBG: 133
+bgError: 22
+upperLimit: 2.02*fb	# official number taken from ATLAS (calculated value: 2.07*fb)
+expectedUpperLimit: 1.467*fb	# official number taken from ATLAS (calculated value: 1.46*fb)
+

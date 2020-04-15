@@ -1,0 +1,7 @@
+dataId: 4j_Meff_2200
+dataType: efficiencyMap
+observedN: 24.0
+expectedBG: 16.5
+bgError: 2.7
+upperLimit: 0.552*fb
+expectedUpperLimit: 0.3*fb

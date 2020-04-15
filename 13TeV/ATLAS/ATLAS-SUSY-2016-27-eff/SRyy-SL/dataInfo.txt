@@ -1,0 +1,7 @@
+dataId: SRyy-SL-q
+dataType: efficiencyMap
+observedN: 0
+expectedBG: 0.5
+bgError: 0.28
+upperLimit: 0.0856*fb
+expectedUpperLimit: 0.0856*fb

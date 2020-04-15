@@ -1,0 +1,16 @@
+txName: T2bbffff
+constraint: 9./4.*[[['b', 'jet','jet']],[['b', 'jet','jet']]]
+condition: None
+conditionDescription: None
+figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2016-15/figaux_12.png
+source: ATLAS
+validated: True
+axes: [[x, y], [x, y]]
+finalState: ['MET', 'MET']
+upperLimits: [[[[2.5000E+02*GeV,2.0000E+02*GeV],[2.5000E+02*GeV,2.0000E+02*GeV]],4.9005E+04*fb],
+[[[3.0000E+02*GeV,2.5000E+02*GeV],[3.0000E+02*GeV,2.5000E+02*GeV]],1.3469E+04*fb],
+[[[3.0000E+02*GeV,2.8000E+02*GeV],[3.0000E+02*GeV,2.8000E+02*GeV]],3.2049E+04*fb],
+[[[3.5000E+02*GeV,3.0000E+02*GeV],[3.5000E+02*GeV,3.0000E+02*GeV]],9.1950E+04*fb],
+[[[4.0000E+02*GeV,3.5000E+02*GeV],[4.0000E+02*GeV,3.5000E+02*GeV]],1.9409E+05*fb],
+[[[4.5000E+02*GeV,4.0000E+02*GeV],[4.5000E+02*GeV,4.0000E+02*GeV]],3.6434E+04*fb],
+[[[5.5000E+02*GeV,5.3000E+02*GeV],[5.5000E+02*GeV,5.3000E+02*GeV]],4.7746E+03*fb]]

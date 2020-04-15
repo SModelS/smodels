@@ -1,0 +1,7 @@
+dataId: SR9_NJet5_Nb2_HT1500_MHT750
+dataType: efficiencyMap
+observedN: 6.0
+expectedBG: 4.4
+bgError: 3.4
+upperLimit: 0.315*fb
+expectedUpperLimit: 0.246*fb

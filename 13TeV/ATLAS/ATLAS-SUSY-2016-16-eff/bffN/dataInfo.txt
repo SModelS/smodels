@@ -1,0 +1,8 @@
+dataId: bffN
+dataType: efficiencyMap
+observedN: 70
+expectedBG: 60.5
+bgError: 6.1
+upperLimit: 0.778*fb	# official number taken from ATLAS (calculated value: 0.878*fb)
+expectedUpperLimit: 0.583*fb	# official number taken from ATLAS (calculated value: 0.59*fb)
+

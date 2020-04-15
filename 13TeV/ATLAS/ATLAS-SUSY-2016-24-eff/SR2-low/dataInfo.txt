@@ -1,0 +1,8 @@
+dataId: SR2-low
+dataType: efficiencyMap
+observedN: 11
+expectedBG: 4.2
+bgError: 3.4
+upperLimit: 0.43*fb	# official number taken from ATLAS (calculated value: 0.499*fb)
+expectedUpperLimit: 0.329*fb	# official number taken from ATLAS (calculated value: 0.25*fb)
+

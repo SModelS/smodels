@@ -1,0 +1,9 @@
+id: ATLAS-SUSY-2016-07
+sqrts: 13*TeV
+lumi: 36.1/fb
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2016-07/
+arxiv: https://arxiv.org/abs/1712.02332
+publication: Phys. Rev. D 97, 112001 (2018)
+contact: smodels-users@lists.oeaw.ac.at
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2020/3/27

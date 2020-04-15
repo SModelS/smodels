@@ -2,6 +2,6 @@ id: CMS-PAS-SUS-16-052
 sqrts: 13.0*TeV
 lumi: 35.9/fb
 url: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/index.html
-contact: CMS
+contact: cms-phys-conveners-sus@cern.ch
 implementedBy: Wolfgang Waltenberger
 lastUpdate: 2018/7/9

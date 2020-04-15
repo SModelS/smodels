@@ -1,0 +1,9 @@
+id: CMS-SUS-18-002
+sqrts: 13*TeV
+lumi: 35.9/fb
+url: https://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-18-002/
+arxiv: https://arxiv.org/abs/1901.06726
+publication: Eur. Phys. J. C 79 (2019) no.5,  444
+contact: cms-phys-conveners-sus@cern.ch
+implementedBy: ck
+lastUpdate: 2020/3/21

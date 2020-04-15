@@ -1,0 +1,8 @@
+dataId: tN_med
+dataType: efficiencyMap
+observedN: 50
+expectedBG: 36.3
+bgError: 6.6
+upperLimit: 0.861*fb	# official number taken from ATLAS (calculated value: 0.971*fb)
+expectedUpperLimit: 0.528*fb	# official number taken from ATLAS (calculated value: 0.541*fb)
+

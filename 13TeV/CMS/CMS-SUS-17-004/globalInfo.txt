@@ -1,0 +1,9 @@
+id: CMS-SUS-17-004
+sqrts: 13*TeV
+lumi: 35.9/fb
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-17-004/index.html
+arxiv: https://arxiv.org/abs/1801.03957
+publication: JHEP 1803 (2018) 160, http://dx.doi:10.1007/JHEP03(2018)160
+contact: cms-phys-conveners-sus@cern.ch
+implementedBy: ck
+lastUpdate: 2020/3/16
