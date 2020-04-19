@@ -1,4 +1,4 @@
-.. image:: https://smodels.github.io/images/banner720.png
+.. image:: https://smodels.github.io/pics/banner.png
 
 ==============
 SModelS v1.2
