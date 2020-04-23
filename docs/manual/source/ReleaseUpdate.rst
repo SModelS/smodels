@@ -44,6 +44,7 @@ New in Version 1.2.3:
   * server for databases is now smodels.github.io, not smodels.hephy.at
   * small bug fix for displaced topologies                       
   * |database| updated with results from more than 20 new analyses 
+  * small fix in slha printer, r_expected was r_observed
 
 New in Version 1.2.2:
 ^^^^^^^^^^^^^^^^^^^^^
