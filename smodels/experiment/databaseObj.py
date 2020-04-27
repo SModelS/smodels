@@ -349,7 +349,7 @@ class Database(object):
             return self.fetchFromScratch ( path, store, discard_zeroes )
         with open(store,"r") as f:
             jsn = json.load(f)
-        filename= "./" + jsn["url"].split("/")[-1]
+        filename= os.path.join ( cDir, jsn["url"].split("/")[-1] )
         class _: ## pseudo class for pseudo requests
             def __init__ ( self ): self.status_code = -1
         r=_()
@@ -366,7 +366,7 @@ class Database(object):
             logger.warning ( "I do however have a local copy of the file. I work with that." )
             self.force_load = "pcl"
             # next step: check the timestamps
-            return ( "./", filename )
+            return ( cDir, filename )
 
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!
