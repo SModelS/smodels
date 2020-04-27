@@ -8,16 +8,18 @@ Release v2.0.0, xxx 2020
   * New simplified missing topologies algorithm and output
   * Added field "type" to the experimental results in the database
   * Input model can now be defined by a SLHA file with QNUMBERS blocks
-  * Downloaded database files now stored in $HOME/.cache/smodels
   * Small bug fix in likelihood computation
   * Changes in output: width values added, coverage groups and others (see manual for details)
   * Added option for signal strength multipliers in cross section calculator
 
-Release v1.2.3, Wed 22 Apr 2020
+Release v1.2.3, Mon 27 Apr 2020
 =======================================================
 
-  * server for databases is now smodels.github.io, not smodels.hephy.at
   * database updated with results from more than 20 new analyses
+  * server for databases is now smodels.github.io, not smodels.hephy.at
+  * small bug fix for displaced topologies
+  * small fix in slha printer, r_expected was r_observed
+  * Downloaded database files now stored in $HOME/.cache/smodels
 
 Release v1.2.2, Tue 28 Nov 2018
 =======================================================

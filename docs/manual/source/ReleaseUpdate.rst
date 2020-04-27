@@ -49,15 +49,17 @@ New in Version 2.0.0:
   * Added :ref:`field "type" <txnameFile>` to the experimental results in the database
   * Added (optional) :ref:`field "intermediateState" <txnameFile>` to the experimental results in the database
   * Input model can now be defined by a SLHA file with :ref:`QNUMBERS blocks <qnumberSLHA>`
-  * :ref:`Downloaded database files <parameterFilePath>` now stored in $HOME/.cache/smodels
   * Small bug fix in :ref:`likelihood computation <likelihoodCalc>`
   * Changes in output: :ref:`width values added <pyOut>`, :ref:`coverage groups <coverageGroups>` and others (see :ref:`output description <outputDescription>` for details)
   * Added option for signal strength multipliers in :ref:`cross section calculator <xsecCalc>`
 
 New in Version 1.2.3:
 ^^^^^^^^^^^^^^^^^^^^^
-  * server for databases is now smodels.github.io, not smodels.hephy.at
   * |database| updated with results from more than 20 new analyses
+  * server for databases is now smodels.github.io, not smodels.hephy.at
+  * small bug fix for displaced topologies
+  * small fix in slha printer, r_expected was r_observed
+  * :ref:`Downloaded database files <parameterFilePath>` now stored in $HOME/.cache/smodels
 
 New in Version 1.2.2:
 ^^^^^^^^^^^^^^^^^^^^^
