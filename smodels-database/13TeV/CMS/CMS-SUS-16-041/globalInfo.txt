@@ -3,7 +3,8 @@ sqrts: 13*TeV
 lumi: 35.9/fb
 url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-041/index.html
 arxiv: https://arxiv.org/abs/1710.09154
-publication: accepted in JHEP
+publication: JHEP 02 (2018) 067
+supersedes: CMS-PAS-SUS-16-022
 contact: cms-phys-conveners-sus@cern.ch
 implementedBy: Juhi Dutta
 lastUpdate: 2018/02/15
