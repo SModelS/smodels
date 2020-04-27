@@ -58,13 +58,13 @@ builddeb: buildrpm
 	cd dist && fakeroot alien smodels-$(VER)-1.x86_64.rpm
 
 pypi:
-	## pypi user is walten
+	## pypi user is walten, repository is https://upload.pypi.org/legacy/
 	rm -rf dist
 	python3 setup.py sdist bdist_wheel
 	twine upload dist/smodels-*.tar.gz
 
 testpypi: 
-	## testpypi user is smodels
+	## testpypi user is smodels, repository is https://test.pypi.org/legacy/
 	# to install from testpypi: 
 	# pip3 install --user --upgrade --index-url https://test.pypi.org/simple/ smodels
 	rm -rf dist
