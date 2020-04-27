@@ -5,6 +5,7 @@ Release v1.2.3, Mon 27 Apr 2020
   * small bug fix for displaced topologies
   * database updated with results from more than 20 new analyses
   * small fix in slha printer, r_expected was r_observed
+  * caching pickle files now in $HOME/.cache, not in cwd
 
 Release v1.2.2, Tue 28 Nov 2018
 =======================================================

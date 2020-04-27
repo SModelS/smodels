@@ -45,6 +45,7 @@ New in Version 1.2.3:
   * small bug fix for displaced topologies                       
   * |database| updated with results from more than 20 new analyses 
   * small fix in slha printer, r_expected was r_observed
+  * caching pickle files now in $HOME/.cache, not in cwd
 
 New in Version 1.2.2:
 ^^^^^^^^^^^^^^^^^^^^^

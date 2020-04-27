@@ -26,6 +26,20 @@ def installDirectory():
     #path = path.replace("installation.py", "")
     return path + "/"
 
+def cacheDirectory ( create=False ):
+    """
+    Returns the user's smodels cache directory, i.e. ~/.cache/smodels.
+    :params create: if True, create the directory if it doesnt exist.
+    """
+    home = os.environ["HOME"]
+    cacheDir = os.path.join ( home, ".cache" )
+    if create and not os.path.exists ( cacheDir ):
+        os.mkdir ( cacheDir )
+    smodelsDir = os.path.join ( cacheDir, "smodels" )
+    if create and not os.path.exists ( smodelsDir ):
+        os.mkdir ( smodelsDir )
+    return smodelsDir
+
 def test_requirements():
     """ checks if all requirements are installed.
     Returns true if that is the case. """
@@ -44,8 +58,8 @@ def test_requirements():
     return True
 
 def resolve_dependencies( as_user = True ):
-    """ method that is meant to resolve the SModelS dependencies, 
-    via pip install --user. Warns you if pip cannot be found. 
+    """ method that is meant to resolve the SModelS dependencies,
+    via pip install --user. Warns you if pip cannot be found.
     :params as_user: if False, try system-wide install.
     """
     ck = test_requirements()
@@ -227,8 +241,8 @@ def main():
               "database": officialDatabase, "test_database": testDatabase,
               "copyright": license, "resolve_dependencies": resolve_dependencies }
     for f,v in args.__dict__.items():
-        if v: 
-            r = funcs[f]() 
+        if v:
+            r = funcs[f]()
             if r != None: print ( r )
 
 if __name__ == "__main__":

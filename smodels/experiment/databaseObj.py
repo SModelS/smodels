@@ -21,6 +21,7 @@ os.environ["OMP_NUM_THREADS"]="2"
 import sys
 import time
 from smodels.experiment import datasetObj
+from smodels.installation import cacheDirectory
 from smodels.experiment.metaObj import Meta
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
@@ -304,11 +305,13 @@ class Database(object):
             logger.error ( "cannot parse json file %s." % path )
             sys.exit()
         size = r.json()["size"]
+        cDir = cacheDirectory ( create=True )
         logger.info ( "need to fetch %s. size is %s." % \
                       ( r.json()["url"], sizeof_fmt ( size ) ) )
         t0=time.time()
         r2=requests.get ( r.json()["url"], stream=True )
-        filename= "./" + r2.url.split("/")[-1]
+        filename= os.path.join ( cDir, r2.url.split("/")[-1] )
+        # filename= "./" + r2.url.split("/")[-1]
         with open ( filename, "wb" ) as dump:
             if not self.inNotebook(): ## \r doesnt work in notebook
                 print ( "         " + " "*51 + "<", end="\r" )
@@ -338,7 +341,9 @@ class Database(object):
         self.source = "http"
         if "ftp://" in path:
             self.source = "ftp"
-        store = "." + path.replace ( ":","_" ).replace( "/", "_" ).replace(".","_" )
+        cDir = cacheDirectory ( create=True )
+        store = os.path.join ( cDir, path.replace ( ":","_" ).replace( "/", "_" ).replace(".","_" ) )
+        # store = "." + path.replace ( ":","_" ).replace( "/", "_" ).replace(".","_" )
         if not os.path.isfile ( store ):
             ## completely new! fetch the description and the db!
             return self.fetchFromScratch ( path, store, discard_zeroes )
