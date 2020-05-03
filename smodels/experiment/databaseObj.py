@@ -546,7 +546,7 @@ class Database(object):
         in the list.  If txname is defined, returns only the results matching
         one of the Tx names in the list.
 
-        :param analysisID: list of analysis ids ([CMS-SUS-13-006,...]). Can
+        :param analysisIDs: list of analysis ids ([CMS-SUS-13-006,...]). Can
                             be wildcarded with usual shell wildcards: * ? [<letters>]
                             Furthermore, the centre-of-mass energy can be chosen
                             as suffix, e.g. ":13*TeV". Note that the asterisk
