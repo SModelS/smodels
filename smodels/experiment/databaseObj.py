@@ -64,6 +64,8 @@ class Database(object):
         """
         self.url = base
         self.source=""
+        if force_load == None and base.endswith(".pcl"):
+            force_load = "pcl"
         self.force_load = force_load
         self.subpickle = subpickle
         if base in [ None, "official" ]:
