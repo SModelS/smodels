@@ -2,6 +2,7 @@ Release v1.2.4, XXXX
 =======================================================
 
   * pickle path bug fix
+  * bug fix for parallel xseccomputers
 
 Release v1.2.3, Mon 27 Apr 2020
 =======================================================

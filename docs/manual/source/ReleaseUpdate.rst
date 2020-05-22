@@ -41,6 +41,7 @@ New in Version 1.2.4:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * pickle path bug fix
+  * bug fix for parallel xseccomputers
 
 New in Version 1.2.3:
 ^^^^^^^^^^^^^^^^^^^^^
