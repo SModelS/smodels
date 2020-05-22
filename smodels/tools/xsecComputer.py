@@ -234,6 +234,7 @@ class XSecComputer:
         else:
             logger.info("get LO cross sections from pythia%d" % self.pythiaVersion )
             tool = toolBox.ToolBox().get("pythia%d" % self.pythiaVersion )
+            tool.tempdir = None # reset, to make sure it works in parallel mode
             tool.nevents = self.nevents
             tool.sqrts = sqrts / TeV
             tool.pythiacard = pythiacard
