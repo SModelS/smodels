@@ -26,11 +26,22 @@ def installDirectory():
     #path = path.replace("installation.py", "")
     return path + "/"
 
-def cacheDirectory ( create=False ):
+def cacheDirectory ( create=False, reportIfDefault=False ):
     """
     Returns the user's smodels cache directory, i.e. ~/.cache/smodels.
     :params create: if True, create the directory if it doesnt exist.
+    :params reportIfDefault: if True, then report also if the default location
+                             has been used
+    :returns: cache dir. optionally returns also if the default cache dir has been
+              used.
     """
+    if "SMODELS_CACHEDIR" in os.environ:
+        cacheDir = os.environ["SMODELS_CACHEDIR"]
+        if create and not os.path.exists ( cacheDir ):
+            os.mkdir ( cacheDir )
+        if reportIfDefault:
+            return cacheDir,False
+        return cacheDir
     home = os.environ["HOME"]
     cacheDir = os.path.join ( home, ".cache" )
     if create and not os.path.exists ( cacheDir ):
@@ -38,6 +49,8 @@ def cacheDirectory ( create=False ):
     smodelsDir = os.path.join ( cacheDir, "smodels" )
     if create and not os.path.exists ( smodelsDir ):
         os.mkdir ( smodelsDir )
+    if reportIfDefault:
+        return smodelsDir,True
     return smodelsDir
 
 def test_requirements():

@@ -39,17 +39,18 @@ The major novelties of all releases since v1.0 are as follows:
 
 New in Version 1.2.4:
 ^^^^^^^^^^^^^^^^^^^^^
-
   * added pyhf support
   * pickle path bug fix
   * bug fix for parallel xseccomputers
+  * Introduced the SMODELS_CACHEDIR environment variable to allow for a different
+    location of the cached database file
 
 New in Version 1.2.3:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * |database| updated with results from more than 20 new analyses 
+  * |database| updated with results from more than 20 new analyses
   * server for databases is now smodels.github.io, not smodels.hephy.at
-  * small bug fix for displaced topologies                       
+  * small bug fix for displaced topologies
   * small fix in slha printer, r_expected was r_observed
   * :ref:`Downloaded database files <parameterFilePath>` now stored in $HOME/.cache/smodels
 
@@ -86,11 +87,11 @@ New in Version 1.1.3:
   * Support for :ref:`covariance matrices <combineSRs>` and combination of signal regions (see :ref:`combineSR <parameterFileCombineSRs>` in |parameters|)
   * New plotting tool added to smodelsTools (see :ref:`Interactive Plots Maker <interactivePlots>`)
   * Path to particles.py can now be specified in parameters.ini file (see :ref:`model <parameterFileModel>` in |parameters|)
-  * Wildcards allowed when selecting analyses, datasets, txnames (see :ref:`analyses <parameterFileAnalyses>`, :ref:`txnames <parameterFileTxnames>` and :ref:`dataselector <parameterFileDataselector>`  in |parameters|) 
+  * Wildcards allowed when selecting analyses, datasets, txnames (see :ref:`analyses <parameterFileAnalyses>`, :ref:`txnames <parameterFileTxnames>` and :ref:`dataselector <parameterFileDataselector>`  in |parameters|)
   * Option to show individual contribution from topologies to total theory prediction (see :ref:`addTxWeights <parameterFileAddTxWeights>` in |parameters|)
   * URLs are allowed as database paths (see :ref:`path <parameterFilePath>` in |parameters|)
   * Python default changed from python2 to python3
-  * Fixed lastUpdate bug, now giving correct date 
+  * Fixed lastUpdate bug, now giving correct date
   * Changes in pickling (e.g. subpickling, removing redundant zeroes)
   * Added fixpermissions to smodelsTools.py, for system-wide installs (see :ref:`Files Permissions Fixer <permissionsFixer>`)
   * Fixed small issue with pair production of even particles
