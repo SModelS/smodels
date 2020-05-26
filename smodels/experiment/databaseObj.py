@@ -342,10 +342,14 @@ class Database(object):
             logger.error( "cannot parse json file %s." % path )
             raise SModelSError()
         size = r.json()["size"]
-        cDir = cacheDirectory ( create=True )
+        cDir,defused = cacheDirectory ( create=True, reportIfDefault=True )
         t0=time.time()
         r2=requests.get ( r.json()["url"], stream=True, timeout=5 )
         filename= os.path.join ( cDir, r2.url.split("/")[-1] )
+        msg = "caching the downloaded database in %s." % cDir
+        if defused:
+            msg += " If you want the pickled database filed to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'." 
+        logger.warn ( msg )
         logger.info ( "need to fetch %s and store in %s. size is %s." % \
                       ( r.json()["url"], filename, sizeof_fmt ( size ) ) )
         with open( filename, "wb" ) as dump:

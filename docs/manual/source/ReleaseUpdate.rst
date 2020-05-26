@@ -53,6 +53,11 @@ New in Version 2.0.0:
   * Changes in output: :ref:`width values added <pyOut>`, :ref:`coverage groups <coverageGroups>` and others (see :ref:`output description <outputDescription>` for details)
   * Added option for signal strength multipliers in :ref:`cross section calculator <xsecCalc>`
 
+New in Version 1.2.4:
+^^^^^^^^^^^^^^^^^^^^^
+  * Introduced the SMODELS_CACHEDIR environment variable to allow for a different 
+    location of the cached database file
+
 New in Version 1.2.3:
 ^^^^^^^^^^^^^^^^^^^^^
   * |database| updated with results from more than 20 new analyses

@@ -12,6 +12,11 @@ Release v2.0.0, xxx 2020
   * Changes in output: width values added, coverage groups and others (see manual for details)
   * Added option for signal strength multipliers in cross section calculator
 
+Release v1.2.4, XXX 2020
+=======================================================
+  * Introduced the SMODELS_CACHEDIR environment variable to allow for a different
+    location of the cached database file
+
 Release v1.2.3, Mon 27 Apr 2020
 =======================================================
 
