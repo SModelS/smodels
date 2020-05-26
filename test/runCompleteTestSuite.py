@@ -36,7 +36,9 @@ def verbose_run():
     for series in alltests:
         for test in series:
             if type(test)!=unittest.suite.TestSuite:
-                print ( "Error: could not import %s" % ( test ) )
+                print ( "%sError: could not import %s%s" % \
+                        ( colors.error, test, colors.reset ) )
+                continue
             for t in test:
                 n_tests += 1
                 print ( "[#%3d] %s ... " % ( n_tests, t.id() ), end="" )
