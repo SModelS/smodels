@@ -305,12 +305,16 @@ class Database(object):
             logger.error ( "cannot parse json file %s." % path )
             sys.exit()
         size = r.json()["size"]
-        cDir = cacheDirectory ( create=True )
+        cDir,defused = cacheDirectory ( create=True, reportIfDefault=True )
         logger.info ( "need to fetch %s. size is %s." % \
                       ( r.json()["url"], sizeof_fmt ( size ) ) )
         t0=time.time()
         r2=requests.get ( r.json()["url"], stream=True )
         filename= os.path.join ( cDir, r2.url.split("/")[-1] )
+        msg = "caching the downloaded database in %s." % cDir
+        if defused:
+            msg += " If you want the pickled database filed to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'." 
+        logger.warn ( msg )
         # filename= "./" + r2.url.split("/")[-1]
         with open ( filename, "wb" ) as dump:
             if not self.inNotebook(): ## \r doesnt work in notebook
