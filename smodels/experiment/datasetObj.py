@@ -321,8 +321,11 @@ class DataSet(object):
                 try:
                     return self.dataInfo.expectedUpperLimit
                 except AttributeError:
-                    logger.info("expectedUpperLimit field not found. Using observed UL instead.")
-                    return self.dataInfo.upperLimit
+                    logger.info("expectedUpperLimit field not found. Returning None instead.")
+                    return None
+                    #return self.dataInfo.upperLimit
+                    #logger.info("expectedUpperLimit field not found. Using observed UL instead.")
+                    #return self.dataInfo.upperLimit
             else:
                 return self.dataInfo.upperLimit
 
@@ -332,7 +335,7 @@ class DataSet(object):
         Nexp = self.dataInfo.expectedBG  #Number of expected BG events
         bgError = self.dataInfo.bgError # error on BG
 
-        m = Data(Nobs,Nexp,bgError,detlas_rel=deltas_rel)
+        m = Data(Nobs,Nexp,bgError,deltas_rel=deltas_rel)
         computer = UpperLimitComputer(cl=1.-alpha )
         maxSignalXsec = computer.ulSigma(m)
         maxSignalXsec = maxSignalXsec/self.globalInfo.lumi
