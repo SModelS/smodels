@@ -36,6 +36,17 @@ class CppTest(unittest.TestCase):
         f.write ( a )
         f.close()
 
+    def restoreIniFile(self):
+        """ restore the old ini file so we dont continuously
+            produce git issues """
+        f=open("../cpp/template.ini","r")
+        lines=f.readlines()
+        f.close()
+        f=open("../cpp/parameters.ini","w" )
+        for line in lines:
+            f.write ( line.replace("@@path@@", "../test/database" ) )
+        f.close()
+
     def createIniFile(self):
         f=open("../cpp/template.ini","r")
         lines=f.readlines()
@@ -102,6 +113,7 @@ class CppTest(unittest.TestCase):
         self.compile()
         #self.writeOutput()
         self.runExample()
+        self.restoreIniFile()
 
 if __name__ == "__main__":
     unittest.main()
