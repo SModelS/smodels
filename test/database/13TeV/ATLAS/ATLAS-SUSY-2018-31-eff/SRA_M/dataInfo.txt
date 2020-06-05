@@ -1,0 +1,8 @@
+dataId: SRA_M
+dataType: efficiencyMap
+observedN: 3
+expectedBG: 5.7
+bgError: 0.8
+upperLimit: 0.0299*fb
+expectedUpperLimit: 0.0511*fb
+jsonfile: BkgOnly.json

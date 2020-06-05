@@ -1,0 +1,12 @@
+id: ATLAS-SUSY-2018-31
+sqrts: 13*TeV
+lumi: 139.0/fb
+prettyName: higgs + b-jets + MET
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-31/
+arxiv: arXiv:1908.03122
+contact: atlas-phys-susy-conveners@cern.ch
+private: False
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2019/12/6
+datasetOrder: "SRA_L", "SRA_M", "SRA_H", "SRB", "SRC_22", "SRC_24", "SRC_26", "SRC_28"
+jsonFiles: {"BkgOnlyA.json": ["SRA_L", "SRA_M", "SRA_H"], "BkgOnlyB.json": ["SRB"], "BkgOnlyC.json": ["SRC_22", "SRC_24", "SRC_26", "SRC_28"]}
