@@ -1,13 +1,14 @@
 """
 .. module:: unitTestHelpers
    :synopsis: helper functions for the unit tests
- 
+
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
- 
+
 """
 
 import os
+import sys
 import unum
 import redirector
 from smodels.tools.runSModelS import run
@@ -15,12 +16,28 @@ from os.path import join, basename
 from smodels.installation import installDirectory as iDir
 from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
 from databaseLoader import database ## to make sure the db exists
- 
+
+def importModule ( filename ):
+    """ import a module, but giving the filename """
+    if sys.version_info[0]==2:
+        import imp
+        ## python2, use imp
+        with open( filename, 'rb') as fp: ## imports file with dots in name
+            output_module = imp.load_module("output",fp, filename, \
+                    ('.py', 'rb', imp.PY_SOURCE) )
+        return output_module.smodelsOutput
+    ### python3, use importlib
+    import importlib
+    spec = importlib.util.spec_from_file_location( "output", filename )
+    output_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(output_module)
+    return output_module.smodelsOutput
+
 def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None ):
     """
     Compare two objects.
     The numerical values are compared up to the precision defined by allowedDiff.
- 
+
     :param obj1: First python object to be compared
     :param obj2: Second python object to be compared
     :param allowedDiff: Allowed % difference between two numerical values
@@ -30,11 +47,11 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None ):
     """
     if type(obj1) in [ float, int ] and type ( obj2) in [ float, int ]:
         obj1,obj2=float(obj1),float(obj2)
- 
+
     if type(obj1) != type(obj2):
         logger.warning("Data types differ (%s,%s)" %(type(obj1),type(obj2)))
         return False
- 
+
     if isinstance(obj1,unum.Unum):
         if obj1 == obj2:
             return True
@@ -55,7 +72,7 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None ):
                 return False
             if not equalObjs(obj1[key],obj2[key],allowedDiff, ignore=ignore, where=key ):
                 logger.warning('Objects differ in %s:\n   %s\n and\n   %s' %(where, str(obj1[key]),str(obj2[key])))
-                #s1,s2 = str(obj1[key]),str(obj2[key]) 
+                #s1,s2 = str(obj1[key]),str(obj2[key])
                 #if False: # len(s1) + len(s2) > 200:
                 #    logger.warning ( "The values are too long to print." )
                 #else:
@@ -74,13 +91,13 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None ):
                 return False
     else:
         return obj1 == obj2
- 
+
     return True
- 
- 
+
+
 def runMain( filename, timeout = 0, suppressStdout=True, development=False,
              inifile = "testParameters.ini" ):
-    """ run SModelS proper 
+    """ run SModelS proper
     :param filename: slha file
     :returns: printer output
     """

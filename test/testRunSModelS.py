@@ -17,7 +17,7 @@ from os.path import join
 from smodels.installation import installDirectory as iDir
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
-from unitTestHelpers import equalObjs, runMain
+from unitTestHelpers import equalObjs, runMain, importModule
 import time
 
 from smodels.tools.smodelsLogging import logger
@@ -70,7 +70,8 @@ class RunSModelSTest(unittest.TestCase):
         outputfile = runMain(filename, inifile=inifile)
         # smodelsOutput = importModule(outputfile)
         with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
+            output_module = imp.load_module( "output", fp,outputfile, \
+		                                         ('.py', 'rb', imp.PY_SOURCE) )
             smodelsOutput = output_module.smodelsOutput
         from pyhf_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
@@ -82,9 +83,7 @@ class RunSModelSTest(unittest.TestCase):
 
         filename = "./testFiles/slha/simplyGluino.slha"
         outputfile = runMain(filename,suppressStdout = True )
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput
+        smodelsOutput = importModule ( outputfile )
         from simplyGluino_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
