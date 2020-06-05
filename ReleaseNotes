@@ -1,6 +1,7 @@
 Release v1.2.4, XXXX
 =======================================================
 
+  * added pyhf support
   * pickle path bug fix
   * bug fix for parallel xseccomputers
 
