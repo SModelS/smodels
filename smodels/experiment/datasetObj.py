@@ -8,7 +8,7 @@
 """
 
 
-import os,glob
+import os,glob,json
 from smodels.experiment import txnameObj,infoObj
 from smodels.tools.physicsUnits import fb
 from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
@@ -353,10 +353,12 @@ class CombinedDataSet(object):
     
     def __init__(self, expResult):
         
+        self.path = expResult.path
         self.globalInfo = expResult.globalInfo
         self._datasets = expResult.datasets[:]
         self._marginalize = False        
         self.sortDataSets()
+        self.bestCB = None# To store the index of the best combination
 
     def __str__(self):
         ret = "Combined Dataset (%i datasets)" %len(self._datasets)
