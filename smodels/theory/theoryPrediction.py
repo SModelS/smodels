@@ -331,7 +331,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
         
     if len(dataSetResults) == 1:
         return dataSetResults[0]
-    elif not expResult.hasCovarianceMatrix():
+    elif not expResult.hasCovarianceMatrix() and not expResult.hasJsonFile():
         return None
     
     txnameList = []
