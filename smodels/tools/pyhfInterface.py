@@ -265,8 +265,7 @@ class PyhfUpperLimitComputer:
         # Same modifiers_settings as those used when running the 'pyhf cls' command line
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         model = workspace.model(modifier_settings=msettings)
-        test_poi = 1.
-        _, nllh = pyhf.infer.mle.fixed_poi_fit(1., workspace.data(model), model, return_fitted_val=True)
+        _, nllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
         logger.debug(workspace['channels'][0]['samples'][0])
         logger.debug('nllh : {}'.format(nllh))
         # Computing the background numbers and fetching the observations
@@ -291,7 +290,7 @@ class PyhfUpperLimitComputer:
         logger.debug(workspace['channels'][0]['samples'][0])
         _, maxNllh = pyhf.infer.mle.fixed_poi_fit(1., workspace.data(model), model, return_fitted_val=True)
         logger.debug('maxNllh : {}'.format(maxNllh))
-        return (nllh - maxNllh).tolist()[0]
+        return (maxNllh - nllh).tolist()[0]
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of looking for mu bounds
