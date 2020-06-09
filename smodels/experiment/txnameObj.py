@@ -53,6 +53,8 @@ class TxName(object):
         self.txnameData = None
         self.txnameDataExp = None ## expected Data
         self._topologyList = TopologyList()
+        self.finalState = ['MET','MET'] #default final state
+        self.intermediateState = None #default intermediate state
 
         logger.debug('Creating object based on txname file: %s' %self.path)
         #Open the info file and get the information:
@@ -100,19 +102,11 @@ class TxName(object):
             self.txnameDataExp = TxNameData( expectedData, dataType, ident)
 
         #Builds up a list of elements appearing in constraints:
-        if hasattr(self,'intermediateState'):
-            intermediateState = self.intermediateState
-        else:
-            intermediateState = None
-        if hasattr(self,'finalState'):
-            finalState = self.finalState
-        else:
-            finalState = ["MET","MET"]
         elements = []
         if not databaseParticles:
             raise SModelSError("Database particles is empty. Can not create TxName object.")
         if hasattr(self,'constraint'):
-            elements += [Element(el,finalState,intermediateState,databaseParticles)
+            elements += [Element(el,self.finalState,self.intermediateState,databaseParticles)
                     for el in elementsInStr(str(self.constraint))]
 
         if any((elA == elB and not elA is elB) for elA in elements for elB in elements):
@@ -126,7 +120,7 @@ class TxName(object):
             if not isinstance(conds,list): conds = [conds]
             for cond in conds:
                 for el in elementsInStr(str(cond)):
-                    newEl = Element(el,finalState,intermediateState,
+                    newEl = Element(el,self.finalState,self.intermediateState,
                                     databaseParticles)
                     if not newEl in elements:
                         elements.append(newEl)

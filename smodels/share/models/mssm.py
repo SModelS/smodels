@@ -28,7 +28,7 @@ scr = Particle(Z2parity=-1, label='sc_R', pdg=2000004, eCharge=2./3, colordim=3,
 sb1 = Particle(Z2parity=-1, label='sb_1', pdg=1000005, eCharge=-1./3, colordim=3, spin=0)
 st1 = Particle(Z2parity=-1, label='st_1', pdg=1000006, eCharge=2./3, colordim=3, spin=0)
 sb2 = Particle(Z2parity=-1, label='sb_2', pdg=2000005, eCharge=-1./3, colordim=3, spin=0)
-st2 = Particle(Z2parity=-1, label='st_2', pdg=2000006, eCharge=-2./3, colordim=3, spin=0)
+st2 = Particle(Z2parity=-1, label='st_2', pdg=2000006, eCharge=2./3, colordim=3, spin=0)
 
 #1st generation sleptons and its conjugates:
 sel = Particle(Z2parity=-1, label='se_L', pdg=1000011, eCharge=-1, colordim=1, spin=0)

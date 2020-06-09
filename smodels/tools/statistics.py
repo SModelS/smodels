@@ -2,7 +2,7 @@
 
 """
 .. module:: statistics
-   :synopsis: a module meant to collect various statistical algorithms. 
+   :synopsis: a module meant to collect various statistical algorithms.
               For now it only contains the procedure that computes an
               approximate Gaussian likelihood from an expected an observer upper
               limit
@@ -11,7 +11,8 @@
 
 """
 
-from scipy import stats, optimize, integrate, special
+from scipy import stats, optimize
+from smodels.tools.smodelsLogging import logger
 from scipy.special import erf
 import numpy as np
 
@@ -32,7 +33,7 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
     fA,fB = root_func ( 0. ), root_func ( max(upperLimit,expectedUpperLimit) )
     if np.sign(fA*fB) > 0.:
         ## the have the same sign
-        logger.error ( "when computing likelihood for %s: fA and fB have same sign" % self.analysisId() )
+        logger.error ( "when computing likelihood fA and fB have same sign")
         return None
     mumax = optimize.brentq ( root_func, 0., max(upperLimit, expectedUpperLimit), rtol=1e-03, xtol=1e-06 )
     if nll:
@@ -43,11 +44,18 @@ def deltaChi2FromLlhd ( likelihood ):
     """ compute the delta chi2 value from a likelihood (convenience function) """
     if likelihood == 0.:
         return 1e10 ## a very high number is good
+    elif likelihood is None:
+        return None
+
     return -2. * np.log ( likelihood )
 
 def chi2FromLimits ( likelihood, expectedUpperLimit ):
-    """ compute the chi2 value from a likelihood (convenience function). 
+    """ compute the chi2 value from a likelihood (convenience function).
     """
     sigma_exp = expectedUpperLimit / 1.96 # the expected scale
     l0 = 2. * stats.norm.logpdf ( 0., 0., sigma_exp )
-    return deltaChi2FromLlhd ( likelihood ) + l0
+    l = deltaChi2FromLlhd(likelihood)
+    if l is None:
+        return None
+
+    return  l + l0

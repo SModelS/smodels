@@ -716,14 +716,23 @@ def _evalExpression(stringExpr,cluster):
     #Get model for final state particles (database particles):
     model = cluster.dataset.globalInfo._databaseParticles
     #Get txname final state:
-    finalState = cluster.txnames[0].finalState
+    if not hasattr(cluster.txnames[0],'finalState'):
+        finalState = ['MET','MET']
+    else:
+        finalState = cluster.txnames[0].finalState
+    if not hasattr(cluster.txnames[0],'intermediateState'):
+        intermediateState = None
+    else:
+        intermediateState = cluster.txnames[0].intermediateState
+
     #Get cross section info from cluster (to generate zero cross section values):
     infoList = cluster.elements[0].weight.getInfo()
     #Get weights for elements appearing in stringExpr
     weightsDict = {}
     evalExpr = stringExpr.replace("'","").replace(" ","")
     for i,elStr in enumerate(elementsInStr(evalExpr)):
-        el = element.Element(elStr,finalState=finalState,model=model)
+        el = element.Element(elStr,intermediateState=intermediateState,
+                                finalState=finalState,model=model)
         weightsDict['w%i'%i] = crossSection.XSectionList(infoList)
         for el1 in cluster.elements:
             if el1 == el:
