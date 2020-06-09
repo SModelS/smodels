@@ -153,7 +153,7 @@ class TheoryPrediction(object):
             return None
         ul = self.dataset.getUpperLimitFor(element=self.avgElement,
                                             txnames=self.txnames,
-                                            expected=True)
+                                            expected=False )
         lumi = self.dataset.globalInfo.lumi
         ulN = float(ul * lumi) ## upper limit on yield
         eulN = float(eul * lumi) ## upper limit on yield
