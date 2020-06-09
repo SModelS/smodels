@@ -702,6 +702,7 @@ def _evalExpression(stringExpr,cluster):
     Auxiliary method to evaluate a string expression using the weights of the elements in the cluster.
     Replaces the elements in stringExpr (in bracket notation) by their weights and evaluate the
     expression.
+
     e.g. computes the total weight of string expressions such as "[[[e^+]],[[e^-]]]+[[[mu^+]],[[mu^-]]]"
     or ratios of weights of string expressions such as "[[[e^+]],[[e^-]]]/[[[mu^+]],[[mu^-]]]"
     and so on...
@@ -714,13 +715,15 @@ def _evalExpression(stringExpr,cluster):
 
     #Get model for final state particles (database particles):
     model = cluster.dataset.globalInfo._databaseParticles
+    #Get txname final state:
+    finalState = cluster.txnames[0].finalState
     #Get cross section info from cluster (to generate zero cross section values):
     infoList = cluster.elements[0].weight.getInfo()
     #Get weights for elements appearing in stringExpr
     weightsDict = {}
     evalExpr = stringExpr.replace("'","").replace(" ","")
     for i,elStr in enumerate(elementsInStr(evalExpr)):
-        el = element.Element(elStr,model=model)
+        el = element.Element(elStr,finalState=finalState,model=model)
         weightsDict['w%i'%i] = crossSection.XSectionList(infoList)
         for el1 in cluster.elements:
             if el1 == el:
