@@ -25,10 +25,21 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
 
     :returns: likelihood
     """
+    assert ( upperLimit > 0. )
     def llhd ( nsig, mumax, sigma_exp, nll ):
+        ## need to account for the truncation!
+        ## first compute how many sigmas left of center is 0.
+        Zprime = mumax / sigma_exp
+        ## now compute the area of the truncated gaussian
+        A = stats.norm.cdf(Zprime)
         if nll:
-            return - stats.norm.logpdf ( nsig, mumax, sigma_exp )
-        return stats.norm.pdf ( nsig, mumax, sigma_exp )
+            return np.log(A ) - stats.norm.logpdf ( nsig, mumax, sigma_exp )
+        return stats.norm.pdf ( nsig, mumax, sigma_exp ) / A
+
+    dr = ( expectedUpperLimit - upperLimit ) / ( expectedUpperLimit + upperLimit )
+    if abs(dr)>.4:
+        logger.warn("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f)" % ( upperLimit, expectedUpperLimit, dr ) )
+        return None
 
     sigma_exp = expectedUpperLimit / 1.96 # the expected scale, eq 3.24 in arXiv:1202.3415
     if upperLimit < expectedUpperLimit:
