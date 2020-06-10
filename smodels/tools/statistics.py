@@ -5,7 +5,7 @@
    :synopsis: a module meant to collect various statistical algorithms.
               For now it only contains the procedure that computes an
               approximate Gaussian likelihood from an expected an observer upper
-              limit
+              limit. See https://arxiv.org/abs/1202.3415.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -25,7 +25,15 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
 
     :returns: likelihood
     """
-    sigma_exp = expectedUpperLimit / 1.96 # the expected scale
+    def llhd ( nsig, mumax, sigma_exp, nll ):
+        if nll:
+            return - stats.norm.logpdf ( nsig, mumax, sigma_exp )
+        return stats.norm.pdf ( nsig, mumax, sigma_exp )
+
+    sigma_exp = expectedUpperLimit / 1.96 # the expected scale, eq 3.24 in arXiv:1202.3415
+    if upperLimit < expectedUpperLimit:
+        ## underfluctuation. mumax = 0.
+        return llhd ( nsig, 0., sigma_exp, nll )
     denominator = np.sqrt(2.) * sigma_exp
     def root_func ( x ): ## we want the root of this one
         return (erf((upperLimit-x)/denominator)+erf(x/denominator)) / ( 1. + erf(x/denominator)) - .95
@@ -33,12 +41,10 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
     fA,fB = root_func ( 0. ), root_func ( max(upperLimit,expectedUpperLimit) )
     if np.sign(fA*fB) > 0.:
         ## the have the same sign
-        logger.error ( "when computing likelihood fA and fB have same sign")
+        logger.error ( "when computing likelihood: fA and fB have same sign")
         return None
     mumax = optimize.brentq ( root_func, 0., max(upperLimit, expectedUpperLimit), rtol=1e-03, xtol=1e-06 )
-    if nll:
-        return - stats.norm.logpdf ( nsig, mumax, sigma_exp )
-    return stats.norm.pdf ( nsig, mumax, sigma_exp )
+    return llhd ( nsig, mumax, sigma_exp, nll )
 
 def deltaChi2FromLlhd ( likelihood ):
     """ compute the delta chi2 value from a likelihood (convenience function) """
