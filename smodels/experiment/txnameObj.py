@@ -647,7 +647,7 @@ class TxNameData(object):
     @_memoize
     def getValueForPoint(self,point):
         """
-        Returns the UL or efficinecy for the point (in coordinates) using interpolation
+        Returns the UL or efficiency for the point (in coordinates) using interpolation
 
         :param point: Point in coordinate space (length = self.full_dimensionality)
 
