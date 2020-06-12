@@ -75,8 +75,12 @@ class DataSet(object):
                 finalState = tx.finalState
             else:
                 finalState = ['MET','MET']
+            if hasattr(tx, 'intermediateState'):
+                intermediateState = tx.intermediateState
+            else:
+                intermediateState = None
             for el in elementsInStr(str(tx.constraint)):
-                newEl = Element(el,finalState,
+                newEl = Element(el,finalState,intermediateState,
                         model=databaseParticles)
                 datasetElements.append(newEl)
         combos = itertools.combinations(datasetElements, 2)
