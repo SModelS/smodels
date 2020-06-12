@@ -39,6 +39,34 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
         return - stats.norm.logpdf ( nsig, mumax, sigma_exp )
     return stats.norm.pdf ( nsig, mumax, sigma_exp )
 
+
+def rvsFromLimits( upperLimit, expectedUpperLimit, n=1 ):
+    """ generates a sample of random variates, given expected and observed likelihoods.
+        the likelihood is modelled as a truncated Gaussian.
+    :param upperLimit: observed upper limit, as a yield (i.e. unitless)
+    :param expectedUpperLimit: expected upper limit, also as a yield
+    :param n: sample size
+
+    :returns: sample of random variates
+    """
+    sigma_exp = expectedUpperLimit / 1.96 # the expected scale
+    denominator = np.sqrt(2.) * sigma_exp
+    def root_func ( x ): ## we want the root of this one
+        return (erf((upperLimit-x)/denominator)+erf(x/denominator)) / ( 1. + erf(x/denominator)) - .95
+
+    fA,fB = root_func ( 0. ), root_func ( max(upperLimit,expectedUpperLimit) )
+    if np.sign(fA*fB) > 0.:
+        ## the have the same sign
+        logger.error ( "when computing likelihood for %s: fA and fB have same sign" % self.analysisId() )
+        return None
+    mumax = optimize.brentq ( root_func, 0., max(upperLimit, expectedUpperLimit), rtol=1e-03, xtol=1e-06 )
+    ret = []
+    while len(ret)<n:
+        tmp = stats.norm.rvs ( mumax, sigma_exp )
+        if tmp > 0.:
+            ret.append ( tmp )
+    return ret
+
 def deltaChi2FromLlhd ( likelihood ):
     """ compute the delta chi2 value from a likelihood (convenience function) """
     if likelihood == 0.:
