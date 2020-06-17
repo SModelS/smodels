@@ -44,6 +44,7 @@ New in Version 1.2.4:
   * bug fix for parallel xseccomputers
   * Introduced the SMODELS_CACHEDIR environment variable to allow for a different
     location of the cached database file
+  * fixed dataId bug in datasets
 
 New in Version 1.2.3:
 ^^^^^^^^^^^^^^^^^^^^^

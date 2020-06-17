@@ -630,10 +630,10 @@ class Database(object):
                     if not hits:
                         continue
 
-                if hasattr(dataset.dataInfo, 'dataID') and datasetIDs != ['all']:
+                if hasattr(dataset.dataInfo, 'dataId') and datasetIDs != ['all']:
                     hits=False
                     for pattern in datasetIDs:
-                        hits = fnmatch.filter ( [ dataset.dataInfo.dataID ], pattern )
+                        hits = fnmatch.filter ( [ dataset.dataInfo.dataId ], pattern )
                         if hits:
                             break
                             # continue
