@@ -57,6 +57,7 @@ New in Version 1.2.4:
 ^^^^^^^^^^^^^^^^^^^^^
   * Introduced the SMODELS_CACHEDIR environment variable to allow for a different 
     location of the cached database file
+  * fix dataId bug in datasets
 
 New in Version 1.2.3:
 ^^^^^^^^^^^^^^^^^^^^^

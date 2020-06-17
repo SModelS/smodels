@@ -16,6 +16,7 @@ Release v1.2.4, XXX 2020
 =======================================================
   * Introduced the SMODELS_CACHEDIR environment variable to allow for a different
     location of the cached database file
+	* fix dataId bug in datasets
 
 Release v1.2.3, Mon 27 Apr 2020
 =======================================================
