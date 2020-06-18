@@ -41,21 +41,21 @@ Total Number of Elements: 1
 Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 5.72E-01 [pb]
 Theory conditions:[None]
-Observed experimental limit: 3.81E+01 [fb]
-Observed r-Value: 15.002655551277469
+Observed experimental limit: 3.44E+01 [fb]
+Observed r-Value: 16.612158456789142
 
 ---------------Analysis Label = CMS-SUS-13-012
--------------------Dataset Label = 6NJet8_1000HT1250_450MHTinf
+-------------------Dataset Label = 6NJet8_1250HT1500_450MHTinf
 -------------------Txname Labels = ['T1']
 Analysis sqrts: 8.00E+00 [TeV]
-Theory prediction: 1.62E-03 [pb]
+Theory prediction: 1.13E-03 [pb]
 Theory conditions:[None]
-Observed experimental limit: 3.86E-01 [fb]
-Expected experimental limit: 2.64E-01 [fb]
-Observed r-Value: 4.20976357763319
-Expected r-Value: 6.155752067085059
-Chi2: 21.874862507567137
-Likelihood: 1.1973117723880388e-06
+Observed experimental limit: 3.00E-01 [fb]
+Expected experimental limit: 1.54E-01 [fb]
+Observed r-Value: 3.7547977747989045
+Expected r-Value: 7.317083951062815
+Chi2: 21.555786728437496
+Likelihood: 4.504032117342903e-06
 
 Total cross section considered (fb):  5.722E+02
 Total missing topology cross section (fb):  0.000E+00
