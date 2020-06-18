@@ -633,7 +633,7 @@ class Database(object):
                 if hasattr(dataset.dataInfo, 'dataId') and datasetIDs != ['all']:
                     hits=False
                     for pattern in datasetIDs:
-                        hits = fnmatch.filter ( [ dataset.dataInfo.dataId ], pattern )
+                        hits = fnmatch.filter ( [ str(dataset.dataInfo.dataId) ], str(pattern) )
                         if hits:
                             break
                             # continue
