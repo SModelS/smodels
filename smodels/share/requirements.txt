@@ -5,3 +5,4 @@ unum>=4.0.0
 argparse
 requests>=2.0.0
 pyslha>=3.1.0
+pyhf>=0.4.3
