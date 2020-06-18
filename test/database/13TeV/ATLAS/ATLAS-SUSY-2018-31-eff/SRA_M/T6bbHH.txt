@@ -7,7 +7,7 @@ checked: NO
 figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-31/figaux_03b.png;https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-31/figaux_03a.png
 dataUrl: https://www.hepdata.net/record/ins1748602?version=1&table=DM130_bestCombined_UpperLimit;https://www.hepdata.net/record/ins1748602?version=1&table=Efficiency_SRB and others
 source: ATLAS
-validated: TBD
+validated: True
 axes: [[x, y, 60.0], [x, y, 60.0]];[[x, y, y - 130.0], [x, y, y - 130.0]]
 finalState: ['MET', 'MET']
 efficiencyMap: [[[[1.3000E+03*GeV,2.0500E+02*GeV,6.0000E+01*GeV],[1.3000E+03*GeV,2.0500E+02*GeV,6.0000E+01*GeV]],0.0013815],
