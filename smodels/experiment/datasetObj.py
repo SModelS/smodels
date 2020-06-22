@@ -460,6 +460,7 @@ class CombinedDataSet(object):
                 return None
             # Getting the path to the json files
             jsonFiles = [os.path.join(self.path, js) for js in self.globalInfo.jsonFiles]
+            combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
             # Constructing the list of signals with subsignals matching each json
             datasets = [ds.getID() for ds in self._datasets]
             total = sum(nsig)
@@ -502,17 +503,17 @@ class CombinedDataSet(object):
                         if ul < ulMin:
                             ulMin = ul
                             i_best = i_ws
-                    self.bestCB = i_best # Keeping the index of the best combination for later
-                    logger.debug('Best combination : %d' % self.bestCB)
+                    self.bestCB = combinations[i_best] # Keeping the index of the best combination for later
+                    logger.debug('Best combination : %s' % self.bestCB)
                 # Computing upper limit using best combination
                 if expected:
                     try:
                         ret = ulMin/self.globalInfo.lumi
                     except NameError:
-                        ret = ulcomputer.ulSigma(expected=True, workspace_index=self.bestCB)
+                        ret = ulcomputer.ulSigma(expected=True, workspace_index=combinations.index(self.bestCB))
                         ret = ret/self.globalInfo.lumi
                 else:
-                    ret = ulcomputer.ulSigma(expected=False, workspace_index=self.bestCB)
+                    ret = ulcomputer.ulSigma(expected=False, workspace_index=combinations.index(self.bestCB))
                     ret = ret/self.globalInfo.lumi
                 logger.debug("pyhf upper limit : {}".format(ret))
                 return ret
@@ -547,6 +548,7 @@ class CombinedDataSet(object):
         elif hasattr(self.globalInfo, "jsonFiles"):
             # Getting the path to the json files
             jsonFiles = [os.path.join(self.path, js) for js in self.globalInfo.jsonFiles]
+            combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
             # Constructing the list of signals with subsignals matching each json
             datasets = [ds.getID() for ds in self._datasets]
             nsignals = list()
@@ -581,9 +583,9 @@ class CombinedDataSet(object):
                         if  ul < ulMin:
                             ulMin = ul
                             i_best = i_ws
-                    self.bestCB = i_best # Keeping the index of the best combination for later
+                    self.bestCB = combinations[i_best] # Keeping the index of the best combination for later
                     logger.debug('Best combination : %d' % self.bestCB)
-                return ulcomputer.likelihood(workspace_index=self.bestCB)
+                return ulcomputer.likelihood(workspace_index=combinations.index(self.bestCB))
         else:
             logger.error("Asked for combined likelihood, but no covariance or json file given." )
             return None
@@ -615,6 +617,7 @@ class CombinedDataSet(object):
         elif hasattr(self.globalInfo, "jsonFiles"):
             # Getting the path to the json files
             jsonFiles = [os.path.join(self.path, js) for js in self.globalInfo.jsonFiles]
+            combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
             # Constructing the list of signals with subsignals matching each json
             datasets = [ds.getID() for ds in self._datasets]
             nsignals = list()
@@ -649,9 +652,9 @@ class CombinedDataSet(object):
                         if  ul < ulMin:
                             ulMin = ul
                             i_best = i_ws
-                    self.bestCB = i_best # Keeping the index of the best combination for later
+                    self.bestCB = combinations[i_best] # Keeping the index of the best combination for later
                     logger.debug('Best combination : %d' % self.bestCB)
-                return ulcomputer.chi2(workspace_index=self.bestCB)
+                return ulcomputer.chi2(workspace_index=combinations.index(self.bestCB))
         else:
             logger.error("Asked for combined likelihood, but no covariance error given." )
             return None
