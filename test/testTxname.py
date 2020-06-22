@@ -141,8 +141,8 @@ class TxTest(unittest.TestCase):
                 initial, txname.txnameData._V, txname.txnameData.delta_x )
         data = txname.txnameData.coordinatesToData(coords, txname.txnameData._V,
                   txname.txnameData.delta_x)
-        data = np.array(data)
-        initial = np.array(initial)
+        data = np.array(data,dtype=object)
+        initial = np.array(initial,dtype=object)
         self.assertEqual(data.shape,initial.shape)
         dataFlat = np.array([x.asNumber(GeV) for x in flattenArray(data)])
         initialFlat = np.array([x.asNumber(GeV) for x in flattenArray(initial)])
@@ -161,9 +161,9 @@ class TxTest(unittest.TestCase):
                 initial, txname.txnameData._V, txname.txnameData.delta_x)
         data = txname.txnameData.coordinatesToData(coords, txname.txnameData._V,
                   txname.txnameData.delta_x)
-        data = np.array(data)
+        data = np.array(data,dtype=object)
         newInitial = ['*',[300.*GeV,100.*GeV]]
-        newInitial = np.array(newInitial)
+        newInitial = np.array(newInitial,dtype=object)
         self.assertEqual(data.shape,newInitial.shape)
         dataFlat = np.array([x.asNumber(GeV) if str(x) != '*' else -1 for x in flattenArray(data)])
         initialFlat = np.array([x.asNumber(GeV) if str(x) != '*' else -1 for x in flattenArray(newInitial)])
@@ -179,9 +179,9 @@ class TxTest(unittest.TestCase):
                 initial, txname.txnameData._V, txname.txnameData.delta_x)
         data = txname.txnameData.coordinatesToData(coords, txname.txnameData._V,
                   txname.txnameData.delta_x)
-        data = np.array(data)
+        data = np.array(data,dtype=object)
         newInitial = [[300.*GeV,50.*GeV], [200.*GeV,100.*GeV,1.*GeV]]
-        newInitial = np.array(newInitial)
+        newInitial = np.array(newInitial,dtype=object)
         self.assertEqual(data.shape,newInitial.shape)
         dataFlat = np.array([x.asNumber(GeV) for x in flattenArray(data)])
         initialFlat = np.array([x.asNumber(GeV) for x in flattenArray(newInitial)])
