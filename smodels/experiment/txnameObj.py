@@ -586,7 +586,7 @@ class TxNameData(object):
             raise SModelSError("Error obtaining units from value: %s " %values[:80])
 
 
-        self.y_values = np.array(values)[:,1]
+        self.y_values = np.array(values,dtype=object)[:,1]
         self.computeV(values)
 
     def getValueFor(self,element):
