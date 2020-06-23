@@ -191,6 +191,10 @@ class XSecComputer:
                 newx.add(x)
         return newx
 
+    def getPythia ( self ):
+        """ returns the pythia tool that is configured to be used """
+        return toolBox.ToolBox().get("pythia%d" % self.pythiaVersion )
+
     def compute ( self, sqrts, slhafile,  lhefile=None, unlink=True, loFromSlha=None,
                   pythiacard=None, ssmultipliers=None ):
         """
@@ -233,7 +237,7 @@ class XSecComputer:
                 logger.warning ( "supplied signal strength multipliers, but LO xsecs are taken from file. Will not apply them" )
         else:
             logger.info("get LO cross sections from pythia%d" % self.pythiaVersion )
-            tool = toolBox.ToolBox().get("pythia%d" % self.pythiaVersion )
+            tool = self.getPythia()
             tool.tempdir = None # reset, to make sure it works in parallel mode
             tool.nevents = self.nevents
             tool.sqrts = sqrts / TeV
