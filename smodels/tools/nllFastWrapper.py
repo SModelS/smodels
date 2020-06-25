@@ -137,10 +137,15 @@ class NllFastWrapper(WrapperBase):
 
         """
         current_dir = os.getcwd()
-        os.chdir ( self.cdPath )
-        nll_output = executor.getoutput( this )
-        os.chdir(current_dir)
-        return nll_output
+        try:
+            os.chdir ( self.cdPath )
+            nll_output = executor.getoutput( this )
+            os.chdir(current_dir)
+            return nll_output
+        except Exception as e:
+            ## make sure we always cd back!
+            os.chdir(current_dir)
+            raise e
 
     def _compute ( self, energy, pIDs, pdf, squarkmass, gluinomass ):
         process = self._getProcessName(pIDs)
