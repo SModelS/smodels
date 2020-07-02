@@ -512,7 +512,9 @@ class TxNameData(object):
         if transVector is not None:
             massAndWidths = massAndWidths + transVector
 
-        massAndWidths = massAndWidths.tolist()[0]
+        massAndWidths = massAndWidths.tolist()
+        if type(massAndWidths[0])==list:
+            massAndWidths = massAndWidths[0]
         #Extract masses and transformed widths
         masses = massAndWidths[:len(massAndWidths)-len(self.widthPosition)]
         xwidths = massAndWidths[len(massAndWidths)-len(self.widthPosition):]
