@@ -76,7 +76,7 @@ class PyhfData:
                 self.channelsInfo = None
                 return
             for i_ch, ch in enumerate(ws['channels']):
-                if 'SR' in ch['name']:
+                if ch['name'][:2] == 'SR': # if channel name starts with 'SR'
                     wsChannelsInfo['signalRegions'].append({'path':'/channels/'+str(i_ch)+'/samples/0', # Path of the new sample to add (signal prediction)
                                                             'size':len(ch['samples'][0]['data'])}) # Number of bins
                 if 'VR' in ch['name'] or 'CR' in ch['name']:
