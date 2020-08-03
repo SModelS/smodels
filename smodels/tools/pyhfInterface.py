@@ -246,7 +246,7 @@ class PyhfUpperLimitComputer:
         model = workspace.model(modifier_settings=msettings)
         test_poi = 1.
         _, nllh = pyhf.infer.mle.fixed_poi_fit(test_poi, workspace.data(model), model, return_fitted_val=True)
-        return np.exp(-nllh.tolist()[0]/2)
+        return np.exp(-nllh.tolist()/2)
 
     def chi2(self, workspace_index=None):
         """
@@ -290,7 +290,7 @@ class PyhfUpperLimitComputer:
         logger.debug(workspace['channels'][0]['samples'][0])
         _, maxNllh = pyhf.infer.mle.fixed_poi_fit(1., workspace.data(model), model, return_fitted_val=True)
         logger.debug('maxNllh : {}'.format(maxNllh))
-        return (maxNllh - nllh).tolist()[0]
+        return (maxNllh - nllh).tolist()
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of looking for mu bounds
