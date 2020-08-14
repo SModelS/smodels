@@ -172,8 +172,8 @@ class TxName(object):
             query += self.globalInfo.id + ":ul:"
             query += self.txName + ":"
             query += self.getMassVectorFromElement ( element )
-            logger.info ( "sending query %s to %s:%d" % \
-                          ( query, dbClient.servername, dbClient.serverport ) )
+            logger.info ( "sending ul query %s to %s:%d" % \
+                          ( query, self.dbClient.servername, self.dbClient.port ) )
             from smodels.tools.physicsUnits import fb
             return self.dbClient.query ( query )
 
@@ -279,6 +279,10 @@ class TxName(object):
         """
         if type(element)==list:
             return str(element).replace(" [GeV]","").replace(" ","")
+        from smodels.theory.clusterTools import AverageElement
+        if type(element) == AverageElement:
+            # ret += str(element.mass).replace(" [GeV]","").replace(" ","")
+            return str(element.mass).replace(" [GeV]","").replace(" ","")
         ret = "["
         for i,br in enumerate(element.branches):
             ret += str(br.mass).replace(" [GeV]","").replace(" ","")
@@ -287,6 +291,22 @@ class TxName(object):
         ret += "]"
         # print ( "getMassVectorFromElement returning", ret )
         return ret
+
+    def getQueryStringForElement ( self, element ):
+        ## we have a databaseClient, so we send the request
+        ## over the network
+        # query = "obs:ATLAS-SUSY-2013-05:ul:T2bb:[[300,100],[300,100]]"
+        query = "obs:"
+        #if expected:
+        #    query = "exp:"
+        query += self.globalInfo.id + ":"
+        dId = self._infoObj.dataId
+        if dId == None:
+            dId = "ul"
+        query += dId + ":"
+        query += self.txName + ":"
+        query += self.getMassVectorFromElement ( element )
+        return query
 
     def getEfficiencyFor(self,element):
         """
@@ -300,32 +320,30 @@ class TxName(object):
         :param element: Element object or mass array with units.
         :return: efficiency (float)
         """
-        if hasattr ( self, "dbClient" ):
-            ## we have a databaseClient, so we send the request
-            ## over the network
-            # query = "obs:ATLAS-SUSY-2013-05:ul:T2bb:[[300,100],[300,100]]"
-            query = "obs:"
-            #if expected:
-            #    query = "exp:"
-            query += self.globalInfo.id + ":"
-            dId = self._infoObj.dataId
-            if dId == None:
-                dId = "ul"
-            query += dId + ":"
-            query += self.txName + ":"
-            query += self.getMassVectorFromElement ( element )
-            logger.info ( "sending query %s to %s:%d" % \
-                          ( query, self.dbClient.servername, self.dbClient.port ) )
-            #print ( "query will be", query )
-            #return 0.001
-            return self.dbClient.query ( query )
 
         if self.txnameData.dataType == 'efficiencyMap':
-            eff = self.txnameData.getValueFor(element)
+            if hasattr ( self, "dbClient" ):
+                query = self.getQueryStringForElement ( element )
+                logger.info ( "sending em query %s to %s:%d" % \
+                              ( query, self.dbClient.servername, self.dbClient.port ) )
+                #print ( "query will be", query )
+                #return 0.001
+                eff = self.dbClient.query ( query )
+            else:
+                eff = self.txnameData.getValueFor(element)
+                
             if not eff or math.isnan(eff):
                 eff = 0. #Element is outside the grid or has zero efficiency
         elif self.txnameData.dataType == 'upperLimit':
-            ul = self.txnameData.getValueFor(element)
+            if hasattr ( self, "dbClient" ):
+                query = self.getQueryStringForElement ( element )
+                logger.info ( "sending query %s to %s:%d" % \
+                              ( query, self.dbClient.servername, self.dbClient.port ) )
+                #print ( "query will be", query )
+                #return 0.001
+                ul = self.dbClient.query ( query )
+            else:
+                ul = self.txnameData.getValueFor(element)
             if isinstance(element,Element):
                 element._upperLimit = ul #Store the upper limit for convenience
             if ul is None:

@@ -14,7 +14,6 @@ from smodels.tools.runSModelS import run
 from os.path import join, basename
 from smodels.installation import installDirectory as iDir
 from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
-from databaseLoader import database ## to make sure the db exists
  
 def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None, fname=None ):
     """
@@ -111,8 +110,11 @@ def runMain( filename, timeout = 0, suppressStdout=True, development=False,
     if suppressStdout:
         level = 'error'
         to = os.devnull
+    database = None
     if overridedatabase != None:
         database = overridedatabase
+    else:
+        from databaseLoader import database ## to make sure the db exists
     with redirector.stdout_redirected ( to = to ):
         out = join( iDir(), "test/unitTestOutput" )
         setLogLevel ( level )

@@ -2,7 +2,10 @@
 
 from smodels.experiment.databaseObj import Database
 from smodels.tools.physicsUnits import GeV
-import socket, atexit, time, os, sys
+import socket, atexit, time, os, sys, copy
+import unum
+
+unum.Unum.VALUE_FORMAT = "%0.16E"
 
 servers = []
 
@@ -13,6 +16,12 @@ def shutdown ():
 
 class DatabaseServer:
     def __init__ ( self, dbpath, servername = None, port = None, verbose = "info" ):
+        verbose = verbose.lower()
+        verbs = { "err": 10, "warn": 20, "info": 30, "debug": 40 }
+        self.verbose = 50
+        for k,v in verbs.items():
+            if k in verbose:
+                self.verbose = v
         if port == None:
             port = 31770
             while self.is_port_in_use ( port ):
@@ -27,7 +36,6 @@ class DatabaseServer:
         self.port = port
         self.packetlength = 256
         self.nlookups = 0
-        self.verbose = verbose
         servers.append ( self )
 
     def is_port_in_use(self, port):
@@ -74,13 +82,15 @@ class DatabaseServer:
         tokens = data.split(":")
         anaId, dType, txname = tokens[1], tokens[2], tokens[3]
         massv = eval(tokens[4])
+        massvunits = copy.deepcopy ( massv )
         for ibr,br in enumerate(massv):
             for iel,el in enumerate(br):
-                    massv[ibr][iel]=el*GeV
+                    massvunits[ibr][iel]=el*GeV
         expected = False 
         if tokens[0] == "exp":
             expected = True
-        self.pprint ( 'looking up result for %s %s %s %s' % ( anaId, txname, dType, massv ) )
+        self.pprint ( 'looking up for %s,%s,%s,%s' % \
+                      ( anaId, dType, txname, massv ) )
         for exp in self.expResults:
             if not exp.globalInfo.id == anaId:
                 continue
@@ -102,7 +112,7 @@ class DatabaseServer:
                             res = txn.txnameDataExp.getValueForPoint ( coords )
                     else:
                         res = txn.txnameData.getValueForPoint ( coords )
-                    print ( "now query", massv, anaId, ds.getType(), txname, ":", res )
+                    # print ( "now query", massv, anaId, ds.getType(), txname, ":", res )
                     return str(res)
         return "None"
 
@@ -129,7 +139,8 @@ class DatabaseServer:
             self.finish()
 
     def pprint ( self, *args ):
-        print ( "[databaseServer]", " ".join(map(str,args)) )
+        if self.verbose > 25:
+            print ( "[databaseServer]", " ".join(map(str,args)) )
 
     def initialize( self ):
         self.db = Database ( self.dbpath )
@@ -162,9 +173,12 @@ if __name__ == "__main__":
     argparser.add_argument ( '-p', '--port',
             help='port to listen to [31770]',
             type=int, default=None )
+    argparser.add_argument ( '-v', '--verbose',
+            help='verbosity [info]',
+            type=str, default="info" )
     argparser.add_argument ( '-s', '--servername',
             help='server name, if not specified then determined from socket [None]',
             type=str, default=None )
     args = argparser.parse_args()
-    server = DatabaseServer ( args.dbpath, args.servername, args.port )
+    server = DatabaseServer ( args.dbpath, args.servername, args.port, args.verbose )
     server.run()
