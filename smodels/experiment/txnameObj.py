@@ -162,6 +162,21 @@ class TxName(object):
         :param element: Element object or mass array (with units)
         :param expected: query self.txnameDataExp
         """
+        if hasattr ( self, "dbClient" ):
+            ## we have a databaseClient, so we send the request
+            ## over the network
+            # query = "obs:ATLAS-SUSY-2013-05:ul:T2bb:[[300,100],[300,100]]"
+            query = "obs:"
+            if expected:
+                query = "exp:"
+            query += self.globalInfo.id + ":ul:"
+            query += self.txName + ":"
+            query += self.getMassVectorFromElement ( element )
+            logger.info ( "sending query %s to %s:%d" % \
+                          ( query, dbClient.servername, dbClient.serverport ) )
+            from smodels.tools.physicsUnits import fb
+            return self.dbClient.query ( query )
+
 
         if not self.txnameData.dataType == 'upperLimit':
             logger.error("getULFor method can only be used in UL-type data.")
@@ -256,6 +271,23 @@ class TxName(object):
             return True
         return False
 
+
+    def getMassVectorFromElement(self, element ):
+        """ given element, extract the mass vector for the 
+            server query. element can be list of masses or "Element"
+        :returns: eg [[300,100],[300,100]]
+        """
+        if type(element)==list:
+            return str(element).replace(" [GeV]","").replace(" ","")
+        ret = "["
+        for i,br in enumerate(element.branches):
+            ret += str(br.mass).replace(" [GeV]","").replace(" ","")
+            if i+1 < len(element.branches):
+                ret += ","
+        ret += "]"
+        # print ( "getMassVectorFromElement returning", ret )
+        return ret
+
     def getEfficiencyFor(self,element):
         """
         For upper limit results, checks if the input element falls inside the
@@ -268,6 +300,25 @@ class TxName(object):
         :param element: Element object or mass array with units.
         :return: efficiency (float)
         """
+        if hasattr ( self, "dbClient" ):
+            ## we have a databaseClient, so we send the request
+            ## over the network
+            # query = "obs:ATLAS-SUSY-2013-05:ul:T2bb:[[300,100],[300,100]]"
+            query = "obs:"
+            #if expected:
+            #    query = "exp:"
+            query += self.globalInfo.id + ":"
+            dId = self._infoObj.dataId
+            if dId == None:
+                dId = "ul"
+            query += dId + ":"
+            query += self.txName + ":"
+            query += self.getMassVectorFromElement ( element )
+            logger.info ( "sending query %s to %s:%d" % \
+                          ( query, self.dbClient.servername, self.dbClient.port ) )
+            #print ( "query will be", query )
+            #return 0.001
+            return self.dbClient.query ( query )
 
         if self.txnameData.dataType == 'efficiencyMap':
             eff = self.txnameData.getValueFor(element)

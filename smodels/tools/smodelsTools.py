@@ -86,6 +86,22 @@ def main():
     iPlots.add_argument('-v', '--verbosity', type=str, default="info",
         help="Verbosity (debug, info, warning, error)")
 
+    proxydb = subparsers.add_parser( 'proxydb', description=
+								                     "create proxy databases for network use")
+    proxydb.add_argument ( '-i', '--inputfile',
+            help='input database file [db31.pcl]',
+            type=str, default="db31.pcl"  )
+    proxydb.add_argument ( '-s', '--servername',
+            help='the server name [localhost]',
+            type=str, default="localhost"  )
+    proxydb.add_argument ( '-p', '--serverport',
+            help='the server port [31770]',
+            type=int, default="31770"  )
+    proxydb.add_argument ( '-o', '--outputfile',
+            help='input database file [proxy31.pcl]',
+            type=str, default="proxy31.pcl"  )
+    proxydb.add_argument('-r', '--run', help='start the server upon creation',
+                           action='store_true')
 
     toolbox = subparsers.add_parser( 'toolbox', description=
 								                     "Facility to control external dependencies")
@@ -115,6 +131,9 @@ def main():
     if args.subparser_name == 'toolbox':
         from smodels.tools import toolBox
         toolBox.main ( args )
+    if args.subparser_name == 'proxydb':
+        from smodels.tools import proxyDBCreator
+        proxyDBCreator.main ( args )
     if args.subparser_name == 'xseccomputer':
         from smodels.tools import xsecComputer
         xsecComputer.main(args)

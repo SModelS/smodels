@@ -94,9 +94,15 @@ def importModule ( filename ):
     return output_module.smodelsOutput
  
 def runMain( filename, timeout = 0, suppressStdout=True, development=False,
-             inifile = "testParameters.ini" ):
+             inifile = "testParameters.ini", overridedatabase = None ):
     """ run SModelS proper 
     :param filename: slha file
+    :param timeout: timeout for the operation, given in seconds
+    :param suppressStdout: if True, then redirect stdout and stderr to /dev/null
+    :param development: development run (FIXME what does that entail?)
+    :param inifile: the config file to be used
+    :param overridedatabase: if not None, then use the provided database,
+           else use databaseLoader.database
     :returns: printer output
     """
     to = None
@@ -105,6 +111,8 @@ def runMain( filename, timeout = 0, suppressStdout=True, development=False,
     if suppressStdout:
         level = 'error'
         to = os.devnull
+    if overridedatabase != None:
+        database = overridedatabase
     with redirector.stdout_redirected ( to = to ):
         out = join( iDir(), "test/unitTestOutput" )
         setLogLevel ( level )
