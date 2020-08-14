@@ -92,11 +92,11 @@ def main():
             help='input database file [db31.pcl]',
             type=str, default="db31.pcl"  )
     proxydb.add_argument ( '-s', '--servername',
-            help='the server name [localhost]',
-            type=str, default="localhost"  )
+            help='the server name [None]',
+            type=str, default=None  )
     proxydb.add_argument ( '-p', '--serverport',
             help='the server port [31770]',
-            type=int, default="31770"  )
+            type=int, default=None  )
     proxydb.add_argument ( '-o', '--outputfile',
             help='input database file [proxy31.pcl]',
             type=str, default="proxy31.pcl"  )

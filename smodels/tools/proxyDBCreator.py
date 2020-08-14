@@ -2,6 +2,7 @@
 
 from smodels.tools.databaseClient import DatabaseClient
 from smodels.experiment.databaseObj import Database
+import socket
 
 class ProxyDBCreater:
     def __init__ ( self, inputfile ):
@@ -9,6 +10,11 @@ class ProxyDBCreater:
         self.database = Database ( self.inputfile )
 
     def create ( self, servername, serverport ):
+        if servername == None:
+            servername = socket.gethostname()
+            self.pprint ( "determined servername as '%s'" % servername )
+        if serverport == None:
+            serverport = 31770
         self.servername = servername
         self.serverport = serverport
         client = DatabaseClient ( servername, serverport )
@@ -35,7 +41,7 @@ class ProxyDBCreater:
         servercmd = "../smodels/tools/databaseServer.py -p %d -d %s" % \
                       ( self.serverport, self.inputfile ) 
         if really:
-            self.pprint ( "starting a server on %s as:" % self.servername )
+            self.pprint ( "starting a server on %s" % self.servername )
             import subprocess
             subprocess.getoutput ( servercmd )
         else:

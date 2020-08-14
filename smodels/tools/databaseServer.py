@@ -2,9 +2,7 @@
 
 from smodels.experiment.databaseObj import Database
 from smodels.tools.physicsUnits import GeV
-import socket
-import atexit
-import time
+import socket, atexit, time, os, sys
 
 servers = []
 
@@ -14,7 +12,12 @@ def shutdown ():
         i.finish()
 
 class DatabaseServer:
-    def __init__ ( self, dbpath, servername, port, verbose = "info" ):
+    def __init__ ( self, dbpath, servername = None, port = None, verbose = "info" ):
+        if port == None:
+            port = 31770
+            while self.is_port_in_use ( port ):
+                port += 1
+            self.pprint ( "using first free port %d" % port )
         if servername == None:
             servername = socket.gethostname()
             self.pprint ( "determined servername as '%s'" % servername )
@@ -27,13 +30,36 @@ class DatabaseServer:
         self.verbose = verbose
         servers.append ( self )
 
-    def run ( self ):
+    def is_port_in_use(self, port):
+        """ check if port is in use """
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            return s.connect_ex(('localhost', port)) == 0
+
+    def run ( self, nonblocking = False ):
+        """ run server
+        :param nonblock: run in nonblocking mode (not yet implemented)
+        """ 
+        if nonblocking:
+            pid = os.fork()
+            if pid == 0:
+                return
         self.initialize()
+        
+    def shutdown ( self ):
+        self.pprint ( "Received shutdown request from client" )
+        self.finish()
+        try:  ## remove from list of servers
+            servers.remove ( s )
+        except:
+            pass
+        sys.exit()
 
     def parseData ( self, data ):
         """ parse the data packet """
         data=data[2:-1]
         self.pprint ( 'received "%s"' % data )
+        if data.startswith ( "shutdown" ):
+            self.shutdown()
         if not data.startswith ( "query " ):
             self.pprint ( "I dont understand the data packet %s" % data )
             return
@@ -135,7 +161,7 @@ if __name__ == "__main__":
             type=str, default="./original.pcl" )
     argparser.add_argument ( '-p', '--port',
             help='port to listen to [31770]',
-            type=int, default=31770 )
+            type=int, default=None )
     argparser.add_argument ( '-s', '--servername',
             help='server name, if not specified then determined from socket [None]',
             type=str, default=None )
