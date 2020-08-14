@@ -4,10 +4,11 @@ import socket, sys
 from smodels.tools.physicsUnits import fb, pb
 
 class DatabaseClient:
-    def __init__ ( self, servername, port ):
+    def __init__ ( self, servername, port, verbose = "info" ):
         self.servername = servername
         self.port = port
         self.packetlength = 256
+        self.verbose = verbose
 
     def query ( self, msg ):
         """ query a certain result, msg is eg.
@@ -49,7 +50,8 @@ class DatabaseClient:
             del self.sock
 
     def pprint ( self, *args ):
-        print ( "[databaseClient]", " ".join(map(str,args)) )
+        if self.verbose == "info":
+            print ( "[databaseClient]", " ".join(map(str,args)) )
 
     def initialize( self ):
         if hasattr ( self, "sock" ):

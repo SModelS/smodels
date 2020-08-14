@@ -19,14 +19,16 @@ from unitTestHelpers import equalObjs, runMain, importModule
 import time
 import subprocess
 
-from smodels.tools.smodelsLogging import logger
+from smodels.tools.smodelsLogging import logger, setLogLevel
+        
+setLogLevel ( "info" )
 
 class ServerTest(unittest.TestCase):
     def testRun(self):
-        startserver = "../smodels/tools/smodelsTools.py proxydb -i database/db31.pcl -o ./proxy31.pcl -r"
+        startserver = "../smodels/tools/smodelsTools.py proxydb -p 31779 -i database/db31.pcl -o ./proxy31.pcl -r"
         cmd = startserver.split(" ")
         print ( "starting server %s" % startserver )
-        subprocess.Popen ( cmd )
+        # subprocess.Popen ( cmd )
         print ( "started server" )
         time.sleep(3)
         filename = "./testFiles/slha/simplyGluino.slha"

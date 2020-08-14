@@ -14,12 +14,17 @@ def shutdown ():
         i.finish()
 
 class DatabaseServer:
-    def __init__ ( self, dbpath, port ):
+    def __init__ ( self, dbpath, servername, port, verbose = "info" ):
+        if servername == None:
+            servername = socket.gethostname()
+            self.pprint ( "determined servername as '%s'" % servername )
+        self.servername = servername
         self.dbpath = dbpath
         self.t0 = time.time()
         self.port = port
         self.packetlength = 256
         self.nlookups = 0
+        self.verbose = verbose
         servers.append ( self )
 
     def run ( self ):
@@ -104,7 +109,7 @@ class DatabaseServer:
         self.db = Database ( self.dbpath )
         self.expResults = self.db.expResultList
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_address = ('localhost', self.port )
+        self.server_address = ( self.servername, self.port )
         self.pprint ( 'starting up on %s port %s' % self.server_address )
         self.pprint ( 'I will be serving database %s at %s' % \
                       (self.db.databaseVersion, self.dbpath ) )
@@ -131,6 +136,9 @@ if __name__ == "__main__":
     argparser.add_argument ( '-p', '--port',
             help='port to listen to [31770]',
             type=int, default=31770 )
+    argparser.add_argument ( '-s', '--servername',
+            help='server name, if not specified then determined from socket [None]',
+            type=str, default=None )
     args = argparser.parse_args()
-    server = DatabaseServer ( args.dbpath, args.port )
+    server = DatabaseServer ( args.dbpath, args.servername, args.port )
     server.run()

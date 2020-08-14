@@ -27,7 +27,6 @@ class ProxyDBCreater:
         """ store the outputfile """
         self.pprint ( "writing to %s" % outputfile )
         self.database.createBinaryFile ( outputfile )
-        self.pprint ( "start a server on %s as:" % self.servername )
 
     def run ( self, really ):
         """ now run the server
@@ -35,10 +34,13 @@ class ProxyDBCreater:
         """
         servercmd = "../smodels/tools/databaseServer.py -p %d -d %s" % \
                       ( self.serverport, self.inputfile ) 
-        self.pprint ( servercmd )
         if really:
+            self.pprint ( "starting a server on %s as:" % self.servername )
             import subprocess
             subprocess.getoutput ( servercmd )
+        else:
+            print ( "not started a server. you can start one yourself:" )
+            self.pprint ( servercmd )
                                   
 
 def main ( args ): ## needed for smodelsTools
