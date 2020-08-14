@@ -97,6 +97,9 @@ def main():
     proxydb.add_argument ( '-p', '--serverport',
             help='the server port [31770]',
             type=int, default=None  )
+    proxydb.add_argument ( '-l', '--symlink',
+            help='set a symlink from outputfile to default.pcl',
+            action='store_true'  )
     proxydb.add_argument ( '-o', '--outputfile',
             help='input database file [proxy31.pcl]',
             type=str, default="proxy31.pcl"  )

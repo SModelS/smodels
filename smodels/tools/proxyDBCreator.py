@@ -2,7 +2,7 @@
 
 from smodels.tools.databaseClient import DatabaseClient
 from smodels.experiment.databaseObj import Database
-import socket
+import socket, os, subprocess
 
 class ProxyDBCreater:
     def __init__ ( self, inputfile ):
@@ -31,15 +31,31 @@ class ProxyDBCreater:
 
     def store ( self, outputfile ):
         """ store the outputfile """
+        self.outputfile = outputfile 
         self.pprint ( "writing to %s" % outputfile )
         self.database.createBinaryFile ( outputfile )
+
+    def symlink ( self ):
+        """ set a symlink from self.outputfile to default.pcl """
+        dirname = os.path.dirname ( self.outputfile )
+        symfile = f"{dirname}/default.pcl"
+        self.pprint ( "setting a symlink from %s to %s" % \
+                      ( self.outputfile, symfile ) )
+        if os.path.exists ( symfile ):
+            os.unlink ( symfile )
+        cmd = f"ln -s {self.outputfile} {symfile}"
+        subprocess.getoutput ( cmd )
 
     def run ( self, really ):
         """ now run the server
         :param really: if False, then only write out command
         """
-        servercmd = "../smodels/tools/databaseServer.py -p %d -d %s" % \
-                      ( self.serverport, self.inputfile ) 
+        dirname = os.path.dirname ( __file__ )
+        inputfile = self.inputfile
+        if not "/" in inputfile:
+            inputfile = os.getcwd() + "/" + inputfile
+        servercmd = "%s/databaseServer.py -p %d -d %s" % \
+                      ( dirname, self.serverport, inputfile ) 
         if really:
             self.pprint ( "starting a server on %s" % self.servername )
             import subprocess
@@ -54,3 +70,5 @@ def main ( args ): ## needed for smodelsTools
     creater.create( args.servername, args.serverport )
     creater.store ( args.outputfile )
     creater.run ( args.run )
+    if args.symlink:
+        creater.symlink()
