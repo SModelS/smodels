@@ -5,8 +5,9 @@ from smodels.experiment.databaseObj import Database
 import socket, os, subprocess
 
 class ProxyDBCreater:
-    def __init__ ( self, inputfile ):
+    def __init__ ( self, inputfile, verbose=True ):
         self.inputfile = inputfile
+        self.verbose = verbose
         self.database = Database ( self.inputfile )
 
     def create ( self, servername, serverport ):
@@ -27,7 +28,8 @@ class ProxyDBCreater:
                         del self.database.expResultList[e].datasets[d].txnameList[t].txnameDataExp.tri
 
     def pprint ( self, *args ):
-        print ( "[ProxyDBCreater]", " ".join(map(str,args)) )
+        if self.verbose:
+            print ( "[ProxyDBCreater]", " ".join(map(str,args)) )
 
     def store ( self, outputfile ):
         """ store the outputfile """
