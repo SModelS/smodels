@@ -80,8 +80,11 @@ class DatabaseServer:
     def lookUpResult ( self, data ):
         self.nlookups += 1
         tokens = data.split(":")
-        anaId, dType, txname = tokens[1], tokens[2], tokens[3]
-        massv = eval(tokens[4])
+        anaId = tokens[1]
+        dType = ":". join ( tokens[2:-2] )
+
+        txname = tokens[-2]
+        massv = eval(tokens[-1])
         massvunits = copy.deepcopy ( massv )
         for ibr,br in enumerate(massv):
             for iel,el in enumerate(br):
