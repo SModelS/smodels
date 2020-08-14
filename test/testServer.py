@@ -23,7 +23,7 @@ from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.tools.databaseClient import DatabaseClient
 from smodels.tools.databaseServer import DatabaseServer
         
-setLogLevel ( "info" )
+setLogLevel ( "warn" )
 
 class ServerTest(unittest.TestCase):
     def mestRun(self):
@@ -53,7 +53,7 @@ class ServerTest(unittest.TestCase):
 
         startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i database/db31.pcl -o ./proxy31.pcl -r"
         cmd = startserver.split(" ")
-        print ( "starting server %s" % startserver )
+        # print ( "starting server %s" % startserver )
         subprocess.Popen ( cmd )
 
         time.sleep ( 2 )
@@ -62,7 +62,7 @@ class ServerTest(unittest.TestCase):
         outputfile = runMain(filename,suppressStdout = True, overridedatabase = db )
         smodelsOutput = importModule ( outputfile )
         
-        client = DatabaseClient ( port = port ) 
+        client = DatabaseClient ( port = port, verbose = "warn" ) 
         client.send_shutdown()
 
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 
