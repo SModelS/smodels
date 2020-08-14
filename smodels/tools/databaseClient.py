@@ -28,7 +28,7 @@ class DatabaseClient:
         self.initialize()
         if not msg.startswith ( "query " ):
             msg = "query " + msg
-        self.send( msg )
+        return self.send( msg )
 
     def send ( self, message, amount_expected=32 ):
         """ send the message.
@@ -55,12 +55,14 @@ class DatabaseClient:
             data = data.replace(" [fb]","*fb")
             data = data.replace(" [pb]","*pb")
             data = eval(data)
-            self.pprint ( 'received "%s"' % data )
+            self.pprint ( 'received "%s", %s' % ( data, type(data) ) )
+            return data
 
         finally:
             self.pprint ( 'closing socket' )
             self.sock.close()
             del self.sock
+
 
     def pprint ( self, *args ):
         if self.verbose == "info":
