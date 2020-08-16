@@ -18,7 +18,7 @@ class ProxyDBCreater:
             serverport = 31770
         self.servername = servername
         self.serverport = serverport
-        client = DatabaseClient ( servername, serverport )
+        client = DatabaseClient ( servername, serverport, verbose="warn" )
         for e,expRes in enumerate(self.database.expResultList):
             for d,dataset in enumerate(expRes.datasets):
                 for t,txn in enumerate(dataset.txnameList):

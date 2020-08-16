@@ -2,6 +2,7 @@
 
 import socket, sys, time, random
 from smodels.tools.physicsUnits import fb, pb
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 class DatabaseClient:
     def __init__ ( self, servername = None, port = None, verbose = "info" ):
@@ -45,24 +46,39 @@ class DatabaseClient:
             # Send data
             # msg = b'query obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]'
             self.pprint ( 'sending "%s"' % message )
-            self.sock.sendall(message)
+            self.ntries = 0
+            while self.ntries < 10:
+            try:
+                self.sock.sendall(message)
 
-            # Look for the response
-            amount_received = 0
+                # Look for the response
+                amount_received = 0
+                
+                self.pprint ( 'sent message' )
+                if amount_expected <= 0:
+                    return
+                
+                while amount_received < amount_expected:
+                    data = self.sock.recv( self.packetlength )
+                    amount_received += len(data)
+                data = str(data)[2:-1]
+                data = data.replace(" [fb]","*fb")
+                data = data.replace(" [pb]","*pb")
+                data = eval(data)
+                self.log ( 'received "%s"' % ( data ) )
+                return data
+
+            except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError) as e:
+                self.ntries += 1
+                dt = random.uniform ( 1, 5 ) + 5*self.ntries
+                self.pprint ( 'could not connect to %s. trying again in %d seconds' % \
+                              ( self.nameAndPort(), dt ) )
+                time.sleep ( dt )
+            self.pprint ( f'could not connect after trying {ntries} times. aborting' )
+            raise SModelSError ( "Could not connect to database: %s" % str(e) )
+        self.pprint ( f'could not connect after trying {ntries} times. aborting' )
+        raise SModelSError ( "Could not connect to database" )
             
-            self.pprint ( 'sent message' )
-            if amount_expected <= 0:
-                return
-            
-            while amount_received < amount_expected:
-                data = self.sock.recv( self.packetlength )
-                amount_received += len(data)
-            data = str(data)[2:-1]
-            data = data.replace(" [fb]","*fb")
-            data = data.replace(" [pb]","*pb")
-            data = eval(data)
-            self.log ( 'received "%s"' % ( data ) )
-            return data
 
         finally:
             self.pprint ( 'closing socket' )
@@ -70,11 +86,11 @@ class DatabaseClient:
             del self.sock
 
     def log ( self, *args ):
-        if self.verbose > 35:
+        if type(self.verbose)==str or self.verbose > 35:
             print ( "[databaseClient]", " ".join(map(str,args)) )
 
     def pprint ( self, *args ):
-        if self.verbose > 25:
+        if type(self.verbose)==str or self.verbose > 25:
             print ( "[databaseClient]", " ".join(map(str,args)) )
 
     def nameAndPort ( self ):
@@ -94,13 +110,16 @@ class DatabaseClient:
             try:
                 self.sock.connect( self.server_address )
                 return
-            except ConnectionRefusedError:
+            except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError) as e:
                 self.ntries += 1
                 dt = random.uniform ( 1, 5 ) + 5*self.ntries
                 self.pprint ( 'could not connect to %s. trying again in %d seconds' % \
                               ( self.nameAndPort(), dt ) )
                 time.sleep ( dt )
+            self.pprint ( f'could not connect after trying {ntries} times. aborting' )
+            raise SModelSError ( "Could not connect to database: %s" % str(e) )
         self.pprint ( f'could not connect after trying {ntries} times. aborting' )
+        raise SModelSError ( "Could not connect to database" )
 
 if __name__ == "__main__":
     import argparse
