@@ -13,7 +13,7 @@ servers = []
 def shutdownAll ():
     print ( "[databaseServer] shutting down servers" )
     for i in servers:
-        i.shutdown()
+        i.shutdown( fromwhere = "atexit" )
 
 class DatabaseServer:
     def __init__ ( self, dbpath, servername = None, port = None, verbose = "info" ):
@@ -54,8 +54,8 @@ class DatabaseServer:
                 return
         self.initialize()
         
-    def shutdown ( self ):
-        self.pprint ( "Received shutdown request from client" )
+    def shutdown ( self, fromwhere = "unknown" ):
+        self.pprint ( f"Received shutdown request from {fromwhere}" )
         self.finish()
         if hasattr ( self, "connection" ):
             self.connection.close()
@@ -64,9 +64,9 @@ class DatabaseServer:
             self.socket.close()
             del self.socket
         try:  ## remove from list of servers
-            servers.remove ( s )
+            servers.remove ( self )
         except:
-            pass
+            print ( "[databaseServer] couldnt remove %s" % str(self ) )
         sys.exit()
 
     def parseData ( self, data ):
@@ -74,7 +74,7 @@ class DatabaseServer:
         data=data[2:-1]
         self.pprint ( 'received "%s"' % data )
         if data.startswith ( "shutdown" ):
-            self.shutdown()
+            self.shutdown( fromwhere = "client" )
         if not data.startswith ( "query " ):
             self.pprint ( "I dont understand the data packet %s" % data )
             return

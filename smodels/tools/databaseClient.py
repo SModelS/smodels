@@ -108,7 +108,7 @@ class DatabaseClient:
             try:
                 self.sock.connect( self.server_address )
                 return
-            except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError) as e:
+            except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
                 self.ntries += 1
                 dt = random.uniform ( 1, 5 ) + 5*self.ntries
                 self.pprint ( 'could not connect to %s. trying again in %d seconds' % \
