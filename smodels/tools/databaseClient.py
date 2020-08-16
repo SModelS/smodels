@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import socket, sys, time, random
+import socket, sys, time, random, os
 from smodels.tools.physicsUnits import fb, pb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
@@ -141,14 +141,19 @@ if __name__ == "__main__":
             help='port to listen to [31770]',
             type=int, default=None )
     args = argparser.parse_args()
+    if args.stresstest:
+        for i in range(50):
+            pid = os.fork()
+            if pid != 0:
+                client = DatabaseClient ( args.servername, args.port, args.verbosity )
+                for i in range(10000):
+                    msg = "obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]"
+                    print ( "client #%d" % pid )
+                    client.query ( msg )
+        sys.exit()
     client = DatabaseClient ( args.servername, args.port, args.verbosity )
     client.initialize()
     if args.shutdown:
         client.send_shutdown()
-        sys.exit()
-    if args.stresstest:
-        for i in range(10000):
-            msg = "obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]"
-            client.query ( msg )
         sys.exit()
     client.query ( args.query )
