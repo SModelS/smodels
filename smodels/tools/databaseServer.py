@@ -2,6 +2,7 @@
 
 from smodels.experiment.databaseObj import Database
 from smodels.tools.physicsUnits import GeV
+from smodels.tools.caching import Cache
 import socket, atexit, time, os, sys, copy
 import unum
 
@@ -150,6 +151,7 @@ class DatabaseServer:
             print ( "[databaseServer]", " ".join(map(str,args)) )
 
     def initialize( self ):
+        Cache.n_stored = 10000 ## crank up the caching
         self.db = Database ( self.dbpath )
         self.expResults = self.db.expResultList
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
