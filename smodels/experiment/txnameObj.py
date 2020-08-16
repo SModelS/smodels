@@ -160,7 +160,7 @@ class TxName(object):
         If a mass array is given as input, no lifetime reweighting will be applied.
 
         :param element: Element object or mass array (with units)
-        :param expected: query self.txnameDataExp
+        :param expected: look in self.txnameDataExp, not self.txnameData
         """
         if hasattr ( self, "dbClient" ):
             ## we have a databaseClient, so we send the request
@@ -176,7 +176,6 @@ class TxName(object):
                           ( query, self.dbClient.servername, self.dbClient.port ) )
             from smodels.tools.physicsUnits import fb
             return self.dbClient.query ( query )
-
 
         if not self.txnameData.dataType == 'upperLimit':
             logger.error("getULFor method can only be used in UL-type data.")

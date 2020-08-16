@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 
-import socket, sys
+import socket, sys, time, random
 from smodels.tools.physicsUnits import fb, pb
 
 class DatabaseClient:
     def __init__ ( self, servername = None, port = None, verbose = "info" ):
-        self.verbose = verbose
+        verbose = verbose.lower()
+        verbs = { "err": 10, "warn": 20, "info": 30, "debug": 40 }
+        self.verbose = 50
+        for k,v in verbs.items():
+            if k in verbose:
+                self.verbose = v
         self.packetlength = 256
         if port == None:
             port = 31770
@@ -28,7 +33,8 @@ class DatabaseClient:
         self.initialize()
         if not msg.startswith ( "query " ):
             msg = "query " + msg
-        return self.send( msg )
+        ret = self.send ( msg )
+        return ret
 
     def send ( self, message, amount_expected=32 ):
         """ send the message.
@@ -55,7 +61,7 @@ class DatabaseClient:
             data = data.replace(" [fb]","*fb")
             data = data.replace(" [pb]","*pb")
             data = eval(data)
-            self.pprint ( 'received "%s", %s' % ( data, type(data) ) )
+            self.log ( 'received "%s"' % ( data ) )
             return data
 
         finally:
@@ -63,10 +69,16 @@ class DatabaseClient:
             self.sock.close()
             del self.sock
 
+    def log ( self, *args ):
+        if self.verbose > 35:
+            print ( "[databaseClient]", " ".join(map(str,args)) )
 
     def pprint ( self, *args ):
-        if self.verbose == "info":
+        if self.verbose > 25:
             print ( "[databaseClient]", " ".join(map(str,args)) )
+
+    def nameAndPort ( self ):
+        return "%s:%d" % ( self.servername, self.port )
 
     def initialize( self ):
         if hasattr ( self, "sock" ):
@@ -77,7 +89,18 @@ class DatabaseClient:
         # Connect the socket to the port where the server is listening
         self.server_address = ( self.servername, self.port )
         self.pprint ( 'connecting to %s port %s' % self.server_address )
-        self.sock.connect( self.server_address )
+        self.ntries = 0
+        while self.ntries < 10:
+            try:
+                self.sock.connect( self.server_address )
+                return
+            except ConnectionRefusedError:
+                self.ntries += 1
+                dt = random.uniform ( 1, 5 ) + 5*self.ntries
+                self.pprint ( 'could not connect to %s. trying again in %d seconds' % \
+                              ( self.nameAndPort(), dt ) )
+                time.sleep ( dt )
+        self.pprint ( f'could not connect after trying {ntries} times. aborting' )
 
 if __name__ == "__main__":
     import argparse
@@ -88,6 +111,9 @@ if __name__ == "__main__":
             type=str, default=None )
     argparser.add_argument ( '-x', '--shutdown',
             help='Send shutdown command to server',
+            action = "store_true" )
+    argparser.add_argument ( '--stresstest',
+            help='stress test the server, send a lot of requests',
             action = "store_true" )
     argparser.add_argument ( '-q', '--query',
             help='query message [obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]]',
@@ -100,5 +126,10 @@ if __name__ == "__main__":
     client.initialize()
     if args.shutdown:
         client.send_shutdown()
-    else:
-        client.query ( args.query )
+        sys.exit()
+    if args.stresstest:
+        for i in range(10000):
+            msg = "obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]"
+            client.query ( msg )
+        sys.exit()
+    client.query ( args.query )

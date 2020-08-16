@@ -120,13 +120,13 @@ class DatabaseServer:
         return "None"
 
     def finish ( self ):
-        self.pprint ( "ramping down connection. we have had %d lookups" % self.nlookups )
+        self.log ( "ramping down connection. we have had %d lookups" % self.nlookups )
         if hasattr ( self, "connection" ):
             self.connection.close()
 
     def listen ( self ):
         try:
-            self.pprint ( 'connection from', self.client_address )
+            self.log ( 'connection from', self.client_address )
 
             # Receive the data in small chunks and retransmit it
             while True:
@@ -140,6 +140,10 @@ class DatabaseServer:
         finally:
             # Clean up the connection
             self.finish()
+
+    def log ( self, *args ):
+        if self.verbose > 35:
+            print ( "[databaseServer]", " ".join(map(str,args)) )
 
     def pprint ( self, *args ):
         if self.verbose > 25:
