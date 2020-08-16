@@ -10,10 +10,10 @@ unum.Unum.VALUE_FORMAT = "%0.16E"
 
 servers = []
 
-def shutdown ():
+def shutdownAll ():
     print ( "[databaseServer] shutting down servers" )
     for i in servers:
-        i.finish()
+        i.shutdown()
 
 class DatabaseServer:
     def __init__ ( self, dbpath, servername = None, port = None, verbose = "info" ):
@@ -57,6 +57,12 @@ class DatabaseServer:
     def shutdown ( self ):
         self.pprint ( "Received shutdown request from client" )
         self.finish()
+        if hasattr ( self, "connection" ):
+            self.connection.close()
+            del self.connection
+        if hasattr ( self, "socket" ):
+            self.socket.close()
+            del self.socket
         try:  ## remove from list of servers
             servers.remove ( s )
         except:
@@ -164,7 +170,7 @@ class DatabaseServer:
         # Listen for incoming connections
         self.sock.listen(1)
 
-        atexit.register ( shutdown )
+        atexit.register ( shutdownAll )
 
         while True:
             # Wait for a connection
@@ -189,5 +195,6 @@ if __name__ == "__main__":
             help='server name, if not specified then determined from socket [None]',
             type=str, default=None )
     args = argparser.parse_args()
+
     server = DatabaseServer ( args.dbpath, args.servername, args.port, args.verbose )
     server.run()

@@ -48,38 +48,35 @@ class DatabaseClient:
             self.pprint ( 'sending "%s"' % message )
             self.ntries = 0
             while self.ntries < 10:
-            try:
-                self.sock.sendall(message)
+                try:
+                    self.sock.sendall(message)
 
-                # Look for the response
-                amount_received = 0
-                
-                self.pprint ( 'sent message' )
-                if amount_expected <= 0:
-                    return
-                
-                while amount_received < amount_expected:
-                    data = self.sock.recv( self.packetlength )
-                    amount_received += len(data)
-                data = str(data)[2:-1]
-                data = data.replace(" [fb]","*fb")
-                data = data.replace(" [pb]","*pb")
-                data = eval(data)
-                self.log ( 'received "%s"' % ( data ) )
-                return data
+                    # Look for the response
+                    amount_received = 0
+                    
+                    self.pprint ( 'sent message' )
+                    if amount_expected <= 0:
+                        return
+                    
+                    while amount_received < amount_expected:
+                        data = self.sock.recv( self.packetlength )
+                        amount_received += len(data)
+                    data = str(data)[2:-1]
+                    data = data.replace(" [fb]","*fb")
+                    data = data.replace(" [pb]","*pb")
+                    data = eval(data)
+                    self.log ( 'received "%s"' % ( data ) )
+                    return data
 
-            except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError) as e:
-                self.ntries += 1
-                dt = random.uniform ( 1, 5 ) + 5*self.ntries
-                self.pprint ( 'could not connect to %s. trying again in %d seconds' % \
-                              ( self.nameAndPort(), dt ) )
-                time.sleep ( dt )
-            self.pprint ( f'could not connect after trying {ntries} times. aborting' )
-            raise SModelSError ( "Could not connect to database: %s" % str(e) )
-        self.pprint ( f'could not connect after trying {ntries} times. aborting' )
-        raise SModelSError ( "Could not connect to database" )
+                except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
+                    self.ntries += 1
+                    dt = random.uniform ( 1, 5 ) + 5*self.ntries
+                    self.pprint ( 'could not connect to %s. trying again in %d seconds' % \
+                                  ( self.nameAndPort(), dt ) )
+                    time.sleep ( dt )
+            self.pprint ( f"could not connect after trying {self.ntries} times. aborting" )
+            raise SModelSError ( "Could not connect to database" )
             
-
         finally:
             self.pprint ( 'closing socket' )
             self.sock.close()
@@ -101,6 +98,7 @@ class DatabaseClient:
             return ## already initialized
         # Create a TCP/IP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.settimeout ( 120 )
 
         # Connect the socket to the port where the server is listening
         self.server_address = ( self.servername, self.port )
@@ -116,9 +114,8 @@ class DatabaseClient:
                 self.pprint ( 'could not connect to %s. trying again in %d seconds' % \
                               ( self.nameAndPort(), dt ) )
                 time.sleep ( dt )
-            self.pprint ( f'could not connect after trying {ntries} times. aborting' )
-            raise SModelSError ( "Could not connect to database: %s" % str(e) )
-        self.pprint ( f'could not connect after trying {ntries} times. aborting' )
+                self.pprint ( f'could not connect after trying {self.ntries} times. trying again' )
+        self.pprint ( f'could not connect after trying {self.ntries} times. aborting' )
         raise SModelSError ( "Could not connect to database" )
 
 if __name__ == "__main__":
@@ -128,6 +125,9 @@ if __name__ == "__main__":
     argparser.add_argument ( '-s', '--servername',
             help='The server name [None]',
             type=str, default=None )
+    argparser.add_argument ( '-v', '--verbosity',
+            help='Verbosity [info]',
+            type=str, default="info" )
     argparser.add_argument ( '-x', '--shutdown',
             help='Send shutdown command to server',
             action = "store_true" )
@@ -141,7 +141,7 @@ if __name__ == "__main__":
             help='port to listen to [31770]',
             type=int, default=None )
     args = argparser.parse_args()
-    client = DatabaseClient ( args.servername, args.port )
+    client = DatabaseClient ( args.servername, args.port, args.verbosity )
     client.initialize()
     if args.shutdown:
         client.send_shutdown()
