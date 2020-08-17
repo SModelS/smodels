@@ -16,10 +16,12 @@ def shutdownAll ():
         i.shutdown( fromwhere = "atexit" )
 
 class DatabaseServer:
-    def __init__ ( self, dbpath, servername = None, port = None, verbose = "info" ):
+    def __init__ ( self, dbpath, servername = None, port = None, verbose = "info",
+                   logfile = "./dbserver.log" ):
         verbose = verbose.lower()
         verbs = { "err": 10, "warn": 20, "info": 30, "debug": 40 }
         self.verbose = 50
+        self.logfile = logfile
         for k,v in verbs.items():
             if k in verbose:
                 self.verbose = v
@@ -151,13 +153,19 @@ class DatabaseServer:
     def log ( self, *args ):
         if self.verbose > 35:
             print ( "[databaseServer]", " ".join(map(str,args)) )
+        with open ( self.logfile, "at" ) as f:
+            f.write ( "[databaseServer] %s\n" % " ".join(map(str,args)) )
+            f.close()
 
     def pprint ( self, *args ):
         if self.verbose > 25:
             print ( "[databaseServer]", " ".join(map(str,args)) )
+        with open ( self.logfile, "at" ) as f:
+            f.write ( "[databaseClient] %s\n" % " ".join(map(str,args)) )
+            f.close()
 
     def initialize( self ):
-        Cache.n_stored = 10000 ## crank up the caching
+        Cache.n_stored = 20000 ## crank up the caching
         self.db = Database ( self.dbpath )
         self.expResults = self.db.expResultList
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

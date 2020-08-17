@@ -2,7 +2,7 @@
 
 from smodels.tools.databaseClient import DatabaseClient
 from smodels.experiment.databaseObj import Database
-import socket, os, subprocess
+import socket, os, subprocess, copy
 
 class ProxyDBCreater:
     def __init__ ( self, inputfile, verbose=True ):
@@ -18,11 +18,12 @@ class ProxyDBCreater:
             serverport = 31770
         self.servername = servername
         self.serverport = serverport
-        client = DatabaseClient ( servername, serverport, verbose="warn" )
+        self.database.client = DatabaseClient ( servername, serverport, verbose="warn",
+                                                logfile = "dbclient.log" )
         for e,expRes in enumerate(self.database.expResultList):
             for d,dataset in enumerate(expRes.datasets):
                 for t,txn in enumerate(dataset.txnameList):
-                    self.database.expResultList[e].datasets[d].txnameList[t].dbClient = client
+                    self.database.expResultList[e].datasets[d].txnameList[t].dbClient = copy.copy ( client )
                     del self.database.expResultList[e].datasets[d].txnameList[t].txnameData.tri
                     if txn.txnameDataExp != None:
                         del self.database.expResultList[e].datasets[d].txnameList[t].txnameDataExp.tri
