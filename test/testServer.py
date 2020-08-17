@@ -51,7 +51,7 @@ class ServerTest(unittest.TestCase):
         port = random.choice ( range(31700, 42000 ) )
         # port = 31744
 
-        startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i database/db31.pcl -o ./proxy31.pcl -r"
+        startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i database/db31.pcl -o ./proxy31.pcl -r -v error"
         cmd = startserver.split(" ")
         # print ( "starting server %s" % startserver )
         subprocess.Popen ( cmd )

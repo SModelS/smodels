@@ -53,8 +53,6 @@ class DatabaseClient:
             # msg = b'query obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]'
             self.pprint ( 'sending "%s"' % message )
             self.ntries = 0
-            if not hasattr ( self, "maxtries" ):
-                self.maxtries = 50
             while self.ntries < self.maxtries:
                 try:
                     self.sock.sendall(message)
@@ -93,21 +91,18 @@ class DatabaseClient:
     def log ( self, *args ):
         if type(self.verbose)==str or self.verbose > 35:
             print ( "[databaseClient]", " ".join(map(str,args)) )
-        if hasattr ( self, "logfile" ):
-            with open ( self.logfile, "at" ) as f:
-                f.write ( "[databaseClient-%s] %s\n" % \
-                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
-                f.close()
+        with open ( self.logfile, "at" ) as f:
+            f.write ( "[databaseClient-%s] %s\n" % \
+                      ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+            f.close()
 
     def pprint ( self, *args ):
         if type(self.verbose)==str or self.verbose > 25:
             print ( "[databaseClient]", " ".join(map(str,args)) )
-        if hasattr ( self, "logfile" ):
-            with open ( self.logfile, "at" ) as f:
-                f.write ( "[databaseClient-%s] %s\n" % \
-                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
-                f.close()
-
+        with open ( self.logfile, "at" ) as f:
+            f.write ( "[databaseClient-%s] %s\n" % \
+                      ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+            f.close()
 
     def nameAndPort ( self ):
         return "%s:%d" % ( self.servername, self.port )
@@ -123,8 +118,6 @@ class DatabaseClient:
         self.server_address = ( self.servername, self.port )
         self.pprint ( 'connecting to %s port %s' % self.server_address )
         self.ntries = 0
-        if not hasattr ( self, "maxtries" ):
-            self.maxtries = 50
         while self.ntries < self.maxtries:
             try:
                 self.sock.connect( self.server_address )

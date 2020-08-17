@@ -8,12 +8,16 @@ class ProxyDBCreater:
     def __init__ ( self, inputfile, rundir, verbose="info" ):
         self.inputfile = inputfile
         self.rundir = rundir
-        verbose = verbose.lower()
-        verbs = { "err": 10, "warn": 20, "info": 30, "debug": 40 }
-        self.verbose = 50
-        for k,v in verbs.items():
-            if k in verbose:
-                self.verbose = v
+        self.verbstring = verbose
+        if type(verbose)==int:
+            self.verbose = verbose
+        else:
+            verbose = verbose.lower()
+            verbs = { "err": 10, "warn": 20, "info": 30, "debug": 40 }
+            self.verbose = 50
+            for k,v in verbs.items():
+                if k in verbose:
+                    self.verbose = v
         self.database = Database ( self.inputfile )
 
     def create ( self, servername, serverport ):
@@ -25,7 +29,7 @@ class ProxyDBCreater:
         self.servername = servername
         self.serverport = serverport
         self.database.client = DatabaseClient ( servername, serverport, 
-                verbose="warn", rundir = self.rundir )
+                verbose=self.verbstring, rundir = self.rundir )
         for e,expRes in enumerate(self.database.expResultList):
             for d,dataset in enumerate(expRes.datasets):
                 for t,txn in enumerate(dataset.txnameList):
@@ -63,8 +67,8 @@ class ProxyDBCreater:
         inputfile = self.inputfile
         if not "/" in inputfile:
             inputfile = os.getcwd() + "/" + inputfile
-        servercmd = "%s/databaseServer.py -p %d -d %s -v error" % \
-                      ( dirname, self.serverport, inputfile ) 
+        servercmd = "%s/databaseServer.py -p %d -d %s -v %s" % \
+                      ( dirname, self.serverport, inputfile, self.verbstring ) 
         if really:
             self.pprint ( "starting a server on %s: %s" % \
                           ( self.servername, servercmd ) )
@@ -77,8 +81,7 @@ class ProxyDBCreater:
                                   
 
 def main ( args ): ## needed for smodelsTools
-    verbose = "info"
-    creater = ProxyDBCreater ( args.inputfile, args.rundir, verbose )
+    creater = ProxyDBCreater ( args.inputfile, args.rundir, args.verbose )
     creater.create( args.servername, args.serverport )
     creater.store ( args.outputfile )
     creater.run ( args.run )
