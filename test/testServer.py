@@ -75,10 +75,10 @@ class ServerTest(unittest.TestCase):
                         'Total xsec for topologies outside the grid (fb)' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.08,
                            ignore=ignoreFields, fname = outputfile )
         if not equals:
-            e =  "output13.py != simplyGluino_default.py"
+            e =  "simplyGluino.py != simplyGluino_default.py"
             logger.error( e )
             # raise AssertionError( e )
 

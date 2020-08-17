@@ -87,8 +87,8 @@ class DatabaseClient:
             
         finally:
             self.pprint ( 'closing socket' )
-       #     self.sock.close()
-       #     del self.sock
+            self.sock.close()
+            del self.sock
 
     def log ( self, *args ):
         if type(self.verbose)==str or self.verbose > 35:
