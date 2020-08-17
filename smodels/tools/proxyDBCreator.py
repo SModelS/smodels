@@ -84,6 +84,6 @@ def main ( args ): ## needed for smodelsTools
     creater = ProxyDBCreater ( args.inputfile, args.rundir, args.verbose )
     creater.create( args.servername, args.serverport )
     creater.store ( args.outputfile )
-    creater.run ( args.run )
     if args.symlink:
         creater.symlink()
+    creater.run ( args.run )
