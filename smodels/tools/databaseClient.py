@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import socket, sys, time, random, os
+import socket, sys, time, random, multiprocessing
 from smodels.tools.physicsUnits import fb, pb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
@@ -87,8 +87,8 @@ class DatabaseClient:
             
         finally:
             self.pprint ( 'closing socket' )
-            self.sock.close()
-            del self.sock
+       #     self.sock.close()
+       #     del self.sock
 
     def log ( self, *args ):
         if type(self.verbose)==str or self.verbose > 35:
@@ -139,6 +139,16 @@ class DatabaseClient:
         self.pprint ( f'could not connect after trying {self.ntries} times. aborting' )
         raise SModelSError ( "Could not connect to database" )
 
+
+def stresstest( args ):
+    """ this is one process in the stress test """
+    verbosity, servername, port = "error", args[0], args[1]
+    client = DatabaseClient ( servername, port, verbose = verbosity )
+    for i in range(1000):
+        msg = "obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]"
+        # print ( "client #%d" % pid )
+        client.query ( msg )
+
 if __name__ == "__main__":
     import argparse
     argparser = argparse.ArgumentParser(
@@ -163,14 +173,12 @@ if __name__ == "__main__":
             type=int, default=None )
     args = argparser.parse_args()
     if args.stresstest:
-        for i in range(50):
-            pid = os.fork()
-            if pid != 0:
-                client = DatabaseClient ( args.servername, args.port, args.verbosity )
-                for i in range(10000):
-                    msg = "obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]"
-                    print ( "client #%d" % pid )
-                    client.query ( msg )
+        t0 = time.time()
+        nproc = 20
+        p = multiprocessing.Pool( nproc )
+        p.map ( stresstest, [(args.servername, args.port )]*nproc )
+        dt = time.time() - t0 
+        print ( "[databaseClient] stress test took %d seconds" % dt )
         sys.exit()
     client = DatabaseClient ( args.servername, args.port, args.verbosity, 
                               rundir="./", logfile="./dbclient.log" )
