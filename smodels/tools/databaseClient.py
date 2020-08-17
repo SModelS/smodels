@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import socket, sys, time, random, multiprocessing
+import socket, sys, time, random, multiprocessing, random
 from smodels.tools.physicsUnits import fb, pb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
@@ -9,6 +9,7 @@ class DatabaseClient:
                    rundir = "./", logfile = "@@rundir@@/dbclient.log" ):
         verbose = verbose.lower()
         verbs = { "err": 10, "warn": 20, "info": 30, "debug": 40 }
+        self.cache = {}
         self.verbose = 50
         self.rundir = rundir
         logfile = logfile.replace("@@rundir@@",rundir )
@@ -37,11 +38,28 @@ class DatabaseClient:
         """ query a certain result, msg is eg.
             obs:ATLAS-SUSY-2016-07:ul:T1:[[5.5000E+02,4.5000E+02],[5.5000E+02,4.5000E+02]]
         """
+        if msg.startswith ( "query " ):
+            msg = msg.replace( "query ", "" )
+        if msg in self.cache:
+            self.cache[msg][1]+=1
+            return self.cache[msg][0]
         self.initialize()
-        if not msg.startswith ( "query " ):
-            msg = "query " + msg
-        ret = self.send ( msg )
+        ret = self.send ( "query " + msg )
+        self.cache[msg] = [ ret, 1 ]
         return ret
+
+    def clearCache ( self ):
+        maxsize = 100000
+        if len(self.cache)<maxsize:
+            return
+        minclass = 1 ## remove entries that got called that many times
+        while len(self.cache)>maxsize/2:
+            newcache = {}
+            for msg,ret in self.cache.items():
+                if ret[1]>minclass:
+                    newcache[msg]=ret
+            self.cache = newcache
+            minclass += 1
 
     def send ( self, message, amount_expected=32 ):
         """ send the message.
@@ -137,8 +155,14 @@ def stresstest( args ):
     """ this is one process in the stress test """
     verbosity, servername, port = "error", args[0], args[1]
     client = DatabaseClient ( servername, port, verbose = verbosity )
+    mmother = random.uniform ( 200, 900 )
+    mlsp = random.uniform ( 0, mmother )
     for i in range(1000):
-        msg = "obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]"
+        if random.uniform(0,1)>.9:
+            mmother = random.uniform ( 200, 900 )
+            mlsp = random.uniform ( 0, mmother )
+        msg = "obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[%.2f,%.2f],[%.2f,%.2f]]" % \
+               ( mmother, mlsp, mmother, mlsp )
         # print ( "client #%d" % pid )
         client.query ( msg )
 
@@ -171,7 +195,7 @@ if __name__ == "__main__":
         p = multiprocessing.Pool( nproc )
         p.map ( stresstest, [(args.servername, args.port )]*nproc )
         dt = time.time() - t0 
-        print ( "[databaseClient] stress test took %d seconds" % dt )
+        print ( "[databaseClient] stress test took %.2f seconds" % dt )
         sys.exit()
     client = DatabaseClient ( args.servername, args.port, args.verbosity, 
                               rundir="./", logfile="./dbclient.log" )

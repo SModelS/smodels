@@ -22,7 +22,8 @@ import subprocess
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.tools.databaseClient import DatabaseClient
 from smodels.tools.databaseServer import DatabaseServer
-        
+import warnings
+
 setLogLevel ( "warn" )
 
 class ServerTest(unittest.TestCase):
@@ -46,6 +47,7 @@ class ServerTest(unittest.TestCase):
         client.send_shutdown()
 
     def testCompare(self):
+        warnings.simplefilter("ignore", ResourceWarning)
         from simplyGluino_default import smodelsOutputDefault
         filename = "./testFiles/slha/simplyGluino.slha"
         port = random.choice ( range(31700, 42000 ) )
