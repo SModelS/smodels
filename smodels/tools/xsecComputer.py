@@ -231,7 +231,7 @@ class XSecComputer:
             xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)
             loXsecs = crossSection.XSectionList()
             for xsec in xsecsInfile:
-                if xsec.info.order == 0 and xsec.info.sqrts == sqrts:
+                if xsec.info.order == 0 and abs ( xsec.info.sqrts - sqrts ).asNumber(TeV) < 1e-5:
                     loXsecs.add(xsec)
             if ssmultipliers != None:
                 logger.warning ( "supplied signal strength multipliers, but LO xsecs are taken from file. Will not apply them" )
