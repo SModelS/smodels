@@ -67,8 +67,8 @@ class ProxyDBCreater:
         inputfile = self.inputfile
         if not "/" in inputfile:
             inputfile = os.getcwd() + "/" + inputfile
-        servercmd = "%s/databaseServer.py -p %d -d %s -v %s" % \
-                      ( dirname, self.serverport, inputfile, self.verbstring ) 
+        servercmd = "%s/databaseServer.py -R %s -p %d -d %s -v %s" % \
+                      ( dirname, self.rundir, self.serverport, inputfile, self.verbstring ) 
         if really:
             self.pprint ( "starting a server on %s: %s" % \
                           ( self.servername, servercmd ) )
