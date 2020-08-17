@@ -17,7 +17,9 @@ def shutdownAll ():
 
 class DatabaseServer:
     def __init__ ( self, dbpath, servername = None, port = None, verbose = "info",
-                   logfile = "./dbserver.log" ):
+                   rundir = "./", logfile = "@@rundir@@/dbserver.log" ):
+        self.rundir = rundir
+        logfile = logfile.replace("@@rundir@@",rundir)
         verbose = verbose.lower()
         verbs = { "err": 10, "warn": 20, "info": 30, "debug": 40 }
         self.verbose = 50
@@ -154,14 +156,16 @@ class DatabaseServer:
         if self.verbose > 35:
             print ( "[databaseServer]", " ".join(map(str,args)) )
         with open ( self.logfile, "at" ) as f:
-            f.write ( "[databaseServer] %s\n" % " ".join(map(str,args)) )
+            f.write ( "[databaseServer-%s] %s\n" % \
+                      ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
             f.close()
 
     def pprint ( self, *args ):
         if self.verbose > 25:
             print ( "[databaseServer]", " ".join(map(str,args)) )
         with open ( self.logfile, "at" ) as f:
-            f.write ( "[databaseClient] %s\n" % " ".join(map(str,args)) )
+            f.write ( "[databaseServer-%s] %s\n" % \
+                      ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
             f.close()
 
     def initialize( self ):
@@ -193,6 +197,9 @@ if __name__ == "__main__":
     argparser.add_argument ( '-d', '--dbpath',
             help='The database path [./original.pcl]',
             type=str, default="./original.pcl" )
+    argparser.add_argument ( '-R', '--rundir',
+            help='The rundir [./]',
+            type=str, default="./" )
     argparser.add_argument ( '-p', '--port',
             help='port to listen to [31770]',
             type=int, default=None )
@@ -204,5 +211,6 @@ if __name__ == "__main__":
             type=str, default=None )
     args = argparser.parse_args()
 
-    server = DatabaseServer ( args.dbpath, args.servername, args.port, args.verbose )
+    server = DatabaseServer ( args.dbpath, args.servername, args.port, args.verbose,
+                              args.rundir )
     server.run()

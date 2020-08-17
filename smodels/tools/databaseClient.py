@@ -6,10 +6,12 @@ from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 class DatabaseClient:
     def __init__ ( self, servername = None, port = None, verbose = "info", 
-                   logfile = "dbclient.log" ):
+                   rundir = "./", logfile = "@@rundir@@/dbclient.log" ):
         verbose = verbose.lower()
         verbs = { "err": 10, "warn": 20, "info": 30, "debug": 40 }
         self.verbose = 50
+        self.rundir = rundir
+        logfile = logfile.replace("@@rundir@@",rundir )
         self.logfile = logfile
         for k,v in verbs.items():
             if k in verbose:
@@ -24,6 +26,7 @@ class DatabaseClient:
             servername = socket.gethostname()
             self.pprint ( "determined servername as '%s'" % servername )
         self.servername = servername
+        self.maxtries = 50 ## max numbers of trying to connect
 
     def send_shutdown ( self ):
         """ send shutdown request to server """
@@ -50,7 +53,9 @@ class DatabaseClient:
             # msg = b'query obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]'
             self.pprint ( 'sending "%s"' % message )
             self.ntries = 0
-            while self.ntries < 10:
+            if not hasattr ( self, "maxtries" ):
+                self.maxtries = 50
+            while self.ntries < self.maxtries:
                 try:
                     self.sock.sendall(message)
 
@@ -72,13 +77,13 @@ class DatabaseClient:
                     return data
 
                 except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
+                    dt = random.uniform ( 1, 10 ) + 10*self.ntries
                     self.ntries += 1
-                    dt = random.uniform ( 1, 5 ) + 5*self.ntries
                     self.pprint ( 'could not connect to %s. trying again in %d seconds' % \
                                   ( self.nameAndPort(), dt ) )
                     time.sleep ( dt )
             self.pprint ( f"could not connect after trying {self.ntries} times. aborting" )
-            raise SModelSError ( "Could not connect to database" )
+            raise SModelSError ( f"Could not connect to database, tried {self.ntries} times" )
             
         finally:
             self.pprint ( 'closing socket' )
@@ -88,16 +93,20 @@ class DatabaseClient:
     def log ( self, *args ):
         if type(self.verbose)==str or self.verbose > 35:
             print ( "[databaseClient]", " ".join(map(str,args)) )
-        with open ( self.logfile, "at" ) as f:
-            f.write ( "[databaseClient] %s\n" % " ".join(map(str,args)) )
-            f.close()
+        if hasattr ( self, "logfile" ):
+            with open ( self.logfile, "at" ) as f:
+                f.write ( "[databaseClient-%s] %s\n" % \
+                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                f.close()
 
     def pprint ( self, *args ):
         if type(self.verbose)==str or self.verbose > 25:
             print ( "[databaseClient]", " ".join(map(str,args)) )
-        with open ( self.logfile, "at" ) as f:
-            f.write ( "[databaseServer] %s\n" % " ".join(map(str,args)) )
-            f.close()
+        if hasattr ( self, "logfile" ):
+            with open ( self.logfile, "at" ) as f:
+                f.write ( "[databaseClient-%s] %s\n" % \
+                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                f.close()
 
 
     def nameAndPort ( self ):
@@ -114,13 +123,15 @@ class DatabaseClient:
         self.server_address = ( self.servername, self.port )
         self.pprint ( 'connecting to %s port %s' % self.server_address )
         self.ntries = 0
-        while self.ntries < 20:
+        if not hasattr ( self, "maxtries" ):
+            self.maxtries = 50
+        while self.ntries < self.maxtries:
             try:
                 self.sock.connect( self.server_address )
                 return
             except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
+                dt = random.uniform ( 1, 10 ) + 10*self.ntries
                 self.ntries += 1
-                dt = random.uniform ( 1, 5 ) + 10*self.ntries
                 self.pprint ( 'could not connect to %s. trying again in %d seconds' % \
                               ( self.nameAndPort(), dt ) )
                 time.sleep ( dt )
@@ -161,7 +172,8 @@ if __name__ == "__main__":
                     print ( "client #%d" % pid )
                     client.query ( msg )
         sys.exit()
-    client = DatabaseClient ( args.servername, args.port, args.verbosity, "./dbclient.log" )
+    client = DatabaseClient ( args.servername, args.port, args.verbosity, 
+                              rundir="./", logfile="./dbclient.log" )
     client.initialize()
     if args.shutdown:
         client.send_shutdown()

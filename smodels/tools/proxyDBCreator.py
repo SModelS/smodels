@@ -5,9 +5,15 @@ from smodels.experiment.databaseObj import Database
 import socket, os, subprocess, copy
 
 class ProxyDBCreater:
-    def __init__ ( self, inputfile, verbose=True ):
+    def __init__ ( self, inputfile, rundir, verbose="info" ):
         self.inputfile = inputfile
-        self.verbose = verbose
+        self.rundir = rundir
+        verbose = verbose.lower()
+        verbs = { "err": 10, "warn": 20, "info": 30, "debug": 40 }
+        self.verbose = 50
+        for k,v in verbs.items():
+            if k in verbose:
+                self.verbose = v
         self.database = Database ( self.inputfile )
 
     def create ( self, servername, serverport ):
@@ -18,18 +24,18 @@ class ProxyDBCreater:
             serverport = 31770
         self.servername = servername
         self.serverport = serverport
-        self.database.client = DatabaseClient ( servername, serverport, verbose="warn",
-                                                logfile = "dbclient.log" )
+        self.database.client = DatabaseClient ( servername, serverport, 
+                verbose="warn", rundir = self.rundir )
         for e,expRes in enumerate(self.database.expResultList):
             for d,dataset in enumerate(expRes.datasets):
                 for t,txn in enumerate(dataset.txnameList):
-                    self.database.expResultList[e].datasets[d].txnameList[t].dbClient = copy.copy ( client )
+                    self.database.expResultList[e].datasets[d].txnameList[t].dbClient = copy.copy ( self.database.client )
                     del self.database.expResultList[e].datasets[d].txnameList[t].txnameData.tri
                     if txn.txnameDataExp != None:
                         del self.database.expResultList[e].datasets[d].txnameList[t].txnameDataExp.tri
 
     def pprint ( self, *args ):
-        if self.verbose:
+        if self.verbose > 25:
             print ( "[ProxyDBCreater]", " ".join(map(str,args)) )
 
     def store ( self, outputfile ):
@@ -71,7 +77,8 @@ class ProxyDBCreater:
                                   
 
 def main ( args ): ## needed for smodelsTools
-    creater = ProxyDBCreater ( args.inputfile )
+    verbose = "info"
+    creater = ProxyDBCreater ( args.inputfile, args.rundir, verbose )
     creater.create( args.servername, args.serverport )
     creater.store ( args.outputfile )
     creater.run ( args.run )

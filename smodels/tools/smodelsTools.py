@@ -94,6 +94,9 @@ def main():
     proxydb.add_argument ( '-s', '--servername',
             help='the server name [None]',
             type=str, default=None  )
+    proxydb.add_argument ( '-R', '--rundir',
+            help='the rundir [./]',
+            type=str, default="./"  )
     proxydb.add_argument ( '-p', '--serverport',
             help='the server port [31770]',
             type=int, default=None  )
