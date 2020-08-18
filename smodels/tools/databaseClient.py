@@ -10,6 +10,7 @@ class DatabaseClient:
         verbose = verbose.lower()
         verbs = { "err": 10, "warn": 20, "info": 30, "debug": 40 }
         self.cache = {}
+        self.nqueries = 0
         self.verbose = 50
         self.rundir = rundir
         logfile = logfile.replace("@@rundir@@",rundir )
@@ -38,8 +39,8 @@ class DatabaseClient:
         self.send ( "shutdown", amount_expected = 0 )
 
     def saveStats ( self ):
-        self.pprint ( "client stats" )
-        self.pprint ( "============" )
+        self.pprint ( "client stats after %d queries" % self.nqueries )
+        self.pprint ( "=================================" )
         self.pprint ( "number of results in cache: %d" % len(self.cache) )
         maxhits=[]
         for i in self.cache.values():
@@ -58,6 +59,11 @@ class DatabaseClient:
             msg = msg.replace( "query ", "" )
         if not hasattr ( self, "cache" ):
             self.cache={}
+        if not hasattr ( self, "nqueries" ):
+            self.nqueries = 0
+        self.nqueries+= 1
+        if self.nqueries % 100000 == 0:
+            self.saveStats()
         if msg in self.cache:
             self.cache[msg][1]+=1
             return self.cache[msg][0]
@@ -205,7 +211,6 @@ def stresstest( args ):
                ( mmother, mlsp, mmother, mlsp )
         # print ( "client #%d" % pid )
         client.query ( msg )
-    # client.saveStats()
     print ( "finished %d" % nr )
 
 if __name__ == "__main__":
