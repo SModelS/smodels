@@ -143,7 +143,7 @@ class DatabaseClient:
             return ## already initialized
         # Create a TCP/IP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout ( 120 )
+        self.sock.settimeout ( 240 )
 
         # Connect the socket to the port where the server is listening
         self.server_address = ( self.servername, self.port )
@@ -153,7 +153,7 @@ class DatabaseClient:
             try:
                 self.sock.connect( self.server_address )
                 return
-            except (OSError,ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
+            except (socket.timeout,OSError,ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
                 dt = random.uniform ( 1, 10 ) + 10*self.ntries
                 self.ntries += 1
                 self.pprint ( 'could not connect to %s. trying again in %d seconds' % \
