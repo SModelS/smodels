@@ -51,6 +51,9 @@ class DatabaseServer:
     def setStatus ( self, status ):
         """ servers have a status file that tells us if they are running """
         statusfile = self.rundir + "/serverstatus.log"
+        if status == "down" and os.path.exists ( statusfile ):
+            os.unlink ( statusfile )
+            return
         with open ( statusfile, "wt" ) as f:
             f.write ( status + "\n" )
             f.close()
