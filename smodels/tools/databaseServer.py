@@ -72,9 +72,16 @@ class DatabaseServer:
             if pid == 0:
                 return
         self.initialize()
+
+    def logServerStats ( self ):
+        """ log our stats upon exit """
+        self.pprint ( "server stats" )
+        self.pprint ( "============" )
+        self.pprint ( "total number of lookups: %d" % self.nlookups )
         
     def shutdown ( self, fromwhere = "unknown" ):
         self.pprint ( f"Received shutdown request from {fromwhere}" )
+        self.logServerStats ()
         self.setStatus ( "down" )
         self.finish()
         if hasattr ( self, "connection" ):
@@ -149,7 +156,6 @@ class DatabaseServer:
         return "None"
 
     def finish ( self ):
-        self.log ( "ramping down connection. we have had %d lookups" % self.nlookups )
         if hasattr ( self, "connection" ):
             self.connection.close()
 
