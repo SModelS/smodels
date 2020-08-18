@@ -101,7 +101,7 @@ class DatabaseClient:
                                ( self.nameAndPort(), dt ) )
                     time.sleep ( dt )
             self.pprint ( f"could not connect after trying {self.ntries} times. aborting" )
-            raise SModelSError ( f"Could not connect to database, tried {self.ntries} times" )
+            raise SModelSError ( f"Could not connect to database in send, tried {self.ntries} times" )
             
         finally:
             self.log ( 'closing socket' )
@@ -149,6 +149,8 @@ class DatabaseClient:
         self.server_address = ( self.servername, self.port )
         self.pprint ( 'connecting to %s port %s' % self.server_address )
         self.ntries = 0
+        if not hasattr ( self, "maxtries" ):
+            self.maxtries = 60
         while self.ntries < self.maxtries:
             try:
                 self.sock.connect( self.server_address )
@@ -160,7 +162,7 @@ class DatabaseClient:
                            ( self.nameAndPort(), self.ntries, dt ) )
                 time.sleep ( dt )
         self.pprint ( f'could not connect after trying {self.ntries} times. aborting' )
-        raise SModelSError ( "Could not connect to database" )
+        raise SModelSError ( "Could not connect to database in initialize, tried %d times" % self.ntries )
 
 
 def stresstest( args ):
