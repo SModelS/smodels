@@ -71,7 +71,7 @@ class DatabaseClient:
             message = bytes ( message, "UTF-8" ) 
             # Send data
             # msg = b'query obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]'
-            self.pprint ( 'sending "%s"' % message )
+            self.log ( 'sending "%s"' % message )
             self.ntries = 0
             while self.ntries < self.maxtries:
                 try:
@@ -80,7 +80,7 @@ class DatabaseClient:
                     # Look for the response
                     amount_received = 0
                     
-                    self.pprint ( 'sent message' )
+                    self.log ( 'sent message' )
                     if amount_expected <= 0:
                         return
                     
@@ -97,14 +97,14 @@ class DatabaseClient:
                 except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
                     dt = random.uniform ( 1, 10 ) + 10*self.ntries
                     self.ntries += 1
-                    self.pprint ( 'could not connect to %s. trying again in %d seconds' % \
-                                  ( self.nameAndPort(), dt ) )
+                    self.log ( 'could not connect to %s. trying again in %d seconds' % \
+                               ( self.nameAndPort(), dt ) )
                     time.sleep ( dt )
             self.pprint ( f"could not connect after trying {self.ntries} times. aborting" )
             raise SModelSError ( f"Could not connect to database, tried {self.ntries} times" )
             
         finally:
-            self.pprint ( 'closing socket' )
+            self.log ( 'closing socket' )
             self.sock.close()
             del self.sock
 
@@ -156,10 +156,9 @@ class DatabaseClient:
             except (OSError,ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
                 dt = random.uniform ( 1, 10 ) + 10*self.ntries
                 self.ntries += 1
-                self.pprint ( 'could not connect to %s. trying again in %d seconds' % \
-                              ( self.nameAndPort(), dt ) )
+                self.log ( 'could not connect to %s after %d times. trying again in %d seconds' % \
+                           ( self.nameAndPort(), self.ntries, dt ) )
                 time.sleep ( dt )
-                self.pprint ( f'could not connect after trying {self.ntries} times. trying again' )
         self.pprint ( f'could not connect after trying {self.ntries} times. aborting' )
         raise SModelSError ( "Could not connect to database" )
 

@@ -76,7 +76,7 @@ class DatabaseServer:
     def parseData ( self, data ):
         """ parse the data packet """
         data=data[2:-1]
-        self.pprint ( 'received "%s"' % data )
+        self.log ( 'received "%s"' % data )
         if data.startswith ( "shutdown" ):
             self.shutdown( fromwhere = "client" )
         if not data.startswith ( "query " ):
@@ -84,7 +84,7 @@ class DatabaseServer:
             return
         data=data[6:] ## remove the query statement
         ret = self.lookUpResult ( data )
-        self.pprint ( 'sending result of "%s" back to the client' % ret )
+        self.log ( 'sending result of "%s" back to the client' % ret )
         ret = (str(ret)+" "*32)[:32]
         self.connection.sendall ( bytes(ret,"utf-8") )
 
@@ -103,7 +103,7 @@ class DatabaseServer:
         expected = False 
         if tokens[0] == "exp":
             expected = True
-        self.pprint ( 'looking up for %s,%s,%s,%s' % \
+        self.log ( 'looking up for %s,%s,%s,%s' % \
                       ( anaId, dType, txname, massv ) )
         for exp in self.expResults:
             if not exp.globalInfo.id == anaId:
@@ -145,8 +145,8 @@ class DatabaseServer:
                 if data:
                     self.parseData ( str(data) )
                 else:
-                    self.pprint ( 'no more data from %s:%s' % \
-                                  ( self.client_address[0], self.client_address[1] ) )
+                    self.log ( 'no more data from %s:%s' % \
+                               ( self.client_address[0], self.client_address[1] ) )
                     break
         finally:
             # Clean up the connection
@@ -186,7 +186,7 @@ class DatabaseServer:
 
         while True:
             # Wait for a connection
-            self.pprint ( 'waiting for a connection' )
+            self.log ( 'waiting for a connection' )
             self.connection, self.client_address = self.sock.accept()
             self.listen()
 
