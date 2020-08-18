@@ -6,10 +6,12 @@ from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 class DatabaseClient:
     def __init__ ( self, servername = None, port = None, verbose = "info", 
-                   rundir = "./", logfile = "@@rundir@@/dbclient.log" ):
+                   rundir = "./", logfile = "@@rundir@@/dbclient.log",
+                   clientid = -1 ):
         verbose = verbose.lower()
         verbs = { "err": 10, "warn": 20, "info": 30, "debug": 40 }
         self.cache = {}
+        self.clientid = clientid
         self.nqueries = 0
         self.verbose = 50
         self.rundir = rundir
@@ -28,10 +30,10 @@ class DatabaseClient:
             servername = socket.gethostname()
             self.pprint ( "determined servername as '%s'" % servername )
         self.servername = servername
-        self.maxtries = 20 ## max numbers of trying to connect
+        self.maxtries = 25 ## max numbers of trying to connect
         sstatus = self.findServerStatus()
-        self.pprint ( "connecting to %s port %s. server status is '%s'" % \
-                      ( self.servername, self.port, sstatus ) )
+        self.pprint ( "connecting to %s port %s, rundir is %s. server status is '%s'" % \
+                      ( self.servername, self.port, self.rundir, sstatus ) )
 
     def send_shutdown ( self ):
         """ send shutdown request to server """
@@ -49,7 +51,7 @@ class DatabaseClient:
 
     def getWaitingTime ( self ):
         """ compute a waiting time between attempts, from self.ntries """
-        return random.uniform ( 1, 5 ) + 5*self.ntries**2
+        return random.uniform ( 1, 5 ) + 6*self.ntries**2
 
     def query ( self, msg ):
         """ query a certain result, msg is eg.
@@ -122,7 +124,7 @@ class DatabaseClient:
                     self.log ( 'could not connect to %s. trying again in %d seconds' % \
                                ( self.nameAndPort(), dt ) )
                     time.sleep ( dt )
-            self.pprint ( f"could not connect after trying {self.ntries} times. aborting" )
+            self.pprint ( f"could not connect in send, after trying {self.ntries} times. aborting" )
             raise SModelSError ( f"Could not connect to database in send, tried {self.ntries} times" )
             
         finally:
@@ -132,8 +134,10 @@ class DatabaseClient:
 
     def setDefaults ( self ):
         """ put in some defaults if data members dont exist """
+        if not hasattr ( self, "clientid" ):
+            self.clientid = 0
         if not hasattr ( self, "maxtries" ):
-            self.maxtries = 20
+            self.maxtries = 25
         if not hasattr ( self, "rundir" ):
             self.rundir = os.getcwd()
         if not hasattr ( self, "logfile" ):
@@ -191,7 +195,7 @@ class DatabaseClient:
                 self.log ( 'could not connect to %s after %d times. trying again in %d seconds' % \
                            ( self.nameAndPort(), self.ntries, dt ) )
                 time.sleep ( dt )
-        self.pprint ( f'could not connect after trying {self.ntries} times. aborting' )
+        self.pprint ( f'could not connect to database in initialize, after trying {self.ntries} times. aborting' )
         raise SModelSError ( "Could not connect to database in initialize, tried %d times" % self.ntries )
 
 
@@ -200,7 +204,8 @@ def stresstest( args ):
     verbosity, servername, port = "error", args[0], args[1]
     nr = args[2]
     client = DatabaseClient ( servername, port, verbose = verbosity,
-                              logfile="@@rundir@@/dbclient%d.log" % nr )
+                              logfile="@@rundir@@/dbclient%d.log" % nr,
+                              clientid = nr )
     mmother = random.uniform ( 200, 900 )
     mlsp = random.uniform ( 0, mmother )
     for i in range(1000):
@@ -251,7 +256,7 @@ if __name__ == "__main__":
         print ( "[databaseClient] stress test took %.2f seconds" % dt )
         sys.exit()
     client = DatabaseClient ( args.servername, args.port, args.verbosity, 
-                              rundir=args.rundir )
+                              rundir=args.rundir, clientid = 0 )
     client.initialize()
     if args.shutdown:
         client.send_shutdown()
