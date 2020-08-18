@@ -8,12 +8,15 @@ import unum
 
 unum.Unum.VALUE_FORMAT = "%0.16E"
 
-servers = []
+servers = [ [] ]
 
 def shutdownAll ():
-    print ( "[databaseServer] shutting down servers" )
-    for i in servers:
+    if len(servers[0])==0:
+        return
+    print ( "[databaseServer] shutting down %d servers" % len(servers[0]) )
+    for i in servers[0]:
         i.shutdown( fromwhere = "atexit" )
+    servers[0] = []
 
 class DatabaseServer:
     def __init__ ( self, dbpath, servername = None, port = None, verbose = "info",
@@ -27,6 +30,7 @@ class DatabaseServer:
         for k,v in verbs.items():
             if k in verbose:
                 self.verbose = v
+        self.setStatus ( "ramping" )
         if port == None:
             port = 31770
             while self.is_port_in_use ( port ):
@@ -41,7 +45,15 @@ class DatabaseServer:
         self.port = port
         self.packetlength = 256
         self.nlookups = 0
-        servers.append ( self )
+        servers[0].append ( self )
+        self.setStatus ( "ramped" )
+
+    def setStatus ( self, status ):
+        """ servers have a status file that tells us if they are running """
+        statusfile = self.rundir + "/serverstatus.log"
+        with open ( statusfile, "wt" ) as f:
+            f.write ( status + "\n" )
+            f.close()
 
     def is_port_in_use(self, port):
         """ check if port is in use """
@@ -60,6 +72,7 @@ class DatabaseServer:
         
     def shutdown ( self, fromwhere = "unknown" ):
         self.pprint ( f"Received shutdown request from {fromwhere}" )
+        self.setStatus ( "down" )
         self.finish()
         if hasattr ( self, "connection" ):
             self.connection.close()
@@ -67,10 +80,11 @@ class DatabaseServer:
         if hasattr ( self, "socket" ):
             self.socket.close()
             del self.socket
-        try:  ## remove from list of servers
-            servers.remove ( self )
-        except:
-            print ( "[databaseServer] couldnt remove %s" % str(self ) )
+        if fromwhere != "atexit":
+            try:  ## remove from list of servers
+                servers[0].remove ( self )
+            except:
+                print ( "[databaseServer] couldnt remove %s" % str(self ) )
         sys.exit()
 
     def parseData ( self, data ):
@@ -79,6 +93,7 @@ class DatabaseServer:
         self.log ( 'received "%s"' % data )
         if data.startswith ( "shutdown" ):
             self.shutdown( fromwhere = "client" )
+            return
         if not data.startswith ( "query " ):
             self.pprint ( "I dont understand the data packet %s" % data )
             return
@@ -169,6 +184,7 @@ class DatabaseServer:
                 f.close()
 
     def initialize( self ):
+        self.setStatus ( "initialized" )
         Cache.n_stored = 20000 ## crank up the caching
         self.db = Database ( self.dbpath )
         self.expResults = self.db.expResultList
@@ -186,6 +202,7 @@ class DatabaseServer:
 
         while True:
             # Wait for a connection
+            self.setStatus ( "waiting" )
             self.log ( 'waiting for a connection' )
             self.connection, self.client_address = self.sock.accept()
             self.listen()
