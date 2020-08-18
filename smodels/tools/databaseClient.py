@@ -119,21 +119,21 @@ class DatabaseClient:
 
     def log ( self, *args ):
         if type(self.verbose)==str or self.verbose > 35:
+            self.setDefaults()
             print ( "[databaseClient]", " ".join(map(str,args)) )
-        self.setDefaults()
-        with open ( self.logfile, "at" ) as f:
-            f.write ( "[databaseClient-%s] %s\n" % \
-                      ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
-            f.close()
+            with open ( self.logfile, "at" ) as f:
+                f.write ( "[databaseClient-%s] %s\n" % \
+                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                f.close()
 
     def pprint ( self, *args ):
         if type(self.verbose)==str or self.verbose > 25:
             print ( "[databaseClient]", " ".join(map(str,args)) )
-        self.setDefaults()
-        with open ( self.logfile, "at" ) as f:
-            f.write ( "[databaseClient-%s] %s\n" % \
-                      ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
-            f.close()
+            self.setDefaults()
+            with open ( self.logfile, "at" ) as f:
+                f.write ( "[databaseClient-%s] %s\n" % \
+                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                f.close()
 
     def nameAndPort ( self ):
         return "%s:%d" % ( self.servername, self.port )

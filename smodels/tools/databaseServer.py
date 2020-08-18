@@ -155,18 +155,18 @@ class DatabaseServer:
     def log ( self, *args ):
         if self.verbose > 35:
             print ( "[databaseServer]", " ".join(map(str,args)) )
-        with open ( self.logfile, "at" ) as f:
-            f.write ( "[databaseServer-%s] %s\n" % \
-                      ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
-            f.close()
+            with open ( self.logfile, "at" ) as f:
+                f.write ( "[databaseServer-%s] %s\n" % \
+                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                f.close()
 
     def pprint ( self, *args ):
         if self.verbose > 25:
             print ( "[databaseServer]", " ".join(map(str,args)) )
-        with open ( self.logfile, "at" ) as f:
-            f.write ( "[databaseServer-%s] %s\n" % \
-                      ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
-            f.close()
+            with open ( self.logfile, "at" ) as f:
+                f.write ( "[databaseServer-%s] %s\n" % \
+                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                f.close()
 
     def initialize( self ):
         Cache.n_stored = 20000 ## crank up the caching
