@@ -27,12 +27,18 @@ class DatabaseClient:
             servername = socket.gethostname()
             self.pprint ( "determined servername as '%s'" % servername )
         self.servername = servername
-        self.maxtries = 60 ## max numbers of trying to connect
+        self.maxtries = 20 ## max numbers of trying to connect
+        self.pprint ( 'connecting to %s port %s' % \
+                      ( self.servername, self.port ) )
 
     def send_shutdown ( self ):
         """ send shutdown request to server """
         self.initialize()
         self.send ( "shutdown", amount_expected = 0 )
+
+    def getWaitingTime ( self ):
+        """ compute a waiting time between attempts, from self.ntries """
+        return random.uniform ( 1, 5 ) + 5*self.ntries**2
 
     def query ( self, msg ):
         """ query a certain result, msg is eg.
@@ -95,7 +101,7 @@ class DatabaseClient:
                     return data
 
                 except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
-                    dt = random.uniform ( 1, 10 ) + 10*self.ntries
+                    dt = self.getWaitingTime()
                     self.ntries += 1
                     self.log ( 'could not connect to %s. trying again in %d seconds' % \
                                ( self.nameAndPort(), dt ) )
@@ -111,7 +117,7 @@ class DatabaseClient:
     def setDefaults ( self ):
         """ put in some defaults if data members dont exist """
         if not hasattr ( self, "maxtries" ):
-            self.maxtries = 60
+            self.maxtries = 20
         if not hasattr ( self, "rundir" ):
             self.rundir = os.getcwd()
         if not hasattr ( self, "logfile" ):
@@ -147,16 +153,15 @@ class DatabaseClient:
 
         # Connect the socket to the port where the server is listening
         self.server_address = ( self.servername, self.port )
-        self.pprint ( 'connecting to %s port %s' % self.server_address )
         self.ntries = 0
         if not hasattr ( self, "maxtries" ):
-            self.maxtries = 60
+            self.maxtries = 20
         while self.ntries < self.maxtries:
             try:
                 self.sock.connect( self.server_address )
                 return
             except (socket.timeout,OSError,ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
-                dt = random.uniform ( 1, 10 ) + 10*self.ntries
+                dt = self.getWaitingTime()
                 self.ntries += 1
                 self.log ( 'could not connect to %s after %d times. trying again in %d seconds' % \
                            ( self.nameAndPort(), self.ntries, dt ) )
