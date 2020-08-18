@@ -189,6 +189,9 @@ if __name__ == "__main__":
     argparser.add_argument ( '-v', '--verbosity',
             help='Verbosity [info]',
             type=str, default="info" )
+    argparser.add_argument ( '-R', '--rundir',
+            help='run directory [./]',
+            type=str, default="./" )
     argparser.add_argument ( '-x', '--shutdown',
             help='Send shutdown command to server',
             action = "store_true" )
@@ -211,7 +214,7 @@ if __name__ == "__main__":
         print ( "[databaseClient] stress test took %.2f seconds" % dt )
         sys.exit()
     client = DatabaseClient ( args.servername, args.port, args.verbosity, 
-                              rundir="./", logfile="./dbclient.log" )
+                              rundir=args.rundir )
     client.initialize()
     if args.shutdown:
         client.send_shutdown()
