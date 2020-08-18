@@ -28,7 +28,7 @@ class ProxyDBCreater:
             serverport = 31770
         self.servername = servername
         self.serverport = serverport
-        self.database.client = DatabaseClient ( servername, serverport, 
+        self.database.client = DatabaseClient ( servername, serverport,
                 verbose=self.verbstring, rundir = self.rundir )
         for e,expRes in enumerate(self.database.expResultList):
             for d,dataset in enumerate(expRes.datasets):
@@ -45,7 +45,7 @@ class ProxyDBCreater:
 
     def store ( self, outputfile ):
         """ store the outputfile """
-        self.outputfile = outputfile 
+        self.outputfile = outputfile
         self.pprint ( "writing to %s" % outputfile )
         if os.path.exists ( outputfile ):
             os.unlink ( outputfile )
@@ -71,7 +71,7 @@ class ProxyDBCreater:
         if not "/" in inputfile:
             inputfile = os.getcwd() + "/" + inputfile
         servercmd = "%s/databaseServer.py -R %s -p %d -d %s -v %s" % \
-                      ( dirname, self.rundir, self.serverport, inputfile, self.verbstring ) 
+                      ( dirname, self.rundir, self.serverport, inputfile, self.verbstring )
         if really:
             self.pprint ( "starting a server on %s: %s" % \
                           ( self.servername, servercmd ) )
@@ -81,7 +81,7 @@ class ProxyDBCreater:
         else:
             print ( "not started a server. you can start one yourself:" )
             self.pprint ( servercmd )
-                                  
+
 
 def main ( args ): ## needed for smodelsTools
     creater = ProxyDBCreater ( args.inputfile, args.rundir, args.verbose )
@@ -90,3 +90,15 @@ def main ( args ): ## needed for smodelsTools
     if args.symlink:
         creater.symlink()
     creater.run ( args.run )
+
+if __name__ == "__main__":
+    import sys
+    args = ""
+    for i in sys.argv[1:]:
+        if " " in i or "," in i:
+            i = '"%s"' % i
+        args += i + " "
+    cmd = "./smodelsTools.py proxydb %s" % args 
+    print ( "call %s" % cmd )
+    #a = subprocess.getoutput ( cmd )
+    #print ( a )

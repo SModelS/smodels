@@ -37,6 +37,15 @@ class DatabaseClient:
         self.initialize()
         self.send ( "shutdown", amount_expected = 0 )
 
+    def saveStats ( self ):
+        self.pprint ( "client stats" )
+        self.pprint ( "============" )
+        self.pprint ( "number of results in cache: %d" % len(self.cache) )
+        maxhits=[]
+        for i in self.cache.values():
+            maxhits.append ( i[1] )
+        self.pprint ( "highest number of hits: %d" % max(maxhits))
+
     def getWaitingTime ( self ):
         """ compute a waiting time between attempts, from self.ntries """
         return random.uniform ( 1, 5 ) + 5*self.ntries**2
@@ -183,7 +192,9 @@ class DatabaseClient:
 def stresstest( args ):
     """ this is one process in the stress test """
     verbosity, servername, port = "error", args[0], args[1]
-    client = DatabaseClient ( servername, port, verbose = verbosity )
+    nr = args[2]
+    client = DatabaseClient ( servername, port, verbose = verbosity,
+                              logfile="@@rundir@@/dbclient%d.log" % nr )
     mmother = random.uniform ( 200, 900 )
     mlsp = random.uniform ( 0, mmother )
     for i in range(1000):
@@ -194,6 +205,8 @@ def stresstest( args ):
                ( mmother, mlsp, mmother, mlsp )
         # print ( "client #%d" % pid )
         client.query ( msg )
+    # client.saveStats()
+    print ( "finished %d" % nr )
 
 if __name__ == "__main__":
     import argparse
@@ -224,8 +237,11 @@ if __name__ == "__main__":
     if args.stresstest:
         t0 = time.time()
         nproc = 20
+        margs = []
+        for i in range(nproc):
+            margs.append ((args.servername, args.port, i ) )
         p = multiprocessing.Pool( nproc )
-        p.map ( stresstest, [(args.servername, args.port )]*nproc )
+        p.map ( stresstest, margs )
         dt = time.time() - t0 
         print ( "[databaseClient] stress test took %.2f seconds" % dt )
         sys.exit()
@@ -236,3 +252,4 @@ if __name__ == "__main__":
         client.send_shutdown()
         sys.exit()
     client.query ( args.query )
+    client.saveStats()
