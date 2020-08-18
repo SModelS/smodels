@@ -28,8 +28,9 @@ class DatabaseClient:
             self.pprint ( "determined servername as '%s'" % servername )
         self.servername = servername
         self.maxtries = 20 ## max numbers of trying to connect
-        self.pprint ( 'connecting to %s port %s' % \
-                      ( self.servername, self.port ) )
+        sstatus = self.findServerStatus()
+        self.pprint ( "connecting to %s port %s. server status is '%s'" % \
+                      ( self.servername, self.port, sstatus ) )
 
     def send_shutdown ( self ):
         """ send shutdown request to server """
@@ -122,6 +123,15 @@ class DatabaseClient:
             self.rundir = os.getcwd()
         if not hasattr ( self, "logfile" ):
             self.logfile = self.rundir + "/dbclient.log"
+
+    def findServerStatus ( self ):
+        serverfile = self.rundir + "/serverstatus.log"
+        if not os.path.exists ( serverfile ):
+            return "not found"
+        with open ( serverfile, "rt" ) as f:
+            status = f.read()
+            f.close()
+        return status.strip()
 
     def log ( self, *args ):
         if type(self.verbose)==str or self.verbose > 35:
