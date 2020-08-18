@@ -46,6 +46,8 @@ class ProxyDBCreater:
         """ store the outputfile """
         self.outputfile = outputfile 
         self.pprint ( "writing to %s" % outputfile )
+        if os.path.exists ( outputfile ):
+            os.unlink ( outputfile )
         self.database.createBinaryFile ( outputfile )
 
     def symlink ( self ):

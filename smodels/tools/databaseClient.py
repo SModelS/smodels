@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import socket, sys, time, random, multiprocessing, random
+import socket, sys, time, random, multiprocessing, random, os
 from smodels.tools.physicsUnits import fb, pb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
@@ -27,7 +27,7 @@ class DatabaseClient:
             servername = socket.gethostname()
             self.pprint ( "determined servername as '%s'" % servername )
         self.servername = servername
-        self.maxtries = 50 ## max numbers of trying to connect
+        self.maxtries = 60 ## max numbers of trying to connect
 
     def send_shutdown ( self ):
         """ send shutdown request to server """
@@ -40,6 +40,8 @@ class DatabaseClient:
         """
         if msg.startswith ( "query " ):
             msg = msg.replace( "query ", "" )
+        if not hasattr ( self, "cache" ):
+            self.cache={}
         if msg in self.cache:
             self.cache[msg][1]+=1
             return self.cache[msg][0]
@@ -106,9 +108,19 @@ class DatabaseClient:
             self.sock.close()
             del self.sock
 
+    def setDefaults ( self ):
+        """ put in some defaults if data members dont exist """
+        if not hasattr ( self, "maxtries" ):
+            self.maxtries = 60
+        if not hasattr ( self, "rundir" ):
+            self.rundir = os.getcwd()
+        if not hasattr ( self, "logfile" ):
+            self.logfile = self.rundir + "/dbclient.log"
+
     def log ( self, *args ):
         if type(self.verbose)==str or self.verbose > 35:
             print ( "[databaseClient]", " ".join(map(str,args)) )
+        self.setDefaults()
         with open ( self.logfile, "at" ) as f:
             f.write ( "[databaseClient-%s] %s\n" % \
                       ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
@@ -117,6 +129,7 @@ class DatabaseClient:
     def pprint ( self, *args ):
         if type(self.verbose)==str or self.verbose > 25:
             print ( "[databaseClient]", " ".join(map(str,args)) )
+        self.setDefaults()
         with open ( self.logfile, "at" ) as f:
             f.write ( "[databaseClient-%s] %s\n" % \
                       ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
@@ -140,7 +153,7 @@ class DatabaseClient:
             try:
                 self.sock.connect( self.server_address )
                 return
-            except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
+            except (OSError,ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
                 dt = random.uniform ( 1, 10 ) + 10*self.ntries
                 self.ntries += 1
                 self.pprint ( 'could not connect to %s. trying again in %d seconds' % \
