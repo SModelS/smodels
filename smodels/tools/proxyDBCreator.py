@@ -2,7 +2,7 @@
 
 from smodels.tools.databaseClient import DatabaseClient
 from smodels.experiment.databaseObj import Database
-import socket, os, subprocess, copy
+import socket, os, subprocess, copy, time
 
 class ProxyDBCreater:
     def __init__ ( self, inputfile, rundir, verbose="info" ):
@@ -40,7 +40,8 @@ class ProxyDBCreater:
 
     def pprint ( self, *args ):
         if self.verbose > 25:
-            print ( "[ProxyDBCreater]", " ".join(map(str,args)) )
+            print ( "[proxyDBCreater-%s] %s" % \
+                    ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
 
     def store ( self, outputfile ):
         """ store the outputfile """
