@@ -48,6 +48,7 @@ class DatabaseClient:
         for i in self.cache.values():
             maxhits.append ( i[1] )
         self.pprint ( "highest number of hits: %d" % max(maxhits))
+        self.pprint ( "lowest number of hits: %d" % min(maxhits))
 
     def getWaitingTime ( self ):
         """ compute a waiting time between attempts, from self.ntries """
@@ -155,19 +156,19 @@ class DatabaseClient:
     def log ( self, *args ):
         if type(self.verbose)==str or self.verbose > 35:
             self.setDefaults()
-            print ( "[databaseClient]", " ".join(map(str,args)) )
+            print ( "[databaseClient%d] %s" % ( self.clientid, " ".join(map(str,args)) ) )
             with open ( self.logfile, "at" ) as f:
-                f.write ( "[databaseClient-%s] %s\n" % \
-                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                f.write ( "[databaseClient%d-%s] %s\n" % \
+                     ( self.clientid, time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
                 f.close()
 
     def pprint ( self, *args ):
         if type(self.verbose)==str or self.verbose > 25:
-            print ( "[databaseClient]", " ".join(map(str,args)) )
             self.setDefaults()
+            print ( "[databaseClient%d] %s" % ( self.clientid, " ".join(map(str,args)) ) )
             with open ( self.logfile, "at" ) as f:
-                f.write ( "[databaseClient-%s] %s\n" % \
-                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                f.write ( "[databaseClient%d-%s] %s\n" % \
+                      ( self.clientid, time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
                 f.close()
 
     def nameAndPort ( self ):
@@ -184,7 +185,7 @@ class DatabaseClient:
         self.server_address = ( self.servername, self.port )
         self.ntries = 0
         if not hasattr ( self, "maxtries" ):
-            self.maxtries = 20
+            self.maxtries = 25
         while self.ntries < self.maxtries:
             try:
                 self.sock.connect( self.server_address )

@@ -30,7 +30,7 @@ class WrapperBase(object):
     def __init__(self):
         self.executablePath = ""
         self.tempdir = ""
-
+        self.maycompile = True
 
     def installDirectory(self):
         """
@@ -67,6 +67,9 @@ class WrapperBase(object):
         """
         Try to compile the tool.
         """
+        if not self.maycompile:
+            logger.debug("Auto-compilation turned off for %s", self.name )
+            return
         logger.debug("Trying to compile %s", self.name)
         cmd = "cd %s; make" % self.srcPath
         out = executor.getoutput(cmd)
@@ -92,7 +95,7 @@ class WrapperBase(object):
                 logger.warn("%s executable not found. Trying to compile it now. This may take a while." % self.name )
                 self.compile()
             else:
-                logger.warn("%s exectuable not found." % self.name )
+                logger.warn("%s executable not found." % self.name )
                 self.complain()
                 return False
         if not os.path.exists(self.executablePath):

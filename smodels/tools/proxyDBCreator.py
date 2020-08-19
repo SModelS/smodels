@@ -8,6 +8,7 @@ class ProxyDBCreater:
     def __init__ ( self, inputfile, rundir, verbose="info" ):
         self.inputfile = inputfile
         self.rundir = rundir
+        self.nr = 0
         self.verbstring = verbose
         if type(verbose)==int:
             self.verbose = verbose
@@ -29,7 +30,7 @@ class ProxyDBCreater:
         self.servername = servername
         self.serverport = serverport
         self.database.client = DatabaseClient ( servername, serverport,
-                verbose=self.verbstring, rundir = self.rundir )
+                verbose=self.verbstring, rundir = self.rundir, clientid = self.nr )
         for e,expRes in enumerate(self.database.expResultList):
             for d,dataset in enumerate(expRes.datasets):
                 for t,txn in enumerate(dataset.txnameList):

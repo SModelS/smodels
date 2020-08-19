@@ -27,7 +27,7 @@ import sys
 
 class XSecComputer:
     """ cross section computer class, what else? """
-    def __init__ ( self, maxOrder, nevents, pythiaVersion ):
+    def __init__ ( self, maxOrder, nevents, pythiaVersion, maycompile=True ):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
                     if maxOrder == LO, compute only LO pythia xsecs
@@ -35,10 +35,12 @@ class XSecComputer:
                     if maxOrder == NLL, apply NLO+NLL K-factors from NLLfast (if available)
         :param nevents: number of events for pythia run
         :param pythiaVersion: pythia6 or pythia8 (integer)
+        :param maycompile: if True, then tools can get compiled on-the-fly
         """
         self.maxOrder = self._checkMaxOrder ( maxOrder )
         self.countNoXSecs = 0
         self.countNoNLOXSecs = 0
+        self.maycompile = maycompile
         if nevents < 1:
             logger.error ( "Supplied nevents < 1" )
             sys.exit()
@@ -89,6 +91,7 @@ class XSecComputer:
         if self.maxOrder > 0:
             pIDs = self.loXsecs.getPIDpairs()
             nllfast = toolBox.ToolBox().get("nllfast%d" % sqrts.asNumber(TeV) )
+            nllfast.maycompile = self.maycompile
             for pID in pIDs:
                 k = 0.
                 kNLO, kNLL = nllfast.getKfactorsFor(pID, slhafile)
@@ -193,7 +196,9 @@ class XSecComputer:
 
     def getPythia ( self ):
         """ returns the pythia tool that is configured to be used """
-        return toolBox.ToolBox().get("pythia%d" % self.pythiaVersion )
+        ret= toolBox.ToolBox().get("pythia%d" % self.pythiaVersion )
+        ret.maycompile = self.maycompile
+        return ret
 
     def compute ( self, sqrts, slhafile,  lhefile=None, unlink=True, loFromSlha=None,
                   pythiacard=None, ssmultipliers=None ):
