@@ -9,8 +9,6 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-from __future__ import print_function
-import json
 import jsonpatch
 import pyhf
 pyhf.set_backend(b"pytorch")
@@ -332,17 +330,16 @@ class PyhfUpperLimitComputer:
             # Same modifiers_settings as those use when running the 'pyhf cls' command line
             msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
             model = workspace.model(modifier_settings=msettings)
-            test_poi = mu
             start = time.time()
-            result = pyhf.infer.hypotest(test_poi, workspace.data(model), model, qtilde=True, return_expected = expected)
+            result = pyhf.infer.hypotest(mu, workspace.data(model), model, qtilde=True, return_expected = expected)
             end = time.time()
             logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
             if expected:
                 logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                CLs = float(result[1].tolist()[0])
+                CLs = float(result[1].tolist())
             else:
                 logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                CLs = float(result[0])
+                CLs = float(result)
             # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
             return 1.0 - self.cl - CLs
         # Rescaling singals so that mu is in [0, 10]
