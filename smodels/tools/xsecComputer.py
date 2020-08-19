@@ -553,6 +553,8 @@ class ArgsStandardizer:
 def main(args):
     canonizer = ArgsStandardizer()
     setLogLevel ( args.verbosity )
+    if not hasattr ( args, "noautocompile" ):
+        args.noautocompile = False
     if args.query:
         return canonizer.queryCrossSections ( args.filename )
     if args.colors:

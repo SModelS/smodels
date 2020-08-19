@@ -87,6 +87,7 @@ class XSecTest(unittest.TestCase):
         xargs = argparse.Namespace()
         xargs.sqrts = [[8.,13.]]
         xargs.ncpus = 1
+        xargs.noautocompile = True
         xargs.nevents = 2000
         #Compute LO xsecs:
         xargs.query = False
@@ -142,6 +143,7 @@ class XSecTest(unittest.TestCase):
         xargs = argparse.Namespace()
         xargs.sqrts = [[8.,13.]]
         xargs.ncpus = 1
+        xargs.noautocompile = True
         xargs.nevents = 5000
         #Compute LO xsecs:
         xargs.query = False
@@ -170,12 +172,12 @@ class XSecTest(unittest.TestCase):
         #Check 8 TeV xsecs:
         lo = xsecsInfile.getXsecsFor('8 TeV (LO)')[0].value.asNumber(fb)
         nll = xsecsInfile.getXsecsFor('8 TeV (NLL)')[0].value.asNumber(fb)
-        self.assertAlmostEqual(lo/1058.444,1.,2)
-        self.assertAlmostEqual(nll/2299.046,1.,2)
+        self.assertAlmostEqual(lo/1058.444,1.,1)
+        self.assertAlmostEqual(nll/2299.046,1.,1)
         #Check 13 TeV xsecs:
         lo = xsecsInfile.getXsecsFor('13 TeV (LO)')[0].value.asNumber(fb)
         nll = xsecsInfile.getXsecsFor('13 TeV (NLL)')[0].value.asNumber(fb)
-        self.assertAlmostEqual(lo/8910.76,1.,2 )
+        self.assertAlmostEqual(lo/8910.76,1.,1 )
         self.assertAlmostEqual(nll/17215.5906, 1.,1)
         
     def testSSJokers(self):
@@ -197,6 +199,7 @@ class XSecTest(unittest.TestCase):
         #Options for cross section calculation:
         xargs = argparse.Namespace()
         xargs.sqrts = [[8.,13.]]
+        xargs.noautocompile = True
         xargs.ncpus = 1
         xargs.nevents = 5000
         #Compute LO xsecs:
