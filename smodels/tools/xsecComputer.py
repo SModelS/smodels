@@ -591,7 +591,8 @@ def main(args):
             logger.debug ( "chunk #%d: pid %d (parent %d)." %
                        ( i, os.getpid(), os.getppid() ) )
             logger.debug ( " `-> %s" % " ".join ( chunk ) )
-            computer = XSecComputer( order, args.nevents, pythiaVersion )
+            computer = XSecComputer( order, args.nevents, pythiaVersion, \
+                                     not args.noautocompile )
             toFile = canonizer.writeToFile ( args )
             computer.computeForBunch (  sqrtses, chunk, not args.keep,
                           args.LOfromSLHA, toFile, pythiacard=pythiacard, \

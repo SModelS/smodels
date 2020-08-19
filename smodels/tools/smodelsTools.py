@@ -41,6 +41,8 @@ def main():
         help="only query if there are cross sections in the file")
     xseccomputer.add_argument('-C', '--colors', action='store_true',
         help="colored terminal output" )
+    xseccomputer.add_argument( '--noautocompile', action='store_true',
+        help="turn off automatic compilation" )
     xseccomputer.add_argument('-k', '--keep', action='store_true',
         help="do not unlink temporary directory")
     xseccomputer.add_argument('-6', '--pythia6', action='store_true',
