@@ -46,6 +46,8 @@ class DatabaseServer:
         self.packetlength = 256
         self.nlookups = 0
         servers[0].append ( self )
+        if "SLURM_JOB_ID" in os.environ:
+            self.pprint ( "slurm job id is %s" % os.environ["SLURM_JOB_ID"] )
         self.setStatus ( "ramped" )
 
     def setStatus ( self, status ):

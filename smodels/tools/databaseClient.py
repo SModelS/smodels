@@ -34,6 +34,8 @@ class DatabaseClient:
         sstatus = self.findServerStatus()
         self.pprint ( "connecting to %s port %s, rundir is %s. server status is '%s'" % \
                       ( self.servername, self.port, self.rundir, sstatus ) )
+        if "SLURM_JOB_ID" in os.environ:
+            self.pprint ( "slurm job id is %s" % os.environ["SLURM_JOB_ID"] )
 
     def send_shutdown ( self ):
         """ send shutdown request to server """
