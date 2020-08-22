@@ -2,7 +2,7 @@
 
 from smodels.tools.databaseClient import DatabaseClient
 from smodels.experiment.databaseObj import Database
-import socket, os, subprocess, copy, time, tempfile
+import socket, os, subprocess, copy, time #, tempfile
 
 class ProxyDBCreater:
     def __init__ ( self, inputfile, rundir, verbose="info" ):
@@ -51,11 +51,11 @@ class ProxyDBCreater:
         if os.path.exists ( outputfile ):
             os.unlink ( outputfile )
         ## first create it as temporary file, then move
-        tempf = tempfile.mktemp ( suffix=".pcl" )
+        tempf = outputfile + ".tmp" # tempfile.mktemp ( suffix=".pcl" )
         self.database.createBinaryFile ( tempf )
-        cmd = f"mv {tempf} {outputfile}"
-        subprocess.getoutput ( cmd )
-        # os.rename ( tempf, outputfile ) ## would only work on same device
+        #cmd = f"mv {tempf} {outputfile}"
+        #subprocess.getoutput ( cmd )
+        os.rename ( tempf, outputfile ) ## would only work on same device
 
     def symlink ( self ):
         """ set a symlink from self.outputfile to default.pcl """
