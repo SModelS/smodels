@@ -117,6 +117,8 @@ class DatabaseServer:
 
     def lookUpResult ( self, data ):
         self.nlookups += 1
+        if self.nlookups % 20000 == 0:
+            self.pprint ( "looked up %dth result" % self.nlookups )
         tokens = data.split(":")
         anaId = tokens[1]
         dType = ":". join ( tokens[2:-2] )
