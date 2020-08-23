@@ -21,6 +21,7 @@ class DatabaseClient:
             if k in verbose:
                 self.verbose = v
         self.logfile = logfile
+        self.pprint ( "starting a database client at %s" % time.asctime() )
         self.packetlength = 256
         if port == None:
             port = 31770

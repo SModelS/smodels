@@ -31,6 +31,7 @@ class DatabaseServer:
             if k in verbose:
                 self.verbose = v
         self.setStatus ( "ramping" )
+        self.pprint ( "starting a server at %s" % time.asctime() )
         if port == None:
             port = 31770
             while self.is_port_in_use ( port ):
