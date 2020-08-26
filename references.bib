@@ -2,14 +2,17 @@
 % When you are using SModelS for a publication, please cite:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+% THE PAPER/PREPRINT FOR THIS RELEASE plus:
+%
 % SModelS citations
 % ---------------------------
 % SModelS proper: \cite{Kraml:2013mwa,Ambrogi:2017neo,Ambrogi:2018ujg}
 % LLPs in SModelS: \cite{Heisig:2018kfq,Ambrogi:2018ujg}
-% Run2 database: \cite{Dutta:2018ioj,Ambrogi:2018ujg}
+% Run2 database: \cite{Dutta:2018ioj,Ambrogi:2018ujg,Khosa:2020zar}
 %
 % External tools used by SModelS:
 % ---------------------------------------------
+% pyhf: \cite{pyhf,ATL-PHYS-PUB-2019-029}
 % PySLHA: \cite{Buckley:2013jua}
 % Pythia6.4: \cite{Sjostrand:2006za}
 % Pythia8.2: \cite{Sjostrand:2006za,Sjostrand:2014zea}
@@ -23,7 +26,20 @@
 %%% contains utf-8, see: https://inspirehep.net/info/faq/general#utf8
 %%% add \usepackage[utf8]{inputenc} to your latex preamble
 
- %%% SModelS v1.2: manual %%%
+%%% SModelS v1.2.3: database update %%%
+
+@article{Khosa:2020zar,
+    author = "Khosa, Charanjit K. and Kraml, Sabine and Lessa, Andre and Neuhuber, Philipp and Waltenberger, Wolfgang",
+    title = "{SModelS database update v1.2.3}",
+    journal = "{to appear in LHEP. }",
+    year = "2020",
+    eprint = "2005.00555", 
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    SLACcitation   = "%%CITATION = ARXIV:2005.00555;%%"
+}
+
+%%% SModelS v1.2: manual %%%
 
 @article{Ambrogi:2018ujg,
       author         = "Ambrogi, Federico and others",
@@ -37,7 +53,7 @@
       SLACcitation   = "%%CITATION = ARXIV:1811.10624;%%"
 }
 
- %%% SModelS v1.2.0: implementation of long-lived signatures %%%
+%%% SModelS v1.2.0: implementation of long-lived signatures %%%
 
 @article{Heisig:2018kfq,
       author         = "Heisig, Jan and Kraml, Sabine and Lessa, Andre",
@@ -52,7 +68,7 @@
       SLACcitation   = "%%CITATION = ARXIV:1808.05229;%%"
 }
 
- %%% SModelS v1.1.2: database update %%%
+%%% SModelS v1.1.2: database update %%%
 
 @article{Dutta:2018ioj,
       author         = "Dutta, Juhi and Kraml, Sabine and Lessa, Andre and
@@ -72,7 +88,7 @@
       SLACcitation   = "%%CITATION = ARXIV:1803.02204;%%"
 }
 
- %%% SModelS v1.1 release %%%
+%%% SModelS v1.1 release %%%
 @article{Ambrogi:2017neo,
       author         = "Ambrogi, Federico and Kraml, Sabine and Kulkarni, Suchita
                         and Laa, Ursula and Lessa, Andre and Magerl, Veronika and
@@ -106,11 +122,10 @@
       SLACcitation   = "%%CITATION = ARXIV:1312.4175;%%",
 }
 
-%%% original SModelS webpage %%%
+%%% SModelS webpage %%%
 @misc{smodels:wiki, 
       note = "{https://smodels.github.io}",
 }
-
 
 
 %%% Pythia 8.2 %%%
@@ -271,6 +286,29 @@ note = "{http://pauli.uni-muenster.de/\~akule\_01/nllwiki/index.php/NLL-fast}",
       reportNumber   = "CERN-PH-TH-2010-142, ITFA-2010-015, ITP-UU-10-17,
                         NIKHEF-2010-016, TTK-10-33",
       SLACcitation   = "%%CITATION = ARXIV:1006.4771;%%",
+}
+
+%%% pyhf %%%
+
+@misc{pyhf,
+  author = "Heinrich, Lukas and Feickert, Matthew and Stark, Giordon",
+  title = "{scikit-hep/pyhf}",
+  doi = {10.5281/zenodo.1169739},
+  howpublished = "\url{https://github.com/scikit-hep/pyhf}, DOI: \href{https://doi.org/10.5281/zenodo.1169739}{10.5281/zenodo.1169739}",
+}
+
+@techreport{ATL-PHYS-PUB-2019-029,
+      author = "{ATLAS Collaboration}",
+      title         = "{Reproducing searches for new physics with the ATLAS
+                       experiment through publication of full statistical
+                       likelihoods}",
+      institution   = "CERN",
+      address       = "Geneva",
+      number        = "ATL-PHYS-PUB-2019-029",
+      month         = "Aug",
+      year          = "2019",
+      reportNumber  = "ATL-PHYS-PUB-2019-029",
+      note           = "\url{https://cds.cern.ch/record/2684863}",
 }
 
 %%% further references %%%
