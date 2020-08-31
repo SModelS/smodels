@@ -68,7 +68,8 @@ class RunSModelSTest(unittest.TestCase):
         from pyhf_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
-                           ignore=ignoreFields, fname=outputfile )
+                           ignore=ignoreFields, fname=outputfile, 
+	                         fname2 = "pyhf_default.py" )
         self.assertTrue(equals)
 
     def testGoodFile13(self):

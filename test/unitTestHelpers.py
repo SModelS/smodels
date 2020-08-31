@@ -16,7 +16,7 @@ from smodels.installation import installDirectory as iDir
 from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
 from databaseLoader import database ## to make sure the db exists
 
-def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None, fname=None ):
+def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None, fname=None, fname2=None ):
     """
     Compare two objects.
     The numerical values are compared up to the precision defined by allowedDiff.
@@ -27,6 +27,7 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None, fname=None ):
     :param ignore: List of keys to be ignored
     :param where: keep track of where we are, for easier debugging.
     :param fname: the filename of obj1
+    :param fname2: the filename of obj2
     :return: True/False
     """
     if type(fname)==str:
@@ -58,9 +59,14 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None, fname=None ):
         for key in obj1:
             if key in ignore: continue
             if not key in obj2:
-                logger.warning("Key ``%s'' missing in %s:%s" % (key, where, fname ) )
+                if where == None:
+                    where = "unspecified"
+                if fname2 == None:
+                    fname2 = "unspecified"
+                warn = "Key ``%s'' missing in %s:%s" % (key, where, fname2 )
+                logger.warning( warn )
                 return False
-            if not equalObjs(obj1[key],obj2[key],allowedDiff, ignore=ignore, where=key, fname = fname ):
+            if not equalObjs(obj1[key],obj2[key],allowedDiff, ignore=ignore, where=key, fname = fname, fname2 = fname2 ):
                 return False
     elif isinstance(obj1,list):
         if len(obj1) != len(obj2):
@@ -68,7 +74,7 @@ def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None, fname=None ):
                                 (len(obj1),len(obj2)))
             return False
         for ival,val in enumerate(obj1):
-            if not equalObjs(val,obj2[ival],allowedDiff, fname = fname ):
+            if not equalObjs(val,obj2[ival],allowedDiff, fname = fname, fname2 = fname2 ):
                 #logger.warning('Lists differ:\n   %s (this run)\n and\n   %s (default)' %\
                 #                (str(val),str(obj2[ival])))
                 return False
