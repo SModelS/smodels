@@ -1,27 +1,25 @@
 #!/usr/bin/env python3
- 
+
 """
 .. module:: testRunSModelS
    :synopsis: Tests runSModelS
- 
+
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
- 
+
 """
- 
-import sys,os,imp
+
+import sys, os, glob, time
 sys.path.insert(0,"../")
 import unittest
-import glob
-from os.path import join 
+from os.path import join
 from smodels.installation import installDirectory as iDir
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
-from unitTestHelpers import equalObjs, runMain
-import time
- 
+from unitTestHelpers import equalObjs, runMain, importModule
+
 from smodels.tools.smodelsLogging import logger
- 
+
 class RunSModelSTest(unittest.TestCase):
     def testMultipleFiles( self ):
         out = join( iDir(), "test/unitTestOutput")
@@ -35,12 +33,12 @@ class RunSModelSTest(unittest.TestCase):
         if nout != nin:
             logger.error("Number of output file (%d) differ from number of input files (%d)" % (nout, nin))
         self.assertTrue( nout == nin )
-     
+
     def timeoutRun(self):
         filename = "./testFiles/slha/complicated.slha"
         outputfile = runMain(filename, timeout=1, suppressStdout=True,
                              development=True, inifile = "timeout.ini" )
-     
+
     def testTimeout(self):
         self.assertRaises(NoTime, self.timeoutRun)
 
@@ -48,14 +46,12 @@ class RunSModelSTest(unittest.TestCase):
         """ remove cruft outputfiles """
         for i in [ f, f.replace(".py",".pyc") ]:
             if os.path.exists ( i ): os.remove ( i )
-  
+
     def testGoodFile(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(filename)
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput
         from gluino_squarks_default import smodelsOutputDefault
+        smodelsOutput = importModule ( outputfile )
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
@@ -63,14 +59,24 @@ class RunSModelSTest(unittest.TestCase):
                            ignore=ignoreFields)
         self.assertTrue(equals)
         self.removeOutputs ( outputfile )
-      
+
+    def testPyhfCombination(self):
+        filename = "./testFiles/slha/T6bbHH_pyhf.slha"
+        inifile = "./testParameters_pyhf.ini"
+        outputfile = runMain(filename, inifile=inifile )
+        smodelsOutput = importModule ( outputfile )
+        from pyhf_default import smodelsOutputDefault
+        ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+                           ignore=ignoreFields, fname=outputfile, 
+	                         fname2 = "pyhf_default.py" )
+        self.assertTrue(equals)
+
     def testGoodFile13(self):
-            
+
         filename = "./testFiles/slha/simplyGluino.slha"
         outputfile = runMain(filename,suppressStdout = True )
-        with open( outputfile, 'rb') as fp: ## imports file with dots in name
-            output_module = imp.load_module("output",fp,outputfile, ('.py', 'rb', imp.PY_SOURCE) )
-            smodelsOutput = output_module.smodelsOutput
+        smodelsOutput = importModule ( outputfile )
         from simplyGluino_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
@@ -78,15 +84,15 @@ class RunSModelSTest(unittest.TestCase):
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields)
         if not equals:
-            e =  "output13.py and simplyGluino_default.py differ!" 
+            e =  "output13.py and simplyGluino_default.py differ!"
             logger.error ( e )
             # raise AssertionError ( e )
 
-        self.assertTrue(equals)        
+        self.assertTrue(equals)
 
         ## test went through, so remove the output files
         self.removeOutputs ( outputfile )
-    
+
     def testBadFile(self):
         # since 112 we skip non-existing slha files!
         filename = "./testFiles/slha/I_dont_exist.slha"
@@ -95,13 +101,13 @@ class RunSModelSTest(unittest.TestCase):
         outputfile = runMain(filename  )
         self.assertTrue ( of in outputfile )
         self.assertTrue ( not os.path.exists ( outputfile ) )
-    
+
     def cleanUp ( self ):
         for f in os.listdir("."):
             if ".crash" in f: os.remove(f)
         for i in [ "crash_report_parameter", "crash_report_input" ]:
             if os.path.exists ( i ): os.remove ( i )
-    
+
     def testCrash(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
         ctr=0
@@ -123,7 +129,7 @@ class RunSModelSTest(unittest.TestCase):
                 ctr+=1
         self.assertEqual ( ctr, 1 )
         inp, par = crashReport.readCrashReportFile(crash_file)
-     
+
         with open(filename) as f:
             with open(inp) as g:
                 self.assertEqual(f.readlines(), g.readlines())
@@ -131,6 +137,6 @@ class RunSModelSTest(unittest.TestCase):
             with open(par) as g:
                self.assertEqual( f.readlines(), g.readlines())
         self.cleanUp()
- 
+
 if __name__ == "__main__":
     unittest.main()

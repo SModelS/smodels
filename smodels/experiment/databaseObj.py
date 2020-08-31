@@ -62,6 +62,8 @@ class Database(object):
             Should only be used when working on the database.
         """
         self.source=""
+        if force_load == None and base.endswith ( ".pcl" ):
+            force_load = "pcl"
         self.force_load = force_load
         self.subpickle = subpickle
         if base in [ None, "official" ]:
@@ -630,8 +632,10 @@ class Database(object):
 
                 if hasattr(dataset.dataInfo, 'dataId') and datasetIDs != ['all']:
                     hits=False
+                    if datasetIDs == None:
+                        datasetIDs = [ None ]
                     for pattern in datasetIDs:
-                        hits = fnmatch.filter ( [ dataset.dataInfo.dataId ], pattern )
+                        hits = fnmatch.filter ( [ str(dataset.dataInfo.dataId) ], str(pattern) )
                         if hits:
                             break
                             # continue

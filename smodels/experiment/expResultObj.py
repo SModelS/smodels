@@ -223,6 +223,8 @@ class ExpResult(object):
             logger.error("Dataset ID %s not found in experimental result %s" %(dataID,self))     
             return None
 
+    def hasJsonFile( self ):
+        return hasattr(self.globalInfo, "jsonFiles")
 
     def getValuesFor(self, attribute=None):
         """
