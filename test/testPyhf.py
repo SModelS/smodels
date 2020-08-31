@@ -275,7 +275,10 @@ class PyhfTest(unittest.TestCase):
         bounds = model.config.suggested_bounds()
         bounds[model.config.poi_index] = [0,100]
         result = pyhf.infer.hypotest(ul, workspace.data(model), model, par_bounds=bounds, qtilde=True, return_expected=False)
-        CLs = float(result[0])
+        try:
+            CLs = float(result[0])
+        except IndexError:
+            CLs = float(result)
         self.assertAlmostEqual(CLs, 0.05, 2)
 
     def testFullPyhfModule2(self):
@@ -317,7 +320,10 @@ class PyhfTest(unittest.TestCase):
         bounds = model.config.suggested_bounds()
         bounds[model.config.poi_index] = [0,100]
         result = pyhf.infer.hypotest(ul, workspace.data(model), model, par_bounds=bounds, qtilde=True, return_expected=False)
-        CLs = float(result[0])
+        try:
+            CLs = float(result[0])
+        except IndexError:
+            CLs = float(result)
         self.assertAlmostEqual(CLs, 0.05, 2)
 
 
