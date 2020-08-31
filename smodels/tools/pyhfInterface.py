@@ -340,7 +340,10 @@ class PyhfUpperLimitComputer:
             logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
             if expected:
                 logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                CLs = float(result[1].tolist())
+                try:
+                    CLs = float(result[1].tolist())
+                except TypeError:
+                    CLs = float(result[1][0])
             else:
                 logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                 CLs = float(result)

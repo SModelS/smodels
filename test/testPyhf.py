@@ -13,7 +13,7 @@ sys.path.insert(0,"../")
 import unittest
 import json
 import jsonpatch
-from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
+from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer, pyhf
 
 class PyhfTest(unittest.TestCase):
 
