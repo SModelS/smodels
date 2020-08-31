@@ -419,7 +419,7 @@ class CombinedDataSet(object):
 
     def getCombinedUpperLimitFor(self, nsig, expected=False, deltas_rel=0.2):
         """
-        Get combined upper limit.
+        Get combined upper limit. If covariances are given in globalInfo then simplified likelihood is used, else if json files are given pyhf cimbination is performed.
 
         :param nsig: list of signal events in each signal region/dataset. The list
                         should obey the ordering in globalInfo.datasetOrder.

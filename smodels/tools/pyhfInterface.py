@@ -81,7 +81,7 @@ class PyhfData:
                 if ch['name'][:2] == 'SR': # if channel name starts with 'SR'
                     wsChannelsInfo['signalRegions'].append({'path':'/channels/'+str(i_ch)+'/samples/0', # Path of the new sample to add (signal prediction)
                                                             'size':len(ch['samples'][0]['data'])}) # Number of bins
-                if 'VR' in ch['name'] or 'CR' in ch['name']:
+                else:
                     wsChannelsInfo['otherRegions'].append('/channels/'+str(i_ch))
             wsChannelsInfo['otherRegions'].sort(key=lambda path: path.split('/')[-1], reverse=True) # Need to sort correctly the paths to the channels to be removed
             self.channelsInfo.append(wsChannelsInfo)
@@ -353,7 +353,7 @@ class PyhfUpperLimitComputer:
         factor = 10.
         wereBothLarge = False
         wereBothTiny = False
-        while "mu is not in [0,10]":
+        while "mu is not in [1,10]":
             # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
             rt1 = root_func(1.)
             rt10 = root_func(10.)
