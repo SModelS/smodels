@@ -11,8 +11,6 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-import pyhf
-pyhf.set_backend(b"pytorch")
 import json
 import jsonpatch
 from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer

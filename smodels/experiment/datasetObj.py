@@ -16,7 +16,6 @@ from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.particleNames import elementsInStr
 from smodels.theory.element import Element
-from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
 import itertools
 
 class DataSet(object):
@@ -482,6 +481,7 @@ class CombinedDataSet(object):
                 with open(js, "r") as fi:
                     inputJsons.append(json.load(fi))
 
+            from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
             data = PyhfData(nsignals, inputJsons)
             if data.errorFlag: return None
             ulcomputer = PyhfUpperLimitComputer(data)
@@ -568,6 +568,7 @@ class CombinedDataSet(object):
                 with open(js, "r") as fi:
                     inputJsons.append(json.load(fi))
 
+            from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
             data = PyhfData(nsignals, inputJsons)
             if data.errorFlag: return None
             ulcomputer = PyhfUpperLimitComputer(data)
@@ -637,6 +638,7 @@ class CombinedDataSet(object):
                 with open(js, "r") as fi:
                     inputJsons.append(json.load(fi))
 
+            from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
             data = PyhfData(nsignals, inputJsons)
             if data.errorFlag: return None
             ulcomputer = PyhfUpperLimitComputer(data)

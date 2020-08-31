@@ -10,12 +10,16 @@
 
 """
 import jsonpatch
-import pyhf
+import time, sys
+try:
+    import pyhf
+except ModuleNotFoundError:
+    print ( "[SModelS:pyhfInterface] pyhf import failed. Is the module installed?" )
+    sys.exit(-1)
 pyhf.set_backend(b"pytorch")
 from scipy import optimize
 import numpy as np
 from smodels.tools.smodelsLogging import logger
-import time
 
 def getLogger():
     """
