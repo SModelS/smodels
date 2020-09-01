@@ -1,0 +1,10 @@
+id: ATLAS-SUSY-2019-08
+sqrts: 13*TeV
+lumi: 139.0/fb
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2019-08/
+arxiv: arXiv:1909.09226
+contact: atlas-phys-susy-conveners@cern.ch
+implementedBy: Gael Alguero
+lastUpdate: 2020/8/25
+datasetOrder: "SR_HM_Low_MCT", "SR_HM_Med_MCT", "SR_HM_High_MCT", "SR_MM_Low_MCT", "SR_MM_Med_MCT", "SR_MM_High_MCT", "SR_LM_Low_MCT", "SR_LM_Med_MCT", "SR_LM_High_MCT"
+jsonFiles: {"BkgOnly.json" : ["SR_HM_Low_MCT", "SR_HM_Med_MCT", "SR_HM_High_MCT", "SR_MM_Low_MCT", "SR_MM_Med_MCT", "SR_MM_High_MCT", "SR_LM_Low_MCT", "SR_LM_Med_MCT", "SR_LM_High_MCT"]}

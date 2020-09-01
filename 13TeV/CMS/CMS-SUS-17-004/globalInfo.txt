@@ -5,5 +5,5 @@ url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-
 arxiv: https://arxiv.org/abs/1801.03957
 publication: JHEP 1803 (2018) 160, http://dx.doi:10.1007/JHEP03(2018)160
 contact: cms-phys-conveners-sus@cern.ch
-implementedBy: ck
-lastUpdate: 2020/3/16
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2020/5/20

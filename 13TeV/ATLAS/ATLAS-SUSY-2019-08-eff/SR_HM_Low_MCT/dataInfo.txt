@@ -1,0 +1,7 @@
+dataId: SR_HM_Low_MCT
+dataType: efficiencyMap
+observedN: 6
+expectedBG: 4.1
+bgError: 1.9
+upperLimit: 0.0688*fb
+expectedUpperLimit: 0.0505*fb
