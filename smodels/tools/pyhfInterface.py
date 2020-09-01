@@ -12,7 +12,7 @@
 import jsonpatch
 import jsonschema
 if jsonschema.__version__[0] == "2":
-    print ( "[pyhfInterface] jsonschema is version %s, we need > 3.x.x" % ( jsonschema.__version__ ) )
+    print ( "[SModelS:pyhfInterface] jsonschema is version %s, we need > 3.x.x" % ( jsonschema.__version__ ) )
     sys.exit()
 
 import time, sys
@@ -21,6 +21,11 @@ try:
 except ModuleNotFoundError:
     print ( "[SModelS:pyhfInterface] pyhf import failed. Is the module installed?" )
     sys.exit(-1)
+ver = pyhf.__version__.split(".")
+if ver[1]=="4" or (ver[1]=="5" and ver[2] in [ "0", "1" ]):
+    print ( f"[SModelS:pyhfInterface] WARNING you are using pyhf vf{pyhf.__version__}. pyhf versions < 0.5.2 have a memory leak and cause troubles for larger scans!" )
+    print ( "[SModelS:pyhfInterface] Please try to update pyhf ASAP!" )
+
 pyhf.set_backend(b"pytorch")
 from scipy import optimize
 import numpy as np
