@@ -116,6 +116,17 @@ class RunSModelSTest(unittest.TestCase):
         self.assertTrue(equals)
         self.removeOutputs( outputfile )
 
+    def testPyhfCombination(self):
+        filename = "./testFiles/slha/T6bbHH_pyhf.slha"
+        inifile = "./testParameters_pyhf.ini"
+        outputfile = runMain(filename, inifile=inifile )
+        smodelsOutput = importModule ( outputfile )
+        from pyhf_default import smodelsOutputDefault
+        ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+                           ignore=ignoreFields, fname=outputfile, 
+	                         fname2 = "pyhf_default.py" )
+        self.assertTrue(equals)
 
     def testGoodFile13(self):
 

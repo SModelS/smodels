@@ -84,6 +84,7 @@ pythonTools = { "unum" : ExternalPythonTool("unum"),
                 "numpy": ExternalPythonTool("numpy"),
                 "pyslha": ExternalPythonTool("pyslha"),
                 "scipy": ExternalPythonTool("scipy"),
+                "pyhf": ExternalPythonTool("pyhf",optional=True)
                 "plotly": ExternalPythonTool("plotly",optional=True),
                 "pandas": ExternalPythonTool("pandas",optional=True),
                 "ipython": ExternalPythonTool("IPython",optional=True), }
