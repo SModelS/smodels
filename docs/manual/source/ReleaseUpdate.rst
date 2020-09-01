@@ -40,7 +40,7 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 1.2.4:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * added pyhf support
+  * added `pyhf <https://scikit-hep.org/pyhf/>`_ support
   * pickle path bug fix
   * bug fix for parallel xseccomputers
   * Introduced the SMODELS_CACHEDIR environment variable to allow for a different

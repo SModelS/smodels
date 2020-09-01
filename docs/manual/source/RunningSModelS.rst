@@ -141,7 +141,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileCombineSRs:
 
-  * **combineSRs** (True/False): set to True to use, whenever available, covariance matrices to combine signal regions. NB this might take a few secs per point. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards. 
+  * **combineSRs** (True/False): set to True to use, whenever available, covariance matrices or full likelihoods to combine signal regions. NB this might take a few secs per point. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards for covariance matrices and v1.2.4 onwards for full likelihoods (using `pyhf <https://scikit-hep.org/pyhf/>`_). 
 
 .. _parameterFileParticles:
 
@@ -380,7 +380,7 @@ Below we go step-by-step through this example code:
   `lheDecomposer.decompose <theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 41-45
+   :lines: 41-46
 
 * *Access basic information* from decomposition, using the
   `topology list <theory.html#theory.topology.TopologyList>`_
@@ -449,40 +449,41 @@ can take as arguments specific results to be loaded.
 * *Print the r-value*, i.e. the ratio |theory prediction|/upper limit.
   A value of :math:`r \geq 1` means that an experimental result excludes the input model.
   For |EMrs| also compute the :math:`\chi^2` and :ref:`likelihood <likelihoodCalc>`.
+  Also check if the :ref:`condition values <ULconditions>` are met.
   Determine the most constraining result:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 105-113
+   :lines: 105-126
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 24-25
+   :lines: 24-26
 
 * *Print the most constraining experimental result*. Using the largest *r*-value,
   determine if the model has been excluded or not by the selected |express|:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 116-120
+   :lines: 128-133
 
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 588-589
+   :lines: 970-971
    
    
 * *Identify missing topologies*. Using the output from decomposition, identify
   the :ref:`missing topologies <topCoverage>` and print some basic information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 125-145
+   :lines: 134-158
 
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 591-602,612-617
+   :lines: 973-1015
 
 
 It is worth noting that SModelS does not include any statistical treatment for

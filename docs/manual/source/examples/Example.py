@@ -36,7 +36,7 @@ def main():
     # Set main options for decomposition
     sigmacut = 0.01 * fb
     mingap = 5. * GeV
-
+    maxcond = 0.2
     
     # Decompose model (use slhaDecomposer for SLHA input or lheDecomposer for LHE input)
     slhaInput = True
@@ -103,11 +103,25 @@ def main():
             # Compute the r-value
             r = theoryPrediction.getRValue()
             print( "r = ",r )
-            #Compute likelihhod and chi^2 for EM-type results:
+            
+            # Compute likelihhod and chi^2 for EM-type results:
             if dataset.dataInfo.dataType == 'efficiencyMap':
                 theoryPrediction.computeStatistics()
                 print( 'Chi2, likelihood=', theoryPrediction.chi2, theoryPrediction.likelihood )
-            if r > rmax:
+
+            # Check condition violation
+            exceedsMaxCond = False
+            CondViolation = theoryPrediction.getmaxCondition()
+            if CondViolation == 'N/A' or CondViolation == None: 
+                print( "no condition violation" )
+            elif CondViolation <= maxcond: 
+                print( "Condition violation = ", CondViolation, " (OK)" )
+            else: 
+                print( "Condition violation ", CondViolation, " exceeds chosen bound of ", maxcond )
+                exceedsMaxCond=True
+                     
+            # determine rmax              
+            if r > rmax and exceedsMaxCond == False:
                 rmax = r
                 bestResult = expResult.globalInfo.id
             
@@ -118,8 +132,8 @@ def main():
     else:
         print( "(The input model is not excluded by the simplified model results)" )
       
-    #Find out missing topologies for sqrts=8*TeV:
-    uncovered = coverage.Uncovered(toplist,sqrts=8.*TeV)
+    #Find out missing topologies for sqrts=13*TeV:
+    uncovered = coverage.Uncovered(toplist,sqrts=13.*TeV)
     #Print uncovered cross-sections:
     print( "\nTotal missing topology cross section (fb): %10.3E\n" %(uncovered.getMissingXsec()) )
     print( "Total cross section where we are outside the mass grid (fb): %10.3E\n" %(uncovered.getOutOfGridXsec()) )
