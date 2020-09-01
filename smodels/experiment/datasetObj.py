@@ -418,10 +418,9 @@ class CombinedDataSet(object):
 
         return None
 
-
     def getCombinedUpperLimitFor(self, nsig, expected=False, deltas_rel=0.2):
         """
-        Get combined upper limit.
+        Get combined upper limit. If covariances are given in globalInfo then simplified likelihood is used, else if json files are given pyhf cimbination is performed.
 
         :param nsig: list of signal events in each signal region/dataset. The list
                         should obey the ordering in globalInfo.datasetOrder.
@@ -431,32 +430,96 @@ class CombinedDataSet(object):
         :returns: upper limit on sigma*eff
         """
 
+        if hasattr(self.globalInfo, "covariance" ):
+            cov = self.globalInfo.covariance
+            if type(cov) != list:
+                raise SModelSError( "covariance field has wrong type: %s" % type(cov))
+            if len(cov) < 1:
+                raise SModelSError( "covariance matrix has length %d." % len(cov))
 
-        if not hasattr(self.globalInfo, "covariance" ):
-            logger.error ( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
-            raise SModelSError( "no covariance matrix given in globalInfo.txt for %s" % self.globalInfo.id )
-        cov = self.globalInfo.covariance
-        if type(cov) != list:
-            raise SModelSError( "covariance field has wrong type: %s" % type(cov))
-        if len(cov) < 1:
-            raise SModelSError( "covariance matrix has length %d." % len(cov))
+            computer = UpperLimitComputer(ntoys=10000)
 
-        computer = UpperLimitComputer(ntoys=10000)
+            nobs = [x.dataInfo.observedN for x in self._datasets]
+            bg = [x.dataInfo.expectedBG for x in self._datasets]
+            no = nobs
 
-        nobs = [x.dataInfo.observedN for x in self._datasets]
-        bg = [x.dataInfo.expectedBG for x in self._datasets]
-        no = nobs
+            ret = computer.ulSigma(Data(observed=no, backgrounds=bg, covariance=cov,
+                                        third_moment=None, nsignal=nsig, deltas_rel=deltas_rel),
+                                        marginalize=self._marginalize,
+                                        expected=expected)
 
-        ret = computer.ulSigma(Data(observed=no, backgrounds=bg, covariance=cov,
-                                     third_moment=None, nsignal=nsig, deltas_rel=deltas_rel),
-                               marginalize=self._marginalize,
-                               expected=expected)
+            #Convert limit on total number of signal events to a limit on sigma*eff
+            ret = ret/self.globalInfo.lumi
+            logger.debug("SL upper limit : {}".format(ret))
+            return ret
+        elif hasattr(self.globalInfo, "jsonFiles" ):
+            logger.debug("Using pyhf")
+            if all([s == 0 for s in nsig]):
+                logger.warning("All signals are empty")
+                return None
+            # Getting the path to the json files
+            jsonFiles = [os.path.join(self.path, js) for js in self.globalInfo.jsonFiles]
+            combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
+            # Constructing the list of signals with subsignals matching each json
+            datasets = [ds.getID() for ds in self._datasets]
+            total = sum(nsig)
+            nsig = [s/total for s in nsig] # Normalising signals to get an upper limit on the events count
+            nsignals = list()
+            for jsName in self.globalInfo.jsonFiles:
+                subSig = list()
+                for srName in self.globalInfo.jsonFiles[jsName]:
+                    try:
+                        index = datasets.index(srName)
+                    except ValueError:
+                        logger.error("%s signal region provided in globalInfo is not in the list of datasets" % srName)
+                    sig = nsig[index]
+                    subSig.append(sig)
+                nsignals.append(subSig)
+            # Loading the jsonFiles
+            inputJsons = list()
+            for js in jsonFiles:
+                with open(js, "r") as fi:
+                    inputJsons.append(json.load(fi))
 
-        #Convert limit on total number of signal events to a limit on sigma*eff
-        ret = ret/self.globalInfo.lumi
-
-        return ret
-
+            from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
+            data = PyhfData(nsignals, inputJsons)
+            if data.errorFlag: return None
+            ulcomputer = PyhfUpperLimitComputer(data)
+            if ulcomputer.nWS == 1:
+                ret = ulcomputer.ulSigma(expected=expected)
+                ret = ret/self.globalInfo.lumi
+                logger.debug("pyhf upper limit : {}".format(ret))
+                return ret
+            else:
+                # Looking for the best combination
+                logger.debug('self.bestCB : {}'.format(self.bestCB))
+                if self.bestCB == None:
+                    logger.debug("Performing best expected combination")
+                    ulMin = float('+inf')
+                    for i_ws in range(ulcomputer.nWS):
+                        ul = ulcomputer.ulSigma(expected=True, workspace_index=i_ws)
+                        if ul == None:
+                            continue
+                        if ul < ulMin:
+                            ulMin = ul
+                            i_best = i_ws
+                    self.bestCB = combinations[i_best] # Keeping the index of the best combination for later
+                    logger.debug('Best combination : %s' % self.bestCB)
+                # Computing upper limit using best combination
+                if expected:
+                    try:
+                        ret = ulMin/self.globalInfo.lumi
+                    except NameError:
+                        ret = ulcomputer.ulSigma(expected=True, workspace_index=combinations.index(self.bestCB))
+                        ret = ret/self.globalInfo.lumi
+                else:
+                    ret = ulcomputer.ulSigma(expected=False, workspace_index=combinations.index(self.bestCB))
+                    ret = ret/self.globalInfo.lumi
+                logger.debug("pyhf upper limit : {}".format(ret))
+                return ret
+        else:
+            logger.error ( "no covariance matrix or json file given in globalInfo.txt for %s" % self.globalInfo.id )
+            raise SModelSError( "no covariance matrix or json file given in globalInfo.txt for %s" % self.globalInfo.id )
 
     def combinedLikelihood(self, nsig, marginalize=False, deltas_rel=0.2):
         """
@@ -470,23 +533,63 @@ class CombinedDataSet(object):
         :returns: likelihood to observe nobs events (float)
         """
 
-        if len(self._datasets) == 1:
-            if isinstance(nsig,list):
-                nsig = nsig[0]
-            return self._datasets[0].likelihood(nsig,marginalize=marginalize)
 
-        if not hasattr(self.globalInfo, "covariance" ):
-            logger.error("Asked for combined likelihood, but no covariance error given." )
+
+        if hasattr(self.globalInfo, "covariance" ):
+            if len(self._datasets) == 1:
+                if isinstance(nsig,list):
+                    nsig = nsig[0]
+                return self._datasets[0].likelihood(nsig,marginalize=marginalize)
+            nobs = [ x.dataInfo.observedN for x in self._datasets]
+            bg = [ x.dataInfo.expectedBG for x in self._datasets]
+            cov = self.globalInfo.covariance
+            computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
+            return computer.likelihood(nsig, marginalize=marginalize )
+        elif hasattr(self.globalInfo, "jsonFiles"):
+            # Getting the path to the json files
+            jsonFiles = [os.path.join(self.path, js) for js in self.globalInfo.jsonFiles]
+            combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
+            # Constructing the list of signals with subsignals matching each json
+            datasets = [ds.getID() for ds in self._datasets]
+            nsignals = list()
+            for jsName in self.globalInfo.jsonFiles:
+                subSig = list()
+                for srName in self.globalInfo.jsonFiles[jsName]:
+                    try:
+                        index = datasets.index(srName)
+                    except ValueError:
+                        logger.error("% signal region provided in jsonFiles is not in datasetOrder" % srName)
+                    sig = nsig[index]
+                    subSig.append(sig)
+                nsignals.append(subSig)
+            # Loading the jsonFiles
+            inputJsons = list()
+            for js in jsonFiles:
+                with open(js, "r") as fi:
+                    inputJsons.append(json.load(fi))
+
+            from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
+            data = PyhfData(nsignals, inputJsons)
+            if data.errorFlag: return None
+            ulcomputer = PyhfUpperLimitComputer(data)
+            if ulcomputer.nWS == 1:
+                return ulcomputer.likelihood()
+            else:
+                # Looking for the best combination
+                if self.bestCB == None:
+                    ulMin = float('+inf')
+                    for i_ws in range(ulcomputer.nWS):
+                        logger.debug("Performing best expected combination")
+                        ul = ulcomputer.ulSigma(expected=True, workspace_index=i_ws)
+                        if  ul < ulMin:
+                            ulMin = ul
+                            i_best = i_ws
+                    self.bestCB = combinations[i_best] # Keeping the index of the best combination for later
+                    logger.debug('Best combination : %d' % self.bestCB)
+                return ulcomputer.likelihood(workspace_index=combinations.index(self.bestCB))
+        else:
+            logger.error("Asked for combined likelihood, but no covariance or json file given." )
             return None
-
-        nobs = [ x.dataInfo.observedN for x in self._datasets]
-        bg = [ x.dataInfo.expectedBG for x in self._datasets]
-        cov = self.globalInfo.covariance
-
-
-        computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-
-        return computer.likelihood(nsig, marginalize=marginalize )
 
     def totalChi2(self, nsig, marginalize=False, deltas_rel=0.2):
         """
@@ -500,19 +603,60 @@ class CombinedDataSet(object):
         :returns: chi2 (float)
         """
 
-        if len(self._datasets) == 1:
-            if isinstance(nsig,list):
-                nsig = nsig[0]
-            return self._datasets[0].chi2(nsig, marginalize=marginalize)
+        if hasattr(self.globalInfo, "covariance" ):
+            if len(self._datasets) == 1:
+                if isinstance(nsig,list):
+                    nsig = nsig[0]
+                return self._datasets[0].chi2(nsig, marginalize=marginalize)
+            nobs = [x.dataInfo.observedN for x in self._datasets ]
+            bg = [x.dataInfo.expectedBG for x in self._datasets ]
+            cov = self.globalInfo.covariance
 
-        if not hasattr(self.globalInfo, "covariance" ):
+            computer = LikelihoodComputer(Data(nobs, bg, cov, deltas_rel=deltas_rel))
+
+            return computer.chi2(nsig, marginalize=marginalize)
+        elif hasattr(self.globalInfo, "jsonFiles"):
+            # Getting the path to the json files
+            jsonFiles = [os.path.join(self.path, js) for js in self.globalInfo.jsonFiles]
+            combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
+            # Constructing the list of signals with subsignals matching each json
+            datasets = [ds.getID() for ds in self._datasets]
+            nsignals = list()
+            for jsName in self.globalInfo.jsonFiles:
+                subSig = list()
+                for srName in self.globalInfo.jsonFiles[jsName]:
+                    try:
+                        index = datasets.index(srName)
+                    except ValueError:
+                        logger.error("% signal region provided in jsonFiles is not in the list of datasets" % srName)
+                    sig = nsig[index]
+                    subSig.append(sig)
+                nsignals.append(subSig)
+            # Loading the jsonFiles
+            inputJsons = list()
+            for js in jsonFiles:
+                with open(js, "r") as fi:
+                    inputJsons.append(json.load(fi))
+
+            from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
+            data = PyhfData(nsignals, inputJsons)
+            if data.errorFlag: return None
+            ulcomputer = PyhfUpperLimitComputer(data)
+            if ulcomputer.nWS == 1:
+                return ulcomputer.chi2()
+            else:
+                # Looking for the best combination
+                if self.bestCB == None:
+                    ulMin = float('+inf')
+                    for i_ws in range(ulcomputer.nWS):
+                        logger.debug("Performing best expected combination")
+                        ul = ulcomputer.ulSigma(expected=True, workspace_index=i_ws)
+                        if  ul < ulMin:
+                            ulMin = ul
+                            i_best = i_ws
+                    self.bestCB = combinations[i_best] # Keeping the index of the best combination for later
+                    logger.debug('Best combination : %d' % self.bestCB)
+                return ulcomputer.chi2(workspace_index=combinations.index(self.bestCB))
+        else:
             logger.error("Asked for combined likelihood, but no covariance error given." )
             return None
-
-        nobs = [x.dataInfo.observedN for x in self._datasets ]
-        bg = [x.dataInfo.expectedBG for x in self._datasets ]
-        cov = self.globalInfo.covariance
-
-        computer = LikelihoodComputer(Data(nobs, bg, cov, deltas_rel=deltas_rel))
-
-        return computer.chi2(nsig, marginalize=marginalize)
