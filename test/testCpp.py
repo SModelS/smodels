@@ -91,6 +91,8 @@ class CppTest(unittest.TestCase):
             self.assertEqual(len(xvals), len(yvals), "Lines:\n %s and \n %s \n differ" %(x,y))
             for i,xv in enumerate(xvals):
                 yv = yvals[i]
+                if "Likelihood" in x: # dont test for these
+                    continue
                 try:
                     yv = eval(yv)
                     xv = eval(xv)
