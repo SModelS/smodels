@@ -55,6 +55,9 @@ New in Version 2.0.0:
 
 New in Version 1.2.4:
 ^^^^^^^^^^^^^^^^^^^^^
+  * added pyhf support FIXME need to cherry pick
+  * pickle path bug fix
+  * bug fix for parallel xseccomputers
   * Introduced the SMODELS_CACHEDIR environment variable to allow for a different 
     location of the cached database file
   * fixed dataId bug in datasets
