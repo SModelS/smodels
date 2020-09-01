@@ -10,6 +10,11 @@
 
 """
 import jsonpatch
+import jsonschema
+if jsonschema.__version__[0] == "2":
+    print ( "[pyhfInterface] jsonschema is version %s, we need > 3.x.x" % ( jsonschema.__version__ ) )
+    sys.exit()
+
 import time, sys
 try:
     import pyhf
