@@ -315,7 +315,7 @@ class Database(object):
         filename= os.path.join ( cDir, r2.url.split("/")[-1] )
         msg = "caching the downloaded database in %s." % cDir
         if defused:
-            msg += " If you want the pickled database filed to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'." 
+            msg += " If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'." 
         logger.warn ( msg )
         # filename= "./" + r2.url.split("/")[-1]
         with open ( filename, "wb" ) as dump:
