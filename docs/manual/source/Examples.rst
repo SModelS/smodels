@@ -12,7 +12,7 @@ How To's
 
 
 
-Below we provide a few examples for using SModelS and some of the :doc:`SModelS tools <Tools>` as a Python library [*]_.
+Below we provide a few examples for using SModelS and some of the :ref:`SModelS tools <smodelsTools>` as a Python library [*]_.
 
 
 To try out the examples in interactive mode: |binder|

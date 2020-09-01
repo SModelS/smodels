@@ -45,7 +45,7 @@ This upper limit is easily computed using the number of observed and expected ev
 and their uncertainties and is typically stored in the :ref:`Database <database>`.
 Since most |EMrs| have several signal regions (|datasets|), there will be one theory prediction/upper limit
 for each |dataset|. By default SModelS keeps only the best |dataset|, i.e. the one with the largest
-ratio :math:`\mbox{r_{exp}=(theory prediction)}/\mbox{(expected limit)}`. (See below for |covariace|)
+ratio :math:`r_\mathrm{exp}=(\mathrm{theory\,prediction})/(\mathrm{expected\, limit})`. (See below for |covariace|)
 Thus each |EMr| will have a single theory prediction/upper limit, corresponding to the best |dataset|
 (based on the expected limit).
 If the user wants to have access to all the |datasets|, the default
