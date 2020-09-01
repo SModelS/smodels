@@ -2,5 +2,6 @@ id: CMS-PAS-SUS-17-004
 sqrts: 13*TeV
 lumi: 35.9/fb
 url: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-17-004/index.html
+supersededBy: CMS-SUS-17-004
 implementedBy: Juhi Dutta
 lastUpdate: 2017/12/28
