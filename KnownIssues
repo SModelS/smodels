@@ -1,3 +1,8 @@
+Known Issues, v1.2.4
+=======================================================
+
+ * The pyhf backend becomes very slow when running SModelS on many cores
+
 Known Issues, v1.2.0
 =======================================================
 
