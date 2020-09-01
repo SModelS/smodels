@@ -94,7 +94,7 @@ likelihood in the denominator, the Neyman-Pearson lemma holds, and we
 can assume :math:`T` to be distributed according to a :math:`\chi^2` distribution
 with one degree of freedom. Because :math:`H_0` assumes the signal strength of
 a particular model, :math:`T=0`  corresponds to a perfect match between that
-model's prediction and the measured data. :math:`T \gtrsim 1.96` corresponds to
+model's prediction and the measured data. :math:`T \gtrsim 3.84` corresponds to
 a 95\% confidence level upper limit.
 While :math:`n_{\mathrm{obs}}`, :math:`b`  and :math:`\delta_{b}` are directly extracted from
 the data set
