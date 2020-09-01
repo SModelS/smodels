@@ -23,7 +23,7 @@ except ModuleNotFoundError:
     sys.exit(-1)
 ver = pyhf.__version__.split(".")
 if ver[1]=="4" or (ver[1]=="5" and ver[2] in [ "0", "1" ]):
-    print ( f"[SModelS:pyhfInterface] WARNING you are using pyhf vf{pyhf.__version__}. pyhf versions < 0.5.2 have a memory leak and cause troubles for larger scans!" )
+    print ( f"[SModelS:pyhfInterface] WARNING you are using pyhf v{pyhf.__version__}. pyhf versions < 0.5.2 have a memory leak and cause troubles for larger scans!" )
     print ( "[SModelS:pyhfInterface] Please try to update pyhf ASAP!" )
 
 pyhf.set_backend(b"pytorch")
