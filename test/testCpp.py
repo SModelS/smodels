@@ -102,7 +102,7 @@ class CppTest(unittest.TestCase):
                     if yv + xv == 0.:
                         print ( "error, ``%s'' is not ``%s'' in line %d" % (x,y,linenr) )
                     dlta = abs ( yv -xv ) / (yv+xv)
-                    if dlta > .1:
+                    if dlta > .1 and abs(xv-yv)>1e-6:
                         print ( "error, delta is %.2f (x=%s,y=%s)" % (dlta,x,y) )
                     self.assertTrue ( dlta < .1 or abs(xv-yv)<1e-6 )
                 else:

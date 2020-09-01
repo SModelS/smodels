@@ -30,7 +30,7 @@ class WrapperBase(object):
     def __init__(self):
         self.executablePath = ""
         self.tempdir = ""
-
+        self.maycompile = True
 
     def installDirectory(self):
         """
@@ -67,13 +67,17 @@ class WrapperBase(object):
         """
         Try to compile the tool.
         """
+        if not self.maycompile:
+            logger.error("Asking to compile, but auto-compilation turned off for %s", self.name )
+            return
         logger.debug("Trying to compile %s", self.name)
         cmd = "cd %s; make" % self.srcPath
         out = executor.getoutput(cmd)
         # out = subprocess.check_output ( cmd, shell=True, universal_newlines=True )
         logger.debug(out)
         if not os.path.exists ( self.executablePath ):
-            logger.error ( "Compilation of %s failed. Is the %s compiler installed?" % ( self.name, self.compiler ) )
+            if self.maycompile: ## should have worked
+                logger.error ( "Compilation of %s failed. Is the %s compiler installed?" % ( self.name, self.compiler ) )
             sys.exit()
         logger.info ( "Compilation of %s succeeded!" % ( self.name ) )
         return True
@@ -92,11 +96,12 @@ class WrapperBase(object):
                 logger.warn("%s executable not found. Trying to compile it now. This may take a while." % self.name )
                 self.compile()
             else:
-                logger.warn("%s exectuable not found." % self.name )
+                logger.warn("%s executable not found." % self.name )
                 self.complain()
                 return False
         if not os.path.exists(self.executablePath):
-            logger.error("Compilation of %s failed Is a according compiler installed?" % self.name )
+            if self.maycompile: ## should have worked
+                logger.error("Compilation of %s failed. Is a according compiler installed?" % self.name )
             self.complain()
         if not os.access(self.executablePath, os.X_OK):
             logger.warning("%s is not executable Trying to chmod" % self.executable)

@@ -41,6 +41,8 @@ def main():
         help="only query if there are cross sections in the file")
     xseccomputer.add_argument('-C', '--colors', action='store_true',
         help="colored terminal output" )
+    xseccomputer.add_argument( '--noautocompile', action='store_true',
+        help="turn off automatic compilation" )
     xseccomputer.add_argument('-k', '--keep', action='store_true',
         help="do not unlink temporary directory")
     xseccomputer.add_argument('-6', '--pythia6', action='store_true',
@@ -86,6 +88,31 @@ def main():
     iPlots.add_argument('-v', '--verbosity', type=str, default="info",
         help="Verbosity (debug, info, warning, error)")
 
+    proxydb = subparsers.add_parser( 'proxydb', description=
+								                     "create proxy databases for network use")
+    proxydb.add_argument ( '-i', '--inputfile',
+            help='input database file [db31.pcl]',
+            type=str, default="db31.pcl"  )
+    proxydb.add_argument ( '-s', '--servername',
+            help='the server name [None]',
+            type=str, default=None  )
+    proxydb.add_argument ( '-v', '--verbose',
+            help='verbosity, for server and client [info]',
+            type=str, default="info" )
+    proxydb.add_argument ( '-R', '--rundir',
+            help='the rundir [./]',
+            type=str, default="./"  )
+    proxydb.add_argument ( '-p', '--serverport',
+            help='the server port [31770]',
+            type=int, default=None  )
+    proxydb.add_argument ( '-l', '--symlink',
+            help='set a symlink from outputfile to default.pcl',
+            action='store_true'  )
+    proxydb.add_argument ( '-o', '--outputfile',
+            help='input database file [proxy31.pcl]',
+            type=str, default="proxy31.pcl"  )
+    proxydb.add_argument('-r', '--run', help='start the server upon creation',
+                           action='store_true')
 
     toolbox = subparsers.add_parser( 'toolbox', description=
 								                     "Facility to control external dependencies")
@@ -115,6 +142,9 @@ def main():
     if args.subparser_name == 'toolbox':
         from smodels.tools import toolBox
         toolBox.main ( args )
+    if args.subparser_name == 'proxydb':
+        from smodels.tools import proxyDBCreator
+        proxyDBCreator.main ( args )
     if args.subparser_name == 'xseccomputer':
         from smodels.tools import xsecComputer
         xsecComputer.main(args)

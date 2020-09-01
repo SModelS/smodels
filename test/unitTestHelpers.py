@@ -14,7 +14,6 @@ from smodels.tools.runSModelS import run
 from os.path import join, basename
 from smodels.installation import installDirectory as iDir
 from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
-from databaseLoader import database ## to make sure the db exists
  
 def equalObjs(obj1,obj2,allowedDiff,ignore=[], where=None, fname=None ):
     """
@@ -94,9 +93,15 @@ def importModule ( filename ):
     return output_module.smodelsOutput
  
 def runMain( filename, timeout = 0, suppressStdout=True, development=False,
-             inifile = "testParameters.ini" ):
+             inifile = "testParameters.ini", overridedatabase = None ):
     """ run SModelS proper 
     :param filename: slha file
+    :param timeout: timeout for the operation, given in seconds
+    :param suppressStdout: if True, then redirect stdout and stderr to /dev/null
+    :param development: development run (FIXME what does that entail?)
+    :param inifile: the config file to be used
+    :param overridedatabase: if not None, then use the provided database,
+           else use databaseLoader.database
     :returns: printer output
     """
     to = None
@@ -105,6 +110,11 @@ def runMain( filename, timeout = 0, suppressStdout=True, development=False,
     if suppressStdout:
         level = 'error'
         to = os.devnull
+    database = None
+    if overridedatabase != None:
+        database = overridedatabase
+    else:
+        from databaseLoader import database ## to make sure the db exists
     with redirector.stdout_redirected ( to = to ):
         out = join( iDir(), "test/unitTestOutput" )
         setLogLevel ( level )
