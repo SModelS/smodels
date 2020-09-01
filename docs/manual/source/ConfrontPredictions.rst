@@ -45,7 +45,7 @@ This upper limit is easily computed using the number of observed and expected ev
 and their uncertainties and is typically stored in the :ref:`Database <database>`.
 Since most |EMrs| have several signal regions (|datasets|), there will be one theory prediction/upper limit
 for each |dataset|. By default SModelS keeps only the best |dataset|, i.e. the one with the largest
-ratio :math:`\mbox{(theory prediction)}/\mbox{(expected limit)}`. (See below for |covariace|)
+ratio :math:`\mbox{(theory prediction)}/\mbox{(expected limit)}`. (See below for |covariace|.)
 Thus each |EMr| will have a single theory prediction/upper limit, corresponding to the best |dataset|
 (based on the expected limit).
 If the user wants to have access to all the |datasets|, the default
@@ -54,7 +54,7 @@ behavior can be disabled by setting *useBestDataset=False* in `theoryPredictions
 
 The procedure described above can be applied to all the |ExpRess| in the database, resulting
 in a list of theory predictions and upper limits for each |ExpRes|. A model can then be considered
-excluded by the experimental results if, for one or more predictions, we have *theory prediction* :math:`>` *upper limit* [*]_.
+excluded by the experimental results if, for one or more predictions, we have *theory prediction* :math:`>` *upper limit*.\ [#f1]_
 
 * **The upper limits for a given**  |ULr| **or** |EMr| **can be obtained using the** `getUpperLimitFor  method <experiment.html#experiment.expResultObj.ExpResult.getUpperLimitFor>`_
 
@@ -94,8 +94,9 @@ likelihood in the denominator, the Neyman-Pearson lemma holds, and we
 can assume :math:`T` to be distributed according to a :math:`\chi^2` distribution
 with one degree of freedom. Because :math:`H_0` assumes the signal strength of
 a particular model, :math:`T=0`  corresponds to a perfect match between that
-model's prediction and the measured data. :math:`T \gtrsim 1.96` corresponds to
-a 95\% confidence level upper limit.
+model's prediction and the measured data. :math:`T \gtrsim 3.84` corresponds to
+a (two-sided!) 95\% confidence level limit (please take note of the
+conceptual difference to the usual *upper* limits that we use).
 While :math:`n_{\mathrm{obs}}`, :math:`b`  and :math:`\delta_{b}` are directly extracted from
 the data set
 (coined *observedN*, *expectedBG* and *bgError*, respectively),
@@ -142,8 +143,8 @@ should correspond to a second order effect.
 
 
 Using the above likelihood we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the 
-test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al., 
-`Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_. 
+test statistic :math:`q_\mu`, as described in Eq. (14) in `G. Cowan et al., 
+Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_. 
 We then search for the value :math:`CL_s = 0.95` using the Brent bracketing technique available through the `scipy optimize library <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_.
 Note that the limit computed through this procedure applies to the total signal yield summed over all signal regions and assumes
 that the relative signal strengths in each signal region are fixed by the signal hypothesis. As a result, the above limit has to be computed
@@ -166,8 +167,8 @@ As we can see, while the curve obtained from the combination of all 44 signal re
 +-----------------------------------------+-----------------------------------------+-----------------------------------------+
 
 
-Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of 17 aggregate signal regions (center), and the combination of all 44 signal regions (right).
+Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of all 44 signal regions (center), and the combination of 17 aggregate signal regions (right).
 
 
-.. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
+.. [#f1] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
    is being tested by a large number of results simultaneously.
