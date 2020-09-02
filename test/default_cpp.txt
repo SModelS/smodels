@@ -47,13 +47,13 @@ Observed r-Value: 15.002655551277469
 -------------------Dataset Label = 6NJet8_1000HT1250_450MHTinf
 -------------------Txname Labels = ['T1']
 Analysis sqrts: 8.00E+00 [TeV]
-Theory prediction: 1.62E-03 [pb]
+Theory prediction: 1.72E-03 [pb]
 Theory conditions:  None
 Observed experimental limit: 3.86E-01 [fb]
 Expected experimental limit: 2.64E-01 [fb]
-Observed r-Value: 4.20976357763319
-Expected r-Value: 6.155752067085059
-Chi2: 45.63444029563222
+Observed r-Value: 4.45023431445
+Expected r-Value: 6.507381845799234
+Chi2: 44.8890538681224
 Likelihood: 6.238452556297261e-11
 
 Total cross-section for missing topologies (fb):  0.000E+00

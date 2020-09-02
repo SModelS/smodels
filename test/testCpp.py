@@ -49,8 +49,8 @@ class CppTest(unittest.TestCase):
 
     def runExample(self):
         """ now run the example """
-        from databaseLoader import dbname
-        self.writeIni ( dbname )
+        from databaseLoader import dbpath
+        self.writeIni ( dbpath )
         cmd = "cd ../cpp; ./run"
         l = CMD.getoutput(cmd)
         l = l[l.find('Input status'):]
@@ -78,13 +78,15 @@ class CppTest(unittest.TestCase):
             self.assertEqual(len(xvals), len(yvals), "Lines:\n %s and \n %s \n differ" %(x,y))
             for i,xv in enumerate(xvals):
                 yv = yvals[i]
+                if "=======" in xv and "=======" in yv:
+                    continue
                 try:
                     yv = eval(yv)
                     xv = eval(xv)
                 except:
                     pass
                 if isinstance(yv,float) and isinstance(xv,float):
-                    self.assertAlmostEqual(xv, yv, 5)
+                    self.assertAlmostEqual(xv, yv, 3)
                 else:
                     self.assertEqual(xv, yv)
         ## reset parameter.ini file
