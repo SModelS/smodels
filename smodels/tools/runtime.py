@@ -24,18 +24,26 @@ def filetype ( filename ):
     import os
     if not os.path.exists ( filename ):
         return None
-    if filename[-5:].lower() == ".slha":
+    if filename.endswith(".slha"):
         return "slha"
-    if filename[-4:].lower() == ".lhe":
+    if filename.endswith(".SLHA"):
+        return "slha"
+    if filename.endswith(".lhe" ):
         return "lhe"
-    with open ( filename ) as f:
-        for line in f:
-            if "<LesHouchesEvents" in line:
-                return "lhe"
-            if "<event>" in line:
-                return "lhe"
-            if "block " in line.lower():
-                return "slha"
+    if filename.endswith(".LHE" ):
+        return "lhe"
+    try:
+        with open ( filename, "rt" ) as f:
+            for line in f:
+                if "<LesHouchesEvents" in line:
+                    return "lhe"
+                if "<event>" in line:
+                    return "lhe"
+                if "block " in line.lower():
+                    return "slha"
+    except UnicodeDecodeError:
+        ## a binary file??
+        return None
     return None
 
 def nCPUs():
