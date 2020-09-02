@@ -258,7 +258,12 @@ class PyhfUpperLimitComputer:
         model = workspace.model(modifier_settings=msettings)
         test_poi = 1.
         _, nllh = pyhf.infer.mle.fixed_poi_fit(test_poi, workspace.data(model), model, return_fitted_val=True)
-        return np.exp(-nllh.tolist()/2)
+        ret = -nllh.tolist()
+        try:
+            ret = float(ret)
+        except:
+            ret = float(ret[0])
+        return np.exp(ret/2.)
 
     def chi2(self, workspace_index=None):
         """
