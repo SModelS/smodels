@@ -209,7 +209,8 @@ class RunPrinterTest(unittest.TestCase):
         self.removeOutputs ( './unitTestOutput/printer_output.py' )
  
     def testPythonPrinterSimple(self):
-        self.removeOutputs ( './unitTestOutput/printer_output_simple.py' )
+        outfile = './unitTestOutput/printer_output_simple.py'
+        self.removeOutputs ( outfile )
  
         mprinter = printer.MPrinter()
         mprinter.Printers['python'] = printer.PyPrinter(output = 'file')
@@ -217,7 +218,7 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.Printers['python'].addelementlist = True
          
         slhafile = "./testFiles/slha/simplyGluino.slha"
-        mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
+        mprinter.setOutPutFiles( outfile.replace(".py",""),silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)
         
         if self.definingRun:
@@ -228,11 +229,12 @@ class RunPrinterTest(unittest.TestCase):
             cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
             a = subprocess.getoutput ( cmd )
 
+        impfile = outfile.replace(".py","").replace("/",".").replace("..","")
         try:
-            smodelsOutput = importlib.import_module( "unitTestOutput.printer_output_simple" ).smodelsOutput
+            smodelsOutput = importlib.import_module( impfile ).smodelsOutput
         except ImportError: #Python2 fallback
             import imp
-            pM=imp.load_source("smodels","./unitTestOutput/printer_output_simple.py")
+            pM=imp.load_source("smodels", outfile )
             smodelsOutput = pM.smodelsOutput
 
         from simplyGluino_default import smodelsOutputDefault    
@@ -250,10 +252,10 @@ class RunPrinterTest(unittest.TestCase):
                             ignore=ignoreFields, fname="./unitTestOutput/printer_output_simple.py" )
         try:
             self.assertTrue(equals)
+            self.removeOutputs ( outfile )
         except AssertionError as e:
             print ( "Error: %s, when comparing %s \nwith %s." % (e,"outputSimple.py","simplyGluino_default.py" ) )
             raise AssertionError(e)
-        self.removeOutputs ( './unitTestOutput/printer_output_simple.py' )
   
   
     def testXmlPrinter(self):
