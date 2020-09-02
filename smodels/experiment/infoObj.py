@@ -52,10 +52,28 @@ class Info(object):
                                 % (tag, self.path))
                     continue
 
+            self.cacheJsons()
+
     def __eq__ ( self, other ):
         if self.__dict__ != other.__dict__:
             return False
         return True
+
+    def cacheJsons ( self ):
+        """ if we have the "jsonFiles" attribute defined,
+            we cache the corresponding jsons. Needed when pickling """
+        if not hasattr ( self, "jsonFiles" ):
+            return
+        if hasattr ( self, "jsons" ): ## seems like we already have them
+            return
+        import json
+        self.jsons = list()
+        dirp = os.path.dirname ( self.path )
+        jsonFiles = [os.path.join( dirp, js) for js in self.jsonFiles]
+        for js in jsonFiles:
+            with open(js, "r") as fi:
+                self.jsons.append(json.load(fi))
+
 
     def dirName ( self, up=0 ):
         """ directory name of path. If up>0, 

@@ -358,7 +358,6 @@ class CombinedDataSet(object):
         self._marginalize = False
         self.sortDataSets()
         self.bestCB = None# To store the index of the best combination
-        self.createInputJsons()
 
     def __str__(self):
         ret = "Combined Dataset (%i datasets)" %len(self._datasets)
@@ -418,20 +417,6 @@ class CombinedDataSet(object):
 
         return None
 
-    def createInputJsons ( self ):
-        """ make sure we have self.inputJsons defined """
-        if not hasattr(self.globalInfo, "jsonFiles" ):
-            ## we dont need input jsons, obviously
-            return
-        # Loading the jsonFiles, unless we already have them (because we pickled)
-        if hasattr ( self, "inputJsons" ) and len(self.inputJsons)>0:
-            return
-        self.inputJsons = list()
-        jsonFiles = [os.path.join(self.path, js) for js in self.globalInfo.jsonFiles]
-        for js in jsonFiles:
-            with open(js, "r") as fi:
-                self.inputJsons.append(json.load(fi))
-
     def getPyhfComputer ( self, nsig ):
         """ create the pyhf ul computer object
         :returns: pyhf upper limit computer, and combinations of signal regions
@@ -456,7 +441,7 @@ class CombinedDataSet(object):
             nsignals.append(subSig)
         # Loading the jsonFiles, unless we already have them (because we pickled)
         from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
-        data = PyhfData(nsignals, self.inputJsons)
+        data = PyhfData(nsignals, self.globalInfo.jsons )
         if data.errorFlag: return None
         ulcomputer = PyhfUpperLimitComputer(data)
         return ulcomputer,combinations
