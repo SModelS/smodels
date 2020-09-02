@@ -307,7 +307,12 @@ class PyhfUpperLimitComputer:
         logger.debug(workspace['channels'][0]['samples'][0])
         _, maxNllh = pyhf.infer.mle.fixed_poi_fit(1., workspace.data(model), model, return_fitted_val=True)
         logger.debug('maxNllh : {}'.format(maxNllh))
-        return (maxNllh - nllh).tolist()
+        ret = (maxNllh - nllh).tolist()
+        try:
+            ret = float(ret)
+        except:
+            ret = float(ret[0])
+        return ret
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of looking for mu bounds
