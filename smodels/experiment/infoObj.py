@@ -20,35 +20,35 @@ class Info(object):
     (luminosity, sqrts, experimentID,...).
     Its attributes are generated according to the lines in the
     .txt file which contain "info_tag: value".
-    
+
     :ivar path: path to the .txt file
     """
-    
+
     def __init__(self, path=None):
-                
+
         self.path = path
         if path:
-            logger.debug('Creating object based on  %s' %self.path)        
-     
+            logger.debug('Creating object based on  %s' %self.path)
+
             #Open the info file and get the information:
             if not os.path.isfile(path):
                 logger.error("Info file %s not found" % path)
-                raise SModelSError()      
+                raise SModelSError()
             from smodels.tools.stringTools import concatenateLines
             infoFile = open(self.path)
             content = concatenateLines ( infoFile.readlines() )
             infoFile.close()
-            
+
             #Get tags in info file:
             tags = [line.split(':', 1)[0].strip() for line in content]
             for i,tag in enumerate(tags):
                 if not tag: continue
                 line = content[i]
-                value = line.split(':',1)[1].strip()            
+                value = line.split(':',1)[1].strip()
                 if tags.count(tag) == 1:
                     self.addInfo(tag,value)
                 else:
-                    logger.info("Ignoring unknown field %s found in file %s" 
+                    logger.info("Ignoring unknown field %s found in file %s"
                                 % (tag, self.path))
                     continue
 
@@ -76,7 +76,7 @@ class Info(object):
 
 
     def dirName ( self, up=0 ):
-        """ directory name of path. If up>0, 
+        """ directory name of path. If up>0,
             we step up 'up' directory levels.
         """
         s_up = "/".join ( [ ".." ] * up )
@@ -85,31 +85,31 @@ class Info(object):
 
     def __ne__ ( self, other ):
         return not self.__eq__ ( other )
-        
+
     def addInfo(self,tag,value):
         """
         Adds the info field labeled by tag with value value to the object.
-        
+
         :param tag: information label (string)
-        :param value: value for the field in string format 
+        :param value: value for the field in string format
         """
-                  
+
         try:
             setattr(self,tag,eval(value, {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV}))
-        except SyntaxError:          
+        except SyntaxError:
             setattr(self,tag,value)
         except NameError:
             setattr(self,tag,value)
         except TypeError:
-            setattr(self,tag,value)             
-        
+            setattr(self,tag,value)
+
     def getInfo(self, infoLabel):
         """
         Returns the value of info field.
-        
+
         :param infoLabel: label of the info field (string). It must be an attribute
                           of the GlobalInfo object
         """
-        
+
         if hasattr(self,infoLabel): return getattr(self,infoLabel)
         else: return False
