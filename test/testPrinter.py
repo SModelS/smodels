@@ -173,7 +173,8 @@ class RunPrinterTest(unittest.TestCase):
         self.removeOutputs('./unitTestOutput/printer_output.py')
  
     def testPythonPrinterSimple(self):
-        self.removeOutputs ( './unitTestOutput/printer_output_simple.py' )
+        outfile = './unitTestOutput/printer_output_simple.py' 
+        self.removeOutputs ( outfile )
  
         mprinter = printer.MPrinter()
         mprinter.Printers['python'] = printer.PyPrinter(output = 'file')
@@ -181,10 +182,11 @@ class RunPrinterTest(unittest.TestCase):
         mprinter.Printers['python'].addelementlist = True
          
         slhafile = "./testFiles/slha/simplyGluino.slha"
-        mprinter.setOutPutFiles('./unitTestOutput/printer_output_simple',silent=True)
+        mprinter.setOutPutFiles( outfile.replace(".py",""),silent=True)
         self.runPrinterMain(slhafile,mprinter,addTopList=True)
         
-        smodelsOutput = importlib.import_module( "unitTestOutput.printer_output_simple" ).smodelsOutput
+        impfile = outfile.replace(".py","").replace("/",".").replace("..","")
+        smodelsOutput = importlib.import_module( impfile ).smodelsOutput
         # from unitTestOutput.printer_output_simple import smodelsOutput
         from simplyGluino_default import smodelsOutputDefault    
          
@@ -195,10 +197,10 @@ class RunPrinterTest(unittest.TestCase):
                             ignore=ignoreFields )
         try:
             self.assertTrue(equals)
+            self.removeOutputs( outfile )
         except AssertionError as e:
-            print ( "Error: %s, when comparing %s \nwith %s." % (e,"outputSimple.py","simplyGluino_default.py" ) )
+            print ( "Error: %s, when comparing %s \nwith %s." % (e, outfile,"simplyGluino_default.py" ) )
             raise AssertionError(e)
-        self.removeOutputs('./unitTestOutput/printer_output_simple.py')
   
   
     def testXmlPrinter(self):

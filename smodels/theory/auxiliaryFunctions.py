@@ -10,7 +10,7 @@ from smodels.theory import crossSection
 from smodels.tools.physicsUnits import pb, GeV, fb
 import numpy as np
 from scipy import stats
-from collections import Iterable
+from collections.abc import Iterable
 import copy
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 

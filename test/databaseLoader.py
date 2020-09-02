@@ -15,7 +15,7 @@ from smodels.experiment.databaseObj import Database
 from smodels.installation import version
 ver = version().replace(".","")
 #dbname="./database/db%d0.pcl" % int ( sys.version[0] )
-dbname="https://smodels.github.io/database/unittest%s" % ver
+# dbname="https://smodels.github.io/database/unittest%s" % ver
 dbname="database/"
 database = Database(dbname, discard_zeroes = False)
 

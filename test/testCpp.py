@@ -35,8 +35,22 @@ class CppTest(unittest.TestCase):
         f.write ( a )
         f.close()
 
+    def writeIni(self, dbpath ):
+        """ write the ini file """
+        templf = open ( "../cpp/template.ini", "rt" )
+        templines = templf.readlines()
+        templf.close()
+        if "database" in dbpath:
+                dbpath = "../test/"+dbpath
+        parmf = open ( "../cpp/parameters.ini", "wt" )
+        for line in templines:
+            parmf.write ( line.replace ( "@@DBPATH@@", dbpath ) )
+        parmf.close()
+
     def runExample(self):
         """ now run the example """
+        from databaseLoader import dbname
+        self.writeIni ( dbname )
         cmd = "cd ../cpp; ./run"
         l = CMD.getoutput(cmd)
         l = l[l.find('Input status'):]
@@ -73,6 +87,8 @@ class CppTest(unittest.TestCase):
                     self.assertAlmostEqual(xv, yv, 5)
                 else:
                     self.assertEqual(xv, yv)
+        ## reset parameter.ini file
+        self.writeIni ( "unittest" )
 
     def testRun(self):
         self.compile()
