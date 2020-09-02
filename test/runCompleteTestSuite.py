@@ -10,7 +10,7 @@
 """
 
 from __future__ import print_function
-import sys
+import sys, subprocess
 sys.path.insert(0,"../")
 from smodels.tools.colors import colors
 colors.on = True
@@ -80,13 +80,22 @@ def parallel_run ( verbose ):
     runner = unittest.TextTestRunner()
     runner.run(concurrent_suite)
 
+def cleanDatabase ():
+    """ remove database pickle files """
+    cmd = "rm -r database/*.pcl database/*TeV/*/*/.*pcl"
+    o =subprocess.getoutput ( cmd )
+
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser('runs the complete test suite')
+    ap.add_argument('-c','--clean_database', help='remove database pickle files',
+                    action='store_true')
     ap.add_argument('-v','--verbose', help='run verbosely',action='store_true')
     ap.add_argument('-f','--filter', help='run only tests that have <FILTER> in name. Works only with verbose and not parallel. case sensitive.',type=str,default=None)
     ap.add_argument('-p','--parallel', help='run in parallel',action='store_true')
     args = ap.parse_args()
+    if args.clean_database:
+        cleanDatabase ()
     if args.parallel:
         parallel_run ( args.verbose )
         sys.exit()
