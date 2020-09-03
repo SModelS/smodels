@@ -376,7 +376,7 @@ class PyhfUpperLimitComputer:
         while "mu is not in [1,10]":
             # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
             rt1 = root_func(1.)
-            rt10 = root_func(10.)
+            rt10 = root_func(5.)
             if rt1 < 0. and 0. < rt10: # Here's the real while condition
                 break
             if self.alreadyBeenThere:
@@ -411,7 +411,7 @@ class PyhfUpperLimitComputer:
                 continue
         # Finding the root (Brent bracketing part)
         logger.debug("Final scale : %f" % self.scale)
-        hi_mu = 10.
+        hi_mu = 5.
         lo_mu = 1.
         logger.debug("Starting brent bracketing")
         ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
