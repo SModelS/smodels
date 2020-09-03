@@ -26,7 +26,12 @@ if ver[1]=="4" or (ver[1]=="5" and ver[2] in [ "0", "1" ]):
     print ( f"[SModelS:pyhfInterface] WARNING you are using pyhf v{pyhf.__version__}." )
     print ( "[SModelS:pyhfInterface] We recommend pyhf >= 0.5.2. Please try to update pyhf ASAP!" )
 
-pyhf.set_backend(b"pytorch")
+try:
+    pyhf.set_backend(b"pytorch")
+except pyhf.exceptions.ImportBackendError as e:
+    print ( "[SModelS:pyhfInterface] WARNING could not set pytorch as the pyhf backend, falling back to the default." )
+    print ( "[SModelS:pyhfInterface] We however recommend that pytorch be installed." )
+
 from scipy import optimize
 import numpy as np
 from smodels.tools.smodelsLogging import logger
