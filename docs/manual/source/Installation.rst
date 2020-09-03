@@ -24,6 +24,11 @@ SModelS is a Python library that requires Python version 2.6 or later, including
  * docutils>=0.3
  * scipy>=1.0.0
  * pyslha>=3.1.0
+ * pyhf>=0.4.3 (>=0.5.2 recommended!)
+ * jsonpatch>=1.25
+ * jsonschema>=3.2.0
+
+For speed reasons, we moreover recommend pytorch>=1.6.0 as backend for pyhf. This is, however, optional: if pytorch is not available, SModelS will use the default backend. 
 
 In addition, the :ref:`cross section computer <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>`
 requires:
@@ -127,10 +132,10 @@ the `SModelS Database releases page <https://github.com/SModelS/smodels-database
 
 
 The complete list of analyses and results included in the database can be
-consulted at `http://smodels.github.io/docs/ListOfAnalyses <http://smodels.github.io/docs/ListOfAnalyses>`_.
+consulted at `https://smodels.github.io/wiki/ListOfAnalyses <https://smodels.github.io/wiki/ListOfAnalyses>`_.
 We note that all the results in the official database release have been
 carefully validated  and the validation material can be
-found at `http://smodels.github.io/docs/Validation <http://smodels.github.io/docs/Validation>`_.
+found at `https://smodels.github.io/wiki/Validation <https://smodels.github.io/wiki/Validation>`_.
 
 The database can conveniently be updated independently from SModelS code
 updates. It suffices to unpack any new database tarball and replace the database
@@ -241,7 +246,7 @@ Then perform the steps listed under ``Installation on SL6``.
 
 
 Installation on other platforms or without superuser privileges using Anaconda
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Another easy and platform independent way of installing SModelS
 without superuser priviledges is via Anaconda (https://www.continuum.io/downloads).

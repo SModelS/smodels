@@ -10,13 +10,28 @@
 
 """
 import jsonpatch
+import jsonschema
+if jsonschema.__version__[0] == "2":
+    print ( "[SModelS:pyhfInterface] jsonschema is version %s, we need > 3.x.x" % ( jsonschema.__version__ ) )
+    sys.exit()
+
 import time, sys
 try:
     import pyhf
 except ModuleNotFoundError:
     print ( "[SModelS:pyhfInterface] pyhf import failed. Is the module installed?" )
     sys.exit(-1)
-pyhf.set_backend(b"pytorch")
+ver = pyhf.__version__.split(".")
+if ver[1]=="4" or (ver[1]=="5" and ver[2] in [ "0", "1" ]):
+    print ( f"[SModelS:pyhfInterface] WARNING you are using pyhf v{pyhf.__version__}." )
+    print ( "[SModelS:pyhfInterface] We recommend pyhf >= 0.5.2. Please try to update pyhf ASAP!" )
+
+try:
+    pyhf.set_backend(b"pytorch")
+except pyhf.exceptions.ImportBackendError as e:
+    print ( "[SModelS:pyhfInterface] WARNING could not set pytorch as the pyhf backend, falling back to the default." )
+    print ( "[SModelS:pyhfInterface] We however recommend that pytorch be installed." )
+
 from scipy import optimize
 import numpy as np
 from smodels.tools.smodelsLogging import logger
@@ -248,7 +263,12 @@ class PyhfUpperLimitComputer:
         model = workspace.model(modifier_settings=msettings)
         test_poi = 1.
         _, nllh = pyhf.infer.mle.fixed_poi_fit(test_poi, workspace.data(model), model, return_fitted_val=True)
-        return np.exp(-nllh.tolist()/2)
+        ret = nllh.tolist()
+        try:
+            ret = float(ret)
+        except:
+            ret = float(ret[0])
+        return np.exp(-ret/2.)
 
     def chi2(self, workspace_index=None):
         """
@@ -292,7 +312,12 @@ class PyhfUpperLimitComputer:
         logger.debug(workspace['channels'][0]['samples'][0])
         _, maxNllh = pyhf.infer.mle.fixed_poi_fit(1., workspace.data(model), model, return_fitted_val=True)
         logger.debug('maxNllh : {}'.format(maxNllh))
-        return (maxNllh - nllh).tolist()
+        ret = (maxNllh - nllh).tolist()
+        try:
+            ret = float(ret)
+        except:
+            ret = float(ret[0])
+        return ret
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of looking for mu bounds
@@ -353,10 +378,16 @@ class PyhfUpperLimitComputer:
         factor = 10.
         wereBothLarge = False
         wereBothTiny = False
-        while "mu is not in [1,10]":
+        nattempts = 0
+        lo_mu, hi_mu = .2, 5.
+        while "mu is not in [lo_mu,hi_mu]":
+            nattempts += 1
+            if nattempts > 10:
+                logger.warn ( "tried 10 times to determine the bounds for brent bracketing. we abort now." )
+                return None
             # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-            rt1 = root_func(1.)
-            rt10 = root_func(10.)
+            rt1 = root_func(lo_mu)
+            rt10 = root_func(hi_mu)
             if rt1 < 0. and 0. < rt10: # Here's the real while condition
                 break
             if self.alreadyBeenThere:
@@ -391,8 +422,6 @@ class PyhfUpperLimitComputer:
                 continue
         # Finding the root (Brent bracketing part)
         logger.debug("Final scale : %f" % self.scale)
-        hi_mu = 10.
-        lo_mu = 1.
         logger.debug("Starting brent bracketing")
         ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
         endUL = time.time()
