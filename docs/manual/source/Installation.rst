@@ -24,7 +24,7 @@ SModelS is a Python library that requires Python version 2.6 or later, including
  * docutils>=0.3
  * scipy>=1.0.0
  * pyslha>=3.1.0
- * pyhf>=0.5.1 (>=0.5.2 recommended when doing scans)
+ * pyhf>=0.4.3 (>=0.5.2 recommended!)
  * jsonpatch>=1.26
  * jsonschema>=3.2.0
  * torch>=1.6.0
