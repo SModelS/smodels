@@ -373,7 +373,7 @@ class PyhfUpperLimitComputer:
         factor = 10.
         wereBothLarge = False
         wereBothTiny = False
-        while "mu is not in [1,10]":
+        while "mu is not in [1,5]":
             # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
             rt1 = root_func(1.)
             rt10 = root_func(5.)
