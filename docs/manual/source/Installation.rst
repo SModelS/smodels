@@ -28,8 +28,7 @@ SModelS is a Python library that requires Python version 2.6 or later, including
  * jsonpatch>=1.25
  * jsonschema>=3.2.0
 
-Pytorch (>=1.6.0) is recomended as backend for pyhf, but not mandatory:  
-if not available, SModelS will fall back to the default backend.
+For speed reasons, we moreover recommend pytorch>=1.6.0 as backend for pyhf. This is, however, optional: if pytorch is not available, SModelS will use the default backend. 
 
 In addition, the :ref:`cross section computer <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>`
 requires:
