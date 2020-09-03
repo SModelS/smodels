@@ -12,9 +12,10 @@ Release v2.0.0, xxx 2020
   * Changes in output: width values added, coverage groups and others (see manual for details)
   * Added option for signal strength multipliers in cross section calculator
 
-Release v1.2.4, Tue 1 Sep 2020
+Release v1.2.4, Thu 3 Sep 2020
 =======================================================
-  * added pyhf support FIXME need to cherry pick
+
+  * added pyhf support
   * pickle path bug fix
   * bug fix for parallel xseccomputers
   * Introduced the SMODELS_CACHEDIR environment variable to allow for a different
