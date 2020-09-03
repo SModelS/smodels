@@ -23,8 +23,8 @@ except ModuleNotFoundError:
     sys.exit(-1)
 ver = pyhf.__version__.split(".")
 if ver[1]=="4" or (ver[1]=="5" and ver[2] in [ "0", "1" ]):
-    print ( f"[SModelS:pyhfInterface] WARNING you are using pyhf v{pyhf.__version__}. pyhf versions < 0.5.2 have a memory leak and cause troubles for larger scans!" )
-    print ( "[SModelS:pyhfInterface] Please try to update pyhf ASAP!" )
+    print ( f"[SModelS:pyhfInterface] WARNING you are using pyhf v{pyhf.__version__}." )
+    print ( "[SModelS:pyhfInterface] We recommend pyhf >= 0.5.2. Please try to update pyhf ASAP!" )
 
 pyhf.set_backend(b"pytorch")
 from scipy import optimize
@@ -373,10 +373,16 @@ class PyhfUpperLimitComputer:
         factor = 10.
         wereBothLarge = False
         wereBothTiny = False
-        while "mu is not in [1,5]":
+        nattempts = 0
+        lo_mu, hi_mu = .2, 5.
+        while "mu is not in [lo_mu,hi_mu]":
+            nattempts += 1
+            if nattempts > 10:
+                logger.warn ( "tried 10 times to determine the bounds for brent bracketing. we abort now." )
+                return None
             # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-            rt1 = root_func(1.)
-            rt10 = root_func(5.)
+            rt1 = root_func(lo_mu)
+            rt10 = root_func(hi_mu)
             if rt1 < 0. and 0. < rt10: # Here's the real while condition
                 break
             if self.alreadyBeenThere:
@@ -411,8 +417,6 @@ class PyhfUpperLimitComputer:
                 continue
         # Finding the root (Brent bracketing part)
         logger.debug("Final scale : %f" % self.scale)
-        hi_mu = 5.
-        lo_mu = 1.
         logger.debug("Starting brent bracketing")
         ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
         endUL = time.time()
