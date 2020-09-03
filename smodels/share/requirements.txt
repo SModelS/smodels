@@ -5,6 +5,6 @@ unum>=4.0.0
 argparse
 requests>=2.0.0
 pyslha>=3.1.0
-pyhf>=0.5.1
+pyhf>=0.4.3
 jsonpatch>=1.26
 jsonschema>=3.2.0
