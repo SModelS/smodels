@@ -1,5 +1,10 @@
 .. image:: https://smodels.github.io/pics/banner.png
 
+
+[![PyPI version](https://badge.fury.io/py/smodels.svg)](https://badge.fury.io/py/smodels)
+[![CodeFactor](https://www.codefactor.io/repository/github/smodels/smodels/badge/master)](https://www.codefactor.io/repository/github/smodels/smodels/overview/master)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/SModelS/pyhep2020/master?filepath=index.ipynb)
+
 ==============
 SModelS v2.0
 ==============
@@ -17,7 +22,7 @@ directly confronted with the relevant experimental constraints.
 Installation
 ============
 
-For instructions on how to install SModelS, see 
+For instructions on how to install SModelS, see
 the section `Installation <http://smodels.readthedocs.io/en/latest/Installation.html>`_ of the `SModelS online manual`_.
 
 
@@ -46,9 +51,9 @@ used to test *runSModelS.py*.
 Citation
 ========
 
-If you use this software please cite both the SModelS v1.1_ and v1.2_ manuals, 
+If you use this software please cite both the SModelS v1.1_ and v1.2_ manuals,
 the original_ SModelS publication, as well as the programs
-it makes use of (pythia8_/pythia6_, NLL-fast_ and pyslha_). 
+it makes use of (pythia8_/pythia6_, NLL-fast_ and pyslha_).
 If you use specifically the long-lived particles implementation, please cite also this_ paper.
 For the Run2 database, cite the v1.2_ manual and the databaseUpdate_ paper.
 
@@ -66,5 +71,5 @@ For citing the experimental analyses in the database, you can use
 .. _pythia6: https://pythia6.hepforge.org/
 .. _pythia8: http://home.thep.lu.se/~torbjorn/Pythia.html
 .. _pyslha: http://www.insectnation.org/projects/pyslha.html
-.. _NLL-fast: http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast 
+.. _NLL-fast: http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast
 .. _SModelS online manual: http://smodels.readthedocs.io/
