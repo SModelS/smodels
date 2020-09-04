@@ -9,8 +9,8 @@
 .. |DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1169739.svg
    :target: https://doi.org/10.5281/zenodo.116973
 
-.. |CodeFactor| image:: https://www.codefactor.io/repository/github/smodels/smodels/overview/master
-   :target: https://www.codefactor.io/repository/github/SModelS/smodels
+.. |CodeFactor| image:: https://www.codefactor.io/repository/github/smodels/smodels/badge/master
+   :target: https://www.codefactor.io/repository/github/smodels/smodels/overview/master
 
 .. |Binder| image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/SModelS/pyhep2020/master?filepath=index.ipynb
