@@ -12,10 +12,13 @@
 .. |CodeFactor| image:: https://www.codefactor.io/repository/github/smodels/smodels/badge/master
    :target: https://www.codefactor.io/repository/github/smodels/smodels/overview/master
 
+.. |Docs| image:: https://img.shields.io/badge/docs-master-blue.svg                    
+   :target: https://smodels.readthedocs.io
+
 .. |Binder| image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/SModelS/pyhep2020/master?filepath=index.ipynb
 
-|GitHub Project| |PyPI version| |CodeFactor| |Binder|
+|GitHub Project| |PyPI version| |CodeFactor| |Binder| |Docs|
 
 ==============
 SModelS v2.0
