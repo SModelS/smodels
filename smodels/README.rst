@@ -1,9 +1,20 @@
 .. image:: https://smodels.github.io/pics/banner.png
 
+.. |PyPI version| image:: https://badge.fury.io/py/smodels.svg
+   :target: https://badge.fury.io/py/smodels
 
-[![PyPI version](https://badge.fury.io/py/smodels.svg)](https://badge.fury.io/py/smodels)
-[![CodeFactor](https://www.codefactor.io/repository/github/smodels/smodels/badge/master)](https://www.codefactor.io/repository/github/smodels/smodels/overview/master)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/SModelS/pyhep2020/master?filepath=index.ipynb)
+.. |GitHub Project| image:: https://img.shields.io/badge/GitHub--blue?style=social&logo=GitHub
+   :target: https://github.com/SModelS
+
+.. |DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1169739.svg
+   :target: https://doi.org/10.5281/zenodo.116973
+
+.. |CodeFactor| image:: https://www.codefactor.io/repository/github/smodels/smodels/overview/master
+
+.. |Binder| image:: https://mybinder.org/badge_logo.svg
+   :target: https://mybinder.org/v2/gh/SModelS/pyhep2020/master?filepath=index.ipynb
+
+|GitHub Project| |PyPI version| |CodeFactor| |Binder|
 
 ==============
 SModelS v2.0
