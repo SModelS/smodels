@@ -383,7 +383,7 @@ class XSectionList(object):
             if type(item) == type(xsec.info.label) and item == xsec.info.label:
                 xsecList.add(xsec)
             elif type(item) == type(xsec.info.sqrts) \
-                    and item == xsec.info.sqrts:
+                    and abs((item - xsec.info.sqrts).asNumber(TeV)) < 1e-2:
                 xsecList.add(xsec)
             elif type(item) == type(xsec.pid) and item == xsec.pid:
                 xsecList.add(xsec)
@@ -606,7 +606,23 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
             # Do not add xsecs which do not match the user required ones:
             if (useXSecs and not xsec.info in useXSecs):
                 continue
-            else: xSecsInFile.add(xsec)
+            skipIt = False
+            for i in xSecsInFile:
+                if xsec == i:
+                    diff = 0.0
+                    if xsec.value.asNumber(pb) > 0. or i.value.asNumber(pb)>0.:
+                        diff = float ( abs ( xsec.value - i.value ) / ( xsec.value + i.value ) )
+                    if diff > 1e-5:
+                        logger.error ( "the same xsec %s appears twice in slha file %s and values differ. exiting." % \
+                                       ( xsec.info.label, slhafile ) )
+                        sys.exit()
+                    else:
+                        logger.warn ( "the same xsec %s appears twice in slha file %s, but values differ only by %s. will skip it." % \
+                                       ( xsec.info.label, slhafile, diff ) )
+                        skipIt = True
+                        break
+            if not skipIt:
+                xSecsInFile.add(xsec)
 
     return xSecsInFile
 
