@@ -73,7 +73,7 @@ class XSectionInfo(object):
         Generate an independent copy of self.
 
         Faster than deepcopy.
-        
+
         """
         newinfo = XSectionInfo()
         newinfo.sqrts = self.sqrts
@@ -245,7 +245,7 @@ class XSectionList(object):
                 self.add(newentry)
 
     def __mul__(self, other):
-        
+
         newList = self.copy()
         for ixsec, xsec in enumerate(newList):
             newList[ixsec] = xsec * other
@@ -253,20 +253,20 @@ class XSectionList(object):
 
 
     def __rmul__(self, other):
-        
+
         return self*other
 
     def __add__(self,other):
-        
+
         newList = self.copy()
         if type(other) != type(self):
             logger.warning("Trying to add a XSectionList and a "+str(type(other)))
             return self
 
         newList += other
-        
+
         return  newList
-    
+
     def __iadd__(self, newXsecs):
         """
         Add a new list of cross sections.
@@ -277,7 +277,7 @@ class XSectionList(object):
         are set to (None, None) if any cross sections are combined.
 
         """
-        
+
         newList = newXsecs
         if type(newXsecs) == type(XSection()):
             newList = [newXsecs]
@@ -290,7 +290,7 @@ class XSectionList(object):
                         oldXsec.value = oldXsec.value + newXsec.value
                         if newXsec.pid != oldXsec.pid:
                             oldXsec.pid = (None, None)
-                            
+
         return self
 
     def __iter__(self):
@@ -552,6 +552,39 @@ class XSectionList(object):
                            (len(self) - len(newList)))
         self.xSections = newList.xSections
 
+    def removeDuplicates(self):
+        """
+        If there are two entries for the same process, center of mass energy and order,
+        keep only one (the one with highest value).
+        """
+
+        newList = XSectionList()
+        for pids in self.getPIDpairs():
+            xsecs = self.getXsecsFor(pids)
+            #Make sure xsecs are sorted by sqrts,order and value:
+            xsecs.xSections = sorted(xsecs.xSections,
+                key=lambda xsec: (xsec.info.sqrts,xsec.info.order,xsec.value.asNumber(pb )))
+            for i, ixsec in enumerate(xsecs):
+                keepXsec = True
+                isqrts = ixsec.info.sqrts
+                iorder = ixsec.info.order
+                # Check if there is a duplicate entry (with higher value):
+                for j, jxsec in enumerate(xsecs):
+                    if i >= j:
+                        continue
+                    jsqrts = jxsec.info.sqrts
+                    jorder = jxsec.info.order
+                    if jsqrts == isqrts and jorder == iorder:
+                        keepXsec = False
+                        break
+                if keepXsec:
+                    newList.add(ixsec.copy())
+
+        if len(self) != len(newList):
+            logger.warning("Removing %i duplicate cross sections",
+                           (len(self) - len(newList)))
+            self.xSections = newList.xSections
+
     def order(self):
         """
         Order the cross section in the list by their PDG pairs
@@ -562,11 +595,11 @@ class XSectionList(object):
     def __lt__(self, other):
         return self.xSections[0].pid < other.xSections[0].pid
 
-
     def sort ( self ):
         """ sort the xsecs by the values """
         self.xSections = sorted(self.xSections,
                 key=lambda xsec: xsec.value.asNumber(pb ), reverse=True )
+
 
 def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
     """
@@ -606,23 +639,10 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
             # Do not add xsecs which do not match the user required ones:
             if (useXSecs and not xsec.info in useXSecs):
                 continue
-            skipIt = False
-            for i in xSecsInFile:
-                if xsec == i:
-                    diff = 0.0
-                    if xsec.value.asNumber(pb) > 0. or i.value.asNumber(pb)>0.:
-                        diff = float ( abs ( xsec.value - i.value ) / ( xsec.value + i.value ) )
-                    if diff > 1e-5:
-                        logger.error ( "the same xsec %s appears twice in slha file %s and values differ. exiting." % \
-                                       ( xsec.info.label, slhafile ) )
-                        sys.exit()
-                    else:
-                        logger.warn ( "the same xsec %s appears twice in slha file %s, but values differ only by %s. will skip it." % \
-                                       ( xsec.info.label, slhafile, diff ) )
-                        skipIt = True
-                        break
-            if not skipIt:
-                xSecsInFile.add(xsec)
+            else: xSecsInFile.add(xsec)
+
+    #Make sure duplicates are removed.
+    xSecsInFile.removeDuplicates()
 
     return xSecsInFile
 
@@ -695,5 +715,8 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
                     xSecsInFile.xSections[ixsec].value += eventCs
 
     reader.close()
+
+    #Make sure duplicates are removed.
+    xSecsInFile.removeDuplicates()
 
     return xSecsInFile
