@@ -596,7 +596,7 @@ def _getElementsFrom(smsTopList, dataset):
                     continue
                 el.setCoveredBy(dataset.globalInfo.type)
                 eff = txname.getEfficiencyFor(newEl)
-                if not eff:
+                if eff == None or abs(eff)<1e-14:
                     continue
                 el.setTestedBy(dataset.globalInfo.type)
                 newEl.eff = eff
