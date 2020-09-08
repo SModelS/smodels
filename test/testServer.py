@@ -8,7 +8,7 @@
 
 """
 
-import sys,os
+import sys,os,glob
 sys.path.insert(0,"../")
 import unittest
 import glob
@@ -30,15 +30,17 @@ class ServerTest(unittest.TestCase):
     def mestRun(self):
         # port = random.choice ( range(31700, 42000 ) )
         port = 31771
+        # pclfile = glob.glob("database/db*.pcl" )[0]
+        pclfile = "database/db30.pcl"
         #server.run ( nonblocking = True )
-        startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i database/db31.pcl -o ./proxy31.pcl -r"
+        startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i {pclfile} -o ./proxy.pcl -r"
         cmd = startserver.split(" ")
         print ( "starting server %s" % startserver )
         popen = subprocess.Popen ( cmd, stdout = subprocess.PIPE )
         print ( "started server" )
         time.sleep(3)
         filename = "./testFiles/slha/simplyGluino.slha"
-        db = Database("./proxy31.pcl" )
+        db = Database("./proxy.pcl" )
         outputfile = runMain(filename,suppressStdout = False, overridedatabase = db )
         # for stdout_line in iter(popen.stdout.readline, ""):
         #    print ( stdout_line )
@@ -53,14 +55,14 @@ class ServerTest(unittest.TestCase):
         port = random.choice ( range(31700, 42000 ) )
         # port = 31744
 
-        startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i database/db31.pcl -o ./proxy31.pcl -r -v error"
+        startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i database/db30.pcl -o ./proxy.pcl -r -v error"
         cmd = startserver.split(" ")
         # print ( "starting server %s" % startserver )
         subprocess.Popen ( cmd )
 
         time.sleep ( 2 )
 
-        db = Database("./proxy31.pcl" )
+        db = Database("./proxy.pcl" )
         outputfile = runMain(filename,suppressStdout = True, overridedatabase = db )
         smodelsOutput = importModule ( outputfile )
         
