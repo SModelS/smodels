@@ -311,6 +311,16 @@ class Model(object):
                 newDecay.evenParticles = evenParticles
                 particle.decays.append(newDecay)
 
+        #Check if all unstable particles have decay channels defined:
+        for p in self.BSMparticles:
+            if p.totalwidth < stableWidth:
+                continue
+            ndecays = len([dec for dec in p.decays if dec is not None])
+            if ndecays == 0:
+                logger.error("Unstable particle %s (%i) has no decay channels defined." %(p,p.pdg))
+                raise SModelSError()
+
+
         #Reset particle equality from all particles:
         for p in Particle.getinstances():
             p._comp = {p._id : 0}
