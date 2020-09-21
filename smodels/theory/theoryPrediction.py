@@ -395,6 +395,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     if combinedResults and len(dataSetResults) > 1:
         combinedDataSetResult = _getCombinedResultFor(dataSetResults,
                                                       expResult,marginalize)
+        print ( "here", combinedResults, len(dataSetResults), combinedDataSetResult )
         if combinedDataSetResult:
             bestResults.append(combinedDataSetResult)
 
@@ -420,7 +421,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
 
     if len(dataSetResults) == 1:
         return dataSetResults[0]
-    elif not expResult.hasCovarianceMatrix():
+    elif not expResult.hasCovarianceMatrix() and not expResult.hasJsonFile():
         return None
 
     txnameList = []

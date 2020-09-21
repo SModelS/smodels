@@ -173,6 +173,9 @@ class ExpResult(object):
     def hasCovarianceMatrix( self ):
         return hasattr(self.globalInfo, "covariance")
 
+    def hasJsonFile( self ):
+        return hasattr(self.globalInfo, "jsonFiles")
+
 
     """ this feature is not yet ready
     def isUncorrelatedWith ( self, other ):

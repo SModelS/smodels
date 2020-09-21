@@ -316,7 +316,7 @@ class Model(object):
             if p.totalwidth < stableWidth:
                 continue
             ndecays = len([dec for dec in p.decays if dec is not None])
-            if ndecays == 0:
+            if ndecays == 0 and p.mass < 1e5*GeV:
                 logger.error("Unstable particle %s (%i) has no decay channels defined." %(p,p.pdg))
                 raise SModelSError()
 
