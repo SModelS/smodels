@@ -207,8 +207,12 @@ class DatabaseServer:
         self.pprint ( 'starting up on %s port %s' % self.server_address )
         self.pprint ( 'I will be serving database %s at %s' % \
                       (self.db.databaseVersion, self.dbpath ) )
-        self.sock.bind( self.server_address )
-
+        try:
+            self.sock.bind( self.server_address )
+        except OSError as e:
+            self.pprint ( "exception %s. is host ''%s'' reachable?" % \
+                          ( e, self.server_address ) )
+            sys.exit(-1)
         # Listen for incoming connections
         self.sock.listen(1)
 

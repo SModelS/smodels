@@ -86,7 +86,10 @@ class CppTest(unittest.TestCase):
                 except:
                     pass
                 if isinstance(yv,float) and isinstance(xv,float):
-                    self.assertAlmostEqual(xv, yv, 3)
+                    if abs(xv)<1e-10 and abs(yv)<1e-10: ## tiny llhds are ok
+                        yv=xv
+                    dlt = abs ( ( xv - yv ) / (xv + yv) )
+                    self.assertAlmostEqual( dlt, 0., 1 )
                 else:
                     self.assertEqual(xv, yv)
         ## reset parameter.ini file
