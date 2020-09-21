@@ -8,7 +8,7 @@
 """
 
 
-import os,glob
+import os,glob,json
 from smodels.experiment import txnameObj,infoObj
 from smodels.tools.physicsUnits import fb
 from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
@@ -355,6 +355,7 @@ class CombinedDataSet(object):
 
     def __init__(self, expResult):
 
+        self.path = expResult.path
         self.globalInfo = expResult.globalInfo
         self._datasets = expResult.datasets[:]
         self._marginalize = False
@@ -418,6 +419,35 @@ class CombinedDataSet(object):
 
         return None
 
+    def getPyhfComputer ( self, nsig ):
+        """ create the pyhf ul computer object
+        :returns: pyhf upper limit computer, and combinations of signal regions
+        """
+        # Getting the path to the json files
+        jsonFiles = [os.path.join(self.path, js) for js in self.globalInfo.jsonFiles]
+        combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
+        # Constructing the list of signals with subsignals matching each json
+        datasets = [ds.getID() for ds in self._datasets]
+        total = sum(nsig)
+        nsig = [s/total for s in nsig] # Normalising signals to get an upper limit on the events count
+        nsignals = list()
+        for jsName in self.globalInfo.jsonFiles:
+            subSig = list()
+            for srName in self.globalInfo.jsonFiles[jsName]:
+                try:
+                    index = datasets.index(srName)
+                except ValueError:
+                    logger.error("%s signal region provided in globalInfo is not in the list of datasets" % srName)
+                sig = nsig[index]
+                subSig.append(sig)
+            nsignals.append(subSig)
+        # Loading the jsonFiles, unless we already have them (because we pickled)
+        from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
+        data = PyhfData(nsignals, self.globalInfo.jsons )
+        if data.errorFlag: return None
+        ulcomputer = PyhfUpperLimitComputer(data)
+        return ulcomputer,combinations
+
     def getCombinedUpperLimitFor(self, nsig, expected=False, deltas_rel=0.2):
         """
         Get combined upper limit. If covariances are given in globalInfo then simplified likelihood is used, else if json files are given pyhf cimbination is performed.
@@ -457,34 +487,7 @@ class CombinedDataSet(object):
             if all([s == 0 for s in nsig]):
                 logger.warning("All signals are empty")
                 return None
-            # Getting the path to the json files
-            jsonFiles = [os.path.join(self.path, js) for js in self.globalInfo.jsonFiles]
-            combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
-            # Constructing the list of signals with subsignals matching each json
-            datasets = [ds.getID() for ds in self._datasets]
-            total = sum(nsig)
-            nsig = [s/total for s in nsig] # Normalising signals to get an upper limit on the events count
-            nsignals = list()
-            for jsName in self.globalInfo.jsonFiles:
-                subSig = list()
-                for srName in self.globalInfo.jsonFiles[jsName]:
-                    try:
-                        index = datasets.index(srName)
-                    except ValueError:
-                        logger.error("%s signal region provided in globalInfo is not in the list of datasets" % srName)
-                    sig = nsig[index]
-                    subSig.append(sig)
-                nsignals.append(subSig)
-            # Loading the jsonFiles
-            inputJsons = list()
-            for js in jsonFiles:
-                with open(js, "r") as fi:
-                    inputJsons.append(json.load(fi))
-
-            from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
-            data = PyhfData(nsignals, inputJsons)
-            if data.errorFlag: return None
-            ulcomputer = PyhfUpperLimitComputer(data)
+            ulcomputer, combinations = self.getPyhfComputer( nsig )
             if ulcomputer.nWS == 1:
                 ret = ulcomputer.ulSigma(expected=expected)
                 ret = ret/self.globalInfo.lumi
@@ -547,31 +550,8 @@ class CombinedDataSet(object):
             return computer.likelihood(nsig, marginalize=marginalize )
         elif hasattr(self.globalInfo, "jsonFiles"):
             # Getting the path to the json files
-            jsonFiles = [os.path.join(self.path, js) for js in self.globalInfo.jsonFiles]
-            combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
-            # Constructing the list of signals with subsignals matching each json
-            datasets = [ds.getID() for ds in self._datasets]
-            nsignals = list()
-            for jsName in self.globalInfo.jsonFiles:
-                subSig = list()
-                for srName in self.globalInfo.jsonFiles[jsName]:
-                    try:
-                        index = datasets.index(srName)
-                    except ValueError:
-                        logger.error("% signal region provided in jsonFiles is not in datasetOrder" % srName)
-                    sig = nsig[index]
-                    subSig.append(sig)
-                nsignals.append(subSig)
             # Loading the jsonFiles
-            inputJsons = list()
-            for js in jsonFiles:
-                with open(js, "r") as fi:
-                    inputJsons.append(json.load(fi))
-
-            from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
-            data = PyhfData(nsignals, inputJsons)
-            if data.errorFlag: return None
-            ulcomputer = PyhfUpperLimitComputer(data)
+            ulcomputer, combinations = self.getPyhfComputer( nsig )
             if ulcomputer.nWS == 1:
                 return ulcomputer.likelihood()
             else:
@@ -617,31 +597,8 @@ class CombinedDataSet(object):
             return computer.chi2(nsig, marginalize=marginalize)
         elif hasattr(self.globalInfo, "jsonFiles"):
             # Getting the path to the json files
-            jsonFiles = [os.path.join(self.path, js) for js in self.globalInfo.jsonFiles]
-            combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
-            # Constructing the list of signals with subsignals matching each json
-            datasets = [ds.getID() for ds in self._datasets]
-            nsignals = list()
-            for jsName in self.globalInfo.jsonFiles:
-                subSig = list()
-                for srName in self.globalInfo.jsonFiles[jsName]:
-                    try:
-                        index = datasets.index(srName)
-                    except ValueError:
-                        logger.error("% signal region provided in jsonFiles is not in the list of datasets" % srName)
-                    sig = nsig[index]
-                    subSig.append(sig)
-                nsignals.append(subSig)
             # Loading the jsonFiles
-            inputJsons = list()
-            for js in jsonFiles:
-                with open(js, "r") as fi:
-                    inputJsons.append(json.load(fi))
-
-            from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
-            data = PyhfData(nsignals, inputJsons)
-            if data.errorFlag: return None
-            ulcomputer = PyhfUpperLimitComputer(data)
+            ulcomputer, combinations = self.getPyhfComputer( nsig )
             if ulcomputer.nWS == 1:
                 return ulcomputer.chi2()
             else:

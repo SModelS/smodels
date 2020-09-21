@@ -395,7 +395,6 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     if combinedResults and len(dataSetResults) > 1:
         combinedDataSetResult = _getCombinedResultFor(dataSetResults,
                                                       expResult,marginalize)
-        print ( "here", combinedResults, len(dataSetResults), combinedDataSetResult )
         if combinedDataSetResult:
             bestResults.append(combinedDataSetResult)
 
