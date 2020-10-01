@@ -2,8 +2,8 @@
 
 """
 .. module:: testReweighting
-   :synopsis: Tests the function of coverage 
-.. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>   
+   :synopsis: Tests the function of coverage
+.. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 """
 import sys
 sys.path.insert(0,"../")
@@ -55,8 +55,8 @@ for key in filters:
         factors[key] = lambda el: reweightFactorFor(el,'prompt')+reweightFactorFor(el,'displaced')
 
 
-class CoverageTest(unittest.TestCase):     
-   
+class CoverageTest(unittest.TestCase):
+
     def testUncovered(self):
 
         topolist = TopologyList()
@@ -99,7 +99,7 @@ class CoverageTest(unittest.TestCase):
         w1.xSections[0].info.sqrts = 8.*TeV
         w1.xSections[0].info.label = '8 TeV'
         w1.xSections[0].info.order = 0
-        w1.xSections[0].value = 10.*fb    
+        w1.xSections[0].value = 10.*fb
         el1.weight = w1
         el2.weight = w1
         el3.weight = w1
@@ -121,7 +121,7 @@ class CoverageTest(unittest.TestCase):
         self.assertAlmostEqual(longLived.generalElements[0].missingX, 10.)
         self.assertAlmostEqual(displaced.generalElements[0].missingX, 9.96109334317542,places=4)
         self.assertAlmostEqual(MET.generalElements[0].missingX, 10.)
-        self.assertAlmostEqual(MET.generalElements[1].missingX, 0.03890665682,places=6)
+        self.assertAlmostEqual(MET.generalElements[1].missingX, 0.03890665682,places=4)
 
 
     def testUncoveredTree(self):
@@ -236,4 +236,4 @@ class CoverageTest(unittest.TestCase):
         self.assertTrue(missingTopos.generalElements[0]._contributingElements[0] is elCombined)
 
 if __name__ == "__main__":
-    unittest.main()       
+    unittest.main()

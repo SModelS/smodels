@@ -14,8 +14,8 @@ from smodels.tools.smodelsLogging import logger
 Leff_inner_default = 0.000769
 Leff_outer_default = 7.0
 
-def defaultEffReweight(element,minWeight=1e-10,
-                        Leff_inner=None,Leff_outer=None):
+def defaultEffReweight(element,Leff_inner=None,Leff_outer=None,
+                                minWeight=1e-10):
     """
     Computes the lifetime reweighting factor for the element efficiency
     based on the lifetimes of all intermediate particles and the last stable odd-particle
