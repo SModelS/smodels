@@ -97,9 +97,18 @@ class TxName(object):
         ident = self.globalInfo.id+":"+dataType[0]+":"+ str(self._infoObj.dataId)
         ident += ":" + self.txName
 
-        self.txnameData = TxNameData(data, dataType, ident)
+        #Get detector size (if not found in self, look for it in datasetInfo or globalInfo).
+        #If not defined anywhere, set it to None and default values will be used for reweighting.
+        self.Leff_inner = self.fetchAttribute('Leff_inner',fillvalue=None)
+        self.Leff_outer = self.fetchAttribute('Leff_outer',fillvalue=None)
+
+        self.txnameData = TxNameData(data, dataType, ident,
+                                        Leff_inner=self.Leff_inner,
+                                        Leff_outer=self.Leff_outer)
         if expectedData:
-            self.txnameDataExp = TxNameData( expectedData, dataType, ident)
+            self.txnameDataExp = TxNameData( expectedData, dataType, ident,
+                                            Leff_inner=self.Leff_inner,
+                                            Leff_outer=self.Leff_outer)
 
         #Builds up a list of elements appearing in constraints:
         elements = []
@@ -141,6 +150,27 @@ class TxName(object):
                 return False
         return ozs
 
+    def fetchAttribute(self,attr,fillvalue=None):
+        """
+        Auxiliary method to get the attribute from self. If
+        not found, look for it in datasetInfo and if still not found
+        look for it in globalInfo.
+        If not found in either of the above, return fillvalue.
+
+        :param attr: Name of attribute (string)
+        :param fillvalue: Value to be returned if attribute is not found.
+
+        :return: Value of the attribute or fillvalue, if attribute was not found.
+        """
+
+        if hasattr(self,attr):
+            return getattr(self,attr)
+        elif  hasattr(self._infoObj,attr):
+            return getattr(self._infoObj,attr)
+        elif  hasattr(self.globalInfo,attr):
+            return getattr(self.globalInfo,attr)
+        else:
+            return fillvalue
 
     def __str__(self):
         return self.txName
@@ -272,7 +302,7 @@ class TxName(object):
 
 
     def getMassVectorFromElement(self, element ):
-        """ given element, extract the mass vector for the 
+        """ given element, extract the mass vector for the
             server query. element can be list of masses or "Element"
         :returns: eg [[300,100],[300,100]]
         """
@@ -330,7 +360,7 @@ class TxName(object):
                 eff = self.dbClient.query ( query )
             else:
                 eff = self.txnameData.getValueFor(element)
-                
+
             if not eff or math.isnan(eff):
                 eff = 0. #Element is outside the grid or has zero efficiency
         elif self.txnameData.dataType == 'upperLimit':
@@ -361,7 +391,9 @@ class TxNameData(object):
     """
     _keep_values = False ## keep the original values, only for debugging
 
-    def __init__(self,value,dataType,Id,accept_errors_upto=.05):
+    def __init__(self,value,dataType,Id,
+                    accept_errors_upto=.05,
+                    Leff_inner=None,Leff_outer=None):
         """
         :param value: values in string format
         :param dataType: the dataType (upperLimit or efficiencyMap)
@@ -371,10 +403,16 @@ class TxNameData(object):
                 uncertainty on the upper limit / efficiency
                 when extrapolating outside convex hull.
                 This method can be used to loosen the equal branches assumption.
+        :param Leff_inner: is the effective inner radius of the detector, given in meters (used for reweighting prompt decays). If None, default values will be used.
+        :param Leff_outer: is the effective outer radius of the detector, given in meters (used for reweighting decays outside the detector). If None, default values will be used.
+
+
         """
         self.dataType = dataType
         self._id = Id
         self._accept_errors_upto=accept_errors_upto
+        self.Leff_inner = Leff_inner
+        self.Leff_outer = Leff_outer
         self._V = None
         self.loadData(value)
         if self._keep_values:
@@ -690,7 +728,7 @@ class TxNameData(object):
                             widths[ibr].append(0.*GeV)
                     else:
                         widths[ibr].append(w)
-            reweightFactor = self.reweightF(widths)
+            reweightFactor = self.reweightF(widths,self.Leff_inner,self.Leff_outer)
         elif isinstance(element,list):
             reweightFactor = 1.
         else:

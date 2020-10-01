@@ -11,9 +11,11 @@ from smodels.theory.element import Element
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
+Leff_inner_default = 0.000769
+Leff_outer_default = 7.0
 
 def defaultEffReweight(element,minWeight=1e-10,
-                        Leff_inner=0.000769,Leff_outer=7.0):
+                        Leff_inner=None,Leff_outer=None):
     """
     Computes the lifetime reweighting factor for the element efficiency
     based on the lifetimes of all intermediate particles and the last stable odd-particle
@@ -24,12 +26,20 @@ def defaultEffReweight(element,minWeight=1e-10,
 
     :param element: Element object or nested list of widths
     :param minWeight: Lower cut for the reweighting factor. Any value below this will be taken to be zero.
-    :param Leff_inner: is the effective inner radius of the detector, given in meters
-    :param Leff_outer: is the effective outer radius of the detector, given in meters
+    :param Leff_inner: is the effective inner radius of the detector, given in meters. If None,
+                        use default value.
+    :param Leff_outer: is the effective outer radius of the detector, given in meters. If None,
+                        use default value.
 
 
     :return: Reweight factor (float)
     """
+
+    if Leff_inner is None:
+        Leff_inner = Leff_inner_default
+    if Leff_outer is None:
+        Leff_outer = Leff_outer_default
+
 
     if isinstance(element,list):
         elWidths = [[w.asNumber(GeV) for w in br] for br in element]
@@ -49,7 +59,7 @@ def defaultEffReweight(element,minWeight=1e-10,
 
     return elFraction
 
-def defaultULReweight(element,Leff_inner=0.000769,Leff_outer=7.0):
+def defaultULReweight(element,Leff_inner=None,Leff_outer=None):
     """
     Computes the lifetime reweighting factor for the element upper limit
     based on the lifetimes of all intermediate particles and the last stable odd-particle
@@ -59,12 +69,20 @@ def defaultULReweight(element,Leff_inner=0.000769,Leff_outer=7.0):
     to the final BSM state.
 
     :param element: Element object
-    :param Leff_inner: is the effective inner radius of the detector, given in meters
-    :param Leff_outer: is the effective outer radius of the detector, given in meters
+    :param Leff_inner: is the effective inner radius of the detector, given in meters. If None,
+                        use default value.
+    :param Leff_outer: is the effective outer radius of the detector, given in meters. If None,
+                        use default value.
 
 
     :return: Reweight factor (float)
     """
+
+    if Leff_inner is None:
+        Leff_inner = Leff_inner_default
+    if Leff_outer is None:
+        Leff_outer = Leff_outer_default
+
 
     effFactor = defaultEffReweight(element,Leff_inner,Leff_outer)
     if not effFactor:
@@ -74,7 +92,7 @@ def defaultULReweight(element,Leff_inner=0.000769,Leff_outer=7.0):
 
 
 def reweightFactorFor(element,resType='prompt',
-                        Leff_inner=0.000769,Leff_outer=7.0):
+                        Leff_inner=None,Leff_outer=None):
     """
     Computer the reweighting factor for the element according to the experimental result type.
     Currently only two result types are supported: 'prompt' and 'displaced'.
@@ -88,11 +106,19 @@ def reweightFactorFor(element,resType='prompt',
 
     :param element: Element object
     :param resType: Type of result to compute the reweight factor for (either 'prompt' or 'displaced')
-    :param Leff_inner: is the effective inner radius of the detector, given in meters
-    :param Leff_outer: is the effective outer radius of the detector, given in meters
+    :param Leff_inner: is the effective inner radius of the detector, given in meters. If None,
+                        use default value.
+    :param Leff_outer: is the effective outer radius of the detector, given in meters. If None,
+                        use default value.
 
     :return: probabilities (depending on types of decay within branch), branches (with different labels depending on type of decay)
     """
+
+    if Leff_inner is None:
+        Leff_inner = Leff_inner_default
+    if Leff_outer is None:
+        Leff_outer = Leff_outer_default
+
 
     if not isinstance(element,Element):
         logger.error('element should be an Element object and not %s' %type(element))
