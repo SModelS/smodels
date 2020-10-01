@@ -662,7 +662,6 @@ class TxNameData(object):
 
         return massAndWidthArray
 
-
     def loadData(self,value):
         """
         Uses the information in value to generate the data grid used for

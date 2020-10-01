@@ -1,6 +1,8 @@
 id: CMS-EXO-13-006
 sqrts: 8*TeV
 lumi: 18.8/fb
+Leff_inner: 0.007
+Leff_outer: 7.0
 prettyName: hscp search
 url: http://cms-results.web.cern.ch/cms-results/public-results/publications/EXO-13-006/index.html
 arxiv: https://arxiv.org/abs/1502.02522

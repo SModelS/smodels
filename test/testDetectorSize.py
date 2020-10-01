@@ -13,6 +13,7 @@ from smodels.theory.branch import Branch
 from smodels.theory.element import Element
 from smodels.tools.reweighting import calculateProbabilities,defaultEffReweight
 from smodels.tools.physicsUnits import GeV
+from databaseLoader import database
 
 class DetectorSizeTest(unittest.TestCase):
 
@@ -76,35 +77,57 @@ class DetectorSizeTest(unittest.TestCase):
 
     def testTxnameDataReweight(self):
 
-        n1 = mssm.n1.copy()
-        n1.totalwidth = 1e-18*GeV
-        st1 = mssm.st1.copy()
-        st1.totalwidth = 5e-15*GeV
+        c1 = mssm.c1.copy()
+        c1.totalwidth = 1e-17*GeV
+        c1.mass = 100*GeV
         gluino = mssm.gluino.copy()
         gluino.totalwidth = 1e-15*GeV
+        gluino.mass = 500*GeV
         branch1 = Branch()
-        branch1.oddParticles = [st1,n1]
+        branch1.oddParticles = [gluino,c1]
         branch2 = Branch()
-        branch2.oddParticles = [gluino,n1]
+        branch2.oddParticles = [gluino,c1]
         el1 = Element([branch1,branch2])
-        #INCOMPLETE
+
+        listofanalyses = database.getExpResults(
+                analysisIDs= [ "CMS-EXO-13-006"], dataTypes = ['efficiencyMap'])
+
+        exp = listofanalyses[0]
+        ds = [d for d in exp.datasets if d.dataInfo.dataId == 'c000'][0]
+        tx = [t for t in ds.txnameList if str(t) == 'THSCPM3'][0]
+        effDefault = tx.getEfficiencyFor(el1)
+        self.assertAlmostEqual(tx.txnameData.Leff_inner,0.007)
+        self.assertAlmostEqual(tx.txnameData.Leff_outer,7.0)
+        self.assertAlmostEqual(effDefault/1e-5,5.223348,places=3)
+
+        ds = [d for d in exp.datasets if d.dataInfo.dataId == 'c000track'][0]
+        tx = [t for t in ds.txnameList if str(t) == 'THSCPM3'][0]
+        effNewSize = tx.getEfficiencyFor(el1)
+        self.assertAlmostEqual(tx.txnameData.Leff_inner,0.007)
+        self.assertAlmostEqual(tx.txnameData.Leff_outer,3.0)
+        self.assertAlmostEqual(effNewSize/1e-5,7.83466,places=3)
 
 
-
-    def testTxnameReweight(self):
-
-        n1 = mssm.n1.copy()
-        n1.totalwidth = 1e-18*GeV
-        st1 = mssm.st1.copy()
-        st1.totalwidth = 5e-15*GeV
-        gluino = mssm.gluino.copy()
-        gluino.totalwidth = 1e-15*GeV
         branch1 = Branch()
-        branch1.oddParticles = [st1,n1]
+        branch1.oddParticles = [c1]
         branch2 = Branch()
-        branch2.oddParticles = [gluino,n1]
-        el1 = Element([branch1,branch2])
-        #INCOMPLETE
+        branch2.oddParticles = [c1]
+        el2 = Element([branch1,branch2])
+
+        ds = [d for d in exp.datasets if d.dataInfo.dataId == 'c000'][0]
+        tx = [t for t in ds.txnameList if str(t) == 'THSCPM1'][0]
+        effDefault = tx.getEfficiencyFor(el2)
+        self.assertAlmostEqual(tx.txnameData.Leff_inner,0.007)
+        self.assertAlmostEqual(tx.txnameData.Leff_outer,7.0)
+        self.assertAlmostEqual(effDefault,0.073292924,places=3)
+
+        ds = [d for d in exp.datasets if d.dataInfo.dataId == 'c000track'][0]
+        tx = [t for t in ds.txnameList if str(t) == 'THSCPM1'][0]
+        effNewSize = tx.getEfficiencyFor(el2)
+        self.assertAlmostEqual(tx.txnameData.Leff_inner,0.1)
+        self.assertAlmostEqual(tx.txnameData.Leff_outer,5.0)
+        self.assertAlmostEqual(effNewSize,0.0897630,places=3)
+
 
 if __name__ == "__main__":
     unittest.main()

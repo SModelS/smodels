@@ -11,6 +11,8 @@ Release v2.0.0, xxx 2020
   * Small bug fix in likelihood computation
   * Changes in output: width values added, coverage groups and others (see manual for details)
   * Added option for signal strength multipliers in cross section calculator
+  * Added support for central database server
+  * Added possibility for analysis specific detector size
 
 Release v1.2.4, Thu 3 Sep 2020
 =======================================================
