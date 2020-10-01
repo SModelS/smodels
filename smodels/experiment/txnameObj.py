@@ -708,6 +708,13 @@ class TxNameData(object):
         :param element: Element object or mass array (with units)
         """
 
+        #For backward compatibility:
+        if not hasattr(self,'Leff_inner'):
+            self.Leff_inner = None
+        if not hasattr(self,'Leff_outer'):
+            self.Leff_outer = None
+
+
         #Compute reweight factor according to lifetime/widths
         #For the widths not used in interpolation we assume that the
         #analysis require prompt decays
@@ -728,7 +735,9 @@ class TxNameData(object):
                             widths[ibr].append(0.*GeV)
                     else:
                         widths[ibr].append(w)
-            reweightFactor = self.reweightF(widths,self.Leff_inner,self.Leff_outer)
+            reweightFactor = self.reweightF(widths,
+                                            Leff_inner=self.Leff_inner,
+                                            Leff_outer=self.Leff_outer)
         elif isinstance(element,list):
             reweightFactor = 1.
         else:
