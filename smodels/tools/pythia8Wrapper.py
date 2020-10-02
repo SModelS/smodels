@@ -17,7 +17,7 @@ from smodels.theory.crossSection import getXsecFromLHEFile
 from smodels import installation
 from smodels.tools.pythia8particles import particles
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-import os, sys, io
+import os, sys, io, shutil
 
 try:
     import commands as executor #python2 
@@ -120,7 +120,6 @@ class Pythia8Wrapper(WrapperBase):
         :returns: List of cross sections
         
         """
-        
         #Change pythia configuration file, if defined:
         if self.pythiacard:
             pythiacard_default = self.cfgfile
@@ -175,6 +174,10 @@ class Pythia8Wrapper(WrapperBase):
         #Reset pythia card to its default value
         if self.pythiacard:
             self.cfgfile = pythiacard_default
+
+        if unlink:
+            shutil.rmtree ( self.tempDirectory() )
+            # print ( "rmtree", self.tempDirectory() )
         
         return ret
 
