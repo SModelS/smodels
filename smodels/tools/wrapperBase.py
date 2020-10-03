@@ -21,12 +21,15 @@ except ImportError:
 class WrapperBase(object):
     """
     An instance of this class represents the installation of an external tool.
-    
+
     An external tool encapsulates a tool that is executed via
     commands.getoutput. The wrapper defines how the tool is tested for proper
     installation and how the tool is executed.
-    
+
     """
+    defaulttempdir = "./" ## the default directory for temp dirs
+    # defaulttempdir = "/tmp/" ## the default directory for temp dirs
+
     def __init__(self):
         self.executablePath = ""
         self.tempdir = ""
@@ -35,7 +38,7 @@ class WrapperBase(object):
     def installDirectory(self):
         """
         :returns: the installation directory of the tool
-        
+
         """
         t = self.executablePath
         p = t.rfind("/")
@@ -47,7 +50,7 @@ class WrapperBase(object):
     def pathOfExecutable(self):
         """
         :returns: path of executable
-        
+
         """
         return self.executablePath
 
@@ -111,7 +114,7 @@ class WrapperBase(object):
     def basePath(self):
         """
         Get the base installation path.
-        
+
         """
         return os.path.dirname(inspect.getabsfile(self.basePath))
 
@@ -120,7 +123,7 @@ class WrapperBase(object):
         """
         Get the absolute path of <path>, replacing <install> with the
         installation directory.
-        
+
         """
         if path == None:
             return self.tempDirectory() + "/temp.cfg"
@@ -133,12 +136,14 @@ class WrapperBase(object):
     def tempDirectory(self):
         """
         Return the temporary directory name.
-        
+
         """
         import tempfile
         import shutil
         if self.tempdir in [ None, "" ]:
-            self.tempdir = tempfile.mkdtemp()
+            self.tempdir = tempfile.mkdtemp( prefix="xsec",
+                                             dir=self.defaulttempdir )
+            # self.tempdir = tempfile.mkdtemp()
             shutil.copy(self.cfgfile, self.tempdir + "/temp.cfg")
         return self.tempdir
 
@@ -152,7 +157,7 @@ class WrapperBase(object):
 def ok(b):
     """
     :returns: 'ok' if b is True, else, return 'error'.
-    
+
     """
     if b:
         return "ok"
