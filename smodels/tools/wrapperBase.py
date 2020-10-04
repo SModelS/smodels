@@ -27,8 +27,8 @@ class WrapperBase(object):
     installation and how the tool is executed.
 
     """
-    defaulttempdir = "./" ## the default directory for temp dirs
-    # defaulttempdir = "/tmp/" ## the default directory for temp dirs
+    #defaulttempdir = "./" ## the default directory for temp dirs
+    defaulttempdir = "/tmp/" ## the default directory for temp dirs
 
     def __init__(self):
         self.executablePath = ""
