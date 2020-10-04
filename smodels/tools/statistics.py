@@ -23,7 +23,7 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
     :param nSig: number of signal events
     :param nll: if True, return negative log likelihood
 
-    :returns: likelihood
+    :returns: likelihood (float)
     """
     assert ( upperLimit > 0. )
     def llhd ( nsig, mumax, sigma_exp, nll ):
@@ -34,7 +34,7 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
         A = stats.norm.cdf(Zprime)
         if nll:
             return np.log(A ) - stats.norm.logpdf ( nsig, mumax, sigma_exp )
-        return stats.norm.pdf ( nsig, mumax, sigma_exp ) / A
+        return float ( stats.norm.pdf ( nsig, mumax, sigma_exp ) / A )
 
     dr = ( expectedUpperLimit - upperLimit ) / ( expectedUpperLimit + upperLimit )
     if abs(dr)>.4:

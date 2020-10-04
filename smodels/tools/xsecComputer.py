@@ -383,8 +383,9 @@ class XSecComputer:
         """
 
         if not os.path.isfile(slhafile):
-            logger.error("SLHA file not found.")
-            raise SModelSError()
+            line = f"SLHA file {slhafile} not found."
+            logger.error( line )
+            raise SModelSError( line )
         if len(xsecs) == 0:
             self.countNoXSecs+=1
             if self.countNoXSecs < 3:
