@@ -91,7 +91,7 @@ class TxTest(unittest.TestCase):
         #test getting efficiency with element and reweighted efficiency
         setattr(n1, 'totalwidth', 0.*GeV)
         setattr(c1, 'totalwidth', 10**(-17)*GeV)
-        self.assertAlmostEqual(tx.getEfficiencyFor(el), 0.08697,5)
+        self.assertAlmostEqual(tx.getEfficiencyFor(el), 0.08697,3)
 
     def testGetValueFor(self):
 

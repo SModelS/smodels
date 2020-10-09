@@ -65,8 +65,8 @@ def compareXML(xmldefault,xmlnew,allowedDiff,ignore=[]):
 
 def compareSLHA(slhadefault,slhanew):
     
-    newData = pyslha.read(slhanew,ignorenomass=True,ignorenobr=True)
-    defaultData = pyslha.read(slhadefault,ignorenomass=True,ignorenobr=True)
+    newData = pyslha.read(slhanew,ignorenomass=True,ignorenobr=True,ignoreblocks=["SMODELS_SETTINGS"])
+    defaultData = pyslha.read(slhadefault,ignorenomass=True,ignorenobr=True,ignoreblocks=["SMODELS_SETTINGS"])
     defaultBlocks = sorted([defaultData.blocks[b].name for b in defaultData.blocks])
     newBlocks = sorted([newData.blocks[b].name for b in newData.blocks])
     if defaultBlocks != newBlocks:
