@@ -34,6 +34,10 @@ class TheoryPrediction(object):
                 (only for upper limit-type analysis, e.g. analysis=ULanalysis)
 
     """
+
+    drmax = 0.4 ## the parameter for truncated Gaussians, regulates at what
+    # (oUL - eUL) / ( eUL + oUL) we dont make predictions at all
+
     def __init__(self):
         self.analysis = None
         self.xsection = None
@@ -158,7 +162,7 @@ class TheoryPrediction(object):
         ulN = float(ul * lumi) ## upper limit on yield
         eulN = float(eul * lumi) ## upper limit on yield
         nsig = mu*(self.xsection.value*lumi).asNumber()
-        llhd = likelihoodFromLimits ( ulN, eulN, nsig )
+        llhd = likelihoodFromLimits ( ulN, eulN, nsig, drmax=self.drmax )
         if chi2also:
             return ( llhd, chi2FromLimits ( llhd, eulN ) )
         return llhd

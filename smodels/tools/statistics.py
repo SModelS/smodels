@@ -16,12 +16,13 @@ from smodels.tools.smodelsLogging import logger
 from scipy.special import erf
 import numpy as np
 
-def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
+def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False, drmax=.4 ):
     """ computes the likelihood from an expected and an observed upper limit.
     :param upperLimit: observed upper limit, as a yield (i.e. unitless)
     :param expectedUpperLimit: expected upper limit, also as a yield
     :param nSig: number of signal events
     :param nll: if True, return negative log likelihood
+    :param drmax: maximum ratio (eUL - oUL) / (eUL + oUL) that we allow before returning None
 
     :returns: likelihood (float)
     """
@@ -37,8 +38,8 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
         return float ( stats.norm.pdf ( nsig, mumax, sigma_exp ) / A )
 
     dr = ( expectedUpperLimit - upperLimit ) / ( expectedUpperLimit + upperLimit )
-    if abs(dr)>.4:
-        logger.warn("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f)" % ( upperLimit, expectedUpperLimit, dr ) )
+    if abs(dr)>drmax:
+        logger.warn("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f)" % ( upperLimit, expectedUpperLimit, dr, drmax ) )
         return None
 
     sigma_exp = expectedUpperLimit / 1.96 # the expected scale, eq 3.24 in arXiv:1202.3415
