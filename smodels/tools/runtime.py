@@ -12,7 +12,12 @@
 
 ## place to keep the pointer to the model file (default = mssm)
 modelFile="smodels.share.models.mssm"
-_experimental = False
+
+_experimental = False ## turn on experimental features
+_cap_likelihoods = False ## cap the likelihoods in likelihoodFromLimits?
+# here, capping means that if an observed UL >> expected UL we "cap"
+# the observed UL such that dr == drmax
+_drmax = 0.4 # maximum ratio (oUL - eUL)/(oUL + eUL) that we allow before capping or returning None ( depending on _cap_likelihoods)
 
 def filetype ( filename ):
     """ obtain information about the filetype of an input file,
