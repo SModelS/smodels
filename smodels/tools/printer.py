@@ -403,8 +403,7 @@ class TxTPrinter(BasicPrinter):
         output += "========================================================\n"
         output += "Experimental Result ID: " + obj.globalInfo.id + '\n'
         output += "Tx Labels: " + str(txnames) + '\n'
-        # output += "Sqrts: " + str(obj.globalInfo.sqrts) + '\n'
-        output += "Sqrts: %2.2E\n" % obj.globalInfo.sqrts
+        output += "Sqrts: %2.2E\n" % obj.globalInfo.sqrts.asNumber(TeV)
         if hasattr(self,"addanainfo") and self.addanainfo:
             output += "\t -----------------------------\n"
             output += "\t Elements tested by analysis:\n"
@@ -433,7 +432,7 @@ class TxTPrinter(BasicPrinter):
         output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"
         slabel = "Experimental Constraints"
         xspace = int((56-len(slabel))/2.)
-        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"        
+        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"
         output += "||" + " "*56+ "||\n"
         output += "  " + "="*56+ "  \n"
 
@@ -478,7 +477,7 @@ class TxTPrinter(BasicPrinter):
                 if theoryPrediction.mass:
                     for ibr, br in enumerate(theoryPrediction.mass):
                         output += "Masses in branch %i: " % ibr + str(br) + "\n"
-                IDList = list(set([el.elID for el in theoryPrediction.elements]))     
+                IDList = list(set([el.elID for el in theoryPrediction.elements]))
                 if IDList:
                     output += "Contributing elements: " + str(IDList) + "\n"
                 for pidList in theoryPrediction.PIDs:
@@ -502,10 +501,10 @@ class TxTPrinter(BasicPrinter):
         output = "\n"
         for group in groups:
             output += "Total cross-section for %s (fb): %10.3E\n" %(group.description,group.getTotalXSec())
-        
+
         output += "\nFull information on unconstrained cross sections\n"
         output += "================================================================================\n"
-        
+
         #Get detailed information:
         for group in groups:
             description = group.description
@@ -523,7 +522,7 @@ class TxTPrinter(BasicPrinter):
                     for el in genEl._contributingElements:
                         contributing.append(el.elID)
                     output += "Contributing elements %s\n" % str(contributing)
-            output += "================================================================================\n"      
+            output += "================================================================================\n"
         return output
 
 class SummaryPrinter(TxTPrinter):
@@ -806,7 +805,7 @@ class PyPrinter(BasicPrinter):
                         'lumi (fb-1)' : (expResult.globalInfo.lumi*fb).asNumber(),
                         'dataType' : dataType,
                         'r' : r, 'r_expected' : r_expected}
-            if widths: 
+            if widths:
                 resDict["Width (GeV)"] = widths
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
@@ -881,7 +880,7 @@ class PyPrinter(BasicPrinter):
                 if hasattr(self,"addelementlist") and self.addelementlist:
                     genElDict["element IDs"] = [el.elID for el in genEl._contributingElements]
                 uncoveredDict["%s" %group.description].append(genElDict)
-        
+
         return uncoveredDict
 
 class XmlPrinter(PyPrinter):

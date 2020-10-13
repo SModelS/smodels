@@ -249,10 +249,6 @@ class Model(object):
                 raise SModelSError("No mass found for %i in input file %s." %(particle.pdg,self.inputFile))
 
             particle.decays = []
-            if not pdg in decaysDict and not -pdg in decaysDict:
-                logger.debug("No decay found for %i. It will be considered stable" %particle.pdg)
-                particle.totalwidth = 0.*GeV
-                continue
 
             if pdg in decaysDict:
                 particleData = decaysDict[pdg]
@@ -316,9 +312,11 @@ class Model(object):
             if p.totalwidth < stableWidth:
                 continue
             ndecays = len([dec for dec in p.decays if dec is not None])
-            if ndecays == 0 and p.mass < 1e5*GeV:
-                logger.error("Unstable particle %s (%i) has no decay channels defined." %(p,p.pdg))
-                # raise SModelSError()
+            if ndecays == 0:
+                if p.Z2parity == -1:
+                    logger.warning("No valid decay found for %s. It will be considered stable." %p)
+                particle.totalwidth = 0.*GeV
+                continue
 
 
         #Reset particle equality from all particles:

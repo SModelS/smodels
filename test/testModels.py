@@ -48,18 +48,10 @@ class ModelsTest(unittest.TestCase):
                     'Total xsec for topologies outside the grid (fb)']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.1,
                            ignore=ignoreFields, fname = outputfile )
-        if not equals:
-            p = outputfile.find ( "unitTestOutput" )
-            fname = outputfile
-            if p > 0:
-                fname = fname[p:]
-            print ( "[testRunSModelS] %s != %s" % \
-                    ( fname, "idm_example_defaultB.py" ) )
-        else:
-            self.assertTrue(equals)
-            self.removeOutputs(outputfile)
+        self.assertTrue(equals)
+        self.removeOutputs(outputfile)
 
     def testParameterFile(self):
         filename = "./testFiles/slha/idm_example.slha"
@@ -78,18 +70,10 @@ class ModelsTest(unittest.TestCase):
                             'Total xsec for topologies outside the grid (fb)']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.1,
                            ignore=ignoreFields, fname = outputfile )
-        if not equals:
-            p = outputfile.find ( "unitTestOutput" )
-            fname = outputfile
-            if p > 0:
-                fname = fname[p:]
-            print ( "[testRunSModelS] %s != %s" % \
-                    ( fname, "idm_example_default.py" ) )
-        else:
-            self.assertTrue(equals)
-            self.removeOutputs(outputfile)
+        self.assertTrue(equals)
+        self.removeOutputs(outputfile)
 
     def testModelFromSLHA(self):
         filename = "./testFiles/slha/idm_example.slha"
@@ -104,8 +88,9 @@ class ModelsTest(unittest.TestCase):
                             'Total xsec for topologies outside the grid (fb)']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.1,
                            ignore=ignoreFields, fname = outputfile )
+
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
 

@@ -25,7 +25,7 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 class IntegrationTest(unittest.TestCase):
     def configureLogger(self):
         import logging.config
-        fc= inspect.getabsfile(self.configureLogger).replace ( 
+        fc= inspect.getabsfile(self.configureLogger).replace (
                 "testTheoryPrediction.py", "integration.conf" )
         logging.config.fileConfig( fname=fc, disable_existing_loggers=False )
 
@@ -46,7 +46,7 @@ class IntegrationTest(unittest.TestCase):
             print ( "no theory predictions for",expresult,"??" )
             sys.exit(-1)
         for pred in theorypredictions:
-            predval=pred.xsection.value 
+            predval=pred.xsection.value
             defpredval = defpreds[expID]
             diff = abs (  predval.asNumber(fb) - defpredval.asNumber(fb) ) / defpredval.asNumber(fb)
             self.assertTrue ( diff < .1 )
@@ -57,19 +57,19 @@ class IntegrationTest(unittest.TestCase):
                 self.assertTrue ( diff < .1 )
 
     def testIntegration(self):
-        
+
         slhafile = '../inputFiles/slha/simplyGluino.slha'
         model = Model(BSMList,SMList)
         model.updateParticles(slhafile)
-                   
+
         self.configureLogger()
         smstoplist = decomposer.decompose(model, .1*fb, doCompress=True,
                 doInvisible=True, minmassgap=5.*GeV)
-        listofanalyses = database.getExpResults( 
-                analysisIDs= [ "ATLAS-SUSY-2013-02", "CMS-SUS-13-012" ], 
+        listofanalyses = database.getExpResults(
+                analysisIDs= [ "ATLAS-SUSY-2013-02", "CMS-SUS-13-012" ],
                 txnames = [ "T1" ] )
         if type(listofanalyses) != list:
-            listofanalyses= [ listofanalyses] 
+            listofanalyses= [ listofanalyses]
         for analysis in listofanalyses:
             self.checkAnalysis(analysis,smstoplist)
 
@@ -104,12 +104,12 @@ class IntegrationTest(unittest.TestCase):
 
         #Test displaced case:
         slhafile = './testFiles/slha/hscpTest_mid.slha'
-        expValue = [2.20e-7]
+        expValue = [2.17e-7]
         self.checkPrediction(slhafile, expID, expValue)
 
         #Test short-lived case:
         slhafile = './testFiles/slha/hscpTest_short.slha'
-        expValue = [5.98e-10]
+        expValue = [5.89e-10]
         self.checkPrediction(slhafile, expID, expValue)
 
 if __name__ == "__main__":
