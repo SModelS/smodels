@@ -408,6 +408,8 @@ class TxTPrinter(BasicPrinter):
         """
 
         output = ""
+        if obj.isEmpty():
+            return output
         output += "   ======================================================= \n"
         output += " || \t \t\t\t\t\t\t || \n"
         output += " || \t Theory Predictions and \t\t\t || \n"
@@ -571,6 +573,8 @@ class SummaryPrinter(TxTPrinter):
             theoPredictions = obj.theoryPredictions
 
         output = ""
+        if obj.isEmpty():
+            return output
 
         rvalues = []
         output += "#Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected"
@@ -744,6 +748,8 @@ class PyPrinter(BasicPrinter):
         """
 
         obj.sort()
+        if obj.isEmpty():
+            return {}
 
         ExptRes = []
         for theoryPrediction in obj.theoryPredictions:
