@@ -605,7 +605,8 @@ class SummaryPrinter(TxTPrinter):
 
         output += "\n \n"
         output += 80 * "=" + "\n"
-        output += "The highest r value is = " + str(max(rvalues)) + "\n"
+        if len(rvalues)>0:
+            output += "The highest r value is = " + str(max(rvalues)) + "\n"
 
         return output
 
