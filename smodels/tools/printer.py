@@ -1048,6 +1048,8 @@ class SLHAPrinter(TxTPrinter):
             if r > 1: excluded = 1
             else: excluded = 0
         output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n" % (excluded)
+        if obj.isEmpty():
+            output += "\n"
         if excluded == 0: rList = [firstResult]
         elif excluded == 1: rList = obj.theoryPredictions
         else: rList = []

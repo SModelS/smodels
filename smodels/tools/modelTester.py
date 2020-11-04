@@ -129,10 +129,11 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """ Define result list that collects all theoryPrediction objects."""
     maxcond = parser.getfloat("parameters", "maxcond")
     results = ioObjects.ResultList(allPredictions,maxcond)
+        
+    masterPrinter.addObj(results)
 
     if not results.isEmpty():
         outputStatus.updateStatus(1)
-        masterPrinter.addObj(results)
     else:
         outputStatus.updateStatus(0) # no results after enforcing maxcond
 
