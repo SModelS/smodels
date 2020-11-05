@@ -37,6 +37,11 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 1.2.4.post2:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  * small change for case of no experimental results in slha printer
+
 New in Version 1.2.4:
 ^^^^^^^^^^^^^^^^^^^^^
 
