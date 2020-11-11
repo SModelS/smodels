@@ -2,9 +2,9 @@
 .. module:: clusterTools
    :synopsis: Module holding the ElementCluster class and cluster methods used to combine similar elements according
       to the analysis.
-        
+
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-        
+
 """
 
 from smodels.theory import crossSection
@@ -40,17 +40,17 @@ class AverageElement(Element):
             self.weight = self.elements[0].weight.copy()
             for el in self.elements[1:]:
                 self.weight += el.weight
-                
+
     def __str__(self):
         """
         Simply returns "averageElement", since the element
         has no well defined branches/final states (in general).
-        
-        :returns: averageElement (string)    
+
+        :returns: averageElement (string)
         """
 
         return "averageElement"
-                
+
 
     def __cmp__(self,other):
         """
@@ -140,8 +140,8 @@ class ElementCluster(object):
     An instance of this class represents a cluster of elements.
     This class is used to store the relevant information about a cluster of
     elements and to manipulate this information.
-    
-    :ivar elements: list of elements in the cluster (Element objects)    
+
+    :ivar elements: list of elements in the cluster (Element objects)
     """
 
     def __init__(self, elements = [], dataset = None, distanceMatrix = None):
@@ -191,7 +191,7 @@ class ElementCluster(object):
         """
         Return the sum over the cross sections of all elements belonging to
         the cluster.
-        
+
         :returns: sum of weights of all the elements in the cluster (XSectionList object)
         """
         totxsec = crossSection.XSectionList()
@@ -246,7 +246,7 @@ class ElementCluster(object):
     def add(self, elements):
         """
         Add an element or list of elements.
-        
+
         :param elements: Element object or list of elements
         """
 
@@ -357,6 +357,8 @@ def relativeDistance(el1, el2, dataset):
 
     if ul1 is None or ul2 is None:
         return None
+    if (ul1+ul2).asNumber(fb) == 0.:
+        return 0.
     ulDistance = 2.*abs(ul1 - ul2)/(ul1 + ul2)
 
     return ulDistance
@@ -453,7 +455,7 @@ def groupElements(elements,dataset):
     for el in elements:
         nclusters = sum([avgEl.contains(el) for avgEl in avgElements])
         if nclusters != 1:
-            raise SModelSError("Error computing average elements. Element %s belongs to %i average elements." 
+            raise SModelSError("Error computing average elements. Element %s belongs to %i average elements."
                                %(str(el),nclusters))
     return avgElements
 
