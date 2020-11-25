@@ -73,7 +73,7 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
         return None
     mumax = optimize.brentq ( root_func, 0., max(upperLimit, expectedUpperLimit), 
                               rtol=1e-03, xtol=1e-06 )
-    doCorrection = True ## compute sigma_obs
+    doCorrection = False ## compute sigma_obs
     llhdexp = llhd ( nsig, mumax, sigma_exp, nll )
     if not doCorrection:
         return llhdexp
