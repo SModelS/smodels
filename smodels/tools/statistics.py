@@ -27,6 +27,13 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
     :returns: likelihood (float)
     """
     assert ( upperLimit > 0. )
+
+    def getSigma ( ul, muhat = 0. ):
+        """ get the standard deviation sigma, given 
+            an upper limit and a central value. assumes a truncated Gaussian likelihood """
+        # the expected scale, eq 3.24 in arXiv:1202.3415
+        return ( ul - muhat ) / 1.96
+
     def llhd ( nsig, mumax, sigma_exp, nll ):
         ## need to account for the truncation!
         ## first compute how many sigmas left of center is 0.
@@ -43,27 +50,50 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
             logger.warn("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f)" % ( upperLimit, expectedUpperLimit, dr, runtime._drmax ) )
             return None
         oldUL = upperLimit
-        upperLimit = expectedUpperLimit * ( 1. + runtime._drmax ) / ( 1. - runtime._drmax )
+        upperLimit = expectedUpperLimit * ( 2. + runtime._drmax ) / ( 2. - runtime._drmax )
         logger.warn("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f). capping to %.2f." % \
                 ( oldUL, expectedUpperLimit, dr, runtime._drmax, upperLimit ) )
         ## we are asked to cap likelihoods, so we set observed UL such that dr == drmax
 
-    sigma_exp = expectedUpperLimit / 1.96 # the expected scale, eq 3.24 in arXiv:1202.3415
+    # sigma_exp = expectedUpperLimit / 1.96 # the expected scale, eq 3.24 in arXiv:1202.3415
+    sigma_exp = getSigma ( expectedUpperLimit ) # the expected scale, eq 3.24 in arXiv:1202.3415
     if upperLimit < expectedUpperLimit:
         ## underfluctuation. mumax = 0.
         return llhd ( nsig, 0., sigma_exp, nll )
-    denominator = np.sqrt(2.) * sigma_exp
     def root_func ( x ): ## we want the root of this one
         return (erf((upperLimit-x)/denominator)+erf(x/denominator)) / ( 1. + erf(x/denominator)) - .95
 
-    fA,fB = root_func ( 0. ), root_func ( max(upperLimit,expectedUpperLimit) )
+    denominator = np.sqrt(2.) * sigma_exp
+
+    fA = root_func ( 0. )
+    fB = root_func ( max(upperLimit,expectedUpperLimit) )
     if np.sign(fA*fB) > 0.:
         ## the have the same sign
         logger.error ( "when computing likelihood: fA and fB have same sign")
         return None
-    mumax = optimize.brentq ( root_func, 0., max(upperLimit, expectedUpperLimit), rtol=1e-03, xtol=1e-06 )
-    return llhd ( nsig, mumax, sigma_exp, nll )
+    mumax = optimize.brentq ( root_func, 0., max(upperLimit, expectedUpperLimit), 
+                              rtol=1e-03, xtol=1e-06 )
+    doCorrection = True ## compute sigma_obs
+    llhdexp = llhd ( nsig, mumax, sigma_exp, nll )
+    if not doCorrection:
+        return llhdexp
+    ## now compute an estimate for sigma_obs
+    sigma_obs = getSigma ( upperLimit, mumax )
+    denominator = np.sqrt(2.) * sigma_obs
 
+    fA = root_func ( 0. )
+    fB = root_func ( max(upperLimit,expectedUpperLimit) )
+
+    if np.sign(fA*fB) > 0.:
+        ## the have the same sign
+        logger.error ( "when computing likelihood: fA and fB have same sign")
+        return None
+    mumax = optimize.brentq ( root_func, 0., max(upperLimit, expectedUpperLimit), 
+                              rtol=1e-03, xtol=1e-06 )
+    ret = llhd ( nsig, mumax, sigma_obs, nll )
+    #print ( "mumax is at", mumax, "sigma_exp at", sigma_exp, "sigma_obs at", sigma_obs, 
+    #        "llhd exp", llhdexp, "llhdobs", ret )
+    return ret
 
 def rvsFromLimits( upperLimit, expectedUpperLimit, n=1 ):
     """ generates a sample of random variates, given expected and observed likelihoods.
