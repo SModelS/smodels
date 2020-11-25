@@ -73,27 +73,8 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
         return None
     mumax = optimize.brentq ( root_func, 0., max(upperLimit, expectedUpperLimit), 
                               rtol=1e-03, xtol=1e-06 )
-    doCorrection = False ## compute sigma_obs
     llhdexp = llhd ( nsig, mumax, sigma_exp, nll )
-    if not doCorrection:
-        return llhdexp
-    ## now compute an estimate for sigma_obs
-    sigma_obs = getSigma ( upperLimit, mumax )
-    denominator = np.sqrt(2.) * sigma_obs
-
-    fA = root_func ( 0. )
-    fB = root_func ( max(upperLimit,expectedUpperLimit) )
-
-    if np.sign(fA*fB) > 0.:
-        ## the have the same sign
-        logger.error ( "when computing likelihood: fA and fB have same sign")
-        return None
-    mumax = optimize.brentq ( root_func, 0., max(upperLimit, expectedUpperLimit), 
-                              rtol=1e-03, xtol=1e-06 )
-    ret = llhd ( nsig, mumax, sigma_obs, nll )
-    #print ( "mumax is at", mumax, "sigma_exp at", sigma_exp, "sigma_obs at", sigma_obs, 
-    #        "llhd exp", llhdexp, "llhdobs", ret )
-    return ret
+    return llhdexp
 
 def rvsFromLimits( upperLimit, expectedUpperLimit, n=1 ):
     """ generates a sample of random variates, given expected and observed likelihoods.
