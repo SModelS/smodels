@@ -37,7 +37,7 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
             return np.log(A ) - stats.norm.logpdf ( nsig, mumax, sigma_exp )
         return float ( stats.norm.pdf ( nsig, mumax, sigma_exp ) / A )
 
-    dr = ( upperLimit - expectedUpperLimit ) / ( expectedUpperLimit + upperLimit )
+    dr = 2. * ( upperLimit - expectedUpperLimit ) / ( expectedUpperLimit + upperLimit )
     if dr>runtime._drmax:
         if runtime._cap_likelihoods == False:
             logger.warn("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f)" % ( upperLimit, expectedUpperLimit, dr, runtime._drmax ) )
