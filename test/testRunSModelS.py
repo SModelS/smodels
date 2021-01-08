@@ -121,7 +121,7 @@ class RunSModelSTest(unittest.TestCase):
         inifile = "./testParameters_pyhf.ini"
         outputfile = runMain(filename, inifile=inifile, suppressStdout = True)
         smodelsOutput = importModule ( outputfile )
-        from pyhf_default import smodelsOutputDefault
+        from T6bbHH_pyhf_default import smodelsOutputDefault
         ignoreFields = ['input file','smodels version', 'ncpus', 'database version']
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields, fname=outputfile,
