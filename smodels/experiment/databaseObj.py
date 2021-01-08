@@ -41,7 +41,11 @@ class Database(object):
     """
     Database object. Holds a list of ExpResult objects.
 
-    :ivar base: path to the database (string)
+    :ivar base: path to the database, or pickle file (string), or http
+        address. If None, "official", or "official_fastlim",
+        use the official database for your code version
+        (including fastlim results, if specified).
+        If "latest", or "latest_fastlim", check for the latest database.
     :ivar force_load: force loading the text database ("txt"),
         or binary database ("pcl"), dont force anything if None
     :ivar expResultList: list of ExpResult objects
@@ -53,7 +57,9 @@ class Database(object):
         """
         :param base: path to the database, or pickle file (string), or http
             address. If None, "official", or "official_fastlim",
-            use the official database (including fastlim results, if specified).
+            use the official database for your code version
+            (including fastlim results, if specified).
+            If "latest", or "latest_fastlim", check for the latest database.
         :param force_load: force loading the text database ("txt"),
             or binary database ("pcl"), dont force anything if None
         :param discard_zeroes: discard txnames with only zeroes as entries.
@@ -361,7 +367,7 @@ class Database(object):
         filename= os.path.join ( cDir, r2.url.split("/")[-1] )
         msg = "caching the downloaded database in %s." % cDir
         if defused:
-            msg += " If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'." 
+            msg += " If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'."
         logger.warn ( msg )
         logger.info ( "need to fetch %s and store in %s. size is %s." % \
                       ( r.json()["url"], filename, sizeof_fmt ( size ) ) )
