@@ -1,7 +1,0 @@
-dataId: tNdiag
-dataType: efficiencyMap
-observedN: 217
-expectedBG: 236
-bgError: 29
-upperLimit: 2.636E+00*fb
-expectedUpperLimit: 3.223E+00*fb

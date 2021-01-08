@@ -1,7 +1,0 @@
-dataId: 6NJet8_500HT800_450MHTinf
-dataType: efficiencyMap
-observedN: 9
-expectedBG: 0.8
-bgError: 3.3
-upperLimit: 0.697*fb
-expectedUpperLimit: 0.155*fb

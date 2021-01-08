@@ -1,8 +1,0 @@
-dataId: ar4
-dataType: efficiencyMap
-observedN: 249
-expectedBG: 285.5
-bgError: 27.075819470516493
-upperLimit: 1.076729*fb
-expectedUpperLimit: 1.856658*fb
-aggregated: SR1LaY;SR1MaY;SR1HaY
