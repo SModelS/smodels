@@ -36,7 +36,12 @@ class ServerTest(unittest.TestCase):
         startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i {pclfile} -o ./proxy.pcl -r"
         cmd = startserver.split(" ")
         print ( "starting server %s" % startserver )
-        popen = subprocess.Popen ( cmd, stdout = subprocess.PIPE )
+        myenv = os.environ.copy()
+        pp=""
+        if "PYTHONPATH" in myenv:
+            pp=":"+myenv["PYTHONPATH"]
+        myenv["PYTHONPATH"]="../" + pp
+        popen = subprocess.Popen ( cmd, stdout = subprocess.PIPE, env=myenv )
         print ( "started server" )
         time.sleep(3)
         filename = "./testFiles/slha/simplyGluino.slha"
@@ -58,7 +63,12 @@ class ServerTest(unittest.TestCase):
         startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i database/db30.pcl -o ./proxy.pcl -r -v error"
         cmd = startserver.split(" ")
         # print ( "starting server %s" % startserver )
-        subprocess.Popen ( cmd )
+        myenv = os.environ.copy()
+        pp=""
+        if "PYTHONPATH" in myenv:
+            pp=":"+myenv["PYTHONPATH"]
+        myenv["PYTHONPATH"]="../" + pp
+        subprocess.Popen ( cmd, env=myenv )
 
         time.sleep ( 3 )
 
