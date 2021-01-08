@@ -253,9 +253,12 @@ class Model(object):
             if pdg in decaysDict:
                 particleData = decaysDict[pdg]
                 chargeConj = 1
-            else:
+            elif -pdg in decaysDict:
                 particleData = decaysDict[-pdg]
                 chargeConj = -1
+            else:
+                logger.error("Decay information for particle %i could not be found" %pdg)
+                raise SModelSError()
 
             particle.totalwidth = abs(particleData.totalwidth)*GeV
             if particle.totalwidth < stableWidth:

@@ -16,18 +16,18 @@ import pyslha
 class LheReader(object):
     """
     An instance of this class represents a reader for LHE files.
-    
+
     """
     def __init__(self, filename, nmax=None):
         """
         Constructor.
-        
+
         :param filename: LHE file name
         :param nmax: When using the iterator, then nmax is the maximum number
         of events to be reader, nmax=None means read till the end of the file.
         If filename is not a string, assume it is already a file object and do
         not open it.
-        
+
         """
         self.filename = filename
         self.nmax = nmax
@@ -73,9 +73,9 @@ class LheReader(object):
     def next(self):
         """
         Get next element in iteration.
-        
+
         Needed for the iterator.
-        
+
         """
         if self.nmax != None and self.ctr == self.nmax:
             raise StopIteration
@@ -88,9 +88,9 @@ class LheReader(object):
     def __iter__(self):
         """
         Make class iterable.
-        
+
         Allows iterations like 'for a in lhereader: print a'.
-        
+
         """
         return self
 
@@ -101,9 +101,9 @@ class LheReader(object):
     def event(self):
         """
         Get next event.
-        
+
         :returns: SmsEvent; None if no event is left to be read.
-        
+
         """
         line = " "
         self.ctr += 1
@@ -153,7 +153,7 @@ class LheReader(object):
 class SmsEvent(object):
     """
     Event class featuring a list of particles and some convenience functions.
-    
+
     """
     def __init__(self, eventnr=None):
         self.particles = []
@@ -164,7 +164,7 @@ class SmsEvent(object):
     def metaInfo(self, key):
         """
         Return the meta information of 'key', None if info does not exist.
-        
+
         """
         if not key in self.metainfo:
             return None
@@ -173,7 +173,7 @@ class SmsEvent(object):
     def add(self, particle):
         """
         Add particle to the event.
-        
+
         """
         self.particles.append(particle)
 
@@ -181,7 +181,7 @@ class SmsEvent(object):
     def getMom(self):
         """
         Return the pdgs of the mothers, None if a problem occurs.
-        
+
         """
         momspdg = []
         imom = 0
@@ -213,7 +213,7 @@ class SmsEvent(object):
 class LHEParticle(object):
     """
     An instance of this class represents a particle.
-    
+
     """
     def __init__(self):
         self.pdg = 0
@@ -238,14 +238,14 @@ class LHEParticle(object):
 def getDictionariesFrom(lheFile,nevts=None):
     """
     Reads all events in the LHE file and create mass and BR dictionaries for each branch in an event.
-    
+
     :param lheFile: LHE file
     :param nevts: (maximum) number of events used in the decomposition. If
                   None, all events from file are processed.
-    
-    :returns: BR and mass dictionaries for the particles appearing in the event    
+
+    :returns: BR and mass dictionaries for the particles appearing in the event
     """
-    
+
     reader = LheReader(lheFile, nevts)
     # Loop over events and decompose
     massDict = {}
@@ -257,18 +257,20 @@ def getDictionariesFrom(lheFile,nevts=None):
                 massDict[pdg] = mass
             else:
                 massDict[pdg] += mass
-                
+
         for pdg,decays in eventDecays.items():
             if not pdg in decaysDict:
                 decaysDict[pdg] = decays
             else:
                 decaysDict[pdg] += decays
-    
+
 
     #Use averaged mass over all events:
     for pdg,masses in massDict.items():
         massDict[pdg] = sum(masses)/len(masses)
-        
+        if not pdg in decaysDict:
+            decaysDict[pdg] = [] #Make sure all particles appear in decaysDict
+
     #Compute the decay dictionaries:
     for pdg,eventDecays in list(decaysDict.items()):
         daughterIDs = []
@@ -283,13 +285,10 @@ def getDictionariesFrom(lheFile,nevts=None):
             for eventDecay in eventDecays:
                 if sorted(eventDecay.ids) != daughterID:
                     continue
-                decay.br += 1./float(n) #Count this decay            
+                decay.br += 1./float(n) #Count this decay
             combinedDecays.append(decay)
-        if not combinedDecays:
-            decaysDict.pop(pdg)
-        else:
-            decaysDict[pdg] = combinedDecays
-    
+        decaysDict[pdg] = combinedDecays #Stable particles will appear with an empty list
+
     #Remove anti-particle decays and masses:
     for pdg in list(massDict.keys())[:]:
         if -abs(pdg) in massDict and abs(pdg) in massDict:
@@ -297,7 +296,7 @@ def getDictionariesFrom(lheFile,nevts=None):
     for pdg in list(decaysDict.keys())[:]:
         if -abs(pdg) in decaysDict and abs(pdg) in decaysDict:
             decaysDict.pop(-abs(pdg))
-            
+
     #Add widths to decaysDict using the pyslha.Particle class:
     for pdg,decays in decaysDict.items():
         decaysDict[pdg] = pyslha.Particle(pid=pdg)
@@ -317,26 +316,26 @@ def getDictionariesFrom(lheFile,nevts=None):
 def getDictionariesFromEvent(event):
     """
     Create mass and BR dictionaries for each branch in an event.
-    
+
     :param event: LHE event
     :returns: BR and mass dictionaries for the branches in the event
-    
+
     """
 
     particles = event.particles
 
-    # Identify and label to which branch each particle belongs 
+    # Identify and label to which branch each particle belongs
     #(the branch label is the position of the primary mother)
     masses = {}
     decays = {}
     for ip, particle in enumerate(particles):
         if particle.status == -1: #Ignore incoming particles
             continue
-        
+
         if not particle.pdg in masses:
             masses[particle.pdg] = [particle.mass]
             decays[particle.pdg] = []
-        
+
         #Get event decay:
         decay = pyslha.Decay(0, 0, [], particle.pdg)
         #Collect all daughters:
@@ -345,13 +344,13 @@ def getDictionariesFromEvent(event):
                 continue
             if not ip+1 in newparticle.moms: #newparticle is not a daughter of particle
                 continue
-           
+
             # Check if particle has a single parent
             # (as it should)
             newparticle.moms = [mom for mom in newparticle.moms if mom != 0]
             if len(newparticle.moms) != 1:
                 raise SModelSError("More than one parent particle found")
-            
+
             decay.nda += 1
             decay.br = 1.
             decay.ids.append(newparticle.pdg)
