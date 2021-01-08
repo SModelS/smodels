@@ -86,8 +86,6 @@ class Database(object):
             base = testDatabase()
         base, pclfile = self.checkPathName(base, discard_zeroes )
         self.pcl_meta = Meta( pclfile )
-        if "latest" in obase:
-            pass ## FIXME possibly add more tests here e.g. major version needs to be the same
         self.expResultList = []
         self.txt_meta = self.pcl_meta
         if not self.force_load == "pcl":
@@ -111,6 +109,12 @@ class Database(object):
             self.loadBinaryFile()
             self._setParticles()
             self.pcl_meta.printFastlimBanner()
+            if "latest" in obase:
+                from smodels import installation
+                codeVersion = installation.version()
+                pclVersion = self.pcl_meta.databaseVersion
+                if codeVersion[0]!=pclVersion[0]:
+                    logger.error ( "major versions of code and database differ! code=%s, database=%s" % ( codeVersion[0], pclVersion[0] ) )
             return
         if self.force_load in [ None, "none", "None" ]:
             self.loadDatabase()
