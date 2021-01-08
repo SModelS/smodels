@@ -73,7 +73,7 @@ class IntegrationTest(unittest.TestCase):
         for analysis in listofanalyses:
             self.checkAnalysis(analysis,smstoplist)
 
-    def checkPrediction(self,slhafile,expID,expectedValues):
+    def checkPrediction(self,slhafile,expID,expectedValues, datasetID):
 
         reducedModel = [ptc for ptc in BSMList if abs(ptc.pdg) in [1000011,1000012]]
         model = Model(reducedModel,SMList)
@@ -83,7 +83,7 @@ class IntegrationTest(unittest.TestCase):
         smstoplist = decomposer.decompose(model, 0.*fb, doCompress=True,
                 doInvisible=True, minmassgap=5.*GeV)
 
-        expresults = database.getExpResults(analysisIDs= expID)
+        expresults = database.getExpResults(analysisIDs= expID, datasetIDs=datasetID)
         for expresult in expresults:
             theorypredictions = theoryPredictionsFor(expresult, smstoplist)
             for pred in theorypredictions:
@@ -97,20 +97,21 @@ class IntegrationTest(unittest.TestCase):
     def testReweightPrediction(self):
 
         expID = ["CMS-EXO-13-006"]
+        datasetID = ['c300']
         #Test long-lived case:
         slhafile = './testFiles/slha/hscpTest_long.slha'
         expValue = [0.0743]
-        self.checkPrediction(slhafile, expID, expValue)
+        self.checkPrediction(slhafile, expID, expValue, datasetID)
 
         #Test displaced case:
         slhafile = './testFiles/slha/hscpTest_mid.slha'
-        expValue = [2.17e-7]
-        self.checkPrediction(slhafile, expID, expValue)
+        expValue = [9.18e-7]
+        self.checkPrediction(slhafile, expID, expValue, datasetID)
 
         #Test short-lived case:
         slhafile = './testFiles/slha/hscpTest_short.slha'
-        expValue = [5.89e-10]
-        self.checkPrediction(slhafile, expID, expValue)
+        expValue = [5.335e-09]
+        self.checkPrediction(slhafile, expID, expValue, datasetID)
 
 if __name__ == "__main__":
     unittest.main()
