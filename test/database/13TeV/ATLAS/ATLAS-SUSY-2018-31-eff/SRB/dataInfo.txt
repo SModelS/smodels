@@ -1,0 +1,8 @@
+dataId: SRB
+dataType: efficiencyMap
+observedN: 3
+expectedBG: 3.3
+bgError: 0.9
+upperLimit: 0.0371*fb
+expectedUpperLimit: 0.0371*fb
+jsonfile: BkgOnly.json
