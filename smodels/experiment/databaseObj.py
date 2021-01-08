@@ -68,17 +68,26 @@ class Database(object):
             force_load = "pcl"
         self.force_load = force_load
         self.subpickle = subpickle
+        obase = base ## keep old name for more checks for 'latest'
         if base in [ None, "official" ]:
             from smodels.installation import officialDatabase
             base = officialDatabase()
         if base in [ "official_fastlim" ]:
             from smodels.installation import officialDatabase
             base = officialDatabase( fastlim=True )
+        if base in [ "latest" ]:
+            from smodels.installation import latestDatabase
+            base = latestDatabase()
+        if base in [ "latest_fastlim" ]:
+            from smodels.installation import latestDatabase
+            base = latestDatabase( fastlim=True )
         if base in [ "unittest" ]:
             from smodels.installation import testDatabase
             base = testDatabase()
         base, pclfile = self.checkPathName(base, discard_zeroes )
         self.pcl_meta = Meta( pclfile )
+        if "latest" in obase:
+            pass ## FIXME possibly add more tests here e.g. major version needs to be the same
         self.expResultList = []
         self.txt_meta = self.pcl_meta
         if not self.force_load == "pcl":

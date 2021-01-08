@@ -1,4 +1,4 @@
-Release v2.0.0, xxx 2020
+Release v2.0.0, xxx 2021
 =======================================================
 
   * Introduction of Particle class
@@ -13,6 +13,7 @@ Release v2.0.0, xxx 2020
   * Added option for signal strength multipliers in cross section calculator
   * Added support for central database server
   * Added possibility for analysis specific detector size
+  * Added "latest" and "latest_fastlim" database abbreviations
 
 Release v1.2.4, Thu 3 Sep 2020
 =======================================================

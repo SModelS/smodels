@@ -52,6 +52,7 @@ New in Version 2.0.0:
   * Small bug fix in :ref:`likelihood computation <likelihoodCalc>`
   * Changes in output: :ref:`width values added <pyOut>`, :ref:`coverage groups <coverageGroups>` and others (see :ref:`output description <outputDescription>` for details)
   * Added option for signal strength multipliers in :ref:`cross section calculator <xsecCalc>`
+  * Added "latest" and "latest_fastlim" |database| abbreviations
 
 New in Version 1.2.4:
 ^^^^^^^^^^^^^^^^^^^^^

@@ -223,6 +223,12 @@ def officialDatabase( fastlim=False ):
     r="%s/official%s%s" % (__dbServer__,v,fl)
     return r
 
+def latestDatabase( fastlim=False ):
+    """ :param fastlim: include fastlim results """
+    fl = "_fastlim" if fastlim else ""
+    r="%s/latest%s" % (__dbServer__,fl)
+    return r
+
 def testDatabase():
     r="%s/unittest%s" % ( __dbServer__, version().replace(".","") )
     return r
