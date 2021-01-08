@@ -60,7 +60,7 @@ class ServerTest(unittest.TestCase):
         # print ( "starting server %s" % startserver )
         subprocess.Popen ( cmd )
 
-        time.sleep ( 2 )
+        time.sleep ( 3 )
 
         db = Database("./proxy.pcl" )
         outputfile = runMain(filename,suppressStdout = True, overridedatabase = db )
