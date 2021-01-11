@@ -45,7 +45,12 @@ class DatabaseTest(unittest.TestCase):
         self.assertTrue(len(nonval)==9)
 
 
-
+    def testLoadLatest(self):
+        dblatest=Database ("latest")
+        latestver = dblatest.databaseVersion.replace(".","")
+        from databaseLoader import database
+        thisver = database.databaseVersion.replace("unittest","").replace(".","")
+        self.assertTrue ( latestver[:2]==thisver[:2] )
 
 
 if __name__ == "__main__":

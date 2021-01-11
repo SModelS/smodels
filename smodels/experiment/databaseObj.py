@@ -368,7 +368,7 @@ class Database(object):
         msg = "caching the downloaded database in %s." % cDir
         if defused:
             msg += " If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'."
-        logger.warn ( msg )
+        logger.warning ( msg )
         logger.info ( "need to fetch %s and store in %s. size is %s." % \
                       ( r.json()["url"], filename, sizeof_fmt ( size ) ) )
         with open( filename, "wb" ) as dump:
