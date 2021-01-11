@@ -360,6 +360,7 @@ class CombinedDataSet(object):
         self._datasets = expResult.datasets[:]
         self._marginalize = False
         self.sortDataSets()
+        self.bestCB = None# To store the index of the best combination
 
     def __str__(self):
         ret = "Combined Dataset (%i datasets)" %len(self._datasets)
