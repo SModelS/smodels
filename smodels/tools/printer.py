@@ -764,7 +764,7 @@ class PyPrinter(BasicPrinter):
             if theoryPrediction.mass  is None:
                 mass = None
             else:
-                mass = np.array(theoryPrediction.mass)
+                mass = np.array(theoryPrediction.mass,dtype=object)
 
             #Add width information to the mass array:
             totalwidth = theoryPrediction.totalwidth
