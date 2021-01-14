@@ -82,21 +82,20 @@ while the SM particles are defined in `SMparticles.py <share.html#share.models.S
 All particles must be assigned a Z\ :sub:`2` parity and can have a flexible
 number of attributes, such as mass, spin, electric charge, etc.
 Two particles are considered equal if all their shared properties
-are equal. *Inclusive* or *generic* particles can then be defined if some
-of its properties are left undefined. For instance, a particle with electric
-charge -1, spin 1/2 but without a defined mass will be matched
-to electrons, muons and taus. This is useful when defining generic simplified models
-(|elements|) in the :ref:`Database <databaseDefs>`. All *generic* particles
+are equal.
+
+*Inclusive* or *generic* particles are introduced by leaving one or more of their properties undefined. For instance, a Z\ :sub:`2`-even particle with electric charge -1, spin 1/2 but undefined mass will be matched to electrons, muons and taus. This is useful when defining generic simplified models
+(|elements|) in the :ref:`Database <databaseDefs>`. All *inclusive* particles
 used by the :ref:`Database <databaseDefs>` are separately defined in
-`databaseParticles.py <experiment.html#experiment.databaseParticles>`_
-Examples for such inclusive definitions are:
+`databaseParticles.py <experiment.html#experiment.databaseParticles>`_ .
+Examples are:
 
  - 'l' for electrons, and muons,
  - 'L' for electrons, muons, and taus,
  - 'q' for u-, d-, and s-quarks,
  - 'jet' for u-, d-, s-, c-quarks and gluons
  - 'anyOdd' for any Z\ :sub:`2`-odd particle
- - '*' for any \ :sub:`2`-even particle
+ - '*' for any Z\ :sub:`2`-even particle
 
 
 * **Particles are described by the** `Particle Class <theory.html#theory.particle.Particle>`_

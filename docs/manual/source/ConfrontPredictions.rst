@@ -45,7 +45,7 @@ This upper limit is easily computed using the number of observed and expected ev
 and their uncertainties and is typically stored in the :ref:`Database <database>`.
 Since most |EMrs| have several signal regions (|datasets|), there will be one theory prediction/upper limit
 for each |dataset|. By default SModelS keeps only the best |dataset|, i.e. the one with the largest
-ratio :math:`\mbox{(theory prediction)}/\mbox{(expected limit)}`. (See below for |covariace|.)
+ratio :math:`r_\mathrm{exp}=(\mathrm{theory\,prediction})/(\mathrm{expected\, limit})`. (See below for |covariace|)
 Thus each |EMr| will have a single theory prediction/upper limit, corresponding to the best |dataset|
 (based on the expected limit).
 If the user wants to have access to all the |datasets|, the default
@@ -54,7 +54,7 @@ behavior can be disabled by setting *useBestDataset=False* in `theoryPredictions
 
 The procedure described above can be applied to all the |ExpRess| in the database, resulting
 in a list of theory predictions and upper limits for each |ExpRes|. A model can then be considered
-excluded by the experimental results if, for one or more predictions, we have *theory prediction* :math:`>` *upper limit*.\ [#f1]_
+excluded by the experimental results if, for one or more predictions, we have *theory prediction* :math:`>` *upper limit* [*]_.
 
 * **The upper limits for a given**  |ULr| **or** |EMr| **can be obtained using the** `getUpperLimitFor  method <experiment.html#experiment.expResultObj.ExpResult.getUpperLimitFor>`_
 
@@ -66,8 +66,8 @@ Likelihood Computation
 
 In the case of |EMrs|, additional statistical information
 about the constrained model can be provided by the SModelS output.
-Following the procedure detailed in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_, we construct a simplified
-likelihood which describes the plausibility of the data :math:`D`, given a signal strength :math:`\mu`:
+Most importantly, we can compute a likelihood, 
+which describes the plausibility of the data :math:`D`, given a signal strength :math:`\mu`:
 
 .. math::
    \mathcal{L}(\mu,\theta|D) =  P\left(D|\mu + b + \theta \right) p(\theta)
@@ -75,7 +75,15 @@ likelihood which describes the plausibility of the data :math:`D`, given a signa
 
 Here, :math:`\theta` denotes the nuisance parameter that describes the
 variations in the signal and background contribtions due to systematic
-effects. We assume :math:`p(\theta)` to follow a Gaussian distribution centered
+effects. 
+
+If no information about the correlation of signal regions is available 
+(or if its usage is turned off, see :doc:`Using SModelS <RunningSModelS>`), 
+we compute a simplified likelihood for the most sensitive (a.k.a. best) signal region, 
+i.e. the signal region with the highest :math:`r_\mathrm{exp}=(\mathrm{theory\,prediction})/(\mathrm{expected\, limit})`,
+following the procedure detailed in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_.
+
+This means we assume :math:`p(\theta)` to follow a Gaussian distribution centered
 around zero and with a variance of :math:`\delta^2`,
 whereas :math:`P(D)` corresponds to a counting variable and is thus
 properly described by a Poissonian. The complete likelihood thus reads:
@@ -95,8 +103,7 @@ can assume :math:`T` to be distributed according to a :math:`\chi^2` distributio
 with one degree of freedom. Because :math:`H_0` assumes the signal strength of
 a particular model, :math:`T=0`  corresponds to a perfect match between that
 model's prediction and the measured data. :math:`T \gtrsim 3.84` corresponds to
-a (two-sided!) 95\% confidence level limit (please take note of the
-conceptual difference to the usual *upper* limits that we use).
+a 95\% confidence level upper limit.
 While :math:`n_{\mathrm{obs}}`, :math:`b`  and :math:`\delta_{b}` are directly extracted from
 the data set
 (coined *observedN*, *expectedBG* and *bgError*, respectively),
@@ -120,11 +127,13 @@ continuous regions of parameter space that give roughly the same phenomenology.
 
 .. _combineSRs:
 
-Combination of Signal Regions
------------------------------
+Combination of Signal Regions - Simplified Likelihood Approach
+--------------------------------------------------------------
 
-If the experiment provides a covariance matrix together with the efficiency maps, signal regions can be combined. 
-This is implemented in SModelS v1.1.3 onwards, following as above the simplified likelihood approach described in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_. 
+If the experiment provides information about the (background) correlations, signal regions can be combined. 
+To this end, CMS sometimes provides a covariance matrix together with the efficiency maps.  
+The usage of such covariance matrices 
+is implemented in SModelS v1.1.3 onwards, following as above the simplified likelihood approach described in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_. 
 
 SModelS allows for a marginalization as well as a profiling of the nuisances, with profiling being the default (an example for using marginalisation can be found in :ref:`How To's <Examples>`).
 Since CPU performance is a concern in SModelS, we try to aggregate the official results, which can comprise >100 signal regions, to an acceptable number of aggregate regions. Here *acceptable* means as few aggregate regions as possible without loosing in precision or constraining power. 
@@ -143,8 +152,8 @@ should correspond to a second order effect.
 
 
 Using the above likelihood we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the 
-test statistic :math:`q_\mu`, as described in Eq. (14) in `G. Cowan et al., 
-Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_. 
+test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al., 
+`Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_. 
 We then search for the value :math:`CL_s = 0.95` using the Brent bracketing technique available through the `scipy optimize library <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_.
 Note that the limit computed through this procedure applies to the total signal yield summed over all signal regions and assumes
 that the relative signal strengths in each signal region are fixed by the signal hypothesis. As a result, the above limit has to be computed
@@ -167,8 +176,35 @@ As we can see, while the curve obtained from the combination of all 44 signal re
 +-----------------------------------------+-----------------------------------------+-----------------------------------------+
 
 
-Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of all 44 signal regions (center), and the combination of 17 aggregate signal regions (right).
+Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of 17 aggregate signal regions (center), and the combination of all 44 signal regions (right).
 
 
-.. [#f1] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
+
+Combination of Signal Regions - Full Likelihoods (pyhf)
+-------------------------------------------------------
+
+In early 2020, following `ATL-PHYS-PUB-2019-029 <https://cds.cern.ch/record/2684863>`_, 
+ATLAS has started to provide *full likelihoods* for results with full Run 2 luminosity (139/fb),  
+using a JSON serialisation of the likelihood. This JSON format describes the `HistFactory <https://cds.cern.ch/record/1456844>`_ family of statistical models, which is used by the majority of ATLAS analyses. 
+Thus background estimates, changes under systematic variations, and observed data counts are provided at the same fidelity as used in the experiment. 
+
+SModelS supports the usage of these JSON likelihoods from v1.2.4 onward via an interface to the 
+`pyhf <https://scikit-hep.org/pyhf/>`_ package, a pure-python implementation of the HistFactory statistical model. This means that for |EMr| from ATLAS, for which a JSON likelihood is available and when the combination of signal regions is turned on, the evaluation of the likelihood is relegated to `pyhf <https://scikit-hep.org/pyhf/>`_. Internally, the whole calculation 
+is based on the asymptotic formulas of *Asymptotic formulae for likelihood-based tests of new physics*, `arXiv:1007.1727 <https://arxiv.org/abs/1007.1727>`_. 
+
+The :ref:`figure below <combinedSRfigPyhf>` examplifies how the constraints improve from 
+using the best signal region (left) to using the full likelihood (right).  
+
+.. _combinedSRfigPyhf:
+
++-----------------------------------------+-----------------------------------------+
+| .. image:: images/TChiWH_bestSR.png     | .. image:: images/TChiWH_pyhf.png       |
+|            :width: 300px                |            :width: 300px                |
+| Best signal region                      | pyhf combining 9 signal regions         |
++-----------------------------------------+-----------------------------------------+
+
+Figure: Comparison of exclusion curves for `ATLAS-SUSY-2019-08 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2019-08/>`_ using only the best signal region (left), and the combination of all 9 signal regions with pyhf (right).
+
+
+.. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
    is being tested by a large number of results simultaneously.
