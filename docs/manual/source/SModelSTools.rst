@@ -57,22 +57,31 @@ for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~
 
 Further Pythia parameters are defined in :download:`smodels/etc/pythia8.cfg </images/pythia8.cfg>` (for Pythia 8)
 or :download:`smodels/etc/pythia.card </images/pythia.card>` (for Pythia 6).
-.
 
 A typical
 usage example is: ::
 
-   smodelsTools.py xseccomputer -s 8 13 -e 10000 --ssmultipliers "{ (1000021,1000021): 4.0, (1000001,-10000001): 2.0 }" -p -f inputFiles/slha/higgsinoStop.slha
+   smodelsTools.py xseccomputer -s 8 13 -e 10000 -p -f inputFiles/slha/higgsinoStop.slha
 
-which will compute 8 TeV and 13 TeV LO cross sections (at the LHC) for all MSSM processes using 10k MC events. Production cross section of gluino pairs (pid 1000021) gets enhanced by a factor of 4, squark-anti-squark production gets an enhancement of 2. For the pids, strings can be supplied instead of integers. Unix filename wildcard syntax is supported. E.g. '100000?' matches all left-handed squarks but no anti-squarks, '\*1000001' matches both (left-handed) down and anti-down. Multiple signal strength multipliers may be applicable to a single theory prediction.
+which will compute 8 TeV and 13 TeV LO cross sections (at the LHC) for all MSSM processes using 10k MC events.
 If, *after* the LO cross sections have been computed, one wants to add the NLO+NLL cross sections for gluinos and squarks: ::
 
    smodelsTools.py xseccomputer -s 8 13 -p -N -O -f inputFiles/slha/higgsinoStop.slha
 
 The resulting file will then contain LO cross sections for all MSSM processes and NLO+NLL cross sections for 
 the available processes in `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_  
-(gluino and squark production). If signal strength multipliers are supplied by the user (via the **--ssmultipliers** argument), they are ignored, since signal strength multipliers always only get applied to LO cross sections. If, however, signal strength multipliers were applied when calculating the LO cross sections given in the input file, they are naturally also propagated to the NLO and NLL cross sections.
+(gluino and squark production).
 When reading the input file, SModelS will then use only the highest order cross sections available for each process.
+
+
+An example using signal strength multipliers (*available from SModelS v2.0 onwards*) is: ::
+
+   smodelsTools.py xseccomputer -s 8 13 -e 10000 --ssmultipliers "{ (1000021,1000021): 4.0, (1000001,-10000001): 2.0 }" -p -f inputFiles/slha/higgsinoStop.slha
+
+This will compute 8 TeV and 13 TeV LO cross sections as above, but the cross section for gluino-pair production (pid 1000021) gets enhanced by a factor of 4, and squark-antisquark production gets enhanced by a factor of 2. For the pids, strings can be supplied instead of integers. Unix filename wildcard syntax is also supported. E.g. '100000?' matches all left-handed squarks but no anti-squarks, '\*1000001' matches both (left-handed) down and anti-down. Multiple signal strength multipliers may be applicable to a single theory prediction. 
+
+Note that signal strength multipliers get applied only to LO cross sections. This means they are propagated to NLO and NLL level only iff the LO cross sections are computed first and the NLO/NLL corrections added afterwards. In other words, if the xseccomputer is called with -n or -N argument but without -O (--LOfromSLHA), the --ssmultipliers argument will be ignored. 
+
 
 * **The cross section calculation is implemented by the** `xsecComputer function <tools.html#tools.xsecComputer.XSecComputer>`_
 
