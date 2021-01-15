@@ -55,9 +55,6 @@ given in the two following forms:
 The SLHA format is usually more compact and best suited for supersymmetric models. On the other hand, an LHE file can always
 be generated for any BSM model (through the use of your favorite MC generator).\ [#f1]_ In this case, however,
 the precision of the results is limited to the MC statistics used to generate the file.
-*We also point out that all the decays appearing in the LHE input are assumed to be prompt and
-this input format should not be used if the model contains meta-stable particles*.
-An example of how to add the width information after reading an LHE input file can be found in `this notebook <lheLLPExample.html>`_ .
 
 *In the case of SLHA input only*, the production cross sections for the BSM states also have to be included
 in the SLHA file as SLHA blocks, according to the :ref:`SLHA cross section format <xsecSLHA>`
@@ -74,6 +71,9 @@ Moreover, all the Z\ :sub:`2`-even :ref:`particles <particleClass>` should be se
 in SModelS they are effectively considered as final states.
 When generating the events it is also important to ensure that no mass smearing is applied, so the mass
 values for a given particle are the same throughout the LHE file.
+We also point out that all the decays appearing in the LHE input are assumed to be prompt, so 
+this input format is not well suited if the model contains meta-stable particles.
+An example of how to add the width information after reading an LHE input file can be found in `this notebook <lheLLPExample.html>`_ .
 
 
 
@@ -146,8 +146,9 @@ are fully dependent on the Monte Carlo statistics used to generate the LHE file.
 Also, when generating the events it is important to ensure that no mass smearing is applied, so the events
 always contain the same mass value for a given particle.
 
-**Note that since all decays appearing in an LHE event are assumed to be prompt and the LHE-based
-decomposition should not be used for models with meta-stable BSM particles**.
+**Note that since all decays appearing in an LHE event are assumed to be prompt, the LHE-based
+decomposition should not be used for models with meta-stable BSM particles**. An example of how to add the width information after reading an LHE input file can be found in `this notebook <lheLLPExample.html>`_ .
+
 
 * **The LHE reader is implemented by the** `LHE reader method <theory.html#theory.lheReader.getDictionariesFrom>`_
 
