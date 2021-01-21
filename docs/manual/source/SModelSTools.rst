@@ -31,12 +31,12 @@ SModelS Tools
 
 Inside SModelS there is a number of tools that may be convenient for the user:
 
-* a :ref:`cross section calculator <xsecCalc>` based on `Pythia8 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ (or `Pythia6 <http://pythia6.hepforge.org>`_) and 
+* a :ref:`cross section calculator <xsecCalc>` based on `Pythia8 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ (or `Pythia6 <http://pythia6.hepforge.org>`_) and
   `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_,
-* :ref:`SLHA and LHE file checkers <fileChecks>` to check your input files for completeness and sanity, 
-* a :ref:`database browser <databaseBrowser>` to provide easy access to the |database| of experimental results, 
+* :ref:`SLHA and LHE file checkers <fileChecks>` to check your input files for completeness and sanity,
+* a :ref:`database browser <databaseBrowser>` to provide easy access to the |database| of experimental results,
 * a plotting tool to make :ref:`interactive plots <interactivePlots>` based on `plotly <https://plot.ly/python/>`_ (v1.1.3 onwards),
-* a :ref:`file permissions fixer <permissionsFixer>` to fix a problem with file permissions for the cross section computers in system-wide installs, and 
+* a :ref:`file permissions fixer <permissionsFixer>` to fix a problem with file permissions for the cross section computers in system-wide installs, and
 * a :ref:`toolbox <toolBox>` to quickly show the state of the external tools.
 
 .. _xsecCalc:
@@ -45,10 +45,10 @@ Cross Section Calculator
 ------------------------
 
 This tool computes LHC production cross sections for *MSSM particles*
-and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be 
-convenient for adding cross sections to SLHA input files, see :doc:`Basic Input <BasicInput>`. 
-The calculation is done at LO with `Pythia8 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ or `Pythia6.4 <http://pythia6.hepforge.org>`_ ; K-factors 
-for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_. Signal strength multipliers can optionally be supplied for each "mother" particle. 
+and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be
+convenient for adding cross sections to SLHA input files, see :doc:`Basic Input <BasicInput>`.
+The calculation is done at LO with `Pythia8 <http://home.thep.lu.se/~torbjorn/Pythia.html>`_ or `Pythia6.4 <http://pythia6.hepforge.org>`_ ; K-factors
+for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_. Signal strength multipliers can optionally be supplied for each "mother" particle.
 
 **The usage of the cross section calculator is:**
 
@@ -68,8 +68,8 @@ If, *after* the LO cross sections have been computed, one wants to add the NLO+N
 
    smodelsTools.py xseccomputer -s 8 13 -p -N -O -f inputFiles/slha/higgsinoStop.slha
 
-The resulting file will then contain LO cross sections for all MSSM processes and NLO+NLL cross sections for 
-the available processes in `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_  
+The resulting file will then contain LO cross sections for all MSSM processes and NLO+NLL cross sections for
+the available processes in `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_
 (gluino and squark production).
 When reading the input file, SModelS will then use only the highest order cross sections available for each process.
 
@@ -78,9 +78,9 @@ An example using signal strength multipliers (*available from SModelS v2.0 onwar
 
    smodelsTools.py xseccomputer -s 8 13 -e 10000 --ssmultipliers "{ (1000021,1000021): 4.0, (1000001,-10000001): 2.0 }" -p -f inputFiles/slha/higgsinoStop.slha
 
-This will compute 8 TeV and 13 TeV LO cross sections as above, but the cross section for gluino-pair production (pid 1000021) gets enhanced by a factor of 4, and squark-antisquark production gets enhanced by a factor of 2. For the pids, strings can be supplied instead of integers. Unix filename wildcard syntax is also supported. E.g. '100000?' matches all left-handed squarks but no anti-squarks, '\*1000001' matches both (left-handed) down and anti-down. Multiple signal strength multipliers may be applicable to a single theory prediction. 
+This will compute 8 TeV and 13 TeV LO cross sections as above, but the cross section for gluino-pair production (pid 1000021) gets enhanced by a factor of 4, and squark-antisquark production gets enhanced by a factor of 2. For the pids, strings can be supplied instead of integers. Unix filename wildcard syntax is also supported. E.g. '100000?' matches all left-handed squarks but no anti-squarks, '\*1000001' matches both (left-handed) down and anti-down. Multiple signal strength multipliers may be applicable to a single theory prediction.
 
-Note that signal strength multipliers get applied only to LO cross sections. This means they are propagated to NLO and NLL level only iff the LO cross sections are computed first and the NLO/NLL corrections added afterwards. In other words, if the xseccomputer is called with -n or -N argument but without -O (--LOfromSLHA), the --ssmultipliers argument will be ignored. 
+Note that signal strength multipliers get applied only to LO cross sections. This means they are propagated to NLO and NLL level only if the LO cross sections are computed first and the NLO/NLL corrections added afterwards. In other words, if the xseccomputer is called with -n or -N argument but without -O (--LOfromSLHA), the --ssmultipliers argument will be ignored. 
 
 
 * **The cross section calculation is implemented by the** `xsecComputer function <tools.html#tools.xsecComputer.XSecComputer>`_
@@ -156,8 +156,8 @@ and error messages.
           checked for the existence of displaced vertices or heavy stable charged
           particles in the input file. Since the inclusion of long lived signatures in
           SModelS, these checks are no longer done by the SLHA file checker.
-          
-          
+
+
 
 .. _databaseBrowser:
 
@@ -181,7 +181,7 @@ A typical usage example is: ::
 
 Loading the database may take a few seconds if the :ref:`binary database file <databasePickle>` exists.
 Otherwise the :ref:`pickle file <databasePickle>` will be created.
-Starting the browser opens an IPython session, which can be used 
+Starting the browser opens an IPython session, which can be used
 to select specific experimental results (or groups of experimental results),
 check upper limits and/or efficiencies for specific masses/topologies and access all the available
 information in the database.
@@ -191,30 +191,30 @@ A simple example is given below:
 
    In [1]: print ( browser )  #Print all experimental results in the browser
    ['ATLAS-SUSY-2015-01', 'ATLAS-SUSY-2015-01', 'ATLAS-SUSY-2015-02', 'ATLAS-SUSY-2015-02', ...
-   
+
    In [2]: browser.selectExpResultsWith(txName = 'T1tttt', dataType = 'upperLimit') #Select only the UL results with the topology T1tttt
-   
+
    In [3]: print ( browser ) #Print all experimental results in the browser (after selection)
    ['ATLAS-SUSY-2015-09', 'CMS-SUS-15-002', 'CMS-PAS-SUS-16-014', 'CMS-PAS-SUS-16-015', ...
-   
+
    In [4]: gluinoMass, LSPmass = 800.*GeV, 100.*GeV  #Define masses for the T1tttt topology
-   
+
    In [5]: browser.getULFor('CMS-SUS-15-002','T1tttt',[[gluinoMass,LSPmass],[gluinoMass,LSPmass]]) #Get UL for a specific experimental result
    Out[5]: 2.23E+01 [fb]
-     
+
    In [6]: for expResult in browser[:5]:  #Get the upper limits for the first five of the selected results for the given topology and mass
       ...:     print ( expResult.getValuesFor('id'),'UL = ',expResult.getUpperLimitFor(txname='T1tttt',mass=[[gluinoMass,LSPmass],[gluinoMass,LSPmass]]) )
-      ...:     
+      ...:
       ['ATLAS-SUSY-2015-09'] UL =  None
       ['CMS-PAS-SUS-16-014'] UL =  4.10E+01 [fb]
       ['CMS-PAS-SUS-16-015'] UL =  1.80E+01 [fb]
       ['CMS-PAS-SUS-16-016'] UL =  5.76E+01 [fb]
       ['CMS-PAS-SUS-16-019'] UL =  1.37E+01 [fb]
 
-      
+
    In [7]: for expResult in browser[:5]:  #Print the luminosities for the first five selected experimental results
       ...:     print ( expResult.getValuesFor('id'),expResult.getValuesFor('lumi') )
-      ...:     
+      ...:
       ['ATLAS-SUSY-2015-09'] [3.20E+00 [1/fb]]
       ['CMS-PAS-SUS-16-014'] [1.29E+01 [1/fb]]
       ['CMS-PAS-SUS-16-015'] [1.29E+01 [1/fb]]
@@ -253,21 +253,21 @@ which will produce 3x9 plots in the gluino vs squark mass plane from a small sca
 iplots parameters file
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The options for the interactive plots tool are defined in a parameters file, *iplots_parameters.py* in the above example.  
+The options for the interactive plots tool are defined in a parameters file, *iplots_parameters.py* in the above example.
 An example file, including all available parameters together with a short description, is stored in :download:`iplots_parameters.py <images/iplots_parameters.py>`.
-Since the plotting information is model dependent, there is no default setting -- the iplots parameters file is mandatory input. 
+Since the plotting information is model dependent, there is no default setting -- the iplots parameters file is mandatory input.
 Below we give more detailed information about each entry in this file.
 
 * *plot_title*: main overall title for your plots, typically the model name.
 
 * *x and y axes*: SLHA block and PDG code number of the variables you want to plot, e.g. 'm_gluino': ['MASS', 1000021].
 
-  * **variable_x**: In a dictionary form, give the name of the x-axis variable, and the block and PDG code number to find it in the SLHA file. Example: variable_x = {'m_gluino[GeV]': ['MASS', 1000021]}. 
+  * **variable_x**: In a dictionary form, give the name of the x-axis variable, and the block and PDG code number to find it in the SLHA file. Example: variable_x = {'m_gluino[GeV]': ['MASS', 1000021]}.
   * **variable_y**: same for the y-axis. Example: variable_y = {'m_suR[GeV]': ['MASS', 2000002]}
 
 * *spectrum hover information*: defines which information from the input SLHA file will appear in the hover box. The syntax is again a python dictonary.
 
-  * **slha_hover_information**: information from the input SLHA file, e.g. model parameters or masses. Example: slha_hover_information = {'m_gluino': ['MASS', 1000021], 'm_suR': ['MASS', 2000002], 'm_LSP': ['MASS', 1000022]} 
+  * **slha_hover_information**: information from the input SLHA file, e.g. model parameters or masses. Example: slha_hover_information = {'m_gluino': ['MASS', 1000021], 'm_suR': ['MASS', 2000002], 'm_LSP': ['MASS', 1000022]}
 
   * **ctau_hover_information**: displays the mean decay length in meter for the listed particle(s). Example: ctau_hover_information = {'ctau_chi1+': 1000024}
 
@@ -276,7 +276,7 @@ Below we give more detailed information about each entry in this file.
 * *SModelS hover information*: defines, as a list of keywords, which information to display from the SModelS output. Example: smodels_hover_information = ['SmodelS_status', 'r_max', 'Tx', 'Analysis', 'file']. The options are:
 
   * **SmodelS_status**: prints whether the point is excluded or not by SModelS
- 
+
   * **r_max**: shows the highest r-value for each parameter point
 
   * **chi2**: shows the chi^2 value, if available (if not, the output is 'none')
@@ -289,21 +289,21 @@ Below we give more detailed information about each entry in this file.
 
   * **MT_max_xsec**: shows the cross section of MT_max
 
-  * **MT_total_xsec**: shows the total missing cross section (i.e. the sum of all missing topologies cross sections)  
+  * **MT_total_xsec**: shows the total missing cross section (i.e. the sum of all missing topologies cross sections)
 
-  * **MT_long_xsec**: shows the total missing cross section in long cascade decays  
+  * **MT_long_xsec**: shows the total missing cross section in long cascade decays
 
-  * **MT_asym_xsec**: shows the total missing cross section in decays with asymmetric branches 
+  * **MT_asym_xsec**: shows the total missing cross section in decays with asymmetric branches
 
   * **MT_outgrid_xsec**: shows the total missing cross section outside the mass grids of the experimental results
 
-  * **file**: shows the name of the input spectrum file 
+  * **file**: shows the name of the input spectrum file
 
 * *Choice of plots to make*
 
-  * **plot_data**: which points you want to plot; the options are: all, non-excluded, excluded points. Example: plot_data = ['all', 'non-excluded', 'excluded'] 
+  * **plot_data**: which points you want to plot; the options are: all, non-excluded, excluded points. Example: plot_data = ['all', 'non-excluded', 'excluded']
 
-  * **plot_list**: which quantities to plot in the x,y plane; the same options as for SModels hover information apply. Example: plot_list = ['SmodelS_status','r_max', 'chi2', 'Tx', 'Analysis', 'MT_max', 'MT_max_xsec', 'MT_total_xsec', 'MT_long_xsec', 'MT_asym_xsec']  
+  * **plot_list**: which quantities to plot in the x,y plane; the same options as for SModels hover information apply. Example: plot_list = ['SmodelS_status','r_max', 'chi2', 'Tx', 'Analysis', 'MT_max', 'MT_max_xsec', 'MT_total_xsec', 'MT_long_xsec', 'MT_asym_xsec']
 
 
 .. _permissionsFixer:
@@ -312,7 +312,7 @@ File Permissions Fixer
 ----------------------
 
 In case the software was installed under a different user than it is used
-(as is the case for system-wide installs), we ship a simple tool that fixes 
+(as is the case for system-wide installs), we ship a simple tool that fixes
 the file permissions for the cross section calculation code.
 
 **The usage of the permissions fixer is:**
@@ -328,8 +328,7 @@ Execute the command as root, i.e.: ::
 ToolBox
 -------
 
-As a quick way to show the status of all external tools, use 
+As a quick way to show the status of all external tools, use
 **the toolbox:**
 
 .. include:: ToolBox.rst
-
