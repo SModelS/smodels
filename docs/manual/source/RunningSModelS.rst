@@ -151,6 +151,15 @@ Below we give more detailed information about each entry in the parameters file.
  
   * **model**: pathname to the Python file that defines the particle content of the BSM model, given either in Unix file notation ("/path/to/model.py") or as Python module path ("path.to.model"). Defaults to *share.models.mssm* which is a standard MSSM. See smodels/share/models folder for more examples. Directory name can be omitted; in that case, the current working directory as well as smodels/share/models are searched for.
 
+.. _promptWidth:
+
+  * **promptWidth**: total decay width in GeV above which decays are considered prompt; available v2.0 onwards.
+
+.. _stableWidth:
+
+  * **stableWidth**: total decay width in GeV below which particles are considered as (quasi)stable; available v2.0 onwards.
+
+
 .. _parameterFileParameters:
 
 * *parameters*: basic parameter values for running SModelS
