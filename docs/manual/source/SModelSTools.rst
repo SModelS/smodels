@@ -10,7 +10,6 @@
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
 .. |intermediate states| replace:: :ref:`intermediate states <odd states>`
-.. |final states| replace:: :ref:`final states <final statesEven>`
 .. |database| replace:: :ref:`database <Database>`
 .. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
 .. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
@@ -80,7 +79,7 @@ An example using signal strength multipliers (*available from SModelS v2.0 onwar
 
 This will compute 8 TeV and 13 TeV LO cross sections as above, but the cross section for gluino-pair production (pid 1000021) gets enhanced by a factor of 4, and squark-antisquark production gets enhanced by a factor of 2. For the pids, strings can be supplied instead of integers. Unix filename wildcard syntax is also supported. E.g. '100000?' matches all left-handed squarks but no anti-squarks, '\*1000001' matches both (left-handed) down and anti-down. Multiple signal strength multipliers may be applicable to a single theory prediction.
 
-Note that signal strength multipliers get applied only to LO cross sections. This means they are propagated to NLO and NLL level only if the LO cross sections are computed first and the NLO/NLL corrections added afterwards. In other words, if the xseccomputer is called with -n or -N argument but without -O (--LOfromSLHA), the --ssmultipliers argument will be ignored. 
+Note that signal strength multipliers get applied only to LO cross sections. This means they are propagated to NLO and NLL level only if the LO cross sections are computed first and the NLO/NLL corrections added afterwards. In other words, if the xseccomputer is called with -n or -N argument but without -O (--LOfromSLHA), the --ssmultipliers argument will be ignored.
 
 
 * **The cross section calculation is implemented by the** `xsecComputer function <tools.html#tools.xsecComputer.XSecComputer>`_

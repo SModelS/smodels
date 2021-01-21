@@ -66,7 +66,7 @@ Likelihood Computation
 
 In the case of |EMrs|, additional statistical information
 about the constrained model can be provided by the SModelS output.
-Most importantly, we can compute a likelihood, 
+Most importantly, we can compute a likelihood,
 which describes the plausibility of the data :math:`D`, given a signal strength :math:`\mu`:
 
 .. math::
@@ -75,11 +75,11 @@ which describes the plausibility of the data :math:`D`, given a signal strength 
 
 Here, :math:`\theta` denotes the nuisance parameter that describes the
 variations in the signal and background contribtions due to systematic
-effects. 
+effects.
 
-If no information about the correlation of signal regions is available 
-(or if its usage is turned off, see :doc:`Using SModelS <RunningSModelS>`), 
-we compute a simplified likelihood for the most sensitive (a.k.a. best) signal region, 
+If no information about the correlation of signal regions is available
+(or if its usage is turned off, see :doc:`Using SModelS <RunningSModelS>`),
+we compute a simplified likelihood for the most sensitive (a.k.a. best) signal region,
 i.e. the signal region with the highest :math:`r_\mathrm{exp}=(\mathrm{theory\,prediction})/(\mathrm{expected\, limit})`,
 following the procedure detailed in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_.
 
@@ -130,13 +130,13 @@ continuous regions of parameter space that give roughly the same phenomenology.
 Combination of Signal Regions - Simplified Likelihood Approach
 --------------------------------------------------------------
 
-If the experiment provides information about the (background) correlations, signal regions can be combined. 
-To this end, CMS sometimes provides a covariance matrix together with the efficiency maps.  
-The usage of such covariance matrices 
-is implemented in SModelS v1.1.3 onwards, following as above the simplified likelihood approach described in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_. 
+If the experiment provides information about the (background) correlations, signal regions can be combined.
+To this end, CMS sometimes provides a covariance matrix together with the efficiency maps.
+The usage of such covariance matrices
+is implemented in SModelS v1.1.3 onwards, following as above the simplified likelihood approach described in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_.
 
 SModelS allows for a marginalization as well as a profiling of the nuisances, with profiling being the default (an example for using marginalisation can be found in :ref:`How To's <Examples>`).
-Since CPU performance is a concern in SModelS, we try to aggregate the official results, which can comprise >100 signal regions, to an acceptable number of aggregate regions. Here *acceptable* means as few aggregate regions as possible without loosing in precision or constraining power. 
+Since CPU performance is a concern in SModelS, we try to aggregate the official results, which can comprise >100 signal regions, to an acceptable number of aggregate regions. Here *acceptable* means as few aggregate regions as possible without loosing in precision or constraining power.
 The CPU time scales roughly linearly with the number of signal regions, so aggregating e.g. from 80 to 20 signal regions means gaining a factor 4 in computing time.
 
 Under the assumptions described in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_,
@@ -146,60 +146,61 @@ the likelihood for the signal hypothesis when combining signal regions is given 
    \mathcal{L}(\mu,\theta|D) = \prod_{i=1}^{N} \frac{(\mu s_i^r + b_i + \theta_i)^{n_{obs}^i} e^{-(\mu s_i^r + b_i + \theta_i)}}{n_{obs}^i!} exp \left( -\frac{1}{2} \vec{\theta}^T V^{-1} \vec{\theta} \right)
 
 where the product is over all :math:`N` signal regions, :math:`\mu` is the overall signal strength, :math:`s_i^r` the relative signal strength
-in each signal region and :math:`V` represents the covariance matrix. 
+in each signal region and :math:`V` represents the covariance matrix.
 Note, however, that unlike the case of a single signal region, we do not include any signal uncertainties, since this
 should correspond to a second order effect.
 
 
-Using the above likelihood we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the 
-test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al., 
-`Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_. 
+Using the above likelihood we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the
+test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al.,
+`Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_.
 We then search for the value :math:`CL_s = 0.95` using the Brent bracketing technique available through the `scipy optimize library <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_.
 Note that the limit computed through this procedure applies to the total signal yield summed over all signal regions and assumes
 that the relative signal strengths in each signal region are fixed by the signal hypothesis. As a result, the above limit has to be computed
 for each given input model (or each :ref:`theory prediction <theoryPredictions>`), thus considerably increasing CPU time.
 
-When using *runSModelS.py*, the combination of signal regions is turned on or off with the parameter **options:combineSRs**, see :ref:`parameter file <parameterFile>`. Its default value is *False*, in which case only the result from the best expected signal region (best SR) is reported. 
-If *combineSRs = True*, both the combined result and the one from the best SR are quoted. 
+When using *runSModelS.py*, the combination of signal regions is turned on or off with the parameter **options:combineSRs**, see :ref:`parameter file <parameterFile>`. Its default value is *False*, in which case only the result from the best expected signal region (best SR) is reported.
+If *combineSRs = True*, both the combined result and the one from the best SR are quoted.
 
-In the :ref:`figure below <combinedSRfig>` we show the constraints on the simplified model 
+In the :ref:`figure below <combinedSRfig>` we show the constraints on the simplified model
 `T2bbWWoff <http://smodels.github.io/docs/SmsDictionary#T2bbWWoff>`_ when using
 the best signal region (left), all the 44 signal regions considered in `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ (center) and the aggregated signal regions included in the SModelS database (right).
 As we can see, while the curve obtained from the combination of all 44 signal regions is much closer to the official exclusion than the one obtained using only the best SR. Finally, the aggregated result included in the SModelS database (total of 17 aggregate regions) comes with little loss in constraining power, although it considerable reduces the running time.
 
 .. _combinedSRfig:
 
-+-----------------------------------------+-----------------------------------------+-----------------------------------------+
-| .. image:: images/T2bbWWoff_bestSR.png  | .. image:: images/T2bbWWoff_44.png      | .. image:: images/T2bbWWoff_17.png      |
-|            :width: 300px                |            :width: 300px                |            :width: 300px                |
-| Best signal region                      | 44 signal regions                       | 17 aggregate regions                    |
-+-----------------------------------------+-----------------------------------------+-----------------------------------------+
+   +-----------------------------------------+-----------------------------------------+-----------------------------------------+
+   | .. image:: images/T2bbWWoff_bestSR.png  | .. image:: images/T2bbWWoff_44.png      | .. image:: images/T2bbWWoff_17.png      |
+   |            :width: 300px                |            :width: 300px                |            :width: 300px                |
+   |                                         |                                         |                                         |
+   | Best signal region                      | 44 signal regions                       | 17 aggregate regions                    |
+   +-----------------------------------------+-----------------------------------------+-----------------------------------------+
 
-
-Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of 17 aggregate signal regions (center), and the combination of all 44 signal regions (right).
+   Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of 17 aggregate signal regions (center), and the combination of all 44 signal regions (right).
 
 
 
 Combination of Signal Regions - Full Likelihoods (pyhf)
 -------------------------------------------------------
 
-In early 2020, following `ATL-PHYS-PUB-2019-029 <https://cds.cern.ch/record/2684863>`_, 
-ATLAS has started to provide *full likelihoods* for results with full Run 2 luminosity (139/fb),  
-using a JSON serialisation of the likelihood. This JSON format describes the `HistFactory <https://cds.cern.ch/record/1456844>`_ family of statistical models, which is used by the majority of ATLAS analyses. 
-Thus background estimates, changes under systematic variations, and observed data counts are provided at the same fidelity as used in the experiment. 
+In early 2020, following `ATL-PHYS-PUB-2019-029 <https://cds.cern.ch/record/2684863>`_,
+ATLAS has started to provide *full likelihoods* for results with full Run 2 luminosity (139/fb),
+using a JSON serialisation of the likelihood. This JSON format describes the `HistFactory <https://cds.cern.ch/record/1456844>`_ family of statistical models, which is used by the majority of ATLAS analyses.
+Thus background estimates, changes under systematic variations, and observed data counts are provided at the same fidelity as used in the experiment.
 
-SModelS supports the usage of these JSON likelihoods from v1.2.4 onward via an interface to the 
-`pyhf <https://scikit-hep.org/pyhf/>`_ package, a pure-python implementation of the HistFactory statistical model. This means that for |EMr| from ATLAS, for which a JSON likelihood is available and when the combination of signal regions is turned on, the evaluation of the likelihood is relegated to `pyhf <https://scikit-hep.org/pyhf/>`_. Internally, the whole calculation 
-is based on the asymptotic formulas of *Asymptotic formulae for likelihood-based tests of new physics*, `arXiv:1007.1727 <https://arxiv.org/abs/1007.1727>`_. 
+SModelS supports the usage of these JSON likelihoods from v1.2.4 onward via an interface to the
+`pyhf <https://scikit-hep.org/pyhf/>`_ package, a pure-python implementation of the HistFactory statistical model. This means that for |EMr| from ATLAS, for which a JSON likelihood is available and when the combination of signal regions is turned on, the evaluation of the likelihood is relegated to `pyhf <https://scikit-hep.org/pyhf/>`_. Internally, the whole calculation
+is based on the asymptotic formulas of *Asymptotic formulae for likelihood-based tests of new physics*, `arXiv:1007.1727 <https://arxiv.org/abs/1007.1727>`_.
 
-The :ref:`figure below <combinedSRfigPyhf>` examplifies how the constraints improve from 
-using the best signal region (left) to using the full likelihood (right).  
+The :ref:`figure below <combinedSRfigPyhf>` examplifies how the constraints improve from
+using the best signal region (left) to using the full likelihood (right).
 
 .. _combinedSRfigPyhf:
 
 +-----------------------------------------+-----------------------------------------+
 | .. image:: images/TChiWH_bestSR.png     | .. image:: images/TChiWH_pyhf.png       |
 |            :width: 300px                |            :width: 300px                |
+|                                         |                                         |
 | Best signal region                      | pyhf combining 9 signal regions         |
 +-----------------------------------------+-----------------------------------------+
 

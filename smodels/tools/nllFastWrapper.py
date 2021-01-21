@@ -2,11 +2,11 @@
 
 """
 .. module:: nllFastWrapper
-   :synopsis: This module provides methods to access the nllfast grid and             
-              compute k-factors (when available) to SUSY pair                         
-              production cross sections.                                              
-                                                                                      
-.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>                       
+   :synopsis: This module provides methods to access the nllfast grid and
+              compute k-factors (when available) to SUSY pair
+              production cross sections.
+
+.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -43,18 +43,18 @@ from smodels.tools.smodelsLogging import logger
 class NllFastWrapper(WrapperBase):
     """
     An instance of this class represents the installation of nllfast.
-
     """
+
     def __init__(self, sqrts, nllfastVersion, testParams, testCondition):
         """
         :param sqrts: sqrt of s, in TeV, as an integer,
         :param nllfastVersion: version of the nllfast tool
         :param testParams: what are the test params we need to run things with?
         :param testCondition: the line that should be the last output line when
-        running executable
+                              running executable
         :srcPath: the path of the source code, for compilation
-
         """
+
         WrapperBase.__init__(self)
         self.sqrts = int(sqrts)
         self.name = "nllfast%d" % sqrts
@@ -71,9 +71,7 @@ class NllFastWrapper(WrapperBase):
 
     def _interpolateKfactors( self, kFacsVector, xval):
         """
-        Interpolate a list of k-factor  values from
-        kFacsVector = [[x0,[k1,k2,..]], [x1,[k1,k2,..],...].
-        FIXME what is xval?
+        Interpolate a list of k-factor  values from kFacsVector = [[x0,[k1,k2,..]], [x1,[k1,k2,..],...].
 
         :returns: list of interpolated k-factor values at x-value xval
 
@@ -192,10 +190,10 @@ class NllFastWrapper(WrapperBase):
         Compute k-factors in the decoupled (squark or gluino) regime for the process.
         If a decoupled grid does not exist for the process, return None
         """
-            
+
         if process != 'sb' and process != 'gg': return None
         elif process == 'sb': process_dcpl = 'sdcpl'
-        elif process == 'gg': process_dcpl = 'gdcpl'    
+        elif process == 'gg': process_dcpl = 'gdcpl'
         nll_run = "./nllfast_" + energy + " %s %s %s" % \
                           (process_dcpl, pdf, mass)
         e = energy.replace ( "TeV", "" ).replace ( "*", "" )
@@ -211,12 +209,12 @@ class NllFastWrapper(WrapperBase):
 
     def getKfactorsFor( self, pIDs, slhafile, pdf='cteq' ):
         """
-        Read the NLLfast grid and returns a pair of k-factors (NLO and NLL) for 
+        Read the NLLfast grid and returns a pair of k-factors (NLO and NLL) for
         the PIDs pair.
 
         :returns: k-factors = None, if NLLfast does not contain the process; uses
                   the slhafile to obtain the SUSY spectrum.
-        
+
         """
         if not os.path.isfile(slhafile):
             logger.error("SLHA file %s not found", slhafile)
@@ -275,8 +273,8 @@ class NllFastWrapper(WrapperBase):
 
         # Check for decoupling cases with a decoupling grid (only for sb and gg)
         doDecoupling = False
-        if "too low/high gluino" in nll_output.lower():        
-            if gluinomass > 500. and process == 'sb': 
+        if "too low/high gluino" in nll_output.lower():
+            if gluinomass > 500. and process == 'sb':
                 doDecoupling = True
                 dcpl_mass = gluinomass
         elif "too low/high squark" in nll_output.lower():
@@ -297,18 +295,18 @@ class NllFastWrapper(WrapperBase):
         if not kfacs:
             logger.warning("Error obtaining k-factors from the NLLfast decoupled grid for " + process)
             return (None, None)
-        elif dcpl_mass/min(gluinomass,squarkmass) > 10.:    
+        elif dcpl_mass/min(gluinomass,squarkmass) > 10.:
             return kfacs
         # Interpolate between the non-decoupled and decoupled grids
         else:
             kFacsVector = [[10.*min(gluinomass,squarkmass),kfacs]]  #First point for interpolation (decoupled grid)
-            kfacs = None        
+            kfacs = None
             while not kfacs and dcpl_mass > 500.:
                 dcpl_mass -= 100.  # Reduce decoupled mass, until NLLfast produces results
                 if process == 'sb': nllinput = (process, pdf, squarkmass, dcpl_mass)
                 else:  nllinput = (process, pdf, dcpl_mass, gluinomass)
                 nll_output = self._runForDecoupled ( energy, nllinput )
-                kfacs = self._getKfactorsFrom(nll_output)        
+                kfacs = self._getKfactorsFrom(nll_output)
             kFacsVector.append([dcpl_mass, kfacs]) #Second point for interpolation (non-decoupled grid)
 
         if len(kFacsVector) < 2:
@@ -324,20 +322,19 @@ class NllFastWrapper(WrapperBase):
 class NllFastWrapper7(NllFastWrapper):
     """
     An instance of this class represents the installation of nllfast 7.
-
     """
+
     def __init__(self):
         NllFastWrapper.__init__(self, 7, "1.2",
                                  testParams="gg cteq 500 600",
                                  testCondition="500.     600.    0.193E+00  "
                                  "0.450E+00  0.497E+00")
 
-
 class NllFastWrapper8(NllFastWrapper):
     """
     An instance of this class represents the installation of nllfast 8.
-
     """
+
     def __init__(self):
         NllFastWrapper.__init__(self, 8, "2.1",
                                  testParams="gg cteq 500 600",
@@ -347,8 +344,8 @@ class NllFastWrapper8(NllFastWrapper):
 class NllFastWrapper13(NllFastWrapper):
     """
     An instance of this class represents the installation of nllfast 8.
-
     """
+
     def __init__(self):
         NllFastWrapper.__init__(self, 13, "3.1",
                                  testParams="gg cteq 500 600",

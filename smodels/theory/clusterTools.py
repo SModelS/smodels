@@ -140,8 +140,6 @@ class ElementCluster(object):
     An instance of this class represents a cluster of elements.
     This class is used to store the relevant information about a cluster of
     elements and to manipulate this information.
-
-    :ivar elements: list of elements in the cluster (Element objects)
     """
 
     def __init__(self, elements = [], dataset = None, distanceMatrix = None):

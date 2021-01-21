@@ -2,10 +2,7 @@
 
 """
 .. module:: statistics
-   :synopsis: a module meant to collect various statistical algorithms.
-              For now it only contains the procedure that computes an
-              approximate Gaussian likelihood from an expected an observer upper
-              limit. See https://arxiv.org/abs/1202.3415.
+   :synopsis: a module meant to collect various statistical algorithms. For now it only contains the procedure that computes an approximate Gaussian likelihood from an expected an observer upper limit. See https://arxiv.org/abs/1202.3415.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -29,7 +26,7 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
     assert ( upperLimit > 0. )
 
     def getSigma ( ul, muhat = 0. ):
-        """ get the standard deviation sigma, given 
+        """ get the standard deviation sigma, given
             an upper limit and a central value. assumes a truncated Gaussian likelihood """
         # the expected scale, eq 3.24 in arXiv:1202.3415
         return ( ul - muhat ) / 1.96
@@ -71,20 +68,23 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
         ## the have the same sign
         logger.error ( "when computing likelihood: fA and fB have same sign")
         return None
-    mumax = optimize.brentq ( root_func, 0., max(upperLimit, expectedUpperLimit), 
+    mumax = optimize.brentq ( root_func, 0., max(upperLimit, expectedUpperLimit),
                               rtol=1e-03, xtol=1e-06 )
     llhdexp = llhd ( nsig, mumax, sigma_exp, nll )
     return llhdexp
 
 def rvsFromLimits( upperLimit, expectedUpperLimit, n=1 ):
-    """ generates a sample of random variates, given expected and observed likelihoods.
-        the likelihood is modelled as a truncated Gaussian.
+    """
+    Generates a sample of random variates, given expected and observed likelihoods.
+    The likelihood is modelled as a truncated Gaussian.
+
     :param upperLimit: observed upper limit, as a yield (i.e. unitless)
     :param expectedUpperLimit: expected upper limit, also as a yield
     :param n: sample size
 
     :returns: sample of random variates
     """
+    
     sigma_exp = expectedUpperLimit / 1.96 # the expected scale
     denominator = np.sqrt(2.) * sigma_exp
     def root_func ( x ): ## we want the root of this one

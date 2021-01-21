@@ -17,14 +17,14 @@ from smodels.tools.smodelsLogging import logger
 class Info(object):
     """
     Holds the meta data information contained in a .txt file
-    (luminosity, sqrts, experimentID,...).
-    Its attributes are generated according to the lines in the
+    (luminosity, sqrts, experimentID,...). Its attributes are generated according to the lines in the
     .txt file which contain "info_tag: value".
-
-    :ivar path: path to the .txt file
     """
 
     def __init__(self, path=None):
+        """
+        :param path: path to the .txt file
+        """
 
         self.path = path
         if path:

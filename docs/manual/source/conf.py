@@ -116,7 +116,7 @@ pygments_style = 'sphinx'
 #keep_warnings = False
 
 #Ignore documentation for python types
-nitpick_ignore = [('py:class', 'type'),('py:class', 'object')]
+nitpick_ignore = [('py:class', 'type'),('py:class', 'object'),('py:obj', 'data'),('py:obj', 'nsignals'),('py:obj', 'inputJsons'),('py:obj', 'channelsInfo'),('py:obj', 'zeroSignalsFlag'),('py:obj', 'nWS'),('py:obj', 'patches'),('py:obj', 'workspaces'),('py:obj', 'cl'),('py:obj', 'scale'),('py:obj', 'alreadyBeenThere')]
 
 
 # -- Options for HTML output ----------------------------------------------
@@ -267,6 +267,8 @@ texinfo_documents = [
 
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []
+
+autoclass_content = 'both'
 
 # If false, no module index is generated.
 #texinfo_domain_indices = True

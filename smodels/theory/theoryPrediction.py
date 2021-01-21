@@ -20,19 +20,6 @@ class TheoryPrediction(object):
     """
     An instance of this class represents the results of the theory prediction
     for an analysis.
-
-    :ivar analysis: holds the analysis (ULanalysis or EManalysis object)
-                    to which the prediction refers
-    :ivar xsection: xsection of the theory prediction
-                (relevant cross section to be compared with the experimental limits).
-                For EM-type analyses, it corresponds to sigma*eff, for
-                UL-type analyses, eff is considered to be 1.
-                It is a XSection object.
-    :ivar conditions: list of values for the analysis conditions
-                      (only for upper limit-type analysis, e.g. analysis=ULanalysis)
-    :ivar mass: mass of the cluster to which the theory prediction refers
-                (only for upper limit-type analysis, e.g. analysis=ULanalysis)
-
     """
 
     def __init__(self):
@@ -269,8 +256,6 @@ class TheoryPredictionList(object):
     """
     An instance of this class represents a collection of theory prediction
     objects.
-
-    :ivar _theoryPredictions: list of TheoryPrediction objects
     """
 
     def __init__(self, theoryPredictions=None, maxCond=None):

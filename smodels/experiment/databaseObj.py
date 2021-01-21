@@ -2,8 +2,7 @@
 
 """
 .. module:: databaseObj
-   :synopsis: Contains Database class that represents the database of
-   experimental results.
+   :synopsis: Contains Database class that represents the database of experimental results.
 
 .. moduleauthor:: Veronika Magerl <v.magerl@gmx.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -40,34 +39,25 @@ except ImportError as e:
 class Database(object):
     """
     Database object. Holds a list of ExpResult objects.
-
-    :ivar base: path to the database, or pickle file (string), or http
-        address. If None, "official", or "official_fastlim",
-        use the official database for your code version
-        (including fastlim results, if specified).
-        If "latest", or "latest_fastlim", check for the latest database.
-    :ivar force_load: force loading the text database ("txt"),
-        or binary database ("pcl"), dont force anything if None
-    :ivar expResultList: list of ExpResult objects
-
     """
 
     def __init__(self, base=None, force_load = None, discard_zeroes = True,
                   progressbar = False, subpickle = True):
         """
         :param base: path to the database, or pickle file (string), or http
-            address. If None, "official", or "official_fastlim",
-            use the official database for your code version
-            (including fastlim results, if specified).
-            If "latest", or "latest_fastlim", check for the latest database.
+                     address. If None, "official", or "official_fastlim",
+                     use the official database for your code version
+                     (including fastlim results, if specified).
+                     If "latest", or "latest_fastlim", check for the latest database.
         :param force_load: force loading the text database ("txt"),
-            or binary database ("pcl"), dont force anything if None
+                           or binary database ("pcl"), dont force anything if None
         :param discard_zeroes: discard txnames with only zeroes as entries.
         :param progressbar: show a progressbar when building pickle file
                             (needs the python-progressbar module)
         :param subpickle: produce small pickle files per exp result.
-            Should only be used when working on the database.
+                          Should only be used when working on the database.
         """
+
         self.url = base
         self.source=""
         if force_load == None and base.endswith(".pcl"):
@@ -799,11 +789,13 @@ class Database(object):
 class ExpResultList(object):
     """
     Holds a list of ExpResult objects for printout.
-
-    :ivar expResultList: list of ExpResult objects
-
     """
+
     def __init__(self, expResList):
+        """
+        :param expResultList: list of ExpResult objects
+        """
+
         self.expResultList = expResList
 
 if __name__ == "__main__":

@@ -84,22 +84,23 @@ class Uncovered(object):
         """
         Inititalize the object.
 
-        :ivar topoList: TopologyList object used to select elements from.
-        :ivar sqrts: Value (with units) for the center of mass energy used to compute the missing cross sections.
+        :param topoList: TopologyList object used to select elements from.
+        :param sqrts: Value (with units) for the center of mass energy used to compute the missing cross sections.
                      If not specified the largest value available will be used.
-        :ivar sigmacut: Minimum cross-section/weight value (after applying the reweight factor)
+        :param sigmacut: Minimum cross-section/weight value (after applying the reweight factor)
                        for an element to be included. The value should in fb (unitless)
-        :ivar groupFilters: Dictionary containing the groups' labels and the method for selecting
+        :param groupFilters: Dictionary containing the groups' labels and the method for selecting
                             elements.
-        :ivar groupFactors: Dictionary containing the groups' labels and the method for reweighting
+        :param groupFactors: Dictionary containing the groups' labels and the method for reweighting
                             cross sections.
-        :ivar groupdDescriptions: Dictionary containing the groups' labels and strings describing the group
+        :param groupdDescriptions: Dictionary containing the groups' labels and strings describing the group
                                   (used for printout)
-        :ivar smFinalStates: List of (inclusive) Particle or MultiParticle objects used for grouping Z2-even
+        :param smFinalStates: List of (inclusive) Particle or MultiParticle objects used for grouping Z2-even
                              particles when creating GeneralElements.
-        :ivar bsmFinalSates: List of (inclusive) Particle or MultiParticle objects used for grouping Z2-odd
+        :param bsmFinalSates: List of (inclusive) Particle or MultiParticle objects used for grouping Z2-odd
                              particles when creating GeneralElements.
         """
+
         #Sanity checks:
         if not isinstance(groupFilters,dict):
             raise SModelSError("groupFilters input should be a Dictionary and not %s" %type(groupFilters))
@@ -173,23 +174,26 @@ class UncoveredGroup(object):
     """
     Holds information about a single coverage group: criteria for selecting and grouping elements,
     function for reweighting cross sections, etc.
-
-    :ivar label: Group label
-    :ivar elementFilter: Function which takes an element as argument and returns True (False) if
-                         the element should (not) be selected.
-    :ivar reweightFactor: Function which takes an element as argument and returns the reweighting
-                          factor to be applied to the element weight.
-    :ivar smFinalStates: List of Particle/MultiParticle objects used to group Z2-even particles appearing
-                        in the final state
-    :ivar bsmFinalStates: List of Particle/MultiParticle objects used to group Z2-odd particles appearing
-                        in the final state
-    :ivar sqrts: Value (with units) for the center of mass energy used to compute the missing cross sections.
-                 If not specified the largest value available will be used.
-    :ivar sigmacut: Minimum cross-section/weight value (after applying the reweight factor)
-                   for an element to be included. The value should in fb (unitless)
     """
+
     def __init__(self, label, elementFilter, reweightFactor,
                  smFinalStates, bsmFinalStates, sqrts, sigmacut=0.):
+        """
+        :param label: Group label
+        :param elementFilter: Function which takes an element as argument and returns True (False) if
+                             the element should (not) be selected.
+        :param reweightFactor: Function which takes an element as argument and returns the reweighting
+                              factor to be applied to the element weight.
+        :param smFinalStates: List of Particle/MultiParticle objects used to group Z2-even particles appearing
+                            in the final state
+        :param bsmFinalStates: List of Particle/MultiParticle objects used to group Z2-odd particles appearing
+                            in the final state
+        :param sqrts: Value (with units) for the center of mass energy used to compute the missing cross sections.
+                     If not specified the largest value available will be used.
+        :param sigmacut: Minimum cross-section/weight value (after applying the reweight factor)
+                       for an element to be included. The value should in fb (unitless)
+        """
+
         self.generalElements = []
         self.smFinalStates = smFinalStates
         self.bsmFinalStates = bsmFinalStates
@@ -426,4 +430,3 @@ class GeneralElement(object):
 
         #Now sort branches
         self.branches = sorted(self.branches, key = lambda br: (br,br.finalBSMstate))
-

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-.. module:: tools.modelTester
+.. module:: modelTester
    :synopsis: Functions to test (a set of) points, handling decomposition,
               result and coverage checks, parallelisation.
 

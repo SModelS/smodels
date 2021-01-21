@@ -438,7 +438,7 @@ def unscaleWidth(x):
 def removeInclusives(massArray,shapeArray):
     """
     Remove all entries corresponding to '*' in shapeArray.
-    If shapeArray contains entries = *, the corresponding entries
+    If shapeArray contains entries = '*', the corresponding entries
     in value will be removed from the output.
 
     :param massArray: Array to be formatted (e.g. [[200.,100.],[200.,100.]] or [[200.,'*'],'*'],0.4])
@@ -462,7 +462,7 @@ def removeInclusives(massArray,shapeArray):
 def addInclusives(massList,shapeArray):
     """
     Add entries corresponding to '*' in shapeArray.
-    If shapeArray contains entries = *, the corresponding entries
+    If shapeArray contains entries = '*', the corresponding entries
     in value will be added from the output.
 
     :param massList: 1D array of floats. Its dimension should be equal to the number

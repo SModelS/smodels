@@ -127,7 +127,7 @@ class XSecComputer:
         return xsecs
 
     def match ( self, pids, theorypid ):
-        """ do the pids given by the user match the 
+        """ do the pids given by the user match the
             pids of the theorypred? """
         spids = list(pids)
         stpids = list(theorypid)
@@ -167,7 +167,7 @@ class XSecComputer:
             return False
         #print ( "tpid", theorypid, "matched", pids )
         return True
-                    
+
 
     def applyMultipliers ( self, xsecs, ssmultipliers ):
         """
@@ -181,7 +181,7 @@ class XSecComputer:
             known_pids = [ 3000006 ] ## here we can define some exceptional pids
             for pid in pids:
                 if type(pid)==int and (abs(pid) < 1000000 or ( abs(pid) > 3000000 and abs(pid) not in known_pids) ):
-                    logger.warning ( "signal strength multiplier for pid %d supplied. what does that mean?" % pid ) 
+                    logger.warning ( "signal strength multiplier for pid %d supplied. what does that mean?" % pid )
         for x in xsecs:
             for pids, multiplier in ssmultipliers.items():
                 if self.match ( pids, x.pid ):
@@ -263,20 +263,22 @@ class XSecComputer:
                             lOfromSLHA, tofile, pythiacard = None,
                             ssmultipliers = None, comment = None ):
         """
-        compute the cross sections for one file.
+        Compute the cross sections for one file.
+
         :param sqrtses: list of sqrt{s} tu run pythia, as a unum (e.g. [7*TeV])
         :param inputFile: input SLHA file to compute xsecs for
         :param unlink: if False, keep temporary files
         :param lofromSLHA: try to obtain LO xsecs from SLHA file itself
-        :param tofile: False, True, "all": write results to file, if "all" also write 
-                       lower xsecs to file.
+        :param tofile: False, True, "all": write results to file, if "all" also write lower xsecs to file.
         :param pythiacard: optionally supply your own runcard
         :param ssmultipliers: optionally supply signal strengh multipliers,
-                given as dictionary of the tuple of the mothers' pids as keys and
-                multipliers as values, e.g { (1000001,1000021):1.1 }.
+                              given as dictionary of the tuple of the mothers' pids as keys and
+                              multipliers as values, e.g { (1000001,1000021):1.1 }.
         :param comment: an optional comment that gets added to the slha file.
+
         :returns: number of xsections that have been computed
         """
+        
         nXSecs = 0 ## count the xsecs we are adding
         if tofile:
             logger.info("Computing SLHA cross section from %s, adding to "

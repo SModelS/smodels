@@ -1,12 +1,9 @@
 """
-.. module:: dgmssm 
-   :synopsis: Defines the BSM particles to be used
-   .
+.. module:: dgmssm
+   :synopsis: Defines the BSM particles to be used. Properties not defined here and defined by the LHE or SLHA input file (such as masses, width and BRs) are automatically added later.
+
 .. moduleauthor:: Sabine Kraml <sabine.kraml@gmail.com>
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
-
-   Properties not defined here and defined by the LHE or SLHA input file 
-   (such as masses, width and BRs) are automatically added later.
 """
 
 from smodels.theory.particle import Particle, MultiParticle
@@ -53,29 +50,29 @@ gluino1 = Particle(Z2parity=-1, label='gluino1', pdg=1000021, eCharge=0, colordi
 gluino2 = Particle(Z2parity=-1, label='gluino2', pdg=2000021, eCharge=0, colordim=8, spin=1./2)
 
 #Neutralinos
-n1 = Particle(Z2parity=-1, label='N1', pdg=1000022, eCharge=0, colordim=1, spin=1./2)  
-n2 = Particle(Z2parity=-1, label='N2', pdg=1000023, eCharge=0, colordim=1, spin=1./2)  
-n3 = Particle(Z2parity=-1, label='N3', pdg=1000025, eCharge=0, colordim=1, spin=1./2)  
-n4 = Particle(Z2parity=-1, label='N4', pdg=1000035, eCharge=0, colordim=1, spin=1./2)  
-n5 = Particle(Z2parity=-1, label='N5', pdg=1000045, eCharge=0, colordim=1, spin=1./2)  
-n6 = Particle(Z2parity=-1, label='N6', pdg=1000055, eCharge=0, colordim=1, spin=1./2)  
+n1 = Particle(Z2parity=-1, label='N1', pdg=1000022, eCharge=0, colordim=1, spin=1./2)
+n2 = Particle(Z2parity=-1, label='N2', pdg=1000023, eCharge=0, colordim=1, spin=1./2)
+n3 = Particle(Z2parity=-1, label='N3', pdg=1000025, eCharge=0, colordim=1, spin=1./2)
+n4 = Particle(Z2parity=-1, label='N4', pdg=1000035, eCharge=0, colordim=1, spin=1./2)
+n5 = Particle(Z2parity=-1, label='N5', pdg=1000045, eCharge=0, colordim=1, spin=1./2)
+n6 = Particle(Z2parity=-1, label='N6', pdg=1000055, eCharge=0, colordim=1, spin=1./2)
 
 #Charginos
-c1 = Particle(Z2parity=-1, label='C1+', pdg=1000024, eCharge=1, colordim=1, spin=1./2)  
-c2 = Particle(Z2parity=-1, label='C2+', pdg=1000037, eCharge=1, colordim=1, spin=1./2)  
-c3 = Particle(Z2parity=-1, label='C3+', pdg=1000047, eCharge=1, colordim=1, spin=1./2)  
+c1 = Particle(Z2parity=-1, label='C1+', pdg=1000024, eCharge=1, colordim=1, spin=1./2)
+c2 = Particle(Z2parity=-1, label='C2+', pdg=1000037, eCharge=1, colordim=1, spin=1./2)
+c3 = Particle(Z2parity=-1, label='C3+', pdg=1000047, eCharge=1, colordim=1, spin=1./2)
 
 #Gravitino
 gravitino = Particle(Z2parity=-1, label='G', pdg=1000039, eCharge=1, colordim=1, spin=1./2)
 
 ##### R-even  ###############
 #Higgs
-H1p = Particle(Z2parity=1, label='H1+', pdg=37, eCharge=+1, colordim=1, spin=0)    
-H2p = Particle(Z2parity=1, label='H2+', pdg=47, eCharge=+1, colordim=1, spin=0)    
-H3p = Particle(Z2parity=1, label='H3+', pdg=57, eCharge=+1, colordim=1, spin=0)    
-H2 = Particle(Z2parity=1, label='H2', pdg=35, eCharge=0, colordim=1, spin=0, _isInvisible=False)  
-H3 = Particle(Z2parity=1, label='H3', pdg=45, eCharge=0, colordim=1, spin=0, _isInvisible=False)  
-H4 = Particle(Z2parity=1, label='H4', pdg=55, eCharge=0, colordim=1, spin=0, _isInvisible=False)  
+H1p = Particle(Z2parity=1, label='H1+', pdg=37, eCharge=+1, colordim=1, spin=0)
+H2p = Particle(Z2parity=1, label='H2+', pdg=47, eCharge=+1, colordim=1, spin=0)
+H3p = Particle(Z2parity=1, label='H3+', pdg=57, eCharge=+1, colordim=1, spin=0)
+H2 = Particle(Z2parity=1, label='H2', pdg=35, eCharge=0, colordim=1, spin=0, _isInvisible=False)
+H3 = Particle(Z2parity=1, label='H3', pdg=45, eCharge=0, colordim=1, spin=0, _isInvisible=False)
+H4 = Particle(Z2parity=1, label='H4', pdg=55, eCharge=0, colordim=1, spin=0, _isInvisible=False)
 A1 = Particle(Z2parity=1, label='A1', pdg=36, eCharge=0, colordim=1, spin=0, _isInvisible=False)
 A2 = Particle(Z2parity=1, label='A2', pdg=46, eCharge=0, colordim=1, spin=0, _isInvisible=False)
 A3 = Particle(Z2parity=1, label='A3', pdg=56, eCharge=0, colordim=1, spin=0, _isInvisible=False)
@@ -89,7 +86,7 @@ squarks = [sdl,sul,sdr,sur] + [ssl,scl,ssr,scr] + [sb1,st1,sb2,st2]
 sleptons = [sel,snel,ser, sner] + [smul,snmul,smur,snmur] + [sta1,sntal,sta2,sntar]
 inos = [gluino1,gluino2] + [n1,n2,n3,n4,n5,n6] + [c1,c2,c3] + [gravitino]
 
-rOdd = squarks + sleptons + inos 
+rOdd = squarks + sleptons + inos
 rOddC = [p.chargeConjugate() for p in rOdd]  #Define the charge conjugates
 
 higgs = [H1p,H2p,H3p,H2,H3,H4,A1,A2,A3]
@@ -99,4 +96,3 @@ higgsC = [p.chargeConjugate() for p in higgs]
 
 BSMList = rOdd + rOddC + higgs + higgsC
 BSMparticleList = MultiParticle('BSM', BSMList)
-

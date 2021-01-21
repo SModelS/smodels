@@ -58,8 +58,8 @@ code (:ref:`Example.py <exampleCode>`) are described below.
           file and specify which BSM particles are even or odd under the assumed
           Z\ :sub:`2` symmetry (see :ref:`adding new particles <newParticles>`).
           From version 1.2.0 onwards it is also necessary to define the BSM particle quantum numbers in the same file [#]_.
-          
-         
+
+
 
 
 
@@ -141,14 +141,14 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileCombineSRs:
 
-  * **combineSRs** (True/False): set to True to use, whenever available, covariance matrices to combine signal regions. NB this might take a few secs per point. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards. 
+  * **combineSRs** (True/False): set to True to use, whenever available, covariance matrices to combine signal regions. NB this might take a few secs per point. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards.
 
 .. _parameterFileParticles:
 
 * *particles*: defines the particle content of the BSM model
- 
+
 .. _parameterFileModel:
- 
+
   * **model**: pathname to the Python file that defines the particle content of the BSM model, given either in Unix file notation ("/path/to/model.py") or as Python module path ("path.to.model"). Defaults to *share.models.mssm* which is a standard MSSM. See smodels/share/models folder for more examples. Directory name can be omitted; in that case, the current working directory as well as smodels/share/models are searched for.
 
 .. _promptWidth:
@@ -166,7 +166,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileSigmacut:
 
-  * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>` 
+  * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>`
     with a weight below sigmacut are neglected during the |decomposition|
     of SLHA files (see :ref:`Minimum Decomposition Weight <minweight>`).
     The default value is 0.03 fb. Note that, depending on the input model, the running time may increase considerably if sigmacut is too low, while too large values might eliminate relevant |elements|.
@@ -193,10 +193,10 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFilePath:
 
-  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Also http addresses may be given, e.g. https://smodels.github.io/database/official113. The path "official" refers to the official database of your SModelS version -- without fastlim; "official_fastlim" includes fastlim results. In addition, the paths "latest_fastlim" and "latest" refer to the latest databases, with and without fastlim results, respectively. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions.  
+  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Also http addresses may be given, e.g. https://smodels.github.io/database/official113. The path "official" refers to the official database of your SModelS version -- without fastlim; "official_fastlim" includes fastlim results. In addition, the paths "latest_fastlim" and "latest" refer to the latest databases, with and without fastlim results, respectively. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions.
 
 .. _parameterFileAnalyses:
-  
+
   * **analyses** (list of results): set to ['all'] to use all available results. If a list of :ref:`experimental analyses <ExpResult>`
     is given, only these will be used. For instance, setting analyses = CMS-PAS-SUS-13-008,ATLAS-CONF-2013-024
     will only use the |results| from `CMS-PAS-SUS-13-008 <https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS13008>`_
@@ -295,8 +295,8 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **addElementList** (True/False): set True to include in the xml output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
-    
-.. _parameterFileAddTxWeightsXML:    
+
+.. _parameterFileAddTxWeightsXML:
 
   * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction. Available v1.1.3 onwards.
 
@@ -331,8 +331,8 @@ The following formats are available:
    |theory predictions| and the :ref:`missing topologies <topCoverage>`. The output can be significantly long, if
    all options are set to True. Due to its broad usage, the xml output can be easily converted to the
    user's preferred format.
-   
- * a :ref:`SLHA file <slhaOut>` containing information about the 
+
+ * a :ref:`SLHA file <slhaOut>` containing information about the
    |theory predictions| and the :ref:`missing topologies <topCoverage>`. The output follows a SLHA-type
    format and contains a summary of the most constraining results and the missed topologies.
 
@@ -479,8 +479,8 @@ can take as arguments specific results to be loaded.
 
 .. literalinclude:: /images/ExampleOutput.txt
    :lines: 588-589
-   
-   
+
+
 * *Identify missing topologies*. Using the output from decomposition, identify
   the :ref:`missing topologies <topCoverage>` and print some basic information:
 
@@ -500,8 +500,8 @@ Due to this, the results are claimed to be "likely excluded" in the output.
 
 
 **Notes:**
- * For an SLHA :ref:`input file <BasicInput>`, the decays of :ref:`final states <final statesEven>` 
-   (or Z\ :sub:`2`-even particles such as the Higgs, W,...) are always ignored during
+ * For an SLHA :ref:`input file <BasicInput>`, the decays of SM :ref:`particles <particleClass>`
+   (or BSM Z\ :sub:`2`-even particles) are always ignored during
    the decomposition. Furthermore, if there are two cross sections at different
    calculation order (say LO and NLO) for the same process, only the highest order is used.
  * The list of |elements| can be extremely long. Try setting **addElementInfo** = False
@@ -511,6 +511,6 @@ Due to this, the results are claimed to be "likely excluded" in the output.
    For a rigorous statistical interpretation, one should use the  :math:`r`-value of
    the result with the highest *expected* :math:`r` (:math:`r_{exp}`).
    Unfortunately, for |ULrs|, the expected limits are often not available;
-   :math:`r_{exp}` is then reported as N/A in the SModelS output.   
+   :math:`r_{exp}` is then reported as N/A in the SModelS output.
 
 .. [#] We note that SLHA files including decay tables and cross sections, together with the corresponding *model.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_

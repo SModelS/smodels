@@ -19,14 +19,8 @@ class Element(object):
     An instance of this class represents an element.
     This class possesses a pair of branches and the element weight
     (cross-section * BR).
-
-    :ivar branches: list of branches (Branch objects)
-    :ivar weight: element weight (cross-section * BR)
-    :ivar motherElements: only for elements generated from a parent element
-                          by mass compression, invisible compression,etc.
-                          Holds a pair of (whence, mother element), where
-                          whence describes what process generated the element
     """
+
     def __init__(self, info=None, finalState=None, intermediateState=None, model=None):
         """
         Initializes the element. If info is defined, tries to generate
@@ -41,8 +35,8 @@ class Element(object):
                                      for each branch  (e.g. [['gluino'], ['gluino']])
         :parameter model: The model (Model object) to be used when converting particle labels to
                           particle objects (only used if info, finalState or intermediateState != None).
-
         """
+
         self.branches = [Branch(), Branch()]
         self.weight = crossSection.XSectionList() # gives the weight for all decays promptly
         self.decayLabels = []

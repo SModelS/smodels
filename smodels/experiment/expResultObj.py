@@ -25,11 +25,6 @@ class ExpResult(object):
     """
     Object  containing the information and data corresponding to an
     experimental result (experimental conference note or publication).
-
-    :ivar path: path to the experimental result folder (i.e. ATLAS-CONF-2013-047)
-    :ivar globalInfo: Info object holding the data in <path>/globalInfo.txt
-    :ivar datasets: List of DataSet objects corresponding to the dataset folders
-                    in <path>
     """
 
     def __init__(self, path = None, discard_zeroes = True, databaseParticles = None):

@@ -105,7 +105,7 @@ class PyhfData:
         """
         Check various inconsistencies of the PyhfData attributes
 
-        :ivar zeroSignalsFlag: boolean identifying if all SRs of a single json are empty
+        :param zeroSignalsFlag: boolean identifying if all SRs of a single json are empty
         """
         if not isinstance(self.nsignals, list):
             logger.error("The `nsignals` parameter must be of type list")
@@ -136,7 +136,7 @@ class PyhfUpperLimitComputer:
     """
     def __init__ ( self, data, cl=0.95):
         """
-        :param: data: instance of `PyhfData` holding the signals information
+        :param data: instance of `PyhfData` holding the signals information
         :param cl: confdence level at which the upper limit is desired to be computed
 
         :ivar data: created from :param data:

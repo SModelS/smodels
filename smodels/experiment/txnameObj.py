@@ -302,8 +302,10 @@ class TxName(object):
 
 
     def getMassVectorFromElement(self, element ):
-        """ given element, extract the mass vector for the
-            server query. element can be list of masses or "Element"
+        """
+        given element, extract the mass vector for the server query.
+        element can be list of masses or "Element"
+
         :returns: eg [[300,100],[300,100]]
         """
         if type(element)==list:

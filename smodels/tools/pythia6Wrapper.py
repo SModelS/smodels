@@ -28,23 +28,22 @@ import tarfile
 
 class Pythia6Wrapper(WrapperBase):
     """
-    An instance of this class represents the installation of pythia6.
-
+    An instance of this class represents the installation of pythia6. nevents keeps track of
+    how many events we run. For each event we only allow a certain computation time:
+    if self.secondsPerEvent * self.nevents > CPU time, we terminate Pythia.
     """
+
     def __init__(self,
                  configFile="<install>/smodels/etc/pythia.card",
                  executablePath="<install>/smodels/lib/pythia6/pythia_lhe",
                  srcPath="<install>/smodels/lib/pythia6/"):
         """
         :param configFile: Location of the config file, full path; copy this
-        file and provide tools to change its content and to provide a template
+                           file and provide tools to change its content and to provide a template
         :param executablePath: Location of executable, full path (pythia_lhe)
-
-        nevents - Keep track of how many events we run over for each event we
-        only allow a certain computation time if
-        self.secondsPerEvent * self.nevents > CPU time, we terminate Pythia.
-
+        :param srcPath: Location of source code
         """
+
         WrapperBase.__init__(self)
         self.name = "pythia6"
         self.executablePath = self.absPath(executablePath)

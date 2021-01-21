@@ -5,7 +5,6 @@
    :synopsis: Provides a class that creates SMSEvents from LHE files.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
-
 """
 
 from smodels.tools.physicsUnits import TeV, pb
@@ -16,19 +15,19 @@ import pyslha
 class LheReader(object):
     """
     An instance of this class represents a reader for LHE files.
-
     """
+
     def __init__(self, filename, nmax=None):
         """
         Constructor.
 
         :param filename: LHE file name
         :param nmax: When using the iterator, then nmax is the maximum number
-        of events to be reader, nmax=None means read till the end of the file.
-        If filename is not a string, assume it is already a file object and do
-        not open it.
-
+                     of events to be reader, nmax=None means read till the end of the file.
+                     If filename is not a string, assume it is already a file object and do
+                     not open it.
         """
+        
         self.filename = filename
         self.nmax = nmax
         self.ctr = 0
