@@ -153,11 +153,11 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _promptWidth:
 
-  * **promptWidth**: total decay width in GeV above which decays are considered prompt; available v2.0 onwards.
+  * **promptWidth**: total decay width in GeV above which decays are considered prompt, default is 1e-8; available v2.0 onwards.
 
 .. _stableWidth:
 
-  * **stableWidth**: total decay width in GeV below which particles are considered as (quasi)stable; available v2.0 onwards.
+  * **stableWidth**: total decay width in GeV below which particles are considered as (quasi)stable, default is 1e-25; available v2.0 onwards.
 
 
 .. _parameterFileParameters:
