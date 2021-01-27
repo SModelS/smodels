@@ -990,12 +990,13 @@ def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_
 
 
 
-def create_index_html(path_to_plots,plot_data,plot_title,plot_list,plot_descriptions):
+def create_index_html(path_to_plots,plot_data,plot_title,plot_list,plot_descriptions,
+                      filename = "index.html"):
     """
     Fills the index.html file with links to the interactive plots.
     """
     
-    main_file= open(path_to_plots+'/index.html', 'w')
+    main_file= open(path_to_plots+'/'+filename, 'w')
     main_file.write('<html><head><font size=6>SModelS interactive plots: '+plot_title+'</font></head>')
     hyperlink_format = '<a href={link}>{text}</a>' 
     for plot in plot_list:

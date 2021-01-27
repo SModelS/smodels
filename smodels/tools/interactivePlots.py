@@ -21,7 +21,7 @@ class DataHolder(object):
     A simple class to store the required data for producing the interactive plots
     """
     
-    def __init__(self,smodelsFolder,slhaFolder,parameterFile):
+    def __init__(self,smodelsFolder,slhaFolder,parameterFile, indexfile ):
         """
         Initializes the class.
         
@@ -34,6 +34,7 @@ class DataHolder(object):
         self.data_dict = []
         self.smodelsFolder = smodelsFolder
         self.slhaFolder = slhaFolder
+        self.indexfile = indexfile
         self.parameterFile = parameterFile
         
         self.slha_hover_information = None 
@@ -281,7 +282,7 @@ class DataHolder(object):
                                                 data_frame_nonexcluded,
                                                 self.plot_data, self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
         
-        helpers.create_index_html(outFolder,self.plot_data,self.plot_title,self.plot_list,plot_descriptions)
+        helpers.create_index_html(outFolder,self.plot_data,self.plot_title,self.plot_list,plot_descriptions, self.indexfile )
         
         logger.info('Generation of interactive plots finished. Go to: \n %s/index.html \n to see the plots.' %outFolder)
         
@@ -291,7 +292,7 @@ class DataHolder(object):
 
 
 def makePlots(smodelsFolder,slhaFolder,outputFolder,
-         parameters,npoints,verbosity):
+         parameters,npoints,verbosity,indexfile = "index.html" ):
     """
     Main interface for the interactive-plots. 
     
@@ -300,6 +301,7 @@ def makePlots(smodelsFolder,slhaFolder,outputFolder,
     :parameter parameters: Path to the parameter file setting the options for the interactive plots
     :parameter npoints: Number of points used to produce the plot. If -1, all points will be used.
     :parameter verbosity: Verbosity of the output (debug,info,warning,error)
+    :parameter indexfile: name of the starting web page (index.html)
     
     :return: True if the plot creation was successfull
     
@@ -322,7 +324,7 @@ def makePlots(smodelsFolder,slhaFolder,outputFolder,
     slhaFolder = slhaFolder
     parFile = parameters
     
-    dataHolder = DataHolder(smodelsFolder,slhaFolder,parFile)
+    dataHolder = DataHolder(smodelsFolder,slhaFolder,parFile, indexfile )
     loadData = dataHolder.loadData(npoints)
     if not loadData:
         raise SModelSError("Error loading data from folders:\n %s\n %s" %(smodelsFolder,slhaFolder))
