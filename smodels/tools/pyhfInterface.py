@@ -23,7 +23,7 @@ except ModuleNotFoundError:
     sys.exit(-1)
 ver = pyhf.__version__.split(".")
 if ver[1]=="4" or (ver[1]=="5" and ver[2] in [ "0", "1" ]):
-    print ( f"[SModelS:pyhfInterface] WARNING you are using pyhf v{pyhf.__version__}." )
+    print ( "[SModelS:pyhfInterface] WARNING you are using pyhf v%s." % pyhf.__version__ )
     print ( "[SModelS:pyhfInterface] We recommend pyhf >= 0.5.2. Please try to update pyhf ASAP!" )
 
 try:
