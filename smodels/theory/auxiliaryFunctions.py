@@ -9,7 +9,10 @@
 from smodels.theory import crossSection
 from smodels.tools.physicsUnits import fb, GeV
 import unum
-from collections.abc import Iterable
+try:
+    from collections.abc import Iterable
+except:
+    from collections import Iterable
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 import numpy as np
