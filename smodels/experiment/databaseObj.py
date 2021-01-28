@@ -415,6 +415,8 @@ class Database(object):
             return ( cDir, filename )
             #return ( cDir, os.path.basename ( filename ) )
 
+        if not os.path.exists ( filename ):
+            return self.fetchFromScratch ( path, store, discard_zeroes )
         stats = os.stat ( filename )
         if stats.st_size < jsn["size"]-2048:
             ## size doesnt match (2048 is to allow for slightly different file
