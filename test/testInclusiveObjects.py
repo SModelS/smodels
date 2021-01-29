@@ -45,6 +45,29 @@ class InclusiveObjectsTest(unittest.TestCase):
         self.assertTrue(x == z)
         self.assertTrue(str(z) == '[*]')
 
+    def testInclusiveVertex(self):
+
+        x = branch.Branch(info='[[q,q],[e-,nu]]',finalState = 'MET',
+        intermediateState = ['gluino','C1+'], model=finalStates)
+        z = branch.InclusiveBranch(model=finalStates)
+        self.assertTrue(x == z)
+        self.assertTrue(str(z) == '[*]')
+
+        z = branch.InclusiveBranch(intermediateState = ['gluino','C1+'],model=finalStates)
+        self.assertTrue(x == z)
+
+        z = branch.InclusiveBranch(finalState = 'MET',
+                    intermediateState = ['gluino','C1+'],model=finalStates)
+        self.assertTrue(x == z)
+
+        z = branch.InclusiveBranch(finalState = 'MET',
+                    intermediateState = ['C1+'],model=finalStates)
+        self.assertFalse(x == z)
+        z = branch.InclusiveBranch(finalState = 'MET',
+                    intermediateState = ['C1+', 'gluino'],model=finalStates)
+        self.assertFalse(x == z)
+
+
     def testInclusiveElement(self):
 
         el1 = element.Element(info='[[[e+],[e-,mu+]],[[*],[e-,mu+]]]',finalState = ['MET','HSCP'], model=finalStates)
@@ -71,6 +94,30 @@ class InclusiveObjectsTest(unittest.TestCase):
         self.assertTrue(str(el1) == "[[[e+],[e-,mu+]],[[*],[e-,mu+]]]")
         self.assertTrue(str(el6) == "[[*],[*]]")
 
+        el10 = element.Element(info="[[[q,q],[e-,nu]],[[e-,nu]]]",
+                                finalState = ['MET','MET'], intermediateState=[['gluino','C1+'],['C1+']],
+                                model=finalStates)
+
+        el11 = element.Element(info="[['*'],['*']]",finalState = ['MET','MET'],
+                      intermediateState=[['C1+'],['C1+']],
+                      model=finalStates)
+        self.assertFalse(el10 == el11)
+        el12 = element.Element(info="[['*'],['*']]",finalState = ['MET','MET'],
+                      intermediateState=[['gluino','C1+'],['C1+']],
+                      model=finalStates)
+        self.assertTrue(el10 == el12)
+
+        el13 = element.Element(info="[[[q,q],[e-,nu]],[]]",
+                                finalState = ['MET','MET'], intermediateState=[['gluino','C1+'],[]],
+                                model=finalStates)
+        el14 = element.Element(info="[['*'],['*']]",finalState = ['MET','MET'],
+                      intermediateState=[['gluino','C1+'],['C1+']],
+                      model=finalStates)
+        self.assertFalse(el13 == el14)
+        el15 = element.Element(info="[['*'],['*']]",finalState = ['MET','MET'],
+                      intermediateState=[['gluino','C1+'],[]],
+                      model=finalStates)
+        self.assertTrue(el13 == el15)
 
     def testInclusiveTxNameData(self):
 

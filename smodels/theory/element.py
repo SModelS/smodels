@@ -80,7 +80,8 @@ class Element(object):
                         finalState = [None]*len(branches)
                     for ibr,branch in enumerate(branches):
                         if branch == '[*]':
-                            self.branches.append(InclusiveBranch(finalState[ibr],model=model))
+                            self.branches.append(InclusiveBranch(finalState[ibr],
+                                                  intermediateState=intermediateState[ibr],model=model))
                         else:
                             self.branches.append(Branch(branch,finalState[ibr],
                                                     intermediateState[ibr],model=model))

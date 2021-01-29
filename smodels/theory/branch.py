@@ -439,11 +439,11 @@ def decayBranches(branchList, sigcut=0.):
 
 class InclusiveBranch(Branch):
     """
-    An inclusive branch class. It will return True when compared to any other branch object
-    with the same final state.
+    An inclusive branch class. It will return True when compared to any other branch object with the same final state. If intermediateState is defined, it will
+    use all the odd (BSM) particles for comparison while neglecting even particles.
     """
 
-    def __init__(self,finalState=None,model=None):
+    def __init__(self,finalState=None,intermediateState=None,model=None):
         """
         :parameter info: string describing the branch in bracket notation
                          (e.g. [[e+],[jet]])
@@ -452,23 +452,39 @@ class InclusiveBranch(Branch):
                          (e.g. 'MET' or 'HSCP')
         :parameter intermediateState: list containing intermediate state labels
                                       (e.g. ['gluino','C1+'])
-        :parameter model: The model (Model object) to be used when converting particle labels to
-                          particle objects (only used if info, finalState or intermediateState != None).
+        :parameter model: The model (Model object) to be used when converting particle labels to particle objects (only used if info, finalState or intermediateState != None).
         """
         Branch.__init__(self)
         self.mass = InclusiveList()
         self.totalwidth = InclusiveList()
         self.evenParticles =  InclusiveList()
-        if finalState:
-            bsmParticle = model.getParticlesWith(label=finalState)
+        self.oddParticles = []
+        #Get labels of intermediate states
+        if intermediateState:
+            if not isinstance(intermediateState,list):
+                raise SModelSError("Intermediate state (``%s'') should be a list)" %intermediateState)
+            bsmLabels = intermediateState[:]
         else:
-            bsmParticle = model.getParticlesWith(label='anyOdd')
-        if not bsmParticle:
-            raise SModelSError("Final state BSM particle ``%s'' has not been defined in finalStateParticles.py" %finalState)
-        if len(bsmParticle) != 1:
-            raise SModelSError("Ambiguous definition of label ``%s'' in finalStates" %bsmParticle[0].label)
-        self.oddParticles = [bsmParticle[0]]
-        self.vertnumb = InclusiveValue()
+            bsmLabels = []
+        if finalState:
+            bsmLabels.append(finalState)
+        else:
+            bsmLabels.append('anyOdd')
+        for bsmLabel in bsmLabels:
+            bsmParticle = model.getParticlesWith(label=bsmLabel)
+            if not bsmParticle:
+                raise SModelSError("BSM particle ``%s'' has not been defined in model %s" %(bsmLabel,model))
+            elif len(bsmParticle) != 1:
+                raise SModelSError("Ambiguous definition of label ``%s'' in model %s" %(bsmLabel,model))
+            else:
+                self.oddParticles.append(bsmParticle[0])
+
+        #If intintermediateState is defined, the number of vertexParticles
+        #(odd particles) must be used for comparison. Otherwise accept any number.
+        if intermediateState:
+            self.vertnumb = len(intermediateState)
+        else:
+            self.vertnumb = InclusiveValue()
         self.vertparts = InclusiveList()
 
     def __cmp__(self,other):
@@ -482,11 +498,18 @@ class InclusiveBranch(Branch):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
-        #If BSM particles are identical, avoid further checks
-        if self.oddParticles and other.oddParticles:
-            #Compare final BSM state by Z2parity and quantum numbers:
-            comp = self.oddParticles[-1].cmpProperties(other.oddParticles[-1],
-                                                       properties=['Z2parity','colordim','eCharge'])
+        #First compare number of vertices. If no intermediate states were
+        #defined, should always pass
+        if self.vertnumb != other.vertnumb:
+            comp = self.vertnumb > other.vertnumb
+            if comp: return 1
+            else: return -1
+
+        #Compare BSM states in reverse order, so the final state is always the first to be compared.
+        # (if no intermediate states were defined, self.oddParticles contain only the final state)
+        for iptc,ptc in enumerate(self.oddParticles[::-1]):
+            iother = -1-iptc #reverse index
+            comp = ptc > other.oddParticles[iother]
             if comp:
                 return comp
 
@@ -502,8 +525,8 @@ class InclusiveBranch(Branch):
         :returns: dictionary containing vertices and number of final states information
         """
 
-        vertnumb = InclusiveValue()
-        vertparts = InclusiveList()
+        vertnumb = self.vertnumb
+        vertparts = self.vertparts
 
         return {"vertnumb" : vertnumb, "vertparts" : vertparts}
 
