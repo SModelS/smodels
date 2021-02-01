@@ -27,9 +27,11 @@ class Model(object):
         :parameter label: Optional string to label the model
         """
 
-
         self.inputFile = None
-        self.BSMparticles = [particle.copy() for particle in BSMparticles]
+        #allBSMparticles stores all possible particles for a given model:
+        self.allBSMparticles = [particle.copy() for particle in BSMparticles]
+        #BSMparticles is used to store the model particles defined by the inputFile
+        self.BSMparticles = self.allBSMparticles[:] #at initialization assume all particles will be used
         self.SMparticles = SMparticles[:]
         self.label = label
 
@@ -146,6 +148,53 @@ class Model(object):
 
         return valueList
 
+    def getModelDataFrom(self,inputFile):
+        """
+        Reads the input file (LHE or SLHA) and extract the relevant information
+        (masses, widths, BRs and cross-sections). If a http address is given, it will
+        attempt to download the file.
+
+        :param inputFile: input file (SLHA or LHE)
+
+        :return: dictionary with masses, dictionary with decays and XSectionList object
+        """
+
+        #Download input file, if requested
+        if inputFile.startswith("http") or inputFile.startswith("ftp"):
+            logger.info("Asked for remote slhafile %s. Fetching it." % inputFile)
+            import requests
+            import os.path
+            r = requests.get(inputFile)
+            if r.status_code != 200:
+                logger.error("Could not retrieve remote file %d: %s" %(r.status_code, r.reason))
+                raise SModelSError()
+            basename = os.path.basename(inputFile)
+            f = open(basename, "w")
+            f.write(r.text)
+            f.close()
+            inputFile = basename
+
+        #Trick to suppress pyslha error messages:
+        import sys
+        storeErr = sys.stderr
+        #Try to read file assuming it is an SLHA file:
+        try:
+            sys.stderr = None
+            res = pyslha.readSLHAFile(inputFile)
+            massDict = res.blocks['MASS']
+            decaysDict = res.decays
+            xsections = crossSection.getXsecFromSLHAFile(inputFile)
+        #If fails assume it is an LHE file:
+        except (IOError,AttributeError,KeyError):
+            massDict,decaysDict = lheReader.getDictionariesFrom(inputFile)
+            xsections = crossSection.getXsecFromLHEFile(inputFile)
+            logger.info("Using LHE input. All unstable particles will be assumed to have prompt decays.")
+            logger.info("Using LHE input. All particles not appearing in the events will be removed from the model.")
+        finally:
+            sys.stderr = storeErr
+
+        return massDict,decaysDict,xsections
+
     def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
                         roundMasses = 1, erasePrompt=['spin','eCharge','colordim']):
         """
@@ -171,45 +220,23 @@ class Model(object):
         if stableWidth is None:
             stableWidth = 1e-25*GeV
 
-        #Download input file, if requested
-        if self.inputFile.startswith("http") or self.inputFile.startswith("ftp"):
-            logger.info("Asked for remote slhafile %s. Fetching it." % self.inputFile)
-            import requests
-            import os.path
-            r = requests.get(self.inputFile)
-            if r.status_code != 200:
-                logger.error("Could not retrieve remote file %d: %s" %(r.status_code, r.reason))
-                raise SModelSError()
-            basename = os.path.basename(self.inputFile)
-            f = open(basename, "w")
-            f.write(r.text)
-            f.close()
-            self.inputFile = basename
+        massDict,decaysDict,xsections = self.getModelDataFrom(self.inputFile)
+        self.xsections = xsections
 
-        #Trick to suppress pyslha error messages:
-        import sys
-        storeErr = sys.stderr
-        try:
-            sys.stderr = None
-            res = pyslha.readSLHAFile(self.inputFile)
-            massDict = res.blocks['MASS']
-            decaysDict = res.decays
-            self.xsections = crossSection.getXsecFromSLHAFile(self.inputFile)
-        except (IOError,AttributeError,KeyError):
-            massDict,decaysDict = lheReader.getDictionariesFrom(self.inputFile)
-            self.xsections = crossSection.getXsecFromLHEFile(self.inputFile)
-            logger.info("Using LHE input. All unstable particles will be assumed to have prompt decays.")
-            logger.info("Using LHE input. All particles not appearing in the events will be removed from the model.")
-            BSMparticlesInEvents = []
-            for particle in self.BSMparticles:
-                if not particle.pdg in massDict and not -particle.pdg in massDict:
-                    continue
-                BSMparticlesInEvents.append(particle)
-            self.BSMparticles = BSMparticlesInEvents
-        finally:
-            sys.stderr = storeErr
+        #Restric BSM particles to the overlap between allBSMparticles and massDict:
+        self.BSMparticles = []
+        for particle in self.allBSMparticles:
+            if not particle.pdg in massDict and not -particle.pdg in massDict:
+                continue
+            self.BSMparticles.append(particle)
+        if len(self.BSMparticles) == len(self.allBSMparticles):
+            logger.info("Loaded %i BSM particles" %(len(self.BSMparticles)))
+        else:
+            logger.info("Loaded %i BSM particles (%i particles not found in %s)"
+                      %(len(self.BSMparticles),len(self.allBSMparticles)-len(self.BSMparticles),
+                      self.inputFile))
 
-        logger.debug("Loaded %i BSM particles" %len(self.BSMparticles))
+
 
         allPDGs = list(set(self.getValuesFor('pdg')))
         evenPDGs = []
