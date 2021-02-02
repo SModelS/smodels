@@ -233,7 +233,7 @@ class RunSModelSTest(unittest.TestCase):
             print ( "This shouldnt throw %s" % e )
             # pass
         """
-        time.sleep(.1)
+        time.sleep(.2)
         for f in os.listdir("."):
             if ".crash" in f:
                 crash_file = f

@@ -27,32 +27,6 @@ import warnings
 setLogLevel ( "warn" )
 
 class ServerTest(unittest.TestCase):
-    def mestRun(self):
-        # port = random.choice ( range(31700, 42000 ) )
-        port = 31771
-        # pclfile = glob.glob("database/db*.pcl" )[0]
-        pclfile = "database/db30.pcl"
-        #server.run ( nonblocking = True )
-        startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i {pclfile} -o ./proxy.pcl -r"
-        cmd = startserver.split(" ")
-        print ( "starting server %s" % startserver )
-        myenv = os.environ.copy()
-        pp=""
-        if "PYTHONPATH" in myenv:
-            pp=":"+myenv["PYTHONPATH"]
-        myenv["PYTHONPATH"]="../" + pp
-        popen = subprocess.Popen ( cmd, stdout = subprocess.PIPE, env=myenv )
-        print ( "started server" )
-        time.sleep(3)
-        filename = "./testFiles/slha/simplyGluino.slha"
-        db = Database("./proxy.pcl" )
-        outputfile = runMain(filename,suppressStdout = False, overridedatabase = db )
-        # for stdout_line in iter(popen.stdout.readline, ""):
-        #    print ( stdout_line )
-        popen.stdout.close()
-        client = DatabaseClient ( port = port ) 
-        client.send_shutdown()
-
     def testCompare(self):
         warnings.simplefilter("ignore", ResourceWarning)
         from simplyGluino_default import smodelsOutputDefault
