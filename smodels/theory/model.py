@@ -182,6 +182,10 @@ class Model(object):
             sys.stderr = None
             res = pyslha.readSLHAFile(inputFile)
             massDict = res.blocks['MASS']
+            #Make sure both PDG signs appear in massDict
+            for pdg,mass in massDict.items():
+                if not -pdg in massDict:
+                    massDict[-pdg] = abs(mass)
             decaysDict = res.decays
             xsections = crossSection.getXsecFromSLHAFile(inputFile)
         #If fails assume it is an LHE file:
@@ -343,7 +347,6 @@ class Model(object):
                     logger.warning("No valid decay found for %s. It will be considered stable." %p)
                 particle.totalwidth = 0.*GeV
                 continue
-
 
     def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
                         roundMasses = 1, erasePrompt=['spin','eCharge','colordim']):
