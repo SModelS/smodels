@@ -74,8 +74,8 @@ class ProxyDBCreater:
         """
         dirname = os.path.dirname ( __file__ )
         inputfile = self.inputfile
-        if not "/" in inputfile:
-            inputfile = os.getcwd() + "/" + inputfile
+        #if not "/" in inputfile:
+        #    inputfile = os.getcwd() + "/" + inputfile
         servercmd = "%s/databaseServer.py -R %s -p %d -d %s -v %s" % \
                       ( dirname, self.rundir, self.serverport, inputfile, self.verbstring )
         if really:

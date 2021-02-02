@@ -36,8 +36,9 @@ def verbose_run( flter ):
     for series in alltests:
         for test in series:
             if type(test)!=unittest.suite.TestSuite:
-                print ( "%sError: could not import %s%s" % \
-                        ( colors.error, test, colors.reset ) )
+                print ( "%sError: could not import ``%s'' {%s}" % \
+                        ( colors.error, test, type(test) ) )
+                print ( test._exception, colors.reset )
                 continue
             for t in test:
                 if flter and (not flter in str(t)):
