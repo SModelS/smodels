@@ -195,48 +195,13 @@ class Model(object):
 
         return massDict,decaysDict,xsections
 
-    def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
-                        roundMasses = 1, erasePrompt=['spin','eCharge','colordim']):
+    def getEvenOddList(self):
         """
-        Update mass, total width and branches of allParticles particles from input SLHA or LHE file.
+        Get the list of even and odd particles, according to the Z2 parity value
+        defined for each particle.
 
-        :param inputFile: input file (SLHA or LHE)
-
-        :param promptWidth: Maximum width for considering particles as decaying prompt. If None, it
-                            will be set 1e-8 GeV.
-        :param stableWidth: Minimum width for considering particles as stable. If None, it
-                            will be set 1e-25 GeV.
-        :param roundMasses: If set, it will round the masses to this number of digits (int)
-
-        :param erasePromptQNs: If set, all particles with prompt decays (totalwidth > promptWidth)
-                               will have the corresponding properties (quantum numbers). So all particles with the same
-                               mass and Z2parity will be considered as equal when combining elements.
-
+        :return: list with PDGs of even particles, list with PDGs of odd particles
         """
-
-        self.inputFile = inputFile
-        if promptWidth is None:
-            promptWidth = 1e-8*GeV
-        if stableWidth is None:
-            stableWidth = 1e-25*GeV
-
-        massDict,decaysDict,xsections = self.getModelDataFrom(self.inputFile)
-        self.xsections = xsections
-
-        #Restric BSM particles to the overlap between allBSMparticles and massDict:
-        self.BSMparticles = []
-        for particle in self.allBSMparticles:
-            if not particle.pdg in massDict and not -particle.pdg in massDict:
-                continue
-            self.BSMparticles.append(particle)
-        if len(self.BSMparticles) == len(self.allBSMparticles):
-            logger.info("Loaded %i BSM particles" %(len(self.BSMparticles)))
-        else:
-            logger.info("Loaded %i BSM particles (%i particles not found in %s)"
-                      %(len(self.BSMparticles),len(self.allBSMparticles)-len(self.BSMparticles),
-                      self.inputFile))
-
-
 
         allPDGs = list(set(self.getValuesFor('pdg')))
         evenPDGs = []
@@ -247,7 +212,17 @@ class Model(object):
             elif all(p.Z2parity == -1 for p in self.getParticlesWith(pdg=pdg)):
                 oddPDGs.append(pdg)
 
-        #Remove cross-sections for even particles or particles which do not belong to the model:
+        return evenPDGs,oddPDGs
+
+    def filterCrossSections(self):
+        """
+        Remove cross-sections for even particles or particles which do not belong to the model.
+        Valid cross-sections are stored in self.xsections
+
+        :return: Number of cross-sections after filter.
+        """
+
+        evenPDGs,oddPDGs = self.getEvenOddList()
         modelPDGs = [particle.pdg for particle in self.BSMparticles if isinstance(particle.pdg,int)]
         for xsec in self.xsections.xSections[:]:
             for pid in xsec.pid:
@@ -258,6 +233,16 @@ class Model(object):
                     logger.debug("Cross-section for %s includes even particles and will be ignored" %str(xsec.pid))
                     self.xsections.delete(xsec)
 
+        return len(self.xsections.xSections)
+
+    def setMasses(self,massDict,roundMasses):
+        """
+        Define particle masses using massDict.
+
+        :param roundMasses: If set, it will round the masses to this number of digits (int)
+        :param massDict: dictionary with PDGs as keys and masses as values.
+        """
+
         for particle in self.BSMparticles:
             if isinstance(particle,MultiParticle):
                 continue
@@ -266,7 +251,6 @@ class Model(object):
                 raise SModelSError("PDG and/or Z2-parity for particle %s has not been defined" %particle.label)
 
             pdg = particle.pdg
-
             if abs(pdg) in massDict.keys():
                 if roundMasses and int(roundMasses) > 0:
                     particle.mass = round(abs(massDict[abs(pdg)]),int(roundMasses))*GeV
@@ -275,8 +259,20 @@ class Model(object):
             else:
                 raise SModelSError("No mass found for %i in input file %s." %(particle.pdg,self.inputFile))
 
-            particle.decays = []
+    def setDecays(self,decaysDict,promptWidth,stableWidth,erasePrompt):
 
+        allPDGs = list(set(self.getValuesFor('pdg')))
+        evenPDGs,oddPDGs = self.getEvenOddList()
+
+        for particle in self.BSMparticles:
+            if isinstance(particle,MultiParticle):
+                continue
+
+            if not hasattr(particle,'pdg') or not hasattr(particle,'Z2parity'):
+                raise SModelSError("PDG and/or Z2-parity for particle %s has not been defined" %particle.label)
+
+            pdg = particle.pdg
+            particle.decays = []
             if pdg in decaysDict:
                 particleData = decaysDict[pdg]
                 chargeConj = 1
@@ -348,6 +344,61 @@ class Model(object):
                 particle.totalwidth = 0.*GeV
                 continue
 
+
+    def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
+                        roundMasses = 1, erasePrompt=['spin','eCharge','colordim']):
+        """
+        Update mass, total width and branches of allParticles particles from input SLHA or LHE file.
+
+        :param inputFile: input file (SLHA or LHE)
+
+        :param promptWidth: Maximum width for considering particles as decaying prompt. If None, it
+                            will be set 1e-8 GeV.
+        :param stableWidth: Minimum width for considering particles as stable. If None, it
+                            will be set 1e-25 GeV.
+        :param roundMasses: If set, it will round the masses to this number of digits (int)
+
+        :param erasePromptQNs: If set, all particles with prompt decays (totalwidth > promptWidth)
+                               will have the corresponding properties (quantum numbers). So all particles with the same
+                               mass and Z2parity will be considered as equal when combining elements.
+
+        """
+
+        self.inputFile = inputFile
+        if promptWidth is None:
+            promptWidth = 1e-8*GeV
+        if stableWidth is None:
+            stableWidth = 1e-25*GeV
+
+        massDict,decaysDict,xsections = self.getModelDataFrom(self.inputFile)
+        self.xsections = xsections
+
+        #Restric BSM particles to the overlap between allBSMparticles and massDict:
+        self.BSMparticles = []
+        for particle in self.allBSMparticles:
+            if not particle.pdg in massDict and not -particle.pdg in massDict:
+                continue
+            self.BSMparticles.append(particle)
+        if len(self.BSMparticles) == len(self.allBSMparticles):
+            logger.info("Loaded %i BSM particles" %(len(self.BSMparticles)))
+        else:
+            logger.info("Loaded %i BSM particles (%i particles not found in %s)"
+                      %(len(self.BSMparticles),len(self.allBSMparticles)-len(self.BSMparticles),
+                      self.inputFile))
+
+        #Remove cross-sections for even particles:
+        nXsecs = self.filterCrossSections()
+        if nXsecs == 0:
+            msg = "No cross-sections found in %s for the Z2 odd BSM particles. "%self.inputFile
+            msg += "Check if the model is compatible with the input file."
+            logger.error(msg)
+            raise SModelSError(msg)
+
+        #Set particl masses:
+        self.setMasses(massDict,roundMasses)
+
+        #Set particle decays
+        self.setDecays(decaysDict,promptWidth,stableWidth,erasePrompt)
 
         #Reset particle equality from all particles:
         for p in Particle.getinstances():
