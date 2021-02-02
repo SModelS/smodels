@@ -59,8 +59,10 @@ class ServerTest(unittest.TestCase):
         filename = "./testFiles/slha/simplyGluino.slha"
         port = random.choice ( range(31700, 42000 ) )
         # port = 31744
+        dbfile = "database/db30.pcl"
+        dbfile = "unittest"
 
-        startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i database/db30.pcl -o ./proxy.pcl -r -v error"
+        startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i {dbfile} -o ./proxy.pcl -r -v error"
         cmd = startserver.split(" ")
         # print ( "starting server %s" % startserver )
         myenv = os.environ.copy()
