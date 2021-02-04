@@ -373,22 +373,22 @@ class CombinedDataSet(object):
         """
         Sort datasets according to globalInfo.datasetOrder.
         """
+        if hasattr(self.globalInfo, "covariance"):
+            datasets = self._datasets[:]
+            if not hasattr(self.globalInfo, "datasetOrder" ):
+                raise SModelSError("datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
+            datasetOrder = self.globalInfo.datasetOrder
+            if isinstance(datasetOrder,str):
+                datasetOrder = [datasetOrder]
 
-        datasets = self._datasets[:]
-        if not hasattr(self.globalInfo, "datasetOrder" ):
-            raise SModelSError("datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id )
-        datasetOrder = self.globalInfo.datasetOrder
-        if isinstance(datasetOrder,str):
-            datasetOrder = [datasetOrder]
-
-        if len(datasetOrder) != len(datasets):
-            raise SModelSError("Number of datasets in the datasetOrder field does not match the number of datasets for %s"
-                               %self.globalInfo.id)
-        for dataset in datasets:
-            if not dataset.getID() in datasetOrder:
-                raise SModelSError("Dataset ID %s not found in datasetOrder" %dataset.getID())
-            dsIndex = datasetOrder.index(dataset.getID())
-            self._datasets[dsIndex] = dataset
+            if len(datasetOrder) != len(datasets):
+                raise SModelSError("Number of datasets in the datasetOrder field does not match the number of datasets for %s"
+                                   %self.globalInfo.id)
+            for dataset in datasets:
+                if not dataset.getID() in datasetOrder:
+                    raise SModelSError("Dataset ID %s not found in datasetOrder" %dataset.getID())
+                dsIndex = datasetOrder.index(dataset.getID())
+                self._datasets[dsIndex] = dataset
 
 
     def getType(self):
@@ -426,14 +426,29 @@ class CombinedDataSet(object):
         :returns: pyhf upper limit computer, and combinations of signal regions
         """
         # Getting the path to the json files
-        jsonFiles = [os.path.join(self.path, js) for js in self.globalInfo.jsonFiles]
+        jsonFiles = [js for js in self.globalInfo.jsonFiles]
         combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
-        # Constructing the list of signals with subsignals matching each json
+        jsons = self.globalInfo.jsons
         datasets = [ds.getID() for ds in self._datasets]
         total = sum(nsig)
         nsig = [s/total for s in nsig] # Normalising signals to get an upper limit on the events count
-        nsignals = list()
+        # Filtering the json files by looking at the available datasets
         for jsName in self.globalInfo.jsonFiles:
+            if all([ds not in self.globalInfo.jsonFiles[jsName] for ds in datasets]):
+                # No datasets found for this json combination
+                jsIndex = jsonFiles.index(jsName)
+                jsonFiles.pop(jsIndex)
+                jsons.pop(jsIndex)
+                continue
+            if not all([ds in datasets for ds in self.globalInfo.jsonFiles[jsName]]):
+                # Some SRs are missing for this json combination
+                logger.error("Wrong json definition in globalInfo.jsonFiles for json : %s" % jsName)
+        logger.debug("list of datasets: {}".format(datasets))
+        logger.debug("jsonFiles after filtering: {}".format(jsonFiles))
+        logger.debug("jsons after filtering: {}".format([js['channels'][0]['name'] for js in jsons]))
+        # Constructing the list of signals with subsignals matching each json
+        nsignals = list()
+        for jsName in jsonFiles:
             subSig = list()
             for srName in self.globalInfo.jsonFiles[jsName]:
                 try:
@@ -445,7 +460,7 @@ class CombinedDataSet(object):
             nsignals.append(subSig)
         # Loading the jsonFiles, unless we already have them (because we pickled)
         from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
-        data = PyhfData(nsignals, self.globalInfo.jsons )
+        data = PyhfData(nsignals, jsons )
         if data.errorFlag: return None
         ulcomputer = PyhfUpperLimitComputer(data)
         return ulcomputer,combinations

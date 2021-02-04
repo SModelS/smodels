@@ -90,8 +90,12 @@ class TheoryPrediction(object):
             if self.dataType() == 'combined':
                 lumi = self.expResult.globalInfo.lumi
                 #Create a list of signal events in each dataset/SR sorted according to datasetOrder
-                srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
-                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
+                if hasattr(self.dataset.globalInfo, "covariance"):
+                    srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
+                    srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
+                elif hasattr(self.dataset.globalInfo, "jsonFiles"):
+                    srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
+                    srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
                 self.expectedUL = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=True,deltas_rel=deltas_rel)
                 self.upperLimit = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=False,deltas_rel=deltas_rel)
 
@@ -191,8 +195,12 @@ class TheoryPrediction(object):
         elif self.dataType() == 'combined':
             lumi = self.expResult.globalInfo.lumi
             #Create a list of signal events in each dataset/SR sorted according to datasetOrder
-            srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
-            srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
+            if hasattr(self.dataset.globalInfo, "covariance"):
+                srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
+                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
+            elif hasattr(self.dataset.globalInfo, "jsonFiles"):
+                srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
+                srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
             self.likelihood = self.dataset.combinedLikelihood(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
             self.chi2 = self.dataset.totalChi2(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
 
