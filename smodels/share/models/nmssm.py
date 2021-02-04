@@ -33,19 +33,19 @@ st2 = Particle(Z2parity=-1, label='st_2', pdg=2000006, eCharge=2./3, colordim=3,
 sel = Particle(Z2parity=-1, label='se_L', pdg=1000011, eCharge=-1, colordim=1, spin=0)
 snel = Particle(Z2parity=-1, label='sne_L', pdg=1000012, eCharge=0, colordim=1, spin=0)
 ser = Particle(Z2parity=-1, label='se_R', pdg=2000011, eCharge=0, colordim=1, spin=0)
-sner = Particle(Z2parity=-1, label='sne_R', pdg=2000012, eCharge=0, colordim=1, spin=0)
+
 
 #2nd generation sleptons and its conjugates:
 smul = Particle(Z2parity=-1, label='smu_L', pdg=1000013, eCharge=-1, colordim=1, spin=0)
 snmul = Particle(Z2parity=-1, label='snmu_L', pdg=1000014, eCharge=0, colordim=1, spin=0)
 smur = Particle(Z2parity=-1, label='smu_R', pdg=2000013, eCharge=-1, colordim=1, spin=0)
-snmur = Particle(Z2parity=-1, label='snmu_R', pdg=2000014, eCharge=0, colordim=1, spin=0)
+
 
 #3rd generation sleptons and its conjugates:
 sta1 = Particle(Z2parity=-1, label='sta_1', pdg=1000015, eCharge=-1, colordim=1, spin=0)
 sntal = Particle(Z2parity=-1, label='snta_L', pdg=1000016, eCharge=0, colordim=1, spin=0)
 sta2 = Particle(Z2parity=-1, label='sta_2', pdg=2000015, eCharge=-1, colordim=1, spin=0)
-sntar = Particle(Z2parity=-1, label='snta_R', pdg=2000016, eCharge=0, colordim=1, spin=0)
+
 
 #Gluino:
 gluino = Particle(Z2parity=-1, label='gluino', pdg=1000021, eCharge=0, colordim=8, spin=1./2)
