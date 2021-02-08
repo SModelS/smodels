@@ -80,7 +80,7 @@ sgluon1 = Particle(Z2parity=-1, label='sgluon2', pdg=3000022, eCharge=0, colordi
 
 
 squarks = [sdl,sul,sdr,sur] + [ssl,scl,ssr,scr] + [sb1,st1,sb2,st2]
-sleptons = [sel,snel,ser, sner] + [smul,snmul,smur,snmur] + [sta1,sntal,sta2,sntar]
+sleptons = [sel,snel,ser] + [smul,snmul,smur] + [sta1,sntal,sta2]
 inos = [gluino1,gluino2] + [n1,n2,n3,n4,n5,n6] + [c1,c2,c3] + [gravitino]
 
 rOdd = squarks + sleptons + inos

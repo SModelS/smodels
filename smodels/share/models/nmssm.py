@@ -72,7 +72,7 @@ A1 = Particle(Z2parity=1, label='A1', pdg=36, eCharge=0, colordim=1, spin=0)
 A2 = Particle(Z2parity=1, label='A2', pdg=46, eCharge=0, colordim=1, spin=0)
 
 squarks = [sdl,sul,sdr,sur] + [ssl,scl,ssr,scr] + [sb1,st1,sb2,st2]
-sleptons = [sel,snel,ser, sner] + [smul,snmul,smur,snmur] + [sta1,sntal,sta2,sntar]
+sleptons = [sel,snel,ser] + [smul,snmul,smur] + [sta1,sntal,sta2]
 inos = [gluino] + [n1,n2,n3,n4,n5] + [c1,c2] + [gravitino]
 
 rOdd = squarks + sleptons + inos
