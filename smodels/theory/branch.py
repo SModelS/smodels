@@ -152,10 +152,8 @@ class Branch(object):
 
         return 0  #Branches are equal
 
-
     def __lt__( self, b2 ):
         return self.__cmp__(b2) == -1
-
 
     def __eq__( self, b2 ):
         return self.__cmp__(b2) == 0
@@ -509,9 +507,13 @@ class InclusiveBranch(Branch):
         # (if no intermediate states were defined, self.oddParticles contain only the final state)
         for iptc,ptc in enumerate(self.oddParticles[::-1]):
             iother = -1-iptc #reverse index
+            if ptc == other.oddParticles[iother]:
+                continue
             comp = ptc > other.oddParticles[iother]
             if comp:
-                return comp
+                return 1
+            else:
+                return -1
 
         return 0  #Branches are equal
 
