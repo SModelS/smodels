@@ -10,6 +10,11 @@ from __future__ import print_function
 
 
 from smodels.tools import runtime
+#Define your model (list of BSM particles)
+runtime.modelFile = 'smodels.share.models.mssm'
+#runtime.modelFile = 'mssmQNumbers.slha'
+
+
 from smodels.theory import decomposer
 from smodels.tools.physicsUnits import fb, GeV, TeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
@@ -28,11 +33,7 @@ def main():
     """
     Main program. Displays basic use case.
     """
-    #Define your model (list of BSM particles)
-    runtime.modelFile = 'smodels.share.models.mssm'
-#     runtime.modelFile = 'mssmQNumbers.slha'
     model = Model(BSMparticles=BSMList, SMparticles=SMList)
-
     # Path to input file (either a SLHA or LHE file)
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
     slhafile = 'inputFiles/slha/lightEWinos.slha'
