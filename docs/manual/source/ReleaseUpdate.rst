@@ -42,20 +42,19 @@ New in Version 2.0.0:
 
   * Introduction of :ref:`particle class <particleClass>`
   * Introduction of model class (see :ref:`Basic Input <basicInput>`)
-  * Unified treatment of SLHA and LHE input files (see :ref:`decomposer <decomp>` and :ref:`LHE-reader <lhereader>`)
-  * :ref:`Decomposition <decomposition>`  and |ExpRess| can now include displaced signatures (see :ref:`Database Structure <databaseStruct>`)
-  * :ref:`Database <widthGrid>` can now handle lifetime dependent results
-  * New :ref:`missing topologies <topCoverage>` algorithm and output
+  * Input model can now be defined by an SLHA file with :ref:`QNUMBERS blocks <qnumberSLHA>`  
+  * Unified treatment of SLHA and LHE input files (see :ref:`decomposer <decomp>` and :ref:`LHE-reader <lhereader>`)  
+  * :ref:`Decomposition <decomposition>`  and |ExpRess| can now handle :ref:`lifetime dependent results <widthGrid>`
   * Added :ref:`field "type" <txnameFile>` to the experimental results in the database
   * Added (optional) :ref:`field "intermediateState" <txnameFile>` to the experimental results in the database
-  * Input model can now be defined by a SLHA file with :ref:`QNUMBERS blocks <qnumberSLHA>`
-  * Small bug fix in :ref:`likelihood computation <likelihoodCalc>`
+  * Inclusive branches can now describe inclusive vertices  
+  * Added possibility for analysis specific detector size  
+  * New :ref:`missing topologies <topCoverage>` algorithm and output  
+  * Added "latest" and "latest_fastlim" :ref:`Database <parameterFileDatabase>` abbreviations
+  * Added support for central database server  
+  * Small bug fix in :ref:`likelihood computation <likelihoodCalc>`  
   * Changes in output: :ref:`width values added <pyOut>`, :ref:`coverage groups <coverageGroups>` and others (see :ref:`output description <outputDescription>` for details)
   * Added option for signal strength multipliers in :ref:`cross section calculator <xsecCalc>`
-  * Added "latest" and "latest_fastlim" `Database <experiment.html#experiment.databaseObj.Database>`_ abbreviations
-  * Inclusive branches can now describe inclusive vertices
-  * Added support for central database server
-  * Added possibility for analysis specific detector size
 
 
 
