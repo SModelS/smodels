@@ -53,6 +53,11 @@ New in Version 2.0.0:
   * Changes in output: :ref:`width values added <pyOut>`, :ref:`coverage groups <coverageGroups>` and others (see :ref:`output description <outputDescription>` for details)
   * Added option for signal strength multipliers in :ref:`cross section calculator <xsecCalc>`
   * Added "latest" and "latest_fastlim" `Database <experiment.html#experiment.databaseObj.Database>`_ abbreviations
+  * Inclusive branches can now describe inclusive vertices
+  * Added support for central database server
+  * Added possibility for analysis specific detector size
+
+
 
 New in Version 1.2.4:
 ^^^^^^^^^^^^^^^^^^^^^

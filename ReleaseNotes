@@ -1,19 +1,22 @@
-Release v2.0.0, Thu 14 Jan 2021
+Release v2.0.0, Fri 12 Feb 2021
 =======================================================
 
   * Introduction of Particle class
+  * Introduction of model class
   * Unified treatment of SLHA and LHE input files
   * Decomposition and experimental results can include displaced signatures
   * Database can now handle lifetime dependent results
   * New simplified missing topologies algorithm and output
   * Added field "type" to the experimental results in the database
+  * Added (optional) "intermediateState" to the experimental results in the database
   * Input model can now be defined by a SLHA file with QNUMBERS blocks
   * Small bug fix in likelihood computation
   * Changes in output: width values added, coverage groups and others (see manual for details)
   * Added option for signal strength multipliers in cross section calculator
+  * Added "latest" and "latest_fastlim" database abbreviations
+  * Inclusive branches can now describe inclusive vertices
   * Added support for central database server
   * Added possibility for analysis specific detector size
-  * Added "latest" and "latest_fastlim" database abbreviations
 
 Release v1.2.4, Thu 3 Sep 2020
 =======================================================
