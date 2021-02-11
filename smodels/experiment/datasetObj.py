@@ -342,7 +342,8 @@ class DataSet(object):
         m = Data(Nobs,Nexp,bgError**2,deltas_rel=deltas_rel)
         computer = UpperLimitComputer(cl=1.-alpha )
         maxSignalXsec = computer.ulSigma(m)
-        maxSignalXsec = maxSignalXsec/self.globalInfo.lumi
+        if maxSignalXsec != None:
+            maxSignalXsec = maxSignalXsec/self.globalInfo.lumi
 
         return maxSignalXsec
 
@@ -479,8 +480,9 @@ class CombinedDataSet(object):
                                         marginalize=self._marginalize,
                                         expected=expected)
 
-            #Convert limit on total number of signal events to a limit on sigma*eff
-            ret = ret/self.globalInfo.lumi
+            if ret != None:
+                #Convert limit on total number of signal events to a limit on sigma*eff
+                ret = ret/self.globalInfo.lumi
             logger.debug("SL upper limit : {}".format(ret))
             return ret
         elif hasattr(self.globalInfo, "jsonFiles" ):
