@@ -53,9 +53,10 @@ class OutputStatus(object):
         self.filestatus = status[0]
         self.warnings = status[1]
         self.databaseVersion = databaseVersion
-        self.statusStrings = {-1: "#could not run the decomposition",
-                              - 4: "#database not found",
-                              - 2: "#bad input file, did not run decomposition",
+        self.statusStrings = {-4: "#database not found",
+                              -3: "#no topology passed cut on production cross section",
+                              -2: "#bad input file, did not run decomposition",
+                              -1: "#could not run the decomposition",
                                0: "#no matching experimental results",
                                1: "#decomposition was successful"}
 
