@@ -11,6 +11,5 @@ dependencies:
     - scipy
     - docutils
     - unum
-    - argparse
     - requests
     - pyslha
