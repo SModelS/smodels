@@ -34,11 +34,100 @@ try:
     import cPickle as serializer
 except ImportError as e:
     import pickle as serializer
-
-
+    
 class Database(object):
+    """ Database object. Holds a list of SubDatabases.
+        Delegates all calls to SubDatabases.
     """
-    Database object. Holds a list of ExpResult objects.
+    def __init__(self, base=None, force_load = None, discard_zeroes = True,
+                  progressbar = False, subpickle = True):
+        """
+        :param base: path to the database, or pickle file (string), or http
+                     address. If None, "official", or "official_fastlim",
+                     use the official database for your code version
+                     (including fastlim results, if specified).
+                     If "latest", or "latest_fastlim", check for the latest database.
+        :param force_load: force loading the text database ("txt"),
+                           or binary database ("pcl"), dont force anything if None
+        :param discard_zeroes: discard txnames with only zeroes as entries.
+        :param progressbar: show a progressbar when building pickle file
+                            (needs the python-progressbar module)
+        :param subpickle: produce small pickle files per exp result.
+                          Should only be used when working on the database.
+        """
+        self.subs = []
+        sstrings = base.split ( "+" )
+        for ss in sstrings:
+            self.subs.append ( SubDatabase ( ss, force_load, discard_zeroes, 
+                                             progressbar, subpickle ) )
+
+    def __str__(self):
+        r = [ str(x) for x in self.subs ]
+        return "+".join(r)
+
+    def __eq__( self, other ):
+        if other in [ None, False, True ]:
+            return False
+        for x,y in zip ( self.subs, other.subs ):
+            if x != y:
+                return False
+        return True
+
+    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
+                    dataTypes = ['all'], useSuperseded=False, useNonValidated=False,
+                    onlyWithExpected = False ):
+        """
+        Returns a list of ExpResult objects.
+
+        Each object refers to an analysisID containing one (for UL) or more
+        (for Efficiency maps) dataset (signal region) and each dataset
+        containing one or more TxNames.  If analysisIDs is defined, returns
+        only the results matching one of the IDs in the list.  If dataTypes is
+        defined, returns only the results matching a dataType in the list.  If
+        datasetIDs is defined, returns only the results matching one of the IDs
+        in the list.  If txname is defined, returns only the results matching
+        one of the Tx names in the list.
+
+        :param analysisIDs: list of analysis ids ([CMS-SUS-13-006,...]). Can
+                            be wildcarded with usual shell wildcards: * ? [<letters>]
+                            Furthermore, the centre-of-mass energy can be chosen
+                            as suffix, e.g. ":13*TeV". Note that the asterisk
+                            in the suffix is not a wildcard.
+        :param datasetIDs: list of dataset ids ([ANA-CUT0,...]). Can be wildcarded
+                            with usual shell wildcards: * ? [<letters>]
+        :param txnames: list of txnames ([TChiWZ,...]). Can be wildcarded with
+                            usual shell wildcards: * ? [<letters>]
+        :param dataTypes: dataType of the analysis (all, efficiencyMap or upperLimit)
+                            Can be wildcarded with usual shell wildcards: * ? [<letters>]
+        :param useSuperseded: If False, the supersededBy results will not be included
+        :param useNonValidated: If False, the results with validated = False
+                                will not be included
+        :param onlyWithExpected: Return only those results that have expected values
+                 also. Note that this is trivially fulfilled for all efficiency maps.
+        :returns: list of ExpResult objects or the ExpResult object if the list
+                  contains only one result
+
+        """
+        ret = []
+        for sub in self.subs:
+            tmp = sub.getExpResults( analysisIDs, datasetIDs, txnames, dataTypes, 
+                    useSuperseded, useNonValidated, onlyWithExpected )
+            for t in tmp:
+                ret.append ( t )
+        return ret
+            
+    @property
+    def databaseVersion(self):
+        """
+        The version of the database, concatenation of the individual versions
+
+        """
+        r = [ x.databaseVersion for x in self.subs ]
+        return "+".join ( r )
+
+class SubDatabase(object):
+    """
+    SubDatabase object. Holds a list of ExpResult objects.
     """
 
     def __init__(self, base=None, force_load = None, discard_zeroes = True,
