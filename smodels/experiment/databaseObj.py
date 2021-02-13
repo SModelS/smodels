@@ -61,9 +61,97 @@ class Database(object):
             self.subs.append ( SubDatabase ( ss, force_load, discard_zeroes, 
                                              progressbar, subpickle ) )
 
+    @property
+    def expResultList(self):
+        """
+        The combined list, compiled from the individual lists
+
+        """
+        if len(self.subs)==0:
+            return []
+        D = {}
+        ## FIXME make this smarter
+        for sub in self.subs:
+            tmp = sub.expResultList
+            for t in tmp:
+                anaid = t.globalInfo.id + t.datasets[0].getType()
+                if not anaid in D:
+                    D[anaid]=t
+                else: ## FIXME merge expResults
+                    D[anaid]=self.mergeERs ( D[anaid], t )
+        return list ( D.values() )
+
+    def mergeERs ( self, r1, r2 ):
+        """ merge the content of exp res r1 and r2 """
+        dids = [ x.getID() for x in r1 ]
+        for ds in r2.datasets:
+            if not ds.getID() in dids: ## completely new dataset
+                r1.datasets.append ( ds )
+            else: ## just overwrite the old txnames
+                idx = dids.index ( ds.getID() ) ## ds index
+                r2txs = ds.txnameList
+                r1txnames = [ x.txName for x in  r1.datasets[idx].txnameList ]
+                for txn in r2txs:
+                     if txn.txName in r1txnames:
+                        tidx = r1txnames.index ( txn.txName ) ## overwrite
+                        r1.datasets[idx].txnameList[tidx]=txn
+                     else:
+                        # a new txname
+                        r1.datasets[idx].txnameList.append ( txn )
+
+                # r1.datasets[idx].
+        return r1
+
+    def createBinaryFile(self, filename ):
+        """ create a pcl file from all the subs """
+        ## make sure we have a model to pickle with the database!
+        logger.debug(  " * create %s" % filename )
+        with open( filename, "wb" ) as f:
+            logger.debug(  " * load text database" )
+            logger.debug(  " * write %s db version %s" % \
+                    ( filename, self.databaseVersion ) )
+            ptcl = min ( 4, serializer.HIGHEST_PROTOCOL ) 
+            ## 4 is default protocol in python3.8, and highest protocol in 3.7
+            serializer.dump(self.txt_meta, f, protocol=ptcl)
+            serializer.dump(self.expResultList, f, protocol=ptcl)
+            serializer.dump(self.databaseParticles, f, protocol=ptcl )
+            logger.info(  "%s created." % ( filename ) )
+
     def __str__(self):
-        r = [ str(x) for x in self.subs ]
-        return "+".join(r)
+        # r = [ str(x) for x in self.subs ]
+        # return "+".join(r)
+        idList = "Database version: " + self.databaseVersion
+        idList += "\n"
+        idList += "-" * len(idList) + "\n"
+        if self.expResultList == None:
+            idList += "no experimental results available! "
+            return idList
+        idList += "%d experimental results: " % \
+                   len( self.expResultList )
+        atlas,cms = [],[]
+        datasets = 0
+        txnames = 0
+        s = { 8:0, 13:0  }
+        for expRes in self.expResultList:
+            Id = expRes.globalInfo.getInfo('id')
+            sqrts = expRes.globalInfo.getInfo('sqrts').asNumber( TeV )
+            if not sqrts in s.keys():
+                s[sqrts] = 0
+            s[sqrts]+=1
+            datasets += len( expRes.datasets )
+            for ds in expRes.datasets:
+                txnames += len( ds.txnameList )
+            if "ATLAS" in Id:
+                atlas.append( expRes )
+            if "CMS" in Id:
+                cms.append( expRes )
+        idList += "%d CMS, %d ATLAS, " % ( len(cms), len(atlas) )
+        for sqrts in s.keys():
+            idList += "%d @ %d TeV, " % ( s[sqrts], sqrts )
+            # idList += expRes.globalInfo.getInfo('id') + ', '
+        idList = idList[:-2] + '\n'
+        idList += "%d datasets, %d txnames.\n" % ( datasets, txnames )
+        return idList
 
     def __eq__( self, other ):
         if other in [ None, False, True ]:
@@ -112,10 +200,18 @@ class Database(object):
         for sub in self.subs:
             tmp = sub.getExpResults( analysisIDs, datasetIDs, txnames, dataTypes, 
                     useSuperseded, useNonValidated, onlyWithExpected )
-            for t in tmp:
+            for t in tmp: ## FIXME merge more smartly
                 ret.append ( t )
         return ret
-            
+
+    @property
+    def databaseParticles(self):
+        """
+        Database particles, a list, one entry per sub
+        """
+        r = [ x.databaseParticles for x in self.subs ]
+        return r[0] ## FIXME do sth smarter?
+
     @property
     def databaseVersion(self):
         """
@@ -124,6 +220,18 @@ class Database(object):
         """
         r = [ x.databaseVersion for x in self.subs ]
         return "+".join ( r )
+
+    @property
+    def txt_meta(self):
+        """
+        The meta info of the text version, a merger of the original ones
+
+        """
+        r = [ x.txt_meta for x in self.subs ]
+        ret = r[0]
+        #for i in r[1:]:
+        #    ret.databaseVersion+="+"+i.databaseVersion
+        return ret
 
 class SubDatabase(object):
     """
