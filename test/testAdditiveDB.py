@@ -46,5 +46,21 @@ class AdditiveDBTest(unittest.TestCase):
         tx2 = tx2[0]
         self.assertTrue ( len(tx2) == len(tx1)+1 )
 
+    def testAddingDataset(self):
+        """ tests adding a dataset """
+        sel = ["CMS-SUS-13-012" ]
+        tx1, tx2 = [], []
+        db1 = Database ( "./database/" )
+        for er1 in db1.getExpResults( analysisIDs= sel ): 
+            tx1.append ( er1.getTxNames() )
+        tx1 = tx1[0]
+        db2 = Database ( "./database/+./dbadd1/" ) ## adds a t1 txname
+        self.assertTrue ( len(db2.expResultList) == len(db1.expResultList) )
+        for er2 in db2.getExpResults( analysisIDs = sel ):
+            tx2.append ( er2.getTxNames() )
+        tx2 = tx2[0]
+        db2 = Database ( "./database/+./dbadd1/" ) ## adds a t1 txname
+        self.assertTrue ( len(tx2) == len(tx1)+5 )
+
 if __name__ == "__main__":
     unittest.main()
