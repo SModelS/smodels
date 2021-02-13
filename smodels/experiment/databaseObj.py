@@ -19,6 +19,7 @@ import os
 os.environ["OMP_NUM_THREADS"]="2"
 import sys
 import time
+import copy
 from smodels.experiment import datasetObj
 from smodels.installation import cacheDirectory
 from smodels.experiment.metaObj import Meta
@@ -69,10 +70,14 @@ class Database(object):
         """
         if len(self.subs)==0:
             return []
+
+        lists = [ x.expResultList for x in self.subs ]
+        return self.mergeLists ( lists )
+
+    def mergeLists ( self, lists ):
+        """ small function, merges lists of ERs """
         D = {}
-        ## FIXME make this smarter
-        for sub in self.subs:
-            tmp = sub.expResultList
+        for tmp in lists:
             for t in tmp:
                 anaid = t.globalInfo.id + t.datasets[0].getType()
                 if not anaid in D:
@@ -81,9 +86,10 @@ class Database(object):
                     D[anaid]=self.mergeERs ( D[anaid], t )
         return list ( D.values() )
 
-    def mergeERs ( self, r1, r2 ):
+    def mergeERs ( self, o1, r2 ):
         """ merge the content of exp res r1 and r2 """
-        dids = [ x.getID() for x in r1 ]
+        r1 = copy.deepcopy ( o1 )
+        dids = [ x.getID() for x in o1.datasets ]
         for ds in r2.datasets:
             if not ds.getID() in dids: ## completely new dataset
                 r1.datasets.append ( ds )
@@ -98,8 +104,6 @@ class Database(object):
                      else:
                         # a new txname
                         r1.datasets[idx].txnameList.append ( txn )
-
-                # r1.datasets[idx].
         return r1
 
     def createBinaryFile(self, filename ):
@@ -154,7 +158,7 @@ class Database(object):
         return idList
 
     def __eq__( self, other ):
-        if other in [ None, False, True ]:
+        if type(other) != type(self):
             return False
         for x,y in zip ( self.subs, other.subs ):
             if x != y:
@@ -200,9 +204,8 @@ class Database(object):
         for sub in self.subs:
             tmp = sub.getExpResults( analysisIDs, datasetIDs, txnames, dataTypes, 
                     useSuperseded, useNonValidated, onlyWithExpected )
-            for t in tmp: ## FIXME merge more smartly
-                ret.append ( t )
-        return ret
+            ret.append ( tmp )
+        return self.mergeLists ( ret )
 
     @property
     def databaseParticles(self):
