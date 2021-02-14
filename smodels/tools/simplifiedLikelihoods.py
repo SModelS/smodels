@@ -369,13 +369,26 @@ class LikelihoodComputer:
         else:
             lmbda = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
         lmbda[lmbda<=0.] = 1e-30 ## turn zeroes to small values
+        obs = self.model.observed
+        def is_integer ( x ):
+            if type(x) in [ int, NP.int64 ]:
+                return True
+            if type(x) in [ float ]:
+                return x.is_integer()
+            return False
+        allintegers = NP.all ( [is_integer( i ) for i in obs ] )
         if nll:
-            #poisson = self.model.observed * log ( lmbda ) - lmbda #- self.gammaln
-            poisson = stats.poisson.logpmf( self.model.observed, lmbda )
-            #print ( "p",poisson,poisson2 )
+            if allintegers:
+                poisson = stats.poisson.logpmf( obs, lmbda )
+            else:
+                poisson = -lmbda + obs * NP.log(lmbda) - special.loggamma(obs+1)
         else:
-            poisson = stats.poisson.pmf( self.model.observed, lmbda )
-            #print ( "nonll",poisson )
+            if allintegers:
+                poisson = stats.poisson.pmf( obs, lmbda )
+            else:
+                # poisson = NP.exp(-lmbda)*NP.power(lmbda,obs)/special.gamma(obs+1)
+                logpoiss = -lmbda + obs * NP.log(lmbda) - special.loggamma(obs+1)
+                poisson = NP.exp(logpoiss)
         try:
             M = [0.]*len(theta)
             C = self.model.V
@@ -737,7 +750,8 @@ class UpperLimitComputer:
             model = copy.deepcopy(oldmodel)
             #model.observed = model.backgrounds
             for i,d in enumerate(model.backgrounds):
-                model.observed[i]=int(NP.round(d))
+                # model.observed[i]=int(NP.round(d))
+                model.observed[i]=float(d)
         computer = LikelihoodComputer(model, toys)
         mu_hat = computer.findMuHat(model.signal_rel)
         theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
