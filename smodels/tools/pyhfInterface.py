@@ -361,7 +361,7 @@ class PyhfUpperLimitComputer:
             msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
             model = workspace.model(modifier_settings=msettings)
             start = time.time()
-            result = pyhf.infer.hypotest(mu, workspace.data(model), model, qtilde=True, return_expected = expected)
+            result = pyhf.infer.hypotest(mu, workspace.data(model), model, test_stat="qtilde", return_expected = expected)
             end = time.time()
             logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
             if expected:
