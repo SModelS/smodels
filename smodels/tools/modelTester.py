@@ -287,37 +287,47 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
                         databaseVersion, listOfExpRes, timeout,
                         development, parameterFile)
     else:
-        logger.info("Running SModelS for %i files with %i processes. Messages will be redirected to smodels.log"
-                    %(nFiles,ncpus))
         for hdlr in logger.handlers[:]:
             logger.removeHandler(hdlr)
         fileLog = logging.FileHandler('./smodels.log')
         logger.addHandler(fileLog)
 
-        ### now split list of files
-        chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
-        pool = multiprocessing.Pool(processes=ncpus)
-        children = []
-        for chunkFile in chunkedFiles:
-            p = pool.apply_async(runSetOfFiles, args=(chunkFile, outputDir, parser,
-                                                      databaseVersion, listOfExpRes, timeout,
-                                                  development, parameterFile,))
-            children.append(p)
-        pool.close()
-        iprint, nprint = 5,5 #Define when to start printing and the percentage step
-        #Check process progress until they are all finished
-        while True:
-            done = sum([p.ready() for p in children])
-            fracDone = 100*float(done)/len(children)
-            if fracDone >= iprint:
-                while fracDone >= iprint:
-                    iprint += nprint
-                logger.info('%i%% of processes done in %1.2f min' %(iprint-nprint,(time.time()-t0)/60.))
-            if done == len(children):
-                break
-            time.sleep(2)
+        if ncpus == 1:
+            logger.info("Running SModelS for %i files with a single process. Messages will be redirected to smodels.log"
+                    %(nFiles))
 
-        logger.debug("All children terminated")
+            ### Run a single process:
+            runSetOfFiles(cleanedList,outputDir, parser,
+                              databaseVersion, listOfExpRes, timeout,
+                              development, parameterFile)
+        else:
+            logger.info("Running SModelS for %i files with %i processes. Messages will be redirected to smodels.log"
+                    %(nFiles,ncpus))
+            ### Launch multiple processes.
+            ### Split list of files
+            chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
+            pool = multiprocessing.Pool(processes=ncpus)
+            children = []
+            for chunkFile in chunkedFiles:
+                p = pool.apply_async(runSetOfFiles, args=(chunkFile, outputDir, parser,
+                                                          databaseVersion, listOfExpRes, timeout,
+                                                      development, parameterFile,))
+                children.append(p)
+            pool.close()
+            iprint, nprint = 5,5 #Define when to start printing and the percentage step
+            #Check process progress until they are all finished
+            while True:
+                done = sum([p.ready() for p in children])
+                fracDone = 100*float(done)/len(children)
+                if fracDone >= iprint:
+                    while fracDone >= iprint:
+                        iprint += nprint
+                    logger.info('%i%% of processes done in %1.2f min' %(iprint-nprint,(time.time()-t0)/60.))
+                if done == len(children):
+                    break
+                time.sleep(2)
+
+            logger.debug("All children terminated")
 
     logger.info("Done in %3.2f min"%((time.time()-t0)/60.))
 
