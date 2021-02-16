@@ -176,6 +176,7 @@ class PyhfUpperLimitComputer:
         except AttributeError:
             pass
         self.scale *= factor
+        logger.debug('new signal scale : {}'.format(self.scale))
         self.patches = self.patchMaker()
         self.workspaces = self.wsMaker()
         try:

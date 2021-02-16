@@ -428,7 +428,7 @@ class CombinedDataSet(object):
         # Getting the path to the json files
         jsonFiles = [js for js in self.globalInfo.jsonFiles]
         combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
-        jsons = self.globalInfo.jsons
+        jsons = self.globalInfo.jsons.copy()
         datasets = [ds.getID() for ds in self._datasets]
         total = sum(nsig)
         nsig = [s/total for s in nsig] # Normalising signals to get an upper limit on the events count
@@ -445,7 +445,6 @@ class CombinedDataSet(object):
                 logger.error("Wrong json definition in globalInfo.jsonFiles for json : %s" % jsName)
         logger.debug("list of datasets: {}".format(datasets))
         logger.debug("jsonFiles after filtering: {}".format(jsonFiles))
-        logger.debug("jsons after filtering: {}".format([js['channels'][0]['name'] for js in jsons]))
         # Constructing the list of signals with subsignals matching each json
         nsignals = list()
         for jsName in jsonFiles:
