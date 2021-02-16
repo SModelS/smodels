@@ -9,3 +9,4 @@ Known Issues, v2.0.0
  * SUSYHit includes the PDG codes 4000001 and 3000001 for some
    decays. These are not included in the SM particle definitions
    and should be added by the user, if needed.
+ * Parallel processing (ncpus > 1) may not work in some machines. Try using ncpus = 1 if this is the case.
