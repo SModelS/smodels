@@ -361,7 +361,8 @@ class PyhfUpperLimitComputer:
             msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
             model = workspace.model(modifier_settings=msettings)
             start = time.time()
-            result = pyhf.infer.hypotest(mu, workspace.data(model), model, test_stat="qtilde", return_expected = expected)
+            stat = "qtilde" # by default
+            result = pyhf.infer.hypotest(mu, workspace.data(model), model, test_stat=stat, return_expected = expected)
             end = time.time()
             logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
             if expected:
@@ -380,9 +381,14 @@ class PyhfUpperLimitComputer:
         wereBothLarge = False
         wereBothTiny = False
         nattempts = 0
+        nNan = 0
         lo_mu, hi_mu = .2, 5.
         while "mu is not in [lo_mu,hi_mu]":
             nattempts += 1
+            if nNan > 5:
+                logger.warn("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
+                stat = "q"
+                nattempts = 0
             if nattempts > 10:
                 logger.warn ( "tried 10 times to determine the bounds for brent bracketing. we abort now." )
                 return None
@@ -395,10 +401,12 @@ class PyhfUpperLimitComputer:
                 factor = 1 + (factor-1)/2
                 logger.debug("Diminishing rescaling factor")
             if np.isnan(rt1):
+                nNan += 1
                 self.rescale(factor)
                 workspace = updateWorkspace()
                 continue
             if np.isnan(rt10):
+                nNan += 1
                 self.rescale(1/factor)
                 workspace = updateWorkspace()
                 continue
