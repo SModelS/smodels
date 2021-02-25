@@ -272,7 +272,7 @@ class PyhfTest(unittest.TestCase):
         model = workspace.model(modifier_settings=msettings)
         bounds = model.config.suggested_bounds()
         bounds[model.config.poi_index] = [0,100]
-        result = pyhf.infer.hypotest(ul, workspace.data(model), model, par_bounds=bounds, qtilde=True, return_expected=False)
+        result = pyhf.infer.hypotest(ul, workspace.data(model), model, par_bounds=bounds, test_stat = "qtilde", return_expected=False)
         try:
             CLs = float(result[0])
         except IndexError:
@@ -317,7 +317,7 @@ class PyhfTest(unittest.TestCase):
         model = workspace.model(modifier_settings=msettings)
         bounds = model.config.suggested_bounds()
         bounds[model.config.poi_index] = [0,100]
-        result = pyhf.infer.hypotest(ul, workspace.data(model), model, par_bounds=bounds, qtilde=True, return_expected=False)
+        result = pyhf.infer.hypotest(ul, workspace.data(model), model, par_bounds=bounds, test_stat = "qtilde", return_expected=False)
         try:
             CLs = float(result[0])
         except IndexError:
