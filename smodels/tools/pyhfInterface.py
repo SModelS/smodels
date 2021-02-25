@@ -362,7 +362,13 @@ class PyhfUpperLimitComputer:
             model = workspace.model(modifier_settings=msettings)
             start = time.time()
             stat = "qtilde" # by default
-            result = pyhf.infer.hypotest(mu, workspace.data(model), model, test_stat=stat, return_expected = expected)
+            args = { "return_expected": expected }
+            pver = float ( pyhf.__version__[:3] )
+            if pver < 0.6:
+                args["qtilde"]=True
+            else:
+                args["test_stat"]=stat
+            result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
             end = time.time()
             logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
             if expected:
