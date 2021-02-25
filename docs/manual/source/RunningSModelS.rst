@@ -56,7 +56,7 @@ code (:ref:`Example.py <exampleCode>`) are described below.
 
 .. note:: For non-MSSM (incl. non-SUSY) input models the user needs to write their own *model.py*
           file and specify which BSM particles are even or odd under the assumed
-          Z\ :sub:`2` symmetry (see :ref:`adding new particles <newParticles>`).
+          Z\ :sub:`2` (or similar) symmetry (see :ref:`adding new particles <newParticles>`).
           From version 1.2.0 onwards it is also necessary to define the BSM particle quantum numbers in the same file [#]_.
 
 
