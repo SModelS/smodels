@@ -277,7 +277,7 @@ class PyhfTest(unittest.TestCase):
         if pver < 0.6:
             args["qtilde"]=True
         else:
-            args["test_stat"]=stat
+            args["test_stat"]="qtilde"
         result = pyhf.infer.hypotest(ul, workspace.data(model), model, par_bounds=bounds, **args )
         try:
             CLs = float(result[0])
@@ -328,7 +328,7 @@ class PyhfTest(unittest.TestCase):
         if pver < 0.6:
             args["qtilde"]=True
         else:
-            args["test_stat"]=stat
+            args["test_stat"]="qtilde"
         result = pyhf.infer.hypotest(ul, workspace.data(model), model, par_bounds=bounds, **args )
         try:
             CLs = float(result[0])
