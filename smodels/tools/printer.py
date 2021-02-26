@@ -1041,7 +1041,7 @@ class SLHAPrinter(TxTPrinter):
             if signalRegion is None:
                 signalRegion = '(UL)'
             r = theoPred.getRValue()
-            r_expected = theoPred.getRValue()
+            r_expected = theoPred.getRValue( expected=True )
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
 
