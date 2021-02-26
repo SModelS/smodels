@@ -169,7 +169,7 @@ Below we give more detailed information about each entry in the parameters file.
   * **sigmacut** (float): minimum value for an |element| weight (in fb). :ref:`Elements <element>`
     with a weight below sigmacut are neglected during the |decomposition|
     of SLHA files (see :ref:`Minimum Decomposition Weight <minweight>`).
-    The default value is 0.03 fb. Note that, depending on the input model, the running time may increase considerably if sigmacut is too low, while too large values might eliminate relevant |elements|.
+    The default value is 0.005 fb. Note that, depending on the input model, the running time may increase considerably if sigmacut is too low, while too large values might eliminate relevant |elements|.
 
 .. _parameterFileMinmassgap:
 
