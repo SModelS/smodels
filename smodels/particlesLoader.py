@@ -91,9 +91,9 @@ def getParticlesFromSLHA(slhafile):
                                 colordim=numbers[3],
                                 spin=(numbers[2]-1.)/2.)
 
-        #Allows a 5-th quantum number defining the Z2-parity:
-        if 5 in numbers:
-            newParticle.Z2parity = numbers[5]
+        #Allows an additional quantum number defining the Z2-parity:
+        if 11 in numbers:
+            newParticle.Z2parity = int((-1)**int(numbers[11]))
         BSMList.append(newParticle)
         if numbers[4]: #Particle is not its own anti-particle
             newParticleC = newParticle.chargeConjugate()

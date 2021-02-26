@@ -32,7 +32,7 @@ st2 = Particle(Z2parity=-1, label='st_2', pdg=2000006, eCharge=2./3, colordim=3,
 #1st generation sleptons and its conjugates:
 sel = Particle(Z2parity=-1, label='se_L', pdg=1000011, eCharge=-1, colordim=1, spin=0)
 snel = Particle(Z2parity=-1, label='sne_L', pdg=1000012, eCharge=0, colordim=1, spin=0)
-ser = Particle(Z2parity=-1, label='se_R', pdg=2000011, eCharge=0, colordim=1, spin=0)
+ser = Particle(Z2parity=-1, label='se_R', pdg=2000011, eCharge=-1, colordim=1, spin=0)
 
 
 #2nd generation sleptons and its conjugates:

@@ -1,23 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="-81 39.643 581.682 247.357" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
     <g>
-        <g latexdraw:type="joinedLines" id="id24161184">
-            <polyline points="180.0,120.0 126.0,68.0 " stroke-width="3.0" stroke="black" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-24161184)"/>
+        <g latexdraw:type="joinedLines" id="id1872980703">
+            <polyline points="180.0,120.0 126.0,68.0 " stroke="black" stroke-width="3.0" fill="black" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-1872980703)"/>
         </g>
-        <g latexdraw:type="text" id="id1590736934" fill="black" latexdraw:position="bl">
+        <g latexdraw:type="text" id="id691171096" fill="black" latexdraw:position="bl">
             <text x="20.0" y="60.0">\textcolor{red}{\large Block identifier}</text>
         </g>
-        <g latexdraw:type="joinedLines" id="id1899736860">
-            <polyline points="314.45843743622,117.35705615913824 278.54156256377973,59.642943840862245 " stroke-width="3.0" stroke="black" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-1899736860)"/>
+        <g latexdraw:type="joinedLines" id="id1448974977">
+            <polyline points="314.45843743622,117.35705615913824 278.54156256377973,59.642943840862245 " stroke="black" stroke-width="3.0" fill="black" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-1448974977)"/>
         </g>
-        <g latexdraw:type="text" id="id770743490" fill="black" latexdraw:position="bl">
+        <g latexdraw:type="text" id="id384359903" fill="black" latexdraw:position="bl">
             <text x="220.0" y="60.0">\textcolor{red}{\large 
 particle PDG
 }</text>
         </g>
-        <g latexdraw:type="joinedLines" id="id18842927">
-            <polyline points="419.3178274005739,134.02735140764491 480.68217259942634,65.97264859235547 " stroke-width="3.0" stroke="black" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-18842927)"/>
+        <g latexdraw:type="joinedLines" id="id196841083">
+            <polyline points="419.3178274005739,134.02735140764491 480.68217259942634,65.97264859235547 " stroke="black" stroke-width="3.0" fill="black" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-196841083)"/>
         </g>
-        <g latexdraw:type="text" id="id1895281499" fill="black" latexdraw:position="bl">
+        <g latexdraw:type="text" id="id1786443949" fill="black" latexdraw:position="bl">
             <text x="80.0" y="267.0">\large 
 \begin{tabular}{l}
 BLOCK QNUMBERS 1000022   \# n1\\
@@ -25,18 +25,18 @@ BLOCK QNUMBERS 1000022   \# n1\\
  \hspace{45pt}  2 \hspace{5pt} 2 \hspace{5pt} \# number of spin states (2s+1)\\
  \hspace{45pt}  3 \hspace{5pt} 1 \hspace{5pt} \# colour rep (1: singlet, 3: triplet, 8: octet)\\
  \hspace{45pt}  4 \hspace{5pt} 0 \hspace{5pt} \# particle/antiparticle distinction (0=own anti)\\
- \hspace{45pt}  \textcolor{red}{5 \hspace{5pt}-1 \hspace{5pt} \# $Z_2$ parity  (1: even, -1:  odd) }
+ \hspace{45pt}  \textcolor{red}{11 \hspace{4pt}1 \hspace{5pt} \# $Z_2$ parity  (0: even, 1:  odd) }
 \end{tabular}</text>
         </g>
-        <g latexdraw:type="text" id="id140992605" fill="black" latexdraw:position="bl">
+        <g latexdraw:type="text" id="id1035162856" fill="black" latexdraw:position="bl">
             <text x="420.0" y="60.0">\textcolor{red}{\large 
 particle label (optional)
 }</text>
         </g>
-        <g latexdraw:type="joinedLines" id="id279374399">
-            <polyline points="73.2907138717701,206.02303230382896 153.70928612822945,249.97696769617096 " stroke-width="3.0" stroke="black" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-279374399)"/>
+        <g latexdraw:type="joinedLines" id="id995534203">
+            <polyline points="73.2907138717701,206.02303230382896 153.70928612822945,249.97696769617096 " stroke="black" stroke-width="3.0" fill="black" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-995534203)"/>
         </g>
-        <g latexdraw:type="text" id="id3561547" fill="black" latexdraw:position="bl">
+        <g latexdraw:type="text" id="id78325963" fill="black" latexdraw:position="bl">
             <text x="-61.0" y="222.0">\textcolor{red}{\large 
 \begin{tabular}{c}
 SModelS specific\\
@@ -46,38 +46,26 @@ SModelS specific\\
         </g>
     </g>
     <defs>
-        <marker overflow="visible" orient="auto" id="arrow0-24161184">
-            <path d="M 0.0 0.0 L 4.034722222222222 1.4409722222222223 L 4.034722222222222 0.0 L 4.034722222222222 -1.4409722222222223 z " latexdraw:arrSizeNum="2.0" fill="black"/>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="43.919" id="arrow0-1872980703">
+            <path d="M 0.0 0.0 L -12.104166666666666 -4.322916666666667 L -12.104166666666666 0.0 L -12.104166666666666 4.322916666666667 z" fill="black" stroke="black" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
-        <marker overflow="visible" orient="auto" id="arrow0-1899736860">
-            <path d="M 0.0 0.0 L 4.034722222222222 1.4409722222222223 L 4.034722222222222 0.0 L 4.034722222222222 -1.4409722222222223 z " latexdraw:arrSizeNum="2.0" fill="black"/>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="58.105" id="arrow0-1448974977">
+            <path d="M 0.0 0.0 L -12.104166666666666 -4.322916666666667 L -12.104166666666666 0.0 L -12.104166666666666 4.322916666666667 z" fill="black" stroke="black" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
-        <marker overflow="visible" orient="auto" id="arrow0-18842927">
-            <path d="M 0.0 0.0 L 4.034722222222222 1.4409722222222223 L 4.034722222222222 0.0 L 4.034722222222222 -1.4409722222222223 z " latexdraw:arrSizeNum="2.0" fill="black"/>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="132.041" id="arrow0-196841083">
+            <path d="M 0.0 0.0 L -12.104166666666666 -4.322916666666667 L -12.104166666666666 0.0 L -12.104166666666666 4.322916666666667 z" fill="black" stroke="black" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
-        <marker overflow="visible" orient="auto" id="arrow1-279374399">
-            <path d="M 0.0 0.0 L -4.034722222222222 1.4409722222222223 L -4.034722222222222 0.0 L -4.034722222222222 -1.4409722222222223 z " latexdraw:arrSizeNum="2.0" fill="black"/>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="28.659" id="arrow1-995534203">
+            <path d="M 0.0 0.0 L -4.034722222222222 -4.322916666666667 L -4.034722222222222 0.0 L -4.034722222222222 4.322916666666667 z" fill="black" stroke="black" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
     </defs>
     <metadata>
         <latexdraw:metadata>
-            <latexdraw:latexIncludes/>
-            <latexdraw:displayXScale>true</latexdraw:displayXScale>
-            <latexdraw:displayYScale>true</latexdraw:displayYScale>
-            <latexdraw:unit>CM</latexdraw:unit>
+            <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
+            <latexdraw:positionVert/>
             <latexdraw:zoom>1.0</latexdraw:zoom>
-            <latexdraw:magneticGridStyle>CUSTOMISED</latexdraw:magneticGridStyle>
-            <latexdraw:gridGap>20</latexdraw:gridGap>
-            <latexdraw:magneticGrid>false</latexdraw:magneticGrid>
-            <latexdraw:version>3.3.8</latexdraw:version>
-            <latexdraw:size>
-                <latexdraw:width>1535</latexdraw:width>
-                <latexdraw:height>876</latexdraw:height>
-            </latexdraw:size>
-            <latexdraw:position>
-                <latexdraw:x>274.0</latexdraw:x>
-                <latexdraw:y>69.0</latexdraw:y>
-            </latexdraw:position>
+            <latexdraw:vpx>0.5</latexdraw:vpx>
+            <latexdraw:vpy>0.418</latexdraw:vpy>
         </latexdraw:metadata>
     </metadata>
 </svg>

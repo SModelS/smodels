@@ -345,8 +345,7 @@ class Model(object):
             if ndecays == 0:
                 if p.Z2parity == -1:
                     logger.warning("No valid decay found for %s. It will be considered stable." %p)
-                particle.totalwidth = 0.*GeV
-                continue
+                p.totalwidth = 0.*GeV
 
     def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
                         roundMasses = 1, erasePrompt=['spin','eCharge','colordim']):
