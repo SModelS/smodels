@@ -42,19 +42,20 @@ New in Version 2.0.0:
 
   * Introduction of :ref:`particle class <particleClass>`
   * Introduction of model class (see :ref:`Basic Input <basicInput>`)
-  * Input model can now be defined by an SLHA file with :ref:`QNUMBERS blocks <qnumberSLHA>`  
-  * Unified treatment of SLHA and LHE input files (see :ref:`decomposer <decomp>` and :ref:`LHE-reader <lhereader>`)  
+  * Input model can now be defined by an SLHA file with :ref:`QNUMBERS blocks <qnumberSLHA>`
+  * Unified treatment of SLHA and LHE input files (see :ref:`decomposer <decomp>` and :ref:`LHE-reader <lhereader>`)
   * :ref:`Decomposition <decomposition>`  and |ExpRess| can now handle :ref:`lifetime dependent results <widthGrid>`
   * Added :ref:`field "type" <txnameFile>` to the experimental results in the database
   * Added (optional) :ref:`field "intermediateState" <txnameFile>` to the experimental results in the database
-  * Inclusive branches can now describe inclusive vertices  
-  * Added possibility for analysis specific detector size  
-  * New :ref:`missing topologies <topCoverage>` algorithm and output  
+  * Inclusive branches can now describe inclusive vertices
+  * Added possibility for analysis specific detector size
+  * New :ref:`missing topologies <topCoverage>` algorithm and output
   * Added "latest" and "latest_fastlim" :ref:`Database <parameterFileDatabase>` abbreviations
-  * Added support for central database server  
-  * Small bug fix in :ref:`likelihood computation <likelihoodCalc>`  
+  * Added support for central database server
+  * Small bug fix in :ref:`likelihood computation <likelihoodCalc>`
   * Changes in output: :ref:`width values added <pyOut>`, :ref:`coverage groups <coverageGroups>` and others (see :ref:`output description <outputDescription>` for details)
   * Added option for signal strength multipliers in :ref:`cross section calculator <xsecCalc>`
+  * Small bug fixes in :ref:`models <basicInput>`  
 
 
 
@@ -63,7 +64,7 @@ New in Version 1.2.4:
   * added pyhf support
   * pickle path bug fix
   * bug fix for parallel xseccomputers
-  * Introduced the SMODELS_CACHEDIR environment variable to allow for a different 
+  * Introduced the SMODELS_CACHEDIR environment variable to allow for a different
     location of the cached database file
   * fixed dataId bug in datasets
 
