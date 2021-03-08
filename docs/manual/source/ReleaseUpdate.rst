@@ -53,6 +53,7 @@ New in Version 2.0.0:
   * Added "latest" and "latest_fastlim" :ref:`Database <parameterFileDatabase>` abbreviations
   * Added support for central database server
   * Small bug fix in :ref:`likelihood computation <likelihoodCalc>`
+  * Small fix due to an API change in pyhf 0.6
   * Changes in output: :ref:`width values added <pyOut>`, :ref:`coverage groups <coverageGroups>` and others (see :ref:`output description <outputDescription>` for details)
   * Added option for signal strength multipliers in :ref:`cross section calculator <xsecCalc>`
   * Small bug fixes in :ref:`models <basicInput>`  

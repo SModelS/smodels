@@ -14,6 +14,7 @@ Release v2.0.0, Mon 1 Mar 2021
   * Added "latest" and "latest_fastlim" database abbreviations
   * Added support for central database server  
   * Small bug fix in likelihood computation
+  * Small fix due to an API change in pyhf 0.6
   * Changes in output: width values added, coverage groups and others (see manual for details)
   * Added option for signal strength multipliers in cross section calculator
   * Small bug fixes in models
