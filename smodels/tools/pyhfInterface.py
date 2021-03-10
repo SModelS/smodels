@@ -26,11 +26,17 @@ if ver[1]=="4" or (ver[1]=="5" and ver[2] in [ "0", "1" ]):
     print ( "[SModelS:pyhfInterface] WARNING you are using pyhf v%s." % pyhf.__version__ )
     print ( "[SModelS:pyhfInterface] We recommend pyhf >= 0.5.2. Please try to update pyhf ASAP!" )
 
+pyhfbackend = "numpy"
+
 try:
     pyhf.set_backend(b"pytorch")
+    pyhfbackend = "pytorch"
 except pyhf.exceptions.ImportBackendError as e:
     print ( "[SModelS:pyhfInterface] WARNING could not set pytorch as the pyhf backend, falling back to the default." )
     print ( "[SModelS:pyhfInterface] We however recommend that pytorch be installed." )
+
+    from numpy import warnings
+    warnings.filterwarnings('ignore', r'invalid value encountered in log')
 
 from scipy import optimize
 import numpy as np
@@ -368,7 +374,10 @@ class PyhfUpperLimitComputer:
                 args["qtilde"]=True
             else:
                 args["test_stat"]=stat
-            result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
+            with np.testing.suppress_warnings() as sup:
+                if pyhfbackend == "numpy":
+                    sup.filter ( RuntimeWarning, r'invalid value encountered in log')
+                result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
             end = time.time()
             logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
             if expected:
