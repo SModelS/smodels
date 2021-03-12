@@ -21,19 +21,25 @@ try:
 except ModuleNotFoundError:
     print ( "[SModelS:pyhfInterface] pyhf import failed. Is the module installed?" )
     sys.exit(-1)
+
 ver = pyhf.__version__.split(".")
 if ver[1]=="4" or (ver[1]=="5" and ver[2] in [ "0", "1" ]):
     print ( "[SModelS:pyhfInterface] WARNING you are using pyhf v%s." % pyhf.__version__ )
     print ( "[SModelS:pyhfInterface] We recommend pyhf >= 0.5.2. Please try to update pyhf ASAP!" )
 
-pyhfbackend = "numpy"
+pyhfinfo = { "backend": "numpy", "hasgreeted": False, "backendver": "?", "ver": ver,
+             "required": "0.6.1".split(".") }
 
 try:
     pyhf.set_backend(b"pytorch")
-    pyhfbackend = "pytorch"
+    import torch
+    pyhfinfo["backend"] = "pytorch"
+    pyhfinfo["backendver"] = torch.__version__
 except pyhf.exceptions.ImportBackendError as e:
     print ( "[SModelS:pyhfInterface] WARNING could not set pytorch as the pyhf backend, falling back to the default." )
     print ( "[SModelS:pyhfInterface] We however recommend that pytorch be installed." )
+    import numpy
+    pyhfinfo["backendver"]=numpy.version.full_version
 
     from numpy import warnings
     warnings.filterwarnings('ignore', r'invalid value encountered in log')
@@ -169,6 +175,20 @@ class PyhfUpperLimitComputer:
         self.cl = cl
         self.scale = 1.
         self.alreadyBeenThere = False # boolean to detect wether self.signals has returned to an older value
+        self.checkPyhfVersion()
+        self.welcome()
+
+    def welcome ( self ):
+        """ greet the world """
+        if pyhfinfo["hasgreeted"]:
+            return
+        logger.info ( f"Pyhf interface, we are using v{'.'.join(pyhfinfo['ver'])}, with {pyhfinfo['backend']} v{pyhfinfo['backendver']} as backend." )
+        pyhfinfo["hasgreeted"] = True
+
+    def checkPyhfVersion ( self ):
+        """ check the pyhf version, currently we need 0.6.1+ """
+        if pyhfinfo["ver"] < pyhfinfo["required"]:
+            logger.warning ( f"pyhf version is {'.'.join(pyhfinfo['ver'])}. SModelS currently requires pyhf>={'.'.join(pyhfinfo['required'])}. You have been warned." )
 
     def rescale(self, factor):
         """
@@ -375,7 +395,7 @@ class PyhfUpperLimitComputer:
             else:
                 args["test_stat"]=stat
             with np.testing.suppress_warnings() as sup:
-                if pyhfbackend == "numpy":
+                if pyhfinfo["backend"] == "numpy":
                     sup.filter ( RuntimeWarning, r'invalid value encountered in log')
                 result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
             end = time.time()
