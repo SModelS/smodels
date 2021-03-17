@@ -35,7 +35,7 @@ try:
     import cPickle as serializer
 except ImportError as e:
     import pickle as serializer
-    
+
 class Database(object):
     """ Database object. Holds a list of SubDatabases.
         Delegates all calls to SubDatabases.
@@ -59,7 +59,7 @@ class Database(object):
         self.subs = []
         sstrings = base.split ( "+" )
         for ss in sstrings:
-            self.subs.append ( SubDatabase ( ss, force_load, discard_zeroes, 
+            self.subs.append ( SubDatabase ( ss, force_load, discard_zeroes,
                                              progressbar, subpickle ) )
 
     @property
@@ -114,7 +114,7 @@ class Database(object):
             logger.debug(  " * load text database" )
             logger.debug(  " * write %s db version %s" % \
                     ( filename, self.databaseVersion ) )
-            ptcl = min ( 4, serializer.HIGHEST_PROTOCOL ) 
+            ptcl = min ( 4, serializer.HIGHEST_PROTOCOL )
             ## 4 is default protocol in python3.8, and highest protocol in 3.7
             serializer.dump(self.txt_meta, f, protocol=ptcl)
             serializer.dump(self.expResultList, f, protocol=ptcl)
@@ -202,7 +202,7 @@ class Database(object):
         """
         ret = []
         for sub in self.subs:
-            tmp = sub.getExpResults( analysisIDs, datasetIDs, txnames, dataTypes, 
+            tmp = sub.getExpResults( analysisIDs, datasetIDs, txnames, dataTypes,
                     useSuperseded, useNonValidated, onlyWithExpected )
             ret.append ( tmp )
         return self.mergeLists ( ret )
@@ -249,6 +249,9 @@ class SubDatabase(object):
                      use the official database for your code version
                      (including fastlim results, if specified).
                      If "latest", or "latest_fastlim", check for the latest database.
+                     Multiple databases may be named, use "+" as delimiter.
+                     Order matters: Results with same name will overwritten
+                     according to sequence
         :param force_load: force loading the text database ("txt"),
                            or binary database ("pcl"), dont force anything if None
         :param discard_zeroes: discard txnames with only zeroes as entries.
