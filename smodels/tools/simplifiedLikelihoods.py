@@ -245,7 +245,7 @@ class LikelihoodComputer:
 
     debug_mode = False
 
-    def __init__(self, data, ntoys = 10000 ):
+    def __init__(self, data, ntoys = 30000 ):
         """
         :param data: a Data object.
         :param ntoys: number of toys when marginalizing
@@ -369,13 +369,27 @@ class LikelihoodComputer:
         else:
             lmbda = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
         lmbda[lmbda<=0.] = 1e-30 ## turn zeroes to small values
+        obs = self.model.observed
+        def is_integer ( x ):
+            if type(x) in [ int, NP.int64 ]:
+                return True
+            if type(x) in [ float ]:
+                return x.is_integer()
+            return False
+        ## not needed for now
+        allintegers = True # NP.all ( [is_integer( i ) for i in obs ] )
         if nll:
-            #poisson = self.model.observed * log ( lmbda ) - lmbda #- self.gammaln
-            poisson = stats.poisson.logpmf( self.model.observed, lmbda )
-            #print ( "p",poisson,poisson2 )
+            if allintegers:
+                poisson = stats.poisson.logpmf( obs, lmbda )
+            else:
+                poisson = -lmbda + obs * NP.log(lmbda) - special.loggamma(obs+1)
         else:
-            poisson = stats.poisson.pmf( self.model.observed, lmbda )
-            #print ( "nonll",poisson )
+            if allintegers:
+                poisson = stats.poisson.pmf( obs, lmbda )
+            else:
+                # poisson = NP.exp(-lmbda)*NP.power(lmbda,obs)/special.gamma(obs+1)
+                logpoiss = -lmbda + obs * NP.log(lmbda) - special.loggamma(obs+1)
+                poisson = NP.exp(logpoiss)
         try:
             M = [0.]*len(theta)
             C = self.model.V
@@ -708,7 +722,7 @@ class LikelihoodComputer:
 class UpperLimitComputer:
     debug_mode = False
 
-    def __init__(self, ntoys=10000, cl=.95):
+    def __init__(self, ntoys=30000, cl=.95):
 
         """
         :param ntoys: number of toys when marginalizing
@@ -717,7 +731,8 @@ class UpperLimitComputer:
         self.ntoys = ntoys
         self.cl = cl
 
-    def ulSigma(self, model, marginalize=False, toys=None, expected=False ):
+    def ulSigma( self, model, marginalize=False, toys=None, expected=False, 
+                 trylasttime = False ):
         """ upper limit obtained from the defined Data (using the signal prediction
             for each signal regio/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
@@ -725,8 +740,11 @@ class UpperLimitComputer:
         :params marginalize: if true, marginalize nuisances, else profile them
         :params toys: specify number of toys. Use default is none
         :params expected: compute the expected value, not the observed.
+        :params trylasttime: if True, then dont try extra
         :returns: upper limit on *production* xsec (efficiencies unfolded)
         """
+        #if expected:
+        #    marginalize = True
         if model.zeroSignal():
             """ only zeroes in efficiencies? cannot give a limit! """
             return None
@@ -737,7 +755,9 @@ class UpperLimitComputer:
             model = copy.deepcopy(oldmodel)
             #model.observed = model.backgrounds
             for i,d in enumerate(model.backgrounds):
+                # model.observed[i]=int(NP.ceil(d))
                 model.observed[i]=int(NP.round(d))
+                # model.observed[i]=float(d)
         computer = LikelihoodComputer(model, toys)
         mu_hat = computer.findMuHat(model.signal_rel)
         theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
@@ -745,6 +765,13 @@ class UpperLimitComputer:
 
         aModel = copy.deepcopy(model)
         aModel.observed = array([NP.round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
+        """
+        if marginalize == False and expected == True:
+            model.observed = array([NP.round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
+            mu_hat = computer.findMuHat(model.signal_rel)
+            theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
+            sigma_mu = computer.getSigmaMu(model.signal_rel)
+        """
         #print ( "aModeldata=", aModel.observed )
         #aModel.observed = array ( [ round(x) for x in model.backgrounds ] )
         aModel.name = aModel.name + "A"
@@ -756,12 +783,12 @@ class UpperLimitComputer:
         nll0 = computer.likelihood(model.signals(mu_hat),
                                      marginalize=marginalize,
                                      nll=True)
-        if NP.isinf(nll0) and marginalize==False:
+        if NP.isinf(nll0) and marginalize==False and not trylasttime:
             logger.warning("nll is infinite in profiling! we switch to marginalization, but only for this one!" )
             marginalize=True
             nll0 = computer.likelihood(model.signals(mu_hat),
                                          marginalize=True,
-                                         nll=True)
+                                         nll=True )
             if NP.isinf(nll0):
                 logger.warning("marginalization didnt help either. switch back.")
                 marginalize=False
@@ -802,7 +829,14 @@ class UpperLimitComputer:
             root = CLs - 1. + self.cl
             return root
 
-
+        a0 = root_func(0.) ## this must be positive
+        if a0 < 0. and marginalize:
+            if toys < 20000:
+                return self.ulSigma ( model, marginalize, 4*toys, 
+                                      expected = expected, trylasttime=False )
+            else:
+                return self.ulSigma ( model, marginalize, 4*toys, 
+                                      expected = expected, trylasttime=True )
         a,b=1.5*mu_hat,2.5*mu_hat+2*sigma_mu
         ctr=0
         while True:
@@ -812,13 +846,20 @@ class UpperLimitComputer:
                 if a < 0.: a=0.
                 ctr+=1
                 if ctr>20: ## but stop after 20 trials
-                    if toys > 2000:
-                        logger.error("cannot find brent bracket after 20 trials. a,b=%s(%s),%s(%s)" % ( root_func(a),a,root_func(b),b ) )
-                        return None
+                    if toys > 20000:
+                        logger.error("cannot find brent bracket after 20 trials. a,b=%s(%s),%s(%s), mu_hat=%.2f, sigma_mu=%.2f" % ( root_func(a),a,root_func(b),b,mu_hat, sigma_mu ) )
+                        logger.error("nll0=%s" % ( nll0 ) )
+                        if marginalize == True:
+                            return self.ulSigma ( model, marginalize = False, 
+                                                  toys = toys, expected = expected, 
+                                                  trylasttime = True )
+                        return float("inf") ## better choice than None
                     else:
                         logger.debug("cannot find brent bracket after 20 trials. but very low number of toys")
-                        return self.ulSigma ( model, marginalize, 4*toys )
+                        return self.ulSigma ( model, marginalize, 4*toys, 
+                                              expected=expected, trylasttime = False )
             try:
+                # root_func bei 0 sollte positiv sein, bei inf = -.05
                 mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
                 return mu_lim
             except ValueError as e: ## it could still be that the signs arent opposite
