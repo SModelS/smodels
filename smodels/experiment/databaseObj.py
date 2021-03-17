@@ -544,8 +544,8 @@ class SubDatabase(object):
             logger.error( "Consider supplying a different database path in the ini file (possibly a local one)" )
             raise SModelSError()
         if r.status_code != 200:
-            logger.error( "Error %d: could not fetch %s from server." % \
-                           ( r.status_code, path ) )
+            logger.error( "Error %d: could not fetch '%s' from server: '%s'" % \
+                           ( r.status_code, path, r.reason ) )
             raise SModelSError()
         ## its new so store the description
         with open( store, "w" ) as f:
