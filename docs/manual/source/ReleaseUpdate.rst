@@ -40,7 +40,7 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 2.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
   
-  * ability to merge databases using '+' as a delimiter
+  * Ability to merge databases using '+' as a delimiter
 
 New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
