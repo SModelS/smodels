@@ -50,7 +50,12 @@ class DatabaseTest(unittest.TestCase):
         latestver = dblatest.databaseVersion.replace(".","")
         from databaseLoader import database
         thisver = database.databaseVersion.replace("unittest","").replace(".","")
-        self.assertTrue ( latestver[:2]==thisver[:2] )
+        ilatestver = int ( latestver[:2] )
+        ithisver = int ( thisver[:2] )
+        if ilatestver < ithisver-1:
+            print ( "latest and this version are different. is that an issue?",
+                    ilatestver,"versus",ithisver )
+        self.assertTrue ( ilatestver>=(ithisver-1) )
 
 
 if __name__ == "__main__":
