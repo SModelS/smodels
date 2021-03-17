@@ -74,6 +74,8 @@ htmlnorecipes:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+	@echo "Try:"
+	@echo "xdg-open $(BUILDDIR)/html/index.html"
 
 
 dirhtml:
