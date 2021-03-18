@@ -215,7 +215,7 @@ def fixpermissions():
         print ( "sudo smodelsTools.py fixpermissions" )
 
 __dbServer__ = "https://smodels.github.io/database"
-__dblabels__ = [ "official", "latest", "fastlim", "backup", "unittest", None ]
+__dblabels__ = [ "official", "latest", "fastlim", "backup", "superseded", "unittest", None ]
 
 def databasePath ( label ):
     """ construct the path to the database json file
