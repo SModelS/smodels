@@ -268,21 +268,10 @@ class SubDatabase(object):
         self.force_load = force_load
         self.subpickle = subpickle
         obase = base ## keep old name for more checks for 'latest'
-        if base in [ None, "official" ]:
-            from smodels.installation import officialDatabase
-            base = officialDatabase()
-        if base in [ "official_fastlim" ]:
-            from smodels.installation import officialDatabase
-            base = officialDatabase( fastlim=True )
-        if base in [ "latest" ]:
-            from smodels.installation import latestDatabase
-            base = latestDatabase()
-        if base in [ "latest_fastlim" ]:
-            from smodels.installation import latestDatabase
-            base = latestDatabase( fastlim=True )
-        if base in [ "unittest" ]:
-            from smodels.installation import testDatabase
-            base = testDatabase()
+        from smodels.installation import __dblabels__
+        if base in __dblabels__:
+            from smodels.installation import databasePath
+            base = databasePath( base )
         base, pclfile = self.checkPathName(base, discard_zeroes )
         self.pcl_meta = Meta( pclfile )
         self.expResultList = []

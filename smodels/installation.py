@@ -40,8 +40,8 @@ def test_requirements():
     return True
 
 def resolve_dependencies( as_user = True ):
-    """ method that is meant to resolve the SModelS dependencies, 
-    via pip install --user. Warns you if pip cannot be found. 
+    """ method that is meant to resolve the SModelS dependencies,
+    via pip install --user. Warns you if pip cannot be found.
     :params as_user: if False, try system-wide install.
     """
     ck = test_requirements()
@@ -215,22 +215,21 @@ def fixpermissions():
         print ( "sudo smodelsTools.py fixpermissions" )
 
 __dbServer__ = "https://smodels.github.io/database"
+__dblabels__ = [ "official", "latest", "fastlim", "backup", "unittest", None ]
 
-def officialDatabase( fastlim=False ):
-    """ :param fastlim: include fastlim results """
+def databasePath ( label ):
+    """ construct the path to the database json file
+    :param label: one of: official, latest, fastlim, backup
+    :returns: URL, e.g. https://smodels.github.io/database/official
+    """
+    if not label in __dblabels__:
+        from smodels.tools.smodelsLogging import logger
+        logger.warning ( f"cannot identify label {label}" )
+        return label
+    if label == None:
+        label = "official"
     v=version().replace(".","")
-    fl = "_fastlim" if fastlim else ""
-    r="%s/official%s%s" % (__dbServer__,v,fl)
-    return r
-
-def latestDatabase( fastlim=False ):
-    """ :param fastlim: include fastlim results """
-    fl = "_fastlim" if fastlim else ""
-    r="%s/latest%s" % (__dbServer__,fl)
-    return r
-
-def testDatabase():
-    r="%s/unittest%s" % ( __dbServer__, version().replace(".","") )
+    r="%s/%s%s" % (__dbServer__,label,v)
     return r
 
 def main():
@@ -258,8 +257,8 @@ def main():
               "database": officialDatabase, "test_database": testDatabase,
               "copyright": license, "resolve_dependencies": resolve_dependencies }
     for f,v in args.__dict__.items():
-        if v: 
-            r = funcs[f]() 
+        if v:
+            r = funcs[f]()
             if r != None: print ( r )
 
 if __name__ == "__main__":
