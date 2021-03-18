@@ -57,6 +57,8 @@ class Database(object):
                           Should only be used when working on the database.
         """
         self.subs = []
+        if "_fastlim" in base: ## for backwards compatibility
+            base = base.replace("_fastlim","+fastlim")
         sstrings = base.split ( "+" )
         for ss in sstrings:
             self.subs.append ( SubDatabase ( ss, force_load, discard_zeroes,

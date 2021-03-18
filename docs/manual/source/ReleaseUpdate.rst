@@ -40,7 +40,7 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 2.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
   
-  * Ability to merge databases using '+' as a delimiter
+  * Ability to merge databases using '+' as a delimiter: "latest_fastlim" and "official_fastlim" are now written as "latest+fastlim", and "official+fastlim".
 
 New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
