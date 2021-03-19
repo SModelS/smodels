@@ -15,7 +15,7 @@ import time
 from smodels.tools.smodelsLogging import logger
 
 class Meta(object):
-    current_version = 213 ## the current format version
+    current_version = 214 ## the current format version
 
     """ The Meta object holds all meta information regarding the
         database, like number of analyses, last time of modification, ...
@@ -52,7 +52,8 @@ class Meta(object):
             hfl="1"
         if self.hasFastLim==False:
             hfl="0"
-        return "db%s%d%s.pcl" % ( self.python[0], self.discard_zeroes, hfl )
+        return "db%s%d.pcl" % ( self.python[0], self.discard_zeroes )
+        # return "db%s%d%s.pcl" % ( self.python[0], self.discard_zeroes, hfl )
 
     def versionFromFile ( self ):
         """

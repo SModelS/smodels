@@ -108,10 +108,12 @@ class Database(object):
                         r1.datasets[idx].txnameList.append ( txn )
         return r1
 
-    def createBinaryFile(self, filename ):
+    def createBinaryFile(self, filename=None ):
         """ create a pcl file from all the subs """
         ## make sure we have a model to pickle with the database!
         logger.debug(  " * create %s" % filename )
+        if filename == None:
+            filename = self.pcl_meta.pathname
         with open( filename, "wb" ) as f:
             logger.debug(  " * load text database" )
             logger.debug(  " * write %s db version %s" % \
@@ -234,8 +236,20 @@ class Database(object):
         """
         r = [ x.txt_meta for x in self.subs ]
         ret = r[0]
-        #for i in r[1:]:
-        #    ret.databaseVersion+="+"+i.databaseVersion
+        return ret
+
+    @property
+    def pcl_meta(self):
+        """
+        The meta info of the text version, a merger of the original ones
+
+        """
+        ret = None
+        r = []
+        for x in self.subs:
+            if hasattr ( x, "pcl_meta" ):
+                r.append ( x.pcl_meta )
+        ret = r[0]
         return ret
 
 class SubDatabase(object):
