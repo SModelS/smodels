@@ -17,16 +17,7 @@ Standard Installation
 
 SModelS is a Python library that requires Python version 2.6 or later, including version 3, which is the default. It depends on the following *external* Python libraries:
 
- * unum>=4.0.0
- * numpy>=1.13.0
- * argparse
- * requests>=2.0.0
- * docutils>=0.3
- * scipy>=1.0.0
- * pyslha>=3.1.0
- * pyhf>=0.6.1
- * jsonpatch>=1.25
- * jsonschema>=3.2.0
+.. include:: dependencies.rst
 
 For speed reasons, we moreover recommend pytorch>=1.8.0 as backend for pyhf. This is, however, optional: if pytorch is not available, SModelS will use the default backend. 
 

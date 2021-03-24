@@ -68,7 +68,10 @@ update_code:
 RstFilesFromHelp:
 	./rstFromHelpFiles.py
 
-html: update_code copy_files recipes RstFilesFromHelp htmlnorecipes
+html: pythondeps update_code copy_files recipes RstFilesFromHelp htmlnorecipes
+
+pythondeps:
+	@cat ../../smodels/share/requirements.txt | sed -e 's/^/ * /' > source/dependencies.rst
 
 htmlnorecipes:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
