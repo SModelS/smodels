@@ -48,6 +48,7 @@ class Database(object):
                      use the official database for your code version
                      (including fastlim results, if specified).
                      If "latest", or "latest_fastlim", check for the latest database.
+                     Multiple databases may be specified using `+' as a delimiter.
         :param force_load: force loading the text database ("txt"),
                            or binary database ("pcl"), dont force anything if None
         :param discard_zeroes: discard txnames with only zeroes as entries.
