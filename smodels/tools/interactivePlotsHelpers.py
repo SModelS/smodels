@@ -8,6 +8,8 @@
    
 """
 import sys
+import math
+import os
 from smodels.tools.smodelsLogging import logger
 try:
     import warnings ## we can ignore these warnings, see
@@ -105,6 +107,31 @@ def get_slha_data(slhaFile):
         return False
     
     return slhaData
+    
+def truncate(number):
+    "truncate float to 5 decimal places"
+    
+    if number<1 and number>1e-90:
+        
+        provisional_number=number
+        order=0
+       
+        while provisional_number<1:
+           
+            provisional_number=provisional_number*(10)
+            order=order+1
+            
+        
+        factor=10**4
+        truncated=(math.trunc(provisional_number * factor) / (factor*10**(order)))
+   
+    #elif number>1e-90:
+    # truncated=0.0
+    
+    else:
+        factor=10**5
+        truncated=math.trunc(number * factor) / factor
+    return truncated
      
 def get_expres(data_dict,smodelsOutput):
     """
@@ -121,9 +148,12 @@ def get_expres(data_dict,smodelsOutput):
             raise SModelSError("Error reading ExptRes.")    
         for expres in expResList:
             if 'r' in expres:
+                
                 r = get_entry(expres,'r')
+        
             else:
                 r = get_entry(expres,'theory prediction (fb)')/get_entry(expres,'upper limit (fb)')
+                r = truncate(r)
             if r>rmax:
                 rmax = r
                 Txname = get_entry(expres,'TxNames')
@@ -132,6 +162,7 @@ def get_expres(data_dict,smodelsOutput):
                     chi_2=False
                 else:    
                     chi_2 = get_entry(expres,'chi2')
+                    chi_2 = truncate(chi_2)
 
                 analysis_id = get_entry(expres,'AnalysisID')
     else:
@@ -174,7 +205,11 @@ def get_missed_topologies(data_dict,smodelsOuptut):
             missedtopo_total_xsec=missedtopo_total_xsec+missedtopo_xsec
             if missedtopo_xsec>missedtopo_max_xsec:
                 missedtopo_max_xsec=missedtopo_xsec
-                mt_max=missed_topo.get('element')       
+                mt_max=missed_topo.get('element')
+        missedtopo_max_xsec=truncate(missedtopo_max_xsec)
+        missedtopo_total_xsec=truncate(missedtopo_total_xsec)
+        
+        
     else:
         missedtopo_max_xsec=False
         missedtopo_total_xsec=False
@@ -199,6 +234,8 @@ def get_long_cascades(data_dict,smodelsOutput):
         for long_cascade in smodelsOutput.get('Long Cascades'):
             long_cascade_xsec=long_cascade.get('weight (fb)')
             long_cascade_total_xsec=long_cascade_total_xsec+long_cascade_xsec
+        long_cascade_total_xsec=truncate(long_cascade_total_xsec)
+    
     else:
         long_cascade_total_xsec=False
     if 'MT_long_xsec' in data_dict.keys():
@@ -213,6 +250,7 @@ def get_asymmetric_branches(data_dict,smodelsOutput):
     decompStatus = get_entry(smodelsOutput,'OutputStatus','decomposition status')
     if decompStatus >= 0:
         asymmetric_branch_total_xsec = sum([asym_br['weight (fb)'] for asym_br in smodelsOutput['Asymmetric Branches']])
+        asymmetric_branch_total_xsec=truncate(asymmetric_branch_total_xsec)
     else:
         asymmetric_branch_total_xsec=False             
     if 'MT_asym_xsec' in data_dict.keys():
@@ -229,6 +267,7 @@ def get_outside_grid(data_dict,smodelsOutput):
         for outside_grid in smodelsOutput.get('Outside Grid'):
             outside_grid_xsec=outside_grid.get('weight (fb)') 
             outside_grid_total_xsec = outside_grid_total_xsec+outside_grid_xsec
+        outside_grid_total_xsec=truncate(outside_grid_total_xsec)
     else:
         outside_grid_total_xsec = False      
     if 'MT_outgrid_xsec' in data_dict.keys():
@@ -244,9 +283,9 @@ def get_slha_hover_info(data_dict,slhaData,slha_hover_information):
             block = slha_hover_information.get(key)[0]
             code_number = slha_hover_information.get(key)[1]
             if block=='MASS':
-                data_dict.get(key).append(abs(slhaData.blocks[block][code_number]))
+                data_dict.get(key).append(truncate(abs(slhaData.blocks[block][code_number])))
             else:
-                data_dict.get(key).append(slhaData.blocks[block][code_number])
+                data_dict.get(key).append(truncate(slhaData.blocks[block][code_number]))
             
         return data_dict
         
@@ -263,6 +302,8 @@ def get_ctau(data_dict,slhaData,ctau_hover_information):
         else:
             mean_lifetime=(6.582119e-16)/(total_width*1e9)
             ctau=(mean_lifetime)*(299792458)
+            
+            ctau=truncate(ctau)
             
         data_dict.get(key).append(ctau)
         
@@ -294,9 +335,9 @@ def get_variable(data_dict,slhaData,slha_hover_information,variable):
             block=variable.get(key)[0]
             code_number=variable.get(key)[1]
             if block=='MASS':
-                data_dict.get(key).append(abs(slhaData.blocks[block][code_number]))
+                data_dict.get(key).append(truncate(abs(slhaData.blocks[block][code_number])))
             else:
-                data_dict.get(key).append(slhaData.blocks[block][code_number])
+                data_dict.get(key).append(truncate(slhaData.blocks[block][code_number]))
             
     return data_dict
     
@@ -365,7 +406,9 @@ def fill_hover(data_frame_all,SModelS_hover_information,
     if 'MT_outgrid_xsec' in SModelS_hover_information:    
         data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_outgrid_xsec'+': '+data_frame_all['MT_outgrid_xsec'].astype('str')+' fb'+'<br>'  
     if 'file' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'file'+': '+data_frame_all['file'].astype('str')+'<br>'          
+        data_frame_all['hover_text']=data_frame_all['hover_text']+'file'+': '+data_frame_all['file'].astype('str')+'<br>'
+        
+
     return data_frame_all;
  
  
@@ -393,6 +436,8 @@ def separate_cont_disc_plots(plot_list,data_dict):
         if plot in discrete_options:
             disc_plots.append(plot)
         else:
+            
+                
             cont_plots.append(plot)
     return cont_plots, disc_plots;   
  
@@ -416,6 +461,16 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
     """ Generate plots with continuous z axis variables, using all data points """
     if 'all' in plot_data: 
         for cont_plot in cont_plots:
+        
+            if cont_plot=='chi2':
+                all_false=True
+                for chi2_value in data_frame_all['chi2']:
+                    if chi2_value!=False:
+                        all_false=False
+                if all_false==True:
+                    logger.info('No values where found for chi^2. Skipping this plot')
+                    continue
+                
             plot_desc=plot_descriptions.get(cont_plot)
             cont_plot_legend=cont_plot
             if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
@@ -517,6 +572,15 @@ def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_f
     """ Generate plots with continuous z axis variables, using excluded data points """
     if 'excluded' in plot_data: 
         for cont_plot in cont_plots:
+        
+            if cont_plot=='chi2':
+                all_false=True
+                for chi2_value in data_frame_excluded['chi2']:
+                    if chi2_value!=False:
+                        all_false=False
+                if all_false==True:
+                    logger.info('No values where found for chi^2 in the excluded region. Skipping this plot')
+                    continue
             plot_desc=plot_descriptions.get(cont_plot)
             cont_plot_legend=cont_plot
             if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
@@ -609,6 +673,15 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
     """ Generate plots with continuous z axis variables, using non-excluded data points """
     if 'non-excluded' in plot_data: 
         for cont_plot in cont_plots:
+        
+            if cont_plot=='chi2':
+                all_false=True
+                for chi2_value in data_frame_nonexcluded['chi2']:
+                    if chi2_value!=False:
+                        all_false=False
+                if all_false==True:
+                    logger.info('No values where found for chi^2 in the non-excluded region. Skipping this plot')
+                    continue
             plot_desc=plot_descriptions.get(cont_plot)
             cont_plot_legend=cont_plot
             if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
@@ -1003,7 +1076,14 @@ def create_index_html(path_to_plots,plot_data,plot_title,plot_list,plot_descript
         plot_name=plot.split('.')[0]
         plot_desc=plot_descriptions.get(plot_name)
         main_file.write('<p>'+'<strong>'+plot_name+'</strong>'+': '+plot_desc+' <br>')
-        for option in plot_data:   
+        for option in plot_data:
+
+                
+            if plot=='chi2' and os.path.isfile(path_to_plots+'/chi2_'+option+'.html')==False:
+                main_file.write('<p> <i> No chi^2 values where found in region '+option+' </i> <br>')
+                continue
+                
+            
             plot_link=hyperlink_format.format(link=plot_name+'_'+option+'.html', text=option) 
             main_file.write(plot_link)
             main_file.write(' ')  

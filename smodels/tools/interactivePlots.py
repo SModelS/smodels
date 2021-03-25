@@ -12,7 +12,7 @@ from __future__ import print_function
 
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-import os, glob
+import os, glob,pathlib
 
 from smodels.tools import interactivePlotsHelpers as helpers
 
@@ -342,7 +342,24 @@ def main(args):
 
     :parameter args: argparser.Namespace object containing the options for makePlots
     """
+    
+    #First check if the needed directories are there
+    #inputdirSlha = os.path(args.slhaFolder)
 
+    if os.path.isdir(args.slhaFolder)==False:
+        raise SModelSError("slha directory does not exist or is a file")
+        
+    if os.path.isdir(args.smodelsFolder)==False:
+        raise SModelSError("smodels directory does not exist or is a file")
+        
+    if os.path.isdir(args.outputFolder)==False:
+        raise SModelSError("output directory does not exist or is a file")
+    
+    if os.path.isdir(args.outputFolder)==False:
+        raise SModelSError("parameter files does not exist")
+
+
+        
     return makePlots(args.smodelsFolder, args.slhaFolder, args.outputFolder,
                      args.parameters, args.npoints, args.verbosity)
 
