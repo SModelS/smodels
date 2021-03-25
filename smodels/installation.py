@@ -254,12 +254,17 @@ def main():
     args = ap.parse_args()
     funcs = { "installdir": installDirectory, "pythondir": pythonDirectory,
               "version": version, "banner": banner, "requirements": requirements,
-              "database": officialDatabase, "test_database": testDatabase,
               "copyright": license, "resolve_dependencies": resolve_dependencies }
+    dbpaths = { "database": "official", "test_database": "unittest" }
     for f,v in args.__dict__.items():
         if v:
-            r = funcs[f]()
-            if r != None: print ( r )
+            if "database" in f:
+                t = databasePath ( dbpaths[f] )
+                if t: print ( t )
+            else:
+                r = funcs[f]()
+                if r != None: 
+                    print ( r )
 
 if __name__ == "__main__":
     main()
