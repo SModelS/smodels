@@ -246,12 +246,14 @@ class DataHolder(object):
         logger.info('Making plots...')
 
         data_frame_all = helpers.make_data_frame(self.data_dict)
-
+        
+        html_names=helpers.refiningVariableNames()
+        
         data_frame_all = helpers.fill_hover(data_frame_all,
                                             self.SModelS_hover_information,
                                             self.slha_hover_information,
                                             self.ctau_hover_information,
-                                            self.BR_hover_information)
+                                            self.BR_hover_information,html_names)
 
         data_frame_excluded,data_frame_nonexcluded = helpers.data_frame_excluded_nonexcluded(data_frame_all)
         x_axis,y_axis = helpers.get_xy_axis(self.variable_x,self.variable_y)
@@ -259,33 +261,34 @@ class DataHolder(object):
                     self.data_dict)
 
         plot_descriptions=helpers.plot_description()
+        
 
         helpers.make_continuous_plots_all(cont_plots,x_axis,
                     y_axis,outFolder,data_frame_all,self.plot_data,
-                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
+                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
 
         helpers.make_continuous_plots_excluded(cont_plots,x_axis,
                     y_axis,outFolder,data_frame_excluded,self.plot_data,
-                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
+                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
 
         helpers.make_continuous_plots_nonexcluded(cont_plots,x_axis, y_axis,
                     outFolder,data_frame_nonexcluded, self.plot_data,
-                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
+                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
 
         helpers.make_discrete_plots_all(disc_plots,x_axis,y_axis,
                     outFolder,data_frame_all,self.plot_data,
-                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
+                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
 
         helpers.make_discrete_plots_excluded(disc_plots,x_axis,y_axis, outFolder,
                     data_frame_excluded,self.plot_data,
-                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
+                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
 
         helpers.make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis, outFolder,
                     data_frame_nonexcluded, self.plot_data,
-                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions)
+                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
 
         helpers.create_index_html(outFolder,self.plot_data,self.plot_title,self.plot_list,
-                    plot_descriptions, self.indexfile )
+                    plot_descriptions,html_names, self.indexfile )
 
         logger.info('Generation of interactive plots finished. Go to: \n %s/%s \n to see the plots.' % ( outFolder, self.indexfile ) )
 

@@ -351,9 +351,25 @@ def make_data_frame(data_dict):
     
     return data_frame_all
   
- 
+
+def refiningVariableNames():
+    ''' Redifining the output variable names to html format  '''
+    
+    html_names={'SModelS_status':'Smodels status',
+                      'r_max':'r<sub>max</sub>',
+                      'chi2':' &#967;<sup>2</sup>',
+                      'Tx':'T<sub>max</sub>',
+                      'Analysis':'Analysis',
+                      'MT_max':'MT<sub>max</sub>',
+                      'MT_max_xsec':'MT<sub>max xsection</sub>.',
+                      'MT_total_xsec':'MT<sub>total xsection</sub>',
+                      'MT_long_xsec':'MT<sub>long cascade xsection</sub>',
+                      'MT_asym_xsec':'MT<sub>asymmetric branch xsection</sub>',
+                      'MT_outgrid_xsec':'MT<sub>outside grid xsection</sub>'}
+    return html_names
+
 def fill_hover(data_frame_all,SModelS_hover_information,
-               slha_hover_information,ctau_hover_information,BR_hover_information):
+               slha_hover_information,ctau_hover_information,BR_hover_information,html_names):
     """ Generates the text of the hover, according to users's requests. """
     data_frame_all['hover_text']=''
     for column in slha_hover_information:
@@ -384,27 +400,27 @@ def fill_hover(data_frame_all,SModelS_hover_information,
             data_frame_br[column][i]=brs    
         data_frame_all['hover_text']=data_frame_all['hover_text']+column+': '+data_frame_br[column].astype('str')+'<br>'     
     if 'SModelS_status' in SModelS_hover_information:
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'SModelS_status'+': '+data_frame_all['SModelS_status'].astype('str')+'<br>'
+        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('SModelS_status')+': '+data_frame_all['SModelS_status'].astype('str')+'<br>'
     if 'r_max' in SModelS_hover_information:
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'r_max'+': '+data_frame_all['r_max'].astype('str')+'<br>'
+        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('r_max')+': '+data_frame_all['r_max'].astype('str')+'<br>'
     if 'Tx' in SModelS_hover_information: 
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'Tx'+': '+data_frame_all['Tx'].astype('str')+'<br>'
+        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('Tx')+': '+data_frame_all['Tx'].astype('str')+'<br>'
     if 'Analysis' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'Analysis'+': '+data_frame_all['Analysis'].astype('str')+'<br>'
+        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('Analysis')+': '+data_frame_all['Analysis'].astype('str')+'<br>'
     if 'chi2' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'chi2'+': '+data_frame_all['chi2'].astype('str')+'<br>'    
+        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('chi2')+': '+data_frame_all['chi2'].astype('str')+'<br>'
     if 'MT_max' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_max'+': '+data_frame_all['MT_max'].astype('str')+'<br>'        
+        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('MT_max')+': '+data_frame_all['MT_max'].astype('str')+'<br>'
     if 'MT_max_xsec' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_max_xsec'+': '+data_frame_all['MT_max_xsec'].astype('str')+' fb'+'<br>'
+        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('MT_max_xsec')+': '+data_frame_all['MT_max_xsec'].astype('str')+' fb'+'<br>'
     if 'MT_total_xsec' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_total_xsec'+': '+data_frame_all['MT_total_xsec'].astype('str')+' fb'+'<br>'
+        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('MT_total_xsec')+': '+data_frame_all['MT_total_xsec'].astype('str')+' fb'+'<br>'
     if 'MT_long_xsec' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_long_xsec'+': '+data_frame_all['MT_long_xsec'].astype('str')+' fb'+'<br>' 
+        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('MT_long_xsec')+': '+data_frame_all['MT_long_xsec'].astype('str')+' fb'+'<br>'
     if 'MT_asym_xsec' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_asym_xsec'+': '+data_frame_all['MT_asym_xsec'].astype('str')+' fb'+'<br>' 
+        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('MT_asym_xsec')+': '+data_frame_all['MT_asym_xsec'].astype('str')+' fb'+'<br>'
     if 'MT_outgrid_xsec' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'MT_outgrid_xsec'+': '+data_frame_all['MT_outgrid_xsec'].astype('str')+' fb'+'<br>'  
+        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('MT_outgrid_xsec')+': '+data_frame_all['MT_outgrid_xsec'].astype('str')+' fb'+'<br>'  
     if 'file' in SModelS_hover_information:    
         data_frame_all['hover_text']=data_frame_all['hover_text']+'file'+': '+data_frame_all['file'].astype('str')+'<br>'
         
@@ -439,13 +455,17 @@ def separate_cont_disc_plots(plot_list,data_dict):
             
                 
             cont_plots.append(plot)
-    return cont_plots, disc_plots;   
+    return cont_plots, disc_plots;
+    
+
+                
+    
  
 def plot_description():
     ''' Generate a description for each plot.'''
     plot_descriptions={'SModelS_status':'Excluded or not excluded by SModelS.',
                       'r_max':'highest r-value from SModelS.',
-                      'chi2':'chi^2 value associated to the highest r-value.',
+                      'chi2':'&#967;<sup>2</sup> value associated to the highest r-value.',
                       'Tx':'Topology/ies which give the highest r-value.',
                       'Analysis':'Experimental analysis from which the highest r-value comes from.',
                       'MT_max':'Missing topologies with the largest cross section.',
@@ -457,7 +477,7 @@ def plot_description():
     return plot_descriptions;   
  
 #####continuous plots##############
-def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_all,plot_data,plot_title,variable_x,variable_y,plot_descriptions):
+def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_all,plot_data,plot_title,variable_x,variable_y,plot_descriptions,html_names):
     """ Generate plots with continuous z axis variables, using all data points """
     if 'all' in plot_data: 
         for cont_plot in cont_plots:
@@ -472,9 +492,9 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
                     continue
                 
             plot_desc=plot_descriptions.get(cont_plot)
-            cont_plot_legend=cont_plot
+            cont_plot_legend=html_names.get(cont_plot)
             if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
-                cont_plot_legend=cont_plot+' (fb)'
+                cont_plot_legend=html_names.get(cont_plot)+' (fb)'
             z=data_frame_all[cont_plot]
             x=data_frame_all[x_axis]
             y=data_frame_all[y_axis]
@@ -568,7 +588,7 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
     return;
  
  
-def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_frame_excluded,plot_data,plot_title,variable_x,variable_y,plot_descriptions):
+def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_frame_excluded,plot_data,plot_title,variable_x,variable_y,plot_descriptions,html_names):
     """ Generate plots with continuous z axis variables, using excluded data points """
     if 'excluded' in plot_data: 
         for cont_plot in cont_plots:
@@ -582,9 +602,9 @@ def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_f
                     logger.info('No values where found for chi^2 in the excluded region. Skipping this plot')
                     continue
             plot_desc=plot_descriptions.get(cont_plot)
-            cont_plot_legend=cont_plot
+            cont_plot_legend=html_names.get(cont_plot)
             if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
-                cont_plot_legend=cont_plot+' (fb)'
+                cont_plot_legend=html_names.get(cont_plot)+' (fb)'
             z=data_frame_excluded[cont_plot]
             x=data_frame_excluded[x_axis]
             y=data_frame_excluded[y_axis]
@@ -669,7 +689,7 @@ def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_f
     return;
  
  
-def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,data_frame_nonexcluded,plot_data,plot_title,variable_x,variable_y,plot_descriptions):
+def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,data_frame_nonexcluded,plot_data,plot_title,variable_x,variable_y,plot_descriptions,html_names):
     """ Generate plots with continuous z axis variables, using non-excluded data points """
     if 'non-excluded' in plot_data: 
         for cont_plot in cont_plots:
@@ -683,9 +703,9 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
                     logger.info('No values where found for chi^2 in the non-excluded region. Skipping this plot')
                     continue
             plot_desc=plot_descriptions.get(cont_plot)
-            cont_plot_legend=cont_plot
+            cont_plot_legend=html_names.get(cont_plot)
             if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
-                cont_plot_legend=cont_plot+' (fb)'
+                cont_plot_legend=html_names.get(cont_plot)+' (fb)'
             z=data_frame_nonexcluded[cont_plot]
             x=data_frame_nonexcluded[x_axis]
             y=data_frame_nonexcluded[y_axis]
@@ -780,7 +800,7 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
  
      
     #########Discrete_plots############
-def make_discrete_plots_all(disc_plots,x_axis,y_axis,path_to_plots,data_frame_all,plot_data,plot_title,variable_x,variable_y,plot_descriptions):
+def make_discrete_plots_all(disc_plots,x_axis,y_axis,path_to_plots,data_frame_all,plot_data,plot_title,variable_x,variable_y,plot_descriptions,html_names):
     """ Generate plots with discrete z axis variables, using all data points """
     if 'all' in plot_data:
         for disc_plot in disc_plots:
@@ -815,7 +835,7 @@ def make_discrete_plots_all(disc_plots,x_axis,y_axis,path_to_plots,data_frame_al
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc,
+                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
                     'xaxis': {'title': x_axis+' (GeV)'},
@@ -830,7 +850,7 @@ def make_discrete_plots_all(disc_plots,x_axis,y_axis,path_to_plots,data_frame_al
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc,
+                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
                     'xaxis': {'title': x_axis},
@@ -845,7 +865,7 @@ def make_discrete_plots_all(disc_plots,x_axis,y_axis,path_to_plots,data_frame_al
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc,
+                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
                     'xaxis': {'title': x_axis+' (GeV)'},
@@ -860,7 +880,7 @@ def make_discrete_plots_all(disc_plots,x_axis,y_axis,path_to_plots,data_frame_al
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc,
+                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
                     'xaxis': {'title': x_axis+' (GeV)'},
@@ -873,7 +893,7 @@ def make_discrete_plots_all(disc_plots,x_axis,y_axis,path_to_plots,data_frame_al
     return;
  
  
-def make_discrete_plots_excluded(disc_plots,x_axis,y_axis,path_to_plots,data_frame_excluded,plot_data,plot_title,variable_x,variable_y,plot_descriptions):
+def make_discrete_plots_excluded(disc_plots,x_axis,y_axis,path_to_plots,data_frame_excluded,plot_data,plot_title,variable_x,variable_y,plot_descriptions,html_names):
     """ Generate plots with discrete z axis variables, using excluded data points """
     if 'excluded' in plot_data:
         for disc_plot in disc_plots:
@@ -912,7 +932,7 @@ def make_discrete_plots_excluded(disc_plots,x_axis,y_axis,path_to_plots,data_fra
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc,
+                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
                     'xaxis': {'title': x_axis+' (GeV)'},
@@ -927,7 +947,7 @@ def make_discrete_plots_excluded(disc_plots,x_axis,y_axis,path_to_plots,data_fra
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc,
+                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
                     'xaxis': {'title': x_axis},
@@ -942,7 +962,7 @@ def make_discrete_plots_excluded(disc_plots,x_axis,y_axis,path_to_plots,data_fra
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc,
+                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
                     'xaxis': {'title': x_axis+' (GeV)'},
@@ -957,7 +977,7 @@ def make_discrete_plots_excluded(disc_plots,x_axis,y_axis,path_to_plots,data_fra
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc,
+                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
                     'xaxis': {'title': x_axis+' (GeV)'},
@@ -967,7 +987,7 @@ def make_discrete_plots_excluded(disc_plots,x_axis,y_axis,path_to_plots,data_fra
             plotly.offline.plot(fig, filename = path_to_plots+'/'+disc_plot+'_excluded.html', auto_open=False)
     return;
  
-def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_frame_nonexcluded,plot_data,plot_title,variable_x,variable_y,plot_descriptions):
+def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_frame_nonexcluded,plot_data,plot_title,variable_x,variable_y,plot_descriptions,html_names):
     """ Generate plots with discrete z axis variables, using non-excluded data points """
     if 'non-excluded' in plot_data:
         for disc_plot in disc_plots:
@@ -1006,7 +1026,7 @@ def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc,
+                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
                     'xaxis': {'title': x_axis+' (GeV)'},
@@ -1021,7 +1041,7 @@ def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc,
+                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
                     'xaxis': {'title': x_axis},
@@ -1036,7 +1056,7 @@ def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc,
+                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
                     'xaxis': {'title': x_axis+' (GeV)'},
@@ -1051,7 +1071,7 @@ def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc,
+                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
                     'xaxis': {'title': x_axis+' (GeV)'},
@@ -1063,7 +1083,7 @@ def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_
 
 
 
-def create_index_html(path_to_plots,plot_data,plot_title,plot_list,plot_descriptions,
+def create_index_html(path_to_plots,plot_data,plot_title,plot_list,plot_descriptions,html_names,
                       filename = "index.html"):
     """
     Fills the index.html file with links to the interactive plots.
@@ -1075,12 +1095,12 @@ def create_index_html(path_to_plots,plot_data,plot_title,plot_list,plot_descript
     for plot in plot_list:
         plot_name=plot.split('.')[0]
         plot_desc=plot_descriptions.get(plot_name)
-        main_file.write('<p>'+'<strong>'+plot_name+'</strong>'+': '+plot_desc+' <br>')
+        main_file.write('<p>'+'<strong>'+html_names.get(plot_name)+'</strong>'+': '+plot_desc+' <br>')
         for option in plot_data:
 
                 
             if plot=='chi2' and os.path.isfile(path_to_plots+'/chi2_'+option+'.html')==False:
-                main_file.write('<p> <i> No chi^2 values where found in region '+option+' </i> <br>')
+                main_file.write('<p> <i> No &#967;<sup>2</sup> values where found in region '+option+' </i> <br>')
                 continue
                 
             
