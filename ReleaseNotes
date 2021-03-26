@@ -2,6 +2,8 @@ Release v2.1.x, xxx
 =======================================================
 
   * Ability to merge databases using '+' as a delimiter
+  * useSuperseded flag in getExpResults is marked as deprecated, 
+	  as we now just put superseded results in separate database
 
 Release v2.0.0, Mon 15 Mar 2021
 =======================================================

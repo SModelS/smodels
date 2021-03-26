@@ -41,6 +41,7 @@ New in Version 2.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
   
   * Ability to merge :ref:`Databases <parameterFileDatabase>` using '+' as a delimiter: "latest_fastlim" and "official_fastlim" are now written as "latest+fastlim", and "official+fastlim".
+  * useSuperseded flag in `getExpResults  <experiment.html#experiment.databaseObj.Database.getExpResults>`_ is marked as deprecated, as we now just put superseded results in separate database
 
 New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^

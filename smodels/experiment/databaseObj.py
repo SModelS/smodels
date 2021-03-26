@@ -197,6 +197,7 @@ class Database(object):
         :param dataTypes: dataType of the analysis (all, efficiencyMap or upperLimit)
                             Can be wildcarded with usual shell wildcards: * ? [<letters>]
         :param useSuperseded: If False, the supersededBy results will not be included
+                              (deprecated)
         :param useNonValidated: If False, the results with validated = False
                                 will not be included
         :param onlyWithExpected: Return only those results that have expected values
@@ -205,6 +206,16 @@ class Database(object):
                   contains only one result
 
         """
+        if useSuperseded:
+            hasSuperseded = False
+            for s in self.subs:
+                if "superseded" in s.url:
+                    hasSuperseded = True
+                    break
+            ss = ""
+            if hasSuperseded:
+                ss = " - which you seem to have already done"
+            logger.warning ( "the useSuperseded flag is deprecated from smodels v2.1 onwards. if you wish to use superseded results, please simply add them to your database path%s, e.g. 'official+superseded'." % ss )
         ret = []
         for sub in self.subs:
             tmp = sub.getExpResults( analysisIDs, datasetIDs, txnames, dataTypes,
@@ -870,7 +881,8 @@ class SubDatabase(object):
                             usual shell wildcards: * ? [<letters>]
         :param dataTypes: dataType of the analysis (all, efficiencyMap or upperLimit)
                             Can be wildcarded with usual shell wildcards: * ? [<letters>]
-        :param useSuperseded: If False, the supersededBy results will not be included
+        :param useSuperseded: If False, the supersededBy results will not be included 
+                              (deprecated)
         :param useNonValidated: If False, the results with validated = False
                                 will not be included
         :param onlyWithExpected: Return only those results that have expected values
