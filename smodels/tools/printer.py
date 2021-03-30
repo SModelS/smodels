@@ -60,7 +60,7 @@ class MPrinter(object):
                 newPrinter = SLHAPrinter(output = 'file')
                 if parser.getboolean("options", "doCompress") or parser.getboolean("options", "doInvisible"):
                     newPrinter.docompress = 1
-                if parser.getboolean("options", "combineSRs"):
+                if parser.has_option("options", "combineSRs") and parser.getboolean("options", "combineSRs"):
                     newPrinter.combinesr = 1
             else:
                 logger.warning("Unknown printer format: %s" %str(prt))
@@ -1094,3 +1094,237 @@ class SLHAPrinter(TxTPrinter):
             output += "\n %d 1 %-30.3E      # %s" %(i,group.getTotalXSec(),"Total cross-section (fb)")
         output += "\n"
         return output
+
+def printScanSummary(outputDict,outputFile):
+    """
+    Method for creating a simple summary of the results when running SModelS
+    over multiple files.
+
+    :param outputDict: A dictionary with filenames as keys and the master printer flush dictionary as values.
+    :param outputFile: Path to the summary file to be written.
+    """
+
+    #Header:
+    header = "#Global results summary (%i files)\n" %len(outputDict)
+
+    #Check available types of printer:
+    printerTypes = ['slha','python','summary']
+    out = list(outputDict.values())[0] #All outputs should have the same format
+    if all([(not ptype in out) for ptype in printerTypes]):
+        header += "#In order to build the summary, one of the following types of printer must be available:\n %s \n" %str(printerTypes)
+        with open(outputFile,'w') as f:
+            f.write(header)
+        return
+
+    #Get summary information:
+    summaryList = []
+    for fname,output in outputDict.items():
+        #default values (in case of empty results):
+        summaryDict = OrderedDict({'filename' : fname,
+                    'r_max' : 0.,
+                    'r_max(exp)' : -1,
+                    'MostConstrainingAnalysis' : 'N/A',
+                    'r_max(ATLAS)' : 0.,
+                    'MostConstraining(ATLAS)' : 'N/A',
+                    'r_max(CMS)' : 0.,
+                    'MostConstraining(CMS)' : 'N/A',
+                    })
+
+        if 'python' in output:
+            sDict = getSummaryFrom(output['python'],'python')
+        elif 'slha' in output:
+            sDict = getSummaryFrom(output['slha'],'slha')
+        elif 'summary' in output:
+            sDict = getSummaryFrom(output['summary'],'summary')
+        else:
+            sDict = {}
+
+        for key in summaryDict:
+            if key in sDict:
+                summaryDict[key] = sDict[key]
+
+        summaryList.append(summaryDict)
+
+
+    #Get column labels and widths:
+    labels = list(summaryList[0].keys())
+    cwidths = []
+    fstr = '%s' #format for strings
+    ffloat = '%1.3g' #format for floats
+    for label in labels:
+        maxlength = max([len(ffloat%entry[label]) if isinstance(entry[label],(float,int))
+                            else  len(fstr%entry[label])
+                            for entry in summaryList])
+        maxlength = max(maxlength,len(label))
+        cwidths.append(maxlength)
+
+    columns = '#'
+    columns += '  '.join([label.ljust(cwidths[i]) for i,label in enumerate(labels)])
+    columns = columns.replace(' ','',1) #Remove one blank space to make labels match values
+    columns += '\n'
+
+    with open(outputFile,'w') as f:
+        f.write(header)
+        f.write(columns)
+
+        for entry in summaryList:
+            row = '  '.join([(ffloat%entry[label]).ljust(cwidths[j])
+                                if isinstance(entry[label],(float,int))
+                                else (fstr%entry[label]).ljust(cwidths[j])
+                            for j,label in enumerate(labels)])
+            f.write(row+'\n')
+
+    return
+
+def getSummaryFrom(output,ptype):
+    """
+    Retrieves information about the output according to the printer type (slha,python or summary)
+
+    :param output: output (dictionary for ptype=python or string for ptype=slha/summary)
+    :param ptype: Printer type (slha, python or summary)
+
+    :return: Dictionary with the output information
+    """
+
+    summaryDict = {}
+    if ptype == 'python':
+        info = getInfoFromPython(output)
+    elif ptype == 'slha':
+        info = getInfoFromSLHA(output)
+    elif ptype == 'summary':
+        info = getInfoFromSummary(output)
+    else:
+        return summaryDict
+
+
+    if info is None:
+        return summaryDict
+    else:
+        rvals,rexp,anaIDs = info
+
+    #Make sure results are sorted in reverse order:
+    asort = rvals.argsort()[::-1]
+    rvals = rvals[asort]
+    anaIDs = anaIDs[asort]
+    rexp = rexp[asort]
+    iATLAS,iCMS = -1,-1
+    for i,anaID in enumerate(anaIDs):
+        if 'ATLAS' in anaID and iATLAS < 0:
+            iATLAS = i
+        elif 'CMS' in anaID and iCMS < 0:
+            iCMS = i
+
+    summaryDict['r_max'] = rvals[0]
+    summaryDict['r_max(exp)'] = rexp[0]
+    summaryDict['MostConstrainingAnalysis'] = anaIDs[0]
+
+    if iATLAS >= 0:
+        summaryDict['r_max(ATLAS)'] = rvals[iATLAS]
+        summaryDict['MostConstraining(ATLAS)']= anaIDs[iATLAS]
+
+    if iCMS >= 0 :
+        summaryDict['r_max(CMS)'] = rvals[iCMS]
+        summaryDict['MostConstraining(CMS)'] = anaIDs[iCMS]
+
+    return summaryDict
+
+def getInfoFromPython(output):
+    """
+    Retrieves information from the python output
+
+    :param output: output (dictionary)
+
+    :return: list of r-values,r-expected and analysis IDs. None if no results are found.
+    """
+
+    if not 'ExptRes' in output or not output['ExptRes']:
+        return None
+    rvals = np.array([res['r'] for res in output['ExptRes']])
+    rexp = np.array([res['r_expected'] if res['r_expected'] else -1 for res in output['ExptRes']])
+    anaIDs = np.array([res['AnalysisID'] for res in output['ExptRes']])
+
+    return rvals,rexp,anaIDs
+
+def getInfoFromSLHA(output):
+    """
+    Retrieves information from the SLHA output
+
+    :param output: output (string)
+
+    :return: list of r-values,r-expected and analysis IDs. None if no results are found.
+    """
+
+
+    import pyslha
+    results = pyslha.readSLHA(output,ignorenomass=True,ignorenobr=True)
+    bname = None
+    for b in results.blocks.values():
+        if b.name.lower() ==  'SModelS_Exclusion'.lower():
+            bname = b.name
+    if bname is None or len(results.blocks[bname]) <= 1:
+        return None
+
+    #Get indices for results:
+    resI = list(set([k[0] for k in results.blocks[bname].keys() if k[0] > 0]))
+    rvals = np.array([results.blocks[bname][(i,1)] for i in resI])
+    rexp = np.array([results.blocks[bname][(i,2)]
+                        if results.blocks[bname][(i,2)] != 'N/A' else -1 for i in resI])
+    anaIDs = np.array([results.blocks[bname][(i,4)] for i in resI])
+
+    return rvals,rexp,anaIDs
+
+def getInfoFromSummary(output):
+    """
+    Retrieves information from the summary output
+
+    :param output: output (string)
+
+    :return: list of r-values,r-expected and analysis IDs. None if no results are found.
+    """
+
+    lines = output.splitlines()
+    rvals = []
+    rexp = []
+    anaIDs = []
+    for l in lines:
+        if 'The highest r value is' in l:
+            rmax = l.split('=')[1].strip()
+            ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
+                    for x in rmax])[0][0] #Get when the value ends
+            rmax = eval(rmax[:ff])
+            anaMax = l.split('from')[1].split()[0].replace(',','')
+            rexpMax = -1
+            if 'r_expected' in l:
+                rexpMax = l.split('r_expected')[1]
+                rexpMax = rexpMax.split('=')[1]
+                ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
+                    for x in rexpMax])[0][0] #Get when the value ends
+                rexpMax = eval(rexpMax[:ff])
+            rvals.append(rmax)
+            anaIDs.append(anaMax)
+            rexp.append(rexpMax)
+        elif 'Most sensitive' in l:
+            rAna = l.split('=')[-1]+ ' ' #the space is required to have at least one non-digit character after the value
+            ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
+                    for x in rAna])[0][0] #Get when the value ends
+            rAna = eval(rAna[:ff])
+            rexpAna = -1
+            if 'r_expected' in l:
+                rexpAna = l.split('r_expected')[1]
+                rexpAna = rexpAna.split('=')[1]
+                ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
+                    for x in rexpAna])[0][0] #Get when the value ends
+                rexpAna = eval(rexpAna[:ff])
+            anaID = l.split('analysis:')[1]
+            anaID = anaID.split()[0].strip().replace(',','')
+            rvals.append(rAna)
+            anaIDs.append(anaID)
+            rexp.append(rexpAna)
+
+    if not rvals:
+        return None
+    rvals = np.array(rvals)
+    rexp = np.array(rexp)
+    anaIDs = np.array(anaIDs)
+
+    return rvals,rexp,anaIDs

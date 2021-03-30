@@ -9,6 +9,7 @@
 
 import os, sys
 import unum
+import numpy as np
 import redirector
 from smodels.tools.runSModelS import run
 from os.path import join, basename
@@ -131,3 +132,33 @@ def runMain( filename, timeout = 0, suppressStdout=True, development=False,
         setLogLevel ( oldlevel )
         sfile = join(iDir(),"test/unitTestOutput/%s.py" % basename(filename))
         return sfile
+
+
+def compareSummaries(outA,outB,allowedDiff):
+
+
+    fA = np.genfromtxt(outA,dtype=None,encoding='utf-8',
+                  skip_header=1,names=True)
+
+    fB = np.genfromtxt(outB,dtype=None,encoding='utf-8',
+                  skip_header=1,names=True)
+
+    if sorted(fA['filename']) != sorted(fB['filename']):
+        logger.error("Filenames differ:\n %s\n and\n %s" %(sorted(fA['filename']),sorted(fB['filename'])))
+        return False
+
+    for fname in fA['filename']:
+        ptA = fA[fA['filename'] == fname][0]
+        ptB = fB[fB['filename'] == fname][0]
+        for col in fA.dtype.names:
+            if ptA[col] == ptB[col]:
+                continue
+            elif isinstance(ptA[col],(float,int)):
+                diff = 2.*abs(ptA[col]-ptB[col])/abs(ptA[col]+ptB[col])
+                if diff > allowedDiff:
+                    logger.error("values for %s differ by %s in %s" % ( col, diff, fname) )
+                    return False
+            else:
+                logger.error("values for %s differ in %s" % ( col, fname))
+                return False
+    return True
