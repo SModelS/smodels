@@ -566,7 +566,20 @@ class SummaryPrinter(TxTPrinter):
 
         output = ""
 
-        rvalues = []
+        maxr = { "obs": -1., "exp": -1, "anaid": "?" }
+        maxcoll = { "CMS": { "obs": -1., "exp": -1, "anaid": "?" },
+                    "ATLAS": { "obs": -1., "exp": -1, "anaid": "?" } }
+        for theoPred in obj._theoryPredictions:
+            r = theoPred.getRValue(expected=False)
+            r_expected = theoPred.getRValue(expected=True)
+            expResult = theoPred.expResult
+            coll = "ATLAS" if "ATLAS" in expResult.globalInfo.id else "CMS"
+            if r_expected != None and r_expected > maxcoll[coll]["exp"]:
+                maxcoll[coll]= { "obs": r, "exp": r_expected,
+                                 "anaid": expResult.globalInfo.id }
+            if r > maxr["obs"]:
+                maxr = { "obs": r, "exp": r_expected, "anaid": expResult.globalInfo.id }
+
         output += "#Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected"
         output += "\n\n"
         for theoPred in theoPredictions:
@@ -579,7 +592,6 @@ class SummaryPrinter(TxTPrinter):
             value = theoPred.xsection.value
             r = theoPred.getRValue(expected=False)
             r_expected = theoPred.getRValue(expected=True)
-            rvalues.append(r)
 
             output += "%19s  " % (expResult.globalInfo.id)  # ana
             # output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
@@ -601,8 +613,16 @@ class SummaryPrinter(TxTPrinter):
 
         output += "\n \n"
         output += 80 * "=" + "\n"
-        output += "The highest r value is = %.12f\n" % max(rvalues)
-        # output += "The highest r value is = " + str(max(rvalues)) + "\n"
+        output += "The highest r value is = %.12f from %s" % \
+                   ( maxr["obs"], maxr["anaid"] )
+        if maxr["exp"] != None and maxr["exp"]>-.5:
+            output += " (r_expected=%.5f)" % maxr["exp"]
+        output += "\n"
+        for coll,values in maxcoll.items():
+            if values["obs"]<-.5:
+                continue
+            output += "Most sensitive %s analysis: %s, r_expected=%.5f, r_obs=%.5f\n" % \
+                      ( coll, values["anaid"], values["exp"], values["obs"] )
 
         return output
 
