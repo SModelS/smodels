@@ -1,0 +1,10 @@
+#Global results summary (8 files)
+#filename            r_max  r_max(exp)  MostConstrainingAnalysis    r_max(ATLAS)  MostConstraining(ATLAS)   r_max(CMS)  MostConstraining(CMS)
+idm_example.slha     0      -1          N/A                         0             N/A                       0           N/A                   
+gluino_squarks.slha  6.84   8.12        ATLAS-SUSY-2016-07          6.84          ATLAS-SUSY-2016-07        1.86        CMS-SUS-19-006        
+longLived.slha       5.11   5.83        CMS-SUS-19-006              2.82          ATLAS-SUSY-2016-07        5.11        CMS-SUS-19-006        
+lightEWinos.slha     1.2    -1          CMS-SUS-13-006              0.29          ATLAS-SUSY-2013-18        1.2         CMS-SUS-13-006        
+gluinoToTops.slha    58.1   68.1        CMS-SUS-19-006              1.93          ATLAS-SUSY-2013-18        58.1        CMS-SUS-19-006        
+higgsinoStop.slha    50.1   -1          CMS-PAS-SUS-13-023          42.9          ATLAS-SUSY-2013-15        50.1        CMS-PAS-SUS-13-023    
+complicated.slha     6.84   8.12        ATLAS-SUSY-2016-07          6.84          ATLAS-SUSY-2016-07        1.86        CMS-SUS-19-006        
+simplyGluino.slha    217    109         CMS-SUS-16-033              53.5          ATLAS-SUSY-2016-07        217         CMS-SUS-16-033        

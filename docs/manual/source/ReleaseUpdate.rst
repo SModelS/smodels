@@ -39,10 +39,11 @@ The major novelties of all releases since v1.0 are as follows:
 
 New in Version 2.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
-  
+
   * Ability to merge :ref:`Databases <parameterFileDatabase>` using '+' as a delimiter: "latest_fastlim" and "official_fastlim" are now written as "latest+fastlim", and "official+fastlim".
   * useSuperseded flag in `getExpResults  <experiment.html#experiment.databaseObj.Database.getExpResults>`_ is marked as deprecated, as we now just put superseded results in separate database
   * slightly extended output of :ref:`summary printer <parameterFileSummaryprinter>`
+  * added scan summary (:ref:`summary.txt <scanSummary>`) when running over multiple files  
 
 New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
@@ -63,7 +64,7 @@ New in Version 2.0.0:
   * Small fix due to an API change in pyhf 0.6
   * Changes in output: :ref:`width values added <pyOut>`, :ref:`coverage groups <coverageGroups>` and others (see :ref:`output description <outputDescription>` for details)
   * Added option for signal strength multipliers in :ref:`cross section calculator <xsecCalc>`
-  * Small bug fixes in :ref:`models <basicInput>`  
+  * Small bug fixes in :ref:`models <basicInput>`
 
 
 

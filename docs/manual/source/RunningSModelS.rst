@@ -336,6 +336,8 @@ The following formats are available:
    |theory predictions| and the :ref:`missing topologies <topCoverage>`. The output follows a SLHA-type
    format and contains a summary of the most constraining results and the missed topologies.
 
+In addition, when running over multiple files, a simple text output (summary.txt) is generated
+with basic information about the results for each input file.
 A detailed explanation of the information contained in each type of output is given
 in :ref:`SModels Output <outputDescription>`.
 
