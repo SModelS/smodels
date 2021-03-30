@@ -2,7 +2,7 @@
 
 """
 .. module:: runtime
-    :synopsis: Tools to gather info about runtime enviroment,
+    :synopsis: Tools to gather info about the runtime environment,
                ( nCPUs() ), or obtain file type ( filetype() ). Pointer
                to model file is also kept here.
 
