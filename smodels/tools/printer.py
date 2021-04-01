@@ -1179,7 +1179,6 @@ def printScanSummary(outputDict,outputFile):
                                 else (fstr%entry[label]).ljust(cwidths[j])
                             for j,label in enumerate(labels)])
             f.write(row+'\n')
-
     return
 
 def getSummaryFrom(output,ptype):
@@ -1293,9 +1292,6 @@ def getInfoFromSummary(output):
     rexp = []
     anaIDs = []
     for l in lines:
-        f=open("bla.txt","at")
-        f.write  ( "l %s \n " % l )
-        f.close()
         if 'The highest r value is' in l:
             rmax = l.split('=')[1].strip()
             ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
