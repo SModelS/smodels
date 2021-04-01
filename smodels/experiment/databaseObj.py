@@ -41,7 +41,7 @@ class Database(object):
         Delegates all calls to SubDatabases.
     """
     def __init__(self, base=None, force_load = None, discard_zeroes = True,
-                  progressbar = False, subpickle = True):
+                  progressbar = False, subpickle = True, combinationsmatrix = None ):
         """
         :param base: path to the database, or pickle file (string), or http
                      address. If None, "official", or "official_fastlim",
@@ -56,6 +56,10 @@ class Database(object):
                             (needs the python-progressbar module)
         :param subpickle: produce small pickle files per exp result.
                           Should only be used when working on the database.
+        :param combinationsmatrix: an optional dictionary that contains info
+                     about combinable analyses, e.g. { "anaid1": ( "anaid2", "anaid3" ) }
+                     optionally specifying signal regions, e.g. { "anaid1:SR1": 
+                     ( "anaid2:SR2", "anaid3" ) }
         """
         self.subs = []
         if "_fastlim" in base: ## for backwards compatibility
@@ -63,7 +67,7 @@ class Database(object):
         sstrings = base.split ( "+" )
         for ss in sstrings:
             self.subs.append ( SubDatabase ( ss, force_load, discard_zeroes,
-                                             progressbar, subpickle ) )
+                                             progressbar, subpickle, combinationsmatrix ) )
 
     @property
     def expResultList(self):
@@ -264,13 +268,28 @@ class Database(object):
         ret = r[0]
         return ret
 
+    def createLinksToCombinationsMatrix ( self ):
+        """ in all globalInfo objects, create a shallow link to the 
+            combinations matrix """
+        for x in self.subs:
+            if not hasattr ( x, "combinationsmatrix" ) or x.combinationsmatrix == None:
+                x.combinationsmatrix = self.combinationsmatrix
+            x.createLinksToCombinationsMatrix()
+
+    def clearLinksToCombinationsMatrix ( self ):
+        """ clear all shallow links to the combinations matrix """
+        self.combinationsmatrix = None
+        for x in self.subs:
+            x.combinationsmatrix = None
+            x.clearLinksToCombinationsMatrix()
+
 class SubDatabase(object):
     """
     SubDatabase object. Holds a list of ExpResult objects.
     """
 
     def __init__(self, base=None, force_load = None, discard_zeroes = True,
-                  progressbar = False, subpickle = True):
+                  progressbar = False, subpickle = True, combinationsmatrix=None ):
         """
         :param base: path to the database, or pickle file (string), or http
                      address. If None, "official", or "official_fastlim",
@@ -287,9 +306,14 @@ class SubDatabase(object):
                             (needs the python-progressbar module)
         :param subpickle: produce small pickle files per exp result.
                           Should only be used when working on the database.
+        :param combinationsmatrix: an optional dictionary that contains info
+                     about combinable analyses, e.g. { "anaid1": ( "anaid2", "anaid3" ) }
+                     optionally specifying signal regions, e.g. { "anaid1:SR1": 
+                     ( "anaid2:SR2", "anaid3" ) }
         """
 
         self.url = base
+        self.combinationsmatrix = combinationsmatrix
         self.source=""
         if force_load == None and base.endswith(".pcl"):
             force_load = "pcl"
@@ -380,6 +404,7 @@ class SubDatabase(object):
         logger.info( "Parsing text database at %s" % self.txt_meta.pathname )
         self.expResultList = self._loadExpResults()
         self.createLinksToModel()
+        self.createLinksToCombinationsMatrix()
 
     def createLinksToModel( self ):
         """ in all globalInfo objects, create links to self.databaseParticles """
@@ -392,6 +417,24 @@ class SubDatabase(object):
                 er.globalInfo._databaseParticles = self.databaseParticles
             elif type(er.globalInfo._databaseParticles) == type(None):
                 er.globalInfo._databaseParticles = self.databaseParticles
+
+    def createLinksToCombinationsMatrix( self ):
+        """ in all globalInfo objects, create links to self.combinationsmatrix  """
+        if not hasattr ( self, "combinationsmatrix" ):
+            return
+        if type(self.combinationsmatrix) == type(None):
+            return
+        for ctr,er in enumerate(self.expResultList):
+            if not hasattr ( er.globalInfo, "_combinationsmatrix" ):
+                er.globalInfo._combinationsmatrix = self.combinationsmatrix
+            elif type(er.globalInfo._combinationsmatrix) == type(None):
+                er.globalInfo._combinationsmatrix = self.combinationsmatrix
+
+    def clearLinksToCombinationsMatrix( self ):
+        for ctr,er in enumerate(self.expResultList):
+            if hasattr ( er.globalInfo, "_combinationsmatrix" ):
+                del er.globalInfo._combinationsmatrix
+        
 
     def removeLinksToModel ( self ):
         """ remove the links of globalInfo._databaseParticles to the model.
@@ -444,6 +487,7 @@ class SubDatabase(object):
                     except EOFError as e:
                         pass ## a model does not *have* to be defined
                     self.createLinksToModel()
+                    self.createLinksToCombinationsMatrix()
         except(EOFError,ValueError) as e:
             os.unlink( self.pcl_meta.pathname )
             if lastm_only:

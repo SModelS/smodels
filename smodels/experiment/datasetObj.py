@@ -62,6 +62,100 @@ class DataSet(object):
             self.txnameList.sort()
             self.checkForRedundancy(databaseParticles)
 
+    def isCombinableWith( self, other ):
+        """ 
+        Function that reports if two datasets are mutually uncorrelated = combinable.
+
+        :param other: datasetObj to compare self with
+        """
+        id1, id2 = self.globalInfo.id, other.globalInfo.id
+        if id1 == id2: ## we are always correlated with ourselves
+            return False
+        from smodels.tools.physicsUnits import TeV
+        ds = abs (self.globalInfo.sqrts.asNumber(TeV) - other.globalInfo.sqrts.asNumber(TeV) )
+        if ds > 1e-5: ## not the same
+            return True
+        def getCollaboration ( ds ):
+            return "CMS" if "CMS" in ds.globalInfo.id else "ATLAS"
+        coll1, coll2 = getCollaboration ( self ), getCollaboration ( other )
+        if coll1 != coll2:
+            return True
+        did1, did2= self.dataInfo.dataId, other.dataInfo.dataId
+        if self.isGlobalFieldCombinableWith_ ( other ):
+            return True
+        if other.isGlobalFieldCombinableWith_ ( self ):
+            return True
+        if self.isLocalFieldCombinableWith_ ( other ):
+            return True
+        if other.isLocalFieldCombinableWith_ ( self ):
+            return True
+        if self.isCombMatrixCombinableWith_ ( other ):
+            return True
+        return False
+
+    def isCombMatrixCombinableWith_ ( self, other ):
+        """ check for combinability via the combinations matrix """
+        if not hasattr ( self.globalInfo, "_combinationsmatrix" ):
+            return False
+        if self.globalInfo._combinationsmatrix == None:
+            return False
+        idSelf = self.globalInfo.id
+        didSelf = self.dataInfo.dataId
+        selflabel = f"{idSelf}:{didSelf}"
+        idOther = other.globalInfo.id
+        didOther = other.dataInfo.dataId
+        otherlabel = f"{idOther}:{didOther}"
+        for label, combs in self.globalInfo._combinationsmatrix.items():
+            if label in [ idSelf, didSelf ]:
+                ## match! with self! is "other" in combs?
+                if idOther in combs or otherlabel in combs:
+                    return True
+            if label in [ idOther, didOther ]:
+                ## match! with other! is "self" in combs?
+                if idSelf in combs or selflabel in combs:
+                    return True
+        return False
+
+    def isGlobalFieldCombinableWith_ ( self, other ):
+        """ check for 'combinableWith' fields in globalInfo, check if <other> matches.
+        this check is at analysis level (not at dataset level).
+
+        :params other: a dataset to check against 
+        :returns: true, if pair is marked as combinable, else false
+        """
+        if not hasattr ( self.globalInfo, "combinableWith" ):
+            return False
+        tokens = self.globalInfo.combinableWith.split ( "," )
+        idOther = other.globalInfo.id
+        for t in tokens:
+            if ":" in t:
+                logger.error ( "combinableWith field in globalInfo is at the analysis level. You specified a dataset-level combination %s." % t ) 
+                sys.exit(-1)
+        if idOther in tokens:
+            return True
+        return False
+
+    def isLocalFieldCombinableWith_ ( self, other ):
+        """ check for 'combinableWith' fields in globalInfo, check if <other> matches.
+        this check is at dataset level (not at dataset level).
+
+        :params other: a dataset to check against 
+        :returns: true, if pair is marked as combinable, else false
+        """
+        if not hasattr ( self.dataInfo, "combinableWith" ):
+            return False
+        tokens = self.dataInfo.combinableWith.split ( "," )
+        for t in tokens:
+            if not ":" in t:
+                logger.error ( "combinableWith field in dataInfo is at the dataset level. You specified an analysis-level combination %s." % t )
+                sys.exit(-1)
+        idOther = other.globalInfo.id
+        didOther = other.dataInfo.dataId
+        label = f"{idOther}:{didOther}"
+        if label in tokens:
+            return True
+        return False
+
     def checkForRedundancy(self,databaseParticles):
         """ In case of efficiency maps, check if any txnames have overlapping
             constraints. This would result in double counting, so we dont
@@ -170,6 +264,7 @@ class DataSet(object):
         given a predicted signal "nsig", assuming "deltas"
         error on the signal efficiency.
         The values observedN, expectedBG, and bgError are part of dataInfo.
+
         :param nsig: predicted signal (float)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param marginalize: if true, marginalize nuisances. Else, profile them.

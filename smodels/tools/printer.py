@@ -617,11 +617,13 @@ class SummaryPrinter(TxTPrinter):
                    ( maxr["obs"], maxr["anaid"] )
         if maxr["exp"] != None and maxr["exp"]>-.5:
             output += " (r_expected=%.5f)" % maxr["exp"]
+        else:
+            output += " (r_expected not available)"
         output += "\n"
         for coll,values in maxcoll.items():
             if values["obs"]<-.5:
                 continue
-            output += "Most sensitive %s analysis: %s, r_expected=%.5f, r_obs=%.5f\n" % \
+            output += "%s analysis with highest available r_expected: %s, r_expected=%.5f, r_obs=%.5f\n" % \
                       ( coll, values["anaid"], values["exp"], values["obs"] )
 
         return output
@@ -1287,6 +1289,9 @@ def getInfoFromSummary(output):
     rexp = []
     anaIDs = []
     for l in lines:
+        f=open("bla.txt","at")
+        f.write  ( "l %s \n " % l )
+        f.close()
         if 'The highest r value is' in l:
             rmax = l.split('=')[1].strip()
             ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
@@ -1294,7 +1299,7 @@ def getInfoFromSummary(output):
             rmax = eval(rmax[:ff])
             anaMax = l.split('from')[1].split()[0].replace(',','')
             rexpMax = -1
-            if 'r_expected' in l:
+            if 'r_expected' in l and not "r_expected not available" in l:
                 rexpMax = l.split('r_expected')[1]
                 rexpMax = rexpMax.split('=')[1]
                 ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
