@@ -1120,7 +1120,11 @@ def printScanSummary(outputDict,outputFile):
 
     #Get summary information:
     summaryList = []
-    for fname,output in outputDict.items():
+    fnames = list ( outputDict.keys() ) 
+    fnames.sort() ## we want a canonical order
+
+    for fname in fnames:
+        output = outputDict[fname]
         #default values (in case of empty results):
         summaryDict = OrderedDict({'filename' : fname,
                     'r_max' : 0.,
