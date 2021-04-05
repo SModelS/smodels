@@ -1063,7 +1063,7 @@ class SLHAPrinter(TxTPrinter):
             rList = [firstResult] + [res for res in obj._theoryPredictions[1:] if res.getRValue() >= 1.0]
         else:
             rList = obj._theoryPredictions[:]
-            
+
         for iTP,theoPred in enumerate(rList):
             cter = iTP + 1
             expResult = theoPred.expResult
@@ -1114,17 +1114,19 @@ def printScanSummary(outputDict,outputFile):
     :param outputFile: Path to the summary file to be written.
     """
 
-    #Header:
-    header = "#Global results summary (%i files)\n" %len(outputDict)
-
     #Check available types of printer:
     printerTypes = ['slha','python','summary']
     out = list(outputDict.values())[0] #All outputs should have the same format
     if all([(not ptype in out) for ptype in printerTypes]):
-        header += "#In order to build the summary, one of the following types of printer must be available:\n %s \n" %str(printerTypes)
+        header = "#In order to build the summary, one of the following types of printer must be available:\n %s \n" %str(printerTypes)
         with open(outputFile,'w') as f:
             f.write(header)
         return
+
+    #Header:
+    header = "#Global results summary (%i files)\n" %len(outputDict)
+    header +="#The most constraining analysis corresponds to the one with largest observed r.\n"
+    header +="#The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.\n"
 
     #Get summary information:
     summaryList = []
@@ -1135,13 +1137,15 @@ def printScanSummary(outputDict,outputFile):
         output = outputDict[fname]
         #default values (in case of empty results):
         summaryDict = OrderedDict({'filename' : fname,
-                    'r_max' : 0.,
-                    'r_max(exp)' : -1,
                     'MostConstrainingAnalysis' : 'N/A',
-                    'r_max(ATLAS)' : 0.,
-                    'MostConstraining(ATLAS)' : 'N/A',
-                    'r_max(CMS)' : 0.,
-                    'MostConstraining(CMS)' : 'N/A',
+                    'r_max' : -1,
+                    'r_exp' : -1,
+                    'MostSensitive(ATLAS)' : 'N/A',
+                    'r(ATLAS)' : -1,
+                    'r_exp(ATLAS)' : -1,
+                    'MostSensitive(CMS)' : 'N/A',
+                    'r(CMS)' : -1,
+                    'r_exp(CMS)' : -1
                     })
 
         if 'python' in output:
@@ -1215,29 +1219,37 @@ def getSummaryFrom(output,ptype):
     else:
         rvals,rexp,anaIDs = info
 
-    #Make sure results are sorted in reverse order:
+    #Sort results by r_obs:
     asort = rvals.argsort()[::-1]
+    rvals = rvals[asort]
+    anaIDs = anaIDs[asort]
+    rexp = rexp[asort]
+    summaryDict['r_max'] = rvals[0]
+    summaryDict['r_exp'] = rexp[0]
+    summaryDict['MostConstrainingAnalysis'] = anaIDs[0]
+
+    #Sort results by r_exp:
+    asort = rexp.argsort()[::-1]
     rvals = rvals[asort]
     anaIDs = anaIDs[asort]
     rexp = rexp[asort]
     iATLAS,iCMS = -1,-1
     for i,anaID in enumerate(anaIDs):
+        if rexp[i] < 0: continue
         if 'ATLAS' in anaID and iATLAS < 0:
             iATLAS = i
         elif 'CMS' in anaID and iCMS < 0:
             iCMS = i
 
-    summaryDict['r_max'] = rvals[0]
-    summaryDict['r_max(exp)'] = rexp[0]
-    summaryDict['MostConstrainingAnalysis'] = anaIDs[0]
-
     if iATLAS >= 0:
-        summaryDict['r_max(ATLAS)'] = rvals[iATLAS]
-        summaryDict['MostConstraining(ATLAS)']= anaIDs[iATLAS]
+        summaryDict['r(ATLAS)'] = rvals[iATLAS]
+        summaryDict['r_exp(ATLAS)'] = rexp[iATLAS]
+        summaryDict['MostSensitive(ATLAS)']= anaIDs[iATLAS]
 
     if iCMS >= 0 :
-        summaryDict['r_max(CMS)'] = rvals[iCMS]
-        summaryDict['MostConstraining(CMS)'] = anaIDs[iCMS]
+        summaryDict['r(CMS)'] = rvals[iCMS]
+        summaryDict['r_exp(CMS)'] = rexp[iCMS]
+        summaryDict['MostSensitive(CMS)'] = anaIDs[iCMS]
 
     return summaryDict
 
@@ -1308,7 +1320,7 @@ def getInfoFromSummary(output):
             anaMax = l.split('from')[1].split()[0].replace(',','')
             rexpMax = -1
             if 'r_expected' in l and not "r_expected not available" in l:
-                rexpMax = l.split('r_expected')[1]
+                rexpMax = l.split('r_expected')[-1]
                 rexpMax = rexpMax.split('=')[1]
                 ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
                     for x in rexpMax])[0][0] #Get when the value ends
@@ -1316,19 +1328,22 @@ def getInfoFromSummary(output):
             rvals.append(rmax)
             anaIDs.append(anaMax)
             rexp.append(rexpMax)
-        elif 'Most sensitive' in l:
+        elif 'analysis with highest available r_expected' in l:
             rAna = l.split('=')[-1]+ ' ' #the space is required to have at least one non-digit character after the value
             ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
                     for x in rAna])[0][0] #Get when the value ends
             rAna = eval(rAna[:ff])
             rexpAna = -1
             if 'r_expected' in l:
-                rexpAna = l.split('r_expected')[1]
+                rexpAna = l.split('r_expected')[-1]
                 rexpAna = rexpAna.split('=')[1]
                 ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
                     for x in rexpAna])[0][0] #Get when the value ends
                 rexpAna = eval(rexpAna[:ff])
-            anaID = l.split('analysis:')[1]
+            if 'CMS' in l:
+                anaID = 'CMS-'+l.split('CMS-')[1].split(' ')[0].split(',')[0]
+            else:
+                anaID = 'ATLAS-'+l.split('ATLAS-')[1].split(' ')[0].split(',')[0]
             anaID = anaID.split()[0].strip().replace(',','')
             rvals.append(rAna)
             anaIDs.append(anaID)

@@ -22,7 +22,7 @@ class ScanSummaryTest(unittest.TestCase):
         dirname = "./testFiles/slha/"
         runMain(dirname,inifile = "testParameters.ini")
         outSummary = os.path.join(out,'summary.txt')
-        outDefault = 'summary_python_default.txt'
+        outDefault = 'summary_scan_default.txt'
 
         self.assertTrue(compareSummaries(outSummary,outDefault,allowedDiff=0.05))
 
@@ -33,7 +33,7 @@ class ScanSummaryTest(unittest.TestCase):
         runMain(dirname,inifile = "slhaOnly.ini",suppressStdout=False,
                              development=True)
         outSummary = os.path.join(out,'summary.txt')
-        outDefault = 'summary_python_default.txt'
+        outDefault = 'summary_scan_default.txt'
         self.assertTrue(compareSummaries(outSummary,outDefault,allowedDiff=0.05))
 
     def testSummarySummary( self ):
@@ -44,7 +44,7 @@ class ScanSummaryTest(unittest.TestCase):
         dirname = "./testFiles/slha/"
         runMain(dirname,inifile = "summaryOnly.ini")
         outSummary = os.path.join(out,'summary.txt')
-        outDefault = 'summary_summary_default.txt'
+        outDefault = 'summary_scan_default.txt'
         self.assertTrue(compareSummaries(outSummary,outDefault,allowedDiff=0.05))
 
 

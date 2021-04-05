@@ -330,14 +330,14 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
 
             logger.debug("All children terminated")
 
-            #Collect output to build global summary:
-            summaryFile = os.path.join(outputDir,'summary.txt')
-            logger.info("A summary of the results can be found in %s" %summaryFile)
             outputDict = {}
             for p in children:
                 outputDict.update(p.get())
 
-            printScanSummary(outputDict,summaryFile)
+        #Collect output to build global summary:
+        summaryFile = os.path.join(outputDir,'summary.txt')
+        logger.info("A summary of the results can be found in %s" %summaryFile)
+        printScanSummary(outputDict,summaryFile)
 
     logger.info("Done in %3.2f min"%((time.time()-t0)/60.))
 

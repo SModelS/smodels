@@ -332,10 +332,11 @@ Multiple Files Summary Output
 When running SModelS over multiple files it might be desirable to have a simplified output with a summary
 of the results for each input file. Since version 2.1 this information is stored by default in the 'summary.txt'
 file in the output folder. This text file contains a single line for each input file and provides basic information
-about the SModelS results, such as the highest r-value and the most constraining analysis, as shown below:
+about the SModelS results. This information includes the most constraining analysis (the one with largest observed r),
+the respective expected r-value (if available) and the most sensitive ATLAS and CMS analyses (the ones with largest expected r), as shown below:
 
 .. literalinclude:: /images/scan_summary.txt
-   :lines: 1-5
+   :lines: 1-8
 
 
 .. [#f1] Some of the output may change depending on the code and database versions used.

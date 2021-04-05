@@ -138,10 +138,10 @@ def compareSummaries(outA,outB,allowedDiff):
 
 
     fA = np.genfromtxt(outA,dtype=None,encoding='utf-8',
-                  skip_header=1,names=True)
+                  skip_header=3,names=True)
 
     fB = np.genfromtxt(outB,dtype=None,encoding='utf-8',
-                  skip_header=1,names=True)
+                  skip_header=3,names=True)
 
     if sorted(fA['filename']) != sorted(fB['filename']):
         logger.error("Filenames differ:\n %s\n and\n %s" %(sorted(fA['filename']),sorted(fB['filename'])))
