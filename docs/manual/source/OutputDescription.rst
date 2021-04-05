@@ -307,8 +307,9 @@ Below we give a description of each block together with a sample output.
 .. literalinclude:: /images/gluino_squarks.slha.smodelsslha
    :lines: 10-11
 
-* followed by the list of experimental results. If the model is excluded, all results with :math:`r`-value greater
-  than one are shown. If the point is not excluded, only the result with the highest :math:`r`-value is displayed.
+* followed by the list of experimental results. If  **expandedOutput** = True, all results are printed. Otherwise,
+  if the model is excluded, all results with :math:`r`-value greater than one are shown and if the point is not excluded,
+  only the result with the highest :math:`r`-value is displayed.
   For each experimental result, the :ref:`Txname <TxName>`, the :math:`r`-value,
   the :ref:`condition violation <ULconditions>` and the experimental result ID are shown.
   If **computeStatistics** = True, the :math:`\chi^2` and likelihood values

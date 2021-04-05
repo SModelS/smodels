@@ -43,8 +43,9 @@ New in Version 2.1.0:
   * Ability to merge :ref:`Databases <parameterFileDatabase>` using '+' as a delimiter: "latest_fastlim" and "official_fastlim" are now written as "latest+fastlim", and "official+fastlim".
   * useSuperseded flag in `getExpResults  <experiment.html#experiment.databaseObj.Database.getExpResults>`_ is marked as deprecated, as we now just put superseded results in separate database
   * slightly extended output of :ref:`summary printer <parameterFileSummaryprinter>`
-  * added scan summary (:ref:`summary.txt <scanSummary>`) when running over multiple files  
+  * added scan summary (:ref:`summary.txt <scanSummary>`) when running over multiple files
   * datasets now have an `.isCombinableWith <experiment.html#experiment.datasetObj.DataSet.isCombinableWith>`_ function
+  * added option to slha-printer ( :ref:`expandedOutput <parameterFileSLHAprinter>` )
 
 New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^

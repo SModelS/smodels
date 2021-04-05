@@ -33,7 +33,7 @@ class ScanSummaryTest(unittest.TestCase):
         runMain(dirname,inifile = "slhaOnly.ini",suppressStdout=False,
                              development=True)
         outSummary = os.path.join(out,'summary.txt')
-        outDefault = 'summary_slha_default.txt'
+        outDefault = 'summary_python_default.txt'
         self.assertTrue(compareSummaries(outSummary,outDefault,allowedDiff=0.05))
 
     def testSummarySummary( self ):

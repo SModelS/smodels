@@ -1042,6 +1042,11 @@ class SLHAPrinter(TxTPrinter):
         return output
 
     def _formatTheoryPredictionList(self, obj):
+
+        printAll = True #Controls which theory predictions are printed
+        if hasattr(self,"expandedoutput") and not self.expandedoutput:
+            printAll = False
+
         output = "BLOCK SModelS_Exclusion\n"
         if not obj._theoryPredictions[0]:
             excluded = -1
@@ -1052,11 +1057,15 @@ class SLHAPrinter(TxTPrinter):
             if r > 1: excluded = 1
             else: excluded = 0
         output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n" % (excluded)
-        if excluded == 0: rList = [firstResult]
-        elif excluded == 1: rList = obj._theoryPredictions
-        else: rList = []
-        cter = 1
-        for theoPred in rList:
+        if excluded == -1:
+            rList = []
+        elif not printAll:
+            rList = [firstResult] + [res for res in obj._theoryPredictions[1:] if res.getRValue() >= 1.0]
+        else:
+            rList = obj._theoryPredictions[:]
+            
+        for iTP,theoPred in enumerate(rList):
+            cter = iTP + 1
             expResult = theoPred.expResult
             txnames = theoPred.txnames
             signalRegion  = theoPred.dataId()
@@ -1067,7 +1076,6 @@ class SLHAPrinter(TxTPrinter):
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
 
-            if r <1 and not excluded == 0: break
             output += " %d 0 %-30s #txname \n" % (cter, txnameStr )
             output += " %d 1 %-30.3E #r value\n" % (cter, r)
             if not r_expected: output += " %d 2 N/A                            #expected r value\n" % (cter)
@@ -1082,7 +1090,7 @@ class SLHAPrinter(TxTPrinter):
                 output += " %d 6 N/A                            #Chi2\n" % (cter)
                 output += " %d 7 N/A                            #Likelihood\n" % (cter)
             output += "\n"
-            cter += 1
+
         return output
 
     def _formatUncovered(self, obj):
@@ -1120,7 +1128,7 @@ def printScanSummary(outputDict,outputFile):
 
     #Get summary information:
     summaryList = []
-    fnames = list ( outputDict.keys() ) 
+    fnames = list ( outputDict.keys() )
     fnames.sort() ## we want a canonical order
 
     for fname in fnames:

@@ -274,6 +274,14 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **expandedSummary** (True/False): set True to include in the summary output all applicable |results|, False for only the strongest one.
 
+.. _parameterFileSLHAprinter:
+
+* *slha-printer*: options for the SLHA printer
+
+  .. _parameterFileExpandedOutput:
+
+    * **expandedOutput** (True/False): set True to print the full list of results. If False only the most constraining result and excluding results are printed.
+
 .. _parameterFilePythonprinter:
 
 * *python-printer*: options for the Python printer
