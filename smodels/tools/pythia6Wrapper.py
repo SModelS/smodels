@@ -96,7 +96,7 @@ class Pythia6Wrapper(WrapperBase):
         if self.tempdir == None:
             return
         if self.keepTempDir:
-            logger.warn("Keeping everything in " + self.tempdir)
+            logger.warning("Keeping everything in " + self.tempdir)
             return
         logger.debug( "Unlinking " + self.tempdir )
         for inputFile in ["fort.61", "fort.68", "log"]:

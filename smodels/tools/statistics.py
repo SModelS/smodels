@@ -44,11 +44,11 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
     dr = 2. * ( upperLimit - expectedUpperLimit ) / ( expectedUpperLimit + upperLimit )
     if dr>runtime._drmax:
         if runtime._cap_likelihoods == False:
-            logger.warn("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f)" % ( upperLimit, expectedUpperLimit, dr, runtime._drmax ) )
+            logger.warning("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f)" % ( upperLimit, expectedUpperLimit, dr, runtime._drmax ) )
             return None
         oldUL = upperLimit
         upperLimit = expectedUpperLimit * ( 2. + runtime._drmax ) / ( 2. - runtime._drmax )
-        logger.warn("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f). capping to %.2f." % \
+        logger.warning("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f). capping to %.2f." % \
                 ( oldUL, expectedUpperLimit, dr, runtime._drmax, upperLimit ) )
         ## we are asked to cap likelihoods, so we set observed UL such that dr == drmax
 

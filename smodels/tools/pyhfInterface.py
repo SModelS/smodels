@@ -421,7 +421,7 @@ class PyhfUpperLimitComputer:
         while "mu is not in [lo_mu,hi_mu]":
             nattempts += 1
             if nNan > 5:
-                logger.warn("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
+                logger.warning("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
                 stat = "q"
                 nattempts = 0
             if nattempts > 10:
