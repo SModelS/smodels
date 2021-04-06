@@ -67,7 +67,7 @@ Likelihood Computation
 In the case of |EMrs|, additional statistical information
 about the constrained model can be provided by the SModelS output.
 Most importantly, we can compute a likelihood,
-which describes the plausibility of the data :math:`D`, given a signal strength :math:`\mu`:
+which describes the plausibility of a signal strength :math:`\mu` given the data :math:`D`:
 
 .. math::
    \mathcal{L}(\mu,\theta|D) =  P\left(D|\mu + b + \theta \right) p(\theta)
