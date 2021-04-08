@@ -1,4 +1,4 @@
-#Global results summary (8 files)
+#Global results summary (4 files)
 #The most constraining analysis corresponds to the one with largest observed r.
 #The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.
 #filename            MostConstrainingAnalysis  r_max  r_exp  MostSensitive(ATLAS)  r(ATLAS)  r_exp(ATLAS)  MostSensitive(CMS)  r(CMS)  r_exp(CMS)
