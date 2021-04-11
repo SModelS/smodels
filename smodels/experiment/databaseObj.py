@@ -86,6 +86,8 @@ class Database(object):
         D = {}
         for tmp in lists:
             for t in tmp:
+                if len(t.datasets)== 0: # skip empty entries
+                    continue
                 anaid = t.globalInfo.id + t.datasets[0].getType()
                 if not anaid in D:
                     D[anaid]=t
