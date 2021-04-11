@@ -63,7 +63,7 @@ class DataSet(object):
             self.checkForRedundancy(databaseParticles)
 
     def isCombinableWith( self, other ):
-        """ 
+        """
         Function that reports if two datasets are mutually uncorrelated = combinable.
 
         :param other: datasetObj to compare self with
@@ -120,7 +120,7 @@ class DataSet(object):
         """ check for 'combinableWith' fields in globalInfo, check if <other> matches.
         this check is at analysis level (not at dataset level).
 
-        :params other: a dataset to check against 
+        :params other: a dataset to check against
         :returns: true, if pair is marked as combinable, else false
         """
         if not hasattr ( self.globalInfo, "combinableWith" ):
@@ -129,7 +129,7 @@ class DataSet(object):
         idOther = other.globalInfo.id
         for t in tokens:
             if ":" in t:
-                logger.error ( "combinableWith field in globalInfo is at the analysis level. You specified a dataset-level combination %s." % t ) 
+                logger.error ( "combinableWith field in globalInfo is at the analysis level. You specified a dataset-level combination %s." % t )
                 sys.exit(-1)
         if idOther in tokens:
             return True
@@ -139,7 +139,7 @@ class DataSet(object):
         """ check for 'combinableWith' fields in globalInfo, check if <other> matches.
         this check is at dataset level (not at dataset level).
 
-        :params other: a dataset to check against 
+        :params other: a dataset to check against
         :returns: true, if pair is marked as combinable, else false
         """
         if not hasattr ( self.dataInfo, "combinableWith" ):
@@ -224,6 +224,17 @@ class DataSet(object):
         """
 
         return self.dataInfo.dataId
+
+    def getLumi(self):
+        """
+        Return the dataset luminosity. If not defined for the dataset, use
+        the value defined in globalInfo.lumi.
+        """
+
+        if hasattr(self,'lumi'):
+            return self.lumi
+        else:
+            return self.globalInfo.lumi
 
 
     def getTxName(self,txname):
@@ -438,7 +449,7 @@ class DataSet(object):
         computer = UpperLimitComputer(cl=1.-alpha )
         maxSignalXsec = computer.ulSigma(m)
         if maxSignalXsec != None:
-            maxSignalXsec = maxSignalXsec/self.globalInfo.lumi
+            maxSignalXsec = maxSignalXsec/self.getLumi()
 
         return maxSignalXsec
 
@@ -462,8 +473,6 @@ class CombinedDataSet(object):
         ret = "Combined Dataset (%i datasets)" %len(self._datasets)
         return ret
 
-
-
     def sortDataSets(self):
         """
         Sort datasets according to globalInfo.datasetOrder.
@@ -485,7 +494,6 @@ class CombinedDataSet(object):
                 dsIndex = datasetOrder.index(dataset.getID())
                 self._datasets[dsIndex] = dataset
 
-
     def getType(self):
         """
         Return the dataset type (combined)
@@ -499,6 +507,15 @@ class CombinedDataSet(object):
         """
 
         return '(combined)'
+
+    def getLumi(self):
+        """
+        Return the dataset luminosity. For CombinedDataSet always return
+        the value defined in globalInfo.lumi.
+        """
+
+        return self.globalInfo.lumi
+
 
     def getDataSet(self,datasetID):
         """
@@ -591,7 +608,7 @@ class CombinedDataSet(object):
 
             if ret != None:
                 #Convert limit on total number of signal events to a limit on sigma*eff
-                ret = ret/self.globalInfo.lumi
+                ret = ret/self.getLumi()
             logger.debug("SL upper limit : {}".format(ret))
             return ret
         elif hasattr(self.globalInfo, "jsonFiles" ):
@@ -602,7 +619,7 @@ class CombinedDataSet(object):
             ulcomputer, combinations = self.getPyhfComputer( nsig )
             if ulcomputer.nWS == 1:
                 ret = ulcomputer.ulSigma(expected=expected)
-                ret = ret/self.globalInfo.lumi
+                ret = ret/self.getLumi()
                 logger.debug("pyhf upper limit : {}".format(ret))
                 return ret
             else:
@@ -623,13 +640,13 @@ class CombinedDataSet(object):
                 # Computing upper limit using best combination
                 if expected:
                     try:
-                        ret = ulMin/self.globalInfo.lumi
+                        ret = ulMin/self.getLumi()
                     except NameError:
                         ret = ulcomputer.ulSigma(expected=True, workspace_index=combinations.index(self.bestCB))
-                        ret = ret/self.globalInfo.lumi
+                        ret = ret/self.getLumi()
                 else:
                     ret = ulcomputer.ulSigma(expected=False, workspace_index=combinations.index(self.bestCB))
-                    ret = ret/self.globalInfo.lumi
+                    ret = ret/self.getLumi()
                 logger.debug("pyhf upper limit : {}".format(ret))
                 return ret
         else:

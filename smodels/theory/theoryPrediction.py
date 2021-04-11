@@ -88,7 +88,7 @@ class TheoryPrediction(object):
                                                                 txnames=self.txnames,
                                                                 expected=False)
             if self.dataType() == 'combined':
-                lumi = self.expResult.globalInfo.lumi
+                lumi = self.dataset.getLumi()
                 #Create a list of signal events in each dataset/SR sorted according to datasetOrder
                 if hasattr(self.dataset.globalInfo, "covariance"):
                     srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
@@ -146,7 +146,7 @@ class TheoryPrediction(object):
         ul = self.dataset.getUpperLimitFor(element=self.avgElement,
                                             txnames=self.txnames,
                                             expected=False )
-        lumi = self.dataset.globalInfo.lumi
+        lumi = self.dataset.getLumi()
         ulN = float(ul * lumi) ## upper limit on yield
         eulN = float(eul * lumi) ## upper limit on yield
         nsig = mu*(self.xsection.value*lumi).asNumber()
@@ -164,7 +164,7 @@ class TheoryPrediction(object):
             # FIXME treat the case of exisiting expected upper limit
             return self.likelihoodFromLimits ( mu, marginalize, deltas_rel, expected )
         if self.dataType() == 'efficiencyMap':
-            lumi = self.dataset.globalInfo.lumi
+            lumi = self.dataset.getLumi()
             nsig = mu*(self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel,expected=expected)
             return llhd
@@ -185,7 +185,7 @@ class TheoryPrediction(object):
             self.chi2 = chi2
 
         elif self.dataType() == 'efficiencyMap':
-            lumi = self.dataset.globalInfo.lumi
+            lumi = self.dataset.getLumi()
             nsig = (self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
             chi2 = self.dataset.chi2(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
@@ -193,7 +193,7 @@ class TheoryPrediction(object):
             self.chi2 =  chi2
 
         elif self.dataType() == 'combined':
-            lumi = self.expResult.globalInfo.lumi
+            lumi = self.dataset.getLumi()
             #Create a list of signal events in each dataset/SR sorted according to datasetOrder
             if hasattr(self.dataset.globalInfo, "covariance"):
                 srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
