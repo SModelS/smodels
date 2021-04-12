@@ -170,27 +170,27 @@ class DataHolder(object):
                 if key != 'file':
                     self.data_dict[key].append(False)
         else:
-            self.data_dict = helpers.get_expres(self.data_dict,smodelsDict)
-            self.data_dict = helpers.get_missed_topologies(self.data_dict,smodelsDict)
-            self.data_dict = helpers.get_asymmetric_branches(self.data_dict,smodelsDict)
-            self.data_dict = helpers.get_outside_grid(self.data_dict,smodelsDict)
-            self.data_dict = helpers.get_long_cascades(self.data_dict,smodelsDict)
+            self.data_dict = helpers.getExpres(self.data_dict,smodelsDict)
+            self.data_dict = helpers.getMissedTopologies(self.data_dict,smodelsDict)
+            self.data_dict = helpers.getAsymmetricBranches(self.data_dict,smodelsDict)
+            self.data_dict = helpers.getOutsideGrid(self.data_dict,smodelsDict)
+            self.data_dict = helpers.getLongCascades(self.data_dict,smodelsDict)
 
 
         #Fill with SLHA data:
-        self.data_dict =  helpers.get_slha_hover_info(self.data_dict,slhaData,
+        self.data_dict =  helpers.getSlhaHoverInfo(self.data_dict,slhaData,
                                                       self.slha_hover_information)
-        self.data_dict = helpers.get_ctau(self.data_dict,slhaData,
+        self.data_dict = helpers.getCtau(self.data_dict,slhaData,
                                           self.ctau_hover_information)
-        self.data_dict = helpers.get_BR(self.data_dict,slhaData,self.BR_hover_information,
+        self.data_dict = helpers.getBR(self.data_dict,slhaData,self.BR_hover_information,
                                         self.BR_get_top)
         #Fill with the x and y data:
         #print(list(self.variable_x.keys())[0])
         if list(self.variable_x.keys())[0] not in self.slha_hover_information.keys():
-            self.data_dict = helpers.get_variable(self.data_dict,slhaData,
+            self.data_dict = helpers.getVariable(self.data_dict,slhaData,
                     self.BR_hover_information, self.variable_x)
         if list(self.variable_y.keys())[0] not in self.slha_hover_information.keys():
-            self.data_dict = helpers.get_variable(self.data_dict,slhaData,
+            self.data_dict = helpers.getVariable(self.data_dict,slhaData,
                                 self.BR_hover_information, self.variable_y)
 
     def loadData(self,npoints=-1):
@@ -209,21 +209,21 @@ class DataHolder(object):
             if npoints > 0 and n >= npoints:
                 break
 
-            smodelsOutput = helpers.import_python_output(f)
+            smodelsOutput = helpers.importPythonOutput(f)
             if not smodelsOutput:
                 continue
 
             #Get SLHA file name:
-            slhaFile = helpers.get_slha_file(smodelsOutput)
+            slhaFile = helpers.getSlhaFile(smodelsOutput)
             slhaFile = os.path.join(self.slhaFolder,os.path.basename(slhaFile))
             #Get SLHA data:
-            slhaData = helpers.get_slha_data(slhaFile)
+            slhaData = helpers.getSlhaData(slhaFile)
             if not slhaData:
                 continue
 
             #Data read successfully
             self.data_dict['file'].append(f.split('/')[-1])
-            outputStatus = helpers.output_status(smodelsOutput)
+            outputStatus = helpers.outputStatus(smodelsOutput)
             if outputStatus == -1:
                 self.fillWith(None,slhaData)
             else:
@@ -245,49 +245,49 @@ class DataHolder(object):
 
         logger.info('Making plots...')
 
-        data_frame_all = helpers.make_data_frame(self.data_dict)
+        data_frame_all = helpers.makeDataFrame(self.data_dict)
         
         html_names=helpers.refiningVariableNames()
         
-        data_frame_all = helpers.fill_hover(data_frame_all,
+        data_frame_all = helpers.fillHover(data_frame_all,
                                             self.SModelS_hover_information,
                                             self.slha_hover_information,
                                             self.ctau_hover_information,
                                             self.BR_hover_information,html_names)
 
-        data_frame_excluded,data_frame_nonexcluded = helpers.data_frame_excluded_nonexcluded(data_frame_all)
-        x_axis,y_axis = helpers.get_xy_axis(self.variable_x,self.variable_y)
-        cont_plots,disc_plots = helpers.separate_cont_disc_plots(self.plot_list,
+        data_frame_excluded,data_frame_nonexcluded = helpers.DataFrameExcludedNonexcluded(data_frame_all)
+        x_axis,y_axis = helpers.GetXyAxis(self.variable_x,self.variable_y)
+        cont_plots,disc_plots = helpers.SeparateContDiscPlots(self.plot_list,
                     self.data_dict)
 
-        plot_descriptions=helpers.plot_description()
+        plot_descriptions=helpers.plotDescription()
         
 
-        helpers.make_continuous_plots_all(cont_plots,x_axis,
+        helpers.makeContinuousPlotsAll(cont_plots,x_axis,
                     y_axis,outFolder,data_frame_all,self.plot_data,
                     self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
 
-        helpers.make_continuous_plots_excluded(cont_plots,x_axis,
+        helpers.makeContinuousPlotsExcluded(cont_plots,x_axis,
                     y_axis,outFolder,data_frame_excluded,self.plot_data,
                     self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
 
-        helpers.make_continuous_plots_nonexcluded(cont_plots,x_axis, y_axis,
+        helpers.makeContinuousPlotsNonexcluded(cont_plots,x_axis, y_axis,
                     outFolder,data_frame_nonexcluded, self.plot_data,
                     self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
 
-        helpers.make_discrete_plots_all(disc_plots,x_axis,y_axis,
+        helpers.makeDiscretePlotsAll(disc_plots,x_axis,y_axis,
                     outFolder,data_frame_all,self.plot_data,
                     self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
 
-        helpers.make_discrete_plots_excluded(disc_plots,x_axis,y_axis, outFolder,
+        helpers.makeDiscretePlotsExcluded(disc_plots,x_axis,y_axis, outFolder,
                     data_frame_excluded,self.plot_data,
                     self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
 
-        helpers.make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis, outFolder,
+        helpers.makeDiscretePlotsNonexcluded(disc_plots,x_axis,y_axis, outFolder,
                     data_frame_nonexcluded, self.plot_data,
                     self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
 
-        helpers.create_index_html(outFolder,self.plot_data,self.plot_title,self.plot_list,
+        helpers.createIndexHtml(outFolder,self.plot_data,self.plot_title,self.plot_list,
                     plot_descriptions,html_names, self.indexfile )
 
         logger.info('Generation of interactive plots finished. Go to: \n %s/%s \n to see the plots.' % ( outFolder, self.indexfile ) )
@@ -335,8 +335,12 @@ def makePlots(smodelsFolder,slhaFolder,outputFolder,
     if not loadData:
         raise SModelSError("Error loading data from folders:\n %s\n %s" %(smodelsFolder,slhaFolder))
 
-    dataHolder.makePlots(outputFolder)
+   # dataHolder.makePlots(outputFolder)
 
+    Plotter=helpers.Plotter(data_dict,SModelS_hover_information,
+               slha_hover_information,ctau_hover_information,BR_hover_information,variable_x,variable_y,plot_list,plot_data)
+    Plotter.makeContinuousPlotsAll()
+    
     return outputFolder
 
 def main(args):
@@ -350,16 +354,16 @@ def main(args):
     #inputdirSlha = os.path(args.slhaFolder)
 
     if os.path.isdir(args.slhaFolder)==False:
-        raise SModelSError("slha directory does not exist or is a file")
+        raise SModelSError("slha directory: "+str(args.slhaFolder)+"' does not exist or is a file")
         
     if os.path.isdir(args.smodelsFolder)==False:
-        raise SModelSError("smodels directory does not exist or is a file")
+        raise SModelSError("smodels directory: "+str(args.smodelsFolder)+"' does not exist or is a file")
         
     if os.path.isdir(args.outputFolder)==False:
-        raise SModelSError("output directory does not exist or is a file")
+        raise SModelSError(f"output directory '{args.outputFolder}' does not exist or is a file")
     
-    if os.path.isdir(args.outputFolder)==False:
-        raise SModelSError("parameter files does not exist")
+    if os.path.isfile(args.parameters)==False:
+        raise SModelSError("parameter file '"+str(args.parameters)+"' does not exist")
 
 
         

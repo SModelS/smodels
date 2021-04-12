@@ -29,7 +29,7 @@ import os
 import pyslha
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
-def import_python_output(smodelsFile): 
+def importPythonOutput(smodelsFile):
     """
     Imports the smodels output from each .py file.
     """
@@ -49,7 +49,7 @@ def import_python_output(smodelsFile):
     return smodelsOutput
 
 
-def get_entry(inputDict,*keys):
+def getEntry(inputDict,*keys):
     """
     Get entry key in dictionary inputDict.
     If a list of keys is provided, it will assumed nested
@@ -66,32 +66,32 @@ def get_entry(inputDict,*keys):
         logger.debug('Key %s not found in input dictionary' %key)
         return False
     else:
-        return get_entry(inputDict[key],*keys)
+        return getEntry(inputDict[key],*keys)
  
-def output_status(smodelsDict):
+def outputStatus(smodelsDict):
     """
     Check the smodels output status in the file, if it's -1, 
     it will append 'none' to each list in the dictionary.
     """
     
-    outputStatus = get_entry(smodelsDict, 'OutputStatus', 'file status')
+    outputStatus = getEntry(smodelsDict, 'OutputStatus', 'file status')
     if outputStatus is False:
         raise SModelSError()
 
     return outputStatus
 
-def get_slha_file(smodelsDict):
+def getSlhaFile(smodelsDict):
     """
     Returns the file name of the SLHA file corresponding to the output in smodelsDict
     """
 
-    slhaFile = get_entry(smodelsDict,'OutputStatus','input file')
+    slhaFile = getEntry(smodelsDict,'OutputStatus','input file')
     if not slhaFile:
         raise SModelSError()
 
     return os.path.basename(slhaFile)
 
-def get_slha_data(slhaFile):
+def getSlhaData(slhaFile):
     """
     Uses pyslha to read the SLHA file. Return a pyslha.Doc objec, if successful.
     """
@@ -109,7 +109,7 @@ def get_slha_data(slhaFile):
     return slhaData
     
 def truncate(number):
-    "truncate float to 5 decimal places"
+    "truncate float to 3 decimal places"
     
     if number<1 and number>1e-90:
         
@@ -122,49 +122,49 @@ def truncate(number):
             order=order+1
             
         
-        factor=10**4
+        factor=10**3
         truncated=(math.trunc(provisional_number * factor) / (factor*10**(order)))
    
     #elif number>1e-90:
     # truncated=0.0
     
     else:
-        factor=10**5
+        factor=10**4
         truncated=math.trunc(number * factor) / factor
     return truncated
      
-def get_expres(data_dict,smodelsOutput):
+def getExpres(data_dict,smodelsOutput):
     """
     Extracts the Expres info from the .py output. If requested, the data will be appended on each corresponding list
     """   
     
     rmax=0
-    decompStatus = get_entry(smodelsOutput,'OutputStatus','decomposition status')
+    decompStatus = getEntry(smodelsOutput,'OutputStatus','decomposition status')
     
     if decompStatus == 1:
-        expResList = get_entry(smodelsOutput,'ExptRes')
+        expResList = getEntry(smodelsOutput,'ExptRes')
         if not expResList or not isinstance(expResList,list):
             print(smodelsOutput)
             raise SModelSError("Error reading ExptRes.")    
         for expres in expResList:
             if 'r' in expres:
                 
-                r = get_entry(expres,'r')
+                r = getEntry(expres,'r')
         
             else:
-                r = get_entry(expres,'theory prediction (fb)')/get_entry(expres,'upper limit (fb)')
+                r = getEntry(expres,'theory prediction (fb)')/getEntry(expres,'upper limit (fb)')
                 r = truncate(r)
             if r>rmax:
                 rmax = r
-                Txname = get_entry(expres,'TxNames')
+                Txname = getEntry(expres,'TxNames')
                 Txname=','.join(Txname)
-                if get_entry(expres,'chi2')==False:
+                if getEntry(expres,'chi2')==False:
                     chi_2=False
                 else:    
-                    chi_2 = get_entry(expres,'chi2')
+                    chi_2 = getEntry(expres,'chi2')
                     chi_2 = truncate(chi_2)
 
-                analysis_id = get_entry(expres,'AnalysisID')
+                analysis_id = getEntry(expres,'AnalysisID')
     else:
         Txname = False
         chi_2 = False
@@ -191,16 +191,16 @@ def get_expres(data_dict,smodelsOutput):
         data_dict['Analysis'].append(analysis_id)   
     return data_dict;   
   
-def get_missed_topologies(data_dict,smodelsOuptut):
+def getMissedTopologies(data_dict,smodelsOuptut):
     """
     Extracts the Missed topologies info from the .py output. If requested, the data will be appended on each corresponding list
     """
-    decompStatus = get_entry(smodelsOuptut,'OutputStatus','decomposition status')
+    decompStatus = getEntry(smodelsOuptut,'OutputStatus','decomposition status')
     missedtopo_max_xsec=0
     missedtopo_total_xsec=0
     mt_max = 'False'
     if decompStatus >= 0:
-        for missed_topo in get_entry(smodelsOuptut, 'Missed Topologies'):
+        for missed_topo in getEntry(smodelsOuptut, 'Missed Topologies'):
             missedtopo_xsec=missed_topo.get('weight (fb)')            
             missedtopo_total_xsec=missedtopo_total_xsec+missedtopo_xsec
             if missedtopo_xsec>missedtopo_max_xsec:
@@ -223,11 +223,11 @@ def get_missed_topologies(data_dict,smodelsOuptut):
         
     return data_dict           
    
-def get_long_cascades(data_dict,smodelsOutput):
+def getLongCascades(data_dict,smodelsOutput):
     """
     Extracts the Long cascade info from the .py output. If requested, the data will be appended on each corresponding list
     """
-    decompStatus = get_entry(smodelsOutput,'OutputStatus','decomposition status')    
+    decompStatus = getEntry(smodelsOutput,'OutputStatus','decomposition status')
     long_cascade_total_xsec=0
     if decompStatus >= 0:
         long_cascade_total_xsec=0
@@ -243,11 +243,11 @@ def get_long_cascades(data_dict,smodelsOutput):
              
     return data_dict
              
-def get_asymmetric_branches(data_dict,smodelsOutput):
+def getAsymmetricBranches(data_dict,smodelsOutput):
     """
     Extracts the asymmetric branches info from the .py output. If requested, the data will be appended on each corresponding list
     """
-    decompStatus = get_entry(smodelsOutput,'OutputStatus','decomposition status')
+    decompStatus = getEntry(smodelsOutput,'OutputStatus','decomposition status')
     if decompStatus >= 0:
         asymmetric_branch_total_xsec = sum([asym_br['weight (fb)'] for asym_br in smodelsOutput['Asymmetric Branches']])
         asymmetric_branch_total_xsec=truncate(asymmetric_branch_total_xsec)
@@ -257,11 +257,11 @@ def get_asymmetric_branches(data_dict,smodelsOutput):
         data_dict.get('MT_asym_xsec').append(asymmetric_branch_total_xsec) 
     return data_dict  
     
-def get_outside_grid(data_dict,smodelsOutput):
+def getOutsideGrid(data_dict,smodelsOutput):
     """
     Extracts the outside grid info from the .py output. If requested, the data will be appended on each corresponding list.
     """   
-    decompStatus = get_entry(smodelsOutput,'OutputStatus','decomposition status')
+    decompStatus = getEntry(smodelsOutput,'OutputStatus','decomposition status')
     outside_grid_total_xsec=0
     if decompStatus >= 0:
         for outside_grid in smodelsOutput.get('Outside Grid'):
@@ -274,14 +274,14 @@ def get_outside_grid(data_dict,smodelsOutput):
         data_dict.get('MT_outgrid_xsec').append(outside_grid_total_xsec)  
     return data_dict   
 
-def get_slha_hover_info(data_dict,slhaData,slha_hover_information):
+def getSlhaHoverInfo(data_dict,slhaData,slha_hover_information):
         """
         Gets the requested slha info from eachh slha file, to fill the hover.
         """
           
-        for key in slha_hover_information.keys():
-            block = slha_hover_information.get(key)[0]
-            code_number = slha_hover_information.get(key)[1]
+        for key in self.slha_hover_information.keys():
+            block = self.slha_hover_information.get(key)[0]
+            code_number = self.slha_hover_information.get(key)[1]
             if block=='MASS':
                 data_dict.get(key).append(truncate(abs(slhaData.blocks[block][code_number])))
             else:
@@ -289,7 +289,7 @@ def get_slha_hover_info(data_dict,slhaData,slha_hover_information):
             
         return data_dict
         
-def get_ctau(data_dict,slhaData,ctau_hover_information):    
+def getCtau(data_dict,slhaData,ctau_hover_information):
     """
     Computes the requested ctaus, that will go into de hover.
     """   
@@ -311,7 +311,7 @@ def get_ctau(data_dict,slhaData,ctau_hover_information):
 
               
               
-def get_BR(data_dict,slhaData,BR_hover_information,BR_get_top):
+def getBR(data_dict,slhaData,BR_hover_information,BR_get_top):
     """
     Gets the requested branching ratios from the slha file, that will go into de hover.
     """   
@@ -326,7 +326,7 @@ def get_BR(data_dict,slhaData,BR_hover_information,BR_get_top):
         
     return data_dict 
 
-def get_variable(data_dict,slhaData,slha_hover_information,variable):
+def getVariable(data_dict,slhaData,slha_hover_information,variable):
     """
     Gets the variable from the slha file.
     """  
@@ -340,22 +340,42 @@ def get_variable(data_dict,slhaData,slha_hover_information,variable):
                 data_dict.get(key).append(truncate(slhaData.blocks[block][code_number]))
             
     return data_dict
-    
 
-def make_data_frame(data_dict):
-    """
-    Transform the main dictionary in a data frame.
-    """
-    data_frame_all = pd.DataFrame(data=data_dict)
-    data_frame_all.to_csv('all_data_frame.txt', sep=' ', index=False,header=True)
-    
-    return data_frame_all
+
+class Plotter(data_dict,SModelS_hover_information,slha_hover_information,ctau_hover_information,BR_hover_information,variable_x,variable_y,plot_list,plot_data,plot_title):
+               
+    def __init__ ( self, data_dict,SModelS_hover_information,
+               slha_hover_information,ctau_hover_information,BR_hover_information,variable_x,variable_y,plot_list,plot_data,plot_title):
+               
+               
+        self.data_dict=data_dict
+        self.SModelS_hover_information=SModelS_hover_information
+        self.slha_hover_information=slha_hover_information
+        self.ctau_hover_information=ctau_hover_information
+        self.BR_hover_information=BR_hover_information
+        self.variable_x=variable_x
+        self.variable_y=variable_y
+        self.plot_list=plot_list
+        self.plot_data=plot_data
+        self.plot_title=plot_title
+        
+        
+        return
+
+    def makeDataFrame(self):
+        """
+        Transform the main dictionary in a data frame.
+        """
+        self.data_frame_all = pd.DataFrame(data=self.data_dict)
+        self.data_frame_all.to_csv('all_data_frame.txt', sep=' ', index=False,header=True)
+      
+        return self.data_frame_all
   
 
-def refiningVariableNames():
-    ''' Redifining the output variable names to html format  '''
+    def refiningVariableNames(self):
+        ''' Redifining the output variable names to html format  '''
     
-    html_names={'SModelS_status':'Smodels status',
+        self.html_names={'SModelS_status':'Smodels status',
                       'r_max':'r<sub>max</sub>',
                       'chi2':' &#967;<sup>2</sup>',
                       'Tx':'T<sub>max</sub>',
@@ -366,104 +386,104 @@ def refiningVariableNames():
                       'MT_long_xsec':'MT<sub>long cascade xsection</sub>',
                       'MT_asym_xsec':'MT<sub>asymmetric branch xsection</sub>',
                       'MT_outgrid_xsec':'MT<sub>outside grid xsection</sub>'}
-    return html_names
+        
+        return self.html_names
 
-def fill_hover(data_frame_all,SModelS_hover_information,
-               slha_hover_information,ctau_hover_information,BR_hover_information,html_names):
-    """ Generates the text of the hover, according to users's requests. """
-    data_frame_all['hover_text']=''
-    for column in slha_hover_information:
-        if  slha_hover_information.get(column)[0]=='MASS':
-            data_frame_all['hover_text'] = data_frame_all['hover_text']+column+': '+data_frame_all[column].astype('str')+' GeV'+'<br>' 
-        else:
-            data_frame_all['hover_text'] = data_frame_all['hover_text']+column+': '+data_frame_all[column].astype('str')+'<br>'
-    for column in ctau_hover_information:
-        data_frame_all['hover_text'] = data_frame_all['hover_text']+column+': '+data_frame_all[column].astype('str')+' m'+'<br>' 
-    data_frame_br=pd.DataFrame()
-    for column in BR_hover_information:
-        i=0
-        data_frame_br[column] = data_frame_all[column]
-        for i in range(len(data_frame_all.index)):
-            if data_frame_all[column][i]:
-                data_frame_br[column][i] = data_frame_all[column][i].split("','")
+    def fillHover(self):
+        """ Generates the text of the hover, according to users's requests. """
+        self.data_frame_all['hover_text']=''
+        for column in self.slha_hover_information:
+            if  self.slha_hover_information.get(column)[0]=='MASS':
+                self.data_frame_all['hover_text'] = self.data_frame_all['hover_text']+column+': '+self.data_frame_all[column].astype('str')+' GeV'+'<br>'
             else:
-                data_frame_br[column][i] = []
-            j=0
-            brs=''
-            for br in data_frame_br[column][i]:
-                if j<=4:
-                    brs=brs+' '+br
-                if j>4:
-                    brs=brs+'<br>'
-                    j=0
-                j=j+1
-            data_frame_br[column][i]=brs    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+column+': '+data_frame_br[column].astype('str')+'<br>'     
-    if 'SModelS_status' in SModelS_hover_information:
-        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('SModelS_status')+': '+data_frame_all['SModelS_status'].astype('str')+'<br>'
-    if 'r_max' in SModelS_hover_information:
-        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('r_max')+': '+data_frame_all['r_max'].astype('str')+'<br>'
-    if 'Tx' in SModelS_hover_information: 
-        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('Tx')+': '+data_frame_all['Tx'].astype('str')+'<br>'
-    if 'Analysis' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('Analysis')+': '+data_frame_all['Analysis'].astype('str')+'<br>'
-    if 'chi2' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('chi2')+': '+data_frame_all['chi2'].astype('str')+'<br>'
-    if 'MT_max' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('MT_max')+': '+data_frame_all['MT_max'].astype('str')+'<br>'
-    if 'MT_max_xsec' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('MT_max_xsec')+': '+data_frame_all['MT_max_xsec'].astype('str')+' fb'+'<br>'
-    if 'MT_total_xsec' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('MT_total_xsec')+': '+data_frame_all['MT_total_xsec'].astype('str')+' fb'+'<br>'
-    if 'MT_long_xsec' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('MT_long_xsec')+': '+data_frame_all['MT_long_xsec'].astype('str')+' fb'+'<br>'
-    if 'MT_asym_xsec' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('MT_asym_xsec')+': '+data_frame_all['MT_asym_xsec'].astype('str')+' fb'+'<br>'
-    if 'MT_outgrid_xsec' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+html_names.get('MT_outgrid_xsec')+': '+data_frame_all['MT_outgrid_xsec'].astype('str')+' fb'+'<br>'  
-    if 'file' in SModelS_hover_information:    
-        data_frame_all['hover_text']=data_frame_all['hover_text']+'file'+': '+data_frame_all['file'].astype('str')+'<br>'
+                self.data_frame_all['hover_text'] = self.data_frame_all['hover_text']+column+': '+self.data_frame_all[column].astype('str')+'<br>'
+        for column in self.ctau_hover_information:
+            self.data_frame_all['hover_text'] = self.data_frame_all['hover_text']+column+': '+self.data_frame_all[column].astype('str')+' m'+'<br>'
+        data_frame_br=pd.DataFrame()
+        for column in self.BR_hover_information:
+            i=0
+            data_frame_br[column] = self.data_frame_all[column]
+            for i in range(len(data_frame_all.index)):
+                if self.data_frame_all[column][i]:
+                    data_frame_br[column][i] = self.data_frame_all[column][i].split("','")
+                else:
+                    data_frame_br[column][i] = []
+                j=0
+                brs=''
+                for br in data_frame_br[column][i]:
+                    if j<=4:
+                        brs=brs+' '+br
+                    if j>4:
+                        brs=brs+'<br>'
+                        j=0
+                    j=j+1
+                data_frame_br[column][i]=brs
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+column+': '+data_frame_br[column].astype('str')+'<br>'
+        if 'SModelS_status' in self.SModelS_hover_information:
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('SModelS_status')+': '+self.data_frame_all['SModelS_status'].astype('str')+'<br>'
+        if 'r_max' in self.SModelS_hover_information:
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('r_max')+': '+self.data_frame_all['r_max'].astype('str')+'<br>'
+        if 'Tx' in self.SModelS_hover_information:
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('Tx')+': '+self.data_frame_all['Tx'].astype('str')+'<br>'
+        if 'Analysis' in self.SModelS_hover_information:
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('Analysis')+': '+self.data_frame_all['Analysis'].astype('str')+'<br>'
+        if 'chi2' in self.SModelS_hover_information:
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('chi2')+': '+self.data_frame_all['chi2'].astype('str')+'<br>'
+        if 'MT_max' in self.SModelS_hover_information:
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_max')+': '+self.data_frame_all['MT_max'].astype('str')+'<br>'
+        if 'MT_max_xsec' in self.SModelS_hover_information:
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_max_xsec')+': '+self.data_frame_all['MT_max_xsec'].astype('str')+' fb'+'<br>'
+        if 'MT_total_xsec' in self.SModelS_hover_information:
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_total_xsec')+': '+self.data_frame_all['MT_total_xsec'].astype('str')+' fb'+'<br>'
+        if 'MT_long_xsec' in self.SModelS_hover_information:
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_long_xsec')+': '+self.data_frame_all['MT_long_xsec'].astype('str')+' fb'+'<br>'
+        if 'MT_asym_xsec' in self.SModelS_hover_information:
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_asym_xsec')+': '+self.data_frame_all['MT_asym_xsec'].astype('str')+' fb'+'<br>'
+        if 'MT_outgrid_xsec' in self.SModelS_hover_information:
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_outgrid_xsec')+': '+self.data_frame_all['MT_outgrid_xsec'].astype('str')+' fb'+'<br>'
+        if 'file' in self.SModelS_hover_information:
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+'file'+': '+self.data_frame_all['file'].astype('str')+'<br>'
         
 
-    return data_frame_all;
+        return self.data_frame_all;
  
  
   
  
-def data_frame_excluded_nonexcluded(data_frame_all):
-    """ Generate sub data frames for excluded and non-excluded points """
-    data_frame_excluded=data_frame_all.loc[data_frame_all['SModelS_status']=='Excluded']
-    data_frame_nonexcluded=data_frame_all.loc[data_frame_all['SModelS_status']=='Non-excluded']
-    return data_frame_excluded, data_frame_nonexcluded;
+    def DataFrameExcludedNonexcluded(self):
+        """ Generate sub data frames for excluded and non-excluded points """
+        self.data_frame_excluded=self.data_frame_all.loc[self.data_frame_all['SModelS_status']=='Excluded']
+        self.data_frame_nonexcluded=self.data_frame_all.loc[self.data_frame_all['SModelS_status']=='Non-excluded']
+        return self.data_frame_excluded, self.data_frame_nonexcluded;
  
-def get_xy_axis(variable_x,variable_y):
-    """ Retrieves the names of the x and y axis variables. """
-    x_axis=list(variable_x.keys())[0]
-    y_axis=list(variable_y.keys())[0]
-    return x_axis,y_axis;
+    def GetXyAxis(self):
+        """ Retrieves the names of the x and y axis variables. """
+        self.x_axis=list(self.variable_x.keys())[0]
+        self.y_axis=list(self.variable_y.keys())[0]
+        return self.x_axis,self.y_axis;
      
  
-def separate_cont_disc_plots(plot_list,data_dict):
-    ''' Generate sub lists of plots with discrete and conitnuous z axis variables. '''
-    cont_plots=[]
-    disc_plots=[]
-    discrete_options=['Tx','Analysis','MT_max','file','SModelS_status']
-    for plot in plot_list:
-        if plot in discrete_options:
-            disc_plots.append(plot)
-        else:
+    def SeparateContDiscPlots(self):
+        ''' Generate sub lists of plots with discrete and conitnuous z axis variables. '''
+        self.cont_plots=[]
+        self.disc_plots=[]
+        discrete_options=['Tx','Analysis','MT_max','file','SModelS_status']
+        for plot in self.plot_list:
+            if plot in discrete_options:
+                self.disc_plots.append(plot)
+            else:
             
                 
-            cont_plots.append(plot)
-    return cont_plots, disc_plots;
+                self.cont_plots.append(plot)
+        return self.cont_plots, self.disc_plots;
     
 
                 
     
  
-def plot_description():
-    ''' Generate a description for each plot.'''
-    plot_descriptions={'SModelS_status':'Excluded or not excluded by SModelS.',
+    def plotDescription(self):
+        ''' Generate a description for each plot.'''
+        self.plot_descriptions={'SModelS_status':'Excluded or not excluded by SModelS.',
                       'r_max':'highest r-value from SModelS.',
                       'chi2':'&#967;<sup>2</sup> value associated to the highest r-value.',
                       'Tx':'Topology/ies which give the highest r-value.',
@@ -474,34 +494,34 @@ def plot_description():
                       'MT_long_xsec':'Missing cross section in long cascade decays.',
                       'MT_asym_xsec':'Missing cross section in decays with asymmetric branches.',
                       'MT_outgrid_xsec':'Missing cross section outside the mass grids of the experimental results.'}
-    return plot_descriptions;   
+        return self.plot_descriptions;
  
 #####continuous plots##############
-def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_all,plot_data,plot_title,variable_x,variable_y,plot_descriptions,html_names):
-    """ Generate plots with continuous z axis variables, using all data points """
-    if 'all' in plot_data: 
-        for cont_plot in cont_plots:
+    def makeContinuousPlotsAll(self):
+        """ Generate plots with continuous z axis variables, using all data points """
+        if 'all' in self.plot_data:
+            for cont_plot in self.cont_plots:
         
-            if cont_plot=='chi2':
-                all_false=True
-                for chi2_value in data_frame_all['chi2']:
-                    if chi2_value!=False:
-                        all_false=False
-                if all_false==True:
-                    logger.info('No values where found for chi^2. Skipping this plot')
-                    continue
+                if cont_plot=='chi2':
+                    all_false=True
+                    for chi2_value in self.data_frame_all['chi2']:
+                        if chi2_value!=False:
+                            all_false=False
+                    if all_false==True:
+                        logger.info('No values where found for chi^2. Skipping this plot')
+                        continue
                 
-            plot_desc=plot_descriptions.get(cont_plot)
-            cont_plot_legend=html_names.get(cont_plot)
-            if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
-                cont_plot_legend=html_names.get(cont_plot)+' (fb)'
-            z=data_frame_all[cont_plot]
-            x=data_frame_all[x_axis]
-            y=data_frame_all[y_axis]
-            hover_text=data_frame_all['hover_text']
+                plot_desc=self.plot_descriptions.get(cont_plot)
+                cont_plot_legend=self.html_names.get(cont_plot)
+                if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
+                    cont_plot_legend=self.html_names.get(cont_plot)+' (fb)'
+                z=self.data_frame_all[cont_plot]
+                x=self.data_frame_all[self.x_axis]
+                y=self.data_frame_all[self.y_axis]
+                hover_text=self.data_frame_all['hover_text']
             
-            data = [
-                go.Scatter(
+                data = [
+                    go.Scatter(
                     x=x,
                     y=y,
                     text=hover_text,
@@ -509,8 +529,8 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
                     mode='markers',
                     marker=dict(
                         size=10,
-                        cmax=data_frame_all[cont_plot].max(),
-                        cmin=data_frame_all[cont_plot].max(),
+                        cmax=self.data_frame_all[cont_plot].max(),
+                        cmin=self.data_frame_all[cont_plot].max(),
                         color=z,
                         colorbar=dict(
                             title=cont_plot_legend), 
@@ -519,11 +539,11 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
                             )
                     ]
                
-            if variable_x.get(x_axis)[0]=='MASS' and variable_y.get(y_axis)[0]=='MASS':
-                layout = go.Layout(hovermode= 'closest',
-                                   title = plot_title,
-                                   xaxis = dict(title=x_axis+' (GeV)'),
-                                   yaxis = dict(title=y_axis+' (GeV)'),
+                if self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
+                    layout = go.Layout(hovermode= 'closest',
+                                   title = self.plot_title,
+                                   xaxis = dict(title=self.x_axis+' (GeV)'),
+                                   yaxis = dict(title=self.y_axis+' (GeV)'),
                                    annotations=[
                                            dict(
                                                    x=0.0,
@@ -535,11 +555,11 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
                                                    )]
                                    )
             
-            elif variable_x.get(x_axis)[0]!='MASS' and variable_y.get(y_axis)[0]=='MASS':
-                layout = go.Layout(hovermode= 'closest',
-                                   title = plot_title,
-                                   xaxis = dict(title=x_axis),
-                                   yaxis = dict(title=y_axis+' (GeV)'),
+                elif self.variable_x.get(self.x_axis)[0]!='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
+                    layout = go.Layout(hovermode= 'closest',
+                                   title = self.plot_title,
+                                   xaxis = dict(title=self.x_axis),
+                                   yaxis = dict(title=self.y_axis+' (GeV)'),
                                    annotations=[
                                            dict(
                                                    x=0.0,
@@ -551,11 +571,11 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
                                                    )]
                                    )            
             
-            elif variable_x.get(x_axis)[0]=='MASS' and variable_y.get(y_axis)[0]!='MASS':
-                layout = go.Layout(hovermode= 'closest',
-                                   title = plot_title,
-                                   xaxis = dict(title=x_axis+' (GeV)'),
-                                   yaxis = dict(title=y_axis),
+                elif self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]!='MASS':
+                    layout = go.Layout(hovermode= 'closest',
+                                   title = self.plot_title,
+                                   xaxis = dict(title=self.x_axis+' (GeV)'),
+                                   yaxis = dict(title=self.y_axis),
                                    annotations=[
                                            dict(
                                                    x=0.0,
@@ -567,11 +587,11 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
                                                    )]
                                    )             
             
-            else:
-                layout = go.Layout(hovermode= 'closest',
-                                   title = plot_title,
-                                   xaxis = dict(title=x_axis),
-                                   yaxis = dict(title=y_axis),
+                else:
+                    layout = go.Layout(hovermode= 'closest',
+                                   title = self.plot_title,
+                                   xaxis = dict(title=self.x_axis),
+                                   yaxis = dict(title=self.y_axis),
                                    annotations=[
                                            dict(
                                                    x=0.0,
@@ -583,44 +603,44 @@ def make_continuous_plots_all(cont_plots,x_axis,y_axis,path_to_plots,data_frame_
                                                    )]
                                    )
                 
-            fig = go.Figure(data=data, layout=layout)
-            plotly.offline.plot(fig, filename = path_to_plots+'/'+cont_plot+'_all.html', auto_open=False)
-    return;
+                fig = go.Figure(data=data, layout=layout)
+                plotly.offline.plot(fig, filename = path_to_plots+'/'+cont_plot+'_all.html', auto_open=False)
+        return;
  
  
-def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_frame_excluded,plot_data,plot_title,variable_x,variable_y,plot_descriptions,html_names):
-    """ Generate plots with continuous z axis variables, using excluded data points """
-    if 'excluded' in plot_data: 
-        for cont_plot in cont_plots:
+    def makeContinuousPlotsExcluded(self):
+        """ Generate plots with continuous z axis variables, using excluded data points """
+        if 'excluded' in self.plot_data:
+            for cont_plot in self.cont_plots:
         
-            if cont_plot=='chi2':
-                all_false=True
-                for chi2_value in data_frame_excluded['chi2']:
-                    if chi2_value!=False:
-                        all_false=False
-                if all_false==True:
-                    logger.info('No values where found for chi^2 in the excluded region. Skipping this plot')
-                    continue
-            plot_desc=plot_descriptions.get(cont_plot)
-            cont_plot_legend=html_names.get(cont_plot)
-            if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
-                cont_plot_legend=html_names.get(cont_plot)+' (fb)'
-            z=data_frame_excluded[cont_plot]
-            x=data_frame_excluded[x_axis]
-            y=data_frame_excluded[y_axis]
-            hover_text=data_frame_excluded['hover_text']
+                if cont_plot=='chi2':
+                    all_false=True
+                    for chi2_value in self.data_frame_excluded['chi2']:
+                        if chi2_value!=False:
+                            all_false=False
+                    if all_false==True:
+                        logger.info('No values where found for chi^2 in the excluded region. Skipping this plot')
+                        continue
+                plot_desc=self.plot_descriptions.get(cont_plot)
+                cont_plot_legend=self.html_names.get(cont_plot)
+                if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
+                    cont_plot_legend=self.html_names.get(cont_plot)+' (fb)'
+                z=self.data_frame_excluded[cont_plot]
+                x=self.data_frame_excluded[self.x_axis]
+                y=self.data_frame_excluded[self.y_axis]
+                hover_text=self.data_frame_excluded['hover_text']
              
              
-            data = [
-                go.Scatter(
+                data = [
+                    go.Scatter(
                     x=x,
                     y=y,
                     text=hover_text,
                     hoverinfo='text',
                     marker=dict(
                         size=10,
-                        cmax=data_frame_excluded[cont_plot].max(),
-                        cmin=data_frame_excluded[cont_plot].max(),
+                        cmax=self.data_frame_excluded[cont_plot].max(),
+                        cmin=self.data_frame_excluded[cont_plot].max(),
                         color=z,
                         colorbar=dict(
                             title=cont_plot_legend), 
@@ -630,11 +650,11 @@ def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_f
      
                     ]
      
-            if variable_x.get(x_axis)[0]=='MASS' and variable_y.get(y_axis)[0]=='MASS':
-                layout = go.Layout(hovermode= 'closest',
-                                   title = plot_title,
-                                   xaxis = dict(title=x_axis+' (GeV)'),
-                                   yaxis = dict(title=y_axis+' (GeV)'),
+                if self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
+                    layout = go.Layout(hovermode= 'closest',
+                                   title = self.plot_title,
+                                   xaxis = dict(title=self.x_axis+' (GeV)'),
+                                   yaxis = dict(title=self.y_axis+' (GeV)'),
                                    annotations=[
                                            dict(
                                                    x=0.0,
@@ -646,11 +666,11 @@ def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_f
                                                    )]
                                    )
             
-            elif variable_x.get(x_axis)[0]!='MASS' and variable_y.get(y_axis)[0]=='MASS':
-                layout = go.Layout(hovermode= 'closest',
-                                   title = plot_title,
-                                   xaxis = dict(title=x_axis),
-                                   yaxis = dict(title=y_axis+' (GeV)'),
+                elif self.variable_x.get(self.x_axis)[0]!='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
+                    layout = go.Layout(hovermode= 'closest',
+                                   title = self.plot_title,
+                                   xaxis = dict(title=self.x_axis),
+                                   yaxis = dict(title=self.y_axis+' (GeV)'),
                                    annotations=[
                                            dict(
                                                    x=0.0,
@@ -662,11 +682,11 @@ def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_f
                                                    )]
                                    )            
             
-            elif variable_x.get(x_axis)[0]=='MASS' and variable_y.get(y_axis)[0]!='MASS':
-                layout = go.Layout(hovermode= 'closest',
-                                   title = plot_title,
-                                   xaxis = dict(title=x_axis+' (GeV)'),
-                                   yaxis = dict(title=y_axis),
+                elif self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]!='MASS':
+                    layout = go.Layout(hovermode= 'closest',
+                                   title = self.plot_title,
+                                   xaxis = dict(title=self.x_axis+' (GeV)'),
+                                   yaxis = dict(title=self.y_axis),
                                    annotations=[
                                            dict(
                                                    x=0.0,
@@ -678,49 +698,49 @@ def make_continuous_plots_excluded(cont_plots,x_axis,y_axis,path_to_plots,data_f
                                                    )]
                                    )             
             
-            else:
-                layout = go.Layout(hovermode= 'closest',
-                                   title = plot_title,
-                                   xaxis = dict(title=x_axis),
-                                   yaxis = dict(title=y_axis)
+                else:
+                    layout = go.Layout(hovermode= 'closest',
+                                   title = self.plot_title,
+                                   xaxis = dict(title=self.x_axis),
+                                   yaxis = dict(title=self.y_axis)
                                    )
-            fig = go.Figure(data=data, layout=layout)
-            plotly.offline.plot(fig, filename=path_to_plots+'/'+cont_plot+'_excluded.html',auto_open=False)
-    return;
+                fig = go.Figure(data=data, layout=layout)
+                plotly.offline.plot(fig, filename=path_to_plots+'/'+cont_plot+'_excluded.html',auto_open=False)
+        return;
  
  
-def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,data_frame_nonexcluded,plot_data,plot_title,variable_x,variable_y,plot_descriptions,html_names):
-    """ Generate plots with continuous z axis variables, using non-excluded data points """
-    if 'non-excluded' in plot_data: 
-        for cont_plot in cont_plots:
+    def makeContinuousPlotsNonexcluded(self):
+        """ Generate plots with continuous z axis variables, using non-excluded data points """
+        if 'non-excluded' in self.plot_data:
+            for cont_plot in self.cont_plots:
         
-            if cont_plot=='chi2':
-                all_false=True
-                for chi2_value in data_frame_nonexcluded['chi2']:
-                    if chi2_value!=False:
-                        all_false=False
-                if all_false==True:
-                    logger.info('No values where found for chi^2 in the non-excluded region. Skipping this plot')
-                    continue
-            plot_desc=plot_descriptions.get(cont_plot)
-            cont_plot_legend=html_names.get(cont_plot)
-            if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
-                cont_plot_legend=html_names.get(cont_plot)+' (fb)'
-            z=data_frame_nonexcluded[cont_plot]
-            x=data_frame_nonexcluded[x_axis]
-            y=data_frame_nonexcluded[y_axis]
-            hover_text=data_frame_nonexcluded['hover_text'] 
+                if cont_plot=='chi2':
+                    all_false=True
+                    for chi2_value in self.data_frame_nonexcluded['chi2']:
+                        if chi2_value!=False:
+                            all_false=False
+                    if all_false==True:
+                        logger.info('No values where found for chi^2 in the non-excluded region. Skipping this plot')
+                        continue
+                plot_desc=self.plot_descriptions.get(cont_plot)
+                cont_plot_legend=self.html_names.get(cont_plot)
+                if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
+                    cont_plot_legend=self.html_names.get(cont_plot)+' (fb)'
+                z=self.data_frame_nonexcluded[cont_plot]
+                x=self.data_frame_nonexcluded[self.x_axis]
+                y=self.data_frame_nonexcluded[self.y_axis]
+                hover_text=self.data_frame_nonexcluded['hover_text']
              
-            data = [
-                go.Scatter(
+                data = [
+                    go.Scatter(
                     x=x,
                     y=y,
                     text=hover_text,
                     hoverinfo='text',
                     marker=dict(
                         size=10,
-                        cmax=data_frame_nonexcluded[cont_plot].max(),
-                        cmin=data_frame_nonexcluded[cont_plot].max(),
+                        cmax=self.data_frame_nonexcluded[cont_plot].max(),
+                        cmin=self.data_frame_nonexcluded[cont_plot].max(),
                         color=z,
                         colorbar=dict(
                             title=cont_plot_legend), 
@@ -730,11 +750,11 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
      
                     ]
      
-            if variable_x.get(x_axis)[0]=='MASS' and variable_y.get(y_axis)[0]=='MASS':
-                layout = go.Layout(hovermode= 'closest',
-                                   title = plot_title,
-                                   xaxis = dict(title=x_axis+' (GeV)'),
-                                   yaxis = dict(title=y_axis+' (GeV)'),
+                if self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
+                    layout = go.Layout(hovermode= 'closest',
+                                   title = self.plot_title,
+                                   xaxis = dict(title=self.x_axis+' (GeV)'),
+                                   yaxis = dict(title=self.y_axis+' (GeV)'),
                                    annotations=[
                                            dict(
                                                    x=0.0,
@@ -746,11 +766,11 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
                                                    )]
                                    )
             
-            elif variable_x.get(x_axis)[0]!='MASS' and variable_y.get(y_axis)[0]=='MASS':
-                layout = go.Layout(hovermode= 'closest',
-                                   title = plot_title,
-                                   xaxis = dict(title=x_axis),
-                                   yaxis = dict(title=y_axis+' (GeV)'),
+                elif self.variable_x.get(self.x_axis)[0]!='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
+                    layout = go.Layout(hovermode= 'closest',
+                                   title = self.plot_title,
+                                   xaxis = dict(title=self.x_axis),
+                                   yaxis = dict(title=self.y_axis+' (GeV)'),
                                    annotations=[
                                            dict(
                                                    x=0.0,
@@ -762,11 +782,11 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
                                                    )]
                                    )            
             
-            elif variable_x.get(x_axis)[0]=='MASS' and variable_y.get(y_axis)[0]!='MASS':
-                layout = go.Layout(hovermode= 'closest',
-                                   title = plot_title,
-                                   xaxis = dict(title=x_axis+' (GeV)'),
-                                   yaxis = dict(title=y_axis),
+                elif self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]!='MASS':
+                    layout = go.Layout(hovermode= 'closest',
+                                   title = self.plot_title,
+                                   xaxis = dict(title=self.x_axis+' (GeV)'),
+                                   yaxis = dict(title=self.y_axis),
                                    annotations=[
                                            dict(
                                                    x=0.0,
@@ -778,11 +798,11 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
                                                    )]
                                    )             
             
-            else:
-                layout = go.Layout(hovermode= 'closest',
-                                   title = plot_title,
-                                   xaxis = dict(title=x_axis),
-                                   yaxis = dict(title=y_axis),
+                else:
+                    layout = go.Layout(hovermode= 'closest',
+                                   title = self.plot_title,
+                                   xaxis = dict(title=self.x_axis),
+                                   yaxis = dict(title=self.y_axis),
                                    annotations=[
                                            dict(
                                                    x=0.0,
@@ -794,31 +814,31 @@ def make_continuous_plots_nonexcluded(cont_plots,x_axis,y_axis,path_to_plots,dat
                                                    )]
                                    )
         
-            fig = go.Figure(data=data, layout=layout)
-            plotly.offline.plot(fig, filename = path_to_plots+'/'+cont_plot+'_non-excluded.html', auto_open=False)
-    return;
+                fig = go.Figure(data=data, layout=layout)
+                plotly.offline.plot(fig, filename = path_to_plots+'/'+cont_plot+'_non-excluded.html', auto_open=False)
+        return;
  
      
     #########Discrete_plots############
-def make_discrete_plots_all(disc_plots,x_axis,y_axis,path_to_plots,data_frame_all,plot_data,plot_title,variable_x,variable_y,plot_descriptions,html_names):
-    """ Generate plots with discrete z axis variables, using all data points """
-    if 'all' in plot_data:
-        for disc_plot in disc_plots:
-            plot_desc=plot_descriptions.get(disc_plot)
+    def makeDiscretePlotsAll(self):
+        """ Generate plots with discrete z axis variables, using all data points """
+        if 'all' in self.plot_data:
+            for disc_plot in self.disc_plots:
+                plot_desc=self.plot_descriptions.get(disc_plot)
              
-            disc_list=[]
-            for value in data_frame_all[disc_plot]:   
-                if value not in disc_list:
-                    disc_list.append(value)  
+                disc_list=[]
+                for value in self.data_frame_all[disc_plot]:
+                    if value not in disc_list:
+                        disc_list.append(value)
      
-            fig = {
-                'data': [
+                fig = {
+                    'data': [
                     {
-                        'x': data_frame_all.loc[data_frame_all[disc_plot]==value][x_axis],
-                        'y': data_frame_all.loc[data_frame_all[disc_plot]==value][y_axis],
+                        'x': self.data_frame_all.loc[self.data_frame_all[disc_plot]==value][self.x_axis],
+                        'y': self.data_frame_all.loc[self.data_frame_all[disc_plot]==value][self.y_axis],
                         'name': value, 'mode': 'markers',
                         'marker':dict(size=10),
-                        'text':data_frame_all.loc[data_frame_all[disc_plot]==value]['hover_text'],
+                        'text':self.data_frame_all.loc[self.data_frame_all[disc_plot]==value]['hover_text'],
                         'hoverinfo':'text',
                  
                  
@@ -827,286 +847,286 @@ def make_discrete_plots_all(disc_plots,x_axis,y_axis,path_to_plots,data_frame_al
 
             }
                 
-            if variable_x.get(x_axis)[0]=='MASS' and variable_y.get(y_axis)[0]=='MASS':               
-                fig['layout'] =  {'title':plot_title,
+                if self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
+                    fig['layout'] =  {'title':self.plot_title,
                     'showlegend':True,       
                     'hovermode':'closest','annotations':[
                                            dict(
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
+                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
-                    'xaxis': {'title': x_axis+' (GeV)'},
-                    'yaxis': {'title': y_axis+' (GeV)'}
+                    'xaxis': {'title': self.x_axis+' (GeV)'},
+                    'yaxis': {'title': self.y_axis+' (GeV)'}
                                 } 
                 
-            elif variable_x.get(x_axis)[0]!='MASS' and variable_y.get(y_axis)[0]=='MASS':               
-                fig['layout'] =  {'title':plot_title,
+                elif self.variable_x.get(self.x_axis)[0]!='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
+                    fig['layout'] =  {'title':self.plot_title,
                     'showlegend':True,       
                     'hovermode':'closest','annotations':[
                                            dict(
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
+                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
-                    'xaxis': {'title': x_axis},
-                    'yaxis': {'title': y_axis+' (GeV)'}
+                    'xaxis': {'title': self.x_axis},
+                    'yaxis': {'title': self.y_axis+' (GeV)'}
                                 }  
                 
-            elif variable_x.get(x_axis)[0]=='MASS' and variable_y.get(y_axis)[0]!='MASS':               
-                fig['layout'] =  {'title':plot_title,
+                elif self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]!='MASS':
+                    fig['layout'] =  {'title':self.plot_title,
                     'showlegend':True,       
                     'hovermode':'closest','annotations':[
                                            dict(
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
+                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
-                    'xaxis': {'title': x_axis+' (GeV)'},
-                    'yaxis': {'title': y_axis}
+                    'xaxis': {'title': self.x_axis+' (GeV)'},
+                    'yaxis': {'title': self.y_axis}
                                 } 
 
-            else:               
-                fig['layout'] =  {'title':plot_title,
+                else:
+                    fig['layout'] =  {'title':self.plot_title,
                     'showlegend':True,       
                     'hovermode':'closest','annotations':[
                                            dict(
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
+                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
-                    'xaxis': {'title': x_axis+' (GeV)'},
-                    'yaxis': {'title': y_axis+' (GeV)'}
+                    'xaxis': {'title': self.x_axis+' (GeV)'},
+                    'yaxis': {'title': self.y_axis+' (GeV)'}
                                 }                 
             
             
      
-            plotly.offline.plot(fig, filename = path_to_plots+'/'+disc_plot+'_all.html', auto_open=False)
-    return;
+                plotly.offline.plot(fig, filename = path_to_plots+'/'+disc_plot+'_all.html', auto_open=False)
+        return;
  
  
-def make_discrete_plots_excluded(disc_plots,x_axis,y_axis,path_to_plots,data_frame_excluded,plot_data,plot_title,variable_x,variable_y,plot_descriptions,html_names):
-    """ Generate plots with discrete z axis variables, using excluded data points """
-    if 'excluded' in plot_data:
-        for disc_plot in disc_plots:
-            plot_desc=plot_descriptions.get(disc_plot) 
-            disc_list=[]
-            for value in data_frame_excluded[disc_plot]:   
-                if value not in disc_list:
-                    disc_list.append(value)  
+    def makeDiscretePlotsExcluded(self):
+        """ Generate plots with discrete z axis variables, using excluded data points """
+        if 'excluded' in self.plot_data:
+            for disc_plot in self.disc_plots:
+                plot_desc=self.plot_descriptions.get(disc_plot)
+                disc_list=[]
+                for value in self.data_frame_excluded[disc_plot]:
+                    if value not in disc_list:
+                        disc_list.append(value)
      
-            fig = {
-                'data': [
+                fig = {
+                    'data': [
                     {
-                        'x': data_frame_excluded.loc[data_frame_excluded[disc_plot]==value][x_axis],
-                        'y': data_frame_excluded.loc[data_frame_excluded[disc_plot]==value][y_axis],
+                        'x': self.data_frame_excluded.loc[self.data_frame_excluded[disc_plot]==value][self.x_axis],
+                        'y': self.data_frame_excluded.loc[self.data_frame_excluded[disc_plot]==value][self.y_axis],
                         'name': value, 'mode': 'markers',
                         'marker':dict(size=10),
-                        'text':data_frame_excluded.loc[data_frame_excluded[disc_plot]==value]['hover_text'],
+                        'text':self.data_frame_excluded.loc[self.data_frame_excluded[disc_plot]==value]['hover_text'],
                         'hoverinfo':'text',
                  
                  
                     } for value in disc_list
                 ],
-                'layout': {'title':plot_title,
+                'layout': {'title':self.plot_title,
                     'showlegend':True,
                     'hovermode':'closest',
-                    'xaxis': {'title': x_axis},
-                    'yaxis': {'title': y_axis}
+                    'xaxis': {'title': self.x_axis},
+                    'yaxis': {'title': self.y_axis}
                 }
             }
                 
-            if variable_x.get(x_axis)[0]=='MASS' and variable_y.get(y_axis)[0]=='MASS':               
-                fig['layout'] =  {'title':plot_title,
+                if self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
+                    fig['layout'] =  {'title':self.plot_title,
                     'showlegend':True,       
                     'hovermode':'closest','annotations':[
                                            dict(
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
+                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
-                    'xaxis': {'title': x_axis+' (GeV)'},
-                    'yaxis': {'title': y_axis+' (GeV)'}
+                    'xaxis': {'title': self.x_axis+' (GeV)'},
+                    'yaxis': {'title': self.y_axis+' (GeV)'}
                                 } 
                 
-            elif variable_x.get(x_axis)[0]!='MASS' and variable_y.get(y_axis)[0]=='MASS':               
-                fig['layout'] =  {'title':plot_title,
+                elif self.variable_x.get(self.x_axis)[0]!='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
+                    fig['layout'] =  {'title':self.plot_title,
                     'showlegend':True,       
                     'hovermode':'closest','annotations':[
                                            dict(
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
+                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
-                    'xaxis': {'title': x_axis},
-                    'yaxis': {'title': y_axis+' (GeV)'}
+                    'xaxis': {'title': self.x_axis},
+                    'yaxis': {'title': self.y_axis+' (GeV)'}
                                 }  
                 
-            elif variable_x.get(x_axis)[0]=='MASS' and variable_y.get(y_axis)[0]!='MASS':               
-                fig['layout'] =  {'title':plot_title,
+                elif self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]!='MASS':
+                    fig['layout'] =  {'title':self.plot_title,
                     'showlegend':True,       
                     'hovermode':'closest','annotations':[
                                            dict(
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
+                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
-                    'xaxis': {'title': x_axis+' (GeV)'},
-                    'yaxis': {'title': y_axis}
+                    'xaxis': {'title': self.x_axis+' (GeV)'},
+                    'yaxis': {'title': self.y_axis}
                                 } 
 
-            else:               
-                fig['layout'] =  {'title':plot_title,
+                else:
+                    fig['layout'] =  {'title':self.plot_title,
                     'showlegend':True,       
                     'hovermode':'closest','annotations':[
                                            dict(
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
+                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
-                    'xaxis': {'title': x_axis+' (GeV)'},
-                    'yaxis': {'title': y_axis+' (GeV)'}
+                    'xaxis': {'title': self.x_axis+' (GeV)'},
+                    'yaxis': {'title': self.y_axis+' (GeV)'}
                                 } 
      
-            plotly.offline.plot(fig, filename = path_to_plots+'/'+disc_plot+'_excluded.html', auto_open=False)
-    return;
+                plotly.offline.plot(fig, filename = path_to_plots+'/'+disc_plot+'_excluded.html', auto_open=False)
+        return;
  
-def make_discrete_plots_nonexcluded(disc_plots,x_axis,y_axis,path_to_plots,data_frame_nonexcluded,plot_data,plot_title,variable_x,variable_y,plot_descriptions,html_names):
-    """ Generate plots with discrete z axis variables, using non-excluded data points """
-    if 'non-excluded' in plot_data:
-        for disc_plot in disc_plots:
-            plot_desc=plot_descriptions.get(disc_plot) 
-            disc_list=[]
-            for value in data_frame_nonexcluded[disc_plot]:   
-                if value not in disc_list:
-                    disc_list.append(value)  
+    def makeDiscretePlotsNonexcluded(self):
+        """ Generate plots with discrete z axis variables, using non-excluded data points """
+        if 'non-excluded' in self.plot_data:
+            for disc_plot in self.disc_plots:
+                plot_desc=self.plot_descriptions.get(disc_plot)
+                disc_list=[]
+                for value in self.data_frame_nonexcluded[disc_plot]:
+                    if value not in disc_list:
+                        disc_list.append(value)
      
-            fig = {
-                'data': [
+                fig = {
+                    'data': [
                     {
-                        'x': data_frame_nonexcluded.loc[data_frame_nonexcluded[disc_plot]==value][x_axis],
-                        'y': data_frame_nonexcluded.loc[data_frame_nonexcluded[disc_plot]==value][y_axis],
+                        'x': self.data_frame_nonexcluded.loc[self.data_frame_nonexcluded[disc_plot]==value][self.x_axis],
+                        'y': self.data_frame_nonexcluded.loc[self.data_frame_nonexcluded[disc_plot]==value][self.y_axis],
                         'name': value, 'mode': 'markers',
                         'marker':dict(size=10),
-                        'text':data_frame_nonexcluded.loc[data_frame_nonexcluded[disc_plot]==value]['hover_text'],
+                        'text':self.data_frame_nonexcluded.loc[self.data_frame_nonexcluded[disc_plot]==value]['hover_text'],
                         'hoverinfo':'text',
                  
                  
                     } for value in disc_list
                 ],
-                'layout': {'title':plot_title,
+                'layout': {'title':self.plot_title,
                     'showlegend':True,
                     'hovermode':'closest',
-                    'xaxis': {'title': x_axis},
-                    'yaxis': {'title': y_axis}
+                    'xaxis': {'title': self.x_axis},
+                    'yaxis': {'title': self.y_axis}
                 }
             }
                 
-            if variable_x.get(x_axis)[0]=='MASS' and variable_y.get(y_axis)[0]=='MASS':               
-                fig['layout'] =  {'title':plot_title,
+                if self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
+                    fig['layout'] =  {'title':self.plot_title,
                     'showlegend':True,       
                     'hovermode':'closest','annotations':[
                                            dict(
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
+                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
-                    'xaxis': {'title': x_axis+' (GeV)'},
-                    'yaxis': {'title': y_axis+' (GeV)'}
+                    'xaxis': {'title': self.x_axis+' (GeV)'},
+                    'yaxis': {'title': self.y_axis+' (GeV)'}
                                 } 
                 
-            elif variable_x.get(x_axis)[0]!='MASS' and variable_y.get(y_axis)[0]=='MASS':               
-                fig['layout'] =  {'title':plot_title,
+                elif self.variable_x.get(self.x_axis)[0]!='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
+                    fig['layout'] =  {'title':self.plot_title,
                     'showlegend':True,       
                     'hovermode':'closest','annotations':[
                                            dict(
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
+                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
-                    'xaxis': {'title': x_axis},
-                    'yaxis': {'title': y_axis+' (GeV)'}
+                    'xaxis': {'title': self.x_axis},
+                    'yaxis': {'title': self.y_axis+' (GeV)'}
                                 }  
                 
-            elif variable_x.get(x_axis)[0]=='MASS' and variable_y.get(y_axis)[0]!='MASS':               
-                fig['layout'] =  {'title':plot_title,
+                elif self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]!='MASS':
+                    fig['layout'] =  {'title':self.plot_title,
                     'showlegend':True,       
                     'hovermode':'closest','annotations':[
                                            dict(
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
+                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
-                    'xaxis': {'title': x_axis+' (GeV)'},
-                    'yaxis': {'title': y_axis}
+                    'xaxis': {'title': self.x_axis+' (GeV)'},
+                    'yaxis': {'title': self.y_axis}
                                 } 
 
-            else:               
-                fig['layout'] =  {'title':plot_title,
+                else:
+                    fig['layout'] =  {'title':self.plot_title,
                     'showlegend':True,       
                     'hovermode':'closest','annotations':[
                                            dict(
                                                    x=0.0,
                                                    y=1.05,
                                                    showarrow=False,
-                                                   text=plot_desc+'  ('+html_names.get(disc_plot)+')',
+                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
                                                    xref='paper',
                                                    yref='paper')],
-                    'xaxis': {'title': x_axis+' (GeV)'},
-                    'yaxis': {'title': y_axis+' (GeV)'}
+                    'xaxis': {'title': self.x_axis+' (GeV)'},
+                    'yaxis': {'title': self.y_axis+' (GeV)'}
                                 }                 
      
-            plotly.offline.plot(fig, filename = path_to_plots+'/'+disc_plot+'_non-excluded.html', auto_open=False)
-    return;
+                plotly.offline.plot(fig, filename = path_to_plots+'/'+disc_plot+'_non-excluded.html', auto_open=False)
+        return;
 
 
 
-def create_index_html(path_to_plots,plot_data,plot_title,plot_list,plot_descriptions,html_names,
+    def createIndexHtml(self,
                       filename = "index.html"):
-    """
-    Fills the index.html file with links to the interactive plots.
-    """
+        """
+        Fills the index.html file with links to the interactive plots.
+        """
     
-    main_file= open(path_to_plots+'/'+filename, 'w')
-    main_file.write('<html><head><font size=6>SModelS interactive plots: '+plot_title+'</font></head>')
-    hyperlink_format = '<a href={link}>{text}</a>' 
-    for plot in plot_list:
-        plot_name=plot.split('.')[0]
-        plot_desc=plot_descriptions.get(plot_name)
-        main_file.write('<p>'+'<strong>'+html_names.get(plot_name)+'</strong>'+': '+plot_desc+' <br>')
-        for option in plot_data:
+        main_file= open(path_to_plots+'/'+filename, 'w')
+        main_file.write('<html><head><font size=6>SModelS interactive plots: '+self.plot_title+'</font></head>')
+        hyperlink_format = '<a href={link}>{text}</a>'
+        for plot in self.plot_list:
+            plot_name=plot.split('.')[0]
+            plot_desc=self.plot_descriptions.get(plot_name)
+            main_file.write('<p>'+'<strong>'+self.html_names.get(plot_name)+'</strong>'+': '+plot_desc+' <br>')
+            for option in self.plot_data:
 
                 
-            if plot=='chi2' and os.path.isfile(path_to_plots+'/chi2_'+option+'.html')==False:
-                main_file.write('<p> <i> No &#967;<sup>2</sup> values where found in region '+option+' </i> <br>')
-                continue
+                if plot=='chi2' and os.path.isfile(path_to_plots+'/chi2_'+option+'.html')==False:
+                    main_file.write('<p> <i> No &#967;<sup>2</sup> values where found in region '+option+' </i> <br>')
+                    continue
                 
             
-            plot_link=hyperlink_format.format(link=plot_name+'_'+option+'.html', text=option) 
-            main_file.write(plot_link)
-            main_file.write(' ')  
-        main_file.write('</p>')
-    main_file.close()
-    return True 
+                plot_link=hyperlink_format.format(link=plot_name+'_'+option+'.html', text=option)
+                main_file.write(plot_link)
+                main_file.write(' ')
+            main_file.write('</p>')
+        main_file.close()
+        return True
