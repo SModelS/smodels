@@ -49,24 +49,7 @@ def importPythonOutput(smodelsFile):
     return smodelsOutput
 
 
-def getEntry(inputDict,*keys):
-    """
-    Get entry key in dictionary inputDict.
-    If a list of keys is provided, it will assumed nested
-    dictionaries (e.g. key1,key2 will return inputDict[key1][key2]). 
-    """
-    
-    keys = list(keys)
-    
-    if not keys:
-        return inputDict
-    
-    key = keys.pop(0)
-    if not key in inputDict:
-        logger.debug('Key %s not found in input dictionary' %key)
-        return False
-    else:
-        return getEntry(inputDict[key],*keys)
+
  
 def outputStatus(smodelsDict):
     """
@@ -79,13 +62,32 @@ def outputStatus(smodelsDict):
         raise SModelSError()
 
     return outputStatus
+    
+def getEntry(inputDict,*keys):
+    """
+    Get entry key in dictionary inputDict.
+    If a list of keys is provided, it will assumed nested
+    dictionaries (e.g. key1,key2 will return inputDict[key1][key2]).
+    """
+    keys = list(keys)
+    
+    if not keys:
+        return inputDict
+    
+    key = keys.pop(0)
+    if not key in inputDict:
+        logger.debug('Key %s not found in input dictionary' %key)
+        return False
+    else:
+        return getEntry(inputDict[key],*keys)
+    
 
-def getSlhaFile(smodelsDict):
+def getSlhaFile(smodelsOutput):
     """
     Returns the file name of the SLHA file corresponding to the output in smodelsDict
     """
 
-    slhaFile = getEntry(smodelsDict,'OutputStatus','input file')
+    slhaFile = getEntry(smodelsOutput,'OutputStatus','input file')
     if not slhaFile:
         raise SModelSError()
 
@@ -108,173 +110,194 @@ def getSlhaData(slhaFile):
     
     return slhaData
     
-def truncate(number):
-    "truncate float to 3 decimal places"
+class Filler:
+    """
+     A class with the functions required to fill the data dictionary to produce the plots
+    """
     
-    if number<1 and number>1e-90:
+    def __init__(self,data_dict,smodelsOutput,slhaData,slha_hover_information,ctau_hover_information,BR_hover_information,BR_get_top):
+    
+        self.data_dict=data_dict
+        self.smodelsOutput=smodelsOutput
+        self.slhaData=slhaData
+        self.slha_hover_information=slha_hover_information
+        self.ctau_hover_information=ctau_hover_information
+        self.BR_hover_information=BR_hover_information
+        self.BR_get_top=BR_get_top
         
-        provisional_number=number
-        order=0
+        return
+    
+    def truncate(self,number):
+        "truncate float to 3 decimal places"
+        
+        if number<1 and number>1e-90:
+        
+            provisional_number=number
+            order=0
        
-        while provisional_number<1:
+            while provisional_number<1:
            
-            provisional_number=provisional_number*(10)
-            order=order+1
+                provisional_number=provisional_number*(10)
+                order=order+1
             
         
-        factor=10**3
-        truncated=(math.trunc(provisional_number * factor) / (factor*10**(order)))
+            factor=10**3
+            truncated=(math.trunc(provisional_number * factor) / (factor*10**(order)))
    
     #elif number>1e-90:
     # truncated=0.0
     
-    else:
-        factor=10**4
-        truncated=math.trunc(number * factor) / factor
-    return truncated
-     
-def getExpres(data_dict,smodelsOutput):
-    """
-    Extracts the Expres info from the .py output. If requested, the data will be appended on each corresponding list
-    """   
-    
-    rmax=0
-    decompStatus = getEntry(smodelsOutput,'OutputStatus','decomposition status')
-    
-    if decompStatus == 1:
-        expResList = getEntry(smodelsOutput,'ExptRes')
-        if not expResList or not isinstance(expResList,list):
-            print(smodelsOutput)
-            raise SModelSError("Error reading ExptRes.")    
-        for expres in expResList:
-            if 'r' in expres:
-                
-                r = getEntry(expres,'r')
-        
-            else:
-                r = getEntry(expres,'theory prediction (fb)')/getEntry(expres,'upper limit (fb)')
-                r = truncate(r)
-            if r>rmax:
-                rmax = r
-                Txname = getEntry(expres,'TxNames')
-                Txname=','.join(Txname)
-                if getEntry(expres,'chi2')==False:
-                    chi_2=False
-                else:    
-                    chi_2 = getEntry(expres,'chi2')
-                    chi_2 = truncate(chi_2)
-
-                analysis_id = getEntry(expres,'AnalysisID')
-    else:
-        Txname = False
-        chi_2 = False
-        analysis_id = False
-        rmax=False
- 
-    if 'SModelS_status' in  data_dict:
-        if rmax ==False:
-            data_dict['SModelS_status'].append(False)
-        elif rmax>1:
-            data_dict['SModelS_status'].append('Excluded')  
         else:
-            data_dict['SModelS_status'].append('Non-excluded')  
+            factor=10**4
+            truncated=math.trunc(number * factor) / factor
+        return truncated
+    
+    
+    
+    
+    
+    def getExpres(self):
+        """
+        Extracts the Expres info from the .py output. If requested, the data will be appended on each corresponding list
+        """
+    
+        rmax=0
+        decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
+    
+        if decompStatus == 1:
+            expResList = getEntry(self.smodelsOutput,'ExptRes')
+            if not expResList or not isinstance(expResList,list):
+                print(self.smodelsOutput)
+                raise SModelSError("Error reading ExptRes.")
+            for expres in expResList:
+                if 'r' in expres:
+                
+                    r = getEntry(expres,'r')
+        
+                else:
+                    r = getEntry(expres,'theory prediction (fb)')/getEntry(expres,'upper limit (fb)')
+                    r = Filler.truncate(self,r)
+                if r>rmax:
+                    rmax = r
+                    Txname = getEntry(expres,'TxNames')
+                    Txname=','.join(Txname)
+                    if getEntry(expres,'chi2')==False:
+                        chi_2=False
+                    else:
+                        chi_2 = getEntry(expres,'chi2')
+                        chi_2 = Filler.truncate(self,chi_2)
 
-    if 'r_max' in data_dict.keys():
-        data_dict['r_max'].append(rmax)
+                    analysis_id = getEntry(expres,'AnalysisID')
+        else:
+            Txname = False
+            chi_2 = False
+            analysis_id = False
+            rmax=False
+ 
+        if 'SModelS_status' in  self.data_dict:
+            if rmax ==False:
+                self.data_dict['SModelS_status'].append(False)
+            elif rmax>1:
+                self.data_dict['SModelS_status'].append('Excluded')
+            else:
+                self.data_dict['SModelS_status'].append('Non-excluded')
+
+        if 'r_max' in self.data_dict.keys():
+            self.data_dict['r_max'].append(rmax)
         
-    if 'Tx' in data_dict.keys(): 
-        data_dict['Tx'].append(Txname)
+        if 'Tx' in self.data_dict.keys():
+            self.data_dict['Tx'].append(Txname)
         
-    if 'chi2' in data_dict.keys(): 
-        data_dict['chi2'].append(chi_2) 
-    if 'Analysis' in data_dict.keys(): 
-        data_dict['Analysis'].append(analysis_id)   
-    return data_dict;   
+        if 'chi2' in self.data_dict.keys():
+            self.data_dict['chi2'].append(chi_2)
+        if 'Analysis' in self.data_dict.keys():
+            self.data_dict['Analysis'].append(analysis_id)
+        return self.data_dict;
   
-def getMissedTopologies(data_dict,smodelsOuptut):
-    """
-    Extracts the Missed topologies info from the .py output. If requested, the data will be appended on each corresponding list
-    """
-    decompStatus = getEntry(smodelsOuptut,'OutputStatus','decomposition status')
-    missedtopo_max_xsec=0
-    missedtopo_total_xsec=0
-    mt_max = 'False'
-    if decompStatus >= 0:
-        for missed_topo in getEntry(smodelsOuptut, 'Missed Topologies'):
-            missedtopo_xsec=missed_topo.get('weight (fb)')            
-            missedtopo_total_xsec=missedtopo_total_xsec+missedtopo_xsec
-            if missedtopo_xsec>missedtopo_max_xsec:
-                missedtopo_max_xsec=missedtopo_xsec
-                mt_max=missed_topo.get('element')
-        missedtopo_max_xsec=truncate(missedtopo_max_xsec)
-        missedtopo_total_xsec=truncate(missedtopo_total_xsec)
+    def getMissedTopologies(self):
+        """
+        Extracts the Missed topologies info from the .py output. If requested, the data will be appended on each corresponding list
+        """
+        decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
+        missedtopo_max_xsec=0
+        missedtopo_total_xsec=0
+        mt_max = 'False'
+        if decompStatus >= 0:
+            for missed_topo in getEntry(self.smodelsOutput, 'Missed Topologies'):
+                missedtopo_xsec=missed_topo.get('weight (fb)')
+                missedtopo_total_xsec=missedtopo_total_xsec+missedtopo_xsec
+                if missedtopo_xsec>missedtopo_max_xsec:
+                    missedtopo_max_xsec=missedtopo_xsec
+                    mt_max=missed_topo.get('element')
+            missedtopo_max_xsec=Filler.truncate(self,missedtopo_max_xsec)
+            missedtopo_total_xsec=Filler.truncate(self,missedtopo_total_xsec)
         
         
-    else:
-        missedtopo_max_xsec=False
-        missedtopo_total_xsec=False
-        missed_topo = False
-    if 'MT_max' in data_dict.keys():
-        data_dict.get('MT_max').append(str(mt_max))
-    if 'MT_max_xsec' in data_dict.keys():
-        data_dict.get('MT_max_xsec').append(missedtopo_max_xsec)    
-    if 'MT_total_xsec' in data_dict.keys():
-        data_dict.get('MT_total_xsec').append(missedtopo_total_xsec)     
+        else:
+            missedtopo_max_xsec=False
+            missedtopo_total_xsec=False
+            missed_topo = False
+        if 'MT_max' in self.data_dict.keys():
+            self.data_dict.get('MT_max').append(str(mt_max))
+        if 'MT_max_xsec' in self.data_dict.keys():
+            self.data_dict.get('MT_max_xsec').append(missedtopo_max_xsec)
+        if 'MT_total_xsec' in self.data_dict.keys():
+            self.data_dict.get('MT_total_xsec').append(missedtopo_total_xsec)
         
-    return data_dict           
+        return self.data_dict
    
-def getLongCascades(data_dict,smodelsOutput):
-    """
-    Extracts the Long cascade info from the .py output. If requested, the data will be appended on each corresponding list
-    """
-    decompStatus = getEntry(smodelsOutput,'OutputStatus','decomposition status')
-    long_cascade_total_xsec=0
-    if decompStatus >= 0:
+    def getLongCascades(self):
+        """
+        Extracts the Long cascade info from the .py output. If requested, the data will be appended on each corresponding list
+        """
+        decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
         long_cascade_total_xsec=0
-        for long_cascade in smodelsOutput.get('Long Cascades'):
-            long_cascade_xsec=long_cascade.get('weight (fb)')
-            long_cascade_total_xsec=long_cascade_total_xsec+long_cascade_xsec
-        long_cascade_total_xsec=truncate(long_cascade_total_xsec)
+        if decompStatus >= 0:
+            long_cascade_total_xsec=0
+            for long_cascade in self.smodelsOutput.get('Long Cascades'):
+                long_cascade_xsec=long_cascade.get('weight (fb)')
+                long_cascade_total_xsec=long_cascade_total_xsec+long_cascade_xsec
+            long_cascade_total_xsec=Filler.truncate(self,long_cascade_total_xsec)
     
-    else:
-        long_cascade_total_xsec=False
-    if 'MT_long_xsec' in data_dict.keys():
-        data_dict.get('MT_long_xsec').append(long_cascade_total_xsec)
+        else:
+            long_cascade_total_xsec=False
+        if 'MT_long_xsec' in self.data_dict.keys():
+            self.data_dict.get('MT_long_xsec').append(long_cascade_total_xsec)
              
-    return data_dict
+        return self.data_dict
              
-def getAsymmetricBranches(data_dict,smodelsOutput):
-    """
-    Extracts the asymmetric branches info from the .py output. If requested, the data will be appended on each corresponding list
-    """
-    decompStatus = getEntry(smodelsOutput,'OutputStatus','decomposition status')
-    if decompStatus >= 0:
-        asymmetric_branch_total_xsec = sum([asym_br['weight (fb)'] for asym_br in smodelsOutput['Asymmetric Branches']])
-        asymmetric_branch_total_xsec=truncate(asymmetric_branch_total_xsec)
-    else:
-        asymmetric_branch_total_xsec=False             
-    if 'MT_asym_xsec' in data_dict.keys():
-        data_dict.get('MT_asym_xsec').append(asymmetric_branch_total_xsec) 
-    return data_dict  
+    def getAsymmetricBranches(self):
+        """
+        Extracts the asymmetric branches info from the .py output. If requested, the data will be appended on each corresponding list
+        """
+        decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
+        if decompStatus >= 0:
+            asymmetric_branch_total_xsec = sum([asym_br['weight (fb)'] for asym_br in self.smodelsOutput['Asymmetric Branches']])
+            asymmetric_branch_total_xsec=Filler.truncate(self,asymmetric_branch_total_xsec)
+        else:
+            asymmetric_branch_total_xsec=False
+        if 'MT_asym_xsec' in self.data_dict.keys():
+            self.data_dict.get('MT_asym_xsec').append(asymmetric_branch_total_xsec)
+        return self.data_dict
     
-def getOutsideGrid(data_dict,smodelsOutput):
-    """
-    Extracts the outside grid info from the .py output. If requested, the data will be appended on each corresponding list.
-    """   
-    decompStatus = getEntry(smodelsOutput,'OutputStatus','decomposition status')
-    outside_grid_total_xsec=0
-    if decompStatus >= 0:
-        for outside_grid in smodelsOutput.get('Outside Grid'):
-            outside_grid_xsec=outside_grid.get('weight (fb)') 
-            outside_grid_total_xsec = outside_grid_total_xsec+outside_grid_xsec
-        outside_grid_total_xsec=truncate(outside_grid_total_xsec)
-    else:
-        outside_grid_total_xsec = False      
-    if 'MT_outgrid_xsec' in data_dict.keys():
-        data_dict.get('MT_outgrid_xsec').append(outside_grid_total_xsec)  
-    return data_dict   
+    def getOutsideGrid(self):
+        """
+        Extracts the outside grid info from the .py output. If requested, the data will be appended on each corresponding list.
+        """
+        decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
+        outside_grid_total_xsec=0
+        if decompStatus >= 0:
+            for outside_grid in self.smodelsOutput.get('Outside Grid'):
+                outside_grid_xsec=outside_grid.get('weight (fb)')
+                outside_grid_total_xsec = outside_grid_total_xsec+outside_grid_xsec
+            outside_grid_total_xsec=Filler.truncate(self,outside_grid_total_xsec)
+        else:
+            outside_grid_total_xsec = False
+        if 'MT_outgrid_xsec' in self.data_dict.keys():
+            self.data_dict.get('MT_outgrid_xsec').append(outside_grid_total_xsec)
+        return self.data_dict
 
-def getSlhaHoverInfo(data_dict,slhaData,slha_hover_information):
+    def getSlhaHoverInfo(self):
         """
         Gets the requested slha info from eachh slha file, to fill the hover.
         """
@@ -283,69 +306,96 @@ def getSlhaHoverInfo(data_dict,slhaData,slha_hover_information):
             block = self.slha_hover_information.get(key)[0]
             code_number = self.slha_hover_information.get(key)[1]
             if block=='MASS':
-                data_dict.get(key).append(truncate(abs(slhaData.blocks[block][code_number])))
+                self.data_dict.get(key).append(Filler.truncate(self,abs(self.slhaData.blocks[block][code_number])))
             else:
-                data_dict.get(key).append(truncate(slhaData.blocks[block][code_number]))
+                self.data_dict.get(key).append(Filler.truncate(self,self.slhaData.blocks[block][code_number]))
             
-        return data_dict
+        return self.data_dict
         
-def getCtau(data_dict,slhaData,ctau_hover_information):
-    """
-    Computes the requested ctaus, that will go into de hover.
-    """   
+    def getCtau(self):
+        """
+        Computes the requested ctaus, that will go into de hover.
+        """
     
-    for key in ctau_hover_information.keys():
-        value=ctau_hover_information.get(key)
-        total_width=float(str(slhaData.decays[value]).split('total width = ')[1].split(' GeV')[0])
-        if total_width == 0:
-            ctau=float('inf')
-        else:
-            mean_lifetime=(6.582119e-16)/(total_width*1e9)
-            ctau=(mean_lifetime)*(299792458)
-            
-            ctau=truncate(ctau)
-            
-        data_dict.get(key).append(ctau)
-        
-    return data_dict 
-
-              
-              
-def getBR(data_dict,slhaData,BR_hover_information,BR_get_top):
-    """
-    Gets the requested branching ratios from the slha file, that will go into de hover.
-    """   
-    for key in BR_hover_information.keys():
-        pdg_number=BR_hover_information.get(key) 
-        BR=str(slhaData.decays[pdg_number]).split('\n')[1:]
-        if BR_get_top != 'all':
-            BR=BR[:int(BR_get_top)]  
-        BR=str(BR).split(' ')      
-        BR=''.join(BR)
-        data_dict.get(key).append(BR)
-        
-    return data_dict 
-
-def getVariable(data_dict,slhaData,slha_hover_information,variable):
-    """
-    Gets the variable from the slha file.
-    """  
-    for key in variable.keys():
-        if str(key) not in slha_hover_information.keys():
-            block=variable.get(key)[0]
-            code_number=variable.get(key)[1]
-            if block=='MASS':
-                data_dict.get(key).append(truncate(abs(slhaData.blocks[block][code_number])))
+        for key in self.ctau_hover_information.keys():
+            value=self.ctau_hover_information.get(key)
+            total_width=float(str(self.slhaData.decays[value]).split('total width = ')[1].split(' GeV')[0])
+            if total_width == 0:
+                ctau=float('inf')
             else:
-                data_dict.get(key).append(truncate(slhaData.blocks[block][code_number]))
+                mean_lifetime=(6.582119e-16)/(total_width*1e9)
+                ctau=(mean_lifetime)*(299792458)
             
-    return data_dict
+                ctau=Filler.truncate(self,ctau)
+            
+            self.data_dict.get(key).append(ctau)
+        
+        return self.data_dict
+
+              
+              
+    def getBR(self):
+        """
+        Gets the requested branching ratios from the slha file, that will go into de hover.
+        """
+        for key in self.BR_hover_information.keys():
+            pdg_number=self.BR_hover_information.get(key)
+            BR=str(self.slhaData.decays[pdg_number]).split('\n')[1:]
+            if self.BR_get_top != 'all':
+                BR=BR[:int(self.BR_get_top)]
+            BR=str(BR).split(' ')
+            BR=''.join(BR)
+            self.data_dict.get(key).append(BR)
+        
+        return self.data_dict
+
+    def getVariable(self,variable):
+        """
+        Gets the variable from the slha file.
+        """
+        for key in variable.keys():
+            if str(key) not in self.slha_hover_information.keys():
+                block=variable.get(key)[0]
+                code_number=variable.get(key)[1]
+                if block=='MASS':
+                    self.data_dict.get(key).append(Filler.truncate(self,abs(self.slhaData.blocks[block][code_number])))
+                else:
+                    self.data_dict.get(key).append(Filler.truncate(self,self.slhaData.blocks[block][code_number]))
+            
+        return self.data_dict
+        
+    def getSmodelSData(self):
+        ''' fills data dict with smodels data'''
+        
+        self.data_dict = Filler.getExpres(self)
+        self.data_dict = Filler.getMissedTopologies(self)
+        self.data_dict = Filler.getAsymmetricBranches(self)
+        self.data_dict = Filler.getOutsideGrid(self)
+        self.data_dict = Filler.getLongCascades(self)
+            
+        return self.data_dict
+            
+    def getSlhaData(self,variable_x,variable_y):
+        ''' fills data dict with slha data'''
+        
+        
+        self.data_dict =  Filler.getSlhaHoverInfo(self)
+        self.data_dict = Filler.getCtau(self)
+        self.data_dict = Filler.getBR(self)
+        #Fill with the x and y data:
+        #print(list(self.variable_x.keys())[0])
+        if list(variable_x.keys())[0] not in self.slha_hover_information.keys():
+            self.data_dict = Filler.getVariable(self, variable_x)
+        if list(variable_y.keys())[0] not in self.slha_hover_information.keys():
+            self.data_dict = Filler.getVariable(self, variable_y)
+                                
+        return self.data_dict
 
 
-class Plotter(data_dict,SModelS_hover_information,slha_hover_information,ctau_hover_information,BR_hover_information,variable_x,variable_y,plot_list,plot_data,plot_title):
+class Plotter:
                
     def __init__ ( self, data_dict,SModelS_hover_information,
-               slha_hover_information,ctau_hover_information,BR_hover_information,variable_x,variable_y,plot_list,plot_data,plot_title):
+               slha_hover_information,ctau_hover_information,BR_hover_information,variable_x,variable_y,plot_list,plot_data,plot_title,path_to_plots):
                
                
         self.data_dict=data_dict
@@ -358,6 +408,7 @@ class Plotter(data_dict,SModelS_hover_information,slha_hover_information,ctau_ho
         self.plot_list=plot_list
         self.plot_data=plot_data
         self.plot_title=plot_title
+        self.path_to_plots=path_to_plots
         
         
         return
@@ -403,7 +454,7 @@ class Plotter(data_dict,SModelS_hover_information,slha_hover_information,ctau_ho
         for column in self.BR_hover_information:
             i=0
             data_frame_br[column] = self.data_frame_all[column]
-            for i in range(len(data_frame_all.index)):
+            for i in range(len(self.data_frame_all.index)):
                 if self.data_frame_all[column][i]:
                     data_frame_br[column][i] = self.data_frame_all[column][i].split("','")
                 else:
@@ -604,7 +655,7 @@ class Plotter(data_dict,SModelS_hover_information,slha_hover_information,ctau_ho
                                    )
                 
                 fig = go.Figure(data=data, layout=layout)
-                plotly.offline.plot(fig, filename = path_to_plots+'/'+cont_plot+'_all.html', auto_open=False)
+                plotly.offline.plot(fig, filename = self.path_to_plots+'/'+cont_plot+'_all.html', auto_open=False)
         return;
  
  
@@ -705,7 +756,7 @@ class Plotter(data_dict,SModelS_hover_information,slha_hover_information,ctau_ho
                                    yaxis = dict(title=self.y_axis)
                                    )
                 fig = go.Figure(data=data, layout=layout)
-                plotly.offline.plot(fig, filename=path_to_plots+'/'+cont_plot+'_excluded.html',auto_open=False)
+                plotly.offline.plot(fig, filename=self.path_to_plots+'/'+cont_plot+'_excluded.html',auto_open=False)
         return;
  
  
@@ -815,7 +866,7 @@ class Plotter(data_dict,SModelS_hover_information,slha_hover_information,ctau_ho
                                    )
         
                 fig = go.Figure(data=data, layout=layout)
-                plotly.offline.plot(fig, filename = path_to_plots+'/'+cont_plot+'_non-excluded.html', auto_open=False)
+                plotly.offline.plot(fig, filename = self.path_to_plots+'/'+cont_plot+'_non-excluded.html', auto_open=False)
         return;
  
      
@@ -909,7 +960,7 @@ class Plotter(data_dict,SModelS_hover_information,slha_hover_information,ctau_ho
             
             
      
-                plotly.offline.plot(fig, filename = path_to_plots+'/'+disc_plot+'_all.html', auto_open=False)
+                plotly.offline.plot(fig, filename = self.path_to_plots+'/'+disc_plot+'_all.html', auto_open=False)
         return;
  
  
@@ -1004,7 +1055,7 @@ class Plotter(data_dict,SModelS_hover_information,slha_hover_information,ctau_ho
                     'yaxis': {'title': self.y_axis+' (GeV)'}
                                 } 
      
-                plotly.offline.plot(fig, filename = path_to_plots+'/'+disc_plot+'_excluded.html', auto_open=False)
+                plotly.offline.plot(fig, filename = self.path_to_plots+'/'+disc_plot+'_excluded.html', auto_open=False)
         return;
  
     def makeDiscretePlotsNonexcluded(self):
@@ -1098,18 +1149,17 @@ class Plotter(data_dict,SModelS_hover_information,slha_hover_information,ctau_ho
                     'yaxis': {'title': self.y_axis+' (GeV)'}
                                 }                 
      
-                plotly.offline.plot(fig, filename = path_to_plots+'/'+disc_plot+'_non-excluded.html', auto_open=False)
+                plotly.offline.plot(fig, filename = self.path_to_plots+'/'+disc_plot+'_non-excluded.html', auto_open=False)
         return;
 
 
 
-    def createIndexHtml(self,
-                      filename = "index.html"):
+    def createIndexHtml(self):
         """
         Fills the index.html file with links to the interactive plots.
         """
-    
-        main_file= open(path_to_plots+'/'+filename, 'w')
+        filename = "index.html"
+        main_file= open(self.path_to_plots+'/'+filename, 'w')
         main_file.write('<html><head><font size=6>SModelS interactive plots: '+self.plot_title+'</font></head>')
         hyperlink_format = '<a href={link}>{text}</a>'
         for plot in self.plot_list:
@@ -1119,7 +1169,7 @@ class Plotter(data_dict,SModelS_hover_information,slha_hover_information,ctau_ho
             for option in self.plot_data:
 
                 
-                if plot=='chi2' and os.path.isfile(path_to_plots+'/chi2_'+option+'.html')==False:
+                if plot=='chi2' and os.path.isfile(self.path_to_plots+'/chi2_'+option+'.html')==False:
                     main_file.write('<p> <i> No &#967;<sup>2</sup> values where found in region '+option+' </i> <br>')
                     continue
                 
@@ -1129,4 +1179,45 @@ class Plotter(data_dict,SModelS_hover_information,slha_hover_information,ctau_ho
                 main_file.write(' ')
             main_file.write('</p>')
         main_file.close()
+        return True
+        
+    def makePlots(self):
+        """
+        Uses the data in self.data_dict to produce the plots.
+
+        :parameter outFolder: Path to the output folder.
+        """
+      
+        
+        self.data_frame_all = Plotter.makeDataFrame(self)
+              
+        
+        self.html_names=Plotter.refiningVariableNames(self)
+        
+        self.data_frame_all = Plotter.fillHover(self)
+
+        data_frame_excluded,data_frame_nonexcluded = Plotter.DataFrameExcludedNonexcluded(self)
+        
+        self.x_axis,self.y_axis = Plotter.GetXyAxis(self)
+        self.cont_plots,self.disc_plots = Plotter.SeparateContDiscPlots(self)
+
+        plot_descriptions=Plotter.plotDescription(self)
+        
+
+        Plotter.makeContinuousPlotsAll(self)
+
+        Plotter.makeContinuousPlotsExcluded(self)
+
+        Plotter.makeContinuousPlotsNonexcluded(self)
+
+        Plotter.makeDiscretePlotsAll(self)
+
+        Plotter.makeDiscretePlotsExcluded(self)
+
+        Plotter.makeDiscretePlotsNonexcluded(self)
+
+        Plotter.createIndexHtml(self)
+
+        
+  
         return True

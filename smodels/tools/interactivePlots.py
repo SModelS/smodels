@@ -16,9 +16,9 @@ import os, glob,pathlib
 
 from smodels.tools import interactivePlotsHelpers as helpers
 
-class DataHolder(object):
+class PlotMaster(object):
     """
-    A simple class to store the required data for producing the interactive plots
+    A class to store the required data and producing the interactive plots
     """
 
     def __init__(self,smodelsFolder,slhaFolder,parameterFile, indexfile ):
@@ -157,41 +157,23 @@ class DataHolder(object):
 
         self.data_dict['file'] = []
 
-    def fillWith(self,smodelsDict,slhaData):
+    def fillWith(self,smodelsOutput,slhaData):
         """
         Fill the dictionary (data_dict) with the desired data from
         the smodels output dictionary (smodelsDict) and the pyslha.Doc object
         slhaData
         """
-
+        filler=helpers.Filler(self.data_dict,smodelsOutput,slhaData,self.slha_hover_information,self.ctau_hover_information,self.BR_hover_information,self.BR_get_top)
         #Fill with smodels data if defined
-        if smodelsDict is None:
+        if smodelsOutput is None:
             for key in self.SModelS_hover_information:
                 if key != 'file':
                     self.data_dict[key].append(False)
         else:
-            self.data_dict = helpers.getExpres(self.data_dict,smodelsDict)
-            self.data_dict = helpers.getMissedTopologies(self.data_dict,smodelsDict)
-            self.data_dict = helpers.getAsymmetricBranches(self.data_dict,smodelsDict)
-            self.data_dict = helpers.getOutsideGrid(self.data_dict,smodelsDict)
-            self.data_dict = helpers.getLongCascades(self.data_dict,smodelsDict)
-
-
-        #Fill with SLHA data:
-        self.data_dict =  helpers.getSlhaHoverInfo(self.data_dict,slhaData,
-                                                      self.slha_hover_information)
-        self.data_dict = helpers.getCtau(self.data_dict,slhaData,
-                                          self.ctau_hover_information)
-        self.data_dict = helpers.getBR(self.data_dict,slhaData,self.BR_hover_information,
-                                        self.BR_get_top)
-        #Fill with the x and y data:
-        #print(list(self.variable_x.keys())[0])
-        if list(self.variable_x.keys())[0] not in self.slha_hover_information.keys():
-            self.data_dict = helpers.getVariable(self.data_dict,slhaData,
-                    self.BR_hover_information, self.variable_x)
-        if list(self.variable_y.keys())[0] not in self.slha_hover_information.keys():
-            self.data_dict = helpers.getVariable(self.data_dict,slhaData,
-                                self.BR_hover_information, self.variable_y)
+            self.data_dict=filler.getSmodelSData()
+      
+        self.data_dict=filler.getSlhaData(self.variable_x,self.variable_y)
+     
 
     def loadData(self,npoints=-1):
         """
@@ -244,62 +226,28 @@ class DataHolder(object):
 
 
         logger.info('Making plots...')
-
-        data_frame_all = helpers.makeDataFrame(self.data_dict)
         
-        html_names=helpers.refiningVariableNames()
+        Plotter=helpers.Plotter(self.data_dict,self.SModelS_hover_information,
+               self.slha_hover_information,self.ctau_hover_information,self.BR_hover_information,self.variable_x,self.variable_y,self.plot_list,self.plot_data,self.plot_title,outFolder)
+               
+        Plotter.makePlots()
+
         
-        data_frame_all = helpers.fillHover(data_frame_all,
-                                            self.SModelS_hover_information,
-                                            self.slha_hover_information,
-                                            self.ctau_hover_information,
-                                            self.BR_hover_information,html_names)
-
-        data_frame_excluded,data_frame_nonexcluded = helpers.DataFrameExcludedNonexcluded(data_frame_all)
-        x_axis,y_axis = helpers.GetXyAxis(self.variable_x,self.variable_y)
-        cont_plots,disc_plots = helpers.SeparateContDiscPlots(self.plot_list,
-                    self.data_dict)
-
-        plot_descriptions=helpers.plotDescription()
-        
-
-        helpers.makeContinuousPlotsAll(cont_plots,x_axis,
-                    y_axis,outFolder,data_frame_all,self.plot_data,
-                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
-
-        helpers.makeContinuousPlotsExcluded(cont_plots,x_axis,
-                    y_axis,outFolder,data_frame_excluded,self.plot_data,
-                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
-
-        helpers.makeContinuousPlotsNonexcluded(cont_plots,x_axis, y_axis,
-                    outFolder,data_frame_nonexcluded, self.plot_data,
-                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
-
-        helpers.makeDiscretePlotsAll(disc_plots,x_axis,y_axis,
-                    outFolder,data_frame_all,self.plot_data,
-                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
-
-        helpers.makeDiscretePlotsExcluded(disc_plots,x_axis,y_axis, outFolder,
-                    data_frame_excluded,self.plot_data,
-                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
-
-        helpers.makeDiscretePlotsNonexcluded(disc_plots,x_axis,y_axis, outFolder,
-                    data_frame_nonexcluded, self.plot_data,
-                    self.plot_title,self.variable_x,self.variable_y,plot_descriptions,html_names)
-
-        helpers.createIndexHtml(outFolder,self.plot_data,self.plot_title,self.plot_list,
-                    plot_descriptions,html_names, self.indexfile )
-
         logger.info('Generation of interactive plots finished. Go to: \n %s/%s \n to see the plots.' % ( outFolder, self.indexfile ) )
-
+     
         return True
 
 
 
 
-def makePlots(smodelsFolder,slhaFolder,outputFolder,
-         parameters,npoints,verbosity,indexfile = "index.html" ):
+
+
+def main(args,indexfile= "index.html" ):
     """
+    Create the interactive plots using the input from argparse
+
+    :parameter args: argparser.Namespace object containing the options for makePlots
+    
     Main interface for the interactive-plots.
 
     :parameter smodelsFolder: Path to the folder containing the SModelS python output
@@ -310,45 +258,10 @@ def makePlots(smodelsFolder,slhaFolder,outputFolder,
     :parameter indexfile: name of the starting web page (index.html)
 
     :return: True if the plot creation was successfull
-
     """
-
-    try:
-        import plotly
-    except ImportError:
-        raise SModelSError("Plotly is not installed. To use this tool, please install plotly")
-
-    try:
-        import pandas
-    except ImportError:
-        raise SModelSError("Pandas is not installed. To use this tool, please install pandas")
-
-    setLogLevel(verbosity)
-
-    #Basic checks:
-    smodelsFolder = smodelsFolder
-    slhaFolder = slhaFolder
-    parFile = parameters
-
-    dataHolder = DataHolder(smodelsFolder,slhaFolder,parFile, indexfile )
-    loadData = dataHolder.loadData(npoints)
-    if not loadData:
-        raise SModelSError("Error loading data from folders:\n %s\n %s" %(smodelsFolder,slhaFolder))
-
-   # dataHolder.makePlots(outputFolder)
-
-    Plotter=helpers.Plotter(data_dict,SModelS_hover_information,
-               slha_hover_information,ctau_hover_information,BR_hover_information,variable_x,variable_y,plot_list,plot_data)
-    Plotter.makeContinuousPlotsAll()
     
-    return outputFolder
-
-def main(args):
-    """
-    Create the interactive plots using the input from argparse
-
-    :parameter args: argparser.Namespace object containing the options for makePlots
-    """
+    
+    
     
     #First check if the needed directories are there
     #inputdirSlha = os.path(args.slhaFolder)
@@ -366,8 +279,37 @@ def main(args):
         raise SModelSError("parameter file '"+str(args.parameters)+"' does not exist")
 
 
-        
-    return makePlots(args.smodelsFolder, args.slhaFolder, args.outputFolder,
-                     args.parameters, args.npoints, args.verbosity)
+    #Basic checks:
+    smodelsFolder = args.smodelsFolder
+    slhaFolder = args.slhaFolder
+    parFile = args.parameters
+    verbosity=args.verbosity
+    outputFolder=args.outputFolder
+    npoints=args.npoints
 
 
+    try:
+        import plotly
+    except ImportError:
+        raise SModelSError("Plotly is not installed. To use this tool, please install plotly")
+
+    try:
+        import pandas
+    except ImportError:
+        raise SModelSError("Pandas is not installed. To use this tool, please install pandas")
+
+    
+    setLogLevel(verbosity)
+
+    
+
+    plotMaster = PlotMaster(smodelsFolder,slhaFolder,parFile, indexfile )
+    loadData = plotMaster.loadData(npoints)
+    if not loadData:
+        raise SModelSError("Error loading data from folders:\n %s\n %s" %(smodelsFolder,slhaFolder))
+
+    plotMaster.makePlots(outputFolder)
+
+
+
+    return
