@@ -426,7 +426,7 @@ class Plotter:
     def refiningVariableNames(self):
         ''' Redifining the output variable names to html format  '''
     
-        self.html_names={'SModelS_status':'Smodels status',
+        self.html_names={'SModelS_status':'SModelS status',
                       'r_max':'r<sub>max</sub>',
                       'chi2':' &#967;<sup>2</sup>',
                       'Tx':'T<sub>max</sub>',
