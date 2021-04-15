@@ -171,9 +171,9 @@ class PlotMaster(object):
                     self.data_dict[key].append(False)
         else:
             self.data_dict=filler.getSmodelSData()
-      
+
         self.data_dict=filler.getSlhaData(self.variable_x,self.variable_y)
-     
+
 
     def loadData(self,npoints=-1):
         """
@@ -226,15 +226,15 @@ class PlotMaster(object):
 
 
         logger.info('Making plots...')
-        
+
         Plotter=helpers.Plotter(self.data_dict,self.SModelS_hover_information,
                self.slha_hover_information,self.ctau_hover_information,self.BR_hover_information,self.variable_x,self.variable_y,self.plot_list,self.plot_data,self.plot_title,outFolder)
-               
+
         Plotter.makePlots()
 
-        
+
         logger.info('Generation of interactive plots finished. Go to: \n %s/%s \n to see the plots.' % ( outFolder, self.indexfile ) )
-     
+
         return True
 
 
@@ -247,7 +247,7 @@ def main(args,indexfile= "index.html" ):
     Create the interactive plots using the input from argparse
 
     :parameter args: argparser.Namespace object containing the options for makePlots
-    
+
     Main interface for the interactive-plots.
 
     :parameter smodelsFolder: Path to the folder containing the SModelS python output
@@ -259,22 +259,23 @@ def main(args,indexfile= "index.html" ):
 
     :return: True if the plot creation was successfull
     """
-    
-    
-    
-    
+
+
+
+
     #First check if the needed directories are there
     #inputdirSlha = os.path(args.slhaFolder)
 
     if os.path.isdir(args.slhaFolder)==False:
         raise SModelSError("slha directory: "+str(args.slhaFolder)+"' does not exist or is a file")
-        
+
     if os.path.isdir(args.smodelsFolder)==False:
         raise SModelSError("smodels directory: "+str(args.smodelsFolder)+"' does not exist or is a file")
-        
+    if not os.path.exists ( args.outputFolder ):
+        os.mkdir ( args.outputFolder )
     if os.path.isdir(args.outputFolder)==False:
         raise SModelSError(f"output directory '{args.outputFolder}' does not exist or is a file")
-    
+
     if os.path.isfile(args.parameters)==False:
         raise SModelSError("parameter file '"+str(args.parameters)+"' does not exist")
 
@@ -298,10 +299,10 @@ def main(args,indexfile= "index.html" ):
     except ImportError:
         raise SModelSError("Pandas is not installed. To use this tool, please install pandas")
 
-    
+
     setLogLevel(verbosity)
 
-    
+
 
     plotMaster = PlotMaster(smodelsFolder,slhaFolder,parFile, indexfile )
     loadData = plotMaster.loadData(npoints)
@@ -310,6 +311,4 @@ def main(args,indexfile= "index.html" ):
 
     plotMaster.makePlots(outputFolder)
 
-
-
-    return
+    return outputFolder

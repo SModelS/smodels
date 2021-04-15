@@ -21,6 +21,8 @@ except ImportError: ## doesnt exist in python2
 
 class RunInteractivePlotSTest(unittest.TestCase):
     
+    # this test corresponds to calling
+    # ../smodelsTools.py interactive-plots -f ./testFiles/scanExample/smodels-output/  -s testFiles/scanExample/slha/ -p iplots_parameters.py
     def testInteractivePlots(self):
         slhaFolder = './testFiles/scanExample/slha'
         smodelsFolder = './testFiles/scanExample/smodels-output'
