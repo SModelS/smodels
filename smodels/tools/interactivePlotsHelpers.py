@@ -470,30 +470,75 @@ class Plotter:
                     j=j+1
                 data_frame_br[column][i]=brs
             self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+column+': '+data_frame_br[column].astype('str')+'<br>'
+        
+        #Provisinal data frame to handle changes False-->not available
+        data_frame_provisional=self.data_frame_all
+        data_frame_provisional=data_frame_provisional.astype(str)
+       
         if 'SModelS_status' in self.SModelS_hover_information:
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('SModelS_status')+': '+self.data_frame_all['SModelS_status'].astype('str')+'<br>'
+        
+            data_frame_provisional.loc[data_frame_provisional['SModelS_status'] =='False', 'SModelS_status'] = 'Not-available'
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('SModelS_status')+': '+data_frame_provisional['SModelS_status']+'<br>'
         if 'r_max' in self.SModelS_hover_information:
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('r_max')+': '+self.data_frame_all['r_max'].astype('str')+'<br>'
+        
+            data_frame_provisional.loc[data_frame_provisional['r_max'] =='False', 'r_max'] = 'Not-available'
+        
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('r_max')+': '+data_frame_provisional['r_max']+'<br>'
+            
         if 'Tx' in self.SModelS_hover_information:
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('Tx')+': '+self.data_frame_all['Tx'].astype('str')+'<br>'
+        
+            data_frame_provisional.loc[data_frame_provisional['Tx'] =='False', 'Tx'] = 'Not-available'
+        
+        
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('Tx')+': '+data_frame_provisional['Tx']+'<br>'
         if 'Analysis' in self.SModelS_hover_information:
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('Analysis')+': '+self.data_frame_all['Analysis'].astype('str')+'<br>'
+        
+            data_frame_provisional.loc[data_frame_provisional['Analysis'] =='False', 'Analysis'] = 'Not-available'
+        
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('Analysis')+': '+data_frame_provisional['Analysis']+'<br>'
         if 'chi2' in self.SModelS_hover_information:
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('chi2')+': '+self.data_frame_all['chi2'].astype('str')+'<br>'
+        
+            
+            data_frame_provisional.loc[data_frame_provisional['chi2'] =='False', 'chi2'] = 'Not-available'
+            
+            
+        
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('chi2')+': '+data_frame_provisional['chi2'].astype('str')+'<br>'
         if 'MT_max' in self.SModelS_hover_information:
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_max')+': '+self.data_frame_all['MT_max'].astype('str')+'<br>'
+        
+            data_frame_provisional.loc[data_frame_provisional['MT_max'] =='False', 'MT_max'] = 'Not-available'
+        
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_max')+': '+data_frame_provisional['MT_max']+'<br>'
         if 'MT_max_xsec' in self.SModelS_hover_information:
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_max_xsec')+': '+self.data_frame_all['MT_max_xsec'].astype('str')+' fb'+'<br>'
+        
+            data_frame_provisional.loc[data_frame_provisional['MT_max_xsec'] =='False', 'MT_max_xsec'] = 'Not-available'
+        
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_max_xsec')+': '+data_frame_provisional['MT_max_xsec'] +' [fb]'+'<br>'
         if 'MT_total_xsec' in self.SModelS_hover_information:
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_total_xsec')+': '+self.data_frame_all['MT_total_xsec'].astype('str')+' fb'+'<br>'
+        
+            data_frame_provisional.loc[data_frame_provisional['MT_total_xsec'] =='False', 'MT_total_xsec'] = 'Not-available'
+        
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_total_xsec')+': '+data_frame_provisional['MT_total_xsec']+' [fb]'+'<br>'
         if 'MT_long_xsec' in self.SModelS_hover_information:
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_long_xsec')+': '+self.data_frame_all['MT_long_xsec'].astype('str')+' fb'+'<br>'
+        
+            data_frame_provisional.loc[data_frame_provisional['MT_long_xsec'] =='False', 'MT_long_xsec'] = 'Not-available'
+        
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_long_xsec')+': '+data_frame_provisional['MT_long_xsec']+' [fb]'+'<br>'
         if 'MT_asym_xsec' in self.SModelS_hover_information:
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_asym_xsec')+': '+self.data_frame_all['MT_asym_xsec'].astype('str')+' fb'+'<br>'
+        
+            data_frame_provisional.loc[data_frame_provisional['MT_asym_xsec'] =='False', 'MT_asym_xsec'] = 'Not-available'
+        
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_asym_xsec')+': '+data_frame_provisional['MT_asym_xsec']+' [fb]'+'<br>'
         if 'MT_outgrid_xsec' in self.SModelS_hover_information:
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_outgrid_xsec')+': '+self.data_frame_all['MT_outgrid_xsec'].astype('str')+' fb'+'<br>'
+        
+            data_frame_provisional.loc[data_frame_provisional['MT_outgrid_xsec'] =='False', 'MT_outgrid_xsec'] = 'Not-available'
+        
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_outgrid_xsec')+': '+data_frame_provisional['MT_outgrid_xsec']+' [fb]'+'<br>'
         if 'file' in self.SModelS_hover_information:
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+'file'+': '+self.data_frame_all['file'].astype('str')+'<br>'
+        
+            data_frame_provisional.loc[data_frame_provisional['file'] =='False', 'file'] = 'Not-available'
+        
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+'file'+': '+data_frame_provisional['file']+'<br>'
         
 
         return self.data_frame_all;
@@ -548,28 +593,32 @@ class Plotter:
         return self.plot_descriptions;
  
 #####continuous plots##############
-    def makeContinuousPlotsAll(self):
-        """ Generate plots with continuous z axis variables, using all data points """
-        if 'all' in self.plot_data:
+    def makeContinuousPlots(self,data_frame,data_selection):
+            """ Generate plots with continuous z axis variables, using all data points """
+            #if 'all' in self.plot_data:
             for cont_plot in self.cont_plots:
         
                 if cont_plot=='chi2':
                     all_false=True
-                    for chi2_value in self.data_frame_all['chi2']:
+                    for chi2_value in data_frame['chi2']:
                         if chi2_value!=False:
                             all_false=False
                     if all_false==True:
                         logger.info('No values where found for chi^2. Skipping this plot')
                         continue
                 
+                ####select only available values
+                data_frame_noFalse=data_frame.loc[data_frame[cont_plot]!=False]
+                
+                
                 plot_desc=self.plot_descriptions.get(cont_plot)
                 cont_plot_legend=self.html_names.get(cont_plot)
                 if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
                     cont_plot_legend=self.html_names.get(cont_plot)+' (fb)'
-                z=self.data_frame_all[cont_plot]
-                x=self.data_frame_all[self.x_axis]
-                y=self.data_frame_all[self.y_axis]
-                hover_text=self.data_frame_all['hover_text']
+                z=data_frame_noFalse[cont_plot]
+                x=data_frame_noFalse[self.x_axis]
+                y=data_frame_noFalse[self.y_axis]
+                hover_text=data_frame_noFalse['hover_text']
             
                 data = [
                     go.Scatter(
@@ -580,8 +629,8 @@ class Plotter:
                     mode='markers',
                     marker=dict(
                         size=10,
-                        cmax=self.data_frame_all[cont_plot].max(),
-                        cmin=self.data_frame_all[cont_plot].max(),
+                        cmax=data_frame_noFalse[cont_plot].max(),
+                        cmin=data_frame_noFalse[cont_plot].max(),
                         color=z,
                         colorbar=dict(
                             title=cont_plot_legend), 
@@ -655,241 +704,36 @@ class Plotter:
                                    )
                 
                 fig = go.Figure(data=data, layout=layout)
-                plotly.offline.plot(fig, filename = self.path_to_plots+'/'+cont_plot+'_all.html', auto_open=False)
-        return;
+                plotly.offline.plot(fig, filename = self.path_to_plots+'/'+cont_plot+'_'+data_selection+'.html', auto_open=False)
+            return;
  
  
-    def makeContinuousPlotsExcluded(self):
-        """ Generate plots with continuous z axis variables, using excluded data points """
-        if 'excluded' in self.plot_data:
-            for cont_plot in self.cont_plots:
-        
-                if cont_plot=='chi2':
-                    all_false=True
-                    for chi2_value in self.data_frame_excluded['chi2']:
-                        if chi2_value!=False:
-                            all_false=False
-                    if all_false==True:
-                        logger.info('No values where found for chi^2 in the excluded region. Skipping this plot')
-                        continue
-                plot_desc=self.plot_descriptions.get(cont_plot)
-                cont_plot_legend=self.html_names.get(cont_plot)
-                if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
-                    cont_plot_legend=self.html_names.get(cont_plot)+' (fb)'
-                z=self.data_frame_excluded[cont_plot]
-                x=self.data_frame_excluded[self.x_axis]
-                y=self.data_frame_excluded[self.y_axis]
-                hover_text=self.data_frame_excluded['hover_text']
-             
-             
-                data = [
-                    go.Scatter(
-                    x=x,
-                    y=y,
-                    text=hover_text,
-                    hoverinfo='text',
-                    marker=dict(
-                        size=10,
-                        cmax=self.data_frame_excluded[cont_plot].max(),
-                        cmin=self.data_frame_excluded[cont_plot].max(),
-                        color=z,
-                        colorbar=dict(
-                            title=cont_plot_legend), 
-                    colorscale='Jet'), 
-                    mode='markers'  
-            )
-     
-                    ]
-     
-                if self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
-                    layout = go.Layout(hovermode= 'closest',
-                                   title = self.plot_title,
-                                   xaxis = dict(title=self.x_axis+' (GeV)'),
-                                   yaxis = dict(title=self.y_axis+' (GeV)'),
-                                   annotations=[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc,
-                                                   xref='paper',
-                                                   yref='paper'
-                                                   )]
-                                   )
-            
-                elif self.variable_x.get(self.x_axis)[0]!='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
-                    layout = go.Layout(hovermode= 'closest',
-                                   title = self.plot_title,
-                                   xaxis = dict(title=self.x_axis),
-                                   yaxis = dict(title=self.y_axis+' (GeV)'),
-                                   annotations=[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc,
-                                                   xref='paper',
-                                                   yref='paper'
-                                                   )]
-                                   )            
-            
-                elif self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]!='MASS':
-                    layout = go.Layout(hovermode= 'closest',
-                                   title = self.plot_title,
-                                   xaxis = dict(title=self.x_axis+' (GeV)'),
-                                   yaxis = dict(title=self.y_axis),
-                                   annotations=[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc,
-                                                   xref='paper',
-                                                   yref='paper'
-                                                   )]
-                                   )             
-            
-                else:
-                    layout = go.Layout(hovermode= 'closest',
-                                   title = self.plot_title,
-                                   xaxis = dict(title=self.x_axis),
-                                   yaxis = dict(title=self.y_axis)
-                                   )
-                fig = go.Figure(data=data, layout=layout)
-                plotly.offline.plot(fig, filename=self.path_to_plots+'/'+cont_plot+'_excluded.html',auto_open=False)
-        return;
- 
- 
-    def makeContinuousPlotsNonexcluded(self):
-        """ Generate plots with continuous z axis variables, using non-excluded data points """
-        if 'non-excluded' in self.plot_data:
-            for cont_plot in self.cont_plots:
-        
-                if cont_plot=='chi2':
-                    all_false=True
-                    for chi2_value in self.data_frame_nonexcluded['chi2']:
-                        if chi2_value!=False:
-                            all_false=False
-                    if all_false==True:
-                        logger.info('No values where found for chi^2 in the non-excluded region. Skipping this plot')
-                        continue
-                plot_desc=self.plot_descriptions.get(cont_plot)
-                cont_plot_legend=self.html_names.get(cont_plot)
-                if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
-                    cont_plot_legend=self.html_names.get(cont_plot)+' (fb)'
-                z=self.data_frame_nonexcluded[cont_plot]
-                x=self.data_frame_nonexcluded[self.x_axis]
-                y=self.data_frame_nonexcluded[self.y_axis]
-                hover_text=self.data_frame_nonexcluded['hover_text']
-             
-                data = [
-                    go.Scatter(
-                    x=x,
-                    y=y,
-                    text=hover_text,
-                    hoverinfo='text',
-                    marker=dict(
-                        size=10,
-                        cmax=self.data_frame_nonexcluded[cont_plot].max(),
-                        cmin=self.data_frame_nonexcluded[cont_plot].max(),
-                        color=z,
-                        colorbar=dict(
-                            title=cont_plot_legend), 
-                    colorscale='Jet'), 
-                    mode='markers'  
-            )
-     
-                    ]
-     
-                if self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
-                    layout = go.Layout(hovermode= 'closest',
-                                   title = self.plot_title,
-                                   xaxis = dict(title=self.x_axis+' (GeV)'),
-                                   yaxis = dict(title=self.y_axis+' (GeV)'),
-                                   annotations=[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc,
-                                                   xref='paper',
-                                                   yref='paper'
-                                                   )]
-                                   )
-            
-                elif self.variable_x.get(self.x_axis)[0]!='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
-                    layout = go.Layout(hovermode= 'closest',
-                                   title = self.plot_title,
-                                   xaxis = dict(title=self.x_axis),
-                                   yaxis = dict(title=self.y_axis+' (GeV)'),
-                                   annotations=[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc,
-                                                   xref='paper',
-                                                   yref='paper'
-                                                   )]
-                                   )            
-            
-                elif self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]!='MASS':
-                    layout = go.Layout(hovermode= 'closest',
-                                   title = self.plot_title,
-                                   xaxis = dict(title=self.x_axis+' (GeV)'),
-                                   yaxis = dict(title=self.y_axis),
-                                   annotations=[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc,
-                                                   xref='paper',
-                                                   yref='paper'
-                                                   )]
-                                   )             
-            
-                else:
-                    layout = go.Layout(hovermode= 'closest',
-                                   title = self.plot_title,
-                                   xaxis = dict(title=self.x_axis),
-                                   yaxis = dict(title=self.y_axis),
-                                   annotations=[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc,
-                                                   xref='paper',
-                                                   yref='paper'
-                                                   )]
-                                   )
-        
-                fig = go.Figure(data=data, layout=layout)
-                plotly.offline.plot(fig, filename = self.path_to_plots+'/'+cont_plot+'_non-excluded.html', auto_open=False)
-        return;
+   
  
      
     #########Discrete_plots############
-    def makeDiscretePlotsAll(self):
-        """ Generate plots with discrete z axis variables, using all data points """
-        if 'all' in self.plot_data:
+    def makeDiscretePlots(self,data_frame,data_selection):
+            """ Generate plots with discrete z axis variables, using all data points """
+   
             for disc_plot in self.disc_plots:
+            
+                
+                data_frame_noFalse=data_frame.loc[data_frame[disc_plot]!=False]
                 plot_desc=self.plot_descriptions.get(disc_plot)
              
                 disc_list=[]
-                for value in self.data_frame_all[disc_plot]:
+                for value in data_frame_noFalse[disc_plot]:
                     if value not in disc_list:
                         disc_list.append(value)
      
                 fig = {
                     'data': [
                     {
-                        'x': self.data_frame_all.loc[self.data_frame_all[disc_plot]==value][self.x_axis],
-                        'y': self.data_frame_all.loc[self.data_frame_all[disc_plot]==value][self.y_axis],
+                        'x': data_frame_noFalse.loc[data_frame_noFalse[disc_plot]==value][self.x_axis],
+                        'y': data_frame_noFalse.loc[data_frame_noFalse[disc_plot]==value][self.y_axis],
                         'name': value, 'mode': 'markers',
                         'marker':dict(size=10),
-                        'text':self.data_frame_all.loc[self.data_frame_all[disc_plot]==value]['hover_text'],
+                        'text':data_frame_noFalse.loc[data_frame_noFalse[disc_plot]==value]['hover_text'],
                         'hoverinfo':'text',
                  
                  
@@ -960,197 +804,11 @@ class Plotter:
             
             
      
-                plotly.offline.plot(fig, filename = self.path_to_plots+'/'+disc_plot+'_all.html', auto_open=False)
-        return;
+                plotly.offline.plot(fig, filename = self.path_to_plots+'/'+disc_plot+'_'+data_selection+'.html', auto_open=False)
+            return;
  
  
-    def makeDiscretePlotsExcluded(self):
-        """ Generate plots with discrete z axis variables, using excluded data points """
-        if 'excluded' in self.plot_data:
-            for disc_plot in self.disc_plots:
-                plot_desc=self.plot_descriptions.get(disc_plot)
-                disc_list=[]
-                for value in self.data_frame_excluded[disc_plot]:
-                    if value not in disc_list:
-                        disc_list.append(value)
-     
-                fig = {
-                    'data': [
-                    {
-                        'x': self.data_frame_excluded.loc[self.data_frame_excluded[disc_plot]==value][self.x_axis],
-                        'y': self.data_frame_excluded.loc[self.data_frame_excluded[disc_plot]==value][self.y_axis],
-                        'name': value, 'mode': 'markers',
-                        'marker':dict(size=10),
-                        'text':self.data_frame_excluded.loc[self.data_frame_excluded[disc_plot]==value]['hover_text'],
-                        'hoverinfo':'text',
-                 
-                 
-                    } for value in disc_list
-                ],
-                'layout': {'title':self.plot_title,
-                    'showlegend':True,
-                    'hovermode':'closest',
-                    'xaxis': {'title': self.x_axis},
-                    'yaxis': {'title': self.y_axis}
-                }
-            }
-                
-                if self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
-                    fig['layout'] =  {'title':self.plot_title,
-                    'showlegend':True,       
-                    'hovermode':'closest','annotations':[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
-                                                   xref='paper',
-                                                   yref='paper')],
-                    'xaxis': {'title': self.x_axis+' (GeV)'},
-                    'yaxis': {'title': self.y_axis+' (GeV)'}
-                                } 
-                
-                elif self.variable_x.get(self.x_axis)[0]!='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
-                    fig['layout'] =  {'title':self.plot_title,
-                    'showlegend':True,       
-                    'hovermode':'closest','annotations':[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
-                                                   xref='paper',
-                                                   yref='paper')],
-                    'xaxis': {'title': self.x_axis},
-                    'yaxis': {'title': self.y_axis+' (GeV)'}
-                                }  
-                
-                elif self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]!='MASS':
-                    fig['layout'] =  {'title':self.plot_title,
-                    'showlegend':True,       
-                    'hovermode':'closest','annotations':[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
-                                                   xref='paper',
-                                                   yref='paper')],
-                    'xaxis': {'title': self.x_axis+' (GeV)'},
-                    'yaxis': {'title': self.y_axis}
-                                } 
 
-                else:
-                    fig['layout'] =  {'title':self.plot_title,
-                    'showlegend':True,       
-                    'hovermode':'closest','annotations':[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
-                                                   xref='paper',
-                                                   yref='paper')],
-                    'xaxis': {'title': self.x_axis+' (GeV)'},
-                    'yaxis': {'title': self.y_axis+' (GeV)'}
-                                } 
-     
-                plotly.offline.plot(fig, filename = self.path_to_plots+'/'+disc_plot+'_excluded.html', auto_open=False)
-        return;
- 
-    def makeDiscretePlotsNonexcluded(self):
-        """ Generate plots with discrete z axis variables, using non-excluded data points """
-        if 'non-excluded' in self.plot_data:
-            for disc_plot in self.disc_plots:
-                plot_desc=self.plot_descriptions.get(disc_plot)
-                disc_list=[]
-                for value in self.data_frame_nonexcluded[disc_plot]:
-                    if value not in disc_list:
-                        disc_list.append(value)
-     
-                fig = {
-                    'data': [
-                    {
-                        'x': self.data_frame_nonexcluded.loc[self.data_frame_nonexcluded[disc_plot]==value][self.x_axis],
-                        'y': self.data_frame_nonexcluded.loc[self.data_frame_nonexcluded[disc_plot]==value][self.y_axis],
-                        'name': value, 'mode': 'markers',
-                        'marker':dict(size=10),
-                        'text':self.data_frame_nonexcluded.loc[self.data_frame_nonexcluded[disc_plot]==value]['hover_text'],
-                        'hoverinfo':'text',
-                 
-                 
-                    } for value in disc_list
-                ],
-                'layout': {'title':self.plot_title,
-                    'showlegend':True,
-                    'hovermode':'closest',
-                    'xaxis': {'title': self.x_axis},
-                    'yaxis': {'title': self.y_axis}
-                }
-            }
-                
-                if self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
-                    fig['layout'] =  {'title':self.plot_title,
-                    'showlegend':True,       
-                    'hovermode':'closest','annotations':[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
-                                                   xref='paper',
-                                                   yref='paper')],
-                    'xaxis': {'title': self.x_axis+' (GeV)'},
-                    'yaxis': {'title': self.y_axis+' (GeV)'}
-                                } 
-                
-                elif self.variable_x.get(self.x_axis)[0]!='MASS' and self.variable_y.get(self.y_axis)[0]=='MASS':
-                    fig['layout'] =  {'title':self.plot_title,
-                    'showlegend':True,       
-                    'hovermode':'closest','annotations':[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
-                                                   xref='paper',
-                                                   yref='paper')],
-                    'xaxis': {'title': self.x_axis},
-                    'yaxis': {'title': self.y_axis+' (GeV)'}
-                                }  
-                
-                elif self.variable_x.get(self.x_axis)[0]=='MASS' and self.variable_y.get(self.y_axis)[0]!='MASS':
-                    fig['layout'] =  {'title':self.plot_title,
-                    'showlegend':True,       
-                    'hovermode':'closest','annotations':[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
-                                                   xref='paper',
-                                                   yref='paper')],
-                    'xaxis': {'title': self.x_axis+' (GeV)'},
-                    'yaxis': {'title': self.y_axis}
-                                } 
-
-                else:
-                    fig['layout'] =  {'title':self.plot_title,
-                    'showlegend':True,       
-                    'hovermode':'closest','annotations':[
-                                           dict(
-                                                   x=0.0,
-                                                   y=1.05,
-                                                   showarrow=False,
-                                                   text=plot_desc+'  ('+self.html_names.get(disc_plot)+')',
-                                                   xref='paper',
-                                                   yref='paper')],
-                    'xaxis': {'title': self.x_axis+' (GeV)'},
-                    'yaxis': {'title': self.y_axis+' (GeV)'}
-                                }                 
-     
-                plotly.offline.plot(fig, filename = self.path_to_plots+'/'+disc_plot+'_non-excluded.html', auto_open=False)
-        return;
 
 
 
@@ -1203,18 +861,18 @@ class Plotter:
 
         plot_descriptions=Plotter.plotDescription(self)
         
+        if 'all' in self.plot_data:
+            Plotter.makeContinuousPlots(self,self.data_frame_all,'all')
+            Plotter.makeDiscretePlots(self,self.data_frame_all,'all')
+            
+        if 'excluded' in self.plot_data:
+            Plotter.makeContinuousPlots(self,data_frame_excluded,'excluded')
+            Plotter.makeDiscretePlots(self,data_frame_excluded,'excluded')
+        if 'non-excluded' in self.plot_data:
+            Plotter.makeContinuousPlots(self,data_frame_nonexcluded,'non-excluded')
+            Plotter.makeDiscretePlots(self,data_frame_nonexcluded,'non-excluded')
 
-        Plotter.makeContinuousPlotsAll(self)
 
-        Plotter.makeContinuousPlotsExcluded(self)
-
-        Plotter.makeContinuousPlotsNonexcluded(self)
-
-        Plotter.makeDiscretePlotsAll(self)
-
-        Plotter.makeDiscretePlotsExcluded(self)
-
-        Plotter.makeDiscretePlotsNonexcluded(self)
 
         Plotter.createIndexHtml(self)
 
