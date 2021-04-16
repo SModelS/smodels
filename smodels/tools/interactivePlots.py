@@ -45,7 +45,7 @@ class PlotMaster(object):
         self.variable_x = None
         self.variable_y = None
         self.plot_list = None
-        self.BR_get_top = None
+        self.min_BR = None
 
 
         if not os.path.isfile(parameterFile):
@@ -119,11 +119,11 @@ class PlotMaster(object):
         else:
             self.plot_list = list(set(parameters.plot_list))
 
-        if not hasattr(parameters,'BR_get_top'):
-            logger.debug("BR_get_top not found in %s. Will include all decay channels")
-            self.BR_get_top = 'all'
+        if not hasattr(parameters,'min_BR'):
+            logger.debug("min_BR not found in %s. Will include all decay channels")
+            self.min_BR = 'all'
         else:
-            self.BR_get_top = parameters.BR_get_top
+            self.min_BR = parameters.min_BR
 
         if not hasattr(parameters,'plot_title'):
             logger.warning("plot_title not defined in %s. Using default title" %parFile)
@@ -163,7 +163,7 @@ class PlotMaster(object):
         the smodels output dictionary (smodelsDict) and the pyslha.Doc object
         slhaData
         """
-        filler=helpers.Filler(self.data_dict,smodelsOutput,slhaData,self.slha_hover_information,self.ctau_hover_information,self.BR_hover_information,self.BR_get_top)
+        filler=helpers.Filler(self.data_dict,smodelsOutput,slhaData,self.slha_hover_information,self.ctau_hover_information,self.BR_hover_information,self.min_BR)
         #Fill with smodels data if defined
         if smodelsOutput is None:
             for key in self.SModelS_hover_information:

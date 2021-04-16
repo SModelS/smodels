@@ -20,8 +20,8 @@ ctau_hover_information = {'ctau(chi1+)': 1000024}
 BR_hover_information = {'BR(gluino)': 1000021, 'BR(chi1+)': 1000024}
 #The output is written in the form '.25[1000022,1,-1]',  where the first number (0.25) is the branching ratio, and the numbers in [,] are the PDG codes of the decay products.
 #WARNING: Lists of branching ratios lists can be very long, so the may not fit in the hover box. 
-#You can tell how many entries you want to print with BR_get_top, e.g. BR_get_top = 5 (default 'all').
-BR_get_top = 5
+#You can tell how many entries you want to print with min_BR, e.g. min_BR = .05 (default 'all').
+min_BR = .05
 
 
 #SModelS hover information; options are:

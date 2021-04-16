@@ -115,7 +115,7 @@ class Filler:
      A class with the functions required to fill the data dictionary to produce the plots
     """
     
-    def __init__(self,data_dict,smodelsOutput,slhaData,slha_hover_information,ctau_hover_information,BR_hover_information,BR_get_top):
+    def __init__(self,data_dict,smodelsOutput,slhaData,slha_hover_information,ctau_hover_information,BR_hover_information,min_BR):
     
         self.data_dict=data_dict
         self.smodelsOutput=smodelsOutput
@@ -123,7 +123,7 @@ class Filler:
         self.slha_hover_information=slha_hover_information
         self.ctau_hover_information=ctau_hover_information
         self.BR_hover_information=BR_hover_information
-        self.BR_get_top=BR_get_top
+        self.min_BR=min_BR
         
         return
     
@@ -340,12 +340,24 @@ class Filler:
         """
         for key in self.BR_hover_information.keys():
             pdg_number=self.BR_hover_information.get(key)
-            BR=str(self.slhaData.decays[pdg_number]).split('\n')[1:]
-            if self.BR_get_top != 'all':
-                BR=BR[:int(self.BR_get_top)]
-            BR=str(BR).split(' ')
-            BR=''.join(BR)
-            self.data_dict.get(key).append(BR)
+            BRs=str(self.slhaData.decays[pdg_number]).split('\n')[1:]
+            
+            
+            if self.min_BR == 'all':
+                BR_top=BRs
+            else:
+           
+                BR_top=[]
+                for br in BRs:
+                    br_val=float(br.split(' [')[0])
+                    if br_val<self.min_BR:
+                        break
+                    BR_top.append(br)
+
+            BR_top=str(BR_top).split(' ')
+            BR_top=''.join(BR_top)
+            BR_top=BR_top[2:-2]
+            self.data_dict.get(key).append(BR_top)
         
         return self.data_dict
 
