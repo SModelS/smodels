@@ -33,13 +33,16 @@ def importPythonOutput(smodelsFile):
     """
     Imports the smodels output from each .py file.
     """
-       
+    
     try:
-        with open(smodelsFile, 'rb') as fsmodels: ## imports smodels file
+        with open(smodelsFile, 'rb') as fsmodels:
+            ## imports smodels file
             smodelsOut = imp.load_module("smodelsOutput",fsmodels,smodelsFile,('.py', 'rb', imp.PY_SOURCE))
             smodelsOutput = smodelsOut.smodelsOutput
+            
     except (ImportError,AttributeError,IOError,ValueError,OSError,SyntaxError):
         logger.debug("Error loading smodels file %s. Does it contain a smodelsOutput dictionary?" %smodelsFile)
+        
         return False
     
     if not isinstance(smodelsOutput,dict):    
@@ -56,7 +59,7 @@ def outputStatus(smodelsDict):
     Check the smodels output status in the file, if it's -1, 
     it will append 'none' to each list in the dictionary.
     """
-    
+
     outputStatus = getEntry(smodelsDict, 'OutputStatus', 'file status')
     if outputStatus is False:
         raise SModelSError()
@@ -194,13 +197,17 @@ class Filler:
             analysis_id = False
             rmax=False
  
-        if 'SModelS_status' in  self.data_dict:
-            if rmax ==False:
-                self.data_dict['SModelS_status'].append(False)
-            elif rmax>1:
-                self.data_dict['SModelS_status'].append('Excluded')
-            else:
-                self.data_dict['SModelS_status'].append('Non-excluded')
+       # if 'SModelS_status' in  self.data_dict:
+       #always add 'SModelS_status' to data_dict
+        if rmax ==False:
+            self.data_dict['SModelS_status'].append('False')
+        elif rmax>1:
+            self.data_dict['SModelS_status'].append('Excluded')
+        else:
+            self.data_dict['SModelS_status'].append('Non-excluded')
+            
+            
+            
 
         if 'r_max' in self.data_dict.keys():
             self.data_dict['r_max'].append(rmax)
@@ -213,6 +220,7 @@ class Filler:
         if 'Analysis' in self.data_dict.keys():
             self.data_dict['Analysis'].append(analysis_id)
         return self.data_dict;
+    '''
   
     def getMissedTopologies(self):
         """
@@ -223,7 +231,7 @@ class Filler:
         missedtopo_total_xsec=0
         mt_max = 'False'
         if decompStatus >= 0:
-            for missed_topo in getEntry(self.smodelsOutput, 'Missed Topologies'):
+            for missed_topo in getEntry(self.smodelsOutput, 'missing topologies'):
                 missedtopo_xsec=missed_topo.get('weight (fb)')
                 missedtopo_total_xsec=missedtopo_total_xsec+missedtopo_xsec
                 if missedtopo_xsec>missedtopo_max_xsec:
@@ -279,27 +287,124 @@ class Filler:
         if 'MT_asym_xsec' in self.data_dict.keys():
             self.data_dict.get('MT_asym_xsec').append(asymmetric_branch_total_xsec)
         return self.data_dict
+        
+  '''
+  
+    def getTotalMissingXsec(self):
+        """ Extracts the total crossection from missing topologies. """
+        
+        decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
+        
+        if decompStatus >= 0:
+            total_xsec = self.smodelsOutput['Total xsec for missing topologies (fb)']
+            total_xsec =  Filler.truncate(self,total_xsec)
+            
+            
+        else:
+            total_xsec=False
+        if 'MT_total_xsec' in self.data_dict.keys():
+            self.data_dict.get('MT_total_xsec').append(total_xsec)
+        
+        return self.data_dict
+        
+    def getMaxMissingTopology(self):
+        """ Extracts the missing topology with the largest cross section  """
+        
+        decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
+        if decompStatus >= 0:
+            try:
+                max_xsec = self.smodelsOutput['missing topologies'][0].get('element')
+            except:
+                
+                max_xsec='No-missing-topologies'
+           
+            
+        
+            
+        else:
+            max_xsec='False'
+       
+        if 'MT_max' in self.data_dict.keys():
+            self.data_dict.get('MT_max').append(max_xsec)
+        
+        return self.data_dict
+        
+    def getMaxMissingTopologyXsection(self):
+        """ Extracts the cross section of the missing topology with the largest cross section  """
+        
+        decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
+        if decompStatus >= 0:
+            try:
+                max_xsec = self.smodelsOutput['missing topologies'][0].get('weight (fb)')
+                max_xsec =  Filler.truncate(self,max_xsec)
+            except:
+                max_xsec=0
+                
+            
+            
+        else:
+            max_xsec=False
+        if 'MT_max_xsec' in self.data_dict.keys():
+            self.data_dict.get('MT_max_xsec').append(max_xsec)
+        
+        return self.data_dict
+        
+    def getTotalMissingPrompt(self):
+        """
+                Extracts the Total cross section from missing prompt topologies
+        """
+        decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
+        if decompStatus >= 0:
+            total_xsec = self.smodelsOutput['Total xsec for missing topologies with prompt decays (fb)']
+            total_xsec =  Filler.truncate(self,total_xsec)
+            
+            
+        else:
+            total_xsec=False
+        if 'MT_prompt_xsec' in self.data_dict.keys():
+            self.data_dict.get('MT_prompt_xsec').append(total_xsec)
+        return self.data_dict
+        
+
+    
+    
+        
+    def getTotalMissingDisplaced(self):
+        """
+        Extracts the Total cross section from missing displaced topologies
+        """
+        decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
+        if decompStatus >= 0:
+            total_xsec = self.smodelsOutput['Total xsec for missing topologies with displaced decays (fb)']
+            total_xsec =  Filler.truncate(self,total_xsec)
+            
+            
+        else:
+            total_xsec=False
+        if 'MT_displaced_xsec' in self.data_dict.keys():
+            self.data_dict.get('MT_displaced_xsec').append(total_xsec)
+        return self.data_dict
+        
     
     def getOutsideGrid(self):
         """
         Extracts the outside grid info from the .py output. If requested, the data will be appended on each corresponding list.
         """
         decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
-        outside_grid_total_xsec=0
         if decompStatus >= 0:
-            for outside_grid in self.smodelsOutput.get('Outside Grid'):
-                outside_grid_xsec=outside_grid.get('weight (fb)')
-                outside_grid_total_xsec = outside_grid_total_xsec+outside_grid_xsec
-            outside_grid_total_xsec=Filler.truncate(self,outside_grid_total_xsec)
+            total_xsec = self.smodelsOutput['Total xsec for topologies outside the grid (fb)']
+            total_xsec =  Filler.truncate(self,total_xsec)
+            
+            
         else:
-            outside_grid_total_xsec = False
+            total_xsec=False
         if 'MT_outgrid_xsec' in self.data_dict.keys():
-            self.data_dict.get('MT_outgrid_xsec').append(outside_grid_total_xsec)
+            self.data_dict.get('MT_outgrid_xsec').append(total_xsec)
         return self.data_dict
 
     def getSlhaHoverInfo(self):
         """
-        Gets the requested slha info from eachh slha file, to fill the hover.
+        Gets the requested slha info from each slha file, to fill the hover.
         """
           
         for key in self.slha_hover_information.keys():
@@ -380,10 +485,17 @@ class Filler:
         ''' fills data dict with smodels data'''
         
         self.data_dict = Filler.getExpres(self)
-        self.data_dict = Filler.getMissedTopologies(self)
-        self.data_dict = Filler.getAsymmetricBranches(self)
+        #self.data_dict = Filler.getMissedTopologies(self)
+        #self.data_dict = Filler.getAsymmetricBranches(self)
+    
+        self.data_dict = Filler.getTotalMissingXsec(self)
+        self.data_dict = Filler.getMaxMissingTopology(self)
+        self.data_dict = Filler.getMaxMissingTopologyXsection(self)
+        
+        self.data_dict = Filler.getTotalMissingPrompt(self)
+        self.data_dict = Filler.getTotalMissingDisplaced(self)
         self.data_dict = Filler.getOutsideGrid(self)
-        self.data_dict = Filler.getLongCascades(self)
+       # self.data_dict = Filler.getLongCascades(self)
             
         return self.data_dict
             
@@ -446,8 +558,8 @@ class Plotter:
                       'MT_max':'MT<sub>max</sub>',
                       'MT_max_xsec':'MT<sub>max xsection</sub>.',
                       'MT_total_xsec':'MT<sub>total xsection</sub>',
-                      'MT_long_xsec':'MT<sub>long cascade xsection</sub>',
-                      'MT_asym_xsec':'MT<sub>asymmetric branch xsection</sub>',
+                      'MT_prompt_xsec':'MT<sub>prompt xsection</sub>',
+                      'MT_displaced_xsec':'MT<sub>displaced xsection</sub>',
                       'MT_outgrid_xsec':'MT<sub>outside grid xsection</sub>'}
         
         return self.html_names
@@ -487,10 +599,13 @@ class Plotter:
         data_frame_provisional=self.data_frame_all
         data_frame_provisional=data_frame_provisional.astype(str)
        
-        if 'SModelS_status' in self.SModelS_hover_information:
+        #if 'SModelS_status' in self.SModelS_hover_information:
+        #Always add smodels_status to the dataframe
         
-            data_frame_provisional.loc[data_frame_provisional['SModelS_status'] =='False', 'SModelS_status'] = 'Not-available'
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('SModelS_status')+': '+data_frame_provisional['SModelS_status']+'<br>'
+        data_frame_provisional.loc[data_frame_provisional['SModelS_status'] =='False', 'SModelS_status'] = 'Not-available'
+        self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('SModelS_status')+': '+data_frame_provisional['SModelS_status']+'<br>'
+            
+            
         if 'r_max' in self.SModelS_hover_information:
         
             data_frame_provisional.loc[data_frame_provisional['r_max'] =='False', 'r_max'] = 'Not-available'
@@ -531,16 +646,19 @@ class Plotter:
             data_frame_provisional.loc[data_frame_provisional['MT_total_xsec'] =='False', 'MT_total_xsec'] = 'Not-available'
         
             self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_total_xsec')+': '+data_frame_provisional['MT_total_xsec']+' [fb]'+'<br>'
-        if 'MT_long_xsec' in self.SModelS_hover_information:
+            
+        if 'MT_prompt_xsec' in self.SModelS_hover_information:
         
-            data_frame_provisional.loc[data_frame_provisional['MT_long_xsec'] =='False', 'MT_long_xsec'] = 'Not-available'
+            data_frame_provisional.loc[data_frame_provisional['MT_prompt_xsec'] =='False', 'MT_prompt_xsec'] = 'Not-available'
         
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_long_xsec')+': '+data_frame_provisional['MT_long_xsec']+' [fb]'+'<br>'
-        if 'MT_asym_xsec' in self.SModelS_hover_information:
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_prompt_xsec')+': '+data_frame_provisional['MT_prompt_xsec']+' [fb]'+'<br>'
+            
+        if 'MT_displaced_xsec' in self.SModelS_hover_information:
         
-            data_frame_provisional.loc[data_frame_provisional['MT_asym_xsec'] =='False', 'MT_asym_xsec'] = 'Not-available'
+            data_frame_provisional.loc[data_frame_provisional['MT_displaced_xsec'] =='False', 'MT_displaced_xsec'] = 'Not-available'
         
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_asym_xsec')+': '+data_frame_provisional['MT_asym_xsec']+' [fb]'+'<br>'
+            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_displaced_xsec')+': '+data_frame_provisional['MT_displaced_xsec']+' [fb]'+'<br>'
+        
         if 'MT_outgrid_xsec' in self.SModelS_hover_information:
         
             data_frame_provisional.loc[data_frame_provisional['MT_outgrid_xsec'] =='False', 'MT_outgrid_xsec'] = 'Not-available'
@@ -599,8 +717,8 @@ class Plotter:
                       'MT_max':'Missing topologies with the largest cross section.',
                       'MT_max_xsec':'Cross section of MT_max.',
                       'MT_total_xsec':'Total missing cross section.',
-                      'MT_long_xsec':'Missing cross section in long cascade decays.',
-                      'MT_asym_xsec':'Missing cross section in decays with asymmetric branches.',
+                      'MT_prompt_xsec':'Extracts the total cross section from missing prompt topologies',
+                      'MT_displaced_xsec':'Extracts the total cross section from missing displaced topologies',
                       'MT_outgrid_xsec':'Missing cross section outside the mass grids of the experimental results.'}
         return self.plot_descriptions;
  
@@ -625,7 +743,7 @@ class Plotter:
                 
                 plot_desc=self.plot_descriptions.get(cont_plot)
                 cont_plot_legend=self.html_names.get(cont_plot)
-                if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_long_xsec' or cont_plot=='MT_asym_xsec' or cont_plot=='MT_outgrid_xsec':
+                if cont_plot=='MT_max_xsec' or cont_plot=='MT_total_xsec' or cont_plot=='MT_prompt_xsec' or cont_plot=='MT_displaced_xsec' or cont_plot=='MT_outgrid_xsec':
                     cont_plot_legend=self.html_names.get(cont_plot)+' (fb)'
                 z=data_frame_noFalse[cont_plot]
                 x=data_frame_noFalse[self.x_axis]

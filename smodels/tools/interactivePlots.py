@@ -30,7 +30,7 @@ class PlotMaster(object):
         :parameter parameterFile: path to the file containing the plotting definitions
         """
 
-
+        
         self.data_dict = []
         self.smodelsFolder = smodelsFolder
         self.slhaFolder = slhaFolder
@@ -130,15 +130,19 @@ class PlotMaster(object):
             self.plot_title = 'interactive-plots'
         else:
             self.plot_title = parameters.plot_title
+        
 
 
     def initializeDataDict(self):
         """
         Initializes an empty dictionary with the plotting options.
         """
-
+      
         self.data_dict = {}
+        self.data_dict['SModelS_status']=[]
         for smodels_names in sorted(self.SModelS_hover_information):
+            if smodels_names=='SModelS_status':
+                continue
             self.data_dict[smodels_names]=[]
         for plot_name in self.plot_list:
             self.data_dict[plot_name]=[]
@@ -156,6 +160,7 @@ class PlotMaster(object):
             self.data_dict[BR]=[]
 
         self.data_dict['file'] = []
+        
 
     def fillWith(self,smodelsOutput,slhaData):
         """
@@ -163,6 +168,7 @@ class PlotMaster(object):
         the smodels output dictionary (smodelsDict) and the pyslha.Doc object
         slhaData
         """
+     
         filler=helpers.Filler(self.data_dict,smodelsOutput,slhaData,self.slha_hover_information,self.ctau_hover_information,self.BR_hover_information,self.min_BR)
         #Fill with smodels data if defined
         if smodelsOutput is None:
@@ -173,6 +179,8 @@ class PlotMaster(object):
             self.data_dict=filler.getSmodelSData()
 
         self.data_dict=filler.getSlhaData(self.variable_x,self.variable_y)
+        
+        
 
 
     def loadData(self,npoints=-1):
@@ -186,15 +194,17 @@ class PlotMaster(object):
         logger.info( f"Reading data folders {self.smodelsFolder} and {self.slhaFolder} ..." )
 
         n = 0
+        
         for f in glob.glob(self.smodelsFolder+'/*'):
 
             if npoints > 0 and n >= npoints:
                 break
-
+            
             smodelsOutput = helpers.importPythonOutput(f)
+           
             if not smodelsOutput:
                 continue
-
+           
             #Get SLHA file name:
             slhaFile = helpers.getSlhaFile(smodelsOutput)
             slhaFile = os.path.join(self.slhaFolder,os.path.basename(slhaFile))
@@ -206,6 +216,7 @@ class PlotMaster(object):
             #Data read successfully
             self.data_dict['file'].append(f.split('/')[-1])
             outputStatus = helpers.outputStatus(smodelsOutput)
+            
             if outputStatus == -1:
                 self.fillWith(None,slhaData)
             else:
