@@ -6,18 +6,31 @@
 #Plot title
 plot_title = 'interactive plot example from a small pMSSM scan'
 
-#Label*, block and code number for the variables you want to plot, e.g. 'm(gluino)': ['MASS', 1000021]. These will be your x and y axes.
-variable_x = {'m<sub>gluino</sub>': ['MASS', 1000021]}
-variable_y = {'m<sub>&#967;<sub>1</sub><sup>0</sup></sub>': ['MASS', 1000022]}
+#Label*, block and code number for the variables you want to plot, e.g. ['MASS', 1000021]. These will be your x and y axes.
+
+variable_x = ['MASS', 1000021]
+variable_y =['MASS', 1000022]
+#Alternatively, you can add custom names as:
+#variable_x = {'m<sub>gluino</sub>': ['MASS', 1000021]}
+#variable_y = {'m<sub>&#967;<sub>1</sub><sup>0</sup></sub>': ['MASS', 1000022]}
 
 
 #SLHA hover information: In a dictionary form, give the name* of your variable, the block and code number to find it in the SLHA file.
-slha_hover_information = {'m(gluino)</sub>': ['MASS', 1000021], 'm(stop1)': ['MASS', 1000006], 'm(chi10)': ['MASS', 1000022]} 
+
+slha_hover_information =[ ['MASS', 1000021], ['MASS', 1000006],  ['MASS', 1000022]]
+#You can provide custom names as:
+#slha_hover_information = {'m(gluino)</sub>': ['MASS', 1000021], 'm(stop1)': ['MASS', 1000006], 'm(chi10)': ['MASS', 1000022]}
 
 #For which particles you want to get the mean decay length.
-ctau_hover_information = {'ctau(chi1+)': 1000024}
-#For which particles you want to display the decay channels and branching ratios. 
-BR_hover_information = {'BR(gluino)': 1000021, 'BR(chi1+)': 1000024}
+ctau_hover_information = [1000024]
+#You can provide custom names as:
+#ctau_hover_information = {'ctau(chi1+)': 1000024}
+
+#For which particles you want to display the decay channels and branching ratios.
+BR_hover_information = [1000021,1000024]
+#You can provide custom names as:
+#BR_hover_information = {'BR(gluino)': 1000021, 'BR(chi1+)': 1000024}
+
 #The output is written in the form '.25[1000022,1,-1]',  where the first number (0.25) is the branching ratio, and the numbers in [,] are the PDG codes of the decay products.
 #WARNING: Lists of branching ratios lists can be very long, so the may not fit in the hover box. 
 #You can tell how many entries you want to print with min_BR, e.g. min_BR = .05 (default 'all').

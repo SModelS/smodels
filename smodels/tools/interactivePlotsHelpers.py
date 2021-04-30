@@ -10,6 +10,8 @@
 import sys
 import math
 import os
+import imp
+import smodels
 from smodels.tools.smodelsLogging import logger
 try:
     import warnings ## we can ignore these warnings, see
@@ -118,7 +120,7 @@ class Filler:
      A class with the functions required to fill the data dictionary to produce the plots
     """
     
-    def __init__(self,data_dict,smodelsOutput,slhaData,slha_hover_information,ctau_hover_information,BR_hover_information,min_BR):
+    def __init__(self,data_dict,smodelsOutput,slhaData,slha_hover_information,ctau_hover_information,BR_hover_information,min_BR,particle_names):
     
         self.data_dict=data_dict
         self.smodelsOutput=smodelsOutput
@@ -127,6 +129,7 @@ class Filler:
         self.ctau_hover_information=ctau_hover_information
         self.BR_hover_information=BR_hover_information
         self.min_BR=min_BR
+        self.particle_names=particle_names
         
         return
     
@@ -220,75 +223,7 @@ class Filler:
         if 'Analysis' in self.data_dict.keys():
             self.data_dict['Analysis'].append(analysis_id)
         return self.data_dict;
-    '''
-  
-    def getMissedTopologies(self):
-        """
-        Extracts the Missed topologies info from the .py output. If requested, the data will be appended on each corresponding list
-        """
-        decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
-        missedtopo_max_xsec=0
-        missedtopo_total_xsec=0
-        mt_max = 'False'
-        if decompStatus >= 0:
-            for missed_topo in getEntry(self.smodelsOutput, 'missing topologies'):
-                missedtopo_xsec=missed_topo.get('weight (fb)')
-                missedtopo_total_xsec=missedtopo_total_xsec+missedtopo_xsec
-                if missedtopo_xsec>missedtopo_max_xsec:
-                    missedtopo_max_xsec=missedtopo_xsec
-                    mt_max=missed_topo.get('element')
-            missedtopo_max_xsec=Filler.truncate(self,missedtopo_max_xsec)
-            missedtopo_total_xsec=Filler.truncate(self,missedtopo_total_xsec)
-        
-        
-        else:
-            missedtopo_max_xsec=False
-            missedtopo_total_xsec=False
-            missed_topo = False
-        if 'MT_max' in self.data_dict.keys():
-            self.data_dict.get('MT_max').append(str(mt_max))
-        if 'MT_max_xsec' in self.data_dict.keys():
-            self.data_dict.get('MT_max_xsec').append(missedtopo_max_xsec)
-        if 'MT_total_xsec' in self.data_dict.keys():
-            self.data_dict.get('MT_total_xsec').append(missedtopo_total_xsec)
-        
-        return self.data_dict
-   
-    def getLongCascades(self):
-        """
-        Extracts the Long cascade info from the .py output. If requested, the data will be appended on each corresponding list
-        """
-        decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
-        long_cascade_total_xsec=0
-        if decompStatus >= 0:
-            long_cascade_total_xsec=0
-            for long_cascade in self.smodelsOutput.get('Long Cascades'):
-                long_cascade_xsec=long_cascade.get('weight (fb)')
-                long_cascade_total_xsec=long_cascade_total_xsec+long_cascade_xsec
-            long_cascade_total_xsec=Filler.truncate(self,long_cascade_total_xsec)
     
-        else:
-            long_cascade_total_xsec=False
-        if 'MT_long_xsec' in self.data_dict.keys():
-            self.data_dict.get('MT_long_xsec').append(long_cascade_total_xsec)
-             
-        return self.data_dict
-             
-    def getAsymmetricBranches(self):
-        """
-        Extracts the asymmetric branches info from the .py output. If requested, the data will be appended on each corresponding list
-        """
-        decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
-        if decompStatus >= 0:
-            asymmetric_branch_total_xsec = sum([asym_br['weight (fb)'] for asym_br in self.smodelsOutput['Asymmetric Branches']])
-            asymmetric_branch_total_xsec=Filler.truncate(self,asymmetric_branch_total_xsec)
-        else:
-            asymmetric_branch_total_xsec=False
-        if 'MT_asym_xsec' in self.data_dict.keys():
-            self.data_dict.get('MT_asym_xsec').append(asymmetric_branch_total_xsec)
-        return self.data_dict
-        
-  '''
   
     def getTotalMissingXsec(self):
         """ Extracts the total crossection from missing topologies. """
@@ -401,6 +336,8 @@ class Filler:
         if 'MT_outgrid_xsec' in self.data_dict.keys():
             self.data_dict.get('MT_outgrid_xsec').append(total_xsec)
         return self.data_dict
+        
+    
 
     def getSlhaHoverInfo(self):
         """
@@ -436,8 +373,44 @@ class Filler:
             self.data_dict.get(key).append(ctau)
         
         return self.data_dict
+        
+    def openSMParticles(self):
+        """Loads  SMparticles.py to parse over SM pdg-labels"""
+        sm_particle_file='/Users/humberto/Documents/work/smodels-iplots/github/smodels/smodels/share/models/SMparticles.py'
+        
+        with open(sm_particle_file, 'rb') as fsmparticles:
+            ## imports parameter file
+            self.sm_particle_names = imp.load_module("sm_particles",fsmparticles,sm_particle_file,('.py', 'rb', imp.PY_SOURCE))
+        return
+        
 
-              
+    def getParticleName(self,pdg):
+        """ looks for the particle label in the model.py file """
+        
+    
+        
+        found=False
+        
+        full_list=self.particle_names.BSMList+self.sm_particle_names.SMList
+        for particle in full_list:
+            #print(particle.pdg)
+            if isinstance(particle,smodels.theory.particle.MultiParticle):
+                
+                for sub_pdg in particle.pdg:
+                    if sub_pdg==pdg:
+                        particle_name=particle.label
+                        found=True
+               
+            else:
+                if particle.pdg==pdg:
+                    particle_name=particle.label
+                    found=True
+            if found:
+                break
+        if not found:
+            particle_name=str(pdg)
+            
+        return particle_name
               
     def getBR(self):
         """
@@ -458,7 +431,31 @@ class Filler:
                     if br_val<self.min_BR:
                         break
                     BR_top.append(br)
-
+          
+            ##### translating pdg to particle name using particles.py
+            
+            if self.particle_names !=None:
+                new_BR_top=[]
+            
+                for br in BR_top:
+                #  print(br)
+                    br_val=br.split(' [')[0]
+                    list_daughters=br.split(' [')[1][:-1].split(',')
+                    #print(list_daughters)
+                    new_list_daughters=[]
+                    for daughter in list_daughters:
+                        #print(int(daughter))
+                        new_list_daughters.append(Filler.getParticleName(self,int(daughter)))
+                    new_daughters=(',').join(new_list_daughters)
+                    br=(' [').join([br_val,new_daughters])+']'
+                    #print(br)
+                    new_BR_top.append(br)
+           
+                
+                BR_top=new_BR_top
+            
+            
+            
             BR_top=str(BR_top).split(' ')
             BR_top=''.join(BR_top)
             BR_top=BR_top[2:-2]
@@ -502,6 +499,7 @@ class Filler:
     def getSlhaData(self,variable_x,variable_y):
         ''' fills data dict with slha data'''
         
+        Filler.openSMParticles(self)
         
         self.data_dict =  Filler.getSlhaHoverInfo(self)
         self.data_dict = Filler.getCtau(self)
@@ -533,7 +531,7 @@ class Plotter:
         self.plot_data=plot_data
         self.plot_title=plot_title
         self.path_to_plots=path_to_plots
-        
+       
         
         return
 
@@ -727,6 +725,9 @@ class Plotter:
             """ Generate plots with continuous z axis variables, using all data points """
             #if 'all' in self.plot_data:
             for cont_plot in self.cont_plots:
+            
+                
+                    
         
                 if cont_plot=='chi2':
                     all_false=True
@@ -992,15 +993,49 @@ class Plotter:
         plot_descriptions=Plotter.plotDescription(self)
         
         if 'all' in self.plot_data:
-            Plotter.makeContinuousPlots(self,self.data_frame_all,'all')
-            Plotter.makeDiscretePlots(self,self.data_frame_all,'all')
+            
+            if self.data_frame_all.shape[0]==0:
+                logger.warning('Empty data frame for dataselection:all. Skipping this plots')
+                new_plot_data=[]
+                for option in self.plot_data:
+                    if option=='all':
+                        continue
+                    new_plot_data.append(option)
+                self.plot_data=new_plot_data
+            else:
+                Plotter.makeContinuousPlots(self,self.data_frame_all,'all')
+                Plotter.makeDiscretePlots(self,self.data_frame_all,'all')
             
         if 'excluded' in self.plot_data:
-            Plotter.makeContinuousPlots(self,data_frame_excluded,'excluded')
-            Plotter.makeDiscretePlots(self,data_frame_excluded,'excluded')
+            if self.data_frame_excluded.shape[0]==0:
+                logger.warning('Empty data frame for dataselection:excluded. Skipping this plots')
+                new_plot_data=[]
+                for option in self.plot_data:
+                    if option=='excluded':
+                        continue
+                    new_plot_data.append(option)
+                self.plot_data=new_plot_data
+            else:
+                Plotter.makeContinuousPlots(self,data_frame_excluded,'excluded')
+                Plotter.makeDiscretePlots(self,data_frame_excluded,'excluded')
+               
+                
+                
+                
         if 'non-excluded' in self.plot_data:
-            Plotter.makeContinuousPlots(self,data_frame_nonexcluded,'non-excluded')
-            Plotter.makeDiscretePlots(self,data_frame_nonexcluded,'non-excluded')
+        
+            if self.data_frame_nonexcluded.shape[0]==0:
+                logger.warning('Empty data frame for dataselection:non-excluded. Skipping this plots')
+                new_plot_data=[]
+                for option in self.plot_data:
+                    if option=='non-excluded':
+                        continue
+                    new_plot_data.append(option)
+                self.plot_data=new_plot_data
+            else:
+        
+                Plotter.makeContinuousPlots(self,data_frame_nonexcluded,'non-excluded')
+                Plotter.makeDiscretePlots(self,data_frame_nonexcluded,'non-excluded')
 
 
 

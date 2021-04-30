@@ -13,15 +13,15 @@ from __future__ import print_function
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import os, glob,pathlib
-
+import imp
 from smodels.tools import interactivePlotsHelpers as helpers
-
+import smodels
 class PlotMaster(object):
     """
     A class to store the required data and producing the interactive plots
     """
 
-    def __init__(self,smodelsFolder,slhaFolder,parameterFile, indexfile ):
+    def __init__(self,smodelsFolder,slhaFolder,parameterFile, indexfile,modelFile=None ):
         """
         Initializes the class.
 
@@ -36,6 +36,7 @@ class PlotMaster(object):
         self.slhaFolder = slhaFolder
         self.indexfile = indexfile
         self.parameterFile = parameterFile
+        self.modelFile = modelFile
 
         self.slha_hover_information = None
         self.ctau_hover_information = None
@@ -50,12 +51,21 @@ class PlotMaster(object):
 
         if not os.path.isfile(parameterFile):
             raise SModelSError('Parameters file %s not found' %parameterFile)
+          
+        if modelFile != None:
+            if not os.path.isfile(self.modelFile):
+                raise SModelSError('model.py file %s not found' %ModelFile)
+            
         if not os.path.isdir(smodelsFolder):
             raise SModelSError("Folder %s not found" %smodelsFolder)
         if not os.path.isdir(slhaFolder):
             raise SModelSError("Folder %s not found" %slhaFolder)
 
         self.loadParameters()
+        
+        
+        self.loadModelFile()
+            
         self.initializeDataDict()
 
     def loadParameters(self):
@@ -132,12 +142,133 @@ class PlotMaster(object):
             self.plot_title = parameters.plot_title
         
 
+    def loadModelFile(self):
+        """
+        Reads the parameters from the plotting parameter file.
+        """
+        
+        logger.info("Reading model.py file from %s ..." %(self.modelFile))
+
+        if self.modelFile==None:
+            self.particle_names=None
+        else:
+
+            try:
+                with open(self.modelFile, 'rb') as fparticles:
+                    ## imports parameter file
+                    self.particle_names = imp.load_module("BSMparticles",fparticles,self.modelFile,('.py', 'rb', imp.PY_SOURCE))
+                    # except Exception as e:
+            except:
+                logger.warning("Error loading model.py file %s , will use pdgs instead.",  self.modelFile)
+                self.particle_names=None
+           
+
+    def getParticleName(self,pdg):
+        """ looks for the particle label in the model.py file """
+        found=False
+        
+        full_list=self.particle_names.BSMList
+        for particle in full_list:
+            #print(particle.pdg)
+            if isinstance(particle,smodels.theory.particle.MultiParticle):
+                
+                for sub_pdg in particle.pdg:
+                    if sub_pdg==pdg:
+                        particle_name=particle.label
+                        found=True
+               
+            else:
+                if particle.pdg==pdg:
+                    particle_name=particle.label
+                    found=True
+            if found:
+                break
+        if not found:
+            particle_name=pdg
+            
+        return particle_name
+
+    def editSlhaInformation(self):
+        """Edits slha_hover_information,ctau_hover_information,BR_hover_information,variable_x,variable_y if they are defined as a list. The function transforms it in a dict whose keys are the object names """
+        
+        #variable_x
+        if  isinstance(self.variable_x,list):
+            variable_x_dict={}
+            
+            if self.variable_x[0]=='MASS' and self.particle_names!=None:
+                particle_name=PlotMaster.getParticleName(self,self.variable_x[1])
+                var_name='m('+particle_name+')'
+            else:
+                var_name=str(self.variable_x[0])+str(self.variable_x[1])
+                    
+            variable_x_dict[var_name]=self.variable_x
+                
+            self.variable_x=variable_x_dict
+        
+        #variable_y
+        if  isinstance(self.variable_y,list):
+            variable_y_dict={}
+            
+            if self.variable_y[0]=='MASS' and self.particle_names!=None:
+                particle_name=PlotMaster.getParticleName(self,self.variable_y[1])
+                var_name='m('+particle_name+')'
+            else:
+                var_name=str(self.variable_y[0])+str(self.variable_y[1])
+                    
+            variable_y_dict[var_name]=self.variable_y
+                
+            self.variable_y=variable_y_dict
+        
+        
+        #slha_hover_information
+        if  isinstance(self.slha_hover_information,list):
+            slha_hover_information_dict={}
+            for slha_info in self.slha_hover_information:
+                if slha_info[0]=='MASS' and self.particle_names!=None:
+                    particle_name=PlotMaster.getParticleName(self,slha_info[1])
+                    var_name='m('+particle_name+')'
+                else:
+                    var_name=str(slha_info[0])+str(slha_info[1])
+                    
+                slha_hover_information_dict[var_name]=slha_info
+                
+            self.slha_hover_information=slha_hover_information_dict
+            
+        #ctau hover information
+        if  isinstance(self.ctau_hover_information,list):
+            ctau_hover_information_dict={}
+            for slha_info in self.ctau_hover_information:
+                if self.particle_names!=None:
+                    particle_name=PlotMaster.getParticleName(self,slha_info)
+                    var_name='ctau('+particle_name+')'
+                else:
+                    var_name='ctau('+str(slha_info)+')'
+                    
+                ctau_hover_information_dict[var_name]=slha_info
+                
+            self.ctau_hover_information=ctau_hover_information_dict
+        
+         #BR hover information
+        if  isinstance(self.BR_hover_information,list):
+            BR_hover_information_dict={}
+            for slha_info in self.BR_hover_information:
+                if self.particle_names!=None:
+                    particle_name=PlotMaster.getParticleName(self,slha_info)
+                    var_name='BR('+particle_name+')'
+                else:
+                    var_name='BR('+str(slha_info)+')'
+                    
+                BR_hover_information_dict[var_name]=slha_info
+                
+            self.BR_hover_information=BR_hover_information_dict
+
+        return
 
     def initializeDataDict(self):
         """
         Initializes an empty dictionary with the plotting options.
         """
-      
+        PlotMaster.editSlhaInformation(self)
         self.data_dict = {}
         self.data_dict['SModelS_status']=[]
         for smodels_names in sorted(self.SModelS_hover_information):
@@ -168,8 +299,8 @@ class PlotMaster(object):
         the smodels output dictionary (smodelsDict) and the pyslha.Doc object
         slhaData
         """
-     
-        filler=helpers.Filler(self.data_dict,smodelsOutput,slhaData,self.slha_hover_information,self.ctau_hover_information,self.BR_hover_information,self.min_BR)
+        
+        filler=helpers.Filler(self.data_dict,smodelsOutput,slhaData,self.slha_hover_information,self.ctau_hover_information,self.BR_hover_information,self.min_BR,self.particle_names)
         #Fill with smodels data if defined
         if smodelsOutput is None:
             for key in self.SModelS_hover_information:
@@ -276,6 +407,7 @@ def main(args,indexfile= "index.html" ):
 
     #First check if the needed directories are there
     #inputdirSlha = os.path(args.slhaFolder)
+    #args.modelFile='/Users/humberto/Documents/work/smodels-iplots/github/smodels/smodels/share/models/mssm.py'
 
     if os.path.isdir(args.slhaFolder)==False:
         raise SModelSError("slha directory: "+str(args.slhaFolder)+"' does not exist or is a file")
@@ -289,12 +421,17 @@ def main(args,indexfile= "index.html" ):
 
     if os.path.isfile(args.parameters)==False:
         raise SModelSError("parameter file '"+str(args.parameters)+"' does not exist")
+    
+    if args.modelFile != None:
+        if os.path.isfile(args.modelFile)==False:
+            raise SModelSError("model file '"+str(args.modelFile)+"' does not exist")
 
-
+    
     #Basic checks:
     smodelsFolder = args.smodelsFolder
     slhaFolder = args.slhaFolder
     parFile = args.parameters
+    modelFile=args.modelFile
     verbosity=args.verbosity
     outputFolder=args.outputFolder
     npoints=args.npoints
@@ -315,7 +452,7 @@ def main(args,indexfile= "index.html" ):
 
 
 
-    plotMaster = PlotMaster(smodelsFolder,slhaFolder,parFile, indexfile )
+    plotMaster = PlotMaster(smodelsFolder,slhaFolder,parFile, indexfile,modelFile )
     loadData = plotMaster.loadData(npoints)
     if not loadData:
         raise SModelSError("Error loading data from folders:\n %s\n %s" %(smodelsFolder,slhaFolder))
