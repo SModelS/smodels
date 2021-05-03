@@ -41,6 +41,7 @@ class RunInteractivePlotSTest(unittest.TestCase):
         parser.outputFolder = outFolder
         parser.verbosity = 'error'
         parser.npoints = -1
+        parser.modelFile='../smodels/share/models/mssm.py'
 
         run = main(parser)
         
