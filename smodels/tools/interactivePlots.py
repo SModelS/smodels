@@ -402,9 +402,6 @@ def main(args,indexfile= "index.html" ):
     :return: True if the plot creation was successfull
     """
 
-
-
-
     #First check if the needed directories are there
     #inputdirSlha = os.path(args.slhaFolder)
     #args.modelFile='/Users/humberto/Documents/work/smodels-iplots/github/smodels/smodels/share/models/mssm.py'

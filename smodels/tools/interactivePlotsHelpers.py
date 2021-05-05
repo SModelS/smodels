@@ -376,11 +376,12 @@ class Filler:
         
     def openSMParticles(self):
         """Loads  SMparticles.py to parse over SM pdg-labels"""
-        sm_particle_file='/Users/humberto/Documents/work/smodels-iplots/github/smodels/smodels/share/models/SMparticles.py'
-        
+        from smodels import installation
+        sm_particle_file=f'{installation.installDirectory()}/smodels/share/models/SMparticles.py'
         with open(sm_particle_file, 'rb') as fsmparticles:
             ## imports parameter file
-            self.sm_particle_names = imp.load_module("sm_particles",fsmparticles,sm_particle_file,('.py', 'rb', imp.PY_SOURCE))
+            self.sm_particle_names = imp.load_module("sm_particles",\
+                    fsmparticles,sm_particle_file,('.py', 'rb', imp.PY_SOURCE))
         return
         
 
