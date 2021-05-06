@@ -266,15 +266,14 @@ Below we give more detailed information about each entry in this file.
 
 * *spectrum hover information*: defines which information from the input SLHA file will appear in the hover box. The syntax is again either a list or a dictionary. 
 
-  * **slha_hover_information**: information from the input SLHA file, e.g. model parameters or masses. Example: slha_hover_information = [ ['MASS', 1000021], ['MASS', 2000002], ['MASS', 1000022]].
-  Alternatively, slha_hover_information = {'m_gluino': ['MASS', 1000021], 'm_suR': ['MASS', 2000002], 'm_LSP': ['MASS', 1000022]}
+  * **slha_hover_information**: information from the input SLHA file, e.g. model parameters or masses. Example: slha_hover_information = [ ['MASS', 1000021], ['MASS', 2000002], ['MASS', 1000022]]. Alternatively, slha_hover_information = {'m_gluino': ['MASS', 1000021], 'm_suR': ['MASS', 2000002], 'm_LSP': ['MASS', 1000022]}
 
 
-  * **ctau_hover_information**: displays the mean decay length in meter for the listed particle(s). Example: ctau_hover_information =  [1000024] or {'ctau_chi1+': 1000024}
+  * **ctau_hover_information**: displays the mean decay length in meter for the listed particle(s). Example: ctau_hover_information =  [1000024] or = {'ctau_chi1+': 1000024}
 
-  * **BR_hover_information**: defines for which particle(s) to display decay channels and branching ratios. Example: BR_hover_information = [1000021]  or = {'BR_gluino': 1000021}. **WARNING:** Lists of branching ratios can be very long, so the may not fit in the hover box. One can define the number of entries with **min_BR*, e.g. min_BR = .05 (default 'all').
+  * **BR_hover_information**: defines for which particle(s) to display decay channels and branching ratios. Example: BR_hover_information = [1000021]  or = {'BR_gluino': 1000021}. **WARNING:** Lists of branching ratios can be very long, so the may not fit in the hover box. One can define the number of entries with **min_BR**, e.g. min_BR = .05 (default 'all').
 
-* *SModelS hover information*: defines, as a list of keywords, which information to display from the SModelS output. Example: smodels_hover_information = ['SModelS_status', 'r_max', 'Tx', 'Analysis','chi2', 'MT_max','MT_max_xsec', 'MT_total_xsec', 'MT_outgrid_xsec','MT_prompt_xsec','MT_displaced_xsec', 'file']. The options are:
+* *SModelS hover information*: defines, as a list of keywords, which information to display from the SModelS output. Example: smodels_hover_information = ['SModelS_status', 'r_max', 'Tx', 'Analysis', 'chi2', 'MT_max', 'MT_max_xsec', 'MT_total_xsec', 'MT_outgrid_xsec', 'MT_prompt_xsec', 'MT_displaced_xsec', 'file']. The options are:
 
   * **SmodelS_status**: prints whether the point is excluded or not by SModelS
 
@@ -304,7 +303,7 @@ Below we give more detailed information about each entry in this file.
 
   * **plot_data**: which points you want to plot; the options are: all, non-excluded, excluded points. Example: plot_data = ['all', 'non-excluded', 'excluded']
 
-  * **plot_list**: which quantities to plot in the x,y plane; the same options as for SModels hover information apply. Example: plot_list = ['SModelS_status', 'r_max', 'Tx', 'Analysis','chi2', 'MT_max','MT_max_xsec', 'MT_total_xsec', 'MT_outgrid_xsec','MT_prompt_xsec','MT_displaced_xsec', 'file']
+  * **plot_list**: which quantities to plot in the x,y plane; the same options as for SModels hover information apply. Example: plot_list = ['SModelS_status', 'r_max', 'Tx', 'Analysis', 'chi2', 'MT_max', 'MT_max_xsec', 'MT_total_xsec', 'MT_outgrid_xsec', 'MT_prompt_xsec', 'MT_displaced_xsec', 'file']
 
 
 .. _permissionsFixer:
