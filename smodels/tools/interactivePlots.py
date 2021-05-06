@@ -12,7 +12,7 @@ from __future__ import print_function
 
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-import os, glob,pathlib
+import os,glob,pathlib
 import imp
 from smodels.tools import interactivePlotsHelpers as helpers
 import smodels
@@ -311,8 +311,12 @@ class PlotMaster(object):
 
         self.data_dict=filler.getSlhaData(self.variable_x,self.variable_y)
         
-        
 
+    def rmFiles ( self, flist ):
+        """ remove files in flist """
+        for f in flist:
+            if os.path.exists ( f ):
+                os.remove ( f )
 
     def loadData(self,npoints=-1):
         """
@@ -326,14 +330,28 @@ class PlotMaster(object):
 
         n = 0
 
+        rmfiles = []
+
         if self.smodelsFolder.endswith(".tar.gz"):
             import tarfile
             with tarfile.open ( self.smodelsFolder, "r:gz" ) as tar:
                 tar.extractall()
                 files = [ x.name for x in tar.getmembers() ]
+                rmfiles += files
                 tar.close()
         else:
             files = glob.glob(self.smodelsFolder+'/*')
+
+        slhaFolderIsTarball=False
+
+        if self.slhaFolder.endswith ( ".tar.gz" ):
+            slhaFolderIsTarball=True
+            import tarfile
+            with tarfile.open ( self.slhaFolder, "r:gz" ) as tar:
+                tar.extractall()
+                slhafiles = [ x.name for x in tar.getmembers() ]
+                rmfiles += slhafiles
+                tar.close()
         
         for f in files:
 
@@ -347,8 +365,9 @@ class PlotMaster(object):
            
             #Get SLHA file name:
             slhaFile = helpers.getSlhaFile(smodelsOutput)
-            slhaFile = os.path.join(self.slhaFolder,os.path.basename(slhaFile))
-            #Get SLHA data:
+            files = []
+            if not slhaFolderIsTarball:
+                slhaFile = os.path.join(self.slhaFolder,os.path.basename(slhaFile))
             slhaData = helpers.getSlhaData(slhaFile)
             if not slhaData:
                 continue
@@ -362,6 +381,8 @@ class PlotMaster(object):
             else:
                 self.fillWith(smodelsOutput,slhaData)
             n += 1
+
+        self.rmFiles ( rmfiles )
 
         return True
 
