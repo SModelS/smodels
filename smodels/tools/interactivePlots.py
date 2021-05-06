@@ -56,10 +56,10 @@ class PlotMaster(object):
             if not os.path.isfile(self.modelFile):
                 raise SModelSError('model.py file %s not found' %ModelFile)
             
-        if not os.path.isdir(smodelsFolder):
-            raise SModelSError("Folder %s not found" %smodelsFolder)
-        if not os.path.isdir(slhaFolder):
-            raise SModelSError("Folder %s not found" %slhaFolder)
+        if not os.path.exists(smodelsFolder):
+            raise SModelSError("%s not found" %smodelsFolder)
+        if not os.path.exists(slhaFolder):
+            raise SModelSError("%s not found" %slhaFolder)
 
         self.loadParameters()
         
@@ -325,8 +325,17 @@ class PlotMaster(object):
         logger.info( f"Reading data folders {self.smodelsFolder} and {self.slhaFolder} ..." )
 
         n = 0
+
+        if self.smodelsFolder.endswith(".tar.gz"):
+            import tarfile
+            with tarfile.open ( self.smodelsFolder, "r:gz" ) as tar:
+                tar.extractall()
+                files = [ x.name for x in tar.getmembers() ]
+                tar.close()
+        else:
+            files = glob.glob(self.smodelsFolder+'/*')
         
-        for f in glob.glob(self.smodelsFolder+'/*'):
+        for f in files:
 
             if npoints > 0 and n >= npoints:
                 break
@@ -406,11 +415,11 @@ def main(args,indexfile= "index.html" ):
     #inputdirSlha = os.path(args.slhaFolder)
     #args.modelFile='/Users/humberto/Documents/work/smodels-iplots/github/smodels/smodels/share/models/mssm.py'
 
-    if os.path.isdir(args.slhaFolder)==False:
-        raise SModelSError("slha directory: "+str(args.slhaFolder)+"' does not exist or is a file")
+    if not os.path.exists(args.slhaFolder):
+        raise SModelSError("slha directory: "+str(args.slhaFolder)+"' does not exist")
 
-    if os.path.isdir(args.smodelsFolder)==False:
-        raise SModelSError("smodels directory: "+str(args.smodelsFolder)+"' does not exist or is a file")
+    if not os.path.exists(args.smodelsFolder):
+        raise SModelSError("directory of SModelS python output files: "+str(args.smodelsFolder)+"' does not exist")
     if not os.path.exists ( args.outputFolder ):
         os.mkdir ( args.outputFolder )
     if os.path.isdir(args.outputFolder)==False:

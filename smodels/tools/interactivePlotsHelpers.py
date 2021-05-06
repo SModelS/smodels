@@ -103,8 +103,8 @@ def getSlhaData(slhaFile):
     Uses pyslha to read the SLHA file. Return a pyslha.Doc objec, if successful.
     """
 
-    if not os.path.isfile(slhaFile):
-        logger.warning("SLHA file %s not found. This point will be ignored" %slhaFile)
+    if not os.path.exists(slhaFile):
+        logger.warning("%s not found. This point will be ignored" % slhaFile )
         return False
     
     try:
