@@ -226,7 +226,7 @@ class Database(object):
         ret = []
         for sub in self.subs:
             tmp = sub.getExpResults( analysisIDs, datasetIDs, txnames, dataTypes,
-                    useSuperseded, useNonValidated, onlyWithExpected )
+                    True, useNonValidated, onlyWithExpected )
             ret.append ( tmp )
         return self.mergeLists ( ret )
 
