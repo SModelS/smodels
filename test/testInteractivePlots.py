@@ -54,5 +54,34 @@ class RunInteractivePlotSTest(unittest.TestCase):
 #             os.unlink("all_data_frame.txt")
 
 
+    # this test corresponds to calling
+    # ../smodelsTools.py interactive-plots -f ./testFiles/scanExampleIDM/smodels-output.tar.gz -s testFiles/scanExampleIDM/slhas.tar.gz -p iplots_parameters_IDM.py
+
+    def testInteractivePlotsIDM(self):
+        slhaFolder = './testFiles/scanExampleIDM/slhas.tar.gz'
+        smodelsFolder = './testFiles/scanExampleIDM/smodels-output.tar.gz'
+        parametersFile = './iplots_parameters_IDM.py'
+        outFolder = './plots_test_idm'
+        
+        defaultFolder = './plots_test_default_idm'
+        
+        if os.path.isdir(outFolder):
+            shutil.rmtree(outFolder)
+
+        parser = SimpleNamespace()
+        parser.smodelsFolder = smodelsFolder
+        parser.slhaFolder  =  slhaFolder
+        parser.parameters = parametersFile
+        parser.outputFolder = outFolder
+        parser.verbosity = 'error'
+        parser.npoints = -1
+        parser.modelFile='../smodels/share/models/idm.py'
+
+        run = main(parser)
+        
+        self.assertEqual(run,outFolder)
+        self.assertEqual(sorted(os.listdir(outFolder)), sorted(os.listdir(defaultFolder)))
+
+
 if __name__ == "__main__":
     unittest.main()
