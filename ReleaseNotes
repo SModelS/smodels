@@ -7,6 +7,7 @@ Release v2.1.x, xxx
   * slightly extended output of summary printer
   * added scan summary (summary.txt) when running over multiple files
   * added option to slha-printer (expandedOutput)
+  * improved interactive plots 
 
 Release v2.0.0, Mon 15 Mar 2021
 =======================================================

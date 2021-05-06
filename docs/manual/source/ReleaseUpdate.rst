@@ -46,6 +46,7 @@ New in Version 2.1.0:
   * slightly extended output of :ref:`summary printer <parameterFileSummaryprinter>`
   * added scan summary (:ref:`summary.txt <scanSummary>`) when running over multiple files
   * added option to slha-printer (:ref:`expandedOutput <parameterFileSLHAprinter>`)
+  * improved :ref:`interactive plots <interactivePlots>`
 
 New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
