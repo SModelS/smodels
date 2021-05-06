@@ -25,8 +25,9 @@ class PlotMaster(object):
         """
         Initializes the class.
 
-        :parameter smodelsFolder: path to the folder containing the smodels (python) output files
-        :parameter slhaFolder: path to the folder containing the SLHA input files
+        :parameter smodelsFolder: path to the folder or tarball containing the smodels 
+                                  (python) output files
+        :parameter slhaFolder: path to the folder or tarball containing the SLHA input files
         :parameter parameterFile: path to the file containing the plotting definitions
         """
 
@@ -422,8 +423,8 @@ def main(args,indexfile= "index.html" ):
 
     Main interface for the interactive-plots.
 
-    :parameter smodelsFolder: Path to the folder containing the SModelS python output
-    :parameter slhaFolder: Path to the folder containing the SLHA files corresponding to the SModelS output
+    :parameter smodelsFolder: Path to the folder or tarball containing the SModelS python output
+    :parameter slhaFolder: Path to the folder or tarball containing the SLHA files corresponding to the SModelS output
     :parameter parameters: Path to the parameter file setting the options for the interactive plots
     :parameter npoints: Number of points used to produce the plot. If -1, all points will be used.
     :parameter verbosity: Verbosity of the output (debug,info,warning,error)
