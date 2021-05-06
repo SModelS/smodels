@@ -154,7 +154,7 @@ class Filler:
     # truncated=0.0
     
         else:
-            factor=10**4
+            factor=10**3
             truncated=math.trunc(number * factor) / factor
         return truncated
     
@@ -179,6 +179,7 @@ class Filler:
                 if 'r' in expres:
                 
                     r = getEntry(expres,'r')
+                    r = Filler.truncate(self,r)
         
                 else:
                     r = getEntry(expres,'theory prediction (fb)')/getEntry(expres,'upper limit (fb)')
