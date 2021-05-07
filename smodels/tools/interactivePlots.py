@@ -55,7 +55,7 @@ class PlotMaster(object):
           
         if modelFile != None:
             if not os.path.isfile(self.modelFile):
-                raise SModelSError('model.py file %s not found' %ModelFile)
+                raise SModelSError('model.py file %s not found' % modelFile )
             
         if not os.path.exists(smodelsFolder):
             raise SModelSError("%s not found" %smodelsFolder)
@@ -397,22 +397,11 @@ class PlotMaster(object):
         if not os.path.isdir(outFolder):
             os.makedirs(outFolder)
 
-
         logger.info('Making plots...')
 
         Plotter=helpers.Plotter(self, outFolder )
-
         Plotter.makePlots()
-
-
         logger.info('Generation of interactive plots finished. Go to: \n %s/%s \n to see the plots.' % ( outFolder, self.indexfile ) )
-
-        return True
-
-
-
-
-
 
 def main(args,indexfile= "index.html" ):
     """
