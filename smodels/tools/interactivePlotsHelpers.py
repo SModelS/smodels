@@ -518,24 +518,21 @@ class Filler:
 
 class Plotter:
                
-    def __init__ ( self, data_dict,SModelS_hover_information,
-               slha_hover_information,ctau_hover_information,BR_hover_information,variable_x,variable_y,plot_list,plot_data,plot_title,path_to_plots):
-               
-               
-        self.data_dict=data_dict
-        self.SModelS_hover_information=SModelS_hover_information
-        self.slha_hover_information=slha_hover_information
-        self.ctau_hover_information=ctau_hover_information
-        self.BR_hover_information=BR_hover_information
-        self.variable_x=variable_x
-        self.variable_y=variable_y
-        self.plot_list=plot_list
-        self.plot_data=plot_data
-        self.plot_title=plot_title
+    #def __init__ ( self, data_dict,SModelS_hover_information,
+    #           slha_hover_information,ctau_hover_information,BR_hover_information,variable_x,variable_y,plot_list,plot_data,plot_title,path_to_plots):
+    def __init__ ( self, master, path_to_plots ):
+        self.data_dict=master.data_dict
+        self.SModelS_hover_information=master.SModelS_hover_information
+        self.slha_hover_information=master.slha_hover_information
+        self.ctau_hover_information=master.ctau_hover_information
+        self.BR_hover_information=master.BR_hover_information
+        self.variable_x=master.variable_x
+        self.variable_y=master.variable_y
+        self.plot_list=master.plot_list
+        self.plot_data=master.plot_data
+        self.plot_title=master.plot_title
+        self.indexfile = master.indexfile
         self.path_to_plots=path_to_plots
-       
-        
-        return
 
     def makeDataFrame(self):
         """
@@ -949,8 +946,7 @@ class Plotter:
         """
         Fills the index.html file with links to the interactive plots.
         """
-        filename = "index.html"
-        main_file= open(self.path_to_plots+'/'+filename, 'w')
+        main_file= open(self.path_to_plots+'/'+self.indexfile, 'w')
         main_file.write('<html><head><font size=6>SModelS interactive plots: '+self.plot_title+'</font></head>')
         hyperlink_format = '<a href={link}>{text}</a>'
         for plot in self.plot_list:

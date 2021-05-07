@@ -8,9 +8,11 @@
 
 # Set up the path to SModelS installation folder
 import sys,os
+
 sys.path.append(".")
-#import smodels_paths
+import smodels_paths
 from smodels.tools.interactivePlots import PlotMaster
+from smodels.installation import installDirectory
 import smodels
 
 
@@ -19,12 +21,12 @@ import smodels
 # In[2]:
 
 
-smodelsOutput = './inputFiles/scanExampleIDM/smodels-output'
-slhaFiles = './inputFiles/scanExampleIDM/slhas'
+smodelsOutput = f'{installDirectory()}/inputFiles/scanExample/smodels-output.tar.gz'
+slhaFiles = f'{installDirectory()}/inputFiles/scanExample/slhas.tar.gz'
 parameters = './iplots_parameters_IDM.py'
 indexfile = 'index.html'
-modelfile='smodels/share/models/idm.py'
-outputFolder = './'
+modelfile=f'{installDirectory()}/smodels/share/models/idm.py'
+outputFolder = './plots/'
 npoints = -1 #If negative will use all the points in the folders
 
 
@@ -33,9 +35,9 @@ npoints = -1 #If negative will use all the points in the folders
 # In[3]:
 
 
-plotMaster = PlotMaster(smodelsOutput,slhaFiles,parameters,indexfile,modelfile)
+plotMaster = PlotMaster(smodelsOutput,slhaFiles,parameters,indexfile)
 loadData = plotMaster.loadData(npoints)
-plotMaster.makePlots(outputFolder)
+plotMaster.makePlots(outputFolder)  
 
 
 # ### Display the output
@@ -46,23 +48,11 @@ plotMaster.makePlots(outputFolder)
 from IPython.core.display import display,HTML
 
 
-# In[7]:
+# In[5]:
 
 
 #Main page (to open the plots go to the plots output folder and open them with the browser)
 mainFile = open(outputFolder + 'index.html','r')
 display(HTML(mainFile.read()))
 mainFile.close()
-
-
-# In[6]:
-
-
-os.getcwd()
-
-
-# In[ ]:
-
-
-
 

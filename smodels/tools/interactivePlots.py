@@ -400,8 +400,9 @@ class PlotMaster(object):
 
         logger.info('Making plots...')
 
-        Plotter=helpers.Plotter(self.data_dict,self.SModelS_hover_information,
-               self.slha_hover_information,self.ctau_hover_information,self.BR_hover_information,self.variable_x,self.variable_y,self.plot_list,self.plot_data,self.plot_title,outFolder)
+        #Plotter=helpers.Plotter(self.data_dict,self.SModelS_hover_information,
+        #       self.slha_hover_information,self.ctau_hover_information,self.BR_hover_information,self.variable_x,self.variable_y,self.plot_list,self.plot_data,self.plot_title,outFolder)
+        Plotter=helpers.Plotter(self, outFolder )
 
         Plotter.makePlots()
 
