@@ -69,7 +69,5 @@ Examples using the Interactive Plots tool
 
 * `How to make interactive plots <interactivePlotsExample.html>`_ (download the Python code :download:`here <recipes/interactivePlotsExample.py>`, IPython notebook :download:`here <recipes/interactivePlotsExample.ipynb>`)
 
-* `Interactive plots, IDM model <interactivePlotsExampleIDM.html>`_ (download the Python code :download:`here <recipes/interactivePlotsExampleIDM.py>`, IPython notebook :download:`here <recipes/interactivePlotsExampleIDM.ipynb>`)
-
 
 .. [*] Some of the output may change depending on the database version used.
