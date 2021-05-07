@@ -16,12 +16,13 @@ import os,glob,pathlib
 import imp
 from smodels.tools import interactivePlotsHelpers as helpers
 import smodels
+
 class PlotMaster(object):
     """
-    A class to store the required data and producing the interactive plots
+    A class to store the required data and produce the interactive plots
     """
 
-    def __init__(self,smodelsFolder,slhaFolder,parameterFile, indexfile,modelFile=None ):
+    def __init__(self,smodelsFolder,slhaFolder,parameterFile,indexfile,modelFile=None ):
         """
         Initializes the class.
 
@@ -29,8 +30,8 @@ class PlotMaster(object):
                                   (python) output files
         :parameter slhaFolder: path to the folder or tarball containing the SLHA input files
         :parameter parameterFile: path to the file containing the plotting definitions
+        :parameter modelFile: path to the model file, e.g smodels/share/models/mssm.py
         """
-
         
         self.data_dict = []
         self.smodelsFolder = smodelsFolder
@@ -49,7 +50,6 @@ class PlotMaster(object):
         self.plot_list = None
         self.min_BR = None
 
-
         if not os.path.isfile(parameterFile):
             raise SModelSError('Parameters file %s not found' %parameterFile)
           
@@ -63,10 +63,7 @@ class PlotMaster(object):
             raise SModelSError("%s not found" %slhaFolder)
 
         self.loadParameters()
-        
-        
         self.loadModelFile()
-            
         self.initializeDataDict()
 
     def loadParameters(self):
@@ -411,10 +408,14 @@ def main(args,indexfile= "index.html" ):
 
     Main interface for the interactive-plots.
 
-    :parameter smodelsFolder: Path to the folder or tarball containing the SModelS python output
-    :parameter slhaFolder: Path to the folder or tarball containing the SLHA files corresponding to the SModelS output
-    :parameter parameters: Path to the parameter file setting the options for the interactive plots
-    :parameter npoints: Number of points used to produce the plot. If -1, all points will be used.
+    :parameter smodelsFolder: Path to the folder or tarball containing the 
+                              SModelS python output
+    :parameter slhaFolder: Path to the folder or tarball containing the SLHA files 
+                           corresponding to the SModelS output
+    :parameter parameters: Path to the parameter file setting the options for the 
+                           interactive plots
+    :parameter npoints: Number of points used to produce the plot. If -1, all points 
+                        will be used.
     :parameter verbosity: Verbosity of the output (debug,info,warning,error)
     :parameter indexfile: name of the starting web page (index.html)
 
@@ -452,7 +453,6 @@ def main(args,indexfile= "index.html" ):
     outputFolder=args.outputFolder
     npoints=args.npoints
 
-
     try:
         import plotly
     except ImportError:
@@ -463,15 +463,13 @@ def main(args,indexfile= "index.html" ):
     except ImportError:
         raise SModelSError("Pandas is not installed. To use this tool, please install pandas")
 
-
     setLogLevel(verbosity)
-
-
 
     plotMaster = PlotMaster(smodelsFolder,slhaFolder,parFile, indexfile,modelFile )
     loadData = plotMaster.loadData(npoints)
     if not loadData:
-        raise SModelSError("Error loading data from folders:\n %s\n %s" %(smodelsFolder,slhaFolder))
+        raise SModelSError("Error loading data from folders:\n %s\n %s" %\
+                            (smodelsFolder,slhaFolder))
 
     plotMaster.makePlots(outputFolder)
 
