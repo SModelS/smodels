@@ -116,17 +116,15 @@ class Filler:
      A class with the functions required to fill the data dictionary to produce the plots
     """
 
-    def __init__(self,data_dict,smodelsOutput,slhaData,slha_hover_information,
-                 ctau_hover_information,BR_hover_information,min_BR,particle_names):
-
-        self.data_dict=data_dict
+    def __init__( self,plotter, smodelsOutput,slhaData ):
+        self.data_dict=plotter.data_dict
         self.smodelsOutput=smodelsOutput
         self.slhaData=slhaData
-        self.slha_hover_information=slha_hover_information
-        self.ctau_hover_information=ctau_hover_information
-        self.BR_hover_information=BR_hover_information
-        self.min_BR=min_BR
-        self.particle_names=particle_names
+        self.slha_hover_information=plotter.slha_hover_information
+        self.ctau_hover_information=plotter.ctau_hover_information
+        self.BR_hover_information=plotter.BR_hover_information
+        self.min_BR=plotter.min_BR
+        self.particle_names=plotter.particle_names
 
         return
 
@@ -620,16 +618,9 @@ class PlotlyBackend:
 
             self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('MT_outgrid_xsec')+': '+data_frame_provisional['MT_outgrid_xsec']+' [fb]'+'<br>'
         if 'file' in self.SModelS_hover_information:
-
             data_frame_provisional.loc[data_frame_provisional['file'] =='False', 'file'] = 'Not-available'
-
             self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+'file'+': '+data_frame_provisional['file']+'<br>'
-
-
         return self.data_frame_all;
-
-
-
 
     def DataFrameExcludedNonexcluded(self):
         """ Generate sub data frames for excluded and non-excluded points """
@@ -653,28 +644,22 @@ class PlotlyBackend:
             if plot in discrete_options:
                 self.disc_plots.append(plot)
             else:
-
-
                 self.cont_plots.append(plot)
         return self.cont_plots, self.disc_plots;
-
-
-
-
 
     def plotDescription(self):
         ''' Generate a description for each plot.'''
         self.plot_descriptions={'SModelS_status':'Excluded or not excluded by SModelS.',
-                      'r_max':'highest r-value from SModelS.',
-                      'chi2':'&#967;<sup>2</sup> value associated to the highest r-value.',
-                      'Tx':'Topology/ies which give the highest r-value.',
-                      'Analysis':'Experimental analysis from which the highest r-value comes from.',
-                      'MT_max':'Missing topologies with the largest cross section.',
-                      'MT_max_xsec':'Cross section of MT_max.',
-                      'MT_total_xsec':'Total missing cross section.',
-                      'MT_prompt_xsec':'Extracts the total cross section from missing prompt topologies',
-                      'MT_displaced_xsec':'Extracts the total cross section from missing displaced topologies',
-                      'MT_outgrid_xsec':'Missing cross section outside the mass grids of the experimental results.'}
+              'r_max':'highest r-value from SModelS.',
+              'chi2':'&#967;<sup>2</sup> value associated to the highest r-value.',
+              'Tx':'Topology/ies which give the highest r-value.',
+              'Analysis':'Experimental analysis from which the highest r-value comes from.',
+              'MT_max':'Missing topologies with the largest cross section.',
+              'MT_max_xsec':'Cross section of MT_max.',
+              'MT_total_xsec':'Total missing cross section.',
+              'MT_prompt_xsec':'Extracts the total cross section from missing prompt topologies',
+              'MT_displaced_xsec':'Extracts the total cross section from missing displaced topologies',
+              'MT_outgrid_xsec':'Missing cross section outside the mass grids of the experimental results.'}
         return self.plot_descriptions;
 
 #####continuous plots##############

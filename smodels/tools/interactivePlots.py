@@ -297,8 +297,7 @@ class Plotter(object):
         slhaData
         """
         
-        filler=helpers.Filler(self.data_dict,smodelsOutput,slhaData,
-                              self.slha_hover_information,self.ctau_hover_information,self.BR_hover_information,self.min_BR,self.particle_names)
+        filler=helpers.Filler(self,smodelsOutput,slhaData)
         #Fill with smodels data if defined
         if smodelsOutput is None:
             for key in self.SModelS_hover_information:
