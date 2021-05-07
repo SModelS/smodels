@@ -52,7 +52,7 @@ min_BR = .05
 #MT_outgrid_xsec -> shows the total missing cross section outside the mass grids of the experimental results.
 #file -> shows the name of the input spectrum file.
 
-SModelS_hover_information = ['SModelS_status', 'r_max', 'Tx', 'Analysis','chi2', 'MT_max','MT_max_xsec', 'MT_total_xsec', 'MT_outgrid_xsec','MT_prompt_xsec','MT_displaced_xsec', 'file']
+SModelS_hover_information = ['SModelS_status', 'r_max', 'Tx', 'Analysis','chi2']
 
 
 
@@ -60,4 +60,5 @@ SModelS_hover_information = ['SModelS_status', 'r_max', 'Tx', 'Analysis','chi2',
 # choice for plot data: all, non-excluded, excluded points.
 plot_data = ['all', 'non-excluded', 'excluded']
 # choice for plot list: same options as for SModels hover information (except 'file').
-plot_list = ['SModelS_status','r_max', 'Tx', 'Analysis','chi2', 'MT_max', 'MT_max_xsec', 'MT_total_xsec','MT_outgrid_xsec','MT_prompt_xsec','MT_displaced_xsec']
+plot_list = ['r_max', 'Analysis']
+
