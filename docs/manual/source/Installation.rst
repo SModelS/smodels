@@ -262,7 +262,7 @@ In order to make sure all libraries have been correctly installed, you can run: 
 Installation of the C++ interface
 ---------------------------------
 
-SModelS v1.1.1 comes with a simple C++ interface, see the cpp directory.
+From version 1.1.1 on, SModelS comes with a simple C++ interface, see the cpp directory.
 Obviously, a C++ compiler is need, alongside with the python developers
 (header) files (libpython-dev on ubuntu, python-devel on rpm-based distros).
 
