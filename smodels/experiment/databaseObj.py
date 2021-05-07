@@ -245,6 +245,11 @@ class Database(object):
 
         """
         r = [ x.databaseVersion for x in self.subs ]
+        for i,ri in enumerate(r): # avoid repetitions
+            for j,rj in enumerate(r[i+1:]):
+                if ri in rj:
+                    r[i+j+1]=rj.replace(ri,"")
+                    
         return "+".join ( r )
 
     @property
