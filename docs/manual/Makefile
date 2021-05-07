@@ -68,7 +68,10 @@ update_code:
 RstFilesFromHelp:
 	./rstFromHelpFiles.py
 
-html: pythondeps update_code copy_files recipes RstFilesFromHelp htmlnorecipes
+html: pythondeps update_code copy_files recipes RstFilesFromHelp htmlnorecipes cpinteractive
+
+cpinteractive:
+	@cp source/recipes/interactivePlotsExample.html $(BUILDDIR)/html/
 
 pythondeps:
 	@cat ../../smodels/share/requirements.txt | sed -e 's/^/ * /' > source/dependencies.rst
