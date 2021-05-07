@@ -24,9 +24,9 @@ import smodels
 smodelsOutput = f'{installDirectory()}/inputFiles/scanExample/smodels-output.tar.gz'
 slhaFiles = f'{installDirectory()}/inputFiles/scanExample/slhas.tar.gz'
 parameters = './iplots_parameters_IDM.py'
-indexfile = 'index.html'
+indexfile = 'main.html'
 modelfile=f'{installDirectory()}/smodels/share/models/idm.py'
-outputFolder = './plots/'
+outputFolder = './'
 npoints = -1 #If negative will use all the points in the folders
 
 
@@ -52,7 +52,7 @@ from IPython.core.display import display,HTML
 
 
 #Main page (to open the plots go to the plots output folder and open them with the browser)
-mainFile = open(outputFolder + 'index.html','r')
+mainFile = open(outputFolder + indexfile,'r')
 display(HTML(mainFile.read()))
 mainFile.close()
 

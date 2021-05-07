@@ -26,9 +26,9 @@ from types import SimpleNamespace
 smodelsOutput = f'{installDirectory()}/inputFiles/scanExample/smodels-output.tar.gz'
 slhaFiles = f'{installDirectory()}/inputFiles/scanExample/slhas.tar.gz'
 parameters = './iplots_parameters.py'
-indexfile = 'index.html'
+indexfile = 'main.html'
 modelfile='{installDirectory()}/smodels/share/models/mssm.py'
-outputFolder = './plots/'
+outputFolder = './'
 npoints = -1 #If negative will use all the points in the folders
 
 
@@ -54,7 +54,7 @@ from IPython.core.display import display,HTML
 
 
 #Main page (to open the plots go to the plots output folder and open them with the browser)
-mainFile = open(outputFolder + 'index.html','r')
+mainFile = open(outputFolder + indexfile,'r')
 display(HTML(mainFile.read()))
 mainFile.close()
 
