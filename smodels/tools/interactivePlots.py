@@ -17,7 +17,7 @@ import imp
 from smodels.tools import interactivePlotsHelpers as helpers
 import smodels
 
-class PlotMaster(object):
+class Plotter(object):
     """
     A class to store the required data and produce the interactive plots
     """
@@ -194,7 +194,7 @@ class PlotMaster(object):
             variable_x_dict={}
             
             if self.variable_x[0]=='MASS' and self.particle_names!=None:
-                particle_name=PlotMaster.getParticleName(self,self.variable_x[1])
+                particle_name=Plotter.getParticleName(self,self.variable_x[1])
                 var_name='m('+particle_name+')'
             else:
                 var_name=str(self.variable_x[0])+str(self.variable_x[1])
@@ -208,7 +208,7 @@ class PlotMaster(object):
             variable_y_dict={}
             
             if self.variable_y[0]=='MASS' and self.particle_names!=None:
-                particle_name=PlotMaster.getParticleName(self,self.variable_y[1])
+                particle_name=Plotter.getParticleName(self,self.variable_y[1])
                 var_name='m('+particle_name+')'
             else:
                 var_name=str(self.variable_y[0])+str(self.variable_y[1])
@@ -223,7 +223,7 @@ class PlotMaster(object):
             slha_hover_information_dict={}
             for slha_info in self.slha_hover_information:
                 if slha_info[0]=='MASS' and self.particle_names!=None:
-                    particle_name=PlotMaster.getParticleName(self,slha_info[1])
+                    particle_name=Plotter.getParticleName(self,slha_info[1])
                     var_name='m('+particle_name+')'
                 else:
                     var_name=str(slha_info[0])+str(slha_info[1])
@@ -237,7 +237,7 @@ class PlotMaster(object):
             ctau_hover_information_dict={}
             for slha_info in self.ctau_hover_information:
                 if self.particle_names!=None:
-                    particle_name=PlotMaster.getParticleName(self,slha_info)
+                    particle_name=Plotter.getParticleName(self,slha_info)
                     var_name='ctau('+particle_name+')'
                 else:
                     var_name='ctau('+str(slha_info)+')'
@@ -251,7 +251,7 @@ class PlotMaster(object):
             BR_hover_information_dict={}
             for slha_info in self.BR_hover_information:
                 if self.particle_names!=None:
-                    particle_name=PlotMaster.getParticleName(self,slha_info)
+                    particle_name=Plotter.getParticleName(self,slha_info)
                     var_name='BR('+particle_name+')'
                 else:
                     var_name='BR('+str(slha_info)+')'
@@ -266,7 +266,7 @@ class PlotMaster(object):
         """
         Initializes an empty dictionary with the plotting options.
         """
-        PlotMaster.editSlhaInformation(self)
+        Plotter.editSlhaInformation(self)
         self.data_dict = {}
         self.data_dict['SModelS_status']=[]
         for smodels_names in sorted(self.SModelS_hover_information):
@@ -298,7 +298,8 @@ class PlotMaster(object):
         slhaData
         """
         
-        filler=helpers.Filler(self.data_dict,smodelsOutput,slhaData,self.slha_hover_information,self.ctau_hover_information,self.BR_hover_information,self.min_BR,self.particle_names)
+        filler=helpers.Filler(self.data_dict,smodelsOutput,slhaData,
+                              self.slha_hover_information,self.ctau_hover_information,self.BR_hover_information,self.min_BR,self.particle_names)
         #Fill with smodels data if defined
         if smodelsOutput is None:
             for key in self.SModelS_hover_information:
@@ -396,8 +397,8 @@ class PlotMaster(object):
 
         logger.info('Making plots...')
 
-        Plotter=helpers.Plotter(self, outFolder )
-        Plotter.makePlots()
+        plotter=helpers.PlotlyBackend(self, outFolder )
+        plotter.makePlots()
         logger.info('Generation of interactive plots finished. Go to: \n %s/%s \n to see the plots.' % ( outFolder, self.indexfile ) )
 
 def main(args,indexfile= "index.html" ):
@@ -465,7 +466,7 @@ def main(args,indexfile= "index.html" ):
 
     setLogLevel(verbosity)
 
-    plotMaster = PlotMaster(smodelsFolder,slhaFolder,parFile, indexfile,modelFile )
+    plotMaster = Plotter(smodelsFolder,slhaFolder,parFile, indexfile,modelFile )
     loadData = plotMaster.loadData(npoints)
     if not loadData:
         raise SModelSError("Error loading data from folders:\n %s\n %s" %\
