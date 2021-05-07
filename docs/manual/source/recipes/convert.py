@@ -17,8 +17,8 @@ htmls=glob.glob("*.html")
 
 def run ( nb ):
     execute=""
-    #if "interactivePlots" in nb:
-    #    execute = " --execute"
+    if "interactivePlots" in nb:
+        execute = " --execute"
     cmd1="%s%s --to html %s" % ( cmd, execute, nb )
     cmd2="%s --to python %s" % ( cmd, nb )
     print ( "convert: %s" % cmd1 )
