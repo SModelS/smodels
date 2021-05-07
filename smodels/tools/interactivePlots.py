@@ -383,7 +383,14 @@ class Plotter(object):
 
         return True
 
-    def makePlots(self, outFolder, indexfile = "plots.html" ):
+    def display ( self ):
+        """ display the pages, works in jupyter notebooks only """
+        from IPython.core.display import display,HTML
+        mainFile = open( self.outFolder + self.indexfile,'r')
+        display(HTML(mainFile.read()))
+        mainFile.close()
+
+    def plot(self, outFolder, indexfile = "plots.html" ):
         """
         Uses the data in self.data_dict to produce the plots.
 
@@ -394,17 +401,20 @@ class Plotter(object):
         if not os.path.isdir(outFolder):
             os.makedirs(outFolder)
 
+        self.outFolder = outFolder
+        self.indexfile = indexfile
         logger.info('Making plots...')
 
         plotter=helpers.PlotlyBackend(self, outFolder )
         plotter.makePlots( indexfile )
         logger.info('Generation of interactive plots finished. Go to: \n %s/%s \n to see the plots.' % ( outFolder, indexfile ) )
 
+
 def main(args,indexfile= "index.html" ):
     """
     Create the interactive plots using the input from argparse
 
-    :parameter args: argparser.Namespace object containing the options for makePlots
+    :parameter args: argparser.Namespace object containing the options for the plotter
 
     Main interface for the interactive-plots.
 
@@ -469,5 +479,5 @@ def main(args,indexfile= "index.html" ):
     if not loadData:
         raise SModelSError("Error loading data from folders:\n %s\n %s" %\
                             (smodelsFolder,slhaFolder))
-    plotter.makePlots(outputFolder, indexfile )
+    plotter.plot(outputFolder, indexfile )
     return outputFolder
