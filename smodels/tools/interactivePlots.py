@@ -22,7 +22,7 @@ class Plotter(object):
     A class to store the required data and produce the interactive plots
     """
 
-    def __init__(self,smodelsFolder,slhaFolder,parameterFile,indexfile,modelFile=None ):
+    def __init__(self,smodelsFolder,slhaFolder,parameterFile,modelFile=None ):
         """
         Initializes the class.
 
@@ -36,7 +36,6 @@ class Plotter(object):
         self.data_dict = []
         self.smodelsFolder = smodelsFolder
         self.slhaFolder = slhaFolder
-        self.indexfile = indexfile
         self.parameterFile = parameterFile
         self.modelFile = modelFile
 
@@ -385,11 +384,12 @@ class Plotter(object):
 
         return True
 
-    def makePlots(self,outFolder):
+    def makePlots(self, outFolder, indexfile = "plots.html" ):
         """
         Uses the data in self.data_dict to produce the plots.
 
         :parameter outFolder: Path to the output folder.
+        :parameter indexfile: name of entry webpage
         """
 
         if not os.path.isdir(outFolder):
@@ -398,8 +398,8 @@ class Plotter(object):
         logger.info('Making plots...')
 
         plotter=helpers.PlotlyBackend(self, outFolder )
-        plotter.makePlots()
-        logger.info('Generation of interactive plots finished. Go to: \n %s/%s \n to see the plots.' % ( outFolder, self.indexfile ) )
+        plotter.makePlots( indexfile )
+        logger.info('Generation of interactive plots finished. Go to: \n %s/%s \n to see the plots.' % ( outFolder, indexfile ) )
 
 def main(args,indexfile= "index.html" ):
     """
@@ -444,7 +444,6 @@ def main(args,indexfile= "index.html" ):
         if os.path.isfile(args.modelFile)==False:
             raise SModelSError("model file '"+str(args.modelFile)+"' does not exist")
 
-    
     #Basic checks:
     smodelsFolder = args.smodelsFolder
     slhaFolder = args.slhaFolder
@@ -466,12 +465,10 @@ def main(args,indexfile= "index.html" ):
 
     setLogLevel(verbosity)
 
-    plotMaster = Plotter(smodelsFolder,slhaFolder,parFile, indexfile,modelFile )
-    loadData = plotMaster.loadData(npoints)
+    plotter = Plotter(smodelsFolder,slhaFolder,parFile, modelFile )
+    loadData = plotter.loadData(npoints)
     if not loadData:
         raise SModelSError("Error loading data from folders:\n %s\n %s" %\
                             (smodelsFolder,slhaFolder))
-
-    plotMaster.makePlots(outputFolder)
-
+    plotter.makePlots(outputFolder, indexfile )
     return outputFolder

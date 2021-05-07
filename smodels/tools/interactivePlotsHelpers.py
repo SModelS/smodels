@@ -490,7 +490,6 @@ class PlotlyBackend:
         self.plot_list=master.plot_list
         self.plot_data=master.plot_data
         self.plot_title=master.plot_title
-        self.indexfile = master.indexfile
         self.path_to_plots=path_to_plots
 
     def makeDataFrame(self):
@@ -909,14 +908,15 @@ class PlotlyBackend:
                     continue
 
 
-                plot_link=hyperlink_format.format(link=plot_name+'_'+option+'.html', text=option)
+                plot_link=hyperlink_format.format( link=plot_name+'_'+option+'.html', 
+                                                   text=option )
                 main_file.write(plot_link)
                 main_file.write(' ')
             main_file.write('</p>')
         main_file.close()
         return True
 
-    def makePlots(self):
+    def makePlots(self, indexfile ):
         """
         Uses the data in self.data_dict to produce the plots.
 
@@ -924,6 +924,7 @@ class PlotlyBackend:
         """
 
         self.data_frame_all = PlotlyBackend.makeDataFrame(self)
+        self.indexfile = indexfile
         self.html_names=PlotlyBackend.refiningVariableNames(self)
         self.data_frame_all = PlotlyBackend.fillHover(self)
         data_frame_excluded,data_frame_nonexcluded = PlotlyBackend.DataFrameExcludedNonexcluded(self)
