@@ -653,7 +653,7 @@ class PlotlyBackend:
               'r_max':'highest r-value from SModelS.',
               'chi2':'&#967;<sup>2</sup> value associated to the highest r-value.',
               'Tx':'Topology/ies which give the highest r-value.',
-              'Analysis':'Experimental analysis from which the highest r-value comes from.',
+              'Analysis':'Experimental analysis that the highest r-value comes from.',
               'MT_max':'Missing topologies with the largest cross section.',
               'MT_max_xsec':'Cross section of MT_max.',
               'MT_total_xsec':'Total missing cross section.',
