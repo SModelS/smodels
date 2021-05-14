@@ -835,9 +835,11 @@ class PyPrinter(BasicPrinter):
                 resDict["Width (GeV)"] = widths
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
-            if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
+            if hasattr(theoryPrediction,'likelihood') and not theoryPrediction.likelihood is None:
                 resDict['chi2'] = theoryPrediction.chi2
                 resDict['likelihood'] = theoryPrediction.likelihood
+                resDict['l_max'] = theoryPrediction.lmax
+                resDict['l_SM'] = theoryPrediction.lsm
             ExptRes.append(resDict)
 
 
@@ -1086,12 +1088,16 @@ class SLHAPrinter(TxTPrinter):
             output += " %d 3 %-30.2f #condition violation\n" % (cter, theoPred.getmaxCondition())
             output += " %d 4 %-30s #analysis\n" % (cter, expResult.globalInfo.id)
             output += " %d 5 %-30s #signal region \n" %(cter, signalRegion.replace(" ","_"))
-            if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
-                output += " %d 6 %-30.3E #Chi2\n" % (cter, theoPred.chi2)
-                output += " %d 7 %-30.3E #Likelihood\n" % (cter, theoPred.likelihood)
+            if hasattr(theoPred,'likelihood') and not theoPred.likelihood is None:
+#                output += " %d 6 %-30.3E #Chi2\n" % (cter, theoPred.chi2)
+#                output += " %d 7 %-30.3E #Likelihood\n" % (cter, theoPred.likelihood)
+                output += " %d 6 %-30.3E #Likelihood\n" % (cter, theoPred.likelihood)
+                output += " %d 7 %-30.3E #L_max\n" % (cter, theoPred.lmax)
+                output += " %d 8 %-30.3E #L_SM\n" % (cter, theoPred.lsm)
             else:
-                output += " %d 6 N/A                            #Chi2\n" % (cter)
-                output += " %d 7 N/A                            #Likelihood\n" % (cter)
+                output += " %d 6 N/A                            #Likelihood\n" % (cter)
+                output += " %d 7 N/A                            #L_max\n" % (cter)
+                output += " %d 8 N/A                            #L_SM\n" % (cter)
             output += "\n"
 
         return output
