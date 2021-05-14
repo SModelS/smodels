@@ -309,7 +309,7 @@ class DataSet(object):
         m = Data( obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
                        deltas_rel=deltas_rel )
         computer = LikelihoodComputer(m)
-        return computer.lmax(nsig, marginalize=marginalize)
+        return computer.lmax(marginalize=marginalize)
 
 
     def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
