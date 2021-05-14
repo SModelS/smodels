@@ -690,6 +690,14 @@ class LikelihoodComputer:
         else:
             return self.profileLikelihood(nsig, nll)
 
+    def lmax(self, marginalize=False, nll=False ):
+        """ convenience function, computes likelihood for nsig = nobs-nbg, 
+        :param marginalize: if true, marginalize, if false, profile nuisances.
+        :param nll: return nll instead of likelihood
+        """
+        dn = self.model.observed-self.model.backgrounds
+        return self.likelihood(dn, marginalize=marginalize, nll=nll )
+
     def chi2(self, nsig, marginalize=False):
             """
             Computes the chi2 for a given number of observed events nobs given
@@ -708,8 +716,7 @@ class LikelihoodComputer:
 
             # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
             # (keeping the same % error on signal):
-            dn = self.model.observed-self.model.backgrounds
-            maxllhd = self.likelihood(dn, marginalize=marginalize, nll=True )
+            maxllhd = self.lmax ( marginalize=marginalize, nll=True )
             
             chi2=2*(llhd-maxllhd)
             
