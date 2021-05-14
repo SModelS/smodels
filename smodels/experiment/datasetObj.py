@@ -80,7 +80,7 @@ class DataSet(object):
         coll1, coll2 = getCollaboration ( self ), getCollaboration ( other )
         if coll1 != coll2:
             return True
-        did1, did2= self.dataInfo.dataId, other.dataInfo.dataId
+
         if self.isGlobalFieldCombinableWith_ ( other ):
             return True
         if other.isGlobalFieldCombinableWith_ ( self ):
@@ -130,7 +130,7 @@ class DataSet(object):
         for t in tokens:
             if ":" in t:
                 logger.error ( "combinableWith field in globalInfo is at the analysis level. You specified a dataset-level combination %s." % t )
-                sys.exit(-1)
+                raise SModelSError()
         if idOther in tokens:
             return True
         return False
@@ -148,7 +148,7 @@ class DataSet(object):
         for t in tokens:
             if not ":" in t:
                 logger.error ( "combinableWith field in dataInfo is at the dataset level. You specified an analysis-level combination %s." % t )
-                sys.exit(-1)
+                raise SModelSError()
         idOther = other.globalInfo.id
         didOther = other.dataInfo.dataId
         label = f"{idOther}:{didOther}"
@@ -236,7 +236,6 @@ class DataSet(object):
         else:
             return self.globalInfo.lumi
 
-
     def getTxName(self,txname):
         """
         get one specific txName object.
@@ -293,7 +292,7 @@ class DataSet(object):
 
     def lmax(self, deltas_rel=0.2, marginalize=False, expected=False ):
         """
-        Convenience function, computes the likelihood at nsig = observedN - expectedBG, 
+        Convenience function, computes the likelihood at nsig = observedN - expectedBG,
         assuming "deltas_rel" error on the signal efficiency.
         The values observedN, expectedBG, and bgError are part of dataInfo.
 
@@ -310,7 +309,6 @@ class DataSet(object):
                        deltas_rel=deltas_rel )
         computer = LikelihoodComputer(m)
         return computer.lmax(marginalize=marginalize)
-
 
     def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
         """
@@ -330,13 +328,11 @@ class DataSet(object):
 
         return ret
 
-
     def folderName(self):
         """
         Name of the folder in text database.
         """
         return os.path.basename( self.path )
-
 
     def getAttributes(self, showPrivate=False):
         """
@@ -354,7 +350,6 @@ class DataSet(object):
             attributes = list(filter(lambda a: a[0] != '_', attributes))
 
         return attributes
-
 
     def getUpperLimitFor(self,element=None,expected = False, txnames = None
                          ,compute=False,alpha=0.05,deltas_rel=0.2):
@@ -424,7 +419,6 @@ class DataSet(object):
             logger.warning("Unkown data type: %s. Data will be ignored.",
                            self.getType())
             return None
-
 
     def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False, deltas_rel=0.2):
         """
@@ -535,7 +529,6 @@ class CombinedDataSet(object):
         """
 
         return self.globalInfo.lumi
-
 
     def getDataSet(self,datasetID):
         """
