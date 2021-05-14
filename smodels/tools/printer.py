@@ -605,8 +605,11 @@ class SummaryPrinter(TxTPrinter):
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
             output += " Txnames:  " + txnameStr + "\n"
-            if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
-                output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)
+#            if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
+#                output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)
+#           print L, L_max and L_SM instead of chi2 and llhd; SK 2021-05-14 
+            if hasattr(theoPred,'likelihood') and not theoPred.likelihood is None:
+                output += " Likelihoods: L, L_max, L_SM = %10.3E %10.3E %10.3E\n" % (theoPred.likelihood, theoPred.lmax, theoPred.lsm)
 
             if not (theoPred is obj[-1]):
                 output += 80 * "-"+ "\n"

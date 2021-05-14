@@ -189,8 +189,12 @@ class TheoryPrediction(object):
             nsig = (self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
             chi2 = self.dataset.chi2(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
-            self.likelihood =  llhd
-            self.chi2 =  chi2
+            llhd_sm = self.dataset.likelihood(nsig=0.,marginalize=marginalize,deltas_rel=deltas_rel)
+            llhd_max = self.dataset.lmax(marginalize=marginalize,deltas_rel=deltas_rel)
+            self.likelihood = llhd
+            self.lmax = llhd_max
+            self.lsm = llhd_sm
+            self.chi2 = chi2
 
         elif self.dataType() == 'combined':
             lumi = self.dataset.getLumi()
