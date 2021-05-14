@@ -466,12 +466,15 @@ class TxTPrinter(BasicPrinter):
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if not upperLimitExp is None:
                 output += "Expected experimental limit: " + str(upperLimitExp) + "\n"
-            output += "Observed r-Value: %s\n" %theoryPrediction.getRValue(expected=False)
+            output += "Observed r-value: %s\n" %theoryPrediction.getRValue(expected=False)
             if not upperLimitExp is None:
-                output += "Expected r-Value: %s\n" %theoryPrediction.getRValue(expected=True)
-            if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
-                output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
+                output += "Expected r-value: %s\n" %theoryPrediction.getRValue(expected=True)
+            if hasattr(theoryPrediction,'likelihood') and not theoryPrediction.likelihood is None:
+#                output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
+                chi2sm = -2*np.log(theoryPrediction.likelihood/theoryPrediction.lsm)
                 output += "Likelihood: " + str(theoryPrediction.likelihood) + "\n"
+                output += "L_max: " + str(theoryPrediction.lmax) + "   -2log(L/L_max): " + str(theoryPrediction.chi2) + "\n"
+                output += "L_SM: " + str(theoryPrediction.lsm) + "   -2log(L/L_SM): " + str(chi2sm) + "\n"
 
             if hasattr(self,"printextendedresults") and self.printextendedresults:
                 if theoryPrediction.mass:
