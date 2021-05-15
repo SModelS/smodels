@@ -690,12 +690,15 @@ class LikelihoodComputer:
         else:
             return self.profileLikelihood(nsig, nll)
 
-    def lmax(self, marginalize=False, nll=False ):
+    def lmax(self, marginalize=False, nll=False, allowNegativeSignals = True ):
         """ convenience function, computes likelihood for nsig = nobs-nbg, 
         :param marginalize: if true, marginalize, if false, profile nuisances.
         :param nll: return nll instead of likelihood
+        :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
         """
         dn = self.model.observed-self.model.backgrounds
+        if not allowNegativeSignals and dn<0.:
+            dn = 0.
         return self.likelihood(dn, marginalize=marginalize, nll=nll )
 
     def chi2(self, nsig, marginalize=False):
