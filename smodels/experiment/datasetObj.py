@@ -312,7 +312,7 @@ class DataSet(object):
         m = Data( obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
                        deltas_rel=deltas_rel )
         computer = LikelihoodComputer(m)
-        return computer.lmax(marginalize=marginalize,
+        return computer.lmax(marginalize=marginalize, nll=False,
                              allowNegativeSignals = allowNegativeSignals )
 
     def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
@@ -560,12 +560,13 @@ class CombinedDataSet(object):
 
         return None
 
-    def lmax ( self, nsig, marginalize, deltas_rel, expected=False ):
+    def lmax ( self, nsig, marginalize, deltas_rel, nll=False, expected=False ):
         """ compute likelihood at maximum """
         if self.type == "simplified":
             nobs = [ x.dataInfo.observedN for x in self._datasets]
             if expected:
-                nobs = [ x.dataInfo.expectedBG for x in self._datasets]
+                # nobs = [ x.dataInfo.expectedBG for x in self._datasets]
+                nobs = [ int(np.round(x.dataInfo.expectedBG)) for x in self._datasets]
             bg = [ x.dataInfo.expectedBG for x in self._datasets]
             cov = self.globalInfo.covariance
             if type(nsig) in [ list, tuple ]:
@@ -574,7 +575,7 @@ class CombinedDataSet(object):
             mu_hat = computer.findMuHat ( nsig )
             print ( "mu_hat", mu_hat, "nsig", nsig )
             musig = nsig * mu_hat
-            return computer.likelihood ( musig, marginalize=marginalize, nll=False )
+            return computer.likelihood ( musig, marginalize=marginalize, nll=nll )
         if self.type == "pyhf":
             return -1.
         return -1.
