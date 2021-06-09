@@ -9,6 +9,7 @@
 
 
 import os,glob,json
+import numpy as np
 from smodels.experiment import txnameObj,infoObj
 from smodels.tools.physicsUnits import fb
 from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
@@ -485,7 +486,16 @@ class CombinedDataSet(object):
         self._datasets = expResult.datasets[:]
         self._marginalize = False
         self.sortDataSets()
-        self.bestCB = None# To store the index of the best combination
+        self.bestCB = None # To store the index of the best combination
+        self.findType()
+
+    def findType ( self ):
+        """ find the type of the combined dataset """
+        self.type = None ## type of combined dataset, e.g. pyhf, or simplified
+        if hasattr(self.globalInfo, "covariance"):
+            self.type = "simplified"
+        if hasattr(self.globalInfo, "jsonFiles" ):
+            self.type = "pyhf"
 
     def __str__(self):
         ret = "Combined Dataset (%i datasets)" %len(self._datasets)
@@ -550,6 +560,25 @@ class CombinedDataSet(object):
 
         return None
 
+    def lmax ( self, nsig, marginalize, deltas_rel, expected=False ):
+        """ compute likelihood at maximum """
+        if self.type == "simplified":
+            nobs = [ x.dataInfo.observedN for x in self._datasets]
+            if expected:
+                nobs = [ x.dataInfo.expectedBG for x in self._datasets]
+            bg = [ x.dataInfo.expectedBG for x in self._datasets]
+            cov = self.globalInfo.covariance
+            if type(nsig) in [ list, tuple ]:
+                nsig = np.array(nsig)
+            computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
+            mu_hat = computer.findMuHat ( nsig )
+            print ( "mu_hat", mu_hat, "nsig", nsig )
+            musig = nsig * mu_hat
+            return computer.likelihood ( musig, marginalize=marginalize, nll=False )
+        if self.type == "pyhf":
+            return -1.
+        return -1.
+
     def getPyhfComputer ( self, nsig ):
         """ create the pyhf ul computer object
         :returns: pyhf upper limit computer, and combinations of signal regions
@@ -560,6 +589,8 @@ class CombinedDataSet(object):
         jsons = self.globalInfo.jsons.copy()
         datasets = [ds.getID() for ds in self._datasets]
         total = sum(nsig)
+        if total == 0.: # all signals zero? can divide by anything!
+            total = 1.
         nsig = [s/total for s in nsig] # Normalising signals to get an upper limit on the events count
         # Filtering the json files by looking at the available datasets
         for jsName in self.globalInfo.jsonFiles:
@@ -605,7 +636,7 @@ class CombinedDataSet(object):
         :returns: upper limit on sigma*eff
         """
 
-        if hasattr(self.globalInfo, "covariance" ):
+        if self.type == "simplified":
             cov = self.globalInfo.covariance
             if type(cov) != list:
                 raise SModelSError( "covariance field has wrong type: %s" % type(cov))
@@ -628,7 +659,7 @@ class CombinedDataSet(object):
                 ret = ret/self.getLumi()
             logger.debug("SL upper limit : {}".format(ret))
             return ret
-        elif hasattr(self.globalInfo, "jsonFiles" ):
+        elif self.type == "pyhf":
             logger.debug("Using pyhf")
             if all([s == 0 for s in nsig]):
                 logger.warning("All signals are empty")

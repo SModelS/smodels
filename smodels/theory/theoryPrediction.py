@@ -207,6 +207,8 @@ class TheoryPrediction(object):
                 srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
             self.likelihood = self.dataset.combinedLikelihood(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
             self.chi2 = self.dataset.totalChi2(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
+            self.lmax = self.dataset.lmax ( srNsigs, marginalize=marginalize,deltas_rel=deltas_rel )
+            self.lsm = self.dataset.combinedLikelihood( [0.]*len(srNsigs), marginalize=marginalize,deltas_rel=deltas_rel)
 
 
     def getmaxCondition(self):

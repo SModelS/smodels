@@ -425,7 +425,7 @@ class PyhfUpperLimitComputer:
                 stat = "q"
                 nattempts = 0
             if nattempts > 10:
-                logger.warn ( "tried 10 times to determine the bounds for brent bracketing. we abort now." )
+                logger.warning ( "tried 10 times to determine the bounds for brent bracketing. we abort now." )
                 return None
             # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
             rt1 = root_func(lo_mu)

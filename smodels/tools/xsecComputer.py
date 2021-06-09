@@ -548,7 +548,7 @@ class ArgsStandardizer:
             toFile="highest"
         if args.alltofile:
             if toFile=="highest":
-                logger.warn ( "Specified both --tofile and --alltofile. Will use "\
+                logger.warning ( "Specified both --tofile and --alltofile. Will use "\
                               "--alltofile" )
             toFile="all"
         return toFile

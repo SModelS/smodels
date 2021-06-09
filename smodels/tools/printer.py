@@ -225,7 +225,7 @@ class BasicPrinter(object):
             formatFunction = getattr(self,'_format'+typeStr)
             return formatFunction(obj)
         except AttributeError as e:
-            logger.debug('Error formating object %s: \n %s' %(typeStr,e))
+            logger.warning('Error formating object %s: \n %s' %(typeStr,e))
             return False
 
 class TxTPrinter(BasicPrinter):
