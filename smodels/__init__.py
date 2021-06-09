@@ -1,3 +1,3 @@
-from installation import version
+from .installation import version
 
 __version__ = version()
