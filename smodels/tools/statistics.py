@@ -18,7 +18,7 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
     """ computes the likelihood from an expected and an observed upper limit.
     :param upperLimit: observed upper limit, as a yield (i.e. unitless)
     :param expectedUpperLimit: expected upper limit, also as a yield
-    :param nSig: number of signal events
+    :param nsig: number of signal events, if None then nsig = mumax
     :param nll: if True, return negative log likelihood
 
     :returns: likelihood (float)

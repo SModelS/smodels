@@ -573,7 +573,6 @@ class CombinedDataSet(object):
                 nsig = np.array(nsig)
             computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
             mu_hat = computer.findMuHat ( nsig )
-            print ( "mu_hat", mu_hat, "nsig", nsig )
             musig = nsig * mu_hat
             return computer.likelihood ( musig, marginalize=marginalize, nll=nll )
         if self.type == "pyhf":
