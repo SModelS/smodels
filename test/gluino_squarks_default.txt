@@ -4,7 +4,7 @@ Decomposition output status: 1 #decomposition was successful
 # maxcond = 0.2
 # minmassgap = 5.0
 # sigmacut = 0.03
-# Database version: unittest200rc10
+# Database version: unittest210
 ================================================================================
 #Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected
 
@@ -16,14 +16,14 @@ Decomposition output status: 1 #decomposition was successful
  Signal Region:  (UL)
  Txnames:  T2
 --------------------------------------------------------------------------------
- ATLAS-SUSY-2013-02  8.00E+00    0.0  9.069E+00  3.233E+01  2.805E-01  N/A
+ ATLAS-SUSY-2013-02  8.00E+00    0.0  9.069E+00  3.239E+01  2.800E-01  N/A
  Signal Region:  (UL)
  Txnames:  T5WW
 --------------------------------------------------------------------------------
      CMS-SUS-13-012  8.00E+00    0.0  1.538E-01  1.205E+00  1.276E-01  2.047E-01
  Signal Region:  3NJet6_1000HT1250_600MHTinf
  Txnames:  T1, T1tttt, T2
- Chi2, Likelihood =  6.761E-01  3.848E-03
+ Likelihoods: L, L_max, L_SM =  3.848E-03  5.396E-03  2.530E-03
 --------------------------------------------------------------------------------
  CMS-PAS-SUS-15-002  1.30E+01    0.0  7.530E+00  6.806E+01  1.106E-01  N/A
  Signal Region:  (UL)
@@ -33,16 +33,16 @@ Decomposition output status: 1 #decomposition was successful
  Signal Region:  (UL)
  Txnames:  T1
 --------------------------------------------------------------------------------
- ATLAS-SUSY-2013-12  8.00E+00    0.0  1.847E+01  4.844E+02  3.813E-02  N/A
+ ATLAS-SUSY-2013-12  8.00E+00    0.0  1.847E+01  4.811E+02  3.839E-02  N/A
  Signal Region:  (UL)
  Txnames:  TChiWZ
 --------------------------------------------------------------------------------
 ATLAS-CONF-2013-037  8.00E+00    0.0  7.318E-04  4.000E-01  1.830E-03  2.091E-03
  Signal Region:  SRtN3
  Txnames:  T1qqtt, T1tttt
- Chi2, Likelihood =  3.865E-01  2.450E-02
+ Likelihoods: L, L_max, L_SM =  2.450E-02  2.972E-02  2.442E-02
 --------------------------------------------------------------------------------
- CMS-PAS-SUS-15-002  1.30E+01    0.0  3.496E-02  4.206E+01  8.312E-04  N/A
+ CMS-PAS-SUS-15-002  1.30E+01    0.0  3.496E-02  4.207E+01  8.310E-04  N/A
  Signal Region:  (UL)
  Txnames:  T1tttt
 --------------------------------------------------------------------------------
@@ -52,7 +52,9 @@ ATLAS-CONF-2013-037  8.00E+00    0.0  7.318E-04  4.000E-01  1.830E-03  2.091E-03
 
  
 ================================================================================
-The highest r value is = 0.3875957890137304
+The highest r value is = 0.387595789014 from ATLAS-SUSY-2013-02 (r_expected not available)
+CMS analysis with highest available r_expected: CMS-SUS-13-012, r_expected=0.20467, r_obs=0.12763
+ATLAS analysis with highest available r_expected: ATLAS-CONF-2013-037, r_expected=0.00209, r_obs=0.00183
 
 Total cross-section for missing topologies (fb):  3.066E+03
 Total cross-section for missing topologies with displaced decays (fb):  0.000E+00

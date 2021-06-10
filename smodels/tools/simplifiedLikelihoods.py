@@ -282,12 +282,13 @@ class LikelihoodComputer:
             ret = sum(ret)
         return ret
 
-    def findMuHat(self, signal_rel):
+    def findMuHat(self, signal_rel, allowNegatives = False ):
         """
         Find the most likely signal strength mu
         given the relative signal strengths in each dataset (signal region).
         
         :param signal_rel: array with relative signal strengths 
+        :param allowNegatives: if true, then also allow for negative values
         
         :returns: mu_hat, the maximum likelihood estimate of mu
         """
@@ -315,10 +316,13 @@ class LikelihoodComputer:
             mu_hat_old = mu_hat
             #logger.info ( "theta hat[%d]=%s" % (ctr,list( theta_hat[:11] ) ) )
             #logger.info ( "   mu hat[%d]=%s" % (ctr, mu_hat ) )
-            mu_c = NP.abs(self.model.observed - self.model.backgrounds - theta_hat)/signal_rel
+            # mu_c = NP.abs(self.model.observed - self.model.backgrounds - theta_hat)/signal_rel
+            mu_c = (self.model.observed - self.model.backgrounds - theta_hat)/signal_rel
             ## find mu_hat by finding the root of 1/L dL/dmu. We know
             ## that the zero has to be between min(mu_c) and max(mu_c).
-            lower,upper = 0.,widener*max(mu_c)
+            lower,upper = 0.,widener*max(NP.abs(mu_c))
+            if allowNegatives:
+                lower = widener*min(mu_c+[0.])
             lower_v = self.dLdMu(lower, signal_rel, theta_hat)
             upper_v = self.dLdMu(upper, signal_rel, theta_hat)
             total_sign = NP.sign(lower_v * upper_v)
@@ -326,10 +330,16 @@ class LikelihoodComputer:
                 if upper_v < lower_v < 0.:
                     ## seems like we really want to go for mu_hat = 0.
                     return 0.
-                logger.debug ( "weird. cant find a zero in the Brent bracket "\
-                               "for finding mu(hat). Let me try with a very small"
-                               " value." )
-                lower = 1e-4*max(mu_c)
+                if allowNegatives:
+                    logger.debug ( "weird. cant find a zero in the Brent bracket "\
+                                   "for finding mu(hat). Let me try with a very small"
+                                   " value." )
+                    lower = -1.*max(NP.abs(mu_c))
+                else:
+                    logger.debug ( "weird. cant find a zero in the Brent bracket "\
+                                   "for finding mu(hat). Let me try with a very small"
+                                   " value." )
+                    lower = 1e-4*max(NP.abs(mu_c))
                 lower_v = self.dLdMu( lower, signal_rel, theta_hat )
                 total_sign = NP.sign( lower_v * upper_v )
                 if total_sign > -.5:
