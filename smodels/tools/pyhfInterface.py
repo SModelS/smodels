@@ -337,14 +337,63 @@ class PyhfUpperLimitComputer:
                 if sp['name'] == 'bsm':
                     sp['data'] = dn
         logger.debug(workspace['channels'][0]['samples'][0])
-        _, maxNllh = pyhf.infer.mle.fixed_poi_fit(1., workspace.data(model), model, return_fitted_val=True)
-        logger.debug('maxNllh : {}'.format(maxNllh))
+        maxNllh = self.lmax ( workspace_index )
         ret = (maxNllh - nllh).tolist()
         try:
             ret = float(ret)
         except:
             ret = float(ret[0])
         return ret
+
+    def lmax(self, workspace_index=None, nll=True ):
+        """
+        Returns the negative log max likelihood
+        :param nll: if true, return nll, not llhd
+        """
+        self.__init__(self.data)
+        logger.debug("Calling lmax")
+        if self.nWS == 1:
+            workspace = self.workspaces[0]
+        elif workspace_index != None:
+            if self.zeroSignalsFlag[workspace_index] == True:
+                logger.warning("Workspace number %d has zero signals" % workspace_index)
+                return None
+            else:
+                workspace = self.workspaces[workspace_index]
+        # Same modifiers_settings as those used when running the 'pyhf cls' command line
+        msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
+        model = workspace.model(modifier_settings=msettings)
+        logger.debug(workspace['channels'][0]['samples'][0])
+        # Computing the background numbers and fetching the observations
+        for ch in workspace['channels']:
+            chName = ch['name']
+            # Backgrounds
+            for sp in ch['samples']:
+                if sp['name'] != 'bsm':
+                    try:
+                        bkg = [b + d for b, d in zip(bkg, sp['data'])]
+                    except NameError: # If bkg doesn't exit, intialize it
+                        bkg = sp['data']
+            # Observations
+            for observation in workspace['observations']:
+                if observation['name'] == chName:
+                    obs = observation['data']
+            dn = [ob - bk for ob, bk in zip(obs, bkg)]
+            # Feeding dn as signal input
+            for sp in ch['samples']:
+                if sp['name'] == 'bsm':
+                    sp['data'] = dn
+        logger.debug(workspace['channels'][0]['samples'][0])
+        _, maxNllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model), model, 
+                                                   return_fitted_val=True)
+        ret = maxNllh.tolist()
+        try:
+            ret = float(ret)
+        except:
+            ret = float(ret[0])
+        if nll:
+            return ret
+        return np.exp(-ret)
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of looking for mu bounds

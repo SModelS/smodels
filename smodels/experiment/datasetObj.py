@@ -576,7 +576,8 @@ class CombinedDataSet(object):
             musig = nsig * mu_hat
             return computer.likelihood ( musig, marginalize=marginalize, nll=nll )
         if self.type == "pyhf":
-            return -1.
+            ulcomputer, combinations = self.getPyhfComputer( nsig )
+            return ulcomputer.lmax ( nll=False )
         return -1.
 
     def getPyhfComputer ( self, nsig ):

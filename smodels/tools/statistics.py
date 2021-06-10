@@ -32,6 +32,8 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
         return ( ul - muhat ) / 1.96
 
     def llhd ( nsig, mumax, sigma_exp, nll ):
+        if nsig == None:
+            nsig = mumax
         ## need to account for the truncation!
         ## first compute how many sigmas left of center is 0.
         Zprime = mumax / sigma_exp
