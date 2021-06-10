@@ -417,7 +417,10 @@ def rescaleWidth(width):
     minWidth = 1e-30 #Any width below this can be safely considered to be zero
     maxWidth = 1e50 #Any width above this can be safely considered to be infinity
     w = (min(w,maxWidth)/minWidth) #Normalize the width and convert it to some finite number (if not finite)
-    return np.log(1+w)
+    if w < 1e-10: #The log function misbehaves for very small values of w (step behavior), so we use log(1+x) = x for x << 1
+        return w
+    else:
+        return np.log(1+w)
 
 def unscaleWidth(x):
     """
