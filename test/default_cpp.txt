@@ -37,7 +37,7 @@ Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 5.72E-01 [pb]
 Theory conditions:  None
 Observed experimental limit: 3.81E+01 [fb]
-Observed r-value: 15.002655551277472
+Observed r-value: 15
 
 ---------------Analysis Label = CMS-SUS-13-012
 -------------------Dataset Label = 6NJet8_1000HT1250_450MHTinf

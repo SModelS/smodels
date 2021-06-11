@@ -225,7 +225,7 @@ class BasicPrinter(object):
             formatFunction = getattr(self,'_format'+typeStr)
             return formatFunction(obj)
         except AttributeError as e:
-            logger.warning('Error formating object %s: \n %s' %(typeStr,e))
+            logger.debug('Error formating object %s: \n %s' %(typeStr,e))
             return False
 
 class TxTPrinter(BasicPrinter):
@@ -417,6 +417,13 @@ class TxTPrinter(BasicPrinter):
 
         return output
 
+    def _formatNumber(self,number,n=4 ):
+        """ format a number <number> to have n digits,
+            but allow also for None, strings, etc """
+        if type(number) not in [ float, np.float64 ]:
+            return str(number)
+        fmt = ".%dg" % n
+        return ("%"+fmt) % number
 
     def _formatTheoryPredictionList(self, obj):
         """
@@ -466,15 +473,18 @@ class TxTPrinter(BasicPrinter):
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if not upperLimitExp is None:
                 output += "Expected experimental limit: " + str(upperLimitExp) + "\n"
-            output += "Observed r-value: %s\n" %theoryPrediction.getRValue(expected=False)
+            srv = self._formatNumber ( theoryPrediction.getRValue(expected=False), 4 )
+            output += "Observed r-value: %s\n" % srv
             if not upperLimitExp is None:
-                output += "Expected r-value: %s\n" %theoryPrediction.getRValue(expected=True)
+                serv = self._formatNumber ( theoryPrediction.getRValue(expected=True), 4 )
+                output += "Expected r-value: %s\n" % serv
             if hasattr(theoryPrediction,'likelihood') and not theoryPrediction.likelihood is None:
 #                output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
                 chi2sm = -2*np.log(theoryPrediction.likelihood/theoryPrediction.lsm)
-                output += "Likelihood: " + str(theoryPrediction.likelihood) + "\n"
-                output += "L_max: " + str(theoryPrediction.lmax) + "   -2log(L/L_max): " + str(theoryPrediction.chi2) + "\n"
-                output += "L_SM: " + str(theoryPrediction.lsm) + "   -2log(L/L_SM): " + str(chi2sm) + "\n"
+                output += "Likelihood: " + self._formatNumber(theoryPrediction.likelihood,4) + "\n"
+                output += "L_max: " + self._formatNumber(theoryPrediction.lmax,4) + "   -2log(L/L_max): " + self._formatNumber(theoryPrediction.chi2,4) + "\n"
+                output += "L_SM: " + self._formatNumber(theoryPrediction.lsm,4) + \
+                          "   -2log(L/L_SM): " + self._formatNumber(chi2sm,4) + "\n"
 
             if hasattr(self,"printextendedresults") and self.printextendedresults:
                 if theoryPrediction.mass:
@@ -762,6 +772,21 @@ class PyPrinter(BasicPrinter):
             infoDict['time spent'] =  "%.2fs" %(time.time() - self.time)
         return {'OutputStatus' : infoDict}
 
+    def _round ( self, number, n=6 ):
+        """ round a number to n significant digits, if it *is* a number """
+        if type(number) not in [ float, np.float64 ]:
+            return number
+        if np.isnan ( number ) or not np.isfinite ( number ):
+            return number
+        try:
+            if number == 0.:
+                return number
+            return round(number, -int(np.floor(np.sign(number) * np.log10(abs(number)))) + n)
+        except Exception as e:
+            pass
+        return number
+        # return round ( number, n )
+
     def _formatTheoryPredictionList(self, obj):
         """
         Format data of the TheoryPredictionList object.
@@ -820,12 +845,12 @@ class PyPrinter(BasicPrinter):
 
             sqrts = expResult.globalInfo.sqrts
 
-            r = theoryPrediction.getRValue(expected=False)
-            r_expected = theoryPrediction.getRValue(expected=True)
+            r = self._round ( theoryPrediction.getRValue(expected=False) )
+            r_expected = self._round ( theoryPrediction.getRValue(expected=True) )
 
-            resDict = {'maxcond': maxconds, 'theory prediction (fb)': value,
-                        'upper limit (fb)': ul,
-                        'expected upper limit (fb)': ulExpected,
+            resDict = {'maxcond': maxconds, 'theory prediction (fb)': self._round ( value ),
+                        'upper limit (fb)': self._round ( ul ),
+                        'expected upper limit (fb)': self._round ( ulExpected ),
                         'TxNames': sorted(txnamesDict.keys()),
                         'Mass (GeV)': mass,
                         'AnalysisID': expID,
@@ -839,10 +864,10 @@ class PyPrinter(BasicPrinter):
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
             if hasattr(theoryPrediction,'likelihood') and not theoryPrediction.likelihood is None:
-                resDict['chi2'] = theoryPrediction.chi2
-                resDict['likelihood'] = theoryPrediction.likelihood
-                resDict['l_max'] = theoryPrediction.lmax
-                resDict['l_SM'] = theoryPrediction.lsm
+                resDict['chi2'] = self._round ( theoryPrediction.chi2 )
+                resDict['likelihood'] = self._round ( self.theoryPrediction.likelihood )
+                resDict['l_max'] = self._round ( theoryPrediction.lmax )
+                resDict['l_SM'] = self._round ( theoryPrediction.lsm )
             ExptRes.append(resDict)
 
 
@@ -903,10 +928,11 @@ class PyPrinter(BasicPrinter):
         #Add summary of groups:
         for group in groups:
             sqrts = group.sqrts.asNumber(TeV)
-            uncoveredDict["Total xsec for %s (fb)" %group.description] = group.getTotalXSec()
+            uncoveredDict["Total xsec for %s (fb)" %group.description] = \
+               self._round ( group.getTotalXSec() )
             uncoveredDict["%s" %group.description] = []
             for genEl in group.generalElements[:nprint]:
-                genElDict = {'sqrts (TeV)' : sqrts, 'weight (fb)' : genEl.missingX,
+                genElDict = {'sqrts (TeV)' : sqrts, 'weight (fb)' : self._round(genEl.missingX ),
                                 'element' : str(genEl)}
                 if hasattr(self,"addelementlist") and self.addelementlist:
                     genElDict["element IDs"] = [el.elID for el in genEl._contributingElements]
