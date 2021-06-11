@@ -735,9 +735,10 @@ class LikelihoodComputer:
 
             # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
             # (keeping the same % error on signal):
+            if len(nsig)==1:
+                nsig = None
             maxllhd = self.lmax ( nsig, marginalize=marginalize, nll=True, 
                                   allowNegativeSignals=False )
-            
             chi2=2*(llhd-maxllhd)
             
             if not NP.isfinite ( chi2 ):
