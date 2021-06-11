@@ -292,7 +292,7 @@ class DataSet(object):
         return computer.likelihood(nsig, marginalize=marginalize)
 
     def lmax( self, deltas_rel=0.2, marginalize=False, expected=False,
-              allowNegativeSignals = True ):
+              allowNegativeSignals = False ):
         """
         Convenience function, computes the likelihood at nsig = observedN - expectedBG,
         assuming "deltas_rel" error on the signal efficiency.
@@ -560,7 +560,8 @@ class CombinedDataSet(object):
 
         return None
 
-    def lmax ( self, nsig, marginalize, deltas_rel, nll=False, expected=False ):
+    def lmax ( self, nsig, marginalize, deltas_rel, nll=False, expected=False,
+               allowNegativeSignals = False ):
         """ compute likelihood at maximum """
         if self.type == "simplified":
             nobs = [ x.dataInfo.observedN for x in self._datasets]
@@ -572,7 +573,7 @@ class CombinedDataSet(object):
             if type(nsig) in [ list, tuple ]:
                 nsig = np.array(nsig)
             computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-            mu_hat = computer.findMuHat ( nsig )
+            mu_hat = computer.findMuHat ( nsig, allowNegativeSignals=allowNegativeSignals )
             musig = nsig * mu_hat
             return computer.likelihood ( musig, marginalize=marginalize, nll=nll )
         if self.type == "pyhf":

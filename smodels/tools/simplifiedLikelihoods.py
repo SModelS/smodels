@@ -282,13 +282,13 @@ class LikelihoodComputer:
             ret = sum(ret)
         return ret
 
-    def findMuHat(self, signal_rel, allowNegatives = False ):
+    def findMuHat(self, signal_rel, allowNegativeSignals = False ):
         """
         Find the most likely signal strength mu
         given the relative signal strengths in each dataset (signal region).
         
         :param signal_rel: array with relative signal strengths 
-        :param allowNegatives: if true, then also allow for negative values
+        :param allowNegativeSignals: if true, then also allow for negative values
         
         :returns: mu_hat, the maximum likelihood estimate of mu
         """
@@ -321,7 +321,7 @@ class LikelihoodComputer:
             ## find mu_hat by finding the root of 1/L dL/dmu. We know
             ## that the zero has to be between min(mu_c) and max(mu_c).
             lower,upper = 0.,widener*max(NP.abs(mu_c))
-            if allowNegatives:
+            if allowNegativeSignals:
                 lower = widener*min(mu_c+[0.])
             lower_v = self.dLdMu(lower, signal_rel, theta_hat)
             upper_v = self.dLdMu(upper, signal_rel, theta_hat)
@@ -330,7 +330,7 @@ class LikelihoodComputer:
                 if upper_v < lower_v < 0.:
                     ## seems like we really want to go for mu_hat = 0.
                     return 0.
-                if allowNegatives:
+                if allowNegativeSignals:
                     logger.debug ( "weird. cant find a zero in the Brent bracket "\
                                    "for finding mu(hat). Let me try with a very small"
                                    " value." )
@@ -700,16 +700,22 @@ class LikelihoodComputer:
         else:
             return self.profileLikelihood(nsig, nll)
 
-    def lmax(self, marginalize=False, nll=False, allowNegativeSignals = True ):
+    def lmax(self, nsig = None, marginalize=False, nll=False, allowNegativeSignals = False ):
         """ convenience function, computes likelihood for nsig = nobs-nbg, 
         :param marginalize: if true, marginalize, if false, profile nuisances.
+        :param nsig: number of signal events, needed only for combinations
+                     if None, then it gets replaced with obsN - expBG
         :param nll: return nll instead of likelihood
         :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
         """
-        dn = self.model.observed-self.model.backgrounds
-        if not allowNegativeSignals and dn<0.:
-            dn = 0.
-        return self.likelihood(dn, marginalize=marginalize, nll=nll )
+        if type(nsig) == type(None):
+            nsig = self.model.observed-self.model.backgrounds
+        if len ( self.model.observed ) == 1:
+            if not allowNegativeSignals and nsig[0]<0.:
+                nsig = [ 0. ]
+            return self.likelihood(nsig, marginalize=marginalize, nll=nll )
+        muhat = self.findMuHat ( nsig , allowNegativeSignals = allowNegativeSignals )
+        return self.likelihood(muhat*nsig, marginalize=marginalize, nll=nll )
 
     def chi2(self, nsig, marginalize=False):
             """
@@ -729,7 +735,8 @@ class LikelihoodComputer:
 
             # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
             # (keeping the same % error on signal):
-            maxllhd = self.lmax ( marginalize=marginalize, nll=True )
+            maxllhd = self.lmax ( nsig, marginalize=marginalize, nll=True, 
+                                  allowNegativeSignals=False )
             
             chi2=2*(llhd-maxllhd)
             
