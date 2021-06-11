@@ -8,6 +8,9 @@ Release v2.1.x, xxx
   * added scan summary (summary.txt) when running over multiple files
   * added option to slha-printer (expandedOutput)
   * improved interactive plots 
+  * the likelihood is now maximized only for positive values of the signal strength,
+    e.g. in the computation of chi2
+  * small changes in the printers: values truncated and L_max and L_SM added
 
 Release v2.0.0, Mon 15 Mar 2021
 =======================================================
