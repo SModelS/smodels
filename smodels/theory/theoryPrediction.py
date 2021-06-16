@@ -163,6 +163,11 @@ class TheoryPrediction(object):
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood
         """
+        self.computeStatistics ( marginalize, deltas_rel )
+        if hasattr ( self, "likelihood" ):
+            return self.likelihood
+        return None
+        """
         if self.dataType()  == 'upperLimit':
             # FIXME treat the case of exisiting expected upper limit
             return self.likelihoodFromLimits ( mu, marginalize, deltas_rel, expected )
@@ -171,7 +176,9 @@ class TheoryPrediction(object):
             nsig = mu*(self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel,expected=expected)
             return llhd
+        # FIXME add combined!!
         return None
+        """
 
     def computeStatistics(self,marginalize=False,deltas_rel=0.2):
         """
