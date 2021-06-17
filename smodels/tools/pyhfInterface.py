@@ -393,7 +393,7 @@ class PyhfUpperLimitComputer:
             ret = float(ret[0])
         if nll:
             return ret
-        return np.exp(-ret)
+        return np.exp(-ret/2.)
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of looking for mu bounds
