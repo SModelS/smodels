@@ -86,7 +86,8 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   After this basic information, the signal cross section (|theory prediction|),
   the list of :ref:`condition values <ULconditions>`  (if applicable) and the corresponding observed
   upper limit are shown. Also, if available, the expected upper limit is included.
-  If  **computeStatistics** = True, the :math:`\chi^2` and likelihood values are printed
+  If  **computeStatistics** = True, the likelihood for the BSM signal, that for the SM hypothesis, 
+  and the maximum likelihood are printed
   (see :ref:`likelihood calculation <likelihoodCalc>`).
   Finally, if **printExtendedResults** = True, basic information about the |elements|
   being constrained, such as their masses\ [#f2]_, IDs and PIDs, is also shown.
@@ -173,7 +174,7 @@ Below we describe in detail the blocks contained in the summary output:
   the (theory cross section)/(observed upper limit) ratio (*r*) and, when available,
   the (theory cross section)/(expected upper limit) ratio (*r_expect*) are also printed.
   For |ULrs| the condition violation (see :ref:`upper limit conditions <ULconditions>`) is also included.
-  Finally, if  **computeStatistics** = True, the :math:`\chi^2` and likelihood values (for |EMrs|) are printed:
+  Finally, if  **computeStatistics** = True, the likelihood values (for |EMrs|) are printed:
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
    :lines: 10-23,36-40
@@ -254,8 +255,8 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   the signal cross section (theory prediction), the corresponding observed
   upper limit and the maximum condition violation (see :ref:`upper limit conditions <ULconditions>`) are shown.
   Furthermore, the masses and widths\ [#f3]_ of the |elements| contributing to the signal cross section, the
-  individual contribution of each |txname| (if **addTxWeights** = True) and the :math:`\chi^2` and
-  likelihood values (if **computeStatistics** = True) are also included.
+  individual contribution of each |txname| (if **addTxWeights** = True) and the likelihood values 
+  (if **computeStatistics** = True) are also included.
 
 .. literalinclude:: /images/gluino_squarks.slha.py
    :lines: 4148-4148
@@ -312,7 +313,7 @@ Below we give a description of each block together with a sample output.
   only the result with the highest :math:`r`-value is displayed.
   For each experimental result, the :ref:`Txname <TxName>`, the :math:`r`-value,
   the :ref:`condition violation <ULconditions>` and the experimental result ID are shown.
-  If **computeStatistics** = True, the :math:`\chi^2` and likelihood values
+  If **computeStatistics** = True, the likelihood values
   for |EMrs| are also printed:
 
 .. literalinclude:: /images/gluino_squarks.slha.smodelsslha
