@@ -47,7 +47,7 @@ class DatabaseTest(unittest.TestCase):
 
     def testLoadLatest(self):
         dblatest=Database ("latest")
-        latestver = dblatest.databaseVersion.replace(".","")
+        latestver = dblatest.databaseVersion.replace(".","").replace("official","")
         from databaseLoader import database
         thisver = database.databaseVersion.replace("unittest","").replace(".","")
         ilatestver = int ( latestver[:2] )
