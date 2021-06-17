@@ -98,12 +98,12 @@ We then search for the value :math:`CL_s = 0.95` using the Brent bracketing tech
 This is used for the computation the observed and expected :math:`r` values.
 
 In addition, SModelS reports *for each* |EMr| : 
-* the likelihood for the hypothezised signal, :math:`\mathcal{L}_{\mathrm{BSM}}` given by :math:`\mu=n_{\mathrm{signal}}`, 
-* the likelihood for the SM,  :math:`\mathcal{L}_{\mathrm{SM}}` given by :math:`\mu=0`, and 
-* the maximum likelihood :math:`\mathcal{L}_{\mathrm{max}}` obtained by setting :math:`\mu=n_{\mathrm{obs}}-b`.  
+  * the likelihood for the hypothezised signal, :math:`\mathcal{L}_{\mathrm{BSM}}` given by :math:`\mu=n_{\mathrm{signal}}`, 
+  * the likelihood for the SM,  :math:`\mathcal{L}_{\mathrm{SM}}` given by :math:`\mu=0`, and 
+  * the maximum likelihood :math:`\mathcal{L}_{\mathrm{max}}` obtained by setting :math:`\mu=n_{\mathrm{obs}}-b`.  
 
-While :math:`n_{\mathrm{obs}}`, :math:`b`  and :math:`\delta_{b}` are directly extracted from
-the data set (coined *observedN*, *expectedBG* and *bgError*, respectively),
+Here :math:`n_{\mathrm{obs}}`, :math:`b`  and :math:`\delta_{b}` are directly extracted from
+the data set (coined *observedN*, *expectedBG* and *bgError*, respectively), while 
 :math:`n_{\mathrm{signal}}` is obtained from the calculation of the
 theory predictions. A default 20\% systematical uncertainty is assumed for :math:`n_{\mathrm{signal}}`,
 resulting in :math:`\delta^2 = \delta_{b}^2 + \left(0.2 n_{\mathrm{signal}}\right)^2`.
@@ -116,8 +116,8 @@ best expected limit does not wildly jump within
 continuous regions of parameter space that give roughly the same phenomenology.
 
 Finally, note that in earlier SModelS versions, a :math:`\chi^2` value, 
-defined as :math:`\chi^2=-2 \ln \frac{\mathcal{L}_{BSM}}{\mathcal{L}_{max}}` was reported instead of 
-:math:`\mathcal{L}_{max}` and :math:`\mathcal{L}_{SM}`.
+defined as :math:`\chi^2=-2 \ln \frac{\mathcal{L}_{\mathrm{BSM}}}{\mathcal{L}_{\mathrm{max}}}` was reported instead of 
+:math:`\mathcal{L}_{max}` and :math:`\mathcal{L}_{\mathrm{SM}}`.
 From v2.1 onwards, the definition of a test statistic for, e.g., likelihood ratio tests, is left to the user. 
 
 
