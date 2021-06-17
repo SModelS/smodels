@@ -223,9 +223,11 @@ class BasicPrinter(object):
         typeStr = type(obj).__name__
         try:
             formatFunction = getattr(self,'_format'+typeStr)
-            return formatFunction(obj)
+            ret = formatFunction(obj)
+            # print ( " `-", len(ret))
+            return ret
         except AttributeError as e:
-            logger.debug('Error formating object %s: \n %s' %(typeStr,e))
+            logger.warning('Error formating object %s: \n %s' %(typeStr,e))
             return False
 
 class TxTPrinter(BasicPrinter):
@@ -865,7 +867,7 @@ class PyPrinter(BasicPrinter):
                 resDict['TxNames weights (fb)'] =  txnamesDict
             if hasattr(theoryPrediction,'likelihood') and not theoryPrediction.likelihood is None:
                 resDict['chi2'] = self._round ( theoryPrediction.chi2 )
-                resDict['likelihood'] = self._round ( self.theoryPrediction.likelihood )
+                resDict['likelihood'] = self._round ( theoryPrediction.likelihood )
                 resDict['l_max'] = self._round ( theoryPrediction.lmax )
                 resDict['l_SM'] = self._round ( theoryPrediction.lsm )
             ExptRes.append(resDict)
