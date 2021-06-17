@@ -131,9 +131,9 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileComputeStatistics:
 
-  * **computeStatistics** (True/False): turns the likelihood and :math:`\chi^2` computation on or off
+  * **computeStatistics** (True/False): turns the likelihood computation on or off
     (see :ref:`likelihood calculation <likelihoodCalc>`).
-    If True, the likelihood and :math:`\chi^2` values are computed for the |EMrs|.
+    If True, the likelihoods L_BSM, L_SM and L_max are computed for the |EMrs|.
 
 .. _parameterFileTestCoverage:
 
@@ -467,7 +467,7 @@ can take as arguments specific results to be loaded.
 
 * *Print the r-value*, i.e. the ratio |theory prediction|/upper limit.
   A value of :math:`r \geq 1` means that an experimental result excludes the input model.
-  For |EMrs| also compute the :math:`\chi^2` and :ref:`likelihood <likelihoodCalc>`.
+  For |EMrs| also compute the :ref:`likelihood <likelihoodCalc>` values.
   Determine the most constraining result:
 
 .. literalinclude:: /examples/Example.py
