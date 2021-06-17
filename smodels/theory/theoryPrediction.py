@@ -182,9 +182,9 @@ class TheoryPrediction(object):
 
     def computeStatistics(self,marginalize=False,deltas_rel=0.2):
         """
-        Compute the likelihood, chi2 and expected upper limit for this theory prediction.
-        The resulting values are stored as the likelihood and chi2
-        attributes.
+        Compute the likelihoods, chi2 and expected upper limit for this theory prediction.
+        The resulting values are stored as the likelihood, lmax, lsm and chi2
+        attributes (chi2 being phased out).
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         """

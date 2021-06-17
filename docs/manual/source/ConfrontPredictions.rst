@@ -91,38 +91,39 @@ properly described by a Poissonian. The complete likelihood thus reads:
 .. math::
    \mathcal{L}(\mu,\theta|D) = \frac{(\mu + b + \theta)^{n_{obs}} e^{-(\mu + b + \theta)}}{n_{obs}!} exp \left( -\frac{\theta^2}{2\delta^2} \right)
 
-where :math:`n_{obs}` is the number of observed events in the signal region.
-A test statistic :math:`T` can now be constructed from a likelihood ratio test:
+where :math:`n_{obs}` is the number of observed events in the signal region. 
+From this likelihood we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al.,
+`Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_.
+We then search for the value :math:`CL_s = 0.95` using the Brent bracketing technique available through the `scipy optimize library <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_. 
+This is used for the computation the observed and expected :math:`r` values.
 
-.. math::
-   \begin{split}T = -2 \ln \frac{H_0}{H_1} = -2 \ln \left(\frac{\mathcal{L}(\mu=n_{\mathrm{signal}},\theta|D)}{sup\{\mathcal{L}(\mu,\theta|D) : \mu \in \mathbb{R}^+ \}}\right)\end{split}
+In addition, SModelS reports *for each* |EMr| : 
+* the likelihood for the hypothezised signal, :math:`\mathcal{L}_{\mathrm{BSM}}` given by :math:`\mu=n_{\mathrm{signal}}`, 
+* the likelihood for the SM,  :math:`\mathcal{L}_{\mathrm{SM}}` given by :math:`\mu=0`, and 
+* the maximum likelihood :math:`\mathcal{L}_{\mathrm{max}}` obtained by setting :math:`\mu=n_{\mathrm{obs}}-b`.  
 
-As the signal hypothesis in the numerator presents a special case of the
-likelihood in the denominator, the Neyman-Pearson lemma holds, and we
-can assume :math:`T` to be distributed according to a :math:`\chi^2` distribution
-with one degree of freedom. Because :math:`H_0` assumes the signal strength of
-a particular model, :math:`T=0`  corresponds to a perfect match between that
-model's prediction and the measured data. :math:`T \gtrsim 3.84` corresponds to
-a 95\% confidence level upper limit.
 While :math:`n_{\mathrm{obs}}`, :math:`b`  and :math:`\delta_{b}` are directly extracted from
-the data set
-(coined *observedN*, *expectedBG* and *bgError*, respectively),
+the data set (coined *observedN*, *expectedBG* and *bgError*, respectively),
 :math:`n_{\mathrm{signal}}` is obtained from the calculation of the
 theory predictions. A default 20\% systematical uncertainty is assumed for :math:`n_{\mathrm{signal}}`,
 resulting in :math:`\delta^2 = \delta_{b}^2 + \left(0.2 n_{\mathrm{signal}}\right)^2`.
 
-SModelS reports the :math:`\chi^2` (:math:`T` values) and likelihood *for each* |EMr|,
-together with the observed and expected :math:`r` values.
-We note that in the general case analyses may be correlated, so summing up the :math:`T`
-values will no longer follow a :math:`\chi^2_{(n)}`  distribution.
+We note that in the general case analyses may be correlated, so the likelihoods from different analyses 
+cannot straightforwardly be combined into a global one.
 Therefore, for a conservative interpretation, only the result with the best expected limit should be used.
 Moreover, for a statistically rigorous usage in scans, it is recommended to check that the analysis giving the
 best expected limit does not wildly jump within
 continuous regions of parameter space that give roughly the same phenomenology.
 
+Finally, note that in earlier SModelS versions, a :math:`\chi^2` value, 
+defined as :math:`\chi^2=-2 \ln \frac{\mathcal{L}_{BSM}}{\mathcal{L}_{max}}` was reported instead of 
+:math:`\mathcal{L}_{max}` and :math:`\mathcal{L}_{SM}`.
+From v2.1 onwards, the definition of a test statistic for, e.g., likelihood ratio tests, is left to the user. 
 
+
+* **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.likelihood>`_ 
+* **The maximum likelihood for a given** |EMr| **is computed using the** `lmax  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.lmax>`_
 * **The** :math:`\chi^2` **for a given** |EMr| **is computed using the** `chi2  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.chi2>`_
-* **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.likelihood>`_
 
 
 .. _combineSRs:
@@ -148,10 +149,9 @@ the likelihood for the signal hypothesis when combining signal regions is given 
 where the product is over all :math:`N` signal regions, :math:`\mu` is the overall signal strength, :math:`s_i^r` the relative signal strength
 in each signal region and :math:`V` represents the covariance matrix.
 Note, however, that unlike the case of a single signal region, we do not include any signal uncertainties, since this
-should correspond to a second order effect.
+should correspond to a second-order effect.
 
-
-Using the above likelihood we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the
+As above, we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the
 test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al.,
 `Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_.
 We then search for the value :math:`CL_s = 0.95` using the Brent bracketing technique available through the `scipy optimize library <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_.
