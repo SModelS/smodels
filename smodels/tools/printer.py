@@ -781,7 +781,7 @@ class PyPrinter(BasicPrinter):
         if np.isnan ( number ) or not np.isfinite ( number ):
             return number
         try:
-            if number == 0.:
+            if abs(number) < 1e-40:
                 return number
             return round(number, -int(np.floor(np.sign(number) * np.log10(abs(number)))) + n)
         except Exception as e:
