@@ -571,6 +571,11 @@ class SubDatabase(object):
         """
         return self.txt_meta.databaseVersion
 
+    @databaseVersion.setter
+    def databaseVersion(self, x ):
+        self.txt_meta.databaseVersion = x
+        self.pcl_meta.databaseVersion = x
+
     def inNotebook(self):
         """
         Are we running within a notebook? Has an effect on the
