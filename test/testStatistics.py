@@ -145,7 +145,7 @@ class StatisticsTest(unittest.TestCase):
         nll = computer.likelihood(2, marginalize=False, nll=True )
         self.assertAlmostEqual(0., llhd, places=2)
         dchi2 = computer.chi2( nsig, marginalize=False )
-        ichi2=4.486108149972863e+21
+        ichi2= 4.486108149972863e+21
         self.assertAlmostEqual(ichi2, dchi2, places=2)
 
     def round_to_sign(self, x, sig=3):
