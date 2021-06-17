@@ -135,6 +135,19 @@ class StatisticsTest(unittest.TestCase):
         # print ( "dchi2,ichi2",dchi2,ichi2)
         self.assertAlmostEqual(ichi2, dchi2, places=2)
 
+    def testZeroLikelihood(self):
+        """ A test to check if a llhd of 0 is being tolerated
+        """
+        nsig = 2
+        m = Data(1e20, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2 )
+        computer = LikelihoodComputer(m)
+        llhd = computer.likelihood(2, marginalize=False )
+        nll = computer.likelihood(2, marginalize=False, nll=True )
+        self.assertAlmostEqual(0., llhd, places=2)
+        dchi2 = computer.chi2( nsig, marginalize=False )
+        ichi2=4.486108149972863e+21
+        self.assertAlmostEqual(ichi2, dchi2, places=2)
+
     def round_to_sign(self, x, sig=3):
         """
         Round the given number to the significant number of digits.
