@@ -207,7 +207,13 @@ class TheoryPrediction(object):
             self.lmax = llhd_max
             self.lsm = llhd_sm
             from math import log
-            chi2 = -2 * log ( llhd / llhd_max )
+            chi2 = None
+            if llhd == 0. and llhd_max == 0.:
+                chi2 = 0.
+            if llhd == 0. and llhd_max > 0.:
+                chi2 = float("inf")
+            if llhd > 0.:
+                chi2 = -2 * log ( llhd / llhd_max )
             self.chi2 = chi2
 
         elif self.dataType() == 'combined':
