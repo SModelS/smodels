@@ -77,7 +77,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   weight, the PIDs of the BSM |particles| contributing to the |element| and the element ID:
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 835-904
+   :lines: 512-581
 
 
 * a list of all the |theory predictions| obtained and the corresponding |expres| upper limit.
@@ -93,7 +93,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   being constrained, such as their masses\ [#f2]_, IDs and PIDs, is also shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 96691-96752
+   :lines: 107624-107746
 
 * summary information about the :ref:`missing topologies <topCoverage>`, if **testCoverage** = True.
   The total missing topology cross section
@@ -106,7 +106,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   total cross section outside the grid.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 97930-97933
+   :lines: 109735-109738
 
 
 * detailed information about the missing topologies with highest cross sections.
@@ -117,25 +117,25 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   obtained with **printDecomp** = True and **addElementInfo** = True.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 97937-97941
+   :lines: 109740-109753
 
 * information about the missing topologies with displaced decays.
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 97960-97961
+   :lines: 109754-109755
 
 * information about the missing topologies with prompt decays.
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 97962-97966
+   :lines: 109756-109768
 
 * detailed information about the topologies which are outside the  |express| grid.
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 97986-97992
+   :lines: 109769-109781
 
 
 .. _logOut:
