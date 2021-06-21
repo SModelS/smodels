@@ -54,7 +54,7 @@ behavior can be disabled by setting *useBestDataset=False* in `theoryPredictions
 
 The procedure described above can be applied to all the |ExpRess| in the database, resulting
 in a list of theory predictions and upper limits for each |ExpRes|. A model can then be considered
-excluded by the experimental results if, for one or more predictions, we have *theory prediction* :math:`>` *upper limit* [*]_.
+excluded by the experimental results if, for one or more predictions, we have *theory prediction* :math:`>` *upper limit* [1]_.
 
 * **The upper limits for a given**  |ULr| **or** |EMr| **can be obtained using the** `getUpperLimitFor  method <experiment.html#experiment.expResultObj.ExpResult.getUpperLimitFor>`_
 
@@ -206,5 +206,4 @@ using the best signal region (left) to using the full likelihood (right).
 Figure: Comparison of exclusion curves for `ATLAS-SUSY-2019-08 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2019-08/>`_ using only the best signal region (left), and the combination of all 9 signal regions with pyhf (right).
 
 
-.. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
-   is being tested by a large number of results simultaneously.
+.. [1] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model is being tested by a large number of results simultaneously.
