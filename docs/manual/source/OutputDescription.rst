@@ -117,25 +117,25 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   obtained with **printDecomp** = True and **addElementInfo** = True.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 109740-109754
+   :lines: 109740-109753
 
 * information about the missing topologies with displaced decays.
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 109755-109756
+   :lines: 109754-109755
 
 * information about the missing topologies with prompt decays.
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 109757-109769
+   :lines: 109756-109768
 
 * detailed information about the topologies which are outside the  |express| grid.
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 109770-109782
+   :lines: 109769-109781
 
 
 .. _logOut:
@@ -183,7 +183,7 @@ Below we describe in detail the blocks contained in the summary output:
   greater or equal 1, the input model is likely excluded by one of the |express| (see :ref:`confronting predictions <confrontPredictions>`)
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 496
+   :line: 496
 
   for a more informed statistical interpretation, the ATLAS and CMS analyses with highest available 
   *expected* r value are reported in addition:
@@ -210,22 +210,22 @@ Below we describe in detail the blocks contained in the summary output:
   (in :ref:`bracket notation <bracketNotation>`) is included for each distinct :ref:`coverage group <coverageGroups>`.
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 505-518
+   :lines: 505-517
 
 * information about the missing topologies with displaced decays.
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 520
+   :lines: 520-521
 
 * information about the missing topologies with prompt decays.
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 522-533
+   :lines: 522-532
 
 * information about the topologies which are outside the  |express| grid
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 535-546
+   :lines: 535-545
 
 .. _pyOut:
 
