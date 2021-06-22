@@ -772,7 +772,7 @@ class UpperLimitComputer:
         :params toys: specify number of toys. Use default is none
         :params expected: compute the expected value, not the observed.
         :params trylasttime: if True, then dont try extra
-        :returns: upper limit on *production* xsec (efficiencies unfolded)
+        :returns: upper limit on yields
         """
         #if expected:
         #    marginalize = True
