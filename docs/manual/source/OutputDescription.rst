@@ -259,7 +259,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   (if **computeStatistics** = True) are also included.
 
 .. literalinclude:: /images/gluino_squarks.slha.py
-   :lines: 4148-4148
+   :lines: 5-5
 
 * the total cross section in each :ref:`missing topology group <coverageGroups>`  (if **testCoverage** = True) followed by a list
   of |elements| contributing to the group.
@@ -268,7 +268,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   is included (see :ref:`missing topology group <coverageGroups>`).
 
 .. literalinclude:: /images/gluino_squarks.slha.py
-   :lines: 4245,4265-4266,4286
+   :lines: 6-9
 
 .. _xmlOut:
 
@@ -317,12 +317,12 @@ Below we give a description of each block together with a sample output.
   for |EMrs| are also printed:
 
 .. literalinclude:: /images/gluino_squarks.slha.smodelsslha
-   :lines: 12-19
+   :lines: 12-20
 
 * the label of each :ref:`coverage group <coverageGroups>` (first entry) and the total cross section in each group (second entry) (if **testCoverage** = True):
 
 .. literalinclude:: /images/gluino_squarks.slha.smodelsslha
-   :lines: 40-48
+   :lines: 1163-1171
 
 
 .. _scanSummary:
