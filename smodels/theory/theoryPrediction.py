@@ -88,13 +88,13 @@ class TheoryPrediction(object):
                                                                 txnames=self.txnames,
                                                                 expected=False)
             if self.dataType() == 'combined':
-                lumi = self.dataset.getLumi()
                 #Create a list of signal events in each dataset/SR sorted according to datasetOrder
+                # lumi = self.dataset.getLumi()
                 if hasattr(self.dataset.globalInfo, "covariance"):
-                    srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
+                    srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*pred.dataset.getLumi() ).asNumber()] for pred in self.datasetPredictions])
                     srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
                 elif hasattr(self.dataset.globalInfo, "jsonFiles"):
-                    srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
+                    srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*pred.dataset.getLumi() ).asNumber()] for pred in self.datasetPredictions])
                     srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
                 self.expectedUL = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=True,deltas_rel=deltas_rel)
                 self.upperLimit = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=False,deltas_rel=deltas_rel)
