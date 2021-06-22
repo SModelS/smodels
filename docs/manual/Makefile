@@ -141,12 +141,14 @@ latex:
 	      "(use \`make latexpdf' here to do that automatically)."
 
 latexpdf:
+	@export buf_size=1000000
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
 	@echo "Running LaTeX files through pdflatex..."
 	$(MAKE) -C $(BUILDDIR)/latex all-pdf
 	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/latex."
 
 latexpdfja:
+	@export buf_size=1000000
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
 	@echo "Running LaTeX files through platex and dvipdfmx..."
 	$(MAKE) -C $(BUILDDIR)/latex all-pdf-ja

@@ -519,7 +519,7 @@ class PyhfUpperLimitComputer:
         ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
         endUL = time.time()
         logger.debug("ulSigma elpased time : %1.4f secs" % (endUL - startUL))
-        return ul*self.scale # self.scale has been updated whithin self.rescale() method
+        return ul*self.scale # self.scale has been updated within self.rescale() method
 
 if __name__ == "__main__":
     C = [ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
