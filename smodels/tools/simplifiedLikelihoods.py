@@ -12,7 +12,7 @@
 """
 
 from __future__ import print_function
-from scipy import stats, optimize, integrate, special
+from scipy import stats, optimize, integrate, special, linalg
 from numpy  import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
 import numpy as NP
@@ -461,7 +461,8 @@ class LikelihoodComputer:
             ## for now deal with variances only
             ntot = nb + nsig
             cov = NP.array(sigma2)
-            weight = cov**(-1) ## weight matrix
+            # weight = cov**(-1) ## weight matrix
+            weight = linalg.inv(cov)
             diag_cov = NP.diag(cov)
             # first: no covariances:
             q = diag_cov * ( ntot - nobs )
