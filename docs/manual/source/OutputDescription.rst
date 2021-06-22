@@ -135,7 +135,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 109769-109781
+   :lines: 109768-109781
 
 
 .. _logOut:
@@ -180,16 +180,10 @@ Below we describe in detail the blocks contained in the summary output:
    :lines: 10-29
 
 * the maximum r value, that is the highest (theory cross section)/(observed upper limit) ratio. If this value is
-  greater or equal 1, the input model is likely excluded by one of the |express| (see :ref:`confronting predictions <confrontPredictions>`)
+  greater or equal 1, the input model is likely excluded by one of the |express| (see :ref:`confronting predictions <confrontPredictions>`).  For a more informed statistical interpretation, from v2.1 onward the ATLAS and CMS analyses with highest available *expected* r value are reported in addition.
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :line: 496
-
-  for a more informed statistical interpretation, the ATLAS and CMS analyses with highest available 
-  *expected* r value are reported in addition:
-
-.. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 497-498
+   :lines: 496-498
 
 * summary information about the :ref:`missing topologies <topCoverage>`, if **testCoverage** = True.
   The total missing topology cross section
@@ -215,17 +209,17 @@ Below we describe in detail the blocks contained in the summary output:
 * information about the missing topologies with displaced decays.
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 520-521
+   :lines: 519-520
 
 * information about the missing topologies with prompt decays.
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 522-532
+   :lines: 521-533
 
 * information about the topologies which are outside the  |express| grid
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 535-545
+   :lines: 534-546
 
 .. _pyOut:
 
