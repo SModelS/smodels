@@ -5,7 +5,7 @@ Decomposition output status: 1 #decomposition was successful
 # minmassgap = 5.
 # ncpus = 1
 # sigmacut = 0.005
-# Database version: official210
+# Database version: 2.1.0
 ================================================================================
 #Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected
 
