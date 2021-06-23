@@ -135,7 +135,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 109768-109781
+   :lines: 109769-109781
 
 
 .. _logOut:
@@ -180,7 +180,7 @@ Below we describe in detail the blocks contained in the summary output:
    :lines: 10-29
 
 * the maximum r value, that is the highest (theory cross section)/(observed upper limit) ratio. If this value is
-  greater or equal 1, the input model is likely excluded by one of the |express| (see :ref:`confronting predictions <confrontPredictions>`).  For a more informed statistical interpretation, from v2.1 onward the ATLAS and CMS analyses with highest available *expected* r value are reported in addition.
+  greater or equal 1, the input model is likely excluded by one of the |express| (see :ref:`confronting predictions <confrontPredictions>`).  For a more informed statistical interpretation, from v2.1 onward the ATLAS and CMS analyses with highest available *expected* r values are reported in addition.
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
    :lines: 496-498
@@ -246,7 +246,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   set **addElementList** to False, unless the |decomposition| information is required by the user.
 
 .. literalinclude:: /images/gluino_squarks.slha.py
-   :lines: 3-4
+   :lines: 3-4, 41-42
 
 
 * a list of all the |theory predictions| obtained for the |express|, stored under the *ExptRes* key.
@@ -259,7 +259,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   (if **computeStatistics** = True) are also included.
 
 .. literalinclude:: /images/gluino_squarks.slha.py
-   :lines: 5-5
+   :lines: 55-55
 
 * the total cross section in each :ref:`missing topology group <coverageGroups>`  (if **testCoverage** = True) followed by a list
   of |elements| contributing to the group.
@@ -268,7 +268,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   is included (see :ref:`missing topology group <coverageGroups>`).
 
 .. literalinclude:: /images/gluino_squarks.slha.py
-   :lines: 6-9
+   :lines: 56-59
 
 .. _xmlOut:
 
