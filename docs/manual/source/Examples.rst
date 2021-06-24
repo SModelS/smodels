@@ -1,7 +1,7 @@
 .. index:: How To's
 
 .. |binder| image::
-      https://mybinder.org/badge.svg
+      images/mybinder.png
       :target: https://mybinder.org/v2/gh/SModelS/smodels/master?filepath=docs%2Fmanual%2Fsource%2Frecipes%2F
 
 
@@ -12,7 +12,7 @@ How To's
 
 
 
-Below we provide a few examples for using SModelS and some of the :ref:`SModelS tools <smodelsTools>` as a Python library [*]_.
+Below we provide a few examples for using SModelS and some of the :ref:`SModelS tools <smodelsTools>` as a Python library [1]_.
 
 
 To try out the examples in interactive mode: |binder|
@@ -70,4 +70,4 @@ Examples using the Interactive Plots tool
 * `How to make interactive plots <interactivePlotsExample.html>`_ (download the Python code :download:`here <recipes/interactivePlotsExample.py>`, IPython notebook :download:`here <recipes/interactivePlotsExample.ipynb>`)
 
 
-.. [*] Some of the output may change depending on the database version used.
+.. [1] Some of the output may change depending on the database version used.
