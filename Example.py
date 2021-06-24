@@ -121,7 +121,7 @@ def main():
     else:
         print("(The input model is not excluded by the simplified model results)" )
       
-    #Find out missing topologies for sqrts=8*TeV:
+    #Find out missing topologies for sqrts=13*TeV:
     uncovered = coverage.Uncovered(toplist,sqrts=13.*TeV)
     #First sort coverage groups by label
     groups = sorted(uncovered.groups[:], key = lambda g: g.label)

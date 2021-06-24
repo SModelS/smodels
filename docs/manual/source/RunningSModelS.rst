@@ -495,7 +495,7 @@ can take as arguments specific results to be loaded.
   the :ref:`missing topologies <topCoverage>` and print some basic information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 125-150
+   :lines: 124-150
 
 
 *output:*
