@@ -57,7 +57,7 @@ code (:ref:`Example.py <exampleCode>`) are described below.
 .. note:: For non-MSSM (incl. non-SUSY) input models the user needs to write their own *model.py*
           file and specify which BSM particles are even or odd under the assumed
           Z\ :sub:`2` (or similar) symmetry (see :ref:`adding new particles <newParticles>`).
-          From version 1.2.0 onwards it is also necessary to define the BSM particle quantum numbers in the same file [#]_.
+          From version 1.2.0 onwards it is also necessary to define the BSM particle quantum numbers in the same file [1]_.
 
 
 
@@ -523,4 +523,4 @@ Due to this, the results are claimed to be "likely excluded" in the output.
    Unfortunately, for |ULrs|, the expected limits are often not available;
    :math:`r_{exp}` is then reported as N/A in the SModelS output.
 
-.. [#] We note that SLHA files including decay tables and cross sections, together with the corresponding *model.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_
+.. [1] We note that SLHA files including decay tables and cross sections, together with the corresponding *model.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_
