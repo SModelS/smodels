@@ -523,4 +523,4 @@ Due to this, the results are claimed to be "likely excluded" in the output.
    Unfortunately, for |ULrs|, the expected limits are often not available;
    :math:`r_{exp}` is then reported as N/A in the SModelS output.
 
-.. [1] We note that SLHA files including decay tables and cross sections, together with the corresponding *model.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_
+.. [1] SLHA files including decay tables and cross sections, together with the corresponding *model.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_
