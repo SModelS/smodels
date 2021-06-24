@@ -8,12 +8,10 @@ from __future__ import print_function
 """
 """ Import basic functions (this file must be executed in the installation folder) """
 
-
 from smodels.tools import runtime
 #Define your model (list of BSM particles)
 runtime.modelFile = 'smodels.share.models.mssm'
 #runtime.modelFile = 'mssmQNumbers.slha'
-
 
 from smodels.theory import decomposer
 from smodels.tools.physicsUnits import fb, GeV, TeV
@@ -124,7 +122,7 @@ def main():
         print("(The input model is not excluded by the simplified model results)" )
       
     #Find out missing topologies for sqrts=8*TeV:
-    uncovered = coverage.Uncovered(toplist,sqrts=8.*TeV)
+    uncovered = coverage.Uncovered(toplist,sqrts=13.*TeV)
     #First sort coverage groups by label
     groups = sorted(uncovered.groups[:], key = lambda g: g.label)
     #Print uncovered cross-sections:
