@@ -47,9 +47,9 @@ New in Version 2.1.0:
   * added scan summary (:ref:`summary.txt <scanSummary>`) when running over multiple files
   * added option to slha-printer (:ref:`expandedOutput <parameterFileSLHAprinter>`)
   * improved :ref:`interactive plots <interactivePlots>`
+  * small changes in the `printers <tools.html#module-tools.printer>`_, L_max and L_SM added
   * the likelihood is now maximized only for positive values of the signal strength,
-    e.g. in the computation of `chi2 <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.chi2>`_
-  * small changes in the `printers <tools.html#module-tools.printer>`_: values truncated and L_max and L_SM added
+    in the computation of `lmax <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.lmax>`_
 
 New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^

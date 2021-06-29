@@ -866,7 +866,7 @@ class PyPrinter(BasicPrinter):
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
             if hasattr(theoryPrediction,'likelihood') and not theoryPrediction.likelihood is None:
-                resDict['chi2'] = self._round ( theoryPrediction.chi2 )
+                # resDict['chi2'] = self._round ( theoryPrediction.chi2 )
                 resDict['likelihood'] = self._round ( theoryPrediction.likelihood )
                 resDict['l_max'] = self._round ( theoryPrediction.lmax )
                 resDict['l_SM'] = self._round ( theoryPrediction.lsm )
