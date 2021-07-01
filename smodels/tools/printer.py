@@ -778,6 +778,8 @@ class PyPrinter(BasicPrinter):
         """ round a number to n significant digits, if it *is* a number """
         if type(number) not in [ float, np.float64 ]:
             return number
+        if not np.isfinite( number ):
+            return f'float("{number}")'
         if np.isnan ( number ) or not np.isfinite ( number ):
             return number
         try:
