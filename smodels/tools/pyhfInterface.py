@@ -82,7 +82,7 @@ class PyhfData:
         self.combinations = None
         if jsonFiles != None:
             self.combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
-            
+
         self.nWS = len(inputJsons)
         self.errorFlag = False
         self.getWSInfo()
@@ -303,6 +303,20 @@ class PyhfUpperLimitComputer:
             ret = float(ret[0])
         return np.exp(-ret/2.)
 
+
+    def getBestCombination( self ):
+        """ find the best expected combination """
+        logger.debug("Performing best expected combination")
+        ulMin = float('+inf')
+        for i_ws in range(self.nWS):
+            ul = self.ulSigma(expected=True, workspace_index=i_ws)
+            if ul == None:
+                continue
+            if ul < ulMin:
+                ulMin = ul
+                i_best = i_ws
+        return self.data.combinations[i_best]
+
     def chi2(self, workspace_index=None):
         """
         Returns the chi square
@@ -390,7 +404,7 @@ class PyhfUpperLimitComputer:
                 if sp['name'] == 'bsm':
                     sp['data'] = dn
         logger.debug(workspace['channels'][0]['samples'][0])
-        _, maxNllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model), model, 
+        _, maxNllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model), model,
                                                    return_fitted_val=True)
         ret = maxNllh.tolist()
         try:
