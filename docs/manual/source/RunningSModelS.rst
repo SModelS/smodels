@@ -360,12 +360,18 @@ users more familiar with Python and the SModelS language may prefer to write the
 A simple example code for this purpose is provided in :download:`examples/Example.py`.
 Below we go step-by-step through this example code:
 
+* *Define the input model*. By default SModelS assumes the MSSM particle content. For using SModelS
+  with a different particle content, the user must define the new particle content and set modelFile
+  to the path of the model file (see **particles:model** in :ref:`Parameter File <parameterFile>`).
+
+.. literalinclude:: /examples/Example.py
+   :lines: 11-14
 
 * *Import the SModelS modules and methods*. If the example code file is not located in
   the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. Set SModelS verbosity level. 
 
 .. literalinclude:: /examples/Example.py
-   :lines: 11-24
+   :lines: 16-24
 
 * *Set the path to the database URL*. Specify which :ref:`database <databaseStruct>` to use. It can be the path
   to the smodels-database folder, the path to a :ref:`pickle file <databasePickle>` or (starting with v1.1.3) a URL path.
@@ -373,19 +379,11 @@ Below we go step-by-step through this example code:
 .. literalinclude:: /examples/Example.py
    :lines: 27-28
 
-* *Define the input model*. By default SModelS assumes the MSSM particle content. For using SModelS
-  with a different particle content, the user must define the new particle content and set modelFile
-  to the path of the model file (see **particles:model** in :ref:`Parameter File <parameterFile>`).
+* *Load the model and set the path to the input file*. Load BSM and SM particle content; specify the location of the input file 
+(must be an SLHA or LHE file, see :ref:`Basic Input <BasicInput>`) and update particles in the model.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 34-34, 37-37
-
-
-* *Path to the input file*. Specify the location of the input file. It must be a
-  SLHA or LHE file (see :ref:`Basic Input <BasicInput>`).
-
-.. literalinclude:: /examples/Example.py
-   :lines: 35-39
+   :lines: 34-39
 
 * *Set main options for* |decomposition|.
   Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:
