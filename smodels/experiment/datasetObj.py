@@ -577,7 +577,8 @@ class CombinedDataSet(object):
             musig = nsig * mu_hat
             return computer.likelihood ( musig, marginalize=marginalize, nll=nll )
         if self.type == "pyhf":
-            ulcomputer, combinations = self.getPyhfComputer( nsig )
+            ulcomputer = self.getPyhfComputer( nsig )
+            combinations = ulcomputer.data.combinations
             return ulcomputer.lmax ( nll=False )
         return -1.
 
@@ -587,7 +588,6 @@ class CombinedDataSet(object):
         """
         # Getting the path to the json files
         jsonFiles = [js for js in self.globalInfo.jsonFiles]
-        combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
         jsons = self.globalInfo.jsons.copy()
         datasets = [ds.getID() for ds in self._datasets]
         total = sum(nsig)
@@ -621,10 +621,10 @@ class CombinedDataSet(object):
             nsignals.append(subSig)
         # Loading the jsonFiles, unless we already have them (because we pickled)
         from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
-        data = PyhfData(nsignals, jsons )
+        data = PyhfData(nsignals, jsons, jsonFiles )
         if data.errorFlag: return None
         ulcomputer = PyhfUpperLimitComputer(data)
-        return ulcomputer,combinations
+        return ulcomputer
 
     def getCombinedUpperLimitFor(self, nsig, expected=False, deltas_rel=0.2):
         """
@@ -666,7 +666,8 @@ class CombinedDataSet(object):
             if all([s == 0 for s in nsig]):
                 logger.warning("All signals are empty")
                 return None
-            ulcomputer, combinations = self.getPyhfComputer( nsig )
+            ulcomputer = self.getPyhfComputer( nsig )
+            combinations = ulcomputer.data.combinations
             if ulcomputer.nWS == 1:
                 ret = ulcomputer.ulSigma(expected=expected)
                 ret = ret/self.getLumi()
@@ -730,7 +731,8 @@ class CombinedDataSet(object):
         elif hasattr(self.globalInfo, "jsonFiles"):
             # Getting the path to the json files
             # Loading the jsonFiles
-            ulcomputer, combinations = self.getPyhfComputer( nsig )
+            ulcomputer = self.getPyhfComputer( nsig )
+            combinations = ulcomputer.data.combinations
             if ulcomputer.nWS == 1:
                 return ulcomputer.likelihood()
             else:
@@ -777,7 +779,8 @@ class CombinedDataSet(object):
         elif hasattr(self.globalInfo, "jsonFiles"):
             # Getting the path to the json files
             # Loading the jsonFiles
-            ulcomputer, combinations = self.getPyhfComputer( nsig )
+            ulcomputer = self.getPyhfComputer( nsig )
+            combinations = ulcomputer.data.combinations
             if ulcomputer.nWS == 1:
                 return ulcomputer.chi2()
             else:

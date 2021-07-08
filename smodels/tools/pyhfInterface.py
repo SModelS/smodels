@@ -15,7 +15,7 @@ if jsonschema.__version__[0] == "2":
     print ( "[SModelS:pyhfInterface] jsonschema is version %s, we need > 3.x.x" % ( jsonschema.__version__ ) )
     sys.exit()
 
-import time, sys
+import time, sys, os
 try:
     import pyhf
 except ModuleNotFoundError:
@@ -72,11 +72,17 @@ class PyhfData:
     Holds data for use in pyhf
     :ivar nsignals: signal predictions list divided into sublists, one for each json file
     :ivar inputJsons: list of json instances
+    :ivar jsonFiles: optional list of json files
     :ivar nWS: number of workspaces = number of json files
     """
-    def __init__ (self, nsignals, inputJsons):
+    def __init__ (self, nsignals, inputJsons, jsonFiles = None ):
         self.nsignals = nsignals # fb
         self.inputJsons = inputJsons
+        self.jsonFiles = jsonFiles
+        self.combinations = None
+        if jsonFiles != None:
+            self.combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
+            
         self.nWS = len(inputJsons)
         self.errorFlag = False
         self.getWSInfo()
