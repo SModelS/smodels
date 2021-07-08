@@ -379,8 +379,7 @@ Below we go step-by-step through this example code:
 .. literalinclude:: /examples/Example.py
    :lines: 27-28
 
-* *Load the model and set the path to the input file*. Load BSM and SM particle content; specify the location of the input file 
-(must be an SLHA or LHE file, see :ref:`Basic Input <BasicInput>`) and update particles in the model.
+* *Load the model and set the path to the input file*. Load BSM and SM particle content; specify the location of the input file (must be an SLHA or LHE file, see :ref:`Basic Input <BasicInput>`) and update particles in the model.
 
 .. literalinclude:: /examples/Example.py
    :lines: 34-39
