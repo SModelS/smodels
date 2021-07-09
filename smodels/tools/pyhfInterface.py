@@ -78,8 +78,8 @@ class PyhfData:
     def __init__ (self, nsignals, inputJsons, jsonFiles = None ):
         self.nsignals = nsignals # fb
         self.inputJsons = inputJsons
-        self.cached_likelihoods = {}
-        self.cached_lmaxes = {}
+        self.cached_likelihoods = {} ## cache of likelihoods (actually nlls)
+        self.cached_lmaxes = {} # cache of lmaxes (actually nlls)
         self.jsonFiles = jsonFiles
         self.combinations = None
         if jsonFiles != None:
@@ -278,19 +278,21 @@ class PyhfUpperLimitComputer:
                 workspaces.append(ws)
             return workspaces
 
-    def likelihood(self, workspace_index=None ):
+    def likelihood(self, workspace_index=None, nll=False ):
         """
         Returns the value of the likelihood.
         Inspired by the `pyhf.infer.mle` module but for non-log likelihood
         :param workspace_index: supply index of workspace to use. If None,
                                 choose index of best combo
+        :param nll: if true, return nll, not llhd
         """
 
         if workspace_index == None:
             workspace_index = self.getBestCombinationIndex()
         logger.debug("Calling likelihood")
         if workspace_index in self.data.cached_likelihoods:
-            return self.data.cached_likelihoods[workspace_index]
+            return self.exponentiateNLL ( self.data.cached_likelihoods[workspace_index],
+                                          not nll )
         self.__init__(self.data)
         if self.nWS == 1:
             workspace = self.workspaces[0]
@@ -305,14 +307,16 @@ class PyhfUpperLimitComputer:
         model = workspace.model(modifier_settings=msettings)
         # test_poi = 1.
         # _, nllh = pyhf.infer.mle.fixed_poi_fit(test_poi, workspace.data(model), model, return_fitted_val=True)
-        _, nllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
+        # _, nllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
+        _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model), model,
+                                                    return_fitted_val=True)
         ret = nllh.tolist()
         try:
             ret = float(ret)
         except:
             ret = float(ret[0])
-        ret = np.exp(-ret/2.)
         self.data.cached_likelihoods[workspace_index]=ret
+        ret = self.exponentiateNLL ( ret, not nll )
         return ret
 
     def getBestCombinationIndex( self ):
@@ -333,7 +337,59 @@ class PyhfUpperLimitComputer:
         """
         Returns the chi square
         """
-        return -2 * np.log ( self.likelihood ( workspace_index ) / self.lmax ( workspace_index ) )
+        self.__init__(self.data)
+        logger.debug("Calling chi2")
+        if self.nWS == 1:
+            workspace = self.workspaces[0]
+        elif workspace_index != None:
+            if self.zeroSignalsFlag[workspace_index] == True:
+                logger.warning("Workspace number %d has zero signals" % workspace_index)
+                return None
+            else:
+                workspace = self.workspaces[workspace_index]
+        # Same modifiers_settings as those used when running the 'pyhf cls' command line
+        msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
+        model = workspace.model(modifier_settings=msettings)
+        _, nllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
+        logger.debug(workspace['channels'][0]['samples'][0])
+        logger.debug('nllh : {}'.format(nllh))
+        # Computing the background numbers and fetching the observations
+        for ch in workspace['channels']:
+            chName = ch['name']
+            # Backgrounds
+            for sp in ch['samples']:
+                if sp['name'] != 'bsm':
+                    print ( "bkg=", sp["data"] )
+                    try:
+                        bkg = [b + d for b, d in zip(bkg, sp['data'])]
+                    except NameError: # If bkg doesn't exit, intialize it
+                        bkg = sp['data']
+            # Observations
+            for observation in workspace['observations']:
+                if observation['name'] == chName:
+                    obs = observation['data']
+                    print ( "obs=", obs )
+            dn = [ob - bk for ob, bk in zip(obs, bkg)]
+            # Feeding dn as signal input
+            for sp in ch['samples']:
+                if sp['name'] == 'bsm':
+                    print ( "sp=", sp["data"] )
+                    sp['data'] = dn
+        logger.debug(workspace['channels'][0]['samples'][0])
+        _, maxNllh = pyhf.infer.mle.fixed_poi_fit(1., workspace.data(model), model, return_fitted_val=True)
+        logger.debug('maxNllh : {}'.format(maxNllh))
+        ret = (maxNllh - nllh).tolist()
+        try:
+            ret = float(ret)
+        except:
+            ret = float(ret[0])
+        return ret
+
+    def chi2f(self, workspace_index=None):
+        """
+        Returns the chi square
+        """
+        return -2 * np.log ( self.likelihood ( workspace_index, nll=False ) / self.lmax ( workspace_index, nll=False ) )
 
     def exponentiateNLL ( self, nll, doIt ):
         """ if doIt, then compute likelihood from nll,
@@ -343,7 +399,7 @@ class PyhfUpperLimitComputer:
         return nll
 
 
-    def lmax(self, workspace_index=None, nll=True ):
+    def lmax(self, workspace_index=None, nll=False ):
         """
         Returns the negative log max likelihood
         :param nll: if true, return nll, not llhd
@@ -369,6 +425,7 @@ class PyhfUpperLimitComputer:
         model = workspace.model(modifier_settings=msettings)
         logger.debug(workspace['channels'][0]['samples'][0])
         # Computing the background numbers and fetching the observations
+        """
         for ch in workspace['channels']:
             chName = ch['name']
             # Backgrounds
@@ -388,8 +445,8 @@ class PyhfUpperLimitComputer:
                 if sp['name'] == 'bsm':
                     sp['data'] = dn
         logger.debug(workspace['channels'][0]['samples'][0])
-        _, maxNllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model), model,
-                                                   return_fitted_val=True)
+        """
+        _, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
         ret = maxNllh.tolist()
         try:
             ret = float(ret)

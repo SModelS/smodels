@@ -577,8 +577,7 @@ class CombinedDataSet(object):
             return computer.likelihood ( musig, marginalize=marginalize, nll=nll )
         if self.type == "pyhf":
             ulcomputer = self.getPyhfComputer( nsig )
-            combinations = ulcomputer.data.combinations
-            return ulcomputer.lmax ( nll=False )
+            return ulcomputer.lmax ( nll=nll )
         return -1.
 
     def getPyhfComputer ( self, nsig ):
@@ -666,7 +665,6 @@ class CombinedDataSet(object):
                 logger.warning("All signals are empty")
                 return None
             ulcomputer = self.getPyhfComputer( nsig )
-            combinations = ulcomputer.data.combinations
             if ulcomputer.nWS == 1:
                 ret = ulcomputer.ulSigma(expected=expected)
                 ret = ret/self.getLumi()
