@@ -330,6 +330,8 @@ class PyhfUpperLimitComputer:
         """
         Returns the chi square
         """
+        if workspace_index == None:
+            workspace_index = self.getBestCombinationIndex()
         self.__init__(self.data)
         logger.debug("Calling chi2")
         if self.nWS == 1:

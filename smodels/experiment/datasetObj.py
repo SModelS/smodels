@@ -486,7 +486,6 @@ class CombinedDataSet(object):
         self._datasets = expResult.datasets[:]
         self._marginalize = False
         self.sortDataSets()
-        self.bestCB = None # To store the index of the best combination
         self.findType()
 
     def findType ( self ):
@@ -674,20 +673,14 @@ class CombinedDataSet(object):
                 logger.debug("pyhf upper limit : {}".format(ret))
                 return ret
             else:
-                # Looking for the best combination
-                logger.debug('self.bestCB : {}'.format(self.bestCB))
-                if self.bestCB == None:
-                    self.bestCB = ulcomputer.getBestCombination()
-                    logger.debug('Best combination : %s' % self.bestCB)
-                # Computing upper limit using best combination
                 if expected:
                     try:
                         ret = ulMin/self.getLumi()
                     except NameError:
-                        ret = ulcomputer.ulSigma(expected=True, workspace_index=combinations.index(self.bestCB))
+                        ret = ulcomputer.ulSigma(expected=True )
                         ret = ret/self.getLumi()
                 else:
-                    ret = ulcomputer.ulSigma(expected=False, workspace_index=combinations.index(self.bestCB))
+                    ret = ulcomputer.ulSigma(expected=False )
                     ret = ret/self.getLumi()
                 logger.debug("pyhf upper limit : {}".format(ret))
                 return ret
@@ -723,14 +716,7 @@ class CombinedDataSet(object):
             # Getting the path to the json files
             # Loading the jsonFiles
             ulcomputer = self.getPyhfComputer( nsig )
-            combinations = ulcomputer.data.combinations
-            if ulcomputer.nWS == 1:
-                return ulcomputer.likelihood()
-            else:
-                # Looking for the best combination
-                if self.bestCB == None:
-                    self.bestCB = ulcomputer.getBestCombination()
-                return ulcomputer.likelihood(workspace_index=combinations.index(self.bestCB))
+            return ulcomputer.likelihood()
         else:
             logger.error("Asked for combined likelihood, but no covariance or json file given." )
             return None
@@ -763,22 +749,7 @@ class CombinedDataSet(object):
             # Getting the path to the json files
             # Loading the jsonFiles
             ulcomputer = self.getPyhfComputer( nsig )
-            combinations = ulcomputer.data.combinations
-            if ulcomputer.nWS == 1:
-                return ulcomputer.chi2()
-            else:
-                # Looking for the best combination
-                if self.bestCB == None:
-                    ulMin = float('+inf')
-                    for i_ws in range(ulcomputer.nWS):
-                        logger.debug("Performing best expected combination")
-                        ul = ulcomputer.ulSigma(expected=True, workspace_index=i_ws)
-                        if  ul < ulMin:
-                            ulMin = ul
-                            i_best = i_ws
-                    self.bestCB = combinations[i_best] # Keeping the index of the best combination for later
-                    logger.debug('Best combination : %d' % self.bestCB)
-                return ulcomputer.chi2(workspace_index=combinations.index(self.bestCB))
+            return ulcomputer.chi2()
         else:
             logger.error("Asked for combined likelihood, but no covariance error given." )
             return None
