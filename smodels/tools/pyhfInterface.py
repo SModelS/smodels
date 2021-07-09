@@ -78,8 +78,8 @@ class PyhfData:
     def __init__ (self, nsignals, inputJsons, jsonFiles = None ):
         self.nsignals = nsignals # fb
         self.inputJsons = inputJsons
-        self.cached_likelihoods = {} ## cache of likelihoods (actually nlls)
-        self.cached_lmaxes = {} # cache of lmaxes (actually nlls)
+        self.cached_likelihoods = {} ## cache of likelihoods (actually twice_nlls)
+        self.cached_lmaxes = {} # cache of lmaxes (actually twice_nlls)
         self.jsonFiles = jsonFiles
         self.combinations = None
         if jsonFiles != None:
@@ -305,11 +305,34 @@ class PyhfUpperLimitComputer:
         # Same modifiers_settings as those used when running the 'pyhf cls' command line
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         model = workspace.model(modifier_settings=msettings)
+        """
         # test_poi = 1.
         # _, nllh = pyhf.infer.mle.fixed_poi_fit(test_poi, workspace.data(model), model, return_fitted_val=True)
         # _, nllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
+        # Computing the background numbers and fetching the observations
+        for ch in workspace['channels']:
+            chName = ch['name']
+            # Backgrounds
+            for sp in ch['samples']:
+                if sp['name'] != 'bsm':
+                    try:
+                        bkg = [b + d for b, d in zip(bkg, sp['data'])]
+                    except NameError: # If bkg doesn't exit, intialize it
+                        bkg = sp['data']
+                else:
+                    print ( "likelihood nsig=", sp["data"] )
+            print ( "likelihood bkg=", bkg )
+            del bkg
+            # Observations
+            for observation in workspace['observations']:
+                if observation['name'] == chName:
+                    obs = observation['data']
+                    print ( "likelihood obs=", obs )
+        print ( "likelihood computing for", workspace.data(model) )
+        """
         _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model), model,
                                                     return_fitted_val=True)
+        # print ( "likelihood best fit", _ )
         ret = nllh.tolist()
         try:
             ret = float(ret)
@@ -333,7 +356,7 @@ class PyhfUpperLimitComputer:
                 i_best = i_ws
         return i_best
 
-    def chi2(self, workspace_index=None):
+    def chi2old(self, workspace_index=None):
         """
         Returns the chi square
         """
@@ -359,7 +382,6 @@ class PyhfUpperLimitComputer:
             # Backgrounds
             for sp in ch['samples']:
                 if sp['name'] != 'bsm':
-                    print ( "bkg=", sp["data"] )
                     try:
                         bkg = [b + d for b, d in zip(bkg, sp['data'])]
                     except NameError: # If bkg doesn't exit, intialize it
@@ -368,7 +390,6 @@ class PyhfUpperLimitComputer:
             for observation in workspace['observations']:
                 if observation['name'] == chName:
                     obs = observation['data']
-                    print ( "obs=", obs )
             dn = [ob - bk for ob, bk in zip(obs, bkg)]
             # Feeding dn as signal input
             for sp in ch['samples']:
@@ -385,18 +406,18 @@ class PyhfUpperLimitComputer:
             ret = float(ret[0])
         return ret
 
-    def chi2f(self, workspace_index=None):
+    def chi2(self, workspace_index=None):
         """
         Returns the chi square
         """
-        return -2 * np.log ( self.likelihood ( workspace_index, nll=False ) / self.lmax ( workspace_index, nll=False ) )
+        return 2 * ( self.lmax ( workspace_index, nll=True ) - self.likelihood ( workspace_index, nll=True ) )
 
-    def exponentiateNLL ( self, nll, doIt ):
+    def exponentiateNLL ( self, twice_nll, doIt ):
         """ if doIt, then compute likelihood from nll,
             else return nll """
         if doIt:
-            return np.exp(-nll/2.)
-        return nll
+            return np.exp(-twice_nll/2.)
+        return twice_nll / 2.
 
 
     def lmax(self, workspace_index=None, nll=False ):
@@ -423,9 +444,9 @@ class PyhfUpperLimitComputer:
         # Same modifiers_settings as those used when running the 'pyhf cls' command line
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         model = workspace.model(modifier_settings=msettings)
+        """
         logger.debug(workspace['channels'][0]['samples'][0])
         # Computing the background numbers and fetching the observations
-        """
         for ch in workspace['channels']:
             chName = ch['name']
             # Backgrounds
@@ -435,18 +456,20 @@ class PyhfUpperLimitComputer:
                         bkg = [b + d for b, d in zip(bkg, sp['data'])]
                     except NameError: # If bkg doesn't exit, intialize it
                         bkg = sp['data']
+            del bkg
             # Observations
             for observation in workspace['observations']:
                 if observation['name'] == chName:
                     obs = observation['data']
-            dn = [ob - bk for ob, bk in zip(obs, bkg)]
+            #dn = [ob - bk for ob, bk in zip(obs, bkg)]
             # Feeding dn as signal input
-            for sp in ch['samples']:
-                if sp['name'] == 'bsm':
-                    sp['data'] = dn
+            #for sp in ch['samples']:
+            #    if sp['name'] == 'bsm':
+            #        sp['data'] = dn
         logger.debug(workspace['channels'][0]['samples'][0])
         """
         _, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
+        # print ( "lmax best fit at", _ )
         ret = maxNllh.tolist()
         try:
             ret = float(ret)

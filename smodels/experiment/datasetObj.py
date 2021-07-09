@@ -576,12 +576,13 @@ class CombinedDataSet(object):
             musig = nsig * mu_hat
             return computer.likelihood ( musig, marginalize=marginalize, nll=nll )
         if self.type == "pyhf":
-            ulcomputer = self.getPyhfComputer( nsig )
+            ulcomputer = self.getPyhfComputer( nsig, False )
             return ulcomputer.lmax ( nll=nll )
         return -1.
 
-    def getPyhfComputer ( self, nsig ):
+    def getPyhfComputer ( self, nsig, normalize = True ):
         """ create the pyhf ul computer object
+        :param normalize: if true, normalize nsig
         :returns: pyhf upper limit computer, and combinations of signal regions
         """
         # Getting the path to the json files
@@ -591,7 +592,8 @@ class CombinedDataSet(object):
         total = sum(nsig)
         if total == 0.: # all signals zero? can divide by anything!
             total = 1.
-        nsig = [s/total for s in nsig] # Normalising signals to get an upper limit on the events count
+        if normalize:
+            nsig = [s/total for s in nsig] # Normalising signals to get an upper limit on the events count
         # Filtering the json files by looking at the available datasets
         for jsName in self.globalInfo.jsonFiles:
             if all([ds not in self.globalInfo.jsonFiles[jsName] for ds in datasets]):
@@ -713,7 +715,7 @@ class CombinedDataSet(object):
         elif hasattr(self.globalInfo, "jsonFiles"):
             # Getting the path to the json files
             # Loading the jsonFiles
-            ulcomputer = self.getPyhfComputer( nsig )
+            ulcomputer = self.getPyhfComputer( nsig, False )
             return ulcomputer.likelihood()
         else:
             logger.error("Asked for combined likelihood, but no covariance or json file given." )
@@ -746,7 +748,7 @@ class CombinedDataSet(object):
         elif hasattr(self.globalInfo, "jsonFiles"):
             # Getting the path to the json files
             # Loading the jsonFiles
-            ulcomputer = self.getPyhfComputer( nsig )
+            ulcomputer = self.getPyhfComputer( nsig, False )
             return ulcomputer.chi2()
         else:
             logger.error("Asked for combined likelihood, but no covariance error given." )
