@@ -78,6 +78,8 @@ class PyhfData:
     def __init__ (self, nsignals, inputJsons, jsonFiles = None ):
         self.nsignals = nsignals # fb
         self.inputJsons = inputJsons
+        self.cached_likelihoods = {}
+        self.cached_lmaxes = {}
         self.jsonFiles = jsonFiles
         self.combinations = None
         if jsonFiles != None:
@@ -276,16 +278,19 @@ class PyhfUpperLimitComputer:
                 workspaces.append(ws)
             return workspaces
 
-    def likelihood(self, workspace_index=None):
+    def likelihood(self, workspace_index=None ):
         """
         Returns the value of the likelihood.
         Inspired by the `pyhf.infer.mle` module but for non-log likelihood
         :param workspace_index: supply index of workspace to use. If None,
                                 choose index of best combo
         """
+
         if workspace_index == None:
             workspace_index = self.getBestCombinationIndex()
         logger.debug("Calling likelihood")
+        if workspace_index in self.data.cached_likelihoods:
+            return self.data.cached_likelihoods[workspace_index]
         self.__init__(self.data)
         if self.nWS == 1:
             workspace = self.workspaces[0]
@@ -306,7 +311,9 @@ class PyhfUpperLimitComputer:
             ret = float(ret)
         except:
             ret = float(ret[0])
-        return np.exp(-ret/2.)
+        ret = np.exp(-ret/2.)
+        self.data.cached_likelihoods[workspace_index]=ret
+        return ret
 
     def getBestCombinationIndex( self ):
         """ find the index of the best expected combination """
@@ -322,16 +329,20 @@ class PyhfUpperLimitComputer:
                 i_best = i_ws
         return i_best
 
-
-    def getBestCombination( self ):
-        """ find the best expected combination """
-        return self.data.combinations[ self.getBestCombinationIndex() ]
-
     def chi2(self, workspace_index=None):
         """
         Returns the chi square
         """
         return -2 * np.log ( self.likelihood ( workspace_index ) / self.lmax ( workspace_index ) )
+
+    def exponentiateNLL ( self, nll, doIt ):
+        """ if doIt, then compute likelihood from nll,
+            else return nll """
+        if doIt:
+            return np.exp(-nll/2.)
+        return nll
+
+
     def lmax(self, workspace_index=None, nll=True ):
         """
         Returns the negative log max likelihood
@@ -343,6 +354,8 @@ class PyhfUpperLimitComputer:
         self.__init__(self.data)
         if workspace_index == None:
             workspace_index = self.getBestCombinationIndex()
+        if workspace_index in self.data.cached_lmaxes:
+            return self.exponentiateNLL ( self.data.cached_lmaxes[workspace_index], not nll )
         if self.nWS == 1:
             workspace = self.workspaces[0]
         elif workspace_index != None:
@@ -382,9 +395,9 @@ class PyhfUpperLimitComputer:
             ret = float(ret)
         except:
             ret = float(ret[0])
-        if nll:
-            return ret
-        return np.exp(-ret/2.)
+        self.data.cached_lmaxes [ workspace_index ] = ret
+        ret = self.exponentiateNLL ( ret, not nll )
+        return ret
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of looking for mu bounds
