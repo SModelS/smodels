@@ -331,52 +331,7 @@ class PyhfUpperLimitComputer:
         """
         Returns the chi square
         """
-        if workspace_index == None:
-            workspace_index = self.getBestCombinationIndex()
-        self.__init__(self.data)
-        logger.debug("Calling chi2")
-        if self.nWS == 1:
-            workspace = self.workspaces[0]
-        elif workspace_index != None:
-            if self.zeroSignalsFlag[workspace_index] == True:
-                logger.warning("Workspace number %d has zero signals" % workspace_index)
-                return None
-            else:
-                workspace = self.workspaces[workspace_index]
-        # Same modifiers_settings as those used when running the 'pyhf cls' command line
-        msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
-        model = workspace.model(modifier_settings=msettings)
-        _, nllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
-        logger.debug(workspace['channels'][0]['samples'][0])
-        logger.debug('nllh : {}'.format(nllh))
-        # Computing the background numbers and fetching the observations
-        for ch in workspace['channels']:
-            chName = ch['name']
-            # Backgrounds
-            for sp in ch['samples']:
-                if sp['name'] != 'bsm':
-                    try:
-                        bkg = [b + d for b, d in zip(bkg, sp['data'])]
-                    except NameError: # If bkg doesn't exit, intialize it
-                        bkg = sp['data']
-            # Observations
-            for observation in workspace['observations']:
-                if observation['name'] == chName:
-                    obs = observation['data']
-            dn = [ob - bk for ob, bk in zip(obs, bkg)]
-            # Feeding dn as signal input
-            for sp in ch['samples']:
-                if sp['name'] == 'bsm':
-                    sp['data'] = dn
-        logger.debug(workspace['channels'][0]['samples'][0])
-        maxNllh = self.lmax ( workspace_index )
-        ret = (maxNllh - nllh).tolist()
-        try:
-            ret = float(ret)
-        except:
-            ret = float(ret[0])
-        return ret
-
+        return -2 * np.log ( self.likelihood ( workspace_index ) / self.lmax ( workspace_index ) )
     def lmax(self, workspace_index=None, nll=True ):
         """
         Returns the negative log max likelihood
