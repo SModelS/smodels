@@ -50,6 +50,7 @@ New in Version 2.1.0:
   * small changes in the printers, :ref:`L_max and L_SM added <likelihoodCalc>` to the :ref:`output <outputDescription>`
   * the :ref:`likelihood <likelihoodCalc>` is now maximized only for positive values of the signal strength,
     in the computation of lmax
+  * upgraded :ref:`pythia8 <xsecCalc>` from 8226 to 8306
 
 New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
