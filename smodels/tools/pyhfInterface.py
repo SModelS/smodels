@@ -280,7 +280,11 @@ class PyhfUpperLimitComputer:
         """
         Returns the value of the likelihood.
         Inspired by the `pyhf.infer.mle` module but for non-log likelihood
+        :param workspace_index: supply index of workspace to use. If None,
+                                choose index of best combo
         """
+        if workspace_index == None:
+            workspace_index = self.getBestCombinationIndex()
         logger.debug("Calling likelihood")
         self.__init__(self.data)
         if self.nWS == 1:
@@ -304,9 +308,8 @@ class PyhfUpperLimitComputer:
             ret = float(ret[0])
         return np.exp(-ret/2.)
 
-
-    def getBestCombination( self ):
-        """ find the best expected combination """
+    def getBestCombinationIndex( self ):
+        """ find the index of the best expected combination """
         logger.debug("Performing best expected combination")
         ulMin = float('+inf')
         for i_ws in range(self.nWS):
@@ -316,7 +319,12 @@ class PyhfUpperLimitComputer:
             if ul < ulMin:
                 ulMin = ul
                 i_best = i_ws
-        return self.data.combinations[i_best]
+        return i_best
+
+
+    def getBestCombination( self ):
+        """ find the best expected combination """
+        return self.data.combinations[ self.getBestCombinationIndex() ]
 
     def chi2(self, workspace_index=None):
         """
@@ -370,9 +378,13 @@ class PyhfUpperLimitComputer:
         """
         Returns the negative log max likelihood
         :param nll: if true, return nll, not llhd
+        :param workspace_index: supply index of workspace to use. If None,
+                                choose index of best combo
         """
-        self.__init__(self.data)
         logger.debug("Calling lmax")
+        self.__init__(self.data)
+        if workspace_index == None:
+            workspace_index = self.getBestCombinationIndex()
         if self.nWS == 1:
             workspace = self.workspaces[0]
         elif workspace_index != None:
@@ -423,17 +435,20 @@ class PyhfUpperLimitComputer:
         """
         Compute the upper limit on the signal strength modifier with:
             - by default, the combination of the workspaces contained into self.workspaces
-            - if workspace_index is specified, self.workspace[workspace_index] (useful for computation of the best upper limit)
+            - if workspace_index is specified, self.workspace[workspace_index]
+              (useful for computation of the best upper limit)
 
         :param expected:  - if set to `True`: uses expected SM backgrounds as signals
                           - else: uses `self.nsignals`
-        :param workspace_index: - if different from `None`: index of the workspace to use for upper limit
-                          - else: all workspaces are combined
+        :param workspace_index: - if different from `None`: index of the workspace to use 
+                                  for upper limit
+                                - else: choose best combo
         :return: the upper limit at `self.cl` level (0.95 by default)
         """
         startUL = time.time()
         logger.debug("Calling ulSigma")
-        if self.data.errorFlag or self.workspaces == None: # For now, this flag can only be turned on by PyhfData.checkConsistency
+        if self.data.errorFlag or self.workspaces == None: 
+            # For now, this flag can only be turned on by PyhfData.checkConsistency
             return None
         if self.nWS == 1:
             if self.zeroSignalsFlag[0] == True:
@@ -441,9 +456,10 @@ class PyhfUpperLimitComputer:
                 return None
         else:
             if workspace_index == None:
-                logger.error("There are several workspaces but no workspace index was provided")
-                return None
-            elif self.zeroSignalsFlag[workspace_index] == True:
+                logger.debug("There are several workspaces but no workspace index was provided")
+                workspace_index = self.getBestCombinationIndex()
+                # return None
+            if self.zeroSignalsFlag[workspace_index] == True:
                 logger.debug("Workspace number %d has zero signals" % workspace_index)
                 return None
         def updateWorkspace():

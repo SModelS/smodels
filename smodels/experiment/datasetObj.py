@@ -678,18 +678,6 @@ class CombinedDataSet(object):
                 logger.debug('self.bestCB : {}'.format(self.bestCB))
                 if self.bestCB == None:
                     self.bestCB = ulcomputer.getBestCombination()
-                    """
-                    logger.debug("Performing best expected combination")
-                    ulMin = float('+inf')
-                    for i_ws in range(ulcomputer.nWS):
-                        ul = ulcomputer.ulSigma(expected=True, workspace_index=i_ws)
-                        if ul == None:
-                            continue
-                        if ul < ulMin:
-                            ulMin = ul
-                            i_best = i_ws
-                    self.bestCB = combinations[i_best] # Keeping the index of the best combination for later
-                    """
                     logger.debug('Best combination : %s' % self.bestCB)
                 # Computing upper limit using best combination
                 if expected:
@@ -742,17 +730,6 @@ class CombinedDataSet(object):
                 # Looking for the best combination
                 if self.bestCB == None:
                     self.bestCB = ulcomputer.getBestCombination()
-                    """
-                    ulMin = float('+inf')
-                    for i_ws in range(ulcomputer.nWS):
-                        logger.debug("Performing best expected combination")
-                        ul = ulcomputer.ulSigma(expected=True, workspace_index=i_ws)
-                        if  ul < ulMin:
-                            ulMin = ul
-                            i_best = i_ws
-                    self.bestCB = combinations[i_best] # Keeping the index of the best combination for later
-                    logger.debug('Best combination : %d' % self.bestCB)
-                    """
                 return ulcomputer.likelihood(workspace_index=combinations.index(self.bestCB))
         else:
             logger.error("Asked for combined likelihood, but no covariance or json file given." )
