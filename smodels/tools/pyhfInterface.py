@@ -294,8 +294,9 @@ class PyhfUpperLimitComputer:
         # Same modifiers_settings as those used when running the 'pyhf cls' command line
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         model = workspace.model(modifier_settings=msettings)
-        test_poi = 1.
-        _, nllh = pyhf.infer.mle.fixed_poi_fit(test_poi, workspace.data(model), model, return_fitted_val=True)
+        # test_poi = 1.
+        # _, nllh = pyhf.infer.mle.fixed_poi_fit(test_poi, workspace.data(model), model, return_fitted_val=True)
+        _, nllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
         ret = nllh.tolist()
         try:
             ret = float(ret)
