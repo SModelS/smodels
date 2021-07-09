@@ -11,7 +11,7 @@ Release v2.1.x, xxx
   * small changes in the printers, L_max and L_SM added
   * the likelihood is now maximized only for positive values of the signal strength
     in the computation of lmax
-	* bumped up pythia8 from 8226 to 8306
+	* upgraded pythia8 in xssecComputer from 8226 to 8306
 
 Release v2.0.0, Mon 15 Mar 2021
 =======================================================
