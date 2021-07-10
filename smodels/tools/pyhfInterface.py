@@ -289,19 +289,17 @@ class PyhfUpperLimitComputer:
 
         if workspace_index == None:
             workspace_index = self.getBestCombinationIndex()
+        if workspace_index == None:
+            return None
         logger.debug("Calling likelihood")
         if workspace_index in self.data.cached_likelihoods:
             return self.exponentiateNLL ( self.data.cached_likelihoods[workspace_index],
                                           not nll )
         self.__init__(self.data)
-        if self.nWS == 1:
-            workspace = self.workspaces[0]
-        elif workspace_index != None:
-            if self.zeroSignalsFlag[workspace_index] == True:
-                logger.warning("Workspace number %d has zero signals" % workspace_index)
-                return None
-            else:
-                workspace = self.workspaces[workspace_index]
+        if self.zeroSignalsFlag[workspace_index] == True:
+            logger.warning("Workspace number %d has zero signals" % workspace_index)
+            return None
+        workspace = self.workspaces[workspace_index]
         # Same modifiers_settings as those used when running the 'pyhf cls' command line
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         model = workspace.model(modifier_settings=msettings)
