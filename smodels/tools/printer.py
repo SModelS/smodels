@@ -1177,6 +1177,8 @@ def printScanSummary(outputDict,outputFile):
 
     for fname in fnames:
         output = outputDict[fname]
+        if output == None:
+            continue
         #default values (in case of empty results):
         summaryDict = OrderedDict({'filename' : fname,
                     'MostConstrainingAnalysis' : 'N/A',
