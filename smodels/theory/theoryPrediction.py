@@ -295,8 +295,9 @@ class TheoryPredictionList(object):
         Initializes the list.
 
         :parameter theoryPredictions: list of TheoryPrediction objects
-        :parameter maxCond: maximum relative violation of conditions for valid results. If defined, it will keep only
-                            the theory predictions with condition violation < maxCond.
+        :parameter maxCond: maximum relative violation of conditions for valid
+        results. If defined, it will keep only the theory predictions with
+        condition violation < maxCond.
         """
         self._theoryPredictions = []
         if theoryPredictions and isinstance(theoryPredictions,list):
