@@ -700,8 +700,6 @@ class CombinedDataSet(object):
         :returns: likelihood to observe nobs events (float)
         """
 
-
-
         if hasattr(self.globalInfo, "covariance" ):
             if len(self._datasets) == 1:
                 if isinstance(nsig,list):
@@ -720,36 +718,3 @@ class CombinedDataSet(object):
         else:
             logger.error("Asked for combined likelihood, but no covariance or json file given." )
             return None
-
-    """
-    def totalChi2(self, nsig, marginalize=False, deltas_rel=0.2):
-        Computes the total chi2 for a given number of observed events, given a
-        predicted signal "nsig", with nsig being a vector with one entry per
-        dataset. nsig has to obey the datasetOrder. Deltas is the error on
-        the signal efficiency.
-        :param nsig: predicted signal (list)
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-
-        :returns: chi2 (float)
-
-        if hasattr(self.globalInfo, "covariance" ):
-            if len(self._datasets) == 1:
-                if isinstance(nsig,list):
-                    nsig = nsig[0]
-                return self._datasets[0].chi2(nsig, marginalize=marginalize)
-            nobs = [x.dataInfo.observedN for x in self._datasets ]
-            bg = [x.dataInfo.expectedBG for x in self._datasets ]
-            cov = self.globalInfo.covariance
-
-            computer = LikelihoodComputer(Data(nobs, bg, cov, deltas_rel=deltas_rel))
-
-            return computer.chi2(nsig, marginalize=marginalize)
-        elif hasattr(self.globalInfo, "jsonFiles"):
-            # Getting the path to the json files
-            # Loading the jsonFiles
-            ulcomputer = self.getPyhfComputer( nsig, False )
-            return ulcomputer.chi2()
-        else:
-            logger.error("Asked for combined likelihood, but no covariance error given." )
-            return None
-    """
