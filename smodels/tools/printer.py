@@ -482,9 +482,17 @@ class TxTPrinter(BasicPrinter):
                 output += "Expected r-value: %s\n" % serv
             if hasattr(theoryPrediction,'likelihood') and not theoryPrediction.likelihood is None:
 #                output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
-                chi2sm = -2*np.log(theoryPrediction.likelihood/theoryPrediction.lsm)
+                chi2, chi2sm = None, None
+                try:
+                    chi2sm = -2*np.log(theoryPrediction.likelihood/theoryPrediction.lsm)
+                except TypeError as e:
+                    pass
+                try:
+                    chi2 = -2*np.log(theoryPrediction.likelihood/theoryPrediction.lmax)
+                except TypeError as e:
+                    pass
                 output += "Likelihood: " + self._formatNumber(theoryPrediction.likelihood,4) + "\n"
-                output += "L_max: " + self._formatNumber(theoryPrediction.lmax,4) + "   -2log(L/L_max): " + self._formatNumber(theoryPrediction.chi2,4) + "\n"
+                output += "L_max: " + self._formatNumber(theoryPrediction.lmax,4) + "   -2log(L/L_max): " + self._formatNumber(chi2,4) + "\n"
                 output += "L_SM: " + self._formatNumber(theoryPrediction.lsm,4) + \
                           "   -2log(L/L_SM): " + self._formatNumber(chi2sm,4) + "\n"
 
@@ -627,12 +635,12 @@ class SummaryPrinter(TxTPrinter):
                 llhd = str(theoPred.likelihood)
                 lmax = str(theoPred.lmax)
                 lsm = str(theoPred.lsm)
-                if type(theoPred.likelihood) in [ float, np.float ]:
-                    llhd = "%10.3E" % theoryPrediction.likelihood
-                if type(theoPred.lmax) in [ float, np.float ]:
-                    lmax = "%10.3E" % theoryPrediction.lmax
-                if type(theoPred.lsm) in [ float, np.float ]:
-                    lsm = "%10.3E" % theoryPrediction.lsm
+                if type(theoPred.likelihood) in [ float, np.float64 ]:
+                    llhd = "%10.3E" % theoPred.likelihood
+                if type(theoPred.lmax) in [ float, np.float64 ]:
+                    lmax = "%10.3E" % theoPred.lmax
+                if type(theoPred.lsm) in [ float, np.float64 ]:
+                    lsm = "%10.3E" % theoPred.lsm
                 output += " Likelihoods: L, L_max, L_SM = %s %s %s\n" % (llhd, lmax, lsm)
 
             if not (theoPred is obj[-1]):
@@ -1133,9 +1141,18 @@ class SLHAPrinter(TxTPrinter):
             if hasattr(theoPred,'likelihood') and not theoPred.likelihood is None:
 #                output += " %d 6 %-30.3E #Chi2\n" % (cter, theoPred.chi2)
 #                output += " %d 7 %-30.3E #Likelihood\n" % (cter, theoPred.likelihood)
-                output += " %d 6 %-30.3E #Likelihood\n" % (cter, theoPred.likelihood)
-                output += " %d 7 %-30.3E #L_max\n" % (cter, theoPred.lmax)
-                output += " %d 8 %-30.3E #L_SM\n" % (cter, theoPred.lsm)
+                llhd = str(theoPred.likelihood)
+                if type(theoPred.likelihood) in [ float, np.float32, np.float64 ]:
+                    llhd = "%-30.3E" % theoPred.likelihood
+                lmax = str(theoPred.lmax)
+                if type(theoPred.lmax) in [ float, np.float32, np.float64 ]:
+                    lmax = "%-30.3E" % theoPred.lmax
+                lsm = str(theoPred.lsm)
+                if type(theoPred.lsm) in [ float, np.float32, np.float64 ]:
+                    lsm = "%-30.3E" % theoPred.lsm
+                output += " %d 6 %s #Likelihood\n" % (cter, llhd )
+                output += " %d 7 %s #L_max\n" % (cter, lmax )
+                output += " %d 8 %s #L_SM\n" % (cter, lsm )
             else:
                 output += " %d 6 N/A                            #Likelihood\n" % (cter)
                 output += " %d 7 N/A                            #L_max\n" % (cter)
