@@ -490,7 +490,7 @@ class CombinedDataSet(object):
 
     def findType ( self ):
         """ find the type of the combined dataset """
-        self.type = None ## type of combined dataset, e.g. pyhf, or simplified
+        self.type = "bestSR" ## type of combined dataset, e.g. pyhf, or simplified
         if hasattr(self.globalInfo, "covariance"):
             self.type = "simplified"
         if hasattr(self.globalInfo, "jsonFiles" ):
@@ -706,7 +706,7 @@ class CombinedDataSet(object):
         :returns: likelihood to observe nobs events (float)
         """
 
-        if hasattr(self.globalInfo, "covariance" ):
+        if self.type == "covariance":
             if len(self._datasets) == 1:
                 if isinstance(nsig,list):
                     nsig = nsig[0]
@@ -714,9 +714,10 @@ class CombinedDataSet(object):
             nobs = [ x.dataInfo.observedN for x in self._datasets]
             bg = [ x.dataInfo.expectedBG for x in self._datasets]
             cov = self.globalInfo.covariance
-            computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
+            computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig,
+                                               deltas_rel=deltas_rel))
             return computer.likelihood(nsig, marginalize=marginalize )
-        elif hasattr(self.globalInfo, "jsonFiles"):
+        elif self.type == "pyhf":
             # Getting the path to the json files
             # Loading the jsonFiles
             ulcomputer = self.getPyhfComputer( nsig, False )
