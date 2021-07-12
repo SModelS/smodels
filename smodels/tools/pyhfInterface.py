@@ -347,6 +347,8 @@ class PyhfUpperLimitComputer:
         logger.debug("Performing best expected combination")
         ulMin = float('+inf')
         i_best = None
+        if self.nWS == 1:
+            return 0
         for i_ws in range(self.nWS):
             ul = self.ulSigma(expected=True, workspace_index=i_ws)
             if ul == None:
