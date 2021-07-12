@@ -396,30 +396,6 @@ class PyhfUpperLimitComputer:
         # Same modifiers_settings as those used when running the 'pyhf cls' command line
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         model = workspace.model(modifier_settings=msettings)
-        """
-        logger.debug(workspace['channels'][0]['samples'][0])
-        # Computing the background numbers and fetching the observations
-        for ch in workspace['channels']:
-            chName = ch['name']
-            # Backgrounds
-            for sp in ch['samples']:
-                if sp['name'] != 'bsm':
-                    try:
-                        bkg = [b + d for b, d in zip(bkg, sp['data'])]
-                    except NameError: # If bkg doesn't exit, intialize it
-                        bkg = sp['data']
-            del bkg
-            # Observations
-            for observation in workspace['observations']:
-                if observation['name'] == chName:
-                    obs = observation['data']
-            #dn = [ob - bk for ob, bk in zip(obs, bkg)]
-            # Feeding dn as signal input
-            #for sp in ch['samples']:
-            #    if sp['name'] == 'bsm':
-            #        sp['data'] = dn
-        logger.debug(workspace['channels'][0]['samples'][0])
-        """
         _, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
         # print ( "lmax best fit at", _ )
         ret = maxNllh.tolist()
