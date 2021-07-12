@@ -721,8 +721,8 @@ class CombinedDataSet(object):
             logger.error("Asked for combined likelihood, but no covariance or json file given." )
             return None
 
+    """
     def totalChi2(self, nsig, marginalize=False, deltas_rel=0.2):
-        """
         Computes the total chi2 for a given number of observed events, given a
         predicted signal "nsig", with nsig being a vector with one entry per
         dataset. nsig has to obey the datasetOrder. Deltas is the error on
@@ -731,7 +731,6 @@ class CombinedDataSet(object):
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
 
         :returns: chi2 (float)
-        """
 
         if hasattr(self.globalInfo, "covariance" ):
             if len(self._datasets) == 1:
@@ -753,3 +752,4 @@ class CombinedDataSet(object):
         else:
             logger.error("Asked for combined likelihood, but no covariance error given." )
             return None
+    """

@@ -12,7 +12,8 @@
 import jsonpatch
 import jsonschema
 if jsonschema.__version__[0] == "2":
-    print ( "[SModelS:pyhfInterface] jsonschema is version %s, we need > 3.x.x" % ( jsonschema.__version__ ) )
+    print ( "[SModelS:pyhfInterface] jsonschema is version %s, we need > 3.x.x" % \
+            ( jsonschema.__version__ ) )
     sys.exit()
 
 import time, sys, os
@@ -296,9 +297,10 @@ class PyhfUpperLimitComputer:
             return self.exponentiateNLL ( self.data.cached_likelihoods[workspace_index],
                                           not nll )
         self.__init__(self.data)
-        if self.zeroSignalsFlag[workspace_index] == True:
-            logger.warning("Workspace number %d has zero signals" % workspace_index)
-            return None
+        ### allow this, for computation of l_SM
+        #if self.zeroSignalsFlag[workspace_index] == True:
+        #    logger.warning("Workspace number %d has zero signals" % workspace_index)
+        #    return None
         workspace = self.workspaces[workspace_index]
         # Same modifiers_settings as those used when running the 'pyhf cls' command line
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
@@ -353,56 +355,6 @@ class PyhfUpperLimitComputer:
                 ulMin = ul
                 i_best = i_ws
         return i_best
-
-    def chi2old(self, workspace_index=None):
-        """
-        Returns the chi square
-        """
-        self.__init__(self.data)
-        logger.debug("Calling chi2")
-        if self.nWS == 1:
-            workspace = self.workspaces[0]
-        elif workspace_index != None:
-            if self.zeroSignalsFlag[workspace_index] == True:
-                logger.warning("Workspace number %d has zero signals" % workspace_index)
-                return None
-            else:
-                workspace = self.workspaces[workspace_index]
-        # Same modifiers_settings as those used when running the 'pyhf cls' command line
-        msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
-        model = workspace.model(modifier_settings=msettings)
-        _, nllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
-        logger.debug(workspace['channels'][0]['samples'][0])
-        logger.debug('nllh : {}'.format(nllh))
-        # Computing the background numbers and fetching the observations
-        for ch in workspace['channels']:
-            chName = ch['name']
-            # Backgrounds
-            for sp in ch['samples']:
-                if sp['name'] != 'bsm':
-                    try:
-                        bkg = [b + d for b, d in zip(bkg, sp['data'])]
-                    except NameError: # If bkg doesn't exit, intialize it
-                        bkg = sp['data']
-            # Observations
-            for observation in workspace['observations']:
-                if observation['name'] == chName:
-                    obs = observation['data']
-            dn = [ob - bk for ob, bk in zip(obs, bkg)]
-            # Feeding dn as signal input
-            for sp in ch['samples']:
-                if sp['name'] == 'bsm':
-                    print ( "sp=", sp["data"] )
-                    sp['data'] = dn
-        logger.debug(workspace['channels'][0]['samples'][0])
-        _, maxNllh = pyhf.infer.mle.fixed_poi_fit(1., workspace.data(model), model, return_fitted_val=True)
-        logger.debug('maxNllh : {}'.format(maxNllh))
-        ret = (maxNllh - nllh).tolist()
-        try:
-            ret = float(ret)
-        except:
-            ret = float(ret[0])
-        return ret
 
     def chi2(self, workspace_index=None):
         """
@@ -501,8 +453,9 @@ class PyhfUpperLimitComputer:
             return None
         if self.nWS == 1:
             if self.zeroSignalsFlag[0] == True:
-                logger.warning("There is only one workspace but all signals are zeroes")
-                return None
+                logger.debug("There is only one workspace but all signals are zeroes")
+                # allow this, for computation of l_SM
+                #return None
         else:
             if workspace_index == None:
                 logger.debug("There are several workspaces but no workspace index was provided")
@@ -559,6 +512,11 @@ class PyhfUpperLimitComputer:
                 logger.warning("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
                 stat = "q"
                 nattempts = 0
+            """
+            if nattempts == 7:
+                logger.debug("7 attempts made, try now with zero lu_mu %s" % ( lo_mu, hi_mu ) )
+                lo_mu = -1e-10
+            """
             if nattempts > 10:
                 logger.warning ( "tried 10 times to determine the bounds for brent bracketing. we abort now." )
                 return None
