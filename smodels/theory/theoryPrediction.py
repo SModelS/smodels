@@ -14,6 +14,7 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statistics import likelihoodFromLimits, chi2FromLimits
+from smodels.tools.combinations import computeCombinedStatistics, getCombinedUpperLimitFor
 import itertools
 
 class TheoryPrediction(object):
@@ -96,8 +97,8 @@ class TheoryPrediction(object):
                 elif hasattr(self.dataset.globalInfo, "jsonFiles"):
                     srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*pred.dataset.getLumi() ).asNumber()] for pred in self.datasetPredictions])
                     srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
-                self.expectedUL = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=True,deltas_rel=deltas_rel)
-                self.upperLimit = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=False,deltas_rel=deltas_rel)
+                self.expectedUL = getCombinedUpperLimitFor(self.dataset, srNsigs,expected=True,deltas_rel=deltas_rel)
+                self.upperLimit = getCombinedUpperLimitFor(self.dataset, srNsigs,expected=False,deltas_rel=deltas_rel)
 
         #Return the expected or observed UL:
         if expected:
@@ -221,7 +222,7 @@ class TheoryPrediction(object):
             #Create a list of signal events in each dataset/SR sorted according to datasetOrder
             srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
             srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
-            llhd,lmax,lsm = self.dataset.computeCombinedStatistics ( srNsigs, marginalize,
+            llhd,lmax,lsm = computeCombinedStatistics ( self.dataset, srNsigs, marginalize,
                                                                      deltas_rel )
             self.likelihood = llhd
             self.lmax = lmax
