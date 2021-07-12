@@ -2,7 +2,9 @@
 
 """
 .. module:: statistics
-   :synopsis: a module meant to collect various statistical algorithms. For now it only contains the procedure that computes an approximate Gaussian likelihood from an expected an observer upper limit. See https://arxiv.org/abs/1202.3415.
+   :synopsis: a module meant to collect various statistical algorithms. It contains
+   the procedure that computes an approximate Gaussian likelihood from an
+   expected an observer upper limit. See https://arxiv.org/abs/1202.3415.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -86,7 +88,7 @@ def rvsFromLimits( upperLimit, expectedUpperLimit, n=1 ):
 
     :returns: sample of random variates
     """
-    
+
     sigma_exp = expectedUpperLimit / 1.96 # the expected scale
     denominator = np.sqrt(2.) * sigma_exp
     def root_func ( x ): ## we want the root of this one
