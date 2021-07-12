@@ -511,7 +511,7 @@ class PyhfUpperLimitComputer:
             if nNan > 5:
                 logger.warning("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
                 stat = "q"
-                nattempts = 0
+                # nattempts = 0
             """
             if nattempts == 7:
                 logger.debug("7 attempts made, try now with zero lu_mu %s" % ( lo_mu, hi_mu ) )
