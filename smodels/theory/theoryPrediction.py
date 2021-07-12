@@ -120,7 +120,7 @@ class TheoryPrediction(object):
                               expected=False, chi2also=False ):
         """ compute the likelihood from expected and observed upper limits.
         :param expected: compute expected, not observed likelihood
-        :param mu: signal strength multiplier, applied to theory prediction. If None, 
+        :param mu: signal strength multiplier, applied to theory prediction. If None,
                    then find muhat
         :param chi2also: if true, return also chi2
         :returns: likelihood; none if no expected upper limit is defined.
@@ -219,15 +219,13 @@ class TheoryPrediction(object):
         elif self.dataType() == 'combined':
             lumi = self.dataset.getLumi()
             #Create a list of signal events in each dataset/SR sorted according to datasetOrder
-            if hasattr(self.dataset.globalInfo, "covariance"):
-                srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
-                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
-            elif hasattr(self.dataset.globalInfo, "jsonFiles"):
-                srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
-                srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
-            self.likelihood = self.dataset.combinedLikelihood(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
-            self.lmax = self.dataset.lmax ( srNsigs, marginalize=marginalize,deltas_rel=deltas_rel, allowNegativeSignals = False )
-            self.lsm = self.dataset.combinedLikelihood( [0.]*len(srNsigs), marginalize=marginalize,deltas_rel=deltas_rel)
+            srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
+            srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
+            llhd,lmax,lsm = self.dataset.computeCombinedStatistics ( srNsigs, marginalize,
+                                                                     deltas_rel )
+            self.likelihood = llhd
+            self.lmax = lmax
+            self.lsm = lsm
 
 
     def getmaxCondition(self):

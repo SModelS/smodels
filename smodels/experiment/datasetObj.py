@@ -688,7 +688,14 @@ class CombinedDataSet(object):
             logger.error ( "no covariance matrix or json file given in globalInfo.txt for %s" % self.globalInfo.id )
             raise SModelSError( "no covariance matrix or json file given in globalInfo.txt for %s" % self.globalInfo.id )
 
-    def combinedLikelihood(self, nsig, marginalize=False, deltas_rel=0.2):
+    def computeCombinedStatistics ( self, nsig, marginalize=False, deltas_rel=0.2 ):
+        """ compute lBSM, lmax, and LSM in a single run """
+        lbsm = self.combinedLikelihood( nsig, marginalize, deltas_rel )
+        lmax = self.lmax ( nsig, marginalize, deltas_rel )
+        lsm =  self.combinedLikelihood ( [0.]*len(nsig), marginalize, deltas_rel )
+        return lbsm, lmax, lsm
+
+    def combinedLikelihood( self, nsig, marginalize=False, deltas_rel=0.2 ):
         """
         Computes the (combined) likelihood to observe nobs events, given a
         predicted signal "nsig", with nsig being a vector with one entry per
@@ -696,7 +703,6 @@ class CombinedDataSet(object):
         the signal.
         :param nsig: predicted signal (list)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-
         :returns: likelihood to observe nobs events (float)
         """
 
