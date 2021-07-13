@@ -10,6 +10,7 @@
 
 """
 import jsonpatch
+import warnings
 import jsonschema
 if jsonschema.__version__[0] == "2":
     print ( "[SModelS:pyhfInterface] jsonschema is version %s, we need > 3.x.x" % \
@@ -419,129 +420,131 @@ class PyhfUpperLimitComputer:
 
         :param expected:  - if set to `True`: uses expected SM backgrounds as signals
                           - else: uses `self.nsignals`
-        :param workspace_index: - if different from `None`: index of the workspace to use 
+        :param workspace_index: - if different from `None`: index of the workspace to use
                                   for upper limit
                                 - else: choose best combo
         :return: the upper limit at `self.cl` level (0.95 by default)
         """
-        startUL = time.time()
-        logger.debug("Calling ulSigma")
-        if self.data.errorFlag or self.workspaces == None: 
-            # For now, this flag can only be turned on by PyhfData.checkConsistency
-            return None
-        if self.nWS == 1:
-            if self.zeroSignalsFlag[0] == True:
-                logger.debug("There is only one workspace but all signals are zeroes")
-                # allow this, for computation of l_SM
-                #return None
-        else:
-            if workspace_index == None:
-                logger.debug("There are several workspaces but no workspace index was provided")
-                workspace_index = self.getBestCombinationIndex()
-                # return None
-            if self.zeroSignalsFlag[workspace_index] == True:
-                logger.debug("Workspace number %d has zero signals" % workspace_index)
+        with warnings.catch_warnings():
+            warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
+            startUL = time.time()
+            logger.debug("Calling ulSigma")
+            if self.data.errorFlag or self.workspaces == None:
+                # For now, this flag can only be turned on by PyhfData.checkConsistency
                 return None
-        def updateWorkspace():
             if self.nWS == 1:
-                return self.workspaces[0]
+                if self.zeroSignalsFlag[0] == True:
+                    logger.debug("There is only one workspace but all signals are zeroes")
+                    # allow this, for computation of l_SM
+                    #return None
             else:
-                return self.workspaces[workspace_index]
-        workspace = updateWorkspace()
-        def root_func(mu):
-            # Same modifiers_settings as those use when running the 'pyhf cls' command line
-            msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
-            model = workspace.model(modifier_settings=msettings)
-            start = time.time()
-            stat = "qtilde" # by default
-            args = { "return_expected": expected }
-            pver = float ( pyhf.__version__[:3] )
-            if pver < 0.6:
-                args["qtilde"]=True
-            else:
-                args["test_stat"]=stat
-            with np.testing.suppress_warnings() as sup:
-                if pyhfinfo["backend"] == "numpy":
-                    sup.filter ( RuntimeWarning, r'invalid value encountered in log')
-                result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
-            end = time.time()
-            logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
-            if expected:
-                logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                try:
-                    CLs = float(result[1].tolist())
-                except TypeError:
-                    CLs = float(result[1][0])
-            else:
-                logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                CLs = float(result)
-            # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
-            return 1.0 - self.cl - CLs
-        # Rescaling singals so that mu is in [0, 10]
-        factor = 10.
-        wereBothLarge = False
-        wereBothTiny = False
-        nattempts = 0
-        nNan = 0
-        lo_mu, hi_mu = .2, 5.
-        while "mu is not in [lo_mu,hi_mu]":
-            nattempts += 1
-            if nNan > 5:
-                logger.warning("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
-                stat = "q"
-                # nattempts = 0
-            """
-            if nattempts == 7:
-                logger.debug("7 attempts made, try now with zero lu_mu %s" % ( lo_mu, hi_mu ) )
-                lo_mu = -1e-10
-            """
-            if nattempts > 10:
-                logger.warning ( "tried 10 times to determine the bounds for brent bracketing. we abort now." )
-                return None
-            # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-            rt1 = root_func(lo_mu)
-            rt10 = root_func(hi_mu)
-            if rt1 < 0. and 0. < rt10: # Here's the real while condition
-                break
-            if self.alreadyBeenThere:
-                factor = 1 + (factor-1)/2
-                logger.debug("Diminishing rescaling factor")
-            if np.isnan(rt1):
-                nNan += 1
-                self.rescale(factor)
-                workspace = updateWorkspace()
-                continue
-            if np.isnan(rt10):
-                nNan += 1
-                self.rescale(1/factor)
-                workspace = updateWorkspace()
-                continue
-            # Analyzing previous values of wereBoth***
-            if rt10 < 0 and rt1 < 0 and wereBothLarge:
-                factor = 1 + (factor-1)/2
-                logger.debug("Diminishing rescaling factor")
-            if rt10 > 0 and rt1 > 0 and wereBothTiny:
-                factor = 1 + (factor-1)/2
-                logger.debug("Diminishing rescaling factor")
-            # Preparing next values of wereBoth***
-            wereBothTiny = rt10 < 0 and rt1 < 0
-            wereBothLarge = rt10 > 0 and rt1 > 0
-            # Main rescaling code
-            if rt10 < 0.:
-                self.rescale(factor)
-                workspace = updateWorkspace()
-                continue
-            if rt1 > 0.:
-                self.rescale(1/factor)
-                workspace = updateWorkspace()
-                continue
-        # Finding the root (Brent bracketing part)
-        logger.debug("Final scale : %f" % self.scale)
-        logger.debug("Starting brent bracketing")
-        ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
-        endUL = time.time()
-        logger.debug("ulSigma elpased time : %1.4f secs" % (endUL - startUL))
-        return ul*self.scale # self.scale has been updated within self.rescale() method
+                if workspace_index == None:
+                    logger.debug("There are several workspaces but no workspace index was provided")
+                    workspace_index = self.getBestCombinationIndex()
+                    # return None
+                if self.zeroSignalsFlag[workspace_index] == True:
+                    logger.debug("Workspace number %d has zero signals" % workspace_index)
+                    return None
+            def updateWorkspace():
+                if self.nWS == 1:
+                    return self.workspaces[0]
+                else:
+                    return self.workspaces[workspace_index]
+            workspace = updateWorkspace()
+            def root_func(mu):
+                # Same modifiers_settings as those use when running the 'pyhf cls' command line
+                msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
+                model = workspace.model(modifier_settings=msettings)
+                start = time.time()
+                stat = "qtilde" # by default
+                args = { "return_expected": expected }
+                pver = float ( pyhf.__version__[:3] )
+                if pver < 0.6:
+                    args["qtilde"]=True
+                else:
+                    args["test_stat"]=stat
+                with np.testing.suppress_warnings() as sup:
+                    if pyhfinfo["backend"] == "numpy":
+                        sup.filter ( RuntimeWarning, r'invalid value encountered in log')
+                    result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
+                end = time.time()
+                logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
+                if expected:
+                    logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                    try:
+                        CLs = float(result[1].tolist())
+                    except TypeError:
+                        CLs = float(result[1][0])
+                else:
+                    logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                    CLs = float(result)
+                # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
+                return 1.0 - self.cl - CLs
+            # Rescaling singals so that mu is in [0, 10]
+            factor = 10.
+            wereBothLarge = False
+            wereBothTiny = False
+            nattempts = 0
+            nNan = 0
+            lo_mu, hi_mu = .2, 5.
+            while "mu is not in [lo_mu,hi_mu]":
+                nattempts += 1
+                if nNan > 5:
+                    logger.warning("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
+                    stat = "q"
+                    # nattempts = 0
+                """
+                if nattempts == 7:
+                    logger.debug("7 attempts made, try now with zero lu_mu %s" % ( lo_mu, hi_mu ) )
+                    lo_mu = -1e-10
+                """
+                if nattempts > 10:
+                    logger.warning ( "tried 10 times to determine the bounds for brent bracketing. we abort now." )
+                    return None
+                # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
+                rt1 = root_func(lo_mu)
+                rt10 = root_func(hi_mu)
+                if rt1 < 0. and 0. < rt10: # Here's the real while condition
+                    break
+                if self.alreadyBeenThere:
+                    factor = 1 + (factor-1)/2
+                    logger.debug("Diminishing rescaling factor")
+                if np.isnan(rt1):
+                    nNan += 1
+                    self.rescale(factor)
+                    workspace = updateWorkspace()
+                    continue
+                if np.isnan(rt10):
+                    nNan += 1
+                    self.rescale(1/factor)
+                    workspace = updateWorkspace()
+                    continue
+                # Analyzing previous values of wereBoth***
+                if rt10 < 0 and rt1 < 0 and wereBothLarge:
+                    factor = 1 + (factor-1)/2
+                    logger.debug("Diminishing rescaling factor")
+                if rt10 > 0 and rt1 > 0 and wereBothTiny:
+                    factor = 1 + (factor-1)/2
+                    logger.debug("Diminishing rescaling factor")
+                # Preparing next values of wereBoth***
+                wereBothTiny = rt10 < 0 and rt1 < 0
+                wereBothLarge = rt10 > 0 and rt1 > 0
+                # Main rescaling code
+                if rt10 < 0.:
+                    self.rescale(factor)
+                    workspace = updateWorkspace()
+                    continue
+                if rt1 > 0.:
+                    self.rescale(1/factor)
+                    workspace = updateWorkspace()
+                    continue
+            # Finding the root (Brent bracketing part)
+            logger.debug("Final scale : %f" % self.scale)
+            logger.debug("Starting brent bracketing")
+            ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
+            endUL = time.time()
+            logger.debug("ulSigma elpased time : %1.4f secs" % (endUL - startUL))
+            return ul*self.scale # self.scale has been updated within self.rescale() method
 
 if __name__ == "__main__":
     C = [ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
