@@ -221,7 +221,8 @@ class TheoryPrediction(object):
             lumi = self.dataset.getLumi()
             #Create a list of signal events in each dataset/SR sorted according to datasetOrder
             srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
-            srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
+            srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
+            # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
             llhd,lmax,lsm = computeCombinedStatistics ( self.dataset, srNsigs, marginalize,
                                                                      deltas_rel )
             self.likelihood = llhd
