@@ -600,7 +600,7 @@ class SummaryPrinter(TxTPrinter):
             if r_expected != None and r_expected > maxcoll[coll]["exp"]:
                 maxcoll[coll]= { "obs": r, "exp": r_expected,
                                  "anaid": expResult.globalInfo.id }
-            if r > maxr["obs"]:
+            if r!= None and r > maxr["obs"]:
                 maxr = { "obs": r, "exp": r_expected, "anaid": expResult.globalInfo.id }
 
         output += "#Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected"
@@ -609,19 +609,28 @@ class SummaryPrinter(TxTPrinter):
             expResult = theoPred.expResult
             txnames = theoPred.txnames
             ul = theoPred.getUpperLimit(expected=False)
+            uls = str(ul)
+            if isinstance(ul,unum.Unum):
+                uls = "%10.3E" % ul.asNumber(fb)
             signalRegion = theoPred.dataset.getID()
             if signalRegion is None:
                 signalRegion = '(UL)'
             value = theoPred.xsection.value
             r = theoPred.getRValue(expected=False)
             r_expected = theoPred.getRValue(expected=True)
+            rs = str(r)
+            rs_expected = str(r_expected)
+            if type(r) in [ int, float, np.float64 ]:
+                rs = "%10.3E" % r
+            if type(r_expected) in [ int, float, np.float64 ]:
+                rs_expected = "%10.3E" % r_expected
 
             output += "%19s  " % (expResult.globalInfo.id)  # ana
             # output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
             output += "%2.2E  " % (expResult.globalInfo.sqrts.asNumber(TeV))  # sqrts
             output += "%5s " % theoPred.getmaxCondition()  # condition violation
-            output += "%10.3E %10.3E " % (value.asNumber(fb), ul.asNumber(fb))  # theory cross section , expt upper limit
-            if r_expected: output += "%10.3E %10.3E" % (r, r_expected)
+            output += "%10.3E %s " % (value.asNumber(fb), uls)  # theory cross section , expt upper limit
+            if r_expected: output += "%s %s" % (rs, rs_expected)
             else: output += "%10.3E  N/A" %r
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
@@ -890,7 +899,6 @@ class PyPrinter(BasicPrinter):
                 resDict['l_max'] = self._round ( theoryPrediction.lmax )
                 resDict['l_SM'] = self._round ( theoryPrediction.lsm )
             ExptRes.append(resDict)
-
 
         return {'ExptRes' : ExptRes}
 
