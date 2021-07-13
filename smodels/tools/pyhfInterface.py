@@ -43,7 +43,6 @@ except pyhf.exceptions.ImportBackendError as e:
     import numpy
     pyhfinfo["backendver"]=numpy.version.full_version
 
-    from numpy import warnings
     warnings.filterwarnings('ignore', r'invalid value encountered in log')
 
 from scipy import optimize
@@ -288,60 +287,36 @@ class PyhfUpperLimitComputer:
                                 choose index of best combo
         :param nll: if true, return nll, not llhd
         """
-
-        if workspace_index == None:
-            workspace_index = self.getBestCombinationIndex()
-        if workspace_index == None:
-            return None
-        logger.debug("Calling likelihood")
-        if workspace_index in self.data.cached_likelihoods:
-            return self.exponentiateNLL ( self.data.cached_likelihoods[workspace_index],
-                                          not nll )
-        self.__init__(self.data)
-        ### allow this, for computation of l_SM
-        #if self.zeroSignalsFlag[workspace_index] == True:
-        #    logger.warning("Workspace number %d has zero signals" % workspace_index)
-        #    return None
-        workspace = self.workspaces[workspace_index]
-        # Same modifiers_settings as those used when running the 'pyhf cls' command line
-        msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
-        model = workspace.model(modifier_settings=msettings)
-        """
-        # test_poi = 1.
-        # _, nllh = pyhf.infer.mle.fixed_poi_fit(test_poi, workspace.data(model), model, return_fitted_val=True)
-        # _, nllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
-        # Computing the background numbers and fetching the observations
-        for ch in workspace['channels']:
-            chName = ch['name']
-            # Backgrounds
-            for sp in ch['samples']:
-                if sp['name'] != 'bsm':
-                    try:
-                        bkg = [b + d for b, d in zip(bkg, sp['data'])]
-                    except NameError: # If bkg doesn't exit, intialize it
-                        bkg = sp['data']
-                else:
-                    print ( "likelihood nsig=", sp["data"] )
-            print ( "likelihood bkg=", bkg )
-            del bkg
-            # Observations
-            for observation in workspace['observations']:
-                if observation['name'] == chName:
-                    obs = observation['data']
-                    print ( "likelihood obs=", obs )
-        print ( "likelihood computing for", workspace.data(model) )
-        """
-        _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model), model,
-                                                    return_fitted_val=True)
-        # print ( "likelihood best fit", _ )
-        ret = nllh.tolist()
-        try:
-            ret = float(ret)
-        except:
-            ret = float(ret[0])
-        self.data.cached_likelihoods[workspace_index]=ret
-        ret = self.exponentiateNLL ( ret, not nll )
-        return ret
+        with warnings.catch_warnings():
+            warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
+            if workspace_index == None:
+                workspace_index = self.getBestCombinationIndex()
+            if workspace_index == None:
+                return None
+            logger.debug("Calling likelihood")
+            if workspace_index in self.data.cached_likelihoods:
+                return self.exponentiateNLL ( self.data.cached_likelihoods[workspace_index],
+                                              not nll )
+            self.__init__(self.data)
+            ### allow this, for computation of l_SM
+            #if self.zeroSignalsFlag[workspace_index] == True:
+            #    logger.warning("Workspace number %d has zero signals" % workspace_index)
+            #    return None
+            workspace = self.workspaces[workspace_index]
+            # Same modifiers_settings as those used when running the 'pyhf cls' command line
+            msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
+            model = workspace.model(modifier_settings=msettings)
+            _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model), model,
+                                                        return_fitted_val=True)
+            # print ( "likelihood best fit", _ )
+            ret = nllh.tolist()
+            try:
+                ret = float(ret)
+            except:
+                ret = float(ret[0])
+            self.data.cached_likelihoods[workspace_index]=ret
+            ret = self.exponentiateNLL ( ret, not nll )
+            return ret
 
     def getBestCombinationIndex( self ):
         """ find the index of the best expected combination """
@@ -380,33 +355,35 @@ class PyhfUpperLimitComputer:
         :param workspace_index: supply index of workspace to use. If None,
                                 choose index of best combo
         """
-        logger.debug("Calling lmax")
-        self.__init__(self.data)
-        if workspace_index == None:
-            workspace_index = self.getBestCombinationIndex()
-        if workspace_index in self.data.cached_lmaxes:
-            return self.exponentiateNLL ( self.data.cached_lmaxes[workspace_index], not nll )
-        if self.nWS == 1:
-            workspace = self.workspaces[0]
-        elif workspace_index != None:
-            if self.zeroSignalsFlag[workspace_index] == True:
-                logger.warning("Workspace number %d has zero signals" % workspace_index)
-                return None
-            else:
-                workspace = self.workspaces[workspace_index]
-        # Same modifiers_settings as those used when running the 'pyhf cls' command line
-        msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
-        model = workspace.model(modifier_settings=msettings)
-        _, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
-        # print ( "lmax best fit at", _ )
-        ret = maxNllh.tolist()
-        try:
-            ret = float(ret)
-        except:
-            ret = float(ret[0])
-        self.data.cached_lmaxes [ workspace_index ] = ret
-        ret = self.exponentiateNLL ( ret, not nll )
-        return ret
+        with warnings.catch_warnings():
+            warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
+            logger.debug("Calling lmax")
+            self.__init__(self.data)
+            if workspace_index == None:
+                workspace_index = self.getBestCombinationIndex()
+            if workspace_index in self.data.cached_lmaxes:
+                return self.exponentiateNLL ( self.data.cached_lmaxes[workspace_index], not nll )
+            if self.nWS == 1:
+                workspace = self.workspaces[0]
+            elif workspace_index != None:
+                if self.zeroSignalsFlag[workspace_index] == True:
+                    logger.warning("Workspace number %d has zero signals" % workspace_index)
+                    return None
+                else:
+                    workspace = self.workspaces[workspace_index]
+            # Same modifiers_settings as those used when running the 'pyhf cls' command line
+            msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
+            model = workspace.model(modifier_settings=msettings)
+            _, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
+            # print ( "lmax best fit at", _ )
+            ret = maxNllh.tolist()
+            try:
+                ret = float(ret)
+            except:
+                ret = float(ret[0])
+            self.data.cached_lmaxes [ workspace_index ] = ret
+            ret = self.exponentiateNLL ( ret, not nll )
+            return ret
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of looking for mu bounds
