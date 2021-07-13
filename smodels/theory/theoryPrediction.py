@@ -354,8 +354,7 @@ class TheoryPredictionList(object):
         Reverse sort theoryPredictions by R value.
         Used for printer.
         """
-        self._theoryPredictions = sorted(self._theoryPredictions, key=lambda theoPred: theoPred.getRValue(), reverse=True)
-
+        self._theoryPredictions = sorted(self._theoryPredictions, key=lambda theoPred: ( theoPred.getRValue() is not None, theoPred.getRValue()), reverse=True)
 
 def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
                 useBestDataset=True, combinedResults=True,
