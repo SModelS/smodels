@@ -56,23 +56,12 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
             logger.warning("All signals are empty")
             return None
         ulcomputer = _getPyhfComputer( dataset, nsig )
-        if ulcomputer.nWS == 1:
-            ret = ulcomputer.ulSigma(expected=expected)
-            ret = ret/dataset.getLumi()
-            logger.debug("pyhf upper limit : {}".format(ret))
-            return ret
-        else:
-            if expected:
-                try:
-                    ret = ulMin/dataset.getLumi()
-                except NameError:
-                    ret = ulcomputer.ulSigma(expected=True )
-                    ret = ret/dataset.getLumi()
-            else:
-                ret = ulcomputer.ulSigma(expected=False )
-                ret = ret/dataset.getLumi()
-            logger.debug("pyhf upper limit : {}".format(ret))
-            return ret
+        ret = ulcomputer.ulSigma(expected=expected)
+        if ret == None:
+            return None
+        ret = ret/dataset.getLumi()
+        logger.debug("pyhf upper limit : {}".format(ret))
+        return ret
     else:
         logger.error ( "no covariance matrix or json file given in globalInfo.txt for %s" % dataset.globalInfo.id )
         raise SModelSError( "no covariance matrix or json file given in globalInfo.txt for %s" % dataset.globalInfo.id )
