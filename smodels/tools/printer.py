@@ -11,7 +11,7 @@
 """
 
 from __future__ import print_function
-import sys,os
+import sys,os,copy
 from smodels.theory.topology import TopologyList
 from smodels.theory.theoryPrediction import TheoryPredictionList
 from smodels.experiment.databaseObj import ExpResultList
@@ -1298,7 +1298,9 @@ def getSummaryFrom(output,ptype):
         rvals,rexp,anaIDs = info
 
     #Sort results by r_obs:
-    asort = rvals.argsort()[::-1]
+    rvalswo = copy.deepcopy ( rvals )
+    rvalswo[rvalswo==None]=-1
+    asort = rvalswo.argsort()[::-1]
     rvals = rvals[asort]
     anaIDs = anaIDs[asort]
     rexp = rexp[asort]
@@ -1306,8 +1308,11 @@ def getSummaryFrom(output,ptype):
     summaryDict['r_exp'] = rexp[0]
     summaryDict['MostConstrainingAnalysis'] = anaIDs[0]
 
+    #Sort results by r_obs:
+    rvalswo = copy.deepcopy ( rexp )
+    rvalswo[rvalswo==None]=-1
     #Sort results by r_exp:
-    asort = rexp.argsort()[::-1]
+    asort = rvalswo.argsort()[::-1]
     rvals = rvals[asort]
     anaIDs = anaIDs[asort]
     rexp = rexp[asort]
