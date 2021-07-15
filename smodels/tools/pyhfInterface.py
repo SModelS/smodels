@@ -386,7 +386,8 @@ class PyhfUpperLimitComputer:
             return ret
 
     # Trying a new method for upper limit computation :
-    # re-scaling the signal predictions so that mu falls in [0, 10] instead of looking for mu bounds
+    # re-scaling the signal predictions so that mu falls in [0, 10] instead of
+    # looking for mu bounds
     # Usage of the index allows for rescaling
     def ulSigma (self, expected=False, workspace_index=None):
         """
@@ -463,18 +464,13 @@ class PyhfUpperLimitComputer:
             wereBothTiny = False
             nattempts = 0
             nNan = 0
-            lo_mu, hi_mu = .2, 5.
+            lo_mu, med_mu, hi_mu = .2, 1., 5.
             while "mu is not in [lo_mu,hi_mu]":
                 nattempts += 1
                 if nNan > 5:
                     logger.warning("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
                     stat = "q"
                     # nattempts = 0
-                """
-                if nattempts == 7:
-                    logger.debug("7 attempts made, try now with zero lu_mu %s" % ( lo_mu, hi_mu ) )
-                    lo_mu = -1e-10
-                """
                 if nattempts > 10:
                     logger.warning ( "tried 10 times to determine the bounds for brent bracketing. we abort now." )
                     return None
@@ -487,11 +483,23 @@ class PyhfUpperLimitComputer:
                     factor = 1 + (factor-1)/2
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
+                    rt5 = root_func ( med_mu )
+                    if rt5 < 0. and rt10 > 0.:
+                        lo_mu = med_mu
+                        med_mu = np.sqrt (lo_mu * hi_mu)
+                        workspace= updateWorkspace()
+                        continue
                     nNan += 1
                     self.rescale(factor)
                     workspace = updateWorkspace()
                     continue
                 if np.isnan(rt10):
+                    rt5 = root_func ( med_mu )
+                    if rt5 > 0. and rt1 < 0.:
+                        hi_mu = med_mu
+                        med_mu = np.sqrt (lo_mu * hi_mu)
+                        workspace= updateWorkspace()
+                        continue
                     nNan += 1
                     self.rescale(1/factor)
                     workspace = updateWorkspace()
