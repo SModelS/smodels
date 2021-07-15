@@ -489,6 +489,8 @@ class PyhfUpperLimitComputer:
                         med_mu = np.sqrt (lo_mu * hi_mu)
                         workspace= updateWorkspace()
                         continue
+                    if rt10 < 0.: ## also try to increase hi_mu
+                        hi_mu = hi_mu + ( 10. - hi_mu ) * .5
                     nNan += 1
                     self.rescale(factor)
                     workspace = updateWorkspace()
@@ -500,6 +502,8 @@ class PyhfUpperLimitComputer:
                         med_mu = np.sqrt (lo_mu * hi_mu)
                         workspace= updateWorkspace()
                         continue
+                    if rt1 > 0.: ## also try to decrease lo_mu
+                        lo_mu = lo_mu * .5
                     nNan += 1
                     self.rescale(1/factor)
                     workspace = updateWorkspace()
