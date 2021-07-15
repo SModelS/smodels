@@ -465,6 +465,7 @@ class PyhfUpperLimitComputer:
             nattempts = 0
             nNan = 0
             lo_mu, med_mu, hi_mu = .2, 1., 5.
+            # print ( "starting with expected", expected )
             while "mu is not in [lo_mu,hi_mu]":
                 nattempts += 1
                 if nNan > 5:
@@ -476,7 +477,9 @@ class PyhfUpperLimitComputer:
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
                 rt1 = root_func(lo_mu)
+                # rt5 = root_func(med_mu)
                 rt10 = root_func(hi_mu)
+                # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
                 if rt1 < 0. and 0. < rt10: # Here's the real while condition
                     break
                 if self.alreadyBeenThere:
@@ -491,6 +494,7 @@ class PyhfUpperLimitComputer:
                         continue
                     if rt10 < 0.: ## also try to increase hi_mu
                         hi_mu = hi_mu + ( 10. - hi_mu ) * .5
+                        med_mu = np.sqrt (lo_mu * hi_mu)
                     nNan += 1
                     self.rescale(factor)
                     workspace = updateWorkspace()
@@ -504,6 +508,7 @@ class PyhfUpperLimitComputer:
                         continue
                     if rt1 > 0.: ## also try to decrease lo_mu
                         lo_mu = lo_mu * .5
+                        med_mu = np.sqrt (lo_mu * hi_mu)
                     nNan += 1
                     self.rescale(1/factor)
                     workspace = updateWorkspace()
@@ -533,6 +538,7 @@ class PyhfUpperLimitComputer:
             ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
             endUL = time.time()
             logger.debug("ulSigma elpased time : %1.4f secs" % (endUL - startUL))
+            # print ( "we found", ul )
             return ul*self.scale # self.scale has been updated within self.rescale() method
 
 if __name__ == "__main__":
