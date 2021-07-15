@@ -459,7 +459,7 @@ class PyhfUpperLimitComputer:
                 # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
                 return 1.0 - self.cl - CLs
             # Rescaling singals so that mu is in [0, 10]
-            factor = 10.
+            factor = 3.
             wereBothLarge = False
             wereBothTiny = False
             nattempts = 0
