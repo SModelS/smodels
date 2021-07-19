@@ -176,16 +176,16 @@ class Filler:
                     rmax = r
                     Txname = getEntry(expres,'TxNames')
                     Txname=','.join(Txname)
-                    if getEntry(expres,'chi2')==False:
-                        chi_2=False
-                    else:
-                        chi_2 = getEntry(expres,'chi2')
-                        chi_2 = Filler.truncate(self,chi_2)
+                    #if getEntry(expres,'chi2')==False:
+                    #    chi_2=False
+                    #else:
+                    #    chi_2 = getEntry(expres,'chi2')
+                    #    chi_2 = Filler.truncate(self,chi_2)
 
                     analysis_id = getEntry(expres,'AnalysisID')
         else:
             Txname = False
-            chi_2 = False
+            #chi_2 = False
             analysis_id = False
             rmax=False
 
@@ -207,8 +207,8 @@ class Filler:
         if 'Tx' in self.data_dict.keys():
             self.data_dict['Tx'].append(Txname)
 
-        if 'chi2' in self.data_dict.keys():
-            self.data_dict['chi2'].append(chi_2)
+        #if 'chi2' in self.data_dict.keys():
+        #    self.data_dict['chi2'].append(chi_2)
         if 'Analysis' in self.data_dict.keys():
             self.data_dict['Analysis'].append(analysis_id)
         return self.data_dict;
@@ -495,7 +495,7 @@ class PlotlyBackend:
         Transform the main dictionary in a data frame.
         """
         self.data_frame_all = pd.DataFrame(data=self.data_dict)
-        self.data_frame_all.to_csv('all_data_frame.txt', sep=' ', index=False,header=True)
+        self.data_frame_all.to_csv(self.path_to_plots+'/data_frame.txt', sep=' ', index=False,header=True)
 
         return self.data_frame_all
 
@@ -505,7 +505,7 @@ class PlotlyBackend:
 
         self.html_names={'SModelS_status':'SModelS status',
                       'r_max':'r<sub>max</sub>',
-                      'chi2':' &#967;<sup>2</sup>',
+                      #'chi2':' &#967;<sup>2</sup>',
                       'Tx':'T<sub>max</sub>',
                       'Analysis':'Analysis',
                       'MT_max':'MT<sub>max</sub>',
@@ -576,14 +576,15 @@ class PlotlyBackend:
             data_frame_provisional.loc[data_frame_provisional['Analysis'] =='False', 'Analysis'] = 'Not-available'
 
             self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('Analysis')+': '+data_frame_provisional['Analysis']+'<br>'
-        if 'chi2' in self.SModelS_hover_information:
-
-
-            data_frame_provisional.loc[data_frame_provisional['chi2'] =='False', 'chi2'] = 'Not-available'
-
-
-
-            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('chi2')+': '+data_frame_provisional['chi2'].astype('str')+'<br>'
+            
+        #if 'chi2' in self.SModelS_hover_information:
+#
+#
+#            data_frame_provisional.loc[data_frame_provisional['chi2'] =='False', 'chi2'] = 'Not-available'
+#
+#
+#
+#            self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+self.html_names.get('chi2')+': '+data_frame_provisional['chi2'].astype('str')+'<br>'
         if 'MT_max' in self.SModelS_hover_information:
 
             data_frame_provisional.loc[data_frame_provisional['MT_max'] =='False', 'MT_max'] = 'Not-available'
@@ -651,7 +652,7 @@ class PlotlyBackend:
         ''' Generate a description for each plot.'''
         self.plot_descriptions={'SModelS_status':'Excluded or not excluded by SModelS.',
               'r_max':'highest r-value from SModelS.',
-              'chi2':'&#967;<sup>2</sup> value associated to the highest r-value.',
+              #'chi2':'&#967;<sup>2</sup> value associated to the highest r-value.',
               'Tx':'Topology/ies which give the highest r-value.',
               'Analysis':'Experimental analysis that the highest r-value comes from.',
               'MT_max':'Missing topologies with the largest cross section.',
@@ -671,14 +672,14 @@ class PlotlyBackend:
 
 
 
-                if cont_plot=='chi2':
-                    all_false=True
-                    for chi2_value in data_frame['chi2']:
-                        if chi2_value!=False:
-                            all_false=False
-                    if all_false==True:
-                        logger.info('No values where found for chi^2. Skipping this plot')
-                        continue
+               # if cont_plot=='chi2':
+               #     all_false=True
+               #     for chi2_value in data_frame['chi2']:
+               #         if chi2_value!=False:
+               #             all_false=False
+               #     if all_false==True:
+               #         logger.info('No values where found for chi^2. Skipping this plot')
+               #         continue
 
                 ####select only available values
                 data_frame_noFalse=data_frame.loc[data_frame[cont_plot]!=False]
@@ -888,9 +889,9 @@ class PlotlyBackend:
             for option in self.plot_data:
 
 
-                if plot=='chi2' and os.path.isfile(self.path_to_plots+'/chi2_'+option+'.html')==False:
-                    main_file.write('<p> <i> No &#967;<sup>2</sup> values where found in region '+option+' </i> <br>')
-                    continue
+               # if plot=='chi2' and os.path.isfile(self.path_to_plots+'/chi2_'+option+'.html')==False:
+               #     main_file.write('<p> <i> No &#967;<sup>2</sup> values where found in region '+option+' </i> <br>')
+               #     continue
 
 
                 plot_link=hyperlink_format.format( link=plot_name+'_'+option+'.html', 

@@ -51,8 +51,7 @@ class RunInteractivePlotSTest(unittest.TestCase):
         if os.path.isdir(outFolder):
             shutil.rmtree(outFolder)
 
-        if os.path.exists ( "all_data_frame.txt" ):
-            os.unlink( "all_data_frame.txt" )
+
 
 
     # this test corresponds to calling
@@ -86,8 +85,7 @@ class RunInteractivePlotSTest(unittest.TestCase):
         if os.path.isdir(outFolder):
             shutil.rmtree(outFolder)
 
-        if os.path.exists ( "all_data_frame.txt" ):
-            os.unlink ( "all_data_frame.txt" )
+
 
 if __name__ == "__main__":
     unittest.main()
