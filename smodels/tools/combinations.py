@@ -86,6 +86,22 @@ def computeCombinedStatistics ( dataset, nsig, marginalize=False, deltas_rel=0.2
     lsm =  _combinedLikelihood ( dataset, [0.]*len(nsig), marginalize, deltas_rel )
     return lbsm, lmax, lsm
 
+def computeCombinedLikelihood ( dataset, nsig, marginalize=False, deltas_rel=0.2 ):
+    """ compute only lBSM
+    :param nsig: predicted signal (list)
+    :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+    """
+    if dataset.type == "pyhf":
+        # Getting the path to the json files
+        # Loading the jsonFiles
+        ulcomputer = _getPyhfComputer( dataset, nsig, False )
+        index = ulcomputer.getBestCombinationIndex()
+        lbsm = ulcomputer.likelihood( index )
+        return lbsm
+    lbsm = _combinedLikelihood( dataset, nsig, marginalize, deltas_rel )
+    return lbsm
+
+
 
 def _getPyhfComputer ( dataset, nsig, normalize = True ):
     """ create the pyhf ul computer object
