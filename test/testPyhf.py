@@ -233,7 +233,7 @@ class PyhfTest(unittest.TestCase):
         data = PyhfData([[0.1], [0.2]], ws)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.ulSigma()
-        self.assertAlmostEqual ( ul, 70.46667757840818, 4 )
+        self.assertAlmostEqual ( ul, 70.44942596708917, 1 )
         # self.assertIsNone(ul)
 
     def testFullPyhfModule1(self):
