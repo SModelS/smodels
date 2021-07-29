@@ -13,6 +13,8 @@
 
 from __future__ import print_function
 import os
+import hashlib
+import pathlib
 ## sweet spot for numpy multi-threading is 2? More threads
 ## make some weaker machines freeze when building the pickle file.
 ## Anyhow, we parallelize at a higher level.
@@ -35,6 +37,9 @@ try:
     import cPickle as serializer
 except ImportError as e:
     import pickle as serializer
+
+def _getSHA1 ( filename ):
+    return hashlib.sha1( pathlib.Path(filename).read_bytes() ).hexdigest()
 
 class Database(object):
     """ Database object. Holds a list of SubDatabases.
@@ -631,8 +636,17 @@ class SubDatabase(object):
         size = r.json()["size"]
         cDir,defused = cacheDirectory ( create=True, reportIfDefault=True )
         t0=time.time()
+        filename =  os.path.join ( cDir, r.json()["url"].split("/")[-1] )
+        if os.path.exists ( filename ):
+            # if file exists and checksums match, we dont download
+            if "sha1" in r.json():
+                sha = _getSHA1 ( filename )
+                if sha == r.json()["sha1"]:
+                    ## seems it hasnt changed
+                    self.force_load = "pcl"
+                    return ( "./", "%s" % filename )
         r2=requests.get ( r.json()["url"], stream=True, timeout=(500,500) )
-        filename= os.path.join ( cDir, r2.url.split("/")[-1] )
+        # filename= os.path.join ( cDir, r2.url.split("/")[-1] )
         msg = "caching the downloaded database in %s." % cDir
         if defused:
             msg += " If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'."
@@ -696,10 +710,19 @@ class SubDatabase(object):
         if not os.path.exists ( filename ):
             return self.fetchFromScratch ( path, store, discard_zeroes )
         stats = os.stat ( filename )
-        if stats.st_size < jsn["size"]-2048:
-            ## size doesnt match (2048 is to allow for slightly different file
+        if abs ( stats.st_size - jsn["size"]) > 4096:
+            ## size doesnt match (4096 is to allow for slightly different file
             ## sizes reported by the OS). redownload!
             return self.fetchFromScratch ( path, store, discard_zeroes )
+        """
+        # dont do this b/c its slowish
+        if "sha1" in r.json():
+            t0 = time.time()
+            sha = _getSHA1 ( filename )
+            print ( "it took", time.time()-t0 )
+            if sha != r.json()["sha1"]:
+                return self.fetchFromScratch ( path, store, discard_zeroes )
+        """
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!
             return self.fetchFromScratch( path, store, discard_zeroes )
