@@ -102,14 +102,12 @@ class StatisticsTest(unittest.TestCase):
         prediction = theoryPredictionsFor(expRes[0], smstoplist)[0]
         prediction.computeStatistics()
         import numpy
-        tot=0.
-        for i in numpy.arange(0.,.2 ,.02 ):
-            tot+=prediction.getLikelihood(i)
         c=0.
         for i in numpy.arange(0.,.2 ,.02 ):
             l=prediction.getLikelihood(i)
             c+=l
         self.assertAlmostEqual ( prediction.likelihood, 1.563288e-35, 3 )
+        self.assertAlmostEqual ( c, 0.010213526179269492, 3 )
 
     def testPredictionInterface(self):
         """ A simple test to see that the interface in datasetObj

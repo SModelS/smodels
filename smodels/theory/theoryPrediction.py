@@ -14,7 +14,8 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statistics import likelihoodFromLimits, chi2FromLimits
-from smodels.tools.combinations import computeCombinedStatistics, getCombinedUpperLimitFor
+from smodels.tools.combinations import computeCombinedStatistics, getCombinedUpperLimitFor,\
+                                       computeCombinedLikelihood
 import itertools
 
 class TheoryPrediction(object):
@@ -165,21 +166,25 @@ class TheoryPrediction(object):
         :param expected: compute expected, not observed likelihood
         """
         self.computeStatistics ( marginalize, deltas_rel )
-        if hasattr ( self, "likelihood" ):
+        if hasattr ( self, "likelihood" ) and abs ( mu - 1. ) < 1e-5:
             return self.likelihood
-        return None
-        """
-        if self.dataType()  == 'upperLimit':
-            # FIXME treat the case of exisiting expected upper limit
-            return self.likelihoodFromLimits ( mu, marginalize, deltas_rel, expected )
-        if self.dataType() == 'efficiencyMap':
-            lumi = self.dataset.getLumi()
-            nsig = mu*(self.xsection.value*lumi).asNumber()
-            llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel,expected=expected)
+        lumi = self.dataset.getLumi()
+        if self.dataType() == 'combined':
+            srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for \
+                              pred in self.datasetPredictions])
+            srNsigs = [mu*srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. \
+                       for ds in self.dataset._datasets]
+            llhd = computeCombinedLikelihood ( self.dataset, srNsigs, marginalize,
+                                               deltas_rel )
             return llhd
-        # FIXME add combined!!
+        if self.dataType() == 'efficiencyMap':
+            nsig = (mu*self.xsection.value*lumi).asNumber()
+            llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
+        if self.dataType()  == 'upperLimit':
+            llhd, chi2 = self.likelihoodFromLimits ( mu, marginalize, deltas_rel, chi2also=True )
+            return llhd
         return None
-        """
+
 
     def computeStatistics(self,marginalize=False,deltas_rel=0.2):
         """
