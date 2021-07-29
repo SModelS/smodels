@@ -58,7 +58,7 @@ class Database(object):
                           Should only be used when working on the database.
         :param combinationsmatrix: an optional dictionary that contains info
                      about combinable analyses, e.g. { "anaid1": ( "anaid2", "anaid3" ) }
-                     optionally specifying signal regions, e.g. { "anaid1:SR1": 
+                     optionally specifying signal regions, e.g. { "anaid1:SR1":
                      ( "anaid2:SR2", "anaid3" ) }
         """
         self.subs = []
@@ -249,7 +249,7 @@ class Database(object):
             for j,rj in enumerate(r[i+1:]):
                 if ri in rj:
                     r[i+j+1]=rj.replace(ri,"")
-                    
+
         return "+".join ( r )
 
     @property
@@ -277,7 +277,7 @@ class Database(object):
         return ret
 
     def createLinksToCombinationsMatrix ( self ):
-        """ in all globalInfo objects, create a shallow link to the 
+        """ in all globalInfo objects, create a shallow link to the
             combinations matrix """
         for x in self.subs:
             if not hasattr ( x, "combinationsmatrix" ) or x.combinationsmatrix == None:
@@ -316,7 +316,7 @@ class SubDatabase(object):
                           Should only be used when working on the database.
         :param combinationsmatrix: an optional dictionary that contains info
                      about combinable analyses, e.g. { "anaid1": ( "anaid2", "anaid3" ) }
-                     optionally specifying signal regions, e.g. { "anaid1:SR1": 
+                     optionally specifying signal regions, e.g. { "anaid1:SR1":
                      ( "anaid2:SR2", "anaid3" ) }
         """
 
@@ -442,7 +442,7 @@ class SubDatabase(object):
         for ctr,er in enumerate(self.expResultList):
             if hasattr ( er.globalInfo, "_combinationsmatrix" ):
                 del er.globalInfo._combinationsmatrix
-        
+
 
     def removeLinksToModel ( self ):
         """ remove the links of globalInfo._databaseParticles to the model.
@@ -619,7 +619,7 @@ class SubDatabase(object):
             raise SModelSError()
         if r.status_code != 200:
             line = "Error %d: could not fetch '%s' from server: '%s'" % \
-                           ( r.status_code, path, r.reason ) 
+                           ( r.status_code, path, r.reason )
             logger.error( line )
             raise SModelSError( line )
         ## its new so store the description
@@ -631,7 +631,7 @@ class SubDatabase(object):
         size = r.json()["size"]
         cDir,defused = cacheDirectory ( create=True, reportIfDefault=True )
         t0=time.time()
-        r2=requests.get ( r.json()["url"], stream=True, timeout=5 )
+        r2=requests.get ( r.json()["url"], stream=True, timeout=(500,500) )
         filename= os.path.join ( cDir, r2.url.split("/")[-1] )
         msg = "caching the downloaded database in %s." % cDir
         if defused:
@@ -938,7 +938,7 @@ class SubDatabase(object):
                             usual shell wildcards: * ? [<letters>]
         :param dataTypes: dataType of the analysis (all, efficiencyMap or upperLimit)
                             Can be wildcarded with usual shell wildcards: * ? [<letters>]
-        :param useSuperseded: If False, the supersededBy results will not be included 
+        :param useSuperseded: If False, the supersededBy results will not be included
                               (deprecated)
         :param useNonValidated: If False, the results with validated = False
                                 will not be included
