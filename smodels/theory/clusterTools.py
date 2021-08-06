@@ -379,11 +379,6 @@ def clusterElements(elements, maxDist, dataset):
     if not isinstance(dataset,(DataSet,CombinedDataSet)):
         raise SModelSError("A dataset object must be defined for clustering")
 
-    txnames = list(set([el.txname for el in elements]))
-    if dataset.getType() == 'upperLimit' and len(txnames) != 1 :
-        logger.error("Clustering elements with different Txnames for an UL result.")
-        raise SModelSError()
-
     #Make sure only unique elements are clustered together (avoids double counting weights)
     #Sort element, so the ones with highest contribution (weight*eff) come first:
     elementList = sorted(elements, key = lambda el: el.weight.getMaxXsec()*el.eff, reverse=True)
@@ -394,6 +389,13 @@ def clusterElements(elements, maxDist, dataset):
         if any(el.isRelatedTo(elB) for elB in elementsUnique):
             continue
         elementsUnique.append(el)
+
+    #Get txname list only with the txnames from unique elements used for clustering
+    txnames = list(set([el.txname for el in elementsUnique]))
+    if dataset.getType() == 'upperLimit' and len(txnames) != 1 :
+        logger.error("Clustering elements with different Txnames for an UL result.")
+        raise SModelSError()
+
 
     if dataset.getType() == 'upperLimit': #Group according to upper limit values
         clusters = doCluster(elementsUnique, dataset, maxDist)
