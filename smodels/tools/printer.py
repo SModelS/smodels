@@ -639,7 +639,7 @@ class SummaryPrinter(TxTPrinter):
             output += " Txnames:  " + txnameStr + "\n"
 #            if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
 #                output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)
-#           print L, L_max and L_SM instead of chi2 and llhd; SK 2021-05-14 
+#           print L, L_max and L_SM instead of chi2 and llhd; SK 2021-05-14
             if hasattr(theoPred,'likelihood'):# and not theoPred.likelihood is None:
                 llhd = str(theoPred.likelihood)
                 lmax = str(theoPred.lmax)
@@ -650,7 +650,10 @@ class SummaryPrinter(TxTPrinter):
                     lmax = "%10.3E" % theoPred.lmax
                 if type(theoPred.lsm) in [ float, np.float64 ]:
                     lsm = "%10.3E" % theoPred.lsm
-                output += " Likelihoods: L, L_max, L_SM = %s %s %s\n" % (llhd, lmax, lsm)
+                if llhd == lmax == lsm == "None":
+                    output += " Likelihoods: L, L_max, L_SM = N/A\n"
+                else:
+                    output += " Likelihoods: L, L_max, L_SM = %s, %s, %s\n" % (llhd, lmax, lsm)
 
             if not (theoPred is obj[-1]):
                 output += 80 * "-"+ "\n"
