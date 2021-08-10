@@ -23,7 +23,7 @@ Decomposition output status: 1 #decomposition was successful
      CMS-SUS-13-012  8.00E+00    0.0  1.538E-01  1.205E+00  1.276E-01  2.047E-01
  Signal Region:  3NJet6_1000HT1250_600MHTinf
  Txnames:  T1, T1tttt, T2
- Likelihoods: L, L_max, L_SM =  3.848E-03  5.396E-03  2.530E-03
+ Likelihoods: L, L_max, L_SM =  3.848E-03,  5.396E-03,  2.530E-03
 --------------------------------------------------------------------------------
  CMS-PAS-SUS-15-002  1.30E+01    0.0  7.530E+00  6.806E+01  1.106E-01  N/A
  Signal Region:  (UL)
@@ -40,7 +40,7 @@ Decomposition output status: 1 #decomposition was successful
 ATLAS-CONF-2013-037  8.00E+00    0.0  7.318E-04  4.000E-01  1.830E-03  2.091E-03
  Signal Region:  SRtN3
  Txnames:  T1qqtt, T1tttt
- Likelihoods: L, L_max, L_SM =  2.450E-02  2.972E-02  2.442E-02
+ Likelihoods: L, L_max, L_SM =  2.450E-02,  2.972E-02,  2.442E-02
 --------------------------------------------------------------------------------
  CMS-PAS-SUS-15-002  1.30E+01    0.0  3.496E-02  4.207E+01  8.310E-04  N/A
  Signal Region:  (UL)
