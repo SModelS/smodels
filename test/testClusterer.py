@@ -30,6 +30,7 @@ from smodels.theory.clusterTools import clusterElements
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.particle import ParticleList
 from smodels.experiment.defaultFinalStates import finalStates
+from smodels.theory.auxiliaryFunctions import roundValue
 
 
 class ClustererTest(unittest.TestCase):
@@ -181,6 +182,10 @@ class ClustererTest(unittest.TestCase):
         clusters = clusterElements([el1,el2,el3],maxDist=0.2,dataset=dataset)
         self.assertEqual(len(clusters),2)
         averageMasses = [[[(1000.*GeV*weights[0]+1020.*GeV*weights[1])/(weights[0]+weights[1]),100.*GeV]]*2, el3.mass]
+        for ibr,br in enumerate(averageMasses):
+            for im,m in enumerate(br):
+                averageMasses[ibr][im] = roundValue(m,nround=5)
+
         elClusters = [[el1,el2], [el3]]
         for ic,cluster in enumerate(clusters):
             avgEl = cluster.averageElement()
@@ -196,6 +201,10 @@ class ClustererTest(unittest.TestCase):
         cluster = clusters[0]
         avgEl = cluster.averageElement()
         averageMass = [[(1000.*GeV*weights[0]+1020.*GeV*weights[1] + 500.*GeV*weights[2])/sum(weights),100.*GeV]]*2
+        for ibr,br in enumerate(averageMass):
+            for im,m in enumerate(br):
+                averageMass[ibr][im] = roundValue(m,nround=5)
+
         self.assertEqual(sorted(cluster.elements),sorted([el1,el2,el3]))
         for ibr,br in enumerate(avgEl.mass):
             for im,m in enumerate(br):
@@ -221,7 +230,7 @@ class ClustererTest(unittest.TestCase):
         globalInfo = Info("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/globalInfo.txt")
         txnameData=TxNameData(data, "upperLimit", Id=1)
         txname=TxName("./database/8TeV/ATLAS/ATLAS-SUSY-2013-05/data/T2bb.txt",
-                        globalInfo,info,finalStates)        
+                        globalInfo,info,finalStates)
         txname.txnameData = txnameData
         dataset = DataSet(info = globalInfo, createInfo = False)
         dataset.dataInfo = info

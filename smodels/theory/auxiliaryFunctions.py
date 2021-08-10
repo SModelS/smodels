@@ -143,7 +143,6 @@ def removeUnits(value,standardUnits):
     else:
         return value
 
-
 def addUnit(obj,unit):
     """
     Add unit to object.
@@ -199,7 +198,6 @@ def reshapeList(objList,shapeArray):
         return [reshapeList(objList,v) for v in shapeArray]
     else:
         return objList.pop(0)
-
 
 def index_bisect(inlist, el):
     """
@@ -346,7 +344,39 @@ def getAttributesFrom(obj,skipIDs=[]):
 
     return list(set(flattenArray(attributes)))
 
-def average(values,weights=None):
+def roundValue(value,nround=-1):
+    """
+    Round a value to nround significant digits. If the input value is not
+    a float or Unum object, it is zero or infinity, nothing is done.
+
+    :param nround: number of significant digits
+
+    :return: rounded value
+    """
+
+    if nround <= 0:
+        return value
+    elif not isinstance(value,(float,unum.Unum)):
+        return value
+
+    #Remove units, if it is a unum object
+    if isinstance(value,unum.Unum):
+        if not value.asNumber():
+            return value
+        elif np.isinf(value.asNumber()):
+            return value
+        unit = value/value.asNumber()
+        v = value.asNumber()
+    else:
+        unit = 1.0
+        v = value
+
+    #Round value:
+    v_rounded = round(v, nround-int(np.floor(np.log10(abs(v))))-1)
+    v_rounded *= unit
+    return v_rounded
+
+def average(values,weights=None,nround=-1):
     """
     Compute the weighted average of a list of objects.
     All the objects must be of the same type.
@@ -358,6 +388,9 @@ def average(values,weights=None):
     :param values: List of objects of the same type
     :param weights: Weights for computing the weighted average. If None it will assume
                     unit weights.
+    :param nround: If greater than zero and the returning attibute is numeric, will round it
+                      to this number of significant digits.
+
     """
 
     if weights is None:
@@ -378,7 +411,7 @@ def average(values,weights=None):
         for i,v in enumerate(values[1:]):
             total += v*weights[i+1]
         total = total/sum(weights)
-        return total
+        return roundValue(total,nround)
     elif isinstance(values[0],list):
         ndim = len(values[0])
         if any(len(v) != ndim for v in values):
@@ -386,15 +419,15 @@ def average(values,weights=None):
         res = []
         for i in range(ndim):
             try:
-                res.append(average([v[i] for v in values],weights))
+                res.append(average([v[i] for v in values],weights,nround))
             except SModelSError:
                 return None
         return res
     else:
         if all(values[0] is v for v in values):
-            return values[0]
+            return roundValue(values[0],nround)
         if all(values[0] == v for v in values):
-            return values[0]
+            return roundValue(values[0],nround)
         return None
 
 def rescaleWidth(width):
