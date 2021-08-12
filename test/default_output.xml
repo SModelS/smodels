@@ -1,214 +1,81 @@
 <?xml version="1.0" ?>
 <smodelsOutput>
-    <missing_topologies_with_displaced_decays_List/>
     <ExptRes_List>
         <ExptRes>
-            <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
-            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <DataSetID>SRtN3</DataSetID>
-            <Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>865.0</Mass_GeV>
-                    <Mass_GeV>129.0</Mass_GeV>
-                </Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>865.0</Mass_GeV>
-                    <Mass_GeV>129.0</Mass_GeV>
-                </Mass_GeV_List>
-            </Mass_GeV_List>
-            <TxNames_List>
-                <TxNames>T1qqtt</TxNames>
-                <TxNames>T1tttt</TxNames>
-            </TxNames_List>
-            <chi2>0.34726082857627727</chi2>
-            <dataType>efficiencyMap</dataType>
-            <expected_upper_limit_fb>0.35</expected_upper_limit_fb>
-            <likelihood>0.024499151313233693</likelihood>
-            <lumi_fb-1>20.7</lumi_fb-1>
-            <maxcond>0.0</maxcond>
-            <r>0.0018295636140032454</r>
-            <r_expected>0.0020909298445751377</r_expected>
-            <theory_prediction_fb>0.0007318254456012982</theory_prediction_fb>
-            <upper_limit_fb>0.4</upper_limit_fb>
-        </ExptRes>
-        <ExptRes>
-            <AnalysisID>CMS-PAS-SUS-12-026</AnalysisID>
-            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <DataSetID>None</DataSetID>
-            <Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>865.0</Mass_GeV>
-                    <Mass_GeV>129.0</Mass_GeV>
-                </Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>865.0</Mass_GeV>
-                    <Mass_GeV>129.0</Mass_GeV>
-                </Mass_GeV_List>
-            </Mass_GeV_List>
-            <TxNames_List>
-                <TxNames>T1tttt</TxNames>
-            </TxNames_List>
-            <dataType>upperLimit</dataType>
-            <expected_upper_limit_fb>None</expected_upper_limit_fb>
-            <lumi_fb-1>9.2</lumi_fb-1>
-            <maxcond>0.0</maxcond>
-            <r>7.13578770016773e-05</r>
-            <r_expected>5.496207299941542e-05</r_expected>
-            <theory_prediction_fb>0.0030736791840730283</theory_prediction_fb>
-            <upper_limit_fb>43.07414</upper_limit_fb>
-        </ExptRes>
-        <ExptRes>
-            <AnalysisID>CMS-PAS-SUS-15-002</AnalysisID>
-            <AnalysisSqrts_TeV>13.0</AnalysisSqrts_TeV>
-            <DataSetID>None</DataSetID>
-            <Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>865.0</Mass_GeV>
-                    <Mass_GeV>129.0</Mass_GeV>
-                </Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>865.0</Mass_GeV>
-                    <Mass_GeV>129.0</Mass_GeV>
-                </Mass_GeV_List>
-            </Mass_GeV_List>
-            <TxNames_List>
-                <TxNames>T1tttt</TxNames>
-            </TxNames_List>
-            <dataType>upperLimit</dataType>
-            <expected_upper_limit_fb>None</expected_upper_limit_fb>
-            <lumi_fb-1>2.2</lumi_fb-1>
-            <maxcond>0.0</maxcond>
-            <r>0.0008310275055354483</r>
-            <r_expected>None</r_expected>
-            <theory_prediction_fb>0.03496324609844045</theory_prediction_fb>
-            <upper_limit_fb>42.072309117991104</upper_limit_fb>
-        </ExptRes>
-        <ExptRes>
-            <AnalysisID>CMS-SUS-13-012</AnalysisID>
-            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <DataSetID>3NJet6_1000HT1250_600MHTinf</DataSetID>
-            <Mass_GeV>None</Mass_GeV>
-            <TxNames_List>
-                <TxNames>T1</TxNames>
-                <TxNames>T1tttt</TxNames>
-                <TxNames>T2</TxNames>
-            </TxNames_List>
-            <chi2>0.5570074332583577</chi2>
-            <dataType>efficiencyMap</dataType>
-            <expected_upper_limit_fb>0.7514</expected_upper_limit_fb>
-            <likelihood>0.003850720535907568</likelihood>
-            <lumi_fb-1>19.5</lumi_fb-1>
-            <maxcond>0.0</maxcond>
-            <r>0.12961544903797048</r>
-            <r_expected>0.20786081460041847</r_expected>
-            <theory_prediction_fb>0.15618661609075443</theory_prediction_fb>
-            <upper_limit_fb>1.205</upper_limit_fb>
-        </ExptRes>
-        <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
             <Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>992.87</Mass_GeV>
+                    <Mass_GeV>269.0</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
                 </Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>991.72</Mass_GeV>
+                    <Mass_GeV>269.0</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
-                </Mass_GeV_List>
-            </Mass_GeV_List>
-            <TxNames_List>
-                <TxNames>T1</TxNames>
-            </TxNames_List>
-            <dataType>upperLimit</dataType>
-            <expected_upper_limit_fb>None</expected_upper_limit_fb>
-            <lumi_fb-1>20.3</lumi_fb-1>
-            <maxcond>0.0</maxcond>
-            <r>0.06118030203929217</r>
-            <r_expected>None</r_expected>
-            <theory_prediction_fb>0.6619328661244639</theory_prediction_fb>
-            <upper_limit_fb>10.819378853333333</upper_limit_fb>
-        </ExptRes>
-        <ExptRes>
-            <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
-            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <DataSetID>None</DataSetID>
-            <Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>991.3057434757244</Mass_GeV>
-                    <Mass_GeV>129.00000000000003</Mass_GeV>
-                </Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>991.4330246223748</Mass_GeV>
-                    <Mass_GeV>129.00000000000003</Mass_GeV>
-                </Mass_GeV_List>
-            </Mass_GeV_List>
-            <TxNames_List>
-                <TxNames>T2</TxNames>
-            </TxNames_List>
-            <dataType>upperLimit</dataType>
-            <expected_upper_limit_fb>None</expected_upper_limit_fb>
-            <lumi_fb-1>20.3</lumi_fb-1>
-            <maxcond>0.0</maxcond>
-            <r>0.320948519453525</r>
-            <r_expected>None</r_expected>
-            <theory_prediction_fb>1.9566713216388227</theory_prediction_fb>
-            <upper_limit_fb>6.09652702237238</upper_limit_fb>
-        </ExptRes>
-        <ExptRes>
-            <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
-            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <DataSetID>None</DataSetID>
-            <Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>991.7768327651964</Mass_GeV>
-                    <Mass_GeV>268.99999999999994</Mass_GeV>
-                    <Mass_GeV>129.00000000000003</Mass_GeV>
-                </Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>992.8128290778042</Mass_GeV>
-                    <Mass_GeV>268.99999999999994</Mass_GeV>
-                    <Mass_GeV>129.00000000000003</Mass_GeV>
                 </Mass_GeV_List>
             </Mass_GeV_List>
             <TxNames_List>
                 <TxNames>T6WW</TxNames>
             </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+            </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>20.3</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>0.3875957890137304</r>
+            <r>0.3875958</r>
             <r_expected>None</r_expected>
-            <theory_prediction_fb>6.660643614793226</theory_prediction_fb>
-            <upper_limit_fb>17.18450974852381</upper_limit_fb>
+            <theory_prediction_fb>6.660644</theory_prediction_fb>
+            <upper_limit_fb>17.18451</upper_limit_fb>
         </ExptRes>
         <ExptRes>
-            <AnalysisID>CMS-PAS-SUS-15-002</AnalysisID>
-            <AnalysisSqrts_TeV>13.0</AnalysisSqrts_TeV>
+            <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
+            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
             <Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>991.43</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
                 </Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>991.31</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
                 </Mass_GeV_List>
             </Mass_GeV_List>
             <TxNames_List>
-                <TxNames>T1</TxNames>
+                <TxNames>T2</TxNames>
             </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+            </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
-            <lumi_fb-1>2.2</lumi_fb-1>
+            <lumi_fb-1>20.3</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>0.11062418780760568</r>
+            <r>0.3209485</r>
             <r_expected>None</r_expected>
-            <theory_prediction_fb>7.529517660424052</theory_prediction_fb>
-            <upper_limit_fb>68.06393619376593</upper_limit_fb>
+            <theory_prediction_fb>1.956671</theory_prediction_fb>
+            <upper_limit_fb>6.096527</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
@@ -229,14 +96,140 @@
             <TxNames_List>
                 <TxNames>T5WW</TxNames>
             </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+            </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>20.3</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>0.2804868785730337</r>
+            <r>0.2800218</r>
             <r_expected>None</r_expected>
-            <theory_prediction_fb>9.068870134286014</theory_prediction_fb>
-            <upper_limit_fb>32.33260029996249</upper_limit_fb>
+            <theory_prediction_fb>9.06887</theory_prediction_fb>
+            <upper_limit_fb>32.3863</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
+            <AnalysisID>CMS-SUS-13-012</AnalysisID>
+            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
+            <DataSetID>3NJet6_1000HT1250_600MHTinf</DataSetID>
+            <Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>981.83</Mass_GeV>
+                    <Mass_GeV>129.0</Mass_GeV>
+                </Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>981.71</Mass_GeV>
+                    <Mass_GeV>129.0</Mass_GeV>
+                </Mass_GeV_List>
+            </Mass_GeV_List>
+            <TxNames_List>
+                <TxNames>T1</TxNames>
+                <TxNames>T1tttt</TxNames>
+                <TxNames>T2</TxNames>
+            </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+            </Width_GeV_List>
+            <chi2>0.6761455</chi2>
+            <dataType>efficiencyMap</dataType>
+            <expected_upper_limit_fb>0.7514</expected_upper_limit_fb>
+            <l_SM>0.002530291</l_SM>
+            <l_max>0.005396484</l_max>
+            <likelihood>0.003848467</likelihood>
+            <lumi_fb-1>19.5</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <r>0.1276286</r>
+            <r_expected>0.2046745</r_expected>
+            <theory_prediction_fb>0.1537924</theory_prediction_fb>
+            <upper_limit_fb>1.205</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
+            <AnalysisID>CMS-PAS-SUS-15-002</AnalysisID>
+            <AnalysisSqrts_TeV>13.0</AnalysisSqrts_TeV>
+            <DataSetID>None</DataSetID>
+            <Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>129.0</Mass_GeV>
+                </Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>129.0</Mass_GeV>
+                </Mass_GeV_List>
+            </Mass_GeV_List>
+            <TxNames_List>
+                <TxNames>T1</TxNames>
+            </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+            </Width_GeV_List>
+            <dataType>upperLimit</dataType>
+            <expected_upper_limit_fb>None</expected_upper_limit_fb>
+            <lumi_fb-1>2.2</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <r>0.1106242</r>
+            <r_expected>None</r_expected>
+            <theory_prediction_fb>7.529518</theory_prediction_fb>
+            <upper_limit_fb>68.06394</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
+            <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
+            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
+            <DataSetID>None</DataSetID>
+            <Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>129.0</Mass_GeV>
+                </Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>129.0</Mass_GeV>
+                </Mass_GeV_List>
+            </Mass_GeV_List>
+            <TxNames_List>
+                <TxNames>T1</TxNames>
+            </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+            </Width_GeV_List>
+            <dataType>upperLimit</dataType>
+            <expected_upper_limit_fb>None</expected_upper_limit_fb>
+            <lumi_fb-1>20.3</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <r>0.0611803</r>
+            <r_expected>None</r_expected>
+            <theory_prediction_fb>0.6619329</theory_prediction_fb>
+            <upper_limit_fb>10.81938</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-12</AnalysisID>
@@ -255,165 +248,289 @@
             <TxNames_List>
                 <TxNames>TChiWZ</TxNames>
             </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+            </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>20.3</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>0.055863102516631</r>
+            <r>0.03839162</r>
             <r_expected>None</r_expected>
-            <theory_prediction_fb>18.470932828101557</theory_prediction_fb>
-            <upper_limit_fb>330.646383677</upper_limit_fb>
+            <theory_prediction_fb>18.47093</theory_prediction_fb>
+            <upper_limit_fb>481.1188</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
+            <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
+            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
+            <DataSetID>SRtN3</DataSetID>
+            <Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>129.0</Mass_GeV>
+                </Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>129.0</Mass_GeV>
+                </Mass_GeV_List>
+            </Mass_GeV_List>
+            <TxNames_List>
+                <TxNames>T1qqtt</TxNames>
+                <TxNames>T1tttt</TxNames>
+            </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+            </Width_GeV_List>
+            <chi2>0.3864796</chi2>
+            <dataType>efficiencyMap</dataType>
+            <expected_upper_limit_fb>0.35</expected_upper_limit_fb>
+            <l_SM>0.02442398</l_SM>
+            <l_max>0.02972175</l_max>
+            <likelihood>0.02449917</likelihood>
+            <lumi_fb-1>20.7</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <r>0.001829564</r>
+            <r_expected>0.00209093</r_expected>
+            <theory_prediction_fb>0.0007318254</theory_prediction_fb>
+            <upper_limit_fb>0.4</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
+            <AnalysisID>CMS-PAS-SUS-15-002</AnalysisID>
+            <AnalysisSqrts_TeV>13.0</AnalysisSqrts_TeV>
+            <DataSetID>None</DataSetID>
+            <Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>129.0</Mass_GeV>
+                </Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>129.0</Mass_GeV>
+                </Mass_GeV_List>
+            </Mass_GeV_List>
+            <TxNames_List>
+                <TxNames>T1tttt</TxNames>
+            </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+            </Width_GeV_List>
+            <dataType>upperLimit</dataType>
+            <expected_upper_limit_fb>None</expected_upper_limit_fb>
+            <lumi_fb-1>2.2</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <r>0.0008310275</r>
+            <r_expected>None</r_expected>
+            <theory_prediction_fb>0.03496325</theory_prediction_fb>
+            <upper_limit_fb>42.07231</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
+            <AnalysisID>CMS-PAS-SUS-12-026</AnalysisID>
+            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
+            <DataSetID>None</DataSetID>
+            <Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>129.0</Mass_GeV>
+                </Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>865.0</Mass_GeV>
+                    <Mass_GeV>129.0</Mass_GeV>
+                </Mass_GeV_List>
+            </Mass_GeV_List>
+            <TxNames_List>
+                <TxNames>T1tttt</TxNames>
+            </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+            </Width_GeV_List>
+            <dataType>upperLimit</dataType>
+            <expected_upper_limit_fb>55.92364</expected_upper_limit_fb>
+            <lumi_fb-1>9.2</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <r>7.135788e-05</r>
+            <r_expected>5.496207e-05</r_expected>
+            <theory_prediction_fb>0.003073679</theory_prediction_fb>
+            <upper_limit_fb>43.07414</upper_limit_fb>
         </ExptRes>
     </ExptRes_List>
-    <missing_topologies_with_prompt_decays_List>
-        <missing_topologies_with_prompt_decays>
-            <element>[[[jet],[W]],[[jet,jet],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>148.1633751063934</weight_fb>
-        </missing_topologies_with_prompt_decays>
-        <missing_topologies_with_prompt_decays>
-            <element>[[[W]],[[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>144.584475</weight_fb>
-        </missing_topologies_with_prompt_decays>
-        <missing_topologies_with_prompt_decays>
-            <element>[[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>144.00164614134306</weight_fb>
-        </missing_topologies_with_prompt_decays>
-        <missing_topologies_with_prompt_decays>
-            <element>[[[b,t],[W]],[[jet,jet],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>104.7136623191279</weight_fb>
-        </missing_topologies_with_prompt_decays>
-        <missing_topologies_with_prompt_decays>
-            <element>[[[jet]],[[jet,jet],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>87.27848831460226</weight_fb>
-        </missing_topologies_with_prompt_decays>
-        <missing_topologies_with_prompt_decays>
-            <element>[[[jet,jet],[W]],[[jet,jet],[higgs]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>86.53583394288269</weight_fb>
-        </missing_topologies_with_prompt_decays>
-        <missing_topologies_with_prompt_decays>
-            <element>[[[jet],[W]],[[b,t],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>75.19826524977003</weight_fb>
-        </missing_topologies_with_prompt_decays>
-        <missing_topologies_with_prompt_decays>
-            <element>[[[jet,jet],[W]],[[jet],[b,t],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>73.08603745807194</weight_fb>
-        </missing_topologies_with_prompt_decays>
-        <missing_topologies_with_prompt_decays>
-            <element>[[[b,t],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>73.08603745807193</weight_fb>
-        </missing_topologies_with_prompt_decays>
-        <missing_topologies_with_prompt_decays>
-            <element>[[[jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>64.66376430463636</weight_fb>
-        </missing_topologies_with_prompt_decays>
-    </missing_topologies_with_prompt_decays_List>
-    <missing_topologies_List>
-        <missing_topologies>
-            <element>[[[jet],[W]],[[jet,jet],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>148.1633751063934</weight_fb>
-        </missing_topologies>
-        <missing_topologies>
-            <element>[[[W]],[[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>144.584475</weight_fb>
-        </missing_topologies>
-        <missing_topologies>
-            <element>[[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>144.00164614134306</weight_fb>
-        </missing_topologies>
-        <missing_topologies>
-            <element>[[[b,t],[W]],[[jet,jet],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>104.7136623191279</weight_fb>
-        </missing_topologies>
-        <missing_topologies>
-            <element>[[[jet]],[[jet,jet],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>87.27848831460226</weight_fb>
-        </missing_topologies>
-        <missing_topologies>
-            <element>[[[jet,jet],[W]],[[jet,jet],[higgs]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>86.53583394288269</weight_fb>
-        </missing_topologies>
-        <missing_topologies>
-            <element>[[[jet],[W]],[[b,t],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>75.19826524977003</weight_fb>
-        </missing_topologies>
-        <missing_topologies>
-            <element>[[[jet,jet],[W]],[[jet],[b,t],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>73.08603745807194</weight_fb>
-        </missing_topologies>
-        <missing_topologies>
-            <element>[[[b,t],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>73.08603745807193</weight_fb>
-        </missing_topologies>
-        <missing_topologies>
-            <element>[[[jet],[W]],[[jet],[jet,jet],[W]]]  (prompt,prompt)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>64.66376430463636</weight_fb>
-        </missing_topologies>
-    </missing_topologies_List>
-    <Total_xsec_for_missing_topologies_with_prompt_decays_fb>3065.779582621469</Total_xsec_for_missing_topologies_with_prompt_decays_fb>
-    <Total_xsec_for_missing_topologies_with_displaced_decays_fb>0.0</Total_xsec_for_missing_topologies_with_displaced_decays_fb>
     <OutputStatus>
-        <database_version>unittest113</database_version>
+        <database_version>unittest210</database_version>
         <decomposition_status>1</decomposition_status>
         <file_status>1</file_status>
         <input_file>./testFiles/slha/gluino_squarks.slha</input_file>
         <maxcond>0.2</maxcond>
         <minmassgap>5.0</minmassgap>
         <sigmacut>0.03</sigmacut>
-        <smodels_version>1.2.0rc1</smodels_version>
+        <smodels_version>2.1.0</smodels_version>
         <warnings>Input file ok</warnings>
     </OutputStatus>
+    <Total_xsec_for_missing_topologies_fb>3065.78</Total_xsec_for_missing_topologies_fb>
+    <Total_xsec_for_missing_topologies_with_displaced_decays_fb>0.0</Total_xsec_for_missing_topologies_with_displaced_decays_fb>
+    <Total_xsec_for_missing_topologies_with_prompt_decays_fb>3065.78</Total_xsec_for_missing_topologies_with_prompt_decays_fb>
+    <Total_xsec_for_topologies_outside_the_grid_fb>237.4251</Total_xsec_for_topologies_outside_the_grid_fb>
+    <missing_topologies_List>
+        <missing_topologies>
+            <element>[[[jet],[W]],[[jet,jet],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>148.1634</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <element>[[[W]],[[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>144.5845</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <element>[[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>144.0016</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <element>[[[jet,jet],[W]],[[b,t],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>104.7137</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <element>[[[jet]],[[jet,jet],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>87.27849</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <element>[[[jet,jet],[higgs]],[[jet,jet],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>86.53583</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <element>[[[jet],[W]],[[b,t],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>75.19827</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <element>[[[jet,jet],[W]],[[jet],[b,t],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>73.08604</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <element>[[[b,t],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>73.08604</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <element>[[[jet],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>64.66376</weight_fb>
+        </missing_topologies>
+    </missing_topologies_List>
+    <missing_topologies_with_displaced_decays_List/>
+    <missing_topologies_with_prompt_decays_List>
+        <missing_topologies_with_prompt_decays>
+            <element>[[[jet],[W]],[[jet,jet],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>148.1634</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <element>[[[W]],[[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>144.5845</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <element>[[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>144.0016</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <element>[[[jet,jet],[W]],[[b,t],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>104.7137</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <element>[[[jet]],[[jet,jet],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>87.27849</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <element>[[[jet,jet],[higgs]],[[jet,jet],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>86.53583</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <element>[[[jet],[W]],[[b,t],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>75.19827</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <element>[[[jet,jet],[W]],[[jet],[b,t],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>73.08604</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <element>[[[b,t],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>73.08604</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <element>[[[jet],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)</element>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>64.66376</weight_fb>
+        </missing_topologies_with_prompt_decays>
+    </missing_topologies_with_prompt_decays_List>
     <topologies_outside_the_grid_List>
         <topologies_outside_the_grid>
-            <element>[[[W]],[[higgs]]]  (prompt,prompt)</element>
+            <element>[[[higgs]],[[W]]]  (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>207.13027034006157</weight_fb>
+            <weight_fb>207.1303</weight_fb>
         </topologies_outside_the_grid>
         <topologies_outside_the_grid>
-            <element>[[[jet]],[[jet,jet]]]  (prompt,prompt)</element>
+            <element>[[[jet]],[[jet,jet]]]  (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>23.326420455104515</weight_fb>
+            <weight_fb>23.32642</weight_fb>
         </topologies_outside_the_grid>
         <topologies_outside_the_grid>
-            <element>[[[b],[W]],[[b],[W]]]  (prompt,prompt)</element>
+            <element>[[[b],[W]],[[b],[W]]]  (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>3.761818871968151</weight_fb>
+            <weight_fb>3.761819</weight_fb>
         </topologies_outside_the_grid>
         <topologies_outside_the_grid>
-            <element>[[[jet]],[[t,t]]]  (prompt,prompt)</element>
+            <element>[[[jet]],[[t,t]]]  (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>1.531994448312818</weight_fb>
+            <weight_fb>1.531994</weight_fb>
         </topologies_outside_the_grid>
         <topologies_outside_the_grid>
-            <element>[[[jet]],[[b,b]]]  (prompt,prompt)</element>
+            <element>[[[jet]],[[b,b]]]  (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>0.9943976550748556</weight_fb>
+            <weight_fb>0.9943977</weight_fb>
         </topologies_outside_the_grid>
         <topologies_outside_the_grid>
-            <element>[[[b,b]],[[jet,jet]]]  (prompt,prompt)</element>
+            <element>[[[jet,jet]],[[b,b]]]  (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>0.6801837428273678</weight_fb>
+            <weight_fb>0.6801837</weight_fb>
         </topologies_outside_the_grid>
     </topologies_outside_the_grid_List>
-    <Total_xsec_for_missing_topologies_fb>3065.779582621469</Total_xsec_for_missing_topologies_fb>
-    <Total_xsec_for_topologies_outside_the_grid_fb>237.4250855133493</Total_xsec_for_topologies_outside_the_grid_fb>
 </smodelsOutput>

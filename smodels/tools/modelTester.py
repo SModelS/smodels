@@ -19,7 +19,7 @@ from smodels.theory.model import Model
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut
-from smodels.tools.printer import MPrinter
+from smodels.tools.printer import MPrinter, printScanSummary
 import multiprocessing
 import os
 import sys
@@ -69,7 +69,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
             dict(parser.items("parameters")), databaseVersion)
     masterPrinter.addObj(outputStatus)
     if outputStatus.status < 0:
-        return masterPrinter.flush()
+        return {os.path.basename(inputFile) : masterPrinter.flush()}
 
     """
     Load the input model
@@ -92,7 +92,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         print("Exception %s %s" %(e, type(e)))
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
-        return masterPrinter.flush()
+        return {os.path.basename(inputFile) : masterPrinter.flush()}
 
 
     """
@@ -112,14 +112,14 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         print("Exception %s %s" %(e, type(e)))
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
-        return masterPrinter.flush()
+        return {os.path.basename(inputFile) : masterPrinter.flush()}
 
     """ Print Decomposition output.
         If no topologies with sigma > sigmacut are found, update status, write
         output file, stop running """
     if not smstoplist:
         outputStatus.updateStatus(-3)
-        return masterPrinter.flush()
+        return {os.path.basename(inputFile) : masterPrinter.flush()}
 
     masterPrinter.addObj(smstoplist)
 
@@ -168,7 +168,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         uncovered = coverage.Uncovered(smstoplist,sigmacut=sigmacut,sqrts=sqrts)
         masterPrinter.addObj(uncovered)
 
-    return masterPrinter.flush()
+    return {os.path.basename(inputFile) : masterPrinter.flush()}
 
 def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
                     timeout, development, parameterFile):
@@ -199,7 +199,7 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
             print(crashReport.createStackTrace())
             crashReportFacility.createCrashReportFile(inputFile, parameterFile)
             print(crashReportFacility.createUnknownErrorMessage())
-    return None
+    return {inputFile: None}
 
 def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
                     timeout, development, parameterFile):
@@ -216,12 +216,13 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
     :returns: printers output
     """
 
+    output = {}
     for inputFile in inputFiles:
-        runSingleFile(inputFile, outputDir, parser, databaseVersion,
-                                  listOfExpRes, timeout, development, parameterFile)
+        output.update(runSingleFile(inputFile, outputDir, parser, databaseVersion,
+                                  listOfExpRes, timeout, development, parameterFile))
         gc.collect()
-    return None
 
+    return output
 
 def _cleanList(fileList, inDir):
     """ clean up list of files """
@@ -297,7 +298,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
                     %(nFiles))
 
             ### Run a single process:
-            runSetOfFiles(cleanedList,outputDir, parser,
+            outputDict = runSetOfFiles(cleanedList,outputDir, parser,
                               databaseVersion, listOfExpRes, timeout,
                               development, parameterFile)
         else:
@@ -328,6 +329,15 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
                 time.sleep(2)
 
             logger.debug("All children terminated")
+
+            outputDict = {}
+            for p in children:
+                outputDict.update(p.get())
+
+        #Collect output to build global summary:
+        summaryFile = os.path.join(outputDir,'summary.txt')
+        logger.info("A summary of the results can be found in %s" %summaryFile)
+        printScanSummary(outputDict,summaryFile)
 
     logger.info("Done in %3.2f min"%((time.time()-t0)/60.))
 

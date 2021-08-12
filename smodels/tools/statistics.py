@@ -2,7 +2,9 @@
 
 """
 .. module:: statistics
-   :synopsis: a module meant to collect various statistical algorithms. For now it only contains the procedure that computes an approximate Gaussian likelihood from an expected an observer upper limit. See https://arxiv.org/abs/1202.3415.
+   :synopsis: a module meant to collect various statistical algorithms. It contains
+   the procedure that computes an approximate Gaussian likelihood from an
+   expected an observer upper limit. See https://arxiv.org/abs/1202.3415.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -18,7 +20,7 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
     """ computes the likelihood from an expected and an observed upper limit.
     :param upperLimit: observed upper limit, as a yield (i.e. unitless)
     :param expectedUpperLimit: expected upper limit, also as a yield
-    :param nSig: number of signal events
+    :param nsig: number of signal events, if None then nsig = mumax
     :param nll: if True, return negative log likelihood
 
     :returns: likelihood (float)
@@ -32,6 +34,8 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
         return ( ul - muhat ) / 1.96
 
     def llhd ( nsig, mumax, sigma_exp, nll ):
+        if nsig == None:
+            nsig = mumax
         ## need to account for the truncation!
         ## first compute how many sigmas left of center is 0.
         Zprime = mumax / sigma_exp
@@ -44,11 +48,11 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
     dr = 2. * ( upperLimit - expectedUpperLimit ) / ( expectedUpperLimit + upperLimit )
     if dr>runtime._drmax:
         if runtime._cap_likelihoods == False:
-            logger.warn("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f)" % ( upperLimit, expectedUpperLimit, dr, runtime._drmax ) )
+            logger.warning("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f)" % ( upperLimit, expectedUpperLimit, dr, runtime._drmax ) )
             return None
         oldUL = upperLimit
         upperLimit = expectedUpperLimit * ( 2. + runtime._drmax ) / ( 2. - runtime._drmax )
-        logger.warn("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f). capping to %.2f." % \
+        logger.warning("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f). capping to %.2f." % \
                 ( oldUL, expectedUpperLimit, dr, runtime._drmax, upperLimit ) )
         ## we are asked to cap likelihoods, so we set observed UL such that dr == drmax
 
@@ -84,7 +88,7 @@ def rvsFromLimits( upperLimit, expectedUpperLimit, n=1 ):
 
     :returns: sample of random variates
     """
-    
+
     sigma_exp = expectedUpperLimit / 1.96 # the expected scale
     denominator = np.sqrt(2.) * sigma_exp
     def root_func ( x ): ## we want the root of this one

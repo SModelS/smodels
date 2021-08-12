@@ -13,12 +13,15 @@
 
 from __future__ import print_function
 import os
+import hashlib
+import pathlib
 ## sweet spot for numpy multi-threading is 2? More threads
 ## make some weaker machines freeze when building the pickle file.
 ## Anyhow, we parallelize at a higher level.
 os.environ["OMP_NUM_THREADS"]="2"
 import sys
 import time
+import copy
 from smodels.experiment import datasetObj
 from smodels.installation import cacheDirectory
 from smodels.experiment.metaObj import Meta
@@ -35,20 +38,22 @@ try:
 except ImportError as e:
     import pickle as serializer
 
+def _getSHA1 ( filename ):
+    return hashlib.sha1( pathlib.Path(filename).read_bytes() ).hexdigest()
 
 class Database(object):
+    """ Database object. Holds a list of SubDatabases.
+        Delegates all calls to SubDatabases.
     """
-    Database object. Holds a list of ExpResult objects.
-    """
-
     def __init__(self, base=None, force_load = None, discard_zeroes = True,
-                  progressbar = False, subpickle = True):
+                  progressbar = False, subpickle = True, combinationsmatrix = None ):
         """
         :param base: path to the database, or pickle file (string), or http
                      address. If None, "official", or "official_fastlim",
                      use the official database for your code version
                      (including fastlim results, if specified).
                      If "latest", or "latest_fastlim", check for the latest database.
+                     Multiple databases may be specified using `+' as a delimiter.
         :param force_load: force loading the text database ("txt"),
                            or binary database ("pcl"), dont force anything if None
         :param discard_zeroes: discard txnames with only zeroes as entries.
@@ -56,30 +61,282 @@ class Database(object):
                             (needs the python-progressbar module)
         :param subpickle: produce small pickle files per exp result.
                           Should only be used when working on the database.
+        :param combinationsmatrix: an optional dictionary that contains info
+                     about combinable analyses, e.g. { "anaid1": ( "anaid2", "anaid3" ) }
+                     optionally specifying signal regions, e.g. { "anaid1:SR1":
+                     ( "anaid2:SR2", "anaid3" ) }
+        """
+        self.subs = []
+        if "_fastlim" in base: ## for backwards compatibility
+            base = base.replace("_fastlim","+fastlim")
+        sstrings = base.split ( "+" )
+        for ss in sstrings:
+            self.subs.append ( SubDatabase ( ss, force_load, discard_zeroes,
+                                             progressbar, subpickle, combinationsmatrix ) )
+
+    @property
+    def expResultList(self):
+        """
+        The combined list, compiled from the individual lists
+
+        """
+        if len(self.subs)==0:
+            return []
+
+        lists = [ x.expResultList for x in self.subs ]
+        return self.mergeLists ( lists )
+
+    def mergeLists ( self, lists ):
+        """ small function, merges lists of ERs """
+        D = {}
+        for tmp in lists:
+            for t in tmp:
+                if len(t.datasets)== 0: # skip empty entries
+                    logger.warning ( f"Analysis {t.globalInfo.id} has no datasets. Will remove it." )
+                    continue
+                anaid = t.globalInfo.id + t.datasets[0].getType()
+                if not anaid in D:
+                    D[anaid]=t
+                else: ## FIXME merge expResults
+                    D[anaid]=self.mergeERs ( D[anaid], t )
+        return list ( D.values() )
+
+    def mergeERs ( self, o1, r2 ):
+        """ merge the content of exp res r1 and r2 """
+        r1 = copy.deepcopy ( o1 )
+        dids = [ x.getID() for x in o1.datasets ]
+        for ds in r2.datasets:
+            if not ds.getID() in dids: ## completely new dataset
+                r1.datasets.append ( ds )
+            else: ## just overwrite the old txnames
+                idx = dids.index ( ds.getID() ) ## ds index
+                r2txs = ds.txnameList
+                r1txnames = [ x.txName for x in  r1.datasets[idx].txnameList ]
+                for txn in r2txs:
+                     if txn.txName in r1txnames:
+                        tidx = r1txnames.index ( txn.txName ) ## overwrite
+                        r1.datasets[idx].txnameList[tidx]=txn
+                     else:
+                        # a new txname
+                        r1.datasets[idx].txnameList.append ( txn )
+        return r1
+
+    def createBinaryFile(self, filename=None ):
+        """ create a pcl file from all the subs """
+        ## make sure we have a model to pickle with the database!
+        logger.debug(  " * create %s" % filename )
+        if filename == None:
+            filename = self.pcl_meta.pathname
+        with open( filename, "wb" ) as f:
+            logger.debug(  " * load text database" )
+            logger.debug(  " * write %s db version %s" % \
+                    ( filename, self.databaseVersion ) )
+            ptcl = min ( 4, serializer.HIGHEST_PROTOCOL )
+            ## 4 is default protocol in python3.8, and highest protocol in 3.7
+            serializer.dump(self.txt_meta, f, protocol=ptcl)
+            serializer.dump(self.expResultList, f, protocol=ptcl)
+            serializer.dump(self.databaseParticles, f, protocol=ptcl )
+            logger.info(  "%s created." % ( filename ) )
+
+    def __str__(self):
+        # r = [ str(x) for x in self.subs ]
+        # return "+".join(r)
+        idList = "Database version: " + self.databaseVersion
+        idList += "\n"
+        idList += "-" * len(idList) + "\n"
+        if self.expResultList == None:
+            idList += "no experimental results available! "
+            return idList
+        idList += "%d experimental results: " % \
+                   len( self.expResultList )
+        atlas,cms = [],[]
+        datasets = 0
+        txnames = 0
+        s = { 8:0, 13:0  }
+        for expRes in self.expResultList:
+            Id = expRes.globalInfo.getInfo('id')
+            sqrts = expRes.globalInfo.getInfo('sqrts').asNumber( TeV )
+            if not sqrts in s.keys():
+                s[sqrts] = 0
+            s[sqrts]+=1
+            datasets += len( expRes.datasets )
+            for ds in expRes.datasets:
+                txnames += len( ds.txnameList )
+            if "ATLAS" in Id:
+                atlas.append( expRes )
+            if "CMS" in Id:
+                cms.append( expRes )
+        idList += "%d CMS, %d ATLAS, " % ( len(cms), len(atlas) )
+        for sqrts in s.keys():
+            idList += "%d @ %d TeV, " % ( s[sqrts], sqrts )
+            # idList += expRes.globalInfo.getInfo('id') + ', '
+        idList = idList[:-2] + '\n'
+        idList += "%d datasets, %d txnames.\n" % ( datasets, txnames )
+        return idList
+
+    def __eq__( self, other ):
+        if type(other) != type(self):
+            return False
+        for x,y in zip ( self.subs, other.subs ):
+            if x != y:
+                return False
+        return True
+
+    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
+                    dataTypes = ['all'], useSuperseded=False, useNonValidated=False,
+                    onlyWithExpected = False ):
+        """
+        Returns a list of ExpResult objects.
+
+        Each object refers to an analysisID containing one (for UL) or more
+        (for Efficiency maps) dataset (signal region) and each dataset
+        containing one or more TxNames.  If analysisIDs is defined, returns
+        only the results matching one of the IDs in the list.  If dataTypes is
+        defined, returns only the results matching a dataType in the list.  If
+        datasetIDs is defined, returns only the results matching one of the IDs
+        in the list.  If txname is defined, returns only the results matching
+        one of the Tx names in the list.
+
+        :param analysisIDs: list of analysis ids ([CMS-SUS-13-006,...]). Can
+                            be wildcarded with usual shell wildcards: * ? [<letters>]
+                            Furthermore, the centre-of-mass energy can be chosen
+                            as suffix, e.g. ":13*TeV". Note that the asterisk
+                            in the suffix is not a wildcard.
+        :param datasetIDs: list of dataset ids ([ANA-CUT0,...]). Can be wildcarded
+                            with usual shell wildcards: * ? [<letters>]
+        :param txnames: list of txnames ([TChiWZ,...]). Can be wildcarded with
+                            usual shell wildcards: * ? [<letters>]
+        :param dataTypes: dataType of the analysis (all, efficiencyMap or upperLimit)
+                            Can be wildcarded with usual shell wildcards: * ? [<letters>]
+        :param useSuperseded: If False, the supersededBy results will not be included
+                              (deprecated)
+        :param useNonValidated: If False, the results with validated = False
+                                will not be included
+        :param onlyWithExpected: Return only those results that have expected values
+                 also. Note that this is trivially fulfilled for all efficiency maps.
+        :returns: list of ExpResult objects or the ExpResult object if the list
+                  contains only one result
+
+        """
+        if useSuperseded:
+            hasSuperseded = False
+            for s in self.subs:
+                if "superseded" in s.url:
+                    hasSuperseded = True
+                    break
+            ss = ""
+            if hasSuperseded:
+                ss = " - which you seem to have already done"
+            logger.warning ( "the useSuperseded flag is deprecated from smodels v2.1 onwards. if you wish to use superseded results, please simply add them to your database path%s, e.g. 'official+superseded'." % ss )
+        ret = []
+        for sub in self.subs:
+            tmp = sub.getExpResults( analysisIDs, datasetIDs, txnames, dataTypes,
+                    True, useNonValidated, onlyWithExpected )
+            ret.append ( tmp )
+        return self.mergeLists ( ret )
+
+    @property
+    def databaseParticles(self):
+        """
+        Database particles, a list, one entry per sub
+        """
+        r = [ x.databaseParticles for x in self.subs ]
+        return r[0] ## FIXME do sth smarter?
+
+    @property
+    def databaseVersion(self):
+        """
+        The version of the database, concatenation of the individual versions
+
+        """
+        r = [ x.databaseVersion for x in self.subs ]
+        for i,ri in enumerate(r): # avoid repetitions
+            for j,rj in enumerate(r[i+1:]):
+                if ri in rj:
+                    r[i+j+1]=rj.replace(ri,"")
+
+        return "+".join ( r )
+
+    @property
+    def txt_meta(self):
+        """
+        The meta info of the text version, a merger of the original ones
+
+        """
+        r = [ x.txt_meta for x in self.subs ]
+        ret = r[0]
+        return ret
+
+    @property
+    def pcl_meta(self):
+        """
+        The meta info of the text version, a merger of the original ones
+
+        """
+        ret = None
+        r = []
+        for x in self.subs:
+            if hasattr ( x, "pcl_meta" ):
+                r.append ( x.pcl_meta )
+        ret = r[0]
+        return ret
+
+    def createLinksToCombinationsMatrix ( self ):
+        """ in all globalInfo objects, create a shallow link to the
+            combinations matrix """
+        for x in self.subs:
+            if not hasattr ( x, "combinationsmatrix" ) or x.combinationsmatrix == None:
+                x.combinationsmatrix = self.combinationsmatrix
+            x.createLinksToCombinationsMatrix()
+
+    def clearLinksToCombinationsMatrix ( self ):
+        """ clear all shallow links to the combinations matrix """
+        self.combinationsmatrix = None
+        for x in self.subs:
+            x.combinationsmatrix = None
+            x.clearLinksToCombinationsMatrix()
+
+class SubDatabase(object):
+    """
+    SubDatabase object. Holds a list of ExpResult objects.
+    """
+
+    def __init__(self, base=None, force_load = None, discard_zeroes = True,
+                  progressbar = False, subpickle = True, combinationsmatrix=None ):
+        """
+        :param base: path to the database, or pickle file (string), or http
+                     address. If None, "official", or "official_fastlim",
+                     use the official database for your code version
+                     (including fastlim results, if specified).
+                     If "latest", or "latest_fastlim", check for the latest database.
+                     Multiple databases may be named, use "+" as delimiter.
+                     Order matters: Results with same name will overwritten
+                     according to sequence
+        :param force_load: force loading the text database ("txt"),
+                           or binary database ("pcl"), dont force anything if None
+        :param discard_zeroes: discard txnames with only zeroes as entries.
+        :param progressbar: show a progressbar when building pickle file
+                            (needs the python-progressbar module)
+        :param subpickle: produce small pickle files per exp result.
+                          Should only be used when working on the database.
+        :param combinationsmatrix: an optional dictionary that contains info
+                     about combinable analyses, e.g. { "anaid1": ( "anaid2", "anaid3" ) }
+                     optionally specifying signal regions, e.g. { "anaid1:SR1":
+                     ( "anaid2:SR2", "anaid3" ) }
         """
 
         self.url = base
+        self.combinationsmatrix = combinationsmatrix
         self.source=""
         if force_load == None and base.endswith(".pcl"):
             force_load = "pcl"
         self.force_load = force_load
         self.subpickle = subpickle
         obase = base ## keep old name for more checks for 'latest'
-        if base in [ None, "official" ]:
-            from smodels.installation import officialDatabase
-            base = officialDatabase()
-        if base in [ "official_fastlim" ]:
-            from smodels.installation import officialDatabase
-            base = officialDatabase( fastlim=True )
-        if base in [ "latest" ]:
-            from smodels.installation import latestDatabase
-            base = latestDatabase()
-        if base in [ "latest_fastlim" ]:
-            from smodels.installation import latestDatabase
-            base = latestDatabase( fastlim=True )
-        if base in [ "unittest" ]:
-            from smodels.installation import testDatabase
-            base = testDatabase()
+        from smodels.installation import __dblabels__
+        if base in __dblabels__:
+            from smodels.installation import databasePath
+            base = databasePath( base )
         base, pclfile = self.checkPathName(base, discard_zeroes )
         self.pcl_meta = Meta( pclfile )
         self.expResultList = []
@@ -160,6 +417,7 @@ class Database(object):
         logger.info( "Parsing text database at %s" % self.txt_meta.pathname )
         self.expResultList = self._loadExpResults()
         self.createLinksToModel()
+        self.createLinksToCombinationsMatrix()
 
     def createLinksToModel( self ):
         """ in all globalInfo objects, create links to self.databaseParticles """
@@ -172,6 +430,24 @@ class Database(object):
                 er.globalInfo._databaseParticles = self.databaseParticles
             elif type(er.globalInfo._databaseParticles) == type(None):
                 er.globalInfo._databaseParticles = self.databaseParticles
+
+    def createLinksToCombinationsMatrix( self ):
+        """ in all globalInfo objects, create links to self.combinationsmatrix  """
+        if not hasattr ( self, "combinationsmatrix" ):
+            return
+        if type(self.combinationsmatrix) == type(None):
+            return
+        for ctr,er in enumerate(self.expResultList):
+            if not hasattr ( er.globalInfo, "_combinationsmatrix" ):
+                er.globalInfo._combinationsmatrix = self.combinationsmatrix
+            elif type(er.globalInfo._combinationsmatrix) == type(None):
+                er.globalInfo._combinationsmatrix = self.combinationsmatrix
+
+    def clearLinksToCombinationsMatrix( self ):
+        for ctr,er in enumerate(self.expResultList):
+            if hasattr ( er.globalInfo, "_combinationsmatrix" ):
+                del er.globalInfo._combinationsmatrix
+
 
     def removeLinksToModel ( self ):
         """ remove the links of globalInfo._databaseParticles to the model.
@@ -224,6 +500,7 @@ class Database(object):
                     except EOFError as e:
                         pass ## a model does not *have* to be defined
                     self.createLinksToModel()
+                    self.createLinksToCombinationsMatrix()
         except(EOFError,ValueError) as e:
             os.unlink( self.pcl_meta.pathname )
             if lastm_only:
@@ -299,6 +576,11 @@ class Database(object):
         """
         return self.txt_meta.databaseVersion
 
+    @databaseVersion.setter
+    def databaseVersion(self, x ):
+        self.txt_meta.databaseVersion = x
+        self.pcl_meta.databaseVersion = x
+
     def inNotebook(self):
         """
         Are we running within a notebook? Has an effect on the
@@ -341,9 +623,10 @@ class Database(object):
             logger.error( "Consider supplying a different database path in the ini file (possibly a local one)" )
             raise SModelSError()
         if r.status_code != 200:
-            logger.error( "Error %d: could not fetch %s from server." % \
-                           ( r.status_code, path ) )
-            raise SModelSError()
+            line = "Error %d: could not fetch '%s' from server: '%s'" % \
+                           ( r.status_code, path, r.reason )
+            logger.error( line )
+            raise SModelSError( line )
         ## its new so store the description
         with open( store, "w" ) as f:
             f.write( r.text )
@@ -353,8 +636,17 @@ class Database(object):
         size = r.json()["size"]
         cDir,defused = cacheDirectory ( create=True, reportIfDefault=True )
         t0=time.time()
-        r2=requests.get ( r.json()["url"], stream=True, timeout=5 )
-        filename= os.path.join ( cDir, r2.url.split("/")[-1] )
+        filename =  os.path.join ( cDir, r.json()["url"].split("/")[-1] )
+        if os.path.exists ( filename ):
+            # if file exists and checksums match, we dont download
+            if "sha1" in r.json():
+                sha = _getSHA1 ( filename )
+                if sha == r.json()["sha1"]:
+                    ## seems it hasnt changed
+                    self.force_load = "pcl"
+                    return ( "./", "%s" % filename )
+        r2=requests.get ( r.json()["url"], stream=True, timeout=(500,500) )
+        # filename= os.path.join ( cDir, r2.url.split("/")[-1] )
         msg = "caching the downloaded database in %s." % cDir
         if defused:
             msg += " If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'."
@@ -418,10 +710,19 @@ class Database(object):
         if not os.path.exists ( filename ):
             return self.fetchFromScratch ( path, store, discard_zeroes )
         stats = os.stat ( filename )
-        if stats.st_size < jsn["size"]-2048:
-            ## size doesnt match (2048 is to allow for slightly different file
+        if abs ( stats.st_size - jsn["size"]) > 4096:
+            ## size doesnt match (4096 is to allow for slightly different file
             ## sizes reported by the OS). redownload!
             return self.fetchFromScratch ( path, store, discard_zeroes )
+        """
+        # dont do this b/c its slowish
+        if "sha1" in r.json():
+            t0 = time.time()
+            sha = _getSHA1 ( filename )
+            print ( "it took", time.time()-t0 )
+            if sha != r.json()["sha1"]:
+                return self.fetchFromScratch ( path, store, discard_zeroes )
+        """
         if r.json()["lastchanged"] > jsn["lastchanged"]:
             ## has changed! redownload everything!
             return self.fetchFromScratch( path, store, discard_zeroes )
@@ -661,6 +962,7 @@ class Database(object):
         :param dataTypes: dataType of the analysis (all, efficiencyMap or upperLimit)
                             Can be wildcarded with usual shell wildcards: * ? [<letters>]
         :param useSuperseded: If False, the supersededBy results will not be included
+                              (deprecated)
         :param useNonValidated: If False, the results with validated = False
                                 will not be included
         :param onlyWithExpected: Return only those results that have expected values

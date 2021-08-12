@@ -1,33 +1,43 @@
 <?xml version="1.0" ?>
 <smodelsOutput>
-    <missing_topologies_with_displaced_decays_List/>
+    <Element_List>
+        <Element>
+            <ID>1</ID>
+            <Masses_GeV_List>
+                <Masses_GeV_List>
+                    <Masses_GeV>675.0</Masses_GeV>
+                    <Masses_GeV>200.0</Masses_GeV>
+                </Masses_GeV_List>
+                <Masses_GeV_List>
+                    <Masses_GeV>675.0</Masses_GeV>
+                    <Masses_GeV>200.0</Masses_GeV>
+                </Masses_GeV_List>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs_List>
+                    <PIDs>1000021</PIDs>
+                    <PIDs>1000022</PIDs>
+                </PIDs_List>
+                <PIDs_List>
+                    <PIDs>1000021</PIDs>
+                    <PIDs>1000022</PIDs>
+                </PIDs_List>
+            </PIDs_List>
+            <Particles>[[[q, q]], [[q, q]]]</Particles>
+            <Weights_fb>
+                <xsec_13.0_TeV>4309.03465</xsec_13.0_TeV>
+                <xsec_8.0_TeV>572.168935</xsec_8.0_TeV>
+            </Weights_fb>
+            <final_states_List>
+                <final_states>N1</final_states>
+                <final_states>N1</final_states>
+            </final_states_List>
+        </Element>
+    </Element_List>
     <ExptRes_List>
         <ExptRes>
-            <AnalysisID>CMS-SUS-13-012</AnalysisID>
-            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
-            <DataSetID>6NJet8_1000HT1250_450MHTinf</DataSetID>
-            <Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>675.0</Mass_GeV>
-                    <Mass_GeV>200.0</Mass_GeV>
-                </Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>675.0</Mass_GeV>
-                    <Mass_GeV>200.0</Mass_GeV>
-                </Mass_GeV_List>
-            </Mass_GeV_List>
-            <TxNames_List>
-                <TxNames>T1</TxNames>
-            </TxNames_List>
-            <dataType>efficiencyMap</dataType>
-            <lumi_fb-1>19.5</lumi_fb-1>
-            <maxcond>0.0</maxcond>
-            <theory_prediction_fb>1.73810052766</theory_prediction_fb>
-            <upper_limit_fb>0.385711556676</upper_limit_fb>
-        </ExptRes>
-        <ExptRes>
             <AnalysisID>CMS-PAS-SUS-15-002</AnalysisID>
-            <AnalysisSqrts_TeV>13</AnalysisSqrts_TeV>
+            <AnalysisSqrts_TeV>13.0</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
             <Mass_GeV_List>
                 <Mass_GeV_List>
@@ -42,11 +52,24 @@
             <TxNames_List>
                 <TxNames>T1</TxNames>
             </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+            </Width_GeV_List>
             <dataType>upperLimit</dataType>
+            <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>2.2</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <theory_prediction_fb>4309.03465</theory_prediction_fb>
-            <upper_limit_fb>167.641313231</upper_limit_fb>
+            <r>25.70389</r>
+            <r_expected>None</r_expected>
+            <theory_prediction_fb>4309.035</theory_prediction_fb>
+            <upper_limit_fb>167.6413</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
@@ -65,61 +88,83 @@
             <TxNames_List>
                 <TxNames>T1</TxNames>
             </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+            </Width_GeV_List>
             <dataType>upperLimit</dataType>
+            <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>20.3</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <theory_prediction_fb>572.168935</theory_prediction_fb>
-            <upper_limit_fb>38.1378438667</upper_limit_fb>
+            <r>15.00266</r>
+            <r_expected>None</r_expected>
+            <theory_prediction_fb>572.1689</theory_prediction_fb>
+            <upper_limit_fb>38.13784</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
+            <AnalysisID>CMS-SUS-13-012</AnalysisID>
+            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
+            <DataSetID>6NJet8_1000HT1250_450MHTinf</DataSetID>
+            <Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>675.0</Mass_GeV>
+                    <Mass_GeV>200.0</Mass_GeV>
+                </Mass_GeV_List>
+                <Mass_GeV_List>
+                    <Mass_GeV>675.0</Mass_GeV>
+                    <Mass_GeV>200.0</Mass_GeV>
+                </Mass_GeV_List>
+            </Mass_GeV_List>
+            <TxNames_List>
+                <TxNames>T1</TxNames>
+            </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+                <Width_GeV_List>
+                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>stable</Width_GeV>
+                </Width_GeV_List>
+            </Width_GeV_List>
+            <chi2>44.88905</chi2>
+            <dataType>efficiencyMap</dataType>
+            <expected_upper_limit_fb>0.2637784</expected_upper_limit_fb>
+            <l_SM>0.04875737</l_SM>
+            <l_max>0.07085462</l_max>
+            <likelihood>1.267167e-11</likelihood>
+            <lumi_fb-1>19.5</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <r>4.450234</r>
+            <r_expected>6.507382</r_expected>
+            <theory_prediction_fb>1.716507</theory_prediction_fb>
+            <upper_limit_fb>0.3857116</upper_limit_fb>
         </ExptRes>
     </ExptRes_List>
-    <missing_topologies_with_prompt_decays_List/>
-    <missing_topologies_List/>
-    <Total_xsec_for_missing_topologies_with_prompt_decays_fb>0.0</Total_xsec_for_missing_topologies_with_prompt_decays_fb>
-    <Total_xsec_for_missing_topologies_with_displaced_decays_fb>0.0</Total_xsec_for_missing_topologies_with_displaced_decays_fb>
     <OutputStatus>
-        <database_version>unittest</database_version>
+        <database_version>unittest210</database_version>
         <decomposition_status>1</decomposition_status>
         <file_status>1</file_status>
-        <input_file>/home/lessa/smodels/inputFiles/slha/simplyGluino.slha</input_file>
+        <input_file>./testFiles/slha/simplyGluino.slha</input_file>
         <maxcond>0.2</maxcond>
         <minmassgap>5.0</minmassgap>
         <sigmacut>0.03</sigmacut>
-        <smodels_version>1.0.93</smodels_version>
+        <smodels_version>2.1.0</smodels_version>
         <warnings>Input file ok</warnings>
     </OutputStatus>
-    <topologies_outside_the_grid_List/>
-    <Element_List>
-        <Element>
-            <ID>1</ID>
-            <Masses_GeV_List>
-                <Masses_GeV_List>
-                    <Masses_GeV>675.0</Masses_GeV>
-                    <Masses_GeV>200.0</Masses_GeV>
-                </Masses_GeV_List>
-                <Masses_GeV_List>
-                    <Masses_GeV>675.0</Masses_GeV>
-                    <Masses_GeV>200.0</Masses_GeV>
-                </Masses_GeV_List>
-            </Masses_GeV_List>
-            <PIDs_List>
-                <PIDs_List>
-                    <PIDs_List>
-                        <PIDs>1000021</PIDs>
-                        <PIDs>1000022</PIDs>
-                    </PIDs_List>
-                    <PIDs_List>
-                        <PIDs>1000021</PIDs>
-                        <PIDs>1000022</PIDs>
-                    </PIDs_List>
-                </PIDs_List>
-            </PIDs_List>
-            <Particles>[[['q', 'q']], [['q', 'q']]]</Particles>
-            <Weights_fb>
-                <xsec_13.0_TeV>4309.03465</xsec_13.0_TeV>
-                <xsec_8.0_TeV>572.168935</xsec_8.0_TeV>
-            </Weights_fb>
-        </Element>
-    </Element_List>
     <Total_xsec_for_missing_topologies_fb>0.0</Total_xsec_for_missing_topologies_fb>
+    <Total_xsec_for_missing_topologies_with_displaced_decays_fb>0.0</Total_xsec_for_missing_topologies_with_displaced_decays_fb>
+    <Total_xsec_for_missing_topologies_with_prompt_decays_fb>0.0</Total_xsec_for_missing_topologies_with_prompt_decays_fb>
     <Total_xsec_for_topologies_outside_the_grid_fb>0.0</Total_xsec_for_topologies_outside_the_grid_fb>
+    <missing_topologies_List/>
+    <missing_topologies_with_displaced_decays_List/>
+    <missing_topologies_with_prompt_decays_List/>
+    <topologies_outside_the_grid_List/>
 </smodelsOutput>

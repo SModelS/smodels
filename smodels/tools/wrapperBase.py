@@ -96,10 +96,10 @@ class WrapperBase(object):
         """
         if not os.path.exists(self.executablePath):
             if compile:
-                logger.warn("%s executable not found. Trying to compile it now. This may take a while." % self.name )
+                logger.warning("%s executable not found. Trying to compile it now. This may take a while." % self.name )
                 self.compile()
             else:
-                logger.warn("%s executable not found." % self.name )
+                logger.warning("%s executable not found." % self.name )
                 self.complain()
                 return False
         if not os.path.exists(self.executablePath):

@@ -1,10 +1,6 @@
 [smodels.cpp] initialising!
-INFO in modelTester.loadDatabase() in 336: database:discardZeroes is not given in config file. Defaulting to 'True'.
-INFO in databaseObj.loadBinaryFile() in 171: loading binary db file ./unittest113.pcl format version 201
-INFO in databaseObj.loadBinaryFile() in 178: Loaded database from ./unittest113.pcl in 0.1 secs.
 [smodels.cpp] now running over test.slha
-WARNING in printer.setOutPutFile() in 558: Removing old output file results/test.slha.smodels
-[smodels.cpp] 8 experimental results found.
+[smodels.cpp] 14 experimental results found.
 Input status: 1
 Decomposition output status: 1 #decomposition was successful
 # Input File: test.slha
@@ -12,13 +8,13 @@ Decomposition output status: 1 #decomposition was successful
 # minmassgap = 5.
 # ncpus = 1
 # sigmacut = 0.01
-# Database version: unittest113
+# Database version: unittest210
 ================================================================================
-   ======================================================= 
- || 	 						 || 
- || 	 	 Topologies Table 		 	 ||
- || 	 						 || 
-   ======================================================= 
+  ========================================================  
+||                                                        ||
+||                    Topologies Table                    ||
+||                                                        ||
+  ========================================================  
 ===================================================== 
 Topology:
 Number of vertices: [1, 1] 
@@ -27,12 +23,12 @@ Total Global topology weight :
 Sqrts: 8.00E+00 [TeV], Weight:5.72E-01 [pb]
 
 Total Number of Elements: 1
-   ======================================================= 
- || 	 						 || 
- || 	 Theory Predictions and 			 || 
- || 	 Experimental Constraints 		 	 ||
- || 	 						 || 
-   ======================================================= 
+  ========================================================  
+||                                                        ||
+||                 Theory Predictions and                 ||
+||                Experimental Constraints                ||
+||                                                        ||
+  ========================================================  
 
 ---------------Analysis Label = ATLAS-SUSY-2013-02
 -------------------Dataset Label = (UL)
@@ -41,7 +37,7 @@ Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 5.72E-01 [pb]
 Theory conditions:  None
 Observed experimental limit: 3.81E+01 [fb]
-Observed r-Value: 15.002655551277469
+Observed r-value: 15
 
 ---------------Analysis Label = CMS-SUS-13-012
 -------------------Dataset Label = 6NJet8_1000HT1250_450MHTinf
@@ -51,10 +47,11 @@ Theory prediction: 1.72E-03 [pb]
 Theory conditions:  None
 Observed experimental limit: 3.86E-01 [fb]
 Expected experimental limit: 2.64E-01 [fb]
-Observed r-Value: 4.45023431445
-Expected r-Value: 6.507381845799234
-Chi2: 44.8890538681224
-Likelihood: 6.238452556297261e-11
+Observed r-value: 4.450234314451397
+Expected r-value: 6.507381845799234
+Likelihood: 1.2671673673817349e-11
+L_max: 0.07085462056029841   -2log(L/L_max): 44.8890538681224
+L_SM: 0.04875737082080812   -2log(L/L_SM): 44.14150627259112
 
 Total cross-section for missing topologies (fb):  0.000E+00
 Total cross-section for missing topologies with displaced decays (fb):  0.000E+00

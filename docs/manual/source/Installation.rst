@@ -17,18 +17,9 @@ Standard Installation
 
 SModelS is a Python library that requires Python version 2.6 or later, including version 3, which is the default. It depends on the following *external* Python libraries:
 
- * unum>=4.0.0
- * numpy>=1.13.0
- * argparse
- * requests>=2.0.0
- * docutils>=0.3
- * scipy>=1.0.0
- * pyslha>=3.1.0
- * pyhf>=0.4.3 (>=0.5.2 recommended!)
- * jsonpatch>=1.25
- * jsonschema>=3.2.0
+.. include:: dependencies.rst
 
-For speed reasons, we moreover recommend pytorch>=1.6.0 as backend for pyhf. This is, however, optional: if pytorch is not available, SModelS will use the default backend. 
+For speed reasons, we moreover recommend pytorch>=1.8.0 as backend for pyhf. This is, however, optional: if pytorch is not available, SModelS will use the default backend. 
 
 In addition, the :ref:`cross section computer <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>`
 requires:
@@ -271,7 +262,7 @@ In order to make sure all libraries have been correctly installed, you can run: 
 Installation of the C++ interface
 ---------------------------------
 
-SModelS v1.1.1 comes with a simple C++ interface, see the cpp directory.
+From version 1.1.1 on, SModelS comes with a simple C++ interface, see the cpp directory.
 Obviously, a C++ compiler is need, alongside with the python developers
 (header) files (libpython-dev on ubuntu, python-devel on rpm-based distros).
 

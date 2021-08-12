@@ -226,13 +226,15 @@ class PyhfTest(unittest.TestCase):
 
     def testWSindex(self):
         """
-        Tests how the module reacts when giving several jsons but not specifying for which the UL should be computed
+	      Tests how the module reacts when giving several jsons but not specifying for
+        which the UL should be computed
         """
         ws = [self.simpleJson([0.9], [10]), self.simpleJson([0.8], [9])]
         data = PyhfData([[0.1], [0.2]], ws)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.ulSigma()
-        self.assertIsNone(ul)
+        self.assertAlmostEqual ( ul, 70.44942596708917, 1 )
+        # self.assertIsNone(ul)
 
     def testFullPyhfModule1(self):
         """

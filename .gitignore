@@ -67,7 +67,7 @@ test/database/**/*.pcl
 test/tinydb/*.pcl
 test/tinydb/**/*.pcl
 smodels/lib/pythia8/.*.tgz
-smodels/lib/pythia8/pythia822*
+smodels/lib/pythia8/pythia8*
 smodels/lib/pythia8/xml.doc
 docs/manual/source/DatabaseBrowser.rst
 docs/manual/source/LheChecker.rst

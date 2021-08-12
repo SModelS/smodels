@@ -11,7 +11,7 @@
 """
 
 from __future__ import print_function
-import sys,os
+import sys,os,copy
 from smodels.theory.topology import TopologyList
 from smodels.theory.theoryPrediction import TheoryPredictionList
 from smodels.experiment.databaseObj import ExpResultList
@@ -60,7 +60,7 @@ class MPrinter(object):
                 newPrinter = SLHAPrinter(output = 'file')
                 if parser.getboolean("options", "doCompress") or parser.getboolean("options", "doInvisible"):
                     newPrinter.docompress = 1
-                if parser.getboolean("options", "combineSRs"):
+                if parser.has_option("options", "combineSRs") and parser.getboolean("options", "combineSRs"):
                     newPrinter.combinesr = 1
             else:
                 logger.warning("Unknown printer format: %s" %str(prt))
@@ -223,9 +223,11 @@ class BasicPrinter(object):
         typeStr = type(obj).__name__
         try:
             formatFunction = getattr(self,'_format'+typeStr)
-            return formatFunction(obj)
+            ret = formatFunction(obj)
+            # print ( " `-", len(ret))
+            return ret
         except AttributeError as e:
-            logger.debug('Error formating object %s: \n %s' %(typeStr,e))
+            logger.warning('Error formating object %s: \n %s' %(typeStr,e))
             return False
 
 class TxTPrinter(BasicPrinter):
@@ -417,6 +419,13 @@ class TxTPrinter(BasicPrinter):
 
         return output
 
+    def _formatNumber(self,number,n=4 ):
+        """ format a number <number> to have n digits,
+            but allow also for None, strings, etc """
+        if type(number) not in [ float, np.float64 ]:
+            return str(number)
+        fmt = ".%dg" % n
+        return ("%"+fmt) % number
 
     def _formatTheoryPredictionList(self, obj):
         """
@@ -466,12 +475,26 @@ class TxTPrinter(BasicPrinter):
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if not upperLimitExp is None:
                 output += "Expected experimental limit: " + str(upperLimitExp) + "\n"
-            output += "Observed r-Value: %s\n" %theoryPrediction.getRValue(expected=False)
+            srv = self._formatNumber ( theoryPrediction.getRValue(expected=False), 4 )
+            output += "Observed r-value: %s\n" % srv
             if not upperLimitExp is None:
-                output += "Expected r-Value: %s\n" %theoryPrediction.getRValue(expected=True)
-            if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
-                output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
-                output += "Likelihood: " + str(theoryPrediction.likelihood) + "\n"
+                serv = self._formatNumber ( theoryPrediction.getRValue(expected=True), 4 )
+                output += "Expected r-value: %s\n" % serv
+            if hasattr(theoryPrediction,'likelihood') and not theoryPrediction.likelihood is None:
+#                output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
+                chi2, chi2sm = None, None
+                try:
+                    chi2sm = -2*np.log(theoryPrediction.likelihood/theoryPrediction.lsm)
+                except TypeError as e:
+                    pass
+                try:
+                    chi2 = -2*np.log(theoryPrediction.likelihood/theoryPrediction.lmax)
+                except TypeError as e:
+                    pass
+                output += "Likelihood: " + self._formatNumber(theoryPrediction.likelihood,4) + "\n"
+                output += "L_max: " + self._formatNumber(theoryPrediction.lmax,4) + "   -2log(L/L_max): " + self._formatNumber(chi2,4) + "\n"
+                output += "L_SM: " + self._formatNumber(theoryPrediction.lsm,4) + \
+                          "   -2log(L/L_SM): " + self._formatNumber(chi2sm,4) + "\n"
 
             if hasattr(self,"printextendedresults") and self.printextendedresults:
                 if theoryPrediction.mass:
@@ -566,43 +589,89 @@ class SummaryPrinter(TxTPrinter):
 
         output = ""
 
-        rvalues = []
+        maxr = { "obs": -1., "exp": -1, "anaid": "?" }
+        maxcoll = { "CMS": { "obs": -1., "exp": -1, "anaid": "?" },
+                    "ATLAS": { "obs": -1., "exp": -1, "anaid": "?" } }
+        for theoPred in obj._theoryPredictions:
+            r = theoPred.getRValue(expected=False)
+            r_expected = theoPred.getRValue(expected=True)
+            expResult = theoPred.expResult
+            coll = "ATLAS" if "ATLAS" in expResult.globalInfo.id else "CMS"
+            if r_expected != None and r_expected > maxcoll[coll]["exp"]:
+                maxcoll[coll]= { "obs": r, "exp": r_expected,
+                                 "anaid": expResult.globalInfo.id }
+            if r!= None and r > maxr["obs"]:
+                maxr = { "obs": r, "exp": r_expected, "anaid": expResult.globalInfo.id }
+
         output += "#Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected"
         output += "\n\n"
         for theoPred in theoPredictions:
             expResult = theoPred.expResult
             txnames = theoPred.txnames
             ul = theoPred.getUpperLimit(expected=False)
+            uls = str(ul)
+            if isinstance(ul,unum.Unum):
+                uls = "%10.3E" % ul.asNumber(fb)
             signalRegion = theoPred.dataset.getID()
             if signalRegion is None:
                 signalRegion = '(UL)'
             value = theoPred.xsection.value
             r = theoPred.getRValue(expected=False)
             r_expected = theoPred.getRValue(expected=True)
-            rvalues.append(r)
+            rs = str(r)
+            rs_expected = str(r_expected)
+            if type(r) in [ int, float, np.float64 ]:
+                rs = "%10.3E" % r
+            if type(r_expected) in [ int, float, np.float64 ]:
+                rs_expected = "%10.3E" % r_expected
 
             output += "%19s  " % (expResult.globalInfo.id)  # ana
             # output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
             output += "%2.2E  " % (expResult.globalInfo.sqrts.asNumber(TeV))  # sqrts
             output += "%5s " % theoPred.getmaxCondition()  # condition violation
-            output += "%10.3E %10.3E " % (value.asNumber(fb), ul.asNumber(fb))  # theory cross section , expt upper limit
-            if r_expected: output += "%10.3E %10.3E" % (r, r_expected)
+            output += "%10.3E %s " % (value.asNumber(fb), uls)  # theory cross section , expt upper limit
+            if r_expected: output += "%s %s" % (rs, rs_expected)
             else: output += "%10.3E  N/A" %r
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
             output += " Txnames:  " + txnameStr + "\n"
-            if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
-                output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)
+#            if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
+#                output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)
+#           print L, L_max and L_SM instead of chi2 and llhd; SK 2021-05-14
+            if hasattr(theoPred,'likelihood'):# and not theoPred.likelihood is None:
+                llhd = str(theoPred.likelihood)
+                lmax = str(theoPred.lmax)
+                lsm = str(theoPred.lsm)
+                if type(theoPred.likelihood) in [ float, np.float64 ]:
+                    llhd = "%10.3E" % theoPred.likelihood
+                if type(theoPred.lmax) in [ float, np.float64 ]:
+                    lmax = "%10.3E" % theoPred.lmax
+                if type(theoPred.lsm) in [ float, np.float64 ]:
+                    lsm = "%10.3E" % theoPred.lsm
+                if llhd == lmax == lsm == "None":
+                    output += " Likelihoods: L, L_max, L_SM = N/A\n"
+                else:
+                    output += " Likelihoods: L, L_max, L_SM = %s, %s, %s\n" % (llhd, lmax, lsm)
 
             if not (theoPred is obj[-1]):
                 output += 80 * "-"+ "\n"
 
         output += "\n \n"
         output += 80 * "=" + "\n"
-        output += "The highest r value is = %.12f\n" % max(rvalues)
-        # output += "The highest r value is = " + str(max(rvalues)) + "\n"
+        output += "The highest r value is = %.12f from %s" % \
+                   ( maxr["obs"], maxr["anaid"] )
+        if maxr["exp"] != None and maxr["exp"]>-.5:
+            output += " (r_expected=%.5f)" % maxr["exp"]
+        else:
+            output += " (r_expected not available)"
+        output += "\n"
+        for coll,values in maxcoll.items():
+            if values["obs"]<-.5:
+                continue
+            output += "%s analysis with highest available r_expected: %s, r_expected=%.5f, r_obs=%.5f\n" % \
+                      ( coll, values["anaid"], values["exp"], values["obs"] )
 
         return output
 
@@ -734,6 +803,23 @@ class PyPrinter(BasicPrinter):
             infoDict['time spent'] =  "%.2fs" %(time.time() - self.time)
         return {'OutputStatus' : infoDict}
 
+    def _round ( self, number, n=6 ):
+        """ round a number to n significant digits, if it *is* a number """
+        if type(number) not in [ float, np.float64 ]:
+            return number
+        if not np.isfinite( number ):
+            return f'float("{number}")'
+        if np.isnan ( number ) or not np.isfinite ( number ):
+            return number
+        try:
+            if abs(number) < 1e-40:
+                return number
+            return round(number, -int(np.floor(np.sign(number) * np.log10(abs(number)))) + n)
+        except Exception as e:
+            pass
+        return number
+        # return round ( number, n )
+
     def _formatTheoryPredictionList(self, obj):
         """
         Format data of the TheoryPredictionList object.
@@ -792,12 +878,12 @@ class PyPrinter(BasicPrinter):
 
             sqrts = expResult.globalInfo.sqrts
 
-            r = theoryPrediction.getRValue(expected=False)
-            r_expected = theoryPrediction.getRValue(expected=True)
+            r = self._round ( theoryPrediction.getRValue(expected=False) )
+            r_expected = self._round ( theoryPrediction.getRValue(expected=True) )
 
-            resDict = {'maxcond': maxconds, 'theory prediction (fb)': value,
-                        'upper limit (fb)': ul,
-                        'expected upper limit (fb)': ulExpected,
+            resDict = {'maxcond': maxconds, 'theory prediction (fb)': self._round ( value ),
+                        'upper limit (fb)': self._round ( ul ),
+                        'expected upper limit (fb)': self._round ( ulExpected ),
                         'TxNames': sorted(txnamesDict.keys()),
                         'Mass (GeV)': mass,
                         'AnalysisID': expID,
@@ -810,11 +896,12 @@ class PyPrinter(BasicPrinter):
                 resDict["Width (GeV)"] = widths
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
-            if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
-                resDict['chi2'] = theoryPrediction.chi2
-                resDict['likelihood'] = theoryPrediction.likelihood
+            if hasattr(theoryPrediction,'likelihood') and not theoryPrediction.likelihood is None:
+                # resDict['chi2'] = self._round ( theoryPrediction.chi2 )
+                resDict['likelihood'] = self._round ( theoryPrediction.likelihood )
+                resDict['l_max'] = self._round ( theoryPrediction.lmax )
+                resDict['l_SM'] = self._round ( theoryPrediction.lsm )
             ExptRes.append(resDict)
-
 
         return {'ExptRes' : ExptRes}
 
@@ -873,10 +960,11 @@ class PyPrinter(BasicPrinter):
         #Add summary of groups:
         for group in groups:
             sqrts = group.sqrts.asNumber(TeV)
-            uncoveredDict["Total xsec for %s (fb)" %group.description] = group.getTotalXSec()
+            uncoveredDict["Total xsec for %s (fb)" %group.description] = \
+               self._round ( group.getTotalXSec() )
             uncoveredDict["%s" %group.description] = []
             for genEl in group.generalElements[:nprint]:
-                genElDict = {'sqrts (TeV)' : sqrts, 'weight (fb)' : genEl.missingX,
+                genElDict = {'sqrts (TeV)' : sqrts, 'weight (fb)' : self._round(genEl.missingX ),
                                 'element' : str(genEl)}
                 if hasattr(self,"addelementlist") and self.addelementlist:
                     genElDict["element IDs"] = [el.elID for el in genEl._contributingElements]
@@ -1020,6 +1108,11 @@ class SLHAPrinter(TxTPrinter):
         return output
 
     def _formatTheoryPredictionList(self, obj):
+
+        printAll = True #Controls which theory predictions are printed
+        if hasattr(self,"expandedoutput") and not self.expandedoutput:
+            printAll = False
+
         output = "BLOCK SModelS_Exclusion\n"
         if not obj._theoryPredictions[0]:
             excluded = -1
@@ -1030,11 +1123,15 @@ class SLHAPrinter(TxTPrinter):
             if r > 1: excluded = 1
             else: excluded = 0
         output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n" % (excluded)
-        if excluded == 0: rList = [firstResult]
-        elif excluded == 1: rList = obj._theoryPredictions
-        else: rList = []
-        cter = 1
-        for theoPred in rList:
+        if excluded == -1:
+            rList = []
+        elif not printAll:
+            rList = [firstResult] + [res for res in obj._theoryPredictions[1:] if res.getRValue() >= 1.0]
+        else:
+            rList = obj._theoryPredictions[:]
+
+        for iTP,theoPred in enumerate(rList):
+            cter = iTP + 1
             expResult = theoPred.expResult
             txnames = theoPred.txnames
             signalRegion  = theoPred.dataId()
@@ -1045,7 +1142,6 @@ class SLHAPrinter(TxTPrinter):
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
 
-            if r <1 and not excluded == 0: break
             output += " %d 0 %-30s #txname \n" % (cter, txnameStr )
             output += " %d 1 %-30.3E #r value\n" % (cter, r)
             if not r_expected: output += " %d 2 N/A                            #expected r value\n" % (cter)
@@ -1053,14 +1149,27 @@ class SLHAPrinter(TxTPrinter):
             output += " %d 3 %-30.2f #condition violation\n" % (cter, theoPred.getmaxCondition())
             output += " %d 4 %-30s #analysis\n" % (cter, expResult.globalInfo.id)
             output += " %d 5 %-30s #signal region \n" %(cter, signalRegion.replace(" ","_"))
-            if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
-                output += " %d 6 %-30.3E #Chi2\n" % (cter, theoPred.chi2)
-                output += " %d 7 %-30.3E #Likelihood\n" % (cter, theoPred.likelihood)
+            if hasattr(theoPred,'likelihood') and not theoPred.likelihood is None:
+#                output += " %d 6 %-30.3E #Chi2\n" % (cter, theoPred.chi2)
+#                output += " %d 7 %-30.3E #Likelihood\n" % (cter, theoPred.likelihood)
+                llhd = str(theoPred.likelihood)
+                if type(theoPred.likelihood) in [ float, np.float32, np.float64 ]:
+                    llhd = "%-30.3E" % theoPred.likelihood
+                lmax = str(theoPred.lmax)
+                if type(theoPred.lmax) in [ float, np.float32, np.float64 ]:
+                    lmax = "%-30.3E" % theoPred.lmax
+                lsm = str(theoPred.lsm)
+                if type(theoPred.lsm) in [ float, np.float32, np.float64 ]:
+                    lsm = "%-30.3E" % theoPred.lsm
+                output += " %d 6 %s #Likelihood\n" % (cter, llhd )
+                output += " %d 7 %s #L_max\n" % (cter, lmax )
+                output += " %d 8 %s #L_SM\n" % (cter, lsm )
             else:
-                output += " %d 6 N/A                            #Chi2\n" % (cter)
-                output += " %d 7 N/A                            #Likelihood\n" % (cter)
+                output += " %d 6 N/A                            #Likelihood\n" % (cter)
+                output += " %d 7 N/A                            #L_max\n" % (cter)
+                output += " %d 8 N/A                            #L_SM\n" % (cter)
             output += "\n"
-            cter += 1
+
         return output
 
     def _formatUncovered(self, obj):
@@ -1074,3 +1183,262 @@ class SLHAPrinter(TxTPrinter):
             output += "\n %d 1 %-30.3E      # %s" %(i,group.getTotalXSec(),"Total cross-section (fb)")
         output += "\n"
         return output
+
+def printScanSummary(outputDict,outputFile):
+    """
+    Method for creating a simple summary of the results when running SModelS
+    over multiple files.
+
+    :param outputDict: A dictionary with filenames as keys and the master printer flush dictionary as values.
+    :param outputFile: Path to the summary file to be written.
+    """
+
+    #Check available types of printer:
+    printerTypes = ['slha','python','summary']
+    out = list(outputDict.values())[0] #All outputs should have the same format
+    if all([(not ptype in out) for ptype in printerTypes]):
+        header = "#In order to build the summary, one of the following types of printer must be available:\n %s \n" %str(printerTypes)
+        with open(outputFile,'w') as f:
+            f.write(header)
+        return
+
+    #Header:
+    header = "#Global results summary (%i files)\n" %len(outputDict)
+    header +="#The most constraining analysis corresponds to the one with largest observed r.\n"
+    header +="#The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.\n"
+
+    #Get summary information:
+    summaryList = []
+    fnames = list ( outputDict.keys() )
+    fnames.sort() ## we want a canonical order
+
+    for fname in fnames:
+        output = outputDict[fname]
+        if output == None:
+            continue
+        #default values (in case of empty results):
+        summaryDict = OrderedDict({'filename' : fname,
+                    'MostConstrainingAnalysis' : 'N/A',
+                    'r_max' : -1,
+                    'r_exp' : -1,
+                    'MostSensitive(ATLAS)' : 'N/A',
+                    'r(ATLAS)' : -1,
+                    'r_exp(ATLAS)' : -1,
+                    'MostSensitive(CMS)' : 'N/A',
+                    'r(CMS)' : -1,
+                    'r_exp(CMS)' : -1
+                    })
+
+        if 'python' in output:
+            sDict = getSummaryFrom(output['python'],'python')
+        elif 'slha' in output:
+            sDict = getSummaryFrom(output['slha'],'slha')
+        elif 'summary' in output:
+            sDict = getSummaryFrom(output['summary'],'summary')
+        else:
+            sDict = {}
+
+        for key in summaryDict:
+            if key in sDict:
+                summaryDict[key] = sDict[key]
+
+        summaryList.append(summaryDict)
+
+
+    #Get column labels and widths:
+    labels = list(summaryList[0].keys())
+    cwidths = []
+    fstr = '%s' #format for strings
+    ffloat = '%1.3g' #format for floats
+    for label in labels:
+        maxlength = max([len(ffloat%entry[label]) if isinstance(entry[label],(float,int))
+                            else  len(fstr%entry[label])
+                            for entry in summaryList])
+        maxlength = max(maxlength,len(label))
+        cwidths.append(maxlength)
+
+    columns = '#'
+    columns += '  '.join([label.ljust(cwidths[i]) for i,label in enumerate(labels)])
+    columns = columns.replace(' ','',1) #Remove one blank space to make labels match values
+    columns += '\n'
+
+    with open(outputFile,'w') as f:
+        f.write(header)
+        f.write(columns)
+
+        for entry in summaryList:
+            row = '  '.join([(ffloat%entry[label]).ljust(cwidths[j])
+                                if isinstance(entry[label],(float,int))
+                                else (fstr%entry[label]).ljust(cwidths[j])
+                            for j,label in enumerate(labels)])
+            f.write(row+'\n')
+    return
+
+def getSummaryFrom(output,ptype):
+    """
+    Retrieves information about the output according to the printer type (slha,python or summary)
+
+    :param output: output (dictionary for ptype=python or string for ptype=slha/summary)
+    :param ptype: Printer type (slha, python or summary)
+
+    :return: Dictionary with the output information
+    """
+
+    summaryDict = {}
+    if ptype == 'python':
+        info = getInfoFromPython(output)
+    elif ptype == 'slha':
+        info = getInfoFromSLHA(output)
+    elif ptype == 'summary':
+        info = getInfoFromSummary(output)
+    else:
+        return summaryDict
+
+
+    if info is None:
+        return summaryDict
+    else:
+        rvals,rexp,anaIDs = info
+
+    #Sort results by r_obs:
+    rvalswo = copy.deepcopy ( rvals )
+    rvalswo[rvalswo==None]=-1
+    asort = rvalswo.argsort()[::-1]
+    rvals = rvals[asort]
+    anaIDs = anaIDs[asort]
+    rexp = rexp[asort]
+    summaryDict['r_max'] = rvals[0]
+    summaryDict['r_exp'] = rexp[0]
+    summaryDict['MostConstrainingAnalysis'] = anaIDs[0]
+
+    #Sort results by r_obs:
+    rvalswo = copy.deepcopy ( rexp )
+    rvalswo[rvalswo==None]=-1
+    #Sort results by r_exp:
+    asort = rvalswo.argsort()[::-1]
+    rvals = rvals[asort]
+    anaIDs = anaIDs[asort]
+    rexp = rexp[asort]
+    iATLAS,iCMS = -1,-1
+    for i,anaID in enumerate(anaIDs):
+        if rexp[i] < 0: continue
+        if 'ATLAS' in anaID and iATLAS < 0:
+            iATLAS = i
+        elif 'CMS' in anaID and iCMS < 0:
+            iCMS = i
+
+    if iATLAS >= 0:
+        summaryDict['r(ATLAS)'] = rvals[iATLAS]
+        summaryDict['r_exp(ATLAS)'] = rexp[iATLAS]
+        summaryDict['MostSensitive(ATLAS)']= anaIDs[iATLAS]
+
+    if iCMS >= 0 :
+        summaryDict['r(CMS)'] = rvals[iCMS]
+        summaryDict['r_exp(CMS)'] = rexp[iCMS]
+        summaryDict['MostSensitive(CMS)'] = anaIDs[iCMS]
+
+    return summaryDict
+
+def getInfoFromPython(output):
+    """
+    Retrieves information from the python output
+
+    :param output: output (dictionary)
+
+    :return: list of r-values,r-expected and analysis IDs. None if no results are found.
+    """
+
+    if not 'ExptRes' in output or not output['ExptRes']:
+        return None
+    rvals = np.array([res['r'] for res in output['ExptRes']])
+    rexp = np.array([res['r_expected'] if res['r_expected'] else -1 for res in output['ExptRes']])
+    anaIDs = np.array([res['AnalysisID'] for res in output['ExptRes']])
+
+    return rvals,rexp,anaIDs
+
+def getInfoFromSLHA(output):
+    """
+    Retrieves information from the SLHA output
+
+    :param output: output (string)
+
+    :return: list of r-values,r-expected and analysis IDs. None if no results are found.
+    """
+
+
+    import pyslha
+    results = pyslha.readSLHA(output,ignorenomass=True,ignorenobr=True)
+    bname = None
+    for b in results.blocks.values():
+        if b.name.lower() ==  'SModelS_Exclusion'.lower():
+            bname = b.name
+    if bname is None or len(results.blocks[bname]) <= 1:
+        return None
+
+    #Get indices for results:
+    resI = list(set([k[0] for k in results.blocks[bname].keys() if k[0] > 0]))
+    rvals = np.array([results.blocks[bname][(i,1)] for i in resI])
+    rexp = np.array([results.blocks[bname][(i,2)]
+                        if results.blocks[bname][(i,2)] != 'N/A' else -1 for i in resI])
+    anaIDs = np.array([results.blocks[bname][(i,4)] for i in resI])
+
+    return rvals,rexp,anaIDs
+
+def getInfoFromSummary(output):
+    """
+    Retrieves information from the summary output
+
+    :param output: output (string)
+
+    :return: list of r-values,r-expected and analysis IDs. None if no results are found.
+    """
+
+    lines = output.splitlines()
+    rvals = []
+    rexp = []
+    anaIDs = []
+    for l in lines:
+        if 'The highest r value is' in l:
+            rmax = l.split('=')[1].strip()
+            ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
+                    for x in rmax])[0][0] #Get when the value ends
+            rmax = eval(rmax[:ff])
+            anaMax = l.split('from')[1].split()[0].replace(',','')
+            rexpMax = -1
+            if 'r_expected' in l and not "r_expected not available" in l:
+                rexpMax = l.split('r_expected')[-1]
+                rexpMax = rexpMax.split('=')[1]
+                ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
+                    for x in rexpMax])[0][0] #Get when the value ends
+                rexpMax = eval(rexpMax[:ff])
+            rvals.append(rmax)
+            anaIDs.append(anaMax)
+            rexp.append(rexpMax)
+        elif 'analysis with highest available r_expected' in l:
+            rAna = l.split('=')[-1]+ ' ' #the space is required to have at least one non-digit character after the value
+            ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
+                    for x in rAna])[0][0] #Get when the value ends
+            rAna = eval(rAna[:ff])
+            rexpAna = -1
+            if 'r_expected' in l:
+                rexpAna = l.split('r_expected')[-1]
+                rexpAna = rexpAna.split('=')[1]
+                ff = np.where([((not x.isdigit()) and (not x in ['.','+','-']))
+                    for x in rexpAna])[0][0] #Get when the value ends
+                rexpAna = eval(rexpAna[:ff])
+            if 'CMS' in l:
+                anaID = 'CMS-'+l.split('CMS-')[1].split(' ')[0].split(',')[0]
+            else:
+                anaID = 'ATLAS-'+l.split('ATLAS-')[1].split(' ')[0].split(',')[0]
+            anaID = anaID.split()[0].strip().replace(',','')
+            rvals.append(rAna)
+            anaIDs.append(anaID)
+            rexp.append(rexpAna)
+
+    if not rvals:
+        return None
+    rvals = np.array(rvals)
+    rexp = np.array(rexp)
+    anaIDs = np.array(anaIDs)
+
+    return rvals,rexp,anaIDs

@@ -33,12 +33,19 @@ def sortXML(xmltree):
         sortXML(el)
     xmltree[:] = sorted(xmltree, key=lambda el: [el.tag,ElementTree.tostring(el)])
 
+def log ( strng ):
+    with open ( "debug.log", "at" ) as f:
+        f.write ( strng + "\n" )
+        f.close()
+
 def compareXML(xmldefault,xmlnew,allowedDiff,ignore=[]):
     if len(xmldefault) != len(xmlnew):
+        log ( "lengths of document %d != %d" % (len(xmldefault),len(xmlnew)) )
         return False
     for i,el in enumerate(xmldefault):
         newel = xmlnew[i]
         if len(el) != len(newel):
+            log ( "lengths of elements %d != %d" % (len(el),len(newel)) )
             return False                
         if len(el) == 0:
             if el.tag in ignore: continue
@@ -52,11 +59,14 @@ def compareXML(xmldefault,xmlnew,allowedDiff,ignore=[]):
                     and newel.text != el.text:
                 diff = 2.*abs(el.text-newel.text)/abs(el.text+newel.text)
                 if diff > allowedDiff:
+                    log ( "values %s and %s differ" % ( el.text, newel.text ) )
                     return False
             else:
                 if el.text != newel.text:
+                    log ( "texts %s and %s differ" % ( el.text, newel.text ) )
                     return False
             if el.tag != newel.tag:
+                log ( "tags %s and %s differ" % ( el.tag, newel.tag ) )
                 return False
         else:                    
             compareXML(el,newel,allowedDiff,ignore)
@@ -291,6 +301,7 @@ class RunPrinterTest(unittest.TestCase):
                                               'Total xsec for topologies outside the grid (fb)']))
         except AssertionError as e:
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
+            msg += ". Try and consult debug.log for more info."
             raise AssertionError(msg)
         self.removeOutputs ( './unitTestOutput/printer_output.xml' )  
  

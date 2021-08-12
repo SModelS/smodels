@@ -27,7 +27,7 @@ class CppTest(unittest.TestCase):
         ## now check if "done" appears in the last line
         self.assertTrue ( "done" in a[-1] )
 
-    def writeOutput(self):
+    def writeOutput(self ):
         """ write the default output. will *define* the unit test. """
         f=open("default_cpp.txt","w" )
         cmd = "cd ../cpp; ./run"
@@ -47,6 +47,14 @@ class CppTest(unittest.TestCase):
             parmf.write ( line.replace ( "@@DBPATH@@", dbpath ) )
         parmf.close()
 
+    def writeDebug ( self, txt ):
+        """ write debugging file """
+        print ( "test failed. writing output to debug.txt" )
+        f=open("debug.txt","w")
+        for i in txt:
+            f.write ( i+ "\n" )
+        f.close()
+
     def runExample(self):
         """ now run the example """
         from databaseLoader import dbpath
@@ -64,17 +72,16 @@ class CppTest(unittest.TestCase):
             b = [ x.strip() for x in lb  if x.strip() and x.strip()[0] != '#' 
                  and not 'WARNING' in x and not 'INFO' in x]
         if len(a) != len(b):
-            print ( "test failed. writing output to debug.txt" )
-            f=open("debug.txt","w")
-            for i in b:
-                f.write ( i+ "\n" )
-            f.close()
+            print ( "Files have different lengths" )
+            self.writeDebug( a )
         self.assertEqual(len(a), len(b))
-        for x,y in zip(a,b):
+        for linenr,(x,y) in enumerate(zip(a,b)):
             if x == y:
                 continue
             xvals = [v.strip() for v in x.split()]
             yvals = [v.strip() for v in y.split()]
+            if len(xvals) != len(yvals):
+                self.writeDebug( a )
             self.assertEqual(len(xvals), len(yvals), "Lines:\n %s and \n %s \n differ" %(x,y))
             for i,xv in enumerate(xvals):
                 yv = yvals[i]
@@ -89,8 +96,13 @@ class CppTest(unittest.TestCase):
                     if abs(xv)<1e-10 and abs(yv)<1e-10: ## tiny llhds are ok
                         yv=xv
                     dlt = abs ( ( xv - yv ) / (xv + yv) )
+                    if abs(dlt)>.1:
+                        self.writeDebug( a )
                     self.assertAlmostEqual( dlt, 0., 1 )
                 else:
+                    if xv != yv:
+                        print ( "Error in line #%d:\n%s (your version) vs\n%s (official version)" % (linenr+1, x, y ) )
+                        self.writeDebug( a )
                     self.assertEqual(xv, yv)
         ## reset parameter.ini file
         self.writeIni ( "unittest" )

@@ -334,8 +334,10 @@ Then the masses and widths are transformed into a flat array:
 .. _dataTransf:
 
 .. math::
-   [[M_1,(M_2,\Gamma_2)],[M_A,(M_B,\Gamma_B)]] \to [M_1,M_2,M_A,M_B,\log(1+\Gamma_2),\log(1+\Gamma_B)]
+   [[M_1,(M_2,\Gamma_2)],[M_A,(M_B,\Gamma_B)]] \to [M_1,M_2,M_A,M_B,\log(1+\Gamma_2/\Gamma_0),\log(1+\Gamma_B/\Gamma_0)]
 
+where :math:`\Gamma_{0} = 10^{-30}` GeV is a rescaling factor to ensure the log is mapped to large
+values for the relevant width range.
 
 Finally a principal component analysis and Delaunay triangulation (see :ref:`figure below <delaunay>`)
 is applied over the new coordinates.

@@ -9,6 +9,7 @@
 
 
 import os,glob,json
+import numpy as np
 from smodels.experiment import txnameObj,infoObj
 from smodels.tools.physicsUnits import fb
 from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
@@ -61,6 +62,100 @@ class DataSet(object):
 
             self.txnameList.sort()
             self.checkForRedundancy(databaseParticles)
+
+    def isCombinableWith( self, other ):
+        """
+        Function that reports if two datasets are mutually uncorrelated = combinable.
+
+        :param other: datasetObj to compare self with
+        """
+        id1, id2 = self.globalInfo.id, other.globalInfo.id
+        if id1 == id2: ## we are always correlated with ourselves
+            return False
+        from smodels.tools.physicsUnits import TeV
+        ds = abs (self.globalInfo.sqrts.asNumber(TeV) - other.globalInfo.sqrts.asNumber(TeV) )
+        if ds > 1e-5: ## not the same
+            return True
+        def getCollaboration ( ds ):
+            return "CMS" if "CMS" in ds.globalInfo.id else "ATLAS"
+        coll1, coll2 = getCollaboration ( self ), getCollaboration ( other )
+        if coll1 != coll2:
+            return True
+
+        if self.isGlobalFieldCombinableWith_ ( other ):
+            return True
+        if other.isGlobalFieldCombinableWith_ ( self ):
+            return True
+        if self.isLocalFieldCombinableWith_ ( other ):
+            return True
+        if other.isLocalFieldCombinableWith_ ( self ):
+            return True
+        if self.isCombMatrixCombinableWith_ ( other ):
+            return True
+        return False
+
+    def isCombMatrixCombinableWith_ ( self, other ):
+        """ check for combinability via the combinations matrix """
+        if not hasattr ( self.globalInfo, "_combinationsmatrix" ):
+            return False
+        if self.globalInfo._combinationsmatrix == None:
+            return False
+        idSelf = self.globalInfo.id
+        didSelf = self.dataInfo.dataId
+        selflabel = f"{idSelf}:{didSelf}"
+        idOther = other.globalInfo.id
+        didOther = other.dataInfo.dataId
+        otherlabel = f"{idOther}:{didOther}"
+        for label, combs in self.globalInfo._combinationsmatrix.items():
+            if label in [ idSelf, didSelf ]:
+                ## match! with self! is "other" in combs?
+                if idOther in combs or otherlabel in combs:
+                    return True
+            if label in [ idOther, didOther ]:
+                ## match! with other! is "self" in combs?
+                if idSelf in combs or selflabel in combs:
+                    return True
+        return False
+
+    def isGlobalFieldCombinableWith_ ( self, other ):
+        """ check for 'combinableWith' fields in globalInfo, check if <other> matches.
+        this check is at analysis level (not at dataset level).
+
+        :params other: a dataset to check against
+        :returns: true, if pair is marked as combinable, else false
+        """
+        if not hasattr ( self.globalInfo, "combinableWith" ):
+            return False
+        tokens = self.globalInfo.combinableWith.split ( "," )
+        idOther = other.globalInfo.id
+        for t in tokens:
+            if ":" in t:
+                logger.error ( "combinableWith field in globalInfo is at the analysis level. You specified a dataset-level combination %s." % t )
+                raise SModelSError()
+        if idOther in tokens:
+            return True
+        return False
+
+    def isLocalFieldCombinableWith_ ( self, other ):
+        """ check for 'combinableWith' fields in globalInfo, check if <other> matches.
+        this check is at dataset level (not at dataset level).
+
+        :params other: a dataset to check against
+        :returns: true, if pair is marked as combinable, else false
+        """
+        if not hasattr ( self.dataInfo, "combinableWith" ):
+            return False
+        tokens = self.dataInfo.combinableWith.split ( "," )
+        for t in tokens:
+            if not ":" in t:
+                logger.error ( "combinableWith field in dataInfo is at the dataset level. You specified an analysis-level combination %s." % t )
+                raise SModelSError()
+        idOther = other.globalInfo.id
+        didOther = other.dataInfo.dataId
+        label = f"{idOther}:{didOther}"
+        if label in tokens:
+            return True
+        return False
 
     def checkForRedundancy(self,databaseParticles):
         """ In case of efficiency maps, check if any txnames have overlapping
@@ -131,6 +226,16 @@ class DataSet(object):
 
         return self.dataInfo.dataId
 
+    def getLumi(self):
+        """
+        Return the dataset luminosity. If not defined for the dataset, use
+        the value defined in globalInfo.lumi.
+        """
+
+        if hasattr(self,'lumi'):
+            return self.lumi
+        else:
+            return self.globalInfo.lumi
 
     def getTxName(self,txname):
         """
@@ -167,9 +272,10 @@ class DataSet(object):
     def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False ):
         """
         Computes the likelihood to observe nobs events,
-        given a predicted signal "nsig", assuming "deltas"
+        given a predicted signal "nsig", assuming "deltas_rel"
         error on the signal efficiency.
         The values observedN, expectedBG, and bgError are part of dataInfo.
+
         :param nsig: predicted signal (float)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
@@ -185,6 +291,29 @@ class DataSet(object):
         computer = LikelihoodComputer(m)
         return computer.likelihood(nsig, marginalize=marginalize)
 
+    def lmax( self, deltas_rel=0.2, marginalize=False, expected=False,
+              allowNegativeSignals = False ):
+        """
+        Convenience function, computes the likelihood at nsig = observedN - expectedBG,
+        assuming "deltas_rel" error on the signal efficiency.
+        The values observedN, expectedBG, and bgError are part of dataInfo.
+
+        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+        :param marginalize: if true, marginalize nuisances. Else, profile them.
+        :param expected: Compute expected instead of observed likelihood
+        :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
+
+        :returns: likelihood to observe nobs events (float)
+        """
+        obs = self.dataInfo.observedN
+        if expected:
+            obs = self.dataInfo.expectedBG
+
+        m = Data( obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
+                       deltas_rel=deltas_rel )
+        computer = LikelihoodComputer(m)
+        return computer.lmax(marginalize=marginalize, nll=False,
+                             allowNegativeSignals = allowNegativeSignals )
 
     def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
         """
@@ -204,13 +333,11 @@ class DataSet(object):
 
         return ret
 
-
     def folderName(self):
         """
         Name of the folder in text database.
         """
         return os.path.basename( self.path )
-
 
     def getAttributes(self, showPrivate=False):
         """
@@ -228,7 +355,6 @@ class DataSet(object):
             attributes = list(filter(lambda a: a[0] != '_', attributes))
 
         return attributes
-
 
     def getUpperLimitFor(self,element=None,expected = False, txnames = None
                          ,compute=False,alpha=0.05,deltas_rel=0.2):
@@ -299,7 +425,6 @@ class DataSet(object):
                            self.getType())
             return None
 
-
     def getSRUpperLimit(self,alpha = 0.05, expected = False, compute = False, deltas_rel=0.2):
         """
         Computes the 95% upper limit on the signal*efficiency for a given dataset (signal region).
@@ -343,11 +468,9 @@ class DataSet(object):
         computer = UpperLimitComputer(cl=1.-alpha )
         maxSignalXsec = computer.ulSigma(m)
         if maxSignalXsec != None:
-            maxSignalXsec = maxSignalXsec/self.globalInfo.lumi
+            maxSignalXsec = maxSignalXsec/self.getLumi()
 
         return maxSignalXsec
-
-
 
 class CombinedDataSet(object):
     """
@@ -361,13 +484,19 @@ class CombinedDataSet(object):
         self._datasets = expResult.datasets[:]
         self._marginalize = False
         self.sortDataSets()
-        self.bestCB = None# To store the index of the best combination
+        self.findType()
+
+    def findType ( self ):
+        """ find the type of the combined dataset """
+        self.type = "bestSR" ## type of combined dataset, e.g. pyhf, or simplified
+        if hasattr(self.globalInfo, "covariance"):
+            self.type = "simplified"
+        if hasattr(self.globalInfo, "jsonFiles" ):
+            self.type = "pyhf"
 
     def __str__(self):
         ret = "Combined Dataset (%i datasets)" %len(self._datasets)
         return ret
-
-
 
     def sortDataSets(self):
         """
@@ -390,7 +519,6 @@ class CombinedDataSet(object):
                 dsIndex = datasetOrder.index(dataset.getID())
                 self._datasets[dsIndex] = dataset
 
-
     def getType(self):
         """
         Return the dataset type (combined)
@@ -404,6 +532,14 @@ class CombinedDataSet(object):
         """
 
         return '(combined)'
+
+    def getLumi(self):
+        """
+        Return the dataset luminosity. For CombinedDataSet always return
+        the value defined in globalInfo.lumi.
+        """
+
+        return self.globalInfo.lumi
 
     def getDataSet(self,datasetID):
         """
@@ -420,217 +556,3 @@ class CombinedDataSet(object):
                 return dataset
 
         return None
-
-    def getPyhfComputer ( self, nsig ):
-        """ create the pyhf ul computer object
-        :returns: pyhf upper limit computer, and combinations of signal regions
-        """
-        # Getting the path to the json files
-        jsonFiles = [js for js in self.globalInfo.jsonFiles]
-        combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
-        jsons = self.globalInfo.jsons.copy()
-        datasets = [ds.getID() for ds in self._datasets]
-        total = sum(nsig)
-        nsig = [s/total for s in nsig] # Normalising signals to get an upper limit on the events count
-        # Filtering the json files by looking at the available datasets
-        for jsName in self.globalInfo.jsonFiles:
-            if all([ds not in self.globalInfo.jsonFiles[jsName] for ds in datasets]):
-                # No datasets found for this json combination
-                jsIndex = jsonFiles.index(jsName)
-                jsonFiles.pop(jsIndex)
-                jsons.pop(jsIndex)
-                continue
-            if not all([ds in datasets for ds in self.globalInfo.jsonFiles[jsName]]):
-                # Some SRs are missing for this json combination
-                logger.error("Wrong json definition in globalInfo.jsonFiles for json : %s" % jsName)
-        logger.debug("list of datasets: {}".format(datasets))
-        logger.debug("jsonFiles after filtering: {}".format(jsonFiles))
-        # Constructing the list of signals with subsignals matching each json
-        nsignals = list()
-        for jsName in jsonFiles:
-            subSig = list()
-            for srName in self.globalInfo.jsonFiles[jsName]:
-                try:
-                    index = datasets.index(srName)
-                except ValueError:
-                    logger.error("%s signal region provided in globalInfo is not in the list of datasets" % srName)
-                sig = nsig[index]
-                subSig.append(sig)
-            nsignals.append(subSig)
-        # Loading the jsonFiles, unless we already have them (because we pickled)
-        from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
-        data = PyhfData(nsignals, jsons )
-        if data.errorFlag: return None
-        ulcomputer = PyhfUpperLimitComputer(data)
-        return ulcomputer,combinations
-
-    def getCombinedUpperLimitFor(self, nsig, expected=False, deltas_rel=0.2):
-        """
-        Get combined upper limit. If covariances are given in globalInfo then simplified likelihood is used, else if json files are given pyhf cimbination is performed.
-
-        :param nsig: list of signal events in each signal region/dataset. The list
-                        should obey the ordering in globalInfo.datasetOrder.
-        :param expected: return expected, not observed value
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-
-        :returns: upper limit on sigma*eff
-        """
-
-        if hasattr(self.globalInfo, "covariance" ):
-            cov = self.globalInfo.covariance
-            if type(cov) != list:
-                raise SModelSError( "covariance field has wrong type: %s" % type(cov))
-            if len(cov) < 1:
-                raise SModelSError( "covariance matrix has length %d." % len(cov))
-
-            computer = UpperLimitComputer(ntoys=10000)
-
-            nobs = [x.dataInfo.observedN for x in self._datasets]
-            bg = [x.dataInfo.expectedBG for x in self._datasets]
-            no = nobs
-
-            ret = computer.ulSigma(Data(observed=no, backgrounds=bg, covariance=cov,
-                                        third_moment=None, nsignal=nsig, deltas_rel=deltas_rel),
-                                        marginalize=self._marginalize,
-                                        expected=expected)
-
-            if ret != None:
-                #Convert limit on total number of signal events to a limit on sigma*eff
-                ret = ret/self.globalInfo.lumi
-            logger.debug("SL upper limit : {}".format(ret))
-            return ret
-        elif hasattr(self.globalInfo, "jsonFiles" ):
-            logger.debug("Using pyhf")
-            if all([s == 0 for s in nsig]):
-                logger.warning("All signals are empty")
-                return None
-            ulcomputer, combinations = self.getPyhfComputer( nsig )
-            if ulcomputer.nWS == 1:
-                ret = ulcomputer.ulSigma(expected=expected)
-                ret = ret/self.globalInfo.lumi
-                logger.debug("pyhf upper limit : {}".format(ret))
-                return ret
-            else:
-                # Looking for the best combination
-                logger.debug('self.bestCB : {}'.format(self.bestCB))
-                if self.bestCB == None:
-                    logger.debug("Performing best expected combination")
-                    ulMin = float('+inf')
-                    for i_ws in range(ulcomputer.nWS):
-                        ul = ulcomputer.ulSigma(expected=True, workspace_index=i_ws)
-                        if ul == None:
-                            continue
-                        if ul < ulMin:
-                            ulMin = ul
-                            i_best = i_ws
-                    self.bestCB = combinations[i_best] # Keeping the index of the best combination for later
-                    logger.debug('Best combination : %s' % self.bestCB)
-                # Computing upper limit using best combination
-                if expected:
-                    try:
-                        ret = ulMin/self.globalInfo.lumi
-                    except NameError:
-                        ret = ulcomputer.ulSigma(expected=True, workspace_index=combinations.index(self.bestCB))
-                        ret = ret/self.globalInfo.lumi
-                else:
-                    ret = ulcomputer.ulSigma(expected=False, workspace_index=combinations.index(self.bestCB))
-                    ret = ret/self.globalInfo.lumi
-                logger.debug("pyhf upper limit : {}".format(ret))
-                return ret
-        else:
-            logger.error ( "no covariance matrix or json file given in globalInfo.txt for %s" % self.globalInfo.id )
-            raise SModelSError( "no covariance matrix or json file given in globalInfo.txt for %s" % self.globalInfo.id )
-
-    def combinedLikelihood(self, nsig, marginalize=False, deltas_rel=0.2):
-        """
-        Computes the (combined) likelihood to observe nobs events, given a
-        predicted signal "nsig", with nsig being a vector with one entry per
-        dataset.  nsig has to obey the datasetOrder. Deltas is the error on
-        the signal.
-        :param nsig: predicted signal (list)
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-
-        :returns: likelihood to observe nobs events (float)
-        """
-
-
-
-        if hasattr(self.globalInfo, "covariance" ):
-            if len(self._datasets) == 1:
-                if isinstance(nsig,list):
-                    nsig = nsig[0]
-                return self._datasets[0].likelihood(nsig,marginalize=marginalize)
-            nobs = [ x.dataInfo.observedN for x in self._datasets]
-            bg = [ x.dataInfo.expectedBG for x in self._datasets]
-            cov = self.globalInfo.covariance
-            computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-            return computer.likelihood(nsig, marginalize=marginalize )
-        elif hasattr(self.globalInfo, "jsonFiles"):
-            # Getting the path to the json files
-            # Loading the jsonFiles
-            ulcomputer, combinations = self.getPyhfComputer( nsig )
-            if ulcomputer.nWS == 1:
-                return ulcomputer.likelihood()
-            else:
-                # Looking for the best combination
-                if self.bestCB == None:
-                    ulMin = float('+inf')
-                    for i_ws in range(ulcomputer.nWS):
-                        logger.debug("Performing best expected combination")
-                        ul = ulcomputer.ulSigma(expected=True, workspace_index=i_ws)
-                        if  ul < ulMin:
-                            ulMin = ul
-                            i_best = i_ws
-                    self.bestCB = combinations[i_best] # Keeping the index of the best combination for later
-                    logger.debug('Best combination : %d' % self.bestCB)
-                return ulcomputer.likelihood(workspace_index=combinations.index(self.bestCB))
-        else:
-            logger.error("Asked for combined likelihood, but no covariance or json file given." )
-            return None
-
-    def totalChi2(self, nsig, marginalize=False, deltas_rel=0.2):
-        """
-        Computes the total chi2 for a given number of observed events, given a
-        predicted signal "nsig", with nsig being a vector with one entry per
-        dataset. nsig has to obey the datasetOrder. Deltas is the error on
-        the signal efficiency.
-        :param nsig: predicted signal (list)
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-
-        :returns: chi2 (float)
-        """
-
-        if hasattr(self.globalInfo, "covariance" ):
-            if len(self._datasets) == 1:
-                if isinstance(nsig,list):
-                    nsig = nsig[0]
-                return self._datasets[0].chi2(nsig, marginalize=marginalize)
-            nobs = [x.dataInfo.observedN for x in self._datasets ]
-            bg = [x.dataInfo.expectedBG for x in self._datasets ]
-            cov = self.globalInfo.covariance
-
-            computer = LikelihoodComputer(Data(nobs, bg, cov, deltas_rel=deltas_rel))
-
-            return computer.chi2(nsig, marginalize=marginalize)
-        elif hasattr(self.globalInfo, "jsonFiles"):
-            # Getting the path to the json files
-            # Loading the jsonFiles
-            ulcomputer, combinations = self.getPyhfComputer( nsig )
-            if ulcomputer.nWS == 1:
-                return ulcomputer.chi2()
-            else:
-                # Looking for the best combination
-                if self.bestCB == None:
-                    ulMin = float('+inf')
-                    for i_ws in range(ulcomputer.nWS):
-                        logger.debug("Performing best expected combination")
-                        ul = ulcomputer.ulSigma(expected=True, workspace_index=i_ws)
-                        if  ul < ulMin:
-                            ulMin = ul
-                            i_best = i_ws
-                    self.bestCB = combinations[i_best] # Keeping the index of the best combination for later
-                    logger.debug('Best combination : %d' % self.bestCB)
-                return ulcomputer.chi2(workspace_index=combinations.index(self.bestCB))
-        else:
-            logger.error("Asked for combined likelihood, but no covariance error given." )
-            return None

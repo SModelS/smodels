@@ -37,6 +37,21 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 2.1.0:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Ability to merge :ref:`Databases <parameterFileDatabase>` using '+' as a delimiter: "latest_fastlim" and "official_fastlim" are now written as "latest+fastlim", and "official+fastlim".
+  * useSuperseded flag in `getExpResults  <experiment.html#experiment.databaseObj.Database.getExpResults>`_ is marked as deprecated, as we now just put superseded results in separate database
+  * datasets now have an `.isCombinableWith <experiment.html#experiment.datasetObj.DataSet.isCombinableWith>`_ function
+  * slightly extended output of :ref:`summary printer <parameterFileSummaryprinter>`
+  * added scan summary (:ref:`summary.txt <scanSummary>`) when running over multiple files
+  * added option to slha-printer (:ref:`expandedOutput <parameterFileSLHAprinter>`)
+  * improved :ref:`interactive plots <interactivePlots>`
+  * small changes in the printers, :ref:`L_max and L_SM added <likelihoodCalc>` to the :ref:`output <outputDescription>`
+  * the :ref:`likelihood <likelihoodCalc>` is now maximized only for positive values of the signal strength,
+    in the computation of lmax
+  * upgraded pythia8 in :ref:`xsecComputer <xsecCalc>` from 8226 to 8306
+
 New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -56,7 +71,7 @@ New in Version 2.0.0:
   * Small fix due to an API change in pyhf 0.6
   * Changes in output: :ref:`width values added <pyOut>`, :ref:`coverage groups <coverageGroups>` and others (see :ref:`output description <outputDescription>` for details)
   * Added option for signal strength multipliers in :ref:`cross section calculator <xsecCalc>`
-  * Small bug fixes in :ref:`models <basicInput>`  
+  * Small bug fixes in :ref:`models <basicInput>`
 
 
 

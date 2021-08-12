@@ -8,12 +8,10 @@ from __future__ import print_function
 """
 """ Import basic functions (this file must be executed in the installation folder) """
 
-
 from smodels.tools import runtime
 #Define your model (list of BSM particles)
 runtime.modelFile = 'smodels.share.models.mssm'
 #runtime.modelFile = 'mssmQNumbers.slha'
-
 
 from smodels.theory import decomposer
 from smodels.tools.physicsUnits import fb, GeV, TeV
@@ -42,7 +40,7 @@ def main():
 
 
     # Set main options for decomposition
-    sigmacut = 0.01*fb
+    sigmacut = 0.005*fb
     mingap = 5.*GeV
 
     # Decompose model
@@ -108,10 +106,10 @@ def main():
             # Compute the r-value
             r = theoryPrediction.getRValue()
             print("r = ",r )
-            #Compute likelihhod and chi^2 for EM-type results:
+            # Compute likelihoods for EM-type results:
             if dataset.getType() == 'efficiencyMap':
                 theoryPrediction.computeStatistics()
-                print('Chi2, likelihood=', theoryPrediction.chi2, theoryPrediction.likelihood )
+                print('L_BSM, L_SM, L_max =', theoryPrediction.likelihood, theoryPrediction.lsm, theoryPrediction.lmax )
             if r > rmax:
                 rmax = r
                 bestResult = expResult.globalInfo.id
@@ -123,8 +121,8 @@ def main():
     else:
         print("(The input model is not excluded by the simplified model results)" )
       
-    #Find out missing topologies for sqrts=8*TeV:
-    uncovered = coverage.Uncovered(toplist,sqrts=8.*TeV)
+    #Find out missing topologies for sqrts=13*TeV:
+    uncovered = coverage.Uncovered(toplist,sqrts=13.*TeV)
     #First sort coverage groups by label
     groups = sorted(uncovered.groups[:], key = lambda g: g.label)
     #Print uncovered cross-sections:

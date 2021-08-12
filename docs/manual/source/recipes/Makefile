@@ -1,7 +1,10 @@
-all: convert # remove_ipynb
+all: convert clean # remove_ipynb
 
 convert:
 	./convert.py
+
+clean:
+	rm -f all_data_frame.txt lheLLPExample.py
 
 run:
 	jupyter notebook

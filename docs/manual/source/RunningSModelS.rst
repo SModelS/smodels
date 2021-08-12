@@ -57,7 +57,7 @@ code (:ref:`Example.py <exampleCode>`) are described below.
 .. note:: For non-MSSM (incl. non-SUSY) input models the user needs to write their own *model.py*
           file and specify which BSM particles are even or odd under the assumed
           Z\ :sub:`2` (or similar) symmetry (see :ref:`adding new particles <newParticles>`).
-          From version 1.2.0 onwards it is also necessary to define the BSM particle quantum numbers in the same file [#]_.
+          From version 1.2.0 onwards it is also necessary to define the BSM particle quantum numbers in the same file [1]_.
 
 
 
@@ -131,9 +131,9 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileComputeStatistics:
 
-  * **computeStatistics** (True/False): turns the likelihood and :math:`\chi^2` computation on or off
+  * **computeStatistics** (True/False): turns the likelihood computation on or off
     (see :ref:`likelihood calculation <likelihoodCalc>`).
-    If True, the likelihood and :math:`\chi^2` values are computed for the |EMrs|.
+    If True, the likelihoods L_BSM, L_SM and L_max are computed for the |EMrs|.
 
 .. _parameterFileTestCoverage:
 
@@ -193,7 +193,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFilePath:
 
-  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Also http addresses may be given, e.g. https://smodels.github.io/database/official113. The path "official" refers to the official database of your SModelS version -- without fastlim; "official_fastlim" includes fastlim results. In addition, the paths "latest_fastlim" and "latest" refer to the latest databases, with and without fastlim results, respectively. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions.
+  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Also http addresses may be given, e.g. https://smodels.github.io/database/official210. Multiple databases may be specified using '+' as a delimiter. Order matters: results will be overwritten according to the sequence specified. The path "official" refers to the official database of your SModelS version -- without fastlim; "official+fastlim" includes fastlim results. In addition, the paths "latest+fastlim" and "latest" refer to the latest databases, with and without fastlim results, respectively. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions.
 
 .. _parameterFileAnalyses:
 
@@ -274,6 +274,14 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **expandedSummary** (True/False): set True to include in the summary output all applicable |results|, False for only the strongest one.
 
+.. _parameterFileSLHAprinter:
+
+* *slha-printer*: options for the SLHA printer
+
+  .. _parameterFileExpandedOutput:
+
+    * **expandedOutput** (True/False): set True to print the full list of results. If False only the most constraining result and excluding results are printed.
+
 .. _parameterFilePythonprinter:
 
 * *python-printer*: options for the Python printer
@@ -336,6 +344,8 @@ The following formats are available:
    |theory predictions| and the :ref:`missing topologies <topCoverage>`. The output follows a SLHA-type
    format and contains a summary of the most constraining results and the missed topologies.
 
+In addition, when running over multiple files, a simple text output (summary.txt) is generated
+with basic information about the results for each input file.
 A detailed explanation of the information contained in each type of output is given
 in :ref:`SModels Output <outputDescription>`.
 
@@ -350,38 +360,35 @@ users more familiar with Python and the SModelS language may prefer to write the
 A simple example code for this purpose is provided in :download:`examples/Example.py`.
 Below we go step-by-step through this example code:
 
-
-* *Import the SModelS modules and methods*. If the example code file is not located in
-  the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. Set SModelS verbosity level.
-
-.. literalinclude:: /examples/Example.py
-   :lines: 11-23
-
-* *Set the path to the database URL*. Specify which :ref:`database <databaseStruct>` to use. It can be the path
-  to the smodels-database folder, the path to a :ref:`pickle file <databasePickle>` or (starting with v1.1.3) a URL path.
-
-.. literalinclude:: /examples/Example.py
-   :lines: 24-25
-
 * *Define the input model*. By default SModelS assumes the MSSM particle content. For using SModelS
   with a different particle content, the user must define the new particle content and set modelFile
   to the path of the model file (see **particles:model** in :ref:`Parameter File <parameterFile>`).
 
 .. literalinclude:: /examples/Example.py
-   :lines: 32-34
+   :lines: 11-14
 
-
-* *Path to the input file*. Specify the location of the input file. It must be a
-  SLHA or LHE file (see :ref:`Basic Input <BasicInput>`).
+* *Import the SModelS modules and methods*. If the example code file is not located in
+  the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. Set SModelS verbosity level. 
 
 .. literalinclude:: /examples/Example.py
-   :lines: 37-38
+   :lines: 16-24
+
+* *Set the path to the database URL*. Specify which :ref:`database <databaseStruct>` to use. It can be the path
+  to the smodels-database folder, the path to a :ref:`pickle file <databasePickle>` or (starting with v1.1.3) a URL path.
+
+.. literalinclude:: /examples/Example.py
+   :lines: 27-28
+
+* *Load the model and set the path to the input file*. Load BSM and SM particle content; specify the location of the input file (must be an SLHA or LHE file, see :ref:`Basic Input <BasicInput>`) and update particles in the model.
+
+.. literalinclude:: /examples/Example.py
+   :lines: 34-39
 
 * *Set main options for* |decomposition|.
   Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 44-45
+   :lines: 43-44
 
 * |Decompose| *model*. Depending on the type
   of input format, choose either
@@ -389,14 +396,14 @@ Below we go step-by-step through this example code:
   `lheDecomposer.decompose <theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 47-49
+   :lines: 46-47
 
 * *Access basic information* from decomposition, using the
   `topology list <theory.html#theory.topology.TopologyList>`_
   and `topology  <theory.html#theory.topology.Topology>`_ objects:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 50-64
+   :lines: 49-63
 
 *output:*
 
@@ -408,7 +415,7 @@ Below we go step-by-step through this example code:
   Here, all results are used:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 68
+   :lines: 67
 
 Alternatively, the `getExpResults  <experiment.html#experiment.databaseObj.Database.getExpResults>`_ method
 can take as arguments specific results to be loaded.
@@ -417,7 +424,7 @@ can take as arguments specific results to be loaded.
   Below we show how to count the number of |ULrs| and |EMrs| loaded:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 72-79
+   :lines: 70-78
 
 *output:*
 
@@ -431,13 +438,13 @@ can take as arguments specific results to be loaded.
   (for each |expres|):
 
 .. literalinclude:: /examples/Example.py
-   :lines: 86-87
+   :lines: 85-86
 
 * *Print the results*. For each |expres|, loop over the corresponding |theory predictions|
   and print the relevant information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 90-102
+   :lines: 88-101
 
 *output:*
 
@@ -448,7 +455,7 @@ can take as arguments specific results to be loaded.
   be compared to the |theory prediction| to decide whether a model is excluded or not:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 104-105
+   :lines: 104
 
 *output:*
 
@@ -457,11 +464,11 @@ can take as arguments specific results to be loaded.
 
 * *Print the r-value*, i.e. the ratio |theory prediction|/upper limit.
   A value of :math:`r \geq 1` means that an experimental result excludes the input model.
-  For |EMrs| also compute the :math:`\chi^2` and :ref:`likelihood <likelihoodCalc>`.
+  For |EMrs| also compute the :ref:`likelihood <likelihoodCalc>` values.
   Determine the most constraining result:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 109-117
+   :lines: 107-115
 
 *output:*
 
@@ -478,20 +485,20 @@ can take as arguments specific results to be loaded.
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 970-972
+   :lines: 819-820
 
 
 * *Identify missing topologies*. Using the output from decomposition, identify
   the :ref:`missing topologies <topCoverage>` and print some basic information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 125-151
+   :lines: 124-150
 
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 973-1015
+   :lines: 823-839
 
 
 It is worth noting that SModelS does not include any statistical treatment for
@@ -513,4 +520,4 @@ Due to this, the results are claimed to be "likely excluded" in the output.
    Unfortunately, for |ULrs|, the expected limits are often not available;
    :math:`r_{exp}` is then reported as N/A in the SModelS output.
 
-.. [#] We note that SLHA files including decay tables and cross sections, together with the corresponding *model.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_
+.. [1] SLHA files including decay tables and cross sections, together with the corresponding *model.py*, can conveniently be generated via the SModelS-micrOMEGAS interface, see `arXiv:1606.03834 <http://www.arXiv.org/abs/1606.03834>`_

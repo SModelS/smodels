@@ -14,6 +14,8 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statistics import likelihoodFromLimits, chi2FromLimits
+from smodels.tools.combinations import computeCombinedStatistics, getCombinedUpperLimitFor,\
+                                       computeCombinedLikelihood
 import itertools
 
 class TheoryPrediction(object):
@@ -88,16 +90,16 @@ class TheoryPrediction(object):
                                                                 txnames=self.txnames,
                                                                 expected=False)
             if self.dataType() == 'combined':
-                lumi = self.expResult.globalInfo.lumi
                 #Create a list of signal events in each dataset/SR sorted according to datasetOrder
+                # lumi = self.dataset.getLumi()
                 if hasattr(self.dataset.globalInfo, "covariance"):
-                    srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
+                    srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*pred.dataset.getLumi() ).asNumber()] for pred in self.datasetPredictions])
                     srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
                 elif hasattr(self.dataset.globalInfo, "jsonFiles"):
-                    srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
+                    srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*pred.dataset.getLumi() ).asNumber()] for pred in self.datasetPredictions])
                     srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
-                self.expectedUL = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=True,deltas_rel=deltas_rel)
-                self.upperLimit = self.dataset.getCombinedUpperLimitFor(srNsigs,expected=False,deltas_rel=deltas_rel)
+                self.expectedUL = getCombinedUpperLimitFor(self.dataset, srNsigs,expected=True,deltas_rel=deltas_rel)
+                self.upperLimit = getCombinedUpperLimitFor(self.dataset, srNsigs,expected=False,deltas_rel=deltas_rel)
 
         #Return the expected or observed UL:
         if expected:
@@ -120,7 +122,8 @@ class TheoryPrediction(object):
                               expected=False, chi2also=False ):
         """ compute the likelihood from expected and observed upper limits.
         :param expected: compute expected, not observed likelihood
-        :param mu: signal strength multiplier, applied to theory prediction
+        :param mu: signal strength multiplier, applied to theory prediction. If None,
+                   then find muhat
         :param chi2also: if true, return also chi2
         :returns: likelihood; none if no expected upper limit is defined.
         """
@@ -146,10 +149,12 @@ class TheoryPrediction(object):
         ul = self.dataset.getUpperLimitFor(element=self.avgElement,
                                             txnames=self.txnames,
                                             expected=False )
-        lumi = self.dataset.globalInfo.lumi
+        lumi = self.dataset.getLumi()
         ulN = float(ul * lumi) ## upper limit on yield
         eulN = float(eul * lumi) ## upper limit on yield
-        nsig = mu*(self.xsection.value*lumi).asNumber()
+        nsig = None
+        if mu != None:
+            nsig = mu*(self.xsection.value*lumi).asNumber()
         llhd = likelihoodFromLimits ( ulN, eulN, nsig )
         if chi2also:
             return ( llhd, chi2FromLimits ( llhd, eulN ) )
@@ -160,21 +165,32 @@ class TheoryPrediction(object):
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood
         """
-        if self.dataType()  == 'upperLimit':
-            # FIXME treat the case of exisiting expected upper limit
-            return self.likelihoodFromLimits ( mu, marginalize, deltas_rel, expected )
+        self.computeStatistics ( marginalize, deltas_rel )
+        if hasattr ( self, "likelihood" ) and abs ( mu - 1. ) < 1e-5:
+            return self.likelihood
+        lumi = self.dataset.getLumi()
+        if self.dataType() == 'combined':
+            srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for \
+                              pred in self.datasetPredictions])
+            srNsigs = [mu*srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. \
+                       for ds in self.dataset._datasets]
+            llhd = computeCombinedLikelihood ( self.dataset, srNsigs, marginalize,
+                                               deltas_rel )
+            return llhd
         if self.dataType() == 'efficiencyMap':
-            lumi = self.dataset.globalInfo.lumi
-            nsig = mu*(self.xsection.value*lumi).asNumber()
-            llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel,expected=expected)
+            nsig = (mu*self.xsection.value*lumi).asNumber()
+            llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
+        if self.dataType()  == 'upperLimit':
+            llhd, chi2 = self.likelihoodFromLimits ( mu, marginalize, deltas_rel, chi2also=True )
             return llhd
         return None
 
+
     def computeStatistics(self,marginalize=False,deltas_rel=0.2):
         """
-        Compute the likelihood, chi2 and expected upper limit for this theory prediction.
-        The resulting values are stored as the likelihood and chi2
-        attributes.
+        Compute the likelihoods, chi2 and expected upper limit for this theory prediction.
+        The resulting values are stored as the likelihood, lmax, lsm and chi2
+        attributes (chi2 being phased out).
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         """
@@ -183,26 +199,40 @@ class TheoryPrediction(object):
             llhd, chi2 = self.likelihoodFromLimits ( 1., marginalize, deltas_rel, chi2also=True )
             self.likelihood = llhd
             self.chi2 = chi2
+            self.lsm = self.likelihoodFromLimits ( 0., marginalize, deltas_rel, False )
+            self.lmax = self.likelihoodFromLimits ( None, marginalize, deltas_rel, False )
 
         elif self.dataType() == 'efficiencyMap':
-            lumi = self.dataset.globalInfo.lumi
+            lumi = self.dataset.getLumi()
             nsig = (self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
-            chi2 = self.dataset.chi2(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
-            self.likelihood =  llhd
-            self.chi2 =  chi2
+            llhd_sm = self.dataset.likelihood(nsig=0.,marginalize=marginalize,deltas_rel=deltas_rel)
+            llhd_max = self.dataset.lmax(marginalize=marginalize,deltas_rel=deltas_rel,\
+                                          allowNegativeSignals = False )
+            self.likelihood = llhd
+            self.lmax = llhd_max
+            self.lsm = llhd_sm
+            from math import log
+            chi2 = None
+            if llhd == 0. and llhd_max == 0.:
+                chi2 = 0.
+            if llhd == 0. and llhd_max > 0.:
+                chi2 = float("inf")
+            if llhd > 0.:
+                chi2 = -2 * log ( llhd / llhd_max )
+            self.chi2 = chi2
 
         elif self.dataType() == 'combined':
-            lumi = self.expResult.globalInfo.lumi
+            lumi = self.dataset.getLumi()
             #Create a list of signal events in each dataset/SR sorted according to datasetOrder
-            if hasattr(self.dataset.globalInfo, "covariance"):
-                srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
-                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
-            elif hasattr(self.dataset.globalInfo, "jsonFiles"):
-                srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
-                srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
-            self.likelihood = self.dataset.combinedLikelihood(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
-            self.chi2 = self.dataset.totalChi2(srNsigs, marginalize=marginalize,deltas_rel=deltas_rel)
+            srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
+            srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
+            # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
+            llhd,lmax,lsm = computeCombinedStatistics ( self.dataset, srNsigs, marginalize,
+                                                                     deltas_rel )
+            self.likelihood = llhd
+            self.lmax = lmax
+            self.lsm = lsm
 
 
     def getmaxCondition(self):
@@ -271,8 +301,9 @@ class TheoryPredictionList(object):
         Initializes the list.
 
         :parameter theoryPredictions: list of TheoryPrediction objects
-        :parameter maxCond: maximum relative violation of conditions for valid results. If defined, it will keep only
-                            the theory predictions with condition violation < maxCond.
+        :parameter maxCond: maximum relative violation of conditions for valid
+        results. If defined, it will keep only the theory predictions with
+        condition violation < maxCond.
         """
         self._theoryPredictions = []
         if theoryPredictions and isinstance(theoryPredictions,list):
@@ -328,8 +359,7 @@ class TheoryPredictionList(object):
         Reverse sort theoryPredictions by R value.
         Used for printer.
         """
-        self._theoryPredictions = sorted(self._theoryPredictions, key=lambda theoPred: theoPred.getRValue(), reverse=True)
-
+        self._theoryPredictions = sorted(self._theoryPredictions, key=lambda theoPred: ( theoPred.getRValue() is not None, theoPred.getRValue()), reverse=True)
 
 def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
                 useBestDataset=True, combinedResults=True,

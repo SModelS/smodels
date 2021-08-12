@@ -102,14 +102,12 @@ class StatisticsTest(unittest.TestCase):
         prediction = theoryPredictionsFor(expRes[0], smstoplist)[0]
         prediction.computeStatistics()
         import numpy
-        tot=0.
-        for i in numpy.arange(0.,.2 ,.02 ):
-            tot+=prediction.getLikelihood(i)
         c=0.
         for i in numpy.arange(0.,.2 ,.02 ):
             l=prediction.getLikelihood(i)
             c+=l
         self.assertAlmostEqual ( prediction.likelihood, 1.563288e-35, 3 )
+        self.assertAlmostEqual ( c, 0.010213526179269492, 3 )
 
     def testPredictionInterface(self):
         """ A simple test to see that the interface in datasetObj
@@ -133,6 +131,19 @@ class StatisticsTest(unittest.TestCase):
         self.assertAlmostEqual(ill, dll, places=2)
         dchi2 = computer.chi2( nsig, marginalize=False )
         # print ( "dchi2,ichi2",dchi2,ichi2)
+        self.assertAlmostEqual(ichi2, dchi2, places=2)
+
+    def testZeroLikelihood(self):
+        """ A test to check if a llhd of 0 is being tolerated
+        """
+        nsig = 2
+        m = Data(1e20, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2 )
+        computer = LikelihoodComputer(m)
+        llhd = computer.likelihood(2, marginalize=False )
+        nll = computer.likelihood(2, marginalize=False, nll=True )
+        self.assertAlmostEqual(0., llhd, places=2)
+        dchi2 = computer.chi2( nsig, marginalize=False )
+        ichi2= 4.486108149972863e+21
         self.assertAlmostEqual(ichi2, dchi2, places=2)
 
     def round_to_sign(self, x, sig=3):

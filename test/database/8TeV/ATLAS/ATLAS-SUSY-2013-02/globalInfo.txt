@@ -5,6 +5,7 @@ prettyName: jets and met
 url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-02/
 arxiv: http://arxiv.org/abs/1405.7875
 publication: http://link.springer.com/article/10.1007/JHEP09%282014%29176
+combinableWith: ATLAS-SUSY-2013-05, ATLAS-CONF-2013-037
 supersedes: ATLAS-CONF-2013-047
 comment: T5WWLSP060 and T6WWLSP060 originally have xvalue on y-axes, changed by us to M2
 private: False

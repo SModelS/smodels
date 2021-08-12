@@ -27,7 +27,6 @@ class AverageElement(Element):
     """
 
     def __init__(self,elements=[]):
-
         if any(not isinstance(el,Element) for el in elements):
             raise SModelSError("An AverageElement must be created from a list of Element objects.")
 
@@ -96,7 +95,7 @@ class AverageElement(Element):
         else:
             return self.__dict__[attr]
 
-    def getAverage(self,attribute,weighted=True):
+    def getAverage(self,attribute,weighted=True,nround=5):
         """
         Compute the average value for the attribute using
         the elements in self.elements.
@@ -104,6 +103,9 @@ class AverageElement(Element):
         using the elements weights.
 
         :param attribute: Name of attribute to be averaged over (string)
+        :param weighted: If True, uses the element weights to compute a weighted average
+        :param nround: If greater than zero and the returning attibute is numeric, will round it
+                      to this number of significant digits.
 
         :return: Average value of attribute.
         """
@@ -118,8 +120,7 @@ class AverageElement(Element):
             weights = [el.weight.getMaxXsec().asNumber(fb) for el in self.elements]
         else:
             weights = [1.]*len(self.elements)
-
-        return average(values,weights)
+        return average(values,weights,nround)
 
     def contains(self,element):
         """
@@ -379,11 +380,6 @@ def clusterElements(elements, maxDist, dataset):
     if not isinstance(dataset,(DataSet,CombinedDataSet)):
         raise SModelSError("A dataset object must be defined for clustering")
 
-    txnames = list(set([el.txname for el in elements]))
-    if dataset.getType() == 'upperLimit' and len(txnames) != 1 :
-        logger.error("Clustering elements with different Txnames for an UL result.")
-        raise SModelSError()
-
     #Make sure only unique elements are clustered together (avoids double counting weights)
     #Sort element, so the ones with highest contribution (weight*eff) come first:
     elementList = sorted(elements, key = lambda el: el.weight.getMaxXsec()*el.eff, reverse=True)
@@ -394,6 +390,13 @@ def clusterElements(elements, maxDist, dataset):
         if any(el.isRelatedTo(elB) for elB in elementsUnique):
             continue
         elementsUnique.append(el)
+
+    #Get txname list only with the txnames from unique elements used for clustering
+    txnames = list(set([el.txname for el in elementsUnique]))
+    if dataset.getType() == 'upperLimit' and len(txnames) != 1 :
+        logger.error("Clustering elements with different Txnames for an UL result.")
+        raise SModelSError()
+
 
     if dataset.getType() == 'upperLimit': #Group according to upper limit values
         clusters = doCluster(elementsUnique, dataset, maxDist)
@@ -557,5 +560,6 @@ def doCluster(elements, dataset, maxDist):
         for avgEl in cluster.elements[:]:
             originalElements += avgEl.elements[:]
         cluster.elements = originalElements[:]
+
 
     return finalClusters

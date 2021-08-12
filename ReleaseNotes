@@ -1,3 +1,18 @@
+Release v2.1.0, Thu 12 Aug 2021
+=======================================================
+
+  * Ability to merge databases using '+' as a delimiter
+  * useSuperseded flag in getExpResults is marked as deprecated, 
+    as we now just put superseded results in separate database
+  * slightly extended output of summary printer
+  * added scan summary (summary.txt) when running over multiple files
+  * added option to slha-printer (expandedOutput)
+  * improved interactive plots 
+  * small changes in the printers, L_max and L_SM added
+  * the likelihood is now maximized only for positive values of the signal strength
+    in the computation of lmax
+	* upgraded pythia8 in xssecComputer from 8226 to 8306
+
 Release v2.0.0, Mon 15 Mar 2021
 =======================================================
 

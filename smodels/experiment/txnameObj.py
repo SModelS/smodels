@@ -678,6 +678,9 @@ class TxNameData(object):
         else:
             val = value
 
+        if len(val)==0:
+            logger.error ( f"no values for {self._id} found" )
+            sys.exit(-1)
         self.units = self.getUnits(val)[0] #Store standard units
         self.dataShape = self.getDataShape(val[0][0]) #Store the data (mass) format (useful if there are inclusives)
         self.widthPosition = self.getWidthPosition(val[0][0]) #Store the position of the required widths

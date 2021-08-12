@@ -4,5 +4,6 @@ observedN: 3
 expectedBG: 3.3
 bgError: 0.9
 upperLimit: 0.0371*fb
+combinableWith: ATLAS-SUSY-2018-31:SRC_22
 expectedUpperLimit: 0.0371*fb
 jsonfile: BkgOnly.json

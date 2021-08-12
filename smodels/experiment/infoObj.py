@@ -93,7 +93,9 @@ class Info(object):
         :param tag: information label (string)
         :param value: value for the field in string format
         """
-
+        if tag == "lastUpdate": # dont eval that!
+            setattr ( self, "lastUpdate", str(value) )
+            return
         try:
             setattr(self,tag,eval(value, {'fb':fb, 'pb':pb, 'GeV':GeV, 'TeV':TeV}))
         except SyntaxError:

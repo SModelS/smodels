@@ -71,20 +71,23 @@ def main():
     dbBrowser = subparsers.add_parser('database-browser', description="Interface for browsing the Database.")
     dbBrowser.add_argument('-p', '--path_to_database', help='path to SModelS database', required=True)
     dbBrowser.add_argument('-t', '--text', help='load text database, dont even search for binary database file', action='store_true')
-    
+
     iPlots = subparsers.add_parser('interactive-plots', description="Produces a set of interactive plots for visualizing results from a scan.")
     iPlots.add_argument('-p', '--parameters', help='path to the parameters file [./iplots_parameters.py]', default = './iplots_parameters.py')
-    iPlots.add_argument('-f', '--smodelsFolder', help='path to the smodels folder with the SModelS python output files.', 
+
+    iPlots.add_argument('-m', '--modelFile', help='path to the model.py file', default = None)
+
+    iPlots.add_argument('-f', '--smodelsFolder', help='path to the smodels folder or tarball (.tar.gz) with the SModelS python output files.',
                             required=True)
-    iPlots.add_argument('-s', '--slhaFolder', help='path to the SLHA folder with the SLHA input files.', 
+    iPlots.add_argument('-s', '--slhaFolder', help='path to the SLHA folder or tarball (.tar.gz) with the SLHA input files.',
                             required=True)
-    iPlots.add_argument('-o', '--outputFolder', 
-                  help='path to the output folder, where the plots will be stored. [./iplots]', 
+    iPlots.add_argument('-o', '--outputFolder',
+                  help='path to the output folder, where the plots will be stored. [./iplots]',
                   default = "./iplots" )
-    
+
     iPlots.add_argument('-N', '--npoints', type=int, default=-1,
         help="How many (randomly selected) points will be included in the plot. If -1 all points will be read and included (default = -1).")
-    
+
     iPlots.add_argument('-v', '--verbosity', type=str, default="info",
         help="Verbosity (debug, info, warning, error)")
 
@@ -128,7 +131,7 @@ def main():
     smodelsLogging.setLogLevel(args.verbose)
 
     from smodels import installation
-    if args.subparser_name == 'fixpermissions':    
+    if args.subparser_name == 'fixpermissions':
         installation.fixpermissions()
 
     if args.subparser_name == 'installation':

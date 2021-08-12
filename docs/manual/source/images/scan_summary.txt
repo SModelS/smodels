@@ -1,0 +1,8 @@
+#Global results summary (4 files)
+#The most constraining analysis corresponds to the one with largest observed r.
+#The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.
+#filename            MostConstrainingAnalysis  r_max  r_exp  MostSensitive(ATLAS)  r(ATLAS)  r_exp(ATLAS)  MostSensitive(CMS)  r(CMS)  r_exp(CMS)
+complicated.slha     ATLAS-SUSY-2016-07        7.42   8.8    ATLAS-SUSY-2016-07    7.42      8.8           CMS-SUS-19-006      2.15    1.79      
+gluinoToTops.slha    CMS-SUS-19-006            58.1   68.1   ATLAS-SUSY-2013-18    1.93      2.73          CMS-SUS-19-006      58.1    68.1      
+gluino_squarks.slha  ATLAS-SUSY-2016-07        7.42   8.8    ATLAS-SUSY-2016-07    7.42      8.8           CMS-SUS-19-006      2.15    1.79      
+higgsinoStop.slha    CMS-PAS-SUS-13-023        50.1   -1     ATLAS-SUSY-2013-15    42.9      39.5          CMS-PAS-SUS-13-015  25.5    29.6      
