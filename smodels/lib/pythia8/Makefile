@@ -3,7 +3,8 @@
 ## on a mac, for now please use the DYLD_LIBRARY_PATH variable  
 ## for pythia8.exe to find the shared object.
 
-PYTHIAVER := `cat pythiaversion`
+## PYTHIAVER := `cat pythiaversion`
+PYTHIAVER := $(shell ./installer.py -v)
 
 PYTHIA8HOME := pythia$(PYTHIAVER)/
 CXXFLAGS := -O3 -I$(PYTHIA8HOME)/include -I$(PYTHIA8HOME)/include/Pythia8/
@@ -11,6 +12,9 @@ LDFLAGS  := -L$(PYTHIA8HOME)/lib/ -L$(PYTHIA8HOME)/lib -Wl,-rpath,$(PWD)/$(PYTHI
 XMLDOC   := $(PYTHIA8HOME)/share/Pythia8/xmldoc
 
 all: install_pythia8 pythia8.exe
+
+version:
+	@echo $(PYTHIAVER)
 
 install_pythia8:
 	./installer.py
