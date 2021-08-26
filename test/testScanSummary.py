@@ -14,7 +14,6 @@ sys.path.insert(0,"../")
 import unittest
 from unitTestHelpers import compareSummaries, runMain
 
-
 class ScanSummaryTest(unittest.TestCase):
 
     def testPythonSummary( self ):
@@ -45,8 +44,10 @@ class ScanSummaryTest(unittest.TestCase):
         runMain(dirname,inifile = "summaryOnly.ini")
         outSummary = os.path.join(out,'summary.txt')
         outDefault = 'summary_scan_default.txt'
-        self.assertTrue(compareSummaries(outSummary,outDefault,allowedDiff=0.05))
-
+        ret = compareSummaries(outSummary,outDefault,allowedDiff=0.05)
+        if not ret:
+            print ( f"ERROR: files {outSummary} and {outDefault} differ!" )
+        self.assertTrue(ret )
 
 if __name__ == "__main__":
     unittest.main()
