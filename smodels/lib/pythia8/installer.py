@@ -113,4 +113,15 @@ def installPythia():
     rmTarball()
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="pythia8 install script" )
+    parser.add_argument( '-i', '--install', help='install pythia8',
+                         action='store_true') 
+    parser.add_argument( '-v', '--version', help='report pythiaversion',
+                         action='store_true') 
+    args = parser.parse_args()
+    if args.version:
+        ver = getVersion()
+        print ( ver )
+        sys.exit()
     installPythia()
