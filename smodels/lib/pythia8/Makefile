@@ -13,7 +13,7 @@ XMLDOC   := $(PYTHIA8HOME)/share/Pythia8/xmldoc
 all: install_pythia8 pythia8.exe
 
 install_pythia8:
-	./installer.sh $(PYTHIAVER)
+	./installer.py
 
 clean:
 	rm -rf $(EXES) test.slha pythia$(PYTHIAVER) .pythia*.tgz* pythia*.tgz*  pythia8.exe events.lhe
@@ -23,7 +23,7 @@ pythia8.exe: pythia8.cc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ pythia8.cc -lpythia8 -ldl
 
 run:
-	./pythia8.exe -f ../../inputFiles/slha/simplyGluino.slha -n 10 -c ../../smodels/etc/pythia8.cfg -x $(XMLDOC)
+	./pythia8.exe -f ../../../inputFiles/slha/simplyGluino.slha -n 10 -c ../../etc/pythia8.cfg -x $(XMLDOC)
 
 help:
 	./pythia8.exe -h
