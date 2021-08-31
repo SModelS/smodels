@@ -28,7 +28,7 @@ def installDirectory():
 def test_requirements():
     """ checks if all requirements are installed.
     Returns true if that is the case. """
-    import importlib
+    import importlib.util
     for i in requirements():
         pos = i.find(">" )
         lib = i
