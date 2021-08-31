@@ -132,13 +132,20 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """ Get theory prediction for each analysis and print basic output """
     allPredictions = []
     combineResults=False
+    useBest = True
     try:
         combineResults = parser.getboolean("options","combineSRs")
     except (NoSectionError,NoOptionError) as e:
         pass
+    try:
+        allSRs = parser.getboolean("options","reportAllSRs")
+        if allSRs:
+            useBest = False
+    except (NoSectionError,NoOptionError) as e:
+        pass
     for expResult in listOfExpRes:
         theorypredictions = theoryPredictionsFor(expResult, smstoplist,
-                    useBestDataset=True, combinedResults=combineResults,
+                    useBestDataset=useBest, combinedResults=combineResults,
                     marginalize=False)
         if not theorypredictions:
             continue
