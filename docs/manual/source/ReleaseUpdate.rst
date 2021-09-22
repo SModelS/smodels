@@ -59,7 +59,7 @@ New in Version 2.1.0:
       ATLAS-SUSY-2018-22 (0l+jets) UL+EM,  
       ATLAS-SUSY-2018-23 (EWino, WH) UL
   * Created and added THSCPM10 and THSCPM11 EMs for ATLAS-SUSY-2016-32, and 
-    corrected off-shell regions of some existing |EMrs| (in three 13 TeV and eigth 8 TeV analyses).
+    corrected off-shell regions of some existing |EMrs| (in three 13 TeV and eight 8 TeV analyses).
 
  
 New in Version 2.0.0:
