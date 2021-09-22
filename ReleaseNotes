@@ -1,17 +1,30 @@
-Release v2.1.0, Thu 12 Aug 2021
+Release v2.1.0, Wed 22 Sep 2021
 =======================================================
 
   * Ability to merge databases using '+' as a delimiter
   * useSuperseded flag in getExpResults is marked as deprecated, 
     as we now just put superseded results in separate database
-  * slightly extended output of summary printer
-  * added scan summary (summary.txt) when running over multiple files
-  * added option to slha-printer (expandedOutput)
-  * improved interactive plots 
-  * small changes in the printers, L_max and L_SM added
-  * the likelihood is now maximized only for positive values of the signal strength
-    in the computation of lmax
-	* upgraded pythia8 in xssecComputer from 8226 to 8306
+  * Datasets now have an 'isCombinableWith' function
+  * Slightly extended output of summary printer
+  * Added scan summary (summary.txt) when running over multiple files
+  * Added 'expandedOutput' option to slha-printer 
+  * Output for efficiency-map results now reports likelihoods L, L_max and L_SM (instead of L and chi^2)
+  * The likelihood is now maximized only for positive values of the signal strength
+    in the computation of L_max
+	* Pythia8 version in xsecComputer updated from 8226 to 8306
+  * Improved interactive plots 
+
+  * Database extension: 
+    - added new results from 5 ATLAS and 1 CMS analyses: 
+      CMS-EXO-19-010 (disappearing tracks) UL,
+      ATLAS-SUSY-2016-08 (displaced leptons) EM, 
+      ATLAS-SUSY-2018-10 (1l+jets) UL+EM, 
+      ATLAS-SUSY-2018-12 (0l+jets) UL+EM, 
+      ATLAS-SUSY-2018-22 (0l+jets) UL+EM,  
+      ATLAS-SUSY-2018-23 (EWino, WH) UL
+    - created and added THSCPM10 and THSCPM11 EMs for ATLAS-SUSY-2016-32;
+    - corrected off-shell regions of some existing efficiency-map results 
+      (in three 13 TeV and eigth 8 TeV analyses)
 
 Release v2.0.0, Mon 15 Mar 2021
 =======================================================
