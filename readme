@@ -1,0 +1,7 @@
+-) my branch for 2.2.0 changes. what i want in:
+
+-) mode to report all signal regions from result (done)
+-) storing of weight matrices (done)
+-) changes for expected combined results
+-) combination of 8 tev and 13 tev results
+-) improved truncated Gaussians
