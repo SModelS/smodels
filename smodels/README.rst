@@ -21,7 +21,7 @@
 |GitHub Project| |PyPI version| |CodeFactor| |Binder| |Docs|
 
 ==============
-SModelS v2.0
+SModelS v2
 ==============
 
 **SModelS -- A tool for interpreting simplified-model results from the LHC.**
