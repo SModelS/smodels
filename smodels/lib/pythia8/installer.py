@@ -23,7 +23,7 @@ def rmTarball():
         os.unlink ( tarball )
 
 def fetch():
-    """ fetch tarball from pythia.org """
+    """ fetch tarball from pythia.org or smodels.github.io """
     ver = getVersion()
     tarball=f"pythia{ver}.tgz"
     if os.path.exists ( tarball ):
@@ -43,7 +43,14 @@ def fetch():
     if r.status_code != 200:
         print ( f"[installer.py] could not fetch tarball: {r.reason}." )
         rmTarball()
-        sys.exit(-1)
+        url=f"http://smodels.github.io/downloads/tarballs/"
+        print ( f"[installer.py] trying to fetch {tarball} from {url}" )
+        path = os.path.join ( url, tarball )
+        r = requests.get ( path, stream=True )
+        if r.status_code != 200:
+            print ( f"[installer.py] could not fetch tarball: {r.reason}." )
+            rmTarball()
+            sys.exit(-1)
     with open ( tarball, "wb" ) as f:
         shutil.copyfileobj( r.raw, f )
         f.close()
