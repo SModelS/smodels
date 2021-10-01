@@ -16,7 +16,7 @@
    :target: https://smodels.readthedocs.io
 
 .. |Binder| image:: https://mybinder.org/badge_logo.svg
-   :target: https://mybinder.org/v2/gh/SModelS/pyhep2020/master?filepath=index.ipynb
+   :target: https://mybinder.org/v2/gh/SModelS/tutorials/master?filepath=index.ipynb
 
 |GitHub Project| |PyPI version| |CodeFactor| |Binder| |Docs|
 
