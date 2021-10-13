@@ -37,6 +37,15 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 2.1.1:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * improved truncated Gaussians in likelihoodsFromLimits (but leave as experimental feature)
+  * caching weight matrix in simplified likelihoods
+  * print-all-datasets option for ini file
+  * tiny fix in mybinder link (see https://pypi.org/project/smodels/)
+  * small fix in testPrinter, make testSLHAPrinter and testTextPrinter tests fuzzy
+
 New in Version 2.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
