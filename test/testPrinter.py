@@ -27,6 +27,7 @@ from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 import pyslha
+from smodels.tools.smodelsLogging import logger
 
 def sortXML(xmltree):
     for el in xmltree:        
@@ -73,20 +74,39 @@ def compareXML(xmldefault,xmlnew,allowedDiff,ignore=[]):
 
     return True
 
-def compareSLHA(slhadefault,slhanew):
+def compareSLHA(slhadefault,slhanew, allowedDiff ):
     
     newData = pyslha.read(slhanew,ignorenomass=True,ignorenobr=True,ignoreblocks=["SMODELS_SETTINGS"])
     defaultData = pyslha.read(slhadefault,ignorenomass=True,ignorenobr=True,ignoreblocks=["SMODELS_SETTINGS"])
     defaultBlocks = sorted([defaultData.blocks[b].name for b in defaultData.blocks])
     newBlocks = sorted([newData.blocks[b].name for b in newData.blocks])
     if defaultBlocks != newBlocks:
-        print('Blocks differ')
+        logger.error('Block structure differs!')
         return False
     
     for b in defaultData.blocks:
-        if defaultData.blocks[b].entries != newData.blocks[b].entries:
-            print('Entries in block %s differ' %(defaultData.blocks[b].name))
+        if len(defaultData.blocks[b].entries) != len(newData.blocks[b].entries):
+            logger.error('Numbers of entries in block %s differ' %(defaultData.blocks[b].name))
             return False
+        keys = defaultData.blocks[b].keys()
+        bkeys = newData.blocks[b].keys()
+        if keys != bkeys:
+            logger.error ( f"Keys of blocks {b} differ!" )
+            return False
+        for k in keys:
+            ei = defaultData.blocks[b].entries[k]
+            ej = newData.blocks[b].entries[k]
+            if type(ei) == float:
+                denom = ei + ej
+                if denom == 0.:
+                    denom = 1e-6
+                de = 2.* abs ( ei - ej ) / denom
+                if de > allowedDiff:
+                    logger.error( f'Entries in block differ: {ei}!={ej} {type(ei)}' )
+                    return False
+            elif ei != ej:
+                logger.error( f'Entries in block differ: {ei}!={ej} {type(ei)}' )
+                return False
     return True
 
 
@@ -168,10 +188,10 @@ class RunPrinterTest(unittest.TestCase):
         sample = summaryReader.Summary(samplefile,allowedDiff=0.05)
         try:
             self.assertEqual(sample, output)
+            self.removeOutputs ( outputfile )
         except AssertionError:
             msg = "%s != %s" %(sample, output) 
             raise AssertionError(msg)
-        self.removeOutputs ( outputfile )
  
     def removeOutputs ( self, f ):
         """ remove cruft outputfiles """
@@ -355,7 +375,8 @@ class RunPrinterTest(unittest.TestCase):
         slhaDefaultFile = "./gluino_squarks_default.slha.smodelsslha"
         slhaNewFile = './unitTestOutput/printer_output.smodelsslha'
         try:
-            self.assertTrue(compareSLHA(slhaDefaultFile, slhaNewFile))
+            self.assertTrue(compareSLHA(slhaDefaultFile, slhaNewFile, 
+                                        allowedDiff=0.05))
         except AssertionError:
             msg = "%s != %s" %(slhaDefaultFile, slhaNewFile) 
             raise AssertionError(msg)

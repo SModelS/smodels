@@ -192,8 +192,14 @@ def fuzzycomp(obj,other,allowedDiff=0.,ignore=[]):
                 continue
             else:
                 try:
+                    val = val.strip()
+                    if val.endswith(","):
+                        val = val[:-1]
                     val = eval(val)
-                    oval = eval(other.__dict__[key])
+                    oval = other.__dict__[key].strip()
+                    if oval.endswith(","):
+                        oval = oval[:-1]
+                    oval = eval(oval)
                     diff = 2.*abs(val-oval)/abs(val+oval)                        
                 except (NameError,TypeError):
                     diff = None
