@@ -143,6 +143,10 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **combineSRs** (True/False): set to True to use, whenever available, covariance matrices to combine signal regions. NB this might take a few secs per point. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards.
 
+.. _parameterFileReportAllSRs:
+
+  * **reportAllSRs** (True/False): set to True to report all signal regions, instead of best signal region only. Available from v2.1.1 onwards.
+
 .. _parameterFileParticles:
 
 * *particles*: defines the particle content of the BSM model
