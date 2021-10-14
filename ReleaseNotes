@@ -3,9 +3,9 @@ Release v2.1.1, xxx
 
   * improved truncated Gaussians in likelihoodsFromLimits (but leave as experimental feature)
   * caching weight matrix in simplified likelihoods
-  * print-all-datasets option for ini file
+  * introduced reportAllSRs option
   * tiny fix in mybinder link (see https://pypi.org/project/smodels/)
-  * small fix in testPrinter, make testSLHAPrinter and testTextPrinter tests fuzzy
+  * small fixes in unit tests
 
 Release v2.1.0, Wed 29 Sep 2021
 =======================================================
