@@ -155,9 +155,10 @@ class TheoryPrediction(object):
         nsig = None
         if mu != None:
             nsig = mu*(self.xsection.value*lumi).asNumber()
-        llhd = likelihoodFromLimits ( ulN, eulN, nsig )
+        llhd = likelihoodFromLimits ( ulN, eulN, nsig,
+                    allowNegativeMuhat = True, corr = 0.6 )
         if chi2also:
-            return ( llhd, chi2FromLimits ( llhd, eulN ) )
+            return ( llhd, chi2FromLimits ( llhd, ulN, eulN, corr = 0.6 ) )
         return llhd
 
     def getLikelihood(self,mu=1.,marginalize=False,deltas_rel=.2,expected=False):

@@ -17,7 +17,7 @@ import numpy as np
 from smodels.tools import runtime
 
 def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False,
-                          allowNegativeMuhat = False ):
+                          allowNegativeMuhat = False, corr = 0. ):
     """ computes the likelihood from an expected and an observed upper limit.
     :param upperLimit: observed upper limit, as a yield (i.e. unitless)
     :param expectedUpperLimit: expected upper limit, also as a yield
@@ -25,11 +25,17 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False,
     :param nll: if True, return negative log likelihood
     :param allowNegativeMuhat: if True, then allow muhat to become negative,
         for underfluctuations, else demand that muhat >= 0.
+    :param corr: correction factor:
+                 ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
+                 a factor of corr = 0.6 is proposed.
 
     :returns: likelihood (float)
     """
     assert ( upperLimit > 0. )
-    
+
+    if corr > 0. and upperLimit  > expectedUpperLimit:
+        expectedUpperLimit = expectedUpperLimit / (1. - corr*((upperLimit-expectedUpperLimit)/(upperLimit+expectedUpperLimit)))
+
     def getSigma ( ul, muhat = 0. ):
         """ get the standard deviation sigma, given
             an upper limit and a central value. assumes a truncated Gaussian likelihood """
@@ -49,8 +55,8 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False,
             xa = 2*xa
             c += 1
             if c > 10:
-               logger.error ( f"cannot find bracket for brent bracketing ul={upperLimit}, eul={expectedUpperLimit}, xa={xa}, xb={xb}" ) 
-            
+               logger.error ( f"cannot find bracket for brent bracketing ul={upperLimit}, eul={expectedUpperLimit}, xa={xa}, xb={xb}" )
+
         mumax = optimize.brentq(root_func, xa, xb, rtol=1e-03, xtol=1e-06 )
         return mumax
 
@@ -66,19 +72,6 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False,
             return np.log(A ) - stats.norm.logpdf ( nsig, mumax, sigma_exp )
         return float ( stats.norm.pdf ( nsig, mumax, sigma_exp ) / A )
 
-    dr = 2. * ( upperLimit - expectedUpperLimit ) / ( expectedUpperLimit + upperLimit )
-    if dr>runtime._drmax:
-        if runtime._cap_likelihoods == False:
-            logger.warning("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f)" % ( upperLimit, expectedUpperLimit, dr, runtime._drmax ) )
-            return None
-        oldUL = upperLimit
-        upperLimit = expectedUpperLimit * ( 2. + runtime._drmax ) / ( 2. - runtime._drmax )
-        logger.warning("asking for likelihood from limit but difference between oUL(%.2f) and eUL(%.2f) is too large (dr=%.2f>%.2f). capping to %.2f." % \
-                ( oldUL, expectedUpperLimit, dr, runtime._drmax, upperLimit ) )
-        ## we are asked to cap likelihoods, so we set observed UL such that dr == drmax
-
-
-    # sigma_exp = expectedUpperLimit / 1.96 # the expected scale, eq 3.24 in arXiv:1202.3415
     if upperLimit < expectedUpperLimit:
         ## underfluctuation. mumax = 0.
         if allowNegativeMuhat:
@@ -100,7 +93,7 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False,
     llhdexp = llhd ( nsig, mumax, sigma_exp, nll )
     return llhdexp
 
-def rvsFromLimits( upperLimit, expectedUpperLimit, n=1 ):
+def rvsFromLimits( upperLimit, expectedUpperLimit, n=1, corr = 0. ):
     """
     Generates a sample of random variates, given expected and observed likelihoods.
     The likelihood is modelled as a truncated Gaussian.
@@ -108,9 +101,13 @@ def rvsFromLimits( upperLimit, expectedUpperLimit, n=1 ):
     :param upperLimit: observed upper limit, as a yield (i.e. unitless)
     :param expectedUpperLimit: expected upper limit, also as a yield
     :param n: sample size
+    :param corr: correction term
 
     :returns: sample of random variates
     """
+
+    if corr > 0. and upperLimit  > expectedUpperLimit:
+        expectedUpperLimit = expectedUpperLimit / (1. - corr*((upperLimit-expectedUpperLimit)/(upperLimit+expectedUpperLimit)))
 
     sigma_exp = expectedUpperLimit / 1.96 # the expected scale
     denominator = np.sqrt(2.) * sigma_exp
@@ -139,9 +136,11 @@ def deltaChi2FromLlhd ( likelihood ):
 
     return -2. * np.log ( likelihood )
 
-def chi2FromLimits ( likelihood, expectedUpperLimit ):
+def chi2FromLimits ( likelihood, upperLimit, expectedUpperLimit, corr = 0. ):
     """ compute the chi2 value from a likelihood (convenience function).
     """
+    if corr > 0. and upperLimit  > expectedUpperLimit:
+        expectedUpperLimit = expectedUpperLimit / (1. - corr*((upperLimit-expectedUpperLimit)/(upperLimit+expectedUpperLimit)))
     sigma_exp = expectedUpperLimit / 1.96 # the expected scale
     l0 = 2. * stats.norm.logpdf ( 0., 0., sigma_exp )
     l = deltaChi2FromLlhd(likelihood)

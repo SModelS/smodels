@@ -3,6 +3,7 @@ Release v2.1.1, xxx
 
   * improved truncated Gaussians in likelihoodsFromLimits (but leave as experimental feature)
   * caching weight matrix in simplified likelihoods
+  * notion of "debug" databases introduced
   * introduced reportAllSRs option
   * tiny fix in mybinder link (see https://pypi.org/project/smodels/)
   * small fixes in unit tests
