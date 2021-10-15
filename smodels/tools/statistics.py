@@ -16,22 +16,43 @@ from scipy.special import erf
 import numpy as np
 from smodels.tools import runtime
 
-def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
+def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False,
+                          allowNegativeMuhat = False ):
     """ computes the likelihood from an expected and an observed upper limit.
     :param upperLimit: observed upper limit, as a yield (i.e. unitless)
     :param expectedUpperLimit: expected upper limit, also as a yield
     :param nsig: number of signal events, if None then nsig = mumax
     :param nll: if True, return negative log likelihood
+    :param allowNegativeMuhat: if True, then allow muhat to become negative,
+        for underfluctuations, else demand that muhat >= 0.
 
     :returns: likelihood (float)
     """
     assert ( upperLimit > 0. )
-
+    
     def getSigma ( ul, muhat = 0. ):
         """ get the standard deviation sigma, given
             an upper limit and a central value. assumes a truncated Gaussian likelihood """
         # the expected scale, eq 3.24 in arXiv:1202.3415
         return ( ul - muhat ) / 1.96
+
+    sigma_exp = getSigma ( expectedUpperLimit ) # the expected scale, eq 3.24 in arXiv:1202.3415
+    denominator = np.sqrt(2.) * sigma_exp
+
+
+    def root_func ( x ): ## we want the root of this one
+        return (erf((upperLimit-x)/denominator)+erf(x/denominator)) / ( 1. + erf(x/denominator)) - .95
+
+    def find_neg_mumax(upperLimit, expectedUpperLimit, xa, xb ):
+        c = 0
+        while root_func(xa)*root_func(xb) > 0:
+            xa = 2*xa
+            c += 1
+            if c > 10:
+               logger.error ( f"cannot find bracket for brent bracketing ul={upperLimit}, eul={expectedUpperLimit}, xa={xa}, xb={xb}" ) 
+            
+        mumax = optimize.brentq(root_func, xa, xb, rtol=1e-03, xtol=1e-06 )
+        return mumax
 
     def llhd ( nsig, mumax, sigma_exp, nll ):
         if nsig == None:
@@ -56,15 +77,17 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False ):
                 ( oldUL, expectedUpperLimit, dr, runtime._drmax, upperLimit ) )
         ## we are asked to cap likelihoods, so we set observed UL such that dr == drmax
 
+
     # sigma_exp = expectedUpperLimit / 1.96 # the expected scale, eq 3.24 in arXiv:1202.3415
-    sigma_exp = getSigma ( expectedUpperLimit ) # the expected scale, eq 3.24 in arXiv:1202.3415
     if upperLimit < expectedUpperLimit:
         ## underfluctuation. mumax = 0.
-        return llhd ( nsig, 0., sigma_exp, nll )
-    def root_func ( x ): ## we want the root of this one
-        return (erf((upperLimit-x)/denominator)+erf(x/denominator)) / ( 1. + erf(x/denominator)) - .95
-
-    denominator = np.sqrt(2.) * sigma_exp
+        if allowNegativeMuhat:
+            xa = - expectedUpperLimit
+            xb = 1
+            mumax = find_neg_mumax(upperLimit, expectedUpperLimit, xa, xb)
+            return llhd( nsig, mumax, sigma_exp, nll )
+        else:
+            return llhd ( nsig, 0., sigma_exp, nll )
 
     fA = root_func ( 0. )
     fB = root_func ( max(upperLimit,expectedUpperLimit) )

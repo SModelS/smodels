@@ -62,6 +62,17 @@ class StatisticsTest(unittest.TestCase):
         print ( "total marg", totmarg )
         f.close()
 
+    def testUnderfluctuatingLlhdsFromLimits(self):
+        """ test the likelihoods from limits allowing for underfluctuations """
+        comparisons = { False: { 0: 0.2869456402153424, 5: 0.05697393370613237 },
+                        True: { 0: 0.43038397431221154, 5: 0.030362667100323704 } }
+
+        for nsig in [ 0, 5 ]:
+            for allowNegatives in [ False, True ]:
+                llhdlim = likelihoodFromLimits ( 4.5, 5.45, nsig, False, allowNegatives )
+                c = comparisons[allowNegatives][nsig]
+                self.assertAlmostEqual ( llhdlim, c, 2 )
+
     def testChi2FromLimits(self):
         """ test the chi2 value that we obtain from limits """
         nsig = 35.0
