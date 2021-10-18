@@ -143,6 +143,13 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
             useBest = False
     except (NoSectionError,NoOptionError) as e:
         pass
+    try:
+        expFeatures = parser.getboolean("options","experimentalFeatures")
+        from smodels.tools import runtime
+        runtime._experimental = expFeatures
+    except (NoSectionError,NoOptionError) as e:
+        pass
+
     for expResult in listOfExpRes:
         theorypredictions = theoryPredictionsFor(expResult, smstoplist,
                     useBestDataset=useBest, combinedResults=combineResults,
