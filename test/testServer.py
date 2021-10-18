@@ -29,6 +29,8 @@ setLogLevel ( "warn" )
 class ServerTest(unittest.TestCase):
     def testCompare(self):
         warnings.simplefilter("ignore", ResourceWarning)
+        if os.path.exists ( "proxy.pcl" ):
+            os.unlink ( "./proxy.pcl" )
         from simplyGluino_default import smodelsOutputDefault
         filename = "./testFiles/slha/simplyGluino.slha"
         port = random.choice ( range(31700, 42000 ) )
@@ -46,7 +48,7 @@ class ServerTest(unittest.TestCase):
         myenv["PYTHONPATH"]="../" + pp
         subprocess.Popen ( cmd, env=myenv )
 
-        time.sleep ( 3 )
+        time.sleep ( 5 )
 
         db = Database("./proxy.pcl" )
         outputfile = runMain(filename,suppressStdout = True, overridedatabase = db )
