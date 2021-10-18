@@ -17,17 +17,20 @@ import numpy as np
 from smodels.tools import runtime
 
 def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False,
-                          allowNegativeMuhat = False, corr = 0. ):
+                          allowNegativeMuhat = True, corr = 0.6 ):
     """ computes the likelihood from an expected and an observed upper limit.
     :param upperLimit: observed upper limit, as a yield (i.e. unitless)
     :param expectedUpperLimit: expected upper limit, also as a yield
     :param nsig: number of signal events, if None then nsig = mumax
     :param nll: if True, return negative log likelihood
     :param allowNegativeMuhat: if True, then allow muhat to become negative,
-        for underfluctuations, else demand that muhat >= 0.
+           else demand that muhat >= 0. In the presence of underfluctuations
+           in the data, setting this to True results in more realistic
+           approximate likelihoods.
     :param corr: correction factor:
                  ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
-                 a factor of corr = 0.6 is proposed.
+                 When comparing with likelihoods constructed from efficiency maps,
+                 a factor of corr = 0.6 has been found to result in the best approximations.
 
     :returns: likelihood (float)
     """

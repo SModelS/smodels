@@ -40,12 +40,13 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 2.1.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * improved truncated Gaussians in likelihoodsFromLimits (but leave as experimental feature)
   * caching weight matrix in simplified :ref:`likelihoods <likelihoodCalc>`
   * notion of "debug" databases introduced
   * introduced :ref:`reportAllSRs <parameterFileReportAllSRs>` option
   * tiny fix in mybinder link (see https://pypi.org/project/smodels/)
   * small fixes in unit tests
+  * improved truncated Gaussians in likelihoodsFromLimits (but kept as experimental feature)
+  * experimental features can now be turned on via ini file
 
 New in Version 2.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
