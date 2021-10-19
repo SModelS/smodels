@@ -873,15 +873,12 @@ class UpperLimitComputer:
             return root
 
         a0 = root_func(0.) ## this must be positive
-        if toys > 300000:
-            print ( "here", marginalize, "a0", a0, "toys", toys, "expected", expected,
-                    "model", model.observed, "bg", model.backgrounds, model.covariance  )
         if a0 < 0. and marginalize:
             if toys < 20000:
                 return self.ulSigma ( model, marginalize, 4*toys,
                                       expected = expected, trylasttime=False )
             else:
-                if trylasttime:
+                if not trylasttime:
                     return self.ulSigma ( model, False, toys,
                                           expected = expected, trylasttime=True )
                 # it ends here
