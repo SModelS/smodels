@@ -37,13 +37,24 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 2.1.1:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * caching weight matrix in simplified :ref:`likelihoods <likelihoodCalc>`
+  * notion of "debug" databases introduced
+  * introduced :ref:`reportAllSRs <parameterFileReportAllSRs>` option
+  * tiny fix in mybinder link (see https://pypi.org/project/smodels/)
+  * small fixes in unit tests
+  * improved truncated Gaussians in likelihoodsFromLimits (but kept as experimental feature)
+  * experimental features can now be turned on via ini file
+
 New in Version 2.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * Ability to merge :ref:`Databases <parameterFileDatabase>` using '+' as a delimiter: "latest_fastlim" and "official_fastlim" are now written as "latest+fastlim", and "official+fastlim".
   * useSuperseded flag in `getExpResults  <experiment.html#experiment.databaseObj.Database.getExpResults>`_ is marked as deprecated, as we now just put superseded results in separate database
   * |Datasets| now have an `.isCombinableWith <experiment.html#experiment.datasetObj.DataSet.isCombinableWith>`_ function
-  * Alightly extended output of :ref:`summary printer <parameterFileSummaryprinter>`
+  * Slightly extended output of :ref:`summary printer <parameterFileSummaryprinter>`
   * Added scan summary (:ref:`summary.txt <scanSummary>`) when running over multiple files
   * Added :ref:`expandedOutput <parameterFileSLHAprinter>` option to slha-printer 
   * :ref:`Output <outputDescription>` for efficiency-map results now reports :ref:`L, L_max and L_SM <likelihoodCalc>` 

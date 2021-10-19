@@ -405,11 +405,17 @@ class LikelihoodComputer:
             C = self.model.V
             #if self.model.n == 1: I think not a good idea
             #    C = self.model.totalCovariance(self.nsig)
+            dTheta = theta - M 
+            expon = - .5 * NP.dot ( NP.dot ( dTheta, self.weight ), dTheta ) + self.logcoeff
+            # print ( "expon", expon, "coeff", self.coeff )
             if nll:
-                gaussian = stats.multivariate_normal.logpdf(theta,mean=M,cov=C)
+                gaussian = expon #  NP.log ( self.coeff )
+                #gaussian2 = stats.multivariate_normal.logpdf(theta,mean=M,cov=C)
                 ret = - gaussian - sum(poisson)
             else:
-                gaussian = stats.multivariate_normal.pdf(theta,mean=M,cov=C)
+                gaussian = NP.exp ( expon )
+                # gaussian = self.coeff * NP.exp ( expon )
+                # gaussian2 = stats.multivariate_normal.pdf(theta,mean=M,cov=C)
                 ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
             return ret
         except ValueError as e:
@@ -528,6 +534,12 @@ class LikelihoodComputer:
                 # self.cov_tot = self.model.totalCovariance (nsig)
                 #self.ntot = None
             self.weight = NP.linalg.inv(self.cov_tot)
+            # self.coeff = 1.
+            logdet = NP.linalg.slogdet ( self.cov_tot )
+            self.logcoeff = -self.model.n/2 * NP.log (2*NP.pi) -.5* logdet[1] 
+            # self.coeff = (2*NP.pi)**(-self.model.n/2) * NP.exp(-.5* logdet[1] )
+            #print ( "coeff", self.coeff, "n", self.model.n, "det", NP.linalg.slogdet ( self.cov_tot ) ) 
+            # print ( "cov_tot", self.cov_tot[:10] )
             self.ones = 1.
             if type ( self.model.observed) in [ list, ndarray ]:
                 self.ones = NP.ones ( len (self.model.observed) )
@@ -861,13 +873,21 @@ class UpperLimitComputer:
             return root
 
         a0 = root_func(0.) ## this must be positive
+        if toys > 300000:
+            print ( "here", marginalize, "a0", a0, "toys", toys, "expected", expected,
+                    "model", model.observed, "bg", model.backgrounds, model.covariance  )
         if a0 < 0. and marginalize:
             if toys < 20000:
                 return self.ulSigma ( model, marginalize, 4*toys,
                                       expected = expected, trylasttime=False )
             else:
-                return self.ulSigma ( model, marginalize, 4*toys,
-                                      expected = expected, trylasttime=True )
+                if trylasttime:
+                    return self.ulSigma ( model, False, toys,
+                                          expected = expected, trylasttime=True )
+                # it ends here
+                return None
+                #return self.ulSigma ( model, marginalize, 4*toys,
+                #                      expected = expected, trylasttime=True )
         a,b=1.5*mu_hat,2.5*mu_hat+2*sigma_mu
         ctr=0
         while True:

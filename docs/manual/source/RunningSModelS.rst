@@ -143,6 +143,10 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **combineSRs** (True/False): set to True to use, whenever available, covariance matrices to combine signal regions. NB this might take a few secs per point. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards.
 
+.. _parameterFileReportAllSRs:
+
+  * **reportAllSRs** (True/False): set to True to report all signal regions, instead of best signal region only. Available from v2.1.1 onwards.
+
 .. _parameterFileParticles:
 
 * *particles*: defines the particle content of the BSM model
@@ -193,7 +197,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFilePath:
 
-  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Also http addresses may be given, e.g. https://smodels.github.io/database/official210. Multiple databases may be specified using '+' as a delimiter. Order matters: results will be overwritten according to the sequence specified. The path "official" refers to the official database of your SModelS version -- without fastlim; "official+fastlim" includes fastlim results. In addition, the paths "latest+fastlim" and "latest" refer to the latest databases, with and without fastlim results, respectively. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions.
+  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Also http addresses may be given, e.g. https://smodels.github.io/database/official210. Multiple databases may be specified using '+' as a delimiter. Order matters: results will be overwritten according to the sequence specified. The path "official" refers to the official database of your SModelS version -- without fastlim; "official+fastlim" includes fastlim results. In addition, the paths "latest+fastlim" and "latest" refer to the latest databases, with and without fastlim results, respectively. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions. Finally, "debug" refers to a version of the database with extra information that is however not intended for usage by a regular user and only mentioned here for completeness.
 
 .. _parameterFileAnalyses:
 

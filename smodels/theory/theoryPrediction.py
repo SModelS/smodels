@@ -119,12 +119,15 @@ class TheoryPrediction(object):
             return (self.xsection.value/upperLimit).asNumber()
 
     def likelihoodFromLimits( self, mu=1., marginalize=False, deltas_rel=.2,
-                              expected=False, chi2also=False ):
+                              expected=False, chi2also=False, corr = 0.6 ):
         """ compute the likelihood from expected and observed upper limits.
         :param expected: compute expected, not observed likelihood
         :param mu: signal strength multiplier, applied to theory prediction. If None,
                    then find muhat
         :param chi2also: if true, return also chi2
+        :param corr: correction factor:
+                 ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
+                 a factor of corr = 0.6 is proposed.
         :returns: likelihood; none if no expected upper limit is defined.
         """
         ## marked as experimental feature
@@ -155,9 +158,10 @@ class TheoryPrediction(object):
         nsig = None
         if mu != None:
             nsig = mu*(self.xsection.value*lumi).asNumber()
-        llhd = likelihoodFromLimits ( ulN, eulN, nsig )
+        llhd = likelihoodFromLimits ( ulN, eulN, nsig,
+                    allowNegativeMuhat = True, corr = corr )
         if chi2also:
-            return ( llhd, chi2FromLimits ( llhd, eulN ) )
+            return ( llhd, chi2FromLimits ( llhd, ulN, eulN, corr = corr ) )
         return llhd
 
     def getLikelihood(self,mu=1.,marginalize=False,deltas_rel=.2,expected=False):
@@ -180,6 +184,7 @@ class TheoryPrediction(object):
         if self.dataType() == 'efficiencyMap':
             nsig = (mu*self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
+            return llhd
         if self.dataType()  == 'upperLimit':
             llhd, chi2 = self.likelihoodFromLimits ( mu, marginalize, deltas_rel, chi2also=True )
             return llhd

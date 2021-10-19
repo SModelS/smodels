@@ -51,7 +51,7 @@ class StatisticsTest(unittest.TestCase):
             print ( "llhd direct", llhddir, chi2dir )
             print ( "llhd marg", llhdmarg, chi2marg )
             llhdlim = likelihoodFromLimits ( ulobs, ulexp, nsig )
-            chi2lim = chi2FromLimits ( llhdlim, ulexp )
+            chi2lim = chi2FromLimits ( llhdlim, ulobs, ulexp )
             print ( "llhd from limits", llhdlim, chi2lim )
             totdir+=llhddir*dx
             totlim+=llhdlim*dx
@@ -61,6 +61,28 @@ class StatisticsTest(unittest.TestCase):
         print ( "total limit", totlim )
         print ( "total marg", totmarg )
         f.close()
+
+    def testUnderfluctuatingLlhdsFromLimits(self):
+        """ test the likelihoods from limits allowing for underfluctuations """
+        comparisons = { False: { 0: 0.2869456402153424, 5: 0.05697393370613237 },
+                        True: { 0: 0.43038397431221154, 5: 0.030362667100323704 } }
+
+        for nsig in [ 0, 5 ]:
+            for allowNegatives in [ False, True ]:
+                llhdlim = likelihoodFromLimits ( 4.5, 5.45, nsig, False, allowNegatives )
+                c = comparisons[allowNegatives][nsig]
+                self.assertAlmostEqual ( llhdlim, c, 2 )
+    def testCorrectedLlhdsFromLimits(self):
+        """ test the likelihoods from limits allowing for underfluctuations """
+        comparisons = { 0.: { 0: 0.094661, 3: 0.151640,  5: 0.12555219 },
+                        0.6: { 0: 0.1233638, 3: 0.1504459, 5: 0.11380 } }
+
+        for nsig in [ 0, 3, 5 ]:
+            for x in [ 0., 0.6 ]:
+                llhdlim = likelihoodFromLimits ( 8.52, 6.18, nsig, False, False,
+                          corr= x )
+                c = comparisons[x][nsig]
+                self.assertAlmostEqual ( llhdlim, c, 2 )
 
     def testChi2FromLimits(self):
         """ test the chi2 value that we obtain from limits """
@@ -78,8 +100,8 @@ class StatisticsTest(unittest.TestCase):
         llhdmarg = llhdcomp.likelihood ( nsig, marginalize=True )
         chi2marg = llhdcomp.chi2 ( nsig, marginalize=True )
         llhdlim = likelihoodFromLimits ( ulobs, ulexp, nsig )
-        chi2lim = chi2FromLimits ( llhdlim, ulexp )
-        ## relative error on chi2, for this example is about 4% 
+        chi2lim = chi2FromLimits ( llhdlim, ulobs, ulexp )
+        ## relative error on chi2, for this example is about 4%
         rel = abs (chi2lim - chi2marg ) / chi2marg
         self.assertAlmostEqual ( rel, 0.04, 1 )
 
@@ -107,7 +129,7 @@ class StatisticsTest(unittest.TestCase):
             l=prediction.getLikelihood(i)
             c+=l
         self.assertAlmostEqual ( prediction.likelihood, 1.563288e-35, 3 )
-        self.assertAlmostEqual ( c, 0.010213526179269492, 3 )
+        self.assertAlmostEqual ( c, 0.011523436957977766, 3 )
 
     def testPredictionInterface(self):
         """ A simple test to see that the interface in datasetObj
