@@ -80,6 +80,7 @@ class ServerTest(unittest.TestCase):
 
         self.assertTrue(equals)
         self.removeOutputs( outputfile )
+        self.removeOutputs( pclfile )
 
     def removeOutputs( self, f ):
         """ remove cruft outputfiles """
