@@ -101,31 +101,11 @@ def computeCombinedStatistics ( dataset, nsig, marginalize=False, deltas_rel=0.2
     lsm =  _combinedLikelihood ( dataset, [0.]*len(nsig), marginalize, deltas_rel )
     return lbsm, lmax, lsm
 
-def _checkJsonBkg( dataset):
-    """ check if dataInfo.expectedBG is consistent with the bkg numbers in the json file
-    """
-    for js, file in zip(dataset.globalInfo.jsonFiles, dataset.globalInfo.jsons):
-        jsBkg = 0.
-        for ch in file['channels']:
-            if ch['name'][:2] == 'SR':
-                for sp in ch['samples']:
-                    jsBkg += sum(sp['data'])
-        smBkg = 0
-        for jsSR in dataset.globalInfo.jsonFiles[js]:
-            for dset in dataset._datasets:
-                if dset.dataInfo.dataId == jsSR:
-                    smBkg += dset.dataInfo.expectedBG
-        perc = (jsBkg - smBkg)/smBkg*100.
-        logger.debug('{} : sum(json bkg) : {}, sum(dataInfo bkg) : {}'.format(js, jsBkg, smBkg))
-        if perc > 10.:
-            logger.warning('bkg numbers in json {} differ from dataInfo.expectedBG up to {}%'.format(js, perc))
-
 def _getPyhfComputer ( dataset, nsig, normalize = True ):
     """ create the pyhf ul computer object
     :param normalize: if true, normalize nsig
     :returns: pyhf upper limit computer, and combinations of signal regions
     """
-    _checkJsonBkg(dataset )
     # Getting the path to the json files
     jsonFiles = [js for js in dataset.globalInfo.jsonFiles]
     jsons = dataset.globalInfo.jsons.copy()
