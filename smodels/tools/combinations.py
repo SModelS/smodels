@@ -55,8 +55,8 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
         if all([s == 0 for s in nsig]):
             logger.warning("All signals are empty")
             return None
-        ulcomputer = _getPyhfComputer( dataset, nsig, expected=expected )
-        ret = ulcomputer.ulSigma()
+        ulcomputer = _getPyhfComputer( dataset, nsig )
+        ret = ulcomputer.ulSigma(expected=expected)
         if ret == None:
             return None
         ret = ret/dataset.getLumi()
@@ -82,7 +82,7 @@ def computeCombinedLikelihood ( dataset, nsig, marginalize=False, deltas_rel=0.2
     return lbsm
 
 def computeCombinedStatistics ( dataset, nsig, marginalize=False, deltas_rel=0.2 ):
-    """ compute lBSM, lmax, and LSM in a single run
+    """ compute lBSM, lmax, and LSM in a single run 
     :param nsig: predicted signal (list)
     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
     """
@@ -101,7 +101,7 @@ def computeCombinedStatistics ( dataset, nsig, marginalize=False, deltas_rel=0.2
     lsm =  _combinedLikelihood ( dataset, [0.]*len(nsig), marginalize, deltas_rel )
     return lbsm, lmax, lsm
 
-def _getPyhfComputer ( dataset, nsig, normalize = True , expected = False):
+def _getPyhfComputer ( dataset, nsig, normalize = True ):
     """ create the pyhf ul computer object
     :param normalize: if true, normalize nsig
     :returns: pyhf upper limit computer, and combinations of signal regions
@@ -109,18 +109,6 @@ def _getPyhfComputer ( dataset, nsig, normalize = True , expected = False):
     # Getting the path to the json files
     jsonFiles = [js for js in dataset.globalInfo.jsonFiles]
     jsons = dataset.globalInfo.jsons.copy()
-    if expected:
-        for js in jsons:
-            for obs in js['observations']:
-                for ch in js['channels']:
-                    # Finding matching observation and bkg channel
-                    if obs['name'] == ch['name']:
-                        bkg = [0.]*len(obs['data'])
-                        for sp in ch['samples']:
-                            for iSR in range(len(obs['data'])):
-                                # Summing over all bkg samples for each bin/SR
-                                bkg[iSR] += sp['data'][iSR]
-                            obs['data'] = bkg
     datasets = [ds.getID() for ds in dataset._datasets]
     total = sum(nsig)
     if total == 0.: # all signals zero? can divide by anything!
@@ -210,3 +198,4 @@ def _combinedLmax ( dataset, nsig, marginalize, deltas_rel, nll=False, expected=
         ulcomputer = _getPyhfComputer( dataset, nsig, False )
         return ulcomputer.lmax ( nll=nll )
     return -1.
+

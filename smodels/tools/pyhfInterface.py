@@ -430,12 +430,25 @@ class PyhfUpperLimitComputer:
                     return self.workspaces[workspace_index]
             workspace = updateWorkspace()
             def root_func(mu):
+                # If expected, set observations = sum(bkg)
+                if expected:
+                    for obs in workspace['observations']:
+                        for ch in workspace['channels']:
+                            # Finding matching observation and bkg channel
+                            if obs['name'] == ch['name']:
+                                bkg = [0.]*len(obs['data'])
+                                for sp in ch['samples']:
+                                    for iSR in range(len(obs['data'])):
+                                        # Summing over all bkg samples for each bin/SR
+                                        bkg[iSR] += sp['data'][iSR]
+                                    obs['data'] = bkg
                 # Same modifiers_settings as those use when running the 'pyhf cls' command line
                 msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
                 model = workspace.model(modifier_settings=msettings)
                 start = time.time()
                 stat = "qtilde" # by default
-                args = { "return_expected": expected }
+                # args = { "return_expected": expected }
+                args = {}
                 pver = float ( pyhf.__version__[:3] )
                 if pver < 0.6:
                     args["qtilde"]=True
@@ -447,15 +460,15 @@ class PyhfUpperLimitComputer:
                     result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
                 end = time.time()
                 logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
-                if expected:
-                    logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                    try:
-                        CLs = float(result[1].tolist())
-                    except TypeError:
-                        CLs = float(result[1][0])
-                else:
-                    logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                    CLs = float(result)
+                # if expected:
+                #     logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                #     try:
+                #         CLs = float(result[1].tolist())
+                #     except TypeError:
+                #         CLs = float(result[1][0])
+                # else:
+                logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                CLs = float(result)
                 # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
                 return 1.0 - self.cl - CLs
             # Rescaling singals so that mu is in [0, 10]
