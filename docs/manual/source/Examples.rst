@@ -48,7 +48,6 @@ Examples displaying several functionalities:
 
 * `How to generate ascii graphs <ascii_graph_from_lhe.html>`_ (download the Python code :download:`here <recipes/ascii_graph_from_lhe.py>`, IPython notebook :download:`here <recipes/ascii_graph_from_lhe.ipynb>`)
 
-* `How to marginalize a combined limit instead of profiling it <marginalize.html>`_ (download the Python code :download:`here <recipes/marginalize.py>`, IPython notebook :download:`here <recipes/marginalize.ipynb>`)
 
 Examples using the cross-section computer:
 ------------------------------------------
