@@ -13,7 +13,7 @@ from __future__ import print_function
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import os,glob,pathlib
-import imp
+import importlib.util
 from smodels.tools import interactivePlotsHelpers as helpers
 import smodels
 
@@ -26,13 +26,13 @@ class Plotter(object):
         """
         Initializes the class.
 
-        :parameter smodelsFolder: path to the folder or tarball containing the smodels 
+        :parameter smodelsFolder: path to the folder or tarball containing the smodels
                                   (python) output files
         :parameter slhaFolder: path to the folder or tarball containing the SLHA input files
         :parameter parameterFile: path to the file containing the plotting definitions
         :parameter modelFile: path to the model file, e.g smodels/share/models/mssm.py
         """
-        
+
         self.data_dict = []
         self.smodelsFolder = smodelsFolder
         self.slhaFolder = slhaFolder
@@ -51,11 +51,11 @@ class Plotter(object):
 
         if not os.path.isfile(parameterFile):
             raise SModelSError('Parameters file %s not found' %parameterFile)
-          
+
         if modelFile != None:
             if not os.path.isfile(self.modelFile):
                 raise SModelSError('model.py file %s not found' % modelFile )
-            
+
         if not os.path.exists(smodelsFolder):
             raise SModelSError("%s not found" %smodelsFolder)
         if not os.path.exists(slhaFolder):
@@ -76,8 +76,10 @@ class Plotter(object):
         import imp
 
         try:
-            with open(self.parameterFile, 'rb') as fParameters: ## imports parameter file
-                parameters = imp.load_module("parameters",fParameters,self.parameterFile,('.py', 'rb', imp.PY_SOURCE))
+            spec = importlib.util.spec_from_file_location( "parameters",
+                                                           self.parameterFile )
+            parameters = importlib.util.module_from_spec( spec )
+            spec.loader.exec_module(parameters)
         # except Exception as e:
         except (IOError,ValueError,ImportError,SyntaxError) as e:
             logger.error("Error loading parameters file %s: %s" % (self.parameterFile,e) )
@@ -137,13 +139,13 @@ class Plotter(object):
             self.plot_title = 'interactive-plots'
         else:
             self.plot_title = parameters.plot_title
-        
+
 
     def loadModelFile(self):
         """
         Reads the parameters from the plotting parameter file.
         """
-        
+
         logger.info("Reading model.py file from %s ..." %(self.modelFile))
 
         if self.modelFile==None:
@@ -151,29 +153,30 @@ class Plotter(object):
         else:
 
             try:
-                with open(self.modelFile, 'rb') as fparticles:
-                    ## imports parameter file
-                    self.particle_names = imp.load_module("BSMparticles",fparticles,self.modelFile,('.py', 'rb', imp.PY_SOURCE))
-                    # except Exception as e:
+                spec = importlib.util.spec_from_file_location( "BSMparticles",
+                                                           self.modelFile )
+                parameters = importlib.util.module_from_spec( spec )
+                spec.loader.exec_module(parameters)
+                self.particle_names = parameters
             except:
                 logger.warning("Error loading model.py file %s , will use pdgs instead.",  self.modelFile)
                 self.particle_names=None
-           
+
 
     def getParticleName(self,pdg):
         """ looks for the particle label in the model.py file """
         found=False
-        
+
         full_list=self.particle_names.BSMList
         for particle in full_list:
             #print(particle.pdg)
             if isinstance(particle,smodels.theory.particle.MultiParticle):
-                
+
                 for sub_pdg in particle.pdg:
                     if sub_pdg==pdg:
                         particle_name=particle.label
                         found=True
-               
+
             else:
                 if particle.pdg==pdg:
                     particle_name=particle.label
@@ -182,41 +185,41 @@ class Plotter(object):
                 break
         if not found:
             particle_name=pdg
-            
+
         return particle_name
 
     def editSlhaInformation(self):
         """Edits slha_hover_information,ctau_hover_information,BR_hover_information,variable_x,variable_y if they are defined as a list. The function transforms it in a dict whose keys are the object names """
-        
+
         #variable_x
         if  isinstance(self.variable_x,list):
             variable_x_dict={}
-            
+
             if self.variable_x[0]=='MASS' and self.particle_names!=None:
                 particle_name=Plotter.getParticleName(self,self.variable_x[1])
                 var_name='m('+particle_name+')'
             else:
                 var_name=str(self.variable_x[0])+str(self.variable_x[1])
-                    
+
             variable_x_dict[var_name]=self.variable_x
-                
+
             self.variable_x=variable_x_dict
-        
+
         #variable_y
         if  isinstance(self.variable_y,list):
             variable_y_dict={}
-            
+
             if self.variable_y[0]=='MASS' and self.particle_names!=None:
                 particle_name=Plotter.getParticleName(self,self.variable_y[1])
                 var_name='m('+particle_name+')'
             else:
                 var_name=str(self.variable_y[0])+str(self.variable_y[1])
-                    
+
             variable_y_dict[var_name]=self.variable_y
-                
+
             self.variable_y=variable_y_dict
-        
-        
+
+
         #slha_hover_information
         if  isinstance(self.slha_hover_information,list):
             slha_hover_information_dict={}
@@ -226,11 +229,11 @@ class Plotter(object):
                     var_name='m('+particle_name+')'
                 else:
                     var_name=str(slha_info[0])+str(slha_info[1])
-                    
+
                 slha_hover_information_dict[var_name]=slha_info
-                
+
             self.slha_hover_information=slha_hover_information_dict
-            
+
         #ctau hover information
         if  isinstance(self.ctau_hover_information,list):
             ctau_hover_information_dict={}
@@ -240,11 +243,11 @@ class Plotter(object):
                     var_name='ctau('+particle_name+')'
                 else:
                     var_name='ctau('+str(slha_info)+')'
-                    
+
                 ctau_hover_information_dict[var_name]=slha_info
-                
+
             self.ctau_hover_information=ctau_hover_information_dict
-        
+
          #BR hover information
         if  isinstance(self.BR_hover_information,list):
             BR_hover_information_dict={}
@@ -254,9 +257,9 @@ class Plotter(object):
                     var_name='BR('+particle_name+')'
                 else:
                     var_name='BR('+str(slha_info)+')'
-                    
+
                 BR_hover_information_dict[var_name]=slha_info
-                
+
             self.BR_hover_information=BR_hover_information_dict
 
         return
@@ -288,7 +291,7 @@ class Plotter(object):
             self.data_dict[BR]=[]
 
         self.data_dict['file'] = []
-        
+
 
     def fillWith(self,smodelsOutput,slhaData):
         """
@@ -296,7 +299,7 @@ class Plotter(object):
         the smodels output dictionary (smodelsDict) and the pyslha.Doc object
         slhaData
         """
-        
+
         filler=helpers.Filler(self,smodelsOutput,slhaData)
         #Fill with smodels data if defined
         if smodelsOutput is None:
@@ -307,7 +310,7 @@ class Plotter(object):
             self.data_dict=filler.getSmodelSData()
 
         self.data_dict=filler.getSlhaData(self.variable_x,self.variable_y)
-        
+
 
     def rmFiles ( self, flist ):
         """ remove files in flist """
@@ -349,17 +352,17 @@ class Plotter(object):
                 slhafiles = [ x.name for x in tar.getmembers() ]
                 rmfiles += slhafiles
                 tar.close()
-        
+
         for f in files:
 
             if npoints > 0 and n >= npoints:
                 break
-            
+
             smodelsOutput = helpers.importPythonOutput(f)
-           
+
             if not smodelsOutput:
                 continue
-           
+
             #Get SLHA file name:
             slhaFile = helpers.getSlhaFile(smodelsOutput)
             files = []
@@ -372,7 +375,7 @@ class Plotter(object):
             #Data read successfully
             self.data_dict['file'].append(f.split('/')[-1])
             outputStatus = helpers.outputStatus(smodelsOutput)
-            
+
             if outputStatus == -1:
                 self.fillWith(None,slhaData)
             else:
@@ -418,13 +421,13 @@ def main(args,indexfile= "index.html" ):
 
     Main interface for the interactive-plots.
 
-    :parameter smodelsFolder: Path to the folder or tarball containing the 
+    :parameter smodelsFolder: Path to the folder or tarball containing the
                               SModelS python output
-    :parameter slhaFolder: Path to the folder or tarball containing the SLHA files 
+    :parameter slhaFolder: Path to the folder or tarball containing the SLHA files
                            corresponding to the SModelS output
-    :parameter parameters: Path to the parameter file setting the options for the 
+    :parameter parameters: Path to the parameter file setting the options for the
                            interactive plots
-    :parameter npoints: Number of points used to produce the plot. If -1, all points 
+    :parameter npoints: Number of points used to produce the plot. If -1, all points
                         will be used.
     :parameter verbosity: Verbosity of the output (debug,info,warning,error)
     :parameter indexfile: name of the starting web page (index.html)
@@ -448,7 +451,7 @@ def main(args,indexfile= "index.html" ):
 
     if os.path.isfile(args.parameters)==False:
         raise SModelSError("parameter file '"+str(args.parameters)+"' does not exist")
-    
+
     if args.modelFile != None:
         if os.path.isfile(args.modelFile)==False:
             raise SModelSError("model file '"+str(args.modelFile)+"' does not exist")
