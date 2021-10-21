@@ -43,6 +43,7 @@ New in Version 2.1.2:
   * allow :ref:`ncpus <parameterFileNcpus>` to take on zero and negative values in ini file
     [meaning use all but this (absolute) number of CPU cores]
   * more small fixes in unit tests
+  * small fixes in the :ref:`Howto's <Examples>` 
 
 New in Version 2.1.1:
 ^^^^^^^^^^^^^^^^^^^^^

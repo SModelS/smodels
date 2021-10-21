@@ -10,54 +10,28 @@
 
 import unittest
 import os
-testdir = os.getcwd()
 
 class NotebookTest(unittest.TestCase):
     nbdir = "../docs/manual/source/recipes"
-
-    def restViaPyTest ( self ):
-        """ test the notebooks by calling pytest --nbmake """
-        import sys, time
-        os.chdir( self.nbdir )
-        cmd = "pytest --nbmake"
-        cmd = "pytest --nbmake ascii_graph_from_lhe.ipynb"
-        import subprocess
-        ps = subprocess.Popen ( cmd, shell=True, stdout = subprocess.PIPE, \
-                stderr = subprocess.STDOUT )
-        os.chdir ( testdir )
-        #time.sleep(.1)
-        #for c in iter(lambda: ps.stdout.read(1), b''):
-        #    sys.stdout.buffer.write(c)
-        #    sys.stdout.buffer.flush()
-
-    def restIpynb ( self ):
-        """ test the notebooks via the testipynb module """
-        try:
-            import testipynb
-        except ImportError as e:
-            print ( "testipynb is not installed. You may want to do:" )
-            print ( "pip install testipynb"  )
-        ignores = []
-        ignores += [ "compareUL" ]
-        ignores += [ "compute_likelihood" ]
-        ignores += [ "runWithParameterFile" ]
-        ignores += [ "runAsLibrary" ]
-        ignores += [ "browserExample3" ]
-        ignores += [ "missingTopologies" ]
-        ignores += [ "marginalize" ]
-        ignores += [ "print_theoryPrediction" ]
-        ignores += [ "load_database" ]
-        ignores += [ "lheLLPExample" ]
-        Test = testipynb.TestNotebooks ( directory = self.nbdir, ignore=ignores, 
-                                         timeout=3 )
-        self.assertTrue ( Test.run_tests() )
-        os.chdir ( testdir )
 
     def listOfNotebooks ( self ):
         import glob
         notebooks = glob.glob ( f"{self.nbdir}/*.ipynb" )
         notebooks = [ x[:-6].replace(self.nbdir+"/", "") for x in notebooks ]
         return notebooks
+
+    def cleanUp ( self, to_unlink ):
+        """ clean up files in to_unlink, heeding wildcards """
+        import glob, shutil
+        for x in to_unlink:
+            files = glob.glob ( x )
+            for f in files:
+                if os.path.isdir ( f ) and not os.path.islink ( f ):
+                    shutil.rmtree ( f )
+                else:
+                    os.unlink ( f )
+        to_unlink = []
+        return to_unlink
 
     def testRun( self ):
         """ test via the ipynb module, which overrides importlib
@@ -81,10 +55,23 @@ class NotebookTest(unittest.TestCase):
             pre = "ipynb.fs.full"
             for nb in notebooks: 
                 # for now check only the ascii graph notebook!
-                if not "ascii_" in nb:
+                good = [ "lookup_efficiency", "interactivePlotsExample", 
+                         "browserExample2", "print_decomposition",
+                         "ascii_graph_from_lhe",
+                         "nll_xsecs_from_slha", "lookup_upper_limit" ]
+                #good = [ "lo_xsecs_from_slha" ]
+                # bad because much memory FIXME should eventually
+                # also be run                    
+                bad = [ "load_database", "missingTopologies", "lheLLPExample",
+                        "print_theoryPrediction", "browserExample3",
+                        "runAsLibrary", "runWithParameterFile",
+                        "compareUL", "compute_likelihood", "lo_xsecs_from_slha" ]
+                #if not nb in good:
+                #    continue
+                if nb in bad:
                     continue
+                #print ( "nb", nb )
                 nbfile = nb + ".ipynb"
-                # print ( "Testing", nb )
                 module = f"{pre}.{nb}"
                 if os.path.exists ( nbfile ):
                     os.unlink ( nbfile )
@@ -95,13 +82,12 @@ class NotebookTest(unittest.TestCase):
                     a=importlib.import_module ( module )
                 os.unlink ( nbfile )
                 to_unlink.remove ( nbfile )
-            for x in to_unlink:
-                if os.path.exists ( x ):
-                    os.unlink ( x )
+                if nb == "interactivePlotsExample":
+                    self.cleanUp ( [ "*.html", "data_frame.txt", "iplots/" ] )
+                # print ( "done nb", nb )
+            to_unlink = self.cleanUp ( to_unlink )
         except Exception as e:
-            for x in to_unlink:
-                if os.path.exists ( x ):
-                    os.unlink ( x )
+            self.cleanUp ( to_unlink )
             raise(e)
 
 if __name__ == "__main__":
