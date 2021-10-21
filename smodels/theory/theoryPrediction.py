@@ -169,9 +169,11 @@ class TheoryPrediction(object):
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood
         """
-        self.computeStatistics ( marginalize, deltas_rel )
-        if hasattr ( self, "likelihood" ) and abs ( mu - 1. ) < 1e-5:
+        self.computeStatistics ( marginalize, deltas_rel, expected=expected )
+        if hasattr ( self, "likelihood" ) and abs ( mu - 1. ) < 1e-5 and not expected:
             return self.likelihood
+        if hasattr ( self, "elikelihood" ) and abs ( mu - 1. ) < 1e-5 and expected:
+            return self.elikelihood
         lumi = self.dataset.getLumi()
         if self.dataType() == 'combined':
             srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for \
@@ -183,40 +185,54 @@ class TheoryPrediction(object):
             return llhd
         if self.dataType() == 'efficiencyMap':
             nsig = (mu*self.xsection.value*lumi).asNumber()
-            llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
+            llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel, expected=expected )
             return llhd
         if self.dataType()  == 'upperLimit':
-            llhd, chi2 = self.likelihoodFromLimits ( mu, marginalize, deltas_rel, chi2also=True )
+            llhd, chi2 = self.likelihoodFromLimits ( mu, marginalize, deltas_rel, chi2also=True, expected=expected )
             return llhd
         return None
 
 
-    def computeStatistics(self,marginalize=False,deltas_rel=0.2):
+    def computeStatistics(self,marginalize=False,deltas_rel=0.2, expected=False ):
         """
         Compute the likelihoods, chi2 and expected upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, lsm and chi2
         attributes (chi2 being phased out).
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+        :param expected: computed expected quantities, not observed
         """
 
         if self.dataType()  == 'upperLimit':
-            llhd, chi2 = self.likelihoodFromLimits ( 1., marginalize, deltas_rel, chi2also=True )
-            self.likelihood = llhd
-            self.chi2 = chi2
-            self.lsm = self.likelihoodFromLimits ( 0., marginalize, deltas_rel, False )
-            self.lmax = self.likelihoodFromLimits ( None, marginalize, deltas_rel, False )
+            llhd, chi2 = self.likelihoodFromLimits ( 1., marginalize, deltas_rel, expected=expected, chi2also=True )
+            lsm = self.likelihoodFromLimits ( 0., marginalize, deltas_rel, expected=expected, chi2also=False )
+            lmax = self.likelihoodFromLimits ( None, marginalize, deltas_rel, expected=expected, chi2also=False )
+            if expected:
+                self.elikelihood = llhd
+                self.echi2 = chi2
+                self.elsm = lsm
+                self.elmax = lmax
+            else:
+                self.likelihood = llhd
+                self.chi2 = chi2
+                self.lsm = lsm
+                self.lmax = lmax
 
         elif self.dataType() == 'efficiencyMap':
             lumi = self.dataset.getLumi()
             nsig = (self.xsection.value*lumi).asNumber()
-            llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel)
-            llhd_sm = self.dataset.likelihood(nsig=0.,marginalize=marginalize,deltas_rel=deltas_rel)
+            llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel,expected=expected)
+            llhd_sm = self.dataset.likelihood(nsig=0.,marginalize=marginalize,deltas_rel=deltas_rel,expected=expected)
             llhd_max = self.dataset.lmax(marginalize=marginalize,deltas_rel=deltas_rel,\
-                                          allowNegativeSignals = False )
-            self.likelihood = llhd
-            self.lmax = llhd_max
-            self.lsm = llhd_sm
+                                          allowNegativeSignals = False, expected=expected )
+            if expected:
+                self.elikelihood = llhd
+                self.elmax = llhd_max
+                self.elsm = llhd_sm
+            else:
+                self.likelihood = llhd
+                self.lmax = llhd_max
+                self.lsm = llhd_sm
             from math import log
             chi2 = None
             if llhd == 0. and llhd_max == 0.:
@@ -225,7 +241,10 @@ class TheoryPrediction(object):
                 chi2 = float("inf")
             if llhd > 0.:
                 chi2 = -2 * log ( llhd / llhd_max )
-            self.chi2 = chi2
+            if expected:
+                self.echi2 = chi2
+            else:
+                self.chi2 = chi2
 
         elif self.dataType() == 'combined':
             lumi = self.dataset.getLumi()
@@ -234,10 +253,15 @@ class TheoryPrediction(object):
             srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
             # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
             llhd,lmax,lsm = computeCombinedStatistics ( self.dataset, srNsigs, marginalize,
-                                                                     deltas_rel )
-            self.likelihood = llhd
-            self.lmax = lmax
-            self.lsm = lsm
+                                                     deltas_rel, expected=expected )
+            if expected:
+                self.elikelihood = llhd
+                self.elmax = lmax
+                self.elsm = lsm
+            else:
+                self.likelihood = llhd
+                self.lmax = lmax
+                self.lsm = lsm
 
 
     def getmaxCondition(self):

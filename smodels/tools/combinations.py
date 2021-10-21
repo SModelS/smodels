@@ -81,24 +81,31 @@ def computeCombinedLikelihood ( dataset, nsig, marginalize=False, deltas_rel=0.2
     lbsm = _combinedLikelihood( dataset, nsig, marginalize, deltas_rel )
     return lbsm
 
-def computeCombinedStatistics ( dataset, nsig, marginalize=False, deltas_rel=0.2 ):
+def computeCombinedStatistics ( dataset, nsig, marginalize=False, deltas_rel=0.2,
+                                expected=False ):
     """ compute lBSM, lmax, and LSM in a single run 
     :param nsig: predicted signal (list)
     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+    :param expected: compute expected values, not observed
     """
     if dataset.type == "pyhf":
         # Getting the path to the json files
         # Loading the jsonFiles
         ulcomputer = _getPyhfComputer( dataset, nsig, False )
         index = ulcomputer.getBestCombinationIndex()
+        logger.error ( "expected flag needs to be heeded!!!" )
         lbsm = ulcomputer.likelihood( index )
         lmax = ulcomputer.lmax ( index )
         ulcomputer = _getPyhfComputer( dataset, [0.]*len(nsig), False )
+        logger.error ( "expected flag needs to be heeded!!!" )
         lsm = ulcomputer.likelihood ( index )
         return lbsm, lmax, lsm
-    lbsm = _combinedLikelihood( dataset, nsig, marginalize, deltas_rel )
-    lmax = _combinedLmax ( dataset, nsig, marginalize, deltas_rel )
-    lsm =  _combinedLikelihood ( dataset, [0.]*len(nsig), marginalize, deltas_rel )
+    lbsm = _combinedLikelihood( dataset, nsig, marginalize, deltas_rel,
+                                expected=expected )
+    lmax = _combinedLmax ( dataset, nsig, marginalize, deltas_rel,
+                                expected=expected )
+    lsm =  _combinedLikelihood ( dataset, [0.]*len(nsig), marginalize, deltas_rel,
+                                expected=expected )
     return lbsm, lmax, lsm
 
 def _getPyhfComputer ( dataset, nsig, normalize = True ):
@@ -147,7 +154,8 @@ def _getPyhfComputer ( dataset, nsig, normalize = True ):
     ulcomputer = PyhfUpperLimitComputer(data)
     return ulcomputer
 
-def _combinedLikelihood( dataset, nsig, marginalize=False, deltas_rel=0.2 ):
+def _combinedLikelihood( dataset, nsig, marginalize=False, deltas_rel=0.2, 
+        expected=False ):
     """
     Computes the (combined) likelihood to observe nobs events, given a
     predicted signal "nsig", with nsig being a vector with one entry per
@@ -155,6 +163,7 @@ def _combinedLikelihood( dataset, nsig, marginalize=False, deltas_rel=0.2 ):
     the signal.
     :param nsig: predicted signal (list)
     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+    :param expected: compute expected likelihood, not observed
     :returns: likelihood to observe nobs events (float)
     """
 
@@ -163,7 +172,10 @@ def _combinedLikelihood( dataset, nsig, marginalize=False, deltas_rel=0.2 ):
             if isinstance(nsig,list):
                 nsig = nsig[0]
             return dataset._datasets[0].likelihood(nsig,marginalize=marginalize)
-        nobs = [ x.dataInfo.observedN for x in dataset._datasets]
+        if expected:
+            nobs = [ x.dataInfo.expectedBG for x in dataset._datasets]
+        else:
+            nobs = [ x.dataInfo.observedN for x in dataset._datasets]
         bg = [ x.dataInfo.expectedBG for x in dataset._datasets]
         cov = dataset.globalInfo.covariance
         computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig,
