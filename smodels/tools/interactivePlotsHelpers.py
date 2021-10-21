@@ -10,7 +10,7 @@
 import sys
 import math
 import os
-import imp
+import importlib.util
 import smodels
 from smodels.tools.smodelsLogging import logger
 try:
@@ -37,10 +37,11 @@ def importPythonOutput(smodelsFile):
     """
 
     try:
-        with open(smodelsFile, 'rb') as fsmodels:
-            ## imports smodels file
-            smodelsOut = imp.load_module("smodelsOutput",fsmodels,smodelsFile,('.py', 'rb', imp.PY_SOURCE))
-            smodelsOutput = smodelsOut.smodelsOutput
+        spec = importlib.util.spec_from_file_location( "smodelsOutput",
+                                                       smodelsFile )
+        smodelsOut = importlib.util.module_from_spec( spec )
+        spec.loader.exec_module(smodelsOut )
+        smodelsOutput = smodelsOut.smodelsOutput
 
     except (ImportError,AttributeError,IOError,ValueError,OSError,SyntaxError):
         logger.debug("Error loading smodels file %s. Does it contain a smodelsOutput dictionary?" %smodelsFile)
@@ -351,10 +352,11 @@ class Filler:
         """Loads  SMparticles.py to parse over SM pdg-labels"""
         from smodels import installation
         sm_particle_file=f'{installation.installDirectory()}/smodels/share/models/SMparticles.py'
-        with open(sm_particle_file, 'rb') as fsmparticles:
-            ## imports parameter file
-            self.sm_particle_names = imp.load_module("sm_particles",\
-                    fsmparticles,sm_particle_file,('.py', 'rb', imp.PY_SOURCE))
+        spec = importlib.util.spec_from_file_location( "sm_particles",
+                                                       sm_particle_file )
+        module = importlib.util.module_from_spec( spec )
+        spec.loader.exec_module( module )
+        self.sm_particle_names = module
         return
 
     def getParticleName(self,pdg):
