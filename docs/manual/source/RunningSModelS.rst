@@ -193,7 +193,7 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **ncpus** (int): number of CPUs. When processing multiple SLHA/LHE files,
     SModelS can run in a parallelized fashion, splitting up the input files in equal chunks.
-    *ncpus = -1* parallelizes to as many processes as number of CPU cores of the machine. Default value is 1. Warning: python already parallelizes many tasks internally.
+    *ncpus = 0* parallelizes to as many processes as number of CPU cores of the machine, negative values mean parallelization to number of CPU cores minus the absolute value of ncpus (but at least 1). Default value is 1. Warning: python already parallelizes many tasks internally.
 
 .. _parameterFileDatabase:
 

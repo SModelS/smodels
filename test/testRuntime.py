@@ -19,6 +19,14 @@ class TxTest(unittest.TestCase):
         ncpus = runtime.nCPUs()
         self.assertTrue ( ncpus >= 1 )
 
+    def testDetermineNCPUs ( self ):
+        from smodels.tools.modelTester import _determineNCPus
+        ncpus = runtime.nCPUs()
+        n = _determineNCPus ( 0, 1e6 )
+        self.assertTrue ( n == ncpus )
+        n = _determineNCPus ( -1e16, 1e6 )
+        self.assertTrue ( n == 1 )
+
 if __name__ == "__main__":
     unittest.main()
     # a=TxTest("testNCPUs") 

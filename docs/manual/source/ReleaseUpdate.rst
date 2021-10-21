@@ -37,6 +37,12 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 2.1.2:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * allow ncpus to take on zero and negative values in ini file
+    [meaning use all but this (absolute) number of CPU cores]
+
 New in Version 2.1.1:
 ^^^^^^^^^^^^^^^^^^^^^
 

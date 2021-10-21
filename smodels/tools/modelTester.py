@@ -259,11 +259,11 @@ def _determineNCPus(cpus_wanted, n_files):
     ncpusAll = runtime.nCPUs()
     # ncpus = parser.getint("parameters", "ncpus")
     ncpus = cpus_wanted
-    if ncpus == 0 or ncpus < -1:
-        logger.error("Weird number of ncpus given in ini file: %d" % ncpus)
-        sys.exit()
-    if ncpus == -1 or ncpus > ncpusAll: ncpus = ncpusAll
+    if ncpus <= 0:
+        ncpus = ncpusAll + ncpus
     ncpus = min(n_files, ncpus)
+    if ncpus < 1:
+        ncpus = 1
     return ncpus
 
 def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
