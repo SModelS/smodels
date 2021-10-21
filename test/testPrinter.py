@@ -237,6 +237,7 @@ class RunPrinterTest(unittest.TestCase):
             print ( "Error: %s, when comparing %s \nwith %s." % (e,"output.py","gluino_squarks_default.py" ) )
             raise AssertionError(e)
         self.removeOutputs ( './unitTestOutput/printer_output.py' )
+        self.removeOutputs ( './debug.log' )
  
     def testPythonPrinterSimple(self):
         outfile = './unitTestOutput/printer_output_simple.py'
@@ -324,6 +325,7 @@ class RunPrinterTest(unittest.TestCase):
             msg += ". Try and consult debug.log for more info."
             raise AssertionError(msg)
         self.removeOutputs ( './unitTestOutput/printer_output.xml' )  
+        self.removeOutputs ( './debug.log' )  
  
     def testXmlPrinterSimple(self):
         self.removeOutputs ( './unitTestOutput/printer_output_simple.xml' )  
@@ -358,6 +360,7 @@ class RunPrinterTest(unittest.TestCase):
             msg = "%s != %s" %(defFile, outFile) + "\n" + str(e)            
             raise AssertionError(msg)
         self.removeOutputs ( './unitTestOutput/printer_output_simple.xml' )  
+        self.removeOutputs ( './debug.log' )  
 
     def testSLHAPrinter(self):    
         self.removeOutputs ( './unitTestOutput/printer_output.smodelsslha' )  

@@ -3,6 +3,7 @@ Release v2.1.2, xxx
 
   * allow ncpus to take on zero and negative values in ini file
     [meaning use all but this (absolute) number of CPU cores]
+	* more small fixes in unit tests
 
 Release v2.1.1, Tue 19 Oct 2021
 =======================================================

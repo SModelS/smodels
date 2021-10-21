@@ -52,6 +52,7 @@ class ModelsTest(unittest.TestCase):
                            ignore=ignoreFields, fname = outputfile )
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
+        self.removeOutputs("./idm_example.slha" )
 
     def testParameterFile(self):
         filename = "./testFiles/slha/idm_example.slha"
