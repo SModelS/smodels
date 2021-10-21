@@ -18,7 +18,7 @@ try:
     # https://stackoverflow.com/questions/40845304/runtimewarning-numpy-dtype-size-changed-may-indicate-binary-incompatibility
     warnings.filterwarnings("ignore", message="numpy.dtype size changed")
     import plotly.graph_objs as go
-    import plotly,imp
+    import plotly
 except ImportError as e:
     logger.error ( "could not import plotly. Please try to install it, e.g. via:\npip install --user plotly" )
     sys.exit()

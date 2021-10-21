@@ -73,7 +73,6 @@ class Plotter(object):
         logger.info("Reading parameters from %s ..." %(self.parameterFile))
 
         parFile = self.parameterFile
-        import imp
 
         try:
             spec = importlib.util.spec_from_file_location( "parameters",
