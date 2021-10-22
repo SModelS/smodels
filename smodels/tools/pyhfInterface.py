@@ -389,7 +389,7 @@ class PyhfUpperLimitComputer:
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of
     # looking for mu bounds
     # Usage of the index allows for rescaling
-    def ulSigma (self, expected=False, workspace_index=None, aposteriori=False):
+    def ulSigma (self, expected=False, workspace_index=None):
         """
         Compute the upper limit on the signal strength modifier with:
             - by default, the combination of the workspaces contained into self.workspaces
@@ -430,8 +430,13 @@ class PyhfUpperLimitComputer:
                     return self.workspaces[workspace_index]
             workspace = updateWorkspace()
             def root_func(mu):
+                try:
+                    from runValidation import _aposteriori
+                except ImportError:
+                    _aposteriori = False
                 # If expected, set observations = sum(bkg)
-                if expected and not aposteriori:
+                if expected and not _aposteriori:
+                    logger.debug('computing a-priori expected limit')
                     for obs in workspace['observations']:
                         for ch in workspace['channels']:
                             # Finding matching observation and bkg channel
@@ -450,7 +455,7 @@ class PyhfUpperLimitComputer:
                 start = time.time()
                 stat = "qtilde" # by default
                 args = {}
-                args["return_expected"] = expected and aposteriori
+                args["return_expected"] = expected and _aposteriori
                 pver = float ( pyhf.__version__[:3] )
                 if pver < 0.6:
                     args["qtilde"]=True
@@ -462,7 +467,8 @@ class PyhfUpperLimitComputer:
                     result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
                 end = time.time()
                 logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
-                if expected and aposteriori:
+                if expected and _aposteriori:
+                    logger.debug('computing a-posteriori expected limit')
                     logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                     try:
                         CLs = float(result[1].tolist())
