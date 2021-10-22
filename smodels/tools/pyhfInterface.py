@@ -431,7 +431,7 @@ class PyhfUpperLimitComputer:
             workspace = updateWorkspace()
             def root_func(mu):
                 try:
-                    from runValidation import _aposteriori
+                    from smodels.tools.runtime import _aposteriori
                 except ImportError:
                     _aposteriori = False
                 # If expected, set observations = sum(bkg)
@@ -447,7 +447,7 @@ class PyhfUpperLimitComputer:
                                     for iSR in range(len(obs['data'])):
                                         # Summing over all bkg samples for each bin/SR
                                         bkg[iSR] += sp['data'][iSR]
-                                logger.debug('bkgs for channel {} :\n{}'.format(obs['name'], bkg))
+                                # logger.debug('bkgs for channel {} :\n{}'.format(obs['name'], bkg))
                                 obs['data'] = bkg
                 # Same modifiers_settings as those use when running the 'pyhf cls' command line
                 msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
