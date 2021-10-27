@@ -58,7 +58,7 @@ class XSecComputer:
         try:
             f=pyslha.readSLHAFile(slhafile)
         except (pyslha.ParseError,ValueError) as e:
-            logger.error("File cannot be parsed as SLHA file: %s" % e )
+            logger.error( f"File {slhafile} cannot be parsed as SLHA file: {e}" )
             raise SModelSError()
 
     def _checkSqrts ( self, sqrts ):
@@ -278,7 +278,7 @@ class XSecComputer:
 
         :returns: number of xsections that have been computed
         """
-        
+
         nXSecs = 0 ## count the xsecs we are adding
         if tofile:
             logger.info("Computing SLHA cross section from %s, adding to "
@@ -401,9 +401,16 @@ class XSecComputer:
             logger.info("SLHA file already contains XSECTION blocks. Adding "
                            "only missing cross sections.")
 
-        # Write cross sections to file, if they do not overlap any cross section in
-        # the file
+        # Write cross sections to file, if they do not overlap with any cross
+        # section in the file
+        outfile = open(slhafile, 'r')
+        lastline = outfile.readlines()[-1]
+        lastline = lastline.strip()
+        outfile.close()
+
         outfile = open(slhafile, 'a')
+        if lastline != "":
+            outfile.write("\n" )
         nxsecs = 0
         for xsec in xsecs:
             writeXsec = True
