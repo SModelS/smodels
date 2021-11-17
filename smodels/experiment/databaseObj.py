@@ -645,7 +645,7 @@ class SubDatabase(object):
                     ## seems it hasnt changed
                     self.force_load = "pcl"
                     return ( "./", "%s" % filename )
-        r2=requests.get ( r.json()["url"], stream=True, timeout=(500,500) )
+        r2=requests.get ( r.json()["url"], stream=True, timeout=(250,2000) )
         # filename= os.path.join ( cDir, r2.url.split("/")[-1] )
         msg = "caching the downloaded database in %s." % cDir
         if defused:

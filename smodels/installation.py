@@ -225,7 +225,7 @@ def databasePath ( label ):
     """
     if not label in __dblabels__:
         from smodels.tools.smodelsLogging import logger
-        logger.warning ( f"cannot identify label {label}" )
+        logger.warning ( "cannot identify label %s" % label )
         return label
     if label == None:
         label = "official"
