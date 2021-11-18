@@ -651,7 +651,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
         for pxsec in process.xsecs:
             csOrder = pxsec.qcd_order
             wlabel = str( int ( pxsec.sqrts / 1000) ) + ' TeV'
-            wlabel += f" ({orderToString(csOrder,True,True)})"
+            wlabel += " (%s)" % orderToString(csOrder,True,True)
             xsec = XSection()
             xsec.info.sqrts = pxsec.sqrts/1000. * TeV
             xsec.info.order = csOrder
