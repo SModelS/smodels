@@ -175,8 +175,16 @@ class XSection(object):
                 res = self.copy()
                 res.value += other.value
                 return res
-        logger.error("Trying to add " + type(other) + " to a XSection object")
-        raise SModelSError()
+            if self.info.sqrts != other.info.sqrts:
+                logger.warning ( f"adding xsecs for different sqrts {self.info.sqrts} != {other.info.sqrts}" )
+            if self.info.order != other.info.order:
+                logger.warning ( f"adding xsecs for different orders {self.info.order} != {other.info.order}" )
+            res = self.copy()
+            res.value += other.value
+            return res
+        line = f"Trying to add {type(other)} to a XSection object"
+        logger.error( line )
+        raise SModelSError( line )
 
 
     def __eq__(self, other):
