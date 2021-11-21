@@ -40,6 +40,7 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 2.1.2:
 ^^^^^^^^^^^^^^^^^^^^^
 
+  * small fixes with expected combined likelihoods (kudos to Jamie Yellen)
   * allow :ref:`ncpus <parameterFileNcpus>` to take on zero and negative values in ini file
     [meaning use all but this (absolute) number of CPU cores]
   * more small fixes in unit tests
