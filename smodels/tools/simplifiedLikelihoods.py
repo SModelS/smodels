@@ -405,7 +405,7 @@ class LikelihoodComputer:
             C = self.model.V
             #if self.model.n == 1: I think not a good idea
             #    C = self.model.totalCovariance(self.nsig)
-            dTheta = theta - M 
+            dTheta = theta - M
             expon = - .5 * NP.dot ( NP.dot ( dTheta, self.weight ), dTheta ) + self.logcoeff
             # print ( "expon", expon, "coeff", self.coeff )
             if nll:
@@ -536,9 +536,9 @@ class LikelihoodComputer:
             self.weight = NP.linalg.inv(self.cov_tot)
             # self.coeff = 1.
             logdet = NP.linalg.slogdet ( self.cov_tot )
-            self.logcoeff = -self.model.n/2 * NP.log (2*NP.pi) -.5* logdet[1] 
+            self.logcoeff = -self.model.n/2 * NP.log (2*NP.pi) -.5* logdet[1]
             # self.coeff = (2*NP.pi)**(-self.model.n/2) * NP.exp(-.5* logdet[1] )
-            #print ( "coeff", self.coeff, "n", self.model.n, "det", NP.linalg.slogdet ( self.cov_tot ) ) 
+            #print ( "coeff", self.coeff, "n", self.model.n, "det", NP.linalg.slogdet ( self.cov_tot ) )
             # print ( "cov_tot", self.cov_tot[:10] )
             self.ones = 1.
             if type ( self.model.observed) in [ list, ndarray ]:
@@ -914,7 +914,50 @@ class UpperLimitComputer:
                 # in that case, try again
                 pass
 
-if __name__ == "__main__":
+class SignalRegionsCombiner():
+    """
+    Facility used to combine signal regions from different analyes.
+    Creates a fake result with a (usually diagonal) covariance matrix
+    Written originally by Jamie Yellen, ported into SModelS proper by WW.
+    """
+    def __init__ (self) -> None:
+        self.fakeResult = None
+
+    def fromDatasets ( self, datasets: list ) -> None:
+        """ create the fake experimental result from a list of datasets """
+        n_datasets = len(datasets)
+        datasetorder, covariance_matrix, ana_ids = [], [], []
+        for d_s in datasets:
+            datasetorder.append ( d_s.dataInfo.dataId )
+            cov_row = [0.]*n_datasets
+            ana_ids.append ( d_s.globalInfo.id )
+            cov_row[ctds]= d_s.dataInfo.bgError**2
+            ctds += 1
+            covariance_matrix.append ( cov_row )
+
+        logger.debug ( "cov_matrx", covariance_matrix )
+        logger.debug ( "datasets", datasets )
+        logger.debug ( "ana_ids", ana_ids )
+        ## construct a fake result with these <n> datasets and and
+        ## an nxn covariance matrix
+        from smodels.experiment.expResultObj import ExpResult
+        self.fakeResult = ExpResult ( path = None, discard_zeroes = True,
+                                      databaseParticles = None )
+        self.fakeResult.datasets = datasets
+        self.fakeResult.analysisIDs = ana_ids
+        self.fakeResult.globalInfo.datasetOrder = datasetorder
+        self.fakeResult.globalInfo.covariance = NP.array ( covariance_matrix )
+
+    @property
+    def covariance(self) -> NP.ndarray:
+        """ return covarience """
+        if self.fakeResult is None:
+            logger.error ('No fake result defined' )
+        else:
+            return self.fakeResult.globalInfo.covariance
+        return NP.array([])
+
+def oldExample_():
     C = [ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
        -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958,
        -5807.3, 900.195, 1799.56, 1376.77, 854.448, 482.435, 258.92, 134.975,
@@ -940,3 +983,20 @@ if __name__ == "__main__":
     print ( "ul (marginalized)", ul )
     ul = ulComp.ulSigma ( m, marginalize=False )
     print ( "ul (profiled)", ul )
+
+if __name__ == "__main__":
+    from smodels.experiment.databaseObj import Database
+    database = Database( "official" )
+    anas_and_sr = { "CMS-SUS-16-033": [ "SR12_Njet5_Nb1_HT750_MHT750", "SR1_Njet2_Nb0_HT500_MHT500" ], "CMS-SUS-13-013": [ "SR22_HighPt" ] }
+    anaids = anas_and_sr.keys()
+    dsIDs = []
+    for anaid,srs in anas_and_sr.items():
+        dsIDs += srs
+    dsIDs = set ( dsIDs )
+
+    exp_results = database.getExpResults( analysisIDs = anaids,
+                                          dataTypes = [ "efficiencyMap" ],
+                                          datasetIDs = dsIDs )
+    print ( exp_results )
+    datasets = []
+    # for e_r in exp_results:
