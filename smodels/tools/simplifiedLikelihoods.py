@@ -927,8 +927,14 @@ class SignalRegionsCombiner():
         """ create the fake experimental result from a list of datasets """
         n_datasets = len(datasets)
         datasetorder, covariance_matrix, ana_ids = [], [], []
+        ctds = 0
         for d_s in datasets:
-            datasetorder.append ( d_s.dataInfo.dataId )
+            dId = d_s.dataInfo.dataId 
+            if dId in datasetorder:
+                logger.error ( f"recurring datasetid when constructing a fake result: {dId}. cannot yet handle." )
+                import sys
+                sys.exit()
+            datasetorder.append ( dId )
             cov_row = [0.]*n_datasets
             ana_ids.append ( d_s.globalInfo.id )
             cov_row[ctds]= d_s.dataInfo.bgError**2
@@ -941,23 +947,45 @@ class SignalRegionsCombiner():
         ## construct a fake result with these <n> datasets and and
         ## an nxn covariance matrix
         from smodels.experiment.expResultObj import ExpResult
+        from smodels.experiment.infoObj import Info
         self.fakeResult = ExpResult ( path = None, discard_zeroes = True,
                                       databaseParticles = None )
         self.fakeResult.datasets = datasets
         self.fakeResult.analysisIDs = ana_ids
+        self.fakeResult.globalInfo = Info()
+        self.fakeResult.globalInfo.id = f"FakeResult[{'+'.join(set(ana_ids))}]"
         self.fakeResult.globalInfo.datasetOrder = datasetorder
         self.fakeResult.globalInfo.covariance = NP.array ( covariance_matrix )
+
+    def fromExpResults ( self, expResultList : list, anas_and_sr : dict ) -> None:
+        """ create from list of experimental results and a dictionary 
+            with analysisIds as keys and lists of SR names as values """
+        datasets = []
+        for e_r in exp_results:
+            ana_id = e_r.globalInfo.id
+            if not ana_id in anas_and_sr:
+                continue
+            srgns = anas_and_sr[ana_id]
+            for s_r in srgns:
+                d_s = e_r.getDataset ( s_r )
+                if d_s is not None:
+                    datasets.append ( d_s )
+        self.fromDatasets ( datasets )
+
+    def fromTheoryPredictions ( self, tpreds : list ):
+        """ create from theory predictions """
+        datasets = [ x.dataset for x in tpreds ]
+        self.fromDatasets ( dataset )
 
     @property
     def covariance(self) -> NP.ndarray:
         """ return covarience """
-        if self.fakeResult is None:
-            logger.error ('No fake result defined' )
-        else:
+        if self.fakeResult is not None:
             return self.fakeResult.globalInfo.covariance
+        logger.error ('No fake result defined' )
         return NP.array([])
 
-def oldExample_():
+""" def oldExample_():
     C = [ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
        -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958,
        -5807.3, 900.195, 1799.56, 1376.77, 854.448, 482.435, 258.92, 134.975,
@@ -982,7 +1010,7 @@ def oldExample_():
     ul = ulComp.ulSigma ( m )
     print ( "ul (marginalized)", ul )
     ul = ulComp.ulSigma ( m, marginalize=False )
-    print ( "ul (profiled)", ul )
+    print ( "ul (profiled)", ul ) """
 
 if __name__ == "__main__":
     from smodels.experiment.databaseObj import Database
@@ -998,5 +1026,6 @@ if __name__ == "__main__":
                                           dataTypes = [ "efficiencyMap" ],
                                           datasetIDs = dsIDs )
     print ( exp_results )
-    datasets = []
-    # for e_r in exp_results:
+    combiner = SignalRegionsCombiner()
+    combiner.fromExpResults ( exp_results, anas_and_sr )
+    print ( combiner.fakeResult )
