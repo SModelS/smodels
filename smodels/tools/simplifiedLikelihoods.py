@@ -923,11 +923,20 @@ class SignalRegionsCombiner():
     def __init__ (self) -> None:
         self.fakeResult = None
 
-    def fromDatasets ( self, datasets: list ) -> None:
-        """ create the fake experimental result from a list of datasets """
+    def fromDatasets ( self, datasets, corrs: dict = {} ) -> None:
+        """ create fake experimental result with covariance matrix 
+            from a list of datasets
+        :param datasets: list of datasets, must be iterable
+        :param corrs: dictionary of dictionary of correlations, 
+                      given with dataset ids as keys,
+                      e.g. { "SR1": { "SR2": 0.2, "SR4": 0.1 } }
+                      omittance implies no correlation, correlation matrix
+                      is by default assumed to be symmetric.
+        """
         n_datasets = len(datasets)
         datasetorder, covariance_matrix, ana_ids = [], [], []
         ctds = 0
+        diag = []
         for d_s in datasets:
             dId = d_s.dataInfo.dataId 
             if dId in datasetorder:
@@ -938,8 +947,23 @@ class SignalRegionsCombiner():
             cov_row = [0.]*n_datasets
             ana_ids.append ( d_s.globalInfo.id )
             cov_row[ctds]= d_s.dataInfo.bgError**2
+            diag.append ( d_s.dataInfo.bgError ) # for the corrs
             ctds += 1
             covariance_matrix.append ( cov_row )
+
+        for sr1,line in corrs.items():
+            if not sr1 in datasetorder:
+                logger.error ( f"found a correlation for {sr1}, but that SR is not in list of datasets. will ignore it." )
+                continue
+            sr1idx = datasetorder.index ( sr1 )
+            for sr2,corr in line.items():
+                if not sr2 in datasetorder:
+                    logger.error ( f"found a correlation for {sr2}, but that SR is not in list of datasets. will ignore it." )
+                    continue
+                sr2idx = datasetorder.index ( sr2 )
+                cov = diag[sr1idx]*diag[sr2idx]*corr
+                covariance_matrix[sr1idx][sr2idx] = cov
+                covariance_matrix[sr2idx][sr1idx] = cov
 
         logger.debug ( "cov_matrx", covariance_matrix )
         logger.debug ( "datasets", datasets )
@@ -957,11 +981,18 @@ class SignalRegionsCombiner():
         self.fakeResult.globalInfo.datasetOrder = datasetorder
         self.fakeResult.globalInfo.covariance = NP.array ( covariance_matrix )
 
-    def fromExpResults ( self, expResultList : list, anas_and_sr : dict ) -> None:
+    def fromExpResults ( self, expResultList : list, anas_and_sr : dict,
+                         corrs : dict = {} ) -> None:
         """ create from list of experimental results and a dictionary 
-            with analysisIds as keys and lists of SR names as values """
+            with analysisIds as keys and lists of SR names as values
+        :param corrs: dictionary of dictionary of correlations, 
+                      given with dataset ids as keys,
+                      e.g. { "SR1": { "SR2": 0.2, "SR4": 0.1 } }
+                      omittance implies no correlation, correlation matrix
+                      is by default assumed to be symmetric.
+        """
         datasets = []
-        for e_r in exp_results:
+        for e_r in expResultList:
             ana_id = e_r.globalInfo.id
             if not ana_id in anas_and_sr:
                 continue
@@ -970,12 +1001,19 @@ class SignalRegionsCombiner():
                 d_s = e_r.getDataset ( s_r )
                 if d_s is not None:
                     datasets.append ( d_s )
-        self.fromDatasets ( datasets )
+        self.fromDatasets ( datasets, corrs )
 
-    def fromTheoryPredictions ( self, tpreds : list ):
-        """ create from theory predictions """
+    def fromTheoryPredictions ( self, tpreds, corrs : dict = {} ):
+        """ create fake result from theory predictions 
+        :param tpreds: list of theory predictions, must be iterable
+        :param corrs: dictionary of dictionary of correlations, 
+                      given with dataset ids as keys,
+                      e.g. { "SR1": { "SR2": 0.2, "SR4": 0.1 } }
+                      omittance implies no correlation, correlation matrix
+                      is by default assumed to be symmetric.
+        """
         datasets = [ x.dataset for x in tpreds ]
-        self.fromDatasets ( dataset )
+        self.fromDatasets ( dataset, corrs )
 
     @property
     def covariance(self) -> NP.ndarray:
@@ -985,7 +1023,8 @@ class SignalRegionsCombiner():
         logger.error ('No fake result defined' )
         return NP.array([])
 
-""" def oldExample_():
+
+if __name__ == "__main__":
     C = [ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
        -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958,
        -5807.3, 900.195, 1799.56, 1376.77, 854.448, 482.435, 258.92, 134.975,
@@ -1010,22 +1049,4 @@ class SignalRegionsCombiner():
     ul = ulComp.ulSigma ( m )
     print ( "ul (marginalized)", ul )
     ul = ulComp.ulSigma ( m, marginalize=False )
-    print ( "ul (profiled)", ul ) """
-
-if __name__ == "__main__":
-    from smodels.experiment.databaseObj import Database
-    database = Database( "official" )
-    anas_and_sr = { "CMS-SUS-16-033": [ "SR12_Njet5_Nb1_HT750_MHT750", "SR1_Njet2_Nb0_HT500_MHT500" ], "CMS-SUS-13-013": [ "SR22_HighPt" ] }
-    anaids = anas_and_sr.keys()
-    dsIDs = []
-    for anaid,srs in anas_and_sr.items():
-        dsIDs += srs
-    dsIDs = set ( dsIDs )
-
-    exp_results = database.getExpResults( analysisIDs = anaids,
-                                          dataTypes = [ "efficiencyMap" ],
-                                          datasetIDs = dsIDs )
-    print ( exp_results )
-    combiner = SignalRegionsCombiner()
-    combiner.fromExpResults ( exp_results, anas_and_sr )
-    print ( combiner.fakeResult )
+    print ( "ul (profiled)", ul )
