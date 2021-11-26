@@ -2,10 +2,13 @@
 
 """
 .. module:: signalRegionsCombiner
-   :synopsis: a module that deals with combining likelihoods into a single
-              higher dimensional simplified likelihood
+   :synopsis: a module that deals with combining signal regions from 
+              different analyses into a single fake result with an appropriate
+              covariance matrix for the corresponding simplified likelihood.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: Jamie Yellen <j.yellen.1@research.gla.ac.uk>
+.. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
@@ -13,6 +16,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.experiment.datasetObj import DataSet
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.infoObj import Info
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 import numpy as np
 
 class SignalRegionsCombiner():
@@ -69,15 +73,16 @@ class SignalRegionsCombiner():
             dsLabels.append( longlabel )
             #If any of the labels match, add it to the filtered datasets
             for dsLabel in dsLabels:
-                if dsLabel in filter_labels:
+                if filter_labels is None or dsLabel in filter_labels:
                     filtered_datasets.append(ds)
                     filtered_labels.append( longlabel )
                     continue
 
         #Make sure there are only unique labels:
         if len(np.unique(filtered_labels)) != len(filtered_labels):
-            logger.error("Could not filter datasets with unique labels")
-            raise SModelSError()
+            line = "Could not filter datasets with unique labels"
+            logger.error( line )
+            raise SModelSError( line )
 
         #Create a dictionary with {datasetLabel : dataset} entries:
         datasetDict = dict(list(zip(filtered_labels,filtered_datasets)))
@@ -123,11 +128,16 @@ class SignalRegionsCombiner():
                     line = self.getLongNames ( line, longnames )
                 ret[cname]=line
                 continue
+            hasAppeared = False
             for c in longnames:
                 if c.endswith ( ":"+cname ):
+                    if hasAppeared:
+                        logger.error ( f"{cname} is non-unique abbreviation for SR name in corrs. specify" )
+                        raise SModelSError()
                     if type(line)==dict:
                         line = self.getLongNames ( line, longnames )
                     ret[c]=line
+                    hasAppeared = True
         return ret
 
     def fromDatasets ( self, datasetDict, corrs: dict = {} ):

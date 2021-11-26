@@ -16,7 +16,6 @@ from __future__ import print_function
 from scipy import stats, optimize, integrate, special, linalg
 from numpy  import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
-from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.infoObj import Info
 
