@@ -31,15 +31,16 @@ class CombinedAnalysisTest(unittest.TestCase):
         exp_results = database.getExpResults( analysisIDs = anaids,
                                               dataTypes = [ "efficiencyMap" ],
                                               datasetIDs = dsIDs )
-        from smodels.tools.simplifiedLikelihoods import SignalRegionsCombiner
+        from smodels.tools.signalRegionsCombiner import SignalRegionsCombiner
         combiner = SignalRegionsCombiner()
-        combiner.fromExpResults ( exp_results, anas_and_sr, 
-                                  corrs = { "c000": { "c100": .1 } } )
+        labels = [ "CMS-PAS-EXO-16-036:c000", "c100", "CMS-SUS-13-012:3NJet6_500HT800_200MHT300" ]
+        datasets = combiner.selectDatasetsFrom ( exp_results, labels )
+        combiner.fromDatasets (datasets, corrs = { "c000": { "c100": .1 } } )
         cov01 = combiner.fakeResult.globalInfo.covariance[0][1]
-        self.assertAlmostEqual ( cov01, 6.731e-3 )
         # print ( exp_results )
-        #print ( combiner.fakeResult )
-        #print ( combiner.covariance )
+        # print ( combiner.fakeResult )
+        # print ( combiner.covariance )
+        self.assertAlmostEqual ( cov01, 6.731e-3 )
  
 if __name__ == "__main__":
     setLogLevel ( "debug" )
