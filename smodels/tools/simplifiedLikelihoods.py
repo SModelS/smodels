@@ -12,9 +12,15 @@
 """
 
 from __future__ import print_function
+
 from scipy import stats, optimize, integrate, special, linalg
 from numpy  import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from smodels.experiment.expResultObj import ExpResult
+from smodels.experiment.datasetObj import Dataset
+from smodels.experiment.infoObj import Info
+
 import numpy as NP
 import math
 import copy
@@ -674,7 +680,7 @@ class LikelihoodComputer:
                     lmbda = array([lmbda])
                 for ctr,v in enumerate( lmbda ):
                     if v<=0.: lmbda[ctr]=1e-30
-#                    print ( "lmbda=",lmbda )
+                    #print ( "lmbda=",lmbda )
                 poisson = self.model.observed*NP.log(lmbda) - lmbda - self.gammaln
                 # poisson = NP.exp(self.model.observed*NP.log(lmbda) - lmbda - self.model.backgrounds - self.gammaln)
                 vals.append( NP.exp ( sum(poisson) ) )
@@ -920,104 +926,144 @@ class SignalRegionsCombiner():
     Creates a fake result with a (usually diagonal) covariance matrix
     Written originally by Jamie Yellen, ported into SModelS proper by WW.
     """
-    def __init__ (self) -> None:
+    def __init__ (self):
         self.fakeResult = None
 
-    def fromDatasets ( self, datasets, corrs: dict = {} ) -> None:
-        """ create fake experimental result with covariance matrix 
-            from a list of datasets
-        :param datasets: list of datasets, must be iterable
-        :param corrs: dictionary of dictionary of correlations, 
-                      given with dataset ids as keys,
+
+    def selectDatasetsFrom ( self, objList, filter_labels = None ):
+        """
+        creates a list of datasets using the filter dictionary. The input list can be
+        a list of Dataset, ExptResult or TheoryPrediction objects.
+
+        :param objList: a list of Dataset, ExptResult or TheoryPrediction objects.
+        :filter_labels: A list of strings with labels for filtering the objList. The labels should be
+                      in the format ['datasetID1', 'datasetID2', ...] (e.g. ['SR1', 'SR2', ...])
+                      or ['analsyisID:datasetID1',...] (e.g. ['CMS-PAS-EXO-16-036:c000'])
+                      if the datasets have non-unique labels.
+
+        :return: a dictionary with the filtered dataset labels as keys and the corresponding datasets
+                 as values.
+        """
+
+        if not isinstance(objList,(list,NP.array,tuple)):
+            logger.error("Input should be an iterable")
+            raise SModelSError()
+
+        filtered_datasets = []
+        filtered_labels = []
+
+        #Get all datasets appearing in the in the list of objects:
+        datasets = []
+        for obj in objList:
+            if isinstance(obj,Dataset):
+                datasets.append(obj)
+            elif isinstance(obj,ExpResult):
+                datasets += obj.datasets
+            elif isinstance(obj,TheoryPrediction):
+                datasets.append(obj.dataset)
+            else:
+                logger.error('Wrong input format. Must be a list of datasets, ExpResults or TheoryPrediction objects')
+                raise SModelSError()
+
+        #Loop over datasets and check which ones should be selected:
+        for ds in datasets:
+            #Get possible labels (datasetId or analysisID:datasetID)
+            dsLabels = [ds.dataInfo.dataId]
+            dsLabels.append(ds.globalInfo.id+':'+ds.dataInfo.dataId)
+            #If any of the labels match, add it to the filtered datasets
+            for dsLabel in dsLabels:
+                if dsLabel in filter_labels:
+                    filtered_datasets.append(ds)
+                    filtered_labels.append(dsLabel)
+                    continue
+
+        #Make sure there are only unique labels:
+        if len(NP.unique(filtered_labels)) != len(filtered_labels):
+            logger.error("Could not filter datasets with unique labels")
+            raise SModelSError()
+
+        #Create a dictionary with {datasetLabel : dataset} entries:
+        datasetDict = dict(list(zip(filtered_labels,filtered_datasets)))
+
+        return datasetDict
+
+
+    def fromDatasets ( self, datasetDict, corrs: dict = {} ):
+        """
+        creates a fake experimental result with covariance matrix from a list of datasets
+
+        :param datasetDict: a dictionary with the filtered dataset labels as keys and the corresponding datasets
+                            as values.
+        :param corrs: dictionary of dictionary of correlations,
+                      using the dataset labels as keys,
                       e.g. { "SR1": { "SR2": 0.2, "SR4": 0.1 } }
                       omittance implies no correlation, correlation matrix
-                      is by default assumed to be symmetric.
+                      is by default assumed to be symmetric. The dataset labels must be the same used in the
+                      datasetDict.
         """
-        n_datasets = len(datasets)
-        datasetorder, covariance_matrix, ana_ids = [], [], []
-        ctds = 0
-        diag = []
-        for d_s in datasets:
-            dId = d_s.dataInfo.dataId 
-            if dId in datasetorder:
-                logger.error ( f"recurring datasetid when constructing a fake result: {dId}. cannot yet handle." )
-                import sys
-                sys.exit()
-            datasetorder.append ( dId )
-            cov_row = [0.]*n_datasets
-            ana_ids.append ( d_s.globalInfo.id )
-            cov_row[ctds]= d_s.dataInfo.bgError**2
-            diag.append ( d_s.dataInfo.bgError ) # for the corrs
-            ctds += 1
-            covariance_matrix.append ( cov_row )
 
-        for sr1,line in corrs.items():
-            if not sr1 in datasetorder:
-                logger.error ( f"found a correlation for {sr1}, but that SR is not in list of datasets. will ignore it." )
-                continue
-            sr1idx = datasetorder.index ( sr1 )
-            for sr2,corr in line.items():
-                if not sr2 in datasetorder:
-                    logger.error ( f"found a correlation for {sr2}, but that SR is not in list of datasets. will ignore it." )
-                    continue
-                sr2idx = datasetorder.index ( sr2 )
-                cov = diag[sr1idx]*diag[sr2idx]*corr
-                covariance_matrix[sr1idx][sr2idx] = cov
-                covariance_matrix[sr2idx][sr1idx] = cov
+
+        datasetOrder = sorted(list(datasetDict.keys())) #Sort for reproducibility
+        datasets = [datasetDict[dsLabel] for dsLabel in datasetOrder]
+        n_datasets = len(datasets)
+
+        #Check if the dataset labels are unique:
+        uniqueIds = NP.unique(datasetOrder)
+        if len(uniqueIds) < len(datasetOrder):
+            logger.error ("Recurring dataset label when constructing a fake result: %s.\n Cannot yet handle." %(datasetOrder) )
+            raise SModelSError()
+
+        #Construct a covariance matrix:
+        covariance_matrix = NP.zeros((n_datasets,n_datasets))
+        bgErrors = NP.array([d_s.dataInfo.bgError for d_s in datasets])
+        #Define the diagonal entries (in case they are not defined in the correlations dict)
+        NP.fill_diagonal(covariance_matrix,bgErrors**2)
+        #Now include the correlations:
+        for i,sr1 in enumerate(datasetOrder):
+            if not sr1 in corrs:
+                continue #If datasetId does not appear in correlations, ignore
+            sr1_corrs = corrs[sr1]
+            for j,sr2 in enumerate(datasetOrder):
+                if not sr2 in sr1_corrs:
+                    continue #If datasetId does not appear in correlations for sr1, ignore
+                covariance_matrix[i,j] = sr1_corrs[sr2]*bgErrors[i]*bgErrors[j]
+                if covariance_matrix[j,i] == 0.:
+                    covariance_matrix[j,i] = covariance_matrix[i,j]
+
+        #Check consistency of the input correlations (should be symmetric and with diagonal entries = 1)
+        if not NP.allclose(covariance_matrix, covariance_matrix.T, rtol=1e-3, atol=1e-8):
+            logger.warning("The provided correlations matrix is not symmetric. Symmetry will be enforced.")
+        if not NP.allclose(np.diag(covariance_matrix),bgErrors**2):
+            logger.warning("The provided correlations matrix nas non-unity diagonal entries. Diagonal entries will be ignored.")
+
+        #Make sure the covariance matrix is symmetric and the diagonals are bgErrors**2:
+        covariance_matrix = (covariance_matrix + covariance_matrix.T)/2.
+        NP.fill_diagonal(covariance_matrix,bgErrors**2)
+
+        #Get experimental result Ids:
+        ana_ids = [d_s.globalInfo.id for d_s in datasets]
 
         logger.debug ( "cov_matrx", covariance_matrix )
         logger.debug ( "datasets", datasets )
         logger.debug ( "ana_ids", ana_ids )
-        ## construct a fake result with these <n> datasets and and
-        ## an nxn covariance matrix
-        from smodels.experiment.expResultObj import ExpResult
-        from smodels.experiment.infoObj import Info
+
+        #Construct a fake result with these N datasets and
+        #an N x N covariance matrix
         self.fakeResult = ExpResult ( path = None, discard_zeroes = True,
                                       databaseParticles = None )
         self.fakeResult.datasets = datasets
         self.fakeResult.analysisIDs = ana_ids
         self.fakeResult.globalInfo = Info()
         self.fakeResult.globalInfo.id = f"FakeResult[{'+'.join(set(ana_ids))}]"
-        self.fakeResult.globalInfo.datasetOrder = datasetorder
-        self.fakeResult.globalInfo.covariance = NP.array ( covariance_matrix )
-
-    def fromExpResults ( self, expResultList : list, anas_and_sr : dict,
-                         corrs : dict = {} ) -> None:
-        """ create from list of experimental results and a dictionary 
-            with analysisIds as keys and lists of SR names as values
-        :param corrs: dictionary of dictionary of correlations, 
-                      given with dataset ids as keys,
-                      e.g. { "SR1": { "SR2": 0.2, "SR4": 0.1 } }
-                      omittance implies no correlation, correlation matrix
-                      is by default assumed to be symmetric.
-        """
-        datasets = []
-        for e_r in expResultList:
-            ana_id = e_r.globalInfo.id
-            if not ana_id in anas_and_sr:
-                continue
-            srgns = anas_and_sr[ana_id]
-            for s_r in srgns:
-                d_s = e_r.getDataset ( s_r )
-                if d_s is not None:
-                    datasets.append ( d_s )
-        self.fromDatasets ( datasets, corrs )
-
-    def fromTheoryPredictions ( self, tpreds, corrs : dict = {} ):
-        """ create fake result from theory predictions 
-        :param tpreds: list of theory predictions, must be iterable
-        :param corrs: dictionary of dictionary of correlations, 
-                      given with dataset ids as keys,
-                      e.g. { "SR1": { "SR2": 0.2, "SR4": 0.1 } }
-                      omittance implies no correlation, correlation matrix
-                      is by default assumed to be symmetric.
-        """
-        datasets = [ x.dataset for x in tpreds ]
-        self.fromDatasets ( dataset, corrs )
+        self.fakeResult.globalInfo.datasetOrder = datasetOrder
+        self.fakeResult.globalInfo.covariance = covariance_matrix
 
     @property
-    def covariance(self) -> NP.ndarray:
-        """ return covarience """
+    def covariance(self):
+        """
+        Return covariance matrix
+        """
+
         if self.fakeResult is not None:
             return self.fakeResult.globalInfo.covariance
         logger.error ('No fake result defined' )
@@ -1037,7 +1083,7 @@ if __name__ == "__main__":
     m=Data( observed=[1964,877,354,182,82,36,15,11],
               backgrounds=[2006.4,836.4,350.,147.1,62.0,26.2,11.1,4.7],
               covariance= C,
-#              third_moment = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],
+              #third_moment = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],
               third_moment = [ 0. ] * 8,
               nsignal = nsignal,
               name="CMS-NOTE-2017-001 model" )
