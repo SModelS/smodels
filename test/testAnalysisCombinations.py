@@ -20,6 +20,8 @@ from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 class CombinedAnalysisTest(unittest.TestCase):
 
     def testConstruction(self):
+        """ this method should simply test if the fake result and the 
+            covariance matrix are constructed appropriately """
         from smodels.experiment.databaseObj import Database
         database = Database( "unittest" )
         exp_results = database.getExpResults( dataTypes = [ "efficiencyMap" ] )
@@ -28,14 +30,17 @@ class CombinedAnalysisTest(unittest.TestCase):
         datasets = combiner.selectDatasetsFrom ( exp_results, labels )
         #print ( "labels", datasets.keys() )
         combiner.fromDatasets (datasets, corrs = { "c000": { "CMS-PAS-EXO-16-036:c100": .1 } } )
-        cov01 = combiner.fakeResult.globalInfo.covariance[1][2]
+        cov00 = combiner.fakeResult.globalInfo.covariance[0][0]
+        cov12 = combiner.fakeResult.globalInfo.covariance[1][2]
         # print ( exp_results )
         #print ( combiner.fakeResult )
         #print ( combiner.covariance )
-        self.assertAlmostEqual ( cov01, 6.731e-3 )
+        self.assertAlmostEqual ( cov00, 1.21 )
+        self.assertAlmostEqual ( cov12, 6.731e-3 )
 
-
-    def runException ( self ):
+    def runIntoException ( self ):
+        """ this method should raise an exception as c100 is not 
+            a unique identifier for a signal region """
         from smodels.experiment.databaseObj import Database
         database = Database( "unittest" )
         exp_results = database.getExpResults( dataTypes = [ "efficiencyMap" ] )
@@ -45,11 +50,7 @@ class CombinedAnalysisTest(unittest.TestCase):
         cov01 = combiner.fakeResult.globalInfo.covariance[0][1]
 
     def testException ( self ):
-        self.assertRaises ( SModelSError, self.runException )
-
-        # print ( exp_results )
-        # print ( combiner.fakeResult )
-        # print ( combiner.covariance )
+        self.assertRaises ( SModelSError, self.runIntoException )
  
 if __name__ == "__main__":
     setLogLevel ( "debug" )
