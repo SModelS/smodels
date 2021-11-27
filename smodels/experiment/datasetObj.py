@@ -498,6 +498,28 @@ class CombinedDataSet(object):
         ret = "Combined Dataset (%i datasets)" %len(self._datasets)
         return ret
 
+    def getIndex ( self, dId, datasetOrder ):
+        """ get the index of dataset within the datasetOrder,
+            but allow for abbreviated names
+        :param dId: id of dataset to search for, may be abbreviated
+        :param datasetOrder: the ordered list of datasetIds, long form
+        :returns: index, or -1 if not found
+        """
+        if dId in datasetOrder:
+            ## easy peasy, we found the dId
+            return datasetOrder.index ( dId )
+        foundIndex = -1
+        for i,ds in enumerate ( datasetOrder ):
+            if ds.endswith ( ":" + dId ):
+                # ok, dId is the abbreviated form
+                if foundIndex == -1:
+                    foundIndex = i
+                else:
+                    line = f"abbreviation {dId} matches more than one id in datasetOrder"
+                    logger.error ( line )
+                    raise SModelSError( line )
+        return foundIndex
+
     def sortDataSets(self):
         """
         Sort datasets according to globalInfo.datasetOrder.
@@ -514,10 +536,12 @@ class CombinedDataSet(object):
                 raise SModelSError("Number of datasets in the datasetOrder field does not match the number of datasets for %s"
                                    %self.globalInfo.id)
             for dataset in datasets:
-                if not dataset.getID() in datasetOrder:
+                idx = self.getIndex ( dataset.getID(), datasetOrder )
+                if idx == -1:
                     raise SModelSError("Dataset ID %s not found in datasetOrder" %dataset.getID())
-                dsIndex = datasetOrder.index(dataset.getID())
-                self._datasets[dsIndex] = dataset
+                self._datasets[idx] = dataset
+                # dsIndex = datasetOrder.index(dataset.getID())
+                # self._datasets[dsIndex] = dataset
 
     def getType(self):
         """

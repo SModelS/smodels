@@ -212,7 +212,10 @@ class SignalRegionsCombiner():
         self.fakeResult.globalInfo = Info()
         self.fakeResult.globalInfo.id = f"FakeResult[{'+'.join(set(ana_ids))}]"
         self.fakeResult.globalInfo.datasetOrder = datasetOrder
-        self.fakeResult.globalInfo.covariance = covariance_matrix
+        self.fakeResult.globalInfo.covariance = list ( covariance_matrix )
+        #print ( "datasetOrder=", datasetOrder )
+        #for ds in datasets:
+        #    print ( "id", ds.dataInfo.dataId )
 
     @property
     def covariance(self):

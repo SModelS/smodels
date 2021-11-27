@@ -29,12 +29,14 @@ class ExpResult(object):
 
     def __init__(self, path = None, discard_zeroes = True, databaseParticles = None):
         """
-        :param path: Path to the experimental result folder
+        :param path: Path to the experimental result folder, None means 
+                     transient experimental result
         :param discard_zeroes: Discard maps with only zeroes
         :param databaseParticles: the model, i.e. the particle content
         """
 
-        if not path:
+        if path in [ None, "<transient>" ]:
+            self.path = "<transient>"
             return
         if not os.path.isdir ( path ):
             raise SModelSExperimentError ( "%s is not a path" % path )

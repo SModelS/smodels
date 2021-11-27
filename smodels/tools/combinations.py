@@ -11,6 +11,7 @@
 
 from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
 from smodels.tools.smodelsLogging import logger
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
 
 def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
