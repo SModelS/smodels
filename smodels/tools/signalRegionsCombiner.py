@@ -17,6 +17,7 @@ from smodels.experiment.datasetObj import DataSet
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.infoObj import Info
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from smodels.tools.physicsUnits import fb
 import numpy as np
 
 class SignalRegionsCombiner():
@@ -157,7 +158,17 @@ class SignalRegionsCombiner():
         datasetOrder = sorted(list(datasetDict.keys())) #Sort for reproducibility
         corrs = self.getLongNames ( corrs, datasetOrder )
 
-        datasets = [datasetDict[dsLabel] for dsLabel in datasetOrder]
+        # datasets = [datasetDict[dsLabel] for dsLabel in datasetOrder]
+        datasets = []
+        import copy
+        for dsLabel in datasetOrder:
+            # newds = datasetDict[dsLabel]
+            newds = copy.deepcopy ( datasetDict[dsLabel] )
+            newds.dataInfo.lumi = datasetDict[dsLabel].globalInfo.lumi
+            newds.dataInfo.dataId = dsLabel
+            # print ( "newds", dsLabel, datasetDict[dsLabel].dataInfo.dataId )
+            datasets.append ( newds )
+
         n_datasets = len(datasets)
 
         #Check if the dataset labels are unique:
@@ -211,6 +222,19 @@ class SignalRegionsCombiner():
         self.fakeResult.analysisIDs = ana_ids
         self.fakeResult.globalInfo = Info()
         self.fakeResult.globalInfo.id = f"FakeResult[{'+'.join(set(ana_ids))}]"
+        totlumi = {}
+        for d in datasets:
+            coll = "CMS"
+            if "ATLAS" in d.globalInfo.id:
+                coll = "ATLAS"
+            lumi = d.dataInfo.lumi
+            sqrts = d.globalInfo.sqrts
+            label = coll + str(sqrts)
+            if not label in totlumi:
+                totlumi[label]=0./fb
+            totlumi[label]+=lumi
+        lumi = sum ( totlumi.values(), start=0./fb )
+        self.fakeResult.globalInfo.lumi = lumi
         self.fakeResult.globalInfo.datasetOrder = datasetOrder
         self.fakeResult.globalInfo.covariance = list ( covariance_matrix )
         #print ( "datasetOrder=", datasetOrder )
