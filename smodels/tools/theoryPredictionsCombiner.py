@@ -148,11 +148,11 @@ class TheoryPredictionsCombiner():
                     deltas_rel = deltas_rel, expected = False )
         nll0 = self.getLikelihood ( self.muhat, marginalize = marginalize,
                                     nll = True )
-        print ( "COMB nll0", nll0 )
+        # print ( "COMB nll0", nll0 )
         ## not exactly the same thing, is it?
         nll0A = self.getLikelihood ( self.muhat, marginalize = marginalize,
                                      expected = True, nll = True )
-        print ( "COMB nll0A", nll0A )
+        # print ( "COMB nll0A", nll0A )
 
         def root_func(mu):
             nll = self.getLikelihood( mu, marginalize=marginalize, nll=True )

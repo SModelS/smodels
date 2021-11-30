@@ -11,13 +11,9 @@
 
 """
 
-from __future__ import print_function
-
 from scipy import stats, optimize, integrate, special, linalg
 from numpy  import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
-from smodels.experiment.expResultObj import ExpResult
-from smodels.experiment.infoObj import Info
 
 import numpy as np
 import math
@@ -63,6 +59,9 @@ class Data:
         self.covariance = self._convertCov(covariance)
         self.nsignal = self.convert(nsignal)
         if self.nsignal is None:
+            if len ( self.backgrounds ) == 1:
+                # doesnt matter, does it?
+                self.nsignal = np.array ( [1.] )
             self.signal_rel = self.convert(1.)
         elif self.nsignal.sum():
             self.signal_rel = self.nsignal/self.nsignal.sum()
@@ -92,7 +91,8 @@ class Data:
         """
         Is the total number of signal events zero?
         """
-
+        if self.nsignal is None:
+            return True
         return len(self.nsignal[self.nsignal>0.]) == 0
 
     def var_s(self,nsig=None):
@@ -391,7 +391,7 @@ class LikelihoodComputer:
                 return x.is_integer()
             return False
         ## not needed for now
-        allintegers = True # np.all ( [is_integer( i ) for i in obs ] )
+        allintegers = np.all ( [is_integer( i ) for i in obs ] )
         if nll:
             if allintegers:
                 poisson = stats.poisson.logpmf( obs, lmbda )
@@ -803,15 +803,16 @@ class UpperLimitComputer:
             #model.observed = model.backgrounds
             for i,d in enumerate(model.backgrounds):
                 # model.observed[i]=int(np.ceil(d))
-                model.observed[i]=int(np.round(d))
-                # model.observed[i]=float(d)
+                #model.observed[i]=int(np.round(d))
+                model.observed[i]=float(d)
         computer = LikelihoodComputer(model, toys)
         mu_hat = computer.findMuHat(model.signal_rel)
         theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
         sigma_mu = computer.getSigmaMu(model.signal_rel)
 
         aModel = copy.deepcopy(model)
-        aModel.observed = array([np.round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
+        aModel.observed = array([ x+y for x,y in zip(model.backgrounds,theta_hat0)])
+        # aModel.observed = array([np.round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
         """
         if marginalize == False and expected == True:
             model.observed = array([np.round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
@@ -844,6 +845,8 @@ class UpperLimitComputer:
         nll0A = compA.likelihood(aModel.signals(mu_hatA),
                                    marginalize=marginalize,
                                    nll=True)
+        #print ( "SL nll0", nll0 )
+        #print ( "SL nll0A", nll0A )
 
         def root_func(mu):
             ## the function to find the zero of (ie CLs - alpha)
