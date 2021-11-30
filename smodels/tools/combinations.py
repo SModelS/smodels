@@ -42,9 +42,8 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
         no = nobs
 
         ret = computer.ulSigma(Data(observed=no, backgrounds=bg, covariance=cov,
-                                    third_moment=None, nsignal=nsig, deltas_rel=deltas_rel),
-                                    marginalize=dataset._marginalize,
-                                    expected=expected)
+                             third_moment=None, nsignal=nsig, deltas_rel=deltas_rel),
+                             marginalize=dataset._marginalize, expected=expected)
 
         if ret != None:
             #Convert limit on total number of signal events to a limit on sigma*eff

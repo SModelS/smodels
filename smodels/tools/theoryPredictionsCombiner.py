@@ -11,7 +11,8 @@
 
 """
 
-import math
+import numpy as np
+from smodels.tools.smodelsLogging import logger
 
 class TheoryPredictionsCombiner():
     """
@@ -82,11 +83,15 @@ class TheoryPredictionsCombiner():
         """ find lmax. """
         import scipy.optimize
         def fun ( mu, *myargs ):
-            return - math.log ( self.getLikelihood ( mu, marginalize = myargs[0],
+            return - np.log ( self.getLikelihood ( mu, marginalize = myargs[0],
                                                      deltas_rel = myargs[1] ) )
         o = scipy.optimize.minimize ( fun, 1., args = ( marginalize, deltas_rel ) )
-        self.lmax = math.exp ( - o.fun )
+        self.lmax = np.exp ( - o.fun )
+        logger.debug ( "result", o )
         self.muhat = o.x[0]
+        ## the inverted hessian is a good approximation for the variance at the
+        ## minimum
+        self.sigmahat = np.sqrt ( o.hess_inv[0][0] )
 
     def getLikelihood(self,mu=1.,marginalize=False,deltas_rel=.2,expected=False):
         """
@@ -105,29 +110,74 @@ class TheoryPredictionsCombiner():
                                              deltas_rel=deltas_rel,expected=expected)
         return llhd
 
-    def getUpperLimit(self, expected=False, deltas_rel=0.2):
-        """ not yet implemented. get upper limit, i.e. value for mu for
+    def getUpperLimitOnMu(self, marginalize=False, expected=False, deltas_rel=0.2):
+        """ get upper limit on signal strength multiplier, i.e. value for mu for
             which CLs = 0.95
+        :param marginalize: if true, marginalize nuisances. Else, profile them.
+        :param expected: if True, compute expected likelihood, else observed
+        :param deltas_rel: relative uncertainty in signal (float).
+                           Default value is 20%.
+        :returns: upper limit on signal strength multiplier mu
         """
-        #if not hasattr ( self, "lsm" ):
-        #    self.computeStatistics ( False, deltas_rel, False )
-        lower,upper=self.muhat/5.,self.muhat*5.
+        ## lower and upper bounds on mu that we scan
+        ## +/- 3 sigma should cover it up to < 1 permille
+        lower, upper = self.muhat - 4*self.sigmahat, self.muhat + 4*self.sigmahat
+
+        ## for one-sided cases we go up to 4.5 sigma, has similar p value.
+        if lower < 0.:
+            lower = 0.
+            upper = 4.5 * self.sigmahat
         if expected:
-            lower,upper = 0., self.muhat*3.
+            lower,upper = 0., self.sigmahat * 4.5
         llhds={}
         totllhd=0.
-        for mu in np.arange ( lower, upper, lower ):
-            llhd = self.getLikelihood ( mu, 
+        nbins = 50.
+        delta = upper / (nbins-1)
+        for mu in np.arange ( lower, upper*1.0001, delta):
+            llhd = self.getLikelihood ( mu, marginalize=marginalize, 
+                                        deltas_rel = deltas_rel, expected=expected )
+            llhds[mu]=llhd
+            totllhd+=llhd
+        ## last likelihood should contribute less than 1 permille
+        if llhd > totllhd * 1e-3:
+            logger.warning ( f"when discretizing likelihood, last bin contributes too much {llhd/totllhd}" )
 
-        return None
+        cum, lastcum, lastmu = 0., 0., 0.
+        alpha = .05
+        significance = 1. - alpha
+        for mu_,cdf_ in llhds.items():
+            cum += cdf_/totllhd
+            llhds[mu_]=cdf_/totllhd
+            if cum > significance:
+                k = ( cum - lastcum ) / ( mu_ - lastmu )
+                d = cum - k * mu_
+                mu_ret = ( significance - d ) / k
+                return mu_ret
+            lastcum = cum
+            lastmu = mu_
 
-    def getRValue ( self, expected = False ):
-        """ not yet implemented, get r-value """
-        upperLimit = self.getUpperLimit(expected)
-        if upperLimit is None or upperLimit.asNumber(fb)==0.:
-            return None
-        return None
+    def getUpperLimit(self, marginalize=False, expected=False, deltas_rel=0.2):
+        """ get upper limit on *fiducial* cross sections
+            which CLs = 0.95
+        :param marginalize: if true, marginalize nuisances. Else, profile them.
+        :param expected: if True, compute expected likelihood, else observed
+        :param deltas_rel: relative uncertainty in signal (float).
+                           Default value is 20%.
+        :returns: upper limit on *fiducial* cross sections (list)
+        """
+        clmu = self.getUpperLimitOnMu ( marginalize, expected, deltas_rel )
+        ret = []
+        for tp in self.theoryPredictions:
+            ret.append ( tp.xsection.value * clmu )
+        return ret
 
-    def getPValue ( self ):
-        """ is this needed? """
-        return None
+    def getRValue(self, marginalize=False, expected=False, deltas_rel=0.2):
+        """ obtain r-value, i.e. predicted_xsec / ul
+        :param marginalize: if true, marginalize nuisances. Else, profile them.
+        :param expected: if True, compute expected likelihood, else observed
+        :param deltas_rel: relative uncertainty in signal (float).
+                           Default value is 20%.
+        :returns: r-value
+        """
+        clmu = self.getUpperLimitOnMu ( marginalize, expected, deltas_rel )
+        return 1. / clmu

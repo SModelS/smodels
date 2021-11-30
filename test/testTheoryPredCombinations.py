@@ -40,13 +40,15 @@ class CombinedTheoryPredsTest(unittest.TestCase):
                 combinedResults=False, useBestDataset=False, marginalize = False )
             for t in ts: 
                 t.computeStatistics()
-                print ( "er", str(er), "lsm", t.lsm, "lmax", t.lmax )
+                # print ( "er", str(er), "lsm", t.lsm, "lmax", t.lmax )
                 tpreds.append ( t )
         combiner = TheoryPredictionsCombiner ( tpreds )
         combiner.computeStatistics()
-        print ( "combiner lsm", combiner.lsm )
-        print ( "combiner likelihood", combiner.likelihood )
-        print ( "combiner lmax", combiner.lmax )
+        ulmu = combiner.getUpperLimitOnMu()
+        self.assertAlmostEqual ( combiner.lsm, 2.756169857697467e-06, 4 )
+        self.assertAlmostEqual ( combiner.likelihood, 5.001298746531528e-06, 4 )
+        self.assertAlmostEqual ( combiner.lmax, 5.131156389020586e-06, 4 )
+        self.assertAlmostEqual ( ulmu, 3.606980755048784, 3 )
 
 
 if __name__ == "__main__":
