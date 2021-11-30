@@ -800,10 +800,16 @@ class UpperLimitComputer:
         oldmodel = model
         if expected:
             model = copy.deepcopy(oldmodel)
+            posterior = False
+            if posterior:
+                tempc = LikelihoodComputer(oldmodel, toys)
+                theta_hat_,_ = tempc.findThetaHat(0*oldmodel.signal_rel)
             #model.observed = model.backgrounds
             for i,d in enumerate(model.backgrounds):
                 # model.observed[i]=int(np.ceil(d))
                 #model.observed[i]=int(np.round(d))
+                if posterior:
+                    d+=theta_hat_[i]
                 model.observed[i]=float(d)
         computer = LikelihoodComputer(model, toys)
         mu_hat = computer.findMuHat(model.signal_rel)
