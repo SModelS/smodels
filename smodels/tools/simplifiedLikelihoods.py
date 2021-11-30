@@ -19,7 +19,7 @@ from functools import reduce
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.infoObj import Info
 
-import numpy as NP
+import numpy as np
 import math
 import copy
 
