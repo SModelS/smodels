@@ -50,6 +50,12 @@ class TheoryPredictionsCombiner():
                                              deltas_rel=deltas_rel,expected=expected)
         return ret
 
+    def chi2( self ):
+        if not hasattr ( self, "likelihood" ):
+            logger.error ( "call computeStatistics before calling chi2" )
+            return
+        return - 2 * np.log ( self.likelihood / self.lmax )
+
     def computeStatistics(self,marginalize=False,deltas_rel=0.2, expected=False ):
         """
         Compute the likelihoods, chi2, and upper limit for this combination
@@ -93,7 +99,8 @@ class TheoryPredictionsCombiner():
         ## minimum
         self.sigmahat = np.sqrt ( o.hess_inv[0][0] )
 
-    def getLikelihood(self,mu=1.,marginalize=False,deltas_rel=.2,expected=False):
+    def getLikelihood(self,mu=1.,marginalize=False,deltas_rel=.2,expected=False,
+                      nll = False ):
         """
         Compute the likelihood at a given mu
         :param mu: signal strength
@@ -101,6 +108,7 @@ class TheoryPredictionsCombiner():
         :param deltas_rel: relative uncertainty in signal (float).
                            Default value is 20%.
         :param expected: if True, compute expected likelihood, else observed
+        :param nll: if True, return negative log likelihood, else likelihood
         """
         llhd = 1.
         for tp in self.theoryPredictions:
@@ -108,7 +116,26 @@ class TheoryPredictionsCombiner():
             nsig = (tp.xsection.value*lumi).asNumber()
             llhd = llhd * tp.dataset.likelihood(mu*nsig,marginalize=marginalize,
                                              deltas_rel=deltas_rel,expected=expected)
+        if nll:
+            return - np.log ( llhd )
         return llhd
+
+    def getUpperLimitOnMuNew(self, marginalize=False, expected=False, deltas_rel=0.2):
+        """ get upper limit on signal strength multiplier, i.e. value for mu for
+            which CLs = 0.95
+        :param marginalize: if true, marginalize nuisances. Else, profile them.
+        :param expected: if True, compute expected likelihood, else observed
+        :param deltas_rel: relative uncertainty in signal (float).
+                           Default value is 20%.
+        :returns: upper limit on signal strength multiplier mu
+        """
+        if not hasattr ( self, "muhat" ):
+            self.computeStatistics( marginalize = marginalize, 
+                    deltas_rel = deltas_rel, expected = False )
+        nll0 = self.getLikelihood ( self.muhat, marginalize = marginalize,
+                                    nll = True )
+        print ( "COMBO nll0", nll0 )
+        return None
 
     def getUpperLimitOnMu(self, marginalize=False, expected=False, deltas_rel=0.2):
         """ get upper limit on signal strength multiplier, i.e. value for mu for
@@ -119,6 +146,9 @@ class TheoryPredictionsCombiner():
                            Default value is 20%.
         :returns: upper limit on signal strength multiplier mu
         """
+        if not hasattr ( self, "muhat" ):
+            self.computeStatistics( marginalize = marginalize, 
+                    deltas_rel = deltas_rel, expected = False )
         ## lower and upper bounds on mu that we scan
         ## +/- 3 sigma should cover it up to < 1 permille
         lower, upper = self.muhat - 4*self.sigmahat, self.muhat + 4*self.sigmahat
