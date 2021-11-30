@@ -13,6 +13,8 @@
 
 import numpy as np
 from smodels.tools.smodelsLogging import logger
+import scipy.stats as stats
+import scipy.optimize as optimize
 
 class TheoryPredictionsCombiner():
     """
@@ -120,7 +122,19 @@ class TheoryPredictionsCombiner():
             return - np.log ( llhd )
         return llhd
 
-    def getUpperLimitOnMuNew(self, marginalize=False, expected=False, deltas_rel=0.2):
+    def signals ( self, mu ):
+        """
+        Returns the number of expected signal events, for all datasets,
+        given total signal strength mu.
+        :param mu: Total number of signal events summed over all datasets.
+        """
+        ret = []
+        for tp in self.theoryPredictions:
+            n = float ( mu * tp.dataset.getLumi() * tp.xsection.value )
+            ret.append ( n )
+        return ret
+
+    def getUpperLimitOnMu(self, marginalize=False, expected=False, deltas_rel=0.2):
         """ get upper limit on signal strength multiplier, i.e. value for mu for
             which CLs = 0.95
         :param marginalize: if true, marginalize nuisances. Else, profile them.
@@ -134,10 +148,86 @@ class TheoryPredictionsCombiner():
                     deltas_rel = deltas_rel, expected = False )
         nll0 = self.getLikelihood ( self.muhat, marginalize = marginalize,
                                     nll = True )
-        print ( "COMBO nll0", nll0 )
+        print ( "COMB nll0", nll0 )
+        ## not exactly the same thing, is it?
+        nll0A = self.getLikelihood ( self.muhat, marginalize = marginalize,
+                                     expected = True, nll = True )
+        print ( "COMB nll0A", nll0A )
+
+        def root_func(mu):
+            nll = self.getLikelihood( mu, marginalize=marginalize, nll=True )
+            nllA = self.getLikelihood( mu, marginalize=marginalize, expected=True, 
+                                       nll=True )
+            qmu =  2*( nll - nll0 )
+            if qmu<0.: qmu=0.
+            sqmu = np.sqrt (qmu)
+            qA =  2*( nllA - nll0A )
+            if qA<0.:
+                qA = 0.
+            sqA = np.sqrt(qA)
+            CLsb = 1. - stats.multivariate_normal.cdf(sqmu)
+            CLb = 0.
+            if qA >= qmu:
+                CLb =  stats.multivariate_normal.cdf(sqA - sqmu)
+            else:
+                if qA == 0.:
+                    CLsb = 1.
+                    CLb  = 1.
+                else:
+                    CLsb = 1. - stats.multivariate_normal.cdf( (qmu + qA)/(2*sqA) )
+                    CLb = 1. - stats.multivariate_normal.cdf( (qmu - qA)/(2*sqA) )
+            CLs = 0.
+            if CLb > 0.:
+                CLs = CLsb / CLb
+            cl = .95
+            root = CLs - 1. + cl
+            return root
+
+        a0 = root_func(0.)
+        if a0 < 0. and marginalize:
+            if toys < 20000:
+                return self.getUpperLimitOnMu ( mu, marginalize, 4*toys,
+                        expected = expected, trylasttime=False )
+            else:
+                if not trylasttime:
+                    return self.getUpperLimitOnMu( mu, False, toys,
+                                          expected = expected, trylasttime=True )
+                # it ends here
+                return None
+        a,b=1.5*self.muhat,2.5*self.muhat+2*self.sigmahat
+        ctr=0
+        while True:
+            while ( np.sign ( root_func(a)* root_func(b) ) > -.5 ):
+                b=1.4*b  ## widen bracket FIXME make a linear extrapolation!
+                a=a-(b-a)*.3 ## widen bracket
+                if a < 0.: a=0.
+                ctr+=1
+                if ctr>20: ## but stop after 20 trials
+                    if toys > 20000:
+                        logger.error("cannot find brent bracket after 20 trials. a,b=%s(%s),%s(%s), mu_hat=%.2f, sigma_mu=%.2f" % ( root_func(a),a,root_func(b),b,mu_hat, sigma_mu ) )
+                        logger.error("nll0=%s" % ( nll0 ) )
+                        if marginalize == True:
+                            return self.getUpperLimitOnMu( mu, marginalize = False,
+                                                  toys = toys, expected = expected,
+                                                  trylasttime = True )
+                        return float("inf") ## better choice than None
+                    else:
+                        logger.debug("cannot find brent bracket after 20 trials. but very low number of toys")
+                        return self.getUpperLimitOnMu ( mu, marginalize, 4*toys,
+                                              expected=expected, trylasttime = False )
+            try:
+                # root_func bei 0 sollte positiv sein, bei inf = -.05
+                mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
+                print ( "COMB returning", mu_lim )
+                return mu_lim
+            except ValueError as e: ## it could still be that the signs arent opposite
+                # in that case, try again
+                pass
+
+        ## and so on and so on
         return None
 
-    def getUpperLimitOnMu(self, marginalize=False, expected=False, deltas_rel=0.2):
+    def getUpperLimitOnMuOld(self, marginalize=False, expected=False, deltas_rel=0.2):
         """ get upper limit on signal strength multiplier, i.e. value for mu for
             which CLs = 0.95
         :param marginalize: if true, marginalize nuisances. Else, profile them.
