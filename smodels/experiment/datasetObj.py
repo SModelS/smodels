@@ -447,16 +447,15 @@ class DataSet(object):
 
         if not compute:
             if expected:
-                try:
-                    return self.dataInfo.expectedUpperLimit
-                except AttributeError:
+                if hasattr ( self.dataInfo, "upperLimit" ) and not hasattr ( self.dataInfo, "expectedUpperLimit" ):
                     logger.info("expectedUpperLimit field not found. Returning None instead.")
                     return None
-                    #return self.dataInfo.upperLimit
-                    #logger.info("expectedUpperLimit field not found. Using observed UL instead.")
-                    #return self.dataInfo.upperLimit
+
+                if hasattr ( self.dataInfo, "expectedUpperLimit" ):
+                    return self.dataInfo.expectedUpperLimit
             else:
-                return self.dataInfo.upperLimit
+                if hasattr ( self.dataInfo, "upperLimit" ):
+                    return self.dataInfo.upperLimit
 
         Nobs = self.dataInfo.observedN  #Number of observed events
         if expected:
