@@ -400,7 +400,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     efficiencies, combine the masses (if needed) and compute the conditions
     (if exist).
 
-    :parameter expResult: expResult to be considered (ExpResult object)
+    :parameter expResult: expResult to be considered (ExpResult object), if list of ExpResults is given, produce theory predictions for all
     :parameter smsTopList: list of topologies containing elements
                            (TopologyList object)
     :parameter maxMassDist: maximum mass distance for clustering elements (float)
@@ -415,6 +415,15 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction
                objects
     """
+    if type(expResult) in [ list, tuple ]:
+        ret = []
+        for er in expResult:
+            tpreds = theoryPredictionsFor ( er, smsTopList, maxMassDist, 
+                           useBestDataset, combinedResults, marginalize, deltas_rel )
+            if tpreds:
+                for tp in tpreds:
+                    ret.append ( tp )
+        return TheoryPredictionList ( ret )
 
     dataSetResults = []
     #Compute predictions for each data set (for UL analyses there is one single set)
