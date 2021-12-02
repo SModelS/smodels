@@ -13,6 +13,7 @@
 
 import numpy as np
 from smodels.tools.smodelsLogging import logger
+from smodels.tools.physicsUnits import fb
 import scipy.stats as stats
 import scipy.optimize as optimize
 
@@ -58,6 +59,23 @@ class TheoryPredictionsCombiner():
             return
         return - 2 * np.log ( self.likelihood / self.lmax )
 
+    def totalXsection ( self ):
+        ret = 0.*fb
+        if self.theoryPredictions != None:
+            for tp in self.theoryPredictions:
+                ret += tp.xsection.value
+        return ret
+
+    def getmaxCondition ( self ):
+        """
+        Returns the maximum xsection from the list conditions
+
+        :returns: maximum condition xsection (float)
+        """
+        conditions = [ tp.getmaxCondition() for tp in self.theoryPredictions ]
+        return max(conditions)
+
+
     def computeStatistics(self,marginalize=False,deltas_rel=0.2, expected=False ):
         """
         Compute the likelihoods, chi2, and upper limit for this combination
@@ -66,6 +84,8 @@ class TheoryPredictionsCombiner():
                            Default value is 20%.
         :param expected: if True, compute expected likelihood, else observed
         """
+        if self.theoryPredictions == None:
+            return
         if expected == "both":
             for e in [ False, True ]:
                 self.computeStatistics ( marginalize, deltas_rel, e )
@@ -152,6 +172,8 @@ class TheoryPredictionsCombiner():
             llhd = llhd * tp.dataset.likelihood(mu*nsig,marginalize=marginalize,
                                              deltas_rel=deltas_rel,expected=expected)
         if nll:
+            if llhd == 0.: ## cut off nll at 700 (1e-300)
+                return 700.
             return - np.log ( llhd )
         return llhd
 
@@ -237,13 +259,13 @@ class TheoryPredictionsCombiner():
         ctr=0
         while True:
             while ( np.sign ( root_func(a)* root_func(b) ) > -.5 ):
-                b=1.7*b  ## widen bracket FIXME make a linear extrapolation!
-                a=a-(b-a)*.4 ## widen bracket
+                b=1.73*b  ## widen bracket FIXME make a linear extrapolation!
+                a=a-(b-a)*.42 ## widen bracket
                 if a < 0.: a=0.
                 ctr+=1
-                if ctr>20: ## but stop after 20 trials
+                if ctr>30: ## but stop after 20 trials
                     if toys > 20000 or not marginalize:
-                        logger.error("cannot find brent bracket after 20 trials. f(a=%s)=%s,f(b=%s)=%s, mu_hat=%.2f, sigma_mu=%.2f" % ( a, root_func(a),b,root_func(b), self.mu_hat, self.sigma_mu ) )
+                        logger.error("cannot find brent bracket after 30 trials. f(a=%s)=%s,f(b=%s)=%s, mu_hat=%.2f, sigma_mu=%.2f" % ( a, root_func(a),b,root_func(b), self.mu_hat, self.sigma_mu ) )
                         logger.error("nll0=%s" % ( nll0 ) )
                         if marginalize == True:
                             return self.getUpperLimitOnMu( mu, marginalize = False,
