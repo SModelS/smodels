@@ -286,18 +286,23 @@ class LikelihoodComputer:
             ret = sum(ret)
         return ret
 
-    def findMuHat(self, signal_rel, allowNegativeSignals = False ):
+    def findMuHat(self, signal_rel, allowNegativeSignals = False,
+            extended_output = False, nll = False, marginalize = False ):
         """
         Find the most likely signal strength mu
         given the relative signal strengths in each dataset (signal region).
 
         :param signal_rel: array with relative signal strengths
         :param allowNegativeSignals: if true, then also allow for negative values
+        :param extended_output: if true, return also sigma_mu, the estimate of the error of mu_hat, and lmax, the likelihood at mu_hat
+        :param nll: if true, return nll instead of lmax in the extended output
 
-        :returns: mu_hat, the maximum likelihood estimate of mu
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu
         """
 
         if (self.model.backgrounds == self.model.observed).all():
+            if extended_output:
+                return 0., 0., 0.
             return 0.
 
         if type(signal_rel) in [list, ndarray]:
@@ -333,6 +338,8 @@ class LikelihoodComputer:
             if total_sign > -.5:
                 if upper_v < lower_v < 0.:
                     ## seems like we really want to go for mu_hat = 0.
+                    if extended_output:
+                        return 0., 0., 0.
                     return 0.
                 if allowNegativeSignals:
                     logger.debug ( "weird. cant find a zero in the Brent bracket "\
@@ -355,6 +362,13 @@ class LikelihoodComputer:
             theta_hat,_ = self.findThetaHat( mu_hat*signal_rel)
             ctr+=1
 
+        if extended_output:
+            sigma_mu = self.getSigmaMu( self.model.signal_rel)
+            llhd = self.likelihood( self.model.signals(mu_hat),
+                                     marginalize=marginalize,
+                                     nll=nll )
+            ret = mu_hat, sigma_mu, llhd
+            return ret
         return mu_hat
 
     def getSigmaMu(self, signal_rel):
@@ -731,7 +745,7 @@ class LikelihoodComputer:
             if not allowNegativeSignals and nsig[0]<0.:
                 nsig = [ 0. ]
             return self.likelihood(nsig, marginalize=marginalize, nll=nll )
-        muhat = self.findMuHat ( nsig , allowNegativeSignals = allowNegativeSignals )
+        muhat_, sigma_mu, lmax = self.findMuHat ( nsig , allowNegativeSignals = allowNegativeSignals, extended_output=True, nll=nll )
         return self.likelihood(muhat*nsig, marginalize=marginalize, nll=nll )
 
     def chi2(self, nsig, marginalize=False):
@@ -786,7 +800,9 @@ class UpperLimitComputer:
 
         :params marginalize: if true, marginalize nuisances, else profile them
         :params toys: specify number of toys. Use default is none
-        :params expected: compute the expected value, not the observed.
+        :params expected: if false, compute observed, 
+                          true: compute a priori expected, "posteriori":  
+                          compute a posteriori expected
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on yields
         """
@@ -800,43 +816,30 @@ class UpperLimitComputer:
         oldmodel = model
         if expected:
             model = copy.deepcopy(oldmodel)
-            posterior = False
-            if posterior:
+            if expected == "posteriori":
+                # print ( "here!" )
                 tempc = LikelihoodComputer(oldmodel, toys)
                 theta_hat_,_ = tempc.findThetaHat(0*oldmodel.signal_rel)
             #model.observed = model.backgrounds
             for i,d in enumerate(model.backgrounds):
                 # model.observed[i]=int(np.ceil(d))
                 #model.observed[i]=int(np.round(d))
-                if posterior:
+                if expected == "posteriori":
                     d+=theta_hat_[i]
                 model.observed[i]=float(d)
         computer = LikelihoodComputer(model, toys)
-        mu_hat = computer.findMuHat(model.signal_rel)
+        mu_hat = computer.findMuHat(model.signal_rel, extended_output = False )
         theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
         sigma_mu = computer.getSigmaMu(model.signal_rel)
+        
+        #print ( f"SL theta_hat0: {theta_hat0} obs: {model.observed[0]:.3f} expbg: {model.backgrounds[0]:.3f}" )
 
-        aModel = copy.deepcopy(model)
-        aModel.observed = array([ x+y for x,y in zip(model.backgrounds,theta_hat0)])
-        # aModel.observed = array([np.round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
-        """
-        if marginalize == False and expected == True:
-            model.observed = array([np.round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
-            mu_hat = computer.findMuHat(model.signal_rel)
-            theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
-            sigma_mu = computer.getSigmaMu(model.signal_rel)
-        """
-        #print ( "aModeldata=", aModel.observed )
-        #aModel.observed = array ( [ round(x) for x in model.backgrounds ] )
-        aModel.name = aModel.name + "A"
-        compA = LikelihoodComputer(aModel, toys)
-        ## compute
-        mu_hatA = compA.findMuHat(aModel.signal_rel)
         if mu_hat < 0.:
             mu_hat = 0.
         nll0 = computer.likelihood(model.signals(mu_hat),
                                      marginalize=marginalize,
                                      nll=True)
+        # print ( f"SL nll0 {nll0:.3f} muhat {mu_hat:.3f} sigma_mu {sigma_mu:.3f}" )
         if np.isinf(nll0) and marginalize==False and not trylasttime:
             logger.warning("nll is infinite in profiling! we switch to marginalization, but only for this one!" )
             marginalize=True
@@ -848,11 +851,18 @@ class UpperLimitComputer:
                 marginalize=False
             else:
                 logger.warning("marginalization worked.")
+        aModel = copy.deepcopy(model)
+        aModel.observed = array([ x+y for x,y in zip(model.backgrounds,theta_hat0)])
+        aModel.name = aModel.name + "A"
+        #print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
+        compA = LikelihoodComputer(aModel, toys)
+        ## compute
+        mu_hatA = compA.findMuHat(aModel.signal_rel)
         nll0A = compA.likelihood(aModel.signals(mu_hatA),
                                    marginalize=marginalize,
                                    nll=True)
-        #print ( "SL nll0", nll0 )
-        #print ( "SL nll0A", nll0A )
+        # print ( f"SL nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f} bg {aModel.backgrounds[0]:.3f} obs {aModel.observed[0]:.3f}" )
+        #return 1.
 
         def root_func(mu):
             ## the function to find the zero of (ie CLs - alpha)
@@ -907,7 +917,7 @@ class UpperLimitComputer:
                 if a < 0.: a=0.
                 ctr+=1
                 if ctr>20: ## but stop after 20 trials
-                    if toys > 20000:
+                    if toys > 20000 and not marginalize:
                         logger.error("cannot find brent bracket after 20 trials. a,b=%s(%s),%s(%s), mu_hat=%.2f, sigma_mu=%.2f" % ( root_func(a),a,root_func(b),b,mu_hat, sigma_mu ) )
                         logger.error("nll0=%s" % ( nll0 ) )
                         if marginalize == True:
@@ -922,6 +932,7 @@ class UpperLimitComputer:
             try:
                 # root_func bei 0 sollte positiv sein, bei inf = -.05
                 mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
+                # print ( f"SL    mu_lim {mu_lim:.3f}" )
                 return mu_lim
             except ValueError as e: ## it could still be that the signs arent opposite
                 # in that case, try again

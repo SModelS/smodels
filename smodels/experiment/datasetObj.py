@@ -279,16 +279,28 @@ class DataSet(object):
         :param nsig: predicted signal (float)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
-        :param expected: Compute expected instead of observed likelihood
+        :param expected: if true, compute prior expected, if false compute observed
+                         if "posteriori" compute posterior expected
         :returns: likelihood to observe nobs events (float)
         """
         obs = self.dataInfo.observedN
-        if expected:
+        if expected == True:
             obs = self.dataInfo.expectedBG
 
         m = Data( obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
                        deltas_rel=deltas_rel )
         computer = LikelihoodComputer(m)
+        if expected == "posteriori":
+            thetahat = computer.findThetaHat ( 0. )
+            if type ( self.dataInfo.expectedBG ) in [ float, np.float64 ]:
+                thetahat = float ( thetahat[0] )
+            obs = self.dataInfo.expectedBG + thetahat
+            m = Data( obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
+                           deltas_rel=deltas_rel )
+            #if abs ( nsig[0]-1 ) < 1e-5:
+            #    print ( f"COMB ebg={self.dataInfo.expectedBG:.3f} obs={obs:.3f} nsig {nsig[0]:.3f}" )
+            computer = LikelihoodComputer(m)
+            
         return computer.likelihood(nsig, marginalize=marginalize)
 
     def lmax( self, deltas_rel=0.2, marginalize=False, expected=False,
@@ -306,8 +318,16 @@ class DataSet(object):
         :returns: likelihood to observe nobs events (float)
         """
         obs = self.dataInfo.observedN
+        posterior = True
         if expected:
             obs = self.dataInfo.expectedBG
+            if posterior:
+                computer = LikelihoodComputer(m)
+                thetahat = computer.findThetaHat ( 0. )
+                if type ( self.dataInfo.expectedBG ) in [ float, np.float64 ]:
+                    thetahat = float ( thetahat[0] )
+                obs = self.dataInfo.expectedBG + thetahat
+            
 
         m = Data( obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
                        deltas_rel=deltas_rel )

@@ -46,8 +46,8 @@ class TheoryPredictionsCombiner():
         """
         ret = 1.
         for tp in self.theoryPredictions:
-            lumi = self.dataset.getLumi()
-            nsig = (self.xsection.value*lumi).asNumber()
+            lumi = tp.dataset.getLumi()
+            nsig = (tp.xsection.value*lumi).asNumber()
             ret = ret * tp.dataset.likelihood(mu*nsig,marginalize=marginalize,
                                              deltas_rel=deltas_rel,expected=expected)
         return ret
@@ -81,28 +81,54 @@ class TheoryPredictionsCombiner():
         if expected:
             self.elikelihood = llhd
             self.elsm = lsm
+            ## posterior expected
             self.elmax = lsm
         else:
             self.likelihood = llhd
             self.lsm = lsm
-        self.computeLMax ( marginalize = marginalize, deltas_rel = deltas_rel )
+        self.mu_hat, self.sigma_mu, self.lmax = self.findMuHat ( marginalize = marginalize, deltas_rel = deltas_rel, extended_output = True )
 
-    def computeLMax(self,marginalize=False, deltas_rel=.2 ):
-        """ find lmax. """
+    def findMuHat( self,marginalize=False, deltas_rel=.2, allowNegativeSignals = False, expected = False, extended_output = False, nll=False ):
+        """ find muhat and lmax.
+        :param allowNegativeSignals: if true, then also allow for negative values
+        :param expected: if true, compute expected prior (=lsm), if "posteriori"
+                         compute posteriori expected
+        :param extended_output: if true, return also sigma_mu, the estimate of the error of mu_hat, and lmax, the likelihood at mu_hat
+        :param nll: if true, return negative log max likelihood instead of lmax
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu
+        """
         import scipy.optimize
         def fun ( mu, *myargs ):
             return - np.log ( self.getLikelihood ( mu, marginalize = myargs[0],
-                                                     deltas_rel = myargs[1] ) )
+                        deltas_rel = myargs[1], expected = expected, 
+                        useRelSigStrengths = True ) )
         o = scipy.optimize.minimize ( fun, 1., args = ( marginalize, deltas_rel ) )
-        self.lmax = np.exp ( - o.fun )
+        lmax = np.exp ( - o.fun )
         logger.debug ( "result", o )
-        self.muhat = o.x[0]
+        mu_hat = o.x[0]
+        if not allowNegativeSignals and mu_hat < 0.:
+            mu_hat = 0.
         ## the inverted hessian is a good approximation for the variance at the
         ## minimum
-        self.sigmahat = np.sqrt ( o.hess_inv[0][0] )
+        sigma_mu = np.sqrt ( o.hess_inv[0][0] )
+        if nll:
+            lmax = - np.log(lmax)
+        if extended_output:
+            return mu_hat, sigma_mu, lmax
+        return mu_hat
+    
+    def getNSigtot ( self ):
+        """ get the total number of signal events, summed over
+            all theory predictions. needed for normalizations. """
+        S = 0.
+        for tp in self.theoryPredictions:
+            lumi = tp.dataset.getLumi()
+            nsig = (tp.xsection.value*lumi).asNumber()
+            S += nsig
+        return S
 
     def getLikelihood(self,mu=1.,marginalize=False,deltas_rel=.2,expected=False,
-                      nll = False ):
+                      nll = False, useRelSigStrengths = True ):
         """
         Compute the likelihood at a given mu
         :param mu: signal strength
@@ -111,11 +137,18 @@ class TheoryPredictionsCombiner():
                            Default value is 20%.
         :param expected: if True, compute expected likelihood, else observed
         :param nll: if True, return negative log likelihood, else likelihood
+        :param useRelSigStrengths: if True, get the likelihood not on signal strength mu, but on relative signal strength, total_nsig = 1 for mu = 1
         """
         llhd = 1.
+        S = 1.
+        if useRelSigStrengths:
+            S = self.getNSigtot()
+
         for tp in self.theoryPredictions:
             lumi = tp.dataset.getLumi()
             nsig = (tp.xsection.value*lumi).asNumber()
+            if useRelSigStrengths:
+                nsig = nsig / S
             llhd = llhd * tp.dataset.likelihood(mu*nsig,marginalize=marginalize,
                                              deltas_rel=deltas_rel,expected=expected)
         if nll:
@@ -143,21 +176,27 @@ class TheoryPredictionsCombiner():
                            Default value is 20%.
         :returns: upper limit on signal strength multiplier mu
         """
-        if not hasattr ( self, "muhat" ):
+        if not hasattr ( self, "mu_hat" ):
             self.computeStatistics( marginalize = marginalize, 
                     deltas_rel = deltas_rel, expected = False )
-        nll0 = self.getLikelihood ( self.muhat, marginalize = marginalize,
-                                    nll = True )
-        # print ( "COMB nll0", nll0 )
-        ## not exactly the same thing, is it?
-        nll0A = self.getLikelihood ( self.muhat, marginalize = marginalize,
-                                     expected = True, nll = True )
-        # print ( "COMB nll0A", nll0A )
+        #nll0 = self.getLikelihood ( self.mu_hat, marginalize = marginalize,
+        #                            nll = True )
+        nll0 = self.getLikelihood ( self.mu_hat, marginalize = marginalize,
+                                    nll = True, useRelSigStrengths = True )
+        toys = 30000
+        #print ( f"COMB nll0 {nll0:.3f} mu_hat {self.mu_hat:.3f} sigma_mu {self.sigma_mu:.3f}" )
+        ## a posteriori expected is needed here
+        # mu_hat is mu_hat for signal_rel
+        mu_hatA,_,nll0A = self.findMuHat ( marginalize = False, deltas_rel = .2,
+                           expected = "posteriori", nll=True, extended_output= True )
+        #print ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
+        #return 1.
 
         def root_func(mu):
-            nll = self.getLikelihood( mu, marginalize=marginalize, nll=True )
+            nll = self.getLikelihood( mu, marginalize=marginalize, nll=True,
+                     expected= expected, useRelSigStrengths = True )
             nllA = self.getLikelihood( mu, marginalize=marginalize, expected=True, 
-                                       nll=True )
+                     nll=True, useRelSigStrengths = True )
             qmu =  2*( nll - nll0 )
             if qmu<0.: qmu=0.
             sqmu = np.sqrt (qmu)
@@ -187,24 +226,24 @@ class TheoryPredictionsCombiner():
         if a0 < 0. and marginalize:
             if toys < 20000:
                 return self.getUpperLimitOnMu ( mu, marginalize, 4*toys,
-                        expected = expected, trylasttime=False )
+                     expected = expected, trylasttime=False )
             else:
                 if not trylasttime:
                     return self.getUpperLimitOnMu( mu, False, toys,
                                           expected = expected, trylasttime=True )
                 # it ends here
                 return None
-        a,b=1.5*self.muhat,2.5*self.muhat+2*self.sigmahat
+        a,b=1.5*self.mu_hat,2.5*self.mu_hat+2*self.sigma_mu
         ctr=0
         while True:
             while ( np.sign ( root_func(a)* root_func(b) ) > -.5 ):
-                b=1.4*b  ## widen bracket FIXME make a linear extrapolation!
-                a=a-(b-a)*.3 ## widen bracket
+                b=1.7*b  ## widen bracket FIXME make a linear extrapolation!
+                a=a-(b-a)*.4 ## widen bracket
                 if a < 0.: a=0.
                 ctr+=1
                 if ctr>20: ## but stop after 20 trials
-                    if toys > 20000:
-                        logger.error("cannot find brent bracket after 20 trials. a,b=%s(%s),%s(%s), mu_hat=%.2f, sigma_mu=%.2f" % ( root_func(a),a,root_func(b),b,mu_hat, sigma_mu ) )
+                    if toys > 20000 or not marginalize:
+                        logger.error("cannot find brent bracket after 20 trials. f(a=%s)=%s,f(b=%s)=%s, mu_hat=%.2f, sigma_mu=%.2f" % ( a, root_func(a),b,root_func(b), self.mu_hat, self.sigma_mu ) )
                         logger.error("nll0=%s" % ( nll0 ) )
                         if marginalize == True:
                             return self.getUpperLimitOnMu( mu, marginalize = False,
@@ -218,8 +257,8 @@ class TheoryPredictionsCombiner():
             try:
                 # root_func bei 0 sollte positiv sein, bei inf = -.05
                 mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
-                print ( "COMB returning", mu_lim )
-                return mu_lim
+                # print ( f"COMBO mu_lim {mu_lim:.3f} expected {expected}" )
+                return mu_lim 
             except ValueError as e: ## it could still be that the signs arent opposite
                 # in that case, try again
                 pass
@@ -236,19 +275,19 @@ class TheoryPredictionsCombiner():
                            Default value is 20%.
         :returns: upper limit on signal strength multiplier mu
         """
-        if not hasattr ( self, "muhat" ):
+        if not hasattr ( self, "mu_hat" ):
             self.computeStatistics( marginalize = marginalize, 
                     deltas_rel = deltas_rel, expected = False )
         ## lower and upper bounds on mu that we scan
         ## +/- 3 sigma should cover it up to < 1 permille
-        lower, upper = self.muhat - 4*self.sigmahat, self.muhat + 4*self.sigmahat
+        lower, upper = self.mu_hat - 4*self.sigma_mu, self.mu_hat + 4*self.sigma_mu
 
         ## for one-sided cases we go up to 4.5 sigma, has similar p value.
         if lower < 0.:
             lower = 0.
-            upper = 4.5 * self.sigmahat
+            upper = 4.5 * self.sigma_mu
         if expected:
-            lower,upper = 0., self.sigmahat * 4.5
+            lower,upper = 0., self.sigma_mu * 4.5
         llhds={}
         totllhd=0.
         nbins = 50.
@@ -300,4 +339,11 @@ class TheoryPredictionsCombiner():
         :returns: r-value
         """
         clmu = self.getUpperLimitOnMu ( marginalize, expected, deltas_rel )
-        return 1. / clmu
+        #ret = []
+        xsecs = []
+        for tp in self.theoryPredictions:
+            xsecs.append ( float (tp.xsection.value * tp.dataset.getLumi() ) )
+        #return ret
+        #print ( "clmu", clmu )
+        #print ( "xsecs", xsecs )
+        return sum(xsecs) / clmu
