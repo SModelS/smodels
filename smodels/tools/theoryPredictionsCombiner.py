@@ -182,7 +182,7 @@ class TheoryPredictionsCombiner():
         #nll0 = self.getLikelihood ( self.mu_hat, marginalize = marginalize,
         #                            nll = True )
         nll0 = self.getLikelihood ( self.mu_hat, marginalize = marginalize,
-                                    nll = True, useRelSigStrengths = True )
+                        expected = expected, nll = True, useRelSigStrengths = True )
         toys = 30000
         #print ( f"COMB nll0 {nll0:.3f} mu_hat {self.mu_hat:.3f} sigma_mu {self.sigma_mu:.3f}" )
         ## a posteriori expected is needed here
@@ -195,8 +195,8 @@ class TheoryPredictionsCombiner():
         def root_func(mu):
             nll = self.getLikelihood( mu, marginalize=marginalize, nll=True,
                      expected= expected, useRelSigStrengths = True )
-            nllA = self.getLikelihood( mu, marginalize=marginalize, expected=True, 
-                     nll=True, useRelSigStrengths = True )
+            nllA = self.getLikelihood( mu, marginalize=marginalize, 
+                     expected="posteriori", nll=True, useRelSigStrengths = True )
             qmu =  2*( nll - nll0 )
             if qmu<0.: qmu=0.
             sqmu = np.sqrt (qmu)
