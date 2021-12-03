@@ -14,6 +14,7 @@
 from scipy import stats, optimize, integrate, special, linalg
 from numpy  import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
+from smodels.tools.statistics import rootFromNLLs
 
 import numpy as np
 import math
@@ -870,30 +871,7 @@ class UpperLimitComputer:
             computer.ntot = model.backgrounds + nsig
             nll = computer.likelihood(nsig, marginalize=marginalize, nll=True )
             nllA = compA.likelihood(nsig, marginalize=marginalize, nll=True )
-            qmu =  2*( nll - nll0 )
-            if qmu<0.: qmu=0.
-            sqmu = sqrt (qmu)
-            qA =  2*( nllA - nll0A )
-            # print ( "mu: %s, qMu: %s, qA: %s nll0A: %s nllA: %s" % ( mu, qmu, qA, nll0A, nllA ) )
-            if qA<0.:
-                qA=0.
-            sqA = sqrt(qA)
-            CLsb = 1. - stats.multivariate_normal.cdf(sqmu)
-            CLb = 0.
-            if qA >= qmu:
-                CLb =  stats.multivariate_normal.cdf(sqA - sqmu)
-            else:
-                if qA == 0.:
-                    CLsb = 1.
-                    CLb  = 1.
-                else:
-                    CLsb = 1. - stats.multivariate_normal.cdf( (qmu + qA)/(2*sqA) )
-                    CLb = 1. - stats.multivariate_normal.cdf( (qmu - qA)/(2*sqA) )
-            CLs = 0.
-            if CLb > 0.:
-                CLs = CLsb/CLb
-            root = CLs - 1. + self.cl
-            return root
+            return rootFromNLLs ( nllA, nll0A, nll, nll0 )
 
         a0 = root_func(0.) ## this must be positive
         if a0 < 0. and marginalize:

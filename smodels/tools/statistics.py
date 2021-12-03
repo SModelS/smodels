@@ -13,6 +13,7 @@
 from scipy import stats, optimize
 from smodels.tools.smodelsLogging import logger
 from scipy.special import erf
+import scipy.stats as stats
 import numpy as np
 from smodels.tools import runtime
 
@@ -95,6 +96,32 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False,
                               rtol=1e-03, xtol=1e-06 )
     llhdexp = llhd ( nsig, mumax, sigma_exp, nll )
     return llhdexp
+
+def rootFromNLLs ( nllA, nll0A, nll, nll0 ):
+    """ compute the CLs - alpha from the NLLs """
+    qmu =  2*( nll - nll0 )
+    if qmu<0.: qmu=0.
+    sqmu = np.sqrt (qmu)
+    qA =  2*( nllA - nll0A )
+    if qA<0.: qA = 0.
+    sqA = np.sqrt(qA)
+    CLsb = 1. - stats.multivariate_normal.cdf(sqmu)
+    CLb = 0.
+    if qA >= qmu:
+        CLb =  stats.multivariate_normal.cdf(sqA - sqmu)
+    else:
+        if qA == 0.:
+            CLsb = 1.
+            CLb  = 1.
+        else:
+            CLsb = 1. - stats.multivariate_normal.cdf( (qmu + qA)/(2*sqA) )
+            CLb = 1. - stats.multivariate_normal.cdf( (qmu - qA)/(2*sqA) )
+    CLs = 0.
+    if CLb > 0.:
+        CLs = CLsb / CLb
+    cl = .95
+    root = CLs - 1. + cl
+    return root
 
 def rvsFromLimits( upperLimit, expectedUpperLimit, n=1, corr = 0. ):
     """
