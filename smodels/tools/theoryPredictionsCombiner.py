@@ -21,8 +21,13 @@ class TheoryPredictionsCombiner():
     """
     Facility used to combine theory predictions from different analyes.
     """
-    def __init__ (self, theoryPredictions : list ):
+    def __init__ (self, theoryPredictions : list, slhafile = None ):
+        """ constructor.
+        :param theoryPredictions: the List of theory predictions
+        :param slhafile: optionally, the slhafile can be given, for debugging
+        """
         self.theoryPredictions = theoryPredictions
+        self.slhafile = slhafile
 
 
     def lsm( self, marginalize = False, deltas_rel = .2, expected = False ):
@@ -123,13 +128,20 @@ class TheoryPredictionsCombiner():
                         deltas_rel = myargs[1], expected = expected, 
                         useRelSigStrengths = True ) )
         o = scipy.optimize.minimize ( fun, 1., args = ( marginalize, deltas_rel ) )
-        lmax = np.exp ( - o.fun )
         logger.debug ( "result", o )
+        if not o.success:
+            logger.debug ( f"combiner.findMuHat did not terminate successfully: {o.message} mu_hat={o.x} hess={o.hess_inv} slhafile={self.slhafile}" )
+            #if extended_output:
+            #    return None, None, None
+            #return None
+        lmax = np.exp ( - o.fun )
         mu_hat = o.x[0]
         if not allowNegativeSignals and mu_hat < 0.:
             mu_hat = 0.
         ## the inverted hessian is a good approximation for the variance at the
         ## minimum
+        if o.hess_inv[0][0]<0. or not np.isfinite ( o.hess_inv[0][0] ):
+            logger.debug ( f"combiner.findMuHat something is wrong with the hessian: mu_hat={o.x} hess={o.hess_inv} slhafile={self.slhafile}" )
         sigma_mu = np.sqrt ( o.hess_inv[0][0] )
         if nll:
             lmax = - np.log(lmax)
