@@ -60,7 +60,7 @@ class TheoryPredictionsCombiner():
         return ret
 
     def chi2( self ):
-        if not hasattr ( self, "likelihood" ):
+        if not hasattr ( self, "likelihood" ) or not hasattr ( self, "lmax" ):
             logger.error ( "call computeStatistics before calling chi2" )
             return
         return - 2 * np.log ( self.likelihood / self.lmax )
