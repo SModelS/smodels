@@ -14,6 +14,7 @@
 import numpy as np
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
+from smodels.tools.statistics import rootFromNLLs, determineBrentBracket
 import scipy.stats as stats
 import scipy.optimize as optimize
 
@@ -21,20 +22,24 @@ class TheoryPredictionsCombiner():
     """
     Facility used to combine theory predictions from different analyes.
     """
-    def __init__ (self, theoryPredictions : list, slhafile = None ):
+    def __init__ ( self, theoryPredictions : list, slhafile = None,
+                   toys = 30000, marginalize = False, deltas_rel = 0.2 ):
         """ constructor.
         :param theoryPredictions: the List of theory predictions
         :param slhafile: optionally, the slhafile can be given, for debugging
+        :param marginalize: if true, marginalize nuisances. Else, profile them.
+        :param deltas_rel: relative uncertainty in signal (float).
+                           Default value is 20%.
         """
         self.theoryPredictions = theoryPredictions
         self.slhafile = slhafile
+        self.toys = toys
+        self.marginalize = marginalize
+        self.deltas_rel  = deltas_rel
 
 
     def lsm( self, marginalize = False, deltas_rel = .2, expected = False ):
         """ compute the likelihood at mu = 0.
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
-        :param deltas_rel: relative uncertainty in signal (float).
-                           Default value is 20%.
         :param expected: if True, compute expected likelihood, else observed
         """
         llhd = 1.
@@ -42,20 +47,16 @@ class TheoryPredictionsCombiner():
             llhd = llhd * tp.dataset.likelihood(0.,marginalize=marginalize,deltas_rel=deltas_rel,expected=expected)
         return llhd
 
-    def likelihood ( self, mu = 1., marginalize = False, deltas_rel=.2, 
-                     expected = False ):
+    def likelihood ( self, mu = 1., expected = False ):
         """ compute the likelihood at signal strength mu
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
-        :param deltas_rel: relative uncertainty in signal (float).
-                           Default value is 20%.
         :param expected: if True, compute expected likelihood, else observed
         """
         ret = 1.
         for tp in self.theoryPredictions:
             lumi = tp.dataset.getLumi()
             nsig = (tp.xsection.value*lumi).asNumber()
-            ret = ret * tp.dataset.likelihood(mu*nsig,marginalize=marginalize,
-                                             deltas_rel=deltas_rel,expected=expected)
+            ret = ret * tp.dataset.likelihood(mu*nsig,marginalize=self.marginalize,
+                                        deltas_rel=self.deltas_rel,expected=expected)
         return ret
 
     def chi2( self ):
@@ -81,7 +82,7 @@ class TheoryPredictionsCombiner():
         return max(conditions)
 
 
-    def computeStatistics(self,marginalize=False,deltas_rel=0.2, expected=False ):
+    def computeStatistics(self, expected=False ):
         """
         Compute the likelihoods, chi2, and upper limit for this combination
         :param marginalize: if true, marginalize nuisances. Else, profile them.
@@ -93,16 +94,16 @@ class TheoryPredictionsCombiner():
             return
         if expected == "both":
             for e in [ False, True ]:
-                self.computeStatistics ( marginalize, deltas_rel, e )
+                self.computeStatistics ( e )
             return
         llhd, lsm = 1., 1.
         for tp in self.theoryPredictions:
             lumi = tp.dataset.getLumi()
             nsig = (tp.xsection.value*lumi).asNumber()
-            llhd = llhd * tp.dataset.likelihood(nsig,marginalize=marginalize,
-                                             deltas_rel=deltas_rel,expected=expected)
-            lsm = lsm * tp.dataset.likelihood(0.,marginalize=marginalize,
-                                             deltas_rel=deltas_rel,expected=expected)
+            llhd = llhd * tp.dataset.likelihood(nsig,marginalize=self.marginalize,
+                                       deltas_rel=self.deltas_rel,expected=expected)
+            lsm = lsm * tp.dataset.likelihood(0.,marginalize=self.marginalize,
+                                       deltas_rel=self.deltas_rel,expected=expected)
         if expected:
             self.elikelihood = llhd
             self.elsm = lsm
@@ -111,9 +112,10 @@ class TheoryPredictionsCombiner():
         else:
             self.likelihood = llhd
             self.lsm = lsm
-        self.mu_hat, self.sigma_mu, self.lmax = self.findMuHat ( marginalize = marginalize, deltas_rel = deltas_rel, extended_output = True )
+        self.mu_hat, self.sigma_mu, self.lmax = self.findMuHat ( allowNegativeSignals = False, extended_output = True )
 
-    def findMuHat( self,marginalize=False, deltas_rel=.2, allowNegativeSignals = False, expected = False, extended_output = False, nll=False ):
+    def findMuHat( self, allowNegativeSignals = False, expected = False, 
+                   extended_output = False, nll=False ):
         """ find muhat and lmax.
         :param allowNegativeSignals: if true, then also allow for negative values
         :param expected: if true, compute expected prior (=lsm), if "posteriori"
@@ -123,26 +125,34 @@ class TheoryPredictionsCombiner():
         :returns: mu_hat, i.e. the maximum likelihood estimate of mu
         """
         import scipy.optimize
-        def fun ( mu, *myargs ):
-            return - np.log ( self.getLikelihood ( mu, marginalize = myargs[0],
-                        deltas_rel = myargs[1], expected = expected, 
+        def fun ( mu ):
+            return - np.log ( self.getLikelihood ( mu, expected = expected, 
                         useRelSigStrengths = True ) )
-        o = scipy.optimize.minimize ( fun, 1., args = ( marginalize, deltas_rel ) )
-        logger.debug ( "result", o )
-        if not o.success:
-            logger.debug ( f"combiner.findMuHat did not terminate successfully: {o.message} mu_hat={o.x} hess={o.hess_inv} slhafile={self.slhafile}" )
-            #if extended_output:
-            #    return None, None, None
-            #return None
-        lmax = np.exp ( - o.fun )
+        toTry = [ 1., 0., 3., 10. ]
+        if allowNegativeSignals:
+            toTry = [ 1., 0., 3., -1., 10., -3. ]
+        for mu0 in toTry:
+            o = scipy.optimize.minimize ( fun, mu0 )
+            logger.debug ( f"result for {mu0}:", o )
+            if not o.success:
+                logger.debug ( f"combiner.findMuHat did not terminate successfully: {o.message} mu_hat={o.x} hess={o.hess_inv} slhafile={self.slhafile}" )
+            ## the inverted hessian is a good approximation for the variance at the
+            ## minimum
+            hessian = o.hess_inv[0][0]
+            if hessian>0.: # found a maximum. all good.
+                break
+            # the hessian is negative meaning we found a maximum, not a minimum
+            logger.debug ( f"combiner.findMuHat the hessian {hessian} is negative at mu_hat={o.x} in {self.slhafile} try again with different initialisation." )
         mu_hat = o.x[0]
+        lmax = np.exp ( - o.fun )
+        if hessian < 0.:
+            logger.error ( "tried with several starting points to find maximum, always ended up in minimum. bailing out." )
+            if extended_output:
+                return None, None, None
+            return None
         if not allowNegativeSignals and mu_hat < 0.:
-            mu_hat = 0.
-        ## the inverted hessian is a good approximation for the variance at the
-        ## minimum
-        if o.hess_inv[0][0]<0. or not np.isfinite ( o.hess_inv[0][0] ):
-            logger.debug ( f"combiner.findMuHat something is wrong with the hessian: mu_hat={o.x} hess={o.hess_inv} slhafile={self.slhafile}" )
-        sigma_mu = np.sqrt ( o.hess_inv[0][0] )
+            mu_hat = 0. # fixme for this case we should reevaluate the hessian!
+        sigma_mu = np.sqrt ( hessian )
         if nll:
             lmax = - np.log(lmax)
         if extended_output:
@@ -159,14 +169,11 @@ class TheoryPredictionsCombiner():
             S += nsig
         return S
 
-    def getLikelihood(self,mu=1.,marginalize=False,deltas_rel=.2,expected=False,
+    def getLikelihood(self,mu=1.,expected=False,
                       nll = False, useRelSigStrengths = True ):
         """
         Compute the likelihood at a given mu
         :param mu: signal strength
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
-        :param deltas_rel: relative uncertainty in signal (float).
-                           Default value is 20%.
         :param expected: if True, compute expected likelihood, else observed
         :param nll: if True, return negative log likelihood, else likelihood
         :param useRelSigStrengths: if True, get the likelihood not on signal strength mu, but on relative signal strength, total_nsig = 1 for mu = 1
@@ -181,8 +188,8 @@ class TheoryPredictionsCombiner():
             nsig = (tp.xsection.value*lumi).asNumber()
             if useRelSigStrengths:
                 nsig = nsig / S
-            llhd = llhd * tp.dataset.likelihood(mu*nsig,marginalize=marginalize,
-                                             deltas_rel=deltas_rel,expected=expected)
+            llhd = llhd * tp.dataset.likelihood(mu*nsig,marginalize=self.marginalize,
+                                        deltas_rel=self.deltas_rel,expected=expected)
         if nll:
             if llhd == 0.: ## cut off nll at 700 (1e-300)
                 return 700.
@@ -201,109 +208,43 @@ class TheoryPredictionsCombiner():
             ret.append ( n )
         return ret
 
-    def getUpperLimitOnMu(self, marginalize=False, expected=False, deltas_rel=0.2):
+    def getUpperLimitOnMu(self, toys = None, expected = False ):
         """ get upper limit on signal strength multiplier, i.e. value for mu for
             which CLs = 0.95
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param expected: if True, compute expected likelihood, else observed
-        :param deltas_rel: relative uncertainty in signal (float).
-                           Default value is 20%.
+        :param toys: specify number of toys. Use default is none
         :returns: upper limit on signal strength multiplier mu
         """
-        if not hasattr ( self, "mu_hat" ):
-            self.computeStatistics( marginalize = marginalize, 
-                    deltas_rel = deltas_rel, expected = False )
-        #nll0 = self.getLikelihood ( self.mu_hat, marginalize = marginalize,
-        #                            nll = True )
-        nll0 = self.getLikelihood ( self.mu_hat, marginalize = marginalize,
-                        expected = expected, nll = True, useRelSigStrengths = True )
-        toys = 30000
-        #print ( f"COMB nll0 {nll0:.3f} mu_hat {self.mu_hat:.3f} sigma_mu {self.sigma_mu:.3f}" )
+        if toys==None:
+            toys=self.toys
+        #if not hasattr ( self, "mu_hat" ):
+        #    self.computeStatistics( expected = False )
+        mu_hat, sigma_mu, lmax = self.findMuHat ( allowNegativeSignals = True, extended_output = True )
+        nll0 = self.getLikelihood ( mu_hat, expected = expected, nll = True, 
+                useRelSigStrengths = True )
         ## a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
-        mu_hatA,_,nll0A = self.findMuHat ( marginalize = False, deltas_rel = .2,
-                           expected = "posteriori", nll=True, extended_output= True )
+        mu_hatA,_,nll0A = self.findMuHat ( expected = "posteriori", nll=True, 
+                extended_output= True )
         #print ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
         #return 1.
 
-        def root_func(mu):
-            nll = self.getLikelihood( mu, marginalize=marginalize, nll=True,
+        def clsRoot (mu):
+            # at - infinity this should be .95,
+            # at + infinity it should -.05
+            nll = self.getLikelihood( mu, nll=True,
                      expected= expected, useRelSigStrengths = True )
-            nllA = self.getLikelihood( mu, marginalize=marginalize, 
-                     expected="posteriori", nll=True, useRelSigStrengths = True )
-            qmu =  2*( nll - nll0 )
-            if qmu<0.: qmu=0.
-            sqmu = np.sqrt (qmu)
-            qA =  2*( nllA - nll0A )
-            if qA<0.:
-                qA = 0.
-            sqA = np.sqrt(qA)
-            CLsb = 1. - stats.multivariate_normal.cdf(sqmu)
-            CLb = 0.
-            if qA >= qmu:
-                CLb =  stats.multivariate_normal.cdf(sqA - sqmu)
-            else:
-                if qA == 0.:
-                    CLsb = 1.
-                    CLb  = 1.
-                else:
-                    CLsb = 1. - stats.multivariate_normal.cdf( (qmu + qA)/(2*sqA) )
-                    CLb = 1. - stats.multivariate_normal.cdf( (qmu - qA)/(2*sqA) )
-            CLs = 0.
-            if CLb > 0.:
-                CLs = CLsb / CLb
-            cl = .95
-            root = CLs - 1. + cl
-            return root
+            nllA = self.getLikelihood( mu,  expected="posteriori", nll=True, 
+                    useRelSigStrengths = True )
+            return rootFromNLLs ( nllA, nll0A, nll, nll0 )
 
-        a0 = root_func(0.)
-        if a0 < 0. and marginalize:
-            if toys < 20000:
-                return self.getUpperLimitOnMu ( mu, marginalize, 4*toys,
-                     expected = expected, trylasttime=False )
-            else:
-                if not trylasttime:
-                    return self.getUpperLimitOnMu( mu, False, toys,
-                                          expected = expected, trylasttime=True )
-                # it ends here
-                return None
-        a,b=1.5*self.mu_hat,2.5*self.mu_hat+2*self.sigma_mu
-        ctr=0
-        while True:
-            while ( np.sign ( root_func(a)* root_func(b) ) > -.5 ):
-                b=1.73*b  ## widen bracket FIXME make a linear extrapolation!
-                a=a-(b-a)*.42 ## widen bracket
-                if a < 0.: a=0.
-                ctr+=1
-                if ctr>30: ## but stop after 20 trials
-                    if toys > 20000 or not marginalize:
-                        logger.error("cannot find brent bracket after 30 trials. f(a=%s)=%s,f(b=%s)=%s, mu_hat=%.2f, sigma_mu=%.2f" % ( a, root_func(a),b,root_func(b), self.mu_hat, self.sigma_mu ) )
-                        logger.error("nll0=%s" % ( nll0 ) )
-                        if marginalize == True:
-                            return self.getUpperLimitOnMu( mu, marginalize = False,
-                                                  toys = toys, expected = expected,
-                                                  trylasttime = True )
-                        return float("inf") ## better choice than None
-                    else:
-                        logger.debug("cannot find brent bracket after 20 trials. but very low number of toys")
-                        return self.getUpperLimitOnMu ( mu, marginalize, 4*toys,
-                                              expected=expected, trylasttime = False )
-            try:
-                # root_func bei 0 sollte positiv sein, bei inf = -.05
-                mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
-                # print ( f"COMBO mu_lim {mu_lim:.3f} expected {expected}" )
-                return mu_lim 
-            except ValueError as e: ## it could still be that the signs arent opposite
-                # in that case, try again
-                pass
+        a,b = determineBrentBracket( mu_hat, sigma_mu, clsRoot )
+        mu_lim = optimize.brentq ( clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
+        return mu_lim 
 
-        ## and so on and so on
-        return None
-
-    def getUpperLimitOnMuOld(self, marginalize=False, expected=False, deltas_rel=0.2):
+    def getUpperLimitOnMuOld(self, expected=False, deltas_rel=0.2):
         """ get upper limit on signal strength multiplier, i.e. value for mu for
             which CLs = 0.95
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param expected: if True, compute expected likelihood, else observed
         :param deltas_rel: relative uncertainty in signal (float).
                            Default value is 20%.
@@ -314,21 +255,20 @@ class TheoryPredictionsCombiner():
                     deltas_rel = deltas_rel, expected = False )
         ## lower and upper bounds on mu that we scan
         ## +/- 3 sigma should cover it up to < 1 permille
-        lower, upper = self.mu_hat - 4*self.sigma_mu, self.mu_hat + 4*self.sigma_mu
+        lower, upper = self.mu_hat - 4*sigma_mu, mu_hat + 4*sigma_mu
 
         ## for one-sided cases we go up to 4.5 sigma, has similar p value.
         if lower < 0.:
             lower = 0.
-            upper = 4.5 * self.sigma_mu
+            upper = 4.5 * sigma_mu
         if expected:
-            lower,upper = 0., self.sigma_mu * 4.5
+            lower,upper = 0., sigma_mu * 4.5
         llhds={}
         totllhd=0.
         nbins = 50.
         delta = upper / (nbins-1)
         for mu in np.arange ( lower, upper*1.0001, delta):
-            llhd = self.getLikelihood ( mu, marginalize=marginalize, 
-                                        deltas_rel = deltas_rel, expected=expected )
+            llhd = self.getLikelihood ( mu, expected=expected )
             llhds[mu]=llhd
             totllhd+=llhd
         ## last likelihood should contribute less than 1 permille
@@ -349,30 +289,28 @@ class TheoryPredictionsCombiner():
             lastcum = cum
             lastmu = mu_
 
-    def getUpperLimit(self, marginalize=False, expected=False, deltas_rel=0.2):
+    def getUpperLimit( self, toys =None, expected=False, 
+                       trylasttime = False ):
         """ get upper limit on *fiducial* cross sections
             which CLs = 0.95
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param expected: if True, compute expected likelihood, else observed
-        :param deltas_rel: relative uncertainty in signal (float).
-                           Default value is 20%.
         :returns: upper limit on *fiducial* cross sections (list)
         """
-        clmu = self.getUpperLimitOnMu ( marginalize, expected, deltas_rel )
+        clmu = self.getUpperLimitOnMu ( expected = expected )
         ret = []
         for tp in self.theoryPredictions:
             ret.append ( tp.xsection.value * clmu )
         return ret
 
-    def getRValue(self, marginalize=False, expected=False, deltas_rel=0.2):
+    def getRValue(self, expected=False ):
         """ obtain r-value, i.e. predicted_xsec / ul
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param expected: if True, compute expected likelihood, else observed
-        :param deltas_rel: relative uncertainty in signal (float).
-                           Default value is 20%.
         :returns: r-value
         """
-        clmu = self.getUpperLimitOnMu ( marginalize, expected, deltas_rel )
+        clmu = self.getUpperLimitOnMu ( expected = expected )
+        if clmu == 0.:
+            ## has no meaning, has it?
+            return None
         #ret = []
         xsecs = []
         for tp in self.theoryPredictions:
