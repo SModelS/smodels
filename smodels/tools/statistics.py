@@ -16,6 +16,7 @@ from scipy.special import erf
 import scipy.stats as stats
 import numpy as np
 from smodels.tools import runtime
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False,
                           allowNegativeMuhat = True, corr = 0.6 ):
@@ -122,6 +123,49 @@ def rootFromNLLs ( nllA, nll0A, nll, nll0 ):
     cl = .95
     root = CLs - 1. + cl
     return root
+
+def determineBrentBracket( mu_hat , sigma_mu, rootfinder ):
+    """ find a, b for brent bracketing
+    :param mu_hat: mu that maximizes likelihood
+    :param sigm_mu: error on mu_hat (not too reliable)
+    :param rootfinder: function that finds the root (usually root_func)
+    """
+    sigma_mu = max ( sigma_mu, .5 ) # there is a minimum on sigma_mu
+    ## the root should be roughly at mu_hat + 2*sigma_mu
+    a = mu_hat + 1.5 * sigma_mu
+    ntrials = 20
+    i = 0
+    foundExtra=False
+    while rootfinder ( a ) < 0.:
+        # if this is negative, we move it to the left
+        i+=1
+        a -= (i**2.)*sigma_mu
+        if i > ntrials or a < -10000.:
+            for a in [ 0., 1., -1., 3., -3., 10., -10. ]:
+                if rootfinder ( a ) > 0.:
+                    foundExtra=True
+                    break
+            if not foundExtra:
+                logger.error ( f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {rootfinder(a):.2f}." )
+                logger.error ( f"mu_hat={mu_hat:.2f}, sigma_mu={sigma_mu:.2f}" )
+                raise SModelSError( f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {rootfinder(a):.2f}." )
+    i = 0
+    foundExtra=False
+    b = mu_hat + 2.5 * sigma_mu
+    while rootfinder ( b ) > 0.:
+        # if this is positive, we move it to the right
+        i+=1
+        b += (i**2.)*sigma_mu
+        if i > ntrials:
+            for b in [ 1., 0., 10., -1. ]:
+                if rootfinder ( b ) > 0.:
+                    foundExtra=True
+                    break
+            if not foundExtra:
+                logger.error ( f"cannot find an b that is right of the root. last attempt, b={b:.2f}, root = {rootfinder(b):.2f}." )
+                logger.error ( f"mu_hat was at {mu_hat:.2f} sigma_mu at {sigma_mu:.2f}" )
+                raise SModelSError( f"cannot find an b that is right of the root. last attempt, b={b:.2f}, root = {rootfinder(b):.2f}." )
+    return a,b
 
 def rvsFromLimits( upperLimit, expectedUpperLimit, n=1, corr = 0. ):
     """
