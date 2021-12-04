@@ -14,7 +14,7 @@
 from scipy import stats, optimize, integrate, special, linalg
 from numpy  import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
-from smodels.tools.statistics import rootFromNLLs
+from smodels.tools.statistics import rootFromNLLs, determineBrentBracket
 
 import numpy as np
 import math
@@ -250,14 +250,14 @@ class LikelihoodComputer:
 
     debug_mode = False
 
-    def __init__(self, data, ntoys = 30000 ):
+    def __init__(self, data, toys = 30000 ):
         """
         :param data: a Data object.
-        :param ntoys: number of toys when marginalizing
+        :param toys: number of toys when marginalizing
         """
 
         self.model = data
-        self.ntoys = ntoys
+        self.toys = toys
 
     def dLdMu(self, mu, signal_rel, theta_hat):
         """
@@ -683,7 +683,7 @@ class LikelihoodComputer:
             thetas = stats.multivariate_normal.rvs(mean=[0.]*self.model.n,
                           # cov=(self.model.totalCovariance(nsig)),
                           cov=self.model.V,
-                          size=self.ntoys ) ## get ntoys values
+                          size=self.toys ) ## get ntoys values
             for theta in thetas :
                 if self.model.isLinear():
                     lmbda = nsig + self.model.backgrounds + theta
@@ -790,7 +790,7 @@ class UpperLimitComputer:
         :param ntoys: number of toys when marginalizing
         :param cl: desired quantile for limits
         """
-        self.ntoys = ntoys
+        self.toys = ntoys
         self.cl = cl
 
     def ulSigma( self, model, marginalize=False, toys=None, expected=False,
@@ -813,7 +813,7 @@ class UpperLimitComputer:
             """ only zeroes in efficiencies? cannot give a limit! """
             return None
         if toys==None:
-            toys=self.ntoys
+            toys=self.toys
         oldmodel = model
         if expected:
             model = copy.deepcopy(oldmodel)
@@ -873,48 +873,9 @@ class UpperLimitComputer:
             nllA = compA.likelihood(nsig, marginalize=marginalize, nll=True )
             return rootFromNLLs ( nllA, nll0A, nll, nll0 )
 
-        a0 = root_func(0.) ## this must be positive
-        if a0 < 0. and marginalize:
-            if toys < 20000:
-                return self.ulSigma ( model, marginalize, 4*toys,
-                                      expected = expected, trylasttime=False )
-            else:
-                if not trylasttime:
-                    return self.ulSigma ( model, False, toys,
-                                          expected = expected, trylasttime=True )
-                # it ends here
-                return None
-                #return self.ulSigma ( model, marginalize, 4*toys,
-                #                      expected = expected, trylasttime=True )
-        a,b=1.5*mu_hat,2.5*mu_hat+2*sigma_mu
-        ctr=0
-        while True:
-            while ( np.sign ( root_func(a)* root_func(b) ) > -.5 ):
-                b=1.4*b  ## widen bracket FIXME make a linear extrapolation!
-                a=a-(b-a)*.3 ## widen bracket
-                if a < 0.: a=0.
-                ctr+=1
-                if ctr>20: ## but stop after 20 trials
-                    if toys > 20000 and not marginalize:
-                        logger.error("cannot find brent bracket after 20 trials. a,b=%s(%s),%s(%s), mu_hat=%.2f, sigma_mu=%.2f" % ( root_func(a),a,root_func(b),b,mu_hat, sigma_mu ) )
-                        logger.error("nll0=%s" % ( nll0 ) )
-                        if marginalize == True:
-                            return self.ulSigma ( model, marginalize = False,
-                                                  toys = toys, expected = expected,
-                                                  trylasttime = True )
-                        return float("inf") ## better choice than None
-                    else:
-                        logger.debug("cannot find brent bracket after 20 trials. but very low number of toys")
-                        return self.ulSigma ( model, marginalize, 4*toys,
-                                              expected=expected, trylasttime = False )
-            try:
-                # root_func bei 0 sollte positiv sein, bei inf = -.05
-                mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
-                # print ( f"SL    mu_lim {mu_lim:.3f}" )
-                return mu_lim
-            except ValueError as e: ## it could still be that the signs arent opposite
-                # in that case, try again
-                pass
+        a, b = determineBrentBracket ( mu_hat, sigma_mu, root_func )
+        mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
+        return mu_lim
 
 if __name__ == "__main__":
     C = [ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
