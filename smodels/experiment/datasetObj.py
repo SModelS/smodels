@@ -326,7 +326,8 @@ class DataSet(object):
                                deltas_rel=deltas_rel )
                 computer = LikelihoodComputer(m)
                 thetahat = computer.findThetaHat ( 0. )
-                if type ( self.dataInfo.expectedBG ) in [ float, np.float64 ]:
+                if type ( self.dataInfo.expectedBG ) in [ float, np.float64, 
+                        np.float32, int, np.int64, np.int32 ]:
                     thetahat = float ( thetahat[0] )
                 obs = self.dataInfo.expectedBG + thetahat
             
