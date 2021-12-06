@@ -61,10 +61,12 @@ class TheoryPredictionsCombiner():
         return ret
 
     def chi2( self ):
-        if not hasattr ( self, "likelihood" ) or not hasattr ( self, "lmax" ):
+        if not hasattr ( self, "llhd" ) or not hasattr ( self, "lmax" ):
             logger.error ( "call computeStatistics before calling chi2" )
             return
-        return - 2 * np.log ( self.likelihood / self.lmax )
+        if self.llhd == 0.:
+            return 2000. ## we cut off at > 1e-300 or so ;)
+        return - 2 * np.log ( self.llhd / self.lmax )
 
     def totalXsection ( self ):
         ret = 0.*fb
@@ -106,12 +108,12 @@ class TheoryPredictionsCombiner():
             lsm = lsm * tp.dataset.likelihood(0.,marginalize=self.marginalize,
                                        deltas_rel=self.deltas_rel,expected=expected)
         if expected:
-            self.elikelihood = llhd
+            self.ellhd = llhd
             self.elsm = lsm
             ## posterior expected
             self.elmax = lsm
         else:
-            self.likelihood = llhd
+            self.llhd = llhd
             self.lsm = lsm
         self.mu_hat, self.sigma_mu, self.lmax = self.findMuHat ( allowNegativeSignals = False, extended_output = True )
 
