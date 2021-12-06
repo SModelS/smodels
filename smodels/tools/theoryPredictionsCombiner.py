@@ -40,7 +40,8 @@ class TheoryPredictionsCombiner():
 
     def lsm( self, marginalize = False, deltas_rel = .2, expected = False ):
         """ compute the likelihood at mu = 0.
-        :param expected: if True, compute expected likelihood, else observed
+        :param expected: if True, compute expected likelihood, else observed.
+                         If "posteriori", compute posterior expected.
         """
         llhd = 1.
         for tp in self.theoryPredictions:

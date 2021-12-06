@@ -284,7 +284,7 @@ class DataSet(object):
         :returns: likelihood to observe nobs events (float)
         """
         obs = self.dataInfo.observedN
-        if expected == True:
+        if expected: # this step is done for prior and posterior expected
             obs = self.dataInfo.expectedBG
 
         m = Data( obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
@@ -318,10 +318,9 @@ class DataSet(object):
         :returns: likelihood to observe nobs events (float)
         """
         obs = self.dataInfo.observedN
-        posterior = True
         if expected:
             obs = self.dataInfo.expectedBG
-            if posterior:
+            if expected == "posteriori":
                 m = Data( obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
                                deltas_rel=deltas_rel )
                 computer = LikelihoodComputer(m)
