@@ -322,6 +322,8 @@ class DataSet(object):
         if expected:
             obs = self.dataInfo.expectedBG
             if posterior:
+                m = Data( obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
+                               deltas_rel=deltas_rel )
                 computer = LikelihoodComputer(m)
                 thetahat = computer.findThetaHat ( 0. )
                 if type ( self.dataInfo.expectedBG ) in [ float, np.float64 ]:
