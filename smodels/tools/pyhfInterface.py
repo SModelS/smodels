@@ -430,12 +430,32 @@ class PyhfUpperLimitComputer:
                     return self.workspaces[workspace_index]
             workspace = updateWorkspace()
             def root_func(mu):
+                try:
+                    from smodels.tools.runtime import _aposteriori
+                except ImportError:
+                    _aposteriori = False
+                # If expected, set observations = sum(bkg)
+                if expected and not _aposteriori:
+                    logger.debug('computing a-priori expected limit')
+                    for obs in workspace['observations']:
+                        for ch in workspace['channels']:
+                            # Finding matching observation and bkg channel
+                            if obs['name'] == ch['name']:
+                                bkg = [0.]*len(obs['data'])
+                                for sp in ch['samples']:
+                                    if sp['name'] == 'bsm': continue
+                                    for iSR in range(len(obs['data'])):
+                                        # Summing over all bkg samples for each bin/SR
+                                        bkg[iSR] += sp['data'][iSR]
+                                # logger.debug('bkgs for channel {} :\n{}'.format(obs['name'], bkg))
+                                obs['data'] = bkg
                 # Same modifiers_settings as those use when running the 'pyhf cls' command line
                 msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
                 model = workspace.model(modifier_settings=msettings)
                 start = time.time()
                 stat = "qtilde" # by default
-                args = { "return_expected": expected }
+                args = {}
+                args["return_expected"] = expected and _aposteriori
                 pver = float ( pyhf.__version__[:3] )
                 if pver < 0.6:
                     args["qtilde"]=True
@@ -447,7 +467,8 @@ class PyhfUpperLimitComputer:
                     result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
                 end = time.time()
                 logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
-                if expected:
+                if expected and _aposteriori:
+                    logger.debug('computing a-posteriori expected limit')
                     logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                     try:
                         CLs = float(result[1].tolist())

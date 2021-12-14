@@ -126,6 +126,9 @@ class RunSModelSTest(unittest.TestCase):
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.02,
                            ignore=ignoreFields, fname=outputfile,
 	                         fname2 = "T6bbHH_pyhf_default.py" )
+        if not equals:
+            e =  "T6bbHH_pyhf_default.py != ./unitTestOutput/T6bbHH_pyhf.slha.py"
+            logger.error( e )
         self.assertTrue(equals)
 
     def testGoodFile13(self):

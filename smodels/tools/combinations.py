@@ -210,4 +210,3 @@ def _combinedLmax ( dataset, nsig, marginalize, deltas_rel, nll=False, expected=
         ulcomputer = _getPyhfComputer( dataset, nsig, False )
         return ulcomputer.lmax ( nll=nll )
     return -1.
-

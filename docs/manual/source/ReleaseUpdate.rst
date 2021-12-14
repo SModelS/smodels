@@ -41,6 +41,7 @@ New in Version 2.1.2:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * small fixes with (expected) combined likelihoods (kudos to Jamie Yellen)
+  * posteriori expected limits introduced
   * allow :ref:`ncpus <parameterFileNcpus>` to take on zero and negative values in 
     ini file [meaning use all but this (absolute) number of CPU cores]
   * small fixes in the :ref:`Howto's <Examples>` 
