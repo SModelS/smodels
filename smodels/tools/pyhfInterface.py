@@ -430,12 +430,8 @@ class PyhfUpperLimitComputer:
                     return self.workspaces[workspace_index]
             workspace = updateWorkspace()
             def root_func(mu):
-                try:
-                    from smodels.tools.runtime import _aposteriori
-                except ImportError:
-                    _aposteriori = False
                 # If expected, set observations = sum(bkg)
-                if expected and not _aposteriori:
+                if expected == True:
                     logger.debug('computing a-priori expected limit')
                     for obs in workspace['observations']:
                         for ch in workspace['channels']:
@@ -455,7 +451,7 @@ class PyhfUpperLimitComputer:
                 start = time.time()
                 stat = "qtilde" # by default
                 args = {}
-                args["return_expected"] = expected and _aposteriori
+                args["return_expected"] = ( expected == "posteriori" )
                 pver = float ( pyhf.__version__[:3] )
                 if pver < 0.6:
                     args["qtilde"]=True
@@ -467,7 +463,7 @@ class PyhfUpperLimitComputer:
                     result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
                 end = time.time()
                 logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
-                if expected and _aposteriori:
+                if expected == "posteriori":
                     logger.debug('computing a-posteriori expected limit')
                     logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                     try:
