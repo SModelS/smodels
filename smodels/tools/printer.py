@@ -125,6 +125,7 @@ class BasicPrinter(object):
         self.filename = filename
         self.output = output
         self.printingOrder = []
+        self.typeofexpectedvalues = "prior"
         self.toPrint = []
 
         if filename and os.path.isfile(filename):
