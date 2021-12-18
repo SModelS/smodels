@@ -55,8 +55,8 @@ class IntegrationTest(unittest.TestCase):
             pred.deltas_rel = 0.
             #pred.computeStatistics( marginalize=True, deltas_rel=0. )
             pred.computeStatistics( )
-            if pred.chi2 != self.predchi2()[expID]:
-                diff = abs ( pred.chi2 - self.predchi2()[expID] ) / self.predchi2()[expID]
+            if pred.chi2() != self.predchi2()[expID]:
+                diff = abs ( pred.chi2() - self.predchi2()[expID] ) / self.predchi2()[expID]
                 self.assertTrue ( diff < .1 )
 
     def testIntegration(self):

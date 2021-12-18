@@ -481,7 +481,7 @@ class TxTPrinter(BasicPrinter):
             if not upperLimitExp is None:
                 serv = self._formatNumber ( theoryPrediction.getRValue(expected=True), 4 )
                 output += "Expected r-value: %s\n" % serv
-            if hasattr(theoryPrediction,'likelihood') and not theoryPrediction.likelihood is None:
+            if not theoryPrediction.likelihood is None:
 #                output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
                 chi2, chi2sm = None, None
                 try:
@@ -638,8 +638,6 @@ class SummaryPrinter(TxTPrinter):
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
             output += " Txnames:  " + txnameStr + "\n"
-#            if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
-#                output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)
 #           print L, L_max and L_SM instead of chi2 and llhd; SK 2021-05-14
             if hasattr(theoPred,'likelihood'):# and not theoPred.likelihood is None:
                 llhd = str(theoPred.likelihood)

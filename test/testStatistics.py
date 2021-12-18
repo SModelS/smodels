@@ -145,7 +145,7 @@ class StatisticsTest(unittest.TestCase):
         pred_signal_strength = prediction.xsection.value
         prediction.computeStatistics()
         ill = math.log(prediction.likelihood)
-        ichi2 = prediction.chi2
+        ichi2 = prediction.chi2()
         nsig = (pred_signal_strength*expRes.globalInfo.lumi).asNumber()
         m = Data(4, 2.2, 1.1**2, None, nsignal=nsig,deltas_rel=0.2)
         computer = LikelihoodComputer(m)

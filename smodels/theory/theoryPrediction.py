@@ -176,6 +176,7 @@ class TheoryPrediction(object):
             return ( llhd, chi2FromLimits ( llhd, ulN, eulN, corr = corr ) )
         return llhd
 
+
     @property
     def likelihood ( self ):
         if not "llhd" in self.cachedObjs[False]:
@@ -199,6 +200,21 @@ class TheoryPrediction(object):
         if not "lsm" in self.cachedObjs[True]:
             raise AttributeError ( "object does not have attribute _elsm" )
         return self.cachedObjs[True]["lsm"]
+
+    @property
+    def lmax ( self ):
+        if not "lmax" in self.cachedObjs[False]:
+            raise AttributeError ( "object does not have attribute _lmax" )
+        return self.cachedObjs[False]["lmax"]
+
+    @property
+    def elmax ( self ):
+        if not "lmax" in self.cachedObjs[True]:
+            raise AttributeError ( "object does not have attribute _elmax" )
+        return self.cachedObjs[True]["lmax"]
+
+    def chi2 ( self, expected=False ):
+        return self.cachedObjs[expected]["chi2"]
 
     def getLikelihood(self,mu=1., expected=False ):
         """
@@ -242,12 +258,8 @@ class TheoryPrediction(object):
             lmax = self.likelihoodFromLimits ( None, expected=expected, chi2also=False )
             self.cachedObjs[expected]["llhd"]=llhd
             self.cachedObjs[expected]["lsm"]=lsm
-            if expected:
-                self.echi2 = chi2
-                self.elmax = lmax
-            else:
-                self.chi2 = chi2
-                self.lmax = lmax
+            self.cachedObjs[expected]["lmax"]=lmax
+            self.cachedObjs[expected]["chi2"]=chi2
 
         elif self.dataType() == 'efficiencyMap':
             lumi = self.dataset.getLumi()
@@ -261,10 +273,7 @@ class TheoryPrediction(object):
                     allowNegativeSignals = False, expected=expected )
             self.cachedObjs[expected]["llhd"]=llhd
             self.cachedObjs[expected]["lsm"]=llhd_sm
-            if expected:
-                self.elmax = llhd_max
-            else:
-                self.lmax = llhd_max
+            self.cachedObjs[expected]["lmax"]=llhd_max
             from math import log
             chi2 = None
             if llhd == 0. and llhd_max == 0.:
@@ -273,10 +282,7 @@ class TheoryPrediction(object):
                 chi2 = float("inf")
             if llhd > 0.:
                 chi2 = -2 * log ( llhd / llhd_max )
-            if expected:
-                self.echi2 = chi2
-            else:
-                self.chi2 = chi2
+            self.cachedObjs[expected]["chi2"]=chi2
 
         elif self.dataType() == 'combined':
             lumi = self.dataset.getLumi()
@@ -288,10 +294,7 @@ class TheoryPrediction(object):
                     self.marginalize, self.deltas_rel, expected=expected )
             self.cachedObjs[expected]["llhd"]=llhd
             self.cachedObjs[expected]["lsm"]=lsm
-            if expected:
-                self.elmax = lmax
-            else:
-                self.lmax = lmax
+            self.cachedObjs[expected]["lmax"]=lmax
 
     def getmaxCondition(self):
         """

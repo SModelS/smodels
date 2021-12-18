@@ -39,7 +39,7 @@ class TheoryPredictionsCombiner():
             from smodels.tools.runtime import _deltas_rel_default
             deltas_rel = _deltas_rel_default
         self.deltas_rel  = deltas_rel
-
+        self.cachedObjs = { False: {}, True: {}, "posteriori": {} }
 
     def lsm( self, expected = False ):
         """ compute the likelihood at mu = 0.
@@ -64,13 +64,35 @@ class TheoryPredictionsCombiner():
                                         deltas_rel=self.deltas_rel,expected=expected)
         return ret
 
-    def chi2( self ):
-        if not hasattr ( self, "llhd" ) or not hasattr ( self, "lmax" ):
+    @property
+    def lsm( self ):
+        return self.cachedObjs[False]["lsm"]
+    @property
+    def elsm( self ):
+        return self.cachedObjs[True]["lsm"]
+    @property
+    def llhd( self ):
+        return self.cachedObjs[False]["llhd"]
+    @property
+    def ellhd( self ):
+        return self.cachedObjs[True]["llhd"]
+    @property
+    def lmax( self ):
+        return self.cachedObjs[False]["lmax"]
+
+    @property
+    def elmax( self ):
+        return self.cachedObjs[True]["lmax"]
+
+    def chi2( self, expected=False ):
+        if not "llhd" in self.cachedObjs[expected] or not "lmax" in self.cachedObjs[expected]:
             logger.error ( "call computeStatistics before calling chi2" )
             return
-        if self.llhd == 0.:
+        llhd = self.cachedObjs[expected]["llhd"]
+        lmax = self.cachedObjs[expected]["lmax"]
+        if llhd == 0.:
             return 2000. ## we cut off at > 1e-300 or so ;)
-        return - 2 * np.log ( self.llhd / self.lmax )
+        return - 2 * np.log ( llhd / lmax )
 
     def totalXsection ( self ):
         ret = 0.*fb
@@ -111,15 +133,12 @@ class TheoryPredictionsCombiner():
                                        deltas_rel=self.deltas_rel,expected=expected)
             lsm = lsm * tp.dataset.likelihood(0.,marginalize=self.marginalize,
                                        deltas_rel=self.deltas_rel,expected=expected)
+        self.cachedObjs[expected]["llhd"]=llhd
+        self.cachedObjs[expected]["lsm"]=lsm
         if expected:
-            self.ellhd = llhd
-            self.elsm = lsm
-            ## posterior expected
-            self.elmax = lsm
-        else:
-            self.llhd = llhd
-            self.lsm = lsm
-        self.mu_hat, self.sigma_mu, self.lmax = self.findMuHat ( allowNegativeSignals = False, extended_output = True )
+            self.cachedObjs[expected]["lmax"]=lsm
+        self.mu_hat, self.sigma_mu, lmax = self.findMuHat ( allowNegativeSignals = False, extended_output = True )
+        self.cachedObjs[expected]["lmax"]=lmax
 
     def findMuHat( self, allowNegativeSignals = False, expected = False, 
                    extended_output = False, nll=False ):
