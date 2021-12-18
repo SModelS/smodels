@@ -51,7 +51,10 @@ class IntegrationTest(unittest.TestCase):
             diff = abs (  predval.asNumber(fb) - defpredval.asNumber(fb) ) / defpredval.asNumber(fb)
             self.assertTrue ( diff < .1 )
             #self.assertAlmostEqual( predval.asNumber(fb), defpredval.asNumber(fb), places=4 )
-            pred.computeStatistics( marginalize=True, deltas_rel=0. )
+            pred.marginalize = True
+            pred.deltas_rel = 0.
+            #pred.computeStatistics( marginalize=True, deltas_rel=0. )
+            pred.computeStatistics( )
             if pred.chi2 != self.predchi2()[expID]:
                 diff = abs ( pred.chi2 - self.predchi2()[expID] ) / self.predchi2()[expID]
                 self.assertTrue ( diff < .1 )

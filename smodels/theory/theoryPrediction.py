@@ -24,12 +24,22 @@ class TheoryPrediction(object):
     for an analysis.
     """
 
-    def __init__(self):
+    def __init__(self, marginalize = False, deltas_rel = .2 ):
+        """ a theory prediction. marginalize and deltas_rel are meant to be
+            constants 
+        :param marginalize: if true, marginalize nuisances. Else, profile them.
+        :param deltas_rel: relative uncertainty in signal (float). 
+                           Default value is 20%.
+        """
         self.analysis = None
         self.xsection = None
         self.conditions = None
         self.mass = None
         self.totalwidth = None
+        self.marginalize = marginalize
+        if deltas_rel == None:
+            deltas_rel = .2
+        self.deltas_rel = deltas_rel
 
     def dataId(self):
         """
@@ -61,7 +71,7 @@ class TheoryPrediction(object):
         return self.dataset.getType()
 
 
-    def getUpperLimit(self, expected=False, deltas_rel=0.2):
+    def getUpperLimit(self, expected=False ):
         """
         Get the upper limit on sigma*eff.
         For UL-type results, use the UL map. For EM-Type returns
@@ -70,8 +80,6 @@ class TheoryPrediction(object):
         total sigma*eff (for all signal regions/datasets).
 
         :param expected: return expected Upper Limit, instead of observed.
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-
         :return: upper limit (Unum object)
         """
 
@@ -80,8 +88,10 @@ class TheoryPrediction(object):
         if not hasattr(self, 'expectedUL') or not hasattr(self, 'upperLimit'):
 
             if self.dataType() == 'efficiencyMap':
-                self.expectedUL = self.dataset.getSRUpperLimit(expected=True,deltas_rel=deltas_rel)
-                self.upperLimit = self.dataset.getSRUpperLimit(expected=False,deltas_rel=deltas_rel)
+                self.expectedUL = self.dataset.getSRUpperLimit(expected=True,
+                        deltas_rel=self.deltas_rel )
+                self.upperLimit = self.dataset.getSRUpperLimit(expected=False,
+                        deltas_rel=self.deltas_rel )
             if self.dataType() == 'upperLimit':
                 self.expectedUL = self.dataset.getUpperLimitFor(element=self.avgElement,
                                                                 txnames=self.txnames,
@@ -98,8 +108,8 @@ class TheoryPrediction(object):
                 elif hasattr(self.dataset.globalInfo, "jsonFiles"):
                     srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*pred.dataset.getLumi() ).asNumber()] for pred in self.datasetPredictions])
                     srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
-                self.expectedUL = getCombinedUpperLimitFor(self.dataset, srNsigs,expected=True,deltas_rel=deltas_rel)
-                self.upperLimit = getCombinedUpperLimitFor(self.dataset, srNsigs,expected=False,deltas_rel=deltas_rel)
+                self.expectedUL = getCombinedUpperLimitFor(self.dataset, srNsigs,expected=True,deltas_rel=self.deltas_rel)
+                self.upperLimit = getCombinedUpperLimitFor(self.dataset, srNsigs,expected=False,deltas_rel=self.deltas_rel)
 
         #Return the expected or observed UL:
         if expected:
@@ -118,8 +128,8 @@ class TheoryPrediction(object):
         else:
             return (self.xsection.value/upperLimit).asNumber()
 
-    def likelihoodFromLimits( self, mu=1., marginalize=False, deltas_rel=.2,
-                              expected=False, chi2also=False, corr = 0.6 ):
+    def likelihoodFromLimits( self, mu=1., expected=False, chi2also=False, 
+                              corr = 0.6 ):
         """ compute the likelihood from expected and observed upper limits.
         :param expected: compute expected, not observed likelihood
         :param mu: signal strength multiplier, applied to theory prediction. If None,
@@ -164,12 +174,12 @@ class TheoryPrediction(object):
             return ( llhd, chi2FromLimits ( llhd, ulN, eulN, corr = corr ) )
         return llhd
 
-    def getLikelihood(self,mu=1.,marginalize=False,deltas_rel=.2,expected=False):
+    def getLikelihood(self,mu=1., expected=False ):
         """
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood
         """
-        self.computeStatistics ( marginalize, deltas_rel, expected=expected )
+        self.computeStatistics ( expected=expected )
         if hasattr ( self, "likelihood" ) and abs ( mu - 1. ) < 1e-5 and not expected:
             return self.likelihood
         if hasattr ( self, "elikelihood" ) and abs ( mu - 1. ) < 1e-5 and expected:
@@ -180,33 +190,32 @@ class TheoryPrediction(object):
                               pred in self.datasetPredictions])
             srNsigs = [mu*srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. \
                        for ds in self.dataset._datasets]
-            llhd = computeCombinedLikelihood ( self.dataset, srNsigs, marginalize,
-                                               deltas_rel )
+            llhd = computeCombinedLikelihood ( self.dataset, srNsigs, 
+                    self.marginalize, self.deltas_rel )
             return llhd
         if self.dataType() == 'efficiencyMap':
             nsig = (mu*self.xsection.value*lumi).asNumber()
-            llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel, expected=expected )
+            llhd = self.dataset.likelihood(nsig,marginalize=self.marginalize,
+                    deltas_rel=self.deltas_rel, expected=expected )
             return llhd
         if self.dataType()  == 'upperLimit':
-            llhd, chi2 = self.likelihoodFromLimits ( mu, marginalize, deltas_rel, chi2also=True, expected=expected )
+            llhd, chi2 = self.likelihoodFromLimits ( mu, chi2also=True, expected=expected )
             return llhd
         return None
 
 
-    def computeStatistics(self,marginalize=False,deltas_rel=0.2, expected=False ):
+    def computeStatistics(self, expected=False ):
         """
         Compute the likelihoods, chi2 and upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, lsm and chi2
         attributes (chi2 being phased out).
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param expected: computed expected quantities, not observed
         """
 
         if self.dataType()  == 'upperLimit':
-            llhd, chi2 = self.likelihoodFromLimits ( 1., marginalize, deltas_rel, expected=expected, chi2also=True )
-            lsm = self.likelihoodFromLimits ( 0., marginalize, deltas_rel, expected=expected, chi2also=False )
-            lmax = self.likelihoodFromLimits ( None, marginalize, deltas_rel, expected=expected, chi2also=False )
+            llhd, chi2 = self.likelihoodFromLimits ( 1., expected=expected, chi2also=True )
+            lsm = self.likelihoodFromLimits ( 0., expected=expected, chi2also=False )
+            lmax = self.likelihoodFromLimits ( None, expected=expected, chi2also=False )
             if expected:
                 self.elikelihood = llhd
                 self.echi2 = chi2
@@ -221,10 +230,13 @@ class TheoryPrediction(object):
         elif self.dataType() == 'efficiencyMap':
             lumi = self.dataset.getLumi()
             nsig = (self.xsection.value*lumi).asNumber()
-            llhd = self.dataset.likelihood(nsig,marginalize=marginalize,deltas_rel=deltas_rel,expected=expected)
-            llhd_sm = self.dataset.likelihood(nsig=0.,marginalize=marginalize,deltas_rel=deltas_rel,expected=expected)
-            llhd_max = self.dataset.lmax(marginalize=marginalize,deltas_rel=deltas_rel,\
-                                          allowNegativeSignals = False, expected=expected )
+            llhd = self.dataset.likelihood(nsig,marginalize=self.marginalize,
+                    deltas_rel=self.deltas_rel,expected=expected)
+            llhd_sm = self.dataset.likelihood(nsig=0.,marginalize=self.marginalize,
+                    deltas_rel=self.deltas_rel,expected=expected)
+            llhd_max = self.dataset.lmax(marginalize=self.marginalize,
+                    deltas_rel=self.deltas_rel,\
+                    allowNegativeSignals = False, expected=expected )
             if expected:
                 self.elikelihood = llhd
                 self.elmax = llhd_max
@@ -252,8 +264,8 @@ class TheoryPrediction(object):
             srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
             srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
             # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
-            llhd,lmax,lsm = computeCombinedStatistics ( self.dataset, srNsigs, marginalize,
-                                                     deltas_rel, expected=expected )
+            llhd,lmax,lsm = computeCombinedStatistics ( self.dataset, srNsigs, 
+                    self.marginalize, self.deltas_rel, expected=expected )
             if expected:
                 self.elikelihood = llhd
                 self.elmax = lmax
@@ -392,7 +404,7 @@ class TheoryPredictionList(object):
 
 def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
                 useBestDataset=True, combinedResults=True,
-                marginalize=False,deltas_rel=0.2):
+                marginalize=False, deltas_rel=.2 ):
     """
     Compute theory predictions for the given experimental result, using the list of
     elements in smsTopList.
@@ -437,7 +449,8 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         result = dataSetResults[0]
         for theoPred in result:
             theoPred.expResult = expResult
-            theoPred.upperLimit = theoPred.getUpperLimit(deltas_rel=deltas_rel)
+            theoPred.deltas_rel = deltas_rel
+            theoPred.upperLimit = theoPred.getUpperLimit()
         return result
 
     #For results with more than one dataset, return all dataset predictions
@@ -446,7 +459,8 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         allResults = sum(dataSetResults)
         for theoPred in allResults:
             theoPred.expResult = expResult
-            theoPred.upperLimit = theoPred.getUpperLimit(deltas_rel=deltas_rel)
+            theoPred.deltas_rel = deltas_rel
+            theoPred.upperLimit = theoPred.getUpperLimit()
         return allResults
 
     #Else include best signal region results, if asked for.
@@ -462,7 +476,8 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
 
     for theoPred in bestResults:
         theoPred.expResult = expResult
-        theoPred.upperLimit = theoPred.getUpperLimit(deltas_rel=deltas_rel)
+        theoPred.deltas_rel = deltas_rel
+        theoPred.upperLimit = theoPred.getUpperLimit()
 
     return bestResults
 
@@ -522,7 +537,7 @@ def _getCombinedResultFor(dataSetResults,expResult,marginalize=False):
     combinedDataset = CombinedDataSet(expResult)
     combinedDataset._marginalize = marginalize
     #Create a theory preidction object for the combined datasets:
-    theoryPrediction = TheoryPrediction()
+    theoryPrediction = TheoryPrediction( marginalize )
     theoryPrediction.dataset = combinedDataset
     theoryPrediction.txnames = txnameList
     theoryPrediction.xsection = totalXsec
@@ -571,7 +586,8 @@ def _getBestResult(dataSetResults):
 
     return bestPred
 
-def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
+def _getDataSetPredictions( dataset,smsTopList,maxMassDist,
+                            marginalize = False, deltas_rel = .2 ):
     """
     Compute theory predictions for a given data set.
     For upper-limit results returns the list of theory predictions for the
@@ -615,7 +631,7 @@ def _getDataSetPredictions(dataset,smsTopList,maxMassDist):
 
     # Collect results and evaluate conditions
     for cluster in clusters:
-        theoryPrediction = TheoryPrediction()
+        theoryPrediction = TheoryPrediction( marginalize, deltas_rel )
         theoryPrediction.dataset = dataset
         theoryPrediction.txnames = cluster.txnames
         theoryPrediction.xsection = _evalConstraint(cluster)
