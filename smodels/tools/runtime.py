@@ -15,6 +15,8 @@ modelFile="smodels.share.models.mssm"
 
 _experimental = False ## turn on experimental features
 
+_deltas_rel_default = .2 ## the default relative error on the signal strength
+
 def filetype ( filename ):
     """ obtain information about the filetype of an input file,
         currently only used to discriminate between slha and lhe

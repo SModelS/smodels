@@ -23,7 +23,7 @@ class TheoryPredictionsCombiner():
     Facility used to combine theory predictions from different analyes.
     """
     def __init__ ( self, theoryPredictions : list, slhafile = None,
-                   toys = 30000, marginalize = False, deltas_rel = 0.2 ):
+                   toys = 30000, marginalize = False, deltas_rel = None ):
         """ constructor.
         :param theoryPredictions: the List of theory predictions
         :param slhafile: optionally, the slhafile can be given, for debugging
@@ -35,17 +35,21 @@ class TheoryPredictionsCombiner():
         self.slhafile = slhafile
         self.toys = toys
         self.marginalize = marginalize
+        if deltas_rel == None:
+            from smodels.tools.runtime import _deltas_rel_default
+            deltas_rel = _deltas_rel_default
         self.deltas_rel  = deltas_rel
 
 
-    def lsm( self, marginalize = False, deltas_rel = .2, expected = False ):
+    def lsm( self, expected = False ):
         """ compute the likelihood at mu = 0.
         :param expected: if True, compute expected likelihood, else observed.
                          If "posteriori", compute posterior expected.
         """
         llhd = 1.
         for tp in self.theoryPredictions:
-            llhd = llhd * tp.dataset.likelihood(0.,marginalize=marginalize,deltas_rel=deltas_rel,expected=expected)
+            llhd = llhd * tp.dataset.likelihood(0.,marginalize=self.marginalize,
+                    deltas_rel=self.deltas_rel,expected=expected )
         return llhd
 
     def likelihood ( self, mu = 1., expected = False ):
@@ -245,7 +249,7 @@ class TheoryPredictionsCombiner():
         mu_lim = optimize.brentq ( clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim 
 
-    def getUpperLimitOnMuOld(self, expected=False, deltas_rel=0.2):
+    def getUpperLimitOnMuOld(self, expected=False ):
         """ get upper limit on signal strength multiplier, i.e. value for mu for
             which CLs = 0.95
         :param expected: if True, compute expected likelihood, else observed
@@ -255,7 +259,7 @@ class TheoryPredictionsCombiner():
         """
         if not hasattr ( self, "mu_hat" ):
             self.computeStatistics( marginalize = marginalize, 
-                    deltas_rel = deltas_rel, expected = False )
+                    deltas_rel = self.deltas_rel, expected = False )
         ## lower and upper bounds on mu that we scan
         ## +/- 3 sigma should cover it up to < 1 permille
         lower, upper = self.mu_hat - 4*sigma_mu, mu_hat + 4*sigma_mu

@@ -24,7 +24,7 @@ class TheoryPrediction(object):
     for an analysis.
     """
 
-    def __init__(self, marginalize = False, deltas_rel = .2 ):
+    def __init__(self, marginalize = False, deltas_rel = None ):
         """ a theory prediction. marginalize and deltas_rel are meant to be
             constants 
         :param marginalize: if true, marginalize nuisances. Else, profile them.
@@ -38,7 +38,8 @@ class TheoryPrediction(object):
         self.totalwidth = None
         self.marginalize = marginalize
         if deltas_rel == None:
-            deltas_rel = .2
+            from smodels.tools.runtime import _deltas_rel_default
+            deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
 
     def dataId(self):
@@ -404,7 +405,7 @@ class TheoryPredictionList(object):
 
 def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
                 useBestDataset=True, combinedResults=True,
-                marginalize=False, deltas_rel=.2 ):
+                marginalize=False, deltas_rel=None ):
     """
     Compute theory predictions for the given experimental result, using the list of
     elements in smsTopList.
@@ -427,6 +428,10 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction
                objects
     """
+    if deltas_rel == None:
+        from smodels.tools.runtime import _deltas_rel_default
+        deltas_rel = _deltas_rel_default
+
     if type(expResult) in [ list, tuple ]:
         ret = []
         for er in expResult:
@@ -587,7 +592,7 @@ def _getBestResult(dataSetResults):
     return bestPred
 
 def _getDataSetPredictions( dataset,smsTopList,maxMassDist,
-                            marginalize = False, deltas_rel = .2 ):
+                            marginalize = False, deltas_rel = None ):
     """
     Compute theory predictions for a given data set.
     For upper-limit results returns the list of theory predictions for the
@@ -604,6 +609,9 @@ def _getDataSetPredictions( dataset,smsTopList,maxMassDist,
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction
                objects
     """
+    if deltas_rel == None:
+        from smodels.tools.runtime import _deltas_rel_default
+        deltas_rel = _deltas_rel_default
 
     predictionList = TheoryPredictionList()
     # Select elements belonging to expResult and apply efficiencies
