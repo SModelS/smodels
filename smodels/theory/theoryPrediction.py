@@ -182,16 +182,32 @@ class TheoryPrediction(object):
             raise AttributeError ( "object does not have attribute _llhd" )
         return self.cachedObjs[False]["llhd"]
 
+    @property
+    def elikelihood ( self ):
+        if not "llhd" in self.cachedObjs[True]:
+            raise AttributeError ( "object does not have attribute _ellhd" )
+        return self.cachedObjs[True]["llhd"]
+
+    @property
+    def lsm ( self ):
+        if not "lsm" in self.cachedObjs[False]:
+            raise AttributeError ( "object does not have attribute _lsm" )
+        return self.cachedObjs[False]["lsm"]
+
+    @property
+    def elsm ( self ):
+        if not "lsm" in self.cachedObjs[True]:
+            raise AttributeError ( "object does not have attribute _elsm" )
+        return self.cachedObjs[True]["lsm"]
+
     def getLikelihood(self,mu=1., expected=False ):
         """
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood
         """
         self.computeStatistics ( expected=expected )
-        if "llhd" in self.cachedObjs[False] and abs ( mu - 1. ) < 1e-5 and not expected:
-            return self.cachedObjs[False]["llhd"]
-        if hasattr ( self, "elikelihood" ) and abs ( mu - 1. ) < 1e-5 and expected:
-            return self.elikelihood
+        if "llhd" in self.cachedObjs[expected] and abs ( mu - 1. ) < 1e-5:
+            return self.cachedObjs[expected]["llhd"]
         lumi = self.dataset.getLumi()
         if self.dataType() == 'combined':
             srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for \
@@ -225,14 +241,12 @@ class TheoryPrediction(object):
             lsm = self.likelihoodFromLimits ( 0., expected=expected, chi2also=False )
             lmax = self.likelihoodFromLimits ( None, expected=expected, chi2also=False )
             self.cachedObjs[expected]["llhd"]=llhd
+            self.cachedObjs[expected]["lsm"]=lsm
             if expected:
-                self.elikelihood = llhd
                 self.echi2 = chi2
-                self.elsm = lsm
                 self.elmax = lmax
             else:
                 self.chi2 = chi2
-                self.lsm = lsm
                 self.lmax = lmax
 
         elif self.dataType() == 'efficiencyMap':
@@ -246,13 +260,11 @@ class TheoryPrediction(object):
                     deltas_rel=self.deltas_rel,\
                     allowNegativeSignals = False, expected=expected )
             self.cachedObjs[expected]["llhd"]=llhd
+            self.cachedObjs[expected]["lsm"]=llhd_sm
             if expected:
-                self.elikelihood = llhd
                 self.elmax = llhd_max
-                self.elsm = llhd_sm
             else:
                 self.lmax = llhd_max
-                self.lsm = llhd_sm
             from math import log
             chi2 = None
             if llhd == 0. and llhd_max == 0.:
@@ -275,14 +287,11 @@ class TheoryPrediction(object):
             llhd,lmax,lsm = computeCombinedStatistics ( self.dataset, srNsigs, 
                     self.marginalize, self.deltas_rel, expected=expected )
             self.cachedObjs[expected]["llhd"]=llhd
+            self.cachedObjs[expected]["lsm"]=lsm
             if expected:
-                self.elikelihood = llhd
                 self.elmax = lmax
-                self.elsm = lsm
             else:
                 self.lmax = lmax
-                self.lsm = lsm
-
 
     def getmaxCondition(self):
         """
