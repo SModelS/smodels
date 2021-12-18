@@ -189,17 +189,12 @@ class TheoryPrediction(object):
             raise AttributeError ( "object does not have attribute _ellhd" )
         return self.cachedObjs[True]["llhd"]
 
-    @property
-    def lsm ( self ):
-        if not "lsm" in self.cachedObjs[False]:
+    def lsm ( self, expected=False ):
+        if not "lsm" in self.cachedObjs[expected]:
+            self.computeStatistics(expected )
+        if not "lsm" in self.cachedObjs[expected]:
             raise AttributeError ( "object does not have attribute _lsm" )
-        return self.cachedObjs[False]["lsm"]
-
-    @property
-    def elsm ( self ):
-        if not "lsm" in self.cachedObjs[True]:
-            raise AttributeError ( "object does not have attribute _elsm" )
-        return self.cachedObjs[True]["lsm"]
+        return self.cachedObjs[expected]["lsm"]
 
     @property
     def lmax ( self ):
