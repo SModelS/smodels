@@ -110,7 +110,7 @@ class SLTest(unittest.TestCase):
         ulProf = ulComp.ulSigma ( m, marginalize=False )
         self.assertAlmostEqual( ulProf/75.29914, 1.0, 3 )
         ul = ulComp.ulSigma ( m, marginalize=True )
-        self.assertAlmostEqual ( ul/77.71288, 1., 1 )
+        self.assertAlmostEqual ( ul/78.5094475, 1., 1 )
 
 if __name__ == "__main__":
     unittest.main()
