@@ -41,6 +41,7 @@ class TheoryPrediction(object):
             from smodels.tools.runtime import _deltas_rel_default
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
+        self.cachedObjs = { False: {}, True: {}, "posteriori": {} }
 
     def dataId(self):
         """
@@ -175,14 +176,20 @@ class TheoryPrediction(object):
             return ( llhd, chi2FromLimits ( llhd, ulN, eulN, corr = corr ) )
         return llhd
 
+    @property
+    def likelihood ( self ):
+        if not "llhd" in self.cachedObjs[False]:
+            raise AttributeError ( "object does not have attribute _llhd" )
+        return self.cachedObjs[False]["llhd"]
+
     def getLikelihood(self,mu=1., expected=False ):
         """
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood
         """
         self.computeStatistics ( expected=expected )
-        if hasattr ( self, "likelihood" ) and abs ( mu - 1. ) < 1e-5 and not expected:
-            return self.likelihood
+        if "llhd" in self.cachedObjs[False] and abs ( mu - 1. ) < 1e-5 and not expected:
+            return self.cachedObjs[False]["llhd"]
         if hasattr ( self, "elikelihood" ) and abs ( mu - 1. ) < 1e-5 and expected:
             return self.elikelihood
         lumi = self.dataset.getLumi()
@@ -217,13 +224,13 @@ class TheoryPrediction(object):
             llhd, chi2 = self.likelihoodFromLimits ( 1., expected=expected, chi2also=True )
             lsm = self.likelihoodFromLimits ( 0., expected=expected, chi2also=False )
             lmax = self.likelihoodFromLimits ( None, expected=expected, chi2also=False )
+            self.cachedObjs[expected]["llhd"]=llhd
             if expected:
                 self.elikelihood = llhd
                 self.echi2 = chi2
                 self.elsm = lsm
                 self.elmax = lmax
             else:
-                self.likelihood = llhd
                 self.chi2 = chi2
                 self.lsm = lsm
                 self.lmax = lmax
@@ -238,12 +245,12 @@ class TheoryPrediction(object):
             llhd_max = self.dataset.lmax(marginalize=self.marginalize,
                     deltas_rel=self.deltas_rel,\
                     allowNegativeSignals = False, expected=expected )
+            self.cachedObjs[expected]["llhd"]=llhd
             if expected:
                 self.elikelihood = llhd
                 self.elmax = llhd_max
                 self.elsm = llhd_sm
             else:
-                self.likelihood = llhd
                 self.lmax = llhd_max
                 self.lsm = llhd_sm
             from math import log
@@ -267,12 +274,12 @@ class TheoryPrediction(object):
             # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
             llhd,lmax,lsm = computeCombinedStatistics ( self.dataset, srNsigs, 
                     self.marginalize, self.deltas_rel, expected=expected )
+            self.cachedObjs[expected]["llhd"]=llhd
             if expected:
                 self.elikelihood = llhd
                 self.elmax = lmax
                 self.elsm = lsm
             else:
-                self.likelihood = llhd
                 self.lmax = lmax
                 self.lsm = lsm
 
