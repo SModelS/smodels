@@ -661,7 +661,7 @@ class SummaryPrinter(TxTPrinter):
 
         output += "\n \n"
         output += 80 * "=" + "\n"
-        output += "The highest r value is = %.12f from %s" % \
+        output += "The highest r value is = %.5f from %s" % \
                    ( maxr["obs"], maxr["anaid"] )
         if maxr["exp"] != None and maxr["exp"]>-.5:
             output += " (r_expected=%.5f)" % maxr["exp"]
