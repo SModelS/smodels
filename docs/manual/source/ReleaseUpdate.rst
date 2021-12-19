@@ -37,11 +37,12 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
-New in Version 2.1.2:
+New in Version 2.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * small fixes with (expected) combined likelihoods (kudos to Jamie Yellen)
+  * likelihood combiner introduced
   * posteriori expected limits introduced
+  * a few smaller changes around expected likelihoods and limits
   * allow :ref:`ncpus <parameterFileNcpus>` to take on zero and negative values in 
     ini file [meaning use all but this (absolute) number of CPU cores]
   * small fixes in the :ref:`Howto's <Examples>` 
