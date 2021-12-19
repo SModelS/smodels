@@ -183,12 +183,6 @@ class TheoryPrediction(object):
             raise AttributeError ( "object does not have attribute _llhd" )
         return self.cachedObjs[False]["llhd"]
 
-    @property
-    def elikelihood ( self ):
-        if not "llhd" in self.cachedObjs[True]:
-            raise AttributeError ( "object does not have attribute _ellhd" )
-        return self.cachedObjs[True]["llhd"]
-
     def lsm ( self, expected=False ):
         if not "lsm" in self.cachedObjs[expected]:
             self.computeStatistics(expected )

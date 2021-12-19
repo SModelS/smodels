@@ -67,6 +67,7 @@ class TheoryPredictionsCombiner():
     @property
     def llhd( self ):
         return self.cachedObjs[False]["llhd"]
+
     @property
     def ellhd( self ):
         return self.cachedObjs[True]["llhd"]
