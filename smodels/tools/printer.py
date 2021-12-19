@@ -481,7 +481,7 @@ class TxTPrinter(BasicPrinter):
             if not upperLimitExp is None:
                 serv = self._formatNumber ( theoryPrediction.getRValue(expected=True), 4 )
                 output += "Expected r-value: %s\n" % serv
-            llhd = theoryPrediction.likelihood
+            llhd = theoryPrediction.likelihood()
             if not llhd is None:
 #                output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
                 chi2, chi2sm = None, None
@@ -640,8 +640,8 @@ class SummaryPrinter(TxTPrinter):
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
             output += " Txnames:  " + txnameStr + "\n"
 #           print L, L_max and L_SM instead of chi2 and llhd; SK 2021-05-14
-            if hasattr(theoPred,'likelihood'):# and not theoPred.likelihood is None:
-                llhd = theoPred.likelihood
+            llhd = theoPred.likelihood()
+            if not llhd is None:
                 lmax = str(theoPred.lmax() )
                 lsm = str(theoPred.lsm())
                 if type(llhd) in [ float, np.float64 ]:
@@ -898,9 +898,10 @@ class PyPrinter(BasicPrinter):
                 resDict["Width (GeV)"] = widths
             if hasattr(self,"addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] =  txnamesDict
-            if hasattr(theoryPrediction,'likelihood') and not theoryPrediction.likelihood is None:
+            llhd = theoryPrediction.likelihood()
+            if not llhd is None:
                 # resDict['chi2'] = self._round ( theoryPrediction.chi2 )
-                resDict['likelihood'] = self._round ( theoryPrediction.likelihood )
+                resDict['likelihood'] = self._round ( llhd )
                 resDict['l_max'] = self._round ( theoryPrediction.lmax() )
                 resDict['l_SM'] = self._round ( theoryPrediction.lsm() )
             ExptRes.append(resDict)
@@ -1151,8 +1152,8 @@ class SLHAPrinter(TxTPrinter):
             output += " %d 3 %-30.2f #condition violation\n" % (cter, theoPred.getmaxCondition())
             output += " %d 4 %-30s #analysis\n" % (cter, expResult.globalInfo.id)
             output += " %d 5 %-30s #signal region \n" %(cter, signalRegion.replace(" ","_"))
-            if hasattr(theoPred,'likelihood') and not theoPred.likelihood is None:
-                llhd = theoPred.likelihood
+            llhd = theoPred.likelihood()
+            if not llhd is None:
                 if type(llhd) in [ float, np.float32, np.float64 ]:
                     llhd = "%-30.3E" % llhd
                 else:

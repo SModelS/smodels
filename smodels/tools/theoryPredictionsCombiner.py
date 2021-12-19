@@ -64,13 +64,8 @@ class TheoryPredictionsCombiner():
                                         deltas_rel=self.deltas_rel,expected=expected)
         return ret
 
-    @property
-    def llhd( self ):
-        return self.cachedObjs[False]["llhd"]
-
-    @property
-    def ellhd( self ):
-        return self.cachedObjs[True]["llhd"]
+    def likelihood( self, expected=False ):
+        return self.cachedObjs[expected]["llhd"]
 
     def lmax( self, expected=False ):
         return self.cachedObjs[expected]["lmax"]

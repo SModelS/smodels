@@ -176,25 +176,24 @@ class TheoryPrediction(object):
             return ( llhd, chi2FromLimits ( llhd, ulN, eulN, corr = corr ) )
         return llhd
 
-
-    @property
-    def likelihood ( self ):
-        if not "llhd" in self.cachedObjs[False]:
-            raise AttributeError ( "object does not have attribute _llhd" )
-        return self.cachedObjs[False]["llhd"]
+    def likelihood ( self, expected=False ):
+        if not "llhd" in self.cachedObjs[expected]:
+            return None
+            # raise AttributeError ( "object does not have attribute _llhd" )
+        return self.cachedObjs[expected]["llhd"]
 
     def lsm ( self, expected=False ):
         if not "lsm" in self.cachedObjs[expected]:
             self.computeStatistics(expected )
         if not "lsm" in self.cachedObjs[expected]:
-            raise AttributeError ( "object does not have attribute _lsm" )
+            return None
         return self.cachedObjs[expected]["lsm"]
 
     def lmax ( self, expected=False ):
         if not "lmax" in self.cachedObjs[expected]:
             self.computeStatistics(expected )
         if not "lmax" in self.cachedObjs[expected]:
-            raise AttributeError ( "object does not have attribute _lmax" )
+            return None
         return self.cachedObjs[expected]["lmax"]
 
     def chi2 ( self, expected=False ):
