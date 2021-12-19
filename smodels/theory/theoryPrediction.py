@@ -14,9 +14,10 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statistics import likelihoodFromLimits, chi2FromLimits
-from smodels.tools.combinations import computeCombinedStatistics, getCombinedUpperLimitFor,\
-                                       computeCombinedLikelihood
+from smodels.tools.combinations import computeCombinedStatistics, \
+         getCombinedUpperLimitFor, computeCombinedLikelihood
 import itertools
+import numpy as np
 
 class TheoryPrediction(object):
     """
@@ -208,11 +209,19 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["chi2"]=None
         return self.cachedObjs[expected]["chi2"]
 
-    def getLikelihood(self,mu=1., expected=False ):
+    def getLikelihood(self,mu=1., expected=False, nll = False ):
         """
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood
+        :param nll: if True, return negative log likelihood, else likelihood
         """
+        if mu in self.cachedLlhds[expected]:
+            llhd = self.cachedLlhds[expected][mu]
+            if nll:
+                if llhd == 0.:
+                    return 700.
+                return - np.log ( llhd )
+            return llhd
         # self.computeStatistics ( expected=expected )
         if "llhd" in self.cachedObjs[expected] and abs ( mu - 1. ) < 1e-5:
             return self.cachedObjs[expected]["llhd"]
@@ -226,16 +235,18 @@ class TheoryPrediction(object):
                        for ds in self.dataset._datasets]
             llhd = computeCombinedLikelihood ( self.dataset, srNsigs, 
                     self.marginalize, self.deltas_rel )
-            return llhd
         if self.dataType() == 'efficiencyMap':
             nsig = (mu*self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig,marginalize=self.marginalize,
                     deltas_rel=self.deltas_rel, expected=expected )
-            return llhd
         if self.dataType()  == 'upperLimit':
             llhd, chi2 = self.likelihoodFromLimits ( mu, chi2also=True, expected=expected )
-            return llhd
-        return None
+        self.cachedLlhds[expected][mu]=llhd
+        if nll:
+            if llhd == 0.:
+                return 700.
+            return - np.log ( llhd )
+        return llhd
 
 
     def computeStatistics(self, expected=False ):

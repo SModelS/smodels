@@ -40,6 +40,8 @@ class TheoryPredictionsCombiner():
             deltas_rel = _deltas_rel_default
         self.deltas_rel  = deltas_rel
         self.cachedObjs = { False: {}, True: {}, "posteriori": {} }
+        self.cachedLlhds = { False: { False: {}, True: {}, "posteriori": {} },
+                             True: { False: {}, True: {}, "posteriori": {} } }
 
     def lsm( self, expected = False ):
         """ compute the likelihood at mu = 0.
@@ -130,8 +132,8 @@ class TheoryPredictionsCombiner():
         """
         import scipy.optimize
         def fun ( mu ):
-            return - np.log ( self.getLikelihood ( mu, expected = expected, 
-                        useRelSigStrengths = True ) )
+            return self.getLikelihood ( mu, expected = expected, 
+                        nll = True, useRelSigStrengths = True ) 
         toTry = [ 1., 0., 3., 10. ]
         if allowNegativeSignals:
             toTry = [ 1., 0., 3., -1., 10., -3. ]
@@ -182,6 +184,18 @@ class TheoryPredictionsCombiner():
         :param nll: if True, return negative log likelihood, else likelihood
         :param useRelSigStrengths: if True, get the likelihood not on signal strength mu, but on relative signal strength, total_nsig = 1 for mu = 1
         """
+        try:
+            mu = mu[0] # some of these methods use arrays with a single element
+        except:
+            pass
+        if mu in self.cachedLlhds[useRelSigStrengths][expected]:
+            llhd = self.cachedLlhds[useRelSigStrengths][expected][mu]
+            if nll:
+                if llhd == 0.: ## cut off nll at 700 (1e-300)
+                    return 700.
+                return - np.log ( llhd )
+            return llhd
+
         llhd = 1.
         S = 1.
         if useRelSigStrengths:
@@ -194,6 +208,7 @@ class TheoryPredictionsCombiner():
                 nsig = nsig / S
             llhd = llhd * tp.dataset.likelihood(mu*nsig,marginalize=self.marginalize,
                                         deltas_rel=self.deltas_rel,expected=expected)
+        self.cachedLlhds[useRelSigStrengths][expected][mu]=llhd
         if nll:
             if llhd == 0.: ## cut off nll at 700 (1e-300)
                 return 700.
