@@ -89,20 +89,14 @@ class TheoryPrediction(object):
 
         #First check if the upper-limit and expected upper-limit have already been computed.
         #If not, compute it and store them.
-        if not hasattr(self, 'expectedUL') or not hasattr(self, 'upperLimit'):
-
+        if not "UL" in self.cachedObjs[expected]:
             if self.dataType() == 'efficiencyMap':
-                self.expectedUL = self.dataset.getSRUpperLimit(expected=True,
-                        deltas_rel=self.deltas_rel )
-                self.upperLimit = self.dataset.getSRUpperLimit(expected=False,
-                        deltas_rel=self.deltas_rel )
+                self.cachedObjs[expected]["UL"] = self.dataset.getSRUpperLimit(
+                        expected=expected, deltas_rel=self.deltas_rel )
             if self.dataType() == 'upperLimit':
-                self.expectedUL = self.dataset.getUpperLimitFor(element=self.avgElement,
-                                                                txnames=self.txnames,
-                                                                expected=True)
-                self.upperLimit = self.dataset.getUpperLimitFor(element=self.avgElement,
-                                                                txnames=self.txnames,
-                                                                expected=False)
+                self.cachedObjs[expected]["UL"] = self.dataset.getUpperLimitFor(
+                        element=self.avgElement, txnames=self.txnames,
+                        expected=expected)
             if self.dataType() == 'combined':
                 #Create a list of signal events in each dataset/SR sorted according to datasetOrder
                 # lumi = self.dataset.getLumi()
@@ -112,14 +106,12 @@ class TheoryPrediction(object):
                 elif hasattr(self.dataset.globalInfo, "jsonFiles"):
                     srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*pred.dataset.getLumi() ).asNumber()] for pred in self.datasetPredictions])
                     srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
-                self.expectedUL = getCombinedUpperLimitFor(self.dataset, srNsigs,expected=True,deltas_rel=self.deltas_rel)
-                self.upperLimit = getCombinedUpperLimitFor(self.dataset, srNsigs,expected=False,deltas_rel=self.deltas_rel)
+                self.cachedObjs[expected]["UL"] = getCombinedUpperLimitFor(self.dataset, srNsigs,expected=expected, deltas_rel=self.deltas_rel)
 
         #Return the expected or observed UL:
-        if expected:
-            return self.expectedUL
-        else:
-            return self.upperLimit
+        #if not self.cachedObjs[expected]["UL"]:
+        #    self.cachedObjs[expected]["UL"]=None
+        return self.cachedObjs[expected]["UL"]
 
     def getRValue(self, expected = False):
         """

@@ -96,7 +96,7 @@ def compareSLHA(slhadefault,slhanew, allowedDiff ):
         for k in keys:
             ei = defaultData.blocks[b].entries[k]
             ej = newData.blocks[b].entries[k]
-            if type(ei) == float:
+            if type(ei) == float and type(ej)==float:
                 denom = ei + ej
                 if denom == 0.:
                     denom = 1e-6
@@ -145,7 +145,7 @@ class RunPrinterTest(unittest.TestCase):
             allPredictions += predictions._theoryPredictions
         
         for theoPred in allPredictions:
-            if theoPred.dataType() == 'efficiencyMap' and hasattr(theoPred,'expectedUL') and not theoPred.expectedUL is None:
+            if theoPred.dataType() == 'efficiencyMap': #  and hasattr(theoPred,'expectedUL') and not theoPred.expectedUL is None:
                 theoPred.computeStatistics()
         
         maxcond = 0.2
