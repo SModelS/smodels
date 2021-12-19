@@ -65,24 +65,14 @@ class TheoryPredictionsCombiner():
         return ret
 
     @property
-    def lsm( self ):
-        return self.cachedObjs[False]["lsm"]
-    @property
-    def elsm( self ):
-        return self.cachedObjs[True]["lsm"]
-    @property
     def llhd( self ):
         return self.cachedObjs[False]["llhd"]
     @property
     def ellhd( self ):
         return self.cachedObjs[True]["llhd"]
-    @property
-    def lmax( self ):
-        return self.cachedObjs[False]["lmax"]
 
-    @property
-    def elmax( self ):
-        return self.cachedObjs[True]["lmax"]
+    def lmax( self, expected=False ):
+        return self.cachedObjs[expected]["lmax"]
 
     def chi2( self, expected=False ):
         if not "llhd" in self.cachedObjs[expected] or not "lmax" in self.cachedObjs[expected]:

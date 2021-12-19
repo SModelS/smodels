@@ -489,11 +489,11 @@ class TxTPrinter(BasicPrinter):
                 except TypeError as e:
                     pass
                 try:
-                    chi2 = -2*np.log(theoryPrediction.likelihood/theoryPrediction.lmax)
+                    chi2 = -2*np.log(theoryPrediction.likelihood/theoryPrediction.lmax() )
                 except TypeError as e:
                     pass
                 output += "Likelihood: " + self._formatNumber(theoryPrediction.likelihood,4) + "\n"
-                output += "L_max: " + self._formatNumber(theoryPrediction.lmax,4) + "   -2log(L/L_max): " + self._formatNumber(chi2,4) + "\n"
+                output += "L_max: " + self._formatNumber(theoryPrediction.lmax(),4) + "   -2log(L/L_max): " + self._formatNumber(chi2,4) + "\n"
                 output += "L_SM: " + self._formatNumber(theoryPrediction.lsm(),4) + \
                           "   -2log(L/L_SM): " + self._formatNumber(chi2sm,4) + "\n"
 
@@ -641,12 +641,12 @@ class SummaryPrinter(TxTPrinter):
 #           print L, L_max and L_SM instead of chi2 and llhd; SK 2021-05-14
             if hasattr(theoPred,'likelihood'):# and not theoPred.likelihood is None:
                 llhd = str(theoPred.likelihood)
-                lmax = str(theoPred.lmax)
+                lmax = str(theoPred.lmax() )
                 lsm = str(theoPred.lsm())
                 if type(theoPred.likelihood) in [ float, np.float64 ]:
                     llhd = "%10.3E" % theoPred.likelihood
-                if type(theoPred.lmax) in [ float, np.float64 ]:
-                    lmax = "%10.3E" % theoPred.lmax
+                if type(lmax) in [ float, np.float64 ]:
+                    lmax = "%10.3E" % lmax
                 if type(lsm) in [ float, np.float64 ]:
                     lsm = "%10.3E" % lsm
                 if llhd == lmax == lsm == "None":
@@ -898,7 +898,7 @@ class PyPrinter(BasicPrinter):
             if hasattr(theoryPrediction,'likelihood') and not theoryPrediction.likelihood is None:
                 # resDict['chi2'] = self._round ( theoryPrediction.chi2 )
                 resDict['likelihood'] = self._round ( theoryPrediction.likelihood )
-                resDict['l_max'] = self._round ( theoryPrediction.lmax )
+                resDict['l_max'] = self._round ( theoryPrediction.lmax() )
                 resDict['l_SM'] = self._round ( theoryPrediction.lsm() )
             ExptRes.append(resDict)
 
@@ -1154,9 +1154,9 @@ class SLHAPrinter(TxTPrinter):
                 llhd = str(theoPred.likelihood)
                 if type(theoPred.likelihood) in [ float, np.float32, np.float64 ]:
                     llhd = "%-30.3E" % theoPred.likelihood
-                lmax = str(theoPred.lmax)
-                if type(theoPred.lmax) in [ float, np.float32, np.float64 ]:
-                    lmax = "%-30.3E" % theoPred.lmax
+                lmax = str(theoPred.lmax())
+                if type(lmax) in [ float, np.float32, np.float64 ]:
+                    lmax = "%-30.3E" % lmax
                 lsm = str(theoPred.lsm() )
                 if type(lsm) in [ float, np.float32, np.float64 ]:
                     lsm = "%-30.3E" % lsm
