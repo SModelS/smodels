@@ -179,24 +179,27 @@ class TheoryPrediction(object):
     def likelihood ( self, expected=False ):
         if not "llhd" in self.cachedObjs[expected]:
             return None
-            # raise AttributeError ( "object does not have attribute _llhd" )
         return self.cachedObjs[expected]["llhd"]
 
     def lsm ( self, expected=False ):
         if not "lsm" in self.cachedObjs[expected]:
             self.computeStatistics(expected )
         if not "lsm" in self.cachedObjs[expected]:
-            return None
+            self.cachedObjs[expected]["lsm"]=None
         return self.cachedObjs[expected]["lsm"]
 
     def lmax ( self, expected=False ):
         if not "lmax" in self.cachedObjs[expected]:
             self.computeStatistics(expected )
         if not "lmax" in self.cachedObjs[expected]:
-            return None
+            self.cachedObjs[expected]["lmax"]=None
         return self.cachedObjs[expected]["lmax"]
 
     def chi2 ( self, expected=False ):
+        if not "chi2" in self.cachedObjs[expected]:
+            self.computeStatistics(expected )
+        if not "chi2" in self.cachedObjs[expected]:
+            self.cachedObjs[expected]["chi2"]=None
         return self.cachedObjs[expected]["chi2"]
 
     def getLikelihood(self,mu=1., expected=False ):
@@ -204,9 +207,11 @@ class TheoryPrediction(object):
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood
         """
-        self.computeStatistics ( expected=expected )
+        # self.computeStatistics ( expected=expected )
         if "llhd" in self.cachedObjs[expected] and abs ( mu - 1. ) < 1e-5:
             return self.cachedObjs[expected]["llhd"]
+        if "lsm" in self.cachedObjs[expected] and abs ( mu ) < 1e-5:
+            return self.cachedObjs[expected]["lsm"]
         lumi = self.dataset.getLumi()
         if self.dataType() == 'combined':
             srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value*lumi).asNumber()] for \

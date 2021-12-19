@@ -52,22 +52,14 @@ class TheoryPredictionsCombiner():
                     deltas_rel=self.deltas_rel,expected=expected )
         return llhd
 
-    def likelihood ( self, mu = 1., expected = False ):
-        """ compute the likelihood at signal strength mu
-        :param expected: if True, compute expected likelihood, else observed
-        """
-        ret = 1.
-        for tp in self.theoryPredictions:
-            lumi = tp.dataset.getLumi()
-            nsig = (tp.xsection.value*lumi).asNumber()
-            ret = ret * tp.dataset.likelihood(mu*nsig,marginalize=self.marginalize,
-                                        deltas_rel=self.deltas_rel,expected=expected)
-        return ret
-
     def likelihood( self, expected=False ):
         return self.cachedObjs[expected]["llhd"]
 
     def lmax( self, expected=False ):
+        if not "lmax" in self.cachedObjs[expected]:
+            self.computeStatistics ( expected = expected )
+        if not "lmax" in self.cachedObjs[expected]:
+            self.cachedObjs[expected]["lmax"]=None
         return self.cachedObjs[expected]["lmax"]
 
     def chi2( self, expected=False ):
