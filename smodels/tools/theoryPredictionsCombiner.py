@@ -231,11 +231,15 @@ class TheoryPredictionsCombiner():
         """ get upper limit on signal strength multiplier, i.e. value for mu for
             which CLs = 0.95
         :param expected: if True, compute expected likelihood, else observed
-        :param toys: specify number of toys. Use default is none
+        :param toys: specify number of toys. Use default if none
         :returns: upper limit on signal strength multiplier mu
         """
         if toys==None:
+            ## caching only used when using default toys
             toys=self.toys
+        if toys == self.toys:
+            if "UL" in self.cachedObjs[expected]:
+                return self.cachedObjs[expected]["UL"]
         #if not hasattr ( self, "mu_hat" ):
         #    self.computeStatistics( expected = False )
         mu_hat, sigma_mu, lmax = self.findMuHat ( allowNegativeSignals = True, extended_output = True )
@@ -259,6 +263,8 @@ class TheoryPredictionsCombiner():
 
         a,b = determineBrentBracket( mu_hat, sigma_mu, clsRoot )
         mu_lim = optimize.brentq ( clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
+        if toys == self.toys:
+            self.cachedObjs[expected]["UL"] = mu_lim
         return mu_lim 
 
     def getUpperLimitOnMuOld(self, expected=False ):
@@ -326,15 +332,15 @@ class TheoryPredictionsCombiner():
         :param expected: if True, compute expected likelihood, else observed
         :returns: r-value
         """
+        if "r" in self.cachedObjs[expected]:
+            return self.cachedObjs[expected]["r"]
         clmu = self.getUpperLimitOnMu ( expected = expected )
         if clmu == 0.:
             ## has no meaning, has it?
             return None
-        #ret = []
         xsecs = []
         for tp in self.theoryPredictions:
             xsecs.append ( float (tp.xsection.value * tp.dataset.getLumi() ) )
-        #return ret
-        #print ( "clmu", clmu )
-        #print ( "xsecs", xsecs )
-        return sum(xsecs) / clmu
+        ret = sum(xsecs) / clmu
+        self.cachedObjs[expected]["r"] = ret
+        return ret

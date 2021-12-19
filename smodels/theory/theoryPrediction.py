@@ -117,12 +117,17 @@ class TheoryPrediction(object):
         """
         Get the r value = theory prediction / experimental upper limit
         """
-
-        upperLimit = self.getUpperLimit(expected)
-        if upperLimit is None or upperLimit.asNumber(fb)==0.:
-            return None
-        else:
-            return (self.xsection.value/upperLimit).asNumber()
+        if not "r" in self.cachedObjs[expected]:
+            upperLimit = self.getUpperLimit(expected)
+            if upperLimit is None or upperLimit.asNumber(fb)==0.:
+                r = None
+                self.cachedObjs[expected]["r"]=r
+                return r
+            else:
+                r = (self.xsection.value/upperLimit).asNumber()
+                self.cachedObjs[expected]["r"]=r
+                return r
+        return self.cachedObjs[expected]["r"]
 
     def likelihoodFromLimits( self, mu=1., expected=False, chi2also=False, 
                               corr = 0.6 ):
