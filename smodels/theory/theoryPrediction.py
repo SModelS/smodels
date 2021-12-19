@@ -42,6 +42,7 @@ class TheoryPrediction(object):
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
         self.cachedObjs = { False: {}, True: {}, "posteriori": {} }
+        self.cachedLlhds = { False: {}, True: {}, "posteriori": {} }
 
     def dataId(self):
         """
@@ -177,11 +178,15 @@ class TheoryPrediction(object):
         return llhd
 
     def likelihood ( self, expected=False ):
+        """ same as .getLikelihood ( mu=1. ) """
+        #if not "llhd" in self.cachedObjs[expected]:
+        #    self.computeStatistics(expected )
         if not "llhd" in self.cachedObjs[expected]:
             return None
         return self.cachedObjs[expected]["llhd"]
 
     def lsm ( self, expected=False ):
+        """ likelihood at SM point, same as .getLikelihood ( mu = 0. ) """
         if not "lsm" in self.cachedObjs[expected]:
             self.computeStatistics(expected )
         if not "lsm" in self.cachedObjs[expected]:
@@ -189,6 +194,7 @@ class TheoryPrediction(object):
         return self.cachedObjs[expected]["lsm"]
 
     def lmax ( self, expected=False ):
+        """ likelihood at mu_hat """
         if not "lmax" in self.cachedObjs[expected]:
             self.computeStatistics(expected )
         if not "lmax" in self.cachedObjs[expected]:
