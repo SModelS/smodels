@@ -132,6 +132,13 @@ class BasicPrinter(object):
             logger.warning("Removing file %s" %filename)
             os.remove(filename)
 
+    def getTypeOfExpected ( self ):
+        """ tiny convenience function """
+        expected = True
+        if self.typeofexpectedvalues == "posteriori":
+            expected = "posteriori"
+        return expected
+
     @property
     def filename(self):
         return self._filename
@@ -471,7 +478,7 @@ class TxTPrinter(BasicPrinter):
 
             #Get upper limit for the respective prediction:
             upperLimit = theoryPrediction.getUpperLimit(expected=False)
-            upperLimitExp = theoryPrediction.getUpperLimit(expected=True)
+            upperLimitExp = theoryPrediction.getUpperLimit(expected=self.getTypeOfExpected())
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if not upperLimitExp is None:
@@ -479,7 +486,7 @@ class TxTPrinter(BasicPrinter):
             srv = self._formatNumber ( theoryPrediction.getRValue(expected=False), 4 )
             output += "Observed r-value: %s\n" % srv
             if not upperLimitExp is None:
-                serv = self._formatNumber ( theoryPrediction.getRValue(expected=True), 4 )
+                serv = self._formatNumber ( theoryPrediction.getRValue(expected=self.getTypeOfExpected()), 4 )
                 output += "Expected r-value: %s\n" % serv
             llhd = theoryPrediction.likelihood()
             if not llhd is None:
@@ -596,7 +603,7 @@ class SummaryPrinter(TxTPrinter):
                     "ATLAS": { "obs": -1., "exp": -1, "anaid": "?" } }
         for theoPred in obj._theoryPredictions:
             r = theoPred.getRValue(expected=False)
-            r_expected = theoPred.getRValue(expected=True)
+            r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
             expResult = theoPred.expResult
             coll = "ATLAS" if "ATLAS" in expResult.globalInfo.id else "CMS"
             if r_expected != None and r_expected > maxcoll[coll]["exp"]:
@@ -619,7 +626,7 @@ class SummaryPrinter(TxTPrinter):
                 signalRegion = '(UL)'
             value = theoPred.xsection.value
             r = theoPred.getRValue(expected=False)
-            r_expected = theoPred.getRValue(expected=True)
+            r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
             rs = str(r)
             rs_expected = str(r_expected)
             if type(r) in [ int, float, np.float64 ]:
@@ -836,7 +843,7 @@ class PyPrinter(BasicPrinter):
             datasetID = theoryPrediction.dataId()
             dataType = theoryPrediction.dataType()
             ul = theoryPrediction.getUpperLimit()
-            ulExpected = theoryPrediction.getUpperLimit(expected = True)
+            ulExpected = theoryPrediction.getUpperLimit(expected = self.getTypeOfExpected() )
             if isinstance(ul,unum.Unum):
                 ul = ul.asNumber(fb)
             if isinstance(ulExpected,unum.Unum):
@@ -881,7 +888,7 @@ class PyPrinter(BasicPrinter):
             sqrts = expResult.globalInfo.sqrts
 
             r = self._round ( theoryPrediction.getRValue(expected=False) )
-            r_expected = self._round ( theoryPrediction.getRValue(expected=True) )
+            r_expected = self._round ( theoryPrediction.getRValue(expected=self.getTypeOfExpected() ) )
 
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': self._round ( value ),
                         'upper limit (fb)': self._round ( ul ),
@@ -1141,7 +1148,7 @@ class SLHAPrinter(TxTPrinter):
             if signalRegion is None:
                 signalRegion = '(UL)'
             r = theoPred.getRValue()
-            r_expected = theoPred.getRValue( expected=True )
+            r_expected = theoPred.getRValue( expected=self.getTypeOfExpected() )
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
 
