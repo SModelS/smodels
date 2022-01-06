@@ -448,10 +448,13 @@ class PyhfUpperLimitComputer:
                 # Same modifiers_settings as those use when running the 'pyhf cls' command line
                 msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
                 model = workspace.model(modifier_settings=msettings)
+                bounds = model.config.suggested_bounds()
+                bounds[model.config.poi_index] = [0,10]
                 start = time.time()
                 stat = "qtilde" # by default
                 args = {}
                 args["return_expected"] = ( expected == "posteriori" )
+                args["par_bounds"] = bounds
                 pver = float ( pyhf.__version__[:3] )
                 if pver < 0.6:
                     args["qtilde"]=True
