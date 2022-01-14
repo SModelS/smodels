@@ -71,6 +71,7 @@ class TheoryPredictionsCombiner():
             return
         llhd = self.cachedObjs[expected]["llhd"]
         lmax = self.cachedObjs[expected]["lmax"]
+
         if llhd == 0.:
             return 2000.  # we cut off at > 1e-300 or so ;)
         return - 2 * np.log(llhd / lmax)
@@ -250,8 +251,8 @@ class TheoryPredictionsCombiner():
                 return self.cachedObjs[expected]["UL"]
         # if not hasattr ( self, "mu_hat" ):
         #    self.computeStatistics( expected = False )
-        mu_hat, sigma_mu, lmax = self.findMuHat(
-            allowNegativeSignals=True, extended_output=True)
+        mu_hat, sigma_mu, lmax = self.findMuHat(allowNegativeSignals=True,
+                                                extended_output=True)
         nll0 = self.getLikelihood(mu_hat, expected=expected, nll=True,
                                   useRelSigStrengths=True)
         # a posteriori expected is needed here

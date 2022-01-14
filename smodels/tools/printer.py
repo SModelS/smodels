@@ -730,11 +730,8 @@ class SummaryPrinter(TxTPrinter):
         expResults = [
             tp.expResult.globalInfo.id for tp in obj.theoryPredictions]
         # Get r-value:
-        r = 0.0
-        ulmu = obj.getUpperLimitOnMu()
-        if ulmu:
-            r = 1./ulmu
-        r = ulmu
+        r = obj.getRValue()
+        r_expected = obj.getRValue(expected=True)
         # Get likelihoods:
         lsm = obj.lsm()
         llhd = obj.likelihood()
@@ -742,7 +739,8 @@ class SummaryPrinter(TxTPrinter):
         output += "Combined Analyses: %s\n" % (','.join(expResults))
         output += "Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (
             llhd, lmax, lsm)
-        output += "combined r-value: %10.3E" % r
+        output += "combined r-value: %10.3E\n" % r
+        output += "combined r-value (expected): %10.3E" % r_expected
         output += "\n\n"
 
         return output
@@ -758,7 +756,7 @@ class PyPrinter(BasicPrinter):
         self.name = "py"
         self.printtimespent = False
         self.printingOrder = [OutputStatus, TopologyList,
-                              TheoryPredictionList, Uncovered]
+                              TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -803,8 +801,8 @@ class PyPrinter(BasicPrinter):
                 outfile.close()
 
         self.toPrint = [None]*len(self.printingOrder)
-        ## it is a special feature of the python printer
-        ## that we also return the output dictionary
+        # it is a special feature of the python printer
+        # that we also return the output dictionary
         return outputDict
 
     def _formatTopologyList(self, obj):
@@ -893,7 +891,7 @@ class PyPrinter(BasicPrinter):
             if abs(number) < 1e-40:
                 return number
             return round(number, -int(np.floor(np.sign(number) * np.log10(abs(number)))) + n)
-        except Exception as e:
+        except Exception:
             pass
         return number
         # return round ( number, n )
@@ -934,7 +932,7 @@ class PyPrinter(BasicPrinter):
             else:
                 mass = np.array(theoryPrediction.mass, dtype=object)
 
-            #Add width information to the mass array:
+            # Add width information to the mass array:
             totalwidth = theoryPrediction.totalwidth
 
             def _convWidth(x):
@@ -979,7 +977,7 @@ class PyPrinter(BasicPrinter):
             if hasattr(self, "addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] = txnamesDict
             llhd = theoryPrediction.likelihood()
-            if not llhd is None:
+            if llhd is not None:
                 # resDict['chi2'] = self._round ( theoryPrediction.chi2 )
                 resDict['likelihood'] = self._round(llhd)
                 resDict['l_max'] = self._round(theoryPrediction.lmax())
@@ -1040,9 +1038,9 @@ class PyPrinter(BasicPrinter):
         nprint = 10
 
         uncoveredDict = {}
-        #First sort groups by label
+        # First sort groups by label
         groups = sorted(obj.groups[:], key=lambda g: g.label)
-        #Add summary of groups:
+        # Add summary of groups:
         for group in groups:
             sqrts = group.sqrts.asNumber(TeV)
             uncoveredDict["Total xsec for %s (fb)" % group.description] = \
@@ -1058,6 +1056,43 @@ class PyPrinter(BasicPrinter):
 
         return uncoveredDict
 
+    def _formatTheoryPredictionsCombiner(self, obj):
+        """
+        Format data of the TheoryPredictionsCombiner object.
+
+        :param obj: A TheoryPredictionsCombiner object to be printed.
+        """
+
+        combRes = []  # In case we have a list of combined results in the future
+
+        # Get list of analyses used in combination:
+        expResults = [
+            tp.expResult.globalInfo.id for tp in obj.theoryPredictions]
+        expIDs = ','.join(expResults)
+        ul = obj.getUpperLimit()
+        ulExpected = obj.getUpperLimit(expected=True)
+        if isinstance(ul, unum.Unum):
+            ul = ul.asNumber(fb)
+        if isinstance(ulExpected, unum.Unum):
+            ulExpected = ulExpected.asNumber(fb)
+
+        r = self._round(obj.getRValue(expected=False))
+        r_expected = self._round(obj.getRValue(expected=True))
+
+        llhd = self._round(obj.likelihood())
+        lmax = self._round(obj.lmax())
+        lsm = self._round(obj.lsm())
+
+        resDict = {'AnalysisID': expIDs,
+                   'r': r, 'r_expected': r_expected,
+                   'likelihood': llhd,
+                   'l_max': lmax,
+                   'l_SM': lsm}
+
+        combRes.append(resDict)
+
+        return {'CombinedRes': combRes}
+
 
 class XmlPrinter(PyPrinter):
     """
@@ -1068,7 +1103,7 @@ class XmlPrinter(PyPrinter):
         PyPrinter.__init__(self, output, filename)
         self.name = "xml"
         self.printingOrder = [OutputStatus, TopologyList,
-                              TheoryPredictionList, Uncovered]
+                              TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -1127,7 +1162,7 @@ class XmlPrinter(PyPrinter):
             outputDict.update(output)
 
         root = None
-        #Convert from python dictionaries to xml:
+        # Convert from python dictionaries to xml:
         if outputDict:
             root = ElementTree.Element('smodelsOutput')
             self.convertToElement(outputDict, root)
