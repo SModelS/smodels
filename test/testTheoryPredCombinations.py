@@ -28,8 +28,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         database = Database("unittest")
         dTypes = ["efficiencyMap"]
         anaids = ["CMS-SUS-16-050-agg", "CMS-SUS-13-012"]
-        # dsids = ["ar8", "ar9", "3NJet6_1250HT1500_300MHT450"]
-        dsids = ['all']
+        dsids = ["ar8", "ar9", "3NJet6_1250HT1500_300MHT450"]
         slhafile = "testFiles/slha/T1tttt.slha"
         exp_results = database.getExpResults(analysisIDs=anaids,
                                              datasetIDs=dsids, dataTypes=dTypes)
