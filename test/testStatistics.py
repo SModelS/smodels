@@ -128,7 +128,7 @@ class StatisticsTest(unittest.TestCase):
         for i in numpy.arange(0.,.2 ,.02 ):
             l=prediction.getLikelihood(i)
             c+=l
-        self.assertAlmostEqual ( prediction.likelihood, 1.563288e-35, 3 )
+        self.assertAlmostEqual ( prediction.likelihood(), 1.563288e-35, 3 )
         self.assertAlmostEqual ( c, 0.011523436957977766, 3 )
 
     def testPredictionInterface(self):
@@ -144,8 +144,8 @@ class StatisticsTest(unittest.TestCase):
         prediction = theoryPredictionsFor(expRes, smstoplist)[0]
         pred_signal_strength = prediction.xsection.value
         prediction.computeStatistics()
-        ill = math.log(prediction.likelihood)
-        ichi2 = prediction.chi2
+        ill = math.log(prediction.likelihood())
+        ichi2 = prediction.chi2()
         nsig = (pred_signal_strength*expRes.globalInfo.lumi).asNumber()
         m = Data(4, 2.2, 1.1**2, None, nsignal=nsig,deltas_rel=0.2)
         computer = LikelihoodComputer(m)

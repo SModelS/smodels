@@ -63,11 +63,10 @@ class SLTest(unittest.TestCase):
                   nsignal= nsignal,
                   name="CMS-NOTE-2017-001 model",deltas_rel=0. )
         ulComp = UpperLimitComputer (ntoys=2000, cl=.95 )
-        ul = ulComp.ulSigma ( m )
-        self.assertAlmostEqual( ul/(131.828*sum(nsignal)), 1.0, 1 )
         ulProf = ulComp.ulSigma ( m, marginalize=False )
-        #print ( "ul,ulprof=", ul,ulProf )
-        self.assertAlmostEqual( ulProf/(131.828*sum(nsignal)), 1.0, 1 )
+        self.assertAlmostEqual( ulProf/180.676, 1.0, 3 )
+        ul = ulComp.ulSigma ( m, marginalize = True )
+        self.assertAlmostEqual( ul/186.609514, 1.0, 1 )
 
     def createModel(self,n=3):
         import model_90 as m9
@@ -87,43 +86,31 @@ class SLTest(unittest.TestCase):
     def testModel3(self):
         """ take first n SRs of model-90 """
         m = self.createModel ( 3 )
-        import time
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
-        t0=time.time()
-        ul = ulComp.ulSigma( m )
-        t1=time.time()
-        #print ( "ul=%s, t=%s" % ( ul, t1-t0 ) )
-        ## Nick's profiling code gets for n=3 ul=2135.66
-        self.assertAlmostEqual( ul/(2135.66*sum(m.nsignal)), 1.0, 1 )
         ulProf = ulComp.ulSigma( m, marginalize=False )
-        t2=time.time()
-        #print ( "ulProf,t=", ulProf, t2-t1 )
-        self.assertAlmostEqual( ulProf/(2135.66*sum(m.nsignal)), 1.0, 1 )
+        self.assertAlmostEqual( ulProf/54.793636190198924, 1.0, 3 )
+        ul = ulComp.ulSigma( m, marginalize=True )
+        ## Nick's profiling code gets for n=3 ul=2135.66
+        self.assertAlmostEqual( ul/55.554, 1.0, 1 )
 
     def testModel10(self):
         """ take first 10 SRs of model-90 """
         m = self.createModel ( 10 )
-        import time
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
-        t0=time.time()
-        ul = ulComp.ulSigma(m)
-        t1=time.time()
-        #print ( "ul=%s, t=%s" % ( ul, t1-t0 ) )
-        ## Nick's profiling code gets for n=10 ul=357.568
-        self.assertAlmostEqual(ul/(357.*sum(m.nsignal)), 1.0, 1 )
         ulProf = ulComp.ulSigma( m, marginalize=False )
-        t2=time.time()
-        #print ( "ulProf,t=", ulProf, t2-t1 )
-        self.assertAlmostEqual( ulProf/(350.*sum(m.nsignal)), 1.0, 1 )
+        self.assertAlmostEqual( ulProf/105.521134, 1.0, 3 )
+        ul = ulComp.ulSigma(m,marginalize=True)
+        ## Nick's profiling code gets for n=10 ul=357.568
+        self.assertAlmostEqual(ul/106.37, 1.0, 1 )
 
     def testModel40(self):
         m = self.createModel ( 40 )
         import time
-        ulComp = UpperLimitComputer(ntoys=5000, cl=.95 )
-        ul = ulComp.ulSigma ( m )
+        ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
         ulProf = ulComp.ulSigma ( m, marginalize=False )
-        self.assertAlmostEqual ( ul/(66.*sum(m.nsignal)), 1., 1 )
-        self.assertAlmostEqual( ulProf/(63.*sum(m.nsignal)), 1.0, 1 )
+        self.assertAlmostEqual( ulProf/75.29914, 1.0, 3 )
+        ul = ulComp.ulSigma ( m, marginalize=True )
+        self.assertAlmostEqual ( ul/78.5094475, 1., 1 )
 
 if __name__ == "__main__":
     unittest.main()

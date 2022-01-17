@@ -1,11 +1,14 @@
-Release v2.1.2, xxx
+Release v2.2.0, xxx
 =======================================================
 
-	* small fixes with expected combined likelihoods (kudos to Jamie Yellen)
+  * likelihood combiner introduced
+  * posteriori expected limits introduced
+  * a few smaller changes around expected likelihoods and limits
   * allow ncpus to take on zero and negative values in ini file
     [meaning use all but this (absolute) number of CPU cores]
-	* more small fixes in unit tests
-	* small fixes in recipes
+  * small fixes in recipes
+  * updates in references.bib, installation notes
+  * more small fixes in unit tests
 
 Release v2.1.1, Tue 19 Oct 2021
 =======================================================

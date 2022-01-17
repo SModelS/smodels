@@ -13,8 +13,10 @@
 from scipy import stats, optimize
 from smodels.tools.smodelsLogging import logger
 from scipy.special import erf
+import scipy.stats as stats
 import numpy as np
 from smodels.tools import runtime
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False,
                           allowNegativeMuhat = True, corr = 0.6 ):
@@ -95,6 +97,75 @@ def likelihoodFromLimits( upperLimit, expectedUpperLimit, nsig, nll=False,
                               rtol=1e-03, xtol=1e-06 )
     llhdexp = llhd ( nsig, mumax, sigma_exp, nll )
     return llhdexp
+
+def rootFromNLLs ( nllA, nll0A, nll, nll0 ):
+    """ compute the CLs - alpha from the NLLs """
+    qmu =  2*( nll - nll0 )
+    if qmu<0.: qmu=0.
+    sqmu = np.sqrt (qmu)
+    qA =  2*( nllA - nll0A )
+    if qA<0.: qA = 0.
+    sqA = np.sqrt(qA)
+    CLsb = 1. - stats.multivariate_normal.cdf(sqmu)
+    CLb = 0.
+    if qA >= qmu:
+        CLb =  stats.multivariate_normal.cdf(sqA - sqmu)
+    else:
+        if qA == 0.:
+            CLsb = 1.
+            CLb  = 1.
+        else:
+            CLsb = 1. - stats.multivariate_normal.cdf( (qmu + qA)/(2*sqA) )
+            CLb = 1. - stats.multivariate_normal.cdf( (qmu - qA)/(2*sqA) )
+    CLs = 0.
+    if CLb > 0.:
+        CLs = CLsb / CLb
+    cl = .95
+    root = CLs - 1. + cl
+    return root
+
+def determineBrentBracket( mu_hat , sigma_mu, rootfinder ):
+    """ find a, b for brent bracketing
+    :param mu_hat: mu that maximizes likelihood
+    :param sigm_mu: error on mu_hat (not too reliable)
+    :param rootfinder: function that finds the root (usually root_func)
+    """
+    sigma_mu = max ( sigma_mu, .5 ) # there is a minimum on sigma_mu
+    ## the root should be roughly at mu_hat + 2*sigma_mu
+    a = mu_hat + 1.5 * sigma_mu
+    ntrials = 20
+    i = 0
+    foundExtra=False
+    while rootfinder ( a ) < 0.:
+        # if this is negative, we move it to the left
+        i+=1
+        a -= (i**2.)*sigma_mu
+        if i > ntrials or a < -10000.:
+            for a in [ 0., 1., -1., 3., -3., 10., -10. ]:
+                if rootfinder ( a ) > 0.:
+                    foundExtra=True
+                    break
+            if not foundExtra:
+                logger.error ( f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {rootfinder(a):.2f}." )
+                logger.error ( f"mu_hat={mu_hat:.2f}, sigma_mu={sigma_mu:.2f}" )
+                raise SModelSError( f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {rootfinder(a):.2f}." )
+    i = 0
+    foundExtra=False
+    b = mu_hat + 2.5 * sigma_mu
+    while rootfinder ( b ) > 0.:
+        # if this is positive, we move it to the right
+        i+=1
+        b += (i**2.)*sigma_mu
+        if i > ntrials:
+            for b in [ 1., 0., 10., -1. ]:
+                if rootfinder ( b ) > 0.:
+                    foundExtra=True
+                    break
+            if not foundExtra:
+                logger.error ( f"cannot find an b that is right of the root. last attempt, b={b:.2f}, root = {rootfinder(b):.2f}." )
+                logger.error ( f"mu_hat was at {mu_hat:.2f} sigma_mu at {sigma_mu:.2f}" )
+                raise SModelSError( f"cannot find an b that is right of the root. last attempt, b={b:.2f}, root = {rootfinder(b):.2f}." )
+    return a,b
 
 def rvsFromLimits( upperLimit, expectedUpperLimit, n=1, corr = 0. ):
     """

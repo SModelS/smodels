@@ -11,11 +11,12 @@
 
 """
 
-from __future__ import print_function
 from scipy import stats, optimize, integrate, special, linalg
 from numpy  import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
-import numpy as NP
+from smodels.tools.statistics import rootFromNLLs, determineBrentBracket
+
+import numpy as np
 import math
 import copy
 
@@ -53,12 +54,15 @@ class Data:
         :param deltas_rel: the assumed relative error on the signal hypotheses.
                            The default is 20%.
         """
-        self.observed = NP.around(self.convert(observed)) #Make sure observed number of events are integers
+        self.observed = np.around(self.convert(observed)) #Make sure observed number of events are integers
         self.backgrounds = self.convert(backgrounds)
         self.n = len(self.observed)
         self.covariance = self._convertCov(covariance)
         self.nsignal = self.convert(nsignal)
         if self.nsignal is None:
+            if len ( self.backgrounds ) == 1:
+                # doesnt matter, does it?
+                self.nsignal = np.array ( [1.] )
             self.signal_rel = self.convert(1.)
         elif self.nsignal.sum():
             self.signal_rel = self.nsignal/self.nsignal.sum()
@@ -66,7 +70,7 @@ class Data:
             self.signal_rel = array([0.]*len(self.nsignal))
 
         self.third_moment = self.convert(third_moment)
-        if type(self.third_moment) != type(None) and NP.sum([ abs(x) for x in self.third_moment ]) < 1e-10:
+        if type(self.third_moment) != type(None) and np.sum([ abs(x) for x in self.third_moment ]) < 1e-10:
             self.third_moment = None
         self.name = name
         self.deltas_rel = deltas_rel
@@ -88,7 +92,8 @@ class Data:
         """
         Is the total number of signal events zero?
         """
-
+        if self.nsignal is None:
+            return True
         return len(self.nsignal[self.nsignal>0.]) == 0
 
     def var_s(self,nsig=None):
@@ -105,7 +110,7 @@ class Data:
             nsig = self.nsignal
         else:
             nsig = self.convert(nsig)
-        return NP.diag((nsig*self.deltas_rel)**2)
+        return np.diag((nsig*self.deltas_rel)**2)
 
     def isScalar(self, obj):
         """
@@ -167,14 +172,14 @@ class Data:
         for m2,m3 in zip(covD, self.third_moment):
             if m3 == 0.:
                 m3 = 1e-30
-            k = -NP.sign(m3)*sqrt(2.*m2 )
+            k = -np.sign(m3)*sqrt(2.*m2 )
             dm = sqrt ( 8.*m2**3/m3**2 - 1. )
-            C.append( k*NP.cos ( 4.*NP.pi/3. + NP.arctan(dm) / 3. ))
+            C.append( k*np.cos ( 4.*np.pi/3. + np.arctan(dm) / 3. ))
 
-        self.C=NP.array(C) ## C, as define in Eq. 1.27 (?) in the second paper
+        self.C=np.array(C) ## C, as define in Eq. 1.27 (?) in the second paper
         self.B = sqrt( covD - 2*self.C**2 ) ## B, as defined in Eq. 1.28(?)
         self.A = self.backgrounds - self.C ## A, Eq. 1.30(?)
-        self.rho = NP.array( [ [0.]*self.n ]*self.n ) ## Eq. 1.29 (?)
+        self.rho = np.array( [ [0.]*self.n ]*self.n ) ## Eq. 1.29 (?)
         for x in range(self.n):
             for y in range(x,self.n):
                 bxby=self.B[x]*self.B[y]
@@ -191,7 +196,7 @@ class Data:
         Sandwich product
         """
 
-        ret = NP.array ( [ [0.]*len(self.B) ]*len(self.B) )
+        ret = np.array ( [ [0.]*len(self.B) ]*len(self.B) )
         for x in range(len(self.B)):
             for y in range(x,len(self.B)):
                 T=self.B[x]*self.B[y]*self.rho[x][y]
@@ -211,7 +216,7 @@ class Data:
         Diagonal elements of covariance matrix. Convenience function.
         """
 
-        return NP.diag( self.covariance )
+        return np.diag( self.covariance )
 
     def correlations(self):
         """
@@ -245,14 +250,14 @@ class LikelihoodComputer:
 
     debug_mode = False
 
-    def __init__(self, data, ntoys = 30000 ):
+    def __init__(self, data, toys = 30000 ):
         """
         :param data: a Data object.
-        :param ntoys: number of toys when marginalizing
+        :param toys: number of toys when marginalizing
         """
 
         self.model = data
-        self.ntoys = ntoys
+        self.toys = toys
 
     def dLdMu(self, mu, signal_rel, theta_hat):
         """
@@ -282,18 +287,23 @@ class LikelihoodComputer:
             ret = sum(ret)
         return ret
 
-    def findMuHat(self, signal_rel, allowNegativeSignals = False ):
+    def findMuHat(self, signal_rel, allowNegativeSignals = False,
+            extended_output = False, nll = False, marginalize = False ):
         """
         Find the most likely signal strength mu
         given the relative signal strengths in each dataset (signal region).
 
         :param signal_rel: array with relative signal strengths
         :param allowNegativeSignals: if true, then also allow for negative values
+        :param extended_output: if true, return also sigma_mu, the estimate of the error of mu_hat, and lmax, the likelihood at mu_hat
+        :param nll: if true, return nll instead of lmax in the extended output
 
-        :returns: mu_hat, the maximum likelihood estimate of mu
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu
         """
 
         if (self.model.backgrounds == self.model.observed).all():
+            if extended_output:
+                return 0., 0., 0.
             return 0.
 
         if type(signal_rel) in [list, ndarray]:
@@ -316,32 +326,34 @@ class LikelihoodComputer:
             mu_hat_old = mu_hat
             #logger.info ( "theta hat[%d]=%s" % (ctr,list( theta_hat[:11] ) ) )
             #logger.info ( "   mu hat[%d]=%s" % (ctr, mu_hat ) )
-            # mu_c = NP.abs(self.model.observed - self.model.backgrounds - theta_hat)/signal_rel
+            # mu_c = np.abs(self.model.observed - self.model.backgrounds - theta_hat)/signal_rel
             mu_c = (self.model.observed - self.model.backgrounds - theta_hat)/signal_rel
             ## find mu_hat by finding the root of 1/L dL/dmu. We know
             ## that the zero has to be between min(mu_c) and max(mu_c).
-            lower,upper = 0.,widener*max(NP.abs(mu_c))
+            lower,upper = 0.,widener*max(np.abs(mu_c))
             if allowNegativeSignals:
                 lower = widener*min(mu_c+[0.])
             lower_v = self.dLdMu(lower, signal_rel, theta_hat)
             upper_v = self.dLdMu(upper, signal_rel, theta_hat)
-            total_sign = NP.sign(lower_v * upper_v)
+            total_sign = np.sign(lower_v * upper_v)
             if total_sign > -.5:
                 if upper_v < lower_v < 0.:
                     ## seems like we really want to go for mu_hat = 0.
+                    if extended_output:
+                        return 0., 0., 0.
                     return 0.
                 if allowNegativeSignals:
                     logger.debug ( "weird. cant find a zero in the Brent bracket "\
                                    "for finding mu(hat). Let me try with a very small"
                                    " value." )
-                    lower = -1.*max(NP.abs(mu_c))
+                    lower = -1.*max(np.abs(mu_c))
                 else:
                     logger.debug ( "weird. cant find a zero in the Brent bracket "\
                                    "for finding mu(hat). Let me try with a very small"
                                    " value." )
-                    lower = 1e-4*max(NP.abs(mu_c))
+                    lower = 1e-4*max(np.abs(mu_c))
                 lower_v = self.dLdMu( lower, signal_rel, theta_hat )
-                total_sign = NP.sign( lower_v * upper_v )
+                total_sign = np.sign( lower_v * upper_v )
                 if total_sign > -.5:
                     logger.debug ( "cant find zero in Brentq bracket. l,u,ctr=%s,%s,%s" % \
                                   ( lower, upper, ctr ) )
@@ -351,6 +363,13 @@ class LikelihoodComputer:
             theta_hat,_ = self.findThetaHat( mu_hat*signal_rel)
             ctr+=1
 
+        if extended_output:
+            sigma_mu = self.getSigmaMu( self.model.signal_rel)
+            llhd = self.likelihood( self.model.signals(mu_hat),
+                                     marginalize=marginalize,
+                                     nll=nll )
+            ret = mu_hat, sigma_mu, llhd
+            return ret
         return mu_hat
 
     def getSigmaMu(self, signal_rel):
@@ -362,7 +381,7 @@ class LikelihoodComputer:
         if type(signal_rel) in [ list, ndarray ]:
             s_effs = sum(signal_rel)
 
-        sgm_mu = sqrt(sum(self.model.observed) + sum(NP.diag(self.model.covariance)))/s_effs
+        sgm_mu = sqrt(sum(self.model.observed) + sum(np.diag(self.model.covariance)))/s_effs
 
         return sgm_mu
 
@@ -381,40 +400,40 @@ class LikelihoodComputer:
         lmbda[lmbda<=0.] = 1e-30 ## turn zeroes to small values
         obs = self.model.observed
         def is_integer ( x ):
-            if type(x) in [ int, NP.int64 ]:
+            if type(x) in [ int, np.int64 ]:
                 return True
             if type(x) in [ float ]:
                 return x.is_integer()
             return False
         ## not needed for now
-        allintegers = True # NP.all ( [is_integer( i ) for i in obs ] )
+        allintegers = np.all ( [is_integer( i ) for i in obs ] )
         if nll:
             if allintegers:
                 poisson = stats.poisson.logpmf( obs, lmbda )
             else:
-                poisson = -lmbda + obs * NP.log(lmbda) - special.loggamma(obs+1)
+                poisson = -lmbda + obs * np.log(lmbda) - special.loggamma(obs+1)
         else:
             if allintegers:
                 poisson = stats.poisson.pmf( obs, lmbda )
             else:
-                # poisson = NP.exp(-lmbda)*NP.power(lmbda,obs)/special.gamma(obs+1)
-                logpoiss = -lmbda + obs * NP.log(lmbda) - special.loggamma(obs+1)
-                poisson = NP.exp(logpoiss)
+                # poisson = np.exp(-lmbda)*np.power(lmbda,obs)/special.gamma(obs+1)
+                logpoiss = -lmbda + obs * np.log(lmbda) - special.loggamma(obs+1)
+                poisson = np.exp(logpoiss)
         try:
             M = [0.]*len(theta)
             C = self.model.V
             #if self.model.n == 1: I think not a good idea
             #    C = self.model.totalCovariance(self.nsig)
-            dTheta = theta - M 
-            expon = - .5 * NP.dot ( NP.dot ( dTheta, self.weight ), dTheta ) + self.logcoeff
+            dTheta = theta - M
+            expon = - .5 * np.dot ( np.dot ( dTheta, self.weight ), dTheta ) + self.logcoeff
             # print ( "expon", expon, "coeff", self.coeff )
             if nll:
-                gaussian = expon #  NP.log ( self.coeff )
+                gaussian = expon #  np.log ( self.coeff )
                 #gaussian2 = stats.multivariate_normal.logpdf(theta,mean=M,cov=C)
                 ret = - gaussian - sum(poisson)
             else:
-                gaussian = NP.exp ( expon )
-                # gaussian = self.coeff * NP.exp ( expon )
+                gaussian = np.exp ( expon )
+                # gaussian = self.coeff * np.exp ( expon )
                 # gaussian2 = stats.multivariate_normal.pdf(theta,mean=M,cov=C)
                 ret = gaussian * ( reduce(lambda x, y: x*y, poisson) )
             return ret
@@ -434,13 +453,13 @@ class LikelihoodComputer:
         if self.model.isLinear():
             xtot = theta + self.model.backgrounds + self.nsig
             xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
-            nllp_ = self.ones - self.model.observed / xtot + NP.dot( theta , self.weight )
+            nllp_ = self.ones - self.model.observed / xtot + np.dot( theta , self.weight )
             return nllp_
         lmbda = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
         lmbda[lmbda<=0.] = 1e-30 ## turn zeroes to small values
-        # nllp_ = ( self.ones - self.model.observed / lmbda + NP.dot( theta , self.weight ) ) * ( self.ones + 2*self.model.C * theta / self.model.B**2 )
+        # nllp_ = ( self.ones - self.model.observed / lmbda + np.dot( theta , self.weight ) ) * ( self.ones + 2*self.model.C * theta / self.model.B**2 )
         T=self.ones + 2*self.model.C/self.model.B**2*theta
-        nllp_ = T - self.model.observed / lmbda * ( T ) + NP.dot( theta , self.weight )
+        nllp_ = T - self.model.observed / lmbda * ( T ) + np.dot( theta , self.weight )
         return nllp_
 
     def nllHess( self, theta ):
@@ -450,26 +469,26 @@ class LikelihoodComputer:
         if self.model.isLinear():
             xtot = theta + self.model.backgrounds + self.nsig
             xtot[xtot<=0.] = 1e-30 ## turn zeroes to small values
-            nllh_ = self.weight + NP.diag ( self.model.observed / (xtot**2) )
+            nllh_ = self.weight + np.diag ( self.model.observed / (xtot**2) )
             return nllh_
         lmbda = self.nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
         lmbda[lmbda<=0.] = 1e-30 ## turn zeroes to small values
         T=self.ones + 2*self.model.C/self.model.B**2*theta
         # T_i = 1_i + 2*c_i/B_i**2 * theta_i
-        nllh_ = self.weight + NP.diag ( self.model.observed * T**2 / (lmbda**2) ) - NP.diag ( self.model.observed / lmbda * 2 * self.model.C / self.model.B**2 ) + NP.diag ( 2*self.model.C/self.model.B**2 )
+        nllh_ = self.weight + np.diag ( self.model.observed * T**2 / (lmbda**2) ) - np.diag ( self.model.observed / lmbda * 2 * self.model.C / self.model.B**2 ) + np.diag ( 2*self.model.C/self.model.B**2 )
         return nllh_
 
     def getThetaHat(self, nobs, nb, nsig, covb, max_iterations ):
             """ Compute nuisance parameter theta that
             maximizes our likelihood (poisson*gauss).  """
             self.nsig = nsig
-            sigma2 = covb + self.model.var_s(nsig) ## NP.diag ( (self.model.deltas)**2 )
+            sigma2 = covb + self.model.var_s(nsig) ## np.diag ( (self.model.deltas)**2 )
             ## for now deal with variances only
             ntot = nb + nsig
-            cov = NP.array(sigma2)
+            cov = np.array(sigma2)
             # weight = cov**(-1) ## weight matrix
             weight = linalg.inv(cov)
-            diag_cov = NP.diag(cov)
+            diag_cov = np.diag(cov)
             # first: no covariances:
             q = diag_cov * ( ntot - nobs )
             p = ntot + diag_cov
@@ -484,7 +503,7 @@ class LikelihoodComputer:
                 for ctr,i in enumerate ( theta2 ):
                     if i == 0.:
                         theta2[ctr]=1e-20
-                return sum ( NP.abs(theta1 - theta2) / NP.abs ( theta1+theta2 ) )
+                return sum ( np.abs(theta1 - theta2) / np.abs ( theta1+theta2 ) )
 
             ictr = 0
             while ictr < max_iterations:
@@ -500,10 +519,10 @@ class LikelihoodComputer:
                         dp = thetamax[j]*weight[i,j]*diag_cov[i]
                         if abs ( dq / q[i] ) > .3:
                             #logger.warning ( "too big a change in iteration." )
-                            dq=NP.abs( .3 * q[i] ) * NP.sign ( dq )
+                            dq=np.abs( .3 * q[i] ) * np.sign ( dq )
                         if abs ( dp / p[i] ) > .3:
                             #logger.warning ( "too big a change in iteration." )
-                            dp=NP.abs( .3 * p[i] ) * NP.sign ( dp )
+                            dp=np.abs( .3 * p[i] ) * np.sign ( dp )
                         q[i] += dq
                         p[i] += dp
                     thetamax = -p/2. * ( 1 - sign(p) * sqrt ( 1. - 4*q / p**2 ) )
@@ -533,16 +552,16 @@ class LikelihoodComputer:
                 # self.cov_tot = self.model.V + self.model.var_s(nsig)
                 # self.cov_tot = self.model.totalCovariance (nsig)
                 #self.ntot = None
-            self.weight = NP.linalg.inv(self.cov_tot)
+            self.weight = np.linalg.inv(self.cov_tot)
             # self.coeff = 1.
-            logdet = NP.linalg.slogdet ( self.cov_tot )
-            self.logcoeff = -self.model.n/2 * NP.log (2*NP.pi) -.5* logdet[1] 
-            # self.coeff = (2*NP.pi)**(-self.model.n/2) * NP.exp(-.5* logdet[1] )
-            #print ( "coeff", self.coeff, "n", self.model.n, "det", NP.linalg.slogdet ( self.cov_tot ) ) 
+            logdet = np.linalg.slogdet ( self.cov_tot )
+            self.logcoeff = -self.model.n/2 * np.log (2*np.pi) -.5* logdet[1]
+            # self.coeff = (2*np.pi)**(-self.model.n/2) * np.exp(-.5* logdet[1] )
+            #print ( "coeff", self.coeff, "n", self.model.n, "det", np.linalg.slogdet ( self.cov_tot ) )
             # print ( "cov_tot", self.cov_tot[:10] )
             self.ones = 1.
             if type ( self.model.observed) in [ list, ndarray ]:
-                self.ones = NP.ones ( len (self.model.observed) )
+                self.ones = np.ones ( len (self.model.observed) )
             self.gammaln = special.gammaln(self.model.observed + 1)
             try:
                 ret_c = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime,
@@ -664,7 +683,7 @@ class LikelihoodComputer:
             thetas = stats.multivariate_normal.rvs(mean=[0.]*self.model.n,
                           # cov=(self.model.totalCovariance(nsig)),
                           cov=self.model.V,
-                          size=self.ntoys ) ## get ntoys values
+                          size=self.toys ) ## get ntoys values
             for theta in thetas :
                 if self.model.isLinear():
                     lmbda = nsig + self.model.backgrounds + theta
@@ -674,12 +693,12 @@ class LikelihoodComputer:
                     lmbda = array([lmbda])
                 for ctr,v in enumerate( lmbda ):
                     if v<=0.: lmbda[ctr]=1e-30
-#                    print ( "lmbda=",lmbda )
-                poisson = self.model.observed*NP.log(lmbda) - lmbda - self.gammaln
-                # poisson = NP.exp(self.model.observed*NP.log(lmbda) - lmbda - self.model.backgrounds - self.gammaln)
-                vals.append( NP.exp ( sum(poisson) ) )
+                    #print ( "lmbda=",lmbda )
+                poisson = self.model.observed*np.log(lmbda) - lmbda - self.gammaln
+                # poisson = np.exp(self.model.observed*np.log(lmbda) - lmbda - self.model.backgrounds - self.gammaln)
+                vals.append( np.exp ( sum(poisson) ) )
                 #vals.append ( reduce(lambda x, y: x*y, poisson) )
-            mean = NP.mean( vals )
+            mean = np.mean( vals )
             if nll:
                 if mean == 0.:
                     mean = 1e-100
@@ -727,7 +746,7 @@ class LikelihoodComputer:
             if not allowNegativeSignals and nsig[0]<0.:
                 nsig = [ 0. ]
             return self.likelihood(nsig, marginalize=marginalize, nll=nll )
-        muhat = self.findMuHat ( nsig , allowNegativeSignals = allowNegativeSignals )
+        muhat_, sigma_mu, lmax = self.findMuHat ( nsig , allowNegativeSignals = allowNegativeSignals, extended_output=True, nll=nll )
         return self.likelihood(muhat*nsig, marginalize=marginalize, nll=nll )
 
     def chi2(self, nsig, marginalize=False):
@@ -756,7 +775,7 @@ class LikelihoodComputer:
                                             allowNegativeSignals=False )
             chi2=2*(llhd-maxllhd)
 
-            if not NP.isfinite ( chi2 ):
+            if not np.isfinite ( chi2 ):
                 logger.error("chi2 is not a finite number! %s,%s,%s" % \
                                (chi2, llhd,maxllhd))
             # Return the test statistic -2log(H0/H1)
@@ -771,7 +790,7 @@ class UpperLimitComputer:
         :param ntoys: number of toys when marginalizing
         :param cl: desired quantile for limits
         """
-        self.ntoys = ntoys
+        self.toys = ntoys
         self.cl = cl
 
     def ulSigma( self, model, marginalize=False, toys=None, expected=False,
@@ -782,7 +801,9 @@ class UpperLimitComputer:
 
         :params marginalize: if true, marginalize nuisances, else profile them
         :params toys: specify number of toys. Use default is none
-        :params expected: compute the expected value, not the observed.
+        :params expected: if false, compute observed, 
+                          true: compute a priori expected, "posteriori":  
+                          compute a posteriori expected
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on yields
         """
@@ -792,54 +813,57 @@ class UpperLimitComputer:
             """ only zeroes in efficiencies? cannot give a limit! """
             return None
         if toys==None:
-            toys=self.ntoys
+            toys=self.toys
         oldmodel = model
         if expected:
             model = copy.deepcopy(oldmodel)
+            if expected == "posteriori":
+                # print ( "here!" )
+                tempc = LikelihoodComputer(oldmodel, toys)
+                theta_hat_,_ = tempc.findThetaHat(0*oldmodel.signal_rel)
             #model.observed = model.backgrounds
             for i,d in enumerate(model.backgrounds):
-                # model.observed[i]=int(NP.ceil(d))
-                model.observed[i]=int(NP.round(d))
-                # model.observed[i]=float(d)
+                # model.observed[i]=int(np.ceil(d))
+                #model.observed[i]=int(np.round(d))
+                if expected == "posteriori":
+                    d+=theta_hat_[i]
+                model.observed[i]=float(d)
         computer = LikelihoodComputer(model, toys)
-        mu_hat = computer.findMuHat(model.signal_rel)
+        mu_hat = computer.findMuHat(model.signal_rel, extended_output = False )
         theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
         sigma_mu = computer.getSigmaMu(model.signal_rel)
+        
+        #print ( f"SL theta_hat0: {theta_hat0} obs: {model.observed[0]:.3f} expbg: {model.backgrounds[0]:.3f}" )
 
-        aModel = copy.deepcopy(model)
-        aModel.observed = array([NP.round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
-        """
-        if marginalize == False and expected == True:
-            model.observed = array([NP.round(x+y) for x,y in zip(model.backgrounds,theta_hat0)])
-            mu_hat = computer.findMuHat(model.signal_rel)
-            theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
-            sigma_mu = computer.getSigmaMu(model.signal_rel)
-        """
-        #print ( "aModeldata=", aModel.observed )
-        #aModel.observed = array ( [ round(x) for x in model.backgrounds ] )
-        aModel.name = aModel.name + "A"
-        compA = LikelihoodComputer(aModel, toys)
-        ## compute
-        mu_hatA = compA.findMuHat(aModel.signal_rel)
         if mu_hat < 0.:
             mu_hat = 0.
         nll0 = computer.likelihood(model.signals(mu_hat),
                                      marginalize=marginalize,
                                      nll=True)
-        if NP.isinf(nll0) and marginalize==False and not trylasttime:
+        # print ( f"SL nll0 {nll0:.3f} muhat {mu_hat:.3f} sigma_mu {sigma_mu:.3f}" )
+        if np.isinf(nll0) and marginalize==False and not trylasttime:
             logger.warning("nll is infinite in profiling! we switch to marginalization, but only for this one!" )
             marginalize=True
             nll0 = computer.likelihood(model.signals(mu_hat),
                                          marginalize=True,
                                          nll=True )
-            if NP.isinf(nll0):
+            if np.isinf(nll0):
                 logger.warning("marginalization didnt help either. switch back.")
                 marginalize=False
             else:
                 logger.warning("marginalization worked.")
+        aModel = copy.deepcopy(model)
+        aModel.observed = array([ x+y for x,y in zip(model.backgrounds,theta_hat0)])
+        aModel.name = aModel.name + "A"
+        #print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
+        compA = LikelihoodComputer(aModel, toys)
+        ## compute
+        mu_hatA = compA.findMuHat(aModel.signal_rel)
         nll0A = compA.likelihood(aModel.signals(mu_hatA),
                                    marginalize=marginalize,
                                    nll=True)
+        # print ( f"SL nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f} bg {aModel.backgrounds[0]:.3f} obs {aModel.observed[0]:.3f}" )
+        #return 1.
 
         def root_func(mu):
             ## the function to find the zero of (ie CLs - alpha)
@@ -847,72 +871,11 @@ class UpperLimitComputer:
             computer.ntot = model.backgrounds + nsig
             nll = computer.likelihood(nsig, marginalize=marginalize, nll=True )
             nllA = compA.likelihood(nsig, marginalize=marginalize, nll=True )
-            qmu =  2*( nll - nll0 )
-            if qmu<0.: qmu=0.
-            sqmu = sqrt (qmu)
-            qA =  2*( nllA - nll0A )
-            # print ( "mu: %s, qMu: %s, qA: %s nll0A: %s nllA: %s" % ( mu, qmu, qA, nll0A, nllA ) )
-            if qA<0.:
-                qA=0.
-            sqA = sqrt(qA)
-            CLsb = 1. - stats.multivariate_normal.cdf(sqmu)
-            CLb = 0.
-            if qA >= qmu:
-                CLb =  stats.multivariate_normal.cdf(sqA - sqmu)
-            else:
-                if qA == 0.:
-                    CLsb = 1.
-                    CLb  = 1.
-                else:
-                    CLsb = 1. - stats.multivariate_normal.cdf( (qmu + qA)/(2*sqA) )
-                    CLb = 1. - stats.multivariate_normal.cdf( (qmu - qA)/(2*sqA) )
-            CLs = 0.
-            if CLb > 0.:
-                CLs = CLsb/CLb
-            root = CLs - 1. + self.cl
-            return root
+            return rootFromNLLs ( nllA, nll0A, nll, nll0 )
 
-        a0 = root_func(0.) ## this must be positive
-        if a0 < 0. and marginalize:
-            if toys < 20000:
-                return self.ulSigma ( model, marginalize, 4*toys,
-                                      expected = expected, trylasttime=False )
-            else:
-                if not trylasttime:
-                    return self.ulSigma ( model, False, toys,
-                                          expected = expected, trylasttime=True )
-                # it ends here
-                return None
-                #return self.ulSigma ( model, marginalize, 4*toys,
-                #                      expected = expected, trylasttime=True )
-        a,b=1.5*mu_hat,2.5*mu_hat+2*sigma_mu
-        ctr=0
-        while True:
-            while ( NP.sign ( root_func(a)* root_func(b) ) > -.5 ):
-                b=1.4*b  ## widen bracket FIXME make a linear extrapolation!
-                a=a-(b-a)*.3 ## widen bracket
-                if a < 0.: a=0.
-                ctr+=1
-                if ctr>20: ## but stop after 20 trials
-                    if toys > 20000:
-                        logger.error("cannot find brent bracket after 20 trials. a,b=%s(%s),%s(%s), mu_hat=%.2f, sigma_mu=%.2f" % ( root_func(a),a,root_func(b),b,mu_hat, sigma_mu ) )
-                        logger.error("nll0=%s" % ( nll0 ) )
-                        if marginalize == True:
-                            return self.ulSigma ( model, marginalize = False,
-                                                  toys = toys, expected = expected,
-                                                  trylasttime = True )
-                        return float("inf") ## better choice than None
-                    else:
-                        logger.debug("cannot find brent bracket after 20 trials. but very low number of toys")
-                        return self.ulSigma ( model, marginalize, 4*toys,
-                                              expected=expected, trylasttime = False )
-            try:
-                # root_func bei 0 sollte positiv sein, bei inf = -.05
-                mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
-                return mu_lim
-            except ValueError as e: ## it could still be that the signs arent opposite
-                # in that case, try again
-                pass
+        a, b = determineBrentBracket ( mu_hat, sigma_mu, root_func )
+        mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
+        return mu_lim
 
 if __name__ == "__main__":
     C = [ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
@@ -927,7 +890,7 @@ if __name__ == "__main__":
     m=Data( observed=[1964,877,354,182,82,36,15,11],
               backgrounds=[2006.4,836.4,350.,147.1,62.0,26.2,11.1,4.7],
               covariance= C,
-#              third_moment = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],
+              #third_moment = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],
               third_moment = [ 0. ] * 8,
               nsignal = nsignal,
               name="CMS-NOTE-2017-001 model" )
