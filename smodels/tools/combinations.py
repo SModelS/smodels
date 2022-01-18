@@ -83,7 +83,7 @@ def computeCombinedLikelihood ( dataset, nsig, marginalize=False, deltas_rel=0.2
 
 def computeCombinedStatistics ( dataset, nsig, marginalize=False, deltas_rel=0.2,
                                 expected=False ):
-    """ compute lBSM, lmax, and LSM in a single run 
+    """ compute lBSM, lmax, and LSM in a single run
     :param nsig: predicted signal (list)
     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
     :param expected: compute expected values, not observed
@@ -151,10 +151,14 @@ def _getPyhfComputer ( dataset, nsig, normalize = True ):
     from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
     data = PyhfData(nsignals, jsons, jsonFiles )
     if data.errorFlag: return None
-    ulcomputer = PyhfUpperLimitComputer(data)
+    if hasattr(dataset.globalInfo, "includeCRs"):
+        includeCRs = dataset.globalInfo.includeCRs
+    else:
+        includeCRs = False
+    ulcomputer = PyhfUpperLimitComputer(data, includeCRs = includeCRs)
     return ulcomputer
 
-def _combinedLikelihood( dataset, nsig, marginalize=False, deltas_rel=0.2, 
+def _combinedLikelihood( dataset, nsig, marginalize=False, deltas_rel=0.2,
         expected=False ):
     """
     Computes the (combined) likelihood to observe nobs events, given a

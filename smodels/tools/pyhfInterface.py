@@ -155,7 +155,7 @@ class PyhfUpperLimitComputer:
     """
     Class that computes the upper limit using the jsons files and signal informations in the `data` instance of `PyhfData`
     """
-    def __init__ ( self, data, cl=0.95):
+    def __init__ ( self, data, cl=0.95, includeCRs = False):
         """
         :param data: instance of `PyhfData` holding the signals information
         :param cl: confdence level at which the upper limit is desired to be computed
@@ -179,6 +179,7 @@ class PyhfUpperLimitComputer:
         self.channelsInfo = self.data.channelsInfo
         self.zeroSignalsFlag = self.data.zeroSignalsFlag
         self.nWS = self.data.nWS
+        self.includeCRs = includeCRs
         self.patches = self.patchMaker()
         self.workspaces = self.wsMaker()
         self.cl = cl
@@ -248,8 +249,11 @@ class PyhfUpperLimitComputer:
                 value["name"] = "bsm"
                 operator["value"] = value
                 patch.append(operator)
-            for path in info['otherRegions']:
-                patch.append({'op':'remove', 'path':path})
+            if self.includeCRs:
+                logger.debug("keeping the CRs")
+            else:
+                for path in info['otherRegions']:
+                    patch.append({'op':'remove', 'path':path})
             patches.append(patch)
         return patches
 
