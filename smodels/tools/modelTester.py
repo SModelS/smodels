@@ -193,8 +193,16 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         combineAnas = parser.get("options", "combineAnas").split(",")
         if combineAnas:
             # Selected the theory predictions which correspond to the analyses to be combined
-            selectedTheoryPreds = [
-                tp for tp in theoryPredictions if tp.expResult.globalInfo.id in combineAnas]
+            # and have likelihoods defined
+            selectedTheoryPreds = []
+            for tp in theoryPredictions:
+                expID = tp.expResult.globalInfo.id
+                if expID not in combineAnas:
+                    continue
+                if tp.likelihood() is None:
+                    continue
+                selectedTheoryPreds.append(tp)
+
             combiner = TheoryPredictionsCombiner(selectedTheoryPreds)
             combiner.computeStatistics()
             masterPrinter.addObj(combiner)
@@ -524,4 +532,5 @@ def getAllInputFiles(inFile):
         fileList = os.listdir(inFile)
         return fileList, inFile
     fileList = [os.path.basename(inFile)]
+    return fileList, os.path.dirname(inFile)
     return fileList, os.path.dirname(inFile)

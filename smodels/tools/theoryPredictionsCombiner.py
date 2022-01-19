@@ -18,13 +18,13 @@ from smodels.tools.statistics import rootFromNLLs, determineBrentBracket
 import scipy.optimize as optimize
 
 
-class TheoryPredictionsCombiner():
+class TheoryPredictionsCombiner(object):
     """
     Facility used to combine theory predictions from different analyes.
     """
 
-    def __init__(self, theoryPredictions: list, slhafile=None,
-                 toys=30000, marginalize=False, deltas_rel=None):
+    def __init__(self, theoryPredictions: list,
+                 slhafile=None, marginalize=False, deltas_rel=None):
         """ constructor.
         :param theoryPredictions: the List of theory predictions
         :param slhafile: optionally, the slhafile can be given, for debugging
@@ -34,15 +34,72 @@ class TheoryPredictionsCombiner():
         """
         self.theoryPredictions = theoryPredictions
         self.slhafile = slhafile
-        self.toys = toys
         self.marginalize = marginalize
         if deltas_rel is None:
             from smodels.tools.runtime import _deltas_rel_default
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
         self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
-        self.cachedLlhds = {False: {False: {}, True: {}, "posteriori": {}},
-                            True: {False: {}, True: {}, "posteriori": {}}}
+        self.cachedLlhds = {False: {}, True: {}, "posteriori": {}}
+
+    def __str__(self):
+        ret = "%s:%s" % (self.analysisId(), self.totalXsection())
+        return ret
+
+    def dataId(self):
+        """
+        Return a string with the IDs of all the datasets used in the combination.
+        """
+        ret = ','.join([tp.dataset.getID() for tp in self.theoryPredictions])
+
+        return ret
+
+    def analysisId(self):
+        """
+        Return a string with the IDs of all the experimental results used in the combination.
+        """
+
+        ret = ','.join([tp.expResult.globalInfo.id for tp in self.theoryPredictions])
+
+        return ret
+
+    def dataType(self, short=False):
+        """
+        Return the type of dataset (=combined)
+        :param: short, if True, return abbreviation (comb)
+        """
+        if short:
+            return 'comb'
+        else:
+            return 'combined'
+
+    def getUpperLimit(self, expected=False,
+                      trylasttime=False):
+        """ get upper limit on *fiducial* cross sections
+            which CLs = 0.95
+        :param expected: if True, compute expected likelihood, else observed
+        :returns: upper limit on *fiducial* cross sections (list)
+        """
+        clmu = self.getUpperLimitOnMu(expected=expected)
+        ret = []
+        for tp in self.theoryPredictions:
+            ret.append(tp.xsection.value * clmu)
+        return ret
+
+    def getRValue(self, expected=False):
+        """ obtain r-value, i.e. predicted_xsec / ul
+        :param expected: if True, compute expected likelihood, else observed
+        :returns: r-value
+        """
+        if "r" in self.cachedObjs[expected]:
+            return self.cachedObjs[expected]["r"]
+        clmu = self.getUpperLimitOnMu(expected=expected)
+        if clmu == 0.:
+            # has no meaning, has it?
+            return None
+        r = 1.0 / clmu
+        self.cachedObjs[expected]["r"] = r
+        return r
 
     def lsm(self, expected=False):
         """ compute the likelihood at mu = 0.
@@ -54,9 +111,6 @@ class TheoryPredictionsCombiner():
             llhd = llhd * tp.dataset.likelihood(0., marginalize=self.marginalize,
                                                 deltas_rel=self.deltas_rel, expected=expected)
         return llhd
-
-    def likelihood(self, expected=False):
-        return self.cachedObjs[expected]["llhd"]
 
     def lmax(self, expected=False):
         if "lmax" not in self.cachedObjs[expected]:
@@ -76,21 +130,41 @@ class TheoryPredictionsCombiner():
             return 2000.  # we cut off at > 1e-300 or so ;)
         return - 2 * np.log(llhd / lmax)
 
-    def totalXsection(self):
-        ret = 0.*fb
-        if self.theoryPredictions is not None:
-            for tp in self.theoryPredictions:
-                ret += tp.xsection.value
-        return ret
-
-    def getmaxCondition(self):
+    def likelihood(self, mu=1., expected=False,
+                   nll=False):
         """
-        Returns the maximum xsection from the list conditions
-
-        :returns: maximum condition xsection (float)
+        Compute the likelihood at a given mu
+        :param mu: signal strength
+        :param expected: if True, compute expected likelihood, else observed
+        :param nll: if True, return negative log likelihood, else likelihood
         """
-        conditions = [tp.getmaxCondition() for tp in self.theoryPredictions]
-        return max(conditions)
+        try:
+            mu = mu[0]  # some of these methods use arrays with a single element
+        except:
+            pass
+        if mu in self.cachedLlhds[expected]:
+            llhd = self.cachedLlhds[expected][mu]
+            if nll:
+                if llhd == 0.:  # cut off nll at 700 (1e-300)
+                    return 700.
+                return - np.log(llhd)
+            return llhd
+
+        llhd = 1.
+
+        for tp in self.theoryPredictions:
+            # Set the theory marginalize attribute to the combiner value:
+            tp_marginalize = tp.marginalize
+            tp.marginalize = self.marginalize
+            llhd = llhd * tp.likelihood(mu, expected=expected)
+            # Restore marginalize setting:
+            tp.marginalize = tp_marginalize
+        self.cachedLlhds[expected][mu] = llhd
+        if nll:
+            if llhd == 0.:  # cut off nll at 700 (1e-300)
+                return 700.
+            return - np.log(llhd)
+        return llhd
 
     def computeStatistics(self, expected=False):
         """
@@ -122,6 +196,22 @@ class TheoryPredictionsCombiner():
             allowNegativeSignals=False, extended_output=True)
         self.cachedObjs[expected]["lmax"] = lmax
 
+    def totalXsection(self):
+        ret = 0.*fb
+        if self.theoryPredictions is not None:
+            for tp in self.theoryPredictions:
+                ret += tp.xsection.value
+        return ret
+
+    def getmaxCondition(self):
+        """
+        Returns the maximum xsection from the list conditions
+
+        :returns: maximum condition xsection (float)
+        """
+        conditions = [tp.getmaxCondition() for tp in self.theoryPredictions]
+        return max(conditions)
+
     def findMuHat(self, allowNegativeSignals=False, expected=False,
                   extended_output=False, nll=False):
         """ find muhat and lmax.
@@ -135,14 +225,16 @@ class TheoryPredictionsCombiner():
         import scipy.optimize
 
         def fun(mu):
-            return self.getLikelihood(mu, expected=expected,
-                                      nll=True, useRelSigStrengths=True)
+            return self.likelihood(mu, expected=expected, nll=True)
+
         toTry = [1., 0., 3., 10.]
         if allowNegativeSignals:
             toTry = [1., 0., 3., -1., 10., -3.]
         for mu0 in toTry:
-            o = scipy.optimize.minimize(fun, mu0)
-            logger.debug(f"result for {mu0}:", o)
+            # Minimize with a delta_mu = 1e-3*mu0 when computing the first derivative
+            # (if delta_mu is too small, the derivative might give zero and terminate the minimization)
+            o = scipy.optimize.minimize(fun, mu0, options={'eps': 1e-3})
+            logger.debug(f"result for {mu0}: %s" % o)
             if not o.success:
                 logger.debug(
                     f"combiner.findMuHat did not terminate successfully: {o.message} mu_hat={o.x} hess={o.hess_inv} slhafile={self.slhafile}")
@@ -169,92 +261,22 @@ class TheoryPredictionsCombiner():
             lmax = - np.log(lmax)
         if extended_output:
             return mu_hat, sigma_mu, lmax
+
         return mu_hat
 
-    def getNSigtot(self):
-        """ get the total number of signal events, summed over
-            all theory predictions. needed for normalizations. """
-        S = 0.
-        for tp in self.theoryPredictions:
-            lumi = tp.dataset.getLumi()
-            nsig = (tp.xsection.value*lumi).asNumber()
-            S += nsig
-        return S
-
-    def getLikelihood(self, mu=1., expected=False,
-                      nll=False, useRelSigStrengths=True):
-        """
-        Compute the likelihood at a given mu
-        :param mu: signal strength
-        :param expected: if True, compute expected likelihood, else observed
-        :param nll: if True, return negative log likelihood, else likelihood
-        :param useRelSigStrengths: if True, get the likelihood
-                                   not on signal strength mu,
-                                   but on relative signal strength,
-                                   total_nsig = 1 for mu = 1
-        """
-        try:
-            mu = mu[0]  # some of these methods use arrays with a single element
-        except:
-            pass
-        if mu in self.cachedLlhds[useRelSigStrengths][expected]:
-            llhd = self.cachedLlhds[useRelSigStrengths][expected][mu]
-            if nll:
-                if llhd == 0.:  # cut off nll at 700 (1e-300)
-                    return 700.
-                return - np.log(llhd)
-            return llhd
-
-        llhd = 1.
-        S = 1.
-        if useRelSigStrengths:
-            S = self.getNSigtot()
-
-        for tp in self.theoryPredictions:
-            lumi = tp.dataset.getLumi()
-            nsig = (tp.xsection.value*lumi).asNumber()
-            if useRelSigStrengths:
-                nsig = nsig / S
-            llhd = llhd * tp.dataset.likelihood(mu*nsig, marginalize=self.marginalize,
-                                                deltas_rel=self.deltas_rel, expected=expected)
-        self.cachedLlhds[useRelSigStrengths][expected][mu] = llhd
-        if nll:
-            if llhd == 0.:  # cut off nll at 700 (1e-300)
-                return 700.
-            return - np.log(llhd)
-        return llhd
-
-    def signals(self, mu):
-        """
-        Returns the number of expected signal events, for all datasets,
-        given total signal strength mu.
-        :param mu: Total number of signal events summed over all datasets.
-        """
-        ret = []
-        for tp in self.theoryPredictions:
-            n = float(mu * tp.dataset.getLumi() * tp.xsection.value)
-            ret.append(n)
-        return ret
-
-    def getUpperLimitOnMu(self, toys=None, expected=False):
+    def getUpperLimitOnMu(self, expected=False):
         """ get upper limit on signal strength multiplier, i.e. value for mu for
             which CLs = 0.95
         :param expected: if True, compute expected likelihood, else observed
-        :param toys: specify number of toys. Use default if none
         :returns: upper limit on signal strength multiplier mu
         """
-        if toys is None:
-            # caching only used when using default toys
-            toys = self.toys
-        if toys == self.toys:
-            if "UL" in self.cachedObjs[expected]:
-                return self.cachedObjs[expected]["UL"]
+        if "UL" in self.cachedObjs[expected]:
+            return self.cachedObjs[expected]["UL"]
         # if not hasattr ( self, "mu_hat" ):
         #    self.computeStatistics( expected = False )
         mu_hat, sigma_mu, lmax = self.findMuHat(allowNegativeSignals=True,
                                                 extended_output=True)
-        nll0 = self.getLikelihood(mu_hat, expected=expected, nll=True,
-                                  useRelSigStrengths=True)
+        nll0 = self.likelihood(mu_hat, expected=expected, nll=True)
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
         mu_hatA, _, nll0A = self.findMuHat(expected="posteriori", nll=True,
@@ -265,45 +287,11 @@ class TheoryPredictionsCombiner():
         def clsRoot(mu):
             # at - infinity this should be .95,
             # at + infinity it should -.05
-            nll = self.getLikelihood(mu, nll=True,
-                                     expected=expected, useRelSigStrengths=True)
-            nllA = self.getLikelihood(mu, expected="posteriori", nll=True,
-                                      useRelSigStrengths=True)
+            nll = self.likelihood(mu, nll=True, expected=expected)
+            nllA = self.likelihood(mu, expected="posteriori", nll=True)
             return rootFromNLLs(nllA, nll0A, nll, nll0)
 
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot)
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
-        if toys == self.toys:
-            self.cachedObjs[expected]["UL"] = mu_lim
+        self.cachedObjs[expected]["UL"] = mu_lim
         return mu_lim
-
-    def getUpperLimit(self, toys=None, expected=False,
-                      trylasttime=False):
-        """ get upper limit on *fiducial* cross sections
-            which CLs = 0.95
-        :param expected: if True, compute expected likelihood, else observed
-        :returns: upper limit on *fiducial* cross sections (list)
-        """
-        clmu = self.getUpperLimitOnMu(expected=expected)
-        ret = []
-        for tp in self.theoryPredictions:
-            ret.append(tp.xsection.value * clmu)
-        return ret
-
-    def getRValue(self, expected=False):
-        """ obtain r-value, i.e. predicted_xsec / ul
-        :param expected: if True, compute expected likelihood, else observed
-        :returns: r-value
-        """
-        if "r" in self.cachedObjs[expected]:
-            return self.cachedObjs[expected]["r"]
-        clmu = self.getUpperLimitOnMu(expected=expected)
-        if clmu == 0.:
-            # has no meaning, has it?
-            return None
-        xsecs = []
-        for tp in self.theoryPredictions:
-            xsecs.append(float(tp.xsection.value * tp.dataset.getLumi()))
-        ret = sum(xsecs) / clmu
-        self.cachedObjs[expected]["r"] = ret
-        return ret

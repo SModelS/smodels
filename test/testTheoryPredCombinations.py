@@ -45,11 +45,13 @@ class CombinedTheoryPredsTest(unittest.TestCase):
                 tpreds.append(t)
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
+        mu_hat, sigma_mu, lmax = combiner.findMuHat(allowNegativeSignals=True,
+                                                    extended_output=True)
         ulmu = combiner.getUpperLimitOnMu()
         self.assertAlmostEqual(combiner.lsm(), 2.756169857697467e-06, 4)
         self.assertAlmostEqual(combiner.likelihood(), 5.001298746531528e-06, 4)
         self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
-        self.assertAlmostEqual(ulmu, 16.78997035426023, 3)
+        self.assertAlmostEqual(ulmu, 16.78997035426023/4.71, 3)
 
 
 if __name__ == "__main__":
