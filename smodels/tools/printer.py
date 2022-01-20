@@ -690,6 +690,7 @@ class SummaryPrinter(TxTPrinter):
                     else:
                         lv = str(lv)
                     lvals[i] = lv
+                llhd, lmax, lsm = lvals[:]
                 if llhd == lmax == lsm == "None":
                     output += " Likelihoods: L, L_max, L_SM = N/A\n"
                 else:
@@ -1229,7 +1230,7 @@ class SLHAPrinter(TxTPrinter):
         output += " 6 %-25s #signal region combination (0 off, 1 on)\n\n" % (
             self.combinesr)
 
-        #for SLHA output we always want to have SModelS_Exclusion block, if no results we write it here
+        # for SLHA output we always want to have SModelS_Exclusion block, if no results we write it here
         if obj.status <= 0:
             output += "BLOCK SModelS_Exclusion\n"
             output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n\n" % (-1)
@@ -1291,17 +1292,17 @@ class SLHAPrinter(TxTPrinter):
             output += " %d 5 %-30s #signal region \n" % (
                 cter, signalRegion.replace(" ", "_"))
             llhd = theoPred.likelihood()
-            if not llhd is None:
-                if type(llhd) in [float, np.float32, np.float64]:
-                    llhd = "%-30.3E" % llhd
-                else:
-                    llhd = str(llhd)
-                lmax = str(theoPred.lmax())
-                if type(lmax) in [float, np.float32, np.float64]:
-                    lmax = "%-30.3E" % lmax
-                lsm = str(theoPred.lsm())
-                if type(lsm) in [float, np.float32, np.float64]:
-                    lsm = "%-30.3E" % lsm
+            if llhd is not None:
+                lmax = theoPred.lmax()
+                lsm = theoPred.lsm()
+                lvals = [llhd, lmax, lsm]
+                for i, lv in enumerate(lvals):
+                    if isinstance(lv, (float, np.float64)):
+                        lv = "%10.3E" % lv
+                    else:
+                        lv = str(lv)
+                    lvals[i] = lv
+                llhd, lmax, lsm = lvals[:]
                 output += " %d 6 %s #Likelihood\n" % (cter, llhd)
                 output += " %d 7 %s #L_max\n" % (cter, lmax)
                 output += " %d 8 %s #L_SM\n" % (cter, lsm)

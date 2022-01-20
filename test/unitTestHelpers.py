@@ -19,7 +19,7 @@ from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
 
 
 def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
-              fname2=None):
+              fname2=None, checkBothOrders=True):
     """
     Compare two objects.
     The numerical values are compared up to the precision defined by allowedDiff.
@@ -31,6 +31,7 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
     :param where: keep track of where we are, for easier debugging.
     :param fname: the filename of obj1
     :param fname2: the filename of obj2
+    :param checkBothOrders: If True, check if obj1 == obj2 and obj2 == obj1.
     :return: True/False
     """
     if type(fname) == str:
@@ -85,6 +86,11 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
     else:
         return obj1 == obj2
 
+    # Now check for the opposite order of the objects
+    if checkBothOrders:
+        if not equalObjs(obj2, obj1, allowedDiff, ignore, where,
+                         fname2, fname, checkBothOrders=False):
+            return False
     return True
 
 

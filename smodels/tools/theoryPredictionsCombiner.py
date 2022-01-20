@@ -292,7 +292,7 @@ class TheoryPredictionsCombiner(object):
             # at - infinity this should be .95,
             # at + infinity it should -.05
             # Make sure to always compute the correct llhd value (from theoryPrediction)
-            # and not used the cached value (which is constant for mu~=1 an mu~=0)            
+            # and not used the cached value (which is constant for mu~=1 an mu~=0)
             nll = self.likelihood(mu, nll=True, expected=expected,
                                   useCached=False)
             nllA = self.likelihood(mu, expected="posteriori", nll=True,

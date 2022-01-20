@@ -70,7 +70,8 @@ class RunSModelSTest(unittest.TestCase):
             subprocess.getoutput(cmd)
         smodelsOutput = importModule(outputfile)
         from gluino_squarks_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec',
+        ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element', 'database version',
+                        'Total missed xsec',
                         'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
                         'Total xsec for missing topologies (fb)', 'Total xsec for missing topologies with displaced decays (fb)',
                         'Total xsec for missing topologies with prompt decays (fb)',
@@ -155,7 +156,7 @@ class RunSModelSTest(unittest.TestCase):
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.08,
                            ignore=ignoreFields, fname=outputfile)
         if not equals:
-            e = "output13.py != simplyGluino_default.py"
+            e = "simplyGluino.slha.py != simplyGluino_default.py"
             logger.error(e)
             # raise AssertionError( e )
 
@@ -174,7 +175,8 @@ class RunSModelSTest(unittest.TestCase):
             subprocess.getoutput(cmd)
         smodelsOutput = importModule(outputfile)
         from longLived_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec',
+        ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element', 'database version',
+                        'Total missed xsec',
                         'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
                         'Total xsec for missing topologies (fb)', 'Total xsec for missing topologies with displaced decays (fb)',
                         'Total xsec for missing topologies with prompt decays (fb)',
