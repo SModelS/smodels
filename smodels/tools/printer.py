@@ -681,16 +681,15 @@ class SummaryPrinter(TxTPrinter):
             # print L, L_max and L_SM instead of chi2 and llhd; SK 2021-05-14
             llhd = theoPred.likelihood()
             if llhd is not None:
-                lmax = str(theoPred.lmax())
-                lsm = str(theoPred.lsm())
-                if type(llhd) in [float, np.float64]:
-                    llhd = "%10.3E" % llhd
-                else:
-                    llhd = str(llhd)
-                if type(lmax) in [float, np.float64]:
-                    lmax = "%10.3E" % lmax
-                if type(lsm) in [float, np.float64]:
-                    lsm = "%10.3E" % lsm
+                lmax = theoPred.lmax()
+                lsm = theoPred.lsm()
+                lvals = [llhd, lmax, lsm]
+                for i, lv in enumerate(lvals):
+                    if isinstance(lv, (float, np.float64)):
+                        lv = "%10.3E" % lv
+                    else:
+                        lv = str(lv)
+                    lvals[i] = lv
                 if llhd == lmax == lsm == "None":
                     output += " Likelihoods: L, L_max, L_SM = N/A\n"
                 else:

@@ -131,12 +131,13 @@ class TheoryPredictionsCombiner(object):
         return - 2 * np.log(llhd / lmax)
 
     def likelihood(self, mu=1., expected=False,
-                   nll=False):
+                   nll=False, useCached=True):
         """
         Compute the likelihood at a given mu
         :param mu: signal strength
         :param expected: if True, compute expected likelihood, else observed
         :param nll: if True, return negative log likelihood, else likelihood
+        :param useCached: if True, will return the cached value from theoryPrediction (if available)
         """
         try:
             mu = mu[0]  # some of these methods use arrays with a single element
@@ -156,7 +157,7 @@ class TheoryPredictionsCombiner(object):
             # Set the theory marginalize attribute to the combiner value:
             tp_marginalize = tp.marginalize
             tp.marginalize = self.marginalize
-            llhd = llhd * tp.likelihood(mu, expected=expected)
+            llhd = llhd * tp.likelihood(mu, expected=expected, useCached=useCached)
             # Restore marginalize setting:
             tp.marginalize = tp_marginalize
         self.cachedLlhds[expected][mu] = llhd
@@ -225,7 +226,10 @@ class TheoryPredictionsCombiner(object):
         import scipy.optimize
 
         def fun(mu):
-            return self.likelihood(mu, expected=expected, nll=True)
+            # Make sure to always compute the correct llhd value (from theoryPrediction)
+            # and not used the cached value (which is constant for mu~=1 an mu~=0)
+            return self.likelihood(mu, expected=expected,
+                                   nll=True, useCached=False)
 
         toTry = [1., 0., 3., 10.]
         if allowNegativeSignals:
@@ -233,7 +237,7 @@ class TheoryPredictionsCombiner(object):
         for mu0 in toTry:
             # Minimize with a delta_mu = 1e-3*mu0 when computing the first derivative
             # (if delta_mu is too small, the derivative might give zero and terminate the minimization)
-            o = scipy.optimize.minimize(fun, mu0, options={'eps': 1e-3})
+            o = scipy.optimize.minimize(fun, mu0)
             logger.debug(f"result for {mu0}: %s" % o)
             if not o.success:
                 logger.debug(
@@ -287,8 +291,12 @@ class TheoryPredictionsCombiner(object):
         def clsRoot(mu):
             # at - infinity this should be .95,
             # at + infinity it should -.05
-            nll = self.likelihood(mu, nll=True, expected=expected)
-            nllA = self.likelihood(mu, expected="posteriori", nll=True)
+            # Make sure to always compute the correct llhd value (from theoryPrediction)
+            # and not used the cached value (which is constant for mu~=1 an mu~=0)            
+            nll = self.likelihood(mu, nll=True, expected=expected,
+                                  useCached=False)
+            nllA = self.likelihood(mu, expected="posteriori", nll=True,
+                                   useCached=False)
             return rootFromNLLs(nllA, nll0A, nll, nll0)
 
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot)

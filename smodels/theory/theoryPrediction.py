@@ -40,7 +40,7 @@ class TheoryPrediction(object):
         self.mass = None
         self.totalwidth = None
         self.marginalize = marginalize
-        if deltas_rel == None:
+        if deltas_rel is None:
             from smodels.tools.runtime import _deltas_rel_default
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
@@ -94,7 +94,7 @@ class TheoryPrediction(object):
 
         # First check if the upper-limit and expected upper-limit have already been computed.
         # If not, compute it and store them.
-        if not "UL" in self.cachedObjs[expected]:
+        if "UL" not in self.cachedObjs[expected]:
             if self.dataType() == 'efficiencyMap':
                 self.cachedObjs[expected]["UL"] = self.dataset.getSRUpperLimit(
                         expected=expected, deltas_rel=self.deltas_rel)
@@ -103,7 +103,7 @@ class TheoryPrediction(object):
                         element=self.avgElement, txnames=self.txnames,
                         expected=expected)
             if self.dataType() == 'combined':
-                #Create a list of signal events in each dataset/SR sorted according to datasetOrder
+                # Create a list of signal events in each dataset/SR sorted according to datasetOrder
                 # lumi = self.dataset.getLumi()
                 if hasattr(self.dataset.globalInfo, "covariance"):
                     srNsigDict = dict([[pred.dataset.getID(), (pred.xsection.value*pred.dataset.getLumi()).asNumber()] for pred in self.datasetPredictions])
@@ -113,8 +113,8 @@ class TheoryPrediction(object):
                     srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
                 self.cachedObjs[expected]["UL"] = getCombinedUpperLimitFor(self.dataset, srNsigs, expected=expected, deltas_rel=self.deltas_rel)
 
-        #Return the expected or observed UL:
-        #if not self.cachedObjs[expected]["UL"]:
+        # Return the expected or observed UL:
+        # if not self.cachedObjs[expected]["UL"]:
         #    self.cachedObjs[expected]["UL"]=None
         return self.cachedObjs[expected]["UL"]
 
@@ -122,7 +122,7 @@ class TheoryPrediction(object):
         """
         Get the r value = theory prediction / experimental upper limit
         """
-        if not "r" in self.cachedObjs[expected]:
+        if "r" not in self.cachedObjs[expected]:
             upperLimit = self.getUpperLimit(expected)
             if upperLimit is None or upperLimit.asNumber(fb) == 0.:
                 r = None
@@ -136,9 +136,9 @@ class TheoryPrediction(object):
 
     def lsm(self, expected=False):
         """ likelihood at SM point, same as .def likelihood( ( mu = 0. ) """
-        if not "lsm" in self.cachedObjs[expected]:
+        if "lsm" not in self.cachedObjs[expected]:
             self.computeStatistics(expected)
-        if not "lsm" in self.cachedObjs[expected]:
+        if "lsm" not in self.cachedObjs[expected]:
             self.cachedObjs[expected]["lsm"] = None
         return self.cachedObjs[expected]["lsm"]
 
@@ -158,24 +158,26 @@ class TheoryPrediction(object):
         return self.cachedObjs[expected]["chi2"]
 
     def likelihood(self, mu=1., expected=False,
-                   nll=False):
+                   nll=False, useCached=True):
         """
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood
         :param nll: if True, return negative log likelihood, else likelihood
+        :param useCached: if True, will return the cached value, if available
         """
-        if mu in self.cachedLlhds[expected]:
+        if useCached and mu in self.cachedLlhds[expected]:
             llhd = self.cachedLlhds[expected][mu]
             if nll:
                 if llhd == 0.:
                     return 700.
                 return - np.log(llhd)
             return llhd
-        # self.computeStatistics ( expected=expected )
-        if "llhd" in self.cachedObjs[expected] and abs(mu - 1.) < 1e-5:
-            return self.cachedObjs[expected]["llhd"]
-        if "lsm" in self.cachedObjs[expected] and abs(mu) < 1e-5:
-            return self.cachedObjs[expected]["lsm"]
+        # self.computeStatistics(expected=expected)
+        if useCached:
+            if "llhd" in self.cachedObjs[expected] and abs(mu - 1.) < 1e-5:
+                return self.cachedObjs[expected]["llhd"]
+            if "lsm" in self.cachedObjs[expected] and abs(mu) < 1e-5:
+                return self.cachedObjs[expected]["lsm"]
         lumi = self.dataset.getLumi()
         if self.dataType() == 'combined':
             srNsigDict = dict([[pred.dataset.getID(), (pred.xsection.value*lumi).asNumber()] for
@@ -189,6 +191,7 @@ class TheoryPrediction(object):
             llhd = self.dataset.likelihood(nsig, marginalize=self.marginalize,
                                            deltas_rel=self.deltas_rel,
                                            expected=expected)
+
         if self.dataType() == 'upperLimit':
             llhd, chi2 = self.likelihoodFromLimits(mu, chi2also=True, expected=expected)
         self.cachedLlhds[expected][mu] = llhd
