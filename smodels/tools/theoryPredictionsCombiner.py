@@ -59,7 +59,7 @@ class TheoryPredictionsCombiner(object):
         Return a string with the IDs of all the experimental results used in the combination.
         """
 
-        ret = ','.join([tp.expResult.globalInfo.id for tp in self.theoryPredictions])
+        ret = ','.join(sorted([tp.expResult.globalInfo.id for tp in self.theoryPredictions]))
 
         return ret
 

@@ -190,11 +190,12 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
     if parser.has_option("options", "combineAnas"):
         """ Combine analyses """
+
+        selectedTheoryPreds = []
         combineAnas = parser.get("options", "combineAnas").split(",")
         if combineAnas:
             # Selected the theory predictions which correspond to the analyses to be combined
             # and have likelihoods defined
-            selectedTheoryPreds = []
             for tp in theoryPredictions:
                 expID = tp.expResult.globalInfo.id
                 if expID not in combineAnas:
@@ -202,7 +203,8 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
                 if tp.likelihood() is None:
                     continue
                 selectedTheoryPreds.append(tp)
-
+        # Only compute combination if at least two results were selected
+        if len(selectedTheoryPreds) > 1:
             combiner = TheoryPredictionsCombiner(selectedTheoryPreds)
             combiner.computeStatistics()
             masterPrinter.addObj(combiner)

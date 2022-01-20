@@ -246,6 +246,23 @@ class BasicPrinter(object):
             logger.warning('Error formating object %s: \n %s' % (typeStr, e))
             return False
 
+    def _round(self, number, n=6):
+        """ round a number to n significant digits, if it *is* a number """
+        if type(number) not in [float, np.float64]:
+            return number
+        if not np.isfinite(number):
+            return f'float("{number}")'
+        if np.isnan(number) or not np.isfinite(number):
+            return number
+        try:
+            if abs(number) < 1e-40:
+                return number
+            return round(number, -int(np.floor(np.sign(number) * np.log10(abs(number)))) + n)
+        except Exception:
+            pass
+        return number
+        # return round ( number, n )
+
 
 class TxTPrinter(BasicPrinter):
     """
@@ -727,8 +744,7 @@ class SummaryPrinter(TxTPrinter):
         output = "===================================================== \n"
 
         # Get list of analyses used in combination:
-        expResults = [
-            tp.expResult.globalInfo.id for tp in obj.theoryPredictions]
+        expIDs = obj.analysisId()
         # Get r-value:
         r = obj.getRValue()
         r_expected = obj.getRValue(expected=True)
@@ -736,7 +752,7 @@ class SummaryPrinter(TxTPrinter):
         lsm = obj.lsm()
         llhd = obj.likelihood()
         lmax = obj.lmax()
-        output += "Combined Analyses: %s\n" % (','.join(expResults))
+        output += "Combined Analyses: %s\n" % (expIDs)
         output += "Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (
             llhd, lmax, lsm)
         output += "combined r-value: %10.3E\n" % r
@@ -879,23 +895,6 @@ class PyPrinter(BasicPrinter):
             infoDict['time spent'] = "%.2fs" % (time.time() - self.time)
         return {'OutputStatus': infoDict}
 
-    def _round(self, number, n=6):
-        """ round a number to n significant digits, if it *is* a number """
-        if type(number) not in [float, np.float64]:
-            return number
-        if not np.isfinite(number):
-            return f'float("{number}")'
-        if np.isnan(number) or not np.isfinite(number):
-            return number
-        try:
-            if abs(number) < 1e-40:
-                return number
-            return round(number, -int(np.floor(np.sign(number) * np.log10(abs(number)))) + n)
-        except Exception:
-            pass
-        return number
-        # return round ( number, n )
-
     def _formatTheoryPredictionList(self, obj):
         """
         Format data of the TheoryPredictionList object.
@@ -920,7 +919,7 @@ class PyPrinter(BasicPrinter):
             value = theoryPrediction.xsection.value.asNumber(fb)
             txnamesDict = {}
             for el in theoryPrediction.elements:
-                if not el.txname.txName in txnamesDict:
+                if el.txname.txName not in txnamesDict:
                     txnamesDict[el.txname.txName] = el.weight[0].value.asNumber(
                         fb)
                 else:
@@ -1066,9 +1065,7 @@ class PyPrinter(BasicPrinter):
         combRes = []  # In case we have a list of combined results in the future
 
         # Get list of analyses used in combination:
-        expResults = [
-            tp.expResult.globalInfo.id for tp in obj.theoryPredictions]
-        expIDs = ','.join(expResults)
+        expIDs = obj.analysisId()
         ul = obj.getUpperLimit()
         ulExpected = obj.getUpperLimit(expected=True)
         if isinstance(ul, unum.Unum):
@@ -1194,7 +1191,8 @@ class SLHAPrinter(TxTPrinter):
         self.name = "slha"
         self.docompress = 0
         self.combinesr = 0
-        self.printingOrder = [OutputStatus, TheoryPredictionList, Uncovered]
+        self.printingOrder = [OutputStatus, TheoryPredictionList,
+                              TheoryPredictionsCombiner, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -1298,7 +1296,7 @@ class SLHAPrinter(TxTPrinter):
                 lvals = [llhd, lmax, lsm]
                 for i, lv in enumerate(lvals):
                     if isinstance(lv, (float, np.float64)):
-                        lv = "%10.3E" % lv
+                        lv = "%-30.3E" % lv
                     else:
                         lv = str(lv)
                     lvals[i] = lv
@@ -1319,9 +1317,9 @@ class SLHAPrinter(TxTPrinter):
 
     def _formatUncovered(self, obj):
 
-        #First sort groups by label
+        # First sort groups by label
         groups = sorted(obj.groups[:], key=lambda g: g.label)
-        #Get summary of groups:
+        # Get summary of groups:
         output = "\nBLOCK SModelS_Coverage"
         for i, group in enumerate(sorted(groups, key=lambda g: g.label)):
             output += "\n %d 0 %-30s      # %s" % (
@@ -1329,6 +1327,54 @@ class SLHAPrinter(TxTPrinter):
             output += "\n %d 1 %-30.3E      # %s" % (
                 i, group.getTotalXSec(), "Total cross-section (fb)")
         output += "\n"
+        return output
+
+    def _formatTheoryPredictionsCombiner(self, obj):
+        """
+        Format data of the TheoryPredictionsCombiner object.
+
+        :param obj: A TheoryPredictionsCombiner object to be printed.
+        """
+
+        output = "BLOCK SModelS_CombinedAnas\n"
+
+        combRes = [obj]  # For now use a dummy list (only a single combined result is expected)
+        for icomb, cRes in enumerate(combRes):
+            cter = icomb + 1
+            # Get list of analyses IDs used in combination:
+            expIDs = cRes.analysisId()
+            # Replace commas by spaces:
+            expIDs = expIDs.replace(',', ' ')
+            ul = cRes.getUpperLimit()
+            ulExpected = cRes.getUpperLimit(expected=True)
+            if isinstance(ul, unum.Unum):
+                ul = ul.asNumber(fb)
+            if isinstance(ulExpected, unum.Unum):
+                ulExpected = ulExpected.asNumber(fb)
+
+            r = self._round(cRes.getRValue(expected=False))
+            r_expected = self._round(cRes.getRValue(expected=True))
+
+            llhd = cRes.likelihood()
+            lmax = cRes.lmax()
+            lsm = cRes.lsm()
+            lvals = [llhd, lmax, lsm]
+            for i, lv in enumerate(lvals):
+                if isinstance(lv, (float, np.float64)):
+                    lv = "%-30.3E" % lv
+                else:
+                    lv = str(lv)
+                lvals[i] = lv
+            llhd, lmax, lsm = lvals[:]
+
+            output += " %d 1 %-30.3E #r value\n" % (cter, r)
+            output += " %d 2 %-30.3E #expected r value\n" % (cter, r_expected)
+            output += " %d 3 %s #Likelihood\n" % (cter, llhd)
+            output += " %d 4 %s #L_max\n" % (cter, lmax)
+            output += " %d 5 %s #L_SM\n" % (cter, lsm)
+            output += " %d 6 %s #IDs of combined analyses\n" % (cter, expIDs)
+            output += "\n"
+
         return output
 
 
@@ -1341,23 +1387,22 @@ def printScanSummary(outputDict, outputFile):
     :param outputFile: Path to the summary file to be written.
     """
 
-    #Check available types of printer:
+    # Check available types of printer:
     printerTypes = ['slha', 'python', 'summary']
     # All outputs should have the same format
     out = list(outputDict.values())[0]
-    if all([(not ptype in out) for ptype in printerTypes]):
-        header = "#In order to build the summary, one of the following types of printer must be available:\n %s \n" % str(
-            printerTypes)
+    if all([(ptype not in out) for ptype in printerTypes]):
+        header = "#In order to build the summary, one of the following types of printer must be available:\n %s \n" % str(printerTypes)
         with open(outputFile, 'w') as f:
             f.write(header)
         return
 
-    #Header:
+    # Header:
     header = "#Global results summary (%i files)\n" % len(outputDict)
     header += "#The most constraining analysis corresponds to the one with largest observed r.\n"
     header += "#The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.\n"
 
-    #Get summary information:
+    # Get summary information:
     summaryList = []
     fnames = list(outputDict.keys())
     fnames.sort()  # we want a canonical order
@@ -1368,15 +1413,15 @@ def printScanSummary(outputDict, outputFile):
             continue
         #default values (in case of empty results):
         summaryDict = OrderedDict({'filename': fname,
-                                   'MostConstrainingAnalysis': 'N/A',
-                                   'r_max': -1,
-                                   'r_exp': -1,
-                                   'MostSensitive(ATLAS)': 'N/A',
-                                   'r(ATLAS)': -1,
-                                   'r_exp(ATLAS)': -1,
-                                   'MostSensitive(CMS)': 'N/A',
-                                   'r(CMS)': -1,
-                                   'r_exp(CMS)': -1
+                                 'MostConstrainingAnalysis': 'N/A',
+                                 'r_max': -1,
+                                 'r_exp': -1,
+                                 'MostSensitive(ATLAS)': 'N/A',
+                                 'r(ATLAS)': -1,
+                                 'r_exp(ATLAS)': -1,
+                                 'MostSensitive(CMS)': 'N/A',
+                                 'r(CMS)': -1,
+                                 'r_exp(CMS)': -1
                                    })
 
         if 'python' in output:
@@ -1394,15 +1439,15 @@ def printScanSummary(outputDict, outputFile):
 
         summaryList.append(summaryDict)
 
-    #Get column labels and widths:
+    # Get column labels and widths:
     labels = list(summaryList[0].keys())
     cwidths = []
     fstr = '%s'  # format for strings
     ffloat = '%1.3g'  # format for floats
     for label in labels:
         maxlength = max([len(ffloat % entry[label]) if isinstance(entry[label], (float, int))
-                         else len(fstr % entry[label])
-                         for entry in summaryList])
+                       else len(fstr % entry[label])
+                       for entry in summaryList])
         maxlength = max(maxlength, len(label))
         cwidths.append(maxlength)
 
@@ -1419,9 +1464,9 @@ def printScanSummary(outputDict, outputFile):
 
         for entry in summaryList:
             row = '  '.join([(ffloat % entry[label]).ljust(cwidths[j])
-                             if isinstance(entry[label], (float, int))
-                             else (fstr % entry[label]).ljust(cwidths[j])
-                             for j, label in enumerate(labels)])
+                           if isinstance(entry[label], (float, int))
+                           else (fstr % entry[label]).ljust(cwidths[j])
+                           for j, label in enumerate(labels)])
             f.write(row+'\n')
     return
 
@@ -1451,9 +1496,9 @@ def getSummaryFrom(output, ptype):
     else:
         rvals, rexp, anaIDs = info
 
-    #Sort results by r_obs:
+    # Sort results by r_obs:
     rvalswo = copy.deepcopy(rvals)
-    rvalswo[rvalswo == None] = -1
+    rvalswo[rvalswo is None] = -1
     asort = rvalswo.argsort()[::-1]
     rvals = rvals[asort]
     anaIDs = anaIDs[asort]
@@ -1462,10 +1507,10 @@ def getSummaryFrom(output, ptype):
     summaryDict['r_exp'] = rexp[0]
     summaryDict['MostConstrainingAnalysis'] = anaIDs[0]
 
-    #Sort results by r_obs:
+    # Sort results by r_obs:
     rvalswo = copy.deepcopy(rexp)
-    rvalswo[rvalswo == None] = -1
-    #Sort results by r_exp:
+    rvalswo[rvalswo is None] = -1
+    # Sort results by r_exp:
     asort = rvalswo.argsort()[::-1]
     rvals = rvals[asort]
     anaIDs = anaIDs[asort]
@@ -1505,7 +1550,7 @@ def getInfoFromPython(output):
         return None
     rvals = np.array([res['r'] for res in output['ExptRes']])
     rexp = np.array([res['r_expected'] if res['r_expected']
-                     else -1 for res in output['ExptRes']])
+                   else -1 for res in output['ExptRes']])
     anaIDs = np.array([res['AnalysisID'] for res in output['ExptRes']])
 
     return rvals, rexp, anaIDs
@@ -1533,7 +1578,7 @@ def getInfoFromSLHA(output):
     resI = list(set([k[0] for k in results.blocks[bname].keys() if k[0] > 0]))
     rvals = np.array([results.blocks[bname][(i, 1)] for i in resI])
     rexp = np.array([results.blocks[bname][(i, 2)]
-                     if results.blocks[bname][(i, 2)] != 'N/A' else -1 for i in resI])
+                   if results.blocks[bname][(i, 2)] != 'N/A' else -1 for i in resI])
     anaIDs = np.array([results.blocks[bname][(i, 4)] for i in resI])
 
     return rvals, rexp, anaIDs
@@ -1556,7 +1601,7 @@ def getInfoFromSummary(output):
         if 'The highest r value is' in l:
             rmax = l.split('=')[1].strip()
             ff = np.where([((not x.isdigit()) and (not x in ['.', '+', '-']))
-                           for x in rmax])[0][0]  # Get when the value ends
+                         for x in rmax])[0][0]  # Get when the value ends
             rmax = eval(rmax[:ff])
             anaMax = l.split('from')[1].split()[0].replace(',', '')
             rexpMax = -1
@@ -1564,7 +1609,7 @@ def getInfoFromSummary(output):
                 rexpMax = l.split('r_expected')[-1]
                 rexpMax = rexpMax.split('=')[1]
                 ff = np.where([((not x.isdigit()) and (not x in ['.', '+', '-']))
-                               for x in rexpMax])[0][0]  # Get when the value ends
+                             for x in rexpMax])[0][0]  # Get when the value ends
                 rexpMax = eval(rexpMax[:ff])
             rvals.append(rmax)
             anaIDs.append(anaMax)
@@ -1573,20 +1618,20 @@ def getInfoFromSummary(output):
             # the space is required to have at least one non-digit character after the value
             rAna = l.split('=')[-1] + ' '
             ff = np.where([((not x.isdigit()) and (not x in ['.', '+', '-']))
-                           for x in rAna])[0][0]  # Get when the value ends
+                         for x in rAna])[0][0]  # Get when the value ends
             rAna = eval(rAna[:ff])
             rexpAna = -1
             if 'r_expected' in l:
                 rexpAna = l.split('r_expected')[-1]
                 rexpAna = rexpAna.split('=')[1]
                 ff = np.where([((not x.isdigit()) and (not x in ['.', '+', '-']))
-                               for x in rexpAna])[0][0]  # Get when the value ends
+                             for x in rexpAna])[0][0]  # Get when the value ends
                 rexpAna = eval(rexpAna[:ff])
             if 'CMS' in l:
                 anaID = 'CMS-'+l.split('CMS-')[1].split(' ')[0].split(',')[0]
             else:
                 anaID = 'ATLAS-' + \
-                    l.split('ATLAS-')[1].split(' ')[0].split(',')[0]
+                l.split('ATLAS-')[1].split(' ')[0].split(',')[0]
             anaID = anaID.split()[0].strip().replace(',', '')
             rvals.append(rAna)
             anaIDs.append(anaID)

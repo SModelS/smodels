@@ -130,7 +130,7 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
         level = 'error'
         to = os.devnull
     database = None
-    if overridedatabase != None:
+    if overridedatabase is not None:
         database = overridedatabase
     else:
         from databaseLoader import database  # to make sure the db exists
