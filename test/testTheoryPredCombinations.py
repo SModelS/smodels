@@ -61,29 +61,6 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
         self.assertAlmostEqual(ulmu, 16.78997035426023/4.71, 3)
 
-    def testAPI(self):
-        
-        filename = "testFiles/slha/T1tttt.slha"
-        outputfile = runMain(filename, inifile='testParameters_comb.ini', suppressStdout=True)
-        smodelsOutput = importModule(outputfile)
-        from T1tttt_comb_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element', 'database version',
-                        'Total missed xsec',
-                        'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
-                        'Total xsec for missing topologies (fb)', 'Total xsec for missing topologies with displaced decays (fb)',
-                        'Total xsec for missing topologies with prompt decays (fb)',
-                        'Total xsec for topologies outside the grid (fb)']
-        smodelsOutputDefault['CombinedRes'] = sorted(smodelsOutputDefault['CombinedRes'],
-                                                     key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.02,
-                           ignore=ignoreFields, fname=outputfile)
-        self.assertTrue(equals)
-
-        for i in ['./output.py', './output.pyc']:
-            if os.path.exists(i):
-                os.remove(i)
-        self.removeOutputs(outputfile)
-
 
 if __name__ == "__main__":
     unittest.main()

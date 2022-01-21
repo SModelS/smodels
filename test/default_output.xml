@@ -1,5 +1,15 @@
 <?xml version="1.0" ?>
 <smodelsOutput>
+    <CombinedRes_List>
+        <CombinedRes>
+            <AnalysisID>ATLAS-CONF-2013-037,CMS-SUS-13-012</AnalysisID>
+            <l_SM>6.179978e-05</l_SM>
+            <l_max>0.0001330265</l_max>
+            <likelihood>9.47724e-05</likelihood>
+            <r>0.1332296</r>
+            <r_expected>0.1810419</r_expected>
+        </CombinedRes>
+    </CombinedRes_List>
     <ExptRes_List>
         <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
@@ -387,6 +397,7 @@
         <file_status>1</file_status>
         <input_file>./testFiles/slha/gluino_squarks.slha</input_file>
         <maxcond>0.2</maxcond>
+        <ncpus>1</ncpus>        
         <minmassgap>5.0</minmassgap>
         <sigmacut>0.03</sigmacut>
         <smodels_version>2.1.0</smodels_version>

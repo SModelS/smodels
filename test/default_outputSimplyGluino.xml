@@ -154,6 +154,7 @@
         <file_status>1</file_status>
         <input_file>./testFiles/slha/simplyGluino.slha</input_file>
         <maxcond>0.2</maxcond>
+        <ncpus>1</ncpus>
         <minmassgap>5.0</minmassgap>
         <sigmacut>0.03</sigmacut>
         <smodels_version>2.1.0</smodels_version>
