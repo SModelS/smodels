@@ -170,9 +170,6 @@ class TheoryPredictionsCombiner(object):
     def computeStatistics(self, expected=False):
         """
         Compute the likelihoods, chi2, and upper limit for this combination
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
-        :param deltas_rel: relative uncertainty in signal (float).
-                           Default value is 20%.
         :param expected: if True, compute expected likelihood, else observed
         """
         if self.theoryPredictions is None:
@@ -183,18 +180,21 @@ class TheoryPredictionsCombiner(object):
             return
         llhd, lsm = 1., 1.
         for tp in self.theoryPredictions:
-            lumi = tp.dataset.getLumi()
-            nsig = (tp.xsection.value*lumi).asNumber()
-            llhd = llhd * tp.likelihood(nsig, marginalize=self.marginalize,
-                                                deltas_rel=self.deltas_rel, expected=expected)
-            lsm = lsm * tp.likelihood(0., marginalize=self.marginalize,
-                                              deltas_rel=self.deltas_rel, expected=expected)
+            tp_marginalize = tp.marginalize
+            tp.marginalize = self.marginalize
+            llhd = llhd * tp.likelihood(1.0, expected=expected,
+                                        useCached=True)
+
+            lsm = lsm * tp.likelihood(0.0, expected=expected,
+                                      useCached=True)
+            # Restore marginalize setting:
+            tp.marginalize = tp_marginalize
+
         self.cachedObjs[expected]["llhd"] = llhd
         self.cachedObjs[expected]["lsm"] = lsm
         if expected:
             self.cachedObjs[expected]["lmax"] = lsm
-        self.mu_hat, self.sigma_mu, lmax = self.findMuHat(
-            allowNegativeSignals=False, extended_output=True)
+        self.mu_hat, self.sigma_mu, lmax = self.findMuHat(extended_output=True)
         self.cachedObjs[expected]["lmax"] = lmax
 
     def totalXsection(self):

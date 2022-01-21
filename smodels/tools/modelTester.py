@@ -197,14 +197,18 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
             # Selected the theory predictions which correspond to the analyses to be combined
             # and have likelihoods defined
             for tp in theoryPredictions:
-                expID = tp.expResult.globalInfo.id
+                expID = tp.analysisId()
                 if expID not in combineAnas:
                     continue
                 if tp.likelihood() is None:
                     continue
                 selectedTheoryPreds.append(tp)
+        # Make sure each analysis appears only once:
+        expIDs = [tp.analysisId() for tp in selectedTheoryPreds]
+        if len(expIDs) != len(set(expIDs)):
+            logger.warning("Duplicated results when trying to combine analyses.")
         # Only compute combination if at least two results were selected
-        if len(selectedTheoryPreds) > 1:
+        elif len(selectedTheoryPreds) > 1:
             combiner = TheoryPredictionsCombiner(selectedTheoryPreds)
             combiner.computeStatistics()
             masterPrinter.addObj(combiner)

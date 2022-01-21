@@ -401,8 +401,8 @@ class TheoryPredictionList(object):
 
 
 def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
-                useBestDataset=True, combinedResults=True,
-                marginalize=False, deltas_rel=None):
+                         useBestDataset=True, combinedResults=True,
+                         marginalize=False, deltas_rel=None):
     """
     Compute theory predictions for the given experimental result, using the list of
     elements in smsTopList.
@@ -425,7 +425,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction
                objects
     """
-    if deltas_rel == None:
+    if deltas_rel is None:
         from smodels.tools.runtime import _deltas_rel_default
         deltas_rel = _deltas_rel_default
 
@@ -433,14 +433,15 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         ret = []
         for er in expResult:
             tpreds = theoryPredictionsFor(er, smsTopList, maxMassDist,
-                           useBestDataset, combinedResults, marginalize, deltas_rel)
+                                          useBestDataset, combinedResults,
+                                          marginalize, deltas_rel)
             if tpreds:
                 for tp in tpreds:
                     ret.append(tp)
         return TheoryPredictionList(ret)
 
     dataSetResults = []
-    #Compute predictions for each data set (for UL analyses there is one single set)
+    # Compute predictions for each data set (for UL analyses there is one single set)
     for dataset in expResult.datasets:
         predList = _getDataSetPredictions(dataset, smsTopList, maxMassDist)
         if predList:
@@ -455,8 +456,8 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
             theoPred.upperLimit = theoPred.getUpperLimit()
         return result
 
-    #For results with more than one dataset, return all dataset predictions
-    #if useBestDataSet=False and combinedResults=False:
+    # For results with more than one dataset, return all dataset predictions
+    # if useBestDataSet=False and combinedResults=False:
     if not useBestDataset and not combinedResults:
         allResults = sum(dataSetResults)
         for theoPred in allResults:
@@ -464,17 +465,16 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
             theoPred.deltas_rel = deltas_rel
             theoPred.upperLimit = theoPred.getUpperLimit()
         return allResults
-
-    #Else include best signal region results, if asked for.
-    bestResults = TheoryPredictionList()
-    if useBestDataset:
+    elif combinedResults:  # Try to combine results
+        bestResults = TheoryPredictionList()
+        combinedRes = _getCombinedResultFor(dataSetResults,
+                                            expResult, marginalize)
+        if combinedRes is None:  # Can not combine, use best dataset:
+            combinedRes = _getBestResult(dataSetResults)
+        bestResults.append(combinedRes)
+    else:  # Use best dataset:
+        bestResults = TheoryPredictionList()
         bestResults.append(_getBestResult(dataSetResults))
-    #If combinedResults = True, also include the combined result (when available):
-    if combinedResults and len(dataSetResults) > 1:
-        combinedDataSetResult = _getCombinedResultFor(dataSetResults,
-                                                      expResult, marginalize)
-        if combinedDataSetResult:
-            bestResults.append(combinedDataSetResult)
 
     for theoPred in bestResults:
         theoPred.expResult = expResult
