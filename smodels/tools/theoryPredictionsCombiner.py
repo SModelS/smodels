@@ -108,8 +108,7 @@ class TheoryPredictionsCombiner(object):
         """
         llhd = 1.
         for tp in self.theoryPredictions:
-            llhd = llhd * tp.dataset.likelihood(0., marginalize=self.marginalize,
-                                                deltas_rel=self.deltas_rel, expected=expected)
+            llhd = llhd * tp.likelihood(0., expected=expected)
         return llhd
 
     def lmax(self, expected=False):

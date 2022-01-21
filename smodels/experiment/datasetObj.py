@@ -530,7 +530,7 @@ class CombinedDataSet(object):
         :returns: index, or -1 if not found
         """
         if dId in datasetOrder:
-            ## easy peasy, we found the dId
+            # easy peasy, we found the dId
             return datasetOrder.index(dId)
         foundIndex = -1
         for i, ds in enumerate(datasetOrder):
