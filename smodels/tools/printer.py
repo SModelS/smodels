@@ -565,18 +565,18 @@ class TxTPrinter(BasicPrinter):
         # Number of missing topologies to be printed (ordered by cross sections)
         nprint = 10
 
-        #First sort groups by label
+        # First sort groups by label
         groups = sorted(obj.groups[:], key=lambda g: g.label)
-        #Get summary of groups:
+        # Get summary of groups:
         output = "\n"
         for group in groups:
             output += "Total cross-section for %s (fb): %10.3E\n" % (
                 group.description, group.getTotalXSec())
 
-        output += "\nFull information on unconstrained cross sections\n"
+        output += "\n#Full information on unconstrained cross sections\n"
         output += "================================================================================\n"
 
-        #Get detailed information:
+        # Get detailed information:
         for group in groups:
             description = group.description
             sqrts = group.sqrts.asNumber(TeV)
@@ -757,7 +757,8 @@ class SummaryPrinter(TxTPrinter):
             llhd, lmax, lsm)
         output += "combined r-value: %10.3E\n" % r
         output += "combined r-value (expected): %10.3E" % r_expected
-        output += "\n\n"
+        output += "\n===================================================== \n"
+        output += "\n"
 
         return output
 

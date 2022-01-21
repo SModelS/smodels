@@ -19,10 +19,9 @@ from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionList
 from smodels.tools import printer, ioObjects
 from smodels.tools import coverage
-import summaryReader
 from xml.etree import ElementTree
 from databaseLoader import database
-from unitTestHelpers import equalObjs
+from unitTestHelpers import equalObjs, Summary, runMain
 from imp import reload
 from smodels.tools import runtime
 from smodels import particlesLoader
@@ -120,7 +119,7 @@ def compareSLHA(slhadefault, slhanew, allowedDiff):
 
 class RunPrinterTest(unittest.TestCase):
     definingRun = False  # meant only to adapt to changes in output format
-    ## use with super great care!!
+    # use with super great care!!
 
     def runPrinterMain(self, slhafile, mprinter, addTopList=False):
         """
@@ -130,7 +129,7 @@ class RunPrinterTest(unittest.TestCase):
         runtime.modelFile = 'mssm'
         reload(particlesLoader)
 
-        #Set main options for decomposition:
+        # Set main options for decomposition:
         sigmacut = 0.03 * fb
         mingap = 5. * GeV
 
@@ -140,7 +139,7 @@ class RunPrinterTest(unittest.TestCase):
         smstoplist = decomposer.decompose(model, sigmacut,
                          doCompress=True, doInvisible=True, minmassgap=mingap)
 
-        #Add the decomposition result to the printers
+        # Add the decomposition result to the printers
         if addTopList:
             mprinter.addObj(smstoplist)
         listOfExpRes = database.getExpResults(analysisIDs=['*:8*TeV', 'CMS-PAS-SUS-15-002', 'CMS-PAS-SUS-16-024'])
@@ -160,11 +159,11 @@ class RunPrinterTest(unittest.TestCase):
         theoryPredictions = TheoryPredictionList(allPredictions, maxcond)
         mprinter.addObj(theoryPredictions)
 
-        #Add coverage information:
+        # Add coverage information:
         coverageInfo = coverage.Uncovered(smstoplist)
         mprinter.addObj(coverageInfo)
 
-        #Add additional information:
+        # Add additional information:
         databaseVersion = database.databaseVersion
         outputStatus = ioObjects.OutputStatus([1, 'Input file ok'], slhafile,
                                               {'sigmacut': sigmacut.asNumber(fb),
@@ -178,24 +177,20 @@ class RunPrinterTest(unittest.TestCase):
     def testTextPrinter(self):
         outputfile = "./unitTestOutput/printer_output.smodels"
         self.removeOutputs(outputfile)
-        mprinter = printer.MPrinter()
-        mprinter.Printers['summary'] = printer.SummaryPrinter(output='file')
-        #Define options:
-        mprinter.Printers['summary'].expandedSummary = True
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
-        mprinter.setOutPutFiles('./unitTestOutput/printer_output', silent=True)
-        self.runPrinterMain(slhafile, mprinter)
+        outputfile = runMain(slhafile)
+        outputfile = outputfile.replace('.py', '.smodels')
 
-        samplefile = "gluino_squarks_default.txt"
-        #Test summary output
-        output = summaryReader.Summary(outputfile, allowedDiff=0.05)
-        sample = summaryReader.Summary(samplefile, allowedDiff=0.05)
+        defaultfile = "gluino_squarks_default.smodels"
+        # Test summary output
+        output = Summary(outputfile, allowedDiff=0.05)
+        default = Summary(defaultfile, allowedDiff=0.05)
         try:
-            self.assertEqual(sample, output)
-            self.removeOutputs(outputfile)
+            self.assertEqual(default, output)
+            # self.removeOutputs(outputfile)
         except AssertionError:
-            msg = "%s != %s" % (sample, output)
+            msg = "%s != %s" % (default, output)
             raise AssertionError(msg)
 
     def removeOutputs(self, f):
@@ -209,7 +204,7 @@ class RunPrinterTest(unittest.TestCase):
         self.removeOutputs('./unitTestOutput/printer_output.py')
         mprinter = printer.MPrinter()
         mprinter.Printers['python'] = printer.PyPrinter(output='file')
-        #Define options:
+        # Define options:
         mprinter.Printers['python'].addElementList = False
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
@@ -222,21 +217,21 @@ class RunPrinterTest(unittest.TestCase):
             import imp
             pM = imp.load_source("smodels", "./unitTestOutput/printer_output.py")
             smodelsOutput = pM.smodelsOutput
-        #Test python output
+        # Test python output
         from gluino_squarks_default import smodelsOutputDefault
         ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version',
-                        'Total missed xsec', 'Missed xsec long-lived', 'Missed xsec displaced',
-                        'Missed xsec MET', 'Total outside grid xsec',
-                        'Total xsec for missing topologies (fb)', 'Total xsec for missing topologies with displaced decays (fb)',
-                        'Total xsec for missing topologies with prompt decays (fb)',
-                        'Total xsec for topologies outside the grid (fb)']
+                      'Total missed xsec', 'Missed xsec long-lived', 'Missed xsec displaced',
+                      'Missed xsec MET', 'Total outside grid xsec',
+                      'Total xsec for missing topologies (fb)', 'Total xsec for missing topologies with displaced decays (fb)',
+                      'Total xsec for missing topologies with prompt decays (fb)',
+                      'Total xsec for topologies outside the grid (fb)']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                      key=lambda res: res['r'], reverse=True)
+                                               key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                       key=lambda res: res['r'], reverse=True)
+                                        key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.05,
-                           ignore=ignoreFields, where="top",
-                           fname="./unitTestOutput/printer_output.py")
+                         ignore=ignoreFields, where="top",
+                         fname="./unitTestOutput/printer_output.py")
         try:
             self.assertTrue(equals)
         except AssertionError as e:
@@ -277,16 +272,16 @@ class RunPrinterTest(unittest.TestCase):
         from simplyGluino_default_extended import smodelsOutputDefault
 
         ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version', 'Total missed xsec',
-                        'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
-                        'Total xsec for missing topologies (fb)', 'Total xsec for missing topologies with displaced decays (fb)',
-                        'Total xsec for missing topologies with prompt decays (fb)',
-                        'Total xsec for topologies outside the grid (fb)']
+                      'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
+                      'Total xsec for missing topologies (fb)', 'Total xsec for missing topologies with displaced decays (fb)',
+                      'Total xsec for missing topologies with prompt decays (fb)',
+                      'Total xsec for topologies outside the grid (fb)']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
+                                               key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                          key=lambda res: res['r'], reverse=True)
+                                        key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.05,
-                           ignore=ignoreFields, fname="./unitTestOutput/printer_output_simple.py")
+                         ignore=ignoreFields, fname="./unitTestOutput/printer_output_simple.py")
         try:
             self.assertTrue(equals)
             self.removeOutputs(outfile)
@@ -372,7 +367,7 @@ class RunPrinterTest(unittest.TestCase):
 
         mprinter = printer.MPrinter()
         mprinter.Printers['slha'] = printer.SLHAPrinter(output='file')
-        #Define options:
+        # Define options:
         mprinter.Printers['slha'].addelementlist = True
         mprinter.Printers['slha'].docompress = 1
 

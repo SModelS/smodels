@@ -9,7 +9,9 @@
 
 import os
 import sys
+sys.path.append('../')
 import unum
+import re
 import numpy as np
 import redirector
 from smodels.tools.runSModelS import run
@@ -145,13 +147,13 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
         return sfile
 
 
-def compareSummaries(outA, outB, allowedDiff):
+def compareScanSummary(outA, outB, allowedDiff):
 
     fA = np.genfromtxt(outA, dtype=None, encoding='utf-8',
-                  skip_header=3, names=True)
+                       skip_header=3, names=True)
 
     fB = np.genfromtxt(outB, dtype=None, encoding='utf-8',
-                  skip_header=3, names=True)
+                       skip_header=3, names=True)
 
     if sorted(fA['filename']) != sorted(fB['filename']):
         logger.error("Filenames differ:\n %s\n and\n %s" % (sorted(fA['filename']), sorted(fB['filename'])))
@@ -172,3 +174,273 @@ def compareSummaries(outA, outB, allowedDiff):
                 logger.error("values for %s differ in %s" % (col, fname))
                 return False
     return True
+
+
+def compareObjs(obj1, obj2, allowedDiff=0.05):
+
+    obj1_keys = sorted([k for k in dir(obj1) if not k[0] == '_'])
+    obj2_keys = sorted([k for k in dir(obj2) if not k[0] == '_'])
+
+    if obj1_keys != obj2_keys:
+        logger.warning('Object attributes differ:\n %s \n and \n %s' % (obj1_keys, obj2_keys))
+        return False
+
+    for key in obj1_keys:
+        attr1 = getattr(obj1, key)
+        attr2 = getattr(obj2, key)
+        if type(attr1) != type(attr2):
+            logger.warning('Type of attribute differ:\n %s \n and \n %s' % (type(attr1), type(attr2)))
+            return False
+        elif attr1 != attr2:
+            if isinstance(attr1, (float, int)):
+                rel_diff = abs(attr1-attr2)/(attr1+attr2)
+                if rel_diff > allowedDiff:
+                    logger.warning('Attribute %s value differ more than %s:\n %s \n and \n %s'
+                                   % (key, allowedDiff, attr1, attr2))
+                    return False
+            else:
+                logger.warning('Attribute %s value differ:\n %s \n and \n %s' % (key, attr1, attr2))
+                return False
+    return True
+
+
+class Summary():
+    """
+    Class to access the output given in the summary.txt
+    """
+
+    def __init__(self, filename, allowedDiff=0.05):
+        self._allowedDiff = allowedDiff
+        self._filename = filename
+        self._read(filename)
+
+    def __str__(self):
+        fn = self.filename.replace("//", "/")
+        final = fn.replace(os.getcwd(), ".")
+        if len(final) > 50:
+            final = "..."+final[-47:]
+        return "Summary(%s)" % final
+
+    def __eq__(self, other):
+        return compareObjs(self, other, self._allowedDiff)
+
+    def _stripComments(self, lineString):
+        return re.sub('#.*', '', lineString)
+
+    def _read(self, filename):
+        """
+        Read input file and store output
+        """
+        f = open(filename)
+        lines = f.readlines()
+        f.close()
+        blocks = {}
+        blockLines = []
+        for line in lines:
+            if not line.replace('\n', '').strip():  # Skip empty lines
+                continue
+            if not line.replace('=', '').replace('\n', '').strip():  # Found separator, reset block
+                if blockLines:
+                    blocks[blockLines[0]] = blockLines
+                blockLines = []
+            else:
+                blockLines.append(line)
+
+        for block in blocks:
+            if 'Input status' in block:
+                self._getInputStatus(blocks[block])
+            elif '#Analysis' in block and " Theory_Value(fb) " in block:
+                self._getResultsOutput(blocks[block])
+            elif 'The highest r value' in block:
+                self._getResultSummary(blocks[block])
+            elif 'Combined Analyses' in block:
+                self._getCombinedOutput(blocks[block])
+            elif 'Total cross-section for missing' in block:
+                self._getMissingSummary(blocks[block])
+            elif 'missing topologies with the highest' in block:
+                self._getMissedTopos(blocks[block], attrLabel='missingTopos')
+            elif 'missing topologies with displaced decays' in block:
+                self._getMissedTopos(blocks[block], attrLabel='missingToposDisplaced')
+            elif 'missing topologies with prompt decays' in block:
+                self._getMissedTopos(blocks[block], attrLabel='missingToposPrompt')
+            elif 'topologies outside the grid with the highest' in block:
+                self._getMissedTopos(blocks[block], attrLabel='outsideTopos')
+
+    def _getInputStatus(self, inputLines):
+        """
+        Store input status information
+        """
+
+        for line in inputLines:
+            line = line.replace('\n', '').strip()
+            line = self._stripComments(line)
+            if not line:  # Remove comment and empty lines
+                continue
+            if 'Input status' in line:
+                self.inputStatus = eval(line.split(':')[1])
+            elif 'Decomposition output status' in line:
+                self.decompStatus = eval(line.split(':')[1])
+
+    def _getResultsOutput(self, inputLines):
+        """
+        Store results information
+        """
+
+        results = []
+        resultLines = []
+        for line in inputLines:
+            line = line.replace('\n', '').strip()
+            line = self._stripComments(line)
+            if not line:  # Remove comment and empty lines
+                continue
+            if '----' in line and not line.replace('-', '').strip():
+                results.append(resultLines)
+                resultLines = []
+            else:
+                resultLines.append(line)
+        self.results = [ResultOutput(res, self._allowedDiff) for res in results]
+
+    def _getResultSummary(self, inputLines):
+        """
+        Store results summary information
+        """
+
+        for line in inputLines:
+            line = line.replace('\n', '').strip()
+            line = self._stripComments(line)
+            if not line:  # Remove comment and empty lines
+                continue
+            if 'The highest r value is' in line:
+                rval = eval(line.split('=')[1].split(' from ')[0])
+                anaID = line.split('=')[1].split(' from ')[1].split()[0].strip()
+                self.highestR = rval
+                self.highestAna = anaID
+            elif 'CMS analysis with highest available r_expected' in line:
+                line = line.split(':')[1]
+                try:
+                    anaID, rexp, robs = line.split(',')
+                    rexp = eval(rexp.split('=')[1])
+                    robs = eval(robs.split('=')[1])
+                    self.highestRCMS = robs
+                    self.highestRexpCMS = rexp
+                    self.highestAnaCMS = anaID
+                except (IndexError, NameError, ValueError):
+                    pass
+            elif 'ATLAS analysis with highest available r_expected' in line:
+                line = line.split(':')[1]
+                try:
+                    anaID, rexp, robs = line.split(',')
+                    rexp = eval(rexp.split('=')[1])
+                    robs = eval(robs.split('=')[1])
+                    self.highestRATLAS = robs
+                    self.highestRexpATLAS = rexp
+                    self.highestAnaATLAS = anaID
+                except (IndexError, NameError, ValueError):
+                    pass
+
+    def _getCombinedOutput(self, inputLines):
+        """
+        Store combined analyses information
+        """
+
+        for line in inputLines:
+            line = line.replace('\n', '').strip()
+            line = self._stripComments(line)
+            if not line:  # Remove comment and empty lines
+                continue
+            if 'Combined Analyses' in line:
+                anaList = sorted(line.split(':')[1].split(','))
+                self.combinedIDs = anaList
+            elif 'Likelihoods' in line:
+                lstr = line.split(':')[1].strip()
+                lkeys, lvals = lstr.split('=')
+                lkeys = lkeys.split(',')
+                lvals = [eval(val) for val in lvals.split(',')]
+                for i, label in enumerate(lkeys):
+                    setattr(self, 'comb'+label.strip(), lvals[i])
+            elif 'combined r-value (expected)' in line:
+                rexp = eval(line.split(':')[1])
+                self.rexpComb = rexp
+            elif 'combined r-value' in line:
+                r = eval(line.split(':')[1])
+                self.rComb = r
+
+    def _getMissingSummary(self, inputLines):
+        """
+        Store summary information about missing topologies
+        """
+
+        for line in inputLines:
+            line = line.replace('\n', '').strip()
+            line = self._stripComments(line)
+            if not line:  # Remove comment and empty lines
+                continue
+            if 'Total cross-section for missing topologies with displaced decays' in line:
+                self.missedDisplacedTotal = eval(line.split(':')[1])
+            elif 'Total cross-section for missing topologies with prompt decays' in line:
+                self.missedPromptTotal = eval(line.split(':')[1])
+            elif 'Total cross-section for missing topologies' in line:
+                self.missedTotal = eval(line.split(':')[1])
+            elif 'Total cross-section for topologies outside the grid' in line:
+                self.outsideTotal = eval(line.split(':')[1])
+
+    def _getMissedTopos(self, inputLines, attrLabel):
+        """
+        Store information about missing topologies
+        """
+
+        if len(inputLines) < 3:
+            setattr(self, attrLabel, None)
+            return
+        inputLines = inputLines[2:]
+        setattr(self, attrLabel, [])
+        for line in inputLines:
+            line = line.replace('\n', '').strip()
+            line = self._stripComments(line)
+            if not line:  # Remove comment and empty lines
+                continue
+            getattr(self, attrLabel).append(MissedTopoOutput(line, self._allowedDiff))
+
+
+class ResultOutput(object):
+
+    def __init__(self, resLines, allowedDiff):
+        anaID, sqrts, cond, tpValue, expLimit, r, rExp = resLines[0].split()
+        self.anaID = anaID.strip()
+        self.sqrts = eval(sqrts)
+        self.cond = eval(cond)
+        self.theoryPred = eval(tpValue)
+        self.expLimit = eval(expLimit)
+        self.r = eval(r)
+        self._allowedDiff = allowedDiff
+        try:
+            self.r_expected = eval(rExp)
+        except NameError:
+            self.r_expected = rExp
+        for line in resLines:
+            if 'Signal Region' in line:
+                self.signalRegion = line.split(':')[1].strip()
+            elif 'Txnames' in line:
+                self.txNames = line.split(':')[1].strip()
+            elif 'Likelihoods' in line:
+                lstr = line.split(':')[1].strip()
+                lkeys, lvals = lstr.split('=')
+                lkeys = lkeys.split(',')
+                lvals = [eval(val) for val in lvals.split(',')]
+                for i, label in enumerate(lkeys):
+                    setattr(self, label.strip(), lvals[i])
+
+    def __eq__(self, other):
+        return compareObjs(self, other, self._allowedDiff)
+
+
+class MissedTopoOutput(object):
+
+    def __init__(self, line, allowedDiff):
+        sqrts, weight = line.split()
+        self.sqrts = eval(sqrts)
+        self.weight = eval(weight)
+        self._allowedDiff = allowedDiff
+
+    def __eq__(self, other):
+        return compareObjs(self, other, self._allowedDiff)

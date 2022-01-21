@@ -9,45 +9,47 @@
 
 """
 
-import sys,os
-sys.path.insert(0,"../")
+import sys
+sys.path.insert(0, "../")
+import os
 import unittest
-from unitTestHelpers import compareSummaries, runMain
+from unitTestHelpers import compareScanSummary, runMain
+
 
 class ScanSummaryTest(unittest.TestCase):
 
-    def testPythonSummary( self ):
+    def testPythonSummary(self):
         out = "./unitTestOutput"
         dirname = "./testFiles/slha/"
-        runMain(dirname,inifile = "testParameters.ini")
-        outSummary = os.path.join(out,'summary.txt')
+        runMain(dirname, inifile="testParameters.ini")
+        outSummary = os.path.join(out, 'summary.txt')
         outDefault = 'summary_scan_default.txt'
 
-        self.assertTrue(compareSummaries(outSummary,outDefault,allowedDiff=0.05))
+        self.assertTrue(compareScanSummary(outSummary, outDefault, allowedDiff=0.05))
 
-
-    def testSLHASummary( self ):
+    def testSLHASummary(self):
         out = "./unitTestOutput"
         dirname = "./testFiles/slha/"
-        runMain(dirname,inifile = "slhaOnly.ini",suppressStdout=False,
-                             development=True)
-        outSummary = os.path.join(out,'summary.txt')
+        runMain(dirname, inifile="slhaOnly.ini", suppressStdout=False,
+                development=True)
+        outSummary = os.path.join(out, 'summary.txt')
         outDefault = 'summary_scan_default.txt'
-        self.assertTrue(compareSummaries(outSummary,outDefault,allowedDiff=0.05))
+        self.assertTrue(compareScanSummary(outSummary, outDefault, allowedDiff=0.05))
 
-    def testSummarySummary( self ):
+    def testSummarySummary(self):
         out = "./unitTestOutput"
-        for i in os.listdir( out ):
-            if i[-8:]==".smodels":
+        for i in os.listdir(out):
+            if i[-8:] == ".smodels":
                 os.unlink(os.path.join(out, i))
         dirname = "./testFiles/slha/"
-        runMain(dirname,inifile = "summaryOnly.ini")
-        outSummary = os.path.join(out,'summary.txt')
+        runMain(dirname, inifile="summaryOnly.ini")
+        outSummary = os.path.join(out, 'summary.txt')
         outDefault = 'summary_scan_default.txt'
-        ret = compareSummaries(outSummary,outDefault,allowedDiff=0.05)
+        ret = compareScanSummary(outSummary, outDefault, allowedDiff=0.05)
         if not ret:
-            print ( f"ERROR: files {outSummary} and {outDefault} differ!" )
-        self.assertTrue(ret )
+            print(f"ERROR: files {outSummary} and {outDefault} differ!")
+        self.assertTrue(ret)
+
 
 if __name__ == "__main__":
     unittest.main()

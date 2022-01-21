@@ -55,6 +55,13 @@ ATLAS-CONF-2013-037  8.00E+00    0.0  7.318E-04  4.000E-01  1.830E-03  2.091E-03
 The highest r value is = 0.387595789014 from ATLAS-SUSY-2013-02 (r_expected not available)
 CMS analysis with highest available r_expected: CMS-SUS-13-012, r_expected=0.20467, r_obs=0.12763
 ATLAS analysis with highest available r_expected: ATLAS-CONF-2013-037, r_expected=0.00209, r_obs=0.00183
+================================================================================
+Combined Analyses: ATLAS-CONF-2013-037,CMS-SUS-13-012
+Likelihoods: L, L_max, L_SM =  9.477E-05,  1.330E-04,  6.180E-05
+combined r-value:  1.332E-01
+combined r-value (expected):  1.810E-01
+================================================================================
+
 
 Total cross-section for missing topologies (fb):  3.066E+03
 Total cross-section for missing topologies with displaced decays (fb):  0.000E+00
