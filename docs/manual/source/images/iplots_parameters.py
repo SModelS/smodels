@@ -41,7 +41,7 @@ min_BR = .05
 #
 #SModelS_status -> prints whether the point is excluded or not by SModelS.
 #r_max -> shows the highest r-value for each parameter point.
-#chi2 -> shows the chi^2 value which corresponds to r_max, if available (if not, the output is 'False').
+
 #Tx -> shows the topology/ies which give r_max
 #Analysis -> shows the experimental analysis from which the strongest constraint (r_max) comes from.
 #MT_max -> shows the missing topology with the largest cross section (in SModelS bracket notation).
@@ -52,7 +52,7 @@ min_BR = .05
 #MT_outgrid_xsec -> shows the total missing cross section outside the mass grids of the experimental results.
 #file -> shows the name of the input spectrum file.
 
-SModelS_hover_information = ['SModelS_status', 'r_max', 'Tx', 'Analysis','chi2', 'MT_max','MT_max_xsec', 'MT_total_xsec', 'MT_outgrid_xsec','MT_prompt_xsec','MT_displaced_xsec', 'file']
+SModelS_hover_information = ['SModelS_status', 'r_max', 'Tx', 'Analysis', 'MT_max','MT_max_xsec', 'MT_total_xsec', 'MT_outgrid_xsec','MT_prompt_xsec','MT_displaced_xsec', 'file']
 
 
 
@@ -60,4 +60,4 @@ SModelS_hover_information = ['SModelS_status', 'r_max', 'Tx', 'Analysis','chi2',
 # choice for plot data: all, non-excluded, excluded points.
 plot_data = ['all', 'non-excluded', 'excluded']
 # choice for plot list: same options as for SModels hover information (except 'file').
-plot_list = ['SModelS_status','r_max', 'Tx', 'Analysis','chi2', 'MT_max', 'MT_max_xsec', 'MT_total_xsec','MT_outgrid_xsec','MT_prompt_xsec','MT_displaced_xsec']
+plot_list = ['SModelS_status','r_max', 'Tx', 'Analysis', 'MT_max', 'MT_max_xsec', 'MT_total_xsec','MT_outgrid_xsec','MT_prompt_xsec','MT_displaced_xsec']

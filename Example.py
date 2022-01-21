@@ -18,6 +18,7 @@ from smodels.tools.physicsUnits import fb, GeV, TeV
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
+from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.tools.smodelsLogging import setLogLevel
 from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
@@ -51,12 +52,12 @@ def main():
     print("\t  Total number of topologies: %i " % len(toplist))
     nel = sum([len(top.elementList) for top in toplist])
     print("\t  Total number of elements = %i " % nel)
-    #Print information about the m-th topology:
+    # Print information about the m-th topology:
     m = 2
     if len(toplist) > m:
         top = toplist[m]
         print("\t\t %i-th topology  = " % m, top, "with total cross section =", top.getTotalWeight())
-        #Print information about the n-th element in the m-th topology:
+        # Print information about the n-th element in the m-th topology:
         n = 0
         el = top.elementList[n]
         print("\t\t %i-th element from %i-th topology  = " % (n, m), el, end="")
@@ -81,6 +82,7 @@ def main():
     print("\n Theory Predictions and Constraints:")
     rmax = 0.
     bestResult = None
+    allPredictions = []
     for expResult in listOfExpRes:
         predictions = theoryPredictionsFor(expResult, toplist, combinedResults=False, marginalize=False)
         if not predictions:
@@ -105,21 +107,49 @@ def main():
 
             # Compute the r-value
             r = theoryPrediction.getRValue()
-            print("r = ", r)
+            print("r = %1.3E" % r)
             # Compute likelihoods for EM-type results:
             if dataset.getType() == 'efficiencyMap':
                 theoryPrediction.computeStatistics()
-                print('L_BSM, L_SM, L_max =', theoryPrediction.likelihood, theoryPrediction.lsm, theoryPrediction.lmax)
+                print('L_BSM, L_SM, L_max = %1.3E, %1.3E, %1.3E' % (theoryPrediction.likelihood(),
+                      theoryPrediction.lsm(), theoryPrediction.lmax()))
             if r > rmax:
                 rmax = r
                 bestResult = expResult.globalInfo.id
+            allPredictions.append(theoryPrediction)
 
     # Print the most constraining experimental result
-    print("\nThe largest r-value (theory/upper limit ratio) is ", rmax)
+    print("\nThe largest r-value (theory/upper limit ratio) is %1.3E" % rmax)
     if rmax > 1.:
         print("(The input model is likely excluded by %s)" % bestResult)
     else:
         print("(The input model is not excluded by the simplified model results)")
+
+    # Select a few results results for combination:
+    combineAnas = ['ATLAS-SUSY-2013-11', 'CMS-SUS-13-013']
+    selectedTheoryPreds = []
+    for tp in allPredictions:
+        expID = tp.analysisId()
+        if expID not in combineAnas:
+            continue
+        if tp.likelihood() is None:
+            continue
+        selectedTheoryPreds.append(tp)
+    # Make sure each analysis appears only once:
+    expIDs = [tp.analysisId() for tp in selectedTheoryPreds]
+    if len(expIDs) != len(set(expIDs)):
+        print("\nDuplicated results when trying to combine analyses. Combination will be skipped.")
+    # Only compute combination if at least two results were selected
+    elif len(selectedTheoryPreds) > 1:
+        combiner = TheoryPredictionsCombiner(selectedTheoryPreds)
+        combiner.computeStatistics()
+        llhd = combiner.likelihood()
+        lmax = combiner.lmax()
+        lsm = combiner.lsm()
+        print("\n\nCombined analyses:", combiner.analysisId())
+        print("Combined r value: %1.3E" % combiner.getRValue())
+        print("Combined r value (expected): %1.3E" % combiner.getRValue(expected=True))
+        print("Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (llhd, lmax, lsm))
 
     # Find out missing topologies for sqrts=13*TeV:
     uncovered = coverage.Uncovered(toplist, sqrts=13.*TeV)

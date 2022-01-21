@@ -40,12 +40,12 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 2.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * likelihood combiner introduced
+  * introduction of (uncorrelated) :ref:`analyses combination <parameterFileCombineAnas>`
   * posteriori expected limits introduced
   * a few smaller changes around expected likelihoods and limits
-  * allow :ref:`ncpus <parameterFileNcpus>` to take on zero and negative values in 
+  * allow :ref:`ncpus <parameterFileNcpus>` to take on zero and negative values in
     ini file [meaning use all but this (absolute) number of CPU cores]
-  * small fixes in the :ref:`Howto's <Examples>` 
+  * small fixes in the :ref:`Howto's <Examples>`
   * updates in references.bib, installation notes
   * more small fixes in unit tests
 
@@ -68,18 +68,18 @@ New in Version 2.1.0:
   * |Datasets| now have an `.isCombinableWith <experiment.html#experiment.datasetObj.DataSet.isCombinableWith>`_ function
   * Slightly extended output of :ref:`summary printer <parameterFileSummaryprinter>`
   * Added scan summary (:ref:`summary.txt <scanSummary>`) when running over multiple files
-  * Added :ref:`expandedOutput <parameterFileSLHAprinter>` option to slha-printer 
-  * :ref:`Output <outputDescription>` for efficiency-map results now reports :ref:`L, L_max and L_SM <likelihoodCalc>` 
+  * Added :ref:`expandedOutput <parameterFileSLHAprinter>` option to slha-printer
+  * :ref:`Output <outputDescription>` for efficiency-map results now reports :ref:`L, L_max and L_SM <likelihoodCalc>`
   * The :ref:`likelihood <likelihoodCalc>` is now maximized only for positive values of the signal strength
     in the computation of L_max
   * Pythia8 version in :ref:`xsecComputer <xsecCalc>` updated from 8226 to 8306
-  * Improved :ref:`interactive plots <interactivePlots>` 
-  * |database| updated with results from 5 new ATLAS and 1 new CMS analyses: 
+  * Improved :ref:`interactive plots <interactivePlots>`
+  * |database| updated with results from 5 new ATLAS and 1 new CMS analyses:
       CMS-EXO-19-010 (disappearing tracks) UL,
-      ATLAS-SUSY-2016-08 (displaced leptons) EM, 
-      ATLAS-SUSY-2018-10 (1l+jets) UL+EM, 
-      ATLAS-SUSY-2018-12 (0l+jets) UL+EM, 
-      ATLAS-SUSY-2018-22 (0l+jets) UL+EM,  
+      ATLAS-SUSY-2016-08 (displaced leptons) EM,
+      ATLAS-SUSY-2018-10 (1l+jets) UL+EM,
+      ATLAS-SUSY-2018-12 (0l+jets) UL+EM,
+      ATLAS-SUSY-2018-22 (0l+jets) UL+EM,
       ATLAS-SUSY-2018-23 (EWino, WH) UL
   * added EM results for
       ATLAS-SUSY-2017-03 (EWino, WZ),
@@ -92,7 +92,7 @@ New in Version 2.1.0:
       ATLAS-SUSY-2013-18, ATLAS-CONF-2013-089  -> ATLAS-SUSY-2013-20)
   * corrected off-shell regions of some existing |EMrs| (in three 13 TeV and eigth 8 TeV analyses).
 
- 
+
 New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
 

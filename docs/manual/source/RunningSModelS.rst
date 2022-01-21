@@ -145,7 +145,11 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileReportAllSRs:
 
-  * **reportAllSRs** (True/False): set to True to report all signal regions, instead of best signal region only. Available from v2.1.1 onwards.
+  * **reportAllSRs** (True/False): set to True to report all signal regions, instead of best signal region only. If True no signal region combination is performed. Available from v2.1.1 onwards.
+
+.. _parameterFileCombineAnas:
+
+    * **combineAnas** (list of results): list of analysis IDs to be combined. *All the analyses are assumed to be fully uncorrelated!* (use with caution).  Available from v2.2.0 onwards.
 
 .. _parameterExperimentalFeatures:
 
@@ -376,27 +380,27 @@ Below we go step-by-step through this example code:
    :lines: 11-14
 
 * *Import the SModelS modules and methods*. If the example code file is not located in
-  the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. Set SModelS verbosity level. 
+  the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. Set SModelS verbosity level.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 16-24
+   :lines: 16-25
 
 * *Set the path to the database URL*. Specify which :ref:`database <databaseStruct>` to use. It can be the path
   to the smodels-database folder, the path to a :ref:`pickle file <databasePickle>` or (starting with v1.1.3) a URL path.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 27-28
+   :lines: 28-29
 
 * *Load the model and set the path to the input file*. Load BSM and SM particle content; specify the location of the input file (must be an SLHA or LHE file, see :ref:`Basic Input <BasicInput>`) and update particles in the model.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 34-39
+   :lines: 35-40
 
 * *Set main options for* |decomposition|.
   Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 43-44
+   :lines: 44-45
 
 * |Decompose| *model*. Depending on the type
   of input format, choose either
@@ -404,14 +408,14 @@ Below we go step-by-step through this example code:
   `lheDecomposer.decompose <theory.html#theory.slhaDecomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 46-47
+   :lines: 47-48
 
 * *Access basic information* from decomposition, using the
   `topology list <theory.html#theory.topology.TopologyList>`_
   and `topology  <theory.html#theory.topology.Topology>`_ objects:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 49-63
+   :lines: 50-64
 
 *output:*
 
@@ -423,7 +427,7 @@ Below we go step-by-step through this example code:
   Here, all results are used:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 67
+   :lines: 68
 
 Alternatively, the `getExpResults  <experiment.html#experiment.databaseObj.Database.getExpResults>`_ method
 can take as arguments specific results to be loaded.
@@ -432,7 +436,7 @@ can take as arguments specific results to be loaded.
   Below we show how to count the number of |ULrs| and |EMrs| loaded:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 70-78
+   :lines: 71-79
 
 *output:*
 
@@ -446,13 +450,13 @@ can take as arguments specific results to be loaded.
   (for each |expres|):
 
 .. literalinclude:: /examples/Example.py
-   :lines: 85-86
+   :lines: 86-87
 
 * *Print the results*. For each |expres|, loop over the corresponding |theory predictions|
   and print the relevant information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 88-101
+   :lines: 90-103
 
 *output:*
 
@@ -463,7 +467,7 @@ can take as arguments specific results to be loaded.
   be compared to the |theory prediction| to decide whether a model is excluded or not:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 104
+   :lines: 106
 
 *output:*
 
@@ -476,7 +480,7 @@ can take as arguments specific results to be loaded.
   Determine the most constraining result:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 107-115
+   :lines: 109-118
 
 *output:*
 
@@ -487,26 +491,45 @@ can take as arguments specific results to be loaded.
   determine if the model has been excluded or not by the selected |express|:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 118-122
+   :lines: 122-126
 
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 819-820
+   :lines: 831-832
 
+* *Select analyses*. Using the theory predictions, select a (user-defined) subset of analyses to be combined:
+
+.. literalinclude:: /examples/Example.py
+   :lines: 129-137
+
+* *Combine analyses*. Using the selected analyses, combine them under the assumption they are fully uncorrelated:
+
+.. literalinclude:: /examples/Example.py
+   :lines: 144-148
+
+* *Print the combination*. Print the *r*-values and likelihood for the combination:
+
+.. literalinclude:: /examples/Example.py
+   :lines: 149-152
+
+*output:*
+
+.. literalinclude:: /images/ExampleOutput.txt
+   :lines: 835-838
 
 * *Identify missing topologies*. Using the output from decomposition, identify
   the :ref:`missing topologies <topCoverage>` and print some basic information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 124-150
+   :lines: 154-180
 
 
 *output:*
 
 .. literalinclude:: /images/ExampleOutput.txt
-   :lines: 823-839
+   :lines: 841-860
 
 
 It is worth noting that SModelS does not include any statistical treatment for

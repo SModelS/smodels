@@ -274,7 +274,8 @@ class TxTPrinter(BasicPrinter):
         self.name = "log"
         self.printtimespent = False
         self.printingOrder = [OutputStatus, ExpResultList, TopologyList,
-                              TheoryPredictionList, Uncovered]
+                              TheoryPredictionList, TheoryPredictionsCombiner,
+                              Uncovered]
         self.toPrint = [None] * len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -506,33 +507,32 @@ class TxTPrinter(BasicPrinter):
                     condlist.append(theoryPrediction.conditions[cond])
                 output += str(condlist) + "\n"
 
-            #Get upper limit for the respective prediction:
+            # Get upper limit for the respective prediction:
             upperLimit = theoryPrediction.getUpperLimit(expected=False)
             upperLimitExp = theoryPrediction.getUpperLimit(
                 expected=self.getTypeOfExpected())
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
-            if not upperLimitExp is None:
+            if upperLimitExp is not None:
                 output += "Expected experimental limit: " + \
                     str(upperLimitExp) + "\n"
             srv = self._formatNumber(
                 theoryPrediction.getRValue(expected=False), 4)
             output += "Observed r-value: %s\n" % srv
-            if not upperLimitExp is None:
+            if upperLimitExp is not None:
                 serv = self._formatNumber(theoryPrediction.getRValue(
                     expected=self.getTypeOfExpected()), 4)
                 output += "Expected r-value: %s\n" % serv
             llhd = theoryPrediction.likelihood()
-            if not llhd is None:
-                #output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
+            if llhd is not None:
                 chi2, chi2sm = None, None
                 try:
                     chi2sm = -2*np.log(llhd/theoryPrediction.lsm())
-                except TypeError as e:
+                except TypeError:
                     pass
                 try:
                     chi2 = -2*np.log(llhd/theoryPrediction.lmax())
-                except TypeError as e:
+                except TypeError:
                     pass
                 output += "Likelihood: " + self._formatNumber(llhd, 4) + "\n"
                 output += "L_max: " + self._formatNumber(theoryPrediction.lmax(
@@ -596,6 +596,34 @@ class TxTPrinter(BasicPrinter):
                         contributing.append(el.elID)
                     output += "Contributing elements %s\n" % str(contributing)
             output += "================================================================================\n"
+        return output
+
+    def _formatTheoryPredictionsCombiner(self, obj):
+        """
+        Format data of the TheoryPredictionsCombiner object.
+
+        :param obj: A TheoryPredictionsCombiner object to be printed.
+        """
+
+        output = "===================================================== \n"
+
+        # Get list of analyses used in combination:
+        expIDs = obj.analysisId()
+        # Get r-value:
+        r = obj.getRValue()
+        r_expected = obj.getRValue(expected=True)
+        # Get likelihoods:
+        lsm = obj.lsm()
+        llhd = obj.likelihood()
+        lmax = obj.lmax()
+        output += "Combined Analyses: %s\n" % (expIDs)
+        output += "Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (
+            llhd, lmax, lsm)
+        output += "combined r-value: %10.3E\n" % r
+        output += "combined r-value (expected): %10.3E" % r_expected
+        output += "\n===================================================== \n"
+        output += "\n"
+
         return output
 
 
