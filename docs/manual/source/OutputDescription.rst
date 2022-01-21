@@ -77,7 +77,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   weight, the PIDs of the BSM |particles| contributing to the |element| and the element ID:
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 512-580
+   :lines: 520-582
 
 
 * a list of all the |theory predictions| obtained and the corresponding |expres| upper limit.
@@ -86,14 +86,20 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   After this basic information, the signal cross section (|theory prediction|),
   the list of :ref:`condition values <ULconditions>`  (if applicable) and the corresponding observed
   upper limit are shown. Also, if available, the expected upper limit is included.
-  If  **computeStatistics** = True, the likelihood for the BSM signal, that for the SM hypothesis, 
+  If  **computeStatistics** = True, the likelihood for the BSM signal, that for the SM hypothesis,
   and the maximum likelihood are printed
   (see :ref:`likelihood calculation <likelihoodCalc>`).
   Finally, if **printExtendedResults** = True, basic information about the |elements|
   being constrained, such as their masses\ [#f2]_, IDs and PIDs, is also shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 107624-107745
+   :lines: 107632-107753
+
+* information about the combination of results, if **combineAnas** is defined (available from v2.2 onward):
+
+.. literalinclude:: /images/gluino_squarks.slha.log
+  :lines: 109762-109765
+
 
 * summary information about the :ref:`missing topologies <topCoverage>`, if **testCoverage** = True.
   The total missing topology cross section
@@ -106,7 +112,7 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   total cross section outside the grid.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 109735-109738
+   :lines: 109769-109772
 
 
 * detailed information about the missing topologies with highest cross sections.
@@ -117,25 +123,25 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   obtained with **printDecomp** = True and **addElementInfo** = True.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 109740-109753
+   :lines: 109774-109782
 
 * information about the missing topologies with displaced decays.
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 109754-109755
+   :lines: 109788-109789
 
 * information about the missing topologies with prompt decays.
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 109756-109768
+   :lines: 109790-109802
 
 * detailed information about the topologies which are outside the  |express| grid.
   If **addCoverageID** = True, all the |elements| IDs contributing to the missing topology are shown.
 
 .. literalinclude:: /images/gluino_squarks.slha.log
-   :lines: 109769-109781
+   :lines: 109803-109815
 
 
 .. _logOut:
@@ -183,7 +189,12 @@ Below we describe in detail the blocks contained in the summary output:
   greater or equal 1, the input model is likely excluded by one of the |express| (see :ref:`confronting predictions <confrontPredictions>`).  For a more informed statistical interpretation, from v2.1 onward the ATLAS and CMS analyses with highest available *expected* r values are reported in addition.
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 496-498
+   :lines: 501-503
+
+* information about the combination of results, if **combineAnas** is defined (available from v2.2 onward):
+
+.. literalinclude:: /images/gluino_squarks.slha.smodels
+ :lines: 505-508
 
 * summary information about the :ref:`missing topologies <topCoverage>`, if **testCoverage** = True.
   The total missing topology cross section
@@ -196,7 +207,7 @@ Below we describe in detail the blocks contained in the summary output:
   total cross section outside the grid.
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 500-503
+   :lines: 512-515
 
 
 * detailed information about the missing topologies with highest cross sections.
@@ -204,22 +215,22 @@ Below we describe in detail the blocks contained in the summary output:
   (in :ref:`bracket notation <bracketNotation>`) is included for each distinct :ref:`coverage group <coverageGroups>`.
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 505-517
+   :lines: 517-529
 
 * information about the missing topologies with displaced decays.
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 519-520
+   :lines: 531-532
 
 * information about the missing topologies with prompt decays.
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 521-533
+   :lines: 533-545
 
 * information about the topologies which are outside the  |express| grid
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
-   :lines: 534-546
+   :lines: 546-558
 
 .. _pyOut:
 
@@ -255,11 +266,16 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   the signal cross section (theory prediction), the corresponding observed
   upper limit and the maximum condition violation (see :ref:`upper limit conditions <ULconditions>`) are shown.
   Furthermore, the masses and widths\ [#f3]_ of the |elements| contributing to the signal cross section, the
-  individual contribution of each |txname| (if **addTxWeights** = True) and the likelihood values 
+  individual contribution of each |txname| (if **addTxWeights** = True) and the likelihood values
   (if **computeStatistics** = True) are also included.
 
 .. literalinclude:: /images/gluino_squarks.slha.py
    :lines: 55-55
+
+* information about the combination of results, if **combineAnas** is defined (available from v2.2 onward):
+
+.. literalinclude:: /images/gluino_squarks.slha.py
+   :lines: 60-60
 
 * the total cross section in each :ref:`missing topology group <coverageGroups>`  (if **testCoverage** = True) followed by a list
   of |elements| contributing to the group.
@@ -319,10 +335,16 @@ Below we give a description of each block together with a sample output.
 .. literalinclude:: /images/gluino_squarks.slha.smodelsslha
    :lines: 12-20
 
+* information about the combination of results, if **combineAnas** is defined (available from v2.2 onward):
+
+.. literalinclude:: /images/gluino_squarks.slha.smodelsslha
+ :lines: 1172-1178
+
+
 * the label of each :ref:`coverage group <coverageGroups>` (first entry) and the total cross section in each group (second entry) (if **testCoverage** = True):
 
 .. literalinclude:: /images/gluino_squarks.slha.smodelsslha
-   :lines: 1163-1171
+   :lines: 1181-1189
 
 
 .. _scanSummary:

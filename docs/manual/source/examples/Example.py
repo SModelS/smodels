@@ -119,7 +119,7 @@ def main():
             allPredictions.append(theoryPrediction)
 
     # Print the most constraining experimental result
-    print("\nThe largest r-value (theory/upper limit ratio) is %1.3E" %rmax)
+    print("\nThe largest r-value (theory/upper limit ratio) is %1.3E" % rmax)
     if rmax > 1.:
         print("(The input model is likely excluded by %s)" % bestResult)
     else:
