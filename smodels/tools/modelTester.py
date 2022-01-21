@@ -143,8 +143,9 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         pass
     try:
         allSRs = parser.getboolean("options", "reportAllSRs")
-        if allSRs:
+        if allSRs:  # If set print out all SRs and skip combination
             useBest = False
+            combineResults = False
     except (NoSectionError, NoOptionError):
         pass
     try:
@@ -206,7 +207,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         # Make sure each analysis appears only once:
         expIDs = [tp.analysisId() for tp in selectedTheoryPreds]
         if len(expIDs) != len(set(expIDs)):
-            logger.warning("Duplicated results when trying to combine analyses.")
+            logger.warning("Duplicated results when trying to combine analyses. Combination will be skipped.")
         # Only compute combination if at least two results were selected
         elif len(selectedTheoryPreds) > 1:
             combiner = TheoryPredictionsCombiner(selectedTheoryPreds)
