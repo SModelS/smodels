@@ -185,9 +185,9 @@ class TheoryPredictionsCombiner(object):
         for tp in self.theoryPredictions:
             lumi = tp.dataset.getLumi()
             nsig = (tp.xsection.value*lumi).asNumber()
-            llhd = llhd * tp.dataset.likelihood(nsig, marginalize=self.marginalize,
+            llhd = llhd * tp.likelihood(nsig, marginalize=self.marginalize,
                                                 deltas_rel=self.deltas_rel, expected=expected)
-            lsm = lsm * tp.dataset.likelihood(0., marginalize=self.marginalize,
+            lsm = lsm * tp.likelihood(0., marginalize=self.marginalize,
                                               deltas_rel=self.deltas_rel, expected=expected)
         self.cachedObjs[expected]["llhd"] = llhd
         self.cachedObjs[expected]["lsm"] = lsm
