@@ -4,7 +4,7 @@ convert:
 	./convert.py
 
 clean:
-	rm -f all_data_frame.txt lheLLPExample.py
+	rm -f all_data_frame.txt # lheLLPExample.py
 
 run:
 	jupyter notebook

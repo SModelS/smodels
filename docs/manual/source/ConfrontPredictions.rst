@@ -204,5 +204,20 @@ using the best signal region (left) to using the full likelihood (right).
 
 Figure: Comparison of exclusion curves for `ATLAS-SUSY-2019-08 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2019-08/>`_ using only the best signal region (left), and the combination of all 9 signal regions with pyhf (right).
 
+Combination of Signal Regions of different Analyses
+---------------------------------------------------
+
+Starting with SModelS v2.2, it is possible to combine signal regions from 
+different analyses, assuming that the signal regions are approximately 
+uncorrelated. As of now, the information of which pairs of signal regions meet
+this criterion is not given by SModelS itself, and has to be provided by the user.
+First systematic studies of correlations between various CMS and ATLAS are
+however underway, see for example contribution 16 of the `Les Houches Working
+Group report <https://arxiv.org/abs/2002.12220>`_.
+For these combinations, the joint likelihoods are simply the products of the individual signal-region specific likelihoods.
+For the determination of the maximum likelihood, `scipy.optimize.minimize <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html>`_ is used
+with default arguments, effectively resulting in the usage of the `BFGS
+<https://docs.scipy.org/doc/scipy/reference/optimize.minimize-bfgs.html#optimize-minimize-bfgs>`_ algorithm.
+
 
 .. [1] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model is being tested by a large number of results simultaneously.
