@@ -193,6 +193,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         """ Combine analyses """
 
         selectedTheoryPreds = []
+        selectedResults = []
         combineAnas = parser.get("options", "combineAnas").split(",")
         if combineAnas:
             # Selected the theory predictions which correspond to the analyses to be combined
@@ -201,11 +202,17 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
                 expID = tp.analysisId()
                 if expID not in combineAnas:
                     continue
+                selectedResults.append(expID)
                 if tp.likelihood() is None:
                     continue
                 selectedTheoryPreds.append(tp)
         # Make sure each analysis appears only once:
         expIDs = [tp.analysisId() for tp in selectedTheoryPreds]
+        # Print a warning if no likelihood was found for the analysis
+        for eID in selectedResults:
+            if not eID in expIDs:
+                logger.info("No likelihood available for %s. This analysis will not be used in analysis combination." %eID)
+
         if len(expIDs) != len(set(expIDs)):
             logger.warning("Duplicated results when trying to combine analyses. Combination will be skipped.")
         # Only compute combination if at least two results were selected
