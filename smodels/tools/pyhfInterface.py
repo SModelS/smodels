@@ -168,6 +168,7 @@ class PyhfUpperLimitComputer:
         :ivar nWS: number of workspaces = number of json files
         :ivar patches: list of patches to be applied to the inputJsons as python dictionary instances
         :ivar workspaces: list of workspaces resulting from the patched inputJsons
+        ;ivar workspaces_expected: list of patched workspaces with observation yields replaced by the expected ones
         :ivar cl: created from :param cl:
         :ivar scale: scale that is applied to the signal predictions, dynamically changes throughout the upper limit calculation
         :ivar alreadyBeenThere: boolean flag that identifies when the :ivar nsignals: accidentally passes twice at two identical values
@@ -182,6 +183,7 @@ class PyhfUpperLimitComputer:
         self.includeCRs = includeCRs
         self.patches = self.patchMaker()
         self.workspaces = self.wsMaker()
+        self.workspaces_expected = self.wsMaker(apriori = True)
         self.cl = cl
         self.scale = 1.
         self.alreadyBeenThere = False # boolean to detect wether self.signals has returned to an older value
@@ -204,7 +206,7 @@ class PyhfUpperLimitComputer:
         """
         Rescales the signal predictions (self.nsignals) and processes again the patches and workspaces
 
-        :return: updated list of patches and workspaces (self.patches and self.workspaces)
+        :return: updated list of patches and workspaces (self.patches, self.workspaces and self.workspaces_expected)
         """
         self.nsignals = [[sig*factor for sig in ws] for ws in self.nsignals]
         try:
@@ -215,6 +217,7 @@ class PyhfUpperLimitComputer:
         logger.debug('new signal scale : {}'.format(self.scale))
         self.patches = self.patchMaker()
         self.workspaces = self.wsMaker()
+        self.workspaces_expected = self.wsMaker(apriori = True)
         try:
             self.nsignals_2 = self.nsignals_1.copy() # nsignals at previous-to-previous loop
         except AttributeError:
@@ -257,9 +260,11 @@ class PyhfUpperLimitComputer:
             patches.append(patch)
         return patches
 
-    def wsMaker(self):
+    def wsMaker(self, apriori = False):
         """
         Apply each region patch (self.patches) to his associated json (self.inputJsons) to obtain the complete workspaces
+        :param apriori: - If set to `True`: Replace the observation data entries of each workspace by the corresponding sum of the expected yields
+                        - Else: The observed yields put in the workspace are the ones written in the corresponfing json dictionary
 
         :returns: the list of patched workspaces
         """
@@ -267,7 +272,22 @@ class PyhfUpperLimitComputer:
             return None
         if self.nWS == 1:
             try:
-                return [pyhf.Workspace(jsonpatch.apply_patch(self.inputJsons[0], self.patches[0]))]
+                wsDict = jsonpatch.apply_patch(self.inputJsons[0], self.patches[0])
+                if apriori == True:
+                    # Replace the observation data entries by the corresponding sum of the expected yields
+                    for obs in wsDict['observations']:
+                        for ch in wsDict['channels']:
+                            # Finding matching observation and bkg channel
+                            if obs['name'] == ch['name']:
+                                bkg = [0.]*len(obs['data'])
+                                for sp in ch['samples']:
+                                    if sp['name'] == 'bsm': continue
+                                    for iSR in range(len(obs['data'])):
+                                        # Summing over all bkg samples for each bin/SR
+                                        bkg[iSR] += sp['data'][iSR]
+                                # logger.debug('bkgs for channel {} :\n{}'.format(obs['name'], bkg))
+                                obs['data'] = bkg
+                return [pyhf.Workspace(wsDict)]
             except (pyhf.exceptions.InvalidSpecification, KeyError) as e:
                 logger.error("The json file is corrupted:\n{}".format(e))
                 return None
@@ -275,6 +295,20 @@ class PyhfUpperLimitComputer:
             workspaces = []
             for js, patch in zip(self.inputJsons, self.patches):
                 wsDict = jsonpatch.apply_patch(js, patch)
+                if apriori == True:
+                    # Replace the observation data entries by the corresponding sum of the expected yields
+                    for obs in wsDict['observations']:
+                        for ch in wsDict['channels']:
+                            # Finding matching observation and bkg channel
+                            if obs['name'] == ch['name']:
+                                bkg = [0.]*len(obs['data'])
+                                for sp in ch['samples']:
+                                    if sp['name'] == 'bsm': continue
+                                    for iSR in range(len(obs['data'])):
+                                        # Summing over all bkg samples for each bin/SR
+                                        bkg[iSR] += sp['data'][iSR]
+                                # logger.debug('bkgs for channel {} :\n{}'.format(obs['name'], bkg))
+                                obs['data'] = bkg
                 try:
                     ws = pyhf.Workspace(wsDict)
                 except (pyhf.exceptions.InvalidSpecification, KeyError) as e:
@@ -351,7 +385,6 @@ class PyhfUpperLimitComputer:
             return np.exp(-twice_nll/2.)
         return twice_nll / 2.
 
-
     def lmax(self, workspace_index=None, nll=False ):
         """
         Returns the negative log max likelihood
@@ -427,28 +460,32 @@ class PyhfUpperLimitComputer:
                 if self.zeroSignalsFlag[workspace_index] == True:
                     logger.debug("Workspace number %d has zero signals" % workspace_index)
                     return None
-            def updateWorkspace():
+            def updateWorkspace(apriori = False):
                 if self.nWS == 1:
-                    return self.workspaces[0]
+                    if apriori == True:
+                        return self.workspaces_expected[0]
+                    else:
+                        return self.workspaces[0]
                 else:
-                    return self.workspaces[workspace_index]
-            workspace = updateWorkspace()
+                    if apriori == True:
+                        return self.workspaces_expected[workspace_index]
+                    else:
+                        return self.workspaces[workspace_index]
             def root_func(mu):
-                # If expected, set observations = sum(bkg)
-                if expected == True:
-                    logger.debug('computing a-priori expected limit')
-                    for obs in workspace['observations']:
-                        for ch in workspace['channels']:
-                            # Finding matching observation and bkg channel
-                            if obs['name'] == ch['name']:
-                                bkg = [0.]*len(obs['data'])
-                                for sp in ch['samples']:
-                                    if sp['name'] == 'bsm': continue
-                                    for iSR in range(len(obs['data'])):
-                                        # Summing over all bkg samples for each bin/SR
-                                        bkg[iSR] += sp['data'][iSR]
-                                # logger.debug('bkgs for channel {} :\n{}'.format(obs['name'], bkg))
-                                obs['data'] = bkg
+                Expected = expected
+                # Allows to modify the value of expected,
+                # otherwise expected is understood as a local
+                # variable and would be referenced before assignment
+                use_posteriori = False
+                # use_posteriori is a conveninant switch one has to set to True
+                # in order to compute expected aposteriori fit.
+                # An equally viable possibility is to change BasicPrinter.typeofexpectedvalues
+                # for "posteriori" (in printer.py)
+                if Expected == True and use_posteriori == True:
+                    # Allows to compute obs and exp posteriori limits within the same run,
+                    # with two switches: here and in BasicPrinter.typeofexpectedvalues (in printer.py)
+                    Expected = "posteriori"
+                workspace = updateWorkspace(Expected) # If expected == True, observations = sum(bkg)
                 # Same modifiers_settings as those use when running the 'pyhf cls' command line
                 msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
                 model = workspace.model(modifier_settings=msettings)
@@ -457,7 +494,7 @@ class PyhfUpperLimitComputer:
                 start = time.time()
                 stat = "qtilde" # by default
                 args = {}
-                args["return_expected"] = ( expected == "posteriori" )
+                args["return_expected"] = ( Expected == "posteriori" )
                 args["par_bounds"] = bounds
                 pver = float ( pyhf.__version__[:3] )
                 if pver < 0.6:
@@ -467,10 +504,11 @@ class PyhfUpperLimitComputer:
                 with np.testing.suppress_warnings() as sup:
                     if pyhfinfo["backend"] == "numpy":
                         sup.filter ( RuntimeWarning, r'invalid value encountered in log')
+                    # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
                     result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
                 end = time.time()
                 logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
-                if expected == "posteriori":
+                if Expected == "posteriori":
                     logger.debug('computing a-posteriori expected limit')
                     logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                     try:
@@ -514,28 +552,28 @@ class PyhfUpperLimitComputer:
                     if rt5 < 0. and rt10 > 0.:
                         lo_mu = med_mu
                         med_mu = np.sqrt (lo_mu * hi_mu)
-                        workspace= updateWorkspace()
+                        # workspace= updateWorkspace()
                         continue
                     if rt10 < 0.: ## also try to increase hi_mu
                         hi_mu = hi_mu + ( 10. - hi_mu ) * .5
                         med_mu = np.sqrt (lo_mu * hi_mu)
                     nNan += 1
                     self.rescale(factor)
-                    workspace = updateWorkspace()
+                    # workspace = updateWorkspace()
                     continue
                 if np.isnan(rt10):
                     rt5 = root_func ( med_mu )
                     if rt5 > 0. and rt1 < 0.:
                         hi_mu = med_mu
                         med_mu = np.sqrt (lo_mu * hi_mu)
-                        workspace= updateWorkspace()
+                        # workspace= updateWorkspace()
                         continue
                     if rt1 > 0.: ## also try to decrease lo_mu
                         lo_mu = lo_mu * .5
                         med_mu = np.sqrt (lo_mu * hi_mu)
                     nNan += 1
                     self.rescale(1/factor)
-                    workspace = updateWorkspace()
+                    # workspace = updateWorkspace()
                     continue
                 # Analyzing previous values of wereBoth***
                 if rt10 < 0 and rt1 < 0 and wereBothLarge:
@@ -550,11 +588,11 @@ class PyhfUpperLimitComputer:
                 # Main rescaling code
                 if rt10 < 0.:
                     self.rescale(factor)
-                    workspace = updateWorkspace()
+                    # workspace = updateWorkspace()
                     continue
                 if rt1 > 0.:
                     self.rescale(1/factor)
-                    workspace = updateWorkspace()
+                    # workspace = updateWorkspace()
                     continue
             # Finding the root (Brent bracketing part)
             logger.debug("Final scale : %f" % self.scale)
