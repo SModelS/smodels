@@ -19,6 +19,15 @@ from os.path import join, basename
 from smodels.installation import installDirectory as iDir
 from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
 
+def sortExptRes ( exptRes ):
+    """ the experimental results may be in different orders. 
+        sort by AnalysisId+datasetid+TxNames """
+    exptRes.sort ( key = lambda x: x["AnalysisID"]+str(x["DataSetID"])+str(x["TxNames"] ) )
+    return exptRes
+
+def sortSModelSOutput ( smodelsOutput ):
+    smodelsOutput["ExptRes"] = sortExptRes ( smodelsOutput["ExptRes"] )
+    return smodelsOutput
 
 def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
               fname2=None, checkBothOrders=True):

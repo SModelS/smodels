@@ -11,7 +11,7 @@ import sys
 sys.path.append('../')
 import os
 import unittest
-from unitTestHelpers import equalObjs, runMain, importModule
+from unitTestHelpers import equalObjs, runMain, importModule, sortSModelSOutput
 
 
 class RunSModelSTest(unittest.TestCase):
@@ -32,7 +32,9 @@ class RunSModelSTest(unittest.TestCase):
         from default_reportAll import smodelsOutputDefault
         ignoreFields = ['input file', 'smodels version', 'ncpus',
                         'database version']
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.02,
+        smodelsOutput = sortSModelSOutput ( smodelsOutput )
+        smodelsOutputDefault = sortSModelSOutput ( smodelsOutputDefault )
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.03,
                            ignore=ignoreFields, fname=outputfile,
                            fname2="default_reportAll.py")
         self.assertTrue(equals)
