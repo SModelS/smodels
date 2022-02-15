@@ -12,7 +12,10 @@
 import jsonpatch
 import warnings
 import jsonschema
-if jsonschema.__version__[0] == "2":
+import importlib.metadata
+
+if importlib.metadata.version("jsonschema")[0] == "2":
+#if jsonschema.__version__[0] == "2": ## deprecated
     print ( "[SModelS:pyhfInterface] jsonschema is version %s, we need > 3.x.x" % \
             ( jsonschema.__version__ ) )
     sys.exit()
