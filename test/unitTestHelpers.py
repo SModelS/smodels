@@ -42,7 +42,7 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
         obj1, obj2 = float(obj1), float(obj2)
 
     if type(obj1) != type(obj2):
-        logger.warning("Data types differ: (%s,%s) <-> (%s,%s) in %s:%s" % (obj1, type(obj1), obj2, type(obj2), where, fname))
+        logger.warning("Data types differ: (%s,%s) <-> (%s,%s) in ''%s'':%s" % (obj1, type(obj1), obj2, type(obj2), where, fname ))
         return False
 
     if isinstance(obj1, unum.Unum):
@@ -55,7 +55,7 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
             return True
         diff = 2.*abs(obj1-obj2)/abs(obj1+obj2)
         if diff > allowedDiff:
-            logger.error("values %s and %s differ by %s in %s:%s" % (obj1, obj2, diff, where, fname))
+            logger.error("values %s and %s differ by %s in ''%s'': %s != %s" % (obj1, obj2, diff, where, fname, fname2))
         return diff < allowedDiff
     elif isinstance(obj1, str):
         if obj1 != obj2:
