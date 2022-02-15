@@ -46,7 +46,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         tpreds = []
         for er in exp_results:
             ts = theoryPredictionsFor(er, smstopos,
-                                      combinedResults=False, useBestDataset=False, marginalize=False)
+                combinedResults=False, useBestDataset=False, marginalize=False)
             for t in ts:
                 t.computeStatistics()
                 # print("er", str(er), "lsm", t.lsm, "lmax", t.lmax)
@@ -55,10 +55,10 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         combiner.computeStatistics()
         mu_hat, sigma_mu, lmax = combiner.findMuHat(allowNegativeSignals=True,
                                                     extended_output=True)
-        ulmu = combiner.getUpperLimitOnMu()
         self.assertAlmostEqual(combiner.lsm(), 2.756169857697467e-06, 4)
         self.assertAlmostEqual(combiner.likelihood(), 5.001298746531528e-06, 4)
         self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
+        ulmu = combiner.getUpperLimitOnMu()
         self.assertAlmostEqual(ulmu, 16.78997035426023/4.71, 3)
 
 
