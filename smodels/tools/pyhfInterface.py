@@ -472,20 +472,10 @@ class PyhfUpperLimitComputer:
                     else:
                         return self.workspaces[workspace_index]
             def root_func(mu):
-                Expected = expected
-                # Allows to modify the value of expected,
-                # otherwise expected is understood as a local
-                # variable and would be referenced before assignment
-                use_posteriori = False
-                # use_posteriori is a conveninant switch one has to set to True
-                # in order to compute expected aposteriori fit.
-                # An equally viable possibility is to change BasicPrinter.typeofexpectedvalues
-                # for "posteriori" (in printer.py)
-                if Expected == True and use_posteriori == True:
-                    # Allows to compute obs and exp posteriori limits within the same run,
-                    # with two switches: here and in BasicPrinter.typeofexpectedvalues (in printer.py)
-                    Expected = "posteriori"
-                workspace = updateWorkspace(Expected) # If expected == True, observations = sum(bkg)
+                # If expected == False, use unmodified (but patched) workspace
+                # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
+                # If expected == posteriori, use unmodified (but patched) workspace
+                workspace = updateWorkspace(expected)
                 # Same modifiers_settings as those use when running the 'pyhf cls' command line
                 msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
                 model = workspace.model(modifier_settings=msettings)
@@ -494,7 +484,7 @@ class PyhfUpperLimitComputer:
                 start = time.time()
                 stat = "qtilde" # by default
                 args = {}
-                args["return_expected"] = ( Expected == "posteriori" )
+                args["return_expected"] = ( expected == "posteriori" )
                 args["par_bounds"] = bounds
                 pver = float ( pyhf.__version__[:3] )
                 if pver < 0.6:
@@ -508,7 +498,7 @@ class PyhfUpperLimitComputer:
                     result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
                 end = time.time()
                 logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
-                if Expected == "posteriori":
+                if expected == "posteriori":
                     logger.debug('computing a-posteriori expected limit')
                     logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                     try:
