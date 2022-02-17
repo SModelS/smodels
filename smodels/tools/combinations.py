@@ -96,12 +96,10 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
         # Loading the jsonFiles
         ulcomputer = _getPyhfComputer(dataset, nsig, False)
         index = ulcomputer.getBestCombinationIndex()
-        logger.error("expected flag needs to be heeded!!!")
-        lbsm = ulcomputer.likelihood(index)
-        lmax = ulcomputer.lmax(index)
+        lbsm = ulcomputer.likelihood(index, expected=expected )
+        lmax = ulcomputer.lmax(index, expected=expected )
         ulcomputer = _getPyhfComputer(dataset, [0.]*len(nsig), False)
-        logger.error("expected flag needs to be heeded!!!")
-        lsm = ulcomputer.likelihood(index)
+        lsm = ulcomputer.likelihood(index, expected=expected )
         return lbsm, lmax, lsm
     lbsm = _combinedLikelihood(dataset, nsig, marginalize, deltas_rel,
                                expected=expected)

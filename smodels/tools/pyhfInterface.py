@@ -320,14 +320,19 @@ class PyhfUpperLimitComputer:
                 workspaces.append(ws)
             return workspaces
 
-    def likelihood(self, workspace_index=None, nll=False ):
+    def likelihood( self, workspace_index=None, nll=False,
+                    expected=False ):
         """
         Returns the value of the likelihood.
         Inspired by the `pyhf.infer.mle` module but for non-log likelihood
         :param workspace_index: supply index of workspace to use. If None,
                                 choose index of best combo
         :param nll: if true, return nll, not llhd
+        :param expected: if False, compute expected values, if True,
+            compute a priori expected, if "posteriori" compute posteriori 
+            expected
         """
+        logger.error("expected flag needs to be heeded!!!")
         with warnings.catch_warnings():
             warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
             if workspace_index == None:
@@ -388,13 +393,18 @@ class PyhfUpperLimitComputer:
             return np.exp(-twice_nll/2.)
         return twice_nll / 2.
 
-    def lmax(self, workspace_index=None, nll=False ):
+    def lmax( self, workspace_index=None, nll=False,
+              expected=False ):
         """
         Returns the negative log max likelihood
         :param nll: if true, return nll, not llhd
         :param workspace_index: supply index of workspace to use. If None,
-                                choose index of best combo
+            choose index of best combo
+        :param expected: if False, compute expected values, if True,
+            compute a priori expected, if "posteriori" compute posteriori 
+            expected
         """
+        logger.error("expected flag needs to be heeded!!!")
         with warnings.catch_warnings():
             warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
             logger.debug("Calling lmax")
