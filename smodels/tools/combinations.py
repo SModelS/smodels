@@ -107,6 +107,10 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
                          expected=expected)
     lsm = _combinedLikelihood(dataset, [0.]*len(nsig), marginalize, deltas_rel,
                               expected=expected)
+    if lsm > lmax:
+        lmax = lsm
+    if lbsm > lmax:
+        lmax = lbsm
     return lbsm, lmax, lsm
 
 
