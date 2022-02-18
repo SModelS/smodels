@@ -215,6 +215,16 @@ def deltaChi2FromLlhd(likelihood):
 
     return -2. * np.log(likelihood)
 
+def chi2FromLmax ( llhd, lmax ):
+    """ compute the chi2 from likelihood and lmax """
+    chi2 = 0.
+    if llhd > 1e-200:
+        from math import log
+        chi2 = 2 * log ( lmax / llhd )
+    if chi2 < 0. and llhd < 1e-100:
+        # numerical inaccuracy
+        chi2 = 0.
+    return chi2
 
 def chi2FromLimits(likelihood, upperLimit, expectedUpperLimit, corr=0.):
     """ compute the chi2 value from a likelihood (convenience function).

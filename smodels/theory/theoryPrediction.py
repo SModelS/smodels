@@ -249,17 +249,6 @@ class TheoryPrediction(object):
             return (llhd, chi2FromLimits(llhd, ulN, eulN, corr=corr))
         return llhd
 
-    def computeChi2 ( self, llhd, llhd_max ):
-        """ very simple routine to compute chi2 from llhds """
-        chi2 = 0.
-        if llhd > 1e-200:
-            from math import log
-            chi2 = 2 * log ( llhd_max / llhd )
-        if chi2 < 0. and llhd < 1e-100:
-            # numerical inaccuracy
-            chi2 = 0.
-        return chi2
-
     def computeStatistics(self, expected=False):
         """
         Compute the likelihoods, chi2 and upper limit for this theory prediction.
@@ -290,9 +279,8 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = llhd_sm
             self.cachedObjs[expected]["lmax"] = llhd_max
-            from math import log
-            chi2 = self.computeChi2 ( llhd, llhd_max )
-            self.cachedObjs[expected]["chi2"] = chi2
+            from smodels.tools.statistics import chi2FromLmax
+            self.cachedObjs[expected]["chi2"] = chi2FromLmax ( llhd, llhd_max )
 
         elif self.dataType() == 'combined':
             lumi = self.dataset.getLumi()
@@ -306,7 +294,8 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"] = lmax
-            self.cachedObjs[expected]["chi2"] = self.computeChi2 ( llhd, lmax )
+            from smodels.tools.statistics import chi2FromLmax
+            self.cachedObjs[expected]["chi2"] = chi2FromLmax ( llhd, lmax )
 
     def totalXsection(self):
         return self.xsection.value
