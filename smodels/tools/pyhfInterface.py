@@ -320,7 +320,7 @@ class PyhfUpperLimitComputer:
                 workspaces.append(ws)
             return workspaces
 
-    def likelihood( self, workspace_index=None, nll=False,
+    def likelihood( self, mu=1., workspace_index=None, nll=False,
                     expected=False ):
         """
         Returns the value of the likelihood.
@@ -332,6 +332,9 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori 
             expected
         """
+        print ( "pyhf likelihood for", mu )
+        if type(workspace_index ) == float:
+            logger.error ( "workspace index is float" )
         logger.error("expected flag needs to be heeded!!!")
         with warnings.catch_warnings():
             warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
@@ -352,8 +355,10 @@ class PyhfUpperLimitComputer:
             # Same modifiers_settings as those used when running the 'pyhf cls' command line
             msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
             model = workspace.model(modifier_settings=msettings)
-            _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model), model,
-                                                        return_fitted_val=True)
+            bounds = model.config.suggested_bounds()
+            bounds[model.config.poi_index] = (mu-1e-6,mu+1e-6)
+            _, nllh = pyhf.infer.mle.fixed_poi_fit( mu, workspace.data(model), model,
+                                       return_fitted_val=True, par_bounds = bounds )
             # print ( "likelihood best fit", _ )
             ret = nllh.tolist()
             try:
@@ -362,6 +367,7 @@ class PyhfUpperLimitComputer:
                 ret = float(ret[0])
             self.data.cached_likelihoods[workspace_index]=ret
             ret = self.exponentiateNLL ( ret, not nll )
+            print ( "now entering the fit mu=", mu, "llhd", ret )
             return ret
 
     def getBestCombinationIndex( self ):
@@ -493,7 +499,7 @@ class PyhfUpperLimitComputer:
                 msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
                 model = workspace.model(modifier_settings=msettings)
                 bounds = model.config.suggested_bounds()
-                bounds[model.config.poi_index] = [0,10]
+                bounds[model.config.poi_index] = (0,10)
                 start = time.time()
                 stat = "qtilde" # by default
                 args = {}

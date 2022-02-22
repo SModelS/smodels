@@ -161,7 +161,8 @@ class TheoryPrediction(object):
                    nll=False, useCached=True):
         """
         get the likelihood for a signal strength modifier mu
-        :param expected: compute expected, not observed likelihood
+        :param expected: compute expected, not observed likelihood. if "posteriori",
+                         compute expected posteriori.
         :param nll: if True, return negative log likelihood, else likelihood
         :param useCached: if True, will return the cached value, if available
         """
@@ -185,7 +186,8 @@ class TheoryPrediction(object):
             srNsigs = [mu*srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.
                        for ds in self.dataset._datasets]
             llhd = computeCombinedLikelihood(self.dataset, srNsigs,
-                                             self.marginalize, self.deltas_rel)
+                          self.marginalize, self.deltas_rel, expected = expected,
+                          mu = mu )
         if self.dataType() == 'efficiencyMap':
             nsig = (mu*self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig, marginalize=self.marginalize,
@@ -289,8 +291,7 @@ class TheoryPrediction(object):
             srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
             # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
             llhd, lmax, lsm = computeCombinedStatistics(self.dataset, srNsigs,
-                                                        self.marginalize,
-                                                        self.deltas_rel, expected=expected)
+                               self.marginalize, self.deltas_rel, expected=expected )
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"] = lmax

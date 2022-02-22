@@ -68,19 +68,25 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
         raise SModelSError("no covariance matrix or json file given in globalInfo.txt for %s" % dataset.globalInfo.id)
 
 
-def computeCombinedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2):
+def computeCombinedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2,
+         expected = False, mu = 1. ):
     """ compute only lBSM
     :param nsig: predicted signal (list)
     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+    :param expected: compute expected, not observed likelihood. if "posteriori",
+                     compute expected posteriori.
+    :param mu: signal strength parameter mu
     """
     if dataset.type == "pyhf":
         # Getting the path to the json files
         # Loading the jsonFiles
         ulcomputer = _getPyhfComputer(dataset, nsig, False)
         index = ulcomputer.getBestCombinationIndex()
-        lbsm = ulcomputer.likelihood(index)
+        lbsm = ulcomputer.likelihood( mu = mu, workspace_index = index, 
+                                      expected = expected  )
         return lbsm
-    lbsm = _combinedLikelihood(dataset, nsig, marginalize, deltas_rel)
+    lbsm = _combinedLikelihood(dataset, nsig, marginalize, deltas_rel,
+                expected = expected )
     return lbsm
 
 
@@ -96,10 +102,12 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
         # Loading the jsonFiles
         ulcomputer = _getPyhfComputer(dataset, nsig, False)
         index = ulcomputer.getBestCombinationIndex()
-        lbsm = ulcomputer.likelihood(index, expected=expected )
-        lmax = ulcomputer.lmax(index, expected=expected )
+        lbsm = ulcomputer.likelihood( mu = 1., workspace_index = index, 
+                                      expected=expected )
+        lmax = ulcomputer.lmax( workspace_index = index, expected=expected )
         ulcomputer = _getPyhfComputer(dataset, [0.]*len(nsig), False)
-        lsm = ulcomputer.likelihood(index, expected=expected )
+        lsm = ulcomputer.likelihood( mu = 0., workspace_index = index, 
+                                     expected=expected )
         return lbsm, lmax, lsm
     lbsm = _combinedLikelihood(dataset, nsig, marginalize, deltas_rel,
                                expected=expected)
