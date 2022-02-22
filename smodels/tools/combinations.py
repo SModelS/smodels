@@ -85,7 +85,7 @@ def computeCombinedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2,
         lbsm = ulcomputer.likelihood( mu = mu, workspace_index = index, 
                                       expected = expected  )
         return lbsm
-    lbsm = _combinedLikelihood(dataset, nsig, marginalize, deltas_rel,
+    lbsm = combinedSimplifiedLikelihood(dataset, nsig, marginalize, deltas_rel,
                 expected = expected )
     return lbsm
 
@@ -109,12 +109,12 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
         lsm = ulcomputer.likelihood( mu = 0., workspace_index = index, 
                                      expected=expected )
         return lbsm, lmax, lsm
-    lbsm = _combinedLikelihood(dataset, nsig, marginalize, deltas_rel,
-                               expected=expected)
-    lmax = _combinedLmax(dataset, nsig, marginalize, deltas_rel,
+    lbsm = combinedSimplifiedLikelihood(dataset, nsig, marginalize, deltas_rel,
                          expected=expected)
-    lsm = _combinedLikelihood(dataset, [0.]*len(nsig), marginalize, deltas_rel,
-                              expected=expected)
+    lmax = combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel,
+                         expected=expected)
+    lsm = combinedSimplifiedLikelihood(dataset, [0.]*len(nsig), marginalize, 
+                         deltas_rel, expected=expected)
     if lsm > lmax:
         lmax = lsm
     if lbsm > lmax:
@@ -174,10 +174,10 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
     return ulcomputer
 
 
-def _combinedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2,
+def combinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2,
         expected=False):
     """
-    Computes the (combined) likelihood to observe nobs events, given a
+    Computes the combined simplified likelihood to observe nobs events, given a
     predicted signal "nsig", with nsig being a vector with one entry per
     dataset.  nsig has to obey the datasetOrder. Deltas is the error on
     the signal.
@@ -187,47 +187,37 @@ def _combinedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2,
     :returns: likelihood to observe nobs events (float)
     """
 
-    if dataset.type == "simplified":
-        if len(dataset._datasets) == 1:
-            if isinstance(nsig, list):
-                nsig = nsig[0]
-            return dataset._datasets[0].likelihood(nsig, marginalize=marginalize)
-        if expected:
-            nobs = [x.dataInfo.expectedBG for x in dataset._datasets]
-        else:
-            nobs = [x.dataInfo.observedN for x in dataset._datasets]
-        bg = [x.dataInfo.expectedBG for x in dataset._datasets]
-        cov = dataset.globalInfo.covariance
-        computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig,
-                                           deltas_rel=deltas_rel))
-        return computer.likelihood(nsig, marginalize=marginalize)
-    elif dataset.type == "pyhf":
-        # Getting the path to the json files
-        # Loading the jsonFiles
-        ulcomputer = _getPyhfComputer(dataset, nsig, False)
-        return ulcomputer.likelihood()
-    else:
-        logger.error("Asked for combined likelihood, but no covariance or json file given: %s" % dataset.type)
+    if dataset.type != "simplified":
+        logger.error("Asked for combined simplified likelihood, but no covariance given: %s" % dataset.type )
         return None
-
-
-def _combinedLmax(dataset, nsig, marginalize, deltas_rel, nll=False, expected=False,
-           allowNegativeSignals=False):
-    """ compute likelihood at maximum """
-    if dataset.type == "simplified":
+    if len(dataset._datasets) == 1:
+        if isinstance(nsig, list):
+            nsig = nsig[0]
+        return dataset._datasets[0].likelihood(nsig, marginalize=marginalize)
+    if expected:
+        nobs = [x.dataInfo.expectedBG for x in dataset._datasets]
+    else:
         nobs = [x.dataInfo.observedN for x in dataset._datasets]
-        if expected:
-            # nobs = [ x.dataInfo.expectedBG for x in dataset._datasets]
-            nobs = [int(np.round(x.dataInfo.expectedBG)) for x in dataset._datasets]
-        bg = [x.dataInfo.expectedBG for x in dataset._datasets]
-        cov = dataset.globalInfo.covariance
-        if type(nsig) in [list, tuple]:
-            nsig = np.array(nsig)
-        computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-        mu_hat = computer.findMuHat(nsig, allowNegativeSignals=allowNegativeSignals)
-        musig = nsig * mu_hat
-        return computer.likelihood(musig, marginalize=marginalize, nll=nll)
-    if dataset.type == "pyhf":
-        ulcomputer = _getPyhfComputer(dataset, nsig, False)
-        return ulcomputer.lmax(nll=nll)
-    return -1.
+    bg = [x.dataInfo.expectedBG for x in dataset._datasets]
+    cov = dataset.globalInfo.covariance
+    computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig,
+                                       deltas_rel=deltas_rel))
+    return computer.likelihood(nsig, marginalize=marginalize)
+
+def combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel, nll=False, 
+        expected=False, allowNegativeSignals=False ):
+    """ compute likelihood at maximum, for simplified likelihoods only """
+    if dataset.type != "simplified":
+        return -1.
+    nobs = [x.dataInfo.observedN for x in dataset._datasets]
+    if expected:
+        # nobs = [ x.dataInfo.expectedBG for x in dataset._datasets]
+        nobs = [int(np.round(x.dataInfo.expectedBG)) for x in dataset._datasets]
+    bg = [x.dataInfo.expectedBG for x in dataset._datasets]
+    cov = dataset.globalInfo.covariance
+    if type(nsig) in [list, tuple]:
+        nsig = np.array(nsig)
+    computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
+    mu_hat = computer.findMuHat(nsig, allowNegativeSignals=allowNegativeSignals)
+    musig = nsig * mu_hat
+    return computer.likelihood(musig, marginalize=marginalize, nll=nll)
