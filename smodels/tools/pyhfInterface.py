@@ -332,7 +332,7 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori 
             expected
         """
-        print ( "pyhf likelihood for", mu )
+        # print ( "pyhf likelihood for", mu )
         if type(workspace_index ) == float:
             logger.error ( "workspace index is float" )
         logger.error("expected flag needs to be heeded!!!")
@@ -367,7 +367,7 @@ class PyhfUpperLimitComputer:
                 ret = float(ret[0])
             self.data.cached_likelihoods[workspace_index]=ret
             ret = self.exponentiateNLL ( ret, not nll )
-            print ( "now entering the fit mu=", mu, "llhd", ret )
+            # print ( "now entering the fit mu=", mu, "llhd", ret )
             return ret
 
     def getBestCombinationIndex( self ):
