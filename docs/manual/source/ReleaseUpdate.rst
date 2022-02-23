@@ -45,6 +45,7 @@ New in Version 2.2.0:
   * a few smaller changes around expected likelihoods and limits
   * allow :ref:`ncpus <parameterFileNcpus>` to take on zero and negative values in
     ini file [meaning use all but this (absolute) number of CPU cores]
+  * notion of "nonaggregated" databases introduced
   * small fixes in the :ref:`Howto's <Examples>`
   * updates in references.bib, installation notes
   * more small fixes in unit tests
