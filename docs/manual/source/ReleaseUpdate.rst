@@ -50,6 +50,21 @@ New in Version 2.2.0:
   * updates in references.bib, installation notes
   * more small fixes in unit tests
 
+  * Database extension:
+    - added new results from 4 ATLAS and 8 CMS analyses:
+      ATLAS-SUSY-2016-24
+      ATLAS-SUSY-2018-08
+      ATLAS-SUSY-2018-40
+      ATLAS-SUSY-2019-09
+      CMS-SUS-16-039 (EMs)
+      CMS-SUS-16-048 (EMs)
+      CMS-SUS-18-007
+      CMS-SUS-19-006 (EMs)
+      CMS-SUS-19-008
+      CMS-SUS-19-011
+      CMS-SUS-20-001
+      CMS-SUS-20-002
+
 New in Version 2.1.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
