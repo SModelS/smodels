@@ -333,6 +333,7 @@ class PyhfUpperLimitComputer:
             expected
         """
         # print ( "pyhf likelihood for", mu )
+        logger.debug("Calling likelihood")
         if type(workspace_index ) == float:
             logger.error ( "workspace index is float" )
         logger.error("expected flag needs to be heeded!!!")
@@ -342,10 +343,6 @@ class PyhfUpperLimitComputer:
                 workspace_index = self.getBestCombinationIndex()
             if workspace_index == None:
                 return None
-            logger.debug("Calling likelihood")
-            if workspace_index in self.data.cached_likelihoods: #I WOULD REMOVE THIS BC IF ONE CHANGES MU OR EXPECTED, THE RESULTS NEEDS TO BE COMPUTED AGAIN -> WE NEVER REUSE A PREVIOUSLY COMPUTED LIKELIHOOD
-                return self.exponentiateNLL ( self.data.cached_likelihoods[workspace_index],
-                                              not nll )
             self.__init__(self.data)
             ### allow this, for computation of l_SM
             #if self.zeroSignalsFlag[workspace_index] == True:
@@ -372,13 +369,17 @@ class PyhfUpperLimitComputer:
 
     def getBestCombinationIndex( self ):
         """ find the index of the best expected combination """
-        logger.debug("Performing best expected combination")
+        logger.debug("Finding best expected combination among %d workspace(s)" % self.nWS)
         ulMin = float('+inf')
         i_best = None
         if self.nWS == 1:
             return 0
         for i_ws in range(self.nWS):
-            ul = self.ulSigma(expected=True, workspace_index=i_ws)
+            if self.zeroSignalsFlag[i_ws] == True:
+                logger.debug("Workspace number %d has zero signals" % i_ws)
+                continue
+            else:
+                ul = self.ulSigma(expected=True, workspace_index=i_ws)
             if ul == None:
                 continue
             if ul < ulMin:
@@ -411,14 +412,12 @@ class PyhfUpperLimitComputer:
             expected
         """
         logger.error("expected flag needs to be heeded!!!")
+        logger.debug("Calling lmax")
         with warnings.catch_warnings():
             warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
-            logger.debug("Calling lmax")
             self.__init__(self.data)
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
-            if workspace_index in self.data.cached_lmaxes:
-                return self.exponentiateNLL ( self.data.cached_lmaxes[workspace_index], not nll )
             if workspace_index != None:
                 if self.zeroSignalsFlag[workspace_index] == True:
                     logger.warning("Workspace number %d has zero signals" % workspace_index)
@@ -449,14 +448,14 @@ class PyhfUpperLimitComputer:
         :param expected: if False, retuns the unmodified (but patched) workspace. Used for computing observed or aposteriori expected limits.
                         if True, retuns the modified (and patched) workspace, where obs = sum(bkg). Used for computing apriori expected limit.
         """
-        if workspace_index == None:
-            logger.error("No workspace index was provided.")
         if self.nWS == 1:
             if expected == True:
                 return self.workspaces_expected[0]
             else:
                 return self.workspaces[0]
         else:
+            if workspace_index == None:
+                logger.error("No workspace index was provided.")
             if expected == True:
                 return self.workspaces_expected[workspace_index]
             else:
@@ -487,19 +486,16 @@ class PyhfUpperLimitComputer:
             if self.data.errorFlag or self.workspaces == None:
                 # For now, this flag can only be turned on by PyhfData.checkConsistency
                 return None
-            if self.nWS == 1:
-                if self.zeroSignalsFlag[0] == True:
-                    logger.debug("There is only one workspace but all signals are zeroes")
-                    # allow this, for computation of l_SM
-                    #return None
-            else:
-                if workspace_index == None:
-                    logger.debug("There are several workspaces but no workspace index was provided")
-                    workspace_index = self.getBestCombinationIndex()
-                    # return None
-                if self.zeroSignalsFlag[workspace_index] == True:
-                    logger.debug("Workspace number %d has zero signals" % workspace_index)
-                    return None
+
+            if all( [self.zeroSignalsFlag[workspace_index] for workspace_index in range(self.nWS)] ) == True:
+                logger.debug("There is (are) %d workspace(s) and no signal(s) was (were) found" % self.nWS)
+                return None
+            if workspace_index == None:
+                workspace_index = self.getBestCombinationIndex()
+            if workspace_index == None:
+                logger.debug("Best combination index not found")
+                return None
+
             def root_func(mu):
                 # If expected == False, use unmodified (but patched) workspace
                 # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
