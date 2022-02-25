@@ -343,9 +343,7 @@ class PyhfUpperLimitComputer:
             if workspace_index == None:
                 return None
             logger.debug("Calling likelihood")
-            print('wsIndex debut', self.data.cached_likelihoods)
             if workspace_index in self.data.cached_likelihoods: #I WOULD REMOVE THIS BC IF ONE CHANGES MU OR EXPECTED, THE RESULTS NEEDS TO BE COMPUTED AGAIN -> WE NEVER REUSE A PREVIOUSLY COMPUTED LIKELIHOOD
-                print('DOES IT EVER ENTER HERE????? likelihood version')
                 return self.exponentiateNLL ( self.data.cached_likelihoods[workspace_index],
                                               not nll )
             self.__init__(self.data)
@@ -353,7 +351,7 @@ class PyhfUpperLimitComputer:
             #if self.zeroSignalsFlag[workspace_index] == True:
             #    logger.warning("Workspace number %d has zero signals" % workspace_index)
             #    return None
-            workspace = self.updateWorkspace(workspace_index, apriori = expected)
+            workspace = self.updateWorkspace(workspace_index, expected = expected)
             # Same modifiers_settings as those used when running the 'pyhf cls' command line
             msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
             model = workspace.model(modifier_settings=msettings)
@@ -368,7 +366,6 @@ class PyhfUpperLimitComputer:
             except:
                 ret = float(ret[0])
             self.data.cached_likelihoods[workspace_index]=ret #THIS CAN STAY BC IT MAY BE NEEDED ELSEWHERE IN THE CODE
-            print('wsIndex fin', self.data.cached_likelihoods)
             ret = self.exponentiateNLL ( ret, not nll )
             # print ( "now entering the fit mu=", mu, "llhd", ret )
             return ret
@@ -382,7 +379,6 @@ class PyhfUpperLimitComputer:
             return 0
         for i_ws in range(self.nWS):
             ul = self.ulSigma(expected=True, workspace_index=i_ws)
-            print ('getBestCombinationIndex i_ws:', i_ws, ' ul:', ul)
             if ul == None:
                 continue
             if ul < ulMin:
@@ -422,16 +418,15 @@ class PyhfUpperLimitComputer:
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
             if workspace_index in self.data.cached_lmaxes:
-                print('DOES IT EVER ENTER HERE????? lmax version')
                 return self.exponentiateNLL ( self.data.cached_lmaxes[workspace_index], not nll )
-            # if self.nWS == 1: # NOT USEFUL
-            #     workspace = self.updateWorkspace(0, False)
             if workspace_index != None:
                 if self.zeroSignalsFlag[workspace_index] == True:
                     logger.warning("Workspace number %d has zero signals" % workspace_index)
                     return None
                 else:
-                    workspace = self.updateWorkspace(workspace_index, apriori = expected)
+                    workspace = self.updateWorkspace(workspace_index, expected = expected)
+            else:
+                return None
             # Same modifiers_settings as those used when running the 'pyhf cls' command line
             msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
             model = workspace.model(modifier_settings=msettings)
@@ -446,23 +441,23 @@ class PyhfUpperLimitComputer:
             ret = self.exponentiateNLL ( ret, not nll )
             return ret
 
-    def updateWorkspace(self, workspace_index = None, apriori = False):
+    def updateWorkspace(self, workspace_index = None, expected = False):
         """
         Small method used to return the appropriate workspace
 
         :param workspace_index: the index of the workspace to retrieve from the corresponding list
-        :param apriori: if False, retuns the unmodified (but patched) workspace. Used for computing observed or aposteriori expected limits.
+        :param expected: if False, retuns the unmodified (but patched) workspace. Used for computing observed or aposteriori expected limits.
                         if True, retuns the modified (and patched) workspace, where obs = sum(bkg). Used for computing apriori expected limit.
         """
         if workspace_index == None:
             logger.error("No workspace index was provided.")
         if self.nWS == 1:
-            if apriori == True:
+            if expected == True:
                 return self.workspaces_expected[0]
             else:
                 return self.workspaces[0]
         else:
-            if apriori == True:
+            if expected == True:
                 return self.workspaces_expected[workspace_index]
             else:
                 return self.workspaces[workspace_index]
@@ -509,7 +504,7 @@ class PyhfUpperLimitComputer:
                 # If expected == False, use unmodified (but patched) workspace
                 # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
                 # If expected == posteriori, use unmodified (but patched) workspace
-                workspace = self.updateWorkspace(workspace_index, expected)
+                workspace = self.updateWorkspace(workspace_index, expected = expected)
                 # Same modifiers_settings as those use when running the 'pyhf cls' command line
                 msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
                 model = workspace.model(modifier_settings=msettings)
