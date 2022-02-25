@@ -353,7 +353,7 @@ class PyhfUpperLimitComputer:
             #if self.zeroSignalsFlag[workspace_index] == True:
             #    logger.warning("Workspace number %d has zero signals" % workspace_index)
             #    return None
-            workspace = self.updateWorkspace(workspace_index, expected = expected)
+            workspace = self.updateWorkspace(workspace_index, apriori = expected)
             # Same modifiers_settings as those used when running the 'pyhf cls' command line
             msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
             model = workspace.model(modifier_settings=msettings)
