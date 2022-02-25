@@ -217,11 +217,18 @@ Figure: Comparison of exclusion curves for `ATLAS-SUSY-2019-08 <https://atlas.we
 Combination of different Analyses
 ---------------------------------
 
-Starting with SModelS v2.2, it is possible to combine likelihoods from different analyses, assuming that their signal regions are approximately uncorrelated. As of now, the information of which analyses meet this criterion is not given by SModelS itself, and has to be provided by the user (see  option :ref:`combineAnas <parameterFileCombineAnas>`).
+Starting with SModelS v2.2, it is possible to combine likelihoods from
+different analyses, assuming that their signal regions are approximately
+uncorrelated. As of now, the information of which analyses meet this criterion
+is not given by SModelS itself, and has to be provided by the user (see option
+:ref:`combineAnas <parameterFileCombineAnas>`).
 
 .. First systematic studies of correlations between various CMS and ATLAS are however underway, see for example contribution 16 of the `Les Houches Working Group report <https://arxiv.org/abs/2002.12220>`_.
 
-For these combinations, the likelihood (:math:`\mathcal{L}_{C}`) is simply the product of the individual analysis likelihoods (:math:`\mathcal{L}_{i}`). Furthermore, we assume a common signal strength (:math:`\mu`) for all analyses:
+For these combinations, the combined likelihood :math:`\mathcal{L}_{C}` is
+simply the product of the individual analysis likelihoods,
+:math:`\mathcal{L}_{i}`. Furthermore, we assume a common signal strength
+:math:`\mu` for all analyses:
 
 .. math::
    \mathcal{L}_{C}(\mu) = \prod_{i=1} \mathcal{L}_{i}(\mu\; s^{i})

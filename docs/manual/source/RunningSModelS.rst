@@ -149,7 +149,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileCombineAnas:
 
-    * **combineAnas** (list of results): list of analysis IDs to be combined. *All the analyses are assumed to be fully uncorrelated!* (use with caution).  Available from v2.2.0 onwards.
+    * **combineAnas** (list of results): list of analysis IDs to be combined. *All the analyses are assumed to be fully uncorrelated!*, use with caution! Available from v2.2.0 onwards.
 
 .. _parameterExperimentalFeatures:
 
