@@ -62,6 +62,51 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # 16.78997035426023/4.71
         self.assertAlmostEqual(ulmu, 3.45262, 3)
 
+    def testByHandComputed ( self ):
+        """ a unit test where in the comments I show the manual computations, step by step, for comparison """
+        database = Database("unittest")
+        dTypes = ["efficiencyMap"]
+        anaids = [ "CMS-SUS-13-012", "ATLAS-CONF-2013-037" ]
+        dsids = [ "3NJet6_1250HT1500_300MHT450", "SRtN2" ]
+        # CMS-SUS-13-012
+        # dataId: 3NJet6_1250HT1500_300MHT450
+        # observedN: 38
+        # expectedBG: 42.8
+        # bgError: 9.5
+        #
+        # ATLAS-CONF-2013-037
+        # dataId: SRtN2
+        # dataType: efficiencyMap
+        # observedN: 14
+        # expectedBG: 13.0
+        # bgError: 3.0
+        slhafile = "testFiles/slha/T1tttt.slha"
+        exp_results = database.getExpResults(analysisIDs=anaids,
+                                             datasetIDs=dsids, dataTypes=dTypes)
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(inputFile=slhafile)
+        smstopos = decomposer.decompose(model)
+        tpreds = []
+        defaultLSMs, defaultLmax = { }, { }
+        # FIXME add the exact derivation
+        defaultLSMs["CMS-SUS-13-012:SRtN2"] = 0.013786096355236995
+        defaultLSMs["CMS-SUS-13-012:3NJet6_1250HT1500_300MHT450" ] = 0.0024804685610203808
+        defaultLmax["CMS-SUS-13-012:SRtN2"] = 0.013786096355236995
+        defaultLmax["CMS-SUS-13-012:3NJet6_1250HT1500_300MHT450" ] = 0.0024804685610203808
+        for er in exp_results:
+            ts = theoryPredictionsFor(er, smstopos,
+                combinedResults=False, useBestDataset=False, marginalize=False)
+            for t in ts:
+                tpreds.append ( t )
+        for t in tpreds:
+            t.computeStatistics()
+            dId = t.dataset.dataInfo.dataId
+            Id = f"{er.globalInfo.id}:{dId}"
+            lsm = t.lsm()
+            lmax = t.lmax()
+            # print ( "[er]", Id, "lsm", lsm, "lmax", lmax )
+            self.assertAlmostEqual ( lsm, defaultLSMs[Id], 5 )
+            self.assertAlmostEqual ( lmax, defaultLmax[Id], 5 )
 
 if __name__ == "__main__":
     unittest.main()
