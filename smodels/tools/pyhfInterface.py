@@ -336,7 +336,7 @@ class PyhfUpperLimitComputer:
         logger.debug("Calling likelihood")
         if type(workspace_index ) == float:
             logger.error ( "workspace index is float" )
-        logger.error("expected flag needs to be heeded!!!")
+        # logger.error("expected flag needs to be heeded!!!")
         with warnings.catch_warnings():
             warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
             if workspace_index == None:
