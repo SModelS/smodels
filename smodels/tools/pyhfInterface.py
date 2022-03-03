@@ -411,7 +411,7 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori
             expected
         """
-        logger.error("expected flag needs to be heeded!!!")
+        # logger.error("expected flag needs to be heeded!!!")
         logger.debug("Calling lmax")
         with warnings.catch_warnings():
             warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
