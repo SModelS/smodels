@@ -305,8 +305,12 @@ class DataSet(object):
             # if abs ( nsig[0]-1 ) < 1e-5:
             #    print ( f"COMB ebg={self.dataInfo.expectedBG:.3f} obs={obs:.3f} nsig {nsig[0]:.3f}" )
             computer = LikelihoodComputer(m)
+        ret = computer.likelihood(nsig, marginalize=marginalize)
+        if hasattr ( computer, "theta_hat" ):
+            ## seems like someone wants to debug them
+            self.theta_hat = computer.theta_hat
 
-        return computer.likelihood(nsig, marginalize=marginalize)
+        return ret
 
     def lmax(self, deltas_rel=0.2, marginalize=False, expected=False,
              allowNegativeSignals=False):
@@ -338,8 +342,12 @@ class DataSet(object):
         m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
                  deltas_rel=deltas_rel)
         computer = LikelihoodComputer(m)
-        return computer.lmax(marginalize=marginalize, nll=False,
-                             allowNegativeSignals=allowNegativeSignals)
+        ret = computer.lmax ( marginalize=marginalize, nll=False,
+                              allowNegativeSignals=allowNegativeSignals )
+        if hasattr ( computer, "theta_hat" ):
+            ## seems like someone wants to debug them
+            self.theta_hat = computer.theta_hat
+        return ret
 
     def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
         """

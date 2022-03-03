@@ -361,6 +361,8 @@ class LikelihoodComputer:
                     continue
             mu_hat = optimize.brentq ( self.dLdMu, lower, upper, args=(signal_rel, theta_hat ) )
             theta_hat,_ = self.findThetaHat( mu_hat*signal_rel)
+            if self.debug_mode:
+                self.theta_hat = theta_hat
             ctr+=1
 
         if extended_output:
@@ -714,6 +716,8 @@ class LikelihoodComputer:
         # compute the profiled (not normalized) likelihood of observing
         # nsig signal events
         theta_hat,_ = self.findThetaHat ( nsig )
+        if self.debug_mode:
+            self.theta_hat = theta_hat
         ret = self.probMV ( nll, theta_hat )
 
         return ret

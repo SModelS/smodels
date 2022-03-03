@@ -10,6 +10,8 @@
 import sys
 sys.path.insert(0, "../")
 
+from smodels.tools.simplifiedLikelihoods import LikelihoodComputer
+LikelihoodComputer.debug_mode = True
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory import decomposer
 from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
@@ -89,9 +91,11 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         tpreds = []
         defaultLSMs, defaultLmax = { }, { }
         # FIXME add the exact derivation
+        # mention theta_hat
+        # poisson ( 38, x ) * gauss ( x, 42.8, 9.5 )
         defaultLSMs["CMS-SUS-13-012:SRtN2"] = 0.013786096355236995
         defaultLSMs["CMS-SUS-13-012:3NJet6_1250HT1500_300MHT450" ] = 0.0024804685610203808
-        defaultLmax["CMS-SUS-13-012:SRtN2"] = 0.013786096355236995
+        defaultLmax["CMS-SUS-13-012:SRtN2"] = 0.014094517457734808
         defaultLmax["CMS-SUS-13-012:3NJet6_1250HT1500_300MHT450" ] = 0.0024804685610203808
         for er in exp_results:
             ts = theoryPredictionsFor(er, smstopos,
@@ -103,7 +107,9 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             dId = t.dataset.dataInfo.dataId
             Id = f"{er.globalInfo.id}:{dId}"
             lsm = t.lsm()
+            # print ( "dataset", t.dataset.theta_hat )
             lmax = t.lmax()
+            # print ( "dataset", t.dataset.theta_hat )
             # print ( "[er]", Id, "lsm", lsm, "lmax", lmax )
             self.assertAlmostEqual ( lsm, defaultLSMs[Id], 5 )
             self.assertAlmostEqual ( lmax, defaultLmax[Id], 5 )
