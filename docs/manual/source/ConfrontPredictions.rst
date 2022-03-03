@@ -213,6 +213,7 @@ using the best signal region (left) to using the full likelihood (right).
 
 Figure: Comparison of exclusion curves for `ATLAS-SUSY-2019-08 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2019-08/>`_ using only the best signal region (left), and the combination of all 9 signal regions with pyhf (right).
 
+.. analysesCombination:
 
 Combination of different Analyses
 ---------------------------------

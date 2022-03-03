@@ -40,7 +40,7 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 2.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * introduction of (uncorrelated) :ref:`analyses combination <parameterFileCombineAnas>`
+  * introduction of (uncorrelated) :ref:`analyses combination <analysesCombination>`
   * posteriori expected limits introduced
   * a few smaller changes around expected likelihoods and limits
   * allow :ref:`ncpus <parameterFileNcpus>` to take on zero and negative values in
