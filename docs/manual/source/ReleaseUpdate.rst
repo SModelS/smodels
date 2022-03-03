@@ -40,8 +40,8 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 2.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * introduction of (uncorrelated) :ref:`analyses combination <analysesCombination>`
-  * posteriori expected limits introduced
+  * introduced (user-defined) :ref:`combinations of analyses <analysesCombination>`
+  * changed expected limits computed with pyhf from post-fit to pre-fit
   * a few smaller changes around expected likelihoods and limits
   * allow :ref:`ncpus <parameterFileNcpus>` to take on zero and negative values in
     ini file [meaning use all but this (absolute) number of CPU cores]
@@ -49,11 +49,13 @@ New in Version 2.2.0:
   * small fixes in the :ref:`Howto's <Examples>`
   * updates in references.bib, installation notes
   * more small fixes in unit tests
-  * Database extension, added new results from 4 ATLAS and 8 CMS analyses:
-      ATLAS-SUSY-2016-24, ATLAS-SUSY-2018-08, ATLAS-SUSY-2018-40, ATLAS-SUSY-2019-09,
-      CMS-SUS-16-039 (EMs), CMS-SUS-16-048 (EMs), CMS-SUS-18-007,
-      CMS-SUS-19-006 (EMs), CMS-SUS-19-008, CMS-SUS-19-011, CMS-SUS-20-001, 
-      CMS-SUS-20-002
+  * Database extension, added new results from 3 ATLAS and 8 CMS analyses:
+     - results from ATLAS: 
+       ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
+     - results from CMS:
+       CMS-SUS-18-007 (UL), CMS-SUS-19-008 (UL), CMS-SUS-19-011 (UL), CMS-SUS-20-001 (UL), CMS-SUS-20-002 (UL)
+     - recast with MadAnalysis5:
+       CMS-SUS-16-039 (EM), CMS-SUS-16-048 (EM), CMS-SUS-19-006 (EM); all incl. covariance matrices
 
 New in Version 2.1.1:
 ^^^^^^^^^^^^^^^^^^^^^

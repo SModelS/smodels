@@ -1,7 +1,7 @@
 Release v2.2.0, xxx
 =======================================================
 
-  * introduced (user-defined) combination of analyses
+  * introduced (user-defined) combinations of analyses
   * changed expected limits computed with pyhf from post-fit to pre-fit 
   * a few smaller changes around expected likelihoods and limits
   * allow ncpus to take on zero and negative values in ini file
@@ -16,7 +16,7 @@ Release v2.2.0, xxx
       ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
     - results from CMS:  
       CMS-SUS-18-007 (UL), CMS-SUS-19-008 (UL), CMS-SUS-19-011 (UL), CMS-SUS-20-001 (UL), CMS-SUS-20-002 (UL)
-    - recasted with MadAnlaysis5:  
+    - recast with MadAnalysis5:  
       CMS-SUS-16-039 (EM), CMS-SUS-16-048 (EM), CMS-SUS-19-006 (EM); all incl. covariance matrices
 
 Release v2.1.1, Tue 19 Oct 2021
