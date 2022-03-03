@@ -70,18 +70,19 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         dTypes = ["efficiencyMap"]
         anaids = [ "CMS-SUS-13-012", "ATLAS-CONF-2013-037" ]
         dsids = [ "3NJet6_1250HT1500_300MHT450", "SRtN2" ]
-        # CMS-SUS-13-012
-        # dataId: 3NJet6_1250HT1500_300MHT450
-        # observedN: 38
-        # expectedBG: 42.8
-        # bgError: 9.5
-        #
         # ATLAS-CONF-2013-037
         # dataId: SRtN2
         # dataType: efficiencyMap
         # observedN: 14
         # expectedBG: 13.0
         # bgError: 3.0
+
+        # CMS-SUS-13-012
+        # dataId: 3NJet6_1250HT1500_300MHT450
+        # observedN: 38
+        # expectedBG: 42.8
+        # bgError: 9.5
+
         slhafile = "testFiles/slha/T1tttt.slha"
         exp_results = database.getExpResults(analysisIDs=anaids,
                                              datasetIDs=dsids, dataTypes=dTypes)
@@ -92,11 +93,22 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         defaultLSMs, defaultLmax = { }, { }
         # FIXME add the exact derivation
         # mention theta_hat
-        # poisson ( 38, x ) * gauss ( x, 42.8, 9.5 )
-        defaultLSMs["CMS-SUS-13-012:SRtN2"] = 0.013786096355236995
-        defaultLSMs["CMS-SUS-13-012:3NJet6_1250HT1500_300MHT450" ] = 0.0024804685610203808
-        defaultLmax["CMS-SUS-13-012:SRtN2"] = 0.014094517457734808
-        defaultLmax["CMS-SUS-13-012:3NJet6_1250HT1500_300MHT450" ] = 0.0024804685610203808
+
+        # theta_hat = 0., x = 13.
+        # scipy.stats.norm.pdf ( x, 13., 3. ) * scipy.stats.poisson.pmf(14, x)
+        # = 0.013575602920029094, so we are actually a little off
+        defaultLSMs["ATLAS-CONF-2013-037:SRtN2"] = 0.013786096355236995
+
+        # theta_hat = -3.33975152, x = 42.8 + theta_hat = 39.46
+        # scipy.stats.norm.pdf(x, 42.8, 9.5) * scipy.stats.poisson.pmf(38, x)
+        # = 0.002480468561020399
+        defaultLSMs["CMS-SUS-13-012:3NJet6_1250HT1500_300MHT450" ] = 0.0024804685610
+
+		    # nsig = 1., theta_hat = 0., x = 14.
+		    # scipy.stats.norm.pdf ( x, 13., 3. ) * scipy.stats.poisson.pmf(14, x)
+        defaultLmax["ATLAS-CONF-2013-037:SRtN2"] = 0.014094517457734808
+
+        defaultLmax["CMS-SUS-13-012:3NJet6_1250HT1500_300MHT450" ] = 0.0024804685610
         for er in exp_results:
             ts = theoryPredictionsFor(er, smstopos,
                 combinedResults=False, useBestDataset=False, marginalize=False)
@@ -105,11 +117,12 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         for t in tpreds:
             t.computeStatistics()
             dId = t.dataset.dataInfo.dataId
-            Id = f"{er.globalInfo.id}:{dId}"
+            Id = f"{t.dataset.globalInfo.id}:{dId}"
             lsm = t.lsm()
             # print ( "dataset", t.dataset.theta_hat )
             lmax = t.lmax()
-            # print ( "dataset", t.dataset.theta_hat )
+            if False:
+                print ( f"dataset {Id}: theta_hat {t.dataset.theta_hat[0]:.3f} lsm {lsm}" )
             # print ( "[er]", Id, "lsm", lsm, "lmax", lmax )
             self.assertAlmostEqual ( lsm, defaultLSMs[Id], 5 )
             self.assertAlmostEqual ( lmax, defaultLmax[Id], 5 )
