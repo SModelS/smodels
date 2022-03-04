@@ -22,7 +22,7 @@ from smodels.experiment.databaseObj import Database
 from unitTestHelpers import equalObjs, runMain, importModule
 import unittest
 import os
-
+from databaseLoader import database
 
 class CombinedTheoryPredsTest(unittest.TestCase):
 
@@ -32,10 +32,9 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             if os.path.exists(i):
                 os.remove(i)
 
-    def testConstruction(self):
+    def mestConstruction(self):
         """ this method should simply test if the fake result and the
             covariance matrix are constructed appropriately """
-        database = Database("unittest")
         dTypes = ["efficiencyMap"]
         anaids = ["CMS-SUS-16-050-agg", "CMS-SUS-13-012"]
         dsids = ["ar8", "ar9", "3NJet6_1250HT1500_300MHT450"]
@@ -66,7 +65,6 @@ class CombinedTheoryPredsTest(unittest.TestCase):
 
     def testByHandComputed ( self ):
         """ a unit test where in the comments I show the manual computations, step by step, for comparison """
-        database = Database("unittest")
         dTypes = ["efficiencyMap"]
         anaids = [ "CMS-SUS-13-012", "ATLAS-CONF-2013-037" ]
         dsids = [ "3NJet6_1250HT1500_300MHT450", "SRtN2" ]
