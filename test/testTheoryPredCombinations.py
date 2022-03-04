@@ -103,9 +103,13 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         defaultLSMs["CMS-SUS-13-012:3NJet6_1250HT1500_300MHT450" ] = 0.0024804685610
 
 		    # nsig = 1., theta_hat = 0., x = 14.
-		    # scipy.stats.norm.pdf ( x, 13., 3. ) * scipy.stats.poisson.pmf(14, x)
+		    # scipy.stats.norm.pdf(x, 14.0, 3.0) * scipy.stats.poisson.pmf(14, x)
+		    # = 0.014094517457734808
         defaultLmax["ATLAS-CONF-2013-037:SRtN2"] = 0.014094517457734808
 
+		    # nsig = 0., theta_hat = -3.33975152, x = 39.460268
+		    # scipy.stats.norm.pdf(x, 42.8, 9.5) * scipy.stats.poisson.pmf(38, x)
+		    # = 0.0024804685610
         defaultLmax["CMS-SUS-13-012:3NJet6_1250HT1500_300MHT450" ] = 0.0024804685610
         for er in exp_results:
             ts = theoryPredictionsFor(er, smstopos,
