@@ -33,6 +33,14 @@ from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.smodelsLogging import logger
 import logging
 
+from importlib.metadata import version
+if version("scipy")[:4] not in [ "1.8.", "1.9.", "1.10.", "2.0.", "2.1." ]:
+    # fix for pickling different scipy versions (1.7.x vs 1.8.x)
+    # so that databases pickled with scipy 1.8.x still work with scipy 1.7.x
+    import scipy.spatial
+    if not hasattr ( scipy.spatial, "_qhull" ) and hasattr ( scipy.spatial, "qhull" ):
+        sys.modules["scipy.spatial._qhull"] = scipy.spatial.qhull
+
 try:
     import cPickle as serializer
 except ImportError as e:
