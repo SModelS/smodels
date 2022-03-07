@@ -8,4 +8,6 @@
 SModelS -- A tool for interpreting simplified-model results from the LHC,
 see https://smodels.github.io/.
 
-Copyright (C) 2012-2022 Gael Alguero, Jan Heisig, Charanjit K. Khosa, Sabine Kraml, Suchita Kulkarni, Andre Lessa, Philipp Neuhuber, Humberto Reyes-Gonzalez, Wolfgang Waltenberger, Alicia Wongel <smodels-users@lists.oeaw.ac.at>
+Copyright (C) 2012-2022 Gael Alguero, Jan Heisig, Sabine Kraml, Andre Lessa, Timothee Pascal, Humberto Reyes-Gonzalez, Wolfgang Waltenberger <smodels-users@lists.oeaw.ac.at>
+
+Previously involved in SModelS: Federico Ambrogi, Charanjit K. Khosa, Juhi Dutta, Suchita Kulkarni, Ursula Laa, Veronika Magerl, Wolfgang Magerl, Philipp Neuhuber, Doris Proschofsky, Jory Sonneveld, Michael Traub, Matthias Wolf, Alicia Wongel
