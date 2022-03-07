@@ -131,7 +131,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             self.assertAlmostEqual ( lsm, defaultLSMs[Id], 5 )
             self.assertAlmostEqual ( lmax, defaultLmax[Id], 5 )
         # combination:
-        # mu_hat 0.018 lmax 1.7e-05 ul_mu 0.24
+        # mu_hat 0.035 lmax 0.00011 ul_mu 0.27
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
         mu_hat, sigma_mu, lmax = combiner.findMuHat(allowNegativeSignals=True,
