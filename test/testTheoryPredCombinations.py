@@ -32,7 +32,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             if os.path.exists(i):
                 os.remove(i)
 
-    def mestConstruction(self):
+    def testConstruction(self):
         """ this method should simply test if the fake result and the
             covariance matrix are constructed appropriately """
         dTypes = ["efficiencyMap"]
@@ -119,11 +119,11 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             t.computeStatistics()
             dId = t.dataset.dataInfo.dataId
             Id = f"{t.dataset.globalInfo.id}:{dId}"
-            print ( "Id", Id )
+            #print ( "Id", Id )
             lsm = t.lsm()
-            print ( "lsm", lsm )
-            print ( "theta_hat", t.dataset.theta_hat )
-            print ( "dataset", t.dataset.dataInfo.observedN, t.dataset.dataInfo.expectedBG, t.dataset.dataInfo.bgError )
+            #print ( "lsm", lsm )
+            #print ( "theta_hat", t.dataset.theta_hat )
+            #print ( "dataset", t.dataset.dataInfo.observedN, t.dataset.dataInfo.expectedBG, t.dataset.dataInfo.bgError )
             lmax = t.lmax()
             if False:
                 print ( f"dataset {Id}: theta_hat {t.dataset.theta_hat[0]:.3f} lsm {lsm} lmax {lmax}" )
@@ -136,7 +136,9 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         combiner.computeStatistics()
         mu_hat, sigma_mu, lmax = combiner.findMuHat(allowNegativeSignals=True,
                                                     extended_output=True)
-        print ( "muhat", mu_hat, "lmax", lmax )
+        # print ( "muhat", mu_hat, "lmax", lmax )
+        self.assertAlmostEqual ( mu_hat, 0.03533022229777052, 4 )
+        self.assertAlmostEqual ( lmax, 0.00010754284992636553, 4 )
 
 if __name__ == "__main__":
     unittest.main()
