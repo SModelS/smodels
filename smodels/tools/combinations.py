@@ -157,7 +157,8 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
             try:
                 index = datasets.index(srName)
             except ValueError:
-                logger.error("%s signal region provided in globalInfo is not in the list of datasets" % srName)
+                line = f"{srName} signal region provided in globalInfo is not in the list of datasets"
+                raise ValueError(line)
             sig = nsig[index]
             subSig.append(sig)
         nsignals.append(subSig)
