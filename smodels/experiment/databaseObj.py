@@ -655,7 +655,7 @@ class SubDatabase(object):
                     return ( "./", "%s" % filename )
         r2=requests.get ( r.json()["url"], stream=True, timeout=(250,2000) )
         # filename= os.path.join ( cDir, r2.url.split("/")[-1] )
-        msg = "caching the downloaded database in %s." % cDir
+        msg = "downloading the database from %s and caching in %s." % ( path, cDir )
         if defused:
             msg += " If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'."
         logger.warning ( msg )
