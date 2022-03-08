@@ -159,8 +159,8 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder):
         i += 1
         b += (i**2.)*sigma_mu
         if i > ntrials:
-            for b in [1., 0., 10., -1.]:
-                if rootfinder(b) > 0.:
+            for b in [1., 0., 3., -1., 10., -3., .1, -.1, -10., 100. ]:
+                if rootfinder(b) < 0.:
                     foundExtra = True
                     break
             if not foundExtra:

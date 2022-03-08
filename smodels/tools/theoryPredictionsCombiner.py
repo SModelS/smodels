@@ -16,7 +16,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
 from smodels.tools.statistics import rootFromNLLs, determineBrentBracket
 import scipy.optimize as optimize
-
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 class TheoryPredictionsCombiner(object):
     """
@@ -32,6 +32,8 @@ class TheoryPredictionsCombiner(object):
         :param deltas_rel: relative uncertainty in signal (float).
                            Default value is 20%.
         """
+        if len(theoryPredictions)==0:
+            raise SModelSError ( "asking to combine zero theory predictions" )
         self.theoryPredictions = theoryPredictions
         self.slhafile = slhafile
         self.marginalize = marginalize
@@ -296,7 +298,8 @@ class TheoryPredictionsCombiner(object):
                                   useCached=False)
             nllA = self.likelihood(mu, expected="posteriori", nll=True,
                                    useCached=False)
-            return rootFromNLLs(nllA, nll0A, nll, nll0)
+            ret = rootFromNLLs(nllA, nll0A, nll, nll0)
+            return ret
 
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot)
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
