@@ -65,6 +65,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
 
     def testByHandComputed ( self ):
         """ a unit test where in the comments I show the manual computations, step by step, for comparison """
+	      # see http://smodels.github.io/test/testTheoryPredCombinations.png
         dTypes = ["efficiencyMap"]
         anaids = [ "CMS-SUS-16-050-agg", "ATLAS-CONF-2013-037" ]
         dsids = [ "SRtN2", "ar8" ]
@@ -88,9 +89,6 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         smstopos = decomposer.decompose(model)
         tpreds = []
         defaultLSMs, defaultLmax = { }, { }
-        # FIXME add the exact derivation
-        # mention theta_hat
-
         # theta_hat = 0., x = 13.
         # scipy.stats.norm.pdf ( x, 13., 3. ) * scipy.stats.poisson.pmf(14, x)
         # = 0.013575602920029094, so we are actually a little off
@@ -121,7 +119,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             Id = f"{t.dataset.globalInfo.id}:{dId}"
             #print ( "Id", Id )
             lsm = t.lsm()
-            #print ( "lsm", lsm )
+            # print ( "l(mu_hat)", t.likelihood ( 0.03533022229777052 ) )
             #print ( "theta_hat", t.dataset.theta_hat )
             #print ( "dataset", t.dataset.dataInfo.observedN, t.dataset.dataInfo.expectedBG, t.dataset.dataInfo.bgError )
             lmax = t.lmax()
@@ -138,9 +136,15 @@ class CombinedTheoryPredsTest(unittest.TestCase):
                                                      extended_output=True )
         lsm = combiner.lsm()
         # print ( "muhat", mu_hat, "lmax", lmax )
-        # FIXME add the manual calculations
+	      # multiply the previous lsms, 0.013786096355236995 * 0.007423073728232388
+	      # = 0.00010233520966944002
         self.assertAlmostEqual ( lsm, 0.00010233520966944002, 4 )
+	      # mu_hat is determined numerically, but its easy to verify graphically,
+	      # see http://smodels.github.io/test/testTheoryPredCombinations.png
         self.assertAlmostEqual ( mu_hat, 0.03533022229777052, 4 )
+	      # lmax must be the product of likelihoods evaluated at mu_hat
+	      # 0.007672358984439363 * 0.014016921020572387
+	      # = 0.00010754284992636553
         self.assertAlmostEqual ( lmax, 0.00010754284992636553, 4 )
 
 if __name__ == "__main__":
