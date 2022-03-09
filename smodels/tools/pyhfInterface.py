@@ -463,8 +463,8 @@ class PyhfUpperLimitComputer:
             # Same modifiers_settings as those used when running the 'pyhf cls' command line
             msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
             model = workspace.model(modifier_settings=msettings)
-            _, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
-            # print ( "lmax best fit at", _ )
+            muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
+            # print ( "lmax best fit at", muhat )
             ret = maxNllh.tolist()
             try:
                 ret = float(ret)
