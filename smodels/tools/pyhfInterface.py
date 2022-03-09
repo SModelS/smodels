@@ -339,8 +339,9 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori
             expected
         """
-        if abs(mu)>50.:
-            logger.warning ( "likelihood of signal strengths > 50 are automatically set to 0" )
+        mumax = 20.
+        if abs(mu)>mumax:
+            logger.warning ( f"likelihoods of signal strengths |mu|= |{mu}| > {mumax} are automatically set to 0" )
             return self.exponentiateNLL ( None, not nll )
         # print ( "pyhf likelihood for", mu )
         logger.debug("Calling likelihood")
