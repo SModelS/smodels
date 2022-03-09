@@ -176,9 +176,15 @@ class TheoryPrediction(object):
         # self.computeStatistics(expected=expected)
         if useCached:
             if "llhd" in self.cachedObjs[expected] and abs(mu - 1.) < 1e-5:
-                return self.cachedObjs[expected]["llhd"]
+                llhd = self.cachedObjs[expected]["llhd"]
+                if nll:
+                    return - np.log ( llhd )
+                return llhd
             if "lsm" in self.cachedObjs[expected] and abs(mu) < 1e-5:
-                return self.cachedObjs[expected]["lsm"]
+                lsm = self.cachedObjs[expected]["lsm"]
+                if nll:
+                    return - np.log ( lsm )
+                return lsm
         lumi = self.dataset.getLumi()
         if self.dataType() == 'combined':
             srNsigDict = dict([[pred.dataset.getID(), (pred.xsection.value*lumi).asNumber()] for
