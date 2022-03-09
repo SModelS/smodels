@@ -70,6 +70,7 @@ def getLogger():
     logger.setLevel(logging.DEBUG)
     return logger
 
+countWarning = { "llhdszero": 0 }
 #logger=getLogger()
 
 class PyhfData:
@@ -341,7 +342,9 @@ class PyhfUpperLimitComputer:
         """
         mumax = 20.
         if abs(mu)>mumax:
-            logger.warning ( f"likelihoods of signal strengths |mu|= |{mu}| > {mumax} are automatically set to 0" )
+            if countWarning["llhdszero"]<1:
+                logger.warning ( f"likelihoods of signal strengths |mu|= |{mu:.1f}| > {mumax} are automatically set to 0 (will suppress similar msgs)" )
+            countWarning["llhdszero"]+=1
             return self.exponentiateNLL ( None, not nll )
         # print ( "pyhf likelihood for", mu )
         logger.debug("Calling likelihood")
@@ -350,6 +353,7 @@ class PyhfUpperLimitComputer:
         # logger.error("expected flag needs to be heeded!!!")
         with warnings.catch_warnings():
             warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
+            # warnings.filterwarnings ( "ignore", "", module="pyhf.exceptions" )
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
             if workspace_index == None:
@@ -373,9 +377,9 @@ class PyhfUpperLimitComputer:
             #bounds[model.config.poi_index] = (mu-1e-6,mu+1e-6)
             try:
                 _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model),
-                        model, return_fitted_val=True, maxiter=100 )
+                        model, return_fitted_val=True, maxiter=50 )
             except pyhf.exceptions.FailedMinimization as e:
-                logger.error ( f"pyhf fixed_poi_fit failed {e}" )
+                logger.info ( f"pyhf fixed_poi_fit failed {e}" )
                 # now we should try sth else
                 self.restore()
                 return self.exponentiateNLL ( None, not nll )
@@ -444,6 +448,7 @@ class PyhfUpperLimitComputer:
         logger.debug("Calling lmax")
         with warnings.catch_warnings():
             warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
+
             self.__init__(self.data)
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
