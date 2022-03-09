@@ -183,7 +183,7 @@ class TheoryPrediction(object):
         if self.dataType() == 'combined':
             srNsigDict = dict([[pred.dataset.getID(), (pred.xsection.value*lumi).asNumber()] for
                               pred in self.datasetPredictions])
-            srNsigs = [mu*srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.
+            srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.
                        for ds in self.dataset._datasets]
             llhd = computeCombinedLikelihood(self.dataset, srNsigs,
                           self.marginalize, self.deltas_rel, expected = expected,

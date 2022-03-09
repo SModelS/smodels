@@ -77,12 +77,14 @@ def computeCombinedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2,
                      compute expected posteriori.
     :param mu: signal strength parameter mu
     """
+    for k,v in enumerate ( nsig ):
+        nsig[k] = v * mu
     if dataset.type == "pyhf":
         # Getting the path to the json files
         # Loading the jsonFiles
         ulcomputer = _getPyhfComputer(dataset, nsig, False)
         index = ulcomputer.getBestCombinationIndex()
-        lbsm = ulcomputer.likelihood( mu = mu, workspace_index = index, 
+        lbsm = ulcomputer.likelihood( mu = 1., workspace_index = index, 
                                       expected = expected  )
         return lbsm
     lbsm = combinedSimplifiedLikelihood(dataset, nsig, marginalize, deltas_rel,
