@@ -365,11 +365,11 @@ class PyhfUpperLimitComputer:
             msettings = { 'normsys': {'interpcode': 'code4'}, 
                           'histosys': {'interpcode': 'code4p'}}
             model = workspace.model(modifier_settings=msettings)
-            bounds = model.config.suggested_bounds()
-            bounds[model.config.poi_index] = (mu-1e-6,mu+1e-6)
+            #bounds = model.config.suggested_bounds()
+            #bounds[model.config.poi_index] = (mu-1e-6,mu+1e-6)
             try:
                 _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model),
-                        model, return_fitted_val=True, par_bounds=bounds )
+                        model, return_fitted_val=True ) # , par_bounds=bounds )
             except pyhf.exceptions.FailedMinimization as e:
                 logger.error ( f"pyhf fixed_poi_fit failed {e}" )
                 # now we should try sth else
@@ -384,7 +384,7 @@ class PyhfUpperLimitComputer:
                 ret = float(ret[0])
             self.data.cached_likelihoods[workspace_index]=ret #THIS CAN STAY BC IT MAY BE NEEDED ELSEWHERE IN THE CODE
             ret = self.exponentiateNLL ( ret, not nll )
-            print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
+            # print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
             self.restore()
             return ret
 
