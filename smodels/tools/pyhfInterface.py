@@ -13,6 +13,7 @@ import jsonpatch
 import warnings
 import jsonschema
 import importlib.metadata
+import copy
 
 if importlib.metadata.version("jsonschema")[0] == "2":
 #if jsonschema.__version__[0] == "2": ## deprecated
@@ -320,6 +321,12 @@ class PyhfUpperLimitComputer:
                 workspaces.append(ws)
             return workspaces
 
+    def backup ( self ):
+        self.bu_signal = copy.deepcopy ( self.data.nsignals )
+
+    def restore ( self ):
+        self.data.nsignals = copy.deepcopy ( self.bu_signal )
+
     def likelihood( self, mu=1., workspace_index=None, nll=False,
                     expected=False ):
         """
@@ -343,6 +350,11 @@ class PyhfUpperLimitComputer:
                 workspace_index = self.getBestCombinationIndex()
             if workspace_index == None:
                 return None
+            self.backup()
+            if abs ( mu-1.) > 1e-6:
+                for i,ns in enumerate ( self.data.nsignals ):
+                    for j,v in enumerate ( ns ):
+                        self.data.nsignals[i][j]=v*mu
             self.__init__(self.data)
             ### allow this, for computation of l_SM
             #if self.zeroSignalsFlag[workspace_index] == True:
@@ -350,17 +362,19 @@ class PyhfUpperLimitComputer:
             #    return None
             workspace = self.updateWorkspace(workspace_index, expected = expected)
             # Same modifiers_settings as those used when running the 'pyhf cls' command line
-            msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
+            msettings = { 'normsys': {'interpcode': 'code4'}, 
+                          'histosys': {'interpcode': 'code4p'}}
             model = workspace.model(modifier_settings=msettings)
             bounds = model.config.suggested_bounds()
             bounds[model.config.poi_index] = (mu-1e-6,mu+1e-6)
             try:
-                _, nllh = pyhf.infer.mle.fixed_poi_fit( mu, workspace.data(model),
-                        model, return_fitted_val=True, par_bounds = bounds )
+                _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model),
+                        model, return_fitted_val=True, par_bounds=bounds )
             except pyhf.exceptions.FailedMinimization as e:
                 logger.error ( f"pyhf fixed_poi_fit failed {e}" )
                 # now we should try sth else
-                return float("nan")
+                self.restore()
+                return elf.exponentiateNLL ( 1e-60, not nll )
 
             # print ( "likelihood best fit", _ )
             ret = nllh.tolist()
@@ -370,7 +384,8 @@ class PyhfUpperLimitComputer:
                 ret = float(ret[0])
             self.data.cached_likelihoods[workspace_index]=ret #THIS CAN STAY BC IT MAY BE NEEDED ELSEWHERE IN THE CODE
             ret = self.exponentiateNLL ( ret, not nll )
-            # print ( "now entering the fit mu=", mu, "llhd", ret )
+            print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
+            self.restore()
             return ret
 
     def getBestCombinationIndex( self ):
@@ -514,6 +529,7 @@ class PyhfUpperLimitComputer:
                 bounds[model.config.poi_index] = (0,10)
                 start = time.time()
                 stat = "qtilde" # by default
+                # stat = "q" # if it were bounded at zero
                 args = {}
                 args["return_expected"] = ( expected == "posteriori" )
                 args["par_bounds"] = bounds
