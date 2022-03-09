@@ -339,6 +339,9 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori
             expected
         """
+        if abs(mu)>50.:
+            logger.warning ( "likelihood of signal strengths > 50 are automatically set to 0" )
+            return self.exponentiateNLL ( None, not nll )
         # print ( "pyhf likelihood for", mu )
         logger.debug("Calling likelihood")
         if type(workspace_index ) == float:
@@ -369,12 +372,12 @@ class PyhfUpperLimitComputer:
             #bounds[model.config.poi_index] = (mu-1e-6,mu+1e-6)
             try:
                 _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model),
-                        model, return_fitted_val=True ) # , par_bounds=bounds )
+                        model, return_fitted_val=True, maxiter=100 )
             except pyhf.exceptions.FailedMinimization as e:
                 logger.error ( f"pyhf fixed_poi_fit failed {e}" )
                 # now we should try sth else
                 self.restore()
-                return elf.exponentiateNLL ( 1e-60, not nll )
+                return self.exponentiateNLL ( None, not nll )
 
             # print ( "likelihood best fit", _ )
             ret = nllh.tolist()
@@ -417,6 +420,10 @@ class PyhfUpperLimitComputer:
     def exponentiateNLL ( self, twice_nll, doIt ):
         """ if doIt, then compute likelihood from nll,
             else return nll """
+        if twice_nll == None:
+            if doIt:
+                return 0.
+            return 9000.
         if doIt:
             return np.exp(-twice_nll/2.)
         return twice_nll / 2.
