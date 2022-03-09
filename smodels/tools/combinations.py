@@ -80,11 +80,9 @@ def computeCombinedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2,
     if dataset.type == "pyhf":
         # Getting the path to the json files
         # Loading the jsonFiles
-        for k,v in enumerate ( nsig ):
-            nsig[k] = v * mu
         ulcomputer = _getPyhfComputer(dataset, nsig, False)
         index = ulcomputer.getBestCombinationIndex()
-        lbsm = ulcomputer.likelihood( mu = 1., workspace_index = index, 
+        lbsm = ulcomputer.likelihood( mu = mu, workspace_index = index,
                                       expected = expected  )
         return lbsm
     lbsm = combinedSimplifiedLikelihood(dataset, nsig, marginalize, deltas_rel,
@@ -104,18 +102,18 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
         # Loading the jsonFiles
         ulcomputer = _getPyhfComputer(dataset, nsig, False)
         index = ulcomputer.getBestCombinationIndex()
-        lbsm = ulcomputer.likelihood( mu = 1., workspace_index = index, 
+        lbsm = ulcomputer.likelihood( mu = 1., workspace_index = index,
                                       expected=expected )
         lmax = ulcomputer.lmax( workspace_index = index, expected=expected )
         ulcomputer = _getPyhfComputer(dataset, [0.]*len(nsig), False)
-        lsm = ulcomputer.likelihood( mu = 0., workspace_index = index, 
+        lsm = ulcomputer.likelihood( mu = 0., workspace_index = index,
                                      expected=expected )
         return lbsm, lmax, lsm
     lbsm = combinedSimplifiedLikelihood(dataset, nsig, marginalize, deltas_rel,
                          expected=expected)
     lmax = combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel,
                          expected=expected)
-    lsm = combinedSimplifiedLikelihood(dataset, [0.]*len(nsig), marginalize, 
+    lsm = combinedSimplifiedLikelihood(dataset, [0.]*len(nsig), marginalize,
                          deltas_rel, expected=expected)
     if lsm > lmax:
         lmax = lsm
@@ -210,7 +208,7 @@ def combinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.
                                        deltas_rel=deltas_rel))
     return computer.likelihood(nsig, marginalize=marginalize)
 
-def combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel, nll=False, 
+def combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel, nll=False,
         expected=False, allowNegativeSignals=False ):
     """ compute likelihood at maximum, for simplified likelihoods only """
     if dataset.type != "simplified":
