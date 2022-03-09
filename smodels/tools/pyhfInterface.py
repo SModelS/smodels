@@ -354,8 +354,14 @@ class PyhfUpperLimitComputer:
             model = workspace.model(modifier_settings=msettings)
             bounds = model.config.suggested_bounds()
             bounds[model.config.poi_index] = (mu-1e-6,mu+1e-6)
-            _, nllh = pyhf.infer.mle.fixed_poi_fit( mu, workspace.data(model), model,
-                                       return_fitted_val=True, par_bounds = bounds )
+            try:
+                _, nllh = pyhf.infer.mle.fixed_poi_fit( mu, workspace.data(model),
+                        model, return_fitted_val=True, par_bounds = bounds )
+            except pyhf.exceptions.FailedMinimization as e:
+                logger.error ( f"pyhf fixed_poi_fit failed {e}" )
+                # now we should try sth else
+                return float("nan")
+
             # print ( "likelihood best fit", _ )
             ret = nllh.tolist()
             try:

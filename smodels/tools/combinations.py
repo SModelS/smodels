@@ -77,18 +77,18 @@ def computeCombinedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2,
                      compute expected posteriori.
     :param mu: signal strength parameter mu
     """
-    for k,v in enumerate ( nsig ):
-        nsig[k] = v * mu
     if dataset.type == "pyhf":
         # Getting the path to the json files
         # Loading the jsonFiles
+        for k,v in enumerate ( nsig ):
+            nsig[k] = v * mu
         ulcomputer = _getPyhfComputer(dataset, nsig, False)
         index = ulcomputer.getBestCombinationIndex()
         lbsm = ulcomputer.likelihood( mu = 1., workspace_index = index, 
                                       expected = expected  )
         return lbsm
     lbsm = combinedSimplifiedLikelihood(dataset, nsig, marginalize, deltas_rel,
-                expected = expected )
+                expected = expected, mu = mu )
     return lbsm
 
 
@@ -178,7 +178,7 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
 
 
 def combinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2,
-        expected=False):
+        expected=False, mu = 1. ):
     """
     Computes the combined simplified likelihood to observe nobs events, given a
     predicted signal "nsig", with nsig being a vector with one entry per
@@ -187,8 +187,11 @@ def combinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.
     :param nsig: predicted signal (list)
     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
     :param expected: compute expected likelihood, not observed
+    :param mu: signal strength parameter mu
     :returns: likelihood to observe nobs events (float)
     """
+    for k,v in enumerate ( nsig ):
+        nsig[k] = v * mu
 
     if dataset.type != "simplified":
         logger.error("Asked for combined simplified likelihood, but no covariance given: %s" % dataset.type )
