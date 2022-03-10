@@ -52,6 +52,8 @@ except pyhf.exceptions.ImportBackendError as e:
 from scipy import optimize
 import numpy as np
 from smodels.tools.smodelsLogging import logger
+import logging
+logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 
 def getLogger():
     """
@@ -326,7 +328,10 @@ class PyhfUpperLimitComputer:
         self.bu_signal = copy.deepcopy ( self.data.nsignals )
 
     def restore ( self ):
+        if not hasattr ( self, "bu_signal" ):
+            return
         self.data.nsignals = copy.deepcopy ( self.bu_signal )
+        del self.bu_signal
 
     def likelihood( self, mu=1., workspace_index=None, nll=False,
                     expected=False ):
@@ -359,28 +364,29 @@ class PyhfUpperLimitComputer:
             if workspace_index == None:
                 return None
             self.backup()
-            if abs ( mu-1.) > 1e-6:
-                for i,ns in enumerate ( self.data.nsignals ):
-                    for j,v in enumerate ( ns ):
-                        self.data.nsignals[i][j]=v*mu
-            self.__init__(self.data)
-            ### allow this, for computation of l_SM
-            #if self.zeroSignalsFlag[workspace_index] == True:
-            #    logger.warning("Workspace number %d has zero signals" % workspace_index)
-            #    return None
-            workspace = self.updateWorkspace(workspace_index, expected = expected)
-            # Same modifiers_settings as those used when running the 'pyhf cls' command line
-            msettings = { 'normsys': {'interpcode': 'code4'}, 
-                          'histosys': {'interpcode': 'code4p'}}
-            model = workspace.model(modifier_settings=msettings)
-            #bounds = model.config.suggested_bounds()
-            #bounds[model.config.poi_index] = (mu-1e-6,mu+1e-6)
             try:
+                if abs ( mu-1.) > 1e-6:
+                    for i,ns in enumerate ( self.data.nsignals ):
+                        for j,v in enumerate ( ns ):
+                            self.data.nsignals[i][j]=v*mu
+                self.__init__(self.data)
+                ### allow this, for computation of l_SM
+                #if self.zeroSignalsFlag[workspace_index] == True:
+                #    logger.warning("Workspace number %d has zero signals" % workspace_index)
+                #    return None
+                workspace = self.updateWorkspace(workspace_index, expected = expected)
+                # Same modifiers_settings as those used when running the 'pyhf cls' command line
+                msettings = { 'normsys': {'interpcode': 'code4'}, 
+                              'histosys': {'interpcode': 'code4p'}}
+                model = workspace.model(modifier_settings=msettings)
                 _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model),
                         model, return_fitted_val=True, maxiter=50 )
-            except pyhf.exceptions.FailedMinimization as e:
+            except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.info ( f"pyhf fixed_poi_fit failed {e}" )
                 # now we should try sth else
+                self.restore()
+                return self.exponentiateNLL ( None, not nll )
+            except:
                 self.restore()
                 return self.exponentiateNLL ( None, not nll )
 
@@ -463,9 +469,16 @@ class PyhfUpperLimitComputer:
             # Same modifiers_settings as those used when running the 'pyhf cls' command line
             msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
             model = workspace.model(modifier_settings=msettings)
-            muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
+            try:
+                muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
+            except (pyhf.exceptions.FailedMinimization, ValueError) as e:
+                logger.error ( f"pyhf mle.fit failed {e}" )
+                muhat, maxNllh = float("nan"), float("nan")
             # print ( "lmax best fit at", muhat )
-            ret = maxNllh.tolist()
+            try:
+                ret = maxNllh.tolist()
+            except:
+                ret = maxNllh
             try:
                 ret = float(ret)
             except:
@@ -539,7 +552,7 @@ class PyhfUpperLimitComputer:
                 msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
                 model = workspace.model(modifier_settings=msettings)
                 bounds = model.config.suggested_bounds()
-                bounds[model.config.poi_index] = (0,10)
+                bounds[model.config.poi_index] = (-5,10)
                 start = time.time()
                 stat = "qtilde" # by default
                 # stat = "q" # if it were bounded at zero
@@ -555,7 +568,10 @@ class PyhfUpperLimitComputer:
                     if pyhfinfo["backend"] == "numpy":
                         sup.filter ( RuntimeWarning, r'invalid value encountered in log')
                     # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
-                    result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
+                    try:
+                        result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
+                    except:
+                        result = float("nan")
                 end = time.time()
                 logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
                 if expected == "posteriori":
