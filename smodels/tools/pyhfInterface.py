@@ -376,7 +376,7 @@ class PyhfUpperLimitComputer:
                 #    return None
                 workspace = self.updateWorkspace(workspace_index, expected = expected)
                 # Same modifiers_settings as those used when running the 'pyhf cls' command line
-                msettings = { 'normsys': {'interpcode': 'code4'}, 
+                msettings = { 'normsys': {'interpcode': 'code4'},
                               'histosys': {'interpcode': 'code4p'}}
                 model = workspace.model(modifier_settings=msettings)
                 _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model),
@@ -543,6 +543,9 @@ class PyhfUpperLimitComputer:
                 logger.debug("Best combination index not found")
                 return None
 
+            stat = "qtilde" # by default
+
+
             def root_func(mu):
                 # If expected == False, use unmodified (but patched) workspace
                 # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
@@ -554,11 +557,11 @@ class PyhfUpperLimitComputer:
                 bounds = model.config.suggested_bounds()
                 bounds[model.config.poi_index] = (-5,10)
                 start = time.time()
-                stat = "qtilde" # by default
                 # stat = "q" # if it were bounded at zero
                 args = {}
                 args["return_expected"] = ( expected == "posteriori" )
                 args["par_bounds"] = bounds
+                args["maxiter"] = 100
                 pver = float ( pyhf.__version__[:3] )
                 if pver < 0.6:
                     args["qtilde"]=True
@@ -596,12 +599,12 @@ class PyhfUpperLimitComputer:
             # print ( "starting with expected", expected )
             while "mu is not in [lo_mu,hi_mu]":
                 nattempts += 1
-                if nNan > 5:
-                    logger.warning("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
+                if nNan > 5 and stat == "qtilde":
+                    logger.info("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
                     stat = "q"
                     # nattempts = 0
                 if nattempts > 10:
-                    logger.warning ( "tried 10 times to determine the bounds for brent bracketing. we abort now." )
+                    logger.info ( "tried 10 times to determine the bounds for brent bracketing. we abort now." )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
                 rt1 = root_func(lo_mu)
