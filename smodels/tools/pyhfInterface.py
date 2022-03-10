@@ -552,7 +552,7 @@ class PyhfUpperLimitComputer:
                 msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
                 model = workspace.model(modifier_settings=msettings)
                 bounds = model.config.suggested_bounds()
-                bounds[model.config.poi_index] = (-5,10)
+                bounds[model.config.poi_index] = (0,10)
                 start = time.time()
                 stat = "qtilde" # by default
                 # stat = "q" # if it were bounded at zero
