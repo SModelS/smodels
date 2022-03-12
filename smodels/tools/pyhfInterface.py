@@ -88,6 +88,7 @@ class PyhfData:
         self.inputJsons = inputJsons
         self.cached_likelihoods = {} ## cache of likelihoods (actually twice_nlls)
         self.cached_lmaxes = {} # cache of lmaxes (actually twice_nlls)
+        self.cachedULs = { False: {}, True: {}, "posteriori": {} }
         self.jsonFiles = jsonFiles
         self.combinations = None
         if jsonFiles != None:
@@ -404,11 +405,11 @@ class PyhfUpperLimitComputer:
 
     def getBestCombinationIndex( self ):
         """ find the index of the best expected combination """
+        if self.nWS == 1:
+            return 0
         logger.debug("Finding best expected combination among %d workspace(s)" % self.nWS)
         ulMin = float('+inf')
         i_best = None
-        if self.nWS == 1:
-            return 0
         for i_ws in range(self.nWS):
             if self.zeroSignalsFlag[i_ws] == True:
                 logger.debug("Workspace number %d has zero signals" % i_ws)
@@ -526,6 +527,8 @@ class PyhfUpperLimitComputer:
                                 - else: choose best combo
         :return: the upper limit at `self.cl` level (0.95 by default)
         """
+        if workspace_index in self.data.cachedULs[expected]:
+            return self.data.cachedULs[expected][workspace_index]
         with warnings.catch_warnings():
             warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
             startUL = time.time()
@@ -543,7 +546,7 @@ class PyhfUpperLimitComputer:
                 logger.debug("Best combination index not found")
                 return None
 
-            def root_func(mu):
+            def root_func(mu ):
                 # If expected == False, use unmodified (but patched) workspace
                 # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
                 # If expected == posteriori, use unmodified (but patched) workspace
@@ -554,12 +557,12 @@ class PyhfUpperLimitComputer:
                 bounds = model.config.suggested_bounds()
                 bounds[model.config.poi_index] = (0,10)
                 start = time.time()
-                stat = "qtilde" # by default
-                # stat = "q" # if it were bounded at zero
                 args = {}
                 args["return_expected"] = ( expected == "posteriori" )
                 args["par_bounds"] = bounds
+                # args["maxiter"]=100000
                 pver = float ( pyhf.__version__[:3] )
+                stat = "qtilde"
                 if pver < 0.6:
                     args["qtilde"]=True
                 else:
@@ -574,6 +577,7 @@ class PyhfUpperLimitComputer:
                         result = float("nan")
                 end = time.time()
                 logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
+                logger.debug(f"result for {mu} {result}" )
                 if expected == "posteriori":
                     logger.debug('computing a-posteriori expected limit')
                     logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
@@ -597,16 +601,16 @@ class PyhfUpperLimitComputer:
             while "mu is not in [lo_mu,hi_mu]":
                 nattempts += 1
                 if nNan > 5:
-                    logger.warning("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
-                    stat = "q"
+                    #logger.warning("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
+                    return None
                     # nattempts = 0
                 if nattempts > 10:
                     logger.warning ( "tried 10 times to determine the bounds for brent bracketing. we abort now." )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-                rt1 = root_func(lo_mu)
+                rt1 = root_func(lo_mu )
                 # rt5 = root_func(med_mu)
-                rt10 = root_func(hi_mu)
+                rt10 = root_func(hi_mu )
                 # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
                 if rt1 < 0. and 0. < rt10: # Here's the real while condition
                     break
@@ -660,7 +664,7 @@ class PyhfUpperLimitComputer:
             ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
             endUL = time.time()
             logger.debug("ulSigma elpased time : %1.4f secs" % (endUL - startUL))
-            # print ( "we found", ul )
+            self.data.cachedULs[expected][workspace_index]=ul*self.scale
             return ul*self.scale # self.scale has been updated within self.rescale() method
 
 if __name__ == "__main__":
