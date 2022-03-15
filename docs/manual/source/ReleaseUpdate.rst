@@ -189,31 +189,31 @@ New in Version 1.1.3:
 New in Version 1.1.2:
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Database update only, the code is the same as v1.1.1
+  * Database update only, the code is the same as v1.1.1
 
 New in Version 1.1.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
-* |Cpp|
-* Support for pythia8 (see :ref:`Cross Section Calculator <xsecCalc>`)
-* improved binary database
-* automated SLHA and LHE file detection
-* Fix and improvements for missing topologies
-* Added SLHA-type output
-* Small improvements in interpolation and clustering
+  * |Cpp|
+  * Support for pythia8 (see :ref:`Cross Section Calculator <xsecCalc>`)
+  * improved binary database
+  * automated SLHA and LHE file detection
+  * Fix and improvements for missing topologies
+  * Added SLHA-type output
+  * Small improvements in interpolation and clustering
 
 
 New in Version 1.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-* the inclusion of efficiency maps (see |EMrs|)
-* a new and more flexible database format (see :ref:`Database structure <databaseStruct>`)
-* inclusion of likelihood and :math:`\chi^2` calculation for |EMrs|
-  (see :ref:`likelihood calculation <likelihoodCalc>`)
-* extended information on the :ref:`topology coverage <topCoverage>`
-* inclusion of a database broswer tool for easy access to the information
-  stored in the database (see :ref:`database browser <databaseBrowser>`)
-* the database now supports also a more efficient :ref:`binary format <databasePickle>`
-* performance improvement for the |decomposition| of the input model
-* inclusion of new simplified results to the |database| (including a few 13 TeV results)
-* |Fastlim| efficiency maps can now also be used in SModelS
+  * the inclusion of efficiency maps (see |EMrs|)
+  * a new and more flexible database format (see :ref:`Database structure <databaseStruct>`)
+  * inclusion of likelihood and :math:`\chi^2` calculation for |EMrs|
+    (see :ref:`likelihood calculation <likelihoodCalc>`)
+  * extended information on the :ref:`topology coverage <topCoverage>`
+  * inclusion of a database broswer tool for easy access to the information
+    stored in the database (see :ref:`database browser <databaseBrowser>`)
+  * the database now supports also a more efficient :ref:`binary format <databasePickle>`
+  * performance improvement for the |decomposition| of the input model
+  * inclusion of new simplified results to the |database| (including a few 13 TeV results)
+  * |Fastlim| efficiency maps can now also be used in SModelS
