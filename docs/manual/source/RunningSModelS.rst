@@ -141,7 +141,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileCombineSRs:
 
-  * **combineSRs** (True/False): set to True to combine signal regions in |EMrs| when covariance matrix or pyhf JSON likelihood is available. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards for covariance matrices and v1.2.4 onwards for full likelihoods (using pyhf). 
+  * **combineSRs** (True/False): set to True to combine signal regions in |EMrs| when covariance matrix or pyhf JSON likelihood is available. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards for covariance matrices and v1.2.4 onwards for full likelihoods (using pyhf).
 
 .. _parameterFileReportAllSRs:
 
@@ -161,7 +161,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileModel:
 
-  * **model**: pathname to the Python file that defines the particle content of the BSM model, given either in Unix file notation ("/path/to/model.py") or as Python module path ("path.to.model"). Defaults to *share.models.mssm* which is a standard MSSM. See smodels/share/models folder for more examples. Directory name can be omitted; in that case, the current working directory as well as smodels/share/models are searched for.
+  * **model**: pathname to the Python file that defines the particle content of the BSM model or to a SLHA file containing QNUMBERS blocks for the BSM particles (see :ref:`Basic Input <BasicInput>`). The Python file can be given either in Unix file notation ("/path/to/model.py") or as Python module path ("path.to.model"). Defaults to *share.models.mssm* which is a standard MSSM. See smodels/share/models folder for more examples. Directory name can be omitted; in that case, the current working directory as well as smodels/share/models are searched for.
 
 .. _promptWidth:
 
