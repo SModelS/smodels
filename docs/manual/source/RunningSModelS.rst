@@ -81,7 +81,7 @@ in several available formats.
 
 Starting on v1.1, *runSModelS.py* is equipped with two additional
 functionalities. First, it can process a folder containing a set of SLHA or LHE
-file, second, it supports parallelization of this input folder.
+files, second, it supports parallelization of this input folder.
 
 
 
