@@ -381,7 +381,7 @@ class PyhfUpperLimitComputer:
                               'histosys': {'interpcode': 'code4p'}}
                 model = workspace.model(modifier_settings=msettings)
                 _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model),
-                        model, return_fitted_val=True, maxiter=50 )
+                        model, return_fitted_val=True, maxiter=200 )
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.info ( f"pyhf fixed_poi_fit failed {e}" )
                 # now we should try sth else
