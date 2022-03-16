@@ -49,9 +49,9 @@ New in Version 2.2.0:
   * small fixes in the :ref:`Howto's <Examples>`
   * updates in references.bib, installation notes
   * more small fixes in unit tests
-  * Database extension, added new results from 3 ATLAS and 9 CMS analyses:
+  * Database extension, added new results from 4 ATLAS and 9 CMS analyses:
      - results from ATLAS: 
-       ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
+       ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2018-41 (UL), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
      - results from CMS:
        CMS-SUS-18-004 (UL), CMS-SUS-18-007 (UL), CMS-SUS-19-008 (UL), CMS-SUS-19-011 (UL), CMS-SUS-20-001 (UL), CMS-SUS-20-002 (UL)
      - recast with MadAnalysis5:
