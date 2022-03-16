@@ -441,7 +441,7 @@ class PyhfUpperLimitComputer:
         return twice_nll / 2.
 
     def lmax( self, workspace_index=None, nll=False,
-              expected=False ):
+              expected=False, allowNegativeSignals = False ):
         """
         Returns the negative log max likelihood
         :param nll: if true, return nll, not llhd
@@ -450,6 +450,7 @@ class PyhfUpperLimitComputer:
         :param expected: if False, compute expected values, if True,
             compute a priori expected, if "posteriori" compute posteriori
             expected
+        :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
         """
         # logger.error("expected flag needs to be heeded!!!")
         logger.debug("Calling lmax")
@@ -471,11 +472,16 @@ class PyhfUpperLimitComputer:
             msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
             model = workspace.model(modifier_settings=msettings)
             try:
-                muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True)
+                bounds = model.config.suggested_bounds()
+                if allowNegativeSignals:
+                    bounds[model.config.poi_index] = (-5., 10. )
+                muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True, par_bounds = bounds )
+                muhat = muhat[model.config.poi_index]*self.scale
+
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.error ( f"pyhf mle.fit failed {e}" )
                 muhat, maxNllh = float("nan"), float("nan")
-            # print ( "lmax best fit at", muhat )
+            self.muhat = muhat
             try:
                 ret = maxNllh.tolist()
             except:

@@ -347,6 +347,9 @@ class DataSet(object):
         if hasattr ( computer, "theta_hat" ):
             ## seems like someone wants to debug them
             self.theta_hat = computer.theta_hat
+        if hasattr ( computer, "muhat" ):
+            ## seems like someone wants to debug them
+            self.muhat = computer.muhat
         return ret
 
     def chi2(self, nsig, deltas_rel=0.2, marginalize=False):

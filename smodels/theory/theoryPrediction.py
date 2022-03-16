@@ -150,6 +150,14 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["lmax"] = None
         return self.cachedObjs[expected]["lmax"]
 
+    def muhat(self, expected=False):
+        """ position of maximum likelihood  """
+        if not "muhat" in self.cachedObjs[expected]:
+            self.computeStatistics(expected)
+        if not "muhat" in self.cachedObjs[expected]:
+            self.cachedObjs[expected]["muhat"] = None
+        return self.cachedObjs[expected]["muhat"]
+
     def chi2(self, expected=False):
         if not "chi2" in self.cachedObjs[expected]:
             self.computeStatistics(expected)
@@ -251,7 +259,7 @@ class TheoryPrediction(object):
         nsig = None
         if mu is not None:
             nsig = mu*(self.xsection.value*lumi).asNumber()
-        llhd = likelihoodFromLimits(ulN, eulN, nsig,
+        llhd, muhat = likelihoodFromLimits(ulN, eulN, nsig,
                                     allowNegativeMuhat=True, corr=corr)
         if chi2also:
             return (llhd, chi2FromLimits(llhd, ulN, eulN, corr=corr))
@@ -273,6 +281,7 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"] = lmax
             self.cachedObjs[expected]["chi2"] = chi2
+            self.cachedObjs[expected]["muhat"] = None
 
         elif self.dataType() == 'efficiencyMap':
             lumi = self.dataset.getLumi()
@@ -284,9 +293,13 @@ class TheoryPrediction(object):
             llhd_max = self.dataset.lmax(marginalize=self.marginalize,
                     deltas_rel=self.deltas_rel,
                     allowNegativeSignals=False, expected=expected)
+            muhat = None
+            if hasattr ( self.dataset, "muhat" ):
+                muhat = self.dataset.muhat
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = llhd_sm
             self.cachedObjs[expected]["lmax"] = llhd_max
+            self.cachedObjs[expected]["muhat"] = muhat
             from smodels.tools.statistics import chi2FromLmax
             self.cachedObjs[expected]["chi2"] = chi2FromLmax ( llhd, llhd_max )
 
@@ -296,11 +309,12 @@ class TheoryPrediction(object):
             srNsigDict = dict([[pred.dataset.getID(), (pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
             srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
             # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
-            llhd, lmax, lsm = computeCombinedStatistics(self.dataset, srNsigs,
+            llhd, lmax, lsm, muhat = computeCombinedStatistics(self.dataset, srNsigs,
                                self.marginalize, self.deltas_rel, expected=expected )
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"] = lmax
+            self.cachedObjs[expected]["muhat"] = muhat
             from smodels.tools.statistics import chi2FromLmax
             self.cachedObjs[expected]["chi2"] = chi2FromLmax ( llhd, lmax )
 

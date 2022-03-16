@@ -120,6 +120,13 @@ class TheoryPredictionsCombiner(object):
             self.cachedObjs[expected]["lmax"] = None
         return self.cachedObjs[expected]["lmax"]
 
+    def muhat( self, expected=False ):
+        if "muhat" not in self.cachedObjs[expected]:
+            self.computeStatistics(expected=expected)
+        if "muhat" not in self.cachedObjs[expected]:
+            self.cachedObjs[expected]["muhat"] = None
+        return self.cachedObjs[expected]["muhat"]
+
     def chi2(self, expected=False):
         if "llhd" not in self.cachedObjs[expected] or "lmax" not in self.cachedObjs[expected]:
             logger.error("call computeStatistics before calling chi2")
@@ -197,6 +204,7 @@ class TheoryPredictionsCombiner(object):
             self.cachedObjs[expected]["lmax"] = lsm
         self.mu_hat, self.sigma_mu, lmax = self.findMuHat(extended_output=True)
         self.cachedObjs[expected]["lmax"] = lmax
+        self.cachedObjs[expected]["muhat"] = self.mu_hat
 
     def totalXsection(self):
         ret = 0.*fb
