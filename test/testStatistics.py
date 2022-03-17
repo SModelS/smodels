@@ -70,7 +70,7 @@ class StatisticsTest(unittest.TestCase):
 
         for nsig in [0, 5]:
             for allowNegatives in [False, True]:
-                llhdlim = likelihoodFromLimits(4.5, 5.45, nsig, False, allowNegatives)
+                llhdlim, muhat = likelihoodFromLimits(4.5, 5.45, nsig, False, allowNegatives)
                 c = comparisons[allowNegatives][nsig]
                 self.assertAlmostEqual(llhdlim, c, 2)
 
@@ -81,7 +81,7 @@ class StatisticsTest(unittest.TestCase):
 
         for nsig in [0, 3, 5]:
             for x in [0., 0.6]:
-                llhdlim = likelihoodFromLimits(8.52, 6.18, nsig, False, False,
+                llhdlim,muhat = likelihoodFromLimits(8.52, 6.18, nsig, False, False,
                           corr=x)
                 c = comparisons[x][nsig]
                 self.assertAlmostEqual(llhdlim, c, 2)
@@ -101,7 +101,7 @@ class StatisticsTest(unittest.TestCase):
         chi2dir = llhdcomp.chi2(nsig)
         llhdmarg = llhdcomp.likelihood(nsig, marginalize=True)
         chi2marg = llhdcomp.chi2(nsig, marginalize=True)
-        llhdlim = likelihoodFromLimits(ulobs, ulexp, nsig)
+        llhdlim, muhat = likelihoodFromLimits(ulobs, ulexp, nsig)
         chi2lim = chi2FromLimits(llhdlim, ulobs, ulexp)
         ## relative error on chi2, for this example is about 4%
         rel = abs(chi2lim - chi2marg) / chi2marg

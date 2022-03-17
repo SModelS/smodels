@@ -261,6 +261,8 @@ class TheoryPrediction(object):
             nsig = mu*(self.xsection.value*lumi).asNumber()
         llhd, muhat = likelihoodFromLimits(ulN, eulN, nsig,
                                     allowNegativeMuhat=True, corr=corr)
+        if mu is None:
+            self.muhat = muhat
         if chi2also:
             return (llhd, chi2FromLimits(llhd, ulN, eulN, corr=corr))
         return llhd
@@ -281,7 +283,7 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"] = lmax
             self.cachedObjs[expected]["chi2"] = chi2
-            self.cachedObjs[expected]["muhat"] = None
+            self.cachedObjs[expected]["muhat"] = self.muhat
 
         elif self.dataType() == 'efficiencyMap':
             lumi = self.dataset.getLumi()

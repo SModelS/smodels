@@ -118,8 +118,10 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
                          deltas_rel, expected=expected)
     if lsm > lmax:
         lmax = lsm
+        muhat = 0.
     if lbsm > lmax:
         lmax = lbsm
+        muhat = 1.
     return lbsm, lmax, lsm, muhat
 
 
