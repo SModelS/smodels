@@ -91,7 +91,7 @@ def computeCombinedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2,
 
 
 def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
-                              expected=False):
+                              expected=False, allowNegativeSignals = False ):
     """ compute lBSM, lmax, and LSM in a single run
     :param nsig: predicted signal (list)
     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
@@ -104,18 +104,19 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
         index = ulcomputer.getBestCombinationIndex()
         lbsm = ulcomputer.likelihood( mu = 1., workspace_index = index,
                                       expected=expected )
-        lmax = ulcomputer.lmax( workspace_index = index, expected=expected )
+        lmax = ulcomputer.lmax( workspace_index = index, expected=expected,
+               allowNegativeSignals = allowNegativeSignals )
         muhat = float ( ulcomputer.muhat )
         ulcomputer = _getPyhfComputer(dataset, [0.]*len(nsig), False)
         lsm = ulcomputer.likelihood( mu = 0., workspace_index = index,
                                      expected=expected )
         return lbsm, lmax, lsm, muhat
     lbsm = combinedSimplifiedLikelihood(dataset, nsig, marginalize, deltas_rel,
-                         expected=expected)
+                     expected=expected)
     lmax, muhat = combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel,
-                         expected=expected)
+                     expected=expected, allowNegativeSignals = allowNegativeSignals)
     lsm = combinedSimplifiedLikelihood(dataset, [0.]*len(nsig), marginalize,
-                         deltas_rel, expected=expected)
+                     deltas_rel, expected=expected)
     if lsm > lmax:
         lmax = lsm
         muhat = 0.
