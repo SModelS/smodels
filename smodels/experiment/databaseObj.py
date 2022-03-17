@@ -678,6 +678,11 @@ class SubDatabase(object):
                 print( "" )
             fcntl.lockf ( dump, fcntl.LOCK_UN )
             dump.close()
+            sha = _getSHA1 ( filename )
+            testsha = r.json()["sha1"]
+            if sha != testsha:
+                logger.error ( f"error: downloaded file has different checksum {sha}!={testsha}. This should not happen. Contact the smodels-developers <smodels-developers@lists.oeaw.ac.at>" )
+                # sys.exit()
         logger.info( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) )
         logger.debug( "store as %s" % filename )
         self.force_load = "pcl"
