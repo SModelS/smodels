@@ -273,6 +273,7 @@ class TheoryPrediction(object):
             llhd, muhat = likelihoodFromLimits(ulN, eulN, nsig, 0.,
                                allowNegativeMuhat=True, corr=corr)
         if mu is None:
+            muhat = muhat / (self.xsection.value*lumi).asNumber()
             self.muhat_ = muhat
         if chi2also:
             return (llhd, chi2FromLimits(llhd, ulN, eulN, corr=corr))
