@@ -592,8 +592,10 @@ class PyhfUpperLimitComputer:
                     try:
                         result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
                     except Exception as e:
-                        logger.info ( "when testing hypothesis, caught exception {e}" )
+                        logger.info ( f"when testing hypothesis {mu}, caught exception: {e}" )
                         result = float("nan")
+                        if expected == "posteriori":
+                            result = [ float("nan") ]*2
                 end = time.time()
                 logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
                 logger.debug(f"result for {mu} {result}" )
