@@ -43,6 +43,8 @@ class Info(object):
             tags = [line.split(':', 1)[0].strip() for line in content]
             for i,tag in enumerate(tags):
                 if not tag: continue
+                if tag.startswith("#"): # a comment!
+                    continue
                 line = content[i]
                 value = line.split(':',1)[1].strip()
                 if tags.count(tag) == 1:
