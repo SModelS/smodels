@@ -433,7 +433,7 @@ class TxTPrinter(BasicPrinter):
         for dataset in obj.datasets:
             for txname in dataset.txnameList:
                 tx = txname.txName
-                if not tx in txnames:
+                if tx not in txnames:
                     txnames.append(tx)
 
         txnames = sorted(txnames)
@@ -1438,19 +1438,19 @@ def printScanSummary(outputDict, outputFile):
 
     for fname in fnames:
         output = outputDict[fname]
-        if output == None:
+        if output is None:
             continue
-        #default values (in case of empty results):
+        # default values (in case of empty results):
         summaryDict = OrderedDict({'filename': fname,
-                                 'MostConstrainingAnalysis': 'N/A',
-                                 'r_max': -1,
-                                 'r_exp': -1,
-                                 'MostSensitive(ATLAS)': 'N/A',
-                                 'r(ATLAS)': -1,
-                                 'r_exp(ATLAS)': -1,
-                                 'MostSensitive(CMS)': 'N/A',
-                                 'r(CMS)': -1,
-                                 'r_exp(CMS)': -1
+                                   'MostConstrainingAnalysis': 'N/A',
+                                   'r_max': -1,
+                                   'r_exp': -1,
+                                   'MostSensitive(ATLAS)': 'N/A',
+                                   'r(ATLAS)': -1,
+                                   'r_exp(ATLAS)': -1,
+                                   'MostSensitive(CMS)': 'N/A',
+                                   'r(CMS)': -1,
+                                   'r_exp(CMS)': -1
                                    })
 
         if 'python' in output:
@@ -1475,8 +1475,7 @@ def printScanSummary(outputDict, outputFile):
     ffloat = '%1.3g'  # format for floats
     for label in labels:
         maxlength = max([len(ffloat % entry[label]) if isinstance(entry[label], (float, int))
-                       else len(fstr % entry[label])
-                       for entry in summaryList])
+                         else len(fstr % entry[label]) for entry in summaryList])
         maxlength = max(maxlength, len(label))
         cwidths.append(maxlength)
 
@@ -1493,9 +1492,9 @@ def printScanSummary(outputDict, outputFile):
 
         for entry in summaryList:
             row = '  '.join([(ffloat % entry[label]).ljust(cwidths[j])
-                           if isinstance(entry[label], (float, int))
-                           else (fstr % entry[label]).ljust(cwidths[j])
-                           for j, label in enumerate(labels)])
+                             if isinstance(entry[label], (float, int))
+                             else (fstr % entry[label]).ljust(cwidths[j])
+                             for j, label in enumerate(labels)])
             f.write(row+'\n')
     return
 
@@ -1575,11 +1574,11 @@ def getInfoFromPython(output):
     :return: list of r-values,r-expected and analysis IDs. None if no results are found.
     """
 
-    if not 'ExptRes' in output or not output['ExptRes']:
+    if 'ExptRes' not in output or not output['ExptRes']:
         return None
     rvals = np.array([res['r'] for res in output['ExptRes']])
     rexp = np.array([res['r_expected'] if res['r_expected']
-                   else -1 for res in output['ExptRes']])
+                     else -1 for res in output['ExptRes']])
     anaIDs = np.array([res['AnalysisID'] for res in output['ExptRes']])
 
     return rvals, rexp, anaIDs
@@ -1603,11 +1602,11 @@ def getInfoFromSLHA(output):
     if bname is None or len(results.blocks[bname]) <= 1:
         return None
 
-    #Get indices for results:
+    # Get indices for results:
     resI = list(set([k[0] for k in results.blocks[bname].keys() if k[0] > 0]))
     rvals = np.array([results.blocks[bname][(i, 1)] for i in resI])
     rexp = np.array([results.blocks[bname][(i, 2)]
-                   if results.blocks[bname][(i, 2)] != 'N/A' else -1 for i in resI])
+                     if results.blocks[bname][(i, 2)] != 'N/A' else -1 for i in resI])
     anaIDs = np.array([results.blocks[bname][(i, 4)] for i in resI])
 
     return rvals, rexp, anaIDs
@@ -1626,41 +1625,41 @@ def getInfoFromSummary(output):
     rvals = []
     rexp = []
     anaIDs = []
-    for l in lines:
-        if 'The highest r value is' in l:
-            rmax = l.split('=')[1].strip()
-            ff = np.where([((not x.isdigit()) and (not x in ['.', '+', '-']))
-                         for x in rmax])[0][0]  # Get when the value ends
+    for line in lines:
+        if 'The highest r value is' in line:
+            rmax = line.split('=')[1].strip()
+            ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
+                           for x in rmax])[0][0]  # Get when the value ends
             rmax = eval(rmax[:ff])
-            anaMax = l.split('from')[1].split()[0].replace(',', '')
+            anaMax = line.split('from')[1].split()[0].replace(',', '')
             rexpMax = -1
-            if 'r_expected' in l and not "r_expected not available" in l:
-                rexpMax = l.split('r_expected')[-1]
+            if 'r_expected' in line and "r_expected not available" not in line:
+                rexpMax = line.split('r_expected')[-1]
                 rexpMax = rexpMax.split('=')[1]
-                ff = np.where([((not x.isdigit()) and (not x in ['.', '+', '-']))
-                             for x in rexpMax])[0][0]  # Get when the value ends
+                ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
+                               for x in rexpMax])[0][0]  # Get when the value ends
                 rexpMax = eval(rexpMax[:ff])
             rvals.append(rmax)
             anaIDs.append(anaMax)
             rexp.append(rexpMax)
-        elif 'analysis with highest available r_expected' in l:
+        elif 'analysis with highest available r_expected' in line:
             # the space is required to have at least one non-digit character after the value
-            rAna = l.split('=')[-1] + ' '
-            ff = np.where([((not x.isdigit()) and (not x in ['.', '+', '-']))
-                         for x in rAna])[0][0]  # Get when the value ends
+            rAna = line.split('=')[-1] + ' '
+            ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
+                           for x in rAna])[0][0]  # Get when the value ends
             rAna = eval(rAna[:ff])
             rexpAna = -1
-            if 'r_expected' in l:
-                rexpAna = l.split('r_expected')[-1]
+            if 'r_expected' in line:
+                rexpAna = line.split('r_expected')[-1]
                 rexpAna = rexpAna.split('=')[1]
-                ff = np.where([((not x.isdigit()) and (not x in ['.', '+', '-']))
-                             for x in rexpAna])[0][0]  # Get when the value ends
+                ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
+                               for x in rexpAna])[0][0]  # Get when the value ends
                 rexpAna = eval(rexpAna[:ff])
-            if 'CMS' in l:
-                anaID = 'CMS-'+l.split('CMS-')[1].split(' ')[0].split(',')[0]
+            if 'CMS' in line:
+                anaID = 'CMS-'+line.split('CMS-')[1].split(' ')[0].split(',')[0]
             else:
                 anaID = 'ATLAS-' + \
-                l.split('ATLAS-')[1].split(' ')[0].split(',')[0]
+                        line.split('ATLAS-')[1].split(' ')[0].split(',')[0]
             anaID = anaID.split()[0].strip().replace(',', '')
             rvals.append(rAna)
             anaIDs.append(anaID)

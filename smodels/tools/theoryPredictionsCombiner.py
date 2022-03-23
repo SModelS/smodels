@@ -18,6 +18,7 @@ from smodels.tools.statistics import rootFromNLLs, determineBrentBracket
 import scipy.optimize as optimize
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
+
 class TheoryPredictionsCombiner(object):
     """
     Facility used to combine theory predictions from different analyes.
@@ -32,8 +33,8 @@ class TheoryPredictionsCombiner(object):
         :param deltas_rel: relative uncertainty in signal (float).
                            Default value is 20%.
         """
-        if len(theoryPredictions)==0:
-            raise SModelSError ( "asking to combine zero theory predictions" )
+        if len(theoryPredictions) == 0:
+            raise SModelSError("asking to combine zero theory predictions")
         self.theoryPredictions = theoryPredictions
         self.slhafile = slhafile
         self.marginalize = marginalize
@@ -48,6 +49,30 @@ class TheoryPredictionsCombiner(object):
         ret = "%s:%s" % (self.analysisId(), self.totalXsection())
         return ret
 
+    def singleDecorator(function):
+        """
+        If the combiner holds a single theoryPrediction, calls
+        the theoryPrediction function.
+        """
+
+        def wrapper(self, *args, **kwargs):
+            # Check if obj contains a single prediction
+            if len(self.theoryPredictions) == 1:
+                tp = self.theoryPredictions[0]
+                # Check if the theoryPrediction object has the function
+                if hasattr(tp, function.__name__):
+                    newF = getattr(tp, function.__name__)
+                    # Check if the attribute is callable:
+                    if callable(newF):
+                        # Return value from theoryPrediction.function call
+                        return newF(*args, **kwargs)
+
+            # If anything failed, call method from combiner:
+            return function(self, *args, **kwargs)
+
+        return wrapper
+
+    @singleDecorator
     def dataId(self):
         """
         Return a string with the IDs of all the datasets used in the combination.
@@ -56,6 +81,7 @@ class TheoryPredictionsCombiner(object):
 
         return ret
 
+    @singleDecorator
     def analysisId(self):
         """
         Return a string with the IDs of all the experimental results used in the combination.
@@ -65,6 +91,7 @@ class TheoryPredictionsCombiner(object):
 
         return ret
 
+    @singleDecorator
     def dataType(self, short=False):
         """
         Return the type of dataset (=combined)
@@ -75,6 +102,7 @@ class TheoryPredictionsCombiner(object):
         else:
             return 'combined'
 
+    @singleDecorator
     def getUpperLimit(self, expected=False,
                       trylasttime=False):
         """ get upper limit on *fiducial* cross sections
@@ -88,6 +116,7 @@ class TheoryPredictionsCombiner(object):
             ret.append(tp.xsection.value * clmu)
         return ret
 
+    @singleDecorator
     def getRValue(self, expected=False):
         """ obtain r-value, i.e. predicted_xsec / ul
         :param expected: if True, compute expected likelihood, else observed
@@ -103,6 +132,7 @@ class TheoryPredictionsCombiner(object):
         self.cachedObjs[expected]["r"] = r
         return r
 
+    @singleDecorator
     def lsm(self, expected=False):
         """ compute the likelihood at mu = 0.
         :param expected: if True, compute expected likelihood, else observed.
@@ -113,6 +143,7 @@ class TheoryPredictionsCombiner(object):
             llhd = llhd * tp.likelihood(0., expected=expected)
         return llhd
 
+    @singleDecorator
     def lmax(self, expected=False):
         if "lmax" not in self.cachedObjs[expected]:
             self.computeStatistics(expected=expected)
@@ -120,13 +151,15 @@ class TheoryPredictionsCombiner(object):
             self.cachedObjs[expected]["lmax"] = None
         return self.cachedObjs[expected]["lmax"]
 
-    def muhat( self, expected=False ):
+    @singleDecorator
+    def muhat(self, expected=False):
         if "muhat" not in self.cachedObjs[expected]:
             self.computeStatistics(expected=expected)
         if "muhat" not in self.cachedObjs[expected]:
             self.cachedObjs[expected]["muhat"] = None
         return self.cachedObjs[expected]["muhat"]
 
+    @singleDecorator
     def chi2(self, expected=False):
         if "llhd" not in self.cachedObjs[expected] or "lmax" not in self.cachedObjs[expected]:
             logger.error("call computeStatistics before calling chi2")
@@ -138,6 +171,7 @@ class TheoryPredictionsCombiner(object):
             return 2000.  # we cut off at > 1e-300 or so ;)
         return - 2 * np.log(llhd / lmax)
 
+    @singleDecorator
     def likelihood(self, mu=1., expected=False,
                    nll=False, useCached=True):
         """
@@ -175,6 +209,7 @@ class TheoryPredictionsCombiner(object):
             return - np.log(llhd)
         return llhd
 
+    @singleDecorator
     def computeStatistics(self, expected=False):
         """
         Compute the likelihoods, chi2, and upper limit for this combination
@@ -206,6 +241,7 @@ class TheoryPredictionsCombiner(object):
         self.cachedObjs[expected]["lmax"] = lmax
         self.cachedObjs[expected]["muhat"] = self.mu_hat
 
+    @singleDecorator
     def totalXsection(self):
         ret = 0.*fb
         if self.theoryPredictions is not None:
@@ -213,6 +249,7 @@ class TheoryPredictionsCombiner(object):
                 ret += tp.xsection.value
         return ret
 
+    @singleDecorator
     def getmaxCondition(self):
         """
         Returns the maximum xsection from the list conditions

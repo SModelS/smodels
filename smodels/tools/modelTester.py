@@ -196,7 +196,9 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         selectedResults = []
         combineAnas = parser.get("options", "combineAnas").split(",")
         if combineAnas:
-            # Selected the theory predictions which correspond to the analyses to be combined
+            if combineResults is True:
+                logger.warning("Combining analyses with signal region combination (combineSRs=True) might significantly reduce CPU performance.")
+            # Select the theory predictions which correspond to the analyses to be combined
             # and have likelihoods defined
             for tp in theoryPredictions:
                 expID = tp.analysisId()
@@ -210,13 +212,13 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         expIDs = [tp.analysisId() for tp in selectedTheoryPreds]
         # Print a warning if no likelihood was found for the analysis
         for eID in selectedResults:
-            if not eID in expIDs:
-                logger.info("No likelihood available for %s. This analysis will not be used in analysis combination." %eID)
+            if eID not in expIDs:
+                logger.info("No likelihood available for %s. This analysis will not be used in analysis combination." % eID)
 
         if len(expIDs) != len(set(expIDs)):
             logger.warning("Duplicated results when trying to combine analyses. Combination will be skipped.")
         # Only compute combination if at least two results were selected
-        elif len(selectedTheoryPreds) > 1:
+        elif len(selectedTheoryPreds) > 0:
             combiner = TheoryPredictionsCombiner(selectedTheoryPreds)
             combiner.computeStatistics()
             masterPrinter.addObj(combiner)

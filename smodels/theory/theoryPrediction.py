@@ -142,26 +142,26 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["lsm"] = None
         return self.cachedObjs[expected]["lsm"]
 
-    def lmax(self, expected=False, allowNegativeSignals = False ):
+    def lmax(self, expected=False, allowNegativeSignals=False):
         """ likelihood at mu_hat """
         if not "lmax" in self.cachedObjs[expected]:
-            self.computeStatistics(expected, allowNegativeSignals )
+            self.computeStatistics(expected, allowNegativeSignals)
         if "lmax" in self.cachedObjs[expected] and not allowNegativeSignals \
                 in self.cachedObjs[expected]["lmax"]:
-                    self.computeStatistics(expected, allowNegativeSignals )
+            self.computeStatistics(expected, allowNegativeSignals)
         if not "lmax" in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["lmax"] = { allowNegativeSignals: None }
+            self.cachedObjs[expected]["lmax"] = {allowNegativeSignals: None}
         return self.cachedObjs[expected]["lmax"][allowNegativeSignals]
 
-    def muhat(self, expected=False, allowNegativeSignals = False ):
+    def muhat(self, expected=False, allowNegativeSignals=False):
         """ position of maximum likelihood  """
         if not "muhat" in self.cachedObjs[expected]:
-            self.computeStatistics(expected, allowNegativeSignals )
+            self.computeStatistics(expected, allowNegativeSignals)
         if "muhat" in self.cachedObjs[expected] and not allowNegativeSignals \
                 in self.cachedObjs[expected]["muhat"]:
-                    self.computeStatistics(expected, allowNegativeSignals )
+            self.computeStatistics(expected, allowNegativeSignals)
         if not "muhat" in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["muhat"] = { allowNegativeSignals: None }
+            self.cachedObjs[expected]["muhat"] = {allowNegativeSignals: None}
         return self.cachedObjs[expected]["muhat"][allowNegativeSignals]
 
     def chi2(self, expected=False):
@@ -192,12 +192,12 @@ class TheoryPrediction(object):
             if "llhd" in self.cachedObjs[expected] and abs(mu - 1.) < 1e-5:
                 llhd = self.cachedObjs[expected]["llhd"]
                 if nll:
-                    return - np.log ( llhd )
+                    return - np.log(llhd)
                 return llhd
             if "lsm" in self.cachedObjs[expected] and abs(mu) < 1e-5:
                 lsm = self.cachedObjs[expected]["lsm"]
                 if nll:
-                    return - np.log ( lsm )
+                    return - np.log(lsm)
                 return lsm
         lumi = self.dataset.getLumi()
         if self.dataType() == 'combined':
@@ -206,8 +206,8 @@ class TheoryPrediction(object):
             srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.
                        for ds in self.dataset._datasets]
             llhd = computeCombinedLikelihood(self.dataset, srNsigs,
-                          self.marginalize, self.deltas_rel, expected = expected,
-                          mu = mu )
+                          self.marginalize, self.deltas_rel, expected=expected,
+                          mu=mu)
         if self.dataType() == 'efficiencyMap':
             nsig = (mu*self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig, marginalize=self.marginalize,
@@ -216,8 +216,8 @@ class TheoryPrediction(object):
 
         if self.dataType() == 'upperLimit':
             # these fits only work with negative signals!
-            llhd, chi2 = self.likelihoodFromLimits(mu, chi2also=True, 
-                    expected=expected, allowNegativeSignals = True )
+            llhd, chi2 = self.likelihoodFromLimits(mu, chi2also=True,
+                    expected=expected, allowNegativeSignals=True)
         self.cachedLlhds[expected][mu] = llhd
         if nll:
             if llhd == 0.:
@@ -226,7 +226,7 @@ class TheoryPrediction(object):
         return llhd
 
     def likelihoodFromLimits(self, mu=1., expected=False, chi2also=False,
-                             corr=0.6, allowNegativeSignals = False ):
+                             corr=0.6, allowNegativeSignals=False):
         """ compute the likelihood from expected and observed upper limits.
         :param expected: compute expected, not observed likelihood
         :param mu: signal strength multiplier, applied to theory prediction. If None,
@@ -279,7 +279,7 @@ class TheoryPrediction(object):
             return (llhd, chi2FromLimits(llhd, ulN, eulN, corr=corr))
         return llhd
 
-    def computeStatistics(self, expected=False, allowNegativeSignals = False ):
+    def computeStatistics(self, expected=False, allowNegativeSignals=False):
         """
         Compute the likelihoods, chi2 and upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, lsm and chi2
@@ -287,22 +287,22 @@ class TheoryPrediction(object):
         :param expected: computed expected quantities, not observed
         """
         if not "lmax" in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["lmax"]={}
-            self.cachedObjs[expected]["muhat"]={}
+            self.cachedObjs[expected]["lmax"] = {}
+            self.cachedObjs[expected]["muhat"] = {}
 
         if self.dataType() == 'upperLimit':
             llhd, chi2 = self.likelihoodFromLimits(1., expected=expected, chi2also=True)
             lsm = self.likelihoodFromLimits(0., expected=expected, chi2also=False)
             lmax = self.likelihoodFromLimits(None, expected=expected, chi2also=False,
-                    allowNegativeSignals = True )
-            if allowNegativeSignals == False and hasattr ( self, "muhat_" ) and self.muhat_ < 0.:
+                    allowNegativeSignals=True)
+            if allowNegativeSignals == False and hasattr(self, "muhat_") and self.muhat_ < 0.:
                 self.muhat_ = 0.
                 self.lmax = lsm
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
             self.cachedObjs[expected]["chi2"] = chi2
-            if hasattr ( self, "muhat_" ):
+            if hasattr(self, "muhat_"):
                 self.cachedObjs[expected]["muhat"][allowNegativeSignals] = self.muhat_
 
         elif self.dataType() == 'efficiencyMap':
@@ -316,14 +316,14 @@ class TheoryPrediction(object):
                     deltas_rel=self.deltas_rel,
                     allowNegativeSignals=allowNegativeSignals, expected=expected)
             muhat = None
-            if hasattr ( self.dataset, "muhat" ):
+            if hasattr(self.dataset, "muhat"):
                 muhat = self.dataset.muhat
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = llhd_sm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = llhd_max
             self.cachedObjs[expected]["muhat"][allowNegativeSignals] = muhat
             from smodels.tools.statistics import chi2FromLmax
-            self.cachedObjs[expected]["chi2"] = chi2FromLmax ( llhd, llhd_max )
+            self.cachedObjs[expected]["chi2"] = chi2FromLmax(llhd, llhd_max)
 
         elif self.dataType() == 'combined':
             lumi = self.dataset.getLumi()
@@ -333,13 +333,13 @@ class TheoryPrediction(object):
             # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
             llhd, lmax, lsm, muhat = computeCombinedStatistics(self.dataset, srNsigs,
                        self.marginalize, self.deltas_rel, expected=expected,
-                       allowNegativeSignals = allowNegativeSignals )
+                       allowNegativeSignals=allowNegativeSignals)
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
             self.cachedObjs[expected]["muhat"][allowNegativeSignals] = muhat
             from smodels.tools.statistics import chi2FromLmax
-            self.cachedObjs[expected]["chi2"] = chi2FromLmax ( llhd, lmax )
+            self.cachedObjs[expected]["chi2"] = chi2FromLmax(llhd, lmax)
 
     def totalXsection(self):
         return self.xsection.value
