@@ -46,7 +46,9 @@ This tool computes LHC production cross sections for *MSSM particles*
 and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be
 convenient for adding cross sections to SLHA input files, see :doc:`Basic Input <BasicInput>`.
 The calculation is done at LO with `Pythia8 <http://pythia.org>`_ or `Pythia6.4 <http://pythia6.hepforge.org>`_ ; K-factors
-for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_. Signal strength multipliers can optionally be supplied for each "mother" particle.
+for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_. Signal strength multipliers can optionally be supplied for each "mother" particle. However, use at your own risk! Make sure the
+output is sensible and contains all cross sections for all production mechanisms
+you are interested in! 
 
 **The usage of the cross section calculator is:**
 

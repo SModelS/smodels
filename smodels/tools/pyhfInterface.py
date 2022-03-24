@@ -346,10 +346,15 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori
             expected
         """
-        mumax = 20.
-        if abs(mu)>mumax:
+        mumin,mumax = -10., 20.
+        if mu>mumax:
             if countWarning["llhdszero"]<1:
-                logger.warning ( f"likelihoods of signal strengths |mu|= |{mu:.1f}| > {mumax} are automatically set to 0 (will suppress similar msgs)" )
+                logger.warning ( f"likelihoods of signal strengths mu= {mu:.1f} > {mumax} are automatically set to 0 (will suppress similar msgs)" )
+            countWarning["llhdszero"]+=1
+            return self.exponentiateNLL ( None, not nll )
+        if mu<mumin:
+            if countWarning["llhdszero"]<1:
+                logger.warning ( f"likelihoods of signal strengths mu= {mu:.1f} < {mumin} are automatically set to 0 (will suppress similar msgs)" )
             countWarning["llhdszero"]+=1
             return self.exponentiateNLL ( None, not nll )
         # print ( "pyhf likelihood for", mu )
@@ -380,7 +385,18 @@ class PyhfUpperLimitComputer:
                 msettings = { 'normsys': {'interpcode': 'code4'}, 
                               'histosys': {'interpcode': 'code4p'}}
                 model = workspace.model(modifier_settings=msettings)
-                _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model),
+                d = workspace.data(model)
+                indices = []
+                slices = list ( workspace.channel_slices.values() )
+                for slce in slices:
+                    for i in range ( slce.start, slce.stop ):
+                        indices.append ( i )
+                total = np.array( [ d[i]+self.data.nsignals[0][i] for i in indices ])
+                if np.any ( total[total<0] ):
+                    # we have negative total yields. return a llhd of 0 for that
+                    self.restore()
+                    return self.exponentiateNLL ( None, not nll )
+                _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., d,
                         model, return_fitted_val=True, maxiter=200 )
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.debug ( f"pyhf fixed_poi_fit failed for mu={mu}: {e}" )
