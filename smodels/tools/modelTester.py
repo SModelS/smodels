@@ -350,14 +350,15 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
                       databaseVersion, listOfExpRes, timeout,
                       development, parameterFile)
     else:
-        for hdlr in logger.handlers[:]:
-            logger.removeHandler(hdlr)
-        fileLog = logging.FileHandler('./smodels.log')
-        logger.addHandler(fileLog)
 
         if ncpus == 1:
             logger.info("Running SModelS for %i files with a single process. Messages will be redirected to smodels.log"
                         % (nFiles))
+
+            for hdlr in logger.handlers[:]:
+                logger.removeHandler(hdlr)
+            fileLog = logging.FileHandler('./smodels.log')
+            logger.addHandler(fileLog)
 
             # Run a single process:
             outputDict = runSetOfFiles(cleanedList, outputDir, parser,
@@ -366,6 +367,12 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         else:
             logger.info("Running SModelS for %i files with %i processes. Messages will be redirected to smodels.log"
                         % (nFiles, ncpus))
+
+            for hdlr in logger.handlers[:]:
+                logger.removeHandler(hdlr)
+            fileLog = logging.FileHandler('./smodels.log')
+            logger.addHandler(fileLog)
+
             # Launch multiple processes.
             # Split list of files
             chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
