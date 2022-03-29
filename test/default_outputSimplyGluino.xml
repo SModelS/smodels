@@ -134,7 +134,6 @@
                     <Width_GeV>stable</Width_GeV>
                 </Width_GeV_List>
             </Width_GeV_List>
-            <chi2>44.88905</chi2>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.2637784</expected_upper_limit_fb>
             <l_SM>0.04875737</l_SM>
@@ -149,15 +148,21 @@
         </ExptRes>
     </ExptRes_List>
     <OutputStatus>
-        <database_version>unittest210</database_version>
+        <checkinput>True</checkinput>
+        <computestatistics>False</computestatistics>
+        <database_version>unittest220</database_version>
         <decomposition_status>1</decomposition_status>
+        <docompress>True</docompress>
+        <doinvisible>True</doinvisible>
         <file_status>1</file_status>
         <input_file>./testFiles/slha/simplyGluino.slha</input_file>
         <maxcond>0.2</maxcond>
-        <ncpus>1</ncpus>
         <minmassgap>5.0</minmassgap>
+        <model>share.models.mssm</model>
+        <ncpus>-6</ncpus>
         <sigmacut>0.03</sigmacut>
-        <smodels_version>2.1.0</smodels_version>
+        <smodels_version>2.2.0</smodels_version>
+        <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>
     </OutputStatus>
     <Total_xsec_for_missing_topologies_fb>0.0</Total_xsec_for_missing_topologies_fb>

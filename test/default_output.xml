@@ -5,9 +5,9 @@
             <AnalysisID>ATLAS-CONF-2013-037,CMS-SUS-13-012</AnalysisID>
             <l_SM>6.179978e-05</l_SM>
             <l_max>0.0001330265</l_max>
-            <likelihood>9.47724e-05</likelihood>
-            <r>0.1332296</r>
-            <r_expected>0.1810419</r_expected>
+            <likelihood>9.477238e-05</likelihood>
+            <r>0.1332295</r>
+            <r_expected>0.1810418</r_expected>
         </CombinedRes>
     </CombinedRes_List>
     <ExptRes_List>
@@ -46,7 +46,7 @@
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>20.3</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>0.3875958</r>
+            <r>0.3875959</r>
             <r_expected>None</r_expected>
             <theory_prediction_fb>6.660644</theory_prediction_fb>
             <upper_limit_fb>17.18451</upper_limit_fb>
@@ -82,10 +82,10 @@
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>20.3</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>0.3209485</r>
+            <r>0.3209495</r>
             <r_expected>None</r_expected>
             <theory_prediction_fb>1.956671</theory_prediction_fb>
-            <upper_limit_fb>6.096527</upper_limit_fb>
+            <upper_limit_fb>6.096509</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
@@ -133,11 +133,11 @@
             <DataSetID>3NJet6_1000HT1250_600MHTinf</DataSetID>
             <Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>981.83</Mass_GeV>
+                    <Mass_GeV>981.97</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
                 </Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>981.71</Mass_GeV>
+                    <Mass_GeV>981.86</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
                 </Mass_GeV_List>
             </Mass_GeV_List>
@@ -156,17 +156,16 @@
                     <Width_GeV>stable</Width_GeV>
                 </Width_GeV_List>
             </Width_GeV_List>
-            <chi2>0.6761455</chi2>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.7514</expected_upper_limit_fb>
             <l_SM>0.002530291</l_SM>
             <l_max>0.005396484</l_max>
-            <likelihood>0.003848467</likelihood>
+            <likelihood>0.003868391</likelihood>
             <lumi_fb-1>19.5</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>0.1276286</r>
-            <r_expected>0.2046745</r_expected>
-            <theory_prediction_fb>0.1537924</theory_prediction_fb>
+            <r>0.1296154</r>
+            <r_expected>0.2078608</r_expected>
+            <theory_prediction_fb>0.1561866</theory_prediction_fb>
             <upper_limit_fb>1.205</upper_limit_fb>
         </ExptRes>
         <ExptRes>
@@ -305,7 +304,6 @@
                     <Width_GeV>stable</Width_GeV>
                 </Width_GeV_List>
             </Width_GeV_List>
-            <chi2>0.3864796</chi2>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.35</expected_upper_limit_fb>
             <l_SM>0.02442398</l_SM>
@@ -349,10 +347,10 @@
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>2.2</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>0.0008310275</r>
+            <r>0.0008312426</r>
             <r_expected>None</r_expected>
             <theory_prediction_fb>0.03496325</theory_prediction_fb>
-            <upper_limit_fb>42.07231</upper_limit_fb>
+            <upper_limit_fb>42.06142</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>CMS-PAS-SUS-12-026</AnalysisID>
@@ -392,15 +390,22 @@
         </ExptRes>
     </ExptRes_List>
     <OutputStatus>
-        <database_version>unittest210</database_version>
+        <checkinput>True</checkinput>
+        <combineanas>CMS-SUS-13-012,ATLAS-SUSY-2018-31,ATLAS-CONF-2013-037</combineanas>
+        <computestatistics>False</computestatistics>
+        <database_version>unittest220</database_version>
         <decomposition_status>1</decomposition_status>
+        <docompress>True</docompress>
+        <doinvisible>True</doinvisible>
         <file_status>1</file_status>
         <input_file>./testFiles/slha/gluino_squarks.slha</input_file>
         <maxcond>0.2</maxcond>
-        <ncpus>1</ncpus>        
         <minmassgap>5.0</minmassgap>
+        <model>share.models.mssm</model>
+        <ncpus>-6</ncpus>
         <sigmacut>0.03</sigmacut>
-        <smodels_version>2.1.0</smodels_version>
+        <smodels_version>2.2.0</smodels_version>
+        <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>
     </OutputStatus>
     <Total_xsec_for_missing_topologies_fb>3065.78</Total_xsec_for_missing_topologies_fb>
