@@ -165,7 +165,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _promptWidth:
 
-  * **promptWidth**: total decay width in GeV above which decays are considered prompt, default is 1e-8; available v2.0 onwards.
+  * **promptWidth**: total decay width in GeV above which decays are considered prompt, default is 1e-11; available v2.0 onwards. (nb default was 1e-8 in v2.0 and 2.1, changed to 1e-11 in v2.2)
 
 .. _stableWidth:
 
