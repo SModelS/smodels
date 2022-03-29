@@ -43,6 +43,7 @@ New in Version 2.2.0:
   * introduced (user-defined) :ref:`combinations of analyses <analysesCombination>`
   * changed expected limits computed with pyhf from post-fit to pre-fit
   * a few smaller changes around expected likelihoods and limits
+  * changed default value of :ref:`promptWidth parameter <parameterFileModel>` from 1e-8 to 1e-11 GeV
   * allow :ref:`ncpus <parameterFileNcpus>` to take on zero and negative values in
     ini file [meaning use all but this (absolute) number of CPU cores]
   * notion of "nonaggregated" databases introduced
