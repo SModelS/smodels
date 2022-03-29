@@ -200,7 +200,7 @@ class RunSModelSTest(unittest.TestCase):
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                                                  key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.02,
-                           ignore=ignoreFields, fname=outputfile)
+                           ignore=ignoreFields, fname=outputfile, fname2="lifetime_default.py" )
         for i in ['./outputHSCP.py', './outputHSCP.pyc']:
             if os.path.exists(i):
                 os.remove(i)

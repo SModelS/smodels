@@ -14,7 +14,7 @@ import unittest
 from unitTestHelpers import equalObjs, runMain, importModule, sortSModelSOutput
 
 
-class RunSModelSTest(unittest.TestCase):
+class TestReportAll(unittest.TestCase):
     definingRun = False  # meant only to adapt to changes in output format
     # use with super great care!!
 
