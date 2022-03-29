@@ -79,7 +79,10 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
                     where = "unspecified"
                 if fname2 is None:
                     fname2 = "unspecified"
-                logger.warning("Key ``%s'' missing in %s:%s" % (key, where, fname2))
+                deffile = f" (default file {fname2})"
+                if fname2 == "unspecified":
+                    deffile = ""
+                logger.warning("Key ``%s'' missing in %s:%s%s" % (key, where, fname, deffile ))
                 return False
             if not equalObjs(obj1[key], obj2[key], allowedDiff, ignore=ignore, where=key, fname=fname, fname2=fname2):
                 return False
