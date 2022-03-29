@@ -1,10 +1,22 @@
 Input status: 1
 Decomposition output status: 1 #decomposition was successful
 # Input File: inputFiles/slha/gluino_squarks.slha
+# checkinput = True
+# combineanas = ATLAS-SUSY-2015-02,CMS-SUS-13-007
+# combinesrs = False
+# computestatistics = True
+# docompress = True
+# doinvisible = True
+# experimentalfeatures = False
 # maxcond = 0.2
 # minmassgap = 5.
+# model = share.models.mssm
 # ncpus = 1
+# promptwidth = 1e-11
+# reportallsrs = False
 # sigmacut = 0.005
+# stablewidth = 1e-25
+# testcoverage = True
 # Database version: 2.1.0
 ================================================================================
 #Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected

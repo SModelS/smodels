@@ -21,6 +21,7 @@ from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut
 from smodels.tools.printer import MPrinter, printScanSummary
+from collections import OrderedDict
 import multiprocessing
 import os
 import sys
@@ -68,8 +69,17 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     if parser.getboolean("options", "checkInput"):
         inputStatus.checkFile(inputFile)
     """Initialize output status and exit if there were errors in the input"""
+    printParameters = []
+    if parser.has_section('parameters'):
+        printParameters += list(parser.items('parameters'))
+    if parser.has_section('particles'):
+        printParameters += list(parser.items('particles'))
+    if parser.has_section('options'):
+        printParameters += list(parser.items('options'))
+
+    printParameters = OrderedDict(printParameters)
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
-                                          dict(parser.items("parameters")), databaseVersion)
+                                          printParameters, databaseVersion)
     masterPrinter.addObj(outputStatus)
     if outputStatus.status < 0:
         return {os.path.basename(inputFile): masterPrinter.flush()}

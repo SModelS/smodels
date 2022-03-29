@@ -68,6 +68,8 @@ class MPrinter(object):
                     newPrinter.docompress = 1
                 if parser.has_option("options", "combineSRs") and parser.getboolean("options", "combineSRs"):
                     newPrinter.combinesr = 1
+                if parser.has_option("options", "combineAnas") and parser.get("options", "combineAnas"):
+                    newPrinter.combineanas = 1
             else:
                 logger.warning("Unknown printer format: %s" % str(prt))
                 continue
@@ -910,7 +912,7 @@ class PyPrinter(BasicPrinter):
         for key, val in obj.parameters.items():
             try:
                 infoDict[key] = eval(val)
-            except (NameError, TypeError):
+            except (NameError, TypeError, SyntaxError):
                 infoDict[key] = val
         infoDict['file status'] = obj.filestatus
         infoDict['decomposition status'] = obj.status
@@ -1220,6 +1222,7 @@ class SLHAPrinter(TxTPrinter):
         self.name = "slha"
         self.docompress = 0
         self.combinesr = 0
+        self.combineanas = 0
         self.printingOrder = [OutputStatus, TheoryPredictionList,
                               TheoryPredictionsCombiner, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
@@ -1244,18 +1247,25 @@ class SLHAPrinter(TxTPrinter):
         smodelsversion = obj.smodelsVersion
         if not smodelsversion.startswith("v"):
             smodelsversion = "v" + smodelsversion
+
+        keysDict = {0: "%-25s #SModelS version\n" % (smodelsversion),
+                    1: "%-25s #database version\n" % (obj.databaseVersion.replace(" ", "")),
+                    2: "%-25s #maximum condition violation\n" % (obj.parameters['maxcond']),
+                    3: "%-25s #compression (0 off, 1 on)\n" % (self.docompress),
+                    4: "%-25s #minimum mass gap for mass compression [GeV]\n" % (obj.parameters['minmassgap']),
+                    5: "%-25s #sigmacut [fb]\n" % (obj.parameters['sigmacut']),
+                    6: "%-25s #signal region combination (0 off, 1 on)\n" % (self.combinesr),
+                    7: "%-25s #analyses combination (0 off, 1 on)\n" % (self.combineanas)}
+
+        if 'promptwidth' in obj.parameters:
+            keysDict[8] = "%-25s #prompt width [GeV] \n" % (obj.parameters['promptwidth'])
+        if 'stablewidth' in obj.parameters:
+            keysDict[9] = "%-25s #stable width [GeV] \n" % (obj.parameters['stablewidth'])
+
         output = "BLOCK SModelS_Settings\n"
-        output += " 0 %-25s #SModelS version\n" % (smodelsversion)
-        output += " 1 %-25s #database version\n" % (
-            obj.databaseVersion.replace(" ", ""))
-        output += " 2 %-25s #maximum condition violation\n" % (
-            obj.parameters['maxcond'])
-        output += " 3 %-25s #compression (0 off, 1 on)\n" % (self.docompress)
-        output += " 4 %-25s #minimum mass gap for mass compression [GeV]\n" % (
-            obj.parameters['minmassgap'])
-        output += " 5 %-25s #sigmacut [fb]\n" % (obj.parameters['sigmacut'])
-        output += " 6 %-25s #signal region combination (0 off, 1 on)\n\n" % (
-            self.combinesr)
+        for key in sorted(list(keysDict.keys())):
+            output += " %i %s" % (key, keysDict[key])
+        output += '\n'
 
         # for SLHA output we always want to have SModelS_Exclusion block, if no results we write it here
         if obj.status <= 0:
@@ -1287,7 +1297,7 @@ class SLHAPrinter(TxTPrinter):
             rList = []
         elif not printAll:
             rList = [firstResult] + [res for res in obj._theoryPredictions[1:]
-                                     if res.getRValue() >= 1.0]
+                                   if res.getRValue() >= 1.0]
         else:
             rList = obj._theoryPredictions[:]
 
@@ -1442,15 +1452,15 @@ def printScanSummary(outputDict, outputFile):
             continue
         # default values (in case of empty results):
         summaryDict = OrderedDict({'filename': fname,
-                                   'MostConstrainingAnalysis': 'N/A',
-                                   'r_max': -1,
-                                   'r_exp': -1,
-                                   'MostSensitive(ATLAS)': 'N/A',
-                                   'r(ATLAS)': -1,
-                                   'r_exp(ATLAS)': -1,
-                                   'MostSensitive(CMS)': 'N/A',
-                                   'r(CMS)': -1,
-                                   'r_exp(CMS)': -1
+                                 'MostConstrainingAnalysis': 'N/A',
+                                 'r_max': -1,
+                                 'r_exp': -1,
+                                 'MostSensitive(ATLAS)': 'N/A',
+                                 'r(ATLAS)': -1,
+                                 'r_exp(ATLAS)': -1,
+                                 'MostSensitive(CMS)': 'N/A',
+                                 'r(CMS)': -1,
+                                 'r_exp(CMS)': -1
                                    })
 
         if 'python' in output:
@@ -1475,7 +1485,7 @@ def printScanSummary(outputDict, outputFile):
     ffloat = '%1.3g'  # format for floats
     for label in labels:
         maxlength = max([len(ffloat % entry[label]) if isinstance(entry[label], (float, int))
-                         else len(fstr % entry[label]) for entry in summaryList])
+                       else len(fstr % entry[label]) for entry in summaryList])
         maxlength = max(maxlength, len(label))
         cwidths.append(maxlength)
 
@@ -1492,9 +1502,9 @@ def printScanSummary(outputDict, outputFile):
 
         for entry in summaryList:
             row = '  '.join([(ffloat % entry[label]).ljust(cwidths[j])
-                             if isinstance(entry[label], (float, int))
-                             else (fstr % entry[label]).ljust(cwidths[j])
-                             for j, label in enumerate(labels)])
+                           if isinstance(entry[label], (float, int))
+                           else (fstr % entry[label]).ljust(cwidths[j])
+                           for j, label in enumerate(labels)])
             f.write(row+'\n')
     return
 
@@ -1578,7 +1588,7 @@ def getInfoFromPython(output):
         return None
     rvals = np.array([res['r'] for res in output['ExptRes']])
     rexp = np.array([res['r_expected'] if res['r_expected']
-                     else -1 for res in output['ExptRes']])
+                   else -1 for res in output['ExptRes']])
     anaIDs = np.array([res['AnalysisID'] for res in output['ExptRes']])
 
     return rvals, rexp, anaIDs
@@ -1606,7 +1616,7 @@ def getInfoFromSLHA(output):
     resI = list(set([k[0] for k in results.blocks[bname].keys() if k[0] > 0]))
     rvals = np.array([results.blocks[bname][(i, 1)] for i in resI])
     rexp = np.array([results.blocks[bname][(i, 2)]
-                     if results.blocks[bname][(i, 2)] != 'N/A' else -1 for i in resI])
+                   if results.blocks[bname][(i, 2)] != 'N/A' else -1 for i in resI])
     anaIDs = np.array([results.blocks[bname][(i, 4)] for i in resI])
 
     return rvals, rexp, anaIDs
@@ -1629,7 +1639,7 @@ def getInfoFromSummary(output):
         if 'The highest r value is' in line:
             rmax = line.split('=')[1].strip()
             ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
-                           for x in rmax])[0][0]  # Get when the value ends
+                         for x in rmax])[0][0]  # Get when the value ends
             rmax = eval(rmax[:ff])
             anaMax = line.split('from')[1].split()[0].replace(',', '')
             rexpMax = -1
@@ -1637,7 +1647,7 @@ def getInfoFromSummary(output):
                 rexpMax = line.split('r_expected')[-1]
                 rexpMax = rexpMax.split('=')[1]
                 ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
-                               for x in rexpMax])[0][0]  # Get when the value ends
+                             for x in rexpMax])[0][0]  # Get when the value ends
                 rexpMax = eval(rexpMax[:ff])
             rvals.append(rmax)
             anaIDs.append(anaMax)
@@ -1646,14 +1656,14 @@ def getInfoFromSummary(output):
             # the space is required to have at least one non-digit character after the value
             rAna = line.split('=')[-1] + ' '
             ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
-                           for x in rAna])[0][0]  # Get when the value ends
+                         for x in rAna])[0][0]  # Get when the value ends
             rAna = eval(rAna[:ff])
             rexpAna = -1
             if 'r_expected' in line:
                 rexpAna = line.split('r_expected')[-1]
                 rexpAna = rexpAna.split('=')[1]
                 ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
-                               for x in rexpAna])[0][0]  # Get when the value ends
+                             for x in rexpAna])[0][0]  # Get when the value ends
                 rexpAna = eval(rexpAna[:ff])
             if 'CMS' in line:
                 anaID = 'CMS-'+line.split('CMS-')[1].split(' ')[0].split(',')[0]

@@ -35,7 +35,8 @@ class CombinedTest(unittest.TestCase):
         smodelsOutput = importModule(outputfile)
         from gluino_squarks_default_agg import smodelsOutputDefault
         ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element', 'database version',
-                        'Total missed xsec',
+                        'Total missed xsec', 'model', 'promptwidth', 'stablewidth', 'checkinput',
+                        'doinvisible', 'docompress', 'computestatistics', 'testcoverage', 'combinesrs',
                         'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
                         'Total xsec for missing topologies (fb)', 'Total xsec for missing topologies with displaced decays (fb)',
                         'Total xsec for missing topologies with prompt decays (fb)',

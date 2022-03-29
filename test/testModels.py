@@ -30,7 +30,7 @@ class ModelsTest(unittest.TestCase):
         filename = "./testFiles/slha/idm_example.slha"
         runtime.modelFile = 'idm'
         reload(particlesLoader)
-        outputfile = runMain(filename,inifile='testParameters_noModel.ini',suppressStdout=True)
+        outputfile = runMain(filename,inifile='testParameters_noModel.ini',suppressStdout=False)
         if self.definingRun:
             logger.error ( "This is a definition run! Know what youre doing!" )
             default = "idm_example_defaultB.py"
@@ -45,7 +45,8 @@ class ModelsTest(unittest.TestCase):
                     'Total xsec for missing topologies (fb)',
                     'Total xsec for missing topologies with displaced decays (fb)',
                     'Total xsec for missing topologies with prompt decays (fb)',
-                    'Total xsec for topologies outside the grid (fb)']
+                    'Total xsec for topologies outside the grid (fb)',  'model', 'promptwidth', 'stablewidth', 'checkinput',
+                    'doinvisible', 'docompress', 'computestatistics', 'testcoverage', 'combinesrs']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.1,
@@ -68,7 +69,8 @@ class ModelsTest(unittest.TestCase):
                             'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
                             'Total xsec for missing topologies (fb)','Total xsec for missing topologies with displaced decays (fb)',
                             'Total xsec for missing topologies with prompt decays (fb)',
-                            'Total xsec for topologies outside the grid (fb)']
+                            'Total xsec for topologies outside the grid (fb)',  'model', 'promptwidth', 'stablewidth', 'checkinput',
+                            'doinvisible', 'docompress', 'computestatistics', 'testcoverage', 'combinesrs']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.1,
@@ -86,7 +88,8 @@ class ModelsTest(unittest.TestCase):
                             'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
                             'Total xsec for missing topologies (fb)','Total xsec for missing topologies with displaced decays (fb)',
                             'Total xsec for missing topologies with prompt decays (fb)',
-                            'Total xsec for topologies outside the grid (fb)']
+                            'Total xsec for topologies outside the grid (fb)',  'model', 'promptwidth', 'stablewidth', 'checkinput',
+                            'doinvisible', 'docompress', 'computestatistics', 'testcoverage', 'combinesrs']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.1,
