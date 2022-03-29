@@ -173,7 +173,7 @@ class RunPrinterTest(unittest.TestCase):
             subprocess.getoutput(cmd)
         from simplyGluino_default_extended import smodelsOutputDefault
 
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version']
+        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version', 'model', 'checkinput', 'doinvisible', 'docompress', 'computestatistics', 'testcoverage' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                                                  key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutput['ExptRes'],
