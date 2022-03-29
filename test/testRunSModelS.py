@@ -98,7 +98,8 @@ class RunSModelSTest(unittest.TestCase):
         outputfile = runMain(filename, inifile='testParametersB.ini')
         smodelsOutput = importModule(outputfile)
         from gluino_squarks_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element', 'database version']
+        ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element',
+                        'database version', 'model']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                                                  key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.02,
