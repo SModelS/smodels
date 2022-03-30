@@ -1,6 +1,9 @@
+Known Issues, v2.2.0
+=======================================================
+ * the mass and invisible compression is affected by the specific value of the promptWidth parameter. All particles with width < promptWidth will not be mass or invisibly compressed.
+ 
 Known Issues, v2.1.0
 =======================================================
-
  * pythia8306 may not compile on Mac OS with clang. A simple fix is to fall back to
    pythia8245 by changing smodels/lib/pythia8/pythiaversion accordingly.
  * Due to the default rounding of input BSM masses to 1 digit, values of minmassgap should be integers in GeV units
