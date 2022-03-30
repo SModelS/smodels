@@ -1,11 +1,14 @@
 BLOCK SModelS_Settings
- 0 v2.1.0                    #SModelS version
+ 0 v2.2.0                    #SModelS version
  1 2.1.0                     #database version
  2 0.2                       #maximum condition violation
  3 1                         #compression (0 off, 1 on)
  4 5.                        #minimum mass gap for mass compression [GeV]
  5 0.005                     #sigmacut [fb]
  6 0                         #signal region combination (0 off, 1 on)
+ 7 1                         #analyses combination (0 off, 1 on)
+ 8 1e-11                     #prompt width [GeV] 
+ 9 1e-25                     #stable width [GeV] 
 
 BLOCK SModelS_Exclusion
  0 0 1                              #output status (-1 not tested, 0 not excluded, 1 excluded)
@@ -420,188 +423,188 @@ BLOCK SModelS_Exclusion
  41 8 1.519E-01                      #L_SM
 
  42 0 TChiWZ                         #txname 
- 42 1 7.304E-02                      #r value
- 42 2 9.306E-02                      #expected r value
+ 42 1 7.396E-02                      #r value
+ 42 2 5.325E-02                      #expected r value
  42 3 0.00                           #condition violation
- 42 4 ATLAS-SUSY-2018-06             #analysis
- 42 5 SR_low                         #signal region 
- 42 6 4.145E-03                      #Likelihood
- 42 7 4.450E-03                      #L_max
- 42 8 3.757E-03                      #L_SM
+ 42 4 ATLAS-SUSY-2017-03             #analysis
+ 42 5 SR2l_Int                       #signal region 
+ 42 6 9.587E-02                      #Likelihood
+ 42 7 1.087E-01                      #L_max
+ 42 8 1.087E-01                      #L_SM
 
- 43 0 T6bbHH                         #txname 
- 43 1 6.857E-02                      #r value
- 43 2 4.012E-02                      #expected r value
+ 43 0 TChiWZ                         #txname 
+ 43 1 7.304E-02                      #r value
+ 43 2 9.306E-02                      #expected r value
  43 3 0.00                           #condition violation
- 43 4 ATLAS-SUSY-2018-31             #analysis
- 43 5 SRA_M                          #signal region 
- 43 6 4.835E-02                      #Likelihood
- 43 7 5.511E-02                      #L_max
- 43 8 5.511E-02                      #L_SM
+ 43 4 ATLAS-SUSY-2018-06             #analysis
+ 43 5 SR_low                         #signal region 
+ 43 6 4.145E-03                      #Likelihood
+ 43 7 4.450E-03                      #L_max
+ 43 8 3.757E-03                      #L_SM
 
- 44 0 T1                             #txname 
- 44 1 6.831E-02                      #r value
- 44 2 N/A                            #expected r value
+ 44 0 T6bbHH                         #txname 
+ 44 1 6.857E-02                      #r value
+ 44 2 4.012E-02                      #expected r value
  44 3 0.00                           #condition violation
- 44 4 CMS-SUS-13-019                 #analysis
- 44 5 (UL)                           #signal region 
- 44 6 N/A                            #Likelihood
- 44 7 N/A                            #L_max
- 44 8 N/A                            #L_SM
+ 44 4 ATLAS-SUSY-2018-31             #analysis
+ 44 5 SRA_M                          #signal region 
+ 44 6 4.835E-02                      #Likelihood
+ 44 7 5.511E-02                      #L_max
+ 44 8 5.511E-02                      #L_SM
 
- 45 0 TChiWZ                         #txname 
- 45 1 6.823E-02                      #r value
+ 45 0 T1                             #txname 
+ 45 1 6.831E-02                      #r value
  45 2 N/A                            #expected r value
  45 3 0.00                           #condition violation
- 45 4 ATLAS-SUSY-2016-24             #analysis
+ 45 4 CMS-SUS-13-019                 #analysis
  45 5 (UL)                           #signal region 
  45 6 N/A                            #Likelihood
  45 7 N/A                            #L_max
  45 8 N/A                            #L_SM
 
- 46 0 T1                             #txname 
- 46 1 6.118E-02                      #r value
+ 46 0 TChiWZ                         #txname 
+ 46 1 6.823E-02                      #r value
  46 2 N/A                            #expected r value
  46 3 0.00                           #condition violation
- 46 4 ATLAS-SUSY-2013-02             #analysis
+ 46 4 ATLAS-SUSY-2016-24             #analysis
  46 5 (UL)                           #signal region 
  46 6 N/A                            #Likelihood
  46 7 N/A                            #L_max
  46 8 N/A                            #L_SM
 
  47 0 T1                             #txname 
- 47 1 5.942E-02                      #r value
- 47 2 8.244E-02                      #expected r value
+ 47 1 6.118E-02                      #r value
+ 47 2 N/A                            #expected r value
  47 3 0.00                           #condition violation
- 47 4 CMS-SUS-13-012                 #analysis
+ 47 4 ATLAS-SUSY-2013-02             #analysis
  47 5 (UL)                           #signal region 
  47 6 N/A                            #Likelihood
  47 7 N/A                            #L_max
  47 8 N/A                            #L_SM
 
- 48 0 T1tttt, T5WW                   #txname 
- 48 1 5.771E-02                      #r value
- 48 2 1.303E-01                      #expected r value
+ 48 0 T1                             #txname 
+ 48 1 5.942E-02                      #r value
+ 48 2 8.244E-02                      #expected r value
  48 3 0.00                           #condition violation
- 48 4 ATLAS-SUSY-2013-09             #analysis
- 48 5 SR0B                           #signal region 
- 48 6 5.078E-03                      #Likelihood
- 48 7 1.838E-02                      #L_max
- 48 8 3.141E-03                      #L_SM
+ 48 4 CMS-SUS-13-012                 #analysis
+ 48 5 (UL)                           #signal region 
+ 48 6 N/A                            #Likelihood
+ 48 7 N/A                            #L_max
+ 48 8 N/A                            #L_SM
 
- 49 0 TChiWZ                         #txname 
- 49 1 5.586E-02                      #r value
- 49 2 N/A                            #expected r value
+ 49 0 T1tttt, T5WW                   #txname 
+ 49 1 5.771E-02                      #r value
+ 49 2 1.303E-01                      #expected r value
  49 3 0.00                           #condition violation
- 49 4 ATLAS-SUSY-2013-12             #analysis
- 49 5 (UL)                           #signal region 
- 49 6 N/A                            #Likelihood
- 49 7 N/A                            #L_max
- 49 8 N/A                            #L_SM
+ 49 4 ATLAS-SUSY-2013-09             #analysis
+ 49 5 SR0B                           #signal region 
+ 49 6 5.078E-03                      #Likelihood
+ 49 7 1.838E-02                      #L_max
+ 49 8 3.141E-03                      #L_SM
 
  50 0 TChiWZ                         #txname 
- 50 1 4.834E-02                      #r value
- 50 2 7.675E-02                      #expected r value
+ 50 1 5.586E-02                      #r value
+ 50 2 N/A                            #expected r value
  50 3 0.00                           #condition violation
- 50 4 ATLAS-SUSY-2018-06             #analysis
+ 50 4 ATLAS-SUSY-2013-12             #analysis
  50 5 (UL)                           #signal region 
  50 6 N/A                            #Likelihood
  50 7 N/A                            #L_max
  50 8 N/A                            #L_SM
 
- 51 0 T6WW                           #txname 
- 51 1 4.752E-02                      #r value
- 51 2 N/A                            #expected r value
+ 51 0 TChiWZ                         #txname 
+ 51 1 4.834E-02                      #r value
+ 51 2 7.675E-02                      #expected r value
  51 3 0.00                           #condition violation
- 51 4 ATLAS-SUSY-2018-22             #analysis
+ 51 4 ATLAS-SUSY-2018-06             #analysis
  51 5 (UL)                           #signal region 
  51 6 N/A                            #Likelihood
  51 7 N/A                            #L_max
  51 8 N/A                            #L_SM
 
- 52 0 TChiWZ                         #txname 
- 52 1 3.977E-02                      #r value
+ 52 0 T6WW                           #txname 
+ 52 1 4.752E-02                      #r value
  52 2 N/A                            #expected r value
  52 3 0.00                           #condition violation
- 52 4 CMS-SUS-13-006                 #analysis
+ 52 4 ATLAS-SUSY-2018-22             #analysis
  52 5 (UL)                           #signal region 
  52 6 N/A                            #Likelihood
  52 7 N/A                            #L_max
  52 8 N/A                            #L_SM
 
  53 0 TChiWZ                         #txname 
- 53 1 2.539E-02                      #r value
+ 53 1 3.977E-02                      #r value
  53 2 N/A                            #expected r value
  53 3 0.00                           #condition violation
- 53 4 CMS-SUS-16-034                 #analysis
+ 53 4 CMS-SUS-13-006                 #analysis
  53 5 (UL)                           #signal region 
  53 6 N/A                            #Likelihood
  53 7 N/A                            #L_max
  53 8 N/A                            #L_SM
 
- 54 0 T1                             #txname 
- 54 1 2.093E-02                      #r value
- 54 2 3.356E-02                      #expected r value
+ 54 0 TChiWZ                         #txname 
+ 54 1 2.539E-02                      #r value
+ 54 2 N/A                            #expected r value
  54 3 0.00                           #condition violation
- 54 4 CMS-SUS-12-028                 #analysis
+ 54 4 CMS-SUS-16-034                 #analysis
  54 5 (UL)                           #signal region 
  54 6 N/A                            #Likelihood
  54 7 N/A                            #L_max
  54 8 N/A                            #L_SM
 
- 55 0 TChiWZ                         #txname 
- 55 1 1.997E-02                      #r value
- 55 2 N/A                            #expected r value
+ 55 0 T1                             #txname 
+ 55 1 2.093E-02                      #r value
+ 55 2 3.356E-02                      #expected r value
  55 3 0.00                           #condition violation
- 55 4 ATLAS-SUSY-2013-11             #analysis
+ 55 4 CMS-SUS-12-028                 #analysis
  55 5 (UL)                           #signal region 
  55 6 N/A                            #Likelihood
  55 7 N/A                            #L_max
  55 8 N/A                            #L_SM
 
- 56 0 TChiWH                         #txname 
- 56 1 1.629E-02                      #r value
+ 56 0 TChiWZ                         #txname 
+ 56 1 1.997E-02                      #r value
  56 2 N/A                            #expected r value
  56 3 0.00                           #condition violation
- 56 4 CMS-SUS-16-043                 #analysis
+ 56 4 ATLAS-SUSY-2013-11             #analysis
  56 5 (UL)                           #signal region 
  56 6 N/A                            #Likelihood
  56 7 N/A                            #L_max
  56 8 N/A                            #L_SM
 
- 57 0 T2cc                           #txname 
- 57 1 1.528E-02                      #r value
+ 57 0 TChiWH                         #txname 
+ 57 1 1.629E-02                      #r value
  57 2 N/A                            #expected r value
  57 3 0.00                           #condition violation
- 57 4 ATLAS-SUSY-2016-26             #analysis
+ 57 4 CMS-SUS-16-043                 #analysis
  57 5 (UL)                           #signal region 
  57 6 N/A                            #Likelihood
  57 7 N/A                            #L_max
  57 8 N/A                            #L_SM
 
- 58 0 TChiWZ                         #txname 
- 58 1 9.551E-03                      #r value
+ 58 0 T2cc                           #txname 
+ 58 1 1.528E-02                      #r value
  58 2 N/A                            #expected r value
  58 3 0.00                           #condition violation
- 58 4 ATLAS-SUSY-2017-03             #analysis
+ 58 4 ATLAS-SUSY-2016-26             #analysis
  58 5 (UL)                           #signal region 
  58 6 N/A                            #Likelihood
  58 7 N/A                            #L_max
  58 8 N/A                            #L_SM
 
- 59 0 T1bbbb                         #txname 
- 59 1 9.459E-03                      #r value
- 59 2 9.459E-03                      #expected r value
+ 59 0 TChiWZ                         #txname 
+ 59 1 9.551E-03                      #r value
+ 59 2 N/A                            #expected r value
  59 3 0.00                           #condition violation
- 59 4 CMS-SUS-19-006                 #analysis
+ 59 4 ATLAS-SUSY-2017-03             #analysis
  59 5 (UL)                           #signal region 
  59 6 N/A                            #Likelihood
  59 7 N/A                            #L_max
  59 8 N/A                            #L_SM
 
- 60 0 T1tttt                         #txname 
- 60 1 8.319E-03                      #r value
- 60 2 8.932E-03                      #expected r value
+ 60 0 T1bbbb                         #txname 
+ 60 1 9.459E-03                      #r value
+ 60 2 9.459E-03                      #expected r value
  60 3 0.00                           #condition violation
  60 4 CMS-SUS-19-006                 #analysis
  60 5 (UL)                           #signal region 
@@ -610,554 +613,572 @@ BLOCK SModelS_Exclusion
  60 8 N/A                            #L_SM
 
  61 0 T1tttt                         #txname 
- 61 1 7.873E-03                      #r value
- 61 2 N/A                            #expected r value
+ 61 1 8.319E-03                      #r value
+ 61 2 8.932E-03                      #expected r value
  61 3 0.00                           #condition violation
- 61 4 CMS-SUS-16-037                 #analysis
+ 61 4 CMS-SUS-19-006                 #analysis
  61 5 (UL)                           #signal region 
  61 6 N/A                            #Likelihood
  61 7 N/A                            #L_max
  61 8 N/A                            #L_SM
 
  62 0 T1tttt                         #txname 
- 62 1 6.354E-03                      #r value
- 62 2 6.540E-03                      #expected r value
+ 62 1 7.873E-03                      #r value
+ 62 2 N/A                            #expected r value
  62 3 0.00                           #condition violation
- 62 4 CMS-SUS-16-050                 #analysis
+ 62 4 CMS-SUS-16-037                 #analysis
  62 5 (UL)                           #signal region 
  62 6 N/A                            #Likelihood
  62 7 N/A                            #L_max
  62 8 N/A                            #L_SM
 
  63 0 T1tttt                         #txname 
- 63 1 5.116E-03                      #r value
- 63 2 4.003E-03                      #expected r value
+ 63 1 6.354E-03                      #r value
+ 63 2 6.540E-03                      #expected r value
  63 3 0.00                           #condition violation
- 63 4 CMS-SUS-16-033                 #analysis
+ 63 4 CMS-SUS-16-050                 #analysis
  63 5 (UL)                           #signal region 
  63 6 N/A                            #Likelihood
  63 7 N/A                            #L_max
  63 8 N/A                            #L_SM
 
- 64 0 T1bbbb                         #txname 
- 64 1 4.572E-03                      #r value
- 64 2 3.087E-03                      #expected r value
+ 64 0 T1tttt                         #txname 
+ 64 1 5.116E-03                      #r value
+ 64 2 4.003E-03                      #expected r value
  64 3 0.00                           #condition violation
- 64 4 CMS-SUS-16-036                 #analysis
+ 64 4 CMS-SUS-16-033                 #analysis
  64 5 (UL)                           #signal region 
  64 6 N/A                            #Likelihood
  64 7 N/A                            #L_max
  64 8 N/A                            #L_SM
 
- 65 0 T1tttt                         #txname 
- 65 1 4.456E-03                      #r value
- 65 2 N/A                            #expected r value
+ 65 0 T1bbbb                         #txname 
+ 65 1 4.572E-03                      #r value
+ 65 2 3.087E-03                      #expected r value
  65 3 0.00                           #condition violation
- 65 4 CMS-SUS-16-042                 #analysis
+ 65 4 CMS-SUS-16-036                 #analysis
  65 5 (UL)                           #signal region 
  65 6 N/A                            #Likelihood
  65 7 N/A                            #L_max
  65 8 N/A                            #L_SM
 
- 66 0 T2tt                           #txname 
- 66 1 3.755E-03                      #r value
+ 66 0 T1tttt                         #txname 
+ 66 1 4.456E-03                      #r value
  66 2 N/A                            #expected r value
  66 3 0.00                           #condition violation
- 66 4 CMS-SUS-19-009                 #analysis
+ 66 4 CMS-SUS-16-042                 #analysis
  66 5 (UL)                           #signal region 
  66 6 N/A                            #Likelihood
  66 7 N/A                            #L_max
  66 8 N/A                            #L_SM
 
- 67 0 T1bbbb                         #txname 
- 67 1 3.121E-03                      #r value
- 67 2 3.169E-03                      #expected r value
+ 67 0 T2tt                           #txname 
+ 67 1 3.755E-03                      #r value
+ 67 2 N/A                            #expected r value
  67 3 0.00                           #condition violation
- 67 4 CMS-SUS-16-033                 #analysis
+ 67 4 CMS-SUS-19-009                 #analysis
  67 5 (UL)                           #signal region 
  67 6 N/A                            #Likelihood
  67 7 N/A                            #L_max
  67 8 N/A                            #L_SM
 
- 68 0 T2tt                           #txname 
- 68 1 2.747E-03                      #r value
- 68 2 1.960E-03                      #expected r value
+ 68 0 T1bbbb                         #txname 
+ 68 1 3.121E-03                      #r value
+ 68 2 3.169E-03                      #expected r value
  68 3 0.00                           #condition violation
- 68 4 CMS-SUS-19-006                 #analysis
+ 68 4 CMS-SUS-16-033                 #analysis
  68 5 (UL)                           #signal region 
  68 6 N/A                            #Likelihood
  68 7 N/A                            #L_max
  68 8 N/A                            #L_SM
 
- 69 0 T1tttt                         #txname 
- 69 1 2.400E-03                      #r value
- 69 2 2.646E-03                      #expected r value
+ 69 0 T2tt                           #txname 
+ 69 1 2.747E-03                      #r value
+ 69 2 1.960E-03                      #expected r value
  69 3 0.00                           #condition violation
- 69 4 CMS-SUS-16-036                 #analysis
+ 69 4 CMS-SUS-19-006                 #analysis
  69 5 (UL)                           #signal region 
  69 6 N/A                            #Likelihood
  69 7 N/A                            #L_max
  69 8 N/A                            #L_SM
 
- 70 0 T2tt                           #txname 
- 70 1 2.191E-03                      #r value
- 70 2 2.687E-03                      #expected r value
+ 70 0 T1tttt                         #txname 
+ 70 1 2.400E-03                      #r value
+ 70 2 2.646E-03                      #expected r value
  70 3 0.00                           #condition violation
- 70 4 ATLAS-SUSY-2018-12             #analysis
+ 70 4 CMS-SUS-16-036                 #analysis
  70 5 (UL)                           #signal region 
  70 6 N/A                            #Likelihood
  70 7 N/A                            #L_max
  70 8 N/A                            #L_SM
 
- 71 0 T1tttt                         #txname 
- 71 1 2.053E-03                      #r value
- 71 2 1.480E-03                      #expected r value
+ 71 0 T2tt                           #txname 
+ 71 1 2.191E-03                      #r value
+ 71 2 2.687E-03                      #expected r value
  71 3 0.00                           #condition violation
- 71 4 CMS-SUS-16-009                 #analysis
+ 71 4 ATLAS-SUSY-2018-12             #analysis
  71 5 (UL)                           #signal region 
  71 6 N/A                            #Likelihood
  71 7 N/A                            #L_max
  71 8 N/A                            #L_SM
 
- 72 0 T2tt                           #txname 
- 72 1 2.004E-03                      #r value
- 72 2 1.284E-03                      #expected r value
+ 72 0 T1tttt                         #txname 
+ 72 1 2.053E-03                      #r value
+ 72 2 1.480E-03                      #expected r value
  72 3 0.00                           #condition violation
- 72 4 CMS-SUS-16-051                 #analysis
+ 72 4 CMS-SUS-16-009                 #analysis
  72 5 (UL)                           #signal region 
  72 6 N/A                            #Likelihood
  72 7 N/A                            #L_max
  72 8 N/A                            #L_SM
 
  73 0 T2tt                           #txname 
- 73 1 1.955E-03                      #r value
- 73 2 1.242E-03                      #expected r value
+ 73 1 2.004E-03                      #r value
+ 73 2 1.284E-03                      #expected r value
  73 3 0.00                           #condition violation
- 73 4 CMS-SUS-16-036                 #analysis
+ 73 4 CMS-SUS-16-051                 #analysis
  73 5 (UL)                           #signal region 
  73 6 N/A                            #Likelihood
  73 7 N/A                            #L_max
  73 8 N/A                            #L_SM
 
  74 0 T2tt                           #txname 
- 74 1 1.866E-03                      #r value
- 74 2 2.294E-03                      #expected r value
+ 74 1 1.955E-03                      #r value
+ 74 2 1.242E-03                      #expected r value
  74 3 0.00                           #condition violation
- 74 4 ATLAS-SUSY-2018-12             #analysis
- 74 5 SRATT                          #signal region 
- 74 6 1.435E-01                      #Likelihood
- 74 7 1.559E-01                      #L_max
- 74 8 1.431E-01                      #L_SM
+ 74 4 CMS-SUS-16-036                 #analysis
+ 74 5 (UL)                           #signal region 
+ 74 6 N/A                            #Likelihood
+ 74 7 N/A                            #L_max
+ 74 8 N/A                            #L_SM
 
  75 0 T2tt                           #txname 
- 75 1 1.438E-03                      #r value
- 75 2 2.200E-03                      #expected r value
+ 75 1 1.866E-03                      #r value
+ 75 2 2.294E-03                      #expected r value
  75 3 0.00                           #condition violation
- 75 4 CMS-SUS-16-049                 #analysis
- 75 5 (UL)                           #signal region 
- 75 6 N/A                            #Likelihood
- 75 7 N/A                            #L_max
- 75 8 N/A                            #L_SM
+ 75 4 ATLAS-SUSY-2018-12             #analysis
+ 75 5 SRATT                          #signal region 
+ 75 6 1.435E-01                      #Likelihood
+ 75 7 1.559E-01                      #L_max
+ 75 8 1.431E-01                      #L_SM
 
  76 0 T2tt                           #txname 
- 76 1 1.405E-03                      #r value
- 76 2 2.112E-03                      #expected r value
+ 76 1 1.438E-03                      #r value
+ 76 2 2.200E-03                      #expected r value
  76 3 0.00                           #condition violation
- 76 4 CMS-SUS-16-050                 #analysis
+ 76 4 CMS-SUS-16-049                 #analysis
  76 5 (UL)                           #signal region 
  76 6 N/A                            #Likelihood
  76 7 N/A                            #L_max
  76 8 N/A                            #L_SM
 
- 77 0 T1tttt                         #txname 
- 77 1 1.381E-03                      #r value
- 77 2 N/A                            #expected r value
+ 77 0 T2tt                           #txname 
+ 77 1 1.405E-03                      #r value
+ 77 2 2.112E-03                      #expected r value
  77 3 0.00                           #condition violation
- 77 4 CMS-SUS-16-041                 #analysis
+ 77 4 CMS-SUS-16-050                 #analysis
  77 5 (UL)                           #signal region 
  77 6 N/A                            #Likelihood
  77 7 N/A                            #L_max
  77 8 N/A                            #L_SM
 
  78 0 T1tttt                         #txname 
- 78 1 1.265E-03                      #r value
+ 78 1 1.381E-03                      #r value
  78 2 N/A                            #expected r value
  78 3 0.00                           #condition violation
- 78 4 CMS-SUS-16-035                 #analysis
+ 78 4 CMS-SUS-16-041                 #analysis
  78 5 (UL)                           #signal region 
  78 6 N/A                            #Likelihood
  78 7 N/A                            #L_max
  78 8 N/A                            #L_SM
 
  79 0 T1tttt                         #txname 
- 79 1 1.172E-03                      #r value
- 79 2 6.639E-04                      #expected r value
+ 79 1 1.265E-03                      #r value
+ 79 2 N/A                            #expected r value
  79 3 0.00                           #condition violation
- 79 4 ATLAS-SUSY-2013-18             #analysis
- 79 5 SR-1l-6j-B                     #signal region 
- 79 6 4.951E-04                      #Likelihood
- 79 7 4.971E-04                      #L_max
- 79 8 4.971E-04                      #L_SM
+ 79 4 CMS-SUS-16-035                 #analysis
+ 79 5 (UL)                           #signal region 
+ 79 6 N/A                            #Likelihood
+ 79 7 N/A                            #L_max
+ 79 8 N/A                            #L_SM
 
- 80 0 T2tt                           #txname 
- 80 1 1.170E-03                      #r value
- 80 2 N/A                            #expected r value
+ 80 0 T1tttt                         #txname 
+ 80 1 1.172E-03                      #r value
+ 80 2 6.639E-04                      #expected r value
  80 3 0.00                           #condition violation
- 80 4 ATLAS-SUSY-2016-15             #analysis
- 80 5 (UL)                           #signal region 
- 80 6 N/A                            #Likelihood
- 80 7 N/A                            #L_max
- 80 8 N/A                            #L_SM
+ 80 4 ATLAS-SUSY-2013-18             #analysis
+ 80 5 SR-1l-6j-B                     #signal region 
+ 80 6 4.951E-04                      #Likelihood
+ 80 7 4.971E-04                      #L_max
+ 80 8 4.971E-04                      #L_SM
 
- 81 0 TChiWH                         #txname 
- 81 1 1.084E-03                      #r value
+ 81 0 T2tt                           #txname 
+ 81 1 1.170E-03                      #r value
  81 2 N/A                            #expected r value
  81 3 0.00                           #condition violation
- 81 4 ATLAS-SUSY-2019-08             #analysis
+ 81 4 ATLAS-SUSY-2016-15             #analysis
  81 5 (UL)                           #signal region 
  81 6 N/A                            #Likelihood
  81 7 N/A                            #L_max
  81 8 N/A                            #L_SM
 
- 82 0 T2tt                           #txname 
- 82 1 9.896E-04                      #r value
+ 82 0 TChiWH                         #txname 
+ 82 1 1.084E-03                      #r value
  82 2 N/A                            #expected r value
  82 3 0.00                           #condition violation
- 82 4 ATLAS-SUSY-2016-16             #analysis
+ 82 4 ATLAS-SUSY-2019-08             #analysis
  82 5 (UL)                           #signal region 
  82 6 N/A                            #Likelihood
  82 7 N/A                            #L_max
  82 8 N/A                            #L_SM
 
  83 0 T2tt                           #txname 
- 83 1 9.374E-04                      #r value
- 83 2 1.160E-03                      #expected r value
+ 83 1 9.896E-04                      #r value
+ 83 2 N/A                            #expected r value
  83 3 0.00                           #condition violation
- 83 4 CMS-SUS-16-033                 #analysis
+ 83 4 ATLAS-SUSY-2016-16             #analysis
  83 5 (UL)                           #signal region 
  83 6 N/A                            #Likelihood
  83 7 N/A                            #L_max
  83 8 N/A                            #L_SM
 
- 84 0 T1tttt                         #txname 
- 84 1 9.190E-04                      #r value
- 84 2 N/A                            #expected r value
+ 84 0 T2tt                           #txname 
+ 84 1 9.374E-04                      #r value
+ 84 2 1.160E-03                      #expected r value
  84 3 0.00                           #condition violation
- 84 4 ATLAS-SUSY-2016-14             #analysis
+ 84 4 CMS-SUS-16-033                 #analysis
  84 5 (UL)                           #signal region 
  84 6 N/A                            #Likelihood
  84 7 N/A                            #L_max
  84 8 N/A                            #L_SM
 
- 85 0 T2tt                           #txname 
- 85 1 8.615E-04                      #r value
+ 85 0 T1tttt                         #txname 
+ 85 1 9.190E-04                      #r value
  85 2 N/A                            #expected r value
  85 3 0.00                           #condition violation
- 85 4 CMS-PAS-SUS-13-023             #analysis
+ 85 4 ATLAS-SUSY-2016-14             #analysis
  85 5 (UL)                           #signal region 
  85 6 N/A                            #Likelihood
  85 7 N/A                            #L_max
  85 8 N/A                            #L_SM
 
- 86 0 T1tttt                         #txname 
- 86 1 8.346E-04                      #r value
- 86 2 6.416E-04                      #expected r value
+ 86 0 T2tt                           #txname 
+ 86 1 8.615E-04                      #r value
+ 86 2 N/A                            #expected r value
  86 3 0.00                           #condition violation
- 86 4 CMS-SUS-14-010                 #analysis
+ 86 4 CMS-PAS-SUS-13-023             #analysis
  86 5 (UL)                           #signal region 
  86 6 N/A                            #Likelihood
  86 7 N/A                            #L_max
  86 8 N/A                            #L_SM
 
- 87 0 TChiWH                         #txname 
- 87 1 8.207E-04                      #r value
- 87 2 N/A                            #expected r value
+ 87 0 T1tttt                         #txname 
+ 87 1 8.346E-04                      #r value
+ 87 2 6.416E-04                      #expected r value
  87 3 0.00                           #condition violation
- 87 4 ATLAS-SUSY-2017-01             #analysis
+ 87 4 CMS-SUS-14-010                 #analysis
  87 5 (UL)                           #signal region 
  87 6 N/A                            #Likelihood
  87 7 N/A                            #L_max
  87 8 N/A                            #L_SM
 
- 88 0 T1tttt                         #txname 
- 88 1 8.067E-04                      #r value
+ 88 0 TChiWH                         #txname 
+ 88 1 8.207E-04                      #r value
  88 2 N/A                            #expected r value
  88 3 0.00                           #condition violation
- 88 4 ATLAS-SUSY-2013-18             #analysis
+ 88 4 ATLAS-SUSY-2017-01             #analysis
  88 5 (UL)                           #signal region 
  88 6 N/A                            #Likelihood
  88 7 N/A                            #L_max
  88 8 N/A                            #L_SM
 
- 89 0 T2tt                           #txname 
- 89 1 7.859E-04                      #r value
+ 89 0 T1tttt                         #txname 
+ 89 1 8.067E-04                      #r value
  89 2 N/A                            #expected r value
  89 3 0.00                           #condition violation
- 89 4 CMS-SUS-13-004                 #analysis
+ 89 4 ATLAS-SUSY-2013-18             #analysis
  89 5 (UL)                           #signal region 
  89 6 N/A                            #Likelihood
  89 7 N/A                            #L_max
  89 8 N/A                            #L_SM
 
- 90 0 T1tttt                         #txname 
- 90 1 7.446E-04                      #r value
+ 90 0 T2tt                           #txname 
+ 90 1 7.859E-04                      #r value
  90 2 N/A                            #expected r value
  90 3 0.00                           #condition violation
- 90 4 CMS-SUS-13-007                 #analysis
+ 90 4 CMS-SUS-13-004                 #analysis
  90 5 (UL)                           #signal region 
  90 6 N/A                            #Likelihood
  90 7 N/A                            #L_max
  90 8 N/A                            #L_SM
 
- 91 0 T1bbbb                         #txname 
- 91 1 5.460E-04                      #r value
+ 91 0 T1tttt                         #txname 
+ 91 1 7.446E-04                      #r value
  91 2 N/A                            #expected r value
  91 3 0.00                           #condition violation
- 91 4 CMS-SUS-13-019                 #analysis
+ 91 4 CMS-SUS-13-007                 #analysis
  91 5 (UL)                           #signal region 
  91 6 N/A                            #Likelihood
  91 7 N/A                            #L_max
  91 8 N/A                            #L_SM
 
- 92 0 T2tt                           #txname 
- 92 1 4.839E-04                      #r value
- 92 2 7.891E-04                      #expected r value
+ 92 0 T1bbbb                         #txname 
+ 92 1 5.460E-04                      #r value
+ 92 2 N/A                            #expected r value
  92 3 0.00                           #condition violation
- 92 4 ATLAS-SUSY-2016-16             #analysis
- 92 5 tN_med                         #signal region 
- 92 6 1.188E-03                      #Likelihood
- 92 7 3.405E-03                      #L_max
- 92 8 1.185E-03                      #L_SM
+ 92 4 CMS-SUS-13-019                 #analysis
+ 92 5 (UL)                           #signal region 
+ 92 6 N/A                            #Likelihood
+ 92 7 N/A                            #L_max
+ 92 8 N/A                            #L_SM
 
  93 0 T2tt                           #txname 
- 93 1 3.394E-04                      #r value
- 93 2 N/A                            #expected r value
+ 93 1 4.839E-04                      #r value
+ 93 2 7.891E-04                      #expected r value
  93 3 0.00                           #condition violation
- 93 4 CMS-SUS-17-001                 #analysis
- 93 5 (UL)                           #signal region 
- 93 6 N/A                            #Likelihood
- 93 7 N/A                            #L_max
- 93 8 N/A                            #L_SM
+ 93 4 ATLAS-SUSY-2016-16             #analysis
+ 93 5 tN_med                         #signal region 
+ 93 6 1.188E-03                      #Likelihood
+ 93 7 3.405E-03                      #L_max
+ 93 8 1.185E-03                      #L_SM
 
- 94 0 T1tttt                         #txname 
- 94 1 3.367E-04                      #r value
+ 94 0 T2tt                           #txname 
+ 94 1 3.394E-04                      #r value
  94 2 N/A                            #expected r value
  94 3 0.00                           #condition violation
- 94 4 CMS-SUS-13-019                 #analysis
+ 94 4 CMS-SUS-17-001                 #analysis
  94 5 (UL)                           #signal region 
  94 6 N/A                            #Likelihood
  94 7 N/A                            #L_max
  94 8 N/A                            #L_SM
 
- 95 0 T1bbbb                         #txname 
- 95 1 3.280E-04                      #r value
+ 95 0 T1tttt                         #txname 
+ 95 1 3.367E-04                      #r value
  95 2 N/A                            #expected r value
  95 3 0.00                           #condition violation
- 95 4 ATLAS-SUSY-2013-18             #analysis
+ 95 4 CMS-SUS-13-019                 #analysis
  95 5 (UL)                           #signal region 
  95 6 N/A                            #Likelihood
  95 7 N/A                            #L_max
  95 8 N/A                            #L_SM
 
- 96 0 T2tt                           #txname 
- 96 1 3.278E-04                      #r value
- 96 2 3.841E-04                      #expected r value
+ 96 0 T1bbbb                         #txname 
+ 96 1 3.280E-04                      #r value
+ 96 2 N/A                            #expected r value
  96 3 0.00                           #condition violation
- 96 4 CMS-SUS-16-009                 #analysis
+ 96 4 ATLAS-SUSY-2013-18             #analysis
  96 5 (UL)                           #signal region 
  96 6 N/A                            #Likelihood
  96 7 N/A                            #L_max
  96 8 N/A                            #L_SM
 
- 97 0 T1bbbb                         #txname 
- 97 1 3.113E-04                      #r value
- 97 2 N/A                            #expected r value
+ 97 0 T2tt                           #txname 
+ 97 1 3.278E-04                      #r value
+ 97 2 3.841E-04                      #expected r value
  97 3 0.00                           #condition violation
- 97 4 CMS-SUS-13-004                 #analysis
+ 97 4 CMS-SUS-16-009                 #analysis
  97 5 (UL)                           #signal region 
  97 6 N/A                            #Likelihood
  97 7 N/A                            #L_max
  97 8 N/A                            #L_SM
 
- 98 0 T1bbbb, T1tttt                 #txname 
- 98 1 3.076E-04                      #r value
- 98 2 4.526E-04                      #expected r value
+ 98 0 T1bbbb                         #txname 
+ 98 1 3.113E-04                      #r value
+ 98 2 N/A                            #expected r value
  98 3 0.00                           #condition violation
- 98 4 CMS-SUS-12-024                 #analysis
- 98 5 MET4_HT4_nb3                   #signal region 
- 98 6 4.657E-02                      #Likelihood
- 98 7 7.085E-02                      #L_max
- 98 8 4.651E-02                      #L_SM
+ 98 4 CMS-SUS-13-004                 #analysis
+ 98 5 (UL)                           #signal region 
+ 98 6 N/A                            #Likelihood
+ 98 7 N/A                            #L_max
+ 98 8 N/A                            #L_SM
 
- 99 0 T1tttt                         #txname 
- 99 1 2.816E-04                      #r value
- 99 2 N/A                            #expected r value
+ 99 0 T1bbbb, T1tttt                 #txname 
+ 99 1 3.076E-04                      #r value
+ 99 2 4.526E-04                      #expected r value
  99 3 0.00                           #condition violation
- 99 4 ATLAS-SUSY-2013-04             #analysis
- 99 5 (UL)                           #signal region 
- 99 6 N/A                            #Likelihood
- 99 7 N/A                            #L_max
- 99 8 N/A                            #L_SM
+ 99 4 CMS-SUS-12-024                 #analysis
+ 99 5 MET4_HT4_nb3                   #signal region 
+ 99 6 4.657E-02                      #Likelihood
+ 99 7 7.085E-02                      #L_max
+ 99 8 4.651E-02                      #L_SM
 
- 100 0 T2tt                           #txname 
- 100 1 2.775E-04                      #r value
+ 100 0 T1tttt                         #txname 
+ 100 1 2.816E-04                      #r value
  100 2 N/A                            #expected r value
  100 3 0.00                           #condition violation
- 100 4 CMS-SUS-13-019                 #analysis
+ 100 4 ATLAS-SUSY-2013-04             #analysis
  100 5 (UL)                           #signal region 
  100 6 N/A                            #Likelihood
  100 7 N/A                            #L_max
  100 8 N/A                            #L_SM
 
  101 0 T2tt                           #txname 
- 101 1 2.579E-04                      #r value
- 101 2 2.579E-04                      #expected r value
+ 101 1 2.775E-04                      #r value
+ 101 2 N/A                            #expected r value
  101 3 0.00                           #condition violation
- 101 4 ATLAS-SUSY-2015-02             #analysis
- 101 5 SR2                            #signal region 
- 101 6 5.501E-01                      #Likelihood
- 101 7 5.502E-01                      #L_max
- 101 8 5.502E-01                      #L_SM
+ 101 4 CMS-SUS-13-019                 #analysis
+ 101 5 (UL)                           #signal region 
+ 101 6 N/A                            #Likelihood
+ 101 7 N/A                            #L_max
+ 101 8 N/A                            #L_SM
 
- 102 0 T1tttt                         #txname 
- 102 1 2.267E-04                      #r value
- 102 2 N/A                            #expected r value
+ 102 0 T2tt                           #txname 
+ 102 1 2.579E-04                      #r value
+ 102 2 2.579E-04                      #expected r value
  102 3 0.00                           #condition violation
- 102 4 ATLAS-SUSY-2013-09             #analysis
- 102 5 (UL)                           #signal region 
- 102 6 N/A                            #Likelihood
- 102 7 N/A                            #L_max
- 102 8 N/A                            #L_SM
+ 102 4 ATLAS-SUSY-2015-02             #analysis
+ 102 5 SR2                            #signal region 
+ 102 6 5.501E-01                      #Likelihood
+ 102 7 5.502E-01                      #L_max
+ 102 8 5.502E-01                      #L_SM
 
  103 0 T1tttt                         #txname 
- 103 1 1.879E-04                      #r value
- 103 2 1.082E-04                      #expected r value
+ 103 1 2.267E-04                      #r value
+ 103 2 N/A                            #expected r value
  103 3 0.00                           #condition violation
- 103 4 CMS-SUS-13-002                 #analysis
+ 103 4 ATLAS-SUSY-2013-09             #analysis
  103 5 (UL)                           #signal region 
  103 6 N/A                            #Likelihood
  103 7 N/A                            #L_max
  103 8 N/A                            #L_SM
 
- 104 0 T2tt                           #txname 
- 104 1 1.874E-04                      #r value
- 104 2 N/A                            #expected r value
+ 104 0 T1tttt                         #txname 
+ 104 1 1.879E-04                      #r value
+ 104 2 1.082E-04                      #expected r value
  104 3 0.00                           #condition violation
- 104 4 ATLAS-SUSY-2016-17             #analysis
+ 104 4 CMS-SUS-13-002                 #analysis
  104 5 (UL)                           #signal region 
  104 6 N/A                            #Likelihood
  104 7 N/A                            #L_max
  104 8 N/A                            #L_SM
 
- 105 0 T1tttt                         #txname 
- 105 1 1.855E-04                      #r value
- 105 2 2.749E-04                      #expected r value
+ 105 0 T2tt                           #txname 
+ 105 1 1.874E-04                      #r value
+ 105 2 N/A                            #expected r value
  105 3 0.00                           #condition violation
- 105 4 CMS-SUS-13-012                 #analysis
+ 105 4 ATLAS-SUSY-2016-17             #analysis
  105 5 (UL)                           #signal region 
  105 6 N/A                            #Likelihood
  105 7 N/A                            #L_max
  105 8 N/A                            #L_SM
 
  106 0 T1tttt                         #txname 
- 106 1 1.829E-04                      #r value
- 106 2 N/A                            #expected r value
+ 106 1 1.855E-04                      #r value
+ 106 2 2.749E-04                      #expected r value
  106 3 0.00                           #condition violation
- 106 4 CMS-SUS-13-004                 #analysis
+ 106 4 CMS-SUS-13-012                 #analysis
  106 5 (UL)                           #signal region 
  106 6 N/A                            #Likelihood
  106 7 N/A                            #L_max
  106 8 N/A                            #L_SM
 
  107 0 T1tttt                         #txname 
- 107 1 1.743E-04                      #r value
- 107 2 1.622E-04                      #expected r value
+ 107 1 1.829E-04                      #r value
+ 107 2 N/A                            #expected r value
  107 3 0.00                           #condition violation
- 107 4 CMS-SUS-13-013                 #analysis
+ 107 4 CMS-SUS-13-004                 #analysis
  107 5 (UL)                           #signal region 
  107 6 N/A                            #Likelihood
  107 7 N/A                            #L_max
  107 8 N/A                            #L_SM
 
  108 0 T1tttt                         #txname 
- 108 1 1.618E-04                      #r value
- 108 2 1.612E-04                      #expected r value
+ 108 1 1.743E-04                      #r value
+ 108 2 1.622E-04                      #expected r value
  108 3 0.00                           #condition violation
  108 4 CMS-SUS-13-013                 #analysis
- 108 5 SR28_HighPt                    #signal region 
- 108 6 1.098E-01                      #Likelihood
- 108 7 1.098E-01                      #L_max
- 108 8 1.098E-01                      #L_SM
+ 108 5 (UL)                           #signal region 
+ 108 6 N/A                            #Likelihood
+ 108 7 N/A                            #L_max
+ 108 8 N/A                            #L_SM
 
- 109 0 T1bbbb                         #txname 
- 109 1 1.389E-04                      #r value
- 109 2 1.889E-04                      #expected r value
+ 109 0 T1tttt                         #txname 
+ 109 1 1.618E-04                      #r value
+ 109 2 1.612E-04                      #expected r value
  109 3 0.00                           #condition violation
- 109 4 CMS-SUS-12-028                 #analysis
- 109 5 (UL)                           #signal region 
- 109 6 N/A                            #Likelihood
- 109 7 N/A                            #L_max
- 109 8 N/A                            #L_SM
+ 109 4 CMS-SUS-13-013                 #analysis
+ 109 5 SR28_HighPt                    #signal region 
+ 109 6 1.098E-01                      #Likelihood
+ 109 7 1.098E-01                      #L_max
+ 109 8 1.098E-01                      #L_SM
 
- 110 0 T1tttt                         #txname 
- 110 1 1.367E-04                      #r value
- 110 2 1.361E-04                      #expected r value
+ 110 0 T1bbbb                         #txname 
+ 110 1 1.389E-04                      #r value
+ 110 2 1.889E-04                      #expected r value
  110 3 0.00                           #condition violation
- 110 4 CMS-PAS-SUS-13-016             #analysis
- 110 5 sr0                            #signal region 
- 110 6 1.387E-01                      #Likelihood
- 110 7 1.387E-01                      #L_max
- 110 8 1.387E-01                      #L_SM
+ 110 4 CMS-SUS-12-028                 #analysis
+ 110 5 (UL)                           #signal region 
+ 110 6 N/A                            #Likelihood
+ 110 7 N/A                            #L_max
+ 110 8 N/A                            #L_SM
 
  111 0 T1tttt                         #txname 
- 111 1 1.338E-04                      #r value
- 111 2 1.340E-04                      #expected r value
+ 111 1 1.367E-04                      #r value
+ 111 2 1.361E-04                      #expected r value
  111 3 0.00                           #condition violation
- 111 4 CMS-SUS-13-007                 #analysis
- 111 5 mu350Nb3                       #signal region 
- 111 6 3.773E-01                      #Likelihood
- 111 7 3.775E-01                      #L_max
- 111 8 3.775E-01                      #L_SM
+ 111 4 CMS-PAS-SUS-13-016             #analysis
+ 111 5 sr0                            #signal region 
+ 111 6 1.387E-01                      #Likelihood
+ 111 7 1.387E-01                      #L_max
+ 111 8 1.387E-01                      #L_SM
 
- 112 0 T2tt                           #txname 
- 112 1 1.247E-04                      #r value
- 112 2 1.282E-04                      #expected r value
+ 112 0 T1tttt                         #txname 
+ 112 1 1.338E-04                      #r value
+ 112 2 1.340E-04                      #expected r value
  112 3 0.00                           #condition violation
- 112 4 CMS-SUS-17-010                 #analysis
- 112 5 (UL)                           #signal region 
- 112 6 N/A                            #Likelihood
- 112 7 N/A                            #L_max
- 112 8 N/A                            #L_SM
+ 112 4 CMS-SUS-13-007                 #analysis
+ 112 5 mu350Nb3                       #signal region 
+ 112 6 3.773E-01                      #Likelihood
+ 112 7 3.775E-01                      #L_max
+ 112 8 3.775E-01                      #L_SM
 
- 113 0 T1tttt                         #txname 
- 113 1 1.175E-04                      #r value
- 113 2 N/A                            #expected r value
+ 113 0 T2tt                           #txname 
+ 113 1 1.247E-04                      #r value
+ 113 2 1.282E-04                      #expected r value
  113 3 0.00                           #condition violation
- 113 4 CMS-SUS-12-024                 #analysis
+ 113 4 CMS-SUS-17-010                 #analysis
  113 5 (UL)                           #signal region 
  113 6 N/A                            #Likelihood
  113 7 N/A                            #L_max
  113 8 N/A                            #L_SM
 
  114 0 T1tttt                         #txname 
- 114 1 1.012E-04                      #r value
+ 114 1 1.175E-04                      #r value
  114 2 N/A                            #expected r value
  114 3 0.00                           #condition violation
- 114 4 CMS-PAS-SUS-13-016             #analysis
+ 114 4 CMS-SUS-12-024                 #analysis
  114 5 (UL)                           #signal region 
  114 6 N/A                            #Likelihood
  114 7 N/A                            #L_max
  114 8 N/A                            #L_SM
 
  115 0 T1tttt                         #txname 
- 115 1 8.524E-05                      #r value
- 115 2 1.165E-04                      #expected r value
+ 115 1 1.012E-04                      #r value
+ 115 2 N/A                            #expected r value
  115 3 0.00                           #condition violation
- 115 4 CMS-SUS-12-028                 #analysis
+ 115 4 CMS-PAS-SUS-13-016             #analysis
  115 5 (UL)                           #signal region 
  115 6 N/A                            #Likelihood
  115 7 N/A                            #L_max
  115 8 N/A                            #L_SM
+
+ 116 0 T1tttt                         #txname 
+ 116 1 8.524E-05                      #r value
+ 116 2 1.165E-04                      #expected r value
+ 116 3 0.00                           #condition violation
+ 116 4 CMS-SUS-12-028                 #analysis
+ 116 5 (UL)                           #signal region 
+ 116 6 N/A                            #Likelihood
+ 116 7 N/A                            #L_max
+ 116 8 N/A                            #L_SM
+
+BLOCK SModelS_CombinedAnas
+ 1 1 4.568E-04                      #r value
+ 1 2 3.278E-04                      #expected r value
+ 1 3 2.076E-01                      #Likelihood
+ 1 4 2.502E-01                      #L_max
+ 1 5 2.077E-01                      #L_SM
+ 1 6 ATLAS-SUSY-2015-02 CMS-SUS-13-007 #IDs of combined analyses
 
 
 BLOCK SModelS_Coverage

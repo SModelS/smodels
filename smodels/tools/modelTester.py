@@ -17,22 +17,26 @@ from smodels.theory import theoryPrediction
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut
 from smodels.tools.printer import MPrinter, printScanSummary
+from collections import OrderedDict
 import multiprocessing
 import os
 import sys
-import time,gc
+import time
+import gc
 try:
-    from ConfigParser import SafeConfigParser,NoSectionError,NoOptionError
-except ImportError as e:
-    from configparser import ConfigParser,NoSectionError,NoOptionError
+    from ConfigParser import SafeConfigParser, NoSectionError, NoOptionError
+except ImportError:
+    from configparser import ConfigParser, NoSectionError, NoOptionError
 from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.experiment.databaseObj import Database, ExpResultList
 from smodels.tools.smodelsLogging import logger
 import logging
+
 
 def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     """
@@ -51,11 +55,11 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     sigmacut = parser.getfloat("parameters", "sigmacut") * fb
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
 
-
     """Setup output printers"""
     masterPrinter = MPrinter()
     masterPrinter.setPrinterOptions(parser)
-    masterPrinter.setOutPutFiles(os.path.join(outputDir, os.path.basename(inputFile)))
+    masterPrinter.setOutPutFiles(os.path.join(
+        outputDir, os.path.basename(inputFile)))
 
     """ Add list of analyses loaded to printer"""
     masterPrinter.addObj(ExpResultList(listOfExpRes))
@@ -65,11 +69,20 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     if parser.getboolean("options", "checkInput"):
         inputStatus.checkFile(inputFile)
     """Initialize output status and exit if there were errors in the input"""
+    printParameters = []
+    if parser.has_section('parameters'):
+        printParameters += list(parser.items('parameters'))
+    if parser.has_section('particles'):
+        printParameters += list(parser.items('particles'))
+    if parser.has_section('options'):
+        printParameters += list(parser.items('options'))
+
+    printParameters = OrderedDict(printParameters)
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
-            dict(parser.items("parameters")), databaseVersion)
+                                          printParameters, databaseVersion)
     masterPrinter.addObj(outputStatus)
     if outputStatus.status < 0:
-        return {os.path.basename(inputFile) : masterPrinter.flush()}
+        return {os.path.basename(inputFile): masterPrinter.flush()}
 
     """
     Load the input model
@@ -83,17 +96,17 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         promptWidth = None
         stableWidth = None
-        if parser.has_option("particles","promptWidth"):
+        if parser.has_option("particles", "promptWidth"):
             promptWidth = parser.getfloat("particles", "promptWidth")*GeV
-        if parser.has_option("particles","stableWidth"):
+        if parser.has_option("particles", "stableWidth"):
             stableWidth = parser.getfloat("particles", "stableWidth")*GeV
-        model.updateParticles(inputFile=inputFile, promptWidth=promptWidth, stableWidth=stableWidth)
+        model.updateParticles(inputFile=inputFile,
+                              promptWidth=promptWidth, stableWidth=stableWidth)
     except SModelSError as e:
-        print("Exception %s %s" %(e, type(e)))
+        print("Exception %s %s" % (e, type(e)))
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
-        return {os.path.basename(inputFile) : masterPrinter.flush()}
-
+        return {os.path.basename(inputFile): masterPrinter.flush()}
 
     """
     Decompose input model
@@ -105,24 +118,25 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         """ Decompose the input model, store the output elements in smstoplist """
         sigmacut = parser.getfloat("parameters", "sigmacut") * fb
         smstoplist = decomposer.decompose(model, sigmacut,
-                    doCompress=parser.getboolean("options", "doCompress"),
-                    doInvisible=parser.getboolean("options", "doInvisible"),
-                    minmassgap=minmassgap)
+                                          doCompress=parser.getboolean(
+                                              "options", "doCompress"),
+                                          doInvisible=parser.getboolean(
+                                              "options", "doInvisible"),
+                                          minmassgap=minmassgap)
     except SModelSError as e:
-        print("Exception %s %s" %(e, type(e)))
+        print("Exception %s %s" % (e, type(e)))
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
-        return {os.path.basename(inputFile) : masterPrinter.flush()}
+        return {os.path.basename(inputFile): masterPrinter.flush()}
 
     """ Print Decomposition output.
         If no topologies with sigma > sigmacut are found, update status, write
         output file, stop running """
     if not smstoplist:
         outputStatus.updateStatus(-3)
-        return {os.path.basename(inputFile) : masterPrinter.flush()}
+        return {os.path.basename(inputFile): masterPrinter.flush()}
 
     masterPrinter.addObj(smstoplist)
-
 
     """
     Compute theory predictions
@@ -131,61 +145,99 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
     """ Get theory prediction for each analysis and print basic output """
     allPredictions = []
-    combineResults=False
+    combineResults = False
     useBest = True
     try:
-        combineResults = parser.getboolean("options","combineSRs")
-    except (NoSectionError,NoOptionError) as e:
+        combineResults = parser.getboolean("options", "combineSRs")
+    except (NoSectionError, NoOptionError):
         pass
     try:
-        allSRs = parser.getboolean("options","reportAllSRs")
-        if allSRs:
+        allSRs = parser.getboolean("options", "reportAllSRs")
+        if allSRs:  # If set print out all SRs and skip combination
             useBest = False
-    except (NoSectionError,NoOptionError) as e:
+            combineResults = False
+    except (NoSectionError, NoOptionError):
         pass
     try:
-        expFeatures = parser.getboolean("options","experimentalFeatures")
+        expFeatures = parser.getboolean("options", "experimentalFeatures")
         from smodels.tools import runtime
         runtime._experimental = expFeatures
-    except (NoSectionError,NoOptionError) as e:
+    except (NoSectionError, NoOptionError):
         pass
 
     for expResult in listOfExpRes:
         theorypredictions = theoryPredictionsFor(expResult, smstoplist,
-                    useBestDataset=useBest, combinedResults=combineResults,
-                    marginalize=False)
+                                                 useBestDataset=useBest, combinedResults=combineResults,
+                                                 marginalize=False)
         if not theorypredictions:
             continue
         allPredictions += theorypredictions._theoryPredictions
 
     """Compute chi-square and likelihood"""
-    if parser.getboolean("options","computeStatistics"):
+    if parser.getboolean("options", "computeStatistics"):
         for theoPred in allPredictions:
             theoPred.computeStatistics()
 
     """ Define theory predictions list that collects all theoryPrediction objects which satisfy max condition."""
     maxcond = parser.getfloat("parameters", "maxcond")
-    theoryPredictions = theoryPrediction.TheoryPredictionList(allPredictions, maxcond)
+    theoryPredictions = theoryPrediction.TheoryPredictionList(
+        allPredictions, maxcond)
 
     if len(theoryPredictions) != 0:
         outputStatus.updateStatus(1)
         masterPrinter.addObj(theoryPredictions)
     else:
-        outputStatus.updateStatus(0) # no results after enforcing maxcond
+        outputStatus.updateStatus(0)  # no results after enforcing maxcond
 
     if parser.getboolean("options", "testCoverage"):
         """ Testing coverage of model point, add results to the output file """
-        if  parser.has_option("options","coverageSqrts"):
+        if parser.has_option("options", "coverageSqrts"):
             sqrts = parser.getfloat("options", "coverageSqrts")*TeV
         else:
             sqrts = None
-        uncovered = coverage.Uncovered(smstoplist,sigmacut=sigmacut,sqrts=sqrts)
+        uncovered = coverage.Uncovered(
+            smstoplist, sigmacut=sigmacut, sqrts=sqrts)
         masterPrinter.addObj(uncovered)
 
-    return {os.path.basename(inputFile) : masterPrinter.flush()}
+    if parser.has_option("options", "combineAnas"):
+        """ Combine analyses """
+
+        selectedTheoryPreds = []
+        selectedResults = []
+        combineAnas = parser.get("options", "combineAnas").split(",")
+        if combineAnas:
+            if combineResults is True:
+                logger.warning("Combining analyses with signal region combination (combineSRs=True) might significantly reduce CPU performance.")
+            # Select the theory predictions which correspond to the analyses to be combined
+            # and have likelihoods defined
+            for tp in theoryPredictions:
+                expID = tp.analysisId()
+                if expID not in combineAnas:
+                    continue
+                selectedResults.append(expID)
+                if tp.likelihood() is None:
+                    continue
+                selectedTheoryPreds.append(tp)
+        # Make sure each analysis appears only once:
+        expIDs = [tp.analysisId() for tp in selectedTheoryPreds]
+        # Print a warning if no likelihood was found for the analysis
+        for eID in selectedResults:
+            if eID not in expIDs:
+                logger.info("No likelihood available for %s. This analysis will not be used in analysis combination." % eID)
+
+        if len(expIDs) != len(set(expIDs)):
+            logger.warning("Duplicated results when trying to combine analyses. Combination will be skipped.")
+        # Only compute combination if at least two results were selected
+        elif len(selectedTheoryPreds) > 0:
+            combiner = TheoryPredictionsCombiner(selectedTheoryPreds)
+            combiner.computeStatistics()
+            masterPrinter.addObj(combiner)
+
+    return {os.path.basename(inputFile): masterPrinter.flush()}
+
 
 def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
-                    timeout, development, parameterFile):
+                  timeout, development, parameterFile):
     """
     Call testPoint on inputFile, write crash report in case of problems
 
@@ -215,8 +267,9 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
             print(crashReportFacility.createUnknownErrorMessage())
     return {inputFile: None}
 
+
 def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
-                    timeout, development, parameterFile):
+                  timeout, development, parameterFile):
     """
     Loop over all input files in inputFiles with testPoint
 
@@ -233,10 +286,11 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
     output = {}
     for inputFile in inputFiles:
         output.update(runSingleFile(inputFile, outputDir, parser, databaseVersion,
-                                  listOfExpRes, timeout, development, parameterFile))
+                                    listOfExpRes, timeout, development, parameterFile))
         gc.collect()
 
     return output
+
 
 def _cleanList(fileList, inDir):
     """ clean up list of files """
@@ -244,10 +298,12 @@ def _cleanList(fileList, inDir):
     for f in fileList:
         tmp = os.path.join(inDir, f)
         if not os.path.isfile(tmp):
-            logger.info("%s does not exist or is not a file. Skipping it." % tmp)
+            logger.info(
+                "%s does not exist or is not a file. Skipping it." % tmp)
             continue
         cleanedList.append(tmp)
     return cleanedList
+
 
 def _determineNCPus(cpus_wanted, n_files):
     """ determine the number of CPUs that are to be used.
@@ -259,15 +315,16 @@ def _determineNCPus(cpus_wanted, n_files):
     ncpusAll = runtime.nCPUs()
     # ncpus = parser.getint("parameters", "ncpus")
     ncpus = cpus_wanted
-    if ncpus == 0 or ncpus < -1:
-        logger.error("Weird number of ncpus given in ini file: %d" % ncpus)
-        sys.exit()
-    if ncpus == -1 or ncpus > ncpusAll: ncpus = ncpusAll
+    if ncpus <= 0:
+        ncpus = ncpusAll + ncpus
     ncpus = min(n_files, ncpus)
+    if ncpus < 1:
+        ncpus = 1
     return ncpus
 
+
 def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
-                 listOfExpRes, timeout, development, parameterFile):
+               listOfExpRes, timeout, development, parameterFile):
     """
     Loop over all input files in fileList with testPoint, using ncpus CPUs
     defined in parser
@@ -290,7 +347,8 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         return None
 
     cleanedList = _cleanList(fileList, inDir)
-    ncpus = _determineNCPus(parser.getint("parameters", "ncpus"), len(cleanedList))
+    ncpus = _determineNCPus(parser.getint(
+        "parameters", "ncpus"), len(cleanedList))
     nFiles = len(cleanedList)
 
     if nFiles == 0:
@@ -299,45 +357,53 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     elif nFiles == 1:
         logger.info("Running SModelS for a single file")
         runSingleFile(cleanedList[0], outputDir, parser,
-                        databaseVersion, listOfExpRes, timeout,
-                        development, parameterFile)
+                      databaseVersion, listOfExpRes, timeout,
+                      development, parameterFile)
     else:
-        for hdlr in logger.handlers[:]:
-            logger.removeHandler(hdlr)
-        fileLog = logging.FileHandler('./smodels.log')
-        logger.addHandler(fileLog)
 
         if ncpus == 1:
             logger.info("Running SModelS for %i files with a single process. Messages will be redirected to smodels.log"
-                    %(nFiles))
+                        % (nFiles))
 
-            ### Run a single process:
-            outputDict = runSetOfFiles(cleanedList,outputDir, parser,
-                              databaseVersion, listOfExpRes, timeout,
-                              development, parameterFile)
+            for hdlr in logger.handlers[:]:
+                logger.removeHandler(hdlr)
+            fileLog = logging.FileHandler('./smodels.log')
+            logger.addHandler(fileLog)
+
+            # Run a single process:
+            outputDict = runSetOfFiles(cleanedList, outputDir, parser,
+                                       databaseVersion, listOfExpRes, timeout,
+                                       development, parameterFile)
         else:
             logger.info("Running SModelS for %i files with %i processes. Messages will be redirected to smodels.log"
-                    %(nFiles,ncpus))
-            ### Launch multiple processes.
-            ### Split list of files
+                        % (nFiles, ncpus))
+
+            for hdlr in logger.handlers[:]:
+                logger.removeHandler(hdlr)
+            fileLog = logging.FileHandler('./smodels.log')
+            logger.addHandler(fileLog)
+
+            # Launch multiple processes.
+            # Split list of files
             chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
             pool = multiprocessing.Pool(processes=ncpus)
             children = []
             for chunkFile in chunkedFiles:
                 p = pool.apply_async(runSetOfFiles, args=(chunkFile, outputDir, parser,
                                                           databaseVersion, listOfExpRes, timeout,
-                                                      development, parameterFile,))
+                                                          development, parameterFile,))
                 children.append(p)
             pool.close()
-            iprint, nprint = 5,5 #Define when to start printing and the percentage step
-            #Check process progress until they are all finished
+            iprint, nprint = 5, 5  # Define when to start printing and the percentage step
+            # Check process progress until they are all finished
             while True:
                 done = sum([p.ready() for p in children])
                 fracDone = 100*float(done)/len(children)
                 if fracDone >= iprint:
                     while fracDone >= iprint:
                         iprint += nprint
-                    logger.info('%i%% of processes done in %1.2f min' %(iprint-nprint,(time.time()-t0)/60.))
+                    logger.info('%i%% of processes done in %1.2f min' %
+                                (iprint-nprint, (time.time()-t0)/60.))
                 if done == len(children):
                     break
                 time.sleep(2)
@@ -348,18 +414,22 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
             for p in children:
                 outputDict.update(p.get())
 
-        #Collect output to build global summary:
-        summaryFile = os.path.join(outputDir,'summary.txt')
-        logger.info("A summary of the results can be found in %s" %summaryFile)
-        printScanSummary(outputDict,summaryFile)
+        # Collect output to build global summary:
+        summaryFile = os.path.join(outputDir, 'summary.txt')
+        logger.info("A summary of the results can be found in %s" %
+                    summaryFile)
+        printScanSummary(outputDict, summaryFile)
 
-    logger.info("Done in %3.2f min"%((time.time()-t0)/60.))
+    logger.info("Done in %3.2f min" % ((time.time()-t0)/60.))
 
     return None
 
+
 def checkForSemicolon(strng, section, var):
     if ";" in strng:
-        logger.warning("A semicolon(;) has been found in [%s] %s, in your config file. If this was meant as comment, then please a space before it." %(section, var))
+        logger.warning(
+            "A semicolon(;) has been found in [%s] %s, in your config file. If this was meant as comment, then please a space before it." % (section, var))
+
 
 def loadDatabase(parser, db):
     """
@@ -374,34 +444,38 @@ def loadDatabase(parser, db):
     """
     try:
         dp = parser.get("path", "databasePath")
-        logger.error("``[path] databasePath'' in ini file is deprecated; " \
-           "use ``[database] path'' instead.(See e.g. smodels/etc/parameters_default.ini)")
+        logger.error("``[path] databasePath'' in ini file is deprecated; "
+                     "use ``[database] path'' instead.(See e.g. smodels/etc/parameters_default.ini)")
         parser.set("database", "path", dp)
-    except (NoSectionError,NoOptionError) as e:
-        ## path.databasePath not set. This is good.
+    except (NoSectionError, NoOptionError):
+        # path.databasePath not set. This is good.
         pass
     try:
         database = db
         # logger.error("database=db: %s" % database)
-        if database in [ None, True ]:
+        if database in [None, True]:
             databasePath = parser.get("database", "path")
             checkForSemicolon(databasePath, "database", "path")
             discard_zeroes = True
             try:
                 discard_zeroes = parser.getboolean("database", "discardZeroes")
-            except (NoSectionError,NoOptionError) as e:
-                logger.debug("database:discardZeroes is not given in config file. Defaulting to 'True'.")
-            force_load=None
-            if database == True: force_load="txt"
+            except (NoSectionError, NoOptionError):
+                logger.debug(
+                    "database:discardZeroes is not given in config file. Defaulting to 'True'.")
+            force_load = None
+            if database is True:
+                force_load = "txt"
             if os.path.isfile(databasePath):
-                force_load="pcl"
-            database = Database(databasePath, force_load=force_load, \
-                                 discard_zeroes = discard_zeroes)
+                force_load = "pcl"
+            database = Database(databasePath, force_load=force_load,
+                                discard_zeroes=discard_zeroes)
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
-        logger.error("Database not found in ``%s''" % os.path.realpath(databasePath))
+        logger.error("Database not found in ``%s''" %
+                     os.path.realpath(databasePath))
         sys.exit()
     return database, databaseVersion
+
 
 def loadDatabaseResults(parser, database):
     """
@@ -414,9 +488,9 @@ def loadDatabaseResults(parser, database):
     """
     """ In case that a list of analyses or txnames are given, retrieve list """
     tmp = parser.get("database", "analyses").split(",")
-    analyses = [ x.strip() for x in tmp ]
+    analyses = [x.strip() for x in tmp]
     tmp_tx = parser.get("database", "txnames").split(",")
-    txnames = [ x.strip() for x in tmp_tx ]
+    txnames = [x.strip() for x in tmp_tx]
     if parser.get("database", "dataselector") == "efficiencyMap":
         dataTypes = ['efficiencyMap']
         datasetIDs = ['all']
@@ -426,19 +500,18 @@ def loadDatabaseResults(parser, database):
     else:
         dataTypes = ['all']
         tmp_dIDs = parser.get("database", "dataselector").split(",")
-        datasetIDs = [ x.strip() for x in tmp_dIDs ]
+        datasetIDs = [x.strip() for x in tmp_dIDs]
 
-    useSuperseded=False
-    useNonValidated=False
-    if parser.has_option("database","useSuperseded"):
+    useSuperseded = False
+    useNonValidated = False
+    if parser.has_option("database", "useSuperseded"):
         useSuperseded = parser.getboolean("database", "usesuperseded")
-    if parser.has_option("database","useNonValidated"):
+    if parser.has_option("database", "useNonValidated"):
         useNonValidated = parser.getboolean("database", "usenonvalidated")
     if useSuperseded:
         logger.info('Including superseded results')
     if useNonValidated:
         logger.info('Including non-validated results')
-
 
     """ Load analyses """
 
@@ -446,6 +519,7 @@ def loadDatabaseResults(parser, database):
                                  datasetIDs=datasetIDs, dataTypes=dataTypes,
                                  useSuperseded=useSuperseded, useNonValidated=useNonValidated)
     return ret
+
 
 def getParameters(parameterFile):
     """
@@ -459,23 +533,25 @@ def getParameters(parameterFile):
         parser = ConfigParser(inline_comment_prefixes=(';',))
     except NameError:
         parser = SafeConfigParser()
-    ret=parser.read(parameterFile)
+    ret = parser.read(parameterFile)
     if ret == []:
         logger.error("No such file or directory: '%s'" % parameterFile)
         sys.exit()
-    setExperimentalFlag ( parser )
+    setExperimentalFlag(parser)
     try:
         from smodels.tools import runtime
-        runtime.modelFile = parser.get("particles","model" )
+        runtime.modelFile = parser.get("particles", "model")
     except:
         pass
     return parser
 
-def setExperimentalFlag ( parser ):
+
+def setExperimentalFlag(parser):
     """ set the experimental flag, if options:experimental = True """
     if parser.has_option("options", "experimental"):
         if parser.getboolean("options", "experimental"):
             runtime._experimental = True
+
 
 def getAllInputFiles(inFile):
     """
@@ -488,5 +564,6 @@ def getAllInputFiles(inFile):
     if os.path.isdir(inFile):
         fileList = os.listdir(inFile)
         return fileList, inFile
-    fileList = [ os.path.basename(inFile) ]
+    fileList = [os.path.basename(inFile)]
+    return fileList, os.path.dirname(inFile)
     return fileList, os.path.dirname(inFile)

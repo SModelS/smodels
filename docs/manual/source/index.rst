@@ -17,7 +17,7 @@ with the relevant experimental constraints. The main SModelS ingredients are
 
 * the decomposition of the BSM spectrum into SMS topologies
 * a database of experimental SMS results
-* the interface between decomposition and results database to compute limits
+* the interface between decomposition and results database, including the tools to perform various kinds of statistical inference 
 
 as illustrated in the graphics below. 
 

@@ -57,8 +57,6 @@ Total cross-section for missing topologies (fb):  0.000E+00
 Total cross-section for missing topologies with displaced decays (fb):  0.000E+00
 Total cross-section for missing topologies with prompt decays (fb):  0.000E+00
 Total cross-section for topologies outside the grid (fb):  0.000E+00
-
-Full information on unconstrained cross sections
 ================================================================================
 No missing topologies found
 ================================================================================

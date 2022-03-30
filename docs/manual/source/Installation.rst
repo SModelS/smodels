@@ -15,7 +15,7 @@ Installation and Deployment
 Standard Installation
 ---------------------
 
-SModelS is a Python library that requires Python version 2.6 or later, including version 3, which is the default. It depends on the following *external* Python libraries:
+SModelS is a Python library that requires Python version 3.6 or later. It depends on the following *external* Python libraries:
 
 .. include:: dependencies.rst
 
@@ -224,17 +224,6 @@ followed by:
 
 Note, that these steps can safely be done within a Python ``virtualenv``.
 Pip can also be called with the "--user" flag.
-
-
-Installation on SL5 and similar distributions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-In some distributions like SL5, the Python default version may be smaller than
-2.6.  In these cases, ``virtualenv`` has to be set up for a Python version >=         2.6.  E.g. for Python 2.6, do ``virtualenv --python=python2.6 <envname>``,            and modify by hand the first line in the executable from ``#!/usr/bin/env python3``
-to ``#!/usr/bin/env python2.6``.
-Then perform the steps listed under ``Installation on SL6``.
-
-
 
 Installation on other platforms or without superuser privileges using Anaconda
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

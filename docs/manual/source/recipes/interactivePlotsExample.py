@@ -35,7 +35,7 @@ npoints = -1 #If negative will use all the points in the folders
 
 
 plotter = Plotter(smodelsOutput,slhaFiles,parameters,modelfile)
-plotter.loadData(npoints)
+loadData = plotter.loadData(npoints)
 plotter.plot(outputFolder,indexfile)
 
 

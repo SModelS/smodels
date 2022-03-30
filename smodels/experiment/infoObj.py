@@ -43,6 +43,8 @@ class Info(object):
             tags = [line.split(':', 1)[0].strip() for line in content]
             for i,tag in enumerate(tags):
                 if not tag: continue
+                if tag.startswith("#"): # a comment!
+                    continue
                 line = content[i]
                 value = line.split(':',1)[1].strip()
                 if tags.count(tag) == 1:
@@ -72,7 +74,11 @@ class Info(object):
         jsonFiles = [os.path.join( dirp, js) for js in self.jsonFiles]
         for js in jsonFiles:
             with open(js, "r") as fi:
-                self.jsons.append(json.load(fi))
+                try:
+                    self.jsons.append(json.load(fi))
+                except Exception as e:
+                    logger.error ( f"cannot load {js}: {e}" )
+                    raise(e)
 
 
     def dirName ( self, up=0 ):

@@ -216,7 +216,7 @@ def fixpermissions():
 
 __dbServer__ = "https://smodels.github.io/database"
 __dblabels__ = [ "official", "latest", "fastlim", "backup", "superseded", "unittest",
-                 "debug", None ]
+                 "debug", "nonaggregated", None ]
 
 def databasePath ( label ):
     """ construct the path to the database json file
@@ -225,7 +225,7 @@ def databasePath ( label ):
     """
     if not label in __dblabels__:
         from smodels.tools.smodelsLogging import logger
-        logger.warning ( f"cannot identify label {label}" )
+        logger.warning ( "cannot identify label %s" % label )
         return label
     if label == None:
         label = "official"

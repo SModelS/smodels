@@ -37,6 +37,27 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 2.2.0:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * introduced (user-defined) :ref:`combinations of analyses <analysesCombination>`
+  * changed expected limits computed with pyhf from post-fit to pre-fit
+  * a few smaller changes around expected likelihoods and limits
+  * changed default value of :ref:`promptWidth parameter <parameterFileModel>` from 1e-8 to 1e-11 GeV
+  * allow :ref:`ncpus <parameterFileNcpus>` to take on zero and negative values in
+    ini file [meaning use all but this (absolute) number of CPU cores]
+  * notion of "nonaggregated" databases introduced
+  * small fixes in the :ref:`Howto's <Examples>`
+  * updates in references.bib, installation notes
+  * more small fixes in unit tests
+  * Database extension, added new results from 4 ATLAS and 9 CMS analyses:
+     - results from ATLAS: 
+       ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2018-41 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
+     - results from CMS:
+       CMS-SUS-18-004 (UL), CMS-SUS-18-007 (UL), CMS-SUS-19-008 (UL), CMS-SUS-19-011 (UL), CMS-SUS-20-001 (UL), CMS-SUS-20-002 (UL)
+     - recast with MadAnalysis5:
+       CMS-SUS-16-039 (EM), CMS-SUS-16-048 (EM), CMS-SUS-19-006 (EM); all incl. covariance matrices
+
 New in Version 2.1.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -56,18 +77,18 @@ New in Version 2.1.0:
   * |Datasets| now have an `.isCombinableWith <experiment.html#experiment.datasetObj.DataSet.isCombinableWith>`_ function
   * Slightly extended output of :ref:`summary printer <parameterFileSummaryprinter>`
   * Added scan summary (:ref:`summary.txt <scanSummary>`) when running over multiple files
-  * Added :ref:`expandedOutput <parameterFileSLHAprinter>` option to slha-printer 
-  * :ref:`Output <outputDescription>` for efficiency-map results now reports :ref:`L, L_max and L_SM <likelihoodCalc>` 
+  * Added :ref:`expandedOutput <parameterFileSLHAprinter>` option to slha-printer
+  * :ref:`Output <outputDescription>` for efficiency-map results now reports :ref:`L, L_max and L_SM <likelihoodCalc>`
   * The :ref:`likelihood <likelihoodCalc>` is now maximized only for positive values of the signal strength
     in the computation of L_max
   * Pythia8 version in :ref:`xsecComputer <xsecCalc>` updated from 8226 to 8306
-  * Improved :ref:`interactive plots <interactivePlots>` 
-  * |database| updated with results from 5 new ATLAS and 1 new CMS analyses: 
+  * Improved :ref:`interactive plots <interactivePlots>`
+  * |database| updated with results from 5 new ATLAS and 1 new CMS analyses:
       CMS-EXO-19-010 (disappearing tracks) UL,
-      ATLAS-SUSY-2016-08 (displaced leptons) EM, 
-      ATLAS-SUSY-2018-10 (1l+jets) UL+EM, 
-      ATLAS-SUSY-2018-12 (0l+jets) UL+EM, 
-      ATLAS-SUSY-2018-22 (0l+jets) UL+EM,  
+      ATLAS-SUSY-2016-08 (displaced leptons) EM,
+      ATLAS-SUSY-2018-10 (1l+jets) UL+EM,
+      ATLAS-SUSY-2018-12 (0l+jets) UL+EM,
+      ATLAS-SUSY-2018-22 (0l+jets) UL+EM,
       ATLAS-SUSY-2018-23 (EWino, WH) UL
   * added EM results for
       ATLAS-SUSY-2017-03 (EWino, WZ),
@@ -80,7 +101,7 @@ New in Version 2.1.0:
       ATLAS-SUSY-2013-18, ATLAS-CONF-2013-089  -> ATLAS-SUSY-2013-20)
   * corrected off-shell regions of some existing |EMrs| (in three 13 TeV and eigth 8 TeV analyses).
 
- 
+
 New in Version 2.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -169,31 +190,31 @@ New in Version 1.1.3:
 New in Version 1.1.2:
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Database update only, the code is the same as v1.1.1
+  * Database update only, the code is the same as v1.1.1
 
 New in Version 1.1.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
-* |Cpp|
-* Support for pythia8 (see :ref:`Cross Section Calculator <xsecCalc>`)
-* improved binary database
-* automated SLHA and LHE file detection
-* Fix and improvements for missing topologies
-* Added SLHA-type output
-* Small improvements in interpolation and clustering
+  * |Cpp|
+  * Support for pythia8 (see :ref:`Cross Section Calculator <xsecCalc>`)
+  * improved binary database
+  * automated SLHA and LHE file detection
+  * Fix and improvements for missing topologies
+  * Added SLHA-type output
+  * Small improvements in interpolation and clustering
 
 
 New in Version 1.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-* the inclusion of efficiency maps (see |EMrs|)
-* a new and more flexible database format (see :ref:`Database structure <databaseStruct>`)
-* inclusion of likelihood and :math:`\chi^2` calculation for |EMrs|
-  (see :ref:`likelihood calculation <likelihoodCalc>`)
-* extended information on the :ref:`topology coverage <topCoverage>`
-* inclusion of a database broswer tool for easy access to the information
-  stored in the database (see :ref:`database browser <databaseBrowser>`)
-* the database now supports also a more efficient :ref:`binary format <databasePickle>`
-* performance improvement for the |decomposition| of the input model
-* inclusion of new simplified results to the |database| (including a few 13 TeV results)
-* |Fastlim| efficiency maps can now also be used in SModelS
+  * the inclusion of efficiency maps (see |EMrs|)
+  * a new and more flexible database format (see :ref:`Database structure <databaseStruct>`)
+  * inclusion of likelihood and :math:`\chi^2` calculation for |EMrs|
+    (see :ref:`likelihood calculation <likelihoodCalc>`)
+  * extended information on the :ref:`topology coverage <topCoverage>`
+  * inclusion of a database broswer tool for easy access to the information
+    stored in the database (see :ref:`database browser <databaseBrowser>`)
+  * the database now supports also a more efficient :ref:`binary format <databasePickle>`
+  * performance improvement for the |decomposition| of the input model
+  * inclusion of new simplified results to the |database| (including a few 13 TeV results)
+  * |Fastlim| efficiency maps can now also be used in SModelS

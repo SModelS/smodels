@@ -33,6 +33,14 @@ from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.smodelsLogging import logger
 import logging
 
+from importlib.metadata import version
+if version("scipy")[:4] not in [ "1.8.", "1.9.", "1.10.", "2.0.", "2.1." ]:
+    # fix for pickling different scipy versions (1.7.x vs 1.8.x)
+    # so that databases pickled with scipy 1.8.x still work with scipy 1.7.x
+    import scipy.spatial
+    if not hasattr ( scipy.spatial, "_qhull" ) and hasattr ( scipy.spatial, "qhull" ):
+        sys.modules["scipy.spatial._qhull"] = scipy.spatial.qhull
+
 try:
     import cPickle as serializer
 except ImportError as e:
@@ -645,9 +653,9 @@ class SubDatabase(object):
                     ## seems it hasnt changed
                     self.force_load = "pcl"
                     return ( "./", "%s" % filename )
-        r2=requests.get ( r.json()["url"], stream=True, timeout=(500,500) )
+        r2=requests.get ( r.json()["url"], stream=True, timeout=(250,2000) )
         # filename= os.path.join ( cDir, r2.url.split("/")[-1] )
-        msg = "caching the downloaded database in %s." % cDir
+        msg = "downloading the database from %s and caching in %s." % ( path, cDir )
         if defused:
             msg += " If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'."
         logger.warning ( msg )
@@ -670,6 +678,11 @@ class SubDatabase(object):
                 print( "" )
             fcntl.lockf ( dump, fcntl.LOCK_UN )
             dump.close()
+            sha = _getSHA1 ( filename )
+            testsha = r.json()["sha1"]
+            if sha != testsha:
+                logger.error ( f"error: downloaded file has different checksum {sha}!={testsha}. This should not happen. Contact the smodels-developers <smodels-developers@lists.oeaw.ac.at>" )
+                # sys.exit()
         logger.info( "fetched %s in %d secs." % ( r2.url, time.time()-t0 ) )
         logger.debug( "store as %s" % filename )
         self.force_load = "pcl"

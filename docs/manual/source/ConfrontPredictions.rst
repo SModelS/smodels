@@ -91,47 +91,57 @@ properly described by a Poissonian. The complete likelihood thus reads:
 .. math::
    \mathcal{L}(\mu,\theta|D) = \frac{(\mu + b + \theta)^{n_{obs}} e^{-(\mu + b + \theta)}}{n_{obs}!} exp \left( -\frac{\theta^2}{2\delta^2} \right)
 
-where :math:`n_{obs}` is the number of observed events in the signal region. 
+where :math:`n_{obs}` is the number of observed events in the signal region.
 From this likelihood we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al.,
 `Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_.
-We then search for the value :math:`CL_s = 0.95` using the Brent bracketing technique available through the `scipy optimize library <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_. 
+We then search for the value :math:`CL_s = 0.95` using the Brent bracketing technique available through the `scipy optimize library <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_.
 This is used for the computation the observed and expected :math:`r` values.
 
-In addition, SModelS reports *for each* |EMr| : 
-  * the likelihood for the hypothezised signal, :math:`\mathcal{L}_{\mathrm{BSM}}` given by :math:`\mu=n_{\mathrm{signal}}`, 
-  * the likelihood for the SM,  :math:`\mathcal{L}_{\mathrm{SM}}` given by :math:`\mu=0`, and 
-  * the maximum likelihood :math:`\mathcal{L}_{\mathrm{max}}` obtained by setting :math:`\mu=n_{\mathrm{obs}}-b`.  
+In addition, SModelS reports *for each* |EMr| :
+  * the likelihood for the hypothezised signal, :math:`\mathcal{L}_{\mathrm{BSM}}` given by :math:`\mu=n_{\mathrm{signal}}`,
+  * the likelihood for the SM,  :math:`\mathcal{L}_{\mathrm{SM}}` given by :math:`\mu=0`, and
+  * the maximum likelihood :math:`\mathcal{L}_{\mathrm{max}}` obtained by setting :math:`\mu=n_{\mathrm{obs}}-b`.
 
 The values for :math:`n_{\mathrm{obs}}`, :math:`b`  and :math:`\delta_{b}` are directly extracted from
-the data set (coined *observedN*, *expectedBG* and *bgError*, respectively), while 
+the data set (coined *observedN*, *expectedBG* and *bgError*, respectively), while
 :math:`n_{\mathrm{signal}}` is obtained from the calculation of the
 theory predictions. A default 20\% systematical uncertainty is assumed for :math:`n_{\mathrm{signal}}`,
 resulting in :math:`\delta^2 = \delta_{b}^2 + \left(0.2 n_{\mathrm{signal}}\right)^2`.
 
-We note that in the general case analyses may be correlated, so the likelihoods from different analyses 
+We note that in the general case analyses may be correlated, so the likelihoods from different analyses
 cannot straightforwardly be combined into a global one.
 Therefore, for a conservative interpretation, only the result with the best expected limit should be used.
 Moreover, for a statistically rigorous usage in scans, it is recommended to check that the analysis giving the
 best expected limit does not wildly jump within
 continuous regions of parameter space that give roughly the same phenomenology.
 
-Finally, note that in earlier SModelS versions, a :math:`\chi^2` value, 
-defined as :math:`\chi^2=-2 \ln \frac{\mathcal{L}_{\mathrm{BSM}}}{\mathcal{L}_{\mathrm{max}}}` was reported instead of 
+Finally, note that in earlier SModelS versions, a :math:`\chi^2` value,
+defined as :math:`\chi^2=-2 \ln \frac{\mathcal{L}_{\mathrm{BSM}}}{\mathcal{L}_{\mathrm{max}}}` was reported instead of
 :math:`\mathcal{L}_{\mathrm{max}}` and :math:`\mathcal{L}_{\mathrm{SM}}`.
-From v2.1 onwards, the definition of a test statistic for, e.g., likelihood ratio tests, is left to the user. 
+From v2.1 onwards, the definition of a test statistic for, e.g., likelihood ratio tests, is left to the user.
 
 
-* **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.likelihood>`_ 
+* **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.likelihood>`_
 * **The maximum likelihood for a given** |EMr| **is computed using the** `lmax  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.lmax>`_
 
 
 .. _combineSRs:
 
-Combination of Signal Regions - Simplified Likelihood Approach
---------------------------------------------------------------
+Combination of Signal Regions
+-----------------------------
 
-If the experiment provides information about the (background) correlations, signal regions can be combined.
-To this end, CMS sometimes provides a covariance matrix together with the efficiency maps.
+The likelihoods from individual signal regions can be combined, if the experimental analysis provides the required information about the correlation between distinct signal regions. Currently two approaches are available, depending on which type of information is provided by the experimental collaborations.
+When using *runSModelS.py*, the combination of signal regions is turned on or off with the parameter **options:combineSRs**, see :ref:`parameter file <parameterFileCombineSRs>`. Its default value is *False*, in which case only the result from the best expected signal region (best SR) is reported.
+If *combineSRs = True*, the combined result is shown instead.
+
+
+.. _simplifiedllhd:
+
+Simplified Likelihood Approach
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The first approach is applicable when information about the (background) correlations is available in the form of a covariance matrix.
+Some CMS analyses provides such matrix together with the efficiency maps.
 The usage of such covariance matrices
 is implemented in SModelS v1.1.3 onwards, following as above the simplified likelihood approach described in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_.
 
@@ -157,9 +167,6 @@ Note that the limit computed through this procedure applies to the total signal 
 that the relative signal strengths in each signal region are fixed by the signal hypothesis. As a result, the above limit has to be computed
 for each given input model (or each :ref:`theory prediction <theoryPredictions>`), thus considerably increasing CPU time.
 
-When using *runSModelS.py*, the combination of signal regions is turned on or off with the parameter **options:combineSRs**, see :ref:`parameter file <parameterFile>`. Its default value is *False*, in which case only the result from the best expected signal region (best SR) is reported.
-If *combineSRs = True*, both the combined result and the one from the best SR are quoted.
-
 In the :ref:`figure below <combinedSRfig>` we show the constraints on the simplified model
 `T2bbWWoff <http://smodels.github.io/docs/SmsDictionary#T2bbWWoff>`_ when using
 the best signal region (left), all the 44 signal regions considered in `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ (center) and the aggregated signal regions included in the SModelS database (right).
@@ -178,8 +185,10 @@ As we can see, while the curve obtained from the combination of all 44 signal re
 
 
 
-Combination of Signal Regions - Full Likelihoods (pyhf)
--------------------------------------------------------
+.. pyhfllhd:
+
+Full Likelihoods (pyhf) Approach
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In early 2020, following `ATL-PHYS-PUB-2019-029 <https://cds.cern.ch/record/2684863>`_,
 ATLAS has started to provide *full likelihoods* for results with full Run 2 luminosity (139/fb),
@@ -204,5 +213,33 @@ using the best signal region (left) to using the full likelihood (right).
 
 Figure: Comparison of exclusion curves for `ATLAS-SUSY-2019-08 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2019-08/>`_ using only the best signal region (left), and the combination of all 9 signal regions with pyhf (right).
 
+.. _analysesCombination:
+
+Combination of different Analyses
+---------------------------------
+
+Starting with SModelS v2.2, it is possible to combine likelihoods from
+different analyses, assuming that their signal regions are approximately
+uncorrelated. As of now, the information of which analyses meet this criterion
+is not given by SModelS itself, and has to be provided by the user (see option
+:ref:`combineAnas <parameterFileCombineAnas>`).
+
+.. First systematic studies of correlations between various CMS and ATLAS are however underway, see for example contribution 16 of the `Les Houches Working Group report <https://arxiv.org/abs/2002.12220>`_.
+
+For these combinations, the combined likelihood :math:`\mathcal{L}_{C}` is
+simply the product of the individual analysis likelihoods,
+:math:`\mathcal{L}_{i}`. Furthermore, we assume a common signal strength
+:math:`\mu` for all analyses:
+
+.. math::
+   \mathcal{L}_{C}(\mu) = \prod_{i=1} \mathcal{L}_{i}(\mu\; s^{i})
+
+
+The individual likelihoods can correspond to the best signal region, if the combination of signal regions is turned off, or to the combined signal region likelihood otherwise.
+For the determination of the maximum likelihood, `scipy.optimize.minimize <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html>`_ is used
+with the method `BFGS
+<https://docs.scipy.org/doc/scipy/reference/optimize.minimize-bfgs.html#optimize-minimize-bfgs>`_ in order to compute :math:`\mu_{max}` and :math:`\mathcal{L}_{max} = \mathcal{L}_{C}(\mu_{max})`.
+
+The resulting likelihood and :math:`r`-values for the combination are displayed in the :ref:`output <outputDescription>` along with the individual results for each analysis.
 
 .. [1] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model is being tested by a large number of results simultaneously.

@@ -26,7 +26,6 @@ from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
 from smodels.tools.reweighting import defaultEffReweight,defaultULReweight
 from scipy.linalg import svd, LinAlgError
-import scipy.spatial.qhull as qhull
 import numpy as np
 import unum
 import math,itertools
@@ -1004,10 +1003,13 @@ class TxNameData(object):
             MpCut.append(i[:self.dimensionality].tolist() )
 
         if self.dimensionality > 1:
-            self.tri = qhull.Delaunay(MpCut)
+            try:
+                from scipy.spatial import Delaunay
+            except:
+                from scipy.spatial.qhull import Delaunay
+            self.tri = Delaunay(MpCut)
         else:
             self.tri = Delaunay1D(MpCut)
-
 
 class Delaunay1D:
     """
