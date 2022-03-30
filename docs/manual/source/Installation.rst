@@ -120,17 +120,17 @@ one can also simply set:  ::
 
      path = official
 
-in |parameters|. Per default, the database pickle file will be located in the users' .cache/smodels/ directory. 
+in the |parameters|. Per default, the database pickle file will be located in the users' .cache/smodels/ directory. 
 
 Alternatively, one can download the :ref:`text version of the database <databaseStruct>` and pickle it locally. 
 This can be convenient if one wants to add or edit experimental results. 
 The source code of the available databases can again be found on 
-the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_ .
+the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_.
 In this case one needs to specify the path to the text database directory, e.g.: :: 
 
      path = ./smodels-database/
 
-in |parameters|. The first time SModelS is run, a :ref:`binary file <databasePickle>` will be built
+in the |parameters|. The first time SModelS is run, a :ref:`binary file <databasePickle>` will be built
 using this text database folder, which can then be used in all subsequent runs.
 
 The complete list of analyses and results included in the database can be
@@ -157,13 +157,13 @@ The official SModelS database can be augmented with data from the
 
      path = official+fastlim
 
-in |parameters|. It is also possible to
+in the |parameters|. It is also possible to
 directly download a database binary file including the Fastlim maps; dedicated URLs are provied on 
 the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_ for this purpose.
 
 For using SModelS with the text database,
-a tarball with the *properly converted* fastlim-1.0 efficiency maps can be downloaded from 
-`Github <https://github.com/SModelS/smodels-database-release/blob/master/smodels-v1.1-fastlim-1.0.tgz>`_ .
+a tarball with the *properly converted* fastlim-1.0 efficiency maps can be downloaded from  
+`Github <https://github.com/SModelS/smodels-database-release/blob/master/smodels-v1.1-fastlim-1.0.tgz>`_.
 The tarball then needs to be exploded in the top level directory of the database: ::
 
  cd <smodels-database folder>
