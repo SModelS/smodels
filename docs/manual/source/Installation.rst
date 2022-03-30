@@ -110,17 +110,28 @@ In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 Installing the SModelS Database
 -------------------------------
 
-The installation methods explained above (except for pip install) also install SModelS'
-:ref:`database of experimental results <databaseStruct>`
-in the smodels-database subdirectory.
-The first time SModelS is run, a :ref:`binary file <databasePickle>` will be built
-using this text database folder, which can then be used in all subsequent runs.
-However, from v1.1.3 onwards it is recommended to provide the URL of the official database as the
+The simplest way is to provide the URL of the official :ref:`database <databaseStruct>` as the
 database path when running SModelS (see :ref:`path <parameterFilePath>` in |parameters|).
 In this case the corresponding database version binary file will be automatically downloaded
-and used.  The available database URLs can be found in 
+and used.  The available database URLs can be found on 
 the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_ .
+For using the latest official database, which is compatible with the code version used, 
+one can also simply set:  :: 
 
+     path = official
+
+in |parameters|. Per default, the database pickle file will be located in the users' .cache/smodels/ directory. 
+
+Alternatively, one can download the :ref:`text version of the database <databaseStruct>` and pickle it locally. 
+This can be convenient if one wants to add or edit experimental results. 
+The source code of the available databases can again be found on 
+the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_ .
+In this case one needs to specify the path to the text database directory, e.g.: :: 
+
+     path = ./smodels-database/
+
+in |parameters|. The first time SModelS is run, a :ref:`binary file <databasePickle>` will be built
+using this text database folder, which can then be used in all subsequent runs.
 
 The complete list of analyses and results included in the database can be
 consulted at `https://smodels.github.io/wiki/ListOfAnalyses <https://smodels.github.io/wiki/ListOfAnalyses>`_.
@@ -142,10 +153,17 @@ Adding FastLim data
 ^^^^^^^^^^^^^^^^^^^
 
 The official SModelS database can be augmented with data from the
-`fastlim <http://cern.ch/fastlim>`_ results.
+`fastlim <http://cern.ch/fastlim>`_ results. The simplest way is to set:  :: 
+
+     path = official+fastlim
+
+in |parameters|. It is also possible to
+directly download a database binary file including the Fastlim maps; dedicated URLs are provied on 
+the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_ for this purpose.
+
 For using SModelS with the text database,
-a tarball with the *properly converted* fastlim-1.0 efficiency maps can be found in 
-the smodels-database folder.
+a tarball with the *properly converted* fastlim-1.0 efficiency maps can be downloaded from 
+`Github <https://github.com/SModelS/smodels-database-release/blob/master/smodels-v1.1-fastlim-1.0.tgz>`_ .
 The tarball then needs to be exploded in the top level directory of the database: ::
 
  cd <smodels-database folder>
@@ -155,15 +173,8 @@ The tarball then needs to be exploded in the top level directory of the database
 Once the fastlim folders have been added to the database,
 SModelS auto-detects fastlim results and issues an acknowledgement.
 
-As discussed above, from v1.1.3 onwards it is also possible to
-directly download the database binary file using the URLs
-provided in the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_ .
-Separate URLs are provided for the database including the Fastlim maps, so the user
-can choose which database to use.
-
 When using the Fastlim results, please properly cite the fastlim paper; for
 convenience, a bibtex file is provided in the smodels-fastlim tarball.
-
 
 Finally we point out that when converting the Fastlim efficiency maps
 efficiencies with a relative statistical uncertainty greater than 25%
