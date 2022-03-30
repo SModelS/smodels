@@ -123,11 +123,11 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileDoInvisible:
 
-  * **doInvisible** (True/False): turns |invisible compression| on or off during the |decomposition|.
+  * **doInvisible** (True/False): turns |invisible compression| on or off during the |decomposition|. (Note that the compression is only applied to prompt particles, with widths larger than the :ref:`promptWidth <promptWidth>` parameter.)
 
 .. _parameterFileDoCompress:
 
-  * **doCompress** (True/False): turns |mass compression| on or off during the |decomposition|.
+  * **doCompress** (True/False): turns |mass compression| on or off during the |decomposition|. (Note that the compression is only applied to prompt particles, with widths larger than the :ref:`promptWidth <promptWidth>` parameter.)
 
 .. _parameterFileComputeStatistics:
 
