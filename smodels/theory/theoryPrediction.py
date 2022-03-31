@@ -297,7 +297,7 @@ class TheoryPrediction(object):
                     allowNegativeSignals=True)
             if allowNegativeSignals == False and hasattr(self, "muhat_") and self.muhat_ < 0.:
                 self.muhat_ = 0.
-                self.lmax = lsm
+                lmax = lsm
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
