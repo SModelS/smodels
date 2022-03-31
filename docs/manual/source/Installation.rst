@@ -48,7 +48,8 @@ Installation Methods
    If the cross section computer is not needed, one can replace *smodels* with *smodels_noexternaltools* in the above command.
    In case the Python libraries can not be successfully
    installed, the user can install them separately using his/her preferred method. Pythia and NLL-fast can also be compiled separately
-   running **make externaltools**.
+   running **make externaltools**. In case the Fortran comiler isn't found, 
+   try *make FC=<path-to-gfortran> smodels* or *make FC=<path-to-gfortran> externaltools*. 
 
  * If Python's *setuptools* is installed in your machine, SModelS and its dependencies
    can also be installed without the use of pip.
@@ -105,24 +106,34 @@ should list and check all internal tools (Pythia and NLL-fast) and external
 
 In case everything fails, please contact smodels-users@lists.oeaw.ac.at
 
+
 .. _installingDB:
 
 Installing the SModelS Database
 -------------------------------
 
-The simplest way is to provide the URL of the official :ref:`database <databaseStruct>` as the
+The simplest way is to **provide the URL** of the official :ref:`database <databaseStruct>` as the
 database path when running SModelS (see :ref:`path <parameterFilePath>` in |parameters|).
 In this case the corresponding database version binary file will be automatically downloaded
 and used.  The available database URLs can be found on 
 the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_ .
 For using the latest official database, which is compatible with the code version used, 
-one can also simply set:  :: 
+one can also simply set:: 
 
      path = official
 
 in the |parameters|. Per default, the database pickle file will be located in the users' .cache/smodels/ directory. 
+If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR 
+accordingly, e.g. to '/tmp'. 
 
-Alternatively, one can download the :ref:`text version of the database <databaseStruct>` and pickle it locally. 
+For performance reasons, from v2.2.0 onwards, the signal regions (SRs) of some of the |EMrs| are aggregated in the official database. 
+(For example for CMS-SUS-19-006, the original 174 SRs have been aggregated to 40; this speeds up the calculation 
+without too much loss in precision when combining SRs). In order to use the original, non-agregated |EMrs|, set::
+
+     path = official+nonaggregated
+
+
+**Alternatively, one can download the text version** of the :ref:`database <databaseStruct>` and pickle it locally. 
 This can be convenient if one wants to add or edit experimental results. 
 The source code of the available databases can again be found on 
 the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_.
@@ -131,7 +142,15 @@ In this case one needs to specify the path to the text database directory, e.g.:
      path = ./smodels-database/
 
 in the |parameters|. The first time SModelS is run, a :ref:`binary file <databasePickle>` will be built
-using this text database folder, which can then be used in all subsequent runs.
+using this text database folder, which can then be used in all subsequent runs. 
+As above, by default this contains some |EMrs| with aggregated SRs. The non-aggregated versions 
+are stored as a tarball on the top level of the database folder; for v2.2.0 this is *nonaggregated220.tar.gz*. 
+To use them, simply expand this tarball in the directory::
+
+ cd <smodels-database folder>
+ tar -xzvf nonaggregated220.tar.gz
+
+The database  :ref:`binary file <databasePickle>` will then be re-built accordingly upon first usage. 
 
 The complete list of analyses and results included in the database can be
 consulted at `https://smodels.github.io/wiki/ListOfAnalyses <https://smodels.github.io/wiki/ListOfAnalyses>`_.
@@ -158,13 +177,13 @@ The official SModelS database can be augmented with data from the
      path = official+fastlim
 
 in the |parameters|. It is also possible to
-directly download a database binary file including the Fastlim maps; dedicated URLs are provied on 
+directly download a database binary file including the fastlim maps; dedicated URLs are provied on 
 the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_ for this purpose.
 
-For using SModelS with the text database,
-a tarball with the *properly converted* fastlim-1.0 efficiency maps can be downloaded from  
-`Github <https://github.com/SModelS/smodels-database-release/blob/master/smodels-v1.1-fastlim-1.0.tgz>`_.
-The tarball then needs to be exploded in the top level directory of the database: ::
+For using this with the text database, 
+a tarball with the properly converted fastlim-1.0 efficiency maps (*smodels-v1.1-fastlim-1.0.tgz*) is located in the top level directory of the database   
+( it can also be downloaded separately from `Github <https://github.com/SModelS/smodels-database-release/blob/master/smodels-v1.1-fastlim-1.0.tgz>`_.)
+As for adding non-aggregated results (see above), this tarball simply needs to be exploded to be added to the database: ::
 
  cd <smodels-database folder>
  tar -xzvf smodels-v1.1-fastlim-1.0.tgz
