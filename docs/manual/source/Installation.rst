@@ -136,16 +136,17 @@ without too much loss in precision when combining SRs). In order to use the orig
 **Alternatively, one can download the text version** of the :ref:`database <databaseStruct>` and pickle it locally. 
 This can be convenient if one wants to add or edit experimental results. 
 The source code of the available databases can again be found on 
-the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_.
-In this case one needs to specify the path to the text database directory, e.g.: :: 
+the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_. 
+After download, unpack it to a convenient location (e.g., to a 'smodels-database' folder in the SModelS source directory),  
+and then specify the local path to this folder in the |parameters|, e.g.:: 
 
      path = ./smodels-database/
 
-in the |parameters|. The first time SModelS is run, a :ref:`binary file <databasePickle>` will be built
+The first time SModelS is run, a :ref:`binary file <databasePickle>` will be built
 using this text database folder, which can then be used in all subsequent runs. 
 As above, by default this contains some |EMrs| with aggregated SRs. The non-aggregated versions 
-are stored as a tarball on the top level of the database folder; for v2.2.0 this is *nonaggregated220.tar.gz*. 
-To use them, simply expand this tarball in the directory::
+are stored as a tarball on the top level of the database folder; for v2.2.0 this is the file *nonaggregated220.tar.gz*. 
+To use this, simply expand this tarball in the directory::
 
  cd <smodels-database folder>
  tar -xzvf nonaggregated220.tar.gz
