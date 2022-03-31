@@ -168,7 +168,7 @@ class StatisticsTest(unittest.TestCase):
         self.assertAlmostEqual(0., llhd, places=2)
         dchi2 = computer.chi2(nsig, marginalize=False)
         ichi2 = 4.486108149972863e+21
-        self.assertAlmostEqual(ichi2, dchi2, places=2)
+        self.assertAlmostEqual(dchi2 / ichi2, 1., places=4 )
 
     def round_to_sign(self, x, sig=3):
         """
