@@ -128,7 +128,7 @@ accordingly, e.g. to '/tmp'.
 
 For performance reasons, from v2.2.0 onwards, the signal regions (SRs) of some of the |EMrs| are aggregated in the official database. 
 (For example for CMS-SUS-19-006, the original 174 SRs have been aggregated to 40; this speeds up the calculation 
-without too much loss in precision when combining SRs). In order to use the original, non-agregated |EMrs|, set::
+without too much loss in precision when combining SRs). In order to use the original, non-aggregated |EMrs|, set::
 
      path = official+nonaggregated
 
