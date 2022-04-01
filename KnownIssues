@@ -2,7 +2,7 @@ Known Issues, v2.2.0
 =======================================================
  * the mass and invisible compression is affected by the specific value of the promptWidth parameter; 
    for particles with a total decay width < promptWidth, neither mass compression nor or invisible compression will be effective.
- * in case of very small r-values, combination of analyses with combineSRs=True can make SModelS crash
+ * in case of very small r-values, combination of analyses together with combineSRs=True can make SModelS crash
  
 Known Issues, v2.1.0
 =======================================================
