@@ -33,8 +33,16 @@ from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.smodelsLogging import logger
 import logging
 
-from importlib.metadata import version
-if version("scipy")[:4] not in [ "1.8.", "1.9.", "1.10.", "2.0.", "2.1." ]:
+scipyver = ""
+try:
+    from importlib.metadata import version
+    scipyver = version("scipy")
+except Exception as e:
+    try:
+        from scipy import __version__ as scipyver
+    except Exception as e:
+        pass
+if scipyver not in [ "1.8.", "1.9.", "1.10.", "2.0.", "2.1." ]:
     # fix for pickling different scipy versions (1.7.x vs 1.8.x)
     # so that databases pickled with scipy 1.8.x still work with scipy 1.7.x
     import scipy.spatial
