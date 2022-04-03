@@ -1,3 +1,8 @@
+Release v2.2.0.post1, Mon 4 April 2022
+=======================================================
+
+  * removed dependency on importlib.metadata to make it work with python <= 3.7
+
 Release v2.2.0, Wed 30 March 2022
 =======================================================
 
