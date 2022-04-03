@@ -12,10 +12,18 @@
 import jsonpatch
 import warnings
 import jsonschema
-import importlib.metadata
 import copy
 
-if importlib.metadata.version("jsonschema")[0] == "2":
+jsonver=""
+try:
+    import importlib.metadata
+    jsonver = importlib.metadata.version("jsonschema")
+except Exception as e:
+    try:
+        from jsonschema import __version__ as jsonver
+    except Exception as e:
+        pass
+if jsonver[0] == "2":
 #if jsonschema.__version__[0] == "2": ## deprecated
     print ( "[SModelS:pyhfInterface] jsonschema is version %s, we need > 3.x.x" % \
             ( jsonschema.__version__ ) )
