@@ -387,7 +387,10 @@ class Plotter(object):
 
     def display ( self ):
         """ display the pages, works in jupyter notebooks only """
-        from IPython.core.display import display,HTML
+        try:
+            from IPython.display import display,HTML
+        except Exception as e:
+            from IPython.core.display import display,HTML
         mainFile = open( self.outFolder + self.indexfile,'r')
         display(HTML(mainFile.read()))
         mainFile.close()
