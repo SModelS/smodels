@@ -50,12 +50,16 @@ class NotebookTest(unittest.TestCase):
         try:
             import redirector
             import os
+            cwd = os.getcwd()
+            if cwd.endswith ( "/test" ):
+                os.chdir ( "../docs/manual/source/recipes/" )
             notebooks = self.listOfNotebooks()
-            for x in ["smodels_paths.py", "inputFiles"]:
-                if os.path.exists(x):
-                    os.unlink(x)
-                os.symlink(f"{self.nbdir}/{x}", x)
-                to_unlink.append(x)
+            #for x in [ "smodels_paths.py" ]:
+            # for x in ["smodels_paths.py", "inputFiles"]:
+            #    if os.path.exists(x):
+            #        os.unlink(x)
+            #    os.symlink(f"{self.nbdir}/{x}", x)
+            #    to_unlink.append(x)
             pre = "ipynb.fs.full"
             for nb in notebooks:
                 # for now check only the ascii graph notebook!
@@ -74,7 +78,10 @@ class NotebookTest(unittest.TestCase):
                 #    continue
                 if nb in bad:
                     continue
-                # print ( "nb", nb )
+                #if os.getcwd().endswith ( "/test" ):
+                #    f = open ( "smodels_paths.py", "wt" )
+                #    f.close()
+                    #os.chdir ( "../docs/manual/source/recipes/" )
                 nbfile = nb + ".ipynb"
                 module = f"{pre}.{nb}"
                 if os.path.exists(nbfile):
@@ -88,7 +95,7 @@ class NotebookTest(unittest.TestCase):
                 to_unlink.remove(nbfile)
                 if nb == "interactivePlotsExample":
                     self.cleanUp(["*.html", "data_frame.txt", "iplots/"])
-                # print ( "done nb", nb )
+            os.chdir ( cwd )
             to_unlink = self.cleanUp(to_unlink)
         except Exception as e:
             self.cleanUp(to_unlink)

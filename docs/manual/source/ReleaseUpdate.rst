@@ -37,6 +37,11 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 2.2.1:
+^^^^^^^^^^^^^^^^^^^^^
+  
+  * small fixes for python 3.10
+
 New in Version 2.2.0.post1:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
