@@ -41,6 +41,7 @@ New in Version 2.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
   
   * small fixes for python 3.10
+  * bumped up pythia8 from 8.306 to 8.307
 
 New in Version 2.2.0.post1:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
