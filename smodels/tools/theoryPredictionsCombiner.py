@@ -188,8 +188,8 @@ class TheoryPredictionsCombiner(object):
         if mu in self.cachedLlhds[expected]:
             llhd = self.cachedLlhds[expected][mu]
             if nll:
-                if llhd == 0.:  # cut off nll at 700 (1e-300)
-                    return 700.
+                if llhd == 0.:  # cut off nll at 999
+                    return 999.
                 return - np.log(llhd)
             return llhd
 
@@ -199,13 +199,14 @@ class TheoryPredictionsCombiner(object):
             # Set the theory marginalize attribute to the combiner value:
             tp_marginalize = tp.marginalize
             tp.marginalize = self.marginalize
-            llhd = llhd * tp.likelihood(mu, expected=expected, useCached=useCached)
+            tmp = tp.likelihood(mu, expected=expected, useCached=useCached)
+            llhd = llhd * tmp
             # Restore marginalize setting:
             tp.marginalize = tp_marginalize
         self.cachedLlhds[expected][mu] = llhd
         if nll:
-            if llhd == 0.:  # cut off nll at 700 (1e-300)
-                return 700.
+            if llhd == 0.:  # cut off nll at 999
+                return 999.
             return - np.log(llhd)
         return llhd
 
@@ -237,9 +238,11 @@ class TheoryPredictionsCombiner(object):
         self.cachedObjs[expected]["lsm"] = lsm
         if expected:
             self.cachedObjs[expected]["lmax"] = lsm
-        self.mu_hat, self.sigma_mu, lmax = self.findMuHat(extended_output=True)
-        self.cachedObjs[expected]["lmax"] = lmax
-        self.cachedObjs[expected]["muhat"] = self.mu_hat
+        else:
+            self.mu_hat, self.sigma_mu, lmax = self.findMuHat(expected=False,
+                                                              extended_output=True)
+            self.cachedObjs[expected]["lmax"] = lmax
+            self.cachedObjs[expected]["muhat"] = self.mu_hat
 
     @singleDecorator
     def totalXsection(self):
@@ -291,14 +294,17 @@ class TheoryPredictionsCombiner(object):
             # the inverted hessian is a good approximation for the variance at the
             # minimum
             hessian = o.hess_inv[0][0]
-            if hessian > 0.:  # found a maximum. all good.
+            nll_ = o.fun
+            if hessian > 0. and nll_ < 899.:  # found a maximum. all good.
                 break
             # the hessian is negative meaning we found a maximum, not a minimum
-            logger.debug(
-                f"combiner.findMuHat the hessian {hessian} is negative at mu_hat={o.x} in {self.slhafile} try again with different initialisation.")
+            if hessian <= 0.:
+                logger.debug( f"combiner.findMuHat the hessian {hessian} is negative at mu_hat={o.x} in {self.slhafile} try again with different initialisation.")
         mu_hat = o.x[0]
-        lmax = np.exp(- o.fun)
-        if hessian < 0.:
+        lmax = o.fun
+        if not nll:
+            lmax = np.exp(- lmax )
+        if hessian < 0. or nll_ > 899.:
             logger.error(
                 "tried with several starting points to find maximum, always ended up in minimum. bailing out.")
             if extended_output:

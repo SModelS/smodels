@@ -97,10 +97,12 @@ def compareSLHA(slhadefault, slhanew, allowedDiff):
                     denom = 1e-6
                 de = 2. * abs(ei - ej) / denom
                 if de > allowedDiff:
-                    logger.error(f'Entries in block differ: {ei}!={ej} {type(ei)}')
+                    blk = "".join(b)
+                    logger.error(f'Entries in block {blk} differ: {ei}!={ej}')
                     return False
             elif ei != ej:
-                logger.error(f'Entries in block differ: {ei}!={ej} {type(ei)}')
+                blk = "".join(b)
+                logger.error(f'Entries in block {blk} differ: {ei}!={ej} {type(ei)}')
                 return False
     return True
 
@@ -137,7 +139,7 @@ class RunPrinterTest(unittest.TestCase):
     def testPythonPrinter(self):
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
-        outputfile = runMain(slhafile)
+        outputfile = runMain(slhafile,suppressStdout = True )
         smodelsOutput = importModule(outputfile)
 
         # Test python output
