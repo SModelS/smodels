@@ -4,6 +4,8 @@ Release v2.2.1, xxx
 
   * small fixes for python 3.10
   * bumped up pythia8 from 8.306 to 8.307
+  * fixes in the combination code, r_expected for combinations may 
+    have changed a litte
 
 Release v2.2.0.post1, Mon 4 April 2022
 =======================================================

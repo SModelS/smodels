@@ -188,7 +188,7 @@ def compareScanSummary(outA, outB, allowedDiff):
     return True
 
 
-def compareObjs(obj1, obj2, allowedDiff=0.05):
+def compareObjs(obj1, obj2, allowedDiff=0.05, filename = None ):
 
     obj1_keys = sorted([k for k in dir(obj1) if not k[0] == '_'])
     obj2_keys = sorted([k for k in dir(obj2) if not k[0] == '_'])
@@ -207,8 +207,11 @@ def compareObjs(obj1, obj2, allowedDiff=0.05):
             if isinstance(attr1, (float, int)):
                 rel_diff = abs(attr1-attr2)/(attr1+attr2)
                 if rel_diff > allowedDiff:
-                    logger.warning('Attribute %s value differ more than %s:\n %s \n and \n %s'
-                                   % (key, allowedDiff, attr1, attr2))
+                    fname = ""
+                    if filename != None:
+                        fname = " in " + filename
+                    logger.warning( f'Attribute {key}{fname}: values differ by more than {allowedDiff}:\n {attr1} and {attr2}' )
+                    sys.exit()
                     return False
             else:
                 logger.warning('Attribute %s value differ:\n %s \n and \n %s' % (key, attr1, attr2))
@@ -234,7 +237,7 @@ class Summary():
         return "Summary(%s)" % final
 
     def __eq__(self, other):
-        return compareObjs(self, other, self._allowedDiff)
+        return compareObjs(self, other, self._allowedDiff, self._filename)
 
     def _stripComments(self, lineString):
         return re.sub('#.*', '', lineString)

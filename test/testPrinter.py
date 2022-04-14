@@ -239,7 +239,7 @@ class RunPrinterTest(unittest.TestCase):
     def testSLHAPrinter(self):
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
-        outputfile = runMain(slhafile)
+        outputfile = runMain(slhafile,suppressStdout = True )
         outputfile = outputfile.replace('.py', '.smodelsslha')
 
         slhaDefaultFile = "./gluino_squarks_default.slha.smodelsslha"

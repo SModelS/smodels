@@ -171,6 +171,12 @@ class TheoryPredictionsCombiner(object):
             return 2000.  # we cut off at > 1e-300 or so ;)
         return - 2 * np.log(llhd / lmax)
 
+    def describe( self ):
+        ids = []
+        for tp in self.theoryPredictions:
+            ids.append ( f"{tp.dataset.globalInfo.id}:{tp.dataset.dataInfo.dataId}" )
+        logger.error ( f"SRs: {', '.join(ids)}" )
+
     @singleDecorator
     def likelihood(self, mu=1., expected=False,
                    nll=False, useCached=True):
@@ -185,7 +191,7 @@ class TheoryPredictionsCombiner(object):
             mu = mu[0]  # some of these methods use arrays with a single element
         except:
             pass
-        if mu in self.cachedLlhds[expected]:
+        if useCached and mu in self.cachedLlhds[expected]:
             llhd = self.cachedLlhds[expected][mu]
             if nll:
                 if llhd == 0.:  # cut off nll at 999
@@ -330,8 +336,8 @@ class TheoryPredictionsCombiner(object):
             return self.cachedObjs[expected]["UL"]
         # if not hasattr ( self, "mu_hat" ):
         #    self.computeStatistics( expected = False )
-        mu_hat, sigma_mu, lmax = self.findMuHat(allowNegativeSignals=True,
-                                                extended_output=True)
+        mu_hat, sigma_mu, lmax = self.findMuHat(expected=expected,
+                allowNegativeSignals=True, extended_output=True)
         nll0 = self.likelihood(mu_hat, expected=expected, nll=True)
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
