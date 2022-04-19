@@ -15,7 +15,7 @@ Release v2.2.1, xxx
     ** if likelihood in combination is zero, we do not think of it as a 
        "good" likelihood, and continue searching for a good likelihood, 
        see smodels/tools/theoryPredictionsCombiner.py:304
-    ** fixed a bug where cached "observed" values where stored as "expected",
+    ** fixed a bug where "observed" values could get cached as "expected",
        see smodels/tools/theoryPredictionsCombiner.py:245
 
 Release v2.2.0.post1, Mon 4 April 2022
