@@ -307,9 +307,7 @@ class TheoryPredictionsCombiner(object):
             if hessian <= 0.:
                 logger.debug( f"combiner.findMuHat the hessian {hessian} is negative at mu_hat={o.x} in {self.slhafile} try again with different initialisation.")
         mu_hat = o.x[0]
-        lmax = o.fun
-        if not nll:
-            lmax = np.exp(- lmax )
+        lmax = np.exp ( - o.fun ) # fun is *always* nll
         if hessian < 0. or nll_ > 899.:
             logger.error(
                 "tried with several starting points to find maximum, always ended up in minimum. bailing out.")
@@ -319,10 +317,11 @@ class TheoryPredictionsCombiner(object):
         if not allowNegativeSignals and mu_hat < 0.:
             mu_hat = 0.  # fixme for this case we should reevaluate the hessian!
         sigma_mu = np.sqrt(hessian)
-        if nll:
-            lmax = - np.log(lmax)
         if extended_output:
-            return mu_hat, sigma_mu, lmax
+            retllh = lmax
+            if nll:
+                retllh = nll_
+            return mu_hat, sigma_mu, retllh
 
         return mu_hat
 
@@ -343,7 +342,7 @@ class TheoryPredictionsCombiner(object):
         # mu_hat is mu_hat for signal_rel
         mu_hatA, _, nll0A = self.findMuHat(expected="posteriori", nll=True,
                                            extended_output=True)
-        # print ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
+        # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
         # return 1.
 
         def clsRoot(mu):

@@ -5,7 +5,18 @@ Release v2.2.1, xxx
   * small fixes for python 3.10
   * bumped up pythia8 from 8.306 to 8.307
   * fixes in the combination code, r_expected for combinations may 
-    have changed a litte
+    have changed a little
+    more concisely:
+    ** when computing expected upper limits, we now initialise
+       the brent bracketing with expected mu_hat, mu_sigma, not observed,
+       see smodels/tools/theoryPredictionsCombiner.py:327
+    ** make sure we only use cached when asked to do so, see 
+       smodels/tools/theoryPredictionsCombiner.py:194
+    ** if likelihood in combination is zero, we do not think of it as a 
+       "good" likelihood, and continue searching for a good likelihood, 
+       see smodels/tools/theoryPredictionsCombiner.py:304
+    ** fixed a bug where cached "observed" values where stored as "expected",
+       see smodels/tools/theoryPredictionsCombiner.py:245
 
 Release v2.2.0.post1, Mon 4 April 2022
 =======================================================

@@ -62,6 +62,8 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         ulmu = combiner.getUpperLimitOnMu()
         # 16.78997035426023/4.71
         self.assertAlmostEqual(ulmu, 3.45262, 3)
+        ulmu_exp = combiner.getUpperLimitOnMu( expected=True )
+        self.assertAlmostEqual(ulmu_exp, 2.41768, 3)
 
     def testByHandComputed ( self ):
         """ a unit test where in the comments I show the manual computations, step by step, for comparison """
