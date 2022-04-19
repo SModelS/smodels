@@ -20,6 +20,7 @@ from smodels.share.models.SMparticles import SMList
 from smodels.share.models.mssm import BSMList
 from smodels.experiment.databaseObj import Database
 from unitTestHelpers import equalObjs, runMain, importModule
+from smodels.tools.physicsUnits import fb, GeV, TeV
 import unittest
 import os
 from databaseLoader import database
@@ -146,6 +147,51 @@ class CombinedTheoryPredsTest(unittest.TestCase):
 	      # 0.007672358984439363 * 0.014016921020572387
 	      # = 0.00010754284992636553
         self.assertAlmostEqual ( lmax, 0.00010754284992636553, 4 )
+
+    def testFilter(self):
+        from smodels.tools import runtime
+        runtime._experimental = True
+
+        anaids = ['CMS-SUS-16-033',
+          'CMS-SUS-12-024',
+          'CMS-SUS-12-028',
+          'ATLAS-SUSY-2018-12',
+          'ATLAS-SUSY-2016-15']
+        db = Database('unittest+./database_extra')
+        slhafile = "testFiles/slha/gluino_squarks.slha"
+        exp_results = db.getExpResults()
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(inputFile=slhafile)
+        sigmacut = 0.005*fb
+        mingap = 5.*GeV
+        smstopos = decomposer.decompose(model,
+                                        sigmacut, doCompress=True, doInvisible=True,
+                                        minmassgap=mingap)
+        tpreds = []
+        for er in exp_results:
+            ts = theoryPredictionsFor(er, smstopos,
+                combinedResults=False, useBestDataset=False, marginalize=False)
+            if not ts:
+                continue
+            for t in ts:
+                tpreds.append(t)
+        combiner = TheoryPredictionsCombiner.selectResultsFrom(tpreds,anaids)
+        # IDs that should be selected and the respective expected r-values:
+        goodIDs = {'CMS-SUS-16-033' : 1.7074799,
+          'CMS-SUS-12-024' : 0.000452551,
+          'ATLAS-SUSY-2018-12' : 0.002687}
+        # Make sure each ID appears only once:
+        selectedIDs = {tp.analysisId() : tp.getRValue(expected=True)
+                        for tp in combiner.theoryPredictions}
+        self.assertEqual(sorted(list(selectedIDs.keys())),sorted(list(goodIDs.keys())))
+        # Check if the correct predictions were selected:
+        for ana in goodIDs:
+            self.assertAlmostEqual(abs(goodIDs[ana]-selectedIDs[ana])/goodIDs[ana],0.,2)
+
+
+        self.assertAlmostEqual(combiner.lsm()*1e9, 8.67222466, 3)
+        self.assertAlmostEqual(combiner.likelihood()*1e11, 3.1499884, 3)
+        self.assertAlmostEqual(combiner.lmax()*1e9, 8.855944, 2)
 
 if __name__ == "__main__":
     unittest.main()

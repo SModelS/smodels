@@ -49,6 +49,43 @@ class TheoryPredictionsCombiner(object):
         ret = "%s:%s" % (self.analysisId(), self.totalXsection())
         return ret
 
+    @classmethod
+    def selectResultsFrom(cls,theoryPredictions,anaIDs):
+        """
+        Select the results from theoryPrediction list which match one
+        of the IDs in anaIDs. If there are multiple predictions for the
+        same ID for which a likelihood is available, it gives priority
+        to the ones with largest expected r-values.
+
+        :param theoryPredictions: list of TheoryPrediction objects
+        :param anaIDs: list with the analyses IDs (in string format) to be combined
+        :return: a TheoryPredictionsCombiner object for the selected predictions.
+                 If no theory prediction was selected, return None.
+        """
+
+        # First select the theory predictions which correspond to the analyses to be combined
+        filteredTPs = [tp for tp in theoryPredictions if  tp.analysisId() in anaIDs]
+        filteredIDs = set([tp.analysisId() for tp in filteredTPs])
+        # Now remove results with no likelihood available
+        selectedTPs = [tp for tp in filteredTPs if tp.likelihood() is not None]
+        selectedIDs = set([tp.analysisId() for tp in selectedTPs])
+        # Warn the user concerning results with no likelihoods:
+        for anaID in filteredIDs.difference(selectedIDs):
+            logger.info("No likelihood available for %s. This analysis will not be used in analysis combination." % anaID)
+        # If no results are available, return None
+        if len(selectedTPs) == 0:
+            return None
+
+        # Now sort by highest expected r-value:
+        selectedTPs = sorted(selectedTPs, key = lambda tp: tp.getRValue(expected=True))
+        # Now get a single TP for each result
+        # (the highest r values come last and are kept in the dict)
+        uniqueTPs = {tp.analysisId() : tp for tp in selectedTPs}
+        uniqueTPs = list(uniqueTPs.values())
+
+        combiner = cls(uniqueTPs)
+        return combiner
+
     def singleDecorator(function):
         """
         If the combiner holds a single theoryPrediction, calls
