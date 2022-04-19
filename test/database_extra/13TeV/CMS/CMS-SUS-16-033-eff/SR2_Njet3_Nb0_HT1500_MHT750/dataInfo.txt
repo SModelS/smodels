@@ -1,0 +1,7 @@
+dataId: SR2_Njet3_Nb0_HT1500_MHT750
+dataType: efficiencyMap
+observedN: 71.0
+expectedBG: 55.2
+bgError: 11.5
+upperLimit: 1.32*fb
+expectedUpperLimit: 0.82*fb

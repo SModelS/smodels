@@ -204,34 +204,16 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
         selectedTheoryPreds = []
         selectedResults = []
-        combineAnas = parser.get("options", "combineAnas").split(",")
+        combineAnas = parser.get("options", "combineAnas").replace(" ","").split(",")
         if combineAnas:
             if combineResults is True:
                 logger.warning("Combining analyses with signal region combination (combineSRs=True) might significantly reduce CPU performance.")
-            # Select the theory predictions which correspond to the analyses to be combined
-            # and have likelihoods defined
-            for tp in theoryPredictions:
-                expID = tp.analysisId()
-                if expID not in combineAnas:
-                    continue
-                selectedResults.append(expID)
-                if tp.likelihood() is None:
-                    continue
-                selectedTheoryPreds.append(tp)
-        # Make sure each analysis appears only once:
-        expIDs = [tp.analysisId() for tp in selectedTheoryPreds]
-        # Print a warning if no likelihood was found for the analysis
-        for eID in selectedResults:
-            if eID not in expIDs:
-                logger.info("No likelihood available for %s. This analysis will not be used in analysis combination." % eID)
-
-        if len(expIDs) != len(set(expIDs)):
-            logger.warning("Duplicated results when trying to combine analyses. Combination will be skipped.")
-        # Only compute combination if at least two results were selected
-        elif len(selectedTheoryPreds) > 0:
-            combiner = TheoryPredictionsCombiner(selectedTheoryPreds)
-            combiner.computeStatistics()
-            masterPrinter.addObj(combiner)
+            combiner = TheoryPredictionsCombiner.selectResultsFrom(theoryPredictions,
+                                                                   combineAnas)
+            # Only compute combination if at least one result was selected
+            if combiner is not None:
+                combiner.computeStatistics()
+                masterPrinter.addObj(combiner)
 
     return {os.path.basename(inputFile): masterPrinter.flush()}
 
