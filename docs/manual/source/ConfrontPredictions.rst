@@ -222,9 +222,7 @@ Starting with SModelS v2.2, it is possible to combine likelihoods from
 different analyses, assuming that their signal regions are approximately
 uncorrelated. As of now, the information of which analyses meet this criterion
 is not given by SModelS itself, and has to be provided by the user (see option
-:ref:`combineAnas <parameterFileCombineAnas>`). If multiple theory predictions are available for a single
-analysis ID and a likelihood can be computed, the prediction with the largest expected r-value is selected
-for each ID and used in the combination.
+:ref:`combineAnas <parameterFileCombineAnas>`).
 
 .. First systematic studies of correlations between various CMS and ATLAS are however underway, see for example contribution 16 of the `Les Houches Working Group report <https://arxiv.org/abs/2002.12220>`_.
 

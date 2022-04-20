@@ -76,10 +76,13 @@ class TheoryPredictionsCombiner(object):
         if len(selectedTPs) == 0:
             return None
 
-        # Now sort by highest expected r-value:
-        selectedTPs = sorted(selectedTPs, key = lambda tp: tp.getRValue(expected=True))
+        # Define a hierarchy for the results:
+        priority = {'combined' : 2, 'efficiencyMap' : 1, 'upperLimit' : 0}
+        # Now sort by highest priority and then by highest expected r-value:
+        selectedTPs = sorted(selectedTPs, key = lambda tp:
+                             (priority[tp.dataType()],tp.getRValue(expected=True)))
         # Now get a single TP for each result
-        # (the highest r values come last and are kept in the dict)
+        # (the highest ranking analyses come last and are kept in the dict)
         uniqueTPs = {tp.analysisId() : tp for tp in selectedTPs}
         uniqueTPs = list(uniqueTPs.values())
 
