@@ -749,8 +749,14 @@ class LikelihoodComputer:
         if len ( self.model.observed ) == 1:
             if not allowNegativeSignals and nsig[0]<0.:
                 nsig = [ 0. ]
+            self.muhat = nsig
+            if abs ( self.model.nsignal ) > 1e-100:
+                self.muhat = nsig / self.model.nsignal
+            self.sigma_mu = np.sqrt ( self.model.observed + self.model.covariance[0][0] )
             return self.likelihood(nsig, marginalize=marginalize, nll=nll )
         muhat_, sigma_mu, lmax = self.findMuHat ( nsig , allowNegativeSignals = allowNegativeSignals, extended_output=True, nll=nll )
+        self.muhat = muhat_
+        self.sigma_mu = sigma_mu
         return self.likelihood(muhat*nsig, marginalize=marginalize, nll=nll )
 
     def chi2(self, nsig, marginalize=False):

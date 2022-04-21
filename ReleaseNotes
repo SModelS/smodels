@@ -17,6 +17,7 @@ Release v2.2.1, xxx
        see smodels/tools/theoryPredictionsCombiner.py:304
     ** fixed a bug where "observed" values could get cached as "expected",
        see smodels/tools/theoryPredictionsCombiner.py:245
+	  ** added an initial guess of weighted_avg ( muhat_i ) for muhat_combined
 
 Release v2.2.0.post1, Mon 4 April 2022
 =======================================================

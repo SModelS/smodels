@@ -350,6 +350,9 @@ class DataSet(object):
         if hasattr ( computer, "muhat" ):
             ## seems like someone wants to debug them
             self.muhat = computer.muhat
+        if hasattr ( computer, "sigma_mu" ):
+            ## seems like someone wants to debug them
+            self.sigma_mu = computer.sigma_mu
         return ret
 
     def chi2(self, nsig, deltas_rel=0.2, marginalize=False):

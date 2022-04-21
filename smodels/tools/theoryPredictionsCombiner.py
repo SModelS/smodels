@@ -279,6 +279,22 @@ class TheoryPredictionsCombiner(object):
         :returns: mu_hat, i.e. the maximum likelihood estimate of mu
         """
         import scipy.optimize
+        muhats, weighted = [], []
+        totweight = 0.
+        for tp in self.theoryPredictions:
+            muhat = tp.muhat ( expected = expected, allowNegativeSignals = True )
+            sigma_mu = tp.sigma_mu ( expected = expected, allowNegativeSignals = True )
+            if muhat != None:
+                muhats.append ( muhat )
+                w = 1./sigma_mu**2
+                weighted.append ( w*muhat )
+                totweight += w
+        if len ( muhats ) == 0:
+            logger.error ( f"asked to compute muhat for combination, but no individual values" )
+            if extended_output:
+                return None, None, None
+            return None
+        toTry = [ sum ( weighted ) / totweight ]
 
         def fun(mu):
             # Make sure to always compute the correct llhd value (from theoryPrediction)
@@ -286,29 +302,40 @@ class TheoryPredictionsCombiner(object):
             return self.likelihood(mu, expected=expected,
                                    nll=True, useCached=False)
 
-        toTry = [1., 0., 3., 10.]
         if allowNegativeSignals:
-            toTry = [1., 0., 3., -1., 10., -3.]
+            toTry += [1., 0., 3., -1., 10., -3., .1, -.1]
+        else:
+            toTry += [1., 0., 3., 10., .1 ]
         for mu0 in toTry:
             # Minimize with a delta_mu = 1e-3*mu0 when computing the first derivative
             # (if delta_mu is too small, the derivative might give zero and terminate the minimization)
-            o = scipy.optimize.minimize(fun, mu0)
-            logger.debug(f"result for {mu0}: %s" % o)
+            o = scipy.optimize.minimize(fun, mu0 )
+            #bounds = [ 0, 3. * max (muhats) ]
+            #if allowNegativeSignals:
+            #    m = min(muhats)
+            #    if m < 0.:
+            #        bounds[0]=3. * m
+            # o = scipy.optimize.minimize(fun, mu0, bounds=[tuple(bounds),] )
             if not o.success:
                 logger.debug(
                     f"combiner.findMuHat did not terminate successfully: {o.message} mu_hat={o.x} hess={o.hess_inv} slhafile={self.slhafile}")
             # the inverted hessian is a good approximation for the variance at the
             # minimum
-            hessian = o.hess_inv[0][0]
+            invh = o.hess_inv
+            try:
+                invh = invh.todense()
+            except AttributeError as e:
+                pass
+            hessian = invh[0][0]
             nll_ = o.fun
-            if hessian > 0. and nll_ < 899.:  # found a maximum. all good.
+            if hessian > 0. and nll_ < 998.:  # found a maximum. all good.
                 break
             # the hessian is negative meaning we found a maximum, not a minimum
             if hessian <= 0.:
                 logger.debug( f"combiner.findMuHat the hessian {hessian} is negative at mu_hat={o.x} in {self.slhafile} try again with different initialisation.")
         mu_hat = o.x[0]
         lmax = np.exp ( - o.fun ) # fun is *always* nll
-        if hessian < 0. or nll_ > 899.:
+        if hessian < 0. or nll_ > 998.:
             logger.error(
                 "tried with several starting points to find maximum, always ended up in minimum. bailing out.")
             if extended_output:

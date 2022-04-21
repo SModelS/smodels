@@ -153,9 +153,17 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["lmax"] = {allowNegativeSignals: None}
         return self.cachedObjs[expected]["lmax"][allowNegativeSignals]
 
+    def sigma_mu(self, expected=False, allowNegativeSignals=False):
+        """ sigma_mu of mu_hat """
+        if not "sigma_mu" in self.cachedObjs[expected]:
+            self.computeStatistics(expected, allowNegativeSignals)
+        return self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals]
+
     def muhat(self, expected=False, allowNegativeSignals=False):
         """ position of maximum likelihood  """
         if not "muhat" in self.cachedObjs[expected]:
+            self.computeStatistics(expected, allowNegativeSignals)
+        if not allowNegativeSignals in self.cachedObjs[expected]["muhat"]:
             self.computeStatistics(expected, allowNegativeSignals)
         if "muhat" in self.cachedObjs[expected] and not allowNegativeSignals \
                 in self.cachedObjs[expected]["muhat"]:
@@ -318,6 +326,11 @@ class TheoryPrediction(object):
             muhat = None
             if hasattr(self.dataset, "muhat"):
                 muhat = self.dataset.muhat
+            if hasattr(self.dataset, "sigma_mu"):
+                sigma_mu = self.dataset.sigma_mu
+                if not "sigma_mu" in self.cachedObjs[expected]:
+                    self.cachedObjs[expected]["sigma_mu"]={}
+                self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = sigma_mu
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = llhd_sm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = llhd_max
