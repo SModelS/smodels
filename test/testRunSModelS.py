@@ -33,11 +33,18 @@ class RunSModelSTest(unittest.TestCase):
                 os.unlink(os.path.join(out, i))
         dirname = "./testFiles/slha/"
         runMain(dirname)
-        nout = len([i for i in glob.iglob("unitTestOutput/*smodels") if not "~" in i])
-        nin = len([i for i in glob.iglob("%s/*slha" % dirname) if not "~" in i])
+        fout = [i.replace("unitTestOutput/","").replace(".smodels","") for i in glob.iglob("unitTestOutput/*smodels") if not "~" in i]
+        nout = len(fout)
+        fin = [i.replace("testFiles/slha/","").replace("./","") for i in glob.iglob("%s/*slha" % dirname) if not "~" in i]
+        nin = len(fin)
         if nout != nin:
-            logger.error("Number of output file(%d) differ from number of input files(%d)" %
-                         (nout, nin))
+            print ( f"[testRunSModelS] Number of output files ({nout}) differs from number of input files ({nin})" )
+            fin.sort()
+            fout.sort()
+            for f in fin:
+                if f not in fout:
+                    print ( f"[testRunSModelS] {f} not in output files\n" )
+            # print ( f"[testRunSModelS] not same number {fin}\n{fout}\n" )
         self.assertEqual(nout, nin)
 
     def testTimeout(self):
