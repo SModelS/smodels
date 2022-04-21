@@ -310,13 +310,13 @@ class TheoryPredictionsCombiner(object):
             # Minimize with a delta_mu = 1e-3*mu0 when computing the first derivative
             # (if delta_mu is too small, the derivative might give zero and terminate the minimization)
             #o  = scipy.optimize.minimize(fun, mu0 ) ## the unbounded method
-            mxm = max(muhats)
+            mxm = float ( max(muhats) )
             upper = 3. * mxm
-            if upper < 0.: # 
-                upper = 1.
+            if upper <= 1.5: # 
+                upper = 1.5
             bounds = [ 0, upper ]
             if allowNegativeSignals:
-                m = min(muhats)
+                m = float ( min(muhats) )
                 if m < 0.:
                     bounds[0]=3. * m
             #if bounds[1] < bounds[0]:
