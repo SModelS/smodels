@@ -309,13 +309,19 @@ class TheoryPredictionsCombiner(object):
         for mu0 in toTry:
             # Minimize with a delta_mu = 1e-3*mu0 when computing the first derivative
             # (if delta_mu is too small, the derivative might give zero and terminate the minimization)
-            o = scipy.optimize.minimize(fun, mu0 )
-            #bounds = [ 0, 3. * max (muhats) ]
-            #if allowNegativeSignals:
-            #    m = min(muhats)
-            #    if m < 0.:
-            #        bounds[0]=3. * m
-            # o = scipy.optimize.minimize(fun, mu0, bounds=[tuple(bounds),] )
+            #o  = scipy.optimize.minimize(fun, mu0 ) ## the unbounded method
+            mxm = max(muhats)
+            upper = 3. * mxm
+            if upper < 0.: # 
+                upper = 1.
+            bounds = [ 0, upper ]
+            if allowNegativeSignals:
+                m = min(muhats)
+                if m < 0.:
+                    bounds[0]=3. * m
+            #if bounds[1] < bounds[0]:
+            #    logger.error ( f"bounds are reversed, this should not happen" )
+            o = scipy.optimize.minimize(fun, mu0, bounds=[tuple(bounds),] )
             if not o.success:
                 logger.debug(
                     f"combiner.findMuHat did not terminate successfully: {o.message} mu_hat={o.x} hess={o.hess_inv} slhafile={self.slhafile}")
