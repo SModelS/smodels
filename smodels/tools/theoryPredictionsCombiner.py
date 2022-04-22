@@ -144,28 +144,28 @@ class TheoryPredictionsCombiner(object):
         return llhd
 
     @singleDecorator
-    def lmax(self, expected=False):
+    def lmax(self, expected=False, allowNegativeSignals = False ):
         if "lmax" not in self.cachedObjs[expected]:
-            self.computeStatistics(expected=expected)
+            self.computeStatistics(expected, allowNegativeSignals )
         if "lmax" not in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["lmax"] = None
-        return self.cachedObjs[expected]["lmax"]
+            self.cachedObjs[expected]["lmax"][allowNegativeSignals] = None
+        return self.cachedObjs[expected]["lmax"][allowNegativeSignals]
 
     @singleDecorator
-    def muhat(self, expected=False):
+    def muhat(self, expected=False, allowNegativeSignals=False ):
         if "muhat" not in self.cachedObjs[expected]:
-            self.computeStatistics(expected=expected)
+            self.computeStatistics(expected, allowNegativeSignals )
         if "muhat" not in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["muhat"] = None
-        return self.cachedObjs[expected]["muhat"]
+            self.cachedObjs[expected]["muhat"][allowNegativeSignals] = None
+        return self.cachedObjs[expected]["muhat"][allowNegativeSignals]
 
     @singleDecorator
-    def chi2(self, expected=False):
+    def chi2(self, expected=False, allowNegativeSignals = False ):
         if "llhd" not in self.cachedObjs[expected] or "lmax" not in self.cachedObjs[expected]:
             logger.error("call computeStatistics before calling chi2")
             return
         llhd = self.cachedObjs[expected]["llhd"]
-        lmax = self.cachedObjs[expected]["lmax"]
+        lmax = self.cachedObjs[expected]["lmax"][allowNegativeSignals]
 
         if llhd == 0.:
             return 2000.  # we cut off at > 1e-300 or so ;)
@@ -217,7 +217,7 @@ class TheoryPredictionsCombiner(object):
         return llhd
 
     @singleDecorator
-    def computeStatistics(self, expected=False):
+    def computeStatistics(self, expected=False, allowNegativeSignals = False ):
         """
         Compute the likelihoods, chi2, and upper limit for this combination
         :param expected: if True, compute expected likelihood, else observed
@@ -226,7 +226,7 @@ class TheoryPredictionsCombiner(object):
             return
         if expected == "both":
             for e in [False, True]:
-                self.computeStatistics(e)
+                self.computeStatistics(e, allowNegativeSignals )
             return
         llhd, lsm = 1., 1.
         for tp in self.theoryPredictions:
@@ -243,12 +243,19 @@ class TheoryPredictionsCombiner(object):
         self.cachedObjs[expected]["llhd"] = llhd
         self.cachedObjs[expected]["lsm"] = lsm
         if expected:
-            self.cachedObjs[expected]["lmax"] = lsm
+            self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lsm
         else:
             self.mu_hat, self.sigma_mu, lmax = self.findMuHat(expected=False,
                                                               extended_output=True)
-            self.cachedObjs[expected]["lmax"] = lmax
-            self.cachedObjs[expected]["muhat"] = self.mu_hat
+            if not "lmax" in self.cachedObjs[expected]:
+                self.cachedObjs[expected]["lmax"] = {}
+            self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
+            if not "muhat" in self.cachedObjs[expected]:
+                self.cachedObjs[expected]["muhat"] = {}
+            self.cachedObjs[expected]["muhat"][allowNegativeSignals] = self.mu_hat
+            if not "sigma_mu" in self.cachedObjs[expected]:
+                self.cachedObjs[expected]["sigma_mu"]={}
+            self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = self.mu_hat
 
     @singleDecorator
     def totalXsection(self):
@@ -284,6 +291,8 @@ class TheoryPredictionsCombiner(object):
         for tp in self.theoryPredictions:
             muhat = tp.muhat ( expected = expected, allowNegativeSignals = True )
             sigma_mu = tp.sigma_mu ( expected = expected, allowNegativeSignals = True )
+            if sigma_mu == None:
+                sigma_mu = 1. # unity weights if no weights
             if muhat != None:
                 muhats.append ( muhat )
                 w = 1./sigma_mu**2
@@ -366,8 +375,6 @@ class TheoryPredictionsCombiner(object):
         """
         if "UL" in self.cachedObjs[expected]:
             return self.cachedObjs[expected]["UL"]
-        # if not hasattr ( self, "mu_hat" ):
-        #    self.computeStatistics( expected = False )
         mu_hat, sigma_mu, lmax = self.findMuHat(expected=expected,
                 allowNegativeSignals=True, extended_output=True)
         nll0 = self.likelihood(mu_hat, expected=expected, nll=True)
