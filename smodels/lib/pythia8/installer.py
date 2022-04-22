@@ -76,9 +76,9 @@ def getNCPUs():
     ncpus = 4
     try:
         from smodels.tools.runtime import nCPUs
-        ncpus = nCPUS()
+        ncpus = nCPUs()
     except Exception as e:
-        pass
+        print ( f"[installer.py] could not determine number of CPUs: {e}" )
     return ncpus
 
 def checkPythia():
