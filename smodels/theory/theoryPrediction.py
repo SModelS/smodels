@@ -157,6 +157,8 @@ class TheoryPrediction(object):
         """ sigma_mu of mu_hat """
         if not "sigma_mu" in self.cachedObjs[expected]:
             self.computeStatistics(expected, allowNegativeSignals)
+        if not allowNegativeSignals in self.cachedObjs[expected]["sigma_mu"]:
+            self.computeStatistics(expected, allowNegativeSignals)
         return self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals]
 
     def muhat(self, expected=False, allowNegativeSignals=False):
