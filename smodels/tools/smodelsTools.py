@@ -26,7 +26,7 @@ def main():
     xseccomputer = subparsers.add_parser('xseccomputer', description="Compute MSSM cross sections for a SLHA file.")
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
         help="sqrt(s) TeV. Can supply more than one value (as a space separated list). Default is both 8 and 13.",
-        type=int, default=[])
+        type=float, default=[])
     xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
         help="number of events to be simulated [10000].")
     xseccomputer.add_argument('-v', '--verbosity', type=str, default="info",
