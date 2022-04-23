@@ -130,7 +130,7 @@ class Pythia8Wrapper(WrapperBase):
         cfg = self.absPath(self.cfgfile)
         logger.debug("running with cfgfile " + str(cfg))
         lhefile = self.tempDirectory() + "/events.lhe"
-        cmd = "%s -n %d -f %s -s %d -c %s -l %s" % \
+        cmd = "%s -n %d -f %s -s %f -c %s -l %s" % \
              ( self.executablePath, self.nevents, slha, self.sqrts, cfg, lhefile )
         xmldoc = self.executablePath.replace ( "pythia8.exe", "xml.doc" )
         logger.debug ( "exe path=%s" % self.executablePath )

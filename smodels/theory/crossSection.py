@@ -55,6 +55,14 @@ class XSectionInfo(object):
     mass, order and label).
 
     """
+    def normalizeSqrts ( self, sqrts ):
+        """ """
+        if sqrts == None:
+            return sqrts
+        if type(sqrts)==float and abs (sqrts % 1) < 1e-5:
+            return int(sqrts)
+        return sqrts
+
     def __init__(self, sqrts = None, order = None, label = None ):
         """
         Constructor.
@@ -62,7 +70,7 @@ class XSectionInfo(object):
         :param: order perturbation order of xsec computation
         :param: label, a string that describes the xsec computation
         """
-        self.sqrts = sqrts
+        self.sqrts = self.normalizeSqrts ( sqrts )
         self.order = order
         self.label = label
 
@@ -84,6 +92,7 @@ class XSectionInfo(object):
         return int(self.sqrts.asNumber(GeV)) + order
 
     def __str__(self):
+        self.sqrts = self.normalizeSqrts ( self.sqrts )
         if not self.order:
             return str(self.sqrts)
         return "%s (%s)" % ( self.sqrts, self.order )
@@ -658,10 +667,13 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
         process = f.xsections.get ( production )
         for pxsec in process.xsecs:
             csOrder = pxsec.qcd_order
-            wlabel = str( int ( pxsec.sqrts / 1000) ) + ' TeV'
+            sqrts = pxsec.sqrts / 1000
+            if abs ( sqrts % 1 ) < 1e-5:
+                sqrts = int ( sqrts )
+            wlabel = str( sqrts ) + ' TeV'
             wlabel += f" ({orderToString(csOrder,True,True)})"
             xsec = XSection()
-            xsec.info.sqrts = pxsec.sqrts/1000. * TeV
+            xsec.info.sqrts = sqrts * TeV
             xsec.info.order = csOrder
             xsec.info.label = wlabel
             xsec.value = pxsec.value * pb
@@ -707,7 +719,6 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     nevts = reader.metainfo["nevents"]
     sqrtS = reader.metainfo["sqrts"]
     eventCs = totxsec / float(nevts)
-
 
     # Get all mom pids
     allpids = []
