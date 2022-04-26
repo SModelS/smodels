@@ -348,7 +348,7 @@ class TheoryPredictionsCombiner(object):
         def fun(mu):
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
-            return self.likelihood(mu, expected=expected,
+            return self.likelihood(float(mu), expected=expected,
                                    nll=True, useCached=False)
 
         if allowNegativeSignals:
