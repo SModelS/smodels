@@ -212,10 +212,11 @@ class TheoryPredictionsCombiner(object):
         return - 2 * np.log(llhd / lmax)
 
     def describe( self ):
+        """ returns a string containing a list of all analysisId and dataIds """
         ids = []
         for tp in self.theoryPredictions:
-            ids.append ( f"{tp.dataset.globalInfo.id}:{tp.dataset.dataInfo.dataId}" )
-        logger.error ( f"SRs: {', '.join(ids)}" )
+            ids.append ( f"{tp.analysisId()}:{tp.dataId()}" )
+        return f"SRs: {', '.join(ids)}"
 
     @singleDecorator
     def likelihood(self, mu=1., expected=False,
