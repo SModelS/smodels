@@ -402,7 +402,6 @@ class TheoryPredictionsCombiner(object):
         if not allowNegativeSignals and mu_hat < 0.:
             mu_hat = 0.  # fixme for this case we should reevaluate the hessian!
         sigma_mu = np.sqrt(hessian)
-        print ( f"[TheoryPredictionsCombiner] sigma_mu {sigma_mu} hessian {hessian}" )
         if extended_output:
             retllh = lmax
             if nll:
