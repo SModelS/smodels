@@ -21,6 +21,8 @@ from smodels.share.models.mssm import BSMList
 from smodels.experiment.databaseObj import Database
 from unitTestHelpers import equalObjs, runMain, importModule
 from smodels.tools.physicsUnits import fb, GeV, TeV
+from smodels.tools.modelTester import getCombiner
+import numpy as np
 import unittest
 import os
 from databaseLoader import database
@@ -195,6 +197,37 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(combiner.likelihood()*1e25,6.540, 2)
         self.assertAlmostEqual(combiner.lmax()*1e23, 6.826, 2)
         self.assertAlmostEqual(combiner.getRValue(), 1.653, 2)
+
+
+    def testGetCombiner(self):
+
+        slhafile = "./testFiles/slha/gluino_squarks.slha"
+        parfile = "./testParameters_comb.ini"
+
+        combiner = getCombiner(slhafile, parfile)
+        lmax = combiner.lmax()
+        lsm = combiner.lsm()
+        lbsm = combiner.likelihood(mu=1.0)
+
+
+        self.assertAlmostEqual(lsm, 0.1009, 2)
+        self.assertAlmostEqual(lbsm,0.15356, 2)
+        self.assertAlmostEqual(lmax, 0.21210, 2)
+        self.assertAlmostEqual(combiner.getRValue(), 0.1342, 2)
+
+        # Also check if likelihood dict is defined:
+        muvals = np.linspace(0.,3.,10)
+        dmu = muvals[1]-muvals[0]
+        llhdDict = combiner.getLlhds(muvals,normalize=True)
+
+        # Check if keys agree
+        keys = sorted(['combined','CMS-SUS-16-050-agg','CMS-SUS-13-012'])
+        self.assertEqual(keys,sorted(list(llhdDict.keys())))
+
+        for anaId,llhvals in llhdDict.items():
+            self.assertEqual(len(muvals),len(llhvals)) # Just check if size of lists match
+            norm = np.sum(llhvals*dmu)
+            self.assertAlmostEqual(norm,1.,2) # Check normalization
 
 if __name__ == "__main__":
     unittest.main()

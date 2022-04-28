@@ -390,3 +390,35 @@ class TheoryPredictionsCombiner(object):
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
         self.cachedObjs[expected]["UL"] = mu_lim
         return mu_lim
+
+    def getLlhds(self,muvals,expected=False,normalize=True):
+        """
+        Compute the likelihoods for the individual analyses and the combined
+        likelihood.
+        Returns a dictionary with the analysis IDs as keys and the likelihood values as values.
+
+        :param muvals: List with values for the signal strenth for which the likelihoods must
+                       be evaluated.
+        :param expected: If True returns the expected likelihood values.
+        :param normalize: If True normalizes the likelihood by its integral over muvals.
+        """
+
+        llhds = {}
+        llhds['combined'] = np.array([self.likelihood(mu,expected=expected) for mu in muvals])
+        tpreds = self.theoryPredictions
+        for t in tpreds:
+            Id = t.analysisId()
+            t.computeStatistics( expected = expected )
+            l = np.array([t.likelihood(mu,expected=expected) for mu in muvals])
+            llhds[Id]=l
+
+        if normalize:
+            # Compute delta mu
+            dmuvals = np.diff(muvals)
+            dmuvals = np.append(dmuvals,dmuvals[-1])
+            for Id,l in llhds.items():
+                # Compute norm (integral over mu)
+                norm = np.sum(l*dmuvals)
+                llhds[Id] = l/norm
+
+        return llhds
