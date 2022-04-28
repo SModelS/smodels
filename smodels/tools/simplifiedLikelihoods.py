@@ -392,7 +392,7 @@ class LikelihoodComputer:
         if type(signal_rel) in [ list, ndarray ]:
             s_effs = sum(signal_rel)
 
-        sgm_mu = sqrt(sum(self.model.observed) + sum(np.diag(self.model.covariance)))/s_effs
+        sgm_mu = float(sqrt(sum(self.model.observed) + sum(np.diag(self.model.covariance)))/s_effs)
 
         return sgm_mu
 
