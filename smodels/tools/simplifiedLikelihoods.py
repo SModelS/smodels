@@ -749,9 +749,9 @@ class LikelihoodComputer:
         if len ( self.model.observed ) == 1:
             if not allowNegativeSignals and nsig[0]<0.:
                 nsig = [ 0. ]
-            self.muhat = nsig
+            self.muhat = float ( nsig[0] )
             if abs ( self.model.nsignal ) > 1e-100:
-                self.muhat = nsig / self.model.nsignal
+                self.muhat = float ( nsig[0] / self.model.nsignal[0] )
             self.sigma_mu = np.sqrt ( self.model.observed + self.model.covariance[0][0] )
             return self.likelihood(nsig, marginalize=marginalize, nll=nll )
         muhat_, sigma_mu, lmax = self.findMuHat ( nsig , allowNegativeSignals = allowNegativeSignals, extended_output=True, nll=nll )
