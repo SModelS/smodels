@@ -329,9 +329,9 @@ class TheoryPrediction(object):
                     allowNegativeSignals=allowNegativeSignals, expected=expected)
             muhat = None
             if hasattr(self.dataset, "muhat"):
-                muhat = self.dataset.muhat
+                muhat = self.dataset.muhat/nsig
             if hasattr(self.dataset, "sigma_mu"):
-                sigma_mu = self.dataset.sigma_mu
+                sigma_mu = self.dataset.sigma_mu/nsig
                 if not "sigma_mu" in self.cachedObjs[expected]:
                     self.cachedObjs[expected]["sigma_mu"]={}
                 self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = sigma_mu
