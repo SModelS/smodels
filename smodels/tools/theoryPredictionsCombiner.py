@@ -167,6 +167,7 @@ class TheoryPredictionsCombiner(object):
         clmu = self.getUpperLimitOnMu(expected=expected)
         if clmu == 0.:
             # has no meaning, has it?
+            self.cachedObjs[expected]["r"] = None
             return None
         r = 1.0 / clmu
         self.cachedObjs[expected]["r"] = r
