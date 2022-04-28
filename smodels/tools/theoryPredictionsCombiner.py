@@ -370,9 +370,10 @@ class TheoryPredictionsCombiner(object):
                 m = float ( min(muhats) )
                 if m < 0.:
                     bounds[0]=3. * m
+            bounds=[tuple(bounds),]
             #if bounds[1] < bounds[0]:
             #    logger.error ( f"bounds are reversed, this should not happen" )
-            o = scipy.optimize.minimize(fun, mu0, bounds=[tuple(bounds),] )
+            o = scipy.optimize.minimize(fun, mu0, bounds=bounds, tol = 1e-9 )
             if not o.success:
                 logger.debug(
                     f"combiner.findMuHat did not terminate successfully: {o.message} mu_hat={o.x} hess={o.hess_inv} slhafile={self.slhafile}")
@@ -385,7 +386,7 @@ class TheoryPredictionsCombiner(object):
                 pass
             hessian = invh[0][0]
             nll_ = o.fun
-            if hessian > 0. and nll_ < 998.:  # found a maximum. all good.
+            if hessian > 0. and nll_ < 998. and o.success:  # found a maximum. all good.
                 break
             # the hessian is negative meaning we found a maximum, not a minimum
             if hessian <= 0.:
@@ -401,6 +402,7 @@ class TheoryPredictionsCombiner(object):
         if not allowNegativeSignals and mu_hat < 0.:
             mu_hat = 0.  # fixme for this case we should reevaluate the hessian!
         sigma_mu = np.sqrt(hessian)
+        print ( f"[TheoryPredictionsCombiner] sigma_mu {sigma_mu} hessian {hessian}" )
         if extended_output:
             retllh = lmax
             if nll:
