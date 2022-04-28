@@ -298,9 +298,8 @@ class LikelihoodComputer:
         :param extended_output: if true, return also sigma_mu, the estimate of the error of mu_hat, and lmax, the likelihood at mu_hat
         :param nll: if true, return nll instead of lmax in the extended output
 
-        :returns: mu_hat, i.e. the maximum likelihood estimate of mu
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended output is requested, it returns mu_hat, sigma_mu -- the standard deviation around mu_hat, and llhd, the likelihood at mu_hat
         """
-
         if (self.model.backgrounds == self.model.observed).all():
             if extended_output:
                 return 0., 0., 0.
@@ -338,6 +337,7 @@ class LikelihoodComputer:
             total_sign = np.sign(lower_v * upper_v)
             if total_sign > -.5:
                 if upper_v < lower_v < 0.:
+                    # print ( "upper_v", upper_v, lower_v ) FIXME
                     ## seems like we really want to go for mu_hat = 0.
                     if extended_output:
                         return 0., 0., 0.

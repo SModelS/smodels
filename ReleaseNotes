@@ -19,6 +19,10 @@ Release v2.2.1, xxx
        see smodels/tools/theoryPredictionsCombiner.py:245
     ** added an initial guess of weighted_avg ( muhat_i ) for muhat_combined,
        bounded the optimization
+    ** removed the rounding when computing expected simplified likelihoods
+    ** minimization in the tpred combiner has now tol = 1e-9 instad of None
+    ** introduced/fixed muhat and sigma_mu for all likelihoods, for
+       initialisation of tpredcombiner.findMuHat
   * small improvements in analyses combination  
 
 Release v2.2.0.post1, Mon 4 April 2022

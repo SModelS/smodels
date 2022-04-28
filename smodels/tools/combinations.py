@@ -110,10 +110,11 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
         ulcomputer = _getPyhfComputer(dataset, [0.]*len(nsig), False)
         lsm = ulcomputer.likelihood( mu = 0., workspace_index = index,
                                      expected=expected )
-        return lbsm, lmax, lsm, muhat
+        sigma_mu = None
+        return lbsm, lmax, lsm, muhat, sigma_mu
     lbsm = combinedSimplifiedLikelihood(dataset, nsig, marginalize, deltas_rel,
                      expected=expected)
-    lmax, muhat = combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel,
+    lmax, muhat, sigma_mu = combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel,
                      expected=expected, allowNegativeSignals = allowNegativeSignals)
     lsm = combinedSimplifiedLikelihood(dataset, [0.]*len(nsig), marginalize,
                      deltas_rel, expected=expected)
@@ -123,7 +124,7 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
     if lbsm > lmax:
         lmax = lbsm
         muhat = 1.
-    return lbsm, lmax, lsm, muhat
+    return lbsm, lmax, lsm, muhat, sigma_mu
 
 
 def _getPyhfComputer(dataset, nsig, normalize=True):
@@ -216,17 +217,16 @@ def combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel, nll=False,
         expected=False, allowNegativeSignals=False ):
     """ compute likelihood at maximum, for simplified likelihoods only """
     if dataset.type != "simplified":
-        return -1., None
+        return -1., None, None
     nobs = [x.dataInfo.observedN for x in dataset._datasets]
     if expected:
         # nobs = [ x.dataInfo.expectedBG for x in dataset._datasets]
-        nobs = [int(np.round(x.dataInfo.expectedBG)) for x in dataset._datasets]
+        nobs = [ x.dataInfo.expectedBG for x in dataset._datasets ]
+        # nobs = [int(np.round(x.dataInfo.expectedBG)) for x in dataset._datasets]
     bg = [x.dataInfo.expectedBG for x in dataset._datasets]
     cov = dataset.globalInfo.covariance
     if type(nsig) in [list, tuple]:
         nsig = np.array(nsig)
     computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-    mu_hat = computer.findMuHat(nsig, allowNegativeSignals=allowNegativeSignals)
-    musig = nsig * mu_hat
-    llhd = computer.likelihood(musig, marginalize=marginalize, nll=nll)
-    return llhd, mu_hat
+    mu_hat, sigma_mu, lmax = computer.findMuHat(nsig, allowNegativeSignals=allowNegativeSignals, extended_output = True )
+    return lmax, mu_hat, sigma_mu

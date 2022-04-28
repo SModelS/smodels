@@ -174,7 +174,8 @@ class TheoryPrediction(object):
             self.computeStatistics(expected, allowNegativeSignals)
         if not "muhat" in self.cachedObjs[expected]:
             self.cachedObjs[expected]["muhat"] = {allowNegativeSignals: None}
-        return self.cachedObjs[expected]["muhat"][allowNegativeSignals]
+        ret = self.cachedObjs[expected]["muhat"][allowNegativeSignals]
+        return ret
 
     def chi2(self, expected=False):
         if not "chi2" in self.cachedObjs[expected]:
@@ -348,13 +349,16 @@ class TheoryPrediction(object):
             srNsigDict = dict([[pred.dataset.getID(), (pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
             srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
             # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
-            llhd, lmax, lsm, muhat = computeCombinedStatistics(self.dataset, srNsigs,
+            llhd, lmax, lsm, muhat, sigma_mu = computeCombinedStatistics(self.dataset, srNsigs,
                        self.marginalize, self.deltas_rel, expected=expected,
                        allowNegativeSignals=allowNegativeSignals)
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
             self.cachedObjs[expected]["muhat"][allowNegativeSignals] = muhat
+            if not "sigma_mu" in self.cachedObjs[expected]:
+                self.cachedObjs[expected]["sigma_mu"]={}
+            self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = sigma_mu
             from smodels.tools.statistics import chi2FromLmax
             self.cachedObjs[expected]["chi2"] = chi2FromLmax(llhd, lmax)
 
