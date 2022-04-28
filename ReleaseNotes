@@ -23,6 +23,7 @@ Release v2.2.1, xxx
     ** minimization in the tpred combiner has now tol = 1e-9 instad of None
     ** introduced/fixed muhat and sigma_mu for all likelihoods, for
        initialisation of tpredcombiner.findMuHat
+	  ** brent bracketing for finding muhat of simplified likelihoods slightly changed
   * small improvements in analyses combination  
 
 Release v2.2.0.post1, Mon 4 April 2022

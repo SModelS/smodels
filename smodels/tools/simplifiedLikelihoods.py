@@ -327,14 +327,23 @@ class LikelihoodComputer:
             #logger.info ( "   mu hat[%d]=%s" % (ctr, mu_hat ) )
             # mu_c = np.abs(self.model.observed - self.model.backgrounds - theta_hat)/signal_rel
             mu_c = (self.model.observed - self.model.backgrounds - theta_hat)/signal_rel
+            for i,s in enumerate ( signal_rel ):
+                if abs(s) < 1e-19:
+                    mu_c[i]=0.
             ## find mu_hat by finding the root of 1/L dL/dmu. We know
             ## that the zero has to be between min(mu_c) and max(mu_c).
             lower,upper = 0.,widener*max(np.abs(mu_c))
             if allowNegativeSignals:
-                lower = widener*min(mu_c+[0.])
-            lower_v = self.dLdMu(lower, signal_rel, theta_hat)
-            upper_v = self.dLdMu(upper, signal_rel, theta_hat)
-            total_sign = np.sign(lower_v * upper_v)
+                lower,upper = min(mu_c),max(mu_c)
+            ct_attempts = 0
+            total_sign = 1.
+            while total_sign > -.5 and ct_attempts < 5:
+                ct_attempts+=1
+                lower_v = self.dLdMu(lower, signal_rel, theta_hat)
+                upper_v = self.dLdMu(upper, signal_rel, theta_hat)
+                total_sign = np.sign(lower_v * upper_v)
+                if total_sign > -.5:
+                    lower, upper  = widener * lower, widener * upper
             if total_sign > -.5:
                 if upper_v < lower_v < 0.:
                     # print ( "upper_v", upper_v, lower_v ) FIXME
