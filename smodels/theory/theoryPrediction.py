@@ -279,15 +279,16 @@ class TheoryPrediction(object):
         nsig = None
         if mu is not None:
             nsig = mu*(self.xsection.value*lumi).asNumber()
-        llhd, muhat = likelihoodFromLimits(ulN, eulN, nsig,
+        llhd, muhat, sigma_mu = likelihoodFromLimits(ulN, eulN, nsig,
                                allowNegativeMuhat=True, corr=corr)
         if muhat < 0. and allowNegativeSignals == False:
             muhat = 0.
-            llhd, muhat = likelihoodFromLimits(ulN, eulN, nsig, 0.,
+            llhd, muhat, sigma_mu = likelihoodFromLimits(ulN, eulN, nsig, 0.,
                                allowNegativeMuhat=True, corr=corr)
         if mu is None:
             muhat = muhat / (self.xsection.value*lumi).asNumber()
             self.muhat_ = muhat
+        self.sigma_mu_ = sigma_mu / (self.xsection.value*lumi).asNumber()
         if chi2also:
             return (llhd, chi2FromLimits(llhd, ulN, eulN, corr=corr))
         return llhd
@@ -317,6 +318,10 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["chi2"] = chi2
             if hasattr(self, "muhat_"):
                 self.cachedObjs[expected]["muhat"][allowNegativeSignals] = self.muhat_
+            if hasattr(self, "sigma_mu_"):
+                if not "sigma_mu" in self.cachedObjs[expected]:
+                    self.cachedObjs[expected]["sigma_mu"] = {}
+                self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = self.sigma_mu_
 
         elif self.dataType() == 'efficiencyMap':
             lumi = self.dataset.getLumi()

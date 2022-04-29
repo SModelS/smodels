@@ -33,7 +33,7 @@ def likelihoodFromLimits(upperLimit, expectedUpperLimit, nsig, nll=False,
                  When comparing with likelihoods constructed from efficiency maps,
                  a factor of corr = 0.6 has been found to result in the best approximations.
 
-    :returns: likelihood (float), and muhat
+    :returns: likelihood (float), muhat, and sigma_mu
     """
     assert (upperLimit > 0.)
 
@@ -81,20 +81,20 @@ def likelihoodFromLimits(upperLimit, expectedUpperLimit, nsig, nll=False,
             xa = - expectedUpperLimit
             xb = 1
             mumax = find_neg_mumax(upperLimit, expectedUpperLimit, xa, xb)
-            return llhd(nsig, mumax, sigma_exp, nll), mumax
+            return llhd(nsig, mumax, sigma_exp, nll), mumax, sigma_exp
         else:
-            return llhd(nsig, 0., sigma_exp, nll), 0.
+            return llhd(nsig, 0., sigma_exp, nll), 0., sigma_exp
 
     fA = root_func(0.)
     fB = root_func(max(upperLimit, expectedUpperLimit))
     if np.sign(fA*fB) > 0.:
         ## the have the same sign
         logger.error("when computing likelihood: fA and fB have same sign")
-        return None
+        return None, None, None
     mumax = optimize.brentq(root_func, 0., max(upperLimit, expectedUpperLimit),
                             rtol=1e-03, xtol=1e-06)
     llhdexp = llhd(nsig, mumax, sigma_exp, nll)
-    return llhdexp, mumax
+    return llhdexp, mumax, sigma_exp
 
 def rootFromNLLs(nllA, nll0A, nll, nll0):
     """ compute the CLs - alpha from the NLLs """
