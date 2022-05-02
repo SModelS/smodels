@@ -108,7 +108,8 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
         lsm = ulcomputer.likelihood( mu = 0., workspace_index = index,
                                      expected=expected )
         sigma_mu = None
-        return lbsm, lmax, lsm, muhat, sigma_mu
+        return { "lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat,
+                 "sigma_mu": sigma_mu }
     lbsm = combinedSimplifiedLikelihood(dataset, nsig, marginalize, deltas_rel,
                      expected=expected)
     cslm = combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel,
@@ -122,7 +123,8 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
     if lbsm > lmax:
         lmax = lbsm
         muhat = 1.
-    return lbsm, lmax, lsm, muhat, sigma_mu
+    return { "lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat,
+             "sigma_mu": sigma_mu }
 
 
 def _getPyhfComputer(dataset, nsig, normalize=True):

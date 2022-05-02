@@ -354,9 +354,11 @@ class TheoryPrediction(object):
             srNsigDict = dict([[pred.dataset.getID(), (pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
             srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
             # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
-            llhd, lmax, lsm, muhat, sigma_mu = computeCombinedStatistics(self.dataset, srNsigs,
+            s = computeCombinedStatistics(self.dataset, srNsigs,
                        self.marginalize, self.deltas_rel, expected=expected,
                        allowNegativeSignals=allowNegativeSignals)
+            llhd, lmax, lsm, muhat, sigma_mu = s["lbsm"], s["lmax"], s["lsm"], \
+                s["muhat"], s["sigma_mu"]
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
