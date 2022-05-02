@@ -344,7 +344,7 @@ class LikelihoodComputer:
                 if lower_v < closestr:
                     closestl, closestr = lower, lower_v
             if lower_v > 0.:
-                logger.debug ( f"did not find a lower value with rootfinder(lower) > 0. Closest: f({closestl})={closestr}" )
+                logger.debug ( f"did not find a lower value with rootfinder(lower) < 0. Closest: f({closestl})={closestr}" )
                 return self.extendedOutput ( extended_output, 0. )
             ustarters = [ max(mu_c), 0., 1., 10., -1. -.1, .1, 100., -100., 1000., -1000., .01, -.01 ]
             closestl, closestr = None, float("inf")
@@ -355,7 +355,7 @@ class LikelihoodComputer:
                 if upper_v < closestr:
                     closestl, closestr = upper, upper_v
             if upper_v < 0.:
-                logger.debug ( "did not find an upper value with rootfinder(upper) < 0." )
+                logger.debug ( "did not find an upper value with rootfinder(upper) > 0." )
                 return self.extendedOutput ( extended_output, 0. )
             mu_hat = optimize.brentq ( self.dNLLdMu, lower, upper, args=(signal_rel, theta_hat ) )
             if not allowNegativeSignals and mu_hat < 0.:
