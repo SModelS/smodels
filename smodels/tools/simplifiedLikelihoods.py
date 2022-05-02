@@ -289,6 +289,11 @@ class LikelihoodComputer:
             ret = sum(ret)
         return ret
 
+    def extendedOutput ( self, extended_output, default = None ):
+            if extended_output:
+                return default, default, default
+            return default
+
     def findMuHat(self, signal_rel, allowNegativeSignals = False,
             extended_output = False, nll = False, marginalize = False ):
         """
@@ -303,9 +308,7 @@ class LikelihoodComputer:
         :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended output is requested, it returns mu_hat, sigma_mu -- the standard deviation around mu_hat, and llhd, the likelihood at mu_hat
         """
         if (self.model.backgrounds == self.model.observed).all():
-            if extended_output:
-                return 0., 0., 0.
-            return 0.
+            return self.extendedOutput ( extended_output, 0. )
 
         if type(signal_rel) in [list, ndarray]:
             signal_rel = array(signal_rel)
@@ -350,9 +353,7 @@ class LikelihoodComputer:
                 if upper_v < lower_v < 0.:
                     # print ( "upper_v", upper_v, lower_v ) FIXME
                     ## seems like we really want to go for mu_hat = 0.
-                    if extended_output:
-                        return 0., 0., 0.
-                    return 0.
+                    return self.extendedOutput ( extended_output, 0. )
                 if allowNegativeSignals:
                     logger.debug ( "weird. cant find a zero in the Brent bracket "\
                                    "for finding mu(hat). Let me try with a very small"
