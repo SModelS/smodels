@@ -261,9 +261,9 @@ class LikelihoodComputer:
         self.model = data
         self.toys = toys
 
-    def dLdMu(self, mu, signal_rel, theta_hat):
+    def dNLLdMu(self, mu, signal_rel, theta_hat):
         """
-        d (ln L)/d mu, if L is the likelihood. The function
+        d (- ln L)/d mu, if L is the likelihood. The function
         whose root gives us muhat, i.e. the mu that maximizes
         the likelihood.
 
@@ -283,7 +283,7 @@ class LikelihoodComputer:
                     denominator[ctr]=1.
                 else:
                     raise Exception("we have a zero value in the denominator at pos %d, with a non-zero numerator. dont know how to handle." % ctr)
-        ret = self.model.observed*signal_rel/denominator - signal_rel
+        ret = - self.model.observed*signal_rel/denominator + signal_rel
 
         if type(ret) in [ array, ndarray, list ]:
             ret = sum(ret)
@@ -338,26 +338,26 @@ class LikelihoodComputer:
             lstarters = [ min(mu_c), 0., -1., 1., 10., -.1, .1, -100., 100., -1000. ]
             closestl, closestr = None, float("inf")
             for lower in lstarters:
-                lower_v = self.dLdMu(lower, signal_rel, theta_hat)
-                if lower_v > 0.:
+                lower_v = self.dNLLdMu(lower, signal_rel, theta_hat)
+                if lower_v < 0.:
                     break
                 if lower_v < closestr:
                     closestl, closestr = lower, lower_v
-            if lower_v < 0.:
+            if lower_v > 0.:
                 logger.debug ( f"did not find a lower value with rootfinder(lower) > 0. Closest: f({closestl})={closestr}" )
                 return self.extendedOutput ( extended_output, 0. )
             ustarters = [ max(mu_c), 0., 1., 10., -1. -.1, .1, 100., -100., 1000., -1000., .01, -.01 ]
             closestl, closestr = None, float("inf")
             for upper in ustarters:
-                upper_v = self.dLdMu(upper, signal_rel, theta_hat)
-                if upper_v < 0.:
+                upper_v = self.dNLLdMu(upper, signal_rel, theta_hat)
+                if upper_v > 0.:
                     break
                 if upper_v < closestr:
                     closestl, closestr = upper, upper_v
-            if upper_v > 0.:
+            if upper_v < 0.:
                 logger.debug ( "did not find an upper value with rootfinder(upper) < 0." )
                 return self.extendedOutput ( extended_output, 0. )
-            mu_hat = optimize.brentq ( self.dLdMu, lower, upper, args=(signal_rel, theta_hat ) )
+            mu_hat = optimize.brentq ( self.dNLLdMu, lower, upper, args=(signal_rel, theta_hat ) )
             if not allowNegativeSignals and mu_hat < 0.:
                 mu_hat = 0.
             theta_hat,_ = self.findThetaHat( mu_hat*signal_rel)
