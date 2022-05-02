@@ -291,7 +291,8 @@ class LikelihoodComputer:
 
     def extendedOutput ( self, extended_output, default = None ):
             if extended_output:
-                return default, default, default
+                ret = { "muhat": default, "sigma_mu": default, "lmax": default }
+                return ret
             return default
 
     def findMuHat(self, signal_rel, allowNegativeSignals = False,
@@ -382,7 +383,7 @@ class LikelihoodComputer:
             llhd = self.likelihood( self.model.signals(mu_hat),
                                      marginalize=marginalize,
                                      nll=nll )
-            ret = mu_hat, sigma_mu, llhd
+            ret = { "muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": llhd }
             return ret
         return mu_hat
 
@@ -766,7 +767,8 @@ class LikelihoodComputer:
                 self.muhat = float ( nsig[0] / self.model.nsignal[0] )
             self.sigma_mu = np.sqrt ( self.model.observed[0] + self.model.covariance[0][0] )
             return self.likelihood(nsig, marginalize=marginalize, nll=nll )
-        muhat_, sigma_mu, lmax = self.findMuHat ( nsig , allowNegativeSignals = allowNegativeSignals, extended_output=True, nll=nll )
+        fmh = self.findMuHat ( nsig , allowNegativeSignals = allowNegativeSignals, extended_output=True, nll=nll )
+        muhat_, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         self.muhat = muhat_
         self.sigma_mu = sigma_mu
         return self.likelihood(muhat*nsig, marginalize=marginalize, nll=nll )

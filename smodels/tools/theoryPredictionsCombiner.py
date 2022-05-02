@@ -287,8 +287,9 @@ class TheoryPredictionsCombiner(object):
         if expected:
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lsm
         else:
-            self.mu_hat, self.sigma_mu, lmax = self.findMuHat(expected=False,
-                                                              extended_output=True)
+            fmh = self.findMuHat(expected=False, extended_output=True)
+            self.mu_hat, self.sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], \
+                                               fmh["lmax"]
             if not "lmax" in self.cachedObjs[expected]:
                 self.cachedObjs[expected]["lmax"] = {}
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
@@ -406,7 +407,7 @@ class TheoryPredictionsCombiner(object):
             retllh = lmax
             if nll:
                 retllh = nll_
-            return mu_hat, sigma_mu, retllh
+            return { "muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": retllh }
 
         return mu_hat
 
@@ -418,13 +419,15 @@ class TheoryPredictionsCombiner(object):
         """
         if "UL" in self.cachedObjs[expected]:
             return self.cachedObjs[expected]["UL"]
-        mu_hat, sigma_mu, lmax = self.findMuHat(expected=expected,
-                allowNegativeSignals=True, extended_output=True)
+        fmh = self.findMuHat( expected=expected, allowNegativeSignals=True, 
+                              extended_output=True)
+        mu_hat, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         nll0 = self.likelihood(mu_hat, expected=expected, nll=True)
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
-        mu_hatA, _, nll0A = self.findMuHat(expected="posteriori", nll=True,
-                                           extended_output=True)
+        fmh = self.findMuHat(expected="posteriori", nll=True, extended_output=True)
+        mu_hatA, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
         # return 1.
 

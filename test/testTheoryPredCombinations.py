@@ -135,8 +135,8 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # mu_hat 0.035 lmax 0.00011 ul_mu 0.27
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
-        mu_hat, sigma_mu, lmax = combiner.findMuHat( allowNegativeSignals=True,
-                                                     extended_output=True )
+        fmh = combiner.findMuHat( allowNegativeSignals=True, extended_output=True )
+        mu_hat, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         lsm = combiner.lsm()
         # print ( "muhat", mu_hat, "lmax", lmax )
 	      # multiply the previous lsms, 0.013786096355236995 * 0.007423073728232388
