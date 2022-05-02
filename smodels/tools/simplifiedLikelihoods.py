@@ -44,7 +44,7 @@ class Data:
         needed to fully define a specific statistical model """
 
     def __init__(self, observed, backgrounds, covariance, third_moment=None,
-                         nsignal=None, name="model", deltas_rel = 0.2):
+                 nsignal=None, name="model", deltas_rel = 0.2, lumi=None ):
         """
         :param observed: number of observed events per dataset
         :param backgrounds: expected bg per dataset
@@ -53,12 +53,14 @@ class Data:
         :param name: give the model a name, just for convenience
         :param deltas_rel: the assumed relative error on the signal hypotheses.
                            The default is 20%.
+        :param lumi: luminosity of dataset in 1/fb, or None
         """
         self.observed = np.around(self.convert(observed)) #Make sure observed number of events are integers
         self.backgrounds = self.convert(backgrounds)
         self.n = len(self.observed)
         self.covariance = self._convertCov(covariance)
         self.nsignal = self.convert(nsignal)
+        self.lumi = lumi
         if self.nsignal is None:
             if len ( self.backgrounds ) == 1:
                 # doesnt matter, does it?
@@ -811,6 +813,31 @@ class UpperLimitComputer:
         """
         self.toys = ntoys
         self.cl = cl
+
+    def ulOnSigmaTimesEff( self, model, marginalize=False, toys=None, expected=False,
+             trylasttime = False ):
+        """ upper limit on the fiducial cross section sigma times efficiency,
+            obtained from the defined
+            Data (using the signal prediction
+            for each signal regio/dataset), by using
+            the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
+
+        :params marginalize: if true, marginalize nuisances, else profile them
+        :params toys: specify number of toys. Use default is none
+        :params expected: if false, compute observed,
+                          true: compute a priori expected, "posteriori":
+                          compute a posteriori expected
+        :params trylasttime: if True, then dont try extra
+        :returns: upper limit on fiducial cross section
+        """
+        ul = self.ulOnYields ( model, marginalize=marginalize, toys=toys,
+                expected=expected, trylasttime=trylasttime )
+        if ul == None:
+            return ul
+        if type ( model.lumi ) == type(None ):
+            logger.error ( f"asked for upper limit on fiducial xsec, but no lumi given with the data" )
+            return ul
+        return ul/model.lumi
 
     def ulOnYields( self, model, marginalize=False, toys=None, expected=False,
              trylasttime = False ):

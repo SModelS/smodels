@@ -42,13 +42,10 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
         bg = [x.dataInfo.expectedBG for x in dataset._datasets]
         no = nobs
 
-        ret = computer.ulOnYields(Data(observed=no, backgrounds=bg, covariance=cov,
-                             third_moment=None, nsignal=nsig, deltas_rel=deltas_rel),
-                             marginalize=dataset._marginalize, expected=expected)
-
-        if ret != None:
-            #Convert limit on total number of signal events to a limit on sigma*eff
-            ret = ret/dataset.getLumi()
+        d = Data(observed=no, backgrounds=bg, covariance=cov, third_moment=None,
+                 nsignal=nsig, deltas_rel=deltas_rel,lumi=dataset.getLumi() )
+        ret = computer.ulOnSigmaTimesEff( d, marginalize=dataset._marginalize,
+                                   expected=expected)
         logger.debug("SL upper limit : {}".format(ret))
         return ret
     elif dataset.type == "pyhf":
