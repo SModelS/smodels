@@ -118,9 +118,11 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
     lsm = combinedSimplifiedLikelihood(dataset, [0.]*len(nsig), marginalize,
                      deltas_rel, expected=expected)
     if lsm > lmax:
+        logger.debug ( f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct" )
         lmax = lsm
         muhat = 0.
     if lbsm > lmax:
+        logger.debug ( f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct" )
         lmax = lbsm
         muhat = 1.
     return { "lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat,
