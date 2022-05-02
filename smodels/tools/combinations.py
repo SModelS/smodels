@@ -42,7 +42,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
         bg = [x.dataInfo.expectedBG for x in dataset._datasets]
         no = nobs
 
-        ret = computer.ulSigma(Data(observed=no, backgrounds=bg, covariance=cov,
+        ret = computer.ulOnYields(Data(observed=no, backgrounds=bg, covariance=cov,
                              third_moment=None, nsignal=nsig, deltas_rel=deltas_rel),
                              marginalize=dataset._marginalize, expected=expected)
 

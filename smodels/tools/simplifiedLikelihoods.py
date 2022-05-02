@@ -812,16 +812,17 @@ class UpperLimitComputer:
         self.toys = ntoys
         self.cl = cl
 
-    def ulSigma( self, model, marginalize=False, toys=None, expected=False,
-                 trylasttime = False ):
-        """ upper limit obtained from the defined Data (using the signal prediction
+    def ulOnYields( self, model, marginalize=False, toys=None, expected=False,
+             trylasttime = False ):
+        """ upper limit on signal yields obtained from the defined
+            Data (using the signal prediction
             for each signal regio/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
         :params marginalize: if true, marginalize nuisances, else profile them
         :params toys: specify number of toys. Use default is none
-        :params expected: if false, compute observed, 
-                          true: compute a priori expected, "posteriori":  
+        :params expected: if false, compute observed,
+                          true: compute a priori expected, "posteriori":
                           compute a posteriori expected
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on yields
@@ -851,7 +852,7 @@ class UpperLimitComputer:
         mu_hat = computer.findMuHat(model.signal_rel, extended_output = False )
         theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
         sigma_mu = computer.getSigmaMu(model.signal_rel)
-        
+
         #print ( f"SL theta_hat0: {theta_hat0} obs: {model.observed[0]:.3f} expbg: {model.backgrounds[0]:.3f}" )
 
         if mu_hat < 0.:
@@ -918,7 +919,7 @@ if __name__ == "__main__":
     #print ( "uls=", uls )
     ul_old = 131.828*sum(nsignal) #With respect to the older refernece value one must normalize the xsec
     print ( "old ul=", ul_old )
-    ul = ulComp.ulSigma ( m )
+    ul = ulComp.ulOnYields ( m )
     print ( "ul (marginalized)", ul )
-    ul = ulComp.ulSigma ( m, marginalize=False )
+    ul = ulComp.ulOnYields ( m, marginalize=False )
     print ( "ul (profiled)", ul )

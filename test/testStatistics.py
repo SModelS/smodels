@@ -33,8 +33,8 @@ class StatisticsTest(unittest.TestCase):
         nobs, nbg = 100, 100.
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.)
         ulcomp = UpperLimitComputer()
-        ulobs = ulcomp.ulSigma(m)
-        ulexp = ulcomp.ulSigma(m, expected=True)
+        ulobs = ulcomp.ulOnYields(m)
+        ulexp = ulcomp.ulOnYields(m, expected=True)
         print("ulobs", ulobs)
         print("ulexp", ulexp)
         f = open("llhds.csv", "wt")
@@ -92,8 +92,8 @@ class StatisticsTest(unittest.TestCase):
         nobs, nbg = 110, 100.
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.)
         ulcomp = UpperLimitComputer()
-        ulobs = ulcomp.ulSigma(m)
-        ulexp = ulcomp.ulSigma(m, expected=True)
+        ulobs = ulcomp.ulOnYields(m)
+        ulexp = ulcomp.ulOnYields(m, expected=True)
         dx = .5
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.)
         llhdcomp = LikelihoodComputer(m)
@@ -110,7 +110,7 @@ class StatisticsTest(unittest.TestCase):
     def testUpperLimit(self):
         m = Data(100., 100., 0.001, None, 1.0, deltas_rel=0.)
         comp = UpperLimitComputer()
-        re = comp.ulSigma(m)
+        re = comp.ulOnYields(m)
         self.assertAlmostEqual(re/(1.06*20.), 1., 1)
 
     def testApproxGaussian(self):
