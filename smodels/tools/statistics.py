@@ -157,15 +157,21 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder):
         # if this is positive, we move it to the right
         i += 1
         b += (i**2.)*sigma_mu
+        closestr, closest = float("inf"), None
         if i > ntrials:
-            for b in [1., 0., 3., -1., 10., -3., .1, -.1, -10., 100. ]:
-                if rootfinder(b) < 0.:
+            for b in [1., 0., 3., -1., 10., -3., .1, -.1, -10., 100., -100., 1000. ]:
+                root = rootfinder(b)
+                if root < 0.:
                     foundExtra = True
                     break
+                if root < closestr:
+                    closestr = root
+                    closest = b
             if not foundExtra:
-                logger.error(f"cannot find an b that is right of the root. last attempt, b={b:.2f}, root = {rootfinder(b):.2f}.")
+                logger.error(f"cannot find a b that is right of the root (i.e. rootfinder(b) < 0).")
+                logger.error(f"closest to zero rootfinder({closest})={closestr}" )
                 logger.error(f"mu_hat was at {mu_hat:.2f} sigma_mu at {sigma_mu:.2f}")
-                raise SModelSError(f"cannot find an b that is right of the root. last attempt, b={b:.2f}, root = {rootfinder(b):.2f}.")
+                raise SModelSError( )
     return a, b
 
 

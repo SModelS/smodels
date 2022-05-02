@@ -114,8 +114,9 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
         return lbsm, lmax, lsm, muhat, sigma_mu
     lbsm = combinedSimplifiedLikelihood(dataset, nsig, marginalize, deltas_rel,
                      expected=expected)
-    lmax, muhat, sigma_mu = combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel,
+    cslm = combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel,
                      expected=expected, allowNegativeSignals = allowNegativeSignals)
+    lmax, muhat, sigma_mu = cslm["lmax"], cslm["muhat"], cslm["sigma_mu" ]
     lsm = combinedSimplifiedLikelihood(dataset, [0.]*len(nsig), marginalize,
                      deltas_rel, expected=expected)
     if lsm > lmax:
@@ -217,7 +218,7 @@ def combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel, nll=False,
         expected=False, allowNegativeSignals=False ):
     """ compute likelihood at maximum, for simplified likelihoods only """
     if dataset.type != "simplified":
-        return -1., None, None
+        return { "lmax": -1., "muhat": None, "sigma_mu": None }
     nobs = [x.dataInfo.observedN for x in dataset._datasets]
     if expected:
         # nobs = [ x.dataInfo.expectedBG for x in dataset._datasets]
@@ -229,4 +230,4 @@ def combinedSimplifiedLmax(dataset, nsig, marginalize, deltas_rel, nll=False,
         nsig = np.array(nsig)
     computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
     mu_hat, sigma_mu, lmax = computer.findMuHat(nsig, allowNegativeSignals=allowNegativeSignals, extended_output = True )
-    return lmax, mu_hat, sigma_mu
+    return { "lmax": lmax, "muhat": mu_hat, "sigma_mu": sigma_mu }
