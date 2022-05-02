@@ -329,50 +329,37 @@ class LikelihoodComputer:
         while abs(mu_hat - mu_hat_old)>1e-10 and abs(mu_hat - mu_hat_old )/(mu_hat+mu_hat_old) > .5e-2 and ctr < 20:
             ctr+=1
             mu_hat_old = mu_hat
-            #logger.info ( "theta hat[%d]=%s" % (ctr,list( theta_hat[:11] ) ) )
-            #logger.info ( "   mu hat[%d]=%s" % (ctr, mu_hat ) )
-            # mu_c = np.abs(self.model.observed - self.model.backgrounds - theta_hat)/signal_rel
-            mu_c = (self.model.observed - self.model.backgrounds - theta_hat)/signal_rel
-            for i,s in enumerate ( signal_rel ):
-                if abs(s) < 1e-19:
-                    mu_c[i]=0.
+            mu_c = (self.model.observed - self.model.backgrounds - theta_hat) # /signal_rel
+            #for i,s in enumerate ( signal_rel ):
+            #    if abs(s) < 1e-19:
+            #        mu_c[i]=0.
             ## find mu_hat by finding the root of 1/L dL/dmu. We know
             ## that the zero has to be between min(mu_c) and max(mu_c).
-            lower,upper = 0.,widener*max(np.abs(mu_c))
-            if allowNegativeSignals:
-                lower,upper = min(mu_c),max(mu_c)
-            ct_attempts = 0
-            total_sign = 1.
-            while total_sign > -.5 and ct_attempts < 5:
-                ct_attempts+=1
+            lstarters = [ min(mu_c), 0., -1., 1., 10., -.1, .1, -100., 100., -1000. ]
+            closestl, closestr = None, float("inf")
+            for lower in lstarters:
                 lower_v = self.dLdMu(lower, signal_rel, theta_hat)
+                if lower_v > 0.:
+                    break
+                if lower_v < closestr:
+                    closestl, closestr = lower, lower_v
+            if lower_v < 0.:
+                logger.error ( f"did not find a lower value with rootfinder(lower) > 0. Closest: f({closestl})={closestr}" )
+                return self.extendedOutput ( extended_output, 0. )
+            ustarters = [ max(mu_c), 0., 1., 10., -1. -.1, .1, 100., -100., 1000., -1000., .01, -.01 ]
+            closestl, closestr = None, float("inf")
+            for upper in ustarters:
                 upper_v = self.dLdMu(upper, signal_rel, theta_hat)
-                total_sign = np.sign(lower_v * upper_v)
-                if total_sign > -.5:
-                    lower, upper  = widener * lower, widener * upper
-            if total_sign > -.5:
-                if upper_v < lower_v < 0.:
-                    # print ( "upper_v", upper_v, lower_v ) FIXME
-                    ## seems like we really want to go for mu_hat = 0.
-                    return self.extendedOutput ( extended_output, 0. )
-                if allowNegativeSignals:
-                    logger.debug ( "weird. cant find a zero in the Brent bracket "\
-                                   "for finding mu(hat). Let me try with a very small"
-                                   " value." )
-                    lower = -1.*max(np.abs(mu_c))
-                else:
-                    logger.debug ( "weird. cant find a zero in the Brent bracket "\
-                                   "for finding mu(hat). Let me try with a very small"
-                                   " value." )
-                    lower = 1e-4*max(np.abs(mu_c))
-                lower_v = self.dLdMu( lower, signal_rel, theta_hat )
-                total_sign = np.sign( lower_v * upper_v )
-                if total_sign > -.5:
-                    logger.debug ( "cant find zero in Brentq bracket. l,u,ctr=%s,%s,%s" % \
-                                  ( lower, upper, ctr ) )
-                    widener=widener*1.5
-                    continue
+                if upper_v < 0.:
+                    break
+                if upper_v < closestr:
+                    closestl, closestr = upper, upper_v
+            if upper_v > 0.:
+                logger.error ( "did not find an upper value with rootfinder(upper) < 0." )
+                return self.extendedOutput ( extended_output, 0. )
             mu_hat = optimize.brentq ( self.dLdMu, lower, upper, args=(signal_rel, theta_hat ) )
+            if not allowNegativeSignals and mu_hat < 0.:
+                mu_hat = 0.
             theta_hat,_ = self.findThetaHat( mu_hat*signal_rel)
             if self.debug_mode:
                 self.theta_hat = theta_hat
@@ -879,14 +866,11 @@ class UpperLimitComputer:
                     d+=theta_hat_[i]
                 model.observed[i]=float(d)
         computer = LikelihoodComputer(model, toys)
-        mu_hat = computer.findMuHat(model.signal_rel, extended_output = False )
+        mu_hat = computer.findMuHat(model.signal_rel, allowNegativeSignals = False,
+                                    extended_output = False )
         theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
         sigma_mu = computer.getSigmaMu(model.signal_rel)
 
-        #print ( f"SL theta_hat0: {theta_hat0} obs: {model.observed[0]:.3f} expbg: {model.backgrounds[0]:.3f}" )
-
-        if mu_hat < 0.:
-            mu_hat = 0.
         nll0 = computer.likelihood(model.signals(mu_hat),
                                      marginalize=marginalize,
                                      nll=True)

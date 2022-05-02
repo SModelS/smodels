@@ -334,7 +334,7 @@ class TheoryPredictionsCombiner(object):
         for tp in self.theoryPredictions:
             muhat = tp.muhat ( expected = expected, allowNegativeSignals = True )
             sigma_mu = tp.sigma_mu ( expected = expected, allowNegativeSignals = True )
-            if sigma_mu == None:
+            if sigma_mu in [ None, 0. ]:
                 sigma_mu = 1. # unity weights if no weights
             if muhat != None:
                 muhats.append ( muhat )
