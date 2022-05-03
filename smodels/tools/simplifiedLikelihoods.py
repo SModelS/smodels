@@ -272,18 +272,21 @@ class LikelihoodComputer:
         :param theta_hat: array with nuisance parameters
 
         """
+        # n_pred^i := mu s_i + b_i + theta_i 
+        # NLL = sum_i [ - n_obs^i * ln ( n_pred^i ) + n_pred^i ]
+        # d NLL / d mu = sum_i [ - ( n_obs^i * s_ i ) / n_pred_i + s_i ]
 
         #Define relative signal strengths:
-        denominator = mu*signal_rel  + self.model.backgrounds + theta_hat
+        n_pred = mu*signal_rel  + self.model.backgrounds + theta_hat
 
-        for ctr,d in enumerate(denominator):
+        for ctr,d in enumerate(n_pred):
             if d == 0.:
                 if (self.model.observed[ctr]*signal_rel[ctr]) == 0.:
                 #    logger.debug("zero denominator, but numerator also zero, so we set denom to 1.")
-                    denominator[ctr]=1.
+                    n_pred[ctr]=1.
                 else:
                     raise Exception("we have a zero value in the denominator at pos %d, with a non-zero numerator. dont know how to handle." % ctr)
-        ret = - self.model.observed*signal_rel/denominator + signal_rel
+        ret = - self.model.observed*signal_rel/n_pred + signal_rel
 
         if type(ret) in [ array, ndarray, list ]:
             ret = sum(ret)
@@ -370,7 +373,7 @@ class LikelihoodComputer:
 #print ( f">>>> obs {self.model.observed[:2]} bg {self.model.backgrounds[:2]}" )
 #print ( f">>>> mu_c {np.mean(mu_c)}" )
         if extended_output:
-            sigma_mu = self.getSigmaMu( signal_rel )
+            sigma_mu = self.getSigmaMu( mu_hat, signal_rel, theta_hat )
             llhd = self.likelihood( self.model.signals(mu_hat),
                                      marginalize=marginalize,
                                      nll=nll )
@@ -378,11 +381,36 @@ class LikelihoodComputer:
             return ret
         return mu_hat
 
-    def getSigmaMu(self, signal_rel):
+    def getSigmaMu(self, mu, signal_rel, theta_hat ):
         """
-        Get a rough estimate for the variance of mu around mu_max.
+        Get an estimate for the standard deviation of mu around mu_max, from
+        the inverse hessian
 
         :param signal_rel: array with relative signal strengths in each dataset (signal region)
+        """
+        # d^2 mu NLL / d mu^2 = sum_i [ n_obs^i * s_i**2 / n_pred^i**2 ]
+
+        #Define relative signal strengths:
+        n_pred = mu*signal_rel  + self.model.backgrounds + theta_hat
+
+        for ctr,d in enumerate(n_pred):
+            if d == 0.:
+                if (self.model.observed[ctr]*signal_rel[ctr]) == 0.:
+                #    logger.debug("zero denominator, but numerator also zero, so we set denom to 1.")
+                    n_pred[ctr]=1.
+                else:
+                    raise Exception("we have a zero value in the denominator at pos %d, with a non-zero numerator. dont know how to handle." % ctr)
+        hessian = self.model.observed*signal_rel**2/n_pred**2
+
+        if type(hessian) in [ array, ndarray, list ]:
+            hessian = sum(hessian)
+        # the error is the square root of the inverse of the hessian
+        if hessian == 0.:
+            # if all observations are zero, we replace them by the expectations
+            if sum(self.model.observed)==0:
+                hessian = sum(signal_rel**2/n_pred)
+        stderr = float ( np.sqrt ( 1. / hessian ) )
+        return stderr
         """
         if type(signal_rel) in [ list, ndarray ]:
             s_effs = sum(signal_rel)
@@ -390,6 +418,7 @@ class LikelihoodComputer:
         sgm_mu = float(sqrt(sum(self.model.observed) + sum(np.diag(self.model.covariance)))/s_effs)
 
         return sgm_mu
+        """
 
     #Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     # def prob(x0, x1 )
@@ -873,7 +902,7 @@ class UpperLimitComputer:
         mu_hat = computer.findMuHat(model.signal_rel, allowNegativeSignals = False,
                                     extended_output = False )
         theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
-        sigma_mu = computer.getSigmaMu(model.signal_rel)
+        sigma_mu = computer.getSigmaMu( mu_hat, model.signal_rel, theta_hat0 )
 
         nll0 = computer.likelihood(model.signals(mu_hat),
                                      marginalize=marginalize,
