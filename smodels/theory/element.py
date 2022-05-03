@@ -1,12 +1,12 @@
 """
 .. module:: element
    :synopsis: Module holding the Element class and its methods.
-    
+
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-    
+
 """
 
-from smodels.theory.auxiliaryFunctions import stringToTree, getTopologyName, getNodeLevelDict, getTreeRoot
+from smodels.theory.graphTools import stringToTree, getTopologyName, getNodeLevelDict, getTreeRoot, treeToString
 from smodels.theory.branch import Branch, InclusiveBranch
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -14,6 +14,7 @@ from smodels.tools.smodelsLogging import logger
 import itertools
 from smodels.theory.particle import Particle
 import networkx as nx
+
 
 class Element(object):
     """
@@ -38,68 +39,72 @@ class Element(object):
                           particle objects (only used if info, finalState or intermediateState != None).
         """
         self.tree = nx.DiGraph()
-        self.weight = crossSection.XSectionList() # gives the weight for all decays promptly
+        self.weight = crossSection.XSectionList()  # gives the weight for all decays promptly
         self.decayLabels = []
-        self.motherElements = [self] #The motheElements includes self to keep track of merged elements
+        self.motherElements = [self]  # The motheElements includes self to keep track of merged elements
         self.elID = 0
         self.coveredBy = set()
         self.testedBy = set()
 
         if info:
-            if isinstance(info,str):
-                self.tree = stringToTree(info,finalState)
-            elif isinstance(info,nx.DiGraph):
-                self.tree = info.copy() #Makes a shallow copy of the original tree
+            if isinstance(info, str):
+                try:
+                    self.tree = stringToTree(info, finalState=finalState,
+                                             intermediateState=intermediateState,
+                                             model=model)
+                except (SModelSError, TypeError):
+                    raise SModelSError("Can not create element from input %s" % info)
+            elif isinstance(info, nx.DiGraph):
+                self.tree = info.copy()  # Makes a shallow copy of the original tree
             else:
-                raise SModelSError("Can not create element from input type %s" %type(info))
-        
+                raise SModelSError("Can not create element from input type %s" % type(info))
+
         self.setEinfo()
-        
-        
+
     def setEinfo(self):
         """
         Compute and store the canonical name for the tree
         topology. The canonical name can be used to compare and sort topologies.
         The name is stored in self.tree.topologyName
         """
-        
+
         canonName = getTopologyName(self.tree)
         self.tree.graph['topologyName'] = canonName
-    
-    def __cmp__(self,other):
+
+    def __cmp__(self, other):
         """
         Compares the element with other.
         Uses the topology name (Tree canonincal name) to identify isomorphic topologies (trees).
         If trees are not isomorphic, compare topologies using the topology name.
         Else  check if nodes (particles) are equal. If particles match return 0,
-        else compare lists of particles in each tree level. 
+        else compare lists of particles in each tree level.
 
         :param other:  element to be compared (Element object)
-        
+
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
-        if not isinstance(other,Element):
+        if not isinstance(other, Element):
             return -1
-        
+
         #make sure the topology names have been computed:
         if not 'topologyName' in self.tree.graph:
             self.setEInfo()
         if not 'topologyName' in other.tree.graph:
             other.setEInfo()
-            
+
         tnameA = self.tree.graph['topologyName']
         tnameB = other.tree.graph['topologyName']
         if tnameA != tnameB:
             return (tnameA > tnameB) - (tnameA < tnameB)
-        
+
         #Check if the elements are isomorphic including particle comparison
-        if nx.isomorphism.is_isomorphic(self.tree,other.tree,node_match=self.equalNodes):
+        if nx.isomorphism.is_isomorphic(self.tree, other.tree, node_match=self.equalNodes):
             return 0
         else:
             #Compare particles in each level of the tree:
             #First build dictionary with nodes in each level:
-            levelNodesA = getNodeLevelDict(self.tree)                                      
+            levelNodesA = getNodeLevelDict(self.tree)
             levelNodesB = getNodeLevelDict(other.tree)
             for nLevel in levelNodesA:
                 pListA = [self.tree.nodes[n]['particle'] for n in levelNodesA[nLevel]]
@@ -109,30 +114,30 @@ class Element(object):
                 pComp = (pListA > pListB) - (pListA < pListB)
                 if pComp != 0:
                     return pComp
-            
-            return 0 #Should never reach this point!
-    
-    def equalNodes(self,n1,n2):
+
+            return 0  # Should never reach this point!
+
+    def equalNodes(self, n1, n2):
         """
         Return True if particles in nodes are equal, False
         otherwise.
 
         :param n1: Dictionary with the node properties
         :param n2: Dictionary with the node properties
-        
+
         :return: True if n1 == n2, False otherwise.
         """
-        
+
         pA = n1['particle']
         pB = n2['particle']
-        
+
         return pA == pB
 
-    def __eq__(self,other):
-        return self.__cmp__(other)==0
+    def __eq__(self, other):
+        return self.__cmp__(other) == 0
 
-    def __lt__(self,other):
-        return self.__cmp__(other)<0
+    def __lt__(self, other):
+        return self.__cmp__(other) < 0
 
     def __hash__(self):
         return object.__hash__(self)
@@ -151,39 +156,33 @@ class Element(object):
             return object.__getattr__(attr)
 
         try:
-            val = [getattr(br,attr) for br in self.branches]
+            val = [getattr(br, attr) for br in self.branches]
             return val
         except AttributeError:
-            raise AttributeError("Neither element nor branch has attribute ``%s''" %attr)
+            raise AttributeError("Neither element nor branch has attribute ``%s''" % attr)
 
     def __str__(self):
         """
-        Create the element bracket notation string, e.g. [[[jet]],[[jet]].
-        
-        :returns: string representation of the element (in bracket notation)    
+        Create the element to a string.
+
+        :returns: string representation of the element
         """
-        
-        T = self.tree
-        elStr = ""
-        root = getTreeRoot(T)
-        for mom,daughters in nx.bfs_successors(T,root):
-            elStr += '%s->(%s),' %(T.nodes[mom]['particle'].label,
-                                   ','.join(T.nodes[n]['particle'].label for n in daughters))
-        return elStr[:-1]
-    
+
+        return treeToString(self.tree)
+
     def __repr__(self):
 
         return self.__str__()
 
-    def __add__(self,other):
+    def __add__(self, other):
         """
         Adds two elements. Should only be used if the elements
         have the same topologies. The element weights are added and their
         odd and even particles are combined.
         """
 
-        if not isinstance(other,Element):
-            raise TypeError("Can not add an Element object to %s" %type(other))
+        if not isinstance(other, Element):
+            raise TypeError("Can not add an Element object to %s" % type(other))
         elif self.getEinfo() != other.getEinfo():
             raise SModelSError("Can not add elements with distinct topologies")
 
@@ -191,12 +190,12 @@ class Element(object):
         newEl.motherElements = self.motherElements[:] + other.motherElements[:]
         newEl.weight = self.weight + other.weight
         newEl.branches = []
-        for ibr,branch in enumerate(self.branches):
+        for ibr, branch in enumerate(self.branches):
             newEl.branches.append(branch + other.branches[ibr])
 
         return newEl
 
-    def __radd__(self,other):
+    def __radd__(self, other):
         """
         Adds two elements. Only elements with the same
         topology can be combined.
@@ -204,26 +203,26 @@ class Element(object):
 
         return self.__add__(other)
 
-    def __iadd__(self,other):
+    def __iadd__(self, other):
         """
         Combine two elements. Should only be used if the elements
         have the same topologies. The element weights are added and their
         odd and even particles are combined.
         """
 
-        if not isinstance(other,Element):
-            raise TypeError("Can not add an Element object to %s" %type(other))
+        if not isinstance(other, Element):
+            raise TypeError("Can not add an Element object to %s" % type(other))
         elif self.getEinfo() != other.getEinfo():
             raise SModelSError("Can not add elements with distinct topologies")
 
         self.motherElements += other.motherElements[:]
         self.weight += other.weight
-        for ibr,_ in enumerate(self.branches):
+        for ibr, _ in enumerate(self.branches):
             self.branches[ibr] += other.branches[ibr]
 
         return self
 
-    def getAverage(self,attr):
+    def getAverage(self, attr):
         """
         Get the average value for a given attribute appearing in
         the odd particles of the element branches.
@@ -231,8 +230,8 @@ class Element(object):
 
         try:
             vals = [br.getAverage(attr) for br in self.branches]
-        except (AttributeError,ZeroDivisionError):
-            raise SModelSError("Could not compute average for %s" %attr)
+        except (AttributeError, ZeroDivisionError):
+            raise SModelSError("Could not compute average for %s" % attr)
 
         return vals
 
@@ -242,24 +241,24 @@ class Element(object):
         including the final states, e.g. [[[jet]],[[jet]] (MET,MET)
         """
 
-        elStr = str(self)+' '+str(tuple(self.getFinalStates())).replace("'","")
+        elStr = str(self)+' '+str(tuple(self.getFinalStates())).replace("'", "")
 
         return elStr
-    
-    def drawTree(self,outputFile=None,show=True,
-                 oddColor = 'lightcoral',evenColor = 'skyblue',
-                 pvColor = 'darkgray',genericColor= 'violet',
-                 nodeScale = 4):
+
+    def drawTree(self, outputFile=None, show=True,
+                 oddColor='lightcoral', evenColor='skyblue',
+                 pvColor='darkgray', genericColor='violet',
+                 nodeScale=4):
         """
         Draws element Tree using matplotlib.
         If outputFile is defined, it will save plot to this file.
         """
-        
+
         import matplotlib.pyplot as plt
-        
+
         T = self.tree
-        
-        labels = dict([[n,str(T.nodes[n]['particle'])] 
+
+        labels = dict([[n, str(T.nodes[n]['particle'])]
                        for n in T.nodes()])
         for key in labels:
             if labels[key] == 'anyOdd':
@@ -270,7 +269,7 @@ class Element(object):
             node_size.append(nodeScale*100*len(labels[n]))
             if 'pv' == labels[n].lower():
                 node_color.append(pvColor)
-            elif hasattr(T.nodes[n]['particle'],'Z2parity'):
+            elif hasattr(T.nodes[n]['particle'], 'Z2parity'):
                 if T.nodes[n]['particle'].Z2parity == 'odd':
                     node_color.append(oddColor)
                 else:
@@ -278,18 +277,17 @@ class Element(object):
             else:
                 node_color.append(genericColor)
         pos = nx.drawing.nx_agraph.graphviz_layout(T, prog='dot')
-        nx.draw(T,pos,
+        nx.draw(T, pos,
                 with_labels=True,
                 arrows=True,
                 labels=labels,
                 node_size=node_size,
                 node_color=node_color)
-        
-        if outputFile:            
+
+        if outputFile:
             plt.savefig(outputFile)
         if show:
             plt.show()
-
 
     def copy(self):
         """
@@ -310,42 +308,42 @@ class Element(object):
     def getParticles(self):
         """
         Get the array of even particle objects in the element.
-        
-        :returns: list of Particle objects                
+
+        :returns: list of Particle objects
         """
 
         g = self.tree
         particles = []
-        
-        for iv,v in enumerate(g.vertices()):
+
+        for iv, v in enumerate(g.vertices()):
             if v.out_degree():
                 continue
             if g.vp.particle[iv].Z2parity != 'even':
-                continue        
+                continue
             particles.append(g.vp.particle[iv])
 
         return particles
-    
+
     def getFinalStates(self):
         """
         Get the array of final state (last BSM particle) particle objects in the element.
 
         :returns: list of Particle objects
         """
-        
+
         g = self.tree
         particles = []
-        
-        for iv,v in enumerate(g.vertices()):
+
+        for iv, v in enumerate(g.vertices()):
             if v.out_degree():
                 continue
             if g.vp.particle[iv].Z2parity != 'odd':
-                continue        
+                continue
             particles.append(g.vp.particle[iv])
 
         return particles
 
-    def _getAncestorsDict(self,igen=0):
+    def _getAncestorsDict(self, igen=0):
         """
         Returns a dictionary with all the ancestors
         of the element. The dictionary keys are integers
@@ -360,18 +358,18 @@ class Element(object):
                  (e.g. {igen+1 : [mother1, mother2], igen+2 : [grandmother1,..],...})
         """
 
-        ancestorsDict = {igen+1 : []}
+        ancestorsDict = {igen+1: []}
         for mother in self.motherElements:
             if mother is self:
                 continue
             ancestorsDict[igen+1].append(mother)
-            for jgen,elList in mother._getAncestorsDict(igen+1).items():
+            for jgen, elList in mother._getAncestorsDict(igen+1).items():
                 if not jgen in ancestorsDict:
                     ancestorsDict[jgen] = []
                 ancestorsDict[jgen] += elList
 
         #Store the result
-        self._ancestorsDict = dict([[key,val] for key,val in ancestorsDict.items()])
+        self._ancestorsDict = dict([[key, val] for key, val in ancestorsDict.items()])
 
         return self._ancestorsDict
 
@@ -385,7 +383,7 @@ class Element(object):
         """
 
         #Check if the ancestors have already been obtained (performance gain)
-        if not hasattr(self,'_ancestorsDict'):
+        if not hasattr(self, '_ancestorsDict'):
             self._getAncestorsDict()
 
         orderedAncestors = []
@@ -394,7 +392,7 @@ class Element(object):
 
         return orderedAncestors
 
-    def isRelatedTo(self,other):
+    def isRelatedTo(self, other):
         """
         Checks if the element has any common ancestors with other or one
         is an ancestor of the other.
@@ -422,7 +420,7 @@ class Element(object):
         """
 
         #Check if the ancestors have already been obtained (performance gain)
-        if not hasattr(self,'_ancestorsDict'):
+        if not hasattr(self, '_ancestorsDict'):
             self._getAncestorsDict()
 
         orderedAncestors = []
@@ -431,7 +429,7 @@ class Element(object):
 
         return orderedAncestors
 
-    def isRelatedTo(self,other):
+    def isRelatedTo(self, other):
         """
         Checks if the element has any common ancestors with other or one
         is an ancestor of the other.
@@ -451,30 +449,28 @@ class Element(object):
 
     def getDaughters(self):
         """
-        Get the list of daughter (last/stable BSM particle in the decay) PDGs. 
+        Get the list of daughter (last/stable BSM particle in the decay) PDGs.
         Can be a nested list, if the element combines several daughters:
-        [ [pdgDAUG1,pdgDAUG2],  [pdgDAUG1',pdgDAUG2']] 
+        [ [pdgDAUG1,pdgDAUG2],  [pdgDAUG1',pdgDAUG2']]
 
-        
+
         :returns: list of PDG ids
         """
-        
+
         daughterPIDs = [particle.pdg for particle in self.getFinalStates()]
-        
+
         return daughterPIDs
-
-
 
     def getEinfo(self):
         """
         Get element topology info from branch topology info.
-        
-        :returns: dictionary containing vertices and number of final states information  
-        """
-                
-        return {"vertices" : self.tree.num_vertices(), "edgesout" : self.tree.degree_property_map('out').get_array()}
 
-    def setTestedBy(self,resultType):
+        :returns: dictionary containing vertices and number of final states information
+        """
+
+        return {"vertices": self.tree.num_vertices(), "edgesout": self.tree.degree_property_map('out').get_array()}
+
+    def setTestedBy(self, resultType):
         """
         Tag the element, all its daughter and all its mothers
         as tested by the type of result specified.
@@ -487,7 +483,7 @@ class Element(object):
         for ancestor in self.getAncestors():
             ancestor.testedBy.add(resultType)
 
-    def setCoveredBy(self,resultType):
+    def setCoveredBy(self, resultType):
         """
         Tag the element, all its daughter and all its mothers
         as covered by the type of result specified.
@@ -502,9 +498,9 @@ class Element(object):
 
     def _getLength(self):
         """
-        Get the maximum of the two branch lengths.    
-        
-        :returns: maximum length of the element branches (int)    
+        Get the maximum of the two branch lengths.
+
+        :returns: maximum length of the element branches (int)
         """
         return len(self.getBSMparticles())
 
@@ -523,7 +519,6 @@ class Element(object):
                     logger.error("Wrong syntax")
                     raise SModelSError()
         return True
-
 
     def compressElement(self, doCompress, doInvisible, minmassgap):
         """
@@ -571,8 +566,7 @@ class Element(object):
         newElements.pop(0)  # Remove original element
         return newElements
 
-
-    def removeVertex(self,ibr,iv):
+    def removeVertex(self, ibr, iv):
         """
         Remove vertex iv located in branch ibr.
         The "vertex-mother" in BSMparticles and (SM) particles in the vertex
@@ -601,34 +595,33 @@ class Element(object):
         newelement.motherElements = [self]
 
         #Loop over branches and look for small mass differences
-        for ibr,branch in enumerate(newelement.branches):
+        for ibr, branch in enumerate(newelement.branches):
             #Get mass differences
 
             removeVertices = []
-            for i,mom in enumerate(branch.oddParticles[:-1]):
+            for i, mom in enumerate(branch.oddParticles[:-1]):
                 massDiff = mom.mass - branch.oddParticles[i+1].mass
                 #Get vertices which have deltaM < minmassgap and the mother is prompt:
                 if massDiff < minmassgap and mom.isPrompt():
                     removeVertices.append(i)
             #Remove vertices till they exist:
             while removeVertices:
-                newelement.removeVertex(ibr,removeVertices[0])
+                newelement.removeVertex(ibr, removeVertices[0])
                 branch = newelement.branches[ibr]
                 removeVertices = []
-                for i,mom in enumerate(branch.oddParticles[:-1]):
+                for i, mom in enumerate(branch.oddParticles[:-1]):
                     massDiff = mom.mass - branch.oddParticles[i+1].mass
                     #Get vertices which have deltaM < minmassgap and the mother is prompt:
                     if massDiff < minmassgap and mom.isPrompt():
                         removeVertices.append(i)
 
-        for ibr,branch in enumerate(newelement.branches):
+        for ibr, branch in enumerate(newelement.branches):
             if branch.vertnumb != self.branches[ibr].vertnumb:
                 newelement.sortBranches()
                 return newelement
 
         #New element was not compressed, return None
         return None
-
 
     def invisibleCompress(self):
         """
@@ -650,7 +643,7 @@ class Element(object):
             neutralDecay = neutralSM and branch.oddParticles[-1].isMET()
             #Check if the mother can be considered MET:
             neutralBSM = (branch.oddParticles[-2].isMET()
-                            or branch.oddParticles[-2].isPrompt())
+                          or branch.oddParticles[-2].isPrompt())
             if neutralBSM and neutralDecay:
                 removeLastVertex = True
             else:
@@ -658,10 +651,10 @@ class Element(object):
 
             while len(branch.oddParticles) > 1 and removeLastVertex:
                 bsmMom = branch.oddParticles[-2]
-                effectiveDaughter = Particle(label='inv', mass = bsmMom.mass,
-                                             eCharge = 0, colordim = 1,
-                                             totalwidth = branch.oddParticles[-1].totalwidth,
-                                             Z2parity = bsmMom.Z2parity, pdg = bsmMom.pdg)
+                effectiveDaughter = Particle(label='inv', mass=bsmMom.mass,
+                                             eCharge=0, colordim=1,
+                                             totalwidth=branch.oddParticles[-1].totalwidth,
+                                             Z2parity=bsmMom.Z2parity, pdg=bsmMom.pdg)
                 branch.removeVertex(len(branch.oddParticles)-2)
                 #For invisible compression, keep an effective mother which corresponds to the invisible
                 #daughter, but with the mass of the parent.
@@ -677,14 +670,13 @@ class Element(object):
                 else:
                     removeLastVertex = False
 
-        for ibr,branch in enumerate(newelement.branches):
+        for ibr, branch in enumerate(newelement.branches):
             if branch.vertnumb != self.branches[ibr].vertnumb:
                 newelement.sortBranches()
                 return newelement
 
         #New element was not compressed, return None
         return None
-
 
     def hasTopInList(self, elementList):
         """
