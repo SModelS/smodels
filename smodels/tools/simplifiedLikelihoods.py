@@ -322,11 +322,12 @@ class LikelihoodComputer:
         ## up with a first theta
         self.nsig = array([0.]*len(self.model.observed))
         ## we start with theta_hat being all zeroes
-        theta_hat = array([0.]*len(self.model.observed))
+        # theta_hat = array([0.]*len(self.model.observed))
         mu_hat_old, mu_hat = 0., 1.
         ctr=0
         widener=3.
         while abs(mu_hat - mu_hat_old)>1e-10 and abs(mu_hat - mu_hat_old )/(mu_hat+mu_hat_old) > .5e-2 and ctr < 20:
+            theta_hat,_ = self.findThetaHat( mu_hat*signal_rel)
             ctr+=1
             mu_hat_old = mu_hat
             mu_c = (self.model.observed - self.model.backgrounds - theta_hat) # /signal_rel
@@ -357,17 +358,19 @@ class LikelihoodComputer:
             if upper_v < 0.:
                 logger.debug ( "did not find an upper value with rootfinder(upper) > 0." )
                 return self.extendedOutput ( extended_output, 0. )
-            mu_hat = optimize.brentq ( self.dNLLdMu, lower, upper, args=(signal_rel, theta_hat ) )
+            mu_hat = optimize.brentq ( self.dNLLdMu, lower, upper, args=(signal_rel, theta_hat ), rtol=1e-9 )
             if not allowNegativeSignals and mu_hat < 0.:
                 mu_hat = 0.
-            theta_hat,_ = self.findThetaHat( mu_hat*signal_rel)
+                theta_hat,_ = self.findThetaHat( mu_hat*signal_rel)
             if self.debug_mode:
                 self.theta_hat = theta_hat
             ctr+=1
 
-        # print ( f">>> found mu_hat {mu_hat} for signal {sum(signal_rel):.2f}" )
+#print ( f">> found mu_hat {mu_hat:.2g} for signal {sum(signal_rel):.2f} allowNeg {allowNegativeSignals} l,u={lower},{upper}" )
+#print ( f">>>> obs {self.model.observed[:2]} bg {self.model.backgrounds[:2]}" )
+#print ( f">>>> mu_c {np.mean(mu_c)}" )
         if extended_output:
-            sigma_mu = self.getSigmaMu( self.model.signal_rel)
+            sigma_mu = self.getSigmaMu( signal_rel )
             llhd = self.likelihood( self.model.signals(mu_hat),
                                      marginalize=marginalize,
                                      nll=nll )
