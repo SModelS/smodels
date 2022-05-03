@@ -11,6 +11,72 @@ import networkx as nx
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 
+class ParticleNode(object):
+    """
+    Simple wrapper for creating graphs with Particle objects.
+    It is necessary because the same particle can appear multiple times within a tree, so
+    Particle objects can not be directly used as nodes
+    (since the same particle can not appear as distinct nodes)
+    """
+
+    def __init__(self, particle, nodeNumber):
+        self.particle = particle
+        self.node = nodeNumber
+        self.cannonName = None
+
+    def __hash__(self):
+        return self.node
+
+    def __cmp__(self, other):
+        if self.node == other.node:
+            return 0
+        elif self.node > other.node:
+            return 1
+        else:
+            return -1
+
+    def __lt__(self, other):
+        return self.__cmp__(other) == -1
+
+    def __gt__(self, other):
+        return self.__cmp__(other) == 1
+
+    def __eq__(self, other):
+        return self.__cmp__(other) == 0
+
+    def __ne__(self, other):
+        return self.__cmp__(other) != 0
+
+    def __str__(self):
+
+        return str(self.particle)
+
+    def __repr__(self):
+
+        return self.__str__()
+
+    def __getattr__(self, attr):
+        """
+        Returns the attribute from particle. If attribute is not found,
+        return attribute from self.
+
+        :parameter attr: Attribute string
+
+        :return: Attribute from self.particle
+        """
+
+        if hasattr(self.particle, attr):
+            return getattr(self.particle, attr)
+        else:
+            return getattr(self, attr)
+
+    def cmpParticle(self, other):
+        return self.particle.__cmp__(other.particle)
+
+    def eqParticle(self, other):
+        return self.particle == other.particle
+
+
 def stringToTree(stringElement, model=None, finalState=None, intermediateState=None):
     """
     Converts a string describing an element to a Tree (DiGraph object). It can
@@ -44,7 +110,7 @@ def stringToTree(stringElement, model=None, finalState=None, intermediateState=N
     decays[0] = decays[0][1:]  # Remove trailing parenthesis
     decays[-1] = decays[-1][:-1]  # Remove remaining parenthesis
 
-    # Build a dictionary with all parent nodes:
+    # Build a dictionary with all unstable particles:
     nodesDict = {}
     for dec in decays:
         ptcs = [dec.split('>')[0].strip()] + [p.strip() for p in dec.split('>')[1].split(',')]
@@ -66,8 +132,8 @@ def stringToTree(stringElement, model=None, finalState=None, intermediateState=N
     edges = []
     for dec in decays:
         ptcs = [dec.split('>')[0].strip()] + [p.strip() for p in dec.split('>')[1].split(',')]
-        momNode = nodesDict[ptcs[0]]
-        for ptc in ptcs:
+
+        for iptc, ptc in enumerate(ptcs):
             if ptc in nodesDict:
                 n = nodesDict[ptc]
             else:
@@ -86,9 +152,12 @@ def stringToTree(stringElement, model=None, finalState=None, intermediateState=N
                                        % (particleLabel, model))
                 else:
                     particle = particle[0]
-            T.add_node(n, particle=particle)
-            if n != momNode:
-                edges.append((momNode, n))
+            node = ParticleNode(particle=particle, nodeNumber=n)
+            if iptc == 0:
+                momNode = node
+            T.add_node(node)
+            if node != momNode:
+                edges.append((momNode, node))
     # Now add all edges
     T.add_edges_from(edges)
 
@@ -113,23 +182,23 @@ def treeToString(tree):
     for mom, daughters in nx.bfs_successors(T, root):
 
         # Add mom (if mom = 0 does not include index)
-        if mom == 0:
-            elStr += '(%s > ' % T.nodes[mom]['particle']
+        if mom.node == 0:
+            elStr += '(%s > ' % mom
         else:
-            if mom not in nodesDict:
-                nodesDict[mom] = counter
+            if mom.node not in nodesDict:
+                nodesDict[mom.node] = counter
                 counter += 1
-            elStr += '(%s(%i) > ' % (T.nodes[mom]['particle'], nodesDict[mom])
+            elStr += '(%s(%i) > ' % (mom, nodesDict[mom.node])
 
         # Add daughters for the decay, if daughter is unstable, add index
         for n in daughters:
             if not list(T.successors(n)):
-                elStr += '%s,' % (T.nodes[n]['particle'])  # stable
+                elStr += '%s,' % n  # stable
             else:
-                if n not in nodesDict:
-                    nodesDict[n] = counter
+                if n.node not in nodesDict:
+                    nodesDict[n.node] = counter
                     counter += 1
-                elStr += '%s(%i),' % (T.nodes[n]['particle'], nodesDict[n])
+                elStr += '%s(%i),' % (n, nodesDict[n.node])
         elStr = elStr[:-1]+'), '
     elStr = elStr[:-2]
 
@@ -207,8 +276,8 @@ def fromTreeToList(T, node=None):
             if list(T[n]):
                 dList.append(fromTreeToList(T, n))
             else:
-                if T.nodes[n]['particle'].Z2parity == 'even':
-                    dList.append(T.nodes[n]['particle'])
+                if T.nodes[n].Z2parity == 'even':
+                    dList.append(T.nodes[n])
 
     return dList
 
@@ -232,13 +301,13 @@ def getTopologyName(T, node=None):
 
     children = list(T.successors(node))
     if not children:
-        T.nodes[node]['canonName'] = 10
+        node.cannonName = 10
     else:
         tp = sorted([getTopologyName(T, n) for n in children])
         tpStr = '1'+"".join(str(c) for c in tp)+'0'
-        T.nodes[node]['canonName'] = int(tpStr)
+        node.cannonName = int(tpStr)
 
-    return T.nodes[node]['canonName']
+    return node.cannonName
 
 
 def getNodeLevelDict(T):
@@ -284,16 +353,16 @@ def getTreeRoot(T):
 
 
 def drawTree(T, oddColor='lightcoral', evenColor='skyblue',
-            pvColor='darkgray', genericColor='lightgray',
-            nodeScale=4):
+             pvColor='darkgray', genericColor='lightgray',
+             nodeScale=4):
     """
     Draws Tree using matplotlib.
     If outputFile is defined, it will save plot to this file.
     """
     import matplotlib.pyplot as plt
 
-    labels = dict([[n, str(T.nodes[n]['particle'])]
-                 for n in T.nodes()])
+    labels = dict([[n, str(n)] for n in T.nodes()])
+
     for key in labels:
         if labels[key] == 'anyOdd':
             labels[key] = 'BSM'
@@ -305,7 +374,13 @@ def drawTree(T, oddColor='lightcoral', evenColor='skyblue',
             node_color.append(pvColor)
         else:
             node_color.append(genericColor)
-    pos = nx.drawing.nx_agraph.graphviz_layout(T, prog='dot')
+
+    # Compute position of nodes (in case the nodes have the same string representation, first
+    # convert the nodes to integers for computing the position)
+    H = nx.convert_node_labels_to_integers(T, label_attribute='node_label')
+    H_layout = nx.drawing.nx_agraph.graphviz_layout(H, prog='dot')
+    pos = {H.nodes[n]['node_label']: p for n, p in H_layout.items()}
+
     nx.draw(T, pos,
             with_labels=True,
             arrows=True,

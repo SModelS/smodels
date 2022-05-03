@@ -6,7 +6,7 @@
 
 """
 
-from smodels.theory.graphTools import stringToTree, getTopologyName, getNodeLevelDict, getTreeRoot, treeToString
+from smodels.theory.graphTools import stringToTree, getTopologyName, getNodeLevelDict, getTreeRoot, treeToString, drawTree
 from smodels.theory.branch import Branch, InclusiveBranch
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -87,7 +87,7 @@ class Element(object):
         if not isinstance(other, Element):
             return -1
 
-        #make sure the topology names have been computed:
+        # make sure the topology names have been computed:
         if not 'topologyName' in self.tree.graph:
             self.setEInfo()
         if not 'topologyName' in other.tree.graph:
@@ -98,17 +98,17 @@ class Element(object):
         if tnameA != tnameB:
             return (tnameA > tnameB) - (tnameA < tnameB)
 
-        #Check if the elements are isomorphic including particle comparison
+        # Check if the elements are isomorphic including particle comparison
         if nx.isomorphism.is_isomorphic(self.tree, other.tree, node_match=self.equalNodes):
             return 0
         else:
-            #Compare particles in each level of the tree:
-            #First build dictionary with nodes in each level:
+            # Compare particles in each level of the tree:
+            # First build dictionary with nodes in each level:
             levelNodesA = getNodeLevelDict(self.tree)
             levelNodesB = getNodeLevelDict(other.tree)
             for nLevel in levelNodesA:
-                pListA = [self.tree.nodes[n]['particle'] for n in levelNodesA[nLevel]]
-                pListB = [other.tree.nodes[n]['particle'] for n in levelNodesB[nLevel]]
+                pListA = [self.tree.nodes[n].particle for n in levelNodesA[nLevel]]
+                pListB = [other.tree.nodes[n].particle for n in levelNodesB[nLevel]]
                 pListA = sorted(pListA)
                 pListB = sorted(pListB)
                 pComp = (pListA > pListB) - (pListA < pListB)
@@ -128,8 +128,8 @@ class Element(object):
         :return: True if n1 == n2, False otherwise.
         """
 
-        pA = n1['particle']
-        pB = n2['particle']
+        pA = n1.particle
+        pB = n2.particle
 
         return pA == pB
 
@@ -151,7 +151,7 @@ class Element(object):
         :return: Attribute value
         """
 
-        #If calling another special method, return default (required for pickling)
+        # If calling another special method, return default (required for pickling)
         if attr.startswith('__') and attr.endswith('__'):
             return object.__getattr__(attr)
 
@@ -245,8 +245,7 @@ class Element(object):
 
         return elStr
 
-    def drawTree(self, outputFile=None, show=True,
-                 oddColor='lightcoral', evenColor='skyblue',
+    def drawTree(self, oddColor='lightcoral', evenColor='skyblue',
                  pvColor='darkgray', genericColor='violet',
                  nodeScale=4):
         """
@@ -254,40 +253,10 @@ class Element(object):
         If outputFile is defined, it will save plot to this file.
         """
 
-        import matplotlib.pyplot as plt
-
-        T = self.tree
-
-        labels = dict([[n, str(T.nodes[n]['particle'])]
-                       for n in T.nodes()])
-        for key in labels:
-            if labels[key] == 'anyOdd':
-                labels[key] = 'BSM'
-        node_size = []
-        node_color = []
-        for n in T.nodes():
-            node_size.append(nodeScale*100*len(labels[n]))
-            if 'pv' == labels[n].lower():
-                node_color.append(pvColor)
-            elif hasattr(T.nodes[n]['particle'], 'Z2parity'):
-                if T.nodes[n]['particle'].Z2parity == 'odd':
-                    node_color.append(oddColor)
-                else:
-                    node_color.append(evenColor)
-            else:
-                node_color.append(genericColor)
-        pos = nx.drawing.nx_agraph.graphviz_layout(T, prog='dot')
-        nx.draw(T, pos,
-                with_labels=True,
-                arrows=True,
-                labels=labels,
-                node_size=node_size,
-                node_color=node_color)
-
-        if outputFile:
-            plt.savefig(outputFile)
-        if show:
-            plt.show()
+        return drawTree(self.tree, oddColor=oddColor,
+                        evenColor=evenColor,
+                        pvColor=pvColor, genericColor=genericColor,
+                        nodeScale=nodeScale)
 
     def copy(self):
         """
@@ -297,7 +266,7 @@ class Element(object):
         :returns: copy of element (Element object)
         """
 
-        #Allows for derived classes (like inclusive classes)
+        # Allows for derived classes (like inclusive classes)
         newel = self.__class__()
         newel.tree = self.tree.copy()
         newel.weight = self.weight.copy()
