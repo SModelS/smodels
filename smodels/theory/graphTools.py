@@ -8,6 +8,7 @@
 
 
 import networkx as nx
+import itertools
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 
@@ -91,6 +92,96 @@ class ParticleNode(object):
 
     def eqParticle(self, other):
         return self.particle == other.particle
+
+
+def compareNodes(treeA, treeB, nodeA, nodeB):
+    """
+    Check if nodeA from treeA equlas nodeB from treeB.
+    The comparison is based on the node canonical name (node structure)
+    and the node particles. It is done recursively, so two nodes are equal
+    only if all their daughters are also equal.
+    For daughters with the same canonical name, all the permutations are tried
+    when comparing nodes.
+    If nodes match return a tree (DiGraph obj) with nodeB as root
+    and its daughters as nodes, but with the daughters sorted according to the ordering
+    to which they matched nodeA.
+
+    :param treeA: a tree (DiGraph object)
+    :param treeB: a tree (DiGraph object)
+    :param nodeA: a node belonging to treeA (ParticleNode object)
+    :param nodeB: a node belonging to treeB (ParticleNode object)
+
+    :return: (True, new tree) if nodes match, (False, None) otherwise.
+    """
+
+    if not isinstance(nodeA, ParticleNode):
+        return -1, None
+    if not isinstance(nodeB, ParticleNode):
+        return -1, None
+
+    if nodeA.canonName != nodeB.canonName:
+        if nodeA.canonName > nodeB.canonName:
+            return 1, None
+        else:
+            return -1, None
+    # print('\n\nComparing %s with %s' %(nodeA.particle,nodeB.particle))
+    # print('\t %s = %s (%s)' %(nodeA.particle,nodeB.particle,nodeA.particle == nodeB.particle))
+    if nodeA.particle != nodeB.particle:
+        if nodeA.particle > nodeB.particle:
+            return 1, None
+        else:
+            return -1, None
+
+    daughtersA = list(treeA.successors(nodeA))
+    daughtersB = list(treeB.successors(nodeB))
+    if not daughtersA and not daughtersB:
+        newNodeB = nx.DiGraph()
+        newNodeB.add_node(nodeB)
+        return 0, newNodeB
+
+    #  print('daughters A =',daughtersA)
+    # print('daughters B =',daughtersB)
+
+    # Compute all permutations within each subgroup with a common canon name:
+    allPerms = []
+    for key, group in itertools.groupby(daughtersB, lambda d: d.canonName):
+        allPerms.append(list(itertools.permutations(group)))
+
+    # Construct all permutations and check against daughtersA:
+    cmp = 0
+    cmp_orig = None
+    for dB_perm in itertools.product(*allPerms):
+        dB_perm = list(itertools.chain.from_iterable(dB_perm))
+        # print('Checking permutation:',dB_perm)
+        cmp = 0
+        newDaughtersB = []
+        for iB, dB in enumerate(dB_perm):
+            cmp, newNodeB = compareNodes(treeA, treeB, daughtersA[iB], dB)
+            newDaughtersB.append(newNodeB)
+            if cmp != 0:  # If one node differs, try next permutation
+                break
+
+        # The first permutation is the original ordering.
+        # Store the comparison for the original ordering in case it does not match,
+        # since this will be the value returned in this case.
+        if cmp_orig is None:
+            cmp_orig = cmp
+
+        if cmp == 0:  # If permutation matches, stop
+            break
+
+    # If matches also return a tree with the nodeB as root and its daughters
+    # ordered according to how they matched nodeA
+    if cmp == 0:
+        newNodeB = nx.DiGraph()
+        newNodeB.add_node(nodeB)
+        for dB in newDaughtersB:
+            dB.add_node(nodeB)
+            dB.add_edge(nodeB, list(dB.nodes())[0])
+            newNodeB = nx.compose(newNodeB, dB)
+        return 0, newNodeB
+    else:
+        return cmp_orig, None
 
 
 def stringToTree(stringElement, model=None, finalState=None, intermediateState=None):
@@ -266,36 +357,41 @@ def bracketToProcessStr(stringEl, finalState=None, intermediateState=None):
     return stringProc
 
 
-def fromTreeToList(T, node=None):
+def treeToBrackets(tree):
     """
     Convert a Tree to a nested list with the Z2 even
     final states. The Z2 odd final states (e.g. 'MET', 'HSCP') are
-    not included.
+    not included. The Tree must be Z2-preserving and represent the
+    pair production cascade decay of two Z2-odd particles.
 
-    :param T: DiGraph object
-    :param node: Name of node. If None it will start with the primary node
+    :param tree: DiGraph object
 
-    :return: Nested list with Z2-even particle objects (e.g. [[[e-,mu],[L]],[[jet]]])
+    :return: Nested list with the strings for the Z2-even final states
+             (e.g. [[['e-','mu'],['L']],[['jet']]])
     """
 
-    if not isinstance(T, nx.DiGraph):
+    if not isinstance(tree, nx.DiGraph):
         raise SModelSError("Input must be a DiGraph object.")
 
-    # Get the primary vertex:
-    if node is None:
-        node = getTreeRoot(T)
+    branches = [b for b in tree.successors(getTreeRoot(tree))]
+    finalState = []
+    intermediateState = []
+    branchList = []
+    if len(branches) != 2:
+        raise SModelSError("Can not convert tree to bracket with %i branches" % len(branches))
+    for ib, b in enumerate(branches):
+        intermediateState.append([])
+        branchList.append([])
+        for mom, daughters in nx.bfs_successors(tree, b):
+            vertexList = [str(d) for d in daughters if d.Z2parity == 'even']
+            fstates = [str(d) for d in daughters if d.Z2parity == 'odd' and not list(tree.successors(d))]
+            if len(vertexList) != len(daughters)-1 or len(fstates) > 1:
+                raise SModelSError("Can not convert tree with Z2-violating decays to bracket")
+            branchList[ib].append(vertexList)
+            intermediateState[ib].append(str(mom))
+            finalState += fstates
 
-    dList = []
-    children = list(T[node])
-    if children:
-        for n in children:
-            if list(T[n]):
-                dList.append(fromTreeToList(T, n))
-            else:
-                if T.nodes[n].Z2parity == 'even':
-                    dList.append(T.nodes[n])
-
-    return dList
+    return branchList, finalState, intermediateState
 
 
 def getCanonName(T, node=None):
@@ -326,30 +422,6 @@ def getCanonName(T, node=None):
     return node.canonName
 
 
-def getNodeLevelDict(T):
-    """
-    Return a dictionary with the nodes in each level of the tree T
-    (e.g. {0 : [PV], 1 : [A,B],...})
-
-    :param T: DiGraph object
-    :return: Dictionary with the levels as keys and a list of nodes in each level as values.
-    """
-
-    if not isinstance(T, nx.DiGraph):
-        raise SModelSError("Input must be a DiGraph object.")
-
-    root = getTreeRoot(T)
-    levelNodes = {}
-    for n in T.nodes():
-        d = nx.shortest_path_length(T, root, n)  # Distance to root
-        if d not in levelNodes:
-            levelNodes[d] = [n]
-        else:
-            levelNodes[d].append(n)
-
-    return levelNodes
-
-
 def getTreeRoot(T):
     """
     Get the root node (primary vertex) of a tree T.
@@ -366,6 +438,27 @@ def getTreeRoot(T):
         raise SModelSError("Malformed Tree, %i root(s) have been found." % len(root))
 
     return root[0]
+
+
+def sortTree(tree):
+    """
+    Sort the tree according to the canonName and then particle. For each node,
+    all the daughters are sorted according to their canonName.
+
+    :param tree: tree (DiGraph object)
+
+    :return: sorted tree (DiGraph object)
+    """
+
+    sortedTree = nx.DiGraph()
+    for mom, daughters in nx.bfs_successors(tree, getTreeRoot(tree)):
+        sortedTree.add_node(mom)
+        sortedDaughters = sorted(daughters, key=lambda d: (d.canonName, d.particle))
+        for d in sortedDaughters:
+            sortedTree.add_node(d)
+            sortedTree.add_edge(mom, d)
+
+    return sortedTree
 
 
 def drawTree(tree, oddColor='lightcoral', evenColor='skyblue',

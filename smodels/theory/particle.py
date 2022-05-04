@@ -509,7 +509,7 @@ class MultiParticle(Particle):
 
         if other is self or self.contains(other):  # Check if other is self or a subset of self
             return self
-        #Check if self is a subset of other
+        # Check if self is a subset of other
         if other.contains(self):
             return other
         elif isinstance(other, MultiParticle):
