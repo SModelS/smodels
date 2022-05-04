@@ -22,7 +22,7 @@ class ParticleNode(object):
     def __init__(self, particle, nodeNumber):
         self.particle = particle
         self.node = nodeNumber
-        self.cannonName = None
+        self.canonName = None
 
     def __hash__(self):
         return self.node
@@ -57,18 +57,34 @@ class ParticleNode(object):
 
     def __getattr__(self, attr):
         """
-        Returns the attribute from particle. If attribute is not found,
-        return attribute from self.
+        Returns the attribute from particle.
 
         :parameter attr: Attribute string
 
         :return: Attribute from self.particle
         """
 
-        if hasattr(self.particle, attr):
-            return getattr(self.particle, attr)
+        return getattr(self.particle, attr)
+
+    def cmpNode(self, other):
+        """
+        Compare nodes. Nodes are equal if their canonNames are equal
+        and the particles match.
+
+        :param other: node (ParticleNode object)
+        """
+
+        if not isinstance(other, ParticleNode):
+            return -1
+        if self.canonName == other.canonName:
+            return self.cmpParticle(self, other)
+        elif self.canonName > other.canonName:
+            return 1
         else:
-            return getattr(self, attr)
+            return -1
+
+    def eqNode(self, other):
+        return (self.cmpNode(other) == 0)
 
     def cmpParticle(self, other):
         return self.particle.__cmp__(other.particle)
@@ -282,9 +298,9 @@ def fromTreeToList(T, node=None):
     return dList
 
 
-def getTopologyName(T, node=None):
+def getCanonName(T, node=None):
     """
-    Recursively compute the topology (canonical) name for the Tree T.
+    Recursively compute the canonical name for the Tree T.
     Returns the name in integer form.
 
     :param T: Tree (networkX DiGraph object)
@@ -301,13 +317,13 @@ def getTopologyName(T, node=None):
 
     children = list(T.successors(node))
     if not children:
-        node.cannonName = 10
+        node.canonName = 10
     else:
-        tp = sorted([getTopologyName(T, n) for n in children])
+        tp = sorted([getCanonName(T, n) for n in children])
         tpStr = '1'+"".join(str(c) for c in tp)+'0'
-        node.cannonName = int(tpStr)
+        node.canonName = int(tpStr)
 
-    return node.cannonName
+    return node.canonName
 
 
 def getNodeLevelDict(T):
@@ -352,23 +368,35 @@ def getTreeRoot(T):
     return root[0]
 
 
-def drawTree(T, oddColor='lightcoral', evenColor='skyblue',
+def drawTree(tree, oddColor='lightcoral', evenColor='skyblue',
              pvColor='darkgray', genericColor='lightgray',
-             nodeScale=4):
+             nodeScale=4, labelAttr=None):
     """
     Draws Tree using matplotlib.
-    If outputFile is defined, it will save plot to this file.
+
+    :param tree: tree to be drawn
+    :param oddColor: color for Z2-odd particles
+    :param evenColor: color for Z2-even particles
+    :param genericColor: color for particles without a defined Z2-parity
+    :param pvColor: color for primary vertex
+    :param nodeScale: scale size for nodes
+    :param labelAttr: attribute to be used as label. If None, will use the string representation
+                      of the node object.
+
     """
     import matplotlib.pyplot as plt
 
-    labels = dict([[n, str(n)] for n in T.nodes()])
+    if labelAttr is None:
+        labels = {n: str(n) for n in tree.nodes()}
+    else:
+        labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr) else str(n) for n in tree.nodes()}
 
     for key in labels:
         if labels[key] == 'anyOdd':
             labels[key] = 'BSM'
     node_size = []
     node_color = []
-    for n in T.nodes():
+    for n in tree.nodes():
         node_size.append(nodeScale*100*len(labels[n]))
         if 'pv' == labels[n].lower():
             node_color.append(pvColor)
@@ -377,11 +405,11 @@ def drawTree(T, oddColor='lightcoral', evenColor='skyblue',
 
     # Compute position of nodes (in case the nodes have the same string representation, first
     # convert the nodes to integers for computing the position)
-    H = nx.convert_node_labels_to_integers(T, label_attribute='node_label')
+    H = nx.convert_node_labels_to_integers(tree, label_attribute='node_label')
     H_layout = nx.drawing.nx_agraph.graphviz_layout(H, prog='dot')
     pos = {H.nodes[n]['node_label']: p for n, p in H_layout.items()}
 
-    nx.draw(T, pos,
+    nx.draw(tree, pos,
             with_labels=True,
             arrows=True,
             labels=labels,

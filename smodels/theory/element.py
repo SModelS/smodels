@@ -6,7 +6,7 @@
 
 """
 
-from smodels.theory.graphTools import stringToTree, getTopologyName, getNodeLevelDict, getTreeRoot, treeToString, drawTree
+from smodels.theory.graphTools import stringToTree, getCanonName, getNodeLevelDict, treeToString, drawTree
 from smodels.theory.branch import Branch, InclusiveBranch
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -29,12 +29,17 @@ class Element(object):
         the element using it.
 
         :parameter info: string describing the element in bracket notation
-                         (e.g. [[[e+],[jet]],[[e-],[jet]]])
+                         (e.g. [[[e+],[jet]],[[e-],[jet]]]) or process notation
+                         (e.g (PV > gluino(1),gluino(2)), (gluino(1) > u,u~,N1), (gluino(2) > d,d~,N1))
+                         OR a tree (DiGraph object)
 
         :parameter finalState: list containing the final state labels for each branch
-                         (e.g. ['MET', 'HSCP'] or ['MET','MET'])
+                         (e.g. ['MET', 'HSCP'] or ['MET','MET']). Only needed for the bracket notation
+                         input.
         :parameter intermediateState: nested list containing intermediate state labels
-                                     for each branch  (e.g. [['gluino'], ['gluino']])
+                                      for each branch  (e.g. [['gluino'], ['gluino']]). Only
+                                      needed for the bracket notation input.
+
         :parameter model: The model (Model object) to be used when converting particle labels to
                           particle objects (only used if info, finalState or intermediateState != None).
         """
@@ -60,24 +65,45 @@ class Element(object):
                 raise SModelSError("Can not create element from input type %s" % type(info))
 
         self.setEinfo()
+        self.sort()
 
     def setEinfo(self):
         """
         Compute and store the canonical name for the tree
         topology. The canonical name can be used to compare and sort topologies.
-        The name is stored in self.tree.topologyName
+        The name is stored in self.tree.canonName
         """
 
-        canonName = getTopologyName(self.tree)
-        self.tree.graph['topologyName'] = canonName
+        canonName = getCanonName(self.tree)
+        self.tree.graph['canonName'] = canonName
+
+    def sort(self):
+        """
+        Sort the tree according to the canonName. For each node,
+        all the daughters are sorted according to their canonName.
+        """
+
+        # If canon names have not been defined, compute them:
+        if 'canonName' not in self.tree.graph:
+            self.setEinfo()
+
+        sortedTree = nx.DiGraph()
+        for mom, daughters in nx.bfs_successors(self.tree, list(self.tree.nodes())[0]):
+            sortedTree.add_node(mom)
+            sortedDaughters = sorted(daughters, key=lambda d: d.canonName)
+            for d in sortedDaughters:
+                sortedTree.add_node(d)
+                sortedTree.add_edge(mom, d)
+
+        self.tree = sortedTree
 
     def __cmp__(self, other):
         """
         Compares the element with other.
         Uses the topology name (Tree canonincal name) to identify isomorphic topologies (trees).
         If trees are not isomorphic, compare topologies using the topology name.
-        Else  check if nodes (particles) are equal. If particles match return 0,
-        else compare lists of particles in each tree level.
+        Else  check if nodes (particles) are equal. For nodes with the same canonName
+        and the same parent, compare against all permutations.
 
         :param other:  element to be compared (Element object)
 
@@ -88,15 +114,17 @@ class Element(object):
             return -1
 
         # make sure the topology names have been computed:
-        if not 'topologyName' in self.tree.graph:
+        if 'canonName' not in self.tree.graph:
             self.setEInfo()
-        if not 'topologyName' in other.tree.graph:
+        if 'canonName' not in other.tree.graph:
             other.setEInfo()
 
-        tnameA = self.tree.graph['topologyName']
-        tnameB = other.tree.graph['topologyName']
+        tnameA = self.tree.graph['canonName']
+        tnameB = other.tree.graph['canonName']
         if tnameA != tnameB:
             return (tnameA > tnameB) - (tnameA < tnameB)
+
+        # Compare the nodes:
 
         # Check if the elements are isomorphic including particle comparison
         if nx.isomorphism.is_isomorphic(self.tree, other.tree, node_match=self.equalNodes):
@@ -247,16 +275,25 @@ class Element(object):
 
     def drawTree(self, oddColor='lightcoral', evenColor='skyblue',
                  pvColor='darkgray', genericColor='violet',
-                 nodeScale=4):
+                 nodeScale=4, labelAttr=None):
         """
-        Draws element Tree using matplotlib.
-        If outputFile is defined, it will save plot to this file.
+        Draws Tree using matplotlib.
+
+        :param tree: tree to be drawn
+        :param oddColor: color for Z2-odd particles
+        :param evenColor: color for Z2-even particles
+        :param genericColor: color for particles without a defined Z2-parity
+        :param pvColor: color for primary vertex
+        :param nodeScale: scale size for nodes
+        :param labelAttr: attribute to be used as label. If None, will use the string representation
+                          of the node object.
+
         """
 
         return drawTree(self.tree, oddColor=oddColor,
                         evenColor=evenColor,
                         pvColor=pvColor, genericColor=genericColor,
-                        nodeScale=nodeScale)
+                        nodeScale=nodeScale, labelAttr=labelAttr)
 
     def copy(self):
         """

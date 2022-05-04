@@ -126,7 +126,7 @@ class Particle(object):
             Particle._lastID += 1
         return Particle._lastID
 
-        def __cmp__(self, other):
+    def __cmp__(self, other):
         """
         Compares particle with other.
         The comparison is based on the particle properties.
@@ -486,7 +486,7 @@ class MultiParticle(Particle):
         :return: 0 if properties are equal, -1 if self < other and 1 if self > other.
         """
 
-        #Check if any of its particles matches other
+        # Check if any of its particles matches other
         if isinstance(other, Particle):
             otherParticles = [other]
         elif isinstance(other, MultiParticle):
