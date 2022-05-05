@@ -67,6 +67,34 @@ class ParticleNode(object):
 
         return getattr(self.particle, attr)
 
+    def __add__(self, other):
+        """
+        Adds two nodes. The properties of self are kept, except
+        for the particle, which is combined with the particle from other.
+
+        :param other: ParticleNode object
+
+        :return: a copy of self with the particle combined with other.particle
+        """
+
+        newNode = self.copy()
+        newNode.particle = self.particle + other.particle
+
+        return newNode
+
+    def copy(self):
+        """
+        Makes a shallow copy of itself. The particle attribute
+        shares the same object with the original copy.
+        :return: ParticleNode object
+        """
+
+        newNode = ParticleNode(particle=self.particle,
+                               nodeNumber=self.node)
+        newNode.canonName = self.canonName
+
+        return newNode
+
     def cmpNode(self, other):
         """
         Compare nodes. Nodes are equal if their canonNames are equal
@@ -459,6 +487,24 @@ def sortTree(tree):
             sortedTree.add_edge(mom, d)
 
     return sortedTree
+
+
+def addTrees(treeA, treeB):
+    """
+    Combines the particles in equivalent nodes in each trees.
+    Can only be done if the trees have the same topology and ordering.
+
+    :param treeA: tree (DiGraph object)
+    :param treeB: tree (DiGraph object)
+
+    :return: new tree with the combined particles (DiGraph object)
+    """
+
+    nodesDict = {n: n+list(treeB.nodes())[inode]
+                 for inode, n in enumerate(treeA.nodes())}
+    newTree = nx.relabel_nodes(treeA, nodesDict, copy=True)
+
+    return newTree
 
 
 def drawTree(tree, oddColor='lightcoral', evenColor='skyblue',

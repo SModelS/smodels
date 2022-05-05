@@ -6,7 +6,7 @@
 
 """
 
-from smodels.theory.graphTools import stringToTree, getCanonName, treeToString, compareNodes, drawTree, getTreeRoot, sortTree
+from smodels.theory.graphTools import stringToTree, getCanonName, treeToString, compareNodes, drawTree, getTreeRoot, sortTree, addTrees
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from networkx import DiGraph
@@ -172,66 +172,51 @@ class Element(object):
 
         return self.__str__()
 
-    # def __add__(self, other):
-    #     """
-    #     Adds two elements. Should only be used if the elements
-    #     have the same topologies. The element weights are added and their
-    #     odd and even particles are combined.
-    #     """
-    #
-    #     if not isinstance(other, Element):
-    #         raise TypeError("Can not add an Element object to %s" % type(other))
-    #     elif self.getCanonName() != other.getCanonName():
-    #         raise SModelSError("Can not add elements with distinct topologies")
-    #
-    #     newEl = self.__class__()
-    #     newEl.motherElements = self.motherElements[:] + other.motherElements[:]
-    #     newEl.weight = self.weight + other.weight
-    #     newEl.branches = []
-    #     for ibr, branch in enumerate(self.branches):
-    #         newEl.branches.append(branch + other.branches[ibr])
-    #
-    #     return newEl
-    #
-    # def __radd__(self, other):
-    #     """
-    #     Adds two elements. Only elements with the same
-    #     topology can be combined.
-    #     """
-    #
-    #     return self.__add__(other)
-    #
-    # def __iadd__(self, other):
-    #     """
-    #     Combine two elements. Should only be used if the elements
-    #     have the same topologies. The element weights are added and their
-    #     odd and even particles are combined.
-    #     """
-    #
-    #     if not isinstance(other, Element):
-    #         raise TypeError("Can not add an Element object to %s" % type(other))
-    #     elif self.getCanonName() != other.getCanonName():
-    #         raise SModelSError("Can not add elements with distinct topologies")
-    #
-    #     self.motherElements += other.motherElements[:]
-    #     self.weight += other.weight
-    #     for ibr, _ in enumerate(self.branches):
-    #         self.branches[ibr] += other.branches[ibr]
-    #
-    #     return self
-    #
-    # def getAverage(self, attr):
-    #     """
-    #     Get the average value for a given attribute appearing in
-    #     the odd particles of the element branches.
-    #     """
-    #
-    #     try:
-    #         vals = [br.getAverage(attr) for br in self.branches]
-    #     except (AttributeError, ZeroDivisionError):
-    #         raise SModelSError("Could not compute average for %s" % attr)
-    #
-    #     return vals
+    def __add__(self, other):
+        """
+        Adds two elements. Should only be used if the elements
+        have the same topologies. The element weights are added and their
+        odd and even particles are combined.
+        """
+
+        if not isinstance(other, Element):
+            raise TypeError("Can not add an Element object to %s" % type(other))
+        elif self.getCanonName() != other.getCanonName():
+            raise SModelSError("Can not add elements with distinct topologies")
+
+        newEl = self.__class__(info=self.tree)
+        newEl.motherElements = self.motherElements[:] + other.motherElements[:]
+        newEl.weight = self.weight + other.weight
+        newEl.tree = addTrees(self.tree, other.tree)
+        newEl.sort()
+
+        return newEl
+
+    def __radd__(self, other):
+        """
+        Adds two elements. Only elements with the same
+        topology can be combined.
+        """
+
+        return self.__add__(other)
+
+    def __iadd__(self, other):
+        """
+        Combine two elements. Should only be used if the elements
+        have the same topologies. The element weights are added and their
+        odd and even particles are combined.
+        """
+
+        if not isinstance(other, Element):
+            raise TypeError("Can not add an Element object to %s" % type(other))
+        elif self.getCanonName() != other.getCanonName():
+            raise SModelSError("Can not add elements with distinct topologies")
+
+        self.motherElements += other.motherElements[:]
+        self.weight += other.weight
+        self.tree = addTrees(self.tree, other.tree)
+
+        return self
 
     def drawTree(self, oddColor='lightcoral', evenColor='skyblue',
                  pvColor='darkgray', genericColor='violet',
@@ -264,8 +249,7 @@ class Element(object):
         """
 
         # Allows for derived classes (like inclusive classes)
-        newel = self.__class__()
-        newel.tree = self.tree.copy()
+        newel = self.__class__(info=self.tree.copy())
         newel.weight = self.weight.copy()
         newel.motherElements = self.motherElements[:]
         newel.elID = self.elID
@@ -415,7 +399,7 @@ class Element(object):
     #             for element in newElements:
     #                 newel = element.massCompress(minmassgap)
     #                 # Avoids double counting
-    #                 #(elements sharing the same parent are removed during clustering)
+    #                 # (elements sharing the same parent are removed during clustering)
     #                 if newel and not any(newel == el for el in newElements[:]):
     #                     newElements.append(newel)
     #                     added = True
@@ -426,7 +410,7 @@ class Element(object):
     #             for element in newElements:
     #                 newel = element.invisibleCompress()
     #                 # Avoids double counting
-    #                 #(elements sharing the same parent are removed during clustering)
+    #                 # (elements sharing the same parent are removed during clustering)
     #                 if newel and not any(newel == el for el in newElements[:]):
     #                     newElements.append(newel)
     #                     added = True
@@ -434,9 +418,9 @@ class Element(object):
     #     newElements.pop(0)  # Remove original element
     #     return newElements
     #
-    # def removeVertex(self, ibr, iv):
+    # def removeNode(self, node):
     #     """
-    #     Remove vertex iv located in branch ibr.
+    #     Remove node from the
     #     The "vertex-mother" in BSMparticles and (SM) particles in the vertex
     #     are removed from the branch. The vertex index corresponds
     #     to the BSM decay (iv = 0 will remove the first BSM particle,...)
@@ -447,7 +431,7 @@ class Element(object):
     #     """
     #
     #     self.branches[ibr].removeVertex(iv)
-    #
+
     # def massCompress(self, minmassgap):
     #     """
     #     Perform mass compression.
