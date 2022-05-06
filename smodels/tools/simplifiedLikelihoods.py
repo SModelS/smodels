@@ -272,6 +272,8 @@ class LikelihoodComputer:
         :param theta_hat: array with nuisance parameters
 
         """
+        if not self.model.isLinear():
+            logger.error ( "implemented only for linear model" )
         # n_pred^i := mu s_i + b_i + theta_i
         # NLL = sum_i [ - n_obs^i * ln ( n_pred^i ) + n_pred^i ]
         # d NLL / d mu = sum_i [ - ( n_obs^i * s_ i ) / n_pred_i + s_i ]
@@ -363,7 +365,7 @@ class LikelihoodComputer:
             #        mu_c[i]=0.
             ## find mu_hat by finding the root of 1/L dL/dmu. We know
             ## that the zero has to be between min(mu_c) and max(mu_c).
-            lstarters = [ avgr - .1*abs(avgr), minr, 0., -1., 1., 10., -.1, .1, -100., 100., -1000. ]
+            lstarters = [ avgr - .2*abs(avgr), minr, 0., -1., 1., 10., -.1, .1, -100., 100., -1000. ]
             closestl, closestr = None, float("inf")
             for lower in lstarters:
                 lower_v = self.dNLLdMu(lower, signal_rel, theta_hat)
@@ -374,7 +376,7 @@ class LikelihoodComputer:
             if lower_v > 0.:
                 logger.debug ( f"did not find a lower value with rootfinder(lower) < 0. Closest: f({closestl})={closestr}" )
                 return self.extendedOutput ( extended_output, 0. )
-            ustarters = [ avgr + .1*abs(avgr), maxr, 0., 1., 10., -1. -.1, .1, 100., -100., 1000., -1000., .01, -.01 ]
+            ustarters = [ avgr + .2*abs(avgr), maxr, 0., 1., 10., -1. -.1, .1, 100., -100., 1000., -1000., .01, -.01 ]
             closestl, closestr = None, float("inf")
             for upper in ustarters:
                 upper_v = self.dNLLdMu(upper, signal_rel, theta_hat)
@@ -406,11 +408,14 @@ class LikelihoodComputer:
 
     def getSigmaMu(self, mu, signal_rel, theta_hat ):
         """
-        Get an estimate for the standard deviation of mu around mu_max, from
+        Get an estimate for the standard deviation of mu at <mu>, from
         the inverse hessian
 
-        :param signal_rel: array with relative signal strengths in each dataset (signal region)
+        :param signal_rel: array with relative signal strengths in each dataset
+                           (signal region)
         """
+        if not self.model.isLinear():
+            logger.error ( "implemented only for linear model" )
         # d^2 mu NLL / d mu^2 = sum_i [ n_obs^i * s_i**2 / n_pred^i**2 ]
 
         #Define relative signal strengths:
@@ -520,7 +525,7 @@ class LikelihoodComputer:
         nllp_ = T - self.model.observed / lmbda * ( T ) + np.dot( theta , self.weight )
         return nllp_
 
-    def nllHess( self, theta ):
+    def d2NLLdTheta2( self, theta ):
         """ the Hessian of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood. """
         # xtot = theta + self.ntot
@@ -623,7 +628,7 @@ class LikelihoodComputer:
             self.gammaln = special.gammaln(self.model.observed + 1)
             try:
                 ret_c = optimize.fmin_ncg ( self.nllOfNuisances, ini,
-                            fprime=self.dNLLdTheta, fhess=self.nllHess,
+                            fprime=self.dNLLdTheta, fhess=self.d2NLLdTheta2,
                             full_output=True, disp=0 )
                 # then always continue with TNC
                 if type ( self.model.observed ) in [ int, float ]:

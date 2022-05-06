@@ -390,7 +390,7 @@ class PyhfUpperLimitComputer:
                 #    return None
                 workspace = self.updateWorkspace(workspace_index, expected = expected)
                 # Same modifiers_settings as those used when running the 'pyhf cls' command line
-                msettings = { 'normsys': {'interpcode': 'code4'}, 
+                msettings = { 'normsys': {'interpcode': 'code4'},
                               'histosys': {'interpcode': 'code4p'}}
                 model = workspace.model(modifier_settings=msettings)
                 d = workspace.data(model)
@@ -420,7 +420,7 @@ class PyhfUpperLimitComputer:
                         model, return_fitted_val=True, init_pars = initpars, maxiter=200 )
                 except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                     logger.info ( f"pyhf fixed_poi_fit failed twice for mu={mu}: {e}" )
-                
+
                     self.restore()
                     return self.exponentiateNLL ( None, not nll )
             except:
@@ -511,7 +511,8 @@ class PyhfUpperLimitComputer:
                 bounds = model.config.suggested_bounds()
                 if allowNegativeSignals:
                     bounds[model.config.poi_index] = (-5., 10. )
-                muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True, par_bounds = bounds )
+                muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model,
+                        return_fitted_val=True, par_bounds = bounds )
                 muhat = muhat[model.config.poi_index]*self.scale
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
