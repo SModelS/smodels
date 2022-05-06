@@ -13,7 +13,8 @@ sys.path.insert(0,"../")
 import unittest
 from databaseLoader import database
 
-# from smodels.tools.smodelsLogging import logger, setLogLevel
+from smodels.tools.smodelsLogging import logger, setLogLevel
+setLogLevel ( "warning" )
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.theory.decomposer import decompose
 from smodels.tools.physicsUnits import fb
