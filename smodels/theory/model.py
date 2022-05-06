@@ -35,7 +35,10 @@ class Model(object):
         for p in self.BSMparticles:
             p._equals = [id(p)]
             p._differs = []
+            p._isSM = False
         self.SMparticles = SMparticles[:]
+        for p in self.SMparticles:
+            p._isSM = True
 
         # Check if for each PDG there is a unique particle object defined
         allPDGs = self.getValuesFor('pdg')

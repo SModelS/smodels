@@ -9,7 +9,8 @@
 from smodels.theory.graphTools import stringToTree, getCanonName, treeToString, compareNodes, drawTree, getTreeRoot, sortTree, addTrees
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from networkx import DiGraph
+from smodels.theory.particle import Particle
+from networkx import DiGraph, bfs_successors
 
 
 class Element(object):
@@ -218,27 +219,28 @@ class Element(object):
 
         return self
 
-    def drawTree(self, oddColor='lightcoral', evenColor='skyblue',
-                 pvColor='darkgray', genericColor='violet',
-                 nodeScale=4, labelAttr=None):
+    def drawTree(self, particleColor='lightcoral',
+                 smColor='skyblue',
+                 pvColor='darkgray',
+                 nodeScale=4, labelAttr=None, attrUnit=None):
         """
         Draws Tree using matplotlib.
 
         :param tree: tree to be drawn
-        :param oddColor: color for Z2-odd particles
-        :param evenColor: color for Z2-even particles
-        :param genericColor: color for particles without a defined Z2-parity
+        :param particleColor: color for particle nodes
+        :param smColor: color used for particles which have the _isSM attribute set to True
         :param pvColor: color for primary vertex
         :param nodeScale: scale size for nodes
         :param labelAttr: attribute to be used as label. If None, will use the string representation
                           of the node object.
+        :param attrUnit: Unum object with the unit to be removed from label attribute (if applicable)
 
         """
 
-        return drawTree(self.tree, oddColor=oddColor,
-                        evenColor=evenColor,
-                        pvColor=pvColor, genericColor=genericColor,
-                        nodeScale=nodeScale, labelAttr=labelAttr)
+        return drawTree(self.tree, particleColor=particleColor,
+                        smColor=smColor,
+                        pvColor=pvColor, nodeScale=nodeScale,
+                        labelAttr=labelAttr, attrUnit=attrUnit)
 
     def copy(self):
         """
@@ -372,180 +374,204 @@ class Element(object):
         for mother in self.getAncestors():
             mother.coveredBy.add(resultType)
 
-    # def compressElement(self, doCompress, doInvisible, minmassgap):
-    #     """
-    #     Keep compressing the original element and the derived ones till they
-    #     can be compressed no more.
-    #
-    #     :parameter doCompress: if True, perform mass compression
-    #     :parameter doInvisible: if True, perform invisible compression
-    #     :parameter minmassgap: value (in GeV) of the maximum
-    #                            mass difference for compression
-    #                            (if mass difference < minmassgap, perform mass compression)
-    #     :returns: list with the compressed elements (Element objects)
-    #     """
-    #
-    #     if not doCompress and not doInvisible:
-    #         return []
-    #
-    #     added = True
-    #     newElements = [self]
-    #     # Keep compressing the new topologies generated so far until no new
-    #     # compressions can happen:
-    #     while added:
-    #         added = False
-    #         # Check for mass compressed topologies
-    #         if doCompress:
-    #             for element in newElements:
-    #                 newel = element.massCompress(minmassgap)
-    #                 # Avoids double counting
-    #                 # (elements sharing the same parent are removed during clustering)
-    #                 if newel and not any(newel == el for el in newElements[:]):
-    #                     newElements.append(newel)
-    #                     added = True
-    #
-    #         # Check for invisible compressed topologies (look for effective
-    #         # LSP, such as LSP + neutrino = LSP')
-    #         if doInvisible:
-    #             for element in newElements:
-    #                 newel = element.invisibleCompress()
-    #                 # Avoids double counting
-    #                 # (elements sharing the same parent are removed during clustering)
-    #                 if newel and not any(newel == el for el in newElements[:]):
-    #                     newElements.append(newel)
-    #                     added = True
-    #
-    #     newElements.pop(0)  # Remove original element
-    #     return newElements
-    #
-    # def removeNode(self, node):
-    #     """
-    #     Remove node from the
-    #     The "vertex-mother" in BSMparticles and (SM) particles in the vertex
-    #     are removed from the branch. The vertex index corresponds
-    #     to the BSM decay (iv = 0 will remove the first BSM particle,...)
-    #
-    #     :parameter ibr: Index of branch (int)
-    #     :parameter iv: Index of vertex in branch ibr (int)
-    #
-    #     """
-    #
-    #     self.branches[ibr].removeVertex(iv)
+    def compressElement(self, doCompress, doInvisible, minmassgap):
+        """
+        Keep compressing the original element and the derived ones till they
+        can be compressed no more.
 
-    # def massCompress(self, minmassgap):
-    #     """
-    #     Perform mass compression.
-    #
-    #     :parameter minmassgap: value (in GeV) of the maximum
-    #                            mass difference for compression
-    #                            (if mass difference < minmassgap -> perform mass compression)
-    #     :returns: compressed copy of the element, if two masses in this
-    #               element are degenerate; None, if compression is not possible;
-    #     """
-    #
-    #     newelement = self.copy()
-    #     newelement.motherElements = [self]
-    #
-    #     #Loop over branches and look for small mass differences
-    #     for ibr, branch in enumerate(newelement.branches):
-    #         #Get mass differences
-    #
-    #         removeVertices = []
-    #         for i, mom in enumerate(branch.oddParticles[:-1]):
-    #             massDiff = mom.mass - branch.oddParticles[i+1].mass
-    #             #Get vertices which have deltaM < minmassgap and the mother is prompt:
-    #             if massDiff < minmassgap and mom.isPrompt():
-    #                 removeVertices.append(i)
-    #         #Remove vertices till they exist:
-    #         while removeVertices:
-    #             newelement.removeVertex(ibr, removeVertices[0])
-    #             branch = newelement.branches[ibr]
-    #             removeVertices = []
-    #             for i, mom in enumerate(branch.oddParticles[:-1]):
-    #                 massDiff = mom.mass - branch.oddParticles[i+1].mass
-    #                 #Get vertices which have deltaM < minmassgap and the mother is prompt:
-    #                 if massDiff < minmassgap and mom.isPrompt():
-    #                     removeVertices.append(i)
-    #
-    #     for ibr, branch in enumerate(newelement.branches):
-    #         if branch.vertnumb != self.branches[ibr].vertnumb:
-    #             newelement.sortBranches()
-    #             return newelement
-    #
-    #     #New element was not compressed, return None
-    #     return None
-    #
-    # def invisibleCompress(self):
-    #     """
-    #     Perform invisible compression.
-    #
-    #     :returns: compressed copy of the element, if element ends with invisible
-    #               particles; None, if compression is not possible
-    #     """
-    #
-    #     newelement = self.copy()
-    #     newelement.motherElements = [self]
-    #
-    #     # Loop over branches
-    #     for branch in newelement.branches:
-    #         if not branch.evenParticles:
-    #             continue
-    #         #Check if the last decay should be removed:
-    #         neutralSM = all(ptc.isMET() for ptc in branch.evenParticles[-1])
-    #         neutralDecay = neutralSM and branch.oddParticles[-1].isMET()
-    #         #Check if the mother can be considered MET:
-    #         neutralBSM = (branch.oddParticles[-2].isMET()
-    #                      or branch.oddParticles[-2].isPrompt())
-    #         if neutralBSM and neutralDecay:
-    #             removeLastVertex = True
-    #         else:
-    #             removeLastVertex = False
-    #
-    #         while len(branch.oddParticles) > 1 and removeLastVertex:
-    #             bsmMom = branch.oddParticles[-2]
-    #             effectiveDaughter = Particle(label='inv', mass=bsmMom.mass,
-    #                                         eCharge=0, colordim=1,
-    #                                         totalwidth=branch.oddParticles[-1].totalwidth,
-    #                                         Z2parity=bsmMom.Z2parity, pdg=bsmMom.pdg)
-    #             branch.removeVertex(len(branch.oddParticles)-2)
-    #             #For invisible compression, keep an effective mother which corresponds to the invisible
-    #             #daughter, but with the mass of the parent.
-    #             branch.oddParticles[-1] = effectiveDaughter
-    #             #Re-check if the last decay should be removed:
-    #             if not branch.evenParticles:
-    #                 continue
-    #             neutralSM = all(ptc.isMET() for ptc in branch.evenParticles[-1])
-    #             neutralDecay = neutralSM and branch.oddParticles[-1].isMET()
-    #             neutralBSM = branch.oddParticles[-2].isMET()
-    #             if neutralBSM and neutralDecay:
-    #                 removeLastVertex = True
-    #             else:
-    #                 removeLastVertex = False
-    #
-    #     for ibr, branch in enumerate(newelement.branches):
-    #         if branch.vertnumb != self.branches[ibr].vertnumb:
-    #             newelement.sortBranches()
-    #             return newelement
-    #
-    #     #New element was not compressed, return None
-    #     return None
-    #
-    # def hasTopInList(self, elementList):
-    #     """
-    #     Check if the element topology matches any of the topologies in the
-    #     element list.
-    #
-    #     :parameter elementList: list of elements (Element objects)
-    #     :returns: True, if element topology has a match in the list, False otherwise.
-    #     """
-    #     if type(elementList) != type([]) or len(elementList) == 0:
-    #         return False
-    #     for element in elementList:
-    #         if type(element) != type(self):
-    #             continue
-    #         info1 = self.getCanonName()
-    #         info2 = element.getCanonName()
-    #         info2B = element.switchBranches().getCanonName()
-    #         if info1 == info2 or info1 == info2B:
-    #             return True
-    #     return False
+        :parameter doCompress: if True, perform mass compression
+        :parameter doInvisible: if True, perform invisible compression
+        :parameter minmassgap: value (in GeV) of the maximum
+                               mass difference for compression
+                               (if mass difference < minmassgap, perform mass compression)
+        :returns: list with the compressed elements (Element objects)
+        """
+
+        if not doCompress and not doInvisible:
+            return []
+
+        added = True
+        newElements = [self]
+        # Keep compressing the new topologies generated so far until no new
+        # compressions can happen:
+        while added:
+            added = False
+            # Check for mass compressed topologies
+            if doCompress:
+                for element in newElements:
+                    newel = element.massCompress(minmassgap)
+                    # Avoids double counting
+                    # (elements sharing the same parent are removed during clustering)
+                    if newel and not any(newel == el for el in newElements[:]):
+                        newElements.append(newel)
+                        added = True
+
+            # Check for invisible compressed topologies (look for effective
+            # LSP, such as LSP + neutrino = LSP')
+            if doInvisible:
+                for element in newElements:
+                    newel = element.invisibleCompress()
+                    # Avoids double counting
+                    # (elements sharing the same parent are removed during clustering)
+                    if newel and not any(newel == el for el in newElements[:]):
+                        newElements.append(newel)
+                        added = True
+
+        newElements.pop(0)  # Remove original element
+        return newElements
+
+    def massCompress(self, minmassgap):
+        """
+        Perform mass compression.
+
+        :parameter minmassgap: value (in GeV) of the maximum
+                               mass difference for compression
+                               (if mass difference < minmassgap -> perform mass compression)
+        :returns: compressed copy of the element, if two masses in this
+                  element are degenerate; None, if compression is not possible;
+        """
+
+        newelement = self.copy()
+        newelement.motherElements = [self]
+        checkCompression = True
+        # Check for compression until tree can no longer be compressed
+        previousName = self.getCanonName()
+
+        while checkCompression:
+            tree = newelement.tree
+            root = getTreeRoot(tree)
+            # Loop over nodes:
+            for mom, daughters in bfs_successors(tree, root):
+                if mom == root:  # Skip primary vertex
+                    continue
+                if not mom.particle.isPrompt():  # Skip long-lived
+                    continue
+                bsmDaughter = []
+                smDaughters = []
+                for d in daughters:
+                    # Split daughters into final states SM and others (BSM)
+                    if hasattr(d, '_isSM') and d._isSM and not list(tree.successors(d)):
+                        smDaughters.append(d)
+                    else:
+                        bsmDaughter.append(d)
+
+                # Skip decays to multiple BSM particles or to SM particles only
+                if len(bsmDaughter) != 1:
+                    continue
+                bsmDaughter = bsmDaughter[0]
+
+                # Check mass difference:
+                massDiff = mom.mass - bsmDaughter.mass
+                if massDiff > minmassgap:
+                    continue
+
+                # Get grandmother:
+                gMom = list(tree.predecessors(mom))
+                if len(gMom) != 1:
+                    raise SModelSError('Found multiple parents for %s when compressing element. Something went wrong.' % mom)
+
+                gMom = gMom[0]
+                # Remove mother and all SM daughters and mom:
+                tree.remove_nodes_from(smDaughters+[mom])
+
+                # Attach BSM daughter to grandmother:
+                tree.add_edge(gMom, bsmDaughter)
+
+                # For safety break loop since tree structure changed
+                break
+
+            # Recompute the canonical name and
+            newelement.setCanonName()
+            # If iteration has not changed element, break loop
+            name = newelement.getCanonName()
+            if name == previousName:
+                checkCompression = False
+            else:
+                checkCompression = True
+                previousName = name
+        newelement.sort()
+
+        # If element was not compressed, return None
+        if newelement.getCanonName() == self.getCanonName():
+            return None
+        else:
+            return newelement
+
+    def invisibleCompress(self):
+        """
+        Perform invisible compression.
+
+        :returns: compressed copy of the element, if element ends with invisible
+                  particles; None, if compression is not possible
+        """
+
+        newelement = self.copy()
+        newelement.motherElements = [self]
+        checkCompression = True
+        # Check for compression until tree can no longer be compressed
+        previousName = self.getCanonName()
+
+        while checkCompression:
+            tree = newelement.tree
+            root = getTreeRoot(tree)
+            # Loop over nodes:
+            for mom, daughters in bfs_successors(tree, root):
+                if mom == root:  # Skip primary vertex
+                    continue
+                # Skip node if its daughters are not stable
+                if any(list(tree.successors(d)) for d in daughters):
+                    continue
+                # Check if all daughters can be considered MET
+                neutralDaughters = all(d.particle.isMET() for d in daughters)
+                # Check if the mother is MET or prompt:
+                neutralMom = (mom.isMET() or mom.isPrompt())
+
+                # If mother and daughters are neutral, remove daughters
+                if (not neutralDaughters) or (not neutralMom):
+                    continue
+
+                tree.remove_nodes_from(daughters)
+                # Replace mom particle by invisible (generic) particle
+                invParticle = Particle(label='inv', mass=mom.mass,
+                                       eCharge=0, colordim=1,
+                                       _isInvisible=True,
+                                       totalwidth=mom.totalwidth,
+                                       pdg=mom.pdg, _isSM=mom._isSM)
+                mom.particle = invParticle
+
+                # For safety break loop since tree structure changed
+                break
+
+            # Recompute the canonical name and
+            newelement.setCanonName()
+            # If iteration has not changed element, break loop
+            name = newelement.getCanonName()
+            if name == previousName:
+                checkCompression = False
+            else:
+                checkCompression = True
+                previousName = name
+        newelement.sort()
+
+        # If element was not compressed, return None
+        if newelement.getCanonName() == self.getCanonName():
+            return None
+        else:
+            return newelement
+
+    def hasTopInList(self, elementList):
+        """
+        Check if the element topology matches any of the topologies in the
+        element list.
+
+        :parameter elementList: list of elements (Element objects)
+        :returns: True, if element topology has a match in the list, False otherwise.
+        """
+        if not isinstance(elementList, list) or len(elementList) == 0:
+            return False
+        for element in elementList:
+            if type(element) != type(self):
+                continue
+            if self.getCanonName() == element.getCanonName():
+                return True
+        return False

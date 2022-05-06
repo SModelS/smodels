@@ -411,8 +411,8 @@ def treeToBrackets(tree):
         intermediateState.append([])
         branchList.append([])
         for mom, daughters in nx.bfs_successors(tree, b):
-            vertexList = [str(d) for d in daughters if d.Z2parity == 'even']
-            fstates = [str(d) for d in daughters if d.Z2parity == 'odd' and not list(tree.successors(d))]
+            vertexList = [str(d) for d in daughters if d.Z2parity == 1]
+            fstates = [str(d) for d in daughters if d.Z2parity == -1 and not list(tree.successors(d))]
             if len(vertexList) != len(daughters)-1 or len(fstates) > 1:
                 raise SModelSError("Can not convert tree with Z2-violating decays to bracket")
             branchList[ib].append(vertexList)
@@ -507,28 +507,33 @@ def addTrees(treeA, treeB):
     return newTree
 
 
-def drawTree(tree, oddColor='lightcoral', evenColor='skyblue',
-             pvColor='darkgray', genericColor='lightgray',
-             nodeScale=4, labelAttr=None):
+def drawTree(tree, particleColor='lightcoral',
+             smColor='skyblue',
+             pvColor='darkgray',
+             nodeScale=4, labelAttr=None, attrUnit=None):
     """
     Draws Tree using matplotlib.
 
     :param tree: tree to be drawn
-    :param oddColor: color for Z2-odd particles
-    :param evenColor: color for Z2-even particles
-    :param genericColor: color for particles without a defined Z2-parity
+    :param particleColor: color for particle nodes
+    :param smColor: color used for particles which have the _isSM attribute set to True
     :param pvColor: color for primary vertex
     :param nodeScale: scale size for nodes
     :param labelAttr: attribute to be used as label. If None, will use the string representation
                       of the node object.
+    :param attrUnit: Unum object with the unit to be removed from label attribute (if applicable)
 
     """
     import matplotlib.pyplot as plt
 
     if labelAttr is None:
         labels = {n: str(n) for n in tree.nodes()}
+    elif attrUnit is not None:
+        labels = {n: str(getattr(n, labelAttr).asNumber(attrUnit)) if hasattr(n, labelAttr)
+                  else str(n) for n in tree.nodes()}
     else:
-        labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr) else str(n) for n in tree.nodes()}
+        labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
+                  else str(n) for n in tree.nodes()}
 
     for key in labels:
         if labels[key] == 'anyOdd':
@@ -539,8 +544,10 @@ def drawTree(tree, oddColor='lightcoral', evenColor='skyblue',
         node_size.append(nodeScale*100*len(labels[n]))
         if 'pv' == labels[n].lower():
             node_color.append(pvColor)
+        elif hasattr(n, '_isSM') and n._isSM:
+            node_color.append(smColor)
         else:
-            node_color.append(genericColor)
+            node_color.append(particleColor)
 
     # Compute position of nodes (in case the nodes have the same string representation, first
     # convert the nodes to integers for computing the position)
