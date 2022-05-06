@@ -272,7 +272,7 @@ class LikelihoodComputer:
         :param theta_hat: array with nuisance parameters
 
         """
-        # n_pred^i := mu s_i + b_i + theta_i 
+        # n_pred^i := mu s_i + b_i + theta_i
         # NLL = sum_i [ - n_obs^i * ln ( n_pred^i ) + n_pred^i ]
         # d NLL / d mu = sum_i [ - ( n_obs^i * s_ i ) / n_pred_i + s_i ]
 
@@ -500,12 +500,12 @@ class LikelihoodComputer:
             #raise Exception("ValueError %s, %s" % ( e, self.model.totalCovariance(self.nsig) ))
             # raise Exception("ValueError %s, %s" % ( e, self.model.V ))
 
-    def nll( self, theta ):
+    def nllOfNuisances( self, theta ):
         """ probability, for nuicance parameters theta,
         as a negative log likelihood. """
         return self.probMV(True,theta)
 
-    def nllprime( self, theta ):
+    def dNLLdTheta( self, theta ):
         """ the derivative of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood. """
         if self.model.isLinear():
@@ -622,17 +622,18 @@ class LikelihoodComputer:
                 self.ones = np.ones ( len (self.model.observed) )
             self.gammaln = special.gammaln(self.model.observed + 1)
             try:
-                ret_c = optimize.fmin_ncg ( self.nll, ini, fprime=self.nllprime,
-                                       fhess=self.nllHess, full_output=True, disp=0 )
+                ret_c = optimize.fmin_ncg ( self.nllOfNuisances, ini,
+                            fprime=self.dNLLdTheta, fhess=self.nllHess,
+                            full_output=True, disp=0 )
                 # then always continue with TNC
                 if type ( self.model.observed ) in [ int, float ]:
                     bounds = [ ( -10*self.model.observed, 10*self.model.observed ) ]
                 else:
                     bounds = [ ( -10*x, 10*x ) for x in self.model.observed ]
                 ini = ret_c
-                ret_c = optimize.fmin_tnc ( self.nll, ret_c[0], fprime=self.nllprime,
+                ret_c = optimize.fmin_tnc ( self.nllOfNuisances, ret_c[0], fprime=self.dNLLdTheta,
                                             disp=0, bounds=bounds )
-                # print ( "[findThetaHat] mu=%s bg=%s observed=%s V=%s, nsig=%s theta=%s, nll=%s" % ( self.nsig[0]/self.model.efficiencies[0], self.model.backgrounds, self.model.observed,self.model.covariance, self.nsig, ret_c[0], self.nll(ret_c[0]) ) )
+                # print ( "[findThetaHat] mu=%s bg=%s observed=%s V=%s, nsig=%s theta=%s, nll=%s" % ( self.nsig[0]/self.model.efficiencies[0], self.model.backgrounds, self.model.observed,self.model.covariance, self.nsig, ret_c[0], self.nllOfNuisances(ret_c[0]) ) )
                 if ret_c[-1] not in [ 0, 1, 2 ]:
                     return ret_c[0],ret_c[-1]
                 else:
