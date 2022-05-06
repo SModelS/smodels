@@ -283,8 +283,9 @@ class LikelihoodComputer:
             if d == 0.:
                 if (self.model.observed[ctr]*signal_rel[ctr]) == 0.:
                 #    logger.debug("zero denominator, but numerator also zero, so we set denom to 1.")
-                    n_pred[ctr]=1.
+                    n_pred[ctr]=1e-5
                 else:
+                    # n_pred[ctr]=1e-5
                     raise Exception("we have a zero value in the denominator at pos %d, with a non-zero numerator. dont know how to handle." % ctr)
         ret = - self.model.observed*signal_rel/n_pred + signal_rel
 
@@ -297,6 +298,29 @@ class LikelihoodComputer:
                 ret = { "muhat": default, "sigma_mu": default, "lmax": default }
                 return ret
             return default
+
+    def findAvgr ( self, mu, theta_hat, signal_rel ):
+        """ from the difference observed - background, find got inital
+            values for lower and upper """
+        mu_c = (self.model.observed - self.model.backgrounds - theta_hat)
+        mu_r, wmu_r = [], []
+        n_pred = mu*signal_rel  + self.model.backgrounds + theta_hat
+        obs = self.model.observed
+        for i,s in enumerate( n_pred ):
+            if s == 0.:
+                n_pred[i]=1e-6
+        hessian = self.model.observed*signal_rel**2 / n_pred**2
+        wtot = 0.
+        for s in zip ( mu_c, signal_rel, hessian ):
+            if s[1] > 1e-10:
+                w = 1.
+                if s[2]> 0.:
+                    w = s[2]
+                wtot += w
+                mu_r.append ( s[0] / s[1] )
+                wmu_r.append ( w * s[0] / s[1] )
+        ret = min(mu_r),sum(wmu_r)/wtot,max(mu_r)
+        return ret
 
     def findMuHat(self, signal_rel, allowNegativeSignals = False,
             extended_output = False, nll = False, marginalize = False ):
@@ -333,13 +357,13 @@ class LikelihoodComputer:
             theta_hat,_ = self.findThetaHat( mu_hat*signal_rel)
             ctr+=1
             mu_hat_old = mu_hat
-            mu_c = (self.model.observed - self.model.backgrounds - theta_hat) # /signal_rel
+            minr,avgr,maxr = self.findAvgr ( mu_hat, theta_hat, signal_rel )
             #for i,s in enumerate ( signal_rel ):
             #    if abs(s) < 1e-19:
             #        mu_c[i]=0.
             ## find mu_hat by finding the root of 1/L dL/dmu. We know
             ## that the zero has to be between min(mu_c) and max(mu_c).
-            lstarters = [ min(mu_c), 0., -1., 1., 10., -.1, .1, -100., 100., -1000. ]
+            lstarters = [ avgr - .1*abs(avgr), minr, 0., -1., 1., 10., -.1, .1, -100., 100., -1000. ]
             closestl, closestr = None, float("inf")
             for lower in lstarters:
                 lower_v = self.dNLLdMu(lower, signal_rel, theta_hat)
@@ -350,7 +374,7 @@ class LikelihoodComputer:
             if lower_v > 0.:
                 logger.debug ( f"did not find a lower value with rootfinder(lower) < 0. Closest: f({closestl})={closestr}" )
                 return self.extendedOutput ( extended_output, 0. )
-            ustarters = [ max(mu_c), 0., 1., 10., -1. -.1, .1, 100., -100., 1000., -1000., .01, -.01 ]
+            ustarters = [ avgr + .1*abs(avgr), maxr, 0., 1., 10., -1. -.1, .1, 100., -100., 1000., -1000., .01, -.01 ]
             closestl, closestr = None, float("inf")
             for upper in ustarters:
                 upper_v = self.dNLLdMu(upper, signal_rel, theta_hat)
@@ -367,11 +391,10 @@ class LikelihoodComputer:
                 theta_hat,_ = self.findThetaHat( mu_hat*signal_rel)
             if self.debug_mode:
                 self.theta_hat = theta_hat
-            ctr+=1
 
-#print ( f">> found mu_hat {mu_hat:.2g} for signal {sum(signal_rel):.2f} allowNeg {allowNegativeSignals} l,u={lower},{upper}" )
-#print ( f">>>> obs {self.model.observed[:2]} bg {self.model.backgrounds[:2]}" )
-#print ( f">>>> mu_c {np.mean(mu_c)}" )
+        # print ( f">> found mu_hat {mu_hat:.2g} for signal {sum(signal_rel):.2f} allowNeg {allowNegativeSignals} l,u={lower},{upper} lastavgr={avgr}" )
+        #print ( f">>>> obs {self.model.observed[:2]} bg {self.model.backgrounds[:2]}" )
+        #print ( f">>>> mu_c {np.mean(mu_c)}" )
         if extended_output:
             sigma_mu = self.getSigmaMu( mu_hat, signal_rel, theta_hat )
             llhd = self.likelihood( self.model.signals(mu_hat),
