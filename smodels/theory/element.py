@@ -10,7 +10,7 @@ from smodels.theory.graphTools import stringToTree, getCanonName, treeToString, 
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.particle import Particle
-from networkx import DiGraph, bfs_successors
+from networkx import DiGraph, bfs_successors, is_tree
 
 
 class Element(object):
@@ -61,6 +61,10 @@ class Element(object):
             else:
                 raise SModelSError("Can not create element from input type %s" % type(info))
 
+        # Check graph consistency:
+        if self.tree.number_of_nodes():
+            if not is_tree(self.tree):
+                raise SModelSError("Elemented created with malformed graph (not  a tree).")
         self.setCanonName()
         self.sort()
 
@@ -264,11 +268,8 @@ class Element(object):
         :returns: list of ParticleNode objects
         """
 
-        finalStates = []
-        for node in self.tree.nodes():
-            if not list(self.tree.successors(node)):
-                finalStates.append(node)
-
+        tree = self.tree
+        finalStates = [n for n in tree.nodes() if tree.out_degree(n) == 0]
         return finalStates
 
     def _getAncestorsDict(self, igen=0):
@@ -433,62 +434,48 @@ class Element(object):
 
         newelement = self.copy()
         newelement.motherElements = [self]
-        checkCompression = True
-        # Check for compression until tree can no longer be compressed
-        previousName = self.getCanonName()
 
-        while checkCompression:
-            tree = newelement.tree
-            root = getTreeRoot(tree)
-            # Loop over nodes:
-            for mom, daughters in bfs_successors(tree, root):
-                if mom == root:  # Skip primary vertex
-                    continue
-                if not mom.particle.isPrompt():  # Skip long-lived
-                    continue
-                bsmDaughter = []
-                smDaughters = []
-                for d in daughters:
-                    # Split daughters into final states SM and others (BSM)
-                    if hasattr(d, '_isSM') and d._isSM and not list(tree.successors(d)):
-                        smDaughters.append(d)
-                    else:
-                        bsmDaughter.append(d)
+        tree = newelement.tree
+        root = getTreeRoot(tree)
+        # Loop over nodes from root to leaves:
+        for mom, daughters in bfs_successors(tree, root):
+            if mom == root:  # Skip primary vertex
+                continue
+            if not mom.particle.isPrompt():  # Skip long-lived
+                continue
+            bsmDaughter = []
+            smDaughters = []
+            for d in daughters:
+                # Split daughters into final states SM and others (BSM)
+                if hasattr(d, '_isSM') and d._isSM and not list(tree.successors(d)):
+                    smDaughters.append(d)
+                else:
+                    bsmDaughter.append(d)
 
-                # Skip decays to multiple BSM particles or to SM particles only
-                if len(bsmDaughter) != 1:
-                    continue
-                bsmDaughter = bsmDaughter[0]
+            # Skip decays to multiple BSM particles or to SM particles only
+            if len(bsmDaughter) != 1:
+                continue
+            bsmDaughter = bsmDaughter[0]
 
-                # Check mass difference:
-                massDiff = mom.mass - bsmDaughter.mass
-                if massDiff > minmassgap:
-                    continue
+            # Check mass difference:
+            massDiff = mom.mass - bsmDaughter.mass
+            if massDiff > minmassgap:
+                continue
 
-                # Get grandmother:
-                gMom = list(tree.predecessors(mom))
-                if len(gMom) != 1:
-                    raise SModelSError('Found multiple parents for %s when compressing element. Something went wrong.' % mom)
+            # Get grandmother:
+            gMom = list(tree.predecessors(mom))
+            if len(gMom) != 1:
+                raise SModelSError('Found multiple parents for %s when compressing element. Something went wrong.' % mom)
 
-                gMom = gMom[0]
-                # Remove mother and all SM daughters and mom:
-                tree.remove_nodes_from(smDaughters+[mom])
+            gMom = gMom[0]
+            # Remove mother and all SM daughters and mom:
+            tree.remove_nodes_from(smDaughters+[mom])
 
-                # Attach BSM daughter to grandmother:
-                tree.add_edge(gMom, bsmDaughter)
+            # Attach BSM daughter to grandmother:
+            tree.add_edge(gMom, bsmDaughter)
 
-                # For safety break loop since tree structure changed
-                break
-
-            # Recompute the canonical name and
-            newelement.setCanonName()
-            # If iteration has not changed element, break loop
-            name = newelement.getCanonName()
-            if name == previousName:
-                checkCompression = False
-            else:
-                checkCompression = True
-                previousName = name
+        # Recompute the canonical name and
+        newelement.setCanonName()
         newelement.sort()
 
         # If element was not compressed, return None
@@ -507,11 +494,11 @@ class Element(object):
 
         newelement = self.copy()
         newelement.motherElements = [self]
-        checkCompression = True
+        keepCompressing = True
         # Check for compression until tree can no longer be compressed
         previousName = self.getCanonName()
 
-        while checkCompression:
+        while keepCompressing:
             tree = newelement.tree
             root = getTreeRoot(tree)
             # Loop over nodes:
@@ -547,9 +534,9 @@ class Element(object):
             # If iteration has not changed element, break loop
             name = newelement.getCanonName()
             if name == previousName:
-                checkCompression = False
+                keepCompressing = False
             else:
-                checkCompression = True
+                keepCompressing = True
                 previousName = name
         newelement.sort()
 

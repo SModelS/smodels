@@ -24,6 +24,7 @@ class ParticleNode(object):
         self.particle = particle
         self.node = nodeNumber
         self.canonName = None
+        self.nodeWeight = None
 
     def __hash__(self):
         return self.node
@@ -257,6 +258,10 @@ def stringToTree(stringElement, model=None, finalState=None, intermediateState=N
             else:
                 continue  # Stable particles will have their nodes defined later
             nodesDict[ptc] = n
+
+    # Make sure particles have unique nodes:
+    if len(set(list(nodesDict.values()))) != len(list(nodesDict.values())):
+        raise SModelSError("Input string has non unique nodes: %s" % nodesDict)
 
     # Find maximum node defined so far:
     maxNode = max([n for n in nodesDict.values() if n is not None])
