@@ -18,6 +18,11 @@ class ParticleNode(object):
     It is necessary because the same particle can appear multiple times within a tree, so
     Particle objects can not be directly used as nodes
     (since the same particle can not appear as distinct nodes)
+
+    :ivar particle: Stores the Particle object
+    :ivar nodeNumber: Node identifier
+    :ivar nodeWeight: Stores the node weight
+                      (1 for stable particles, BR for unstable and production xsec for primary vertex)
     """
 
     _lastNodeNumber = 0
@@ -33,8 +38,11 @@ class ParticleNode(object):
             ParticleNode._lastNodeNumber += 1
         else:
             self.node = nodeNumber
+        ParticleNode._lastNodeNumber = max(self.node, ParticleNode._lastNodeNumber)
         self.canonName = None
-        self.nodeWeight = None
+        # Node weight:
+        # (1 for stable particles, BR for unstable and production xsec for primary vertex)
+        self.nodeWeight = 1.0
 
     def __hash__(self):
         return self.node
@@ -81,15 +89,17 @@ class ParticleNode(object):
     def __add__(self, other):
         """
         Adds two nodes. The properties of self are kept, except
-        for the particle, which is combined with the particle from other.
+        for the particle and nodeWeight, which are added with other.
 
         :param other: ParticleNode object
 
         :return: a copy of self with the particle combined with other.particle
+                 and nodeWeight added.
         """
 
         newNode = self.copy()
         newNode.particle = self.particle + other.particle
+        newNode.nodeWeight = self.nodeWeight + other.nodeWeight
 
         return newNode
 
@@ -103,6 +113,7 @@ class ParticleNode(object):
         newNode = ParticleNode(particle=self.particle,
                                nodeNumber=self.node)
         newNode.canonName = self.canonName
+        newNode.nodeWeight = self.nodeWeight
 
         return newNode
 
@@ -131,18 +142,6 @@ class ParticleNode(object):
 
     def eqParticle(self, other):
         return self.particle == other.particle
-
-
-class DecayTree(nx.DiGraph):
-    """
-    Simple wrapper for storing the particle decay channel as a tree (DiGraph object).
-    The root is the mother and its daughters the decay products.
-    It also stores the branching ratio for the decay
-    """
-
-    def __init__(self, incoming_graph_data=None, br=None):
-        nx.DiGraph.__init__(self, incoming_graph_data)
-        self.br = br  # Branching ratio
 
 
 def compareNodes(treeA, treeB, nodeA, nodeB):
@@ -512,21 +511,24 @@ def getTreeRoot(T):
 
 def getTreeWeight(tree):
     """
-    Computes the tree weight (production cross-section*BRs). If can not be computed,
-    return None.
+    Computes the tree weight (production cross-section*BRs). If it can not be computed,
+    return None. Does not include the weight of final state (undecayed) particles.
 
     :param: tree (DiGraph object)
 
     :return: tree weight (Unum object) if available, None otherwise.
     """
 
-    pv = getTreeRoot(tree)
-    if not hasattr(pv, 'nodeWeight') or pv.nodeWeight is None:
-        return None
+    weight = 1.0
+    for n in tree.nodes():
+        # Skip final state (stable) particles
+        if tree.out_degree(n) == 0:
+            continue
+        if not hasattr(n, 'nodeWeight') or n.nodeWeight is None:
+            return None
+        weight *= n.nodeWeight
 
-    prodXsec = pv.nodeWeight
-    brTot = 1
-    for node in tree.nodes():
+    return weight
 
 
 def sortTree(tree):
@@ -573,10 +575,12 @@ def getDecayTrees(mother):
     Generates a simple list of trees with all the decay channels
     for the mother. In each tree the mother appears as the root
     and each of its decays as daughters.
+    The  mother node weight is set to the respective decay branching ratio.
     (The node numbering for the root/mother node is kept equal,
     while the numbering of the daughters is automatically assigned to
     avoid overlap with any previously created nodes, so the
     decay tree can be directly merged to any other tree.)
+
 
     :param mother: Mother for which the decay trees will be generated (ParticleNode object)
 
@@ -596,7 +600,7 @@ def getDecayTrees(mother):
             ptcNode = ParticleNode(particle=ptc)
             daughters.append(ptcNode)
 
-        decayTrees.append(DecayTree({mother: daughters}, br=decay.br))
+        decayTrees.append(nx.DiGraph({mom: daughters}))
 
     return decayTrees
 
@@ -637,7 +641,9 @@ def addOneStepDecays(tree, sigmacut=None):
         # Add all decay channels to all the trees
         newTrees = []
         for T, decay in itertools.product(treeList, decayTrees):
-            newTree = nx.compose(T, decay)
+            # The order below matters,
+            # since we want to keep the mother from the decay tree (which holds the BR value)
+            newTree = nx.compose(decay, T)
             if sigmacut is not None:
                 treeWeight = getTreeWeight(newTree)
                 if treeWeight is not None:
