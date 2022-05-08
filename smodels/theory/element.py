@@ -6,7 +6,7 @@
 
 """
 
-from smodels.theory.graphTools import stringToTree, getCanonName, treeToString, compareNodes, drawTree, getTreeRoot, sortTree, addTrees
+from smodels.theory.graphTools import stringToTree, getCanonName, treeToString, compareNodes, drawTree, getTreeRoot, sortTree, addTrees, getFinalStates
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.particle import Particle
@@ -269,8 +269,7 @@ class Element(object):
         :returns: list of ParticleNode objects
         """
 
-        tree = self.tree
-        finalStates = [n for n in tree.nodes() if tree.out_degree(n) == 0]
+        finalStates = getFinalStates(self.tree)
         return finalStates
 
     def _getAncestorsDict(self, igen=0):

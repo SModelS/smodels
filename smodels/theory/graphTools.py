@@ -44,6 +44,9 @@ class ParticleNode(object):
         # (1 for stable particles, BR for unstable and production xsec for primary vertex)
         self.nodeWeight = 1.0
 
+        # Flag to tag nodes which should not be decayed
+        self.finalState = False
+
     def __hash__(self):
         return self.node
 
@@ -142,6 +145,13 @@ class ParticleNode(object):
 
     def eqParticle(self, other):
         return self.particle == other.particle
+
+    def isFinalState(self):
+        """
+        Checks if the node should be considered as a final state
+        (should not be decayed). Returns True if .finalState has been
+        defined and set to True
+        """
 
 
 def compareNodes(treeA, treeB, nodeA, nodeB):
@@ -491,6 +501,17 @@ def getMaxNode(tree):
     return maxNode
 
 
+def getFinalStates(tree):
+    """
+    Get the list of particles which have not decayed (appear at the top of the tree)
+
+    :returns: list of ParticleNode objects
+    """
+
+    finalStates = [n for n in tree.nodes() if tree.out_degree(n) == 0]
+    return finalStates
+
+
 def getTreeRoot(T):
     """
     Get the root node (primary vertex) of a tree T.
@@ -584,14 +605,19 @@ def getDecayTrees(mother):
 
     :param mother: Mother for which the decay trees will be generated (ParticleNode object)
 
-    :return: List of simple trees representing the decay channels of daughter
+    :return: List of simple trees representing the decay channels of daughter sorted in reverse
+             order according to the BR (largest BR first)
     """
 
     decayTrees = []
 
+    # Sort decays:
+    decays = [decay for decay in mother.decays if decay is not None]
+    decays = sorted(decays, key=lambda dec: dec.br, reverse=True)
+
     # Loop over decays of the daughter
-    for decay in mother.particle.decays:
-        if decay is None or not decay.br:
+    for decay in decays:
+        if not decay.br:
             continue  # Skip decays with zero BRs
         daughters = []
         mom = mother.copy()
@@ -625,31 +651,41 @@ def addOneStepDecays(tree, sigmacut=None):
     # of the decays to be added:
     mothers = [n for n in tree.nodes() if tree.out_degree(n) == 0]
     for mom in mothers:
-        if mom.isStable():
+        # Check if mom should decay:
+        if mom.finalState:
+            continue
+        if mom.particle.isStable():
+            mom.finalState = True
             continue  # Skip if particle is stable
         # Skip if particle has no decays
         if not hasattr(mom, 'decays'):
+            mom.finalState = True
             continue
         if not mom.decays:
+            mom.finalState = True
             continue
 
         # Get all decay trees for final state:
         decayTrees = getDecayTrees(mom)
         if not decayTrees:
+            mom.finalState = True
             continue
 
         # Add all decay channels to all the trees
         newTrees = []
-        for T, decay in itertools.product(treeList, decayTrees):
-            # The order below matters,
-            # since we want to keep the mother from the decay tree (which holds the BR value)
-            newTree = nx.compose(decay, T)
-            if sigmacut is not None:
-                treeWeight = getTreeWeight(newTree)
-                if treeWeight is not None:
-                    if treeWeight < sigmacut:
-                        continue
-            newTrees.append(newTree)
+        for T in treeList:
+            for decay in decayTrees:
+                # The order below matters,
+                # since we want to keep the mother from the decay tree (which holds the BR value)
+                newTree = nx.compose(decay, T)
+                if sigmacut is not None:
+                    treeWeight = getTreeWeight(newTree)
+                    if treeWeight is not None and treeWeight < sigmacut:
+                        # Do not consider this decay or the next ones,
+                        # since they are sorted accodring to BR and the subsequent
+                        # decays will only contain smaller weights
+                        break
+                newTrees.append(newTree)
 
         if not newTrees:
             continue
@@ -681,6 +717,11 @@ def cascadeDecay(tree, sigmacut=None):
         for T in treeList:
             newT = addOneStepDecays(T, sigmacut)
             if not newT:
+                finalStates = getFinalStates(T)
+                # Make sure all the final states have decayed
+                # (newT can be empty if there is no allowed decay above sigmacut)
+                if any(fs.finalState is False for fs in finalStates):
+                    continue
                 finalTrees.append(T)  # It was not possible to add any new decay to the tree
             else:
                 newTrees += newT  # Add decayed trees to the next iteration
