@@ -612,7 +612,16 @@ def getDecayTrees(mother):
     decayTrees = []
 
     # Sort decays:
-    decays = [decay for decay in mother.decays if decay is not None]
+    decays = []
+    for decay in mother.decays:
+        if decay is not None:
+            decays.append(decay)
+        else:
+            # Include possibility of mother appearing as a final state
+            mom = mother.copy()
+            mom.finalState = True  # Forbids further node decays
+            decayTrees.append(nx.DiGraph({mom: []}))
+
     decays = sorted(decays, key=lambda dec: dec.br, reverse=True)
 
     # Loop over decays of the daughter
