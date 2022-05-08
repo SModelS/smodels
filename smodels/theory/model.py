@@ -314,18 +314,13 @@ class Model(object):
                 if missingIDs:
                     logger.info("Particle(s) %s is not defined within model. Decay %s will be ignored" % (missingIDs, decay))
                     continue
-                oddPids = [pid for pid in decay.ids if abs(pid) in oddPDGs]
-                evenPids = [pid for pid in decay.ids if abs(pid) in evenPDGs]
-                if len(oddPids) != 1 or len(evenPids+oddPids) != len(decay.ids):
-                    logger.debug("Decay %i -> %s is not of the form Z2-odd -> Z2-odd + [Z2-even particles] and will be ignored" % (pdg, pids))
-                    continue
 
-                #Conjugated decays if needed
-                #(if pid*chargeConj is not in model, assume the particle is its own anti-particle)
+                # Conjugated decays if needed
+                # (if pid*chargeConj is not in model, assume the particle is its own anti-particle)
                 decayIDs = [pid*chargeConj if pid*chargeConj in allPDGs else pid for pid in decay.ids]
                 newDecay = pyslha.Decay(br=decay.br, nda=decay.nda, parentid=decay.parentid, ids=decayIDs)
 
-                #Convert PDGs to particle objects:
+                # Convert PDGs to particle objects:
                 daughters = []
                 for pdg in newDecay.ids:
                     daughter = self.getParticlesWith(pdg=pdg)
@@ -336,13 +331,10 @@ class Model(object):
                     else:
                         daughter = daughter[0]
                     daughters.append(daughter)
-                oddParticles = [p for p in daughters if p.Z2parity == -1]
-                evenParticles = ParticleList([p for p in daughters if p.Z2parity == 1])
-                newDecay.oddParticles = oddParticles
-                newDecay.evenParticles = evenParticles
+                newDecay.daughters = daughters
                 particle.decays.append(newDecay)
 
-        #Check if all unstable particles have decay channels defined:
+        # Check if all unstable particles have decay channels defined:
         for p in self.BSMparticles:
             if p.totalwidth < stableWidth:
                 continue
@@ -380,20 +372,20 @@ class Model(object):
         massDict, decaysDict, xsections = self.getModelDataFrom(self.inputFile)
         self.xsections = xsections
 
-        #Restric BSM particles to the overlap between allBSMparticles and massDict:
+        # Restric BSM particles to the overlap between allBSMparticles and massDict:
         self.BSMparticles = []
         for particle in self.allBSMparticles:
-            if not particle.pdg in massDict and not -particle.pdg in massDict:
+            if particle.pdg not in massDict and -particle.pdg not in massDict:
                 continue
             self.BSMparticles.append(particle)
         if len(self.BSMparticles) == len(self.allBSMparticles):
             logger.info("Loaded %i BSM particles" % (len(self.BSMparticles)))
         else:
             logger.info("Loaded %i BSM particles (%i particles not found in %s)"
-                      % (len(self.BSMparticles), len(self.allBSMparticles)-len(self.BSMparticles),
-                      self.inputFile))
+                        % (len(self.BSMparticles), len(self.allBSMparticles)-len(self.BSMparticles),
+                           self.inputFile))
 
-        #Remove cross-sections for even particles:
+        # Remove cross-sections for even particles:
         nXsecs = self.filterCrossSections()
         if nXsecs == 0:
             msg = "No cross-sections found in %s for the Z2 odd BSM particles. " % self.inputFile
@@ -401,19 +393,19 @@ class Model(object):
             logger.error(msg)
             raise SModelSError(msg)
 
-        #Set particl masses:
+        # Set particle masses:
         self.setMasses(massDict, roundMasses)
 
-        #Set particle decays
+        # Set particle decays
         self.setDecays(decaysDict, promptWidth, stableWidth, erasePrompt)
 
-        #Reset particle equality from all particles:
+        # Reset particle equality from all particles:
         for p in Particle.getinstances():
             p._comp = {p._id: 0}
             if isinstance(p, MultiParticle):
                 for ptc in p.particles:
                     p._comp[ptc._id] = 0
 
-        #Reset particle equality from all particle lists:
+        # Reset particle equality from all particle lists:
         for pL in ParticleList.getinstances():
             pL._comp = {pL._id: 0}

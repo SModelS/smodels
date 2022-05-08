@@ -20,9 +20,19 @@ class ParticleNode(object):
     (since the same particle can not appear as distinct nodes)
     """
 
-    def __init__(self, particle, nodeNumber):
+    _lastNodeNumber = 0
+
+    def __init__(self, particle, nodeNumber=None):
         self.particle = particle
-        self.node = nodeNumber
+
+        # Since ParticleNodes are identified by their numbering,
+        # if it is not specifically assigned, automatically assign
+        # a new number which does not overlap with any previous class instances
+        if nodeNumber is None:
+            self.node = ParticleNode._lastNodeNumber+1
+            ParticleNode._lastNodeNumber += 1
+        else:
+            self.node = nodeNumber
         self.canonName = None
         self.nodeWeight = None
 
@@ -121,6 +131,18 @@ class ParticleNode(object):
 
     def eqParticle(self, other):
         return self.particle == other.particle
+
+
+class DecayTree(nx.DiGraph):
+    """
+    Simple wrapper for storing the particle decay channel as a tree (DiGraph object).
+    The root is the mother and its daughters the decay products.
+    It also stores the branching ratio for the decay
+    """
+
+    def __init__(self, incoming_graph_data=None, br=None):
+        nx.DiGraph.__init__(self, incoming_graph_data)
+        self.br = br  # Branching ratio
 
 
 def compareNodes(treeA, treeB, nodeA, nodeB):
@@ -455,6 +477,21 @@ def getCanonName(T, node=None):
     return node.canonName
 
 
+def getMaxNode(tree):
+    """
+    Returns the maximum node number (ParticleNode.node) in the nodes from the tree.
+    It can be relevant when adding new ParticleNodes, since nodes with same number will
+    be considered equal within the tree and would not be added.
+
+    :param tree: Tree (DiGraph object)
+
+    :return: Maximum node number (int)
+    """
+
+    maxNode = max([n.node for n in tree.nodes()])
+    return maxNode
+
+
 def getTreeRoot(T):
     """
     Get the root node (primary vertex) of a tree T.
@@ -471,6 +508,25 @@ def getTreeRoot(T):
         raise SModelSError("Malformed Tree, %i root(s) have been found." % len(root))
 
     return root[0]
+
+
+def getTreeWeight(tree):
+    """
+    Computes the tree weight (production cross-section*BRs). If can not be computed,
+    return None.
+
+    :param: tree (DiGraph object)
+
+    :return: tree weight (Unum object) if available, None otherwise.
+    """
+
+    pv = getTreeRoot(tree)
+    if not hasattr(pv, 'nodeWeight') or pv.nodeWeight is None:
+        return None
+
+    prodXsec = pv.nodeWeight
+    brTot = 1
+    for node in tree.nodes():
 
 
 def sortTree(tree):
@@ -510,6 +566,124 @@ def addTrees(treeA, treeB):
     newTree = nx.relabel_nodes(treeA, nodesDict, copy=True)
 
     return newTree
+
+
+def getDecayTrees(mother):
+    """
+    Generates a simple list of trees with all the decay channels
+    for the mother. In each tree the mother appears as the root
+    and each of its decays as daughters.
+    (The node numbering for the root/mother node is kept equal,
+    while the numbering of the daughters is automatically assigned to
+    avoid overlap with any previously created nodes, so the
+    decay tree can be directly merged to any other tree.)
+
+    :param mother: Mother for which the decay trees will be generated (ParticleNode object)
+
+    :return: List of simple trees representing the decay channels of daughter
+    """
+
+    decayTrees = []
+
+    # Loop over decays of the daughter
+    for decay in mother.particle.decays:
+        if decay is None or not decay.br:
+            continue  # Skip decays with zero BRs
+        daughters = []
+        mom = mother.copy()
+        mom.nodeWeight = decay.br
+        for ptc in decay.daughters:
+            ptcNode = ParticleNode(particle=ptc)
+            daughters.append(ptcNode)
+
+        decayTrees.append(DecayTree({mother: daughters}, br=decay.br))
+
+    return decayTrees
+
+
+def addOneStepDecays(tree, sigmacut=None):
+    """
+    Given a tree, generates a list of new trees (DiGraph objects),
+    where all the (unstable) nodes appearing at the end of the original tree
+    have been decayed. Each entry in the list corresponds to a different combination
+    of decays. If no decays were possible, return an empty list.
+
+    :param tree: Tree (DiGraph object) for which to add the decays
+    :param sigmacut: Cut on the tree weight (xsec*BR). Any tree with weights
+                     smaller than sigmacut will be ignored.
+
+
+    :return: List of trees with all possible 1-step decays added.
+    """
+
+    treeList = [tree]
+    # Get all (current) final states which are the mothers
+    # of the decays to be added:
+    mothers = [n for n in tree.nodes() if tree.out_degree(n) == 0]
+    for mom in mothers:
+        if mom.isStable():
+            continue  # Skip if particle is stable
+        # Skip if particle has no decays
+        if not hasattr(mom, 'decays'):
+            continue
+        if not mom.decays:
+            continue
+
+        # Get all decay trees for final state:
+        decayTrees = getDecayTrees(mom)
+        if not decayTrees:
+            continue
+
+        # Add all decay channels to all the trees
+        newTrees = []
+        for T, decay in itertools.product(treeList, decayTrees):
+            newTree = nx.compose(T, decay)
+            if sigmacut is not None:
+                treeWeight = getTreeWeight(newTree)
+                if treeWeight is not None:
+                    if treeWeight < sigmacut:
+                        continue
+            newTrees.append(newTree)
+
+        if not newTrees:
+            continue
+        treeList = newTrees
+
+    if len(treeList) == 1 and treeList[0] == tree:
+        return []
+    else:
+        return treeList
+
+
+def cascadeDecay(tree, sigmacut=None):
+    """
+    Given a tree, generates a list of new trees (DiGraph objects),
+    where all the particles have cascade decayed to stable final states.
+
+    :param tree: Tree (DiGraph object) for which to add the decays
+    :param sigmacut: Cut on the tree weight (xsec*BR). Any tree with weights
+                     smaller than sigmacut will be ignored.
+
+    :return: List of trees with all possible decays added.
+    """
+
+    treeList = [tree]
+    newTrees = True
+    finalTrees = []
+    while newTrees:
+        newTrees = []
+        for T in treeList:
+            newT = addOneStepDecays(T, sigmacut)
+            if not newT:
+                finalTrees.append(T)  # It was not possible to add any new decay to the tree
+            else:
+                newTrees += newT  # Add decayed trees to the next iteration
+
+        if not newTrees:  # It was not possible to add any new decay
+            break
+        treeList = newTrees[:]
+
+    return finalTrees
 
 
 def drawTree(tree, particleColor='lightcoral',

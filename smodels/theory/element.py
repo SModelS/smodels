@@ -10,7 +10,7 @@ from smodels.theory.graphTools import stringToTree, getCanonName, treeToString, 
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.particle import Particle
-from networkx import DiGraph, bfs_successors, is_tree
+from networkx import DiGraph, bfs_successors, is_arborescence
 
 
 class Element(object):
@@ -61,9 +61,10 @@ class Element(object):
             else:
                 raise SModelSError("Can not create element from input type %s" % type(info))
 
-        # Check graph consistency:
+        # Check graph consistency
+        # (must be a rooted tree with each node having a single parent):
         if self.tree.number_of_nodes():
-            if not is_tree(self.tree):
+            if not is_arborescence(self.tree):
                 raise SModelSError("Elemented created with malformed graph (not  a tree).")
         self.setCanonName()
         self.sort()
