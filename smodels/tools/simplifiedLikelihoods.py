@@ -414,7 +414,7 @@ class LikelihoodComputer:
         Get an estimate for the standard deviation of mu at <mu>, from
         the inverse hessian
 
-        :param nsig: array with signal yields or relative signal strengths 
+        :param nsig: array with signal yields or relative signal strengths
                      in each dataset (signal region)
         """
         if not self.model.isLinear():
@@ -824,6 +824,30 @@ class LikelihoodComputer:
         self.muhat = muhat_
         self.sigma_mu = sigma_mu
         return self.likelihood(muhat*nsig, marginalize=marginalize, nll=nll )
+
+    def findMuHatViaGradient(self, signal_rel, allowNegativeSignals = False,
+            extended_output = False, nll = False, marginalize = False ):
+        """ currently not used but finding muhat via gradient descent """
+        def myllhd ( mu ):
+            return self.likelihood ( mu * signal_rel, nll = True,                                                          marginalize = marginalize )
+        import scipy.optimize
+        bounds = None
+        if not allowNegativeSignals:
+            bounds = [ (0, 1000.) ]
+        o = scipy.optimize.minimize ( myllhd, 0., bounds=bounds )
+        llhd = o.fun
+        if not nll:
+            llhd = np.exp ( - o.fun )
+        hess = o.hess_inv
+        try:
+            hess = hess.todense()
+        except Exception as e:
+            pass                              
+        mu_hat = float ( o.x[0] )
+        if extended_output:
+            sigma_mu = float ( np.sqrt ( hess[0][0] ) )
+            return mu_hat, sigma_mu, llhd
+        return mu_hat
 
     def chi2(self, nsig, marginalize=False):
             """
