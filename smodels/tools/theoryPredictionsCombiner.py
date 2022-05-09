@@ -285,6 +285,8 @@ class TheoryPredictionsCombiner(object):
         self.cachedObjs[expected]["llhd"] = llhd
         self.cachedObjs[expected]["lsm"] = lsm
         if expected:
+            if not "lmax" in self.cachedObjs[expected]:
+                self.cachedObjs[expected]["lmax"]={}
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lsm
         else:
             fmh = self.findMuHat(expected=False, extended_output=True)
