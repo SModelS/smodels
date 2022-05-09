@@ -20,24 +20,26 @@ import numpy as np
 import math
 import copy
 
-def getLogger():
-    """
-    Configure the logging facility. Maybe adapted to fit into
-    your framework.
-    """
+try:
+    from smodels.tools.smodelsLogging import logger
+except ModuleNotFoundError:
+    def getLogger():
+        """
+        Configure the logging facility. Maybe adapted to fit into
+        your framework.
+        """
 
-    import logging
+        import logging
 
-    logger = logging.getLogger("SL")
-    formatter = logging.Formatter('%(module)s - %(levelname)s: %(message)s')
-    ch = logging.StreamHandler()
-    ch.setFormatter(formatter)
-    ch.setLevel(logging.DEBUG)
-    logger.addHandler(ch)
-    return logger
+        logger = logging.getLogger("SL")
+        formatter = logging.Formatter('%(module)s - %(levelname)s: %(message)s')
+        ch = logging.StreamHandler()
+        ch.setFormatter(formatter)
+        # ch.setLevel(logging.DEBUG)
+        logger.addHandler(ch)
+        return logger
 
-logger=getLogger()
-
+    logger=getLogger()
 
 class Data:
     """ A very simple observed container to collect all the data
@@ -273,7 +275,7 @@ class LikelihoodComputer:
 
         """
         if not self.model.isLinear():
-            logger.error ( "implemented only for linear model" )
+            logger.debug ( "implemented only for linear model" )
         # n_pred^i := mu s_i + b_i + theta_i
         # NLL = sum_i [ - n_obs^i * ln ( n_pred^i ) + n_pred^i ]
         # d NLL / d mu = sum_i [ - ( n_obs^i * s_ i ) / n_pred_i + s_i ]
@@ -324,13 +326,13 @@ class LikelihoodComputer:
         ret = min(mu_r),sum(wmu_r)/wtot,max(mu_r)
         return ret
 
-    def findMuHat(self, signal_rel, allowNegativeSignals = False,
+    def findMuHat(self, nsig, allowNegativeSignals = False,
             extended_output = False, nll = False, marginalize = False ):
         """
         Find the most likely signal strength mu
         given the relative signal strengths in each dataset (signal region).
 
-        :param signal_rel: array with relative signal strengths
+        :param nsig: array with relative signal strengths or signal yields
         :param allowNegativeSignals: if true, then also allow for negative values
         :param extended_output: if true, return also sigma_mu, the estimate of the error of mu_hat, and lmax, the likelihood at mu_hat
         :param nll: if true, return nll instead of lmax in the extended output
@@ -340,26 +342,27 @@ class LikelihoodComputer:
         if (self.model.backgrounds == self.model.observed).all():
             return self.extendedOutput ( extended_output, 0. )
 
-        if type(signal_rel) in [list, ndarray]:
-            signal_rel = array(signal_rel)
+        if type(nsig) in [list, ndarray]:
+            nsig = array(nsig)
 
-        signal_rel[signal_rel==0.] = 1e-20
-        if sum(signal_rel<0.):
+        nsig[nsig==0.] = 1e-20
+        if sum(nsig<0.):
             raise Exception("Negative relative signal strengths!")
 
         ## we need a very rough initial guess for mu(hat), to come
         ## up with a first theta
-        self.nsig = array([0.]*len(self.model.observed))
+        # self.nsig = array([0.]*len(self.model.observed))
+        self.nsig = nsig
         ## we start with theta_hat being all zeroes
         # theta_hat = array([0.]*len(self.model.observed))
         mu_hat_old, mu_hat = 0., 1.
         ctr=0
         widener=3.
         while abs(mu_hat - mu_hat_old)>1e-10 and abs(mu_hat - mu_hat_old )/(mu_hat+mu_hat_old) > .5e-2 and ctr < 20:
-            theta_hat,_ = self.findThetaHat( mu_hat*signal_rel)
+            theta_hat,_ = self.findThetaHat( mu_hat*nsig )
             ctr+=1
             mu_hat_old = mu_hat
-            minr,avgr,maxr = self.findAvgr ( mu_hat, theta_hat, signal_rel )
+            minr,avgr,maxr = self.findAvgr ( mu_hat, theta_hat, nsig )
             #for i,s in enumerate ( signal_rel ):
             #    if abs(s) < 1e-19:
             #        mu_c[i]=0.
@@ -368,7 +371,7 @@ class LikelihoodComputer:
             lstarters = [ avgr - .2*abs(avgr), minr, 0., -1., 1., 10., -.1, .1, -100., 100., -1000. ]
             closestl, closestr = None, float("inf")
             for lower in lstarters:
-                lower_v = self.dNLLdMu(lower, signal_rel, theta_hat)
+                lower_v = self.dNLLdMu(lower, nsig, theta_hat)
                 if lower_v < 0.:
                     break
                 if lower_v < closestr:
@@ -379,7 +382,7 @@ class LikelihoodComputer:
             ustarters = [ avgr + .2*abs(avgr), maxr, 0., 1., 10., -1. -.1, .1, 100., -100., 1000., -1000., .01, -.01 ]
             closestl, closestr = None, float("inf")
             for upper in ustarters:
-                upper_v = self.dNLLdMu(upper, signal_rel, theta_hat)
+                upper_v = self.dNLLdMu(upper, nsig, theta_hat)
                 if upper_v > 0.:
                     break
                 if upper_v < closestr:
@@ -387,10 +390,10 @@ class LikelihoodComputer:
             if upper_v < 0.:
                 logger.debug ( "did not find an upper value with rootfinder(upper) > 0." )
                 return self.extendedOutput ( extended_output, 0. )
-            mu_hat = optimize.brentq ( self.dNLLdMu, lower, upper, args=(signal_rel, theta_hat ), rtol=1e-9 )
+            mu_hat = optimize.brentq ( self.dNLLdMu, lower, upper, args=(nsig, theta_hat ), rtol=1e-9 )
             if not allowNegativeSignals and mu_hat < 0.:
                 mu_hat = 0.
-                theta_hat,_ = self.findThetaHat( mu_hat*signal_rel)
+                theta_hat,_ = self.findThetaHat( mu_hat*nsig)
             if self.debug_mode:
                 self.theta_hat = theta_hat
 
@@ -398,7 +401,7 @@ class LikelihoodComputer:
         #print ( f">>>> obs {self.model.observed[:2]} bg {self.model.backgrounds[:2]}" )
         #print ( f">>>> mu_c {np.mean(mu_c)}" )
         if extended_output:
-            sigma_mu = self.getSigmaMu( mu_hat, signal_rel, theta_hat )
+            sigma_mu = self.getSigmaMu( mu_hat, nsig, theta_hat )
             llhd = self.likelihood( self.model.signals(mu_hat),
                                      marginalize=marginalize,
                                      nll=nll )
@@ -406,29 +409,29 @@ class LikelihoodComputer:
             return ret
         return mu_hat
 
-    def getSigmaMu(self, mu, signal_rel, theta_hat ):
+    def getSigmaMu(self, mu, nsig, theta_hat ):
         """
         Get an estimate for the standard deviation of mu at <mu>, from
         the inverse hessian
 
-        :param signal_rel: array with relative signal strengths in each dataset
-                           (signal region)
+        :param nsig: array with signal yields or relative signal strengths 
+                     in each dataset (signal region)
         """
         if not self.model.isLinear():
-            logger.error ( "implemented only for linear model" )
+            logger.debug ( "implemented only for linear model" )
         # d^2 mu NLL / d mu^2 = sum_i [ n_obs^i * s_i**2 / n_pred^i**2 ]
 
         #Define relative signal strengths:
-        n_pred = mu*signal_rel  + self.model.backgrounds + theta_hat
+        n_pred = mu*nsig  + self.model.backgrounds + theta_hat
 
         for ctr,d in enumerate(n_pred):
             if d == 0.:
-                if (self.model.observed[ctr]*signal_rel[ctr]) == 0.:
+                if (self.model.observed[ctr]*nsig[ctr]) == 0.:
                 #    logger.debug("zero denominator, but numerator also zero, so we set denom to 1.")
                     n_pred[ctr]=1.
                 else:
                     raise Exception("we have a zero value in the denominator at pos %d, with a non-zero numerator. dont know how to handle." % ctr)
-        hessian = self.model.observed*signal_rel**2/n_pred**2
+        hessian = self.model.observed*nsig**2/n_pred**2
 
         if type(hessian) in [ array, ndarray, list ]:
             hessian = sum(hessian)
@@ -436,12 +439,12 @@ class LikelihoodComputer:
         if hessian == 0.:
             # if all observations are zero, we replace them by the expectations
             if sum(self.model.observed)==0:
-                hessian = sum(signal_rel**2/n_pred)
+                hessian = sum(nsig**2/n_pred)
         stderr = float ( np.sqrt ( 1. / hessian ) )
         return stderr
         """
-        if type(signal_rel) in [ list, ndarray ]:
-            s_effs = sum(signal_rel)
+        if type(nsig) in [ list, ndarray ]:
+            s_effs = sum(nsig)
 
         sgm_mu = float(sqrt(sum(self.model.observed) + sum(np.diag(self.model.covariance)))/s_effs)
 
