@@ -57,7 +57,8 @@ class Data:
                            The default is 20%.
         :param lumi: luminosity of dataset in 1/fb, or None
         """
-        self.observed = np.around(self.convert(observed)) #Make sure observed number of events are integers
+        self.observed = self.convert(observed) #Make sure observed number of events are integers
+        ## self.observed = np.around(self.convert(observed)) #Make sure observed number of events are integers
         self.backgrounds = self.convert(backgrounds)
         self.n = len(self.observed)
         self.covariance = self._convertCov(covariance)
