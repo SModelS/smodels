@@ -27,7 +27,7 @@ class ParticleNode(object):
 
     _lastNodeNumber = 0
 
-    def __init__(self, particle, nodeNumber=None):
+    def __init__(self, particle, nodeNumber=None, nodeWeight=1.0):
         self.particle = particle
 
         # Since ParticleNodes are identified by their numbering,
@@ -42,7 +42,7 @@ class ParticleNode(object):
         self.canonName = None
         # Node weight:
         # (1 for stable particles, BR for unstable and production xsec for primary vertex)
-        self.nodeWeight = 1.0
+        self.nodeWeight = nodeWeight
 
         # Flag to tag nodes which should not be decayed
         self.finalState = False

@@ -14,8 +14,9 @@ import pyslha
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
-## orders in perturbation theory
-LO,NLO,NLL = range(3)
+# Orders in perturbation theory
+LO, NLO, NLL = range(3)
+
 
 class XSectionInfo(object):
     """
@@ -25,7 +26,8 @@ class XSectionInfo(object):
     mass, order and label).
 
     """
-    def __init__(self, sqrts = None, order = None, label = None ):
+
+    def __init__(self, sqrts=None, order=None, label=None):
         """
         Constructor.
         :param: sqrts  center of mass energy, with unit
@@ -36,7 +38,6 @@ class XSectionInfo(object):
         self.order = order
         self.label = label
 
-
     def __eq__(self, other):
         if type(other) != type(self):
             return False
@@ -46,20 +47,20 @@ class XSectionInfo(object):
             return False
         return True
 
-    def __hash__( self ):
-        ## for now lets just make it a string
+    def __hash__(self):
+        # for now lets just make it a string
         order = self.order
-        if order == None:
-            order=9
+        if order is None:
+            order = 9
         return int(self.sqrts.asNumber(GeV)) + order
 
     def __str__(self):
         if not self.order:
             return str(self.sqrts)
-        return "%s (%s)" % ( self.sqrts, self.order )
+        return "%s (%s)" % (self.sqrts, self.order)
 
     def __ne__(self, other):
-        if type(other) != type(XSectionInfo()):
+        if not isinstance(other, XSectionInfo):
             return True
         if other.sqrts != self.sqrts:
             return True
@@ -67,13 +68,12 @@ class XSectionInfo(object):
             return True
         return False
 
-
     def copy(self):
         """
         Generate an independent copy of self.
 
         Faster than deepcopy.
-        
+
         """
         newinfo = XSectionInfo()
         newinfo.sqrts = self.sqrts
@@ -92,6 +92,7 @@ class XSection(object):
     order = 0 (LO), 1 (NLO) or 2 (NLL).
 
     """
+
     def __init__(self):
         """
         Initializes the object to store a cross section value.
@@ -106,11 +107,11 @@ class XSection(object):
         return self._pid
 
     @pid.setter
-    def pid(self,pn):
+    def pid(self, pn):
         if None in pn:
             self._pid = pn
             return
-        self._pid = tuple ( sorted (pn) )
+        self._pid = tuple(sorted(pn))
 
     def __mul__(self, other):
         """
@@ -119,14 +120,13 @@ class XSection(object):
         """
 
         newXsec = self.copy()
-        if isinstance(other,float) or isinstance(other,int):
+        if isinstance(other, float) or isinstance(other, int):
             newXsec.value = newXsec.value * float(other)
         else:
-            print (other,type(other))
+            print(other, type(other))
             logger.error("Xsections can only be multiplied by floats")
             raise SModelSError()
         return newXsec
-
 
     def __rmul__(self, other):
         """
@@ -134,13 +134,12 @@ class XSection(object):
         """
         return self * other
 
-
     def __add__(self, other):
         """
         Returns a copy of self with the value of other added to its value.
         """
 
-        if type(other) == type(XSection()):
+        if isinstance(other, XSection):
             if self.info == other.info:
                 res = self.copy()
                 res.value += other.value
@@ -148,14 +147,13 @@ class XSection(object):
         logger.error("Trying to add " + type(other) + " to a XSection object")
         raise SModelSError()
 
-
     def __eq__(self, other):
         """
         Compare two XSection objects. Returns True if .info and type and value and
         pid are equal.
         """
 
-        if type(other) != type(XSection()):
+        if not isinstance(other, XSection):
             return False
         if other.info != self.info:
             return False
@@ -165,29 +163,57 @@ class XSection(object):
             return False
         return True
 
-
     def __ne__(self, other):
         """
         Compare two XSection objects. Returns True if .info or type or value or
         pid is not equal.
         """
 
-        if type(other) != type(XSection()):
-            return True
-        if other.info != self.info:
-            return True
-        if other.value != self.value:
-            return True
-        if other.pid != self.pid:
-            return True
-        return False
+        return not self.__eq__(other)
 
+    def __cmp__(self, other):
+        """
+        Compares the cross-section value to the value of another XSection object,
+        float or Unum object (irrespective of the info attribute).
+        """
+
+        valA = self.value
+        if isinstance(other, XSection):
+            valB = other.value
+        elif type(other) == type(pb):
+            valB = other
+        elif isinstance(other, (int, float)):
+            valB = other
+            valA = valA.asNumber()
+        else:
+            raise SModelSError("Can not compare %s and %s" % (self, other))
+
+        if valA == valB:
+            return 0
+        elif valA > valB:
+            return 1
+        else:
+            return -1
+
+    def __lt__(self, other):
+        """
+        Checks if the cross-section value of self is smaller than of other.
+        """
+
+        return self.__cmp__(other) == -1
+
+    def __gt__(self, other):
+        """
+        Checks if the cross-section value of self is smaller than of other.
+        """
+
+        return self.__cmp__(other) == 1
 
     def __str__(self):
         """
         Generate cross section information in string format.
         """
-        st = self.info.label + ':' + str(self.value)+ " " + str(self.pid)
+        st = self.info.label + ':' + str(self.value) + " " + str(self.pid)
         return st
 
     def niceStr(self):
@@ -211,7 +237,6 @@ class XSection(object):
         newXsec.pid = tuple(list(self.pid)[:])
         return newXsec
 
-
     def _zeroXSec(self):
         """
         Replace the cross section value by zero.
@@ -228,6 +253,7 @@ class XSectionList(object):
     The list is sorted by cross section, highest cross section first.
 
     """
+
     def __init__(self, infoList=None):
         """
         If infoList is defined, create entries with zero cross sections
@@ -250,34 +276,28 @@ class XSectionList(object):
             newList[ixsec] = xsec * other
         return newList
 
-
     def __rmul__(self, other):
         return self * other
 
-
-    def __add__(self,other):
+    def __add__(self, other):
         newList = self.copy()
         if type(other) != type(self):
             logger.warning("Trying to add a XSectionList and a "+str(type(other)))
             return self
 
         newList.combineWith(other)
-        return  newList
-
+        return newList
 
     def __iter__(self):
         return iter(self.xSections)
 
-
     def __getitem__(self, index):
-        if len(self)<=index:
-            txt = "Index in XSectionList out of bounds: idx(%d)>=length(%d). " \
-                   "(Are there cross sections given in the input?)" % \
-                   ( index, len(self) )
-            logger.error ( txt )
-            raise SModelSError ( txt )
+        if len(self) <= index:
+            txt = "Index in XSectionList out of bounds: idx(%d)>=length(%d). " % (index, len(self))
+            txt += "(Are there cross sections given in the input?)"
+            logger.error(txt)
+            raise SModelSError(txt)
         return self.xSections[index]
-
 
     def __setitem__(self, index, xsec):
         if type(xsec) != type(XSection()):
@@ -286,10 +306,49 @@ class XSectionList(object):
         else:
             self.xSections[index] = xsec
 
-
     def __len__(self):
         return len(self.xSections)
 
+    def __cmp__(self, other):
+        """
+        Compares the cross-section value to the value of another XSectionList object,
+        XSection object, float or Unum object (irrespective of the info attribute).
+        For XSectionList uses the largest cross-section in the list.
+        """
+
+        valA = self.getMaxXsec()
+        if isinstance(other, XSectionList):
+            valB = other.getMaxXsec()
+        elif isinstance(other, XSection):
+            valB = other.value
+        elif type(other) == type(pb):
+            valB = other
+        elif isinstance(other, (int, float)):
+            valB = other
+            valA = valA.asNumber()
+        else:
+            raise SModelSError("Can not compare %s and %s" % (self, other))
+
+        if valA == valB:
+            return 0
+        elif valA > valB:
+            return 1
+        else:
+            return -1
+
+    def __lt__(self, other):
+        """
+        Checks if the cross-section value of self is smaller than of other.
+        """
+
+        return self.__cmp__(other) == -1
+
+    def __gt__(self, other):
+        """
+        Checks if the cross-section value of self is smaller than of other.
+        """
+
+        return self.__cmp__(other) == 1
 
     def __str__(self):
         return str([str(xsec) for xsec in self])
@@ -300,7 +359,6 @@ class XSectionList(object):
             st += xsec.niceStr()+'\n'
         return st
 
-
     def copy(self):
         """
         Generates an independent copy of itself. Faster than deepcopy.
@@ -310,7 +368,6 @@ class XSectionList(object):
         for xsec in self.xSections:
             newList.xSections.append(xsec.copy())
         return newList
-
 
     def add(self, newxsec):
         """
@@ -337,13 +394,11 @@ class XSectionList(object):
         else:
             exists = False
             for iXSec, xSec in enumerate(self.xSections):
-                if xSec.info == newxsec.info \
-                        and sorted(xSec.pid) == sorted(newxsec.pid):
+                if xSec.info == newxsec.info and sorted(xSec.pid) == sorted(newxsec.pid):
                     self.xSections[iXSec].value = xSec.value + newxsec.value
                     break
             if not exists:
                 self.add(newxsec)
-
 
     def getXsecsFor(self, item):
         """
@@ -354,15 +409,13 @@ class XSectionList(object):
         for xsec in self:
             if type(item) == type(xsec.info.label) and item == xsec.info.label:
                 xsecList.add(xsec)
-            elif type(item) == type(xsec.info.sqrts) \
-                    and item == xsec.info.sqrts:
+            elif type(item) == type(xsec.info.sqrts) and item == xsec.info.sqrts:
                 xsecList.add(xsec)
             elif type(item) == type(xsec.pid) and item == xsec.pid:
                 xsecList.add(xsec)
             elif type(item) == type(1) and (item in xsec.pid):
                 xsecList.add(xsec)
         return xsecList
-
 
     def _zeroXSecs(self):
         """
@@ -372,7 +425,6 @@ class XSectionList(object):
         for xsec in self:
             xsec.value = 0. * pb
 
-
     def delete(self, xSec):
         """
         Delete the cross section entry from the list.
@@ -381,7 +433,6 @@ class XSectionList(object):
         for ixsec, xsec in enumerate(self):
             if xsec == xSec:
                 self.xSections.pop(ixsec)
-
 
     def getInfo(self):
         """
@@ -398,7 +449,6 @@ class XSectionList(object):
                 allInfo.append(info)
         return allInfo
 
-
     def _getLabels(self):
         """
         Get all labels appearing in the list.
@@ -410,7 +460,6 @@ class XSectionList(object):
             allLabels.append(info.label)
         return list(set(allLabels))
 
-
     def getPIDpairs(self):
         """
         Get all particle ID pairs appearing in the list.
@@ -421,7 +470,6 @@ class XSectionList(object):
             allPidPairs.append(xsec.pid)
         return list(set(allPidPairs))
 
-
     def getPIDs(self):
         """
         Get all particle IDs appearing in the list.
@@ -431,7 +479,6 @@ class XSectionList(object):
         for xsec in self:
             allPids.extend(xsec.pid)
         return sorted(list(set(allPids)))
-
 
     def getMaxXsec(self):
         """
@@ -451,12 +498,12 @@ class XSectionList(object):
         """
         if len(self) > 0:
             minxsec = self.xSections[0].value
-        else: return False
+        else:
+            return False
         for xsec in self:
             if xsec.value < minxsec:
                 minxsec = xsec.value
         return minxsec
-
 
     def getDictionary(self, groupBy="pids"):
         """
@@ -487,7 +534,6 @@ class XSectionList(object):
 
         return xSecDictionary
 
-
     def combineWith(self, newXsecs):
         """
         Add a new list of cross sections.
@@ -510,7 +556,6 @@ class XSectionList(object):
                         oldXsec.value = oldXsec.value + newXsec.value
                         if newXsec.pid != oldXsec.pid:
                             oldXsec.pid = (None, None)
-
 
     def removeLowerOrder(self):
         """
@@ -546,26 +591,17 @@ class XSectionList(object):
 
         if len(self) != len(newList):
             logger.debug("Ignoring %i lower order cross sections",
-                           (len(self) - len(newList)))
+                         (len(self) - len(newList)))
         self.xSections = newList.xSections
 
-    def order(self):
-        """
-        Order the cross section in the list by their PDG pairs
-        """
-
-        self.xSections = sorted(self.xSections, key=lambda xsec: xsec.pid)
-
-    def __lt__(self, other):
-        return self.xSections[0].pid < other.xSections[0].pid
-
-
-    def sort ( self ):
+    def sort(self):
         """ sort the xsecs by the values """
         self.xSections = sorted(self.xSections,
-                key=lambda xsec: xsec.value.asNumber(pb ), reverse=True )
+                                key=lambda xsec: xsec.value.asNumber(pb),
+                                reverse=True)
 
-def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
+
+def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
     """
     Obtain cross sections for pair production of R-odd particles from input SLHA file.
     The default unit for cross section is pb.
@@ -579,12 +615,12 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
     """
     # Store information about all cross sections in the SLHA file
     xSecsInFile = XSectionList()
-    f=pyslha.readSLHAFile(slhafile)
+    f = pyslha.readSLHAFile(slhafile)
     for production in f.xsections:
-        process = f.xsections.get ( production )
+        process = f.xsections.get(production)
         for pxsec in process.xsecs:
             csOrder = pxsec.qcd_order
-            wlabel = str( int ( pxsec.sqrts / 1000) ) + ' TeV'
+            wlabel = str(int(pxsec.sqrts / 1000)) + ' TeV'
             if csOrder == 0:
                 wlabel += ' (LO)'
             elif csOrder == 1:
@@ -592,7 +628,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
             elif csOrder == 2:
                 wlabel += ' (NLL)'
             else:
-                logger.error ( "Unknown QCD order %d" % csOrder )
+                logger.error("Unknown QCD order %d" % csOrder)
                 raise SModelSError()
             xsec = XSection()
             xsec.info.sqrts = pxsec.sqrts/1000. * TeV
@@ -603,7 +639,8 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit = pb):
             # Do not add xsecs which do not match the user required ones:
             if (useXSecs and not xsec.info in useXSecs):
                 continue
-            else: xSecsInFile.add(xsec)
+            else:
+                xSecsInFile.add(xsec)
 
     return xSecsInFile
 
@@ -621,16 +658,16 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     # Store information about all cross sections in the LHE file
     xSecsInFile = XSectionList()
     reader = lheReader.LheReader(lhefile)
-    if not type ( reader.metainfo["totalxsec"] ) == type ( pb) :
+    if not type(reader.metainfo["totalxsec"]) == type(pb):
         logger.error("cross section information not found in LHE file.")
         raise SModelSError()
     elif not reader.metainfo["nevents"]:
-        logger.error("Total number of events information not found in LHE " +
-                     "file.")
+        logger.error("Total number of events information not found in LHE "
+                     + "file.")
         raise SModelSError()
-    elif not type ( reader.metainfo["sqrts"] ) == type ( TeV ):
-        logger.error("Center-of-mass energy information not found in LHE " +
-                     "file.")
+    elif not type(reader.metainfo["sqrts"]) == type(TeV):
+        logger.error("Center-of-mass energy information not found in LHE "
+                     + "file.")
         raise SModelSError()
 
     # Common cross section info
@@ -638,7 +675,6 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     nevts = reader.metainfo["nevents"]
     sqrtS = reader.metainfo["sqrts"]
     eventCs = totxsec / float(nevts)
-
 
     # Get all mom pids
     allpids = []
@@ -654,7 +690,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
         else:
             # Assume LO xsecs, if not defined in the reader
             xsec.info.order = 0
-        wlabel = str( sqrtS / TeV ) + ' TeV'
+        wlabel = str(sqrtS / TeV) + ' TeV'
         if xsec.info.order == LO:
             wlabel += ' (LO)'
         elif xsec.info.order == NLO:
