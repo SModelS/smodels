@@ -356,7 +356,7 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori
             expected
         """
-        mumin,mumax = -10., 20.
+        mumin,mumax = -20., 40.
         if mu>mumax:
             if countWarning["llhdszero"]<1:
                 logger.warning ( f"likelihoods of signal strengths mu= {mu:.1f} > {mumax} are automatically set to 0 (will suppress similar msgs)" )
@@ -515,10 +515,10 @@ class PyhfUpperLimitComputer:
         n = len ( obss )
         sigma_mu = float ( np.sqrt ( var_mu / n ) )
         self.sigma_mu = sigma_mu
+        logger.error ( f"sigma_mu {sigma_mu} {var[:3]} "  )
         #import IPython
         #IPython.embed()
         #sys.exit()
-        #logger.error ( f"obs {obs} "  )
 
     def lmax( self, workspace_index=None, nll=False,
               expected=False, allowNegativeSignals = False ):
