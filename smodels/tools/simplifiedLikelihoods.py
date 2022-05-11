@@ -122,7 +122,7 @@ class Data:
         Determine if obj is a scalar (float or int)
         """
 
-        if type(obj) == ndarray:
+        if isinstance(obj, ndarray):
             ## need to treat separately since casting array([0.]) to float works
             return False
         try:
@@ -152,9 +152,9 @@ class Data:
 
         if self.isScalar(obj):
             return array ( [ [ obj ] ] )
-        if type(obj[0]) == list:
+        if isinstance(obj[0], list):
             return array ( obj )
-        if type(obj[0]) == float:
+        if isinstance(obj[0], float):
             ## if the matrix is flattened, unflatten it.
             return array([ obj[self.n*i:self.n*(i+1)] for i in range(self.n)])
 
@@ -914,25 +914,24 @@ class UpperLimitComputer:
                 expected=expected, trylasttime=trylasttime )
         if ul == None:
             return ul
-        if type ( model.lumi ) == type(None ):
+        if  model.lumi is None:
             logger.error ( f"asked for upper limit on fiducial xsec, but no lumi given with the data" )
             return ul
         return ul/model.lumi
 
-    def ulOnYields( self, model, marginalize=False, toys=None, expected=False,
-             trylasttime = False ):
-        """ upper limit on signal yields obtained from the defined
-            Data (using the signal prediction
-            for each signal regio/dataset), by using
-            the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
-
-        :params marginalize: if true, marginalize nuisances, else profile them
-        :params toys: specify number of toys. Use default is none
-        :params expected: if false, compute observed,
+    def _ul_preprocess(
+        self, model, marginalize=False, toys=None, expected=False, trylasttime = False
+    ):
+        """
+        Process the upper limit calculator
+        :param model: statistical model
+        :param marginalize: if true, marginalize nuisances, else profile them
+        :param toys: specify number of toys. Use default is none
+        :param expected: if false, compute observed,
                           true: compute a priori expected, "posteriori":
                           compute a posteriori expected
-        :params trylasttime: if True, then dont try extra
-        :returns: upper limit on yields
+        :param trylasttime: if True, then dont try extra
+        :return: mu_hat, sigma_mu, root_func
         """
         #if expected:
         #    marginalize = True
@@ -956,14 +955,15 @@ class UpperLimitComputer:
                     d+=theta_hat_[i]
                 model.observed[i]=float(d)
         computer = LikelihoodComputer(model, toys)
-        mu_hat = computer.findMuHat(model.signal_rel, allowNegativeSignals = False,
-                                    extended_output = False )
+        mu_hat = computer.findMuHat(
+                model.signal_rel, allowNegativeSignals = False, extended_output = False
+        )
         theta_hat0,_ = computer.findThetaHat(0*model.signal_rel)
         sigma_mu = computer.getSigmaMu( mu_hat, model.signal_rel, theta_hat0 )
 
-        nll0 = computer.likelihood(model.signals(mu_hat),
-                                     marginalize=marginalize,
-                                     nll=True)
+        nll0 = computer.likelihood(
+                model.signals(mu_hat), marginalize=marginalize, nll=True
+        )
         # print ( f"SL nll0 {nll0:.3f} muhat {mu_hat:.3f} sigma_mu {sigma_mu:.3f}" )
         if np.isinf(nll0) and marginalize==False and not trylasttime:
             logger.warning("nll is infinite in profiling! we switch to marginalization, but only for this one!" )
@@ -983,9 +983,9 @@ class UpperLimitComputer:
         compA = LikelihoodComputer(aModel, toys)
         ## compute
         mu_hatA = compA.findMuHat(aModel.signal_rel)
-        nll0A = compA.likelihood(aModel.signals(mu_hatA),
-                                   marginalize=marginalize,
-                                   nll=True)
+        nll0A = compA.likelihood(
+            aModel.signals(mu_hatA),  marginalize=marginalize, nll=True
+        )
         # print ( f"SL nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f} bg {aModel.backgrounds[0]:.3f} obs {aModel.observed[0]:.3f}" )
         #return 1.
 
@@ -997,9 +997,52 @@ class UpperLimitComputer:
             nllA = compA.likelihood(nsig, marginalize=marginalize, nll=True )
             return rootFromNLLs ( nllA, nll0A, nll, nll0 )
 
+        return mu_hat, sigma_mu, root_func
+
+
+    def ulOnYields( self, model, marginalize=False, toys=None, expected=False,
+             trylasttime = False ):
+        """ upper limit on signal yields obtained from the defined
+            Data (using the signal prediction
+            for each signal regio/dataset), by using
+            the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
+
+        :params marginalize: if true, marginalize nuisances, else profile them
+        :params toys: specify number of toys. Use default is none
+        :params expected: if false, compute observed,
+                          true: compute a priori expected, "posteriori":
+                          compute a posteriori expected
+        :params trylasttime: if True, then dont try extra
+        :returns: upper limit on yields
+        """
+        mu_hat, sigma_mu, root_func = self._ul_preprocess(
+            model, marginalize, toys, expected, trylasttime
+        )
         a, b = determineBrentBracket ( mu_hat, sigma_mu, root_func )
         mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim
+
+    def computeCLs(
+        self, model, marginalize=False, toys=None, expected=False, trylasttime=False
+    ):
+        """
+        Compute the confidence level of the model
+        :param model: statistical model
+        :param marginalize: if true, marginalize nuisances, else profile them
+        :param toys: specify number of toys. Use default is none
+        :param expected: if false, compute observed,
+                          true: compute a priori expected, "posteriori":
+                          compute a posteriori expected
+        :param trylasttime: if True, then dont try extra
+        :return: 1 - CLs value
+        """
+        _, _, root_func = self._ul_preprocess(
+                model, marginalize, toys, expected, trylasttime
+        )
+
+        # 1-(CLs+alpha) -> alpha = 0.05
+        return 0.95 - root_func(1.)
+
 
 if __name__ == "__main__":
     C = [ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
@@ -1023,7 +1066,20 @@ if __name__ == "__main__":
     #print ( "uls=", uls )
     ul_old = 131.828*sum(nsignal) #With respect to the older refernece value one must normalize the xsec
     print ( "old ul=", ul_old )
-    ul = ulComp.ulOnYields ( m )
+    ul = ulComp.ulOnYields ( m, marginalize=True)
+    cls = ulComp.computeCLs(m, marginalize=True)
     print ( "ul (marginalized)", ul )
+    print("CLs (marginalized)", cls)
     ul = ulComp.ulOnYields ( m, marginalize=False )
+    cls = ulComp.computeCLs(m, marginalize = False)
     print ( "ul (profiled)", ul )
+    print("CLs (profiled)", cls)
+
+    """
+    results:
+    old ul= 180.999844
+    ul (marginalized) 180.84672924414696
+    CLs (marginalized) 0.0
+    ul (profiled) 180.68039063387553
+    CLs (profiled) 0.75
+    """
