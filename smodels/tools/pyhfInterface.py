@@ -61,6 +61,7 @@ from scipy import optimize
 import numpy as np
 from smodels.tools.smodelsLogging import logger
 import logging
+import math
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 
 def getLogger():
@@ -202,6 +203,7 @@ class PyhfUpperLimitComputer:
         self.workspaces_expected = self.wsMaker(apriori = True)
         self.cl = cl
         self.scale = 1.
+        self.sigma_mu = None
         self.alreadyBeenThere = False # boolean to detect wether self.signals has returned to an older value
         self.checkPyhfVersion()
         self.welcome()
@@ -476,6 +478,48 @@ class PyhfUpperLimitComputer:
             return np.exp(-twice_nll/2.)
         return twice_nll / 2.
 
+    def getSigmaMu ( self, workspace ):
+        """ given a workspace, compute a rough estimate of sigma_mu,
+            the uncertainty of mu_hat """
+        obss, bgs, bgVars, nsig = {}, {}, {}, {}
+        channels = workspace.channels
+        for chdata in workspace["channels"]:
+            if not chdata["name"] in channels:
+                continue
+            bg = 0.
+            var = 0.
+            for sample in chdata["samples"]:
+                if sample["name"]=="Bkg":
+                    tbg = sample["data"][0]
+                    bg += tbg
+                    hi = sample["modifiers"][0]["data"]["hi_data"][0]
+                    lo = sample["modifiers"][0]["data"]["lo_data"][0]
+                    delta = max ( (hi-bg, bg-lo ) )
+                    var += delta**2
+                if sample["name"]=="bsm":
+                    ns = sample["data"][0]
+                    nsig[ chdata["name"] ] = ns
+            bgs[ chdata["name"] ] = bg
+            bgVars[ chdata["name"] ] = var
+        for chdata in workspace["observations"]:
+            if not chdata["name"] in channels:
+                continue
+            obss[ chdata["name"] ] = chdata["data"][0]
+        vars = []
+        for c in channels:
+            # poissonian error
+            poiss = (obss[c]-bgs[c]) / nsig[c]
+            gauss = bgVars[c] / nsig[c]**2
+            vars.append ( poiss + gauss )
+        var_mu = np.sum ( var )
+        n = len ( obss )
+        sigma_mu = float ( np.sqrt ( var_mu / n ) )
+        self.sigma_mu = sigma_mu
+        #import IPython
+        #IPython.embed()
+        #sys.exit()
+        #logger.error ( f"obs {obs} "  )
+
     def lmax( self, workspace_index=None, nll=False,
               expected=False, allowNegativeSignals = False ):
         """
@@ -507,6 +551,8 @@ class PyhfUpperLimitComputer:
             # Same modifiers_settings as those used when running the 'pyhf cls' command line
             msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
             model = workspace.model(modifier_settings=msettings)
+            # obs = workspace.data(model)
+            self.getSigmaMu ( workspace )
             try:
                 bounds = model.config.suggested_bounds()
                 if allowNegativeSignals:
@@ -723,7 +769,7 @@ if __name__ == "__main__":
        -846.653, 116.779, 258.92, 203.967, 129.55, 74.7665, 40.9423, 21.7285,
        -442.531, 59.5958, 134.975, 106.926, 68.2075, 39.5247, 21.7285, 11.5732]
     nsignal = [ x/100. for x in [47,29.4,21.1,14.3,9.4,7.1,4.7,4.3] ]
-    m=Data( observed=[1964,877,354,182,82,36,15,11],
+    m=PyhfData( observed=[1964,877,354,182,82,36,15,11],
               backgrounds=[2006.4,836.4,350.,147.1,62.0,26.2,11.1,4.7],
               covariance= C,
 #              third_moment = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],

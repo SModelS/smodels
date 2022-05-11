@@ -236,6 +236,17 @@ class PyhfTest(unittest.TestCase):
         self.assertAlmostEqual ( ul, 70.44942596708917, 1 )
         # self.assertIsNone(ul)
 
+    def testLmax(self):
+        """
+	      Tests the computation of lmax
+        """
+        ws = [self.simpleJson([0.9], [10]), self.simpleJson([0.8], [9])]
+        data = PyhfData([[0.1], [0.2]], ws)
+        ulcomputer = PyhfUpperLimitComputer(data)
+        lmax = ulcomputer.lmax()
+        self.assertAlmostEqual ( lmax, 3.091935, 1 )
+        # self.assertIsNone(ul)
+
     def testFullPyhfModule1(self):
         """
         Computes the UL using the pyhfInterface module and checks if, outside of the module, this UL still gives a 95% CLs

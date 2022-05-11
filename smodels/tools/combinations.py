@@ -104,10 +104,10 @@ def computeCombinedStatistics(dataset, nsig, marginalize=False, deltas_rel=0.2,
         lmax = ulcomputer.lmax( workspace_index = index, expected=expected,
                allowNegativeSignals = allowNegativeSignals )
         muhat = float ( ulcomputer.muhat )
+        sigma_mu = ulcomputer.sigma_mu
         ulcomputer = _getPyhfComputer(dataset, [0.]*len(nsig), False)
         lsm = ulcomputer.likelihood( mu = 0., workspace_index = index,
                                      expected=expected )
-        sigma_mu = None
         return { "lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat,
                  "sigma_mu": sigma_mu }
     lbsm = combinedSimplifiedLikelihood(dataset, nsig, marginalize, deltas_rel,
