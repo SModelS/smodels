@@ -937,7 +937,7 @@ class UpperLimitComputer:
         #    marginalize = True
         if model.zeroSignal():
             """ only zeroes in efficiencies? cannot give a limit! """
-            return None
+            return None, None, None
         if toys==None:
             toys=self.toys
         oldmodel = model
@@ -1018,6 +1018,8 @@ class UpperLimitComputer:
         mu_hat, sigma_mu, root_func = self._ul_preprocess(
             model, marginalize, toys, expected, trylasttime
         )
+        if mu_hat == None:
+            return None
         a, b = determineBrentBracket ( mu_hat, sigma_mu, root_func )
         mu_lim = optimize.brentq ( root_func, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim

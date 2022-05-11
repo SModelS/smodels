@@ -511,11 +511,11 @@ class PyhfUpperLimitComputer:
             poiss = (obss[c]-bgs[c]) / nsig[c]
             gauss = bgVars[c] / nsig[c]**2
             vars.append ( poiss + gauss )
-        var_mu = np.sum ( var )
+        var_mu = np.sum ( vars )
         n = len ( obss )
-        sigma_mu = float ( np.sqrt ( var_mu / n ) )
+        sigma_mu = float ( np.sqrt ( var_mu / (n**2) ) )
         self.sigma_mu = sigma_mu
-        logger.error ( f"sigma_mu {sigma_mu} {var[:3]} "  )
+        # logger.error ( f"sigma_mu {sigma_mu} {vars[:3]} "  )
         #import IPython
         #IPython.embed()
         #sys.exit()
