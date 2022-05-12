@@ -16,66 +16,91 @@ from smodels.tools import runtime
 from smodels import particlesLoader
 from imp import reload
 
+
 def main():
     import argparse
+
     """ Set default input and output files """
     parameterFile = "%s/smodels/etc/parameters_default.ini" % installDirectory()
     outputDir = "./results/"
 
     """ Get the name of input SLHA file and parameter file """
-    ap = argparse.ArgumentParser( description=
-            "Run SModelS over SLHA/LHE input files." )
-    ap.add_argument('-f', '--filename',
-            help='name of SLHA or LHE input file or a directory path (required argument). '
-            'If a directory is given, loop over all files in the directory', required=True)
-    ap.add_argument('-p', '--parameterFile',
-            help='name of parameter file, where most options are defined (optional argument). If not set, use '
-            'all parameters from smodels/etc/parameters_default.ini',
-            default=parameterFile)
-    ap.add_argument('-o', '--outputDir',
-            help='name of output directory (optional argument). The default folder is: ' +
-            outputDir, default=outputDir)
-    ap.add_argument('-d', '--development', help='if set, SModelS will run in development mode and exit if any errors are found.',
-            action='store_true')
-    ap.add_argument('-t', '--force_txt', help='force loading the text database',
-            action='store_true')
-    ap.add_argument('-C', '--colors', help='colored output',
-            action='store_true')
-    ap.add_argument('-V', '--version', action='version', version = version() )
-    ap.add_argument('-c', '--run-crashreport',
-            help='parse crash report file and use its contents for a SModelS run. '
-                 "Supply the crash file simply via '--filename myfile.crash'",
-            action='store_true')
-    ap.add_argument('-v','--verbose', help='sets the verbosity level (debug, info, warning, error). Default value is info.',
-            default = "info", type = str )
-    ap.add_argument('-T', '--timeout',
-            help='define a limit on the running time (in secs).'
-                 'If not set, run without a time limit. If a directory is given as input, '
-                 'the timeout will be  applied for each individual file.',
-            default = 0, type = int)
-
+    ap = argparse.ArgumentParser(description="Run SModelS over SLHA/LHE input files.")
+    ap.add_argument(
+        "-f",
+        "--filename",
+        help="name of SLHA or LHE input file or a directory path (required argument). "
+        "If a directory is given, loop over all files in the directory",
+        required=True,
+    )
+    ap.add_argument(
+        "-p",
+        "--parameterFile",
+        help="name of parameter file, where most options are defined (optional argument). If not set, use "
+        "all parameters from smodels/etc/parameters_default.ini",
+        default=parameterFile,
+    )
+    ap.add_argument(
+        "-o",
+        "--outputDir",
+        help="name of output directory (optional argument). The default folder is: " + outputDir,
+        default=outputDir,
+    )
+    ap.add_argument(
+        "-d",
+        "--development",
+        help="if set, SModelS will run in development mode and exit if any errors are found.",
+        action="store_true",
+    )
+    ap.add_argument(
+        "-t", "--force_txt", help="force loading the text database", action="store_true"
+    )
+    ap.add_argument("-C", "--colors", help="colored output", action="store_true")
+    ap.add_argument("-V", "--version", action="version", version=version())
+    ap.add_argument(
+        "-c",
+        "--run-crashreport",
+        help="parse crash report file and use its contents for a SModelS run. "
+        "Supply the crash file simply via '--filename myfile.crash'",
+        action="store_true",
+    )
+    ap.add_argument(
+        "-v",
+        "--verbose",
+        help="sets the verbosity level (debug, info, warning, error). Default value is info.",
+        default="info",
+        type=str,
+    )
+    ap.add_argument(
+        "-T",
+        "--timeout",
+        help="define a limit on the running time (in secs)."
+        "If not set, run without a time limit. If a directory is given as input, "
+        "the timeout will be  applied for each individual file.",
+        default=0,
+        type=int,
+    )
 
     args = ap.parse_args()
     if args.colors:
         from smodels.tools.colors import colors
+
         colors.on = True
 
-
-    db=None
-    if args.force_txt: db=True
-    smodelsLogging.setLogLevel ( args.verbose )
+    db = None
+    if args.force_txt:
+        db = True
+    smodelsLogging.setLogLevel(args.verbose)
 
     if args.run_crashreport:
-        args.filename, args.parameterFile = crashReport.readCrashReportFile(
-                args.filename)
-        run(args.filename, args.parameterFile, args.outputDir,
-               db, args.timeout, development=True )
+        args.filename, args.parameterFile = crashReport.readCrashReportFile(args.filename)
+        run(args.filename, args.parameterFile, args.outputDir, db, args.timeout, development=True)
 
     else:
-        run(args.filename, args.parameterFile, args.outputDir,
-              db, args.timeout, args.development)
+        run(args.filename, args.parameterFile, args.outputDir, db, args.timeout, args.development)
 
-def run( inFile, parameterFile, outputDir, db, timeout, development ):
+
+def run(inFile, parameterFile, outputDir, db, timeout, development):
     """
     Provides a command line interface to basic SModelS functionalities.
 
@@ -98,8 +123,8 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     parser = modelTester.getParameters(parameterFile)
 
     """ Determine particles module from ini file, if necessary """
-    if parser.has_option("particles","model"):
-        runtime.modelFile = parser.get( "particles", "model" )
+    if parser.has_option("particles", "model"):
+        runtime.modelFile = parser.get("particles", "model")
         reload(particlesLoader)
 
     """ Check database location and load database, exit if not found """
@@ -109,14 +134,25 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     fileList, inDir = modelTester.getAllInputFiles(inFile)
 
     """ Create output directory if missing """
-    if not os.path.isdir(outputDir): os.mkdir(outputDir)
+    if not os.path.isdir(outputDir):
+        os.mkdir(outputDir)
 
     """ Load analysis database, print list """
     listOfExpRes = modelTester.loadDatabaseResults(parser, database)
 
     """ Test all input points """
-    modelTester.testPoints(fileList, inDir, outputDir, parser, databaseVersion,
-                 listOfExpRes, timeout, development, parameterFile )
+    modelTester.testPoints(
+        fileList,
+        inDir,
+        outputDir,
+        parser,
+        databaseVersion,
+        listOfExpRes,
+        timeout,
+        development,
+        parameterFile,
+    )
+
 
 if __name__ == "__main__":
     main()

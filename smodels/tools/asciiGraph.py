@@ -18,11 +18,10 @@ from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 
 
-
 def _printParticle(label):
     """
     Rename particles for the asciidraw routine.
-    
+
     """
     if label == "jet":
         label = "q"
@@ -33,9 +32,9 @@ def _printParticle(label):
 def _drawBranch(branch, upwards, htmlFormat, border, l):
     """
     Draw a single branch.
-    
+
     """
-    ret=""
+    ret = ""
     lines = ["   ", "----"]
     labels = "   "
     if border and upwards:
@@ -55,8 +54,9 @@ def _drawBranch(branch, upwards, htmlFormat, border, l):
             labels += " " + _printParticle(insertions[0].label) + "  "
             lines[0] += " |   "
         if len(insertions) == 2:
-            labels += _printParticle(insertions[0].label) + " " + \
-                    _printParticle(insertions[1].label)
+            labels += (
+                _printParticle(insertions[0].label) + " " + _printParticle(insertions[1].label)
+            )
             if upwards:
                 lines[0] += "\\ /  "
             else:
@@ -69,59 +69,58 @@ def _drawBranch(branch, upwards, htmlFormat, border, l):
     if not upwards:
         order = [1, 0]
     html = "<br>"
-    lengthdiff = int ( l - len(lines[0]) / 5 )
+    lengthdiff = int(l - len(lines[0]) / 5)
     if border:
         if l == 2:
             lines[0] += " "
             lines[1] += " "
             labels += " "
-        labels += " " + " "*(5 * lengthdiff) + " |"
-        lines[0] += " "*(5 * lengthdiff + 0) + "  |"
-        lines[1] += " "*(5 * lengthdiff + 0) + " |"
+        labels += " " + " " * (5 * lengthdiff) + " |"
+        lines[0] += " " * (5 * lengthdiff + 0) + "  |"
+        lines[1] += " " * (5 * lengthdiff + 0) + " |"
     if border and upwards:
-        ret+=" /" + "-"*(4 * l + 4) + "\\\n"
+        ret += " /" + "-" * (4 * l + 4) + "\\\n"
     if htmlFormat:
-        ret+=html+"\n"
+        ret += html + "\n"
     if upwards and labels:
-        ret+=labels+"\n"
+        ret += labels + "\n"
     if htmlFormat:
-        ret+=html+"\n"
+        ret += html + "\n"
     for i in order:
-        ret+=lines[i]+"\n"
+        ret += lines[i] + "\n"
     if htmlFormat:
-        ret+=html+"\n"
+        ret += html + "\n"
     if not upwards and labels:
-        ret+=labels+"\n"
+        ret += labels + "\n"
     if htmlFormat:
-        ret+=html+"\n"
+        ret += html + "\n"
     if border and not upwards:
-        ret+=" \\" + "-"*(4 * l + 4) + "/\n"
+        ret += " \\" + "-" * (4 * l + 4) + "/\n"
     return ret
 
 
 def asciidraw(element, labels=True, html=False, border=False):
     """
     Draw a simple ASCII graph on the screen.
-    
+
     """
-    ret=""
+    ret = ""
     l = []
     for (ct, branch) in enumerate(element.branches):
         l.append(int(str(branch).count("[")))
     for (ct, branch) in enumerate(element.branches):
-        ret+=_drawBranch(branch, upwards=(ct == 0), htmlFormat=html,
-                    border=border, l=max(l))
+        ret += _drawBranch(branch, upwards=(ct == 0), htmlFormat=html, border=border, l=max(l))
     return ret
 
 
 if __name__ == "__main__":
-    argparser = argparse.ArgumentParser(description="simple tool that is "
-                                        "meant to draw lessagraphs, as an "
-                                        "ascii plot")
-    argparser.add_argument('-l', '--lhe', help="LHE file name",
-                           type=str, required=True )
-    argparser.add_argument('-b', '--border', action='store_true',
-                           help="draw a border around the graph")
+    argparser = argparse.ArgumentParser(
+        description="simple tool that is " "meant to draw lessagraphs, as an " "ascii plot"
+    )
+    argparser.add_argument("-l", "--lhe", help="LHE file name", type=str, required=True)
+    argparser.add_argument(
+        "-b", "--border", action="store_true", help="draw a border around the graph"
+    )
     args = argparser.parse_args()
 
     filename = args.lhe

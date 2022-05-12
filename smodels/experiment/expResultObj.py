@@ -14,12 +14,13 @@ from smodels.experiment import metaObj
 from smodels.experiment.exceptions import SModelSExperimentError
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.stringTools import cleanWalk
-from smodels.theory.auxiliaryFunctions import getAttributesFrom,getValuesForObj
+from smodels.theory.auxiliaryFunctions import getAttributesFrom, getValuesForObj
 
 try:
     import cPickle as serializer
 except ImportError as e:
     import pickle as serializer
+
 
 class ExpResult(object):
     """
@@ -27,19 +28,19 @@ class ExpResult(object):
     experimental result (experimental conference note or publication).
     """
 
-    def __init__(self, path = None, discard_zeroes = True, databaseParticles = None):
+    def __init__(self, path=None, discard_zeroes=True, databaseParticles=None):
         """
-        :param path: Path to the experimental result folder, None means 
+        :param path: Path to the experimental result folder, None means
                      transient experimental result
         :param discard_zeroes: Discard maps with only zeroes
         :param databaseParticles: the model, i.e. the particle content
         """
 
-        if path in [ None, "<transient>" ]:
+        if path in [None, "<transient>"]:
             self.path = "<transient>"
             return
-        if not os.path.isdir ( path ):
-            raise SModelSExperimentError ( "%s is not a path" % path )
+        if not os.path.isdir(path):
+            raise SModelSExperimentError("%s is not a path" % path)
 
         self.discard_zeroes = discard_zeroes
         self.path = path
@@ -47,80 +48,82 @@ class ExpResult(object):
             logger.error("globalInfo.txt file not found in " + path)
             raise TypeError
         self.globalInfo = infoObj.Info(os.path.join(path, "globalInfo.txt"))
-        #Add type of experimental result (if not defined)
-        if not hasattr(self.globalInfo,'type'):
-            self.globalInfo.type = 'prompt'
+        # Add type of experimental result (if not defined)
+        if not hasattr(self.globalInfo, "type"):
+            self.globalInfo.type = "prompt"
 
         datasets = {}
-        folders=[]
+        folders = []
         for root, _, files in cleanWalk(path):
-            folders.append ( (root, files) )
+            folders.append((root, files))
         folders.sort()
         self.datasets = []
         hasOrder = hasattr(self.globalInfo, "datasetOrder")
         for root, files in folders:
-            if 'dataInfo.txt' in files:  # data folder found
+            if "dataInfo.txt" in files:  # data folder found
                 # Build data set
                 try:
-                    dataset = datasetObj.DataSet(root, self.globalInfo,
-                            discard_zeroes = discard_zeroes,
-                            databaseParticles = databaseParticles)
+                    dataset = datasetObj.DataSet(
+                        root,
+                        self.globalInfo,
+                        discard_zeroes=discard_zeroes,
+                        databaseParticles=databaseParticles,
+                    )
                     if hasOrder:
-                        datasets[dataset.dataInfo.dataId]=dataset
+                        datasets[dataset.dataInfo.dataId] = dataset
                     else:
-                        self.datasets.append ( dataset )
+                        self.datasets.append(dataset)
                 except TypeError:
                     continue
         if not hasOrder:
             return
         dsOrder = self.globalInfo.datasetOrder
-        if type ( dsOrder ) == str:
+        if type(dsOrder) == str:
             ## for debugging only, we allow a single dataset
-            dsOrder = [ dsOrder ]
+            dsOrder = [dsOrder]
         for dsname in dsOrder:
-            self.datasets.append ( datasets[dsname] )
+            self.datasets.append(datasets[dsname])
         if len(self.datasets) != len(dsOrder):
-            raise SModelSExperimentError ( "lengths of datasets and datasetOrder mismatch" )
-
+            raise SModelSExperimentError("lengths of datasets and datasetOrder mismatch")
 
     def writePickle(self, dbVersion):
-        """ write the pickle file """
+        """write the pickle file"""
 
-        meta = metaObj.Meta ( self.path, self.discard_zeroes, databaseVersion=dbVersion )
-        pclfile = "%s/.%s" % ( self.path, meta.getPickleFileName() )
-        logger.debug ( "writing expRes pickle file %s, mtime=%s" % (pclfile, meta.cTime() ) )
-        f=open( pclfile, "wb" )
-        ptcl = min ( 4, serializer.HIGHEST_PROTOCOL )
+        meta = metaObj.Meta(self.path, self.discard_zeroes, databaseVersion=dbVersion)
+        pclfile = "%s/.%s" % (self.path, meta.getPickleFileName())
+        logger.debug("writing expRes pickle file %s, mtime=%s" % (pclfile, meta.cTime()))
+        f = open(pclfile, "wb")
+        ptcl = min(4, serializer.HIGHEST_PROTOCOL)
         serializer.dump(meta, f, protocol=ptcl)
         serializer.dump(self, f, protocol=ptcl)
         f.close()
 
-    def __eq__(self, other ):
+    def __eq__(self, other):
         if self.globalInfo != other.globalInfo:
             return False
-        if len(self.datasets) != len ( other.datasets ):
+        if len(self.datasets) != len(other.datasets):
             return False
-        for (myds,otherds) in zip ( self.datasets, other.datasets ):
+        for (myds, otherds) in zip(self.datasets, other.datasets):
             if myds != otherds:
                 return False
         return True
 
-    def __ne__(self, other ):
-        return not self.__eq__ ( other )
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def id(self):
-        return self.globalInfo.getInfo('id')
+        return self.globalInfo.getInfo("id")
 
     def __str__(self):
-        label = self.globalInfo.getInfo('id') + ": "
+        label = self.globalInfo.getInfo("id") + ": "
         dataIDs = [dataset.getID() for dataset in self.datasets]
-        ct_dids=0
+        ct_dids = 0
         if dataIDs:
             for dataid in dataIDs:
                 if dataid:
-                    ct_dids+=1
+                    ct_dids += 1
                     label += dataid + ","
-        label = "%s(%d):" % ( label[:-1], ct_dids )
+        label = "%s(%d):" % (label[:-1], ct_dids)
         txnames = []
         for dataset in self.datasets:
             for txname in dataset.txnameList:
@@ -130,13 +133,13 @@ class ExpResult(object):
                     txnames.append(tx)
         if isinstance(txnames, list):
             for txname in txnames:
-                label += txname + ','
-            label = "%s(%d)," % (label[:-1], len(txnames) )
+                label += txname + ","
+            label = "%s(%d)," % (label[:-1], len(txnames))
         else:
-            label += txnames + ','
+            label += txnames + ","
         return label[:-1]
 
-    def getDataset(self, dataId ):
+    def getDataset(self, dataId):
         """
         retrieve dataset by dataId
         """
@@ -167,12 +170,11 @@ class ExpResult(object):
             return dataset.getEfficiencyFor(txname, mass)
         return None
 
-    def hasCovarianceMatrix( self ):
+    def hasCovarianceMatrix(self):
         return hasattr(self.globalInfo, "covariance")
 
-    def hasJsonFile( self ):
+    def hasJsonFile(self):
         return hasattr(self.globalInfo, "jsonFiles")
-
 
     """ this feature is not yet ready
     def isUncorrelatedWith ( self, other ):
@@ -193,10 +195,9 @@ class ExpResult(object):
         return None ## FIXME implement
     """
 
-
-
-    def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
-                          txname=None, mass=None, compute=False):
+    def getUpperLimitFor(
+        self, dataID=None, alpha=0.05, expected=False, txname=None, mass=None, compute=False
+    ):
         """
         Computes the 95% upper limit (UL) on the signal cross section according
         to the type of result.
@@ -221,16 +222,15 @@ class ExpResult(object):
 
         dataset = self.getDataset(dataID)
         if dataset:
-            upperLimit = dataset.getUpperLimitFor(element=mass,expected = expected,
-                                                      txnames = txname,
-                                                      compute=compute,alpha=alpha)
+            upperLimit = dataset.getUpperLimitFor(
+                element=mass, expected=expected, txnames=txname, compute=compute, alpha=alpha
+            )
             return upperLimit
         else:
-            logger.error("Dataset ID %s not found in experimental result %s" %(dataID,self))
+            logger.error("Dataset ID %s not found in experimental result %s" % (dataID, self))
             return None
 
-
-    def getValuesFor(self,attribute):
+    def getValuesFor(self, attribute):
         """
         Returns a list for the possible values appearing in the ExpResult
         for the required attribute (sqrts,id,constraint,...).
@@ -241,8 +241,7 @@ class ExpResult(object):
 
         """
 
-        return getValuesForObj(self,attribute)
-
+        return getValuesForObj(self, attribute)
 
     def getAttributes(self, showPrivate=False):
         """
@@ -257,10 +256,9 @@ class ExpResult(object):
         attributes = getAttributesFrom(self)
 
         if not showPrivate:
-            attributes = list(filter(lambda a: a[0] != '_', attributes))
+            attributes = list(filter(lambda a: a[0] != "_", attributes))
 
         return attributes
-
 
     def getTxnameWith(self, restrDict={}):
         """
@@ -291,8 +289,7 @@ class ExpResult(object):
 
         return txnameList
 
-
-    def __lt__ ( self, other ):
-        """ experimental results are sorted alphabetically according
-        to their description strings """
+    def __lt__(self, other):
+        """experimental results are sorted alphabetically according
+        to their description strings"""
         return str(self) < str(other)

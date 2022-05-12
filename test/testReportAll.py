@@ -8,7 +8,8 @@
 
 """
 import sys
-sys.path.append('../')
+
+sys.path.append("../")
 import os
 import unittest
 from unitTestHelpers import equalObjs, runMain, importModule, sortSModelSOutput
@@ -19,7 +20,7 @@ class TestReportAll(unittest.TestCase):
     # use with super great care!!
 
     def removeOutputs(self, f):
-        """ remove cruft outputfiles """
+        """remove cruft outputfiles"""
         for i in [f, f.replace(".py", ".pyc")]:
             if os.path.exists(i):
                 os.remove(i)
@@ -30,13 +31,18 @@ class TestReportAll(unittest.TestCase):
         outputfile = runMain(filename, inifile=inifile, suppressStdout=True)
         smodelsOutput = importModule(outputfile)
         from default_reportAll import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus',
-                        'database version']
-        smodelsOutput = sortSModelSOutput ( smodelsOutput )
-        smodelsOutputDefault = sortSModelSOutput ( smodelsOutputDefault )
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.03,
-                           ignore=ignoreFields, fname=outputfile,
-                           fname2="default_reportAll.py")
+
+        ignoreFields = ["input file", "smodels version", "ncpus", "database version"]
+        smodelsOutput = sortSModelSOutput(smodelsOutput)
+        smodelsOutputDefault = sortSModelSOutput(smodelsOutputDefault)
+        equals = equalObjs(
+            smodelsOutput,
+            smodelsOutputDefault,
+            allowedDiff=0.03,
+            ignore=ignoreFields,
+            fname=outputfile,
+            fname2="default_reportAll.py",
+        )
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
 

@@ -10,6 +10,7 @@
 """
 
 import sys
+
 sys.path.insert(0, "../")
 import os
 import unittest
@@ -17,23 +18,21 @@ from unitTestHelpers import compareScanSummary, runMain
 
 
 class ScanSummaryTest(unittest.TestCase):
-
     def testPythonSummary(self):
         out = "./unitTestOutput"
         dirname = "./testFiles/slha/"
         runMain(dirname, inifile="testParameters.ini")
-        outSummary = os.path.join(out, 'summary.txt')
-        outDefault = 'summary_scan_default.txt'
+        outSummary = os.path.join(out, "summary.txt")
+        outDefault = "summary_scan_default.txt"
 
         self.assertTrue(compareScanSummary(outSummary, outDefault, allowedDiff=0.05))
 
     def testSLHASummary(self):
         out = "./unitTestOutput"
         dirname = "./testFiles/slha/"
-        runMain(dirname, inifile="slhaOnly.ini", suppressStdout=False,
-                development=True)
-        outSummary = os.path.join(out, 'summary.txt')
-        outDefault = 'summary_scan_default.txt'
+        runMain(dirname, inifile="slhaOnly.ini", suppressStdout=False, development=True)
+        outSummary = os.path.join(out, "summary.txt")
+        outDefault = "summary_scan_default.txt"
         self.assertTrue(compareScanSummary(outSummary, outDefault, allowedDiff=0.05))
 
     def testSummarySummary(self):
@@ -43,8 +42,8 @@ class ScanSummaryTest(unittest.TestCase):
                 os.unlink(os.path.join(out, i))
         dirname = "./testFiles/slha/"
         runMain(dirname, inifile="summaryOnly.ini")
-        outSummary = os.path.join(out, 'summary.txt')
-        outDefault = 'summary_scan_default.txt'
+        outSummary = os.path.join(out, "summary.txt")
+        outDefault = "summary_scan_default.txt"
         ret = compareScanSummary(outSummary, outDefault, allowedDiff=0.05)
         if not ret:
             print(f"ERROR: files {outSummary} and {outDefault} differ!")

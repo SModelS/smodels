@@ -10,14 +10,15 @@
 """
 
 import sys
-sys.path.insert(0,"../")
+
+sys.path.insert(0, "../")
 from smodels.experiment.databaseObj import Database
 
 # dbpath = "./database"
 # dbpath = "../../smodels-database"
 dbpath = "unittest"
 
-database = Database( dbpath, discard_zeroes = False)
+database = Database(dbpath, discard_zeroes=False)
 
 if __name__ == "__main__":
-    print ( database )
+    print(database)

@@ -14,6 +14,7 @@ from smodels.tools.smodelsLogging import logger
 import itertools
 from smodels.theory.particle import Particle
 
+
 class Element(object):
     """
     An instance of this class represents an element.
@@ -38,9 +39,11 @@ class Element(object):
         """
 
         self.branches = [Branch(), Branch()]
-        self.weight = crossSection.XSectionList() # gives the weight for all decays promptly
+        self.weight = crossSection.XSectionList()  # gives the weight for all decays promptly
         self.decayLabels = []
-        self.motherElements = [self] #The motheElements includes self to keep track of merged elements
+        self.motherElements = [
+            self
+        ]  # The motheElements includes self to keep track of merged elements
         self.elID = 0
         self.coveredBy = set()
         self.testedBy = set()
@@ -53,49 +56,67 @@ class Element(object):
                     nel = 0
                     if elements:
                         nel = len(elements)
-                    logger.error("Malformed input string. Number of elements "
-                                  "is %d (expected 1) in: ``%s''", nel, info)
+                    logger.error(
+                        "Malformed input string. Number of elements "
+                        "is %d (expected 1) in: ``%s''",
+                        nel,
+                        info,
+                    )
                     return None
                 else:
                     el = elements[0]
                     branches = elementsInStr(el[1:-1])
                     if not branches or len(branches) != 2:
-                        logger.error("Malformed input string. Number of "
-                                      "branches is %d (expected 2) in: ``%s''",
-                                      len(branches), info)
+                        logger.error(
+                            "Malformed input string. Number of "
+                            "branches is %d (expected 2) in: ``%s''",
+                            len(branches),
+                            info,
+                        )
                         return None
                     self.branches = []
                     if intermediateState:
                         if len(intermediateState) != len(branches):
-                            raise SModelSError("Number of intermediate states (%i) does not match number of branches (%i)"
-                                               %(len(intermediateState),len(branches)))
+                            raise SModelSError(
+                                "Number of intermediate states (%i) does not match number of branches (%i)"
+                                % (len(intermediateState), len(branches))
+                            )
                     else:
-                        intermediateState = [None]*len(branches)
+                        intermediateState = [None] * len(branches)
 
                     if finalState:
                         if len(finalState) != len(branches):
-                            raise SModelSError("Number of final states (%i) does not match number of branches (%i)"
-                                               %(len(finalState),len(branches)))
+                            raise SModelSError(
+                                "Number of final states (%i) does not match number of branches (%i)"
+                                % (len(finalState), len(branches))
+                            )
                     else:
-                        finalState = [None]*len(branches)
-                    for ibr,branch in enumerate(branches):
-                        if branch == '[*]':
-                            self.branches.append(InclusiveBranch(finalState[ibr],
-                                                  intermediateState=intermediateState[ibr],model=model))
+                        finalState = [None] * len(branches)
+                    for ibr, branch in enumerate(branches):
+                        if branch == "[*]":
+                            self.branches.append(
+                                InclusiveBranch(
+                                    finalState[ibr],
+                                    intermediateState=intermediateState[ibr],
+                                    model=model,
+                                )
+                            )
                         else:
-                            self.branches.append(Branch(branch,finalState[ibr],
-                                                    intermediateState[ibr],model=model))
+                            self.branches.append(
+                                Branch(branch, finalState[ibr], intermediateState[ibr], model=model)
+                            )
 
             # Create element from branch pair
-            elif isinstance(info,list) and all(isinstance(x,(Branch,InclusiveBranch)) for x in info):
+            elif isinstance(info, list) and all(
+                isinstance(x, (Branch, InclusiveBranch)) for x in info
+            ):
                 self.branches = [br.copy() for br in info]
             else:
-                raise SModelSError("Can not create element from input type %s" %type(info))
+                raise SModelSError("Can not create element from input type %s" % type(info))
 
         self.setEinfo()
 
-
-    def __cmp__(self,other):
+    def __cmp__(self, other):
         """
         Compares the element with other for any branch ordering.
         The comparison is made based on branches.
@@ -104,26 +125,26 @@ class Element(object):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
-        if not isinstance(other,Element):
+        if not isinstance(other, Element):
             return -1
 
-        #Compare branches:
+        # Compare branches:
         for branchA in itertools.permutations(self.branches):
             branchA = list(branchA)
             if branchA == other.branches:
                 return 0
 
-        comp = (self.branches > other.branches)
+        comp = self.branches > other.branches
         if comp:
             return 1
         else:
             return -1
 
-    def __eq__(self,other):
-        return self.__cmp__(other)==0
+    def __eq__(self, other):
+        return self.__cmp__(other) == 0
 
-    def __lt__(self,other):
-        return self.__cmp__(other)<0
+    def __lt__(self, other):
+        return self.__cmp__(other) < 0
 
     def __hash__(self):
         return object.__hash__(self)
@@ -137,15 +158,15 @@ class Element(object):
         :return: Attribute value
         """
 
-        #If calling another special method, return default (required for pickling)
-        if attr.startswith('__') and attr.endswith('__'):
+        # If calling another special method, return default (required for pickling)
+        if attr.startswith("__") and attr.endswith("__"):
             return object.__getattr__(attr)
 
         try:
-            val = [getattr(br,attr) for br in self.branches]
+            val = [getattr(br, attr) for br in self.branches]
             return val
         except AttributeError:
-            raise AttributeError("Neither element nor branch has attribute ``%s''" %attr)
+            raise AttributeError("Neither element nor branch has attribute ``%s''" % attr)
 
     def __str__(self):
         """
@@ -154,7 +175,7 @@ class Element(object):
         :returns: string representation of the element (in bracket notation)
         """
 
-        elStr = "["+",".join([str(br) for br in self.branches])+"]"
+        elStr = "[" + ",".join([str(br) for br in self.branches]) + "]"
         elStr = elStr.replace(" ", "").replace("'", "")
         return elStr
 
@@ -162,15 +183,15 @@ class Element(object):
 
         return self.__str__()
 
-    def __add__(self,other):
+    def __add__(self, other):
         """
         Adds two elements. Should only be used if the elements
         have the same topologies. The element weights are added and their
         odd and even particles are combined.
         """
 
-        if not isinstance(other,Element):
-            raise TypeError("Can not add an Element object to %s" %type(other))
+        if not isinstance(other, Element):
+            raise TypeError("Can not add an Element object to %s" % type(other))
         elif self.getEinfo() != other.getEinfo():
             raise SModelSError("Can not add elements with distinct topologies")
 
@@ -178,12 +199,12 @@ class Element(object):
         newEl.motherElements = self.motherElements[:] + other.motherElements[:]
         newEl.weight = self.weight + other.weight
         newEl.branches = []
-        for ibr,branch in enumerate(self.branches):
+        for ibr, branch in enumerate(self.branches):
             newEl.branches.append(branch + other.branches[ibr])
 
         return newEl
 
-    def __radd__(self,other):
+    def __radd__(self, other):
         """
         Adds two elements. Only elements with the same
         topology can be combined.
@@ -191,26 +212,26 @@ class Element(object):
 
         return self.__add__(other)
 
-    def __iadd__(self,other):
+    def __iadd__(self, other):
         """
         Combine two elements. Should only be used if the elements
         have the same topologies. The element weights are added and their
         odd and even particles are combined.
         """
 
-        if not isinstance(other,Element):
-            raise TypeError("Can not add an Element object to %s" %type(other))
+        if not isinstance(other, Element):
+            raise TypeError("Can not add an Element object to %s" % type(other))
         elif self.getEinfo() != other.getEinfo():
             raise SModelSError("Can not add elements with distinct topologies")
 
         self.motherElements += other.motherElements[:]
         self.weight += other.weight
-        for ibr,_ in enumerate(self.branches):
+        for ibr, _ in enumerate(self.branches):
             self.branches[ibr] += other.branches[ibr]
 
         return self
 
-    def getAverage(self,attr):
+    def getAverage(self, attr):
         """
         Get the average value for a given attribute appearing in
         the odd particles of the element branches.
@@ -218,8 +239,8 @@ class Element(object):
 
         try:
             vals = [br.getAverage(attr) for br in self.branches]
-        except (AttributeError,ZeroDivisionError):
-            raise SModelSError("Could not compute average for %s" %attr)
+        except (AttributeError, ZeroDivisionError):
+            raise SModelSError("Could not compute average for %s" % attr)
 
         return vals
 
@@ -229,7 +250,7 @@ class Element(object):
         including the final states, e.g. [[[jet]],[[jet]] (MET,MET)
         """
 
-        elStr = str(self)+' '+str(tuple(self.getFinalStates())).replace("'","")
+        elStr = str(self) + " " + str(tuple(self.getFinalStates())).replace("'", "")
 
         return elStr
 
@@ -239,7 +260,7 @@ class Element(object):
         See the Branch object for definition of branch size and comparison
         """
 
-        #Now sort branches
+        # Now sort branches
         self.branches = sorted(self.branches)
 
     def copy(self):
@@ -250,7 +271,7 @@ class Element(object):
         :returns: copy of element (Element object)
         """
 
-        #Allows for derived classes (like inclusive classes)
+        # Allows for derived classes (like inclusive classes)
         newel = self.__class__()
         newel.branches = []
         for branch in self.branches:
@@ -283,7 +304,7 @@ class Element(object):
 
         return fsparticles
 
-    def _getAncestorsDict(self,igen=0):
+    def _getAncestorsDict(self, igen=0):
         """
         Returns a dictionary with all the ancestors
         of the element. The dictionary keys are integers
@@ -298,18 +319,18 @@ class Element(object):
                  (e.g. {igen+1 : [mother1, mother2], igen+2 : [grandmother1,..],...})
         """
 
-        ancestorsDict = {igen+1 : []}
+        ancestorsDict = {igen + 1: []}
         for mother in self.motherElements:
             if mother is self:
                 continue
-            ancestorsDict[igen+1].append(mother)
-            for jgen,elList in mother._getAncestorsDict(igen+1).items():
+            ancestorsDict[igen + 1].append(mother)
+            for jgen, elList in mother._getAncestorsDict(igen + 1).items():
                 if not jgen in ancestorsDict:
                     ancestorsDict[jgen] = []
                 ancestorsDict[jgen] += elList
 
-        #Store the result
-        self._ancestorsDict = dict([[key,val] for key,val in ancestorsDict.items()])
+        # Store the result
+        self._ancestorsDict = dict([[key, val] for key, val in ancestorsDict.items()])
 
         return self._ancestorsDict
 
@@ -322,8 +343,8 @@ class Element(object):
         :return: A list of Element objects containing all the ancestors sorted by generation.
         """
 
-        #Check if the ancestors have already been obtained (performance gain)
-        if not hasattr(self,'_ancestorsDict'):
+        # Check if the ancestors have already been obtained (performance gain)
+        if not hasattr(self, "_ancestorsDict"):
             self._getAncestorsDict()
 
         orderedAncestors = []
@@ -332,7 +353,7 @@ class Element(object):
 
         return orderedAncestors
 
-    def isRelatedTo(self,other):
+    def isRelatedTo(self, other):
         """
         Checks if the element has any common ancestors with other or one
         is an ancestor of the other.
@@ -363,10 +384,10 @@ class Element(object):
             if branch.vertnumb is None:
                 branch.setInfo()
             bInfo = branch.getInfo()
-            vertparts.append(bInfo['vertparts'])
-            vertnumb.append(bInfo['vertnumb'])
+            vertparts.append(bInfo["vertparts"])
+            vertnumb.append(bInfo["vertnumb"])
 
-        return {"vertnumb" : vertnumb, "vertparts" : vertparts}
+        return {"vertnumb": vertnumb, "vertparts": vertparts}
 
     def setEinfo(self):
         """
@@ -376,7 +397,7 @@ class Element(object):
         for branch in self.branches:
             branch.setInfo()
 
-    def setTestedBy(self,resultType):
+    def setTestedBy(self, resultType):
         """
         Tag the element, all its daughter and all its mothers
         as tested by the type of result specified.
@@ -389,7 +410,7 @@ class Element(object):
         for ancestor in self.getAncestors():
             ancestor.testedBy.add(resultType)
 
-    def setCoveredBy(self,resultType):
+    def setCoveredBy(self, resultType):
         """
         Tag the element, all its daughter and all its mothers
         as covered by the type of result specified.
@@ -421,11 +442,10 @@ class Element(object):
         info = self.getEinfo()
         for ib, branch in enumerate(self.branches):
             for iv, vertex in enumerate(branch.evenParticles):
-                if len(vertex) != info['vertparts'][ib][iv]:
+                if len(vertex) != info["vertparts"][ib][iv]:
                     logger.error("Wrong syntax")
                     raise SModelSError()
         return True
-
 
     def compressElement(self, doCompress, doInvisible, minmassgap):
         """
@@ -454,7 +474,7 @@ class Element(object):
                 for element in newElements:
                     newel = element.massCompress(minmassgap)
                     # Avoids double counting
-                    #(elements sharing the same parent are removed during clustering)
+                    # (elements sharing the same parent are removed during clustering)
                     if newel and not any(newel == el for el in newElements[:]):
                         newElements.append(newel)
                         added = True
@@ -465,7 +485,7 @@ class Element(object):
                 for element in newElements:
                     newel = element.invisibleCompress()
                     # Avoids double counting
-                    #(elements sharing the same parent are removed during clustering)
+                    # (elements sharing the same parent are removed during clustering)
                     if newel and not any(newel == el for el in newElements[:]):
                         newElements.append(newel)
                         added = True
@@ -473,8 +493,7 @@ class Element(object):
         newElements.pop(0)  # Remove original element
         return newElements
 
-
-    def removeVertex(self,ibr,iv):
+    def removeVertex(self, ibr, iv):
         """
         Remove vertex iv located in branch ibr.
         The "vertex-mother" in BSMparticles and (SM) particles in the vertex
@@ -502,35 +521,34 @@ class Element(object):
         newelement = self.copy()
         newelement.motherElements = [self]
 
-        #Loop over branches and look for small mass differences
-        for ibr,branch in enumerate(newelement.branches):
-            #Get mass differences
+        # Loop over branches and look for small mass differences
+        for ibr, branch in enumerate(newelement.branches):
+            # Get mass differences
 
             removeVertices = []
-            for i,mom in enumerate(branch.oddParticles[:-1]):
-                massDiff = mom.mass - branch.oddParticles[i+1].mass
-                #Get vertices which have deltaM < minmassgap and the mother is prompt:
+            for i, mom in enumerate(branch.oddParticles[:-1]):
+                massDiff = mom.mass - branch.oddParticles[i + 1].mass
+                # Get vertices which have deltaM < minmassgap and the mother is prompt:
                 if massDiff < minmassgap and mom.isPrompt():
                     removeVertices.append(i)
-            #Remove vertices till they exist:
+            # Remove vertices till they exist:
             while removeVertices:
-                newelement.removeVertex(ibr,removeVertices[0])
+                newelement.removeVertex(ibr, removeVertices[0])
                 branch = newelement.branches[ibr]
                 removeVertices = []
-                for i,mom in enumerate(branch.oddParticles[:-1]):
-                    massDiff = mom.mass - branch.oddParticles[i+1].mass
-                    #Get vertices which have deltaM < minmassgap and the mother is prompt:
+                for i, mom in enumerate(branch.oddParticles[:-1]):
+                    massDiff = mom.mass - branch.oddParticles[i + 1].mass
+                    # Get vertices which have deltaM < minmassgap and the mother is prompt:
                     if massDiff < minmassgap and mom.isPrompt():
                         removeVertices.append(i)
 
-        for ibr,branch in enumerate(newelement.branches):
+        for ibr, branch in enumerate(newelement.branches):
             if branch.vertnumb != self.branches[ibr].vertnumb:
                 newelement.sortBranches()
                 return newelement
 
-        #New element was not compressed, return None
+        # New element was not compressed, return None
         return None
-
 
     def invisibleCompress(self):
         """
@@ -547,12 +565,11 @@ class Element(object):
         for branch in newelement.branches:
             if not branch.evenParticles:
                 continue
-            #Check if the last decay should be removed:
+            # Check if the last decay should be removed:
             neutralSM = all(ptc.isMET() for ptc in branch.evenParticles[-1])
             neutralDecay = neutralSM and branch.oddParticles[-1].isMET()
-            #Check if the mother can be considered MET:
-            neutralBSM = (branch.oddParticles[-2].isMET()
-                            or branch.oddParticles[-2].isPrompt())
+            # Check if the mother can be considered MET:
+            neutralBSM = branch.oddParticles[-2].isMET() or branch.oddParticles[-2].isPrompt()
             if neutralBSM and neutralDecay:
                 removeLastVertex = True
             else:
@@ -560,15 +577,20 @@ class Element(object):
 
             while len(branch.oddParticles) > 1 and removeLastVertex:
                 bsmMom = branch.oddParticles[-2]
-                effectiveDaughter = Particle(label='inv', mass = bsmMom.mass,
-                                             eCharge = 0, colordim = 1,
-                                             totalwidth = branch.oddParticles[-1].totalwidth,
-                                             Z2parity = bsmMom.Z2parity, pdg = bsmMom.pdg)
-                branch.removeVertex(len(branch.oddParticles)-2)
-                #For invisible compression, keep an effective mother which corresponds to the invisible
-                #daughter, but with the mass of the parent.
+                effectiveDaughter = Particle(
+                    label="inv",
+                    mass=bsmMom.mass,
+                    eCharge=0,
+                    colordim=1,
+                    totalwidth=branch.oddParticles[-1].totalwidth,
+                    Z2parity=bsmMom.Z2parity,
+                    pdg=bsmMom.pdg,
+                )
+                branch.removeVertex(len(branch.oddParticles) - 2)
+                # For invisible compression, keep an effective mother which corresponds to the invisible
+                # daughter, but with the mass of the parent.
                 branch.oddParticles[-1] = effectiveDaughter
-                #Re-check if the last decay should be removed:
+                # Re-check if the last decay should be removed:
                 if not branch.evenParticles:
                     continue
                 neutralSM = all(ptc.isMET() for ptc in branch.evenParticles[-1])
@@ -579,14 +601,13 @@ class Element(object):
                 else:
                     removeLastVertex = False
 
-        for ibr,branch in enumerate(newelement.branches):
+        for ibr, branch in enumerate(newelement.branches):
             if branch.vertnumb != self.branches[ibr].vertnumb:
                 newelement.sortBranches()
                 return newelement
 
-        #New element was not compressed, return None
+        # New element was not compressed, return None
         return None
-
 
     def hasTopInList(self, elementList):
         """

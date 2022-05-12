@@ -8,15 +8,22 @@
 
 """
 import sys
-sys.path.insert(0,"../")
+
+sys.path.insert(0, "../")
 import unittest
+
 
 class InStrTest(unittest.TestCase):
     def testInStr(self):
-        instring="[[['t+'],['W-']],[['t+'],['W-']]]+[[['t-'],['W+']],[['t-'],['W+']]]+[[['t+'],['W-']],[['t-'],['W+']]]"
-        from smodels.theory.auxiliaryFunctions import elementsInStr 
-        out= elementsInStr( instring )
-        self.assertEqual ( out, ['[[[t+],[W-]],[[t+],[W-]]]', '[[[t-],[W+]],[[t-],[W+]]]', '[[[t+],[W-]],[[t-],[W+]]]'] )
+        instring = "[[['t+'],['W-']],[['t+'],['W-']]]+[[['t-'],['W+']],[['t-'],['W+']]]+[[['t+'],['W-']],[['t-'],['W+']]]"
+        from smodels.theory.auxiliaryFunctions import elementsInStr
+
+        out = elementsInStr(instring)
+        self.assertEqual(
+            out,
+            ["[[[t+],[W-]],[[t+],[W-]]]", "[[[t-],[W+]],[[t-],[W+]]]", "[[[t+],[W-]],[[t-],[W+]]]"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

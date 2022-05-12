@@ -36,9 +36,9 @@ class Topology(object):
         self.elementList = []
 
         if elements:
-            if isinstance(elements,Element):
+            if isinstance(elements, Element):
                 self.addElement(elements)
-            elif isinstance(elements,list):
+            elif isinstance(elements, list):
                 for element in elements:
                     self.addElement(element)
 
@@ -57,17 +57,17 @@ class Topology(object):
     def __repr__(self):
         return self.__str__()
 
-    def __ne__(self,other):
-        return not ( self.__eq__(other) )
+    def __ne__(self, other):
+        return not (self.__eq__(other))
 
-    def __eq__(self,other):
-        ret = (self.__cmp__(other)==0 )
+    def __eq__(self, other):
+        ret = self.__cmp__(other) == 0
         return ret
 
-    def __lt__(self,other):
-        return self.__cmp__(other)<0
+    def __lt__(self, other):
+        return self.__cmp__(other) < 0
 
-    def __cmp__(self,other):
+    def __cmp__(self, other):
         """
         Compares the topology with other.
         The comparison is made on number of vertices and then on the
@@ -76,23 +76,26 @@ class Topology(object):
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
-        #Check for any permutation of branches:
+        # Check for any permutation of branches:
         for v1 in itertools.permutations(self.vertparts):
             v1 = list(v1)
             if v1 == other.vertparts:
                 return 0
 
-        if sorted(self.vertnumb,reverse=True) != sorted(other.vertnumb,reverse=True):
-            comp = sorted(self.vertnumb,reverse=True) > sorted(other.vertnumb,reverse=True)
-            if comp: return 1
-            else: return -1
+        if sorted(self.vertnumb, reverse=True) != sorted(other.vertnumb, reverse=True):
+            comp = sorted(self.vertnumb, reverse=True) > sorted(other.vertnumb, reverse=True)
+            if comp:
+                return 1
+            else:
+                return -1
         elif sorted(self.vertparts) != sorted(other.vertparts):
             comp = sorted(self.vertparts) > sorted(other.vertparts)
-            if comp: return 1
-            else: return -1
+            if comp:
+                return 1
+            else:
+                return -1
         else:
             return 0
-
 
     def checkConsistency(self):
         """
@@ -114,18 +117,17 @@ class Topology(object):
         logger.info("Consistent topology.")
         return True
 
-
     def describe(self):
         """
         Create a detailed description of the topology.
 
         :returns: list of strings with a description of the topology
         """
-        ret = ("number of vertices: %s, number of vertex particles: %s, "
-               "number of elements: %d" % \
-               (self.vertnumb, self.vertparts, len(self.elementList)))
+        ret = (
+            "number of vertices: %s, number of vertex particles: %s, "
+            "number of elements: %d" % (self.vertnumb, self.vertparts, len(self.elementList))
+        )
         return ret
-
 
     def getElements(self):
         """
@@ -134,7 +136,6 @@ class Topology(object):
         :return: elementList (list of Element objects)
         """
         return self.elementList
-
 
     def addElement(self, newelement):
         """
@@ -156,22 +157,20 @@ class Topology(object):
         if not self.vertnumb:
             self.vertnumb = newelement.getEinfo()["vertnumb"]
 
-        #First check if element matches topology structure
+        # First check if element matches topology structure
         info = newelement.getEinfo()
 
         if info != self._getTinfo():
-            logger.warning('Element to be added does not match topology')
+            logger.warning("Element to be added does not match topology")
             return False
 
-        index = index_bisect(self.elementList,newelement)
+        index = index_bisect(self.elementList, newelement)
         if index != len(self.elementList) and self.elementList[index] == newelement:
             self.elementList[index] += newelement
         else:
-            self.elementList.insert(index,newelement)
+            self.elementList.insert(index, newelement)
 
         return True
-
-
 
     def _getTinfo(self):
         """
@@ -179,8 +178,7 @@ class Topology(object):
 
         :returns: dictionary with topology information
         """
-        return {'vertnumb' : self.vertnumb, 'vertparts' : self.vertparts}
-
+        return {"vertnumb": self.vertnumb, "vertparts": self.vertparts}
 
     def getTotalWeight(self):
         """
@@ -202,7 +200,7 @@ class TopologyList(object):
     """
     An instance of this class represents an iterable collection of topologies.
     """
-    
+
     def __init__(self, topologies=[]):
         """
         Add topologies sequentially, if provided.
@@ -212,23 +210,20 @@ class TopologyList(object):
         for topo in topologies:
             self.add(topo)
 
-    def __ne__(self,other):
+    def __ne__(self, other):
         return not self.__eq__(other)
 
-    def __eq__(self,other):
+    def __eq__(self, other):
         return self.topos == other.topos
 
     def __len__(self):
         return len(self.topos)
 
-
     def __getitem__(self, index):
         return self.topos[index]
 
-
     def __iter__(self):
         return iter(self.topos)
-
 
     def __str__(self):
         s = "TopologyList:\n"
@@ -239,9 +234,8 @@ class TopologyList(object):
     def __repr__(self):
         return self.__str__()
 
-    def insert(self,index,topo):
-        self.topos.insert(index,topo)
-
+    def insert(self, index, topo):
+        self.topos.insert(index, topo)
 
     def addList(self, topoList):
         """
@@ -250,7 +244,6 @@ class TopologyList(object):
         """
         for topo in topoList:
             self.add(topo)
-
 
     def describe(self):
         """
@@ -262,7 +255,7 @@ class TopologyList(object):
             s += str(topo) + "\n"
         return s
 
-    def index(self,topo):
+    def index(self, topo):
         """
         Uses bisect to find the index where of topo in the list.
         If topo does not appear in the list, returns None.
@@ -278,8 +271,7 @@ class TopologyList(object):
 
         return None
 
-
-    def hasTopology(self,topo):
+    def hasTopology(self, topo):
         """
         Checks if topo appears in any of the topologies in the list.
 
@@ -292,7 +284,6 @@ class TopologyList(object):
                 return True
 
         return False
-
 
     def add(self, newTopology):
         """
@@ -311,8 +302,7 @@ class TopologyList(object):
             for newelement in newTopology.elementList:
                 self.topos[index].addElement(newelement)
         else:
-            self.insert(index,newTopology)
-
+            self.insert(index, newTopology)
 
     def addElement(self, newelement):
         """
@@ -325,20 +315,19 @@ class TopologyList(object):
         :returns: True, if the element was added. False, otherwise
         """
 
-        #First create a dummy topology from the element to check
-        #if this topology already exists in the list:
+        # First create a dummy topology from the element to check
+        # if this topology already exists in the list:
         elInfo = newelement.getEinfo()
         topoDummy = Topology()
         topoDummy.elementList.append(newelement)
         topoDummy.vertnumb = elInfo["vertnumb"]
         topoDummy.vertparts = elInfo["vertparts"]
 
-        index = index_bisect(self,topoDummy)
+        index = index_bisect(self, topoDummy)
         if index != len(self) and self.topos[index] == topoDummy:
             self.topos[index].addElement(newelement)
         else:
-            self.topos.insert(index,topoDummy)
-
+            self.topos.insert(index, topoDummy)
 
     def getTotalWeight(self):
         """
@@ -352,7 +341,6 @@ class TopologyList(object):
                 sumw += topoweight
         return sumw
 
-
     def getElements(self):
         """
         Return a list with all the elements in all the topologies.
@@ -363,7 +351,7 @@ class TopologyList(object):
             elements.extend(top.elementList)
         return elements
 
-    def compressElements(self,doCompress,doInvisible,minmassgap):
+    def compressElements(self, doCompress, doInvisible, minmassgap):
         """
         Compress all elements in the list and include the compressed
         elements in the topology list.
@@ -377,11 +365,11 @@ class TopologyList(object):
         """
 
         for el in self.getElements():
-            newElements = el.compressElement(doCompress,doInvisible,minmassgap)
+            newElements = el.compressElement(doCompress, doInvisible, minmassgap)
             if not newElements:
                 continue
             for newelement in newElements:
-                newelement.sortBranches()  #Make sure elements are sorted BEFORE adding them
+                newelement.sortBranches()  # Make sure elements are sorted BEFORE adding them
                 self.addElement(newelement)
 
     def _setElementIds(self):

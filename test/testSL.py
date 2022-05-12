@@ -9,22 +9,27 @@
 """
 
 import sys
-sys.path.insert(0,"../")
+
+sys.path.insert(0, "../")
 import unittest
 from smodels.tools.simplifiedLikelihoods import Data, UpperLimitComputer
-from numpy  import sqrt
+from numpy import sqrt
+
 
 class SLTest(unittest.TestCase):
-
     def testPathologicalModel(self):
-        C=[ 1. ]
-        m=Data ( observed=[0],
-                  backgrounds=[.0],
-                  covariance= C,
-                  third_moment = [ 0. ] * 8,
-                  nsignal=[x/100. for x in [0.] ],
-                  name="pathological model",deltas_rel=0. )
+        C = [1.0]
+        m = Data(
+            observed=[0],
+            backgrounds=[0.0],
+            covariance=C,
+            third_moment=[0.0] * 8,
+            nsignal=[x / 100.0 for x in [0.0]],
+            name="pathological model",
+            deltas_rel=0.0,
+        )
         m.zeroSignal()
+
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
         ul = ulComp.ulOnMu(m, marginalize=True )
         ulProf = ulComp.ulOnMu ( m, marginalize=False )
@@ -32,14 +37,18 @@ class SLTest(unittest.TestCase):
         self.assertEqual(ulProf, None )
 
     def testPathologicalModel2(self):
-        C=[ 1. ]
-        m=Data(observed=[0],
-                  backgrounds=[.0],
-                  covariance= C,
-                  third_moment = [ 0. ] * 8,
-                  nsignal=[x/100. for x in [0.1] ],
-                  name="pathological model 2",deltas_rel=0. )
+        C = [1.0]
+        m = Data(
+            observed=[0],
+            backgrounds=[0.0],
+            covariance=C,
+            third_moment=[0.0] * 8,
+            nsignal=[x / 100.0 for x in [0.1]],
+            name="pathological model 2",
+            deltas_rel=0.0,
+        )
         m.zeroSignal()
+
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
         ul = ulComp.ulOnMu(m, marginalize=True )
         ulProf = ulComp.ulOnMu(m, marginalize=False )
@@ -70,20 +79,29 @@ class SLTest(unittest.TestCase):
 
     def createModel(self,n=3):
         import model_90 as m9
-        S=m9.third_moment.tolist()[:n]
-        D=m9.observed.tolist()[:n]
-        B=m9.background.tolist()[:n]
-        sig=[ x/100. for x in m9.signal.tolist()[:n] ]
-        C_=m9.covariance.tolist()
-        ncov=int(sqrt(len(C_)))
-        C=[]
+
+        S = m9.third_moment.tolist()[:n]
+        D = m9.observed.tolist()[:n]
+        B = m9.background.tolist()[:n]
+        sig = [x / 100.0 for x in m9.signal.tolist()[:n]]
+        C_ = m9.covariance.tolist()
+        ncov = int(sqrt(len(C_)))
+        C = []
         for i in range(n):
-            C.append ( C_[ncov*i:ncov*i+n] )
-        m = Data ( observed=D, backgrounds=B, covariance=C, third_moment=S, 
-                    nsignal=sig, name="model%d" % n, deltas_rel=0. )
+            C.append(C_[ncov * i : ncov * i + n])
+        m = Data(
+            observed=D,
+            backgrounds=B,
+            covariance=C,
+            third_moment=S,
+            nsignal=sig,
+            name="model%d" % n,
+            deltas_rel=0.0,
+        )
         return m
 
     def testModel3(self):
+
         """ take first n SRs of model-90 """
         m = self.createModel ( 3 )
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
@@ -91,9 +109,10 @@ class SLTest(unittest.TestCase):
         self.assertAlmostEqual( ulProf/54.793636190198924, 1.0, 3 )
         ul = ulComp.ulOnMu( m, marginalize=True )
         ## Nick's profiling code gets for n=3 ul=2135.66
-        self.assertAlmostEqual( ul/55.554, 1.0, 1 )
+        self.assertAlmostEqual(ul / 55.554, 1.0, 1)
 
     def testModel10(self):
+
         """ take first 10 SRs of model-90 """
         m = self.createModel ( 10 )
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
@@ -101,11 +120,12 @@ class SLTest(unittest.TestCase):
         self.assertAlmostEqual( ulProf/105.521134, 1.0, 3 )
         ul = ulComp.ulOnMu(m,marginalize=True)
         ## Nick's profiling code gets for n=10 ul=357.568
-        self.assertAlmostEqual(ul/106.37, 1.0, 1 )
+        self.assertAlmostEqual(ul / 106.37, 1.0, 1)
 
     def testModel40(self):
-        m = self.createModel ( 40 )
+        m = self.createModel(40)
         import time
+
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
         ulProf = ulComp.ulOnMu ( m, marginalize=False )
         self.assertAlmostEqual( ulProf/75.29914, 1.0, 3 )

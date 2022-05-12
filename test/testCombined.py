@@ -11,6 +11,7 @@
 
 import sys
 import os
+
 sys.path.insert(0, "../")
 import unittest
 from unitTestHelpers import equalObjs, runMain, importModule
@@ -18,10 +19,9 @@ from smodels.tools.smodelsLogging import logger, setLogLevel
 
 
 class CombinedTest(unittest.TestCase):
-
     def defineTest(self):
-        """ define the current output as the default output.
-        Use with care! """
+        """define the current output as the default output.
+        Use with care!"""
         filename = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(filename, inifile="testParameters_agg.ini", suppressStdout=True)
         smodelsOutput = importModule(outputfile)
@@ -34,17 +34,42 @@ class CombinedTest(unittest.TestCase):
         outputfile = runMain(filename, inifile="testParameters_agg.ini", suppressStdout=True)
         smodelsOutput = importModule(outputfile)
         from gluino_squarks_default_agg import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element', 'database version',
-                        'Total missed xsec', 'model', 'promptwidth', 'stablewidth', 'checkinput',
-                        'doinvisible', 'docompress', 'computestatistics', 'testcoverage', 'combinesrs',
-                        'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
-                        'Total xsec for missing topologies (fb)', 'Total xsec for missing topologies with displaced decays (fb)',
-                        'Total xsec for missing topologies with prompt decays (fb)',
-                        'Total xsec for topologies outside the grid (fb)']
-        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.02,
-                           ignore=ignoreFields, fname=outputfile)
+
+        ignoreFields = [
+            "input file",
+            "smodels version",
+            "ncpus",
+            "Element",
+            "database version",
+            "Total missed xsec",
+            "model",
+            "promptwidth",
+            "stablewidth",
+            "checkinput",
+            "doinvisible",
+            "docompress",
+            "computestatistics",
+            "testcoverage",
+            "combinesrs",
+            "Missed xsec long-lived",
+            "Missed xsec displaced",
+            "Missed xsec MET",
+            "Total outside grid xsec",
+            "Total xsec for missing topologies (fb)",
+            "Total xsec for missing topologies with displaced decays (fb)",
+            "Total xsec for missing topologies with prompt decays (fb)",
+            "Total xsec for topologies outside the grid (fb)",
+        ]
+        smodelsOutputDefault["ExptRes"] = sorted(
+            smodelsOutputDefault["ExptRes"], key=lambda res: res["r"], reverse=True
+        )
+        equals = equalObjs(
+            smodelsOutput,
+            smodelsOutputDefault,
+            allowedDiff=0.02,
+            ignore=ignoreFields,
+            fname=outputfile,
+        )
         if equals != True:
             logger.error("%s differs from %s!" % ("gluino_squarks_default_agg.py", outputfile))
         self.assertTrue(equals)

@@ -9,6 +9,7 @@
 from smodels.theory import crossSection
 from smodels.tools.physicsUnits import fb, GeV
 import unum
+
 try:
     from collections.abc import Iterable
 except:
@@ -16,7 +17,6 @@ except:
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 import numpy as np
-
 
 
 def cSim(*weights):
@@ -48,14 +48,14 @@ def cSim(*weights):
     # Evaluate the inequality for each cross section info
     result = crossSection.XSectionList()
     for info in infoList:
-        res = 0.
+        res = 0.0
         xsecRes = crossSection.XSection()
         xsecRes.info = info
         for weightA in weights:
             for weightB in weights:
-                a = weightA.getXsecsFor(info.label)[0].value.asNumber ( fb )
-                b = weightB.getXsecsFor(info.label)[0].value.asNumber ( fb )
-                if a + b == 0.:
+                a = weightA.getXsecsFor(info.label)[0].value.asNumber(fb)
+                b = weightB.getXsecsFor(info.label)[0].value.asNumber(fb)
+                if a + b == 0.0:
                     continue
                 res = max(res, abs(a - b) / abs(a + b))
         xsecRes.value = res
@@ -74,8 +74,9 @@ def cGtr(weightA, weightB):
     :returns: XSectioList object with the values for each label.
 
     """
-    if type(weightA) != type(crossSection.XSectionList()) or \
-            type(weightB) != type(crossSection.XSectionList()):
+    if type(weightA) != type(crossSection.XSectionList()) or type(weightB) != type(
+        crossSection.XSectionList()
+    ):
         logger.error("Trying to evaluate non-xsection objects")
         raise SModelSError()
 
@@ -87,7 +88,7 @@ def cGtr(weightA, weightB):
             infoList.append(info)
     if not infoList:
         # If there are no cross sections, can not evaluate
-        return 'N/A'
+        return "N/A"
     zeros = crossSection.XSectionList(infoList)
     weightA += zeros
     weightB += zeros
@@ -99,15 +100,16 @@ def cGtr(weightA, weightB):
         b = weightB.getXsecsFor(info.label)[0].value / fb
         xsecRes = crossSection.XSection()
         xsecRes.info = info
-        if a + b == 0.:
-            xsecRes.value = 'N/A'
+        if a + b == 0.0:
+            xsecRes.value = "N/A"
         else:
-            xsecRes.value = (abs(a - b) - (a - b)) / (2.*(a + b))
+            xsecRes.value = (abs(a - b) - (a - b)) / (2.0 * (a + b))
         result.add(xsecRes)
 
     return result
 
-def removeUnits(value,standardUnits):
+
+def removeUnits(value, standardUnits):
     """
     Remove units from unum objects. Uses the units defined
     in physicsUnits.standard units to normalize the data.
@@ -118,32 +120,37 @@ def removeUnits(value,standardUnits):
     :return: Object normalized to standard units (e.g. [[100,100],3000])
     """
 
-    if isinstance(standardUnits,unum.Unum):
+    if isinstance(standardUnits, unum.Unum):
         stdunits = [standardUnits]
     else:
         stdunits = standardUnits
 
-    if isinstance(value,list):
-        return [removeUnits(x,stdunits) for x in value]
-    if isinstance(value,tuple):
-        return tuple([removeUnits(x,stdunits) for x in value])
-    elif isinstance(value,dict):
-        return dict([[removeUnits(x,stdunits),removeUnits(y,stdunits)] for x,y in value.items()])
-    elif isinstance(value,unum.Unum):
-        #Check if value has unit or not:
+    if isinstance(value, list):
+        return [removeUnits(x, stdunits) for x in value]
+    if isinstance(value, tuple):
+        return tuple([removeUnits(x, stdunits) for x in value])
+    elif isinstance(value, dict):
+        return dict(
+            [[removeUnits(x, stdunits), removeUnits(y, stdunits)] for x, y in value.items()]
+        )
+    elif isinstance(value, unum.Unum):
+        # Check if value has unit or not:
         if not value._unit:
             return value.asNumber()
-        #Now try to normalize it by one of the standard pre-defined units:
+        # Now try to normalize it by one of the standard pre-defined units:
         for unit in stdunits:
-            y = (value/unit).normalize()
+            y = (value / unit).normalize()
             if not y._unit:
                 return value.asNumber(unit)
-        raise SModelSError("Could not normalize unit value %s using the standard units: %s"
-                       %(str(value),str(standardUnits)))
+        raise SModelSError(
+            "Could not normalize unit value %s using the standard units: %s"
+            % (str(value), str(standardUnits))
+        )
     else:
         return value
 
-def addUnit(obj,unit):
+
+def addUnit(obj, unit):
     """
     Add unit to object.
     If the object is a nested list, adds the unit to all of its elements.
@@ -153,16 +160,17 @@ def addUnit(obj,unit):
     :return: Object with units (e.g. [[100*GeV,100*GeV]])
     """
 
-    if isinstance(obj,list):
-        return [addUnit(x,unit) for x in obj]
-    elif isinstance(obj,tuple):
-        return tuple([addUnit(x,unit) for x in obj])
-    elif isinstance(obj,dict):
-        return dict([[addUnit(x,unit),addUnit(y,unit)] for x,y in obj.items()])
-    elif isinstance(obj,(float,int,unum.Unum)):
-        return obj*unit
+    if isinstance(obj, list):
+        return [addUnit(x, unit) for x in obj]
+    elif isinstance(obj, tuple):
+        return tuple([addUnit(x, unit) for x in obj])
+    elif isinstance(obj, dict):
+        return dict([[addUnit(x, unit), addUnit(y, unit)] for x, y in obj.items()])
+    elif isinstance(obj, (float, int, unum.Unum)):
+        return obj * unit
     else:
         return obj
+
 
 def flattenArray(objList):
     """
@@ -182,7 +190,8 @@ def flattenArray(objList):
             ret.append(obj)
     return ret
 
-def reshapeList(objList,shapeArray):
+
+def reshapeList(objList, shapeArray):
     """
     Reshape a flat list according to the shape of shapeArray.
     The number of elements in shapeArray should equal the length of objList.
@@ -194,10 +203,11 @@ def reshapeList(objList,shapeArray):
              (e.g. [[200.,100.,'*',50],'*'])
     """
 
-    if isinstance(shapeArray,list):
-        return [reshapeList(objList,v) for v in shapeArray]
+    if isinstance(shapeArray, list):
+        return [reshapeList(objList, v) for v in shapeArray]
     else:
         return objList.pop(0)
+
 
 def index_bisect(inlist, el):
     """
@@ -211,12 +221,15 @@ def index_bisect(inlist, el):
     lo = 0
     hi = len(inlist)
     while lo < hi:
-        mid = (lo+hi)//2
-        if inlist[mid] < el: lo = mid+1
-        else: hi = mid
+        mid = (lo + hi) // 2
+        if inlist[mid] < el:
+            lo = mid + 1
+        else:
+            hi = mid
     return lo
 
-def elementsInStr(instring,removeQuotes=True):
+
+def elementsInStr(instring, removeQuotes=True):
     """
     Parse instring and return a list of elements appearing in instring.
     instring can also be a list of strings.
@@ -229,18 +242,20 @@ def elementsInStr(instring,removeQuotes=True):
 
     """
     outstr = ""
-    if isinstance(instring,str):
+    if isinstance(instring, str):
         outstr = instring
-    elif isinstance(instring,list):
+    elif isinstance(instring, list):
         for st in instring:
-            if not isinstance(st,str):
+            if not isinstance(st, str):
                 logger.error("Input must be a string or a list of strings")
                 raise SModelSError()
             # Combine list of strings in a single string
             outstr += st
     else:
-        raise SModelSError ( "syntax error in constraint/condition: ``%s''." \
-              "Check your constraints and conditions in your database." % str(instring) )
+        raise SModelSError(
+            "syntax error in constraint/condition: ``%s''."
+            "Check your constraints and conditions in your database." % str(instring)
+        )
 
     elements = []
     outstr = outstr.replace(" ", "")
@@ -252,9 +267,9 @@ def elementsInStr(instring,removeQuotes=True):
     # complete, store element
     for c in outstr:
         delta = 0
-        if c == '[':
+        if c == "[":
             delta = -1
-        elif c == ']':
+        elif c == "]":
             delta = 1
         nc += delta
         if nc != 0:
@@ -263,10 +278,9 @@ def elementsInStr(instring,removeQuotes=True):
             elements.append(elStr + c)
             elStr = ""
             # Syntax checks
-            ptclist = elements[-1].replace(']', ',').replace('[', ',').\
-                    split(',')
+            ptclist = elements[-1].replace("]", ",").replace("[", ",").split(",")
             for ptc in ptclist:
-                ptc = ptc.replace("'","")
+                ptc = ptc.replace("'", "")
                 if not ptc:
                     continue
 
@@ -275,6 +289,7 @@ def elementsInStr(instring,removeQuotes=True):
         raise SModelSError("Wrong input (incomplete elements?) " + instring)
 
     return elements
+
 
 def getValuesForObj(obj, attribute):
     """
@@ -293,22 +308,22 @@ def getValuesForObj(obj, attribute):
     except AttributeError:
         return values
 
-
-    for attr,value in objDict:
+    for attr, value in objDict:
         if attribute == attr:
             values += [value]
-        elif isinstance(value,Iterable):
-            values += [getValuesForObj(v,attribute) for v in value if not v is obj]
+        elif isinstance(value, Iterable):
+            values += [getValuesForObj(v, attribute) for v in value if not v is obj]
         elif not value is obj:
-            values += getValuesForObj(value,attribute)
+            values += getValuesForObj(value, attribute)
 
-    values =  list(filter(lambda a: (not isinstance(a,list)) or a != [], values))
+    values = list(filter(lambda a: (not isinstance(a, list)) or a != [], values))
     values = flattenArray(values)
-    uniqueValues = [v for n,v in enumerate(values) if v not in values[:n]]
+    uniqueValues = [v for n, v in enumerate(values) if v not in values[:n]]
 
     return uniqueValues
 
-def getAttributesFrom(obj,skipIDs=[]):
+
+def getAttributesFrom(obj, skipIDs=[]):
     """
     Loops over all attributes in the object and return a list
     of the attributes.
@@ -320,7 +335,7 @@ def getAttributesFrom(obj,skipIDs=[]):
     :return: List with unique attribute labels.
     """
 
-    if id(obj) in skipIDs or isinstance(obj,(tuple,list,float,int,unum.Unum)):
+    if id(obj) in skipIDs or isinstance(obj, (tuple, list, float, int, unum.Unum)):
         return []
     else:
         newSkipIDs = skipIDs[:] + [id(obj)]
@@ -330,21 +345,21 @@ def getAttributesFrom(obj,skipIDs=[]):
     except AttributeError:
         return attributes
 
-
-    for attr,value in objDict:
+    for attr, value in objDict:
         attributes.append(attr)
-        if isinstance(value,list):
-            attributes += [getAttributesFrom(v,newSkipIDs) for v in value]
-        elif isinstance(value,dict):
-            attributes += [getAttributesFrom(v,newSkipIDs) for v in value.values()]
+        if isinstance(value, list):
+            attributes += [getAttributesFrom(v, newSkipIDs) for v in value]
+        elif isinstance(value, dict):
+            attributes += [getAttributesFrom(v, newSkipIDs) for v in value.values()]
         else:
-            attributes += getAttributesFrom(value,newSkipIDs)
+            attributes += getAttributesFrom(value, newSkipIDs)
 
-    attributes =  list(filter(lambda a: a != [], attributes))
+    attributes = list(filter(lambda a: a != [], attributes))
 
     return list(set(flattenArray(attributes)))
 
-def roundValue(value,nround=-1):
+
+def roundValue(value, nround=-1):
     """
     Round a value to nround significant digits. If the input value is not
     a float or Unum object, it is zero or infinity, nothing is done.
@@ -356,27 +371,28 @@ def roundValue(value,nround=-1):
 
     if nround <= 0:
         return value
-    elif not isinstance(value,(float,unum.Unum)):
+    elif not isinstance(value, (float, unum.Unum)):
         return value
 
-    #Remove units, if it is a unum object
-    if isinstance(value,unum.Unum):
+    # Remove units, if it is a unum object
+    if isinstance(value, unum.Unum):
         if not value.asNumber():
             return value
         elif np.isinf(value.asNumber()):
             return value
-        unit = value/value.asNumber()
+        unit = value / value.asNumber()
         v = value.asNumber()
     else:
         unit = 1.0
         v = value
 
-    #Round value:
-    v_rounded = round(v, nround-int(np.floor(np.log10(abs(v))))-1)
+    # Round value:
+    v_rounded = round(v, nround - int(np.floor(np.log10(abs(v)))) - 1)
     v_rounded *= unit
     return v_rounded
 
-def average(values,weights=None,nround=-1):
+
+def average(values, weights=None, nround=-1):
     """
     Compute the weighted average of a list of objects.
     All the objects must be of the same type.
@@ -394,41 +410,42 @@ def average(values,weights=None,nround=-1):
     """
 
     if weights is None:
-        weights = [1.]*len(values)
-    if not isinstance(values,list):
+        weights = [1.0] * len(values)
+    if not isinstance(values, list):
         raise SModelSError("Values must be a list of objects")
-    if not isinstance(weights,list):
+    if not isinstance(weights, list):
         raise SModelSError("Weights must be a list of objects")
-    if any(not isinstance(w,(float,int)) for w in weights):
+    if any(not isinstance(w, (float, int)) for w in weights):
         raise SModelSError("Weights must be a list of integers or floats")
     if len(values) != len(weights):
         return SModelSError("Values and weights must have the same length")
 
     if any(type(v) != type(values[0]) for v in values):
         raise SModelSError("Can not compute average of distinct types of objects")
-    if isinstance(values[0],(float,int,unum.Unum)):
-        total = values[0]*weights[0]
-        for i,v in enumerate(values[1:]):
-            total += v*weights[i+1]
-        total = total/sum(weights)
-        return roundValue(total,nround)
-    elif isinstance(values[0],list):
+    if isinstance(values[0], (float, int, unum.Unum)):
+        total = values[0] * weights[0]
+        for i, v in enumerate(values[1:]):
+            total += v * weights[i + 1]
+        total = total / sum(weights)
+        return roundValue(total, nround)
+    elif isinstance(values[0], list):
         ndim = len(values[0])
         if any(len(v) != ndim for v in values):
             raise SModelSError("Can not compute average of lists of distinct lengths")
         res = []
         for i in range(ndim):
             try:
-                res.append(average([v[i] for v in values],weights,nround))
+                res.append(average([v[i] for v in values], weights, nround))
             except SModelSError:
                 return None
         return res
     else:
         if all(values[0] is v for v in values):
-            return roundValue(values[0],nround)
+            return roundValue(values[0], nround)
         if all(values[0] == v for v in values):
-            return roundValue(values[0],nround)
+            return roundValue(values[0], nround)
         return None
+
 
 def rescaleWidth(width):
     """
@@ -442,18 +459,23 @@ def rescaleWidth(width):
     :return x: Coordinate value (float)
     """
 
-    if isinstance(width,unum.Unum):
+    if isinstance(width, unum.Unum):
         w = width.asNumber(GeV)
     else:
         w = width
 
-    minWidth = 1e-30 #Any width below this can be safely considered to be zero
-    maxWidth = 1e50 #Any width above this can be safely considered to be infinity
-    w = (min(w,maxWidth)/minWidth) #Normalize the width and convert it to some finite number (if not finite)
-    if w < 1e-10: #The log function misbehaves for very small values of w (step behavior), so we use log(1+x) = x for x << 1
+    minWidth = 1e-30  # Any width below this can be safely considered to be zero
+    maxWidth = 1e50  # Any width above this can be safely considered to be infinity
+    w = (
+        min(w, maxWidth) / minWidth
+    )  # Normalize the width and convert it to some finite number (if not finite)
+    if (
+        w < 1e-10
+    ):  # The log function misbehaves for very small values of w (step behavior), so we use log(1+x) = x for x << 1
         return w
     else:
-        return np.log(1+w)
+        return np.log(1 + w)
+
 
 def unscaleWidth(x):
     """
@@ -465,16 +487,17 @@ def unscaleWidth(x):
     :return width: Width value (in GeV) with unit
     """
 
-    minWidth = 1e-30 #Any width below this can be safely considered to be zero
-    maxWidth = 1e50 #Any width above this can be safely considered to be infinity
-    with np.errstate(over='ignore'): #Temporarily disable overflow error message
-        #The small increase in x is required to enforce unscaleWidth(widthToCoordinae(np.inf)) = np.inf
-        width = minWidth*(np.exp(x)-1)
+    minWidth = 1e-30  # Any width below this can be safely considered to be zero
+    maxWidth = 1e50  # Any width above this can be safely considered to be infinity
+    with np.errstate(over="ignore"):  # Temporarily disable overflow error message
+        # The small increase in x is required to enforce unscaleWidth(widthToCoordinae(np.inf)) = np.inf
+        width = minWidth * (np.exp(x) - 1)
         if width > maxWidth:
             width = np.inf
-    return width*GeV
+    return width * GeV
 
-def removeInclusives(massArray,shapeArray):
+
+def removeInclusives(massArray, shapeArray):
     """
     Remove all entries corresponding to '*' in shapeArray.
     If shapeArray contains entries = '*', the corresponding entries
@@ -486,19 +509,24 @@ def removeInclusives(massArray,shapeArray):
     :return: formatted array (e.g. [[200.,100.]] or [[200.]],0.4])
     """
 
-    if shapeArray == '*':
+    if shapeArray == "*":
         return None
-    elif isinstance(massArray,list):
+    elif isinstance(massArray, list):
         if len(shapeArray) != len(massArray):
-            raise SModelSError("Input value and data shape mismatch (%s,%s)"
-                               %(len(shapeArray),len(massArray)))
+            raise SModelSError(
+                "Input value and data shape mismatch (%s,%s)" % (len(shapeArray), len(massArray))
+            )
         else:
-            return [removeInclusives(xi,shapeArray[i]) for i,xi in enumerate(massArray)
-                    if not removeInclusives(xi,shapeArray[i]) is None]
+            return [
+                removeInclusives(xi, shapeArray[i])
+                for i, xi in enumerate(massArray)
+                if not removeInclusives(xi, shapeArray[i]) is None
+            ]
     else:
         return massArray
 
-def addInclusives(massList,shapeArray):
+
+def addInclusives(massList, shapeArray):
     """
     Add entries corresponding to '*' in shapeArray.
     If shapeArray contains entries = '*', the corresponding entries
@@ -512,9 +540,9 @@ def addInclusives(massList,shapeArray):
     :return: original array with '*' inserted at the correct entries.
     """
 
-    if isinstance(shapeArray,list):
-        return [addInclusives(massList,v) for v in shapeArray]
-    elif shapeArray != '*':
+    if isinstance(shapeArray, list):
+        return [addInclusives(massList, v) for v in shapeArray]
+    elif shapeArray != "*":
         return massList.pop(0)
     else:
         return shapeArray

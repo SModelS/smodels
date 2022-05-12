@@ -6,6 +6,6 @@
 
 .. moduleauthor:: Michael Traub <michael.traub@gmx.at>
 
-"""   
+"""
 
-utilsPath = '../../../smodels-utils'
+utilsPath = "../../../smodels-utils"

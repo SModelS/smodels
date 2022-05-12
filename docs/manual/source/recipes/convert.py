@@ -2,44 +2,46 @@
 
 import subprocess, glob, os
 
-cmd=subprocess.getoutput("which jupyter-nbconvert")
-if cmd=="":
-    cmd=subprocess.getoutput("which jupyter" )
+cmd = subprocess.getoutput("which jupyter-nbconvert")
+if cmd == "":
+    cmd = subprocess.getoutput("which jupyter")
     if cmd == "":
-        cmd=subprocess.getoutput("which ipython" ) 
+        cmd = subprocess.getoutput("which ipython")
     if cmd != "":
-        cmd =cmd + " nbconvert"
+        cmd = cmd + " nbconvert"
 
-print ( "command for conversion: %s" % cmd )
+print("command for conversion: %s" % cmd)
 
-notebooks=glob.glob("*.ipynb")
-htmls=glob.glob("*.html")
+notebooks = glob.glob("*.ipynb")
+htmls = glob.glob("*.html")
 
-def run ( nb ):
-    execute=""
+
+def run(nb):
+    execute = ""
     if "interactivePlots" in nb:
         execute = " --execute"
-    cmd1="%s%s --to html %s" % ( cmd, execute, nb )
-    cmd2="%s --to python %s" % ( cmd, nb )
-    print ( "convert: %s" % cmd1 )
-    subprocess.getoutput ( cmd1 )
-    subprocess.getoutput ( cmd2 )
+    cmd1 = "%s%s --to html %s" % (cmd, execute, nb)
+    cmd2 = "%s --to python %s" % (cmd, nb)
+    print("convert: %s" % cmd1)
+    subprocess.getoutput(cmd1)
+    subprocess.getoutput(cmd2)
+
 
 for notebook in notebooks:
-    m_nb = os.stat ( notebook ).st_mtime ## last modified notebook
-    htmlf = notebook.replace(".ipynb",".html")
+    m_nb = os.stat(notebook).st_mtime  ## last modified notebook
+    htmlf = notebook.replace(".ipynb", ".html")
     if not htmlf in htmls:
-        run ( notebook )
+        run(notebook)
         continue
-    m_html = os.stat ( htmlf ).st_mtime ## last modified html
-    if m_html < m_nb: ## notebook changed since?
-        run ( notebook )
+    m_html = os.stat(htmlf).st_mtime  ## last modified html
+    if m_html < m_nb:  ## notebook changed since?
+        run(notebook)
     else:
-        print ( "%s has not changed." % notebook )
+        print("%s has not changed." % notebook)
 
 #
-#for i in `ls *.ipynb`; do
-#	$CMD --to html $i || { echo "\nERROR: cannot execute $CMD nbconvert. Maybe install jupyter-nbconvert?\n\n"; exit; }
+# for i in `ls *.ipynb`; do
+# 	$CMD --to html $i || { echo "\nERROR: cannot execute $CMD nbconvert. Maybe install jupyter-nbconvert?\n\n"; exit; }
 #  $CMD --to python $i;
-#done
+# done
 #

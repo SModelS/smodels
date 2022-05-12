@@ -12,6 +12,7 @@ import sys
 import os
 import importlib
 import subprocess
+
 sys.path.insert(0, "../")
 import unittest
 from xml.etree import ElementTree
@@ -50,9 +51,12 @@ def compareXML(xmldefault, xmlnew, allowedDiff, ignore=[]):
                     newel.text = eval(newel.text)
                 except (TypeError, NameError, SyntaxError):
                     pass
-            if isinstance(el.text, float) and isinstance(newel.text, float) \
-                    and newel.text != el.text:
-                diff = 2.*abs(el.text-newel.text)/abs(el.text+newel.text)
+            if (
+                isinstance(el.text, float)
+                and isinstance(newel.text, float)
+                and newel.text != el.text
+            ):
+                diff = 2.0 * abs(el.text - newel.text) / abs(el.text + newel.text)
                 if diff > allowedDiff:
                     log("values %s and %s differ" % (el.text, newel.text))
                     return False
@@ -71,17 +75,21 @@ def compareXML(xmldefault, xmlnew, allowedDiff, ignore=[]):
 
 def compareSLHA(slhadefault, slhanew, allowedDiff):
 
-    newData = pyslha.read(slhanew, ignorenomass=True, ignorenobr=True, ignoreblocks=["SMODELS_SETTINGS"])
-    defaultData = pyslha.read(slhadefault, ignorenomass=True, ignorenobr=True, ignoreblocks=["SMODELS_SETTINGS"])
+    newData = pyslha.read(
+        slhanew, ignorenomass=True, ignorenobr=True, ignoreblocks=["SMODELS_SETTINGS"]
+    )
+    defaultData = pyslha.read(
+        slhadefault, ignorenomass=True, ignorenobr=True, ignoreblocks=["SMODELS_SETTINGS"]
+    )
     defaultBlocks = sorted([defaultData.blocks[b].name for b in defaultData.blocks])
     newBlocks = sorted([newData.blocks[b].name for b in newData.blocks])
     if defaultBlocks != newBlocks:
-        logger.error('Block structure differs!')
+        logger.error("Block structure differs!")
         return False
 
     for b in defaultData.blocks:
         if len(defaultData.blocks[b].entries) != len(newData.blocks[b].entries):
-            logger.error('Numbers of entries in block %s differ' % (defaultData.blocks[b].name))
+            logger.error("Numbers of entries in block %s differ" % (defaultData.blocks[b].name))
             return False
         keys = defaultData.blocks[b].keys()
         bkeys = newData.blocks[b].keys()
@@ -93,16 +101,16 @@ def compareSLHA(slhadefault, slhanew, allowedDiff):
             ej = newData.blocks[b].entries[k]
             if type(ei) == float and type(ej) == float:
                 denom = ei + ej
-                if denom == 0.:
+                if denom == 0.0:
                     denom = 1e-6
-                de = 2. * abs(ei - ej) / denom
+                de = 2.0 * abs(ei - ej) / denom
                 if de > allowedDiff:
                     blk = "".join(b)
-                    logger.error(f'Entries in block {blk} differ: {ei}!={ej}')
+                    logger.error(f"Entries in block {blk} differ: {ei}!={ej}")
                     return False
             elif ei != ej:
                 blk = "".join(b)
-                logger.error(f'Entries in block {blk} differ: {ei}!={ej} {type(ei)}')
+                logger.error(f"Entries in block {blk} differ: {ei}!={ej} {type(ei)}")
                 return False
     return True
 
@@ -112,7 +120,7 @@ class RunPrinterTest(unittest.TestCase):
     # use with super great care!!
 
     def removeOutputs(self, f):
-        """ remove cruft outputfiles """
+        """remove cruft outputfiles"""
         for i in [f, f.replace(".py", ".pyc")]:
             if os.path.exists(i):
                 os.remove(i)
@@ -123,7 +131,7 @@ class RunPrinterTest(unittest.TestCase):
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(slhafile)
-        outputfile = outputfile.replace('.py', '.smodels')
+        outputfile = outputfile.replace(".py", ".smodels")
 
         defaultfile = "gluino_squarks_default.smodels"
         # Test summary output
@@ -139,62 +147,94 @@ class RunPrinterTest(unittest.TestCase):
     def testPythonPrinter(self):
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
-        outputfile = runMain(slhafile,suppressStdout = True )
+        outputfile = runMain(slhafile, suppressStdout=True)
         smodelsOutput = importModule(outputfile)
 
         # Test python output
         from gluino_squarks_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version']
-        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
-        smodelsOutput['ExptRes'] = sorted(smodelsOutput['ExptRes'],
-                                          key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.05,
-                           ignore=ignoreFields, where="top",
-                           fname="./unitTestOutput/printer_output.py")
+
+        ignoreFields = ["input file", "smodels version", "ncpus", "database version"]
+        smodelsOutputDefault["ExptRes"] = sorted(
+            smodelsOutputDefault["ExptRes"], key=lambda res: res["r"], reverse=True
+        )
+        smodelsOutput["ExptRes"] = sorted(
+            smodelsOutput["ExptRes"], key=lambda res: res["r"], reverse=True
+        )
+        equals = equalObjs(
+            smodelsOutput,
+            smodelsOutputDefault,
+            allowedDiff=0.05,
+            ignore=ignoreFields,
+            where="top",
+            fname="./unitTestOutput/printer_output.py",
+        )
         try:
             self.assertTrue(equals)
         except AssertionError as e:
-            print("Error: %s, when comparing %s \nwith %s." % (e, "output.py", "gluino_squarks_default.py"))
+            print(
+                "Error: %s, when comparing %s \nwith %s."
+                % (e, "output.py", "gluino_squarks_default.py")
+            )
             raise AssertionError(e)
         self.removeOutputs(outputfile)
-        self.removeOutputs('./debug.log')
+        self.removeOutputs("./debug.log")
 
     def testPythonPrinterSimple(self):
 
         slhafile = "./testFiles/slha/simplyGluino.slha"
-        outputfile = runMain(slhafile, inifile='testParameters_exp.ini')
+        outputfile = runMain(slhafile, inifile="testParameters_exp.ini")
         smodelsOutput = importModule(outputfile)
 
         if self.definingRun:
             from smodels.tools.smodelsLogging import logger
+
             logger.error("This is a definition run! Know what youre doing!")
             default = "simplyGluino_default.py"
-            outputfile = './unitTestOutput/printer_output_simple.py'
-            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (outputfile, default)
+            outputfile = "./unitTestOutput/printer_output_simple.py"
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (
+                outputfile,
+                default,
+            )
             subprocess.getoutput(cmd)
         from simplyGluino_default_extended import smodelsOutputDefault
 
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version', 'model', 'checkinput', 'doinvisible', 'docompress', 'computestatistics', 'testcoverage' ]
-        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
-        smodelsOutput['ExptRes'] = sorted(smodelsOutput['ExptRes'],
-                                          key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.05,
-                           ignore=ignoreFields)
+        ignoreFields = [
+            "input file",
+            "smodels version",
+            "ncpus",
+            "database version",
+            "model",
+            "checkinput",
+            "doinvisible",
+            "docompress",
+            "computestatistics",
+            "testcoverage",
+        ]
+        smodelsOutputDefault["ExptRes"] = sorted(
+            smodelsOutputDefault["ExptRes"], key=lambda res: res["r"], reverse=True
+        )
+        smodelsOutput["ExptRes"] = sorted(
+            smodelsOutput["ExptRes"], key=lambda res: res["r"], reverse=True
+        )
+        equals = equalObjs(
+            smodelsOutput, smodelsOutputDefault, allowedDiff=0.05, ignore=ignoreFields
+        )
 
         try:
             self.assertTrue(equals)
             self.removeOutputs(outputfile)
         except AssertionError as e:
-            print("Error: %s, when comparing %s \nwith %s." % (e, outputfile, "simplyGluino_default.py"))
+            print(
+                "Error: %s, when comparing %s \nwith %s."
+                % (e, outputfile, "simplyGluino_default.py")
+            )
             raise AssertionError(e)
 
     def testXmlPrinter(self):
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(slhafile)
-        outputfile = outputfile.replace('.py', '.xml')
+        outputfile = outputfile.replace(".py", ".xml")
 
         defFile = "default_output.xml"
 
@@ -204,21 +244,26 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         try:
-            self.assertTrue(compareXML(xmlDefault, xmlNew,
-                                       allowedDiff=0.05,
-                                       ignore=['input_file', 'smodels_version', 'ncpus']))
+            self.assertTrue(
+                compareXML(
+                    xmlDefault,
+                    xmlNew,
+                    allowedDiff=0.05,
+                    ignore=["input_file", "smodels_version", "ncpus"],
+                )
+            )
         except AssertionError as e:
             msg = "%s != %s" % (defFile, outputfile) + "\n" + str(e)
             msg += ". Try and consult debug.log for more info."
             raise AssertionError(msg)
         self.removeOutputs(outputfile)
-        self.removeOutputs('./debug.log')
+        self.removeOutputs("./debug.log")
 
     def testXmlPrinterSimple(self):
 
         slhafile = "./testFiles/slha/simplyGluino.slha"
-        outputfile = runMain(slhafile, inifile='testParameters_exp.ini')
-        outputfile = outputfile.replace('.py', '.xml')
+        outputfile = runMain(slhafile, inifile="testParameters_exp.ini")
+        outputfile = outputfile.replace(".py", ".xml")
 
         defFile = "default_outputSimplyGluino.xml"
 
@@ -228,24 +273,29 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         try:
-            self.assertTrue(compareXML(xmlDefault, xmlNew, allowedDiff=0.05,
-                                       ignore=['input_file', 'smodels_version', 'ncpus']))
+            self.assertTrue(
+                compareXML(
+                    xmlDefault,
+                    xmlNew,
+                    allowedDiff=0.05,
+                    ignore=["input_file", "smodels_version", "ncpus"],
+                )
+            )
         except AssertionError as e:
             msg = "%s != %s" % (defFile, outputfile) + "\n" + str(e)
             raise AssertionError(msg)
         self.removeOutputs(outputfile)
-        self.removeOutputs('./debug.log')
+        self.removeOutputs("./debug.log")
 
     def testSLHAPrinter(self):
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
-        outputfile = runMain(slhafile,suppressStdout = True )
-        outputfile = outputfile.replace('.py', '.smodelsslha')
+        outputfile = runMain(slhafile, suppressStdout=True)
+        outputfile = outputfile.replace(".py", ".smodelsslha")
 
         slhaDefaultFile = "./gluino_squarks_default.slha.smodelsslha"
         try:
-            self.assertTrue(compareSLHA(slhaDefaultFile, outputfile,
-                                        allowedDiff=0.05))
+            self.assertTrue(compareSLHA(slhaDefaultFile, outputfile, allowedDiff=0.05))
         except AssertionError:
             msg = "%s != %s" % (slhaDefaultFile, outputfile)
             raise AssertionError(msg)

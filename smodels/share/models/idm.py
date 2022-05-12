@@ -14,15 +14,15 @@ from smodels.theory.particle import Particle, MultiParticle
 
 ####  R-odd   ##########
 
-H0 = Particle(Z2parity=-1, label='H0', pdg=35, eCharge=0, colordim=1, spin=0)
-A0 = Particle(Z2parity=-1, label='A0', pdg=36, eCharge=0, colordim=1, spin=0)
-H = Particle(Z2parity=-1, label='H+', pdg=37, eCharge=+1, colordim=1, spin=0)
+H0 = Particle(Z2parity=-1, label="H0", pdg=35, eCharge=0, colordim=1, spin=0)
+A0 = Particle(Z2parity=-1, label="A0", pdg=36, eCharge=0, colordim=1, spin=0)
+H = Particle(Z2parity=-1, label="H+", pdg=37, eCharge=+1, colordim=1, spin=0)
 
 
 rOdd = [H0, A0, H]
-rOddC = [p.chargeConjugate() for p in rOdd]  #Define the charge conjugates
+rOddC = [p.chargeConjugate() for p in rOdd]  # Define the charge conjugates
 
-#Generic BSM particles:
+# Generic BSM particles:
 
 BSMList = rOdd + rOddC
-BSMparticleList = MultiParticle('BSM', BSMList)
+BSMparticleList = MultiParticle("BSM", BSMList)

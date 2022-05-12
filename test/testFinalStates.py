@@ -6,7 +6,8 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 import sys
-sys.path.insert(0,"../")
+
+sys.path.insert(0, "../")
 import unittest
 
 from smodels.theory.model import Model
@@ -15,20 +16,19 @@ from smodels.experiment.defaultFinalStates import finalStates
 
 
 class FinalStateTest(unittest.TestCase):
-
     def testUniqueLabels(self):
 
-        allLabels = finalStates.getValuesFor('label')
-        #Check if for each label there is a unique particle object defined
+        allLabels = finalStates.getValuesFor("label")
+        # Check if for each label there is a unique particle object defined
         for label in allLabels:
             p = finalStates.getParticlesWith(label=label)
             self.assertTrue(len(p) == 1)
 
     def testUniquePDGs(self):
 
-        model = Model(SMparticles=SMList,BSMparticles=[])
-        allPDGs = model.getValuesFor('pdg')
-        #Check if for each SM PDG there is a unique particle object defined
+        model = Model(SMparticles=SMList, BSMparticles=[])
+        allPDGs = model.getValuesFor("pdg")
+        # Check if for each SM PDG there is a unique particle object defined
         for pdg in allPDGs:
             p = model.getParticlesWith(pdg=pdg)
             self.assertTrue(len(p) == 1)
