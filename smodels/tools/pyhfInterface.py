@@ -514,8 +514,8 @@ class PyhfUpperLimitComputer:
         var_mu = np.sum ( vars )
         n = len ( obss )
         sigma_mu = float ( np.sqrt ( var_mu / (n**2) ) )
+        # print ( f" sigma_mu from pyhf uncorr {sigma_mu} {vars[:3]} "  )
         self.sigma_mu = sigma_mu
-        # logger.error ( f"sigma_mu {sigma_mu} {vars[:3]} "  )
         #import IPython
         #IPython.embed()
         #sys.exit()
@@ -559,6 +559,15 @@ class PyhfUpperLimitComputer:
                     bounds[model.config.poi_index] = (-5., 10. )
                 muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model,
                         return_fitted_val=True, par_bounds = bounds )
+                if False: # get sigma_mu from hessian
+                    pyhf.set_backend(pyhf.tensorlib, 'minuit')
+                    muhat, maxNllh,o = pyhf.infer.mle.fit(workspace.data(model), model,
+                            return_fitted_val=True, par_bounds = bounds,
+                            return_result_obj = True )
+                    sigma_mu = float ( np.sqrt ( o.hess_inv[0][0] ) ) * self.scale
+                    # print ( f"\n>>> sigma_mu from hessian {sigma_mu:.2f}" )
+                    pyhf.set_backend(pyhf.tensorlib, 'scipy')
+
                 muhat = muhat[model.config.poi_index]*self.scale
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:

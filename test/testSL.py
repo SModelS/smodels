@@ -26,8 +26,8 @@ class SLTest(unittest.TestCase):
                   name="pathological model",deltas_rel=0. )
         m.zeroSignal()
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
-        ul = ulComp.ulOnYields(m, marginalize=True )
-        ulProf = ulComp.ulOnYields ( m, marginalize=False )
+        ul = ulComp.ulOnMu(m, marginalize=True )
+        ulProf = ulComp.ulOnMu ( m, marginalize=False )
         self.assertEqual(ul, None )
         self.assertEqual(ulProf, None )
 
@@ -41,8 +41,8 @@ class SLTest(unittest.TestCase):
                   name="pathological model 2",deltas_rel=0. )
         m.zeroSignal()
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
-        ul = ulComp.ulOnYields(m, marginalize=True )
-        ulProf = ulComp.ulOnYields(m, marginalize=False )
+        ul = ulComp.ulOnMu(m, marginalize=True )
+        ulProf = ulComp.ulOnMu(m, marginalize=False )
         self.assertAlmostEqual(ul/(3049.*sum(m.nsignal)), 1., 1 )
         self.assertAlmostEqual(ulProf/(1920.*sum(m.nsignal)), 1., 1 )
 
@@ -63,9 +63,9 @@ class SLTest(unittest.TestCase):
                   nsignal= nsignal,
                   name="CMS-NOTE-2017-001 model",deltas_rel=0. )
         ulComp = UpperLimitComputer (ntoys=2000, cl=.95 )
-        ulProf = ulComp.ulOnYields ( m, marginalize=False )
+        ulProf = ulComp.ulOnMu ( m, marginalize=False )
         self.assertAlmostEqual( ulProf/180.676, 1.0, 3 )
-        ul = ulComp.ulOnYields ( m, marginalize = True )
+        ul = ulComp.ulOnMu ( m, marginalize = True )
         self.assertAlmostEqual( ul/186.609514, 1.0, 1 )
 
     def createModel(self,n=3):
@@ -87,9 +87,9 @@ class SLTest(unittest.TestCase):
         """ take first n SRs of model-90 """
         m = self.createModel ( 3 )
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
-        ulProf = ulComp.ulOnYields( m, marginalize=False )
+        ulProf = ulComp.ulOnMu( m, marginalize=False )
         self.assertAlmostEqual( ulProf/54.793636190198924, 1.0, 3 )
-        ul = ulComp.ulOnYields( m, marginalize=True )
+        ul = ulComp.ulOnMu( m, marginalize=True )
         ## Nick's profiling code gets for n=3 ul=2135.66
         self.assertAlmostEqual( ul/55.554, 1.0, 1 )
 
@@ -97,9 +97,9 @@ class SLTest(unittest.TestCase):
         """ take first 10 SRs of model-90 """
         m = self.createModel ( 10 )
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
-        ulProf = ulComp.ulOnYields( m, marginalize=False )
+        ulProf = ulComp.ulOnMu( m, marginalize=False )
         self.assertAlmostEqual( ulProf/105.521134, 1.0, 3 )
-        ul = ulComp.ulOnYields(m,marginalize=True)
+        ul = ulComp.ulOnMu(m,marginalize=True)
         ## Nick's profiling code gets for n=10 ul=357.568
         self.assertAlmostEqual(ul/106.37, 1.0, 1 )
 
@@ -107,9 +107,9 @@ class SLTest(unittest.TestCase):
         m = self.createModel ( 40 )
         import time
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
-        ulProf = ulComp.ulOnYields ( m, marginalize=False )
+        ulProf = ulComp.ulOnMu ( m, marginalize=False )
         self.assertAlmostEqual( ulProf/75.29914, 1.0, 3 )
-        ul = ulComp.ulOnYields ( m, marginalize=True )
+        ul = ulComp.ulOnMu ( m, marginalize=True )
         self.assertAlmostEqual ( ul/78.5094475, 1., 1 )
 
 if __name__ == "__main__":
