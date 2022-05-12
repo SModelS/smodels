@@ -465,7 +465,7 @@ class PyhfUpperLimitComputer:
                     self.restore()
                     return self.exponentiateNLL(None, not nll)
                 _, nllh = pyhf.infer.mle.fixed_poi_fit(
-                    1.0, d, model, return_fitted_val=True, maxiter=200
+                    mu, d, model, return_fitted_val=True, maxiter=200
                 )
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.debug(f"pyhf fixed_poi_fit failed for mu={mu}: {e}")
@@ -479,7 +479,7 @@ class PyhfUpperLimitComputer:
                     initpars[i] = 1.0
                 try:
                     _, nllh = pyhf.infer.mle.fixed_poi_fit(
-                        1.0,
+                        mu,
                         workspace.data(model),
                         model,
                         return_fitted_val=True,
