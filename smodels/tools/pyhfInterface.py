@@ -508,6 +508,8 @@ class PyhfUpperLimitComputer:
         vars = []
         for c in channels:
             # poissonian error
+            if nsig[c]==0.:
+                nsig[c]=1e-5
             poiss = (obss[c]-bgs[c]) / nsig[c]
             gauss = bgVars[c] / nsig[c]**2
             vars.append ( poiss + gauss )
