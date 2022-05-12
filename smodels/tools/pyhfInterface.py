@@ -578,17 +578,19 @@ class PyhfUpperLimitComputer:
         vars = []
         for c in channels:
             # poissonian error
-            poiss = (obss[c] - bgs[c]) / nsig[c]
-            gauss = bgVars[c] / nsig[c] ** 2
-            vars.append(poiss + gauss)
-        var_mu = np.sum(vars)
-        n = len(obss)
-        sigma_mu = float(np.sqrt(var_mu / (n**2)))
+            if nsig[c]==0.:
+                nsig[c]=1e-5
+            poiss = (obss[c]-bgs[c]) / nsig[c]
+            gauss = bgVars[c] / nsig[c]**2
+            vars.append ( poiss + gauss )
+        var_mu = np.sum ( vars )
+        n = len ( obss )
+        sigma_mu = float ( np.sqrt ( var_mu / (n**2) ) )
+        # print ( f" sigma_mu from pyhf uncorr {sigma_mu} {vars[:3]} "  )
         self.sigma_mu = sigma_mu
-        # logger.error ( f"sigma_mu {sigma_mu} {vars[:3]} "  )
-        # import IPython
-        # IPython.embed()
-        # sys.exit()
+        #import IPython
+        #IPython.embed()
+        #sys.exit()
 
     def lmax(self, workspace_index=None, nll=False, expected=False, allowNegativeSignals=False):
         """
@@ -628,11 +630,19 @@ class PyhfUpperLimitComputer:
             try:
                 bounds = model.config.suggested_bounds()
                 if allowNegativeSignals:
-                    bounds[model.config.poi_index] = (-5.0, 10.0)
-                muhat, maxNllh = pyhf.infer.mle.fit(
-                    workspace.data(model), model, return_fitted_val=True, par_bounds=bounds
-                )
-                muhat = muhat[model.config.poi_index] * self.scale
+                    bounds[model.config.poi_index] = (-5., 10. )
+                muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model,
+                        return_fitted_val=True, par_bounds = bounds )
+                if False: # get sigma_mu from hessian
+                    pyhf.set_backend(pyhf.tensorlib, 'minuit')
+                    muhat, maxNllh,o = pyhf.infer.mle.fit(workspace.data(model), model,
+                            return_fitted_val=True, par_bounds = bounds,
+                            return_result_obj = True )
+                    sigma_mu = float ( np.sqrt ( o.hess_inv[0][0] ) ) * self.scale
+                    # print ( f"\n>>> sigma_mu from hessian {sigma_mu:.2f}" )
+                    pyhf.set_backend(pyhf.tensorlib, 'scipy')
+
+                muhat = muhat[model.config.poi_index]*self.scale
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.error(f"pyhf mle.fit failed {e}")

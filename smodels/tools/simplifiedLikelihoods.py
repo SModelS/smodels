@@ -993,12 +993,12 @@ class UpperLimitComputer:
         self.toys = ntoys
         self.cl = cl
 
-    def ulOnSigmaTimesEff(
-        self, model, marginalize=False, toys=None, expected=False, trylasttime=False
-    ):
-        """upper limit on the fiducial cross section sigma times efficiency,
-            obtained from the defined
-            Data (using the signal prediction
+
+    def ulOnSigmaTimesEff( self, model, marginalize=False, toys=None, expected=False,
+             trylasttime = False ):
+        """ upper limit on the fiducial cross section sigma times efficiency,
+            summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
+            obtained from the defined Data (using the signal prediction
             for each signal regio/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
@@ -1010,9 +1010,9 @@ class UpperLimitComputer:
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on fiducial cross section
         """
-        ul = self.ulOnYields(
-            model, marginalize=marginalize, toys=toys, expected=expected, trylasttime=trylasttime
-        )
+        ul = self.ulOnMu ( model, marginalize=marginalize, toys=toys,
+                expected=expected, trylasttime=trylasttime )
+
         if ul == None:
             return ul
         if model.lumi is None:
@@ -1127,9 +1127,11 @@ class UpperLimitComputer:
 
         return mu_hat, sigma_mu, root_func
 
-    def ulOnYields(self, model, marginalize=False, toys=None, expected=False, trylasttime=False):
-        """upper limit on signal yields obtained from the defined
-            Data (using the signal prediction
+    def ulOnMu( self, model, marginalize=False, toys=None, expected=False,
+             trylasttime = False ):
+        """ upper limit on the signal strength multiplier mu
+            obtained from the defined Data (using the signal prediction
+
             for each signal regio/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
@@ -1139,7 +1141,7 @@ class UpperLimitComputer:
                           true: compute a priori expected, "posteriori":
                           compute a posteriori expected
         :params trylasttime: if True, then dont try extra
-        :returns: upper limit on yields
+        :returns: upper limit on the signal strength multiplier mu
         """
         mu_hat, sigma_mu, root_func = self._ul_preprocess(
             model, marginalize, toys, expected, trylasttime
@@ -1260,12 +1262,14 @@ if __name__ == "__main__":
     )  # With respect to the older refernece value one must normalize the xsec
     print("old ul=", ul_old)
     ul = ulComp.ulOnYields(m, marginalize=True)
+
     cls = ulComp.computeCLs(m, marginalize=True)
     print("ul (marginalized)", ul)
     print("CLs (marginalized)", cls)
-    ul = ulComp.ulOnYields(m, marginalize=False)
-    cls = ulComp.computeCLs(m, marginalize=False)
-    print("ul (profiled)", ul)
+
+    ul = ulComp.ulOnMu ( m, marginalize=False )
+    cls = ulComp.computeCLs(m, marginalize = False)
+    print ( "ul (profiled)", ul )
     print("CLs (profiled)", cls)
 
     """

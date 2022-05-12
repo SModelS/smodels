@@ -34,8 +34,8 @@ class StatisticsTest(unittest.TestCase):
         nobs, nbg = 100, 100.0
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0)
         ulcomp = UpperLimitComputer()
-        ulobs = ulcomp.ulOnYields(m)
-        ulexp = ulcomp.ulOnYields(m, expected=True)
+        ulobs = ulcomp.ulOnMu(m)
+        ulexp = ulcomp.ulOnMu(m, expected=True)
         print("ulobs", ulobs)
         print("ulexp", ulexp)
         f = open("llhds.csv", "wt")
@@ -100,10 +100,10 @@ class StatisticsTest(unittest.TestCase):
         nobs, nbg = 110, 100.0
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0)
         ulcomp = UpperLimitComputer()
-        ulobs = ulcomp.ulOnYields(m)
-        ulexp = ulcomp.ulOnYields(m, expected=True)
-        dx = 0.5
-        m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0)
+        ulobs = ulcomp.ulOnMu(m)
+        ulexp = ulcomp.ulOnMu(m, expected=True)
+        dx = .5
+        m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.)
         llhdcomp = LikelihoodComputer(m)
         llhddir = llhdcomp.likelihood(nsig)
         chi2dir = llhdcomp.chi2(nsig)
@@ -118,8 +118,8 @@ class StatisticsTest(unittest.TestCase):
     def testUpperLimit(self):
         m = Data(100.0, 100.0, 0.001, None, 1.0, deltas_rel=0.0)
         comp = UpperLimitComputer()
-        re = comp.ulOnYields(m)
-        self.assertAlmostEqual(re / (1.06 * 20.0), 1.0, 1)
+        re = comp.ulOnMu(m)
+        self.assertAlmostEqual(re/(1.06*20.), 1., 1)
 
     def testApproxGaussian(self):
         ## turn experimental features on
