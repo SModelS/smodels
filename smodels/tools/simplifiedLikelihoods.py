@@ -1010,7 +1010,7 @@ class UpperLimitComputer:
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on fiducial cross section
         """
-        ul = self.ulOnMu ( model, marginalize=marginalize, toys=toys,
+        ul = self.getUpperLimitOnMu ( model, marginalize=marginalize, toys=toys,
                 expected=expected, trylasttime=trylasttime )
 
         if ul == None:
@@ -1127,7 +1127,7 @@ class UpperLimitComputer:
 
         return mu_hat, sigma_mu, root_func
 
-    def ulOnMu( self, model, marginalize=False, toys=None, expected=False,
+    def getUpperLimitOnMu( self, model, marginalize=False, toys=None, expected=False,
              trylasttime = False ):
         """ upper limit on the signal strength multiplier mu
             obtained from the defined Data (using the signal prediction
@@ -1267,7 +1267,7 @@ if __name__ == "__main__":
     print("ul (marginalized)", ul)
     print("CLs (marginalized)", cls)
 
-    ul = ulComp.ulOnMu ( m, marginalize=False )
+    ul = ulComp.getUpperLimitOnMu ( m, marginalize=False )
     cls = ulComp.computeCLs(m, marginalize = False)
     print ( "ul (profiled)", ul )
     print("CLs (profiled)", cls)
