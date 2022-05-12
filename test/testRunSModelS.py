@@ -11,6 +11,7 @@
 
 import sys
 import os
+
 sys.path.insert(0, "../")
 import unittest
 import glob
@@ -33,17 +34,27 @@ class RunSModelSTest(unittest.TestCase):
                 os.unlink(os.path.join(out, i))
         dirname = "./testFiles/slha/"
         runMain(dirname)
-        fout = [i.replace("unitTestOutput/","").replace(".smodels","") for i in glob.iglob("unitTestOutput/*smodels") if not "~" in i]
+        fout = [
+            i.replace("unitTestOutput/", "").replace(".smodels", "")
+            for i in glob.iglob("unitTestOutput/*smodels")
+            if not "~" in i
+        ]
         nout = len(fout)
-        fin = [i.replace("testFiles/slha/","").replace("./","") for i in glob.iglob("%s/*slha" % dirname) if not "~" in i]
+        fin = [
+            i.replace("testFiles/slha/", "").replace("./", "")
+            for i in glob.iglob("%s/*slha" % dirname)
+            if not "~" in i
+        ]
         nin = len(fin)
         if nout != nin:
-            print ( f"[testRunSModelS] Number of output files ({nout}) differs from number of input files ({nin})" )
+            print(
+                f"[testRunSModelS] Number of output files ({nout}) differs from number of input files ({nin})"
+            )
             fin.sort()
             fout.sort()
             for f in fin:
                 if f not in fout:
-                    print ( f"[testRunSModelS] {f} not in output files\n" )
+                    print(f"[testRunSModelS] {f} not in output files\n")
             # print ( f"[testRunSModelS] not same number {fin}\n{fout}\n" )
         self.assertEqual(nout, nin)
 
@@ -51,9 +62,10 @@ class RunSModelSTest(unittest.TestCase):
         try:
             filename = "./testFiles/slha/complicated.slha"
             t0 = time.time()
-            runMain(filename, timeout=1, suppressStdout=True,
-                    development=True, inifile="timeout.ini")
-            print("should never get here. time spent:%.1fs " % (time.time()-t0))
+            runMain(
+                filename, timeout=1, suppressStdout=True, development=True, inifile="timeout.ini"
+            )
+            print("should never get here. time spent:%.1fs " % (time.time() - t0))
             self.assertTrue(False)
         except NoTime:
             self.assertTrue(True)
@@ -62,7 +74,7 @@ class RunSModelSTest(unittest.TestCase):
             self.assertTrue(False)
 
     def removeOutputs(self, f):
-        """ remove cruft outputfiles """
+        """remove cruft outputfiles"""
         for i in [f, f.replace(".py", ".pyc")]:
             if os.path.exists(i):
                 os.remove(i)
@@ -73,21 +85,41 @@ class RunSModelSTest(unittest.TestCase):
         if self.definingRun:
             logger.error("This is a definition run! Know what youre doing!")
             default = "gluino_squarks_default.py"
-            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (outputfile, default)
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (
+                outputfile,
+                default,
+            )
             subprocess.getoutput(cmd)
         smodelsOutput = importModule(outputfile)
         from gluino_squarks_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element', 'database version',
-                        'Total missed xsec',
-                        'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
-                        'Total xsec for missing topologies (fb)', 'Total xsec for missing topologies with displaced decays (fb)',
-                        'Total xsec for missing topologies with prompt decays (fb)',
-                        'Total xsec for topologies outside the grid (fb)']
-        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.02,
-                           ignore=ignoreFields, fname=outputfile)
-        for i in ['./output.py', './output.pyc']:
+
+        ignoreFields = [
+            "input file",
+            "smodels version",
+            "ncpus",
+            "Element",
+            "database version",
+            "Total missed xsec",
+            "Missed xsec long-lived",
+            "Missed xsec displaced",
+            "Missed xsec MET",
+            "Total outside grid xsec",
+            "Total xsec for missing topologies (fb)",
+            "Total xsec for missing topologies with displaced decays (fb)",
+            "Total xsec for missing topologies with prompt decays (fb)",
+            "Total xsec for topologies outside the grid (fb)",
+        ]
+        smodelsOutputDefault["ExptRes"] = sorted(
+            smodelsOutputDefault["ExptRes"], key=lambda res: res["r"], reverse=True
+        )
+        equals = equalObjs(
+            smodelsOutput,
+            smodelsOutputDefault,
+            allowedDiff=0.02,
+            ignore=ignoreFields,
+            fname=outputfile,
+        )
+        for i in ["./output.py", "./output.pyc"]:
             if os.path.exists(i):
                 os.remove(i)
         if not equals:
@@ -95,23 +127,35 @@ class RunSModelSTest(unittest.TestCase):
             fname = outputfile
             if p > 0:
                 fname = fname[p:]
-            print("[testRunSModelS] %s != %s" %
-                  (fname, "gluino_squarks_default.py"))
+            print("[testRunSModelS] %s != %s" % (fname, "gluino_squarks_default.py"))
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
 
     def testGoodFileWithModelFromSLHA(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
-        outputfile = runMain(filename, inifile='testParametersB.ini')
+        outputfile = runMain(filename, inifile="testParametersB.ini")
         smodelsOutput = importModule(outputfile)
         from gluino_squarks_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element',
-                        'database version', 'model']
-        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.02,
-                           ignore=ignoreFields, fname=outputfile)
-        for i in ['./output.py', './output.pyc']:
+
+        ignoreFields = [
+            "input file",
+            "smodels version",
+            "ncpus",
+            "Element",
+            "database version",
+            "model",
+        ]
+        smodelsOutputDefault["ExptRes"] = sorted(
+            smodelsOutputDefault["ExptRes"], key=lambda res: res["r"], reverse=True
+        )
+        equals = equalObjs(
+            smodelsOutput,
+            smodelsOutputDefault,
+            allowedDiff=0.02,
+            ignore=ignoreFields,
+            fname=outputfile,
+        )
+        for i in ["./output.py", "./output.pyc"]:
             if os.path.exists(i):
                 os.remove(i)
         if not equals:
@@ -119,8 +163,7 @@ class RunSModelSTest(unittest.TestCase):
             fname = outputfile
             if p > 0:
                 fname = fname[p:]
-            print("[testRunSModelS] %s != %s" %
-                  (fname, "gluino_squarks_default.py"))
+            print("[testRunSModelS] %s != %s" % (fname, "gluino_squarks_default.py"))
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
 
@@ -130,10 +173,16 @@ class RunSModelSTest(unittest.TestCase):
         outputfile = runMain(filename, inifile=inifile, suppressStdout=True)
         smodelsOutput = importModule(outputfile)
         from T6bbHH_pyhf_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version']
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.02,
-                           ignore=ignoreFields, fname=outputfile,
-                           fname2="T6bbHH_pyhf_default.py")
+
+        ignoreFields = ["input file", "smodels version", "ncpus", "database version"]
+        equals = equalObjs(
+            smodelsOutput,
+            smodelsOutputDefault,
+            allowedDiff=0.02,
+            ignore=ignoreFields,
+            fname=outputfile,
+            fname2="T6bbHH_pyhf_default.py",
+        )
         if not equals:
             e = "T6bbHH_pyhf_default.py != ./unitTestOutput/T6bbHH_pyhf.slha.py"
             logger.error(e)
@@ -146,19 +195,40 @@ class RunSModelSTest(unittest.TestCase):
         if self.definingRun:
             logger.error("This is a definition run! Know what youre doing!")
             default = "simplyGluino_default.py"
-            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (outputfile, default)
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (
+                outputfile,
+                default,
+            )
             subprocess.getoutput(cmd)
         smodelsOutput = importModule(outputfile)
         from simplyGluino_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element', 'database version', 'Total missed xsec',
-                        'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
-                        'Total xsec for missing topologies (fb)', 'Total xsec for missing topologies with displaced decays (fb)',
-                        'Total xsec for missing topologies with prompt decays (fb)',
-                        'Total xsec for topologies outside the grid (fb)']
-        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.08,
-                           ignore=ignoreFields, fname=outputfile)
+
+        ignoreFields = [
+            "input file",
+            "smodels version",
+            "ncpus",
+            "Element",
+            "database version",
+            "Total missed xsec",
+            "Missed xsec long-lived",
+            "Missed xsec displaced",
+            "Missed xsec MET",
+            "Total outside grid xsec",
+            "Total xsec for missing topologies (fb)",
+            "Total xsec for missing topologies with displaced decays (fb)",
+            "Total xsec for missing topologies with prompt decays (fb)",
+            "Total xsec for topologies outside the grid (fb)",
+        ]
+        smodelsOutputDefault["ExptRes"] = sorted(
+            smodelsOutputDefault["ExptRes"], key=lambda res: res["r"], reverse=True
+        )
+        equals = equalObjs(
+            smodelsOutput,
+            smodelsOutputDefault,
+            allowedDiff=0.08,
+            ignore=ignoreFields,
+            fname=outputfile,
+        )
         if not equals:
             e = "simplyGluino.slha.py != simplyGluino_default.py"
             logger.error(e)
@@ -175,21 +245,42 @@ class RunSModelSTest(unittest.TestCase):
         if self.definingRun:
             logger.error("This is a definition run! Know what youre doing!")
             default = "longLived_default.py"
-            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (outputfile, default)
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (
+                outputfile,
+                default,
+            )
             subprocess.getoutput(cmd)
         smodelsOutput = importModule(outputfile)
         from longLived_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element', 'database version',
-                        'Total missed xsec',
-                        'Missed xsec long-lived', 'Missed xsec displaced', 'Missed xsec MET', 'Total outside grid xsec',
-                        'Total xsec for missing topologies (fb)', 'Total xsec for missing topologies with displaced decays (fb)',
-                        'Total xsec for missing topologies with prompt decays (fb)',
-                        'Total xsec for topologies outside the grid (fb)']
-        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.02,
-                           ignore=ignoreFields, fname=outputfile, fname2="longLived_default.py" )
-        for i in ['./outputHSCP.py', './outputHSCP.pyc']:
+
+        ignoreFields = [
+            "input file",
+            "smodels version",
+            "ncpus",
+            "Element",
+            "database version",
+            "Total missed xsec",
+            "Missed xsec long-lived",
+            "Missed xsec displaced",
+            "Missed xsec MET",
+            "Total outside grid xsec",
+            "Total xsec for missing topologies (fb)",
+            "Total xsec for missing topologies with displaced decays (fb)",
+            "Total xsec for missing topologies with prompt decays (fb)",
+            "Total xsec for topologies outside the grid (fb)",
+        ]
+        smodelsOutputDefault["ExptRes"] = sorted(
+            smodelsOutputDefault["ExptRes"], key=lambda res: res["r"], reverse=True
+        )
+        equals = equalObjs(
+            smodelsOutput,
+            smodelsOutputDefault,
+            allowedDiff=0.02,
+            ignore=ignoreFields,
+            fname=outputfile,
+            fname2="longLived_default.py",
+        )
+        for i in ["./outputHSCP.py", "./outputHSCP.pyc"]:
             if os.path.exists(i):
                 os.remove(i)
         self.assertTrue(equals)
@@ -200,16 +291,27 @@ class RunSModelSTest(unittest.TestCase):
         if self.definingRun:
             logger.error("This is a definition run! Know what youre doing!")
             default = "lifetime_default.py"
-            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (outputfile, default)
+            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (
+                outputfile,
+                default,
+            )
             subprocess.getoutput(cmd)
         smodelsOutput = importModule(outputfile)
         from lifetime_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version']
-        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.02,
-                           ignore=ignoreFields, fname=outputfile, fname2="lifetime_default.py" )
-        for i in ['./outputHSCP.py', './outputHSCP.pyc']:
+
+        ignoreFields = ["input file", "smodels version", "ncpus", "database version"]
+        smodelsOutputDefault["ExptRes"] = sorted(
+            smodelsOutputDefault["ExptRes"], key=lambda res: res["r"], reverse=True
+        )
+        equals = equalObjs(
+            smodelsOutput,
+            smodelsOutputDefault,
+            allowedDiff=0.02,
+            ignore=ignoreFields,
+            fname=outputfile,
+            fname2="lifetime_default.py",
+        )
+        for i in ["./outputHSCP.py", "./outputHSCP.pyc"]:
             if os.path.exists(i):
                 os.remove(i)
         self.assertTrue(equals)
@@ -236,8 +338,7 @@ class RunSModelSTest(unittest.TestCase):
         ctr = 0
         crash_file = None
         self.cleanUp()
-        runMain(filename, timeout=1, suppressStdout=True,
-                inifile="timeout.ini")
+        runMain(filename, timeout=1, suppressStdout=True, inifile="timeout.ini")
         """
         try:
             ## trying to sync!!
@@ -248,7 +349,7 @@ class RunSModelSTest(unittest.TestCase):
             print ( "This shouldnt throw %s" % e )
             # pass
         """
-        time.sleep(.2)
+        time.sleep(0.2)
         for f in os.listdir("."):
             if ".crash" in f:
                 crash_file = f

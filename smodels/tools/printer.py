@@ -1,4 +1,3 @@
-
 """
 .. module:: printer
    :synopsis: Facility used to print elements, theorypredictions, missing topologies et al
@@ -49,41 +48,46 @@ class MPrinter(object):
         """
 
         # Define the printer types and the printer-specific options:
-        printerTypes = [prt.strip() for prt in parser.get(
-            "printer", "outputType").split(",")]
+        printerTypes = [prt.strip() for prt in parser.get("printer", "outputType").split(",")]
         for prt in printerTypes:
-            if prt == 'python':
-                newPrinter = PyPrinter(output='file')
-            elif prt == 'summary':
-                newPrinter = SummaryPrinter(output='file')
-            elif prt == 'stdout':
-                newPrinter = TxTPrinter(output='stdout')
-            elif prt == 'log':
-                newPrinter = TxTPrinter(output='file')
-            elif prt == 'xml':
-                newPrinter = XmlPrinter(output='file')
-            elif prt == 'slha':
-                newPrinter = SLHAPrinter(output='file')
-                if parser.getboolean("options", "doCompress") or parser.getboolean("options", "doInvisible"):
+            if prt == "python":
+                newPrinter = PyPrinter(output="file")
+            elif prt == "summary":
+                newPrinter = SummaryPrinter(output="file")
+            elif prt == "stdout":
+                newPrinter = TxTPrinter(output="stdout")
+            elif prt == "log":
+                newPrinter = TxTPrinter(output="file")
+            elif prt == "xml":
+                newPrinter = XmlPrinter(output="file")
+            elif prt == "slha":
+                newPrinter = SLHAPrinter(output="file")
+                if parser.getboolean("options", "doCompress") or parser.getboolean(
+                    "options", "doInvisible"
+                ):
                     newPrinter.docompress = 1
-                if parser.has_option("options", "combineSRs") and parser.getboolean("options", "combineSRs"):
+                if parser.has_option("options", "combineSRs") and parser.getboolean(
+                    "options", "combineSRs"
+                ):
                     newPrinter.combinesr = 1
-                if parser.has_option("options", "combineAnas") and parser.get("options", "combineAnas"):
+                if parser.has_option("options", "combineAnas") and parser.get(
+                    "options", "combineAnas"
+                ):
                     newPrinter.combineanas = 1
             else:
                 logger.warning("Unknown printer format: %s" % str(prt))
                 continue
 
             # Copy stdout options to log options:
-            if 'log' in printerTypes:
-                if parser.has_section('stdout-printer') and not parser.has_section('log-printer'):
-                    parser.add_section('log-printer')
-                    for option, val in parser.items('stdout-printer'):
-                        parser.set('log-printer', option, val)
+            if "log" in printerTypes:
+                if parser.has_section("stdout-printer") and not parser.has_section("log-printer"):
+                    parser.add_section("log-printer")
+                    for option, val in parser.items("stdout-printer"):
+                        parser.set("log-printer", option, val)
 
             # Set printer-specific options:
-            if parser.has_section(prt+'-printer'):
-                newPrinter.setOptions(parser.items(prt+'-printer'))
+            if parser.has_section(prt + "-printer"):
+                newPrinter.setOptions(parser.items(prt + "-printer"))
             self.Printers[prt] = newPrinter
 
     def addObj(self, obj):
@@ -142,7 +146,7 @@ class BasicPrinter(object):
             os.remove(filename)
 
     def getTypeOfExpected(self):
-        """ tiny convenience function """
+        """tiny convenience function"""
         expected = True
         if self.typeofexpectedvalues == "posteriori":
             expected = "posteriori"
@@ -158,7 +162,7 @@ class BasicPrinter(object):
         self.mkdir()
 
     def mkdir(self):
-        """ create directory to file, if necessary """
+        """create directory to file, if necessary"""
         if not self.filename:
             return
         dirname = os.path.dirname(self.filename)
@@ -193,8 +197,8 @@ class BasicPrinter(object):
         return False
 
     def openOutFile(self, filename, mode):
-        """ creates and opens a data sink,
-            creates path if needed """
+        """creates and opens a data sink,
+        creates path if needed"""
         d = os.path.dirname(filename)
         if not os.path.exists(d):
             os.makedirs(d)
@@ -215,17 +219,17 @@ class BasicPrinter(object):
             if not output:
                 continue  # Skip empty output
             ret += output
-            if self.output == 'stdout':
+            if self.output == "stdout":
                 sys.stdout.write(output)
-            elif self.output == 'file':
+            elif self.output == "file":
                 if not self.filename:
-                    logger.error('Filename not defined for printer')
+                    logger.error("Filename not defined for printer")
                     return False
                 with self.openOutFile(self.filename, "a") as outfile:
                     outfile.write(output)
                     outfile.close()
 
-        self.toPrint = [None]*len(self.printingOrder)  # Reset printing objects
+        self.toPrint = [None] * len(self.printingOrder)  # Reset printing objects
         self.time = time.time()  # prepare next timestamp
         return ret
 
@@ -240,16 +244,16 @@ class BasicPrinter(object):
 
         typeStr = type(obj).__name__
         try:
-            formatFunction = getattr(self, '_format'+typeStr)
+            formatFunction = getattr(self, "_format" + typeStr)
             ret = formatFunction(obj)
             # print ( " `-", len(ret))
             return ret
         except AttributeError as e:
-            logger.warning('Error formating object %s: \n %s' % (typeStr, e))
+            logger.warning("Error formating object %s: \n %s" % (typeStr, e))
             return False
 
     def _round(self, number, n=6):
-        """ round a number to n significant digits, if it *is* a number """
+        """round a number to n significant digits, if it *is* a number"""
         if type(number) not in [float, np.float64]:
             return number
         if not np.isfinite(number):
@@ -271,13 +275,18 @@ class TxTPrinter(BasicPrinter):
     Printer class to handle the printing of one single text output
     """
 
-    def __init__(self, output='stdout', filename=None):
+    def __init__(self, output="stdout", filename=None):
         BasicPrinter.__init__(self, output, filename)
         self.name = "log"
         self.printtimespent = False
-        self.printingOrder = [OutputStatus, ExpResultList, TopologyList,
-                              TheoryPredictionList, TheoryPredictionsCombiner,
-                              Uncovered]
+        self.printingOrder = [
+            OutputStatus,
+            ExpResultList,
+            TopologyList,
+            TheoryPredictionList,
+            TheoryPredictionsCombiner,
+            Uncovered,
+        ]
         self.toPrint = [None] * len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -290,7 +299,7 @@ class TxTPrinter(BasicPrinter):
         :param silent: dont comment removing old files
         """
 
-        self.filename = filename + '.' + self.name
+        self.filename = filename + "." + self.name
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
@@ -326,7 +335,7 @@ class TxTPrinter(BasicPrinter):
         # for label, par in obj.parameters.items():
         for label in labels:
             par = obj.parameters[label]
-            output += "# " + label + " = " + str(par) + '\n'
+            output += "# " + label + " = " + str(par) + "\n"
         if obj.databaseVersion:
             output += "# Database version: %s\n" % obj.databaseVersion
         output += "=" * 80 + "\n"
@@ -339,18 +348,18 @@ class TxTPrinter(BasicPrinter):
         :param obj: A TopologyList object to be printed.
         """
 
-        if not hasattr(self, 'printdecomp') or not self.printdecomp:
+        if not hasattr(self, "printdecomp") or not self.printdecomp:
             return None
 
         old_vertices = ""
         slabel = "Topologies Table"
         output = ""
-        output += "  " + "="*56 + "  \n"
-        output += "||" + " "*56 + "||\n"
-        xspace = int((56-len(slabel))/2.)
-        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"
-        output += "||" + " "*56 + "||\n"
-        output += "  " + "="*56 + "  \n"
+        output += "  " + "=" * 56 + "  \n"
+        output += "||" + " " * 56 + "||\n"
+        xspace = int((56 - len(slabel)) / 2.0)
+        output += "||" + " " * xspace + slabel + " " * (56 - xspace - len(slabel)) + "||\n"
+        output += "||" + " " * 56 + "||\n"
+        output += "  " + "=" * 56 + "  \n"
 
         for topo in obj:
             if old_vertices == str(topo.vertnumb):
@@ -358,14 +367,13 @@ class TxTPrinter(BasicPrinter):
             else:
                 output += "===================================================== \n"
                 output += "Topology:\n"
-                output += "Number of vertices: " + str(topo.vertnumb) + ' \n'
+                output += "Number of vertices: " + str(topo.vertnumb) + " \n"
                 old_vertices = str(topo.vertnumb)
-            output += "Number of vertex parts: " + str(topo.vertparts) + '\n'
+            output += "Number of vertex parts: " + str(topo.vertparts) + "\n"
             totxsec = topo.getTotalWeight()
-            output += "Total Global topology weight :\n" + totxsec.niceStr() + '\n'
-            output += "Total Number of Elements: " + \
-                str(len(topo.elementList)) + '\n'
-            if not hasattr(self, 'addelementinfo') or not self.addelementinfo:
+            output += "Total Global topology weight :\n" + totxsec.niceStr() + "\n"
+            output += "Total Number of Elements: " + str(len(topo.elementList)) + "\n"
+            if not hasattr(self, "addelementinfo") or not self.addelementinfo:
                 continue
             for el in topo.elementList:
                 output += "\t\t " + 73 * "." + "\n"
@@ -395,8 +403,9 @@ class TxTPrinter(BasicPrinter):
         output += "\t\t The element PIDs are \n"
         for pidlist in obj.pdg:
             output += "\t\t PIDs: " + str(pidlist) + "\n"
-        output += "\t\t The element weights are: \n \t\t " + \
-            obj.weight.niceStr().replace("\n", "\n \t\t ")
+        output += "\t\t The element weights are: \n \t\t " + obj.weight.niceStr().replace(
+            "\n", "\n \t\t "
+        )
 
         return output
 
@@ -412,17 +421,17 @@ class TxTPrinter(BasicPrinter):
 
         slabel = "Selected Experimental Results"
         output = ""
-        output += "  " + "="*56 + "  \n"
-        output += "||" + " "*56 + "||\n"
-        xspace = int((56-len(slabel))/2.)
-        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"
-        output += "||" + " "*56 + "||\n"
-        output += "  " + "="*56 + "  \n"
+        output += "  " + "=" * 56 + "  \n"
+        output += "||" + " " * 56 + "||\n"
+        xspace = int((56 - len(slabel)) / 2.0)
+        output += "||" + " " * xspace + slabel + " " * (56 - xspace - len(slabel)) + "||\n"
+        output += "||" + " " * 56 + "||\n"
+        output += "  " + "=" * 56 + "  \n"
 
         for expRes in obj.expResultList:
             output += self._formatExpResult(expRes)
 
-        return output+"\n"
+        return output + "\n"
 
     def _formatExpResult(self, obj):
         """
@@ -441,8 +450,8 @@ class TxTPrinter(BasicPrinter):
         txnames = sorted(txnames)
         output = ""
         output += "========================================================\n"
-        output += "Experimental Result ID: " + obj.globalInfo.id + '\n'
-        output += "Tx Labels: " + str(txnames) + '\n'
+        output += "Experimental Result ID: " + obj.globalInfo.id + "\n"
+        output += "Tx Labels: " + str(txnames) + "\n"
         output += "Sqrts: %2.2E\n" % obj.globalInfo.sqrts.asNumber(TeV)
         if hasattr(self, "addanainfo") and self.addanainfo:
             output += "\t -----------------------------\n"
@@ -459,12 +468,12 @@ class TxTPrinter(BasicPrinter):
         return output
 
     def _formatNumber(self, number, n=4):
-        """ format a number <number> to have n digits,
-            but allow also for None, strings, etc """
+        """format a number <number> to have n digits,
+        but allow also for None, strings, etc"""
         if type(number) not in [float, np.float64]:
             return str(number)
         fmt = ".%dg" % n
-        return ("%"+fmt) % number
+        return ("%" + fmt) % number
 
     def _formatTheoryPredictionList(self, obj):
         """
@@ -474,15 +483,15 @@ class TxTPrinter(BasicPrinter):
         """
         slabel = "Theory Predictions and"
         output = ""
-        output += "  " + "="*56 + "  \n"
-        output += "||" + " "*56 + "||\n"
-        xspace = int((56-len(slabel))/2.)
-        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"
+        output += "  " + "=" * 56 + "  \n"
+        output += "||" + " " * 56 + "||\n"
+        xspace = int((56 - len(slabel)) / 2.0)
+        output += "||" + " " * xspace + slabel + " " * (56 - xspace - len(slabel)) + "||\n"
         slabel = "Experimental Constraints"
-        xspace = int((56-len(slabel))/2.)
-        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"
-        output += "||" + " "*56 + "||\n"
-        output += "  " + "="*56 + "  \n"
+        xspace = int((56 - len(slabel)) / 2.0)
+        output += "||" + " " * xspace + slabel + " " * (56 - xspace - len(slabel)) + "||\n"
+        output += "||" + " " * 56 + "||\n"
+        output += "  " + "=" * 56 + "  \n"
 
         for theoryPrediction in obj._theoryPredictions:
             expRes = theoryPrediction.expResult
@@ -491,15 +500,13 @@ class TxTPrinter(BasicPrinter):
             txnames = sorted(list(set(txnames)))
             output += "\n"
             output += "---------------Analysis Label = " + expRes.globalInfo.id + "\n"
-            output += "-------------------Dataset Label = " + \
-                str(dataId).replace("None", "(UL)") + "\n"
-            output += "-------------------Txname Labels = " + \
-                str(txnames) + "\n"
-            output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
-                "\n"
+            output += (
+                "-------------------Dataset Label = " + str(dataId).replace("None", "(UL)") + "\n"
+            )
+            output += "-------------------Txname Labels = " + str(txnames) + "\n"
+            output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + "\n"
 
-            output += "Theory prediction: " + \
-                str(theoryPrediction.xsection.value) + "\n"
+            output += "Theory prediction: " + str(theoryPrediction.xsection.value) + "\n"
             output += "Theory conditions:"
             if not theoryPrediction.conditions:
                 output += "  " + str(theoryPrediction.conditions) + "\n"
@@ -511,45 +518,50 @@ class TxTPrinter(BasicPrinter):
 
             # Get upper limit for the respective prediction:
             upperLimit = theoryPrediction.getUpperLimit(expected=False)
-            upperLimitExp = theoryPrediction.getUpperLimit(
-                expected=self.getTypeOfExpected())
+            upperLimitExp = theoryPrediction.getUpperLimit(expected=self.getTypeOfExpected())
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if upperLimitExp is not None:
-                output += "Expected experimental limit: " + \
-                    str(upperLimitExp) + "\n"
-            srv = self._formatNumber(
-                theoryPrediction.getRValue(expected=False), 4)
+                output += "Expected experimental limit: " + str(upperLimitExp) + "\n"
+            srv = self._formatNumber(theoryPrediction.getRValue(expected=False), 4)
             output += "Observed r-value: %s\n" % srv
             if upperLimitExp is not None:
-                serv = self._formatNumber(theoryPrediction.getRValue(
-                    expected=self.getTypeOfExpected()), 4)
+                serv = self._formatNumber(
+                    theoryPrediction.getRValue(expected=self.getTypeOfExpected()), 4
+                )
                 output += "Expected r-value: %s\n" % serv
             llhd = theoryPrediction.likelihood()
             if llhd is not None:
                 chi2, chi2sm = None, None
                 try:
-                    chi2sm = -2*np.log(llhd/theoryPrediction.lsm())
+                    chi2sm = -2 * np.log(llhd / theoryPrediction.lsm())
                 except TypeError:
                     pass
                 try:
-                    chi2 = -2*np.log(llhd/theoryPrediction.lmax())
+                    chi2 = -2 * np.log(llhd / theoryPrediction.lmax())
                 except TypeError:
                     pass
                 output += "Likelihood: " + self._formatNumber(llhd, 4) + "\n"
-                output += "L_max: " + self._formatNumber(theoryPrediction.lmax(
-                ), 4) + "   -2log(L/L_max): " + self._formatNumber(chi2, 4) + "\n"
-                output += "L_SM: " + self._formatNumber(theoryPrediction.lsm(), 4) + \
-                          "   -2log(L/L_SM): " + \
-                    self._formatNumber(chi2sm, 4) + "\n"
+                output += (
+                    "L_max: "
+                    + self._formatNumber(theoryPrediction.lmax(), 4)
+                    + "   -2log(L/L_max): "
+                    + self._formatNumber(chi2, 4)
+                    + "\n"
+                )
+                output += (
+                    "L_SM: "
+                    + self._formatNumber(theoryPrediction.lsm(), 4)
+                    + "   -2log(L/L_SM): "
+                    + self._formatNumber(chi2sm, 4)
+                    + "\n"
+                )
 
             if hasattr(self, "printextendedresults") and self.printextendedresults:
                 if theoryPrediction.mass:
                     for ibr, br in enumerate(theoryPrediction.mass):
-                        output += "Masses in branch %i: " % ibr + \
-                            str(br) + "\n"
-                IDList = list(
-                    set([el.elID for el in theoryPrediction.elements]))
+                        output += "Masses in branch %i: " % ibr + str(br) + "\n"
+                IDList = list(set([el.elID for el in theoryPrediction.elements]))
                 if IDList:
                     output += "Contributing elements: " + str(IDList) + "\n"
                 for pidList in theoryPrediction.PIDs:
@@ -573,10 +585,14 @@ class TxTPrinter(BasicPrinter):
         output = "\n"
         for group in groups:
             output += "Total cross-section for %s (fb): %10.3E\n" % (
-                group.description, group.getTotalXSec())
+                group.description,
+                group.getTotalXSec(),
+            )
 
         output += "\n#Full information on unconstrained cross sections\n"
-        output += "================================================================================\n"
+        output += (
+            "================================================================================\n"
+        )
 
         # Get detailed information:
         for group in groups:
@@ -586,18 +602,18 @@ class TxTPrinter(BasicPrinter):
                 output += "No %s found\n" % description
                 output += "================================================================================\n"
                 continue
-            output += "%s with the highest cross sections (up to %i):\n" % (
-                description, nprint)
+            output += "%s with the highest cross sections (up to %i):\n" % (description, nprint)
             output += "Sqrts (TeV)   Weight (fb)                  Element description\n"
             for genEl in group.generalElements[:nprint]:
-                output += "%5s         %10.3E    # %53s\n" % (
-                    str(sqrts), genEl.missingX, genEl)
+                output += "%5s         %10.3E    # %53s\n" % (str(sqrts), genEl.missingX, genEl)
                 if hasattr(self, "addcoverageid") and self.addcoverageid:
                     contributing = []
                     for el in genEl._contributingElements:
                         contributing.append(el.elID)
                     output += "Contributing elements %s\n" % str(contributing)
-            output += "================================================================================\n"
+            output += (
+                "================================================================================\n"
+            )
         return output
 
     def _formatTheoryPredictionsCombiner(self, obj):
@@ -619,8 +635,7 @@ class TxTPrinter(BasicPrinter):
         llhd = obj.likelihood()
         lmax = obj.lmax()
         output += "Combined Analyses: %s\n" % (expIDs)
-        output += "Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (
-            llhd, lmax, lsm)
+        output += "Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (llhd, lmax, lsm)
         output += "combined r-value: %10.3E\n" % r
         output += "combined r-value (expected): %10.3E" % r_expected
         output += "\n===================================================== \n"
@@ -635,12 +650,16 @@ class SummaryPrinter(TxTPrinter):
     It uses the facilities of the TxTPrinter.
     """
 
-    def __init__(self, output='stdout', filename=None):
+    def __init__(self, output="stdout", filename=None):
         TxTPrinter.__init__(self, output, filename)
         self.name = "summary"
         self.printingOrder = [
-            OutputStatus, TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
-        self.toPrint = [None]*len(self.printingOrder)
+            OutputStatus,
+            TheoryPredictionList,
+            TheoryPredictionsCombiner,
+            Uncovered,
+        ]
+        self.toPrint = [None] * len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
         """
@@ -651,7 +670,7 @@ class SummaryPrinter(TxTPrinter):
         :param silent: dont comment removing old files
         """
 
-        self.filename = filename + '.smodels'
+        self.filename = filename + ".smodels"
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
@@ -671,20 +690,20 @@ class SummaryPrinter(TxTPrinter):
 
         output = ""
 
-        maxr = {"obs": -1., "exp": -1, "anaid": "?"}
-        maxcoll = {"CMS": {"obs": -1., "exp": -1, "anaid": "?"},
-                   "ATLAS": {"obs": -1., "exp": -1, "anaid": "?"}}
+        maxr = {"obs": -1.0, "exp": -1, "anaid": "?"}
+        maxcoll = {
+            "CMS": {"obs": -1.0, "exp": -1, "anaid": "?"},
+            "ATLAS": {"obs": -1.0, "exp": -1, "anaid": "?"},
+        }
         for theoPred in obj._theoryPredictions:
             r = theoPred.getRValue(expected=False)
             r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
             expResult = theoPred.expResult
             coll = "ATLAS" if "ATLAS" in expResult.globalInfo.id else "CMS"
             if (r_expected is not None) and (r_expected > maxcoll[coll]["exp"]):
-                maxcoll[coll] = {"obs": r, "exp": r_expected,
-                                 "anaid": expResult.globalInfo.id}
+                maxcoll[coll] = {"obs": r, "exp": r_expected, "anaid": expResult.globalInfo.id}
             if (r is not None) and (r > maxr["obs"]):
-                maxr = {"obs": r, "exp": r_expected,
-                        "anaid": expResult.globalInfo.id}
+                maxr = {"obs": r, "exp": r_expected, "anaid": expResult.globalInfo.id}
 
         output += "#Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected"
         output += "\n\n"
@@ -697,7 +716,7 @@ class SummaryPrinter(TxTPrinter):
                 uls = "%10.3E" % ul.asNumber(fb)
             signalRegion = theoPred.dataset.getID()
             if signalRegion is None:
-                signalRegion = '(UL)'
+                signalRegion = "(UL)"
             value = theoPred.xsection.value
             r = theoPred.getRValue(expected=False)
             r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
@@ -720,10 +739,9 @@ class SummaryPrinter(TxTPrinter):
             else:
                 output += "%10.3E  N/A" % r
             output += "\n"
-            output += " Signal Region:  "+signalRegion+"\n"
+            output += " Signal Region:  " + signalRegion + "\n"
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
-            txnameStr = txnameStr.replace(
-                "'", "").replace("[", "").replace("]", "")
+            txnameStr = txnameStr.replace("'", "").replace("[", "").replace("]", "")
             output += " Txnames:  " + txnameStr + "\n"
             # print L, L_max and L_SM instead of chi2 and llhd; SK 2021-05-14
             llhd = theoPred.likelihood()
@@ -741,26 +759,26 @@ class SummaryPrinter(TxTPrinter):
                 if llhd == lmax == lsm == "None":
                     output += " Likelihoods: L, L_max, L_SM = N/A\n"
                 else:
-                    output += " Likelihoods: L, L_max, L_SM = %s, %s, %s\n" % (
-                        llhd, lmax, lsm)
+                    output += " Likelihoods: L, L_max, L_SM = %s, %s, %s\n" % (llhd, lmax, lsm)
 
             if not (theoPred is obj[-1]):
                 output += 80 * "-" + "\n"
 
         output += "\n \n"
         output += 80 * "=" + "\n"
-        output += "The highest r value is = %.5f from %s" % \
-            (maxr["obs"], maxr["anaid"])
-        if maxr["exp"] is not None and maxr["exp"] > -.5:
+        output += "The highest r value is = %.5f from %s" % (maxr["obs"], maxr["anaid"])
+        if maxr["exp"] is not None and maxr["exp"] > -0.5:
             output += " (r_expected=%.5f)" % maxr["exp"]
         else:
             output += " (r_expected not available)"
         output += "\n"
         for coll, values in maxcoll.items():
-            if values["obs"] < -.5:
+            if values["obs"] < -0.5:
                 continue
-            output += "%s analysis with highest available r_expected: %s, r_expected=%.5f, r_obs=%.5f\n" % \
-                      (coll, values["anaid"], values["exp"], values["obs"])
+            output += (
+                "%s analysis with highest available r_expected: %s, r_expected=%.5f, r_obs=%.5f\n"
+                % (coll, values["anaid"], values["exp"], values["obs"])
+            )
 
         return output
 
@@ -783,8 +801,7 @@ class SummaryPrinter(TxTPrinter):
         llhd = obj.likelihood()
         lmax = obj.lmax()
         output += "Combined Analyses: %s\n" % (expIDs)
-        output += "Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (
-            llhd, lmax, lsm)
+        output += "Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (llhd, lmax, lsm)
         output += "combined r-value: %10.3E\n" % r
         output += "combined r-value (expected): %10.3E" % r_expected
         output += "\n===================================================== \n"
@@ -798,13 +815,18 @@ class PyPrinter(BasicPrinter):
     Printer class to handle the printing of one single pythonic output
     """
 
-    def __init__(self, output='stdout', filename=None):
+    def __init__(self, output="stdout", filename=None):
         BasicPrinter.__init__(self, output, filename)
         self.name = "py"
         self.printtimespent = False
-        self.printingOrder = [OutputStatus, TopologyList,
-                              TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
-        self.toPrint = [None]*len(self.printingOrder)
+        self.printingOrder = [
+            OutputStatus,
+            TopologyList,
+            TheoryPredictionList,
+            TheoryPredictionsCombiner,
+            Uncovered,
+        ]
+        self.toPrint = [None] * len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
         """
@@ -815,7 +837,7 @@ class PyPrinter(BasicPrinter):
         :param silent: dont comment removing old files
         """
 
-        self.filename = filename + '.py'
+        self.filename = filename + ".py"
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
@@ -836,18 +858,18 @@ class PyPrinter(BasicPrinter):
                 continue  # Skip empty output
             outputDict.update(output)
 
-        output = 'smodelsOutput = '+str(outputDict)
-        if self.output == 'stdout':
+        output = "smodelsOutput = " + str(outputDict)
+        if self.output == "stdout":
             sys.stdout.write(output)
-        elif self.output == 'file':
+        elif self.output == "file":
             if not self.filename:
-                logger.error('Filename not defined for printer')
+                logger.error("Filename not defined for printer")
                 return False
             with open(self.filename, "a") as outfile:
                 outfile.write(output)
                 outfile.close()
 
-        self.toPrint = [None]*len(self.printingOrder)
+        self.toPrint = [None] * len(self.printingOrder)
         # it is a special feature of the python printer
         # that we also return the output dictionary
         return outputDict
@@ -859,7 +881,7 @@ class PyPrinter(BasicPrinter):
         :param obj: A TopologyList object to be printed.
         """
 
-        if not hasattr(self, 'addelementlist') or not self.addelementlist:
+        if not hasattr(self, "addelementlist") or not self.addelementlist:
             return None
 
         elements = []
@@ -882,8 +904,7 @@ class PyPrinter(BasicPrinter):
         elDic = {}
         elDic["ID"] = obj.elID
         elDic["Particles"] = str(obj.evenParticles)
-        elDic["Masses (GeV)"] = [[round(m.asNumber(GeV), 2)
-                                  for m in br] for br in obj.mass]
+        elDic["Masses (GeV)"] = [[round(m.asNumber(GeV), 2) for m in br] for br in obj.mass]
         elDic["PIDs"] = obj.pdg
         elDic["Weights (fb)"] = {}
         elDic["final states"] = [str(fs) for fs in obj.getFinalStates()]
@@ -891,13 +912,15 @@ class PyPrinter(BasicPrinter):
         allsqrts = sorted(list(set(sqrts)))
         for ssqrts in allsqrts:
             sqrts = ssqrts * TeV
-            xsecs = [xsec.value.asNumber(fb)
-                     for xsec in obj.weight.getXsecsFor(sqrts)]
+            xsecs = [xsec.value.asNumber(fb) for xsec in obj.weight.getXsecsFor(sqrts)]
             if len(xsecs) != 1:
-                logger.warning("Element cross sections contain multiple values for %s .\
-                Only the first cross section will be printed" % str(sqrts))
+                logger.warning(
+                    "Element cross sections contain multiple values for %s .\
+                Only the first cross section will be printed"
+                    % str(sqrts)
+                )
             xsecs = xsecs[0]
-            sqrtsStr = 'xsec '+str(sqrts.asNumber(TeV))+' TeV'
+            sqrtsStr = "xsec " + str(sqrts.asNumber(TeV)) + " TeV"
             elDic["Weights (fb)"][sqrtsStr] = xsecs
         return elDic
 
@@ -914,17 +937,17 @@ class PyPrinter(BasicPrinter):
                 infoDict[key] = eval(val)
             except (NameError, TypeError, SyntaxError):
                 infoDict[key] = val
-        infoDict['file status'] = obj.filestatus
-        infoDict['decomposition status'] = obj.status
-        infoDict['warnings'] = obj.warnings
-        infoDict['input file'] = obj.inputfile
-        infoDict['database version'] = obj.databaseVersion
-        infoDict['smodels version'] = obj.smodelsVersion
+        infoDict["file status"] = obj.filestatus
+        infoDict["decomposition status"] = obj.status
+        infoDict["warnings"] = obj.warnings
+        infoDict["input file"] = obj.inputfile
+        infoDict["database version"] = obj.databaseVersion
+        infoDict["smodels version"] = obj.smodelsVersion
         # hidden feature, printtimespent, turn on in ini file, e.g.
         # [summary-printer] printtimespent = True
         if self.printtimespent:
-            infoDict['time spent'] = "%.2fs" % (time.time() - self.time)
-        return {'OutputStatus': infoDict}
+            infoDict["time spent"] = "%.2fs" % (time.time() - self.time)
+        return {"OutputStatus": infoDict}
 
     def _formatTheoryPredictionList(self, obj):
         """
@@ -940,8 +963,7 @@ class PyPrinter(BasicPrinter):
             datasetID = theoryPrediction.dataId()
             dataType = theoryPrediction.dataType()
             ul = theoryPrediction.getUpperLimit()
-            ulExpected = theoryPrediction.getUpperLimit(
-                expected=self.getTypeOfExpected())
+            ulExpected = theoryPrediction.getUpperLimit(expected=self.getTypeOfExpected())
             if isinstance(ul, unum.Unum):
                 ul = ul.asNumber(fb)
             if isinstance(ulExpected, unum.Unum):
@@ -951,11 +973,9 @@ class PyPrinter(BasicPrinter):
             txnamesDict = {}
             for el in theoryPrediction.elements:
                 if el.txname.txName not in txnamesDict:
-                    txnamesDict[el.txname.txName] = el.weight[0].value.asNumber(
-                        fb)
+                    txnamesDict[el.txname.txName] = el.weight[0].value.asNumber(fb)
                 else:
-                    txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(
-                        fb)
+                    txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(fb)
             maxconds = theoryPrediction.getmaxCondition()
             if theoryPrediction.mass is None:
                 mass = None
@@ -970,9 +990,10 @@ class PyPrinter(BasicPrinter):
                     x = float(x.asNumber(GeV))
                 if x == float("inf"):
                     x = "prompt"
-                if x == 0.:
+                if x == 0.0:
                     x = "stable"
                 return x
+
             widths = None
             if totalwidth is not None:
                 widths = [[_convWidth(x) for x in br] for br in totalwidth]
@@ -988,33 +1009,36 @@ class PyPrinter(BasicPrinter):
             sqrts = expResult.globalInfo.sqrts
 
             r = self._round(theoryPrediction.getRValue(expected=False))
-            r_expected = self._round(theoryPrediction.getRValue(
-                expected=self.getTypeOfExpected()))
+            r_expected = self._round(theoryPrediction.getRValue(expected=self.getTypeOfExpected()))
 
-            resDict = {'maxcond': maxconds, 'theory prediction (fb)': self._round(value),
-                       'upper limit (fb)': self._round(ul),
-                       'expected upper limit (fb)': self._round(ulExpected),
-                       'TxNames': sorted(txnamesDict.keys()),
-                       'Mass (GeV)': mass,
-                       'AnalysisID': expID,
-                       'DataSetID': datasetID,
-                       'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
-                       'lumi (fb-1)': (expResult.globalInfo.lumi*fb).asNumber(),
-                       'dataType': dataType,
-                       'r': r, 'r_expected': r_expected}
+            resDict = {
+                "maxcond": maxconds,
+                "theory prediction (fb)": self._round(value),
+                "upper limit (fb)": self._round(ul),
+                "expected upper limit (fb)": self._round(ulExpected),
+                "TxNames": sorted(txnamesDict.keys()),
+                "Mass (GeV)": mass,
+                "AnalysisID": expID,
+                "DataSetID": datasetID,
+                "AnalysisSqrts (TeV)": sqrts.asNumber(TeV),
+                "lumi (fb-1)": (expResult.globalInfo.lumi * fb).asNumber(),
+                "dataType": dataType,
+                "r": r,
+                "r_expected": r_expected,
+            }
             if widths:
                 resDict["Width (GeV)"] = widths
             if hasattr(self, "addtxweights") and self.addtxweights:
-                resDict['TxNames weights (fb)'] = txnamesDict
+                resDict["TxNames weights (fb)"] = txnamesDict
             llhd = theoryPrediction.likelihood()
             if llhd is not None:
                 # resDict['chi2'] = self._round ( theoryPrediction.chi2 )
-                resDict['likelihood'] = self._round(llhd)
-                resDict['l_max'] = self._round(theoryPrediction.lmax())
-                resDict['l_SM'] = self._round(theoryPrediction.lsm())
+                resDict["likelihood"] = self._round(llhd)
+                resDict["l_max"] = self._round(theoryPrediction.lmax())
+                resDict["l_SM"] = self._round(theoryPrediction.lsm())
             ExptRes.append(resDict)
 
-        return {'ExptRes': ExptRes}
+        return {"ExptRes": ExptRes}
 
     def _formatDoc(self, obj):
         """
@@ -1023,39 +1047,46 @@ class PyPrinter(BasicPrinter):
         :param obj: pyslha object
         """
 
-        MINPAR = dict(obj.blocks['MINPAR'].entries)
-        EXTPAR = dict(obj.blocks['EXTPAR'].entries)
-        mass = OrderedDict(obj.blocks['MASS'].entries.items())
+        MINPAR = dict(obj.blocks["MINPAR"].entries)
+        EXTPAR = dict(obj.blocks["EXTPAR"].entries)
+        mass = OrderedDict(obj.blocks["MASS"].entries.items())
         chimix = {}
-        for key in obj.blocks['NMIX'].entries:
-            val = obj.blocks['NMIX'].entries[key]
+        for key in obj.blocks["NMIX"].entries:
+            val = obj.blocks["NMIX"].entries[key]
             if key[0] != 1:
                 continue
-            newkey = 'N'+str(key[0])+str(key[1])
+            newkey = "N" + str(key[0]) + str(key[1])
             chimix[newkey] = val
         chamix = {}
-        for key in obj.blocks['UMIX'].entries:
-            val = obj.blocks['UMIX'].entries[key]
-            newkey = 'U'+str(key[0])+str(key[1])
+        for key in obj.blocks["UMIX"].entries:
+            val = obj.blocks["UMIX"].entries[key]
+            newkey = "U" + str(key[0]) + str(key[1])
             chamix[newkey] = val
-        for key in obj.blocks['VMIX'].entries:
-            val = obj.blocks['VMIX'].entries[key]
-            newkey = 'V'+str(key[0])+str(key[1])
+        for key in obj.blocks["VMIX"].entries:
+            val = obj.blocks["VMIX"].entries[key]
+            newkey = "V" + str(key[0]) + str(key[1])
             chamix[newkey] = val
         stopmix = {}
-        for key in obj.blocks['STOPMIX'].entries:
-            val = obj.blocks['STOPMIX'].entries[key]
-            newkey = 'ST'+str(key[0])+str(key[1])
+        for key in obj.blocks["STOPMIX"].entries:
+            val = obj.blocks["STOPMIX"].entries[key]
+            newkey = "ST" + str(key[0]) + str(key[1])
             stopmix[newkey] = val
         sbotmix = {}
-        for key in obj.blocks['SBOTMIX'].entries:
-            val = obj.blocks['SBOTMIX'].entries[key]
-            newkey = 'SB'+str(key[0])+str(key[1])
+        for key in obj.blocks["SBOTMIX"].entries:
+            val = obj.blocks["SBOTMIX"].entries[key]
+            newkey = "SB" + str(key[0]) + str(key[1])
             sbotmix[newkey] = val
 
-        return {'MINPAR': MINPAR, 'chimix': chimix, 'stopmix': stopmix,
-                'chamix': chamix, 'MM': {}, 'sbotmix': sbotmix,
-                'EXTPAR': EXTPAR, 'mass': mass}
+        return {
+            "MINPAR": MINPAR,
+            "chimix": chimix,
+            "stopmix": stopmix,
+            "chamix": chamix,
+            "MM": {},
+            "sbotmix": sbotmix,
+            "EXTPAR": EXTPAR,
+            "mass": mass,
+        }
 
     def _formatUncovered(self, obj):
         """
@@ -1073,15 +1104,18 @@ class PyPrinter(BasicPrinter):
         # Add summary of groups:
         for group in groups:
             sqrts = group.sqrts.asNumber(TeV)
-            uncoveredDict["Total xsec for %s (fb)" % group.description] = \
-                self._round(group.getTotalXSec())
+            uncoveredDict["Total xsec for %s (fb)" % group.description] = self._round(
+                group.getTotalXSec()
+            )
             uncoveredDict["%s" % group.description] = []
             for genEl in group.generalElements[:nprint]:
-                genElDict = {'sqrts (TeV)': sqrts, 'weight (fb)': self._round(genEl.missingX),
-                             'element': str(genEl)}
+                genElDict = {
+                    "sqrts (TeV)": sqrts,
+                    "weight (fb)": self._round(genEl.missingX),
+                    "element": str(genEl),
+                }
                 if hasattr(self, "addelementlist") and self.addelementlist:
-                    genElDict["element IDs"] = [
-                        el.elID for el in genEl._contributingElements]
+                    genElDict["element IDs"] = [el.elID for el in genEl._contributingElements]
                 uncoveredDict["%s" % group.description].append(genElDict)
 
         return uncoveredDict
@@ -1111,15 +1145,18 @@ class PyPrinter(BasicPrinter):
         lmax = self._round(obj.lmax())
         lsm = self._round(obj.lsm())
 
-        resDict = {'AnalysisID': expIDs,
-                   'r': r, 'r_expected': r_expected,
-                   'likelihood': llhd,
-                   'l_max': lmax,
-                   'l_SM': lsm}
+        resDict = {
+            "AnalysisID": expIDs,
+            "r": r,
+            "r_expected": r_expected,
+            "likelihood": llhd,
+            "l_max": lmax,
+            "l_SM": lsm,
+        }
 
         combRes.append(resDict)
 
-        return {'CombinedRes': combRes}
+        return {"CombinedRes": combRes}
 
 
 class XmlPrinter(PyPrinter):
@@ -1127,12 +1164,17 @@ class XmlPrinter(PyPrinter):
     Printer class to handle the printing of one single XML output
     """
 
-    def __init__(self, output='stdout', filename=None):
+    def __init__(self, output="stdout", filename=None):
         PyPrinter.__init__(self, output, filename)
         self.name = "xml"
-        self.printingOrder = [OutputStatus, TopologyList,
-                              TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
-        self.toPrint = [None]*len(self.printingOrder)
+        self.printingOrder = [
+            OutputStatus,
+            TopologyList,
+            TheoryPredictionList,
+            TheoryPredictionsCombiner,
+            Uncovered,
+        ]
+        self.toPrint = [None] * len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
         """
@@ -1143,7 +1185,7 @@ class XmlPrinter(PyPrinter):
         :param silent: dont comment removing old files
         """
 
-        self.filename = filename + '.xml'
+        self.filename = filename + ".xml"
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
@@ -1168,7 +1210,7 @@ class XmlPrinter(PyPrinter):
                 self.convertToElement(val, newElement, tag=key)
                 parent.append(newElement)
         elif isinstance(pyObj, list):
-            parent.tag += '_List'
+            parent.tag += "_List"
             for val in pyObj:
                 newElement = ElementTree.Element(tag)
                 self.convertToElement(val, newElement, tag)
@@ -1192,22 +1234,21 @@ class XmlPrinter(PyPrinter):
         root = None
         # Convert from python dictionaries to xml:
         if outputDict:
-            root = ElementTree.Element('smodelsOutput')
+            root = ElementTree.Element("smodelsOutput")
             self.convertToElement(outputDict, root)
-            rough_xml = ElementTree.tostring(root, 'utf-8')
-            nice_xml = minidom.parseString(
-                rough_xml).toprettyxml(indent="    ")
-            if self.output == 'stdout':
+            rough_xml = ElementTree.tostring(root, "utf-8")
+            nice_xml = minidom.parseString(rough_xml).toprettyxml(indent="    ")
+            if self.output == "stdout":
                 sys.stdout.write(nice_xml)
-            elif self.output == 'file':
+            elif self.output == "file":
                 if not self.filename:
-                    logger.error('Filename not defined for printer')
+                    logger.error("Filename not defined for printer")
                     return False
                 with open(self.filename, "a") as outfile:
                     outfile.write(nice_xml)
                     outfile.close()
 
-        self.toPrint = [None]*len(self.printingOrder)
+        self.toPrint = [None] * len(self.printingOrder)
         return root
 
 
@@ -1217,15 +1258,19 @@ class SLHAPrinter(TxTPrinter):
     It uses the facilities of the TxTPrinter.
     """
 
-    def __init__(self, output='file', filename=None):
+    def __init__(self, output="file", filename=None):
         TxTPrinter.__init__(self, output, filename)
         self.name = "slha"
         self.docompress = 0
         self.combinesr = 0
         self.combineanas = 0
-        self.printingOrder = [OutputStatus, TheoryPredictionList,
-                              TheoryPredictionsCombiner, Uncovered]
-        self.toPrint = [None]*len(self.printingOrder)
+        self.printingOrder = [
+            OutputStatus,
+            TheoryPredictionList,
+            TheoryPredictionsCombiner,
+            Uncovered,
+        ]
+        self.toPrint = [None] * len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
         """
@@ -1236,7 +1281,7 @@ class SLHAPrinter(TxTPrinter):
         :param silent: dont comment removing old files
         """
 
-        self.filename = filename + '.smodelsslha'
+        self.filename = filename + ".smodelsslha"
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
@@ -1248,29 +1293,34 @@ class SLHAPrinter(TxTPrinter):
         if not smodelsversion.startswith("v"):
             smodelsversion = "v" + smodelsversion
 
-        keysDict = {0: "%-25s #SModelS version\n" % (smodelsversion),
-                    1: "%-25s #database version\n" % (obj.databaseVersion.replace(" ", "")),
-                    2: "%-25s #maximum condition violation\n" % (obj.parameters['maxcond']),
-                    3: "%-25s #compression (0 off, 1 on)\n" % (self.docompress),
-                    4: "%-25s #minimum mass gap for mass compression [GeV]\n" % (obj.parameters['minmassgap']),
-                    5: "%-25s #sigmacut [fb]\n" % (obj.parameters['sigmacut']),
-                    6: "%-25s #signal region combination (0 off, 1 on)\n" % (self.combinesr),
-                    7: "%-25s #analyses combination (0 off, 1 on)\n" % (self.combineanas)}
+        keysDict = {
+            0: "%-25s #SModelS version\n" % (smodelsversion),
+            1: "%-25s #database version\n" % (obj.databaseVersion.replace(" ", "")),
+            2: "%-25s #maximum condition violation\n" % (obj.parameters["maxcond"]),
+            3: "%-25s #compression (0 off, 1 on)\n" % (self.docompress),
+            4: "%-25s #minimum mass gap for mass compression [GeV]\n"
+            % (obj.parameters["minmassgap"]),
+            5: "%-25s #sigmacut [fb]\n" % (obj.parameters["sigmacut"]),
+            6: "%-25s #signal region combination (0 off, 1 on)\n" % (self.combinesr),
+            7: "%-25s #analyses combination (0 off, 1 on)\n" % (self.combineanas),
+        }
 
-        if 'promptwidth' in obj.parameters:
-            keysDict[8] = "%-25s #prompt width [GeV] \n" % (obj.parameters['promptwidth'])
-        if 'stablewidth' in obj.parameters:
-            keysDict[9] = "%-25s #stable width [GeV] \n" % (obj.parameters['stablewidth'])
+        if "promptwidth" in obj.parameters:
+            keysDict[8] = "%-25s #prompt width [GeV] \n" % (obj.parameters["promptwidth"])
+        if "stablewidth" in obj.parameters:
+            keysDict[9] = "%-25s #stable width [GeV] \n" % (obj.parameters["stablewidth"])
 
         output = "BLOCK SModelS_Settings\n"
         for key in sorted(list(keysDict.keys())):
             output += " %i %s" % (key, keysDict[key])
-        output += '\n'
+        output += "\n"
 
         # for SLHA output we always want to have SModelS_Exclusion block, if no results we write it here
         if obj.status <= 0:
             output += "BLOCK SModelS_Exclusion\n"
-            output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n\n" % (-1)
+            output += (
+                " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n\n" % (-1)
+            )
 
         return output
 
@@ -1292,12 +1342,14 @@ class SLHAPrinter(TxTPrinter):
             else:
                 excluded = 0
         output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n" % (
-            excluded)
+            excluded
+        )
         if excluded == -1:
             rList = []
         elif not printAll:
-            rList = [firstResult] + [res for res in obj._theoryPredictions[1:]
-                                   if res.getRValue() >= 1.0]
+            rList = [firstResult] + [
+                res for res in obj._theoryPredictions[1:] if res.getRValue() >= 1.0
+            ]
         else:
             rList = obj._theoryPredictions[:]
 
@@ -1307,27 +1359,21 @@ class SLHAPrinter(TxTPrinter):
             txnames = theoPred.txnames
             signalRegion = theoPred.dataId()
             if signalRegion is None:
-                signalRegion = '(UL)'
+                signalRegion = "(UL)"
             r = theoPred.getRValue()
             r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
-            txnameStr = txnameStr.replace(
-                "'", "").replace("[", "").replace("]", "")
+            txnameStr = txnameStr.replace("'", "").replace("[", "").replace("]", "")
 
             output += " %d 0 %-30s #txname \n" % (cter, txnameStr)
             output += " %d 1 %-30.3E #r value\n" % (cter, r)
             if not r_expected:
-                output += " %d 2 N/A                            #expected r value\n" % (
-                    cter)
+                output += " %d 2 N/A                            #expected r value\n" % (cter)
             else:
-                output += " %d 2 %-30.3E #expected r value\n" % (
-                    cter, r_expected)
-            output += " %d 3 %-30.2f #condition violation\n" % (
-                cter, theoPred.getmaxCondition())
-            output += " %d 4 %-30s #analysis\n" % (cter,
-                                                   expResult.globalInfo.id)
-            output += " %d 5 %-30s #signal region \n" % (
-                cter, signalRegion.replace(" ", "_"))
+                output += " %d 2 %-30.3E #expected r value\n" % (cter, r_expected)
+            output += " %d 3 %-30.2f #condition violation\n" % (cter, theoPred.getmaxCondition())
+            output += " %d 4 %-30s #analysis\n" % (cter, expResult.globalInfo.id)
+            output += " %d 5 %-30s #signal region \n" % (cter, signalRegion.replace(" ", "_"))
             llhd = theoPred.likelihood()
             if llhd is not None:
                 lmax = theoPred.lmax()
@@ -1344,12 +1390,9 @@ class SLHAPrinter(TxTPrinter):
                 output += " %d 7 %s #L_max\n" % (cter, lmax)
                 output += " %d 8 %s #L_SM\n" % (cter, lsm)
             else:
-                output += " %d 6 N/A                            #Likelihood\n" % (
-                    cter)
-                output += " %d 7 N/A                            #L_max\n" % (
-                    cter)
-                output += " %d 8 N/A                            #L_SM\n" % (
-                    cter)
+                output += " %d 6 N/A                            #Likelihood\n" % (cter)
+                output += " %d 7 N/A                            #L_max\n" % (cter)
+                output += " %d 8 N/A                            #L_SM\n" % (cter)
             output += "\n"
 
         return output
@@ -1361,10 +1404,12 @@ class SLHAPrinter(TxTPrinter):
         # Get summary of groups:
         output = "\nBLOCK SModelS_Coverage"
         for i, group in enumerate(sorted(groups, key=lambda g: g.label)):
-            output += "\n %d 0 %-30s      # %s" % (
-                i, group.label, group.description)
+            output += "\n %d 0 %-30s      # %s" % (i, group.label, group.description)
             output += "\n %d 1 %-30.3E      # %s" % (
-                i, group.getTotalXSec(), "Total cross-section (fb)")
+                i,
+                group.getTotalXSec(),
+                "Total cross-section (fb)",
+            )
         output += "\n"
         return output
 
@@ -1383,7 +1428,7 @@ class SLHAPrinter(TxTPrinter):
             # Get list of analyses IDs used in combination:
             expIDs = cRes.analysisId()
             # Replace commas by spaces:
-            expIDs = expIDs.replace(',', ' ')
+            expIDs = expIDs.replace(",", " ")
             ul = cRes.getUpperLimit()
             ulExpected = cRes.getUpperLimit(expected=True)
             if isinstance(ul, unum.Unum):
@@ -1427,12 +1472,15 @@ def printScanSummary(outputDict, outputFile):
     """
 
     # Check available types of printer:
-    printerTypes = ['slha', 'python', 'summary']
+    printerTypes = ["slha", "python", "summary"]
     # All outputs should have the same format
     out = list(outputDict.values())[0]
     if all([(ptype not in out) for ptype in printerTypes]):
-        header = "#In order to build the summary, one of the following types of printer must be available:\n %s \n" % str(printerTypes)
-        with open(outputFile, 'w') as f:
+        header = (
+            "#In order to build the summary, one of the following types of printer must be available:\n %s \n"
+            % str(printerTypes)
+        )
+        with open(outputFile, "w") as f:
             f.write(header)
         return
 
@@ -1451,24 +1499,27 @@ def printScanSummary(outputDict, outputFile):
         if output is None:
             continue
         # default values (in case of empty results):
-        summaryDict = OrderedDict({'filename': fname,
-                                 'MostConstrainingAnalysis': 'N/A',
-                                 'r_max': -1,
-                                 'r_exp': -1,
-                                 'MostSensitive(ATLAS)': 'N/A',
-                                 'r(ATLAS)': -1,
-                                 'r_exp(ATLAS)': -1,
-                                 'MostSensitive(CMS)': 'N/A',
-                                 'r(CMS)': -1,
-                                 'r_exp(CMS)': -1
-                                   })
+        summaryDict = OrderedDict(
+            {
+                "filename": fname,
+                "MostConstrainingAnalysis": "N/A",
+                "r_max": -1,
+                "r_exp": -1,
+                "MostSensitive(ATLAS)": "N/A",
+                "r(ATLAS)": -1,
+                "r_exp(ATLAS)": -1,
+                "MostSensitive(CMS)": "N/A",
+                "r(CMS)": -1,
+                "r_exp(CMS)": -1,
+            }
+        )
 
-        if 'python' in output:
-            sDict = getSummaryFrom(output['python'], 'python')
-        elif 'slha' in output:
-            sDict = getSummaryFrom(output['slha'], 'slha')
-        elif 'summary' in output:
-            sDict = getSummaryFrom(output['summary'], 'summary')
+        if "python" in output:
+            sDict = getSummaryFrom(output["python"], "python")
+        elif "slha" in output:
+            sDict = getSummaryFrom(output["slha"], "slha")
+        elif "summary" in output:
+            sDict = getSummaryFrom(output["summary"], "summary")
         else:
             sDict = {}
 
@@ -1481,31 +1532,40 @@ def printScanSummary(outputDict, outputFile):
     # Get column labels and widths:
     labels = list(summaryList[0].keys())
     cwidths = []
-    fstr = '%s'  # format for strings
-    ffloat = '%1.3g'  # format for floats
+    fstr = "%s"  # format for strings
+    ffloat = "%1.3g"  # format for floats
     for label in labels:
-        maxlength = max([len(ffloat % entry[label]) if isinstance(entry[label], (float, int))
-                       else len(fstr % entry[label]) for entry in summaryList])
+        maxlength = max(
+            [
+                len(ffloat % entry[label])
+                if isinstance(entry[label], (float, int))
+                else len(fstr % entry[label])
+                for entry in summaryList
+            ]
+        )
         maxlength = max(maxlength, len(label))
         cwidths.append(maxlength)
 
-    columns = '#'
-    columns += '  '.join([label.ljust(cwidths[i])
-                          for i, label in enumerate(labels)])
+    columns = "#"
+    columns += "  ".join([label.ljust(cwidths[i]) for i, label in enumerate(labels)])
     # Remove one blank space to make labels match values
-    columns = columns.replace(' ', '', 1)
-    columns += '\n'
+    columns = columns.replace(" ", "", 1)
+    columns += "\n"
 
-    with open(outputFile, 'w') as f:
+    with open(outputFile, "w") as f:
         f.write(header)
         f.write(columns)
 
         for entry in summaryList:
-            row = '  '.join([(ffloat % entry[label]).ljust(cwidths[j])
-                           if isinstance(entry[label], (float, int))
-                           else (fstr % entry[label]).ljust(cwidths[j])
-                           for j, label in enumerate(labels)])
-            f.write(row+'\n')
+            row = "  ".join(
+                [
+                    (ffloat % entry[label]).ljust(cwidths[j])
+                    if isinstance(entry[label], (float, int))
+                    else (fstr % entry[label]).ljust(cwidths[j])
+                    for j, label in enumerate(labels)
+                ]
+            )
+            f.write(row + "\n")
     return
 
 
@@ -1520,11 +1580,11 @@ def getSummaryFrom(output, ptype):
     """
 
     summaryDict = {}
-    if ptype == 'python':
+    if ptype == "python":
         info = getInfoFromPython(output)
-    elif ptype == 'slha':
+    elif ptype == "slha":
         info = getInfoFromSLHA(output)
-    elif ptype == 'summary':
+    elif ptype == "summary":
         info = getInfoFromSummary(output)
     else:
         return summaryDict
@@ -1541,9 +1601,9 @@ def getSummaryFrom(output, ptype):
     rvals = rvals[asort]
     anaIDs = anaIDs[asort]
     rexp = rexp[asort]
-    summaryDict['r_max'] = rvals[0]
-    summaryDict['r_exp'] = rexp[0]
-    summaryDict['MostConstrainingAnalysis'] = anaIDs[0]
+    summaryDict["r_max"] = rvals[0]
+    summaryDict["r_exp"] = rexp[0]
+    summaryDict["MostConstrainingAnalysis"] = anaIDs[0]
 
     # Sort results by r_obs:
     rvalswo = copy.deepcopy(rexp)
@@ -1557,20 +1617,20 @@ def getSummaryFrom(output, ptype):
     for i, anaID in enumerate(anaIDs):
         if rexp[i] < 0:
             continue
-        if 'ATLAS' in anaID and iATLAS < 0:
+        if "ATLAS" in anaID and iATLAS < 0:
             iATLAS = i
-        elif 'CMS' in anaID and iCMS < 0:
+        elif "CMS" in anaID and iCMS < 0:
             iCMS = i
 
     if iATLAS >= 0:
-        summaryDict['r(ATLAS)'] = rvals[iATLAS]
-        summaryDict['r_exp(ATLAS)'] = rexp[iATLAS]
-        summaryDict['MostSensitive(ATLAS)'] = anaIDs[iATLAS]
+        summaryDict["r(ATLAS)"] = rvals[iATLAS]
+        summaryDict["r_exp(ATLAS)"] = rexp[iATLAS]
+        summaryDict["MostSensitive(ATLAS)"] = anaIDs[iATLAS]
 
     if iCMS >= 0:
-        summaryDict['r(CMS)'] = rvals[iCMS]
-        summaryDict['r_exp(CMS)'] = rexp[iCMS]
-        summaryDict['MostSensitive(CMS)'] = anaIDs[iCMS]
+        summaryDict["r(CMS)"] = rvals[iCMS]
+        summaryDict["r_exp(CMS)"] = rexp[iCMS]
+        summaryDict["MostSensitive(CMS)"] = anaIDs[iCMS]
 
     return summaryDict
 
@@ -1584,12 +1644,11 @@ def getInfoFromPython(output):
     :return: list of r-values,r-expected and analysis IDs. None if no results are found.
     """
 
-    if 'ExptRes' not in output or not output['ExptRes']:
+    if "ExptRes" not in output or not output["ExptRes"]:
         return None
-    rvals = np.array([res['r'] for res in output['ExptRes']])
-    rexp = np.array([res['r_expected'] if res['r_expected']
-                   else -1 for res in output['ExptRes']])
-    anaIDs = np.array([res['AnalysisID'] for res in output['ExptRes']])
+    rvals = np.array([res["r"] for res in output["ExptRes"]])
+    rexp = np.array([res["r_expected"] if res["r_expected"] else -1 for res in output["ExptRes"]])
+    anaIDs = np.array([res["AnalysisID"] for res in output["ExptRes"]])
 
     return rvals, rexp, anaIDs
 
@@ -1604,10 +1663,11 @@ def getInfoFromSLHA(output):
     """
 
     import pyslha
+
     results = pyslha.readSLHA(output, ignorenomass=True, ignorenobr=True)
     bname = None
     for b in results.blocks.values():
-        if b.name.lower() == 'SModelS_Exclusion'.lower():
+        if b.name.lower() == "SModelS_Exclusion".lower():
             bname = b.name
     if bname is None or len(results.blocks[bname]) <= 1:
         return None
@@ -1615,8 +1675,12 @@ def getInfoFromSLHA(output):
     # Get indices for results:
     resI = list(set([k[0] for k in results.blocks[bname].keys() if k[0] > 0]))
     rvals = np.array([results.blocks[bname][(i, 1)] for i in resI])
-    rexp = np.array([results.blocks[bname][(i, 2)]
-                   if results.blocks[bname][(i, 2)] != 'N/A' else -1 for i in resI])
+    rexp = np.array(
+        [
+            results.blocks[bname][(i, 2)] if results.blocks[bname][(i, 2)] != "N/A" else -1
+            for i in resI
+        ]
+    )
     anaIDs = np.array([results.blocks[bname][(i, 4)] for i in resI])
 
     return rvals, rexp, anaIDs
@@ -1636,41 +1700,48 @@ def getInfoFromSummary(output):
     rexp = []
     anaIDs = []
     for line in lines:
-        if 'The highest r value is' in line:
-            rmax = line.split('=')[1].strip()
-            ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
-                         for x in rmax])[0][0]  # Get when the value ends
+        if "The highest r value is" in line:
+            rmax = line.split("=")[1].strip()
+            ff = np.where([((not x.isdigit()) and (x not in [".", "+", "-"])) for x in rmax])[0][
+                0
+            ]  # Get when the value ends
             rmax = eval(rmax[:ff])
-            anaMax = line.split('from')[1].split()[0].replace(',', '')
+            anaMax = line.split("from")[1].split()[0].replace(",", "")
             rexpMax = -1
-            if 'r_expected' in line and "r_expected not available" not in line:
-                rexpMax = line.split('r_expected')[-1]
-                rexpMax = rexpMax.split('=')[1]
-                ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
-                             for x in rexpMax])[0][0]  # Get when the value ends
+            if "r_expected" in line and "r_expected not available" not in line:
+                rexpMax = line.split("r_expected")[-1]
+                rexpMax = rexpMax.split("=")[1]
+                ff = np.where(
+                    [((not x.isdigit()) and (x not in [".", "+", "-"])) for x in rexpMax]
+                )[0][
+                    0
+                ]  # Get when the value ends
                 rexpMax = eval(rexpMax[:ff])
             rvals.append(rmax)
             anaIDs.append(anaMax)
             rexp.append(rexpMax)
-        elif 'analysis with highest available r_expected' in line:
+        elif "analysis with highest available r_expected" in line:
             # the space is required to have at least one non-digit character after the value
-            rAna = line.split('=')[-1] + ' '
-            ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
-                         for x in rAna])[0][0]  # Get when the value ends
+            rAna = line.split("=")[-1] + " "
+            ff = np.where([((not x.isdigit()) and (x not in [".", "+", "-"])) for x in rAna])[0][
+                0
+            ]  # Get when the value ends
             rAna = eval(rAna[:ff])
             rexpAna = -1
-            if 'r_expected' in line:
-                rexpAna = line.split('r_expected')[-1]
-                rexpAna = rexpAna.split('=')[1]
-                ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
-                             for x in rexpAna])[0][0]  # Get when the value ends
+            if "r_expected" in line:
+                rexpAna = line.split("r_expected")[-1]
+                rexpAna = rexpAna.split("=")[1]
+                ff = np.where(
+                    [((not x.isdigit()) and (x not in [".", "+", "-"])) for x in rexpAna]
+                )[0][
+                    0
+                ]  # Get when the value ends
                 rexpAna = eval(rexpAna[:ff])
-            if 'CMS' in line:
-                anaID = 'CMS-'+line.split('CMS-')[1].split(' ')[0].split(',')[0]
+            if "CMS" in line:
+                anaID = "CMS-" + line.split("CMS-")[1].split(" ")[0].split(",")[0]
             else:
-                anaID = 'ATLAS-' + \
-                        line.split('ATLAS-')[1].split(' ')[0].split(',')[0]
-            anaID = anaID.split()[0].strip().replace(',', '')
+                anaID = "ATLAS-" + line.split("ATLAS-")[1].split(" ")[0].split(",")[0]
+            anaID = anaID.split()[0].strip().replace(",", "")
             rvals.append(rAna)
             anaIDs.append(anaID)
             rexp.append(rexpAna)

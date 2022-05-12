@@ -9,16 +9,19 @@
 
 """
 import sys
-sys.path.insert(0,"../")
+
+sys.path.insert(0, "../")
 import unittest
 from smodels.tools import slhaChecks
+
 
 class SlhaTest(unittest.TestCase):
     def testGoodFile(self):
 
         filename = "./testFiles/slha/gluino_squarks.slha"
-        st=slhaChecks.SlhaStatus(filename)
-        self.assertEqual ( st.status, (1, 'Input file ok') )
-        
+        st = slhaChecks.SlhaStatus(filename)
+        self.assertEqual(st.status, (1, "Input file ok"))
+
+
 if __name__ == "__main__":
     unittest.main()

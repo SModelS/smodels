@@ -11,6 +11,7 @@
 from __future__ import print_function
 from smodels.tools.ioObjects import LheStatus
 
-def main(args):   
+
+def main(args):
     status = LheStatus(args.filename)
     print(status.status)

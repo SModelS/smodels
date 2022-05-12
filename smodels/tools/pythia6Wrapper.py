@@ -26,6 +26,7 @@ except ImportError:
 import urllib
 import tarfile
 
+
 class Pythia6Wrapper(WrapperBase):
     """
     An instance of this class represents the installation of pythia6. nevents keeps track of
@@ -33,10 +34,12 @@ class Pythia6Wrapper(WrapperBase):
     if self.secondsPerEvent * self.nevents > CPU time, we terminate Pythia.
     """
 
-    def __init__(self,
-                 configFile="<install>/smodels/etc/pythia.card",
-                 executablePath="<install>/smodels/lib/pythia6/pythia_lhe",
-                 srcPath="<install>/smodels/lib/pythia6/"):
+    def __init__(
+        self,
+        configFile="<install>/smodels/etc/pythia.card",
+        executablePath="<install>/smodels/lib/pythia6/pythia_lhe",
+        srcPath="<install>/smodels/lib/pythia6/",
+    ):
         """
         :param configFile: Location of the config file, full path; copy this
                            file and provide tools to change its content and to provide a template
@@ -54,7 +57,7 @@ class Pythia6Wrapper(WrapperBase):
         self.cfgfile = self.checkFileExists(configFile)
         self.keepTempDir = False
         self.nevents = 10000
-        self.sqrts = 8 # sqrt(s) in TeV
+        self.sqrts = 8  # sqrt(s) in TeV
         self.secondsPerEvent = 10
         self.pythiacard = None
 
@@ -72,8 +75,6 @@ class Pythia6Wrapper(WrapperBase):
             raise IOError("file %s does not exist" % nFile)
         return nFile
 
-
-
     def __str__(self):
         """
         Describe the current status
@@ -84,7 +85,6 @@ class Pythia6Wrapper(WrapperBase):
         ret += "temp dir: %s\n" % self.tempdir
         ret += "nevents: %d\n" % self.nevents
         return ret
-
 
     def unlink(self, unlinkdir=True):
         """
@@ -98,7 +98,7 @@ class Pythia6Wrapper(WrapperBase):
         if self.keepTempDir:
             logger.warning("Keeping everything in " + self.tempdir)
             return
-        logger.debug( "Unlinking " + self.tempdir )
+        logger.debug("Unlinking " + self.tempdir)
         for inputFile in ["fort.61", "fort.68", "log"]:
             if os.path.exists(self.tempdir + "/" + inputFile):
                 os.unlink(self.tempdir + "/" + inputFile)
@@ -109,8 +109,7 @@ class Pythia6Wrapper(WrapperBase):
                 os.rmdir(self.tempdir)
                 self.tempdir = None
 
-
-    def replaceInCfgFile(self, replacements={"NEVENTS": 10000, "SQRTS":8000}):
+    def replaceInCfgFile(self, replacements={"NEVENTS": 10000, "SQRTS": 8000}):
         """
         Replace strings in the config file by other strings, similar to
         setParameter.
@@ -136,7 +135,6 @@ class Pythia6Wrapper(WrapperBase):
             f.write(line)
         f.close()
 
-
     def setParameter(self, param="MSTP(163)", value=6):
         """
         Modifies the config file, similar to .replaceInCfgFile.
@@ -154,7 +152,7 @@ class Pythia6Wrapper(WrapperBase):
         f.write("%s=%s\n" % (param, str(value)))
         f.close()
 
-    def run( self, slhafile, lhefile=None, unlink=True ):
+    def run(self, slhafile, lhefile=None, unlink=True):
         """
         Execute pythia_lhe with n events, at sqrt(s)=sqrts.
 
@@ -167,17 +165,16 @@ class Pythia6Wrapper(WrapperBase):
         :returns: List of cross sections
 
         """
-        if lhefile and os.path.isfile ( lhefile ):
-            lheFile = open(lhefile, 'r')
+        if lhefile and os.path.isfile(lhefile):
+            lheFile = open(lhefile, "r")
             xsecsInfile = crossSection.getXsecFromSLHAFile(slhafile)
             loXsecs = crossSection.XSectionList()
             for xsec in xsecsInfile:
-                if xsec.info.order == LO and \
-                        float (xsec.info.sqrts.asNumber(TeV)) == self.sqrts:
+                if xsec.info.order == LO and float(xsec.info.sqrts.asNumber(TeV)) == self.sqrts:
                     loXsecs.add(xsec)
             return loXsecs
 
-        #Change pythia card, if defined:
+        # Change pythia card, if defined:
         if self.pythiacard:
             pythiacard_default = self.cfgfile
             self.cfgfile = self.pythiacard
@@ -186,51 +183,49 @@ class Pythia6Wrapper(WrapperBase):
             self.unlink()
         else:
             self.tempdir = None
-        self.replaceInCfgFile({"NEVENTS": self.nevents, "SQRTS":1000 * self.sqrts})
+        self.replaceInCfgFile({"NEVENTS": self.nevents, "SQRTS": 1000 * self.sqrts})
         self.setParameter("MSTP(163)", "6")
 
-        if unlink==False:
-            logger.info ( "keeping temporary directory at %s" % self.tempDirectory() )
+        if unlink == False:
+            logger.info("keeping temporary directory at %s" % self.tempDirectory())
         r = self.checkInstallation()
         if r == False:
-            logger.info ( "Installation check failed." )
+            logger.info("Installation check failed.")
             sys.exit()
-        self.replaceInCfgFile({"NEVENTS": self.nevents, "SQRTS":1000 * self.sqrts})
+        self.replaceInCfgFile({"NEVENTS": self.nevents, "SQRTS": 1000 * self.sqrts})
         self.setParameter("MSTP(163)", "6")
-        lhedata = self._run(slhafile, unlink=unlink )
+        lhedata = self._run(slhafile, unlink=unlink)
         if not "<LesHouchesEvents" in lhedata:
             pythiadir = "%s/log" % self.tempDirectory()
-            logger.error("No LHE events found in pythia output %s" % pythiadir )
-            if not os.path.exists ( pythiadir ):
-                logger.error ("Will dump pythia output to %s" % pythiadir )
-                f=open ( pythiadir, "w" )
+            logger.error("No LHE events found in pythia output %s" % pythiadir)
+            if not os.path.exists(pythiadir):
+                logger.error("Will dump pythia output to %s" % pythiadir)
+                f = open(pythiadir, "w")
                 for line in lhedata:
-                    f.write ( line )
+                    f.write(line)
                 f.close()
-            raise SModelSError( "No LHE events found in %s" % pythiadir )
+            raise SModelSError("No LHE events found in %s" % pythiadir)
 
-        #Reset pythia card to its default value
+        # Reset pythia card to its default value
         if self.pythiacard:
             self.cfgfile = pythiacard_default
 
-        #if not unlink:
+        # if not unlink:
         #    lhefile = self.tempdir + "/events.lhe"
         # Generate file object with lhe events
         if lhefile:
-            lheFile = open(lhefile, 'w')
+            lheFile = open(lhefile, "w")
             lheFile.write(lhedata)
             lheFile.close()
-            lheFile = open(lhefile, 'r')
+            lheFile = open(lhefile, "r")
         else:
             # Create memory only file object
-            if sys.version[0]=="2":
-                lhedata = unicode ( lhedata )
+            if sys.version[0] == "2":
+                lhedata = unicode(lhedata)
             lheFile = io.StringIO(lhedata)
-        return crossSection.getXsecFromLHEFile ( lheFile )
+        return crossSection.getXsecFromLHEFile(lheFile)
 
-
-    def _run(self, slhaFile, cfgfile=None, unlink=True, do_compile=False,
-            do_check=True ):
+    def _run(self, slhaFile, cfgfile=None, unlink=True, do_compile=False, do_check=True):
         """
         Really Run Pythia.
 
@@ -246,44 +241,44 @@ class Pythia6Wrapper(WrapperBase):
 
         """
         if do_check:
-            self.checkInstallation( do_compile )
+            self.checkInstallation(do_compile)
         slha = self.checkFileExists(slhaFile)
         cfg = self.absPath(cfgfile)
         ck_cfg = self.checkFileExists(cfg)
         logger.debug("running with " + str(cfg))
         import shutil
+
         shutil.copy(slha, self.tempDirectory() + "/fort.61")
-        cmd = "cd %s ; %s < %s" % \
-             (self.tempDirectory(), self.executablePath, cfg)
+        cmd = "cd %s ; %s < %s" % (self.tempDirectory(), self.executablePath, cfg)
         logger.debug("Now running " + str(cmd))
         out = executor.getoutput(cmd)
         if unlink:
-            self.unlink( unlinkdir=True )
+            self.unlink(unlinkdir=True)
         else:
             f = open(self.tempDirectory() + "/log", "w")
-            f.write (cmd + "\n\n\n")
-            f.write (out + "\n")
+            f.write(cmd + "\n\n\n")
+            f.write(out + "\n")
             f.close()
         return out
 
+
 if __name__ == "__main__":
-    #from smodelsLogging import setLogLevel
-    #setLogLevel ( "debug" )
+    # from smodelsLogging import setLogLevel
+    # setLogLevel ( "debug" )
     tool = Pythia6Wrapper()
     print("[Pythia6Wrapper] installed: " + str(tool.installDirectory()))
     td_exists = wrapperBase.ok(os.path.exists(tool.tempDirectory()))
-    print("[Pythia6Wrapper] temporary directory: %s: %s" % (str(tool.tempDirectory()),
-                                           td_exists))
+    print("[Pythia6Wrapper] temporary directory: %s: %s" % (str(tool.tempDirectory()), td_exists))
     print("[Pythia6Wrapper] check: " + wrapperBase.ok(tool.checkInstallation()))
     print("[Pythia6Wrapper] seconds per event: %d" % tool.secondsPerEvent)
-    tool.replaceInCfgFile({"NEVENTS": 1, "SQRTS":8000})
+    tool.replaceInCfgFile({"NEVENTS": 1, "SQRTS": 8000})
     tool.setParameter("MSTP(163)", "6")
     slhafile = "inputFiles/slha/simplyGluino.slha"
-    slhapath = os.path.join ( installation.installDirectory(), slhafile )
+    slhapath = os.path.join(installation.installDirectory(), slhafile)
     # print ( "[Pythia6Wrapper] slhapath:",slhapath )
-    xsec = tool.run(slhapath, unlink=True )
+    xsec = tool.run(slhapath, unlink=True)
     # n = len (output.split("\n"))
     # print ( "n: ",n )
-    isok = abs ( xsec[0].value.asNumber ( pb ) - 2.80E-01  ) < 1e-5
-    print("[Pythia6Wrapper] run: " + wrapperBase.ok (isok))
+    isok = abs(xsec[0].value.asNumber(pb) - 2.80e-01) < 1e-5
+    print("[Pythia6Wrapper] run: " + wrapperBase.ok(isok))
     # tool.unlink()

@@ -31,8 +31,9 @@ class DataSet(object):
     Holds the information to a data set folder (TxName objects, dataInfo,...)
     """
 
-    def __init__(self, path=None, info=None, createInfo=True,
-                 discard_zeroes=True, databaseParticles=None):
+    def __init__(
+        self, path=None, info=None, createInfo=True, discard_zeroes=True, databaseParticles=None
+    ):
         """
         :param discard_zeroes: discard txnames with zero-only results
         """
@@ -42,7 +43,7 @@ class DataSet(object):
         self.txnameList = []
 
         if path and createInfo:
-            logger.debug('Creating object based on data folder : %s' % self.path)
+            logger.debug("Creating object based on data folder : %s" % self.path)
 
             # Get data folder info:
             if not os.path.isfile(os.path.join(path, "dataInfo.txt")):
@@ -53,11 +54,13 @@ class DataSet(object):
             # Get list of TxName objects:
             for txtfile in glob.iglob(os.path.join(path, "*.txt")):
                 try:
-                    txname = txnameObj.TxName(txtfile, self.globalInfo,
-                                              self.dataInfo, databaseParticles)
+                    txname = txnameObj.TxName(
+                        txtfile, self.globalInfo, self.dataInfo, databaseParticles
+                    )
                     if discard_zeroes and txname.hasOnlyZeroes():
-                        logger.debug("%s, %s has only zeroes. discard it." %
-                                     (self.path, txname.txName))
+                        logger.debug(
+                            "%s, %s has only zeroes. discard it." % (self.path, txname.txName)
+                        )
                         continue
                     self.txnameList.append(txname)
                 except TypeError:
@@ -76,12 +79,14 @@ class DataSet(object):
         if id1 == id2:  # we are always correlated with ourselves
             return False
         from smodels.tools.physicsUnits import TeV
+
         ds = abs(self.globalInfo.sqrts.asNumber(TeV) - other.globalInfo.sqrts.asNumber(TeV))
         if ds > 1e-5:  # not the same
             return True
 
         def getCollaboration(ds):
             return "CMS" if "CMS" in ds.globalInfo.id else "ATLAS"
+
         coll1, coll2 = getCollaboration(self), getCollaboration(other)
         if coll1 != coll2:
             return True
@@ -99,7 +104,7 @@ class DataSet(object):
         return False
 
     def isCombMatrixCombinableWith_(self, other):
-        """ check for combinability via the combinations matrix """
+        """check for combinability via the combinations matrix"""
         if not hasattr(self.globalInfo, "_combinationsmatrix"):
             return False
         if self.globalInfo._combinationsmatrix is None:
@@ -122,7 +127,7 @@ class DataSet(object):
         return False
 
     def isGlobalFieldCombinableWith_(self, other):
-        """ check for 'combinableWith' fields in globalInfo, check if <other> matches.
+        """check for 'combinableWith' fields in globalInfo, check if <other> matches.
         this check is at analysis level (not at dataset level).
 
         :params other: a dataset to check against
@@ -134,14 +139,17 @@ class DataSet(object):
         idOther = other.globalInfo.id
         for t in tokens:
             if ":" in t:
-                logger.error("combinableWith field in globalInfo is at the analysis level. You specified a dataset-level combination %s." % t)
+                logger.error(
+                    "combinableWith field in globalInfo is at the analysis level. You specified a dataset-level combination %s."
+                    % t
+                )
                 raise SModelSError()
         if idOther in tokens:
             return True
         return False
 
     def isLocalFieldCombinableWith_(self, other):
-        """ check for 'combinableWith' fields in globalInfo, check if <other> matches.
+        """check for 'combinableWith' fields in globalInfo, check if <other> matches.
         this check is at dataset level (not at dataset level).
 
         :params other: a dataset to check against
@@ -152,7 +160,10 @@ class DataSet(object):
         tokens = self.dataInfo.combinableWith.split(",")
         for t in tokens:
             if ":" not in t:
-                logger.error("combinableWith field in dataInfo is at the dataset level. You specified an analysis-level combination %s." % t)
+                logger.error(
+                    "combinableWith field in dataInfo is at the dataset level. You specified an analysis-level combination %s."
+                    % t
+                )
                 raise SModelSError()
         idOther = other.globalInfo.id
         didOther = other.dataInfo.dataId
@@ -162,32 +173,32 @@ class DataSet(object):
         return False
 
     def checkForRedundancy(self, databaseParticles):
-        """ In case of efficiency maps, check if any txnames have overlapping
-            constraints. This would result in double counting, so we dont
-            allow it. """
+        """In case of efficiency maps, check if any txnames have overlapping
+        constraints. This would result in double counting, so we dont
+        allow it."""
         if self.getType() == "upperLimit":
             return False
         logger.debug("checking for redundancy")
         datasetElements = []
         for tx in self.txnameList:
-            if hasattr(tx, 'finalState'):
+            if hasattr(tx, "finalState"):
                 finalState = tx.finalState
             else:
-                finalState = ['MET', 'MET']
-            if hasattr(tx, 'intermediateState'):
+                finalState = ["MET", "MET"]
+            if hasattr(tx, "intermediateState"):
                 intermediateState = tx.intermediateState
             else:
                 intermediateState = None
             for el in elementsInStr(str(tx.constraint)):
-                newEl = Element(el, finalState, intermediateState,
-                                model=databaseParticles)
+                newEl = Element(el, finalState, intermediateState, model=databaseParticles)
                 datasetElements.append(newEl)
         combos = itertools.combinations(datasetElements, 2)
         for x, y in combos:
             if x == y and _complainAboutOverlappingConstraints:
-                errmsg = "Constraints (%s) and (%s) appearing in dataset %s:%s overlap "\
-                        "(may result in double counting)." % \
-                        (x, y, self.getID(), self.globalInfo.id)
+                errmsg = (
+                    "Constraints (%s) and (%s) appearing in dataset %s:%s overlap "
+                    "(may result in double counting)." % (x, y, self.getID(), self.globalInfo.id)
+                )
                 logger.error(errmsg)
                 raise SModelSError(errmsg)
 
@@ -205,7 +216,7 @@ class DataSet(object):
         if self.dataInfo.dataId:
             return self.dataInfo.dataId
         else:
-            return 'Dataset'
+            return "Dataset"
 
     def __eq__(self, other):
         if type(other) != type(self):
@@ -236,7 +247,7 @@ class DataSet(object):
         the value defined in globalInfo.lumi.
         """
 
-        if hasattr(self, 'lumi'):
+        if hasattr(self, "lumi"):
             return self.lumi
         else:
             return self.globalInfo.lumi
@@ -291,29 +302,28 @@ class DataSet(object):
         if expected:  # this step is done for prior and posterior expected
             obs = self.dataInfo.expectedBG
 
-        m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                 deltas_rel=deltas_rel)
+        m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2, deltas_rel=deltas_rel)
         computer = LikelihoodComputer(m)
         if expected == "posteriori":
-            thetahat = computer.findThetaHat(0.)
+            thetahat = computer.findThetaHat(0.0)
             if type(self.dataInfo.expectedBG) in [float, np.float64, int]:
                 thetahat = float(thetahat[0])
 
             obs = self.dataInfo.expectedBG + thetahat
-            m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                     deltas_rel=deltas_rel)
+            m = Data(
+                obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2, deltas_rel=deltas_rel
+            )
             # if abs ( nsig[0]-1 ) < 1e-5:
             #    print ( f"COMB ebg={self.dataInfo.expectedBG:.3f} obs={obs:.3f} nsig {nsig[0]:.3f}" )
             computer = LikelihoodComputer(m)
         ret = computer.likelihood(nsig, marginalize=marginalize)
-        if hasattr ( computer, "theta_hat" ):
+        if hasattr(computer, "theta_hat"):
             ## seems like someone wants to debug them
             self.theta_hat = computer.theta_hat
 
         return ret
 
-    def lmax(self, deltas_rel=0.2, marginalize=False, expected=False,
-             allowNegativeSignals=False):
+    def lmax(self, deltas_rel=0.2, marginalize=False, expected=False, allowNegativeSignals=False):
         """
         Convenience function, computes the likelihood at nsig = observedN - expectedBG,
         assuming "deltas_rel" error on the signal efficiency.
@@ -330,27 +340,34 @@ class DataSet(object):
         if expected:
             obs = self.dataInfo.expectedBG
             if expected == "posteriori":
-                m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                         deltas_rel=deltas_rel)
+                m = Data(
+                    obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2, deltas_rel=deltas_rel
+                )
                 computer = LikelihoodComputer(m)
-                thetahat = computer.findThetaHat(0.)
-                if type(self.dataInfo.expectedBG) in [float, np.float64,
-                                                np.float32, int, np.int64, np.int32]:
+                thetahat = computer.findThetaHat(0.0)
+                if type(self.dataInfo.expectedBG) in [
+                    float,
+                    np.float64,
+                    np.float32,
+                    int,
+                    np.int64,
+                    np.int32,
+                ]:
                     thetahat = float(thetahat[0])
                 obs = self.dataInfo.expectedBG + thetahat
 
-        m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                 deltas_rel=deltas_rel)
+        m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2, deltas_rel=deltas_rel)
         computer = LikelihoodComputer(m)
-        ret = computer.lmax ( marginalize=marginalize, nll=False,
-                              allowNegativeSignals=allowNegativeSignals )
-        if hasattr ( computer, "theta_hat" ):
+        ret = computer.lmax(
+            marginalize=marginalize, nll=False, allowNegativeSignals=allowNegativeSignals
+        )
+        if hasattr(computer, "theta_hat"):
             ## seems like someone wants to debug them
             self.theta_hat = computer.theta_hat
-        if hasattr ( computer, "muhat" ):
+        if hasattr(computer, "muhat"):
             ## seems like someone wants to debug them
             self.muhat = computer.muhat
-        if hasattr ( computer, "sigma_mu" ):
+        if hasattr(computer, "sigma_mu"):
             ## seems like someone wants to debug them
             self.sigma_mu = computer.sigma_mu
         return ret
@@ -366,8 +383,12 @@ class DataSet(object):
         :return: chi2 (float)
         """
 
-        m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG,
-                 self.dataInfo.bgError**2, deltas_rel=deltas_rel)
+        m = Data(
+            self.dataInfo.observedN,
+            self.dataInfo.expectedBG,
+            self.dataInfo.bgError**2,
+            deltas_rel=deltas_rel,
+        )
         computer = LikelihoodComputer(m)
         ret = computer.chi2(nsig, marginalize=marginalize)
 
@@ -392,11 +413,13 @@ class DataSet(object):
         attributes = getAttributesFrom(self)
 
         if not showPrivate:
-            attributes = list(filter(lambda a: a[0] != '_', attributes))
+            attributes = list(filter(lambda a: a[0] != "_", attributes))
 
         return attributes
 
-    def getUpperLimitFor(self, element=None, expected=False, txnames=None, compute=False, alpha=0.05, deltas_rel=0.2):
+    def getUpperLimitFor(
+        self, element=None, expected=False, txnames=None, compute=False, alpha=0.05, deltas_rel=0.2
+    ):
         """
         Returns the upper limit for a given element (or mass) and txname. If
         the dataset hold an EM map result the upper limit is independent of
@@ -419,32 +442,38 @@ class DataSet(object):
         :return: upper limit (Unum object)
         """
 
-        if self.getType() == 'efficiencyMap':
-            upperLimit = self.getSRUpperLimit(expected=expected, alpha=alpha, compute=compute,
-                                              deltas_rel=deltas_rel)
-            if (upperLimit/fb).normalize()._unit:
-                logger.error("Upper limit defined with wrong units for %s and %s"
-                             % (self.globalInfo.id, self.getID()))
+        if self.getType() == "efficiencyMap":
+            upperLimit = self.getSRUpperLimit(
+                expected=expected, alpha=alpha, compute=compute, deltas_rel=deltas_rel
+            )
+            if (upperLimit / fb).normalize()._unit:
+                logger.error(
+                    "Upper limit defined with wrong units for %s and %s"
+                    % (self.globalInfo.id, self.getID())
+                )
                 return False
             else:
                 return upperLimit
 
-        elif self.getType() == 'upperLimit':
+        elif self.getType() == "upperLimit":
             if not txnames or not element:
-                logger.error("A TxName and mass array must be defined when \
-                             computing ULs for upper-limit results.")
+                logger.error(
+                    "A TxName and mass array must be defined when \
+                             computing ULs for upper-limit results."
+                )
                 return False
             elif isinstance(txnames, list):
                 if len(txnames) != 1:
-                    logger.error("txnames must be a TxName object, a string or a list with a single Txname object")
+                    logger.error(
+                        "txnames must be a TxName object, a string or a list with a single Txname object"
+                    )
                     return False
                 else:
                     txname = txnames[0]
             else:
                 txname = txnames
 
-            if not isinstance(txname, txnameObj.TxName) and \
-                    not isinstance(txname, str):
+            if not isinstance(txname, txnameObj.TxName) and not isinstance(txname, str):
                 logger.error("txname must be a TxName object or a string")
                 return False
 
@@ -459,8 +488,7 @@ class DataSet(object):
             return upperLimit
 
         else:
-            logger.warning("Unkown data type: %s. Data will be ignored.",
-                           self.getType())
+            logger.warning("Unkown data type: %s. Data will be ignored.", self.getType())
             return None
 
     def getSRUpperLimit(self, alpha=0.05, expected=False, compute=False, deltas_rel=0.2):
@@ -479,13 +507,15 @@ class DataSet(object):
         :return: upper limit value
         """
 
-        if not self.getType() == 'efficiencyMap':
+        if not self.getType() == "efficiencyMap":
             logger.error("getSRUpperLimit can only be used for efficiency map results!")
             raise SModelSError()
 
         if not compute:
             if expected:
-                if hasattr(self.dataInfo, "upperLimit") and not hasattr(self.dataInfo, "expectedUpperLimit"):
+                if hasattr(self.dataInfo, "upperLimit") and not hasattr(
+                    self.dataInfo, "expectedUpperLimit"
+                ):
                     logger.info("expectedUpperLimit field not found. Returning None instead.")
                     return None
 
@@ -502,10 +532,10 @@ class DataSet(object):
         bgError = self.dataInfo.bgError  # error on BG
 
         m = Data(Nobs, Nexp, bgError**2, deltas_rel=deltas_rel)
-        computer = UpperLimitComputer(cl=1.-alpha)
+        computer = UpperLimitComputer(cl=1.0 - alpha)
         maxSignalXsec = computer.ulSigma(m)
         if maxSignalXsec != None:
-            maxSignalXsec = maxSignalXsec/self.getLumi()
+            maxSignalXsec = maxSignalXsec / self.getLumi()
 
         return maxSignalXsec
 
@@ -525,7 +555,7 @@ class CombinedDataSet(object):
         self.findType()
 
     def findType(self):
-        """ find the type of the combined dataset """
+        """find the type of the combined dataset"""
         self.type = "bestSR"  # type of combined dataset, e.g. pyhf, or simplified
         if hasattr(self.globalInfo, "covariance"):
             self.type = "simplified"
@@ -537,7 +567,7 @@ class CombinedDataSet(object):
         return ret
 
     def getIndex(self, dId, datasetOrder):
-        """ get the index of dataset within the datasetOrder,
+        """get the index of dataset within the datasetOrder,
             but allow for abbreviated names
         :param dId: id of dataset to search for, may be abbreviated
         :param datasetOrder: the ordered list of datasetIds, long form
@@ -565,14 +595,18 @@ class CombinedDataSet(object):
         if hasattr(self.globalInfo, "covariance"):
             datasets = self._datasets[:]
             if not hasattr(self.globalInfo, "datasetOrder"):
-                raise SModelSError("datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id)
+                raise SModelSError(
+                    "datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id
+                )
             datasetOrder = self.globalInfo.datasetOrder
             if isinstance(datasetOrder, str):
                 datasetOrder = [datasetOrder]
 
             if len(datasetOrder) != len(datasets):
-                raise SModelSError("Number of datasets in the datasetOrder field does not match the number of datasets for %s"
-                                   % self.globalInfo.id)
+                raise SModelSError(
+                    "Number of datasets in the datasetOrder field does not match the number of datasets for %s"
+                    % self.globalInfo.id
+                )
             for dataset in datasets:
                 idx = self.getIndex(dataset.getID(), datasetOrder)
                 if idx == -1:
@@ -586,14 +620,14 @@ class CombinedDataSet(object):
         Return the dataset type (combined)
         """
 
-        return 'combined'
+        return "combined"
 
     def getID(self):
         """
         Return the ID for the combined dataset
         """
 
-        return '(combined)'
+        return "(combined)"
 
     def getLumi(self):
         """
