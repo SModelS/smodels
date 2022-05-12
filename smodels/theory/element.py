@@ -6,11 +6,10 @@
 
 """
 
-from smodels.theory.graphTools import stringToTree, getCanonName, treeToString, compareNodes, drawTree, getTreeRoot, sortTree, addTrees, getFinalStates
+from smodels.theory.tree import Tree, compareNodes
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.particle import Particle
-from networkx import DiGraph, bfs_successors, is_arborescence
 
 
 class Element(object):
@@ -20,7 +19,8 @@ class Element(object):
     (cross-section * BR).
     """
 
-    def __init__(self, info=None, finalState=None, intermediateState=None, model=None):
+    def __init__(self, info=None, finalState=None,
+                 intermediateState=None, model=None):
         """
         Initializes the element. If info is defined, tries to generate
         the element using it.
@@ -40,7 +40,13 @@ class Element(object):
         :parameter model: The model (Model object) to be used when converting particle labels to
                           particle objects (only used if info, finalState or intermediateState != None).
         """
-        self.tree = DiGraph()
+
+        if isinstance(info, Tree):
+            self.tree = info.copyTree()
+        else:
+            self.tree = Tree(info=info, finalState=finalState,
+                             intermediateState=intermediateState,
+                             model=model)
         self.weight = crossSection.XSectionList()  # gives the weight for all decays promptly
         self.decayLabels = []
         self.motherElements = [self]  # The motheElements includes self to keep track of merged elements
@@ -48,36 +54,12 @@ class Element(object):
         self.coveredBy = set()
         self.testedBy = set()
 
-        if info:
-            if isinstance(info, str):
-                try:
-                    self.tree = stringToTree(info, finalState=finalState,
-                                             intermediateState=intermediateState,
-                                             model=model)
-                except (SModelSError, TypeError):
-                    raise SModelSError("Can not create element from input %s" % info)
-            elif isinstance(info, DiGraph):
-                self.tree = info.copy()  # Makes a shallow copy of the original tree
-            else:
-                raise SModelSError("Can not create element from input type %s" % type(info))
-
-        # Check graph consistency
+        # Check graph consistency and sort it
         # (must be a rooted tree with each node having a single parent):
         if self.tree.number_of_nodes():
-            if not is_arborescence(self.tree):
-                raise SModelSError("Elemented created with malformed graph (not  a tree).")
-        self.setCanonName()
-        self.sort()
-
-    def setCanonName(self):
-        """
-        Compute and store the canonical name for the tree
-        topology. The canonical name can be used to compare and sort topologies.
-        The name is stored in self.tree.canonName
-        """
-
-        canonName = getCanonName(self.tree)
-        self.tree.graph['canonName'] = canonName
+            self.tree.checkConsistency()
+            self.tree.setCanonName()
+            self.sort()
 
     def sort(self):
         """
@@ -85,13 +67,9 @@ class Element(object):
         all the daughters are sorted according to their canonName.
         """
 
-        # If canon names have not been defined, compute them:
-        if 'canonName' not in self.tree.graph:
-            self.setCanonName()
+        self.tree.sort()
 
-        self.tree = sortTree(self.tree)
-
-    def compareTo(self, other, sortOther=False):
+    def compareTo(self, other):
         """
         Compares the element with other.
         Uses the topology name (Tree canonincal name) to identify isomorphic topologies (trees).
@@ -102,10 +80,6 @@ class Element(object):
         comparison.
 
         :param other:  element to be compared (Element object)
-        :param sortOther: if True and the elements match,
-                          also returns a copy of other, but with its tree sorted
-                          according to the way it matched self.
-                          If True, but elements do not match, return None.
 
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
@@ -114,33 +88,36 @@ class Element(object):
             return -1
 
         # make sure the topology names have been computed:
-        if 'canonName' not in self.tree.graph:
-            self.setCanonName()
-        if 'canonName' not in other.tree.graph:
-            other.setCanonName()
+        canonName = self.getCanonName()
+        otherName = other.getCanonName()
+        if canonName != otherName:
+            if canonName > otherName:
+                return 1
+            else:
+                return -1
 
         # Recursively compare the nodes:
         cmp, newTree = compareNodes(self.tree, other.tree,
-                                    getTreeRoot(self.tree), getTreeRoot(other.tree))
+                                    self.tree.getTreeRoot(),
+                                    other.tree.getTreeRoot())
 
-        if sortOther:
-            if cmp == 0:  # Elements matched, return copy of other with tree sorted
-                otherNew = other.copy()
-                otherNew.tree = newTree
-            else:
-                otherNew = None
-            return cmp, otherNew
+        if cmp == 0:  # Elements matched, return copy of other with tree sorted
+            otherNew = other.copy()
+            otherNew.tree = newTree
         else:
-            return cmp
+            otherNew = None
+        return cmp, otherNew
 
     def __eq__(self, other):
-        return self.compareTo(other) == 0
+        cmp, otherSorted = self.compareTo(other)
+        return (cmp == 0)
 
     def __lt__(self, other):
-        return self.compareTo(other) < 0
+        cmp, otherSorted = self.compareTo(other)
+        return (cmp < 0)
 
     def __gt__(self, other):
-        return self.compareTo(other) > 0
+        return not (self < other)
 
     def __hash__(self):
         return object.__hash__(self)
@@ -172,7 +149,7 @@ class Element(object):
         :returns: string representation of the element
         """
 
-        return treeToString(self.tree)
+        return self.tree.treeToString()
 
     def __repr__(self):
 
@@ -190,10 +167,10 @@ class Element(object):
         elif self.getCanonName() != other.getCanonName():
             raise SModelSError("Can not add elements with distinct topologies")
 
-        newEl = self.__class__(info=self.tree)
+        newEl = self.__class__(info=None)
         newEl.motherElements = self.motherElements[:] + other.motherElements[:]
         newEl.weight = self.weight + other.weight
-        newEl.tree = addTrees(self.tree, other.tree)
+        newEl.tree = self.tree + other.tree
         newEl.sort()
 
         return newEl
@@ -220,7 +197,7 @@ class Element(object):
 
         self.motherElements += other.motherElements[:]
         self.weight += other.weight
-        self.tree = addTrees(self.tree, other.tree)
+        self.tree = self.tree + other.tree
 
         return self
 
@@ -242,10 +219,10 @@ class Element(object):
 
         """
 
-        return drawTree(self.tree, particleColor=particleColor,
-                        smColor=smColor,
-                        pvColor=pvColor, nodeScale=nodeScale,
-                        labelAttr=labelAttr, attrUnit=attrUnit)
+        return self.tree.draw(particleColor=particleColor,
+                              smColor=smColor,
+                              pvColor=pvColor, nodeScale=nodeScale,
+                              labelAttr=labelAttr, attrUnit=attrUnit)
 
     def copy(self):
         """
@@ -269,7 +246,7 @@ class Element(object):
         :returns: list of ParticleNode objects
         """
 
-        finalStates = getFinalStates(self.tree)
+        finalStates = self.tree.getFinalStates()
         return finalStates
 
     def _getAncestorsDict(self, igen=0):
@@ -339,16 +316,6 @@ class Element(object):
         else:
             return False
 
-    def getCanonName(self):
-        """
-        Get element topology info from branch topology info.
-
-        :returns: dictionary containing vertices and number of final states information
-        """
-        if 'canonName' not in self.tree.graph:
-            self.setCanonName()
-        return self.tree.graph['canonName']
-
     def setTestedBy(self, resultType):
         """
         Tag the element, all its daughter and all its mothers
@@ -374,6 +341,19 @@ class Element(object):
         self.coveredBy.add(resultType)
         for mother in self.getAncestors():
             mother.coveredBy.add(resultType)
+
+    def getCanonName(self):
+        """
+        Returns the canonincal name for the tree. If not defined,
+        compute it.
+        """
+
+        canonName = self.tree.canonName
+        if not canonName:
+            self.tree.setCanonName()
+            canonName = self.tree.canonName
+
+        return canonName
 
     def compressElement(self, doCompress, doInvisible, minmassgap):
         """
@@ -436,9 +416,9 @@ class Element(object):
         newelement.motherElements = [self]
 
         tree = newelement.tree
-        root = getTreeRoot(tree)
+        root = tree.getTreeRoot()
         # Loop over nodes from root to leaves:
-        for mom, daughters in bfs_successors(tree, root):
+        for mom, daughters in tree.bfs_successors(root):
             if mom == root:  # Skip primary vertex
                 continue
             if not mom.particle.isPrompt():  # Skip long-lived
@@ -475,7 +455,7 @@ class Element(object):
             tree.add_edge(gMom, bsmDaughter)
 
         # Recompute the canonical name and
-        newelement.setCanonName()
+        newelement.tree.setCanonName()
         newelement.sort()
 
         # If element was not compressed, return None
@@ -500,9 +480,9 @@ class Element(object):
 
         while keepCompressing:
             tree = newelement.tree
-            root = getTreeRoot(tree)
+            root = tree.getTreeRoot()
             # Loop over nodes:
-            for mom, daughters in bfs_successors(tree, root):
+            for mom, daughters in tree.bfs_successors(root):
                 if mom == root:  # Skip primary vertex
                     continue
                 # Skip node if its daughters are not stable
@@ -530,7 +510,7 @@ class Element(object):
                 break
 
             # Recompute the canonical name and
-            newelement.setCanonName()
+            newelement.tree.setCanonName()
             # If iteration has not changed element, break loop
             name = newelement.getCanonName()
             if name == previousName:

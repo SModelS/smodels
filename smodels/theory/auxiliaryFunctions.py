@@ -317,6 +317,51 @@ def getValuesForObj(obj, attribute):
     return uniqueValues
 
 
+def bracketToProcessStr(stringEl, finalState=None, intermediateState=None):
+    """
+    :parameter info: string describing the element in bracket notation
+                         (e.g. [[[e+],[jet]],[[e-],[jet]]])
+
+    :parameter finalState: list containing the final state labels for each branch
+                         (e.g. ['MET', 'HSCP'] or ['MET','MET'])
+    :parameter intermediateState: nested list containing intermediate state labels
+                                     for each branch  (e.g. [['gluino'], ['gluino']])
+    """
+
+    branches = eval(stringEl.replace('[*]', "['InclusiveBranch']"))
+
+    if finalState is None:
+        fStates = ['MET']*len(branches)
+    else:
+        fStates = finalState[:]
+
+    if intermediateState is None:
+        intStates = [['anyOdd' for dec in br] for br in branches]
+    else:
+        intStates = intermediateState[:]
+
+    stringProc = '(PV > ' + ','.join(['%s(%i)' % (intStates[i][0], i+1) for i, br in enumerate(branches)]) + ')'
+
+    j = len(branches)
+    for ibr, br in enumerate(branches):
+        fs = fStates[ibr]
+        brStr = ''
+        i = ibr+1
+        for idec, dec in enumerate(br):
+            mom = intStates[ibr][idec]
+            if idec < len(br)-1:
+                daughter = intStates[ibr][idec+1]
+                j += 1
+                brStr += ', (%s(%i) > %s(%i),' % (mom, i, daughter, j) + ','.join(dec) + ')'
+            else:
+                brStr += ', (%s(%i) > %s,' % (mom, i, fs) + ','.join(dec) + ')'
+            i = j
+
+        stringProc += brStr
+
+    return stringProc
+
+
 def getAttributesFrom(obj, skipIDs=[]):
     """
     Loops over all attributes in the object and return a list

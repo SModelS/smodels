@@ -12,16 +12,17 @@
 
 import time
 from smodels.theory import element, topology
-from smodels.theory.branch import Branch, decayBranches
+from smodels.theory.tree import Tree, ParticleNode
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
-def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
-              minmassgap= 0*GeV):
+
+def decompose(model, sigcut=0*fb, doCompress=True, doInvisible=True,
+              minmassgap=0*GeV):
     """
     Perform decomposition using the information stored in model.
-    
+
     :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
     :param doCompress: turn mass compression on/off
     :param doInvisible: turn invisible compression on/off
@@ -31,99 +32,205 @@ def decompose(model, sigcut= 0*fb, doCompress=True, doInvisible=True,
 
     """
     t1 = time.time()
-    
-    xSectionList = model.xsections    
-    pdgList = model.getValuesFor('pdg')
+
+    xSectionList = model.xsections
 
     if doCompress and minmassgap/GeV < 0.:
-        logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")        
+        logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")
         raise SModelSError()
 
-    if type(sigcut) == type(1.):
-        sigcut = sigcut * fb
+    if isinstance(sigcut, (float, int)):
+        sigcut = float(sigcut) * fb
 
     xSectionList.removeLowerOrder()
-    # Order xsections by PDGs to improve performance
-    xSectionList.order()
+    # Order xsections by highest xsec value to improve performance
+    xSectionList.sort()
 
-    # Get maximum cross sections (weights) for single particles (irrespective
-    # of sqrtS)
-    maxWeight = {}
-    for pid in xSectionList.getPIDs():
-        maxWeight[pid] = xSectionList.getXsecsFor(pid).getMaxXsec()   
+    # Generate all primary nodes (e.g. PV > X+Y)
+    # and assign the nodeWeight as the maximum cross-section
+    productionTrees = []
+    for pid in xSectionList.getPIDpairs():
+        weight = xSectionList.getXsecsFor(pid)
+        if weight < sigcut:
+            continue
+        pv = ParticleNode(model.getParticlesWith(label='PV')[0], 0, nodeWeight=weight)
+        pv.xsection = xSectionList.getXsecsFor(pid)
+        primaryMothers = [ParticleNode(model.getParticlesWith(pdg=pdg)[0], i+1) for i, pdg in enumerate(pid)]
+        productionTrees.append(Tree({pv: primaryMothers}))
 
-    # Generate dictionary, where keys are the PIDs and values 
-    # are the list of cross sections for the PID pair (for performance)
-    xSectionListDict = {}    
-    for pids in xSectionList.getPIDpairs():
-        xSectionListDict[pids] = xSectionList.getXsecsFor(pids)
+    # Sort production trees
+    productionTrees = sorted(productionTrees,
+                             key=lambda t: t.getTreeWeight().getMaxXsec(),
+                             reverse=True)
+    # For each production tree, produce all allowed cascade decays (above sigmacut):
+    allTrees = []
+    for tree in productionTrees:
+        print('len=', len(allTrees))
+        allTrees += cascadeDecay(tree)
 
-    # Create 1-particle branches with all possible mothers    
-    branchList = []
-    for pid in maxWeight:
-        branchList.append(Branch())
-        bsmParticle = model.getParticlesWith(pdg=pid)
-        if not bsmParticle:
-            raise SModelSError("Particle for pdg %i has not been defined.")
-        if len(bsmParticle) != 1:
-            raise SModelSError("Particle with pdg %i has multiple definitions.")
-        branchList[-1].oddParticles = [bsmParticle[0]]
-        if not pid in pdgList:
-            logger.error("PDG %i has not been defined" %int(pid))
-        branchList[-1].maxWeight = maxWeight[pid]        
-        
-    # Generate final branches (after all R-odd particles have decayed)
-    finalBranchList = decayBranches(branchList, sigcut)
-    
-    # Generate dictionary, where keys are the PIDs and values are the list of branches for the PID (for performance)
-    branchListDict = {}
-    for branch in finalBranchList:
-        if branch.oddParticles[0].pdg in branchListDict:
-            branchListDict[branch.oddParticles[0].pdg].append(branch)
-        else:
-            branchListDict[branch.oddParticles[0].pdg] = [branch]
-
-    for pid in xSectionList.getPIDs():
-        if not pid in branchListDict:
-            branchListDict[pid] = []
-
-    #Sort the branch lists by max weight to improve performance:
-    for pid in branchListDict:
-        branchListDict[pid] = sorted(branchListDict[pid], 
-                                     key=lambda br: br.maxWeight, reverse=True)        
-
+    # Create elements for each tree and combine equal elements
     smsTopList = topology.TopologyList()
 
-    # Combine pairs of branches into elements according to production
-    # cross section list
-    for pids in xSectionList.getPIDpairs():
-        weightList = xSectionListDict[pids]
-        minBR = (sigcut/weightList.getMaxXsec()).asNumber()    
-        if minBR > 1.:
-            continue
-        for branch1 in branchListDict[pids[0]]:
-            BR1 =  branch1.maxWeight/maxWeight[pids[0]]  #Branching ratio for first branch            
-            if BR1 < minBR:
-                break #Stop loop if BR1 is already too low
-            for branch2 in branchListDict[pids[1]]:   
-                BR2 =  branch2.maxWeight/maxWeight[pids[1]]  #Branching ratio for second branch                
-                if BR2 < minBR:
-                    break #Stop loop if BR2 is already too low        
-                                     
-                finalBR = BR1*BR2                
-                if type(finalBR) == type(1.*fb):
-                    finalBR = finalBR.asNumber()
-                if finalBR < minBR:
-                    continue # Skip elements with xsec below sigcut
-                                       
-                newElement = element.Element([branch1, branch2])
-                newElement.weight = weightList*finalBR
-                newElement.sortBranches()  #Make sure elements are sorted BEFORE adding them              
-                smsTopList.addElement(newElement)                                                 
-                                                    
+    for tree in allTrees:
+        newElement = element.Element(tree)
+        newElement.weight = tree.getTreeWeight()
+        newElement.sort()  # Make sure elements are sorted BEFORE adding them
+        smsTopList.addElement(newElement)
+
     smsTopList.compressElements(doCompress, doInvisible, minmassgap)
-    smsTopList._setElementIds()       
-            
-    logger.debug("decomposer done in %.2f s." % (time.time() -t1 ) )
-  
+    smsTopList._setElementIds()
+
+    logger.debug("decomposer done in %.2f s." % (time.time() - t1))
+
     return smsTopList
+
+
+def getDecayTrees(mother):
+    """
+    Generates a simple list of trees with all the decay channels
+    for the mother. In each tree the mother appears as the root
+    and each of its decays as daughters.
+    The  mother node weight is set to the respective decay branching ratio.
+    (The node numbering for the root/mother node is kept equal,
+    while the numbering of the daughters is automatically assigned to
+    avoid overlap with any previously created nodes, so the
+    decay tree can be directly merged to any other tree.)
+
+
+    :param mother: Mother for which the decay trees will be generated (ParticleNode object)
+
+    :return: List of simple trees representing the decay channels of daughter sorted in reverse
+             order according to the BR (largest BR first)
+    """
+
+    decayTrees = []
+
+    # Sort decays:
+    decays = []
+    for decay in mother.decays:
+        if decay is not None:
+            decays.append(decay)
+        else:
+            # Include possibility of mother appearing as a final state
+            mom = mother.copy()
+            mom.finalState = True  # Forbids further node decays
+            decayTrees.append(Tree({mom: []}))
+
+    decays = sorted(decays, key=lambda dec: dec.br, reverse=True)
+
+    # Loop over decays of the daughter
+    for decay in decays:
+        if not decay.br:
+            continue  # Skip decays with zero BRs
+        daughters = []
+        mom = mother.copy()
+        mom.nodeWeight = decay.br
+        for ptc in decay.daughters:
+            ptcNode = ParticleNode(particle=ptc)
+            daughters.append(ptcNode)
+
+        decayTrees.append(Tree({mom: daughters}))
+
+    return decayTrees
+
+
+def addOneStepDecays(tree, sigmacut=None):
+    """
+    Given a tree, generates a list of new trees (Tree objects),
+    where all the (unstable) nodes appearing at the end of the original tree
+    have been decayed. Each entry in the list corresponds to a different combination
+    of decays. If no decays were possible, return an empty list.
+
+    :param tree: Tree (Tree object) for which to add the decays
+    :param sigmacut: Cut on the tree weight (xsec*BR). Any tree with weights
+                     smaller than sigmacut will be ignored.
+
+
+    :return: List of trees with all possible 1-step decays added.
+    """
+
+    treeList = [tree]
+    # Get all (current) final states which are the mothers
+    # of the decays to be added:
+    mothers = [n for n in tree.nodes() if tree.out_degree(n) == 0]
+    for mom in mothers:
+        # Check if mom should decay:
+        if mom.finalState:
+            continue
+        if mom.particle.isStable():
+            mom.finalState = True
+            continue  # Skip if particle is stable
+        # Skip if particle has no decays
+        if not hasattr(mom, 'decays'):
+            mom.finalState = True
+            continue
+        if not mom.decays:
+            mom.finalState = True
+            continue
+
+        # Get all decay trees for final state:
+        decayTrees = getDecayTrees(mom)
+        if not decayTrees:
+            mom.finalState = True
+            continue
+
+        # Add all decay channels to all the trees
+        newTrees = []
+        for T in treeList:
+            for decay in decayTrees:
+                # The order below matters,
+                # since we want to keep the mother from the decay tree (which holds the BR value)
+                newTree = decay.compose(T)
+                if sigmacut is not None:
+                    treeWeight = newTree.getTreeWeight()
+                    if treeWeight is not None and treeWeight < sigmacut:
+                        # Do not consider this decay or the next ones,
+                        # since they are sorted accodring to BR and the subsequent
+                        # decays will only contain smaller weights
+                        break
+                newTrees.append(newTree)
+
+        if not newTrees:
+            continue
+        treeList = newTrees
+
+    if len(treeList) == 1 and treeList[0] == tree:
+        return []
+    else:
+        return treeList
+
+
+def cascadeDecay(tree, sigmacut=None):
+    """
+    Given a tree, generates a list of new trees (Tree objects),
+    where all the particles have cascade decayed to stable final states.
+
+    :param tree: Tree (Tree object) for which to add the decays
+    :param sigmacut: Cut on the tree weight (xsec*BR). Any tree with weights
+                     smaller than sigmacut will be ignored.
+
+    :return: List of trees with all possible decays added.
+    """
+
+    treeList = [tree]
+    newTrees = True
+    finalTrees = []
+    while newTrees:
+        newTrees = []
+        for T in treeList:
+            newT = addOneStepDecays(T, sigmacut)
+            if not newT:
+                finalStates = T.getFinalStates()
+                # Make sure all the final states have decayed
+                # (newT can be empty if there is no allowed decay above sigmacut)
+                if any(fs.finalState is False for fs in finalStates):
+                    continue
+                finalTrees.append(T)  # It was not possible to add any new decay to the tree
+            else:
+                newTrees += newT  # Add decayed trees to the next iteration
+
+        if not newTrees:  # It was not possible to add any new decay
+            break
+        treeList = newTrees[:]
+
+    return finalTrees
