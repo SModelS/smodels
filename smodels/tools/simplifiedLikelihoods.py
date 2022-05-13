@@ -14,7 +14,7 @@
 from scipy import stats, optimize, integrate, special, linalg
 from numpy import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
-from smodels.tools.statistics import rootFromNLLs, determineBrentBracket
+from smodels.tools.statistics import CLsfromNLL, determineBrentBracket
 from typing import Text, Optional, Union, Tuple
 
 import numpy as np
@@ -993,10 +993,10 @@ class UpperLimitComputer:
         self.toys = ntoys
         self.cl = cl
 
-
-    def getUpperLimitOnSigmaTimesEff( self, model, marginalize=False, toys=None,
-	           expected=False, trylasttime = False ):
-        """ upper limit on the fiducial cross section sigma times efficiency,
+    def getUpperLimitOnSigmaTimesEff(
+        self, model, marginalize=False, toys=None, expected=False, trylasttime=False
+    ):
+        """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
             obtained from the defined Data (using the signal prediction
             for each signal regio/dataset), by using
@@ -1010,8 +1010,9 @@ class UpperLimitComputer:
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on fiducial cross section
         """
-        ul = self.getUpperLimitOnMu ( model, marginalize=marginalize, toys=toys,
-                expected=expected, trylasttime=trylasttime )
+        ul = self.getUpperLimitOnMu(
+            model, marginalize=marginalize, toys=toys, expected=expected, trylasttime=trylasttime
+        )
 
         if ul == None:
             return ul
@@ -1112,7 +1113,7 @@ class UpperLimitComputer:
         # print ( f"SL nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f} bg {aModel.backgrounds[0]:.3f} obs {aModel.observed[0]:.3f}" )
         # return 1.
 
-        def root_func(mu: float, get_cls: bool = False) -> float:
+        def root_func(mu: float, return_type: Text = "CLs-alpha") -> float:
             """
             Calculate the root
             :param mu: float POI
@@ -1123,13 +1124,14 @@ class UpperLimitComputer:
             computer.ntot = model.backgrounds + nsig
             nll = computer.likelihood(nsig, marginalize=marginalize, nll=True)
             nllA = compA.likelihood(nsig, marginalize=marginalize, nll=True)
-            return rootFromNLLs(nllA, nll0A, nll, nll0, get_cls=get_cls)
+            return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type)
 
         return mu_hat, sigma_mu, root_func
 
-    def getUpperLimitOnMu( self, model, marginalize=False, toys=None, expected=False,
-             trylasttime = False ):
-        """ upper limit on the signal strength multiplier mu
+    def getUpperLimitOnMu(
+        self, model, marginalize=False, toys=None, expected=False, trylasttime=False
+    ):
+        """upper limit on the signal strength multiplier mu
             obtained from the defined Data (using the signal prediction
 
             for each signal regio/dataset), by using
@@ -1174,7 +1176,7 @@ class UpperLimitComputer:
         _, _, root_func = self._ul_preprocess(model, marginalize, toys, expected, trylasttime)
 
         # 1-(CLs+alpha) -> alpha = 0.05
-        return root_func(1.0, get_cls=True)
+        return root_func(1.0, return_type="1-CLs")
 
 
 if __name__ == "__main__":
@@ -1267,9 +1269,9 @@ if __name__ == "__main__":
     print("ul (marginalized)", ul)
     print("CLs (marginalized)", cls)
 
-    ul = ulComp.getUpperLimitOnMu ( m, marginalize=False )
-    cls = ulComp.computeCLs(m, marginalize = False)
-    print ( "ul (profiled)", ul )
+    ul = ulComp.getUpperLimitOnMu(m, marginalize=False)
+    cls = ulComp.computeCLs(m, marginalize=False)
+    print("ul (profiled)", ul)
     print("CLs (profiled)", cls)
 
     """

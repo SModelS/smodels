@@ -15,6 +15,7 @@ from smodels.tools.smodelsLogging import logger
 from scipy.special import erf
 import numpy as np
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from typing import Text
 
 
 def likelihoodFromLimits(
@@ -105,8 +106,8 @@ def likelihoodFromLimits(
     return llhdexp, mumax, sigma_exp
 
 
-def rootFromNLLs(
-    nllA: float, nll0A: float, nll: float, nll0: float, get_cls: bool = False
+def CLsfromNLL(
+    nllA: float, nll0A: float, nll: float, nll0: float, return_type: Text = "CLs-alpha"
 ) -> float:
     """
     compute the CLs - alpha from the NLLs
@@ -115,9 +116,10 @@ def rootFromNLLs(
     :param nll0A:
     :param nll:
     :param nll0:
-    :param get_cls: bool return CLs value if True
+    :param return_type: (Text) "CLs-alpha" or "1-CLs"
     :return:
     """
+    assert return_type in ["CLs-alpha", "1-CLs"], f"Unknown return type: {return_type}."
     qmu = 0.0 if 2 * (nll - nll0) < 0.0 else 2 * (nll - nll0)
     sqmu = np.sqrt(qmu)
     qA = 2 * (nllA - nll0A)
@@ -133,7 +135,7 @@ def rootFromNLLs(
 
     CLs = CLsb / CLb if CLb > 0 else 0.0
 
-    if get_cls:
+    if return_type == "1-CLs":
         return 1.0 - CLs
 
     cl = 0.95
