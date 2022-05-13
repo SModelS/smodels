@@ -419,11 +419,10 @@ class TheoryPredictionsCombiner(object):
 
         return mu_hat
 
-    def getUpperLimitOnMu(self, expected=False):
-        """get upper limit on signal strength multiplier, i.e. value for mu for
-            which CLs = 0.95
+    def _ul_preprocess(self, expected: bool = False) -> float:
+        """
+        preprocess upper limit computation
         :param expected: if True, compute expected likelihood, else observed
-        :returns: upper limit on signal strength multiplier mu
         """
         if "UL" in self.cachedObjs[expected]:
             return self.cachedObjs[expected]["UL"]
@@ -438,17 +437,36 @@ class TheoryPredictionsCombiner(object):
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
         # return 1.
 
-        def clsRoot(mu):
+        def clsRoot(mu: float, return_type: Text = "CLs-alpha") -> float:
             # at - infinity this should be .95,
             # at + infinity it should -.05
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
             nll = self.likelihood(mu, nll=True, expected=expected, useCached=False)
             nllA = self.likelihood(mu, expected="posteriori", nll=True, useCached=False)
-            ret = CLsfromNLL(nllA, nll0A, nll, nll0)
-            return ret
+            return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type)
+
+        return mu_hat, sigma_mu, clsRoot
+
+    def getUpperLimitOnMu(self, expected=False):
+        """get upper limit on signal strength multiplier, i.e. value for mu for
+            which CLs = 0.95
+        :param expected: if True, compute expected likelihood, else observed
+        :returns: upper limit on signal strength multiplier mu
+        """
+        mu_hat, sigma_mu, clsRoot = self._ul_preprocess(expected=expected)
 
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot)
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
         self.cachedObjs[expected]["UL"] = mu_lim
         return mu_lim
+
+    def computeCLs(self, expected: bool = False):
+        """
+        Compute the exclusion confidence level of the model (1-CLs)
+        :param expected: if false, compute observed, true: compute a priori expected
+        :return: float (1 - CLs value)
+        """
+        _, _, clsRoot = self._ul_preprocess(expected=expected)
+
+        return clsRoot(1.0, return_type="1-CLs")
