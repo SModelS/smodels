@@ -580,13 +580,13 @@ class PyhfUpperLimitComputer:
             # poissonian error
             if nsig[c]==0.:
                 nsig[c]=1e-5
-            poiss = (obss[c]-bgs[c]) / nsig[c]
+            poiss = abs(obss[c]-bgs[c]) / nsig[c]
             gauss = bgVars[c] / nsig[c]**2
             vars.append ( poiss + gauss )
         var_mu = np.sum ( vars )
         n = len ( obss )
+        # print ( f" sigma_mu from pyhf uncorr {var_mu} {n} "  )
         sigma_mu = float ( np.sqrt ( var_mu / (n**2) ) )
-        # print ( f" sigma_mu from pyhf uncorr {sigma_mu} {vars[:3]} "  )
         self.sigma_mu = sigma_mu
         #import IPython
         #IPython.embed()

@@ -51,7 +51,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
             deltas_rel=deltas_rel,
             lumi=dataset.getLumi(),
         )
-        ret = computer.ulOnSigmaTimesEff(d, marginalize=dataset._marginalize, expected=expected)
+        ret = computer.getUpperLimitOnSigmaTimesEff(d, marginalize=dataset._marginalize, expected=expected)
         logger.debug("SL upper limit : {}".format(ret))
         return ret
     elif dataset.type == "pyhf":

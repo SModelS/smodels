@@ -994,8 +994,8 @@ class UpperLimitComputer:
         self.cl = cl
 
 
-    def ulOnSigmaTimesEff( self, model, marginalize=False, toys=None, expected=False,
-             trylasttime = False ):
+    def getUpperLimitOnSigmaTimesEff( self, model, marginalize=False, toys=None,
+	           expected=False, trylasttime = False ):
         """ upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
             obtained from the defined Data (using the signal prediction
@@ -1261,7 +1261,7 @@ if __name__ == "__main__":
         nsignal
     )  # With respect to the older refernece value one must normalize the xsec
     print("old ul=", ul_old)
-    ul = ulComp.ulOnYields(m, marginalize=True)
+    ul = ulComp.getUpperLimitOnMu(m, marginalize=True)
 
     cls = ulComp.computeCLs(m, marginalize=True)
     print("ul (marginalized)", ul)
