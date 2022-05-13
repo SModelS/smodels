@@ -14,7 +14,7 @@
 import numpy as np
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
-from smodels.tools.statistics import rootFromNLLs, determineBrentBracket
+from smodels.tools.statistics import CLsfromNLL, determineBrentBracket
 import scipy.optimize as optimize
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
@@ -445,7 +445,7 @@ class TheoryPredictionsCombiner(object):
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
             nll = self.likelihood(mu, nll=True, expected=expected, useCached=False)
             nllA = self.likelihood(mu, expected="posteriori", nll=True, useCached=False)
-            ret = rootFromNLLs(nllA, nll0A, nll, nll0)
+            ret = CLsfromNLL(nllA, nll0A, nll, nll0)
             return ret
 
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot)
