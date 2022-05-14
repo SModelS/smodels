@@ -563,42 +563,39 @@ class Tree(nx.DiGraph):
         if self.canonName is None:
             self.setCanonName()
 
-        debug = False
-        # if self.canonName == 11101010011011010000:
-        # debug = True
-
-        if debug:
-            print('Initial:', self._succ)
-
-        # Create a dictionary with the mothers as keys
-        # and the sorted daughters as values
-        newTreeDict = OrderedDict()
-        for mom, daughters in nx.bfs_successors(self, self.getTreeRoot()):
+        # Sort edges (order edges from mom to daughter)
+        root = self.getTreeRoot()
+        for mom, daughters in self.bfs_successors(root):
             sortedDaughters = sorted(daughters, key=lambda d: (d.canonName, d.particle))
-            newTreeDict[mom] = sortedDaughters
+            # Replace edges by correct ordering:
+            self.remove_edges_from([(mom, d) for d in daughters])
+            self.add_edges_from([(mom, d) for d in sortedDaughters])
 
-        # Build new graph
+        # Although the edges are sorted, the nodes are still
+        # stored in an arbitrary order.
+        # To sort the nodes we build a list with nodes, their edges and a sorted index
+        # following the breadth-first search (which only relies on the already sorted edges):
+        edgesDict = self._succ
+        nodeList = [(root, edgesDict[root], 0)]
+        inode = 1
+        for mom, daughters in self.bfs_successors(root):
+            for d in daughters:
+                nodeList.append((d, edgesDict[d], inode))
+                inode += 1
+        if len(nodeList) != len(list(self.nodes)):
+            raise SModelSError('Tree seems to be malformed. Number of daughters does not match number of nodes-1')
+
+        # Sort nodes according to index
+        nodeList = sorted(nodeList, key=lambda n: n[-1])
+        # Convert sorted node list to an ordered dictionary
+        # and assign the sorted index to the node number
+        newTreeDict = OrderedDict()
+        for node, succ, nodeNumber in nodeList:
+            node.node = nodeNumber
+            newTreeDict[node] = succ
+
+        # Finally update tree with the node dictionary:
         nx.to_networkx_graph(newTreeDict, create_using=self)
-
-        if debug:
-            print('Final:', self._succ)
-
-        # # Traverse intermediate graph according following the sorted daughters
-        # # in order to add the mothers in the correct order
-        # newTreeDict = OrderedDict()
-        # for mom, daughters in nx.bfs_successors(self, self.getTreeRoot()):
-        #     newTreeDict[mom] = daughters
-        # nx.to_networkx_graph(newTreeDict, create_using=self)
-
-        # # Remove all nodes and edges:
-        # nx.to_networkx_graph(sortedTreeDict, create_using=self)
-        # # Remove all nodes and edges:
-        # # self.remove_nodes_from(list(self.nodes()))
-        # # Replace with sorted nodes:
-        # # for mom, daughters in sortedTreeDict.items():
-        # # self.add_node(mom)
-        # # for d in daughters:
-        # # self.add_edge(mom, d)
 
     def copyTree(self):
         """
