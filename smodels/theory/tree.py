@@ -11,6 +11,7 @@ import networkx as nx
 import itertools
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.auxiliaryFunctions import bracketToProcessStr
+from collections import OrderedDict
 
 
 class ParticleNode(object):
@@ -175,7 +176,12 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
     :return: (True, new tree) if nodes match, (False, None) otherwise.
     """
 
-    # logger.debug('Comparing nodes', nodeA, nodeB)
+    debug = False
+    # if treeA.canonName == 11101010011011010000:
+    # debug = True
+
+    if debug:
+        print('Comparing nodes', nodeA, nodeB)
 
     if not isinstance(nodeA, ParticleNode):
         return -1, None
@@ -183,14 +189,17 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
         return -1, None
 
     if nodeA.canonName != nodeB.canonName:
-        # logger.debug('\t node names differ', nodeA, nodeB)
+        if debug:
+            print('\t node names differ', nodeA, nodeB)
+            print('\t%s\n\t%s' % (nodeA.canonName, nodeB.canonName))
         if nodeA.canonName > nodeB.canonName:
             return 1, None
         else:
             return -1, None
 
     if nodeA.particle != nodeB.particle:
-        # print('\t node particles differ', nodeA, nodeB)
+        if debug:
+            print('\t node particles differ', nodeA, nodeB)
         if nodeA.particle > nodeB.particle:
             return 1, None
         else:
@@ -198,6 +207,10 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
 
     daughtersA = list(treeA.successors(nodeA))
     daughtersB = list(treeB.successors(nodeB))
+    if debug:
+        print('\t successors A = ', daughtersA, '(%s)' % ([d.canonName for d in daughtersA]))
+        print('\t successors B = ', daughtersB, '(%s)' % ([d.canonName for d in daughtersB]))
+
     if not daughtersA and not daughtersB:
         newNodeB = Tree()
         newNodeB.add_node(nodeB)
@@ -239,10 +252,12 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
             dB.add_node(nodeB)
             dB.add_edge(nodeB, list(dB.nodes())[0])
             newNodeB = nx.compose(newNodeB, dB)
-        # logger.debug('\t returning cmp = ', 0)
+        if debug:
+            print('\t returning cmp = ', 0)
         return 0, newNodeB
     else:
-        # logger.debug('\t returning cmp = ', cmp_orig)
+        if debug:
+            print('\t returning cmp = ', cmp_orig)
         return cmp_orig, None
 
 
@@ -430,13 +445,21 @@ class Tree(nx.DiGraph):
         for ib, b in enumerate(branches):
             intermediateState.append([])
             branchList.append([])
+            # Deal separately with the case where the primary mother is stable:
+            if tree.out_degree(b) == 0:
+                if b.Z2parity == -1:
+                    finalState.append(str(b))
+                    continue
+                else:
+                    raise SModelSError("Can not convert tree with Z2-violating decays to bracket")
             for mom, daughters in nx.bfs_successors(tree, b):
                 vertexList = [str(d) for d in daughters if d.Z2parity == 1]
-                fstates = [str(d) for d in daughters if d.Z2parity == -1 and not list(tree.successors(d))]
-                if len(vertexList) != len(daughters)-1 or len(fstates) > 1:
-                    raise SModelSError("Can not convert tree with Z2-violating decays to bracket")
-                branchList[ib].append(vertexList)
+                fstates = [str(d) for d in daughters if d.Z2parity == -1 and tree.out_degree(d) == 0]
+                if daughters:
+                    if len(vertexList) != len(daughters)-1 or len(fstates) > 1:
+                        raise SModelSError("Can not convert tree with Z2-violating decays to bracket: \n  %s" % self.treeToString())
                 intermediateState[ib].append(str(mom))
+                branchList[ib].append(vertexList)
                 finalState += fstates
 
         return branchList, finalState, intermediateState
@@ -513,15 +536,18 @@ class Tree(nx.DiGraph):
 
         return weight
 
-    def bfs_successors(self, node):
+    def bfs_successors(self, node=None):
         """
         Returns an iterator over the mother and daughter
         nodes starting at node using a breadth first search.
 
-        :param node: Node from tree
+        :param node: Node from tree. If None, starts at tree root.
 
         :return: Iterator over nodes.
         """
+
+        if node is None:
+            node = self.getTreeRoot()
 
         return nx.bfs_successors(self, node)
 
@@ -537,27 +563,53 @@ class Tree(nx.DiGraph):
         if self.canonName is None:
             self.setCanonName()
 
-        sortedTreeDict = {}
+        debug = False
+        # if self.canonName == 11101010011011010000:
+        # debug = True
+
+        if debug:
+            print('Initial:', self._succ)
+
+        # Create a dictionary with the mothers as keys
+        # and the sorted daughters as values
+        newTreeDict = OrderedDict()
         for mom, daughters in nx.bfs_successors(self, self.getTreeRoot()):
             sortedDaughters = sorted(daughters, key=lambda d: (d.canonName, d.particle))
-            sortedTreeDict[mom] = sortedDaughters
+            newTreeDict[mom] = sortedDaughters
 
-        # Remove all nodes and edges:
-        self.remove_nodes_from(list(self.nodes()))
-        # Replace with sorted nodes:
-        for mom, daughters in sortedTreeDict.items():
-            self.add_node(mom)
-            for d in daughters:
-                self.add_edge(mom, d)
+        # Build new graph
+        nx.to_networkx_graph(newTreeDict, create_using=self)
+
+        if debug:
+            print('Final:', self._succ)
+
+        # # Traverse intermediate graph according following the sorted daughters
+        # # in order to add the mothers in the correct order
+        # newTreeDict = OrderedDict()
+        # for mom, daughters in nx.bfs_successors(self, self.getTreeRoot()):
+        #     newTreeDict[mom] = daughters
+        # nx.to_networkx_graph(newTreeDict, create_using=self)
+
+        # # Remove all nodes and edges:
+        # nx.to_networkx_graph(sortedTreeDict, create_using=self)
+        # # Remove all nodes and edges:
+        # # self.remove_nodes_from(list(self.nodes()))
+        # # Replace with sorted nodes:
+        # # for mom, daughters in sortedTreeDict.items():
+        # # self.add_node(mom)
+        # # for d in daughters:
+        # # self.add_edge(mom, d)
 
     def copyTree(self):
         """
-        Returns a shallow copy of self.
+        Returns a copy of self. The copy contains the same canonical name
+        and copies of nodes.
 
         :return: Tree object
         """
 
-        newTree = self.copy()
+        newNodesDict = {n: n.copy() for n in self.nodes}
+        newTree = nx.relabel_nodes(self, newNodesDict, copy=True)
         newTree.canonName = self.canonName
 
         return newTree
@@ -621,17 +673,17 @@ class Tree(nx.DiGraph):
             labels = {n: str(n) for n in self.nodes()}
         elif attrUnit is not None:
             labels = {n: str(getattr(n, labelAttr).asNumber(attrUnit)) if hasattr(n, labelAttr)
-                      else str(n) for n in self.nodes()}
+                    else str(n) for n in self.nodes()}
         else:
             labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
-                      else str(n) for n in self.nodes()}
+                    else str(n) for n in self.nodes()}
 
         for key in labels:
             if labels[key] == 'anyOdd':
                 labels[key] = 'BSM'
         node_size = []
         node_color = []
-        for n in self.nodes():
+        for n in self.nodes:
             node_size.append(nodeScale*100*len(labels[n]))
             if 'pv' == labels[n].lower():
                 node_color.append(pvColor)

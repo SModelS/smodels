@@ -180,6 +180,7 @@ def addOneStepDecays(tree, sigmacut=None):
             for decay in decayTrees:
                 # The order below matters,
                 # since we want to keep the mother from the decay tree (which holds the BR value)
+                dec = decay.copy()
                 newTree = decay.compose(T)
                 if sigmacut is not None:
                     treeWeight = newTree.getTreeWeight()

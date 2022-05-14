@@ -17,43 +17,140 @@ from smodels.tools.smodelsLogging import logger
 import itertools
 
 
+class TopologyDict(dict):
+    """
+    An instance of this class represents an iterable collection of topologies.
+
+    :ivar topos: list of topologies (Topology objects)
+
+    """
+
+    def __init__(self):
+
+        self.__dict__ = {}
+
+    def addElement(self, newelement):
+
+        # debug = False
+        # if newelement.getCanonName() == 11101010011011010000:
+        #     debug = True
+        #
+        # if debug:
+        #     print('\n\nadding new Element: ')
+        #     canonName = newelement.getCanonName()
+        #     for d in newelement.tree.successors(newelement.tree.getTreeRoot()):
+        #         print(d, d.canonName)
+        #     if canonName not in self:
+        #         print('first element')
+        #     else:
+        #         print('to list:')
+        #         for el in self[canonName]:
+        #             print('\t el=')
+        #             for d in el.tree.successors(el.tree.getTreeRoot()):
+        #                 print('\t', d, d.canonName)
+
+        if isinstance(newelement, Element):
+            canonName = newelement.getCanonName()
+            if canonName not in self:
+                self[canonName] = [newelement]
+
+                # if debug:
+                #     print('Added first element as:')
+                #     el = self[canonName][0]
+                #     for d in el.tree.successors(el.tree.getTreeRoot()):
+                #         print('\t', d, d.canonName)
+
+            else:
+                elementList = self[canonName]
+                index = index_bisect(elementList, newelement)
+                if index != len(elementList) and elementList[index] == newelement:
+                    elementList[index] += newelement
+                else:
+                    elementList.insert(index, newelement)
+
+                self[canonName] = elementList[:]
+
+            return True
+        else:
+            return False
+
+    def getElements(self):
+        """
+        Return a list with all the elements in all the topologies.
+
+        """
+        elements = []
+        for elementList in self.values():
+            elements.extend(elementList)
+        return elements
+
+    def compressElements(self, doCompress, doInvisible, minmassgap):
+        """
+        Compress all elements in the dictionary and include the compressed
+        elements in the topology list.
+
+        :parameter doCompress: if True, perform mass compression
+        :parameter doInvisible: if True, perform invisible compression
+        :parameter minmassgap: value (in GeV) of the maximum
+                               mass difference for compression
+                               (if mass difference < minmassgap, perform mass compression)
+
+        """
+
+        for el in self.getElements():
+            newElements = el.compressElement(doCompress, doInvisible, minmassgap)
+            if not newElements:
+                continue
+            for newelement in newElements:
+                newelement.sort()  # Make sure elements are sorted BEFORE adding them
+                self.addElement(newelement)
+
+    def _setElementIds(self):
+        """
+        Assign unique ID to each element in the Topology list
+        """
+        elID = 1
+        for element in self.getElements():
+            element.elID = elID
+            elID += 1
+
+
 class Topology(object):
     """
     An instance of this class represents a topology.
-
-    :ivar vertnumb: list with number of vertices in each branch
-    :ivar verparts: list with number of final states in each branch
-    :ivar elementList: list of Element objects with this common topology
     """
 
     def __init__(self, elements=None):
         """
         Constructor.
         If elements is defined, create the topology from it. If elements it is
-        a list, all elements must share a common canonical name (common topology).
+        a list, all elements must share a common global topology.
 
         :parameter elements: Element object or list of Element objects
         """
-        self.canonName = None
+
+        self.vertnumb = []
+        self.vertparts = []
+        self.elementList = []
 
         if elements:
             if isinstance(elements, Element):
-                self.canonName = elements.getCanonName()
                 self.addElement(elements)
             elif isinstance(elements, list):
                 for element in elements:
-                    if self.canonName is None:
-                        self.canonName = element.getCanonName()
                     self.addElement(element)
 
     def __str__(self):
         """
-        Returns the topology canonical name
+        Return string with numbers of particles per vertex, e.g.
+        [1],[2,1]
 
-        :returns: string with canonical name
+        :returns: string with number of final states in each branch
         """
-
-        return str(self.canonName)
+        ret = ""
+        for p in self.vertparts:
+            ret += "%s" % str(p).replace(" ", "")
+        return ret
 
     def __repr__(self):
         return self.__str__()
@@ -71,14 +168,27 @@ class Topology(object):
     def __cmp__(self, other):
         """
         Compares the topology with other.
-        The comparison is made base on the canonical name.
+        The comparison is made on number of vertices and then on the
+        total number of particles coming out of the vertices.
         :param other:  topology to be compared (Topology object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
-        # First compare the canonical name:
-        if self.canonName != other.canonName:
-            if self.canonName > other.canonName:
+        #Check for any permutation of branches:
+        for v1 in itertools.permutations(self.vertparts):
+            v1 = list(v1)
+            if v1 == other.vertparts:
+                return 0
+
+        if sorted(self.vertnumb, reverse=True) != sorted(other.vertnumb, reverse=True):
+            comp = sorted(self.vertnumb, reverse=True) > sorted(other.vertnumb, reverse=True)
+            if comp:
+                return 1
+            else:
+                return -1
+        elif sorted(self.vertparts) != sorted(other.vertparts):
+            comp = sorted(self.vertparts) > sorted(other.vertparts)
+            if comp:
                 return 1
             else:
                 return -1
@@ -95,9 +205,14 @@ class Topology(object):
         """
 
         for element in self.elementList:
-            if element.getCanonName() != self.canonName:
+            info = element.getEinfo()
+            if self.vertnumb != info["vertnumb"]:
                 logger.error("Inconsistent topology.")
                 raise SModelSError()
+            if self.vertparts != info["vertparts"]:
+                logger.error("Inconsistent topology.")
+                raise SModelSError()
+        logger.info("Consistent topology.")
         return True
 
     def describe(self):
@@ -148,7 +263,7 @@ class Topology(object):
 
         index = index_bisect(self.elementList, newelement)
         if index != len(self.elementList) and self.elementList[index] == newelement:
-            self.elementList[index].combineWith(newelement)
+            self.elementList[index] += newelement
         else:
             self.elementList.insert(index, newelement)
 
@@ -173,7 +288,7 @@ class Topology(object):
 
         sumw = crossSection.XSectionList()
         for element in self.elementList:
-            sumw.combineWith(element.weight)
+            sumw += element.weight
 
         return sumw
 
@@ -181,9 +296,6 @@ class Topology(object):
 class TopologyList(object):
     """
     An instance of this class represents an iterable collection of topologies.
-
-    :ivar topos: list of topologies (Topology objects)
-
     """
 
     def __init__(self, topologies=[]):
@@ -323,7 +435,7 @@ class TopologyList(object):
         for topo in self:
             topoweight = topo.getTotalWeight()
             if topoweight:
-                sumw.combineWith(topoweight)
+                sumw += topoweight
         return sumw
 
     def getElements(self):

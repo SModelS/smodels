@@ -67,7 +67,21 @@ class Element(object):
         all the daughters are sorted according to their canonName.
         """
 
+        debug = False
+        # if self.tree.canonName == 11101010011011010000:
+        #     debug = True
+
+        if debug:
+            print('El initial: ')
+            for key, val in self.tree._succ.items():
+                print('   ', key, [(v, v.canonName) for v in val])
+
         self.tree.sort()
+
+        if debug:
+            print('El Final: ')
+            for key, val in self.tree._succ.items():
+                print('   ', key, [(v, v.canonName) for v in val])
 
     def compareTo(self, other):
         """
@@ -81,20 +95,33 @@ class Element(object):
 
         :param other:  element to be compared (Element object)
 
-        :return: -1 if self < other, 0 if self == other, +1, if self > other.
+        :return: (cmp,otherSorted), where cmp = -1 if self < other, 0 if self == other, +1, if self > other and otherSorted is None if cmp != 0 or other sorted according to the way it matched self.
         """
 
         if not isinstance(other, Element):
-            return -1
+            return -1, None
 
         # make sure the topology names have been computed:
         canonName = self.getCanonName()
         otherName = other.getCanonName()
         if canonName != otherName:
             if canonName > otherName:
-                return 1
+                return 1, None
             else:
-                return -1
+                return -1, None
+
+        debug = False
+        # if self.tree.canonName == 11101010011011010000:
+            # debug = True
+
+        if debug:
+            print('Calling CompareTo')
+            print('self: ')
+            for d in self.tree.successors(self.tree.getTreeRoot()):
+                print(d, d.canonName)
+            print('other: ')
+            for d in other.tree.successors(other.tree.getTreeRoot()):
+                print(d, d.canonName)
 
         # Recursively compare the nodes:
         cmp, newTree = compareNodes(self.tree, other.tree,
@@ -399,6 +426,7 @@ class Element(object):
                         added = True
 
         newElements.pop(0)  # Remove original element
+        newElements = [el.sort() for el in newElements]
         return newElements
 
     def massCompress(self, minmassgap):
