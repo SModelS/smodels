@@ -164,7 +164,7 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
     only if all their daughters are also equal.
     For daughters with the same canonical name, all the permutations are tried
     when comparing nodes.
-    If nodes match return a tree (Tree obj) with nodeB as root
+    If nodes match, return a tree (Tree obj) with nodeB as root
     and its daughters as nodes, but with the daughters sorted according to the ordering
     to which they matched nodeA.
 
@@ -250,7 +250,7 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
         newNodeB.add_node(nodeB)
         for dB in newDaughtersB:
             dB.add_node(nodeB)
-            dB.add_edge(nodeB, list(dB.nodes())[0])
+            dB.add_edge(nodeB, list(dB.nodes)[0])
             newNodeB = nx.compose(newNodeB, dB)
         if debug:
             print('\t returning cmp = ', 0)
@@ -501,7 +501,7 @@ class Tree(nx.DiGraph):
         :returns: list of ParticleNode objects
         """
 
-        finalStates = [n for n in self.nodes() if self.out_degree(n) == 0]
+        finalStates = [n for n in self.nodes if self.out_degree(n) == 0]
         return finalStates
 
     def getTreeRoot(self):
@@ -511,7 +511,7 @@ class Tree(nx.DiGraph):
         :return: node
         """
 
-        root = [n for n in self.nodes() if self.in_degree[n] == 0]
+        root = [n for n in self.nodes if self.in_degree[n] == 0]
         if len(root) != 1:
             raise SModelSError("Malformed Tree, %i root(s) have been found." % len(root))
 
@@ -526,7 +526,7 @@ class Tree(nx.DiGraph):
         """
 
         weight = 1.0
-        for n in self.nodes():
+        for n in self.nodes:
             # Skip final state (stable) particles
             if self.out_degree(n) == 0:
                 continue
@@ -553,44 +553,33 @@ class Tree(nx.DiGraph):
 
     def sort(self):
         """
-        Sort the tree according to the canonName and then particle. For each node,
-        all the daughters are sorted according to their canonName.
-
-        :return: sorted tree (Tree object)
+        Sort the tree according to the the node comparison (based on canonName and particle).
+        For each node, all the daughters (edges) are also sorted.
         """
 
         # If canon names have not been defined, compute them:
         if self.canonName is None:
             self.setCanonName()
 
-        # Sort edges (order edges from mom to daughter)
-        root = self.getTreeRoot()
-        for mom, daughters in self.bfs_successors(root):
-            sortedDaughters = sorted(daughters, key=lambda d: (d.canonName, d.particle))
-            # Replace edges by correct ordering:
-            self.remove_edges_from([(mom, d) for d in daughters])
-            self.add_edges_from([(mom, d) for d in sortedDaughters])
-
-        # Although the edges are sorted, the nodes are still
-        # stored in an arbitrary order.
-        # To sort the nodes we build a list with nodes, their edges and a sorted index
-        # following the breadth-first search (which only relies on the already sorted edges):
-        edgesDict = self._succ
-        nodeList = [(root, edgesDict[root], 0)]
-        inode = 1
-        for mom, daughters in self.bfs_successors(root):
-            for d in daughters:
-                nodeList.append((d, edgesDict[d], inode))
+        # Created a listed of sorted nodes according to the node comparison:
+        sortedNodes = []
+        for node in self.nodes:
+            inode = 0
+            while inode < len(sortedNodes) and compareNodes(self, self, node, sortedNodes[inode])[0] < 0:
                 inode += 1
-        if len(nodeList) != len(list(self.nodes)):
-            raise SModelSError('Tree seems to be malformed. Number of daughters does not match number of nodes-1')
+            sortedNodes.insert(inode, node)
 
-        # Sort nodes according to index
-        nodeList = sorted(nodeList, key=lambda n: n[-1])
+        # Created a sorted list with the necessary information
+        sortedTreeList = []
+        for node in sortedNodes:
+            sortedDaughters = sorted(self.successors(node),
+                                     key=lambda n: sortedNodes.index(n), reverse=True)
+            sortedTreeList.append((node, sortedDaughters, sortedNodes.index(node)))
+
         # Convert sorted node list to an ordered dictionary
         # and assign the sorted index to the node number
         newTreeDict = OrderedDict()
-        for node, succ, nodeNumber in nodeList:
+        for node, succ, nodeNumber in sortedTreeList:
             node.node = nodeNumber
             newTreeDict[node] = succ
 
@@ -629,8 +618,9 @@ class Tree(nx.DiGraph):
         :return: new tree with the combined particles (Tree object)
         """
 
-        nodesDict = {n: n+list(other.nodes())[inode]
-                     for inode, n in enumerate(self.nodes())}
+        nodesB = list(other.nodes)
+        nodesDict = {n: n+nodesB[inode]
+                     for inode, n in enumerate(self.nodes)}
         newTree = nx.relabel_nodes(self, nodesDict, copy=True)
 
         return newTree
@@ -667,13 +657,13 @@ class Tree(nx.DiGraph):
         import matplotlib.pyplot as plt
 
         if labelAttr is None:
-            labels = {n: str(n) for n in self.nodes()}
+            labels = {n: str(n) for n in self.nodes}
         elif attrUnit is not None:
             labels = {n: str(getattr(n, labelAttr).asNumber(attrUnit)) if hasattr(n, labelAttr)
-                    else str(n) for n in self.nodes()}
+                      else str(n) for n in self.nodes}
         else:
             labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
-                    else str(n) for n in self.nodes()}
+                      else str(n) for n in self.nodes}
 
         for key in labels:
             if labels[key] == 'anyOdd':
