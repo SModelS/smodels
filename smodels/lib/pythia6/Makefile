@@ -1,3 +1,5 @@
+FC=$(shell ../check_fortran_compiler.sh)
+
 all: pythia_lhe
 
 tarball:

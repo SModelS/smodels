@@ -1,4 +1,4 @@
-FCC=gfortran
+FCC=$(shell ../../check_fortran_compiler.sh)
 PROGRAM=nllfast_7TeV
 
 all: $(PROGRAM) gg.out sb.out sg.out ss.out st.out gdcpl.out sdcpl.out

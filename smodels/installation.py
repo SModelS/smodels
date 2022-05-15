@@ -12,7 +12,6 @@ from __future__ import print_function
 import sys
 import os
 
-
 def installDirectory():
     """
     Return the software installation directory, by looking at location of this
@@ -29,23 +28,20 @@ def installDirectory():
 def test_requirements():
     """ checks if all requirements are installed.
     Returns true if that is the case. """
-    import importlib
+    import importlib.util
     for i in requirements():
-        try:
-            pos = i.find(">" )
-            lib = i
-            if pos > -1:
-                lib = i[:pos]
-            found = importlib.util.find_spec( lib )
-            if found == None:
-                return False
-        except Exception as e:
+        pos = i.find(">" )
+        lib = i
+        if pos > -1:
+            lib = i[:pos]
+        found = importlib.util.find_spec( lib )
+        if found == None:
             return False
     return True
 
 def resolve_dependencies( as_user = True ):
-    """ method that is meant to resolve the SModelS dependencies, 
-    via pip install --user. Warns you if pip cannot be found. 
+    """ method that is meant to resolve the SModelS dependencies,
+    via pip install --user. Warns you if pip cannot be found.
     :params as_user: if False, try system-wide install.
     """
     ck = test_requirements()
@@ -72,6 +68,33 @@ def resolve_dependencies( as_user = True ):
     else:
         print ( "an error has occurred when resolving the dependencies." )
         return -1
+
+def cacheDirectory ( create=False, reportIfDefault=False ):
+    """
+    Returns the user's smodels cache directory, i.e. ~/.cache/smodels.
+    :params create: if True, create the directory if it doesnt exist.
+    :params reportIfDefault: if True, then report also if the default location
+                             has been used
+    :returns: cache dir. optionally returns also if the default cache dir has been
+              used.
+    """
+    if "SMODELS_CACHEDIR" in os.environ:
+        cacheDir = os.environ["SMODELS_CACHEDIR"]
+        if create and not os.path.exists ( cacheDir ):
+            os.mkdir ( cacheDir )
+        if reportIfDefault:
+            return cacheDir,False
+        return cacheDir
+    home = os.environ["HOME"]
+    cacheDir = os.path.join ( home, ".cache" )
+    if create and not os.path.exists ( cacheDir ):
+        os.mkdir ( cacheDir )
+    smodelsDir = os.path.join ( cacheDir, "smodels" )
+    if create and not os.path.exists ( smodelsDir ):
+        os.mkdir ( smodelsDir )
+    if reportIfDefault:
+        return smodelsDir,True
+    return smodelsDir
 
 def pythonDirectory():
     """
@@ -121,7 +144,7 @@ def _toTuple_ ( ver ):
                 minor = i[:i.find(pf)]
                 try:
                     minor = int(minor)
-                except:
+                except (ValueError,TypeError):
                     pass
                 b.append ( minor )
                 b.append ( i[i.find(pf):] )
@@ -178,7 +201,7 @@ def fixpermissions():
     """ make sure that all filepermissions are such that
         we can compile the wrappers for pythia and nllfast. """
     from smodels.tools.smodelsLogging import logger
-    import os, glob
+    import glob
     Dir = "%ssmodels/lib/" % installDirectory()
     try:
         Dirs = [ "%spythia6" % Dir, "%spythia8" % Dir ]
@@ -187,19 +210,27 @@ def fixpermissions():
         for p in Dirs:
             logger.debug ( "chmod 777 %s" % (p) )
             os.chmod ( p, 0o777 )
-    except Exception as e:
+    except OSError:
         print ( "chmod failed (permission error). Please try as root, i.e.:" )
         print ( "sudo smodelsTools.py fixpermissions" )
 
-def officialDatabase( fastlim=False ):
-    """ :param fastlim: include fastlim results """
-    v=version().replace(".","")
-    fl = "_fastlim" if fastlim else ""
-    r="http://smodels.hephy.at/database/official%s%s" % (v,fl)
-    return r
+__dbServer__ = "https://smodels.github.io/database"
+__dblabels__ = [ "official", "latest", "fastlim", "backup", "superseded", "unittest",
+                 "debug", "nonaggregated", None ]
 
-def testDatabase():
-    r="http://smodels.hephy.at/database/unittest%s" % version().replace(".","")
+def databasePath ( label ):
+    """ construct the path to the database json file
+    :param label: one of: official, latest, fastlim, backup
+    :returns: URL, e.g. https://smodels.github.io/database/official
+    """
+    if not label in __dblabels__:
+        from smodels.tools.smodelsLogging import logger
+        logger.warning ( "cannot identify label %s" % label )
+        return label
+    if label == None:
+        label = "official"
+    v=version().replace(".","")
+    r="%s/%s%s" % (__dbServer__,label,v)
     return r
 
 def main():
@@ -224,12 +255,17 @@ def main():
     args = ap.parse_args()
     funcs = { "installdir": installDirectory, "pythondir": pythonDirectory,
               "version": version, "banner": banner, "requirements": requirements,
-              "database": officialDatabase, "test_database": testDatabase,
               "copyright": license, "resolve_dependencies": resolve_dependencies }
+    dbpaths = { "database": "official", "test_database": "unittest" }
     for f,v in args.__dict__.items():
-        if v: 
-            r = funcs[f]() 
-            if r != None: print ( r )
+        if v:
+            if "database" in f:
+                t = databasePath ( dbpaths[f] )
+                if t: print ( t )
+            else:
+                r = funcs[f]()
+                if r != None: 
+                    print ( r )
 
 if __name__ == "__main__":
     main()
