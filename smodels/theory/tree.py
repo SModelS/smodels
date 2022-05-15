@@ -176,12 +176,6 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
     :return: (True, new tree) if nodes match, (False, None) otherwise.
     """
 
-    debug = False
-    # if treeA.canonName == 11101010011011010000:
-    # debug = True
-
-    if debug:
-        print('Comparing nodes', nodeA, nodeB)
 
     if not isinstance(nodeA, ParticleNode):
         return -1, None
@@ -189,17 +183,12 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
         return -1, None
 
     if nodeA.canonName != nodeB.canonName:
-        if debug:
-            print('\t node names differ', nodeA, nodeB)
-            print('\t%s\n\t%s' % (nodeA.canonName, nodeB.canonName))
         if nodeA.canonName > nodeB.canonName:
             return 1, None
         else:
             return -1, None
 
     if nodeA.particle != nodeB.particle:
-        if debug:
-            print('\t node particles differ', nodeA, nodeB)
         if nodeA.particle > nodeB.particle:
             return 1, None
         else:
@@ -207,9 +196,6 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
 
     daughtersA = list(treeA.successors(nodeA))
     daughtersB = list(treeB.successors(nodeB))
-    if debug:
-        print('\t successors A = ', daughtersA, '(%s)' % ([d.canonName for d in daughtersA]))
-        print('\t successors B = ', daughtersB, '(%s)' % ([d.canonName for d in daughtersB]))
 
     if not daughtersA and not daughtersB:
         newNodeB = Tree()
@@ -252,12 +238,8 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
             dB.add_node(nodeB)
             dB.add_edge(nodeB, list(dB.nodes)[0])
             newNodeB = nx.compose(newNodeB, dB)
-        if debug:
-            print('\t returning cmp = ', 0)
         return 0, newNodeB
     else:
-        if debug:
-            print('\t returning cmp = ', cmp_orig)
         return cmp_orig, None
 
 
@@ -569,19 +551,12 @@ class Tree(nx.DiGraph):
                 inode += 1
             sortedNodes.insert(inode, node)
 
-        # Created a sorted list with the necessary information
-        sortedTreeList = []
+        # Created an ordered dictionary with the nodes and edges
+        newTreeDict = OrderedDict()
         for node in sortedNodes:
             sortedDaughters = sorted(self.successors(node),
-                                     key=lambda n: sortedNodes.index(n), reverse=True)
-            sortedTreeList.append((node, sortedDaughters, sortedNodes.index(node)))
-
-        # Convert sorted node list to an ordered dictionary
-        # and assign the sorted index to the node number
-        newTreeDict = OrderedDict()
-        for node, succ, nodeNumber in sortedTreeList:
-            node.node = nodeNumber
-            newTreeDict[node] = succ
+                                     key=lambda n: sortedNodes.index(n))
+            newTreeDict[node] = sortedDaughters
 
         # Finally update tree with the node dictionary:
         nx.to_networkx_graph(newTreeDict, create_using=self)

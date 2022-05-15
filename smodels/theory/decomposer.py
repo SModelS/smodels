@@ -11,19 +11,20 @@
 """
 
 import time
-from smodels.theory import element, topology
+from smodels.theory.element import Element
+from smodels.theory.topology import TopologyDict
 from smodels.theory.tree import Tree, ParticleNode
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
 
-def decompose(model, sigcut=0*fb, doCompress=True, doInvisible=True,
+def decompose(model, sigmacut=0*fb, doCompress=True, doInvisible=True,
               minmassgap=0*GeV):
     """
     Perform decomposition using the information stored in model.
 
-    :param sigcut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
+    :param sigmacut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
     :param doCompress: turn mass compression on/off
     :param doInvisible: turn invisible compression on/off
     :param minmassgap: maximum value (in GeV) for considering two R-odd particles
@@ -34,13 +35,14 @@ def decompose(model, sigcut=0*fb, doCompress=True, doInvisible=True,
     t1 = time.time()
 
     xSectionList = model.xsections
+    pdgList = model.getValuesFor('pdg')
 
     if doCompress and minmassgap/GeV < 0.:
         logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")
         raise SModelSError()
 
-    if isinstance(sigcut, (float, int)):
-        sigcut = float(sigcut) * fb
+    if isinstance(sigmacut,(float,int)):
+        sigmacut = float(sigmacut) * fb
 
     xSectionList.removeLowerOrder()
     # Order xsections by highest xsec value to improve performance
@@ -51,38 +53,39 @@ def decompose(model, sigcut=0*fb, doCompress=True, doInvisible=True,
     productionTrees = []
     for pid in xSectionList.getPIDpairs():
         weight = xSectionList.getXsecsFor(pid)
-        if weight < sigcut:
+        if weight < sigmacut:
             continue
-        pv = ParticleNode(model.getParticlesWith(label='PV')[0], 0, nodeWeight=weight)
+        pv = ParticleNode(model.getParticlesWith(label='PV')[0],0,nodeWeight=weight)
         pv.xsection = xSectionList.getXsecsFor(pid)
-        primaryMothers = [ParticleNode(model.getParticlesWith(pdg=pdg)[0], i+1) for i, pdg in enumerate(pid)]
-        productionTrees.append(Tree({pv: primaryMothers}))
+        primaryMothers = [ParticleNode(model.getParticlesWith(pdg=pdg)[0],i+1)
+                          for i,pdg in enumerate(pid)]
+        productionTrees.append(Tree({pv : primaryMothers}))
 
     # Sort production trees
     productionTrees = sorted(productionTrees,
-                             key=lambda t: t.getTreeWeight().getMaxXsec(),
+                             key = lambda t: t.getTreeWeight().getMaxXsec(),
                              reverse=True)
+
     # For each production tree, produce all allowed cascade decays (above sigmacut):
     allTrees = []
     for tree in productionTrees:
-        print('len=', len(allTrees))
-        allTrees += cascadeDecay(tree)
+        allTrees += cascadeDecay(tree,sigmacut=sigmacut)
 
     # Create elements for each tree and combine equal elements
-    smsTopList = topology.TopologyList()
+    smsTopDict = TopologyDict()
 
     for tree in allTrees:
-        newElement = element.Element(tree)
+        newElement = Element(tree)
         newElement.weight = tree.getTreeWeight()
-        newElement.sort()  # Make sure elements are sorted BEFORE adding them
-        smsTopList.addElement(newElement)
+        smsTopDict.addElement(newElement)
 
-    smsTopList.compressElements(doCompress, doInvisible, minmassgap)
-    smsTopList._setElementIds()
+    if doCompress or doInvisible:
+        smsTopDict.compressElements(doCompress, doInvisible, minmassgap)
+    smsTopDict._setElementIds()
 
     logger.debug("decomposer done in %.2f s." % (time.time() - t1))
 
-    return smsTopList
+    return smsTopDict
 
 
 def getDecayTrees(mother):

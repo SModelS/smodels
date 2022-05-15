@@ -67,21 +67,7 @@ class Element(object):
         all the daughters are sorted according to their canonName.
         """
 
-        debug = False
-        # if self.tree.canonName == 11101010011011010000:
-        #     debug = True
-
-        if debug:
-            print('El initial: ')
-            for key, val in self.tree._succ.items():
-                print('   ', key, [(v, v.canonName) for v in val])
-
         self.tree.sort()
-
-        if debug:
-            print('El Final: ')
-            for key, val in self.tree._succ.items():
-                print('   ', key, [(v, v.canonName) for v in val])
 
     def compareTo(self, other):
         """
@@ -110,19 +96,6 @@ class Element(object):
             else:
                 return -1, None
 
-        debug = False
-        # if self.tree.canonName == 11101010011011010000:
-            # debug = True
-
-        if debug:
-            print('Calling CompareTo')
-            print('self: ')
-            for d in self.tree.successors(self.tree.getTreeRoot()):
-                print(d, d.canonName)
-            print('other: ')
-            for d in other.tree.successors(other.tree.getTreeRoot()):
-                print(d, d.canonName)
-
         # Recursively compare the nodes:
         cmp, newTree = compareNodes(self.tree, other.tree,
                                     self.tree.getTreeRoot(),
@@ -131,6 +104,7 @@ class Element(object):
         if cmp == 0:  # Elements matched, return copy of other with tree sorted
             otherNew = other.copy()
             otherNew.tree = newTree
+            otherNew.sort()
         else:
             otherNew = None
         return cmp, otherNew
@@ -410,7 +384,7 @@ class Element(object):
                     newel = element.massCompress(minmassgap)
                     # Avoids double counting
                     # (elements sharing the same parent are removed during clustering)
-                    if newel and not any(newel == el for el in newElements[:]):
+                    if (newel is not None) and (newel not in newElements):
                         newElements.append(newel)
                         added = True
 
@@ -421,12 +395,12 @@ class Element(object):
                     newel = element.invisibleCompress()
                     # Avoids double counting
                     # (elements sharing the same parent are removed during clustering)
-                    if newel and not any(newel == el for el in newElements[:]):
+                    if (newel is not None) and (newel not in newElements):
                         newElements.append(newel)
                         added = True
 
         newElements.pop(0)  # Remove original element
-        newElements = [el.sort() for el in newElements]
+
         return newElements
 
     def massCompress(self, minmassgap):
