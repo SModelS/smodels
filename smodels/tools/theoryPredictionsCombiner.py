@@ -17,6 +17,7 @@ from smodels.tools.physicsUnits import fb
 from smodels.tools.statistics import CLsfromNLL, determineBrentBracket
 import scipy.optimize as optimize
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from typing import Text
 
 
 class TheoryPredictionsCombiner(object):
