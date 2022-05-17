@@ -17,7 +17,7 @@ from smodels.tools.physicsUnits import fb
 from smodels.tools.statistics import CLsfromNLL, determineBrentBracket
 import scipy.optimize as optimize
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from typing import Text
+from typing import Text, Tuple, Callable, Union, Dict
 
 
 class TheoryPredictionsCombiner(object):
@@ -224,7 +224,13 @@ class TheoryPredictionsCombiner(object):
         return f"SRs: {', '.join(ids)}"
 
     @singleDecorator
-    def likelihood(self, mu=1.0, expected=False, nll=False, useCached=True):
+    def likelihood(
+        self,
+        mu: float = 1.0,
+        expected: Union[bool, Text] = False,
+        nll: bool = False,
+        useCached: bool = True,
+    ) -> float:
         """
         Compute the likelihood at a given mu
         :param mu: signal strength
@@ -321,13 +327,18 @@ class TheoryPredictionsCombiner(object):
         return max(conditions)
 
     def findMuHat(
-        self, allowNegativeSignals=False, expected=False, extended_output=False, nll=False
-    ):
+        self,
+        allowNegativeSignals: bool = False,
+        expected: Union[bool, Text] = False,
+        extended_output: bool = False,
+        nll: bool = False,
+    ) -> Union[Dict, float, None]:
         """find muhat and lmax.
         :param allowNegativeSignals: if true, then also allow for negative values
         :param expected: if true, compute expected prior (=lsm), if "posteriori"
                          compute posteriori expected
-        :param extended_output: if true, return also sigma_mu, the estimate of the error of mu_hat, and lmax, the likelihood at mu_hat
+        :param extended_output: if true, return also sigma_mu, the estimate of the error of mu_hat,
+                                and lmax, the likelihood at mu_hat
         :param nll: if true, return negative log max likelihood instead of lmax
         :returns: mu_hat, i.e. the maximum likelihood estimate of mu
         """
@@ -348,7 +359,9 @@ class TheoryPredictionsCombiner(object):
         if len(muhats) == 0:
             logger.error(f"asked to compute muhat for combination, but no individual values")
             if extended_output:
-                return None, None, None
+                # @JACK: Instead of None this should return an appropriate value in order not to
+                # break the computation.
+                return {"muhat": None, "sigma_mu": None, "lmax": None}
             return None
         toTry = [sum(weighted) / totweight]
 
@@ -363,8 +376,8 @@ class TheoryPredictionsCombiner(object):
             toTry += [1.0, 0.0, 3.0, 10.0, 0.1]
         for mu0 in toTry:
             # Minimize with a delta_mu = 1e-3*mu0 when computing the first derivative
-            # (if delta_mu is too small, the derivative might give zero and terminate the minimization)
-            # o  = scipy.optimize.minimize(fun, mu0 ) ## the unbounded method
+            # (if delta_mu is too small, the derivative might give zero and terminate the
+            # minimization) o  = scipy.optimize.minimize(fun, mu0 ) ## the unbounded method
             mxm = float(max(muhats))
             upper = 3.0 * mxm
             if upper <= 1.5:  #
@@ -382,7 +395,8 @@ class TheoryPredictionsCombiner(object):
             o = scipy.optimize.minimize(fun, mu0, bounds=bounds, tol=1e-9)
             if not o.success:
                 logger.debug(
-                    f"combiner.findMuHat did not terminate successfully: {o.message} mu_hat={o.x} hess={o.hess_inv} slhafile={self.slhafile}"
+                    f"combiner.findMuHat did not terminate successfully: {o.message} "
+                    f"mu_hat={o.x} hess={o.hess_inv} slhafile={self.slhafile}"
                 )
             # the inverted hessian is a good approximation for the variance at the
             # minimum
@@ -398,16 +412,18 @@ class TheoryPredictionsCombiner(object):
             # the hessian is negative meaning we found a maximum, not a minimum
             if hessian <= 0.0:
                 logger.debug(
-                    f"combiner.findMuHat the hessian {hessian} is negative at mu_hat={o.x} in {self.slhafile} try again with different initialisation."
+                    f"combiner.findMuHat the hessian {hessian} is negative at mu_hat={o.x} in "
+                    f"{self.slhafile} try again with different initialisation."
                 )
         mu_hat = o.x[0]
         lmax = np.exp(-o.fun)  # fun is *always* nll
         if hessian < 0.0 or nll_ > 998.0:
             logger.error(
-                "tried with several starting points to find maximum, always ended up in minimum. bailing out."
+                "tried with several starting points to find maximum, always ended up in minimum. "
+                "bailing out."
             )
             if extended_output:
-                return None, None, None
+                return {"muhat": None, "sigma_mu": None, "lmax": None}
             return None
         if not allowNegativeSignals and mu_hat < 0.0:
             mu_hat = 0.0  # fixme for this case we should reevaluate the hessian!
@@ -420,15 +436,17 @@ class TheoryPredictionsCombiner(object):
 
         return mu_hat
 
-    def _ul_preprocess(self, expected: bool = False) -> float:
+    def _ul_preprocess(self, expected: bool = False) -> Tuple[float, float, Callable]:
         """
         preprocess upper limit computation
         :param expected: if True, compute expected likelihood, else observed
         """
-        if "UL" in self.cachedObjs[expected]:
-            return self.cachedObjs[expected]["UL"]
+        # @JACK: this needs to be fixed. Is this UL refers to UL on mu?
+        # if "UL" in self.cachedObjs[expected]:
+        #     return self.cachedObjs[expected]["UL"]
         fmh = self.findMuHat(expected=expected, allowNegativeSignals=True, extended_output=True)
         mu_hat, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+        mu_hat = mu_hat if mu_hat is not None else 0.0
         nll0 = self.likelihood(mu_hat, expected=expected, nll=True)
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
