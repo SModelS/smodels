@@ -30,7 +30,7 @@ class Particle(object):
                                Attributes can also be directly assigned using keyword arguments.
 
         Possible properties for arguments.
-        Z2parity: int, +1 or -1
+        isSM: True/False
         label: str, e.g. 'e-'
         pdg: number in pdg
         mass: mass of the particle
@@ -196,7 +196,7 @@ class Particle(object):
         return str(self.__dict__)
 
     def eqProperties(self, other,
-                     properties=['Z2parity', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']):
+                     properties=['isSM', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']):
         """
         Check if particle has the same properties (default is spin, colordim and eCharge)
         as other. Only compares the attributes which have been defined in both objects.
@@ -213,7 +213,7 @@ class Particle(object):
             return False
 
     def cmpProperties(self, other,
-                      properties=['Z2parity', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']):
+                      properties=['isSM', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']):
         """
         Compare properties (default is spin, colordim and eCharge).
         Return 0 if properties are equal, -1 if self < other and 1 if self > other.
@@ -470,7 +470,7 @@ class MultiParticle(Particle):
             raise AttributeError(e)
 
     def cmpProperties(self, other,
-                      properties=['Z2parity', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']):
+                      properties=['isSM', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']):
         """
         Compares the properties in self with the ones in other.
         If other is a Particle object, checks if any of the particles in self matches

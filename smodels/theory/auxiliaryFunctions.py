@@ -328,38 +328,59 @@ def bracketToProcessStr(stringEl, finalState=None, intermediateState=None):
                                      for each branch  (e.g. [['gluino'], ['gluino']])
     """
 
-    branches = eval(stringEl.replace('[*]', "['InclusiveBranch']"))
+    branches = eval(stringEl.replace('[*]', "'InclusiveNode'").replace("'*'", "'anySM'"))
 
-    if finalState is None:
-        fStates = ['MET']*len(branches)
-    else:
-        fStates = finalState[:]
-
-    if intermediateState is None:
-        intStates = [['anyOdd' for dec in br] for br in branches]
-    else:
-        intStates = intermediateState[:]
-
-    stringProc = '(PV > ' + ','.join(['%s(%i)' % (intStates[i][0], i+1) for i, br in enumerate(branches)]) + ')'
-
-    j = len(branches)
+    # Get ordered list of BSM states:
+    bsmStates = []
+    bsmIndices = []
+    iptc = 1
     for ibr, br in enumerate(branches):
-        fs = fStates[ibr]
-        brStr = ''
-        i = ibr+1
+        bsmStates.append([])
+        bsmIndices.append([])
+        if br == 'InclusiveNode':
+            bsmStates[ibr].append(br)
+            bsmIndices[ibr].append(None)
+            continue
         for idec, dec in enumerate(br):
-            mom = intStates[ibr][idec]
-            if idec < len(br)-1:
-                daughter = intStates[ibr][idec+1]
-                j += 1
-                brStr += ', (%s(%i) > %s(%i),' % (mom, i, daughter, j) + ','.join(dec) + ')'
+            if intermediateState is None:
+                bsmStates[ibr].append('anyBSM')
             else:
-                brStr += ', (%s(%i) > %s,' % (mom, i, fs) + ','.join(dec) + ')'
-            i = j
+                bsmStates[ibr].append(intermediateState[ibr][idec])
+            bsmIndices[ibr].append(iptc)
+            iptc += 1
+        if finalState is None:
+            bsmStates[ibr].append('MET')
+        else:
+            bsmStates[ibr].append(finalState[ibr])
 
-        stringProc += brStr
+    # Get PV:
+    pvStrs = []
+    for ibr, br in enumerate(branches):
+        if bsmIndices[ibr][0] is None:
+            pvStrs.append(bsmStates[ibr][0])
+        else:
+            pvStrs.append(bsmStates[ibr][0]+'(%i)' % bsmIndices[ibr][0])
 
-    return stringProc
+    pv = '(PV > '+','.join(pvStrs)+')'
+    edges = [pv]
+    for ibr, br in enumerate(branches):
+        # If there is a single BSM state do nothing
+        if len(bsmStates[ibr]) < 2:
+            continue
+
+        for ibsm, bsm in enumerate(bsmStates[ibr][:-1]):
+            iptc = bsmIndices[ibr][ibsm]
+            mom = bsm+'(%i)' % iptc
+            smDaughters = ','.join(br[ibsm])
+            bsmDaughter = bsmStates[ibr][ibsm+1]
+            if ibsm+1 < len(bsmIndices[ibr]):
+                bsmDaughter += '(%i)' % (bsmIndices[ibr][ibsm+1])
+
+            daughters = smDaughters+','+bsmDaughter
+            edges.append('('+mom+' > '+daughters+')')
+
+    procStr = ','.join(edges)
+    return procStr
 
 
 def getAttributesFrom(obj, skipIDs=[]):

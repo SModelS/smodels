@@ -35,9 +35,9 @@ class Model(object):
         self.BSMparticles = self.allBSMparticles[:]  # at initialization assume all particles will be used
         self.SMparticles = SMparticles[:]
         for p in self.SMparticles:
-            p._isSM = True
+            p.isSM = True
         for p in self.BSMparticles:
-            p._isSM = False
+            p.isSM = False
 
         self.label = label
 
@@ -204,24 +204,24 @@ class Model(object):
 
         return massDict, decaysDict, xsections
 
-    def getEvenOddList(self):
+    def getSMandBSMList(self):
         """
-        Get the list of even and odd particles, according to the Z2 parity value
+        Get the list of SM and BSM particles, according to the isSM value
         defined for each particle.
 
         :return: list with PDGs of even particles, list with PDGs of odd particles
         """
 
         allPDGs = list(set(self.getValuesFor('pdg')))
-        evenPDGs = []
-        oddPDGs = []
+        smPDGs = []
+        bsmPDGs = []
         for pdg in allPDGs:
-            if all(p.Z2parity == 1 for p in self.getParticlesWith(pdg=pdg)):
-                evenPDGs.append(pdg)
-            elif all(p.Z2parity == -1 for p in self.getParticlesWith(pdg=pdg)):
-                oddPDGs.append(pdg)
+            if all(p.isSM for p in self.getParticlesWith(pdg=pdg)):
+                smPDGs.append(pdg)
+            elif all(not p.isSM for p in self.getParticlesWith(pdg=pdg)):
+                bsmPDGs.append(pdg)
 
-        return evenPDGs, oddPDGs
+        return smPDGs, bsmPDGs
 
     def filterCrossSections(self):
         """
@@ -231,14 +231,14 @@ class Model(object):
         :return: Number of cross-sections after filter.
         """
 
-        evenPDGs, oddPDGs = self.getEvenOddList()
+        smPDGs, bsmPDGs = self.getSMandBSMList()
         modelPDGs = [particle.pdg for particle in self.BSMparticles if isinstance(particle.pdg, int)]
         for xsec in self.xsections.xSections[:]:
             for pid in xsec.pid:
-                if not pid in modelPDGs:
+                if pid not in modelPDGs:
                     logger.debug("Cross-section for %s includes particles not belonging to model and will be ignored" % str(xsec.pid))
                     self.xsections.delete(xsec)
-                if not pid in oddPDGs:
+                if pid not in bsmPDGs:
                     logger.debug("Cross-section for %s includes even particles and will be ignored" % str(xsec.pid))
                     self.xsections.delete(xsec)
 
@@ -256,8 +256,8 @@ class Model(object):
             if isinstance(particle, MultiParticle):
                 continue
 
-            if not hasattr(particle, 'pdg') or not hasattr(particle, 'Z2parity'):
-                raise SModelSError("PDG and/or Z2-parity for particle %s has not been defined" % particle.label)
+            if not hasattr(particle, 'pdg'):
+                raise SModelSError("PDG for particle %s has not been defined" % particle.label)
 
             pdg = particle.pdg
             if abs(pdg) in massDict.keys():
@@ -271,14 +271,13 @@ class Model(object):
     def setDecays(self, decaysDict, promptWidth, stableWidth, erasePrompt):
 
         allPDGs = list(set(self.getValuesFor('pdg')))
-        evenPDGs, oddPDGs = self.getEvenOddList()
 
         for particle in self.BSMparticles:
             if isinstance(particle, MultiParticle):
                 continue
 
-            if not hasattr(particle, 'pdg') or not hasattr(particle, 'Z2parity'):
-                raise SModelSError("PDG and/or Z2-parity for particle %s has not been defined" % particle.label)
+            if not hasattr(particle, 'pdg'):
+                raise SModelSError("PDG for particle %s has not been defined" % particle.label)
 
             pdg = particle.pdg
             particle.decays = []
@@ -301,7 +300,7 @@ class Model(object):
             if particle.totalwidth > promptWidth:
                 particle.totalwidth = float('inf')*GeV  # Treat particle as prompt
                 logger.debug("Particle %s has width above the threshold and will be assumed as prompt." % particle.pdg)
-                if erasePrompt and particle.Z2parity == -1:
+                if erasePrompt and not particle.isSM:
                     logger.debug("Erasing quantum numbers of (prompt) particle %s." % particle.pdg)
                     for attr in erasePrompt:
                         delattr(particle, attr)
@@ -340,7 +339,7 @@ class Model(object):
                 continue
             ndecays = len([dec for dec in p.decays if dec is not None])
             if ndecays == 0:
-                if p.Z2parity == -1:
+                if not p.isSM:
                     logger.warning("No valid decay found for %s. It will be considered stable." % p)
                 p.totalwidth = 0.*GeV
 
@@ -359,7 +358,7 @@ class Model(object):
 
         :param erasePromptQNs: If set, all particles with prompt decays (totalwidth > promptWidth)
                                will have the corresponding properties (quantum numbers). So all particles with the same
-                               mass and Z2parity will be considered as equal when combining elements.
+                               mass and isSM=False will be considered as equal when combining elements.
 
         """
 

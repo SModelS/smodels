@@ -11,9 +11,11 @@ import sys,glob
 sys.path.insert(0,"../")
 import os
 import unittest
+import time
 import pickle
 import subprocess
 from convertNotebook2Test import getNotebookData
+import progressbar
 
 def loadDefaultOutput(notebookFile):
     # Get default output
@@ -45,15 +47,28 @@ class notebookTests(unittest.TestCase):
     def testNotebooks(self):
 
         for notebookFile in glob.glob('../notebooks-Examples/*.ipynb'):
+
+            if 'decomp' in notebookFile:
+                continue
+            # if not 'cross' in notebookFile:
+                # continue
+
             defaultOutputDict = loadDefaultOutput(notebookFile)
             self.assertFalse(defaultOutputDict is None)
             outputDict = getNewOutput(notebookFile)
             self.assertFalse(outputDict is None)
 
             print('\nChecking %s' %os.path.basename(notebookFile))
+            widgets = [progressbar.Percentage(), progressbar.Bar()]
+            bar = progressbar.ProgressBar(widgets=widgets,
+                                          maxval=len(defaultOutputDict)).start()
             for icell in sorted(defaultOutputDict.keys()):
-                print('\t checking cell %i' %icell)
+                bar.update(icell)
+                time.sleep(0.2)
+                # print('\t checking cell %i' %icell)
+                # print(defaultOutputDict[icell])
                 self.assertEqual(defaultOutputDict[icell],outputDict[icell])
+            bar.finish()
 
 if __name__ == "__main__":
     unittest.main()

@@ -211,7 +211,7 @@ class Element(object):
 
         :param tree: tree to be drawn
         :param particleColor: color for particle nodes
-        :param smColor: color used for particles which have the _isSM attribute set to True
+        :param smColor: color used for particles which have the isSM attribute set to True
         :param pvColor: color for primary vertex
         :param nodeScale: scale size for nodes
         :param labelAttr: attribute to be used as label. If None, will use the string representation
@@ -429,7 +429,7 @@ class Element(object):
             smDaughters = []
             for d in daughters:
                 # Split daughters into final states SM and others (BSM)
-                if hasattr(d, '_isSM') and d._isSM and not list(tree.successors(d)):
+                if hasattr(d, 'isSM') and d.isSM and not list(tree.successors(d)):
                     smDaughters.append(d)
                 else:
                     bsmDaughter.append(d)
@@ -505,7 +505,7 @@ class Element(object):
                                        eCharge=0, colordim=1,
                                        _isInvisible=True,
                                        totalwidth=mom.totalwidth,
-                                       pdg=mom.pdg, _isSM=mom._isSM)
+                                       pdg=mom.pdg, isSM=mom.isSM)
                 mom.particle = invParticle
 
                 # For safety break loop since tree structure changed

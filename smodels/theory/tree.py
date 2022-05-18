@@ -11,6 +11,7 @@ import networkx as nx
 import itertools
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.auxiliaryFunctions import bracketToProcessStr
+from smodels.tools.inclusiveObjects import InclusiveValue
 from collections import OrderedDict
 
 
@@ -122,38 +123,34 @@ class ParticleNode(object):
 
         return newNode
 
-    def cmpNode(self, other):
+
+class InclusiveParticleNode(ParticleNode):
+    """
+    An inclusive ParticleNode class. It will return True when compared to any other
+    ParticleNode object or InclusiveParticleNode object.
+
+    :ivar particle: None (dummy)
+    :ivar nodeNumber: Node identifier
+    :ivar nodeWeight: 1 (dummy value)
+    """
+
+    def __init__(self, nodeNumber=None, nodeWeight=1.0):
+        ParticleNode.__init__(self, particle='Inclusive',
+                              nodeNumber=nodeNumber, nodeWeight=nodeWeight)
+        self.canonName = InclusiveValue
+
+    def copy(self):
         """
-        Compare nodes. Nodes are equal if their canonNames are equal
-        and the particles match.
-
-        :param other: node (ParticleNode object)
+        Makes a shallow copy of itself. The particle attribute
+        shares the same object with the original copy.
+        :return: ParticleNode object
         """
 
-        if not isinstance(other, ParticleNode):
-            return -1
-        if self.canonName == other.canonName:
-            return self.cmpParticle(self, other)
-        elif self.canonName > other.canonName:
-            return 1
-        else:
-            return -1
+        newNode = InclusiveParticleNode(nodeNumber=self.node)
+        newNode.canonName = self.canonName
+        newNode.nodeWeight = self.nodeWeight
 
-    def eqNode(self, other):
-        return (self.cmpNode(other) == 0)
-
-    def cmpParticle(self, other):
-        return self.particle.__cmp__(other.particle)
-
-    def eqParticle(self, other):
-        return self.particle == other.particle
-
-    def isFinalState(self):
-        """
-        Checks if the node should be considered as a final state
-        (should not be decayed). Returns True if .finalState has been
-        defined and set to True
-        """
+        return newNode
 
 
 def compareNodes(treeA, treeB, nodeA, nodeB):
@@ -176,11 +173,16 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
     :return: (True, new tree) if nodes match, (False, None) otherwise.
     """
 
+    if not isinstance(nodeA, (ParticleNode, InclusiveParticleNode)):
+        return -1, None
+    if not isinstance(nodeB, (ParticleNode, InclusiveParticleNode)):
+        return -1, None
 
-    if not isinstance(nodeA, ParticleNode):
-        return -1, None
-    if not isinstance(nodeB, ParticleNode):
-        return -1, None
+    # For inclusive nodes always return True
+    if isinstance(nodeA, InclusiveParticleNode):
+        return 0, nodeB
+    if isinstance(nodeB, InclusiveParticleNode):
+        return 0, nodeB
 
     if nodeA.canonName != nodeB.canonName:
         if nodeA.canonName > nodeB.canonName:
@@ -338,7 +340,9 @@ class Tree(nx.DiGraph):
         # First add all nodes:
         edges = []
         for dec in decays:
-            ptcs = [dec.split('>')[0].strip()] + [p.strip() for p in dec.split('>')[1].split(',')]
+            mom = dec.split('>')[0].strip()
+            daughters = [p.strip() for p in dec.split('>')[1].split(',')]
+            ptcs = [mom] + daughters
 
             for iptc, ptc in enumerate(ptcs):
                 if ptc in nodesDict:
@@ -347,19 +351,23 @@ class Tree(nx.DiGraph):
                     n = maxNode+1
                     maxNode = n
                 particleLabel = ptc.replace('(%i)' % n, '')
-                if model is None:
-                    particle = particleLabel
+                # Check for inclusive node:
+                if particleLabel.lower() == 'inclusivenode':
+                    node = InclusiveParticleNode(nodeNumber=n)
                 else:
-                    particle = model.getParticlesWith(label=particleLabel)
-                    if not particle:
-                        raise SModelSError("Final state %s has not been defined in model %s"
-                                           % (particleLabel, model))
-                    elif len(particle) != 1:
-                        raise SModelSError("Ambiguos defintion of label %s in model %s"
-                                           % (particleLabel, model))
+                    if model is None:
+                        particle = particleLabel
                     else:
-                        particle = particle[0]
-                node = ParticleNode(particle=particle, nodeNumber=n)
+                        particle = model.getParticlesWith(label=particleLabel)
+                        if not particle:
+                            raise SModelSError("Final state %s has not been defined in model %s"
+                                               % (particleLabel, model))
+                        elif len(particle) != 1:
+                            raise SModelSError("Ambiguos defintion of label %s in model %s"
+                                               % (particleLabel, model))
+                        else:
+                            particle = particle[0]
+                    node = ParticleNode(particle=particle, nodeNumber=n)
                 if iptc == 0:
                     momNode = node
                 self.add_node(node)
@@ -429,14 +437,14 @@ class Tree(nx.DiGraph):
             branchList.append([])
             # Deal separately with the case where the primary mother is stable:
             if tree.out_degree(b) == 0:
-                if b.Z2parity == -1:
+                if not b.isSM:
                     finalState.append(str(b))
                     continue
                 else:
                     raise SModelSError("Can not convert tree with Z2-violating decays to bracket")
             for mom, daughters in nx.bfs_successors(tree, b):
-                vertexList = [str(d) for d in daughters if d.Z2parity == 1]
-                fstates = [str(d) for d in daughters if d.Z2parity == -1 and tree.out_degree(d) == 0]
+                vertexList = [str(d) for d in daughters if d.isSM]
+                fstates = [str(d) for d in daughters if not d.isSM and tree.out_degree(d) == 0]
                 if daughters:
                     if len(vertexList) != len(daughters)-1 or len(fstates) > 1:
                         raise SModelSError("Can not convert tree with Z2-violating decays to bracket: \n  %s" % self.treeToString())
@@ -463,16 +471,27 @@ class Tree(nx.DiGraph):
         if node is None:
             node = self.getTreeRoot()
 
+        # If it is inclusive node set its name to an inclusive integer
+        # and return its name (no need to check the children)
+        if isinstance(node, InclusiveParticleNode):
+            node.canonName = InclusiveValue()
+            return node.canonName
+
         children = list(self.successors(node))
         if not children:
             node.canonName = 10
         else:
-            tp = sorted([self.setCanonName(n) for n in children])
-            tpStr = '1'+"".join(str(c) for c in tp)+'0'
-            node.canonName = int(tpStr)
-            # Use the root canon name to assign the tree canon name
-            if self.in_degree[node] == 0:
-                self.canonName = node.canonName
+            tp = [self.setCanonName(n) for n in children]
+            if any(isinstance(name, InclusiveValue) for name in tp):
+                node.canonName = InclusiveValue()
+            else:
+                tp = sorted(tp)
+                tpStr = '1'+"".join(str(c) for c in tp)+'0'
+                node.canonName = int(tpStr)
+
+        # Use the root canon name to assign the tree canon name
+        if self.in_degree[node] == 0:
+            self.canonName = node.canonName
 
         return node.canonName
 
@@ -543,14 +562,22 @@ class Tree(nx.DiGraph):
         if self.canonName is None:
             self.setCanonName()
 
-        # Created a listed of sorted nodes according to the node comparison:
+        # Identify all nodes that are inclusive or contain inclusive nodes as a daughter
+        # (these nodes can not be sorted, since they have improper canonical names)
+        inclusiveNodes = [n for n in self.nodes if isinstance(n.canonName, InclusiveValue)]
+
+        # Create a listed of sorted nodes with proper canonical names according to the node comparison:
         sortedNodes = []
         for node in self.nodes:
+            if node in inclusiveNodes:
+                continue
             inode = 0
             while inode < len(sortedNodes) and compareNodes(self, self, node, sortedNodes[inode])[0] < 0:
                 inode += 1
             sortedNodes.insert(inode, node)
 
+        # Add the inclusive list at the beginning of the list
+        sortedNodes = inclusiveNodes + sortedNodes
         # Created an ordered dictionary with the nodes and edges
         newTreeDict = OrderedDict()
         for node in sortedNodes:
@@ -621,7 +648,7 @@ class Tree(nx.DiGraph):
         Draws Tree using matplotlib.
 
         :param particleColor: color for particle nodes
-        :param smColor: color used for particles which have the _isSM attribute set to True
+        :param smColor: color used for particles which have the isSM attribute set to True
         :param pvColor: color for primary vertex
         :param nodeScale: scale size for nodes
         :param labelAttr: attribute to be used as label. If None, will use the string representation
@@ -649,7 +676,7 @@ class Tree(nx.DiGraph):
             node_size.append(nodeScale*100*len(labels[n]))
             if 'pv' == labels[n].lower():
                 node_color.append(pvColor)
-            elif hasattr(n, '_isSM') and n._isSM:
+            elif hasattr(n, 'isSM') and n.isSM:
                 node_color.append(smColor)
             else:
                 node_color.append(particleColor)
