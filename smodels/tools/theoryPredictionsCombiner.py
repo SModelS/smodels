@@ -8,7 +8,7 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 .. moduleauthor:: Jamie Yellen <j.yellen.1@research.gla.ac.uk>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-
+.. moduleauthor:: Jack Y. Araz <jack.araz@durham.ac.uk>
 """
 
 import numpy as np
@@ -480,12 +480,16 @@ class TheoryPredictionsCombiner(object):
         self.cachedObjs[expected]["UL"] = mu_lim
         return mu_lim
 
-    def computeCLs(self, expected: bool = False):
+    def computeCLs(self, expected: bool = False, return_type: Text = "1-CLs"):
         """
         Compute the exclusion confidence level of the model (1-CLs)
         :param expected: if false, compute observed, true: compute a priori expected
-        :return: float (1 - CLs value)
+        :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
+                        CLs-alpha: returns CLs - 0.05
+                        1-CLs: returns 1-CLs value
+                        CLs: returns CLs value
         """
+        assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
         _, _, clsRoot = self._ul_preprocess(expected=expected)
 
-        return clsRoot(1.0, return_type="1-CLs")
+        return clsRoot(1.0, return_type=return_type)

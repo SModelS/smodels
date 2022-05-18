@@ -8,7 +8,7 @@
               Simplified likelihoods v2 (JHEP_021P_1018) are partly implemented.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
-
+.. moduleauthor:: Jack Y. Araz <jack.araz@durham.ac.uk>
 """
 
 from scipy import stats, optimize, integrate, special, linalg
@@ -1117,7 +1117,10 @@ class UpperLimitComputer:
             """
             Calculate the root
             :param mu: float POI
-            :param get_cls: if true returns 1-CLs value
+            :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
+                        CLs-alpha: returns CLs - 0.05
+                        1-CLs: returns 1-CLs value
+                        CLs: returns CLs value
             """
             ## the function to find the zero of (ie CLs - alpha)
             nsig = getattr(model, "signals" if signal_type == "signal_rel" else "nsignals")(mu)
@@ -1161,6 +1164,7 @@ class UpperLimitComputer:
         toys: float = None,
         expected: Union[bool, Text] = False,
         trylasttime: bool = False,
+        return_type: Text = "1-CLs",
     ) -> float:
         """
         Compute the exclusion confidence level of the model (1-CLs)
@@ -1171,12 +1175,13 @@ class UpperLimitComputer:
                           true: compute a priori expected, "posteriori":
                           compute a posteriori expected
         :param trylasttime: if True, then dont try extra
-        :return: 1 - CLs value
+        :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
+                        CLs-alpha: returns CLs - 0.05
+                        1-CLs: returns 1-CLs value
+                        CLs: returns CLs value
         """
         _, _, clsRoot = self._ul_preprocess(model, marginalize, toys, expected, trylasttime)
-
-        # 1-(CLs+alpha) -> alpha = 0.05
-        return clsRoot(1.0, return_type="1-CLs")
+        return clsRoot(1.0, return_type=return_type)
 
 
 if __name__ == "__main__":

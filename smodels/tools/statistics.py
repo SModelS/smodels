@@ -7,7 +7,7 @@
    expected an observer upper limit. See https://arxiv.org/abs/1202.3415.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
-
+.. moduleauthor:: Jack Y. Araz <jack.araz@durham.ac.uk>
 """
 
 from scipy import stats, optimize
@@ -116,10 +116,13 @@ def CLsfromNLL(
     :param nll0A:
     :param nll:
     :param nll0:
-    :param return_type: (Text) "CLs-alpha" or "1-CLs"
+    :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
+                        CLs-alpha: returns CLs - 0.05
+                        1-CLs: returns 1-CLs value
+                        CLs: returns CLs value
     :return:
     """
-    assert return_type in ["CLs-alpha", "1-CLs"], f"Unknown return type: {return_type}."
+    assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
     qmu = 0.0 if 2 * (nll - nll0) < 0.0 else 2 * (nll - nll0)
     sqmu = np.sqrt(qmu)
     qA = 2 * (nllA - nll0A)
@@ -137,10 +140,10 @@ def CLsfromNLL(
 
     if return_type == "1-CLs":
         return 1.0 - CLs
+    elif return_type == "CLs":
+        return CLs
 
-    cl = 0.95
-    root = CLs - 1.0 + cl
-    return root
+    return CLs - 0.05
 
 
 def determineBrentBracket(mu_hat, sigma_mu, rootfinder):
