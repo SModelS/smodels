@@ -8,7 +8,7 @@
               Simplified likelihoods v2 (JHEP_021P_1018) are partly implemented.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
-
+.. moduleauthor:: Jack Y. Araz <jack.araz@durham.ac.uk>
 """
 
 from scipy import stats, optimize, integrate, special, linalg
@@ -1113,11 +1113,14 @@ class UpperLimitComputer:
         # print ( f"SL nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f} bg {aModel.backgrounds[0]:.3f} obs {aModel.observed[0]:.3f}" )
         # return 1.
 
-        def root_func(mu: float, return_type: Text = "CLs-alpha") -> float:
+        def clsRoot(mu: float, return_type: Text = "CLs-alpha") -> float:
             """
             Calculate the root
             :param mu: float POI
-            :param get_cls: if true returns 1-CLs value
+            :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
+                        CLs-alpha: returns CLs - 0.05
+                        1-CLs: returns 1-CLs value
+                        CLs: returns CLs value
             """
             ## the function to find the zero of (ie CLs - alpha)
             nsig = getattr(model, "signals" if signal_type == "signal_rel" else "nsignals")(mu)
@@ -1126,7 +1129,7 @@ class UpperLimitComputer:
             nllA = compA.likelihood(nsig, marginalize=marginalize, nll=True)
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type)
 
-        return mu_hat, sigma_mu, root_func
+        return mu_hat, sigma_mu, clsRoot
 
     def getUpperLimitOnMu(
         self, model, marginalize=False, toys=None, expected=False, trylasttime=False
@@ -1145,13 +1148,13 @@ class UpperLimitComputer:
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on the signal strength multiplier mu
         """
-        mu_hat, sigma_mu, root_func = self._ul_preprocess(
+        mu_hat, sigma_mu, clsRoot = self._ul_preprocess(
             model, marginalize, toys, expected, trylasttime
         )
         if mu_hat == None:
             return None
-        a, b = determineBrentBracket(mu_hat, sigma_mu, root_func)
-        mu_lim = optimize.brentq(root_func, a, b, rtol=1e-03, xtol=1e-06)
+        a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot)
+        mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
         return mu_lim
 
     def computeCLs(
@@ -1161,9 +1164,10 @@ class UpperLimitComputer:
         toys: float = None,
         expected: Union[bool, Text] = False,
         trylasttime: bool = False,
+        return_type: Text = "1-CLs",
     ) -> float:
         """
-        Compute the confidence level of the model
+        Compute the exclusion confidence level of the model (1-CLs)
         :param model: statistical model
         :param marginalize: if true, marginalize nuisances, else profile them
         :param toys: specify number of toys. Use default is none
@@ -1171,12 +1175,13 @@ class UpperLimitComputer:
                           true: compute a priori expected, "posteriori":
                           compute a posteriori expected
         :param trylasttime: if True, then dont try extra
-        :return: 1 - CLs value
+        :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
+                        CLs-alpha: returns CLs - 0.05
+                        1-CLs: returns 1-CLs value
+                        CLs: returns CLs value
         """
-        _, _, root_func = self._ul_preprocess(model, marginalize, toys, expected, trylasttime)
-
-        # 1-(CLs+alpha) -> alpha = 0.05
-        return root_func(1.0, return_type="1-CLs")
+        _, _, clsRoot = self._ul_preprocess(model, marginalize, toys, expected, trylasttime)
+        return clsRoot(1.0, return_type=return_type)
 
 
 if __name__ == "__main__":
