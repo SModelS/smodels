@@ -48,8 +48,8 @@ class notebookTests(unittest.TestCase):
 
         for notebookFile in glob.glob('../notebooks-Examples/*.ipynb'):
 
-            if 'decomp' in notebookFile:
-                continue
+            # if 'decomp' in notebookFile:
+                # continue
             # if not 'cross' in notebookFile:
                 # continue
 
@@ -59,7 +59,7 @@ class notebookTests(unittest.TestCase):
             self.assertFalse(outputDict is None)
 
             print('\nChecking %s' %os.path.basename(notebookFile))
-            widgets = [progressbar.Percentage(), progressbar.Bar()]
+            widgets = [progressbar.Percentage(), progressbar.Bar(), progressbar.Counter()]
             bar = progressbar.ProgressBar(widgets=widgets,
                                           maxval=len(defaultOutputDict)).start()
             for icell in sorted(defaultOutputDict.keys()):
