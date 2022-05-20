@@ -51,7 +51,7 @@ class notebookTests(unittest.TestCase):
 
             # if 'decomp' in notebookFile:
                 # continue
-            # if not 'cross' in notebookFile:
+            # if not 'split' in notebookFile:
                 # continue
 
             defaultOutputDict = loadDefaultOutput(notebookFile)
@@ -59,11 +59,15 @@ class notebookTests(unittest.TestCase):
             outputDict = getNewOutput(notebookFile)
             self.assertFalse(outputDict is None)
 
-            print('\nChecking %s' %os.path.basename(notebookFile))
-            widgets = [progressbar.Percentage(), progressbar.Bar(), progressbar.Counter()]
+            print('\nChecking %s' % os.path.basename(notebookFile))
+            widgets = [progressbar.Percentage(), progressbar.Bar(),
+                       progressbar.Counter()]
+            cells = list(defaultOutputDict.keys()) + list(outputDict.keys())
+            cells = sorted(list(set(cells)))
             bar = progressbar.ProgressBar(widgets=widgets,
-                                          maxval=len(defaultOutputDict)).start()
-            for icell in sorted(defaultOutputDict.keys()):
+                                          maxval=len(cells)).start()
+
+            for icell in cells:
                 bar.update(icell)
                 time.sleep(0.2)
                 # print('\t checking cell %i' %icell)

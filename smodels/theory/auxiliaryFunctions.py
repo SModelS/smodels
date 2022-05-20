@@ -9,9 +9,10 @@
 from smodels.theory import crossSection
 from smodels.tools.physicsUnits import fb, GeV
 import unum
+import re
 try:
     from collections.abc import Iterable
-except:
+except (ImportError, ModuleNotFoundError):
     from collections import Iterable
 
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -30,7 +31,7 @@ def cSim(*weights):
 
     """
     for weight in weights:
-        if type(weight) != type(crossSection.XSectionList()):
+        if not isinstance(weight, crossSection.XSectionList):
             logger.error("Trying to evaluate non-xsection objects")
             raise SModelSError()
 
@@ -39,7 +40,7 @@ def cSim(*weights):
     infoList = []
     for weight in weights:
         for info in weight.getInfo():
-            if not info in infoList:
+            if info not in infoList:
                 infoList.append(info)
     zeros = crossSection.XSectionList(infoList)
     for weight in weights:
@@ -74,8 +75,7 @@ def cGtr(weightA, weightB):
     :returns: XSectioList object with the values for each label.
 
     """
-    if type(weightA) != type(crossSection.XSectionList()) or \
-            type(weightB) != type(crossSection.XSectionList()):
+    if not isinstance(weightA, crossSection.XSectionList) or not isinstance(weightB, crossSection.XSectionList):
         logger.error("Trying to evaluate non-xsection objects")
         raise SModelSError()
 
@@ -83,7 +83,7 @@ def cGtr(weightA, weightB):
     # missing entries)
     infoList = weightA.getInfo()
     for info in weightB.getInfo():
-        if not info in infoList:
+        if info not in infoList:
             infoList.append(info)
     if not infoList:
         # If there are no cross sections, can not evaluate
@@ -224,14 +224,12 @@ def index_bisect(inlist, el):
     return lo
 
 
-def elementsInStr(instring, removeQuotes=True):
+def elementsInStr(instring):
     """
     Parse instring and return a list of elements appearing in instring.
     instring can also be a list of strings.
 
     :param instring: string containing elements (e.g. "[[['e+']],[['e-']]]+[[['mu+']],[['mu-']]]")
-    :param removeQuotes: If True, it will remove the quotes from the particle labels.
-                         Set to False, if one wants to run eval on the output.
 
     :returns: list of elements appearing in instring in string format
 
@@ -250,39 +248,48 @@ def elementsInStr(instring, removeQuotes=True):
         raise SModelSError("syntax error in constraint/condition: ``%s''."
               "Check your constraints and conditions in your database." % str(instring))
 
-    elements = []
     outstr = outstr.replace(" ", "")
-    if removeQuotes:
-        outstr = outstr.replace("'", "")
+
+    if 'PV' in outstr and '>' in outstr:
+        if '{' not in outstr or '}' not in outstr:
+            raise SModelSError("Elements in %s should be enclosed by curly brackets" % oustr)
+        elements = re.findall(r"\{(.*?)\}", outstr)
+        return elements
+
+    elements = []
     elStr = ""
-    nc = 0
+    bCounter = 0
     # Parse the string and looks for matching ['s and ]'s, when the matching is
     # complete, store element
     for c in outstr:
-        delta = 0
         if c == '[':
-            delta = -1
+            bCounter += 1
         elif c == ']':
-            delta = 1
-        nc += delta
-        if nc != 0:
+            bCounter -= 1
+
+        if bCounter != 0:
             elStr += c
-        if nc == 0 and delta != 0:
-            elements.append(elStr + c)
+        elif elStr:
+            elements.append(elStr+c)
             elStr = ""
-            # Syntax checks
-            ptclist = elements[-1].replace(']', ',').replace('[', ',')
-            ptclist = ptclist.split(',')
-            for ptc in ptclist:
-                ptc = ptc.replace("'", "")
-                if not ptc:
-                    continue
 
     # Check if there are not unmatched ['s and/or ]'s in the string
-    if nc != 0:
+    if bCounter != 0:
         raise SModelSError("Wrong input (incomplete elements?) " + instring)
 
-    return elements
+    # Add quotes, if necessary:
+    newElements = []
+    for el in elements:
+        # Get particles without quotes
+        ptcList = set(el.replace(']', '').replace('[', '').split(','))
+        ptcList = [ptc for ptc in ptcList if ("'" not in ptc) and ptc]
+        newEl = el[:]
+        # Replace them by their values with quotes
+        for ptc in ptcList:
+            newEl = newEl.replace(ptc, "'%s'" % ptc).replace("''", "'")
+        newElements.append(newEl)
+
+    return newElements
 
 
 def getValuesForObj(obj, attribute):
@@ -339,7 +346,6 @@ def bracketToProcessStr(stringEl, finalState=None, intermediateState=None):
         bsmIndices.append([])
         if br == 'InclusiveNode':
             bsmStates[ibr].append(br)
-            bsmIndices[ibr].append(None)
             continue
         for idec, dec in enumerate(br):
             if intermediateState is None:
@@ -356,7 +362,7 @@ def bracketToProcessStr(stringEl, finalState=None, intermediateState=None):
     # Get PV:
     pvStrs = []
     for ibr, br in enumerate(branches):
-        if bsmIndices[ibr][0] is None:
+        if not bsmIndices[ibr]:
             pvStrs.append(bsmStates[ibr][0])
         else:
             pvStrs.append(bsmStates[ibr][0]+'(%i)' % bsmIndices[ibr][0])

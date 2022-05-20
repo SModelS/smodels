@@ -30,9 +30,11 @@ class Model(object):
 
         self.inputFile = None
         # allBSMparticles stores all possible particles for a given model:
-        self.allBSMparticles = [particle.copy() for particle in BSMparticles]
-        # BSMparticles is used to store the model particles defined by the inputFile
-        self.BSMparticles = self.allBSMparticles[:]  # at initialization assume all particles will be used
+        self.allBSMparticles = BSMparticles[:]
+        # BSMparticles is used to store the model particles defined by the inputFile.
+        # When a model is updated, a copy of the BSM particles are stored in BSMparticles
+        # and these are used to store masses, decays,...
+        self.BSMparticles = BSMparticles[:]  # at initialization assume all particles will be used
         self.SMparticles = SMparticles[:]
         for p in self.SMparticles:
             p.isSM = True
@@ -41,7 +43,7 @@ class Model(object):
 
         self.label = label
 
-        # Check if for each PDG there is a unique particle object defined
+        #  Check if for each PDG there is a unique particle object defined
         allPDGs = self.getValuesFor('pdg')
         for pdg in allPDGs:
             p = self.getParticlesWith(pdg=pdg)
@@ -104,18 +106,18 @@ class Model(object):
 
                 particleList.append(particle)
 
-        #Remove repeated entries. If the list contains a Particle and a MultiParticle
-        #which contains the Particle, remove the MultiParticle
+        # Remove repeated entries. If the list contains a Particle and a MultiParticle
+        # which contains the Particle, remove the MultiParticle
         cleanList = []
-        #First include all Particle objects:
+        # First include all Particle objects:
         for particle in particleList:
             if isinstance(particle, MultiParticle):
                 continue
             if any(particle is ptc for ptc in cleanList):
                 continue
             cleanList.append(particle)
-        #Now only include MultiParticle objects, if they do not contain
-        #any of the particles already in the list:
+        # Now only include MultiParticle objects, if they do not contain
+        # any of the particles already in the list:
         for particle in particleList:
             if not isinstance(particle, MultiParticle):
                 continue
@@ -164,7 +166,7 @@ class Model(object):
         :return: dictionary with masses, dictionary with decays and XSectionList object
         """
 
-        #Download input file, if requested
+        # Download input file, if requested
         if inputFile.startswith("http") or inputFile.startswith("ftp"):
             logger.info("Asked for remote slhafile %s. Fetching it." % inputFile)
             import requests
@@ -179,21 +181,21 @@ class Model(object):
             f.close()
             inputFile = basename
 
-        # Trick to suppress pyslha error messages:
+        #  Trick to suppress pyslha error messages:
         import sys
         storeErr = sys.stderr
-        # Try to read file assuming it is an SLHA file:
+        #  Try to read file assuming it is an SLHA file:
         try:
             sys.stderr = None
             res = pyslha.readSLHAFile(inputFile)
             massDict = res.blocks['MASS']
-            # Make sure both PDG signs appear in massDict
+            #  Make sure both PDG signs appear in massDict
             for pdg, mass in massDict.items():
                 if not -pdg in massDict:
                     massDict[-pdg] = abs(mass)
             decaysDict = res.decays
             xsections = crossSection.getXsecFromSLHAFile(inputFile)
-        # If fails assume it is an LHE file:
+        #  If fails assume it is an LHE file:
         except (IOError, AttributeError, KeyError):
             massDict, decaysDict = lheReader.getDictionariesFrom(inputFile)
             xsections = crossSection.getXsecFromLHEFile(inputFile)
@@ -314,12 +316,12 @@ class Model(object):
                     logger.info("Particle(s) %s is not defined within model. Decay %s will be ignored" % (missingIDs, decay))
                     continue
 
-                # Conjugated decays if needed
-                # (if pid*chargeConj is not in model, assume the particle is its own anti-particle)
+                #  Conjugated decays if needed
+                #  (if pid*chargeConj is not in model, assume the particle is its own anti-particle)
                 decayIDs = [pid*chargeConj if pid*chargeConj in allPDGs else pid for pid in decay.ids]
                 newDecay = pyslha.Decay(br=decay.br, nda=decay.nda, parentid=decay.parentid, ids=decayIDs)
 
-                # Convert PDGs to particle objects:
+                #  Convert PDGs to particle objects:
                 daughters = []
                 for pdg in newDecay.ids:
                     daughter = self.getParticlesWith(pdg=pdg)
@@ -333,7 +335,7 @@ class Model(object):
                 newDecay.daughters = daughters
                 particle.decays.append(newDecay)
 
-        # Check if all unstable particles have decay channels defined:
+        #  Check if all unstable particles have decay channels defined:
         for p in self.BSMparticles:
             if p.totalwidth < stableWidth:
                 continue
@@ -371,12 +373,12 @@ class Model(object):
         massDict, decaysDict, xsections = self.getModelDataFrom(self.inputFile)
         self.xsections = xsections
 
-        # Restric BSM particles to the overlap between allBSMparticles and massDict:
+        #  Restric BSM particles to the overlap between allBSMparticles and massDict:
         self.BSMparticles = []
         for particle in self.allBSMparticles:
             if particle.pdg not in massDict and -particle.pdg not in massDict:
                 continue
-            self.BSMparticles.append(particle)
+            self.BSMparticles.append(particle.copy())
         if len(self.BSMparticles) == len(self.allBSMparticles):
             logger.info("Loaded %i BSM particles" % (len(self.BSMparticles)))
         else:
@@ -384,7 +386,7 @@ class Model(object):
                         % (len(self.BSMparticles), len(self.allBSMparticles)-len(self.BSMparticles),
                            self.inputFile))
 
-        # Remove cross-sections for even particles:
+        #  Remove cross-sections for even particles:
         nXsecs = self.filterCrossSections()
         if nXsecs == 0:
             msg = "No cross-sections found in %s for the Z2 odd BSM particles. " % self.inputFile
@@ -392,19 +394,19 @@ class Model(object):
             logger.error(msg)
             raise SModelSError(msg)
 
-        # Set particle masses:
+        #  Set particle masses:
         self.setMasses(massDict, roundMasses)
 
-        # Set particle decays
+        #  Set particle decays
         self.setDecays(decaysDict, promptWidth, stableWidth, erasePrompt)
 
-        # Reset particle equality from all particles:
+        #  Reset particle equality from all particles:
         for p in Particle.getinstances():
             p._comp = {p._id: 0}
             if isinstance(p, MultiParticle):
                 for ptc in p.particles:
                     p._comp[ptc._id] = 0
 
-        # Reset particle equality from all particle lists:
+        #  Reset particle equality from all particle lists:
         for pL in ParticleList.getinstances():
             pL._comp = {pL._id: 0}
