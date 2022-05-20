@@ -335,8 +335,17 @@ def bracketToProcessStr(stringEl, finalState=None, intermediateState=None):
                                      for each branch  (e.g. [['gluino'], ['gluino']])
     """
 
-    branches = eval(stringEl.replace('[*]', "'InclusiveNode'").replace("'*'", "'anySM'"))
+    branches = eval(stringEl)
+    # Make replacements to take care of inclusive objects:
+    newBranches = []
+    for br in branches:
+        if br == ['*']:
+            newBranches.append('InclusiveNode')
+        else:
+            newBranches.append([[ptc.replace('*', 'anySM')
+                                 for ptc in vt] for vt in br])
 
+    branches = newBranches
     # Get ordered list of BSM states:
     bsmStates = []
     bsmIndices = []

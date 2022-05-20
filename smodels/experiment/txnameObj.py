@@ -113,6 +113,8 @@ class TxName(object):
             self.txnameDataExp = TxNameData(expectedData, dataType, ident,
                                             Leff_inner=self.Leff_inner,
                                             Leff_outer=self.Leff_outer)
+        print(self.globalInfo.id, self)
+        print(self.constraint)
         # Builds up a list of elements appearing in constraints:
         elements = []
         if not databaseParticles:
