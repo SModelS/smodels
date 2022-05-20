@@ -152,6 +152,17 @@ class InclusiveParticleNode(ParticleNode):
 
         return newNode
 
+    def __getattr__(self, attr):
+        """
+        Returns None if does not contain the attribute.
+
+        :parameter attr: Attribute string
+
+        :return: Attribute value or None
+        """
+        if attr not in self.__dict__:
+            return None
+
 
 def compareNodes(treeA, treeB, nodeA, nodeB):
     """
@@ -179,10 +190,10 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
         return -1, None
 
     # For inclusive nodes always return True
-    if isinstance(nodeA, InclusiveParticleNode):
-        return 0, nodeB
-    if isinstance(nodeB, InclusiveParticleNode):
-        return 0, nodeB
+    if isinstance(nodeA, InclusiveParticleNode) or isinstance(nodeB, InclusiveParticleNode):
+        newNodeB = Tree()
+        newNodeB.add_node(InclusiveParticleNode())
+        return 0, newNodeB
 
     if nodeA.canonName != nodeB.canonName:
         if nodeA.canonName > nodeB.canonName:
@@ -565,6 +576,10 @@ class Tree(nx.DiGraph):
         # Identify all nodes that are inclusive or contain inclusive nodes as a daughter
         # (these nodes can not be sorted, since they have improper canonical names)
         inclusiveNodes = [n for n in self.nodes if isinstance(n.canonName, InclusiveValue)]
+        # Sort inclusive nodes by distance from root
+        root = self.getTreeRoot()
+        dists = nx.single_source_shortest_path_length(self, root)
+        inclusiveNodes = sorted(inclusiveNodes, key=lambda n: dists[n])
 
         # Create a listed of sorted nodes with proper canonical names according to the node comparison:
         sortedNodes = []

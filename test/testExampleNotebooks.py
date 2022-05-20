@@ -7,8 +7,7 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
-import sys,glob
-sys.path.insert(0,"../")
+import glob
 import os
 import unittest
 import time
@@ -17,17 +16,19 @@ import subprocess
 from convertNotebook2Test import getNotebookData
 import progressbar
 
+
 def loadDefaultOutput(notebookFile):
     # Get default output
     outputFile = os.path.basename(notebookFile)
-    outputFile = outputFile.replace('.ipynb','_output.pcl')
+    outputFile = outputFile.replace('.ipynb', '_output.pcl')
     if not os.path.isfile(outputFile):
-        print('File %s not found. (Try running convertNotebook2Test)' %outputFile)
+        print('File %s not found. (Try running convertNotebook2Test)' % outputFile)
         return None
 
-    with open(outputFile,'rb') as f:
+    with open(outputFile, 'rb') as f:
         defaultOutputDict = pickle.load(f)
     return defaultOutputDict
+
 
 def getNewOutput(notebookFile):
     # Run notebook
@@ -67,7 +68,12 @@ class notebookTests(unittest.TestCase):
                 time.sleep(0.2)
                 # print('\t checking cell %i' %icell)
                 # print(defaultOutputDict[icell])
-                self.assertEqual(defaultOutputDict[icell],outputDict[icell])
+                try:
+                    self.assertEqual(defaultOutputDict[icell],outputDict[icell])
+                except AssertionError:
+                    print('----- CELL %i ------' % icell)
+                    print('default:\n %s \n new:\n %s\n' %(defaultOutputDict[icell],outputDict[icell]))
+                    raise AssertionError()
             bar.finish()
 
 if __name__ == "__main__":

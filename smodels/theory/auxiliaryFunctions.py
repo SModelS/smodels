@@ -271,8 +271,8 @@ def elementsInStr(instring, removeQuotes=True):
             elements.append(elStr + c)
             elStr = ""
             # Syntax checks
-            ptclist = elements[-1].replace(']', ',').replace('[', ',').\
-            split(',')
+            ptclist = elements[-1].replace(']', ',').replace('[', ',')
+            ptclist = ptclist.split(',')
             for ptc in ptclist:
                 ptc = ptc.replace("'", "")
                 if not ptc:
