@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="text" id="id1330656713" fill="black" latexdraw:position="bl">
+            <text x="120.0" y="220.0">\textcolor[rgb]{0.7,0,0}{\LARGE $\mathbf{X_1 \left(\Gamma_{X_1}\right)}$}</text>
+        </g>
+        <g latexdraw:type="text" id="id615517603" fill="black" latexdraw:position="bl">
+            <text x="140.0" y="440.0">\textcolor[rgb]{0.7,0,0}{\LARGE $\mathbf{X_2 \left(\Gamma_{X_2}\right)}$}</text>
+        </g>
+        <g latexdraw:type="text" id="id1455768207" fill="black" latexdraw:position="bl">
+            <text x="420.0" y="480.0">\textcolor[rgb]{0.7,0,0}{\LARGE $\mathbf{Y_2 \left(\Gamma_{Y_2}\right)}$}</text>
+        </g>
+        <g latexdraw:type="text" id="id258150449" fill="black" latexdraw:position="bl">
+            <text x="400.0" y="160.0">\textcolor[rgb]{0.7,0,0}{\LARGE $\mathbf{Y_1 \left(\Gamma_{Y_1}\right)}$}</text>
+        </g>
+        <g latexdraw:type="picture" id="id137253541">
+            <image xlink:href="/home/lessa/smodels/docs/manual/source/images/elementCb.png" x="20.0" y="20.0" height="562" width="514"/>
+        </g>
+        <g latexdraw:type="text" id="id1561431420" fill="black" latexdraw:position="bl">
+            <text x="825.0" y="310.0">{\Huge $\to \epsilon_{\mbox{\normalsize prompt}}$}</text>
+        </g>
+        <g latexdraw:type="text" id="id1377906650" fill="black" latexdraw:position="bl">
+            <text x="460.0" y="320.0">\textcolor[rgb]{0.7,0,0}{\Huge $\Gamma_{X_i} \to \infty,\; \Gamma_{Y_i} = 0$}</text>
+        </g>
+    </g>
+    <defs/>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:latexIncludes/>
+            <latexdraw:displayXScale>true</latexdraw:displayXScale>
+            <latexdraw:displayYScale>true</latexdraw:displayYScale>
+            <latexdraw:unit>CM</latexdraw:unit>
+            <latexdraw:zoom>1.0</latexdraw:zoom>
+            <latexdraw:magneticGridStyle>CUSTOMISED</latexdraw:magneticGridStyle>
+            <latexdraw:gridGap>20</latexdraw:gridGap>
+            <latexdraw:magneticGrid>false</latexdraw:magneticGrid>
+            <latexdraw:version>3.3.9</latexdraw:version>
+            <latexdraw:size>
+                <latexdraw:width>1853</latexdraw:width>
+                <latexdraw:height>1047</latexdraw:height>
+            </latexdraw:size>
+            <latexdraw:position>
+                <latexdraw:x>67.0</latexdraw:x>
+                <latexdraw:y>33.0</latexdraw:y>
+            </latexdraw:position>
+        </latexdraw:metadata>
+    </metadata>
+</svg>

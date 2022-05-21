@@ -1,6 +1,7 @@
 """
 .. module:: graphTools
-   :synopsis: A collection of functions used to create and maninuplate graphs. Based on networkx.
+   :synopsis: A collection of functions used to create and maninuplate graphs.
+              Based on networkx.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
@@ -18,14 +19,16 @@ from collections import OrderedDict
 class ParticleNode(object):
     """
     Simple wrapper for creating graphs with Particle objects.
-    It is necessary because the same particle can appear multiple times within a tree, so
+    It is necessary because the same particle can appear multiple
+    times within a tree, so
     Particle objects can not be directly used as nodes
     (since the same particle can not appear as distinct nodes)
 
     :ivar particle: Stores the Particle object
     :ivar nodeNumber: Node identifier
     :ivar nodeWeight: Stores the node weight
-                      (1 for stable particles, BR for unstable and production xsec for primary vertex)
+                      (1 for stable particles, BR for unstable
+                      and production xsec for primary vertex)
     """
 
     _lastNodeNumber = 0
@@ -41,10 +44,12 @@ class ParticleNode(object):
             ParticleNode._lastNodeNumber += 1
         else:
             self.node = nodeNumber
-        ParticleNode._lastNodeNumber = max(self.node, ParticleNode._lastNodeNumber)
+        ParticleNode._lastNodeNumber = max(self.node,
+                                           ParticleNode._lastNodeNumber)
         self.canonName = None
         # Node weight:
-        # (1 for stable particles, BR for unstable and production xsec for primary vertex)
+        # (1 for stable particles, BR for unstable and
+        # production xsec for primary vertex)
         self.nodeWeight = nodeWeight
 
         # Flag to tag nodes which should not be decayed
@@ -173,8 +178,8 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
     For daughters with the same canonical name, all the permutations are tried
     when comparing nodes.
     If nodes match, return a tree (Tree obj) with nodeB as root
-    and its daughters as nodes, but with the daughters sorted according to the ordering
-    to which they matched nodeA.
+    and its daughters as nodes, but with the daughters sorted according
+    to the ordering to which they matched nodeA.
 
     :param treeA: a tree (Tree object)
     :param treeB: a tree (Tree object)

@@ -1,0 +1,9 @@
+ * docutils>=0.3
+ * numpy>=1.13.0
+ * scipy>=1.0.0
+ * unum>=4.0.0
+ * requests>=2.0.0
+ * pyslha>=3.1.0
+ * pyhf>=0.6.1
+ * jsonpatch>=1.25
+ * jsonschema>=3.2.0

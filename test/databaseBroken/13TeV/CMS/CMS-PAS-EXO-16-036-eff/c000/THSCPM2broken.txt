@@ -1,0 +1,13 @@
+txName: THSCPM2
+constraint: [[*],[]]
+condition: None
+conditionDescription: None
+susyProcess: pp --> lsp chargino^pm_1, chargino^pm_1 lsp --> chargino^pm_1 lsp
+figureUrl: None
+dataUrl: None
+source: SModelS
+validated: N/A
+axes: [['*'], [x]]
+finalState: ['MET', 'non-MET']
+efficiencyMap: [[['*',[1.5000E+02*GeV]],0.12396],
+[['*',[1.0000E+02*GeV]],0.058038]]
