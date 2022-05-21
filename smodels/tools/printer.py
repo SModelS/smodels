@@ -1,3 +1,4 @@
+
 """
 .. module:: printer
    :synopsis: Facility used to print elements, theorypredictions, missing topologies et al
@@ -11,18 +12,24 @@
 """
 
 from __future__ import print_function
-import sys,os
+import sys
+import os
+import copy
 from smodels.theory.topology import TopologyList
 from smodels.theory.theoryPrediction import TheoryPredictionList
+from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.experiment.databaseObj import ExpResultList
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.tools.physicsUnits import GeV, fb, TeV
 from smodels.tools.smodelsLogging import logger
+import numpy as np
 from collections import OrderedDict
 from xml.dom import minidom
 from xml.etree import ElementTree
 import unum
+import time
+
 
 class MPrinter(object):
     """
@@ -30,84 +37,89 @@ class MPrinter(object):
     """
 
     def __init__(self):
-        
+
         self.name = "master"
         self.Printers = {}
-    
-    def setPrinterOptions(self,parser):
+
+    def setPrinterOptions(self, parser):
         """
         Define the printer types and their options.
-        
+
         :param parser: ConfigParser storing information from the parameters file
         """
-        
-        #Define the printer types and the printer-specific options:
-        printerTypes = parser.get("printer", "outputType").split(",")        
+
+        # Define the printer types and the printer-specific options:
+        printerTypes = [prt.strip() for prt in parser.get(
+            "printer", "outputType").split(",")]
         for prt in printerTypes:
-            prt = prt.strip() ## trailing spaces shouldnt matter
             if prt == 'python':
-                newPrinter = PyPrinter(output = 'file')                
-            elif prt == 'summary':        
-                newPrinter = SummaryPrinter(output = 'file')
+                newPrinter = PyPrinter(output='file')
+            elif prt == 'summary':
+                newPrinter = SummaryPrinter(output='file')
             elif prt == 'stdout':
-                newPrinter = TxTPrinter(output = 'stdout')
+                newPrinter = TxTPrinter(output='stdout')
             elif prt == 'log':
-                newPrinter = TxTPrinter(output = 'file')
+                newPrinter = TxTPrinter(output='file')
             elif prt == 'xml':
-                newPrinter = XmlPrinter(output = 'file')           
+                newPrinter = XmlPrinter(output='file')
             elif prt == 'slha':
-                newPrinter = SLHAPrinter(output = 'file')
+                newPrinter = SLHAPrinter(output='file')
                 if parser.getboolean("options", "doCompress") or parser.getboolean("options", "doInvisible"):
                     newPrinter.docompress = 1
+                if parser.has_option("options", "combineSRs") and parser.getboolean("options", "combineSRs"):
+                    newPrinter.combinesr = 1
+                if parser.has_option("options", "combineAnas") and parser.get("options", "combineAnas"):
+                    newPrinter.combineanas = 1
             else:
-                logger.warning("Unknown printer format: %s" %str(prt))
+                logger.warning("Unknown printer format: %s" % str(prt))
                 continue
-            
-            #Copy stdout options to log options:
+
+            # Copy stdout options to log options:
             if 'log' in printerTypes:
                 if parser.has_section('stdout-printer') and not parser.has_section('log-printer'):
                     parser.add_section('log-printer')
-                    for option,val in parser.items('stdout-printer'):
-                        parser.set('log-printer',option,val)
-            
-            #Set printer-specific options:
+                    for option, val in parser.items('stdout-printer'):
+                        parser.set('log-printer', option, val)
+
+            # Set printer-specific options:
             if parser.has_section(prt+'-printer'):
                 newPrinter.setOptions(parser.items(prt+'-printer'))
             self.Printers[prt] = newPrinter
 
-    def addObj(self,obj):
+    def addObj(self, obj):
         """
         Adds the object to all its Printers:
-        
+
         :param obj: An object which can be handled by the Printers.
         """
-        
+
         for prt in self.Printers.values():
             prt.addObj(obj)
-            
-    def setOutPutFiles(self,filename,silent=False):
+
+    def setOutPutFiles(self, filename, silent=False):
         """
         Set the basename for the output files. Each printer will
-        use this file name appended of the respective extension 
+        use this file name appended of the respective extension
         (i.e. .py for a python printer, .smodels for a summary printer,...)
-        
+
         :param filename: Input file name
         :param silent: dont comment removing old files
         """
-        
+
         for printer in self.Printers.values():
-            printer.setOutPutFile(filename,silent=silent)
+            printer.setOutPutFile(filename, silent=silent)
 
     def flush(self):
         """
         Ask all printers to write the output and clear their cache.
-        If the printers return anything other than None, 
+        If the printers return anything other than None,
         we pass it on.
         """
         ret = {}
-        for printerType,printer in self.Printers.items():
+        for printerType, printer in self.Printers.items():
             ret[printerType] = printer.flush()
         return ret
+
 
 class BasicPrinter(object):
     """
@@ -116,141 +128,175 @@ class BasicPrinter(object):
 
     def __init__(self, output, filename):
         self.name = "basic"
+        self.time = time.time()  # time stamps
 
         self.outputList = []
         self.filename = filename
         self.output = output
         self.printingOrder = []
+        self.typeofexpectedvalues = "prior"
         self.toPrint = []
 
         if filename and os.path.isfile(filename):
-            logger.warning("Removing file %s" %filename)
+            logger.warning("Removing file %s" % filename)
             os.remove(filename)
+
+    def getTypeOfExpected(self):
+        """ tiny convenience function """
+        expected = True
+        if self.typeofexpectedvalues == "posteriori":
+            expected = "posteriori"
+        return expected
 
     @property
     def filename(self):
         return self._filename
 
     @filename.setter
-    def filename(self,fn):
-        self._filename=fn
+    def filename(self, fn):
+        self._filename = fn
         self.mkdir()
 
-    def mkdir(self ):
+    def mkdir(self):
         """ create directory to file, if necessary """
         if not self.filename:
             return
-        dirname = os.path.dirname ( self.filename )
-        if not os.path.exists ( dirname ):
-            os.makedirs ( dirname )
-            
-    def setOptions(self,options):
+        dirname = os.path.dirname(self.filename)
+        if dirname != "" and not os.path.exists(dirname):
+            os.makedirs(dirname)
+
+    def setOptions(self, options):
         """
         Store the printer specific options to control the output of each printer.
         Each option is stored as a printer attribute.
-        
+
         :param options: a list of (option,value) for the printer.
         """
-        
-        for opt,value in options:
-            setattr(self,opt,eval(value))        
-            
-    def addObj(self,obj):
+
+        for opt, value in options:
+            setattr(self, opt, eval(value))
+
+    def addObj(self, obj):
         """
-        Adds object to the Printer. 
-        
+        Adds object to the Printer.
+
         :param obj: A object to be printed. Must match one of the types defined in formatObj
 
         :return: True if the object has been added to the output. If the object does not belong
                 to the pre-defined printing list toPrint, returns False.
         """
-        
-        for iobj,objType in enumerate(self.printingOrder):
-            if isinstance(obj,objType):
+
+        for iobj, objType in enumerate(self.printingOrder):
+            if isinstance(obj, objType):
                 self.toPrint[iobj] = obj
                 return True
         return False
 
-    def openOutFile(self, filename, mode ):
-        """ creates and opens a data sink, 
+    def openOutFile(self, filename, mode):
+        """ creates and opens a data sink,
             creates path if needed """
-        d = os.path.dirname ( filename )
-        if not os.path.exists ( d ):
-            os.makedirs ( d )
-            logger.info ( "creating directory %s" % d )
-        return open ( filename, mode )
-
+        d = os.path.dirname(filename)
+        if not os.path.exists(d):
+            os.makedirs(d)
+            logger.info("creating directory %s" % d)
+        return open(filename, mode)
 
     def flush(self):
         """
         Format the objects added to the output, print them to the screen
         or file and remove them from the printer.
         """
-        ret=""
+        ret = ""
 
         for obj in self.toPrint:
-            if obj is None: continue
-            output = self._formatObj(obj)                
-            if not output: continue  #Skip empty output                
+            if obj is None:
+                continue
+            output = self._formatObj(obj)
+            if not output:
+                continue  # Skip empty output
             ret += output
             if self.output == 'stdout':
                 sys.stdout.write(output)
             elif self.output == 'file':
                 if not self.filename:
                     logger.error('Filename not defined for printer')
-                    return False   
+                    return False
                 with self.openOutFile(self.filename, "a") as outfile:
                     outfile.write(output)
                     outfile.close()
 
-        self.toPrint = [None]*len(self.printingOrder)  #Reset printing objects
+        self.toPrint = [None]*len(self.printingOrder)  # Reset printing objects
+        self.time = time.time()  # prepare next timestamp
         return ret
 
-    def _formatObj(self,obj):
+    def _formatObj(self, obj):
         """
         Method for formatting the output depending on the type of object
         and output.
-        
+
         :param obj: A object to be printed. Must match one of the types defined in formatObj
 
         """
 
         typeStr = type(obj).__name__
         try:
-            formatFunction = getattr(self,'_format'+typeStr)
-            return formatFunction(obj)
+            formatFunction = getattr(self, '_format'+typeStr)
+            ret = formatFunction(obj)
+            # print ( " `-", len(ret))
+            return ret
         except AttributeError as e:
-            logger.debug('Error formating object %s: \n %s' %(typeStr,e))
+            logger.warning('Error formating object %s: \n %s' % (typeStr, e))
             return False
+
+    def _round(self, number, n=6):
+        """ round a number to n significant digits, if it *is* a number """
+        if type(number) not in [float, np.float64]:
+            return number
+        if not np.isfinite(number):
+            return f'float("{number}")'
+        if np.isnan(number) or not np.isfinite(number):
+            return number
+        try:
+            if abs(number) < 1e-40:
+                return number
+            return round(number, -int(np.floor(np.sign(number) * np.log10(abs(number)))) + n)
+        except Exception:
+            pass
+        return number
+        # return round ( number, n )
+
 
 class TxTPrinter(BasicPrinter):
     """
     Printer class to handle the printing of one single text output
     """
-    def __init__(self, output = 'stdout', filename = None):
-        BasicPrinter.__init__(self, output, filename)        
+
+    def __init__(self, output='stdout', filename=None):
+        BasicPrinter.__init__(self, output, filename)
         self.name = "log"
-        self.printingOrder = [OutputStatus,ExpResultList,TopologyList,
-                             TheoryPredictionList,Uncovered]
-        self.toPrint = [None]*len(self.printingOrder)        
-        
-    def setOutPutFile(self,filename,overwrite=True,silent=False):
+        self.printtimespent = False
+        self.printingOrder = [OutputStatus, ExpResultList, TopologyList,
+                              TheoryPredictionList, TheoryPredictionsCombiner,
+                              Uncovered]
+        self.toPrint = [None] * len(self.printingOrder)
+
+    def setOutPutFile(self, filename, overwrite=True, silent=False):
         """
         Set the basename for the text printer. The output filename will be
         filename.log.
-        
+
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
         :param silent: dont comment removing old files
-        """        
-        
-        self.filename = filename +'.' + self.name    
+        """
+
+        self.filename = filename + '.' + self.name
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
-            
-    def _formatDoc(self,obj):
+
+    def _formatDoc(self, obj):
 
         return False
 
@@ -263,21 +309,28 @@ class TxTPrinter(BasicPrinter):
 
         output = ""
         output += "Input status: " + str(obj.filestatus) + "\n"
+        # hidden feature, printtimespent, turn on in ini file, e.g.
+        # [summary-printer] printtimespent = True
+        if self.printtimespent:
+            output += "Time spent: %.2fs\n" % (time.time() - self.time)
         output += "Decomposition output status: " + str(obj.status) + " "
-        output += obj.statusStrings[obj.status] + "\n"
-        if obj.filestatus < 0: output += str(obj.warnings) + "\n"
+        st = "unknown status"
+        if obj.status in obj.statusStrings:
+            st = obj.statusStrings[obj.status]
+        output += st + "\n"
+        if obj.filestatus < 0:
+            output += str(obj.warnings) + "\n"
         output += "# Input File: " + obj.inputfile + "\n"
-        labels = list ( obj.parameters.keys() )
+        labels = list(obj.parameters.keys())
         labels.sort()
         # for label, par in obj.parameters.items():
         for label in labels:
-            par=obj.parameters[label]
+            par = obj.parameters[label]
             output += "# " + label + " = " + str(par) + '\n'
         if obj.databaseVersion:
             output += "# Database version: %s\n" % obj.databaseVersion
         output += "=" * 80 + "\n"
         return output
-
 
     def _formatTopologyList(self, obj):
         """
@@ -286,16 +339,19 @@ class TxTPrinter(BasicPrinter):
         :param obj: A TopologyList object to be printed.
         """
 
-        if not hasattr(self,'printdecomp') or not self.printdecomp:
+        if not hasattr(self, 'printdecomp') or not self.printdecomp:
             return None
 
         old_vertices = ""
+        slabel = "Topologies Table"
         output = ""
-        output += "   ======================================================= \n"
-        output += " || \t \t\t\t\t\t\t || \n"
-        output += " || \t \t Topologies Table \t\t \t ||\n"
-        output += " || \t \t\t\t\t\t\t || \n"
-        output += "   ======================================================= \n"
+        output += "  " + "="*56 + "  \n"
+        output += "||" + " "*56 + "||\n"
+        xspace = int((56-len(slabel))/2.)
+        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"
+        output += "||" + " "*56 + "||\n"
+        output += "  " + "="*56 + "  \n"
+
         for topo in obj:
             if old_vertices == str(topo.vertnumb):
                 output += "\t .................................................. \n"
@@ -307,15 +363,16 @@ class TxTPrinter(BasicPrinter):
             output += "Number of vertex parts: " + str(topo.vertparts) + '\n'
             totxsec = topo.getTotalWeight()
             output += "Total Global topology weight :\n" + totxsec.niceStr() + '\n'
-            output += "Total Number of Elements: " + str(len(topo.elementList)) + '\n'
-            if not hasattr(self,'addelementinfo') or not self.addelementinfo: continue
+            output += "Total Number of Elements: " + \
+                str(len(topo.elementList)) + '\n'
+            if not hasattr(self, 'addelementinfo') or not self.addelementinfo:
+                continue
             for el in topo.elementList:
-                output += "\t\t "+ 73 * "." + "\n"
+                output += "\t\t " + 73 * "." + "\n"
                 output += "\t\t Element: \n"
                 output += self._formatElement(el) + "\n"
 
         return output
-
 
     def _formatElement(self, obj):
         """
@@ -325,23 +382,23 @@ class TxTPrinter(BasicPrinter):
         """
 
         output = ""
-        output +="\t\t Element ID: " + str(obj.elID)
+        output += "\t\t Element ID: " + str(obj.elID)
         output += "\n"
-        output += "\t\t Particles in element: " + str(obj.getParticles())
+        output += "\t\t Particles in element: " + str(obj.evenParticles)
         output += "\n"
         output += "\t\t Final states in element: " + str(obj.getFinalStates())
-        output += "\n"        
+        output += "\n"
         output += "\t\t The element masses are \n"
-        for i, mass in enumerate(obj.getMasses()):
+        for i, mass in enumerate(obj.mass):
             output += "\t\t Branch %i: " % i + str(mass) + "\n"
         output += "\n"
         output += "\t\t The element PIDs are \n"
-        for pidlist in obj.getPIDs():
-            output += "\t\t PIDs: "+ str(pidlist) + "\n"
-        output += "\t\t The element weights are: \n \t\t " + obj.weight.niceStr().replace("\n", "\n \t\t ")
+        for pidlist in obj.pdg:
+            output += "\t\t PIDs: " + str(pidlist) + "\n"
+        output += "\t\t The element weights are: \n \t\t " + \
+            obj.weight.niceStr().replace("\n", "\n \t\t ")
 
         return output
-
 
     def _formatExpResultList(self, obj):
         """
@@ -349,24 +406,23 @@ class TxTPrinter(BasicPrinter):
 
         :param obj: A ExpResultList object to be printed.
         """
-        
-        if not hasattr(self,"printdatabase") or not self.printdatabase:
+
+        if not hasattr(self, "printdatabase") or not self.printdatabase:
             return None
 
+        slabel = "Selected Experimental Results"
         output = ""
-        
-        output += "   ======================================================= \n"
-        output += " || \t \t\t\t\t\t\t || \n"
-        output += " || \t \t Selected Experimental Results \t \t ||\n"
-        output += " || \t \t\t\t\t\t\t || \n"
-        output += "   ======================================================= \n"
-        
+        output += "  " + "="*56 + "  \n"
+        output += "||" + " "*56 + "||\n"
+        xspace = int((56-len(slabel))/2.)
+        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"
+        output += "||" + " "*56 + "||\n"
+        output += "  " + "="*56 + "  \n"
 
-        for expRes in obj.expResultList:    
+        for expRes in obj.expResultList:
             output += self._formatExpResult(expRes)
 
         return output+"\n"
-
 
     def _formatExpResult(self, obj):
         """
@@ -379,7 +435,7 @@ class TxTPrinter(BasicPrinter):
         for dataset in obj.datasets:
             for txname in dataset.txnameList:
                 tx = txname.txName
-                if not tx in txnames:
+                if tx not in txnames:
                     txnames.append(tx)
 
         txnames = sorted(txnames)
@@ -387,36 +443,47 @@ class TxTPrinter(BasicPrinter):
         output += "========================================================\n"
         output += "Experimental Result ID: " + obj.globalInfo.id + '\n'
         output += "Tx Labels: " + str(txnames) + '\n'
-        output += "Sqrts: " + str(obj.globalInfo.sqrts) + '\n'
-        if hasattr(self,"addanainfo") and self.addanainfo:
+        output += "Sqrts: %2.2E\n" % obj.globalInfo.sqrts.asNumber(TeV)
+        if hasattr(self, "addanainfo") and self.addanainfo:
             output += "\t -----------------------------\n"
             output += "\t Elements tested by analysis:\n"
             listOfelements = []
             for dataset in obj.datasets:
                 for txname in dataset.txnameList:
                     for el in txname._topologyList.getElements():
-                        if not el.toStr() in listOfelements: listOfelements.append(el.toStr())
+                        if not el.toStr() in listOfelements:
+                            listOfelements.append(el.toStr())
             for el in listOfelements:
                 output += "\t    " + str(el) + "\n"
 
         return output
-    
+
+    def _formatNumber(self, number, n=4):
+        """ format a number <number> to have n digits,
+            but allow also for None, strings, etc """
+        if type(number) not in [float, np.float64]:
+            return str(number)
+        fmt = ".%dg" % n
+        return ("%"+fmt) % number
 
     def _formatTheoryPredictionList(self, obj):
         """
         Format data for a TheoryPredictionList object.
 
         :param obj: A TheoryPredictionList object to be printed.
-        """ 
+        """
+        slabel = "Theory Predictions and"
         output = ""
-        output += "   ======================================================= \n"
-        output += " || \t \t\t\t\t\t\t || \n"
-        output += " || \t Theory Predictions and \t\t\t || \n"
-        output += " || \t Experimental Constraints \t\t \t ||\n"
-        output += " || \t \t\t\t\t\t\t || \n"
-        output += "   ======================================================= \n"
-                
-        
+        output += "  " + "="*56 + "  \n"
+        output += "||" + " "*56 + "||\n"
+        xspace = int((56-len(slabel))/2.)
+        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"
+        slabel = "Experimental Constraints"
+        xspace = int((56-len(slabel))/2.)
+        output += "||" + " "*xspace+slabel+" "*(56-xspace-len(slabel))+"||\n"
+        output += "||" + " "*56 + "||\n"
+        output += "  " + "="*56 + "  \n"
+
         for theoryPrediction in obj._theoryPredictions:
             expRes = theoryPrediction.expResult
             dataId = theoryPrediction.dataId()
@@ -424,12 +491,15 @@ class TxTPrinter(BasicPrinter):
             txnames = sorted(list(set(txnames)))
             output += "\n"
             output += "---------------Analysis Label = " + expRes.globalInfo.id + "\n"
-            output += "-------------------Dataset Label = " + str(dataId).replace("None","(UL)") + "\n"
-            output += "-------------------Txname Labels = " + str(txnames) + "\n"
+            output += "-------------------Dataset Label = " + \
+                str(dataId).replace("None", "(UL)") + "\n"
+            output += "-------------------Txname Labels = " + \
+                str(txnames) + "\n"
             output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
-                    "\n"
+                "\n"
 
-            output += "Theory prediction: " + str(theoryPrediction.xsection.value) + "\n"
+            output += "Theory prediction: " + \
+                str(theoryPrediction.xsection.value) + "\n"
             output += "Theory conditions:"
             if not theoryPrediction.conditions:
                 output += "  " + str(theoryPrediction.conditions) + "\n"
@@ -439,105 +509,154 @@ class TxTPrinter(BasicPrinter):
                     condlist.append(theoryPrediction.conditions[cond])
                 output += str(condlist) + "\n"
 
-            #Get upper limit for the respective prediction:
+            # Get upper limit for the respective prediction:
             upperLimit = theoryPrediction.getUpperLimit(expected=False)
-            upperLimitExp = theoryPrediction.getUpperLimit(expected=True)
+            upperLimitExp = theoryPrediction.getUpperLimit(
+                expected=self.getTypeOfExpected())
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
-            if not upperLimitExp is None:
-                output += "Expected experimental limit: " + str(upperLimitExp) + "\n"
-            output += "Observed r-Value: %s\n" %theoryPrediction.getRValue(expected=False)
-            if not upperLimitExp is None:
-                output += "Expected r-Value: %s\n" %theoryPrediction.getRValue(expected=True)
-            if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
-                output += "Chi2: " + str(theoryPrediction.chi2) + "\n"
-                output += "Likelihood: " + str(theoryPrediction.likelihood) + "\n"
+            if upperLimitExp is not None:
+                output += "Expected experimental limit: " + \
+                    str(upperLimitExp) + "\n"
+            srv = self._formatNumber(
+                theoryPrediction.getRValue(expected=False), 4)
+            output += "Observed r-value: %s\n" % srv
+            if upperLimitExp is not None:
+                serv = self._formatNumber(theoryPrediction.getRValue(
+                    expected=self.getTypeOfExpected()), 4)
+                output += "Expected r-value: %s\n" % serv
+            llhd = theoryPrediction.likelihood()
+            if llhd is not None:
+                chi2, chi2sm = None, None
+                try:
+                    chi2sm = -2*np.log(llhd/theoryPrediction.lsm())
+                except TypeError:
+                    pass
+                try:
+                    chi2 = -2*np.log(llhd/theoryPrediction.lmax())
+                except TypeError:
+                    pass
+                output += "Likelihood: " + self._formatNumber(llhd, 4) + "\n"
+                output += "L_max: " + self._formatNumber(theoryPrediction.lmax(
+                ), 4) + "   -2log(L/L_max): " + self._formatNumber(chi2, 4) + "\n"
+                output += "L_SM: " + self._formatNumber(theoryPrediction.lsm(), 4) + \
+                          "   -2log(L/L_SM): " + \
+                    self._formatNumber(chi2sm, 4) + "\n"
 
-            if hasattr(self,"printextendedresults") and self.printextendedresults:
+            if hasattr(self, "printextendedresults") and self.printextendedresults:
                 if theoryPrediction.mass:
                     for ibr, br in enumerate(theoryPrediction.mass):
-                        output += "Masses in branch %i: " % ibr + str(br) + "\n"                
-                if not theoryPrediction.IDs[0]==0:
-                    output += "Contributing elements: " + str(theoryPrediction.IDs) + "\n"
+                        output += "Masses in branch %i: " % ibr + \
+                            str(br) + "\n"
+                IDList = list(
+                    set([el.elID for el in theoryPrediction.elements]))
+                if IDList:
+                    output += "Contributing elements: " + str(IDList) + "\n"
                 for pidList in theoryPrediction.PIDs:
                     output += "PIDs:" + str(pidList) + "\n"
 
         return output
 
-
     def _formatUncovered(self, obj):
         """
         Format all uncovered data.
-        
+
         :param obj: Uncovered object to be printed.
         """
-                
-        nprint = 10  # Number of missing topologies to be printed (ordered by cross sections)
 
-        output = ""
-        output += "\nTotal missing topology cross section (fb): %10.3E\n" %(obj.missingTopos.getTotalXsec())
-        output += "Total cross section where we are outside the mass grid (fb): %10.3E\n" %(obj.outsideGrid.getTotalXsec())
-        output += "Total cross section with longlived decays (fb): %10.3E\n" %(obj.longLived.getTotalXsec())
-        output += "Total cross section with displaced decays (fb): %10.3E\n" %(obj.displaced.getTotalXsec())
-        output += "Total cross section with MET decays (fb): %10.3E\n" %(obj.MET.getTotalXsec())
-        
-        output += "\nFull information on unconstrained cross sections\n"
+        # Number of missing topologies to be printed (ordered by cross sections)
+        nprint = 10
+
+        # First sort groups by label
+        groups = sorted(obj.groups[:], key=lambda g: g.label)
+        # Get summary of groups:
+        output = "\n"
+        for group in groups:
+            output += "Total cross-section for %s (fb): %10.3E\n" % (
+                group.description, group.getTotalXSec())
+
+        output += "\n#Full information on unconstrained cross sections\n"
         output += "================================================================================\n"
-        
 
-        notFoundMessage = ["No missing topologies found\n", "No contributions outside the mass grid\n",
-                           "No long-lived decays\n","No displaced decays\n","No MET decays\n"]
-        header = ["Missing topologies with the highest cross sections (up to " + str(nprint) + "):\n",
-                  "Contributions outside the mass grid (up to " + str(nprint) + "):\n",
-                  "Missing topos: long-lived decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV)),
-                  "Missing topos: displaced decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV)),
-                  "Missing topos: MET decays (up to %s entries), sqrts = %d TeV:\n" %(str(nprint),obj.missingTopos.sqrts.asNumber(TeV))
-                  ]
-        for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid, obj.longLived, obj.displaced, obj.MET]):
-            if len(uncovEntry.generalElements) == 0:
-                output += notFoundMessage[ix] 
-            else:                    
-                output += header[ix]
-                output += "Sqrts (TeV)   Weight (fb)                  Element description\n"        
-                for genEl in sorted(uncovEntry.generalElements, key=lambda x: x.missingX, reverse=True)[:nprint]:
-                    output += "%5s         %10.3E    # %53s\n" % (str(obj.missingTopos.sqrts.asNumber(TeV)),genEl.missingX, str(genEl._outputDescription))
-                    if hasattr(self, "addcoverageid") and self.addcoverageid:
-                        contributing = []
-                        for el in genEl._contributingElements:
-                            contributing.append(el.elID)
-                        output += "Contributing elements %s\n" % str(contributing)            
-            output += "================================================================================\n"      
+        # Get detailed information:
+        for group in groups:
+            description = group.description
+            sqrts = group.sqrts.asNumber(TeV)
+            if not group.generalElements:
+                output += "No %s found\n" % description
+                output += "================================================================================\n"
+                continue
+            output += "%s with the highest cross sections (up to %i):\n" % (
+                description, nprint)
+            output += "Sqrts (TeV)   Weight (fb)                  Element description\n"
+            for genEl in group.generalElements[:nprint]:
+                output += "%5s         %10.3E    # %53s\n" % (
+                    str(sqrts), genEl.missingX, genEl)
+                if hasattr(self, "addcoverageid") and self.addcoverageid:
+                    contributing = []
+                    for el in genEl._contributingElements:
+                        contributing.append(el.elID)
+                    output += "Contributing elements %s\n" % str(contributing)
+            output += "================================================================================\n"
         return output
-                      
+
+    def _formatTheoryPredictionsCombiner(self, obj):
+        """
+        Format data of the TheoryPredictionsCombiner object.
+
+        :param obj: A TheoryPredictionsCombiner object to be printed.
+        """
+
+        output = "===================================================== \n"
+
+        # Get list of analyses used in combination:
+        expIDs = obj.analysisId()
+        # Get r-value:
+        r = obj.getRValue()
+        r_expected = obj.getRValue(expected=True)
+        # Get likelihoods:
+        lsm = obj.lsm()
+        llhd = obj.likelihood()
+        lmax = obj.lmax()
+        output += "Combined Analyses: %s\n" % (expIDs)
+        output += "Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (
+            llhd, lmax, lsm)
+        output += "combined r-value: %10.3E\n" % r
+        output += "combined r-value (expected): %10.3E" % r_expected
+        output += "\n===================================================== \n"
+        output += "\n"
+
+        return output
+
+
 class SummaryPrinter(TxTPrinter):
     """
     Printer class to handle the printing of one single summary output.
     It uses the facilities of the TxTPrinter.
     """
 
-    def __init__(self, output = 'stdout', filename = None):
+    def __init__(self, output='stdout', filename=None):
         TxTPrinter.__init__(self, output, filename)
         self.name = "summary"
-        self.printingOrder = [OutputStatus,TheoryPredictionList, Uncovered]
+        self.printingOrder = [
+            OutputStatus, TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
-        
-    
-    def setOutPutFile(self,filename,overwrite=True,silent=False):
+
+    def setOutPutFile(self, filename, overwrite=True, silent=False):
         """
         Set the basename for the text printer. The output filename will be
         filename.smodels.
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
         :param silent: dont comment removing old files
-        """        
-        
-        self.filename = filename +'.smodels'
+        """
+
+        self.filename = filename + '.smodels'
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
-            
-            
+
     def _formatTheoryPredictionList(self, obj):
         """
         Format data of the TheoryPredictionList object.
@@ -545,71 +664,158 @@ class SummaryPrinter(TxTPrinter):
         :param obj: A TheoryPredictionList object to be printed.
         """
         obj.sortTheoryPredictions()
-        if hasattr(self,"expandedsummary") and not self.expandedsummary:    
+        if hasattr(self, "expandedsummary") and not self.expandedsummary:
             theoPredictions = [obj._theoryPredictions[0]]
         else:
             theoPredictions = obj._theoryPredictions
 
         output = ""
 
-        rvalues = []
+        maxr = {"obs": -1., "exp": -1, "anaid": "?"}
+        maxcoll = {"CMS": {"obs": -1., "exp": -1, "anaid": "?"},
+                   "ATLAS": {"obs": -1., "exp": -1, "anaid": "?"}}
+        for theoPred in obj._theoryPredictions:
+            r = theoPred.getRValue(expected=False)
+            r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
+            expResult = theoPred.expResult
+            coll = "ATLAS" if "ATLAS" in expResult.globalInfo.id else "CMS"
+            if (r_expected is not None) and (r_expected > maxcoll[coll]["exp"]):
+                maxcoll[coll] = {"obs": r, "exp": r_expected,
+                                 "anaid": expResult.globalInfo.id}
+            if (r is not None) and (r > maxr["obs"]):
+                maxr = {"obs": r, "exp": r_expected,
+                        "anaid": expResult.globalInfo.id}
+
         output += "#Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected"
         output += "\n\n"
         for theoPred in theoPredictions:
             expResult = theoPred.expResult
             txnames = theoPred.txnames
             ul = theoPred.getUpperLimit(expected=False)
+            uls = str(ul)
+            if isinstance(ul, unum.Unum):
+                uls = "%10.3E" % ul.asNumber(fb)
             signalRegion = theoPred.dataset.getID()
             if signalRegion is None:
                 signalRegion = '(UL)'
             value = theoPred.xsection.value
             r = theoPred.getRValue(expected=False)
-            r_expected = theoPred.getRValue(expected=True)
-            rvalues.append(r)
+            r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
+            rs = str(r)
+            rs_expected = str(r_expected)
+            if type(r) in [int, float, np.float64]:
+                rs = "%10.3E" % r
+            if type(r_expected) in [int, float, np.float64]:
+                rs_expected = "%10.3E" % r_expected
 
             output += "%19s  " % (expResult.globalInfo.id)  # ana
-            output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
+            # output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
+            # sqrts
+            output += "%2.2E  " % (expResult.globalInfo.sqrts.asNumber(TeV))
             output += "%5s " % theoPred.getmaxCondition()  # condition violation
-            output += "%10.3E %10.3E " % (value.asNumber(fb), ul.asNumber(fb))  # theory cross section , expt upper limit
-            if r_expected: output += "%10.3E %10.3E" % (r, r_expected)
-            else: output += "%10.3E  N/A" %r
+            # theory cross section , expt upper limit
+            output += "%10.3E %s " % (value.asNumber(fb), uls)
+            if r_expected:
+                output += "%s %s" % (rs, rs_expected)
+            else:
+                output += "%10.3E  N/A" % r
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
-            txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
+            txnameStr = txnameStr.replace(
+                "'", "").replace("[", "").replace("]", "")
             output += " Txnames:  " + txnameStr + "\n"
-            if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
-                output += " Chi2, Likelihood = %10.3E %10.3E\n" % (theoPred.chi2, theoPred.likelihood)            
+            # print L, L_max and L_SM instead of chi2 and llhd; SK 2021-05-14
+            llhd = theoPred.likelihood()
+            if llhd is not None:
+                lmax = theoPred.lmax()
+                lsm = theoPred.lsm()
+                lvals = [llhd, lmax, lsm]
+                for i, lv in enumerate(lvals):
+                    if isinstance(lv, (float, np.float64)):
+                        lv = "%10.3E" % lv
+                    else:
+                        lv = str(lv)
+                    lvals[i] = lv
+                llhd, lmax, lsm = lvals[:]
+                if llhd == lmax == lsm == "None":
+                    output += " Likelihoods: L, L_max, L_SM = N/A\n"
+                else:
+                    output += " Likelihoods: L, L_max, L_SM = %s, %s, %s\n" % (
+                        llhd, lmax, lsm)
 
             if not (theoPred is obj[-1]):
-                output += 80 * "-"+ "\n"
+                output += 80 * "-" + "\n"
 
         output += "\n \n"
         output += 80 * "=" + "\n"
-        output += "The highest r value is = " + str(max(rvalues)) + "\n"
+        output += "The highest r value is = %.5f from %s" % \
+            (maxr["obs"], maxr["anaid"])
+        if maxr["exp"] is not None and maxr["exp"] > -.5:
+            output += " (r_expected=%.5f)" % maxr["exp"]
+        else:
+            output += " (r_expected not available)"
+        output += "\n"
+        for coll, values in maxcoll.items():
+            if values["obs"] < -.5:
+                continue
+            output += "%s analysis with highest available r_expected: %s, r_expected=%.5f, r_obs=%.5f\n" % \
+                      (coll, values["anaid"], values["exp"], values["obs"])
 
         return output
-            
+
+    def _formatTheoryPredictionsCombiner(self, obj):
+        """
+        Format data of the TheoryPredictionsCombiner object.
+
+        :param obj: A TheoryPredictionsCombiner object to be printed.
+        """
+
+        output = "===================================================== \n"
+
+        # Get list of analyses used in combination:
+        expIDs = obj.analysisId()
+        # Get r-value:
+        r = obj.getRValue()
+        r_expected = obj.getRValue(expected=True)
+        # Get likelihoods:
+        lsm = obj.lsm()
+        llhd = obj.likelihood()
+        lmax = obj.lmax()
+        output += "Combined Analyses: %s\n" % (expIDs)
+        output += "Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (
+            llhd, lmax, lsm)
+        output += "combined r-value: %10.3E\n" % r
+        output += "combined r-value (expected): %10.3E" % r_expected
+        output += "\n===================================================== \n"
+        output += "\n"
+
+        return output
+
+
 class PyPrinter(BasicPrinter):
     """
     Printer class to handle the printing of one single pythonic output
     """
-    def __init__(self, output = 'stdout', filename = None):
+
+    def __init__(self, output='stdout', filename=None):
         BasicPrinter.__init__(self, output, filename)
         self.name = "py"
-        self.printingOrder = [OutputStatus,TopologyList,TheoryPredictionList,Uncovered]
+        self.printtimespent = False
+        self.printingOrder = [OutputStatus, TopologyList,
+                              TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
-        
-    def setOutPutFile(self,filename,overwrite=True,silent=False):
+
+    def setOutPutFile(self, filename, overwrite=True, silent=False):
         """
         Set the basename for the text printer. The output filename will be
         filename.py.
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
         :param silent: dont comment removing old files
-        """        
-        
-        self.filename = filename +'.py'
+        """
+
+        self.filename = filename + '.py'
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
@@ -620,30 +826,31 @@ class PyPrinter(BasicPrinter):
         Write the python dictionaries generated by the object formatting
         to the defined output
         """
-        
+
         outputDict = {}
         for obj in self.toPrint:
-            if obj is None: continue
-            output = self._formatObj(obj)                
-            if not output: continue  #Skip empty output
+            if obj is None:
+                continue
+            output = self._formatObj(obj)
+            if not output:
+                continue  # Skip empty output
             outputDict.update(output)
-                
-        output = 'smodelsOutput = '+str(outputDict)      
+
+        output = 'smodelsOutput = '+str(outputDict)
         if self.output == 'stdout':
             sys.stdout.write(output)
         elif self.output == 'file':
             if not self.filename:
                 logger.error('Filename not defined for printer')
                 return False
-            with open(self.filename, "a") as outfile:                
+            with open(self.filename, "a") as outfile:
                 outfile.write(output)
                 outfile.close()
 
         self.toPrint = [None]*len(self.printingOrder)
-        ## it is a special feature of the python printer
-        ## that we also return the output dictionary
+        # it is a special feature of the python printer
+        # that we also return the output dictionary
         return outputDict
-
 
     def _formatTopologyList(self, obj):
         """
@@ -651,8 +858,8 @@ class PyPrinter(BasicPrinter):
 
         :param obj: A TopologyList object to be printed.
         """
-                
-        if not hasattr(self,'addelementlist') or not self.addelementlist:
+
+        if not hasattr(self, 'addelementlist') or not self.addelementlist:
             return None
 
         elements = []
@@ -660,11 +867,10 @@ class PyPrinter(BasicPrinter):
         for topo in obj:
             for el in topo.elementList:
                 thisEl = self._formatElement(el)
-                if thisEl: elements.append(thisEl)
-                
-        
-        return {"Element": elements}
+                if thisEl:
+                    elements.append(thisEl)
 
+        return {"Element": elements}
 
     def _formatElement(self, obj):
         """
@@ -675,24 +881,25 @@ class PyPrinter(BasicPrinter):
 
         elDic = {}
         elDic["ID"] = obj.elID
-        elDic["Particles"] = str(obj.getParticles())
-        elDic["Masses (GeV)"] = [[round(m.asNumber(GeV),2) for m in br] for br in obj.getMasses()]
-        elDic["PIDs"] = obj.getPIDs()
+        elDic["Particles"] = str(obj.evenParticles)
+        elDic["Masses (GeV)"] = [[round(m.asNumber(GeV), 2)
+                                  for m in br] for br in obj.mass]
+        elDic["PIDs"] = obj.pdg
         elDic["Weights (fb)"] = {}
         elDic["final states"] = [str(fs) for fs in obj.getFinalStates()]
         sqrts = [info.sqrts.asNumber(TeV) for info in obj.weight.getInfo()]
         allsqrts = sorted(list(set(sqrts)))
         for ssqrts in allsqrts:
             sqrts = ssqrts * TeV
-            xsecs = [xsec.value.asNumber(fb) for xsec in obj.weight.getXsecsFor(sqrts)]
+            xsecs = [xsec.value.asNumber(fb)
+                     for xsec in obj.weight.getXsecsFor(sqrts)]
             if len(xsecs) != 1:
                 logger.warning("Element cross sections contain multiple values for %s .\
-                Only the first cross section will be printed" %str(sqrts))
+                Only the first cross section will be printed" % str(sqrts))
             xsecs = xsecs[0]
             sqrtsStr = 'xsec '+str(sqrts.asNumber(TeV))+' TeV'
             elDic["Weights (fb)"][sqrtsStr] = xsecs
         return elDic
-
 
     def _formatOutputStatus(self, obj):
         """
@@ -702,19 +909,22 @@ class PyPrinter(BasicPrinter):
         """
 
         infoDict = {}
-        for key,val in obj.parameters.items():
+        for key, val in obj.parameters.items():
             try:
                 infoDict[key] = eval(val)
-            except (NameError,TypeError):
-                infoDict[key] = val        
+            except (NameError, TypeError, SyntaxError):
+                infoDict[key] = val
         infoDict['file status'] = obj.filestatus
         infoDict['decomposition status'] = obj.status
         infoDict['warnings'] = obj.warnings
         infoDict['input file'] = obj.inputfile
         infoDict['database version'] = obj.databaseVersion
         infoDict['smodels version'] = obj.smodelsVersion
-        return {'OutputStatus' : infoDict}
-
+        # hidden feature, printtimespent, turn on in ini file, e.g.
+        # [summary-printer] printtimespent = True
+        if self.printtimespent:
+            infoDict['time spent'] = "%.2fs" % (time.time() - self.time)
+        return {'OutputStatus': infoDict}
 
     def _formatTheoryPredictionList(self, obj):
         """
@@ -724,56 +934,87 @@ class PyPrinter(BasicPrinter):
         """
         obj.sortTheoryPredictions()
         ExptRes = []
-        for theoryPrediction in obj._theoryPredictions:           
+        for theoryPrediction in obj._theoryPredictions:
             expResult = theoryPrediction.expResult
             expID = expResult.globalInfo.id
             datasetID = theoryPrediction.dataId()
             dataType = theoryPrediction.dataType()
             ul = theoryPrediction.getUpperLimit()
-            ulExpected = theoryPrediction.getUpperLimit(expected = True)
-            if isinstance(ul,unum.Unum):
+            ulExpected = theoryPrediction.getUpperLimit(
+                expected=self.getTypeOfExpected())
+            if isinstance(ul, unum.Unum):
                 ul = ul.asNumber(fb)
-            if isinstance(ulExpected,unum.Unum):
+            if isinstance(ulExpected, unum.Unum):
                 ulExpected = ulExpected.asNumber(fb)
+
             value = theoryPrediction.xsection.value.asNumber(fb)
             txnamesDict = {}
             for el in theoryPrediction.elements:
-                if not el.txname.txName in txnamesDict:
-                    txnamesDict[el.txname.txName] = el.weight[0].value.asNumber(fb)
+                if el.txname.txName not in txnamesDict:
+                    txnamesDict[el.txname.txName] = el.weight[0].value.asNumber(
+                        fb)
                 else:
-                    txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(fb)            
+                    txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(
+                        fb)
             maxconds = theoryPrediction.getmaxCondition()
-            mass = theoryPrediction.mass
-            if mass:
-                mass = [[round(m.asNumber(GeV),2) for m in mbr] for mbr in mass]
-            else:
+            if theoryPrediction.mass is None:
                 mass = None
+            else:
+                mass = np.array(theoryPrediction.mass, dtype=object)
+
+            # Add width information to the mass array:
+            totalwidth = theoryPrediction.totalwidth
+
+            def _convWidth(x):
+                if type(x) == type(GeV):
+                    x = float(x.asNumber(GeV))
+                if x == float("inf"):
+                    x = "prompt"
+                if x == 0.:
+                    x = "stable"
+                return x
+            widths = None
+            if totalwidth is not None:
+                widths = [[_convWidth(x) for x in br] for br in totalwidth]
+
+            def roundme(x):
+                if type(x) == tuple:
+                    return (round(x[0].asNumber(GeV), 2), x[1].asNumber(GeV))
+                return round(x.asNumber(GeV), 2)
+
+            if mass is not None:
+                mass = [[roundme(m) for m in mbr] for mbr in mass]
+
             sqrts = expResult.globalInfo.sqrts
-            
-            r = theoryPrediction.getRValue(expected=False)
-            r_expected = theoryPrediction.getRValue(expected=True)
-            
-            resDict = {'maxcond': maxconds, 'theory prediction (fb)': value,
-                        'upper limit (fb)': ul,
-                        'expected upper limit (fb)': ulExpected,
-                        'TxNames': sorted(txnamesDict.keys()),
-                        'Mass (GeV)': mass,
-                        'AnalysisID': expID,
-                        'DataSetID' : datasetID,
-                        'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
-                        'lumi (fb-1)' : (expResult.globalInfo.lumi*fb).asNumber(),
-                        'dataType' : dataType,
-                        'r' : r, 'r_expected' : r_expected}  
-            if hasattr(self,"addtxweights") and self.addtxweights:
-                resDict['TxNames weights (fb)'] =  txnamesDict
-            if hasattr(theoryPrediction,'chi2') and not theoryPrediction.chi2 is None:
-                resDict['chi2'] = theoryPrediction.chi2
-                resDict['likelihood'] = theoryPrediction.likelihood                
+
+            r = self._round(theoryPrediction.getRValue(expected=False))
+            r_expected = self._round(theoryPrediction.getRValue(
+                expected=self.getTypeOfExpected()))
+
+            resDict = {'maxcond': maxconds, 'theory prediction (fb)': self._round(value),
+                       'upper limit (fb)': self._round(ul),
+                       'expected upper limit (fb)': self._round(ulExpected),
+                       'TxNames': sorted(txnamesDict.keys()),
+                       'Mass (GeV)': mass,
+                       'AnalysisID': expID,
+                       'DataSetID': datasetID,
+                       'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
+                       'lumi (fb-1)': (expResult.globalInfo.lumi*fb).asNumber(),
+                       'dataType': dataType,
+                       'r': r, 'r_expected': r_expected}
+            if widths:
+                resDict["Width (GeV)"] = widths
+            if hasattr(self, "addtxweights") and self.addtxweights:
+                resDict['TxNames weights (fb)'] = txnamesDict
+            llhd = theoryPrediction.likelihood()
+            if llhd is not None:
+                # resDict['chi2'] = self._round ( theoryPrediction.chi2 )
+                resDict['likelihood'] = self._round(llhd)
+                resDict['l_max'] = self._round(theoryPrediction.lmax())
+                resDict['l_SM'] = self._round(theoryPrediction.lsm())
             ExptRes.append(resDict)
-       
 
-        return {'ExptRes' : ExptRes}
-
+        return {'ExptRes': ExptRes}
 
     def _formatDoc(self, obj):
         """
@@ -788,7 +1029,8 @@ class PyPrinter(BasicPrinter):
         chimix = {}
         for key in obj.blocks['NMIX'].entries:
             val = obj.blocks['NMIX'].entries[key]
-            if key[0] != 1: continue
+            if key[0] != 1:
+                continue
             newkey = 'N'+str(key[0])+str(key[1])
             chimix[newkey] = val
         chamix = {}
@@ -811,103 +1053,103 @@ class PyPrinter(BasicPrinter):
             newkey = 'SB'+str(key[0])+str(key[1])
             sbotmix[newkey] = val
 
-        return {'MINPAR' : MINPAR, 'chimix' : chimix, 'stopmix' : stopmix,
-                'chamix' : chamix, 'MM' : {}, 'sbotmix' : sbotmix,
-                'EXTPAR' : EXTPAR, 'mass' : mass}
+        return {'MINPAR': MINPAR, 'chimix': chimix, 'stopmix': stopmix,
+                'chamix': chamix, 'MM': {}, 'sbotmix': sbotmix,
+                'EXTPAR': EXTPAR, 'mass': mass}
 
-    
     def _formatUncovered(self, obj):
         """
         Format data of the Uncovered object containing coverage info
 
-        :param obj: A Uncovered object to be printed.
+        :param obj: An Uncovered object to be printed.
         """
 
-        nprint = 10  # Number of missing topologies to be printed (ordered by cross sections)
+        # Number of missing topologies to be printed (ordered by cross sections)
+        nprint = 10
 
-        missedTopos = []
-        
-        obj.missingTopos.generalElements = sorted(obj.missingTopos.generalElements, 
-                                        key=lambda x: [x.missingX,str(x)], 
-                                        reverse=True)        
-    
-        for genEl in obj.missingTopos.generalElements[:nprint]:
-            missed = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}          
-            if hasattr(self,"addelementlist") and self.addelementlist:
-                contributing = []
-                for el in genEl._contributingElements:
-                    contributing.append(el.elID)
-                missed["element IDs"] = contributing
-            missedTopos.append(missed)
-            
-        outsideGrid = []
-        obj.outsideGrid.generalElements = sorted(obj.outsideGrid.generalElements, 
-                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
-                                       reverse=True)        
-        for genEl in obj.outsideGrid.generalElements[:nprint]:
-            outside = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}      
-            outsideGrid.append(outside)     
+        uncoveredDict = {}
+        # First sort groups by label
+        groups = sorted(obj.groups[:], key=lambda g: g.label)
+        # Add summary of groups:
+        for group in groups:
+            sqrts = group.sqrts.asNumber(TeV)
+            uncoveredDict["Total xsec for %s (fb)" % group.description] = \
+                self._round(group.getTotalXSec())
+            uncoveredDict["%s" % group.description] = []
+            for genEl in group.generalElements[:nprint]:
+                genElDict = {'sqrts (TeV)': sqrts, 'weight (fb)': self._round(genEl.missingX),
+                             'element': str(genEl)}
+                if hasattr(self, "addelementlist") and self.addelementlist:
+                    genElDict["element IDs"] = [
+                        el.elID for el in genEl._contributingElements]
+                uncoveredDict["%s" % group.description].append(genElDict)
 
-        longLived = []
-        obj.longLived.generalElements = sorted(obj.longLived.generalElements, 
-                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
-                                       reverse=True)        
-        for genEl in obj.longLived.generalElements[:nprint]:
-            longDict = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}      
-            longLived.append(longDict)
-            
-        displaced = []
-        obj.displaced.generalElements = sorted(obj.displaced.generalElements, 
-                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
-                                       reverse=True)        
-        for genEl in obj.displaced.generalElements[:nprint]:
-            displ = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}      
-            displaced.append(displ)
-            
-        MET = []
-        obj.MET.generalElements = sorted(obj.MET.generalElements, 
-                                       key=lambda x: [x.missingX,str(x._outputDescription)], 
-                                       reverse=True)        
-        for genEl in obj.MET.generalElements[:nprint]:
-            met = {'sqrts (TeV)' : obj.sqrts.asNumber(TeV), 'weight (fb)' : genEl.missingX,
-                                'element' : str(genEl._outputDescription)}      
-            MET.append(met)                        
+        return uncoveredDict
 
-        return {'Missed Topologies': missedTopos, 'Long-lived' : longLived,
-                     'Displaced': displaced, 'MET': MET, 'Outside Grid': outsideGrid}
+    def _formatTheoryPredictionsCombiner(self, obj):
+        """
+        Format data of the TheoryPredictionsCombiner object.
+
+        :param obj: A TheoryPredictionsCombiner object to be printed.
+        """
+
+        combRes = []  # In case we have a list of combined results in the future
+
+        # Get list of analyses used in combination:
+        expIDs = obj.analysisId()
+        ul = obj.getUpperLimit()
+        ulExpected = obj.getUpperLimit(expected=True)
+        if isinstance(ul, unum.Unum):
+            ul = ul.asNumber(fb)
+        if isinstance(ulExpected, unum.Unum):
+            ulExpected = ulExpected.asNumber(fb)
+
+        r = self._round(obj.getRValue(expected=False))
+        r_expected = self._round(obj.getRValue(expected=True))
+
+        llhd = self._round(obj.likelihood())
+        lmax = self._round(obj.lmax())
+        lsm = self._round(obj.lsm())
+
+        resDict = {'AnalysisID': expIDs,
+                   'r': r, 'r_expected': r_expected,
+                   'likelihood': llhd,
+                   'l_max': lmax,
+                   'l_SM': lsm}
+
+        combRes.append(resDict)
+
+        return {'CombinedRes': combRes}
+
 
 class XmlPrinter(PyPrinter):
     """
     Printer class to handle the printing of one single XML output
     """
-    def __init__(self, output = 'stdout', filename = None):
+
+    def __init__(self, output='stdout', filename=None):
         PyPrinter.__init__(self, output, filename)
         self.name = "xml"
-        self.printingOrder = [OutputStatus,TopologyList,TheoryPredictionList,Uncovered]
+        self.printingOrder = [OutputStatus, TopologyList,
+                              TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
-        
-    def setOutPutFile(self,filename,overwrite=True,silent=False):
+    def setOutPutFile(self, filename, overwrite=True, silent=False):
         """
         Set the basename for the text printer. The output filename will be
         filename.xml.
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
         :param silent: dont comment removing old files
-        """        
-        
-        self.filename = filename +'.xml'
+        """
+
+        self.filename = filename + '.xml'
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
-            os.remove(self.filename)     
+            os.remove(self.filename)
 
-
-    def convertToElement(self,pyObj,parent,tag=""):
+    def convertToElement(self, pyObj, parent, tag=""):
         """
         Convert a python object (list,dict,string,...)
         to a nested XML element tree.
@@ -916,22 +1158,21 @@ class XmlPrinter(PyPrinter):
         :param tag: tag for the daughter element
         """
 
-        tag = tag.replace(" ","_").replace("(","").replace(")","")
-        if not isinstance(pyObj,list) and not isinstance(pyObj,dict):
+        tag = tag.replace(" ", "_").replace("(", "").replace(")", "")
+        if not isinstance(pyObj, list) and not isinstance(pyObj, dict):
             parent.text = str(pyObj).lstrip().rstrip()
-        elif isinstance(pyObj,dict):
-            for key,val in sorted(pyObj.items()):
-                key = key.replace(" ","_").replace("(","").replace(")","")
+        elif isinstance(pyObj, dict):
+            for key, val in sorted(pyObj.items()):
+                key = key.replace(" ", "_").replace("(", "").replace(")", "")
                 newElement = ElementTree.Element(key)
-                self.convertToElement(val,newElement,tag=key)
+                self.convertToElement(val, newElement, tag=key)
                 parent.append(newElement)
-        elif isinstance(pyObj,list):
+        elif isinstance(pyObj, list):
             parent.tag += '_List'
             for val in pyObj:
                 newElement = ElementTree.Element(tag)
-                self.convertToElement(val,newElement,tag)
+                self.convertToElement(val, newElement, tag)
                 parent.append(newElement)
-
 
     def flush(self):
         """
@@ -941,18 +1182,21 @@ class XmlPrinter(PyPrinter):
 
         outputDict = {}
         for obj in self.toPrint:
-            if obj is None: continue
-            output = self._formatObj(obj)  # Convert to python dictionaries                        
-            if not output: continue  #Skip empty output            
+            if obj is None:
+                continue
+            output = self._formatObj(obj)  # Convert to python dictionaries
+            if not output:
+                continue  # Skip empty output
             outputDict.update(output)
 
         root = None
-        #Convert from python dictionaries to xml:
-        if outputDict:            
+        # Convert from python dictionaries to xml:
+        if outputDict:
             root = ElementTree.Element('smodelsOutput')
-            self.convertToElement(outputDict,root)
+            self.convertToElement(outputDict, root)
             rough_xml = ElementTree.tostring(root, 'utf-8')
-            nice_xml = minidom.parseString(rough_xml).toprettyxml(indent="    ")                        
+            nice_xml = minidom.parseString(
+                rough_xml).toprettyxml(indent="    ")
             if self.output == 'stdout':
                 sys.stdout.write(nice_xml)
             elif self.output == 'file':
@@ -966,21 +1210,24 @@ class XmlPrinter(PyPrinter):
         self.toPrint = [None]*len(self.printingOrder)
         return root
 
+
 class SLHAPrinter(TxTPrinter):
     """
     Printer class to handle the printing of slha format summary output.
     It uses the facilities of the TxTPrinter.
     """
 
-    def __init__(self, output = 'file', filename = None):
+    def __init__(self, output='file', filename=None):
         TxTPrinter.__init__(self, output, filename)
         self.name = "slha"
         self.docompress = 0
-        self.printingOrder = [OutputStatus,TheoryPredictionList, Uncovered]
+        self.combinesr = 0
+        self.combineanas = 0
+        self.printingOrder = [OutputStatus, TheoryPredictionList,
+                              TheoryPredictionsCombiner, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
-
-    def setOutPutFile(self,filename,overwrite=True,silent=False):
+    def setOutPutFile(self, filename, overwrite=True, silent=False):
         """
         Set the basename for the text printer. The output filename will be
         filename.smodels.
@@ -989,26 +1236,50 @@ class SLHAPrinter(TxTPrinter):
         :param silent: dont comment removing old files
         """
 
-        self.filename = filename +'.smodelsslha'
+        self.filename = filename + '.smodelsslha'
         if overwrite and os.path.isfile(self.filename):
             if not silent:
                 logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
 
     def _formatOutputStatus(self, obj):
-        
+
         smodelsversion = obj.smodelsVersion
-        if not smodelsversion.startswith("v"): smodelsversion = "v" + smodelsversion
+        if not smodelsversion.startswith("v"):
+            smodelsversion = "v" + smodelsversion
+
+        keysDict = {0: "%-25s #SModelS version\n" % (smodelsversion),
+                    1: "%-25s #database version\n" % (obj.databaseVersion.replace(" ", "")),
+                    2: "%-25s #maximum condition violation\n" % (obj.parameters['maxcond']),
+                    3: "%-25s #compression (0 off, 1 on)\n" % (self.docompress),
+                    4: "%-25s #minimum mass gap for mass compression [GeV]\n" % (obj.parameters['minmassgap']),
+                    5: "%-25s #sigmacut [fb]\n" % (obj.parameters['sigmacut']),
+                    6: "%-25s #signal region combination (0 off, 1 on)\n" % (self.combinesr),
+                    7: "%-25s #analyses combination (0 off, 1 on)\n" % (self.combineanas)}
+
+        if 'promptwidth' in obj.parameters:
+            keysDict[8] = "%-25s #prompt width [GeV] \n" % (obj.parameters['promptwidth'])
+        if 'stablewidth' in obj.parameters:
+            keysDict[9] = "%-25s #stable width [GeV] \n" % (obj.parameters['stablewidth'])
+
         output = "BLOCK SModelS_Settings\n"
-        output += " 0 %-25s #SModelS version\n" %(smodelsversion)
-        output += " 1 %-25s #database version\n" %(obj.databaseVersion.replace(" ",""))
-        output += " 2 %-25s #maximum condition violation\n" % (obj.parameters['maxcond'])
-        output += " 3 %-25s #compression (0 off, 1 on)\n" % (self.docompress)
-        output += " 4 %-25s #minimum mass gap for mass compression [GeV]\n" % (obj.parameters['minmassgap'])
-        output += " 5 %-25s #sigmacut [fb]\n\n" % (obj.parameters['sigmacut'])
+        for key in sorted(list(keysDict.keys())):
+            output += " %i %s" % (key, keysDict[key])
+        output += '\n'
+
+        # for SLHA output we always want to have SModelS_Exclusion block, if no results we write it here
+        if obj.status <= 0:
+            output += "BLOCK SModelS_Exclusion\n"
+            output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n\n" % (-1)
+
         return output
 
     def _formatTheoryPredictionList(self, obj):
+
+        printAll = True  # Controls which theory predictions are printed
+        if hasattr(self, "expandedoutput") and not self.expandedoutput:
+            printAll = False
+
         output = "BLOCK SModelS_Exclusion\n"
         if not obj._theoryPredictions[0]:
             excluded = -1
@@ -1016,54 +1287,398 @@ class SLHAPrinter(TxTPrinter):
             obj.sortTheoryPredictions()
             firstResult = obj._theoryPredictions[0]
             r = firstResult.getRValue()
-            if r > 1: excluded = 1
-            else: excluded = 0
-        output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n" % (excluded)
-        if excluded == 0: rList = [firstResult]
-        elif excluded == 1: rList = obj._theoryPredictions
-        else: rList = []
-        cter = 1
-        for theoPred in rList:
+            if r > 1:
+                excluded = 1
+            else:
+                excluded = 0
+        output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n" % (
+            excluded)
+        if excluded == -1:
+            rList = []
+        elif not printAll:
+            rList = [firstResult] + [res for res in obj._theoryPredictions[1:]
+                                   if res.getRValue() >= 1.0]
+        else:
+            rList = obj._theoryPredictions[:]
+
+        for iTP, theoPred in enumerate(rList):
+            cter = iTP + 1
             expResult = theoPred.expResult
             txnames = theoPred.txnames
-            signalRegion  = theoPred.dataId()
+            signalRegion = theoPred.dataId()
             if signalRegion is None:
                 signalRegion = '(UL)'
             r = theoPred.getRValue()
-            r_expected = theoPred.getRValue()
+            r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
-            txnameStr = txnameStr.replace("'","").replace("[", "").replace("]","")
+            txnameStr = txnameStr.replace(
+                "'", "").replace("[", "").replace("]", "")
 
-            if r <1 and not excluded == 0: break
-            output += " %d 0 %-30s #txname \n" % (cter, txnameStr )
+            output += " %d 0 %-30s #txname \n" % (cter, txnameStr)
             output += " %d 1 %-30.3E #r value\n" % (cter, r)
-            if not r_expected: output += " %d 2 N/A                            #expected r value\n" % (cter)
-            else: output += " %d 2 %-30.3E #expected r value\n" % (cter, r_expected)
-            output += " %d 3 %-30.2f #condition violation\n" % (cter, theoPred.getmaxCondition())
-            output += " %d 4 %-30s #analysis\n" % (cter, expResult.globalInfo.id)
-            output += " %d 5 %-30s #signal region \n" %(cter, signalRegion.replace(" ","_"))
-            if hasattr(theoPred,'chi2') and not theoPred.chi2 is None:
-                output += " %d 6 %-30.3E #Chi2\n" % (cter, theoPred.chi2)
-                output += " %d 7 %-30.3E #Likelihood\n" % (cter, theoPred.likelihood)
+            if not r_expected:
+                output += " %d 2 N/A                            #expected r value\n" % (
+                    cter)
             else:
-                output += " %d 6 N/A                            #Chi2\n" % (cter)
-                output += " %d 7 N/A                            #Likelihood\n" % (cter)
+                output += " %d 2 %-30.3E #expected r value\n" % (
+                    cter, r_expected)
+            output += " %d 3 %-30.2f #condition violation\n" % (
+                cter, theoPred.getmaxCondition())
+            output += " %d 4 %-30s #analysis\n" % (cter,
+                                                   expResult.globalInfo.id)
+            output += " %d 5 %-30s #signal region \n" % (
+                cter, signalRegion.replace(" ", "_"))
+            llhd = theoPred.likelihood()
+            if llhd is not None:
+                lmax = theoPred.lmax()
+                lsm = theoPred.lsm()
+                lvals = [llhd, lmax, lsm]
+                for i, lv in enumerate(lvals):
+                    if isinstance(lv, (float, np.float64)):
+                        lv = "%-30.3E" % lv
+                    else:
+                        lv = str(lv)
+                    lvals[i] = lv
+                llhd, lmax, lsm = lvals[:]
+                output += " %d 6 %s #Likelihood\n" % (cter, llhd)
+                output += " %d 7 %s #L_max\n" % (cter, lmax)
+                output += " %d 8 %s #L_SM\n" % (cter, lsm)
+            else:
+                output += " %d 6 N/A                            #Likelihood\n" % (
+                    cter)
+                output += " %d 7 N/A                            #L_max\n" % (
+                    cter)
+                output += " %d 8 N/A                            #L_SM\n" % (
+                    cter)
             output += "\n"
-            cter += 1
+
         return output
 
     def _formatUncovered(self, obj):
-        output = ""
-        for ix, uncovEntry in enumerate([obj.missingTopos, obj.outsideGrid, obj.longLived, obj.displaced, obj.MET]):
-            if ix==0: output += "BLOCK SModelS_Missing_Topos #sqrts[TeV] weight[fb] description\n"
-            elif ix==1: output += "\nBLOCK SModelS_Outside_Grid #sqrts[TeV] weight[fb] description\n"
-            elif ix==2: output += "\nBLOCK SModelS_Long_Lived #sqrts[TeV] weight[fb] description\n"
-            elif ix==3: output += "\nBLOCK SModelS_Displaced #sqrts[TeV] weight[fb] description\n"
-            else: output += "\nBLOCK SModelS_MET #sqrts[TeV] weight[fb] description\n"
-            cter = 0
-            for genEl in sorted(uncovEntry.generalElements, key=lambda x: x.missingX, reverse=True):
-                output += " %d %d %10.3E %s\n" % (cter, obj.missingTopos.sqrts/TeV, genEl.missingX, str(genEl._outputDescription))
-                cter += 1
-                if cter > 9: break
+
+        # First sort groups by label
+        groups = sorted(obj.groups[:], key=lambda g: g.label)
+        # Get summary of groups:
+        output = "\nBLOCK SModelS_Coverage"
+        for i, group in enumerate(sorted(groups, key=lambda g: g.label)):
+            output += "\n %d 0 %-30s      # %s" % (
+                i, group.label, group.description)
+            output += "\n %d 1 %-30.3E      # %s" % (
+                i, group.getTotalXSec(), "Total cross-section (fb)")
+        output += "\n"
         return output
-            
+
+    def _formatTheoryPredictionsCombiner(self, obj):
+        """
+        Format data of the TheoryPredictionsCombiner object.
+
+        :param obj: A TheoryPredictionsCombiner object to be printed.
+        """
+
+        output = "BLOCK SModelS_CombinedAnas\n"
+
+        combRes = [obj]  # For now use a dummy list (only a single combined result is expected)
+        for icomb, cRes in enumerate(combRes):
+            cter = icomb + 1
+            # Get list of analyses IDs used in combination:
+            expIDs = cRes.analysisId()
+            # Replace commas by spaces:
+            expIDs = expIDs.replace(',', ' ')
+            ul = cRes.getUpperLimit()
+            ulExpected = cRes.getUpperLimit(expected=True)
+            if isinstance(ul, unum.Unum):
+                ul = ul.asNumber(fb)
+            if isinstance(ulExpected, unum.Unum):
+                ulExpected = ulExpected.asNumber(fb)
+
+            r = self._round(cRes.getRValue(expected=False))
+            r_expected = self._round(cRes.getRValue(expected=True))
+
+            llhd = cRes.likelihood()
+            lmax = cRes.lmax()
+            lsm = cRes.lsm()
+            lvals = [llhd, lmax, lsm]
+            for i, lv in enumerate(lvals):
+                if isinstance(lv, (float, np.float64)):
+                    lv = "%-30.3E" % lv
+                else:
+                    lv = str(lv)
+                lvals[i] = lv
+            llhd, lmax, lsm = lvals[:]
+
+            output += " %d 1 %-30.3E #r value\n" % (cter, r)
+            output += " %d 2 %-30.3E #expected r value\n" % (cter, r_expected)
+            output += " %d 3 %s #Likelihood\n" % (cter, llhd)
+            output += " %d 4 %s #L_max\n" % (cter, lmax)
+            output += " %d 5 %s #L_SM\n" % (cter, lsm)
+            output += " %d 6 %s #IDs of combined analyses\n" % (cter, expIDs)
+            output += "\n"
+
+        return output
+
+
+def printScanSummary(outputDict, outputFile):
+    """
+    Method for creating a simple summary of the results when running SModelS
+    over multiple files.
+
+    :param outputDict: A dictionary with filenames as keys and the master printer flush dictionary as values.
+    :param outputFile: Path to the summary file to be written.
+    """
+
+    # Check available types of printer:
+    printerTypes = ['slha', 'python', 'summary']
+    # All outputs should have the same format
+    out = list(outputDict.values())[0]
+    if all([(ptype not in out) for ptype in printerTypes]):
+        header = "#In order to build the summary, one of the following types of printer must be available:\n %s \n" % str(printerTypes)
+        with open(outputFile, 'w') as f:
+            f.write(header)
+        return
+
+    # Header:
+    header = "#Global results summary (%i files)\n" % len(outputDict)
+    header += "#The most constraining analysis corresponds to the one with largest observed r.\n"
+    header += "#The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.\n"
+
+    # Get summary information:
+    summaryList = []
+    fnames = list(outputDict.keys())
+    fnames.sort()  # we want a canonical order
+
+    for fname in fnames:
+        output = outputDict[fname]
+        if output is None:
+            continue
+        # default values (in case of empty results):
+        summaryDict = OrderedDict({'filename': fname,
+                                 'MostConstrainingAnalysis': 'N/A',
+                                 'r_max': -1,
+                                 'r_exp': -1,
+                                 'MostSensitive(ATLAS)': 'N/A',
+                                 'r(ATLAS)': -1,
+                                 'r_exp(ATLAS)': -1,
+                                 'MostSensitive(CMS)': 'N/A',
+                                 'r(CMS)': -1,
+                                 'r_exp(CMS)': -1
+                                   })
+
+        if 'python' in output:
+            sDict = getSummaryFrom(output['python'], 'python')
+        elif 'slha' in output:
+            sDict = getSummaryFrom(output['slha'], 'slha')
+        elif 'summary' in output:
+            sDict = getSummaryFrom(output['summary'], 'summary')
+        else:
+            sDict = {}
+
+        for key in summaryDict:
+            if key in sDict:
+                summaryDict[key] = sDict[key]
+
+        summaryList.append(summaryDict)
+
+    # Get column labels and widths:
+    labels = list(summaryList[0].keys())
+    cwidths = []
+    fstr = '%s'  # format for strings
+    ffloat = '%1.3g'  # format for floats
+    for label in labels:
+        maxlength = max([len(ffloat % entry[label]) if isinstance(entry[label], (float, int))
+                       else len(fstr % entry[label]) for entry in summaryList])
+        maxlength = max(maxlength, len(label))
+        cwidths.append(maxlength)
+
+    columns = '#'
+    columns += '  '.join([label.ljust(cwidths[i])
+                          for i, label in enumerate(labels)])
+    # Remove one blank space to make labels match values
+    columns = columns.replace(' ', '', 1)
+    columns += '\n'
+
+    with open(outputFile, 'w') as f:
+        f.write(header)
+        f.write(columns)
+
+        for entry in summaryList:
+            row = '  '.join([(ffloat % entry[label]).ljust(cwidths[j])
+                           if isinstance(entry[label], (float, int))
+                           else (fstr % entry[label]).ljust(cwidths[j])
+                           for j, label in enumerate(labels)])
+            f.write(row+'\n')
+    return
+
+
+def getSummaryFrom(output, ptype):
+    """
+    Retrieves information about the output according to the printer type (slha,python or summary)
+
+    :param output: output (dictionary for ptype=python or string for ptype=slha/summary)
+    :param ptype: Printer type (slha, python or summary)
+
+    :return: Dictionary with the output information
+    """
+
+    summaryDict = {}
+    if ptype == 'python':
+        info = getInfoFromPython(output)
+    elif ptype == 'slha':
+        info = getInfoFromSLHA(output)
+    elif ptype == 'summary':
+        info = getInfoFromSummary(output)
+    else:
+        return summaryDict
+
+    if info is None:
+        return summaryDict
+    else:
+        rvals, rexp, anaIDs = info
+
+    # Sort results by r_obs:
+    rvalswo = copy.deepcopy(rvals)
+    rvalswo[rvalswo is None] = -1
+    asort = rvalswo.argsort()[::-1]
+    rvals = rvals[asort]
+    anaIDs = anaIDs[asort]
+    rexp = rexp[asort]
+    summaryDict['r_max'] = rvals[0]
+    summaryDict['r_exp'] = rexp[0]
+    summaryDict['MostConstrainingAnalysis'] = anaIDs[0]
+
+    # Sort results by r_obs:
+    rvalswo = copy.deepcopy(rexp)
+    rvalswo[rvalswo is None] = -1
+    # Sort results by r_exp:
+    asort = rvalswo.argsort()[::-1]
+    rvals = rvals[asort]
+    anaIDs = anaIDs[asort]
+    rexp = rexp[asort]
+    iATLAS, iCMS = -1, -1
+    for i, anaID in enumerate(anaIDs):
+        if rexp[i] < 0:
+            continue
+        if 'ATLAS' in anaID and iATLAS < 0:
+            iATLAS = i
+        elif 'CMS' in anaID and iCMS < 0:
+            iCMS = i
+
+    if iATLAS >= 0:
+        summaryDict['r(ATLAS)'] = rvals[iATLAS]
+        summaryDict['r_exp(ATLAS)'] = rexp[iATLAS]
+        summaryDict['MostSensitive(ATLAS)'] = anaIDs[iATLAS]
+
+    if iCMS >= 0:
+        summaryDict['r(CMS)'] = rvals[iCMS]
+        summaryDict['r_exp(CMS)'] = rexp[iCMS]
+        summaryDict['MostSensitive(CMS)'] = anaIDs[iCMS]
+
+    return summaryDict
+
+
+def getInfoFromPython(output):
+    """
+    Retrieves information from the python output
+
+    :param output: output (dictionary)
+
+    :return: list of r-values,r-expected and analysis IDs. None if no results are found.
+    """
+
+    if 'ExptRes' not in output or not output['ExptRes']:
+        return None
+    rvals = np.array([res['r'] for res in output['ExptRes']])
+    rexp = np.array([res['r_expected'] if res['r_expected']
+                   else -1 for res in output['ExptRes']])
+    anaIDs = np.array([res['AnalysisID'] for res in output['ExptRes']])
+
+    return rvals, rexp, anaIDs
+
+
+def getInfoFromSLHA(output):
+    """
+    Retrieves information from the SLHA output
+
+    :param output: output (string)
+
+    :return: list of r-values,r-expected and analysis IDs. None if no results are found.
+    """
+
+    import pyslha
+    results = pyslha.readSLHA(output, ignorenomass=True, ignorenobr=True)
+    bname = None
+    for b in results.blocks.values():
+        if b.name.lower() == 'SModelS_Exclusion'.lower():
+            bname = b.name
+    if bname is None or len(results.blocks[bname]) <= 1:
+        return None
+
+    # Get indices for results:
+    resI = list(set([k[0] for k in results.blocks[bname].keys() if k[0] > 0]))
+    rvals = np.array([results.blocks[bname][(i, 1)] for i in resI])
+    rexp = np.array([results.blocks[bname][(i, 2)]
+                   if results.blocks[bname][(i, 2)] != 'N/A' else -1 for i in resI])
+    anaIDs = np.array([results.blocks[bname][(i, 4)] for i in resI])
+
+    return rvals, rexp, anaIDs
+
+
+def getInfoFromSummary(output):
+    """
+    Retrieves information from the summary output
+
+    :param output: output (string)
+
+    :return: list of r-values,r-expected and analysis IDs. None if no results are found.
+    """
+
+    lines = output.splitlines()
+    rvals = []
+    rexp = []
+    anaIDs = []
+    for line in lines:
+        if 'The highest r value is' in line:
+            rmax = line.split('=')[1].strip()
+            ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
+                         for x in rmax])[0][0]  # Get when the value ends
+            rmax = eval(rmax[:ff])
+            anaMax = line.split('from')[1].split()[0].replace(',', '')
+            rexpMax = -1
+            if 'r_expected' in line and "r_expected not available" not in line:
+                rexpMax = line.split('r_expected')[-1]
+                rexpMax = rexpMax.split('=')[1]
+                ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
+                             for x in rexpMax])[0][0]  # Get when the value ends
+                rexpMax = eval(rexpMax[:ff])
+            rvals.append(rmax)
+            anaIDs.append(anaMax)
+            rexp.append(rexpMax)
+        elif 'analysis with highest available r_expected' in line:
+            # the space is required to have at least one non-digit character after the value
+            rAna = line.split('=')[-1] + ' '
+            ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
+                         for x in rAna])[0][0]  # Get when the value ends
+            rAna = eval(rAna[:ff])
+            rexpAna = -1
+            if 'r_expected' in line:
+                rexpAna = line.split('r_expected')[-1]
+                rexpAna = rexpAna.split('=')[1]
+                ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
+                             for x in rexpAna])[0][0]  # Get when the value ends
+                rexpAna = eval(rexpAna[:ff])
+            if 'CMS' in line:
+                anaID = 'CMS-'+line.split('CMS-')[1].split(' ')[0].split(',')[0]
+            else:
+                anaID = 'ATLAS-' + \
+                        line.split('ATLAS-')[1].split(' ')[0].split(',')[0]
+            anaID = anaID.split()[0].strip().replace(',', '')
+            rvals.append(rAna)
+            anaIDs.append(anaID)
+            rexp.append(rexpAna)
+
+    if not rvals:
+        return None
+    rvals = np.array(rvals)
+    rexp = np.array(rexp)
+    anaIDs = np.array(anaIDs)
+
+    return rvals, rexp, anaIDs

@@ -10,22 +10,19 @@ SModelS User Manual
 
 SModelS is an automatic, public tool for interpreting simplified-model results from the LHC.
 It is based on a general procedure to decompose Beyond the Standard Model
-(BSM) collider signatures presenting a Z\ :sub:`2` symmetry into Simplified Model
+(BSM) collider signatures presenting a Z\ :sub:`2`-like symmetry into Simplified Model
 Spectrum (SMS) topologies. Our method provides a way to cast BSM predictions
 for the LHC in a model independent framework, which can be directly confronted
-with the relevant experimental constraints. Our concrete implementation
-currently focusses on supersymmetry searches with missing energy, for which a
-large variety of SMS results from ATLAS and CMS are available. The main
-ingredients are
+with the relevant experimental constraints. The main SModelS ingredients are
 
 * the decomposition of the BSM spectrum into SMS topologies
 * a database of experimental SMS results
-* the interface between decomposition and results database (to check limits)
+* the interface between decomposition and results database, including the tools to perform various kinds of statistical inference 
 
 as illustrated in the graphics below. 
 
 .. image:: images/smodelsScheme.png
-   :width: 70%
+   :width: 60%
 
 
 Contents

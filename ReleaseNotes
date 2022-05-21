@@ -1,16 +1,136 @@
-Release v2.0.0, Nov 2018
+
+Release v2.2.1, xxx
 =======================================================
 
-  * Included Particle class
-  * Particles are compared according to their properties
+  * small fixes for python 3.10
+  * bumped up pythia8 from 8.306 to 8.307
+  * fixes in analyses combination  
+  * included example on how to plot likelihoods from analysis combination
 
-Release v1.2.2, Wed 24 Oct 2018
+Release v2.2.0.post1, Mon 4 April 2022
 =======================================================
 
-  * Updated database, added T3GQ eff maps and a few ATLAS 13 TeV results
+  * removed dependency on importlib.metadata to make it work with python <= 3.7
+
+Release v2.2.0, Wed 30 March 2022
+=======================================================
+
+  * introduced (user-defined) combinations of analyses
+  * changed expected limits computed with pyhf from post-fit to pre-fit 
+  * a few smaller changes around expected likelihoods and limits
+  * changed default value of promptWidth parameter from 1e-8 to 1e-11 GeV
+  * allow ncpus to take on zero and negative values in ini file
+    [meaning use all but this (absolute) number of CPU cores]
+  * notion of "nonaggregated" databases introduced
+  * small fixes in recipes
+  * updates in references.bib, installation notes
+  * more small fixes in unit tests
+
+  * Database extension -- added new results from 4 ATLAS and 11 CMS analyses:
+    - results from ATLAS: 
+      ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2018-41 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
+    - results from CMS:  
+      CMS-SUS-16-050 (EM), CMS-SUS-18-004 (UL), CMS-SUS-18-007 (UL), CMS-SUS-19-008 (UL), CMS-SUS-19-011 (UL), CMS-SUS-19-013 (UL), CMS-SUS-20-001 (UL), CMS-SUS-20-002 (UL)
+    - recast with MadAnalysis5:  
+      CMS-SUS-16-039 (EM), CMS-SUS-16-048 (EM), CMS-SUS-19-006 (EM); all incl. covariance matrices
+
+Release v2.1.1, Tue 19 Oct 2021
+=======================================================
+
+  * caching weight matrix in simplified likelihoods
+  * notion of "debug" databases introduced
+  * introduced reportAllSRs option
+  * tiny fix in mybinder link (see https://pypi.org/project/smodels/)
+  * small fixes in unit tests
+  * improved truncated Gaussians in likelihoodsFromLimits (but kept as experimental feature)
+  * experimental features can now be turned on via ini file
+
+Release v2.1.0, Wed 29 Sep 2021
+=======================================================
+
+  * Ability to merge databases using '+' as a delimiter
+  * useSuperseded flag in getExpResults is marked as deprecated,
+    as we now just put superseded results in separate database
+  * Datasets now have an 'isCombinableWith' function
+  * Slightly extended output of summary printer
+  * Added scan summary (summary.txt) when running over multiple files
+  * Added 'expandedOutput' option to slha-printer
+  * Output for efficiency-map results now reports likelihoods L, L_max and L_SM (instead of L and chi^2)
+  * The likelihood is now maximized only for positive values of the signal strength
+    in the computation of L_max
+  * Pythia8 version in xsecComputer updated from 8226 to 8306
+  * Improved interactive plots
+
+  * Database extension:
+    - added new results from 5 ATLAS and 1 CMS analyses:
+      CMS-EXO-19-010 (disappearing tracks) UL,
+      ATLAS-SUSY-2016-08 (displaced leptons) EM,
+      ATLAS-SUSY-2018-10 (1l+jets) UL+EM,
+      ATLAS-SUSY-2018-12 (0l+jets) UL+EM,
+      ATLAS-SUSY-2018-22 (0l+jets) UL+EM,
+      ATLAS-SUSY-2018-23 (EWino, WH) UL
+    - added EM results for
+      ATLAS-SUSY-2017-03 (EWino, WZ),
+      ATLAS-SUSY-2018-06 (EWino, WZ),
+      ATLAS-SUSY-2018-14 (sleptons),
+      CMS-SUSY-14-021 (stops)
+    - created and added THSCPM10 and THSCPM11 EMs for ATLAS-SUSY-2016-32;
+    - replaced some 8 TeV ATLAS conf notes with the published results
+      (ATLAS-CONF-2013-007 -> ATLAS-SUSY-2013-09, ATLAS-CONF-2013-061 ->
+       ATLAS-SUSY-2013-18, ATLAS-CONF-2013-089  -> ATLAS-SUSY-2013-20)
+    - corrected off-shell regions of some existing efficiency-map results
+      (in three 13 TeV and eight 8 TeV analyses).
+
+Release v2.0.0, Mon 15 Mar 2021
+=======================================================
+
+  * Introduction of Particle class
+  * Introduction of model class
+  * Input model can now be defined by an SLHA file with QNUMBERS blocks
+  * Unified treatment of SLHA and LHE input files
+  * Decomposition and experimental results can now handle lifetime dependent results
+  * Added field "type" to the experimental results in the database
+  * Added (optional) "intermediateState" to the experimental results in the database
+  * Inclusive branches can now describe inclusive vertices
+  * Added possibility for analysis specific detector size
+  * New missing topologies algorithm and output
+  * Added "latest" and "latest_fastlim" database abbreviations
+  * Added support for central database server
+  * Small bug fix in likelihood computation
+  * Small fix due to an API change in pyhf 0.6
+  * Changes in output: width values added, coverage groups and others (see manual for details)
+  * Added option for signal strength multipliers in cross section calculator
+  * Small bug fixes in models
+
+
+Release v1.2.4, Thu 3 Sep 2020
+=======================================================
+
+  * added pyhf support
+  * pickle path bug fix
+  * bug fix for parallel xseccomputers
+  * Introduced the SMODELS_CACHEDIR environment variable to allow for a different
+    location of the cached database file
+  * fixed dataId bug in datasets
+
+Release v1.2.3, Mon 27 Apr 2020
+=======================================================
+
+  * database updated with results from more than 20 new analyses
+  * server for databases is now smodels.github.io, not smodels.hephy.at
+  * small bug fix for displaced topologies
+  * small fix in slha printer, r_expected was r_observed
+  * Downloaded database files now stored in $HOME/.cache/smodels
+
+Release v1.2.2, Tue 28 Nov 2018
+=======================================================
+
+  * Updated database, added T3GQ eff maps for 8TeV and a few ATLAS 13 TeV results
   * Database "official" now refers to a database without fastlim results, "official_fastlim", to the official database *with* fastlim
   * List displaced signatures in missing topologies
   * Small improvements in documentation
+  * Fix in clustering for asymmetric masses
+  * Small improvements in the interactive plots tool
 
 Release v1.2.1, Tue 9 Oct 2018
 =======================================================
@@ -39,13 +159,13 @@ Release v1.1.3, Wed 08 Aug 2018
     topologies to total theory prediction
   * Database path allows URLs
   * Python default changed from python2 to python3
-  * Fixed lastUpdate bug, now giving correct date 
+  * Fixed lastUpdate bug, now giving correct date
   * Changes in pickling (e.g. subpickling, removing redundant zeroes)
   * smodelsTools.py now has fixpermissions, for system-wide installs
   * fixed small issue with pair production of even particles
   * Moved the code documentation to the manual
   * Added option for installing within the source folder
- 
+
 Release v1.1.2, Fri 02 Mar 2018
 =======================================================
 

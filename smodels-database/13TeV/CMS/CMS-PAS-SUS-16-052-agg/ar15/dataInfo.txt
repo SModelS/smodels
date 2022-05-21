@@ -1,8 +1,0 @@
-dataId: ar15
-dataType: efficiencyMap
-observedN: 12
-expectedBG: 10.7
-bgError: 1.7728508115461943
-upperLimit: 0.258352*fb
-expectedUpperLimit: 0.235474*fb
-aggregated: SR2HcX

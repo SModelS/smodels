@@ -1,8 +1,0 @@
-dataId: ar5
-dataType: efficiencyMap
-observedN: 48
-expectedBG: 38.8
-bgError: 6.5360538553472765
-upperLimit: 0.789021*fb
-expectedUpperLimit: 0.535298*fb
-aggregated: SR1VLbX

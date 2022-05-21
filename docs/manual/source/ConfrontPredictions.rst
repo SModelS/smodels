@@ -45,7 +45,7 @@ This upper limit is easily computed using the number of observed and expected ev
 and their uncertainties and is typically stored in the :ref:`Database <database>`.
 Since most |EMrs| have several signal regions (|datasets|), there will be one theory prediction/upper limit
 for each |dataset|. By default SModelS keeps only the best |dataset|, i.e. the one with the largest
-ratio :math:`\mbox{(theory prediction)}/\mbox{(expected limit)}`. (See below for |covariace|)
+ratio :math:`r_\mathrm{exp}=(\mathrm{theory\,prediction})/(\mathrm{expected\, limit})`. (See below for |covariace|)
 Thus each |EMr| will have a single theory prediction/upper limit, corresponding to the best |dataset|
 (based on the expected limit).
 If the user wants to have access to all the |datasets|, the default
@@ -54,7 +54,7 @@ behavior can be disabled by setting *useBestDataset=False* in `theoryPredictions
 
 The procedure described above can be applied to all the |ExpRess| in the database, resulting
 in a list of theory predictions and upper limits for each |ExpRes|. A model can then be considered
-excluded by the experimental results if, for one or more predictions, we have *theory prediction* :math:`>` *upper limit* [*]_.
+excluded by the experimental results if, for one or more predictions, we have *theory prediction* :math:`>` *upper limit* [1]_.
 
 * **The upper limits for a given**  |ULr| **or** |EMr| **can be obtained using the** `getUpperLimitFor  method <experiment.html#experiment.expResultObj.ExpResult.getUpperLimitFor>`_
 
@@ -66,8 +66,8 @@ Likelihood Computation
 
 In the case of |EMrs|, additional statistical information
 about the constrained model can be provided by the SModelS output.
-Following the procedure detailed in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_, we construct a simplified
-likelihood which describes the plausibility of the data :math:`D`, given a signal strength :math:`\mu`:
+Most importantly, we can compute a likelihood,
+which describes the plausibility of a signal strength :math:`\mu` given the data :math:`D`:
 
 .. math::
    \mathcal{L}(\mu,\theta|D) =  P\left(D|\mu + b + \theta \right) p(\theta)
@@ -75,46 +75,54 @@ likelihood which describes the plausibility of the data :math:`D`, given a signa
 
 Here, :math:`\theta` denotes the nuisance parameter that describes the
 variations in the signal and background contribtions due to systematic
-effects. We assume :math:`p(\theta)` to follow a Gaussian distribution centered
+effects.
+
+If no information about the correlation of signal regions is available
+(or if its usage is turned off, see :doc:`Using SModelS <RunningSModelS>`),
+we compute a simplified likelihood for the most sensitive (a.k.a. best) signal region,
+i.e. the signal region with the highest :math:`r_\mathrm{exp}=(\mathrm{theory\,prediction})/(\mathrm{expected\, limit})`,
+following the procedure detailed in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_.
+
+This means we assume :math:`p(\theta)` to follow a Gaussian distribution centered
 around zero and with a variance of :math:`\delta^2`,
 whereas :math:`P(D)` corresponds to a counting variable and is thus
 properly described by a Poissonian. The complete likelihood thus reads:
 
 .. math::
-   \mathcal{L}(\mu,\theta|D) = \frac{(\mu + b + \theta)^{n_{obs}} e^{\mu + b + \theta}}{n_{obs}!} exp \left( -\frac{\theta^2}{2\delta^2} \right)
+   \mathcal{L}(\mu,\theta|D) = \frac{(\mu + b + \theta)^{n_{obs}} e^{-(\mu + b + \theta)}}{n_{obs}!} exp \left( -\frac{\theta^2}{2\delta^2} \right)
 
 where :math:`n_{obs}` is the number of observed events in the signal region.
-A test statistic :math:`T` can now be constructed from a likelihood ratio test:
+From this likelihood we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al.,
+`Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_.
+We then search for the value :math:`CL_s = 0.95` using the Brent bracketing technique available through the `scipy optimize library <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_.
+This is used for the computation the observed and expected :math:`r` values.
 
-.. math::
-   \begin{split}T = -2 \ln \frac{H_0}{H_1} = -2 \ln \left(\frac{\mathcal{L}(\mu=n_{\mathrm{signal}},\theta|D)}{sup\{\mathcal{L}(\mu,\theta|D) : \mu \in \mathbb{R}^+ \}}\right)\end{split}
+In addition, SModelS reports *for each* |EMr| :
+  * the likelihood for the hypothezised signal, :math:`\mathcal{L}_{\mathrm{BSM}}` given by :math:`\mu=n_{\mathrm{signal}}`,
+  * the likelihood for the SM,  :math:`\mathcal{L}_{\mathrm{SM}}` given by :math:`\mu=0`, and
+  * the maximum likelihood :math:`\mathcal{L}_{\mathrm{max}}` obtained by setting :math:`\mu=n_{\mathrm{obs}}-b`.
 
-As the signal hypothesis in the numerator presents a special case of the
-likelihood in the denominator, the Neyman-Pearson lemma holds, and we
-can assume :math:`T` to be distributed according to a :math:`\chi^2` distribution
-with one degree of freedom. Because :math:`H_0` assumes the signal strength of
-a particular model, :math:`T=0`  corresponds to a perfect match between that
-model's prediction and the measured data. :math:`T \gtrsim 1.96` corresponds to
-a 95\% confidence level upper limit.
-While :math:`n_{\mathrm{obs}}`, :math:`b`  and :math:`\delta_{b}` are directly extracted from
-the data set
-(coined *observedN*, *expectedBG* and *bgError*, respectively),
+The values for :math:`n_{\mathrm{obs}}`, :math:`b`  and :math:`\delta_{b}` are directly extracted from
+the data set (coined *observedN*, *expectedBG* and *bgError*, respectively), while
 :math:`n_{\mathrm{signal}}` is obtained from the calculation of the
 theory predictions. A default 20\% systematical uncertainty is assumed for :math:`n_{\mathrm{signal}}`,
 resulting in :math:`\delta^2 = \delta_{b}^2 + \left(0.2 n_{\mathrm{signal}}\right)^2`.
 
-SModelS reports the :math:`\chi^2` (:math:`T` values) and likelihood *for each* |EMr|,
-together with the observed and expected :math:`r` values.
-We note that in the general case analyses may be correlated, so summing up the :math:`T`
-values will no longer follow a :math:`\chi^2_{(n)}`  distribution.
+We note that in the general case analyses may be correlated, so the likelihoods from different analyses
+cannot straightforwardly be combined into a global one.
 Therefore, for a conservative interpretation, only the result with the best expected limit should be used.
 Moreover, for a statistically rigorous usage in scans, it is recommended to check that the analysis giving the
 best expected limit does not wildly jump within
 continuous regions of parameter space that give roughly the same phenomenology.
 
+Finally, note that in earlier SModelS versions, a :math:`\chi^2` value,
+defined as :math:`\chi^2=-2 \ln \frac{\mathcal{L}_{\mathrm{BSM}}}{\mathcal{L}_{\mathrm{max}}}` was reported instead of
+:math:`\mathcal{L}_{\mathrm{max}}` and :math:`\mathcal{L}_{\mathrm{SM}}`.
+From v2.1 onwards, the definition of a test statistic for, e.g., likelihood ratio tests, is left to the user.
 
-* **The** :math:`\chi^2` **for a given** |EMr| **is computed using the** `chi2  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.chi2>`_
+
 * **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.likelihood>`_
+* **The maximum likelihood for a given** |EMr| **is computed using the** `lmax  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.lmax>`_
 
 
 .. _combineSRs:
@@ -122,52 +130,116 @@ continuous regions of parameter space that give roughly the same phenomenology.
 Combination of Signal Regions
 -----------------------------
 
-If the experiment provides a covariance matrix together with the efficiency maps, signal regions can be combined. 
-This is implemented in SModelS v1.1.3 onwards, following as above the simplified likelihood approach described in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_. 
+The likelihoods from individual signal regions can be combined, if the experimental analysis provides the required information about the correlation between distinct signal regions. Currently two approaches are available, depending on which type of information is provided by the experimental collaborations.
+When using *runSModelS.py*, the combination of signal regions is turned on or off with the parameter **options:combineSRs**, see :ref:`parameter file <parameterFileCombineSRs>`. Its default value is *False*, in which case only the result from the best expected signal region (best SR) is reported.
+If *combineSRs = True*, the combined result is shown instead.
 
-SModelS allows for a marginalization as well as a profiling of the nuisances, with profiling being the default (an example for using marginalisation can be found in :ref:`How To's <Examples>`).
-Since CPU performance is a concern in SModelS, we try to aggregate the official results, which can comprise >100 signal regions, to an acceptable number of aggregate regions. Here *acceptable* means as few aggregate regions as possible without loosing in precision or constraining power. 
+
+.. _simplifiedllhd:
+
+Simplified Likelihood Approach
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The first approach is applicable when information about the (background) correlations is available in the form of a covariance matrix.
+Some CMS analyses provides such matrix together with the efficiency maps.
+The usage of such covariance matrices
+is implemented in SModelS v1.1.3 onwards, following as above the simplified likelihood approach described in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_.
+
+Since CPU performance is a concern in SModelS, we try to aggregate the official results, which can comprise >100 signal regions, to an acceptable number of aggregate regions. Here *acceptable* means as few aggregate regions as possible without loosing in precision or constraining power.
 The CPU time scales roughly linearly with the number of signal regions, so aggregating e.g. from 80 to 20 signal regions means gaining a factor 4 in computing time.
 
 Under the assumptions described in `CMS-NOTE-2017-001 <https://cds.cern.ch/record/2242860?ln=en>`_,
 the likelihood for the signal hypothesis when combining signal regions is given by:
 
 .. math::
-   \mathcal{L}(\mu,\theta|D) = \prod_{i=1}^{N} \frac{(\mu s_i^r + b_i + \theta_i)^{n_{obs}^i} e^{\mu s_i^r + b_i + \theta_i}}{n_{obs}^i!} exp \left( -\frac{1}{2} \vec{\theta}^T V^{-1} \vec{\theta} \right)
+   \mathcal{L}(\mu,\theta|D) = \prod_{i=1}^{N} \frac{(\mu s_i^r + b_i + \theta_i)^{n_{obs}^i} e^{-(\mu s_i^r + b_i + \theta_i)}}{n_{obs}^i!} exp \left( -\frac{1}{2} \vec{\theta}^T V^{-1} \vec{\theta} \right)
 
 where the product is over all :math:`N` signal regions, :math:`\mu` is the overall signal strength, :math:`s_i^r` the relative signal strength
-in each signal region and :math:`V` represents the covariance matrix. 
+in each signal region and :math:`V` represents the covariance matrix.
 Note, however, that unlike the case of a single signal region, we do not include any signal uncertainties, since this
-should correspond to a second order effect.
+should correspond to a second-order effect.
 
-
-Using the above likelihood we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the 
-test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al., 
-`Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_. 
+As above, we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the
+test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al.,
+`Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_.
 We then search for the value :math:`CL_s = 0.95` using the Brent bracketing technique available through the `scipy optimize library <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_.
 Note that the limit computed through this procedure applies to the total signal yield summed over all signal regions and assumes
 that the relative signal strengths in each signal region are fixed by the signal hypothesis. As a result, the above limit has to be computed
 for each given input model (or each :ref:`theory prediction <theoryPredictions>`), thus considerably increasing CPU time.
 
-When using *runSModelS.py*, the combination of signal regions is turned on or off with the parameter **options:combineSRs**, see :ref:`parameter file <parameterFile>`. Its default value is *False*, in which case only the result from the best expected signal region (best SR) is reported. 
-If *combineSRs = True*, both the combined result and the one from the best SR are quoted. 
-
-In the :ref:`figure below <combinedSRfig>` we show the constraints on the simplified model 
-`T2bbWWoff <http://smodels.hephy.at/wiki/SmsDictionary#T2bbWWoff>`_ when using
+In the :ref:`figure below <combinedSRfig>` we show the constraints on the simplified model
+`T2bbWWoff <http://smodels.github.io/docs/SmsDictionary#T2bbWWoff>`_ when using
 the best signal region (left), all the 44 signal regions considered in `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ (center) and the aggregated signal regions included in the SModelS database (right).
 As we can see, while the curve obtained from the combination of all 44 signal regions is much closer to the official exclusion than the one obtained using only the best SR. Finally, the aggregated result included in the SModelS database (total of 17 aggregate regions) comes with little loss in constraining power, although it considerable reduces the running time.
 
 .. _combinedSRfig:
 
-+-----------------------------------------+-----------------------------------------+-----------------------------------------+
-| .. image:: images/T2bbWWoff_bestSR.png  | .. image:: images/T2bbWWoff_44.png      | .. image:: images/T2bbWWoff_17.png      |
-|            :width: 300px                |            :width: 300px                |            :width: 300px                |
-| Best signal region                      | 44 signal regions                       | 17 aggregate regions                    |
-+-----------------------------------------+-----------------------------------------+-----------------------------------------+
+   +-----------------------------------------+-----------------------------------------+-----------------------------------------+
+   | .. image:: images/T2bbWWoff_bestSR.png  | .. image:: images/T2bbWWoff_44.png      | .. image:: images/T2bbWWoff_17.png      |
+   |            :width: 300px                |            :width: 300px                |            :width: 300px                |
+   |                                         |                                         |                                         |
+   | Best signal region                      | 44 signal regions                       | 17 aggregate regions                    |
+   +-----------------------------------------+-----------------------------------------+-----------------------------------------+
+
+   Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of 17 aggregate signal regions (center), and the combination of all 44 signal regions (right).
 
 
-Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of 17 aggregate signal regions (center), and the combination of all 44 signal regions (right).
+
+.. pyhfllhd:
+
+Full Likelihoods (pyhf) Approach
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In early 2020, following `ATL-PHYS-PUB-2019-029 <https://cds.cern.ch/record/2684863>`_,
+ATLAS has started to provide *full likelihoods* for results with full Run 2 luminosity (139/fb),
+using a JSON serialisation of the likelihood. This JSON format describes the `HistFactory <https://cds.cern.ch/record/1456844>`_ family of statistical models, which is used by the majority of ATLAS analyses.
+Thus background estimates, changes under systematic variations, and observed data counts are provided at the same fidelity as used in the experiment.
+
+SModelS supports the usage of these JSON likelihoods from v1.2.4 onward via an interface to the
+`pyhf <https://scikit-hep.org/pyhf/>`_ package, a pure-python implementation of the HistFactory statistical model. This means that for |EMr| from ATLAS, for which a JSON likelihood is available and when the combination of signal regions is turned on, the evaluation of the likelihood is relegated to `pyhf <https://scikit-hep.org/pyhf/>`_. Internally, the whole calculation
+is based on the asymptotic formulas of *Asymptotic formulae for likelihood-based tests of new physics*, `arXiv:1007.1727 <https://arxiv.org/abs/1007.1727>`_.
+
+The :ref:`figure below <combinedSRfigPyhf>` examplifies how the constraints improve from
+using the best signal region (left) to using the full likelihood (right).
+
+.. _combinedSRfigPyhf:
+
++-----------------------------------------+-----------------------------------------+
+| .. image:: images/TChiWH_bestSR.png     | .. image:: images/TChiWH_pyhf.png       |
+|            :width: 300px                |            :width: 300px                |
+|                                         |                                         |
+| Best signal region                      | pyhf combining 9 signal regions         |
++-----------------------------------------+-----------------------------------------+
+
+Figure: Comparison of exclusion curves for `ATLAS-SUSY-2019-08 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2019-08/>`_ using only the best signal region (left), and the combination of all 9 signal regions with pyhf (right).
+
+.. _analysesCombination:
+
+Combination of different Analyses
+---------------------------------
+
+Starting with SModelS v2.2, it is possible to combine likelihoods from
+different analyses, assuming that their signal regions are approximately
+uncorrelated. As of now, the information of which analyses meet this criterion
+is not given by SModelS itself, and has to be provided by the user (see option
+:ref:`combineAnas <parameterFileCombineAnas>`).
+
+.. First systematic studies of correlations between various CMS and ATLAS are however underway, see for example contribution 16 of the `Les Houches Working Group report <https://arxiv.org/abs/2002.12220>`_.
+
+For these combinations, the combined likelihood :math:`\mathcal{L}_{C}` is
+simply the product of the individual analysis likelihoods,
+:math:`\mathcal{L}_{i}`. Furthermore, we assume a common signal strength
+:math:`\mu` for all analyses:
+
+.. math::
+   \mathcal{L}_{C}(\mu) = \prod_{i=1} \mathcal{L}_{i}(\mu\; s^{i})
 
 
-.. [*] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model
-   is being tested by a large number of results simultaneously.
+The individual likelihoods can correspond to the best signal region, if the combination of signal regions is turned off, or to the combined signal region likelihood otherwise.
+For the determination of the maximum likelihood, `scipy.optimize.minimize <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html>`_ is used
+with the method `BFGS
+<https://docs.scipy.org/doc/scipy/reference/optimize.minimize-bfgs.html#optimize-minimize-bfgs>`_ in order to compute :math:`\mu_{max}` and :math:`\mathcal{L}_{max} = \mathcal{L}_{C}(\mu_{max})`.
+
+The resulting likelihood and :math:`r`-values for the combination are displayed in the :ref:`output <outputDescription>` along with the individual results for each analysis.
+
+.. [1] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model is being tested by a large number of results simultaneously.

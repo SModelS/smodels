@@ -12,11 +12,9 @@
 
 from __future__ import print_function
 from smodels.tools.ioObjects import SlhaStatus
-from smodels.tools.physicsUnits import fb
 
 def main(args):   
     status = SlhaStatus( args.filename, 
-                 sigmacut=args.sigmacut*fb,
                  findIllegalDecays=args.illegal, checkXsec=args.xsec, 
                  findMissingDecayBlocks=args.decayBlocks) # pylint: disable-msg=C0103
 

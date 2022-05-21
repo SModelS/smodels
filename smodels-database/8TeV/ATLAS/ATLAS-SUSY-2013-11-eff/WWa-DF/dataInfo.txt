@@ -1,7 +1,0 @@
-dataId: WWa-DF
-dataType: efficiencyMap
-observedN: 70
-expectedBG: 73.6
-bgError: 7.9
-upperLimit: 1.07*fb
-expectedUpperLimit: 1.17*fb

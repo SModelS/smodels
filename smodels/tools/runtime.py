@@ -2,7 +2,7 @@
 
 """
 .. module:: runtime
-    :synopsis: Tools to gather info about runtime enviroment,
+    :synopsis: Tools to gather info about the runtime environment,
                ( nCPUs() ), or obtain file type ( filetype() ). Pointer
                to model file is also kept here.
 
@@ -12,6 +12,10 @@
 
 ## place to keep the pointer to the model file (default = mssm)
 modelFile="smodels.share.models.mssm"
+
+_experimental = False ## turn on experimental features
+
+_deltas_rel_default = .2 ## the default relative error on the signal strength
 
 def filetype ( filename ):
     """ obtain information about the filetype of an input file,
@@ -24,19 +28,33 @@ def filetype ( filename ):
     import os
     if not os.path.exists ( filename ):
         return None
-    if filename[-5:].lower() == ".slha":
+    if filename.endswith(".slha"):
         return "slha"
-    if filename[-4:].lower() == ".lhe":
+    if filename.endswith(".SLHA"):
+        return "slha"
+    if filename.endswith(".lhe" ):
         return "lhe"
-    with open ( filename ) as f:
-        for line in f:
-            if "<LesHouchesEvents" in line:
-                return "lhe"
-            if "<event>" in line:
-                return "lhe"
-            if "block " in line.lower():
-                return "slha"
+    if filename.endswith(".LHE" ):
+        return "lhe"
+    try:
+        with open ( filename, "rt" ) as f:
+            for line in f:
+                if "<LesHouchesEvents" in line:
+                    return "lhe"
+                if "<event>" in line:
+                    return "lhe"
+                if "block " in line.lower():
+                    return "slha"
+    except UnicodeDecodeError:
+        ## a binary file??
+        return None
     return None
+
+def experimentalFeatures():
+    """ a simple boolean flag to turn experimental features on/off,
+    can be turned on and off via options:experimental in parameters.ini.
+    """
+    return _experimental
 
 def nCPUs():
     """ obtain the number of CPU cores on the machine, for several
@@ -44,18 +62,18 @@ def nCPUs():
     try:
         import multiprocessing
         return multiprocessing.cpu_count()
-    except ImportError as e:
+    except ImportError:
         pass
     try:
         import psutil
         return psutil.NUM_CPUS
-    except ImportError as e:
+    except ImportError:
         pass
     try:
         import os
         res = int(os.sysconf('SC_NPROCESSORS_ONLN'))
         if res>0: return res
-    except ImportError as e:
+    except ImportError:
         pass
     return None
 

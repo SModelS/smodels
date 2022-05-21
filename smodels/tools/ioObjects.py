@@ -53,10 +53,10 @@ class OutputStatus(object):
         self.filestatus = status[0]
         self.warnings = status[1]
         self.databaseVersion = databaseVersion
-        self.statusStrings = {-1: "#could not run the decomposition",
-                              - 3: "#no cross sections above sigmacut found",
-                              - 4: "#database not found",
-                              - 2: "#bad input file, did not run decomposition",
+        self.statusStrings = {-4: "#database not found",
+                              -3: "#no topology passed cut on production cross section",
+                              -2: "#bad input file, did not run decomposition",
+                              -1: "#could not run the decomposition",
                                0: "#no matching experimental results",
                                1: "#decomposition was successful"}
 
@@ -110,15 +110,12 @@ class FileStatus(object):
         self.status = 0, "File not checked\n"
 
 
-    def checkFile(self, inputFile, sigmacut=None):
+    def checkFile(self, inputFile):
         """
         Run checks on the input file.
         
-        :parameter inputFile: path to input file
-        :parameter sigmacut: sigmacut in fb        
+        :parameter inputFile: path to input file   
         """
-        
-        
         
         inputType = runtime.filetype( inputFile )
 
@@ -126,7 +123,7 @@ class FileStatus(object):
             self.filestatus = LheStatus(inputFile)
             self.status = self.filestatus.status
         elif inputType == 'slha':
-            self.filestatus = SlhaStatus(inputFile, sigmacut=sigmacut)
+            self.filestatus = SlhaStatus(inputFile)
             self.status = self.filestatus.status
         else:
             self.filestatus = None
@@ -176,13 +173,12 @@ class SlhaStatus(object):
     = -2: case of formal problems, e.g. no cross sections
         
     """
-    def __init__(self, filename, sigmacut=.03 * fb,
+    def __init__(self, filename,
                  findMissingDecayBlocks=True,
                  findIllegalDecays=False, checkXsec=True):
         
         """
         :parameter filename: path to input SLHA file
-        :parameter sigmacut: sigmacut in fb
         :parameter findMissingDecayBlocks: if True add a warning for missing decay blocks
         :parameter findIllegalDecays: if True check if all decays are kinematically allowed
         :parameter checkXsec: if True check if SLHA file contains cross sections
@@ -190,7 +186,6 @@ class SlhaStatus(object):
         """
         
         self.filename = filename
-        self.sigmacut = sigmacut
         self.slha = self.read()
         
         from smodels.particlesLoader import BSMList
@@ -199,14 +194,13 @@ class SlhaStatus(object):
             self.status = -3, "Could not read input SLHA file"
             return
         try:
-            model = Model(BSMList,SMList,filename)
-            model.updateParticles()     
+            model = Model(BSMList,SMList)
+            model.updateParticles(filename)
             self.model = model
             self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
             self.xsec = self.hasXsec(checkXsec)
             self.decayBlocksStatus = self.findMissingDecayBlocks(findMissingDecayBlocks)
             self.status = self.evaluateStatus()
-        ## except Exception,e:
         except (SModelSError,TypeError,IOError,ValueError,AttributeError) as e:
             self.status = -4, "Error checking SLHA file: "+str(e)
 
@@ -217,7 +211,7 @@ class SlhaStatus(object):
         
         """
         try: ret = pyslha.readSLHAFile(self.filename)
-        except (pyslha.AccessError,pyslha.ParseError,IOError): 
+        except (pyslha.ParseError,IOError): 
             return None
         if not ret.blocks["MASS"]: return None
         return ret

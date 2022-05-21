@@ -1,9 +1,0 @@
-id: CMS-SUS-16-049
-sqrts: 13*TeV
-lumi: 35.9/fb
-url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-16-049/index.html
-arxiv: http://arxiv.org/abs/1707.03316
-publication: J. High Energy Phys. 10 (2017) 005, http://dx.doi.org/10.1007/JHEP10(2017)005
-contact: cms-phys-conveners-sus@cern.ch
-implementedBy: Juhi Dutta
-lastUpdate: 2017/12/28

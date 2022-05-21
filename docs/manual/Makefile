@@ -56,23 +56,32 @@ copy_files:
 	cp ../../parameters.ini source/images/
 	cp ../../iplots_parameters.py source/images/
 	cp ../../smodels/etc/parameters_default.ini source/images/
-	cp ../../cpp/run.cpp source/images/
+	cp ../../cpp/run.cpp source/examples/
 	cp ../../Example.py source/examples/
 
 update_code:
 	sphinx-apidoc -f -T -o source/ ../../smodels/experiment/
 	sphinx-apidoc -f -T -o source/ ../../smodels/theory/
 	sphinx-apidoc -f -T -o source/ ../../smodels/tools/
+	sphinx-apidoc -f -T -o source/ ../../smodels/share/
 
 RstFilesFromHelp:
 	./rstFromHelpFiles.py
 
-html: update_code copy_files recipes RstFilesFromHelp htmlnorecipes
+html: pythondeps update_code copy_files recipes RstFilesFromHelp htmlnorecipes cpinteractive
+
+cpinteractive:
+	@cp source/recipes/interactivePlotsExample.html $(BUILDDIR)/html/
+
+pythondeps:
+	@cat ../../smodels/share/requirements.txt | sed -e 's/^/ * /' > source/dependencies.rst
 
 htmlnorecipes:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+	@echo "Try:"
+	@echo "xdg-open $(BUILDDIR)/html/index.html"
 
 
 dirhtml:
@@ -134,13 +143,13 @@ latex:
 latexpdf:
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
 	@echo "Running LaTeX files through pdflatex..."
-	$(MAKE) -C $(BUILDDIR)/latex all-pdf
+	buf_size=1000000 $(MAKE) -C $(BUILDDIR)/latex all-pdf
 	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/latex."
 
 latexpdfja:
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
 	@echo "Running LaTeX files through platex and dvipdfmx..."
-	$(MAKE) -C $(BUILDDIR)/latex all-pdf-ja
+	buf_size=1000000 $(MAKE) -C $(BUILDDIR)/latex all-pdf-ja
 	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/latex."
 
 text:

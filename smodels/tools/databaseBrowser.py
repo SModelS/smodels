@@ -17,17 +17,14 @@ from smodels.theory.auxiliaryFunctions import getAttributesFrom,getValuesForObj
 
 class Browser(object):
 
-    """Browses the database, exits if given path does not point to a valid
+    """
+    Browses the database, exits if given path does not point to a valid
     smodels-database. Browser can be restricted to specified run or experiment.
     """
-    
+
     def __init__(self, database, force_txt = False ):
         """
-        :ivar _selectedExpResults: list of experimental results loaded in the browser.
-                           Can be used to hold a subset of results in the database.
-                           By default all results are loaded.
-        
-        
+        :param force_txt: If True forces loading the text database.
         :param database: Path to the database or Database object
         """
 
@@ -100,16 +97,16 @@ class Browser(object):
         :return: list of field names (strings)
         """
 
-        attributes = getAttributesFrom(self)        
+        attributes = getAttributesFrom(self)
 
         if not showPrivate:
             attributes = list(filter(lambda a: a[0] != '_', attributes))
 
         return attributes
-        
+
     def getEfficiencyFor(self,expid,dataset,txname,massarray):
         """
-        Get an efficiency for the given experimental id, 
+        Get an efficiency for the given experimental id,
         the dataset name, the txname, and the massarray.
         Can only be used for EfficiencyMap-type experimental results.
         Interpolation is done, if necessary.
@@ -124,10 +121,10 @@ class Browser(object):
         #First select the experimental results matching the id and the result type:
         expres = None
         for expResult in self:
-            if expResult.getValuesFor('id')[0] != expid:
+            if expResult.globalInfo.id != expid:
                 continue
             else:
-                if 'efficiencyMap' in expResult.getValuesFor('dataType'):
+                if 'efficiencyMap' in [ds.dataInfo.dataType for ds in expResult.datasets]:
                     expres = expResult
                     break
 
@@ -141,7 +138,7 @@ class Browser(object):
 
     def getULFor(self,expid,txname,massarray, expected=False ):
         """
-        Get an upper limit for the given experimental id, the txname, 
+        Get an upper limit for the given experimental id, the txname,
         and the massarray.
         Can only be used for UL experimental results.
         Interpolation is done, if necessary.
@@ -158,10 +155,10 @@ class Browser(object):
         #First select the experimental results matching the id and the result type:
         expres = None
         for expResult in self:
-            if expResult.getValuesFor('id')[0] != expid:
+            if expResult.globalInfo.id != expid:
                 continue
             else:
-                if 'upperLimit' in expResult.getValuesFor('dataType'):
+                if 'upperLimit' in [ds.dataInfo.dataType for ds in expResult.datasets]:
                     expres = expResult
                     break
 
@@ -174,7 +171,7 @@ class Browser(object):
         for tx in txnames:
             if not tx.txName == txname:
                 continue
-            return tx.getValueFor(massarray,expected)
+            return tx.getULFor(massarray,expected)
 
         logger.warning( "Could not find TxName %s ." % (txname))
         return None
@@ -191,10 +188,10 @@ class Browser(object):
         #First select the experimental results matching the id and the result type:
         expres = None
         for expResult in self:
-            if expResult.getValuesFor('id')[0] != expid:
+            if expResult.globalInfo.id != expid:
                 continue
             else:
-                if 'efficiencyMap' in expResult.getValuesFor('dataType'):
+                if 'efficiencyMap' in [ds.dataInfo.dataType for ds in expResult.datasets]:
                     expres = expResult
                     break
 
@@ -269,9 +266,9 @@ def main(args):
 
     try:
         import IPython
-    except ImportError as e:
-        print ( "IPython is not installed. ", )
-        print ( "To use this script, please install ipython." )
+    except ImportError:
+        print("IPython is not installed.")
+        print("To use this script, please install ipython.")
         import sys
         sys.exit()
 

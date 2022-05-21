@@ -1,3 +1,15 @@
+Known Issues, v2.2.0
+=======================================================
+ * The mass and invisible compression is affected by the specific value of the promptWidth parameter; 
+   for particles with a total decay width < promptWidth, neither mass compression nor or invisible compression will be effective.
+ * In case of very small r-values, combination of analyses together with combineSRs=True can make SModelS crash
+ 
+Known Issues, v2.1.0
+=======================================================
+ * pythia8306 may not compile on Mac OS with clang. A simple fix is to fall back to
+   pythia8245 by changing smodels/lib/pythia8/pythiaversion accordingly.
+ * Due to the default rounding of input BSM masses to 1 digit, values of minmassgap should be integers in GeV units
+
 Known Issues, v2.0.0
 =======================================================
 
@@ -9,3 +21,4 @@ Known Issues, v2.0.0
  * SUSYHit includes the PDG codes 4000001 and 3000001 for some
    decays. These are not included in the SM particle definitions
    and should be added by the user, if needed.
+ * Parallel processing (ncpus > 1) may not work in some machines. Try using ncpus = 1 if this is the case.

@@ -126,8 +126,8 @@ if __name__ == "__main__":
 
     filename = args.lhe
 
-    model = Model(inputFile=filename, BSMparticles=BSMList, SMparticles=SMList)
-    model.updateParticles()
+    model = Model(BSMparticles=BSMList, SMparticles=SMList)
+    model.updateParticles(inputFile=filename)
     topList = decomposer.decompose(model)
     element = topList.getElements()[0]
-    print(asciidraw(element, border=args.border) )
+    print(asciidraw(element, border=args.border))

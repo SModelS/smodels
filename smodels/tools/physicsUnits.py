@@ -45,6 +45,8 @@ MeV = unum.Unum.unit('MeV', 10 ** 6 * eV)
 GeV = unum.Unum.unit('GeV', 10 ** 9 * eV)
 TeV = unum.Unum.unit('TeV', 10 ** 12 * eV)
 
+ns = unum.Unum.unit('ns', 1e-9*6.582e-25/GeV)
+
 #Define standard units to be used when storing data:
 standardUnits = [GeV, fb]
 
@@ -52,7 +54,7 @@ standardUnits = [GeV, fb]
 if __name__ == "__main__":
     """
     Called as script, will print some physicsUnits.
-    
+
     """
     three = 3.0 * fb
     print(three, "=", three.asUnit(pb))

@@ -1,7 +1,0 @@
-dataId: LM200
-dataType: efficiencyMap
-observedN: 69
-expectedBG: 83
-bgError: 21
-upperLimit: 1.8797E+00*fb
-expectedUpperLimit: 2.3503E+00*fb

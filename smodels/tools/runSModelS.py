@@ -115,7 +115,7 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     listOfExpRes = modelTester.loadDatabaseResults(parser, database)
 
     """ Test all input points """
-    modelTester.testPoints( fileList, inDir, outputDir, parser, databaseVersion,
+    modelTester.testPoints(fileList, inDir, outputDir, parser, databaseVersion,
                  listOfExpRes, timeout, development, parameterFile )
 
 if __name__ == "__main__":

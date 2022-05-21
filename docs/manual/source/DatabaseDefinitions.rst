@@ -16,6 +16,9 @@
 .. |elements| replace:: :ref:`elements <element>`
 .. |topology| replace:: :ref:`topology <topology>`
 .. |topologies| replace:: :ref:`topologies <topology>`
+.. |particle| replace:: :ref:`particle <particleClass>`
+.. |particles| replace:: :ref:`particles <particleClass>`
+
 
 .. _databaseDefs:
 
@@ -25,7 +28,7 @@ Database Definitions
 The so-called `experiment module <experiment.html#experiment>`_ 
 contains the basic tools necessary for handling the database of experimental results.
 The SModelS database collects experimental
-results of SUSY searches from both ATLAS and CMS, which are used to compute the
+results of searches from both ATLAS and CMS, which are used to compute the
 experimental constraints on specific models.
 Starting with version 1.1, the SModelS database includes two types of experimental constraints:
 
@@ -42,18 +45,22 @@ simutaneously handle both |UL| and |EM| results.
 Therefore, for both |UL| and |EM| constraints, the database obeys the following structure:
 
 * :ref:`Database <Database>`: collects a list of |ExpRess|.
-   * |ExpRes|: each |ExpRes| corresponds to an experimental preliminary result (i.e. a CONF-NOTE or PAS) or publication and contains a list of |Datasets| as well as general information about the result (luminosity, publication reference,...).
+  
+  * |ExpRes|: each |ExpRes| corresponds to an experimental preliminary result (i.e. a CONF-NOTE or PAS) or publication and contains a list of |Datasets| as well as general information about the result (luminosity, publication reference,...).
 
       * |Dataset|:
         a single |Dataset| corresponds to one signal region of the experimental
-        note or publication [*]_. In case of |ULrs| there is a single |Dataset|, usually corresponding to the best signal
-        region (for more details see |Dataset|). For |EMrs|, there is one |Dataset| for each signal region.
+        note or publication.\ [#f1]_ In case of |ULrs| there is a single |Dataset|, usually corresponding to the best signal
+        region or a combination of signal regions (for more details see |Dataset|). For |EMrs|, there is one |Dataset| for each signal region.
         Each |Dataset| contains the Upper Limit maps for :ref:`Upper Limit results <ULtype>` *or* the Efficiency maps for :ref:`Efficiency Map results <EMtype>`. 
 
-            * Upper Limit map: contains the upper limit constraints for |ULrs|. Each map refers to a single 
-              simplified model (or more precisely to a single |element| or sum of |elements|).
-            * Efficiency map: contains the efficiencies for |EMrs|. Each map refers to a single 
-              simplified model (or more precisely to a single |element| or sum of |elements|).
+            * Upper Limit map: contains the upper limit constraints for |ULrs|. Each map contains
+              upper limits for the signal cross-section for a single simplified model 
+              (or more precisely to a single |element| or sum of |elements|)
+              as a function of the simplified model parameters.
+            * Efficiency map: contains the efficiencies for |EMrs|. Each map contains efficiencies
+              for the signal for a single simplified model (or more precisely to a single |element| or sum of |elements|)
+              as a function of the simplified model paramters.
 
 A schematic summary of the above structure can be seen below:
 
@@ -102,9 +109,8 @@ the cross section times branching ratio
 result. These constraints are typically given in the format of Upper Limit maps,
 which correspond to 95% confidence level (C.L.) upper limit values on :math:`\sigma \times BR`
 as a function of the respective parameter space (usually BSM masses
-or slices over mass planes). The UL values usually assume the best signal region
-(for a given point in parameter space), a combination of signal regions or
-more involved limits from other methods.
+or slices over mass planes). The UL values typically refer to the best signal region
+(for a given point in parameter space) or a combination of signal regions.
 Hence, for UL results there is a single |Dataset|, containing one
 or more UL maps. An example of a UL map is shown below:
 
@@ -118,11 +124,14 @@ simplified model :math:`\tilde{q} + \tilde{q} \to \left(jet+\tilde{\chi}_1^0\rig
 Using the SModelS notation this simplified model is mapped to the
 :ref:`element<element>` :math:`[[[jet]],[[jet]]]`, using the notation defined in
 :ref:`Bracket Notation <notation>`.
-In addition to the constraint information, it is also
-possible to specificy a final state property for the simplified model,
-which corresponds to the BSM final state signature (see :ref:`Final State particles <final stateOdd>`).
+The specific BSM states appearing in the simplified model are replaced by
+generic Z\ :sub:`2`-even |particles| which have no attributes, except for its
+Z\ :sub:`2` parity. The only exception are the last BSM states appearing in the cascade
+decay, which signature can be specified through the final state property.
 If no final state is defined, the :ref:`element<element>`
 is assumed to have a :math:`(MET,MET)` final state signature.
+However, other signatures are also possible, such as *HSCP* (heavy stable charged particle),
+*R-hadrons*, etc. A list of all possible database BSM states (or |particles|) can be found in smodels/experiment/databaseParticles.py.
 Usually a single preliminary result/publication contains several UL maps, hence
 each UL-type experimental result contains several UL maps, each one constraining
 different simplified
@@ -158,13 +167,13 @@ In this case the UL constraint is simply:
 .. math::
     [[[e^+]],[[e^-]]] + [[[\mu^+]],[[\mu^-]]]
     
-where it is understood that the sum is over the weights of the respective |elements|
+where it is understood that the sum runs over the weights of the respective |elements|
 and not over the |elements| themselves.    
 
 Note that the sum can be over particle charges, flavors or more complex combinations of elements.
 However, almost all experimental results sum only over elements sharing a common |topology|.
 
-Finally, in some cases the UL constraint assumes specific constributions from each |element|.
+Finally, in some cases the UL constraint assumes specific contributions from each |element|.
 For instance, in the :ref:`example above <constraintplot>` it is implicitly assumed that
 both the electron and muon |elements| contribute equally to the total cross section.
 Hence these conditions must also be specified along with the constraint, as described in :ref:`UL conditions<ULconditions>`.
@@ -206,8 +215,8 @@ Concretely, SModelS computes for each condition a number between 0 and 1, where
 0 means the condition is exactly satisfied and 1 means it is maximally violated.
 Allowing for a :math:`20\%` violation of a condition corresponds approximately to 
 a ''condition violation value'' (or simply condition value) of 0.2.
-The condition values  are given as an output of SModelS, so the user can decide what are the
-maximum acceptable values.
+The condition values are given as an output of SModelS, so the user can decide what are the
+maximum acceptable values (see :ref:`maxcond <parameterFileMaxcond>` in the parameters file).
 
 
 
@@ -223,13 +232,13 @@ Efficiency maps correspond to a grid of simulated acceptance times efficiency
 ( :math:`A \times \epsilon` ) values for a specific signal region. In the following we will refer to 
 :math:`A \times \epsilon` simply as *efficiency* and denote it by :math:`\epsilon`. 
 Furthermore, additional information, such as the luminosity, number of observed and expected events, etc is also
-stored in a EM-type result.
+stored in an EM-type result.
 
 Another important difference between |ULrs| and |EMrs| is the existence of several signal regions, which in SModelS
 are mapped to |Datasets|.  While |ULrs| contain a single |Dataset| (''signal region''), EM results hold several |Datasets|,
 one for each signal region (see the :ref:`database scheme<databaseScheme>` above).
 Each |Dataset| contains one or more efficiency maps, one for each |element| or sum of |elements|. 
-The efficiency map is usually a function of the BSM masses appearing in the element, as shown by the example below:
+The efficiency map is usually a function of the BSM masses (or masses and widths) appearing in the element, as shown by the example below:
 
 .. _EMplot:
 
@@ -239,9 +248,14 @@ The efficiency map is usually a function of the BSM masses appearing in the elem
 Within SModelS the above EM map is used to compute the efficiency for the
 :ref:`element<element>` :math:`[[[jet]],[[jet]]]`, where we are using the
 notation defined in :ref:`Bracket Notation <notation>`.
-Furthermore, a final state property can also be defined (see :ref:`Final State class <final stateOdd>`).
-If no final state is given, the :ref:`element<element>`
+As in the case of |ULrs|, the specific BSM states appearing in the simplified model are replaced by
+generic Z\ :sub:`2`-even |particles| which have no attributes, except for its
+Z\ :sub:`2` parity. The only exception are the last BSM states appearing in the cascade
+decay, which signature can be specified through the final state property.
+If no final state is defined, the :ref:`element<element>`
 is assumed to have a :math:`(MET,MET)` final state signature.
+However, other signatures are also possible, such as *HSCP* (heavy stable charged particle),
+*R-hadrons*, etc. A list of all possible database BSM states (or |particles|) can be found in smodels/experiment/databaseParticles.py.
 Usually there are several EM maps for a single |dataset|: one for each |element|
 or sum of  |elements|. In order to use a language similar to the one used in |ULrs|, the |element| (or |elements|)
 for which the efficiencies correspond to are still called *constraint*.
@@ -250,7 +264,7 @@ for which the efficiencies correspond to are still called *constraint*.
 Although efficiencis are most useful for |EMrs|, their concept can also be extended to
 |ULrs|. For the latter, the efficiencies for a given element are either 1, if the element
 appears in the :ref:`UL constraint <ULconstraint>`, or 0, otherwise. Atlhough trivial, this extension
-allows us to treat |EMrs| and |ULrs| in a very similar fashion
+allows for a unified treatment of |EMrs| and |ULrs|
 (see :ref:`Theory Predictions <theoryPredictions>` for more details).
 
 
@@ -289,7 +303,7 @@ the :ref:`constraints <ULconstraint>`. SModelS adopts a notation based on
 the CMS SMS conventions, where each specific :ref:`constraint <ULconstraint>` is
 labeled as *T<constraint name>*, which we refer as *TxName*. For instance, the TxName corresponding to 
 the constraint in the :ref:`example above <constraintplot>` is *TSlepSlep*.
-A complete list of TxNames can be found `here <http://smodels.hephy.at/wiki/SmsDictionary>`_.
+A complete list of TxNames can be found `here <http://smodels.github.io/docs/SmsDictionary>`_.
 
 
 * **Upper limit and efficiency maps are described by the** `TxName Class <experiment.html#experiment.txnameObj.TxName>`_
@@ -298,6 +312,6 @@ A complete list of TxNames can be found `here <http://smodels.hephy.at/wiki/SmsD
 *More details about the database folder structure and object
 structure can be found in* :ref:`Database of Experimental Results<databaseStruct>`. 
 
-.. [*] The name *Data Set* is used instead of signal region because its concept is slightly more general. For instance,
+.. [#f1] The name *Data Set* is used instead of signal region because its concept is slightly more general. For instance,
    in the case of |ULrs|, a |Dataset| may not correspond to a single signal region, but to a combination of signal regions.
  

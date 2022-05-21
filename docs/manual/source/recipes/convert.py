@@ -16,7 +16,10 @@ notebooks=glob.glob("*.ipynb")
 htmls=glob.glob("*.html")
 
 def run ( nb ):
-    cmd1="%s --to html %s" % ( cmd, nb )
+    execute=""
+    if "interactivePlots" in nb:
+        execute = " --execute"
+    cmd1="%s%s --to html %s" % ( cmd, execute, nb )
     cmd2="%s --to python %s" % ( cmd, nb )
     print ( "convert: %s" % cmd1 )
     subprocess.getoutput ( cmd1 )
