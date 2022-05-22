@@ -58,6 +58,10 @@ class Test_Notebook():
         new_cells = [icell for icell in outputDict.keys() if icell not in default_cells]
         cells = sorted(default_cells)
         for icell in cells:
-            assert defaultOutputDict[icell] == outputDict[icell]
+            if isinstance(defaultOutputDict[icell], list):
+                for iout, out in enumerate(defaultOutputDict[icell]):
+                    assert out == outputDict[icell][iout]
+            else:
+                assert defaultOutputDict[icell] == outputDict[icell]
 
         assert new_cells == []  # Make sure the notebook has no more cells than the default
