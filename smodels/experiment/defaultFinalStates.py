@@ -51,6 +51,14 @@ RHadronD = Particle(label='RHadronD', isSM=False, eCharge=-1./3., colordim=3)
 RHadronQ = MultiParticle(label='RHadronQ', particles=[RHadronU, RHadronU.chargeConjugate(),
                                                       RHadronD, RHadronD.chargeConjugate()])
 
+gluino = Particle(label='gluino', isSM=False, eCharge=0, colordim=8, spin=1./2.)
+chargino = Particle(label='C1+', isSM=False, eCharge=1, colordim=1, spin=1./2.)
+charginoBar = Particle(label='C1-', isSM=False, eCharge=-1, colordim=1, spin=1./2.)
+C1 = MultiParticle(label='C1', particles=[chargino, charginoBar])
+Hp = Particle(label='H+', isSM=False, eCharge=1, colordim=1, spin=0.)
+Hm = Particle(label='H-', isSM=False, eCharge=-1, colordim=1, spin=0.)
+Hpm = MultiParticle(label='Hpm', particles=[Hp, Hm])
+
 
 # Define list of inclusive final states:
 finalStates = [eList, muList, taList, lpList, lmList, lList, WList,
@@ -58,7 +66,9 @@ finalStates = [eList, muList, taList, lpList, lmList, lList, WList,
 # Include list of exclusive final states:
 finalStates += SMList
 # Define list of BSM final states:
-BSMfinalStates = [MET, HSCP, RHadronG, RHadronQ, anyBSM]
+BSMfinalStates = [MET, HSCP, RHadronU, RHadronD, RHadronG, RHadronQ, anyBSM,
+                  gluino, chargino, charginoBar, C1, Hp, Hm, Hpm]
+
 
 # Avoid double counting:
 for i, ptc in enumerate(finalStates):
