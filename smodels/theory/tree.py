@@ -97,6 +97,24 @@ class ParticleNode(object):
 
         return getattr(self.particle, attr)
 
+    def __getstate__(self):
+        """
+        Since getattr is defined, we must defined getstate
+        for pickling/unpickling.
+        """
+
+        attrDict = self.__dict__
+
+        return attrDict
+
+    def __setstate__(self, state):
+        """
+        Since getattr is defined, we must defined getstate
+        for pickling/unpickling.
+        """
+
+        self.__dict__.update(state)
+
     def __add__(self, other):
         """
         Adds two nodes. The properties of self are kept, except
