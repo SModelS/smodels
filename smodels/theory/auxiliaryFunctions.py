@@ -129,12 +129,13 @@ def removeUnits(value, standardUnits):
     if isinstance(value, tuple):
         return tuple([removeUnits(x, stdunits) for x in value])
     elif isinstance(value, dict):
-        return dict([[removeUnits(x, stdunits), removeUnits(y, stdunits)] for x, y in value.items()])
+        return dict([[removeUnits(x, stdunits), removeUnits(y, stdunits)]
+                     for x, y in value.items()])
     elif isinstance(value, unum.Unum):
-        #Check if value has unit or not:
+        # Check if value has unit or not:
         if not value._unit:
             return value.asNumber()
-        #Now try to normalize it by one of the standard pre-defined units:
+        # N ow try to normalize it by one of the standard pre-defined units:
         for unit in stdunits:
             y = (value/unit).normalize()
             if not y._unit:
@@ -160,7 +161,8 @@ def addUnit(obj, unit):
     elif isinstance(obj, tuple):
         return tuple([addUnit(x, unit) for x in obj])
     elif isinstance(obj, dict):
-        return dict([[addUnit(x, unit), addUnit(y, unit)] for x, y in obj.items()])
+        return dict([[addUnit(x, unit), addUnit(y, unit)]
+                     for x, y in obj.items()])
     elif isinstance(obj, (float, int, unum.Unum)):
         return obj*unit
     else:
@@ -252,7 +254,7 @@ def elementsInStr(instring):
 
     if 'PV' in outstr and '>' in outstr:
         if '{' not in outstr or '}' not in outstr:
-            raise SModelSError("Elements in %s should be enclosed by curly brackets" % oustr)
+            raise SModelSError("Elements in %s should be enclosed by curly brackets" % outstr)
         elements = re.findall(r"\{(.*?)\}", outstr)
         return elements
 
@@ -270,23 +272,29 @@ def elementsInStr(instring):
         if bCounter != 0:
             elStr += c
         elif elStr:
-            elements.append(elStr+c)
+            elements.append(elStr + c)
             elStr = ""
 
     # Check if there are not unmatched ['s and/or ]'s in the string
     if bCounter != 0:
         raise SModelSError("Wrong input (incomplete elements?) " + instring)
 
-    # Add quotes, if necessary:
+    # Make sure single quotes are used for the particle strings:
     newElements = []
     for el in elements:
+        # Remove all single quotes
+        el = el.replace("'", "")
         # Get particles without quotes
-        ptcList = set(el.replace(']', '').replace('[', '').split(','))
-        ptcList = [ptc for ptc in ptcList if ("'" not in ptc) and ptc]
+        ptcList = el.replace(']', '').replace('[', '').split(',')
+        ptcList = [ptc for ptc in ptcList if ptc]
         newEl = el[:]
-        # Replace them by their values with quotes
+        iptc = 0
+        # Replace particle strings by their values with single quotes
         for ptc in ptcList:
-            newEl = newEl.replace(ptc, "'%s'" % ptc).replace("''", "'")
+            # Search for ptc only starting after the last replacement
+            iptc += newEl[iptc:].find(ptc)
+            newEl = newEl[:iptc] + newEl[iptc:].replace(ptc, "'%s'" % ptc, 1)
+            iptc += len(ptc) + 1  # Update the position
         newElements.append(newEl)
 
     return newElements
@@ -313,8 +321,8 @@ def getValuesForObj(obj, attribute):
         if attribute == attr:
             values += [value]
         elif isinstance(value, Iterable):
-            values += [getValuesForObj(v, attribute) for v in value if not v is obj]
-        elif not value is obj:
+            values += [getValuesForObj(v, attribute) for v in value if v is not obj]
+        elif value is not obj:
             values += getValuesForObj(value, attribute)
 
     values = list(filter(lambda a: (not isinstance(a, list)) or a != [], values))
@@ -335,7 +343,8 @@ def bracketToProcessStr(stringEl, finalState=None, intermediateState=None):
                                      for each branch  (e.g. [['gluino'], ['gluino']])
     """
 
-    branches = eval(stringEl)
+    # Make sure inclusive symbols come with single quotes:
+    branches = eval(stringEl.replace("*", "'*'").replace("''", "'"))
     # Make replacements to take care of inclusive objects:
     newBranches = []
     for br in branches:

@@ -15,7 +15,7 @@ from __future__ import print_function
 import sys
 import os
 import copy
-from smodels.theory.topology import TopologyList
+from smodels.theory.topology import TopologyDict
 from smodels.theory.theoryPrediction import TheoryPredictionList
 from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.experiment.databaseObj import ExpResultList
@@ -275,7 +275,7 @@ class TxTPrinter(BasicPrinter):
         BasicPrinter.__init__(self, output, filename)
         self.name = "log"
         self.printtimespent = False
-        self.printingOrder = [OutputStatus, ExpResultList, TopologyList,
+        self.printingOrder = [OutputStatus, ExpResultList, TopologyDict,
                               TheoryPredictionList, TheoryPredictionsCombiner,
                               Uncovered]
         self.toPrint = [None] * len(self.printingOrder)
@@ -332,11 +332,11 @@ class TxTPrinter(BasicPrinter):
         output += "=" * 80 + "\n"
         return output
 
-    def _formatTopologyList(self, obj):
+    def _formatTopologyDict(self, obj):
         """
-        Format data for a TopologyList object.
+        Format data for a TopologyDict object.
 
-        :param obj: A TopologyList object to be printed.
+        :param obj: A TopologyDict object to be printed.
         """
 
         if not hasattr(self, 'printdecomp') or not self.printdecomp:
@@ -450,7 +450,7 @@ class TxTPrinter(BasicPrinter):
             listOfelements = []
             for dataset in obj.datasets:
                 for txname in dataset.txnameList:
-                    for el in txname._topologyList.getElements():
+                    for el in txname._topologyDict.getElements():
                         if not el.toStr() in listOfelements:
                             listOfelements.append(el.toStr())
             for el in listOfelements:
@@ -802,7 +802,7 @@ class PyPrinter(BasicPrinter):
         BasicPrinter.__init__(self, output, filename)
         self.name = "py"
         self.printtimespent = False
-        self.printingOrder = [OutputStatus, TopologyList,
+        self.printingOrder = [OutputStatus, TopologyDict,
                               TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
@@ -852,11 +852,11 @@ class PyPrinter(BasicPrinter):
         # that we also return the output dictionary
         return outputDict
 
-    def _formatTopologyList(self, obj):
+    def _formatTopologyDict(self, obj):
         """
-        Format data for a TopologyList object.
+        Format data for a TopologyDict object.
 
-        :param obj: A TopologyList object to be printed.
+        :param obj: A TopologyDict object to be printed.
         """
 
         if not hasattr(self, 'addelementlist') or not self.addelementlist:
@@ -1130,7 +1130,7 @@ class XmlPrinter(PyPrinter):
     def __init__(self, output='stdout', filename=None):
         PyPrinter.__init__(self, output, filename)
         self.name = "xml"
-        self.printingOrder = [OutputStatus, TopologyList,
+        self.printingOrder = [OutputStatus, TopologyDict,
                               TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 

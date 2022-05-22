@@ -53,7 +53,7 @@ class TxName(object):
         self._infoObj = infoObj
         self.txnameData = None
         self.txnameDataExp = None  # expected Data
-        self._topologyList = TopologyDict()
+        self._topologyDict = TopologyDict()
         self.finalState = ['MET', 'MET']  # default final state
         self.intermediateState = None  # default intermediate state
 
@@ -113,8 +113,6 @@ class TxName(object):
             self.txnameDataExp = TxNameData(expectedData, dataType, ident,
                                             Leff_inner=self.Leff_inner,
                                             Leff_outer=self.Leff_outer)
-        print(self.globalInfo.id, self)
-        print(self.constraint)
         # Builds up a list of elements appearing in constraints:
         elements = []
         if not databaseParticles:
@@ -137,13 +135,13 @@ class TxName(object):
                 for el in elementsInStr(str(cond)):
                     newEl = Element(el, self.finalState, self.intermediateState,
                                     databaseParticles)
-                    if not newEl in elements:
+                    if newEl not in elements:
                         elements.append(newEl)
 
-        #  Builds up TopologyList with all the elements appearing in constraints
+        #  Builds up topologyDict with all the elements appearing in constraints
         #  and conditions:
         for el in elements:
-            self._topologyList.addElement(el)
+            self._topologyDict.addElement(el)
 
     def hasOnlyZeroes(self):
         ozs = self.txnameData.onlyZeroValues()
@@ -278,25 +276,22 @@ class TxName(object):
                 in the Txname constraint or condition.
         """
 
-        # Stores all orderings of elements which matches the txname
-        matches = []
-        for el in self._topologyList.getElements():
-            # Compare branches:
-            for branchesA in itertools.permutations(element.branches):
-                branchesA = list(branchesA)
-                if branchesA == el.branches:
-                    newEl = element.copy()
-                    newEl.branches = [br.copy() for br in branchesA]
-                    matches.append(newEl)
-
-        # No elements matched:
-        if not matches:
+        cName = element.getCanonName()
+        # Check if the canonical name matches any of the
+        # elements in self:
+        if cName not in self._topologyDict:
             return False
-        elif len(matches) == 1:
-            return matches[0]
-        else:  # If more than one element ordering matches, return the one with largest mass (relevant for clustering)
-            matches = sorted(matches, key=lambda el: el.mass, reverse=True)
-            return matches[0]
+
+        # Get list of elements with the same canonical name
+        elList = self._topologyDict[cName]
+        for el in elList:
+            # Compare elements:
+            cmp, sortedEl = el.compareTo(element)
+            if cmp == 0:
+                return sortedEl
+
+        # If this point was reached, there were no macthes
+        return False
 
     def hasLikelihood(self):
         """ can I construct a likelihood for this map?
@@ -304,7 +299,7 @@ class TxName(object):
         with expected Values. """
         if self._infoObj.dataType == "efficiencyMap":
             return True
-        if self.txnameDataExp != None:
+        if self.txnameDataExp is not None:
             return True
         return False
 
@@ -1135,4 +1130,5 @@ if __name__ == "__main__":
         result = txnameData.getValueFor(masses)
         sm = "%.1f %.1f" % (masses[0][0].asNumber(GeV), masses[0][1].asNumber(GeV))
         print("%s %.3f fb" % (sm, result.asNumber(fb)))
+    print("%.2f ms" % ((time.time()-t0)*1000.))
     print("%.2f ms" % ((time.time()-t0)*1000.))

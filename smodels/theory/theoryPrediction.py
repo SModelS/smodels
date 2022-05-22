@@ -714,7 +714,7 @@ def _getElementsFrom(smsTopList, dataset):
     elements = []
     for txname in dataset.txnameList:
         for top in smsTopList:
-            itop = txname._topologyList.index(top)  # Check if the topology appear in txname
+            itop = txname._topologyDict.index(top)  # Check if the topology appear in txname
             if itop is None:
                 continue
             for el in top.getElements():
