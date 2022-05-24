@@ -12,7 +12,8 @@ import sys
 
 sys.path.insert(0, "../")
 import unittest
-from smodels.tools.simplifiedLikelihoods import Data, UpperLimitComputer
+from smodels.tools.simplifiedLikelihoods import Data, UpperLimitComputer, \
+      LikelihoodComputer
 from numpy import sqrt
 
 
@@ -57,12 +58,12 @@ class SLTest(unittest.TestCase):
 
     def testModel8(self):
         C=[ 18774.2, -2866.97,-5807.3,-4460.52,-2777.25,-1572.97, -846.653, -442.531,
-           -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958, 
-           -5807.3, 900.195, 1799.56, 1376.77, 854.448, 482.435, 258.92, 134.975, 
-           -4460.52, 667.591, 1376.77, 1063.03, 664.527, 377.714, 203.967, 106.926, 
-           -2777.25, 403.92, 854.448, 664.527, 417.837, 238.76, 129.55, 68.2075, 
+           -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958,
+           -5807.3, 900.195, 1799.56, 1376.77, 854.448, 482.435, 258.92, 134.975,
+           -4460.52, 667.591, 1376.77, 1063.03, 664.527, 377.714, 203.967, 106.926,
+           -2777.25, 403.92, 854.448, 664.527, 417.837, 238.76, 129.55, 68.2075,
            -1572.97, 222.614, 482.435, 377.714, 238.76, 137.151, 74.7665, 39.5247,
-           -846.653, 116.779, 258.92, 203.967, 129.55, 74.7665, 40.9423, 21.7285, 
+           -846.653, 116.779, 258.92, 203.967, 129.55, 74.7665, 40.9423, 21.7285,
            -442.531, 59.5958, 134.975, 106.926, 68.2075, 39.5247, 21.7285, 11.5732]
         nsignal = [ x/100. for x in [47,29.4,21.1,14.3,9.4,7.1,4.7,4.3] ]
         m=Data ( observed=[1964,877,354,182,82,36,15,11],
@@ -105,11 +106,20 @@ class SLTest(unittest.TestCase):
         """ take first n SRs of model-90 """
         m = self.createModel ( 3 )
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
+        lComp = LikelihoodComputer( m )
         ulProf = ulComp.getUpperLimitOnMu( m, marginalize=False )
         self.assertAlmostEqual( ulProf/54.793636190198924, 1.0, 3 )
         ul = ulComp.getUpperLimitOnMu( m, marginalize=True )
         ## Nick's profiling code gets for n=3 ul=2135.66
         self.assertAlmostEqual(ul / 55.554, 1.0, 1)
+        lmax = lComp.lmax ( m.nsignal )
+        self.assertAlmostEqual( lmax, 2.1722054152e-09, 7 )
+        self.assertAlmostEqual( lComp.muhat, 0. )
+        lmax = lComp.lmax ( m.nsignal, allowNegativeSignals=True )
+        self.assertAlmostEqual( lmax, 2.1708552631256182e-09, 12 )
+        self.assertAlmostEqual( lComp.muhat, -71.523083468, 7 )
+
+
 
     def testModel10(self):
 
