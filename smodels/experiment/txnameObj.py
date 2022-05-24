@@ -30,7 +30,6 @@ from scipy.linalg import svd, LinAlgError
 import numpy as np
 import unum
 import math
-import itertools
 from math import floor, log10
 
 
@@ -117,8 +116,12 @@ class TxName(object):
         elements = []
         if not databaseParticles:
             raise SModelSError("Database particles is empty. Can not create TxName object.")
+        # Create unsorted elements (in order to make sure its order matches the data grid)
         if hasattr(self, 'constraint'):
-            elements += [Element(el, self.finalState, self.intermediateState, databaseParticles)
+            elements += [Element(el, self.finalState,
+                                 self.intermediateState,
+                                 model=databaseParticles,
+                                 sort=False)
                          for el in elementsInStr(str(self.constraint))]
 
         if any((elA == elB and elA is not elB) for elA in elements for elB in elements):

@@ -19,8 +19,8 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
 
-def decompose(model, sigmacut=0*fb, massCompress=True, invisibleCompress=True,
-              minmassgap=0*GeV):
+def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
+              minmassgap=0 * GeV):
     """
     Perform decomposition using the information stored in model.
 
@@ -35,7 +35,7 @@ def decompose(model, sigmacut=0*fb, massCompress=True, invisibleCompress=True,
     t1 = time.time()
 
     xSectionList = model.xsections
-    if massCompress and minmassgap/GeV < 0.:
+    if massCompress and minmassgap / GeV < 0.:
         logger.error("Asked for compression without specifying minmassgap. Please set minmassgap.")
         raise SModelSError()
 
@@ -55,7 +55,7 @@ def decompose(model, sigmacut=0*fb, massCompress=True, invisibleCompress=True,
             continue
         pv = ParticleNode(model.getParticlesWith(label='PV')[0], 0, nodeWeight=weight)
         pv.xsection = xSectionList.getXsecsFor(pid)
-        primaryMothers = [ParticleNode(model.getParticlesWith(pdg=pdg)[0], i+1)
+        primaryMothers = [ParticleNode(model.getParticlesWith(pdg=pdg)[0], i + 1)
                           for i, pdg in enumerate(pid)]
         productionTrees.append(Tree({pv: primaryMothers}))
 
@@ -72,9 +72,14 @@ def decompose(model, sigmacut=0*fb, massCompress=True, invisibleCompress=True,
     # Create elements for each tree and combine equal elements
     smsTopDict = TopologyDict()
 
+    nel = 0
     for tree in allTrees:
         newElement = Element(tree)
         newElement.weight = tree.getTreeWeight()
+        # nel += 1
+        # if nel == 3:
+        #     return newElement, smsTopDict
+        # print('Adding', newElement)
         smsTopDict.addElement(newElement)
 
     if massCompress or invisibleCompress:

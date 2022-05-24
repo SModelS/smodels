@@ -20,7 +20,7 @@ class Element(object):
     """
 
     def __init__(self, info=None, finalState=None,
-                 intermediateState=None, model=None):
+                 intermediateState=None, model=None, sort=True):
         """
         Initializes the element. If info is defined, tries to generate
         the element using it.
@@ -39,6 +39,8 @@ class Element(object):
 
         :parameter model: The model (Model object) to be used when converting particle labels to
                           particle objects (only used if info, finalState or intermediateState != None).
+
+        :parameter sort: If False, it will not sort the element.
         """
 
         if isinstance(info, Tree):
@@ -59,7 +61,8 @@ class Element(object):
         if self.tree.number_of_nodes():
             self.tree.checkConsistency()
             self.tree.setCanonName()
-            self.sort()
+            if sort:
+                self.sort()
 
     def sort(self):
         """
@@ -98,8 +101,8 @@ class Element(object):
 
         # Recursively compare the nodes:
         cmp, newTree = compareNodes(self.tree, other.tree,
-                                    self.tree.getTreeRoot(),
-                                    other.tree.getTreeRoot())
+                                    self.tree.root,
+                                    other.tree.root)
 
         if cmp == 0:  # Elements matched, return copy of other with tree sorted
             otherNew = other.copy()
@@ -234,7 +237,7 @@ class Element(object):
         """
 
         # Allows for derived classes (like inclusive classes)
-        newel = self.__class__(info=self.tree.copy())
+        newel = self.__class__(info=self.tree.copyTree())
         newel.weight = self.weight.copy()
         newel.motherElements = self.motherElements[:]
         newel.elID = self.elID
@@ -265,12 +268,12 @@ class Element(object):
                  (e.g. {igen+1 : [mother1, mother2], igen+2 : [grandmother1,..],...})
         """
 
-        ancestorsDict = {igen+1: []}
+        ancestorsDict = {igen + 1: []}
         for mother in self.motherElements:
             if mother is self:
                 continue
-            ancestorsDict[igen+1].append(mother)
-            for jgen, elList in mother._getAncestorsDict(igen+1).items():
+            ancestorsDict[igen + 1].append(mother)
+            for jgen, elList in mother._getAncestorsDict(igen + 1).items():
                 if jgen not in ancestorsDict:
                     ancestorsDict[jgen] = []
                 ancestorsDict[jgen] += elList
@@ -418,7 +421,7 @@ class Element(object):
         newelement.motherElements = [self]
 
         tree = newelement.tree
-        root = tree.getTreeRoot()
+        root = tree.root
         # Loop over nodes from root to leaves:
         for mom, daughters in tree.bfs_successors(root):
             if mom == root:  # Skip primary vertex
@@ -482,7 +485,7 @@ class Element(object):
 
         while keepCompressing:
             tree = newelement.tree
-            root = tree.getTreeRoot()
+            root = tree.root
             # Loop over nodes:
             for mom, daughters in tree.bfs_successors(root):
                 if mom == root:  # Skip primary vertex

@@ -13,7 +13,6 @@ import itertools
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.auxiliaryFunctions import bracketToProcessStr
 from smodels.tools.inclusiveObjects import InclusiveValue
-from collections import OrderedDict
 
 
 class ParticleNode(object):
@@ -40,7 +39,7 @@ class ParticleNode(object):
         # if it is not specifically assigned, automatically assign
         # a new number which does not overlap with any previous class instances
         if nodeNumber is None:
-            self.node = ParticleNode._lastNodeNumber+1
+            self.node = ParticleNode._lastNodeNumber + 1
             ParticleNode._lastNodeNumber += 1
         else:
             self.node = nodeNumber
@@ -233,9 +232,11 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
     daughtersA = list(treeA.successors(nodeA))
     daughtersB = list(treeB.successors(nodeB))
 
+    # If we the node has no daughters (final state)
+    # and we reached this point, the nodes are equal, return node
     if not daughtersA and not daughtersB:
         newNodeB = Tree()
-        newNodeB.add_node(nodeB)
+        newNodeB.add_node(nodeB.copy())
         return 0, newNodeB
 
     # Compute all permutations within each subgroup with a common canon name:
@@ -247,7 +248,7 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
     cmp = 0
     cmp_orig = None
     for dB_perm in itertools.product(*allPerms):
-        dB_perm = list(itertools.chain.from_iterable(dB_perm))
+        dB_perm = itertools.chain.from_iterable(dB_perm)
         cmp = 0
         newDaughtersB = []
         for iB, dB in enumerate(dB_perm):
@@ -269,10 +270,10 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
     # ordered according to how they matched nodeA
     if cmp == 0:
         newNodeB = Tree()
-        newNodeB.add_node(nodeB)
+        newMom = nodeB.copy()
+        newNodeB.add_node(newMom)
         for dB in newDaughtersB:
-            dB.add_node(nodeB)
-            dB.add_edge(nodeB, list(dB.nodes)[0])
+            dB.add_edge(newMom, list(dB.nodes)[0])
             newNodeB = nx.compose(newNodeB, dB)
         return 0, newNodeB
     else:
@@ -287,16 +288,19 @@ class Tree(nx.DiGraph):
     def __init__(self, info=None, finalState=None,
                  intermediateState=None, model=None):
 
-        self.canonName = None
+        self._canonName = None
+        self._root = None
         if not info:  # Initialize empty tree
             nx.DiGraph.__init__(self)
-        elif info and isinstance(info, str):
+        elif isinstance(info, str):
             nx.DiGraph.__init__(self)
             try:
                 self.stringToTree(info, finalState, intermediateState, model)
             except (SModelSError, TypeError):
                 raise SModelSError("Can not create element from input %s" % info)
         elif isinstance(info, dict):
+            nx.DiGraph.__init__(self, info)
+        elif isinstance(info, nx.DiGraph):
             nx.DiGraph.__init__(self, info)
         else:
             raise SModelSError("Can not create element from input type %s" % type(info))
@@ -312,6 +316,12 @@ class Tree(nx.DiGraph):
         """
 
         return self.addTrees(other)
+
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return self.treeToString()
 
     def stringToTree(self, stringElement, finalState=None,
                      intermediateState=None, model=None):
@@ -341,13 +351,13 @@ class Tree(nx.DiGraph):
         # First check if string is in old format:
         if '[' in stringElement and ']' in stringElement:
             procString = bracketToProcessStr(stringElement, finalState=finalState,
-                                             intermediateState=intermediateState)
+                                           intermediateState=intermediateState)
         elif '>' in stringElement and 'PV' in stringElement:
             procString = stringElement
         else:
             raise SModelSError("Could not recognize string format for element (%s)" % stringElement)
 
-        decays = procString.replace(" ,", ",").replace(", ", ",").split("),(")
+        decays = procString.replace(" ", "").split("),(")
         decays[0] = decays[0][1:]  # Remove trailing parenthesis
         decays[-1] = decays[-1][:-1]  # Remove remaining parenthesis
 
@@ -382,7 +392,7 @@ class Tree(nx.DiGraph):
                 if ptc in nodesDict:
                     n = nodesDict[ptc]
                 else:
-                    n = maxNode+1
+                    n = maxNode + 1
                     maxNode = n
                 particleLabel = ptc.replace('(%i)' % n, '')
                 # Check for inclusive node:
@@ -420,7 +430,7 @@ class Tree(nx.DiGraph):
 
         elStr = ""
         T = self
-        root = self.getTreeRoot()
+        root = self.root
         nodesDict = {0: 0}
         counter = 1
         for mom, daughters in nx.bfs_successors(T, root):
@@ -443,7 +453,7 @@ class Tree(nx.DiGraph):
                         nodesDict[n.node] = counter
                         counter += 1
                     elStr += '%s(%i),' % (n, nodesDict[n.node])
-            elStr = elStr[:-1]+'), '
+            elStr = elStr[:-1] + '), '
         elStr = elStr[:-2]
 
         return elStr
@@ -460,7 +470,7 @@ class Tree(nx.DiGraph):
         """
 
         tree = self
-        branches = [b for b in tree.successors(self.getTreeRoot())]
+        branches = [b for b in tree.successors(self.root)]
         finalState = []
         intermediateState = []
         branchList = []
@@ -480,13 +490,26 @@ class Tree(nx.DiGraph):
                 vertexList = [str(d) for d in daughters if d.isSM]
                 fstates = [str(d) for d in daughters if not d.isSM and tree.out_degree(d) == 0]
                 if daughters:
-                    if len(vertexList) != len(daughters)-1 or len(fstates) > 1:
+                    if len(vertexList) != len(daughters) - 1 or len(fstates) > 1:
                         raise SModelSError("Can not convert tree with Z2-violating decays to bracket: \n  %s" % self.treeToString())
                 intermediateState[ib].append(str(mom))
                 branchList[ib].append(vertexList)
                 finalState += fstates
 
         return branchList, finalState, intermediateState
+
+    @ property
+    def canonName(self):
+        """
+        Returns the canonName. If not defined, it will be computed.
+
+        :return: Canonical name (int)
+        """
+
+        if self._canonName is None:
+            self._canonName = self.setCanonName()
+
+        return self._canonName
 
     def setCanonName(self, node=None):
         """
@@ -503,7 +526,7 @@ class Tree(nx.DiGraph):
             return None
 
         if node is None:
-            node = self.getTreeRoot()
+            node = self.root
 
         # If it is inclusive node set its name to an inclusive integer
         # and return its name (no need to check the children)
@@ -520,12 +543,12 @@ class Tree(nx.DiGraph):
                 node.canonName = InclusiveValue()
             else:
                 tp = sorted(tp)
-                tpStr = '1'+"".join(str(c) for c in tp)+'0'
+                tpStr = '1' + "".join(str(c) for c in tp) + '0'
                 node.canonName = int(tpStr)
 
         # Use the root canon name to assign the tree canon name
         if self.in_degree[node] == 0:
-            self.canonName = node.canonName
+            self._canonName = node.canonName
 
         return node.canonName
 
@@ -539,18 +562,22 @@ class Tree(nx.DiGraph):
         finalStates = [n for n in self.nodes if self.out_degree(n) == 0]
         return finalStates
 
-    def getTreeRoot(self):
+    @ property
+    def root(self):
         """
-        Get the root node (primary vertex) of the tree.
+        Returns the root node (primary vertex) of the tree.
+        If it has not been defined, compute it.
 
-        :return: node
+        :return: root node
         """
 
-        root = [n for n in self.nodes if self.in_degree[n] == 0]
-        if len(root) != 1:
-            raise SModelSError("Malformed Tree, %i root(s) have been found." % len(root))
+        if self._root is None:
+            root = [n for n in self.nodes if self.in_degree[n] == 0]
+            if len(root) != 1:
+                raise SModelSError("Malformed Tree, %i root(s) have been found." % len(root))
+            self._root = root[0]
 
-        return root[0]
+        return self._root
 
     def getTreeWeight(self):
         """
@@ -582,31 +609,35 @@ class Tree(nx.DiGraph):
         """
 
         if node is None:
-            node = self.getTreeRoot()
+            node = self.root
 
         return nx.bfs_successors(self, node)
 
-    def sort(self):
+    def sortNodeList(self, nodeList):
         """
-        Sort the tree according to the the node comparison (based on canonName and particle).
-        For each node, all the daughters (edges) are also sorted.
+        Sorts the node list according to the order set by compareNodes.
+        If the nodeList contains InclusiveParticleNodes, they will always
+        appear first and sorted by their distance to the root.
+
+        :param tree: Tree object
+        :param nodeList: List of ParticleNode and InclusiveParticleNode objects
+                         (or iterator over list)
+
+        :return: Iterator over sorted list of ParticleNode and InclusiveParticleNode objects
         """
 
-        # If canon names have not been defined, compute them:
-        if self.canonName is None:
-            self.setCanonName()
-
+        nodes = list(nodeList)
         # Identify all nodes that are inclusive or contain inclusive nodes as a daughter
         # (these nodes can not be sorted, since they have improper canonical names)
-        inclusiveNodes = [n for n in self.nodes if isinstance(n.canonName, InclusiveValue)]
+        inclusiveNodes = [n for n in nodes if isinstance(n.canonName, InclusiveValue)]
         # Sort inclusive nodes by distance from root
-        root = self.getTreeRoot()
+        root = self.root
         dists = nx.single_source_shortest_path_length(self, root)
         inclusiveNodes = sorted(inclusiveNodes, key=lambda n: dists[n])
 
         # Create a listed of sorted nodes with proper canonical names according to the node comparison:
         sortedNodes = []
-        for node in self.nodes:
+        for node in nodes:
             if node in inclusiveNodes:
                 continue
             inode = 0
@@ -616,33 +647,79 @@ class Tree(nx.DiGraph):
 
         # Add the inclusive list at the beginning of the list
         sortedNodes = inclusiveNodes + sortedNodes
-        # Created an ordered dictionary with the nodes and edges
-        newTreeDict = OrderedDict()
-        for node in sortedNodes:
-            sortedDaughters = sorted(self.successors(node),
-                                     key=lambda n: sortedNodes.index(n))
-            newTreeDict[node] = sortedDaughters
+
+        return iter(sortedNodes)
+
+    def numberNodes(self):
+        """
+        Store the nodes and the edges according to the breadth first search ordering
+        and number the nodes following the same ordering.
+        """
+
+        # If canon names have not been defined, compute them:
+        cName = self.canonName
+        if cName is None:  # Nothing to be done
+            return
+
+        # Construct new tree with nodes and edges following the bfs order.
+        # If sort=True, also sort the nodes according to compareNodes.
+        newTree = nx.bfs_tree(self, source=self.root)
+        nodeList = list(newTree.nodes)
+        edgesList = list(newTree.edges)
+        # Re-number nodes:
+        inode = 0
+        for node in nodeList:
+            node.node = inode
+            inode += 1
 
         # Finally update tree with the node dictionary:
-        nx.to_networkx_graph(newTreeDict, create_using=self)
+        nx.to_networkx_graph(edgesList, create_using=self)
+
+    def sort(self):
+        """
+        Sort the nodes according to the the node comparison
+        (based on canonName and particle). For each node, all the daughters (edges)
+        are also sorted.
+        Store the nodes and the edges according to the breadth first search ordering
+        and number the nodes following the same ordering.
+        """
+
+        # If canon names have not been defined, compute them:
+        if self.canonName is None:
+            return  # Nothing to be done
+
+        # Construct new tree with nodes and edges following the bfs order.
+        # If sort=True, also sort the nodes according to compareNodes.
+        newTree = nx.bfs_tree(self, source=self.root,
+                            sort_neighbors=self.sortNodeList)
+        nodeList = list(newTree.nodes)
+        edgesList = list(newTree.edges)
+        # Re-number nodes:
+        inode = 0
+        for node in nodeList:
+            node.node = inode
+            inode += 1
+
+        # Finally update tree with the node dictionary:
+        nx.to_networkx_graph(edgesList, create_using=self)
 
     def copyTree(self):
         """
         Returns a copy of self. The copy contains the same canonical name
         and copies of nodes.
 
-        :return: Tree object
+        : return: Tree object
         """
 
         newNodesDict = {n: n.copy() for n in self.nodes}
         newTree = nx.relabel_nodes(self, newNodesDict, copy=True)
-        newTree.canonName = self.canonName
+        newTree._canonName = self._canonName
 
         return newTree
 
     def checkConsistency(self):
         """
-        Make sure the tree has the correct topology (directed rooted tree).
+        Make sure the tree has the correct topology(directed rooted tree).
         Raises an error otherwise.
         """
         if self.number_of_nodes() and not nx.is_arborescence(self):
@@ -650,17 +727,17 @@ class Tree(nx.DiGraph):
 
     def addTrees(self, other):
         """
-        Combines the nodes (add particles) in equivalent nodes in each trees.
+        Combines the nodes(add particles) in equivalent nodes in each trees.
         Can only be done if the trees have the same topology and ordering.
 
-        :param other: tree (Tree object)
+        : param other: tree(Tree object)
 
-        :return: new tree with the combined particles (Tree object)
+        : return: new tree with the combined particles(Tree object)
         """
 
         nodesB = list(other.nodes)
-        nodesDict = {n: n+nodesB[inode]
-                     for inode, n in enumerate(self.nodes)}
+        nodesDict = {n: n + nodesB[inode]
+                   for inode, n in enumerate(self.nodes)}
         newTree = nx.relabel_nodes(self, nodesDict, copy=True)
 
         return newTree
@@ -671,9 +748,9 @@ class Tree(nx.DiGraph):
         The trees are joined where the nodes overlap and the nodes
         from self are kept.
 
-        :param other: tree (Tree object)
+        : param other: tree(Tree object)
 
-        :return: new tree with the other composed with self.
+        : return: new tree with the other composed with self.
         """
 
         return nx.compose(self, other)
@@ -685,13 +762,13 @@ class Tree(nx.DiGraph):
         """
         Draws Tree using matplotlib.
 
-        :param particleColor: color for particle nodes
-        :param smColor: color used for particles which have the isSM attribute set to True
-        :param pvColor: color for primary vertex
-        :param nodeScale: scale size for nodes
-        :param labelAttr: attribute to be used as label. If None, will use the string representation
+        : param particleColor: color for particle nodes
+        : param smColor: color used for particles which have the isSM attribute set to True
+        : param pvColor: color for primary vertex
+        : param nodeScale: scale size for nodes
+        : param labelAttr: attribute to be used as label. If None, will use the string representation
                           of the node object.
-        :param attrUnit: Unum object with the unit to be removed from label attribute (if applicable)
+        : param attrUnit: Unum object with the unit to be removed from label attribute(if applicable)
 
         """
         import matplotlib.pyplot as plt
@@ -700,10 +777,10 @@ class Tree(nx.DiGraph):
             labels = {n: str(n) for n in self.nodes}
         elif attrUnit is not None:
             labels = {n: str(getattr(n, labelAttr).asNumber(attrUnit)) if hasattr(n, labelAttr)
-                      else str(n) for n in self.nodes}
+                    else str(n) for n in self.nodes}
         else:
             labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
-                      else str(n) for n in self.nodes}
+                    else str(n) for n in self.nodes}
 
         for key in labels:
             if labels[key] == 'anyOdd':
@@ -711,7 +788,7 @@ class Tree(nx.DiGraph):
         node_size = []
         node_color = []
         for n in self.nodes:
-            node_size.append(nodeScale*100*len(labels[n]))
+            node_size.append(nodeScale * 100 * len(labels[n]))
             if 'pv' == labels[n].lower():
                 node_color.append(pvColor)
             elif hasattr(n, 'isSM') and n.isSM:
