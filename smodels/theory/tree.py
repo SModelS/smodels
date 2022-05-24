@@ -85,6 +85,12 @@ class ParticleNode(object):
 
         return self.__str__()
 
+    def __getitem__(self, attr):
+        if attr in self.__dict__:
+            return self.__dict__[attr]
+        else:
+            return getattr(self, attr)
+
     def __getattr__(self, attr):
         """
         Returns the attribute from particle.
@@ -206,6 +212,7 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
     :return: (True, new tree) if nodes match, (False, None) otherwise.
     """
 
+    print('Comparing %s to %s' % (nodeA, nodeB))
     if not isinstance(nodeA, (ParticleNode, InclusiveParticleNode)):
         return -1, None
     if not isinstance(nodeB, (ParticleNode, InclusiveParticleNode)):
@@ -231,17 +238,32 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
 
     daughtersA = list(treeA.successors(nodeA))
     daughtersB = list(treeB.successors(nodeB))
-
     # If we the node has no daughters (final state)
     # and we reached this point, the nodes are equal, return node
     if not daughtersA and not daughtersB:
-        newNodeB = Tree()
-        newNodeB.add_node(nodeB.copy())
-        return 0, newNodeB
+        newSubTreeB = Tree()
+        newNodeB = nodeB.copy()
+        newNodeB.node = nodeA.node
+        newSubTreeB.add_node(newNodeB)
+        print('->Returning', 0, newNodeB)
+        return 0, newSubTreeB
+
+    # Sort the daughters by their particles, so if the nodes differ,
+    # the comparison is independent of the original daughters position
+    sortedDaughtersA = [d for d in daughtersA if isinstance(d, InclusiveParticleNode)]
+    sortedDaughtersA += sorted([d for d in daughtersA
+                                if not isinstance(d, InclusiveParticleNode)],
+                               key=lambda n: (n.canonName, n.particle),
+                               reverse=True)
+    sortedDaughtersB = [d for d in daughtersB if isinstance(d, InclusiveParticleNode)]
+    sortedDaughtersB += sorted([d for d in daughtersB
+                                if not isinstance(d, InclusiveParticleNode)],
+                               key=lambda n: (n.canonName, n.particle),
+                               reverse=True)
 
     # Compute all permutations within each subgroup with a common canon name:
     allPerms = []
-    for key, group in itertools.groupby(daughtersB, lambda d: d.canonName):
+    for key, group in itertools.groupby(sortedDaughtersB, lambda d: d.canonName):
         allPerms.append(list(itertools.permutations(group)))
 
     # Construct all permutations and check against daughtersA:
@@ -251,10 +273,13 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
         dB_perm = itertools.chain.from_iterable(dB_perm)
         cmp = 0
         newDaughtersB = []
+        # print('  comparing perm', dB_perm)
         for iB, dB in enumerate(dB_perm):
-            cmp, newNodeB = compareNodes(treeA, treeB, daughtersA[iB], dB)
+            # print('      going to check', daughtersA[iB], dB)
+            cmp, newNodeB = compareNodes(treeA, treeB, sortedDaughtersA[iB], dB)
             newDaughtersB.append(newNodeB)
             if cmp != 0:  # If one node differs, try next permutation
+                # print('    comparison failed. break')
                 break
 
         # The first permutation is the original ordering.
@@ -269,14 +294,19 @@ def compareNodes(treeA, treeB, nodeA, nodeB):
     # If matches also return a tree with the nodeB as root and its daughters
     # ordered according to how they matched nodeA
     if cmp == 0:
-        newNodeB = Tree()
-        newMom = nodeB.copy()
-        newNodeB.add_node(newMom)
+        newSubTreeB = Tree()
+        newNodeB = nodeB.copy()
+        newNodeB.node = nodeA.node
+        newSubTreeB.add_node(newNodeB)
+        # order newDaughtersB according to daughtersA
+        newDaughtersB = sorted(newDaughtersB, key=lambda dB: daughtersA.index(list(dB.nodes)[0]))
         for dB in newDaughtersB:
-            dB.add_edge(newMom, list(dB.nodes)[0])
-            newNodeB = nx.compose(newNodeB, dB)
-        return 0, newNodeB
+            dB.add_edge(newNodeB, list(dB.nodes)[0])
+            newSubTreeB = nx.compose(newSubTreeB, dB)
+        print('-->Returning', 0, newSubTreeB)
+        return 0, newSubTreeB
     else:
+        # print('-->Returning', cmp_orig, None)
         return cmp_orig, None
 
 
@@ -351,7 +381,7 @@ class Tree(nx.DiGraph):
         # First check if string is in old format:
         if '[' in stringElement and ']' in stringElement:
             procString = bracketToProcessStr(stringElement, finalState=finalState,
-                                           intermediateState=intermediateState)
+                                             intermediateState=intermediateState)
         elif '>' in stringElement and 'PV' in stringElement:
             procString = stringElement
         else:
@@ -691,9 +721,10 @@ class Tree(nx.DiGraph):
         # Construct new tree with nodes and edges following the bfs order.
         # If sort=True, also sort the nodes according to compareNodes.
         newTree = nx.bfs_tree(self, source=self.root,
-                            sort_neighbors=self.sortNodeList)
+                              sort_neighbors=self.sortNodeList)
         nodeList = list(newTree.nodes)
         edgesList = list(newTree.edges)
+
         # Re-number nodes:
         inode = 0
         for node in nodeList:
@@ -735,9 +766,30 @@ class Tree(nx.DiGraph):
         : return: new tree with the combined particles(Tree object)
         """
 
+        if self.canonName == 11101101010001101101010000:
+            for inode, n in enumerate(self.nodes):
+                if str(n) == 't-' and str(list(other.nodes)[inode]) == 't+':
+                    self.draw()
+                    self.sort()
+                    self.draw()
+                    other.draw()
+                    other.sort()
+                    other.draw()
+                    return
+                    print('SELF:')
+                    print(self.nodes)
+                    print([n.node for n in self.nodes])
+                    print(self.edges)
+                    print('OTHER:')
+                    print(other.nodes)
+                    print([n.node for n in other.nodes])
+                    print(other.edges)
+                    print('\n')
+                    break
+
         nodesB = list(other.nodes)
         nodesDict = {n: n + nodesB[inode]
-                   for inode, n in enumerate(self.nodes)}
+                     for inode, n in enumerate(self.nodes)}
         newTree = nx.relabel_nodes(self, nodesDict, copy=True)
 
         return newTree

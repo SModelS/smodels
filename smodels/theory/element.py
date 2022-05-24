@@ -107,7 +107,7 @@ class Element(object):
         if cmp == 0:  # Elements matched, return copy of other with tree sorted
             otherNew = other.copy()
             otherNew.tree = newTree
-            otherNew.sort()
+            # otherNew.sort()
         else:
             otherNew = None
         return cmp, otherNew

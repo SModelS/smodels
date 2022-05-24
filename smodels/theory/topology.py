@@ -9,12 +9,8 @@
 
 """
 
-from smodels.theory import crossSection
 from smodels.theory.element import Element
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.auxiliaryFunctions import index_bisect
-from smodels.tools.smodelsLogging import logger
-import itertools
 
 
 class TopologyDict(dict):
