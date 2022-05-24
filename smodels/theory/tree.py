@@ -9,10 +9,112 @@
 
 
 import networkx as nx
-import itertools
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.theory.particle import Particle
 from smodels.theory.auxiliaryFunctions import bracketToProcessStr
 from smodels.tools.inclusiveObjects import InclusiveValue
+
+# Define a common inclusive particle object
+# to be used with the inclusive node
+IncluviseParticle = Particle(label='Inclusive')
+
+
+def equalNodes(nodeA, nodeB):
+    """
+    Check if nodes canonical names and particles are equal.
+    (Auxiliary method for networkx DiGraphMatcher.)
+
+    :param nodeA: ParticleNode object or a dictionary with node attributes
+    :param nodeB: ParticleNode object or a dictionary with node attributes
+
+    :return: True if nodes are equal, false otherwise
+    """
+
+    if nodeA['canonName'] != nodeB['canonName']:
+        return False
+    if nodeA['particle'] != nodeB['particle']:
+        return False
+
+    return True
+
+
+def sortTreeList(treeList):
+    """
+    Sort a list of Tree objects according to the compareTrees method.
+
+    :param treeList: List of Tree objects
+
+    :return: Sorted list of Tree objects
+    """
+
+    # Create a listed of sorted nodes with proper canonical names according to the node comparison:
+    # Always put the inclusive trees at the beginning
+    inclusiveTrees = [t for t in treeList if isinstance(t.root, InclusiveParticleNode)]
+    sortedTrees = []
+    for tree in treeList:
+        if isinstance(tree.root, InclusiveParticleNode):
+            continue
+        itree = 0
+        while itree < len(sortedTrees) and compareTrees(tree, sortedTrees[itree]) > 0:
+            itree += 1
+        sortedTrees.insert(itree, tree)
+
+    sortedTrees = inclusiveTrees + sortedTrees
+    return sortedTrees
+
+
+def compareTrees(treeA, treeB):
+    """
+    Recursively compare trees. The comparison is based on the canon names
+    and particles of the roots. If these are equal, the subtrees are compared.
+    The comparison does not take into account permutations of equivalent subtrees.
+    If one of the trees has an InclusiveParticleNode as root, it is always considered
+    as the smaller tree.
+
+    :param treeA: Tree object
+    :param treeB: Tree object
+
+    :return: 1, if treeA > treeB, -1, if treeA < treeB, 0 if treeA == treeB
+    """
+
+    canonA = treeA.canonName
+    canonB = treeB.canonName
+    if canonA != canonB:
+        return (-1)**int(canonA < canonB)
+
+    rootA = treeA.root
+    rootB = treeB.root
+    if isinstance(rootA, InclusiveParticleNode):
+        return 0
+    elif isinstance(rootB, InclusiveParticleNode):
+        return 0
+
+    cmp = rootA.compareNode(rootB)
+    # Return comparison if roots differ or root has no daughters
+    if cmp != 0:
+        return cmp
+
+    # If root has no daughters and roots agree, then trees are equal
+    if treeA.out_degree(rootA) == 0:
+        return 0
+
+    # Get daughters and sort them, so the comparison is unique:
+    subTreesA = [Tree(nx.bfs_tree(treeA, source=daughter))
+                 for daughter in treeA.successors(rootA)]
+    subTreesA = sortTreeList(subTreesA)
+    subTreesB = [Tree(nx.bfs_tree(treeB, source=daughter))
+                 for daughter in treeB.successors(rootB)]
+    subTreesB = sortTreeList(subTreesB)
+
+    # Loop over sorted daughters and stop when the first differ:
+    for itree, subtreeA in enumerate(subTreesA):
+        subtreeB = subTreesB[itree]
+        cmp = compareTrees(subtreeA, subtreeB)
+        if cmp != 0:
+            return cmp
+
+    # If all subtrees were identical, return zero
+    return 0
 
 
 class ParticleNode(object):
@@ -137,6 +239,44 @@ class ParticleNode(object):
 
         return newNode
 
+    def compareNode(self, other):
+        """
+        Compare nodes accoring to their canonical name
+        and particle.
+
+        :param other: ParticleNode or InclusiveParticleNode object
+
+        :return: 1 if self > other, -1 if self < other and 0 if self == other
+        """
+
+        if isinstance(other, InclusiveParticleNode):
+            return -other.compareNode(self)
+
+        if not isinstance(other, ParticleNode):
+            raise SModelSError("Can not compare node to %s" % type(other))
+
+        if self.canonName != other.canonName:
+            return (-1)**int(self.canonName < other.canonName)
+
+        if self.particle > other.particle:
+            return 1
+        elif self.particle < other.particle:
+            return -1
+
+        return 0
+
+    def equalTo(self, other):
+        """
+        Compare nodes accoring to their canonical name
+        and particle.
+
+        :param other: ParticleNode or InclusiveParticleNode object
+
+        :return: True if nodes are equal, false otherwise
+        """
+
+        return (self.compareNode(other) == 0)
+
     def copy(self):
         """
         Makes a shallow copy of itself. The particle attribute
@@ -157,15 +297,44 @@ class InclusiveParticleNode(ParticleNode):
     An inclusive ParticleNode class. It will return True when compared to any other
     ParticleNode object or InclusiveParticleNode object.
 
-    :ivar particle: None (dummy)
+    :ivar particle: IncluviseParticle (dummy)
     :ivar nodeNumber: Node identifier
     :ivar nodeWeight: 1 (dummy value)
+    :ivar finalStates: Allowed final states (final state nodes)
     """
 
-    def __init__(self, nodeNumber=None, nodeWeight=1.0):
-        ParticleNode.__init__(self, particle='Inclusive',
-                              nodeNumber=nodeNumber, nodeWeight=nodeWeight)
-        self.canonName = InclusiveValue
+    def __init__(self, nodeNumber=None,
+                 nodeWeight=1.0,
+                 particle=IncluviseParticle,
+                 finalStates=[]):
+        ParticleNode.__init__(self, particle=particle,
+                              nodeNumber=nodeNumber,
+                              nodeWeight=nodeWeight)
+        self.canonName = InclusiveValue()
+        self.finalStates = finalStates[:]
+
+    def compareNode(self, other):
+        """
+        Return 0 when compared to any ParticleNode.
+        If compared to InclusiveParticleNode, compare the
+        allowed BSM and SM states.
+
+        :param other: ParticleNode or InclusiveParticleNode object
+
+        :return: 0 (self == other), 1 (self > other), -1 (self < other)
+        """
+
+        if isinstance(other, ParticleNode):
+            return 0
+        elif isinstance(other, InclusiveParticleNode):
+            fsA = sorted(self.finalStates)
+            fsB = sorted(other.finalStates)
+            if fsA != fsB:
+                if fsA > fsB:
+                    return 1
+                else:
+                    return -1
+        return 0
 
     def copy(self):
         """
@@ -174,9 +343,11 @@ class InclusiveParticleNode(ParticleNode):
         :return: ParticleNode object
         """
 
-        newNode = InclusiveParticleNode(nodeNumber=self.node)
+        newNode = InclusiveParticleNode(nodeNumber=self.node,
+                                        particle=self.particle)
         newNode.canonName = self.canonName
         newNode.nodeWeight = self.nodeWeight
+        newNode.finalStates = self.finalStates[:]
 
         return newNode
 
@@ -190,124 +361,6 @@ class InclusiveParticleNode(ParticleNode):
         """
         if attr not in self.__dict__:
             return None
-
-
-def compareNodes(treeA, treeB, nodeA, nodeB):
-    """
-    Check if nodeA from treeA equals nodeB from treeB.
-    The comparison is based on the node canonical name (node structure)
-    and the node particles. It is done recursively, so two nodes are equal
-    only if all their daughters are also equal.
-    For daughters with the same canonical name, all the permutations are tried
-    when comparing nodes.
-    If nodes match, return a tree (Tree obj) with nodeB as root
-    and its daughters as nodes, but with the daughters sorted according
-    to the ordering to which they matched nodeA.
-
-    :param treeA: a tree (Tree object)
-    :param treeB: a tree (Tree object)
-    :param nodeA: a node belonging to treeA (ParticleNode object)
-    :param nodeB: a node belonging to treeB (ParticleNode object)
-
-    :return: (True, new tree) if nodes match, (False, None) otherwise.
-    """
-
-    print('Comparing %s to %s' % (nodeA, nodeB))
-    if not isinstance(nodeA, (ParticleNode, InclusiveParticleNode)):
-        return -1, None
-    if not isinstance(nodeB, (ParticleNode, InclusiveParticleNode)):
-        return -1, None
-
-    # For inclusive nodes always return True
-    if isinstance(nodeA, InclusiveParticleNode) or isinstance(nodeB, InclusiveParticleNode):
-        newNodeB = Tree()
-        newNodeB.add_node(InclusiveParticleNode())
-        return 0, newNodeB
-
-    if nodeA.canonName != nodeB.canonName:
-        if nodeA.canonName > nodeB.canonName:
-            return 1, None
-        else:
-            return -1, None
-
-    if nodeA.particle != nodeB.particle:
-        if nodeA.particle > nodeB.particle:
-            return 1, None
-        else:
-            return -1, None
-
-    daughtersA = list(treeA.successors(nodeA))
-    daughtersB = list(treeB.successors(nodeB))
-    # If we the node has no daughters (final state)
-    # and we reached this point, the nodes are equal, return node
-    if not daughtersA and not daughtersB:
-        newSubTreeB = Tree()
-        newNodeB = nodeB.copy()
-        newNodeB.node = nodeA.node
-        newSubTreeB.add_node(newNodeB)
-        print('->Returning', 0, newNodeB)
-        return 0, newSubTreeB
-
-    # Sort the daughters by their particles, so if the nodes differ,
-    # the comparison is independent of the original daughters position
-    sortedDaughtersA = [d for d in daughtersA if isinstance(d, InclusiveParticleNode)]
-    sortedDaughtersA += sorted([d for d in daughtersA
-                                if not isinstance(d, InclusiveParticleNode)],
-                               key=lambda n: (n.canonName, n.particle),
-                               reverse=True)
-    sortedDaughtersB = [d for d in daughtersB if isinstance(d, InclusiveParticleNode)]
-    sortedDaughtersB += sorted([d for d in daughtersB
-                                if not isinstance(d, InclusiveParticleNode)],
-                               key=lambda n: (n.canonName, n.particle),
-                               reverse=True)
-
-    # Compute all permutations within each subgroup with a common canon name:
-    allPerms = []
-    for key, group in itertools.groupby(sortedDaughtersB, lambda d: d.canonName):
-        allPerms.append(list(itertools.permutations(group)))
-
-    # Construct all permutations and check against daughtersA:
-    cmp = 0
-    cmp_orig = None
-    for dB_perm in itertools.product(*allPerms):
-        dB_perm = itertools.chain.from_iterable(dB_perm)
-        cmp = 0
-        newDaughtersB = []
-        # print('  comparing perm', dB_perm)
-        for iB, dB in enumerate(dB_perm):
-            # print('      going to check', daughtersA[iB], dB)
-            cmp, newNodeB = compareNodes(treeA, treeB, sortedDaughtersA[iB], dB)
-            newDaughtersB.append(newNodeB)
-            if cmp != 0:  # If one node differs, try next permutation
-                # print('    comparison failed. break')
-                break
-
-        # The first permutation is the original ordering.
-        # Store the comparison for the original ordering in case it does not match,
-        # since this will be the value returned in this case.
-        if cmp_orig is None:
-            cmp_orig = cmp
-
-        if cmp == 0:  # If permutation matches, stop
-            break
-
-    # If matches also return a tree with the nodeB as root and its daughters
-    # ordered according to how they matched nodeA
-    if cmp == 0:
-        newSubTreeB = Tree()
-        newNodeB = nodeB.copy()
-        newNodeB.node = nodeA.node
-        newSubTreeB.add_node(newNodeB)
-        # order newDaughtersB according to daughtersA
-        newDaughtersB = sorted(newDaughtersB, key=lambda dB: daughtersA.index(list(dB.nodes)[0]))
-        for dB in newDaughtersB:
-            dB.add_edge(newNodeB, list(dB.nodes)[0])
-            newSubTreeB = nx.compose(newSubTreeB, dB)
-        print('-->Returning', 0, newSubTreeB)
-        return 0, newSubTreeB
-    else:
-        # print('-->Returning', cmp_orig, None)
-        return cmp_orig, None
 
 
 class Tree(nx.DiGraph):
@@ -417,7 +470,6 @@ class Tree(nx.DiGraph):
             mom = dec.split('>')[0].strip()
             daughters = [p.strip() for p in dec.split('>')[1].split(',')]
             ptcs = [mom] + daughters
-
             for iptc, ptc in enumerate(ptcs):
                 if ptc in nodesDict:
                     n = nodesDict[ptc]
@@ -442,11 +494,18 @@ class Tree(nx.DiGraph):
                         else:
                             particle = particle[0]
                     node = ParticleNode(particle=particle, nodeNumber=n)
+                self.add_node(node)  # only added if node is not in the tree
                 if iptc == 0:
-                    momNode = node
-                self.add_node(node)
-                if node != momNode:
-                    edges.append((momNode, node))
+                    # Make sure to use the correct node object
+                    momNode = [n for n in self.nodes if n == node][0]
+                else:
+                    # For inclusive nodes, add decays as possible final states
+                    # and do not include nodes in the tree
+                    if isinstance(momNode, InclusiveParticleNode):
+                        self.remove_node(node)
+                        momNode.finalStates.append(node.particle)
+                    else:
+                        edges.append((momNode, node))
         # Now add all edges
         self.add_edges_from(edges)
 
@@ -528,7 +587,7 @@ class Tree(nx.DiGraph):
 
         return branchList, finalState, intermediateState
 
-    @ property
+    @property
     def canonName(self):
         """
         Returns the canonName. If not defined, it will be computed.
@@ -592,7 +651,7 @@ class Tree(nx.DiGraph):
         finalStates = [n for n in self.nodes if self.out_degree(n) == 0]
         return finalStates
 
-    @ property
+    @property
     def root(self):
         """
         Returns the root node (primary vertex) of the tree.
@@ -643,85 +702,127 @@ class Tree(nx.DiGraph):
 
         return nx.bfs_successors(self, node)
 
-    def sortNodeList(self, nodeList):
+    def compareTreeTo(self, other):
         """
-        Sorts the node list according to the order set by compareNodes.
-        If the nodeList contains InclusiveParticleNodes, they will always
-        appear first and sorted by their distance to the root.
+        Check self equals other.
+        The comparison is based on the node canonical name (node structure)
+        and the node particles. It is done recursively, so two nodes are equal
+        only if all their daughters are also equal.
+        For daughters with the same canonical name, all the permutations are tried
+        when comparing nodes.
+        If nodes match, return a tree (Tree obj) with nodeB as root
+        and its daughters as nodes, but with the daughters sorted according
+        to the ordering to which they matched nodeA.
 
-        :param tree: Tree object
-        :param nodeList: List of ParticleNode and InclusiveParticleNode objects
-                         (or iterator over list)
+        :param other: a tree (Tree object)
 
-        :return: Iterator over sorted list of ParticleNode and InclusiveParticleNode objects
-        """
-
-        nodes = list(nodeList)
-        # Identify all nodes that are inclusive or contain inclusive nodes as a daughter
-        # (these nodes can not be sorted, since they have improper canonical names)
-        inclusiveNodes = [n for n in nodes if isinstance(n.canonName, InclusiveValue)]
-        # Sort inclusive nodes by distance from root
-        root = self.root
-        dists = nx.single_source_shortest_path_length(self, root)
-        inclusiveNodes = sorted(inclusiveNodes, key=lambda n: dists[n])
-
-        # Create a listed of sorted nodes with proper canonical names according to the node comparison:
-        sortedNodes = []
-        for node in nodes:
-            if node in inclusiveNodes:
-                continue
-            inode = 0
-            while inode < len(sortedNodes) and compareNodes(self, self, node, sortedNodes[inode])[0] < 0:
-                inode += 1
-            sortedNodes.insert(inode, node)
-
-        # Add the inclusive list at the beginning of the list
-        sortedNodes = inclusiveNodes + sortedNodes
-
-        return iter(sortedNodes)
-
-    def numberNodes(self):
-        """
-        Store the nodes and the edges according to the breadth first search ordering
-        and number the nodes following the same ordering.
+        :return: (True, new tree) if nodes match, (False, None) otherwise.
         """
 
-        # If canon names have not been defined, compute them:
-        cName = self.canonName
-        if cName is None:  # Nothing to be done
-            return
+        # Compare canon names and make sure they are defined
+        canonA = self.canonName
+        canonB = other.canonName
+        if canonA != canonB:
+            return (-1)**int(canonA < canonB), None
 
-        # Construct new tree with nodes and edges following the bfs order.
-        # If sort=True, also sort the nodes according to compareNodes.
-        newTree = nx.bfs_tree(self, source=self.root)
-        nodeList = list(newTree.nodes)
-        edgesList = list(newTree.edges)
-        # Re-number nodes:
-        inode = 0
-        for node in nodeList:
-            node.node = inode
-            inode += 1
+        # Compare root nodes:
+        rootA = self.root
+        rootB = other.root
+        cmpNode = rootA.compareNode(rootB)
+        if cmpNode != 0:
+            return cmpNode, None
 
-        # Finally update tree with the node dictionary:
-        nx.to_networkx_graph(edgesList, create_using=self)
+        # Make sure node attributes are set and updated:
+        attrs = {n: n.__dict__ for n in self.nodes}
+        nx.set_node_attributes(self, attrs)
+        attrs = {n: n.__dict__ for n in other.nodes}
+        nx.set_node_attributes(other, attrs)
+
+        # Check for inclusive tree:
+        if any(isinstance(d, InclusiveParticleNode) for d in self.successors(rootA)):
+            # Check if self is a subgraph of other
+            matcher = nx.algorithms.isomorphism.DiGraphMatcher(other, self,
+                                                               node_match=equalNodes)
+            matches = matcher.subgraph_isomorphisms_iter()
+        elif any(isinstance(d, InclusiveParticleNode) for d in other.successors(rootB)):
+            # Check if other is a subgraph of self
+            matcher = nx.algorithms.isomorphism.DiGraphMatcher(self, other,
+                                                               node_match=equalNodes)
+            matches = matcher.subgraph_isomorphisms_iter()
+        else:
+            matcher = nx.algorithms.isomorphism.DiGraphMatcher(self, other,
+                                                               node_match=equalNodes)
+            # Check if there is any isomorphism which matches the trees
+            # using the equalNodes function to compare node attributes
+            matches = matcher.match()
+
+        # If there is a match, return the first match
+        # with a copy of the other and its nodes ordered according
+        # to self.
+        for match in matches:
+            # Make a copy of other
+            matchedTree = other.copyTree()
+            # Remove all nodes and edges
+            matchedTree.clear()
+            # Store the nodes in the correct order:
+            newNodes = []
+            for n in self.nodes:
+                newNode = match[n].copy()  # match = {self.node : other.node}
+                newNode.node = n.node
+                newNodes.append(newNode)
+                match[n] = newNode  # Update the dictionary with the copied node
+            # Store the edges in the correct order:
+            newEdges = [(match[nA], match[nB]) for nA, nB in self.edges]
+            # Add the nodes and the edges to the new tree:
+            matchedTree.add_nodes_from(newNodes)
+            matchedTree.add_edges_from(newEdges)
+            return 0, matchedTree
+
+        # If no matches were found, compare the trees:
+        cmp = compareTrees(self, other)
+        # We should always have cmp != 0, since no isomorphism was found.
+        # Sanity check:
+        if cmp == 0:
+            raise SModelSError("Trees are equal, but no isomorphism was found. Something went wrong.")
+        return cmp, None
 
     def sort(self):
         """
-        Sort the nodes according to the the node comparison
-        (based on canonName and particle). For each node, all the daughters (edges)
-        are also sorted.
-        Store the nodes and the edges according to the breadth first search ordering
-        and number the nodes following the same ordering.
+        Sort tree. All the subtrees are sorted according to compareTrees.
+        The node numbering is not modified.
         """
 
-        # If canon names have not been defined, compute them:
-        if self.canonName is None:
-            return  # Nothing to be done
+        cName = self.canonName  # Just to make sure canonName is defined
+        if cName is None:
+            return
 
-        # Construct new tree with nodes and edges following the bfs order.
-        # If sort=True, also sort the nodes according to compareNodes.
-        newTree = nx.bfs_tree(self, source=self.root,
-                              sort_neighbors=self.sortNodeList)
+        # Get all subtrees formed by the daughters of the
+        # current root node and sort each subtree
+        subTrees = []
+        for daughter in list(self.successors(self.root)):
+            subTree = Tree(nx.bfs_tree(self, source=daughter))
+            subTree.sort()
+            subTrees.append(subTree)
+            self.remove_nodes_from(subTree.nodes())
+
+        # Sort the subtrees
+        subTrees = sortTreeList(subTrees)
+        # Add sorted nodes:
+        for subTree in subTrees:
+            self.add_node(subTree.root)
+
+        # Add sorted edges:
+        for subTree in subTrees:
+            self.add_edge(self.root, subTree.root)
+            self.add_edges_from(subTree.edges)
+
+    def numberNodes(self):
+        """
+        Renumber the nodes from 0,N following a breadth-first search
+        for the tree.
+        """
+
+        newTree = nx.bfs_tree(self, source=self.root)
         nodeList = list(newTree.nodes)
         edgesList = list(newTree.edges)
 
@@ -766,27 +867,6 @@ class Tree(nx.DiGraph):
         : return: new tree with the combined particles(Tree object)
         """
 
-        if self.canonName == 11101101010001101101010000:
-            for inode, n in enumerate(self.nodes):
-                if str(n) == 't-' and str(list(other.nodes)[inode]) == 't+':
-                    self.draw()
-                    self.sort()
-                    self.draw()
-                    other.draw()
-                    other.sort()
-                    other.draw()
-                    return
-                    print('SELF:')
-                    print(self.nodes)
-                    print([n.node for n in self.nodes])
-                    print(self.edges)
-                    print('OTHER:')
-                    print(other.nodes)
-                    print([n.node for n in other.nodes])
-                    print(other.edges)
-                    print('\n')
-                    break
-
         nodesB = list(other.nodes)
         nodesDict = {n: n + nodesB[inode]
                      for inode, n in enumerate(self.nodes)}
@@ -829,10 +909,10 @@ class Tree(nx.DiGraph):
             labels = {n: str(n) for n in self.nodes}
         elif attrUnit is not None:
             labels = {n: str(getattr(n, labelAttr).asNumber(attrUnit)) if hasattr(n, labelAttr)
-                    else str(n) for n in self.nodes}
+                      else str(n) for n in self.nodes}
         else:
             labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
-                    else str(n) for n in self.nodes}
+                      else str(n) for n in self.nodes}
 
         for key in labels:
             if labels[key] == 'anyOdd':

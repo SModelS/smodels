@@ -6,7 +6,7 @@
 
 """
 
-from smodels.theory.tree import Tree, compareNodes
+from smodels.theory.tree import Tree
 from smodels.theory import crossSection
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.particle import Particle
@@ -71,6 +71,7 @@ class Element(object):
         """
 
         self.tree.sort()
+        self.tree.numberNodes()
 
     def compareTo(self, other):
         """
@@ -91,8 +92,8 @@ class Element(object):
             return -1, None
 
         # make sure the topology names have been computed:
-        canonName = self.getCanonName()
-        otherName = other.getCanonName()
+        canonName = self.tree.canonName
+        otherName = other.tree.canonName
         if canonName != otherName:
             if canonName > otherName:
                 return 1, None
@@ -100,14 +101,11 @@ class Element(object):
                 return -1, None
 
         # Recursively compare the nodes:
-        cmp, newTree = compareNodes(self.tree, other.tree,
-                                    self.tree.root,
-                                    other.tree.root)
+        cmp, newTree = self.tree.compareTreeTo(other.tree)
 
         if cmp == 0:  # Elements matched, return copy of other with tree sorted
             otherNew = other.copy()
             otherNew.tree = newTree
-            # otherNew.sort()
         else:
             otherNew = None
         return cmp, otherNew

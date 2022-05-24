@@ -141,7 +141,7 @@ def removeUnits(value, standardUnits):
             if not y._unit:
                 return value.asNumber(unit)
         raise SModelSError("Could not normalize unit value %s using the standard units: %s"
-                       % (str(value), str(standardUnits)))
+                           % (str(value), str(standardUnits)))
     else:
         return value
 
@@ -364,14 +364,16 @@ def bracketToProcessStr(stringEl, finalState=None, intermediateState=None):
         bsmIndices.append([])
         if br == 'InclusiveNode':
             bsmStates[ibr].append(br)
-            continue
-        for idec, dec in enumerate(br):
-            if intermediateState is None:
-                bsmStates[ibr].append('anyBSM')
-            else:
-                bsmStates[ibr].append(intermediateState[ibr][idec])
             bsmIndices[ibr].append(iptc)
             iptc += 1
+        else:
+            for idec, dec in enumerate(br):
+                if intermediateState is None:
+                    bsmStates[ibr].append('anyBSM')
+                else:
+                    bsmStates[ibr].append(intermediateState[ibr][idec])
+                bsmIndices[ibr].append(iptc)
+                iptc += 1
         if finalState is None:
             bsmStates[ibr].append('MET')
         else:
@@ -395,7 +397,10 @@ def bracketToProcessStr(stringEl, finalState=None, intermediateState=None):
         for ibsm, bsm in enumerate(bsmStates[ibr][:-1]):
             iptc = bsmIndices[ibr][ibsm]
             mom = bsm+'(%i)' % iptc
-            smDaughters = ','.join(br[ibsm])
+            if bsm == 'InclusiveNode':
+                smDaughters = 'anySM'
+            else:
+                smDaughters = ','.join(br[ibsm])
             bsmDaughter = bsmStates[ibr][ibsm+1]
             if ibsm+1 < len(bsmIndices[ibr]):
                 bsmDaughter += '(%i)' % (bsmIndices[ibr][ibsm+1])
