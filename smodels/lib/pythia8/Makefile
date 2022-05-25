@@ -19,12 +19,12 @@ version:
 install_pythia8:
 	./installer.py
 
-clean:
-	rm -rf $(EXES) test.slha pythia$(PYTHIAVER) .pythia*.tgz* pythia*.tgz*  pythia8.exe events.lhe
-
 pythia8.exe: pythia8.cc .PHONY
 	echo $(XMLDOC) > xml.doc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ pythia8.cc -lpythia8 -ldl
+
+clean:
+	./installer.py --clean
 
 run:
 	./pythia8.exe -f ../../../inputFiles/slha/simplyGluino.slha -n 10 -c ../../etc/pythia8.cfg -x $(XMLDOC)

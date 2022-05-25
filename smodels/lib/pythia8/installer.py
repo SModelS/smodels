@@ -2,8 +2,7 @@
 
 """ the installer script, fetches pythia8, explodes the tarball, compiles. """
 
-import os, sys, shutil
-
+import os, sys, shutil, subprocess
 
 def getVersion():
     """obtain the pythia version we wish to use, stored in file 'pythiaversion'"""
@@ -103,6 +102,21 @@ def checkPythia():
             shutil.rmtree(afile)
     return False
 
+def checkPythiaIncludeFile():
+    """check if include file exists """
+    ver = getVersion()
+    afile = f"pythia{ver}/include/Pythia8/Pythia.h"
+    if os.path.exists(afile):
+        size = os.stat(afile).st_size
+        if size > 100:
+            return True
+    return False
+
+def clean():
+    """ clean up  install """
+    ver = getVersion()
+    cmd = f"rm -rf test.slha pythia{ver} .pythia*.tgz* pythia*.tgz*  pythia8.exe events.lhe"
+    subprocess.getoutput ( cmd )
 
 def compilePythia():
     """finally, compile pythia"""
@@ -122,6 +136,12 @@ def compilePythia():
 
 def installPythia():
     """fetch tarball, unzip it, compile pythia"""
+    if not checkPythiaIncludeFile():
+        if checkPythia():
+            # the include file is missing? but the binary is there?
+            # clean up!
+            clean()
+
     if checkPythia():
         rmTarball()
         return
@@ -137,9 +157,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pythia8 install script")
     parser.add_argument("-i", "--install", help="install pythia8", action="store_true")
     parser.add_argument("-v", "--version", help="report pythiaversion", action="store_true")
+    parser.add_argument("-c", "--clean", help="clean up", action="store_true")
     args = parser.parse_args()
     if args.version:
         ver = getVersion()
         print(ver)
+        sys.exit()
+    if args.clean:
+        clean()
         sys.exit()
     installPythia()
