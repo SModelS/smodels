@@ -256,5 +256,5 @@ def combinedSimplifiedLmax(
     if type(nsig) in [list, tuple]:
         nsig = np.array(nsig)
     computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-    ret = computer.findMuHat(nsig, allowNegativeSignals=allowNegativeSignals, extended_output=True)
+    ret = computer.findMuHat(allowNegativeSignals=allowNegativeSignals, extended_output=True)
     return ret

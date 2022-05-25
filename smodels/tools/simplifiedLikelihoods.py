@@ -358,7 +358,7 @@ class LikelihoodComputer:
         return ret
 
     def findMuHat(
-        self, nsig, allowNegativeSignals=False, extended_output=False, nll=False, marginalize=False
+        self, allowNegativeSignals=False, extended_output=False, nll=False, marginalize=False
     ):
         """
         Find the most likely signal strength mu
@@ -373,6 +373,7 @@ class LikelihoodComputer:
         """
         if (self.model.backgrounds == self.model.observed).all():
             return self.extendedOutput(extended_output, 0.0)
+        nsig = self.model.nsignal
 
         if type(nsig) in [list, ndarray]:
             nsig = array(nsig)
@@ -907,9 +908,8 @@ class LikelihoodComputer:
                 self.muhat = float(nsig[0] / self.model.nsignal[0])
             self.sigma_mu = np.sqrt(self.model.observed[0] + self.model.covariance[0][0])
             return self.likelihood(nsig, marginalize=marginalize, nll=nll)
-        fmh = self.findMuHat( self.model.nsignal,
-                allowNegativeSignals=allowNegativeSignals, extended_output=True,
-                nll=nll
+        fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
+                              extended_output=True, nll=nll
         )
         muhat_, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         self.muhat = muhat_
@@ -1070,13 +1070,9 @@ class UpperLimitComputer:
                     d += theta_hat_[i]
                 model.observed[i] = float(d)
         computer = LikelihoodComputer(model, toys)
+        mu_hat = computer.findMuHat( allowNegativeSignals=False, extended_output=False)
         if signal_type == "signal_rel":
-            mu_hat = computer.findMuHat( model.nsignal,
-                    allowNegativeSignals=False, extended_output=False)
             mu_hat = mu_hat * sum(model.nsignal)
-        else:
-            mu_hat = computer.findMuHat( model.nsignal, allowNegativeSignals=False, extended_output=False
-            )
         theta_hat0, _ = computer.findThetaHat(0 * getattr(model, signal_type))
         if signal_type == "signal_rel":
             sigma_mu = computer.getSigmaMu(mu_hat/sum(model.nsignal), theta_hat0)
@@ -1111,11 +1107,9 @@ class UpperLimitComputer:
         # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
         compA = LikelihoodComputer(aModel, toys)
         ## compute
+        mu_hatA = compA.findMuHat()
         if signal_type == "signal_rel":
-            mu_hatA = compA.findMuHat(aModel.nsignal)
             mu_hatA = mu_hatA * sum ( aModel.nsignal)
-        else:
-            mu_hatA = compA.findMuHat(aModel.nsignal)
         nll0A = compA.likelihood(
             getattr(aModel, "signals" if signal_type == "signal_rel" else "nsignals")(mu_hatA),
             marginalize=marginalize,
