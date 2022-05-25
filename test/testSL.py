@@ -90,15 +90,8 @@ class SLTest(unittest.TestCase):
         C = []
         for i in range(n):
             C.append(C_[ncov * i : ncov * i + n])
-        m = Data(
-            observed=D,
-            backgrounds=B,
-            covariance=C,
-            third_moment=S,
-            nsignal=sig,
-            name="model%d" % n,
-            deltas_rel=0.0,
-        )
+        m = Data( observed=D, backgrounds=B, covariance=C, third_moment=S,
+            nsignal=sig, name="model%d" % n, deltas_rel=0.0,)
         return m
 
     def testModel3(self):
@@ -115,9 +108,11 @@ class SLTest(unittest.TestCase):
         lmax = lComp.lmax ( m.nsignal )
         self.assertAlmostEqual( lmax, 2.1722054152e-09, 7 )
         self.assertAlmostEqual( lComp.muhat, 0. )
+        self.assertAlmostEqual( lComp.sigma_mu, 798.9887891147 )
         lmax = lComp.lmax ( m.nsignal, allowNegativeSignals=True )
         self.assertAlmostEqual( lmax, 2.1708552631256182e-09, 12 )
         self.assertAlmostEqual( lComp.muhat, -71.523083468, 7 )
+        self.assertAlmostEqual( lComp.sigma_mu, 795.0121298843319 )
 
 
 
