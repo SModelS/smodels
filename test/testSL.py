@@ -114,7 +114,26 @@ class SLTest(unittest.TestCase):
         self.assertAlmostEqual( lComp.muhat, -71.523083468, 7 )
         self.assertAlmostEqual( lComp.sigma_mu, 795.0121298843319 )
 
+    def xestModel1(self):
+        """ take first SR of model-90 """
+        m = self.createModel ( 1 )
+        m.nsignal[0]=1.
+        lComp = LikelihoodComputer( m )
+        lmax = lComp.lmax ( m.nsignal )
+        self.assertAlmostEqual( lmax, 0.0003441355122238784 )
+        self.assertAlmostEqual( lComp.muhat, 1. )
+        self.assertAlmostEqual( lComp.sigma_mu, 32.31764780503341 )
+        lmax = lComp.lmax ( m.nsignal, allowNegativeSignals=True )
+        self.assertAlmostEqual( lmax, 0.0003441355122238784 )
+        self.assertAlmostEqual( lComp.muhat, 1. )
+        self.assertAlmostEqual( lComp.sigma_mu, 32.31764780503341 )
 
+        ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
+        #ulProf = ulComp.getUpperLimitOnMu( m, marginalize=False )
+        #self.assertAlmostEqual( ulProf/54.793636190198924, 1.0, 3 )
+        ul = ulComp.getUpperLimitOnMu( m, marginalize=False )
+        ## Nick's profiling code gets for n=3 ul=2135.66
+        self.assertAlmostEqual(ul / 61.26914, 1.0, 1)
 
     def testModel10(self):
 
