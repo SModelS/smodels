@@ -465,23 +465,21 @@ class LikelihoodComputer:
         # print ( f">>>> obs {self.model.observed[:2]} bg {self.model.backgrounds[:2]}" )
         # print ( f">>>> mu_c {np.mean(mu_c)}" )
         if extended_output:
-            sigma_mu = self.getSigmaMu(mu_hat, nsig, theta_hat)
+            sigma_mu = self.getSigmaMu(mu_hat, theta_hat)
             llhd = self.likelihood(self.model.signals(mu_hat), marginalize=marginalize, nll=nll)
             ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": llhd}
             return ret
         return mu_hat
 
-    def getSigmaMu(self, mu, nsig, theta_hat):
+    def getSigmaMu(self, mu, theta_hat):
         """
         Get an estimate for the standard deviation of mu at <mu>, from
         the inverse hessian
-
-        :param nsig: array with signal yields or relative signal strengths
-                     in each dataset (signal region)
         """
         if not self.model.isLinear():
             logger.debug("implemented only for linear model")
         # d^2 mu NLL / d mu^2 = sum_i [ n_obs^i * s_i**2 / n_pred^i**2 ]
+        nsig = self.model.nsignal
 
         # Define relative signal strengths:
         n_pred = mu * nsig + self.model.backgrounds + theta_hat
@@ -1075,7 +1073,11 @@ class UpperLimitComputer:
             getattr(model, signal_type), allowNegativeSignals=False, extended_output=False
         )
         theta_hat0, _ = computer.findThetaHat(0 * getattr(model, signal_type))
-        sigma_mu = computer.getSigmaMu(mu_hat, getattr(model, signal_type), theta_hat0)
+        if signal_type == "signal_rel":
+            sigma_mu = computer.getSigmaMu(mu_hat/sum(model.nsignal), theta_hat0)
+            sigma_mu = sigma_mu * sum(model.nsignal)
+        else:
+            sigma_mu = computer.getSigmaMu(mu_hat, theta_hat0)
 
         nll0 = computer.likelihood(
             getattr(model, "signals" if signal_type == "signal_rel" else "nsignals")(mu_hat),
