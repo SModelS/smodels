@@ -907,8 +907,9 @@ class LikelihoodComputer:
                 self.muhat = float(nsig[0] / self.model.nsignal[0])
             self.sigma_mu = np.sqrt(self.model.observed[0] + self.model.covariance[0][0])
             return self.likelihood(nsig, marginalize=marginalize, nll=nll)
-        fmh = self.findMuHat(
-            nsig, allowNegativeSignals=allowNegativeSignals, extended_output=True, nll=nll
+        fmh = self.findMuHat( self.model.nsignal,
+                allowNegativeSignals=allowNegativeSignals, extended_output=True,
+                nll=nll
         )
         muhat_, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         self.muhat = muhat_
@@ -1069,7 +1070,14 @@ class UpperLimitComputer:
                     d += theta_hat_[i]
                 model.observed[i] = float(d)
         computer = LikelihoodComputer(model, toys)
-        mu_hat = computer.findMuHat(
+        if signal_type == "signal_rel":
+            mu_hat = computer.findMuHat( model.nsignal,
+                    allowNegativeSignals=False, extended_output=False)
+            mu_hat = mu_hat * sum(model.nsignal)
+        else:
+            mu_hat = computer.findMuHat( model.nsignal, allowNegativeSignals=False, extended_output=False
+            )
+        ref_hat = computer.findMuHat(
             getattr(model, signal_type), allowNegativeSignals=False, extended_output=False
         )
         theta_hat0, _ = computer.findThetaHat(0 * getattr(model, signal_type))
