@@ -971,7 +971,7 @@ class LikelihoodComputer:
             nsig = self.model.observed - self.model.backgrounds
             maxllhd = self.likelihood(nsig, marginalize=marginalize, nll=True)
         else:
-            maxllhd = self.lmax(nsig, marginalize=marginalize, nll=True, allowNegativeSignals=False)
+            maxllhd = self.lmax(self.model.nsignal, marginalize=marginalize, nll=True, allowNegativeSignals=False)
         chi2 = 2 * (llhd - maxllhd)
 
         if not np.isfinite(chi2):
