@@ -60,7 +60,7 @@ class Element(object):
         # (must be a rooted tree with each node having a single parent):
         if self.tree.number_of_nodes():
             self.tree.checkConsistency()
-            self.tree.setCanonName()
+            self.tree.setGlobalProperties()
             if sort:
                 self.sort()
 

@@ -120,7 +120,7 @@ def getDecayTrees(mother):
         else:
             # Include possibility of mother appearing as a final state
             mom = mother.copy()
-            mom.finalState = True  # Forbids further node decays
+            mom.isFinalState = True  # Forbids further node decays
             decayTrees.append(Tree({mom: []}))
 
     decays = sorted(decays, key=lambda dec: dec.br, reverse=True)
@@ -162,23 +162,23 @@ def addOneStepDecays(tree, sigmacut=None):
     mothers = [n for n in tree.nodes() if tree.out_degree(n) == 0]
     for mom in mothers:
         # Check if mom should decay:
-        if mom.finalState:
+        if mom.isFinalState:
             continue
         if mom.particle.isStable():
-            mom.finalState = True
+            mom.isFinalState = True
             continue  # Skip if particle is stable
         # Skip if particle has no decays
         if not hasattr(mom, 'decays'):
-            mom.finalState = True
+            mom.isFinalState = True
             continue
         if not mom.decays:
-            mom.finalState = True
+            mom.isFinalState = True
             continue
 
         # Get all decay trees for final state:
         decayTrees = getDecayTrees(mom)
         if not decayTrees:
-            mom.finalState = True
+            mom.isFinalState = True
             continue
 
         # Add all decay channels to all the trees
@@ -231,7 +231,7 @@ def cascadeDecay(tree, sigmacut=None):
                 finalStates = T.getFinalStates()
                 # Make sure all the final states have decayed
                 # (newT can be empty if there is no allowed decay above sigmacut)
-                if any(fs.finalState is False for fs in finalStates):
+                if any(fs.isFinalState is False for fs in finalStates):
                     continue
                 finalTrees.append(T)  # It was not possible to add any new decay to the tree
             else:
