@@ -918,13 +918,13 @@ class LikelihoodComputer:
 
     def findMuHatViaGradient(
         self,
-        signal_rel,
         allowNegativeSignals=False,
         extended_output=False,
         nll=False,
         marginalize=False,
     ):
         """currently not used but finding muhat via gradient descent"""
+        signal_rel = self.model.signal_rel
 
         def myllhd(mu):
             return self.likelihood(mu * signal_rel, nll=True, marginalize=marginalize)
@@ -1077,9 +1077,6 @@ class UpperLimitComputer:
         else:
             mu_hat = computer.findMuHat( model.nsignal, allowNegativeSignals=False, extended_output=False
             )
-        ref_hat = computer.findMuHat(
-            getattr(model, signal_type), allowNegativeSignals=False, extended_output=False
-        )
         theta_hat0, _ = computer.findThetaHat(0 * getattr(model, signal_type))
         if signal_type == "signal_rel":
             sigma_mu = computer.getSigmaMu(mu_hat/sum(model.nsignal), theta_hat0)
@@ -1114,7 +1111,11 @@ class UpperLimitComputer:
         # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
         compA = LikelihoodComputer(aModel, toys)
         ## compute
-        mu_hatA = compA.findMuHat(getattr(aModel, signal_type))
+        if signal_type == "signal_rel":
+            mu_hatA = compA.findMuHat(aModel.nsignal)
+            mu_hatA = mu_hatA * sum ( aModel.nsignal)
+        else:
+            mu_hatA = compA.findMuHat(aModel.nsignal)
         nll0A = compA.likelihood(
             getattr(aModel, "signals" if signal_type == "signal_rel" else "nsignals")(mu_hatA),
             marginalize=marginalize,
