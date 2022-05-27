@@ -122,8 +122,11 @@ class Pythia8Wrapper(WrapperBase):
 
     def checkInstallInSubclass ( self ):
         exists = os.path.exists ( self.includeFile )
-        if not exists:
-            self.compile()
+        if exists:
+            return True
+        self.compile()
+        exists = os.path.exists ( self.includeFile )
+        return exists
 
     def run(self, slhaFile, lhefile=None, unlink=True):
         """
