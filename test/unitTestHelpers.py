@@ -268,7 +268,7 @@ class Summary:
         self._read(filename)
 
     def __str__(self):
-        fn = self.filename.replace("//", "/")
+        fn = self._filename.replace("//", "/")
         final = fn.replace(os.getcwd(), ".")
         if len(final) > 50:
             final = "..." + final[-47:]
