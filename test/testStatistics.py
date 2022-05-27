@@ -47,9 +47,9 @@ class StatisticsTest(unittest.TestCase):
             m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0)
             llhdcomp = LikelihoodComputer(m)
             llhddir = llhdcomp.likelihood(nsig)
-            chi2dir = llhdcomp.chi2(nsig)
+            chi2dir = llhdcomp.chi2()
             llhdmarg = llhdcomp.likelihood(nsig, marginalize=True)
-            chi2marg = llhdcomp.chi2(nsig, marginalize=True)
+            chi2marg = llhdcomp.chi2( marginalize=True)
             print("llhd direct", llhddir, chi2dir)
             print("llhd marg", llhdmarg, chi2marg)
             llhdlim, muhat, sigma_mu = likelihoodFromLimits(ulobs, ulexp, nsig)
@@ -106,9 +106,9 @@ class StatisticsTest(unittest.TestCase):
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.)
         llhdcomp = LikelihoodComputer(m)
         llhddir = llhdcomp.likelihood(nsig)
-        chi2dir = llhdcomp.chi2(nsig)
+        chi2dir = llhdcomp.chi2()
         llhdmarg = llhdcomp.likelihood(nsig, marginalize=True)
-        chi2marg = llhdcomp.chi2(nsig, marginalize=True)
+        chi2marg = llhdcomp.chi2( marginalize=True)
         llhdlim, muhat, sigma_exp = likelihoodFromLimits(ulobs, ulexp, nsig)
         chi2lim = chi2FromLimits(llhdlim, ulobs, ulexp)
         ## relative error on chi2, for this example is about 4%
@@ -163,7 +163,7 @@ class StatisticsTest(unittest.TestCase):
         computer = LikelihoodComputer(m)
         dll = math.log(computer.likelihood(nsig, marginalize=False))
         self.assertAlmostEqual(ill, dll, places=2)
-        dchi2 = computer.chi2(nsig, marginalize=False)
+        dchi2 = computer.chi2( marginalize=False)
         # print ( "dchi2,ichi2",dchi2,ichi2)
         self.assertAlmostEqual(ichi2, dchi2, places=2)
 
@@ -175,7 +175,7 @@ class StatisticsTest(unittest.TestCase):
         llhd = computer.likelihood(2, marginalize=False)
         nll = computer.likelihood(2, marginalize=False, nll=True)
         self.assertAlmostEqual(0.0, llhd, places=2)
-        dchi2 = computer.chi2(nsig, marginalize=False)
+        dchi2 = computer.chi2( marginalize=False)
         ichi2 = 4.486108149972863e21
         self.assertAlmostEqual(dchi2 / ichi2, 1.0, places=4)
 
@@ -711,9 +711,9 @@ class StatisticsTest(unittest.TestCase):
             deltab = d["deltab"]
             # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
             # Chi2 as computed by statistics module:
-            m = Data(nobs, nb, deltab**2, deltas_rel=0.2)
+            m = Data(nobs, nb, deltab**2, deltas_rel=0.2, nsignal = nsig )
             computer = LikelihoodComputer(m)
-            chi2_actual = computer.chi2(nsig, marginalize=True)  # , .2*nsig )
+            chi2_actual = computer.chi2( marginalize=True)  # , .2*nsig )
             chi2_expected = d["chi2"]
             # print('chi2exp', chi2_expected)
             if not chi2_expected == None and not np.isnan(chi2_expected):

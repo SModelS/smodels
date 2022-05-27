@@ -946,7 +946,7 @@ class LikelihoodComputer:
             return mu_hat, sigma_mu, llhd
         return mu_hat
 
-    def chi2(self, nsig, marginalize=False):
+    def chi2(self, marginalize=False):
         """
         Computes the chi2 for a given number of observed events nobs given
         the predicted background nb, error on this background deltab,
@@ -957,6 +957,8 @@ class LikelihoodComputer:
         :return: chi2 (float)
 
         """
+        nsig = self.model.nsignal
+        # logger.error ( f"chi2! {nsig} {self.model.nsignal}" )
         nsig = self.model.convert(nsig)
 
         # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
