@@ -35,6 +35,6 @@ jobs:
         python -m pip install -e .
     - name: Test with unittest
       run: |
-        make
+        make pythia8
         cd test
         make test
