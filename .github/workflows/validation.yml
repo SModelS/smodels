@@ -5,9 +5,11 @@ name: SModelS Validation
 
 on:
   push:
-    branches: [ master, release/* ]
+    branches: [ master, develop, release/* ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, develop ]
+  # Enables manual action execution.
+  workflow_dispatch:
 
 jobs:
   build:
@@ -29,7 +31,7 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f smodels/share/requirements.txt ]; then pip install -r smodels/share/requirements.txt; fi
         python -m pip install -e .
-    - name: Test with pytest
+    - name: Test with unitest
       run: |
         cd test
         make test
