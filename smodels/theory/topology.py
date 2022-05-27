@@ -28,7 +28,7 @@ class TopologyDict(dict):
     def addElement(self, newelement):
 
         if isinstance(newelement, Element):
-            canonName = newelement.getCanonName()
+            canonName = newelement.canonName
             if canonName not in self:
                 self[canonName] = [newelement]
             else:

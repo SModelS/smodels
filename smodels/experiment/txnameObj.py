@@ -279,7 +279,7 @@ class TxName(object):
                 in the Txname constraint or condition.
         """
 
-        cName = element.getCanonName()
+        cName = element.canonName
         # Check if the canonical name matches any of the
         # elements in self:
         if cName not in self._topologyDict:

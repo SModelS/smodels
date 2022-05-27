@@ -228,10 +228,10 @@ def cascadeDecay(tree, sigmacut=None):
         for T in treeList:
             newT = addOneStepDecays(T, sigmacut)
             if not newT:
-                finalStates = T.getFinalStates()
+                finalNodes = [n for n in T.nodes if T.out_degree(n) == 0]
                 # Make sure all the final states have decayed
                 # (newT can be empty if there is no allowed decay above sigmacut)
-                if any(fs.isFinalState is False for fs in finalStates):
+                if any(fn.isFinalState is False for fn in finalNodes):
                     continue
                 finalTrees.append(T)  # It was not possible to add any new decay to the tree
             else:

@@ -160,7 +160,10 @@ class ParticleNode(object):
             raise SModelSError("Can not compare node to %s" % type(other))
 
         if self.canonName != other.canonName:
-            return (-1)**int(self.canonName < other.canonName)
+            if self.canonName < other.canonName:
+                return -1
+            else:
+                return 1
 
         if self.particle > other.particle:
             return 1

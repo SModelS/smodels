@@ -166,7 +166,7 @@ class Element(object):
 
         if not isinstance(other, Element):
             raise TypeError("Can not add an Element object to %s" % type(other))
-        elif self.getCanonName() != other.getCanonName():
+        elif self.canonName != other.canonName:
             raise SModelSError("Can not add elements with distinct topologies")
 
         newEl = self.__class__(info=None)
@@ -194,7 +194,7 @@ class Element(object):
 
         if not isinstance(other, Element):
             raise TypeError("Can not add an Element object to %s" % type(other))
-        elif self.getCanonName() != other.getCanonName():
+        elif self.canonName != other.canonName:
             raise SModelSError("Can not add elements with distinct topologies")
 
         self.motherElements += other.motherElements[:]
@@ -344,7 +344,8 @@ class Element(object):
         for mother in self.getAncestors():
             mother.coveredBy.add(resultType)
 
-    def getCanonName(self):
+    @property
+    def canonName(self):
         """
         Returns the canonincal name for the tree. If not defined,
         compute it.
@@ -352,7 +353,7 @@ class Element(object):
 
         canonName = self.tree.canonName
         if not canonName:
-            self.tree.setCanonName()
+            self.tree.setGlobalProperties()
             canonName = self.tree.canonName
 
         return canonName
@@ -458,11 +459,11 @@ class Element(object):
             tree.add_edge(gMom, bsmDaughter)
 
         # Recompute the canonical name and
-        newelement.tree.setCanonName()
+        newelement.tree.setGlobalProperties()
         newelement.sort()
 
         # If element was not compressed, return None
-        if newelement.getCanonName() == self.getCanonName():
+        if newelement.canonName == self.canonName:
             return None
         else:
             return newelement
@@ -479,7 +480,7 @@ class Element(object):
         newelement.motherElements = [self]
         keepCompressing = True
         # Check for compression until tree can no longer be compressed
-        previousName = self.getCanonName()
+        previousName = self.canonName
 
         while keepCompressing:
             tree = newelement.tree
@@ -513,9 +514,9 @@ class Element(object):
                 break
 
             # Recompute the canonical name and
-            newelement.tree.setCanonName()
+            newelement.tree.setGlobalProperties()
             # If iteration has not changed element, break loop
-            name = newelement.getCanonName()
+            name = newelement.canonName
             if name == previousName:
                 keepCompressing = False
             else:
@@ -524,7 +525,7 @@ class Element(object):
         newelement.sort()
 
         # If element was not compressed, return None
-        if newelement.getCanonName() == self.getCanonName():
+        if newelement.canonName == self.canonName:
             return None
         else:
             return newelement
@@ -542,6 +543,6 @@ class Element(object):
         for element in elementList:
             if type(element) != type(self):
                 continue
-            if self.getCanonName() == element.getCanonName():
+            if self.canonName == element.canonName:
                 return True
         return False
