@@ -119,6 +119,8 @@ class WrapperBase(object):
         if not os.access(self.executablePath, os.X_OK):
             logger.warning("%s is not executable Trying to chmod" % self.executable)
             self.chmod()
+        if hasattr ( self, "checkInstallInSubclass" ):
+            return self.checkInstallInSubclass()
         return True
 
     def basePath(self):

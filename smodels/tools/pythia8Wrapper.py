@@ -48,6 +48,9 @@ class Pythia8Wrapper(WrapperBase):
         self.executablePath = self.absPath(executablePath)
         self.executable = None
         self.srcPath = self.absPath(srcPath)
+        self.version = self.getPythiaVersion()
+        includeFile = f"<install>/smodels/lib/pythia8/pythia{self.version}/include/Pythia8/Pythia.h"
+        self.includeFile = self.absPath ( includeFile )
         self.compiler = "C++"
         self.tempdir = None
         self.cfgfile = self.checkFileExists(configFile)
@@ -58,6 +61,18 @@ class Pythia8Wrapper(WrapperBase):
         self.pythiacard = None
 
         self.unlink()
+
+    def getPythiaVersion( self ):
+        """obtain the pythia version we wish to use, stored in file 'pythiaversion'"""
+        versionfile = f"{self.srcPath}/pythiaversion"
+        if not os.path.exists( versionfile ):
+            print( f"[installer.py] error cannot determine pythiaversion: did not find {versionfile}")
+            sys.exit(-1)
+        with open( versionfile, "rt") as f:
+            ver = f.read()
+            ver = ver.strip()
+            f.close()
+        return ver
 
     def checkFileExists(self, inputFile):
         """
@@ -104,6 +119,11 @@ class Pythia8Wrapper(WrapperBase):
             if os.path.exists(self.tempdir):
                 os.rmdir(self.tempdir)
                 self.tempdir = None
+
+    def checkInstallInSubclass ( self ):
+        exists = os.path.exists ( self.includeFile )
+        if not exists:
+            self.compile()
 
     def run(self, slhaFile, lhefile=None, unlink=True):
         """
