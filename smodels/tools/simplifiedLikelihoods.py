@@ -257,10 +257,10 @@ class Data:
                 self.corr[y][x] = rho
         return self.corr
 
-    def signals(self, mu):
+    def rel_signals(self, mu):
         """
-        Returns the number of expected signal events, for all datasets,
-        given total signal strength mu.
+        Returns the number of expected relative signal events, for all datasets,
+        given total signal strength mu. For mu=1, the sum of the numbers = 1.
 
         :param mu: Total number of signal events summed over all datasets.
         """
@@ -467,7 +467,7 @@ class LikelihoodComputer:
         # print ( f">>>> mu_c {np.mean(mu_c)}" )
         if extended_output:
             sigma_mu = self.getSigmaMu(mu_hat, theta_hat)
-            llhd = self.likelihood(self.model.signals(mu_hat), marginalize=marginalize, nll=nll)
+            llhd = self.likelihood(self.model.rel_signals(mu_hat), marginalize=marginalize, nll=nll)
             ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": llhd}
             return ret
         return mu_hat
@@ -876,11 +876,12 @@ class LikelihoodComputer:
 
         return ret
 
-    def likelihood(self, nsig, marginalize=False, nll=False):
+    def likelihood(self, nsig, marginalize=False, nll=False, mu=None):
         """compute likelihood for nsig, profiling the nuisances
         :param marginalize: if true, marginalize, if false, profile
         :param nll: return nll instead of likelihood
         """
+        # print ( f"likelihood {nsig[:2]} {self.model.nsignal[:2]} mu={mu}" )
         nsig = self.model.convert(nsig)
         self.ntot = self.model.backgrounds + nsig
         if marginalize:
@@ -904,14 +905,14 @@ class LikelihoodComputer:
             if abs(self.model.nsignal) > 1e-100:
                 self.muhat = float(dn[0] / self.model.nsignal[0])
             self.sigma_mu = np.sqrt(self.model.observed[0] + self.model.covariance[0][0])
-            return self.likelihood(dn, marginalize=marginalize, nll=nll)
+            return self.likelihood(dn, marginalize=marginalize, nll=nll, mu = self.muhat )
         fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
                               extended_output=True, nll=nll
         )
         muhat_, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         self.muhat = muhat_
         self.sigma_mu = sigma_mu
-        return self.likelihood(muhat_ * self.model.nsignal, marginalize=marginalize, nll=nll)
+        return self.likelihood(muhat_ * self.model.nsignal, marginalize=marginalize, nll=nll, mu=muhat_ )
 
     def findMuHatViaGradient(
         self,
@@ -924,7 +925,7 @@ class LikelihoodComputer:
         signal_rel = self.model.signal_rel
 
         def myllhd(mu):
-            return self.likelihood(mu * signal_rel, nll=True, marginalize=marginalize)
+            return self.likelihood(mu * signal_rel, nll=True, marginalize=marginalize, mu = mu )
 
         import scipy.optimize
 
@@ -962,13 +963,13 @@ class LikelihoodComputer:
         nsig = self.model.convert(nsig)
 
         # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
-        llhd = self.likelihood(nsig, marginalize=marginalize, nll=True)
+        llhd = self.likelihood(nsig, marginalize=marginalize, nll=True, mu = 1. )
 
         # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
         # (keeping the same % error on signal):
         if len(nsig) == 1:
             nsig = self.model.observed - self.model.backgrounds
-            maxllhd = self.likelihood(nsig, marginalize=marginalize, nll=True)
+            maxllhd = self.likelihood(nsig, marginalize=marginalize, nll=True, mu = 1. )
         else:
             maxllhd = self.lmax( marginalize=marginalize, nll=True, allowNegativeSignals=False)
         chi2 = 2 * (llhd - maxllhd)
@@ -1076,14 +1077,17 @@ class UpperLimitComputer:
         if signal_type == "signal_rel":
             sigma_mu = computer.getSigmaMu(mu_hat/sum(model.nsignal), theta_hat0)
             sigma_mu = sigma_mu * sum(model.nsignal)
+            nll0 = computer.likelihood( model.rel_signals(mu_hat),
+                marginalize=marginalize,
+                nll=True, mu = mu_hat,
+            )
         else:
             sigma_mu = computer.getSigmaMu(mu_hat, theta_hat0)
 
-        nll0 = computer.likelihood(
-            getattr(model, "signals" if signal_type == "signal_rel" else "nsignals")(mu_hat),
-            marginalize=marginalize,
-            nll=True,
-        )
+            nll0 = computer.likelihood( model.nsignals(mu_hat),
+                marginalize=marginalize,
+                nll=True, mu = mu_hat,
+            )
         # print ( f"SL nll0 {nll0:.3f} muhat {mu_hat:.3f} sigma_mu {sigma_mu:.3f}" )
         if np.isinf(nll0) and not marginalize and not trylasttime:
             logger.warning(
@@ -1093,7 +1097,7 @@ class UpperLimitComputer:
             nll0 = computer.likelihood(
                 getattr(model, "signals" if signal_type == "signal_rel" else "nsignals")(mu_hat),
                 marginalize=True,
-                nll=True,
+                nll=True, mu = mu_hat,
             )
             if np.isinf(nll0):
                 logger.warning("marginalization didnt help either. switch back.")
@@ -1110,7 +1114,7 @@ class UpperLimitComputer:
         if signal_type == "signal_rel":
             mu_hatA = mu_hatA * sum ( aModel.nsignal)
         nll0A = compA.likelihood(
-            getattr(aModel, "signals" if signal_type == "signal_rel" else "nsignals")(mu_hatA),
+            getattr(aModel, "rel_signals" if signal_type == "signal_rel" else "nsignals")(mu_hatA),
             marginalize=marginalize,
             nll=True,
         )
@@ -1127,7 +1131,7 @@ class UpperLimitComputer:
                         CLs: returns CLs value
             """
             ## the function to find the zero of (ie CLs - alpha)
-            nsig = getattr(model, "signals" if signal_type == "signal_rel" else "nsignals")(mu)
+            nsig = getattr(model, "rel_signals" if signal_type == "signal_rel" else "nsignals")(mu)
             computer.ntot = model.backgrounds + nsig
             nll = computer.likelihood(nsig, marginalize=marginalize, nll=True)
             nllA = compA.likelihood(nsig, marginalize=marginalize, nll=True)
