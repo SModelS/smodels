@@ -17,6 +17,9 @@ class InclusiveValue(int):
     def __init__(self):
         int.__init__(self)
 
+    def __hash__(self):
+        return 0
+
     def __str__(self):
         return '*'
 

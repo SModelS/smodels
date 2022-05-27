@@ -64,9 +64,9 @@ class TxName(object):
         txtFile = open(path, 'r')
         txdata = txtFile.read()
         txtFile.close()
-        if not "txName" in txdata:
+        if "txName" not in txdata:
             raise TypeError
-        if not 'upperLimits' in txdata and not 'efficiencyMap' in txdata:
+        if 'upperLimits' not in txdata and 'efficiencyMap' not in txdata:
             raise TypeError
         content = concatenateLines(txdata.split("\n"))
 
@@ -100,18 +100,6 @@ class TxName(object):
         ident = self.globalInfo.id+":"+dataType[0]+":" + str(self._infoObj.dataId)
         ident += ":" + self.txName
 
-        # Get detector size (if not found in self, look for it in datasetInfo or globalInfo).
-        # If not defined anywhere, set it to None and default values will be used for reweighting.
-        self.Leff_inner = self.fetchAttribute('Leff_inner', fillvalue=None)
-        self.Leff_outer = self.fetchAttribute('Leff_outer', fillvalue=None)
-
-        self.txnameData = TxNameData(data, dataType, ident,
-                                     Leff_inner=self.Leff_inner,
-                                     Leff_outer=self.Leff_outer)
-        if expectedData:
-            self.txnameDataExp = TxNameData(expectedData, dataType, ident,
-                                            Leff_inner=self.Leff_inner,
-                                            Leff_outer=self.Leff_outer)
         # Builds up a list of elements appearing in constraints:
         elements = []
         if not databaseParticles:
@@ -145,6 +133,47 @@ class TxName(object):
         #  and conditions:
         for el in elements:
             self._topologyDict.addElement(el)
+        # If not defined, compute the dataMap
+        dataMap = self.getDataMap()
+
+        # Get detector size (if not found in self, look for it in datasetInfo or globalInfo).
+        # If not defined anywhere, set it to None and default values will be used for reweighting.
+        self.Leff_inner = self.fetchAttribute('Leff_inner', fillvalue=None)
+        self.Leff_outer = self.fetchAttribute('Leff_outer', fillvalue=None)
+
+        self.txnameData = TxNameData(data, dataType, ident,
+                                     Leff_inner=self.Leff_inner,
+                                     Leff_outer=self.Leff_outer)
+        if expectedData:
+            self.txnameDataExp = TxNameData(expectedData, dataType, ident,
+                                            Leff_inner=self.Leff_inner,
+                                            Leff_outer=self.Leff_outer)
+
+    def getDataMap(self):
+        """
+        Using the elements in the topology, construct a dictionary
+        mapping the node.number, the node attributes and the corresponding
+        index in flatten data array.
+
+        :return: Dictionary with the data mapping
+                (e.g. {node1.node : {'mass' : 0}, node2.node : {'mass' : 1, 'totalwidth' : 2},...})
+        """
+
+        # If dataMap has already been defined, return it
+        if hasattr(self, 'dataMap'):
+            return self.dataMap
+
+        # Check if all elements in the txname share the same topology:
+        if len(self._topologyDict) != 1:
+            print(self.globalInfo.id)
+            print(self)
+            print(self._topologyDict)
+            raise SModelSError("Can not construct a data map for elements with distinct topologies")
+
+        # Since all elements are equivalent, use the first one
+        # to define the map:
+        el = self._topologyDict.getElements()[0]
+        #
 
     def hasOnlyZeroes(self):
         ozs = self.txnameData.onlyZeroValues()
@@ -199,20 +228,6 @@ class TxName(object):
         :param element: Element object or mass array (with units)
         :param expected: look in self.txnameDataExp, not self.txnameData
         """
-        if hasattr(self, "dbClient"):
-            # #  we have a databaseClient, so we send the request
-            # #  over the network
-            #  query = "obs:ATLAS-SUSY-2013-05:ul:T2bb:[[300,100],[300,100]]"
-            query = "obs:"
-            if expected:
-                query = "exp:"
-            query += self.globalInfo.id + ":ul:"
-            query += self.txName + ":"
-            query += self.getMassVectorFromElement(element)
-            logger.info("sending ul query %s to %s:%d" %
-                        (query, self.dbClient.servername, self.dbClient.port))
-            from smodels.tools.physicsUnits import fb
-            return self.dbClient.query(query)
 
         if not self.txnameData.dataType == 'upperLimit':
             logger.error("getULFor method can only be used in UL-type data.")
@@ -306,44 +321,6 @@ class TxName(object):
             return True
         return False
 
-    def getMassVectorFromElement(self, element):
-        """
-        given element, extract the mass vector for the server query.
-        element can be list of masses or "Element"
-
-        :returns: eg [[300,100],[300,100]]
-        """
-        if type(element) == list:
-            return str(element).replace(" [GeV]", "").replace(" ", "")
-        from smodels.theory.clusterTools import AverageElement
-        if type(element) == AverageElement:
-            #  ret += str(element.mass).replace(" [GeV]","").replace(" ","")
-            return str(element.mass).replace(" [GeV]", "").replace(" ", "")
-        ret = "["
-        for i, br in enumerate(element.branches):
-            ret += str(br.mass).replace(" [GeV]", "").replace(" ", "")
-            if i+1 < len(element.branches):
-                ret += ","
-        ret += "]"
-        #  print ( "getMassVectorFromElement returning", ret )
-        return ret
-
-    def getQueryStringForElement(self, element):
-        # #  we have a databaseClient, so we send the request
-        # #  over the network
-        #  query = "obs:ATLAS-SUSY-2013-05:ul:T2bb:[[300,100],[300,100]]"
-        query = "obs:"
-        # if expected:
-        #     query = "exp:"
-        query += self.globalInfo.id + ":"
-        dId = self._infoObj.dataId
-        if dId == None:
-            dId = "ul"
-        query += dId + ":"
-        query += self.txName + ":"
-        query += self.getMassVectorFromElement(element)
-        return query
-
     def getEfficiencyFor(self, element):
         """
         For upper limit results, checks if the input element falls inside the
@@ -358,28 +335,11 @@ class TxName(object):
         """
 
         if self.txnameData.dataType == 'efficiencyMap':
-            if hasattr(self, "dbClient"):
-                query = self.getQueryStringForElement(element)
-                logger.info("sending em query %s to %s:%d" %
-                            (query, self.dbClient.servername, self.dbClient.port))
-                # print ( "query will be", query )
-                # return 0.001
-                eff = self.dbClient.query(query)
-            else:
-                eff = self.txnameData.getValueFor(element)
-
+            eff = self.txnameData.getValueFor(element)
             if not eff or math.isnan(eff):
                 eff = 0.  # Element is outside the grid or has zero efficiency
         elif self.txnameData.dataType == 'upperLimit':
-            if hasattr(self, "dbClient"):
-                query = self.getQueryStringForElement(element)
-                logger.info("sending query %s to %s:%d" %
-                            (query, self.dbClient.servername, self.dbClient.port))
-                # print ( "query will be", query )
-                # return 0.001
-                ul = self.dbClient.query(query)
-            else:
-                ul = self.txnameData.getValueFor(element)
+            ul = self.txnameData.getValueFor(element)
             if isinstance(element, Element):
                 element._upperLimit = ul  # Store the upper limit for convenience
             if ul is None:
@@ -786,11 +746,11 @@ class TxNameData(object):
         # Check if input point has larger dimensionality:
         dp = self.countNonZeros(point)
         if dp > self.dimensionality:  # we have data in different dimensions
-            if self._accept_errors_upto == None:
+            if self._accept_errors_upto is None:
                 return None
             logger.debug("attempting to interpolate outside of convex hull "
-                    "(d=%d,dp=%d,point=%s)" %
-                     (self.dimensionality, dp, str(point)))
+                         "(d=%d,dp=%d,point=%s)" %
+                         (self.dimensionality, dp, str(point)))
             val = self._interpolateOutsideConvexHull(point)
         else:
             val = self._returnProjectedValue()
@@ -849,7 +809,7 @@ class TxNameData(object):
         point = np.array(point)
         # #  how far are we away from the "plane": distance alpha
         alpha = float(np.sqrt(np.dot(point[self.dimensionality:],
-                        point[self.dimensionality:])))
+                                     point[self.dimensionality:])))
         if alpha == 0.:
             # #  no distance to the plane, so no extrapolation error
             return 0.
@@ -962,7 +922,7 @@ class TxNameData(object):
 
         """
 
-        if not self._V is None:
+        if self._V is not None:
             return
 
         # Convert nested mass arrays (with width tuples) to coordinates
@@ -1008,7 +968,7 @@ class TxNameData(object):
         if self.dimensionality > 1:
             try:
                 from scipy.spatial import Delaunay
-            except:
+            except (ImportError, ModuleNotFoundError):
                 from scipy.spatial.qhull import Delaunay
             self.tri = Delaunay(MpCut)
         else:

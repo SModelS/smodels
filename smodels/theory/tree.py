@@ -448,11 +448,10 @@ class Tree(nx.DiGraph):
         """
 
         elStr = ""
-        T = self
         root = self.root
         nodesDict = {0: 0}
         counter = 1
-        for mom, daughters in nx.bfs_successors(T, root):
+        for mom, daughters in self.bfs_successors(root):
 
             # Add mom (if mom = 0 does not include index)
             if mom.node == 0:
@@ -467,7 +466,7 @@ class Tree(nx.DiGraph):
             for n in daughters:
                 if n.isInclusive and n.finalStates:
                     stable = False
-                elif T.out_degree(n) == 0:
+                elif self.out_degree(n) == 0:
                     stable = True
                 else:
                     stable = False
@@ -482,7 +481,7 @@ class Tree(nx.DiGraph):
         elStr = elStr[:-2]
 
         # Deal separately with daughters for inclusive nodes (if it exists)
-        for n in T.nodes:
+        for n in self.nodes:
             if not n.isInclusive:
                 continue
             if not n.finalStates:
@@ -503,8 +502,7 @@ class Tree(nx.DiGraph):
                  (e.g. [[['e-','mu'],['L']],[['jet']]])
         """
 
-        tree = self
-        branches = [b for b in tree.successors(self.root)]
+        branches = [b for b in self.successors(self.root)]
         finalState = []
         intermediateState = []
         branchList = []
@@ -514,15 +512,15 @@ class Tree(nx.DiGraph):
             intermediateState.append([])
             branchList.append([])
             # Deal separately with the case where the primary mother is stable:
-            if tree.out_degree(b) == 0:
+            if self.out_degree(b) == 0:
                 if not b.isSM:
                     finalState.append(str(b))
                     continue
                 else:
                     raise SModelSError("Can not convert tree with Z2-violating decays to bracket")
-            for mom, daughters in nx.bfs_successors(tree, b):
+            for mom, daughters in self.bfs_successors(b):
                 vertexList = [str(d) for d in daughters if d.isSM]
-                fstates = [str(d) for d in daughters if not d.isSM and tree.out_degree(d) == 0]
+                fstates = [str(d) for d in daughters if not d.isSM and self.out_degree(d) == 0]
                 if daughters:
                     if len(vertexList) != len(daughters) - 1 or len(fstates) > 1:
                         raise SModelSError("Can not convert tree with Z2-violating decays to bracket: \n  %s" % self.treeToString())
@@ -609,7 +607,7 @@ class Tree(nx.DiGraph):
 
         # Return source, if it is already a final state
         if self.out_degree(source) == 0:
-            return [source]
+            return [source.particle]
 
         finalStates = []
         for mom, daughters in self.bfs_successors(source):

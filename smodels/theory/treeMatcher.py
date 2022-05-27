@@ -57,23 +57,19 @@ class TreeMatcher(object):
         :return: 0 if nodes are equal, 1 if T1_node > T2_node, -1 otherwise
         """
 
-        # print('Checking %s and %s' % (T1_node, T2_node))
         if T2_node in self._comps[T1_node]:
-            # print('-returning cache')
             return self._comps[T1_node][T2_node]
 
         # Compare nodes directly (canon name and particle content)
         cmp = T1_node.compareTo(T2_node)
         if cmp != 0:
             self._comps[T1_node].update({T2_node: cmp})
-            # print('---> Returning nodes %s and %s do not match' % (T1_node, T2_node), cmp)
             return cmp
 
         # For inclusive nodes always return True (once nodes are equal)
         if T1_node.isInclusive or T2_node.isInclusive:
             self._comps[T1_node].update({T2_node: 0})  # Cache comparison
             self.mappingDict.update({T1_node: T2_node})
-            # print('---> Returning (inclusive)', 0)
             return 0
 
         # Check for equality of daughters
@@ -89,8 +85,6 @@ class TreeMatcher(object):
         sortedDaughters2 = sorted(successors2,
                                   key=lambda n: (not n.isInclusive, n.canonName, n.particle))
 
-        # print('Daughters1 = ', sortedDaughters1)
-        # print('Daughters2 = ', sortedDaughters2)
         # Check all permutations within each set of daughters with the
         # same canonical name
         allPerms = []
@@ -102,12 +96,11 @@ class TreeMatcher(object):
         for daughters2_perm in itertools.product(*allPerms):
             daughters2_perm = itertools.chain.from_iterable(daughters2_perm)
             daughters2_perm = list(daughters2_perm)
-            # print('checking perm', daughters2_perm)
+
             for i2, d2 in enumerate(daughters2_perm):
                 d1 = sortedDaughters1[i2]
                 cmp = self.compareSubTrees(d1, d2)
                 if cmp != 0:
-                    # print('daughter failed', cmp, cmp_max)
                     cmp_max = max(cmp, cmp_max)
                     break
             else:
@@ -116,7 +109,6 @@ class TreeMatcher(object):
                 self.mappingDict.update({T1_node: T2_node})
                 return 0
 
-        # print('--->Returning False (daughters did not match)', cmp_max)
         self._comps[T1_node].update({T2_node: cmp_max})  # Cache comparison
         # Return maximum comparison value,
         # so the result is independent of the nodes ordering

@@ -52,6 +52,8 @@ class DataSet(object):
 
             # Get list of TxName objects:
             for txtfile in glob.iglob(os.path.join(path, "*.txt")):
+                if 'dataInfo.txt' in txtfile:
+                    continue
                 try:
                     txname = txnameObj.TxName(txtfile, self.globalInfo,
                                               self.dataInfo, databaseParticles)
@@ -60,7 +62,8 @@ class DataSet(object):
                                      (self.path, txname.txName))
                         continue
                     self.txnameList.append(txname)
-                except TypeError:
+                except TypeError as e:
+                    logger.warning('Error creating txname from file %s:\n %s' % (txtfile, e))
                     continue
 
             self.txnameList.sort()
@@ -162,9 +165,11 @@ class DataSet(object):
         return False
 
     def checkForRedundancy(self, databaseParticles):
-        """ In case of efficiency maps, check if any txnames have overlapping
-            constraints. This would result in double counting, so we dont
-            allow it. """
+        """
+        In case of efficiency maps, check if any txnames have overlapping
+        constraints. This would result in double counting, so we dont
+        allow it.
+         """
         if self.getType() == "upperLimit":
             return False
         logger.debug("checking for redundancy")
@@ -183,11 +188,12 @@ class DataSet(object):
                                 model=databaseParticles)
                 datasetElements.append(newEl)
         combos = itertools.combinations(datasetElements, 2)
+
         for x, y in combos:
             if x == y and _complainAboutOverlappingConstraints:
                 errmsg = "Constraints (%s) and (%s) appearing in dataset %s:%s overlap "\
-                        "(may result in double counting)." % \
-                        (x, y, self.getID(), self.globalInfo.id)
+                         "(may result in double counting)." % \
+                         (x, y, self.getID(), self.globalInfo.id)
                 logger.error(errmsg)
                 raise SModelSError(errmsg)
 
@@ -306,7 +312,7 @@ class DataSet(object):
             #    print ( f"COMB ebg={self.dataInfo.expectedBG:.3f} obs={obs:.3f} nsig {nsig[0]:.3f}" )
             computer = LikelihoodComputer(m)
         ret = computer.likelihood(nsig, marginalize=marginalize)
-        if hasattr ( computer, "theta_hat" ):
+        if hasattr(computer, "theta_hat"):
             ## seems like someone wants to debug them
             self.theta_hat = computer.theta_hat
 
@@ -342,12 +348,12 @@ class DataSet(object):
         m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
                  deltas_rel=deltas_rel)
         computer = LikelihoodComputer(m)
-        ret = computer.lmax ( marginalize=marginalize, nll=False,
-                              allowNegativeSignals=allowNegativeSignals )
-        if hasattr ( computer, "theta_hat" ):
+        ret = computer.lmax(marginalize=marginalize, nll=False,
+                            allowNegativeSignals=allowNegativeSignals)
+        if hasattr(computer, "theta_hat"):
             ## seems like someone wants to debug them
             self.theta_hat = computer.theta_hat
-        if hasattr ( computer, "muhat" ):
+        if hasattr(computer, "muhat"):
             ## seems like someone wants to debug them
             self.muhat = computer.muhat
         return ret
