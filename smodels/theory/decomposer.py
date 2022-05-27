@@ -72,15 +72,9 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
     # Create elements for each tree and combine equal elements
     smsTopDict = TopologyDict()
 
-    # nel = 0
     for tree in allTrees:
         newElement = Element(tree)
         newElement.weight = tree.getTreeWeight()
-        # nel += 1
-        # if nel == 444:
-        # return tree, smsTopDict
-        # print('Adding', newElement)
-        # print(nel)
         smsTopDict.addElement(newElement)
 
     if massCompress or invisibleCompress:

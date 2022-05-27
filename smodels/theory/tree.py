@@ -13,7 +13,7 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.particle import Particle
 from smodels.theory.auxiliaryFunctions import bracketToProcessStr
 from smodels.tools.inclusiveObjects import InclusiveValue
-from smodels.theory.treeMatcher import compareTrees, TreeMatcher, sortTreeList
+from smodels.theory.treeMatcher import TreeMatcher, sortTreeList
 
 # Define a common inclusive particle object
 # to be used with the inclusive node
@@ -143,7 +143,7 @@ class ParticleNode(object):
 
         return newNode
 
-    def compareNode(self, other):
+    def compareTo(self, other):
         """
         Compare nodes accoring to their canonical name
         and particle.
@@ -154,7 +154,7 @@ class ParticleNode(object):
         """
 
         if other.isInclusive:
-            return -other.compareNode(self)
+            return -other.compareTo(self)
 
         if not isinstance(other, ParticleNode):
             raise SModelSError("Can not compare node to %s" % type(other))
@@ -182,7 +182,7 @@ class ParticleNode(object):
         :return: True if nodes are equal, false otherwise
         """
 
-        return (self.compareNode(other) == 0)
+        return (self.compareTo(other) == 0)
 
     def copy(self):
         """
@@ -225,7 +225,7 @@ class InclusiveParticleNode(ParticleNode):
         self.isFinalState = True  # Can always be considered as a final state
         self.isInclusive = True
 
-    def compareNode(self, other):
+    def compareTo(self, other):
         """
         Compares only the finalStates attributes of self and other.
         All the final states in other have to match at least one final
@@ -242,7 +242,9 @@ class InclusiveParticleNode(ParticleNode):
         for fs in fsB:
             if fs in fsA:
                 continue
-            if fs > fsA[-1]:  # Define other > self if fs > largest state in self
+            elif not other.isInclusive:
+                return -1  # Always smaller than ParitcleNode
+            elif fs > fsA[-1]:  # Define other > self if fs > largest state in self
                 return -1
             else:
                 return 1
@@ -695,23 +697,14 @@ class Tree(nx.DiGraph):
         canonB = other.canonName
         if canonA != canonB:
             if canonA > canonB:
-                return 1
+                return 1, None
             else:
-                return -1
+                return -1, None
 
         # Try to find an isormorphism:
         matcher = TreeMatcher(self, other)
-        matchedTree = next(matcher.getMatches(), None)
-        if matchedTree is not None:
-            return 0, matchedTree
-
-        # If no matches were found, compare the trees:
-        cmp = compareTrees(self, other)
-        # We should always have cmp != 0, since no isomorphism was found.
-        # Sanity check:
-        if cmp == 0:
-            raise SModelSError("Trees are equal, but no isomorphism was found. Something went wrong.")
-        return cmp, None
+        cmp, matchedTree = matcher.compareTrees()
+        return cmp, matchedTree
 
     def sort(self):
         """

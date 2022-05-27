@@ -7,130 +7,197 @@
 
 """
 
-import networkx.algorithms.isomorphism.isomorphvf2 as vf2
-from smodels.tools.smodelsLogging import logger
+import itertools
 
-class TreeMatcher(vf2.DiGraphMatcher):
+
+class TreeMatcher(object):
     """
-    VF2 isomorphism checker for directed graphs.
-    It uses the node comparison method to define equivalent nodes.
+    Isomorphism checker for labelled trees. It starts at the root and checks for subtree
+    isomosphisms. The tree and subtree topology is encoded in its encoding (canonical name),
+    so the comparison is made based on its canonical name. If a set of neighboor subtrees
+    have identical names, all the permutations are tested for isomorphism.
+    The comparison relies on the method for node comparison, which compares canonical names
+    and particle content.
     """
 
-    def __init__(self, G1, G2):
+    def __init__(self, T1, T2):
         """
         Initialize graph matcher.
 
-        Parameters
-        ----------
-        G1, G2 : graph
-            The graphs to be tested.
+        :parameter treeA: Tree object
+        :parameter treeB: Tree object
+
+        :return: A dictionary mappinn the nodes of treeA and treeB ({nA : nB}).
 
         """
-        vf2.DiGraphMatcher.__init__(self, G1, G2)
 
         # These will be modified during checks to minimize code repeat.
-        self.G1_adj = self.G1.adj
-        self.G2_adj = self.G2.adj
+        self.T1 = T1
+        self.T2 = T2
+        self._comps = {n: {} for n in T1.nodes}  # Cache node comparison (for debugging)
+        self.mappingDict = {n: None for n in T1.nodes}
 
-    def semantic_feasibility(self, G1_node, G2_node):
+    def swapTrees(self):
         """
-        Returns True if G1_node to G2_node are semantically feasible.
+        Swap the trees T1<->T2, so the comparison will be made as T2 as the base tree.
+        """
+
+        T1, T2 = self.T1, self.T2
+        self.__init__(T2, T1)
+
+    def compareSubTrees(self, T1_node, T2_node):
+        """
+        Compare the subtrees with T1_node and T2_node as roots.
+        The comparison is made according to their names, particle content and final states.
         It uses the node comparison to define semantically equivalent nodes.
+
+        :param T1_node: Particle node belonging to self.T1
+        :param T2_node: Particle node belonging to self.T2
+
+        :return: 0 if nodes are equal, 1 if T1_node > T2_node, -1 otherwise
         """
 
-        # Test node_match and also test edge_match on successors
-        feasible = G1_node.equalTo(G2_node)
-        if not feasible:
-            return False
+        # print('Checking %s and %s' % (T1_node, T2_node))
+        if T2_node in self._comps[T1_node]:
+            # print('-returning cache')
+            return self._comps[T1_node][T2_node]
 
-        # Test edge_match on predecessors
-        self.G1_adj = self.G1.pred
-        self.G2_adj = self.G2.pred
-        feasible = G1_node.equalTo(G2_node)
-        self.G1_adj = self.G1.adj
-        self.G2_adj = self.G2.adj
+        # Compare nodes directly (canon name and particle content)
+        cmp = T1_node.compareTo(T2_node)
+        if cmp != 0:
+            self._comps[T1_node].update({T2_node: cmp})
+            # print('---> Returning nodes %s and %s do not match' % (T1_node, T2_node), cmp)
+            return cmp
 
-        return feasible
+        # For inclusive nodes always return True (once nodes are equal)
+        if T1_node.isInclusive or T2_node.isInclusive:
+            self._comps[T1_node].update({T2_node: 0})  # Cache comparison
+            self.mappingDict.update({T1_node: T2_node})
+            # print('---> Returning (inclusive)', 0)
+            return 0
 
-    def getMatches(self, invert=False):
-        """
-        Compare self.G1 to self.G2, which contains an inclusive node.
-        There is a match if G2 is a subtree of G1
-        and the inclusive node matches the equivalent node of the subtree.
+        # Check for equality of daughters
+        successors1 = list(self.T1.successors(T1_node))
+        successors2 = list(self.T2.successors(T2_node))
 
-        The matched tree has its tree reduced to the subtree,
-        with an InclusiveNode.
+        # Sort the daughters. Inclusive nodes will always come first,
+        # and the remaining nodes are sorted by canonName and particle, so if the nodes differ,
+        # the comparison is independent of the original daughters position
+        sortedDaughters1 = sorted(successors1,
+                                  key=lambda n: (not n.isInclusive, n.canonName, n.particle))
 
-        :param other: Tree containing an InclusiveParticleNode
-        :param invert: If True, will return the copy of the
-                       G1 subtree correspoding to G2.
+        sortedDaughters2 = sorted(successors2,
+                                  key=lambda n: (not n.isInclusive, n.canonName, n.particle))
 
-        :return: Iterator over the matching trees. If no matches were found, return None.
-        """
+        # print('Daughters1 = ', sortedDaughters1)
+        # print('Daughters2 = ', sortedDaughters2)
+        # Check all permutations within each set of daughters with the
+        # same canonical name
+        allPerms = []
+        for key, group in itertools.groupby(sortedDaughters2, lambda d: d.canonName):
+            allPerms.append(itertools.permutations(group))
 
-        treeA = self.G1
-        treeB = self.G2
-        inclusiveA = any(n.isInclusive for n in treeA.nodes)
-        inclusiveB = any(n.isInclusive for n in treeB.nodes)
-        if inclusiveA and inclusiveB:
-            msg = 'Comparing two trees with inclusive nodes.'
-            msg += 'The comparison will likely produce wrong results!'
-            logger.warning(msg)
-        if inclusiveA and not inclusiveB:
-            matcher = TreeMatcher(treeB, treeA)
-            treeA = self.G2
-            treeB = self.G1
-            invert = not invert
-        else:
-            matcher = self
-
-        inclusive = (inclusiveA or inclusiveB)
-
-        # Get the isomorphism matches (if inclusive, other = subtree of self)
-        if inclusive:
-            matches = matcher.subgraph_isomorphisms_iter()
-        else:
-            matches = matcher.match()
-
-        for match in matches:
-            if invert:
-                match = {v: k for k, v in match.items()}
-                sourceTree = treeA
-                baseTree = treeB
+        # Construct all permutations and check against daughters1:
+        cmp_max = -10
+        for daughters2_perm in itertools.product(*allPerms):
+            daughters2_perm = itertools.chain.from_iterable(daughters2_perm)
+            daughters2_perm = list(daughters2_perm)
+            # print('checking perm', daughters2_perm)
+            for i2, d2 in enumerate(daughters2_perm):
+                d1 = sortedDaughters1[i2]
+                cmp = self.compareSubTrees(d1, d2)
+                if cmp != 0:
+                    # print('daughter failed', cmp, cmp_max)
+                    cmp_max = max(cmp, cmp_max)
+                    break
             else:
-                sourceTree = treeB
-                baseTree = treeA
+                # Found one permutation where all nodes match:
+                self._comps[T1_node].update({T2_node: 0})  # Cache comparison
+                self.mappingDict.update({T1_node: T2_node})
+                return 0
 
-            # Make a copy of the source tree
-            matchedTree = sourceTree.copyTree()
+        # print('--->Returning False (daughters did not match)', cmp_max)
+        self._comps[T1_node].update({T2_node: cmp_max})  # Cache comparison
+        # Return maximum comparison value,
+        # so the result is independent of the nodes ordering
+        return cmp_max
 
-            # Remove all nodes and edges
-            matchedTree.clear()
-            # Store the nodes in the correct order:
-            newNodes = []
-            for n in baseTree.nodes:  # match = {baseTree : sourceTree}
-                if n not in match:  # In case of inclusive nodes the match is partial
-                    continue
-                if n.isInclusive:
-                    newNode = n.copy()
-                else:
-                    # Make a copy of the original node
-                    newNode = match[n].copy()
-                newNode.node = n.node  # Force the node numbering to be equal
-                newNodes.append(newNode)
-                match[n] = newNode  # Update the dictionary with the copied node
+    def compareTrees(self, invert=False):
+        """
+        Compare self.T1 to self.T2. Returns an isomorphism of self.T2 which
+        matches T1. If T2 contains an inclusive node, T2 can be a subtree of T1 (T2 C T1).
+        If T1 contains an inclusive node, T1 can be a subtree of T2 (T1 C T2).
+        If both T1 and T2 have inclusive nodes, both possibilites are tried out:
+        T1 C T2 or T2 C T1.
 
-            # Store the edges in the correct order:
-            newEdges = [(match[nA], match[nB]) for nA, nB in baseTree.edges
-                        if (nA in match and nB in match)]
-            # Add the nodes and the edges to the new tree:
-            matchedTree.add_nodes_from(newNodes)
-            matchedTree.add_edges_from(newEdges)
-            matchedTree.setGlobalProperties()
-            yield matchedTree
+        :param invert: If True, will return a copy of the
+                       T1 tree matching T2.
 
-        # If there was not good match, return None
-        return None
+        :return: Returns the comparison value and the matching tree.
+                 If no matches were found (cmp != 0), return None and the comparison value.
+        """
+
+        isInclusiveT1 = any(n.isInclusive for n in self.T1)
+        isInclusiveT2 = any(n.isInclusive for n in self.T2)
+        if isInclusiveT1:
+            self.swapTrees()
+            invert = not invert
+        # print('First check', invert)
+        cmp = self.compareSubTrees(self.T1.root, self.T2.root)
+        if invert:
+            cmp = -cmp
+        if cmp != 0:
+            # If both trees are inclusive, try the opposite comparison:
+            if isInclusiveT1 and isInclusiveT2:
+                self.swapTrees()
+                invert = not invert
+                # print('Second check', invert)
+                cmp_swap = self.compareSubTrees(self.T1.root, self.T2.root)
+                if cmp_swap != 0:
+                    return cmp, None
+            else:
+                return cmp, None
+
+        # Remove unmatched nodes (which happens in case of InclusiveNodes)
+        match = {n1: n2 for n1, n2 in self.mappingDict.items() if n2 is not None}
+        # Define sourceTree (tree to be returned with its ordering
+        # and node numbering matching the baseTree)
+        if not invert:
+            sourceTree = self.T2
+            baseTree = self.T1
+        else:
+            match = {v: k for k, v in match.items()}
+            sourceTree = self.T1
+            baseTree = self.T2
+
+        # Make a copy of the source tree
+        matchedTree = sourceTree.copyTree()
+
+        # Remove all nodes and edges
+        matchedTree.clear()
+        # Store the nodes in the correct order:
+        newNodes = []
+        for n in baseTree.nodes:  # match = {baseTree : sourceTree}
+            if n not in match:  # In case of inclusive nodes the match is partial
+                continue
+            if n.isInclusive:
+                newNode = n.copy()
+            else:
+                # Make a copy of the original node
+                newNode = match[n].copy()
+            newNode.node = n.node   # Force the node numbering to be equal
+            newNodes.append(newNode)
+            match[n] = newNode  # Update the dictionary with the copied node
+
+        # Store the edges in the correct order:
+        newEdges = [(match[nA], match[nB]) for nA, nB in baseTree.edges
+                    if (nA in match and nB in match)]
+        # Add the nodes and the edges to the new tree:
+        matchedTree.add_nodes_from(newNodes)
+        matchedTree.add_edges_from(newEdges)
+        matchedTree.setGlobalProperties()
+
+        return 0, matchedTree
 
 
 def sortTreeList(treeList):
@@ -142,69 +209,15 @@ def sortTreeList(treeList):
     :return: Sorted list of Tree objects
     """
 
-    # Create a listed of sorted nodes with proper canonical names according to the node comparison:
-    # Always put the inclusive trees at the beginning
+    # Create a listed of sorted nodes with proper canonical names according to the node comparison.
+    # Make sure trees which have an include node as root are always at the beginning
     inclusiveTrees = [t for t in treeList if t.root.isInclusive]
     sortedTrees = []
     for tree in treeList:
-        if tree.root.isInclusive:
-            continue
         itree = 0
-        while itree < len(sortedTrees) and compareTrees(tree, sortedTrees[itree]) > 0:
+        while itree < len(sortedTrees) and tree.compareTreeTo(sortedTrees[itree])[0] > 0:
             itree += 1
         sortedTrees.insert(itree, tree)
 
     sortedTrees = inclusiveTrees + sortedTrees
     return sortedTrees
-
-
-def compareTrees(treeA, treeB):
-    """
-    Recursively compare trees. The comparison is based on the canon names
-    and particles of the roots. If these are equal, the subtrees are compared.
-    The comparison does not take into account permutations of equivalent subtrees.
-    If one of the trees has an InclusiveParticleNode as root, it is always considered
-    as the smaller tree.
-
-    :param treeA: Tree object
-    :param treeB: Tree object
-
-    :return: 1, if treeA > treeB, -1, if treeA < treeB, 0 if treeA == treeB
-    """
-
-    canonA = treeA.canonName
-    canonB = treeB.canonName
-    if canonA != canonB:
-        return (-1)**int(canonA < canonB)
-
-    rootA = treeA.root
-    rootB = treeB.root
-    if rootA.isInclusive:
-        return 0
-    elif rootB.isInclusive:
-        return 0
-
-    cmp = rootA.compareNode(rootB)
-    # Return comparison if roots differ or root has no daughters
-    if cmp != 0:
-        return cmp
-
-    # If root has no daughters and roots agree, then trees are equal
-    if treeA.out_degree(rootA) == 0:
-        return 0
-
-    # Get daughters and sort them, so the comparison is unique:
-    subTreesA = [treeA.getSubTree(source=daughter) for daughter in treeA.successors(rootA)]
-    subTreesA = sortTreeList(subTreesA)
-    subTreesB = [treeB.getSubTree(source=daughter)  for daughter in treeB.successors(rootB)]
-    subTreesB = sortTreeList(subTreesB)
-
-    # Loop over sorted daughters and stop when the first differ:
-    for itree, subtreeA in enumerate(subTreesA):
-        subtreeB = subTreesB[itree]
-        cmp = compareTrees(subtreeA, subtreeB)
-        if cmp != 0:
-            return cmp
-
-    # If all subtrees were identical, return zero
-    return 0
