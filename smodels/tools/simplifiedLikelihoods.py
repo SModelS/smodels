@@ -366,10 +366,13 @@ class LikelihoodComputer:
 
         :param nsig: array with relative signal strengths or signal yields
         :param allowNegativeSignals: if true, then also allow for negative values
-        :param extended_output: if true, return also sigma_mu, the estimate of the error of mu_hat, and lmax, the likelihood at mu_hat
+        :param extended_output: if true, return also sigma_mu, the estimate of the error of mu_hat,
+         and lmax, the likelihood at mu_hat
         :param nll: if true, return nll instead of lmax in the extended output
 
-        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended output is requested, it returns mu_hat, sigma_mu -- the standard deviation around mu_hat, and llhd, the likelihood at mu_hat
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended output is
+        requested, it returns mu_hat, sigma_mu -- the standard deviation around mu_hat, and llhd,
+        the likelihood at mu_hat
         """
         if (self.model.backgrounds == self.model.observed).all():
             return self.extendedOutput(extended_output, 0.0)
@@ -891,6 +894,22 @@ class LikelihoodComputer:
         else:
             return self.profileLikelihood(nsig, nll)
 
+    def likelihood_beta(self, mu: float, marginalize: bool = False, nll: bool = False) -> float:
+        """compute likelihood for nsig, profiling the nuisances
+        :param mu: float Parameter of interest, signal strength
+        :param marginalize: if true, marginalize, if false, profile
+        :param nll: return nll instead of likelihood
+        """
+        # print ( f"likelihood {nsig[:2]} {self.model.nsignal[:2]} mu={mu}" )
+        nsig = self.model.nsignal * mu
+        self.ntot = self.model.backgrounds + nsig
+        if marginalize:
+            # p,err = self.profileLikelihood ( nsig, deltas )
+            return self.marginalizedLikelihood(nsig, nll)
+            # print ( "p,l=",p,l,p/l )
+        else:
+            return self.profileLikelihood(nsig, nll)
+
     def lmax(self, marginalize=False, nll=False, allowNegativeSignals=False):
         """convenience function, computes likelihood for nsig = nobs-nbg,
         :param marginalize: if true, marginalize, if false, profile nuisances.
@@ -905,7 +924,7 @@ class LikelihoodComputer:
             if abs(self.model.nsignal) > 1e-100:
                 self.muhat = float(dn[0] / self.model.nsignal[0])
             self.sigma_mu = np.sqrt(self.model.observed[0] + self.model.covariance[0][0])
-            return self.likelihood(dn, marginalize=marginalize, nll=nll, mu = self.muhat )
+            return self.likelihood_beta(marginalize=marginalize, nll=nll, mu = self.muhat )
         fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
                               extended_output=True, nll=nll
         )
@@ -963,11 +982,13 @@ class LikelihoodComputer:
         nsig = self.model.convert(nsig)
 
         # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
-        llhd = self.likelihood(nsig, marginalize=marginalize, nll=True, mu = 1. )
+        llhd = self.likelihood_beta(1., marginalize=marginalize, nll=True)
 
         # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
         # (keeping the same % error on signal):
         if len(nsig) == 1:
+            # TODO this nsig initiation seems wrong and changing maxllhd to likelihood_beta
+            # fails ./testStatistics.py : zero division error in L115
             nsig = self.model.observed - self.model.backgrounds
             maxllhd = self.likelihood(nsig, marginalize=marginalize, nll=True, mu = 1. )
         else:
@@ -1077,6 +1098,7 @@ class UpperLimitComputer:
         if signal_type == "signal_rel":
             sigma_mu = computer.getSigmaMu(mu_hat/sum(model.nsignal), theta_hat0)
             sigma_mu = sigma_mu * sum(model.nsignal)
+            # TODO convert rel_signals to signals
             nll0 = computer.likelihood( model.rel_signals(mu_hat),
                 marginalize=marginalize,
                 nll=True, mu = mu_hat,
@@ -1084,9 +1106,9 @@ class UpperLimitComputer:
         else:
             sigma_mu = computer.getSigmaMu(mu_hat, theta_hat0)
 
-            nll0 = computer.likelihood( model.nsignals(mu_hat),
+            nll0 = computer.likelihood_beta(
+                mu_hat,
                 marginalize=marginalize,
-                nll=True, mu = mu_hat,
             )
         # print ( f"SL nll0 {nll0:.3f} muhat {mu_hat:.3f} sigma_mu {sigma_mu:.3f}" )
         if np.isinf(nll0) and not marginalize and not trylasttime:
@@ -1094,6 +1116,7 @@ class UpperLimitComputer:
                 "nll is infinite in profiling! we switch to marginalization, but only for this one!"
             )
             marginalize = True
+            # TODO convert rel_signals to signals
             nll0 = computer.likelihood(
                 getattr(model, "signals" if signal_type == "signal_rel" else "nsignals")(mu_hat),
                 marginalize=True,
@@ -1113,6 +1136,7 @@ class UpperLimitComputer:
         mu_hatA = compA.findMuHat()
         if signal_type == "signal_rel":
             mu_hatA = mu_hatA * sum ( aModel.nsignal)
+        # TODO convert rel_signals to signals
         nll0A = compA.likelihood(
             getattr(aModel, "rel_signals" if signal_type == "signal_rel" else "nsignals")(mu_hatA),
             marginalize=marginalize,
@@ -1131,6 +1155,7 @@ class UpperLimitComputer:
                         CLs: returns CLs value
             """
             ## the function to find the zero of (ie CLs - alpha)
+            # TODO convert rel_signals to signals
             nsig = getattr(model, "rel_signals" if signal_type == "signal_rel" else "nsignals")(mu)
             computer.ntot = model.backgrounds + nsig
             nll = computer.likelihood(nsig, marginalize=marginalize, nll=True)
