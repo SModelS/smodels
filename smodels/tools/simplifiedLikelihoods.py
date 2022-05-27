@@ -890,31 +890,28 @@ class LikelihoodComputer:
         else:
             return self.profileLikelihood(nsig, nll)
 
-    def lmax(self, nsig=None, marginalize=False, nll=False, allowNegativeSignals=False):
+    def lmax(self, marginalize=False, nll=False, allowNegativeSignals=False):
         """convenience function, computes likelihood for nsig = nobs-nbg,
         :param marginalize: if true, marginalize, if false, profile nuisances.
-        :param nsig: number of signal events, needed only for combinations
-                     if None, then it gets replaced with obsN - expBG
         :param nll: return nll instead of likelihood
         :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
         """
-        if type(nsig) == type(None):
-            nsig = self.model.observed - self.model.backgrounds
         if len(self.model.observed) == 1:
-            if not allowNegativeSignals and nsig[0] < 0.0:
-                nsig = [0.0]
-            self.muhat = float(nsig[0])
+            dn = self.model.observed - self.model.backgrounds
+            if not allowNegativeSignals and dn[0] < 0.0:
+                dn = [0.0]
+            self.muhat = float(dn[0])
             if abs(self.model.nsignal) > 1e-100:
-                self.muhat = float(nsig[0] / self.model.nsignal[0])
+                self.muhat = float(dn[0] / self.model.nsignal[0])
             self.sigma_mu = np.sqrt(self.model.observed[0] + self.model.covariance[0][0])
-            return self.likelihood(nsig, marginalize=marginalize, nll=nll)
+            return self.likelihood(dn, marginalize=marginalize, nll=nll)
         fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
                               extended_output=True, nll=nll
         )
         muhat_, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         self.muhat = muhat_
         self.sigma_mu = sigma_mu
-        return self.likelihood(muhat_ * nsig, marginalize=marginalize, nll=nll)
+        return self.likelihood(muhat_ * self.model.nsignal, marginalize=marginalize, nll=nll)
 
     def findMuHatViaGradient(
         self,
@@ -971,7 +968,7 @@ class LikelihoodComputer:
             nsig = self.model.observed - self.model.backgrounds
             maxllhd = self.likelihood(nsig, marginalize=marginalize, nll=True)
         else:
-            maxllhd = self.lmax(self.model.nsignal, marginalize=marginalize, nll=True, allowNegativeSignals=False)
+            maxllhd = self.lmax( marginalize=marginalize, nll=True, allowNegativeSignals=False)
         chi2 = 2 * (llhd - maxllhd)
 
         if not np.isfinite(chi2):
