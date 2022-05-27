@@ -105,11 +105,11 @@ class SLTest(unittest.TestCase):
         ul = ulComp.getUpperLimitOnMu( m, marginalize=True )
         ## Nick's profiling code gets for n=3 ul=2135.66
         self.assertAlmostEqual(ul / 55.554, 1.0, 1)
-        lmax = lComp.lmax ( m.nsignal )
+        lmax = lComp.lmax ( )
         self.assertAlmostEqual( lmax, 2.1722054152e-09, 7 )
         self.assertAlmostEqual( lComp.muhat, 0. )
         self.assertAlmostEqual( lComp.sigma_mu, 798.9887891147 )
-        lmax = lComp.lmax ( m.nsignal, allowNegativeSignals=True )
+        lmax = lComp.lmax ( allowNegativeSignals=True )
         self.assertAlmostEqual( lmax, 2.1708552631256182e-09, 12 )
         self.assertAlmostEqual( lComp.muhat, -71.523083468, 7 )
         self.assertAlmostEqual( lComp.sigma_mu, 795.0121298843319 )
