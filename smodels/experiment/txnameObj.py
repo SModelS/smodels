@@ -133,30 +133,100 @@ class TxName(object):
         #  and conditions:
         for el in elements:
             self._topologyDict.addElement(el)
-        # If not defined, compute the dataMap
-        dataMap = self.getDataMap()
 
         # Get detector size (if not found in self, look for it in datasetInfo or globalInfo).
         # If not defined anywhere, set it to None and default values will be used for reweighting.
         self.Leff_inner = self.fetchAttribute('Leff_inner', fillvalue=None)
         self.Leff_outer = self.fetchAttribute('Leff_outer', fillvalue=None)
 
-        self.txnameData = TxNameData(data, dataType, ident,
+        x_values, y_values = self.preProcessData(data)
+        self.txnameData = TxNameData(x=x_values, y=y_values,
+                                     dataType=dataType, txdataId=ident,
                                      Leff_inner=self.Leff_inner,
                                      Leff_outer=self.Leff_outer)
         if expectedData:
-            self.txnameDataExp = TxNameData(expectedData, dataType, ident,
+            x_values, y_values = self.preProcessData(expectedData)
+            self.txnameDataExp = TxNameData(x=x_values, y=y_values,
+                                            dataType=dataType, txdataId=ident,
                                             Leff_inner=self.Leff_inner,
                                             Leff_outer=self.Leff_outer)
+
+    def preProcessData(self, rawData):
+        """
+        Convert input data (from the upperLimits, expectedUpperLimits or efficiencyMap fields)
+        to a flat array without units. The output is used to construct the TxNameData object,
+        which will further process the data and interpolate it.
+        It also builds the dictionary for translating Element properties to the flat data array.
+
+        :parameter rawData: Raw data (either string or list)
+
+        :return: Two flat lists of data, one for the model parameters and the other for the y values
+                 (UL or efficiency values)
+        """
+
+        if isinstance(rawData, str):
+            data = self.evaluateString(rawData)
+        else:
+            data = rawData
+
+        if len(data) == 0:
+            logger.error("no data values for %s found" % self)
+            raise SModelSError("no data values for %s found" % self)
+
+        dataPoint = data[0]
+        # Store data units:
+        self.units = self.getUnits(dataPoint)
+        if not isinstance(self.units[-1], (unum.Unum, float)):
+            raise SModelSError("Error obtaining units from value: %s " % dataPoint)
+
+        # Define Element->data mapping
+        self.dataMap = self.getDataMap(dataPoint)
+        # Remove units and store the
+        dataUnitless = removeUnits(data, physicsUnits.standardUnits)
+
+        if len(dataUnitless) < 1 or len(dataUnitless[0]) < 2:
+            raise SModelSError("input value not in correct format. expecting sth "
+                               "like [ [ [[ 300.*GeV,100.*GeV], "
+                               "[ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] "
+                               "for upper limits or [ [ [[ 300.*GeV,100.*GeV],"
+                               " [ 300.*GeV,100.*GeV] ], .1 ], ... ] for "
+                               "efficiency maps. Received %s" % rawData[:80])
+
+        # Flatten data points:
+        dataFlat = np.array([flattenArray(pt) for pt in dataUnitless], dtype=object)
+        # Split the data into parameter values and y values:
+        y_values = dataFlat[:, 1]
+        x_values = dataFlat[:, 0]
+
+        return x_values, y_values
+
+    def evaluateString(self, value):
+        """
+        Evaluate string.
+
+        :param value: String expression.
+        """
+
+        if not isinstance(value, str):
+            raise SModelSError("Data should be in string format. Format %s found" % type(value))
+
+        try:
+            val = eval(value, unitsDict)
+        except (NameError, ValueError, SyntaxError):
+            raise SModelSError("data string malformed: %s" % value)
+
+        return val
 
     def getDataMap(self):
         """
         Using the elements in the topology, construct a dictionary
         mapping the node.number, the node attributes and the corresponding
         index in flatten data array.
+        If the dataMap has not been defined, construct from the element topology
+        and data point format.
 
-        :return: Dictionary with the data mapping
-                (e.g. {node1.node : {'mass' : 0}, node2.node : {'mass' : 1, 'totalwidth' : 2},...})
+        :return: Dictionary with the data mapping {dataArrayIndex : (nodeNumber,attr)}
+                (e.g. {0  : (1,'mass'), 1 : (1, 'totalwidth'),...})
         """
 
         # If dataMap has already been defined, return it
@@ -173,7 +243,7 @@ class TxName(object):
         # Since all elements are equivalent, use the first one
         # to define the map:
         el = self._topologyDict.getElements()[0]
-        #
+        # Now
 
     def hasOnlyZeroes(self):
         ozs = self.txnameData.onlyZeroValues()
@@ -359,13 +429,14 @@ class TxNameData(object):
     """
     _keep_values = False  # keep the original values, only for debugging
 
-    def __init__(self, value, dataType, Id,
+    def __init__(self, x, y, dataType, txdataId,
                  accept_errors_upto=.05,
                  Leff_inner=None, Leff_outer=None):
         """
-        :param value: values in string format
+        :param x: 2-D list of flat and unitless x-points (e.g. [ [mass1,mass2,mass3,mass4], ...])
+        :param y: 1-D list with y-values (upper limits or efficiencies)
         :param dataType: the dataType (upperLimit or efficiencyMap)
-        :param Id: an identifier, must be unique for each TxNameData!
+        :param txdataId: an identifier, must be unique for each TxNameData!
         :param _accept_errors_upto: If None, do not allow extrapolations outside of
                 convex hull.  If float value given, allow that much relative
                 uncertainty on the upper limit / efficiency
@@ -377,14 +448,16 @@ class TxNameData(object):
 
         """
         self.dataType = dataType
-        self._id = Id
+        self._id = txdataId
         self._accept_errors_upto = accept_errors_upto
         self.Leff_inner = Leff_inner
         self.Leff_outer = Leff_outer
         self._V = None
-        self.loadData(value)
+        self.y_values = y[:]
+        # Compute PCA transformation:
+        self.computeV(x)
         if self._keep_values:
-            self.origdata = value
+            self.origdata = x
 
         if self.dataType == 'efficiencyMap':
             self.reweightF = defaultEffReweight
@@ -409,23 +482,6 @@ class TxNameData(object):
         if type(self) != type(other):
             return False
         return self._id == other._id
-
-    def evaluateString(self, value):
-        """
-        Evaluate string.
-
-        :param value: String expression.
-        """
-
-        if not isinstance(value, str):
-            raise SModelSError("Data should be in string format. Format %s found" % type(value))
-
-        try:
-            val = eval(value, unitsDict)
-        except (NameError, ValueError, SyntaxError):
-            raise SModelSError("data string malformed: %s" % value)
-
-        return val
 
     def getUnits(self, value):
         """
@@ -629,42 +685,6 @@ class TxNameData(object):
             massAndWidthArray.append(newBr)
 
         return massAndWidthArray
-
-    def loadData(self, value):
-        """
-        Uses the information in value to generate the data grid used for
-        interpolation.
-        """
-
-        if self._V:
-            return
-
-        if isinstance(value, str):
-            val = self.evaluateString(value)
-        else:
-            val = value
-
-        if len(val) == 0:
-            logger.error(f"no values for {self._id} found")
-            sys.exit(-1)
-        self.units = self.getUnits(val)[0]  # Store standard units
-        self.dataShape = self.getDataShape(val[0][0])  # Store the data (mass) format (useful if there are inclusives)
-        self.widthPosition = self.getWidthPosition(val[0][0])  # Store the position of the required widths
-        values = removeUnits(val, physicsUnits.standardUnits)  # Remove units and store the normalization units
-
-        if len(values) < 1 or len(values[0]) < 2:
-            raise SModelSError("input value not in correct format. expecting sth "
-                               "like [ [ [[ 300.*GeV,100.*GeV], "
-                               "[ 300.*GeV,100.*GeV] ], 10.*fb ], ... ] "
-                               "for upper limits or [ [ [[ 300.*GeV,100.*GeV],"
-                               " [ 300.*GeV,100.*GeV] ], .1 ], ... ] for "
-                               "efficiency maps. Received %s" % values[:80])
-
-        if not isinstance(self.units[-1], unum.Unum) and not isinstance(self.units[-1], float):
-            raise SModelSError("Error obtaining units from value: %s " % values[:80])
-
-        self.y_values = np.array(values, dtype=object)[:, 1]
-        self.computeV(values)
 
     def getValueFor(self, element):
         """
@@ -914,11 +934,12 @@ class TxNameData(object):
             return False
         return True
 
-    def computeV(self, values):
+    def computeV(self, x):
         """
         Compute rotation matrix _V, and triangulation self.tri
 
-        :param values: Nested array with the data values without units
+        :parameter x: 2-D array with the flatten x-points without units
+                      (e.g. [ [mass1,mass2,mass3,mass4], [mass1',mass2',mass3',mass4'], ...])
 
         """
 
@@ -929,7 +950,7 @@ class TxNameData(object):
         # (remove entries in mass corresponding to inclusive values,
         # select the required widths and combine masses and widths
         # in a flat array where the widths are the last entries)
-        Morig = [self.dataToCoordinates(pt[0]) for pt in values]
+        Morig = x[:]
 
         aM = np.array(Morig)
         MT = aM.T.tolist()

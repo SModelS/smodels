@@ -70,6 +70,7 @@ class ParticleNode(object):
         return self.node
 
     def __cmp__(self, other):
+
         if self.node == other.node:
             return 0
         elif self.node > other.node:
@@ -631,6 +632,31 @@ class Tree(nx.DiGraph):
             self._root = root[0]
 
         return self._root
+
+    def getNode(self, node):
+        """
+        Return the node object in the tree corresponding to node.
+        Node can be an integer or a node object. The node.node number
+        is used to retrive the object. If the node is not found, return None.
+
+        :param node: ParticleNode, InclusiveParticleNode or int
+
+        :return: Node object if found, otherwise None.
+        """
+
+        # Allows comparison with integers (by node.node) or node objs
+        if isinstance(node, int):
+            nodeNumber = node
+        elif isinstance(node, (ParticleNode, InclusiveParticleNode)):
+            nodeNumber = node.node
+        else:
+            raise SModelSError("Can not fetch node object from type %s" % (type(node)))
+
+        for n in self.nodes:
+            if n.node == nodeNumber:
+                return n
+
+        return None
 
     def getTreeWeight(self):
         """
