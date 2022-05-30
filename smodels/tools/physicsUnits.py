@@ -9,8 +9,6 @@
 """
 
 import unum
-from unum import IncompatibleUnitsError
-from smodels.tools.smodelsLogging import logger
 
 # description see
 # http://home.scarlet.be/be052320/Unum.html
@@ -31,13 +29,13 @@ unum.Unum.VALUE_FORMAT = "%0.2E"
 unum.Unum.UNIT_HIDE_EMPTY = True
 
 m = unum.Unum.unit('m')
-cm = unum.Unum.unit('cm', 0.01 * m )
-mm = unum.Unum.unit('mm', 0.001 * m )
-fm = unum.Unum.unit('fm', 1e-15 * m )
+cm = unum.Unum.unit('cm', 0.01 * m)
+mm = unum.Unum.unit('mm', 0.001 * m)
+fm = unum.Unum.unit('fm', 1e-15 * m)
 
 fb = unum.Unum.unit('fb')
 pb = unum.Unum.unit('pb', 1000 * fb)
-mb = unum.Unum.unit('mb', 10**12 * fb )
+mb = unum.Unum.unit('mb', 10**12 * fb)
 
 eV = unum.Unum.unit('eV')
 keV = unum.Unum.unit('keV', 10 ** 3 * eV)
@@ -47,7 +45,7 @@ TeV = unum.Unum.unit('TeV', 10 ** 12 * eV)
 
 ns = unum.Unum.unit('ns', 1e-9*6.582e-25/GeV)
 
-#Define standard units to be used when storing data:
+# Define standard units to be used when storing data:
 standardUnits = [GeV, fb]
 
 

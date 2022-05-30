@@ -692,6 +692,22 @@ class Tree(nx.DiGraph):
 
         return nx.bfs_successors(self, node)
 
+    def dfs_successors(self, node=None):
+        """
+        Returns a dictionary with the mother as keys
+        and the daughters as values using a depth-first search.
+        nodes starting at node using a breadth first search.
+
+        :param node: Node from tree. If None, starts at tree root.
+
+        :return: Dictionary with mothers and daughters
+        """
+
+        if node is None:
+            node = self.root
+
+        return nx.dfs_successors(self, node)
+
     def getSubTree(self, source):
         """
         Returns the subtree with source as its root.

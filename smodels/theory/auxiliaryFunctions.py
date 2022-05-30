@@ -7,7 +7,7 @@
 """
 
 from smodels.theory import crossSection
-from smodels.tools.physicsUnits import fb, GeV
+from smodels.tools.physicsUnits import fb, GeV, standardUnits
 import unum
 import re
 try:
@@ -108,7 +108,7 @@ def cGtr(weightA, weightB):
     return result
 
 
-def removeUnits(value, standardUnits):
+def removeUnits(value, stdUnits=standardUnits, returnUnit=False):
     """
     Remove units from unum objects. Uses the units defined
     in physicsUnits.standard units to normalize the data.
@@ -116,13 +116,18 @@ def removeUnits(value, standardUnits):
     :param value: Object containing units (e.g. [[100*GeV,100.*GeV],3.*pb])
     :param standardUnits: Unum unit or Array of unum units defined to
                           normalize the data.
-    :return: Object normalized to standard units (e.g. [[100,100],3000])
+    :param returnUnit: If True also resturns the unit corresponding to the returned
+                       value.
+
+    :return: Object normalized to standard units (e.g. [[100,100],3000]).
+             If returnUnit = True, returns a tuple with the value and its unit (e.g. 100,GeV).
+             For unitless values return 1.0 as the unit.
     """
 
-    if isinstance(standardUnits, unum.Unum):
-        stdunits = [standardUnits]
+    if isinstance(stdUnits, unum.Unum):
+        stdunits = [stdUnits]
     else:
-        stdunits = standardUnits
+        stdunits = stdUnits
 
     if isinstance(value, list):
         return [removeUnits(x, stdunits) for x in value]
@@ -135,15 +140,22 @@ def removeUnits(value, standardUnits):
         # Check if value has unit or not:
         if not value._unit:
             return value.asNumber()
-        # N ow try to normalize it by one of the standard pre-defined units:
+        # Now try to normalize it by one of the standard pre-defined units:
         for unit in stdunits:
             y = (value/unit).normalize()
             if not y._unit:
-                return value.asNumber(unit)
+                val = value.asNumber(unit)
+                if returnUnit:
+                    return val, unit
+                else:
+                    return val
         raise SModelSError("Could not normalize unit value %s using the standard units: %s"
                            % (str(value), str(standardUnits)))
     else:
-        return value
+        if returnUnit:
+            return value, 1.0
+        else:
+            return value
 
 
 def addUnit(obj, unit):
