@@ -804,8 +804,23 @@ class Tree(nx.DiGraph):
         """
 
         newNodesDict = {n: n.copy() for n in self.nodes}
-        newTree = nx.relabel_nodes(self, newNodesDict, copy=True)
+        newTree = self.relabel_nodes(newNodesDict, copy=True)
         newTree._canonName = self._canonName
+
+        return newTree
+
+    def relabel_nodes(self, newNodesDict, copy=True):
+        """
+        Replace the nodes in the Tree according to newNodesDict.
+        If copy = True, create a new Tree object, otherwise replace inplace.
+
+        :param newNodesDict: A dictionary with current nodes as keys as new nodes as values.
+        :param copy: If True, create a new Tree object, otherwise replace inplace.
+
+        :return: A new tree if copy = True, otherwise returns self
+        """
+
+        newTree = nx.relabel_nodes(self, newNodesDict, copy=copy)
 
         return newTree
 
@@ -830,7 +845,7 @@ class Tree(nx.DiGraph):
         nodesB = list(other.nodes)
         nodesDict = {n: n + nodesB[inode]
                      for inode, n in enumerate(self.nodes)}
-        newTree = nx.relabel_nodes(self, nodesDict, copy=True)
+        newTree = self.relabel_nodes(nodesDict, copy=True)
 
         return newTree
 

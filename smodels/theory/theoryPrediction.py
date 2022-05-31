@@ -697,7 +697,7 @@ def _getDataSetPredictions(dataset, smsTopList, maxMassDist,
         return predictionList
 
 
-def _getElementsFrom(smsTopList, dataset):
+def _getElementsFrom(smsTopDict, dataset):
     """
     Get elements that belong to any of the TxNames in dataset
     (appear in any of constraints in the result).
@@ -706,24 +706,23 @@ def _getElementsFrom(smsTopList, dataset):
     have their weights multiplied by their respective efficiencies.
 
     :parameter dataset:  Data Set to be considered (DataSet object)
-    :parameter smsTopList: list of topologies containing elements
-                           (TopologyList object)
+    :parameter smsTopDict: Dictionary of topologies containing elements
+                           (TopologyDict object)
     :returns: list of elements (Element objects)
     """
 
     elements = []
     for txname in dataset.txnameList:
-        for top in smsTopList:
-            itop = txname._topologyDict.index(top)  # Check if the topology appear in txname
-            if itop is None:
+        for cName in smsTopDict:
+            if cName not in list(txname._topologyDict.keys()):  # Check if the topology appear in txname
                 continue
-            for el in top.getElements():
+            for el in smsTopDict[cName]:
                 newEl = txname.hasElementAs(el)  # Check if element appears in txname
                 if not newEl:
                     continue
                 el.setCoveredBy(dataset.globalInfo.type)
                 eff = txname.getEfficiencyFor(newEl)
-                if eff == None or abs(eff) < 1e-14:
+                if eff is None or abs(eff) < 1e-14:
                     continue
                 el.setTestedBy(dataset.globalInfo.type)
                 newEl.eff = eff

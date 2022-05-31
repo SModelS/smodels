@@ -45,23 +45,26 @@ def main():
     mingap = 5.*GeV
 
     # Decompose model
-    toplist = decomposer.decompose(model, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
+    topDict = decomposer.decompose(model, sigmacut,
+                                   massCompress=True, invisibleCompress=True,
+                                   minmassgap=mingap)
 
     # Access basic information from decomposition, using the topology list and topology objects:
     print("\n Decomposition Results: ")
-    print("\t  Total number of topologies: %i " % len(toplist))
-    nel = sum([len(top.elementList) for top in toplist])
+    print("\t  Total number of topologies: %i " % len(topDict))
+    nel = len(topDict.getElements())
     print("\t  Total number of elements = %i " % nel)
     # Print information about the m-th topology:
     m = 2
-    if len(toplist) > m:
-        top = toplist[m]
-        print("\t\t %i-th topology  = " % m, top, "with total cross section =", top.getTotalWeight())
+    if len(topDict) > m:
+        cName = sorted(topDict.keys())[m]
+        elementList = topDict[cName]
+        print("\t\t %i topology  = " % cName)
         # Print information about the n-th element in the m-th topology:
         n = 0
-        el = top.elementList[n]
-        print("\t\t %i-th element from %i-th topology  = " % (n, m), el, end="")
-        print("\n\t\t\twith final states =", el.getFinalStates(), "\n\t\t\twith cross section =", el.weight, "\n\t\t\tand masses = ", el.mass)
+        el = elementList[n]
+        print("\t\t %i-th element  = " % (n), el, end="")
+        print("\n\t\t\twith final states =", el.tree.getFinalStates(), "\n\t\t\twith cross section =", el.weight, "\n\t\t\tand masses = ", el.mass)
 
     # Load the experimental results to be used.
     # In this case, all results are employed.
