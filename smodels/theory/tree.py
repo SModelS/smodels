@@ -868,7 +868,8 @@ class Tree(nx.DiGraph):
         if labelAttr is None:
             labels = {n: str(n) if not n.isInclusive else n.longStr() for n in self.nodes}
         elif attrUnit is not None:
-            labels = {n: str(getattr(n, labelAttr).asNumber(attrUnit)) if hasattr(n, labelAttr)
+            labels = {n: str(getattr(n, labelAttr).asNumber(attrUnit))
+                      if (hasattr(n, labelAttr) and getattr(n, labelAttr) is not None)
                       else str(n) for n in self.nodes}
         else:
             labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)

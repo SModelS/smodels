@@ -238,25 +238,21 @@ class TxName(object):
         :return: A flat and unitless list matching sel.dataMap.
         """
 
-        x = np.array(x, dtype=object)
         # Get length of flat array:
         nDim = max([arrayIndex for arrayIndex in self.dataMap.keys()])+1
         xFlat = [None]*nDim
         for arrayIndex in self.dataMap:
-            # If x is already flat, retrieve its value directly from x
-            if x.ndim == 1:
+            # If arrayMap has not been defined, retrieve its value directly from x
+            if self.arrayMap is None:
                 _, attr, unit = self.dataMap[arrayIndex]
                 xval = x[arrayIndex]
             # If it is a nested bracket use the arrayMap:
-            elif x.ndim == 2:
+            else:
                 multiIndex, attr, unit, _ = self.arrayMap[arrayIndex]
                 i, j = multiIndex[:2]
-                xval = x[i, j]
+                xval = x[i][j]
                 if isinstance(xval, tuple):
                     xval = xval[multiIndex[2]]
-            else:
-                logger.error("x-value for data point has the wrong dimensions %s" % x)
-                raise SModelSError()
 
             # Remove unit:
             if isinstance(xval, unum.Unum):
@@ -289,26 +285,26 @@ class TxName(object):
 
         mLength = max(self.dataMap.keys())+1
         if self.arrayMap is not None:  # Convert to nested bracket
-            xDim = max([v[0][0] for v in self.arrayMap.values()])
-            yDim = max([v[0][1] for v in self.arrayMap.values()])
-            massPoint = np.empty(shape=(xDim+1, yDim+1), dtype=object)
-            for index in self.arrayMap:
-                ijk, attr, unit, _ = self.arrayMap[index]
+            # Invert array map:
+            mapInv = {v[0]: k for k, v in self.arrayMap.items()}
+            # Get sorted array indices
+            ijk = sorted(mapInv.keys())
+            massPoint = []
+            for i, j, k in ijk:
+                while i >= len(massPoint):
+                    massPoint.append([])
+                while j >= len(massPoint[i]):
+                    massPoint[i].append([])
+                index = mapInv[(i, j, k)]
+                _, attr, unit, _ = self.arrayMap[index]
                 value = xFlat[index]
                 if attr == 'totalwidth':
                     value = unscaleWidth(value)
                 value = value*unit
-                i, j, k = ijk
-                storedValue = massPoint[i, j]
-                if isinstance(storedValue, tuple):
-                    if k == 1:
-                        massPoint[i, j] = (storedValue[0], value)
-                    elif k == 0:
-                        massPoint[i, j] = (value, storedValue[1])
+                if k == 0:
+                    massPoint[i][j] = value
                 elif k == 1:
-                    massPoint[i, j] = (storedValue, value)
-                else:
-                    massPoint[i, j] = value
+                    massPoint[i][j] = (massPoint[i][j], value)
 
         else:  # Convert to flat list
             massPoint = [None]*mLength
@@ -337,36 +333,9 @@ class TxName(object):
                 (e.g. {0  : (1,'mass',GeV), 1 : (1, 'totalwidth',GeV),...})
         """
 
-        massPoint = np.array(massPoint, dtype=object)
-        # If dataMap has already been defined, check consistency:
+        # If dataMap has already been defined, do nothing:
         if self.dataMap is not None:
-
-            if massPoint.ndim != 1:
-                msgError = "Inconsistent data format."
-                msgError += " The x-values (%s) should be a 1D array" % massPoint
-                logger.error(msgError)
-                raise SModelSError(msgError)
-            dataLength = max([k for k in self.dataMap])+1
-            if len(massPoint) != dataLength:
-                msgError = "Inconsistent data format."
-                msgError += " The number of values in x (%s) do not match dataMap" % massPoint
-                logger.error(msgError)
-                raise SModelSError(msgError)
-            if sorted([k for k in self.dataMap]) != list(range(dataLength)):
-                msgError = "Inconsistent data map."
-                msgError += " The keys (%s) are missing array indices" % str(self.dataMap.keys())
-                logger.error(msgError)
-                raise SModelSError(msgError)
-
             return
-
-        # If dataMap was not previously defined, the massPoint
-        # should be a nested array (e.g. [[mass1,(mass2,width2)],[mass3,mass4]])
-        if massPoint.ndim != 2:
-            msgError = "Inconsistent data format."
-            msgError += " The x-values (%s) should be a nested array" % massPoint
-            logger.error(msgError)
-            raise SModelSError(msgError)
 
         # Check if all elements in the txname share the same topology:
         if len(self._topologyDict) != 1:
@@ -382,48 +351,42 @@ class TxName(object):
         # Get a nested array of nodes corresponding to the data point:
         nodeArray = []
         for mom, daughters in tree.dfs_successors().items():
-            if mom == tree.root:  # Ignore PV
+            if mom.isInclusive:
                 continue
-            nodeArray.append(mom)
+            if mom != tree.root:  # Ignore PV
+                nodeArray.append(mom)
             for d in daughters:
                 if d.isSM:  # Ignore SM particles
+                    continue
+                if d.isInclusive:
                     continue
                 if tree.out_degree(d) != 0:  # Ignore unstable daughters (will appear as mom)
                     continue
                 nodeArray.append(d)
 
-        try:
-            nodeArray = np.reshape(nodeArray, massPoint.shape)
-        except ValueError:
-            msgError = "Txname element and data grid have inconsistent formats:"
-            msgError += "\n %s\n and %s" % (nodeArray, massPoint)
-            logger.error(msgError)
-            raise SModelSError(msgError)
-
         # Iterate over the array and construct a map for the nodes
         # and the flat array:
         arrayMap = {}
         massIndex = 0  # Initial index for the masses
-        widthIndex = len(nodeArray.flatten())  # Initial index for the widths
-        for index in np.ndindex(massPoint.shape):
-            node = nodeArray[index]
-            if node.isInclusive:
-                continue
-
-            arrayValue = massPoint[index]
-            mass, massUnit, width, widthUnit = self.getDataEntry(arrayValue)
-            # Add entry for mass
-            if mass is not None:
-                arrayMap[massIndex] = ((*index, 0), 'mass', massUnit, node.node)
-                massIndex += 1
-            # Add entry for width
-            if width is not None:
-                arrayMap[widthIndex] = ((*index, 1), 'totalwidth', widthUnit, node.node)
-                widthIndex += 1
+        widthIndex = len(nodeArray)  # Initial index for the widths
+        for i, br in enumerate(massPoint):
+            if br == '*':
+                continue  # Skip inclusive branch
+            for j, m in enumerate(br):
+                node = nodeArray.pop(0)
+                arrayValue = m
+                mass, massUnit, width, widthUnit = self.getDataEntry(arrayValue)
+                # Add entry for mass
+                if mass is not None:
+                    arrayMap[massIndex] = ((i, j, 0), 'mass', massUnit, node.node)
+                    massIndex += 1
+                # Add entry for width
+                if width is not None:
+                    arrayMap[widthIndex] = ((i, j, 1), 'totalwidth', widthUnit, node.node)
+                    widthIndex += 1
 
         # Store the nested bracket <-> flat array map
         self.arrayMap = arrayMap
-
         # Also store graph <-> flat array map
         self.dataMap = {}
         for key, val in self.arrayMap.items():
@@ -692,13 +655,17 @@ class TxName(object):
         """
 
         cName = element.canonName
-        # Check if the canonical name matches any of the
-        # elements in self:
-        if cName not in self._topologyDict:
+        # Get list of elements with matching canonical name
+        # (takes into account inclusive names)
+        elList = []
+        for canonName, elements in self._topologyDict.items():
+            if cName == canonName:
+                elList += elements[:]
+
+        # If not matching elements, return False
+        if not elList:
             return False
 
-        # Get list of elements with the same canonical name
-        elList = self._topologyDict[cName]
         for el in elList:
             # Compare elements:
             cmp, sortedEl = el.compareTo(element)
@@ -721,7 +688,9 @@ class TxName(object):
 
 class TxNameData(object):
     """
-    Holds the data for the Txname object.  It holds Upper limit values or efficiencies.
+    Holds the pre-processed data for the Txname object.
+    It is responsible for computing the PCA transformation and interpolating.
+    Only handles pre-processed data (1D unitless arrays, with widths rescaled).
     """
     _keep_values = False  # keep the original values, only for debugging
 
@@ -1186,6 +1155,10 @@ if __name__ == "__main__":
         result = txnameData.getValueFor(masses)
         sm = "%.1f %.1f" % (masses[0][0].asNumber(GeV), masses[0][1].asNumber(GeV))
         print("%s %.3f fb" % (sm, result.asNumber(fb)))
+    print("%.2f ms" % ((time.time()-t0)*1000.))
+    print("%.2f ms" % ((time.time()-t0)*1000.))
+    print("%.2f ms" % ((time.time()-t0)*1000.))
+    print("%.2f ms" % ((time.time()-t0)*1000.))
     print("%.2f ms" % ((time.time()-t0)*1000.))
     print("%.2f ms" % ((time.time()-t0)*1000.))
     print("%.2f ms" % ((time.time()-t0)*1000.))

@@ -59,7 +59,7 @@ def getWidthsFromElement(element):
     return unstableWidths, stableWidths
 
 
-def defaultEffReweight(element=None, unstableWidths=[], stableWidths=[],
+def defaultEffReweight(element=None, unstableWidths=None, stableWidths=None,
                        Leff_inner=None, Leff_outer=None,
                        minWeight=1e-10):
     """
@@ -87,7 +87,7 @@ def defaultEffReweight(element=None, unstableWidths=[], stableWidths=[],
     if Leff_outer is None:
         Leff_outer = Leff_outer_default
 
-    if not unstableWidths or not stableWidths:
+    if unstableWidths is None or stableWidths is None:
         if element is None or not isinstance(element, Element):
             logger.error("If unstableWidths and stableWidths are not defined, the element should be given.")
             raise SModelSError()
@@ -111,7 +111,7 @@ def defaultEffReweight(element=None, unstableWidths=[], stableWidths=[],
     return elFraction
 
 
-def defaultULReweight(element=None, unstableWidths=[], stableWidths=[],
+def defaultULReweight(element=None, unstableWidths=None, stableWidths=None,
                       Leff_inner=None, Leff_outer=None):
     """
     Computes the lifetime reweighting factor for the element upper limit
@@ -145,7 +145,7 @@ def defaultULReweight(element=None, unstableWidths=[], stableWidths=[],
         return 1./effFactor
 
 
-def reweightFactorFor(element=None, unstableWidths=[], stableWidths=[],
+def reweightFactorFor(element=None, unstableWidths=None, stableWidths=None,
                       resType='prompt', Leff_inner=None, Leff_outer=None):
     """
     Computer the reweighting factor for the element according to the experimental result type.
@@ -173,7 +173,7 @@ def reweightFactorFor(element=None, unstableWidths=[], stableWidths=[],
     if Leff_outer is None:
         Leff_outer = Leff_outer_default
 
-    if not unstableWidths or not stableWidths:
+    if unstableWidths is None or stableWidths is None:
         if element is None or not isinstance(element, Element):
             logger.error("If unstableWidths and stableWidths are not defined, the element should be given.")
             raise SModelSError()
