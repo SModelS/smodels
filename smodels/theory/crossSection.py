@@ -350,10 +350,10 @@ class XSectionList(object):
         """
 
         newList = newXsecs
-        if type(newXsecs) == type(XSection()):
+        if isinstance(newXsecs, XSection):
             newList = [newXsecs]
         for newXsec in newList:
-            if not newXsec.info in self.getInfo():
+            if newXsec.info not in self.getInfo():
                 self.add(newXsec)
             else:
                 for oldXsec in self:
@@ -376,7 +376,7 @@ class XSectionList(object):
         return self.xSections[index]
 
     def __setitem__(self, index, xsec):
-        if type(xsec) != type(XSection()):
+        if not isinstance(xsec, XSection):
             logger.error("Input object must be a XSection() object")
             raise SModelSError()
         else:
@@ -450,7 +450,7 @@ class XSectionList(object):
         Append a XSection object to the list.
 
         """
-        if type(newxsec) != type(XSection()):
+        if not isinstance(newxsec, XSection):
             logger.error("Input object must be a XSection() object")
             raise SModelSError()
         else:
@@ -464,7 +464,7 @@ class XSectionList(object):
         append the object.
 
         """
-        if type(newxsec) != type(XSection()):
+        if not isinstance(newxsec, XSection):
             logger.error("Input object must be a XSection() object")
             raise SModelSError()
         else:

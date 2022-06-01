@@ -16,7 +16,6 @@ from smodels.theory.auxiliaryFunctions import (elementsInStr, removeUnits,
                                                rescaleWidth, unscaleWidth, cSim, cGtr)
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
-from smodels.theory.topology import TopologyDict
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.txnameDataObj import TxNameData
@@ -47,8 +46,9 @@ class TxName(object):
         self.txnameDataExp = None  # expected Data
         self.dataMap = None
         self.arrayMap = None
-        self.elementMap = {}
-        self._topologyDict = TopologyDict()
+        self.elementMap = {}  # Stores the elements and their label representaion
+        self._constraintFunc = None
+        self._conditionsFunc = None
         self.finalState = ['MET', 'MET']  # default final state
         self.intermediateState = None  # default intermediate state
 
@@ -103,25 +103,28 @@ class TxName(object):
         if not databaseParticles:
             raise SModelSError("Database particles is empty. Can not create TxName object.")
 
-        # Process constraint and convert it to a function
+        # Process constraint, simplify it so it can be easily evaluated and
+        # stores the elements in self.elementMap
         if hasattr(self, 'constraint'):
-            self.evalConstraint = self.processExpr(self.constraint,
-                                                   databaseParticles,
-                                                   checkUnique=True)
+            self._constraintFunc = self.processExpr(self.constraint,
+                                                    databaseParticles,
+                                                    checkUnique=True)
 
-        # Process conditions and convert it to a function
+        # Process conditions, simplify it so it can be easily evaluated and
+        # stores the elements in self.elementMap
         if hasattr(self, 'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds, list):
                 conds = [conds]
             conditionFuncs = [self.processExpr(cond, databaseParticles, checkUnique=False)
                               for cond in conds]
-            self.evalConditions = lambda elDict: [condF(elDict) for condF in conditionFuncs]
+            self._conditionsFunc = conditionFuncs[:]
 
-        # Store all the elements appearing in constraint and condition
-        # in a topology dictionary
-        for el in self.elementMap:
-            self._topologyDict.addElement(el)
+        # Do consistency checks:
+        self.checkConsistency()
+
+        # Define canonical name (should be the same for all elements)
+        self.canonName = list(self.elementMap.keys())[0].canonName
 
         # Get detector size (if not found in self, look for it in datasetInfo or globalInfo).
         # If not defined anywhere, set it to None and default values will be used for reweighting.
@@ -147,6 +150,58 @@ class TxName(object):
 
         return self.txName < other.txName
 
+    def checkConsistency(self):
+        """
+        Checks if all the elements in txname have the same structure (topology/canonical name)
+        and verify if its constraints and conditions are valid expressions.
+
+        :return: True if txname is consitency. Raises an error otherwise.
+        """
+
+        # Check if all elements have the same canonical name:
+        elements = list(self.elementMap.keys())
+        cName = elements[0].canonName
+        for el in elements[1:]:
+            if el.canonName != cName:
+                msgError = "Txname %s referes to elements with distinct topologies." % self
+                logger.error(msgError)
+                raise SModelSError(msgError)
+
+        # Check if the constraint can be evaluated:
+        elements = []
+        for iel, elLabel in enumerate(self.elementMap.values()):
+            elTest = Element()
+            elTest.weight = 3.0*(iel+1)*physicsUnits.fb  # dumyy xsec
+            elTest.txlabel = elLabel
+            elements.append(elTest)
+
+        # Dummy constraint eval:
+        try:
+            res = self.evalConstraintFor(elements)
+        except NameError:
+            msgError = "Can not evaluate constraint %s for %s." % (self._constraintFunc, self)
+            logger.error(msgError)
+            raise SModelSError(msgError)
+
+        if res is not None and not isinstance(res, (float, int, unum.Unum,)):
+            msgError = "Constraint dor %s returned an invalid value: %s (%s)" % (self, res, type(res))
+            logger.error(msgError)
+            raise SModelSError(msgError)
+
+        # Dummy condistions eval:
+        try:
+            res = self.evalConditionsFor(elements)
+        except NameError:
+            msgError = "Can not evaluate conditions %s for %s." % (self._conditionsFunc, self)
+            logger.error(msgError)
+            raise SModelSError(msgError)
+
+        if res is not None and not isinstance(res, list):
+            msgError = "Constraint dor %s returned an invalid value: %s (%s)" % (self, res, type(res))
+            logger.error(msgError)
+
+        return True
+
     def processExpr(self, stringExpr, databaseParticles, checkUnique=True):
         """
         Process a string expression (constraint or condition) for
@@ -162,7 +217,7 @@ class TxName(object):
                  the expression.
         """
 
-        exprFunc = stringExpr[:]
+        exprFunc = stringExpr[:].replace("'", "").replace(" ", "")
 
         # Get the maximum element ID already used
         if self.elementMap:
@@ -172,57 +227,82 @@ class TxName(object):
             nel = 0
 
         # Get the elements contained in the expression
-        elements = []
         for elStr in elementsInStr(str(stringExpr)):
             elObj = Element(elStr, self.finalState,
                             self.intermediateState,
                             model=databaseParticles,
                             sort=False)
-            elements.append(elObj)
-            # If it is a new element, add it to the element -> label map
-            if elObj not in self.elementMap:
+
+            for el in self.elementMap:
+                if elObj == el:
+                    elObjLabel = self.elementMap[el]
+                    if checkUnique:
+                        msgError = "Duplicate elements found in: "
+                        msgError += "%s in %s" % (stringExpr, self.globalInfo.id)
+                        logger.error(msgError)
+                        raise SModelSError(msgError)
+                    break
+            else:
+                # If it is a new element, add it to the element -> label map
                 nel += 1
                 elObj.elID = nel
                 elObjLabel = 'el_%i' % elObj.elID
-                elObj.label = elObjLabel
                 self.elementMap[elObj] = elObjLabel
-            else:
-                elObjLabel = self.elementMap[elObj]
 
-            # Replace the element string by its label.weight
-            exprFunc = exprFunc.replace(elStr, '%s.weight' % elObjLabel)
+            # Replace the element string by its label
+            elStr = elStr.replace("'", "").replace(" ", "")
+            exprFunc = exprFunc.replace(elStr, '%s' % elObjLabel)
 
-        if checkUnique:
-            # Check if the expression only contain unique elements
-            if any((elA == elB and elA is not elB) for elA in elements for elB in elements):
-                msgError = "Duplicate elements found in: "
-                msgError += "%s in %s" % (stringExpr, self.globalInfo.id)
-                logger.error(msgError)
-                raise SModelSError(msgError)
+        return exprFunc
 
-        # Define the function:
-        def evalExpr(elDict):
-            localsDict = {k: v for k, v in elDict.items()}
-            localsDict.update({"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim})
-            return eval(exprFunc, localsDict, {})
+    def evalConstraintFor(self, elements):
+        """
+        Evaluate the constraint function for a list of elements
+        which have been matched to the txname elements. The
+        elements must have the attribute txlabel assigned to
+        the label appearing in the constraint expression.
 
-        # Check if the expression can be evaluated:
-        elDictTest = {elLabel: 3.0*iel*physicsUnits.fb
-                      for iel, elLabel in enumerate(self.elementMap.values())}
-        # Dummy eval:
-        try:
-            res = evalExpr(elDictTest)
-        except NameError:
-            msgError = "Malformed expression %s for %s." % (stringExpr, self)
-            logger.error(msgError)
-            raise SModelSError(msgError)
+        :param elements: List of Element objects
 
-        if not isinstance(res, (float, int, unum.Unum)):
-            msgError = "Expression %s for %s does not return a value." % (stringExpr, self)
-            logger.error(msgError)
-            raise SModelSError(msgError)
+        :return: Value for the evaluated constraint, if the constraint
+                 has been defined, None otherwise.
+        """
 
-        return evalExpr
+        if not self._constraintFunc:
+            return None
+
+        localsDict = {el.txlabel: el.weight for el in elements}
+        for elLabel in self.elementMap.values():
+            if elLabel not in localsDict:
+                localsDict[elLabel] = 0.0*physicsUnits.fb  # Add zero weights for missing elements
+        localsDict.update({"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim})
+
+        return eval(self._constraintFunc, localsDict, {})
+
+    def evalConditionsFor(self, elements):
+        """
+        Evaluate the conditions for a list of elements
+        which have been matched to the txname elements. The
+        elements must have the attribute txlabel assigned to
+        the label appearing in the constraint expression.
+
+        :param elements: List of Element objects
+
+        :return: List of condition values.
+        """
+
+        if not self._conditionsFunc:
+            return None
+
+        localsDict = {el.txlabel: el.weight for el in elements}
+        for elLabel in self.elementMap.values():
+            if elLabel not in localsDict:
+                localsDict[elLabel] = 0.0*physicsUnits.fb  # Add zero weights for missing elements
+        localsDict.update({"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim})
+
+        conditions = [eval(cond, localsDict, {}) for cond in self._conditionsFunc]
+
+        return conditions
 
     def preProcessData(self, rawData):
         """
@@ -407,15 +487,9 @@ class TxName(object):
         if self.dataMap is not None:
             return
 
-        # Check if all elements in the txname share the same topology:
-        if len(self._topologyDict) != 1:
-            msgError = "Can not construct a data map for elements with distinct topologies"
-            msgError += " (%s,%s)" % (self.globalInfo.id, self)
-            raise SModelSError(msgError)
-
         # Since all elements are equivalent, use the first one
         # to define the map:
-        el = self._topologyDict.getElements()[0]
+        el = list(self.elementMap.keys())[0]
         tree = el.tree
 
         # Get a nested array of nodes corresponding to the data point:
@@ -724,24 +798,14 @@ class TxName(object):
                 in the Txname constraint or condition.
         """
 
-        cName = element.canonName
         # Get list of elements with matching canonical name
         # (takes into account inclusive names)
-        elList = []
-        for canonName, elements in self._topologyDict.items():
-            if cName == canonName:
-                elList += elements[:]
-
-        # If not matching elements, return False
-        if not elList:
-            return False
-
-        for el in elList:
+        for el, elLabel in self.elementMap.items():
             # Compare elements:
             cmp, sortedEl = el.compareTo(element)
             if cmp == 0:
                 # Attach label used for evaluating expressions
-                sortedEl.label = el.label
+                sortedEl.txlabel = elLabel
                 return sortedEl
 
         # If this point was reached, there were no macthes

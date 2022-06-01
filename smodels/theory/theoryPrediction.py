@@ -86,26 +86,25 @@ class TheoryPrediction(object):
         # Adds the contributions of all txnames
         # (for an UL result there will be a single txname)
         for tx in self.txnames:
+            # Filter the elements
+            elements = [el for el in self.elements
+                        if el.txname is tx]
             # Build dictionary needed for evaluation:
-            elDict = {el.label: el for el in self.cluster.elements
-                      if el.txname is tx}
-            xsection += tx.evalConstraint(elDict)
+            xsection += tx.evalConstraintFor(elements)
 
         self.xsection = xsection
 
-    def computeCondition(self):
+    def computeConditions(self):
 
         # Adds the contributions of all txnames
         # (for an UL result there will be a single txname
         # and for EM results there should be no conditions)
         allConditions = []
         for tx in self.txnames:
-            if not tx.condition:
-                continue
-            # Build dictionary needed for evaluation:
-            elDict = {el.label: el for el in self.cluster.elements
-                      if el.txname is tx}
-            allConditions.append(tx.evalCondition(elDict))
+            # Filter the elements
+            elements = [el for el in self.elements
+                        if el.txname is tx]
+            allConditions.append(tx.evalConditionsFor(elements))
 
         if not allConditions:
             self.conditions = None
@@ -705,12 +704,15 @@ def _getDataSetPredictions(dataset, smsTopList, maxMassDist,
         logger.error("Sqrt(s) defined with wrong units for %s" % (ID))
         return False
 
-    #  Remove unwanted cross sections
+    # Remove unwanted cross sections
+    # and replace weight by max xsection value
+    # (should be a single value)
     newelements = []
     for el in elements:
         el.weight = el.weight.getXsecsFor(dataset.globalInfo.sqrts)
         if not el.weight:
             continue
+        el.weight = el.weight.getMaxXsec()
         newelements.append(el)
     elements = newelements
     if len(elements) == 0:
@@ -760,7 +762,7 @@ def _getElementsFrom(smsTopDict, dataset):
     elements = []
     for txname in dataset.txnameList:
         for cName in smsTopDict:
-            if cName not in list(txname._topologyDict.keys()):  # Check if the topology appear in txname
+            if cName != txname.canonName:  # Check if the topology appear in txname
                 continue
             for el in smsTopDict[cName]:
                 newEl = txname.hasElementAs(el)  # Check if element appears in txname

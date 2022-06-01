@@ -27,42 +27,28 @@ def cSim(*weights):
     Return the maximum relative difference between any element weights of the
     list, normalized to [0,1].
 
-    :returns: XSectionList object with the values for each label.
+    :returns: List of values.
 
     """
-    for weight in weights:
-        if not isinstance(weight, crossSection.XSectionList):
-            logger.error("Trying to evaluate non-xsection objects")
-            raise SModelSError()
 
-    # Make sure both xsec lists have the same entries (add zero xsecs for the
-    # missing entries)
-    infoList = []
-    for weight in weights:
-        for info in weight.getInfo():
-            if info not in infoList:
-                infoList.append(info)
-    zeros = crossSection.XSectionList(infoList)
-    for weight in weights:
-        weight += zeros
+    if any(not isinstance(w, (float, unum.Unum)) for w in weights):
+        logger.error("Trying to evaluate with invalid objects %s")
+        raise SModelSError()
 
-    # Evaluate the inequality for each cross section info
-    result = crossSection.XSectionList()
-    for info in infoList:
-        res = 0.
-        xsecRes = crossSection.XSection()
-        xsecRes.info = info
-        for weightA in weights:
-            for weightB in weights:
-                a = weightA.getXsecsFor(info.label)[0].value.asNumber(fb)
-                b = weightB.getXsecsFor(info.label)[0].value.asNumber(fb)
-                if a + b == 0.:
-                    continue
-                res = max(res, abs(a - b) / abs(a + b))
-        xsecRes.value = res
-        result.add(xsecRes)
-
-    return result
+    x = np.array([removeUnits(w) for w in weights], dtype=float)
+    # Convert x to a matrix
+    xM = np.reshape(x, (len(x), 1))
+    # Compute the differences between all values
+    d = np.abs(xM - xM.transpose())
+    # Compute the average between all values
+    s = np.abs(xM + xM.transpose())
+    # Compute the relative difference for
+    # the entries which have a non-zero average
+    delta = d[np.nonzero(s)]/s[np.nonzero(s)]
+    if len(delta) > 0:
+        return delta.max()
+    else:
+        return 0.
 
 
 def cGtr(weightA, weightB):
@@ -75,36 +61,18 @@ def cGtr(weightA, weightB):
     :returns: XSectioList object with the values for each label.
 
     """
-    if not isinstance(weightA, crossSection.XSectionList) or not isinstance(weightB, crossSection.XSectionList):
-        logger.error("Trying to evaluate non-xsection objects")
+
+    if any(not isinstance(w, (float, unum.Unum)) for w in [weightA, weightB]):
+        logger.error("Trying to evaluate with invalid objects")
         raise SModelSError()
 
-    # Make sure both xsec lists have the same entries (add zero xsecs for the
-    # missing entries)
-    infoList = weightA.getInfo()
-    for info in weightB.getInfo():
-        if info not in infoList:
-            infoList.append(info)
-    if not infoList:
-        # If there are no cross sections, can not evaluate
-        return 'N/A'
-    zeros = crossSection.XSectionList(infoList)
-    weightA += zeros
-    weightB += zeros
-
     # Evaluate the inequality for each cross section info
-    result = crossSection.XSectionList()
-    for info in infoList:
-        a = weightA.getXsecsFor(info.label)[0].value / fb
-        b = weightB.getXsecsFor(info.label)[0].value / fb
-        xsecRes = crossSection.XSection()
-        xsecRes.info = info
-        if a + b == 0.:
-            xsecRes.value = 'N/A'
-        else:
-            xsecRes.value = (abs(a - b) - (a - b)) / (2.*(a + b))
-        result.add(xsecRes)
-
+    a = removeUnits(weightA)
+    b = removeUnits(weightB)
+    if a + b == 0.:
+        return None
+    else:
+        result = (abs(a - b) - (a - b)) / (2.*(a + b))
     return result
 
 
