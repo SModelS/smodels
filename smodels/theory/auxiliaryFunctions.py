@@ -475,20 +475,23 @@ def roundValue(value, nround=-1):
     elif not isinstance(value, (float, unum.Unum)):
         return value
 
-    #Remove units, if it is a unum object
+    # Remove units, if it is a unum object
     if isinstance(value, unum.Unum):
         if not value.asNumber():
             return value
         elif np.isinf(value.asNumber()):
             return value
-        unit = value/value.asNumber()
-        v = value.asNumber()
+        unit = unum.Unum(value._unit)
+        v = value.asNumber(unit)
     else:
         unit = 1.0
         v = value
 
-    #Round value:
-    v_rounded = round(v, nround-int(np.floor(np.log10(abs(v))))-1)
+    # Round value:
+    if v != 0.0:
+        v_rounded = round(v, nround-int(np.floor(np.log10(abs(v))))-1)
+    else:
+        v_rounded = v
     v_rounded *= unit
     return v_rounded
 
@@ -587,7 +590,8 @@ def unscaleWidth(x):
     minWidth = 1e-30  # Any width below this can be safely considered to be zero
     maxWidth = 1e50  # Any width above this can be safely considered to be infinity
     with np.errstate(over='ignore'):  # Temporarily disable overflow error message
-        #The small increase in x is required to enforce unscaleWidth(widthToCoordinae(np.inf)) = np.inf
+        # The small increase in x is required to
+        # enforce unscaleWidth(widthToCoordinae(np.inf)) = np.inf
         width = minWidth*(np.exp(x)-1)
         if width > maxWidth:
             width = np.inf
@@ -650,65 +654,3 @@ def sortParticleList(ptcList):
 
     newPtcList = sorted(ptcList, key=lambda x: x.label)
     return newPtcList
-
-
-def getValuesForObj(obj, attribute):
-    """
-    Loops over all attributes in the object and in its attributes
-    and returns a list of values for the desired attribute:
-
-    :param obj: Any object with a __dict__ attribute
-    :param attribute: String for the desired attribute
-
-    :return: List with unique attribute values. If the attribute is not found, returns empty list.
-    """
-
-    values = []
-    try:
-        objDict = obj.__dict__.items()
-    except:
-        return values
-
-    for attr, value in objDict:
-        if attribute == attr:
-            values += [value]
-        elif isinstance(value, Iterable):
-            values += [getValuesForObj(v, attribute) for v in value]
-        else:
-            values += getValuesForObj(value, attribute)
-
-    values = list(filter(lambda a: (not isinstance(a, list)) or a != [], values))
-    values = flattenArray(values)
-    uniqueValues = [v for n, v in enumerate(values) if v not in values[:n]]
-
-    return uniqueValues
-
-
-def getAttributesFrom(obj):
-    """
-    Loops over all attributes in the object and return a list
-    of the attributes.
-
-    :param obj: Any object with a __dict__ attribute
-
-    :return: List with unique attribute labels.
-    """
-
-    attributes = []
-    try:
-        objDict = obj.__dict__.items()
-    except:
-        return attributes
-
-    for attr, value in objDict:
-        attributes.append(attr)
-        if isinstance(value, list):
-            attributes += [getAttributesFrom(v) for v in value]
-        elif isinstance(value, dict):
-            attributes += [getAttributesFrom(v) for v in value.values()]
-        else:
-            attributes += getAttributesFrom(value)
-
-    attributes = list(filter(lambda a: a != [], attributes))
-
-    return list(set(flattenArray(attributes)))

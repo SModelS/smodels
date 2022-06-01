@@ -8,7 +8,7 @@
 """
 
 from smodels.theory import clusterTools, crossSection, element
-from smodels.theory.auxiliaryFunctions import cSim, cGtr, elementsInStr, average
+from smodels.theory.auxiliaryFunctions import elementsInStr, average
 from smodels.tools.physicsUnits import TeV, fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
@@ -80,6 +80,42 @@ class TheoryPrediction(object):
 
         return self.dataset.getType()
 
+    def computeXSection(self):
+
+        xsection = 0*fb
+        # Adds the contributions of all txnames
+        # (for an UL result there will be a single txname)
+        for tx in self.txnames:
+            # Build dictionary needed for evaluation:
+            elDict = {el.label: el for el in self.cluster.elements
+                      if el.txname is tx}
+            xsection += tx.evalConstraint(elDict)
+
+        self.xsection = xsection
+
+    def computeCondition(self):
+
+        # Adds the contributions of all txnames
+        # (for an UL result there will be a single txname
+        # and for EM results there should be no conditions)
+        allConditions = []
+        for tx in self.txnames:
+            if not tx.condition:
+                continue
+            # Build dictionary needed for evaluation:
+            elDict = {el.label: el for el in self.cluster.elements
+                      if el.txname is tx}
+            allConditions.append(tx.evalCondition(elDict))
+
+        if not allConditions:
+            self.conditions = None
+        elif len(allConditions) == 1:
+            self.conditions = allConditions[0]
+        else:
+            msgError = "Multiple conditions found for a %s result." % self.dataType()
+            logger.error(msgError)
+            raise SModelSError(msgError)
+
     def getUpperLimit(self, expected=False):
         """
         Get the upper limit on sigma*eff.
@@ -92,19 +128,21 @@ class TheoryPrediction(object):
         :return: upper limit (Unum object)
         """
 
-        # First check if the upper-limit and expected upper-limit have already been computed.
-        # If not, compute it and store them.
+        #  First check if the upper-limit and expected upper-limit have already been computed.
+        #  If not, compute it and store them.
         if "UL" not in self.cachedObjs[expected]:
             if self.dataType() == 'efficiencyMap':
-                self.cachedObjs[expected]["UL"] = self.dataset.getSRUpperLimit(
-                        expected=expected, deltas_rel=self.deltas_rel)
+                ul = self.dataset.getSRUpperLimit(expected=expected,
+                                                  deltas_rel=self.deltas_rel)
+                self.cachedObjs[expected]["UL"] = ul
             if self.dataType() == 'upperLimit':
-                self.cachedObjs[expected]["UL"] = self.dataset.getUpperLimitFor(
-                        element=self.avgElement, txnames=self.txnames,
-                        expected=expected)
+                ul = self.dataset.getUpperLimitFor(element=self.avgElement,
+                                                   txnames=self.txnames,
+                                                   expected=expected)
+                self.cachedObjs[expected]["UL"] = ul
             if self.dataType() == 'combined':
-                # Create a list of signal events in each dataset/SR sorted according to datasetOrder
-                # lumi = self.dataset.getLumi()
+                #  Create a list of signal events in each dataset/SR sorted according to datasetOrder
+                #  lumi = self.dataset.getLumi()
                 if hasattr(self.dataset.globalInfo, "covariance"):
                     srNsigDict = dict([[pred.dataset.getID(), (pred.xsection.value*pred.dataset.getLumi()).asNumber()] for pred in self.datasetPredictions])
                     srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
@@ -113,9 +151,9 @@ class TheoryPrediction(object):
                     srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
                 self.cachedObjs[expected]["UL"] = getCombinedUpperLimitFor(self.dataset, srNsigs, expected=expected, deltas_rel=self.deltas_rel)
 
-        # Return the expected or observed UL:
-        # if not self.cachedObjs[expected]["UL"]:
-        #    self.cachedObjs[expected]["UL"]=None
+        #  Return the expected or observed UL:
+        #  if not self.cachedObjs[expected]["UL"]:
+        #     self.cachedObjs[expected]["UL"]=None
         return self.cachedObjs[expected]["UL"]
 
     def getRValue(self, expected=False):
@@ -144,30 +182,30 @@ class TheoryPrediction(object):
 
     def lmax(self, expected=False, allowNegativeSignals=False):
         """ likelihood at mu_hat """
-        if not "lmax" in self.cachedObjs[expected]:
+        if "lmax" not in self.cachedObjs[expected]:
             self.computeStatistics(expected, allowNegativeSignals)
-        if "lmax" in self.cachedObjs[expected] and not allowNegativeSignals \
-                in self.cachedObjs[expected]["lmax"]:
+        if "lmax" in self.cachedObjs[expected] and allowNegativeSignals \
+                not in self.cachedObjs[expected]["lmax"]:
             self.computeStatistics(expected, allowNegativeSignals)
-        if not "lmax" in self.cachedObjs[expected]:
+        if "lmax" not in self.cachedObjs[expected]:
             self.cachedObjs[expected]["lmax"] = {allowNegativeSignals: None}
         return self.cachedObjs[expected]["lmax"][allowNegativeSignals]
 
     def muhat(self, expected=False, allowNegativeSignals=False):
         """ position of maximum likelihood  """
-        if not "muhat" in self.cachedObjs[expected]:
+        if "muhat" not in self.cachedObjs[expected]:
             self.computeStatistics(expected, allowNegativeSignals)
-        if "muhat" in self.cachedObjs[expected] and not allowNegativeSignals \
-                in self.cachedObjs[expected]["muhat"]:
+        if "muhat" in self.cachedObjs[expected] and allowNegativeSignals \
+                not in self.cachedObjs[expected]["muhat"]:
             self.computeStatistics(expected, allowNegativeSignals)
-        if not "muhat" in self.cachedObjs[expected]:
+        if "muhat" not in self.cachedObjs[expected]:
             self.cachedObjs[expected]["muhat"] = {allowNegativeSignals: None}
         return self.cachedObjs[expected]["muhat"][allowNegativeSignals]
 
     def chi2(self, expected=False):
-        if not "chi2" in self.cachedObjs[expected]:
+        if "chi2" not in self.cachedObjs[expected]:
             self.computeStatistics(expected)
-        if not "chi2" in self.cachedObjs[expected]:
+        if "chi2" not in self.cachedObjs[expected]:
             self.cachedObjs[expected]["chi2"] = None
         return self.cachedObjs[expected]["chi2"]
 
@@ -187,7 +225,7 @@ class TheoryPrediction(object):
                     return 700.
                 return - np.log(llhd)
             return llhd
-        # self.computeStatistics(expected=expected)
+        #  self.computeStatistics(expected=expected)
         if useCached:
             if "llhd" in self.cachedObjs[expected] and abs(mu - 1.) < 1e-5:
                 llhd = self.cachedObjs[expected]["llhd"]
@@ -206,8 +244,9 @@ class TheoryPrediction(object):
             srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.
                        for ds in self.dataset._datasets]
             llhd = computeCombinedLikelihood(self.dataset, srNsigs,
-                          self.marginalize, self.deltas_rel, expected=expected,
-                          mu=mu)
+                                             self.marginalize,
+                                             self.deltas_rel,
+                                             expected=expected, mu=mu)
         if self.dataType() == 'efficiencyMap':
             nsig = (mu*self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig, marginalize=self.marginalize,
@@ -215,9 +254,10 @@ class TheoryPrediction(object):
                                            expected=expected)
 
         if self.dataType() == 'upperLimit':
-            # these fits only work with negative signals!
+            #  these fits only work with negative signals!
             llhd, chi2 = self.likelihoodFromLimits(mu, chi2also=True,
-                    expected=expected, allowNegativeSignals=True)
+                                                   expected=expected,
+                                                   allowNegativeSignals=True)
         self.cachedLlhds[expected][mu] = llhd
         if nll:
             if llhd == 0.:
@@ -238,7 +278,7 @@ class TheoryPrediction(object):
         :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
         :returns: likelihood; none if no expected upper limit is defined.
         """
-        # marked as experimental feature
+        #  marked as experimental feature
         from smodels.tools.runtime import experimentalFeatures
         if not experimentalFeatures():
             if chi2also:
@@ -267,11 +307,13 @@ class TheoryPrediction(object):
         if mu is not None:
             nsig = mu*(self.xsection.value*lumi).asNumber()
         llhd, muhat = likelihoodFromLimits(ulN, eulN, nsig,
-                               allowNegativeMuhat=True, corr=corr)
-        if muhat < 0. and allowNegativeSignals == False:
+                                           allowNegativeMuhat=True,
+                                           corr=corr)
+        if muhat < 0. and allowNegativeSignals is False:
             muhat = 0.
             llhd, muhat = likelihoodFromLimits(ulN, eulN, nsig, 0.,
-                               allowNegativeMuhat=True, corr=corr)
+                                               allowNegativeMuhat=True,
+                                               corr=corr)
         if mu is None:
             muhat = muhat / (self.xsection.value*lumi).asNumber()
             self.muhat_ = muhat
@@ -286,7 +328,7 @@ class TheoryPrediction(object):
         attributes (chi2 being phased out).
         :param expected: computed expected quantities, not observed
         """
-        if not "lmax" in self.cachedObjs[expected]:
+        if "lmax" not in self.cachedObjs[expected]:
             self.cachedObjs[expected]["lmax"] = {}
             self.cachedObjs[expected]["muhat"] = {}
 
@@ -294,8 +336,8 @@ class TheoryPrediction(object):
             llhd, chi2 = self.likelihoodFromLimits(1., expected=expected, chi2also=True)
             lsm = self.likelihoodFromLimits(0., expected=expected, chi2also=False)
             lmax = self.likelihoodFromLimits(None, expected=expected, chi2also=False,
-                    allowNegativeSignals=True)
-            if allowNegativeSignals == False and hasattr(self, "muhat_") and self.muhat_ < 0.:
+                                             allowNegativeSignals=True)
+            if allowNegativeSignals is False and hasattr(self, "muhat_") and self.muhat_ < 0.:
                 self.muhat_ = 0.
                 lmax = lsm
             self.cachedObjs[expected]["llhd"] = llhd
@@ -309,12 +351,15 @@ class TheoryPrediction(object):
             lumi = self.dataset.getLumi()
             nsig = (self.xsection.value*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig, marginalize=self.marginalize,
-                    deltas_rel=self.deltas_rel, expected=expected)
+                                           deltas_rel=self.deltas_rel,
+                                           expected=expected)
             llhd_sm = self.dataset.likelihood(nsig=0., marginalize=self.marginalize,
-                    deltas_rel=self.deltas_rel, expected=expected)
+                                              deltas_rel=self.deltas_rel,
+                                              expected=expected)
             llhd_max = self.dataset.lmax(marginalize=self.marginalize,
-                    deltas_rel=self.deltas_rel,
-                    allowNegativeSignals=allowNegativeSignals, expected=expected)
+                                         deltas_rel=self.deltas_rel,
+                                         allowNegativeSignals=allowNegativeSignals,
+                                         expected=expected)
             muhat = None
             if hasattr(self.dataset, "muhat"):
                 muhat = self.dataset.muhat
@@ -327,13 +372,15 @@ class TheoryPrediction(object):
 
         elif self.dataType() == 'combined':
             lumi = self.dataset.getLumi()
-            # Create a list of signal events in each dataset/SR sorted according to datasetOrder
+            #  Create a list of signal events in each dataset/SR sorted according to datasetOrder
             srNsigDict = dict([[pred.dataset.getID(), (pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
             srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
-            # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
+            #  srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
             llhd, lmax, lsm, muhat = computeCombinedStatistics(self.dataset, srNsigs,
-                       self.marginalize, self.deltas_rel, expected=expected,
-                       allowNegativeSignals=allowNegativeSignals)
+                                                               self.marginalize,
+                                                               self.deltas_rel,
+                                                               expected=expected,
+                                                               allowNegativeSignals=allowNegativeSignals)
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
@@ -353,18 +400,15 @@ class TheoryPrediction(object):
 
         if not self.conditions:
             return 0.
-        # maxcond = 0.
+
         values = [0.]
         for value in self.conditions.values():
             if value == 'N/A':
                 return value
-            if value == None:
+            if value is None:
                 continue
-            #print ( "value=",value,type(value),float(value) )
-            #maxcond = max(maxcond,float(value))
             values.append(float(value))
         return max(values)
-        # return maxcond
 
 
 class TheoryPredictionList(object):
@@ -480,7 +524,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         return TheoryPredictionList(ret)
 
     dataSetResults = []
-    # Compute predictions for each data set (for UL analyses there is one single set)
+    #  Compute predictions for each data set (for UL analyses there is one single set)
     for dataset in expResult.datasets:
         predList = _getDataSetPredictions(dataset, smsTopList, maxMassDist)
         if predList:
@@ -495,8 +539,8 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
             theoPred.upperLimit = theoPred.getUpperLimit()
         return result
 
-    # For results with more than one dataset, return all dataset predictions
-    # if useBestDataSet=False and combinedResults=False:
+    #  For results with more than one dataset, return all dataset predictions
+    #  if useBestDataSet=False and combinedResults=False:
     if not useBestDataset and not combinedResults:
         allResults = sum(dataSetResults)
         for theoPred in allResults:
@@ -574,10 +618,10 @@ def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
         mass = average(massList, weights=weights)
         totalwidth = average(widthList, weights=weights)
 
-    #Create a combinedDataSet object:
+    # Create a combinedDataSet object:
     combinedDataset = CombinedDataSet(expResult)
     combinedDataset._marginalize = marginalize
-    #Create a theory preidction object for the combined datasets:
+    # Create a theory preidction object for the combined datasets:
     theoryPrediction = TheoryPrediction(marginalize)
     theoryPrediction.dataset = combinedDataset
     theoryPrediction.txnames = txnameList
@@ -600,13 +644,13 @@ def _getBestResult(dataSetResults):
     :return: best result (TheoryPrediction object)
     """
 
-    #In the case of UL analyses or efficiency-maps with a single signal region
-    #return the single result:
+    # In the case of UL analyses or efficiency-maps with a single signal region
+    # return the single result:
     if len(dataSetResults) == 1:
         return dataSetResults[0]
 
-    #For efficiency-map analyses with multipler signal regions,
-    #select the best one according to the expected upper limit:
+    # For efficiency-map analyses with multipler signal regions,
+    # select the best one according to the expected upper limit:
     bestExpectedR = 0.
     bestXsec = 0.*fb
     for predList in dataSetResults:
@@ -652,16 +696,16 @@ def _getDataSetPredictions(dataset, smsTopList, maxMassDist,
         deltas_rel = _deltas_rel_default
 
     predictionList = TheoryPredictionList()
-    # Select elements belonging to expResult and apply efficiencies
+    #  Select elements belonging to expResult and apply efficiencies
     elements = _getElementsFrom(smsTopList, dataset)
 
-    # Check dataset sqrts format:
+    #  Check dataset sqrts format:
     if (dataset.globalInfo.sqrts/TeV).normalize()._unit:
         ID = dataset.globalInfo.id
         logger.error("Sqrt(s) defined with wrong units for %s" % (ID))
         return False
 
-    # Remove unwanted cross sections
+    #  Remove unwanted cross sections
     newelements = []
     for el in elements:
         el.weight = el.weight.getXsecsFor(dataset.globalInfo.sqrts)
@@ -672,23 +716,25 @@ def _getDataSetPredictions(dataset, smsTopList, maxMassDist,
     if len(elements) == 0:
         return None
 
-    # Combine elements according to their respective constraints and masses
-    # (For efficiencyMap analysis group all elements)
+    #  Combine elements according to their respective constraints and masses
+    #  (For efficiencyMap analysis group all elements)
     clusters = _combineElements(elements, dataset, maxDist=maxMassDist)
 
-    # Collect results and evaluate conditions
+    #  Collect results and evaluate conditions
     for cluster in clusters:
         theoryPrediction = TheoryPrediction(marginalize, deltas_rel)
         theoryPrediction.dataset = dataset
         theoryPrediction.txnames = cluster.txnames
-        theoryPrediction.xsection = _evalConstraint(cluster)
-        theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.elements = cluster.elements
         theoryPrediction.avgElement = cluster.averageElement()
         theoryPrediction.mass = theoryPrediction.avgElement.mass
         theoryPrediction.totalwidth = theoryPrediction.avgElement.totalwidth
         PIDs = [el.pdg for el in cluster.elements]
         theoryPrediction.PIDs = [pdg for pdg, _ in itertools.groupby(PIDs)]  # Remove duplicates
+        # Compute relevant cross-section and conditions:
+        theoryPrediction.computeXSection()
+        theoryPrediction.computeConditions()
+
         predictionList._theoryPredictions.append(theoryPrediction)
 
     if len(predictionList) == 0:
@@ -759,116 +805,3 @@ def _combineElements(elements, dataset, maxDist):
                        % dataset.getType())
 
     return clusters
-
-
-def _evalConstraint(cluster):
-    """
-    Evaluate the constraint inside an element cluster.
-    If the cluster refers to a specific TxName, sum all the elements' weights
-    according to the analysis constraint.
-    For efficiency map results, sum all the elements' weights.
-
-    :parameter cluster: cluster of elements (ElementCluster object)
-    :returns: cluster cross section
-    """
-
-    if cluster.getDataType() == 'efficiencyMap':
-        return cluster.getTotalXSec()
-    elif cluster.getDataType() == 'upperLimit':
-        if len(cluster.txnames) != 1:
-            logger.error("An upper limit cluster should never contain more than one TxName")
-            raise SModelSError()
-        txname = cluster.txnames[0]
-        if not txname.constraint or txname.constraint == "not yet assigned":
-            return txname.constraint
-        exprvalue = _evalExpression(txname.constraint, cluster)
-        return exprvalue
-    else:
-        logger.error("Unknown data type %s" % (str(cluster.getDataType())))
-        raise SModelSError()
-
-
-def _evalConditions(cluster):
-    """
-    Evaluate the conditions (if any) inside an element cluster.
-
-    :parameter cluster: cluster of elements (ElementCluster object)
-    :returns: list of condition values (floats) if analysis type == upper limit. None, otherwise.
-    """
-
-    conditionVals = {}
-    for txname in cluster.txnames:
-        if not txname.condition or txname.condition == "not yet assigned":
-            continue
-        #Make sure conditions is always a list
-        if isinstance(txname.condition, str):
-            conditions = [txname.condition]
-        elif isinstance(txname.condition, list):
-            conditions = txname.condition
-        else:
-            logger.error("Conditions should be a list or a string")
-            raise SModelSError()
-
-        # Loop over conditions
-        for cond in conditions:
-            exprvalue = _evalExpression(cond, cluster)
-            if isinstance(exprvalue, crossSection.XSection):
-                conditionVals[cond] = exprvalue.value
-            else:
-                conditionVals[cond] = exprvalue
-
-    if not conditionVals:
-        return None
-    else:
-        return conditionVals
-
-
-def _evalExpression(stringExpr, cluster):
-    """
-    Auxiliary method to evaluate a string expression using the weights of the elements in the cluster.
-    Replaces the elements in stringExpr (in bracket notation) by their weights and evaluate the
-    expression.
-
-    e.g. computes the total weight of string expressions such as "[[[e^+]],[[e^-]]]+[[[mu^+]],[[mu^-]]]"
-    or ratios of weights of string expressions such as "[[[e^+]],[[e^-]]]/[[[mu^+]],[[mu^-]]]"
-    and so on...
-
-    :parameter stringExpr: string containing the expression to be evaluated
-    :parameter cluster: cluster of elements (ElementCluster object)
-    :returns: xsection for the expression. Can be a XSection object, a float or not numerical (None,string,...)
-
-    """
-
-    #Get model for final state particles (database particles):
-    model = cluster.dataset.globalInfo._databaseParticles
-    #Get txname final state:
-    if not hasattr(cluster.txnames[0], 'finalState'):
-        finalState = ['MET', 'MET']
-    else:
-        finalState = cluster.txnames[0].finalState
-    if not hasattr(cluster.txnames[0], 'intermediateState'):
-        intermediateState = None
-    else:
-        intermediateState = cluster.txnames[0].intermediateState
-
-    #Get cross section info from cluster (to generate zero cross section values):
-    infoList = cluster.elements[0].weight.getInfo()
-    #Get weights for elements appearing in stringExpr
-    weightsDict = {}
-    evalExpr = stringExpr.replace("'", "").replace(" ", "")
-    for i, elStr in enumerate(elementsInStr(evalExpr)):
-        el = element.Element(elStr, intermediateState=intermediateState,
-                             finalState=finalState, model=model)
-        weightsDict['w%i' % i] = crossSection.XSectionList(infoList)
-        for el1 in cluster.elements:
-            if el1 == el:
-                weightsDict['w%i' % i] += el1.weight
-        evalExpr = evalExpr.replace(elStr, 'w%i' % i)
-
-    weightsDict.update({"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim})
-    exprvalue = eval(evalExpr, weightsDict)
-    if type(exprvalue) == type(crossSection.XSectionList()):
-        if len(exprvalue) != 1:
-            logger.error("Evaluation of expression "+evalExpr+" returned multiple values.")
-        return exprvalue[0]  # Return XSection object
-    return exprvalue

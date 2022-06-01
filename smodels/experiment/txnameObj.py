@@ -13,7 +13,7 @@
 import os
 from smodels.tools import physicsUnits
 from smodels.theory.auxiliaryFunctions import (elementsInStr, removeUnits,
-                                               rescaleWidth, unscaleWidth)
+                                               rescaleWidth, unscaleWidth, cSim, cGtr)
 from smodels.tools.stringTools import concatenateLines
 from smodels.theory.element import Element
 from smodels.theory.topology import TopologyDict
@@ -47,6 +47,7 @@ class TxName(object):
         self.txnameDataExp = None  # expected Data
         self.dataMap = None
         self.arrayMap = None
+        self.elementMap = {}
         self._topologyDict = TopologyDict()
         self.finalState = ['MET', 'MET']  # default final state
         self.intermediateState = None  # default intermediate state
@@ -99,38 +100,27 @@ class TxName(object):
         ident = self.globalInfo.id+":"+self.dataType+":" + str(self._infoObj.dataId)
         ident += ":" + self.txName
 
-        # Builds up a list of elements appearing in constraints:
-        elements = []
         if not databaseParticles:
             raise SModelSError("Database particles is empty. Can not create TxName object.")
-        # Create unsorted elements (in order to make sure its order matches the data grid)
+
+        # Process constraint and convert it to a function
         if hasattr(self, 'constraint'):
-            elements += [Element(el, self.finalState,
-                                 self.intermediateState,
-                                 model=databaseParticles,
-                                 sort=False)
-                         for el in elementsInStr(str(self.constraint))]
+            self.evalConstraint = self.processExpr(self.constraint,
+                                                   databaseParticles,
+                                                   checkUnique=True)
 
-        if any((elA == elB and elA is not elB) for elA in elements for elB in elements):
-            txt = "Duplicate elements in constraint: %s in %s" % \
-                  (self.constraint, self.globalInfo.id)
-            logger.error(txt)
-            raise SModelSError(txt)
-
+        # Process conditions and convert it to a function
         if hasattr(self, 'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds, list):
                 conds = [conds]
-            for cond in conds:
-                for el in elementsInStr(str(cond)):
-                    newEl = Element(el, self.finalState, self.intermediateState,
-                                    databaseParticles)
-                    if newEl not in elements:
-                        elements.append(newEl)
+            conditionFuncs = [self.processExpr(cond, databaseParticles, checkUnique=False)
+                              for cond in conds]
+            self.evalConditions = lambda elDict: [condF(elDict) for condF in conditionFuncs]
 
-        #  Builds up topologyDict with all the elements appearing in constraints
-        #  and conditions:
-        for el in elements:
+        # Store all the elements appearing in constraint and condition
+        # in a topology dictionary
+        for el in self.elementMap:
             self._topologyDict.addElement(el)
 
         # Get detector size (if not found in self, look for it in datasetInfo or globalInfo).
@@ -151,8 +141,88 @@ class TxName(object):
         return self.__str__()
 
     def __lt__(self, other):
-        """ sort by txName """
+        """
+        Sort by txName
+        """
+
         return self.txName < other.txName
+
+    def processExpr(self, stringExpr, databaseParticles, checkUnique=True):
+        """
+        Process a string expression (constraint or condition) for
+        element weights. The element appearing in the string are stored in self.elementMap
+        along with their string labels which are used to evaluate the expression.
+
+        :param stringExpr: A mathematical expression for elements (e.g. 2*([[['jet']],[['jet']]]))
+        :param databaseParticles: A Model object containing all the particle objects for the database.
+        :param checkUnique: If True raises an error if the elements appearing in the expression
+                            are not unique (relevant for avoiding double counting in the expression).
+
+        :return: A function that takes a dictionary ({stringLabel : element}) and evaluates
+                 the expression.
+        """
+
+        exprFunc = stringExpr[:]
+
+        # Get the maximum element ID already used
+        if self.elementMap:
+            nel = max([el.elID for el in self.elementMap])
+        else:
+            self.elementMap = {}
+            nel = 0
+
+        # Get the elements contained in the expression
+        elements = []
+        for elStr in elementsInStr(str(stringExpr)):
+            elObj = Element(elStr, self.finalState,
+                            self.intermediateState,
+                            model=databaseParticles,
+                            sort=False)
+            elements.append(elObj)
+            # If it is a new element, add it to the element -> label map
+            if elObj not in self.elementMap:
+                nel += 1
+                elObj.elID = nel
+                elObjLabel = 'el_%i' % elObj.elID
+                elObj.label = elObjLabel
+                self.elementMap[elObj] = elObjLabel
+            else:
+                elObjLabel = self.elementMap[elObj]
+
+            # Replace the element string by its label.weight
+            exprFunc = exprFunc.replace(elStr, '%s.weight' % elObjLabel)
+
+        if checkUnique:
+            # Check if the expression only contain unique elements
+            if any((elA == elB and elA is not elB) for elA in elements for elB in elements):
+                msgError = "Duplicate elements found in: "
+                msgError += "%s in %s" % (stringExpr, self.globalInfo.id)
+                logger.error(msgError)
+                raise SModelSError(msgError)
+
+        # Define the function:
+        def evalExpr(elDict):
+            localsDict = {k: v for k, v in elDict.items()}
+            localsDict.update({"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim})
+            return eval(exprFunc, localsDict, {})
+
+        # Check if the expression can be evaluated:
+        elDictTest = {elLabel: 3.0*iel*physicsUnits.fb
+                      for iel, elLabel in enumerate(self.elementMap.values())}
+        # Dummy eval:
+        try:
+            res = evalExpr(elDictTest)
+        except NameError:
+            msgError = "Malformed expression %s for %s." % (stringExpr, self)
+            logger.error(msgError)
+            raise SModelSError(msgError)
+
+        if not isinstance(res, (float, int, unum.Unum)):
+            msgError = "Expression %s for %s does not return a value." % (stringExpr, self)
+            logger.error(msgError)
+            raise SModelSError(msgError)
+
+        return evalExpr
 
     def preProcessData(self, rawData):
         """
@@ -670,6 +740,8 @@ class TxName(object):
             # Compare elements:
             cmp, sortedEl = el.compareTo(element)
             if cmp == 0:
+                # Attach label used for evaluating expressions
+                sortedEl.label = el.label
                 return sortedEl
 
         # If this point was reached, there were no macthes

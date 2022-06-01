@@ -139,7 +139,7 @@ class Element(object):
 
         try:
             val = [getattr(node, attr) if str(node) != 'PV' else None
-                   for node in self.tree.nodes()]
+                   for node in self.tree.nodes]
             return val
         except AttributeError:
             raise AttributeError("Neither element nor particles have attribute ``%s''" % attr)
