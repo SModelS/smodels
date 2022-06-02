@@ -104,7 +104,10 @@ class TheoryPrediction(object):
             # Filter the elements
             elements = [el for el in self.elements
                         if el.txname is tx]
-            allConditions.append(tx.evalConditionsFor(elements))
+            cond = tx.evalConditionsFor(elements)
+            if cond is None:
+                continue
+            allConditions.append(cond)
 
         if not allConditions:
             self.conditions = None
@@ -143,10 +146,10 @@ class TheoryPrediction(object):
                 #  Create a list of signal events in each dataset/SR sorted according to datasetOrder
                 #  lumi = self.dataset.getLumi()
                 if hasattr(self.dataset.globalInfo, "covariance"):
-                    srNsigDict = dict([[pred.dataset.getID(), (pred.xsection.value*pred.dataset.getLumi()).asNumber()] for pred in self.datasetPredictions])
+                    srNsigDict = dict([[pred.dataset.getID(), (pred.xsection*pred.dataset.getLumi()).asNumber()] for pred in self.datasetPredictions])
                     srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
                 elif hasattr(self.dataset.globalInfo, "jsonFiles"):
-                    srNsigDict = dict([[pred.dataset.getID(), (pred.xsection.value*pred.dataset.getLumi()).asNumber()] for pred in self.datasetPredictions])
+                    srNsigDict = dict([[pred.dataset.getID(), (pred.xsection*pred.dataset.getLumi()).asNumber()] for pred in self.datasetPredictions])
                     srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
                 self.cachedObjs[expected]["UL"] = getCombinedUpperLimitFor(self.dataset, srNsigs, expected=expected, deltas_rel=self.deltas_rel)
 
@@ -166,7 +169,7 @@ class TheoryPrediction(object):
                 self.cachedObjs[expected]["r"] = r
                 return r
             else:
-                r = (self.xsection.value/upperLimit).asNumber()
+                r = (self.xsection/upperLimit).asNumber()
                 self.cachedObjs[expected]["r"] = r
                 return r
         return self.cachedObjs[expected]["r"]
@@ -238,7 +241,7 @@ class TheoryPrediction(object):
                 return lsm
         lumi = self.dataset.getLumi()
         if self.dataType() == 'combined':
-            srNsigDict = dict([[pred.dataset.getID(), (pred.xsection.value*lumi).asNumber()] for
+            srNsigDict = dict([[pred.dataset.getID(), (pred.xsection*lumi).asNumber()] for
                               pred in self.datasetPredictions])
             srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.
                        for ds in self.dataset._datasets]
@@ -247,7 +250,7 @@ class TheoryPrediction(object):
                                              self.deltas_rel,
                                              expected=expected, mu=mu)
         if self.dataType() == 'efficiencyMap':
-            nsig = (mu*self.xsection.value*lumi).asNumber()
+            nsig = (mu*self.xsection*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig, marginalize=self.marginalize,
                                            deltas_rel=self.deltas_rel,
                                            expected=expected)
@@ -304,7 +307,7 @@ class TheoryPrediction(object):
         eulN = float(eul * lumi)  # upper limit on yield
         nsig = None
         if mu is not None:
-            nsig = mu*(self.xsection.value*lumi).asNumber()
+            nsig = mu*(self.xsection*lumi).asNumber()
         llhd, muhat = likelihoodFromLimits(ulN, eulN, nsig,
                                            allowNegativeMuhat=True,
                                            corr=corr)
@@ -314,7 +317,7 @@ class TheoryPrediction(object):
                                                allowNegativeMuhat=True,
                                                corr=corr)
         if mu is None:
-            muhat = muhat / (self.xsection.value*lumi).asNumber()
+            muhat = muhat / (self.xsection*lumi).asNumber()
             self.muhat_ = muhat
         if chi2also:
             return (llhd, chi2FromLimits(llhd, ulN, eulN, corr=corr))
@@ -348,7 +351,7 @@ class TheoryPrediction(object):
 
         elif self.dataType() == 'efficiencyMap':
             lumi = self.dataset.getLumi()
-            nsig = (self.xsection.value*lumi).asNumber()
+            nsig = (self.xsection*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig, marginalize=self.marginalize,
                                            deltas_rel=self.deltas_rel,
                                            expected=expected)
@@ -372,7 +375,7 @@ class TheoryPrediction(object):
         elif self.dataType() == 'combined':
             lumi = self.dataset.getLumi()
             #  Create a list of signal events in each dataset/SR sorted according to datasetOrder
-            srNsigDict = dict([[pred.dataset.getID(), (pred.xsection.value*lumi).asNumber()] for pred in self.datasetPredictions])
+            srNsigDict = dict([[pred.dataset.getID(), (pred.xsection*lumi).asNumber()] for pred in self.datasetPredictions])
             srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
             #  srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
             llhd, lmax, lsm, muhat = computeCombinedStatistics(self.dataset, srNsigs,
@@ -388,7 +391,7 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["chi2"] = chi2FromLmax(llhd, lmax)
 
     def totalXsection(self):
-        return self.xsection.value
+        return self.xsection
 
     def getmaxCondition(self):
         """
@@ -606,7 +609,7 @@ def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
             totalXsec += pred.xsection
         massList.append(pred.mass)
         widthList.append(pred.totalwidth)
-        weights.append(pred.xsection.value.asNumber(fb))
+        weights.append(pred.xsection.asNumber(fb))
         PIDList += pred.PIDs
 
     txnameList = list(set(txnameList))
@@ -663,11 +666,11 @@ def _getBestResult(dataSetResults):
             raise SModelSError(txt)
         pred = predList[0]
         xsec = pred.xsection
-        expectedR = (xsec.value/dataset.getSRUpperLimit(0.05, True, False)).asNumber()
-        if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec.value > bestXsec):
+        expectedR = (xsec/dataset.getSRUpperLimit(0.05, True, False)).asNumber()
+        if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec > bestXsec):
             bestExpectedR = expectedR
             bestPred = pred
-            bestXsec = xsec.value
+            bestXsec = xsec
 
     return bestPred
 
@@ -704,15 +707,17 @@ def _getDataSetPredictions(dataset, smsTopList, maxMassDist,
         logger.error("Sqrt(s) defined with wrong units for %s" % (ID))
         return False
 
-    # Remove unwanted cross sections
-    # and replace weight by max xsection value
-    # (should be a single value)
+    # Compute relevant element weights
     newelements = []
     for el in elements:
-        el.weight = el.weight.getXsecsFor(dataset.globalInfo.sqrts)
+        # Get cross-sections for correct CM energy:
+        el.weight = el.weightList.getXsecsFor(dataset.globalInfo.sqrts)
         if not el.weight:
             continue
+        # Get largest weight (in case there are LO, NLO,... values)
         el.weight = el.weight.getMaxXsec()
+        # Multiply weight by element efficiency:
+        el.weight *= el.eff
         newelements.append(el)
     elements = newelements
     if len(elements) == 0:
@@ -728,11 +733,7 @@ def _getDataSetPredictions(dataset, smsTopList, maxMassDist,
         theoryPrediction.dataset = dataset
         theoryPrediction.txnames = cluster.txnames
         theoryPrediction.elements = cluster.elements
-        theoryPrediction.avgElement = cluster.averageElement()
-        theoryPrediction.mass = theoryPrediction.avgElement.mass
-        theoryPrediction.totalwidth = theoryPrediction.avgElement.totalwidth
-        PIDs = [el.pdg for el in cluster.elements]
-        theoryPrediction.PIDs = [pdg for pdg, _ in itertools.groupby(PIDs)]  # Remove duplicates
+        theoryPrediction.avgElement = cluster.averageElement
         # Compute relevant cross-section and conditions:
         theoryPrediction.computeXSection()
         theoryPrediction.computeConditions()
@@ -774,7 +775,6 @@ def _getElementsFrom(smsTopDict, dataset):
                     continue
                 el.setTestedBy(dataset.globalInfo.type)
                 newEl.eff = eff
-                newEl.weight *= eff
                 newEl.txname = txname
                 elements.append(newEl)  # Save element with correct branch ordering
 

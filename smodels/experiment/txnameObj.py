@@ -178,27 +178,30 @@ class TxName(object):
         # Dummy constraint eval:
         try:
             res = self.evalConstraintFor(elements)
-        except NameError:
+        except (TypeError, NameError) as e:
             msgError = "Can not evaluate constraint %s for %s." % (self._constraintFunc, self)
+            msgError += "\n error: %s" % str(e)
             logger.error(msgError)
             raise SModelSError(msgError)
 
         if res is not None and not isinstance(res, (float, int, unum.Unum,)):
-            msgError = "Constraint dor %s returned an invalid value: %s (%s)" % (self, res, type(res))
+            msgError = "Constraint for %s returned an invalid value: %s (%s)" % (self, res, type(res))
             logger.error(msgError)
             raise SModelSError(msgError)
 
         # Dummy condistions eval:
         try:
             res = self.evalConditionsFor(elements)
-        except NameError:
+        except (TypeError, NameError) as e:
             msgError = "Can not evaluate conditions %s for %s." % (self._conditionsFunc, self)
+            msgError += "\n error: %s" % str(e)
             logger.error(msgError)
             raise SModelSError(msgError)
 
         if res is not None and not isinstance(res, list):
-            msgError = "Constraint dor %s returned an invalid value: %s (%s)" % (self, res, type(res))
+            msgError = "Conditions for %s returned an invalid value: %s (%s)" % (self, res, type(res))
             logger.error(msgError)
+            raise SModelSError(msgError)
 
         return True
 
@@ -217,7 +220,10 @@ class TxName(object):
                  the expression.
         """
 
-        exprFunc = stringExpr[:].replace("'", "").replace(" ", "")
+        # Remove quotes, spaces and curly brackets from expression
+        exprFunc = stringExpr[:].replace("'", "").replace('"', '')
+        exprFunc = exprFunc.replace(" ", "")
+        exprFunc = exprFunc.replace("}", "").replace("{", "")  # New format
 
         # Get the maximum element ID already used
         if self.elementMap:
@@ -271,11 +277,14 @@ class TxName(object):
         if not self._constraintFunc:
             return None
 
-        localsDict = {el.txlabel: el.weight for el in elements}
-        for elLabel in self.elementMap.values():
-            if elLabel not in localsDict:
-                localsDict[elLabel] = 0.0*physicsUnits.fb  # Add zero weights for missing elements
-        localsDict.update({"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim})
+        # Build dictionary with elements and functions
+        # required for evaluating the constraint expression
+        localsDict = {"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim}
+        # Add a dictionary entry with zero weights for all element labels
+        localsDict.update({elLabel: 0*physicsUnits.fb for elLabel in self.elementMap.values()})
+        # Add elements weights
+        for el in elements:
+            localsDict[el.txlabel] += el.weight
 
         return eval(self._constraintFunc, localsDict, {})
 
@@ -294,11 +303,14 @@ class TxName(object):
         if not self._conditionsFunc:
             return None
 
-        localsDict = {el.txlabel: el.weight for el in elements}
-        for elLabel in self.elementMap.values():
-            if elLabel not in localsDict:
-                localsDict[elLabel] = 0.0*physicsUnits.fb  # Add zero weights for missing elements
-        localsDict.update({"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim})
+        # Build dictionary with elements and functions
+        # required for evaluating the constraint expression
+        localsDict = {"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim}
+        # Add a dictionary entry with zero weights for all element labels
+        localsDict.update({elLabel: 0*physicsUnits.fb for elLabel in self.elementMap.values()})
+        # Add elements weights
+        for el in elements:
+            localsDict[el.txlabel] += el.weight
 
         conditions = [eval(cond, localsDict, {}) for cond in self._conditionsFunc]
 

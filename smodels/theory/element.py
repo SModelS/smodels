@@ -15,7 +15,7 @@ from smodels.theory.particle import Particle
 class Element(object):
     """
     An instance of this class represents an element.
-    This class possesses a pair of branches and the element weight
+    This class possesses a pair of branches and the element weightList
     (cross-section * BR).
     """
 
@@ -49,7 +49,7 @@ class Element(object):
             self.tree = Tree(info=info, finalState=finalState,
                              intermediateState=intermediateState,
                              model=model)
-        self.weight = crossSection.XSectionList()  # gives the weight for all decays promptly
+        self.weightList = crossSection.XSectionList()
         self.decayLabels = []
         self.motherElements = [self]  # The motheElements includes self to keep track of merged elements
         self.elID = 0
@@ -171,7 +171,7 @@ class Element(object):
 
         newEl = self.__class__(info=None)
         newEl.motherElements = self.motherElements[:] + other.motherElements[:]
-        newEl.weight = self.weight + other.weight
+        newEl.weightList = self.weightList + other.weightList
         newEl.tree = self.tree + other.tree
         newEl.sort()
 
@@ -198,7 +198,7 @@ class Element(object):
             raise SModelSError("Can not add elements with distinct topologies")
 
         self.motherElements += other.motherElements[:]
-        self.weight += other.weight
+        self.weightList += other.weightList
         self.tree = self.tree + other.tree
 
         return self
@@ -236,7 +236,7 @@ class Element(object):
 
         # Allows for derived classes (like inclusive classes)
         newel = self.__class__(info=self.tree.copyTree())
-        newel.weight = self.weight.copy()
+        newel.weightList = self.weightList.copy()
         newel.motherElements = self.motherElements[:]
         newel.elID = self.elID
         return newel

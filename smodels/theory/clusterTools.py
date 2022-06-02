@@ -7,7 +7,6 @@
 
 """
 
-from smodels.theory import crossSection
 from smodels.theory.element import Element
 from smodels.theory.particle import Particle
 from smodels.experiment.datasetObj import DataSet, CombinedDataSet
@@ -27,13 +26,22 @@ class AverageElement(Element):
     all elements.
     """
 
-    def __init__(self, elements=[], particleProperties=['mass', 'totalwidth', 'isSM']):
+    def __init__(self, elements=[]):
         if any(not isinstance(el, Element) for el in elements):
             raise SModelSError("An AverageElement must be created from a list of Element objects.")
 
         Element.__init__(self, elements[0].tree)
+
+        # Get the relevant properties needed by the txnames
+        # (in addition to mass, totalwidth and isSM)
+        attrList = ['mass', 'totalwidth', 'isSM']
+        for el in elements:
+            dataMap = el.txname.dataMap
+            attrList += [attr for node, attr, unit in dataMap.values()]
+        attrList = list(set(attrList))
+
         #  Define relevant properties to be stored and averaged over:
-        self.properties = particleProperties[:]
+        self.properties = attrList
         self.elements = elements[:]
         tree = self.elements[0].tree
         self.txname = self.elements[0].txname
@@ -65,7 +73,7 @@ class AverageElement(Element):
 
         self.tree = tree.relabel_nodes(newNodeDict, copy=True)
 
-        self.weight = self.elements[0].weight.copy()
+        self.weight = self.elements[0].weight
         for el in self.elements[1:]:
             self.weight += el.weight
 
@@ -108,21 +116,6 @@ class AverageElement(Element):
     def __neq__(self, other):
         return not self.__eq__(other)
 
-    #  def __getattr__(self, attr):
-    #      """
-    #      Returns the attribute of self (necessary to overwrite the Element
-    #      class method).
-    #
-    #      :param attr: Attribute name
-    #
-    #      :return: Attribute value
-    #      """
-    #
-    #      if attr not in self.__dict__:
-    #          raise AttributeError("%s not in AverageElement" % attr)
-    #      else:
-    #          return self.__dict__[attr]
-
     def getAverage(self, values, weighted=True, nround=5):
         """
         Compute the average value for the attribute using
@@ -139,7 +132,7 @@ class AverageElement(Element):
         """
 
         if weighted:
-            weights = [el.weight.getMaxXsec().asNumber(fb) for el in self.elements]
+            weights = [el.weight.asNumber(fb) for el in self.elements]
         else:
             weights = [1.]*len(self.elements)
 
@@ -216,9 +209,12 @@ class ElementCluster(object):
 
         :returns: sum of weights of all the elements in the cluster (XSectionList object)
         """
-        totxsec = crossSection.XSectionList()
+        totxsec = None
         for el in self:
-            totxsec += el.weight
+            if totxsec is None:
+                totxsec = el.weight
+            else:
+                totxsec += el.weight
         if len(totxsec) != 1:
             logger.error("Cluster total cross section should have a single value")
             raise SModelSError()
@@ -239,15 +235,26 @@ class ElementCluster(object):
 
         return dataType
 
+    @property
     def averageElement(self):
         """
         Computes the average element for the cluster.
-        The average element is an empty element,
-        but with its mass and width given by the average over the cluster elements.
+        The average element has generic ParticleNodes
+        with the attributes set to the average values of self.elements.
+        It can only be defined if all elements share the same canonical name
+        and the same txname. Otherwise, returns None
 
-        :return: Element object
+        :return: AverageElement object or None (if it can not be defined)
         """
 
+        # Check if an average element can be defined:
+        cName = self.elements[0].canonName
+        tx = self.elements[0].txname
+        if any(el.canonName != cName for el in self.elements):
+            return None
+        if any(el.txname != tx for el in self.elements):
+            return None
+        # Define the average element with the required properties averaged over:
         avgEl = AverageElement(self.elements[:])
         if self.dataset:
             avgEl._upperLimit = self.dataset.getUpperLimitFor(avgEl,
@@ -344,7 +351,7 @@ class ElementCluster(object):
         :return: True/False if the cluster is/is not consistent.
         """
 
-        avgElement = self.averageElement()
+        avgElement = self.averageElement
         if avgElement._upperLimit is None:
             return False
 
@@ -406,7 +413,7 @@ def clusterElements(elements, maxDist, dataset):
 
     # Make sure only unique elements are clustered together (avoids double counting weights)
     # Sort element, so the ones with highest contribution (weight*eff) come first:
-    elementList = sorted(elements, key=lambda el: el.weight.getMaxXsec()*el.eff, reverse=True)
+    elementList = sorted(elements, key=lambda el: el.weight, reverse=True)
     # Remove duplicated elements:
     elementsUnique = []
     for el in elementList:
@@ -522,7 +529,7 @@ def doCluster(elements, dataset, maxDist):
                 cluster.add(elB)
         if not cluster.elements:
             continue
-        if cluster.averageElement()._upperLimit is None:
+        if cluster.averageElement._upperLimit is None:
             continue
         if cluster not in clusterList:
             clusterList.append(cluster)
@@ -548,7 +555,7 @@ def doCluster(elements, dataset, maxDist):
                     if cluster.getDistanceTo(el) > maxDist or not isConsistent:
                         newcluster = cluster.copy()
                         newcluster.remove(el)
-                        if newcluster.averageElement()._upperLimit is None:
+                        if newcluster.averageElement._upperLimit is None:
                             continue
                         if newcluster in newClusters:
                             continue

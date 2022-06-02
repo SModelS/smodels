@@ -74,7 +74,7 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
 
     for tree in allTrees:
         newElement = Element(tree)
-        newElement.weight = tree.getTreeWeight()
+        newElement.weightList = tree.getTreeWeight()
         smsTopDict.addElement(newElement)
 
     if massCompress or invisibleCompress:
