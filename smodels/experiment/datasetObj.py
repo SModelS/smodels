@@ -313,7 +313,7 @@ class DataSet(object):
             computer = LikelihoodComputer(m)
         ret = computer.likelihood(nsig, marginalize=marginalize)
         if hasattr(computer, "theta_hat"):
-            ## seems like someone wants to debug them
+            # seems like someone wants to debug them
             self.theta_hat = computer.theta_hat
 
         return ret
@@ -340,8 +340,9 @@ class DataSet(object):
                          deltas_rel=deltas_rel)
                 computer = LikelihoodComputer(m)
                 thetahat = computer.findThetaHat(0.)
-                if type(self.dataInfo.expectedBG) in [float, np.float64,
-                                                np.float32, int, np.int64, np.int32]:
+                if isinstance(self.dataInfo.expectedBG, (float, np.float64,
+                                                         np.float32, int,
+                                                         np.int64, np.int32)):
                     thetahat = float(thetahat[0])
                 obs = self.dataInfo.expectedBG + thetahat
 
@@ -351,10 +352,10 @@ class DataSet(object):
         ret = computer.lmax(marginalize=marginalize, nll=False,
                             allowNegativeSignals=allowNegativeSignals)
         if hasattr(computer, "theta_hat"):
-            ## seems like someone wants to debug them
+            # seems like someone wants to debug them
             self.theta_hat = computer.theta_hat
         if hasattr(computer, "muhat"):
-            ## seems like someone wants to debug them
+            # seems like someone wants to debug them
             self.muhat = computer.muhat
         return ret
 
@@ -507,7 +508,7 @@ class DataSet(object):
         m = Data(Nobs, Nexp, bgError**2, deltas_rel=deltas_rel)
         computer = UpperLimitComputer(cl=1.-alpha)
         maxSignalXsec = computer.ulSigma(m)
-        if maxSignalXsec != None:
+        if maxSignalXsec is not None:
             maxSignalXsec = maxSignalXsec/self.getLumi()
 
         return maxSignalXsec
