@@ -48,7 +48,7 @@ class TxName(object):
         self.arrayMap = None
         self.elementMap = {}  # Stores the elements and their label representaion
         self._constraintFunc = None
-        self._conditionsFunc = None
+        self._conditionsDict = {}
         self.finalState = ['MET', 'MET']  # default final state
         self.intermediateState = None  # default intermediate state
 
@@ -106,19 +106,23 @@ class TxName(object):
         # Process constraint, simplify it so it can be easily evaluated and
         # stores the elements in self.elementMap
         if hasattr(self, 'constraint'):
-            self._constraintFunc = self.processExpr(self.constraint,
-                                                    databaseParticles,
-                                                    checkUnique=True)
+            exprFunc, elMap = self.processExpr(self.constraint,
+                                               databaseParticles,
+                                               checkUnique=True)
+            self._constraintFunc = exprFunc
+            self.elementMap = elMap
 
         # Process conditions, simplify it so it can be easily evaluated and
-        # stores the elements in self.elementMap
+        # stores the expressions and element maps in _conditionsDict
         if hasattr(self, 'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds, list):
                 conds = [conds]
-            conditionFuncs = [self.processExpr(cond, databaseParticles, checkUnique=False)
-                              for cond in conds]
-            self._conditionsFunc = conditionFuncs[:]
+            conditionsDict = {}
+            for cond in conds:
+                exprFunc, elMap = self.processExpr(cond, databaseParticles)
+                conditionsDict[exprFunc] = elMap
+            self._conditionsDict = conditionsDict
 
         # Do consistency checks:
         self.checkConsistency()
@@ -169,9 +173,9 @@ class TxName(object):
 
         # Check if the constraint can be evaluated:
         elements = []
-        for iel, elLabel in enumerate(self.elementMap.values()):
-            elTest = Element()
-            elTest.weight = 3.0*(iel+1)*physicsUnits.fb  # dumyy xsec
+        for elObj, elLabel in self.elementMap.items():
+            elTest = elObj.copy()
+            elTest.weight = 3.0*(len(elements)+1)*physicsUnits.fb  # dumyy xsec
             elTest.txlabel = elLabel
             elements.append(elTest)
 
@@ -190,6 +194,12 @@ class TxName(object):
             raise SModelSError(msgError)
 
         # Dummy condistions eval:
+        elements = []
+        for elMap in self._conditionsDict.values():
+            for elObj, elLabel in elMap.items():
+                elTest = elObj.copy()
+                elTest.weight = 3.0*(len(elements)+1)*physicsUnits.fb  # dumyy xsec
+                elements.append(elTest)
         try:
             res = self.evalConditionsFor(elements)
         except (TypeError, NameError) as e:
@@ -205,19 +215,22 @@ class TxName(object):
 
         return True
 
-    def processExpr(self, stringExpr, databaseParticles, checkUnique=True):
+    def processExpr(self, stringExpr, databaseParticles,
+                    checkUnique=False):
         """
         Process a string expression (constraint or condition) for
-        element weights. The element appearing in the string are stored in self.elementMap
-        along with their string labels which are used to evaluate the expression.
+        element weights.
+        Returns a simplified string expression, which can be readily evaluated using
+        a dictionary mapping element labels to their weights. It also returns an
+        element map (dictionary) with the element objects as keys and their labels
+        (appearing in the simplified expression) as values.
 
         :param stringExpr: A mathematical expression for elements (e.g. 2*([[['jet']],[['jet']]]))
         :param databaseParticles: A Model object containing all the particle objects for the database.
         :param checkUnique: If True raises an error if the elements appearing in the expression
                             are not unique (relevant for avoiding double counting in the expression).
 
-        :return: A function that takes a dictionary ({stringLabel : element}) and evaluates
-                 the expression.
+        :return: simplfied expression (str), elementMap (dict).
         """
 
         # Remove quotes, spaces and curly brackets from expression
@@ -226,11 +239,8 @@ class TxName(object):
         exprFunc = exprFunc.replace("}", "").replace("{", "")  # New format
 
         # Get the maximum element ID already used
-        if self.elementMap:
-            nel = max([el.elID for el in self.elementMap])
-        else:
-            self.elementMap = {}
-            nel = 0
+        elementMap = {}
+        nel = 0
 
         # Get the elements contained in the expression
         for elStr in elementsInStr(str(stringExpr)):
@@ -239,27 +249,23 @@ class TxName(object):
                             model=databaseParticles,
                             sort=False)
 
-            for el in self.elementMap:
-                if elObj == el:
-                    elObjLabel = self.elementMap[el]
-                    if checkUnique:
-                        msgError = "Duplicate elements found in: "
-                        msgError += "%s in %s" % (stringExpr, self.globalInfo.id)
-                        logger.error(msgError)
-                        raise SModelSError(msgError)
-                    break
-            else:
-                # If it is a new element, add it to the element -> label map
-                nel += 1
-                elObj.elID = nel
-                elObjLabel = 'el_%i' % elObj.elID
-                self.elementMap[elObj] = elObjLabel
+            if checkUnique and any(elObj == el for el in elementMap):
+                msgError = "Duplicate elements found in: "
+                msgError += "%s in %s" % (stringExpr, self.globalInfo.id)
+                logger.error(msgError)
+                raise SModelSError(msgError)
+
+            # Add a new element and label to the map:
+            nel += 1
+            elObj.elID = nel
+            elObjLabel = 'el_%i' % elObj.elID
+            elementMap[elObj] = elObjLabel
 
             # Replace the element string by its label
             elStr = elStr.replace("'", "").replace(" ", "")
             exprFunc = exprFunc.replace(elStr, '%s' % elObjLabel)
 
-        return exprFunc
+        return exprFunc, elementMap
 
     def evalConstraintFor(self, elements):
         """
@@ -300,19 +306,23 @@ class TxName(object):
         :return: List of condition values.
         """
 
-        if not self._conditionsFunc:
+        if not self._conditionsDict:
             return None
 
-        # Build dictionary with elements and functions
-        # required for evaluating the constraint expression
-        localsDict = {"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim}
-        # Add a dictionary entry with zero weights for all element labels
-        localsDict.update({elLabel: 0*physicsUnits.fb for elLabel in self.elementMap.values()})
-        # Add elements weights
-        for el in elements:
-            localsDict[el.txlabel] += el.weight
-
-        conditions = [eval(cond, localsDict, {}) for cond in self._conditionsFunc]
+        conditions = []
+        for cond, elMap in self._conditionsDict.items():
+            weightsMap = {elLabel: 0.0*physicsUnits.fb for elLabel in elMap.values()}
+            # Add weights for matching elements:
+            for el in elements:
+                for elC, elLabel in elMap.items():
+                    if el == elC:
+                        weightsMap[elLabel] += el.weight
+            # Build dict with needed functions
+            localsDict = {"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim}
+            # Add weightMap:
+            localsDict.update(weightsMap)
+            # Evaluate condition:
+            conditions.append(eval(cond, localsDict, {}))
 
         return conditions
 
