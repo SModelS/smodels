@@ -7,8 +7,8 @@
 .. autofunction:: _getElementsFrom
 """
 
-from smodels.theory import clusterTools, crossSection, element
-from smodels.theory.auxiliaryFunctions import elementsInStr, average
+from smodels.theory import clusterTools
+from smodels.theory.auxiliaryFunctions import average
 from smodels.tools.physicsUnits import TeV, fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet

@@ -73,7 +73,7 @@ class Element(object):
         self.tree.sort()
         self.tree.numberNodes()
 
-    def compareTo(self, other):
+    def compareTo(self, other, inclusive=True):
         """
         Compares the element with other.
         Uses the topology name (Tree canonincal name) to identify isomorphic topologies (trees).
@@ -84,6 +84,9 @@ class Element(object):
         comparison.
 
         :param other:  element to be compared (Element object)
+        :param inclusive: If False, particles are required to be identical
+                          (the inclusiveness of MultiParticles or InclusiveNodes
+                          are not considered when comparing)
 
         :return: (cmp,otherSorted), where cmp = -1 if self < other, 0 if self == other, +1, if self > other and otherSorted is None if cmp != 0 or other sorted according to the way it matched self.
         """
@@ -101,7 +104,7 @@ class Element(object):
                 return -1, None
 
         # Recursively compare the nodes:
-        cmp, newTree = self.tree.compareTreeTo(other.tree)
+        cmp, newTree = self.tree.compareTreeTo(other.tree, inclusive)
 
         if cmp == 0:  # Elements matched, return copy of other with tree sorted
             otherNew = other.copy()
@@ -109,6 +112,24 @@ class Element(object):
         else:
             otherNew = None
         return cmp, otherNew
+
+    def isIdenticalTo(self, other):
+        """
+        Checks if the element is identical to other.
+        Two elements are identical if their topologies (canonical names)
+        are the same and their particles are identical.
+        The inclusiveness of MultiParticles or InclusiveNodes
+        are not considered when checking for identical particles.
+
+
+        :param other:  element to be compared (Element object)
+
+        :return: True/False
+        """
+
+        cmp, otherSorted = self.compareTo(other, inclusive=False)
+
+        return (cmp == 0)
 
     def __eq__(self, other):
         cmp, otherSorted = self.compareTo(other)

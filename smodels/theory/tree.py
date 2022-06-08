@@ -144,18 +144,21 @@ class ParticleNode(object):
 
         return newNode
 
-    def compareTo(self, other):
+    def compareTo(self, other, inclusive=True):
         """
         Compare nodes accoring to their canonical name
         and particle.
 
         :param other: ParticleNode or InclusiveParticleNode object
+        :param inclusive: If False, particles are required to be identical
+                          (the inclusiveness of MultiParticles or InclusiveNodes
+                          are not considered when comparing)
 
         :return: 1 if self > other, -1 if self < other and 0 if self == other
         """
 
         if other.isInclusive:
-            return -other.compareTo(self)
+            return -other.compareTo(self, inclusive)
 
         if not isinstance(other, ParticleNode):
             raise SModelSError("Can not compare node to %s" % type(other))
@@ -166,24 +169,37 @@ class ParticleNode(object):
             else:
                 return 1
 
-        if self.particle > other.particle:
-            return 1
-        elif self.particle < other.particle:
-            return -1
+        # If inclusive = False, require particles to be the same
+        if not inclusive:
+            if self.particle is other.particle:
+                return 0
+            elif self.particle > other.particle:
+                return 1
+            else:
+                return -1
+
+        if self.particle != other.particle:
+            if self.particle > other.particle:
+                return 1
+            else:
+                return -1
 
         return 0
 
-    def equalTo(self, other):
+    def equalTo(self, other, inclusive=True):
         """
         Compare nodes accoring to their canonical name
         and particle.
 
         :param other: ParticleNode or InclusiveParticleNode object
+        :param inclusive: If False, particles are required to be identical
+                          (the inclusiveness of MultiParticles or InclusiveNodes
+                          are not considered when comparing)
 
         :return: True if nodes are equal, false otherwise
         """
 
-        return (self.compareTo(other) == 0)
+        return (self.compareTo(other, inclusive) == 0)
 
     def copy(self):
         """
@@ -226,19 +242,41 @@ class InclusiveParticleNode(ParticleNode):
         self.isFinalState = True  # Can always be considered as a final state
         self.isInclusive = True
 
-    def compareTo(self, other):
+    def compareTo(self, other, inclusive=True):
         """
         Compares only the finalStates attributes of self and other.
         All the final states in other have to match at least one final
         state in self.
 
         :param other: ParticleNode or InclusiveParticleNode object
+        :param inclusive: If False, particles are required to be identical
+                          (the inclusiveness of MultiParticles or InclusiveNodes
+                          are not considered when comparing)
 
         :return: 0 (self == other), 1 (self > other), -1 (self < other)
         """
 
         fsA = self.finalStates[:]  # Sorted final states in A
         fsB = other.finalStates[:]  # Sorted final states in B
+
+        # If inclusive=False, requires final states to be the same particle
+        # and other node to be an InclusiveNode
+        if not inclusive:
+            if not other.isInclusive:
+                return -1
+            if len(fsA) != len(fsB):
+                if len(fsA) > len(fsB):
+                    return 1
+                else:
+                    return -1
+            for iB, fs in enumerate(fsB):
+                if fs is fsA[iB]:
+                    continue
+                if fs < fsA[iB]:
+                    return 1
+                else:
+                    return -1
+            return 0
 
         for fs in fsB:
             if fs in fsA:
@@ -718,7 +756,7 @@ class Tree(nx.DiGraph):
 
         return Tree(nx.bfs_tree(self, source=source))
 
-    def compareTreeTo(self, other):
+    def compareTreeTo(self, other, inclusive=True):
         """
         Check self equals other.
         The comparison is based on the node comparison.
@@ -728,6 +766,9 @@ class Tree(nx.DiGraph):
         subtree is returned.
 
         :param other: a tree (Tree object)
+        :param inclusive: If False, particles are required to be identical
+                          (the inclusiveness of MultiParticles or InclusiveNodes
+                          are not considered when comparing)
 
         :return: (True, new tree) if nodes match, (False, None) otherwise.
         """
@@ -742,7 +783,7 @@ class Tree(nx.DiGraph):
                 return -1, None
 
         # Try to find an isormorphism:
-        matcher = TreeMatcher(self, other)
+        matcher = TreeMatcher(self, other, inclusive)
         cmp, matchedTree = matcher.compareTrees()
         return cmp, matchedTree
 

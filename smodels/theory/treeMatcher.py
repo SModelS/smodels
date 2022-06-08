@@ -20,12 +20,16 @@ class TreeMatcher(object):
     and particle content.
     """
 
-    def __init__(self, T1, T2):
+    def __init__(self, T1, T2, inclusive=True):
         """
         Initialize graph matcher.
 
-        :parameter treeA: Tree object
-        :parameter treeB: Tree object
+        :parameter T1: Tree object
+        :parameter T2: Tree object
+        :param inclusive: If False, particles are required to be identical
+                          (the inclusiveness of MultiParticles or InclusiveNodes
+                          are not considered when comparing)
+
 
         :return: A dictionary mappinn the nodes of treeA and treeB ({nA : nB}).
 
@@ -36,6 +40,7 @@ class TreeMatcher(object):
         self.T2 = T2
         self._comps = {n: {} for n in T1.nodes}  # Cache node comparison (for debugging)
         self.mappingDict = {n: None for n in T1.nodes}
+        self.inclusive = inclusive  # Whether to allow for inclusive labels or not
 
     def swapTrees(self):
         """
@@ -43,7 +48,7 @@ class TreeMatcher(object):
         """
 
         T1, T2 = self.T1, self.T2
-        self.__init__(T2, T1)
+        self.__init__(T2, T1, self.inclusive)
 
     def compareSubTrees(self, T1_node, T2_node):
         """
@@ -61,7 +66,7 @@ class TreeMatcher(object):
             return self._comps[T1_node][T2_node]
 
         # Compare nodes directly (canon name and particle content)
-        cmp = T1_node.compareTo(T2_node)
+        cmp = T1_node.compareTo(T2_node, self.inclusive)
         if cmp != 0:
             self._comps[T1_node].update({T2_node: cmp})
             return cmp
