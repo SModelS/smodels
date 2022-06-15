@@ -865,6 +865,31 @@ class Tree(nx.DiGraph):
 
         return newTree
 
+    def compressToFinalStates(self):
+        """
+        Compress the Tree to its final states. After the compression
+        the tree will have one root (PV). The root's daughters
+        are the final state nodes of self.
+
+        :returns: compressed copy of the Tree.
+        """
+
+        newTree = self.copyTree()
+        # Get root:
+        root = newTree.root
+        # Get final state nodes:
+        fsNodes = [node for node in newTree.nodes if newTree.out_degree(node) == 0]
+        fsNodes = sorted(fsNodes, key=lambda node: node.particle)
+        # Remove all nodes
+        newTree.remove_nodes_from(list(newTree.nodes))
+
+        # Add root > fsNode edges:
+        edges = [(root, fsNode) for fsNode in fsNodes]
+        newTree.add_edges_from(edges)
+        newTree.setGlobalProperties()
+
+        return newTree
+
     def checkConsistency(self):
         """
         Make sure the tree has the correct topology(directed rooted tree).

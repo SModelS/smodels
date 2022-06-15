@@ -145,8 +145,9 @@ def defaultULReweight(element=None, unstableWidths=None, stableWidths=None,
         return 1./effFactor
 
 
-def reweightFactorFor(element=None, unstableWidths=None, stableWidths=None,
-                      resType='prompt', Leff_inner=None, Leff_outer=None):
+def reweightFactorFor(element=None, resType='prompt',
+                      unstableWidths=None, stableWidths=None,
+                      Leff_inner=None, Leff_outer=None):
     """
     Computer the reweighting factor for the element according to the experimental result type.
     Currently only two result types are supported: 'prompt' and 'displaced'.

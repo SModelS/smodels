@@ -50,7 +50,6 @@ class Element(object):
                              intermediateState=intermediateState,
                              model=model)
         self.weightList = crossSection.XSectionList()
-        self.decayLabels = []
         self.motherElements = [self]  # The motheElements includes self to keep track of merged elements
         self.elID = 0
         self.coveredBy = set()
@@ -260,6 +259,8 @@ class Element(object):
         newel.weightList = self.weightList.copy()
         newel.motherElements = self.motherElements[:]
         newel.elID = self.elID
+        newel.coveredBy = set(list(self.coveredBy)[:])
+        newel.testedBy = set(list(self.testedBy)[:])
         return newel
 
     def getFinalStates(self):
@@ -550,6 +551,21 @@ class Element(object):
             return None
         else:
             return newelement
+
+    def compressToFinalStates(self):
+        """
+        Compress the elements to its final states. After the compression
+        the element will hold a tree with one root (PV). The root's daughters
+        are the final state nodes of self.
+
+        :returns: compressed copy of the element.
+
+        """
+
+        newElement = self.copy()
+        newElement.tree = newElement.tree.compressToFinalStates()
+
+        return newElement
 
     def hasTopInList(self, elementList):
         """

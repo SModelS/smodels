@@ -6,8 +6,7 @@
 
 """
 
-from smodels.theory import crossSection
-from smodels.tools.physicsUnits import fb, GeV, standardUnits
+from smodels.tools.physicsUnits import standardUnits
 import unum
 import re
 try:

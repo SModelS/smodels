@@ -38,7 +38,7 @@ class TreeMatcher(object):
         # These will be modified during checks to minimize code repeat.
         self.T1 = T1
         self.T2 = T2
-        self._comps = {n: {} for n in T1.nodes}  # Cache node comparison (for debugging)
+        self._comps = {n.node: {} for n in T1.nodes}  # Cache node comparison (for debugging)
         self.mappingDict = {n: None for n in T1.nodes}
         self.inclusive = inclusive  # Whether to allow for inclusive labels or not
 
@@ -62,18 +62,18 @@ class TreeMatcher(object):
         :return: 0 if nodes are equal, 1 if T1_node > T2_node, -1 otherwise
         """
 
-        if T2_node in self._comps[T1_node]:
-            return self._comps[T1_node][T2_node]
+        if T2_node.node in self._comps[T1_node.node]:
+            return self._comps[T1_node.node][T2_node.node]
 
         # Compare nodes directly (canon name and particle content)
         cmp = T1_node.compareTo(T2_node, self.inclusive)
         if cmp != 0:
-            self._comps[T1_node].update({T2_node: cmp})
+            self._comps[T1_node.node].update({T2_node.node: cmp})
             return cmp
 
         # For inclusive nodes always return True (once nodes are equal)
         if T1_node.isInclusive or T2_node.isInclusive:
-            self._comps[T1_node].update({T2_node: 0})  # Cache comparison
+            self._comps[T1_node.node].update({T2_node.node: 0})  # Cache comparison
             self.mappingDict.update({T1_node: T2_node})
             return 0
 
@@ -89,6 +89,19 @@ class TreeMatcher(object):
 
         sortedDaughters2 = sorted(successors2,
                                   key=lambda n: (not n.isInclusive, n.canonName, n.particle))
+
+        # Get comparison dictionary for daughters:
+        matchesDict = {}
+        for d2 in sortedDaughters2:
+            compDict = {d1.node: self.compareSubTrees(d1, d2) for d1 in sortedDaughters1}
+            compValues = list(compDict.values())
+            # If d2 does not match ANY node in daughters1, stop comparison
+            if 0 not in compValues:
+                cmp = max(compValues)
+                self._comps[T1_node.node].update({T2_node.node: cmp})  # Cache comparison
+                return cmp
+            else:
+                matchesDict[d2.node] = compDict
 
         # Check all permutations within each set of daughters with the
         # same canonical name
@@ -110,11 +123,11 @@ class TreeMatcher(object):
                     break
             else:
                 # Found one permutation where all nodes match:
-                self._comps[T1_node].update({T2_node: 0})  # Cache comparison
+                self._comps[T1_node.node].update({T2_node.node: 0})  # Cache comparison
                 self.mappingDict.update({T1_node: T2_node})
                 return 0
 
-        self._comps[T1_node].update({T2_node: cmp_max})  # Cache comparison
+        self._comps[T1_node.node].update({T2_node.node: cmp_max})  # Cache comparison
         # Return maximum comparison value,
         # so the result is independent of the nodes ordering
         return cmp_max

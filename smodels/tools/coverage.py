@@ -4,17 +4,16 @@
 .. module:: coverage
    :synopsis: Definitions of classes used to find, group and format missing topologies
 
-.. moduleauthor:: Ursula Laa <ursula.laa@lpsc.in2p3.fr>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-.. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 """
 
 from smodels.tools.physicsUnits import fb
 from smodels.tools.reweighting import reweightFactorFor
-from smodels.theory.particle import MultiParticle, ParticleList, Particle
-from smodels.share.models.SMparticles import e, mu, ta, taC, eC, muC, W, WC, t, tC, q, c, g, pion, nu
 from smodels.theory.auxiliaryFunctions import index_bisect
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.theory.element import Element
+from smodels.experiment.defaultFinalStates import (WList, lList, tList, taList, nuList, jetList,
+                                                   MET, HSCP, RHadronG, RHadronQ)
 
 
 #  Default definitions for the uncovered topology categories/groups:
@@ -35,19 +34,11 @@ descriptionDefault = {'missing (prompt)': 'missing topologies with prompt decays
                       'missing (all)': 'missing topologies',
                       'outsideGrid (all)': 'topologies outside the grid'}
 
-# Default final BSM states for grouping topologies:
-# Used to construct BSM final states:
-MET = Particle(label='MET', Z2parity=-1, eCharge=0, colordim=1)
-HSCPp = Particle(label='HSCP+', Z2parity=-1, eCharge=+1, colordim=1)
-HSCPm = Particle(label='HSCP-', Z2parity=-1, eCharge=-1, colordim=1)
-HSCP = MultiParticle(label='HSCP', particles=[HSCPp, HSCPm])
-
-RHadronG = Particle(label='RHadronG', Z2parity=-1, eCharge=0, colordim=8)
-RHadronU = Particle(label='RHadronU', Z2parity=-1, eCharge=2./3., colordim=3)
-RHadronD = Particle(label='RHadronD', Z2parity=-1, eCharge=-1./3., colordim=3)
-RHadronQ = MultiParticle(label='RHadronQ', particles=[RHadronU, RHadronU.chargeConjugate(),
-                                                      RHadronD, RHadronD.chargeConjugate()])
+# Default BSM inclusive particles used for grouping final states:
 bsmDefault = [MET, HSCP, RHadronG, RHadronQ]
+
+# Defaul SM inclusive particles used for grouping final states
+smDefault = [WList, lList, tList, taList, nuList, jetList]
 
 # Weight factors for each group:
 # (it should be a function which takes an Element object as input
@@ -79,11 +70,11 @@ class Uncovered(object):
                  groupFilters=filtersDefault,
                  groupFactors=factorsDefault,
                  groupdDescriptions=descriptionDefault,
-                 smFinalStates=None, bsmFinalSates=None):
+                 smFinalStates=smDefault, bsmFinalStates=bsmDefault):
         """
         Inititalize the object.
 
-        :param topDict: TopologyList object used to select elements from.
+        :param topDict: TopologyDict object used to select elements from.
         :param sqrts: Value (with units) for the center of mass energy used to compute the missing cross sections.
                      If not specified the largest value available will be used.
         :param sigmacut: Minimum cross-section/weight value (after applying the reweight factor)
@@ -95,9 +86,9 @@ class Uncovered(object):
         :param groupdDescriptions: Dictionary containing the groups' labels and strings describing the group
                                   (used for printout)
         :param smFinalStates: List of (inclusive) Particle or MultiParticle objects used for grouping SM
-                              particles when creating GeneralElements.
+                              particles when creating FinalStateElements.
         :param bsmFinalSates: List of (inclusive) Particle or MultiParticle objects used for grouping
-                              BSM particles when creating GeneralElements.
+                              BSM particles when creating FinalStateElements.
         """
 
         # Sanity checks:
@@ -110,19 +101,6 @@ class Uncovered(object):
         if any(not hasattr(gFilter, '__call__') for gFilter in groupFilters.values()):
             raise SModelSError("Group filters must be callable methods")
 
-        if smFinalStates is None:
-            # Define multiparticles for conveniently grouping SM final states
-            taList = MultiParticle('ta', [ta, taC])
-            lList = MultiParticle('l', [e, mu, eC, muC])
-            WList = MultiParticle('W', [W, WC])
-            tList = MultiParticle('t', [t, tC])
-            jetList = MultiParticle('jet', [q, c, g, pion])
-            nuList = nu
-            smFinalStates = [WList, lList, tList, taList, nuList, jetList]
-        if bsmFinalSates is None:
-            # Define inclusive BSM states to group/label the last BSM states:
-            bsmFinalStates = bsmDefault
-
         if sqrts is None:
             sqrts = max([xsec.info.sqrts for xsec in topDict.getTotalWeight()])
         else:
@@ -130,7 +108,7 @@ class Uncovered(object):
 
         # Store the relevant element cross-sections to improve performance:
         for el in topDict.getElements():
-            xsec = el.weight.getXsecsFor(sqrts)
+            xsec = el.weightList.getXsecsFor(sqrts)
             if xsec:
                 el._totalXsec = xsec[0].value.asNumber(fb)
             else:
@@ -150,7 +128,7 @@ class Uncovered(object):
             else:
                 uncoveredTopos.description = gLabel
             # Fill the list with the elements in topDict:
-            uncoveredTopos.getToposFrom(topDict)
+            uncoveredTopos.getElementsFrom(topDict)
             self.groups.append(uncoveredTopos)
 
     def getGroup(self, label):
@@ -193,7 +171,7 @@ class UncoveredGroup(object):
                        for an element to be included. The value should in fb (unitless)
         """
 
-        self.generalElements = []
+        self.finalStateElements = []
         self.smFinalStates = smFinalStates
         self.bsmFinalStates = bsmFinalStates
         self.sqrts = sqrts
@@ -208,11 +186,11 @@ class UncoveredGroup(object):
     def __repr__(self):
         return str(self)
 
-    def getToposFrom(self, topDict):
+    def getElementsFrom(self, topDict):
         """
         Select the elements from topDict according to self.elementFilter
-        and build GeneralElements from the selected elements.
-        The GeneralElement weights corresponds to the missing cross-section
+        and build FinalStateElements from the selected elements.
+        The FinalStateElements weights corresponds to the missing cross-section
         with double counting from compressed elements already accounted for.
         """
 
@@ -220,14 +198,11 @@ class UncoveredGroup(object):
         elementList = [el for el in topDict.getElements() if self.elementFilter(el)]
 
         # Get missing xsections including the reweight factor:
-        missingXandEls = [[self.getMissingX(el)*self.reweightFactor(el), el] for el in elementList]
+        missingXandEls = [(self.getMissingX(el)*self.reweightFactor(el), el) for el in elementList]
         # Only keep the ones elements sigmacut:
-        if self.sigmacut:
-            missingXandEls = [x for x in missingXandEls[:] if x[0] > self.sigmacut]
-        else:
-            missingXandEls = [x for x in missingXandEls[:] if x[0] > 0.]
+        missingXandEls = [x for x in missingXandEls[:] if x[0] > self.sigmacut]
         # Sort according to largest missingX, smallest size and largest ID
-        missingXandEls = sorted(missingXandEls, key=lambda pt: [pt[0], -pt[1]._getLength(), -pt[1].elID], reverse=True)
+        missingXandEls = sorted(missingXandEls, key=lambda pt: (pt[0], -pt[1].canonName, -pt[1].elID), reverse=True)
 
         # Split lists of elements and missingX:
         missingXsecs = [pt[0] for pt in missingXandEls]
@@ -254,14 +229,14 @@ class UncoveredGroup(object):
 
         # Now that we only have unique elements with their effective missing cross-sections
         # we create General Elements out of them
-        for i, el in enumerate(elementListUnique):
-            missingX = missingXsecsUnique[i]
+        for iel, el in enumerate(elementListUnique):
+            missingX = missingXsecsUnique[iel]
             if not missingX:
                 continue
-            self.addToGeneralElements(el, missingX)
+            self.addToFSElements(el, missingX)
 
         # Finally sort general elements by their missing cross-section:
-        self.generalElements = sorted(self.generalElements[:], key=lambda genEl: genEl.missingX, reverse=True)
+        self.finalStateElements = sorted(self.finalStateElements, key=lambda fsEl: fsEl.missingX, reverse=True)
 
     def getMissingX(self, element):
         """
@@ -291,12 +266,12 @@ class UncoveredGroup(object):
             if self.elementFilter(ancestor):
                 continue
             # Subtract the weight of the ancestor and skip checking for all the older family tree of the ancestor
-            # (avoid subtracting the same weight twice from mother and grandmother for instance)
+            # (avoid subtracting the same weightList twice from mother and grandmother for instance)
             # (since the ancestorList is sorted by generation, the mother always
             # appears before the grandmother in the list)
             alreadyChecked += ancestor.getAncestors()
             if not hasattr(ancestor, '_totalXsec'):
-                xsec = ancestor.weight.getXsecsFor(self.sqrts)
+                xsec = ancestor.weightList.getXsecsFor(self.sqrts)
                 ancestor._totalXsec = xsec[0].value.asNumber(fb)
             overlapXsec += ancestor._totalXsec
 
@@ -310,120 +285,65 @@ class UncoveredGroup(object):
         xsec = 0.
         if not sqrts:
             sqrts = self.sqrts
-        for genEl in self.generalElements:
-            xsec += genEl.missingX
+        for fsEl in self.finalStateElements:
+            xsec += fsEl.missingX
         return xsec
 
-    def addToGeneralElements(self, el, missingX):
+    def addToFSElements(self, el, missingX):
         """
-        Adds an element to the list of missing topologies = general elements.
-        If the element contributes to a missing topology that is already in the list, add element and weight to topology.
+        Adds an element to the list of missing topologies = final state elements.
+        If the element contributes to an element that is already in the list, add element and weight to
+        the element.
         :parameter el: element to be added
         :parameter missingX: missing cross-section for the element (in fb)
         """
 
-        newGenEl = GeneralElement(el, missingX, self.smFinalStates, self.bsmFinalStates)
+        newGenEl = FinalStateElement(el, missingX, self.smFinalStates, self.bsmFinalStates)
 
-        index = index_bisect(self.generalElements, newGenEl)
-        if index != len(self.generalElements) and self.generalElements[index] == newGenEl:
-            self.generalElements[index]._contributingElements.append(el)
-            self.generalElements[index].missingX += missingX
+        index = index_bisect(self.finalStateElements, newGenEl)
+        if index != len(self.finalStateElements) and self.finalStateElements[index] == newGenEl:
+            self.finalStateElements[index]._contributingElements.append(el)
+            self.finalStateElements[index].missingX += missingX
         else:
-            self.generalElements.insert(index, newGenEl)
+            self.finalStateElements.insert(index, newGenEl)
 
 
-class GeneralElement(object):
+class FinalStateElement(Element):
     """
-    This class represents a simplified (general) element which does
-    only holds information about its even particles and decay type.
-    The even particles are replaced/grouped by the particles defined in smFinalStates.
+    This class represents a simplified element which does
+    only holds information about the final states. It holds a simple
+    tree with one root (PV), having the final state nodes as its
+    daughters.
     """
 
-    def __init__(self, el, missingX, smFinalStates, bsmFinalStates):
+    def __new__(self, el, missingX=None,
+                smFinalStates=smDefault,
+                bsmFinalStates=bsmDefault):
 
-        self.missingX = missingX
-        self.finalBSMstates = []
+        if missingX is None:
+            missingX = el.weightList.getMaxXsec()
 
-        newNodesDict = {}
-        for node in el.tree.nodes:
-            if node.isSM:
-                for particleList in smFinalStates:
-                    if particleList.contains(node.particle):
-                        newNode = node.copy()
-                        newNode.particle = particleList[:]
-                        newNodesDict[node] = newNode
-            elif el.tree.out_degree(node) == 0:
+        # Get an element holding only the final states
+        finalStatesEl = el.compressToFinalStates()
+        finalStatesEl.missingX = missingX
+        # Replace particles by inclusive particles, if possible:
+        for node in finalStatesEl.tree.nodes:
+            if node == finalStatesEl.tree.root:
+                continue
+            ptc = node.particle
+            if ptc.isSM:
+                for smFS in smFinalStates:
+                    if ptc == smFS:
+                        node.particle = smFS
+                        break
+            else:
                 for bsmFS in bsmFinalStates:
-                    if node.particle == bsmFS:
-                        newNode = node.copy()
-                        newNode.particle = bsmFS
-                        newNodesDict[node] = newNode
+                    if ptc == bsmFS:
+                        node.particle = bsmFS
                         break
 
-        self.tree = el.tree.relabel_nodes(newNodesDict, copy=True)
-        self.tree.sort()
-        self.tree.setGlobalProperties()
-        self.finalBSMstates = [node for node in self.tree.getFinalStates() if not node.isSM]
-        self._contributingElements = [el]
-        self._outputDescription = str(self)
+        finalStatesEl.tree.sort()
+        finalStatesEl.tree.setGlobalProperties()
+        finalStatesEl._contributingElements = [el]
 
-    def __cmp__(self, other):
-        """
-        Compares the element with other for any branch ordering.
-        The comparison is made based on branches.
-        OBS: The elements and the branches must be sorted!
-        :param other:  element to be compared (GeneralElement object)
-        :return: -1 if self < other, 0 if self == other, +1, if self > other.
-        """
-
-        if not isinstance(other, GeneralElement):
-            return -1
-
-        # Compare branches:
-        if self.branches != other.branches:
-            comp = (self.branches > other.branches)
-            if comp:
-                return 1
-            else:
-                return -1
-        # Compare decay type
-        if self.finalBSMstates != other.finalBSMstates:
-            comp = (self.finalBSMstates > other.finalBSMstates)
-            if comp:
-                return 1
-            else:
-                return -1
-
-        return 0
-
-    def __eq__(self, other):
-        return self.__cmp__(other) == 0
-
-    def __lt__(self, other):
-        return self.__cmp__(other) < 0
-
-    def __str__(self):
-        """
-        Create the element bracket notation string, e.g. [[[jet]],[[jet]],
-        including the decay type.
-
-        :returns: string representation of the element (in bracket notation)
-        """
-
-        elStr = "["+",".join([str(br) for br in self.branches])+"]"
-        elStr = elStr.replace(" ", "").replace("'", "")
-        name = elStr.replace('~', '') + '  (%s)' % (','.join([str(p) for p in self.finalBSMstates]))
-        return name
-
-    def __repr__(self):
-
-        return self.__str__()
-
-    def sortBranches(self):
-        """
-        Sort branches. The smallest branch is the first one.
-        If branches are equal, sort accoding to decayType.
-        """
-
-        # Now sort branches
-        self.branches = sorted(self.branches, key=lambda br: (br, br.finalBSMstate))
+        return finalStatesEl

@@ -215,7 +215,7 @@ class Particle(object):
     def cmpProperties(self, other,
                       properties=['isSM', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']):
         """
-        Compare properties (default is spin, colordim and eCharge).
+        Compare properties (default is isSM, spin, colordim, eCharge, mass and totalwidth).
         Return 0 if properties are equal, -1 if self < other and 1 if self > other.
         Only compares the attributes which have been defined in both objects.
         The comparison is made in hierarchical order, following the order
