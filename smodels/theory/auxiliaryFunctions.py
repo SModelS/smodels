@@ -6,7 +6,7 @@
 
 """
 
-from smodels.tools.physicsUnits import standardUnits
+from smodels.tools.physicsUnits import standardUnits, GeV
 import unum
 import re
 try:

@@ -91,17 +91,19 @@ class TreeMatcher(object):
                                   key=lambda n: (not n.isInclusive, n.canonName, n.particle))
 
         # Get comparison dictionary for daughters:
-        matchesDict = {}
-        for d2 in sortedDaughters2:
-            compDict = {d1.node: self.compareSubTrees(d1, d2) for d1 in sortedDaughters1}
-            compValues = list(compDict.values())
-            # If d2 does not match ANY node in daughters1, stop comparison
-            if 0 not in compValues:
-                cmp = max(compValues)
-                self._comps[T1_node.node].update({T2_node.node: cmp})  # Cache comparison
-                return cmp
-            else:
-                matchesDict[d2.node] = compDict
+        # compDict = {}
+        # matchesDict = {}
+        # for d1 in sortedDaughters1:
+        # compDict[d1.node] = {d2.node: self.compareSubTrees(d1, d2)
+        # for d2 in sortedDaughters2}
+        # compValues = list(compDict.values())
+        # If d2 does not match ANY node in daughters1, stop comparison
+        # if 0 not in compValues:
+        # cmp = max(compValues)
+        # self._comps[T1_node.node].update({T2_node.node: cmp})  # Cache comparison
+        # return cmp
+        # else:
+        # matchesDict[d2.node] = compDict
 
         # Check all permutations within each set of daughters with the
         # same canonical name
@@ -117,6 +119,7 @@ class TreeMatcher(object):
 
             for i2, d2 in enumerate(daughters2_perm):
                 d1 = sortedDaughters1[i2]
+                # cmp = compDict[d1.node][d2.node]
                 cmp = self.compareSubTrees(d1, d2)
                 if cmp != 0:
                     cmp_max = max(cmp, cmp_max)
