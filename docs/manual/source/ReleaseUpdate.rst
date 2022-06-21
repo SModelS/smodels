@@ -40,9 +40,9 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 2.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
+  * bigger fixes in ref:`analyses combinations <analysesCombination>` and simplified :ref:`likelihoods <likelihoodCalc>`
   * small fixes for python 3.10
   * bumped up pythia8 from 8.306 to 8.307
-  * fixes in :ref:`combinations of analyses <analysesCombination>`
   * included :ref:`example on how to plot likelihoods from analysis combination  <Examples>`
 
 New in Version 2.2.0.post1:
