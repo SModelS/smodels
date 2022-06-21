@@ -7,7 +7,8 @@
 
 """
 
-import itertools
+from networkx import Graph
+from networkx.algorithms.bipartite.matching import maximum_matching
 
 
 class TreeMatcher(object):
@@ -90,50 +91,41 @@ class TreeMatcher(object):
         sortedDaughters2 = sorted(successors2,
                                   key=lambda n: (not n.isInclusive, n.canonName, n.particle))
 
-        # Get comparison dictionary for daughters:
-        # compDict = {}
-        # matchesDict = {}
-        # for d1 in sortedDaughters1:
-        # compDict[d1.node] = {d2.node: self.compareSubTrees(d1, d2)
-        # for d2 in sortedDaughters2}
-        # compValues = list(compDict.values())
-        # If d2 does not match ANY node in daughters1, stop comparison
-        # if 0 not in compValues:
-        # cmp = max(compValues)
-        # self._comps[T1_node.node].update({T2_node.node: cmp})  # Cache comparison
-        # return cmp
-        # else:
-        # matchesDict[d2.node] = compDict
-
-        # Check all permutations within each set of daughters with the
-        # same canonical name
-        allPerms = []
-        for key, group in itertools.groupby(sortedDaughters2, lambda d: d.canonName):
-            allPerms.append(itertools.permutations(group))
-
-        # Construct all permutations and check against daughters1:
-        cmp_max = -10
-        for daughters2_perm in itertools.product(*allPerms):
-            daughters2_perm = itertools.chain.from_iterable(daughters2_perm)
-            daughters2_perm = list(daughters2_perm)
-
-            for i2, d2 in enumerate(daughters2_perm):
-                d1 = sortedDaughters1[i2]
-                # cmp = compDict[d1.node][d2.node]
+        # Create bipartite graph for compute matching:
+        g = Graph()
+        cmpDict = {}
+        top_nodes = []
+        for i1, d1 in enumerate(sortedDaughters1):
+            cmpDict[d1.node] = {}
+            node1 = i1+1   # Use positive integers to represent nodes from T1
+            top_nodes.append(node1)  # Store nodes from left set
+            for i2, d2 in enumerate(sortedDaughters2):
+                node2 = -(i2+1)   # Use negative integers to represent nodes from T2
                 cmp = self.compareSubTrees(d1, d2)
-                if cmp != 0:
-                    cmp_max = max(cmp, cmp_max)
-                    break
-            else:
-                # Found one permutation where all nodes match:
+                cmpDict[d1.node][d2.node] = cmp
+                if cmp == 0:
+                    g.add_edge(node1, node2)
+        # Check if all nodes had at least one match (were included in the bipartite graph)
+        if len(g.nodes) == len(sortedDaughters1)+len(sortedDaughters2):
+            # Compute dictionary with d1->d2 matching
+            matchDict = maximum_matching(g, top_nodes=top_nodes)
+            # Remove redundancy in answer:
+            mapDict = {k: v for k, v in matchDict.items() if k in top_nodes}
+            # If all nodes appear in mappingDict, one permutation was found
+            # where all nodes match:
+            if len(mapDict) == len(top_nodes):
                 self._comps[T1_node.node].update({T2_node.node: 0})  # Cache comparison
                 self.mappingDict.update({T1_node: T2_node})
                 return 0
 
-        self._comps[T1_node.node].update({T2_node.node: cmp_max})  # Cache comparison
-        # Return maximum comparison value,
-        # so the result is independent of the nodes ordering
-        return cmp_max
+        # Otherwise compare subtrees according to their sorted particles:
+        for i1, d1 in enumerate(sortedDaughters1):
+            d2 = sortedDaughters2[i1]
+            cmp = cmpDict[d1.node][d2.node]
+            if cmp != 0:
+                self._comps[T1_node.node].update({T2_node.node: cmp})  # Cache comparison
+                return cmp
+
 
     def compareTrees(self, invert=False):
         """
