@@ -63,6 +63,7 @@ class TreeMatcher(object):
         :return: 0 if nodes are equal, 1 if T1_node > T2_node, -1 otherwise
         """
 
+        # print('Comparing %s(%i) to %s(%i)' % (T1_node, T1_node.node, T2_node, T2_node.node))
         if T2_node.node in self._comps[T1_node.node]:
             return self._comps[T1_node.node][T2_node.node]
 
@@ -81,6 +82,10 @@ class TreeMatcher(object):
         # Check for equality of daughters
         successors1 = list(self.T1.successors(T1_node))
         successors2 = list(self.T2.successors(T2_node))
+        if len(successors1) == len(successors2) == 0:
+            self._comps[T1_node.node].update({T2_node.node: 0})  # Cache comparison
+            self.mappingDict.update({T1_node: T2_node})
+            return 0
 
         # Sort the daughters. Inclusive nodes will always come first,
         # and the remaining nodes are sorted by canonName and particle, so if the nodes differ,
@@ -91,26 +96,42 @@ class TreeMatcher(object):
         sortedDaughters2 = sorted(successors2,
                                   key=lambda n: (not n.isInclusive, n.canonName, n.particle))
 
+        # Check for a direct match first:
+        cmpDict = {}
+        for i1, d1 in enumerate(sortedDaughters1):
+            d2 = sortedDaughters2[i1]
+            cmpDict[d1.node] = {d2.node: self.compareSubTrees(d1, d2)}
+        if all(sum(cmpD.values()) == 0 for cmpD in cmpDict.values()):
+            self._comps[T1_node.node].update({T2_node.node: 0})  # Cache comparison
+            self.mappingDict.update({T1_node: T2_node})
+            return 0
+
+        # print('\t Comparing daughters:\n\t %s and \n\t%s' % (sortedDaughters1, sortedDaughters2))
         # Create bipartite graph for compute matching:
         g = Graph()
-        cmpDict = {}
         top_nodes = []
         for i1, d1 in enumerate(sortedDaughters1):
-            cmpDict[d1.node] = {}
             node1 = i1+1   # Use positive integers to represent nodes from T1
             top_nodes.append(node1)  # Store nodes from left set
             for i2, d2 in enumerate(sortedDaughters2):
+                if i2 == i1:
+                    continue  # The comparison was already made above
                 node2 = -(i2+1)   # Use negative integers to represent nodes from T2
                 cmp = self.compareSubTrees(d1, d2)
                 cmpDict[d1.node][d2.node] = cmp
                 if cmp == 0:
                     g.add_edge(node1, node2)
+            # If node had no matches, stop
+            if 0 not in cmpDict[d1.node].values():
+                break
+
         # Check if all nodes had at least one match (were included in the bipartite graph)
         if len(g.nodes) == len(sortedDaughters1)+len(sortedDaughters2):
             # Compute dictionary with d1->d2 matching
             matchDict = maximum_matching(g, top_nodes=top_nodes)
             # Remove redundancy in answer:
-            mapDict = {k: v for k, v in matchDict.items() if k in top_nodes}
+            mapDict = {sortedDaughters1[k-1]: sortedDaughters2[-v-1]
+                       for k, v in matchDict.items() if k in top_nodes}
             # If all nodes appear in mappingDict, one permutation was found
             # where all nodes match:
             if len(mapDict) == len(top_nodes):
@@ -125,7 +146,6 @@ class TreeMatcher(object):
             if cmp != 0:
                 self._comps[T1_node.node].update({T2_node.node: cmp})  # Cache comparison
                 return cmp
-
 
     def compareTrees(self, invert=False):
         """
@@ -147,7 +167,7 @@ class TreeMatcher(object):
         if isInclusiveT1:
             self.swapTrees()
             invert = not invert
-        # print('First check', invert)
+
         cmp = self.compareSubTrees(self.T1.root, self.T2.root)
         if invert:
             cmp = -cmp
@@ -156,7 +176,6 @@ class TreeMatcher(object):
             if isInclusiveT1 and isInclusiveT2:
                 self.swapTrees()
                 invert = not invert
-                # print('Second check', invert)
                 cmp_swap = self.compareSubTrees(self.T1.root, self.T2.root)
                 if cmp_swap != 0:
                     return cmp, None
