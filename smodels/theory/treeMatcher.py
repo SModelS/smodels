@@ -122,6 +122,8 @@ class TreeMatcher(object):
         for d1 in sortedDaughters1:
             node1 = d1.node   # Use positive integers to represent nodes from T1
             top_nodes.append(node1)  # Store nodes from left set
+            if node1 not in cmpDict:
+                cmpDict[node1] = {}
             for d2 in sortedDaughters2:
                 node2 = -d2.node   # Use negative integers to represent nodes from T2
                 if node2 in cmpDict[node1]:
@@ -137,31 +139,54 @@ class TreeMatcher(object):
             if node1 not in g.nodes:
                 break
 
-        # Check if all nodes had at least one match (were included in the bipartite graph)
-        if len(g.nodes) == len(labelToNode):
-            # Compute dictionary with d1->d2 matching
+        # Check if all nodes were included in the graph
+        # (they had at least one match)
+        if len(g.nodes) != len(labelToNode):
+            matched = False
+        else:
+            # Compute the maximal matching
+            # (mapping where each node1 is connected to a single node2)
             matchDict = maximum_matching(g, top_nodes=top_nodes)
-            # Remove redundancy in answer:
+            matchDict = {node1: node2 for node1, node2 in list(matchDict.items())
+                         if node1 in top_nodes}
+
+            # Check if the match was successful.
+            # Consider a successful match if all nodes in daughters1 were matched
+            # or if all nodes in daughers2 were matched and the unmatched nodes
+            # in daughters1 match an InclusiveNode.
+            matched = False
+            if len(matchDict) == len(top_nodes):
+                matched = True
+            elif len(matchDict) == len(sortedDaughters2):
+                matched = True
+                unMatched = [n1 for n1 in top_nodes if n1 not in matchDict]
+                for n1 in unMatched:
+                    if any(not labelToNode[n2].isInclusive for n2 in g.neighbors(n1)):
+                        matched = False
+                        break
+
+        if matched:
+            # Convert from node numbers to ParticleNodes:
             mapDict = {labelToNode[node1]: labelToNode[node2]
-                       for node1, node2 in matchDict.items() if node1 in top_nodes}
-            if len(mapDict) == len(top_nodes):
-                # Include matches according to the selected edges:
-                for d1, d2 in list(mapDict.items())[:]:
-                    daughtersMap = g[d1.node][-d2.node]['daughtersMap']
-                    mapDict.update(daughtersMap)
-                mapDict[T1_node] = T2_node
+                       for node1, node2 in matchDict.items()}
+            # Include matches according to the selected edges:
+            for d1, d2 in list(mapDict.items())[:]:
+                daughtersMap = g[d1.node][-d2.node]['daughtersMap']
+                mapDict.update(daughtersMap)
+            mapDict[T1_node] = T2_node
 
-                # If all nodes appear in mapDict, one permutation was found
-                # where all nodes match:
-                self._comps[T1_node.node].update({T2_node.node: (0, mapDict)})  # Cache comparison
-                return (0, mapDict)
+            # If all nodes appear in mapDict, one permutation was found
+            # where all nodes match:
+            self._comps[T1_node.node].update({T2_node.node: (0, mapDict)})  # Cache comparison
+            return (0, mapDict)
 
-        # Otherwise compare subtrees according to their sorted particles:
-        for d1, d2 in zip(sortedDaughters1, sortedDaughters2):
-            cmp, _ = cmpDict[d1.node][-d2.node]
-            if cmp != 0:
-                self._comps[T1_node.node].update({T2_node.node: (cmp, None)})  # Cache comparison
-                return (cmp, None)
+        else:
+            # Otherwise compare subtrees according to their sorted particles:
+            for d1, d2 in zip(sortedDaughters1, sortedDaughters2):
+                cmp, _ = cmpDict[d1.node][-d2.node]
+                if cmp != 0:
+                    self._comps[T1_node.node].update({T2_node.node: (cmp, None)})  # Cache comparison
+                    return (cmp, None)
 
     def compareTrees(self, invert=False):
         """
