@@ -34,10 +34,13 @@ class TopologyDict(dict):
             else:
                 elementList = self[canonName]
                 index = index_bisect(elementList, newelement)
-                if index != len(elementList) and elementList[index] == newelement:
-                    # Get element ordered according to the element in the list
-                    newEl = elementList[index].compareTo(newelement)[1]
-                    elementList[index] += newEl
+                if index != len(elementList):
+                    cmp, newEl = elementList[index].compareTo(newelement)
+                    if cmp == 0:
+                        # Combine element ordered according to the element in the list
+                        elementList[index] += newEl
+                    else:
+                        elementList.insert(index, newelement)
                 else:
                     elementList.insert(index, newelement)
 
