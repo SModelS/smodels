@@ -29,18 +29,27 @@ class TopologyDict(dict):
 
         if isinstance(newelement, Element):
             canonName = newelement.canonName
-            if canonName not in list(self.keys()):
+            if canonName not in self:
                 self[canonName] = [newelement]
             else:
                 elementList = self[canonName]
-                index = index_bisect(elementList, newelement)
-                if index != len(elementList):
-                    cmp, newEl = elementList[index].compareTo(newelement)
-                    if cmp == 0:
-                        # Combine element ordered according to the element in the list
-                        elementList[index] += newEl
-                    else:
-                        elementList.insert(index, newelement)
+                # Find position to insert element
+                # (using a bisection method)
+                lo = 0
+                hi = len(elementList)
+                while lo < hi:
+                    mid = (lo+hi)//2
+                    cmp, newEl = elementList[mid].compareTo(newelement)
+                    if cmp < 0:
+                        lo = mid+1
+                    elif cmp > 0:
+                        hi = mid
+                    elif cmp == 0:
+                        lo = mid
+                        break
+                index = lo
+                if cmp == 0:
+                    elementList[index] += newEl
                 else:
                     elementList.insert(index, newelement)
 

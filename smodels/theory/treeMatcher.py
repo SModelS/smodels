@@ -7,8 +7,7 @@
 
 """
 
-from networkx import Graph
-from networkx.algorithms.bipartite.matching import maximum_matching
+import collections
 
 
 class TreeMatcher(object):
@@ -39,7 +38,6 @@ class TreeMatcher(object):
         # These will be modified during checks to minimize code repeat.
         self.T1 = T1
         self.T2 = T2
-        self._comps = {n.node: {} for n in T1.nodes}  # Cache node comparison (for debugging)
         self.inclusive = inclusive  # Whether to allow for inclusive labels or not
 
     def swapTrees(self):
@@ -64,25 +62,19 @@ class TreeMatcher(object):
                  ({d1 : d2}).
         """
 
-        if T2_node.node in self._comps[T1_node.node]:
-            return self._comps[T1_node.node][T2_node.node]
-
         # Compare nodes directly (canon name and particle content)
         cmp = T1_node.compareTo(T2_node, self.inclusive)
         if cmp != 0:
-            self._comps[T1_node.node].update({T2_node.node: (cmp, None)})
             return (cmp, None)
 
         # For inclusive nodes always return True (once nodes are equal)
         if T1_node.isInclusive or T2_node.isInclusive:
-            self._comps[T1_node.node].update({T2_node.node: (0, {T1_node: T2_node})})  # Cache comparison
             return (0, {T1_node: T2_node})
 
         # Check for equality of daughters
         successors1 = list(self.T1.successors(T1_node))
         successors2 = list(self.T2.successors(T2_node))
         if len(successors1) == len(successors2) == 0:
-            self._comps[T1_node.node].update({T2_node.node: (0, {T1_node: T2_node})})  # Cache comparison
             return (0, {T1_node: T2_node})
 
         # Sort the daughters. Inclusive nodes will always come first,
@@ -94,98 +86,87 @@ class TreeMatcher(object):
         sortedDaughters2 = sorted(successors2,
                                   key=lambda n: (not n.isInclusive, n.canonName, n.particle))
 
-        # Build a simple label->node mapping
-        labelToNode = {d1.node: d1 for d1 in sortedDaughters1}
-        labelToNode.update({-d2.node: d2 for d2 in sortedDaughters2})
-
         # Compare daughters directly:
         cmpDict = {}
         cmp_max = 0
         for d1, d2 in zip(sortedDaughters1, sortedDaughters2):
             cmp, mapDict = self.compareSubTrees(d1, d2)
             cmp_max = max(abs(cmp), cmp_max)  # Stores 1, if any pair of nodes differs
-            cmpDict[d1.node] = {-d2.node: (cmp, mapDict)}
+            cmpDict[d1] = {d2: (cmp, mapDict)}
         # Check for a direct match first
         # (likely since daughters are sorted):
-        if cmp_max == 0:
+        if cmp_max == 0 and len(sortedDaughters1) == len(sortedDaughters2):
             mapDict = {T1_node: T2_node}
             mapDict.update({d1: d2 for d1, d2 in zip(sortedDaughters1, sortedDaughters2)})
             for node1 in cmpDict:
                 daughtersMap = list(cmpDict[node1].values())[0][1]
                 mapDict.update(daughtersMap)
-            self._comps[T1_node.node].update({T2_node.node: (0, mapDict)})  # Cache comparison
             return (0, mapDict)
 
-        # Create bipartite graph for compute matching:
-        g = Graph()
-        top_nodes = []
-        for d1 in sortedDaughters1:
-            node1 = d1.node   # Use positive integers to represent nodes from T1
-            top_nodes.append(node1)  # Store nodes from left set
-            if node1 not in cmpDict:
-                cmpDict[node1] = {}
+        # Define left and right nodes in order to compute matching:
+        left_nodes = sortedDaughters1[:]
+        right_nodes = sortedDaughters2[:]
+        edges = {}
+        for d1 in left_nodes:
+            if d1 not in cmpDict:
+                cmpDict[d1] = {}
             for d2 in sortedDaughters2:
-                node2 = -d2.node   # Use negative integers to represent nodes from T2
-                if node2 in cmpDict[node1]:
-                    cmp, mapDict = cmpDict[node1][node2]
+                if d2 in cmpDict[d1]:
+                    cmp, mapDict = cmpDict[d1][d2]
                 else:
                     cmp, mapDict = self.compareSubTrees(d1, d2)
-                    cmpDict[node1].update({node2: (cmp, mapDict)})
+                    cmpDict[d1].update({d2: (cmp, mapDict)})
                 if cmp == 0:
-                    g.add_edge(node1, node2, daughtersMap=mapDict)
+                    if d1 not in edges:
+                        edges[d1] = {d2: mapDict}
+                    else:
+                        edges[d1].update({d2: mapDict})
 
             # If node had no matches (was not added to the graph),
             # we already know T1_node and T2_node differs
-            if node1 not in g.nodes:
+            if d1 not in edges:
                 break
 
         # Check if all nodes were included in the graph
         # (they had at least one match)
-        if len(g.nodes) != len(labelToNode):
+        if len(edges) != len(left_nodes):
             matched = False
         else:
             # Compute the maximal matching
             # (mapping where each node1 is connected to a single node2)
-            matchDict = maximum_matching(g, top_nodes=top_nodes)
-            matchDict = {node1: node2 for node1, node2 in list(matchDict.items())
-                         if node1 in top_nodes}
+            mapDict = self.maximal_matching(left_nodes, right_nodes, edges)
 
             # Check if the match was successful.
             # Consider a successful match if all nodes in daughters1 were matched
             # or if all nodes in daughers2 were matched and the unmatched nodes
             # in daughters1 match an InclusiveNode.
             matched = False
-            if len(matchDict) == len(top_nodes):
+            if len(mapDict) == len(left_nodes):
                 matched = True
-            elif len(matchDict) == len(sortedDaughters2):
+            elif len(mapDict) == len(right_nodes):
                 matched = True
-                unMatched = [n1 for n1 in top_nodes if n1 not in matchDict]
-                for n1 in unMatched:
-                    if any(not labelToNode[n2].isInclusive for n2 in g.neighbors(n1)):
+                unMatched = [d1 for d1 in left_nodes if d1 not in mapDict]
+                for d1 in unMatched:
+                    if any(not d2.isInclusive for d2 in edges[d1]):
                         matched = False
                         break
 
         if matched:
-            # Convert from node numbers to ParticleNodes:
-            mapDict = {labelToNode[node1]: labelToNode[node2]
-                       for node1, node2 in matchDict.items()}
             # Include matches according to the selected edges:
-            for d1, d2 in list(mapDict.items())[:]:
-                daughtersMap = g[d1.node][-d2.node]['daughtersMap']
+            for d1, d2 in list(mapDict.items()):
+                daughtersMap = edges[d1][d2]
                 mapDict.update(daughtersMap)
             mapDict[T1_node] = T2_node
 
             # If all nodes appear in mapDict, one permutation was found
             # where all nodes match:
-            self._comps[T1_node.node].update({T2_node.node: (0, mapDict)})  # Cache comparison
             return (0, mapDict)
 
         else:
             # Otherwise compare subtrees according to their sorted particles:
             for d1, d2 in zip(sortedDaughters1, sortedDaughters2):
-                cmp, _ = cmpDict[d1.node][-d2.node]
+                cmp, _ = cmpDict[d1][d2]
                 if cmp != 0:
-                    self._comps[T1_node.node].update({T2_node.node: (cmp, None)})  # Cache comparison
                     return (cmp, None)
 
     def compareTrees(self, invert=False):
@@ -264,6 +245,69 @@ class TreeMatcher(object):
 
         return 0, matchedTree
 
+    def maximal_matching(self, left, right, edges):
+        """
+        Computes the maximal matching from left nodes to right nodes.
+        The maximal matching is the maximal number of left nodes which can be
+        connected to the right nodes without any node belonging to more than one edge.
+        Adpated from networkx.algorithms.bipartite.matching.hopcroft_karp_matching.
+
+        :param left: List of left nodes
+        :param right: List of right nodes
+        :param edges: Nested dictionary with left nodes as keys and macthing right nodes as values
+                      (e.g. {nL1 : {nR2 : {}, nR3 : {}}, nL2 : {nR2 : {}, nR1 : {}},... })
+        """
+
+        INFINITY = float("inf")
+        # Initialize the "global" variables that maintain state during the search.
+        leftmatches = {v: None for v in left}
+        rightmatches = {v: None for v in right}
+        distances = {}
+        queue = collections.deque()
+
+        def breadth_first_search():
+            for v in left:
+                if leftmatches[v] is None:
+                    distances[v] = 0
+                    queue.append(v)
+                else:
+                    distances[v] = INFINITY
+            distances[None] = INFINITY
+            while queue:
+                v = queue.popleft()
+                if distances[v] < distances[None]:
+                    for u in edges[v]:
+                        if distances[rightmatches[u]] is INFINITY:
+                            distances[rightmatches[u]] = distances[v] + 1
+                            queue.append(rightmatches[u])
+            return distances[None] is not INFINITY
+
+        def depth_first_search(v):
+            if v is not None:
+                for u in edges[v]:
+                    if distances[rightmatches[u]] == distances[v] + 1:
+                        if depth_first_search(rightmatches[u]):
+                            rightmatches[u] = v
+                            leftmatches[v] = u
+                            return True
+                distances[v] = INFINITY
+                return False
+            return True
+
+        # Implementation note: this counter is incremented as pairs are matched but
+        # it is currently not used elsewhere in the computation.
+        num_matched_pairs = 0
+        while breadth_first_search():
+            for v in left:
+                if leftmatches[v] is None:
+                    if depth_first_search(v):
+                        num_matched_pairs += 1
+
+        # Strip the entries matched to `None`.
+        leftmatches = {k: v for k, v in leftmatches.items() if v is not None}
+
+        return leftmatches
+
 
 def sortTreeList(treeList):
     """
@@ -279,10 +323,18 @@ def sortTreeList(treeList):
     inclusiveTrees = [t for t in treeList if t.root.isInclusive]
     sortedTrees = []
     for tree in treeList:
-        itree = 0
-        while itree < len(sortedTrees) and tree.compareTreeTo(sortedTrees[itree])[0] > 0:
-            itree += 1
-        sortedTrees.insert(itree, tree)
+        if tree.root.isInclusive:
+            continue
+
+        lo = 0
+        hi = len(sortedTrees)
+        while lo < hi:
+            mid = (lo+hi)//2
+            if tree.compareTreeTo(sortedTrees[mid])[0] > 0:
+                lo = mid+1
+            else:
+                hi = mid
+        sortedTrees.insert(lo, tree)
 
     sortedTrees = inclusiveTrees + sortedTrees
     return sortedTrees
