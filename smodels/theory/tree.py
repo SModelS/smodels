@@ -8,15 +8,15 @@
 """
 
 
-import networkx as nx
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.auxiliaryFunctions import bracketToProcessStr
 from smodels.tools.inclusiveObjects import InclusiveValue
 from smodels.theory.treeMatcher import TreeMatcher, sortTreeList
 from smodels.theory.particleNode import ParticleNode, InclusiveParticleNode
+from collections import OrderedDict
 
 
-class Tree(nx.DiGraph):
+class Tree(object):
     """
     A wrapper for the tree graphs used to describe elements.
     """
@@ -26,7 +26,7 @@ class Tree(nx.DiGraph):
 
         self._canonName = None
         self._root = None
-        nx.DiGraph.__init__(self)
+        self.nodes_and_edges = OrderedDict()
 
         # Convert from string:
         if isinstance(info, str):
@@ -39,7 +39,7 @@ class Tree(nx.DiGraph):
             for node1, nodeList in info.items():
                 self.add_edges_from(zip([node1]*len(nodeList), nodeList))
         # Convert from Tree or DiGraph objec:
-        elif isinstance(info, nx.DiGraph):
+        elif isinstance(info, Tree):
             self.add_nodes_from(info.nodes)
             self.add_edges_from(info.edges)
         elif info is not None:
@@ -62,6 +62,59 @@ class Tree(nx.DiGraph):
 
     def __str__(self):
         return self.treeToString()
+
+    def add_node(self, node):
+
+        if node not in self.nodes_and_edges:
+            self.nodes_and_edges[node] = []
+
+    def add_nodes_from(self, nodes):
+
+        for node in nodes:
+            self.add_node(node)
+
+    def add_edge(self, edge):
+
+        nodeA = edge[0]
+        nodeB = edge[1]
+        if nodeA not in self.nodes_and_edges:
+            self.nodes_and_edges[nodeA] = [nodeB]
+        elif nodeB not in self.nodes_and_edges[nodeA]:
+            self.nodes_and_edges[nodeA].append(nodeB)
+
+    def add_edges_from(self, edges):
+
+        for edge in edges:
+            self.add_edge(edge)
+
+    @property
+    def nodes(self):
+
+        for node in self.nodes_and_edges.keys():
+            yield node
+
+    @property
+    def edges(self):
+
+        for node, nodeList in self.nodes_and_edges.items():
+            for nodeB in nodeList:
+                yield (node, nodeB)
+
+    def out_degree(self, node):
+
+        if node not in self.nodes_and_edges:
+            return 0
+        else:
+            return len(self.nodes_and_edges[node])
+
+    def in_dregree(self, node):
+
+        degree = 0
+        # Count how many times node appears as a daughter
+        for nodeList in self.nodes_and_edges.values():
+            degree += nodeList.count(node)
+
+        return degree
 
     def stringToTree(self, stringElement, finalState=None,
                      intermediateState=None, model=None):
@@ -408,12 +461,14 @@ class Tree(nx.DiGraph):
 
         return weight
 
-    def bfs_successors(self, node=None):
+    def bfs_successors(self, node=None, includeLeaves=False):
         """
         Returns an iterator over the mother and daughter
         nodes starting at node using a breadth first search.
 
         :param node: Node from tree. If None, starts at tree root.
+        :param includeLeaves: If True, it will consider the leaves (undecayed nodes)
+                              as moms in the iterator (with an empty daughters list)
 
         :return: Iterator over nodes.
         """
@@ -421,15 +476,30 @@ class Tree(nx.DiGraph):
         if node is None:
             node = self.root
 
-        return nx.bfs_successors(self, node)
+        mom = node
+        daughters = self.nodes_and_edges[mom]
+        generation = [(mom, daughters)]
+        while generation:
+            for pair in generation:
+                yield pair
+            next_generation = []
+            for pair in generation:
+                mom, daughters = pair
+                for new_mom in daughters:
+                    new_daughters = self.nodes_and_edges[new_mom]
+                    if new_daughters or includeLeaves:
+                        next_generation.append((new_mom, new_daughters))
+            generation = next_generation
 
-    def dfs_successors(self, node=None):
+    def dfs_successors(self, node=None, includeLeaves=False):
         """
         Returns a dictionary with the mother as keys
         and the daughters as values using a depth-first search.
         nodes starting at node using a breadth first search.
 
         :param node: Node from tree. If None, starts at tree root.
+        :param includeLeaves: If True, it will consider the leaves (undecayed nodes)
+                              as moms in the iterator (with an empty daughters list)
 
         :return: Dictionary with mothers and daughters
         """
@@ -437,7 +507,37 @@ class Tree(nx.DiGraph):
         if node is None:
             node = self.root
 
-        return nx.dfs_successors(self, node)
+        mom = node
+        daughters = self.nodes_and_edges[node][:]
+        daughtersDict = {mom: daughters[:]}
+
+        # Go down in generation until it has no more daughters
+        while daughters:
+            new_mom = daughters.pop(0)
+            new_daughters = self.nodes_and_edges[new_mom][:]
+            if new_daughters or includeLeaves:
+                daughtersDict.update({new_mom: new_daughters[:]})
+            # Attach new daughters to the beginning of the list
+            daughters = new_daughters[:] + daughters[:]
+
+        return daughtersDict
+
+    def bfs_tree(self, node=None):
+        """
+        Returns an oriented tree constructed from of a breadth-first-search
+        starting at node.
+        """
+
+        if node is None:
+            node = self.root
+
+        T = Tree()
+        T.add_node(node)
+        for mom, daughters in self.bfs_successors(node):
+            T.add_node(mom)
+            for daughter in daughters:
+                T.add_edge((mom, daughter))
+        return T
 
     def getSubTree(self, source):
         """
@@ -519,18 +619,23 @@ class Tree(nx.DiGraph):
         for the tree.
         """
 
-        newTree = nx.bfs_tree(self, source=self.root)
-        nodeList = list(newTree.nodes)
-        edgesList = list(newTree.edges)
+        # Get
+        nodeOrder = []
+        for mom, daughters in self.bfs_successors(includeLeaves=True):
+            nodeOrder.append((mom, daughters))
 
         # Re-number nodes:
         inode = 0
-        for node in nodeList:
+        for node, daughters in nodeOrder:
             node.node = inode
             inode += 1
 
-        # Finally update tree with the node dictionary:
-        nx.to_networkx_graph(edgesList, create_using=self)
+        new_nodes_and_edges = OrderedDict()
+        for node, daughters in nodeOrder:
+            daughters = sorted(daughters, key=lambda d: d.node)
+            new_nodes_and_edges[node] = daughters
+
+        self.nodes_and_edges = new_nodes_and_edges
 
     def copyTree(self):
         """
@@ -557,7 +662,21 @@ class Tree(nx.DiGraph):
         :return: A new tree if copy = True, otherwise returns self
         """
 
-        newTree = nx.relabel_nodes(self, newNodesDict, copy=copy)
+        nodes_and_edges = list(self.nodes_and_edges.list())
+        new_nodes_and_edges = OrderedDict()
+        for entry in nodes_and_edges:
+            node = entry[0]
+            daughters = entry[1][:]
+            new_node = newNodesDict[node]
+            new_daughters = [newNodesDict[d] for d in daughters]
+            new_nodes_and_edges[new_node] = new_daughters
+
+        if copy:
+            newTree = self.copyTree()
+        else:
+            newTree = self
+
+        newTree.nodes_and_edges = new_nodes_and_edges
 
         return newTree
 
@@ -588,10 +707,27 @@ class Tree(nx.DiGraph):
 
     def checkConsistency(self):
         """
-        Make sure the tree has the correct topology(directed rooted tree).
+        Make sure the tree has the correct topology (directed rooted tree).
         Raises an error otherwise.
         """
-        if self.number_of_nodes() and not nx.is_arborescence(self):
+
+        malformedTree = False
+        if len(self.nodes_and_edges) > 1:
+            root = self.root
+
+            # Check if root has no parents and at least one daughter
+            if self.in_dregree(root) != 0 or self.out_degree(root) == 0:
+                malformedTree = True
+
+            # Check if all nodes (except root) have a unique parent
+            if any(self.in_dregree(node) != 1 for node in self.nodes if node is not root):
+                malformedTree = True
+
+            # Check if all nodes can be reached from the root node
+            if len(self.dfs_successors(includeLeaves=True)) != len(self.nodes_and_edges):
+                malformedTree = True
+
+        if malformedTree:
             raise SModelSError("Graph created with malformed structure (not  a tree).")
 
     def addTrees(self, other):
@@ -606,23 +742,52 @@ class Tree(nx.DiGraph):
 
         nodesB = list(other.nodes)
         nodesDict = {n: n + nodesB[inode]
-                     for inode, n in enumerate(self.nodes)}
+                   for inode, n in enumerate(self.nodes)}
         newTree = self.relabel_nodes(nodesDict, copy=True)
 
         return newTree
 
-    def compose(self, other):
+    def compose(self, other, atNode=None, copy=True):
         """
-        Returns a new graph of self composed with other.
-        The trees are joined where the nodes overlap and the nodes
+        Returns a new graph of self composed with other at node atNode.
+        If atNode is not defined, the trees are joined where the nodes overlap and the nodes
         from self are kept.
 
-        : param other: tree(Tree object)
+        :param other: tree (Tree object)
+        :param atNode: node (ParticleNode object) where the merge has to take place
+                        If not defined, will find the common node between the trees.
+        :param copy: If True, return a copy of self, merged with other. Otherwise,
+                     extend self.
 
         : return: new tree with the other composed with self.
         """
 
-        return nx.compose(self, other)
+        if atNode is None:
+            # Find intersection:
+            self_nodes = set(list(self.nodes))
+            other_nodes = set(list(other.nodes))
+            common_nodes = self_nodes.intersection(other_nodes)
+            if len(common_nodes) != 1:
+                raise SModelSError("Can not merge trees. %i common nodes found" % len(common_nodes))
+
+            atNode = common_nodes[0]  # merge node of self
+
+        if self.out_degree(atNode) != 0:
+            raise SModelSError("Can not merge trees. Common node in Tree A can not have daughters.")
+        if other.in_degree(atNode) != 0:
+            raise SModelSError("Can not merge trees. Common node in Tree B can not have parents.")
+
+        if copy:
+            newTree = self.copyTree()
+        else:
+            newTree = self
+
+        for mom, daughters in other.bfs_successors(atNode):
+            if mom == atNode:
+                mom = atNode  # Make sure the merge node of self is kept
+            newTree.nodes_and_edges[mom] = daughters[:]
+
+        return newTree
 
     def draw(self, particleColor='lightcoral',
              smColor='skyblue',
@@ -646,11 +811,11 @@ class Tree(nx.DiGraph):
             labels = {n: str(n) if not n.isInclusive else n.longStr() for n in self.nodes}
         elif attrUnit is not None:
             labels = {n: str(getattr(n, labelAttr).asNumber(attrUnit))
-                      if (hasattr(n, labelAttr) and getattr(n, labelAttr) is not None)
-                      else str(n) for n in self.nodes}
+                    if (hasattr(n, labelAttr) and getattr(n, labelAttr) is not None)
+                    else str(n) for n in self.nodes}
         else:
             labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
-                      else str(n) for n in self.nodes}
+                    else str(n) for n in self.nodes}
 
         for key in labels:
             if labels[key] == 'anyOdd':
