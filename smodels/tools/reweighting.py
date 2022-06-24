@@ -34,24 +34,21 @@ def getWidthsFromElement(element):
     unstableWidths = []
     stableWidths = []
     tree = element.tree
-    for mom, daughters in tree.dfs_successors().items():
-        if mom == tree.root:
-            continue  # Ignore primary vertex
-        if mom.isInclusive:
-            continue  # Ignore inclusive nodes
-        width = mom.totalwidth
-        if isinstance(width, list):  # If width is a list (MultiParticle obj), use smallest
-            width = min(width)
-        unstableWidths.append(width)
+    for node in tree.nodes:
+        if node == tree.root:
+            continue
+        if node.isInclusive:
+            continue
 
-        for d in daughters:
-            if tree.out_degree(d) != 0:
-                continue   # Skip intermediate states
-            if d.isInclusive:
+        if tree.out_degree(node) != 0:
+            width = node.totalwidth
+            if isinstance(width, list):  # If width is a list (MultiParticle obj), use smallest
+                width = min(width)
+            unstableWidths.append(width)
+        else:
+            if node.isSM:
                 continue
-            if d.isSM:
-                continue
-            width = d.totalwidth
+            width = node.totalwidth
             if isinstance(width, list):  # If width is a list (MultiParticle obj), use largest
                 width = max(width)
             stableWidths.append(width)

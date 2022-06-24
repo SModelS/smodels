@@ -38,7 +38,6 @@ anyBSM = Particle(label='anyBSM', isSM=False)
 anySM = Particle(label='anySM', isSM=True)
 anyParticle = Particle(label='*')
 
-
 # Used to construct BSM final states:
 MET = Particle(label='MET', isSM=False, eCharge=0, colordim=1)
 HSCPp = Particle(label='HSCP+', isSM=False, eCharge=+1, colordim=1)

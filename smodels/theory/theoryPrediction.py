@@ -514,7 +514,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         from smodels.tools.runtime import _deltas_rel_default
         deltas_rel = _deltas_rel_default
 
-    if type(expResult) in [list, tuple]:
+    if isinstance(expResult, (list, tuple)):
         ret = []
         for er in expResult:
             tpreds = theoryPredictionsFor(er, smsTopList, maxMassDist,
@@ -523,7 +523,9 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
             if tpreds:
                 for tp in tpreds:
                     ret.append(tp)
-        return TheoryPredictionList(ret)
+        tpList = TheoryPredictionList(ret)
+        tpList.sortTheoryPredictions()
+        return tpList
 
     dataSetResults = []
     #  Compute predictions for each data set (for UL analyses there is one single set)
@@ -539,6 +541,8 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
             theoPred.expResult = expResult
             theoPred.deltas_rel = deltas_rel
             theoPred.upperLimit = theoPred.getUpperLimit()
+
+        result.sortTheoryPredictions()
         return result
 
     #  For results with more than one dataset, return all dataset predictions
@@ -549,7 +553,9 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
             theoPred.expResult = expResult
             theoPred.deltas_rel = deltas_rel
             theoPred.upperLimit = theoPred.getUpperLimit()
+        allResults.sortTheoryPredictions()
         return allResults
+
     elif combinedResults:  # Try to combine results
         bestResults = TheoryPredictionList()
         combinedRes = _getCombinedResultFor(dataSetResults,
@@ -566,6 +572,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
         theoPred.deltas_rel = deltas_rel
         theoPred.upperLimit = theoPred.getUpperLimit()
 
+    bestResults.sortTheoryPredictions()
     return bestResults
 
 

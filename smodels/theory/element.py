@@ -189,7 +189,7 @@ class Element(object):
         elif self.canonName != other.canonName:
             raise SModelSError("Can not add elements with distinct topologies")
 
-        newEl = self.__class__(info=None)
+        newEl = self.__class__()
         newEl.motherElements = self.motherElements[:] + other.motherElements[:]
         newEl.weightList = self.weightList + other.weightList
         newEl.tree = self.tree + other.tree
@@ -512,7 +512,7 @@ class Element(object):
                 if mom == root:  # Skip primary vertex
                     continue
                 # Skip node if its daughters are not stable
-                if any(list(tree.successors(d)) for d in daughters):
+                if any(tree.out_degree(d) != 0 for d in daughters):
                     continue
                 # Check if all daughters can be considered MET
                 neutralDaughters = all(d.particle.isMET() for d in daughters)
@@ -525,10 +525,12 @@ class Element(object):
 
                 tree.remove_nodes_from(daughters)
                 # Replace mom particle by invisible (generic) particle
+                # with its width equal to the maximum width amongst the daughters
+                maxWidth = max([d.totalwidth for d in daughters])
                 invParticle = Particle(label='inv', mass=mom.mass,
                                        eCharge=0, colordim=1,
                                        _isInvisible=True,
-                                       totalwidth=mom.totalwidth,
+                                       totalwidth=maxWidth,
                                        pdg=mom.pdg, isSM=mom.isSM)
                 mom.particle = invParticle
 

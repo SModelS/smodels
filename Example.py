@@ -26,7 +26,8 @@ from smodels.theory.model import Model
 setLogLevel("info")
 
 # Set the path to the database
-database = Database("official")
+import os
+database = Database(os.path.expanduser('~/smodels-database'))
 
 
 def main():
@@ -64,7 +65,7 @@ def main():
         n = 0
         el = elementList[n]
         print("\t\t %i-th element  = " % (n), el, end="")
-        print("\n\t\t\twith final states =", el.tree.getFinalStates(), "\n\t\t\twith cross section =", el.weight, "\n\t\t\tand masses = ", el.mass)
+        print("\n\t\t\twith final states =", el.tree.getFinalStates(), "\n\t\t\twith cross section =", el.weightList, "\n\t\t\tand masses = ", el.mass)
 
     # Load the experimental results to be used.
     # In this case, all results are employed.
@@ -87,7 +88,7 @@ def main():
     bestResult = None
     allPredictions = []
     for expResult in listOfExpRes:
-        predictions = theoryPredictionsFor(expResult, toplist, combinedResults=False, marginalize=False)
+        predictions = theoryPredictionsFor(expResult, topDict, combinedResults=False, marginalize=False)
         if not predictions:
             continue  # Skip if there are no constraints from this result
         print('\n %s ' % expResult.globalInfo.id)
@@ -164,9 +165,9 @@ def main():
 
     missingTopos = uncovered.getGroup('missing (prompt)')
     # Print some of the missing topologies:
-    if missingTopos.generalElements:
+    if missingTopos.finalStateElements:
         print('Missing topologies (up to 3):')
-        for genEl in missingTopos.generalElements[:3]:
+        for genEl in missingTopos.finalStateElements[:3]:
             print('Element:', genEl)
             print('\tcross-section (fb):', genEl.missingX)
     else:
@@ -174,9 +175,9 @@ def main():
 
     missingDisplaced = uncovered.getGroup('missing (displaced)')
     # Print elements with displaced decays:
-    if missingDisplaced.generalElements:
+    if missingDisplaced.finalStateElements:
         print('\nElements with displaced vertices (up to 2):')
-        for genEl in missingDisplaced.generalElements[:2]:
+        for genEl in missingDisplaced.finalStateElements[:2]:
             print('Element:', genEl)
             print('\tcross-section (fb):', genEl.missingX)
     else:

@@ -196,10 +196,9 @@ class UncoveredGroup(object):
 
         # First select all elements according to the filter (type of uncovered/missing topology):
         elementList = [el for el in topDict.getElements() if self.elementFilter(el)]
-
         # Get missing xsections including the reweight factor:
         missingXandEls = [(self.getMissingX(el)*self.reweightFactor(el), el) for el in elementList]
-        # Only keep the ones elements sigmacut:
+        # Only keep the elements above sigmacut:
         missingXandEls = [x for x in missingXandEls[:] if x[0] > self.sigmacut]
         # Sort according to largest missingX, smallest size and largest ID
         missingXandEls = sorted(missingXandEls, key=lambda pt: (pt[0], -pt[1].canonName, -pt[1].elID), reverse=True)
