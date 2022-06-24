@@ -141,21 +141,18 @@ class ParticleNode(object):
 
         return newNode
 
-    def compareTo(self, other, inclusive=True):
+    def compareTo(self, other):
         """
         Compare nodes accoring to their canonical name
         and particle.
 
         :param other: ParticleNode or InclusiveParticleNode object
-        :param inclusive: If False, particles are required to be identical
-                          (the inclusiveness of MultiParticles or InclusiveNodes
-                          are not considered when comparing)
 
         :return: 1 if self > other, -1 if self < other and 0 if self == other
         """
 
         if other.isInclusive:
-            return -other.compareTo(self, inclusive)
+            return -other.compareTo(self)
 
         if not isinstance(other, ParticleNode):
             raise SModelSError("Can not compare node to %s" % type(other))
@@ -166,15 +163,6 @@ class ParticleNode(object):
             else:
                 return 1
 
-        # If inclusive = False, require particles to be the same
-        if not inclusive:
-            if self.particle is other.particle:
-                return 0
-            elif self.particle > other.particle:
-                return 1
-            else:
-                return -1
-
         if self.particle != other.particle:
             if self.particle > other.particle:
                 return 1
@@ -183,20 +171,17 @@ class ParticleNode(object):
 
         return 0
 
-    def equalTo(self, other, inclusive=True):
+    def equalTo(self, other):
         """
         Compare nodes accoring to their canonical name
         and particle.
 
         :param other: ParticleNode or InclusiveParticleNode object
-        :param inclusive: If False, particles are required to be identical
-                          (the inclusiveness of MultiParticles or InclusiveNodes
-                          are not considered when comparing)
 
         :return: True if nodes are equal, false otherwise
         """
 
-        return (self.compareTo(other, inclusive) == 0)
+        return (self.compareTo(other) == 0)
 
     def copy(self):
         """

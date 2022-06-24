@@ -20,7 +20,7 @@ class TreeMatcher(object):
     and particle content.
     """
 
-    def __init__(self, T1, T2, inclusive=True):
+    def __init__(self, T1, T2):
         """
         Initialize graph matcher.
 
@@ -38,7 +38,6 @@ class TreeMatcher(object):
         # These will be modified during checks to minimize code repeat.
         self.T1 = T1
         self.T2 = T2
-        self.inclusive = inclusive  # Whether to allow for inclusive labels or not
 
     def swapTrees(self):
         """
@@ -46,7 +45,7 @@ class TreeMatcher(object):
         """
 
         T1, T2 = self.T1, self.T2
-        self.__init__(T2, T1, self.inclusive)
+        self.__init__(T2, T1)
 
     def compareSubTrees(self, T1_node, T2_node):
         """
@@ -63,7 +62,7 @@ class TreeMatcher(object):
         """
 
         # Compare nodes directly (canon name and particle content)
-        cmp = T1_node.compareTo(T2_node, self.inclusive)
+        cmp = T1_node.compareTo(T2_node)
         if cmp != 0:
             return (cmp, None)
 

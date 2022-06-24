@@ -445,7 +445,7 @@ class Tree(nx.DiGraph):
 
         return Tree(nx.bfs_tree(self, source=source))
 
-    def compareTreeTo(self, other, inclusive=True):
+    def compareTreeTo(self, other):
         """
         Check self equals other.
         The comparison is based on the node comparison.
@@ -455,9 +455,6 @@ class Tree(nx.DiGraph):
         subtree is returned.
 
         :param other: a tree (Tree object)
-        :param inclusive: If False, particles are required to be identical
-                          (the inclusiveness of MultiParticles or InclusiveNodes
-                          are not considered when comparing)
 
         :return: (True, new tree) if nodes match, (False, None) otherwise.
         """
@@ -472,7 +469,7 @@ class Tree(nx.DiGraph):
                 return -1, None
 
         # Try to find an isormorphism:
-        matcher = TreeMatcher(self, other, inclusive)
+        matcher = TreeMatcher(self, other)
         cmp, matchedTree = matcher.compareTrees()
         return cmp, matchedTree
 

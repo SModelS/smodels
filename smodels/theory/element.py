@@ -43,7 +43,9 @@ class Element(object):
         :parameter sort: If False, it will not sort the element.
         """
 
-        if isinstance(info, Tree):
+        if info is None:
+            self.tree = None
+        elif isinstance(info, Tree):
             self.tree = info.copyTree()
         else:
             self.tree = Tree(info=info, finalState=finalState,
@@ -57,7 +59,7 @@ class Element(object):
 
         # Check graph consistency and sort it
         # (must be a rooted tree with each node having a single parent):
-        if self.tree.number_of_nodes():
+        if self.tree and self.tree.number_of_nodes():
             self.tree.checkConsistency()
             self.tree.setGlobalProperties()
             if sort:
@@ -72,7 +74,7 @@ class Element(object):
         self.tree.sort()
         self.tree.numberNodes()
 
-    def compareTo(self, other, inclusive=True):
+    def compareTo(self, other):
         """
         Compares the element with other.
         Uses the topology name (Tree canonincal name) to identify isomorphic topologies (trees).
@@ -83,9 +85,6 @@ class Element(object):
         comparison.
 
         :param other:  element to be compared (Element object)
-        :param inclusive: If False, particles are required to be identical
-                          (the inclusiveness of MultiParticles or InclusiveNodes
-                          are not considered when comparing)
 
         :return: (cmp,otherSorted), where cmp = -1 if self < other, 0 if self == other, +1, if self > other and otherSorted is None if cmp != 0 or other sorted according to the way it matched self.
         """
@@ -103,32 +102,14 @@ class Element(object):
                 return -1, None
 
         # Recursively compare the nodes:
-        cmp, newTree = self.tree.compareTreeTo(other.tree, inclusive)
+        cmp, newTree = self.tree.compareTreeTo(other.tree)
 
         if cmp == 0:  # Elements matched, return copy of other with tree sorted
-            otherNew = other.copy()
+            otherNew = other.copy(emptyTree=True)
             otherNew.tree = newTree
         else:
             otherNew = None
         return cmp, otherNew
-
-    def isIdenticalTo(self, other):
-        """
-        Checks if the element is identical to other.
-        Two elements are identical if their topologies (canonical names)
-        are the same and their particles are identical.
-        The inclusiveness of MultiParticles or InclusiveNodes
-        are not considered when checking for identical particles.
-
-
-        :param other:  element to be compared (Element object)
-
-        :return: True/False
-        """
-
-        cmp, otherSorted = self.compareTo(other, inclusive=False)
-
-        return (cmp == 0)
 
     def __eq__(self, other):
         cmp, otherSorted = self.compareTo(other)
@@ -246,21 +227,28 @@ class Element(object):
                               pvColor=pvColor, nodeScale=nodeScale,
                               labelAttr=labelAttr, attrUnit=attrUnit)
 
-    def copy(self):
+    def copy(self, emptyTree=False):
         """
         Create a copy of self.
         Faster than deepcopy.
+
+        :param emptyTree: If True, creates an element without a
+                          tree.
 
         :returns: copy of element (Element object)
         """
 
         # Allows for derived classes (like inclusive classes)
-        newel = self.__class__(info=self.tree.copyTree())
+        if emptyTree:
+            newel = self.__class__()
+        else:
+            newel = self.__class__(info=self.tree.copyTree())
         newel.weightList = self.weightList.copy()
         newel.motherElements = self.motherElements[:]
         newel.elID = self.elID
         newel.coveredBy = set(list(self.coveredBy)[:])
         newel.testedBy = set(list(self.testedBy)[:])
+
         return newel
 
     def getFinalStates(self):
@@ -564,24 +552,7 @@ class Element(object):
 
         """
 
-        newElement = self.copy()
-        newElement.tree = newElement.tree.compressToFinalStates()
+        newElement = self.copy(emptyTree=True)
+        newElement.tree = self.tree.compressToFinalStates()
 
         return newElement
-
-    def hasTopInList(self, elementList):
-        """
-        Check if the element topology matches any of the topologies in the
-        element list.
-
-        :parameter elementList: list of elements (Element objects)
-        :returns: True, if element topology has a match in the list, False otherwise.
-        """
-        if not isinstance(elementList, list) or len(elementList) == 0:
-            return False
-        for element in elementList:
-            if type(element) != type(self):
-                continue
-            if self.canonName == element.canonName:
-                return True
-        return False

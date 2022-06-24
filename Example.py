@@ -23,6 +23,7 @@ from smodels.tools.smodelsLogging import setLogLevel
 from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
+import time
 setLogLevel("info")
 
 # Set the path to the database
@@ -45,12 +46,14 @@ def main():
     sigmacut = 0.005*fb
     mingap = 5.*GeV
 
+    t0 = time.time()
     # Decompose model
     topDict = decomposer.decompose(model, sigmacut,
                                    massCompress=True, invisibleCompress=True,
                                    minmassgap=mingap)
 
     # Access basic information from decomposition, using the topology list and topology objects:
+    print("\n Decomposition done in %1.2fm" %((time.time()-t0)/60.))
     print("\n Decomposition Results: ")
     print("\t  Total number of topologies: %i " % len(topDict))
     nel = len(topDict.getElements())
@@ -71,6 +74,7 @@ def main():
     # In this case, all results are employed.
     listOfExpRes = database.getExpResults()
 
+    t0 = time.time()
     # Print basic information about the results loaded.
     # Count the number of loaded UL and EM experimental results:
     nUL, nEM = 0, 0
@@ -97,12 +101,10 @@ def main():
             datasetID = theoryPrediction.dataId()
             mass = theoryPrediction.mass
             txnames = [str(txname) for txname in theoryPrediction.txnames]
-            PIDs = theoryPrediction.PIDs
             print("------------------------")
             print("Dataset = ", datasetID)  # Analysis name
             print("TxNames = ", txnames)
             print("Prediction Mass = ", mass)  # Value for average cluster mass (average mass of the elements in cluster)
-            print("Prediction PIDs = ", PIDs)  # Value for average cluster mass (average mass of the elements in cluster)
             print("Theory Prediction = ", theoryPrediction.xsection)  # Signal cross section
             print("Condition Violation = ", theoryPrediction.conditions)  # Condition violation values
 
@@ -129,6 +131,8 @@ def main():
     else:
         print("(The input model is not excluded by the simplified model results)")
 
+    print("\n Theory Predictions done in %1.2fm" %((time.time()-t0)/60.))
+    t0 = time.time()
     # Select a few results results for combination:
     combineAnas = ['ATLAS-SUSY-2013-11', 'CMS-SUS-13-013']
     selectedTheoryPreds = []
@@ -155,8 +159,11 @@ def main():
         print("Combined r value (expected): %1.3E" % combiner.getRValue(expected=True))
         print("Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (llhd, lmax, lsm))
 
+    print("\n Combination of analyses done in %1.2fm" %((time.time()-t0)/60.))
+    t0 = time.time()
     # Find out missing topologies for sqrts=13*TeV:
-    uncovered = coverage.Uncovered(toplist, sqrts=13.*TeV)
+    uncovered = coverage.Uncovered(topDict, sqrts=13.*TeV)
+    print("\n Coverage done in %1.2fm" %((time.time()-t0)/60.))
     # First sort coverage groups by label
     groups = sorted(uncovered.groups[:], key=lambda g: g.label)
     # Print uncovered cross-sections:
