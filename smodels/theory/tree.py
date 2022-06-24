@@ -26,19 +26,23 @@ class Tree(nx.DiGraph):
 
         self._canonName = None
         self._root = None
-        if not info:  # Initialize empty tree
-            nx.DiGraph.__init__(self)
-        elif isinstance(info, str):
-            nx.DiGraph.__init__(self)
+        nx.DiGraph.__init__(self)
+
+        # Convert from string:
+        if isinstance(info, str):
             try:
                 self.stringToTree(info, finalState, intermediateState, model)
             except (SModelSError, TypeError):
                 raise SModelSError("Can not create element from input %s" % info)
+        # Convert from dictionary with edges ({node : [node1,node2,..], ...}):
         elif isinstance(info, dict):
-            nx.DiGraph.__init__(self, info)
+            for node1, nodeList in info.items():
+                self.add_edges_from(zip([node1]*len(nodeList), nodeList))
+        # Convert from Tree or DiGraph objec:
         elif isinstance(info, nx.DiGraph):
-            nx.DiGraph.__init__(self, info)
-        else:
+            self.add_nodes_from(info.nodes)
+            self.add_edges_from(info.edges)
+        elif info is not None:
             raise SModelSError("Can not create element from input type %s" % type(info))
 
     def __add__(self, other):
@@ -443,7 +447,13 @@ class Tree(nx.DiGraph):
         :return: Tree object with source as its root node
         """
 
-        return Tree(nx.bfs_tree(self, source=source))
+        subTree = Tree()
+        subTree.add_node(source)
+        for mom, daughters in self.bfs_successors(source):
+            for d in daughters:
+                subTree.add_edge(mom, d)
+
+        return subTree
 
     def compareTreeTo(self, other):
         """
@@ -486,9 +496,8 @@ class Tree(nx.DiGraph):
         # Get all subtrees formed by the daughters of the
         # current root node and sort each subtree
         subTrees = []
-        for daughter in list(self.successors(self.root)):
-            subTree = nx.bfs_tree(self, source=daughter)
-            subTree = Tree(subTree)
+        for daughter in list(self.successors(self.root))[:]:
+            subTree = self.getSubTree(source=daughter)
             subTree.sort()
             subTrees.append(subTree)
             self.remove_nodes_from(subTree.nodes())
