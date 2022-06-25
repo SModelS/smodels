@@ -71,8 +71,8 @@ class TreeMatcher(object):
             return (0, {T1_node: T2_node})
 
         # Check for equality of daughters
-        successors1 = list(self.T1.successors(T1_node))
-        successors2 = list(self.T2.successors(T2_node))
+        successors1 = self.T1.successors(T1_node)
+        successors2 = self.T2.successors(T2_node)
         if len(successors1) == len(successors2) == 0:
             return (0, {T1_node: T2_node})
 
@@ -183,8 +183,8 @@ class TreeMatcher(object):
                  If no matches were found (cmp != 0), return None and the comparison value.
         """
 
-        isInclusiveT1 = any(n.isInclusive for n in self.T1)
-        isInclusiveT2 = any(n.isInclusive for n in self.T2)
+        isInclusiveT1 = any(n.isInclusive for n in self.T1.nodes)
+        isInclusiveT2 = any(n.isInclusive for n in self.T2.nodes)
         if isInclusiveT1:
             self.swapTrees()
             invert = not invert

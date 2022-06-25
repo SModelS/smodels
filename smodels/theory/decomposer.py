@@ -153,7 +153,7 @@ def addOneStepDecays(tree, sigmacut=None):
     treeList = [tree]
     # Get all (current) final states which are the mothers
     # of the decays to be added:
-    mothers = [n for n in tree.nodes() if tree.out_degree(n) == 0]
+    mothers = [n for n in tree.nodes if tree.out_degree(n) == 0]
     for mom in mothers:
         # Check if mom should decay:
         if mom.isFinalState:
@@ -181,8 +181,8 @@ def addOneStepDecays(tree, sigmacut=None):
             for decay in decayTrees:
                 # The order below matters,
                 # since we want to keep the mother from the decay tree (which holds the BR value)
-                dec = decay.copy()
-                newTree = dec.compose(T)
+                dec = decay.copyTree()
+                newTree = dec.attachTo(T)
                 if sigmacut is not None:
                     treeWeight = newTree.getTreeWeight()
                     if treeWeight is not None and treeWeight < sigmacut:

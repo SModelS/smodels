@@ -73,32 +73,57 @@ class Tree(object):
         for node in nodes:
             self.add_node(node)
 
-    def add_edge(self, edge):
+    def remove_node(self, node):
 
-        nodeA = edge[0]
-        nodeB = edge[1]
+        if node in self.nodes_and_edges:
+            self.nodes_and_edges.pop(node)
+        for nodeA, daughtersA in self.nodes_and_edges.items():
+            if node not in daughtersA:
+                continue
+            daughtersA = [d for d in daughtersA[:] if d != node]
+            self.nodes_and_edges[nodeA] = daughtersA[:]
+
+    def remove_nodes_from(self, nodeList):
+
+        for node in nodeList:
+            self.remove_node(node)
+
+    def add_edge(self, nodeA, nodeB):
+
         if nodeA not in self.nodes_and_edges:
-            self.nodes_and_edges[nodeA] = [nodeB]
-        elif nodeB not in self.nodes_and_edges[nodeA]:
-            self.nodes_and_edges[nodeA].append(nodeB)
+            self.nodes_and_edges[nodeA] = []
+        if nodeB not in self.nodes_and_edges:
+            self.nodes_and_edges[nodeB] = []
+
+        self.nodes_and_edges[nodeA].append(nodeB)
 
     def add_edges_from(self, edges):
 
         for edge in edges:
-            self.add_edge(edge)
+            self.add_edge(edge[0], edge[1])
+
+    def clear(self):
+        """
+        Remove all nodes and edges from the graph, but
+        keep its canonName.
+        """
+
+        self.nodes_and_edges = OrderedDict()
+        self._root = None
 
     @property
     def nodes(self):
 
-        for node in self.nodes_and_edges.keys():
-            yield node
+        return list(self.nodes_and_edges.keys())
 
     @property
     def edges(self):
 
+        edgesList = []
         for node, nodeList in self.nodes_and_edges.items():
             for nodeB in nodeList:
-                yield (node, nodeB)
+                edgesList.append((node, nodeB))
+        return edgesList
 
     def out_degree(self, node):
 
@@ -107,7 +132,7 @@ class Tree(object):
         else:
             return len(self.nodes_and_edges[node])
 
-    def in_dregree(self, node):
+    def in_degree(self, node):
 
         degree = 0
         # Count how many times node appears as a daughter
@@ -115,6 +140,10 @@ class Tree(object):
             degree += nodeList.count(node)
 
         return degree
+
+    def number_of_nodes(self):
+
+        return len(self.nodes_and_edges)
 
     def stringToTree(self, stringElement, finalState=None,
                      intermediateState=None, model=None):
@@ -362,7 +391,7 @@ class Tree(object):
                 node.canonName = int(tpStr)
 
         # Use the root canon name to assign the tree canon name
-        if self.in_degree[node] == 0:
+        if self.in_degree(node) == 0:
             self._canonName = node.canonName
 
         return node.canonName
@@ -410,7 +439,7 @@ class Tree(object):
         """
 
         if self._root is None:
-            root = [n for n in self.nodes if self.in_degree[n] == 0]
+            root = [n for n in self.nodes if self.in_degree(n) == 0]
             if len(root) != 1:
                 raise SModelSError("Malformed Tree, %i root(s) have been found." % len(root))
             self._root = root[0]
@@ -460,6 +489,10 @@ class Tree(object):
             weight *= n.nodeWeight
 
         return weight
+
+    def successors(self, node):
+
+        return self.nodes_and_edges[node]
 
     def bfs_successors(self, node=None, includeLeaves=False):
         """
@@ -549,6 +582,7 @@ class Tree(object):
 
         subTree = Tree()
         subTree.add_node(source)
+        subTree._root = source
         for mom, daughters in self.bfs_successors(source):
             for d in daughters:
                 subTree.add_edge(mom, d)
@@ -596,18 +630,16 @@ class Tree(object):
         # Get all subtrees formed by the daughters of the
         # current root node and sort each subtree
         subTrees = []
-        for daughter in list(self.successors(self.root))[:]:
+        for daughter in self.nodes_and_edges[self.root][:]:
             subTree = self.getSubTree(source=daughter)
             subTree.sort()
             subTrees.append(subTree)
-            self.remove_nodes_from(subTree.nodes())
+            self.remove_nodes_from(subTree.nodes)
 
         # Sort the subtrees
         subTrees = sortTreeList(subTrees)
         # Add sorted nodes:
-        for subTree in subTrees:
-            self.add_node(subTree.root)
-
+        self.add_nodes_from([subTree.root for subTree in subTrees])
         # Add sorted edges:
         for subTree in subTrees:
             self.add_edge(self.root, subTree.root)
@@ -646,14 +678,23 @@ class Tree(object):
         """
 
         newNodesDict = {n: n.copy() for n in self.nodes}
-        newTree = self.relabel_nodes(newNodesDict, copy=True)
-        newTree._canonName = self._canonName
+        newTree = Tree()
+        if self._canonName:
+            newTree._canonName = self._canonName
+        if self._root is not None:
+            newTree._root = newNodesDict[self._root]
+        for node, daughters in self.nodes_and_edges.items():
+            new_node = newNodesDict[node]
+            new_daughters = [newNodesDict[d] for d in daughters]
+            newTree.nodes_and_edges[new_node] = new_daughters
 
         return newTree
 
-    def relabel_nodes(self, newNodesDict, copy=True):
+    def relabel_nodes(self, newNodesDict):
         """
         Replace the nodes in the Tree according to newNodesDict.
+        If a node does not appear in newNodesDict, keep the original node.
+
         If copy = True, create a new Tree object, otherwise replace inplace.
 
         :param newNodesDict: A dictionary with current nodes as keys as new nodes as values.
@@ -662,23 +703,16 @@ class Tree(object):
         :return: A new tree if copy = True, otherwise returns self
         """
 
-        nodes_and_edges = list(self.nodes_and_edges.list())
         new_nodes_and_edges = OrderedDict()
-        for entry in nodes_and_edges:
-            node = entry[0]
-            daughters = entry[1][:]
-            new_node = newNodesDict[node]
-            new_daughters = [newNodesDict[d] for d in daughters]
+        for node, daughters in self.nodes_and_edges.items():
+            if node not in newNodesDict:
+                new_node = node
+            else:
+                new_node = newNodesDict[node]
+            new_daughters = [newNodesDict[d] if d in newNodesDict else d for d in daughters]
             new_nodes_and_edges[new_node] = new_daughters
 
-        if copy:
-            newTree = self.copyTree()
-        else:
-            newTree = self
-
-        newTree.nodes_and_edges = new_nodes_and_edges
-
-        return newTree
+        self.nodes_and_edges = new_nodes_and_edges
 
     def compressToFinalStates(self):
         """
@@ -716,11 +750,11 @@ class Tree(object):
             root = self.root
 
             # Check if root has no parents and at least one daughter
-            if self.in_dregree(root) != 0 or self.out_degree(root) == 0:
+            if self.in_degree(root) != 0 or self.out_degree(root) == 0:
                 malformedTree = True
 
             # Check if all nodes (except root) have a unique parent
-            if any(self.in_dregree(node) != 1 for node in self.nodes if node is not root):
+            if any(self.in_degree(node) != 1 for node in self.nodes if node is not root):
                 malformedTree = True
 
             # Check if all nodes can be reached from the root node
@@ -740,24 +774,30 @@ class Tree(object):
         : return: new tree with the combined particles(Tree object)
         """
 
+        if other.canonName != self.canonName:
+            raise SModelSError("Can not add trees with distinct topologies")
+
         nodesB = list(other.nodes)
         nodesDict = {n: n + nodesB[inode]
-                   for inode, n in enumerate(self.nodes)}
-        newTree = self.relabel_nodes(nodesDict, copy=True)
+                     for inode, n in enumerate(self.nodes)}
+
+        newTree = Tree()
+        newTree._canonName = self._canonName
+        newTree._root = nodesDict[self._root]
+        newTree.nodes_and_edges = self.nodes_and_edges
+        newTree.relabel_nodes(nodesDict)
 
         return newTree
 
-    def compose(self, other, atNode=None, copy=True):
+    def attachTo(self, other, atNode=None):
         """
-        Returns a new graph of self composed with other at node atNode.
-        If atNode is not defined, the trees are joined where the nodes overlap and the nodes
-        from self are kept.
+        Returns a copy of other with self attached to it at node atNode.
+        If atNode is not defined, the trees are joined where the nodes overlap.
+        The overlapping node from self is kept.
 
         :param other: tree (Tree object)
         :param atNode: node (ParticleNode object) where the merge has to take place
                         If not defined, will find the common node between the trees.
-        :param copy: If True, return a copy of self, merged with other. Otherwise,
-                     extend self.
 
         : return: new tree with the other composed with self.
         """
@@ -770,21 +810,23 @@ class Tree(object):
             if len(common_nodes) != 1:
                 raise SModelSError("Can not merge trees. %i common nodes found" % len(common_nodes))
 
-            atNode = common_nodes[0]  # merge node of self
+            atNode = list(common_nodes)[0]  # merge node of self
+            # Make sure the node from self replaces the equivalent node from other
+            atNode = [n for n in self.nodes if n == atNode][0]
 
-        if self.out_degree(atNode) != 0:
-            raise SModelSError("Can not merge trees. Common node in Tree A can not have daughters.")
-        if other.in_degree(atNode) != 0:
-            raise SModelSError("Can not merge trees. Common node in Tree B can not have parents.")
+        if not any(n is atNode for n in self.nodes):
+            raise SModelSError("Attach node must belong to self")
 
-        if copy:
-            newTree = self.copyTree()
-        else:
-            newTree = self
+        if other.out_degree(atNode) != 0:
+            raise SModelSError("Can not attach tree. Common node can not have daughters in the other tree.")
+        if self.in_degree(atNode) != 0:
+            raise SModelSError("Can not attach tree. Common node can not have parents in self.")
 
-        for mom, daughters in other.bfs_successors(atNode):
-            if mom == atNode:
-                mom = atNode  # Make sure the merge node of self is kept
+        newTree = other.copyTree()
+        # Replace node from base tree by atNode:
+        newTree.relabel_nodes({atNode: atNode})
+
+        for mom, daughters in self.bfs_successors(atNode, includeLeaves=True):
             newTree.nodes_and_edges[mom] = daughters[:]
 
         return newTree
@@ -806,16 +848,17 @@ class Tree(object):
 
         """
         import matplotlib.pyplot as plt
+        import networkx as nx
 
         if labelAttr is None:
             labels = {n: str(n) if not n.isInclusive else n.longStr() for n in self.nodes}
         elif attrUnit is not None:
             labels = {n: str(getattr(n, labelAttr).asNumber(attrUnit))
-                    if (hasattr(n, labelAttr) and getattr(n, labelAttr) is not None)
-                    else str(n) for n in self.nodes}
+                      if (hasattr(n, labelAttr) and getattr(n, labelAttr) is not None)
+                      else str(n) for n in self.nodes}
         else:
             labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
-                    else str(n) for n in self.nodes}
+                      else str(n) for n in self.nodes}
 
         for key in labels:
             if labels[key] == 'anyOdd':
@@ -833,11 +876,14 @@ class Tree(object):
 
         # Compute position of nodes (in case the nodes have the same string representation, first
         # convert the nodes to integers for computing the position)
-        H = nx.convert_node_labels_to_integers(self, label_attribute='node_label')
+        G = nx.DiGraph()
+        G.add_nodes_from(self.nodes)
+        G.add_edges_from(self.edges)
+        H = nx.convert_node_labels_to_integers(G, label_attribute='node_label')
         H_layout = nx.drawing.nx_agraph.graphviz_layout(H, prog='dot')
         pos = {H.nodes[n]['node_label']: p for n, p in H_layout.items()}
 
-        nx.draw(self, pos,
+        nx.draw(G, pos,
                 with_labels=True,
                 arrows=True,
                 labels=labels,
