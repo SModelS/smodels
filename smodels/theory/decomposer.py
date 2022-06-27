@@ -118,7 +118,6 @@ def getDecayTrees(mother):
             decayTrees.append(Tree({mom: []}))
 
     decays = sorted(decays, key=lambda dec: dec.br, reverse=True)
-
     # Loop over decays of the daughter
     for decay in decays:
         if not decay.br:

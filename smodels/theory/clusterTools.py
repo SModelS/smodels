@@ -71,7 +71,8 @@ class AverageElement(Element):
                 setattr(newNode.particle, attr, avgAttr)
             newNodeDict[node] = newNode
 
-        self.tree = tree.relabel_nodes(newNodeDict, copy=True)
+        self.tree = self.tree.copyTree()
+        self.tree = self.tree.relabel_nodes(newNodeDict)
 
         self.weight = self.elements[0].weight
         for el in self.elements[1:]:

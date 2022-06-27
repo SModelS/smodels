@@ -432,8 +432,10 @@ class Element(object):
         tree = newelement.tree
         root = tree.root
         # Loop over nodes from root to leaves:
-        for mom, daughters in tree.bfs_successors(root):
-            if mom == root:  # Skip primary vertex
+        for mom, daughters in list(tree.bfs_successors(root)):
+            if mom is root:  # Skip primary vertex
+                continue
+            if mom not in tree.nodes:  # In case the mother has been removed by compression
                 continue
             if not mom.particle.isPrompt():  # Skip long-lived
                 continue
@@ -457,7 +459,7 @@ class Element(object):
                 continue
 
             # Get grandmother:
-            gMom = list(tree.predecessors(mom))
+            gMom = tree.predecessors(mom)
             if len(gMom) != 1:
                 raise SModelSError('Found multiple parents for %s when compressing element. Something went wrong.' % mom)
 

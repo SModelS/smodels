@@ -36,6 +36,7 @@ class Tree(object):
                 raise SModelSError("Can not create element from input %s" % info)
         # Convert from dictionary with edges ({node : [node1,node2,..], ...}):
         elif isinstance(info, dict):
+            self.add_nodes_from(info.keys())
             for node1, nodeList in info.items():
                 self.add_edges_from(zip([node1]*len(nodeList), nodeList))
         # Convert from Tree or DiGraph objec:
@@ -490,6 +491,16 @@ class Tree(object):
 
         return weight
 
+    def predecessors(self, node):
+
+        parents = []
+        # Count how many times node appears as a daughter
+        for mom, daughters in self.nodes_and_edges.items():
+            if node in daughters:
+                parents.append(mom)
+
+        return parents
+
     def successors(self, node):
 
         return self.nodes_and_edges[node]
@@ -519,6 +530,8 @@ class Tree(object):
             for pair in generation:
                 mom, daughters = pair
                 for new_mom in daughters:
+                    if new_mom not in self.nodes_and_edges:
+                        continue
                     new_daughters = self.nodes_and_edges[new_mom]
                     if new_daughters or includeLeaves:
                         next_generation.append((new_mom, new_daughters))
@@ -808,6 +821,8 @@ class Tree(object):
             other_nodes = set(list(other.nodes))
             common_nodes = self_nodes.intersection(other_nodes)
             if len(common_nodes) != 1:
+                print(self.nodes_and_edges)
+                print(other.nodes_and_edges)
                 raise SModelSError("Can not merge trees. %i common nodes found" % len(common_nodes))
 
             atNode = list(common_nodes)[0]  # merge node of self
