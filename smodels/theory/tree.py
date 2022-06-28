@@ -14,6 +14,7 @@ from smodels.tools.inclusiveObjects import InclusiveValue
 from smodels.theory.treeMatcher import TreeMatcher, sortTreeList
 from smodels.theory.particleNode import ParticleNode, InclusiveParticleNode
 from collections import OrderedDict
+from itertools import product
 
 
 class Tree(object):
@@ -27,6 +28,7 @@ class Tree(object):
         self._canonName = None
         self._root = None
         self.nodes_and_edges = OrderedDict()
+        self.nodesMapping = {}
 
         # Convert from string:
         if isinstance(info, str):
@@ -38,7 +40,7 @@ class Tree(object):
         elif isinstance(info, dict):
             self.add_nodes_from(info.keys())
             for node1, nodeList in info.items():
-                self.add_edges_from(zip([node1]*len(nodeList), nodeList))
+                self.add_edges_from(product([node1], nodeList))
         # Convert from Tree or DiGraph objec:
         elif isinstance(info, Tree):
             self.add_nodes_from(info.nodes)
@@ -66,8 +68,10 @@ class Tree(object):
 
     def add_node(self, node):
 
-        if node not in self.nodes_and_edges:
-            self.nodes_and_edges[node] = []
+        nodeIndex = node.node   # Use node number for fast indexing
+        if nodeIndex not in self.nodes_and_edges:
+            self.nodes_and_edges[nodeIndex] = []
+            self.nodesMapping[nodeIndex] = node
 
     def add_nodes_from(self, nodes):
 
@@ -76,12 +80,15 @@ class Tree(object):
 
     def remove_node(self, node):
 
-        if node in self.nodes_and_edges:
-            self.nodes_and_edges.pop(node)
+        nodeIndex = node.node   # Use node number for fast indexing
+        if nodeIndex in self.nodes_and_edges:
+            self.nodes_and_edges.pop(nodeIndex)
+            self.nodesMapping.pop(nodeIndex)
+
         for nodeA, daughtersA in self.nodes_and_edges.items():
-            if node not in daughtersA:
+            if nodeIndex not in daughtersA:
                 continue
-            daughtersA = [d for d in daughtersA[:] if d != node]
+            daughtersA = [d for d in daughtersA[:] if d != nodeIndex]
             self.nodes_and_edges[nodeA] = daughtersA[:]
 
     def remove_nodes_from(self, nodeList):
@@ -91,12 +98,11 @@ class Tree(object):
 
     def add_edge(self, nodeA, nodeB):
 
-        if nodeA not in self.nodes_and_edges:
-            self.nodes_and_edges[nodeA] = []
-        if nodeB not in self.nodes_and_edges:
-            self.nodes_and_edges[nodeB] = []
-
-        self.nodes_and_edges[nodeA].append(nodeB)
+        self.add_node(nodeA)
+        self.add_node(nodeB)
+        nodeIndexA = nodeA.node
+        nodeIndexB = nodeB.node
+        self.nodes_and_edges[nodeIndexA].append(nodeIndexB)
 
     def add_edges_from(self, edges):
 
@@ -110,12 +116,14 @@ class Tree(object):
         """
 
         self.nodes_and_edges = OrderedDict()
+        self.nodesMapping = {}
         self._root = None
 
     @property
     def nodes(self):
 
-        return list(self.nodes_and_edges.keys())
+        nodeList = [self.nodesMapping[n] for n in self.nodes_and_edges]
+        return nodeList
 
     @property
     def edges(self):
@@ -123,22 +131,24 @@ class Tree(object):
         edgesList = []
         for node, nodeList in self.nodes_and_edges.items():
             for nodeB in nodeList:
-                edgesList.append((node, nodeB))
+                edgesList.append((self.nodesMapping[node], self.nodesMapping[nodeB]))
         return edgesList
 
     def out_degree(self, node):
 
-        if node not in self.nodes_and_edges:
+        nodeIndex = node.node
+        if nodeIndex not in self.nodes_and_edges:
             return 0
         else:
-            return len(self.nodes_and_edges[node])
+            return len(self.nodes_and_edges[nodeIndex])
 
     def in_degree(self, node):
 
         degree = 0
+        nodeIndex = node.node
         # Count how many times node appears as a daughter
         for nodeList in self.nodes_and_edges.values():
-            degree += nodeList.count(node)
+            degree += nodeList.count(nodeIndex)
 
         return degree
 
@@ -494,16 +504,20 @@ class Tree(object):
     def predecessors(self, node):
 
         parents = []
+        nodeIndex = node.node
         # Count how many times node appears as a daughter
         for mom, daughters in self.nodes_and_edges.items():
-            if node in daughters:
-                parents.append(mom)
+            if nodeIndex in daughters:
+                parents.append(self.nodesMapping[mom])
 
         return parents
 
     def successors(self, node):
 
-        return self.nodes_and_edges[node]
+        nodeIndex = node.node
+        daughters = [self.nodesMapping[n]
+                     for n in self.nodes_and_edges[nodeIndex]]
+        return daughters
 
     def bfs_successors(self, node=None, includeLeaves=False):
         """
@@ -520,12 +534,12 @@ class Tree(object):
         if node is None:
             node = self.root
 
-        mom = node
+        mom = node.node
         daughters = self.nodes_and_edges[mom]
         generation = [(mom, daughters)]
         while generation:
             for pair in generation:
-                yield pair
+                yield (self.nodesMapping[pair[0]], [self.nodesMapping[d] for d in pair[1]])
             next_generation = []
             for pair in generation:
                 mom, daughters = pair
@@ -553,16 +567,17 @@ class Tree(object):
         if node is None:
             node = self.root
 
-        mom = node
-        daughters = self.nodes_and_edges[node][:]
-        daughtersDict = {mom: daughters[:]}
+        mom = node.node
+        daughters = self.nodes_and_edges[mom][:]
+        daughtersDict = {self.nodesMapping[mom]: [self.nodesMapping[d] for d in daughters]}
 
         # Go down in generation until it has no more daughters
         while daughters:
             new_mom = daughters.pop(0)
             new_daughters = self.nodes_and_edges[new_mom][:]
             if new_daughters or includeLeaves:
-                daughtersDict.update({new_mom: new_daughters[:]})
+                daughtersDict.update({self.nodesMapping[new_mom]:
+                                      [self.nodesMapping[d] for d in new_daughters]})
             # Attach new daughters to the beginning of the list
             daughters = new_daughters[:] + daughters[:]
 
@@ -643,8 +658,8 @@ class Tree(object):
         # Get all subtrees formed by the daughters of the
         # current root node and sort each subtree
         subTrees = []
-        for daughter in self.nodes_and_edges[self.root][:]:
-            subTree = self.getSubTree(source=daughter)
+        for daughter in self.nodes_and_edges[self.root.node][:]:
+            subTree = self.getSubTree(source=self.nodesMapping[daughter])
             subTree.sort()
             subTrees.append(subTree)
             self.remove_nodes_from(subTree.nodes)
@@ -676,11 +691,14 @@ class Tree(object):
             inode += 1
 
         new_nodes_and_edges = OrderedDict()
+        newMapping = {}
         for node, daughters in nodeOrder:
             daughters = sorted(daughters, key=lambda d: d.node)
-            new_nodes_and_edges[node] = daughters
+            new_nodes_and_edges[node.node] = [d.node for d in daughters]
+            newMapping[node.node] = node
 
         self.nodes_and_edges = new_nodes_and_edges
+        self.nodesMapping = newMapping
 
     def copyTree(self):
         """
@@ -690,42 +708,16 @@ class Tree(object):
         : return: Tree object
         """
 
-        newNodesDict = {n: n.copy() for n in self.nodes}
         newTree = Tree()
+        newTree.nodes_and_edges = {n: daughters[:]
+                                 for n, daughters in self.nodes_and_edges.items()}
+        newTree.nodesMapping = {n.node: n.copy() for n in self.nodes}
         if self._canonName:
             newTree._canonName = self._canonName
         if self._root is not None:
-            newTree._root = newNodesDict[self._root]
-        for node, daughters in self.nodes_and_edges.items():
-            new_node = newNodesDict[node]
-            new_daughters = [newNodesDict[d] for d in daughters]
-            newTree.nodes_and_edges[new_node] = new_daughters
+            newTree._root = newTree.nodesMapping[self._root.node]
 
         return newTree
-
-    def relabel_nodes(self, newNodesDict):
-        """
-        Replace the nodes in the Tree according to newNodesDict.
-        If a node does not appear in newNodesDict, keep the original node.
-
-        If copy = True, create a new Tree object, otherwise replace inplace.
-
-        :param newNodesDict: A dictionary with current nodes as keys as new nodes as values.
-        :param copy: If True, create a new Tree object, otherwise replace inplace.
-
-        :return: A new tree if copy = True, otherwise returns self
-        """
-
-        new_nodes_and_edges = OrderedDict()
-        for node, daughters in self.nodes_and_edges.items():
-            if node not in newNodesDict:
-                new_node = node
-            else:
-                new_node = newNodesDict[node]
-            new_daughters = [newNodesDict[d] if d in newNodesDict else d for d in daughters]
-            new_nodes_and_edges[new_node] = new_daughters
-
-        self.nodes_and_edges = new_nodes_and_edges
 
     def compressToFinalStates(self):
         """
@@ -790,15 +782,16 @@ class Tree(object):
         if other.canonName != self.canonName:
             raise SModelSError("Can not add trees with distinct topologies")
 
-        nodesB = list(other.nodes)
-        nodesDict = {n: n + nodesB[inode]
-                     for inode, n in enumerate(self.nodes)}
+        nodesB = other.nodes
+        newMapping = {n.node: n + nodesB[inode]
+                    for inode, n in enumerate(self.nodes)}
 
         newTree = Tree()
         newTree._canonName = self._canonName
-        newTree._root = nodesDict[self._root]
+        newTree._root = newMapping[self._root.node]
         newTree.nodes_and_edges = self.nodes_and_edges
-        newTree.relabel_nodes(nodesDict)
+        # Just change the nodeIndex -> node mapping:
+        newTree.nodesMapping = newMapping
 
         return newTree
 
@@ -821,8 +814,6 @@ class Tree(object):
             other_nodes = set(list(other.nodes))
             common_nodes = self_nodes.intersection(other_nodes)
             if len(common_nodes) != 1:
-                print(self.nodes_and_edges)
-                print(other.nodes_and_edges)
                 raise SModelSError("Can not merge trees. %i common nodes found" % len(common_nodes))
 
             atNode = list(common_nodes)[0]  # merge node of self
@@ -839,10 +830,10 @@ class Tree(object):
 
         newTree = other.copyTree()
         # Replace node from base tree by atNode:
-        newTree.relabel_nodes({atNode: atNode})
+        newTree.nodesMapping[atNode.node] = atNode
 
         for mom, daughters in self.bfs_successors(atNode, includeLeaves=True):
-            newTree.nodes_and_edges[mom] = daughters[:]
+            newTree.add_edges_from(product([mom], daughters))
 
         return newTree
 
@@ -869,11 +860,11 @@ class Tree(object):
             labels = {n: str(n) if not n.isInclusive else n.longStr() for n in self.nodes}
         elif attrUnit is not None:
             labels = {n: str(getattr(n, labelAttr).asNumber(attrUnit))
-                      if (hasattr(n, labelAttr) and getattr(n, labelAttr) is not None)
-                      else str(n) for n in self.nodes}
+                    if (hasattr(n, labelAttr) and getattr(n, labelAttr) is not None)
+                    else str(n) for n in self.nodes}
         else:
             labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
-                      else str(n) for n in self.nodes}
+                    else str(n) for n in self.nodes}
 
         for key in labels:
             if labels[key] == 'anyOdd':

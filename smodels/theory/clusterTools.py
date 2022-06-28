@@ -30,7 +30,7 @@ class AverageElement(Element):
         if any(not isinstance(el, Element) for el in elements):
             raise SModelSError("An AverageElement must be created from a list of Element objects.")
 
-        Element.__init__(self, elements[0].tree)
+        Element.__init__(self)
 
         # Get the relevant properties needed by the txnames
         # (in addition to mass, totalwidth and isSM)
@@ -43,11 +43,10 @@ class AverageElement(Element):
         #  Define relevant properties to be stored and averaged over:
         self.properties = attrList
         self.elements = elements[:]
-        tree = self.elements[0].tree
         self.txname = self.elements[0].txname
 
         #  Consistency checks:
-        if any(el.canonName != self.canonName for el in self.elements):
+        if any(el.canonName != elements[0].canonName for el in self.elements[1:]):
             logger.error("Can not build average Element from elements with distinct topologies.")
             raise SModelSError()
         if any(el.txname != self.txname for el in self.elements):
@@ -56,24 +55,22 @@ class AverageElement(Element):
 
         #  Replace particles in nodes by generic particles
         #  holding the average attributes (assume the elements are sorted)
-        newNodeDict = {}
-        for node in tree.nodes:
-            eqNodes = [el.tree.getNode(node) for el in elements]
-            newNode = node.copy()
-            if node == tree.root:
-                newNodeDict[node] = newNode  # Do nothing for PV
+        newTree = self.elements[0].tree.copyTree()
+        for nodeIndex in newTree.nodes_and_edges:
+            eqNodes = [el.tree.nodesMapping[nodeIndex] for el in elements]
+            # Do nothing for root:
+            if nodeIndex == newTree.root.node:
                 continue
 
-            newNode.particle = Particle(label='average')
+            newParticle = Particle(label='average')
             for attr in self.properties:
                 values = [getattr(n, attr) for n in eqNodes]
                 avgAttr = self.getAverage(values)
-                setattr(newNode.particle, attr, avgAttr)
-            newNodeDict[node] = newNode
+                setattr(newParticle, attr, avgAttr)
+            newNode = newTree.nodesMapping[nodeIndex]
+            newNode.particle = newParticle
 
-        self.tree = self.tree.copyTree()
-        self.tree = self.tree.relabel_nodes(newNodeDict)
-
+        self.tree = newTree
         self.weight = self.elements[0].weight
         for el in self.elements[1:]:
             self.weight += el.weight
