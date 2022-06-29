@@ -400,7 +400,79 @@ class PyhfUpperLimitComputer:
         self.data.nsignals = copy.deepcopy(self.bu_signal)
         del self.bu_signal
 
-    def likelihood(self, mu=1.0, workspace_index=None, nll=False, expected=False):
+    def get_position(self, name, model):
+        """
+        :param name: name of the parameter one wants to increase
+        :param model: the pyhf model
+        :return: the position of the parameter that has to be modified in order to turn positive the negative total yield
+        """
+        position = 0
+        for par in model.config.par_order:
+            if name == par:
+                return position
+            else:
+                position += model.config.param_set(par).n_parameters
+
+    def rescaleBgYields(self, init_pars, workspace, model):
+        """
+        :param init_pars: list of initial parameters values one wants to increase in order to turn positive the negative total yields
+        :param workspace: the pyhf workspace
+        :param model: the pyhf model
+        :return: the list of initial parameters values that gives positive total yields
+        """
+        for pos,yld in enumerate(model.expected_actualdata(init_pars)):
+            # If a total yield (mu*signal + background) evaluated with the initial parameters is negative, increase a parameter to turn it positive
+            if yld < 0:
+                sum_bins = 0
+                # Find the SR and the bin (the position inside the SR) corresponding to the negative total yield
+                for channel,nbins in model.config.channel_nbins.items():
+                    sum_bins += nbins
+                    if pos < sum_bins:
+                        SR = channel
+                        # Bin number = the position of the bin in the SR
+                        # (i.e. the position of the negative total yield in the list, starting at the corresponding SR)
+                        bin_num = pos-sum_bins+nbins
+                        break
+                # Find the name of the parameter that modifies the background yield of the negative total yield
+                for channel in workspace['channels']:
+                    if channel['name'] == SR:
+                        for sample in range(len(channel['samples'])):
+                            for modifier in channel['samples'][sample]['modifiers']:
+                                # The multiplicative modifier (i.e. parameter) that will be increased is a 'staterror' one (others may work as well)
+                                if 'type' in modifier.keys() and modifier['type'] == 'staterror':
+                                    name = modifier['name']
+                                    break
+                # Find the position of the parameter within the pyhf list of parameters
+                position = self.get_position(name,model)+bin_num
+                # Find the upper bound of the parameter that will be increased
+                max_bound = model.config.suggested_bounds()[position][1]
+                #print(f'initial staterror of bin {pos}:',init_pars[position])
+                # If the parameter one wants to increase is not fixed, add 0.1 to its value (it is an arbitrary step) until
+                # the total yield becomes positive or the parameter upper bound is reached
+                if not model.config.suggested_fixed()[position]:
+                    while model.expected_actualdata(init_pars)[pos] < 0:
+                        if init_pars[position] + 0.1 < max_bound:
+                            init_pars[position] += 0.1
+                        else:
+                            init_pars[position] = max_bound
+                            break
+                    #print(f'actualdata before changing staterror in bin {pos}:',model.expected_actualdata(init_pars)[pos])
+                    #nominal_init_pars = model.config.suggested_init()
+                    #nominal_init_pars[model.config.poi_index] = 0
+                    #print('actualdata bg only:',model.expected_actualdata(nominal_init_pars)[pos])
+                    #nominal_bg = model.expected_actualdata(nominal_init_pars)[pos]
+                    #nsigpyhf = np.array([0.0, 0.0, 0.0, 3.8385295078033232, 6.798207594690076, 6.4233656554685785, 1.5951140115408478, 0.43669404083287855, 0.9448899210237275])
+                    #nsigpyhf = np.array([1.4349825452486582, 1.0533138982733217, 1.1158810930352483, 0.719039660507198, 0.9461983338046028, 1.5376094024329356, 0.8276376394629201, 0.8551014982035671, 1.6913336713087228])
+                    #print('signal only pyhf:', nsigpyhf[pos])
+                    #nominal_yield = nsigpyhf[pos] + nominal_bg
+                    #init_pars[position] = ((nominal_yield - mu*nsigpyhf[pos])/nominal_bg).item()
+                    #if not model.config.suggested_bounds()[get_position(name)+bin_num][0] <= ((nominal_yield - mu*nsigpyhf[pos])/nominal_bg).item() <= max_bound:
+                    #    print('Initial parameter outside its bounds')
+                #print(f'final staterror of bin {pos}:',init_pars[position])
+                #print(f'actualdata after changing staterror in bin {pos}:',model.expected_actualdata(init_pars))
+        return init_pars
+
+    def likelihood(self, mu=1.0, workspace_index=None, nll=False, expected=False, previous=False):
         """
         Returns the value of the likelihood.
         Inspired by the `pyhf.infer.mle` module but for non-log likelihood
@@ -459,19 +531,16 @@ class PyhfUpperLimitComputer:
                     "histosys": {"interpcode": "code4p"},
                 }
                 model = workspace.model(modifier_settings=msettings)
-                d = workspace.data(model)
-                indices = []
-                slices = list(workspace.channel_slices.values())
-                for slce in slices:
-                    for i in range(slce.start, slce.stop):
-                        indices.append(i)
-                total = np.array([d[i] + self.data.nsignals[0][i] for i in indices])
-                if np.any(total[total < 0]):
-                    # we have negative total yields. return a llhd of 0 for that
-                    self.restore()
-                    return self.exponentiateNLL(None, not nll)
+                wsData = workspace.data(model)
+
+                # indices = []
+                # slices = list(workspace.channel_slices.values())
+                # for slce in slices:
+                #     for i in range(slce.start, slce.stop):
+                #         indices.append(i)
+
                 _, nllh = pyhf.infer.mle.fixed_poi_fit(
-                    1.0, d, model, return_fitted_val=True, maxiter=200
+                    1.0, wsData, model, return_fitted_val=True, maxiter=200
                 )
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.debug(f"pyhf fixed_poi_fit failed for mu={mu}: {e}")
@@ -480,36 +549,42 @@ class PyhfUpperLimitComputer:
                     0.0, workspace.data(model), model, return_fitted_val=True, maxiter=200
                 )
                 initpars = init.tolist()
-                initpars[1] = 1
-                for i in [0, 2]:
-                    initpars[i] = 1.0
+                initpars[model.config.poi_index] = 1.
+                if not previous :
+                    # Try to turn positive all the negative total yields (mu*signal + background) evaluated with the initial parameters
+                    initpars = self.rescaleBgYields(initpars, workspace, model)
+                    # If the a total yield is still negative with the increased initial parameters, print a message
+                    if not all([True if yld >= 0 else False for yld in model.expected_actualdata(initpars)]):
+                        print(f'Negative total yield after increasing the initial parameters for mu={mu} and previous={previous}')
                 try:
-                    _, nllh = pyhf.infer.mle.fixed_poi_fit(
+                    bestFitParam, nllh = pyhf.infer.mle.fixed_poi_fit(
                         1.0,
-                        workspace.data(model),
+                        wsData,
                         model,
                         return_fitted_val=True,
                         init_pars=initpars,
-                        maxiter=200,
+                        maxiter=2000,
                     )
+                    if not previous:
+                        # If a total yield is negative with the best profiled parameters, return None
+                        if not all([True if yld >= 0 else False for yld in model.expected_actualdata(bestFitParam)]):
+                            self.restore()
+                            return self.exponentiateNLL(None, not nll)
                 except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                     logger.info(f"pyhf fixed_poi_fit failed twice for mu={mu}: {e}")
 
                     self.restore()
                     return self.exponentiateNLL(None, not nll)
-            except:
-                self.restore()
-                return self.exponentiateNLL(None, not nll)
 
-            # print ( "likelihood best fit", _ )
             ret = nllh.tolist()
             try:
                 ret = float(ret)
             except:
                 ret = float(ret[0])
+            # Cache the likelihood (but do we use it?)
             self.data.cached_likelihoods[
                 workspace_index
-            ] = ret  # THIS CAN STAY BC IT MAY BE NEEDED ELSEWHERE IN THE CODE
+            ] = ret
             ret = self.exponentiateNLL(ret, not nll)
             # print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
             self.restore()
