@@ -61,7 +61,7 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
 
     # Sort production trees
     productionTrees = sorted(productionTrees,
-                             key=lambda t: t.getTreeWeight().getMaxXsec(),
+                             key=lambda t: t.getTreeWeight(),
                              reverse=True)
 
     # For each production tree, produce all allowed cascade decays (above sigmacut):
@@ -74,7 +74,7 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
 
     for tree in allTrees:
         newElement = Element(tree)
-        newElement.weightList = tree.getTreeWeight()
+        newElement.weightList = tree.getTreeWeightList()
         smsTopDict.addElement(newElement)
 
     if massCompress or invisibleCompress:
@@ -134,7 +134,7 @@ def getDecayTrees(mother):
     return decayTrees
 
 
-def addOneStepDecays(tree, sigmacut=None):
+def addOneStepDecays(tree, sigmacut=0*fb):
     """
     Given a tree, generates a list of new trees (Tree objects),
     where all the (unstable) nodes appearing at the end of the original tree
@@ -152,7 +152,7 @@ def addOneStepDecays(tree, sigmacut=None):
     treeList = [tree]
     # Get all (current) final states which are the mothers
     # of the decays to be added:
-    mothers = [n for n in tree.nodes if tree.out_degree(n) == 0]
+    mothers = [n for n in tree.nodes if tree.out_degree(n.node) == 0]
     for mom in mothers:
         # Check if mom should decay:
         if mom.isFinalState:
@@ -170,6 +170,9 @@ def addOneStepDecays(tree, sigmacut=None):
 
         # Get all decay trees for final state:
         decayTrees = getDecayTrees(mom)
+        # Sort by weight
+        decayTrees = sorted(decayTrees, key=lambda dTree: dTree.getTreeWeight(),
+                            reverse=True)
         if not decayTrees:
             mom.isFinalState = True
             continue
@@ -177,23 +180,31 @@ def addOneStepDecays(tree, sigmacut=None):
         # Add all decay channels to all the trees
         newTrees = []
         for T in treeList:
+            tweight = T.getTreeWeight()
+            if tweight < sigmacut:
+                continue
             for decay in decayTrees:
+                dweight = decay.getTreeWeight()
+                if tweight*dweight < sigmacut:
+                    break  # Since the decays are sorted, the next ones will also fall below sigmacut
+
                 # The order below matters,
                 # since we want to keep the mother from the decay tree (which holds the BR value)
                 dec = decay.copyTree()
                 newTree = dec.attachTo(T)
-                if sigmacut is not None:
-                    treeWeight = newTree.getTreeWeight()
-                    if treeWeight is not None and treeWeight < sigmacut:
-                        # Do not consider this decay or the next ones,
-                        # since they are sorted accodring to BR and the subsequent
-                        # decays will only contain smaller weights
-                        break
+
+                treeWeight = newTree.getTreeWeight()
+                if treeWeight is not None and treeWeight < sigmacut:
+                    # Do not consider this decay or the next ones,
+                    # since they are sorted accodring to BR and the subsequent
+                    # decays will only contain smaller weights
+                    break
                 newTrees.append(newTree)
 
         if not newTrees:
             continue
-        treeList = newTrees
+        treeList = sorted(newTrees, key=lambda t: t.getTreeWeight(),
+                          reverse=True)
 
     if len(treeList) == 1 and treeList[0] == tree:
         return []
@@ -221,7 +232,7 @@ def cascadeDecay(tree, sigmacut=None):
         for T in treeList:
             newT = addOneStepDecays(T, sigmacut)
             if not newT:
-                finalNodes = [n for n in T.nodes if T.out_degree(n) == 0]
+                finalNodes = [n for n in T.nodes if T.out_degree(n.node) == 0]
                 # Make sure all the final states have decayed
                 # (newT can be empty if there is no allowed decay above sigmacut)
                 if any(fn.isFinalState is False for fn in finalNodes):

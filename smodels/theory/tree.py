@@ -15,6 +15,7 @@ from smodels.theory.treeMatcher import TreeMatcher, sortTreeList
 from smodels.theory.particleNode import ParticleNode, InclusiveParticleNode
 from collections import OrderedDict
 from itertools import product
+import unum
 
 
 class Tree(object):
@@ -27,8 +28,10 @@ class Tree(object):
 
         self._canonName = None
         self._root = None
-        self.nodes_and_edges = OrderedDict()
-        self.nodesMapping = {}
+        self._weight = None
+        self.successors = OrderedDict()  # Stores the nodes and their successors (daughters)
+        self.predecessors = {}  # Stores the nodes and their predecessors (parents)
+        self.nodesMapping = {}  # Stores the mapping nodeIndex->node object
 
         # Convert from string:
         if isinstance(info, str):
@@ -67,44 +70,86 @@ class Tree(object):
         return self.treeToString()
 
     def add_node(self, node):
+        """
+        Adds a node to the Tree if the nodeIndex (node.node)
+        is not in the Tree.
+
+        :param node: ParticleNode object
+        """
 
         nodeIndex = node.node   # Use node number for fast indexing
-        if nodeIndex not in self.nodes_and_edges:
-            self.nodes_and_edges[nodeIndex] = []
+        if nodeIndex not in self.successors:
+            self.successors[nodeIndex] = []
             self.nodesMapping[nodeIndex] = node
 
     def add_nodes_from(self, nodes):
+        """
+        Adds a list of nodes to the Tree.
+
+        :param nodes: List of ParticleNode objects
+        """
 
         for node in nodes:
             self.add_node(node)
 
-    def remove_node(self, node):
+    def remove_node(self, nodeIndex):
+        """
+        Removes a node from the Tree if the nodeIndex (node.node).
+        The node is removed as well as its appearing in any edges.
 
-        nodeIndex = node.node   # Use node number for fast indexing
-        if nodeIndex in self.nodes_and_edges:
-            self.nodes_and_edges.pop(nodeIndex)
+        :param nodeIndex: Node index
+        """
+
+        if nodeIndex in self.successors:
+            self.successors.pop(nodeIndex)
             self.nodesMapping.pop(nodeIndex)
 
-        for nodeA, daughtersA in self.nodes_and_edges.items():
+        for nodeA, daughtersA in self.successors.items():
             if nodeIndex not in daughtersA:
                 continue
             daughtersA = [d for d in daughtersA[:] if d != nodeIndex]
-            self.nodes_and_edges[nodeA] = daughtersA[:]
+            self.successors[nodeA] = daughtersA[:]
 
-    def remove_nodes_from(self, nodeList):
+        if nodeIndex in self.predecessors:
+            self.predecessors.pop(nodeIndex)
 
-        for node in nodeList:
-            self.remove_node(node)
+        for nodeA, momA in list(self.predecessors.items()):
+            if momA == nodeIndex:
+                self.predecessors.pop(nodeA)
+
+    def remove_nodes_from(self, nodeIndices):
+        """
+        Removes a list of nodes from the Tree.
+
+        :param nodeIndices: List of node indices
+        """
+
+        for nodeIndex in nodeIndices:
+            self.remove_node(nodeIndex)
 
     def add_edge(self, nodeA, nodeB):
+        """
+        Adds a directed edge to the Tree (nodeA -> nodeB).
+        If the nodes were not present in the Tree, they are also added.
+
+        :param nodeA: ParticleNode object
+        :param nodeB: ParticleNode object
+        """
 
         self.add_node(nodeA)
         self.add_node(nodeB)
         nodeIndexA = nodeA.node
         nodeIndexB = nodeB.node
-        self.nodes_and_edges[nodeIndexA].append(nodeIndexB)
+        self.successors[nodeIndexA].append(nodeIndexB)
+        self.predecessors[nodeIndexB] = nodeIndexA
 
     def add_edges_from(self, edges):
+        """
+        Adds a list of directed edges to the Tree.
+
+        :param edges: List of tuples containing ParticleNode objects
+                      (e.g. [(nodeA,nodeB),(nodeA,nodeC),...])
+        """
 
         for edge in edges:
             self.add_edge(edge[0], edge[1])
@@ -115,46 +160,187 @@ class Tree(object):
         keep its canonName.
         """
 
-        self.nodes_and_edges = OrderedDict()
+        self.successors = OrderedDict()
+        self.predecessors = {}
         self.nodesMapping = {}
         self._root = None
 
     @property
-    def nodes(self):
+    def nodes(self, indices=False):
+        """
+        Returns the tist of ParticleNode objects in the Tree.
 
-        nodeList = [self.nodesMapping[n] for n in self.nodes_and_edges]
+        :param indices: If True, return the node indices, instead of
+                        the node objects.
+
+        :return: List of ParticleNode objects
+        """
+
+        if not indices:
+            nodeList = [self.nodesMapping[n] for n in self.successors]
+        else:
+            nodeList = list(self.successors)
+
         return nodeList
 
     @property
-    def edges(self):
+    def edges(self, indices=False):
+        """
+        Returns the list of edges (pairs of ParticleNode objects) in the Tree.
+
+        :param indices: If True, return the node indices, instead of
+                        the node objects.
+
+        :return: List of edges
+        """
 
         edgesList = []
-        for node, nodeList in self.nodes_and_edges.items():
+        for node, nodeList in self.successors.items():
             for nodeB in nodeList:
-                edgesList.append((self.nodesMapping[node], self.nodesMapping[nodeB]))
+                if not indices:
+                    edgesList.append((self.nodesMapping[node], self.nodesMapping[nodeB]))
+                else:
+                    edgesList.append((node, nodeB))
         return edgesList
 
-    def out_degree(self, node):
+    def out_degree(self, nodeIndex):
+        """
+        Computes the number of outgoing edges from the node
+        (number of daughters).
 
-        nodeIndex = node.node
-        if nodeIndex not in self.nodes_and_edges:
+        :param nodeIndex: Node index (int)
+
+        :return: Number of outgoing edges (int)
+        """
+
+        if nodeIndex not in self.successors:
             return 0
         else:
-            return len(self.nodes_and_edges[nodeIndex])
+            return len(self.successors[nodeIndex])
 
-    def in_degree(self, node):
+    def in_degree(self, nodeIndex):
+        """
+        Computes the number of incoming edges to the node
+        (number of parents).
 
-        degree = 0
-        nodeIndex = node.node
-        # Count how many times node appears as a daughter
-        for nodeList in self.nodes_and_edges.values():
-            degree += nodeList.count(nodeIndex)
+        :param nodeIndex: Node index (int)
 
-        return degree
+        :return: Number of incoming edges (1 or 0)
+        """
+
+        if nodeIndex in self.predecessors:
+            if self.predecessors[nodeIndex] is not None:
+                return 1
+
+        return 0
 
     def number_of_nodes(self):
+        """
+        Returns the total number of nodes in the Tree.
 
-        return len(self.nodes_and_edges)
+
+        :return: Number of nodes (int)
+        """
+
+        return len(self.successors)
+
+    def bfs_successors(self, node=None,
+                       includeLeaves=False, indices=False):
+        """
+        Returns an iterator over the mother and daughter
+        nodes starting at node using a breadth first search.
+
+        :param node: Node from tree. If None, starts at tree root.
+        :param includeLeaves: If True, it will consider the leaves (undecayed nodes)
+                              as moms in the iterator (with an empty daughters list)
+        :param indices: If True, return the node indices, instead of
+                        the node objects.
+
+
+        :return: Iterator over nodes.
+        """
+
+        if node is None:
+            node = self.root
+
+        mom = node.node
+        daughters = self.successors[mom]
+        generation = [(mom, daughters)]
+        while generation:
+            for pair in generation:
+                if not indices:
+                    yield (self.nodesMapping[pair[0]], [self.nodesMapping[d] for d in pair[1]])
+                else:
+                    yield pair
+            next_generation = []
+            for pair in generation:
+                mom, daughters = pair
+                for new_mom in daughters:
+                    if new_mom not in self.successors:
+                        continue
+                    new_daughters = self.successors[new_mom]
+                    if new_daughters or includeLeaves:
+                        next_generation.append((new_mom, new_daughters))
+            generation = next_generation
+
+    def dfs_successors(self, node=None,
+                       includeLeaves=False, indices=False):
+        """
+        Returns a dictionary with the mother as keys
+        and the daughters as values using a depth-first search.
+        nodes starting at node using a breadth first search.
+
+        :param node: Node from tree. If None, starts at tree root.
+        :param includeLeaves: If True, it will consider the leaves (undecayed nodes)
+                              as moms in the iterator (with an empty daughters list)
+        :param indices: If True, return the node indices, instead of
+                        the node objects.
+
+        :return: Dictionary with mothers and daughters
+        """
+
+        if node is None:
+            node = self.root
+
+        mom = node.node
+        daughters = self.successors[mom][:]
+        if not indices:
+            daughtersDict = {self.nodesMapping[mom]: [self.nodesMapping[d] for d in daughters]}
+        else:
+            daughtersDict = {mom: daughters}
+
+        # Go down in generation until it has no more daughters
+        while daughters:
+            new_mom = daughters.pop(0)
+            new_daughters = self.successors[new_mom][:]
+            if new_daughters or includeLeaves:
+                if not indices:
+                    daughtersDict.update({self.nodesMapping[new_mom]:
+                                          [self.nodesMapping[d] for d in new_daughters]})
+                else:
+                    daughtersDict.update({new_mom: daughters[:]})
+
+            # Attach new daughters to the beginning of the list
+            daughters = new_daughters[:] + daughters[:]
+
+        return daughtersDict
+
+    def bfs_tree(self, node=None):
+        """
+        Returns an oriented tree constructed from of a breadth-first-search
+        starting at node.
+        """
+
+        if node is None:
+            node = self.root
+
+        T = Tree()
+        T.nodesMapping = {nodeIndex: n for nodeIndex, n in self.nodesMapping}
+        for mom, daughters in self.bfs_successors(node, includeLeaves=True, indices=True):
+            T.successors[mom] = daughters
+            for d in daughters:
+                T.predecessors[d] = mom
+        return T
 
     def stringToTree(self, stringElement, finalState=None,
                      intermediateState=None, model=None):
@@ -363,14 +549,13 @@ class Tree(object):
 
         return self._canonName
 
-    def setGlobalProperties(self, node=None):
+    def setGlobalProperties(self, nodeIndex=None):
         """
         Define useful global properties for the trees and the nodes.
         Recursively sets the canonName and finalStates for each node.
         Returns the canonical name in integer form.
 
-        :param T: Tree (Tree object)
-        :param node: Node to get the name for. If None, it will use the root
+        :param nodeIndex: Node index to set the name for. If None, it will use the root
 
         :return: Integer representing the Tree canonical name
         """
@@ -378,10 +563,11 @@ class Tree(object):
         if not self.number_of_nodes():
             return None
 
-        if node is None:
-            node = self.root
+        if nodeIndex is None:
+            nodeIndex = self.root.node
 
         # Set the final state
+        node = self.nodesMapping[nodeIndex]
         node.finalStates = self.getFinalStates(node)
         # If it is inclusive node set its name to an inclusive integer
         # and return its name (no need to check the children)
@@ -389,7 +575,7 @@ class Tree(object):
             node.canonName = InclusiveValue()
             return node.canonName
 
-        children = list(self.successors(node))
+        children = self.successors[nodeIndex]
         if not children:
             node.canonName = 10
         else:
@@ -402,7 +588,7 @@ class Tree(object):
                 node.canonName = int(tpStr)
 
         # Use the root canon name to assign the tree canon name
-        if self.in_degree(node) == 0:
+        if not self.in_degree(nodeIndex):
             self._canonName = node.canonName
 
         return node.canonName
@@ -427,16 +613,17 @@ class Tree(object):
 
         # If source is root, it is quicker to get all final states directly
         if source is self.root:
-            finalStates = [n.particle for n in self.nodes if self.out_degree(n) == 0]
+            finalStates = [n.particle for n in self.nodes if self.out_degree(n.node) == 0]
             return sorted(finalStates)
 
         # Return source, if it is already a final state
-        if self.out_degree(source) == 0:
+        if not self.successors[source.node]:
             return [source.particle]
 
         finalStates = []
         for mom, daughters in self.bfs_successors(source):
-            finalStates += [d.particle for d in daughters if self.out_degree(d) == 0]
+            finalStates += [d.particle for d in daughters
+                            if not self.successors[d.node]]
 
         return sorted(finalStates)
 
@@ -450,155 +637,50 @@ class Tree(object):
         """
 
         if self._root is None:
-            root = [n for n in self.nodes if self.in_degree(n) == 0]
+            root = [n for n in self.nodes if self.in_degree(n.node) == 0]
             if len(root) != 1:
+                print(self.successors)
+                print(self.predecessors)
                 raise SModelSError("Malformed Tree, %i root(s) have been found." % len(root))
             self._root = root[0]
 
         return self._root
 
-    def getNode(self, node):
-        """
-        Return the node object in the tree corresponding to node.
-        Node can be an integer or a node object. The node.node number
-        is used to retrive the object. If the node is not found, return None.
-
-        :param node: ParticleNode, InclusiveParticleNode or int
-
-        :return: Node object if found, otherwise None.
-        """
-
-        # Allows comparison with integers (by node.node) or node objs
-        if isinstance(node, int):
-            nodeNumber = node
-        elif isinstance(node, (ParticleNode, InclusiveParticleNode)):
-            nodeNumber = node.node
-        else:
-            raise SModelSError("Can not fetch node object from type %s" % (type(node)))
-
-        for n in self.nodes:
-            if n.node == nodeNumber:
-                return n
-
-        return None
-
-    def getTreeWeight(self):
+    def getTreeWeightList(self):
         """
         Computes the tree weight (production cross-section*BRs). If it can not be computed,
         return None. Does not include the weight of final state (undecayed) particles.
 
-        :return: tree weight (Unum object) if available, None otherwise.
+        :return: CrossSectionList object or Unum object, if available, None otherwise.
         """
 
         weight = 1.0
         for n in self.nodes:
             # Skip final state (stable) particles
-            if self.out_degree(n) == 0:
+            if self.out_degree(n.node) == 0:
                 continue
-            if not hasattr(n, 'nodeWeight') or n.nodeWeight is None:
-                return None
             weight *= n.nodeWeight
 
         return weight
 
-    def predecessors(self, node):
-
-        parents = []
-        nodeIndex = node.node
-        # Count how many times node appears as a daughter
-        for mom, daughters in self.nodes_and_edges.items():
-            if nodeIndex in daughters:
-                parents.append(self.nodesMapping[mom])
-
-        return parents
-
-    def successors(self, node):
-
-        nodeIndex = node.node
-        daughters = [self.nodesMapping[n]
-                     for n in self.nodes_and_edges[nodeIndex]]
-        return daughters
-
-    def bfs_successors(self, node=None, includeLeaves=False):
+    def getTreeWeight(self):
         """
-        Returns an iterator over the mother and daughter
-        nodes starting at node using a breadth first search.
+        Computes the tree maximum weight (max production cross-section*BRs). If it can not be computed,
+        return None. Does not include the weight of final state (undecayed) particles.
 
-        :param node: Node from tree. If None, starts at tree root.
-        :param includeLeaves: If True, it will consider the leaves (undecayed nodes)
-                              as moms in the iterator (with an empty daughters list)
-
-        :return: Iterator over nodes.
+        :return: tree weight (Unum object) if available, None otherwise.
         """
 
-        if node is None:
-            node = self.root
+        if self._weight is not None:
+            return self._weight
 
-        mom = node.node
-        daughters = self.nodes_and_edges[mom]
-        generation = [(mom, daughters)]
-        while generation:
-            for pair in generation:
-                yield (self.nodesMapping[pair[0]], [self.nodesMapping[d] for d in pair[1]])
-            next_generation = []
-            for pair in generation:
-                mom, daughters = pair
-                for new_mom in daughters:
-                    if new_mom not in self.nodes_and_edges:
-                        continue
-                    new_daughters = self.nodes_and_edges[new_mom]
-                    if new_daughters or includeLeaves:
-                        next_generation.append((new_mom, new_daughters))
-            generation = next_generation
+        weight = self.getTreeWeightList()
 
-    def dfs_successors(self, node=None, includeLeaves=False):
-        """
-        Returns a dictionary with the mother as keys
-        and the daughters as values using a depth-first search.
-        nodes starting at node using a breadth first search.
-
-        :param node: Node from tree. If None, starts at tree root.
-        :param includeLeaves: If True, it will consider the leaves (undecayed nodes)
-                              as moms in the iterator (with an empty daughters list)
-
-        :return: Dictionary with mothers and daughters
-        """
-
-        if node is None:
-            node = self.root
-
-        mom = node.node
-        daughters = self.nodes_and_edges[mom][:]
-        daughtersDict = {self.nodesMapping[mom]: [self.nodesMapping[d] for d in daughters]}
-
-        # Go down in generation until it has no more daughters
-        while daughters:
-            new_mom = daughters.pop(0)
-            new_daughters = self.nodes_and_edges[new_mom][:]
-            if new_daughters or includeLeaves:
-                daughtersDict.update({self.nodesMapping[new_mom]:
-                                      [self.nodesMapping[d] for d in new_daughters]})
-            # Attach new daughters to the beginning of the list
-            daughters = new_daughters[:] + daughters[:]
-
-        return daughtersDict
-
-    def bfs_tree(self, node=None):
-        """
-        Returns an oriented tree constructed from of a breadth-first-search
-        starting at node.
-        """
-
-        if node is None:
-            node = self.root
-
-        T = Tree()
-        T.add_node(node)
-        for mom, daughters in self.bfs_successors(node):
-            T.add_node(mom)
-            for daughter in daughters:
-                T.add_edge((mom, daughter))
-        return T
+        if isinstance(weight, (int, float, unum.Unum)):
+            self._weight = weight
+        else:
+            self._weight = weight.getMaxXsec()
+        return self._weight
 
     def getSubTree(self, source):
         """
@@ -609,11 +691,12 @@ class Tree(object):
         """
 
         subTree = Tree()
-        subTree.add_node(source)
+        subTree.nodesMapping = {nodeIndex: node for nodeIndex, node in self.nodesMapping.items()}
         subTree._root = source
-        for mom, daughters in self.bfs_successors(source):
+        for mom, daughters in self.bfs_successors(source, indices=True, includeLeaves=True):
+            subTree.successors[mom] = daughters[:]
             for d in daughters:
-                subTree.add_edge(mom, d)
+                subTree.predecessors[d] = mom
 
         return subTree
 
@@ -658,11 +741,11 @@ class Tree(object):
         # Get all subtrees formed by the daughters of the
         # current root node and sort each subtree
         subTrees = []
-        for daughter in self.nodes_and_edges[self.root.node][:]:
+        for daughter in self.successors[self.root.node][:]:
             subTree = self.getSubTree(source=self.nodesMapping[daughter])
             subTree.sort()
             subTrees.append(subTree)
-            self.remove_nodes_from(subTree.nodes)
+            self.remove_nodes_from(subTree.successors.keys())
 
         # Sort the subtrees
         subTrees = sortTreeList(subTrees)
@@ -697,25 +780,31 @@ class Tree(object):
             new_nodes_and_edges[node.node] = [d.node for d in daughters]
             newMapping[node.node] = node
 
-        self.nodes_and_edges = new_nodes_and_edges
+        self.successors = new_nodes_and_edges
         self.nodesMapping = newMapping
 
-    def copyTree(self):
+    def copyTree(self, emptyNodes=False):
         """
         Returns a copy of self. The copy contains the same canonical name
         and copies of nodes.
 
-        : return: Tree object
+        :param emptyNodes: If True, will not define nodes to the tree
+
+        :return: Tree object
         """
 
         newTree = Tree()
-        newTree.nodes_and_edges = {n: daughters[:]
-                                 for n, daughters in self.nodes_and_edges.items()}
-        newTree.nodesMapping = {n.node: n.copy() for n in self.nodes}
+        if not emptyNodes:
+            newTree.successors.update({n: daughters[:]
+                                       for n, daughters in self.successors.items()})
+            newTree.predecessors = {k: v for k, v in self.predecessors.items()}
+            newTree.nodesMapping = {n.node: n.copy() for n in self.nodes}
+            if self._root is not None:
+                newTree._root = newTree.nodesMapping[self._root.node]
         if self._canonName:
             newTree._canonName = self._canonName
-        if self._root is not None:
-            newTree._root = newTree.nodesMapping[self._root.node]
+
+        newTree._weight = self._weight
 
         return newTree
 
@@ -751,19 +840,19 @@ class Tree(object):
         """
 
         malformedTree = False
-        if len(self.nodes_and_edges) > 1:
+        if len(self.successors) > 1:
             root = self.root
 
             # Check if root has no parents and at least one daughter
-            if self.in_degree(root) != 0 or self.out_degree(root) == 0:
+            if self.in_degree(root.node) != 0 or self.out_degree(root.node) == 0:
                 malformedTree = True
 
             # Check if all nodes (except root) have a unique parent
-            if any(self.in_degree(node) != 1 for node in self.nodes if node is not root):
+            if any(self.in_degree(node.node) != 1 for node in self.nodes if node is not root):
                 malformedTree = True
 
             # Check if all nodes can be reached from the root node
-            if len(self.dfs_successors(includeLeaves=True)) != len(self.nodes_and_edges):
+            if len(self.dfs_successors(includeLeaves=True)) != len(self.successors):
                 malformedTree = True
 
         if malformedTree:
@@ -784,12 +873,13 @@ class Tree(object):
 
         nodesB = other.nodes
         newMapping = {n.node: n + nodesB[inode]
-                    for inode, n in enumerate(self.nodes)}
+                      for inode, n in enumerate(self.nodes)}
 
         newTree = Tree()
         newTree._canonName = self._canonName
         newTree._root = newMapping[self._root.node]
-        newTree.nodes_and_edges = self.nodes_and_edges
+        newTree.successors.update({k: v[:] for k, v in self.successors.items()})
+        newTree.predecessors.update({k: v for k, v in self.predecessors.items()})
         # Just change the nodeIndex -> node mapping:
         newTree.nodesMapping = newMapping
 
@@ -818,14 +908,14 @@ class Tree(object):
 
             atNode = list(common_nodes)[0]  # merge node of self
             # Make sure the node from self replaces the equivalent node from other
-            atNode = [n for n in self.nodes if n == atNode][0]
+            atNode = self.nodesMapping[atNode.node]
 
         if not any(n is atNode for n in self.nodes):
             raise SModelSError("Attach node must belong to self")
 
-        if other.out_degree(atNode) != 0:
+        if other.out_degree(atNode.node) != 0:
             raise SModelSError("Can not attach tree. Common node can not have daughters in the other tree.")
-        if self.in_degree(atNode) != 0:
+        if self.in_degree(atNode.node) != 0:
             raise SModelSError("Can not attach tree. Common node can not have parents in self.")
 
         newTree = other.copyTree()
@@ -833,7 +923,11 @@ class Tree(object):
         newTree.nodesMapping[atNode.node] = atNode
 
         for mom, daughters in self.bfs_successors(atNode, includeLeaves=True):
+            newTree.add_node(mom)
             newTree.add_edges_from(product([mom], daughters))
+
+        # Update weight
+        newTree._weight = self.getTreeWeight()*other.getTreeWeight()
 
         return newTree
 

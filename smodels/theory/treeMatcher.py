@@ -53,8 +53,8 @@ class TreeMatcher(object):
         The comparison is made according to their names, particle content and final states.
         It uses the node comparison to define semantically equivalent nodes.
 
-        :param T1_node: Particle node belonging to self.T1
-        :param T2_node: Particle node belonging to self.T2
+        :param T1_node: Node index belonging to self.T1
+        :param T2_node: Node index belonging to self.T2
 
         :return: (cmp,matcDict), where: cmp = 0 (nodes are equal), 1 (T1_node > T2_node) or -1 (T1_node < T2_node)
                  and matchDict = None (nodes differ) or a dictionary with the mapping of the nodes daughters
@@ -62,17 +62,19 @@ class TreeMatcher(object):
         """
 
         # Compare nodes directly (canon name and particle content)
-        cmp = T1_node.compareTo(T2_node)
+        node1 = self.T1.nodesMapping[T1_node]
+        node2 = self.T2.nodesMapping[T2_node]
+        cmp = node1.compareTo(node2)
         if cmp != 0:
             return (cmp, None)
 
         # For inclusive nodes always return True (once nodes are equal)
-        if T1_node.isInclusive or T2_node.isInclusive:
+        if node1.isInclusive or node2.isInclusive:
             return (0, {T1_node: T2_node})
 
         # Check for equality of daughters
-        successors1 = self.T1.successors(T1_node)
-        successors2 = self.T2.successors(T2_node)
+        successors1 = self.T1.successors[T1_node]
+        successors2 = self.T2.successors[T2_node]
         if len(successors1) == len(successors2) == 0:
             return (0, {T1_node: T2_node})
 
@@ -80,10 +82,14 @@ class TreeMatcher(object):
         # and the remaining nodes are sorted by canonName and particle, so if the nodes differ,
         # the comparison is independent of the original daughters position
         sortedDaughters1 = sorted(successors1,
-                                  key=lambda n: (not n.isInclusive, n.canonName, n.particle))
+                                  key=lambda n: (not self.T1.nodesMapping[n].isInclusive,
+                                                 self.T1.nodesMapping[n].canonName,
+                                                 self.T1.nodesMapping[n].particle))
 
         sortedDaughters2 = sorted(successors2,
-                                  key=lambda n: (not n.isInclusive, n.canonName, n.particle))
+                                  key=lambda n: (not self.T2.nodesMapping[n].isInclusive,
+                                                 self.T2.nodesMapping[n].canonName,
+                                                 self.T2.nodesMapping[n].particle))
 
         # Compare daughters directly:
         cmpDict = {}
@@ -189,7 +195,7 @@ class TreeMatcher(object):
             self.swapTrees()
             invert = not invert
 
-        cmp, mappingDict = self.compareSubTrees(self.T1.root, self.T2.root)
+        cmp, mappingDict = self.compareSubTrees(self.T1.root.node, self.T2.root.node)
         if invert:
             cmp = -cmp
         if cmp != 0:
@@ -197,7 +203,7 @@ class TreeMatcher(object):
             if isInclusiveT1 and isInclusiveT2:
                 self.swapTrees()
                 invert = not invert
-                cmp_swap, _ = self.compareSubTrees(self.T1.root, self.T2.root)
+                cmp_swap, _ = self.compareSubTrees(self.T1.root.node, self.T2.root.node)
                 if cmp_swap != 0:
                     return cmp, None
             else:
@@ -215,28 +221,26 @@ class TreeMatcher(object):
             sourceTree = self.T1
             baseTree = self.T2
 
-        # Make a copy of the source tree
-        matchedTree = sourceTree.copyTree()
+        # Make a new tree
+        matchedTree = sourceTree.copyTree(emptyNodes=True)
 
-        # Remove all nodes and edges
-        matchedTree.clear()
         # Store the nodes in the correct order:
         newNodes = []
         for n in baseTree.nodes:  # match = {baseTree : sourceTree}
-            if n not in match:  # In case of inclusive nodes the match is partial
+            if n.node not in match:  # In case of inclusive nodes the match is partial
                 continue
-            if n.isInclusive:
+            elif n.isInclusive:
                 newNode = n.copy()
             else:
                 # Make a copy of the original node
-                newNode = match[n].copy()
+                newNode = sourceTree.nodesMapping[match[n.node]].copy()
             newNode.node = n.node   # Force the node numbering to be equal
             newNodes.append(newNode)
-            match[n] = newNode  # Update the dictionary with the copied node
+            match[n.node] = newNode  # Update the dictionary with the copied node
 
         # Store the edges in the correct order:
-        newEdges = [(match[nA], match[nB]) for nA, nB in baseTree.edges
-                    if (nA in match and nB in match)]
+        newEdges = [(match[nA.node], match[nB.node]) for nA, nB in baseTree.edges
+                    if (nA.node in match and nB.node in match)]
         # Add the nodes and the edges to the new tree:
         matchedTree.add_nodes_from(newNodes)
         matchedTree.add_edges_from(newEdges)

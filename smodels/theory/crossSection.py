@@ -9,6 +9,7 @@
 """
 
 from smodels.tools.physicsUnits import TeV, pb, GeV
+import unum
 from smodels.theory import lheReader
 import pyslha
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -229,7 +230,7 @@ class XSection(object):
         valA = self.value
         if isinstance(other, XSection):
             valB = other.value
-        elif type(other) == type(pb):
+        elif isinstance(other, unum.Unum):
             valB = other
         elif isinstance(other, (int, float)):
             valB = other
@@ -310,6 +311,7 @@ class XSectionList(object):
 
         """
         self.xSections = []
+        self.maxValue = 0*pb
 
         if infoList:
             for info in infoList:
@@ -323,6 +325,8 @@ class XSectionList(object):
         newList = self.copy()
         for ixsec, xsec in enumerate(newList):
             newList[ixsec] = xsec * other
+
+        self.maxValue *= other
         return newList
 
     def __rmul__(self, other):
@@ -521,7 +525,7 @@ class XSectionList(object):
         allInfo = []
         for xsec in self:
             info = xsec.info
-            if not info in allInfo:
+            if info not in allInfo:
                 allInfo.append(info)
         return allInfo
 
