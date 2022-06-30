@@ -60,10 +60,10 @@ class Element(object):
         # Check graph consistency and sort it
         # (must be a rooted tree with each node having a single parent):
         if self.tree and self.tree.number_of_nodes():
-            self.tree.checkConsistency()
             self.tree.setGlobalProperties()
             if sort:
                 self.sort()
+            self.tree.checkConsistency()
 
     def sort(self):
         """
@@ -435,7 +435,7 @@ class Element(object):
         for mom, daughters in list(tree.bfs_successors(root)):
             if mom is root:  # Skip primary vertex
                 continue
-            if mom not in tree.nodes:  # In case the mother has been removed by compression
+            if mom.node not in tree.successors:  # In case the mother has been removed by compression
                 continue
             if not mom.particle.isPrompt():  # Skip long-lived
                 continue
@@ -443,7 +443,7 @@ class Element(object):
             smDaughters = []
             for d in daughters:
                 # Split daughters into final states SM and others (BSM)
-                if hasattr(d, 'isSM') and d.isSM and not list(tree.successors(d)):
+                if hasattr(d, 'isSM') and d.isSM and tree.out_degree(d.node) == 0:
                     smDaughters.append(d)
                 else:
                     bsmDaughter.append(d)
@@ -459,16 +459,13 @@ class Element(object):
                 continue
 
             # Get grandmother:
-            gMom = tree.predecessors(mom)
-            if len(gMom) != 1:
-                raise SModelSError('Found multiple parents for %s when compressing element. Something went wrong.' % mom)
-
-            gMom = gMom[0]
+            gMomIndex = tree.predecessors[mom.node]
             # Remove mother and all SM daughters and mom:
-            tree.remove_nodes_from(smDaughters+[mom])
+            removeIndices = [d.node for d in smDaughters] + [mom.node]
+            tree.remove_nodes_from(removeIndices)
 
             # Attach BSM daughter to grandmother:
-            tree.add_edge(gMom, bsmDaughter)
+            tree.add_edge(tree.nodesMapping[gMomIndex], bsmDaughter)
 
         # Recompute the canonical name and
         newelement.tree.setGlobalProperties()
@@ -502,7 +499,7 @@ class Element(object):
                 if mom == root:  # Skip primary vertex
                     continue
                 # Skip node if its daughters are not stable
-                if any(tree.out_degree(d) != 0 for d in daughters):
+                if any(tree.out_degree(d.node) != 0 for d in daughters):
                     continue
                 # Check if all daughters can be considered MET
                 neutralDaughters = all(d.particle.isMET() for d in daughters)
@@ -513,7 +510,8 @@ class Element(object):
                 if (not neutralDaughters) or (not neutralMom):
                     continue
 
-                tree.remove_nodes_from(daughters)
+                removeIndices = [d.node for d in daughters]
+                tree.remove_nodes_from(removeIndices)
                 # Replace mom particle by invisible (generic) particle
                 # with its width equal to the maximum width amongst the daughters
                 maxWidth = max([d.totalwidth for d in daughters])

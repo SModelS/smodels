@@ -13,6 +13,7 @@ from smodels.theory.auxiliaryFunctions import bracketToProcessStr
 from smodels.tools.inclusiveObjects import InclusiveValue
 from smodels.theory.treeMatcher import TreeMatcher, sortTreeList
 from smodels.theory.particleNode import ParticleNode, InclusiveParticleNode
+from smodels.tools.physicsUnits import fb
 from collections import OrderedDict
 from itertools import product
 import unum
@@ -438,7 +439,7 @@ class Tree(object):
                     # For inclusive nodes, add decays as possible final states
                     # and do not include nodes in the tree
                     if momNode.isInclusive:
-                        self.remove_node(node)
+                        self.remove_node(node.node)
                         momNode.finalStates.append(node.particle)
                     else:
                         edges.append((momNode, node))
@@ -472,7 +473,7 @@ class Tree(object):
             for n in daughters:
                 if n.isInclusive and n.finalStates:
                     stable = False
-                elif self.out_degree(n) == 0:
+                elif self.out_degree(n.node) == 0:
                     stable = True
                 else:
                     stable = False
@@ -508,7 +509,7 @@ class Tree(object):
                  (e.g. [[['e-','mu'],['L']],[['jet']]])
         """
 
-        branches = [b for b in self.successors(self.root)]
+        branches = [self.nodesMapping[b] for b in self.successors[self.root.node]]
         finalState = []
         intermediateState = []
         branchList = []
@@ -518,7 +519,7 @@ class Tree(object):
             intermediateState.append([])
             branchList.append([])
             # Deal separately with the case where the primary mother is stable:
-            if self.out_degree(b) == 0:
+            if self.out_degree(b.node) == 0:
                 if not b.isSM:
                     finalState.append(str(b))
                     continue
@@ -526,7 +527,8 @@ class Tree(object):
                     raise SModelSError("Can not convert tree with Z2-violating decays to bracket")
             for mom, daughters in self.bfs_successors(b):
                 vertexList = [str(d) for d in daughters if d.isSM]
-                fstates = [str(d) for d in daughters if not d.isSM and self.out_degree(d) == 0]
+                fstates = [str(d) for d in daughters
+                           if not d.isSM and self.out_degree(d.node) == 0]
                 if daughters:
                     if len(vertexList) != len(daughters) - 1 or len(fstates) > 1:
                         raise SModelSError("Can not convert tree with Z2-violating decays to bracket: \n  %s" % self.treeToString())
@@ -668,7 +670,7 @@ class Tree(object):
         Computes the tree maximum weight (max production cross-section*BRs). If it can not be computed,
         return None. Does not include the weight of final state (undecayed) particles.
 
-        :return: tree weight (Unum object) if available, None otherwise.
+        :return: tree weight in fb (float) if available, None otherwise.
         """
 
         if self._weight is not None:
@@ -676,10 +678,12 @@ class Tree(object):
 
         weight = self.getTreeWeightList()
 
-        if isinstance(weight, (int, float, unum.Unum)):
+        if isinstance(weight, (int, float)):
             self._weight = weight
+        elif isinstance(weight, unum.Unum):
+            self._weight = weight.asNumber(fb)
         else:
-            self._weight = weight.getMaxXsec()
+            self._weight = weight.getMaxXsec().asNumber(fb)
         return self._weight
 
     def getSubTree(self, source):
@@ -773,14 +777,18 @@ class Tree(object):
             node.node = inode
             inode += 1
 
-        new_nodes_and_edges = OrderedDict()
+        new_successors = OrderedDict()
+        new_predecessors = {}
         newMapping = {}
         for node, daughters in nodeOrder:
             daughters = sorted(daughters, key=lambda d: d.node)
-            new_nodes_and_edges[node.node] = [d.node for d in daughters]
+            new_successors[node.node] = [d.node for d in daughters]
+            for d in daughters:
+                new_predecessors[d.node] = node.node
             newMapping[node.node] = node
 
-        self.successors = new_nodes_and_edges
+        self.successors = new_successors
+        self.predecessors = new_predecessors
         self.nodesMapping = newMapping
 
     def copyTree(self, emptyNodes=False):
@@ -821,10 +829,10 @@ class Tree(object):
         # Get root:
         root = newTree.root
         # Get final state nodes:
-        fsNodes = [node for node in newTree.nodes if newTree.out_degree(node) == 0]
+        fsNodes = [node for node in newTree.nodes if newTree.out_degree(node.node) == 0]
         fsNodes = sorted(fsNodes, key=lambda node: node.particle)
         # Remove all nodes
-        newTree.remove_nodes_from(list(newTree.nodes))
+        newTree.clear()
 
         # Add root > fsNode edges:
         edges = [(root, fsNode) for fsNode in fsNodes]
@@ -841,14 +849,15 @@ class Tree(object):
 
         malformedTree = False
         if len(self.successors) > 1:
-            root = self.root
+            rootIndex = self.root.node
 
             # Check if root has no parents and at least one daughter
-            if self.in_degree(root.node) != 0 or self.out_degree(root.node) == 0:
+            if self.in_degree(rootIndex) != 0 or self.out_degree(rootIndex) == 0:
                 malformedTree = True
 
             # Check if all nodes (except root) have a unique parent
-            if any(self.in_degree(node.node) != 1 for node in self.nodes if node is not root):
+            if any(self.in_degree(nodeIndex) != 1 for nodeIndex in self.successors
+                   if nodeIndex != rootIndex):
                 malformedTree = True
 
             # Check if all nodes can be reached from the root node

@@ -62,6 +62,7 @@ class Particle(object):
             setattr(newParticle, attr, value)
         newParticle._id = Particle.getID()
         newParticle._comp = {newParticle._id: 0}
+        newParticle._isStable = None
         Particle._instances.add(weakref.ref(newParticle))
         return newParticle
 
@@ -338,7 +339,10 @@ class Particle(object):
         :return: True/False
         """
 
-        return self.totalwidth.asNumber() == 0.
+        if self._isStable is None:
+            self._isStable = (self.totalwidth.asNumber() == 0)
+
+        return self._isStable
 
     def contains(self, particle):
         """

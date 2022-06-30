@@ -56,7 +56,7 @@ class AverageElement(Element):
         #  Replace particles in nodes by generic particles
         #  holding the average attributes (assume the elements are sorted)
         newTree = self.elements[0].tree.copyTree()
-        for nodeIndex in newTree.nodes_and_edges:
+        for nodeIndex in newTree.successors:
             eqNodes = [el.tree.nodesMapping[nodeIndex] for el in elements]
             # Do nothing for root:
             if nodeIndex == newTree.root.node:

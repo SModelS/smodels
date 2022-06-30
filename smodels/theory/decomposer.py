@@ -41,6 +41,7 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
 
     if isinstance(sigmacut, (float, int)):
         sigmacut = float(sigmacut) * fb
+    sigmacutFB = sigmacut.asNumber(fb)  # sigmacut in fb (faster comparison)
 
     xSectionList.removeLowerOrder()
     # Order xsections by highest xsec value to improve performance
@@ -51,7 +52,7 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
     productionTrees = []
     for pid in xSectionList.getPIDpairs():
         weight = xSectionList.getXsecsFor(pid)
-        if weight < sigmacut:
+        if weight.getMaxXsec().asNumber(fb) < sigmacutFB:
             continue
         pv = ParticleNode(model.getParticlesWith(label='PV')[0], 0, nodeWeight=weight)
         pv.xsection = xSectionList.getXsecsFor(pid)
@@ -67,7 +68,7 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
     # For each production tree, produce all allowed cascade decays (above sigmacut):
     allTrees = []
     for tree in productionTrees:
-        allTrees += cascadeDecay(tree, sigmacut=sigmacut)
+        allTrees += cascadeDecay(tree, sigmacutFB=sigmacutFB)
 
     # Create elements for each tree and combine equal elements
     smsTopDict = TopologyDict()
@@ -134,7 +135,7 @@ def getDecayTrees(mother):
     return decayTrees
 
 
-def addOneStepDecays(tree, sigmacut=0*fb):
+def addOneStepDecays(tree, sigmacutFB=0.0):
     """
     Given a tree, generates a list of new trees (Tree objects),
     where all the (unstable) nodes appearing at the end of the original tree
@@ -142,8 +143,8 @@ def addOneStepDecays(tree, sigmacut=0*fb):
     of decays. If no decays were possible, return an empty list.
 
     :param tree: Tree (Tree object) for which to add the decays
-    :param sigmacut: Cut on the tree weight (xsec*BR). Any tree with weights
-                     smaller than sigmacut will be ignored.
+    :param sigmacutFB: Cut on the tree weight (xsec*BR) in fb. Any tree with weights
+                     smaller than sigmacutFB will be ignored.
 
 
     :return: List of trees with all possible 1-step decays added.
@@ -181,24 +182,17 @@ def addOneStepDecays(tree, sigmacut=0*fb):
         newTrees = []
         for T in treeList:
             tweight = T.getTreeWeight()
-            if tweight < sigmacut:
+            if tweight < sigmacutFB:
                 continue
             for decay in decayTrees:
                 dweight = decay.getTreeWeight()
-                if tweight*dweight < sigmacut:
+                if tweight*dweight < sigmacutFB:
                     break  # Since the decays are sorted, the next ones will also fall below sigmacut
 
                 # The order below matters,
                 # since we want to keep the mother from the decay tree (which holds the BR value)
                 dec = decay.copyTree()
                 newTree = dec.attachTo(T)
-
-                treeWeight = newTree.getTreeWeight()
-                if treeWeight is not None and treeWeight < sigmacut:
-                    # Do not consider this decay or the next ones,
-                    # since they are sorted accodring to BR and the subsequent
-                    # decays will only contain smaller weights
-                    break
                 newTrees.append(newTree)
 
         if not newTrees:
@@ -212,14 +206,14 @@ def addOneStepDecays(tree, sigmacut=0*fb):
         return treeList
 
 
-def cascadeDecay(tree, sigmacut=None):
+def cascadeDecay(tree, sigmacutFB=0.0):
     """
     Given a tree, generates a list of new trees (Tree objects),
     where all the particles have cascade decayed to stable final states.
 
     :param tree: Tree (Tree object) for which to add the decays
-    :param sigmacut: Cut on the tree weight (xsec*BR). Any tree with weights
-                     smaller than sigmacut will be ignored.
+    :param sigmacutFB: Cut on the tree weight (xsec*BR) inf b. Any tree with weights
+                     smaller than sigmacutFB will be ignored.
 
     :return: List of trees with all possible decays added.
     """
@@ -230,11 +224,11 @@ def cascadeDecay(tree, sigmacut=None):
     while newTrees:
         newTrees = []
         for T in treeList:
-            newT = addOneStepDecays(T, sigmacut)
+            newT = addOneStepDecays(T, sigmacutFB)
             if not newT:
                 finalNodes = [n for n in T.nodes if T.out_degree(n.node) == 0]
                 # Make sure all the final states have decayed
-                # (newT can be empty if there is no allowed decay above sigmacut)
+                # (newT can be empty if there is no allowed decay above sigmacutFB)
                 if any(fn.isFinalState is False for fn in finalNodes):
                     continue
                 finalTrees.append(T)  # It was not possible to add any new decay to the tree

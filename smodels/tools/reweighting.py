@@ -40,7 +40,7 @@ def getWidthsFromElement(element):
         if node.isInclusive:
             continue
 
-        if tree.out_degree(node) != 0:
+        if tree.out_degree(node.node) != 0:
             width = node.totalwidth
             if isinstance(width, list):  # If width is a list (MultiParticle obj), use smallest
                 width = min(width)

@@ -526,7 +526,7 @@ class TxName(object):
                     continue
                 if d.isInclusive:
                     continue
-                if tree.out_degree(d) != 0:  # Ignore unstable daughters (will appear as mom)
+                if tree.out_degree(d.node) != 0:  # Ignore unstable daughters (will appear as mom)
                     continue
                 nodeArray.append(d)
 
@@ -588,8 +588,8 @@ class TxName(object):
         dataMap = self.dataMap
         elementData = [None]*(1+max(dataMap.keys()))
         for indexArray, nodeTuple in dataMap.items():
-            nodeNumber, attr, unit = nodeTuple
-            node = element.tree.getNode(nodeNumber)
+            nodeIndex, attr, unit = nodeTuple
+            node = element.tree.nodesMapping[nodeIndex]
             value = getattr(node, attr)
             if isinstance(unit, unum.Unum):
                 value = value.asNumber(unit)
@@ -641,7 +641,7 @@ class TxName(object):
             if mom.node not in widthsInData:
                 unstableWidths.append(mom.totalwidth)
             for d in daughters:
-                if tree.out_degree(d) != 0:
+                if tree.out_degree(d.node) != 0:
                     continue   # Skip intermediate states
                 if d.isInclusive:
                     continue

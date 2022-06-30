@@ -152,7 +152,8 @@ class TreeMatcher(object):
                 matched = True
                 unMatched = [d1 for d1 in left_nodes if d1 not in mapDict]
                 for d1 in unMatched:
-                    if any(not d2.isInclusive for d2 in edges[d1]):
+                    if any(not self.T2.nodesMapping[d2].isInclusive
+                           for d2 in edges[d1]):
                         matched = False
                         break
 
