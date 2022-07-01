@@ -380,7 +380,7 @@ class MultiParticle(Particle):
 
         particles = sorted(particles)
         if not label:
-            label = "/".join([p.label for p in particles])
+            label = "/".join(sorted(list(set([p.label for p in particles]))))
         attrDict = dict(attributesDict.items())
         attrDict.update(kwargs)
         attrDict.pop('_id', None)
