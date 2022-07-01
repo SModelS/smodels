@@ -430,18 +430,22 @@ class Element(object):
         newelement.motherElements = [self]
 
         tree = newelement.tree
-        root = tree.root
+        root = tree.root.node
         # Loop over nodes from root to leaves:
         for mom, daughters in list(tree.bfs_successors(root)):
-            if mom is root:  # Skip primary vertex
+            if mom == root:  # Skip primary vertex
                 continue
-            if mom.node not in tree.successors:  # In case the mother has been removed by compression
+            if mom not in tree.successors:  # In case the mother has been removed by compression
                 continue
+            # Convert node index to node object
+            mom = tree.nodesMapping[mom]
             if not mom.particle.isPrompt():  # Skip long-lived
                 continue
             bsmDaughter = []
             smDaughters = []
             for d in daughters:
+                # Convert to node object
+                d = tree.nodesMapping[d]
                 # Split daughters into final states SM and others (BSM)
                 if hasattr(d, 'isSM') and d.isSM and tree.out_degree(d.node) == 0:
                     smDaughters.append(d)
@@ -493,14 +497,17 @@ class Element(object):
 
         while keepCompressing:
             tree = newelement.tree
-            root = tree.root
+            root = tree.root.node
             # Loop over nodes:
             for mom, daughters in tree.bfs_successors(root):
                 if mom == root:  # Skip primary vertex
                     continue
                 # Skip node if its daughters are not stable
-                if any(tree.out_degree(d.node) != 0 for d in daughters):
+                if any(tree.out_degree(d) != 0 for d in daughters):
                     continue
+                # Convert indices to node objects:
+                mom = tree.nodesMapping[mom]
+                daughters = [tree.nodesMapping[d] for d in daughters]
                 # Check if all daughters can be considered MET
                 neutralDaughters = all(d.particle.isMET() for d in daughters)
                 # Check if the mother is MET or prompt:

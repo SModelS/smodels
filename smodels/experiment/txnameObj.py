@@ -517,9 +517,12 @@ class TxName(object):
         # Get a nested array of nodes corresponding to the data point:
         nodeArray = []
         for mom, daughters in tree.dfs_successors().items():
+            # Convert to node objects:
+            mom = tree.nodesMapping[mom]
+            daughters = [tree.nodesMapping[d] for d in daughters]
             if mom.isInclusive:
                 continue
-            if mom != tree.root:  # Ignore PV
+            if mom is not tree.root:  # Ignore PV
                 nodeArray.append(mom)
             for d in daughters:
                 if d.isSM:  # Ignore SM particles
@@ -634,7 +637,10 @@ class TxName(object):
         stableWidths = []
         tree = element.tree
         for mom, daughters in tree.dfs_successors().items():
-            if mom == tree.root:
+            # Convert to node objects:
+            mom = tree.nodesMapping[mom]
+            daughters = [tree.nodesMapping[d] for d in daughters]
+            if mom is tree.root:
                 continue  # Ignore primary vertex
             if mom.isInclusive:
                 continue  # Ignore inclusive nodes

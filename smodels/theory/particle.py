@@ -540,7 +540,7 @@ class MultiParticle(Particle):
         if addParticles:
             self.particles += addParticles[:]
             self.particles = sorted(self.particles)
-            #Since the multiparticle changed, reset comparison tracking:
+            # Since the multiparticle changed, reset comparison tracking:
             self._comp = {self._id: 0}
             for ptc in self.particles:
                 self._comp[ptc._id] = 0
