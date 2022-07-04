@@ -490,7 +490,7 @@ class TxName(object):
 
         return massPoint
 
-    def getDataMap(self, massPoint):
+    def getDataMap(self, dataPoint):
         """
         Using the elements in the topology, construct a dictionary
         mapping the node.number, the node attributes and the corresponding
@@ -516,6 +516,7 @@ class TxName(object):
 
         # Get a nested array of nodes corresponding to the data point:
         nodeArray = []
+
         for mom, daughters in tree.dfs_successors().items():
             # Convert to node objects:
             mom = tree.nodesMapping[mom]
@@ -538,7 +539,7 @@ class TxName(object):
         arrayMap = {}
         massIndex = 0  # Initial index for the masses
         widthIndex = len(nodeArray)  # Initial index for the widths
-        for i, br in enumerate(massPoint):
+        for i, br in enumerate(dataPoint):
             if br == '*':
                 continue  # Skip inclusive branch
             for j, m in enumerate(br):
@@ -849,4 +850,5 @@ class TxName(object):
             return True
         if self.txnameDataExp is not None:
             return True
+        return False
         return False

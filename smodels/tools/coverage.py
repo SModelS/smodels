@@ -341,7 +341,7 @@ class FinalStateElement(Element):
                         node.particle = bsmFS
                         break
 
-        finalStatesEl.tree.sort()
+        finalStatesEl.tree.sort(force=True)
         finalStatesEl.tree.setGlobalProperties()
         finalStatesEl._contributingElements = [el]
 

@@ -65,13 +65,15 @@ class Element(object):
                 self.sort()
             self.tree.checkConsistency()
 
-    def sort(self):
+    def sort(self, force=False):
         """
         Sort the tree according to the canonName and then particle. For each node,
         all the daughters are sorted according to their canonName.
+
+        :param force: If True, it will sort the tree even if it is tagged as sorted.
         """
 
-        self.tree.sort()
+        self.tree.sort(force=force)
         self.tree.numberNodes()
 
     def compareTo(self, other):
@@ -473,7 +475,7 @@ class Element(object):
 
         # Recompute the canonical name and
         newelement.tree.setGlobalProperties()
-        newelement.sort()
+        newelement.sort(force=True)
 
         # If element was not compressed, return None
         if newelement.canonName == self.canonName:
@@ -541,7 +543,7 @@ class Element(object):
             else:
                 keepCompressing = True
                 previousName = name
-        newelement.sort()
+        newelement.sort(force=True)
 
         # If element was not compressed, return None
         if newelement.canonName == self.canonName:
