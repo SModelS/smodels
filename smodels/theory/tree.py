@@ -979,55 +979,43 @@ class Tree(object):
 
         return newTree
 
-    def attachTo(self, other, atNode=None):
+    def attachDecay(self, decay, copy=True):
         """
         Returns a copy of other with self attached to it at node atNode.
         If atNode is not defined, the trees are joined where the nodes overlap.
         The overlapping node from self is kept.
 
-        :param other: tree (Tree object)
-        :param atNode: node (ParticleNode object) where the merge has to take place
-                        If not defined, will find the common node between the trees.
+        :param decay: A tuple containint the mother node (carring the BR as the nodeWeight)
+                      and the daughter nodes.
+        :param copy: if True, return a copy of self, with the decay attached.
 
         : return: new tree with the other composed with self.
         """
 
-        if atNode is None:
-            # Find intersection:
-            self_nodes = set(list(self.nodes))
-            other_nodes = set(list(other.nodes))
-            common_nodes = self_nodes.intersection(other_nodes)
-            if len(common_nodes) != 1:
-                raise SModelSError("Can not merge trees. %i common nodes found" % len(common_nodes))
+        mother = decay[0]
+        daughters = decay[1]
 
-            atNode = list(common_nodes)[0]  # merge node of self
-            # Make sure the node from self replaces the equivalent node from other
-            atNode = self.nodesMapping[atNode.node]
+        if copy:
+            tree = self.copyTree()
+        else:
+            tree = self
 
-        if not any(n is atNode for n in self.nodes):
-            raise SModelSError("Attach node must belong to self")
+        # Update tree weight
+        if tree._weight:
+            oldMotherWeight = tree.nodesMapping[mother.node].nodeWeight
+            if oldMotherWeight:
+                tree._weight = tree._weight/oldMotherWeight
+            tree._weight = tree._weight*mother.nodeWeight
+        # Update mother node:
+        tree.nodesMapping[mother.node] = mother
+        # Add daughter nodes to nodes map:
+        for d in daughters:
+            tree.add_edge(mother, d)
 
-        if other.out_degree(atNode.node) != 0:
-            raise SModelSError("Can not attach tree. Common node can not have daughters in the other tree.")
-        if self.in_degree(atNode.node) != 0:
-            raise SModelSError("Can not attach tree. Common node can not have parents in self.")
+        # The tree is no longer sorted
+        tree._sorted = False
 
-        newTree = other.copyTree()
-        # Replace node from base tree by atNode:
-        newTree.nodesMapping[atNode.node] = atNode
-
-        for mom, daughters in self.bfs_successors(atNode.node, includeLeaves=True):
-            # Convert to node objects
-            mom = self.nodesMapping[mom]
-            daughters = [self.nodesMapping[d] for d in daughters]
-            newTree.add_node(mom)
-            newTree.add_edges_from(product([mom], daughters))
-
-        # Update weight
-        newTree._weight = self.getTreeWeight()*other.getTreeWeight()
-        newTree._sorted = False
-
-        return newTree
+        return tree
 
     def draw(self, particleColor='lightcoral',
              smColor='skyblue',

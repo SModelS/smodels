@@ -87,7 +87,7 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
     return smsTopDict
 
 
-def getDecayTrees(mother):
+def getDecayNodes(mother):
     """
     Generates a simple list of trees with all the decay channels
     for the mother. In each tree the mother appears as the root
@@ -101,8 +101,9 @@ def getDecayTrees(mother):
 
     :param mother: Mother for which the decay trees will be generated (ParticleNode object)
 
-    :return: List of simple trees representing the decay channels of daughter sorted in reverse
-             order according to the BR (largest BR first)
+    :return: A list with simple tuples ((mom,daughters)) where
+             the first entry is the new mother ParticleNode (with its nodeWeight set to the decay BR)
+             and the second is a list of daughter ParticleNode objects.
     """
 
     decayTrees = []
@@ -115,8 +116,9 @@ def getDecayTrees(mother):
         else:
             # Include possibility of mother appearing as a final state
             mom = mother.copy()
+            mom.nodeWeight = 1.0
             mom.isFinalState = True  # Forbids further node decays
-            decayTrees.append(Tree({mom: []}))
+            decayTrees.append((mom, []))
 
     decays = sorted(decays, key=lambda dec: dec.br, reverse=True)
     # Loop over decays of the daughter
@@ -130,7 +132,7 @@ def getDecayTrees(mother):
             ptcNode = ParticleNode(particle=ptc)
             daughters.append(ptcNode)
 
-        decayTrees.append(Tree({mom: daughters}))
+        decayTrees.append((mom, daughters))
 
     return decayTrees
 
@@ -170,9 +172,9 @@ def addOneStepDecays(tree, sigmacutFB=0.0):
             continue
 
         # Get all decay trees for final state:
-        decayTrees = getDecayTrees(mom)
+        decayTrees = getDecayNodes(mom)
         # Sort by weight
-        decayTrees = sorted(decayTrees, key=lambda dTree: dTree.getTreeWeight(),
+        decayTrees = sorted(decayTrees, key=lambda decay: decay[0].nodeWeight,
                             reverse=True)
         if not decayTrees:
             mom.isFinalState = True
@@ -185,14 +187,13 @@ def addOneStepDecays(tree, sigmacutFB=0.0):
             if tweight < sigmacutFB:
                 continue
             for decay in decayTrees:
-                dweight = decay.getTreeWeight()
+                dweight = decay[0].nodeWeight
                 if tweight*dweight < sigmacutFB:
                     break  # Since the decays are sorted, the next ones will also fall below sigmacut
 
-                # The order below matters,
-                # since we want to keep the mother from the decay tree (which holds the BR value)
-                dec = decay.copyTree()
-                newTree = dec.attachTo(T)
+                # Attach decay to original tree
+                # (the mother node gets replaced by node from the decay dict)
+                newTree = T.attachDecay(decay, copy=True)
                 newTrees.append(newTree)
 
         if not newTrees:
@@ -200,7 +201,7 @@ def addOneStepDecays(tree, sigmacutFB=0.0):
         treeList = sorted(newTrees, key=lambda t: t.getTreeWeight(),
                           reverse=True)
 
-    if len(treeList) == 1 and treeList[0] == tree:
+    if len(treeList) == 1 and treeList[0] is tree:
         return []
     else:
         return treeList
@@ -219,9 +220,8 @@ def cascadeDecay(tree, sigmacutFB=0.0):
     """
 
     treeList = [tree]
-    newTrees = True
     finalTrees = []
-    while newTrees:
+    while treeList:
         newTrees = []
         for T in treeList:
             newT = addOneStepDecays(T, sigmacutFB)
@@ -235,8 +235,6 @@ def cascadeDecay(tree, sigmacutFB=0.0):
             else:
                 newTrees += newT  # Add decayed trees to the next iteration
 
-        if not newTrees:  # It was not possible to add any new decay
-            break
         treeList = newTrees[:]
 
     return finalTrees
