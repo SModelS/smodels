@@ -258,9 +258,16 @@ class TheoryPredictionsCombiner(object):
             tp_marginalize = tp.marginalize
             tp.marginalize = self.marginalize
             tmp = tp.likelihood(mu, expected=expected, useCached=useCached)
-            llhd = llhd * tmp
+            if tmp == None:
+                llhd = 0
+            else:
+                llhd = llhd * tmp
             # Restore marginalize setting:
             tp.marginalize = tp_marginalize
+        if llhd == 0:
+            llhd = None
+            self.cachedLlhds[expected][mu] = llhd
+            return None
         self.cachedLlhds[expected][mu] = llhd
         if nll:
             if llhd == 0.0:  # cut off nll at 999
@@ -338,12 +345,12 @@ class TheoryPredictionsCombiner(object):
         :param allowNegativeSignals: if true, then also allow for negative values
         :param expected: if true, compute expected prior (=lsm), if "posteriori"
                          compute posteriori expected
-        :param extended_output: if true, return also sigma_mu, the estimate of the 
+        :param extended_output: if true, return also sigma_mu, the estimate of the
                          error of mu_hat, and lmax, the likelihood at mu_hat
         :param nll: if true, return negative log max likelihood instead of lmax
-        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended 
-                  output is requested, it returns a dictionary with mu_hat, 
-                  sigma_mu -- the standard deviation around mu_hat, and lmax, 
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended
+                  output is requested, it returns a dictionary with mu_hat,
+                  sigma_mu -- the standard deviation around mu_hat, and lmax,
                   i.e. the likelihood at mu_hat
         """
         import scipy.optimize
@@ -368,7 +375,7 @@ class TheoryPredictionsCombiner(object):
                 retllh = self.theoryPredictions[0].likelihood ( muhat, nll = nll, expected = expected )
                 return {"muhat": muhat, "sigma_mu": sigma_mu, "lmax": retllh}
             return muhat
-            
+
         if len(muhats) == 0:
             logger.error(f"asked to compute muhat for combination, but no individual values")
             if extended_output:
@@ -457,14 +464,14 @@ class TheoryPredictionsCombiner(object):
         """
         # if "UL" in self.cachedObjs[expected]:
         #     return self.cachedObjs[expected]["UL"]
-        fmh = self.findMuHat(expected=expected, allowNegativeSignals=False, 
+        fmh = self.findMuHat(expected=expected, allowNegativeSignals=False,
                              extended_output=True)
         mu_hat, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         mu_hat = mu_hat if mu_hat is not None else 0.0
         nll0 = self.likelihood(mu_hat, expected=expected, nll=True)
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
-        fmh = self.findMuHat(expected="posteriori", allowNegativeSignals=False, 
+        fmh = self.findMuHat(expected="posteriori", allowNegativeSignals=False,
                              nll=True, extended_output=True)
         mu_hatA, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
 
