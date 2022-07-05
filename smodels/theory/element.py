@@ -88,37 +88,23 @@ class Element(object):
 
         :param other:  element to be compared (Element object)
 
-        :return: (cmp,otherSorted), where cmp = -1 if self < other, 0 if self == other, +1, if self > other and otherSorted is None if cmp != 0 or other sorted according to the way it matched self.
+        :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
         if not isinstance(other, Element):
-            return -1, None
+            return -1
 
-        # make sure the topology names have been computed:
-        canonName = self.tree.canonName
-        otherName = other.tree.canonName
-        if canonName != otherName:
-            if canonName > otherName:
-                return 1, None
-            else:
-                return -1, None
+        # Compare the trees:
+        cmp = self.tree.compareTreeTo(other.tree)
 
-        # Recursively compare the nodes:
-        cmp, newTree = self.tree.compareTreeTo(other.tree)
-
-        if cmp == 0:  # Elements matched, return copy of other with tree sorted
-            otherNew = other.copy(emptyTree=True)
-            otherNew.tree = newTree
-        else:
-            otherNew = None
-        return cmp, otherNew
+        return cmp
 
     def __eq__(self, other):
-        cmp, otherSorted = self.compareTo(other)
+        cmp = self.compareTo(other)
         return (cmp == 0)
 
     def __lt__(self, other):
-        cmp, otherSorted = self.compareTo(other)
+        cmp = self.compareTo(other)
         return (cmp < 0)
 
     def __gt__(self, other):

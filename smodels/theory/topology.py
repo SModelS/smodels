@@ -10,7 +10,6 @@
 """
 
 from smodels.theory.element import Element
-from smodels.theory.auxiliaryFunctions import index_bisect
 
 
 class TopologyDict(dict):
@@ -39,7 +38,7 @@ class TopologyDict(dict):
                 hi = len(elementList)
                 while lo < hi:
                     mid = (lo+hi)//2
-                    cmp, newEl = elementList[mid].compareTo(newelement)
+                    cmp = elementList[mid].compareTo(newelement)
                     if cmp < 0:
                         lo = mid+1
                     elif cmp > 0:
@@ -49,7 +48,7 @@ class TopologyDict(dict):
                         break
                 index = lo
                 if cmp == 0:
-                    elementList[index] += newEl
+                    elementList[index] += newelement
                 else:
                     elementList.insert(index, newelement)
 
