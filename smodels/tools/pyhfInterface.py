@@ -439,14 +439,14 @@ class PyhfUpperLimitComputer:
                         for sample in range(len(channel['samples'])):
                             for modifier in channel['samples'][sample]['modifiers']:
                                 # The multiplicative modifier (i.e. parameter) that will be increased is a 'staterror' one (others may work as well)
-                                if 'type' in modifier.keys() and modifier['type'] == 'staterror':
+                                # In case of a simplified json, let's take the only parameter called 'totalError'
+                                if ('type' in modifier.keys() and modifier['type'] == 'staterror') or modifier['name'] == 'totalError':
                                     name = modifier['name']
                                     break
                 # Find the position of the parameter within the pyhf list of parameters
                 position = self.get_position(name,model)+bin_num
                 # Find the upper bound of the parameter that will be increased
                 max_bound = model.config.suggested_bounds()[position][1]
-                #print(f'initial staterror of bin {pos}:',init_pars[position])
                 # If the parameter one wants to increase is not fixed, add 0.1 to its value (it is an arbitrary step) until
                 # the total yield becomes positive or the parameter upper bound is reached
                 if not model.config.suggested_fixed()[position]:
@@ -456,23 +456,9 @@ class PyhfUpperLimitComputer:
                         else:
                             init_pars[position] = max_bound
                             break
-                    #print(f'actualdata before changing staterror in bin {pos}:',model.expected_actualdata(init_pars)[pos])
-                    #nominal_init_pars = model.config.suggested_init()
-                    #nominal_init_pars[model.config.poi_index] = 0
-                    #print('actualdata bg only:',model.expected_actualdata(nominal_init_pars)[pos])
-                    #nominal_bg = model.expected_actualdata(nominal_init_pars)[pos]
-                    #nsigpyhf = np.array([0.0, 0.0, 0.0, 3.8385295078033232, 6.798207594690076, 6.4233656554685785, 1.5951140115408478, 0.43669404083287855, 0.9448899210237275])
-                    #nsigpyhf = np.array([1.4349825452486582, 1.0533138982733217, 1.1158810930352483, 0.719039660507198, 0.9461983338046028, 1.5376094024329356, 0.8276376394629201, 0.8551014982035671, 1.6913336713087228])
-                    #print('signal only pyhf:', nsigpyhf[pos])
-                    #nominal_yield = nsigpyhf[pos] + nominal_bg
-                    #init_pars[position] = ((nominal_yield - mu*nsigpyhf[pos])/nominal_bg).item()
-                    #if not model.config.suggested_bounds()[get_position(name)+bin_num][0] <= ((nominal_yield - mu*nsigpyhf[pos])/nominal_bg).item() <= max_bound:
-                    #    print('Initial parameter outside its bounds')
-                #print(f'final staterror of bin {pos}:',init_pars[position])
-                #print(f'actualdata after changing staterror in bin {pos}:',model.expected_actualdata(init_pars))
         return init_pars
 
-    def likelihood(self, mu=1.0, workspace_index=None, nll=False, expected=False, previous=False):
+    def likelihood(self, mu=1.0, workspace_index=None, nll=False, expected=False):
         """
         Returns the value of the likelihood.
         Inspired by the `pyhf.infer.mle` module but for non-log likelihood
@@ -533,12 +519,6 @@ class PyhfUpperLimitComputer:
                 model = workspace.model(modifier_settings=msettings)
                 wsData = workspace.data(model)
 
-                # indices = []
-                # slices = list(workspace.channel_slices.values())
-                # for slce in slices:
-                #     for i in range(slce.start, slce.stop):
-                #         indices.append(i)
-
                 _, nllh = pyhf.infer.mle.fixed_poi_fit(
                     1.0, wsData, model, return_fitted_val=True, maxiter=200
                 )
@@ -550,12 +530,11 @@ class PyhfUpperLimitComputer:
                 )
                 initpars = init.tolist()
                 initpars[model.config.poi_index] = 1.
-                if not previous :
-                    # Try to turn positive all the negative total yields (mu*signal + background) evaluated with the initial parameters
-                    initpars = self.rescaleBgYields(initpars, workspace, model)
-                    # If the a total yield is still negative with the increased initial parameters, print a message
-                    if not all([True if yld >= 0 else False for yld in model.expected_actualdata(initpars)]):
-                        print(f'Negative total yield after increasing the initial parameters for mu={mu} and previous={previous}')
+                # Try to turn positive all the negative total yields (mu*signal + background) evaluated with the initial parameters
+                initpars = self.rescaleBgYields(initpars, workspace, model)
+                # If the a total yield is still negative with the increased initial parameters, print a message
+                if not all([True if yld >= 0 else False for yld in model.expected_actualdata(initpars)]):
+                    print(f'Negative total yield after increasing the initial parameters for mu={mu}')
                 try:
                     bestFitParam, nllh = pyhf.infer.mle.fixed_poi_fit(
                         1.0,
@@ -565,11 +544,10 @@ class PyhfUpperLimitComputer:
                         init_pars=initpars,
                         maxiter=2000,
                     )
-                    if not previous:
-                        # If a total yield is negative with the best profiled parameters, return None
-                        if not all([True if yld >= 0 else False for yld in model.expected_actualdata(bestFitParam)]):
-                            self.restore()
-                            return self.exponentiateNLL(None, not nll)
+                    # If a total yield is negative with the best profiled parameters, return None
+                    if not all([True if yld >= 0 else False for yld in model.expected_actualdata(bestFitParam)]):
+                        self.restore()
+                        return self.exponentiateNLL(None, not nll)
                 except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                     logger.info(f"pyhf fixed_poi_fit failed twice for mu={mu}: {e}")
 
