@@ -48,7 +48,7 @@ class TxName(object):
         self.arrayMap = None
         self.elementMap = {}  # Stores the elements and their label representaion
         self._constraintFunc = None
-        self._conditionsDict = {}
+        self._conditionsList = []
         self.finalState = ['MET', 'MET']  # default final state
         self.intermediateState = None  # default intermediate state
 
@@ -113,16 +113,16 @@ class TxName(object):
             self.elementMap = elMap
 
         # Process conditions, simplify it so it can be easily evaluated and
-        # stores the expressions and element maps in _conditionsDict
+        # stores the expressions and element maps in _conditionsList
         if hasattr(self, 'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds, list):
                 conds = [conds]
-            conditionsDict = {}
+            conditionsList = []
             for cond in conds:
                 exprFunc, elMap = self.processExpr(cond, databaseParticles)
-                conditionsDict[exprFunc] = elMap
-            self._conditionsDict = conditionsDict
+                conditionsList.append({exprFunc: elMap})
+            self._conditionsList = conditionsList
 
         # Do consistency checks:
         self.checkConsistency()
@@ -195,11 +195,12 @@ class TxName(object):
 
         # Dummy condistions eval:
         elements = []
-        for elMap in self._conditionsDict.values():
-            for elObj, elLabel in elMap.items():
-                elTest = elObj.copy()
-                elTest.weight = 3.0*(len(elements)+1)*physicsUnits.fb  # dumyy xsec
-                elements.append(elTest)
+        for cond in self._conditionsList:
+            for elMap in cond.values():
+                for elObj, elLabel in elMap.items():
+                    elTest = elObj.copy()
+                    elTest.weight = 3.0*(len(elements)+1)*physicsUnits.fb  # dumyy xsec
+                    elements.append(elTest)
         try:
             res = self.evalConditionsFor(elements)
         except (TypeError, NameError) as e:
@@ -249,7 +250,7 @@ class TxName(object):
                             model=databaseParticles,
                             sort=False)
 
-            if checkUnique and any(elObj == el for el in elementMap):
+            if checkUnique and any(elObj.matchElementTo(el) for el in elementMap):
                 msgError = "Duplicate elements found in: "
                 msgError += "%s in %s" % (stringExpr, self.globalInfo.id)
                 logger.error(msgError)
@@ -306,23 +307,25 @@ class TxName(object):
         :return: List of condition values.
         """
 
-        if not self._conditionsDict:
+        if not self._conditionsList:
             return None
 
         conditions = []
-        for cond, elMap in self._conditionsDict.items():
+        for cond in self._conditionsList:
+            condExpr = list(cond.keys())[0]
+            elMap = list(cond.values())[0]
             weightsMap = {elLabel: 0.0*physicsUnits.fb for elLabel in elMap.values()}
             # Add weights for matching elements:
             for el in elements:
                 for elC, elLabel in elMap.items():
-                    if el == elC:
+                    if elC.matchElementTo(el) is not None:
                         weightsMap[elLabel] += el.weight
             # Build dict with needed functions
             localsDict = {"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim}
             # Add weightMap:
             localsDict.update(weightsMap)
             # Evaluate condition:
-            conditions.append(eval(cond, localsDict, {}))
+            conditions.append(eval(condExpr, localsDict, {}))
 
         return conditions
 
@@ -831,11 +834,12 @@ class TxName(object):
         # (takes into account inclusive names)
         for el, elLabel in self.elementMap.items():
             # Compare elements:
-            cmp, sortedEl = el.compareTo(element)
-            if cmp == 0:
-                # Attach label used for evaluating expressions
-                sortedEl.txlabel = elLabel
-                return sortedEl
+            sortedEl = el.matchElementTo(element)
+            if sortedEl is None:
+                continue
+            # Attach label used for evaluating expressions
+            sortedEl.txlabel = elLabel
+            return sortedEl
 
         # If this point was reached, there were no macthes
         return False

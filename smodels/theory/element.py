@@ -60,7 +60,7 @@ class Element(object):
         # Check graph consistency and sort it
         # (must be a rooted tree with each node having a single parent):
         if self.tree and self.tree.number_of_nodes():
-            self.tree.setGlobalProperties()
+            self.tree.getCanonName()
             if sort:
                 self.sort()
             self.tree.checkConsistency()
@@ -191,6 +191,30 @@ class Element(object):
         self.tree = self.tree + other.tree
 
         return self
+
+    def matchElementTo(self, other):
+        """
+        Checks if the element matches to other.
+        The element matches if they have the same topology (canonical name),
+        and their trees match. Inclusive nodes/particles are always assumed
+        to belong to self.
+
+        :param other: Element object
+
+        :return: None if elements do not match. Otherwise returns a copy of
+                 other sorted according to self.
+        """
+
+        # Check if trees match
+        matchedTree = self.tree.matchTreeTo(other.tree)
+        if matchedTree is None:
+            return None
+
+        # In case the trees match, return a copy of other with the new tree.
+        matchedEl = other.copy(emptyTree=True)
+        matchedEl.tree = matchedTree
+
+        return matchedEl
 
     def drawTree(self, particleColor='lightcoral',
                  smColor='skyblue',
@@ -351,7 +375,7 @@ class Element(object):
 
         canonName = self.tree.canonName
         if not canonName:
-            self.tree.setGlobalProperties()
+            self.tree.getCanonName()
             canonName = self.tree.canonName
 
         return canonName
@@ -421,14 +445,12 @@ class Element(object):
         root = tree.root.node
         # Loop over nodes from root to leaves:
         for mom, daughters in list(tree.bfs_successors(root)):
-            if mom == root:  # Skip primary vertex
+            if mom is root:  # Skip primary vertex
                 continue
             if mom not in tree.successors:  # In case the mother has been removed by compression
                 continue
             # Convert node index to node object
             mom = tree.nodesMapping[mom]
-            if not mom.particle.isPrompt():  # Skip long-lived
-                continue
             bsmDaughter = []
             smDaughters = []
             for d in daughters:
@@ -447,7 +469,8 @@ class Element(object):
 
             # Check mass difference:
             massDiff = mom.mass - bsmDaughter.mass
-            if massDiff > minmassgap:
+            # Skip if mass difference is above minimum or if the parent is long-lived
+            if massDiff > minmassgap or not mom.particle.isPrompt():
                 continue
 
             # Get grandmother:
@@ -459,8 +482,8 @@ class Element(object):
             # Attach BSM daughter to grandmother:
             tree.add_edge(tree.nodesMapping[gMomIndex], bsmDaughter)
 
-        # Recompute the canonical name and
-        newelement.tree.setGlobalProperties()
+        # Recompute the canonical name and sort the element
+        newelement.tree.getCanonName()
         newelement.sort(force=True)
 
         # If element was not compressed, return None
@@ -521,7 +544,7 @@ class Element(object):
                 break
 
             # Recompute the canonical name and
-            newelement.tree.setGlobalProperties()
+            newelement.tree.getCanonName()
             # If iteration has not changed element, break loop
             name = newelement.canonName
             if name == previousName:
@@ -529,6 +552,7 @@ class Element(object):
             else:
                 keepCompressing = True
                 previousName = name
+        # Sort element
         newelement.sort(force=True)
 
         # If element was not compressed, return None

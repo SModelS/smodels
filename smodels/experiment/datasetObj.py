@@ -190,7 +190,7 @@ class DataSet(object):
         combos = itertools.combinations(datasetElements, 2)
 
         for x, y in combos:
-            if x == y and _complainAboutOverlappingConstraints:
+            if x.matchElementTo(y) and _complainAboutOverlappingConstraints:
                 errmsg = "Constraints (%s) and (%s) appearing in dataset %s:%s overlap "\
                          "(may result in double counting)." % \
                          (x, y, self.getID(), self.globalInfo.id)

@@ -13,8 +13,8 @@ import collections
 class TreeMatcher(object):
     """
     Isomorphism checker for labelled trees. It starts at the root and checks for subtree
-    isomosphisms. The tree and subtree topology is encoded in its encoding (canonical name),
-    so the comparison is made based on its canonical name. If a set of neighboor subtrees
+    isomosphisms. The tree and subtree topology is encoded in its canonical name,
+    so the comparison is made based on it. If a set of neighboor subtrees
     have identical names, all the permutations are tested for isomorphism.
     The comparison relies on the method for node comparison, which compares canonical names
     and particle content.
@@ -26,16 +26,8 @@ class TreeMatcher(object):
 
         :parameter T1: Tree object
         :parameter T2: Tree object
-        :param inclusive: If False, particles are required to be identical
-                          (the inclusiveness of MultiParticles or InclusiveNodes
-                          are not considered when comparing)
-
-
-        :return: A dictionary mappinn the nodes of treeA and treeB ({nA : nB}).
-
         """
 
-        # These will be modified during checks to minimize code repeat.
         self.T1 = T1
         self.T2 = T2
 
@@ -56,86 +48,81 @@ class TreeMatcher(object):
         :param T1_node: Node index belonging to self.T1
         :param T2_node: Node index belonging to self.T2
 
-        :return: (cmp,matcDict), where: cmp = 0 (nodes are equal), 1 (T1_node > T2_node) or -1 (T1_node < T2_node)
-                 and matchDict = None (nodes differ) or a dictionary with the mapping of the nodes daughters
-                 ({d1 : d2}).
+        :return: matcDict is None (subtrees differ) or a dictionary
+                 with the mapping of the nodes daughters ({d1 : d2}).
         """
 
         # Compare nodes directly (canon name and particle content)
         node1 = self.T1.nodesMapping[T1_node]
         node2 = self.T2.nodesMapping[T2_node]
+        if node1.isInclusive:
+            self.T2.getFinalStates(node2.node)  # Make sure final states are defined
+        if node2.isInclusive:
+            self.T1.getFinalStates(node1.node)  # Make sure final states are defined
+
         cmp = node1.compareTo(node2)
         if cmp != 0:
-            return (cmp, None)
+            return None
 
         # For inclusive nodes always return True (once nodes are equal)
         if node1.isInclusive or node2.isInclusive:
-            return (0, {T1_node: T2_node})
+            return {T1_node: T2_node}
 
         # Check for equality of daughters
-        successors1 = self.T1.successors[T1_node]
-        successors2 = self.T2.successors[T2_node]
-        if len(successors1) == len(successors2) == 0:
-            return (0, {T1_node: T2_node})
-
-        # Sort the daughters. Inclusive nodes will always come first,
-        # and the remaining nodes are sorted by canonName and particle, so if the nodes differ,
-        # the comparison is independent of the original daughters position
-        sortedDaughters1 = sorted(successors1,
-                                  key=lambda n: (not self.T1.nodesMapping[n].isInclusive,
-                                                 self.T1.nodesMapping[n].canonName,
-                                                 self.T1.nodesMapping[n].particle))
-
-        sortedDaughters2 = sorted(successors2,
-                                  key=lambda n: (not self.T2.nodesMapping[n].isInclusive,
-                                                 self.T2.nodesMapping[n].canonName,
-                                                 self.T2.nodesMapping[n].particle))
+        daughters1 = self.T1.successors[T1_node]
+        daughters2 = self.T2.successors[T2_node]
+        if len(daughters1) == len(daughters2) == 0:
+            return {T1_node: T2_node}
 
         # Compare daughters directly:
-        cmpDict = {}
-        cmp_max = 0
-        for d1, d2 in zip(sortedDaughters1, sortedDaughters2):
-            cmp, mapDict = self.compareSubTrees(d1, d2)
-            cmp_max = max(abs(cmp), cmp_max)  # Stores 1, if any pair of nodes differs
-            cmpDict[d1] = {d2: (cmp, mapDict)}
+        matchesDict = {}
+        directMatch = True
+        for d1, d2 in zip(daughters1, daughters2):
+            mapDict = self.compareSubTrees(d1, d2)
+            matchesDict[d1] = {d2: mapDict}  # Store the comparison
+            if mapDict is None:
+                directMatch = False
+
         # Check for a direct match first
-        # (likely since daughters are sorted):
-        if cmp_max == 0 and len(sortedDaughters1) == len(sortedDaughters2):
+        if directMatch and len(daughters1) == len(daughters2):
             mapDict = {T1_node: T2_node}
-            mapDict.update({d1: d2 for d1, d2 in zip(sortedDaughters1, sortedDaughters2)})
-            for node1 in cmpDict:
-                daughtersMap = list(cmpDict[node1].values())[0][1]
+            mapDict.update({d1: d2 for d1, d2 in zip(daughters1, daughters2)})
+            for node1 in matchesDict:
+                daughtersMap = list(matchesDict[node1].values())[0]
                 mapDict.update(daughtersMap)
-            return (0, mapDict)
+            return mapDict
 
         # Define left and right nodes in order to compute matching:
-        left_nodes = sortedDaughters1[:]
-        right_nodes = sortedDaughters2[:]
+        left_nodes = daughters1[:]
+        right_nodes = daughters2[:]
         edges = {}
         for d1 in left_nodes:
-            if d1 not in cmpDict:
-                cmpDict[d1] = {}
-            for d2 in sortedDaughters2:
-                if d2 in cmpDict[d1]:
-                    cmp, mapDict = cmpDict[d1][d2]
+            if d1 not in matchesDict:
+                matchesDict[d1] = {}
+            for d2 in right_nodes:
+                if d2 in matchesDict[d1]:
+                    mapDict = matchesDict[d1][d2]
                 else:
-                    cmp, mapDict = self.compareSubTrees(d1, d2)
-                    cmpDict[d1].update({d2: (cmp, mapDict)})
-                if cmp == 0:
-                    if d1 not in edges:
-                        edges[d1] = {d2: mapDict}
-                    else:
-                        edges[d1].update({d2: mapDict})
+                    mapDict = self.compareSubTrees(d1, d2)
+                    matchesDict[d1].update({d2: mapDict})
+
+                # If daughters do not match, do not include in edges
+                if mapDict is None:
+                    continue
+                if d1 not in edges:
+                    edges[d1] = {d2: mapDict}
+                else:
+                    edges[d1].update({d2: mapDict})
 
             # If node had no matches (was not added to the graph),
             # we already know T1_node and T2_node differs
             if d1 not in edges:
-                break
+                return None
 
         # Check if all nodes were included in the graph
         # (they had at least one match)
         if len(edges) != len(left_nodes):
-            matched = False
+            return None
         else:
             # Compute the maximal matching
             # (mapping where each node1 is connected to a single node2)
@@ -166,16 +153,12 @@ class TreeMatcher(object):
 
             # If all nodes appear in mapDict, one permutation was found
             # where all nodes match:
-            return (0, mapDict)
+            return mapDict
 
         else:
-            # Otherwise compare subtrees according to their sorted particles:
-            for d1, d2 in zip(sortedDaughters1, sortedDaughters2):
-                cmp, _ = cmpDict[d1][d2]
-                if cmp != 0:
-                    return (cmp, None)
+            return None
 
-    def compareTrees(self, invert=False):
+    def matchTrees(self, invert=False):
         """
         Compare self.T1 to self.T2. Returns an isomorphism of self.T2 which
         matches T1. If T2 contains an inclusive node, T2 can be a subtree of T1 (T2 C T1).
@@ -186,8 +169,7 @@ class TreeMatcher(object):
         :param invert: If True, will return a copy of the
                        T1 tree matching T2.
 
-        :return: Returns the comparison value and the matching tree.
-                 If no matches were found (cmp != 0), return None and the comparison value.
+        :return: Returns the matched tree, if trees match. Otherwise returns None.
         """
 
         isInclusiveT1 = any(n.isInclusive for n in self.T1.nodes)
@@ -196,19 +178,17 @@ class TreeMatcher(object):
             self.swapTrees()
             invert = not invert
 
-        cmp, mappingDict = self.compareSubTrees(self.T1.root.node, self.T2.root.node)
-        if invert:
-            cmp = -cmp
-        if cmp != 0:
+        mappingDict = self.compareSubTrees(self.T1.root.node, self.T2.root.node)
+        if mappingDict is None:
             # If both trees are inclusive, try the opposite comparison:
             if isInclusiveT1 and isInclusiveT2:
                 self.swapTrees()
                 invert = not invert
-                cmp_swap, _ = self.compareSubTrees(self.T1.root.node, self.T2.root.node)
-                if cmp_swap != 0:
-                    return cmp, None
+                mappingDict = self.compareSubTrees(self.T1.root.node, self.T2.root.node)
+                if mappingDict is None:
+                    return None
             else:
-                return cmp, None
+                return None
 
         # Remove unmatched nodes (which happens in case of InclusiveNodes)
         match = {n1: n2 for n1, n2 in mappingDict.items() if n2 is not None}
@@ -245,9 +225,8 @@ class TreeMatcher(object):
         # Add the nodes and the edges to the new tree:
         matchedTree.add_nodes_from(newNodes)
         matchedTree.add_edges_from(newEdges)
-        matchedTree.setGlobalProperties()
 
-        return 0, matchedTree
+        return matchedTree
 
     def maximal_matching(self, left, right, edges):
         """
@@ -311,34 +290,3 @@ class TreeMatcher(object):
         leftmatches = {k: v for k, v in leftmatches.items() if v is not None}
 
         return leftmatches
-
-
-def sortTreeList(treeList):
-    """
-    Sort a list of Tree objects according to the compareTrees method.
-
-    :param treeList: List of Tree objects
-
-    :return: Sorted list of Tree objects
-    """
-
-    # Create a listed of sorted nodes with proper canonical names according to the node comparison.
-    # Make sure trees which have an include node as root are always at the beginning
-    inclusiveTrees = [t for t in treeList if t.root.isInclusive]
-    sortedTrees = []
-    for tree in treeList:
-        if tree.root.isInclusive:
-            continue
-
-        lo = 0
-        hi = len(sortedTrees)
-        while lo < hi:
-            mid = (lo+hi)//2
-            if tree.compareTreeTo(sortedTrees[mid])[0] > 0:
-                lo = mid+1
-            else:
-                hi = mid
-        sortedTrees.insert(lo, tree)
-
-    sortedTrees = inclusiveTrees + sortedTrees
-    return sortedTrees
