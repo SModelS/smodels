@@ -440,3 +440,280 @@ class TheorySMS(GenericSMS):
         return newTree
 
 
+################ ---------------- REFACTORED UP TO HERE ----------
+
+    def _getAncestorsDict(self, igen=0):
+        """
+        Returns a dictionary with all the ancestors
+        of the element. The dictionary keys are integers
+        labeling the generation (number of generations away from self)
+        and the values are a list of Element objects (ancestors) for that generation.
+        igen is used as the counter for the initial generation.
+        The output is also stored in self._ancestorsDict for future use.
+
+        :param igen: Auxiliary integer indicating to which generation self belongs.
+
+        :return: Dictionary with generation index as key and ancestors as values
+                 (e.g. {igen+1 : [mother1, mother2], igen+2 : [grandmother1,..],...})
+        """
+
+        ancestorsDict = {igen + 1: []}
+        for mother in self.motherElements:
+            if mother is self:
+                continue
+            ancestorsDict[igen + 1].append(mother)
+            for jgen, elList in mother._getAncestorsDict(igen + 1).items():
+                if jgen not in ancestorsDict:
+                    ancestorsDict[jgen] = []
+                ancestorsDict[jgen] += elList
+
+        # Store the result
+        self._ancestorsDict = dict([[key, val] for key, val in ancestorsDict.items()])
+
+        return self._ancestorsDict
+
+    def getAncestors(self):
+        """
+        Get a list of all the ancestors of the element.
+        The list is ordered so the mothers appear first, then the grandmother,
+        then the grandgrandmothers,...
+
+        :return: A list of Element objects containing all the ancestors sorted by generation.
+        """
+
+        # Check if the ancestors have already been obtained (performance gain)
+        if not hasattr(self, '_ancestorsDict'):
+            self._getAncestorsDict()
+
+        orderedAncestors = []
+        for jgen in sorted(self._ancestorsDict.keys()):
+            orderedAncestors += self._ancestorsDict[jgen]
+
+        return orderedAncestors
+
+    def isRelatedTo(self, other):
+        """
+        Checks if the element has any common ancestors with other or one
+        is an ancestor of the other.
+        Returns True if self and other have at least one ancestor in common
+        or are the same element, otherwise returns False.
+
+        :return: True/False
+        """
+
+        ancestorsA = set([id(self)] + [id(el) for el in self.getAncestors()])
+        ancestorsB = set([id(other)] + [id(el) for el in other.getAncestors()])
+
+        if ancestorsA.intersection(ancestorsB):
+            return True
+        else:
+            return False
+
+    def setTestedBy(self, resultType):
+        """
+        Tag the element, all its daughter and all its mothers
+        as tested by the type of result specified.
+        It also recursively tags all granddaughters, grandmothers,...
+
+        :param resultType: String describing the type of result (e.g. 'prompt', 'displaced')
+        """
+
+        self.testedBy.add(resultType)
+        for ancestor in self.getAncestors():
+            ancestor.testedBy.add(resultType)
+
+    def setCoveredBy(self, resultType):
+        """
+        Tag the element, all its daughter and all its mothers
+        as covered by the type of result specified.
+        It also recursively tags all granddaughters, grandmothers,...
+
+        :param resultType: String describing the type of result (e.g. 'prompt', 'displaced')
+        """
+
+        self.coveredBy.add(resultType)
+        for mother in self.getAncestors():
+            mother.coveredBy.add(resultType)
+
+    def compressElement(self, doCompress, doInvisible, minmassgap):
+        """
+        Keep compressing the original element and the derived ones till they
+        can be compressed no more.
+
+        :parameter doCompress: if True, perform mass compression
+        :parameter doInvisible: if True, perform invisible compression
+        :parameter minmassgap: value (in GeV) of the maximum
+                               mass difference for compression
+                               (if mass difference < minmassgap, perform mass compression)
+        :returns: list with the compressed elements (Element objects)
+        """
+
+        if not doCompress and not doInvisible:
+            return []
+
+        added = True
+        newElements = [self]
+        # Keep compressing the new topologies generated so far until no new
+        # compressions can happen:
+        while added:
+            added = False
+            # Check for mass compressed topologies
+            if doCompress:
+                for element in newElements:
+                    newel = element.massCompress(minmassgap)
+                    # Avoids double counting
+                    # (elements sharing the same parent are removed during clustering)
+                    if (newel is not None) and (newel not in newElements):
+                        newElements.append(newel)
+                        added = True
+
+            # Check for invisible compressed topologies (look for effective
+            # LSP, such as LSP + neutrino = LSP')
+            if doInvisible:
+                for element in newElements:
+                    newel = element.invisibleCompress()
+                    # Avoids double counting
+                    # (elements sharing the same parent are removed during clustering)
+                    if (newel is not None) and (newel not in newElements):
+                        newElements.append(newel)
+                        added = True
+
+        newElements.pop(0)  # Remove original element
+
+        return newElements
+
+    def massCompress(self, minmassgap):
+        """
+        Perform mass compression.
+
+        :parameter minmassgap: value (in GeV) of the maximum
+                               mass difference for compression
+                               (if mass difference < minmassgap -> perform mass compression)
+        :returns: compressed copy of the element, if two masses in this
+                  element are degenerate; None, if compression is not possible;
+        """
+
+        newelement = self.copy()
+        newelement.motherElements = [self]
+
+        tree = newelement.tree
+        root = tree.root.node
+        # Loop over nodes from root to leaves:
+        for mom, daughters in list(tree.bfs_successors(root)):
+            if mom is root:  # Skip primary vertex
+                continue
+            if mom not in tree.successors:  # In case the mother has been removed by compression
+                continue
+            # Convert node index to node object
+            mom = tree.nodesMapping[mom]
+            bsmDaughter = []
+            smDaughters = []
+            for d in daughters:
+                # Convert to node object
+                d = tree.nodesMapping[d]
+                # Split daughters into final states SM and others (BSM)
+                if hasattr(d, 'isSM') and d.isSM and tree.out_degree(d.node) == 0:
+                    smDaughters.append(d)
+                else:
+                    bsmDaughter.append(d)
+
+            # Skip decays to multiple BSM particles or to SM particles only
+            if len(bsmDaughter) != 1:
+                continue
+            bsmDaughter = bsmDaughter[0]
+
+            # Check mass difference:
+            massDiff = mom.mass - bsmDaughter.mass
+            # Skip if mass difference is above minimum or if the parent is long-lived
+            if massDiff > minmassgap or not mom.particle.isPrompt():
+                continue
+
+            # Get grandmother:
+            gMomIndex = tree.predecessors[mom.node]
+            # Remove mother and all SM daughters and mom:
+            removeIndices = [d.node for d in smDaughters] + [mom.node]
+            tree.remove_nodes_from(removeIndices)
+
+            # Attach BSM daughter to grandmother:
+            tree.add_edge(tree.nodesMapping[gMomIndex], bsmDaughter)
+
+        # Recompute the canonical name and sort the element
+        newelement.tree.getCanonName()
+        newelement.sort(force=True)
+
+        # If element was not compressed, return None
+        if newelement.canonName == self.canonName:
+            return None
+        else:
+            return newelement
+
+    def invisibleCompress(self):
+        """
+        Perform invisible compression.
+
+        :returns: compressed copy of the element, if element ends with invisible
+                  particles; None, if compression is not possible
+        """
+
+        newelement = self.copy()
+        newelement.motherElements = [self]
+        keepCompressing = True
+        # Check for compression until tree can no longer be compressed
+        previousName = self.canonName
+
+        while keepCompressing:
+            tree = newelement.tree
+            root = tree.root.node
+            # Loop over nodes:
+            for mom, daughters in tree.bfs_successors(root):
+                if mom == root:  # Skip primary vertex
+                    continue
+                # Skip node if its daughters are not stable
+                if any(tree.out_degree(d) != 0 for d in daughters):
+                    continue
+                # Convert indices to node objects:
+                mom = tree.nodesMapping[mom]
+                daughters = [tree.nodesMapping[d] for d in daughters]
+                # Check if all daughters can be considered MET
+                neutralDaughters = all(d.particle.isMET() for d in daughters)
+                # Check if the mother is MET or prompt:
+                neutralMom = (mom.isMET() or mom.isPrompt())
+
+                # If mother and daughters are neutral, remove daughters
+                if (not neutralDaughters) or (not neutralMom):
+                    continue
+
+                removeIndices = [d.node for d in daughters]
+                tree.remove_nodes_from(removeIndices)
+                # Replace mom particle by invisible (generic) particle
+                # with its width equal to the maximum width amongst the daughters
+                maxWidth = max([d.totalwidth for d in daughters])
+                invParticle = Particle(label='inv', mass=mom.mass,
+                                       eCharge=0, colordim=1,
+                                       _isInvisible=True,
+                                       totalwidth=maxWidth,
+                                       pdg=mom.pdg, isSM=mom.isSM)
+                mom.particle = invParticle
+
+                # For safety break loop since tree structure changed
+                break
+
+            # Recompute the canonical name and
+            newelement.tree.getCanonName()
+            # If iteration has not changed element, break loop
+            name = newelement.canonName
+            if name == previousName:
+                keepCompressing = False
+            else:
+                keepCompressing = True
+                previousName = name
+        # Sort element
+        newelement.sort(force=True)
+
+        # If element was not compressed, return None
+        if newelement.canonName == self.canonName:
+            return None
+        else:
+            return newelement
+
+
