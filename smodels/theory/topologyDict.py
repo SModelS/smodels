@@ -80,7 +80,7 @@ class TopologyDict(dict):
         """
 
         for sms in self.getSMSList():
-            newSMSList = sms.compressElement(doCompress, doInvisible, minmassgap)
+            newSMSList = sms.compress(doCompress, doInvisible, minmassgap)
             if not newSMSList:
                 continue
             for sms in newSMSList:

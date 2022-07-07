@@ -14,6 +14,7 @@ from smodels.theory.particle import Particle
 from smodels.theory import crossSection
 from itertools import product
 from smodels.tools.physicsUnits import fb
+import unum
 
 class TheorySMS(GenericSMS):
     """
@@ -87,8 +88,9 @@ class TheorySMS(GenericSMS):
         """
 
         # If calling another special method, return default (required for pickling)
-        if attr.startswith('__') and attr.endswith('__'):
-            return object.__getattr__(attr)
+        if (attr.startswith('__') and attr.endswith('__')) or attr in dir(self):
+            return self.__getattribute__(attr)
+
 
         try:
             val = [getattr(node, attr) if str(node) != 'PV' else None
@@ -137,7 +139,7 @@ class TheorySMS(GenericSMS):
         """
 
         if canonName:
-            self._canonName = self.getCanonName()
+            self._canonName = self.computeCanonName()
         if sort:
             self.sort(force=True)
         if weight:
@@ -171,6 +173,9 @@ class TheorySMS(GenericSMS):
             if cmp != 0:
                 return cmp
 
+        # If all nodes are equal, return 0
+        return 0
+
     def copy(self):
         """
         Returns a shallow copy of self.
@@ -182,12 +187,16 @@ class TheorySMS(GenericSMS):
         newSMS._successors.update({n: daughters[:]
                                        for n, daughters in self._successors.items()})
         newSMS._predecessors = {k: v for k, v in self._predecessors.items()}
-        newSMS._nodesMapping = {n: node for n, node in self.nodesMapping.items()}
+        newSMS._nodesMapping = {n: node for n, node in self._nodesMapping.items()}
         newSMS._rootIndex = self._rootIndex
         newSMS._canonName = self._canonName
         newSMS._maxWeight = self._maxWeight
         newSMS._sorted = self._sorted
-        newSMS.weightList = self.weightList.copy()
+        if isinstance(self.weightList,
+                      (crossSection.XSectionList,crossSection.XSection)):
+            newSMS._weightList = self._weightList.copy()
+        else:
+            newSMS._weightList = self._weightList
         newSMS.ancestors = self.ancestors[:]
         if self._allAncestors is not None:
             newSMS._allAncestors = self._allAncestors[:]
@@ -208,13 +217,12 @@ class TheorySMS(GenericSMS):
         if other.canonName != self.canonName:
             raise SModelSError("Can not add trees with distinct topologies")
 
-        nodesB = other.nodes
         newMapping = {}
         for n in self.nodeIndices:
             newMapping[n] = self.indexToNode(n) + other.indexToNode(n)
 
         # Just change the nodeIndex -> node mapping:
-        self.relabelNodes(nodeObjectDict=newMapping)
+        self.updateNodeObjects(nodeObjectDict=newMapping)
 
     def attachDecay(self, motherIndex, decayNodes, copy=True):
         """
@@ -229,6 +237,10 @@ class TheorySMS(GenericSMS):
         : return: new tree with the other composed with self.
         """
 
+        if self.out_degree(motherIndex) != 0:
+            raise SModelSError("Can not attach decay to an intermediate node.")
+
+
         motherNode = decayNodes[0]
         daughterNodes = decayNodes[1]
 
@@ -237,19 +249,16 @@ class TheorySMS(GenericSMS):
         else:
             newSMS = self
 
-        oldMother = self.indexToNode(motherIndex)
         # Update maximum weight
-        if newSMS._maxWeight:
-            oldMotherWeight = oldMother.nodeWeight
-            if oldMotherWeight:
-                newSMS._maxWeight = newSMS._maxWeight/oldMotherWeight
-            newSMS._maxWeight = newSMS._maxWeight*motherNode.nodeWeight
+        if motherNode.nodeWeight is not None:
+            newSMS._maxWeight = newSMS.maxWeight*motherNode.nodeWeight
+            newSMS._weightList = newSMS.weightList*motherNode.nodeWeight
 
         # Update mother node:
-        self.updateNodeObjects({motherIndex : motherNode})
+        newSMS.updateNodeObjects({motherIndex : motherNode})
         # Add daughter nodes and edges:
         for d in daughterNodes:
-            dIndex = self.add_node(d)
+            dIndex = newSMS.add_node(d)
             newSMS.add_edge(motherIndex, dIndex)
 
         # The tree is no longer sorted
@@ -297,7 +306,7 @@ class TheorySMS(GenericSMS):
         """
 
         if self._weightList is None:
-            self._weightList = self.computeMaxWeightList()
+            self._weightList = self.computeWeightList()
 
         return self._weightList
 
@@ -311,12 +320,17 @@ class TheorySMS(GenericSMS):
 
         root = self.root
         prodXSec = root.nodeWeight
-        maxXSec = prodXSec.getMaxXsec().asNumber(fb)
-        maxWeight = self.getMaxWeight()
-        brs = maxWeight/maxXSec
-        weightList = prodXSec*brs
+        brs = 1.0
+        for nodeIndex in self.nodeIndices:
+            if nodeIndex == self.rootIndex:
+                continue
+            if self.out_degree(nodeIndex) == 0:
+                continue
+            node = self.indexToNode(nodeIndex)
+            brs *= node.nodeWeight
 
-        return weightList
+
+        return prodXSec*brs
 
     @property
     def maxWeight(self):
@@ -344,7 +358,6 @@ class TheorySMS(GenericSMS):
         # Get maximum production cross-section
         root = self.root
         prodXSec = root.nodeWeight
-        maxXsec = prodXSec.getMaxXsec().asNumber(fb)
 
         # Get product of branching ratios:
         brs = 1.0
@@ -356,9 +369,18 @@ class TheorySMS(GenericSMS):
             node = self.indexToNode(nodeIndex)
             brs *= node.nodeWeight
 
-        weight = maxXsec*brs
 
-        return weight
+        weight = prodXSec*brs
+        if isinstance(weight,unum.Unum):
+            return weight.asNumber(fb)
+        elif isinstance(weight,float):
+            return weight
+        elif isinstance(weight,crossSection.XSection):
+            return weight.value.asNumber(fb)
+        elif isinstance(weight,crossSection.XSectionList):
+            return weight.getMaxXsec().asNumber(fb)
+        else:
+            return weight
 
     def sort(self, nodeIndex=None, force=False):
         """
@@ -392,7 +414,7 @@ class TheorySMS(GenericSMS):
             # Remove nodeIndex -> daughters edges
             self.remove_edges(product([nodeIndex],daughters))
             # Add edges with the correct ordering:
-            self.add_edges(product([nodeIndex],sorted_daughters))
+            self.add_edges_from(product([nodeIndex],sorted_daughters))
 
         # Finally, after sorting the subtrees,
         # make sure the nodes are sorted according
@@ -481,10 +503,6 @@ class TheorySMS(GenericSMS):
         if cmp != 0:
             return cmp
 
-        # For inclusive nodes always return True (once nodes are equal)
-        if root1.isInclusive or root2.isInclusive:
-            return 0
-
         daughters1 = self.daughterIndices(n1)
         daughters2 = self.daughterIndices(n2)
         # If nodes are leaves, return 0
@@ -524,7 +542,7 @@ class TheorySMS(GenericSMS):
         # Add root > fsNode edges:
         edges = product([rootIndex],fsIndices)
         newTree.add_edges_from(edges)
-        newTree._canonName = newTree.getCanonName()
+        newTree._canonName = newTree.computeCanonName()
         newTree.sort()
 
         return newTree

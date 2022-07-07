@@ -216,8 +216,8 @@ class GenericSMS(object):
         :param nodeIndex: Parent node index
         """
 
-        daughtersIndices = self.daughterIndices(nodeIndex)
-        daughters = self.indexToNode(daughtersIndices)
+        daughterIndices = self.daughterIndices(nodeIndex)
+        daughters = self.indexToNode(daughterIndices)
 
         return daughters
 
@@ -385,13 +385,13 @@ class GenericSMS(object):
             nodeIndex = self.rootIndex
 
         mom = nodeIndex
-        daughters = self.daughtersIndices(mom)[:]
+        daughters = self.computeCanonName(mom)[:]
         daughtersDict = {mom: daughters[:]}
 
         # Go down in generation until it has no more daughters
         while daughters:
             new_mom = daughters.pop(0)
-            new_daughters = self.daughtersIndices[new_mom][:]
+            new_daughters = self.daughterIndices(new_mom)[:]
             if new_daughters or includeLeaves:
                 daughtersDict.update({new_mom: new_daughters[:]})
 
@@ -479,30 +479,38 @@ class GenericSMS(object):
                  (e.g. [[['e-','mu'],['L']],[['jet']]])
         """
 
-        branches = [self.nodesMapping[b] for b in self.successors[self.root.node]]
+        branches = self.daughters(self.rootIndex)
+        branchIndices = self.daughterIndices(self.rootIndex)
         finalState = []
         intermediateState = []
         branchList = []
         if len(branches) != 2:
             raise SModelSError("Can not convert tree to bracket with %i branches" % len(branches))
         for ib, b in enumerate(branches):
+            bIndex = branchIndices[ib]
             intermediateState.append([])
             branchList.append([])
             # Deal separately with the case where the primary mother is stable:
-            if self.out_degree(b.node) == 0:
+            if self.out_degree(bIndex) == 0:
                 if not b.isSM:
                     finalState.append(str(b))
                     continue
                 else:
                     raise SModelSError("Can not convert tree with Z2-violating decays to bracket")
-            for mom, daughters in self.bfs_successors(b.node):
+            for momIndex, daughterIndices in self.genIndexIterator(bIndex):
                 # Convert from indices to node objects
-                mom = self.nodesMapping[mom]
-                daughters = [self.nodesMapping[d] for d in daughters[:]]
+                mom = self.indexToNode(momIndex)
+                daughters = self.indexToNode(daughterIndices)
 
                 vertexList = [str(d) for d in daughters if d.isSM]
-                fstates = [str(d) for d in daughters
-                           if not d.isSM and self.out_degree(d.node) == 0]
+                fstates = []
+                for idaughter, daughter in enumerate(daughters):
+                    if daughter.isSM:
+                        continue
+                    if self.out_degree(daughterIndices[idaughter]) != 0:
+                        continue
+                    fstates.append(str(daughter))
+
                 if daughters:
                     if len(vertexList) != len(daughters) - 1 or len(fstates) > 1:
                         raise SModelSError("Can not convert tree with Z2-violating decays to bracket: \n  %s" % self.treeToString())
@@ -647,7 +655,7 @@ class GenericSMS(object):
         for oldIndex, newIndex in nodeIndexDict.items():
             # Update daughter indices
             newDaughters = []
-            for d in self.daughtersIndices(oldIndex):
+            for d in self.daughterIndices(oldIndex):
                 if d in nodeIndexDict:
                     newDaughters.append(nodeIndexDict[d])
                 else:
@@ -664,7 +672,7 @@ class GenericSMS(object):
         self._successors = newSuccessors
         self._predecessors = newPredecessors
         self._nodesMapping = newMapping
-        self._rootIndex = nodeIndexDict[self._rootindex]
+        self._rootIndex = nodeIndexDict[self._rootIndex]
 
     def updateNodeObjects(self, nodeObjectDict):
         """

@@ -12,7 +12,7 @@
 
 import time
 from smodels.theory.theorySMS import TheorySMS
-from smodels.theory.topologyDicy import TopologyDict
+from smodels.theory.topologyDict import TopologyDict
 from smodels.theory.particleNode import ParticleNode
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -56,8 +56,8 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
         maxWeight = weight.getMaxXsec().asNumber(fb)
         if  maxWeight < sigmacutFB:
             continue
-        pv = ParticleNode(model.getParticlesWith(label='PV')[0], 0, nodeWeight=weight)
-        primaryMothers = [ParticleNode(model.getParticlesWith(pdg=pdg)[0]) for pdg in pdgs]
+        pv = ParticleNode(model.getParticle(label='PV'), nodeWeight=weight)
+        primaryMothers = [ParticleNode(model.getParticle(pdg=pdg)) for pdg in pdgs]
         newSMS = TheorySMS()
         pvIndex = newSMS.add_node(pv)
         motherIndices = newSMS.add_nodes_from(primaryMothers)
@@ -146,7 +146,7 @@ def getDecayNodes(mother):
     return decayTrees
 
 
-def addOneStepDecays(tree, sigmacutFB=0.0):
+def addOneStepDecays(sms, sigmacutFB=0.0):
     """
     Given a tree, generates a list of new trees (Tree objects),
     where all the (unstable) nodes appearing at the end of the original tree
@@ -161,11 +161,12 @@ def addOneStepDecays(tree, sigmacutFB=0.0):
     :return: List of trees with all possible 1-step decays added.
     """
 
-    treeList = [tree]
+    smsList = [sms]
     # Get all (current) final states which are the mothers
     # of the decays to be added:
-    mothers = [n for n in tree.nodes if tree.out_degree(n.node) == 0]
-    for mom in mothers:
+    motherIndices = [n for n in sms.nodeIndices if sms.out_degree(n) == 0]
+    mothers = sms.indexToNode(motherIndices)
+    for motherIndex,mom in zip(motherIndices,mothers):
         # Check if mom should decay:
         if mom.isFinalState:
             continue
@@ -180,40 +181,41 @@ def addOneStepDecays(tree, sigmacutFB=0.0):
             mom.isFinalState = True
             continue
 
-        # Get all decay trees for final state:
-        decayTrees = getDecayNodes(mom)
+        # Get a list of decay nodes for final state:
+        decayNodesList = getDecayNodes(mom)
         # Sort by weight
-        decayTrees = sorted(decayTrees, key=lambda decay: decay[0].nodeWeight,
-                            reverse=True)
-        if not decayTrees:
+        decayNodesList = sorted(decayNodesList,
+                                key=lambda decay: decay[0].nodeWeight,
+                                reverse=True)
+        if not decayNodesList:
             mom.isFinalState = True
             continue
 
         # Add all decay channels to all the trees
-        newTrees = []
-        for T in treeList:
-            tweight = T.getTreeWeight()
+        newSMSList = []
+        for T in smsList:
+            tweight = T.maxWeight
             if tweight < sigmacutFB:
                 continue
-            for decay in decayTrees:
-                dweight = decay[0].nodeWeight
+            for decayNodes in decayNodesList:
+                dweight = decayNodes[0].nodeWeight
                 if tweight*dweight < sigmacutFB:
                     break  # Since the decays are sorted, the next ones will also fall below sigmacut
 
                 # Attach decay to original tree
                 # (the mother node gets replaced by node from the decay dict)
-                newTree = T.attachDecay(decay, copy=True)
-                newTrees.append(newTree)
+                newSMS = T.attachDecay(motherIndex, decayNodes, copy=True)
+                newSMSList.append(newSMS)
 
-        if not newTrees:
+        if not newSMSList:
             continue
-        treeList = sorted(newTrees, key=lambda t: t.getTreeWeight(),
+        smsList = sorted(newSMSList, key=lambda t: t.maxWeight,
                           reverse=True)
 
-    if len(treeList) == 1 and treeList[0] is tree:
+    if len(smsList) == 1 and smsList[0] is sms:
         return []
     else:
-        return treeList
+        return smsList
 
 
 def cascadeDecay(tree, sigmacutFB=0.0):
@@ -235,10 +237,10 @@ def cascadeDecay(tree, sigmacutFB=0.0):
         for T in treeList:
             newT = addOneStepDecays(T, sigmacutFB)
             if not newT:
-                finalNodes = [n for n in T.nodes if T.out_degree(n.node) == 0]
+                finalNodes = [n for n in T.nodeIndices if T.out_degree(n) == 0]
                 # Make sure all the final states have decayed
                 # (newT can be empty if there is no allowed decay above sigmacutFB)
-                if any(fn.isFinalState is False for fn in finalNodes):
+                if any(T.indexToNode(fn).isFinalState is False for fn in finalNodes):
                     continue
                 finalTrees.append(T)  # It was not possible to add any new decay to the tree
             else:
