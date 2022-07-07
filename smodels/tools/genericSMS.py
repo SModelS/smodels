@@ -215,6 +215,29 @@ class GenericSMS(object):
 
         return daughters
 
+    def parentIndex(self, nodeIndex):
+        """
+        Returns the node index corresponding to the
+        parent of nodeIndex.
+
+        :param nodeIndex: Daughter node index
+        """
+
+        return self._predecessors[nodeIndex]
+
+    def parent(self, nodeIndex):
+        """
+        Returns the node object corresponding to the
+        parent of nodeIndex.
+
+        :param nodeIndex: Daughter node index
+        """
+
+        parentIndex = self.parentIndex(nodeIndex)
+        parent = self.indexToNode(parentIndex)
+
+        return parent
+
     @property
     def nodeIndices(self):
         """
@@ -490,11 +513,11 @@ class GenericSMS(object):
         """
 
         if self._canonName is None:
-            self._canonName = self.getCanonName()
+            self._canonName = self.computeCanonName()
 
         return self._canonName
 
-    def getCanonName(self, nodeIndex=None):
+    def computeCanonName(self, nodeIndex=None):
         """
         Recursively sets the canonName for each node.
         Returns the canonical name in integer form.
@@ -522,7 +545,7 @@ class GenericSMS(object):
         if not children:
             node.canonName = 10
         else:
-            tp = [self.getCanonName(n) for n in children]
+            tp = [self.computeCanonName(n) for n in children]
             if any(isinstance(name, InclusiveValue) for name in tp):
                 node.canonName = InclusiveValue()
             else:

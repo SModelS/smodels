@@ -11,12 +11,13 @@
 """
 
 import time
-from smodels.theory.element import Element
-from smodels.theory.topology import TopologyDict
-from smodels.theory.tree import Tree, ParticleNode
+from smodels.theory.theorySMS import TheorySMS
+from smodels.theory.topologyDicy import TopologyDict
+from smodels.theory.particleNode import ParticleNode
 from smodels.tools.physicsUnits import fb, GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
+from itertools import product
 
 
 def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
@@ -49,38 +50,46 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
 
     # Generate all primary nodes (e.g. PV > X+Y)
     # and assign the nodeWeight as the maximum cross-section
-    productionTrees = []
-    for pid in xSectionList.getPIDpairs():
-        weight = xSectionList.getXsecsFor(pid)
-        if weight.getMaxXsec().asNumber(fb) < sigmacutFB:
+    productionSMS = []
+    for pdgs in xSectionList.getPIDpairs():
+        weight = xSectionList.getXsecsFor(pdgs)
+        maxWeight = weight.getMaxXsec().asNumber(fb)
+        if  maxWeight < sigmacutFB:
             continue
         pv = ParticleNode(model.getParticlesWith(label='PV')[0], 0, nodeWeight=weight)
-        pv.xsection = xSectionList.getXsecsFor(pid)
-        primaryMothers = [ParticleNode(model.getParticlesWith(pdg=pdg)[0], i + 1)
-                          for i, pdg in enumerate(pid)]
-        productionTrees.append(Tree({pv: primaryMothers}))
+        primaryMothers = [ParticleNode(model.getParticlesWith(pdg=pdg)[0]) for pdg in pdgs]
+        newSMS = TheorySMS()
+        pvIndex = newSMS.add_node(pv)
+        motherIndices = newSMS.add_nodes_from(primaryMothers)
+        newSMS.add_edges_from(product([pvIndex],motherIndices))
+        newSMS._maxWeight = maxWeight
+        productionSMS.append(newSMS)
 
-    # Sort production trees
-    productionTrees = sorted(productionTrees,
-                             key=lambda t: t.getTreeWeight(),
+    # Sort production SMS by their maximum weights
+    productionSMS = sorted(productionSMS,
+                             key=lambda sms: sms.maxWeight,
                              reverse=True)
 
     # For each production tree, produce all allowed cascade decays (above sigmacut):
-    allTrees = []
-    for tree in productionTrees:
-        allTrees += cascadeDecay(tree, sigmacutFB=sigmacutFB)
+    allSMS = []
+    for sms in productionSMS:
+        allSMS += cascadeDecay(sms, sigmacutFB=sigmacutFB)
 
     # Create elements for each tree and combine equal elements
     smsTopDict = TopologyDict()
 
-    for tree in allTrees:
-        newElement = Element(tree)
-        newElement.weightList = tree.getTreeWeightList()
-        smsTopDict.addElement(newElement)
+    for sms in allSMS:
+        # Sort SMS, compute canonical name and its total weight
+        sms.setGlobalProperties()
+        smsTopDict.addSMS(sms)
 
     if massCompress or invisibleCompress:
-        smsTopDict.compressElements(massCompress, invisibleCompress, minmassgap)
-    smsTopDict._setElementIds()
+        smsTopDict.compress(massCompress, invisibleCompress, minmassgap)
+    # Sort the topology dictionary according to the canonical names
+    smsTopDict.sort()
+    # Set the SMS IDs
+    smsTopDict.setSMSIds()
+
 
     logger.debug("decomposer done in %.2f s." % (time.time() - t1))
 
