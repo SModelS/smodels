@@ -31,6 +31,9 @@ class GenericSMS(object):
         self._predecessors = {}  # Stores the nodes and their predecessors (parents)
         self._nodesMapping = {}  # Stores the nodeIndex->node object mapping
 
+    def __hash__(self):
+        return object.__hash__(self)
+
     def __repr__(self):
         """
         Returns the string representation of the tree.
@@ -56,7 +59,10 @@ class GenericSMS(object):
         :return: The node index for the newly added node
         """
 
-        nodeIndex = max(self.nodeIndices)+1
+        if not self._successors:
+            nodeIndex = 0
+        else:
+            nodeIndex = max(self.nodeIndices)+1
         self._successors[nodeIndex] = []
         self._nodesMapping[nodeIndex] = node
 
@@ -261,7 +267,7 @@ class GenericSMS(object):
 
         edgesList = []
         for n in self.nodeIndices:
-            edgesList += list(product([n],self.daughters[n]))
+            edgesList += list(product([n],self.daughterIndices(n)))
 
         return edgesList
 
@@ -414,49 +420,51 @@ class GenericSMS(object):
         """
 
         elStr = ""
-        root = self.root
-        nodesDict = {self.root.node: 0}
+        rootIndex = self.rootIndex
+        nodesDict = {rootIndex: 0}
         counter = 1
-        for mom, daughters in self.bfs_successors(root.node):
+        for momIndex, daughterIndices in self.genIndexIterator(rootIndex):
 
             # Convert from indices to node objects
-            mom = self.nodesMapping[mom]
-            daughters = [self.nodesMapping[d] for d in daughters[:]]
+            mom = self.indexToNode(momIndex)
+            daughters = self.indexToNode(daughterIndices)
             # Add mom (if mom = 0 does not include index)
-            if mom.node == 0:
+            if momIndex == 0:
                 elStr += '(%s > ' % mom
             else:
-                if mom.node not in nodesDict:
-                    nodesDict[mom.node] = counter
+                if momIndex not in nodesDict:
+                    nodesDict[momIndex] = counter
                     counter += 1
-                elStr += '(%s(%i) > ' % (mom, nodesDict[mom.node])
+                elStr += '(%s(%i) > ' % (mom, nodesDict[momIndex])
 
             # Add daughters for the decay, if daughter is unstable, add index
-            for n in daughters:
-                if n.isInclusive and n.finalStates:
+            for iD, d in enumerate(daughters):
+                dIndex = daughterIndices[iD]
+                if d.isInclusive and d.finalStates:
                     stable = False
-                elif self.out_degree(n.node) == 0:
+                elif self.out_degree(dIndex) == 0:
                     stable = True
                 else:
                     stable = False
                 if stable:
-                    elStr += '%s,' % n  # stable
+                    elStr += '%s,' % d  # stable
                 else:
-                    if n.node not in nodesDict:
-                        nodesDict[n.node] = counter
+                    if dIndex not in nodesDict:
+                        nodesDict[dIndex] = counter
                         counter += 1
-                    elStr += '%s(%i),' % (n, nodesDict[n.node])
+                    elStr += '%s(%i),' % (d, nodesDict[dIndex])
             elStr = elStr[:-1] + '), '
         elStr = elStr[:-2]
 
         # Deal separately with daughters for inclusive nodes (if it exists)
-        for n in self.nodes:
+        for nodeIndex in self.nodeIndices:
+            n = self.indexToNode(nodeIndex)
             if not n.isInclusive:
                 continue
             if not n.finalStates:
                 continue
             daughters = [str(d) for d in n.finalStates]
-            elStr += ', (%s(%i) > %s)' % (n, nodesDict[n.node],
+            elStr += ', (%s(%i) > %s)' % (n, nodesDict[nodeIndex],
                                           ','.join(daughters))
         return elStr
 
@@ -531,17 +539,17 @@ class GenericSMS(object):
             return None
 
         if nodeIndex is None:
-            nodeIndex = self.root.node
+            nodeIndex = self.rootIndex
 
         # Set the final state
-        node = self.nodesMapping[nodeIndex]
+        node = self.indexToNode(nodeIndex)
         # If it is inclusive node set its name to an inclusive integer
         # and return its name (no need to check the children)
         if node.isInclusive:
             node.canonName = InclusiveValue()
             return node.canonName
 
-        children = self.successors[nodeIndex]
+        children = self.daughterIndices(nodeIndex)
         if not children:
             node.canonName = 10
         else:
@@ -554,7 +562,7 @@ class GenericSMS(object):
                 node.canonName = int(tpStr)
 
         # Use the root canon name to assign the tree canon name
-        if nodeIndex == self.root.node:
+        if nodeIndex == self.rootIndex:
             self._canonName = node.canonName
 
         return node.canonName
@@ -743,6 +751,8 @@ class GenericSMS(object):
             labels = {n: str(getattr(n, labelAttr).asNumber(attrUnit))
                       if (hasattr(n, labelAttr) and getattr(n, labelAttr) is not None)
                       else str(n) for n in self.nodes}
+        elif labelAttr == 'node':
+            labels = {n: str(nodeIndex) for n,nodeIndex in zip(self.nodes,self.nodeIndices)}
         else:
             labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
                       else str(n) for n in self.nodes}

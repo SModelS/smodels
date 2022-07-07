@@ -78,9 +78,6 @@ class TheorySMS(GenericSMS):
         """
         return not (self < other)
 
-    def __hash__(self):
-        return object.__hash__(self)
-
     def __getattr__(self, attr):
         """
         If the attribute has not been defined for self

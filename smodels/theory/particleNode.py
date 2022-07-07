@@ -32,10 +32,7 @@ class ParticleNode(object):
                       and production xsec for primary vertex)
     """
 
-    _lastNodeNumber = 0
-
-    def __init__(self, particle,
-                 nodeNumber=None, nodeWeight=1.0,
+    def __init__(self, particle, nodeWeight=1.0,
                  canonName=None, isFinalState=False,
                  finalStates=None, isInclusive=False):
         self.particle = particle
@@ -43,13 +40,6 @@ class ParticleNode(object):
         # Since ParticleNodes are identified by their numbering,
         # if it is not specifically assigned, automatically assign
         # a new number which does not overlap with any previous class instances
-        if nodeNumber is None:
-            self.node = ParticleNode._lastNodeNumber + 1
-            ParticleNode._lastNodeNumber += 1
-        else:
-            self.node = nodeNumber
-        ParticleNode._lastNodeNumber = max(self.node,
-                                           ParticleNode._lastNodeNumber)
         self.canonName = canonName
         # Node weight:
         # (1 for stable particles, BR for unstable and
@@ -70,16 +60,16 @@ class ParticleNode(object):
         self.isInclusive = isInclusive
 
     def __hash__(self):
-        return self.node
+        return object.__hash__(self)
 
     def __cmp__(self, other):
+        """
+        Node comparison based on compareTo method
 
-        if self.node == other.node:
-            return 0
-        elif self.node > other.node:
-            return 1
-        else:
-            return -1
+        :return: 0 if nodes are equal, 1 if self > other, -1 otherwise
+        """
+
+        return self.compareTo(other)
 
     def __lt__(self, other):
         return self.__cmp__(other) == -1
@@ -197,12 +187,16 @@ class ParticleNode(object):
         """
 
         newNode = ParticleNode(particle=self.particle,
-                               nodeNumber=self.node,
-                               nodeWeight=self.nodeWeight,
                                canonName=self.canonName,
                                isInclusive=self.isInclusive,
-                               isFinalState=self.isFinalState,
-                               finalStates=self.finalStates)
+                               isFinalState=self.isFinalState)
+
+        if self.finalStates is not None:
+            newNode.finalStates = self.finalStates[:]
+        if isinstance(self.nodeWeight,(int,float,type(None))):
+            newNode.nodeWeight = self.nodeWeight
+        else:
+            newNode.nodeWeight = self.nodeWeight.copy()
 
         return newNode
 
@@ -283,7 +277,6 @@ class InclusiveParticleNode(ParticleNode):
         """
 
         newNode = InclusiveParticleNode(particle=self.particle,
-                                        nodeNumber=self.node,
                                         nodeWeight=self.nodeWeight,
                                         canonName=self.canonName,
                                         isFinalState=self.isFinalState,

@@ -81,6 +81,24 @@ class Model(object):
 
         return True
 
+    def getParticle(self, **kwargs):
+        """
+        Return a single particle object with the listed attributes.
+        If no particle is found or more than one particle is found, raise an error.
+
+        :returns: Particle object
+        """
+
+        particleList = self.getParticlesWith(**kwargs)
+        if not particleList:
+            raise SModelSError("Particle with attributes %s has not been found in model %s"
+                               % (kwargs, self))
+        elif len(particleList) > 1:
+            raise SModelSError("Multiple particles with attributes %s found in model %s"
+                                   % (kwargs, self))
+        else:
+            return particleList[0]
+
     def getParticlesWith(self, **kwargs):
         """
         Return the particle objects with the listed attributes.
