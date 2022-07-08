@@ -139,8 +139,7 @@ class ParticleNode(object):
 
     def compareTo(self, other):
         """
-        Compare nodes accoring to their canonical name
-        and particle.
+        Compare nodes accoring to  particles.
 
         :param other: ParticleNode or InclusiveParticleNode object
 
@@ -152,12 +151,6 @@ class ParticleNode(object):
 
         if not isinstance(other, ParticleNode):
             raise SModelSError("Can not compare node to %s" % type(other))
-
-        if self.canonName != other.canonName:
-            if self.canonName < other.canonName:
-                return -1
-            else:
-                return 1
 
         if self.particle != other.particle:
             if self.particle > other.particle:

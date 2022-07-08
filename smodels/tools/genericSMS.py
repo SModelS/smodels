@@ -30,6 +30,7 @@ class GenericSMS(object):
         self._successors = OrderedDict()  # Stores the nodes and their successors (daughters)
         self._predecessors = {}  # Stores the nodes and their predecessors (parents)
         self._nodesMapping = {}  # Stores the nodeIndex->node object mapping
+        self._nodeCanonNames = {}  # Stores the canonical names for the nodes
 
     def __hash__(self):
         return object.__hash__(self)
@@ -245,6 +246,38 @@ class GenericSMS(object):
         return parent
 
     @property
+    def rootIndex(self):
+        """
+        Returns the index of the root node (primary vertex) of the tree.
+        If it has not been defined, compute it.
+
+        :return: root node index
+        """
+
+        if self._rootIndex is None:
+            root = [nodeIndex for nodeIndex in self.nodeIndices
+                    if self.in_degree(nodeIndex) == 0]
+            if len(root) != 1:
+                raise SModelSError("Malformed Tree, %i root(s) have been found." % len(root))
+            self._rootIndex = root[0]
+
+        return self._rootIndex
+
+    @property
+    def root(self):
+        """
+        Returns the root node (primary vertex) of the tree.
+        If it has not been defined, compute it.
+
+        :return: root node
+        """
+
+        rootIndex = self.rootIndex
+        root = self.indexToNode(rootIndex)
+
+        return root
+
+    @property
     def nodeIndices(self):
         """
         Returns the tist of node indices in the Tree.
@@ -295,6 +328,74 @@ class GenericSMS(object):
         edgesList = [self.indexToNode(edgeIndex) for edgeIndex in self.edgeIndices]
 
         return edgesList
+
+    @property
+    def canonName(self):
+        """
+        Returns the canonName. If not defined, it will be computed.
+
+        :return: Canonical name (int)
+        """
+
+        if self.rootIndex not in self._nodeCanonNames:
+            self.computeCanonName()
+
+        return self._nodeCanonNames[self.rootIndex]
+
+    def computeCanonName(self, nodeIndex=None):
+        """
+        Recursively sets the canonName for each node.
+        Returns the canonical name in integer form.
+
+        :param nodeIndex: Node index to set the name for. If None, it will use the root
+
+        :return: Integer representing the Tree canonical name
+        """
+
+        if not self.number_of_nodes():
+            return None
+
+        if nodeIndex is None:
+            nodeIndex = self.rootIndex
+
+        # Set the final state
+        node = self.indexToNode(nodeIndex)
+        # If it is inclusive node set its name to an inclusive integer
+        # and return its name (no need to check the children)
+        if node.isInclusive:
+            canonName = InclusiveValue()
+            self._nodeCanonNames[nodeIndex] = canonName
+            return canonName
+
+        children = self.daughterIndices(nodeIndex)
+        if not children:
+            canonName = 10
+        else:
+            tp = [self.computeCanonName(n) for n in children]
+            if any(isinstance(name, InclusiveValue) for name in tp):
+                canonName = InclusiveValue()
+            else:
+                tp = sorted(tp)
+                tpStr = '1' + "".join(str(c) for c in tp) + '0'
+                canonName = int(tpStr)
+
+        self._nodeCanonNames[nodeIndex] = canonName
+
+        return canonName
+
+    def nodeCanonName(self,nodeIndex):
+        """
+        Returns the canon name for the node.
+
+        :param nodeIndex: Index of the node
+
+        :return: Canonical name (int)
+        """
+
+        if nodeIndex not in self._nodeCanonNames:
+            self.computeCanonName(nodeIndex)
+
+        return self._nodeCanonNames[nodeIndex]
 
     def out_degree(self, nodeIndex):
         """
@@ -520,61 +621,6 @@ class GenericSMS(object):
 
         return branchList, finalState, intermediateState
 
-    @property
-    def canonName(self):
-        """
-        Returns the canonName. If not defined, it will be computed.
-
-        :return: Canonical name (int)
-        """
-
-        if self._canonName is None:
-            self._canonName = self.computeCanonName()
-
-        return self._canonName
-
-    def computeCanonName(self, nodeIndex=None):
-        """
-        Recursively sets the canonName for each node.
-        Returns the canonical name in integer form.
-
-        :param nodeIndex: Node index to set the name for. If None, it will use the root
-
-        :return: Integer representing the Tree canonical name
-        """
-
-        if not self.number_of_nodes():
-            return None
-
-        if nodeIndex is None:
-            nodeIndex = self.rootIndex
-
-        # Set the final state
-        node = self.indexToNode(nodeIndex)
-        # If it is inclusive node set its name to an inclusive integer
-        # and return its name (no need to check the children)
-        if node.isInclusive:
-            node.canonName = InclusiveValue()
-            return node.canonName
-
-        children = self.daughterIndices(nodeIndex)
-        if not children:
-            node.canonName = 10
-        else:
-            tp = [self.computeCanonName(n) for n in children]
-            if any(isinstance(name, InclusiveValue) for name in tp):
-                node.canonName = InclusiveValue()
-            else:
-                tp = sorted(tp)
-                tpStr = '1' + "".join(str(c) for c in tp) + '0'
-                node.canonName = int(tpStr)
-
-        # Use the root canon name to assign the tree canon name
-        if nodeIndex == self.rootIndex:
-            self._canonName = node.canonName
-
-        return node.canonName
-
     def getFinalStates(self, n=None):
         """
         Get the list of particles which have not decayed (appear at the top of the tree).
@@ -605,38 +651,6 @@ class GenericSMS(object):
 
         return node.finalStates
 
-    @property
-    def rootIndex(self):
-        """
-        Returns the index of the root node (primary vertex) of the tree.
-        If it has not been defined, compute it.
-
-        :return: root node index
-        """
-
-        if self._rootIndex is None:
-            root = [nodeIndex for nodeIndex in self.nodeIndices
-                    if self.in_degree(nodeIndex) == 0]
-            if len(root) != 1:
-                raise SModelSError("Malformed Tree, %i root(s) have been found." % len(root))
-            self._rootIndex = root[0]
-
-        return self._rootIndex
-
-    @property
-    def root(self):
-        """
-        Returns the root node (primary vertex) of the tree.
-        If it has not been defined, compute it.
-
-        :return: root node
-        """
-
-        rootIndex = self.rootIndex
-        root = self.indexToNode(rootIndex)
-
-        return root
-
     def relabelNodeIndices(self,nodeIndexDict):
         """
         Relabel node indices according to nodeIndexDict.
@@ -652,6 +666,7 @@ class GenericSMS(object):
         newMapping = {}
         newSuccessors = OrderedDict()
         newPredecessors = {}
+        newCanonNames = {}
         for oldIndex, newIndex in nodeIndexDict.items():
             # Update daughter indices
             newDaughters = []
@@ -667,11 +682,15 @@ class GenericSMS(object):
             newSuccessors[newIndex] = newDaughters
             # Add entry to newMapping dict
             newMapping[newIndex] = self.indexToNode(oldIndex)
+            # Add entry to canonNames dict
+            if oldIndex in self._nodeCanonNames:
+                newCanonNames[newIndex] = self._nodeCanonNames[oldIndex]
 
         # Update dicts:
         self._successors = newSuccessors
         self._predecessors = newPredecessors
         self._nodesMapping = newMapping
+        self._nodeCanonNames = newCanonNames
         self._rootIndex = nodeIndexDict[self._rootIndex]
 
     def updateNodeObjects(self, nodeObjectDict):
@@ -761,6 +780,9 @@ class GenericSMS(object):
                       else str(n) for n in self.nodes}
         elif labelAttr == 'node':
             labels = {n: str(nodeIndex) for n,nodeIndex in zip(self.nodes,self.nodeIndices)}
+        elif labelAttr == 'canonName':
+            labels = {n: str(self.nodeCanonName(nodeIndex))
+                        for n,nodeIndex in zip(self.nodes,self.nodeIndices)}
         else:
             labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
                       else str(n) for n in self.nodes}
