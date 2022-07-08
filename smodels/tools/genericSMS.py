@@ -96,6 +96,9 @@ class GenericSMS(object):
             self._successors.pop(nodeIndex)
             self._nodesMapping.pop(nodeIndex)
 
+        if nodeIndex in self._nodeCanonNames:
+            self._nodeCanonNames.pop(nodeIndex)
+
         for nodeA, daughtersA in self._successors.items():
             if nodeIndex not in daughtersA:
                 continue
@@ -178,6 +181,7 @@ class GenericSMS(object):
         self._successors = OrderedDict()
         self._predecessors = {}
         self._nodesMapping = {}
+        self._nodeCanonNames = {}
         self._rootIndex = None
 
     def indexToNode(self, nodeIndex):

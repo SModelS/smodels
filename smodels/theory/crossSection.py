@@ -311,7 +311,6 @@ class XSectionList(object):
 
         """
         self.xSections = []
-        self.maxValue = 0*pb
 
         if infoList:
             for info in infoList:
@@ -326,7 +325,6 @@ class XSectionList(object):
         for ixsec, xsec in enumerate(newList):
             newList[ixsec] = xsec * other
 
-        self.maxValue *= other
         return newList
 
     def __rmul__(self, other):

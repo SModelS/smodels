@@ -120,8 +120,8 @@ class TheorySMS(GenericSMS):
         newSMS.addNodesFrom(other)
         # Add other attributes
         newSMS.ancestors = self.ancestors[:] + other.ancestors[:]
-        newSMS._weightList = self._weightList + other._weightList
-        newSMS._maxWeight = self._maxWeight + other._maxWeight
+        newSMS._weightList = self.weightList + other.weightList
+        newSMS._maxWeight = self.maxWeight + other.maxWeight
         if other._allAncestors is not None:
             newSMS._allAncestors += other._allAncestors[:]
 
@@ -187,11 +187,6 @@ class TheorySMS(GenericSMS):
                                   for nodeIndex,cName in self._nodeCanonNames.items()}
         newSMS._maxWeight = self._maxWeight
         newSMS._sorted = self._sorted
-        if isinstance(self.weightList,
-                      (crossSection.XSectionList,crossSection.XSection)):
-            newSMS._weightList = self._weightList.copy()
-        else:
-            newSMS._weightList = self._weightList
         newSMS.ancestors = self.ancestors[:]
         if self._allAncestors is not None:
             newSMS._allAncestors = self._allAncestors[:]
@@ -247,7 +242,6 @@ class TheorySMS(GenericSMS):
         # Update maximum weight
         if motherNode.nodeWeight is not None:
             newSMS._maxWeight = newSMS.maxWeight*motherNode.nodeWeight
-            newSMS._weightList = newSMS.weightList*motherNode.nodeWeight
 
         # Update mother node:
         newSMS.updateNodeObjects({motherIndex : motherNode})
@@ -709,11 +703,12 @@ class TheorySMS(GenericSMS):
                   SMS can be considered degenerate; None, if compression is not possible;
         """
 
-        newSMS = self.copy()
-        newSMS.ancestors = [self]
+        # Start with self and make a copy later if needed
+        newSMSList = [self]  # Dummy list to store newSMS
 
         # Loop over nodes from root to leaves:
         for momIndex, daughterIndices in self.genIndexIterator():
+            newSMS = newSMSList[0]
             if momIndex is newSMS.rootIndex:  # Skip primary vertex
                 continue
             if momIndex not in newSMS.nodeIndices:  # In case the mother has been removed by compression
@@ -744,6 +739,12 @@ class TheorySMS(GenericSMS):
             if massDiff > minmassgap or not mom.particle.isPrompt():
                 continue
 
+            # If making first compression, copy self:
+            if newSMS is self:
+                newSMS = self.copy()
+                newSMS.ancestors = [self]
+                newSMSList[0] = newSMS
+
             # Get grandmother:
             gMomIndex = newSMS.parentIndex(momIndex)
             # Remove mother and all SM daughters:
@@ -753,10 +754,14 @@ class TheorySMS(GenericSMS):
             # Attach BSM daughter to grandmother:
             newSMS.add_edge(gMomIndex, bsmDaughter)
 
+        newSMS = newSMSList[0]
         # If no compression was made, return None
-        if self.number_of_nodes() == newSMS.number_of_nodes():
+        if newSMS is self:
             return None
 
+        # Set the compressed topology weight as the original weight
+        # (it can not longer be computed from its nodes)
+        newSMS._weightList = self.weightList
         # Recompute the global properties (except for the weightList)
         # and sort the new SMS
         newSMS.setGlobalProperties(weight=False)
@@ -774,10 +779,11 @@ class TheorySMS(GenericSMS):
                   particles; None, if compression is not possible
         """
 
-        newSMS = self.copy()
-        newSMS.ancestors = [self]
+        # Start with self and make a copy later if needed
+        newSMSList = [self]  # Dummy list to store newSMS
 
         while True:
+            newSMS = newSMSList[0]
             # Loop over nodes:
             nNodes = newSMS.number_of_nodes()
             for momIndex, daughterIndices in newSMS.genIndexIterator():
@@ -798,6 +804,12 @@ class TheorySMS(GenericSMS):
                 if (not neutralDaughters) or (not neutralMom):
                     continue
 
+                # If making first compression, copy self:
+                if newSMS is self:
+                    newSMS = self.copy()
+                    newSMS.ancestors = [self]
+                    newSMSList[0] = newSMS
+
                 newSMS.remove_nodes_from(daughterIndices)
                 # Replace mother particle by invisible (generic) particle
                 # with its width equal to the maximum width amongst the daughters
@@ -817,7 +829,12 @@ class TheorySMS(GenericSMS):
             if newSMS.number_of_nodes() == nNodes:
                 break  # No compressions could be made, stop
 
-
+        newSMS = newSMSList[0]
+        if newSMS is self:
+            return None
+        # Set the compressed topology weight as the original weight
+        # (it can not longer be computed from its nodes)
+        newSMS._weightList = self.weightList
         # Recompute the global properties (except for the weightList)
         # and sort the new SMS
         newSMS.setGlobalProperties(weight=False)

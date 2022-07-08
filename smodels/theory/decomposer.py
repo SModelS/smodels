@@ -49,7 +49,7 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
     xSectionList.sort()
 
     # Generate all primary nodes (e.g. PV > X+Y)
-    # and assign the nodeWeight as the maximum cross-section
+    # and assign the nodeWeight to the cross-section list
     productionSMS = []
     for pdgs in xSectionList.getPIDpairs():
         weight = xSectionList.getXsecsFor(pdgs)
