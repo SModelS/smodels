@@ -13,14 +13,14 @@ from smodels.theory.theorySMS import TheorySMS
 from collections import OrderedDict
 
 
-class TopologyDict(dict):
+class TopologyDict(OrderedDict):
     """
     An instance of this class represents an iterable collection of topologies.
     """
 
     def __init__(self):
 
-        self.__dict__ = OrderedDict()
+        self.__dict__ = {}
 
     def addSMS(self, newSMS):
 
@@ -93,9 +93,10 @@ class TopologyDict(dict):
 
         newDict = OrderedDict()
         for key in sorted(self.keys()):
-            newDict[key] = self[key]
+            newDict[key] = self.pop(key)
 
-        self.__dict__ = newDict
+        for key,smsList in newDict.items():
+            self[key] = smsList
 
     def setSMSIds(self):
         """
