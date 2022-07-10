@@ -474,36 +474,35 @@ class GenericSMS(object):
                         next_generation.append((new_mom, new_daughters))
             generation = next_generation
 
-    def genIndexDictionary(self, nodeIndex=None, includeLeaves=False):
+    def dfsIndexIterator(self):
         """
-        Returns a dictionary with the mother indices as keys
-        and the daughter indices as values using a depth-first search.
+        Iterates over the nodes following a depth-first traversal of the tree.
 
-        :param nodeIndex: Node index from tree. If None, starts at tree root.
-        :param includeLeaves: If True, it will include the leaves (undecayed nodes)
-                              as moms (with an empty daughters list)
-
-        :return: Dictionary with mother and daughter indices
+        :return: Iterator over nodes
         """
 
-        if nodeIndex is None:
-            nodeIndex = self.rootIndex
-
-        mom = nodeIndex
-        daughters = self.computeCanonName(mom)[:]
-        daughtersDict = {mom: daughters[:]}
-
-        # Go down in generation until it has no more daughters
-        while daughters:
-            new_mom = daughters.pop(0)
-            new_daughters = self.daughterIndices(new_mom)[:]
-            if new_daughters or includeLeaves:
-                daughtersDict.update({new_mom: new_daughters[:]})
-
-            # Attach new daughters to the beginning of the list
-            daughters = new_daughters[:] + daughters[:]
-
-        return daughtersDict
+        nodes = self.nodeIndices
+        yield nodes[0]
+        visited = set()   # Store visited nodes
+        depth_limit = len(nodes)
+        # Loop over nodes
+        for node in nodes:
+            if node in visited:
+                continue
+            visited.add(node)
+            daughters = [iter(self.daughterIndices(node))]
+            while daughters:
+                last_children = daughters[-1]  # Get the last added children
+                try:
+                    child = next(last_children)
+                    if child not in visited:
+                        yield child
+                        visited.add(child)
+                        # Add daughters of child
+                        daughters.append(iter(self.daughterIndices(child)))
+                except StopIteration:
+                    # All the children have been visited, remove from list
+                    daughters.pop()
 
     def bfs_sort(self):
         """
@@ -751,7 +750,7 @@ class GenericSMS(object):
                 malformedTree = True
 
             # Check if all nodes can be reached from the root node
-            if len(self.genIndexDictionary(includeLeaves=True)) != nNodes:
+            if len(list(self.dfsIndexIterator())) != nNodes:
                 malformedTree = True
 
         if malformedTree:
