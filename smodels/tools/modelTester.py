@@ -351,6 +351,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
 
             for hdlr in logger.handlers[:]:
                 logger.removeHandler(hdlr)
+                hdlr.close()
             fileLog = logging.FileHandler('./smodels.log')
             logger.addHandler(fileLog)
 
@@ -364,6 +365,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
 
             for hdlr in logger.handlers[:]:
                 logger.removeHandler(hdlr)
+                hdlr.close()
             fileLog = logging.FileHandler('./smodels.log')
             logger.addHandler(fileLog)
 
