@@ -17,6 +17,7 @@ except (ImportError, ModuleNotFoundError):
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 import numpy as np
+from collections import OrderedDict, deque
 
 
 def cSim(*weights):
@@ -530,3 +531,67 @@ def sortParticleList(ptcList):
 
     newPtcList = sorted(ptcList, key=lambda x: x.label)
     return newPtcList
+
+
+def maximal_matching(left, right, edges):
+    """
+    Computes the maximal matching from left nodes to right nodes.
+    The maximal matching is the maximal number of left nodes which can be
+    connected to the right nodes without any node belonging to more than one edge.
+    Adpated from networkx.algorithms.bipartite.matching.hopcroft_karp_matching.
+
+    :param left: List of left nodes
+    :param right: List of right nodes
+    :param edges: Nested dictionary with left nodes as keys and macthing right nodes as values
+                  (e.g. {nL1 : {nR2 : {}, nR3 : {}}, nL2 : {nR2 : {}, nR1 : {}},... })
+    """
+
+    INFINITY = float("inf")
+    # Initialize the "global" variables that maintain state during the search.
+    leftmatches = {v: None for v in left}
+    rightmatches = {v: None for v in right}
+    distances = {}
+    queue = deque()
+
+    def breadth_first_search():
+        for v in left:
+            if leftmatches[v] is None:
+                distances[v] = 0
+                queue.append(v)
+            else:
+                distances[v] = INFINITY
+        distances[None] = INFINITY
+        while queue:
+            v = queue.popleft()
+            if distances[v] < distances[None]:
+                for u in edges[v]:
+                    if distances[rightmatches[u]] is INFINITY:
+                        distances[rightmatches[u]] = distances[v] + 1
+                        queue.append(rightmatches[u])
+        return distances[None] is not INFINITY
+
+    def depth_first_search(v):
+        if v is not None:
+            for u in edges[v]:
+                if distances[rightmatches[u]] == distances[v] + 1:
+                    if depth_first_search(rightmatches[u]):
+                        rightmatches[u] = v
+                        leftmatches[v] = u
+                        return True
+            distances[v] = INFINITY
+            return False
+        return True
+
+    # Implementation note: this counter is incremented as pairs are matched but
+    # it is currently not used elsewhere in the computation.
+    num_matched_pairs = 0
+    while breadth_first_search():
+        for v in left:
+            if leftmatches[v] is None:
+                if depth_first_search(v):
+                    num_matched_pairs += 1
+
+    # Strip the entries matched to `None`.
+    leftmatches = {k: v for k, v in leftmatches.items() if v is not None}
+
+    return leftmatches

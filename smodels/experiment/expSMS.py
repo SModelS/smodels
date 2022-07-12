@@ -11,10 +11,10 @@
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.theory.particleNode import ParticleNode,InclusiveParticleNode
 from smodels.tools.genericSMS import GenericSMS
-from smodels.experiment.expAuxiliaryFuncs import bracketToProcessStr
+from smodels.experiment.expAuxiliaryFuncs import bracketToProcessStr, maximal_matching
 from itertools import product
 from smodels.tools.physicsUnits import fb
-from collections import OrderedDict
+from collections import OrderedDict, deque
 
 class ExpSMS(GenericSMS):
     """
@@ -30,8 +30,8 @@ class ExpSMS(GenericSMS):
         GenericSMS.__init__(self)
 
     @classmethod
-    def from_string(cls, stringSMS, finalState=None,
-                     intermediateState=None, model=None):
+    def from_string(cls, stringSMS, model, finalState=None,
+                     intermediateState=None):
         """
         Converts a string describing an SMS to a SMS object. It accepts
         the (old) bracket notation or the process notation. For the old notation the
@@ -113,44 +113,51 @@ class ExpSMS(GenericSMS):
             sortedSuccessors[mom] = sortedDaughters
 
         # Convert strings to node objects:
+        nodesObjDict = {}
         for ptcStr in nodesDict:
             # Check for inclusive node
             # (in this case, the daughters have to be included as final states of the node)
             label = ptcStr.split('(')[0]
             if label.lower() == 'inclusivenode':
                 node = InclusiveParticleNode()
+                daughters = []
                 if ptcStr in sortedSuccessors:
                     daughters = [dStr.split('(')[0]
                                  for dStr in sortedSuccessors[ptcStr]]
-                else:
-                    daughters = []
-                if model is not None:
-                    daughters= [model.getParticle(label=d) for d in daughters[:]]
+                daughters= [model.getParticle(label=d) for d in daughters[:]]
                 node.finalStates = sorted(daughters)
-                # Delede daughters:
-                sortedSuccessors[ptcStr] = []
             else:
-                if model is not None:
-                    particle = model.getParticle(label=label)
-                    node = ParticleNode(particle=particle)
-                else:
-                    node = ParticleNode(particle=label)
+                particle = model.getParticle(label=label)
+                node = ParticleNode(particle=particle)
 
             # Change key from node index to node object
-            nodesDict[ptcStr] = node
+            nodesObjDict[ptcStr] = node
+
+        # Remove daughters from inclusiveNodes from dicts:
+        for ptcStr in nodesDict:
+            label = ptcStr.split('(')[0]
+            if label.lower() != 'inclusivenode':
+                continue
+            if ptcStr not in sortedSuccessors:
+                continue
+            daughters = sortedSuccessors[ptcStr]
+            for dStr in daughters:
+                if dStr in nodesObjDict:
+                    nodesObjDict.pop(dStr)
+            sortedSuccessors[ptcStr] = []
 
         # Create SMS, add all unstable nodes following the sorted order
         # and keep track of generated indices
         newSMS = cls()
         smsDict = {}
         for momStr in sortedSuccessors:
-            nodeIndex = newSMS.add_node(nodesDict[momStr])
+            nodeIndex = newSMS.add_node(nodesObjDict[momStr])
             smsDict[momStr] = nodeIndex
         # Add stable nodes and keep track of SMS indices
-        for ptcStr in nodesDict:
+        for ptcStr in nodesObjDict:
             if ptcStr in smsDict:
                 continue  # Node has been added
-            nodeIndex = newSMS.add_node(nodesDict[ptcStr])
+            nodeIndex = newSMS.add_node(nodesObjDict[ptcStr])
             smsDict[ptcStr] = nodeIndex
 
         # Finally add all edges according to successorsDict:
@@ -172,24 +179,159 @@ class ExpSMS(GenericSMS):
         :return: True if objects are equivalent.
         """
 
-        cmp = self.matchesTo(other)
+        match = self.matchesTo(other)
 
-        return (cmp == 0)
+        return (match is not None)
 
     def matchesTo(self, other):
         """
-        Compare self to other.
-        If the SMS are not sorted, sort them and then do a direct comparison of each
-        node with the same nodeIndex.
+        Check if self matches other.
 
-        :param other: TheorySMS object to be compared against self
+        :param other: TheorySMS or ExpSMS object to be compared to
 
-        :return: 0, if objects are equal, -1 if self < other, 1 if other > sekf
+        :return: None if objects do not match or a copy of self,
+                 but with the nodes from other.
         """
 
         if not isinstance(other,GenericSMS):
             raise SModelSError("Can not compare ExpSMS and %s" %str(type(other)))
 
-        # IMPLEMENT MATCHING
+        mapDict = self.compareSubTrees(other)
+
+        if mapDict is None:
+            return None
+
+
+        # Remove unmatched nodes (which happens in case of InclusiveNodes)
+        match = {n1: n2 for n1, n2 in mapDict.items() if n2 is not None}
+
+        # Make a new tree
+        matchedTree = self.copy()
+
+        # Create nodes dict:
+        nodesDict = {}
+        for n1, n2 in match.items():
+            node = other.indexToNode(n2)  # Node from other
+            nodesDict[n1] = node  # index from self
+
+        # Update node objects:
+        matchedTree.updateNodeObjects(nodesDict)
+
+        return matchedTree
+
+    def compareSubTrees(self, other, T1_node=None, T2_node=None):
+        """
+        Compare the subtrees with T1_node and T2_node as roots.
+        The comparison is made according to their names, particle content and final states.
+        It uses the node comparison to define semantically equivalent nodes.
+
+        :param other: TheorySMS or ExpSMS object to be compared to self.
+        :param T1_node: Node index belonging to self.T1
+        :param T2_node: Node index belonging to self.T2
+
+        :return: matcDict is None (subtrees differ) or a dictionary
+                 with the mapping of the nodes daughters ({nodeINd : d2}).
+        """
+
+        if T1_node is None:
+            T1_node = self.rootIndex
+        if T2_node is None:
+            T2_node = other.rootIndex
+
+        # Compare nodes directly (canon name and particle content)
+        node1 = self.indexToNode(T1_node)
+        node2 = other.indexToNode(T2_node)
+        if node1.isInclusive:
+            other.getFinalStates(T2_node)  # Make sure final states are defined
+        if node2.isInclusive:
+            self.getFinalStates(T1_node)  # Make sure final states are defined
+
+        cmp = node1.compareTo(node2)
+        if cmp != 0:
+            return None
+
+        # For inclusive nodes always return True (once nodes are equal)
+        if node1.isInclusive or node2.isInclusive:
+            return {T1_node: T2_node}
+
+        # Check for equality of daughters
+        daughters1 = self.daughterIndices(T1_node)
+        daughters2 = other.daughterIndices(T2_node)
+        if len(daughters1) == len(daughters2) == 0:
+            return {T1_node: T2_node}
+
+
+        # Define left and right nodes in order to compute matching:
+        left_nodes = daughters1[:]
+        right_nodes = daughters2[:]
+        edges = {}
+        matchesDict = {}
+        for d1 in left_nodes:
+            for d2 in right_nodes:
+                mapDict = self.compareSubTrees(other,d1, d2)
+                if mapDict is not None:
+                    if d1 not in matchesDict:
+                        matchesDict[d1] = {}
+                        edges[d1] = {}
+                    matchesDict[d1].update({d2: mapDict})
+                    edges[d1].update({d2: mapDict})
+
+            # If node had no matches (was not added to the graph),
+            # we already know T1_node and T2_node differs
+            if d1 not in matchesDict:
+                return None
+
+        # Check if all nodes were included in the graph
+        # (they had at least one match)
+        if len(edges) != len(left_nodes):
+            return None
+        else:
+            # Compute the maximal matching
+            # (mapping where each node1 is connected to a single node2)
+            mapDict = maximal_matching(left_nodes, right_nodes, edges)
+
+            # Check if the match was successful.
+            # Consider a successful match if all nodes in daughters1 were matched
+            # or if all nodes in daughers2 were matched and the unmatched nodes
+            # in daughters1 match an InclusiveNode.
+            matched = False
+            if len(mapDict) == len(left_nodes):
+                matched = True
+            elif len(mapDict) == len(right_nodes):
+                matched = True
+                unMatched = [d1 for d1 in left_nodes if d1 not in mapDict]
+                for d1 in unMatched:
+                    if any(not other.indexToNode(d2).isInclusive
+                           for d2 in edges[d1]):
+                        matched = False
+                        break
+
+        if not matched:
+            return None
+
+        for d1, d2 in list(mapDict.items()):
+            daughtersMap = edges[d1][d2]
+            mapDict.update(daughtersMap)
+        mapDict[T1_node] = T2_node
+
+        return mapDict
+
+    def copy(self):
+        """
+        Returns a shallow copy of self.
+
+        : return: TheorySMS object
+        """
+
+        newSMS = ExpSMS()
+        newSMS._successors.update({n: daughters[:]
+                                   for n, daughters in self._successors.items()})
+        newSMS._predecessors = {k: v for k, v in self._predecessors.items()}
+        newSMS._nodesMapping = {n: node for n, node in self._nodesMapping.items()}
+        newSMS._rootIndex = self._rootIndex
+        newSMS._canonName = self._canonName
+
+        return newSMS
+
 
 

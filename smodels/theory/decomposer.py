@@ -117,8 +117,11 @@ def getDecayNodes(mother):
     """
 
 
-    if hasattr(mother.particle,'decayTrees'):
-        return mother.particle.decayTrees
+    # If the trees were already computed, store them in the particle object
+    if hasattr(mother.particle,'_decayTrees'):
+        return mother.particle._decayTrees
+
+    # Otherwise, compute them
     decayTrees = []
 
     # Sort decays:
@@ -145,7 +148,9 @@ def getDecayNodes(mother):
 
         decayTrees.append((mom, daughters, decay.br))
 
-    mother.particle.decayTrees = decayTrees
+    # Store the decays in the particle object
+    mother.particle._decayTrees = decayTrees
+
     return decayTrees
 
 

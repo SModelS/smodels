@@ -26,7 +26,6 @@ class ParticleNode(object):
     (since the same particle can not appear as distinct nodes)
 
     :ivar particle: Stores the Particle object
-    :ivar nodeNumber: Node identifier
     """
 
     def __init__(self, particle,
@@ -139,7 +138,6 @@ class ParticleNode(object):
 
         if other.isInclusive:
             return -other.compareTo(self)
-
         if not isinstance(other, ParticleNode):
             raise SModelSError("Can not compare node to %s" % type(other))
 
@@ -183,55 +181,34 @@ class InclusiveParticleNode(ParticleNode):
     ParticleNode object or InclusiveParticleNode object.
 
     :ivar particle: IncluviseParticle (dummy)
-    :ivar nodeNumber: Node identifier
     :ivar finalStates: Allowed final states (final state nodes)
     """
 
     def __init__(self, particle=IncluviseParticle,
-                 nodeNumber=None,
                  canonName=InclusiveValue(), isFinalState=True,
                  finalStates=[], isInclusive=True):
 
         ParticleNode.__init__(self, particle=particle,
-                              nodeNumber=nodeNumber,
                               canonName=canonName, isFinalState=isFinalState,
                               finalStates=finalStates, isInclusive=isInclusive)
 
-    def compareTo(self, other, inclusive=True):
+    def compareTo(self, other):
         """
         Compares only the finalStates attributes of self and other.
         All the final states in other have to match at least one final
         state in self.
 
         :param other: ParticleNode or InclusiveParticleNode object
-        :param inclusive: If False, particles are required to be identical
-                          (the inclusiveness of MultiParticles or InclusiveNodes
-                          are not considered when comparing)
 
         :return: 0 (self == other), 1 (self > other), -1 (self < other)
         """
 
         fsA = self.finalStates[:]  # Sorted final states in A
-        fsB = other.finalStates[:]  # Sorted final states in B
-
-        # If inclusive=False, requires final states to be the same particle
-        # and other node to be an InclusiveNode
-        if not inclusive:
-            if not other.isInclusive:
-                return -1
-            if len(fsA) != len(fsB):
-                if len(fsA) > len(fsB):
-                    return 1
-                else:
-                    return -1
-            for iB, fs in enumerate(fsB):
-                if fs is fsA[iB]:
-                    continue
-                if fs < fsA[iB]:
-                    return 1
-                else:
-                    return -1
+        if other.finalStates:
+            fsB = other.finalStates[:]  # Sorted final states in B
+        else:
             return 0
+
 
         for fs in fsB:
             if fs in fsA:
