@@ -27,12 +27,9 @@ class ParticleNode(object):
 
     :ivar particle: Stores the Particle object
     :ivar nodeNumber: Node identifier
-    :ivar nodeWeight: Stores the node weight
-                      (1 for stable particles, BR for unstable
-                      and production xsec for primary vertex)
     """
 
-    def __init__(self, particle, nodeWeight=1.0,
+    def __init__(self, particle,
                  canonName=None, isFinalState=False,
                  finalStates=None, isInclusive=False):
         self.particle = particle
@@ -41,10 +38,6 @@ class ParticleNode(object):
         # if it is not specifically assigned, automatically assign
         # a new number which does not overlap with any previous class instances
         self.canonName = canonName
-        # Node weight:
-        # (1 for stable particles, BR for unstable and
-        # production xsec for primary vertex)
-        self.nodeWeight = nodeWeight
 
         # Flag to tag nodes which should not be decayed
         self.isFinalState = isFinalState
@@ -123,17 +116,15 @@ class ParticleNode(object):
     def __add__(self, other):
         """
         Adds two nodes. The properties of self are kept, except
-        for the particle and nodeWeight, which are added with other.
+        for the particle, which are added with other.
 
         :param other: ParticleNode object
 
         :return: a copy of self with the particle combined with other.particle
-                 and nodeWeight added.
         """
 
         newNode = self.copy()
         newNode.particle = self.particle + other.particle
-        newNode.nodeWeight = self.nodeWeight + other.nodeWeight
 
         return newNode
 
@@ -152,13 +143,9 @@ class ParticleNode(object):
         if not isinstance(other, ParticleNode):
             raise SModelSError("Can not compare node to %s" % type(other))
 
-        if self.particle != other.particle:
-            if self.particle > other.particle:
-                return 1
-            else:
-                return -1
+        cmp = self.particle.__cmp__(other.particle)
 
-        return 0
+        return cmp
 
     def equalTo(self, other):
         """
@@ -186,10 +173,6 @@ class ParticleNode(object):
 
         if self.finalStates is not None:
             newNode.finalStates = self.finalStates[:]
-        if isinstance(self.nodeWeight,(int,float,type(None))):
-            newNode.nodeWeight = self.nodeWeight
-        else:
-            newNode.nodeWeight = self.nodeWeight.copy()
 
         return newNode
 
@@ -201,17 +184,16 @@ class InclusiveParticleNode(ParticleNode):
 
     :ivar particle: IncluviseParticle (dummy)
     :ivar nodeNumber: Node identifier
-    :ivar nodeWeight: 1 (dummy value)
     :ivar finalStates: Allowed final states (final state nodes)
     """
 
     def __init__(self, particle=IncluviseParticle,
-                 nodeNumber=None, nodeWeight=1.0,
+                 nodeNumber=None,
                  canonName=InclusiveValue(), isFinalState=True,
                  finalStates=[], isInclusive=True):
 
         ParticleNode.__init__(self, particle=particle,
-                              nodeNumber=nodeNumber, nodeWeight=nodeWeight,
+                              nodeNumber=nodeNumber,
                               canonName=canonName, isFinalState=isFinalState,
                               finalStates=finalStates, isInclusive=isInclusive)
 
@@ -270,7 +252,6 @@ class InclusiveParticleNode(ParticleNode):
         """
 
         newNode = InclusiveParticleNode(particle=self.particle,
-                                        nodeWeight=self.nodeWeight,
                                         canonName=self.canonName,
                                         isFinalState=self.isFinalState,
                                         finalStates=self.finalStates,

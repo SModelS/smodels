@@ -56,13 +56,14 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
         maxWeight = weight.getMaxXsec().asNumber(fb)
         if  maxWeight < sigmacutFB:
             continue
-        pv = ParticleNode(model.getParticle(label='PV'), nodeWeight=weight)
+        pv = ParticleNode(model.getParticle(label='PV'))
         primaryMothers = [ParticleNode(model.getParticle(pdg=pdg)) for pdg in pdgs]
         newSMS = TheorySMS()
+        newSMS.maxWeight = maxWeight
+        newSMS.prodXSec = weight
         pvIndex = newSMS.add_node(pv)
         motherIndices = newSMS.add_nodes_from(primaryMothers)
         newSMS.add_edges_from(product([pvIndex],motherIndices))
-        newSMS._maxWeight = maxWeight
         productionSMS.append(newSMS)
 
     # Sort production SMS by their maximum weights
@@ -101,7 +102,6 @@ def getDecayNodes(mother):
     Generates a simple list of trees with all the decay channels
     for the mother. In each tree the mother appears as the root
     and each of its decays as daughters.
-    The  mother node weight is set to the respective decay branching ratio.
     (The node numbering for the root/mother node is kept equal,
     while the numbering of the daughters is automatically assigned to
     avoid overlap with any previously created nodes, so the
@@ -110,11 +110,15 @@ def getDecayNodes(mother):
 
     :param mother: Mother for which the decay trees will be generated (ParticleNode object)
 
-    :return: A list with simple tuples ((mom,daughters)) where
-             the first entry is the new mother ParticleNode (with its nodeWeight set to the decay BR)
-             and the second is a list of daughter ParticleNode objects.
+    :return: A list with simple tuples ((mom,daughters,BRs)) where
+             the first entry is the new mother ParticleNode,
+             the second is a list of daughter ParticleNode objects and
+             the third the corresponding BR.
     """
 
+
+    if hasattr(mother.particle,'decayTrees'):
+        return mother.particle.decayTrees
     decayTrees = []
 
     # Sort decays:
@@ -125,9 +129,8 @@ def getDecayNodes(mother):
         else:
             # Include possibility of mother appearing as a final state
             mom = mother.copy()
-            mom.nodeWeight = 1.0
             mom.isFinalState = True  # Forbids further node decays
-            decayTrees.append((mom, []))
+            decayTrees.append((mom, [], 1.0))
 
     decays = sorted(decays, key=lambda dec: dec.br, reverse=True)
     # Loop over decays of the daughter
@@ -136,13 +139,13 @@ def getDecayNodes(mother):
             continue  # Skip decays with zero BRs
         daughters = []
         mom = mother.copy()
-        mom.nodeWeight = decay.br
         for ptc in decay.daughters:
             ptcNode = ParticleNode(particle=ptc)
             daughters.append(ptcNode)
 
-        decayTrees.append((mom, daughters))
+        decayTrees.append((mom, daughters, decay.br))
 
+    mother.particle.decayTrees = decayTrees
     return decayTrees
 
 
@@ -181,12 +184,8 @@ def addOneStepDecays(sms, sigmacutFB=0.0):
             mom.isFinalState = True
             continue
 
-        # Get a list of decay nodes for final state:
+        # Get a list of decay nodes for final state (sorted by highest BR):
         decayNodesList = getDecayNodes(mom)
-        # Sort by weight
-        decayNodesList = sorted(decayNodesList,
-                                key=lambda decay: decay[0].nodeWeight,
-                                reverse=True)
         if not decayNodesList:
             mom.isFinalState = True
             continue
@@ -198,13 +197,13 @@ def addOneStepDecays(sms, sigmacutFB=0.0):
             if tweight < sigmacutFB:
                 continue
             for decayNodes in decayNodesList:
-                dweight = decayNodes[0].nodeWeight
-                if tweight*dweight < sigmacutFB:
+                br = decayNodes[2]
+                if tweight*br < sigmacutFB:
                     break  # Since the decays are sorted, the next ones will also fall below sigmacut
 
                 # Attach decay to original tree
                 # (the mother node gets replaced by node from the decay dict)
-                newSMS = T.attachDecay(motherIndex, decayNodes, copy=True)
+                newSMS = T.attachDecay(motherIndex, decayNodes, br=br, copy=True)
                 newSMSList.append(newSMS)
 
         if not newSMSList:

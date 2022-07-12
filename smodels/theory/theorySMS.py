@@ -30,8 +30,6 @@ class TheorySMS(GenericSMS):
         GenericSMS.__init__(self)
 
         # Include additional attributes
-        self._maxWeight = None
-        self._weightList = None
         self._sorted = False
         # List of SMS topologies which could have generated self (such as during compression)
         self.ancestors = [self]
@@ -120,8 +118,8 @@ class TheorySMS(GenericSMS):
         newSMS.addNodesFrom(other)
         # Add other attributes
         newSMS.ancestors = self.ancestors[:] + other.ancestors[:]
-        newSMS._weightList = self.weightList + other.weightList
-        newSMS._maxWeight = self.maxWeight + other.maxWeight
+        newSMS.weightList = self.weightList + other.weightList
+        newSMS.maxWeight = self.maxWeight + other.maxWeight
         if other._allAncestors is not None:
             newSMS._allAncestors += other._allAncestors[:]
 
@@ -143,7 +141,7 @@ class TheorySMS(GenericSMS):
         if sort:
             self.sort(force=True)
         if weight:
-            self._weightList = self.computeWeightList()
+            self.weightList = self.computeWeightList()
 
     def compareTo(self, other):
         """
@@ -165,9 +163,7 @@ class TheorySMS(GenericSMS):
         other.sort()
 
         cmp = self.compareSubTrees(other,self.rootIndex,other.rootIndex)
-
         return cmp
-
 
     def copy(self):
         """
@@ -185,7 +181,8 @@ class TheorySMS(GenericSMS):
         newSMS._canonName = self._canonName
         newSMS._nodeCanonNames = {nodeIndex : cName
                                   for nodeIndex,cName in self._nodeCanonNames.items()}
-        newSMS._maxWeight = self._maxWeight
+        newSMS.maxWeight = self.maxWeight
+        newSMS.prodXSec = self.prodXSec
         newSMS._sorted = self._sorted
         newSMS.ancestors = self.ancestors[:]
         if self._allAncestors is not None:
@@ -214,17 +211,17 @@ class TheorySMS(GenericSMS):
         # Just change the nodeIndex -> node mapping:
         self.updateNodeObjects(nodeObjectDict=newMapping)
 
-    def attachDecay(self, motherIndex, decayNodes, copy=True):
+    def attachDecay(self, motherIndex, decayNodes, br=1.0, copy=True):
         """
         Attaches a decay to self. If copy = True, returns a copy of self
         with the decay attached.
 
-        : param decay: A tuple containing the mother node (carring the BR as the nodeWeight)
-                      and the daughter nodes.
+        :param motherIndex: Node index for the mother to which the decay should be added.
+        :param decayNodes: Particle nodes for the daughters.
+        :br: Branching ratio value for the decay
+        :param copy: if True, return a copy of self, with the decay attached.
 
-        : param copy: if True, return a copy of self, with the decay attached.
-
-        : return: new tree with the other composed with self.
+        :return: new tree with the other composed with self.
         """
 
         if self.out_degree(motherIndex) != 0:
@@ -240,8 +237,7 @@ class TheorySMS(GenericSMS):
             newSMS = self
 
         # Update maximum weight
-        if motherNode.nodeWeight is not None:
-            newSMS._maxWeight = newSMS.maxWeight*motherNode.nodeWeight
+        newSMS.maxWeight = self.maxWeight*br
 
         # Update mother node:
         newSMS.updateNodeObjects({motherIndex : motherNode})
@@ -285,91 +281,24 @@ class TheorySMS(GenericSMS):
 
         return node.finalStates
 
-    @property
-    def weightList(self):
-        """
-        Returns the SMS weight list (production cross-sections*BRs).
-        It does not include the weight of final state (undecayed) particles.
-
-        :return: CrossSectionList object
-        """
-
-        if self._weightList is None:
-            self._weightList = self.computeWeightList()
-
-        return self._weightList
-
     def computeWeightList(self):
         """
-        Computes the SMS weight (production cross-section*BRs).
-        It does not include the weight of final state (undecayed) particles.
+        Computes the SMS weight (production cross-section*BRs) using maxWeight
+        and the production cross-section.
 
         :return: CrossSectionList object
         """
 
-        root = self.root
-        prodXSec = root.nodeWeight
-        brs = 1.0
-        for nodeIndex in self.nodeIndices:
-            if nodeIndex == self.rootIndex:
-                continue
-            if self.out_degree(nodeIndex) == 0:
-                continue
-            node = self.indexToNode(nodeIndex)
-            brs *= node.nodeWeight
-
+        prodXSec = self.prodXSec
+        if isinstance(prodXSec,(crossSection.XSectionList,crossSection.XSection)):
+            maxSec = prodXSec.getMaxXsec().asNumber(fb)
+        elif isinstance(prodXSec,unum.Unum):
+            maxSec = prodXSec.asNumber(fb)
+        else:
+            maxSec = prodXSec
+        brs = self.maxWeight/maxSec
 
         return prodXSec*brs
-
-    @property
-    def maxWeight(self):
-        """
-        Returns the SMS maximum weight (max production cross-section*BRs).
-        Does not include the weight of final state (undecayed) particles.
-        If it has not yet been computed, compute it.
-
-        :return: SMS weight in fb (float).
-        """
-
-        if self._maxWeight is None:
-            self._maxWeight = self.computeMaxWeight()
-
-        return self._maxWeight
-
-    def computeMaxWeight(self):
-        """
-        Computes the SMS maximum weight (max production cross-section*BRs).
-        Does not include the weight of final state (undecayed) particles.
-
-        :return: SMS weight in fb (float).
-        """
-
-        # Get maximum production cross-section
-        root = self.root
-        prodXSec = root.nodeWeight
-
-        # Get product of branching ratios:
-        brs = 1.0
-        for nodeIndex in self.nodeIndices:
-            if nodeIndex == self.rootIndex:
-                continue
-            if self.out_degree(nodeIndex) == 0:
-                continue
-            node = self.indexToNode(nodeIndex)
-            brs *= node.nodeWeight
-
-
-        weight = prodXSec*brs
-        if isinstance(weight,unum.Unum):
-            return weight.asNumber(fb)
-        elif isinstance(weight,float):
-            return weight
-        elif isinstance(weight,crossSection.XSection):
-            return weight.value.asNumber(fb)
-        elif isinstance(weight,crossSection.XSectionList):
-            return weight.getMaxXsec().asNumber(fb)
-        else:
-            return weight
 
     def sort(self, nodeIndex=None, force=False):
         """
@@ -386,6 +315,7 @@ class TheorySMS(GenericSMS):
         # If tree is already sorted, do nothing
         if self._sorted and not force:
             return
+
 
         if nodeIndex is None:
             cName = self.canonName  # Just to make sure canonName is defined
@@ -406,11 +336,10 @@ class TheorySMS(GenericSMS):
             self.add_edges_from(product([nodeIndex],sorted_daughters))
 
         # Finally, after sorting the subtrees,
-        # make sure the nodes are sorted according
+        # make sure the nodes are sorted and numbered according
         # to the generations (breadth-first search)
         if nodeIndex == self.rootIndex:
-            self.bfs_sort()
-            self.numberNodes()
+            self.bfs_sort(numberNodes=True)
             # Tag the tree as sorted
             self._sorted = True
 
@@ -761,7 +690,7 @@ class TheorySMS(GenericSMS):
 
         # Set the compressed topology weight as the original weight
         # (it can not longer be computed from its nodes)
-        newSMS._weightList = self.weightList
+        newSMS.weightList = self.weightList
         # Recompute the global properties (except for the weightList)
         # and sort the new SMS
         newSMS.setGlobalProperties(weight=False)
@@ -834,7 +763,7 @@ class TheorySMS(GenericSMS):
             return None
         # Set the compressed topology weight as the original weight
         # (it can not longer be computed from its nodes)
-        newSMS._weightList = self.weightList
+        newSMS.weightList = self.weightList
         # Recompute the global properties (except for the weightList)
         # and sort the new SMS
         newSMS.setGlobalProperties(weight=False)

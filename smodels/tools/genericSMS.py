@@ -504,16 +504,25 @@ class GenericSMS(object):
                     # All the children have been visited, remove from list
                     daughters.pop()
 
-    def bfs_sort(self):
+    def bfs_sort(self, numberNodes=False):
         """
         Sort the nodes according to their appearence in a
-        breadth first search
+        breadth first search.
+
+        :param numberNodes: If True, renumber the nodes according to their bfs order
         """
 
         new_successors = OrderedDict()
+        indexDict = {}
+        newIndex = 0
         for mom, daughters in self.genIndexIterator(includeLeaves=True):
+            indexDict[mom] = newIndex
+            newIndex += 1
             new_successors[mom] = daughters
+
         self._successors = new_successors
+        if numberNodes:
+            self.relabelNodeIndices(nodeIndexDict=indexDict)
 
     def treeToString(self):
         """
@@ -707,27 +716,6 @@ class GenericSMS(object):
 
         for nodeIndex, newObj in nodeObjectDict.items():
             self._nodesMapping[nodeIndex] = newObj
-
-    def numberNodes(self):
-        """
-        Relabel the node indices from 0 to N following the generations
-        iterator.
-        """
-
-        nodeOrder = []
-        for mom, daughters in self.genIndexIterator(includeLeaves=True):
-            nodeOrder.append((mom, daughters))
-
-        # Creating mapping dict from old indices to new indices,
-        # where the new indices correspond to the node appearence order:
-        inode = 0
-        newIndexDict = {}
-        for node, _ in nodeOrder:
-            newIndexDict[node] = inode
-            inode += 1
-
-        # Relabel nodes:
-        self.relabelNodeIndices(nodeIndexDict=newIndexDict)
 
     def checkConsistency(self):
         """
