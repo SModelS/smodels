@@ -50,6 +50,26 @@ class GenericSMS(object):
 
         return self.treeToString()
 
+    def __getattr__(self, attr):
+        """
+        If the attribute has not been defined for self
+        try to fetch it from its nodes
+        :param attr: Attribute name
+        :return: Attribute value
+        """
+
+        # If calling another special method, return default (required for pickling)
+        if (attr.startswith('__') and attr.endswith('__')) or attr in dir(self):
+            return self.__getattribute__(attr)
+
+
+        try:
+            val = [getattr(node, attr) if node is not self.root else None
+                   for node in self.nodes]
+            return val
+        except AttributeError:
+            raise AttributeError("Neither SMS nor nodes have attribute ``%s''" % attr)
+
     def add_node(self, node):
         """
         Adds a node object to the tree. The node index will be

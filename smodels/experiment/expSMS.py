@@ -208,11 +208,20 @@ class ExpSMS(GenericSMS):
         # Make a new tree
         matchedTree = self.copy()
 
+        # Remove missing nodes (in case there are inclusive matchings)
+        for n1 in matchedTree.nodeIndices:
+            if n1 not in match:
+                matchedTree.remove_node(n1)
+
         # Create nodes dict:
         nodesDict = {}
         for n1, n2 in match.items():
-            node = other.indexToNode(n2)  # Node from other
-            nodesDict[n1] = node  # index from self
+            node1 = self.indexToNode(n1) # Node from self
+            if node1.isInclusive or node1.inclusiveList:
+                continue # Do not copy inclusive nodes
+            else:
+                node2 = other.indexToNode(n2)  # Node from other
+                nodesDict[n1] = node2  # index from self
 
         # Update node objects:
         matchedTree.updateNodeObjects(nodesDict)
@@ -238,6 +247,15 @@ class ExpSMS(GenericSMS):
         if T2_node is None:
             T2_node = other.rootIndex
 
+        # print('comparing',T1_node,T2_node,self.indexToNode(T1_node),other.indexToNode(T2_node))
+
+        # Compare node canonical names
+        cName1 = self.nodeCanonName(T1_node)
+        cName2 = other.nodeCanonName(T2_node)
+        if cName1 != cName2:
+            return None
+
+
         # Compare nodes directly (canon name and particle content)
         node1 = self.indexToNode(T1_node)
         node2 = other.indexToNode(T2_node)
@@ -247,17 +265,20 @@ class ExpSMS(GenericSMS):
             self.getFinalStates(T1_node)  # Make sure final states are defined
 
         cmp = node1.compareTo(node2)
+        # print('  node comp=',cmp)
         if cmp != 0:
             return None
 
         # For inclusive nodes always return True (once nodes are equal)
         if node1.isInclusive or node2.isInclusive:
+            # print('  equal nodes (inclusive)')
             return {T1_node: T2_node}
 
         # Check for equality of daughters
         daughters1 = self.daughterIndices(T1_node)
         daughters2 = other.daughterIndices(T2_node)
         if len(daughters1) == len(daughters2) == 0:
+            # print('  equal nodes (leaf)')
             return {T1_node: T2_node}
 
 
@@ -265,56 +286,63 @@ class ExpSMS(GenericSMS):
         left_nodes = daughters1[:]
         right_nodes = daughters2[:]
         edges = {}
-        matchesDict = {}
         for d1 in left_nodes:
             for d2 in right_nodes:
                 mapDict = self.compareSubTrees(other,d1, d2)
                 if mapDict is not None:
-                    if d1 not in matchesDict:
-                        matchesDict[d1] = {}
+                    if d1 not in edges:
                         edges[d1] = {}
-                    matchesDict[d1].update({d2: mapDict})
                     edges[d1].update({d2: mapDict})
 
             # If node had no matches (was not added to the graph),
             # we already know T1_node and T2_node differs
-            if d1 not in matchesDict:
+            if d1 not in edges:
                 return None
 
-        # Check if all nodes were included in the graph
-        # (they had at least one match)
-        if len(edges) != len(left_nodes):
+        # Remove nodes and edges for inclusiveList nodes
+        # and add them to the final map
+        finalMap = {}
+        for d1 in daughters1[:]:
+            if not self.indexToNode(d1).inclusiveList:
+                continue
+            if not d1 in edges:
+                continue
+            left_nodes.remove(d1)
+            for d2 in edges[d1]:
+                right_nodes.remove(d2)
+            finalMap[d1] = edges.pop(d1)
+
+
+        # print('Left=',left_nodes)
+        # print('Right=',right_nodes)
+        # print('edges=',edges)
+        # Compute the maximal matching
+        # (mapping where each node1 is connected to a single node2)
+        mapDict = maximal_matching(left_nodes, right_nodes, edges)
+
+        # print('Maximal matching:\n',mapDict)
+
+        # Check if the match was successful.
+        # Consider a successful match if all nodes in daughters1 were matched
+        # or if all nodes in daughers2 were matched and the unmatched nodes
+        # in daughters1 match an InclusiveNode.
+        matched = False
+        # Matched left nodes:
+        left_matches = len(set(mapDict.keys()))
+        right_matches = len(set(mapDict.values()))
+        if left_matches != len(left_nodes):
             return None
-        else:
-            # Compute the maximal matching
-            # (mapping where each node1 is connected to a single node2)
-            mapDict = maximal_matching(left_nodes, right_nodes, edges)
-
-            # Check if the match was successful.
-            # Consider a successful match if all nodes in daughters1 were matched
-            # or if all nodes in daughers2 were matched and the unmatched nodes
-            # in daughters1 match an InclusiveNode.
-            matched = False
-            if len(mapDict) == len(left_nodes):
-                matched = True
-            elif len(mapDict) == len(right_nodes):
-                matched = True
-                unMatched = [d1 for d1 in left_nodes if d1 not in mapDict]
-                for d1 in unMatched:
-                    if any(not other.indexToNode(d2).isInclusive
-                           for d2 in edges[d1]):
-                        matched = False
-                        break
-
-        if not matched:
+        if right_matches != len(right_nodes):
             return None
 
-        for d1, d2 in list(mapDict.items()):
+        finalMap.update(mapDict)
+        for d1, d2 in list(finalMap.items()):
             daughtersMap = edges[d1][d2]
-            mapDict.update(daughtersMap)
-        mapDict[T1_node] = T2_node
+            finalMap.update(daughtersMap)
+        finalMap[T1_node] = T2_node
 
-        return mapDict
+        # print('   returning for %i = %i' %(T1_node,T2_node),finalMap)
+        return finalMap
 
     def copy(self):
         """

@@ -29,14 +29,10 @@ class ParticleNode(object):
     """
 
     def __init__(self, particle,
-                 canonName=None, isFinalState=False,
-                 finalStates=None, isInclusive=False):
-        self.particle = particle
+                 isFinalState=False, finalStates=None,
+                 isInclusive=False, inclusiveList=False):
 
-        # Since ParticleNodes are identified by their numbering,
-        # if it is not specifically assigned, automatically assign
-        # a new number which does not overlap with any previous class instances
-        self.canonName = canonName
+        self.particle = particle
 
         # Flag to tag nodes which should not be decayed
         self.isFinalState = isFinalState
@@ -50,6 +46,9 @@ class ParticleNode(object):
 
         # Flag to identify as non-inclusive node:
         self.isInclusive = isInclusive
+        # Flag to identify as non-inclusive node:
+        self.inclusiveList = inclusiveList
+
 
     def __hash__(self):
         return object.__hash__(self)
@@ -147,8 +146,7 @@ class ParticleNode(object):
 
     def equalTo(self, other):
         """
-        Compare nodes accoring to their canonical name
-        and particle.
+        Compare nodes accoring to their particle.
 
         :param other: ParticleNode or InclusiveParticleNode object
 
@@ -165,7 +163,6 @@ class ParticleNode(object):
         """
 
         newNode = ParticleNode(particle=self.particle,
-                               canonName=self.canonName,
                                isInclusive=self.isInclusive,
                                isFinalState=self.isFinalState)
 
@@ -185,12 +182,14 @@ class InclusiveParticleNode(ParticleNode):
     """
 
     def __init__(self, particle=IncluviseParticle,
-                 canonName=InclusiveValue(), isFinalState=True,
-                 finalStates=[], isInclusive=True):
+                 isFinalState=True,finalStates=[],
+                 isInclusive=True,inclusiveList=False):
 
         ParticleNode.__init__(self, particle=particle,
-                              canonName=canonName, isFinalState=isFinalState,
-                              finalStates=finalStates, isInclusive=isInclusive)
+                              isFinalState=isFinalState,
+                              finalStates=finalStates,
+                              isInclusive=isInclusive,
+                              inclusiveList=inclusiveList)
 
     def compareTo(self, other):
         """
@@ -229,10 +228,10 @@ class InclusiveParticleNode(ParticleNode):
         """
 
         newNode = InclusiveParticleNode(particle=self.particle,
-                                        canonName=self.canonName,
                                         isFinalState=self.isFinalState,
                                         finalStates=self.finalStates,
-                                        isInclusive=self.isInclusive)
+                                        isInclusive=self.isInclusive,
+                                        inclusiveList=self.inclusiveList)
 
         return newNode
 
@@ -258,5 +257,6 @@ class InclusiveParticleNode(ParticleNode):
 
         :return: Attribute value or None
         """
+
         if attr not in self.__dict__:
             return None
