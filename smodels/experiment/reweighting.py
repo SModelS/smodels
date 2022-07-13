@@ -7,7 +7,7 @@
 
 from math import exp
 from smodels.tools.physicsUnits import GeV
-from smodels.theory.element import Element
+from smodels.experiment.expSMS import ExpSMS
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 

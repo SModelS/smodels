@@ -163,6 +163,8 @@ class TheorySMS(GenericSMS):
                                   for nodeIndex,cName in self._nodeCanonNames.items()}
         newSMS.maxWeight = self.maxWeight
         newSMS.prodXSec = self.prodXSec
+        if hasattr(self,'weightList'):
+            newSMS.weightList = self.weightList.copy()
         newSMS._sorted = self._sorted
         newSMS.ancestors = self.ancestors[:]
         if self._allAncestors is not None:
@@ -741,9 +743,6 @@ class TheorySMS(GenericSMS):
         newSMS = newSMSList[0]
         if newSMS is self:
             return None
-        # Set the compressed topology weight as the original weight
-        # (it can not longer be computed from its nodes)
-        newSMS.weightList = self.weightList
         # Recompute the global properties (except for the weightList)
         # and sort the new SMS
         newSMS.setGlobalProperties(weight=False)

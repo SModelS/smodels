@@ -12,14 +12,14 @@
 
 import os
 from smodels.tools import physicsUnits
-from smodels.theory.auxiliaryFunctions import (elementsInStr, removeUnits,
+from smodels.experiment.expAuxiliaryFuncs import (elementsInStr, removeUnits,
                                                rescaleWidth, unscaleWidth, cSim, cGtr)
 from smodels.tools.stringTools import concatenateLines
-from smodels.theory.element import Element
+from smodels.experiment.expSMS import ExpSMS
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.txnameDataObj import TxNameData
-from smodels.tools.reweighting import defaultEffReweight, defaultULReweight
+from smodels.experiment.reweighting import defaultEffReweight, defaultULReweight
 import numpy as np
 import unum
 import math
