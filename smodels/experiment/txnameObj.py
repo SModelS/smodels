@@ -12,10 +12,11 @@
 
 import os
 from smodels.tools import physicsUnits
-from smodels.experiment.expAuxiliaryFuncs import (elementsInStr, removeUnits,
+from smodels.experiment.expAuxiliaryFuncs import (smsInStr, removeUnits,
                                                rescaleWidth, unscaleWidth, cSim, cGtr)
 from smodels.tools.stringTools import concatenateLines
 from smodels.experiment.expSMS import ExpSMS
+from smodels.tools.genericSMS import GenericSMS
 from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.txnameDataObj import TxNameData
@@ -46,7 +47,7 @@ class TxName(object):
         self.txnameDataExp = None  # expected Data
         self.dataMap = None
         self.arrayMap = None
-        self.elementMap = {}  # Stores the elements and their label representaion
+        self.smsMap = {}  # Stores the SMS and their label representaion
         self._constraintFunc = None
         self._conditionsList = []
         self.finalState = ['MET', 'MET']  # default final state
@@ -104,16 +105,16 @@ class TxName(object):
             raise SModelSError("Database particles is empty. Can not create TxName object.")
 
         # Process constraint, simplify it so it can be easily evaluated and
-        # stores the elements in self.elementMap
+        # stores the SMS in self.smsMap
         if hasattr(self, 'constraint'):
-            exprFunc, elMap = self.processExpr(self.constraint,
+            exprFunc, smsMap = self.processExpr(self.constraint,
                                                databaseParticles,
                                                checkUnique=True)
             self._constraintFunc = exprFunc
-            self.elementMap = elMap
+            self.smsMap = smsMap
 
         # Process conditions, simplify it so it can be easily evaluated and
-        # stores the expressions and element maps in _conditionsList
+        # stores the expressions and SMS maps in _conditionsList
         if hasattr(self, 'condition') and self.condition:
             conds = self.condition
             if not isinstance(conds, list):
@@ -127,8 +128,8 @@ class TxName(object):
         # Do consistency checks:
         self.checkConsistency()
 
-        # Define canonical name (should be the same for all elements)
-        self.canonName = list(self.elementMap.keys())[0].canonName
+        # Define canonical name (should be the same for all SMS)
+        self.canonName = list(self.smsMap.keys())[0].canonName
 
         # Get detector size (if not found in self, look for it in datasetInfo or globalInfo).
         # If not defined anywhere, set it to None and default values will be used for reweighting.
@@ -156,32 +157,32 @@ class TxName(object):
 
     def checkConsistency(self):
         """
-        Checks if all the elements in txname have the same structure (topology/canonical name)
+        Checks if all the SMS in txname have the same structure (topology/canonical name)
         and verify if its constraints and conditions are valid expressions.
 
         :return: True if txname is consitency. Raises an error otherwise.
         """
 
-        # Check if all elements have the same canonical name:
-        elements = list(self.elementMap.keys())
-        cName = elements[0].canonName
-        for el in elements[1:]:
-            if el.canonName != cName:
-                msgError = "Txname %s referes to elements with distinct topologies." % self
+        # Check if all SMS have the same canonical name:
+        smsList = list(self.smsMap.keys())
+        cName = smsList[0].canonName
+        for sms in smsList[1:]:
+            if sms.canonName != cName:
+                msgError = "Txname %s referes to SMS with distinct topologies." % self
                 logger.error(msgError)
                 raise SModelSError(msgError)
 
         # Check if the constraint can be evaluated:
-        elements = []
-        for elObj, elLabel in self.elementMap.items():
-            elTest = elObj.copy()
-            elTest.weight = 3.0*(len(elements)+1)*physicsUnits.fb  # dumyy xsec
-            elTest.txlabel = elLabel
-            elements.append(elTest)
+        smsList = []
+        for smsObj, smsLabel in self.smsMap.items():
+            smsTest = smsObj.copy()
+            smsTest.weight = 3.0*(len(smsList)+1)*physicsUnits.fb  # dumyy xsec
+            smsTest.txlabel = smsLabel
+            smsList.append(smsTest)
 
         # Dummy constraint eval:
         try:
-            res = self.evalConstraintFor(elements)
+            res = self.evalConstraintFor(smsList)
         except (TypeError, NameError) as e:
             msgError = "Can not evaluate constraint %s for %s." % (self._constraintFunc, self)
             msgError += "\n error: %s" % str(e)
@@ -194,15 +195,15 @@ class TxName(object):
             raise SModelSError(msgError)
 
         # Dummy condistions eval:
-        elements = []
+        smsList = []
         for cond in self._conditionsList:
-            for elMap in cond.values():
-                for elObj, elLabel in elMap.items():
-                    elTest = elObj.copy()
-                    elTest.weight = 3.0*(len(elements)+1)*physicsUnits.fb  # dumyy xsec
-                    elements.append(elTest)
+            for smsMap in cond.values():
+                for smsObj, smsLabel in smsMap.items():
+                    smsTest = smsObj.copy()
+                    smsTest.weight = 3.0*(len(smsList)+1)*physicsUnits.fb  # dumyy xsec
+                    smsList.append(smsTest)
         try:
-            res = self.evalConditionsFor(elements)
+            res = self.evalConditionsFor(smsList)
         except (TypeError, NameError) as e:
             msgError = "Can not evaluate conditions %s for %s." % (self._conditionsFunc, self)
             msgError += "\n error: %s" % str(e)
@@ -220,18 +221,18 @@ class TxName(object):
                     checkUnique=False):
         """
         Process a string expression (constraint or condition) for
-        element weights.
+        the SMS weights.
         Returns a simplified string expression, which can be readily evaluated using
-        a dictionary mapping element labels to their weights. It also returns an
-        element map (dictionary) with the element objects as keys and their labels
+        a dictionary mapping SMS labels to their weights. It also returns an
+        SMS map (dictionary) with the SMS objects as keys and their labels
         (appearing in the simplified expression) as values.
 
-        :param stringExpr: A mathematical expression for elements (e.g. 2*([[['jet']],[['jet']]]))
+        :param stringExpr: A mathematical expression for SMS weights (e.g. 2*([[['jet']],[['jet']]]))
         :param databaseParticles: A Model object containing all the particle objects for the database.
-        :param checkUnique: If True raises an error if the elements appearing in the expression
+        :param checkUnique: If True raises an error if the SMS appearing in the expression
                             are not unique (relevant for avoiding double counting in the expression).
 
-        :return: simplfied expression (str), elementMap (dict).
+        :return: simplfied expression (str), smsMap (dict).
         """
 
         # Remove quotes, spaces and curly brackets from expression
@@ -239,43 +240,42 @@ class TxName(object):
         exprFunc = exprFunc.replace(" ", "")
         exprFunc = exprFunc.replace("}", "").replace("{", "")  # New format
 
-        # Get the maximum element ID already used
-        elementMap = {}
-        nel = 0
+        # Get the maximum SMS ID already used
+        smsMap = {}
+        nsms = 0
 
-        # Get the elements contained in the expression
-        for elStr in elementsInStr(str(stringExpr)):
-            elObj = Element(elStr, self.finalState,
-                            self.intermediateState,
-                            model=databaseParticles,
-                            sort=False)
+        # Get the SMS contained in the expression
+        for smsStr in smsInStr(str(stringExpr)):
+            smsObj = ExpSMS.from_string(smsStr,model=databaseParticles,
+                                        finalState=self.finalState,
+                                        intermediateState=self.intermediateState)
 
-            if checkUnique and any(elObj.matchElementTo(el) for el in elementMap):
-                msgError = "Duplicate elements found in: "
+            if checkUnique and any(smsObj == sms for sms in smsMap):
+                msgError = "Duplicate SMS found in: "
                 msgError += "%s in %s" % (stringExpr, self.globalInfo.id)
                 logger.error(msgError)
                 raise SModelSError(msgError)
 
-            # Add a new element and label to the map:
-            nel += 1
-            elObj.elID = nel
-            elObjLabel = 'el_%i' % elObj.elID
-            elementMap[elObj] = elObjLabel
+            # Add a new SMS and label to the map:
+            nsms += 1
+            smsObj.smsID = nsms
+            smsObjLabel = 'sms_%i' % smsObj.smsID
+            smsMap[smsObj] = smsObjLabel
 
-            # Replace the element string by its label
-            elStr = elStr.replace("'", "").replace(" ", "")
-            exprFunc = exprFunc.replace(elStr, '%s' % elObjLabel)
+            # Replace the SMS string by its label
+            smsStr = smsStr.replace("'", "").replace(" ", "")
+            exprFunc = exprFunc.replace(smsStr, '%s' % smsObjLabel)
 
-        return exprFunc, elementMap
+        return exprFunc, smsMap
 
-    def evalConstraintFor(self, elements):
+    def evalConstraintFor(self, smsList):
         """
-        Evaluate the constraint function for a list of elements
-        which have been matched to the txname elements. The
-        elements must have the attribute txlabel assigned to
+        Evaluate the constraint function for a list of SMS
+        which have been matched to the txname SMS. The
+        SMS must have the attribute txlabel assigned to
         the label appearing in the constraint expression.
 
-        :param elements: List of Element objects
+        :param smsList: List of SMS objects with txlabel and weight attributes
 
         :return: Value for the evaluated constraint, if the constraint
                  has been defined, None otherwise.
@@ -284,25 +284,25 @@ class TxName(object):
         if not self._constraintFunc:
             return None
 
-        # Build dictionary with elements and functions
+        # Build dictionary with SMS and functions
         # required for evaluating the constraint expression
         localsDict = {"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim}
-        # Add a dictionary entry with zero weights for all element labels
-        localsDict.update({elLabel: 0*physicsUnits.fb for elLabel in self.elementMap.values()})
-        # Add elements weights
-        for el in elements:
-            localsDict[el.txlabel] += el.weight
+        # Add a dictionary entry with zero weights for all SMS labels
+        localsDict.update({smsLabel: 0*physicsUnits.fb for smsLabel in self.smsMap.values()})
+        # Add SMS weights
+        for sms in smsList:
+            localsDict[sms.txlabel] += sms.weight
 
         return eval(self._constraintFunc, localsDict, {})
 
-    def evalConditionsFor(self, elements):
+    def evalConditionsFor(self, smsList):
         """
-        Evaluate the conditions for a list of elements
-        which have been matched to the txname elements. The
-        elements must have the attribute txlabel assigned to
+        Evaluate the conditions for a list of SMS
+        which have been matched to the txname SMS. The
+        SMS must have the attribute txlabel assigned to
         the label appearing in the constraint expression.
 
-        :param elements: List of Element objects
+        :param smsList: List of SMS objects with txlabel and weight attributes
 
         :return: List of condition values.
         """
@@ -313,13 +313,13 @@ class TxName(object):
         conditions = []
         for cond in self._conditionsList:
             condExpr = list(cond.keys())[0]
-            elMap = list(cond.values())[0]
-            weightsMap = {elLabel: 0.0*physicsUnits.fb for elLabel in elMap.values()}
-            # Add weights for matching elements:
-            for el in elements:
-                for elC, elLabel in elMap.items():
-                    if elC.matchElementTo(el) is not None:
-                        weightsMap[elLabel] += el.weight
+            smsMap = list(cond.values())[0]
+            weightsMap = {smsLabel: 0.0*physicsUnits.fb for smsLabel in smsMap.values()}
+            # Add weights for matching SMS:
+            for sms in smsList:
+                for smsC, smsLabel in smsMap.items():
+                    if smsC == sms:
+                        weightsMap[smsLabel] += sms.weight
             # Build dict with needed functions
             localsDict = {"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim}
             # Add weightMap:
@@ -334,7 +334,7 @@ class TxName(object):
         Convert input data (from the upperLimits, expectedUpperLimits or efficiencyMap fields)
         to a flat array without units. The output is used to construct the TxNameData object,
         which will further process the data and interpolate it.
-        It also builds the dictionary for translating Element properties to the flat data array.
+        It also builds the dictionary for translating SMS properties to the flat data array.
 
         :parameter rawData: Raw data (either string or list)
 
@@ -495,10 +495,10 @@ class TxName(object):
 
     def getDataMap(self, dataPoint):
         """
-        Using the elements in the topology, construct a dictionary
+        Using the sms in the topology, construct a dictionary
         mapping the node.number, the node attributes and the corresponding
         index in flatten data array.
-        If the dataMap has not been defined, construct from the element topology
+        If the dataMap has not been defined, construct from the sms topology
         and data point format.
 
         :param dataPoint: A point with the x-values from the data grid
@@ -512,30 +512,21 @@ class TxName(object):
         if self.dataMap is not None:
             return
 
-        # Since all elements are equivalent, use the first one
+        # Since all SMS are equivalent, use the first one
         # to define the map:
-        el = list(self.elementMap.keys())[0]
-        tree = el.tree
+        tree = list(self.smsMap.keys())[0]
 
         # Get a nested array of nodes corresponding to the data point:
         nodeArray = []
 
-        for mom, daughters in tree.dfs_successors().items():
+        for nodeIndex in tree.dfsIndexIterator(skipRoot=True):
             # Convert to node objects:
-            mom = tree.nodesMapping[mom]
-            daughters = [tree.nodesMapping[d] for d in daughters]
-            if mom.isInclusive:
+            node = tree.indexToNode(nodeIndex)
+            if node.isInclusive or node.inclusiveList:
                 continue
-            if mom is not tree.root:  # Ignore PV
-                nodeArray.append(mom)
-            for d in daughters:
-                if d.isSM:  # Ignore SM particles
-                    continue
-                if d.isInclusive:
-                    continue
-                if tree.out_degree(d.node) != 0:  # Ignore unstable daughters (will appear as mom)
-                    continue
-                nodeArray.append(d)
+            if node.isSM:
+                continue
+            nodeArray.append((node,nodeIndex))
 
         # Iterate over the array and construct a map for the nodes
         # and the flat array:
@@ -546,16 +537,16 @@ class TxName(object):
             if br == '*':
                 continue  # Skip inclusive branch
             for j, m in enumerate(br):
-                node = nodeArray.pop(0)
+                node,nodeIndex = nodeArray.pop(0)
                 arrayValue = m
                 mass, massUnit, width, widthUnit = self.getDataEntry(arrayValue)
                 # Add entry for mass
                 if mass is not None:
-                    arrayMap[massIndex] = ((i, j, 0), 'mass', massUnit, node.node)
+                    arrayMap[massIndex] = ((i, j, 0), 'mass', massUnit, nodeIndex)
                     massIndex += 1
                 # Add entry for width
                 if width is not None:
-                    arrayMap[widthIndex] = ((i, j, 1), 'totalwidth', widthUnit, node.node)
+                    arrayMap[widthIndex] = ((i, j, 1), 'totalwidth', widthUnit, nodeIndex)
                     widthIndex += 1
 
         # Store the nested bracket <-> flat array map
@@ -590,35 +581,35 @@ class TxName(object):
 
         return mass, massUnit, width, widthUnit
 
-    def getDataFromElement(self, element):
+    def getDataFromSMS(self, sms):
 
         dataMap = self.dataMap
-        elementData = [None]*(1+max(dataMap.keys()))
+        smsData = [None]*(1+max(dataMap.keys()))
         for indexArray, nodeTuple in dataMap.items():
             nodeIndex, attr, unit = nodeTuple
-            node = element.tree.nodesMapping[nodeIndex]
+            node = sms.indexToNode(nodeIndex)
             value = getattr(node, attr)
             if isinstance(unit, unum.Unum):
                 value = value.asNumber(unit)
             if attr == 'totalwidth':
                 value = rescaleWidth(value)
-            elementData[indexArray] = value
+            smsData[indexArray] = value
 
-        return elementData
+        return smsData
 
-    def getReweightingFor(self, element):
+    def getReweightingFor(self, sms):
         """
-        Compute the lifetime reweighting for the element (fraction of prompt decays).
-        If element is a list, return 1.0.
+        Compute the lifetime reweighting for the SMS (fraction of prompt decays).
+        If sms is a list, return 1.0.
 
-        :param element: Element object
+        :param sms: SMS object
 
         :return: Reweighting factor (float)
         """
 
-        if not isinstance(element, Element):
-            msgError = "Input of getReweightingFor must be an Element object"
-            msgError += " and not %s" % str(type(element))
+        if not isinstance(sms, GenericSMS):
+            msgError = "Input of getReweightingFor must be an SMS object"
+            msgError += " and not %s" % str(type(sms))
             logger.error(msgError)
             raise SModelSError()
 
@@ -639,26 +630,20 @@ class TxName(object):
         # particles not appearing in data:
         unstableWidths = []
         stableWidths = []
-        tree = element.tree
-        for mom, daughters in tree.dfs_successors().items():
-            # Convert to node objects:
-            mom = tree.nodesMapping[mom]
-            daughters = [tree.nodesMapping[d] for d in daughters]
-            if mom is tree.root:
-                continue  # Ignore primary vertex
-            if mom.isInclusive:
+        tree = sms
+        for nodeIndex in tree.dfsIndexIterator(skipRoot=True):
+            if nodeIndex in widthsInData:
+                continue  # Ignore node if its width does not need reweighting
+
+            # Convert to node object:
+            node = tree.indexToNode(nodeIndex)
+            if node.isInclusive or node.inclusiveList:
                 continue  # Ignore inclusive nodes
-            if mom.node not in widthsInData:
-                unstableWidths.append(mom.totalwidth)
-            for d in daughters:
-                if tree.out_degree(d.node) != 0:
-                    continue   # Skip intermediate states
-                if d.isInclusive:
-                    continue
-                if d.isSM:
-                    continue
-                if d.node not in widthsInData:
-                    stableWidths.append(d.totalwidth)
+
+            if tree.out_degree(nodeIndex) != 0:
+                unstableWidths.append(node.totalwidth)
+            else:
+                stableWidths.append(node.totalwidth)
 
         # Compute reweight factor according to lifetime/widths
         # For the widths not used in interpolation we assume that the
@@ -720,14 +705,14 @@ class TxName(object):
         else:
             return fillvalue
 
-    def getULFor(self, element, expected=False):
+    def getULFor(self, sms, expected=False):
         """
-        Returns the upper limit (or expected) for element (only for upperLimit-type).
+        Returns the upper limit (or expected) for SMS (only for upperLimit-type).
         Includes the lifetime reweighting (ul/reweight).
         If called for efficiencyMap results raises an error.
         If a mass array is given as input, no lifetime reweighting will be applied.
 
-        :param element: Element object or mass array (with units)
+        :param sms: SMS object or mass array (with units)
         :param expected: look in self.txnameDataExp, not self.txnameData
         """
 
@@ -735,7 +720,7 @@ class TxName(object):
             logger.error("getULFor method can only be used in UL-type data.")
             raise SModelSError()
 
-        point = self.getDataFromElement(element)
+        point = self.getDataFromSMS(sms)
         if not expected:
             ul = self.txnameData.getValueFor(point)
         else:
@@ -748,7 +733,7 @@ class TxName(object):
             return None
 
         # Compute reweighting factor:
-        reweightF = self.getReweightingFor(element)
+        reweightF = self.getReweightingFor(sms)
         if reweightF is None:
             return None
 
@@ -756,34 +741,34 @@ class TxName(object):
 
         return ul
 
-    def getEfficiencyFor(self, element):
+    def getEfficiencyFor(self, sms):
         """
-        For upper limit results, checks if the input element falls inside the
+        For upper limit results, checks if the input SMS falls inside the
         upper limit grid and has a non-zero reweigthing factor.
         If it does, returns efficiency = 1, else returns
         efficiency = 0.  For efficiency map results, returns the
         signal efficiency including the lifetime reweighting.
         If a mass array is given as input, no lifetime reweighting will be applied.
 
-        :param element: Element object or mass array with units.
+        :param sms: SMS object or mass array with units.
         :return: efficiency (float)
         """
 
-        # Get flat data from element:
-        point = self.getDataFromElement(element)
+        # Get flat data from sms:
+        point = self.getDataFromSMS(sms)
         if self.dataType == 'efficiencyMap':
             eff = self.txnameData.getValueFor(point)
             if not eff or math.isnan(eff):
-                eff = 0.  # Element is outside the grid or has zero efficiency
+                eff = 0.  # SMS is outside the grid or has zero efficiency
             # Compute reweighting factor:
-            reweightF = self.getReweightingFor(element)
+            reweightF = self.getReweightingFor(sms)
             eff = eff*reweightF*self.y_unit  # (unit should be 1)
 
         elif self.dataType == 'upperLimit':
             ul = self.txnameData.getValueFor(point)
-            element._upperLimit = ul  # Store the upper limit for convenience
+            sms._upperLimit = ul  # Store the upper limit for convenience
             if ul is None:
-                eff = 0.  # Element is outside the grid or the decays do not correspond to the txname
+                eff = 0.  # SMS is outside the grid or the decays do not correspond to the txname
             else:
                 eff = 1.
         else:
@@ -819,27 +804,24 @@ class TxName(object):
             except TypeError:
                 setattr(self, tag, value)
 
-    def hasElementAs(self, element):
+    def hasSMSas(self, sms):
         """
-        Verify if the conditions or constraint in Txname contains the element.
-        Check both branch orderings. If both orderings match, returns the one
-        with the highest mass array.
+        Verify if any SMS in conditions or constraint matches sms.
 
-        :param element: Element object
-        :return: A copy of the element on the correct branch ordering appearing
-                in the Txname constraint or condition.
+        :param sms: SMS object
+        :return: A copy of the sms with its nodes sorted according to
+                 the matching topology in the TxName. Nodes matching InclusiveNodes
+                 or inclusiveLists are replaced.
         """
 
-        # Get list of elements with matching canonical name
-        # (takes into account inclusive names)
-        for el, elLabel in self.elementMap.items():
-            # Compare elements:
-            sortedEl = el.matchElementTo(element)
-            if sortedEl is None:
+        for txsms, txLabel in self.smsMap.items():
+            # Compare sms:
+            matchedSMS = txsms.matchesTo(sms)
+            if matchedSMS is None:
                 continue
             # Attach label used for evaluating expressions
-            sortedEl.txlabel = elLabel
-            return sortedEl
+            matchedSMS.txlabel = txLabel
+            return matchedSMS
 
         # If this point was reached, there were no macthes
         return False

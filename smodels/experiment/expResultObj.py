@@ -14,7 +14,7 @@ from smodels.experiment import metaObj
 from smodels.experiment.exceptions import SModelSExperimentError
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.stringTools import cleanWalk
-from smodels.theory.auxiliaryFunctions import getAttributesFrom, getValuesForObj
+from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj
 
 try:
     import cPickle as serializer

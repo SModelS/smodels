@@ -494,15 +494,18 @@ class GenericSMS(object):
                         next_generation.append((new_mom, new_daughters))
             generation = next_generation
 
-    def dfsIndexIterator(self):
+    def dfsIndexIterator(self, skipRoot=False):
         """
         Iterates over the nodes following a depth-first traversal of the tree.
+
+        :param skipRoot: If True, it will not return the root node.
 
         :return: Iterator over nodes
         """
 
         nodes = self.nodeIndices
-        yield nodes[0]
+        if not skipRoot:
+            yield nodes[0]
         visited = set()   # Store visited nodes
         depth_limit = len(nodes)
         # Loop over nodes

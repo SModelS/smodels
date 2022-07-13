@@ -50,9 +50,15 @@ class TheorySMS(GenericSMS):
         :return: True if objects are equivalent.
         """
 
+        if not isinstance(other,TheorySMS):
+            return (other == self)
+
         cmp = self.compareTo(other)
 
         return (cmp == 0)
+
+    def __hash__(self):
+        return object.__hash__(self)
 
     def __lt__(self, other):
         """
@@ -129,7 +135,7 @@ class TheorySMS(GenericSMS):
         If the SMS are not sorted, sort them and then do a direct comparison of each
         node with the same nodeIndex.
 
-        :param other: TheorySMS object to be compared against self
+        :param other: SMS object to be compared against self
 
         :return: 0, if objects are equal, -1 if self < other, 1 if other > sekf
         """

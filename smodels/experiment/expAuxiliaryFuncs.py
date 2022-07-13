@@ -206,7 +206,7 @@ def index_bisect(inlist, el):
     return lo
 
 
-def elementsInStr(instring):
+def smsInStr(instring):
     """
     Parse instring and return a list of elements appearing in instring.
     instring can also be a list of strings.

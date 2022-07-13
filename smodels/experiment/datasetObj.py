@@ -15,10 +15,10 @@ from smodels.experiment import txnameObj, infoObj
 from smodels.tools.physicsUnits import fb
 from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from smodels.theory.auxiliaryFunctions import getAttributesFrom, getValuesForObj
+from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, smsInStr
 from smodels.tools.smodelsLogging import logger
-from smodels.theory.auxiliaryFunctions import elementsInStr
-from smodels.theory.element import Element
+from smodels.experiment.expSMS import ExpSMS
+from smodels.theory.theorySMS import TheorySMS
 
 import itertools
 
@@ -173,7 +173,7 @@ class DataSet(object):
         if self.getType() == "upperLimit":
             return False
         logger.debug("checking for redundancy")
-        datasetElements = []
+        datasetSMS = []
         for tx in self.txnameList:
             if hasattr(tx, 'finalState'):
                 finalState = tx.finalState
@@ -183,14 +183,15 @@ class DataSet(object):
                 intermediateState = tx.intermediateState
             else:
                 intermediateState = None
-            for el in elementsInStr(str(tx.constraint)):
-                newEl = Element(el, finalState, intermediateState,
-                                model=databaseParticles)
-                datasetElements.append(newEl)
-        combos = itertools.combinations(datasetElements, 2)
+            for sms in smsInStr(str(tx.constraint)):
+                newSMS = ExpSMS.from_string(sms, model=databaseParticles,
+                                            finalState=finalState,
+                                            intermediateState=intermediateState)
+                datasetSMS.append(newSMS)
+        combos = itertools.combinations(datasetSMS, 2)
 
         for x, y in combos:
-            if x.matchElementTo(y) and _complainAboutOverlappingConstraints:
+            if x == y and _complainAboutOverlappingConstraints:
                 errmsg = "Constraints (%s) and (%s) appearing in dataset %s:%s overlap "\
                          "(may result in double counting)." % \
                          (x, y, self.getID(), self.globalInfo.id)
@@ -400,17 +401,17 @@ class DataSet(object):
 
         return attributes
 
-    def getUpperLimitFor(self, element=None, expected=False, txnames=None, compute=False, alpha=0.05, deltas_rel=0.2):
+    def getUpperLimitFor(self, sms=None, expected=False, txnames=None, compute=False, alpha=0.05, deltas_rel=0.2):
         """
-        Returns the upper limit for a given element (or mass) and txname. If
+        Returns the upper limit for a given SMS (or mass) and txname. If
         the dataset hold an EM map result the upper limit is independent of
         the input txname or mass.
-        For UL results if an Element object is given the corresponding upper limit
-        will be rescaled according to the lifetimes of the element intermediate particles.
+        For UL results if an SMS object is given the corresponding upper limit
+        will be rescaled according to the lifetimes of the SMS intermediate particles.
         On the other hand, if a mass is given, no rescaling will be applied.
 
         :param txname: TxName object or txname string (only for UL-type results)
-        :param element: Element object or mass array with units (only for UL-type results)
+        :param sms: TheorySMS object or mass array with units (only for UL-type results)
         :param alpha: Can be used to change the C.L. value. The default value is 0.05
                       (= 95% C.L.) (only for  efficiency-map results)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
@@ -434,7 +435,7 @@ class DataSet(object):
                 return upperLimit
 
         elif self.getType() == 'upperLimit':
-            if not txnames or not element:
+            if not txnames or not sms:
                 logger.error("A TxName and mass array must be defined when \
                              computing ULs for upper-limit results.")
                 return False
@@ -452,13 +453,13 @@ class DataSet(object):
                 logger.error("txname must be a TxName object or a string")
                 return False
 
-            if not isinstance(element, list) and not isinstance(element, Element):
-                logger.error("Element must be an element object or a mass array")
+            if not isinstance(sms, list) and not isinstance(sms, TheorySMS):
+                logger.error("SMS must be a TheorySMS object or a mass array")
                 return False
 
             for tx in self.txnameList:
                 if tx == txname or tx.txName == txname:
-                    upperLimit = tx.getULFor(element, expected)
+                    upperLimit = tx.getULFor(sms, expected)
 
             return upperLimit
 
