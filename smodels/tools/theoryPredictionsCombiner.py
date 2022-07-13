@@ -252,19 +252,18 @@ class TheoryPredictionsCombiner(object):
             return llhd
 
         llhd = 1.0
-
+        changed = False
         for tp in self.theoryPredictions:
             # Set the theory marginalize attribute to the combiner value:
             tp_marginalize = tp.marginalize
             tp.marginalize = self.marginalize
             tmp = tp.likelihood(mu, expected=expected, useCached=useCached)
-            if tmp == None:
-                llhd = 0
-            else:
+            if tmp != None:
                 llhd = llhd * tmp
+                changed = True
             # Restore marginalize setting:
             tp.marginalize = tp_marginalize
-        if llhd == 0:
+        if changed == False:
             llhd = None
             self.cachedLlhds[expected][mu] = llhd
             return None

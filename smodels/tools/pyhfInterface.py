@@ -534,7 +534,7 @@ class PyhfUpperLimitComputer:
                 initpars = self.rescaleBgYields(initpars, workspace, model)
                 # If the a total yield is still negative with the increased initial parameters, print a message
                 if not all([True if yld >= 0 else False for yld in model.expected_actualdata(initpars)]):
-                    print(f'Negative total yield after increasing the initial parameters for mu={mu}')
+                    logger.debug(f'Negative total yield after increasing the initial parameters for mu={mu}')
                 try:
                     bestFitParam, nllh = pyhf.infer.mle.fixed_poi_fit(
                         1.0,
