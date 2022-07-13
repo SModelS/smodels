@@ -737,6 +737,26 @@ class GenericSMS(object):
         for nodeIndex, newObj in nodeObjectDict.items():
             self._nodesMapping[nodeIndex] = newObj
 
+    def copyTreeFrom(self,other,nodesObjDict):
+        """
+        Replaces the tree structure (nodes, edges, indices,...)
+        by the structure in other. Uses the nodesObjDict to set the
+        new node mapping (nodeIndex > nodeObj).
+
+        :param other: SMS object
+        :param nodesObjDict: Dictionary where keys are node indices (from other)
+                             and values are node objects.
+        """
+
+        self._successors = {n : dList[:] for n,dList in other._successors.items()}
+        self._predecessors = {d : parent for d,parent in other._predecessors.items()}
+        self._canonName = other._canonName
+        self._rootIndex = other._rootIndex
+        self._nodesMapping = {nodeIndex : n for nodeIndex,n in nodesObjDict.items()}
+        self._nodeCanonNames = {nodeIndex : cName for nodeIndex,cName
+                                in other._nodeCanonNames.items()}
+
+
     def checkConsistency(self):
         """
         Make sure the tree has the correct topology(directed rooted tree).

@@ -203,28 +203,31 @@ class ExpSMS(GenericSMS):
 
 
         # Remove unmatched nodes (which happens in case of InclusiveNodes)
-        match = {n1: n2 for n1, n2 in mapDict.items() if n2 is not None}
+        match = {n1 : n2 for n1, n2 in mapDict.items() if n2 is not None}
 
-        # Make a new tree
-        matchedTree = self.copy()
+        # Create nodes dict with nodes from self:
+        nodesDict = {n1 : node for n1,node in zip(self.nodeIndices,self.nodes)}
+
+        # Replace relevant nodes with nodes from other:
+        for n1, n2 in match.items():
+            node1 = self.indexToNode(n1) # Node from self
+            if node1.isInclusive or node1.inclusiveList:
+                continue  # Keep node from self
+            else:
+                node2 = other.indexToNode(n2)  # Node from other
+                nodesDict[n1] = node2  # index from self
+
+        # Make a new tree from other
+        matchedTree = other.copy()
+        # Copy tree structure (node indices, node order,....)
+        # from self to other and use nodesDict to set the
+        # corresponding node objects
+        matchedTree.copyTreeFrom(self,nodesDict)
 
         # Remove missing nodes (in case there are inclusive matchings)
         for n1 in matchedTree.nodeIndices:
             if n1 not in match:
                 matchedTree.remove_node(n1)
-
-        # Create nodes dict:
-        nodesDict = {}
-        for n1, n2 in match.items():
-            node1 = self.indexToNode(n1) # Node from self
-            if node1.isInclusive or node1.inclusiveList:
-                continue # Do not copy inclusive nodes
-            else:
-                node2 = other.indexToNode(n2)  # Node from other
-                nodesDict[n1] = node2  # index from self
-
-        # Update node objects:
-        matchedTree.updateNodeObjects(nodesDict)
 
         return matchedTree
 
