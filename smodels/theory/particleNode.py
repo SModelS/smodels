@@ -76,7 +76,10 @@ class ParticleNode(object):
 
     def __str__(self):
 
-        return str(self.particle)
+        label = str(self.particle)
+        if self.inclusiveList:
+            label = '*'+label
+        return label
 
     def __repr__(self):
 

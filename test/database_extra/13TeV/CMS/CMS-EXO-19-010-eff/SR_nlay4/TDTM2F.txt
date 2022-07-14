@@ -1,5 +1,5 @@
 txName: TDTM2F
-constraint: {(PV > C1(1),MET), (C1(1) > InclusiveNode(2),MET), (InclusiveNode(2) > anySM)}
+constraint: {(PV > C1(1),MET), (C1(1) > *anySM,MET)}
 condition: None
 conditionDescription: None
 susyProcess: pp --> chargino^pm_1 neutralino_1, chargino^pm_1 neutralino_1 --> pion^pm lsp lsp

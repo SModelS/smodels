@@ -77,7 +77,7 @@ for ds in datasets:
     TDTM1F.validationTarball = "TDTM1M2F.tar.gz"
     TDTM1F.setParticlesFromFile(particlesFile)
     TDTM1F.checked = ''
-    TDTM1F.constraint ="{(PV > C1+(1),C1-(2)), (C1+(1) > InclusiveNode(3),MET), (C1-(2) > InclusiveNode(4),MET), (InclusiveNode(3) > anySM), (InclusiveNode(4) > anySM)}"
+    TDTM1F.constraint ="{(PV > C1+(1),C1-(2)), (C1+(1) > *anySM,MET), (C1-(2) > *anySM,MET)}"
     TDTM1F.conditionDescription = None
     TDTM1F.condition = None
     TDTM1F.source = 'CMS'
@@ -106,7 +106,7 @@ for ds in datasets:
     TDTM2F.validationTarball = "TDTM1M2F.tar.gz"
     TDTM2F.setParticlesFromFile(particlesFile)
     TDTM2F.checked = ''
-    TDTM2F.constraint ="{(PV > C1(1),MET), (C1(1) > InclusiveNode(2),MET), (InclusiveNode(2) > anySM)}"
+    TDTM2F.constraint ="{(PV > C1(1),MET), (C1(1) > *anySM,MET)}"
     TDTM2F.conditionDescription = None
     TDTM2F.condition = None
     TDTM2F.source = 'CMS'

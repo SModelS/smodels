@@ -386,7 +386,7 @@ class GenericSMS(object):
         node = self.indexToNode(nodeIndex)
         # If it is inclusive node set its name to an inclusive integer
         # and return its name (no need to check the children)
-        if node.isInclusive:
+        if node.isInclusive or node.inclusiveList:
             canonName = InclusiveValue()
             self._nodeCanonNames[nodeIndex] = canonName
             return canonName
