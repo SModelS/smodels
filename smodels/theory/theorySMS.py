@@ -151,22 +151,17 @@ class TheorySMS(GenericSMS):
         cmp = self.compareSubTrees(other,self.rootIndex,other.rootIndex)
         return cmp
 
-    def copy(self):
+    def copy(self, emptyNodes=False):
         """
         Returns a shallow copy of self.
 
-        : return: TheorySMS object
+        :param emptyNodes: If True, does not copy any of the nodes from self.
+
+        :return: TheorySMS object
         """
 
         newSMS = TheorySMS()
-        newSMS._successors.update({n: daughters[:]
-                                   for n, daughters in self._successors.items()})
-        newSMS._predecessors = {k: v for k, v in self._predecessors.items()}
-        newSMS._nodesMapping = {n: node for n, node in self._nodesMapping.items()}
-        newSMS._rootIndex = self._rootIndex
-        newSMS._canonName = self._canonName
-        newSMS._nodeCanonNames = {nodeIndex : cName
-                                  for nodeIndex,cName in self._nodeCanonNames.items()}
+
         newSMS.maxWeight = self.maxWeight
         newSMS.prodXSec = self.prodXSec
         if hasattr(self,'weightList'):
@@ -178,6 +173,11 @@ class TheorySMS(GenericSMS):
         newSMS.smsID = self.smsID
         newSMS.coveredBy = set(list(self.coveredBy)[:])
         newSMS.testedBy = set(list(self.testedBy)[:])
+
+        # Set nodes:
+        if not emptyNodes:
+            nodesObjDict = {n : node for n,node in zip(self.nodeIndices,self.nodes)}
+            newSMS.copyTreeFrom(self, nodesObjDict)
 
         return newSMS
 

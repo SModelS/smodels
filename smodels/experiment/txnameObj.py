@@ -637,6 +637,9 @@ class TxName(object):
 
             # Convert to node object:
             node = tree.indexToNode(nodeIndex)
+            if node.isSM:
+                continue  # Ignore SM particles
+
             if node.isInclusive or node.inclusiveList:
                 continue  # Ignore inclusive nodes
 

@@ -58,6 +58,9 @@ class Test_Notebook():
         new_cells = [icell for icell in outputDict.keys() if icell not in default_cells]
         cells = sorted(default_cells)
         for icell in cells:
+            # print(icell)
+            # print(defaultOutputDict[icell])
+            # print(outputDict[icell],'\n')
             if isinstance(defaultOutputDict[icell], list):
                 for iout, out in enumerate(defaultOutputDict[icell]):
                     assert out == outputDict[icell][iout]

@@ -227,7 +227,7 @@ class ExpSMS(GenericSMS):
                 nodesDict[n1] = node2  # index from self
 
         # Make a new tree from other
-        matchedTree = other.copy()
+        matchedTree = other.copy(emptyNodes=True)
         # Copy tree structure (node indices, node order,....)
         # from self to other and use nodesDict to set the
         # corresponding node objects
@@ -357,20 +357,19 @@ class ExpSMS(GenericSMS):
         # print('   returning for %i = %i' %(T1_node,T2_node),finalMap)
         return finalMap
 
-    def copy(self):
+    def copy(self, emptyNodes=False):
         """
         Returns a shallow copy of self.
 
-        : return: TheorySMS object
+        :param emptyNodes: If True, does not copy any of the nodes from self.
+
+        :return: TheorySMS object
         """
 
         newSMS = ExpSMS()
-        newSMS._successors.update({n: daughters[:]
-                                   for n, daughters in self._successors.items()})
-        newSMS._predecessors = {k: v for k, v in self._predecessors.items()}
-        newSMS._nodesMapping = {n: node for n, node in self._nodesMapping.items()}
-        newSMS._rootIndex = self._rootIndex
-        newSMS._canonName = self._canonName
+        if not emptyNodes:
+            nodesObjDict = {n : node for n,node in zip(self.nodeIndices,self.nodes)}
+            newSMS.copyTreeFrom(self, nodesObjDict)
 
         return newSMS
 

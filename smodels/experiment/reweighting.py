@@ -7,7 +7,7 @@
 
 from math import exp
 from smodels.tools.physicsUnits import GeV
-from smodels.experiment.expSMS import ExpSMS
+from smodels.tools.genericSMS import GenericSMS
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 
@@ -15,32 +15,33 @@ Leff_inner_default = 0.000769
 Leff_outer_default = 7.0
 
 
-def getWidthsFromElement(element):
+def getWidthsFromSMS(sms):
     """
-    Extracts all the widths of unstable particles in the element and the widths
+    Extracts all the widths of unstable particles in the SMS and the widths
     of BSM particles appearing as final states (undecayed).
 
-    :param element: Element object
+    :param sms: SMS object
 
     :return: List of unstable widths and list of stable widths
     """
 
-    if not isinstance(element, Element):
-        msgError = "Input to getWidthsFromElement should be an Element object"
+    if not isinstance(sms, GenericSMS):
+        msgError = "Input to getWidthsFromSMS should be an SMS object"
         logger.error(msgError)
         raise SModelSError(msgError)
 
     # Get the unstable and stable widths:
     unstableWidths = []
     stableWidths = []
-    tree = element.tree
-    for node in tree.nodes:
-        if node == tree.root:
+    for nodeIndex in sms.nodeIndices:
+        if nodeIndex == sms.rootIndex:
             continue
+        # Convert from index to node object
+        node = sms.indexToNode(nodeIndex)
         if node.isInclusive:
             continue
 
-        if tree.out_degree(node.node) != 0:
+        if sms.out_degree(nodeIndex) != 0:
             width = node.totalwidth
             if isinstance(width, list):  # If width is a list (MultiParticle obj), use smallest
                 width = min(width)
@@ -56,17 +57,18 @@ def getWidthsFromElement(element):
     return unstableWidths, stableWidths
 
 
-def defaultEffReweight(element=None, unstableWidths=None, stableWidths=None,
+def defaultEffReweight(sms=None, unstableWidths=None, stableWidths=None,
                        Leff_inner=None, Leff_outer=None,
                        minWeight=1e-10):
     """
-    Computes the lifetime reweighting factor for the element efficiency
+    Computes the lifetime reweighting factor for the SMS efficiency
     based on the widths of the BSM particles.
     The widths can be defined through the unstableWidths and stableWidths arguments
-    or they will be extracted from the element.
+    or they will be extracted from the SMS.
     The reweighting factor corresponds to the fraction of prompt decays (for the unstableWidths)
     and the fractions of detector-stable decays (for the stableWidths).
 
+    :param sms: SMS object
     :param unstableWidths: List of widths for particles appearing as prompt decays
     :param stableWidths: List of widths for particles appearing as stable
     :param minWeight: Lower cut for the reweighting factor. Any value below this will be taken to be zero.
@@ -85,11 +87,11 @@ def defaultEffReweight(element=None, unstableWidths=None, stableWidths=None,
         Leff_outer = Leff_outer_default
 
     if unstableWidths is None or stableWidths is None:
-        if element is None or not isinstance(element, Element):
-            logger.error("If unstableWidths and stableWidths are not defined, the element should be given.")
+        if sms is None or not isinstance(sms, GenericSMS):
+            logger.error("If unstableWidths and stableWidths are not defined, the SMS should be given.")
             raise SModelSError()
-        # Extract element widths:
-        unstableWidths, stableWidths = getWidthsFromElement(element)
+        # Extract SMS widths:
+        unstableWidths, stableWidths = getWidthsFromSMS(sms)
 
     unstableWidths = [w.asNumber(GeV) for w in unstableWidths[:]]
     stableWidths = [w.asNumber(GeV) for w in stableWidths[:]]
@@ -108,17 +110,17 @@ def defaultEffReweight(element=None, unstableWidths=None, stableWidths=None,
     return elFraction
 
 
-def defaultULReweight(element=None, unstableWidths=None, stableWidths=None,
+def defaultULReweight(sms=None, unstableWidths=None, stableWidths=None,
                       Leff_inner=None, Leff_outer=None):
     """
-    Computes the lifetime reweighting factor for the element upper limit
+    Computes the lifetime reweighting factor for the SMS upper limit
     based on the lifetimes of all intermediate particles and the last stable odd-particle
-    appearing in the element.
+    appearing in the SMS.
     The fraction corresponds to the fraction of decays corresponding to prompt
     decays to all intermediate BSM particles and to a long-lived decay (outside the detector)
     to the final BSM state.
 
-    :param element: Element object
+    :param sms: SMS object
     :param Leff_inner: is the effective inner radius of the detector, given in meters. If None,
                         use default value.
     :param Leff_outer: is the effective outer radius of the detector, given in meters. If None,
@@ -133,7 +135,7 @@ def defaultULReweight(element=None, unstableWidths=None, stableWidths=None,
     if Leff_outer is None:
         Leff_outer = Leff_outer_default
 
-    effFactor = defaultEffReweight(element=element, unstableWidths=unstableWidths,
+    effFactor = defaultEffReweight(sms=sms, unstableWidths=unstableWidths,
                                    stableWidths=stableWidths,
                                    Leff_inner=Leff_inner, Leff_outer=Leff_outer)
     if not effFactor:
@@ -142,21 +144,21 @@ def defaultULReweight(element=None, unstableWidths=None, stableWidths=None,
         return 1./effFactor
 
 
-def reweightFactorFor(element=None, resType='prompt',
+def reweightFactorFor(sms=None, resType='prompt',
                       unstableWidths=None, stableWidths=None,
                       Leff_inner=None, Leff_outer=None):
     """
-    Computer the reweighting factor for the element according to the experimental result type.
+    Computer the reweighting factor for the SMS according to the experimental result type.
     Currently only two result types are supported: 'prompt' and 'displaced'.
-    If resultType = 'prompt', returns the reweighting factor for all decays in the element
+    If resultType = 'prompt', returns the reweighting factor for all decays in the SMS
     to be prompt and the last odd particle to be stable.
-    If resultType = 'displaced', returns the reweighting factor for ANY decay in the element
+    If resultType = 'displaced', returns the reweighting factor for ANY decay in the SMS
     to be displaced and no long-lived decays and the last odd particle to be stable.
     Not that the fraction of "long-lived (meta-stable) decays" is usually included
     in topologies where the meta-stable particle appears in the final state. Hence
     it should not be included in the prompt or displaced fractions.
 
-    :param element: Element object
+    :param sms: SMS object
     :param resType: Type of result to compute the reweight factor for (either 'prompt' or 'displaced')
     :param Leff_inner: is the effective inner radius of the detector, given in meters. If None,
                         use default value.
@@ -172,11 +174,11 @@ def reweightFactorFor(element=None, resType='prompt',
         Leff_outer = Leff_outer_default
 
     if unstableWidths is None or stableWidths is None:
-        if element is None or not isinstance(element, Element):
-            logger.error("If unstableWidths and stableWidths are not defined, the element should be given.")
+        if sms is None or not isinstance(sms, GenericSMS):
+            logger.error("If unstableWidths and stableWidths are not defined, the SMS should be given.")
             raise SModelSError()
-        # Extract element widths:
-        unstableWidths, stableWidths = getWidthsFromElement(element)
+        # Extract SMS widths:
+        unstableWidths, stableWidths = getWidthsFromSMS(sms)
 
     rType = resType.lower()
     if rType not in ['prompt', 'displaced']:
