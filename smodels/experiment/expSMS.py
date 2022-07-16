@@ -205,7 +205,8 @@ class ExpSMS(GenericSMS):
         if not isinstance(other,GenericSMS):
             raise SModelSError("Can not compare ExpSMS and %s" %str(type(other)))
 
-        mapDict = self.compareSubTrees(other)
+        mapDict = self.computeMatchingDict(other,self.rootIndex,
+                                    other.rootIndex)
 
         if mapDict is None:
             return None
@@ -240,58 +241,66 @@ class ExpSMS(GenericSMS):
 
         return matchedTree
 
-    def compareSubTrees(self, other, T1_node=None, T2_node=None):
+    def computeMatchingDict(self, other, n1, n2):
         """
-        Compare the subtrees with T1_node and T2_node as roots.
-        The comparison is made according to their names, particle content and final states.
+        Compare the subtrees with n1 and n2 as roots and
+        return a dictionary with the node matchings {n1 : n2,...}.
         It uses the node comparison to define semantically equivalent nodes.
 
         :param other: TheorySMS or ExpSMS object to be compared to self.
-        :param T1_node: Node index belonging to self.T1
-        :param T2_node: Node index belonging to self.T2
+        :param n1: Node index belonging to self
+        :param n2: Node index belonging to other
 
-        :return: matcDict is None (subtrees differ) or a dictionary
-                 with the mapping of the nodes daughters ({nodeINd : d2}).
+        :return: None (subtrees differ) or a dictionary
+                 with the mapping of the nodes and their daughters
+                ({n1 : n2, d1 : d2, ...}).
         """
 
-        if T1_node is None:
-            T1_node = self.rootIndex
-        if T2_node is None:
-            T2_node = other.rootIndex
+        if n1 is None:
+            n1 = self.rootIndex
+        if n2 is None:
+            n2 = other.rootIndex
 
-        # print('comparing',T1_node,T2_node,self.indexToNode(T1_node),other.indexToNode(T2_node))
+        # print('comparing',n1,n2,self.indexToNode(n1),other.indexToNode(n2))
 
         # Compare node canonical names
-        cName1 = self.nodeCanonName(T1_node)
-        cName2 = other.nodeCanonName(T2_node)
+        cName1 = self.nodeCanonName(n1)
+        cName2 = other.nodeCanonName(n2)
         if cName1 != cName2:
             return None
 
+        # Get node objects
+        node1 = self.indexToNode(n1)
+        node2 = other.indexToNode(n2)
 
         # Compare nodes directly (canon name and particle content)
-        node1 = self.indexToNode(T1_node)
-        node2 = other.indexToNode(T2_node)
-        if node1.isInclusive:
-            other.getFinalStates(T2_node)  # Make sure final states are defined
-        if node2.isInclusive:
-            self.getFinalStates(T1_node)  # Make sure final states are defined
-
-        cmp = node1.compareTo(node2)
-        # print('  node comp=',cmp)
-        if cmp != 0:
+        if node1 != node2:
             return None
 
-        # For inclusive nodes always return True (once nodes are equal)
+        # In the case of inclusive nodes, compare final states:
+        if node1.isInclusive:
+            n2FinalStates = other.getFinalStates(n2)
+            equalFS = node1.equalFinalStates(n2FinalStates)
+            if not equalFS:
+                return None
+        elif node2.isInclusive:
+            n1FinalStates = self.getFinalStates(n1)
+            equalFS = node2.equalFinalStates(n1FinalStates)
+            if not equalFS:
+                return None
+
+        # For inclusive nodes always return True
+        #(once final states are equal)
         if node1.isInclusive or node2.isInclusive:
             # print('  equal nodes (inclusive)')
-            return {T1_node: T2_node}
+            return {n1: n2}
 
         # Check for equality of daughters
-        daughters1 = self.daughterIndices(T1_node)
-        daughters2 = other.daughterIndices(T2_node)
+        daughters1 = self.daughterIndices(n1)
+        daughters2 = other.daughterIndices(n2)
         if len(daughters1) == len(daughters2) == 0:
             # print('  equal nodes (leaf)')
-            return {T1_node: T2_node}
+            return {n1: n2}
 
 
         # Define left and right nodes in order to compute matching:
@@ -300,14 +309,14 @@ class ExpSMS(GenericSMS):
         edges = {}
         for d1 in left_nodes:
             for d2 in right_nodes:
-                mapDict = self.compareSubTrees(other,d1, d2)
+                mapDict = self.computeMatchingDict(other,d1, d2)
                 if mapDict is not None:
                     if d1 not in edges:
                         edges[d1] = {}
                     edges[d1].update({d2: mapDict})
 
             # If node had no matches (was not added to the graph),
-            # we already know T1_node and T2_node differs
+            # we already know n1 and n2 differs
             if d1 not in edges:
                 return None
 
@@ -352,9 +361,9 @@ class ExpSMS(GenericSMS):
         for d1, d2 in list(mapDict.items()):
             daughtersMap = edges[d1][d2]
             finalMap.update(daughtersMap)
-        finalMap[T1_node] = T2_node
+        finalMap[n1] = n2
 
-        # print('   returning for %i = %i' %(T1_node,T2_node),finalMap)
+        # print('   returning for %i = %i' %(n1,n2),finalMap)
         return finalMap
 
     def copy(self, emptyNodes=False):
