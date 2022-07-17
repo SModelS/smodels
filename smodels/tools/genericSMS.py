@@ -223,8 +223,10 @@ class GenericSMS(object):
 
         if isinstance(nodeIndex,int):
             return self._nodesMapping[nodeIndex]
-        elif isinstance(nodeIndex,(list,tuple)):
+        elif isinstance(nodeIndex,list):
             return [self._nodesMapping[n] for n in nodeIndex]
+        elif isinstance(nodeIndex,tuple):
+            return tuple([self._nodesMapping[n] for n in nodeIndex])
         else:
             raise SModelSError("Can not convert object of type %s to nodes" %str(type(nodeIndex)))
 

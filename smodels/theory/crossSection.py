@@ -563,10 +563,8 @@ class XSectionList(object):
         Get the maximum cross section value appearing in the list.
 
         """
-        maxxsec = 0. * pb
-        for xsec in self:
-            if xsec.value > maxxsec:
-                maxxsec = xsec.value
+        maxxsec = max([xsec.value for xsec in self])
+
         return maxxsec
 
     def getMinXsec(self):

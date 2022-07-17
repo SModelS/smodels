@@ -29,6 +29,12 @@ class TheorySMS(GenericSMS):
 
         GenericSMS.__init__(self)
 
+        # Production cross-section:
+        self.prodXSec = None
+        # Total branching ratio (product of BRs)
+        self.decayBRs = 1.0
+        # Maximum weight:
+        self.maxWeight = None
         # Include additional attributes
         self._sorted = False
         # List of SMS topologies which could have generated self (such as during compression)
@@ -103,9 +109,12 @@ class TheorySMS(GenericSMS):
         # Add nodes from other
         newSMS.addNodesFrom(other)
         # Add other attributes
+        newSMS.prodXSec = self.prodXSec + other.prodXSec
         newSMS.ancestors = self.ancestors[:] + other.ancestors[:]
         newSMS.weightList = self.weightList + other.weightList
         newSMS.maxWeight = self.maxWeight + other.maxWeight
+        # Decay BRs can no longer be properly defined:
+        newSMS.decayBRs = None
         if other._allAncestors is not None:
             newSMS._allAncestors += other._allAncestors[:]
 
@@ -164,6 +173,7 @@ class TheorySMS(GenericSMS):
 
         newSMS.maxWeight = self.maxWeight
         newSMS.prodXSec = self.prodXSec
+        newSMS.decayBRs = self.decayBRs
         if hasattr(self,'weightList'):
             newSMS.weightList = self.weightList.copy()
         newSMS._sorted = self._sorted
@@ -226,6 +236,8 @@ class TheorySMS(GenericSMS):
 
         # Update maximum weight
         newSMS.maxWeight = self.maxWeight*br
+        # Update BRs:
+        newSMS.decayBRs = self.decayBRs*br
 
         # Update mother node:
         newSMS.updateNodeObjects({motherIndex : motherNode})
@@ -248,13 +260,7 @@ class TheorySMS(GenericSMS):
         """
 
         prodXSec = self.prodXSec
-        if isinstance(prodXSec,(crossSection.XSectionList,crossSection.XSection)):
-            maxSec = prodXSec.getMaxXsec().asNumber(fb)
-        elif isinstance(prodXSec,unum.Unum):
-            maxSec = prodXSec.asNumber(fb)
-        else:
-            maxSec = prodXSec
-        brs = self.maxWeight/maxSec
+        brs = self.decayBRs
 
         return prodXSec*brs
 
