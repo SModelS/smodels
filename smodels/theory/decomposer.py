@@ -80,6 +80,7 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
     smsTopDict = TopologyDict()
 
     for sms in allSMS:
+        sms.ancestors = [sms]  # Set ancestors (before compression)
         # Sort SMS, compute canonical name and its total weight
         sms.setGlobalProperties()
         smsTopDict.addSMS(sms)

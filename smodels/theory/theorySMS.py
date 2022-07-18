@@ -47,47 +47,31 @@ class TheorySMS(GenericSMS):
         # which the physical parameters are covered
         self.testedBy = set()
 
-    def __eq__(self, other):
+    def __cmp__(self,other):
         """
-        SMS equality based on the compareTo method.
+        Compare self to other based on the compareTo method.
 
         :parameter other: TheorySMS object
 
-        :return: True if objects are equivalent.
+        :return: 0, if objects are equal, -1 if self < other, 1 if other > sekf
         """
 
-        if not isinstance(other,TheorySMS):
-            return (other == self)
+        return self.compareTo(other)
 
-        cmp = self.compareTo(other)
+    def __lt__(self, other):
+        return self.__cmp__(other) == -1
 
-        return (cmp == 0)
+    def __gt__(self, other):
+        return self.__cmp__(other) == 1
+
+    def __eq__(self, other):
+        return self.__cmp__(other) == 0
+
+    def __ne__(self, other):
+        return self.__cmp__(other) != 0
 
     def __hash__(self):
         return object.__hash__(self)
-
-    def __lt__(self, other):
-        """
-        SMS comparison based on the compareTo method.
-
-        :parameter other: TheorySMS object
-
-        :return: True if self < other, False otherwise.
-        """
-
-        cmp = self.compareTo(other)
-
-        return (cmp < 0)
-
-    def __gt__(self, other):
-        """
-        SMS comparison based on the compareTo method.
-
-        :parameter other: TheorySMS object
-
-        :return: True if self > other, False otherwise.
-        """
-        return not (self < other)
 
     def __add__(self, other):
         """
@@ -461,10 +445,10 @@ class TheorySMS(GenericSMS):
             if ancestor is self:
                 continue
             ancestorsDict[igen + 1].append(ancestor)
-            for jgen, elList in ancestor._getAncestorsDict(igen + 1).items():
+            for jgen, smsList in ancestor._getAncestorsDict(igen + 1).items():
                 if jgen not in ancestorsDict:
                     ancestorsDict[jgen] = []
-                ancestorsDict[jgen] += elList
+                ancestorsDict[jgen] += smsList
 
         return ancestorsDict
 
@@ -487,15 +471,15 @@ class TheorySMS(GenericSMS):
         for igen in sorted(ancestorsDict.keys()):
             allAncestors += ancestorsDict[igen]
 
-        self._allAncestors = allAncestors
+        # self._allAncestors = allAncestors
 
         return allAncestors
 
     def isRelatedTo(self, other):
         """
-        Checks if self has any common ancestors with other or they share
-        ancestors. Returns True if self and other have at least one ancestor in common
-        or are the same object, otherwise returns False.
+        Checks if self has other as an ancestor or they share
+        ancestors. Returns True if self and other have at least one ancestor in common,
+                   otherwise returns False.
 
         :return: True/False
         """
@@ -503,9 +487,12 @@ class TheorySMS(GenericSMS):
         if self is other:
             return True
 
-        ancestorsA = set([id(sms) for sms in self.getAncestors()])
-        ancestorsB = set([id(sms) for sms in other.getAncestors()])
+        # Get ids for all ancestors of self, including self
+        ancestorsA = set([id(self)]+[id(sms) for sms in self.getAncestors()])
+        # Get ids for all ancestors of other, including other
+        ancestorsB = set([id(other)]+[id(sms) for sms in other.getAncestors()])
 
+        # Check if any ids intersect
         if ancestorsA.intersection(ancestorsB):
             return True
         else:

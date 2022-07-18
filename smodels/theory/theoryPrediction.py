@@ -4,11 +4,10 @@
               reference cross sections and related functions.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-.. autofunction:: _getElementsFrom
 """
 
 from smodels.theory import clusterTools
-from smodels.theory.auxiliaryFunctions import average
+from smodels.theory.theoryAuxiliaryFuncs import average
 from smodels.tools.physicsUnits import TeV, fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
@@ -86,11 +85,11 @@ class TheoryPrediction(object):
         # Adds the contributions of all txnames
         # (for an UL result there will be a single txname)
         for tx in self.txnames:
-            # Filter the elements
-            elements = [el for el in self.elements
-                        if el.txname is tx]
+            # Filter the SMS
+            smsList = [sms for sms in self.smsList
+                        if sms.txname is tx]
             # Build dictionary needed for evaluation:
-            xsection += tx.evalConstraintFor(elements)
+            xsection += tx.evalConstraintFor(smsList)
 
         self.xsection = xsection
 
@@ -101,10 +100,10 @@ class TheoryPrediction(object):
         # and for EM results there should be no conditions)
         allConditions = []
         for tx in self.txnames:
-            # Filter the elements
-            elements = [el for el in self.elements
-                        if el.txname is tx]
-            cond = tx.evalConditionsFor(elements)
+            # Filter the SMS
+            smsList = [sms for sms in self.smsList
+                        if sms.txname is tx]
+            cond = tx.evalConditionsFor(smsList)
             if cond is None:
                 continue
             allConditions.append(cond)
@@ -138,7 +137,7 @@ class TheoryPrediction(object):
                                                   deltas_rel=self.deltas_rel)
                 self.cachedObjs[expected]["UL"] = ul
             if self.dataType() == 'upperLimit':
-                ul = self.dataset.getUpperLimitFor(element=self.avgElement,
+                ul = self.dataset.getUpperLimitFor(sms=self.avgSMS,
                                                    txnames=self.txnames,
                                                    expected=expected)
                 self.cachedObjs[expected]["UL"] = ul
@@ -286,20 +285,20 @@ class TheoryPrediction(object):
             if chi2also:
                 return (None, None)
             return None
-        if not hasattr(self, "avgElement"):
-            logger.error("theory prediction %s has no average element! why??" % self.analysisId())
+        if not hasattr(self, "avgSMS"):
+            logger.error("theory prediction %s has no average SMS! why??" % self.analysisId())
             if chi2also:
                 return (None, None)
             return None
 
-        eul = self.dataset.getUpperLimitFor(element=self.avgElement,
+        eul = self.dataset.getUpperLimitFor(sms=self.avgSMS,
                                             txnames=self.txnames,
                                             expected=True)
         if eul is None:
             if chi2also:
                 return (None, None)
             return None
-        ul = self.dataset.getUpperLimitFor(element=self.avgElement,
+        ul = self.dataset.getUpperLimitFor(sms=self.avgSMS,
                                            txnames=self.txnames,
                                            expected=False)
         lumi = self.dataset.getLumi()
@@ -485,20 +484,19 @@ class TheoryPredictionList(object):
         self._theoryPredictions = sorted(self._theoryPredictions, key=lambda theoPred: (theoPred.getRValue() is not None, theoPred.getRValue()), reverse=True)
 
 
-def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
+def theoryPredictionsFor(expResult, smsTopDict, maxMassDist=0.2,
                          useBestDataset=True, combinedResults=True,
                          marginalize=False, deltas_rel=None):
     """
     Compute theory predictions for the given experimental result, using the list of
-    elements in smsTopList.
-    For each Txname appearing in expResult, it collects the elements and
-    efficiencies, combine the masses (if needed) and compute the conditions
-    (if exist).
+    SMS in smsTopDict.
+    For each Txname appearing in expResult, it collects the SMS and
+    efficiencies, combine the SMS and compute the conditions  (if exist).
 
     :parameter expResult: expResult to be considered (ExpResult object), if list of ExpResults is given, produce theory predictions for all
-    :parameter smsTopList: list of topologies containing elements
-                           (TopologyList object)
-    :parameter maxMassDist: maximum mass distance for clustering elements (float)
+    :parameter smsTopDict: dictionary of SMS, where the canonical names are keys and the TheorySMS objects are values.
+                           (TopologyDict object)
+    :parameter maxMassDist: maximum mass distance for clustering SMS (float)
     :parameter useBestDataset: If True, uses only the best dataset (signal region).
                If False, returns predictions for all datasets (if combinedResults is False),
                or only the combinedResults (if combinedResults is True).
@@ -517,7 +515,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     if isinstance(expResult, (list, tuple)):
         ret = []
         for er in expResult:
-            tpreds = theoryPredictionsFor(er, smsTopList, maxMassDist,
+            tpreds = theoryPredictionsFor(er, smsTopDict, maxMassDist,
                                           useBestDataset, combinedResults,
                                           marginalize, deltas_rel)
             if tpreds:
@@ -530,7 +528,7 @@ def theoryPredictionsFor(expResult, smsTopList, maxMassDist=0.2,
     dataSetResults = []
     #  Compute predictions for each data set (for UL analyses there is one single set)
     for dataset in expResult.datasets:
-        predList = _getDataSetPredictions(dataset, smsTopList, maxMassDist)
+        predList = _getDataSetPredictions(dataset, smsTopDict, maxMassDist)
         if predList:
             dataSetResults.append(predList)
     if not dataSetResults:  # no results at all?
@@ -596,7 +594,7 @@ def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
         return None
 
     txnameList = []
-    elementList = []
+    smsList = []
     totalXsec = None
     massList = []
     widthList = []
@@ -609,7 +607,7 @@ def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
         pred = predList[0]
         datasetPredictions.append(pred)
         txnameList += pred.txnames
-        elementList += pred.elements
+        smsList += pred.smsList
         if not totalXsec:
             totalXsec = pred.xsection
         else:
@@ -637,7 +635,7 @@ def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
     theoryPrediction.xsection = totalXsec
     theoryPrediction.datasetPredictions = datasetPredictions
     theoryPrediction.conditions = None
-    theoryPrediction.elements = elementList
+    theoryPrediction.smsList = smsList
     theoryPrediction.mass = mass
     theoryPrediction.totalwidth = totalwidth
     theoryPrediction.PIDs = [pdg for pdg, _ in itertools.groupby(PIDList)]  # Remove duplicates
@@ -682,21 +680,21 @@ def _getBestResult(dataSetResults):
     return bestPred
 
 
-def _getDataSetPredictions(dataset, smsTopList, maxMassDist,
+def _getDataSetPredictions(dataset, smsTopDict, maxMassDist,
                            marginalize=False, deltas_rel=None):
     """
     Compute theory predictions for a given data set.
     For upper-limit results returns the list of theory predictions for the
     experimental result.  For efficiency-map results returns the list of theory
-    predictions for the signal region.  Uses the list of elements in
-    smsTopList.
-    For each Txname appearing in dataset, it collects the elements and efficiencies,
+    predictions for the signal region.  Uses the list of SMS in
+    smsTopDict.
+    For each Txname appearing in dataset, it collects the SMS and efficiencies,
     combine the masses (if needed) and compute the conditions (if existing).
 
     :parameter dataset: Data Set to be considered (DataSet object)
-    :parameter smsTopList: list of topologies containing elements
-                           (TopologyList object)
-    :parameter maxMassDist: maximum mass distance for clustering elements (float)
+    :parameter smsTopDict: dictionary of SMS, where the canonical names are keys and the TheorySMS objects are values.
+                           (TopologyDict object)
+    :parameter maxMassDist: maximum mass distance for clustering SMS (float)
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction
                objects
     """
@@ -705,8 +703,11 @@ def _getDataSetPredictions(dataset, smsTopList, maxMassDist,
         deltas_rel = _deltas_rel_default
 
     predictionList = TheoryPredictionList()
-    #  Select elements belonging to expResult and apply efficiencies
-    elements = _getElementsFrom(smsTopList, dataset)
+    #  Select SMS belonging to expResult and apply efficiencies
+    smsList = _getSMSFrom(smsTopDict, dataset)
+
+    if len(smsList) == 0:
+        return None
 
     #  Check dataset sqrts format:
     if (dataset.globalInfo.sqrts/TeV).normalize()._unit:
@@ -714,33 +715,29 @@ def _getDataSetPredictions(dataset, smsTopList, maxMassDist,
         logger.error("Sqrt(s) defined with wrong units for %s" % (ID))
         return False
 
-    # Compute relevant element weights
-    newelements = []
-    for el in elements:
+    # Compute relevant SMS weights
+    for sms in smsList:
         # Get cross-sections for correct CM energy:
-        el.weight = el.weightList.getXsecsFor(dataset.globalInfo.sqrts)
-        if not el.weight:
+        sms.weight = sms.weightList.getXsecsFor(dataset.globalInfo.sqrts)
+        if not sms.weight:
             continue
         # Get largest weight (in case there are LO, NLO,... values)
-        el.weight = el.weight.getMaxXsec()
-        # Multiply weight by element efficiency:
-        el.weight *= el.eff
-        newelements.append(el)
-    elements = newelements
-    if len(elements) == 0:
-        return None
+        sms.weight = sms.weight.getMaxXsec()
+        # Multiply weight by SMSs efficiency:
+        sms.weight = sms.weight*sms.eff
 
-    #  Combine elements according to their respective constraints and masses
-    #  (For efficiencyMap analysis group all elements)
-    clusters = _combineElements(elements, dataset, maxDist=maxMassDist)
+
+    #  Combine SMS according to their respective constraints and masses
+    #  (For efficiencyMap analysis group all SMS)
+    clusters = _combineSMS(smsList, dataset, maxDist=maxMassDist)
 
     #  Collect results and evaluate conditions
     for cluster in clusters:
         theoryPrediction = TheoryPrediction(marginalize, deltas_rel)
         theoryPrediction.dataset = dataset
         theoryPrediction.txnames = cluster.txnames
-        theoryPrediction.elements = cluster.elements
-        theoryPrediction.avgElement = cluster.averageElement
+        theoryPrediction.smsList = cluster.smsList
+        theoryPrediction.avgSMS = cluster.averageSMS
         # Compute relevant cross-section and conditions:
         theoryPrediction.computeXSection()
         theoryPrediction.computeConditions()
@@ -753,62 +750,62 @@ def _getDataSetPredictions(dataset, smsTopList, maxMassDist,
         return predictionList
 
 
-def _getElementsFrom(smsTopDict, dataset):
+def _getSMSFrom(smsTopDict, dataset):
     """
-    Get elements that belong to any of the TxNames in dataset
+    Get SMS that belong to any of the TxNames in dataset
     (appear in any of constraints in the result).
-    Loop over all elements in smsTopList and returns a copy of the elements belonging
-    to any of the constraints (i.e. have efficiency != 0). The copied elements
+    Loop over all SMS in smsTopDict and returns a copy of the SMS belonging
+    to any of the constraints (i.e. have efficiency != 0). The copied SMS
     have their weights multiplied by their respective efficiencies.
 
     :parameter dataset:  Data Set to be considered (DataSet object)
-    :parameter smsTopDict: Dictionary of topologies containing elements
+    :parameter smsTopDict: dictionary of SMS, where the canonical names are keys and the TheorySMS objects are values.
                            (TopologyDict object)
-    :returns: list of elements (Element objects)
+    :returns: list of SMS (TheorySMS objects)
     """
 
-    elements = []
+    smsList = []
     for txname in dataset.txnameList:
-        for cName in smsTopDict:
+        for cName in smsTopDict:  # Must loop over all canonical names (in case of inclusive txnames)
             if cName != txname.canonName:  # Check if the topology appear in txname
                 continue
-            for el in smsTopDict[cName]:
-                newEl = txname.hasElementAs(el)  # Check if element appears in txname
-                if not newEl:
+            for sms in smsTopDict[cName]:
+                newSMS = txname.hasSMSas(sms)  # Check if SMS appears in txname
+                if not newSMS:
                     continue
-                el.setCoveredBy(dataset.globalInfo.type)
-                eff = txname.getEfficiencyFor(newEl)
+                sms.setCoveredBy(dataset.globalInfo.type)
+                eff = txname.getEfficiencyFor(newSMS)
                 if eff is None or abs(eff) < 1e-14:
                     continue
-                el.setTestedBy(dataset.globalInfo.type)
-                newEl.eff = eff
-                newEl.txname = txname
-                elements.append(newEl)  # Save element with correct branch ordering
+                sms.setTestedBy(dataset.globalInfo.type)
+                newSMS.eff = eff
+                newSMS.txname = txname
+                smsList.append(newSMS)  # Save SMS sorted according to the txname
 
-    return elements
+    return smsList
 
 
-def _combineElements(elements, dataset, maxDist):
+def _combineSMS(smsList, dataset, maxDist):
     """
-    Combine elements according to the data set type.
-    If expResult == upper limit type, first group elements with different TxNames
+    Combine SMS according to the data set type.
+    If expResult == upper limit type, first group SMS with different TxNames
     and then into mass clusters.
-    If expResult == efficiency map type, group all elements into a single cluster.
+    If expResult == efficiency map type, group all SMS into a single cluster.
 
-    :parameter elements: list of elements (Element objects)
+    :parameter smsList: list of SMS (TheorySMS objects)
     :parameter expResult: Data Set to be considered (DataSet object)
-    :returns: list of element clusters (ElementCluster objects)
+    :returns: list of SMS clusters (SMSCluster objects)
     """
 
     clusters = []
 
-    if dataset.getType() == 'efficiencyMap':  # cluster all elements
-        clusters += clusterTools.clusterElements(elements, maxDist, dataset)
+    if dataset.getType() == 'efficiencyMap':  # cluster all SMS
+        clusters += clusterTools.clusterSMS(smsList, maxDist, dataset)
     elif dataset.getType() == 'upperLimit':  # Cluster each txname individually
-        txnames = list(set([el.txname for el in elements]))
+        txnames = list(set([sms.txname for sms in smsList]))
         for txname in txnames:
-            txnameEls = [el for el in elements if el.txname == txname]
-            clusters += clusterTools.clusterElements(txnameEls, maxDist, dataset)
+            txnameSMS = [sms for sms in smsList if sms.txname is txname]
+            clusters += clusterTools.clusterSMS(txnameSMS, maxDist, dataset)
     else:
         logger.warning("Unkown data type: %s. Data will be ignored."
                        % dataset.getType())

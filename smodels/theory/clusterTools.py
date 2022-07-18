@@ -1,99 +1,98 @@
 """
 .. module:: clusterTools
-   :synopsis: Module holding the ElementCluster class and cluster methods used to combine similar elements according
+   :synopsis: Module holding the SMSCluster class and cluster methods used to combine similar SMS according
       to the analysis.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
-from smodels.theory.element import Element
+from smodels.theory.theorySMS import TheorySMS
+from smodels.theory.particleNode import ParticleNode
 from smodels.theory.particle import Particle
 from smodels.experiment.datasetObj import DataSet, CombinedDataSet
 from smodels.tools.physicsUnits import fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.theory.auxiliaryFunctions import average
+from smodels.theory.theoryAuxiliaryFuncs import average
 import numpy as np
 from smodels.tools.smodelsLogging import logger
 
 
-class AverageElement(Element):
+class AverageSMS(TheorySMS):
     """
-    Represents an element or list of elements containing only
+    Represents an SMS or list of SMS containing only
     the basic attributes required for clustering or computing efficiencies/upper limits.
-    Its properties are given by the average properties of the elements
+    Its properties are given by the average properties of the SMS
     it represents and its weight is given by the total weight of
-    all elements.
+    all SMS.
     """
 
-    def __init__(self, elements=[]):
-        if any(not isinstance(el, Element) for el in elements):
-            raise SModelSError("An AverageElement must be created from a list of Element objects.")
+    def __init__(self, smsList=[]):
+        if any(not isinstance(sms, TheorySMS) for sms in smsList):
+            raise SModelSError("An AverageSMS must be created from a list of TheorySMS objects.")
 
-        Element.__init__(self)
+        TheorySMS.__init__(self)
 
         # Get the relevant properties needed by the txnames
         # (in addition to mass, totalwidth and isSM)
         attrList = ['mass', 'totalwidth', 'isSM']
-        for el in elements:
-            dataMap = el.txname.dataMap
+        for sms in smsList:
+            dataMap = sms.txname.dataMap
             attrList += [attr for node, attr, unit in dataMap.values()]
         attrList = list(set(attrList))
 
+        # Define base SMS to copy (common) global properties from
+        smsBase = smsList[0]
+
         #  Define relevant properties to be stored and averaged over:
         self.properties = attrList
-        self.elements = elements[:]
-        self.txname = self.elements[0].txname
+        self.smsList = smsList[:]
+        self.txname = smsBase.txname
 
         #  Consistency checks:
-        if any(el.canonName != elements[0].canonName for el in self.elements[1:]):
-            logger.error("Can not build average Element from elements with distinct topologies.")
+        if any(sms.canonName != smsBase.canonName for sms in self.smsList):
+            logger.error("Can not build average SMS from SMS with distinct topologies.")
             raise SModelSError()
-        if any(el.txname != self.txname for el in self.elements):
-            logger.error("Can not build average Element from elements for distinct txnames.")
+        if any(sms.txname != self.txname for sms in self.smsList):
+            logger.error("Can not build average SMS from SMS for distinct txnames.")
             raise SModelSError()
 
-        #  Replace particles in nodes by generic particles
-        #  holding the average attributes (assume the elements are sorted)
-        newTree = self.elements[0].tree.copyTree()
-        for nodeIndex in newTree.successors:
-            eqNodes = [el.tree.nodesMapping[nodeIndex] for el in elements]
-            # Do nothing for root:
-            if nodeIndex == newTree.root.node:
-                continue
 
-            newParticle = Particle(label='average')
-            for attr in self.properties:
-                values = [getattr(n, attr) for n in eqNodes]
-                avgAttr = self.getAverage(values)
-                setattr(newParticle, attr, avgAttr)
-            newNode = newTree.nodesMapping[nodeIndex]
-            newNode.particle = newParticle
+        # Create new node objects holding particels
+        # with the average attributes
+        avgNodesDict = {}
+        for nodeIndex in smsBase.nodeIndices:
+            if nodeIndex == smsBase.rootIndex:
+                # For the root node make a dummy copy:
+                avgNode = smsBase.indexToNode(nodeIndex).copy()
+            else:
+                # For all the other nodes compute the average
+                allNodes = [sms.indexToNode(nodeIndex) for sms in smsList]
+                avgParticle = Particle(label='average')
+                for attr in self.properties:
+                    values = [getattr(n, attr) for n in allNodes]
+                    avgAttr = self.getAverage(values)
+                    setattr(avgParticle, attr, avgAttr)
+                avgNode = ParticleNode(particle=avgParticle)
+            avgNodesDict[nodeIndex] = avgNode
 
-        self.tree = newTree
-        self.weight = self.elements[0].weight
-        for el in self.elements[1:]:
-            self.weight += el.weight
-
-    def __str__(self):
-        """
-        Simply returns "averageElement", since the element
-        has no well defined branches/final states (in general).
-
-        :returns: averageElement (string)
-        """
-
-        return "averageElement"
+        # Copy the tree structure from smsBase,
+        # but replacing the node objects by the average nodes
+        self.copyTreeFrom(smsBase,nodesObjDict=avgNodesDict)
+        # Compute the weight
+        self.weight = smsBase.weight
+        for sms in self.smsList[1:]:
+            self.weight = self.weight + sms.weight
 
     def __cmp__(self, other):
         """
-        Compares the element with other. Only the properties
+        Compares the SMS with other. Only the properties
         defined in self.properties are used for comparison.
-        :param other:  element to be compared (Element or AverageElement object)
+        :param other:  SMS to be compared (SMS object)
         :return: -1 if self < other, 0 if self == other, +1, if self > other.
         """
 
-        if not isinstance(other, (Element, AverageElement)):
+        if not isinstance(other, TheorySMS):
             return -1
 
         otherProperties = [getattr(other, attr) for attr in self.properties]
@@ -102,27 +101,27 @@ class AverageElement(Element):
 
         return comp
 
+    def __lt__(self, other):
+        return self.__cmp__(other) == -1
+
+    def __gt__(self, other):
+        return self.__cmp__(other) == 1
+
     def __eq__(self, other):
         return self.__cmp__(other) == 0
 
-    def __lt__(self, other):
-        return self.__cmp__(other) < 0
-
-    def __gt__(self, other):
-        return self.__cmp__(other) > 0
-
-    def __neq__(self, other):
-        return not self.__eq__(other)
+    def __ne__(self, other):
+        return self.__cmp__(other) != 0
 
     def getAverage(self, values, weighted=True, nround=5):
         """
         Compute the average value for the attribute using
-        the elements in self.elements.
+        the SMS list in self.smsList.
         If weighted = True, compute the weighted average
-        using the elements weights.
+        using the SMS weights.
 
         :param values: List of values to be averaged over
-        :param weighted: If True, uses the element weights to compute a weighted average
+        :param weighted: If True, uses the SMS weights to compute a weighted average
         :param nround: If greater than zero and the returning attibute is numeric, will round it
                       to this number of significant digits.
 
@@ -130,42 +129,42 @@ class AverageElement(Element):
         """
 
         if weighted:
-            weights = [el.weight.asNumber(fb) for el in self.elements]
+            weights = [sms.weight.asNumber(fb) for sms in self.smsList]
         else:
-            weights = [1.]*len(self.elements)
+            weights = [1.]*len(self.smsList)
 
         return average(values, weights, nround)
 
-    def contains(self, element):
+    def contains(self, sms):
         """
-        Check if the average element contains the element
+        Check if the average SMS contains the SMS
 
-        :param element: Element object
+        :param sms: TheorySMS object
 
         :return: True/False
         """
 
-        if any(el is element for el in self.elements):
+        if any(sms is selfSMS for selfSMS in self.smsList):
             return True
         return False
 
 
-class ElementCluster(object):
+class SMSCluster(object):
     """
-    An instance of this class represents a cluster of elements.
+    An instance of this class represents a cluster of SMS.
     This class is used to store the relevant information about a cluster of
-    elements and to manipulate this information.
+    SMS and to manipulate this information.
     """
 
-    def __init__(self, elements=[], dataset=None, distanceMatrix=None):
+    def __init__(self, smsList=[], dataset=None, distanceMatrix=None):
 
-        self.elements = elements
+        self.smsList = smsList
         self.dataset = dataset
         self.maxInternalDist = 0.
         self._distanceMatrix = distanceMatrix
         # Compute maximal internal distance
-        if self.elements and self._distanceMatrix is not None:
-            self.maxInternalDist = max([self.getDistanceTo(el) for el in self])
+        if self.smsList and self._distanceMatrix is not None:
+            self.maxInternalDist = max([self.getDistanceTo(sms) for sms in self])
 
     def __eq__(self, other):
 
@@ -177,42 +176,37 @@ class ElementCluster(object):
             return True
 
     def __iter__(self):
-        return iter(self.elements)
+        return iter(self.smsList)
 
-    def __getitem__(self, iel):
-        return self.elements[iel]
+    def __getitem__(self, isms):
+        return self.smsList[isms]
 
     def __len__(self):
-        return len(self.elements)
+        return len(self.smsList)
 
     def __str__(self):
-        return str(self.elements)
+        return str(self.smsList)
 
     def __repr__(self):
-        return str(self.elements)
+        return str(self.smsList)
 
     def indices(self):
         """
-        Return a list of element indices appearing in cluster
+        Return a list of SMS indices appearing in cluster
         """
 
-        indices = [el._index for el in self]
+        indices = [sms._index for sms in self]
 
         return indices
 
     def getTotalXSec(self):
         """
-        Return the sum over the cross sections of all elements belonging to
+        Return the sum over the cross sections of all SMS belonging to
         the cluster.
 
-        :returns: sum of weights of all the elements in the cluster (XSectionList object)
+        :returns: sum of weights of all the SMS in the cluster (XSectionList object)
         """
-        totxsec = None
-        for el in self:
-            if totxsec is None:
-                totxsec = el.weight
-            else:
-                totxsec += el.weight
+        totxsec = sum([sms.weight for sms in self.smsList])
         if len(totxsec) != 1:
             logger.error("Cluster total cross section should have a single value")
             raise SModelSError()
@@ -234,153 +228,154 @@ class ElementCluster(object):
         return dataType
 
     @property
-    def averageElement(self):
+    def averageSMS(self):
         """
-        Computes the average element for the cluster.
-        The average element has generic ParticleNodes
-        with the attributes set to the average values of self.elements.
-        It can only be defined if all elements share the same canonical name
+        Computes the average SMS for the cluster.
+        The average SMS has generic ParticleNodes
+        with the attributes set to the average values of self.smsList.
+        It can only be defined if all SMS share the same canonical name
         and the same txname. Otherwise, returns None
 
-        :return: AverageElement object or None (if it can not be defined)
+        :return: AverageSMS object or None (if it can not be defined)
         """
 
-        # Check if an average element can be defined:
-        cName = self.elements[0].canonName
-        tx = self.elements[0].txname
-        if any(el.canonName != cName for el in self.elements):
+        # Check if an average SMS can be defined:
+        cName = self.smsList[0].canonName
+        tx = self.smsList[0].txname
+        if any(sms.canonName != cName for sms in self.smsList):
             return None
-        if any(el.txname != tx for el in self.elements):
+        if any(sms.txname != tx for sms in self.smsList):
             return None
-        # Define the average element with the required properties averaged over:
-        avgEl = AverageElement(self.elements[:])
+        # Define the average SMS with the required properties averaged over:
+        avgSMS = AverageSMS(self.smsList[:])
         if self.dataset:
-            avgEl._upperLimit = self.dataset.getUpperLimitFor(avgEl,
-                                                              txnames=avgEl.txname)
+            avgSMS._upperLimit = self.dataset.getUpperLimitFor(avgSMS,
+                                                              txnames=avgSMS.txname)
 
-        avgEl._index = None
-        return avgEl
+        avgSMS._index = None
+
+        return avgSMS
 
     def copy(self):
         """
         Returns a copy of the index cluster (faster than deepcopy).
         """
 
-        newcluster = ElementCluster(self.elements[:], self.dataset, self._distanceMatrix)
+        newcluster = SMSCluster(self.smsList[:], self.dataset, self._distanceMatrix)
         newcluster.maxInternalDist = self.maxInternalDist
         return newcluster
 
-    def add(self, elements):
+    def add(self, smsList):
         """
-        Add an element or list of elements.
+        Add an SMS or list of SMS.
 
-        :param elements: Element object or list of elements
+        :param smsList: TheorySMS object or list of SMS
         """
 
-        if not isinstance(elements, list):
-            elementList = [elements]
+        if not isinstance(smsList, list):
+            smsList = [smsList]
         else:
-            elementList = elements
+            smsList = smsList[:]
 
-        for el in elementList:
-            if el._index in self.indices():
+        for sms in smsList:
+            if sms._index in self.indices():
                 continue
 
-            self.elements.append(el)
+            self.smsList.append(sms)
             # Update internal distance:
-            self.maxInternalDist = max(self.maxInternalDist, self.getDistanceTo(el))
+            self.maxInternalDist = max(self.maxInternalDist, self.getDistanceTo(sms))
 
-    def remove(self, elements):
+    def remove(self, smsList):
         """
-        Remove an element or a list of element  from the cluster.
+        Remove an SMS or a list of SMS from the cluster.
 
-        :param elements: Element object or list of elements
+        :param smsList: TheorySMS object or list of SMS
         """
 
-        if not isinstance(elements, list):
-            elementList = [elements]
+        if not isinstance(smsList, list):
+            smsList = [smsList]
         else:
-            elementList = elements
+            smsList = smsList[:]
 
-        for el in elementList:
+        for sms in smsList:
             indices = self.indices()
-            if el._index not in indices:
+            if sms._index not in indices:
                 continue
-            iel = indices.index(el._index)
-            self.elements.pop(iel)
+            isms = indices.index(sms._index)
+            self.smsList.pop(isms)
         # Update internal distance:
         self.maxInternalDist = max([self.getDistanceTo(elB) for elB in self])
 
-    def getDistanceTo(self, element):
+    def getDistanceTo(self, sms):
         """
-        Return the maximum distance between any elements belonging to the
-        cluster and element.
+        Return the maximum distance between any of the SMS belonging to the
+        cluster and sms.
 
-        :parameter element: Element object
+        :parameter sms: SMS object
         :return: maximum distance (float)
         """
 
-        if not hasattr(element, '_upperLimit'):
-            element._upperLimit = self.dataset.getUpperLimitFor(element,
-                                                                txnames=element.txname)
-        if element._upperLimit is None:
+        if not hasattr(sms, '_upperLimit'):
+            sms._upperLimit = self.dataset.getUpperLimitFor(sms,
+                                                            txnames=sms.txname)
+        if sms._upperLimit is None:
             return None
 
-        # Use pre-computed distances for regular (non-averge) elements
-        if element._index is not None:
-            return max([self._distanceMatrix[element._index, el._index] for el in self])
+        # Use pre-computed distances for regular (non-averge) SMS
+        if sms._index is not None:
+            return max([self._distanceMatrix[sms._index, el._index] for el in self])
 
         dmax = 0.
-        for el in self:
-            if not hasattr(el, '_upperLimit'):
-                el._upperLimit = self.dataset.getUpperLimitFor(el,
-                                                               txnames=el.txname)
-            dmax = max(dmax, relativeDistance(element, el, self.dataset))
+        for smsSelf in self:
+            if not hasattr(smsSelf, '_upperLimit'):
+                smsSelf._upperLimit = self.dataset.getUpperLimitFor(smsSelf,
+                                                               txnames=smsSelf.txname)
+            dmax = max(dmax, relativeDistance(sms, smsSelf, self.dataset))
 
         return dmax
 
     def isConsistent(self, maxDist):
         """
         Checks if the cluster is consistent.
-        Computes an average element in the cluster
-        and checks if this average element belongs to the cluster
-        according to the maximum allowed distance between cluster elements.
+        Computes an average SMS in the cluster
+        and checks if this average SMS belongs to the cluster
+        according to the maximum allowed distance between cluster SMS.
 
         :return: True/False if the cluster is/is not consistent.
         """
 
-        avgElement = self.averageElement
-        if avgElement._upperLimit is None:
+        avgSMS = self.averageSMS
+        if avgSMS._upperLimit is None:
             return False
 
-        dmax = self.getDistanceTo(avgElement)
+        dmax = self.getDistanceTo(avgSMS)
         if dmax > maxDist:
             return False
 
         return True
 
 
-def relativeDistance(el1, el2, dataset):
+def relativeDistance(sms1, sms2, dataset):
     """
-    Defines the relative distance between two elements according to their
+    Defines the relative distance between two SMS according to their
     upper limit values.
     The distance is defined as d = 2*|ul1-ul2|/(ul1+ul2).
 
-    :parameter el1: Element object
-    :parameter el2: Element object
+    :parameter sms1: SMS object
+    :parameter sms2: SMS object
 
     :returns: relative distance
     """
 
-    if not hasattr(el1, '_upperLimit'):
-        el1._upperLimit = dataset.getUpperLimitFor(el1,
-                                                   txnames=el1.txname)
-    if not hasattr(el2, '_upperLimit'):
-        el2._upperLimit = dataset.getUpperLimitFor(el2,
-                                                   txnames=el2.txname)
+    if not hasattr(sms1, '_upperLimit'):
+        sms1._upperLimit = dataset.getUpperLimitFor(sms1,
+                                                   txnames=sms1.txname)
+    if not hasattr(sms2, '_upperLimit'):
+        sms2._upperLimit = dataset.getUpperLimitFor(sms2,
+                                                   txnames=sms2.txname)
 
-    ul1 = el1._upperLimit
-    ul2 = el2._upperLimit
+    ul1 = sms1._upperLimit
+    ul2 = sms2._upperLimit
 
     if ul1 is None or ul2 is None:
         return None
@@ -391,49 +386,50 @@ def relativeDistance(el1, el2, dataset):
     return ulDistance
 
 
-def clusterElements(elements, maxDist, dataset):
+def clusterSMS(smsList, maxDist, dataset):
     """
-    Cluster the original elements according to their distance in upper limit space.
+    Cluster the original SMS according to their distance in upper limit space.
 
-    :parameter elements: list of elements (Element objects)
+    :parameter smsList: list of sms (TheorySMS objects)
     :parameter dataset: Dataset object to be used when computing distances in upper limit space
-    :parameter maxDist: maximum distance for clustering two elements
+    :parameter maxDist: maximum distance for clustering two SMS
 
-    :returns: list of clusters (ElementCluster objects)
+    :returns: list of clusters (SMSCluster objects)
     """
-    if len(elements) == 0:
+    if len(smsList) == 0:
         return []
 
-    if any(not isinstance(el, Element) for el in elements):
-        raise SModelSError("Asked to cluster non Element objects")
+    if any(not isinstance(sms, TheorySMS) for sms in smsList):
+        raise SModelSError("Asked to cluster non TheorySMS objects")
     if not isinstance(dataset, (DataSet, CombinedDataSet)):
         raise SModelSError("A dataset object must be defined for clustering")
 
-    # Make sure only unique elements are clustered together (avoids double counting weights)
-    # Sort element, so the ones with highest contribution (weight*eff) come first:
-    elementList = sorted(elements, key=lambda el: el.weight, reverse=True)
-    # Remove duplicated elements:
-    elementsUnique = []
-    for el in elementList:
-        # Skip the element if it is related to any another element in the list
-        if any(el.isRelatedTo(elB) for elB in elementsUnique):
-            continue
-        elementsUnique.append(el)
+    # Make sure only unique SMS are clustered together (avoids double counting weights)
+    # Sort SMS, so the ones with highest contribution (weight*eff) come first:
+    smsList = sorted(smsList, key=lambda sms: sms.weight, reverse=True)
 
-    # Get txname list only with the txnames from unique elements used for clustering
-    txnames = list(set([el.txname for el in elementsUnique]))
+    # Remove duplicated SMS:
+    smsUnique = []
+    for sms in smsList:
+        # Skip the SMS if it is related to any another SMS in the list
+        if any(sms.isRelatedTo(smsB) for smsB in smsUnique):
+            continue
+        smsUnique.append(sms)
+
+    # Get txname list only with the txnames from unique SMS used for clustering
+    txnames = list(set([sms.txname for sms in smsUnique]))
     if dataset.getType() == 'upperLimit' and len(txnames) != 1:
-        logger.error("Clustering elements with different Txnames for an UL result.")
+        logger.error("Clustering SMS with different Txnames for an UL result.")
         raise SModelSError()
 
     if dataset.getType() == 'upperLimit':  # Group according to upper limit values
-        clusters = doCluster(elementsUnique, dataset, maxDist)
-    elif dataset.getType() == 'efficiencyMap':  # Group all elements together
-        distanceMatrix = np.zeros((len(elementsUnique), len(elementsUnique)))
-        cluster = ElementCluster(dataset=dataset, distanceMatrix=distanceMatrix)
-        for iel, el in enumerate(elementsUnique):
-            el._index = iel
-        cluster.elements = elementsUnique
+        clusters = doCluster(smsUnique, dataset, maxDist)
+    elif dataset.getType() == 'efficiencyMap':  # Group all SMS together
+        distanceMatrix = np.zeros((len(smsUnique), len(smsUnique)))
+        cluster = SMSCluster(dataset=dataset, distanceMatrix=distanceMatrix)
+        for isms, sms in enumerate(smsUnique):
+            sms._index = isms
+        cluster.smsList = smsUnique
         clusters = [cluster]
 
     for cluster in clusters:
@@ -441,100 +437,100 @@ def clusterElements(elements, maxDist, dataset):
     return clusters
 
 
-def groupElements(elements, dataset):
+def groupSMS(smsList, dataset):
     """
-    Group elements into groups where the average element
-    identical to all the elements in group.
-    The groups contain all elements which share the same mass,width and upper limit
-    and can be replaced by their average element when building clusters.
+    Group SMS into groups where the average SMS
+    identical to all the SMS in group.
+    The groups contain all SMS which share the same mass,width and upper limit
+    and can be replaced by their average SMS when building clusters.
 
-    :parameter elements: list of all elements to be grouped
+    :parameter smsList: list of all SMS to be grouped
     :parameter dataset: Dataset object to be used when computing distances in upper limit space
 
-    :returns: a list of AverageElement objects
-              which represents a group of elements with same mass, width and upper limit.
+    :returns: a list of AverageSMS objects
+              which represents a group of SMS with same mass, width and upper limit.
     """
 
-    #  First make sure all elements contain their upper limits
-    for el in elements:
-        if not hasattr(el, '._upperLimit'):
-            el._upperLimit = dataset.getUpperLimitFor(el, txnames=el.txname)
-        if el._upperLimit is None:
-            raise SModelSError("Trying to cluster element outside the grid.")
+    #  First make sure all SMS contain their upper limits
+    for sms in smsList:
+        if not hasattr(sms, '._upperLimit'):
+            sms._upperLimit = dataset.getUpperLimitFor(sms, txnames=sms.txname)
+        if sms._upperLimit is None:
+            raise SModelSError("Trying to cluster SMS outside the grid.")
 
-    # Group elements if they have the same UL
-    # and give the same average element (same mass and same width)
-    avgElements = []
-    for iA, elA in enumerate(elements):
-        avgEl = AverageElement([elA])
-        avgEl._upperLimit = elA._upperLimit
-        for iB, elB in enumerate(elements):
+    # Group SMS if they have the same UL
+    # and give the same average SMS (same mass and same width)
+    avgSMSList = []
+    for iA, smsA in enumerate(smsList):
+        avgSMS = AverageSMS([smsA])
+        avgSMS._upperLimit = smsA._upperLimit
+        for iB, smsB in enumerate(smsList):
             if iB <= iA:
                 continue
-            if elA._upperLimit != elB._upperLimit:
+            if smsA._upperLimit != smsB._upperLimit:
                 continue
-            if avgEl != elB:
+            if avgSMS != smsB:
                 continue
-            avgEl.elements.append(elB)
-            avgEl.weight += elB.weight
-        if avgEl not in avgElements:
-            avgElements.append(avgEl)
+            avgSMS.smsList.append(smsB)
+            avgSMS.weight += smsB.weight
+        if avgSMS not in avgSMSList:
+            avgSMSList.append(avgSMS)
 
-    # Make sure each element belongs to a average element:
-    for el in elements:
-        nclusters = sum([avgEl.contains(el) for avgEl in avgElements])
+    # Make sure each SMS belongs to a average SMS:
+    for sms in smsList:
+        nclusters = sum([avgSMS.contains(sms) for avgSMS in avgSMSList])
         if nclusters != 1:
-            raise SModelSError("Error computing average elements. Element %s belongs to %i average elements."
-                               % (str(el), nclusters))
-    return avgElements
+            raise SModelSError("Error computing average SMS. SMS %s belongs to %i average SMS."
+                               % (str(sms), nclusters))
+    return avgSMSList
 
 
-def doCluster(elements, dataset, maxDist):
+def doCluster(smsList, dataset, maxDist):
     """
-    Cluster algorithm to cluster elements.
+    Cluster algorithm to cluster SMS.
 
-    :parameter elements: list of all elements to be clustered
+    :parameter smsList: list of all SMS to be clustered
     :parameter dataset: Dataset object to be used when computing distances in upper limit space
-    :parameter maxDist: maximum distance for clustering two elements
+    :parameter maxDist: maximum distance for clustering two SMS
 
-    :returns: a list of ElementCluster objects containing the elements
+    :returns: a list of SMSCluster objects containing the SMS
               belonging to the cluster
     """
 
-    # Get average elements:
-    averageElements = groupElements(elements, dataset)
+    # Get average SMS:
+    averageSMSList = groupSMS(smsList, dataset)
 
-    # Index average elements:
-    elementList = sorted(averageElements, key=lambda el: el._upperLimit)
-    for iel, el in enumerate(elementList):
-        el._index = iel
+    # Index average SMS:
+    sortedSMSList = sorted(averageSMSList, key=lambda sms: sms._upperLimit)
+    for isms, sms in enumerate(sortedSMSList):
+        sms._index = isms
 
     # Pre-compute all necessary distances:
-    distanceMatrix = np.zeros((len(elementList), len(elementList)))
-    for iel, elA in enumerate(elementList):
-        for jel, elB in enumerate(elementList):
-            if jel <= iel:
+    distanceMatrix = np.zeros((len(sortedSMSList), len(sortedSMSList)))
+    for isms, smsA in enumerate(sortedSMSList):
+        for jsms, smsB in enumerate(sortedSMSList):
+            if jsms <= isms:
                 continue
-            distanceMatrix[iel, jel] = relativeDistance(elA, elB, dataset)
+            distanceMatrix[isms, jsms] = relativeDistance(smsA, smsB, dataset)
     distanceMatrix = distanceMatrix + distanceMatrix.T
 
     # Start building maximal clusters
     clusterList = []
-    for el in elementList:
-        cluster = ElementCluster([], dataset, distanceMatrix)
-        for elB in elementList:
-            if distanceMatrix[el._index, elB._index] <= maxDist:
-                cluster.add(elB)
-        if not cluster.elements:
+    for sms in sortedSMSList:
+        cluster = SMSCluster([], dataset, distanceMatrix)
+        for smsB in sortedSMSList:
+            if distanceMatrix[sms._index, smsB._index] <= maxDist:
+                cluster.add(smsB)
+        if not cluster.smsList:
             continue
-        if cluster.averageElement._upperLimit is None:
+        if cluster.averageSMS._upperLimit is None:
             continue
         if cluster not in clusterList:
             clusterList.append(cluster)
 
-    # Split the maximal clusters until all elements inside each cluster are
+    # Split the maximal clusters until all SMS inside each cluster are
     # less than maxDist apart from each other and the cluster average position
-    # is less than maxDist apart from all elements
+    # is less than maxDist apart from all SMS
     finalClusters = []
     while clusterList:
         newClusters = []
@@ -547,13 +543,13 @@ def doCluster(elements, dataset, maxDist):
 
             # Cluster violates maxDist:
             else:
-                # Loop over cluster elements and if element distance
-                # falls outside the cluster, remove element
-                for el in cluster:
-                    if cluster.getDistanceTo(el) > maxDist or not isConsistent:
+                # Loop over cluster SMS and if the SMS distance
+                # falls outside the cluster, remove SMS
+                for sms in cluster:
+                    if cluster.getDistanceTo(sms) > maxDist or not isConsistent:
                         newcluster = cluster.copy()
-                        newcluster.remove(el)
-                        if newcluster.averageElement._upperLimit is None:
+                        newcluster.remove(sms)
+                        if newcluster.averageSMS._upperLimit is None:
                             continue
                         if newcluster in newClusters:
                             continue
@@ -562,14 +558,14 @@ def doCluster(elements, dataset, maxDist):
         clusterList = newClusters
         #  Check for oversized list of indexCluster (too time consuming)
         if len(clusterList) > 100:
-            logger.warning("ElementCluster failed, using unclustered masses")
+            logger.warning("SMSCluster failed, using unclustered masses")
             finalClusters = []
             clusterList = []
 
     #  finalClusters = finalClusters + clusterList
     #  Add clusters of individual masses (just to be safe)
-    for el in elementList:
-        finalClusters.append(ElementCluster([el], dataset, distanceMatrix))
+    for sms in sortedSMSList:
+        finalClusters.append(SMSCluster([sms], dataset, distanceMatrix))
 
     #  Clean up clusters (remove redundant clusters)
     for ic, clusterA in enumerate(finalClusters):
@@ -583,11 +579,11 @@ def doCluster(elements, dataset, maxDist):
     while finalClusters.count(None) > 0:
         finalClusters.remove(None)
 
-    # Replace average elements by the original elements:
+    # Replace average SMS by the original SMS:
     for cluster in finalClusters:
-        originalElements = []
-        for avgEl in cluster.elements[:]:
-            originalElements += avgEl.elements[:]
-        cluster.elements = originalElements[:]
+        originalSMS = []
+        for avgSMS in cluster.smsList[:]:
+            originalSMS += avgSMS.smsList[:]
+        cluster.smsList = originalSMS[:]
 
     return finalClusters

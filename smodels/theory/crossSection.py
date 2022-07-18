@@ -101,6 +101,9 @@ class XSectionInfo(object):
             return str(self.sqrts)
         return "%s (%s)" % (self.sqrts, self.order)
 
+    def __repr__(self):
+        return str(self)
+
     def __ne__(self, other):
         if not isinstance(other, XSectionInfo):
             return True
@@ -266,6 +269,9 @@ class XSection(object):
         st = self.info.label + ':' + str(self.value) + " " + str(self.pid)
         return st
 
+    def __repr__(self):
+        return str(self)
+
     def niceStr(self):
         """
         Generates a more human readable string. The string format is:
@@ -430,6 +436,9 @@ class XSectionList(object):
 
     def __str__(self):
         return str([str(xsec) for xsec in self])
+
+    def __repr__(self):
+        return str(self)
 
     def niceStr(self):
         st = ""
