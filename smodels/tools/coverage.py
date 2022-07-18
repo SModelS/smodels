@@ -8,8 +8,8 @@
 """
 
 from smodels.tools.physicsUnits import fb
-from smodels.tools.reweighting import reweightFactorFor
-from smodels.theory.auxiliaryFunctions import index_bisect
+from smodels.experiment.reweighting import reweightFactorFor
+from bisect import bisect
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.theory.element import Element
 from smodels.experiment.defaultFinalStates import (WList, lList, tList, taList, nuList, jetList,
@@ -299,7 +299,7 @@ class UncoveredGroup(object):
 
         newGenEl = FinalStateElement(el, missingX, self.smFinalStates, self.bsmFinalStates)
 
-        index = index_bisect(self.finalStateElements, newGenEl)
+        index = bisect(self.finalStateElements, newGenEl)
         if index != len(self.finalStateElements) and self.finalStateElements[index] == newGenEl:
             self.finalStateElements[index]._contributingElements.append(el)
             self.finalStateElements[index].missingX += missingX

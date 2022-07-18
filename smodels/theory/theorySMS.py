@@ -39,7 +39,6 @@ class TheorySMS(GenericSMS):
         self._sorted = False
         # List of SMS topologies which could have generated self (such as during compression)
         self.ancestors = [self]
-        self._allAncestors = None
         self.smsID = 0  # SMS identifier
         # Type of analyses which have SMS matching self:
         self.coveredBy = set()
@@ -99,8 +98,6 @@ class TheorySMS(GenericSMS):
         newSMS.maxWeight = self.maxWeight + other.maxWeight
         # Decay BRs can no longer be properly defined:
         newSMS.decayBRs = None
-        if other._allAncestors is not None:
-            newSMS._allAncestors += other._allAncestors[:]
 
         return newSMS
 
@@ -162,8 +159,6 @@ class TheorySMS(GenericSMS):
             newSMS.weightList = self.weightList.copy()
         newSMS._sorted = self._sorted
         newSMS.ancestors = self.ancestors[:]
-        if self._allAncestors is not None:
-            newSMS._allAncestors = self._allAncestors[:]
         newSMS.smsID = self.smsID
         newSMS.coveredBy = set(list(self.coveredBy)[:])
         newSMS.testedBy = set(list(self.testedBy)[:])
@@ -461,17 +456,11 @@ class TheorySMS(GenericSMS):
         :return: A list of SMS objects containing all the ancestors sorted by generation.
         """
 
-        # Check if the ancestors have already been obtained (performance gain)
-        if hasattr(self, '_allAncestors') and self._allAncestors is not None:
-            return self._allAncestors
-
         ancestorsDict = self._getAncestorsDict()
         allAncestors = []
 
         for igen in sorted(ancestorsDict.keys()):
             allAncestors += ancestorsDict[igen]
-
-        # self._allAncestors = allAncestors
 
         return allAncestors
 
