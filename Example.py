@@ -56,7 +56,7 @@ def main():
     print("\n Decomposition done in %1.2fm" %((time.time()-t0)/60.))
     print("\n Decomposition Results: ")
     print("\t  Total number of topologies: %i " % len(topDict))
-    nel = len(topDict.getElements())
+    nel = len(topDict.getSMSList())
     print("\t  Total number of elements = %i " % nel)
     # Print information about the m-th topology:
     m = 2
@@ -68,7 +68,7 @@ def main():
         n = 0
         el = elementList[n]
         print("\t\t %i-th element  = " % (n), el, end="")
-        print("\n\t\t\twith final states =", el.tree.getFinalStates(), "\n\t\t\twith cross section =", el.weightList, "\n\t\t\tand masses = ", el.mass)
+        print("\n\t\t\twith final states =", el.getFinalStates(), "\n\t\t\twith cross section =", el.weightList, "\n\t\t\tand masses = ", el.mass)
 
     # Load the experimental results to be used.
     # In this case, all results are employed.
@@ -172,9 +172,9 @@ def main():
 
     missingTopos = uncovered.getGroup('missing (prompt)')
     # Print some of the missing topologies:
-    if missingTopos.finalStateElements:
+    if missingTopos.finalStateSMS:
         print('Missing topologies (up to 3):')
-        for genEl in missingTopos.finalStateElements[:3]:
+        for genEl in missingTopos.finalStateSMS[:3]:
             print('Element:', genEl)
             print('\tcross-section (fb):', genEl.missingX)
     else:
@@ -182,9 +182,9 @@ def main():
 
     missingDisplaced = uncovered.getGroup('missing (displaced)')
     # Print elements with displaced decays:
-    if missingDisplaced.finalStateElements:
+    if missingDisplaced.finalStateSMS:
         print('\nElements with displaced vertices (up to 2):')
-        for genEl in missingDisplaced.finalStateElements[:2]:
+        for genEl in missingDisplaced.finalStateSMS[:2]:
             print('Element:', genEl)
             print('\tcross-section (fb):', genEl.missingX)
     else:

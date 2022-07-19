@@ -761,7 +761,7 @@ class GenericSMS(object):
         self._nodesMapping = newMapping
         self._nodeCanonNames = newCanonNames
         self._finalStates = newFinalStates
-        self._rootIndex = nodeIndexDict[self._rootIndex]
+        self._rootIndex = nodeIndexDict[self.rootIndex]
 
     def updateNodeObjects(self, nodeObjectDict):
         """
@@ -803,67 +803,81 @@ class GenericSMS(object):
             raise SModelSError("Graph created with malformed structure (not  a tree).")
 
     def draw(self, particleColor='lightcoral',
-             smColor='skyblue',
-             pvColor='darkgray',
-             nodeScale=4, labelAttr=None, attrUnit=None):
+                smColor='skyblue',
+                pvColor='darkgray',
+                fontsize=10,
+                labelAttr=None,
+                attrUnit=None, filename=None):
         """
         Draws Tree using matplotlib.
 
         : param particleColor: color for particle nodes
         : param smColor: color used for particles which have the isSM attribute set to True
         : param pvColor: color for primary vertex
-        : param nodeScale: scale size for nodes
+        : param fontsize: Font size for labels
         : param labelAttr: attribute to be used as label. If None, will use the string representation
                           of the node object.
-        : param attrUnit: Unum object with the unit to be removed from label attribute(if applicable)
+        :param attrUnit: Unum object with the unit to be removed from label attribute(if applicable)
+        :param filename: Filename to save drawing to.
 
+        :return: Display a GraphViz Digraph object (and save it to file if filename is defined)
         """
-        import matplotlib.pyplot as plt
-        import networkx as nx
+
+        try:
+            import graphviz
+        except ImportError as err:
+            raise SModelSError("For drawing SMS objects, please install graphviz")
+
+        nodesAndIndices = zip(self.nodes,self.nodeIndices)
 
         if labelAttr is None:
-            labels = {n: str(n) if not n.isInclusive else n.longStr() for n in self.nodes}
+            labels = {nodeIndex: str(n) if not n.isInclusive else n.longStr() for n,nodeIndex in nodesAndIndices}
         elif attrUnit is not None:
-            labels = {n: str(getattr(n, labelAttr).asNumber(attrUnit))
+            labels = {nodeIndex: str(getattr(n, labelAttr).asNumber(attrUnit))
                       if (hasattr(n, labelAttr) and getattr(n, labelAttr) is not None)
-                      else str(n) for n in self.nodes}
+                      else str(n) for n,nodeIndex in nodesAndIndices}
         elif labelAttr == 'node':
-            labels = {n: str(nodeIndex) for n,nodeIndex in zip(self.nodes,self.nodeIndices)}
+            labels = {nodeIndex: str(nodeIndex) for n,nodeIndex in nodesAndIndices}
         elif labelAttr == 'canonName':
-            labels = {n: str(self.nodeCanonName(nodeIndex))
-                        for n,nodeIndex in zip(self.nodes,self.nodeIndices)}
+            labels = {nodeIndex: str(self.nodeCanonName(nodeIndex))
+                        for n,nodeIndex in nodesAndIndices}
         else:
-            labels = {n: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
-                      else str(n) for n in self.nodes}
+            labels = {nodeIndex: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
+                      else str(n) for n,nodeIndex in nodesAndIndices}
 
         for key in labels:
             if labels[key] == 'anyOdd':
                 labels[key] = 'BSM'
-        node_size = []
-        node_color = []
-        for n in self.nodes:
-            node_size.append(nodeScale * 100 * len(labels[n]))
-            if 'pv' == labels[n].lower():
-                node_color.append(pvColor)
-            elif hasattr(n, 'isSM') and n.isSM:
-                node_color.append(smColor)
+
+        node_color = {}
+        for n in self.nodeIndices:
+            node = self.indexToNode(n)
+            if n == self.rootIndex:
+                node_color[n] = pvColor
+            elif hasattr(node, 'isSM') and node.isSM:
+                node_color[n] = smColor
             else:
-                node_color.append(particleColor)
+                node_color[n] = particleColor
 
-        # Compute position of nodes (in case the nodes have the same string representation, first
-        # convert the nodes to integers for computing the position)
-        G = nx.DiGraph()
-        G.add_nodes_from(self.nodes)
-        G.add_edges_from(self.edges)
-        H = nx.convert_node_labels_to_integers(G, label_attribute='node_label')
-        H_layout = nx.drawing.nx_agraph.graphviz_layout(H, prog='dot')
-        pos = {H.nodes[n]['node_label']: p for n, p in H_layout.items()}
 
-        nx.draw(G, pos,
-                with_labels=True,
-                arrows=True,
-                labels=labels,
-                node_size=node_size,
-                node_color=node_color)
+        dot = graphviz.Digraph()
+        for nodeIndex in self.nodeIndices:
+            dot.node(str(nodeIndex),labels[nodeIndex], style='filled', fontsize=str(fontsize),
+                     color = node_color[nodeIndex], fillcolor = node_color[nodeIndex],
+                     shape='circle',margin='0')
+        for edgeIndex in self.edgeIndices:
+            dot.edge(str(edgeIndex[0]),str(edgeIndex[1]))
 
-        plt.show()
+        # Try to display (if within a notebook)
+        try:
+            display(dot)
+        except NameError:
+            pass
+
+        # If filename is defined, save image
+        if filename is not None:
+            import os
+            filename = os.path.abspath(filename)
+            fname, extension = os.path.splitext(filename)
+            dot.format = extension[1:]
+            dot.view(filename=fname)

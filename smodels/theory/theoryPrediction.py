@@ -716,6 +716,7 @@ def _getDataSetPredictions(dataset, smsTopDict, maxMassDist,
         return False
 
     # Compute relevant SMS weights
+    newList = []
     for sms in smsList:
         # Get cross-sections for correct CM energy:
         sms.weight = sms.weightList.getXsecsFor(dataset.globalInfo.sqrts)
@@ -725,6 +726,8 @@ def _getDataSetPredictions(dataset, smsTopDict, maxMassDist,
         sms.weight = sms.weight.getMaxXsec()
         # Multiply weight by SMSs efficiency:
         sms.weight = sms.weight*sms.eff
+        newList.append(sms)
+    smsList = newList[:]
 
 
     #  Combine SMS according to their respective constraints and masses
