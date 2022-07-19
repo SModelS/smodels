@@ -297,14 +297,16 @@ class UncoveredGroup(object):
         :parameter missingX: missing cross-section for the SMS (in fb)
         """
 
-        newGenEl = FinalStateSMS(sms, missingX, self.smFinalStates, self.bsmFinalStates)
+        newGenSMS = FinalStateSMS(sms, missingX, self.smFinalStates, self.bsmFinalStates)
 
-        index = bisect(self.finalStateSMS, newGenEl)
-        if index != len(self.finalStateSMS) and self.finalStateSMS[index] == newGenEl:
-            self.finalStateSMS[index]._contributingSMS.append(sms)
-            self.finalStateSMS[index].missingX += missingX
+        # Get index where to insert the new SMS
+        # (if the SMS to the left of index is equal, add missing xsec)
+        index = bisect(self.finalStateSMS, newGenSMS)
+        if index != 0 and self.finalStateSMS[index-1] == newGenSMS:
+            self.finalStateSMS[index-1]._contributingSMS.append(sms)
+            self.finalStateSMS[index-1].missingX += missingX
         else:
-            self.finalStateSMS.insert(index, newGenEl)
+            self.finalStateSMS.insert(index, newGenSMS)
 
 
 class FinalStateSMS(TheorySMS):

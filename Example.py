@@ -31,14 +31,14 @@ import os
 database = Database(os.path.expanduser('~/smodels-database'))
 
 
-def main():
+def main(inputFile='./inputFiles/slha/lightEWinos.slha'):
     """
     Main program. Displays basic use case.
     """
     model = Model(BSMparticles=BSMList, SMparticles=SMList)
     # Path to input file (either a SLHA or LHE file)
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
-    slhafile = 'inputFiles/slha/lightEWinos.slha'
+    slhafile = os.path.abspath(inputFile)
 #     model.updateParticles(inputFile=lhefile)
     model.updateParticles(inputFile=slhafile)
 
@@ -100,11 +100,11 @@ def main():
             dataset = theoryPrediction.dataset
             datasetID = theoryPrediction.dataId()
             mass = theoryPrediction.mass
-            txnames = [str(txname) for txname in theoryPrediction.txnames]
+            PIDs = theoryPrediction.PIDs
+            txnames = sorted([str(txname) for txname in theoryPrediction.txnames])
             print("------------------------")
             print("Dataset = ", datasetID)  # Analysis name
             print("TxNames = ", txnames)
-            print("Prediction Mass = ", mass)  # Value for average cluster mass (average mass of the elements in cluster)
             print("Theory Prediction = ", theoryPrediction.xsection)  # Signal cross section
             print("Condition Violation = ", theoryPrediction.conditions)  # Condition violation values
 
