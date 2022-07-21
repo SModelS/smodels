@@ -31,7 +31,7 @@ import os
 database = Database(os.path.expanduser('~/smodels-database'))
 
 
-def main(inputFile='./inputFiles/slha/lightEWinos.slha'):
+def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb):
     """
     Main program. Displays basic use case.
     """
@@ -43,7 +43,7 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha'):
     model.updateParticles(inputFile=slhafile)
 
     # Set main options for decomposition
-    sigmacut = 0.005*fb
+    sigmacut = sigmacut
     mingap = 5.*GeV
 
     t0 = time.time()
