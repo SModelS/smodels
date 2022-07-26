@@ -317,22 +317,25 @@ class FinalStateSMS(TheorySMS):
     daughters.
     """
 
-    def __new__(self, sms, missingX=None,
+    def __init__(self, sms, missingX=None,
                 smFinalStates=smDefault,
                 bsmFinalStates=bsmDefault):
 
+        TheorySMS.__init__(self)
+
         if missingX is None:
             missingX = sms.weightList.getMaxXsec()
+        self.missingX = missingX
 
         # Get an SMS holding only the final states
-        finalStateSMS = sms.compressToFinalStates()
-        finalStateSMS.missingX = missingX
+        compressedSMS = sms.compressToFinalStates()
         # Replace particles by inclusive particles, if possible:
         nodeDict = {}
-        for nodeIndex in finalStateSMS.nodeIndices:
-            if nodeIndex == finalStateSMS.rootIndex:
+        for nodeIndex in compressedSMS.nodeIndices:
+            if nodeIndex == compressedSMS.rootIndex:
+                nodeDict[nodeIndex] = compressedSMS.root
                 continue
-            node = finalStateSMS.indexToNode(nodeIndex)
+            node = compressedSMS.indexToNode(nodeIndex)
             ptc = node.particle
             newParticle = None
             if ptc.isSM:
@@ -349,11 +352,34 @@ class FinalStateSMS(TheorySMS):
                 newNode = node.copy()
                 newNode.particle = newParticle
                 nodeDict[nodeIndex] = newNode
+            else:
+                nodeDict[nodeIndex] = node
 
-        finalStateSMS.updateNodeObjects(nodeDict)
+        self.copyTreeFrom(compressedSMS,nodeDict)
 
-        finalStateSMS.sort(force=True)
-        finalStateSMS.setGlobalProperties(weight=False)
-        finalStateSMS._contributingSMS = [sms]
+        self.sort(force=True)
+        self.setGlobalProperties(weight=False)
+        self._contributingSMS = [sms]
 
-        return finalStateSMS
+
+    def oldStr(self):
+        """
+        Generates a string using the old format (bracket notaion)
+
+        :returns: string representation of the SMS (in bracket notation)
+        """
+
+        smFS = []
+        bsmFS = []
+        for node in self.nodes:
+            if node is self.root:
+                continue
+            if node.isSM:
+                smFS.append(str(node))
+            else:
+                bsmFS.append(node)
+
+        smsStr = '%s  %s' %(str(smFS),str(tuple(bsmFS)))
+        smsStr = smsStr.replace("'", "").replace(" ", "")
+        smsStr = smsStr.replace('~','')
+        return smsStr

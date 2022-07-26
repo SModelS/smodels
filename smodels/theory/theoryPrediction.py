@@ -741,10 +741,6 @@ def _getDataSetPredictions(dataset, smsTopDict, maxMassDist,
         theoryPrediction.txnames = cluster.txnames
         theoryPrediction.smsList = cluster.smsList
         theoryPrediction.avgSMS = cluster.averageSMS
-        if cluster.averageSMS is not None:
-            theoryPrediction.mass = theoryPrediction.avgSMS.mass
-        PIDs = [sms.pdg for sms in cluster.smsList]
-        theoryPrediction.PIDs = [pdg for pdg, _ in itertools.groupby(PIDs)]
         # Compute relevant cross-section and conditions:
         theoryPrediction.computeXSection()
         theoryPrediction.computeConditions()
