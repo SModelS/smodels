@@ -243,10 +243,12 @@ def getCombinedSimplifiedStatistics(
     lsm = computer.likelihood ( 0., marginalize = marginalize )
     lmax = ret["lmax"]
     if lsm > lmax:
+        muhat = ret["muhat"]
         logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
         ret["lmax"] = lsm
         ret["muhat"] = 0.0
     if lbsm > lmax:
+        muhat = ret["muhat"]
         logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
         ret["lmax"] = lbsm
         ret["muhat"] = 1.0
