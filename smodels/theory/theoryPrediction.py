@@ -403,7 +403,7 @@ class TheoryPrediction(object):
             return 0.
 
         values = [0.]
-        for value in self.conditions.values():
+        for value in self.conditions:
             if value == 'N/A':
                 return value
             if value is None:

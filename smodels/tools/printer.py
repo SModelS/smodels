@@ -385,15 +385,26 @@ class TxTPrinter(BasicPrinter):
         :param obj: A SMS object to be printed.
         """
 
+        output = ""
         if self.outputFormat == 'version2':
             branchList, finalState, intermediateState = obj.treeToBrackets()
             masses = []
-            for ibr, branch in obj.daughters(obj.rootIndex):
-                masses.append([])
+            pidlist = []
+            for bIndex in obj.daughterIndices(obj.rootIndex):
+                branch = obj.indexToNode(bIndex)
+                if branch.isSM:
+                    continue
+                bMasses = [branch.mass]
+                pids = [branch.pdg]
+                for n in obj.dfsIndexIterator(bIndex):
+                    node = obj.indexToNode(n)
+                    if node.isSM:
+                        continue
+                    bMasses.append(node.mass)
+                    pids.append(node.pdg)
+                masses.append(bMasses)
+                pidlist.append(pids)
 
-
-            masses = [obj.indexToNode(n).mass for n in obj.dfsIndexIterator(skipRoot=True)]
-            output = ""
             output += "\t\t SMS ID: " + str(obj.elID)
             output += "\n"
             output += "\t\t Particles in element: " + str(branchList)
@@ -405,10 +416,14 @@ class TxTPrinter(BasicPrinter):
                 output += "\t\t Branch %i: " % i + str(mass) + "\n"
             output += "\n"
             output += "\t\t The element PIDs are \n"
-            for pidlist in obj.pdg:
-                output += "\t\t PIDs: " + str(pidlist) + "\n"
+            output += "\t\t PIDs: " + str(pidlist) + "\n"
             output += "\t\t The element weights are: \n \t\t " + \
                 obj.weight.niceStr().replace("\n", "\n \t\t ")
+
+        else:
+            output += "\t\t SMS: %s" %str(obj)
+            output += "\t\t Masses: %s" %str(list(zip(obj.nodes,obj.mass)))
+            output += "\t\t Cross-Sections: "+obj.weight.niceStr().replace("\n", "\n \t\t ")
 
         return output
 
@@ -458,15 +473,15 @@ class TxTPrinter(BasicPrinter):
         output += "Sqrts: %2.2E\n" % obj.globalInfo.sqrts.asNumber(TeV)
         if hasattr(self, "addanainfo") and self.addanainfo:
             output += "\t -----------------------------\n"
-            output += "\t Elements tested by analysis:\n"
-            listOfelements = []
+            output += "\t SMS tested by analysis:\n"
+            listOfSMS = []
             for dataset in obj.datasets:
                 for txname in dataset.txnameList:
-                    for el in txname._topologyDict.getElements():
-                        if not el.toStr() in listOfelements:
-                            listOfelements.append(el.toStr())
-            for el in listOfelements:
-                output += "\t    " + str(el) + "\n"
+                    for sms in txname._topologyDict.getSMSList():
+                        if not str(sms) in listOfSMS:
+                            listOfSMS.append(str(sms))
+            for sms in listOfSMS:
+                output += "\t    %s \n" %sms
 
         return output
 
@@ -511,7 +526,7 @@ class TxTPrinter(BasicPrinter):
                 "\n"
 
             output += "Theory prediction: " + \
-                str(theoryPrediction.xsection.value) + "\n"
+                str(theoryPrediction.xsection) + "\n"
             output += "Theory conditions:"
             if not theoryPrediction.conditions:
                 output += "  " + str(theoryPrediction.conditions) + "\n"
@@ -561,9 +576,9 @@ class TxTPrinter(BasicPrinter):
                         output += "Masses in branch %i: " % ibr + \
                             str(br) + "\n"
                 IDList = list(
-                    set([el.elID for el in theoryPrediction.elements]))
+                    set([sms.smsID for sms in theoryPrediction.smsList]))
                 if IDList:
-                    output += "Contributing elements: " + str(IDList) + "\n"
+                    output += "Contributing SMS: " + str(IDList) + "\n"
                 for pidList in theoryPrediction.PIDs:
                     output += "PIDs:" + str(pidList) + "\n"
 
@@ -594,21 +609,21 @@ class TxTPrinter(BasicPrinter):
         for group in groups:
             description = group.description
             sqrts = group.sqrts.asNumber(TeV)
-            if not group.generalElements:
+            if not group.finalStateSMS:
                 output += "No %s found\n" % description
                 output += "================================================================================\n"
                 continue
             output += "%s with the highest cross sections (up to %i):\n" % (
                 description, nprint)
-            output += "Sqrts (TeV)   Weight (fb)                  Element description\n"
-            for genEl in group.generalElements[:nprint]:
+            output += "Sqrts (TeV)   Weight (fb)                  SMS description\n"
+            for fsSMS in group.finalStateSMS[:nprint]:
                 output += "%5s         %10.3E    # %53s\n" % (
-                    str(sqrts), genEl.missingX, genEl)
+                    str(sqrts), fsSMS.missingX, fsSMS)
                 if hasattr(self, "addcoverageid") and self.addcoverageid:
                     contributing = []
-                    for el in genEl._contributingElements:
-                        contributing.append(el.elID)
-                    output += "Contributing elements %s\n" % str(contributing)
+                    for sms in fsSMS._contributingSMS:
+                        contributing.append(sms.smsID)
+                    output += "Contributing SMS %s\n" % str(contributing)
             output += "================================================================================\n"
         return output
 
@@ -710,7 +725,7 @@ class SummaryPrinter(TxTPrinter):
             signalRegion = theoPred.dataset.getID()
             if signalRegion is None:
                 signalRegion = '(UL)'
-            value = theoPred.xsection.value
+            value = theoPred.xsection
             r = theoPred.getRValue(expected=False)
             r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
             rs = str(r)
@@ -871,47 +886,47 @@ class PyPrinter(BasicPrinter):
         :param obj: A TopologyDict object to be printed.
         """
 
-        if not hasattr(self, 'addelementlist') or not self.addelementlist:
+        if not hasattr(self, 'addsmslist') or not self.addsmslist:
             return None
 
-        elements = []
+        smsList = []
 
         for topo in obj:
-            for el in topo.elementList:
-                thisEl = self._formatElement(el)
-                if thisEl:
-                    elements.append(thisEl)
+            for sms in topo.smsList:
+                smsStr = self._formatSMS(sms)
+                if smsStr:
+                    smsList.append(smsStr)
 
-        return {"Element": elements}
+        return {"SMS": smsList}
 
-    def _formatElement(self, obj):
+    def _formatSMS(self, obj):
         """
-        Format data for a Element object.
+        Format data for a SMS object.
 
-        :param obj: A Element object to be printed.
+        :param obj: A SMS object to be printed.
         """
 
-        elDic = {}
-        elDic["ID"] = obj.elID
-        elDic["Particles"] = str(obj.evenParticles)
-        elDic["Masses (GeV)"] = [[round(m.asNumber(GeV), 2)
-                                  for m in br] for br in obj.mass]
-        elDic["PIDs"] = obj.pdg
-        elDic["Weights (fb)"] = {}
-        elDic["final states"] = [str(fs) for fs in obj.getFinalStates()]
+        smsDic = {}
+        smsDic["ID"] = obj.smsID
+        smsDic["SMS"] = str(obj)
+        smsDic["Masses (GeV)"] = {str(node) : round(node.massasNumber(GeV), 2)
+                                  for node in obj.nodes if not node.isSM}
+        smsDic["PIDs"] = {str(node) : node.pdg
+                          for node in obj.nodes if not node.isSM}
+        smsDic["Weights (fb)"] = {}
         sqrts = [info.sqrts.asNumber(TeV) for info in obj.weight.getInfo()]
         allsqrts = sorted(list(set(sqrts)))
         for ssqrts in allsqrts:
             sqrts = ssqrts * TeV
             xsecs = [xsec.value.asNumber(fb)
-                     for xsec in obj.weight.getXsecsFor(sqrts)]
+                     for xsec in obj.weightList.getXsecsFor(sqrts)]
             if len(xsecs) != 1:
-                logger.warning("Element cross sections contain multiple values for %s .\
+                logger.warning("Cross section lists contain multiple values for %s .\
                 Only the first cross section will be printed" % str(sqrts))
             xsecs = xsecs[0]
             sqrtsStr = 'xsec '+str(sqrts.asNumber(TeV))+' TeV'
-            elDic["Weights (fb)"][sqrtsStr] = xsecs
-        return elDic
+            smsDic["Weights (fb)"][sqrtsStr] = xsecs
+        return smsDic
 
     def _formatOutputStatus(self, obj):
         """
@@ -959,15 +974,13 @@ class PyPrinter(BasicPrinter):
             if isinstance(ulExpected, unum.Unum):
                 ulExpected = ulExpected.asNumber(fb)
 
-            value = theoryPrediction.xsection.value.asNumber(fb)
+            value = theoryPrediction.xsection.asNumber(fb)
             txnamesDict = {}
-            for el in theoryPrediction.elements:
-                if el.txname.txName not in txnamesDict:
-                    txnamesDict[el.txname.txName] = el.weight[0].value.asNumber(
-                        fb)
+            for sms in theoryPrediction.smsList:
+                if sms.txname.txName not in txnamesDict:
+                    txnamesDict[sms.txname.txName] = sms.weight.asNumber(fb)
                 else:
-                    txnamesDict[el.txname.txName] += el.weight[0].value.asNumber(
-                        fb)
+                    txnamesDict[sms.txname.txName] += sms.weight.asNumber(fb)
             maxconds = theoryPrediction.getmaxCondition()
             if theoryPrediction.mass is None:
                 mass = None
@@ -995,7 +1008,12 @@ class PyPrinter(BasicPrinter):
                 return round(x.asNumber(GeV), 2)
 
             if mass is not None:
-                mass = [[roundme(m) for m in mbr] for mbr in mass]
+                massDict = {}
+                for n,m in zip(theoryPrediction.avgSMS.nodes,theoryPrediction.avgSMS.mass):
+                    if n.isSM or n is theoryPrediction.avgSMS.root:
+                        continue
+                    massDict[str(n)] = m
+                mass = massDict
 
             sqrts = expResult.globalInfo.sqrts
 
@@ -1088,13 +1106,13 @@ class PyPrinter(BasicPrinter):
             uncoveredDict["Total xsec for %s (fb)" % group.description] = \
                 self._round(group.getTotalXSec())
             uncoveredDict["%s" % group.description] = []
-            for genEl in group.generalElements[:nprint]:
-                genElDict = {'sqrts (TeV)': sqrts, 'weight (fb)': self._round(genEl.missingX),
-                             'element': str(genEl)}
-                if hasattr(self, "addelementlist") and self.addelementlist:
-                    genElDict["element IDs"] = [
-                        el.elID for el in genEl._contributingElements]
-                uncoveredDict["%s" % group.description].append(genElDict)
+            for fsSMS in group.finalStateSMS[:nprint]:
+                fsSMSDict = {'sqrts (TeV)': sqrts, 'weight (fb)': self._round(fsSMS.missingX),
+                             'SMS': str(fsSMS)}
+                if hasattr(self, "addsmslist") and self.addsmslist:
+                    fsSMSDict["SMS IDs"] = [
+                        sms.smsID for sms in fsSMS._contributingSMS]
+                uncoveredDict["%s" % group.description].append(fsSMSDict)
 
         return uncoveredDict
 

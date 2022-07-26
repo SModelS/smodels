@@ -9,7 +9,7 @@
 
 from smodels.theory.theorySMS import TheorySMS
 from smodels.theory.particleNode import ParticleNode
-from smodels.theory.particle import Particle
+from smodels.theory.particle import MultiParticle
 from smodels.experiment.datasetObj import DataSet, CombinedDataSet
 from smodels.tools.physicsUnits import fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
@@ -58,23 +58,35 @@ class AverageSMS(TheorySMS):
             raise SModelSError()
 
 
-        # Create new node objects holding particels
+        # Create new node objects holding particles
         # with the average attributes
         avgNodesDict = {}
-        for nodeIndex in smsBase.nodeIndices:
-            if nodeIndex == smsBase.rootIndex:
-                # For the root node make a dummy copy:
-                avgNode = smsBase.indexToNode(nodeIndex).copy()
-            else:
-                # For all the other nodes compute the average
-                allNodes = [sms.indexToNode(nodeIndex) for sms in smsList]
-                avgParticle = Particle(label='average')
-                for attr in self.properties:
-                    values = [getattr(n, attr) for n in allNodes]
-                    avgAttr = self.getAverage(values)
-                    setattr(avgParticle, attr, avgAttr)
-                avgNode = ParticleNode(particle=avgParticle)
-            avgNodesDict[nodeIndex] = avgNode
+        if len(smsList) == 1:
+            avgNodesDict = {n : node for n,node in zip(smsBase.nodeIndices,smsBase.nodes)}
+        else:
+            for nodeIndex in smsBase.nodeIndices:
+                if nodeIndex == smsBase.rootIndex:
+                    # For the root node make a dummy copy:
+                    avgNode = smsBase.indexToNode(nodeIndex).copy()
+                else:
+                    # For all the other nodes compute the average
+                    allParticles = [sms.indexToNode(nodeIndex).particle for sms in smsList]
+                    attrDict = {}
+                    for attr in self.properties:
+                        values = [getattr(ptc, attr) for ptc in allParticles]
+                        avgAttr = self.getAverage(values)
+                        attrDict[attr] = avgAttr
+                    mp = allParticles[0]
+                    for ptc in allParticles[1:]:
+                        mp = mp + ptc
+                    if isinstance(mp,MultiParticle):
+                        avgParticle = MultiParticle(particles=mp.particles,
+                                                attributesDict=attrDict)
+                    else:
+                        avgParticle = MultiParticle(particles=[mp],
+                                                attributesDict=attrDict)
+                    avgNode = ParticleNode(particle=avgParticle)
+                avgNodesDict[nodeIndex] = avgNode
 
         # Copy the tree structure from smsBase,
         # but replacing the node objects by the average nodes
