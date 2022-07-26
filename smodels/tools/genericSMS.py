@@ -501,24 +501,30 @@ class GenericSMS(object):
                         next_generation.append((new_mom, new_daughters))
             generation = next_generation
 
-    def dfsIndexIterator(self, skipRoot=False):
+    def dfsIndexIterator(self, nodeIndex=None):
         """
-        Iterates over the nodes following a depth-first traversal of the tree.
+        Iterates over the node indices following a depth-first traversal of the tree
+        starting at nodeIndex. If nodeIndex is None, include all nodes.
 
-        :param skipRoot: If True, it will not return the root node.
+        :param nodeIndex: Node index to which start the iterator
+                          (the corresponding node is NOT included in the iterator)
 
-        :return: Iterator over nodes
+        :return: Iterator over node indices
         """
 
-        nodes = self.nodeIndices
-        if not skipRoot:
-            yield nodes[0]
+        if nodeIndex is None:
+            nodeIndex = self.rootIndex
+            yield self.rootIndex
+
+        nodes = self.daughterIndices(nodeIndex)
+
         visited = set()   # Store visited nodes
         depth_limit = len(nodes)
         # Loop over nodes
         for node in nodes:
             if node in visited:
                 continue
+            yield node
             visited.add(node)
             daughters = [iter(self.daughterIndices(node))]
             while daughters:

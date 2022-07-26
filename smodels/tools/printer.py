@@ -1,7 +1,7 @@
 
 """
 .. module:: printer
-   :synopsis: Facility used to print elements, theorypredictions, missing topologies et al
+   :synopsis: Facility used to print decomposition, theorypredictions, missing topologies et al
       in various forms
 
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
@@ -15,7 +15,7 @@ from __future__ import print_function
 import sys
 import os
 import copy
-from smodels.theory.topology import TopologyDict
+from smodels.theory.topologyDict import TopologyDict
 from smodels.theory.theoryPrediction import TheoryPredictionList
 from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.experiment.databaseObj import ExpResultList
@@ -40,6 +40,7 @@ class MPrinter(object):
 
         self.name = "master"
         self.Printers = {}
+        self.outputFormat = "current"
 
     def setPrinterOptions(self, parser):
         """
@@ -51,19 +52,21 @@ class MPrinter(object):
         # Define the printer types and the printer-specific options:
         printerTypes = [prt.strip() for prt in parser.get(
             "printer", "outputType").split(",")]
+        if parser.has_option("printer","outputFormat"):
+            self.outputFormat = parser.get("printer","outputFormat")
         for prt in printerTypes:
             if prt == 'python':
-                newPrinter = PyPrinter(output='file')
+                newPrinter = PyPrinter(output='file', outputFormat=self.outputFormat)
             elif prt == 'summary':
-                newPrinter = SummaryPrinter(output='file')
+                newPrinter = SummaryPrinter(output='file', outputFormat=self.outputFormat)
             elif prt == 'stdout':
-                newPrinter = TxTPrinter(output='stdout')
+                newPrinter = TxTPrinter(output='stdout', outputFormat=self.outputFormat)
             elif prt == 'log':
-                newPrinter = TxTPrinter(output='file')
+                newPrinter = TxTPrinter(output='file', outputFormat=self.outputFormat)
             elif prt == 'xml':
-                newPrinter = XmlPrinter(output='file')
+                newPrinter = XmlPrinter(output='file', outputFormat=self.outputFormat)
             elif prt == 'slha':
-                newPrinter = SLHAPrinter(output='file')
+                newPrinter = SLHAPrinter(output='file', outputFormat=self.outputFormat)
                 if parser.getboolean("options", "doCompress") or parser.getboolean("options", "doInvisible"):
                     newPrinter.docompress = 1
                 if parser.has_option("options", "combineSRs") and parser.getboolean("options", "combineSRs"):
@@ -126,7 +129,7 @@ class BasicPrinter(object):
     Super class to handle the basic printing methods
     """
 
-    def __init__(self, output, filename):
+    def __init__(self, output, filename, outputFormat = 'current'):
         self.name = "basic"
         self.time = time.time()  # time stamps
 
@@ -136,6 +139,7 @@ class BasicPrinter(object):
         self.printingOrder = []
         self.typeofexpectedvalues = "prior"
         self.toPrint = []
+        self.outputFormat = outputFormat
 
         if filename and os.path.isfile(filename):
             logger.warning("Removing file %s" % filename)
@@ -271,8 +275,8 @@ class TxTPrinter(BasicPrinter):
     Printer class to handle the printing of one single text output
     """
 
-    def __init__(self, output='stdout', filename=None):
-        BasicPrinter.__init__(self, output, filename)
+    def __init__(self, output='stdout', filename=None, outputFormat='current'):
+        BasicPrinter.__init__(self, output, filename, outputFormat)
         self.name = "log"
         self.printtimespent = False
         self.printingOrder = [OutputStatus, ExpResultList, TopologyDict,
@@ -363,40 +367,48 @@ class TxTPrinter(BasicPrinter):
             output += "Number of vertex parts: " + str(topo.vertparts) + '\n'
             totxsec = topo.getTotalWeight()
             output += "Total Global topology weight :\n" + totxsec.niceStr() + '\n'
-            output += "Total Number of Elements: " + \
-                str(len(topo.elementList)) + '\n'
-            if not hasattr(self, 'addelementinfo') or not self.addelementinfo:
+            output += "Total Number of SMS: " + \
+                str(len(topo.smsList)) + '\n'
+            if not hasattr(self, 'addsmsinfo') or not self.addsmsinfo:
                 continue
-            for el in topo.elementList:
+            for sms in topo.smsList:
                 output += "\t\t " + 73 * "." + "\n"
-                output += "\t\t Element: \n"
-                output += self._formatElement(el) + "\n"
+                output += "\t\t SMS: \n"
+                output += self._formatSMS(sms) + "\n"
 
         return output
 
-    def _formatElement(self, obj):
+    def _formatSMS(self, obj):
         """
-        Format data for a Element object.
+        Format data for a SMS object.
 
-        :param obj: A Element object to be printed.
+        :param obj: A SMS object to be printed.
         """
 
-        output = ""
-        output += "\t\t Element ID: " + str(obj.elID)
-        output += "\n"
-        output += "\t\t Particles in element: " + str(obj.evenParticles)
-        output += "\n"
-        output += "\t\t Final states in element: " + str(obj.getFinalStates())
-        output += "\n"
-        output += "\t\t The element masses are \n"
-        for i, mass in enumerate(obj.mass):
-            output += "\t\t Branch %i: " % i + str(mass) + "\n"
-        output += "\n"
-        output += "\t\t The element PIDs are \n"
-        for pidlist in obj.pdg:
-            output += "\t\t PIDs: " + str(pidlist) + "\n"
-        output += "\t\t The element weights are: \n \t\t " + \
-            obj.weight.niceStr().replace("\n", "\n \t\t ")
+        if self.outputFormat == 'version2':
+            branchList, finalState, intermediateState = obj.treeToBrackets()
+            masses = []
+            for ibr, branch in obj.daughters(obj.rootIndex):
+                masses.append([])
+
+
+            masses = [obj.indexToNode(n).mass for n in obj.dfsIndexIterator(skipRoot=True)]
+            output = ""
+            output += "\t\t SMS ID: " + str(obj.elID)
+            output += "\n"
+            output += "\t\t Particles in element: " + str(branchList)
+            output += "\n"
+            output += "\t\t Final states in element: " + str(finalState)
+            output += "\n"
+            output += "\t\t The element masses are \n"
+            for i, mass in enumerate(obj.mass):
+                output += "\t\t Branch %i: " % i + str(mass) + "\n"
+            output += "\n"
+            output += "\t\t The element PIDs are \n"
+            for pidlist in obj.pdg:
+                output += "\t\t PIDs: " + str(pidlist) + "\n"
+            output += "\t\t The element weights are: \n \t\t " + \
+                obj.weight.niceStr().replace("\n", "\n \t\t ")
 
         return output
 
@@ -635,8 +647,8 @@ class SummaryPrinter(TxTPrinter):
     It uses the facilities of the TxTPrinter.
     """
 
-    def __init__(self, output='stdout', filename=None):
-        TxTPrinter.__init__(self, output, filename)
+    def __init__(self, output='stdout', filename=None, outputFormat='current'):
+        TxTPrinter.__init__(self, output, filename, outputFormat)
         self.name = "summary"
         self.printingOrder = [
             OutputStatus, TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
@@ -798,8 +810,8 @@ class PyPrinter(BasicPrinter):
     Printer class to handle the printing of one single pythonic output
     """
 
-    def __init__(self, output='stdout', filename=None):
-        BasicPrinter.__init__(self, output, filename)
+    def __init__(self, output='stdout', filename=None, outputFormat='current'):
+        BasicPrinter.__init__(self, output, filename, outputFormat)
         self.name = "py"
         self.printtimespent = False
         self.printingOrder = [OutputStatus, TopologyDict,
@@ -1127,8 +1139,8 @@ class XmlPrinter(PyPrinter):
     Printer class to handle the printing of one single XML output
     """
 
-    def __init__(self, output='stdout', filename=None):
-        PyPrinter.__init__(self, output, filename)
+    def __init__(self, output='stdout', filename=None, outputFormat='current'):
+        PyPrinter.__init__(self, output, filename, outputFormat)
         self.name = "xml"
         self.printingOrder = [OutputStatus, TopologyDict,
                               TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
@@ -1217,8 +1229,8 @@ class SLHAPrinter(TxTPrinter):
     It uses the facilities of the TxTPrinter.
     """
 
-    def __init__(self, output='file', filename=None):
-        TxTPrinter.__init__(self, output, filename)
+    def __init__(self, output='file', filename=None, outputFormat='current'):
+        TxTPrinter.__init__(self, output, filename, outputFormat)
         self.name = "slha"
         self.docompress = 0
         self.combinesr = 0

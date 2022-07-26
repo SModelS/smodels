@@ -519,7 +519,7 @@ class TxName(object):
         # Get a nested array of nodes corresponding to the data point:
         nodeArray = []
 
-        for nodeIndex in tree.dfsIndexIterator(skipRoot=True):
+        for nodeIndex in tree.dfsIndexIterator(nodeIndex=tree.rootIndex):
             # Convert to node objects:
             node = tree.indexToNode(nodeIndex)
             if node.isInclusive or node.inclusiveList:
@@ -631,7 +631,7 @@ class TxName(object):
         unstableWidths = []
         stableWidths = []
         tree = sms
-        for nodeIndex in tree.dfsIndexIterator(skipRoot=True):
+        for nodeIndex in tree.dfsIndexIterator(nodeIndex=tree.rootIndex):
             if nodeIndex in widthsInData:
                 continue  # Ignore node if its width does not need reweighting
 
