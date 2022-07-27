@@ -144,10 +144,10 @@ class PyPrinter(BasicPrinter):
         else:
             smsDict["ID"] = obj.smsID
             smsDict["SMS"] = str(obj)
-            smsDict["Masses (GeV)"] = {str(node) : float('%1.3e' %node.mass.asNumber(GeV))
-                                      for node in obj.nodes if not node.isSM}
-            smsDict["PIDs"] = {str(node) : node.pdg
-                              for node in obj.nodes if not node.isSM}
+            smsDict["Masses (GeV)"] = [(str(node),float('%1.3e' %node.mass.asNumber(GeV)))
+                                      for node in obj.nodes if not node.isSM]
+            smsDict["PIDs"] = [(str(node),node.pdg)
+                              for node in obj.nodes if not node.isSM]
 
 
         smsDict["Weights (fb)"] = {}
