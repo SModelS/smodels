@@ -189,6 +189,8 @@ def main(inputFile='inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb, databa
     else:
         print("\nNo displaced decays")
 
+    return toplist, allPredictions
+
 
 if __name__ == '__main__':
     main()
