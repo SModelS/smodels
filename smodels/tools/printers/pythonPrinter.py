@@ -97,15 +97,15 @@ class PyPrinter(BasicPrinter):
         if not hasattr(self, 'addsmslist') or not self.addsmslist:
             return None
 
+
         smsList = []
+        for sms in obj.getSMSList():
+            smsList.append(self._formatSMS(sms))
 
-        for topo in obj:
-            for sms in topo.smsList:
-                smsStr = self._formatSMS(sms)
-                if smsStr:
-                    smsList.append(smsStr)
-
-        return {"SMS": smsList}
+        if self.outputFormat == 'version2':
+            return {'Element' : smsList}
+        else:
+            return {"SMS Decomposition": smsList}
 
     def _formatSMS(self, obj):
         """
@@ -114,15 +114,44 @@ class PyPrinter(BasicPrinter):
         :param obj: A SMS object to be printed.
         """
 
-        smsDic = {}
-        smsDic["ID"] = obj.smsID
-        smsDic["SMS"] = str(obj)
-        smsDic["Masses (GeV)"] = {str(node) : round(node.massasNumber(GeV), 2)
-                                  for node in obj.nodes if not node.isSM}
-        smsDic["PIDs"] = {str(node) : node.pdg
-                          for node in obj.nodes if not node.isSM}
-        smsDic["Weights (fb)"] = {}
-        sqrts = [info.sqrts.asNumber(TeV) for info in obj.weight.getInfo()]
+        smsDict = {}
+        if self.outputFormat == 'version2':
+            branchList, finalState, intermediateState = obj.treeToBrackets()
+            masses = []
+            pidlist = []
+            for bIndex in obj.daughterIndices(obj.rootIndex):
+                branch = obj.indexToNode(bIndex)
+                if branch.isSM:
+                    continue
+                mass = float('%1.3e' %branch.mass.asNumber(GeV))
+                bMasses = [mass]
+                pids = [branch.pdg]
+                for n in obj.dfsIndexIterator(bIndex):
+                    node = obj.indexToNode(n)
+                    if node.isSM:
+                        continue
+                    mass = float('%1.3e' %node.mass.asNumber(GeV))
+                    bMasses.append(mass)
+                    pids.append(node.pdg)
+                masses.append(bMasses)
+                pidlist.append(pids)
+
+            smsDict["ID"] = obj.smsID
+            smsDict["Particles"] =  str(branchList).replace("'","").replace(" ","")
+            smsDict["final states"] =  finalState
+            smsDict["Masses (GeV)"] = masses
+            smsDict["PIDs"] = pidlist
+        else:
+            smsDict["ID"] = obj.smsID
+            smsDict["SMS"] = str(obj)
+            smsDict["Masses (GeV)"] = {str(node) : float('%1.3e' %node.mass.asNumber(GeV))
+                                      for node in obj.nodes if not node.isSM}
+            smsDict["PIDs"] = {str(node) : node.pdg
+                              for node in obj.nodes if not node.isSM}
+
+
+        smsDict["Weights (fb)"] = {}
+        sqrts = [info.sqrts.asNumber(TeV) for info in obj.weightList.getInfo()]
         allsqrts = sorted(list(set(sqrts)))
         for ssqrts in allsqrts:
             sqrts = ssqrts * TeV
@@ -131,10 +160,11 @@ class PyPrinter(BasicPrinter):
             if len(xsecs) != 1:
                 logger.warning("Cross section lists contain multiple values for %s .\
                 Only the first cross section will be printed" % str(sqrts))
-            xsecs = xsecs[0]
+            xsecs = float('%1.2e' %xsecs[0])
             sqrtsStr = 'xsec '+str(sqrts.asNumber(TeV))+' TeV'
-            smsDic["Weights (fb)"][sqrtsStr] = xsecs
-        return smsDic
+            smsDict["Weights (fb)"][sqrtsStr] = xsecs
+
+        return smsDict
 
     def _formatOutputStatus(self, obj):
         """
@@ -315,8 +345,13 @@ class PyPrinter(BasicPrinter):
                 self._round(group.getTotalXSec())
             uncoveredDict["%s" % group.description] = []
             for fsSMS in group.finalStateSMS[:nprint]:
+                if self.outputFormat == 'version2':
+                    smsStr = fsSMS.oldStr()
+                else:
+                    smsStr = str(fsSMS)
+
                 fsSMSDict = {'sqrts (TeV)': sqrts, 'weight (fb)': self._round(fsSMS.missingX),
-                             'SMS': str(fsSMS)}
+                             'SMS': smsStr}
                 if hasattr(self, "addsmslist") and self.addsmslist:
                     fsSMSDict["SMS IDs"] = [
                         sms.smsID for sms in fsSMS._contributingSMS]
