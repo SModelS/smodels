@@ -115,13 +115,21 @@ HSCPm = Particle(label='HSCP-', Z2parity = -1, eCharge = -1, colordim = 1)
 HSCP = MultiParticle(label='HSCP', particles = [HSCPp,HSCPm])
 
 RHadronG = Particle(label='RHadronG', Z2parity = -1, eCharge = 0, colordim = 8)
-RHadronU = Particle(label='RHadronU', Z2parity = -1, eCharge = 2./3., colordim = 3)
-RHadronD = Particle(label='RHadronD', Z2parity = -1, eCharge = -1./3., colordim = 3)
-RHadronQ = MultiParticle(label='RHadronQ', particles = [RHadronU,RHadronU.chargeConjugate(),
-                                                                         RHadronD,RHadronD.chargeConjugate()])
+RHadronUp = Particle(label='RHadronU+', Z2parity = -1, eCharge = 2./3., colordim = 3)
+RHadronDm = Particle(label='RHadronD-', Z2parity = -1, eCharge = -1./3., colordim = 3)
+RHadronU = MultiParticle(label='RHadronU', particles = [RHadronUp,RHadronUp.chargeConjugate()])
+RHadronD = MultiParticle(label='RHadronD', particles = [RHadronDm,RHadronDm.chargeConjugate()])
+RHadronQ = MultiParticle(label='RHadronQ', particles = [RHadronUp,RHadronUp.chargeConjugate(),
+                                                                         RHadronDm,RHadronDm.chargeConjugate()])
 
 gluino = Particle(label='gluino', Z2parity = -1, eCharge = 0, colordim = 8, spin = 1./2.)
-chargino = Particle(label='C1+', Z2parity = -1, eCharge = 1, colordim = 0, spin = 1./2.)
+chargino = Particle(label='C1+', Z2parity = -1, eCharge = 1, colordim = 1, spin = 1./2.)
+charginoBar = Particle(label='C1-', Z2parity = -1, eCharge = -1, colordim = 1, spin = 1./2.)
+C1 = MultiParticle(label='C1', particles = [chargino,charginoBar])
+Hp = Particle(label='H+', Z2parity = -1, eCharge = 1, colordim = 1, spin = 0.)
+Hm = Particle(label='H-', Z2parity = -1, eCharge = -1, colordim = 1, spin = 0.)
+Hpm = MultiParticle(label='Hpm', particles = [Hp,Hm])
+
 
 #Define list of inclusive final states:
 SMfinalStates = [eList,muList,taList,lpList,lmList,lList,WList,
@@ -129,8 +137,8 @@ SMfinalStates = [eList,muList,taList,lpList,lmList,lList,WList,
 #Include list of exclusive final states:
 SMfinalStates +=  SMList
 #Define list of BSM final states:
-BSMfinalStates = [MET,HSCP,RHadronG,RHadronQ,anyOdd,
-                  gluino,chargino]
+BSMfinalStates = [MET,HSCP,RHadronU,RHadronD,RHadronG,RHadronQ,anyOdd,
+                  gluino,chargino,charginoBar,C1,Hp,Hm,Hpm]
 
 allFinalStates = SMfinalStates + BSMfinalStates
 #Avoid double counting:
