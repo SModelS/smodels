@@ -95,9 +95,7 @@ class TheoryPrediction(object):
         # If not, compute it and store them.
         if "UL" not in self.cachedObjs[expected]:
             if self.dataType() == "efficiencyMap":
-                self.cachedObjs[expected]["UL"] = self.dataset.getSRUpperLimit(
-                    expected=expected, deltas_rel=self.deltas_rel
-                )
+                self.cachedObjs[expected]["UL"] = self.dataset.getSRUpperLimit(expected=expected)
             if self.dataType() == "upperLimit":
                 self.cachedObjs[expected]["UL"] = self.dataset.getUpperLimitFor(
                     element=self.avgElement, txnames=self.txnames, expected=expected
@@ -734,7 +732,7 @@ def _getBestResult(dataSetResults):
             raise SModelSError(txt)
         pred = predList[0]
         xsec = pred.xsection
-        expectedR = (xsec.value / dataset.getSRUpperLimit(0.05, True, False)).asNumber()
+        expectedR = (xsec.value / dataset.getSRUpperLimit(expected=True)).asNumber()
         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec.value > bestXsec):
             bestExpectedR = expectedR
             bestPred = pred
