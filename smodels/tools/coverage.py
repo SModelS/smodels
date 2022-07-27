@@ -379,7 +379,8 @@ class FinalStateSMS(TheorySMS):
             else:
                 bsmFS.append(node)
 
-        smsStr = '%s  %s' %(str(smFS),str(tuple(bsmFS)))
-        smsStr = smsStr.replace("'", "").replace(" ", "")
+        smsStr = '%s  %s' %(str(smFS).replace("'", "").replace(" ", ""),
+                            str(tuple(bsmFS)).replace("'", "").replace(" ", ""))
+        smsStr = smsStr
         smsStr = smsStr.replace('~','')
         return smsStr
