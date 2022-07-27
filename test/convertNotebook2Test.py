@@ -33,7 +33,7 @@ def getNotebookData(notebookFile,savePickle=True):
             continue
             
         outputList = [[outStr.replace('\n','') for outStr in c['text']]
-                      for c in cell['outputs']if c['output_type'] == 'stream']
+                      for c in cell['outputs'] if c['output_type'] == 'stream']
         outputDict[cell_count] = outputList
 
     if savePickle:
