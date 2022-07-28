@@ -16,7 +16,7 @@ import sys
 import os
 import copy
 from smodels.theory.topologyDict import TopologyDict
-from smodels.theory.theoryPrediction import TheoryPredictionList
+from smodels.matcher.theoryPrediction import TheoryPredictionList
 from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.experiment.databaseObj import ExpResultList
 from smodels.tools.ioObjects import OutputStatus

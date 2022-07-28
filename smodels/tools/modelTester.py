@@ -13,14 +13,15 @@
 from smodels.tools import ioObjects
 from smodels.tools import coverage, runtime
 from smodels.theory import decomposer
-from smodels.theory import theoryPrediction
+from smodels.matcher import theoryPrediction
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
-from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.matcher.theoryPrediction import theoryPredictionsFor
 from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut
-from smodels.tools.printer import MPrinter, printScanSummary
+from smodels.tools.printers.masterPrinter import MPrinter
+from smodels.tools.printerTools import printScanSummary
 from collections import OrderedDict
 import multiprocessing
 import os
@@ -119,9 +120,9 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         """ Decompose the input model, store the output elements in smstoplist """
         sigmacut = parser.getfloat("parameters", "sigmacut") * fb
         smstoplist = decomposer.decompose(model, sigmacut,
-                                          doCompress=parser.getboolean(
+                                          massCompress=parser.getboolean(
                                               "options", "doCompress"),
-                                          doInvisible=parser.getboolean(
+                                          invisibleCompress=parser.getboolean(
                                               "options", "doInvisible"),
                                           minmassgap=minmassgap)
     except SModelSError as e:
