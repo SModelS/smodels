@@ -132,12 +132,12 @@ class SLHAPrinter(TxTPrinter):
                 "'", "").replace("[", "").replace("]", "")
 
             output += " %d 0 %-30s #txname \n" % (cter, txnameStr)
-            output += " %d 1 %-30.3E #r value\n" % (cter, r)
+            output += " %d 1 %-30.2E #r value\n" % (cter, r)
             if not r_expected:
                 output += " %d 2 N/A                            #expected r value\n" % (
                     cter)
             else:
-                output += " %d 2 %-30.3E #expected r value\n" % (
+                output += " %d 2 %-30.2E #expected r value\n" % (
                     cter, r_expected)
             output += " %d 3 %-30.2f #condition violation\n" % (
                 cter, theoPred.getmaxCondition())
@@ -152,7 +152,7 @@ class SLHAPrinter(TxTPrinter):
                 lvals = [llhd, lmax, lsm]
                 for i, lv in enumerate(lvals):
                     if isinstance(lv, (float, np.float64)):
-                        lv = "%-30.3E" % lv
+                        lv = "%-30.2E" % lv
                     else:
                         lv = str(lv)
                     lvals[i] = lv
@@ -180,7 +180,7 @@ class SLHAPrinter(TxTPrinter):
         for i, group in enumerate(sorted(groups, key=lambda g: g.label)):
             output += "\n %d 0 %-30s      # %s" % (
                 i, group.label, group.description)
-            output += "\n %d 1 %-30.3E      # %s" % (
+            output += "\n %d 1 %-30.2E      # %s" % (
                 i, group.getTotalXSec(), "Total cross-section (fb)")
         output += "\n"
         return output
@@ -217,14 +217,14 @@ class SLHAPrinter(TxTPrinter):
             lvals = [llhd, lmax, lsm]
             for i, lv in enumerate(lvals):
                 if isinstance(lv, (float, np.float64)):
-                    lv = "%-30.3E" % lv
+                    lv = "%-30.2E" % lv
                 else:
                     lv = str(lv)
                 lvals[i] = lv
             llhd, lmax, lsm = lvals[:]
 
-            output += " %d 1 %-30.3E #r value\n" % (cter, r)
-            output += " %d 2 %-30.3E #expected r value\n" % (cter, r_expected)
+            output += " %d 1 %-30.2E #r value\n" % (cter, r)
+            output += " %d 2 %-30.2E #expected r value\n" % (cter, r_expected)
             output += " %d 3 %s #Likelihood\n" % (cter, llhd)
             output += " %d 4 %s #L_max\n" % (cter, lmax)
             output += " %d 5 %s #L_SM\n" % (cter, lsm)

@@ -153,7 +153,7 @@ class TheoryPredictionsCombiner(object):
         clmu = self.getUpperLimitOnMu(expected=expected)
         ret = []
         for tp in self.theoryPredictions:
-            ret.append(tp.xsection.value * clmu)
+            ret.append(tp.xsection * clmu)
         return ret
 
     @singleDecorator
@@ -286,7 +286,7 @@ class TheoryPredictionsCombiner(object):
         ret = 0.*fb
         if self.theoryPredictions is not None:
             for tp in self.theoryPredictions:
-                ret += tp.xsection.value
+                ret += tp.xsection
         return ret
 
     @singleDecorator
