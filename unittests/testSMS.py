@@ -14,18 +14,23 @@ from smodels.theory.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
 from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
+from smodels.theory.particle import Particle
 from smodels.theory.model import Model
 from collections import OrderedDict
-from smodels.tools.physicsUnits import fb, GeV
+from smodels.tools.physicsUnits import fb, GeV, TeV
 from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList
 from smodels.share.models import SMparticles
 from smodels.experiment.defaultFinalStates import finalStates
+from unitTestHelpers import theorySMSFromString as fromString
 
 
 
 slhafile = '../inputFiles/slha/lightEWinos.slha'
+
 model = Model( BSMparticles=BSMList, SMparticles=SMList)
 model.updateParticles(inputFile=slhafile,erasePrompt=['spin'])
+invisible = Particle(label='invisible',pdg=50000,mass=500*GeV,isSM=False)
+model.BSMparticles.append(invisible)
 
 class SMSTest(unittest.TestCase):
 
@@ -33,34 +38,13 @@ class SMSTest(unittest.TestCase):
 
 
         stringEl = "(PV > gluino(1),st_1(2)), (gluino(1) > st_1(3),t+), (st_1(2) >b,t+,N1), (st_1(3) > b,t+,N1)"
-        # Hack to create a theory element from a string:
-        expSMS = ExpSMS.from_string(stringEl, model=model)
-        sms1 = TheorySMS()
-        sms1.add_nodes_from(expSMS.nodes)
-        sms1.add_edges_from(expSMS.edgeIndices)
-        sms1.prodXSec = 1.0*fb
-        sms1.maxWeight = 1.0*fb
-        sms1.setGlobalProperties()
+        sms1 = fromString(stringEl, model=model)
 
         stringEl = "(PV > st_1(1),st_1(2)), (st_1(2) >b,t+,N1), (st_1(1) > b,t+,N1)"
-        # Hack to create a theory element from a string:
-        expSMS = ExpSMS.from_string(stringEl, model=model)
-        sms2 = TheorySMS()
-        sms2.add_nodes_from(expSMS.nodes)
-        sms2.add_edges_from(expSMS.edgeIndices)
-        sms2.prodXSec = 1.0*fb
-        sms2.maxWeight = 1.0*fb
-        sms2.setGlobalProperties()
+        sms2 = fromString(stringEl, model=model)
 
         stringEl = "(PV > st_1(1),gluino(2)), (st_1(1) >b,t+,N1), (gluino(2) > st_1(3),t+), (st_1(3) > b,t+,N1)"
-        # Hack to create a theory element from a string:
-        expSMS = ExpSMS.from_string(stringEl, model=model)
-        sms1B = TheorySMS()
-        sms1B.add_nodes_from(expSMS.nodes)
-        sms1B.add_edges_from(expSMS.edgeIndices)
-        sms1B.prodXSec = 1.0*fb
-        sms1B.maxWeight = 1.0*fb
-        sms1B.setGlobalProperties()
+        sms1B = fromString(stringEl, model=model)
 
         self.assertEqual(sms1 > sms2, True) #Bigger by number of vertices
         self.assertEqual(sms1,sms1B) #Just differ by branch ordering
@@ -70,13 +54,7 @@ class SMSTest(unittest.TestCase):
     def testExpSMS(self):
 
         stringEl = "(PV > gluino(1),st_1(2)), (gluino(1) > st_1(3),e-), (st_1(2) >e-,nue,N1), (st_1(3) > e-,nue,N1)"
-        expSMS = ExpSMS.from_string(stringEl, model=model)
-        sms1 = TheorySMS()
-        sms1.add_nodes_from(expSMS.nodes)
-        sms1.add_edges_from(expSMS.edgeIndices)
-        sms1.prodXSec = 1.0*fb
-        sms1.maxWeight = 1.0*fb
-        sms1.setGlobalProperties()
+        sms1 = fromString(stringEl, model=model)
 
         stringEl = "(PV > RHadronU(1),RHadronG(2)), (RHadronU(1) >e-,nue,MET), (RHadronG(2) > RHadronU(3),L), (RHadronU(3) > L,nue,MET)"
         expSMS2 = ExpSMS.from_string(stringEl, model=finalStates)
@@ -101,14 +79,7 @@ class SMSTest(unittest.TestCase):
 
 
         stringEl = "(PV > gluino(1),st_1(2)), (gluino(1) > st_1(3),t+), (st_1(2) >b,t+,N1), (st_1(3) > b,t+,N1)"
-        # Hack to create a theory element from a string:
-        expSMS = ExpSMS.from_string(stringEl, model=model)
-        sms1 = TheorySMS()
-        sms1.add_nodes_from(expSMS.nodes)
-        sms1.add_edges_from(expSMS.edgeIndices)
-        sms1.prodXSec = 1.0*fb
-        sms1.maxWeight = 1.0*fb
-        sms1.setGlobalProperties()
+        sms1 = fromString(stringEl, model=model)
 
         gluino = model.getParticle(label='gluino')
         st1 = model.getParticle(label='st_1')
@@ -125,14 +96,7 @@ class SMSTest(unittest.TestCase):
         smsComp = sms1.massCompress(minmassgap = 5.*GeV)
 
         stringEl = "(PV > st_1(1),st_1(2)), (st_1(2) >b,t+,N1), (st_1(1) > b,t+,N1)"
-        # Hack to create a theory element from a string:
-        expSMS = ExpSMS.from_string(stringEl, model=model)
-        sms2 = TheorySMS()
-        sms2.add_nodes_from(expSMS.nodes)
-        sms2.add_edges_from(expSMS.edgeIndices)
-        sms2.prodXSec = 1.0*fb
-        sms2.maxWeight = 1.0*fb
-        sms2.setGlobalProperties()
+        sms2 = fromString(stringEl, model=model)
 
         self.assertEqual(smsComp,sms2) #Elements should be equal
 
@@ -144,14 +108,7 @@ class SMSTest(unittest.TestCase):
         smsComp = sms1.massCompress(minmassgap = 5.*GeV)
 
         stringEl = "(PV > gluino(1),N1), (gluino(1) > t+,N1)"
-        # Hack to create a theory element from a string:
-        expSMS = ExpSMS.from_string(stringEl, model=model)
-        sms2 = TheorySMS()
-        sms2.add_nodes_from(expSMS.nodes)
-        sms2.add_edges_from(expSMS.edgeIndices)
-        sms2.prodXSec = 1.0*fb
-        sms2.maxWeight = 1.0*fb
-        sms2.setGlobalProperties()
+        sms2 = fromString(stringEl, model=model)
 
         self.assertEqual(smsComp,sms2) #Elements should be equal
 
@@ -159,14 +116,7 @@ class SMSTest(unittest.TestCase):
         #Compress everything
         smsComp = sms1.massCompress(minmassgap = 10.*GeV) #Fully compress
         stringEl = "(PV > N1,N1)"
-        # Hack to create a theory element from a string:
-        expSMS = ExpSMS.from_string(stringEl, model=model)
-        sms2 = TheorySMS()
-        sms2.add_nodes_from(expSMS.nodes)
-        sms2.add_edges_from(expSMS.edgeIndices)
-        sms2.prodXSec = 1.0*fb
-        sms2.maxWeight = 1.0*fb
-        sms2.setGlobalProperties()
+        sms2 = fromString(stringEl, model=model)
 
         self.assertEqual(smsComp,sms2) #Elements should be equal
 
@@ -180,6 +130,8 @@ class SMSTest(unittest.TestCase):
         n2 = model.getParticle(label='N2')
         n3 = model.getParticle(label='N3')
         n4 = model.getParticle(label='N4')
+        inv = model.getParticle(label='invisible')
+
 
         gluino.mass = 500.*GeV
         st1.mass = 400.*GeV
@@ -187,121 +139,92 @@ class SMSTest(unittest.TestCase):
         n2.mass = 310.*GeV
         n3.mass = 320.*GeV
         n4.mass = 330.*GeV
+        inv.mass = n3.mass
 
         #Compress one step:
         #N3 --> N1 + [nue,nue]
         #gluino --> st_1 + [t+]/st_1 --> N3 + [t+]/N3 --> N1 + [nue,nue]
         stringEl = "(PV > gluino(1),N3(2)), (gluino(1) > st_1(3),t+), (N3(2) >nue,nue,N1), (st_1(3) > N3(4),t+), (N3(4) > nue,nue,N1)"
-        # Hack to create a theory element from a string:
-        expSMS = ExpSMS.from_string(stringEl, model=model)
-        sms1 = TheorySMS()
-        sms1.add_nodes_from(expSMS.nodes)
-        sms1.add_edges_from(expSMS.edgeIndices)
-        sms1.prodXSec = 1.0*fb
-        sms1.maxWeight = 1.0*fb
-        sms1.setGlobalProperties()
-
+        sms1 = fromString(stringEl, model=model)
         smsComp = sms1.invisibleCompress()
 
-        stringEl = "(PV > gluino(1),N3), (gluino(1) > st_1(3),t+), (st_1(3) > N3,t+)"
-        # Hack to create a theory element from a string:
-        expSMS = ExpSMS.from_string(stringEl, model=model)
-        sms2 = TheorySMS()
-        sms2.add_nodes_from(expSMS.nodes)
-        sms2.add_edges_from(expSMS.edgeIndices)
-        sms2.prodXSec = 1.0*fb
-        sms2.maxWeight = 1.0*fb
-        sms2.setGlobalProperties()
-
+        stringEl = "(PV > gluino(1),invisible), (gluino(1) > st_1(3),t+), (st_1(3) > invisible,t+)"
+        sms2 = fromString(stringEl, model=model)
         self.assertEqual(smsComp,sms2) #SMS should be equal
 
         #Compress two steps:
         #N3 --> N1 + [nue,nue]
         #gluino --> st_1 + [t+]/st_1 --> N3 + [t+]/N3 --> N2 + [nue]/N2 --> N1 + [nue,nue,nue,nue]
+        stringEl = "(PV > N3(2),gluino(1)), (N3(2) > nue,nue,N1), (gluino(1) > st_1(3),t+), (st_1(3) > N3(4),t+), (N3(4) > nue,N2(5)), (N2(5)>nue,nue,nue,nue,N1)"
+        sms1 = fromString(stringEl, model=model)
+        smsComp = sms1.invisibleCompress()
 
-
-
-        b1 = Branch()
-        b1.evenParticles = [[nue,nue]]
-        b1.oddParticles = [n3,n1]
-        b2 = Branch()
-        b2.evenParticles = [[t],[t],[nue],[nue,nue,nue,nue]]
-        b2.oddParticles = [gluino,st1,n3,n2,n1]
-        el1 = Element(info=[b1,b2])
-
-        el1Comp = el1.invisibleCompress()
-        b1Comp = Branch()
-        b1Comp.evenParticles = []
-        b1Comp.oddParticles = [n3]
-        b2Comp = Branch()
-        b2Comp.evenParticles = [[t],[t]]
-        b2Comp.oddParticles = [gluino,st1,n3]
-        el2 = Element(info=[b1Comp,b2Comp])
-        self.assertEqual(el1Comp,el2) #Elements should be equal
+        stringEl = "(PV > invisible,gluino(1)), (gluino(1) > st_1(3),t+), (st_1(3) > invisible,t+)"
+        sms2 = fromString(stringEl, model=model)
+        self.assertEqual(smsComp,sms2) # SMS should be equal
 
         #Make sure compression only happens at the end:
         #N3 --> N1 + [nue,nue]
         #gluino --> st_1 + [t+]/st_1 --> N3 + [t+]/N3 --> N2 + [nue]/N2 --> N1 + [e-,nue,nue,nue]
-        b1 = Branch()
-        b1.evenParticles = [[nue,nue]]
-        b1.oddParticles = [n3,n1]
-        b2 = Branch()
-        b2.evenParticles = [[t],[t],[nue],[e,nue,nue,nue]]
-        b2.oddParticles = [gluino,st1,n3,n2,n1]
-        el1 = Element(info=[b1,b2])
+        stringEl = "(PV > N3(2),gluino(1)), (N3(2) > nue,nue,N1), (gluino(1) > st_1(3),t+), (st_1(3) > N3(4),t+), (N3(4) > nue,N2(5)), (N2(5)>e-,nue,nue,nue,N1)"
+        sms1 = fromString(stringEl, model=model)
+        smsComp = sms1.invisibleCompress()
 
-        el1Comp = el1.invisibleCompress()
-        b1Comp = Branch()
-        b1Comp.evenParticles = []
-        b1Comp.oddParticles = [n3]
-        b2Comp = b2.copy()
-        el2 = Element(info=[b1Comp,b2Comp])
-        self.assertEqual(el1Comp,el2) #Elements should be equal
-
-    # def testElementCombine(self):
-
-    #     gluino.mass = 500.*GeV
-    #     st1.mass = 400.*GeV
-    #     n1.mass = 250.*GeV
-    #     n2.mass = 300.*GeV
-    #     n3.mass = 320.*GeV
-    #     n1.totalwidth = 0.*GeV
-    #     n2.totalwidth = 0.*GeV #just for the sake of the example
-
-    #     w1 = XSectionList()
-    #     w1.xSections.append(XSection())
-    #     w1.xSections[0].info = XSectionInfo()
-    #     w1.xSections[0].info.sqrts = 8.*TeV
-    #     w1.xSections[0].info.label = '8 TeV'
-    #     w1.xSections[0].info.order = 0
-    #     w1.xSections[0].value = 10.*fb
-    #     w2 = w1.copy()
-    #     w2.xSections[0].value = 22.*fb
-    #     w3 = w1.copy()
-    #     w3.xSections[0].value = 2.*fb
+        stringEl = "(PV > invisible,gluino(1)), (gluino(1) > st_1(3),t+), (st_1(3) > N3(4),t+), (N3(4) > nue,N2(5)), (N2(5)>e-,nue,nue,nue,N1)"
+        sms2 = fromString(stringEl, model=model)
+        self.assertEqual(smsComp,sms2) #SMS should be equal
 
 
-    #     b1 = Branch()
-    #     b2 = Branch()
-    #     b1.evenParticles = [[g]]
-    #     b1.oddParticles = [gluino,n1]
-    #     b2.evenParticles = [[g]]
-    #     b2.oddParticles = [gluino,n2]
+    def testElementCombine(self):
 
-    #     el1 = Element(info=[b1,b1])
-    #     el1.weight = w1
-    #     el2 = Element(info=[b2,b2])
-    #     el2.weight = w2
-    #     el3 = Element(info=[b1,b2])
-    #     el3.weight = w3
-    #     el1 += el2
-    #     self.assertEqual(el1.weight[0].value,32.*fb)
-    #     self.assertEqual(el1.pdg,[[1000021,[1000022,1000023]],[1000021,[1000022,1000023]]])
-    #     self.assertEqual(el1.getAverage('mass'),[[gluino.mass,(n1.mass+n2.mass)/2.]]*2)
-    #     el1 += el3
-    #     self.assertEqual(el1.weight[0].value,34.*fb)
-    #     self.assertEqual(el1.pdg,[[1000021,[1000022,1000023]],[1000021,[1000022,1000023]]])
-    #     self.assertEqual(el1.getAverage('mass'),[[gluino.mass,(n1.mass+n2.mass)/2.]]*2)
+        gluino = model.getParticle(label='gluino')
+        st1 = model.getParticle(label='st_1')
+        n1 = model.getParticle(label='N1')
+        n2 = model.getParticle(label='N2')
+        n3 = model.getParticle(label='N3')
+
+        gluino.mass = 500.*GeV
+        st1.mass = 400.*GeV
+        n1.mass = 250.*GeV
+        n2.mass = 300.*GeV
+        n3.mass = 320.*GeV
+        n1.totalwidth = 0.*GeV
+        n2.totalwidth = 0.*GeV #just for the sake of the example
+
+        w1 = XSectionList()
+        w1.xSections.append(XSection())
+        w1.xSections[0].info = XSectionInfo()
+        w1.xSections[0].info.sqrts = 8.*TeV
+        w1.xSections[0].info.label = '8 TeV'
+        w1.xSections[0].info.order = 0
+        w1.xSections[0].value = 10.*fb
+        w2 = w1.copy()
+        w2.xSections[0].value = 22.*fb
+        w3 = w1.copy()
+        w3.xSections[0].value = 2.*fb
+
+
+        stringEl = "(PV > gluino(2),gluino(1)), (gluino(2) > g,N1), (gluino(1) > N1,g)"
+        sms1 = fromString(stringEl, model=model,prodXSec = w1, maxWeight = w1.getMaxXsec())
+
+        stringEl = "(PV > gluino(2),gluino(1)), (gluino(2) > g,N2), (gluino(1) > N2,g)"
+        sms2 = fromString(stringEl, model=model,prodXSec = w2, maxWeight = w2.getMaxXsec())
+
+        stringEl = "(PV > gluino(2),gluino(1)), (gluino(2) > g,N1), (gluino(1) > N2,g)"
+        sms3 = fromString(stringEl, model=model,prodXSec = w3, maxWeight = w3.getMaxXsec())
+
+        sms1 += sms2
+        self.assertEqual(sms1.weightList[0].value,32.*fb)
+        self.assertEqual(sms1.pdg,[None, 1000021, 1000021,
+                                    [1000022, 1000023], [21, -21],
+                                    [1000022, 1000023], [21, -21]])
+
+        sms1 += sms3
+        self.assertEqual(sms1.weightList[0].value,34.*fb)
+        self.assertEqual(sms1.pdg,[None, 1000021, 1000021,
+                                    [1000022, 1000023], [21, -21],
+                                    [1000022, 1000023], [21, -21]])
+
 
 if __name__ == "__main__":
     unittest.main()

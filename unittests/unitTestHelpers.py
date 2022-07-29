@@ -18,6 +18,28 @@ from smodels.tools.runSModelS import run
 from os.path import join, basename
 from smodels.installation import installDirectory as iDir
 from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
+from smodels.tools.physicsUnits import fb
+from smodels.theory.theorySMS import TheorySMS
+from smodels.experiment.expSMS import ExpSMS
+
+
+def theorySMSFromString(stringEl,model,prodXSec = 1.0*fb,
+                              maxWeight = 1.0*fb):
+
+    """
+    Facility to construct a TheorySMS object from a string (only needed for unit tests)
+    """
+
+    # Hack to create a theory element from a string:
+    expSMS = ExpSMS.from_string(stringEl, model=model)
+    sms = TheorySMS()
+    sms.add_nodes_from(expSMS.nodes)
+    sms.add_edges_from(expSMS.edgeIndices)
+    sms.prodXSec = prodXSec
+    sms.maxWeight = maxWeight
+    sms.setGlobalProperties()
+
+    return sms
 
 def sortExptRes ( exptRes ):
     """ the experimental results may be in different orders. 
