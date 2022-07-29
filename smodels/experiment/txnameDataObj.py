@@ -328,7 +328,7 @@ class TxNameData(object):
         # in a flat array where the widths are the last entries)
         Morig = x[:]
 
-        aM = np.array(Morig)
+        aM = np.array(Morig, dtype=object)
         MT = aM.T.tolist()
         self.delta_x = np.array([[sum(x)/len(Morig) for x in MT]])
         M = []

@@ -1,0 +1,8 @@
+dataId: ar39
+dataType: efficiencyMap
+observedN: 1
+expectedBG: 0.6
+bgError: 1.0756393447619885
+upperLimit: 0.118205*fb
+expectedUpperLimit: 0.118205*fb
+aggregated: t2b2MT2200__400MET>=600

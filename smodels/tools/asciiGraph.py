@@ -45,18 +45,18 @@ def _drawBranch(branch, upwards, htmlFormat, border, l):
         lines = [" |    ", " | ----"]
         labels = " |    "
 
-    for insertions in branch.evenParticles:
+    for insertions in branch:
         if len(insertions) == 0:
             lines[0] += " "
             lines[1] += "*"
             continue
         lines[1] += "*----"
         if len(insertions) == 1:
-            labels += " " + _printParticle(insertions[0].label) + "  "
+            labels += " " + _printParticle(insertions[0]) + "  "
             lines[0] += " |   "
         if len(insertions) == 2:
-            labels += _printParticle(insertions[0].label) + " " + \
-                    _printParticle(insertions[1].label)
+            labels += _printParticle(insertions[0]) + " " + \
+                    _printParticle(insertions[1])
             if upwards:
                 lines[0] += "\\ /  "
             else:
@@ -99,16 +99,17 @@ def _drawBranch(branch, upwards, htmlFormat, border, l):
     return ret
 
 
-def asciidraw(element, labels=True, html=False, border=False):
+def asciidraw(sms, labels=True, html=False, border=False):
     """
     Draw a simple ASCII graph on the screen.
     
     """
     ret=""
     l = []
-    for (ct, branch) in enumerate(element.branches):
+    branches = sms.treeToBrackets()[0]
+    for (ct, branch) in enumerate(branches):
         l.append(int(str(branch).count("[")))
-    for (ct, branch) in enumerate(element.branches):
+    for (ct, branch) in enumerate(branches):
         ret+=_drawBranch(branch, upwards=(ct == 0), htmlFormat=html,
                     border=border, l=max(l))
     return ret

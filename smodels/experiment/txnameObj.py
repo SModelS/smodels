@@ -39,7 +39,8 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
 
-    def __init__(self, path, globalObj, infoObj, databaseParticles):
+    def __init__(self, path=None, globalObj=None, infoObj=None,
+                 databaseParticles=None):
         self.path = path
         self.globalInfo = globalObj
         self._infoObj = infoObj
@@ -53,6 +54,8 @@ class TxName(object):
         self.finalState = ['MET', 'MET']  # default final state
         self.intermediateState = None  # default intermediate state
 
+        if self.path is None:
+            return
         logger.debug('Creating object based on txname file: %s' % self.path)
         # Open the info file and get the information:
         if not os.path.isfile(path):
