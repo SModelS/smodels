@@ -25,7 +25,7 @@ from unitTestHelpers import theorySMSFromString as fromString
 
 
 
-slhafile = '../inputFiles/slha/lightEWinos.slha'
+slhafile = './testFiles/slha/lightEWinos.slha'
 
 model = Model( BSMparticles=BSMList, SMparticles=SMList)
 model.updateParticles(inputFile=slhafile,erasePrompt=['spin'])
