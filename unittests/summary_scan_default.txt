@@ -1,0 +1,21 @@
+#Global results summary (17 files)
+#The most constraining analysis corresponds to the one with largest observed r.
+#The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.
+#filename            MostConstrainingAnalysis  r_max     r_exp     MostSensitive(ATLAS)  r(ATLAS)  r_exp(ATLAS)  MostSensitive(CMS)  r(CMS)    r_exp(CMS)
+416126634.slha       ATLAS-SUSY-2013-12        1.29      -1        N/A                   -1        -1            N/A                 -1        -1        
+T1tttt.slha          CMS-PAS-SUS-15-002        30.5      -1        ATLAS-CONF-2013-037   5.92      5.47          CMS-SUS-13-012      5.73      8.11      
+T6bbHH_pyhf.slha     N/A                       -1        -1        N/A                   -1        -1            N/A                 -1        -1        
+broken.slha          N/A                       -1        -1        N/A                   -1        -1            N/A                 -1        -1        
+complicated.slha     ATLAS-SUSY-2013-02        0.388     -1        ATLAS-CONF-2013-037   0.00183   0.00209       CMS-SUS-13-012      0.128     0.205     
+gluinoToTops.slha    CMS-PAS-SUS-15-002        5.52      -1        ATLAS-CONF-2013-037   0.479     0.443         CMS-SUS-13-012      0.844     0.703     
+gluino_squarks.slha  ATLAS-SUSY-2013-02        0.388     -1        ATLAS-CONF-2013-037   0.00183   0.00209       CMS-SUS-13-012      0.128     0.205     
+higgsinoStop.slha    ATLAS-CONF-2013-037       22.2      25.3      ATLAS-CONF-2013-037   22.2      25.3          N/A                 -1        -1        
+hscpTest_long.slha   CMS-EXO-13-006            0.5       0.5       N/A                   -1        -1            CMS-EXO-13-006      0.5       0.5       
+hscpTest_mid.slha    CMS-EXO-13-006            0.00193   0.00193   N/A                   -1        -1            CMS-EXO-13-006      0.00193   0.00193   
+hscpTest_short.slha  CMS-EXO-13-006            5.16e-05  5.16e-05  N/A                   -1        -1            CMS-EXO-13-006      5.16e-05  5.16e-05  
+idm_example.slha     N/A                       -1        -1        N/A                   -1        -1            N/A                 -1        -1        
+lifetime.slha        CMS-PAS-SUS-15-002        0.000451  -1        N/A                   -1        -1            N/A                 -1        -1        
+lightEWinos.slha     ATLAS-SUSY-2013-12        0.646     -1        ATLAS-CONF-2013-037   0.119     0.11          CMS-SUS-13-012      0.00548   0.00776   
+longLived.slha       CMS-EXO-13-006            0.835     0.835     ATLAS-CONF-2013-037   0.00801   0.00916       CMS-EXO-13-006      0.835     0.835     
+nobdecay.slha        ATLAS-SUSY-2013-02        0.803     -1        N/A                   -1        -1            N/A                 -1        -1        
+simplyGluino.slha    CMS-PAS-SUS-15-002        25.7      -1        N/A                   -1        -1            CMS-SUS-13-012      4.45      6.51      

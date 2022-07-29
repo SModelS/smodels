@@ -1,0 +1,68 @@
+[smodels.cpp] initialising!
+[smodels.cpp] now running over test.slha
+[smodels.cpp] 14 experimental results found.
+Input status: 1
+Decomposition output status: 1 #decomposition was successful
+# Input File: test.slha
+# maxcond = 0.2
+# minmassgap = 5.
+# ncpus = 1
+# sigmacut = 0.01
+# Database version: unittest210
+================================================================================
+  ========================================================  
+||                                                        ||
+||                    Topologies Table                    ||
+||                                                        ||
+  ========================================================  
+===================================================== 
+Topology:
+Number of vertices: [1, 1] 
+Number of vertex parts: [[2], [2]]
+Total Global topology weight :
+Sqrts: 8.00E+00 [TeV], Weight:5.72E-01 [pb]
+
+Total Number of Elements: 1
+  ========================================================  
+||                                                        ||
+||                 Theory Predictions and                 ||
+||                Experimental Constraints                ||
+||                                                        ||
+  ========================================================  
+
+---------------Analysis Label = ATLAS-SUSY-2013-02
+-------------------Dataset Label = (UL)
+-------------------Txname Labels = ['T1']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 5.72E-01 [pb]
+Theory conditions:  None
+Observed experimental limit: 3.81E+01 [fb]
+Observed r-value: 15
+
+---------------Analysis Label = CMS-SUS-13-012
+-------------------Dataset Label = 6NJet8_1000HT1250_450MHTinf
+-------------------Txname Labels = ['T1']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 1.72E-03 [pb]
+Theory conditions:  None
+Observed experimental limit: 3.86E-01 [fb]
+Expected experimental limit: 2.64E-01 [fb]
+Observed r-value: 4.450234314451397
+Expected r-value: 6.507381845799234
+Likelihood: 1.2671673673817349e-11
+L_max: 0.07085462056029841   -2log(L/L_max): 44.8890538681224
+L_SM: 0.04875737082080812   -2log(L/L_SM): 44.14150627259112
+
+Total cross-section for missing topologies (fb):  0.000E+00
+Total cross-section for missing topologies with displaced decays (fb):  0.000E+00
+Total cross-section for missing topologies with prompt decays (fb):  0.000E+00
+Total cross-section for topologies outside the grid (fb):  0.000E+00
+================================================================================
+No missing topologies found
+================================================================================
+No missing topologies with displaced decays found
+================================================================================
+No missing topologies with prompt decays found
+================================================================================
+No topologies outside the grid found
+================================================================================

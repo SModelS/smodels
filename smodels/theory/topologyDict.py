@@ -107,3 +107,20 @@ class TopologyDict(OrderedDict):
             sms.smsID = smsID
             smsID += 1
 
+    def getTotalWeight(self, canonName=None):
+        """
+        Compute the summed cross-section over all the SMS.
+        If canonName is not None, return the total cross-section
+        for the SMS with the corresponding canonName.
+        """
+
+        if canonName is not None:
+            smsList = self[canonName]
+        else:
+            smsList = self.getSMSList()
+
+        totxsec = smsList[0].weightList
+        for sms in smsList[1:]:
+            totxsec = totxsec = sms.weightList
+
+        return totxsec
