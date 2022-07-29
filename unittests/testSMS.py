@@ -97,140 +97,166 @@ class SMSTest(unittest.TestCase):
         self.assertTrue(expSMS1 == expSMSB) #SMS should be equal (only branch order differs)
         self.assertTrue(expSMS1 == expSMSC) #SMS should be equal (inclusive labels)
 
-    # def testElementMassComp(self):
-
-    #     b1 = Branch()
-    #     b1.evenParticles = [[t],[b,t]]
-    #     b1.oddParticles = [gluino,st1,n1]
-    #     b2 = Branch()
-    #     b2.evenParticles = [[b,t]]
-    #     b2.oddParticles = [st1,n1]
-    #     b1.setInfo()
-    #     b2.setInfo()
-
-    #     el1 = Element()
-    #     el1.branches=[b1,b2]
+    def testSMSMassComp(self):
 
 
-    #     #Compress gluino-stop1
-    #     gluino.mass = 400.*GeV
-    #     gluino.totalwidth = float('inf')*GeV
-    #     st1.mass = 398.*GeV
-    #     st1.totalwidth = float('inf')*GeV
-    #     n1.mass = 390.*GeV
-    #     n1.totalwidth = 0.*GeV
-    #     el1Comp = el1.massCompress(minmassgap = 5.*GeV)
-    #     b1Comp = Branch()
-    #     b1Comp.evenParticles = [[b,t]]
-    #     b1Comp.oddParticles = [st1,n1]
-    #     b2Comp = Branch()
-    #     b2Comp.evenParticles = [[b,t]]
-    #     b2Comp.oddParticles = [st1,n1]
-    #     el2 = Element()
-    #     el2.branches = [b1Comp,b2Comp]
-    #     el2.setEinfo()
-    #     self.assertEqual(el1Comp,el2) #Elements should be equal
+        stringEl = "(PV > gluino(1),st_1(2)), (gluino(1) > st_1(3),t+), (st_1(2) >b,t+,N1), (st_1(3) > b,t+,N1)"
+        # Hack to create a theory element from a string:
+        expSMS = ExpSMS.from_string(stringEl, model=model)
+        sms1 = TheorySMS()
+        sms1.add_nodes_from(expSMS.nodes)
+        sms1.add_edges_from(expSMS.edgeIndices)
+        sms1.prodXSec = 1.0*fb
+        sms1.maxWeight = 1.0*fb
+        sms1.setGlobalProperties()
+
+        gluino = model.getParticle(label='gluino')
+        st1 = model.getParticle(label='st_1')
+        n1 = model.getParticle(label='N1')
+
+        #Compress gluino-stop1
+        gluino.mass = 400.*GeV
+        gluino.totalwidth = float('inf')*GeV
+        st1.mass = 398.*GeV
+        st1.totalwidth = float('inf')*GeV
+        n1.mass = 390.*GeV
+        n1.totalwidth = 0.*GeV
+
+        smsComp = sms1.massCompress(minmassgap = 5.*GeV)
+
+        stringEl = "(PV > st_1(1),st_1(2)), (st_1(2) >b,t+,N1), (st_1(1) > b,t+,N1)"
+        # Hack to create a theory element from a string:
+        expSMS = ExpSMS.from_string(stringEl, model=model)
+        sms2 = TheorySMS()
+        sms2.add_nodes_from(expSMS.nodes)
+        sms2.add_edges_from(expSMS.edgeIndices)
+        sms2.prodXSec = 1.0*fb
+        sms2.maxWeight = 1.0*fb
+        sms2.setGlobalProperties()
+
+        self.assertEqual(smsComp,sms2) #Elements should be equal
 
 
-    #     #Compress stop1-neutralino1
-    #     gluino.mass = 400.*GeV
-    #     st1.mass = 393.*GeV
-    #     n1.mass = 390.*GeV
-    #     el1Comp = el1.massCompress(minmassgap = 5.*GeV)
+        #Compress stop1-neutralino1
+        gluino.mass = 400.*GeV
+        st1.mass = 393.*GeV
+        n1.mass = 390.*GeV
+        smsComp = sms1.massCompress(minmassgap = 5.*GeV)
 
-    #     b1Comp = Branch()
-    #     b1Comp.evenParticles = [[t]]
-    #     b1Comp.oddParticles = [gluino,n1]
-    #     b2Comp = Branch()
-    #     b2Comp.evenParticles = []
-    #     b2Comp.oddParticles = [n1]
-    #     el2 = Element(info=[b1Comp,b2Comp])
-    #     el1.sortBranches()
-    #     el2.sortBranches()
-    #     self.assertEqual(el1Comp,el2) #Elements should be equal
+        stringEl = "(PV > gluino(1),N1), (gluino(1) > t+,N1)"
+        # Hack to create a theory element from a string:
+        expSMS = ExpSMS.from_string(stringEl, model=model)
+        sms2 = TheorySMS()
+        sms2.add_nodes_from(expSMS.nodes)
+        sms2.add_edges_from(expSMS.edgeIndices)
+        sms2.prodXSec = 1.0*fb
+        sms2.maxWeight = 1.0*fb
+        sms2.setGlobalProperties()
 
-
-    #     #Compress everything
-    #     el1Comp = el1.massCompress(minmassgap = 10.*GeV) #Fully compress
-    #     b1Comp = Branch()
-    #     b1Comp.evenParticles = []
-    #     b1Comp.oddParticles = [n1]
-    #     b2Comp = b1Comp.copy()
-    #     el2 = Element(info=[b1Comp,b2Comp])
-    #     self.assertEqual(el1Comp,el2) #Elements should be equal
+        self.assertEqual(smsComp,sms2) #Elements should be equal
 
 
-    # def testElementInvComp(self):
+        #Compress everything
+        smsComp = sms1.massCompress(minmassgap = 10.*GeV) #Fully compress
+        stringEl = "(PV > N1,N1)"
+        # Hack to create a theory element from a string:
+        expSMS = ExpSMS.from_string(stringEl, model=model)
+        sms2 = TheorySMS()
+        sms2.add_nodes_from(expSMS.nodes)
+        sms2.add_edges_from(expSMS.edgeIndices)
+        sms2.prodXSec = 1.0*fb
+        sms2.maxWeight = 1.0*fb
+        sms2.setGlobalProperties()
 
-    #     gluino.mass = 500.*GeV
-    #     st1.mass = 400.*GeV
-    #     n1.mass = 300.*GeV
-    #     n2.mass = 310.*GeV
-    #     n3.mass = 320.*GeV
-    #     n4.mass = 330.*GeV
-
-    #     #Compress one step:
-    #     #N3 --> N1 + [nue,nue]
-    #     #gluino --> st_1 + [t+]/st_1 --> N3 + [t+]/N3 --> N1 + [nue,nue]
-    #     b1 = Branch()
-    #     b1.evenParticles = [[t],[t],[nue,nue]]
-    #     b1.oddParticles = [gluino,st1,n3,n1]
-    #     b2 = Branch()
-    #     b2.evenParticles = [[nue,nue]]
-    #     b2.oddParticles = [n3,n1]
-    #     el1 = Element(info=[b1,b2])
-    #     el1Comp = el1.invisibleCompress()
+        self.assertEqual(smsComp,sms2) #Elements should be equal
 
 
-    #     b1Comp = Branch()
-    #     b1Comp.evenParticles = [[t],[t]]
-    #     b1Comp.oddParticles = [gluino,st1,n3]
-    #     b2Comp = Branch()
-    #     b2Comp.evenParticles = []
-    #     b2Comp.oddParticles = [n3]
-    #     el2 = Element(info=[b1Comp,b2Comp])
-    #     el2.sortBranches()
-    #     self.assertEqual(el1Comp,el2) #Elements should be equal
+    def testSMSInvComp(self):
 
-    #     #Compress two steps:
-    #     #N3 --> N1 + [nue,nue]
-    #     #gluino --> st_1 + [t+]/st_1 --> N3 + [t+]/N3 --> N2 + [nue]/N2 --> N1 + [nue,nue,nue,nue]
-    #     b1 = Branch()
-    #     b1.evenParticles = [[nue,nue]]
-    #     b1.oddParticles = [n3,n1]
-    #     b2 = Branch()
-    #     b2.evenParticles = [[t],[t],[nue],[nue,nue,nue,nue]]
-    #     b2.oddParticles = [gluino,st1,n3,n2,n1]
-    #     el1 = Element(info=[b1,b2])
 
-    #     el1Comp = el1.invisibleCompress()
-    #     b1Comp = Branch()
-    #     b1Comp.evenParticles = []
-    #     b1Comp.oddParticles = [n3]
-    #     b2Comp = Branch()
-    #     b2Comp.evenParticles = [[t],[t]]
-    #     b2Comp.oddParticles = [gluino,st1,n3]
-    #     el2 = Element(info=[b1Comp,b2Comp])
-    #     self.assertEqual(el1Comp,el2) #Elements should be equal
+        gluino = model.getParticle(label='gluino')
+        st1 = model.getParticle(label='st_1')
+        n1 = model.getParticle(label='N1')
+        n2 = model.getParticle(label='N2')
+        n3 = model.getParticle(label='N3')
+        n4 = model.getParticle(label='N4')
 
-    #     #Make sure compression only happens at the end:
-    #     #N3 --> N1 + [nue,nue]
-    #     #gluino --> st_1 + [t+]/st_1 --> N3 + [t+]/N3 --> N2 + [nue]/N2 --> N1 + [e-,nue,nue,nue]
-    #     b1 = Branch()
-    #     b1.evenParticles = [[nue,nue]]
-    #     b1.oddParticles = [n3,n1]
-    #     b2 = Branch()
-    #     b2.evenParticles = [[t],[t],[nue],[e,nue,nue,nue]]
-    #     b2.oddParticles = [gluino,st1,n3,n2,n1]
-    #     el1 = Element(info=[b1,b2])
+        gluino.mass = 500.*GeV
+        st1.mass = 400.*GeV
+        n1.mass = 300.*GeV
+        n2.mass = 310.*GeV
+        n3.mass = 320.*GeV
+        n4.mass = 330.*GeV
 
-    #     el1Comp = el1.invisibleCompress()
-    #     b1Comp = Branch()
-    #     b1Comp.evenParticles = []
-    #     b1Comp.oddParticles = [n3]
-    #     b2Comp = b2.copy()
-    #     el2 = Element(info=[b1Comp,b2Comp])
-    #     self.assertEqual(el1Comp,el2) #Elements should be equal
+        #Compress one step:
+        #N3 --> N1 + [nue,nue]
+        #gluino --> st_1 + [t+]/st_1 --> N3 + [t+]/N3 --> N1 + [nue,nue]
+        stringEl = "(PV > gluino(1),N3(2)), (gluino(1) > st_1(3),t+), (N3(2) >nue,nue,N1), (st_1(3) > N3(4),t+), (N3(4) > nue,nue,N1)"
+        # Hack to create a theory element from a string:
+        expSMS = ExpSMS.from_string(stringEl, model=model)
+        sms1 = TheorySMS()
+        sms1.add_nodes_from(expSMS.nodes)
+        sms1.add_edges_from(expSMS.edgeIndices)
+        sms1.prodXSec = 1.0*fb
+        sms1.maxWeight = 1.0*fb
+        sms1.setGlobalProperties()
+
+        smsComp = sms1.invisibleCompress()
+
+        stringEl = "(PV > gluino(1),N3), (gluino(1) > st_1(3),t+), (st_1(3) > N3,t+)"
+        # Hack to create a theory element from a string:
+        expSMS = ExpSMS.from_string(stringEl, model=model)
+        sms2 = TheorySMS()
+        sms2.add_nodes_from(expSMS.nodes)
+        sms2.add_edges_from(expSMS.edgeIndices)
+        sms2.prodXSec = 1.0*fb
+        sms2.maxWeight = 1.0*fb
+        sms2.setGlobalProperties()
+
+        self.assertEqual(smsComp,sms2) #SMS should be equal
+
+        #Compress two steps:
+        #N3 --> N1 + [nue,nue]
+        #gluino --> st_1 + [t+]/st_1 --> N3 + [t+]/N3 --> N2 + [nue]/N2 --> N1 + [nue,nue,nue,nue]
+
+
+
+        b1 = Branch()
+        b1.evenParticles = [[nue,nue]]
+        b1.oddParticles = [n3,n1]
+        b2 = Branch()
+        b2.evenParticles = [[t],[t],[nue],[nue,nue,nue,nue]]
+        b2.oddParticles = [gluino,st1,n3,n2,n1]
+        el1 = Element(info=[b1,b2])
+
+        el1Comp = el1.invisibleCompress()
+        b1Comp = Branch()
+        b1Comp.evenParticles = []
+        b1Comp.oddParticles = [n3]
+        b2Comp = Branch()
+        b2Comp.evenParticles = [[t],[t]]
+        b2Comp.oddParticles = [gluino,st1,n3]
+        el2 = Element(info=[b1Comp,b2Comp])
+        self.assertEqual(el1Comp,el2) #Elements should be equal
+
+        #Make sure compression only happens at the end:
+        #N3 --> N1 + [nue,nue]
+        #gluino --> st_1 + [t+]/st_1 --> N3 + [t+]/N3 --> N2 + [nue]/N2 --> N1 + [e-,nue,nue,nue]
+        b1 = Branch()
+        b1.evenParticles = [[nue,nue]]
+        b1.oddParticles = [n3,n1]
+        b2 = Branch()
+        b2.evenParticles = [[t],[t],[nue],[e,nue,nue,nue]]
+        b2.oddParticles = [gluino,st1,n3,n2,n1]
+        el1 = Element(info=[b1,b2])
+
+        el1Comp = el1.invisibleCompress()
+        b1Comp = Branch()
+        b1Comp.evenParticles = []
+        b1Comp.oddParticles = [n3]
+        b2Comp = b2.copy()
+        el2 = Element(info=[b1Comp,b2Comp])
+        self.assertEqual(el1Comp,el2) #Elements should be equal
 
     # def testElementCombine(self):
 
