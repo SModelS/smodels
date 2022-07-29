@@ -24,14 +24,16 @@ from smodels.experiment.expSMS import ExpSMS
 
 
 def theorySMSFromString(stringEl,model,prodXSec = 1.0*fb,
-                              maxWeight = 1.0*fb):
+                              maxWeight = 1.0*fb, intermediateState=None,
+                              finalState=None):
 
     """
     Facility to construct a TheorySMS object from a string (only needed for unit tests)
     """
 
     # Hack to create a theory element from a string:
-    expSMS = ExpSMS.from_string(stringEl, model=model)
+    expSMS = ExpSMS.from_string(stringEl, model=model,finalState=finalState,
+                                intermediateState=intermediateState)
     sms = TheorySMS()
     sms.add_nodes_from(expSMS.nodes)
     sms.add_edges_from(expSMS.edgeIndices)
