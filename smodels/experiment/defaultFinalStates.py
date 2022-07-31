@@ -82,4 +82,4 @@ for ptc in finalStates+BSMfinalStates:
     ptc._static = True
 
 finalStates = Model(SMparticles=finalStates,
-                    BSMparticles=BSMfinalStates)
+                    BSMparticles=BSMfinalStates, label='DB Final States (default)')

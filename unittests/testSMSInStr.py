@@ -14,8 +14,9 @@ import unittest
 class InStrTest(unittest.TestCase):
     def testInStr(self):
         instring="[[['t+'],['W-']],[['t+'],['W-']]]+[[['t-'],['W+']],[['t-'],['W+']]]+[[['t+'],['W-']],[['t-'],['W+']]]"
-        from smodels.theory.auxiliaryFunctions import elementsInStr 
-        out= elementsInStr( instring )
+        from smodels.experiment.expAuxiliaryFuncs import smsInStr
+        out= smsInStr( instring )
+        out = [x.replace("'","") for x in out[:]]
         self.assertEqual ( out, ['[[[t+],[W-]],[[t+],[W-]]]', '[[[t-],[W+]],[[t-],[W+]]]', '[[[t+],[W-]],[[t-],[W+]]]'] )
 
 if __name__ == "__main__":

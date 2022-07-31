@@ -106,19 +106,23 @@ class ModelsTest(unittest.TestCase):
         BSMList = getParticlesFromSLHA("./testFiles/slha/idm_example.slha")
         BSMList = sorted(BSMList, key = lambda p: p.pdg)
 
-        h2 = Particle(Z2parity=-1,label='h2',pdg=35,eCharge=0,colordim=1,spin=0)
-        h3 = Particle(Z2parity=-1,label='h3',pdg=36,eCharge=0,colordim=1,spin=0)
-        hp = Particle(Z2parity=-1,label='h+',pdg=37,eCharge=1,colordim=1,spin=0)
-        hm = Particle(Z2parity=-1,label='h-',pdg=-37,eCharge=-1,colordim=1,spin=0)
+        h2 = Particle(isSM=False,label='h2',pdg=35,eCharge=0.0,colordim=1,spin=0.0)
+        h3 = Particle(isSM=False,label='h3',pdg=36,eCharge=0.0,colordim=1,spin=0.0)
+        hp = Particle(isSM=False,label='h+',pdg=37,eCharge=1.0,colordim=1,spin=0.0)
+        hm = Particle(isSM=False,label='h-',pdg=-37,eCharge=-1.0,colordim=1,spin=0.0)
         BSMListDefault = [hm,h2,h3,hp]
         for i,p in enumerate(BSMListDefault):
-            self.assertEqual(p.__dict__,BSMList[i].__dict__)
+            pDict = p.__dict__
+            pDict.pop('_comp')
+            pDict.pop('_id')
+            pBDict = BSMList[i].__dict__
+            pBDict.pop('_comp')
+            pBDict.pop('_id')
+            self.assertEqual(pDict,pBDict)
 
     def testWrongModel(self):
-        runtime.modelFile = 'mssm'
-        reload(particlesLoader)
-        filename = "./testFiles/slha/idm_example.slha"
-        outputfile = runMain(filename,suppressStdout=True)
+        filename = "./testFiles/slha/simplyGluino.slha"
+        outputfile = runMain(filename,inifile='testParameters_idm.ini',suppressStdout=True)
         smodelsOutput = importModule ( outputfile )
         self.assertTrue(smodelsOutput['OutputStatus']['decomposition status'] < 0)
         self.removeOutputs(outputfile)

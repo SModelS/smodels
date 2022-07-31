@@ -10,26 +10,26 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.theory.particle import Particle, MultiParticle
 from smodels.tools.physicsUnits import GeV
-from smodels.theory.auxiliaryFunctions import elementsInStr
+from smodels.experiment.expAuxiliaryFuncs import smsInStr
 from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory import model
 from smodels.experiment.defaultFinalStates import finalStates
 import numpy as np
 
-p1 = Particle(Z2parity=-1, label='p1', pdg=None, mass=100.*GeV,
+p1 = Particle(isSM=False, label='p1', pdg=None, mass=100.*GeV,
               eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p2 = Particle(Z2parity=-1, label='p1', pdg=1000021, mass=50*GeV,
+p2 = Particle(isSM=False, label='p1', pdg=1000021, mass=50*GeV,
               eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p3 = Particle(Z2parity=-1, label='p3', pdg=1, mass=110.*GeV,
+p3 = Particle(isSM=False, label='p3', pdg=1, mass=110.*GeV,
               eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p4 = Particle(Z2parity=-1, label='p4', pdg=None, mass=110.*GeV,
+p4 = Particle(isSM=False, label='p4', pdg=None, mass=110.*GeV,
               eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p4a = Particle(Z2parity=-1, label='p4~', pdg=None, mass=110.*GeV,
+p4a = Particle(isSM=False, label='p4~', pdg=None, mass=110.*GeV,
                eCharge=None, colordim=None, spin=None, width=None, branches=None)
-p5 = Particle(Z2parity=-1, label='p5+', pdg=2, mass=110.*GeV,
+p5 = Particle(isSM=False, label='p5+', pdg=2, mass=110.*GeV,
               eCharge=1., colordim=None, spin=None, width=None, branches=None)
-p5m = Particle(Z2parity=-1, label='p5-', pdg=-2, mass=110.*GeV,
+p5m = Particle(isSM=False, label='p5-', pdg=-2, mass=110.*GeV,
                eCharge=-1., colordim=None, spin=None, width=None, branches=None)
 
 p1c = p1.copy()
@@ -99,9 +99,9 @@ class ParticleTest(unittest.TestCase):
     def testInclusiveParticle(self):
         anything = Particle(label='anything')
         l1 = MultiParticle(label='plist', particles=[p1,p2,p4])
-        anyEven = finalStates.getParticlesWith(label='*')[0]
-        anyOdd = finalStates.getParticlesWith(label='anyOdd')[0]
-        lList = finalStates.getParticlesWith(label='l')[0]
+        anyEven = finalStates.getParticle(label='anySM')
+        anyOdd = finalStates.getParticle(label='anyBSM')
+        lList = finalStates.getParticle(label='l')
 
         self.assertTrue(isinstance(p1, Particle))
         self.assertTrue(p1 == anything)
@@ -118,7 +118,8 @@ class ParticleTest(unittest.TestCase):
 
     def testInStr(self):
         instring="[[['t+'],['W-']],[['t+'],['W-']]]+[[['t-'],['W+']],[['t-'],['W+']]]+[[['t+'],['W-']],[['t-'],['W+']]]"
-        out= elementsInStr(instring)
+        out= smsInStr(instring)
+        out = [x.replace("'","") for x in out]
         self.assertEqual(out, ['[[[t+],[W-]],[[t+],[W-]]]', '[[[t-],[W+]],[[t-],[W+]]]', '[[[t+],[W-]],[[t-],[W+]]]'])
 
 

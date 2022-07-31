@@ -220,13 +220,6 @@ class PyPrinter(BasicPrinter):
                 else:
                     txnamesDict[sms.txname.txName] += sms.weight.asNumber(fb)
             maxconds = theoryPrediction.getmaxCondition()
-            if theoryPrediction.mass is None:
-                mass = None
-            else:
-                mass = np.array(theoryPrediction.mass, dtype=object)
-
-            # Add width information to the mass array:
-            totalwidth = theoryPrediction.totalwidth
 
             def _convWidth(x):
                 if type(x) == type(GeV):
@@ -236,22 +229,37 @@ class PyPrinter(BasicPrinter):
                 if x == 0.:
                     x = "stable"
                 return x
-            widths = None
-            if totalwidth is not None:
-                widths = [[_convWidth(x) for x in br] for br in totalwidth]
 
             def roundme(x):
                 if type(x) == tuple:
                     return (round(x[0].asNumber(GeV), 2), x[1].asNumber(GeV))
                 return round(x.asNumber(GeV), 2)
 
-            if mass is not None:
+            if self.outputFormat == "version2":
+                mass = []
+                widths = []
+                avgSMS = theoryPrediction.avgSMS
+                for dIndex in avgSMS.daughterIndices(avgSMS.rootIndex):
+                    daughter = avgSMS.indexToNode(dIndex)
+                    mass.append([daughter.mass.asNumber(GeV)])
+                    widths.append([_convWidth(daughter.totalwidth)])
+                    for nodeIndex in avgSMS.dfsIndexIterator(dIndex):
+                        node = avgSMS.indexToNode(nodeIndex)
+                        if node.isSM:
+                            continue
+                        m = node.mass.asNumber(GeV)
+                        mass[-1].append(m)
+                        widths[-1].append(_convWidth(node.totalwidth))
+            else:
+                widthDict = {}
                 massDict = {}
-                for n,m in zip(theoryPrediction.avgSMS.nodes,theoryPrediction.avgSMS.mass):
+                for n in theoryPrediction.avgSMS.nodes:
                     if n.isSM or n is theoryPrediction.avgSMS.root:
                         continue
-                    massDict[str(n)] = m
+                    massDict[str(n)] = node.mass.asNumber(GeV)
+                    widthDict[str(n)] = node.totalwidth.asNumber(GeV)
                 mass = massDict
+                widths = widthDict
 
             sqrts = expResult.globalInfo.sqrts
 
@@ -269,9 +277,9 @@ class PyPrinter(BasicPrinter):
                        'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
                        'lumi (fb-1)': (expResult.globalInfo.lumi*fb).asNumber(),
                        'dataType': dataType,
-                       'r': r, 'r_expected': r_expected}
-            if widths:
-                resDict["Width (GeV)"] = widths
+                       'r': r, 'r_expected': r_expected,
+                       'Width (GeV)' : widths}
+
             if hasattr(self, "addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] = txnamesDict
             llhd = theoryPrediction.likelihood()
@@ -345,16 +353,22 @@ class PyPrinter(BasicPrinter):
                 self._round(group.getTotalXSec())
             uncoveredDict["%s" % group.description] = []
             for fsSMS in group.finalStateSMS[:nprint]:
+                fsSMSDict = {'sqrts (TeV)': sqrts, 'weight (fb)': self._round(fsSMS.missingX)}
+
                 if self.outputFormat == 'version2':
                     smsStr = fsSMS.oldStr()
+                    fsSMSDict['element'] = smsStr
                 else:
+                    fsSMSDict['SMS'] = smsStr
                     smsStr = str(fsSMS)
 
-                fsSMSDict = {'sqrts (TeV)': sqrts, 'weight (fb)': self._round(fsSMS.missingX),
-                             'SMS': smsStr}
                 if hasattr(self, "addsmslist") and self.addsmslist:
-                    fsSMSDict["SMS IDs"] = [
-                        sms.smsID for sms in fsSMS._contributingSMS]
+                    if self.outputFormat == "version2":
+                        fsSMSDict["element IDs"] = [sms.smsID
+                                                for sms in fsSMS._contributingSMS]
+                    else:
+                        fsSMSDict["SMS IDs"] = [sms.smsID
+                                                for sms in fsSMS._contributingSMS]
                 uncoveredDict["%s" % group.description].append(fsSMSDict)
 
         return uncoveredDict

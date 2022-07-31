@@ -252,15 +252,15 @@ class Model(object):
         """
 
         smPDGs, bsmPDGs = self.getSMandBSMList()
+        allPDGs = smPDGs+bsmPDGs
         modelPDGs = [particle.pdg for particle in self.BSMparticles if isinstance(particle.pdg, int)]
         for xsec in self.xsections.xSections[:]:
-            for pid in xsec.pid:
-                if pid not in modelPDGs:
-                    logger.debug("Cross-section for %s includes particles not belonging to model and will be ignored" % str(xsec.pid))
-                    self.xsections.delete(xsec)
-                if pid not in bsmPDGs:
-                    logger.debug("Cross-section for %s includes even particles and will be ignored" % str(xsec.pid))
-                    self.xsections.delete(xsec)
+            if any(pid not in allPDGs for pid in xsec.pid):
+                logger.debug("Cross-section for %s includes particles not belonging to model and will be ignored" % str(xsec.pid))
+                self.xsections.delete(xsec)
+            if all(pid in smPDGs for pid in xsec.pid):
+                logger.debug("Cross-section for %s includes only SM particles and will be ignored" % str(xsec.pid))
+                self.xsections.delete(xsec)
 
         return len(self.xsections.xSections)
 
@@ -407,7 +407,7 @@ class Model(object):
         #  Remove cross-sections for even particles:
         nXsecs = self.filterCrossSections()
         if nXsecs == 0:
-            msg = "No cross-sections found in %s for the Z2 odd BSM particles. " % self.inputFile
+            msg = "No cross-sections found in %s for the BSM particles. " % self.inputFile
             msg += "Check if the model is compatible with the input file."
             logger.error(msg)
             raise SModelSError(msg)

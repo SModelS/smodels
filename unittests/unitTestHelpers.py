@@ -168,18 +168,19 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
         level = 'error'
         to = os.devnull
     database = None
+    from smodels.tools import runtime
     if overridedatabase is not None:
         database = overridedatabase
     else:
         from databaseLoader import database  # to make sure the db exists
     with redirector.stdout_redirected(to=to):
-        out = join(iDir(), "test/unitTestOutput")
+        out = join(iDir(), "unittests/unitTestOutput")
         setLogLevel(level)
-        run(filename, parameterFile=join(iDir(), "test/%s" % inifile),
+        run(filename, parameterFile=join(iDir(), "unittests/%s" % inifile),
             outputDir=out, db=database, timeout=timeout,
             development=development)
         setLogLevel(oldlevel)
-        sfile = join(iDir(), "test/unitTestOutput/%s.py" % basename(filename))
+        sfile = join(iDir(), "unittests/unitTestOutput/%s.py" % basename(filename))
         return sfile
 
 
