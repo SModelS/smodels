@@ -56,14 +56,27 @@ class TopologyDict(OrderedDict):
         else:
             return False
 
-    def getSMSList(self):
+    def getSMSList(self, canonName=None):
         """
-        Return a list with all the SMS appearing in the dict
+        Return a list with all the SMS appearing in the dict.
+        If canonName is not None, return the SMS with the corresponding
+        canonical name only.
 
+        :param canonName: if None, return all SMS, otherwise return only the
+                          the SMS with the corresponding canonical name.
+
+        :return: List of TheorySMS objects.
         """
+
         allsmsList = []
-        for smsList in self.values():
-            allsmsList.extend(smsList)
+        if canonName is None:
+            cNames = sorted(list(self.keys()))
+        else:
+            cNames = [canonName]
+        for cName in cNames:
+            if cName not in self:
+                continue
+            allsmsList.extend(self[cName])
         return allsmsList
 
     def compress(self, doCompress, doInvisible, minmassgap):
@@ -121,6 +134,6 @@ class TopologyDict(OrderedDict):
 
         totxsec = smsList[0].weightList
         for sms in smsList[1:]:
-            totxsec = totxsec = sms.weightList
+            totxsec = totxsec + sms.weightList
 
         return totxsec
