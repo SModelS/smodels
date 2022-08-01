@@ -108,17 +108,24 @@ class TxTest(unittest.TestCase):
         gInfo.addInfo('dataId','c000')
         tx = TxName(f,gInfo,gInfo,finalStates)
 
-        el = Element(info="[[],[]]",finalState = ['HSCP','HSCP'], model = finalStates)
-        setattr(c1, 'mass', 150*GeV)
-        el.branches[0].oddParticles = [c1]
-        el.branches[1].oddParticles = [c1]
-
+        mass = [150.0,150.0]
         #test getting UL with mass only
-        self.assertEqual(tx.txnameData.getValueFor(el.mass), 0.21496)
+        self.assertEqual(tx.txnameData.getValueFor(mass), 0.21496)
 
-        #test getting UL with element and reweighted efficiency
-        setattr(c1, 'totalwidth', 10**(-17)*GeV)
-        self.assertAlmostEqual(tx.txnameData.getValueFor(el),0.49*0.21496,3)
+        slhafile = './testFiles/slha/lightEWinos.slha'
+        model = Model( BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(inputFile=slhafile,erasePrompt=['spin'])
+        sms = fromString("[[],[]]",finalState = ['C1+','C1-'],  model=model)
+        c1m = model.getParticle(label='C1-')
+        c1p = model.getParticle(label='C1+')
+        c1p.mass = 150.0*GeV
+        c1m.mass = 150.0*GeV
+        c1p.totalwidth = 1e-17*GeV
+        c1m.totalwidth = 1e-17*GeV
+        smsMatch = tx.hasSMSas(sms)
+        eff = tx.getEfficiencyFor(smsMatch)
+
+        self.assertAlmostEqual(eff,0.49*0.21496,3)
 
     def testCoordinateTransf(self):
         """ test the transformation of data into coordinates, back into data """
@@ -126,36 +133,29 @@ class TxTest(unittest.TestCase):
         #Test with a regular mass array:
         expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"],
                     datasetIDs=[None], txnames=["T2bb" ] )
-        txname=expRes[0].datasets[0].txnameList[0] # T2bb
-        initial = [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ]
-        coords=txname.txnameData.dataToCoordinates(
-                initial, txname.txnameData._V, txname.txnameData.delta_x )
-        data = txname.txnameData.coordinatesToData( coords, txname.txnameData._V,
-                  txname.txnameData.delta_x)
+        txname = expRes[0].datasets[0].txnameList[0] # T2bb
+        initial = [300.,100.,300.,100.]
+        coords = txname.txnameData.PCAtransf(initial)
+        data = txname.txnameData.inversePCAtransf(coords)
         data = np.array(data)
         initial = np.array(initial)
         self.assertEqual(data.shape,initial.shape)
-        dataFlat = np.array([x.asNumber(GeV) for x in flattenArray(data)])
-        initialFlat = np.array([x.asNumber(GeV) for x in flattenArray(initial)])
-        diff = np.linalg.norm(dataFlat-initialFlat)
-        self.assertAlmostEqual(diff, 0.)
+        diff = np.linalg.norm(data-initial)
+        self.assertAlmostEqual(diff, 0.,2)
 
         #Test with with a mass array containing tuples:
         expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2016-08"],
                     datasetIDs=[None], txnames=["T5Disp" ] )
         txname=expRes[0].datasets[0].txnameList[0]
-        initial = [[(300.*GeV,1e-16*GeV),100.*GeV], [(300.*GeV,1e-16*GeV),100.*GeV]]
-        coords=txname.txnameData.dataToCoordinates(
-                initial, txname.txnameData._V, txname.txnameData.delta_x )
-        data = txname.txnameData.coordinatesToData(coords, txname.txnameData._V,
-                  txname.txnameData.delta_x)
-        data = np.array(data,dtype=object)
-        initial = np.array(initial,dtype=object)
+        initial = [300.,100.,300.,100.,1e-16,1e-16]
+        coords = txname.txnameData.PCAtransf(initial)
+        data = txname.txnameData.inversePCAtransf(coords)
+        data = np.array(data)
+        initial = np.array(initial)
         self.assertEqual(data.shape,initial.shape)
-        dataFlat = np.array([x.asNumber(GeV) for x in flattenArray(data)])
-        initialFlat = np.array([x.asNumber(GeV) for x in flattenArray(initial)])
-        diff = np.linalg.norm(dataFlat-initialFlat)
-        self.assertAlmostEqual(diff, 0.)
+        diff = np.linalg.norm(data-initial)
+        self.assertAlmostEqual(diff, 0.,2)
+
 
     def testCoordinateTransfInclusive(self):
         """ test the transformation of data into coordinates, back into data """
@@ -164,37 +164,27 @@ class TxTest(unittest.TestCase):
         expRes = database.getExpResults(analysisIDs=["CMS-EXO-13-006"],
                     datasetIDs=['c000'], txnames=["THSCPM4" ])
         txname=expRes[0].datasets[0].txnameList[0]
-        initial = [[(300.*GeV,1e-16*GeV),100.*GeV], [(300.*GeV,1e-16*GeV),100.*GeV]]
-        coords=txname.txnameData.dataToCoordinates(
-                initial, txname.txnameData._V, txname.txnameData.delta_x)
-        data = txname.txnameData.coordinatesToData(coords, txname.txnameData._V,
-                  txname.txnameData.delta_x)
-        data = np.array(data,dtype=object)
-        newInitial = ['*',[300.*GeV,100.*GeV]]
-        newInitial = np.array(newInitial,dtype=object)
-        self.assertEqual(data.shape,newInitial.shape)
-        dataFlat = np.array([x.asNumber(GeV) if str(x) != '*' else -1 for x in flattenArray(data)])
-        initialFlat = np.array([x.asNumber(GeV) if str(x) != '*' else -1 for x in flattenArray(newInitial)])
-        diff = np.linalg.norm(dataFlat-initialFlat)
-        self.assertAlmostEqual(diff, 0.)
+        initial = [300.,100.]
+        coords = txname.txnameData.PCAtransf(initial)
+        data = txname.txnameData.inversePCAtransf(coords)
+        data = np.array(data)
+        initial = np.array(initial)
+        self.assertEqual(data.shape,initial.shape)
+        diff = np.linalg.norm(data-initial)
+        self.assertAlmostEqual(diff, 0.,2)
 
         #Test with another type of inclusive result:
         expRes = database.getExpResults(analysisIDs=["CMS-EXO-13-006"],
                     datasetIDs=['c000'], txnames=["THSCPM7" ] )
         txname=expRes[0].datasets[0].txnameList[0]
-        initial = [[(300.*GeV,1e-16*GeV),50.*GeV], [(200.*GeV,1e-18*GeV),100.*GeV,1.*GeV]]
-        coords=txname.txnameData.dataToCoordinates(
-                initial, txname.txnameData._V, txname.txnameData.delta_x)
-        data = txname.txnameData.coordinatesToData(coords, txname.txnameData._V,
-                  txname.txnameData.delta_x)
-        data = np.array(data,dtype=object)
-        newInitial = [[300.*GeV,50.*GeV], [200.*GeV,100.*GeV,1.*GeV]]
-        newInitial = np.array(newInitial,dtype=object)
-        self.assertEqual(data.shape,newInitial.shape)
-        dataFlat = np.array([x.asNumber(GeV) for x in flattenArray(data)])
-        initialFlat = np.array([x.asNumber(GeV) for x in flattenArray(newInitial)])
-        diff = np.linalg.norm(dataFlat-initialFlat)
-        self.assertAlmostEqual(diff, 0.)
+        initial = [300.,50.,200.,100.,1.]
+        coords = txname.txnameData.PCAtransf(initial)
+        data = txname.txnameData.inversePCAtransf(coords)
+        data = np.array(data)
+        initial = np.array(initial)
+        self.assertEqual(data.shape,initial.shape)
+        diff = np.linalg.norm(data-initial)
+        self.assertAlmostEqual(diff, 0.,2)
 
 
 if __name__ == "__main__":
