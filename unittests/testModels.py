@@ -15,8 +15,7 @@ import unittest
 from unitTestHelpers import equalObjs, runMain, importModule
 from smodels.tools.smodelsLogging import setLogLevel
 from smodels.tools import runtime
-from smodels import particlesLoader
-from imp import reload
+from smodels.particlesLoader import load
 import subprocess
 from smodels.tools.smodelsLogging import logger
 setLogLevel('debug')
@@ -29,8 +28,7 @@ class ModelsTest(unittest.TestCase):
     def testRuntimeImport(self):
         filename = "./testFiles/slha/idm_example.slha"
         runtime.modelFile = 'idm'
-        reload(particlesLoader)
-        outputfile = runMain(filename,inifile='testParameters_noModel.ini',suppressStdout=False)
+        outputfile = runMain(filename,inifile='testParameters_noModel.ini',suppressStdout=True)
         if self.definingRun:
             logger.error ( "This is a definition run! Know what youre doing!" )
             default = "idm_example_defaultB.py"

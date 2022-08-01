@@ -13,7 +13,7 @@ from smodels.experiment.reweighting import calculateProbabilities,reweightFactor
 from smodels.tools.physicsUnits import GeV
 from smodels.theory.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
-from smodels.particlesLoader import BSMList
+from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.particle import Particle
 from smodels.theory.model import Model

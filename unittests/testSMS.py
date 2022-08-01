@@ -12,7 +12,7 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.theory.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
-from smodels.particlesLoader import BSMList
+from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.particle import Particle
 from smodels.theory.model import Model

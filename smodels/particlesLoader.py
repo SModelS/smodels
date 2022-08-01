@@ -13,6 +13,10 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 import os
 import sys
+from smodels.theory.particle import Particle
+from smodels.installation import installDirectory
+from importlib import import_module
+
 
 
 def getParticlesFromSLHA(slhafile):
@@ -25,9 +29,6 @@ def getParticlesFromSLHA(slhafile):
 
     :return: List with Particle objects
     """
-
-    from smodels.theory.particle import Particle
-    from smodels.installation import installDirectory
 
     checkDirs = [os.path.join(installDirectory(), "smodels", "share", "models"), installDirectory(),
                 os.path.join(installDirectory(), "smodels")]
@@ -103,7 +104,6 @@ def getParticlesFromSLHA(slhafile):
 
     return BSMList
 
-
 def getParticlesFromModule(modelFile):
     """
     Reads the python model file and retrieves the list of BSM particles (BSMList)
@@ -113,8 +113,6 @@ def getParticlesFromModule(modelFile):
     :return: a list of Particle objects
     """
 
-    from smodels.installation import installDirectory
-    from importlib import import_module
     fulldir = os.path.join(installDirectory(), "smodels", "share", "models")
     sys.path.insert(0, installDirectory())
     sys.path.insert(0, os.path.join(installDirectory(), "smodels"))
@@ -157,6 +155,3 @@ def load():
             or a SLHA file with QNUMBERS blocks." % modelFile)
             raise SModelSError()
     return BSMList
-
-
-BSMList = load()

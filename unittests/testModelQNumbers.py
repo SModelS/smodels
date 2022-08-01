@@ -14,9 +14,8 @@ import unittest
 from smodels.tools.smodelsLogging import setLogLevel
 from smodels.tools import runtime
 from smodels.theory.model import Model
-from smodels import particlesLoader
+from smodels.particlesLoader import load
 from smodels.share.models.SMparticles import SMList
-from imp import reload
 setLogLevel('error')
 
 
@@ -25,14 +24,12 @@ class ModelsTest(unittest.TestCase):
     def testRuntimeImport(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
         runtime.modelFile = 'mssm'
-        reload(particlesLoader)
-        from smodels.particlesLoader import BSMList
+        BSMList = load()
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles(filename)
 
         runtime.modelFile = 'mssmQNumbers.slha'
-        reload(particlesLoader)
-        from smodels.particlesLoader import BSMList
+        BSMList = load()
         modelB = Model(BSMparticles=BSMList, SMparticles=SMList)
         modelB.updateParticles(filename)
 

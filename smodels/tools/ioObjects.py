@@ -188,7 +188,9 @@ class SlhaStatus(object):
         self.filename = filename
         self.slha = self.read()
         
-        from smodels.particlesLoader import BSMList
+        from smodels.particlesLoader import load
+
+        BSMList = load()
         
         if not self.slha:
             self.status = -3, "Could not read input SLHA file"

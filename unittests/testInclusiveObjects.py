@@ -17,7 +17,7 @@ from smodels.tools.inclusiveObjects import InclusiveValue, InclusiveList
 from smodels.experiment.defaultFinalStates import finalStates
 from smodels.experiment.expSMS import ExpSMS
 from unitTestHelpers import theorySMSFromString as fromString
-from smodels.particlesLoader import BSMList
+from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 

@@ -11,7 +11,7 @@ import unittest
 from smodels.theory.particle import Particle, MultiParticle
 from smodels.tools.physicsUnits import GeV
 from smodels.experiment.expAuxiliaryFuncs import smsInStr
-from smodels.particlesLoader import BSMList
+from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory import model
 from smodels.experiment.defaultFinalStates import finalStates

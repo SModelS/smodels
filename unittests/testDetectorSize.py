@@ -57,9 +57,10 @@ class DetectorSizeTest(unittest.TestCase):
 
     def testEffReweight(self):
 
-        from smodels.particlesLoader import BSMList
         from smodels.share.models.SMparticles import SMList
+        from smodels.share.models.mssm import BSMList
         from smodels.theory.model import Model
+        from smodels.tools import runtime
 
         slhafile = './testFiles/slha/lightEWinos.slha'
 
@@ -85,7 +86,7 @@ class DetectorSizeTest(unittest.TestCase):
     def testTxnameDataReweight(self):
 
 
-        from smodels.particlesLoader import BSMList
+        from smodels.share.models.mssm import BSMList
         from smodels.share.models.SMparticles import SMList
         from smodels.theory.model import Model
 

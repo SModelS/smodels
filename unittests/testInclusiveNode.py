@@ -13,7 +13,7 @@ sys.path.append('../')
 from smodels.theory.particleNode import InclusiveParticleNode
 from smodels.experiment.expAuxiliaryFuncs import bracketToProcessStr
 from smodels.experiment.defaultFinalStates import finalStates
-from smodels.particlesLoader import BSMList
+from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 from smodels.tools.physicsUnits import fb, GeV
