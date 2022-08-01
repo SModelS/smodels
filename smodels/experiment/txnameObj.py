@@ -756,7 +756,7 @@ class TxName(object):
         signal efficiency including the lifetime reweighting.
         If a mass array is given as input, no lifetime reweighting will be applied.
 
-        :param sms: SMS object or mass array with units.
+        :param sms: SMS object.
         :return: efficiency (float)
         """
 

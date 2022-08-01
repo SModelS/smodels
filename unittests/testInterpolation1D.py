@@ -31,10 +31,14 @@ class Interpolation1DTest(unittest.TestCase):
                 [[[1.2191E+03*GeV],[1.2191E+03*GeV]],4.8380E-04*pb],
                 [[[1.4098E+03*GeV],[1.4098E+03*GeV]],5.1410E-04*pb],
                 [[[1.6005E+03*GeV],[1.6005E+03*GeV]],5.8110E-04*pb]]
-        
-        txnameData=TxNameData ( data, "upperLimit",
-                sys._getframe().f_code.co_name )
 
+        xvalues = []
+        yvalues = []
+        for pt in data:
+            mass = np.array(pt[0]).flatten()
+            xvalues.append([m.asNumber(GeV) for m in mass])
+            yvalues.append(pt[1].asNumber(pb))
+        txnameData=TxNameData (x=xvalues,y=yvalues, txdataId='test')
         self.assertEqual(txnameData.dimensionality,1)
 
         #Tranformation to "PCA frame"        
@@ -42,11 +46,11 @@ class Interpolation1DTest(unittest.TestCase):
         dataShift = dataShift.asNumber(GeV)
         
         #Check inside the grid:
-        result=txnameData.getValueFor([[ 1100.*GeV]]*2)
-        self.assertAlmostEqual( result.asNumber(pb),0.00049953) 
+        result=txnameData.getValueFor([1100.,1100.])
+        self.assertAlmostEqual(result,0.00049953)
         #Check outside the grid:
-        result=txnameData.getValueFor([[ 2000.*GeV]]*2)
-        self.assertEqual( result,None)
+        result=txnameData.getValueFor([2000.,2000.])
+        self.assertEqual(result,None)
         
         #Check class methods:
         isimplex = txnameData.tri.find_simplex(np.array([350.-dataShift]))

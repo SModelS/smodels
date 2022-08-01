@@ -22,6 +22,26 @@ from smodels.tools.physicsUnits import fb
 from smodels.theory.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
 
+def canonNameToVertNumb(topoDict,cName):
+    """
+    Convert canonical name to old vertnumb notation (in string format)
+
+    :param topoDict: TopologyDict object
+    :param cName: Canonical name for the desired topology
+
+    :return: Vertnumb in string format
+    """
+
+    if cName not in topoDict:
+        return None
+    sms = topoDict[cName][0]
+    evenParticles = sms.treeToBrackets()[0]
+    vertnumb = str([len(v) for v in evenParticles[0]])
+    vertnumb += str([len(v) for v in evenParticles[1]])
+    vertnumb = vertnumb.replace(' ','')
+
+    return vertnumb
+
 
 def theorySMSFromString(stringEl,model,prodXSec = 1.0*fb,
                               maxWeight = 1.0*fb, intermediateState=None,

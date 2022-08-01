@@ -19,19 +19,8 @@ from smodels.theory import decomposer
 from smodels.tools.physicsUnits import GeV,pb,TeV,fb
 from smodels.experiment.defaultFinalStates import finalStates
 from unitTestHelpers import theorySMSFromString as fromString
+from unitTestHelpers import canonNameToVertNumb
 
-
-def canonNameToVertNumb(topoDict,cName):
-
-    if cName not in topoDict:
-        return None
-    sms = topoDict[cName][0]
-    evenParticles = sms.treeToBrackets()[0]
-    vertnumb = str([len(v) for v in evenParticles[0]])
-    vertnumb += str([len(v) for v in evenParticles[1]])
-    vertnumb = vertnumb.replace(' ','')
-
-    return vertnumb
 
 class DecomposerTest(unittest.TestCase):
 

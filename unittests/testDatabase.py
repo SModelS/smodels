@@ -45,8 +45,8 @@ class DatabaseTest(unittest.TestCase):
         self.assertTrue(len(nonval)==9)
 
 
-    def testLoadLatest(self):
-        dblatest=Database ("latest")
+    def testLoadOfficial(self):
+        dblatest=Database ("official")
         latestver = dblatest.databaseVersion.replace(".","").replace("official","")
         from databaseLoader import database
         thisver = database.databaseVersion.replace("unittest","").replace(".","")

@@ -10,14 +10,17 @@
 import sys
 sys.path.insert(0,"../")
 from smodels.share.models import mssm
-from smodels.theory.element import Element
 from smodels.experiment import infoObj
 from smodels.experiment.txnameObj import TxName, rescaleWidth, unscaleWidth
 from smodels.tools.physicsUnits import GeV
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.theory.auxiliaryFunctions import flattenArray
+from smodels.experiment.expAuxiliaryFuncs import flattenArray
 from databaseLoader import database
 from smodels.experiment.defaultFinalStates import finalStates
+from smodels.share.models.mssm import BSMList
+from smodels.share.models.SMparticles import SMList
+from smodels.theory.model import Model
+from unitTestHelpers import theorySMSFromString as fromString
 import numpy as np
 import unittest
 
@@ -42,17 +45,17 @@ class TxTest(unittest.TestCase):
         b = unscaleWidth(rescaleWidth(a))
         self.assertAlmostEqual(b.asNumber(GeV), a.asNumber(GeV))
 
-    def testTxnameElements(self):
+    def testTxnameSMS(self):
 
         f = './databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/c000/THSCPM2.txt'
         gInfo = infoObj.Info('./databaseBroken/13TeV/CMS/CMS-PAS-EXO-16-036-eff/globalInfo.txt')
         gInfo.addInfo('dataId','c000')
         tx = TxName(f,gInfo,gInfo,finalStates)
 
-        el = Element(info="[[*],[]]",finalState = ['MET','HSCP'], model = finalStates)
-
-        self.assertTrue(len(tx._topologyList.getElements()), 1)
-        self.assertEqual(tx._topologyList.getElements()[0], el)
+        self.assertTrue(len(tx.smsMap), 1)
+        sms = list(tx.smsMap.keys())[0]
+        defaultSMS = '(PV > Inclusive(1),HSCP), (Inclusive(1) > MET,anySM)'
+        self.assertEqual(str(sms).replace(' ',''), defaultSMS.replace(' ',''))
 
     def testBrokenFinalState(self):
 
@@ -67,8 +70,9 @@ class TxTest(unittest.TestCase):
         except SModelSError as e:
             gotError = e
 
-        errstr = "BSM particle ``non-MET'' has not been defined in databaseParticles.py"
-        self.assertEqual(gotError.args[0], errstr)
+        errstr = "has not been found"
+        self.assertTrue(errstr in gotError.args[0])
+        self.assertTrue('non-MET' in gotError.args[0])
 
     def testgetEffFor(self):
 
@@ -77,21 +81,25 @@ class TxTest(unittest.TestCase):
         gInfo.addInfo('dataId','c000')
         tx = TxName(f,gInfo,gInfo,finalStates)
 
-        self.assertFalse(hasattr(tx._topologyList.getElements()[0], 'mass'))
+        slhafile = './testFiles/slha/lightEWinos.slha'
+        model = Model( BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(inputFile=slhafile,erasePrompt=['spin'])
+        sms = fromString("[[],[]]",finalState = ['C1+','N1'],  model=model)
 
-        el = Element(info="[[[e+]],[]]",finalState = ['HSCP','MET'], model = finalStates)
-        setattr(n1, 'mass', 200*GeV)
-        setattr(c1, 'mass', 150*GeV)
-        el.branches[0].oddParticles = [n1]
-        el.branches[1].oddParticles = [c1]
+        n1 = model.getParticle(label='N1')
+        c1 = model.getParticle(label='C1+')
+        n1.mass = 200.0*GeV
+        c1.mass = 150.0*GeV
+        n1.totalwidth = 0.0*GeV
+        c1.totalwidth = 1e-30*GeV
 
+        smsMatch = tx.hasSMSas(sms)
         #test getting efficiency with mass only
-        self.assertEqual(tx.getEfficiencyFor(el.mass), 0.12396)
+        self.assertAlmostEqual(tx.getEfficiencyFor(smsMatch), 0.12396,3)
 
-        #test getting efficiency with element and reweighted efficiency
-        setattr(n1, 'totalwidth', 0.*GeV)
-        setattr(c1, 'totalwidth', 10**(-17)*GeV)
-        self.assertAlmostEqual(tx.getEfficiencyFor(el), 0.08697,3)
+        #test getting efficiency with SMS and reweighted efficiency
+        c1.totalwidth = 1e-17*GeV
+        self.assertAlmostEqual(tx.getEfficiencyFor(smsMatch), 0.08697,3)
 
     def testGetValueFor(self):
 

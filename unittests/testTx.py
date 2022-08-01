@@ -25,15 +25,14 @@ class TxTest(unittest.TestCase):
         model = Model(BSMList,SMList)
         model.updateParticles(inputFile=slhafile)
         topos = decomposer.decompose(model, .1*fb, False, False, 5.*GeV)
-        for topo in topos:
-            for element in topo.elementList:
-                masses=element.mass
-                # print "e=",element,"masses=",masses
-                mgluino=masses[0][0]
-                mLSP=masses[0][1]
-                self.assertEqual( str(element), "[[[q,q]],[[q,q]]]" )
-                self.assertEqual( int ( mgluino / GeV ), 675 )
-                self.assertEqual( int ( mLSP / GeV ), 200 )
+        self.assertEqual(len(topos),1)
+        self.assertEqual(len(topos.getSMSList()),1)
+        sms = topos.getSMSList()[0]
+        masses = [node.mass for node in sms.nodes if node.isSM is False]
+        self.assertEqual(masses,[675.*GeV,675.*GeV,200.*GeV,200.*GeV])
+        evenParticles = sms.treeToBrackets()[0]
+        evenParticles = str(evenParticles).replace("'","").replace(' ', '')
+        self.assertEqual(evenParticles, "[[[q,q]],[[q,q]]]" )
 
 if __name__ == "__main__":
     unittest.main()
