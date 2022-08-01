@@ -596,11 +596,7 @@ def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
     txnameList = []
     smsList = []
     totalXsec = None
-    massList = []
-    widthList = []
-    PIDList = []
     datasetPredictions = []
-    weights = []
     for predList in dataSetResults:
         if len(predList) != 1:
             raise SModelSError("Results with multiple datasets should have a single theory prediction (EM-type)!")
@@ -608,22 +604,12 @@ def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
         datasetPredictions.append(pred)
         txnameList += pred.txnames
         smsList += pred.smsList
-        if not totalXsec:
+        if totalXsec is None:
             totalXsec = pred.xsection
         else:
             totalXsec += pred.xsection
-        massList.append(pred.mass)
-        widthList.append(pred.totalwidth)
-        weights.append(pred.xsection.asNumber(fb))
-        PIDList += pred.PIDs
 
     txnameList = list(set(txnameList))
-    if None in massList:
-        mass = None
-        totalwidth = None
-    else:
-        mass = average(massList, weights=weights)
-        totalwidth = average(widthList, weights=weights)
 
     # Create a combinedDataSet object:
     combinedDataset = CombinedDataSet(expResult)
@@ -636,9 +622,6 @@ def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
     theoryPrediction.datasetPredictions = datasetPredictions
     theoryPrediction.conditions = None
     theoryPrediction.smsList = smsList
-    theoryPrediction.mass = mass
-    theoryPrediction.totalwidth = totalwidth
-    theoryPrediction.PIDs = [pdg for pdg, _ in itertools.groupby(PIDList)]  # Remove duplicates
 
     return theoryPrediction
 
