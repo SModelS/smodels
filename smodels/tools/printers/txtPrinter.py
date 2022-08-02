@@ -105,16 +105,31 @@ class TxTPrinter(BasicPrinter):
         output += "||" + " "*56 + "||\n"
         output += "  " + "="*56 + "  \n"
 
+        if self.outputFormat == "version2":
+            baseLabel = 'Element'
+        else:
+            baseLabel = 'SMS'
+
         for canonName in obj:
             smsList = obj[canonName]
+            if self.outputFormat == "version2":
+                sms = smsList[0]
+                evenParticles = sms.treeToBrackets()[0]
+                vertnumb = str([len(v) for v in evenParticles[0]])
+                vertnumb += str([len(v) for v in evenParticles[1]])
+                vertnumb = vertnumb.replace(' ','')
+                topoName = vertnumb
+            else:
+                topoName = canonName
+
             output += "===================================================== \n"
-            output += "Topology (%s) \n" %canonName
+            output += "Topology: %s \n" %topoName
             totxsec = smsList[0].weightList
             for sms in smsList[1:]:
                 totxsec += sms.weightList
 
             output += "Total Global topology weight :\n" + totxsec.niceStr() + '\n'
-            output += "Total Number of SMS: " + \
+            output += "Total Number of %s: " %baseLabel + \
                 str(len(smsList)) + '\n'
             if not hasattr(self, 'addsmsinfo') or not self.addsmsinfo:
                 continue
@@ -132,8 +147,9 @@ class TxTPrinter(BasicPrinter):
         """
 
         output = ""
+
         if self.outputFormat == 'version2':
-            output += "\t\t SMS: \n"
+            output += "\t\t Element: \n"
             branchList, finalState, intermediateState = obj.treeToBrackets()
             masses = []
             pidlist = []
@@ -152,7 +168,7 @@ class TxTPrinter(BasicPrinter):
                 masses.append(bMasses)
                 pidlist.append(pids)
 
-            output += "\t\t SMS ID: " + str(obj.smsID)
+            output += "\t\t Element ID: " + str(obj.smsID)
             output += "\n"
             output += "\t\t Particles in element: " + str(branchList).replace("'","").replace(" ","")
             output += "\n"
@@ -207,6 +223,12 @@ class TxTPrinter(BasicPrinter):
         :param obj: A ExpResult object to be printed.
         """
 
+        if self.outputFormat == "version2":
+            baseLabel = 'Elements'
+        else:
+            baseLabel = 'SMS'
+
+
         txnames = []
         for dataset in obj.datasets:
             for txname in dataset.txnameList:
@@ -222,7 +244,7 @@ class TxTPrinter(BasicPrinter):
         output += "Sqrts: %2.2E\n" % obj.globalInfo.sqrts.asNumber(TeV)
         if hasattr(self, "addanainfo") and self.addanainfo:
             output += "\t -----------------------------\n"
-            output += "\t SMS tested by analysis:\n"
+            output += "\t %s tested by analysis:\n" %baseLabel
             listOfSMS = []
             for dataset in obj.datasets:
                 for txname in dataset.txnameList:
@@ -253,6 +275,13 @@ class TxTPrinter(BasicPrinter):
 
         :param obj: A TheoryPredictionList object to be printed.
         """
+
+        if self.outputFormat == "version2":
+            baseLabel = 'Elements'
+        else:
+            baseLabel = 'SMS'
+
+
         slabel = "Theory Predictions and"
         output = ""
         output += "  " + "="*56 + "  \n"
@@ -326,7 +355,7 @@ class TxTPrinter(BasicPrinter):
                 IDList = list(
                     set([sms.smsID for sms in theoryPrediction.smsList]))
                 if IDList:
-                    output += "Contributing SMS: " + str(IDList) + "\n"
+                    output += "Contributing %s: " %baseLabel + str(IDList) + "\n"
 
                 if self.outputFormat == 'version2':
                     smsPIDs = []
@@ -354,6 +383,12 @@ class TxTPrinter(BasicPrinter):
         :param obj: Uncovered object to be printed.
         """
 
+        if self.outputFormat == "version2":
+            baseLabel = 'Element'
+        else:
+            baseLabel = 'SMS'
+
+
         # Number of missing topologies to be printed (ordered by cross sections)
         nprint = 10
 
@@ -378,7 +413,7 @@ class TxTPrinter(BasicPrinter):
                 continue
             output += "%s with the highest cross sections (up to %i):\n" % (
                 description, nprint)
-            output += "Sqrts (TeV)   Weight (fb)                  SMS description\n"
+            output += "Sqrts (TeV)   Weight (fb)                  %s description\n" %baseLabel
             for fsSMS in group.finalStateSMS[:nprint]:
                 if self.outputFormat == 'version2':
                     smsStr = fsSMS.oldStr()
@@ -391,7 +426,7 @@ class TxTPrinter(BasicPrinter):
                     contributing = []
                     for sms in fsSMS._contributingSMS:
                         contributing.append(sms.smsID)
-                    output += "Contributing SMS %s\n" % str(contributing)
+                    output += "Contributing %s %s\n" %(baseLabel,str(contributing))
             output += "================================================================================\n"
         return output
 

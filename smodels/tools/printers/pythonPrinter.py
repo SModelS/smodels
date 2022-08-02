@@ -256,10 +256,10 @@ class PyPrinter(BasicPrinter):
                 for n in theoryPrediction.avgSMS.nodes:
                     if n.isSM or n is theoryPrediction.avgSMS.root:
                         continue
-                    massDict[str(n)] = node.mass.asNumber(GeV)
-                    widthDict[str(n)] = node.totalwidth.asNumber(GeV)
-                mass = massDict
-                widths = widthDict
+                    massDict[str(n)] = n.mass.asNumber(GeV)
+                    widthDict[str(n)] = n.totalwidth.asNumber(GeV)
+                mass = [(k,v) for k,v in massDict.items()]
+                widths = [(k,v) for k,v in widthDict.items()]
 
             sqrts = expResult.globalInfo.sqrts
 
@@ -359,8 +359,9 @@ class PyPrinter(BasicPrinter):
                     smsStr = fsSMS.oldStr()
                     fsSMSDict['element'] = smsStr
                 else:
-                    fsSMSDict['SMS'] = smsStr
                     smsStr = str(fsSMS)
+                    fsSMSDict['SMS'] = smsStr
+
 
                 if hasattr(self, "addsmslist") and self.addsmslist:
                     if self.outputFormat == "version2":
