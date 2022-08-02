@@ -51,7 +51,7 @@ class InclusiveObjectsTest(unittest.TestCase):
 
         stringEl = "(PV > gluino(1)), (gluino(1) > st_1(2),e+), (st_1(2) >e-,mu+,N1)"
         sms1 = fromString(stringEl, model=model)
-        expInc = ExpSMS.from_string('(PV  > Inclusive(1)), (Inclusive(1) > anySM,anyBSM)',model=finalStates)
+        expInc = ExpSMS.from_string('(PV  > Inclusive(1)), (Inclusive(1) > *anySM,anyBSM)',model=finalStates)
 
         self.assertTrue(expInc.matchesTo(sms1) is not None)
 
@@ -164,7 +164,7 @@ class InclusiveObjectsTest(unittest.TestCase):
         smsMatch = tx.hasSMSas(sms)  #newEl should be equal to el, but with opposite branch ordering
         self.assertFalse(smsMatch is None)
         nodes = [str(n) for n in smsMatch.nodes]
-        self.assertEqual(nodes,['PV','Inclusive','C1+'])
+        self.assertEqual(nodes,['PV','C1+','C1+','e+','N1'])
 
 
 if __name__ == "__main__":

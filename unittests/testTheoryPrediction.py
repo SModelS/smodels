@@ -59,22 +59,22 @@ class IntegrationTest(unittest.TestCase):
                 diff = abs ( pred.chi2() - self.predchi2()[expID] ) / self.predchi2()[expID]
                 self.assertTrue ( diff < .1 )
 
-    # def testIntegration(self):
+    def testIntegration(self):
 
-    #     slhafile = '../inputFiles/slha/simplyGluino.slha'
-    #     model = Model(BSMList,SMList)
-    #     model.updateParticles(slhafile)
+        slhafile = '../inputFiles/slha/simplyGluino.slha'
+        model = Model(BSMList,SMList)
+        model.updateParticles(slhafile)
 
-    #     # self.configureLogger()
-    #     smstoplist = decomposer.decompose(model, .1*fb, massCompress=True,
-    #             invisibleCompress=True, minmassgap=5.*GeV)
-    #     listofanalyses = database.getExpResults(
-    #             analysisIDs= [ "ATLAS-SUSY-2013-02", "CMS-SUS-13-012" ],
-    #             txnames = [ "T1" ] )
-    #     if type(listofanalyses) != list:
-    #         listofanalyses= [ listofanalyses]
-    #     for analysis in listofanalyses:
-    #         self.checkAnalysis(analysis,smstoplist)
+        # self.configureLogger()
+        smstoplist = decomposer.decompose(model, .1*fb, massCompress=True,
+                invisibleCompress=True, minmassgap=5.*GeV)
+        listofanalyses = database.getExpResults(
+                analysisIDs= [ "ATLAS-SUSY-2013-02", "CMS-SUS-13-012" ],
+                txnames = [ "T1" ] )
+        if type(listofanalyses) != list:
+            listofanalyses= [ listofanalyses]
+        for analysis in listofanalyses:
+            self.checkAnalysis(analysis,smstoplist)
 
     def checkPrediction(self,slhafile,expID,expectedValues, datasetID):
 
@@ -106,15 +106,15 @@ class IntegrationTest(unittest.TestCase):
         expValue = [0.0743]
         self.checkPrediction(slhafile, expID, expValue, datasetID)
 
-        # #Test displaced case:
-        # slhafile = './testFiles/slha/hscpTest_mid.slha'
-        # expValue = [9.18e-7]
-        # self.checkPrediction(slhafile, expID, expValue, datasetID)
+        #Test displaced case:
+        slhafile = './testFiles/slha/hscpTest_mid.slha'
+        expValue = [9.18e-7]
+        self.checkPrediction(slhafile, expID, expValue, datasetID)
 
-        # #Test short-lived case:
-        # slhafile = './testFiles/slha/hscpTest_short.slha'
-        # expValue = [5.335e-09]
-        # self.checkPrediction(slhafile, expID, expValue, datasetID)
+        #Test short-lived case:
+        slhafile = './testFiles/slha/hscpTest_short.slha'
+        expValue = [5.335e-09]
+        self.checkPrediction(slhafile, expID, expValue, datasetID)
 
 if __name__ == "__main__":
     unittest.main()

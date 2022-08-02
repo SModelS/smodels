@@ -194,7 +194,7 @@ class ExpResult(object):
     """
 
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
-                         txname=None, mass=None, compute=False):
+                         txname=None, sms=None, compute=False):
         """
         Computes the 95% upper limit (UL) on the signal cross section according
         to the type of result.
@@ -209,7 +209,7 @@ class ExpResult(object):
         :param expected: Compute expected limit, i.e. Nobserved = NexpectedBG
                          (only for efficiency-map results)
         :param txname: TxName object or txname string (only for UL-type results)
-        :param mass: Mass array with units (only for UL-type results)
+        :param sms: SMS object
         :param compute: If True, the upper limit will be computed
                         from expected and observed number of events.
                         If False, the value listed in the database will be used
@@ -219,7 +219,7 @@ class ExpResult(object):
 
         dataset = self.getDataset(dataID)
         if dataset:
-            upperLimit = dataset.getUpperLimitFor(element=mass, expected=expected,
+            upperLimit = dataset.getUpperLimitFor(sms=sms, expected=expected,
                                                   txnames=txname,
                                                   compute=compute, alpha=alpha)
             return upperLimit

@@ -329,11 +329,6 @@ class ExpSMS(GenericSMS):
 
 
         # Check if the match was successful.
-        # Consider a successful match if all nodes in daughters1 were matched
-        # or if all nodes in daughers2 were matched and the unmatched nodes
-        # in daughters1 match an InclusiveNode.
-        matched = False
-        # Matched left nodes:
         left_matches = len(set(mapDict.keys()))
         right_matches = len(set(mapDict.values()))
         if left_matches != len(left_nodes):

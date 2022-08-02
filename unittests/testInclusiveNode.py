@@ -32,24 +32,25 @@ class InclusiveNodeTest(unittest.TestCase):
         stringEl = "[ [ ['L','nu'] ], ['*'] ]"
         output = bracketToProcessStr(stringEl)
         self.assertEqual(output.replace(" ",""),
-                         "(PV>anyBSM(1),InclusiveNode(2)),(anyBSM(1)>L,nu,MET),(InclusiveNode(2)>anySM,MET)")
+                         "(PV>anyBSM(1),InclusiveNode(2)),(anyBSM(1)>L,nu,MET),(InclusiveNode(2)>*anySM,MET)")
         stringEl = "[ [['*'],['e+']], [ ['L','nu'] ] ]"
         output2 = bracketToProcessStr(stringEl)
         self.assertEqual(output2,"(PV > anyBSM(1),anyBSM(3)),(anyBSM(1) > anySM,anyBSM(2)),(anyBSM(2) > e+,MET),(anyBSM(3) > L,nu,MET)")
 
         stringEl = "[ ['*'], [ ['L','nu'] ] ]"
         output = bracketToProcessStr(stringEl)
-        self.assertEqual(output,"(PV > InclusiveNode(1),anyBSM(2)),(InclusiveNode(1) > anySM,MET),(anyBSM(2) > L,nu,MET)")
+        self.assertEqual(output,"(PV > InclusiveNode(1),anyBSM(2)),(InclusiveNode(1) > *anySM,MET),(anyBSM(2) > L,nu,MET)")
 
     def testGraph(self):
 
         stringEl = "[ [ ['L','nu'] ], ['*'] ]"
         T = ExpSMS.from_string(stringEl,model=finalStates)
         nodes = [str(n) for n in T.nodes]
-        self.assertEqual(nodes,['PV', 'anyBSM', 'Inclusive', 'L', 'nu', 'MET'])
-        edges = [(str(edge[0]),str(edge[1])) for edge in T.edges]
-        self.assertEqual(edges,[('PV', 'anyBSM'), ('PV', 'Inclusive'),
-                                ('anyBSM', 'L'), ('anyBSM', 'nu'), ('anyBSM', 'MET')])
+        self.assertEqual(nodes,['PV', 'anyBSM', 'Inclusive', 'L', 'nu', 'MET','*anySM','MET'])
+        edges = sorted([(str(edge[0]),str(edge[1])) for edge in T.edges])
+        self.assertEqual(edges,sorted([('PV', 'anyBSM'), ('PV', 'Inclusive'),
+                                       ('Inclusive','*anySM'), ('Inclusive','MET'),
+                                       ('anyBSM', 'L'), ('anyBSM', 'nu'), ('anyBSM', 'MET')]))
 
         stringEl = "[ [['*'],['e+']], [ ['L','nu'] ] ]"
         output2 = bracketToProcessStr(stringEl)
@@ -68,7 +69,7 @@ class InclusiveNodeTest(unittest.TestCase):
         stringEl = "[ [ ['L','nu'] ], ['*'] ]"
         T = ExpSMS.from_string(stringEl,model=finalStates)
         cNamesDict = {'PV' : InclusiveValue(),'anyBSM' : 11010100, 'Inclusive': InclusiveValue(),
-                        'L' : 10, 'nu' : 10, 'MET': 10}
+                        'L' : 10, 'nu' : 10, 'MET': 10, '*anySM' : InclusiveValue()}
         for nodeIndex in T.nodeIndices:
             node = T.indexToNode(nodeIndex)
             cname = T.nodeCanonName(nodeIndex)
@@ -93,20 +94,33 @@ class InclusiveNodeTest(unittest.TestCase):
                             finalState=['N1','C2+'])
 
         matchedEl = treeB.matchesTo(treeA)
+        for nodeIndex,node in zip(treeB.nodeIndices,treeB.nodes):
+            self.assertEqual(node,matchedEl.indexToNode(nodeIndex))
+
+        nodesDict = {0 : 'PV', 1 : 'N2', 2 : 'C1-', 3 : 'ta-', 4 : 'N1', 5 : 'e-', 6 : 'nu', 7 : 'N1'}
+        for nodeIndex,nodeStr in nodesDict.items():
+            self.assertEqual(str(matchedEl.indexToNode(nodeIndex)),nodeStr)
+
         nodes = [str(n) for n in matchedEl.nodes]
-        self.assertEqual(nodes,['PV', 'Inclusive', 'C1-', 'e-', 'nu', 'N1'])
+        self.assertEqual(nodes,['PV', 'N2', 'C1-', 'ta-', 'N1', 'e-', 'nu', 'N1', 'gluino', 'q', 'q', 'ta+'])
         edges = [(str(edge[0]),str(edge[1])) for edge in matchedEl.edges]
-        self.assertEqual(edges,[('PV', 'Inclusive'), ('PV', 'C1-'),
-                                ('C1-', 'e-'), ('C1-', 'nu'), ('C1-', 'N1')])
+        self.assertEqual(edges,[('PV', 'N2'), ('PV', 'C1-'), ('N2','ta-'),
+                                ('N2','gluino'), ('N2','ta+'), ('C1-', 'e-'), ('C1-', 'nu'), ('C1-', 'N1'),
+                                ('gluino','N1'), ('gluino','q'),('gluino','q')])
 
         self.assertTrue(treeB.matchesTo(treeC) is None)
 
-        mass = [None, None, 1.34E+02, 5.00E-04, 0.00E+00, 6.81E+01]
-        for im,m in enumerate(matchedEl.mass):
-            if m is None:
-                self.assertEqual(m,mass[im])
-            else:
-                self.assertEqual(float('%1.2e' %(m.asNumber(GeV))),mass[im])
+        n2 = model.getParticle(label='N2')
+        n1 = model.getParticle(label='N1')
+        c1 = model.getParticle(label='C1-')
+        mass = {1 : n2.mass, 2 : c1.mass, 4 : n1.mass, 7 : n1.mass}
+        for nodeIndex in treeB.nodeIndices:
+            node = matchedEl.indexToNode(nodeIndex)
+            if node.isSM:
+                continue
+            m = float('%1.2e' %(node.mass.asNumber(GeV)))
+            m_default = float('%1.2e' %(mass[nodeIndex].asNumber(GeV)))
+            self.assertEqual(m,m_default)
 
 
         stringEl = "[ [['*','t-']], [ ['L','nu'] ] ]"
