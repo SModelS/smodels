@@ -61,6 +61,7 @@ class ExpSMS(GenericSMS):
         else:
             raise SModelSError("Could not recognize string format for element (%s)" % stringSMS)
 
+
         decays = procString.replace(" ", "").split("),(")
         decays[0] = decays[0][1:]  # Remove trailing parenthesis
         decays[-1] = decays[-1][:-1]  # Remove remaining parenthesis
@@ -116,16 +117,9 @@ class ExpSMS(GenericSMS):
         nodesObjDict = {}
         for ptcStr in nodesDict:
             # Check for inclusive node
-            # (in this case, the daughters have to be included as final states of the node)
             label = ptcStr.split('(')[0]
             if label.lower() == 'inclusive' or label.lower() == 'inclusivenode':
                 node = InclusiveParticleNode()
-                daughters = []
-                if ptcStr in sortedSuccessors:
-                    daughters = [dStr.split('(')[0]
-                                 for dStr in sortedSuccessors[ptcStr]]
-                daughters= [model.getParticle(label=d) for d in daughters[:]]
-                node.finalStates = sorted(daughters)
             else:
                 # Check for inclusive lists:
                 inclusiveList = False
@@ -138,19 +132,6 @@ class ExpSMS(GenericSMS):
 
             # Change key from node index to node object
             nodesObjDict[ptcStr] = node
-
-        # Remove daughters from inclusiveNodes from dicts:
-        for ptcStr in nodesDict:
-            label = ptcStr.split('(')[0]
-            if label.lower() != 'inclusivenode' and label.lower() != 'inclusive':
-                continue
-            if ptcStr not in sortedSuccessors:
-                continue
-            daughters = sortedSuccessors[ptcStr]
-            for dStr in daughters:
-                if dStr in nodesObjDict:
-                    nodesObjDict.pop(dStr)
-            sortedSuccessors[ptcStr] = []
 
         # Create SMS, add all unstable nodes following the sorted order
         # and keep track of generated indices
@@ -206,38 +187,39 @@ class ExpSMS(GenericSMS):
             raise SModelSError("Can not compare ExpSMS and %s" %str(type(other)))
 
         mapDict = self.computeMatchingDict(other,self.rootIndex,
-                                    other.rootIndex)
+                                           other.rootIndex)
 
         if mapDict is None:
             return None
 
 
-        # Remove unmatched nodes (which happens in case of InclusiveNodes)
-        match = {n1 : n2 for n1, n2 in mapDict.items() if n2 is not None}
+        # Invert mapping dictionary {self -> other} -> {other -> self}
+        # following the ordering of self
+        invMapDict = OrderedDict()
+        for n1 in self.nodeIndices:
+            n2 = mapDict[n1]
+            # For inclusiveLists, set the firt match
+            if isinstance(n2,dict):
+                n2 = list(n2.keys())[0]
+            # If there were missing matches, skip
+            if n2 is None:
+                continue
+            invMapDict[n2] = n1
 
-        # Create nodes dict with nodes from self:
-        nodesDict = {n1 : node for n1,node in zip(self.nodeIndices,self.nodes)}
 
-        # Replace relevant nodes with nodes from other:
-        for n1, n2 in match.items():
-            node1 = self.indexToNode(n1) # Node from self
-            if node1.isInclusive or node1.inclusiveList:
-                continue  # Keep node from self
-            else:
-                node2 = other.indexToNode(n2)  # Node from other
-                nodesDict[n1] = node2  # index from self
+        # Get max node number from self
+        maxNode = max(invMapDict.values())
+        # Get unmatched nodes from other (in case of InclusiveNodes or InclusiveLists)
+        missingNodes = set(other.nodeIndices).difference(set(invMapDict.keys()))
+        # Add missing nodes to invMapDict:
+        for n2 in missingNodes:
+            maxNode += 1
+            invMapDict[n2] = maxNode
 
         # Make a new tree from other
-        matchedTree = other.copy(emptyNodes=True)
-        # Copy tree structure (node indices, node order,....)
-        # from self to other and use nodesDict to set the
-        # corresponding node objects
-        matchedTree.copyTreeFrom(self,nodesDict)
-
-        # Remove missing nodes (in case there are inclusive matchings)
-        for n1 in matchedTree.nodeIndices:
-            if n1 not in match:
-                matchedTree.remove_node(n1)
+        matchedTree = other.copy()
+        # Relabel nodes following the numbering and ordering of self:
+        matchedTree.relabelNodeIndices(invMapDict)
 
         return matchedTree
 
@@ -277,29 +259,19 @@ class ExpSMS(GenericSMS):
         if node1 != node2:
             return None
 
-        # In the case of inclusive nodes, compare final states:
-        if node1.isInclusive:
-            n2FinalStates = other.getFinalStates(n2)
-            equalFS = node1.equalFinalStates(n2FinalStates)
-            if not equalFS:
-                return None
-        elif node2.isInclusive:
-            n1FinalStates = self.getFinalStates(n1)
-            equalFS = node2.equalFinalStates(n1FinalStates)
-            if not equalFS:
-                return None
-
-        # For inclusive nodes always return True
-        #(once final states are equal)
-        if node1.isInclusive or node2.isInclusive:
-            # print('  equal nodes (inclusive)')
-            return {n1: n2}
-
         # Check for equality of daughters
-        daughters1 = self.daughterIndices(n1)
-        daughters2 = other.daughterIndices(n2)
+        # In the case of inclusive nodes, jump to final states:
+        if node1.isInclusive:
+            daughters2 = other.getFinalStates(n2)
+        else:
+            daughters2 = other.daughterIndices(n2)
+
+        if node2.isInclusive:
+            daughters1 = self.getFinalStates(n1)
+        else:
+            daughters1 = self.daughterIndices(n1)
+
         if len(daughters1) == len(daughters2) == 0:
-            # print('  equal nodes (leaf)')
             return {n1: n2}
 
 

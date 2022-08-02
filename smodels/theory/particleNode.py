@@ -170,18 +170,12 @@ class InclusiveParticleNode(ParticleNode):
     An inclusive ParticleNode class. It will return True when compared to any other ParticleNode object or InclusiveParticleNode object.
 
     :ivar particle: IncluviseParticle (dummy)
-    :ivar finalStates: Allowed final states (final state nodes)
     """
 
-    def __init__(self, particle=IncluviseParticle,
-                 finalStates=[]):
+    def __init__(self, particle=IncluviseParticle):
 
         ParticleNode.__init__(self, particle=particle,
-                              isFinalState=True,
                               isInclusive=True)
-
-        # Store the final states for the inclusive node
-        self.finalStates = sorted(finalStates)
 
     def compareTo(self, other):
         """
@@ -194,26 +188,6 @@ class InclusiveParticleNode(ParticleNode):
 
         return 0
 
-    def equalFinalStates(self,otherFinalStates):
-        """
-        Compares only the finalStates of self to otherFinalStates.
-        All the final states in other have to match at least one final
-        state in self.
-
-        :param otherFinalStates: List of particle objects
-
-        :return: True if all the particles in otherFinalStates match
-                 at least one particle in self.finalStates.
-        """
-
-        fsOther = otherFinalStates
-        for fs in fsOther:
-            if not any(fs == fsB for fsB in self.finalStates):
-                return False
-
-        return True
-
-
     def copy(self):
         """
         Makes a shallow copy of itself. The particle attribute
@@ -221,24 +195,9 @@ class InclusiveParticleNode(ParticleNode):
         :return: ParticleNode object
         """
 
-        newNode = InclusiveParticleNode(particle=self.particle,
-                                        finalStates=self.finalStates[:])
+        newNode = InclusiveParticleNode(particle=self.particle)
 
         return newNode
-
-    def longStr(self):
-        """
-        Returns a string representation of self containing
-        its final states.
-
-        :return: String
-        """
-
-        nodeStr = str(self)
-        if self.finalStates:
-            fStates = [str(ptc) for ptc in self.finalStates]
-            nodeStr += '\n(%s)' % (','.join(fStates))
-        return nodeStr
 
     def __getattr__(self, attr):
         """

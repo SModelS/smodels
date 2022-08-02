@@ -378,7 +378,7 @@ def bracketToProcessStr(stringSMS, finalState=None, intermediateState=None):
             iptc = bsmIndices[ibr][ibsm]
             mom = bsm+'(%i)' % iptc
             if bsm == 'InclusiveNode':
-                smDaughters = 'anySM'
+                smDaughters = '*anySM'
             else:
                 smDaughters = ','.join(br[ibsm])
             bsmDaughter = bsmStates[ibr][ibsm+1]
