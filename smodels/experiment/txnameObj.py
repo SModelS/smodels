@@ -522,11 +522,9 @@ class TxName(object):
         # Get a nested array of nodes corresponding to the data point:
         nodeArray = []
 
-        for nodeIndex in tree.dfsIndexIterator(nodeIndex=tree.rootIndex):
+        for nodeIndex in tree.dfsIndexIterator(nodeIndex=tree.rootIndex,ignoreInclusiveNodes=True):
             # Convert to node objects:
             node = tree.indexToNode(nodeIndex)
-            if node.isInclusive or node.inclusiveList:
-                continue
             if node.isSM:
                 continue
             nodeArray.append((node,nodeIndex))
@@ -642,9 +640,6 @@ class TxName(object):
             node = tree.indexToNode(nodeIndex)
             if node.isSM:
                 continue  # Ignore SM particles
-
-            if node.isInclusive or node.inclusiveList:
-                continue  # Ignore inclusive nodes
 
             if tree.out_degree(nodeIndex) != 0:
                 unstableWidths.append(node.totalwidth)

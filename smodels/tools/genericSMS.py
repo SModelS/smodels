@@ -230,25 +230,32 @@ class GenericSMS(object):
         else:
             raise SModelSError("Can not convert object of type %s to nodes" %str(type(nodeIndex)))
 
-    def daughterIndices(self, nodeIndex):
+    def daughterIndices(self, nodeIndex, ignoreInclusiveNodes=False):
         """
         Returns the list of node indices corresponding to the
         daughters of nodeIndex.
 
         :param nodeIndex: Parent node index
+        :param ignoreInclusiveNodes: If True, skips inclusive nodes
         """
 
-        return self._successors[nodeIndex]
+        daughters = self._successors[nodeIndex]
+        if ignoreInclusiveNodes:
+            daughters = [d for d in daughters[:]
+                         if not self.indexToNode(d).isInclusive]
 
-    def daughters(self, nodeIndex):
+        return daughters
+
+    def daughters(self, nodeIndex,  ignoreInclusiveNodes=False):
         """
         Returns the list of node objects corresponding to the
         daughters of nodeIndex.
 
         :param nodeIndex: Parent node index
+        :param ignoreInclusiveNodes: If True, it skips inclusive nodes
         """
 
-        daughterIndices = self.daughterIndices(nodeIndex)
+        daughterIndices = self.daughterIndices(nodeIndex, ignoreInclusiveNodes)
         daughters = self.indexToNode(daughterIndices)
 
         return daughters
@@ -469,7 +476,8 @@ class GenericSMS(object):
 
         return len(self.nodeIndices)
 
-    def genIndexIterator(self, nodeIndex=None, includeLeaves=False):
+    def genIndexIterator(self, nodeIndex=None,
+                         includeLeaves=False, ignoreInclusiveNodes=False):
         """
         Returns an iterator over the generations (mother and its daughters)
         of node indices starting at nodeIndex using a breadth first search.
@@ -477,6 +485,7 @@ class GenericSMS(object):
         :param nodeIndex: Node index from tree. If None, starts at tree root.
         :param includeLeaves: If True, it will consider the leaves (undecayed nodes)
                               as moms in the iterator (with an empty daughters list)
+        :param ignoreInclusiveNodes: If True, it skip inclusive nodes and its descendents.
 
         :return: Iterator over nodes.
         """
@@ -485,7 +494,12 @@ class GenericSMS(object):
             nodeIndex = self.rootIndex
 
         mom = nodeIndex
-        daughters = self.daughterIndices(mom)
+        if ignoreInclusiveNodes:
+            if self.indexToNode(mom).isInclusive:
+                return []
+
+        daughters = self.daughterIndices(mom,ignoreInclusiveNodes)
+
         generation = [(mom, daughters)]
         while generation:
             for pair in generation:
@@ -496,18 +510,20 @@ class GenericSMS(object):
                 for new_mom in daughters:
                     if new_mom not in self.nodeIndices:
                         continue
-                    new_daughters = self.daughterIndices(new_mom)
+                    new_daughters = self.daughterIndices(new_mom,ignoreInclusiveNodes)
+
                     if new_daughters or includeLeaves:
                         next_generation.append((new_mom, new_daughters))
             generation = next_generation
 
-    def dfsIndexIterator(self, nodeIndex=None):
+    def dfsIndexIterator(self, nodeIndex=None, ignoreInclusiveNodes=False):
         """
         Iterates over the node indices following a depth-first traversal of the tree
         starting at nodeIndex. If nodeIndex is None, include all nodes.
 
         :param nodeIndex: Node index to which start the iterator
                           (the corresponding node is NOT included in the iterator)
+        :param ignoreInclusiveNodes: If True, it skip inclusive nodes and its descendents.
 
         :return: Iterator over node indices
         """
@@ -516,7 +532,7 @@ class GenericSMS(object):
             nodeIndex = self.rootIndex
             yield self.rootIndex
 
-        nodes = self.daughterIndices(nodeIndex)
+        nodes = self.daughterIndices(nodeIndex,ignoreInclusiveNodes)
 
         visited = set()   # Store visited nodes
         depth_limit = len(nodes)
@@ -526,7 +542,8 @@ class GenericSMS(object):
                 continue
             yield node
             visited.add(node)
-            daughters = [iter(self.daughterIndices(node))]
+            daughters = [iter(self.daughterIndices(node,
+                                                   ignoreInclusiveNodes))]
             while daughters:
                 last_children = daughters[-1]  # Get the last added children
                 try:
@@ -535,7 +552,8 @@ class GenericSMS(object):
                         yield child
                         visited.add(child)
                         # Add daughters of child
-                        daughters.append(iter(self.daughterIndices(child)))
+                        daughters.append(iter(self.daughterIndices(child,
+                                                                   ignoreInclusiveNodes)))
                 except StopIteration:
                     # All the children have been visited, remove from list
                     daughters.pop()
@@ -548,17 +566,42 @@ class GenericSMS(object):
         :param numberNodes: If True, renumber the nodes according to their bfs order
         """
 
-        new_successors = OrderedDict()
-        indexDict = {}
-        newIndex = 0
-        for mom, daughters in self.genIndexIterator(includeLeaves=True):
-            indexDict[mom] = newIndex
-            newIndex += 1
-            new_successors[mom] = daughters
+        orderedList = []
+        for nodeIndex, _ in self.genIndexIterator(includeLeaves=True):
+            orderedList.append(nodeIndex)
 
-        self._successors = new_successors
+        # Sort according to the bfs order
+        self.sortAccordingTo(orderedList)
+
+        # Re-number nodes according to their order
         if numberNodes:
+            indexDict = {n : orderedList.index(n) for n in self.nodeIndices}
             self.relabelNodeIndices(nodeIndexDict=indexDict)
+
+    def sortAccordingTo(self,indicesList):
+        """
+        Sort the nodes according to their order in indicesList.
+
+        :param indicesList: List of node indices used to sort the nodes.
+        """
+
+        newSuccessors = OrderedDict()
+        indices = self.nodeIndices
+        sortList = indicesList[:]
+        # Indices not present in indicesList are left
+        # put at the end of the list
+        for nodeIndex in indices:
+            if nodeIndex not in sortList:
+                sortList.append(nodeIndex)
+
+        sortedIndices = sorted(indices, key = lambda n: sortList.index(n))
+        # Go over sorted indices and create new successors dict
+        for nodeIndex in sortedIndices:
+            daughters = self.daughterIndices(nodeIndex)
+            # Sort daughters according to the list
+            sortedDaughters = sorted(daughters, key = lambda n: sortList.index(n))
+            newSuccessors[nodeIndex] = sortedDaughters[:]
+        self._successors = newSuccessors
 
     def copyTreeFrom(self, other, nodesObjDict):
         """

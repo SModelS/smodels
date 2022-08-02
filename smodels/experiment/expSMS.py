@@ -197,13 +197,12 @@ class ExpSMS(GenericSMS):
         # following the ordering of self
         invMapDict = OrderedDict()
         for n1 in self.nodeIndices:
+            if not n1 in mapDict:  # For InclusiveNodes the match is partial
+                continue
             n2 = mapDict[n1]
             # For inclusiveLists, set the firt match
             if isinstance(n2,dict):
                 n2 = list(n2.keys())[0]
-            # If there were missing matches, skip
-            if n2 is None:
-                continue
             invMapDict[n2] = n1
 
 
@@ -220,6 +219,9 @@ class ExpSMS(GenericSMS):
         matchedTree = other.copy()
         # Relabel nodes following the numbering and ordering of self:
         matchedTree.relabelNodeIndices(invMapDict)
+        # Sort according to node order from self:
+        nodesOrder = self.nodeIndices
+        matchedTree.sortAccordingTo(nodesOrder)
 
         return matchedTree
 
@@ -295,7 +297,7 @@ class ExpSMS(GenericSMS):
         # Remove nodes and edges for inclusiveList nodes
         # and add them to the final map
         finalMap = {}
-        for d1 in daughters1[:]:
+        for d1 in left_nodes[:]:
             if not self.indexToNode(d1).inclusiveList:
                 continue
             if not d1 in edges:
@@ -304,6 +306,15 @@ class ExpSMS(GenericSMS):
             for d2 in edges[d1]:
                 right_nodes.remove(d2)
             finalMap[d1] = edges.pop(d1)
+
+        for d2 in right_nodes[:]:
+            if not other.indexToNode(d2).inclusiveList:
+                continue
+            right_nodes.remove(d2)
+            for d1 in list(edges.keys()):
+                if d2 in edges[d1]:
+                    left_nodes.remove(d1)
+                    finalMap[d1] = edges.pop(d1)
 
 
         # print('Left=',left_nodes)
