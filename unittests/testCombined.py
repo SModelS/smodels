@@ -15,7 +15,7 @@ sys.path.insert(0, "../")
 import unittest
 from unitTestHelpers import equalObjs, runMain, importModule
 from smodels.tools.smodelsLogging import logger, setLogLevel
-
+setLogLevel('debug')
 
 class CombinedTest(unittest.TestCase):
 

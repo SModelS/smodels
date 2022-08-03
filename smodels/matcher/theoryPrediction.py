@@ -152,9 +152,6 @@ class TheoryPrediction(object):
                     srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
                 self.cachedObjs[expected]["UL"] = getCombinedUpperLimitFor(self.dataset, srNsigs, expected=expected, deltas_rel=self.deltas_rel)
 
-        #  Return the expected or observed UL:
-        #  if not self.cachedObjs[expected]["UL"]:
-        #     self.cachedObjs[expected]["UL"]=None
         return self.cachedObjs[expected]["UL"]
 
     def getRValue(self, expected=False):
@@ -618,6 +615,7 @@ def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
     theoryPrediction = TheoryPrediction(marginalize)
     theoryPrediction.dataset = combinedDataset
     theoryPrediction.txnames = txnameList
+    theoryPrediction.avgSMS = None
     theoryPrediction.xsection = totalXsec
     theoryPrediction.datasetPredictions = datasetPredictions
     theoryPrediction.conditions = None

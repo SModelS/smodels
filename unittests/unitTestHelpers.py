@@ -42,7 +42,6 @@ def canonNameToVertNumb(topoDict,cName):
 
     return vertnumb
 
-
 def theorySMSFromString(stringEl,model,prodXSec = 1.0*fb,
                               maxWeight = 1.0*fb, intermediateState=None,
                               finalState=None):
@@ -151,7 +150,6 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
             return False
     return True
 
-
 def importModule(filename):
     """ import a module, but giving the filename """
     if sys.version_info[0] == 2:
@@ -166,8 +164,12 @@ def importModule(filename):
     spec = importlib.util.spec_from_file_location("output", filename)
     output_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(output_module)
-    return output_module.smodelsOutput
+    try:
+        output = output_module.smodelsOutput
+    except AttributeError:
+        output = output_module.smodelsOutputDefault
 
+    return output
 
 def runMain(filename, timeout=0, suppressStdout=True, development=False,
             inifile="testParameters.ini", overridedatabase=None):

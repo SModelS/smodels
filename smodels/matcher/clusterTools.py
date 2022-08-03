@@ -472,7 +472,7 @@ def groupSMS(smsList, dataset):
             raise SModelSError("Trying to cluster SMS outside the grid.")
 
     # Group SMS if they have the same UL
-    # and give the same average SMS (same mass and same width)
+    # and give the same average SMS (same BSM attributes)
     avgSMSList = []
     for iA, smsA in enumerate(smsList):
         avgSMS = AverageSMS([smsA])

@@ -235,10 +235,13 @@ class PyPrinter(BasicPrinter):
                     return (round(x[0].asNumber(GeV), 2), x[1].asNumber(GeV))
                 return round(x.asNumber(GeV), 2)
 
-            if self.outputFormat == "version2":
+            avgSMS = theoryPrediction.avgSMS
+            if avgSMS is None:  # There is no commong topology
+                mass = None
+                widths = None
+            elif self.outputFormat == "version2":
                 mass = []
                 widths = []
-                avgSMS = theoryPrediction.avgSMS
                 for dIndex in avgSMS.daughterIndices(avgSMS.rootIndex):
                     daughter = avgSMS.indexToNode(dIndex)
                     mass.append([daughter.mass.asNumber(GeV)])
