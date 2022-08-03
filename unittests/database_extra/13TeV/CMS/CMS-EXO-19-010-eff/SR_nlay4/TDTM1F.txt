@@ -1,5 +1,5 @@
 txName: TDTM1F
-constraint: [['*'],['*']]
+constraint: {(PV > C1+(1),C1-(2)), (C1+(1) > *anySM,MET), (C1-(2) > *anySM,MET)}
 condition: None
 conditionDescription: None
 susyProcess: pp --> chargino^pm_1 chargino^mp_1, chargino^pm_1 --> pion^pm lsp
@@ -9,8 +9,6 @@ source: CMS
 validated: True
 axes: [[(x, y), x - 1.5], [(x, y), x - 1.5]]; [[(x, y), x], [(x, y), x]]
 validationTarball: TDTM1M2F.tar.gz
-finalState: ['MET', 'MET']
-intermediateState: [['C1+'], ['C1-']]
 efficiencyMap: [[[[(1.0000E+02*GeV,1.9733E-18*GeV),1.0000E+02*GeV],[(1.0000E+02*GeV,1.9733E-18*GeV),1.0000E+02*GeV]],1.0318e-05],
 [[[(2.0000E+02*GeV,1.9733E-18*GeV),2.0000E+02*GeV],[(2.0000E+02*GeV,1.9733E-18*GeV),2.0000E+02*GeV]],1.2614e-05],
 [[[(3.0000E+02*GeV,1.9733E-18*GeV),3.0000E+02*GeV],[(3.0000E+02*GeV,1.9733E-18*GeV),3.0000E+02*GeV]],5.5447e-05],
