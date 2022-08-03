@@ -107,8 +107,9 @@ class AverageSMS(TheorySMS):
         if not isinstance(other, TheorySMS):
             return -1
 
-        otherProperties = [getattr(other, attr) for attr in self.properties]
-        selfProperties = [getattr(self, attr) for attr in self.properties]
+        otherProperties = [other.getBSMattr(attr) for attr in self.properties]
+        selfProperties = [self.getBSMattr(attr) for attr in self.properties]
+
         comp = (selfProperties > otherProperties) - (otherProperties > selfProperties)
 
         return comp
