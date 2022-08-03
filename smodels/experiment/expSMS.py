@@ -263,15 +263,15 @@ class ExpSMS(GenericSMS):
 
         # Check for equality of daughters
         # In the case of inclusive nodes, jump to final states:
-        if node1.isInclusive:
+        if node1.isInclusive or node2.isInclusive:
+            daughters1 = self.getFinalStates(n1)
             daughters2 = other.getFinalStates(n2)
         else:
+            daughters1 = self.daughterIndices(n1)
             daughters2 = other.daughterIndices(n2)
 
-        if node2.isInclusive:
-            daughters1 = self.getFinalStates(n1)
-        else:
-            daughters1 = self.daughterIndices(n1)
+        # print('daughters1 = ',list(zip(daughters1,self.indexToNode(daughters1))))
+        # print('daughters2 = ',list(zip(daughters2,other.indexToNode(daughters2))))
 
         if len(daughters1) == len(daughters2) == 0:
             return {n1: n2}
@@ -290,19 +290,20 @@ class ExpSMS(GenericSMS):
                     edges[d1].update({d2: mapDict})
 
             # If node had no matches (was not added to the graph),
-            # we already know n1 and n2 differs
+            # and it is not an inclusiveList, we already know n1 and n2 differs
             if d1 not in edges:
-                return None
+                if not self.indexToNode(d1).inclusiveList:
+                    return None
 
-        # Remove nodes and edges for inclusiveList nodes
+        # Remove nodes and edges from inclusiveList nodes
         # and add them to the final map
         finalMap = {}
         for d1 in left_nodes[:]:
             if not self.indexToNode(d1).inclusiveList:
                 continue
+            left_nodes.remove(d1)
             if not d1 in edges:
                 continue
-            left_nodes.remove(d1)
             for d2 in edges[d1]:
                 right_nodes.remove(d2)
             finalMap[d1] = edges.pop(d1)
@@ -320,6 +321,11 @@ class ExpSMS(GenericSMS):
         # print('Left=',left_nodes)
         # print('Right=',right_nodes)
         # print('edges=',edges)
+
+        # If number of left and right nodes do not match,
+        # there will be no full matching:
+        if len(left_nodes) != len(right_nodes):
+            return None
         # Compute the maximal matching
         # (mapping where each node1 is connected to a single node2)
         mapDict = maximal_matching(left_nodes, right_nodes, edges)

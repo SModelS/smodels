@@ -57,10 +57,11 @@ class UpperLimitTest(unittest.TestCase):
         txname = expRes.getTxNames()[0]
         smsMatch = txname.hasSMSas(sms)
 
-        ul = expRes.getUpperLimitFor (txname= "T6bbWW", sms=sms )
+        ul = expRes.getUpperLimitFor (txname= "T6bbWW", sms=smsMatch )
         self.assertTrue( ul is None )
  
     def testCascadeDecay(self):
+
         expRes=database.getExpResults(analysisIDs = [ "ATLAS-SUSY-2013-05" ],
                     datasetIDs= [ None ] , txnames= [ "T6bbWW" ] )[0]
 
@@ -77,7 +78,7 @@ class UpperLimitTest(unittest.TestCase):
         smsMatch = txname.hasSMSas(sms)
 
 
-        ul = expRes[0].getUpperLimitFor (txname= "T6bbWW",sms=sms).asNumber(pb)
+        ul = expRes.getUpperLimitFor(txname= "T6bbWW",sms=smsMatch).asNumber(pb)
         self.assertAlmostEqual( ul, 324.682 )
 
 if __name__ == "__main__":
