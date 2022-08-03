@@ -9,7 +9,7 @@ import pyslha
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import GeV
 from smodels.theory import lheReader, crossSection
-from smodels.theory.particle import Particle, MultiParticle, ParticleList
+from smodels.theory.particle import Particle, MultiParticle
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 
 
@@ -424,7 +424,3 @@ class Model(object):
             if isinstance(p, MultiParticle):
                 for ptc in p.particles:
                     p._comp[ptc._id] = 0
-
-        #  Reset particle equality from all particle lists:
-        for pL in ParticleList.getinstances():
-            pL._comp = {pL._id: 0}
