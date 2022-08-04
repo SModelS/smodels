@@ -47,16 +47,16 @@ smDefault = [WList, lList, tList, taList, nuList, jetList]
 factorsDefault = {}
 for key in filtersDefault:
     if 'prompt' in key.lower():
-        factorsDefault[key] = lambda el: reweightFactorFor(el, 'prompt')
+        factorsDefault[key] = lambda sms: reweightFactorFor(sms, 'prompt')
     elif 'displaced' in key.lower():
-        factorsDefault[key] = lambda el: reweightFactorFor(el, 'displaced')
+        factorsDefault[key] = lambda sms: reweightFactorFor(sms, 'displaced')
     else:
         # If not specified assumed all fractions
         # (note that we can not include any long-lived fraction since this is already included in
         # the topologies where the meta-stable particle appears as a final state,
         # so the total is = (fraction of all decays being prompt)
         # + (fraction of at least one displaced decay and no long-lived decays)
-        factorsDefault[key] = lambda el: reweightFactorFor(el, 'prompt') + reweightFactorFor(el, 'displaced')
+        factorsDefault[key] = lambda sms: reweightFactorFor(sms, 'prompt') + reweightFactorFor(sms, 'displaced')
 
 
 class Uncovered(object):
