@@ -231,16 +231,6 @@ class RunSModelSTest(unittest.TestCase):
         self.cleanUp()
         runMain(filename, timeout=1, suppressStdout=True,
                 inifile="timeout.ini")
-        """
-        try:
-            ## trying to sync!!
-            import ctypes
-            libc = ctypes.CDLL("libc.so.6")
-            libc.sync()
-        except(OSError,AttributeError,ImportError) as e:
-            print ( "This shouldnt throw %s" % e )
-            # pass
-        """
         time.sleep(.2)
         for f in os.listdir("."):
             if ".crash" in f:

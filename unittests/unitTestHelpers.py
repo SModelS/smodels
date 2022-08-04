@@ -73,7 +73,7 @@ def sortSModelSOutput ( smodelsOutput ):
     return smodelsOutput
 
 def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
-              fname2=None, checkBothOrders=True):
+              fname2=None, checkBothOrders=True,version3=True):
     """
     Compare two objects.
     The numerical values are compared up to the precision defined by allowedDiff.
@@ -86,6 +86,9 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
     :param fname: the filename of obj1
     :param fname2: the filename of obj2
     :param checkBothOrders: If True, check if obj1 == obj2 and obj2 == obj1.
+    :param version3: If True, tries to take into account differences of output
+                     between version 2 and version 3
+
     :return: True/False
     """
     if type(fname) == str:
@@ -94,6 +97,9 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
         obj1, obj2 = float(obj1), float(obj2)
 
     if type(obj1) != type(obj2):
+        if (where == 'Mass (GeV)' or where == 'Width (GeV)') and version3:
+            if obj1 is None or obj2 is None:
+                return True
         logger.warning("Data types differ: (%s,%s) <-> (%s,%s) in ''%s'':%s" % (obj1, type(obj1), obj2, type(obj2), where, fname ))
         return False
 
@@ -110,6 +116,17 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
             logger.error("values %s and %s differ by %s in ''%s'': %s != %s" % (obj1, obj2, diff, where, fname, fname2))
         return diff < allowedDiff
     elif isinstance(obj1, str):
+        if obj1 != obj2 and version3:
+            if '[[' in obj1:
+                oldStr = obj1[obj1.find('[')+1:obj1.rfind(']')]
+                newStr = oldStr.replace('[','').replace(']','')
+                newStr = ','.join([x for x in newStr.split(',') if x.strip()])
+                obj1 = obj1.replace(oldStr,newStr)
+            if '[[' in obj2:
+                oldStr = obj2[obj2.find('[')+1:obj2.rfind(']')]
+                newStr = oldStr.replace('[','').replace(']','')
+                newStr = ','.join([x for x in newStr.split(',') if x.strip()])
+                obj2 = obj2.replace(oldStr,newStr)
         if obj1 != obj2:
             logger.error("strings ``%s'' and ``%s'' differ in %s:%s" % (obj1, obj2, where, fname))
         return obj1 == obj2
