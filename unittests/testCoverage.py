@@ -119,7 +119,7 @@ class CoverageTest(unittest.TestCase):
               eCharge=0., colordim=1, totalwidth=1e-15*GeV)
         pv = Particle(isSM=True, label='PV', pdg=0)
 
-        model = Model(BSMList=[p1,p2], SMList= [pv])
+        model = Model(BSMparticles=[p1,p2], SMparticles= [pv])
 
         xsecA = XSectionList()
         xsecA.xSections.append(XSection())
@@ -148,7 +148,7 @@ class CoverageTest(unittest.TestCase):
         #SMS family-tree: A0->A1+B1, A1->A2
         #Mother A
         smsA = fromString('(PV > p1,p1)',prodXSec=xsecA,
-                          maxWeight=xsecA.getMaxXsec())
+                          maxWeight=xsecA.getMaxXsec(),model=model)
         smsA.label = 'A0'
         smsA.testedBy = ['prompt','displaced']
         smsA.coveredBy = ['prompt','displaced']
@@ -156,21 +156,21 @@ class CoverageTest(unittest.TestCase):
 
         #Daughters:
         smsA1 = fromString('(PV > p1,p1)',prodXSec=xsecA,
-                          maxWeight=xsecA.getMaxXsec())
+                          maxWeight=xsecA.getMaxXsec(),model=model)
         smsA1.label = 'A1'
         smsA1.testedBy = []
         smsA1.coveredBy = []
         smsA1.ancestors = [smsA1,smsA]
 
-        smsB1 = fromString('(PV > p1,p1)',prodXSec=xsecA,
-                          maxWeight=xsecA.getMaxXsec())
+        smsB1 = fromString('(PV > p2(1),p1), (p2(1)>p1)',prodXSec=xsecA,
+                          maxWeight=xsecA.getMaxXsec(),model=model)
         smsB1.label = 'B1'
         smsB1.testedBy = []
         smsB1.coveredBy = []
         smsB1.ancestors = [smsB1,smsA]
 
         smsA2 = fromString('(PV > p1,p1)',prodXSec=xsecA,
-                          maxWeight=xsecA.getMaxXsec())
+                          maxWeight=xsecA.getMaxXsec(),model=model)
         smsA2.label = 'A2'
         smsA2.testedBy = []
         smsA2.coveredBy = []
@@ -178,72 +178,57 @@ class CoverageTest(unittest.TestCase):
 
         #Element family-tree: a0->a1+b1
         #Mother B
-        smsa = TheorySMS()
+        smsa = fromString('(PV > p1,p1)',prodXSec=xsecB,
+                          maxWeight=xsecB.getMaxXsec(),model=model)
+
         smsa.label = 'a0'
         smsa.testedBy = []
         smsa.coveredBy = []
-        smsa.weightList = xsecB
         smsa.ancestors = [smsa]
         #Daughters:
-        smsa1 = TheorySMS()
+        smsa1 = fromString('(PV > p1,p2(1)), (p2(1)>p1)',prodXSec=xsecB,
+                          maxWeight=xsecB.getMaxXsec(),model=model)
         smsa1.label = 'a1'
         smsa1.testedBy = []
         smsa1.coveredBy = []
-        smsa1.weightList = xsecB
         smsa1.ancestors = [smsa1,smsa]
-        smsb1 = TheorySMS()
+
+        smsb1 = fromString('(PV > p1,p2(1)), (p2(1)>p1)',prodXSec=xsecB,
+                          maxWeight=xsecB.getMaxXsec(),model=model)
         smsb1.label = 'b1'
         smsb1.testedBy = []
         smsb1.coveredBy = []
-        smsb1.weightList = xsecB
         smsb1.ancestors = [smsb1,smsa]
 
 
         #Merged element = (A2+b1)
-        smsCombined = TheorySMS()
+        smsCombined = fromString('(PV > p1,p1)',prodXSec=xsec,
+                          maxWeight=xsec.getMaxXsec(),model=model)
         smsCombined.label = 'A2+b1'
         smsCombined.testedBy = []
         smsCombined.coveredBy = []
-        smsCombined.weightList = xsec
         smsCombined.ancestors = [smsCombined,smsA2,smsb1]
 
-        topoList = TopologyDict()
+
         smsList = [smsA,smsA1,smsA2,smsB1,smsa,smsb1,smsa1,smsCombined]
-        #Set odd particles (important for sorting the smsements)
-        for sms in [smsA,smsA1,smsA2,smsCombined]:
-            sms.add_node(pv)
-            sms.add_node(p1)
-            sms.add_node(p2)
-            sms.add_edge(0,1)  # pv > p1
-            sms.add_edge(0,2)  # pv > p2
-
-        smsB1.add_nodes_from([p2,p1,p1])
-        smsB1.add_edges_from([(0,1),(0,2)(1,3),])  # pv > p2, pv > p1, p2 >p1
-
-        smsa1.add_nodes_from([p2,p1,p1])
-        smsa1.add_edges_from([(0,2),(0,1)(1,3),])  # pv > p1, pv > p2, p2 >
-
-        branches[1].oddParticles = [p2,p1]
-        smsb1.branches[1].oddParticles = [p2,p1]
-        smsa.branches[0].oddParticles = [p2,p2,p1]
-
         #make sure the ordering in elList is not important:
-        random.shuffle(elList)
-        topoList.topos[0].elementList = elList[:]
-        topoList._setElementIds()
+        random.shuffle(smsList)
+        topoDict = TopologyDict()
+        topoDict[100] = smsList[:]
+        topoDict.setSMSIds()
 
         #Test if the family tree is being retrieved correctly and in the correct ordering (mother before grandmother,...):
-        elListAncestors = {'A0' : [], 'A1' : ['A0'], 'A2' : ['A1','A0'], 'B1' : ['A0'],'A2+b1' : ['A2','b1','A1','a0','A0'],
+        smsListAncestors = {'A0' : [], 'A1' : ['A0'], 'A2' : ['A1','A0'], 'B1' : ['A0'],'A2+b1' : ['A2','b1','A1','a0','A0'],
                            'b1' : ['a0'], 'a1' : ['a0'] , 'a0' : []}
-        for el in elList:
-            ancestors = [mom.label for mom in el.getAncestors()]
-            self.assertEqual(ancestors,elListAncestors[el.label])
+        for sms in smsList:
+            ancestors = [mom.label for mom in sms.getAncestors()]
+            self.assertEqual(ancestors,smsListAncestors[sms.label])
         # A2+b1--> b1 is not tested, A2 is tested because its grandmother is tested
-        missingTopos = Uncovered(topoList).getGroup('missing (all)')
-        self.assertEqual(len(missingTopos.generalElements),1) #Only elCombined should appear (it is smaller than a1)
-        self.assertAlmostEqual(missingTopos.generalElements[0].missingX,5.) #Only the fraction of the cross-section from elB is not missing
-        self.assertEqual(len(missingTopos.generalElements[0]._contributingElements),1) #Only elCombined should appear
-        self.assertTrue(missingTopos.generalElements[0]._contributingElements[0] is elCombined)
+        missingTopos = Uncovered(topoDict).getGroup('missing (all)')
+        self.assertEqual(len(missingTopos.finalStateSMS),1) #Only elCombined should appear (it is smaller than a1)
+        self.assertAlmostEqual(missingTopos.finalStateSMS[0].missingX,5.) #Only the fraction of the cross-section from elB is not missing
+        self.assertEqual(len(missingTopos.finalStateSMS[0]._contributingSMS),1) #Only elCombined should appear
+        self.assertTrue(missingTopos.finalStateSMS[0]._contributingSMS[0] is smsCombined)
 
 if __name__ == "__main__":
     unittest.main()
