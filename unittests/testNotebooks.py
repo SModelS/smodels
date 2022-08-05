@@ -15,7 +15,7 @@ import subprocess
 sys.path.append('../')
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.smodelsLogging import setLogLevel
-setLogLevel( "info" )
+setLogLevel( "debug" )
 
 
 
@@ -51,7 +51,7 @@ class NotebookTest(unittest.TestCase):
             return
 
         notebooks = self.listOfNotebooks()
-        for notebookFile in notebooks[:3]:
+        for notebookFile in notebooks:
             try:
                 r = subprocess.check_output(["pytest --nbmake %s" %notebookFile], shell=True)
             except subprocess.CalledProcessError as e:
