@@ -142,7 +142,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
     """
 
     if where is not None and version3:
-        if 'missing topologies' in where and 'xsec' not in where:
+        if 'topologies' in where and 'xsec' not in where:
             return compareMissingTopologies(obj1,obj2,allowedRelDiff,
                                             ignore=ignore)
 
