@@ -413,6 +413,9 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
         logger.info("A summary of the results can be found in %s" %
                     summaryFile)
         printScanSummary(outputDict, summaryFile)
+        # Remove summary log from logger
+        logger.removeHandler(fileLog)
+        fileLog.close()
 
     logger.info("Done in %3.2f min" % ((time.time()-t0)/60.))
 

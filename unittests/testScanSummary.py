@@ -19,7 +19,6 @@ from unitTestHelpers import compareScanSummary, runMain
 class ScanSummaryTest(unittest.TestCase):
 
     def removeOutputs(self,f):
-        f = os.path.splitext(f)[0]
         extList = ['py','pyc','smodels','smodelsslha','xml']
         for ext in extList:
             fname= f+'.'+ext
