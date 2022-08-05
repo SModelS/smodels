@@ -298,9 +298,9 @@ Below we give more detailed information about each entry in the parameters file.
 
 * *python-printer*: options for the Python printer
 
-.. _parameterFileAddElementList:
+.. _parameterFileAddSMSList:
 
-  * **addElementList** (True/False): set True to include in the Python output all information about all |elements| generated in the |decomposition|. If set to True the
+  * **addSMSList** (True/False): set True to include in the Python output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
 
 .. _parameterFileAddTxWeights:
@@ -311,9 +311,9 @@ Below we give more detailed information about each entry in the parameters file.
 
 * *xml-printer*: options for the xml printer
 
-.. _parameterFileAddElementListXML:
+.. _parameterFileAddSMSListXML:
 
-  * **addElementList** (True/False): set True to include in the xml output all information about all |elements| generated in the |decomposition|. If set to True the
+  * **addSMSList** (True/False): set True to include in the xml output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
 
 .. _parameterFileAddTxWeightsXML:

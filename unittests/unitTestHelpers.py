@@ -176,17 +176,8 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
             logger.error("values %s and %s differ by %s in ''%s'': %s != %s" % (obj1, obj2, rel_diff, where, fname, fname2))
         return ret
     elif isinstance(obj1, str):
-        if obj1 != obj2 and version3:
-            if '[[' in obj1:
-                oldStr = obj1[obj1.find('[')+1:obj1.rfind(']')]
-                newStr = oldStr.replace('[','').replace(']','')
-                newStr = ','.join([x for x in newStr.split(',') if x.strip()])
-                obj1 = obj1.replace(oldStr,newStr)
-            if '[[' in obj2:
-                oldStr = obj2[obj2.find('[')+1:obj2.rfind(']')]
-                newStr = oldStr.replace('[','').replace(']','')
-                newStr = ','.join([x for x in newStr.split(',') if x.strip()])
-                obj2 = obj2.replace(oldStr,newStr)
+        obj1 = obj1.replace(" ","")  # Remove blanks
+        obj2 = obj2.replace(" ","")  # Remove blanks
         if obj1 != obj2:
             logger.error("strings ``%s'' and ``%s'' differ in %s:%s" % (obj1, obj2, where, fname))
         return obj1 == obj2
