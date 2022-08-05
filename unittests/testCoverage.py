@@ -140,13 +140,13 @@ class CoverageTest(unittest.TestCase):
         xsec = XSectionList()
         xsec.xSections.append(XSection())
         xsec.xSections[0].info = XSectionInfo()
-        xsec.xSections[0].value = 15.*fb
+        xsec.xSections[0].value = 15.0*fb
         xsec.xSections[0].info.sqrts = 13.*TeV
         xsec.xSections[0].info.label = 'wA+wB'
         xsec.xSections[0].info.order = 0
 
-        #SMS family-tree: A0->A1+B1, A1->A2
-        #Mother A
+        # SMS family-tree: A0->A1+B1, A1->A2
+        # Mother A
         smsA = fromString('(PV > p1,p1)',prodXSec=xsecA,
                           maxWeight=xsecA.getMaxXsec(),model=model)
         smsA.label = 'A0'
@@ -154,7 +154,7 @@ class CoverageTest(unittest.TestCase):
         smsA.coveredBy = ['prompt','displaced']
         smsA.ancestors = [smsA]
 
-        #Daughters:
+        # Daughters:
         smsA1 = fromString('(PV > p1,p1)',prodXSec=xsecA,
                           maxWeight=xsecA.getMaxXsec(),model=model)
         smsA1.label = 'A1'
@@ -176,9 +176,10 @@ class CoverageTest(unittest.TestCase):
         smsA2.coveredBy = []
         smsA2.ancestors = [smsA2,smsA1]
 
-        #Element family-tree: a0->a1+b1
-        #Mother B
-        smsa = fromString('(PV > p1,p1)',prodXSec=xsecB,
+        # SMS family-tree: a0->a1+b1
+        # Mother B
+        smsa = fromString('(PV > p2(1),p1), (p2(1) > p2(2)), (p2(2)>p1)',
+                          prodXSec=xsecB,
                           maxWeight=xsecB.getMaxXsec(),model=model)
 
         smsa.label = 'a0'
@@ -201,7 +202,7 @@ class CoverageTest(unittest.TestCase):
         smsb1.ancestors = [smsb1,smsa]
 
 
-        #Merged element = (A2+b1)
+        # Merged element = (A2+b1)
         smsCombined = fromString('(PV > p1,p1)',prodXSec=xsec,
                           maxWeight=xsec.getMaxXsec(),model=model)
         smsCombined.label = 'A2+b1'
@@ -217,17 +218,28 @@ class CoverageTest(unittest.TestCase):
         topoDict[100] = smsList[:]
         topoDict.setSMSIds()
 
+
+        # SMS list: A0->[(A1->A2),B1], a0->[a1,b1]
+        # A2+b1->Comb
+        # Tested: A0 => A1,A2,B1 are tested
+        # Not tested: a0,a1,b1,Comb/A2
+        # Resulting missed topology: Comb, but with a missingX = b1 xsec = 5*fb
+
         #Test if the family tree is being retrieved correctly and in the correct ordering (mother before grandmother,...):
         smsListAncestors = {'A0' : [], 'A1' : ['A0'], 'A2' : ['A1','A0'], 'B1' : ['A0'],'A2+b1' : ['A2','b1','A1','a0','A0'],
                            'b1' : ['a0'], 'a1' : ['a0'] , 'a0' : []}
         for sms in smsList:
             ancestors = [mom.label for mom in sms.getAncestors()]
             self.assertEqual(ancestors,smsListAncestors[sms.label])
+
         # A2+b1--> b1 is not tested, A2 is tested because its grandmother is tested
         missingTopos = Uncovered(topoDict).getGroup('missing (all)')
-        self.assertEqual(len(missingTopos.finalStateSMS),1) #Only elCombined should appear (it is smaller than a1)
-        self.assertAlmostEqual(missingTopos.finalStateSMS[0].missingX,5.) #Only the fraction of the cross-section from elB is not missing
-        self.assertEqual(len(missingTopos.finalStateSMS[0]._contributingSMS),1) #Only elCombined should appear
+        # Only elCombined should appear (it is smaller than a1)
+        self.assertEqual(len(missingTopos.finalStateSMS),1)
+        # Only the fraction of the cross-section from elB is not missing
+        self.assertAlmostEqual(missingTopos.finalStateSMS[0].missingX,5.)
+        # Only smsCombined should appear
+        self.assertEqual(len(missingTopos.finalStateSMS[0]._contributingSMS),1)
         self.assertTrue(missingTopos.finalStateSMS[0]._contributingSMS[0] is smsCombined)
 
 if __name__ == "__main__":
