@@ -72,15 +72,62 @@ def sortSModelSOutput ( smodelsOutput ):
     smodelsOutput["ExptRes"] = sortExptRes ( smodelsOutput["ExptRes"] )
     return smodelsOutput
 
-def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
-              fname2=None, checkBothOrders=True,version3=True):
+def flattenElement(elStr):
+
+    oldStr = elStr[elStr.find('[')+1:elStr.rfind(']')]
+    newStr = oldStr.replace('[','').replace(']','')
+    newStr = ','.join(sorted([x for x in newStr.split(',') if x.strip()]))
+    newElStr = elStr.replace(oldStr,newStr)
+    return newElStr
+
+def convertCoverage(topologiesList):
+
+    # Flatten strings and combine weights of equal
+    # flattened elements
+    topoDict = {}
+    for topo in topologiesList:
+        if 'element' in topo:
+            elStr = topo['element']
+            newElStr = flattenElement(elStr)
+            topo['element'] = newElStr
+        elStr = topo['element']
+        if elStr  in topoDict:
+            topoDict[elStr]['weight (fb)'] += topo['weight (fb)']
+        else:
+            topoDict[elStr] = topo
+
+    # Get new list of topologies sorted by weights:
+    newList = sorted(topoDict.values(), key = lambda topo: topo['weight (fb)'],
+                     reverse = True)
+    return newList
+
+def compareMissingTopologies(obj1,obj2,allowedRelDiff,ignore=[]):
+
+    if len(obj1) == len(obj2) == 0:
+        return True
+
+    # Convert to version 3 notation and combine weights
+    newList1 = convertCoverage(obj1)
+    newList2 = convertCoverage(obj2)
+    # Since the list number can change, restrict list to smallest size
+    maxSize = min(len(newList1),len(newList2))
+    newList1 = newList1[:maxSize]
+    newList2 = newList2[:maxSize]
+
+    return equalObjs(newList1,newList2,allowedRelDiff,
+                     where='New Coverage Comparison',ignore=ignore)
+
+
+def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
+              fname2=None, checkBothOrders=True,
+              version3=True,allowedAbsDiff=0.0):
     """
     Compare two objects.
-    The numerical values are compared up to the precision defined by allowedDiff.
+    The numerical values are compared up to the precision defined by allowedRelDiff.
 
     :param obj1: First python object to be compared
     :param obj2: Second python object to be compared
-    :param allowedDiff: Allowed % difference between two numerical values
+    :param allowedRelDiff: Allowed % difference between two numerical values
     :param ignore: List of keys to be ignored
     :param where: keep track of where we are, for easier debugging.
     :param fname: the filename of obj1
@@ -88,9 +135,17 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
     :param checkBothOrders: If True, check if obj1 == obj2 and obj2 == obj1.
     :param version3: If True, tries to take into account differences of output
                      between version 2 and version 3
+    :param allowedAbsDiff: If the relative difference is larger than allowedRelDiff,
+                           check if the absolute difference is within allowedAbsDiff
 
     :return: True/False
     """
+
+    if where is not None and version3:
+        if 'missing topologies' in where and 'xsec' not in where:
+            return compareMissingTopologies(obj1,obj2,allowedRelDiff,
+                                            ignore=ignore)
+
     if type(fname) == str:
         fname = fname.replace(os.getcwd(), ".")
     if type(obj1) in [float, int] and type(obj2) in [float, int]:
@@ -106,15 +161,20 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
     if isinstance(obj1, unum.Unum):
         if obj1 == obj2:
             return True
-        diff = 2.*abs(obj1-obj2)/abs(obj1+obj2)
-        return diff.asNumber() < allowedDiff
+        abs_diff = abs(obj1-obj2)
+        rel_diff = 2.*abs_diff/abs(obj1+obj2)
+        # For numbers with units, do not check for absolute difference
+        ret = (rel_diff.asNumber() < allowedRelDiff)
+        return ret
     elif isinstance(obj1, float):
         if obj1 == obj2:
             return True
-        diff = 2.*abs(obj1-obj2)/abs(obj1+obj2)
-        if diff > allowedDiff:
-            logger.error("values %s and %s differ by %s in ''%s'': %s != %s" % (obj1, obj2, diff, where, fname, fname2))
-        return diff < allowedDiff
+        abs_diff = abs(obj1-obj2)
+        rel_diff = 2.*abs_diff/abs(obj1+obj2)
+        ret = (rel_diff < allowedRelDiff) or (abs_diff < allowedAbsDiff)
+        if not ret:
+            logger.error("values %s and %s differ by %s in ''%s'': %s != %s" % (obj1, obj2, rel_diff, where, fname, fname2))
+        return ret
     elif isinstance(obj1, str):
         if obj1 != obj2 and version3:
             if '[[' in obj1:
@@ -144,16 +204,18 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
                     deffile = ""
                 logger.warning("Key ``%s'' missing in %s:%s%s" % (key, where, fname, deffile ))
                 return False
-            if not equalObjs(obj1[key], obj2[key], allowedDiff, ignore=ignore, where=key, fname=fname, fname2=fname2):
+            if not equalObjs(obj1[key], obj2[key], allowedRelDiff, ignore=ignore,
+                             where=key, fname=fname, fname2=fname2,
+                             allowedAbsDiff=allowedAbsDiff):
                 return False
     elif isinstance(obj1, list):
         if len(obj1) != len(obj2):
-            logger.warning('Lists differ in length:\n   %i (this run)\n and\n   %i (default)' %
-                           (len(obj1), len(obj2)))
+            logger.warning('Lists for %s differ in length:\n   %i (this run)\n and\n   %i (default)' %
+                           (where,len(obj1), len(obj2)))
             return False
         for ival, val in enumerate(obj1):
-            if not equalObjs(val, obj2[ival], allowedDiff, fname=fname, ignore=ignore,
-                             fname2=fname2):
+            if not equalObjs(val, obj2[ival], allowedRelDiff, fname=fname, ignore=ignore,
+                             fname2=fname2,allowedAbsDiff=allowedAbsDiff):
                 # logger.warning('Lists differ:\n   %s (this run)\n and\n   %s (default)' %\
                 #                (str(val),str(obj2[ival])))
                 return False
@@ -162,8 +224,9 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
 
     # Now check for the opposite order of the objects
     if checkBothOrders:
-        if not equalObjs(obj2, obj1, allowedDiff, ignore, where,
-                         fname2, fname, checkBothOrders=False):
+        if not equalObjs(obj2, obj1, allowedRelDiff, ignore, where,
+                         fname2, fname, checkBothOrders=False,
+                         allowedAbsDiff=allowedAbsDiff):
             return False
     return True
 
@@ -223,7 +286,7 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
         return sfile
 
 
-def compareScanSummary(outA, outB, allowedDiff):
+def compareScanSummary(outA, outB, allowedRelDiff):
 
     fA = np.genfromtxt(outA, dtype=None, encoding='utf-8',
                        skip_header=3, names=True)
@@ -243,7 +306,7 @@ def compareScanSummary(outA, outB, allowedDiff):
                 continue
             elif isinstance(ptA[col], (float, int)):
                 diff = 2.*abs(ptA[col]-ptB[col])/abs(ptA[col]+ptB[col])
-                if diff > allowedDiff:
+                if diff > allowedRelDiff:
                     logger.error("values for %s differ by %s in %s" % (col, diff, fname))
                     return False
             else:
@@ -252,7 +315,7 @@ def compareScanSummary(outA, outB, allowedDiff):
     return True
 
 
-def compareObjs(obj1, obj2, allowedDiff=0.05):
+def compareObjs(obj1, obj2, allowedRelDiff=0.05):
 
     obj1_keys = sorted([k for k in dir(obj1) if not k[0] == '_'])
     obj2_keys = sorted([k for k in dir(obj2) if not k[0] == '_'])
@@ -270,9 +333,9 @@ def compareObjs(obj1, obj2, allowedDiff=0.05):
         elif attr1 != attr2:
             if isinstance(attr1, (float, int)):
                 rel_diff = abs(attr1-attr2)/(attr1+attr2)
-                if rel_diff > allowedDiff:
+                if rel_diff > allowedRelDiff:
                     logger.warning('Attribute %s value differ more than %s:\n %s \n and \n %s'
-                                   % (key, allowedDiff, attr1, attr2))
+                                   % (key, allowedRelDiff, attr1, attr2))
                     return False
             else:
                 logger.warning('Attribute %s value differ:\n %s \n and \n %s' % (key, attr1, attr2))
@@ -285,8 +348,8 @@ class Summary():
     Class to access the output given in the summary.txt
     """
 
-    def __init__(self, filename, allowedDiff=0.05):
-        self._allowedDiff = allowedDiff
+    def __init__(self, filename, allowedRelDiff=0.05):
+        self._allowedRelDiff = allowedRelDiff
         self._filename = filename
         self._read(filename)
 
@@ -298,7 +361,7 @@ class Summary():
         return "Summary(%s)" % final
 
     def __eq__(self, other):
-        return compareObjs(self, other, self._allowedDiff)
+        return compareObjs(self, other, self._allowedRelDiff)
 
     def _stripComments(self, lineString):
         return re.sub('#.*', '', lineString)
@@ -374,7 +437,7 @@ class Summary():
                 resultLines = []
             else:
                 resultLines.append(line)
-        self.results = [ResultOutput(res, self._allowedDiff) for res in results]
+        self.results = [ResultOutput(res, self._allowedRelDiff) for res in results]
 
     def _getResultSummary(self, inputLines):
         """
@@ -475,12 +538,12 @@ class Summary():
             line = self._stripComments(line)
             if not line:  # Remove comment and empty lines
                 continue
-            getattr(self, attrLabel).append(MissedTopoOutput(line, self._allowedDiff))
+            getattr(self, attrLabel).append(MissedTopoOutput(line, self._allowedRelDiff))
 
 
 class ResultOutput(object):
 
-    def __init__(self, resLines, allowedDiff):
+    def __init__(self, resLines, allowedRelDiff):
         anaID, sqrts, cond, tpValue, expLimit, r, rExp = resLines[0].split()
         self.anaID = anaID.strip()
         self.sqrts = eval(sqrts)
@@ -488,7 +551,7 @@ class ResultOutput(object):
         self.theoryPred = eval(tpValue)
         self.expLimit = eval(expLimit)
         self.r = eval(r)
-        self._allowedDiff = allowedDiff
+        self._allowedRelDiff = allowedRelDiff
         try:
             self.r_expected = eval(rExp)
         except NameError:
@@ -507,16 +570,16 @@ class ResultOutput(object):
                     setattr(self, label.strip(), lvals[i])
 
     def __eq__(self, other):
-        return compareObjs(self, other, self._allowedDiff)
+        return compareObjs(self, other, self._allowedRelDiff)
 
 
 class MissedTopoOutput(object):
 
-    def __init__(self, line, allowedDiff):
+    def __init__(self, line, allowedRelDiff):
         sqrts, weight = line.split()
         self.sqrts = eval(sqrts)
         self.weight = eval(weight)
-        self._allowedDiff = allowedDiff
+        self._allowedRelDiff = allowedRelDiff
 
     def __eq__(self, other):
-        return compareObjs(self, other, self._allowedDiff)
+        return compareObjs(self, other, self._allowedRelDiff)

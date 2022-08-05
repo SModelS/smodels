@@ -15,12 +15,12 @@ runtime.modelFile = 'smodels.share.models.mssm'
 
 from smodels.theory import decomposer
 from smodels.tools.physicsUnits import fb, GeV, TeV
-from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.matcher.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
 from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.tools.smodelsLogging import setLogLevel
-from smodels.particlesLoader import BSMList
+from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 import time
@@ -28,13 +28,16 @@ setLogLevel("info")
 
 # Set the path to the database
 import os
-database = Database(os.path.expanduser('~/smodels-database'))
 
 
-def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb):
+def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb,
+         database = 'official'):
     """
     Main program. Displays basic use case.
     """
+
+    database = Database(database)
+
     model = Model(BSMparticles=BSMList, SMparticles=SMList)
     # Path to input file (either a SLHA or LHE file)
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
@@ -99,8 +102,6 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb):
         for theoryPrediction in predictions:
             dataset = theoryPrediction.dataset
             datasetID = theoryPrediction.dataId()
-            mass = theoryPrediction.mass
-            PIDs = theoryPrediction.PIDs
             txnames = sorted([str(txname) for txname in theoryPrediction.txnames])
             print("------------------------")
             print("Dataset = ", datasetID)  # Analysis name
@@ -190,6 +191,8 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb):
     else:
         print("\nNo displaced decays")
 
+    return topDict,allPredictions,uncovered
 
 if __name__ == '__main__':
-    main()
+
+    topDict,allPredictions,uncovered = main()

@@ -43,7 +43,7 @@ class CombinedTest(unittest.TestCase):
                         'Total xsec for topologies outside the grid (fb)']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                                                  key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.02,
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.02,
                            ignore=ignoreFields, fname=outputfile)
         if equals != True:
             logger.error("%s differs from %s!" % ("gluino_squarks_default_agg.py", outputfile))

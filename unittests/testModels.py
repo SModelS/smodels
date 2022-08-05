@@ -47,7 +47,7 @@ class ModelsTest(unittest.TestCase):
                     'doinvisible', 'docompress', 'computestatistics', 'testcoverage', 'combinesrs']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.1,
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedRelDiff=0.1,
                            ignore=ignoreFields, fname = outputfile )
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
@@ -71,7 +71,7 @@ class ModelsTest(unittest.TestCase):
                             'doinvisible', 'docompress', 'computestatistics', 'testcoverage', 'combinesrs']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.1,
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedRelDiff=0.1,
                            ignore=ignoreFields, fname = outputfile )
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
@@ -90,7 +90,7 @@ class ModelsTest(unittest.TestCase):
                             'doinvisible', 'docompress', 'computestatistics', 'testcoverage', 'combinesrs']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.1,
+        equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedRelDiff=0.1,
                            ignore=ignoreFields, fname = outputfile )
 
         self.assertTrue(equals)
