@@ -401,17 +401,23 @@ class DataSet(object):
 
         return attributes
 
-    def getUpperLimitFor(self, sms=None, expected=False, txnames=None, compute=False, alpha=0.05, deltas_rel=0.2):
+    def getUpperLimitFor(self, sms=None, expected=False, txnames=None,
+                         compute=False, alpha=0.05, deltas_rel=0.2,
+                         mass=None):
         """
         Returns the upper limit for a given SMS (or mass) and txname. If
         the dataset hold an EM map result the upper limit is independent of
         the input txname or mass.
         For UL results if an SMS object is given the corresponding upper limit
         will be rescaled according to the lifetimes of the SMS intermediate particles.
-        On the other hand, if a mass is given, no rescaling will be applied.
+        If SMS is not defined, but mass is given, compute the UL using only the mass array
+        (no width reweighting is applied) and the mass format is assumed
+        to follow the expected by the data.
+
 
         :param txname: TxName object or txname string (only for UL-type results)
-        :param sms: TheorySMS object or mass array with units (only for UL-type results)
+        :param sms: SMS object (only for UL-type results)
+        :param mass: Mass array  (only for UL-type results)
         :param alpha: Can be used to change the C.L. value. The default value is 0.05
                       (= 95% C.L.) (only for  efficiency-map results)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
@@ -435,7 +441,7 @@ class DataSet(object):
                 return upperLimit
 
         elif self.getType() == 'upperLimit':
-            if not txnames or not sms:
+            if not txnames or (not sms and not mass):
                 logger.error("A TxName and mass array must be defined when \
                              computing ULs for upper-limit results.")
                 return False
@@ -453,13 +459,13 @@ class DataSet(object):
                 logger.error("txname must be a TxName object or a string")
                 return False
 
-            if not isinstance(sms, list) and not isinstance(sms, TheorySMS):
+            if not isinstance(mass, list) and not isinstance(sms, TheorySMS):
                 logger.error("SMS must be a TheorySMS object or a mass array")
                 return False
 
             for tx in self.txnameList:
                 if tx == txname or tx.txName == txname:
-                    upperLimit = tx.getULFor(sms, expected)
+                    upperLimit = tx.getULFor(sms, expected, mass=mass)
 
             return upperLimit
 

@@ -11,7 +11,7 @@ from smodels.experiment.databaseObj import Database,ExpResult
 import numpy, unum
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
-from smodels.theory.auxiliaryFunctions import getAttributesFrom,getValuesForObj
+from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom,getValuesForObj
 
 #logger.setLevel(level=logging.INFO)
 
@@ -171,7 +171,7 @@ class Browser(object):
         for tx in txnames:
             if not tx.txName == txname:
                 continue
-            return tx.getULFor(massarray,expected)
+            return tx.getULFor(sms=None,mass=massarray,expected=expected)
 
         logger.warning( "Could not find TxName %s ." % (txname))
         return None

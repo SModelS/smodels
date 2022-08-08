@@ -706,12 +706,15 @@ class TxName(object):
         else:
             return fillvalue
 
-    def getULFor(self, sms, expected=False):
+    def getULFor(self, sms, expected=False, mass=None):
         """
         Returns the upper limit (or expected) for SMS (only for upperLimit-type).
         Includes the lifetime reweighting (ul/reweight).
         If called for efficiencyMap results raises an error.
-        If a mass array is given as input, no lifetime reweighting will be applied.
+        If SMS is not defined, but mass is given, compute the UL using only the mass array
+        (no width reweighting is applied) and the mass format is assumed
+        to follow the expected by the data.
+
 
         :param sms: SMS object or mass array (with units)
         :param expected: look in self.txnameDataExp, not self.txnameData
@@ -721,7 +724,14 @@ class TxName(object):
             logger.error("getULFor method can only be used in UL-type data.")
             raise SModelSError()
 
-        point = self.getDataFromSMS(sms)
+        # If an SMS has been given, extract the data from it,
+        # otherwise use the mass array
+        if sms is not None:
+            point = self.getDataFromSMS(sms)
+        else:
+            massFlat = np.array(mass,dtype=object).flatten()
+            point = [m.asNumber(physicsUnits.GeV) if isinstance(m,unum.Unum)
+                     else m for m in massFlat]
         if not expected:
             ul = self.txnameData.getValueFor(point)
         else:
@@ -733,10 +743,14 @@ class TxName(object):
         if ul is None:
             return None
 
-        # Compute reweighting factor:
-        reweightF = self.getReweightingFor(sms)
-        if reweightF is None:
-            return None
+        # Compute reweighting factor
+        # (in case a SMS has been given as input)
+        if sms is not None:
+            reweightF = self.getReweightingFor(sms)
+            if reweightF is None:
+                return None
+        else:
+            reweightF = 1.0
 
         ul = ul*reweightF*self.y_unit  # Add unit
 

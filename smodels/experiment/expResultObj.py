@@ -194,7 +194,7 @@ class ExpResult(object):
     """
 
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
-                         txname=None, sms=None, compute=False):
+                         txname=None, sms=None, compute=False, mass=None):
         """
         Computes the 95% upper limit (UL) on the signal cross section according
         to the type of result.
@@ -202,6 +202,9 @@ class ExpResult(object):
         for the given dataSet ID (signal region). For an Upper Limit type,
         returns the UL for the signal*BR for the given mass array and
         Txname.
+        If SMS is not defined, but mass is given, compute the UL using only the mass array
+        (no width reweighting is applied) and the mass format is assumed
+        to follow the expected by the data.
 
         :param dataID: dataset ID (string) (only for efficiency-map type results)
         :param alpha: Can be used to change the C.L. value. The default value is 0.05
@@ -210,6 +213,7 @@ class ExpResult(object):
                          (only for efficiency-map results)
         :param txname: TxName object or txname string (only for UL-type results)
         :param sms: SMS object
+        :param mass: Mass array
         :param compute: If True, the upper limit will be computed
                         from expected and observed number of events.
                         If False, the value listed in the database will be used
@@ -221,7 +225,8 @@ class ExpResult(object):
         if dataset:
             upperLimit = dataset.getUpperLimitFor(sms=sms, expected=expected,
                                                   txnames=txname,
-                                                  compute=compute, alpha=alpha)
+                                                  compute=compute, alpha=alpha,
+                                                  mass=mass)
             return upperLimit
         else:
             logger.error("Dataset ID %s not found in experimental result %s" % (dataID, self))
