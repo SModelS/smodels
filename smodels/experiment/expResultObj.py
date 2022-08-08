@@ -155,18 +155,30 @@ class ExpResult(object):
             txnames += dataset.txnameList
         return txnames
 
-    def getEfficiencyFor(self, txname, mass, dataset=None):
+    def getEfficiencyFor(self, dataID=None, txname=None, sms=None, mass=None):
         """
-        Convenience function. Get the efficiency for
-        a specific dataset for a a specific txname.
-        Equivalent to:
-        self.getDataset ( dataset ).getEfficiencyFor ( txname, mass )
+        For an Efficiency Map type, returns the efficiency for the corresponding
+        txname and dataset for the given dataSet ID (signal region).
+        For an Upper Limit type, returns 1 or 0, depending on whether the SMS
+        matches the Txname.
+        If SMS is not defined, but mass is given, give the efficiency using only the mass array
+        (no width reweighting is applied) and the mass format is assumed
+        to follow the expected by the data.
+
+        :param dataID: dataset ID (string) (only for efficiency-map type results)
+        :param txname: TxName object or txname string (only for UL-type results)
+        :param sms: SMS object
+        :param mass: Mass array
+
+        :return: efficiency (float)
         """
 
-        dataset = self.getDataset(dataset)
+
+        dataset = self.getDataset(dataID)
         if dataset:
-            return dataset.getEfficiencyFor(txname, mass)
-        return None
+            return dataset.getEfficiencyFor(txname, sms=sms, mass=mass)
+        else:
+            return None
 
     def hasCovarianceMatrix(self):
         return hasattr(self.globalInfo, "covariance")

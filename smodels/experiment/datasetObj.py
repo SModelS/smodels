@@ -257,14 +257,15 @@ class DataSet(object):
                 return tn
         return None
 
-    def getEfficiencyFor(self, txname, mass):
+    def getEfficiencyFor(self, txname, sms, mass):
         """
         Convenience function. Get efficiency for mass
-        assuming no lifetime rescaling. Same as self.getTxName(txname).getEfficiencyFor(m)
+        assuming no lifetime rescaling. Same as self.getTxName(txname).getEfficiencyFor(sms,mass)
         """
+
         txname = self.getTxName(txname)
         if txname:
-            return txname.getEfficiencyFor(mass)
+            return txname.getEfficiencyFor(sms=sms,mass=mass)
         else:
             return None
 

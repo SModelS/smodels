@@ -20,9 +20,13 @@ class TestReportAll(unittest.TestCase):
 
     def removeOutputs(self, f):
         """ remove cruft outputfiles """
-        for i in [f, f.replace(".py", ".pyc")]:
-            if os.path.exists(i):
-                os.remove(i)
+
+        f = os.path.splitext(f)[0]
+        extList = ['py','pyc','smodels','smodelsslha','xml']
+        for ext in extList:
+            fname= f+'.'+ext
+            if os.path.exists(fname):
+                os.remove(fname)
 
     def testReportAll(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
@@ -34,7 +38,7 @@ class TestReportAll(unittest.TestCase):
                         'database version']
         smodelsOutput = sortSModelSOutput ( smodelsOutput )
         smodelsOutputDefault = sortSModelSOutput ( smodelsOutputDefault )
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.03,
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.03,
                            ignore=ignoreFields, fname=outputfile,
                            fname2="default_reportAll.py")
         self.assertTrue(equals)

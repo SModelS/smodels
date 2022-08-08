@@ -756,7 +756,7 @@ class TxName(object):
 
         return ul
 
-    def getEfficiencyFor(self, sms):
+    def getEfficiencyFor(self, sms, mass=None):
         """
         For upper limit results, checks if the input SMS falls inside the
         upper limit grid and has a non-zero reweigthing factor.
@@ -769,19 +769,31 @@ class TxName(object):
         :return: efficiency (float)
         """
 
-        # Get flat data from sms:
-        point = self.getDataFromSMS(sms)
+        if sms is not None:
+            # Get flat data from sms:
+            point = self.getDataFromSMS(sms)
+        else:
+            massFlat = np.array(mass,dtype=object).flatten()
+            point = [m.asNumber(physicsUnits.GeV) if isinstance(m,unum.Unum)
+                     else m for m in massFlat]
+
         if self.dataType == 'efficiencyMap':
             eff = self.txnameData.getValueFor(point)
             if not eff or math.isnan(eff):
                 eff = 0.  # SMS is outside the grid or has zero efficiency
-            # Compute reweighting factor:
-            reweightF = self.getReweightingFor(sms)
+            if sms is not None:
+                # Compute reweighting factor
+                # (if the SMS has been defined)
+                reweightF = self.getReweightingFor(sms)
+            else:
+                reweightF = 1.0
+
             eff = eff*reweightF*self.y_unit  # (unit should be 1)
 
         elif self.dataType == 'upperLimit':
             ul = self.txnameData.getValueFor(point)
-            sms._upperLimit = ul  # Store the upper limit for convenience
+            if sms is not None:
+                sms._upperLimit = ul  # Store the upper limit for convenience
             if ul is None:
                 eff = 0.  # SMS is outside the grid or the decays do not correspond to the txname
             else:
