@@ -1,7 +1,7 @@
 """
 .. module:: tree
    :synopsis: This is a class for describing Simplified Model Topologies
-              used for decomposing BSM models.
+              used for describing experimental results BSM models.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
@@ -135,7 +135,7 @@ class ExpSMS(GenericSMS):
 
         # Create SMS, add all unstable nodes following the sorted order
         # and keep track of generated indices
-        newSMS = cls()
+        newSMS = ExpSMS()
         smsDict = {}
         for momStr in sortedSuccessors:
             nodeIndex = newSMS.add_node(nodesObjDict[momStr])

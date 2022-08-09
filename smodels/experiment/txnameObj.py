@@ -124,8 +124,8 @@ class TxName(object):
                 conds = [conds]
             conditionsList = []
             for cond in conds:
-                exprFunc, elMap = self.processExpr(cond, databaseParticles)
-                conditionsList.append({exprFunc: elMap})
+                exprFunc, smsMap = self.processExpr(cond, databaseParticles)
+                conditionsList.append({exprFunc: smsMap})
             self._conditionsList = conditionsList
 
         # Do consistency checks:
@@ -499,8 +499,7 @@ class TxName(object):
     def getDataMap(self, dataPoint):
         """
         Using the sms in the topology, construct a dictionary
-        mapping the node.number, the node attributes and the corresponding
-        index in flatten data array.
+        mapping the node index to a flat data array.
         If the dataMap has not been defined, construct from the sms topology
         and data point format.
 
@@ -515,7 +514,7 @@ class TxName(object):
         if self.dataMap is not None:
             return
 
-        # Since all SMS are equivalent, use the first one
+        # Since all SMS have to be equivalent, use the first one
         # to define the map:
         tree = list(self.smsMap.keys())[0]
 
