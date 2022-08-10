@@ -27,11 +27,20 @@ if v[0]==2 and v[1] < 7 and v[1] > 3:
 from smodels.tools.smodelsLogging import setLogLevel
 setLogLevel ( "error" )
 
-def run():
-    unittest.TextTestRunner().run( unittest.TestLoader().discover("./") )
+def run(testNotebooks=False):
 
-def verbose_run( flter ):
+    tests = unittest.TestLoader().discover("./")
+    if not testNotebooks:
+        tests._tests = [t for t in tests._tests[:] if not 'notebook' in str(t).lower()]
+    unittest.TextTestRunner().run(tests)
+
+def verbose_run( flter, testNotebooks=False ):
+
     alltests = unittest.TestLoader().discover("./")
+
+    if not testNotebooks:
+        alltests._tests = [t for t in alltests._tests[:] if not 'notebook' in str(t).lower()]
+
     n_tests, n_failed = 0, 0
     for series in alltests:
         for test in series:
@@ -94,6 +103,8 @@ if __name__ == "__main__":
     ap.add_argument('-v','--verbose', help='run verbosely',action='store_true')
     ap.add_argument('-f','--filter', help='run only tests that have <FILTER> in name. Works only with verbose and not parallel. case sensitive.',type=str,default=None)
     ap.add_argument('-p','--parallel', help='run in parallel',action='store_true')
+    ap.add_argument('-n','--notebooks', help='also test notebooks',action='store_true',default=False)
+
     args = ap.parse_args()
     if args.clean_database:
         cleanDatabase ()
@@ -101,6 +112,6 @@ if __name__ == "__main__":
         parallel_run ( args.verbose )
         sys.exit()
     if args.verbose:
-        verbose_run( args.filter )
+        verbose_run( args.filter, args.notebooks )
         sys.exit()
-    run()
+    run(args.notebooks)
