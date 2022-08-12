@@ -10,7 +10,7 @@
 """
 
 from __future__ import print_function
-import sys, subprocess
+import sys, subprocess, os
 sys.path.insert(0,"../")
 from smodels.base.smodelsLogging import colors
 colors.on = True
@@ -92,8 +92,15 @@ def parallel_run ( verbose ):
 
 def cleanDatabase ():
     """ remove database pickle files """
-    cmd = "rm -r database/*.pcl database/*TeV/*/*/.*pcl"
-    o =subprocess.getoutput ( cmd )
+    databaseFolders = ['./database', './databaseBroken','./tinydb',
+                       './database_extra', './database_simple', './dbadd1']
+    for db in databaseFolders:
+        for dirpath,dirnames,filenames in os.walk(db):
+            for f in filenames:
+                if os.path.splitext(f)[1] != '.pcl':
+                    continue
+                filename = os.path.join(dirpath,f)
+                os.remove(filename)
 
 if __name__ == "__main__":
     import argparse
@@ -108,10 +115,11 @@ if __name__ == "__main__":
     args = ap.parse_args()
     if args.clean_database:
         cleanDatabase ()
-    if args.parallel:
+    elif args.parallel:
         parallel_run ( args.verbose )
         sys.exit()
-    if args.verbose:
+    elif args.verbose:
         verbose_run( args.filter, args.notebooks )
         sys.exit()
-    run(args.notebooks)
+    else:
+        run(args.notebooks)

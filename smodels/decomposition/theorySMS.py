@@ -409,35 +409,6 @@ class TheorySMS(GenericSMS):
                 return cmp
         return 0
 
-    def compressToFinalStates(self):
-        """
-        Compress the SMS to its final states. After the compression
-        the tree will have one root(PV). The root's daughters
-        are the final state nodes of self.
-
-        : returns: compressed copy of the Tree.
-        """
-
-        newTree = self.copy()
-        # Get root:
-        root = newTree.root
-        # Get final state nodes
-        fsNodes = [self.indexToNode(n) for n in self.nodeIndices if
-                    self.out_degree(n) == 0]
-
-        # Remove all nodes
-        newTree.clear()
-        # Add root and final state nodes
-        rootIndex = newTree.add_node(root)
-        fsIndices = newTree.add_nodes_from(fsNodes)
-        # Add root > fsNode edges:
-        edges = product([rootIndex],fsIndices)
-        newTree.add_edges_from(edges)
-        newTree._canonName = newTree.computeCanonName()
-        newTree.sort()
-
-        return newTree
-
     def _getAncestorsDict(self, igen=0):
         """
         Returns a dictionary with all the ancestors

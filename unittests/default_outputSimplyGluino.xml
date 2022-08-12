@@ -23,10 +23,10 @@
                     <PIDs>1000022</PIDs>
                 </PIDs_List>
             </PIDs_List>
-            <Particles>[[[q, q]], [[q, q]]]</Particles>
+            <Particles>[[[q,q]],[[q,q]]]</Particles>
             <Weights_fb>
-                <xsec_13.0_TeV>4309.03465</xsec_13.0_TeV>
-                <xsec_8.0_TeV>572.168935</xsec_8.0_TeV>
+                <xsec_13.0_TeV>4310.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>572.0</xsec_8.0_TeV>
             </Weights_fb>
             <final_states_List>
                 <final_states>N1</final_states>
@@ -150,7 +150,7 @@
     <OutputStatus>
         <checkinput>True</checkinput>
         <computestatistics>False</computestatistics>
-        <database_version>unittest220</database_version>
+        <database_version>unittest300-beta</database_version>
         <decomposition_status>1</decomposition_status>
         <docompress>True</docompress>
         <doinvisible>True</doinvisible>
@@ -161,7 +161,7 @@
         <model>share.models.mssm</model>
         <ncpus>-6</ncpus>
         <sigmacut>0.03</sigmacut>
-        <smodels_version>2.2.0</smodels_version>
+        <smodels_version>3.0.0-beta</smodels_version>
         <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>
     </OutputStatus>

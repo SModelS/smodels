@@ -26,45 +26,45 @@ def sortXML(xmltree):
     xmltree[:] = sorted(xmltree, key=lambda el: [el.tag, ElementTree.tostring(el)])
 
 
-def log(strng):
-    with open("debug.log", "at") as f:
-        f.write(strng + "\n")
-        f.close()
-
-
 def compareXML(xmldefault, xmlnew, allowedRelDiff, ignore=[]):
+
     if len(xmldefault) != len(xmlnew):
-        log("lengths of document %d != %d" % (len(xmldefault), len(xmlnew)))
+        logger.warning("lengths of document %d != %d" % (len(xmldefault), len(xmlnew)))
         return False
     for i, el in enumerate(xmldefault):
         newel = xmlnew[i]
         if len(el) != len(newel):
-            log("lengths of elements %d != %d" % (len(el), len(newel)))
+            logger.warning("lengths of elements %s and %s differ (%d != %d)" % (el.tag,newel.tag,len(el), len(newel)))
             return False
         if len(el) == 0:
             if el.tag in ignore:
                 continue
+            if el.tag != newel.tag:
+                logger.warning("tags %s and %s differ" % (el.tag, newel.tag))
+                return False
+
+            if el.text == newel.text:
+                continue
+
             if type(el.text) == str and "[" not in el.text:
                 try:
                     el.text = eval(el.text)
                     newel.text = eval(newel.text)
                 except (TypeError, NameError, SyntaxError):
-                    pass
-            if isinstance(el.text, float) and isinstance(newel.text, float) \
-                    and newel.text != el.text:
+                    el.text = el.text.replace(" ","")
+                    newel.text = newel.text.replace(" ","")
+
+            if isinstance(el.text, float) and isinstance(newel.text, float):
                 diff = 2.*abs(el.text-newel.text)/abs(el.text+newel.text)
                 if diff > allowedRelDiff:
-                    log("values %s and %s differ" % (el.text, newel.text))
+                    logger.warning("values %s and %s differ" % (el.text, newel.text))
                     return False
-            else:
-                if el.text != newel.text:
-                    log("texts %s and %s differ" % (el.text, newel.text))
-                    return False
-            if el.tag != newel.tag:
-                log("tags %s and %s differ" % (el.tag, newel.tag))
+            elif newel.text != el.text:
+                logger.warning("texts %s and %s differ" % (el.text, newel.text))
                 return False
         else:
-            compareXML(el, newel, allowedRelDiff, ignore)
+            if not compareXML(el, newel, allowedRelDiff, ignore):
+                return False
 
     return True
 
@@ -193,8 +193,8 @@ class RunPrinterTest(unittest.TestCase):
         self.assertTrue(compareXML(xmlDefault, xmlNew,
                                    allowedRelDiff=0.05,
                                    ignore=['input_file', 'smodels_version', 'ncpus']))
-        self.removeOutputs(outputfile)
-        self.removeOutputs('./debug.log')
+        # self.removeOutputs(outputfile)
+        # self.removeOutputs('./debug.log')
 
     def testXmlPrinterSimple(self):
 

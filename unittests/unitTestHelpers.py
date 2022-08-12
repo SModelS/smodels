@@ -80,47 +80,9 @@ def flattenElement(elStr):
     newElStr = elStr.replace(oldStr,newStr)
     return newElStr
 
-def convertCoverage(topologiesList):
-
-    # Flatten strings and combine weights of equal
-    # flattened elements
-    topoDict = {}
-    for topo in topologiesList:
-        if 'element' in topo:
-            elStr = topo['element']
-            newElStr = flattenElement(elStr)
-            topo['element'] = newElStr
-        elStr = topo['element']
-        if elStr  in topoDict:
-            topoDict[elStr]['weight (fb)'] += topo['weight (fb)']
-        else:
-            topoDict[elStr] = topo
-
-    # Get new list of topologies sorted by weights:
-    newList = sorted(topoDict.values(), key = lambda topo: topo['weight (fb)'],
-                     reverse = True)
-    return newList
-
-def compareMissingTopologies(obj1,obj2,allowedRelDiff,ignore=[]):
-
-    if len(obj1) == len(obj2) == 0:
-        return True
-
-    # Convert to version 3 notation and combine weights
-    newList1 = convertCoverage(obj1)
-    newList2 = convertCoverage(obj2)
-    # Since the list number can change, restrict list to smallest size
-    maxSize = min(len(newList1),len(newList2))
-    newList1 = newList1[:maxSize]
-    newList2 = newList2[:maxSize]
-
-    return equalObjs(newList1,newList2,allowedRelDiff,
-                     where='New Coverage Comparison',ignore=ignore)
-
 
 def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
-              fname2=None, checkBothOrders=True,
-              version3=True,allowedAbsDiff=0.0):
+              fname2=None, checkBothOrders=True):
     """
     Compare two objects.
     The numerical values are compared up to the precision defined by allowedRelDiff.
@@ -141,18 +103,13 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
     :return: True/False
     """
 
-    if where is not None and version3:
-        if 'topologies' in where and 'xsec' not in where:
-            return compareMissingTopologies(obj1,obj2,allowedRelDiff,
-                                            ignore=ignore)
-
     if type(fname) == str:
         fname = fname.replace(os.getcwd(), ".")
     if type(obj1) in [float, int] and type(obj2) in [float, int]:
         obj1, obj2 = float(obj1), float(obj2)
 
     if type(obj1) != type(obj2):
-        if (where == 'Mass (GeV)' or where == 'Width (GeV)') and version3:
+        if (where == 'Mass (GeV)' or where == 'Width (GeV)'):
             if obj1 is None or obj2 is None:
                 return True
         logger.warning("Data types differ: (%s,%s) <-> (%s,%s) in ''%s'':%s" % (obj1, type(obj1), obj2, type(obj2), where, fname ))
@@ -171,7 +128,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
             return True
         abs_diff = abs(obj1-obj2)
         rel_diff = 2.*abs_diff/abs(obj1+obj2)
-        ret = (rel_diff < allowedRelDiff) or (abs_diff < allowedAbsDiff)
+        ret = (rel_diff < allowedRelDiff)
         if not ret:
             logger.error("values %s and %s differ by %s in ''%s'': %s != %s" % (obj1, obj2, rel_diff, where, fname, fname2))
         return ret
@@ -196,8 +153,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
                 logger.warning("Key ``%s'' missing in %s:%s%s" % (key, where, fname, deffile ))
                 return False
             if not equalObjs(obj1[key], obj2[key], allowedRelDiff, ignore=ignore,
-                             where=key, fname=fname, fname2=fname2,
-                             allowedAbsDiff=allowedAbsDiff):
+                             where=key, fname=fname, fname2=fname2):
                 return False
     elif isinstance(obj1, list):
         if len(obj1) != len(obj2):
@@ -206,7 +162,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
             return False
         for ival, val in enumerate(obj1):
             if not equalObjs(val, obj2[ival], allowedRelDiff, fname=fname, ignore=ignore,
-                             fname2=fname2,allowedAbsDiff=allowedAbsDiff):
+                             fname2=fname2):
                 # logger.warning('Lists differ:\n   %s (this run)\n and\n   %s (default)' %\
                 #                (str(val),str(obj2[ival])))
                 return False
@@ -216,8 +172,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
     # Now check for the opposite order of the objects
     if checkBothOrders:
         if not equalObjs(obj2, obj1, allowedRelDiff, ignore, where,
-                         fname2, fname, checkBothOrders=False,
-                         allowedAbsDiff=allowedAbsDiff):
+                         fname2, fname, checkBothOrders=False):
             return False
     return True
 

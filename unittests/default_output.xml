@@ -17,12 +17,12 @@
             <DataSetID>None</DataSetID>
             <Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>992.87</Mass_GeV>
+                    <Mass_GeV>991.72</Mass_GeV>
                     <Mass_GeV>269.0</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
                 </Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>991.72</Mass_GeV>
+                    <Mass_GeV>992.87</Mass_GeV>
                     <Mass_GeV>269.0</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
                 </Mass_GeV_List>
@@ -57,11 +57,11 @@
             <DataSetID>None</DataSetID>
             <Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>991.43</Mass_GeV>
+                    <Mass_GeV>991.31</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
                 </Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>991.31</Mass_GeV>
+                    <Mass_GeV>991.43</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
                 </Mass_GeV_List>
             </Mass_GeV_List>
@@ -131,31 +131,13 @@
             <AnalysisID>CMS-SUS-13-012</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>3NJet6_1000HT1250_600MHTinf</DataSetID>
-            <Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>981.97</Mass_GeV>
-                    <Mass_GeV>129.0</Mass_GeV>
-                </Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>981.86</Mass_GeV>
-                    <Mass_GeV>129.0</Mass_GeV>
-                </Mass_GeV_List>
-            </Mass_GeV_List>
+            <Mass_GeV>None</Mass_GeV>
             <TxNames_List>
                 <TxNames>T1</TxNames>
                 <TxNames>T1tttt</TxNames>
                 <TxNames>T2</TxNames>
             </TxNames_List>
-            <Width_GeV_List>
-                <Width_GeV_List>
-                    <Width_GeV>prompt</Width_GeV>
-                    <Width_GeV>stable</Width_GeV>
-                </Width_GeV_List>
-                <Width_GeV_List>
-                    <Width_GeV>prompt</Width_GeV>
-                    <Width_GeV>stable</Width_GeV>
-                </Width_GeV_List>
-            </Width_GeV_List>
+            <Width_GeV>None</Width_GeV>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.7514</expected_upper_limit_fb>
             <l_SM>0.002530291</l_SM>
@@ -280,30 +262,12 @@
             <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>SRtN3</DataSetID>
-            <Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>865.0</Mass_GeV>
-                    <Mass_GeV>129.0</Mass_GeV>
-                </Mass_GeV_List>
-                <Mass_GeV_List>
-                    <Mass_GeV>865.0</Mass_GeV>
-                    <Mass_GeV>129.0</Mass_GeV>
-                </Mass_GeV_List>
-            </Mass_GeV_List>
+            <Mass_GeV>None</Mass_GeV>
             <TxNames_List>
                 <TxNames>T1qqtt</TxNames>
                 <TxNames>T1tttt</TxNames>
             </TxNames_List>
-            <Width_GeV_List>
-                <Width_GeV_List>
-                    <Width_GeV>prompt</Width_GeV>
-                    <Width_GeV>stable</Width_GeV>
-                </Width_GeV_List>
-                <Width_GeV_List>
-                    <Width_GeV>prompt</Width_GeV>
-                    <Width_GeV>stable</Width_GeV>
-                </Width_GeV_List>
-            </Width_GeV_List>
+            <Width_GeV>None</Width_GeV>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.35</expected_upper_limit_fb>
             <l_SM>0.02442398</l_SM>
@@ -393,7 +357,7 @@
         <checkinput>True</checkinput>
         <combineanas>CMS-SUS-13-012,ATLAS-SUSY-2018-31,ATLAS-CONF-2013-037</combineanas>
         <computestatistics>False</computestatistics>
-        <database_version>unittest220</database_version>
+        <database_version>unittest300-beta</database_version>
         <decomposition_status>1</decomposition_status>
         <docompress>True</docompress>
         <doinvisible>True</doinvisible>
@@ -404,7 +368,7 @@
         <model>share.models.mssm</model>
         <ncpus>-6</ncpus>
         <sigmacut>0.03</sigmacut>
-        <smodels_version>2.2.0</smodels_version>
+        <smodels_version>3.0.0-beta</smodels_version>
         <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>
     </OutputStatus>
@@ -414,52 +378,52 @@
     <Total_xsec_for_topologies_outside_the_grid_fb>237.4251</Total_xsec_for_topologies_outside_the_grid_fb>
     <missing_topologies_List>
         <missing_topologies>
-            <element>[[[jet],[W]],[[jet,jet],[W]]]  (MET,MET)</element>
+            <element>[[[jet,W]],[[jet,jet,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>148.1634</weight_fb>
         </missing_topologies>
         <missing_topologies>
-            <element>[[[W]],[[W]]]  (MET,MET)</element>
+            <element>[[[W]],[[W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>144.5845</weight_fb>
         </missing_topologies>
         <missing_topologies>
-            <element>[[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)</element>
+            <element>[[[jet,jet,W]],[[jet,jet,jet,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>144.0016</weight_fb>
         </missing_topologies>
         <missing_topologies>
-            <element>[[[jet,jet],[W]],[[b,t],[W]]]  (MET,MET)</element>
+            <element>[[[jet,jet,W]],[[t,b,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>104.7137</weight_fb>
         </missing_topologies>
         <missing_topologies>
-            <element>[[[jet]],[[jet,jet],[W]]]  (MET,MET)</element>
+            <element>[[[jet]],[[jet,jet,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>87.27849</weight_fb>
         </missing_topologies>
         <missing_topologies>
-            <element>[[[jet,jet],[higgs]],[[jet,jet],[W]]]  (MET,MET)</element>
+            <element>[[[jet,jet,higgs]],[[jet,jet,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>86.53583</weight_fb>
         </missing_topologies>
         <missing_topologies>
-            <element>[[[jet],[W]],[[b,t],[W]]]  (MET,MET)</element>
+            <element>[[[jet,W]],[[t,b,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>75.19827</weight_fb>
         </missing_topologies>
         <missing_topologies>
-            <element>[[[jet,jet],[W]],[[jet],[b,t],[W]]]  (MET,MET)</element>
+            <element>[[[jet,jet,W]],[[jet,t,b,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>73.08604</weight_fb>
         </missing_topologies>
         <missing_topologies>
-            <element>[[[b,t],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)</element>
+            <element>[[[t,b,W]],[[jet,jet,jet,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>73.08604</weight_fb>
         </missing_topologies>
         <missing_topologies>
-            <element>[[[jet],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)</element>
+            <element>[[[jet,W]],[[jet,jet,jet,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>64.66376</weight_fb>
         </missing_topologies>
@@ -467,84 +431,84 @@
     <missing_topologies_with_displaced_decays_List/>
     <missing_topologies_with_prompt_decays_List>
         <missing_topologies_with_prompt_decays>
-            <element>[[[jet],[W]],[[jet,jet],[W]]]  (MET,MET)</element>
+            <element>[[[jet,W]],[[jet,jet,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>148.1634</weight_fb>
         </missing_topologies_with_prompt_decays>
         <missing_topologies_with_prompt_decays>
-            <element>[[[W]],[[W]]]  (MET,MET)</element>
+            <element>[[[W]],[[W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>144.5845</weight_fb>
         </missing_topologies_with_prompt_decays>
         <missing_topologies_with_prompt_decays>
-            <element>[[[jet,jet],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)</element>
+            <element>[[[jet,jet,W]],[[jet,jet,jet,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>144.0016</weight_fb>
         </missing_topologies_with_prompt_decays>
         <missing_topologies_with_prompt_decays>
-            <element>[[[jet,jet],[W]],[[b,t],[W]]]  (MET,MET)</element>
+            <element>[[[jet,jet,W]],[[t,b,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>104.7137</weight_fb>
         </missing_topologies_with_prompt_decays>
         <missing_topologies_with_prompt_decays>
-            <element>[[[jet]],[[jet,jet],[W]]]  (MET,MET)</element>
+            <element>[[[jet]],[[jet,jet,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>87.27849</weight_fb>
         </missing_topologies_with_prompt_decays>
         <missing_topologies_with_prompt_decays>
-            <element>[[[jet,jet],[higgs]],[[jet,jet],[W]]]  (MET,MET)</element>
+            <element>[[[jet,jet,higgs]],[[jet,jet,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>86.53583</weight_fb>
         </missing_topologies_with_prompt_decays>
         <missing_topologies_with_prompt_decays>
-            <element>[[[jet],[W]],[[b,t],[W]]]  (MET,MET)</element>
+            <element>[[[jet,W]],[[t,b,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>75.19827</weight_fb>
         </missing_topologies_with_prompt_decays>
         <missing_topologies_with_prompt_decays>
-            <element>[[[jet,jet],[W]],[[jet],[b,t],[W]]]  (MET,MET)</element>
+            <element>[[[jet,jet,W]],[[jet,t,b,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>73.08604</weight_fb>
         </missing_topologies_with_prompt_decays>
         <missing_topologies_with_prompt_decays>
-            <element>[[[b,t],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)</element>
+            <element>[[[t,b,W]],[[jet,jet,jet,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>73.08604</weight_fb>
         </missing_topologies_with_prompt_decays>
         <missing_topologies_with_prompt_decays>
-            <element>[[[jet],[W]],[[jet],[jet,jet],[W]]]  (MET,MET)</element>
+            <element>[[[jet,W]],[[jet,jet,jet,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>64.66376</weight_fb>
         </missing_topologies_with_prompt_decays>
     </missing_topologies_with_prompt_decays_List>
     <topologies_outside_the_grid_List>
         <topologies_outside_the_grid>
-            <element>[[[higgs]],[[W]]]  (MET,MET)</element>
+            <element>[[[higgs]],[[W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>207.1303</weight_fb>
         </topologies_outside_the_grid>
         <topologies_outside_the_grid>
-            <element>[[[jet]],[[jet,jet]]]  (MET,MET)</element>
+            <element>[[[jet]],[[jet,jet]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>23.32642</weight_fb>
         </topologies_outside_the_grid>
         <topologies_outside_the_grid>
-            <element>[[[b],[W]],[[b],[W]]]  (MET,MET)</element>
+            <element>[[[b,W]],[[b,W]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>3.761819</weight_fb>
         </topologies_outside_the_grid>
         <topologies_outside_the_grid>
-            <element>[[[jet]],[[t,t]]]  (MET,MET)</element>
+            <element>[[[jet]],[[t,t]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>1.531994</weight_fb>
         </topologies_outside_the_grid>
         <topologies_outside_the_grid>
-            <element>[[[jet]],[[b,b]]]  (MET,MET)</element>
+            <element>[[[jet]],[[b,b]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>0.9943977</weight_fb>
         </topologies_outside_the_grid>
         <topologies_outside_the_grid>
-            <element>[[[jet,jet]],[[b,b]]]  (MET,MET)</element>
+            <element>[[[jet,jet]],[[b,b]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>0.6801837</weight_fb>
         </topologies_outside_the_grid>
