@@ -12,13 +12,13 @@ import os
 import glob
 import numpy as np
 from smodels.experiment import txnameObj, infoObj
-from smodels.tools.physicsUnits import fb
-from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
+from smodels.base.physicsUnits import fb
+from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, smsInStr
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 from smodels.experiment.expSMS import ExpSMS
-from smodels.theory.theorySMS import TheorySMS
+from smodels.decomposition.theorySMS import TheorySMS
 
 import itertools
 
@@ -78,7 +78,7 @@ class DataSet(object):
         id1, id2 = self.globalInfo.id, other.globalInfo.id
         if id1 == id2:  # we are always correlated with ourselves
             return False
-        from smodels.tools.physicsUnits import TeV
+        from smodels.base.physicsUnits import TeV
         ds = abs(self.globalInfo.sqrts.asNumber(TeV) - other.globalInfo.sqrts.asNumber(TeV))
         if ds > 1e-5:  # not the same
             return True

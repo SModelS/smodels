@@ -9,11 +9,12 @@
 from __future__ import print_function
 import os
 from smodels.installation import installDirectory, version
-from smodels.tools import modelTester
-from smodels.tools import crashReport
-from smodels.tools import smodelsLogging
-from smodels.tools import runtime
 from smodels.particlesLoader import load
+from smodels.base import smodelsLogging
+from smodels.base import runtime
+from smodels.matching import modelTester
+from smodels.tools import crashReport
+
 
 def main():
     import argparse
@@ -56,7 +57,7 @@ def main():
 
     args = ap.parse_args()
     if args.colors:
-        from smodels.tools.colors import colors
+        from smodels.base.smodelsLogging import colors
         colors.on = True
 
 

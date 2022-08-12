@@ -8,15 +8,15 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.theory.branch import Branch
+from smodels.decomposition.branch import Branch
 from smodels.tools.coverage import Uncovered
-from smodels.theory.topology import TopologyList, Topology
-from smodels.tools.physicsUnits import GeV, TeV, fb
-from smodels.theory.element import Element
-from smodels.theory.crossSection import XSectionList, XSection, XSectionInfo
+from smodels.decomposition.topology import TopologyList, Topology
+from smodels.base.physicsUnits import GeV, TeV, fb
+from smodels.decomposition.element import Element
+from smodels.base.crossSection import XSectionList, XSection, XSectionInfo
 from smodels.share.models import SMparticles, mssm
 from smodels.tools.reweighting import reweightFactorFor
-from smodels.theory.particle import Particle
+from smodels.base.particle import Particle
 import random
 
 n1 = mssm.n1

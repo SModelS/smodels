@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import socket, sys, time, random, multiprocessing, random, os
-from smodels.tools.physicsUnits import fb, pb
+from smodels.base.physicsUnits import fb, pb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 class DatabaseClient:

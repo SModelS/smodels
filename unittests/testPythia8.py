@@ -13,7 +13,7 @@ import sys
 sys.path.insert(0,"../")
 from smodels.tools import xsecComputer, toolBox
 from smodels.tools.xsecComputer import LO
-from smodels.tools.physicsUnits import TeV, fb
+from smodels.base.physicsUnits import TeV, fb
 from unum import Unum
 import unittest
 from math import sqrt

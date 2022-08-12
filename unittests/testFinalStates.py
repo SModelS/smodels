@@ -9,7 +9,7 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 
-from smodels.theory.model import Model
+from smodels.base.model import Model
 from smodels.share.models.SMparticles import SMList
 from smodels.experiment.defaultFinalStates import finalStates
 

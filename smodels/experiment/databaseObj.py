@@ -23,10 +23,10 @@ from smodels.installation import cacheDirectory
 from smodels.experiment.metaObj import Meta
 from smodels.experiment.expResultObj import ExpResult
 from smodels.experiment.exceptions import DatabaseNotFoundException
-from smodels.tools.physicsUnits import TeV
-from smodels.tools.stringTools import cleanWalk
+from smodels.base.physicsUnits import TeV
+from smodels.experiment.expAuxiliaryFuncs import cleanWalk
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 import logging
 os.environ["OMP_NUM_THREADS"] = "2"
 
@@ -1134,7 +1134,7 @@ class ExpResultList(object):
 
 if __name__ == "__main__":
     import argparse
-    from smodels.tools.smodelsLogging import setLogLevel
+    from smodels.base.smodelsLogging import setLogLevel
     """ Run as a script, this checks and/or writes dbX.pcl files """
     argparser = argparse.ArgumentParser(description='simple script to check \
             and/or write dbX.pcl files')

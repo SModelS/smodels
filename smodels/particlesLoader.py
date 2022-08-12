@@ -9,11 +9,11 @@
 
 """
 
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.tools.smodelsLogging import logger
 import os
 import sys
-from smodels.theory.particle import Particle
+from smodels.base.exceptions import SModelSBaseError as SModelSError
+from smodels.base.smodelsLogging import logger
+from smodels.base.particle import Particle
 from smodels.installation import installDirectory
 from importlib import import_module
 
@@ -142,7 +142,7 @@ def getParticlesFromModule(modelFile):
 
 def load():
 
-    from smodels.tools.runtime import modelFile
+    from smodels.base.runtime import modelFile
 
     try:
         BSMList = getParticlesFromModule(modelFile)

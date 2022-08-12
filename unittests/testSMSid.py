@@ -10,13 +10,13 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.theory import decomposer
-from smodels.tools.physicsUnits import GeV,fb
+from smodels.decomposition import decomposer
+from smodels.base.physicsUnits import GeV,fb
 from databaseLoader import database
-from smodels.matcher.theoryPrediction import theoryPredictionsFor
+from smodels.matching.theoryPrediction import theoryPredictionsFor
 from smodels.share.models.SMparticles import SMList
 from smodels.share.models.mssm import BSMList
-from smodels.theory.model import Model
+from smodels.base.model import Model
 
 class SMSIdTest(unittest.TestCase):
     def testGoodFile(self):

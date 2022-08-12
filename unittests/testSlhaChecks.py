@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools import slhaChecks
-from smodels.tools import runtime
+from smodels.base import runtime
 
 class SlhaTest(unittest.TestCase):
 

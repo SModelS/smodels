@@ -10,9 +10,9 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.theory.particle import Particle, MultiParticle,ParticleList
-from smodels.theory.branch import Branch, decayBranches, InclusiveBranch
-from smodels.tools.physicsUnits import GeV, MeV
+from smodels.base.particle import Particle, MultiParticle,ParticleList
+from smodels.decomposition.branch import Branch, decayBranches, InclusiveBranch
+from smodels.base.physicsUnits import GeV, MeV
 from smodels.experiment.defaultFinalStates import finalStates
 import pyslha
 

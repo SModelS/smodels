@@ -19,7 +19,7 @@ from smodels.tools.timeOut import NoTime
 from unitTestHelpers import equalObjs, runMain, importModule
 import time
 import subprocess
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 
 
 class RunSModelSTest(unittest.TestCase):

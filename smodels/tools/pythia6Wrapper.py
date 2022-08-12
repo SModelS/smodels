@@ -11,12 +11,12 @@
 from __future__ import print_function
 from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools import wrapperBase
-from smodels.tools.physicsUnits import pb, TeV
-from smodels.tools.smodelsLogging import logger
-from smodels.theory import crossSection
-from smodels.theory.crossSection import LO
+from smodels.base.physicsUnits import pb, TeV
+from smodels.base.smodelsLogging import logger
+from smodels.base import crossSection
+from smodels.base.crossSection import LO
 from smodels import installation
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 import os, sys, io
 
 try:

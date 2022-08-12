@@ -7,11 +7,12 @@
 
 """
 
-from smodels.experiment.databaseObj import Database,ExpResult
+
 import numpy, unum
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom,getValuesForObj
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from smodels.experiment.databaseObj import Database,ExpResult
 
 #logger.setLevel(level=logging.INFO)
 
@@ -274,7 +275,7 @@ def main(args):
 
 
     from smodels.tools import databaseBrowser
-    from smodels.tools.physicsUnits import fb, pb, GeV, TeV
+    from smodels.base.physicsUnits import fb, pb, GeV, TeV
 
     def getHeader ():
         from smodels.installation import installDirectory

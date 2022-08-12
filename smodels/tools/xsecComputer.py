@@ -11,12 +11,12 @@
 """
 from __future__ import print_function
 from smodels import installation
-from smodels.tools import toolBox, runtime
-from smodels.tools.physicsUnits import pb, TeV, GeV
-from smodels.theory import crossSection
-from smodels.theory.crossSection import LO, NLO, NLL
-from smodels.tools.smodelsLogging import logger, setLogLevel
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.tools import toolBox
+from smodels.base.physicsUnits import pb, TeV, GeV
+from smodels.base import crossSection, runtime
+from smodels.base.crossSection import LO, NLO, NLL
+from smodels.base.smodelsLogging import logger, setLogLevel
+from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 import os, copy
 import pyslha
 try:
@@ -578,7 +578,7 @@ def main(args):
     if args.query:
         return canonizer.queryCrossSections ( args.filename )
     if args.colors:
-        from smodels.tools.colors import colors
+        from smodels.base.smodelsLogging import colors
         colors.on = True
     sqrtses = canonizer.getSqrtses ( args )
     order = canonizer.getOrder ( args )

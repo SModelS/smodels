@@ -12,14 +12,14 @@ import sys
 sys.path.insert(0, "../")
 import unittest
 # from smodels.tools import statistics
-from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
-from smodels.tools.statistics import likelihoodFromLimits, chi2FromLimits
-from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.statistics.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
+from smodels.statistics.statisticalTools import likelihoodFromLimits, chi2FromLimits
+from smodels.decomposition.theoryPrediction import theoryPredictionsFor
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
+from smodels.base.model import Model
 from databaseLoader import database
-from smodels.theory import decomposer
+from smodels.decomposition import decomposer
 from math import floor, log10
 import numpy as np
 import math
@@ -115,7 +115,7 @@ class StatisticsTest(unittest.TestCase):
 
     def testApproxGaussian(self):
         ## turn experimental features on
-        from smodels.tools import runtime
+        from smodels.base import runtime
         runtime._experimental = True
         expRes = database.getExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
         self.assertTrue(len(expRes), 1)

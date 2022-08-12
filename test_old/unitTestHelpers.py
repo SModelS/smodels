@@ -17,7 +17,7 @@ import redirector
 from smodels.tools.runSModelS import run
 from os.path import join, basename
 from smodels.installation import installDirectory as iDir
-from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
+from smodels.base.smodelsLogging import logger, setLogLevel, getLogLevel
 
 def sortExptRes ( exptRes ):
     """ the experimental results may be in different orders. 

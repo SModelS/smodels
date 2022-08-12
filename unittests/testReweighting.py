@@ -10,16 +10,16 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.share.models import SMparticles, mssm
 from smodels.experiment.reweighting import calculateProbabilities,reweightFactorFor
-from smodels.tools.physicsUnits import GeV
-from smodels.theory.theorySMS import TheorySMS
+from smodels.base.physicsUnits import GeV
+from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.particle import Particle
-from smodels.theory.model import Model
+from smodels.base.particle import Particle
+from smodels.base.model import Model
 from collections import OrderedDict
-from smodels.tools.physicsUnits import fb, GeV, TeV
-from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList
+from smodels.base.physicsUnits import fb, GeV, TeV
+from smodels.base.crossSection import XSection,XSectionInfo,XSectionList
 from smodels.share.models import SMparticles
 from smodels.experiment.defaultFinalStates import finalStates
 from unitTestHelpers import theorySMSFromString as fromString

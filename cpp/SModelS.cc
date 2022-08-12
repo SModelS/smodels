@@ -44,8 +44,8 @@ void SModelS::initialize ( const string & parameterfile, const string & smodelsd
   PyRun_SimpleString( set_path.str().c_str() );
   PyRun_SimpleString("import time");
   PyRun_SimpleString("t0=time.time()");
-  PyRun_SimpleString("from smodels.tools import modelTester");
-  PyRun_SimpleString("from smodels.tools.smodelsLogging import setLogLevel");
+  PyRun_SimpleString("from smodels.matching import modelTester");
+  PyRun_SimpleString("from smodels.base.smodelsLogging import setLogLevel");
 	ostringstream set_verbosity;
 	set_verbosity << "setLogLevel ( \"" << verbose << "\" ) ";
   PyRun_SimpleString( set_verbosity.str().c_str() );

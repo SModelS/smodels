@@ -11,15 +11,15 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.experiment.txnameObj import TxName
-from smodels.tools.physicsUnits import GeV
+from smodels.base.physicsUnits import GeV
 from smodels.experiment import infoObj
-from smodels.tools.inclusiveObjects import InclusiveValue, InclusiveList
+from smodels.base.inclusiveObjects import InclusiveValue, InclusiveList
 from smodels.experiment.defaultFinalStates import finalStates
 from smodels.experiment.expSMS import ExpSMS
 from unitTestHelpers import theorySMSFromString as fromString
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
+from smodels.base.model import Model
 
 
 slhafile = './testFiles/slha/lightEWinos.slha'

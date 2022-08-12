@@ -10,9 +10,9 @@
 """
 import sys
 sys.path.insert(0,"../")
-from smodels.theory.element import Element
+from smodels.decomposition.element import Element
 from smodels.share.models import mssm
-from smodels.tools.physicsUnits import GeV
+from smodels.base.physicsUnits import GeV
 from databaseLoader import database
 from smodels.experiment.defaultFinalStates import finalStates
 import unittest

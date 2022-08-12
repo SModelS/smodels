@@ -139,7 +139,7 @@ setup(
                 "supersymmetry UEDs"),
     url="http://smodels.hephy.at/",
     packages=['smodels',
-              'smodels.theory',
+              'smodels.decomposition',
               'smodels.tools',
               'smodels.experiment'],
     include_package_data = True,

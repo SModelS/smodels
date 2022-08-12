@@ -11,7 +11,7 @@ from datetime import datetime
 import platform
 import traceback
 from smodels.installation import installDirectory
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 
 class CrashReport(object):
     """

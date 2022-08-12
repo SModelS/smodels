@@ -10,12 +10,12 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.physicsUnits import GeV, pb
+from smodels.base.physicsUnits import GeV, pb
 from databaseLoader import database
 from unitTestHelpers import theorySMSFromString as fromString
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
+from smodels.base.model import Model
 
 slhafile = './testFiles/slha/lightEWinos.slha'
 model = Model( BSMparticles=BSMList, SMparticles=SMList)

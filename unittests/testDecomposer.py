@@ -14,9 +14,9 @@ sys.path.insert(0,"../")
 from smodels.experiment.expSMS import ExpSMS
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
-from smodels.theory import decomposer
-from smodels.tools.physicsUnits import GeV,pb,TeV,fb
+from smodels.base.model import Model
+from smodels.decomposition import decomposer
+from smodels.base.physicsUnits import GeV,pb,TeV,fb
 from smodels.experiment.defaultFinalStates import finalStates
 from unitTestHelpers import theorySMSFromString as fromString
 from unitTestHelpers import canonNameToVertNumb

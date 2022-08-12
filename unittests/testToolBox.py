@@ -14,7 +14,7 @@ from smodels.tools import toolBox
 import unittest
 
 class TestToolBox(unittest.TestCase):
-    from smodels.tools.smodelsLogging import logger
+    from smodels.base.smodelsLogging import logger
 
     def testToolBox(self):
         self.logger.info( "ToolBox" )

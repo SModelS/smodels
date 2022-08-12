@@ -13,12 +13,12 @@ import sys,os
 sys.path.insert(0,"../")
 import unittest
 from unitTestHelpers import equalObjs, runMain, importModule
-from smodels.tools.smodelsLogging import setLogLevel
-from smodels.tools import runtime
+from smodels.base.smodelsLogging import setLogLevel
+from smodels.base import runtime
 from smodels import particlesLoader
 from imp import reload
 import subprocess
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 setLogLevel('debug')
 
 
@@ -101,7 +101,7 @@ class ModelsTest(unittest.TestCase):
     def testParticlesFromSLHA(self):
 
         from smodels.particlesLoader import getParticlesFromSLHA
-        from smodels.theory.particle import Particle
+        from smodels.base.particle import Particle
 
         BSMList = getParticlesFromSLHA("./testFiles/slha/idm_example.slha")
         BSMList = sorted(BSMList, key = lambda p: p.pdg)

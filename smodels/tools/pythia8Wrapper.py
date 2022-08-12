@@ -11,12 +11,12 @@
 from __future__ import print_function
 from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools import wrapperBase
-from smodels.tools.smodelsLogging import logger, setLogLevel
-from smodels.tools.physicsUnits import fb, pb, TeV, mb
-from smodels.theory.crossSection import getXsecFromLHEFile
+from smodels.base.smodelsLogging import logger, setLogLevel
+from smodels.base.physicsUnits import fb, pb, TeV, mb
+from smodels.base.crossSection import getXsecFromLHEFile
 from smodels import installation
 from smodels.tools.pythia8particles import particles
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 import os, sys, io, shutil
 
 try:

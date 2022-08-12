@@ -13,7 +13,7 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools.caching import Cache
-from smodels.tools.physicsUnits import GeV, fb
+from smodels.base.physicsUnits import GeV, fb
 from databaseLoader import database
 
 class CachingTest(unittest.TestCase):

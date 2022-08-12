@@ -7,10 +7,10 @@
 
 """
 
-from smodels.theory.particle import Particle, MultiParticle
-from smodels.theory.model import Model
-from smodels.tools.physicsUnits import MeV, GeV
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.base.particle import Particle, MultiParticle
+from smodels.base.model import Model
+from smodels.base.physicsUnits import MeV, GeV
+from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 
 # Below we define all particles that are relevant for the database constraints.
 # One must avoid defining non-unique labels, so there is a one-to-one correspondence

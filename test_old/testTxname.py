@@ -10,12 +10,12 @@
 import sys
 sys.path.insert(0,"../")
 from smodels.share.models import mssm
-from smodels.theory.element import Element
+from smodels.decomposition.element import Element
 from smodels.experiment import infoObj
 from smodels.experiment.txnameObj import TxName, rescaleWidth, unscaleWidth
-from smodels.tools.physicsUnits import GeV
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.theory.auxiliaryFunctions import flattenArray
+from smodels.base.physicsUnits import GeV
+from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
+from smodels.decomposition.auxiliaryFunctions import flattenArray
 from databaseLoader import database
 from smodels.experiment.defaultFinalStates import finalStates
 import numpy as np

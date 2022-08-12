@@ -11,11 +11,11 @@
 from __future__ import print_function
 import sys
 import argparse
-from smodels.theory import decomposer
-from smodels.tools.smodelsLogging import logger
+from smodels.decomposition import decomposer
+from smodels.base.smodelsLogging import logger
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
+from smodels.base.model import Model
 
 
 

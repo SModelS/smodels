@@ -9,17 +9,17 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools.coverage import Uncovered
-from smodels.theory.theorySMS import TheorySMS
-from smodels.theory.topologyDict import TopologyDict
-from smodels.tools.physicsUnits import GeV, TeV, fb
-from smodels.theory.crossSection import XSectionList, XSection, XSectionInfo
+from smodels.decomposition.theorySMS import TheorySMS
+from smodels.decomposition.topologyDict import TopologyDict
+from smodels.base.physicsUnits import GeV, TeV, fb
+from smodels.base.crossSection import XSectionList, XSection, XSectionInfo
 from smodels.share.models import SMparticles, mssm
 from smodels.experiment.reweighting import reweightFactorFor
-from smodels.theory.particle import Particle
-from smodels.theory.particleNode import ParticleNode
+from smodels.base.particle import Particle
+from smodels.base.particleNode import ParticleNode
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
+from smodels.base.model import Model
 from unitTestHelpers import theorySMSFromString as fromString
 import random
 

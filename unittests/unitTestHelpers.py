@@ -17,9 +17,9 @@ import redirector
 from smodels.tools.runSModelS import run
 from os.path import join, basename
 from smodels.installation import installDirectory as iDir
-from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
-from smodels.tools.physicsUnits import fb
-from smodels.theory.theorySMS import TheorySMS
+from smodels.base.smodelsLogging import logger, setLogLevel, getLogLevel
+from smodels.base.physicsUnits import fb
+from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
 
 def canonNameToVertNumb(topoDict,cName):
@@ -261,7 +261,7 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
         level = 'error'
         to = os.devnull
     database = None
-    from smodels.tools import runtime
+    from smodels.base import runtime
     if overridedatabase is not None:
         database = overridedatabase
     else:

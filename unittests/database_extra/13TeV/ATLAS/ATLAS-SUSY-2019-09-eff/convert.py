@@ -9,7 +9,7 @@ import sys
 import os
 import copy
 import csv
-from smodels.tools.physicsUnits import fb
+from smodels.base.physicsUnits import fb
 from smodels_utils.dataPreparation.argParser import getParserArgs
 from smodels_utils.dataPreparation.inputObjects import MetaInfoInput,DataSetInput
 from smodels_utils.dataPreparation.databaseCreation import databaseCreator

@@ -9,10 +9,10 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.share.models import SMparticles, mssm
-from smodels.theory.branch import Branch
-from smodels.theory.element import Element
+from smodels.decomposition.branch import Branch
+from smodels.decomposition.element import Element
 from smodels.tools.reweighting import calculateProbabilities,reweightFactorFor
-from smodels.tools.physicsUnits import GeV
+from smodels.base.physicsUnits import GeV
 
 class ReweightingTest(unittest.TestCase):
 

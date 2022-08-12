@@ -12,12 +12,12 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.experiment.txnameObj import TxNameData
-from smodels.tools.physicsUnits import GeV, pb, fb
+from smodels.base.physicsUnits import GeV, pb, fb
 from databaseLoader import database
 from unitTestHelpers import theorySMSFromString as fromString
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
+from smodels.base.model import Model
 import numpy as np
 
 slhafile = './testFiles/slha/lightEWinos.slha'

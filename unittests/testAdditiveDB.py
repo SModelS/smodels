@@ -18,7 +18,7 @@ import os
 class AdditiveDBTest(unittest.TestCase):
     # use different logging config for the unit tests.
     logging.config.fileConfig( "./logging.conf" )
-    from smodels.tools.smodelsLogging import logger
+    from smodels.base.smodelsLogging import logger
 
     def testAddingSubset(self):
         """ tests adding same dataset """

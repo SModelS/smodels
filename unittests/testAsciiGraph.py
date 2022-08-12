@@ -13,9 +13,9 @@ import sys
 sys.path.insert(0,"../")
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
+from smodels.base.model import Model
 from smodels.tools import asciiGraph
-from smodels.theory import decomposer
+from smodels.decomposition import decomposer
 
 class AsciiTest(unittest.TestCase):
     def orig(self):

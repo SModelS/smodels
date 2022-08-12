@@ -11,14 +11,14 @@ from __future__ import print_function
 import sys
 import os
 import copy
-from smodels.theory.topologyDict import TopologyDict
-from smodels.matcher.theoryPrediction import TheoryPredictionList
-from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
+from smodels.decomposition.topologyDict import TopologyDict
+from smodels.matching.theoryPrediction import TheoryPredictionList
+from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.experiment.databaseObj import ExpResultList
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
-from smodels.tools.physicsUnits import GeV, fb, TeV
-from smodels.tools.smodelsLogging import logger
+from smodels.base.physicsUnits import GeV, fb, TeV
+from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.basicPrinter import BasicPrinter
 import numpy as np
 from collections import OrderedDict

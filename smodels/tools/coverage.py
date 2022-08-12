@@ -7,11 +7,11 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 
-from smodels.tools.physicsUnits import fb
-from smodels.experiment.reweighting import reweightFactorFor
 from bisect import bisect
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.theory.theorySMS import TheorySMS
+from smodels.base.physicsUnits import fb
+from smodels.base.exceptions import SModelSBaseError as SModelSError
+from smodels.experiment.reweighting import reweightFactorFor
+from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.defaultFinalStates import (WList, lList, tList, taList, nuList, jetList,
                                                    MET, HSCP, RHadronG, RHadronQ)
 

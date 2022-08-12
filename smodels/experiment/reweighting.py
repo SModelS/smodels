@@ -6,10 +6,10 @@
 """
 
 from math import exp
-from smodels.tools.physicsUnits import GeV
-from smodels.tools.genericSMS import GenericSMS
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.tools.smodelsLogging import logger
+from smodels.base.physicsUnits import GeV
+from smodels.base.genericSMS import GenericSMS
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from smodels.base.smodelsLogging import logger
 
 Leff_inner_default = 0.000769
 Leff_outer_default = 7.0

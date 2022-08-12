@@ -59,7 +59,7 @@ except pyhf.exceptions.ImportBackendError as e:
 
 from scipy import optimize
 import numpy as np
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 

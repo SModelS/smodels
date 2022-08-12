@@ -12,7 +12,7 @@
 from __future__ import print_function
 import sys, subprocess
 sys.path.insert(0,"../")
-from smodels.tools.colors import colors
+from smodels.base.smodelsLogging import colors
 colors.on = True
 
 v=sys.version_info
@@ -24,7 +24,7 @@ if v[0]==2 and v[1] < 7 and v[1] > 3:
     except ImportError as e:
         print ( "Error: python v",sys.version,"needs unittest2. Please install." )
         sys.exit()
-from smodels.tools.smodelsLogging import setLogLevel
+from smodels.base.smodelsLogging import setLogLevel
 setLogLevel ( "error" )
 
 def run():
@@ -70,7 +70,7 @@ def parallel_run ( verbose ):
         print ( "Need to install the module concurrencytest." )
         print ( "pip install --user concurrencytest" )
         return
-    from smodels.tools import runtime
+    from smodels.base import runtime
     suite = unittest.TestLoader().discover("./")
     ncpus = runtime.nCPUs()
     ## "shuffle" the tests, so that the heavy tests get distributed

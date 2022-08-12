@@ -13,8 +13,8 @@ import sys,os
 sys.path.insert(0,"../")
 from smodels.tools import xsecComputer, toolBox
 from smodels.tools.xsecComputer import LO, NLL
-from smodels.tools.physicsUnits import TeV, fb
-from smodels.theory import crossSection
+from smodels.base.physicsUnits import TeV, fb
+from smodels.base import crossSection
 import tempfile
 import unittest
 import argparse
@@ -24,7 +24,7 @@ import logging.config
 class XSecTest(unittest.TestCase):
     # use different logging config for the unit tests.
     logging.config.fileConfig( "./logging.conf" )
-    from smodels.tools.smodelsLogging import setLogLevel,logger
+    from smodels.base.smodelsLogging import setLogLevel,logger
     
     setLogLevel ( "warn" )
 

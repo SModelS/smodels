@@ -15,7 +15,7 @@ sys.path.insert(0,"../")
 import unittest
 import numpy
 from smodels.experiment.txnameObj import TxNameData
-from smodels.tools.physicsUnits import GeV, eV, fb, MeV, pb, keV
+from smodels.base.physicsUnits import GeV, eV, fb, MeV, pb, keV
 import unum
 
 def pprint ( energy ):

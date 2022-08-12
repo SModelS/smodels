@@ -16,7 +16,7 @@ import unittest
 import numpy
 from smodels.experiment.txnameDataObj import TxNameData
 from smodels.experiment.txnameObj import TxName
-from smodels.tools.physicsUnits import GeV, eV, fb, MeV, pb, keV
+from smodels.base.physicsUnits import GeV, eV, fb, MeV, pb, keV
 from smodels.experiment.infoObj import Info
 from smodels.experiment.defaultFinalStates import finalStates
 import numpy as np

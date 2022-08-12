@@ -10,7 +10,7 @@
 
 """
 
-from smodels.theory.particle import Particle, MultiParticle
+from smodels.base.particle import Particle, MultiParticle
 
 ####  R-odd   ##########
 

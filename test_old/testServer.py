@@ -19,7 +19,7 @@ from unitTestHelpers import equalObjs, runMain, importModule
 import time, random
 import subprocess
 
-from smodels.tools.smodelsLogging import logger, setLogLevel
+from smodels.base.smodelsLogging import logger, setLogLevel
 from smodels.tools.databaseClient import DatabaseClient
 from smodels.tools.databaseServer import DatabaseServer
 import warnings

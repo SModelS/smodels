@@ -12,7 +12,7 @@
 import unittest
 import sys
 sys.path.insert(0,"../")
-from smodels.theory import lheReader
+from smodels.base import lheReader
 import pyslha
 import logging as logger
 

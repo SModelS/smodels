@@ -12,10 +12,10 @@ sys.path.insert(0,"../")
 import unittest
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory import decomposer
-from smodels.theory.model import Model
-from smodels.tools.physicsUnits import GeV, fb
-from smodels.matcher.theoryPrediction import theoryPredictionsFor
+from smodels.decomposition import decomposer
+from smodels.base.model import Model
+from smodels.base.physicsUnits import GeV, fb
+from smodels.matching.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database
 
 class ConditionTest(unittest.TestCase):

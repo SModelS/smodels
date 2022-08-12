@@ -9,10 +9,10 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.share.models import mssm
-from smodels.theory.branch import Branch
-from smodels.theory.element import Element
+from smodels.decomposition.branch import Branch
+from smodels.decomposition.element import Element
 from smodels.tools.reweighting import calculateProbabilities,defaultEffReweight
-from smodels.tools.physicsUnits import GeV
+from smodels.base.physicsUnits import GeV
 from databaseLoader import database
 
 class DetectorSizeTest(unittest.TestCase):

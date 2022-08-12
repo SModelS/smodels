@@ -9,9 +9,9 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.share.models import mssm
-from smodels.theory.theorySMS import TheorySMS
+from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.reweighting import calculateProbabilities,defaultEffReweight
-from smodels.tools.physicsUnits import GeV
+from smodels.base.physicsUnits import GeV
 from databaseLoader import database
 from unitTestHelpers import theorySMSFromString as fromString
 
@@ -59,8 +59,8 @@ class DetectorSizeTest(unittest.TestCase):
 
         from smodels.share.models.SMparticles import SMList
         from smodels.share.models.mssm import BSMList
-        from smodels.theory.model import Model
-        from smodels.tools import runtime
+        from smodels.base.model import Model
+        from smodels.base import runtime
 
         slhafile = './testFiles/slha/lightEWinos.slha'
 
@@ -88,7 +88,7 @@ class DetectorSizeTest(unittest.TestCase):
 
         from smodels.share.models.mssm import BSMList
         from smodels.share.models.SMparticles import SMList
-        from smodels.theory.model import Model
+        from smodels.base.model import Model
 
         slhafile = './testFiles/slha/lightEWinos.slha'
 

@@ -12,25 +12,25 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 
-from smodels.theory.element import Element
-from smodels.theory.branch import Branch
-from smodels.theory import decomposer
+from smodels.decomposition.element import Element
+from smodels.decomposition.branch import Branch
+from smodels.decomposition import decomposer
 from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
-from smodels.theory import clusterTools
+from smodels.base.model import Model
+from smodels.decomposition import clusterTools
 from smodels.experiment.txnameObj import TxName, TxNameData
 from smodels.experiment.datasetObj import DataSet
 from smodels.experiment.infoObj import Info
 from smodels.share.models import SMparticles, mssm
-from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList
-from smodels.tools.physicsUnits import GeV, TeV, fb
+from smodels.base.crossSection import XSection,XSectionInfo,XSectionList
+from smodels.base.physicsUnits import GeV, TeV, fb
 from databaseLoader import database
-from smodels.theory.clusterTools import clusterElements
-from smodels.theory.theoryPrediction import theoryPredictionsFor
-from smodels.theory.particle import ParticleList
+from smodels.decomposition.clusterTools import clusterElements
+from smodels.decomposition.theoryPrediction import theoryPredictionsFor
+from smodels.base.particle import ParticleList
 from smodels.experiment.defaultFinalStates import finalStates
-from smodels.theory.auxiliaryFunctions import roundValue
+from smodels.decomposition.auxiliaryFunctions import roundValue
 
 
 class ClustererTest(unittest.TestCase):

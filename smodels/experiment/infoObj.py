@@ -10,9 +10,9 @@
 """
 
 import os
-from smodels.tools.physicsUnits import GeV, fb, TeV, pb
+from smodels.base.physicsUnits import GeV, fb, TeV, pb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 
 
 class Info(object):
@@ -35,7 +35,7 @@ class Info(object):
             if not os.path.isfile(path):
                 logger.error("Info file %s not found" % path)
                 raise SModelSError()
-            from smodels.tools.stringTools import concatenateLines
+            from smodels.experiment.expAuxiliaryFuncs import concatenateLines
             infoFile = open(self.path)
             content = concatenateLines(infoFile.readlines())
             infoFile.close()

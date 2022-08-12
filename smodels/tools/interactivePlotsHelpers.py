@@ -12,7 +12,7 @@ import math
 import os
 import importlib.util
 import smodels
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 try:
     import warnings ## we can ignore these warnings, see
     # https://stackoverflow.com/questions/40845304/runtimewarning-numpy-dtype-size-changed-may-indicate-binary-incompatibility
@@ -29,7 +29,7 @@ except ImportError as e:
     sys.exit()
 import os
 import pyslha
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 
 def importPythonOutput(smodelsFile):
     """
@@ -366,7 +366,7 @@ class Filler:
         full_list=self.particle_names.BSMList+self.sm_particle_names.SMList
         for particle in full_list:
             #print(particle.pdg)
-            if isinstance(particle,smodels.theory.particle.MultiParticle):
+            if isinstance(particle,smodels.base.particle.MultiParticle):
 
                 for sub_pdg in particle.pdg:
                     if sub_pdg==pdg:

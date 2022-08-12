@@ -12,14 +12,14 @@ sys.path.insert(0,"../")
 from smodels.share.models import mssm
 from smodels.experiment import infoObj
 from smodels.experiment.txnameObj import TxName, rescaleWidth, unscaleWidth
-from smodels.tools.physicsUnits import GeV
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.base.physicsUnits import GeV
+from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.experiment.expAuxiliaryFuncs import flattenArray
 from databaseLoader import database
 from smodels.experiment.defaultFinalStates import finalStates
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
+from smodels.base.model import Model
 from unitTestHelpers import theorySMSFromString as fromString
 import numpy as np
 import unittest

@@ -11,11 +11,11 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.share.models import SMparticles, mssm
-from smodels.theory.branch import Branch
-from smodels.theory.element import Element
-from smodels.theory.topology import Topology,TopologyList
-from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList
-from smodels.tools.physicsUnits import TeV, fb
+from smodels.decomposition.branch import Branch
+from smodels.decomposition.element import Element
+from smodels.decomposition.topology import Topology,TopologyList
+from smodels.base.crossSection import XSection,XSectionInfo,XSectionList
+from smodels.base.physicsUnits import TeV, fb
 
 
 

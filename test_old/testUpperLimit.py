@@ -10,7 +10,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.physicsUnits import GeV, pb
+from smodels.base.physicsUnits import GeV, pb
 from databaseLoader import database
 
 class UpperLimitTest(unittest.TestCase): 

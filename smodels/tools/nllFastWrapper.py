@@ -37,7 +37,7 @@ gluinos = [1000021]
 
 import os
 from smodels.tools.wrapperBase import WrapperBase
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 
 
 class NllFastWrapper(WrapperBase):

@@ -13,13 +13,13 @@ sys.path.insert(0,"../")
 import unittest
 from databaseLoader import database
 
-# from smodels.tools.smodelsLogging import logger, setLogLevel
-from smodels.matcher.theoryPrediction import theoryPredictionsFor
-from smodels.theory.decomposer import decompose
-from smodels.tools.physicsUnits import fb
+# from smodels.base.smodelsLogging import logger, setLogLevel
+from smodels.matching.theoryPrediction import theoryPredictionsFor
+from smodels.decomposition.decomposer import decompose
+from smodels.base.physicsUnits import fb
 from smodels.share.models.mssm import st1,gluino,n1
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
+from smodels.base.model import Model
 from smodels.experiment.defaultFinalStates import finalStates
 
 class TopoCombTest(unittest.TestCase):

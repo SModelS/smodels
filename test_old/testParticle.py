@@ -2,18 +2,18 @@
 
 """
 .. module:: testParticleClass
-   :synopsis: Tests the smodels.theory.particleClass.Particles and .MultiParticle class
+   :synopsis: Tests the smodels.base.particleClass.Particles and .MultiParticle class
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>
 """
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.theory.particle import Particle, MultiParticle
-from smodels.tools.physicsUnits import GeV
-from smodels.theory.auxiliaryFunctions import elementsInStr
+from smodels.base.particle import Particle, MultiParticle
+from smodels.base.physicsUnits import GeV
+from smodels.decomposition.auxiliaryFunctions import elementsInStr
 from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory import model
+from smodels.decomposition import model
 from smodels.experiment.defaultFinalStates import finalStates
 import numpy as np
 
@@ -41,7 +41,7 @@ class ParticleTest(unittest.TestCase):
     def testParticleComparison(self):
 
         slhafile = 'testFiles/slha/lightEWinos.slha'
-        bsmModel = model.Model(BSMparticles=BSMList, SMparticles=SMList)
+        bsmModel = base.model(BSMparticles=BSMList, SMparticles=SMList)
         bsmModel.updateParticles(slhafile)
         BSMparticles = bsmModel.BSMparticles
         SMparticles = bsmModel.SMparticles

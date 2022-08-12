@@ -9,7 +9,7 @@
 
 from functools import wraps
 from unum import IncompatibleUnitsError
-from smodels.tools.physicsUnits import GeV, fb
+from smodels.base.physicsUnits import GeV, fb
 
 
 def _toString(arg):

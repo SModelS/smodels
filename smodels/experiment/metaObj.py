@@ -12,7 +12,7 @@
 import os
 import sys
 import time
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 
 class Meta(object):
     current_version = 214 ## the current format version

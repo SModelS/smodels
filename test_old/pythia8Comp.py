@@ -11,10 +11,10 @@
 import sys,os,glob
 
 sys.path.insert(0,"../")
-from smodels.theory.crossSection import getXsecFromSLHAFile
+from smodels.base.crossSection import getXsecFromSLHAFile
 from smodels.tools import xsecComputer
 from smodels.tools.xsecComputer import LO
-from smodels.tools.physicsUnits import TeV,fb,pb
+from smodels.base.physicsUnits import TeV,fb,pb
 from unum import Unum
 import logging
 import pyslha

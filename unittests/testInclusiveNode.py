@@ -10,16 +10,16 @@
 
 import sys,time
 sys.path.append('../')
-from smodels.theory.particleNode import InclusiveParticleNode
+from smodels.base.particleNode import InclusiveParticleNode
 from smodels.experiment.expAuxiliaryFuncs import bracketToProcessStr
 from smodels.experiment.defaultFinalStates import finalStates
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
-from smodels.tools.physicsUnits import fb, GeV
-from smodels.theory.theorySMS import TheorySMS
+from smodels.base.model import Model
+from smodels.base.physicsUnits import fb, GeV
+from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
-from smodels.tools.inclusiveObjects import InclusiveValue
+from smodels.base.inclusiveObjects import InclusiveValue
 from unitTestHelpers import theorySMSFromString as fromString
 import networkx as nx
 import unittest

@@ -9,11 +9,11 @@
 
 
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from smodels.theory.particleNode import ParticleNode,InclusiveParticleNode
-from smodels.tools.genericSMS import GenericSMS
+from smodels.base.particleNode import ParticleNode,InclusiveParticleNode
+from smodels.base.genericSMS import GenericSMS
 from smodels.experiment.expAuxiliaryFuncs import bracketToProcessStr, maximal_matching
+from smodels.base.physicsUnits import fb
 from itertools import product
-from smodels.tools.physicsUnits import fb
 from collections import OrderedDict, deque
 
 class ExpSMS(GenericSMS):

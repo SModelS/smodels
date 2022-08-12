@@ -121,8 +121,8 @@ defined as :math:`\chi^2=-2 \ln \frac{\mathcal{L}_{\mathrm{BSM}}}{\mathcal{L}_{\
 From v2.1 onwards, the definition of a test statistic for, e.g., likelihood ratio tests, is left to the user.
 
 
-* **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.likelihood>`_
-* **The maximum likelihood for a given** |EMr| **is computed using the** `lmax  method <tools.html#tools.simplifiedLikelihoods.LikelihoodComputer.lmax>`_
+* **The likelihood for a given** |EMr| **is computed using the** `likelihood  method <tools.html#statistics.simplifiedLikelihoods.LikelihoodComputer.likelihood>`_
+* **The maximum likelihood for a given** |EMr| **is computed using the** `lmax  method <tools.html#statistics.simplifiedLikelihoods.LikelihoodComputer.lmax>`_
 
 
 .. _combineSRs:

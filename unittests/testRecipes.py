@@ -14,8 +14,8 @@ import os,glob
 import sys
 import subprocess
 sys.path.append('../')
-from smodels.tools.smodelsLogging import logger
-from smodels.tools.smodelsLogging import setLogLevel
+from smodels.base.smodelsLogging import logger
+from smodels.base.smodelsLogging import setLogLevel
 setLogLevel( "info" )
 
 try:

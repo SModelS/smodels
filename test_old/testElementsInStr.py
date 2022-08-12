@@ -14,7 +14,7 @@ import unittest
 class InStrTest(unittest.TestCase):
     def testInStr(self):
         instring="[[['t+'],['W-']],[['t+'],['W-']]]+[[['t-'],['W+']],[['t-'],['W+']]]+[[['t+'],['W-']],[['t-'],['W+']]]"
-        from smodels.theory.auxiliaryFunctions import elementsInStr 
+        from smodels.decomposition.auxiliaryFunctions import elementsInStr
         out= elementsInStr( instring )
         self.assertEqual ( out, ['[[[t+],[W-]],[[t+],[W-]]]', '[[[t-],[W+]],[[t-],[W+]]]', '[[[t+],[W-]],[[t-],[W+]]]'] )
 

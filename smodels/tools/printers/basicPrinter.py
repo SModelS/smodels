@@ -8,7 +8,7 @@
 
 import sys
 import os
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 import numpy as np
 import time
 

@@ -10,7 +10,7 @@
 
 import sys
 sys.path.insert(0,"../")
-from smodels.tools.smodelsLogging import setLogLevel
+from smodels.base.smodelsLogging import setLogLevel
 setLogLevel ( "error" )
 
 import unittest

@@ -7,8 +7,8 @@
 
 """
 
-from smodels.tools.physicsUnits import MeV, GeV
-from smodels.theory.particle import Particle, MultiParticle
+from smodels.base.physicsUnits import MeV, GeV
+from smodels.base.particle import Particle, MultiParticle
 
 # SM particles
 

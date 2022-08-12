@@ -12,14 +12,14 @@ from __future__ import print_function
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.physicsUnits import fb, GeV
+from smodels.base.physicsUnits import fb, GeV
 from databaseLoader import database
 import inspect
-from smodels.theory import decomposer
+from smodels.decomposition import decomposer
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
-from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.base.model import Model
+from smodels.decomposition.theoryPrediction import theoryPredictionsFor
 
 
 class IntegrationTest(unittest.TestCase):

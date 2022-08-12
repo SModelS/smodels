@@ -11,10 +11,10 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.experiment.txnameObj import TxName
-from smodels.tools.physicsUnits import GeV
-from smodels.theory import branch,element
+from smodels.base.physicsUnits import GeV
+from smodels.decomposition import branch,element
 from smodels.experiment import infoObj
-from smodels.tools.inclusiveObjects import InclusiveValue, InclusiveList
+from smodels.base.inclusiveObjects import InclusiveValue, InclusiveList
 from smodels.experiment.defaultFinalStates import finalStates
 
 class InclusiveObjectsTest(unittest.TestCase):

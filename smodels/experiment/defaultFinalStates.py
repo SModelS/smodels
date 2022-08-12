@@ -8,9 +8,9 @@
 
 """
 
-from smodels.theory.particle import Particle, MultiParticle
+from smodels.base.particle import Particle, MultiParticle
 from smodels.share.models.SMparticles import SMList, e, eC, mu, muC, ta, taC, pion, t, tC, W, WC, g, q, c, nu
-from smodels.theory.model import Model
+from smodels.base.model import Model
 
 # Below we define all particles that are relevant for the database constraints.
 # One must avoid defining non-unique labels, so there is a one-to-one correspondence

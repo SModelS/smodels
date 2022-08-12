@@ -14,8 +14,8 @@ from smodels.tools import pythia6Wrapper
 from smodels.tools import pythia8Wrapper
 from smodels.tools import nllFastWrapper
 from smodels.tools import externalPythonTools
-from smodels.tools.smodelsLogging import logger
-from smodels.tools.colors import colors
+from smodels.base.smodelsLogging import logger
+from smodels.base.smodelsLogging import colors
 
 class ToolBox(object):
     """

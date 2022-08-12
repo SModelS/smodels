@@ -11,7 +11,7 @@
 
 import sys
 
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
 from scipy.linalg import svd, LinAlgError

@@ -12,23 +12,23 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 
-from smodels.theory import decomposer
-from smodels.matcher import clusterTools
+from smodels.decomposition import decomposer
+from smodels.matching import clusterTools
 from smodels.experiment.txnameObj import TxName
 from smodels.experiment.txnameDataObj import TxNameData
 from smodels.experiment.datasetObj import DataSet
 from smodels.experiment.infoObj import Info
 from smodels.share.models import SMparticles, mssm
-from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList
-from smodels.tools.physicsUnits import GeV, TeV, fb
+from smodels.base.crossSection import XSection,XSectionInfo,XSectionList
+from smodels.base.physicsUnits import GeV, TeV, fb
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
+from smodels.base.model import Model
 import numpy as np
 from databaseLoader import database
-from smodels.matcher.theoryPrediction import theoryPredictionsFor
+from smodels.matching.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.defaultFinalStates import finalStates
-from smodels.matcher.matcherAuxiliaryFuncs import roundValue
+from smodels.matching.matcherAuxiliaryFuncs import roundValue
 
 from unitTestHelpers import theorySMSFromString as fromString
 slhafile = './testFiles/slha/lightEWinos.slha'

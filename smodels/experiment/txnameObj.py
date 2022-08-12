@@ -11,13 +11,14 @@
 """
 
 import os
-from smodels.tools import physicsUnits
+from smodels.base import physicsUnits
+from smodels.base.genericSMS import GenericSMS
+from smodels.base.smodelsLogging import logger
+
 from smodels.experiment.expAuxiliaryFuncs import (smsInStr, removeUnits,
-                                               rescaleWidth, unscaleWidth, cSim, cGtr)
-from smodels.tools.stringTools import concatenateLines
+                                               rescaleWidth, unscaleWidth,
+                                               concatenateLines, cSim, cGtr)
 from smodels.experiment.expSMS import ExpSMS
-from smodels.tools.genericSMS import GenericSMS
-from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.txnameDataObj import TxNameData
 from smodels.experiment.reweighting import defaultEffReweight, defaultULReweight

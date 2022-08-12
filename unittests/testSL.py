@@ -11,7 +11,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.simplifiedLikelihoods import Data, UpperLimitComputer
+from smodels.statistics.simplifiedLikelihoods import Data, UpperLimitComputer
 from numpy  import sqrt
 
 class SLTest(unittest.TestCase):

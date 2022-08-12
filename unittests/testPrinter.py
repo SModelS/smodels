@@ -17,7 +17,7 @@ import unittest
 from xml.etree import ElementTree
 from unitTestHelpers import equalObjs, Summary, runMain, importModule
 import pyslha
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 
 
 def sortXML(xmltree):
@@ -157,7 +157,7 @@ class RunPrinterTest(unittest.TestCase):
         smodelsOutput = importModule(outputfile)
 
         if self.definingRun:
-            from smodels.tools.smodelsLogging import logger
+            from smodels.base.smodelsLogging import logger
             logger.error("This is a definition run! Know what youre doing!")
             default = "simplyGluino_default.py"
             outputfile = './unitTestOutput/printer_output_simple.py'

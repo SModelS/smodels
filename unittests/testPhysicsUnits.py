@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-.. module:: testPhysicsUnits
+.. module:: testbase.physicsUnits
    :synopsis: Tests conversion of the physics units.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -10,7 +10,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.physicsUnits import GeV, TeV, fb, pb
+from smodels.base.physicsUnits import GeV, TeV, fb, pb
 
 class PhysicsUnitsTest(unittest.TestCase):
     def testXSecs(self):

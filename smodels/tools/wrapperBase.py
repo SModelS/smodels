@@ -10,7 +10,7 @@
 
 import os
 import inspect
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 from smodels import installation
 import sys
 try:

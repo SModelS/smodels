@@ -10,8 +10,8 @@
 
 from __future__ import print_function
 
-from smodels.tools.smodelsLogging import logger, setLogLevel
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.base.smodelsLogging import logger, setLogLevel
+from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 import os,glob,pathlib
 import importlib.util
 from smodels.tools import interactivePlotsHelpers as helpers
@@ -169,7 +169,7 @@ class Plotter(object):
         full_list=self.particle_names.BSMList
         for particle in full_list:
             #print(particle.pdg)
-            if isinstance(particle,smodels.theory.particle.MultiParticle):
+            if isinstance(particle,smodels.base.particle.MultiParticle):
 
                 for sub_pdg in particle.pdg:
                     if sub_pdg==pdg:

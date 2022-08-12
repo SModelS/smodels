@@ -7,7 +7,7 @@
 
 """
 
-from smodels.theory.particle import Particle
+from smodels.base.particle import Particle
 
 ####  R-odd   ##########
 #1st generation squarks and its conjugates:

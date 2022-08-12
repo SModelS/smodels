@@ -8,21 +8,21 @@ from __future__ import print_function
 """
 """ Import basic functions (this file must be executed in the installation folder) """
 
-from smodels.tools import runtime
+from smodels.base import runtime
 # Define your model (list of BSM particles)
 runtime.modelFile = 'smodels.share.models.mssm'
 # runtime.modelFile = 'mssmQNumbers.slha'
 
-from smodels.theory import decomposer
-from smodels.tools.physicsUnits import fb, GeV, TeV
-from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.decomposition import decomposer
+from smodels.base.physicsUnits import fb, GeV, TeV
+from smodels.decomposition.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
-from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
-from smodels.tools.smodelsLogging import setLogLevel
+from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner
+from smodels.base.smodelsLogging import setLogLevel
 from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.theory.model import Model
+from smodels.base.model import Model
 setLogLevel("info")
 
 # Set the path to the database

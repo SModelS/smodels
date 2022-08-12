@@ -6,18 +6,20 @@
 
 """
 
-from smodels.tools.physicsUnits import standardUnits, GeV
+from smodels.base.physicsUnits import standardUnits, GeV
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from smodels.base.smodelsLogging import logger
+
 import unum
 import re
+import numpy as np
+from collections import OrderedDict, deque
+
 try:
     from collections.abc import Iterable
 except (ImportError, ModuleNotFoundError):
     from collections import Iterable
 
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.tools.smodelsLogging import logger
-import numpy as np
-from collections import OrderedDict, deque
 
 
 def cSim(*weights):
@@ -79,7 +81,7 @@ def cGtr(weightA, weightB):
 def removeUnits(value, stdUnits=standardUnits, returnUnit=False):
     """
     Remove units from unum objects. Uses the units defined
-    in physicsUnits.standard units to normalize the data.
+    in base.physicsUnits.standard units to normalize the data.
 
     :param value: Object containing units (e.g. [[100*GeV,100.*GeV],3.*pb])
     :param standardUnits: Unum unit or Array of unum units defined to
@@ -595,3 +597,41 @@ def maximal_matching(left, right, edges):
     leftmatches = {k: v for k, v in leftmatches.items() if v is not None}
 
     return leftmatches
+
+
+def cleanWalk ( topdir ):
+    """ perform os.walk, but ignore all hidden files and directories """
+    import os
+    ret = []
+    for root, d_, f_ in os.walk ( topdir ):
+        isHidden=False
+        tokens = root.split("/")
+        for token in tokens:
+            if len(token)>0 and token[0]==".":
+                isHidden=True
+                break
+        if isHidden:
+            continue
+        dirs,files = [],[]
+        for d in d_:
+            if not d[0]==".":
+                dirs.append ( d )
+        for f in f_:
+            if not f[0]==".":
+                files.append ( f )
+        ret.append ( [ root, dirs, files ] )
+    return ret
+
+def concatenateLines ( oldcontent ):
+    """ of all lines in the list "oldcontent", concatenate the ones
+        that end with \  or , """
+    content=[] ## concatenate lines that end with "," or "\"
+    tmp=""
+    for line in oldcontent:
+        tmp+=line.strip()
+        if tmp != "" and tmp[-1] not in [ ",", '\\' ]:
+            content.append ( tmp )
+            tmp=""
+        if tmp != "" and tmp[-1] == '\\':
+            tmp=tmp[:-1] # remove trailing \ (but keep trailing ,)
+    return content

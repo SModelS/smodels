@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.experiment.txnameObj import TxNameData
-from smodels.tools.physicsUnits import GeV, pb, fb
+from smodels.base.physicsUnits import GeV, pb, fb
 from databaseLoader import database
 
 class InterpolationTest(unittest.TestCase):

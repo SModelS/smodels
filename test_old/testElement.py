@@ -10,12 +10,12 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.theory.branch import Branch
-from smodels.theory.element import Element
-from smodels.tools.physicsUnits import GeV, TeV, fb
-from smodels.theory.crossSection import XSection,XSectionInfo,XSectionList
+from smodels.decomposition.branch import Branch
+from smodels.decomposition.element import Element
+from smodels.base.physicsUnits import GeV, TeV, fb
+from smodels.base.crossSection import XSection,XSectionInfo,XSectionList
 from smodels.share.models import SMparticles, mssm
-from smodels.theory.particle import ParticleList
+from smodels.base.particle import ParticleList
 
 from smodels.experiment.defaultFinalStates import finalStates
 

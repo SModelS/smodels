@@ -11,7 +11,7 @@
 import sys,os,shutil
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.physicsUnits import GeV, fb, pb
+from smodels.base.physicsUnits import GeV, fb, pb
 from smodels.tools import databaseBrowser
 
 

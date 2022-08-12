@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from smodels.experiment.databaseObj import Database
-from smodels.tools.physicsUnits import GeV
+from smodels.base.physicsUnits import GeV
 from smodels.tools.caching import Cache
 import socket, atexit, time, os, sys, copy
 import unum

@@ -10,18 +10,18 @@
 import sys
 sys.path.insert(0, "../")
 
-from smodels.tools.simplifiedLikelihoods import LikelihoodComputer
+from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer
 LikelihoodComputer.debug_mode = True
-from smodels.theory.theoryPrediction import theoryPredictionsFor
-from smodels.theory import decomposer
-from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
-from smodels.theory.model import Model
+from smodels.decomposition.theoryPrediction import theoryPredictionsFor
+from smodels.decomposition import decomposer
+from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner
+from smodels.base.model import Model
 from smodels.share.models.SMparticles import SMList
 from smodels.share.models.mssm import BSMList
 from smodels.experiment.databaseObj import Database
 from unitTestHelpers import equalObjs, runMain, importModule
-from smodels.tools.physicsUnits import fb, GeV, TeV
-from smodels.tools.modelTester import getCombiner
+from smodels.base.physicsUnits import fb, GeV, TeV
+from smodels.matching.modelTester import getCombiner
 import numpy as np
 import unittest
 import os
@@ -151,7 +151,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual ( lmax, 0.00010754284992636553, 4 )
 
     def testFilter(self):
-        from smodels.tools import runtime
+        from smodels.base import runtime
         runtime._experimental = True
 
         anaids = ['CMS-SUS-16-036',

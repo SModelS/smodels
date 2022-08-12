@@ -11,15 +11,15 @@
 """
 
 import os
-from smodels.theory import lheReader
-from smodels.tools.physicsUnits import GeV, fb
-from smodels import installation
 import pyslha
+from smodels.base import lheReader
+from smodels.base.physicsUnits import GeV, fb
+from smodels.base.model import Model
+from smodels.base.exceptions import SModelSBaseError as SModelSError
+from smodels.base.smodelsLogging import logger
+from smodels.base import runtime
+from smodels import installation
 from smodels.share.models.SMparticles import SMList, SMparticleList
-from smodels.theory.model import Model
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.tools.smodelsLogging import logger
-from smodels.tools import runtime
 
 SMpdgs = SMparticleList.pdg
 

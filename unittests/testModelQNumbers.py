@@ -11,9 +11,9 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.smodelsLogging import setLogLevel
-from smodels.tools import runtime
-from smodels.theory.model import Model
+from smodels.base.smodelsLogging import setLogLevel
+from smodels.base import runtime
+from smodels.base.model import Model
 from smodels.particlesLoader import load
 from smodels.share.models.SMparticles import SMList
 setLogLevel('error')

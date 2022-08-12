@@ -75,7 +75,7 @@ def getNCPUs():
     """ get the number of CPUs to compile pythia8 with """
     ncpus = 4
     try:
-        from smodels.tools.runtime import nCPUs
+        from smodels.base.runtime import nCPUs
         ncpus = nCPUs()
     except Exception as e:
         print ( f"[installer.py] could not determine number of CPUs: {e}" )
