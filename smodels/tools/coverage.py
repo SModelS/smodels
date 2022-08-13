@@ -422,7 +422,8 @@ class FinalStateSMS(TheorySMS):
         fsStrs = []
         for d in self.daughterIndices(self.rootIndex):
             if self.out_degree(d) == 0:
-                finalStates = '(%s)' %str(d)
+                daughter = self.indexToNode(d)
+                finalStates = '(%s)' %str(daughter)
             else:
                 finalStates = str(tuple(self.daughters(d)[::-1]))
             fsStrs.append(finalStates.replace(' ',''))
