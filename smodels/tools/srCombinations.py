@@ -106,7 +106,11 @@ def getCombinedPyhfStatistics(
         lmax = ulcomputer.lmax(
             workspace_index=index, expected=expected, allowNegativeSignals=allowNegativeSignals
         )
-        muhat = float(ulcomputer.muhat)
+        muhat = None
+        try:
+            muhat = float(ulcomputer.muhat)
+        except AttributeError:
+            pass
         sigma_mu = ulcomputer.sigma_mu
         ulcomputer = _getPyhfComputer(dataset, [0.0] * len(nsig), False)
         lsm = ulcomputer.likelihood(mu=0.0, workspace_index=index, expected=expected)

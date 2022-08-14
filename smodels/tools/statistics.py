@@ -315,6 +315,8 @@ def deltaChi2FromLlhd(likelihood):
 
 def chi2FromLmax(llhd, lmax):
     """compute the chi2 from likelihood and lmax"""
+    if llhd is None or lmax is None:
+        return None
     chi2 = 0.0
     if llhd > 1e-200:
         from math import log
