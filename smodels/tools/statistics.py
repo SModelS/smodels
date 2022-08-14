@@ -255,6 +255,7 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder):
     :param rootfinder: function that finds the root (usually root_func)
     """
     sigma_mu = max(sigma_mu, 0.5)  # there is a minimum on sigma_mu
+    sigma_mu = min(sigma_mu, 100.) # there is a maximum on sigma_mu
     # the root should be roughly at mu_hat + 2*sigma_mu
     a = mu_hat + 1.5 * sigma_mu
     ntrials = 20

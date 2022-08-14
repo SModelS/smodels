@@ -485,8 +485,9 @@ class LikelihoodComputer:
         # d^2 mu NLL / d mu^2 = sum_i [ n_obs^i * s_i**2 / n_pred^i**2 ]
         hessian = self.d2NLLdMu2 ( mu, theta_hat, allowZeroHessian = False )
         hessian = sum ( hessian )
-        """
         if hessian == 0.0:
+            hessian = 1e-10
+        """
             # if all observations are zero, we replace them by the expectations
             if sum(self.model.observed) == 0:
                 hessian = sum(nsig**2 / n_pred)
@@ -666,10 +667,13 @@ class LikelihoodComputer:
                     return thetamax
         return thetamax
 
-    def findThetaHat(self, mu ):
+    def findThetaHat(self, mu : float ):
         """Compute nuisance parameters theta that maximize our likelihood
         (poisson*gauss).
         """
+        mu = float(mu)
+        if np.isinf ( mu ):
+            return None
         nsig = mu * self.model.nsignal
 
         ## first step is to disregard the covariances and solve the
@@ -854,7 +858,7 @@ class LikelihoodComputer:
             mean = -log(mean)
         return mean
 
-    def profileLikelihood(self, mu, nll ):
+    def profileLikelihood(self, mu : float, nll : bool ):
         """compute the profiled likelihood for mu.
         Warning: not normalized.
         Returns profile likelihood and error code (0=no error)
@@ -874,7 +878,6 @@ class LikelihoodComputer:
         :param marginalize: if true, marginalize, if false, profile
         :param nll: return nll instead of likelihood
         """
-        # print ( f"likelihood {nsig[:2]} {self.model.nsignal[:2]} mu={mu}" )
         if marginalize:
             # p,err = self.profileLikelihood ( nsig, deltas )
             return self.marginalizedLikelihood(mu, nll)
@@ -931,8 +934,8 @@ class LikelihoodComputer:
         theta_hat, _ = self.findThetaHat( avgr )
         minr, avgr, maxr = self.findAvgr( theta_hat )
 
-        def myllhd(mu):
-            theta = self.findThetaHat ( mu=mu )
+        def myllhd( mu : float ):
+            theta = self.findThetaHat ( mu=float(mu) )
             ret = self.likelihood(nll=True, marginalize=marginalize, mu = mu )
             return ret
 
@@ -1083,7 +1086,7 @@ class UpperLimitComputer:
                 model.observed[i] = float(d)
         computer = LikelihoodComputer(model, toys)
         mu_hat = computer.findMuHat( allowNegativeSignals=False, extended_output=False)
-        theta_hat0, _ = computer.findThetaHat(0 * model.nsignal )
+        theta_hat0, _ = computer.findThetaHat( 0. )
         sigma_mu = computer.getSigmaMu(mu_hat, theta_hat0)
 
         nll0 = computer.likelihood( mu_hat, marginalize=marginalize, nll=True)

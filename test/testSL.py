@@ -55,7 +55,7 @@ class SLTest(unittest.TestCase):
         ulComp = UpperLimitComputer(ntoys=10000, cl=.95 )
         ul = ulComp.getUpperLimitOnMu(m, marginalize=True )
         ulProf = ulComp.getUpperLimitOnMu(m, marginalize=False )
-        self.assertAlmostEqual(ul, 3049.617040116002, 1 )
+        self.assertAlmostEqual(ul / 3049.617040116002, 1., 2 )
         self.assertAlmostEqual(ulProf, 1920.7547785412298, 1 )
 
     def testModel8(self):
@@ -178,14 +178,14 @@ class SLTest(unittest.TestCase):
                   nsignal= signal,
                   name="trivial model",deltas_rel=0., lumi = 100./fb )
         lComp = LikelihoodComputer( m )
-        theta_hat = lComp.findThetaHat( signal )
+        theta_hat = lComp.findThetaHat( 1. )
         pprint ( "theta_hat", theta_hat )
         lmax = lComp.lmax()
         lm = lComp.likelihood ( 1. )
         muhat = lComp.muhat
         sigma_mu = lComp.sigma_mu
         pprint ( "muhat", muhat, "sigma_mu", sigma_mu )
-        theta_hat = lComp.findThetaHat( muhat * np.array ( signal ) )
+        theta_hat = lComp.findThetaHat( muhat )
         pprint ( "theta_hat", theta_hat )
         # mu_hat is (observed - background) / signal
         # (as it's the same for all regions)
