@@ -15,6 +15,7 @@ from scipy import stats, optimize, integrate, special, linalg
 from numpy import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
 from smodels.tools.statistics import CLsfromNLL, determineBrentBracket
+from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from typing import Text, Optional, Union, Tuple
 
 import numpy as np
@@ -347,7 +348,7 @@ class LikelihoodComputer:
         hessian = self.d2NLLdMu2 ( 1., theta_hat )
         wtot = 0.0
         for s in zip(mu_c, self.model.nsignal, hessian):
-            if s[1] > 1e-10:
+            if s[1] > 1e-16:
                 w = 1. # 1e-5
                 if s[2] > 0.0:
                     w = s[2]
@@ -355,6 +356,8 @@ class LikelihoodComputer:
                 r = s[0] / s[1]
                 mu_r.append( r )
                 wmu_r.append(w * r )
+        if len(mu_r)==0:
+            return None, None, None
         ret = min(mu_r), sum(wmu_r) / wtot, max(mu_r)
         return ret
 
@@ -1151,7 +1154,10 @@ class UpperLimitComputer:
         )
         if mu_hat == None:
             return None
-        a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot)
+        try:
+            a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot)
+        except SModelSError as e:
+            return None
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
         return mu_lim
 

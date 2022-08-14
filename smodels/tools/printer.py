@@ -718,7 +718,10 @@ class SummaryPrinter(TxTPrinter):
             if r_expected:
                 output += "%s %s" % (rs, rs_expected)
             else:
-                output += "%10.3E  N/A" % r
+                if r is None:
+                    output += "N/A  N/A"
+                else:
+                    output += "%10.3E  N/A" % r
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
