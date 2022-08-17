@@ -21,7 +21,6 @@ from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
 from smodels.base.inclusiveObjects import InclusiveValue
 from unitTestHelpers import theorySMSFromString as fromString
-import networkx as nx
 import unittest
 
 
