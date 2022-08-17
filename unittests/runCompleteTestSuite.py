@@ -32,7 +32,11 @@ def run(testNotebooks=False):
     tests = unittest.TestLoader().discover("./")
     if not testNotebooks:
         tests._tests = [t for t in tests._tests[:] if not 'notebook' in str(t).lower()]
-    unittest.TextTestRunner().run(tests)
+        tests._tests = [t for t in tests._tests[:] if not 'recipes' in str(t).lower()]
+    ret = unittest.TextTestRunner().run(tests)
+    if not ret.wasSuccessful():
+        raise AssertionError("%i tests failed" %len(ret.failures))
+
 
 def verbose_run( flter, testNotebooks=False ):
 
