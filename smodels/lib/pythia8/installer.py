@@ -88,16 +88,33 @@ def checkPythia():
     if os.path.exists ( afile ):
         size = os.stat ( afile ).st_size
         if size > 10000000:
-            print ( f"[installer.py] {afile} exists. skipping compilation." )
             return True
         else:
             shutil.rmtree ( afile )
     return False
 
+def rmPythiaFolder():
+    """ remove the pythia<ver> folder if exists """
+    ver = getVersion()
+    path = f"pythia{ver}"
+    if not os.path.exists ( path ):
+        return
+    shutil.rmtree ( path )
+
+def checkPythiaHeaderFile():
+    """ check if pythia header file is there """
+    ver = getVersion()
+    path = f"pythia{ver}"
+    afile = f"{path}/include/Pythia8/Pythia.h"
+    if not os.path.exists ( afile ):
+        return False
+    size = os.stat ( afile ).st_size
+    if size < 10000:
+        return False
+    return True
+
 def compilePythia():
     """ finally, compile pythia """
-    if checkPythia():
-        return
     ver = getVersion()
     ncpus = getNCPUs()
     cmd = f"cd pythia{ver}; ./configure ; make -j {ncpus}"
@@ -111,9 +128,12 @@ def compilePythia():
 
 def installPythia():
     """ fetch tarball, unzip it, compile pythia """
-    if checkPythia():
+    if checkPythia() and checkPythiaHeaderFile():
+        print ( f"[installPythia] found an install that looks ok, will use it" )
         rmTarball()
         return
+    if not checkPythiaHeaderFile(): # no Pythia.h header file?
+        rmPythiaFolder() # remove the whole folder if exists
     fetch()
     unzip()
     compilePythia()
