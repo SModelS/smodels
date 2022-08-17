@@ -7,7 +7,7 @@
 PYTHIAVER := $(shell ./installer.py -v)
 
 PYTHIA8HOME := pythia$(PYTHIAVER)/
-CXXFLAGS := -O3 -I$(PYTHIA8HOME)/include -I$(PYTHIA8HOME)/include/Pythia8/
+CXXFLAGS := -O3 -I$(PYTHIA8HOME)/include -I$(PYTHIA8HOME)/include/Pythia8/ -std=c++14
 LDFLAGS  := -L$(PYTHIA8HOME)/lib/ -L$(PYTHIA8HOME)/lib -Wl,-rpath,$(PWD)/$(PYTHIA8HOME)/lib
 XMLDOC   := $(PYTHIA8HOME)/share/Pythia8/xmldoc
 
