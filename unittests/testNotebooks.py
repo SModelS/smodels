@@ -73,6 +73,8 @@ class TestNotebook(unittest.TestCase):
         p = subprocess.Popen(["jupyter nbconvert --output-dir='./' --execute --to notebook %s" % filename],
                           shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, error = p.communicate()
+        if p.returncode != 0:
+            logger.error("Notebook error: %s" %error)
         self.assertEqual(p.returncode,0)
 
         # Get notebook output
