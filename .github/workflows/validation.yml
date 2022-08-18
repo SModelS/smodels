@@ -15,6 +15,7 @@ jobs:
   test:
     name: OS ${{ matrix.os }}, Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 540
 
     strategy:
       matrix:
