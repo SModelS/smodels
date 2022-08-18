@@ -4,12 +4,11 @@
 name: SModelS Tests
 
 on:
-  push:
-    branches: [ graphs ]
-  pull_request:
-    branches: [ graphs ]
-  # Enables manual action execution.
-  workflow_dispatch:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '00 4 * * 1,2,3,4,5,6'
+    - cron:  '55 15 * * 1,2,3,4,5,6'
+    - cron:  '10 15 * * 1,2,3,4,5,6'        
 
 jobs:
   test:
@@ -24,6 +23,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        ref: graphs
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
