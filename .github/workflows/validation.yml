@@ -35,7 +35,6 @@ jobs:
         python -m pip install -e .
     - name: Test with unittest
       run: |
-        if [ ${{ matrix.os }} == "macos-latest" ]; then echo 8245 > smodels/lib/pythia8/pythiaversion; fi
         make pythia8
         cd test
         make test
