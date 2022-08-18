@@ -32,7 +32,11 @@ def run(testNotebooks=False):
     tests = unittest.TestLoader().discover("./")
     if not testNotebooks:
         tests._tests = [t for t in tests._tests[:] if not 'notebook' in str(t).lower()]
-    unittest.TextTestRunner().run(tests)
+        tests._tests = [t for t in tests._tests[:] if not 'recipes' in str(t).lower()]
+    ret = unittest.TextTestRunner().run(tests)
+    if not ret.wasSuccessful():
+        raise AssertionError("%i tests failed" %len(ret.failures))
+
 
 def verbose_run( flter, testNotebooks=False ):
 
@@ -67,8 +71,11 @@ def verbose_run( flter, testNotebooks=False ):
                 #a=t.run() ## python3
                 # print ( "a=",a )
     print( "[runCompleteTestSuite] %d/%d tests failed." % ( n_failed, n_tests ))
+    if n_failed > 0:
+        raise AssertionError("%i tests failed" %n_failed)
 
-def parallel_run ( verbose ):
+
+def parallel_run ( verbose, testNotebooks=False ):
     if verbose:
         print ("[runCompleteTestSuite] verbose run not implemented "
                "for parallel version" )
@@ -80,15 +87,24 @@ def parallel_run ( verbose ):
         print ( "pip install --user concurrencytest" )
         return
     from smodels.base import runtime
-    suite = unittest.TestLoader().discover("./")
+
+    alltests = unittest.TestLoader().discover("./")
+
+    if not testNotebooks:
+        alltests._tests = [t for t in alltests._tests[:] if not 'notebook' in str(t).lower()]
+
     ncpus = runtime.nCPUs()
+    ncpus = max(1,ncpus-2)
     ## "shuffle" the tests, so that the heavy tests get distributed
     ## more evenly among threads (didnt help, so I commented it out)
     #suite._tests = [ item for sublist in [ suite._tests[x::ncpus] \
     #    for x in range(ncpus) ] for item in sublist ]
-    concurrent_suite = ConcurrentTestSuite(suite, fork_for_tests( ncpus ))
+    concurrent_suite = ConcurrentTestSuite(alltests, fork_for_tests( ncpus ))
     runner = unittest.TextTestRunner()
-    runner.run(concurrent_suite)
+    ret = runner.run(concurrent_suite)
+    if not ret.wasSuccessful():
+        raise AssertionError("%i tests failed" %len(ret.failures))
+
 
 def cleanDatabase ():
     """ remove database pickle files """
@@ -116,7 +132,7 @@ if __name__ == "__main__":
     if args.clean_database:
         cleanDatabase ()
     elif args.parallel:
-        parallel_run ( args.verbose )
+        parallel_run ( args.verbose, args.notebooks  )
         sys.exit()
     elif args.verbose:
         verbose_run( args.filter, args.notebooks )

@@ -530,22 +530,7 @@ class MultiParticle(Particle):
         return self.__add__(other)
 
     def __iadd__(self, other):
-
-        addParticles = []
-        if isinstance(other, MultiParticle):
-            addParticles = [ptc for ptc in other.particles if not self.contains(ptc)]
-        elif isinstance(other, Particle):
-            if not self.contains(other):
-                addParticles = [other]
-        if addParticles:
-            self.particles += addParticles[:]
-            self.particles = sorted(self.particles)
-            # Since the multiparticle changed, reset comparison tracking:
-            self._comp = {self._id: 0}
-            for ptc in self.particles:
-                self._comp[ptc._id] = 0
-
-        return self
+        return self.__add__(other)
 
     def getPdgs(self):
         """
