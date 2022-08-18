@@ -1,0 +1,8 @@
+pandas
+torch
+ipynb
+plotly
+parameterized
+nbmake
+jupyter
+pytest

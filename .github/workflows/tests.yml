@@ -15,6 +15,7 @@ jobs:
   test:
     name: OS ${{ matrix.os }}, Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
 
     strategy:
       matrix:
@@ -30,13 +31,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ -f smodels/share/requirements.txt ]; then python -m pip install -r smodels/share/requirements.txt; fi
-        python -m pip install plotly ipynb pytest parameterized nbmake pandas jupyter
-        python -m pip install -e .
+        if [ -f unittests/test_requirements.txt ]; then python -m pip install -r unittests/test_requirements.txt; fi
     - name: Tests with unittest
       run: |
-        if [ ${{ matrix.os }} == "macos-latest" ]; then echo 8245 > smodels/lib/pythia8/pythiaversion; fi
         make pythia8
         cd unittests
-        ./runCompleteTestSuite.py -n
+        ./runCompleteTestSuite.py
 
