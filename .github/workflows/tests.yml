@@ -6,8 +6,8 @@ name: SModelS Daily Test
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron:  '00 4 * * 1,2,3,4,5,6'
-    - cron:  '10 16 * * 1,2,3,4,5,6'        
+    - cron:  '00 4 * * 1,2,3,4,5'
+    - cron:  '00 17 * * 1,2,3,4,5'        
 
 jobs:
   test:
@@ -37,4 +37,3 @@ jobs:
         make pythia8
         cd unittests
         ./runCompleteTestSuite.py -n
-
