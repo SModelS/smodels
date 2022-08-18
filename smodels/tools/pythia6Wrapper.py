@@ -23,8 +23,6 @@ try:
     import commands as executor
 except ImportError:
     import subprocess as executor
-import urllib
-import tarfile
 
 class Pythia6Wrapper(WrapperBase):
     """
