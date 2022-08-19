@@ -14,7 +14,8 @@ sys.path.insert(0, "../")
 import os
 import unittest
 from unitTestHelpers import compareScanSummary, runMain
-
+from smodels.base.smodelsLogging import logger, setLogLevel, getLogLevel
+setLogLevel("error")
 
 class ScanSummaryTest(unittest.TestCase):
 

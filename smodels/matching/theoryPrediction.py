@@ -724,6 +724,9 @@ def _getDataSetPredictions(dataset, smsTopDict, maxMassDist,
         theoryPrediction.avgSMS = cluster.averageSMS
         # Compute relevant cross-section and conditions:
         theoryPrediction.computeXSection()
+        # Skip results with too small (invisible) cross-sections
+        if theoryPrediction.xsection < 1e-6*fb:
+            continue
         theoryPrediction.computeConditions()
 
         predictionList._theoryPredictions.append(theoryPrediction)
