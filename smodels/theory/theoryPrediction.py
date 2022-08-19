@@ -794,6 +794,9 @@ def _getDataSetPredictions(dataset, smsTopList, maxMassDist, marginalize=False, 
         theoryPrediction.dataset = dataset
         theoryPrediction.txnames = cluster.txnames
         theoryPrediction.xsection = _evalConstraint(cluster)
+        # Skip results with too small (invisible) cross-sections
+        if theoryPrediction.xsection.value < 1e-6*fb:
+            continue
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.elements = cluster.elements
         theoryPrediction.avgElement = cluster.averageElement()
