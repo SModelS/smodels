@@ -153,7 +153,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterExperimentalFeatures:
 
-  * **experimentalFeatures** (True/False): set to True to enable experimental features that are not yet considered part of SModelS proper. Available from v2.1.1 onwards. Use with care. *need to specify which experimental features exist*
+  * **experimentalFeatures** (True/False): set to True to enable experimental features that are not yet considered part of SModelS proper. Available from v2.1.1 onwards. Use with care.
 
 .. _parameterFileParticles:
 
