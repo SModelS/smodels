@@ -186,7 +186,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         combiner = TheoryPredictionsCombiner.selectResultsFrom(tpreds, anaids)
         # IDs that should be selected and the respective expected r-values:
         goodIDs = {
-            "CMS-SUS-16-036": (1.379, "upperLimit"),
+#            "CMS-SUS-16-036": (1.379, "upperLimit"),
             "CMS-SUS-12-024": (4.52551e-4, "efficiencyMap"),
             "ATLAS-SUSY-2018-12": (2.294e-3, "efficiencyMap"),
             "ATLAS-SUSY-2019-09": (2.318e-1, "combined"),
@@ -196,17 +196,18 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             tp.analysisId(): (tp.getRValue(expected=True), tp.dataType())
             for tp in combiner.theoryPredictions
         }
-        self.assertEqual(sorted(list(selectedIDs.keys())), sorted(list(goodIDs.keys())))
+        self.assertEqual( sorted(list(selectedIDs.keys())), \
+                          sorted(list(goodIDs.keys())) )
         # Check if the correct predictions were selected:
         for ana in goodIDs:
             diff_rel = abs(goodIDs[ana][0] - selectedIDs[ana][0]) / goodIDs[ana][0]
             self.assertAlmostEqual(diff_rel, 0.0, 2)
             self.assertEqual(goodIDs[ana][1], selectedIDs[ana][1])
 
-        self.assertAlmostEqual(combiner.lsm() * 1e23, 6.869, 2)
-        self.assertAlmostEqual(combiner.likelihood() * 1e25, 6.540, 2)
-        self.assertAlmostEqual(combiner.lmax() * 1e23, 6.826, 2)
-        self.assertAlmostEqual(combiner.getRValue(), 1.653, 2)
+        self.assertAlmostEqual(combiner.lsm() * 1e21, 10.6988795, 2)
+        self.assertAlmostEqual(combiner.likelihood() * 1e22, 89.504, 2)
+        self.assertAlmostEqual(combiner.lmax() * 1e3, 7.93747, 2)
+        self.assertAlmostEqual(combiner.getRValue() * 1e4, 2.557064, 2)
 
 
 if __name__ == "__main__":
