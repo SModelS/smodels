@@ -4,11 +4,9 @@
 .. module:: simplifiedLikelihoods
    :synopsis: Code that implements the simplified likelihoods as presented
               in CMS-NOTE-2017-001, see https://cds.cern.ch/record/2242860.
-              In collaboration with Andy Buckley, Sylvain Fichet and Nickolas Wardle.
-              Simplified likelihoods v2 (JHEP_021P_1018) are partly implemented.
+              Simplified likelihoods v2 (arXiv:1809.05548) are partly implemented.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
-.. moduleauthor:: Jack Y. Araz <jack.araz@durham.ac.uk>
 """
 
 from scipy import stats, optimize, integrate, special, linalg
@@ -178,7 +176,7 @@ class Data:
     def _computeABC(self):
         """
         Compute the terms A, B, C, rho, V. Corresponds with
-        Eqs. 1.27-1.30 in the second paper.
+        Eqs. 1.27-1.30 in arXiv:1809.05548
         """
         self.V = self.covariance
         if self.third_moment is None:
