@@ -2,7 +2,7 @@
 Release v2.2.1, xxx
 =======================================================
 
-  * bigger fixes in analyses combinations, simplified and pyhf likelihoods 
+  * fixes in analyses combinations, simplified and pyhf likelihoods
   * small fixes for python 3.10
   * bumped up pythia8 from 8.306 to 8.307
   * included example on how to plot likelihoods from analysis combination
@@ -17,7 +17,7 @@ Release v2.2.0, Wed 30 March 2022
 =======================================================
 
   * introduced (user-defined) combinations of analyses
-  * changed expected limits computed with pyhf from post-fit to pre-fit 
+  * changed expected limits computed with pyhf from post-fit to pre-fit
   * a few smaller changes around expected likelihoods and limits
   * changed default value of promptWidth parameter from 1e-8 to 1e-11 GeV
   * allow ncpus to take on zero and negative values in ini file
@@ -28,11 +28,11 @@ Release v2.2.0, Wed 30 March 2022
   * more small fixes in unit tests
 
   * Database extension -- added new results from 4 ATLAS and 11 CMS analyses:
-    - results from ATLAS: 
+    - results from ATLAS:
       ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2018-41 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
-    - results from CMS:  
+    - results from CMS:
       CMS-SUS-16-050 (EM), CMS-SUS-18-004 (UL), CMS-SUS-18-007 (UL), CMS-SUS-19-008 (UL), CMS-SUS-19-011 (UL), CMS-SUS-19-013 (UL), CMS-SUS-20-001 (UL), CMS-SUS-20-002 (UL)
-    - recast with MadAnalysis5:  
+    - recast with MadAnalysis5:
       CMS-SUS-16-039 (EM), CMS-SUS-16-048 (EM), CMS-SUS-19-006 (EM); all incl. covariance matrices
 
 Release v2.1.1, Tue 19 Oct 2021
