@@ -161,11 +161,22 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
 
 def compareScanSummary(outA, outB, allowedDiff):
 
+    # Check header:
+    with open(outA, 'r') as f:
+        headerA = f.readlines()[:5]
+    with open(outB, 'r') as f:
+        headerB = f.readlines()[:5]
+    for il,lA in enumerate(headerA):
+        if lA != headerB[il]:
+            logger.error("Headers differ:\n %s\n and\n %s\n" % (lA, headerB[il]))
+            return False
+
     fA = np.genfromtxt(outA, dtype=None, encoding='utf-8',
-                       skip_header=3, names=True)
+                       skip_header=5, names=True)
 
     fB = np.genfromtxt(outB, dtype=None, encoding='utf-8',
-                       skip_header=3, names=True)
+                       skip_header=5, names=True)
+
 
     if sorted(fA['filename']) != sorted(fB['filename']):
         logger.error("Filenames differ:\n %s\n and\n %s" % (sorted(fA['filename']), sorted(fB['filename'])))
