@@ -8,7 +8,6 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 .. moduleauthor:: Jamie Yellen <j.yellen.1@research.gla.ac.uk>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-.. moduleauthor:: Jack Y. Araz <jack.araz@durham.ac.uk>
 """
 
 import numpy as np

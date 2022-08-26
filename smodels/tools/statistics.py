@@ -7,7 +7,6 @@
    expected an observer upper limit. See https://arxiv.org/abs/1202.3415.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
-.. moduleauthor:: Jack Y. Araz <jack.araz@durham.ac.uk>
 """
 
 from scipy import stats, optimize
