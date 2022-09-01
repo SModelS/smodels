@@ -247,53 +247,66 @@ def CLsfromNLL(
     return CLs - 0.05
 
 
-def determineBrentBracket(mu_hat, sigma_mu, rootfinder):
+def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
+         allowNegative = True ):
     """find a, b for brent bracketing
     :param mu_hat: mu that maximizes likelihood
     :param sigm_mu: error on mu_hat (not too reliable)
     :param rootfinder: function that finds the root (usually root_func)
+    :param allowNegative: if False, then do not allow a or b to become negative
+    :returns: the interval a,b
     """
     sigma_mu = max(sigma_mu, 0.5)  # there is a minimum on sigma_mu
     sigma_mu = min(sigma_mu, 100.) # there is a maximum on sigma_mu
     # the root should be roughly at mu_hat + 2*sigma_mu
     a = mu_hat + 1.5 * sigma_mu
+    ra = rootfinder(a)
     ntrials = 20
     i = 0
     foundExtra = False
-    while rootfinder(a) < 0.0:
+    while ra < 0.0:
         # if this is negative, we move it to the left
         i += 1
         a -= (i**2.0) * sigma_mu
-        if i > ntrials or a < -10000.0:
-            for a in [0.0, 1.0, -1.0, 3.0, -3.0, 10.0, -10.0, 0.1, -0.1, 0.01, -0.01, .001, -.001, 100., -100., .0001, -.0001 ]:
-                r = rootfinder(a)
-                if r > 0.0:
+        ra = rootfinder(a)
+        if i > ntrials or a < -10000.0 or ( a < 0 and not allowNegative ):
+            avalues = [0.0, 1.0, -1.0, 3.0, -3.0, 10.0, -10.0, 0.1, -0.1, 0.01, -0.01, .001, -.001, 100., -100., .0001, -.0001 ]
+            if not allowNegative:
+                avalues = [0.0, 1.0, 3.0, 10.0, 0.1, 0.01, .001, 100., .0001 ]
+            for a in avalues:
+                ra = rootfinder(a)
+                if ra > 0.0:
                     foundExtra = True
                     break
             if not foundExtra:
                 logger.error(
-                    f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {rootfinder(a):.2f}."
+                    f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {ra:.2f}."
                 )
                 logger.error(f"mu_hat={mu_hat:.2f}, sigma_mu={sigma_mu:.2f}")
                 raise SModelSError(
-                    f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {rootfinder(a):.2f}."
+                    f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {ra:.2f}."
                 )
     i = 0
     foundExtra = False
     b = mu_hat + 2.5 * sigma_mu
-    while rootfinder(b) > 0.0:
+    rb = rootfinder(b)
+    while rb > 0.0:
         # if this is positive, we move it to the right
         i += 1
         b += (i**2.0) * sigma_mu
+        rb = rootfinder(b)
         closestr, closest = float("inf"), None
-        if i > ntrials:
-            for b in [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1, -10.0, 100.0, -100.0, 1000.0, .01, -.01, .001, -.001 ]:
-                root = rootfinder(b)
-                if root < 0.0:
+        if i > ntrials or ( b < 0 and not allowNegative ):
+            bvalues = [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1, -10.0, 100.0, -100.0, 1000.0, .01, -.01, .001, -.001 ]
+            if not allowNegative:
+                bvalues = [1.0, 0.0, 3.0, 10.0, 0.1, 100.0, 1000.0, .01, .001 ]
+            for b in bvalues:
+                rb = rootfinder(b)
+                if rb < 0.0:
                     foundExtra = True
                     break
-                if root < closestr:
-                    closestr = root
+                if rb < closestr:
+                    closestr = rb
                     closest = b
             if not foundExtra:
                 logger.error(f"cannot find a b that is right of the root (i.e. rootfinder(b) < 0).")

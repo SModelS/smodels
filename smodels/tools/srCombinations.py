@@ -132,11 +132,16 @@ def getCombinedStatistics(
     )
     return cslm
 
+_pyhfcomputers = {}
+
 def _getPyhfComputer(dataset, nsig, normalize=True):
     """create the pyhf ul computer object
     :param normalize: if true, normalize nsig
     :returns: pyhf upper limit computer, and combinations of signal regions
     """
+    idt = dataset.globalInfo.id + str(nsig)
+    if idt in _pyhfcomputers:
+        return _pyhfcomputers[idt]
     # Getting the path to the json files
     jsonFiles = [js for js in dataset.globalInfo.jsonFiles]
     jsons = dataset.globalInfo.jsons.copy()
@@ -188,6 +193,7 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
         includeCRs = False
     ulcomputer = PyhfUpperLimitComputer(data, includeCRs=includeCRs,
                                         lumi=dataset.getLumi() )
+    # _pyhfcomputers[idt] = ulcomputer
     return ulcomputer
 
 

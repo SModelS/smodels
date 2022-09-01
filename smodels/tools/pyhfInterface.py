@@ -784,7 +784,8 @@ class PyhfUpperLimitComputer:
         :return: the upper limit at `self.cl` level (0.95 by default)
         """
         if workspace_index in self.data.cachedULs[expected]:
-            return self.data.cachedULs[expected][workspace_index]
+            ret = self.data.cachedULs[expected][workspace_index]
+            return ret
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 "ignore",
@@ -861,7 +862,7 @@ class PyhfUpperLimitComputer:
                 # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
                 return 1.0 - self.cl - CLs
 
-            # Rescaling singals so that mu is in [0, 10]
+            # Rescaling signals so that mu is in [0, 10]
             factor = 3.0
             wereBothLarge = False
             wereBothTiny = False
@@ -937,11 +938,10 @@ class PyhfUpperLimitComputer:
             ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
             endUL = time.time()
             logger.debug("getUpperLimitOnMu elpased time : %1.4f secs" % (endUL - startUL))
-            self.data.cachedULs[expected][workspace_index] = ul * self.scale
             # the ul is actually on yields
-            ul = ul / self.data.totalYield()
-            return ul * self.scale  # self.scale has been updated within self.rescale() method
-
+            ul = ul / self.data.totalYield() * self.scale
+            self.data.cachedULs[expected][workspace_index] = ul
+            return ul  # self.scale has been updated within self.rescale() method
 
 if __name__ == "__main__":
     C = [

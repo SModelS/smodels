@@ -495,7 +495,7 @@ class TheoryPredictionsCombiner(object):
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected)
 
-        a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot)
+        a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot, allowNegative = False )
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
         self.cachedObjs[expected]["UL"] = mu_lim
         return mu_lim
