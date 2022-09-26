@@ -53,7 +53,7 @@ Installation Methods
    In case the Python libraries can not be successfully
    installed, the user can install them separately using his/her preferred method. Pythia and NLL-fast can also be compiled separately
    running **make externaltools**. In case the Fortran comiler isn't found, 
-   try *make FC=<path-to-gfortran> smodels* or *make FC=<path-to-gfortran> externaltools*. 
+   try *make FCC=<path-to-gfortran> smodels* or *make FCC=<path-to-gfortran> externaltools*. 
 
  * If Python's *setuptools* is installed in your machine, SModelS and its dependencies
    can also be installed without the use of pip.
