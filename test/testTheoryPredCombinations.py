@@ -152,6 +152,9 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(lmax, 0.00010754284992636553, 4)
 
     def testFilter(self):
+        #import warnings
+        #warnings.filterwarnings("ignore", category=DeprecationWarning)
+        #warnings.filterwarnings("ignore", category=UserWarning)
         from smodels.tools import runtime
 
         runtime._experimental = True
@@ -204,10 +207,10 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             self.assertAlmostEqual(diff_rel, 0.0, 2)
             self.assertEqual(goodIDs[ana][1], selectedIDs[ana][1])
 
-        self.assertAlmostEqual(combiner.lsm() * 1e21, 10.6988795, 2)
-        self.assertAlmostEqual(combiner.likelihood() * 1e22, 89.504, 2)
-        self.assertAlmostEqual(combiner.lmax() * 1e3, 7.93747, 2)
-        self.assertAlmostEqual(combiner.getRValue() * 1e4, 2.557064, 2)
+        self.assertAlmostEqual(combiner.lsm() / 1.06988795e-20, 1., 2)
+        self.assertAlmostEqual(combiner.likelihood() / 8.9504e-21, 1., 2)
+        self.assertAlmostEqual(combiner.lmax() / 1.0698879533540923e-20, 1., 2)
+        self.assertAlmostEqual(combiner.getRValue() / .2229345123626656, 1., 2)
 
 
 if __name__ == "__main__":
