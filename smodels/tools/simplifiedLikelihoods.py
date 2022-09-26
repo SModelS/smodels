@@ -1153,7 +1153,7 @@ class UpperLimitComputer:
         if mu_hat == None:
             return None
         try:
-            a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot)
+            a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot, allowNegative=False )
         except SModelSError as e:
             return None
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)

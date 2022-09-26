@@ -356,8 +356,9 @@ class TheoryPredictionsCombiner(object):
         muhats, weighted = [], []
         totweight = 0.0
         for tp in self.theoryPredictions:
-            muhat = tp.muhat(expected=expected, allowNegativeSignals=True)
-            sigma_mu = tp.sigma_mu(expected=expected, allowNegativeSignals=True)
+            # FIXME should we use allowNegativeSignals?
+            muhat = tp.muhat(expected=expected, allowNegativeSignals=allowNegativeSignals )
+            sigma_mu = tp.sigma_mu(expected=expected, allowNegativeSignals=allowNegativeSignals )
             if sigma_mu in [None, 0.0]:
                 sigma_mu = 1.0  # unity weights if no weights
             if muhat != None:
