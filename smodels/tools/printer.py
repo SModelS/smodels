@@ -614,7 +614,7 @@ class TxTPrinter(BasicPrinter):
         expIDs = obj.analysisId()
         # Get r-value:
         r = obj.getRValue()
-        r_expected = obj.getRValue(expected=True)
+        r_expected = obj.getRValue(expected=self.getTypeOfExpected() )
         # Get likelihoods:
         lsm = obj.lsm()
         llhd = obj.likelihood()
