@@ -128,6 +128,10 @@ class BasicPrinter(object):
     """
 
     def __init__(self, output, filename):
+        """
+        :ivar str typeofexpectedvalues: what type of expected values to print,
+              apriori or posteriori
+        """
         self.name = "basic"
         self.time = time.time()  # time stamps
 
@@ -135,7 +139,7 @@ class BasicPrinter(object):
         self.filename = filename
         self.output = output
         self.printingOrder = []
-        self.typeofexpectedvalues = "prior"
+        self.typeofexpectedvalues = "apriori"
         self.toPrint = []
 
         if filename and os.path.isfile(filename):
@@ -143,7 +147,8 @@ class BasicPrinter(object):
             os.remove(filename)
 
     def getTypeOfExpected(self):
-        """ tiny convenience function """
+        """ tiny convenience function for what expected values to print,
+            apriori (True) or posteriori """
         expected = True
         if self.typeofexpectedvalues == "posteriori":
             expected = "posteriori"
