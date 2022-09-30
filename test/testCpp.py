@@ -25,7 +25,9 @@ class CppTest(unittest.TestCase):
         cmd = "cd ../cpp; make"
         a = CMD.getoutput ( cmd ).split("\n" )
         ## now check if "done" appears in the last line
-        self.assertTrue ( "done" in a[-1] )
+        if not "done" in a[-1] and not "done" in a[-2]:
+            print ( f"[testCpp] keyword 'done' missing in output:\n{a}" )
+        self.assertTrue ( "done" in a[-1] or "done" in a[-2] )
 
     def writeOutput(self ):
         """ write the default output. will *define* the unit test. """
