@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-def find():
+def findLibFile():
     try:
         import sysconfig
         ldlib = sysconfig.get_config_vars()["LDLIBRARY"]
@@ -11,4 +11,5 @@ def find():
         import sys
         print ( f"-lpython{sys.version_info.major}.{sys.version_info.minor}" )
 
-find()
+if __name__ == "__main__":
+    findLibFile()
