@@ -35,7 +35,6 @@ jobs:
         python -m pip install -e .
     - name: Test with unittest
       run: |
-#        make cpp
-#        make pythia8
+        make pythia8
         cd test
         make reduced
