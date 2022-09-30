@@ -47,6 +47,9 @@ pythia6:
 pythia8:
 	cd smodels/lib && make pythia8
 
+cpp: .PHONY
+	cd cpp && make
+
 clean:
 	yes | rm -rf build dist
 	cd smodels/lib && make clean

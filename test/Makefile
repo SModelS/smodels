@@ -2,6 +2,10 @@ all: test
 
 test:
 	./runCompleteTestSuite.py
+
+test_norecipes:
+	./runCompleteTestSuite.py -S
+
 obs:
 	py.test -v
 
