@@ -38,4 +38,4 @@ jobs:
         make cpp
         make pythia8
         cd test
-        make test_norecipes
+        make reduced

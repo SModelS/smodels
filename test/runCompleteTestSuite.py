@@ -27,23 +27,38 @@ if v[0]==2 and v[1] < 7 and v[1] > 3:
 from smodels.tools.smodelsLogging import setLogLevel
 setLogLevel ( "error" )
 
-def run(skiprecipes=False):
+def isInReducedSet ( t ):
+    """ is t in the reduced set of unit tests? """
+    t = str(t).lower()
+    if "cpp" in t:
+        return False
+    if "nllfast" in t:
+        return False
+    if "pythia" in t:
+        return False
+    return True
+
+def run(skiprecipes=False, reduced=False ):
 
     tests = unittest.TestLoader().discover("./")
     if skiprecipes:
         tests._tests = [t for t in tests._tests[:] if not 'recipe' in str(t).lower()]
+    if reduced:
+        tests._tests = [t for t in tests._tests[:] if isInReducedSet(t) ]
+
     ret = unittest.TextTestRunner().run(tests)
     if not ret.wasSuccessful():
         raise AssertionError("%i tests failed" %len(ret.failures))
 
 
-def verbose_run( flter, skiprecipes=False ):
+def verbose_run( flter, skiprecipes=False, reduced=False ):
 
     alltests = unittest.TestLoader().discover("./")
 
     if skiprecipes:
         alltests._tests = [t for t in alltests._tests[:] if not 'recipe' in str(t).lower()]
-
+    if reduced:
+        alltests._tests = [t for t in alltests._tests[:] if isInReducedSet(t) ]
 
     n_tests, n_failed = 0, 0
     for series in alltests:
@@ -72,7 +87,7 @@ def verbose_run( flter, skiprecipes=False ):
                 # print ( "a=",a )
     print( "[runCompleteTestSuite] %d/%d tests failed." % ( n_failed, n_tests ))
 
-def parallel_run ( verbose, skiprecipes=False ):
+def parallel_run ( verbose, skiprecipes=False, reduced=False ):
     if verbose:
         print ("[runCompleteTestSuite] verbose run not implemented "
                "for parallel version" )
@@ -87,7 +102,8 @@ def parallel_run ( verbose, skiprecipes=False ):
     suite = unittest.TestLoader().discover("./")
     if skiprecipes:
         suite._tests = [t for t in suite._tests[:] if not 'recipe' in str(t).lower()]
-
+    if reduced:
+        suite._tests = [t for t in suite._tests[:] if isInReducedSet(t) ]
 
     ncpus = runtime.nCPUs()
     ## "shuffle" the tests, so that the heavy tests get distributed
@@ -113,16 +129,20 @@ if __name__ == "__main__":
     ap.add_argument('-p','--parallel', help='run in parallel',action='store_true')
     ap.add_argument('-S','--skiprecipes', help='skip testing the notebooks (recipes in the manual)',
                     action='store_true', default = False)
+    ap.add_argument('-r','--reduced', help='run reduced set of tests (no C++ interface, no xsec computation)',
+                    action='store_true', default = False)
     args = ap.parse_args()
 
     if args.skiprecipes:
         print('Documentation recipes (notebooks) will not be tested.')
+    if args.reduced:
+        print('Reduced set of unit tests')
 
     if args.clean_database:
         cleanDatabase ()
     if args.parallel:
-        parallel_run ( args.verbose, args.skiprecipes )
+        parallel_run ( args.verbose, args.skiprecipes, args.reduced )
     if args.verbose:
-        verbose_run( args.filter, args.skiprecipes )
+        verbose_run( args.filter, args.skiprecipes, args.reduced )
     else:
-        run(args.skiprecipes)
+        run(args.skiprecipes, args.reduced )
