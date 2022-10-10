@@ -57,7 +57,7 @@ class XSectionInfo(object):
     """
     def normalizeSqrts ( self, sqrts ):
         """ """
-        if sqrts == None:
+        if type(sqrts) == type(None):
             return sqrts
         if type(sqrts)==float and abs (sqrts % 1) < 1e-5:
             return int(sqrts)
