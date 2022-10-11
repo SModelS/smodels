@@ -1080,7 +1080,7 @@ class UpperLimitComputer:
             model = copy.deepcopy(oldmodel)
             if expected == "posteriori":
                 tempc = LikelihoodComputer(oldmodel, toys)
-                theta_hat_, _ = tempc.findThetaHat(0 * oldmodel.nsignal )
+                theta_hat_, _ = tempc.findThetaHat(0 )
             for i, d in enumerate(model.backgrounds):
                 if expected == "posteriori":
                     d += theta_hat_[i]
