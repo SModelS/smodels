@@ -488,6 +488,7 @@ class TheoryPredictionsCombiner(object):
 
         return mu_hat, sigma_mu, clsRoot
 
+    @singleDecorator
     def getUpperLimitOnMu(self, expected=False):
         """get upper limit on signal strength multiplier, i.e. value for mu for
             which CLs = 0.95
