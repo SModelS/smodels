@@ -140,6 +140,26 @@ class TheoryPrediction(object):
         #    self.cachedObjs[expected]["UL"]=None
         return self.cachedObjs[expected]["UL"]
 
+    def getUpperLimitOnMu(self, expected=False):
+        """
+        Get upper limit on signal strength multiplier, using the
+        theory prediction value and the corresponding upper limit
+        (i.e. mu_UL = upper limit/theory xsec)
+
+        :param expected: if True, compute expected upper limit, else observed
+        :returns: upper limit on signal strength multiplier mu
+        """
+
+        upperLimit = self.getUpperLimit(expected=expected)
+        xsec = self.xsection.value
+        if xsec is None or upperLimit is None:
+            return None
+
+        muUL = (upperLimit/xsec).asNumber()
+
+        return muUL
+
+
     def getRValue(self, expected=False):
         """
         Get the r value = theory prediction / experimental upper limit
