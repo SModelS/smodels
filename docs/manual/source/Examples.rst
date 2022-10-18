@@ -2,7 +2,7 @@
 
 .. |binder| image::
       images/mybinder.png
-      :target: https://mybinder.org/v2/gh/SModelS/smodels/master?filepath=docs%2Fmanual%2Fsource%2Frecipes%2F
+      :target: https://mybinder.org/v2/gh/SModelS/smodels/main?filepath=docs%2Fmanual%2Fsource%2Frecipes%2F
 
 
 .. _Examples:
