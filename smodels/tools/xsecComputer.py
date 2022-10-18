@@ -77,7 +77,10 @@ class XSecComputer:
     def addHigherOrders ( self, sqrts, slhafile ):
         """ add higher order xsecs """
         xsecs = copy.deepcopy ( self.loXsecs )
-        wlabel = str(int(sqrts / TeV)) + ' TeV'
+        s = float(sqrts/TeV)
+        if abs (s % 1) < 1e-5:
+            s = int(s)
+        wlabel = str(s) + ' TeV'
         if self.maxOrder == LO:
             wlabel += ' (LO)'
         elif self.maxOrder == NLO:
@@ -90,24 +93,29 @@ class XSecComputer:
 
         if self.maxOrder > 0:
             pIDs = self.loXsecs.getPIDpairs()
-            nllfast = toolBox.ToolBox().get("nllfast%d" % sqrts.asNumber(TeV) )
-            nllfast.maycompile = self.maycompile
-            for pID in pIDs:
-                k = 0.
-                kNLO, kNLL = nllfast.getKfactorsFor(pID, slhafile)
-                if self.maxOrder == NLO and kNLO:
-                    k = kNLO
-                elif self.maxOrder == NLL and kNLL and kNLO:
-                    k = kNLO * kNLL
-                elif self.maxOrder > 2 and kNLL and kNLO:
-                    logger.warning("Unkown xsec order, using NLL+NLO k-factor, "
-                                   "if available")
-                    k = kNLO * kNLL
-                k = float(k)
-                for i, xsec in enumerate(xsecs):
-                    if set(xsec.pid) == set(pID):
-                        # Apply k-factor
-                        xsecs[i] = xsec * k
+            nllfastnr = sqrts.asNumber(TeV)
+            if nllfastnr % 1 == 0:
+                nllfastnr = int(nllfastnr)
+                nllfast = toolBox.ToolBox().get( f"nllfast{nllfastnr}" )
+                nllfast.maycompile = self.maycompile
+                for pID in pIDs:
+                    k = 0.
+                    kNLO, kNLL = nllfast.getKfactorsFor(pID, slhafile)
+                    if self.maxOrder == NLO and kNLO:
+                        k = kNLO
+                    elif self.maxOrder == NLL and kNLL and kNLO:
+                        k = kNLO * kNLL
+                    elif self.maxOrder > 2 and kNLL and kNLO:
+                        logger.warning("Unkown xsec order, using NLL+NLO k-factor, "
+                                       "if available")
+                        k = kNLO * kNLL
+                    k = float(k)
+                    for i, xsec in enumerate(xsecs):
+                        if set(xsec.pid) == set(pID):
+                            # Apply k-factor
+                            xsecs[i] = xsec * k
+            else:
+                logger.error ( f"nllfast{nllfastnr} not yet available! will compute LO only!" )
 
         # Remove zero cross sections
         while len(xsecs) > 0 and xsecs.getMinXsec() == 0. * pb:
@@ -487,12 +495,14 @@ class ArgsStandardizer:
             files = os.listdir ( inputPath )
             for f in files:
                 inputFiles.append ( os.path.join ( inputPath, f ) )
+        import random
+        random.shuffle ( inputFiles )
         return inputFiles
 
     def checkAllowedSqrtses ( self, order, sqrtses ):
         """ check if the sqrtses are 'allowed' """
         if order == 0: return
-        allowedsqrtses=[7, 8, 13]
+        allowedsqrtses=[7, 8, 13, 13.6]
         for sqrts in sqrtses:
             if not sqrts in allowedsqrtses:
                 logger.error("Cannot compute NLO or NLL xsecs for sqrts = %d "

@@ -37,6 +37,15 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 2.2.1:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * fixes in :ref:`analyses combinations <analysesCombination>`, simplified and pyhf :ref:`likelihoods <likelihoodCalc>`
+  * small fixes for python 3.10
+  * bumped up pythia8 from 8.306 to 8.307
+  * included :ref:`example on how to plot likelihoods from analysis combination  <Examples>`
+  * small bug fix for particle addition
+
 New in Version 2.2.0.post1:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -56,7 +65,7 @@ New in Version 2.2.0:
   * updates in references.bib, installation notes
   * more small fixes in unit tests
   * Database extension, added new results from 4 ATLAS and 11 CMS analyses:
-     - results from ATLAS: 
+     - results from ATLAS:
        ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2018-41 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
      - results from CMS:
        CMS-SUS-16-050 (EM), CMS-SUS-18-004 (UL), CMS-SUS-18-007 (UL), CMS-SUS-19-008 (UL), CMS-SUS-19-011 (UL), CMS-SUS-19-013 (UL), CMS-SUS-20-001 (UL), CMS-SUS-20-002 (UL)

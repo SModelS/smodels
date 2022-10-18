@@ -70,12 +70,12 @@ Most importantly, we can compute a likelihood,
 which describes the plausibility of a signal strength :math:`\mu` given the data :math:`D`:
 
 .. math::
-   \mathcal{L}(\mu,\theta|D) =  P\left(D|\mu + b + \theta \right) p(\theta)
+   \mathcal{L}(\mu,\theta|D) =  P\left(D|\mu s + b + \theta \right) p(\theta)
 
 
 Here, :math:`\theta` denotes the nuisance parameter that describes the
 variations in the signal and background contribtions due to systematic
-effects.
+effects, :math:`s` is the number of predicted signal events.
 
 If no information about the correlation of signal regions is available
 (or if its usage is turned off, see :doc:`Using SModelS <RunningSModelS>`),
@@ -89,7 +89,7 @@ whereas :math:`P(D)` corresponds to a counting variable and is thus
 properly described by a Poissonian. The complete likelihood thus reads:
 
 .. math::
-   \mathcal{L}(\mu,\theta|D) = \frac{(\mu + b + \theta)^{n_{obs}} e^{-(\mu + b + \theta)}}{n_{obs}!} exp \left( -\frac{\theta^2}{2\delta^2} \right)
+   \mathcal{L}(\mu,\theta|D) = \frac{(\mu s + b + \theta)^{n_{obs}} e^{-(\mu s + b + \theta)}}{n_{obs}!} exp \left( -\frac{\theta^2}{2\delta^2} \right)
 
 where :math:`n_{obs}` is the number of observed events in the signal region.
 From this likelihood we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al.,
@@ -154,7 +154,7 @@ the likelihood for the signal hypothesis when combining signal regions is given 
 .. math::
    \mathcal{L}(\mu,\theta|D) = \prod_{i=1}^{N} \frac{(\mu s_i^r + b_i + \theta_i)^{n_{obs}^i} e^{-(\mu s_i^r + b_i + \theta_i)}}{n_{obs}^i!} exp \left( -\frac{1}{2} \vec{\theta}^T V^{-1} \vec{\theta} \right)
 
-where the product is over all :math:`N` signal regions, :math:`\mu` is the overall signal strength, :math:`s_i^r` the relative signal strength
+where the product is over all :math:`N` signal regions, :math:`\mu` is the overall signal strength, :math:`s_i^r` the signal strength
 in each signal region and :math:`V` represents the covariance matrix.
 Note, however, that unlike the case of a single signal region, we do not include any signal uncertainties, since this
 should correspond to a second-order effect.

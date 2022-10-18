@@ -14,9 +14,10 @@ import warnings
 import jsonschema
 import copy
 
-jsonver=""
+jsonver = ""
 try:
     import importlib.metadata
+
     jsonver = importlib.metadata.version("jsonschema")
 except Exception as e:
     try:
@@ -24,44 +25,59 @@ except Exception as e:
     except Exception as e:
         pass
 if jsonver[0] == "2":
-#if jsonschema.__version__[0] == "2": ## deprecated
-    print ( "[SModelS:pyhfInterface] jsonschema is version %s, we need > 3.x.x" % \
-            ( jsonschema.__version__ ) )
+    # if jsonschema.__version__[0] == "2": ## deprecated
+    print(
+        "[SModelS:pyhfInterface] jsonschema is version %s, we need > 3.x.x"
+        % (jsonschema.__version__)
+    )
     sys.exit()
 
 import time, sys, os
+
 try:
     import pyhf
 except ModuleNotFoundError:
-    print ( "[SModelS:pyhfInterface] pyhf import failed. Is the module installed?" )
+    print("[SModelS:pyhfInterface] pyhf import failed. Is the module installed?")
     sys.exit(-1)
 
 ver = pyhf.__version__.split(".")
-if ver[1]=="4" or (ver[1]=="5" and ver[2] in [ "0", "1" ]):
-    print ( "[SModelS:pyhfInterface] WARNING you are using pyhf v%s." % pyhf.__version__ )
-    print ( "[SModelS:pyhfInterface] We recommend pyhf >= 0.5.2. Please try to update pyhf ASAP!" )
+if ver[1] == "4" or (ver[1] == "5" and ver[2] in ["0", "1"]):
+    print("[SModelS:pyhfInterface] WARNING you are using pyhf v%s." % pyhf.__version__)
+    print("[SModelS:pyhfInterface] We recommend pyhf >= 0.5.2. Please try to update pyhf ASAP!")
 
-pyhfinfo = { "backend": "numpy", "hasgreeted": False, "backendver": "?", "ver": ver,
-             "required": "0.6.1".split(".") }
+pyhfinfo = {
+    "backend": "numpy",
+    "hasgreeted": False,
+    "backendver": "?",
+    "ver": ver,
+    "required": "0.6.1".split("."),
+}
 
 try:
     pyhf.set_backend(b"pytorch")
     import torch
+
     pyhfinfo["backend"] = "pytorch"
     pyhfinfo["backendver"] = torch.__version__
 except pyhf.exceptions.ImportBackendError as e:
-    print ( "[SModelS:pyhfInterface] WARNING could not set pytorch as the pyhf backend, falling back to the default." )
-    print ( "[SModelS:pyhfInterface] We however recommend that pytorch be installed." )
+    print(
+        "[SModelS:pyhfInterface] WARNING could not set pytorch as the pyhf backend, falling back to the default."
+    )
+    print("[SModelS:pyhfInterface] We however recommend that pytorch be installed.")
     import numpy
-    pyhfinfo["backendver"]=numpy.version.full_version
 
-    warnings.filterwarnings('ignore', r'invalid value encountered in log')
+    pyhfinfo["backendver"] = numpy.version.full_version
+
+    warnings.filterwarnings("ignore", r"invalid value encountered in log")
 
 from scipy import optimize
 import numpy as np
 from smodels.tools.smodelsLogging import logger
 import logging
+import math
+
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
+
 
 def getLogger():
     """
@@ -80,8 +96,10 @@ def getLogger():
     logger.setLevel(logging.DEBUG)
     return logger
 
-countWarning = { "llhdszero": 0 }
-#logger=getLogger()
+
+countWarning = {"llhdszero": 0}
+# logger=getLogger()
+
 
 class PyhfData:
     """
@@ -91,12 +109,13 @@ class PyhfData:
     :ivar jsonFiles: optional list of json files
     :ivar nWS: number of workspaces = number of json files
     """
-    def __init__ (self, nsignals, inputJsons, jsonFiles = None ):
-        self.nsignals = nsignals # fb
+
+    def __init__(self, nsignals, inputJsons, jsonFiles=None ):
+        self.nsignals = nsignals  # fb
         self.inputJsons = inputJsons
-        self.cached_likelihoods = {} ## cache of likelihoods (actually twice_nlls)
-        self.cached_lmaxes = {} # cache of lmaxes (actually twice_nlls)
-        self.cachedULs = { False: {}, True: {}, "posteriori": {} }
+        self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
+        self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
+        self.cachedULs = {False: {}, True: {}, "posteriori": {}}
         self.jsonFiles = jsonFiles
         self.combinations = None
         if jsonFiles != None:
@@ -107,6 +126,11 @@ class PyhfData:
         self.getWSInfo()
         self.checkConsistency()
 
+    def totalYield ( self ):
+        """ the total yield in all signal regions """
+        S = sum ( [ sum(x) for x in self.nsignals ] )
+        return S
+
     def getWSInfo(self):
         """
         Getting informations from the json files
@@ -116,26 +140,38 @@ class PyhfData:
             - :key otherRegions: list of strings indicating the path to the control and validation region channels
         """
         # Identifying the path to the SR and VR channels in the main workspace files
-        self.channelsInfo = [] # workspace specifications
+        self.channelsInfo = []  # workspace specifications
         if not isinstance(self.inputJsons, list):
             logger.error("The `inputJsons` parameter must be of type list")
             self.errorFlag = True
             return
         for ws in self.inputJsons:
             wsChannelsInfo = {}
-            wsChannelsInfo['signalRegions'] = []
-            wsChannelsInfo['otherRegions'] = []
-            if not 'channels' in ws.keys():
-                logger.error("Json file number {} is corrupted (channels are missing)".format(self.inputJsons.index(ws)))
+            wsChannelsInfo["signalRegions"] = []
+            wsChannelsInfo["otherRegions"] = []
+            if not "channels" in ws.keys():
+                logger.error(
+                    "Json file number {} is corrupted (channels are missing)".format(
+                        self.inputJsons.index(ws)
+                    )
+                )
                 self.channelsInfo = None
                 return
-            for i_ch, ch in enumerate(ws['channels']):
-                if ch['name'][:2] == 'SR': # if channel name starts with 'SR'
-                    wsChannelsInfo['signalRegions'].append({'path':'/channels/'+str(i_ch)+'/samples/0', # Path of the new sample to add (signal prediction)
-                                                            'size':len(ch['samples'][0]['data'])}) # Number of bins
+            for i_ch, ch in enumerate(ws["channels"]):
+                if ch["name"][:2] == "SR":  # if channel name starts with 'SR'
+                    wsChannelsInfo["signalRegions"].append(
+                        {
+                            "path": "/channels/"
+                            + str(i_ch)
+                            + "/samples/0",  # Path of the new sample to add (signal prediction)
+                            "size": len(ch["samples"][0]["data"]),
+                        }
+                    )  # Number of bins
                 else:
-                    wsChannelsInfo['otherRegions'].append('/channels/'+str(i_ch))
-            wsChannelsInfo['otherRegions'].sort(key=lambda path: path.split('/')[-1], reverse=True) # Need to sort correctly the paths to the channels to be removed
+                    wsChannelsInfo["otherRegions"].append("/channels/" + str(i_ch))
+            wsChannelsInfo["otherRegions"].sort(
+                key=lambda path: path.split("/")[-1], reverse=True
+            )  # Need to sort correctly the paths to the channels to be removed
             self.channelsInfo.append(wsChannelsInfo)
 
     def checkConsistency(self):
@@ -148,7 +184,9 @@ class PyhfData:
             logger.error("The `nsignals` parameter must be of type list")
             self.errorFlag = True
         if self.nWS != len(self.nsignals):
-            logger.error('The number of subsignals provided is different from the number of json files')
+            logger.error(
+                "The number of subsignals provided is different from the number of json files"
+            )
             self.errorFlag = True
         self.zeroSignalsFlag = list()
         if self.channelsInfo == None:
@@ -158,20 +196,26 @@ class PyhfData:
                 logger.error("The `nsignals` parameter must be a two dimensional list")
                 self.errorFlag = True
             nBinsJson = 0
-            for sr in wsInfo['signalRegions']:
-                nBinsJson += sr['size']
+            for sr in wsInfo["signalRegions"]:
+                nBinsJson += sr["size"]
             if nBinsJson != len(subSig):
-                logger.error('The number of signals provided is different from the number of bins for json number {} and channel number {}'.format(self.channelsInfo.index(wsInfo), self.nsignals.index(subSig)))
+                logger.error(
+                    "The number of signals provided is different from the number of bins for json number {} and channel number {}".format(
+                        self.channelsInfo.index(wsInfo), self.nsignals.index(subSig)
+                    )
+                )
                 self.errorFlag = True
             allZero = all([s == 0 for s in subSig])
             # Checking if all signals matching this json are zero
             self.zeroSignalsFlag.append(allZero)
 
+
 class PyhfUpperLimitComputer:
     """
     Class that computes the upper limit using the jsons files and signal informations in the `data` instance of `PyhfData`
     """
-    def __init__ ( self, data, cl=0.95, includeCRs = False):
+
+    def __init__(self, data, cl=0.95, includeCRs=False, lumi=None ):
         """
         :param data: instance of `PyhfData` holding the signals information
         :param cl: confdence level at which the upper limit is desired to be computed
@@ -190,6 +234,7 @@ class PyhfUpperLimitComputer:
         :ivar alreadyBeenThere: boolean flag that identifies when the :ivar nsignals: accidentally passes twice at two identical values
         """
         self.data = data
+        self.lumi = lumi
         self.nsignals = self.data.nsignals
         logger.debug("Signals : {}".format(self.nsignals))
         self.inputJsons = self.data.inputJsons
@@ -199,24 +244,31 @@ class PyhfUpperLimitComputer:
         self.includeCRs = includeCRs
         self.patches = self.patchMaker()
         self.workspaces = self.wsMaker()
-        self.workspaces_expected = self.wsMaker(apriori = True)
+        self.workspaces_expected = self.wsMaker(apriori=True)
         self.cl = cl
-        self.scale = 1.
-        self.alreadyBeenThere = False # boolean to detect wether self.signals has returned to an older value
+        self.scale = 1.0
+        self.sigma_mu = None
+        self.alreadyBeenThere = (
+            False  # boolean to detect wether self.signals has returned to an older value
+        )
         self.checkPyhfVersion()
         self.welcome()
 
-    def welcome ( self ):
-        """ greet the world """
+    def welcome(self):
+        """greet the world"""
         if pyhfinfo["hasgreeted"]:
             return
-        logger.info ( f"Pyhf interface, we are using v{'.'.join(pyhfinfo['ver'])}, with {pyhfinfo['backend']} v{pyhfinfo['backendver']} as backend." )
+        logger.info(
+            f"Pyhf interface, we are using v{'.'.join(pyhfinfo['ver'])}, with {pyhfinfo['backend']} v{pyhfinfo['backendver']} as backend."
+        )
         pyhfinfo["hasgreeted"] = True
 
-    def checkPyhfVersion ( self ):
-        """ check the pyhf version, currently we need 0.6.1+ """
+    def checkPyhfVersion(self):
+        """check the pyhf version, currently we need 0.6.1+"""
         if pyhfinfo["ver"] < pyhfinfo["required"]:
-            logger.warning ( f"pyhf version is {'.'.join(pyhfinfo['ver'])}. SModelS currently requires pyhf>={'.'.join(pyhfinfo['required'])}. You have been warned." )
+            logger.warning(
+                f"pyhf version is {'.'.join(pyhfinfo['ver'])}. SModelS currently requires pyhf>={'.'.join(pyhfinfo['required'])}. You have been warned."
+            )
 
     def rescale(self, factor):
         """
@@ -224,21 +276,21 @@ class PyhfUpperLimitComputer:
 
         :return: updated list of patches and workspaces (self.patches, self.workspaces and self.workspaces_expected)
         """
-        self.nsignals = [[sig*factor for sig in ws] for ws in self.nsignals]
+        self.nsignals = [[sig * factor for sig in ws] for ws in self.nsignals]
         try:
             self.alreadyBeenThere = self.nsignals == self.nsignals_2
         except AttributeError:
             pass
         self.scale *= factor
-        logger.debug('new signal scale : {}'.format(self.scale))
+        logger.debug("new signal scale : {}".format(self.scale))
         self.patches = self.patchMaker()
         self.workspaces = self.wsMaker()
-        self.workspaces_expected = self.wsMaker(apriori = True)
+        self.workspaces_expected = self.wsMaker(apriori=True)
         try:
-            self.nsignals_2 = self.nsignals_1.copy() # nsignals at previous-to-previous loop
+            self.nsignals_2 = self.nsignals_1.copy()  # nsignals at previous-to-previous loop
         except AttributeError:
             pass
-        self.nsignals_1 = self.nsignals.copy() # nsignals at previous loop
+        self.nsignals_1 = self.nsignals.copy()  # nsignals at previous loop
 
     def patchMaker(self):
         """
@@ -254,11 +306,11 @@ class PyhfUpperLimitComputer:
         patches = []
         for ws, info, subSig in zip(self.inputJsons, self.channelsInfo, self.nsignals):
             patch = []
-            for srInfo in info['signalRegions']:
-                nBins = srInfo['size']
+            for srInfo in info["signalRegions"]:
+                nBins = srInfo["size"]
                 operator = {}
                 operator["op"] = "add"
-                operator["path"] = srInfo['path']
+                operator["path"] = srInfo["path"]
                 value = {}
                 value["data"] = subSig[:nBins]
                 subSig = subSig[nBins:]
@@ -271,12 +323,12 @@ class PyhfUpperLimitComputer:
             if self.includeCRs:
                 logger.debug("keeping the CRs")
             else:
-                for path in info['otherRegions']:
-                    patch.append({'op':'remove', 'path':path})
+                for path in info["otherRegions"]:
+                    patch.append({"op": "remove", "path": path})
             patches.append(patch)
         return patches
 
-    def wsMaker(self, apriori = False):
+    def wsMaker(self, apriori=False):
         """
         Apply each region patch (self.patches) to his associated json (self.inputJsons) to obtain the complete workspaces
         :param apriori: - If set to `True`: Replace the observation data entries of each workspace by the corresponding sum of the expected yields
@@ -291,18 +343,19 @@ class PyhfUpperLimitComputer:
                 wsDict = jsonpatch.apply_patch(self.inputJsons[0], self.patches[0])
                 if apriori == True:
                     # Replace the observation data entries by the corresponding sum of the expected yields
-                    for obs in wsDict['observations']:
-                        for ch in wsDict['channels']:
+                    for obs in wsDict["observations"]:
+                        for ch in wsDict["channels"]:
                             # Finding matching observation and bkg channel
-                            if obs['name'] == ch['name']:
-                                bkg = [0.]*len(obs['data'])
-                                for sp in ch['samples']:
-                                    if sp['name'] == 'bsm': continue
-                                    for iSR in range(len(obs['data'])):
+                            if obs["name"] == ch["name"]:
+                                bkg = [0.0] * len(obs["data"])
+                                for sp in ch["samples"]:
+                                    if sp["name"] == "bsm":
+                                        continue
+                                    for iSR in range(len(obs["data"])):
                                         # Summing over all bkg samples for each bin/SR
-                                        bkg[iSR] += sp['data'][iSR]
+                                        bkg[iSR] += sp["data"][iSR]
                                 # logger.debug('bkgs for channel {} :\n{}'.format(obs['name'], bkg))
-                                obs['data'] = bkg
+                                obs["data"] = bkg
                 return [pyhf.Workspace(wsDict)]
             except (pyhf.exceptions.InvalidSpecification, KeyError) as e:
                 logger.error("The json file is corrupted:\n{}".format(e))
@@ -313,37 +366,99 @@ class PyhfUpperLimitComputer:
                 wsDict = jsonpatch.apply_patch(js, patch)
                 if apriori == True:
                     # Replace the observation data entries by the corresponding sum of the expected yields
-                    for obs in wsDict['observations']:
-                        for ch in wsDict['channels']:
+                    for obs in wsDict["observations"]:
+                        for ch in wsDict["channels"]:
                             # Finding matching observation and bkg channel
-                            if obs['name'] == ch['name']:
-                                bkg = [0.]*len(obs['data'])
-                                for sp in ch['samples']:
-                                    if sp['name'] == 'bsm': continue
-                                    for iSR in range(len(obs['data'])):
+                            if obs["name"] == ch["name"]:
+                                bkg = [0.0] * len(obs["data"])
+                                for sp in ch["samples"]:
+                                    if sp["name"] == "bsm":
+                                        continue
+                                    for iSR in range(len(obs["data"])):
                                         # Summing over all bkg samples for each bin/SR
-                                        bkg[iSR] += sp['data'][iSR]
+                                        bkg[iSR] += sp["data"][iSR]
                                 # logger.debug('bkgs for channel {} :\n{}'.format(obs['name'], bkg))
-                                obs['data'] = bkg
+                                obs["data"] = bkg
                 try:
                     ws = pyhf.Workspace(wsDict)
                 except (pyhf.exceptions.InvalidSpecification, KeyError) as e:
-                    logger.error("Json file number {} is corrupted:\n{}".format(self.inputJsons.index(json), e))
+                    logger.error(
+                        "Json file number {} is corrupted:\n{}".format(
+                            self.inputJsons.index(json), e
+                        )
+                    )
                     return None
                 workspaces.append(ws)
             return workspaces
 
-    def backup ( self ):
-        self.bu_signal = copy.deepcopy ( self.data.nsignals )
+    def backup(self):
+        self.bu_signal = copy.deepcopy(self.data.nsignals)
 
-    def restore ( self ):
-        if not hasattr ( self, "bu_signal" ):
+    def restore(self):
+        if not hasattr(self, "bu_signal"):
             return
-        self.data.nsignals = copy.deepcopy ( self.bu_signal )
+        self.data.nsignals = copy.deepcopy(self.bu_signal)
         del self.bu_signal
 
-    def likelihood( self, mu=1., workspace_index=None, nll=False,
-                    expected=False ):
+    def get_position(self, name, model):
+        """
+        :param name: name of the parameter one wants to increase
+        :param model: the pyhf model
+        :return: the position of the parameter that has to be modified in order to turn positive the negative total yield
+        """
+        position = 0
+        for par in model.config.par_order:
+            if name == par:
+                return position
+            else:
+                position += model.config.param_set(par).n_parameters
+
+    def rescaleBgYields(self, init_pars, workspace, model):
+        """
+        :param init_pars: list of initial parameters values one wants to increase in order to turn positive the negative total yields
+        :param workspace: the pyhf workspace
+        :param model: the pyhf model
+        :return: the list of initial parameters values that gives positive total yields
+        """
+        for pos,yld in enumerate(model.expected_actualdata(init_pars)):
+            # If a total yield (mu*signal + background) evaluated with the initial parameters is negative, increase a parameter to turn it positive
+            if yld < 0:
+                sum_bins = 0
+                # Find the SR and the bin (the position inside the SR) corresponding to the negative total yield
+                for channel,nbins in model.config.channel_nbins.items():
+                    sum_bins += nbins
+                    if pos < sum_bins:
+                        SR = channel
+                        # Bin number = the position of the bin in the SR
+                        # (i.e. the position of the negative total yield in the list, starting at the corresponding SR)
+                        bin_num = pos-sum_bins+nbins
+                        break
+                # Find the name of the parameter that modifies the background yield of the negative total yield
+                for channel in workspace['channels']:
+                    if channel['name'] == SR:
+                        for sample in range(len(channel['samples'])):
+                            for modifier in channel['samples'][sample]['modifiers']:
+                                # The multiplicative modifier (i.e. parameter) that will be increased is a 'staterror' one (others may work as well)
+                                # In case of a simplified json, let's take the only parameter called 'totalError'
+                                if ('type' in modifier.keys() and modifier['type'] == 'staterror') or modifier['name'] == 'totalError':
+                                    name = modifier['name']
+                                    break
+                # Find the position of the parameter within the pyhf list of parameters
+                position = self.get_position(name,model)+bin_num
+                # Find the upper bound of the parameter that will be increased
+                max_bound = model.config.suggested_bounds()[position][1]
+                # If the parameter one wants to increase is not fixed, add 0.1 to its value (it is an arbitrary step) until
+                # the total yield becomes positive or the parameter upper bound is reached
+                if not model.config.suggested_fixed()[position]:
+                    while model.expected_actualdata(init_pars)[pos] < 0:
+                        if init_pars[position] + 0.1 < max_bound:
+                            init_pars[position] += 0.1
+                        else:
+                            init_pars[position] = max_bound
+                            break
+        return init_pars
+
+    def likelihood(self, mu=1.0, workspace_index=None, nll=False, expected=False):
         """
         Returns the value of the likelihood.
         Inspired by the `pyhf.infer.mle` module but for non-log likelihood
@@ -354,24 +469,31 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori
             expected
         """
-        mumin,mumax = -10., 20.
-        if mu>mumax:
-            if countWarning["llhdszero"]<1:
-                logger.warning ( f"likelihoods of signal strengths mu= {mu:.1f} > {mumax} are automatically set to 0 (will suppress similar msgs)" )
-            countWarning["llhdszero"]+=1
-            return self.exponentiateNLL ( None, not nll )
-        if mu<mumin:
-            if countWarning["llhdszero"]<1:
-                logger.warning ( f"likelihoods of signal strengths mu= {mu:.1f} < {mumin} are automatically set to 0 (will suppress similar msgs)" )
-            countWarning["llhdszero"]+=1
-            return self.exponentiateNLL ( None, not nll )
+        mumin, mumax = -20.0, 40.0
+        if mu > mumax:
+            if countWarning["llhdszero"] < 1:
+                logger.warning(
+                    f"likelihoods of signal strengths mu= {mu:.1f} > {mumax} are automatically set to 0 (will suppress similar msgs)"
+                )
+            countWarning["llhdszero"] += 1
+            return self.exponentiateNLL(None, not nll)
+        if mu < mumin:
+            if countWarning["llhdszero"] < 1:
+                logger.warning(
+                    f"likelihoods of signal strengths mu= {mu:.1f} < {mumin} are automatically set to 0 (will suppress similar msgs)"
+                )
+            countWarning["llhdszero"] += 1
+            return self.exponentiateNLL(None, not nll)
         # print ( "pyhf likelihood for", mu )
         logger.debug("Calling likelihood")
-        if type(workspace_index ) == float:
-            logger.error ( "workspace index is float" )
+        if type(workspace_index) == float:
+            logger.error("workspace index is float")
         # logger.error("expected flag needs to be heeded!!!")
         with warnings.catch_warnings():
-            warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
+            warnings.filterwarnings(
+                "ignore",
+                "Values in x were outside bounds during a minimize step, clipping to bounds",
+            )
             # warnings.filterwarnings ( "ignore", "", module="pyhf.exceptions" )
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
@@ -379,79 +501,86 @@ class PyhfUpperLimitComputer:
                 return None
             self.backup()
             try:
-                if abs ( mu-1.) > 1e-6:
-                    for i,ns in enumerate ( self.data.nsignals ):
-                        for j,v in enumerate ( ns ):
-                            self.data.nsignals[i][j]=v*mu
+                if abs(mu - 1.0) > 1e-6:
+                    for i, ns in enumerate(self.data.nsignals):
+                        for j, v in enumerate(ns):
+                            self.data.nsignals[i][j] = v * mu
                 self.__init__(self.data)
                 ### allow this, for computation of l_SM
-                #if self.zeroSignalsFlag[workspace_index] == True:
+                # if self.zeroSignalsFlag[workspace_index] == True:
                 #    logger.warning("Workspace number %d has zero signals" % workspace_index)
                 #    return None
-                workspace = self.updateWorkspace(workspace_index, expected = expected)
+                workspace = self.updateWorkspace(workspace_index, expected=expected)
                 # Same modifiers_settings as those used when running the 'pyhf cls' command line
-                msettings = { 'normsys': {'interpcode': 'code4'}, 
-                              'histosys': {'interpcode': 'code4p'}}
+                msettings = {
+                    "normsys": {"interpcode": "code4"},
+                    "histosys": {"interpcode": "code4p"},
+                }
                 model = workspace.model(modifier_settings=msettings)
-                d = workspace.data(model)
-                indices = []
-                slices = list ( workspace.channel_slices.values() )
-                for slce in slices:
-                    for i in range ( slce.start, slce.stop ):
-                        indices.append ( i )
-                total = np.array( [ d[i]+self.data.nsignals[0][i] for i in indices ])
-                if np.any ( total[total<0] ):
-                    # we have negative total yields. return a llhd of 0 for that
-                    self.restore()
-                    return self.exponentiateNLL ( None, not nll )
-                _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., d,
-                        model, return_fitted_val=True, maxiter=200 )
-            except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                logger.debug ( f"pyhf fixed_poi_fit failed for mu={mu}: {e}" )
-                # lets try with different initialisation
-                init, n_ = pyhf.infer.mle.fixed_poi_fit( 0., workspace.data(model),
-                        model, return_fitted_val=True, maxiter=200 )
-                initpars=init.tolist()
-                initpars[1]=1
-                for i in [ 0, 2 ]:
-                    initpars[i]=1.
-                try:
-                    _, nllh = pyhf.infer.mle.fixed_poi_fit( 1., workspace.data(model),
-                        model, return_fitted_val=True, init_pars = initpars, maxiter=200 )
-                except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                    logger.info ( f"pyhf fixed_poi_fit failed twice for mu={mu}: {e}" )
-                
-                    self.restore()
-                    return self.exponentiateNLL ( None, not nll )
-            except:
-                self.restore()
-                return self.exponentiateNLL ( None, not nll )
+                wsData = workspace.data(model)
 
-            # print ( "likelihood best fit", _ )
+                _, nllh = pyhf.infer.mle.fixed_poi_fit(
+                    1.0, wsData, model, return_fitted_val=True, maxiter=200
+                )
+            except (pyhf.exceptions.FailedMinimization, ValueError) as e:
+                logger.debug(f"pyhf fixed_poi_fit failed for mu={mu}: {e}")
+                # lets try with different initialisation
+                init, n_ = pyhf.infer.mle.fixed_poi_fit(
+                    0.0, workspace.data(model), model, return_fitted_val=True, maxiter=200
+                )
+                initpars = init.tolist()
+                initpars[model.config.poi_index] = 1.
+                # Try to turn positive all the negative total yields (mu*signal + background) evaluated with the initial parameters
+                initpars = self.rescaleBgYields(initpars, workspace, model)
+                # If the a total yield is still negative with the increased initial parameters, print a message
+                if not all([True if yld >= 0 else False for yld in model.expected_actualdata(initpars)]):
+                    logger.debug(f'Negative total yield after increasing the initial parameters for mu={mu}')
+                try:
+                    bestFitParam, nllh = pyhf.infer.mle.fixed_poi_fit(
+                        1.0,
+                        wsData,
+                        model,
+                        return_fitted_val=True,
+                        init_pars=initpars,
+                        maxiter=2000,
+                    )
+                    # If a total yield is negative with the best profiled parameters, return None
+                    if not all([True if yld >= 0 else False for yld in model.expected_actualdata(bestFitParam)]):
+                        self.restore()
+                        return self.exponentiateNLL(None, not nll)
+                except (pyhf.exceptions.FailedMinimization, ValueError) as e:
+                    logger.info(f"pyhf fixed_poi_fit failed twice for mu={mu}: {e}")
+
+                    self.restore()
+                    return self.exponentiateNLL(None, not nll)
+
             ret = nllh.tolist()
             try:
                 ret = float(ret)
             except:
                 ret = float(ret[0])
-            self.data.cached_likelihoods[workspace_index]=ret #THIS CAN STAY BC IT MAY BE NEEDED ELSEWHERE IN THE CODE
-            ret = self.exponentiateNLL ( ret, not nll )
+            # Cache the likelihood (but do we use it?)
+            self.data.cached_likelihoods[
+                workspace_index
+            ] = ret
+            ret = self.exponentiateNLL(ret, not nll)
             # print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
             self.restore()
             return ret
 
-    def getBestCombinationIndex( self ):
-        """ find the index of the best expected combination """
+    def getBestCombinationIndex(self):
+        """find the index of the best expected combination"""
         if self.nWS == 1:
             return 0
         logger.debug("Finding best expected combination among %d workspace(s)" % self.nWS)
-        ulMin = float('+inf')
+        ulMin = float("+inf")
         i_best = None
         for i_ws in range(self.nWS):
             if self.zeroSignalsFlag[i_ws] == True:
                 logger.debug("Workspace number %d has zero signals" % i_ws)
                 continue
             else:
-                ul = self.ulSigma(expected=True, workspace_index=i_ws)
+                ul = self.getUpperLimitOnMu(expected=True, workspace_index=i_ws)
             if ul == None:
                 continue
             if ul < ulMin:
@@ -463,21 +592,67 @@ class PyhfUpperLimitComputer:
         """
         Returns the chi square
         """
-        return 2 * ( self.lmax ( workspace_index, nll=True ) - self.likelihood ( workspace_index, nll=True ) )
+        return 2 * (
+            self.lmax(workspace_index, nll=True) - self.likelihood(workspace_index, nll=True)
+        )
 
-    def exponentiateNLL ( self, twice_nll, doIt ):
-        """ if doIt, then compute likelihood from nll,
-            else return nll """
+    def exponentiateNLL(self, twice_nll, doIt):
+        """if doIt, then compute likelihood from nll,
+        else return nll"""
         if twice_nll == None:
-            if doIt:
-                return 0.
-            return 9000.
+            return None
+            #if doIt:
+            #    return 0.0
+            #return 9000.0
         if doIt:
-            return np.exp(-twice_nll/2.)
-        return twice_nll / 2.
+            return np.exp(-twice_nll / 2.0)
+        return twice_nll / 2.0
 
-    def lmax( self, workspace_index=None, nll=False,
-              expected=False, allowNegativeSignals = False ):
+    def getSigmaMu(self, workspace):
+        """given a workspace, compute a rough estimate of sigma_mu,
+        the uncertainty of mu_hat"""
+        obss, bgs, bgVars, nsig = {}, {}, {}, {}
+        channels = workspace.channels
+        for chdata in workspace["channels"]:
+            if not chdata["name"] in channels:
+                continue
+            bg = 0.0
+            var = 0.0
+            for sample in chdata["samples"]:
+                if sample["name"] == "Bkg":
+                    tbg = sample["data"][0]
+                    bg += tbg
+                    hi = sample["modifiers"][0]["data"]["hi_data"][0]
+                    lo = sample["modifiers"][0]["data"]["lo_data"][0]
+                    delta = max((hi - bg, bg - lo))
+                    var += delta**2
+                if sample["name"] == "bsm":
+                    ns = sample["data"][0]
+                    nsig[chdata["name"]] = ns
+            bgs[chdata["name"]] = bg
+            bgVars[chdata["name"]] = var
+        for chdata in workspace["observations"]:
+            if not chdata["name"] in channels:
+                continue
+            obss[chdata["name"]] = chdata["data"][0]
+        vars = []
+        for c in channels:
+            # poissonian error
+            if nsig[c]==0.:
+                nsig[c]=1e-5
+            poiss = abs(obss[c]-bgs[c]) / nsig[c]
+            gauss = bgVars[c] / nsig[c]**2
+            vars.append ( poiss + gauss )
+        var_mu = np.sum ( vars )
+        n = len ( obss )
+        # print ( f" sigma_mu from pyhf uncorr {var_mu} {n} "  )
+        sigma_mu = float ( np.sqrt ( var_mu / (n**2) ) )
+        self.sigma_mu = sigma_mu
+        #import IPython
+        #IPython.embed()
+        #sys.exit()
+
+    def lmax(self, workspace_index=None, nll=False, expected=False, allowNegativeSignals=False):
         """
         Returns the negative log max likelihood
         :param nll: if true, return nll, not llhd
@@ -491,7 +666,10 @@ class PyhfUpperLimitComputer:
         # logger.error("expected flag needs to be heeded!!!")
         logger.debug("Calling lmax")
         with warnings.catch_warnings():
-            warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
+            warnings.filterwarnings(
+                "ignore",
+                "Values in x were outside bounds during a minimize step, clipping to bounds",
+            )
 
             self.__init__(self.data)
             if workspace_index == None:
@@ -501,21 +679,33 @@ class PyhfUpperLimitComputer:
                     logger.warning("Workspace number %d has zero signals" % workspace_index)
                     return None
                 else:
-                    workspace = self.updateWorkspace(workspace_index, expected = expected)
+                    workspace = self.updateWorkspace(workspace_index, expected=expected)
             else:
                 return None
             # Same modifiers_settings as those used when running the 'pyhf cls' command line
-            msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
+            msettings = {"normsys": {"interpcode": "code4"}, "histosys": {"interpcode": "code4p"}}
             model = workspace.model(modifier_settings=msettings)
+            # obs = workspace.data(model)
+            self.getSigmaMu(workspace)
             try:
                 bounds = model.config.suggested_bounds()
                 if allowNegativeSignals:
                     bounds[model.config.poi_index] = (-5., 10. )
-                muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model, return_fitted_val=True, par_bounds = bounds )
+                muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model,
+                        return_fitted_val=True, par_bounds = bounds )
+                if False: # get sigma_mu from hessian
+                    pyhf.set_backend(pyhf.tensorlib, 'minuit')
+                    muhat, maxNllh,o = pyhf.infer.mle.fit(workspace.data(model), model,
+                            return_fitted_val=True, par_bounds = bounds,
+                            return_result_obj = True )
+                    sigma_mu = float ( np.sqrt ( o.hess_inv[0][0] ) ) * self.scale
+                    # print ( f"\n>>> sigma_mu from hessian {sigma_mu:.2f}" )
+                    pyhf.set_backend(pyhf.tensorlib, 'scipy')
+
                 muhat = muhat[model.config.poi_index]*self.scale
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                logger.error ( f"pyhf mle.fit failed {e}" )
+                logger.error(f"pyhf mle.fit failed {e}")
                 muhat, maxNllh = float("nan"), float("nan")
             self.muhat = muhat
             try:
@@ -526,11 +716,11 @@ class PyhfUpperLimitComputer:
                 ret = float(ret)
             except:
                 ret = float(ret[0])
-            self.data.cached_lmaxes [ workspace_index ] = ret
-            ret = self.exponentiateNLL ( ret, not nll )
+            self.data.cached_lmaxes[workspace_index] = ret
+            ret = self.exponentiateNLL(ret, not nll)
             return ret
 
-    def updateWorkspace(self, workspace_index = None, expected = False):
+    def updateWorkspace(self, workspace_index=None, expected=False):
         """
         Small method used to return the appropriate workspace
 
@@ -551,11 +741,35 @@ class PyhfUpperLimitComputer:
             else:
                 return self.workspaces[workspace_index]
 
+    def getUpperLimitOnSigmaTimesEff(self, expected=False, workspace_index=None):
+        """
+        Compute the upper limit on the fiducial cross section sigma times efficiency:
+            - by default, the combination of the workspaces contained into self.workspaces
+            - if workspace_index is specified, self.workspace[workspace_index]
+              (useful for computation of the best upper limit)
+
+        :param expected:  - if set to `True`: uses expected SM backgrounds as signals
+                          - else: uses `self.nsignals`
+        :param workspace_index: - if different from `None`: index of the workspace to use
+                                  for upper limit
+                                - else: choose best combo
+        :return: the upper limit on sigma times eff at `self.cl` level (0.95 by default)
+        """
+
+        ul = self.getUpperLimitOnMu( expected=expected, workspace_index=workspace_index)
+        if ul == None:
+            return ul
+        if self.lumi is None:
+            logger.error(f"asked for upper limit on fiducial xsec, but no lumi given with the data")
+            return ul
+        xsec = self.data.totalYield() / self.lumi
+        return ul * xsec
+
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of
     # looking for mu bounds
     # Usage of the index allows for rescaling
-    def ulSigma (self, expected=False, workspace_index=None):
+    def getUpperLimitOnMu(self, expected=False, workspace_index=None):
         """
         Compute the upper limit on the signal strength modifier with:
             - by default, the combination of the workspaces contained into self.workspaces
@@ -570,17 +784,26 @@ class PyhfUpperLimitComputer:
         :return: the upper limit at `self.cl` level (0.95 by default)
         """
         if workspace_index in self.data.cachedULs[expected]:
-            return self.data.cachedULs[expected][workspace_index]
+            ret = self.data.cachedULs[expected][workspace_index]
+            return ret
         with warnings.catch_warnings():
-            warnings.filterwarnings ( "ignore", "Values in x were outside bounds during a minimize step, clipping to bounds" )
+            warnings.filterwarnings(
+                "ignore",
+                "Values in x were outside bounds during a minimize step, clipping to bounds",
+            )
             startUL = time.time()
-            logger.debug("Calling ulSigma")
+            logger.debug("Calling getUpperLimitOnMu")
             if self.data.errorFlag or self.workspaces == None:
                 # For now, this flag can only be turned on by PyhfData.checkConsistency
                 return None
 
-            if all( [self.zeroSignalsFlag[workspace_index] for workspace_index in range(self.nWS)] ) == True:
-                logger.debug("There is (are) %d workspace(s) and no signal(s) was (were) found" % self.nWS)
+            if (
+                all([self.zeroSignalsFlag[workspace_index] for workspace_index in range(self.nWS)])
+                == True
+            ):
+                logger.debug(
+                    "There is (are) %d workspace(s) and no signal(s) was (were) found" % self.nWS
+                )
                 return None
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
@@ -588,43 +811,46 @@ class PyhfUpperLimitComputer:
                 logger.debug("Best combination index not found")
                 return None
 
-            def root_func(mu ):
+            def root_func(mu):
                 # If expected == False, use unmodified (but patched) workspace
                 # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
                 # If expected == posteriori, use unmodified (but patched) workspace
-                workspace = self.updateWorkspace(workspace_index, expected = expected)
+                workspace = self.updateWorkspace(workspace_index, expected=expected)
                 # Same modifiers_settings as those use when running the 'pyhf cls' command line
-                msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
+                msettings = {
+                    "normsys": {"interpcode": "code4"},
+                    "histosys": {"interpcode": "code4p"},
+                }
                 model = workspace.model(modifier_settings=msettings)
                 bounds = model.config.suggested_bounds()
-                bounds[model.config.poi_index] = (0,10)
+                bounds[model.config.poi_index] = (0, 10)
                 start = time.time()
                 args = {}
-                args["return_expected"] = ( expected == "posteriori" )
+                args["return_expected"] = expected == "posteriori"
                 args["par_bounds"] = bounds
                 # args["maxiter"]=100000
-                pver = float ( pyhf.__version__[:3] )
+                pver = float(pyhf.__version__[:3])
                 stat = "qtilde"
                 if pver < 0.6:
-                    args["qtilde"]=True
+                    args["qtilde"] = True
                 else:
-                    args["test_stat"]=stat
+                    args["test_stat"] = stat
                 with np.testing.suppress_warnings() as sup:
                     if pyhfinfo["backend"] == "numpy":
-                        sup.filter ( RuntimeWarning, r'invalid value encountered in log')
+                        sup.filter(RuntimeWarning, r"invalid value encountered in log")
                     # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
                     try:
-                        result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args )
+                        result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
                     except Exception as e:
-                        logger.info ( f"when testing hypothesis {mu}, caught exception: {e}" )
+                        logger.info(f"when testing hypothesis {mu}, caught exception: {e}")
                         result = float("nan")
                         if expected == "posteriori":
-                            result = [ float("nan") ]*2
+                            result = [float("nan")] * 2
                 end = time.time()
                 logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
-                logger.debug(f"result for {mu} {result}" )
+                logger.debug(f"result for {mu} {result}")
                 if expected == "posteriori":
-                    logger.debug('computing a-posteriori expected limit')
+                    logger.debug("computing a-posteriori expected limit")
                     logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                     try:
                         CLs = float(result[1].tolist())
@@ -635,106 +861,173 @@ class PyhfUpperLimitComputer:
                     CLs = float(result)
                 # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
                 return 1.0 - self.cl - CLs
-            # Rescaling singals so that mu is in [0, 10]
-            factor = 3.
+
+            # Rescaling signals so that mu is in [0, 10]
+            factor = 3.0
             wereBothLarge = False
             wereBothTiny = False
             nattempts = 0
             nNan = 0
-            lo_mu, med_mu, hi_mu = .2, 1., 5.
+            lo_mu, med_mu, hi_mu = 0.2, 1.0, 5.0
             # print ( "starting with expected", expected )
             while "mu is not in [lo_mu,hi_mu]":
                 nattempts += 1
                 if nNan > 5:
-                    #logger.warning("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
+                    # logger.warning("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
                     return None
                     # nattempts = 0
                 if nattempts > 10:
-                    logger.warning ( "tried 10 times to determine the bounds for brent bracketing. we abort now." )
+                    logger.warning(
+                        "tried 10 times to determine the bounds for brent bracketing. we abort now."
+                    )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-                rt1 = root_func(lo_mu )
+                rt1 = root_func(lo_mu)
                 # rt5 = root_func(med_mu)
-                rt10 = root_func(hi_mu )
+                rt10 = root_func(hi_mu)
                 # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
-                if rt1 < 0. and 0. < rt10: # Here's the real while condition
+                if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
                 if self.alreadyBeenThere:
-                    factor = 1 + (factor-1)/2
+                    factor = 1 + (factor - 1) / 2
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
-                    rt5 = root_func ( med_mu )
-                    if rt5 < 0. and rt10 > 0.:
+                    rt5 = root_func(med_mu)
+                    if rt5 < 0.0 and rt10 > 0.0:
                         lo_mu = med_mu
-                        med_mu = np.sqrt (lo_mu * hi_mu)
+                        med_mu = np.sqrt(lo_mu * hi_mu)
                         continue
-                    if rt10 < 0.: ## also try to increase hi_mu
-                        hi_mu = hi_mu + ( 10. - hi_mu ) * .5
-                        med_mu = np.sqrt (lo_mu * hi_mu)
+                    if rt10 < 0.0:  ## also try to increase hi_mu
+                        hi_mu = hi_mu + (10.0 - hi_mu) * 0.5
+                        med_mu = np.sqrt(lo_mu * hi_mu)
                     nNan += 1
                     self.rescale(factor)
                     continue
                 if np.isnan(rt10):
-                    rt5 = root_func ( med_mu )
-                    if rt5 > 0. and rt1 < 0.:
+                    rt5 = root_func(med_mu)
+                    if rt5 > 0.0 and rt1 < 0.0:
                         hi_mu = med_mu
-                        med_mu = np.sqrt (lo_mu * hi_mu)
+                        med_mu = np.sqrt(lo_mu * hi_mu)
                         continue
-                    if rt1 > 0.: ## also try to decrease lo_mu
-                        lo_mu = lo_mu * .5
-                        med_mu = np.sqrt (lo_mu * hi_mu)
+                    if rt1 > 0.0:  ## also try to decrease lo_mu
+                        lo_mu = lo_mu * 0.5
+                        med_mu = np.sqrt(lo_mu * hi_mu)
                     nNan += 1
-                    self.rescale(1/factor)
+                    self.rescale(1 / factor)
                     continue
                 # Analyzing previous values of wereBoth***
                 if rt10 < 0 and rt1 < 0 and wereBothLarge:
-                    factor = 1 + (factor-1)/2
+                    factor = 1 + (factor - 1) / 2
                     logger.debug("Diminishing rescaling factor")
                 if rt10 > 0 and rt1 > 0 and wereBothTiny:
-                    factor = 1 + (factor-1)/2
+                    factor = 1 + (factor - 1) / 2
                     logger.debug("Diminishing rescaling factor")
                 # Preparing next values of wereBoth***
                 wereBothTiny = rt10 < 0 and rt1 < 0
                 wereBothLarge = rt10 > 0 and rt1 > 0
                 # Main rescaling code
-                if rt10 < 0.:
+                if rt10 < 0.0:
                     self.rescale(factor)
                     continue
-                if rt1 > 0.:
-                    self.rescale(1/factor)
+                if rt1 > 0.0:
+                    self.rescale(1 / factor)
                     continue
             # Finding the root (Brent bracketing part)
             logger.debug("Final scale : %f" % self.scale)
             logger.debug("Starting brent bracketing")
             ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
             endUL = time.time()
-            logger.debug("ulSigma elpased time : %1.4f secs" % (endUL - startUL))
-            self.data.cachedULs[expected][workspace_index]=ul*self.scale
-            return ul*self.scale # self.scale has been updated within self.rescale() method
+            logger.debug("getUpperLimitOnMu elpased time : %1.4f secs" % (endUL - startUL))
+            # the ul is actually on yields
+            ul = ul / self.data.totalYield() * self.scale
+            self.data.cachedULs[expected][workspace_index] = ul
+            return ul  # self.scale has been updated within self.rescale() method
 
 if __name__ == "__main__":
-    C = [ 18774.2, -2866.97, -5807.3, -4460.52, -2777.25, -1572.97, -846.653, -442.531,
-       -2866.97, 496.273, 900.195, 667.591, 403.92, 222.614, 116.779, 59.5958,
-       -5807.3, 900.195, 1799.56, 1376.77, 854.448, 482.435, 258.92, 134.975,
-       -4460.52, 667.591, 1376.77, 1063.03, 664.527, 377.714, 203.967, 106.926,
-       -2777.25, 403.92, 854.448, 664.527, 417.837, 238.76, 129.55, 68.2075,
-       -1572.97, 222.614, 482.435, 377.714, 238.76, 137.151, 74.7665, 39.5247,
-       -846.653, 116.779, 258.92, 203.967, 129.55, 74.7665, 40.9423, 21.7285,
-       -442.531, 59.5958, 134.975, 106.926, 68.2075, 39.5247, 21.7285, 11.5732]
-    nsignal = [ x/100. for x in [47,29.4,21.1,14.3,9.4,7.1,4.7,4.3] ]
-    m=Data( observed=[1964,877,354,182,82,36,15,11],
-              backgrounds=[2006.4,836.4,350.,147.1,62.0,26.2,11.1,4.7],
-              covariance= C,
-#              third_moment = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],
-              third_moment = [ 0. ] * 8,
-              nsignal = nsignal,
-              name="ATLAS-SUSY-2018-31 model" )
-    ulComp = PyhfUpperLimitComputer(cl=.95)
-    #uls = ulComp.ulSigma ( Data ( 15,17.5,3.2,0.00454755 ) )
-    #print ( "uls=", uls )
-    ul_old = 131.828*sum(nsignal) #With respect to the older refernece value one must normalize the xsec
-    print ( "old ul=", ul_old )
-    ul = ulComp.ulSigma ( m )
-    print ( "ul (marginalized)", ul )
-    ul = ulComp.ulSigma ( m, marginalize=False )
-    print ( "ul (profiled)", ul )
+    C = [
+        18774.2,
+        -2866.97,
+        -5807.3,
+        -4460.52,
+        -2777.25,
+        -1572.97,
+        -846.653,
+        -442.531,
+        -2866.97,
+        496.273,
+        900.195,
+        667.591,
+        403.92,
+        222.614,
+        116.779,
+        59.5958,
+        -5807.3,
+        900.195,
+        1799.56,
+        1376.77,
+        854.448,
+        482.435,
+        258.92,
+        134.975,
+        -4460.52,
+        667.591,
+        1376.77,
+        1063.03,
+        664.527,
+        377.714,
+        203.967,
+        106.926,
+        -2777.25,
+        403.92,
+        854.448,
+        664.527,
+        417.837,
+        238.76,
+        129.55,
+        68.2075,
+        -1572.97,
+        222.614,
+        482.435,
+        377.714,
+        238.76,
+        137.151,
+        74.7665,
+        39.5247,
+        -846.653,
+        116.779,
+        258.92,
+        203.967,
+        129.55,
+        74.7665,
+        40.9423,
+        21.7285,
+        -442.531,
+        59.5958,
+        134.975,
+        106.926,
+        68.2075,
+        39.5247,
+        21.7285,
+        11.5732,
+    ]
+    nsignal = [x / 100.0 for x in [47, 29.4, 21.1, 14.3, 9.4, 7.1, 4.7, 4.3]]
+    m = PyhfData(
+        observed=[1964, 877, 354, 182, 82, 36, 15, 11],
+        backgrounds=[2006.4, 836.4, 350.0, 147.1, 62.0, 26.2, 11.1, 4.7],
+        covariance=C,
+        #              third_moment = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],
+        third_moment=[0.0] * 8,
+        nsignal=nsignal,
+        name="ATLAS-SUSY-2018-31 model",
+    )
+    ulComp = PyhfUpperLimitComputer(cl=0.95)
+    # uls = ulComp.getUpperLimitOnMu ( Data ( 15,17.5,3.2,0.00454755 ) )
+    # print ( "uls=", uls )
+    ul_old = 131.828 * sum(
+        nsignal
+    )  # With respect to the older refernece value one must normalize the xsec
+    print("old ul=", ul_old)
+    ul = ulComp.getUpperLimitOnMu(m)
+    print("ul (marginalized)", ul)
+    ul = ulComp.getUpperLimitOnMu(m, marginalize=False)
+    print("ul (profiled)", ul)

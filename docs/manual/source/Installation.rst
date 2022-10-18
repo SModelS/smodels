@@ -45,11 +45,15 @@ Installation Methods
 
    in the top-level directory. The installation will remove redundant folders, install the required 
    dependencies (using pip install) and compile Pythia and NLL-fast. 
-   If the cross section computer is not needed, one can replace *smodels* with *smodels_noexternaltools* in the above command.
+   If the MSSM cross section computer is not needed, one can install SModelS without Pythia and NLL-fast. To this end, run::
+
+     make smodels_noexternaltools
+ 
+   instead of *make smodels*. 
    In case the Python libraries can not be successfully
    installed, the user can install them separately using his/her preferred method. Pythia and NLL-fast can also be compiled separately
    running **make externaltools**. In case the Fortran comiler isn't found, 
-   try *make FC=<path-to-gfortran> smodels* or *make FC=<path-to-gfortran> externaltools*. 
+   try *make FCC=<path-to-gfortran> smodels* or *make FCC=<path-to-gfortran> externaltools*. 
 
  * If Python's *setuptools* is installed in your machine, SModelS and its dependencies
    can also be installed without the use of pip.
@@ -77,7 +81,7 @@ Installation Methods
 
 
 
- * Finally, if *pip3* (or *pip*) is installed in your machine, it is also possible to install SModelS directly without the need for
+ * Finally, SModelS is `indexed on pypi <https://pypi.org/project/smodels/>`_. Thus, if *pip3* (or *pip*) is installed in your machine, it is also possible to install SModelS directly without the need for
    downloading the source code: ::
 
      pip3 install smodels
@@ -95,6 +99,7 @@ Installation Methods
    Be aware that the example files and the |parameters| discussed in the manual 
    will also be located in your default system or user directory. Furthermore the database
    folder is not included (see :ref:`database installation <installingDB>` below).
+   This installation method is best suited for experienced python users.   
 
 
 There is also a diagnostic tool available: ::

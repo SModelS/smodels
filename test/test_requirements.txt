@@ -1,0 +1,6 @@
+pandas
+torch
+plotly
+nbmake
+pytest
+parameterized

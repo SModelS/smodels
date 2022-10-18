@@ -362,6 +362,9 @@ the respective expected r-value (if available) and the most sensitive ATLAS and 
    :lines: 1-8
 
 
+If **combineAnas** is defined, the summary will also include the :math:`r`-value and expected  :math:`r`-value
+for the combination of analyses.
+
 .. [#f1] Some of the output may change depending on the code and database versions used.
 
 .. [#f2] The mass shown corresponds to an average mass over all the |elements| contributing

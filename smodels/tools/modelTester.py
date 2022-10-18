@@ -48,7 +48,8 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     :parameter parser: ConfigParser storing information from parameters file
     :parameter databaseVersion: Database version (printed to output file)
     :parameter listOfExpRes: list of ExpResult objects to be considered
-    :returns: output of printers
+
+    :return: dictionary with input filename as key and the MasterPrinter object as value
     """
 
     """Get run parameters and options from the parser"""
@@ -82,7 +83,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
                                           printParameters, databaseVersion)
     masterPrinter.addObj(outputStatus)
     if outputStatus.status < 0:
-        return {os.path.basename(inputFile): masterPrinter.flush()}
+        return {os.path.basename(inputFile): masterPrinter}
 
     """
     Load the input model
@@ -106,7 +107,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         print("Exception %s %s" % (e, type(e)))
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
-        return {os.path.basename(inputFile): masterPrinter.flush()}
+        return {os.path.basename(inputFile): masterPrinter}
 
     """
     Decompose input model
@@ -127,14 +128,14 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         print("Exception %s %s" % (e, type(e)))
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
-        return {os.path.basename(inputFile): masterPrinter.flush()}
+        return {os.path.basename(inputFile): masterPrinter}
 
     """ Print Decomposition output.
         If no topologies with sigma > sigmacut are found, update status, write
         output file, stop running """
     if not smstoplist:
         outputStatus.updateStatus(-3)
-        return {os.path.basename(inputFile): masterPrinter.flush()}
+        return {os.path.basename(inputFile): masterPrinter}
 
     masterPrinter.addObj(smstoplist)
 
@@ -202,38 +203,18 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     if parser.has_option("options", "combineAnas"):
         """ Combine analyses """
 
-        selectedTheoryPreds = []
-        selectedResults = []
-        combineAnas = parser.get("options", "combineAnas").split(",")
+        combineAnas = parser.get("options", "combineAnas").replace(" ","").split(",")
         if combineAnas:
             if combineResults is True:
                 logger.warning("Combining analyses with signal region combination (combineSRs=True) might significantly reduce CPU performance.")
-            # Select the theory predictions which correspond to the analyses to be combined
-            # and have likelihoods defined
-            for tp in theoryPredictions:
-                expID = tp.analysisId()
-                if expID not in combineAnas:
-                    continue
-                selectedResults.append(expID)
-                if tp.likelihood() is None:
-                    continue
-                selectedTheoryPreds.append(tp)
-        # Make sure each analysis appears only once:
-        expIDs = [tp.analysisId() for tp in selectedTheoryPreds]
-        # Print a warning if no likelihood was found for the analysis
-        for eID in selectedResults:
-            if eID not in expIDs:
-                logger.info("No likelihood available for %s. This analysis will not be used in analysis combination." % eID)
+            combiner = TheoryPredictionsCombiner.selectResultsFrom(theoryPredictions,
+                                                                   combineAnas)
+            # Only compute combination if at least one result was selected
+            if combiner is not None:
+                combiner.computeStatistics()
+                masterPrinter.addObj(combiner)
 
-        if len(expIDs) != len(set(expIDs)):
-            logger.warning("Duplicated results when trying to combine analyses. Combination will be skipped.")
-        # Only compute combination if at least two results were selected
-        elif len(selectedTheoryPreds) > 0:
-            combiner = TheoryPredictionsCombiner(selectedTheoryPreds)
-            combiner.computeStatistics()
-            masterPrinter.addObj(combiner)
-
-    return {os.path.basename(inputFile): masterPrinter.flush()}
+    return {os.path.basename(inputFile): masterPrinter}
 
 
 def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
@@ -253,8 +234,11 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
 
     try:
         with timeOut.Timeout(timeout):
-            return testPoint(inputFile, outputDir, parser, databaseVersion,
+            res = testPoint(inputFile, outputDir, parser, databaseVersion,
                              listOfExpRes)
+            for fname,mprinter in res.items():
+                res[fname] = mprinter.flush()
+            return res
     except Exception as e:
         crashReportFacility = crashReport.CrashReport()
 
@@ -367,6 +351,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
 
             for hdlr in logger.handlers[:]:
                 logger.removeHandler(hdlr)
+                hdlr.close()
             fileLog = logging.FileHandler('./smodels.log')
             logger.addHandler(fileLog)
 
@@ -380,6 +365,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
 
             for hdlr in logger.handlers[:]:
                 logger.removeHandler(hdlr)
+                hdlr.close()
             fileLog = logging.FileHandler('./smodels.log')
             logger.addHandler(fileLog)
 
@@ -567,3 +553,51 @@ def getAllInputFiles(inFile):
     fileList = [os.path.basename(inFile)]
     return fileList, os.path.dirname(inFile)
     return fileList, os.path.dirname(inFile)
+
+
+def getCombiner(inputFile,parameterFile):
+    """
+    Facility for running SModelS, computing the theory predictions and returning the combination of analyses
+    (defined in the parameterFile). Useful for plotting likelihoods!.
+    Extracts and returns the TheoryPredictionsCombiner object from the master printer, if the object is found. Return None otherwise.
+
+    :param inputFile: path to the input SLHA file
+    :param parameterFile: path to parameters.ini file
+
+    :return: TheoryPredictionsCombiner object generated by running SModelS.
+    """
+
+    from imp import reload
+    from smodels import particlesLoader
+
+
+    # Get parameters
+    parser = getParameters(parameterFile)
+    if parser.has_option("particles","model"):
+        runtime.modelFile = parser.get( "particles", "model" )
+        reload(particlesLoader)
+
+    # Load database and results
+    database, databaseVersion = loadDatabase(parser, None)
+    listOfExpRes = loadDatabaseResults(parser, database)
+
+    # Run SModelS for a single file and get the printer
+    outputDir = './'
+    output = testPoint(inputFile, outputDir, parser,
+                                      databaseVersion, listOfExpRes)
+    mprinter = list(output.values())[0]
+    # Try to exctract the TheoryPredictionsCombiner object from one of the printers.
+    combiner = None
+    for p in mprinter.Printers.values():
+        if combiner is not None:
+            break
+        for obj in p.toPrint:
+            if isinstance(obj,TheoryPredictionsCombiner):
+                combiner = obj
+                break
+    if combiner is None:
+        logger.info("Combiner not found for input file %s with parameters from %s. Is combineAnas defined correctly? (At least one printer must be defined).")
+
+
+    return combiner
+

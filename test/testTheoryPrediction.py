@@ -108,12 +108,12 @@ class IntegrationTest(unittest.TestCase):
 
         #Test displaced case:
         slhafile = './testFiles/slha/hscpTest_mid.slha'
-        expValue = [9.18e-7]
+        expValue = [1.31e-3]
         self.checkPrediction(slhafile, expID, expValue, datasetID)
 
         #Test short-lived case:
         slhafile = './testFiles/slha/hscpTest_short.slha'
-        expValue = [5.335e-09]
+        expValue = [2.205e-04]
         self.checkPrediction(slhafile, expID, expValue, datasetID)
 
 if __name__ == "__main__":

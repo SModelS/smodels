@@ -23,31 +23,35 @@ from smodels.tools.smodelsLogging import setLogLevel
 from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
+import time
 setLogLevel("info")
 
-# Set the path to the database
-database = Database("official")
-
-
-def main():
+def main(inputFile='inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb, database='official'):
     """
     Main program. Displays basic use case.
     """
+
+    # Set the path to the database
+    database = Database(database)
+
+
     model = Model(BSMparticles=BSMList, SMparticles=SMList)
     # Path to input file (either a SLHA or LHE file)
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
-    slhafile = 'inputFiles/slha/lightEWinos.slha'
+    slhafile = inputFile
 #     model.updateParticles(inputFile=lhefile)
     model.updateParticles(inputFile=slhafile)
 
     # Set main options for decomposition
-    sigmacut = 0.005*fb
+    sigmacut = sigmacut
     mingap = 5.*GeV
 
+    t0 = time.time()
     # Decompose model
     toplist = decomposer.decompose(model, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
 
     # Access basic information from decomposition, using the topology list and topology objects:
+    print("\n Decomposition done in %1.2fs" %(time.time()-t0))
     print("\n Decomposition Results: ")
     print("\t  Total number of topologies: %i " % len(toplist))
     nel = sum([len(top.elementList) for top in toplist])
@@ -67,6 +71,7 @@ def main():
     # In this case, all results are employed.
     listOfExpRes = database.getExpResults()
 
+    t0 = time.time()
     # Print basic information about the results loaded.
     # Count the number of loaded UL and EM experimental results:
     nUL, nEM = 0, 0
@@ -125,6 +130,8 @@ def main():
     else:
         print("(The input model is not excluded by the simplified model results)")
 
+    print("\n Theory Predictions done in %1.2fs" %(time.time()-t0))
+    t0 = time.time()
     # Select a few results results for combination:
     combineAnas = ['ATLAS-SUSY-2013-11', 'CMS-SUS-13-013']
     selectedTheoryPreds = []
@@ -151,8 +158,11 @@ def main():
         print("Combined r value (expected): %1.3E" % combiner.getRValue(expected=True))
         print("Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (llhd, lmax, lsm))
 
+    print("\n Combination of analyses done in %1.2fs" %(time.time()-t0))
+    t0 = time.time()
     # Find out missing topologies for sqrts=13*TeV:
     uncovered = coverage.Uncovered(toplist, sqrts=13.*TeV)
+    print("\n Coverage done in %1.2fs" %(time.time()-t0))
     # First sort coverage groups by label
     groups = sorted(uncovered.groups[:], key=lambda g: g.label)
     # Print uncovered cross-sections:
@@ -178,6 +188,8 @@ def main():
             print('\tcross-section (fb):', genEl.missingX)
     else:
         print("\nNo displaced decays")
+
+    return toplist, allPredictions
 
 
 if __name__ == '__main__':

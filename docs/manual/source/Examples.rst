@@ -48,6 +48,8 @@ Examples displaying several functionalities:
 
 * `How to generate ascii graphs <ascii_graph_from_lhe.html>`_ (download the Python code :download:`here <recipes/ascii_graph_from_lhe.py>`, IPython notebook :download:`here <recipes/ascii_graph_from_lhe.ipynb>`)
 
+* `How to plot likelihoods from analysis combinations <plotCombinedLikelihood.html>`_ (download the Python code :download:`here <recipes/plotCombinedLikelihood.py>`, IPython notebook :download:`here <recipes/plotCombinedLikelihood.ipynb>`)
+
 
 Examples using the cross-section computer:
 ------------------------------------------

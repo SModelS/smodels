@@ -350,7 +350,7 @@ class Plotter(object):
                         if not is_within_directory(path, member_path):
                             raise Exception("Attempted Path Traversal in Tar File")
                 
-                    tar.extractall(path) # , members, numeric_owner) 
+                    tar.extractall(path) # , members, numeric_owner
                     
                 
                 safe_extract(tar)
@@ -382,7 +382,7 @@ class Plotter(object):
                         if not is_within_directory(path, member_path):
                             raise Exception("Attempted Path Traversal in Tar File")
                 
-                    tar.extractall(path)#, members, numeric_owner) 
+                    tar.extractall(path) # , members, numeric_owner
                     
                 
                 safe_extract(tar)
@@ -425,7 +425,10 @@ class Plotter(object):
 
     def display ( self ):
         """ display the pages, works in jupyter notebooks only """
-        from IPython.core.display import display,HTML
+        try:
+            from IPython.display import display,HTML
+        except Exception as e:
+            from IPython.core.display import display,HTML
         mainFile = open( self.outFolder + self.indexfile,'r')
         display(HTML(mainFile.read()))
         mainFile.close()
