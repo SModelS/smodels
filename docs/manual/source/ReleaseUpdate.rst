@@ -81,7 +81,7 @@ New in Version 2.1.1:
   * tiny fix in mybinder link (see https://pypi.org/project/smodels/)
   * small fixes in unit tests
   * improved truncated Gaussians in likelihoodsFromLimits (but kept as experimental feature)
-  * :ref:`experimental features <parameterExperimentalFeatures>` can now be turned on via ini file
+  * experimental features can now be turned on via ini file
 
 New in Version 2.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
