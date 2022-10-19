@@ -11,7 +11,7 @@
 
 from scipy import stats, optimize
 from smodels.base.smodelsLogging import logger
-from smodels.tools.physicsUnits import fb
+from smodels.base.physicsUnits import fb
 from scipy.special import erf
 import numpy as np
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError

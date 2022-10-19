@@ -436,7 +436,7 @@ class DataSet(object):
 
         if self.getType() == 'efficiencyMap':
             upperLimit = self.getSRUpperLimit(expected=expected)
-	    if upperLimit is None:
+            if upperLimit is None:
                 return None
             if (upperLimit/fb).normalize()._unit:
                 logger.error("Upper limit defined with wrong units for %s and %s"

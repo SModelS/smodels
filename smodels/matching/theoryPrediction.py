@@ -332,7 +332,7 @@ class TheoryPrediction(object):
                                            txnames=self.txnames,
                                            expected=False)
         lumi = self.dataset.getLumi()
-        computer = TruncatedGaussians(ul, eul, self.xsection.value, lumi=lumi, corr = corr)
+        computer = TruncatedGaussians(ul, eul, self.xsection, lumi=lumi, corr = corr)
         ret = computer.likelihood(mu)
         llhd, muhat, sigma_mu = ret["llhd"], ret["muhat"], ret["sigma_mu"]
 

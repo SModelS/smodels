@@ -24,6 +24,7 @@ from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 import numpy as np
+import itertools
 from collections import OrderedDict
 from xml.dom import minidom
 from xml.etree import ElementTree

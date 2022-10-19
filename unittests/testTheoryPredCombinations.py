@@ -157,7 +157,8 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         from smodels.base import runtime
         runtime._experimental = True
 
-        anaids = ['CMS-SUS-16-036',
+        anaids = [
+          # 'CMS-SUS-16-036',
           'CMS-SUS-12-024',
           'CMS-SUS-12-028',
           'ATLAS-SUSY-2018-12',

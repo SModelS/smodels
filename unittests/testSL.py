@@ -14,7 +14,7 @@ sys.path.insert(0, "../")
 import unittest
 from smodels.statistics.simplifiedLikelihoods import Data, UpperLimitComputer, \
       LikelihoodComputer
-from smodels.tools.physicsUnits import fb
+from smodels.base.physicsUnits import fb
 from numpy import sqrt
 import numpy as np
 
