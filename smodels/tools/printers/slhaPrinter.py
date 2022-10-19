@@ -199,8 +199,6 @@ class SLHAPrinter(TxTPrinter):
             cter = icomb + 1
             # Get list of analyses IDs used in combination:
             expIDs = cRes.analysisId()
-            # Replace commas by spaces:
-            expIDs = expIDs.replace(',', ' ')
             ul = cRes.getUpperLimit()
             ulExpected = cRes.getUpperLimit(expected=True)
             if isinstance(ul, unum.Unum):

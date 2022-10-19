@@ -116,6 +116,8 @@ class SummaryPrinter(TxTPrinter):
             output += "%10.3E %s " % (value.asNumber(fb), uls)
             if r_expected:
                 output += "%s %s" % (rs, rs_expected)
+	       elif r is None:
+                output += "N/A  N/A"
             else:
                 output += "%10.3E  N/A" % r
             output += "\n"

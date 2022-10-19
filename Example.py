@@ -36,6 +36,7 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb,
     Main program. Displays basic use case.
     """
 
+    # Set the path to the database
     database = Database(database)
 
     model = Model(BSMparticles=BSMList, SMparticles=SMList)

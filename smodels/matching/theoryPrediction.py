@@ -12,9 +12,9 @@ from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.matching import clusterTools
 from smodels.matching.matcherAuxiliaryFuncs import average
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.statisticalTools import likelihoodFromLimits, chi2FromLimits
-from smodels.statistics.combinations import computeCombinedStatistics
-from smodels.statistics.combinations import getCombinedUpperLimitFor, computeCombinedLikelihood
+from smodels.statistics.statisticalTools import TruncatedGaussians
+from smodels.statistics.srCombinations import getCombinedStatistics
+from smodels.statistics.srCombinations import getCombinedUpperLimitFor, getCombinedLikelihood
 import itertools
 import numpy as np
 
@@ -133,8 +133,7 @@ class TheoryPrediction(object):
         #  If not, compute it and store them.
         if "UL" not in self.cachedObjs[expected]:
             if self.dataType() == 'efficiencyMap':
-                ul = self.dataset.getSRUpperLimit(expected=expected,
-                                                  deltas_rel=self.deltas_rel)
+                ul = self.dataset.getSRUpperLimit(expected=expected)
                 self.cachedObjs[expected]["UL"] = ul
             if self.dataType() == 'upperLimit':
                 ul = self.dataset.getUpperLimitFor(sms=self.avgSMS,
@@ -154,13 +153,33 @@ class TheoryPrediction(object):
 
         return self.cachedObjs[expected]["UL"]
 
+    def getUpperLimitOnMu(self, expected=False):
+        """
+        Get upper limit on signal strength multiplier, using the
+        theory prediction value and the corresponding upper limit
+        (i.e. mu_UL = upper limit/theory xsec)
+
+        :param expected: if True, compute expected upper limit, else observed
+        :returns: upper limit on signal strength multiplier mu
+        """
+
+        upperLimit = self.getUpperLimit(expected=expected)
+        xsec = self.xsection.value
+        if xsec is None or upperLimit is None:
+            return None
+
+        muUL = (upperLimit/xsec).asNumber()
+
+        return muUL
+
+
     def getRValue(self, expected=False):
         """
         Get the r value = theory prediction / experimental upper limit
         """
         if "r" not in self.cachedObjs[expected]:
             upperLimit = self.getUpperLimit(expected)
-            if upperLimit is None or upperLimit.asNumber(fb) == 0.:
+            if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
                 r = None
                 self.cachedObjs[expected]["r"] = r
                 return r
@@ -182,23 +201,36 @@ class TheoryPrediction(object):
         """ likelihood at mu_hat """
         if "lmax" not in self.cachedObjs[expected]:
             self.computeStatistics(expected, allowNegativeSignals)
-        if "lmax" in self.cachedObjs[expected] and allowNegativeSignals \
-                not in self.cachedObjs[expected]["lmax"]:
+        if ("lmax" in self.cachedObjs[expected]
+            and allowNegativeSignals not in self.cachedObjs[expected]["lmax"]):
             self.computeStatistics(expected, allowNegativeSignals)
         if "lmax" not in self.cachedObjs[expected]:
             self.cachedObjs[expected]["lmax"] = {allowNegativeSignals: None}
         return self.cachedObjs[expected]["lmax"][allowNegativeSignals]
 
+    def sigma_mu(self, expected=False, allowNegativeSignals=False):
+        """sigma_mu of mu_hat"""
+        if not "sigma_mu" in self.cachedObjs[expected]:
+            self.computeStatistics(expected, allowNegativeSignals)
+        if not "sigma_mu" in self.cachedObjs[expected]:
+            return None
+        if not allowNegativeSignals in self.cachedObjs[expected]["sigma_mu"]:
+            self.computeStatistics(expected, allowNegativeSignals)
+        return self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals]
+
     def muhat(self, expected=False, allowNegativeSignals=False):
         """ position of maximum likelihood  """
         if "muhat" not in self.cachedObjs[expected]:
             self.computeStatistics(expected, allowNegativeSignals)
-        if "muhat" in self.cachedObjs[expected] and allowNegativeSignals \
-                not in self.cachedObjs[expected]["muhat"]:
+        if allowNegativeSignals not in self.cachedObjs[expected]["muhat"]:
+            self.computeStatistics(expected, allowNegativeSignals)
+        if ("muhat" in self.cachedObjs[expected]
+	        and allowNegativeSignals not in self.cachedObjs[expected]["muhat"]):
             self.computeStatistics(expected, allowNegativeSignals)
         if "muhat" not in self.cachedObjs[expected]:
             self.cachedObjs[expected]["muhat"] = {allowNegativeSignals: None}
-        return self.cachedObjs[expected]["muhat"][allowNegativeSignals]
+        ret = self.cachedObjs[expected]["muhat"][allowNegativeSignals]
+        return ret
 
     def chi2(self, expected=False):
         if "chi2" not in self.cachedObjs[expected]:
@@ -219,51 +251,51 @@ class TheoryPrediction(object):
         if useCached and mu in self.cachedLlhds[expected]:
             llhd = self.cachedLlhds[expected][mu]
             if nll:
-                if llhd == 0.:
-                    return 700.
-                return - np.log(llhd)
+                if llhd == 0.0:
+                    return 700.0
+                return -np.log(llhd)
             return llhd
-        #  self.computeStatistics(expected=expected)
+        # self.computeStatistics(expected=expected)
         if useCached:
-            if "llhd" in self.cachedObjs[expected] and abs(mu - 1.) < 1e-5:
+            if "llhd" in self.cachedObjs[expected] and abs(mu - 1.0) < 1e-5:
                 llhd = self.cachedObjs[expected]["llhd"]
                 if nll:
-                    return - np.log(llhd)
+                    return -np.log(llhd)
                 return llhd
             if "lsm" in self.cachedObjs[expected] and abs(mu) < 1e-5:
                 lsm = self.cachedObjs[expected]["lsm"]
                 if nll:
-                    return - np.log(lsm)
+                    return -np.log(lsm)
                 return lsm
         lumi = self.dataset.getLumi()
-        if self.dataType() == 'combined':
+        if self.dataType() == "combined":
             srNsigDict = dict([[pred.dataset.getID(), (pred.xsection*lumi).asNumber()] for
                               pred in self.datasetPredictions])
             srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.
                        for ds in self.dataset._datasets]
-            llhd = computeCombinedLikelihood(self.dataset, srNsigs,
+            llhd = getCombinedLikelihood(self.dataset, srNsigs,
                                              self.marginalize,
                                              self.deltas_rel,
                                              expected=expected, mu=mu)
-        if self.dataType() == 'efficiencyMap':
+        if self.dataType() == "efficiencyMap":
             nsig = (mu*self.xsection*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig, marginalize=self.marginalize,
                                            deltas_rel=self.deltas_rel,
                                            expected=expected)
 
-        if self.dataType() == 'upperLimit':
-            #  these fits only work with negative signals!
+        if self.dataType() == "upperLimit":
+            # these fits only work with negative signals!
             llhd, chi2 = self.likelihoodFromLimits(mu, chi2also=True,
                                                    expected=expected,
                                                    allowNegativeSignals=True)
         self.cachedLlhds[expected][mu] = llhd
         if nll:
-            if llhd == 0.:
-                return 700.
-            return - np.log(llhd)
+            if llhd == 0.0:
+                return 700.0
+            return -np.log(llhd)
         return llhd
 
-    def likelihoodFromLimits(self, mu=1., expected=False, chi2also=False,
+    def likelihoodFromLimits(self, mu=1.0, expected=False, chi2also=False,
                              corr=0.6, allowNegativeSignals=False):
         """ compute the likelihood from expected and observed upper limits.
         :param expected: compute expected, not observed likelihood
@@ -276,8 +308,9 @@ class TheoryPrediction(object):
         :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
         :returns: likelihood; none if no expected upper limit is defined.
         """
-        #  marked as experimental feature
+        # marked as experimental feature
         from smodels.base.runtime import experimentalFeatures
+
         if not experimentalFeatures():
             if chi2also:
                 return (None, None)
@@ -299,24 +332,14 @@ class TheoryPrediction(object):
                                            txnames=self.txnames,
                                            expected=False)
         lumi = self.dataset.getLumi()
-        ulN = float(ul * lumi)  # upper limit on yield
-        eulN = float(eul * lumi)  # upper limit on yield
-        nsig = None
-        if mu is not None:
-            nsig = mu*(self.xsection*lumi).asNumber()
-        llhd, muhat = likelihoodFromLimits(ulN, eulN, nsig,
-                                           allowNegativeMuhat=True,
-                                           corr=corr)
-        if muhat < 0. and allowNegativeSignals is False:
-            muhat = 0.
-            llhd, muhat = likelihoodFromLimits(ulN, eulN, nsig, 0.,
-                                               allowNegativeMuhat=True,
-                                               corr=corr)
-        if mu is None:
-            muhat = muhat / (self.xsection*lumi).asNumber()
-            self.muhat_ = muhat
+        computer = TruncatedGaussians(ul, eul, self.xsection.value, lumi=lumi, corr = corr)
+        ret = computer.likelihood(mu)
+        llhd, muhat, sigma_mu = ret["llhd"], ret["muhat"], ret["sigma_mu"]
+
+        self.muhat_ = muhat
+        self.sigma_mu_ = sigma_mu
         if chi2also:
-            return (llhd, chi2FromLimits(llhd, ulN, eulN, corr=corr))
+            return (llhd, computer.chi2 ( ) )
         return llhd
 
     def computeStatistics(self, expected=False, allowNegativeSignals=False):
@@ -330,13 +353,13 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["lmax"] = {}
             self.cachedObjs[expected]["muhat"] = {}
 
-        if self.dataType() == 'upperLimit':
-            llhd, chi2 = self.likelihoodFromLimits(1., expected=expected, chi2also=True)
-            lsm = self.likelihoodFromLimits(0., expected=expected, chi2also=False)
+        if self.dataType() == "upperLimit":
+            llhd, chi2 = self.likelihoodFromLimits(1.0, expected=expected, chi2also=True)
+            lsm = self.likelihoodFromLimits(0.0, expected=expected, chi2also=False)
             lmax = self.likelihoodFromLimits(None, expected=expected, chi2also=False,
                                              allowNegativeSignals=True)
-            if allowNegativeSignals is False and hasattr(self, "muhat_") and self.muhat_ < 0.:
-                self.muhat_ = 0.
+            if allowNegativeSignals is False and hasattr(self, "muhat_") and self.muhat_ < 0.0:
+                self.muhat_ = 0.0
                 lmax = lsm
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
@@ -344,14 +367,18 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["chi2"] = chi2
             if hasattr(self, "muhat_"):
                 self.cachedObjs[expected]["muhat"][allowNegativeSignals] = self.muhat_
+            if hasattr(self, "sigma_mu_"):
+                if "sigma_mu" not in self.cachedObjs[expected]:
+                    self.cachedObjs[expected]["sigma_mu"] = {}
+                self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = self.sigma_mu_
 
-        elif self.dataType() == 'efficiencyMap':
+        elif self.dataType() == "efficiencyMap":
             lumi = self.dataset.getLumi()
             nsig = (self.xsection*lumi).asNumber()
             llhd = self.dataset.likelihood(nsig, marginalize=self.marginalize,
                                            deltas_rel=self.deltas_rel,
                                            expected=expected)
-            llhd_sm = self.dataset.likelihood(nsig=0., marginalize=self.marginalize,
+            llhd_sm = self.dataset.likelihood(nsig=0.0, marginalize=self.marginalize,
                                               deltas_rel=self.deltas_rel,
                                               expected=expected)
             llhd_max = self.dataset.lmax(marginalize=self.marginalize,
@@ -360,7 +387,12 @@ class TheoryPrediction(object):
                                          expected=expected)
             muhat = None
             if hasattr(self.dataset, "muhat"):
-                muhat = self.dataset.muhat
+                muhat = self.dataset.muhat / nsig
+            if hasattr(self.dataset, "sigma_mu"):
+                sigma_mu = float(self.dataset.sigma_mu/nsig)
+                if not "sigma_mu" in self.cachedObjs[expected]:
+                    self.cachedObjs[expected]["sigma_mu"] = {}
+                self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = sigma_mu
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = llhd_sm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = llhd_max
@@ -368,22 +400,36 @@ class TheoryPrediction(object):
             from smodels.statistics.statisticalTools import chi2FromLmax
             self.cachedObjs[expected]["chi2"] = chi2FromLmax(llhd, llhd_max)
 
-        elif self.dataType() == 'combined':
+        elif self.dataType() == "combined":
             lumi = self.dataset.getLumi()
             #  Create a list of signal events in each dataset/SR sorted according to datasetOrder
             srNsigDict = dict([[pred.dataset.getID(), (pred.xsection*lumi).asNumber()] for pred in self.datasetPredictions])
-            srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0. for ds in self.dataset._datasets]
-            #  srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
-            llhd, lmax, lsm, muhat = computeCombinedStatistics(self.dataset, srNsigs,
-                                                               self.marginalize,
-                                                               self.deltas_rel,
-                                                               expected=expected,
-                                                               allowNegativeSignals=allowNegativeSignals)
+            srNsigs = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0 for ds in self.dataset._datasets]
+
+            s = getCombinedStatistics(
+                self.dataset,
+                srNsigs,
+                self.marginalize,
+                self.deltas_rel,
+                expected=expected,
+                allowNegativeSignals=allowNegativeSignals,
+            )
+            llhd, lmax, lsm, muhat, sigma_mu = (
+                s["lbsm"],
+                s["lmax"],
+                s["lsm"],
+                s["muhat"],
+                s["sigma_mu"],
+            )
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
             self.cachedObjs[expected]["muhat"][allowNegativeSignals] = muhat
+            if not "sigma_mu" in self.cachedObjs[expected]:
+                self.cachedObjs[expected]["sigma_mu"] = {}
+            self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = sigma_mu
             from smodels.statistics.statisticalTools import chi2FromLmax
+
             self.cachedObjs[expected]["chi2"] = chi2FromLmax(llhd, lmax)
 
     def totalXsection(self):
@@ -397,9 +443,9 @@ class TheoryPrediction(object):
         """
 
         if not self.conditions:
-            return 0.
+            return 0.0
 
-        values = [0.]
+        values = [0.0]
         for value in self.conditions:
             if value == 'N/A':
                 return value
@@ -433,7 +479,7 @@ class TheoryPredictionList(object):
                 newPredictions = []
                 for theoPred in theoryPredictions:
                     mCond = theoPred.getmaxCondition()
-                    if mCond == 'N/A' or round(mCond/maxCond, 2) > 1.0:
+                    if mCond == "N/A" or round(mCond/maxCond, 2) > 1.0:
                         continue
                     else:
                         newPredictions.append(theoPred)
@@ -478,7 +524,9 @@ class TheoryPredictionList(object):
         Reverse sort theoryPredictions by R value.
         Used for printer.
         """
-        self._theoryPredictions = sorted(self._theoryPredictions, key=lambda theoPred: (theoPred.getRValue() is not None, theoPred.getRValue()), reverse=True)
+        self._theoryPredictions = sorted(self._theoryPredictions,
+                                         key=lambda theoPred: (theoPred.getRValue() is not None, theoPred.getRValue()),
+                                         reverse=True)
 
 
 def theoryPredictionsFor(expResult, smsTopDict, maxMassDist=0.2,
@@ -639,20 +687,23 @@ def _getBestResult(dataSetResults):
 
     # For efficiency-map analyses with multipler signal regions,
     # select the best one according to the expected upper limit:
-    bestExpectedR = 0.
-    bestXsec = 0.*fb
+    bestExpectedR = 0.0
+    bestXsec = 0.0*fb
     for predList in dataSetResults:
         if len(predList) != 1:
             logger.error("Multiple clusters should only exist for upper limit results!")
             raise SModelSError()
         dataset = predList[0].dataset
-        if dataset.getType() != 'efficiencyMap':
-            txt = "Multiple data sets should only exist for efficiency map results, but we have them for %s?" % (predList[0].analysisId())
+        if dataset.getType() != "efficiencyMap":
+            txt = (
+                "Multiple data sets should only exist for efficiency map results, but we have them for %s?"
+                % (predList[0].analysisId())
+            )
             logger.error(txt)
             raise SModelSError(txt)
         pred = predList[0]
         xsec = pred.xsection
-        expectedR = (xsec/dataset.getSRUpperLimit(0.05, True, False)).asNumber()
+        expectedR = (xsec/dataset.getSRUpperLimit(expected=True)).asNumber()
         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec > bestXsec):
             bestExpectedR = expectedR
             bestPred = pred
@@ -786,9 +837,9 @@ def _combineSMS(smsList, dataset, maxDist):
 
     clusters = []
 
-    if dataset.getType() == 'efficiencyMap':  # cluster all SMS
+    if dataset.getType() == "efficiencyMap":  # cluster all SMS
         clusters += clusterTools.clusterSMS(smsList, maxDist, dataset)
-    elif dataset.getType() == 'upperLimit':  # Cluster each txname individually
+    elif dataset.getType() == "upperLimit":  # Cluster each txname individually
         txnames = list(set([sms.txname for sms in smsList]))
         for txname in txnames:
             txnameSMS = [sms for sms in smsList if sms.txname is txname]

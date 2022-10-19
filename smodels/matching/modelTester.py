@@ -362,6 +362,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
 
             for hdlr in logger.handlers[:]:
                 logger.removeHandler(hdlr)
+                hdlr.close()
             fileLog = logging.FileHandler('./smodels.log')
             logger.addHandler(fileLog)
 
@@ -375,6 +376,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
 
             for hdlr in logger.handlers[:]:
                 logger.removeHandler(hdlr)
+                hdlr.close()
             fileLog = logging.FileHandler('./smodels.log')
             logger.addHandler(fileLog)
 
@@ -565,10 +567,12 @@ def getAllInputFiles(inFile):
     return fileList, os.path.dirname(inFile)
     return fileList, os.path.dirname(inFile)
 
+
 def getCombiner(inputFile,parameterFile):
     """
-    Run SModelS to compute the theory predictions and the combination of analyses
-    (defined in the parameterFile). Extracts and returns the TheoryPredictionsCombiner object from the master printer, if the object is found. Return None otherwise.
+    Facility for running SModelS, computing the theory predictions and returning the combination of analyses
+    (defined in the parameterFile). Useful for plotting likelihoods!.
+    Extracts and returns the TheoryPredictionsCombiner object from the master printer, if the object is found. Return None otherwise.
 
     :param inputFile: path to the input SLHA file
     :param parameterFile: path to parameters.ini file
@@ -602,3 +606,4 @@ def getCombiner(inputFile,parameterFile):
 
 
     return combiner
+

@@ -1178,7 +1178,7 @@ BLOCK SModelS_CombinedAnas
  1 3 2.076E-01                      #Likelihood
  1 4 2.502E-01                      #L_max
  1 5 2.077E-01                      #L_SM
- 1 6 ATLAS-SUSY-2015-02 CMS-SUS-13-007 #IDs of combined analyses
+ 1 6 ATLAS-SUSY-2015-02,CMS-SUS-13-007 #IDs of combined analyses
 
 
 BLOCK SModelS_Coverage

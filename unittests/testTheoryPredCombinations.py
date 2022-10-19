@@ -64,7 +64,9 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
         ulmu = combiner.getUpperLimitOnMu()
         # 16.78997035426023/4.71
-        self.assertAlmostEqual(ulmu, 3.45262, 3)
+        self.assertAlmostEqual(ulmu, 3.41744, 3)
+        ulmu_exp = combiner.getUpperLimitOnMu(expected=True)
+        self.assertAlmostEqual(ulmu_exp, 2.143318, 3)
 
     def testByHandComputed ( self ):
         """ a unit test where in the comments I show the manual computations, step by step, for comparison """
@@ -91,7 +93,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         model.updateParticles(inputFile=slhafile)
         smstopos = decomposer.decompose(model)
         tpreds = []
-        defaultLSMs, defaultLmax = { }, { }
+        defaultLSMs, defaultLmax = {}, {}
         # theta_hat = 0., x = 13.
         # scipy.stats.norm.pdf ( x, 13., 3. ) * scipy.stats.poisson.pmf(14, x)
         # = 0.013575602920029094, so we are actually a little off
@@ -100,7 +102,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # theta_hat = 2.87723307, x = 3.7 + theta_hat = 6.57723307
         # scipy.stats.norm.pdf(x, 3.7, 2.7948166) * scipy.stats.poisson.pmf(9, x)
         # = 0.007423073728232388
-        defaultLSMs["CMS-SUS-16-050-agg:ar8" ] = 0.007423073728232388
+        defaultLSMs["CMS-SUS-16-050-agg:ar8"] = 0.007423073728232388
 
         # nsig = 1., theta_hat = 0., x = 14.
         # scipy.stats.norm.pdf(x, 14.0, 3.0) * scipy.stats.poisson.pmf(14, x)
@@ -110,45 +112,46 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # nsig = 5.3, theta_hat = 0, x = 9.
         # scipy.stats.norm.pdf(x, 9., 2.7948166) * scipy.stats.poisson.pmf(9, x)
         # = 0.01880727876784458
-        defaultLmax["CMS-SUS-16-050-agg:ar8" ] = 0.01880727876784458
+        defaultLmax["CMS-SUS-16-050-agg:ar8"] = 0.01880727876784458
         for er in exp_results:
-            ts = theoryPredictionsFor(er, smstopos,
-                combinedResults=False, useBestDataset=False, marginalize=False)
+            ts = theoryPredictionsFor(
+                er, smstopos, combinedResults=False, useBestDataset=False, marginalize=False
+            )
             for t in ts:
-                tpreds.append ( t )
+                tpreds.append(t)
         for t in tpreds:
             t.computeStatistics()
             dId = t.dataset.dataInfo.dataId
             Id = f"{t.dataset.globalInfo.id}:{dId}"
-            #print ( "Id", Id )
+            # print ( "Id", Id )
             lsm = t.lsm()
             # print ( "l(mu_hat)", t.likelihood ( 0.03533022229777052 ) )
-            #print ( "theta_hat", t.dataset.theta_hat )
-            #print ( "dataset", t.dataset.dataInfo.observedN, t.dataset.dataInfo.expectedBG, t.dataset.dataInfo.bgError )
+            # print ( "theta_hat", t.dataset.theta_hat )
+            # print ( "dataset", t.dataset.dataInfo.observedN, t.dataset.dataInfo.expectedBG, t.dataset.dataInfo.bgError )
             lmax = t.lmax()
             if False:
-                print ( f"dataset {Id}: theta_hat {t.dataset.theta_hat[0]:.3f} lsm {lsm} lmax {lmax}" )
+                print(f"dataset {Id}: theta_hat {t.dataset.theta_hat[0]:.3f} lsm {lsm} lmax {lmax}")
             # print ( "[er]", Id, "lsm", lsm, "lmax", lmax )
-            self.assertAlmostEqual ( lsm, defaultLSMs[Id], 5 )
-            self.assertAlmostEqual ( lmax, defaultLmax[Id], 5 )
+            self.assertAlmostEqual(lsm, defaultLSMs[Id], 5)
+            self.assertAlmostEqual(lmax, defaultLmax[Id], 5)
         # combination:
         # mu_hat 0.035 lmax 0.00011 ul_mu 0.27
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
-        mu_hat, sigma_mu, lmax = combiner.findMuHat( allowNegativeSignals=True,
-                                                     extended_output=True )
+        fmh = combiner.findMuHat(allowNegativeSignals=True, extended_output=True)
+        mu_hat, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         lsm = combiner.lsm()
         # print ( "muhat", mu_hat, "lmax", lmax )
-	      # multiply the previous lsms, 0.013786096355236995 * 0.007423073728232388
-	      # = 0.00010233520966944002
-        self.assertAlmostEqual ( lsm, 0.00010233520966944002, 4 )
-	      # mu_hat is determined numerically, but its easy to verify graphically,
-	      # see http://smodels.github.io/test/testTheoryPredCombinations.png
-        self.assertAlmostEqual ( mu_hat, 0.03533022229777052, 4 )
-	      # lmax must be the product of likelihoods evaluated at mu_hat
-	      # 0.007672358984439363 * 0.014016921020572387
-	      # = 0.00010754284992636553
-        self.assertAlmostEqual ( lmax, 0.00010754284992636553, 4 )
+        # multiply the previous lsms, 0.013786096355236995 * 0.007423073728232388
+        # = 0.00010233520966944002
+        self.assertAlmostEqual(lsm, 0.00010233520966944002, 4)
+        # mu_hat is determined numerically, but its easy to verify graphically,
+        # see http://smodels.github.io/test/testTheoryPredCombinations.png
+        self.assertAlmostEqual(mu_hat, 0.03533022229777052, 4)
+        # lmax must be the product of likelihoods evaluated at mu_hat
+        # 0.007672358984439363 * 0.014016921020572387
+        # = 0.00010754284992636553
+        self.assertAlmostEqual(lmax, 0.00010754284992636553, 4)
 
     def testFilter(self):
         from smodels.base import runtime
@@ -171,19 +174,21 @@ class CombinedTheoryPredsTest(unittest.TestCase):
                                         minmassgap=mingap)
         tpreds = []
         for er in exp_results:
-            ts = theoryPredictionsFor(er, smstopos,
-                combinedResults=True, useBestDataset=False, marginalize=False)
+            ts = theoryPredictionsFor(
+                er, smstopos, combinedResults=True, useBestDataset=False, marginalize=False
+            )
             if not ts:
                 continue
             for t in ts:
                 tpreds.append(t)
-        combiner = TheoryPredictionsCombiner.selectResultsFrom(tpreds,anaids)
-
+        combiner = TheoryPredictionsCombiner.selectResultsFrom(tpreds, anaids)
         # IDs that should be selected and the respective expected r-values:
-        goodIDs = {'CMS-SUS-16-036' : (1.379,'upperLimit'),
-          'CMS-SUS-12-024' : (4.52551e-4,'efficiencyMap'),
-          'ATLAS-SUSY-2018-12' : (2.294e-3,'efficiencyMap'),
-          'ATLAS-SUSY-2019-09' : (2.318e-1,'combined')}
+        goodIDs = {
+#            "CMS-SUS-16-036": (1.379, "upperLimit"),
+            "CMS-SUS-12-024": (4.52551e-4, "efficiencyMap"),
+            "ATLAS-SUSY-2018-12": (2.294e-3, "efficiencyMap"),
+            "ATLAS-SUSY-2019-09": (2.318e-1, "combined"),
+        }
         # Make sure each ID appears only once:
         selectedIDs = {tp.analysisId() : (tp.getRValue(expected=True),tp.dataType())
                         for tp in combiner.theoryPredictions}
@@ -191,13 +196,13 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # Check if the correct predictions were selected:
         for ana in goodIDs:
             diff_rel = abs(goodIDs[ana][0]-selectedIDs[ana][0])/goodIDs[ana][0]
-            self.assertAlmostEqual(diff_rel,0.,2)
-            self.assertEqual(goodIDs[ana][1],selectedIDs[ana][1])
+            self.assertAlmostEqual(diff_rel,0.0,2)
+            self.assertEqual(goodIDs[ana][1], selectedIDs[ana][1])
 
-        self.assertAlmostEqual(combiner.lsm()*1e23, 6.869, 2)
-        self.assertAlmostEqual(combiner.likelihood()*1e25,6.540, 2)
-        self.assertAlmostEqual(combiner.lmax()*1e23, 6.826, 2)
-        self.assertAlmostEqual(combiner.getRValue(), 1.653, 2)
+        self.assertAlmostEqual(combiner.lsm() / 1.06988795e-20, 1., 2)
+        self.assertAlmostEqual(combiner.likelihood() / 8.9504e-21, 1., 2)
+        self.assertAlmostEqual(combiner.lmax() / 1.0698879533540923e-20, 1., 2)
+        self.assertAlmostEqual(combiner.getRValue() / .2229345123626656, 1., 2)
 
 
     def testGetCombiner(self):

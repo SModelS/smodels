@@ -44,7 +44,7 @@ class NotebookTest(unittest.TestCase):
     def testRunNotebook(self,notebookFile):
 
         filename = os.path.join(nbdir,notebookFile)
-        p = subprocess.Popen(["pytest --nbmake %s" %filename], shell=True,
+        p = subprocess.Popen(["pytest --nbmake --nbmake-timeout=900 %s" %filename], shell=True,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         t0 = time.time()
         output, error = p.communicate()

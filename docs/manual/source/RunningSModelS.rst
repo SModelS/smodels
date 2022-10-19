@@ -153,7 +153,11 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterExperimentalFeatures:
 
-  * **experimentalFeatures** (True/False): set to True to enable experimental features that are not yet considered part of SModelS proper. Available from v2.1.1 onwards. Use with care. *need to specify which experimental features exist*
+  * **experimentalFeatures** (True/False): set to True to enable experimental features that are not yet considered part of SModelS proper. Available from v2.1.1 onwards. Use with care.
+
+.. _parameterExperimentalFeatures:
+
+  * **experimentalFeatures** (True/False): set to True to enable experimental features that are not yet considered part of SModelS proper. Available from v2.1.1 onwards. Use with care.
 
 .. _parameterFileParticles:
 
@@ -298,9 +302,9 @@ Below we give more detailed information about each entry in the parameters file.
 
 * *python-printer*: options for the Python printer
 
-.. _parameterFileAddSMSList:
+.. _parameterFileAddElementList:
 
-  * **addSMSList** (True/False): set True to include in the Python output all information about all |elements| generated in the |decomposition|. If set to True the
+  * **addElementList** (True/False): set True to include in the Python output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
 
 .. _parameterFileAddTxWeights:
@@ -311,9 +315,9 @@ Below we give more detailed information about each entry in the parameters file.
 
 * *xml-printer*: options for the xml printer
 
-.. _parameterFileAddSMSListXML:
+.. _parameterFileAddElementListXML:
 
-  * **addSMSList** (True/False): set True to include in the xml output all information about all |elements| generated in the |decomposition|. If set to True the
+  * **addElementList** (True/False): set True to include in the xml output all information about all |elements| generated in the |decomposition|. If set to True the
     output file can be quite large.
 
 .. _parameterFileAddTxWeightsXML:

@@ -50,11 +50,6 @@ def printScanSummary(outputDict, outputFile):
             f.write(header)
         return
 
-    # Header:
-    header = "#Global results summary (%i files)\n" % len(outputDict)
-    header += "#The most constraining analysis corresponds to the one with largest observed r.\n"
-    header += "#The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.\n"
-
     # Get summary information:
     summaryList = []
     fnames = list(outputDict.keys())
@@ -74,7 +69,10 @@ def printScanSummary(outputDict, outputFile):
                                  'r_exp(ATLAS)': -1,
                                  'MostSensitive(CMS)': 'N/A',
                                  'r(CMS)': -1,
-                                 'r_exp(CMS)': -1
+                                 'r_exp(CMS)': -1,
+                                 'r(combined)' : -1,
+                                 'r_exp(combined)' : -1,
+                                 'CombinedAnalyses' : 'N/A'
                                    })
 
         if 'python' in output:
@@ -91,6 +89,33 @@ def printScanSummary(outputDict, outputFile):
                 summaryDict[key] = sDict[key]
 
         summaryList.append(summaryDict)
+
+    # If there are no combined results, remove its (dummy) entries
+    anaList = set([])
+    if all(summary['r(combined)'] == -1 for summary in summaryList):
+        for summary in summaryList:
+            summary.pop('r(combined)')
+            summary.pop('r_exp(combined)')
+
+    else:
+        # Get maximum list of combined analyses
+        # and remove info from rows
+        for summary in summaryList:
+            anas = summary.pop('CombinedAnalyses')
+            if anas == 'N/A':
+                continue
+            anas = anas.replace(' ','').split(',')
+            anaList.update(anas)
+        anaList = sorted(anaList)
+
+    # Header:
+    header = "#Global results summary (%i files)\n" % len(outputDict)
+    header += "#The most constraining analysis corresponds to the one with largest observed r.\n"
+    header += "#The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.\n"
+    if anaList:
+        header += "#Analyses used for combination = %s.\n" %(','.join(anaList))
+        header += "#r(combined) = -1 means no analysis from the above combination set produced results.\n"
+
 
     # Get column labels and widths:
     labels = list(summaryList[0].keys())
@@ -146,7 +171,7 @@ def getSummaryFrom(output, ptype):
     if info is None:
         return summaryDict
     else:
-        rvals, rexp, anaIDs = info
+        rvals, rexp, anaIDs, r_comb, rexp_comb, anaID_comb = info
 
     # Sort results by r_obs:
     rvalswo = copy.deepcopy(rvals)
@@ -186,6 +211,10 @@ def getSummaryFrom(output, ptype):
         summaryDict['r_exp(CMS)'] = rexp[iCMS]
         summaryDict['MostSensitive(CMS)'] = anaIDs[iCMS]
 
+    summaryDict['r(combined)'] = r_comb
+    summaryDict['r_exp(combined)'] = rexp_comb
+    summaryDict['CombinedAnalyses'] = anaID_comb
+
     return summaryDict
 
 
@@ -196,6 +225,9 @@ def getInfoFromPython(output):
     :param output: output (dictionary)
 
     :return: list of r-values,r-expected and analysis IDs. None if no results are found.
+             If there are results for combined analyses, returns the largest r-value and the
+             corresponding r-expected from the combination.
+
     """
 
     if 'ExptRes' not in output or not output['ExptRes']:
@@ -205,7 +237,18 @@ def getInfoFromPython(output):
                    else -1 for res in output['ExptRes']])
     anaIDs = np.array([res['AnalysisID'] for res in output['ExptRes']])
 
-    return rvals, rexp, anaIDs
+    r_comb = -1
+    rexp_comb = -1
+    anaID_comb = 'N/A'
+
+    if 'CombinedRes' in output:
+        for res in output['CombinedRes']:
+            if r_comb is None or r_comb < res['r']:
+                r_comb = res['r']
+                rexp_comb = res['r_expected']
+                anaID_comb = res['AnalysisID']
+
+    return rvals, rexp, anaIDs, r_comb, rexp_comb, anaID_comb
 
 
 def getInfoFromSLHA(output):
@@ -215,25 +258,52 @@ def getInfoFromSLHA(output):
     :param output: output (string)
 
     :return: list of r-values,r-expected and analysis IDs. None if no results are found.
+             If there are results for combined analyses, returns the largest r-value and the
+             corresponding r-expected from the combination.
     """
 
     import pyslha
     results = pyslha.readSLHA(output, ignorenomass=True, ignorenobr=True)
     bname = None
+    bcombName = None
     for b in results.blocks.values():
         if b.name.lower() == 'SModelS_Exclusion'.lower():
             bname = b.name
+        if b.name.lower() == 'SModelS_CombinedAnas'.lower():
+            bcombName = b.name
+
     if bname is None or len(results.blocks[bname]) <= 1:
         return None
+    else:
+        # Group results by block index:
+        groups = itertools.groupby(results.blocks[bname].items(),
+                                  key = lambda k: k[0][0])
+        resDict = {i : dict(block) for i,block in groups if  i != 0}
+        # Get r values:
+        rvals = np.array([resDict[i][(i,1)] for i in resDict])
+        rexp = np.array([resDict[i][(i,2)] if resDict[i][(i,2)] != 'N/A' else -1
+                        for i in resDict])
+        anaIDs = np.array([resDict[i][(i,4)] for i in resDict])
 
-    # Get indices for results:
-    resI = list(set([k[0] for k in results.blocks[bname].keys() if k[0] > 0]))
-    rvals = np.array([results.blocks[bname][(i, 1)] for i in resI])
-    rexp = np.array([results.blocks[bname][(i, 2)]
-                   if results.blocks[bname][(i, 2)] != 'N/A' else -1 for i in resI])
-    anaIDs = np.array([results.blocks[bname][(i, 4)] for i in resI])
+    if bcombName is None or len(results.blocks[bcombName]) < 1:
+        r_comb = -1
+        rexp_comb = -1
+        anaID_comb = 'N/A'
+    else:
+        # Group combined results by block index:
+        groups = itertools.groupby(results.blocks[bcombName].items(),
+                                  key = lambda k: k[0][0])
+        resDict = {i : dict(block) for i,block in groups if  i != 0}
+        rvals_comb = np.array([resDict[i][(i,1)] for i in resDict  if  i != 0])
+        rexp_comb = np.array([resDict[i][(i,2)] if resDict[i][(i,2)] != 'N/A' else -1
+                        for i in resDict if i != 0])
+        anaID_comb = np.array([resDict[i][(i,6)] for i in resDict if i != 0])
 
-    return rvals, rexp, anaIDs
+        r_comb = max(rvals_comb)
+        rexp_comb = rexp_comb[np.argmax(rvals_comb)]
+        anaID_comb = anaID_comb[np.argmax(rvals_comb)]
+
+    return rvals, rexp, anaIDs, r_comb, rexp_comb, anaID_comb
 
 
 def getInfoFromSummary(output):
@@ -243,12 +313,19 @@ def getInfoFromSummary(output):
     :param output: output (string)
 
     :return: list of r-values,r-expected and analysis IDs. None if no results are found.
+             If there are results for combined analyses, returns the largest r-value and the
+             corresponding r-expected from the combination.
+
     """
 
     lines = output.splitlines()
     rvals = []
     rexp = []
     anaIDs = []
+    r_comb = -1
+    rexp_comb = -1
+    anaID_comb = 'N/A'
+
     for line in lines:
         if 'The highest r value is' in line:
             rmax = line.split('=')[1].strip()
@@ -288,6 +365,12 @@ def getInfoFromSummary(output):
             rvals.append(rAna)
             anaIDs.append(anaID)
             rexp.append(rexpAna)
+        elif 'combined r-value:' in line:
+            r_comb = float(line.replace('\n','').split(':')[1])
+        elif 'combined r-value (expected):' in line:
+            rexp_comb = float(line.replace('\n','').split(':')[1])
+        elif 'Combined Analyses:' in line:
+            anaID_comb = line.replace('\n','').split(':')[1].replace(' ','')
 
     if not rvals:
         return None
@@ -295,4 +378,4 @@ def getInfoFromSummary(output):
     rexp = np.array(rexp)
     anaIDs = np.array(anaIDs)
 
-    return rvals, rexp, anaIDs
+    return rvals, rexp, anaIDs, r_comb, rexp_comb, anaID_comb

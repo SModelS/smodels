@@ -359,6 +359,9 @@ class DataSet(object):
         if hasattr(computer, "muhat"):
             # seems like someone wants to debug them
             self.muhat = computer.muhat
+        if hasattr ( computer, "sigma_mu" ):
+            # seems like someone wants to debug them
+            self.sigma_mu = computer.sigma_mu
         return ret
 
     def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
@@ -432,8 +435,9 @@ class DataSet(object):
         """
 
         if self.getType() == 'efficiencyMap':
-            upperLimit = self.getSRUpperLimit(expected=expected, alpha=alpha, compute=compute,
-                                              deltas_rel=deltas_rel)
+            upperLimit = self.getSRUpperLimit(expected=expected)
+	    if upperLimit is None:
+                return None
             if (upperLimit/fb).normalize()._unit:
                 logger.error("Upper limit defined with wrong units for %s and %s"
                              % (self.globalInfo.id, self.getID()))
@@ -475,18 +479,12 @@ class DataSet(object):
                            self.getType())
             return None
 
-    def getSRUpperLimit(self, alpha=0.05, expected=False, compute=False, deltas_rel=0.2):
+    def getSRUpperLimit(self,expected=False):
         """
-        Computes the 95% upper limit on the signal*efficiency for a given dataset (signal region).
+        Returns the 95% upper limit on the signal*efficiency for a given dataset (signal region).
         Only to be used for efficiency map type results.
 
-        :param alpha: Can be used to change the C.L. value. The default value is 0.05 (= 95% C.L.)
-        :param expected: Compute expected limit ( i.e. Nobserved = NexpectedBG )
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-        :param compute: If True, the upper limit will be computed
-                        from expected and observed number of events. If False, the value listed
-                        in the database will be used instead.
-
+        :param expected: If True, return the expected limit ( i.e. Nobserved = NexpectedBG )
 
         :return: upper limit value
         """
@@ -495,31 +493,17 @@ class DataSet(object):
             logger.error("getSRUpperLimit can only be used for efficiency map results!")
             raise SModelSError()
 
-        if not compute:
-            if expected:
-                if hasattr(self.dataInfo, "upperLimit") and not hasattr(self.dataInfo, "expectedUpperLimit"):
-                    logger.info("expectedUpperLimit field not found. Returning None instead.")
-                    return None
-
-                if hasattr(self.dataInfo, "expectedUpperLimit"):
-                    return self.dataInfo.expectedUpperLimit
-            else:
-                if hasattr(self.dataInfo, "upperLimit"):
-                    return self.dataInfo.upperLimit
-
-        Nobs = self.dataInfo.observedN  # Number of observed events
         if expected:
-            Nobs = self.dataInfo.expectedBG
-        Nexp = self.dataInfo.expectedBG  # Number of expected BG events
-        bgError = self.dataInfo.bgError  # error on BG
+            if hasattr(self.dataInfo, "upperLimit") and not hasattr(self.dataInfo, "expectedUpperLimit"):
+                logger.info("expectedUpperLimit field not found. Returning None instead.")
+                return None
 
-        m = Data(Nobs, Nexp, bgError**2, deltas_rel=deltas_rel)
-        computer = UpperLimitComputer(cl=1.-alpha)
-        maxSignalXsec = computer.ulSigma(m)
-        if maxSignalXsec is not None:
-            maxSignalXsec = maxSignalXsec/self.getLumi()
+            if hasattr(self.dataInfo, "expectedUpperLimit"):
+                return self.dataInfo.expectedUpperLimit
+        else:
+            if hasattr(self.dataInfo, "upperLimit"):
+                return self.dataInfo.upperLimit
 
-        return maxSignalXsec
 
 
 class CombinedDataSet(object):
