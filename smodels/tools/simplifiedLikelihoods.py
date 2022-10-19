@@ -52,7 +52,7 @@ class Data:
         observed,
         backgrounds,
         covariance,
-        third_moment=None,
+        thirdMoment=None,
         nsignal=None,
         name="model",
         deltas_rel=0.2,
@@ -85,15 +85,20 @@ class Data:
         else:
             self.signal_rel = array([0.0] * len(self.nsignal))
 
-        self.third_moment = self.convert(third_moment)
-        if (
-            type(self.third_moment) != type(None)
-            and np.sum([abs(x) for x in self.third_moment]) < 1e-10
-        ):
-            self.third_moment = None
+        self.thirdMoment = self.convert(thirdMoment)
         self.name = name
         self.deltas_rel = deltas_rel
         self._computeABC()
+
+    def hasThirdMomenta ( self ):
+        """ do we have an SLv2? """
+        if type( self.thirdMoment ) == type ( None ):
+            return False
+        if type(self.thirdMoment) in [ list, ndarray ]:
+            if self.thirdMoment[0]==None:
+                return False
+            # s = sum ( self.thirdMoment )
+        return True
 
     def totalCovariance(self, nsig):
         """get the total covariance matrix, taking into account
@@ -179,7 +184,7 @@ class Data:
         Eqs. 1.27-1.30 in arXiv:1809.05548
         """
         self.V = self.covariance
-        if self.third_moment is None:
+        if not self.hasThirdMomenta():
             self.A = None
             self.B = None
             self.C = None
@@ -187,7 +192,7 @@ class Data:
 
         covD = self.diagCov()
         C = []
-        for m2, m3 in zip(covD, self.third_moment):
+        for m2, m3 in zip(covD, self.thirdMoment):
             if m3 == 0.0:
                 m3 = 1e-30
             k = -np.sign(m3) * sqrt(2.0 * m2)
@@ -1260,8 +1265,8 @@ if __name__ == "__main__":
         observed=[1964, 877, 354, 182, 82, 36, 15, 11],
         backgrounds=[2006.4, 836.4, 350.0, 147.1, 62.0, 26.2, 11.1, 4.7],
         covariance=C,
-        # third_moment = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],
-        third_moment=[0.0] * 8,
+        # thirdMoment = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],
+        thirdMoment=[0.0] * 8,
         nsignal=nsignal,
         name="CMS-NOTE-2017-001 model",
     )

@@ -2,7 +2,7 @@
 
 """
 .. module:: srCombinations
-   :synopsis: a module to contain the logic around combinations of signal regions 
+   :synopsis: a module to contain the logic around combinations of signal regions
               within a single analysis, be they SL-based or pyhf-based.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -40,13 +40,14 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
 
         nobs = [x.dataInfo.observedN for x in dataset._datasets]
         bg = [x.dataInfo.expectedBG for x in dataset._datasets]
+        thirds = [ x.dataInfo.thirdMoment for x in dataset._datasets ]
         no = nobs
 
         d = Data(
             observed=no,
             backgrounds=bg,
             covariance=cov,
-            third_moment=None,
+            thirdMoment=thirds,
             nsignal=nsig,
             deltas_rel=deltas_rel,
             lumi=dataset.getLumi(),
@@ -230,11 +231,13 @@ def getCombinedSimplifiedLikelihood(
     if expected == False:
         nobs = [x.dataInfo.observedN for x in dataset._datasets]
     cov = dataset.globalInfo.covariance
-    computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
+    thirds = [ x.dataInfo.thirdMoment for x in dataset._datasets]
+    computer = LikelihoodComputer(Data(nobs, bg, thirds, nsig,
+                deltas_rel=deltas_rel))
     if expected == "posteriori":
         theta_hat, _ = computer.findThetaHat ( 0. )
         nobs = [float(x + y) for x, y in zip(bg, theta_hat)]
-        computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
+        computer = LikelihoodComputer(Data(nobs, bg, cov, thirds, nsig, deltas_rel=deltas_rel))
     return computer.likelihood(1., marginalize=marginalize)
 
 def getCombinedSimplifiedStatistics(
@@ -251,13 +254,14 @@ def getCombinedSimplifiedStatistics(
         # nobs = [int(np.round(x.dataInfo.expectedBG)) for x in dataset._datasets]
     bg = [x.dataInfo.expectedBG for x in dataset._datasets]
     cov = dataset.globalInfo.covariance
+    thirds = [ x.dataInfo.thirdMoment for x in dataset._datasets ]
     if type(nsig) in [list, tuple]:
         nsig = np.array(nsig)
-    computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
+    computer = LikelihoodComputer(Data(nobs, bg, cov, thirds, nsig, deltas_rel=deltas_rel))
     if expected == "posteriori":
         theta_hat, _ = computer.findThetaHat ( 0. )
         nobs = [float(x + y) for x, y in zip(bg, theta_hat)]
-        computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
+        computer = LikelihoodComputer(Data(nobs, bg, cov, thirds, nsig, deltas_rel=deltas_rel))
     ret = computer.findMuHat(allowNegativeSignals=allowNegativeSignals, extended_output=True)
     lbsm = computer.likelihood ( 1., marginalize = marginalize )
     lsm = computer.likelihood ( 0., marginalize = marginalize )

@@ -292,7 +292,7 @@ class DataSet(object):
             obs = self.dataInfo.expectedBG
 
         m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                 deltas_rel=deltas_rel)
+                 self.dataInfo.thirdMoment, deltas_rel=deltas_rel )
         computer = LikelihoodComputer(m)
         if expected == "posteriori":
             thetahat = computer.findThetaHat(0.)
@@ -301,7 +301,7 @@ class DataSet(object):
 
             obs = self.dataInfo.expectedBG + thetahat
             m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                     deltas_rel=deltas_rel)
+                     self.dataInfo.thirdMoment, deltas_rel=deltas_rel)
             # if abs ( nsig[0]-1 ) < 1e-5:
             #    print ( f"COMB ebg={self.dataInfo.expectedBG:.3f} obs={obs:.3f} nsig {nsig[0]:.3f}" )
             computer = LikelihoodComputer(m)
@@ -331,7 +331,7 @@ class DataSet(object):
             obs = self.dataInfo.expectedBG
             if expected == "posteriori":
                 m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                         deltas_rel=deltas_rel)
+                         self.dataInfo.thirdMoment, deltas_rel=deltas_rel)
                 computer = LikelihoodComputer(m)
                 thetahat = computer.findThetaHat(0.)
                 if type(self.dataInfo.expectedBG) in [float, np.float64,
@@ -340,7 +340,7 @@ class DataSet(object):
                 obs = self.dataInfo.expectedBG + thetahat
 
         m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                 deltas_rel=deltas_rel)
+                 self.dataInfo.thirdMoment, deltas_rel=deltas_rel)
         computer = LikelihoodComputer(m)
         ret = computer.lmax ( marginalize=marginalize, nll=False,
                               allowNegativeSignals=allowNegativeSignals )
@@ -367,7 +367,8 @@ class DataSet(object):
         """
 
         m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG,
-                 self.dataInfo.bgError**2, deltas_rel=deltas_rel)
+                 self.dataInfo.bgError**2, self.dataInfo.thirdMoment,
+                 deltas_rel=deltas_rel)
         computer = LikelihoodComputer(m)
         ret = computer.chi2(nsig, marginalize=marginalize)
 

@@ -53,8 +53,17 @@ class Info(object):
                     logger.info("Ignoring unknown field %s found in file %s"
                                 % (tag, self.path))
                     continue
-
             self.cacheJsons()
+
+    @property
+    def thirdMoment(self):
+        if hasattr ( self, "_thirdMoment" ):
+            return self._thirdMoment
+        return None
+
+    @thirdMoment.setter
+    def thirdMoment(self, value):
+        self._thirdMoment = value
 
     def __eq__ ( self, other ):
         if self.__dict__ != other.__dict__:
