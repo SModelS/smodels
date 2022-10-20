@@ -144,7 +144,7 @@ class StatisticsTest(unittest.TestCase):
         model.updateParticles(filename)
         smstoplist = decomposer.decompose(model, sigmacut=0)
         prediction = theoryPredictionsFor(expRes, smstoplist)[0]
-        pred_signal_strength = prediction.xsection.value
+        pred_signal_strength = prediction.xsection
         prediction.computeStatistics()
         ill = math.log(prediction.likelihood())
         ichi2 = prediction.chi2()

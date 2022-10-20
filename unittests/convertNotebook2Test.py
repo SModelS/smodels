@@ -44,4 +44,10 @@ def getNotebookData(notebookFile,savePickle=True):
 
 
 if __name__ == "__main__":
-    getNotebookData(sys.argv[1])
+    import argparse
+    ap = argparse.ArgumentParser('Convert the notebook output to a pickle file to be used as a unit test')
+    ap.add_argument('-f','--filename', help='path to the notebook file')
+    args = ap.parse_args()
+
+
+    getNotebookData(args.filename)

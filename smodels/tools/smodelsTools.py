@@ -127,7 +127,7 @@ def main():
                            action='store_true')
     args = parser.parse_args()
 
-    from smodels.tools import smodelsLogging
+    from smodels.base import smodelsLogging
     smodelsLogging.setLogLevel(args.verbose)
 
     from smodels import installation

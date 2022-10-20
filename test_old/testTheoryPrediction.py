@@ -46,7 +46,7 @@ class IntegrationTest(unittest.TestCase):
             print ( "no theory predictions for",expresult,"??" )
             sys.exit(-1)
         for pred in theorypredictions:
-            predval=pred.xsection.value
+            predval=pred.xsection
             defpredval = defpreds[expID]
             diff = abs (  predval.asNumber(fb) - defpredval.asNumber(fb) ) / defpredval.asNumber(fb)
             self.assertTrue ( diff < .1 )
@@ -90,7 +90,7 @@ class IntegrationTest(unittest.TestCase):
         for expresult in expresults:
             theorypredictions = theoryPredictionsFor(expresult, smstoplist)
             for pred in theorypredictions:
-                predval=pred.xsection.value
+                predval=pred.xsection
                 expval = expectedValues.pop()
                 delta = expval*0.01
                 self.assertAlmostEqual(predval.asNumber(fb), expval,delta=delta)

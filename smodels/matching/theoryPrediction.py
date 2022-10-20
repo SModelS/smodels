@@ -164,7 +164,7 @@ class TheoryPrediction(object):
         """
 
         upperLimit = self.getUpperLimit(expected=expected)
-        xsec = self.xsection.value
+        xsec = self.xsection
         if xsec is None or upperLimit is None:
             return None
 

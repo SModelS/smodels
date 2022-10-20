@@ -67,7 +67,7 @@ XSECTION  1.30E+04  2212 2212 2 1000021 1000021 # 10000 events, [pb], pythia8 fo
             # print ( "Experimental result: %s" % expRes )
             tp = theoryPredictionsFor(expRes, deco, useBestDataset=False, combinedResults=True)
             for t in tp:
-                predXSecs[case]=t.xsection.value
+                predXSecs[case]=t.xsection
                 rvalues[case]=t.getRValue(expected=True)
             if True:
                 os.unlink ( filename )
