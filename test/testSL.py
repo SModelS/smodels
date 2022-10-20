@@ -26,7 +26,7 @@ class SLTest(unittest.TestCase):
             observed=[0],
             backgrounds=[0.0],
             covariance=C,
-            third_moment=[0.0] * 8,
+            thirdMoment=[None] * 8,
             nsignal=[x / 100.0 for x in [0.0]],
             name="pathological model",
             deltas_rel=0.0,
@@ -45,7 +45,7 @@ class SLTest(unittest.TestCase):
             observed=[0],
             backgrounds=[0.0],
             covariance=C,
-            third_moment=[0.0] * 8,
+            thirdMoment=[None] * 8,
             nsignal=[x / 100.0 for x in [0.1]],
             name="pathological model 2",
             deltas_rel=0.0,
@@ -71,7 +71,7 @@ class SLTest(unittest.TestCase):
         m=Data ( observed=[1964,877,354,182,82,36,15,11],
                   backgrounds=[2006.4,836.4,350.,147.1,62.0,26.2,11.1,4.7],
                   covariance= C,
-                  third_moment = [ 0. ] * 8,
+                  thirdMoment = [ None ] * 8,
                   nsignal= nsignal,
                   name="CMS-NOTE-2017-001 model",deltas_rel=0. )
         ulComp = UpperLimitComputer (ntoys=2000, cl=.95 )
@@ -83,7 +83,7 @@ class SLTest(unittest.TestCase):
     def createModel(self,n=3):
         import model_90 as m9
 
-        S = m9.third_moment.tolist()[:n]
+        S = m9.thirdMoment.tolist()[:n]
         D = m9.observed.tolist()[:n]
         B = m9.background.tolist()[:n]
         sig = [x / 100.0 for x in m9.signal.tolist()[:n]]
@@ -92,7 +92,7 @@ class SLTest(unittest.TestCase):
         C = []
         for i in range(n):
             C.append(C_[ncov * i : ncov * i + n])
-        m = Data( observed=D, backgrounds=B, covariance=C, third_moment=S,
+        m = Data( observed=D, backgrounds=B, covariance=C, thirdMoment=S,
             nsignal=sig, name="model%d" % n, deltas_rel=0.0,)
         return m
 
@@ -174,7 +174,7 @@ class SLTest(unittest.TestCase):
         m=Data ( observed=observed,
                   backgrounds=background,
                   covariance= covariance,
-                  third_moment = [ 0. ] * 2,
+                  thirdMoment = [ None ] * 2,
                   nsignal= signal,
                   name="trivial model",deltas_rel=0., lumi = 100./fb )
         lComp = LikelihoodComputer( m )
