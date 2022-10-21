@@ -163,7 +163,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
           'CMS-SUS-12-028',
           'ATLAS-SUSY-2018-12',
           'ATLAS-SUSY-2016-15','ATLAS-SUSY-2019-09']
-        db = Database('unittest+./database_extra')
+        db = Database('unittest+unittestextra')
         slhafile = "testFiles/slha/gluino_squarks.slha"
         exp_results = db.getExpResults()
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
