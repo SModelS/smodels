@@ -40,7 +40,7 @@ def isInReducedSet ( t ):
         return False
     return True
 
-def run(testNotebooks=False, reduced=False ):
+def run(filter=None, testNotebooks=False, reduced=False ):
 
     tests = unittest.TestLoader().discover("./")
     if not testNotebooks:
@@ -48,13 +48,15 @@ def run(testNotebooks=False, reduced=False ):
         tests._tests = [t for t in tests._tests[:] if not 'recipes' in str(t).lower()]
     if reduced:
         tests._tests = [t for t in tests._tests[:] if isInReducedSet(t) ]
+    if filter is not None:
+        tests._tests = [t for t in tests._tests[:] if filter in str(t)]
 
     ret = unittest.TextTestRunner().run(tests)
     if not ret.wasSuccessful():
         raise AssertionError("%i tests failed" %len(ret.failures))
 
 
-def verbose_run( flter, testNotebooks=False, reduced=False ):
+def verbose_run( filter=None, testNotebooks=False, reduced=False ):
 
     alltests = unittest.TestLoader().discover("./")
 
@@ -73,7 +75,7 @@ def verbose_run( flter, testNotebooks=False, reduced=False ):
                 print ( test._exception, colors.reset )
                 continue
             for t in test:
-                if flter and (not flter in str(t)):
+                if filter and (not filter in str(t)):
                     continue
                 n_tests += 1
                 print ( "[#%3d] %s ... " % ( n_tests, t.id() ), end="" )
@@ -158,12 +160,12 @@ if __name__ == "__main__":
         print('Reduced set of unit tests')
 
     if args.clean_database:
-        cleanDatabase ()
+        cleanDatabase()
     elif args.parallel:
-        parallel_run ( args.verbose, args.notebooks, args.reduced )
+        parallel_run(args.verbose, args.notebooks, args.reduced)
         sys.exit()
     elif args.verbose:
-        verbose_run( args.filter, args.notebooks, args.reduced )
+        verbose_run(args.filter, args.notebooks, args.reduced)
         sys.exit()
     else:
-        run(args.notebooks, args.reduced)
+        run(args.filter, args.notebooks, args.reduced)
