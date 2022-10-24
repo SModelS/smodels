@@ -288,7 +288,16 @@ def getDictionariesFrom(lheFile,nevts=None):
             combinedDecays.append(decay)
         decaysDict[pdg] = combinedDecays #Stable particles will appear with an empty list
 
-    #Remove anti-particle decays and masses:
+    # Make sure that for each anti-particle
+    # there is also an entry for the corresponding particle:
+    for pdg in list(massDict.keys())[:]:
+        if -abs(pdg) in massDict and abs(pdg) not in massDict:
+            massDict[abs(pdg)] = massDict[-abs(pdg)]
+    for pdg in list(decaysDict.keys())[:]:            
+        if -abs(pdg) in decaysDict and abs(pdg) not in decaysDict:
+            decaysDict[abs(pdg)] = decaysDict[-abs(pdg)]
+
+    # Remove anti-particle decays and masses:
     for pdg in list(massDict.keys())[:]:
         if -abs(pdg) in massDict and abs(pdg) in massDict:
             massDict.pop(-abs(pdg))
