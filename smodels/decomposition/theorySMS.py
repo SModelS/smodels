@@ -388,9 +388,7 @@ class TheorySMS(GenericSMS):
                 return 1
 
         # Compare nodes
-        root1 = self.indexToNode(n1)
-        root2 = other.indexToNode(n2)
-        cmp = root1.compareTo(root2)
+        cmp = self.compareNodes(n1,n2)
         if cmp != 0:
             return cmp
 
@@ -408,6 +406,25 @@ class TheorySMS(GenericSMS):
             if cmp != 0:
                 return cmp
         return 0
+
+    def compareNodes(self,nodeIndex1,nodeIndex2):
+        """
+        Convenience function for defining how nodes are compared
+        within the SMS.
+
+        :param nodeIndex1: Index of first node
+        :param nodeIndex2: Index of second node
+
+        :return: 1 if node1 > node2, -1 if node1 < node2, 0 if node1 == node2.
+        """
+
+        # Comparison parameters:
+        node1 = self.indexToNode(nodeIndex1)
+        node2 = self.indexToNode(nodeIndex2)
+
+        # Directly use node comparison:
+        cmp = node1.compareTo(node2)
+        return cmp
 
     def _getAncestorsDict(self, igen=0):
         """

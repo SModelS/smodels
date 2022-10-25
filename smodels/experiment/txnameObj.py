@@ -146,6 +146,9 @@ class TxName(object):
             x_values, y_values = self.preProcessData(expectedData)
             self.txnameDataExp = TxNameData(x=x_values, y=y_values, txdataId=ident)
 
+        # Sort all SMS appearing in constraints:
+        self.sortSMSMap()
+
     def __str__(self):
         return self.txName
 
@@ -220,6 +223,38 @@ class TxName(object):
             raise SModelSError(msgError)
 
         return True
+
+    def sortSMSMap(self):
+        """
+        Sort the nodes ExpSMS appearing in self.smsMap (constraints).
+        If sorting can not be made so all the SMS
+        are consistent with a single dataMap, raise an error.
+        """
+
+        nodesDict = None
+        relevantNodes = [v[0] for v in self.dataMap.values()]
+        for expSMS in self.smsMap:
+            newNodesDict = expSMS.sort()
+            # Restrict to relevant nodes only
+            # (ignore relabeling of nodes which are not needed by the data grid)
+            newNodesDict = {k : v for k,v in newNodesDict.items() 
+                            if k in relevantNodes}
+            # Store the new nodes dictionary:
+            if nodesDict is None:
+                nodesDict = {key : val for key,val in newNodesDict.items()}
+                continue
+            # Make sure all the SMS had their relevant nodes reordered in the same way 
+            # (otherwise the dataMap can not be consistently changed for all SMS)
+            if newNodesDict != nodesDict:
+                txt = "Can not set the SMS in %s to the standard format." %(self)
+                txt += "\nMake sure the constraint %s is consistent with the data grid"  %(self.constraint)
+                txt += " for all the SMS appearing in the constraint."
+                logger.error(txt)
+                raise SModelSError(txt)
+
+        # If all the relabeling are equal, relabel the dataMap 
+        # using the new nodes dict
+        self.relabelDataMap(nodesDict)
 
     def processExpr(self, stringExpr, databaseParticles,
                     checkUnique=False):
@@ -367,7 +402,7 @@ class TxName(object):
 
         # Define graph->data mapping
         try:
-            self.getDataMap(xDataPoint)
+            self.setDataMap(xDataPoint)
         except (IndexError) as e:
             msgError = "Error constructing dataMap for %s" % self.path
             msgError += ": %s" % str(e)
@@ -497,12 +532,11 @@ class TxName(object):
 
         return massPoint
 
-    def getDataMap(self, dataPoint):
+    def setDataMap(self, dataPoint):
         """
-        Using the sms in the topology, construct a dictionary
-        mapping the node index to a flat data array.
-        If the dataMap has not been defined, construct from the sms topology
-        and data point format.
+        If self.dataMap has not been defined,
+        sets the dataMap using the first sms in self.smsMap.
+        The dataMap is a dictionary mapping the node index to a flat data array.
 
         :param dataPoint: A point with the x-values from the data grid
                           (e.g. [[100*GeV,(50*GeV,1e-3*GeV)],[100*GeV,(50*GeV,1e-3*GeV),10*GeV]])
@@ -557,6 +591,28 @@ class TxName(object):
         for key, val in self.arrayMap.items():
             bracketIndex, attr, unit, nodeIndex = val
             self.dataMap[key] = (nodeIndex, attr, unit)
+
+    def relabelDataMap(self,nodeIndexDict):
+        """
+        Relabel the node indices in self.dataMap according to nodeIndexDict.
+        For node indices not appearing in nodeIndexDict nothing is done.
+
+        :param nodeIndexDict: Dictionary with old node indices as keys
+                              and new indices as values
+        """
+
+        # If dataMap has not been defined, do nothing
+        if self.dataMap is None:
+            logger.warning("Could not find dataMap for relabeling nodes!")
+            return
+
+        for dataArrayIndex, nodeTuple in self.dataMap.items():
+            oldIndex,attrib,unit = nodeTuple
+            # If old index does not appear in the dict, do nothing
+            if oldIndex not in nodeIndexDict:
+                continue
+            newIndex = nodeIndexDict[oldIndex]
+            self.dataMap[dataArrayIndex] = (newIndex,attrib,unit)
 
     def getDataEntry(self, arrayValue):
         """
