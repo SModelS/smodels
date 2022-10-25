@@ -147,7 +147,7 @@ class TxName(object):
             self.txnameDataExp = TxNameData(x=x_values, y=y_values, txdataId=ident)
 
         # Sort all SMS appearing in constraints:
-        self.sortSMSMap()
+        # self.sortSMSMap()
 
     def __str__(self):
         return self.txName

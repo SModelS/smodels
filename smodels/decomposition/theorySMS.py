@@ -388,7 +388,7 @@ class TheorySMS(GenericSMS):
                 return 1
 
         # Compare nodes
-        cmp = self.compareNodes(n1,n2)
+        cmp = self.compareNodes(other,n1,n2)
         if cmp != 0:
             return cmp
 
@@ -407,11 +407,12 @@ class TheorySMS(GenericSMS):
                 return cmp
         return 0
 
-    def compareNodes(self,nodeIndex1,nodeIndex2):
+    def compareNodes(self,other,nodeIndex1,nodeIndex2):
         """
         Convenience function for defining how nodes are compared
         within the SMS.
 
+        :param other: TheorySMS object (if other=self compare subtrees of the same SMS).
         :param nodeIndex1: Index of first node
         :param nodeIndex2: Index of second node
 
@@ -420,7 +421,7 @@ class TheorySMS(GenericSMS):
 
         # Comparison parameters:
         node1 = self.indexToNode(nodeIndex1)
-        node2 = self.indexToNode(nodeIndex2)
+        node2 = other.indexToNode(nodeIndex2)
 
         # Directly use node comparison:
         cmp = node1.compareTo(node2)

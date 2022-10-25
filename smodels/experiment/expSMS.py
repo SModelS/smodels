@@ -489,11 +489,7 @@ class ExpSMS(GenericSMS):
             return 1
 
         # Compare nodes
-        root1 = self.indexToNode(n1)
-        root2 = other.indexToNode(n2)
-
-        # Comparison parameters:
-        cmp = self.compareNodes(n1,n2)
+        cmp = self.compareNodes(other,n1,n2)
         if cmp != 0:
             return cmp
 
@@ -512,11 +508,12 @@ class ExpSMS(GenericSMS):
                 return cmp
         return 0
 
-    def compareNodes(self,nodeIndex1,nodeIndex2):
+    def compareNodes(self,other,nodeIndex1,nodeIndex2):
         """
         Convenience function for defining how nodes are compared
         within the SMS.
 
+        :param other: ExpSMS object (if other=self compare subtrees of the same SMS).
         :param nodeIndex1: Index of first node
         :param nodeIndex2: Index of second node
 
@@ -525,7 +522,7 @@ class ExpSMS(GenericSMS):
 
         # Comparison parameters:
         node1 = self.indexToNode(nodeIndex1)
-        node2 = self.indexToNode(nodeIndex2)
+        node2 = other.indexToNode(nodeIndex2)
         cmp1 = (not node1.isInclusive, not node1.inclusiveList, 
                node1.isSM, str(node1))
         cmp2 = (not node2.isInclusive, not node2.inclusiveList, 
