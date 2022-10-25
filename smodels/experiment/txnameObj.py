@@ -226,7 +226,7 @@ class TxName(object):
 
     def sortSMSMap(self):
         """
-        Sort the nodes ExpSMS appearing in self.smsMap (constraints).
+        Sort the nodes in the ExpSMS appearing in self.smsMap (constraints).
         If sorting can not be made so all the SMS
         are consistent with a single dataMap, raise an error.
         """
