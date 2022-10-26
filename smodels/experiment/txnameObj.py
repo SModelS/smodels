@@ -231,21 +231,29 @@ class TxName(object):
         are consistent with a single dataMap, raise an error.
         """
 
-        nodesDict = None
+        nodesOrder = None
+        # Store relevant nodes for the data grid:
         relevantNodes = [v[0] for v in self.dataMap.values()]
         for expSMS in self.smsMap:
-            newNodesDict = expSMS.sort()
-            # Restrict to relevant nodes only
-            # (ignore relabeling of nodes which are not needed by the data grid)
-            newNodesDict = {k : v for k,v in newNodesDict.items() 
-                            if k in relevantNodes}
-            # Store the new nodes dictionary:
-            if nodesDict is None:
-                nodesDict = {key : val for key,val in newNodesDict.items()}
+            # Define node ordering from the first SMS:
+            if nodesOrder is None:
+                nodesDict = expSMS.sort(force=True)
+                nodesOrder = sorted([k for k in nodesDict.keys()], 
+                                     key = lambda n: nodesDict[n])
                 continue
-            # Make sure all the SMS had their relevant nodes reordered in the same way 
-            # (otherwise the dataMap can not be consistently changed for all SMS)
-            if newNodesDict != nodesDict:
+            # For the remaining SMS, re-roder according to the first
+            # (so the dataMap is consistent)
+            else:
+                expSMS.sortAccordingTo(nodesOrder)
+                expSMS.bfs_sort(numberNodes=True)
+            # Finally check if the reordering results
+            # in a sorted SMS:
+            newNodesDict = expSMS.sort(force=True)
+            newNodesDict = {k : v for k,v in newNodesDict.items() 
+                    if k in relevantNodes}
+            # If the sort has changed any node, then the reordering
+            # did not result in a sorted SMS:
+            if any(k != v for k,v in newNodesDict.items()):        
                 txt = "Can not set the SMS in %s to the standard format." %(self)
                 txt += "\nMake sure the constraint %s is consistent with the data grid"  %(self.constraint)
                 txt += " for all the SMS appearing in the constraint."
