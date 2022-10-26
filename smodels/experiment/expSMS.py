@@ -30,7 +30,7 @@ class ExpSMS(GenericSMS):
         GenericSMS.__init__(self)
 
     @classmethod
-    def from_string(cls, stringSMS, model, finalState=None,
+    def from_string(cls, stringSMS, model=None, finalState=None,
                      intermediateState=None):
         """
         Converts a string describing an SMS to a SMS object. It accepts
@@ -126,7 +126,10 @@ class ExpSMS(GenericSMS):
                 if label[0] == '*':
                     label = label[1:]
                     inclusiveList = True
-                particle = model.getParticle(label=label)
+                if model is None:
+                    particle = label
+                else:
+                    particle = model.getParticle(label=label)
                 node = ParticleNode(particle=particle,
                                     inclusiveList=inclusiveList)
 
