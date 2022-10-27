@@ -372,7 +372,9 @@ class ExpSMS(GenericSMS):
     def compareNodes(self,other,nodeIndex1,nodeIndex2):
         """
         Convenience function for defining how nodes are compared
-        within the SMS.
+        within the SMS. For ExpSMS the nodes are sorted according to their
+        inclusiveness (InclsuiveNode or inclusiveList), 
+        the particle content and finally their string representation.
 
         :param other: ExpSMS object (if other=self compare subtrees of the same SMS).
         :param nodeIndex1: Index of first node
@@ -384,14 +386,29 @@ class ExpSMS(GenericSMS):
         # Comparison parameters:
         node1 = self.indexToNode(nodeIndex1)
         node2 = other.indexToNode(nodeIndex2)
-        cmp1 = (not node1.isInclusive, not node1.inclusiveList, 
-               node1.isSM, str(node1))
-        cmp2 = (not node2.isInclusive, not node2.inclusiveList, 
-               node2.isSM, str(node2))
+        
+        # First sort nodes by inclusiveness:
+        cmp1 = (not node1.isInclusive, not node1.inclusiveList)
+        cmp2 = (not node2.isInclusive, not node2.inclusiveList)
+        if cmp1 != cmp2:
+            if cmp1 > cmp2:
+                return 1
+            else:
+                return -1
 
-        if cmp1 > cmp2:
-            return 1
-        elif cmp1 < cmp2:
-            return -1
-        else:
-            return 0
+        # If both are inclusive, compare particles:
+        cmp = node1.compareTo(node2)
+        if cmp != 0:
+            return cmp
+        
+        # If particles are equal, compare strings:
+        cmp1 = str(node1)
+        cmp2 = str(node2)
+        if cmp1 != cmp2:
+            if cmp1 > cmp2:
+                return 1
+            else:
+                return -1        
+        
+        # If nodes are identical, return 0
+        return 0
