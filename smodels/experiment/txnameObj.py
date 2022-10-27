@@ -231,38 +231,35 @@ class TxName(object):
         are consistent with a single dataMap, raise an error.
         """
 
-        nodesOrder = None
-        # Store relevant nodes for the data grid:
+        # If the SMS are already sorted, do nothing:
+        if all((hasattr(expSMS,'_sorted') and expSMS._sorted) 
+                for expSMS in self.smsMap):
+            return
+
         relevantNodes = [v[0] for v in self.dataMap.values()]
+        nodesDict = None
         for expSMS in self.smsMap:
             # Define node ordering from the first SMS:
-            if nodesOrder is None:
+            if nodesDict is None:
                 nodesDict = expSMS.sort(force=True)
-                nodesOrder = sorted([k for k in nodesDict.keys()], 
-                                     key = lambda n: nodesDict[n])
+                nodesDict = {n : nodesDict[n] for n in relevantNodes}
                 continue
-            # For the remaining SMS, re-roder according to the first
-            # (so the dataMap is consistent)
-            else:
-                expSMS.sortAccordingTo(nodesOrder)
-                expSMS.bfs_sort(numberNodes=True)
-            # Finally check if the reordering results
-            # in a sorted SMS:
             newNodesDict = expSMS.sort(force=True)
-            newNodesDict = {k : v for k,v in newNodesDict.items() 
-                    if k in relevantNodes}
-            # If the sort has changed any node, then the reordering
-            # did not result in a sorted SMS:
-            if any(k != v for k,v in newNodesDict.items()):        
-                txt = "Can not set the SMS in %s to the standard format." %(self)
-                txt += "\nMake sure the constraint %s is consistent with the data grid"  %(self.constraint)
-                txt += " for all the SMS appearing in the constraint."
-                logger.error(txt)
-                raise SModelSError(txt)
+            newNodesDict = {n : newNodesDict[n] for n in relevantNodes}
+            # Check if the sorting of the SMS requires
+            # a new reordering of the dataMap 
+            # (if the dataMap is symmetric it might not be an issue)
+            if newNodesDict != nodesDict:        
+                txt = "The sorting of the SMS in %s require distinct data ordering." %(self)
+                txt += "\nMake sure the constraint %s is consistent with any data grid ordering"  %(self.constraint)
+                txt += " (symmetric data grid)."
+                logger.warning(txt)
+                # raise SModelSError(txt)
 
         # If all the relabeling are equal, relabel the dataMap 
         # using the new nodes dict
         self.relabelDataMap(nodesDict)
+        
 
     def processExpr(self, stringExpr, databaseParticles,
                     checkUnique=False):

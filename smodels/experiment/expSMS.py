@@ -353,6 +353,22 @@ class ExpSMS(GenericSMS):
         # print('   returning for %i = %i' %(n1,n2),finalMap)
         return finalMap
 
+    def identicalTo(self,other):
+        
+        if self.canonName != other.canonName:
+            return False
+        
+        for nodeIndex in self.dfsIndexIterator():
+            cName1 = self.nodeCanonName(nodeIndex)
+            cName2 = other.nodeCanonName(nodeIndex)
+            if cName1 != cName2:
+                return False
+            node1 = self.indexToNode(nodeIndex)
+            node2 = other.indexToNode(nodeIndex)
+            if node1.particle is not node2.particle:
+                return False
+        return True
+
     def copy(self, emptyNodes=False):
         """
         Returns a shallow copy of self.
@@ -401,7 +417,19 @@ class ExpSMS(GenericSMS):
         if cmp != 0:
             return cmp
         
-        # If particles are equal, compare strings:
+        # If particles are the same object, return 0
+        if node1.particle is node2.particle:
+            return 0
+        # If they are not the same object, but node2 in node1(MultiParticle):
+        # define node1 > node2
+        elif node1.particle.contains(node2.particle):
+            return 1
+        # If they are not the same object, but node1 in node2(MultiParticle):
+        # define node2 > node1
+        elif node2.particle.contains(node1.particle):
+            return -1
+
+        # If everything else fails, compare strings:
         cmp1 = str(node1)
         cmp2 = str(node2)
         if cmp1 != cmp2:
