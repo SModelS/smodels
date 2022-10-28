@@ -106,12 +106,12 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     """ Create output directory if missing """
     if not os.path.isdir(outputDir): os.mkdir(outputDir)
 
-    """ Load analysis database, print list """
-    listOfExpRes = modelTester.loadDatabaseResults(parser, database)
+    """ Restrict database results according to parameter file"""
+    modelTester.loadDatabaseResults(parser, database)
 
     """ Test all input points """
     modelTester.testPoints(fileList, inDir, outputDir, parser, databaseVersion,
-                 listOfExpRes, timeout, development, parameterFile )
+                 database, timeout, development, parameterFile )
 
 if __name__ == "__main__":
     main()

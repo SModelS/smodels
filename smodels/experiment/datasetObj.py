@@ -31,10 +31,13 @@ class DataSet(object):
     Holds the information to a data set folder (TxName objects, dataInfo,...)
     """
 
-    def __init__(self, path=None, info=None, createInfo=True,
-                 discard_zeroes=True, databaseParticles=None):
+    def __init__(self, path=None, info=None, createInfo=True, databaseParticles=None):
         """
-        :param discard_zeroes: discard txnames with zero-only results
+        :param path: Path to the dataset folder
+        :param info: globalInfo (from the ExptResult obj)
+        :param createInfo: If True, create object from dataset folder
+        :param databaseParticles: Model object holding Particle objects to be
+                                  used when creating the SMS topologies in the TxNames.
         """
 
         self.path = path
@@ -57,7 +60,7 @@ class DataSet(object):
                 try:
                     txname = txnameObj.TxName(txtfile, self.globalInfo,
                                               self.dataInfo, databaseParticles)
-                    if discard_zeroes and txname.hasOnlyZeroes():
+                    if txname.hasOnlyZeroes():
                         logger.debug("%s, %s has only zeroes. discard it." %
                                      (self.path, txname.txName))
                         continue
@@ -68,6 +71,7 @@ class DataSet(object):
 
             self.txnameList.sort()
             self.checkForRedundancy(databaseParticles)
+
 
     def isCombinableWith(self, other):
         """

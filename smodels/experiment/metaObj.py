@@ -21,12 +21,11 @@ class Meta(object):
         database, like number of analyses, last time of modification, ...
         This info is needed to understand if we have to re-pickle. """
 
-    def __init__(self, pathname, discard_zeroes=None, mtime=None, filecount=None,
+    def __init__(self, pathname, mtime=None, filecount=None,
                    hasFastLim=None, databaseVersion=None, format_version=current_version,
                    python=sys.version):
         """
         :param pathname: filename of pickle file, or dirname of text files
-        :param discard_zeroes: do we discard zeroes?
         :param mtime: last modification time stamps
         :param filecount: number of files
         :param hasFastLim: fastlim in the database?
@@ -35,7 +34,6 @@ class Meta(object):
         :param python: python version
         """
         self.pathname = pathname
-        self.discard_zeroes = discard_zeroes
         self.mtime = mtime
         self.filecount = filecount
         self.hasFastLim = hasFastLim
@@ -52,8 +50,8 @@ class Meta(object):
             hfl="1"
         if self.hasFastLim==False:
             hfl="0"
-        return "db%s%d.pcl" % ( self.python[0], self.discard_zeroes )
-        # return "db%s%d%s.pcl" % ( self.python[0], self.discard_zeroes, hfl )
+        return "db%s.pcl" % ( self.python[0] )
+        # return "db%s%s.pcl" % ( self.python[0], hfl )
 
     def versionFromFile ( self ):
         """
@@ -81,7 +79,6 @@ class Meta(object):
         ret  = "Meta: path =%s\n" % self.pathname
         ret += "      mtime=%s" % time.ctime ( self.mtime )
         ret += ", filecount=%d" % self.filecount
-        ret += ", discard_0=%d" % self.discard_zeroes
         ret += ", fl=%s" % self.hasFastLim
         ret += ", format_version=%d" % self.format_version
         ret += ", dbVersion=%s" % self.databaseVersion
@@ -168,8 +165,6 @@ class Meta(object):
         if other == None: return False
         if self.pathname != other.pathname:
             return False
-        if self.discard_zeroes != other.discard_zeroes:
-            return False
         if self.mtime != other.mtime:
             return False
         if self.filecount != other.filecount:
@@ -194,8 +189,6 @@ class Meta(object):
             return True ## number of files changed
         #if self.databaseVersion != current.databaseVersion:
         #    return True ## database version changed
-        if self.discard_zeroes != current.discard_zeroes:
-            return True ## flag changed
         if self.format_version != current.format_version:
             return True ## pickle file format version changed
         if self.python != current.python:

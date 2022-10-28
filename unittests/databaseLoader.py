@@ -17,7 +17,7 @@ from smodels.experiment.databaseObj import Database
 # dbpath = "../../smodels-database"
 dbpath = "unittest"
 
-database = Database( dbpath, discard_zeroes = False)
+database = Database( dbpath)
 
 if __name__ == "__main__":
     print ( database )

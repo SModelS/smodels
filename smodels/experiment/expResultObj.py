@@ -27,11 +27,10 @@ class ExpResult(object):
     experimental result (experimental conference note or publication).
     """
 
-    def __init__(self, path=None, discard_zeroes=True, databaseParticles=None):
+    def __init__(self, path=None, databaseParticles=None):
         """
         :param path: Path to the experimental result folder, None means
                      transient experimental result
-        :param discard_zeroes: Discard maps with only zeroes
         :param databaseParticles: the model, i.e. the particle content
         """
 
@@ -41,7 +40,6 @@ class ExpResult(object):
         if not os.path.isdir(path):
             raise SModelSExperimentError("%s is not a path" % path)
 
-        self.discard_zeroes = discard_zeroes
         self.path = path
         if not os.path.isfile(os.path.join(path, "globalInfo.txt")):
             logger.error("globalInfo.txt file not found in " + path)
@@ -63,7 +61,6 @@ class ExpResult(object):
                 # Build data set
                 try:
                     dataset = datasetObj.DataSet(root, self.globalInfo,
-                                                 discard_zeroes=discard_zeroes,
                                                  databaseParticles=databaseParticles)
                     if hasOrder:
                         datasets[dataset.dataInfo.dataId] = dataset
@@ -86,7 +83,7 @@ class ExpResult(object):
     def writePickle(self, dbVersion):
         """ write the pickle file """
 
-        meta = metaObj.Meta(self.path, self.discard_zeroes, databaseVersion=dbVersion)
+        meta = metaObj.Meta(self.path, databaseVersion=dbVersion)
         pclfile = "%s/.%s" % (self.path, meta.getPickleFileName())
         logger.debug("writing expRes pickle file %s, mtime=%s" % (pclfile, meta.cTime()))
         f = open(pclfile, "wb")

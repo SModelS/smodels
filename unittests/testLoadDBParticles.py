@@ -24,7 +24,7 @@ class LoadDBParticlesTest(unittest.TestCase):
     def testFallBack(self):
         #Test if smodels/experiment/defaultFinalStates.py is being used if databaseParticle.py is missing
         dbpath = "./database_simple"
-        dbOld = Database( dbpath, discard_zeroes = False, force_load ='txt')
+        dbOld = Database( dbpath, force_load ='txt')
         model = dbOld.databaseParticles
         self.assertEqual(model.label,'DB Final States (default)') #Simple fallback test
 

@@ -456,19 +456,12 @@ def loadDatabase(parser, db):
         if database in [None, True]:
             databasePath = parser.get("database", "path")
             checkForSemicolon(databasePath, "database", "path")
-            discard_zeroes = True
-            try:
-                discard_zeroes = parser.getboolean("database", "discardZeroes")
-            except (NoSectionError, NoOptionError):
-                logger.debug(
-                    "database:discardZeroes is not given in config file. Defaulting to 'True'.")
             force_load = None
             if database is True:
                 force_load = "txt"
             if os.path.isfile(databasePath):
                 force_load = "pcl"
-            database = Database(databasePath, force_load=force_load,
-                                discard_zeroes=discard_zeroes)
+            database = Database(databasePath, force_load=force_load)
         databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
         logger.error("Database not found in ``%s''" %
@@ -479,11 +472,10 @@ def loadDatabase(parser, db):
 
 def loadDatabaseResults(parser, database):
     """
-    Load database entries specified in parser
+    Restrict the (active) database results to the ones specified in parser
 
     :parameter parser: ConfigParser, containing analysis and txnames selection
     :parameter database: Database object
-    :returns: List of experimental results
 
     """
     """ In case that a list of analyses or txnames are given, retrieve list """
@@ -515,11 +507,10 @@ def loadDatabaseResults(parser, database):
 
     """ Load analyses """
 
-    ret = database.getExpResults(analysisIDs=analyses, txnames=txnames,
+    database.selectExpResults(analysisIDs=analyses, txnames=txnames,
                                  datasetIDs=datasetIDs, dataTypes=dataTypes,
                                  useSuperseded=useSuperseded, useNonValidated=useNonValidated)
-    return ret
-
+    
 
 def getParameters(parameterFile):
     """
