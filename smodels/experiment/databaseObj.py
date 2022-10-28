@@ -458,7 +458,7 @@ class SubDatabase(object):
         # If active results have never been defined,
         # set it to all results
         if self.activeResults is None:
-            self.activeResults = self.allExpResults[:]
+            self.activeResults = self.getExpResults()
 
         return self.activeResults[:]
 
