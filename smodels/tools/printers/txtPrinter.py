@@ -11,7 +11,7 @@ from smodels.tools.printers.basicPrinter import BasicPrinter
 from smodels.decomposition.topologyDict import TopologyDict
 from smodels.matching.theoryPrediction import TheoryPredictionList
 from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner
-from smodels.experiment.databaseObj import ExpResultList
+from smodels.experiment.databaseObj import Database
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV
@@ -28,7 +28,7 @@ class TxTPrinter(BasicPrinter):
         BasicPrinter.__init__(self, output, filename, outputFormat)
         self.name = "log"
         self.printtimespent = False
-        self.printingOrder = [OutputStatus, ExpResultList, TopologyDict,
+        self.printingOrder = [OutputStatus, Database, TopologyDict,
                               TheoryPredictionList, TheoryPredictionsCombiner,
                               Uncovered]
         self.toPrint = [None] * len(self.printingOrder)
@@ -192,16 +192,17 @@ class TxTPrinter(BasicPrinter):
 
         return output
 
-    def _formatExpResultList(self, obj):
+    def _formatDatabase(self, obj):
         """
-        Format data for a ExpResultList object.
+        Format data for a Database object.
 
-        :param obj: A ExpResultList object to be printed.
+        :param obj: A Database object to be printed.
         """
 
         if not hasattr(self, "printdatabase") or not self.printdatabase:
             return None
 
+        expResults = obj.expResultList
         slabel = "Selected Experimental Results"
         output = ""
         output += "  " + "="*56 + "  \n"
@@ -211,7 +212,7 @@ class TxTPrinter(BasicPrinter):
         output += "||" + " "*56 + "||\n"
         output += "  " + "="*56 + "  \n"
 
-        for expRes in obj.expResultList:
+        for expRes in expResults:
             output += self._formatExpResult(expRes)
 
         return output+"\n"

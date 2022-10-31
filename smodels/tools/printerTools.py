@@ -18,7 +18,7 @@ import copy
 from smodels.decomposition.topologyDict import TopologyDict
 from smodels.matching.theoryPrediction import TheoryPredictionList
 from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner
-from smodels.experiment.databaseObj import ExpResultList
+from smodels.experiment.databaseObj import Database
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV

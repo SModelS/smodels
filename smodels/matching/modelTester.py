@@ -44,7 +44,7 @@ except ImportError:
 import logging
 
 
-def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
+def testPoint(inputFile, outputDir, parser, database):
     """
     Test model point defined in input file (running decomposition, check
     results, test coverage)
@@ -52,8 +52,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     :parameter inputFile: path to input file
     :parameter outputDir: path to directory where output is be stored
     :parameter parser: ConfigParser storing information from parameters file
-    :parameter databaseVersion: Database version (printed to output file)
-    :parameter listOfExpRes: list of ExpResult objects to be considered
+    :parameter database: Database holding the list of experiment results
 
     :return: dictionary with input filename as key and the MasterPrinter object as value
     """
@@ -74,7 +73,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
         outputDir, os.path.basename(inputFile)))
 
     """ Add list of analyses loaded to printer"""
-    masterPrinter.addObj(ExpResultList(listOfExpRes))
+    masterPrinter.addObj(database)
 
     """Check input file for errors"""
     inputStatus = ioObjects.FileStatus()
@@ -91,7 +90,8 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
 
     printParameters = OrderedDict(printParameters)
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
-                                          printParameters, databaseVersion)
+                                          printParameters, 
+                                          database.databaseVersion)
     masterPrinter.addObj(outputStatus)
     if outputStatus.status < 0:
         return {os.path.basename(inputFile): masterPrinter}
@@ -177,13 +177,10 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     except (NoSectionError, NoOptionError):
         pass
 
-    for expResult in listOfExpRes:
-        theorypredictions = theoryPredictionsFor(expResult, smstoplist,
-                                                 useBestDataset=useBest, combinedResults=combineResults,
-                                                 marginalize=False)
-        if not theorypredictions:
-            continue
-        allPredictions += theorypredictions._theoryPredictions
+    allPredictions = theoryPredictionsFor(database, smstoplist,
+                                          useBestDataset=useBest, 
+                                          combinedResults=combineResults,
+                                          marginalize=False)
 
     """Compute chi-square and likelihood"""
     if parser.getboolean("options", "computeStatistics"):
@@ -228,7 +225,7 @@ def testPoint(inputFile, outputDir, parser, databaseVersion, listOfExpRes):
     return {os.path.basename(inputFile): masterPrinter}
 
 
-def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
+def runSingleFile(inputFile, outputDir, parser, database,
                   timeout, development, parameterFile):
     """
     Call testPoint on inputFile, write crash report in case of problems
@@ -236,8 +233,7 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
     :parameter inputFile: path to input file
     :parameter outputDir: path to directory where output is be stored
     :parameter parser: ConfigParser storing information from parameter.ini file
-    :parameter databaseVersion: Database version (printed to output file)
-    :parameter listOfExpRes: list of ExpResult objects to be considered
+    :parameter datbase: Database holding the list of selected results
     :parameter crashReport: if True, write crash report in case of problems
     :param timeout: set a timeout for one model point (0 means no timeout)
     :returns: output of printers
@@ -245,8 +241,7 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
 
     try:
         with timeOut.Timeout(timeout):
-            res = testPoint(inputFile, outputDir, parser, databaseVersion,
-                             listOfExpRes)
+            res = testPoint(inputFile, outputDir, parser, database)
             for fname,mprinter in res.items():
                 res[fname] = mprinter.flush()
             return res
@@ -263,7 +258,7 @@ def runSingleFile(inputFile, outputDir, parser, databaseVersion, listOfExpRes,
     return {inputFile: None}
 
 
-def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
+def runSetOfFiles(inputFiles, outputDir, parser, database,
                   timeout, development, parameterFile):
     """
     Loop over all input files in inputFiles with testPoint
@@ -271,8 +266,7 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
     :parameter inputFiles: list of input files to be tested
     :parameter outputDir: path to directory where output is be stored
     :parameter parser: ConfigParser storing information from parameter.ini file
-    :parameter databaseVersion: Database version (printed to output file)
-    :parameter listOfExpRes: list of ExpResult objects to be considered
+    :parameter database: Database with selected experimental results
     :parameter development: turn on development mode (e.g. no crash report)
     :parameter parameterFile: parameter file, for crash reports
     :returns: printers output
@@ -280,8 +274,8 @@ def runSetOfFiles(inputFiles, outputDir, parser, databaseVersion, listOfExpRes,
 
     output = {}
     for inputFile in inputFiles:
-        output.update(runSingleFile(inputFile, outputDir, parser, databaseVersion,
-                                    listOfExpRes, timeout, development, parameterFile))
+        output.update(runSingleFile(inputFile, outputDir, parser, database,
+                                    timeout, development, parameterFile))
         gc.collect()
 
     return output
@@ -318,8 +312,8 @@ def _determineNCPus(cpus_wanted, n_files):
     return ncpus
 
 
-def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
-               listOfExpRes, timeout, development, parameterFile):
+def testPoints(fileList, inDir, outputDir, parser, database, 
+               timeout, development, parameterFile):
     """
     Loop over all input files in fileList with testPoint, using ncpus CPUs
     defined in parser
@@ -328,8 +322,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     :param inDir: path to directory where input files are stored
     :param outputDir: path to directory where output is stored
     :param parser: ConfigParser storing information from parameter.ini file
-    :param databaseVersion: Database version (printed to output files)
-    :param listOfExpRes: list of ExpResult objects to be considered
+    :param database: Database with selected experimental results
     :param timeout: set a timeout for one model point (0 means no timeout)
     :param development: turn on development mode (e.g. no crash report)
     :param parameterFile: parameter file, for crash reports
@@ -352,7 +345,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
     elif nFiles == 1:
         logger.info("Running SModelS for a single file")
         runSingleFile(cleanedList[0], outputDir, parser,
-                      databaseVersion, listOfExpRes, timeout,
+                      database, timeout,
                       development, parameterFile)
     else:
 
@@ -368,7 +361,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
 
             # Run a single process:
             outputDict = runSetOfFiles(cleanedList, outputDir, parser,
-                                       databaseVersion, listOfExpRes, timeout,
+                                       database, timeout,
                                        development, parameterFile)
         else:
             logger.info("Running SModelS for %i files with %i processes. Messages will be redirected to smodels.log"
@@ -387,7 +380,7 @@ def testPoints(fileList, inDir, outputDir, parser, databaseVersion,
             children = []
             for chunkFile in chunkedFiles:
                 p = pool.apply_async(runSetOfFiles, args=(chunkFile, outputDir, parser,
-                                                          databaseVersion, listOfExpRes, timeout,
+                                                          database, timeout,
                                                           development, parameterFile,))
                 children.append(p)
             pool.close()
@@ -439,7 +432,7 @@ def loadDatabase(parser, db):
     :parameter db: binary database object. If None, then database is loaded,
                    according to databasePath. If True, then database is loaded,
                    and text mode is forced.
-    :returns: database object, database version
+    :returns: database object
 
     """
     try:
@@ -462,12 +455,11 @@ def loadDatabase(parser, db):
             if os.path.isfile(databasePath):
                 force_load = "pcl"
             database = Database(databasePath, force_load=force_load)
-        databaseVersion = database.databaseVersion
     except DatabaseNotFoundException:
         logger.error("Database not found in ``%s''" %
                      os.path.realpath(databasePath))
         sys.exit()
-    return database, databaseVersion
+    return database
 
 
 def loadDatabaseResults(parser, database):
@@ -575,13 +567,13 @@ def getCombiner(inputFile,parameterFile):
     parser = getParameters(parameterFile)
 
     # Load database and results
-    database, databaseVersion = loadDatabase(parser, None)
-    listOfExpRes = loadDatabaseResults(parser, database)
+    database = loadDatabase(parser, None)
+    loadDatabaseResults(parser, database)
 
     # Run SModelS for a single file and get the printer
     outputDir = './'
     output = testPoint(inputFile, outputDir, parser,
-                                      databaseVersion, listOfExpRes)
+                       database)
     mprinter = list(output.values())[0]
     # Try to exctract the TheoryPredictionsCombiner object from one of the printers.
     combiner = None

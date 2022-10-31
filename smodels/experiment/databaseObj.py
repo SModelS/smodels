@@ -22,6 +22,7 @@ from smodels.experiment import datasetObj
 from smodels.installation import cacheDirectory
 from smodels.experiment.metaObj import Meta
 from smodels.experiment.expResultObj import ExpResult
+from smodels.experiment.expSMSMapObj import ExpSMSMap
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.base.physicsUnits import TeV
 from smodels.experiment.expAuxiliaryFuncs import cleanWalk
@@ -57,8 +58,9 @@ def _getSHA1(filename):
 
 
 class Database(object):
-    """ Database object. Holds a list of SubDatabases.
-        Delegates all calls to SubDatabases.
+    """ 
+    Database object. Holds a list of SubDatabases and the ExpSMS map.
+    Delegates all calls to SubDatabases.
     """
 
     def __init__(self, base=None, force_load=None,
@@ -84,7 +86,6 @@ class Database(object):
         """
         
         self.subs = []
-        self._expResultList = None
         
         if "_fastlim" in base:  # for backwards compatibility
             base = base.replace("_fastlim", "+fastlim")
@@ -93,20 +94,20 @@ class Database(object):
             self.subs.append(SubDatabase(ss, force_load,
                                          progressbar, subpickle, 
                                          combinationsmatrix))
-        self.updateExpResultList()
-        self.centralSMSDict = self.getUniqueSMS()
+        self.expSMSMap = ExpSMSMap(self.expResultList)
 
-    def updateExpResultList(self):
+    @property
+    def expResultList(self):
         """
-        Fetches the experimental results from the SubDatabases
-        and store the list in _expResultList.
+        The combined list of results, compiled from the 
+        the active results in each subdatase.
         """
 
         if len(self.subs) == 0:
-            self._expResultList = []
+            return []
         else:
             lists = [x.expResultList for x in self.subs]
-            self._expResultList = self.mergeLists(lists)        
+            return self.mergeLists(lists)
 
     def mergeLists(self, lists):
         """ small function, merges lists of ERs """
@@ -142,64 +143,6 @@ class Database(object):
                         # a new txname
                         r1.datasets[idx].txnameList.append(txn)
         return r1
-
-    @property
-    def expResultList(self):
-        """
-        The combined list of results, compiled from the 
-        the active results in each subdatase.
-        """
-
-        if self._expResultList is None:
-            self.updateExpResultList()
-
-        return self._expResultList[:]
-
-    def getUniqueSMS(self):
-        """
-        Iterates over all (active) experimental results and build
-        a nested dictionary with the unique SMS as keys and a dictionary
-        {ExpResult : {DataSet : {TxName : smsLabel}}} as values.
-
-        :return: Nested dictionary.
-        """
-
-        smsDict = {}
-                
-        # Loop over active experimental results:
-        # (Note that expResultList returns only the active results)
-        for iexp,exp in enumerate(self.expResultList):
-            # Loop over datasets:
-            for ids,dataset in enumerate(exp.datasets):
-                # Loop over txnames:
-                for itx,tx in enumerate(dataset.txnameList):
-                    # Sort TxName (if it is already tagged as sorted, do nothing)
-                    tx.sortSMSMap()
-                    # Loop over ExpSMS in the txname:
-                    for sms,smsLabel in tx.smsMap.items():
-                        smsMatch = None
-                        # Loop for an identical SMS in smsDict
-                        # (there can only be one match, since the SMS within
-                        # a given txname must be unique)
-                        for sms1 in smsDict:
-                            if sms.identicalTo(sms1):
-                                smsMatch = sms1
-                                break
-                                        
-                        # Update dictionary
-                        if smsMatch is None:
-                            smsDict[sms] = {iexp : {ids : {itx : smsLabel}}}
-                        else:
-                            useDict = smsDict[smsMatch]
-                            entry = [iexp,ids,itx]
-                            # Loop over entries until one is not found
-                            for key in entry:
-                                if useDict.get(key) is None:
-                                    useDict.update({key : {}})
-                                useDict = useDict.get(key)
-                            useDict[itx] = smsLabel      
-
-        return smsDict
 
     def createBinaryFile(self, filename=None):
         """ create a pcl file from all the subs """
@@ -288,10 +231,8 @@ class Database(object):
         for sub in self.subs:
             sub.setActiveExpResults(analysisIDs, datasetIDs, txnames, dataTypes,
                                     useNonValidated, onlyWithExpected)
-        # Update results list:
-        self.updateExpResultList()
-        # Update SMS dict
-        self.centralSMSDict = self.getUniqueSMS()
+        # Update SMS map
+        self.expSMSMap = ExpSMSMap(self.expResultList)
 
     @property
     def databaseParticles(self):
@@ -1195,18 +1136,6 @@ class SubDatabase(object):
         else:
             logger.debug("Binary db file does not need an update.")
 
-
-class ExpResultList(object):
-    """
-    Holds a list of ExpResult objects for printout.
-    """
-
-    def __init__(self, expResList):
-        """
-        :param expResultList: list of ExpResult objects
-        """
-
-        self.allExpResults = expResList
 
 
 if __name__ == "__main__":
