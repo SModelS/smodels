@@ -42,19 +42,16 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         anaids = ["CMS-SUS-16-050-agg", "CMS-SUS-13-012"]
         dsids = ["ar8", "ar9", "3NJet6_1250HT1500_300MHT450"]
         slhafile = "testFiles/slha/T1tttt.slha"
-        exp_results = database.getExpResults(analysisIDs=anaids,
+        database.selectExpResults(analysisIDs=anaids,
                                              datasetIDs=dsids, dataTypes=dTypes)
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles(inputFile=slhafile)
         smstopos = decomposer.decompose(model)
         tpreds = []
-        for er in exp_results:
-            ts = theoryPredictionsFor(er, smstopos,
+        tpreds = theoryPredictionsFor(database, smstopos,
                 combinedResults=False, useBestDataset=False, marginalize=False)
-            for t in ts:
-                t.computeStatistics()
-                # print("er", str(er), "lsm", t.lsm, "lmax", t.lmax)
-                tpreds.append(t)
+        for t in tpreds:
+            t.computeStatistics()
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
         mu_hat, sigma_mu, lmax = combiner.findMuHat(allowNegativeSignals=True,
@@ -87,7 +84,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # expectedBG: 3.7
         # bgError: 2.7948166
         slhafile = "testFiles/slha/T1tttt.slha"
-        exp_results = database.getExpResults(analysisIDs=anaids,
+        database.selectExpResults(analysisIDs=anaids,
                                              datasetIDs=dsids, dataTypes=dTypes)
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles(inputFile=slhafile)
@@ -113,12 +110,9 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # scipy.stats.norm.pdf(x, 9., 2.7948166) * scipy.stats.poisson.pmf(9, x)
         # = 0.01880727876784458
         defaultLmax["CMS-SUS-16-050-agg:ar8"] = 0.01880727876784458
-        for er in exp_results:
-            ts = theoryPredictionsFor(
-                er, smstopos, combinedResults=False, useBestDataset=False, marginalize=False
-            )
-            for t in ts:
-                tpreds.append(t)
+        tpreds = theoryPredictionsFor(database, smstopos, 
+                                      combinedResults=False, useBestDataset=False, 
+                                      marginalize=False)
         for t in tpreds:
             t.computeStatistics()
             dId = t.dataset.dataInfo.dataId
@@ -165,7 +159,6 @@ class CombinedTheoryPredsTest(unittest.TestCase):
           'ATLAS-SUSY-2016-15','ATLAS-SUSY-2019-09']
         db = Database('unittest+unittestextra')
         slhafile = "testFiles/slha/gluino_squarks.slha"
-        exp_results = db.getExpResults()
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles(inputFile=slhafile)
         sigmacut = 0.005*fb
@@ -173,15 +166,9 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         smstopos = decomposer.decompose(model,
                                         sigmacut, massCompress=True, invisibleCompress=True,
                                         minmassgap=mingap)
-        tpreds = []
-        for er in exp_results:
-            ts = theoryPredictionsFor(
-                er, smstopos, combinedResults=True, useBestDataset=False, marginalize=False
-            )
-            if not ts:
-                continue
-            for t in ts:
-                tpreds.append(t)
+        tpreds =  theoryPredictionsFor(database, smstopos, 
+                                       combinedResults=True, useBestDataset=False, 
+                                       marginalize=False)
         combiner = TheoryPredictionsCombiner.selectResultsFrom(tpreds, anaids)
         # IDs that should be selected and the respective expected r-values:
         goodIDs = {

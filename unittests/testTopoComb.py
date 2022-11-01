@@ -61,9 +61,9 @@ XSECTION  1.30E+04  2212 2212 2 1000021 1000021 # 10000 events, [pb], pythia8 fo
             model.updateParticles(filename)
             deco = decompose(model)
 
-            expRes = database.getExpResults( analysisIDs = [ "CMS-SUS-16-050-agg" ] )[0]
+            database.selectExpResults( analysisIDs = [ "CMS-SUS-16-050-agg" ] )
             # print ( "Experimental result: %s" % expRes )
-            tp = theoryPredictionsFor(expRes, deco, useBestDataset=False, combinedResults=True)
+            tp = theoryPredictionsFor(database, deco, useBestDataset=False, combinedResults=True)
             for t in tp:
                 predXSecs[case]=t.xsection
                 rvalues[case]=t.getRValue(expected=True)

@@ -22,7 +22,7 @@ from smodels.experiment import datasetObj
 from smodels.installation import cacheDirectory
 from smodels.experiment.metaObj import Meta
 from smodels.experiment.expResultObj import ExpResult
-from smodels.experiment.expSMSMapObj import ExpSMSMap
+from smodels.experiment.expSMSDict import ExpSMSDict
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.base.physicsUnits import TeV
 from smodels.experiment.expAuxiliaryFuncs import cleanWalk
@@ -94,7 +94,7 @@ class Database(object):
             self.subs.append(SubDatabase(ss, force_load,
                                          progressbar, subpickle, 
                                          combinationsmatrix))
-        self.expSMSMap = ExpSMSMap(self.expResultList)
+        self.expSMSDict = ExpSMSDict(self.expResultList)
 
     @property
     def expResultList(self):

@@ -260,7 +260,6 @@ class TxName(object):
         # using the new nodes dict
         self.relabelDataMap(nodesDict)
         
-
     def processExpr(self, stringExpr, databaseParticles,
                     checkUnique=False):
         """
@@ -902,13 +901,12 @@ class TxName(object):
                  or inclusiveLists are replaced.
         """
 
-        for txsms, txLabel in self.smsMap.items():
+        for txsms, smsLabel in self.smsMap.items():
             # Compare sms:
             matchedSMS = txsms.matchesTo(sms)
             if matchedSMS is None:
                 continue
-            # Attach label used for evaluating expressions
-            matchedSMS.txlabel = txLabel
+            matchedSMS.txlabel = smsLabel
             return matchedSMS
 
         # If this point was reached, there were no macthes

@@ -29,15 +29,13 @@ class SMSIdTest(unittest.TestCase):
         ## model.describe()
 
         topDict = decomposer.decompose(model, sigmacut= 0.1*fb, massCompress=True, invisibleCompress=True, minmassgap= 5*GeV)
-        resultlist = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'])
+        database.selectExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'])
+        allTheorypredictions = [tp for tp in theoryPredictionsFor(database, topDict) if 'EXO' not in tp.analysisId()]
         
-        for res in resultlist:
-            if 'EXO' in res.globalInfo.id: continue #skip EXO searches
-            theorypredictions = theoryPredictionsFor(res, topDict)
-            if not theorypredictions: continue
-            self.assertEqual(len(theorypredictions),1)
-            tpIDs = [sms.smsID for sms in theorypredictions[0].smsList]
-            self.assertEqual(sorted(tpIDs),sorted(listOfIDs[res.globalInfo.id]))            
+        self.assertEqual(len(allTheorypredictions),1)
+        tp = allTheorypredictions[0]
+        tpIDs = [sms.smsID for sms in tp.smsList]
+        self.assertEqual(sorted(tpIDs),sorted(listOfIDs[tp.analysisId()]))            
 
 if __name__ == "__main__":
     unittest.main()

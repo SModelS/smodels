@@ -172,7 +172,6 @@ class TheoryPrediction(object):
 
         return muUL
 
-
     def getRValue(self, expected=False):
         """
         Get the r value = theory prediction / experimental upper limit
@@ -529,7 +528,7 @@ class TheoryPredictionList(object):
                                          reverse=True)
 
 
-def theoryPredictionsFor(expResult, smsTopDict, maxMassDist=0.2,
+def theoryPredictionsFor(database, smsTopDict, maxMassDist=0.2,
                          useBestDataset=True, combinedResults=True,
                          marginalize=False, deltas_rel=None):
     """
@@ -557,66 +556,76 @@ def theoryPredictionsFor(expResult, smsTopDict, maxMassDist=0.2,
         from smodels.base.runtime import _deltas_rel_default
         deltas_rel = _deltas_rel_default
 
-    if isinstance(expResult, (list, tuple)):
-        ret = []
-        for er in expResult:
-            tpreds = theoryPredictionsFor(er, smsTopDict, maxMassDist,
-                                          useBestDataset, combinedResults,
-                                          marginalize, deltas_rel)
-            if tpreds:
-                for tp in tpreds:
-                    ret.append(tp)
-        tpList = TheoryPredictionList(ret)
-        tpList.sortTheoryPredictions()
-        return tpList
 
-    dataSetResults = []
-    #  Compute predictions for each data set (for UL analyses there is one single set)
-    for dataset in expResult.datasets:
-        predList = _getDataSetPredictions(dataset, smsTopDict, maxMassDist)
-        if predList:
-            dataSetResults.append(predList)
-    if not dataSetResults:  # no results at all?
-        return None
-    elif len(dataSetResults) == 1:  # only a single dataset? Easy case.
-        result = dataSetResults[0]
-        for theoPred in result:
+    # Compute matches between TheorySMS from decomposition and the
+    # (unique) ExpSMS in the database
+    smsDict = database.expSMSDict
+    smsMatch = {sms : [] for sms in smsDict}
+    cNamesDict = {}
+    for sms in smsDict:
+        if sms.canonName not in cNamesDict:
+            cNamesDict[sms.canonName] = []
+        cNamesDict[sms.canonName].append(sms)
+
+    for sms in smsTopDict.getSMSList():
+        canonName  = sms.canonName
+        # Select txSMS with matching canon name:
+        selectedSMSlist = []
+        for cName,smsList in cNamesDict.items():
+            if cName == canonName:
+                selectedSMSlist += smsList
+
+        # Loop over selected SMS and check for matches
+        # Store the (correctly orderd) match in smsMatch
+        for txsms in selectedSMSlist:
+            matchedSMS = txsms.matchesTo(sms)
+            if matchedSMS is None:
+                continue
+            smsMatch[txsms].append((matchedSMS,sms))
+
+    ret = []
+    for expResult in database.expResultList:
+        dataSetResults = []
+        #  Compute predictions for each data set (for UL analyses there is one single set)
+        for dataset in expResult.datasets:
+            predList = _getDataSetPredictions(dataset, smsMatch, smsDict, maxMassDist)
+            if predList:
+                dataSetResults.append(predList)
+        if not dataSetResults:  # no results at all?
+            continue
+        
+        #  For results with more than one dataset keep all dataset predictions
+        if len(dataSetResults) == 1:  # only a single dataset? Easy case.
+            expResults = dataSetResults[0]
+        
+        #  if useBestDataSet=False and combinedResults=False:
+        elif not useBestDataset and not combinedResults:
+            expResults = sum(dataSetResults)
+
+        elif combinedResults:  # Try to combine results
+            expResults = TheoryPredictionList()
+            combinedRes = _getCombinedResultFor(dataSetResults,
+                                                expResult, marginalize)
+            if combinedRes is None:  # Can not combine, use best dataset:
+                combinedRes = _getBestResult(dataSetResults)
+            expResults.append(combinedRes)
+        else:  # Use best dataset:
+            expResults = TheoryPredictionList()
+            expResults.append(_getBestResult(dataSetResults))
+
+        for theoPred in expResults:
             theoPred.expResult = expResult
             theoPred.deltas_rel = deltas_rel
             theoPred.upperLimit = theoPred.getUpperLimit()
+        expResults.sortTheoryPredictions()
 
-        result.sortTheoryPredictions()
-        return result
+        for theoPred in expResults:
+            ret.append(theoPred)
 
-    #  For results with more than one dataset, return all dataset predictions
-    #  if useBestDataSet=False and combinedResults=False:
-    if not useBestDataset and not combinedResults:
-        allResults = sum(dataSetResults)
-        for theoPred in allResults:
-            theoPred.expResult = expResult
-            theoPred.deltas_rel = deltas_rel
-            theoPred.upperLimit = theoPred.getUpperLimit()
-        allResults.sortTheoryPredictions()
-        return allResults
+    tpList = TheoryPredictionList(ret)
+    tpList.sortTheoryPredictions()
 
-    elif combinedResults:  # Try to combine results
-        bestResults = TheoryPredictionList()
-        combinedRes = _getCombinedResultFor(dataSetResults,
-                                            expResult, marginalize)
-        if combinedRes is None:  # Can not combine, use best dataset:
-            combinedRes = _getBestResult(dataSetResults)
-        bestResults.append(combinedRes)
-    else:  # Use best dataset:
-        bestResults = TheoryPredictionList()
-        bestResults.append(_getBestResult(dataSetResults))
-
-    for theoPred in bestResults:
-        theoPred.expResult = expResult
-        theoPred.deltas_rel = deltas_rel
-        theoPred.upperLimit = theoPred.getUpperLimit()
-
-    bestResults.sortTheoryPredictions()
-    return bestResults
+    return tpList
 
 
 def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
@@ -712,8 +721,8 @@ def _getBestResult(dataSetResults):
     return bestPred
 
 
-def _getDataSetPredictions(dataset, smsTopDict, maxMassDist,
-                           marginalize=False, deltas_rel=None):
+def _getDataSetPredictions(dataset, smsMatch,smsDict, maxMassDist,
+                           marginalize=False, deltas_rel=None,new=False):
     """
     Compute theory predictions for a given data set.
     For upper-limit results returns the list of theory predictions for the
@@ -736,7 +745,7 @@ def _getDataSetPredictions(dataset, smsTopDict, maxMassDist,
 
     predictionList = TheoryPredictionList()
     #  Select SMS belonging to expResult and apply efficiencies
-    smsList = _getSMSFrom(smsTopDict, dataset)
+    smsList = _getSMSFor(dataset,smsMatch,smsDict)
 
     if len(smsList) == 0:
         return None
@@ -788,37 +797,35 @@ def _getDataSetPredictions(dataset, smsTopDict, maxMassDist,
         return predictionList
 
 
-def _getSMSFrom(smsTopDict, dataset):
+def _getSMSFor(dataset,smsMatch,smsDict):
     """
     Get SMS that belong to any of the TxNames in dataset
     (appear in any of constraints in the result).
-    Loop over all SMS in smsTopDict and returns a copy of the SMS belonging
-    to any of the constraints (i.e. have efficiency != 0). The copied SMS
-    have their weights multiplied by their respective efficiencies.
 
     :parameter dataset:  Data Set to be considered (DataSet object)
-    :parameter smsTopDict: dictionary of SMS, where the canonical names are keys and the TheorySMS objects are values.
-                           (TopologyDict object)
+    :parameter smsMatch: dictionary with unique ExpSMS as keys and the corresponding list of
+                         (matched TheorySMS, orignal TheorySMS) as values
     :returns: list of SMS (TheorySMS objects)
     """
 
     smsList = []
     for txname in dataset.txnameList:
-        for cName in smsTopDict:  # Must loop over all canonical names (in case of inclusive txnames)
-            if cName != txname.canonName:  # Check if the topology appear in txname
-                continue
-            for sms in smsTopDict[cName]:
-                newSMS = txname.hasSMSas(sms)  # Check if SMS appears in txname
-                if not newSMS:
-                    continue
-                sms.setCoveredBy(dataset.globalInfo.type)
-                eff = txname.getEfficiencyFor(newSMS)
+        # Loop over unique SMS for the given txname:
+        for smsLabel,txsms in smsDict[txname].items():
+            for sms,sms_orig in smsMatch[txsms]:
+                # Tag the original SMS as covered:
+                sms_orig.setCoveredBy(dataset.globalInfo.type)
+                # Compute efficiency
+                eff = txname.getEfficiencyFor(sms)
                 if eff is None or abs(eff) < 1e-14:
                     continue
-                sms.setTestedBy(dataset.globalInfo.type)
+                # Tag the original SMS as tested:
+                sms_orig.setTestedBy(dataset.globalInfo.type)
+                newSMS = sms.copy()
                 newSMS.eff = eff
                 newSMS.txname = txname
-                smsList.append(newSMS)  # Save SMS sorted according to the txname
+                newSMS.txlabel = smsLabel             
+                smsList.append(newSMS)
 
     return smsList
 

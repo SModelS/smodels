@@ -26,8 +26,8 @@ class ConditionTest(unittest.TestCase):
         model.updateParticles(filename)
                 
         topolist = decomposer.decompose(model, sigmacut= 0.1*fb, massCompress=True, invisibleCompress=True, minmassgap = 5*GeV)
-        analyses = database.getExpResults(txnames=["TChiWZoff"],analysisIDs='ATLAS-SUSY-2013-12')
-        theoryPrediction = theoryPredictionsFor(analyses[0], topolist)[0]
+        database.selectExpResults(txnames=["TChiWZoff"],analysisIDs='ATLAS-SUSY-2013-12')
+        theoryPrediction = theoryPredictionsFor(database, topolist)[0]
         conditionViolation = theoryPrediction.conditions
         self.assertAlmostEqual(conditionViolation,[0.],3)
         

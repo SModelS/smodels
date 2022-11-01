@@ -38,9 +38,11 @@ class IntegrationTest(unittest.TestCase):
      #            'CMS-SUS-13-012': 19.9647839329 } ## with 20% signal error
                  'CMS-SUS-13-012': 41.42533308488771 } ## thats with no signal error
 
-    def checkAnalysis(self,expresult,smstoplist):
+    def checkAnalysis(self,database,expresult,smstoplist):
         expID = expresult.globalInfo.id
-        theorypredictions = theoryPredictionsFor(expresult, smstoplist)
+        database.selectResults(analysisIDs=[expID],datasetIds=[str(ds) for ds in expresult],
+                               dataTypes=[expresult.dataType()])
+        theorypredictions = theoryPredictionsFor(database, smstoplist)
         defpreds=self.predictions()
         if not theorypredictions:
             print ( "no theory predictions for",expresult,"??" )
@@ -68,13 +70,12 @@ class IntegrationTest(unittest.TestCase):
         # self.configureLogger()
         smstoplist = decomposer.decompose(model, .1*fb, massCompress=True,
                 invisibleCompress=True, minmassgap=5.*GeV)
-        listofanalyses = database.getExpResults(
+        database.selectExpResults(
                 analysisIDs= [ "ATLAS-SUSY-2013-02", "CMS-SUS-13-012" ],
                 txnames = [ "T1" ] )
-        if type(listofanalyses) != list:
-            listofanalyses= [ listofanalyses]
+        listofanalyses = database.expResultList
         for analysis in listofanalyses:
-            self.checkAnalysis(analysis,smstoplist)
+            self.checkAnalysis(database,analysis,smstoplist)
 
     def checkPrediction(self,slhafile,expID,expectedValues, datasetID):
 
@@ -86,14 +87,13 @@ class IntegrationTest(unittest.TestCase):
         smstoplist = decomposer.decompose(model, 0.*fb, massCompress=True,
                 invisibleCompress=True, minmassgap=5.*GeV)
 
-        expresults = database.getExpResults(analysisIDs= expID, datasetIDs=datasetID)
-        for expresult in expresults:
-            theorypredictions = theoryPredictionsFor(expresult, smstoplist)
-            for pred in theorypredictions:
-                predval=pred.xsection
-                expval = expectedValues.pop()
-                delta = expval*0.01
-                self.assertAlmostEqual(predval.asNumber(fb), expval,delta=delta)
+        database.selectExpResults(analysisIDs= expID, datasetIDs=datasetID)
+        theorypredictions = theoryPredictionsFor(database, smstoplist)
+        for pred in theorypredictions:
+            predval=pred.xsection
+            expval = expectedValues.pop()
+            delta = expval*0.01
+            self.assertAlmostEqual(predval.asNumber(fb), expval,delta=delta)
 
         self.assertTrue(len(expectedValues) == 0)
 

@@ -88,7 +88,7 @@ class ExpSMSMap(object):
                             self.smsExpMap[isms] = {iexp : {ids : {itx : smsLabel}}}
                         else:
                             useDict = self.smsExpMap[ismsMatch]
-                            entry = [iexp,ids,itx]
+                            entry = [iexp,ids]
                             # Loop over entries until one is not found
                             for key in entry:
                                 if useDict.get(key) is None:

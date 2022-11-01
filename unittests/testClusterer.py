@@ -347,8 +347,8 @@ class ClustererTest(unittest.TestCase):
 
 
         #Test clustering for UL results
-        expResult = database.getExpResults(analysisIDs='CMS-SUS-16-039',dataTypes='upperLimit')[0]
-        predictions = theoryPredictionsFor(expResult, topDict, combinedResults=False, marginalize=False)
+        database.selectExpResults(analysisIDs='CMS-SUS-16-039',dataTypes='upperLimit')[0]
+        predictions = theoryPredictionsFor(database, topDict, combinedResults=False, marginalize=False)
         clusterSizes = sorted([len(p.smsList) for p in predictions])
         self.assertEqual(clusterSizes, [1,16,24])
 

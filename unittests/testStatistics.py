@@ -138,13 +138,13 @@ class StatisticsTest(unittest.TestCase):
         from smodels.base import runtime
 
         runtime._experimental = True
-        expRes = database.getExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
-        self.assertTrue(len(expRes), 1)
+        database.selectExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
+        self.assertTrue(len(database.expResultList), 1)
         filename = "./testFiles/slha/T1tttt.slha"
         model = Model(BSMList, SMList)
         model.updateParticles(filename)
         smstoplist = decomposer.decompose(model, sigmacut=0)
-        prediction = theoryPredictionsFor(expRes[0], smstoplist)[0]
+        prediction = theoryPredictionsFor(database, smstoplist)[0]
         prediction.computeStatistics()
         import numpy
 
@@ -159,18 +159,18 @@ class StatisticsTest(unittest.TestCase):
         """A simple test to see that the interface in datasetObj
         and TheoryPrediction to the statistics tools is working correctly
         """
-        expRes = database.getExpResults(analysisIDs=["CMS-SUS-13-012"])[0]
+        database.selectExpResults(analysisIDs=["CMS-SUS-13-012"])
 
         filename = "./testFiles/slha/simplyGluino.slha"
         model = Model(BSMList, SMList)
         model.updateParticles(filename)
         smstoplist = decomposer.decompose(model, sigmacut=0)
-        prediction = theoryPredictionsFor(expRes, smstoplist)[0]
+        prediction = theoryPredictionsFor(database, smstoplist)[0]
         pred_signal_strength = prediction.xsection
         prediction.computeStatistics()
         ill = math.log(prediction.likelihood())
         ichi2 = prediction.chi2()
-        nsig = (pred_signal_strength * expRes.globalInfo.lumi).asNumber()
+        nsig = (pred_signal_strength * prediction.dataset.globalInfo.lumi).asNumber()
         m = Data(4, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
         computer = LikelihoodComputer(m)
         dll = math.log(computer.likelihood(mu=1., marginalize=False))

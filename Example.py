@@ -76,7 +76,7 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb,
 
     # Load the experimental results to be used.
     # In this case, all results are employed.
-    listOfExpRes = database.getExpResults()
+    listOfExpRes = database.expResultList
 
     t0 = time.time()
     # Print basic information about the results loaded.
@@ -94,37 +94,32 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb,
     print("\n Theory Predictions and Constraints:")
     rmax = 0.
     bestResult = None
-    allPredictions = []
-    for expResult in listOfExpRes:
-        predictions = theoryPredictionsFor(expResult, topDict, combinedResults=False, marginalize=False)
-        if not predictions:
-            continue  # Skip if there are no constraints from this result
-        print('\n %s ' % expResult.globalInfo.id)
-        for theoryPrediction in predictions:
-            dataset = theoryPrediction.dataset
-            datasetID = theoryPrediction.dataId()
-            txnames = sorted([str(txname) for txname in theoryPrediction.txnames])
-            print("------------------------")
-            print("Dataset = ", datasetID)  # Analysis name
-            print("TxNames = ", txnames)
-            print("Theory Prediction = ", theoryPrediction.xsection)  # Signal cross section
-            print("Condition Violation = ", theoryPrediction.conditions)  # Condition violation values
+    allPredictions = theoryPredictionsFor(database, topDict, combinedResults=False, marginalize=False)
+    for theoryPrediction in allPredictions:
+        print('\n %s ' % theoryPrediction.analysisId())
+        dataset = theoryPrediction.dataset
+        datasetID = theoryPrediction.dataId()
+        txnames = sorted([str(txname) for txname in theoryPrediction.txnames])
+        print("------------------------")
+        print("Dataset = ", datasetID)  # Analysis name
+        print("TxNames = ", txnames)
+        print("Theory Prediction = ", theoryPrediction.xsection)  # Signal cross section
+        print("Condition Violation = ", theoryPrediction.conditions)  # Condition violation values
 
-            # Get the corresponding upper limit:
-            print("UL for theory prediction = ", theoryPrediction.upperLimit)
+        # Get the corresponding upper limit:
+        print("UL for theory prediction = ", theoryPrediction.upperLimit)
 
-            # Compute the r-value
-            r = theoryPrediction.getRValue()
-            print("r = %1.3E" % r)
-            # Compute likelihoods for EM-type results:
-            if dataset.getType() == 'efficiencyMap':
-                theoryPrediction.computeStatistics()
-                print('L_BSM, L_SM, L_max = %1.3E, %1.3E, %1.3E' % (theoryPrediction.likelihood(),
-                      theoryPrediction.lsm(), theoryPrediction.lmax()))
-            if r > rmax:
-                rmax = r
-                bestResult = expResult.globalInfo.id
-            allPredictions.append(theoryPrediction)
+        # Compute the r-value
+        r = theoryPrediction.getRValue()
+        print("r = %1.3E" % r)
+        # Compute likelihoods for EM-type results:
+        if dataset.getType() == 'efficiencyMap':
+            theoryPrediction.computeStatistics()
+            print('L_BSM, L_SM, L_max = %1.3E, %1.3E, %1.3E' % (theoryPrediction.likelihood(),
+                    theoryPrediction.lsm(), theoryPrediction.lmax()))
+        if r > rmax:
+            rmax = r
+            bestResult = theoryPrediction.analysisId()
 
     # Print the most constraining experimental result
     print("\nThe largest r-value (theory/upper limit ratio) is %1.3E" % rmax)
