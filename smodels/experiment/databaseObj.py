@@ -157,8 +157,9 @@ class Database(object):
             ptcl = min(4, serializer.HIGHEST_PROTOCOL)
             ## 4 is default protocol in python3.8, and highest protocol in 3.7
             serializer.dump(self.txt_meta, f, protocol=ptcl)
-            serializer.dump(self.allExpResults, f, protocol=ptcl)
+            serializer.dump(self.expResultList, f, protocol=ptcl)
             serializer.dump(self.databaseParticles, f, protocol=ptcl)
+
             logger.info("%s created." % (filename))
 
     def __str__(self):
@@ -167,16 +168,16 @@ class Database(object):
         idList = "Database version: " + self.databaseVersion
         idList += "\n"
         idList += "-" * len(idList) + "\n"
-        if self.allExpResults == None:
+        if self.expResultList == None:
             idList += "no experimental results available! "
             return idList
         idList += "%d experimental results: " % \
-        len(self.allExpResults)
+        len(self.expResultList)
         atlas, cms = [], []
         datasets = 0
         txnames = 0
         s = {8: 0, 13: 0}
-        for expRes in self.allExpResults:
+        for expRes in self.expResultList:
             Id = expRes.globalInfo.getInfo('id')
             sqrts = expRes.globalInfo.getInfo('sqrts').asNumber(TeV)
             if not sqrts in s.keys():
@@ -232,7 +233,7 @@ class Database(object):
             sub.setActiveExpResults(analysisIDs, datasetIDs, txnames, dataTypes,
                                     useNonValidated, onlyWithExpected)
         # Update SMS map
-        self.expSMSMap = ExpSMSMap(self.expResultList)
+        self.expSMSDict = ExpSMSDict(self.expResultList)
 
     @property
     def databaseParticles(self):
@@ -505,7 +506,7 @@ class SubDatabase(object):
                     t1 = time.time()-t0
                     logger.info("Loaded database from %s in %.1f secs." %
                             (self.pcl_meta.pathname, t1))
-                    self.databaseParticles = None
+                    self.databaseParticles = None                    
                     try:
                         self.databaseParticles = serializer.load(f)
                     except EOFError as e:
@@ -794,16 +795,16 @@ class SubDatabase(object):
         idList = "Database version: " + self.databaseVersion
         idList += "\n"
         idList += "-" * len(idList) + "\n"
-        if self.allExpResults == None:
+        if self.expResultList == None:
             idList += "no experimental results available! "
             return idList
         idList += "%d experimental results: " % \
-        len(self.allExpResults)
+        len(self.expResultList)
         atlas, cms = [], []
         datasets = 0
         txnames = 0
         s = {8: 0, 13: 0}
-        for expRes in self.allExpResults:
+        for expRes in self.expResultList:
             Id = expRes.globalInfo.getInfo('id')
             sqrts = expRes.globalInfo.getInfo('sqrts').asNumber(TeV)
             if not sqrts in s.keys():
