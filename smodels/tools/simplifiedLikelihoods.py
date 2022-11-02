@@ -966,11 +966,11 @@ class LikelihoodComputer:
             theta_hat, _ = self.findThetaHat( tmp )
             minr, avgr, maxr = self.findAvgr( theta_hat )
             bounds = [(minr,maxr)]
-            logger.info ( f"fit failed, try again with {avgr} and bounds {bounds}" )
+            logger.debug ( f"fit failed, try again with {avgr} and bounds {bounds}" )
             # logger.error ( f"o={o}" )
             o = scipy.optimize.minimize( myllhd, x0=avgr, bounds=bounds, jac = self.dNLLdMu )
         if o.success == False:
-            logger.warning ( "fit failed again. dont know what to do." )
+            logger.error ( f"fitting of muhat failed {o.message}. will try to proceed anyhow with last known good value muhat={o.x[0]}. you have been warned." )
             """
             ret = None
             if extended_output:
