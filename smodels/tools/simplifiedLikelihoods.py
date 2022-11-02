@@ -963,16 +963,20 @@ class LikelihoodComputer:
         o = scipy.optimize.minimize( myllhd, x0=avgr, bounds=bounds, jac = self.dNLLdMu )
         if o.success == False:
             tmp = float(o.x[0])
-            minr, avgr, maxr = self.findAvgr( tmp )
+            theta_hat, _ = self.findThetaHat( tmp )
+            minr, avgr, maxr = self.findAvgr( theta_hat )
             bounds = [(minr,maxr)]
-            logger.info ( "fit failed, try again with {avgr} and bounds {bounds}" )
+            logger.info ( f"fit failed, try again with {avgr} and bounds {bounds}" )
+            # logger.error ( f"o={o}" )
             o = scipy.optimize.minimize( myllhd, x0=avgr, bounds=bounds, jac = self.dNLLdMu )
         if o.success == False:
-            logger.info ( "fit failed again. dont know what to do." )
+            logger.warning ( "fit failed again. dont know what to do." )
+            """
             ret = None
             if extended_output:
-                ret = {"muhat": None, "sigma_mu": None, "lmax": None }
+                ret = { "muhat": None, "sigma_mu": None, "lmax": None }
             return None
+            """
 
         llhd = o.fun
         if not nll:

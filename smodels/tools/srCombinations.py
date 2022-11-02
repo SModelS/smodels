@@ -264,19 +264,22 @@ def getCombinedSimplifiedStatistics(
         nobs = [float(x + y) for x, y in zip(bg, theta_hat)]
         computer = LikelihoodComputer(Data(nobs, bg, cov, thirds, nsig, deltas_rel=deltas_rel))
     ret = computer.findMuHat(allowNegativeSignals=allowNegativeSignals, extended_output=True)
+    if ret == None:
+        ret = {}
     lbsm = computer.likelihood ( 1., marginalize = marginalize )
     lsm = computer.likelihood ( 0., marginalize = marginalize )
-    lmax = ret["lmax"]
-    if lsm > lmax:
-        muhat = ret["muhat"]
-        logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-        ret["lmax"] = lsm
-        ret["muhat"] = 0.0
-    if lbsm > lmax:
-        muhat = ret["muhat"]
-        logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-        ret["lmax"] = lbsm
-        ret["muhat"] = 1.0
     ret["lbsm"] = lbsm
     ret["lsm"] = lsm
+    if "lmax" in ret:
+        lmax = ret["lmax"]
+        if lsm > lmax:
+            muhat = ret["muhat"]
+            logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+            ret["lmax"] = lsm
+            ret["muhat"] = 0.0
+        if lbsm > lmax:
+            muhat = ret["muhat"]
+            logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+            ret["lmax"] = lbsm
+            ret["muhat"] = 1.0
     return ret
