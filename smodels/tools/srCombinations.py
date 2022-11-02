@@ -232,7 +232,8 @@ def getCombinedSimplifiedLikelihood(
         nobs = [x.dataInfo.observedN for x in dataset._datasets]
     cov = dataset.globalInfo.covariance
     thirds = [ x.dataInfo.thirdMoment for x in dataset._datasets]
-    computer = LikelihoodComputer(Data(nobs, bg, thirds, nsig,
+    computer = LikelihoodComputer(Data(nobs, bg, covariance = cov,
+                thirdMoment = thirds, nsignal = nsig,
                 deltas_rel=deltas_rel))
     if expected == "posteriori":
         theta_hat, _ = computer.findThetaHat ( 0. )
