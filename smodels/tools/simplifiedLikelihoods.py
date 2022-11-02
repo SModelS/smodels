@@ -961,16 +961,23 @@ class LikelihoodComputer:
             bounds = [(0, max(maxr,1e-5))]
         assert bounds[0][1] > bounds[0][0], f"bounds are in wrong order: {bounds}"
         o = scipy.optimize.minimize( myllhd, x0=avgr, bounds=bounds, jac = self.dNLLdMu )
+        if o.success == False:
+            tmp = float(o.x[0])
+            minr, avgr, maxr = self.findAvgr( tmp )
+            bounds = [(minr,maxr)]
+            logger.info ( "fit failed, try again with {avgr} and bounds {bounds}" )
+            o = scipy.optimize.minimize( myllhd, x0=avgr, bounds=bounds, jac = self.dNLLdMu )
+        if o.success == False:
+            logger.info ( "fit failed again. dont know what to do." )
+            ret = None
+            if extended_output:
+                ret = {"muhat": None, "sigma_mu": None, "lmax": None }
+            return None
+
         llhd = o.fun
         if not nll:
             llhd = np.exp(-o.fun)
-        """
-        hess = o.hess_inv
-        try:
-            hess = hess.todense()
-        except Exception as e:
-            pass
-        """
+
         mu_hat = float(o.x[0])
         if extended_output:
             sigma_mu = self.getSigmaMu ( mu_hat, theta_hat )
