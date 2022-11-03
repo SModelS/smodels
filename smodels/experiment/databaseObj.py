@@ -100,7 +100,7 @@ class Database(object):
     def expResultList(self):
         """
         The combined list of results, compiled from the 
-        the active results in each subdatase.
+        the active results in each subdatabase.
         """
 
         if len(self.subs) == 0:
@@ -339,8 +339,8 @@ class SubDatabase(object):
             base = databasePath(base)
         base, pclfile = self.checkPathName(base)
         self.pcl_meta = Meta(pclfile)
-        self.allExpResults = []
-        self.activeResults = None
+        self._allExpResults = []
+        self._activeResults = []
         self.txt_meta = self.pcl_meta
         if not self.force_load == "pcl":
             self.txt_meta = Meta(base)
@@ -384,9 +384,9 @@ class SubDatabase(object):
             return False
         if not self.txt_meta.sameAs(other.txt_meta):
             return False
-        if len(self.allExpResults) != len(other.allExpResults):
+        if len(self.expResultList) != len(other.expResultList):
             return False
-        for (myres, otherres) in zip(self.allExpResults, other.allExpResults):
+        for (myres, otherres) in zip(self.expResultList, other.expResultList):
             if myres != otherres:
                 return False
         return True
@@ -397,12 +397,17 @@ class SubDatabase(object):
         The list of active results.
         """
 
-        # If active results have never been defined,
-        # set it to all results
-        if self.activeResults is None:
-            self.activeResults = self.getExpResults()
+        return self._activeResults[:]
 
-        return self.activeResults[:]
+    @expResultList.setter
+    def expResultList(self,value):
+        """
+        If a results list is defined for the database,
+        store it in _allExpResults and reset the active list.
+        """
+
+        self._allExpResults = value
+        self._activeResults = self._allExpResults[:]
 
     def loadDatabase(self):
         """ if no binary file is available, then
@@ -424,11 +429,11 @@ class SubDatabase(object):
 
     def loadTextDatabase(self):
         """ simply loads the textdabase """
-        if self.txt_meta.databaseVersion and len(self.allExpResults) > 0:
+        if self.txt_meta.databaseVersion and len(self.expResultList) > 0:
             logger.debug("Asked to load database, but has already been loaded. Ignore.")
             return
         logger.info("Parsing text database at %s" % self.txt_meta.pathname)
-        self.allExpResults = self._loadExpResults()
+        self.expResultList = self._loadExpResults()
         self.createLinksToModel()
         self.createLinksToCombinationsMatrix()
 
@@ -438,7 +443,7 @@ class SubDatabase(object):
             return
         if type(self.databaseParticles) == type(None):
             return
-        for ctr, er in enumerate(self.allExpResults):
+        for ctr, er in enumerate(self.expResultList):
             if not hasattr(er.globalInfo, "_databaseParticles"):
                 er.globalInfo._databaseParticles = self.databaseParticles
             elif type(er.globalInfo._databaseParticles) == type(None):
@@ -450,21 +455,21 @@ class SubDatabase(object):
             return
         if type(self.combinationsmatrix) == type(None):
             return
-        for ctr, er in enumerate(self.allExpResults):
+        for ctr, er in enumerate(self.expResultList):
             if not hasattr(er.globalInfo, "_combinationsmatrix"):
                 er.globalInfo._combinationsmatrix = self.combinationsmatrix
             elif type(er.globalInfo._combinationsmatrix) == type(None):
                 er.globalInfo._combinationsmatrix = self.combinationsmatrix
 
     def clearLinksToCombinationsMatrix(self):
-        for ctr, er in enumerate(self.allExpResults):
+        for ctr, er in enumerate(self.expResultList):
             if hasattr(er.globalInfo, "_combinationsmatrix"):
                 del er.globalInfo._combinationsmatrix
 
     def removeLinksToModel(self):
         """ remove the links of globalInfo._databaseParticles to the model.
             Currently not used. """
-        for ctr, er in enumerate(self.allExpResults):
+        for ctr, er in enumerate(self.expResultList):
             if hasattr(er.globalInfo, "_databaseParticles"):
                 del er.globalInfo._databaseParticles
 
@@ -500,9 +505,9 @@ class SubDatabase(object):
                     logger.info("loading binary db file %s format version %s" %
                            (self.pcl_meta.pathname, self.pcl_meta.format_version))
                     if sys.version[0] == "2":
-                        self.allExpResults = serializer.load(f)
+                        self.expResultList = serializer.load(f)
                     else:
-                        self.allExpResults = serializer.load(f, encoding="latin1")
+                        self.expResultList = serializer.load(f, encoding="latin1")
                     t1 = time.time()-t0
                     logger.info("Loaded database from %s in %.1f secs." %
                             (self.pcl_meta.pathname, t1))
@@ -576,7 +581,7 @@ class SubDatabase(object):
             # ptcl = serializer.HIGHEST_PROTOCOL
             ptcl = min(4, serializer.HIGHEST_PROTOCOL)  # 4 is default protocol in python3.8, and highest protocol in 3.7
             serializer.dump(self.txt_meta, f, protocol=ptcl)
-            serializer.dump(self.allExpResults, f, protocol=ptcl)
+            serializer.dump(self.expResultList, f, protocol=ptcl)
             serializer.dump(self.databaseParticles, f, protocol=ptcl)
             logger.info("%s created." % (binfile))
 
@@ -982,7 +987,7 @@ class SubDatabase(object):
 
         """
 
-        self.activeResults = self.getExpResults(analysisIDs, datasetIDs, txnames,
+        self._activeResults = self.getExpResults(analysisIDs, datasetIDs, txnames,
                                                 dataTypes, useNonValidated, 
                                                 onlyWithExpected)
 
@@ -1031,7 +1036,7 @@ class SubDatabase(object):
 
         import fnmatch
         expResultList = []
-        for expResult in self.allExpResults:
+        for expResult in self._allExpResults:
             analysisID = expResult.globalInfo.getInfo('id')
             sqrts = expResult.globalInfo.getInfo('sqrts')
 
