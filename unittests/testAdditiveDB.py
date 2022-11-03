@@ -26,37 +26,41 @@ class AdditiveDBTest(unittest.TestCase):
         db2 = Database ( "./tinydb/+./database/" ) ## tinydb is subset of database
         self.assertTrue ( len(db2.expResultList) == len(db1.expResultList) )
         tx1, tx2 = [], []
-        for er1, er2 in zip ( db1.getExpResults(), db2.getExpResults() ):
+        for er1, er2 in zip ( db1.expResultList, db2.expResultList ):
             tx1.append ( er1.getTxNames() )
             tx2.append ( er2.getTxNames() )
         self.assertTrue ( len(tx1) == len(tx2) )
 
     def testAddingTxname(self):
         """ tests adding same dataset """
-        sel = ["CMS-PAS-SUS-15-002" ]
+        sel = "CMS-PAS-SUS-15-002"
         tx1, tx2 = [], []
         db1 = Database ( "./database/" )
-        for er1 in db1.getExpResults( analysisIDs= sel ): 
-            tx1.append ( er1.getTxNames() )
+        for er1 in db1.expResultList: 
+            if er1.globalInfo.id == sel:
+                tx1.append ( er1.getTxNames() )
         tx1 = tx1[0]
         db2 = Database ( "./database/+./dbadd1/" ) ## adds a t1 txname
         self.assertTrue ( len(db2.expResultList) == len(db1.expResultList) )
-        for er2 in db2.getExpResults( analysisIDs = sel ):
-            tx2.append ( er2.getTxNames() )
+        for er2 in db2.expResultList:
+            if er2.globalInfo.id == sel:
+                tx2.append ( er2.getTxNames() )
         tx2 = tx2[0]
         self.assertTrue ( len(tx2) == len(tx1)+1 )
 
     def testAddingDataset(self):
         """ tests adding a dataset """
-        sel = ["CMS-SUS-13-012" ]
+        sel = "CMS-SUS-13-012"
         tx1, tx2 = [], []
         db1 = Database ( "./database/" )
-        for er1 in db1.getExpResults( analysisIDs= sel ): 
-            tx1.append ( er1.getTxNames() )
+        for er1 in db1.expResultList: 
+            if er1.globalInfo.id == sel:
+                tx1.append ( er1.getTxNames() )
         tx1 = tx1[0]
         db2 = Database ( "./database/+./dbadd1/" ) ## adds a t1 txname
         self.assertTrue ( len(db2.expResultList) == len(db1.expResultList) )
-        for er2 in db2.getExpResults( analysisIDs = sel ):
+        db2.selectExpResults( analysisIDs = sel )
+        for er2 in db2.expResultList:
             tx2.append ( er2.getTxNames() )
         tx2 = tx2[0]
         db2 = Database ( "./database/+./dbadd1/" ) ## adds a t1 txname

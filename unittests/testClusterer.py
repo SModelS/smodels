@@ -161,8 +161,9 @@ class ClustererTest(unittest.TestCase):
                                        invisibleCompress=True, minmassgap=mingap)
 
         #Test clustering for EM results
-        dataset = database.getExpResults(analysisIDs='CMS-SUS-13-012',
-                                         datasetIDs='3NJet6_800HT1000_300MHT450')[0]
+        database.selectExpResults(analysisIDs='CMS-SUS-13-012',
+                                         datasetIDs='3NJet6_800HT1000_300MHT450')
+        dataset = database.expResultList[0]
         dataset = dataset.getDataset('3NJet6_800HT1000_300MHT450')
 
 
@@ -211,7 +212,8 @@ class ClustererTest(unittest.TestCase):
         n4.mass = 500*GeV
 
         #Test clustering for UL results
-        dataset = database.getExpResults(analysisIDs='ATLAS-SUSY-2013-02',datasetIDs=None)[0]
+        database.selectExpResults(analysisIDs='ATLAS-SUSY-2013-02',datasetIDs=None)
+        dataset = database.expResultList[0]
         dataset = dataset.getDataset(None)
         tx = [t for t in dataset.txnameList if str(t) == 'T1'][0]
         smsList = [tx.hasSMSas(sms) for sms in smsList[:]]
@@ -347,7 +349,7 @@ class ClustererTest(unittest.TestCase):
 
 
         #Test clustering for UL results
-        database.selectExpResults(analysisIDs='CMS-SUS-16-039',dataTypes='upperLimit')[0]
+        database.selectExpResults(analysisIDs='CMS-SUS-16-039',dataTypes='upperLimit')
         predictions = theoryPredictionsFor(database, topDict, combinedResults=False, marginalize=False)
         clusterSizes = sorted([len(p.smsList) for p in predictions])
         self.assertEqual(clusterSizes, [1,16,24])

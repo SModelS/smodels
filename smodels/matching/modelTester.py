@@ -16,7 +16,7 @@ from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base import runtime
 from smodels.decomposition import decomposer
 from smodels.experiment.exceptions import DatabaseNotFoundException
-from smodels.experiment.databaseObj import Database, ExpResultList
+from smodels.experiment.databaseObj import Database
 from smodels.matching import theoryPrediction
 from smodels.matching.theoryPrediction import theoryPredictionsFor
 from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner

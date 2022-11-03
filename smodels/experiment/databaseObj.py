@@ -206,6 +206,20 @@ class Database(object):
                 return False
         return True
 
+    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
+                    dataTypes=['all'], useNonValidated=False,
+                    onlyWithExpected=False):
+        """
+        Select (filter) the results within the database satisfying the restrictions set by the arguments and returns the corresponding results.
+        """
+
+        self.selectExpResults(analysisIDs=analysisIDs, datasetIDs=datasetIDs, 
+                             txnames=txnames, dataTypes=dataTypes, 
+                             useNonValidated=useNonValidated,
+                             onlyWithExpected=onlyWithExpected)
+        
+        return self.expResultList[:]
+
     def selectExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
                     dataTypes=['all'], useNonValidated=False,
                     onlyWithExpected=False):

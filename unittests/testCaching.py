@@ -21,8 +21,9 @@ class CachingTest(unittest.TestCase):
     def testCache(self):
         Cache.n_stored = 10
         Cache.reset()
-        expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], 
+        database.selectExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], 
                     datasetIDs=[None], txnames=["T2bb" ] )
+        expRes = database.expResultList
         txname=expRes[0].datasets[0].txnameList[0] # T2bb
         massesvec = [] 
         for i in range(170,290,10):
