@@ -815,13 +815,14 @@ def _getSMSFor(dataset,smsMatch,smsDict):
             for sms,sms_orig in smsMatch[txsms]:
                 # Tag the original SMS as covered:
                 sms_orig.setCoveredBy(dataset.globalInfo.type)
+                newSMS = sms.copy()
+                newSMS = smsDict.setTxNodeOrdering(newSMS,txname,smsLabel)
                 # Compute efficiency
-                eff = txname.getEfficiencyFor(sms)
+                eff = txname.getEfficiencyFor(newSMS)
                 if eff is None or abs(eff) < 1e-14:
                     continue
                 # Tag the original SMS as tested:
                 sms_orig.setTestedBy(dataset.globalInfo.type)
-                newSMS = sms.copy()
                 newSMS.eff = eff
                 newSMS.txname = txname
                 newSMS.txlabel = smsLabel             

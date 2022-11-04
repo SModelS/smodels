@@ -27,6 +27,7 @@ class ExpSMSDict(dict):
 
         self._smsDict = {}
         self._txDict = {}
+        self._nodesDict = {}
 
         if len(expResultList) > 0:
             self.computeDicts(expResultList)
@@ -109,6 +110,12 @@ class ExpSMSDict(dict):
 
         return iter(self._txDict)
 
+    def setTxNodeOrdering(self,sms,tx,smsLabel):
+
+        nodesDict = self._nodesDict[tx][smsLabel]
+        sms.relabelNodeIndices(nodesDict)
+        
+        return sms
 
     def computeDicts(self,expResultList):
         """
@@ -125,14 +132,20 @@ class ExpSMSDict(dict):
         for exp in expResultList:
             # Loop over txnames:
             for tx in exp.getTxNames():
-                # Sort TxName (if it is already tagged as sorted, do nothing)
-                tx.sortSMSMap()
                 # Loop over ExpSMS in the txname:
                 if tx in self.getTx():
-                    logger.error("TxName %s fpr %s already present in the map (should never happen)!" %(tx,exp))
+                    logger.error("TxName %s for %s already present in the map (should never happen)!" %(tx,exp))
                     raise SModelSError()
                 self[tx] = {}
+                self._nodesDict[tx] = {}
                 for sms,smsLabel in tx.smsMap.items():
+                    sms = sms.copy()
+                    # Keep the mapping between original nodes
+                    # and sorted nodes
+                    nodesDict = sms.sort()
+                    invertNodesDict = {newIndex : oldIndex 
+                                      for oldIndex,newIndex 
+                                      in nodesDict.items()}
                     smsMatch = None
                     # Loop for an identical SMS in smsDict
                     # (there can only be one match, since the SMS within
@@ -146,6 +159,8 @@ class ExpSMSDict(dict):
                     if smsMatch is None:
                         self[sms] = {tx : smsLabel}
                         self[tx][smsLabel] = sms
+                        self._nodesDict[tx][smsLabel] = invertNodesDict
                     else:
                         self[smsMatch].update({tx : smsLabel})
                         self[tx][smsLabel] = smsMatch
+                        self._nodesDict[tx][smsLabel] = invertNodesDict
