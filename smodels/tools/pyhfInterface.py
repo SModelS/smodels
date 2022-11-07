@@ -637,6 +637,8 @@ class PyhfUpperLimitComputer:
             obss[chdata["name"]] = chdata["data"][0]
         vars = []
         for c in channels:
+            if not c in nsig:
+                continue
             # poissonian error
             if nsig[c]==0.:
                 nsig[c]=1e-5
