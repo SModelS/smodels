@@ -1,4 +1,10 @@
 
+Release v2.2.2, xxx xx xxxxxxx 2022
+=======================================================
+
+  * added support for simplified likelihoods v2
+  * small issues with newer pyhf likelihoods
+
 Release v2.2.1, Tue 18 October 2022
 =======================================================
 
