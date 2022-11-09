@@ -61,6 +61,8 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
             logger.warning("All signals are empty")
             return None
         ulcomputer = _getPyhfComputer(dataset, nsig)
+        if ulcomputer == None: ## happens when sth is wrong with the data
+            return None
         ret = ulcomputer.getUpperLimitOnSigmaTimesEff(expected=expected)
         logger.debug("pyhf upper limit : {}".format(ret))
         return ret
@@ -102,6 +104,8 @@ def getCombinedPyhfStatistics(
         # Getting the path to the json files
         # Loading the jsonFiles
         ulcomputer = _getPyhfComputer(dataset, nsig, False)
+        if ulcomputer is None:
+            return {"lbsm": None, "lmax": None, "lsm": None, "muhat": None, "sigma_mu": None }
         index = ulcomputer.getBestCombinationIndex()
         lbsm = ulcomputer.likelihood(mu=1.0, workspace_index=index, expected=expected)
         lmax = ulcomputer.lmax(
