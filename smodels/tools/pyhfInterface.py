@@ -200,7 +200,8 @@ class PyhfData:
                 nBinsJson += sr["size"]
             if nBinsJson != len(subSig):
                 logger.error(
-                    "The number of signals provided is different from the number of bins for json number {} and channel number {}".format(
+                    "The number of signals provided ({}) is different from the number of bins for json ({}) number {} and channel number {}".format( \
+                        len(subSig), nBinsJson,
                         self.channelsInfo.index(wsInfo), self.nsignals.index(subSig)
                     )
                 )
