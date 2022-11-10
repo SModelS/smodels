@@ -12,7 +12,7 @@
 .. |CodeFactor| image:: https://www.codefactor.io/repository/github/smodels/smodels/badge/main
    :target: https://www.codefactor.io/repository/github/smodels/smodels/overview/main
 
-.. |Docs| image:: https://img.shields.io/badge/docs-master-blue.svg                    
+.. |Docs| image:: https://img.shields.io/badge/docs-main-blue.svg                    
    :target: https://smodels.readthedocs.io
 
 .. |Binder| image:: https://mybinder.org/badge_logo.svg

@@ -62,6 +62,7 @@ class Data:
         :param observed: number of observed events per dataset
         :param backgrounds: expected bg per dataset
         :param covariance: uncertainty in background, as a covariance matrix
+        :param thirdMoment: third moment for the simplified likelihoods v2
         :param nsignal: number of signal events in each dataset
         :param name: give the model a name, just for convenience
         :param deltas_rel: the assumed relative error on the signal hypotheses.
@@ -88,14 +89,22 @@ class Data:
         self.thirdMoment = self.convert(thirdMoment)
         self.name = name
         self.deltas_rel = deltas_rel
-        self._computeABC()
+        self.V = self.covariance
+        # Coefficients for SLv2:
+        self.A = None
+        self.B = None
+        self.C = None
+        # In case thirdMomenta is available, compute
+        # the coefficients:
+        if self.hasThirdMomenta():
+            self._computeABC()
 
     def hasThirdMomenta ( self ):
         """ do we have an SLv2? """
-        if type( self.thirdMoment ) == type ( None ):
+        if self.thirdMoment is None:
             return False
-        if type(self.thirdMoment) in [ list, ndarray ]:
-            if self.thirdMoment[0]==None:
+        if isinstance(self.thirdMoment, (list, ndarray)):
+            if self.thirdMoment[0] is None:
                 return False
             # s = sum ( self.thirdMoment )
         return True
@@ -181,14 +190,8 @@ class Data:
     def _computeABC(self):
         """
         Compute the terms A, B, C, rho, V. Corresponds with
-        Eqs. 1.27-1.30 in arXiv:1809.05548
+        Eqs. 2.9-2.12 in arXiv:1809.05548
         """
-        self.V = self.covariance
-        if not self.hasThirdMomenta():
-            self.A = None
-            self.B = None
-            self.C = None
-            return
 
         covD = self.diagCov()
         C = []
@@ -212,14 +215,6 @@ class Data:
                 )
                 self.rho[x][y] = e
                 self.rho[y][x] = e
-
-        self.sandwich()
-        # self.V = sandwich ( self.B, self.rho )
-
-    def sandwich(self):
-        """
-        Sandwich product
-        """
 
         ret = np.array([[0.0] * len(self.B)] * len(self.B))
         for x in range(len(self.B)):

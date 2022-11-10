@@ -61,7 +61,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
             logger.warning("All signals are empty")
             return None
         ulcomputer = _getPyhfComputer(dataset, nsig)
-        if ulcomputer == None: ## happens when sth is wrong with the data
+        if ulcomputer is None: ## happens when sth is wrong with the data
             return None
         ret = ulcomputer.getUpperLimitOnSigmaTimesEff(expected=expected)
         logger.debug("pyhf upper limit : {}".format(ret))
@@ -268,7 +268,7 @@ def getCombinedSimplifiedStatistics(
         nobs = [float(x + y) for x, y in zip(bg, theta_hat)]
         computer = LikelihoodComputer(Data(nobs, bg, cov, thirds, nsig, deltas_rel=deltas_rel))
     ret = computer.findMuHat(allowNegativeSignals=allowNegativeSignals, extended_output=True)
-    if ret == None:
+    if ret is None:
         ret = {}
     lbsm = computer.likelihood ( 1., marginalize = marginalize )
     lsm = computer.likelihood ( 0., marginalize = marginalize )

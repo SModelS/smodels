@@ -1323,14 +1323,13 @@ class SLHAPrinter(TxTPrinter):
             txnameStr = txnameStr.replace(
                 "'", "").replace("[", "").replace("]", "")
 
-            output += " %d 0 %-30s #txname \n" % (cter, txnameStr)
-            sr = str(r)
-            if type(r) == type(None):
+            output += " %d 0 %-30s #txname \n" % (cter, txnameStr)            
+            if r is None:
                 sr = "N/A"
             try:
-              sr = "%-30.3E" % r
+                sr = "%-30.3E" % r
             except TypeError as e:
-                pass
+                sr = str(r)
             output += " %d 1 %s #r value\n" % (cter, sr )
             if not r_expected:
                 output += " %d 2 N/A                            #expected r value\n" % (
