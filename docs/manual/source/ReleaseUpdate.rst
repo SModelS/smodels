@@ -41,7 +41,7 @@ New in Version 2.2.2:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * added support for simplified likelihoods v2
-  * small issues with newer pyhf likelihoods
+  * fixed small issues with newer pyhf likelihoods
   * Database extension -- added new results from 2 ATLAS and 2 CMS analyses:
     - results from ATLAS:
       ATLAS-SUSY-2018-05 (UL), ATLAS-SUSY-2018-32 (EM)
