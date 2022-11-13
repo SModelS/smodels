@@ -42,6 +42,12 @@ New in Version 2.2.2:
 
   * added support for simplified likelihoods v2
   * small issues with newer pyhf likelihoods
+  * Database extension -- added new results from 2 ATLAS and 2 CMS analyses:
+    - results from ATLAS:
+      ATLAS-SUSY-2018-05 (UL), ATLAS-SUSY-2018-32 (EM)
+    - results from CMS:
+      CMS-SUS-20-004 (UL), CMS-SUS-21-002 (UL)
+  * Added expected Upper Limit maps to CMS-SUS-19-009
 
 New in Version 2.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
