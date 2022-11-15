@@ -1167,6 +1167,7 @@ class UpperLimitComputer:
             a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot, allowNegative=False )
         except SModelSError as e:
             return None
+        np.random.seed(seed=233423) # make it deterministic
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
         return mu_lim
 
