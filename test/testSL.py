@@ -113,7 +113,7 @@ class SLTest(unittest.TestCase):
         # self.assertAlmostEqual( lComp.sigma_mu, 798.9887891147, 2 )
         self.assertAlmostEqual( lComp.sigma_mu, 800.1380826235132, 2 )
         lmax = lComp.lmax ( allowNegativeSignals=True )
-        self.assertAlmostEqual( lmax, 2.1708552631256182e-09, 12 )
+        self.assertAlmostEqual( lmax, 2.1708552631256182e-09, 8 )
         #self.assertAlmostEqual( lComp.muhat, -71.523083468, 7 )
         self.assertAlmostEqual( lComp.muhat, -72.63852360245156, 7 )
         #self.assertAlmostEqual( lComp.sigma_mu, 795.0121298843319 )

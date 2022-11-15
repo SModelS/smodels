@@ -1169,6 +1169,7 @@ class UpperLimitComputer:
             return None
         np.random.seed(seed=233423) # make it deterministic
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
+        logger.debug ( f"muhat={mu_hat}+-{sigma_mu} a,b={a,b} mu_lim={mu_lim}" )
         return mu_lim
 
     def computeCLs(
