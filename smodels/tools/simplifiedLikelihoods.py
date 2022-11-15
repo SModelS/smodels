@@ -1157,6 +1157,7 @@ class UpperLimitComputer:
         except SModelSError as e:
             return None
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
+        logger.debug ( f"muhat={mu_hat}+-{sigma_mu} a,b={a,b} mu_lim={mu_lim}" )
         return mu_lim
 
     def computeCLs(
