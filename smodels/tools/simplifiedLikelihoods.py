@@ -955,15 +955,19 @@ class LikelihoodComputer:
         if not allowNegativeSignals:
             bounds = [(0, max(maxr,1e-5))]
         assert bounds[0][1] > bounds[0][0], f"bounds are in wrong order: {bounds}"
-        o = scipy.optimize.minimize( myllhd, x0=avgr, bounds=bounds, jac = self.dNLLdMu )
+
+        o = scipy.optimize.minimize( myllhd, x0=avgr, bounds=bounds, jac = self.dNLLdMu, method = "SLSQP" )
         if o.success == False:
+            oldnll = o.fun
             tmp = float(o.x[0])
             theta_hat, _ = self.findThetaHat( tmp )
             minr, avgr, maxr = self.findAvgr( theta_hat )
             bounds = [(minr,maxr)]
             logger.debug ( f"fit failed, try again with {avgr} and bounds {bounds}" )
-            # logger.error ( f"o={o}" )
             o = scipy.optimize.minimize( myllhd, x0=avgr, bounds=bounds, jac = self.dNLLdMu )
+            logger.debug ( f"after second minimization we are at {o.x, o.fun, o.success, o.message}" )
+            if o.fun > oldnll:
+                logger.warning ( f"after repeating minimization we have worse result: nll({tmp})={oldnll}<nll({o.x[0]})={o.fun}!" )
         if o.success == False:
             logger.error ( f"fitting of muhat failed {o.message}. will try to proceed anyhow with last known good value muhat={o.x[0]}. you have been warned." )
             """
