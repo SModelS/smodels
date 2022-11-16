@@ -98,6 +98,11 @@ class Data:
         # the coefficients:
         if self.hasThirdMomenta():
             self._computeABC()
+        # self.print ()
+
+    def print ( self ):
+        print ( "[SLData] sig", self.nsignal[:3] )
+        print ( "[SLData] A,B,C", self.A, self.B, self.C )
 
     def hasThirdMomenta ( self ):
         """ do we have an SLv2? """
@@ -209,9 +214,14 @@ class Data:
         for x in range(self.n):
             for y in range(x, self.n):
                 bxby = self.B[x] * self.B[y]
-                cxcy = self.C[x] * self.C[y]
+                epsilon = 1e-5
+                cx = self.C[x]
+                cy = self.C[y]
+                cx += epsilon if cx >= 0 else -epsilon
+                cy += epsilon if cy >= 0 else -epsilon
+                cxcy = cx * cy
                 e = (4.0 * cxcy) ** (-1) * (
-                    sqrt(bxby**2 + 8 * cxcy * self.covariance[x][y]) - bxby
+                    sqrt(abs(bxby**2 + 8 * cxcy * self.covariance[x][y])) - bxby
                 )
                 self.rho[x][y] = e
                 self.rho[y][x] = e
