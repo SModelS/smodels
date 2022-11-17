@@ -98,7 +98,7 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     parser = modelTester.getParameters(parameterFile)
 
     """ Check database location and load database, exit if not found """
-    database, databaseVersion = modelTester.loadDatabase(parser, db)
+    database = modelTester.loadDatabase(parser, db)
 
     """ Get list of input files to be tested """
     fileList, inDir = modelTester.getAllInputFiles(inFile)
@@ -110,8 +110,8 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     modelTester.loadDatabaseResults(parser, database)
 
     """ Test all input points """
-    modelTester.testPoints(fileList, inDir, outputDir, parser, databaseVersion,
-                 database, timeout, development, parameterFile )
+    modelTester.testPoints(fileList, inDir, outputDir, parser,
+                           database, timeout, development, parameterFile)
 
 if __name__ == "__main__":
     main()

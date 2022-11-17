@@ -134,7 +134,7 @@ def cleanDatabase ():
     databaseFolders = ['./database', './databaseBroken','./tinydb',
                        './database_extra', './database_simple', './dbadd1']
     for db in databaseFolders:
-        for dirpath,dirnames,filenames in os.walk(db):
+        for dirpath,_,filenames in os.walk(db):
             for f in filenames:
                 if os.path.splitext(f)[1] != '.pcl':
                     continue
@@ -142,6 +142,7 @@ def cleanDatabase ():
                 os.remove(filename)
 
 if __name__ == "__main__":
+
     import argparse
     ap = argparse.ArgumentParser('runs the complete test suite')
     ap.add_argument('-c','--clean_database', help='remove database pickle files',
@@ -154,18 +155,21 @@ if __name__ == "__main__":
                     action='store_true', default = False)
     args = ap.parse_args()
 
-    if not args.notebooks:
-        print('Notebooks WILL NOT be tested.')
-    if args.reduced:
-        print('Reduced set of unit tests')
-
     if args.clean_database:
+        print('Deleting database pickle files.')
         cleanDatabase()
-    elif args.parallel:
-        parallel_run(args.verbose, args.notebooks, args.reduced)
-        sys.exit()
-    elif args.verbose:
-        verbose_run(args.filter, args.notebooks, args.reduced)
-        sys.exit()
     else:
-        run(args.filter, args.notebooks, args.reduced)
+        if not args.notebooks:
+            print('Notebooks WILL NOT be tested.')
+        if args.reduced:
+            print('Reduced set of unit tests')
+
+
+        elif args.parallel:
+            parallel_run(args.verbose, args.notebooks, args.reduced)
+            sys.exit()
+        elif args.verbose:
+            verbose_run(args.filter, args.notebooks, args.reduced)
+            sys.exit()
+        else:
+            run(args.filter, args.notebooks, args.reduced)

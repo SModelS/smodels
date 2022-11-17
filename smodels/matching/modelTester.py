@@ -501,7 +501,7 @@ def loadDatabaseResults(parser, database):
 
     database.selectExpResults(analysisIDs=analyses, txnames=txnames,
                                  datasetIDs=datasetIDs, dataTypes=dataTypes,
-                                 useSuperseded=useSuperseded, useNonValidated=useNonValidated)
+                                 useNonValidated=useNonValidated)
     
 
 def getParameters(parameterFile):

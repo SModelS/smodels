@@ -470,7 +470,8 @@ class TheoryPredictionList(object):
         condition violation < maxCond.
         """
         self._theoryPredictions = []
-        if theoryPredictions and isinstance(theoryPredictions, list):
+        if theoryPredictions and isinstance(theoryPredictions, 
+                                            (TheoryPredictionList,list)):
 
             if not maxCond:
                 self._theoryPredictions = theoryPredictions
@@ -478,7 +479,7 @@ class TheoryPredictionList(object):
                 newPredictions = []
                 for theoPred in theoryPredictions:
                     mCond = theoPred.getmaxCondition()
-                    if mCond == "N/A" or round(mCond/maxCond, 2) > 1.0:
+                    if mCond != "N/A" and round(mCond/maxCond, 2) > 1.0:
                         continue
                     else:
                         newPredictions.append(theoPred)
