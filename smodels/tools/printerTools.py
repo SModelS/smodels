@@ -148,6 +148,79 @@ def printScanSummary(outputDict, outputFile):
             f.write(row+'\n')
     return
 
+def formatNestedDict(outputDict,ident=0,maxLength=50):
+    """
+    Convert a nested dictionary to a string
+    with identation.
+
+    :param outputDict: Dictionary to be printed
+    :param ident: Current identation
+    :param maxLength: Maximum length allowed without identation
+
+    return: String with formatted output
+    """
+
+    if len(str(outputDict)) <= maxLength:
+        return str(outputDict)
+
+    output = '{\n'
+    for ik,(key,val) in enumerate(outputDict.items()):
+        if isinstance(val,dict):
+            valStr = formatNestedDict(val,ident=ident+4,maxLength=maxLength)
+        elif isinstance(val,list):
+            valStr = formatNestedList(val,ident=ident+4,maxLength=maxLength)
+        elif isinstance(val,str):
+            valStr = "'"+val+"'"
+        else:
+            valStr = str(val)
+
+        if isinstance(key,str):
+            keyStr = "'"+key+"'"
+        else:
+            keyStr = str(key)
+        if ik == 0:
+            output += ' '*ident+"%s : %s,\n" %(keyStr,valStr)
+        elif ik != len(outputDict)-1:
+            output += "%s : %s,\n" %(' '*ident+keyStr,valStr)
+        else:
+            output += "%s : %s\n" %(' '*ident+keyStr,valStr)
+    output += ' '*(ident-4)+'}'
+    return output
+
+def formatNestedList(outputList,ident=0,maxLength=50):    
+    """
+    Convert a nested list to a string
+    with identation.
+
+    :param outputList: List to be formatted
+    :param ident: Current identation
+    :param maxLength: Maximum length allowed without identation
+
+    return: String with formatted output
+    """
+
+    if len(str(outputList)) <= maxLength:
+        return str(outputList)
+
+    output = '[\n'
+    for iv,val in enumerate(outputList):
+        if isinstance(val,dict):
+            valStr = formatNestedDict(val,ident=ident+4,maxLength=maxLength)
+        elif isinstance(val,list):
+            valStr = formatNestedList(val,ident=ident+4,maxLength=maxLength)
+        elif isinstance(val,str):
+            valStr = "'"+val+"'"
+        else:
+            valStr = str(val)
+
+        if iv == 0 :
+            output += ' '*ident+'%s,\n' %(valStr)
+        elif iv != len(outputList)-1:
+            output += '%s,\n' %(' '*ident+valStr)
+        else:
+            output += '%s\n' %(' '*ident+valStr)
+    output += ' '*(ident-4)+']'
+    return output
 
 def getSummaryFrom(output, ptype):
     """
@@ -380,3 +453,4 @@ def getInfoFromSummary(output):
     anaIDs = np.array(anaIDs)
 
     return rvals, rexp, anaIDs, r_comb, rexp_comb, anaID_comb
+

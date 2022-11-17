@@ -19,6 +19,7 @@ from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.basicPrinter import BasicPrinter
+from smodels.tools.printerTools import formatNestedDict
 import numpy as np
 from collections import OrderedDict
 from xml.dom import minidom
@@ -70,7 +71,7 @@ class PyPrinter(BasicPrinter):
                 continue  # Skip empty output
             outputDict.update(output)
 
-        output = 'smodelsOutput = '+str(outputDict)
+        output = 'smodelsOutput = ' + formatNestedDict(outputDict)
         if self.output == 'stdout':
             sys.stdout.write(output)
         elif self.output == 'file':
