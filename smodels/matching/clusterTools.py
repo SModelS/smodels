@@ -108,12 +108,20 @@ class AverageSMS(TheorySMS):
         if not isinstance(other, TheorySMS):
             return -1
 
-        otherProperties = [other.getBSMattr(attr) for attr in self.properties]
-        selfProperties = [self.getBSMattr(attr) for attr in self.properties]
-
-        comp = (selfProperties > otherProperties) - (otherProperties > selfProperties)
-
-        return comp
+        for nodeIndex in self.nodeIndices:
+            nodeA = self.indexToNode(nodeIndex)
+            nodeB = other.indexToNode(nodeIndex)
+            if nodeA.isSM and nodeB.isSM:
+                continue
+            for attr in self.properties:
+                attrA = getattr(nodeA,attr)
+                attrB = getattr(nodeB,attr)
+                if attrA != attrB:
+                    if attrA > attrB:
+                        return 1
+                    else:
+                        return -1
+        return 0
 
     def __lt__(self, other):
         return self.__cmp__(other) == -1

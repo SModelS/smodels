@@ -241,24 +241,6 @@ class TheorySMS(GenericSMS):
 
         return prodXSec*brs
 
-    def getBSMattr(self,attr):
-        """
-        Returns the list of attribute values for the BSM particles
-        following the node ordering in self.
-
-        :param attr: Attribute label (str)
-
-        :return: List of attribute values
-        """
-
-        values = []
-        for node in self.nodes:
-            if node.isSM:
-                continue
-            values.append(getattr(node,attr))
-
-        return values
-
     def _getAncestorsDict(self, igen=0):
         """
         Returns a dictionary with all the ancestors
