@@ -375,7 +375,7 @@
     <Total_xsec_for_missing_topologies_fb>3065.78</Total_xsec_for_missing_topologies_fb>
     <Total_xsec_for_missing_topologies_with_displaced_decays_fb>0.0</Total_xsec_for_missing_topologies_with_displaced_decays_fb>
     <Total_xsec_for_missing_topologies_with_prompt_decays_fb>3065.78</Total_xsec_for_missing_topologies_with_prompt_decays_fb>
-    <Total_xsec_for_topologies_outside_the_grid_fb>237.4251</Total_xsec_for_topologies_outside_the_grid_fb>
+    <Total_xsec_for_topologies_outside_the_grid_fb>235.8</Total_xsec_for_topologies_outside_the_grid_fb>
     <missing_topologies_List>
         <missing_topologies>
             <element>[[[jet,W]],[[jet,jet,W]]] (MET,MET)</element>
@@ -501,16 +501,6 @@
             <element>[[[jet]],[[t,t]]] (MET,MET)</element>
             <sqrts_TeV>13.0</sqrts_TeV>
             <weight_fb>1.531994</weight_fb>
-        </topologies_outside_the_grid>
-        <topologies_outside_the_grid>
-            <element>[[[jet]],[[b,b]]] (MET,MET)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>0.9943977</weight_fb>
-        </topologies_outside_the_grid>
-        <topologies_outside_the_grid>
-            <element>[[[jet,jet]],[[b,b]]] (MET,MET)</element>
-            <sqrts_TeV>13.0</sqrts_TeV>
-            <weight_fb>0.6801837</weight_fb>
         </topologies_outside_the_grid>
     </topologies_outside_the_grid_List>
 </smodelsOutput>

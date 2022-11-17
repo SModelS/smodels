@@ -74,7 +74,7 @@ combined r-value (expected):  2.068E-01
 Total cross-section for missing topologies (fb):  3.066E+03
 Total cross-section for missing topologies with displaced decays (fb):  0.000E+00
 Total cross-section for missing topologies with prompt decays (fb):  3.066E+03
-Total cross-section for topologies outside the grid (fb):  2.374E+02
+Total cross-section for topologies outside the grid (fb):  2.358E+02
 
 #Full information on unconstrained cross sections
 ================================================================================
@@ -112,6 +112,4 @@ Sqrts (TeV)   Weight (fb)                  Element description
  13.0          2.333E+01    #                       [[[jet]],[[jet,jet]]] (MET,MET) 
  13.0          3.762E+00    #                           [[[b,W]],[[b,W]]] (MET,MET) 
  13.0          1.532E+00    #                           [[[jet]],[[t,t]]] (MET,MET) 
- 13.0          9.944E-01    #                           [[[jet]],[[b,b]]] (MET,MET) 
- 13.0          6.802E-01    #                       [[[jet,jet]],[[b,b]]] (MET,MET) 
 ================================================================================

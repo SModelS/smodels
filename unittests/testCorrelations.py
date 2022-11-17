@@ -31,6 +31,8 @@ class CorrelationsTest(unittest.TestCase):
         """
         ds1 = database.getExpResults( analysisIDs = [ "ATLAS-SUSY-2013-05" ] )[0].datasets[0]
         ds3 = database.getExpResults( analysisIDs = [ "ATLAS-SUSY-2013-12" ] )[0].datasets[0]
+        # Reset database:
+        database.selectExpResults()
         self.assertFalse ( ds1.isCombinableWith ( ds3 ) )
         database.combinationsmatrix = { "ATLAS-SUSY-2013-12": [ "ATLAS-SUSY-2013-05" ] }
         database.createLinksToCombinationsMatrix()

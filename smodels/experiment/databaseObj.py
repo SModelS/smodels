@@ -469,21 +469,21 @@ class SubDatabase(object):
             return
         if type(self.combinationsmatrix) == type(None):
             return
-        for ctr, er in enumerate(self.expResultList):
+        for er in self.expResultList:
             if not hasattr(er.globalInfo, "_combinationsmatrix"):
                 er.globalInfo._combinationsmatrix = self.combinationsmatrix
             elif type(er.globalInfo._combinationsmatrix) == type(None):
                 er.globalInfo._combinationsmatrix = self.combinationsmatrix
 
     def clearLinksToCombinationsMatrix(self):
-        for ctr, er in enumerate(self.expResultList):
+        for er in self.expResultList:
             if hasattr(er.globalInfo, "_combinationsmatrix"):
                 del er.globalInfo._combinationsmatrix
 
     def removeLinksToModel(self):
         """ remove the links of globalInfo._databaseParticles to the model.
             Currently not used. """
-        for ctr, er in enumerate(self.expResultList):
+        for er in self.expResultList:
             if hasattr(er.globalInfo, "_databaseParticles"):
                 del er.globalInfo._databaseParticles
 
@@ -1121,7 +1121,6 @@ class SubDatabase(object):
                         logger.debug("validated is None in %s/%s/%s. Please set to True, False, N/A, or tbd." %
                             (expResult.globalInfo.id, dataset.dataInfo.dataId, txname))
                     if txname.validated not in [None, True, "true", "n/a", "tbd"] and (not useNonValidated):
-                        #                    if txname.validated is False and (not useNonValidated):
                         continue
                     if txnames != ['all']:
                         #Replaced by wildcard-evaluation below (2018-04-06 mat)
