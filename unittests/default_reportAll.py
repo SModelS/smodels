@@ -1362,7 +1362,7 @@ smodelsOutputDefault={
             'element': '[[[jet,W]],[[jet,jet,jet,W]]] (MET,MET)'
         }
     ],
-    'Total xsec for topologies outside the grid (fb)': 237.4251,
+    'Total xsec for topologies outside the grid (fb)': 235.8,
     'topologies outside the grid': [
         {
             'sqrts (TeV)': 13.0,
@@ -1383,16 +1383,6 @@ smodelsOutputDefault={
             'sqrts (TeV)': 13.0,
             'weight (fb)': 1.531994,
             'element': '[[[jet]],[[t,t]]] (MET,MET)'
-        },
-        {
-            'sqrts (TeV)': 13.0,
-            'weight (fb)': 0.9943977,
-            'element': '[[[jet]],[[b,b]]] (MET,MET)'
-        },
-        {
-            'sqrts (TeV)': 13.0,
-            'weight (fb)': 0.6801837,
-            'element': '[[[jet,jet]],[[b,b]]] (MET,MET)'
         }
     ]
 }
