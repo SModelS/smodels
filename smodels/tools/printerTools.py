@@ -170,20 +170,25 @@ def formatNestedDict(outputDict,ident=0,maxLength=50):
         elif isinstance(val,list):
             valStr = formatNestedList(val,ident=ident+4,maxLength=maxLength)
         elif isinstance(val,str):
-            valStr = "'"+val+"'"
+            valStr = val.replace("'","")
+            valStr = "'"+valStr+"'"
         else:
             valStr = str(val)
 
         if isinstance(key,str):
             keyStr = "'"+key+"'"
         else:
-            keyStr = str(key)
+            keyStr = str(key)        
         if ik == 0:
-            output += ' '*ident+"%s : %s,\n" %(keyStr,valStr)
-        elif ik != len(outputDict)-1:
-            output += "%s : %s,\n" %(' '*ident+keyStr,valStr)
+            output += ' '*ident+"%s : %s" %(keyStr,valStr)
         else:
-            output += "%s : %s\n" %(' '*ident+keyStr,valStr)
+            output += "%s : %s" %(' '*ident+keyStr,valStr)
+
+        if ik < len(outputDict)-1:
+            output += ",\n"
+        else:
+            output += "\n"
+            
     output += ' '*(ident-4)+'}'
     return output
 
@@ -209,16 +214,19 @@ def formatNestedList(outputList,ident=0,maxLength=50):
         elif isinstance(val,list):
             valStr = formatNestedList(val,ident=ident+4,maxLength=maxLength)
         elif isinstance(val,str):
-            valStr = "'"+val+"'"
+            valStr = val.replace("'","")
+            valStr = "'"+valStr+"'"
         else:
             valStr = str(val)
 
         if iv == 0 :
-            output += ' '*ident+'%s,\n' %(valStr)
-        elif iv != len(outputList)-1:
-            output += '%s,\n' %(' '*ident+valStr)
+            output += ' '*ident+'%s' %(valStr)
         else:
-            output += '%s\n' %(' '*ident+valStr)
+            output += '%s' %(' '*ident+valStr)
+        if iv < len(outputList)-1:
+            output += ',\n'
+        else:
+            output += '\n'
     output += ' '*(ident-4)+']'
     return output
 
