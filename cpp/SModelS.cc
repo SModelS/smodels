@@ -60,8 +60,8 @@ void SModelS::loadDatabase ( const string & parameterfile )
 	buffer << "parameterFile='" << parameterfile << "'";
   PyRun_SimpleString( buffer.str().c_str() );
   PyRun_SimpleString( "parser = modelTester.getParameters( parameterFile )" );
-  PyRun_SimpleString( "database, databaseVersion = modelTester.loadDatabase(parser, None )" );
-  PyRun_SimpleString( "listOfExpRes = modelTester.loadDatabaseResults(parser, database)" );
+  PyRun_SimpleString( "database = modelTester.loadDatabase(parser, None )" );
+  PyRun_SimpleString( "modelTester.loadDatabaseResults(parser, database)" );
   PyRun_SimpleString( "print ( '[smodels.cpp] %d experimental results found.' % len(listOfExpRes) ) " );
 }
 
@@ -72,7 +72,7 @@ int SModelS::run ( const string & inFile )
 	buffer << "inFile='" << inFile << "'";
   PyRun_SimpleString( buffer.str().c_str() );
   PyRun_SimpleString( "fileList, inDir = modelTester.getAllInputFiles( inFile )" );
-  PyRun_SimpleString( "modelTester.testPoints( fileList, inDir, 'results', parser, databaseVersion, listOfExpRes, 900, False, parameterFile )" );
+  PyRun_SimpleString( "modelTester.testPoints( fileList, inDir, 'results', parser, database, 900, False, parameterFile )" );
   //PyRun_SimpleString( "print('pyx=',pyx)" );
   // double result = PyFloat_AsDouble(myResult);
   return 0;

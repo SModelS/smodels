@@ -40,8 +40,7 @@ class IntegrationTest(unittest.TestCase):
 
     def checkAnalysis(self,database,expresult,smstoplist):
         expID = expresult.globalInfo.id
-        database.selectResults(analysisIDs=[expID],datasetIds=[str(ds) for ds in expresult],
-                               dataTypes=[expresult.dataType()])
+        database.selectExpResults(analysisIDs=expID,dataTypes=expresult.datasets[0].getType())
         theorypredictions = theoryPredictionsFor(database, smstoplist)
         defpreds=self.predictions()
         if not theorypredictions:

@@ -166,7 +166,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         smstopos = decomposer.decompose(model,
                                         sigmacut, massCompress=True, invisibleCompress=True,
                                         minmassgap=mingap)
-        tpreds =  theoryPredictionsFor(database, smstopos, 
+        tpreds =  theoryPredictionsFor(db, smstopos, 
                                        combinedResults=True, useBestDataset=False, 
                                        marginalize=False)
         combiner = TheoryPredictionsCombiner.selectResultsFrom(tpreds, anaids)
