@@ -486,14 +486,9 @@ def loadDatabaseResults(parser, database):
         tmp_dIDs = parser.get("database", "dataselector").split(",")
         datasetIDs = [x.strip() for x in tmp_dIDs]
 
-    useSuperseded = False
     useNonValidated = False
-    if parser.has_option("database", "useSuperseded"):
-        useSuperseded = parser.getboolean("database", "usesuperseded")
     if parser.has_option("database", "useNonValidated"):
         useNonValidated = parser.getboolean("database", "usenonvalidated")
-    if useSuperseded:
-        logger.info('Including superseded results')
     if useNonValidated:
         logger.info('Including non-validated results')
 

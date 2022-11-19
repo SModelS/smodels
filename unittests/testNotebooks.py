@@ -11,14 +11,10 @@
 
 """
 
-import glob
-import os
 import pickle
 import subprocess
 from convertNotebook2Test import getNotebookData
-import pytest
 import unittest
-import time
 import os,glob
 import sys
 import subprocess
@@ -41,7 +37,6 @@ nbdir = "./notebookTests"
 
 
 def listOfNotebooks(notebookDir=nbdir):
-    import glob
     notebooks = glob.glob(f"{notebookDir}/*.ipynb")
     notebooks = list(notebooks)
     notebooks = [os.path.basename(n) for n in notebooks]
@@ -66,39 +61,49 @@ class TestNotebook(unittest.TestCase):
     def test_notebook(self, notebookFile):
 
         defaultOutputDict = loadDefaultOutput(notebookFile)
-        self.assertTrue(defaultOutputDict is not None)
+        errorMsg = "Error fetching default output for %s" %notebookFile
+        self.assertTrue(defaultOutputDict is not None,msg=errorMsg)
 
         # Run notebook:
         filename = os.path.join(nbdir,notebookFile)
         p = subprocess.Popen(["jupyter nbconvert --output-dir='./' --execute --to notebook %s" % filename],
                           shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output, error = p.communicate()
+        _, error = p.communicate()
         if p.returncode != 0:
             logger.error("Notebook error: %s" %error)
-        self.assertEqual(p.returncode,0)
+        errorMsg = "Error running notebook %s" %notebookFile
+        self.assertEqual(p.returncode,0, msg=errorMsg)
 
         # Get notebook output
         outputFile = os.path.basename(notebookFile)
         outputDict = getNotebookData(outputFile, savePickle=False)
-        self.assertTrue(outputDict is not None)
+        errorMsg = "Error executing %s (empty dict)" %notebookFile
+        self.assertTrue(outputDict is not None, msg=errorMsg)
 
         if os.path.isfile(outputFile):
                 os.remove(outputFile)
 
         default_cells = list(defaultOutputDict.keys())
         new_cells = [icell for icell in outputDict.keys() if icell not in default_cells]
-        self.assertTrue(len(new_cells) == 0)  # Make sure the notebook has no more cells than the default
+        errorMsg = 'New notebook has %i extra cells (cells = %s)' %(len(new_cells),new_cells)
+        self.assertTrue(len(new_cells) == 0, msg = errorMsg)  # Make sure the notebook has no more cells than the default
+        old_cells = [icell for icell in default_cells if icell not in outputDict.keys()]
+        errorMsg = 'Old notebook has %i extra cells (cells = %s)' %(len(old_cells),old_cells)
+        self.assertTrue(len(old_cells) == 0, msg = errorMsg)  # Make sure the notebook has no more cells than the default
+
+
 
         cells = sorted(default_cells)
         for icell in cells:
-            # print(icell)
-            # print(defaultOutputDict[icell])
-            # print(outputDict[icell],'\n')
             if isinstance(defaultOutputDict[icell], list):
                 for iout, out in enumerate(defaultOutputDict[icell]):
-                    self.assertEqual(out,outputDict[icell][iout])
+                    errorMsg = 'Error in cell %i and entry %i' %(icell,iout)
+                    self.assertEqual(out,outputDict[icell][iout], 
+                                     msg=errorMsg)
             else:
-                self.assertEqual(defaultOutputDict[icell],outputDict[icell])
+                errorMsg = 'Error in cell %i' %icell
+                self.assertEqual(defaultOutputDict[icell],outputDict[icell], 
+                                 msg=errorMsg)
 
 
 
