@@ -122,6 +122,8 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
         rel_diff = 2.*abs_diff/abs(obj1+obj2)
         # For numbers with units, do not check for absolute difference
         ret = (rel_diff.asNumber() < allowedRelDiff)
+        if not ret:
+            logger.error("values %s and %s differ by %s" % (obj1, obj2, rel_diff))        
         return ret
     elif isinstance(obj1, float):
         if obj1 == obj2:
@@ -154,6 +156,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
                 return False
             if not equalObjs(obj1[key], obj2[key], allowedRelDiff, ignore=ignore,
                              where=key, fname=fname, fname2=fname2):
+                logger.warning("Objects differ for %s" % (key))
                 return False
     elif isinstance(obj1, list):
         if len(obj1) != len(obj2):
@@ -173,6 +176,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
     if checkBothOrders:
         if not equalObjs(obj2, obj1, allowedRelDiff, ignore, where,
                          fname2, fname, checkBothOrders=False):
+            logger.error("Objects %s and %s differ in %s: %s != %s" % (obj1, obj2, where, fname, fname2))
             return False
     return True
 

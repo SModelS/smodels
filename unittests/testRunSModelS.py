@@ -36,7 +36,7 @@ class RunSModelSTest(unittest.TestCase):
         nout = len([i for i in glob.iglob("unitTestOutput/*smodels") if not "~" in i])
         nin = len([i for i in glob.iglob("%s/*slha" % dirname) if not "~" in i])
         if nout != nin:
-            logger.error("Number of output file(%d) differ from number of input files(%d)" %
+            logger.error("Number of output files (%d) differ from number of input files (%d)" %
                          (nout, nin))
         self.assertEqual(nout, nin)
 

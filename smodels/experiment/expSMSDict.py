@@ -113,8 +113,26 @@ class ExpSMSDict(dict):
     def setTxNodeOrdering(self,sms,tx,smsLabel):
 
         nodesDict = self._nodesDict[tx][smsLabel]
-        if nodesDict is not None:
-            sms.relabelNodeIndices(nodesDict)
+        # If no relabeling is needed, return original sms
+        if nodesDict is None:
+            return sms
+        
+        # Restrict the nodes dict to the indices present in the sms
+        # (for the case of inclusive txnames, some nodes
+        # might not be present in the sms)
+        reducedNodesDict = {oldIndex : newIndex for oldIndex,newIndex in nodesDict.items()
+                            if oldIndex in sms.nodeIndices}
+        # If no relabeling is needed, return original sms
+        if len(reducedNodesDict) == 0:
+            return sms
+
+        # Make sure all old nodes appear:
+        # (for the case of inclusive names some nodes in
+        # the sms might not appear in the dict)
+        for oldIndex in sms.nodeIndices:
+            if oldIndex not in reducedNodesDict:
+                reducedNodesDict[oldIndex] = oldIndex
+        sms.relabelNodeIndices(reducedNodesDict)
         
         return sms
 

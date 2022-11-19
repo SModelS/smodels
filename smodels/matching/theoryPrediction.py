@@ -577,7 +577,7 @@ def theoryPredictionsFor(database, smsTopDict, maxMassDist=0.2,
                 selectedSMSlist += smsList
 
         # Loop over selected SMS and check for matches
-        # Store the (correctly orderd) match in smsMatch
+        # Store the (correctly ordered) match in smsMatch
         for txsms in selectedSMSlist:
             matchedSMS = txsms.matchesTo(sms)
             if matchedSMS is None:
