@@ -139,11 +139,12 @@ class ExpSMSDict(dict):
     def computeDicts(self,expResultList):
         """
         Iterates over all (active) experimental results and build two dictionaries:
-        one mapping indices to the unique SMS and another one
+        one mapping TxNames and smsLabels to the unique SMS and another one
         a with the unique SMS indices as keys and a dictionary
-        {ExpResult_index : {DataSet_index : {TxName_index : smsLabel}}} as values.
+        {TxName : smsLabel} as values. It also stores the mapping of the
+        node numbering from the original Txname SMS to the unique (sorted) SMS.
 
-        :return: Index->SMS dictionary and SMS_index -> Exp_index dictionary
+
         """
                 
         # Loop over active experimental results:
