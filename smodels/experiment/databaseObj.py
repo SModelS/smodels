@@ -94,7 +94,9 @@ class Database(object):
             self.subs.append(SubDatabase(ss, force_load,
                                          progressbar, subpickle, 
                                          combinationsmatrix))
+        
         self.expSMSDict = ExpSMSDict(self.expResultList)
+        self._allExpSMSDict = self.expSMSDict
 
     @property
     def expResultList(self):
@@ -247,7 +249,9 @@ class Database(object):
             sub.setActiveExpResults(analysisIDs, datasetIDs, txnames, dataTypes,
                                     useNonValidated, onlyWithExpected)
         # Update SMS map
-        self.expSMSDict = ExpSMSDict(self.expResultList)
+        expDict = self._allExpSMSDict
+        self.expSMSDict = expDict.filter(self.expResultList)
+        # self.expSMSDict = ExpSMSDict(self.expResultList)
 
     @property
     def databaseParticles(self):

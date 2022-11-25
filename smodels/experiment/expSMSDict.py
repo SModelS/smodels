@@ -18,9 +18,14 @@ class ExpSMSDict(dict):
     """ 
     A two-way dictionary for storing the connections between unique ExpSMS and their
     corresponding TxNames.
+
+    :ivar _smsDict: Dictionary mapping the unique SMS to the TxNames ({smsUnique : {TxName : smsLabel}})
+    :ivar _txDict: Dictionary mapping the TxNames to the unique SMS ({TxName : {smsLabel : smsUnique}})
+    :ivar _nodesDict: Dictionary mapping the node numbering in unique SMS to the
+                      original numbering in the Txname SMS ({TxName : {smsLabel : nodesDict}})
     """
 
-    def __init__(self, expResultList):
+    def __init__(self, expResultList=[]):
         """
         :param exptResultList: List of ExptResult objects used to build the map
         """
@@ -95,6 +100,60 @@ class ExpSMSDict(dict):
             raise SModelSError()
 
         dict.__delitem__(useDict,key)
+
+    def copy(self):
+        """
+        Create a copy of self.
+
+        :return: the new ExpSMSDict object 
+        """
+
+        newDict = ExpSMSDict()
+        newDict._smsDict = {key : {key2 : val2 for key2,val2 in val.items()} 
+                                  for key,val in self._smsDict.items()}
+        newDict._txDict = {key : {key2 : val2 for key2,val2 in val.items()} 
+                                  for key,val in self._txDict.items()}
+        newDict._nodesDict = {key : {key2 : val2 for key2,val2 in val.items()} 
+                                  for key,val in self._nodesDict.items()}
+
+        return newDict
+
+    def filter(self,expResultList):
+        """
+        Returns a copy of self contanining only the mapping
+        to the TxNames contained in expResultList.
+
+        :param expResultList: List of experimental results (ExpResult obj)
+
+        :return: A new ExpSMSDict with the selected TxNames.
+        """
+
+        selectedTx = []
+        for exp in expResultList:
+            selectedTx += exp.getTxNames()
+
+        newDict = self.copy()
+        for tx in list(newDict.getTx()):
+            # If tx is in the list, do nothing
+            if tx in selectedTx:
+                continue
+            # Get list of unique SMS matching
+            # the txname:
+            smsList = newDict[tx].values()
+            # Remove tx from newDict:
+            del newDict[tx]
+            # Remove tx from the unique sms List:
+            for sms in smsList:
+                del newDict[sms][tx]
+
+        # Finally, remove the unique sms
+        # without any txnames attached to them
+        for sms in list(newDict.getSMS()):
+            if not newDict[sms]:
+                del newDict[sms]
+
+        return newDict
+            
 
     def getSMS(self):
         """
