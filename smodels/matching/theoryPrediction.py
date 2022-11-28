@@ -106,16 +106,12 @@ class TheoryPrediction(object):
             cond = tx.evalConditionsFor(smsList)
             if cond is None:
                 continue
-            allConditions.append(cond)
+            allConditions += cond
 
         if not allConditions:
             self.conditions = None
-        elif len(allConditions) == 1:
-            self.conditions = allConditions[0]
         else:
-            msgError = "Multiple conditions found for a %s result." % self.dataType()
-            logger.error(msgError)
-            raise SModelSError(msgError)
+            self.conditions = allConditions[:]
 
     def getUpperLimit(self, expected=False):
         """
