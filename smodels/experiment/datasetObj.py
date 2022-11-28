@@ -227,6 +227,21 @@ class DataSet(object):
             return False
         return True
 
+    def longStr(self):
+        """
+        Returns a long string displaying the dataset ID,
+        the experimental result ID, the dataset type and the dataset txnames.
+
+        :return: String
+        """
+
+        dsStr = str(self)
+        expID = self.globalInfo.id
+        dsType = self.getType()
+        lStr = '%s : %s (%s)' %(expID,dsStr,dsType)
+
+        return lStr
+
     def getType(self):
         """
         Return the dataset type (EM/UL)

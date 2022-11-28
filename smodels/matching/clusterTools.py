@@ -473,12 +473,14 @@ def groupSMS(smsList, dataset):
               which represents a group of SMS with same mass, width and upper limit.
     """
 
+
     #  First make sure all SMS contain their upper limits
     for sms in smsList:
         if not hasattr(sms, '._upperLimit'):
             sms._upperLimit = dataset.getUpperLimitFor(sms, txnames=sms.txname)
         if sms._upperLimit is None:
-            raise SModelSError("Trying to cluster SMS outside the grid.")
+            raise SModelSError("Trying to cluster SMS (id = %i, txname = %s) outside the grid for dataset %s." 
+                                %(sms.smsID,sms.txname,dataset.longStr()))
 
     # Group SMS if they have the same UL
     # and give the same average SMS (same BSM attributes)

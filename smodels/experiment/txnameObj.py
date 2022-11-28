@@ -555,14 +555,14 @@ class TxName(object):
 
         # Since all SMS have to be equivalent, use the first one
         # to define the map:
-        tree = list(self.smsMap.keys())[0]
+        sms = list(self.smsMap.keys())[0]
 
         # Get a nested array of nodes corresponding to the data point:
         nodeArray = []
 
-        for nodeIndex in tree.dfsIndexIterator(nodeIndex=tree.rootIndex,ignoreInclusiveNodes=True):
+        for nodeIndex in sms.dfsIndexIterator(nodeIndex=sms.rootIndex,ignoreInclusiveNodes=True):
             # Convert to node objects:
-            node = tree.indexToNode(nodeIndex)
+            node = sms.indexToNode(nodeIndex)
             if node.isSM:
                 continue
             nodeArray.append((node,nodeIndex))
@@ -691,17 +691,16 @@ class TxName(object):
         # particles not appearing in data:
         unstableWidths = []
         stableWidths = []
-        tree = sms
-        for nodeIndex in tree.dfsIndexIterator(nodeIndex=tree.rootIndex):
+        for nodeIndex in sms.dfsIndexIterator(nodeIndex=sms.rootIndex):
             if nodeIndex in widthsInData:
                 continue  # Ignore node if its width does not need reweighting
 
             # Convert to node object:
-            node = tree.indexToNode(nodeIndex)
+            node = sms.indexToNode(nodeIndex)
             if node.isSM:
                 continue  # Ignore SM particles
 
-            if tree.out_degree(nodeIndex) != 0:
+            if sms.out_degree(nodeIndex) != 0:
                 unstableWidths.append(node.totalwidth)
             else:
                 stableWidths.append(node.totalwidth)
@@ -788,10 +787,17 @@ class TxName(object):
         # otherwise use the mass array
         if sms is not None:
             point = self.getDataFromSMS(sms)
+            reweightF = self.getReweightingFor(sms)
+            # If reweight factor is None (eff = 0),
+            # return None
+            if reweightF is None:
+                return None
         else:
             massFlat = np.array(mass,dtype=object).flatten()
             point = [m.asNumber(physicsUnits.GeV) if isinstance(m,unum.Unum)
                      else m for m in massFlat]
+            reweightF = 1.0
+
         if not expected:
             ul = self.txnameData.getValueFor(point)
         else:
@@ -801,16 +807,7 @@ class TxName(object):
                 ul = self.txnameDataExp.getValueFor(point)
 
         if ul is None:
-            return None
-
-        # Compute reweighting factor
-        # (in case a SMS has been given as input)
-        if sms is not None:
-            reweightF = self.getReweightingFor(sms)
-            if reweightF is None:
-                return None
-        else:
-            reweightF = 1.0
+            return None           
 
         ul = ul*reweightF*self.y_unit  # Add unit
 
@@ -829,29 +826,30 @@ class TxName(object):
         :return: efficiency (float)
         """
 
-        if sms is not None:
-            # Get flat data from sms:
-            point = self.getDataFromSMS(sms)
-        else:
-            massFlat = np.array(mass,dtype=object).flatten()
-            point = [m.asNumber(physicsUnits.GeV) if isinstance(m,unum.Unum)
-                     else m for m in massFlat]
-
+        
         if self.dataType == 'efficiencyMap':
+            # If SMS has been given, extract data from it
+            if sms is not None:
+                # Get flat data from sms:
+                point = self.getDataFromSMS(sms)
+                # Compute reweighting factor
+                reweightF = self.getReweightingFor(sms)
+                if not reweightF:
+                    return reweightF
+            else:
+                # If SMS is None, get data from mass array
+                massFlat = np.array(mass,dtype=object).flatten()
+                point = [m.asNumber(physicsUnits.GeV) if isinstance(m,unum.Unum)
+                        else m for m in massFlat]
+                reweightF = 1.0
+
             eff = self.txnameData.getValueFor(point)
             if not eff or math.isnan(eff):
                 eff = 0.  # SMS is outside the grid or has zero efficiency
-            if sms is not None:
-                # Compute reweighting factor
-                # (if the SMS has been defined)
-                reweightF = self.getReweightingFor(sms)
-            else:
-                reweightF = 1.0
-
             eff = eff*reweightF*self.y_unit  # (unit should be 1)
 
         elif self.dataType == 'upperLimit':
-            ul = self.txnameData.getValueFor(point)
+            ul = self.getULFor(sms,mass=mass)
             if sms is not None:
                 sms._upperLimit = ul  # Store the upper limit for convenience
             if ul is None:
