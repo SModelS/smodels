@@ -14,7 +14,7 @@ from smodels.base.genericSMS import GenericSMS
 from smodels.experiment.expAuxiliaryFuncs import bracketToProcessStr, maximal_matching
 from smodels.base.physicsUnits import fb
 from itertools import product
-from collections import OrderedDict, deque
+from collections import OrderedDict
 
 class ExpSMS(GenericSMS):
     """

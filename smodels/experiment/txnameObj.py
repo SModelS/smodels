@@ -146,8 +146,6 @@ class TxName(object):
             x_values, y_values = self.preProcessData(expectedData)
             self.txnameDataExp = TxNameData(x=x_values, y=y_values, txdataId=ident)
 
-        # Sort all SMS appearing in constraints:
-        # self.sortSMSMap()
 
     def __str__(self):
         return self.txName
@@ -223,42 +221,6 @@ class TxName(object):
             raise SModelSError(msgError)
 
         return True
-
-    def sortSMSMap(self):
-        """
-        Sort the nodes in the ExpSMS appearing in self.smsMap (constraints).
-        If sorting can not be made so all the SMS
-        are consistent with a single dataMap, raise an error.
-        """
-
-        # If the SMS are already sorted, do nothing:
-        if all((hasattr(expSMS,'_sorted') and expSMS._sorted) 
-                for expSMS in self.smsMap):
-            return
-
-        relevantNodes = [v[0] for v in self.dataMap.values()]
-        nodesDict = None
-        for expSMS in self.smsMap:
-            # Define node ordering from the first SMS:
-            if nodesDict is None:
-                nodesDict = expSMS.sort(force=True)
-                nodesDict = {n : nodesDict[n] for n in relevantNodes}
-                continue
-            newNodesDict = expSMS.sort(force=True)
-            newNodesDict = {n : newNodesDict[n] for n in relevantNodes}
-            # Check if the sorting of the SMS requires
-            # a new reordering of the dataMap 
-            # (if the dataMap is symmetric it might not be an issue)
-            if newNodesDict != nodesDict:        
-                txt = "The sorting of the SMS in %s require distinct data ordering." %(self)
-                txt += "\nMake sure the constraint %s is consistent with any data grid ordering"  %(self.constraint)
-                txt += " (symmetric data grid)."
-                logger.warning(txt)
-                # raise SModelSError(txt)
-
-        # If all the relabeling are equal, relabel the dataMap 
-        # using the new nodes dict
-        self.relabelDataMap(nodesDict)
         
     def processExpr(self, stringExpr, databaseParticles,
                     checkUnique=False):
@@ -595,28 +557,6 @@ class TxName(object):
         for key, val in self.arrayMap.items():
             bracketIndex, attr, unit, nodeIndex = val
             self.dataMap[key] = (nodeIndex, attr, unit)
-
-    def relabelDataMap(self,nodeIndexDict):
-        """
-        Relabel the node indices in self.dataMap according to nodeIndexDict.
-        For node indices not appearing in nodeIndexDict nothing is done.
-
-        :param nodeIndexDict: Dictionary with old node indices as keys
-                              and new indices as values
-        """
-
-        # If dataMap has not been defined, do nothing
-        if self.dataMap is None:
-            logger.warning("Could not find dataMap for relabeling nodes!")
-            return
-
-        for dataArrayIndex, nodeTuple in self.dataMap.items():
-            oldIndex,attrib,unit = nodeTuple
-            # If old index does not appear in the dict, do nothing
-            if oldIndex not in nodeIndexDict:
-                continue
-            newIndex = nodeIndexDict[oldIndex]
-            self.dataMap[dataArrayIndex] = (newIndex,attrib,unit)
 
     def getDataEntry(self, arrayValue):
         """
