@@ -72,20 +72,25 @@ class GenericSMS(object):
         except AttributeError:
             raise AttributeError("Neither SMS nor nodes have attribute ``%s''" % attr)
 
-    def add_node(self, node):
+    def add_node(self, node, nodeIndex=None):
         """
-        Adds a node object to the tree. The node index will be
-        automatically assigned.
+        Adds a node object to the tree. If nodeIndex is None,
+        the node index will be automatically assigned.
 
         :param node: ParticleNode object
+        :param nodeIndex: The index for the ParticleNode. It must not
+                          match any other indices already in the tree.
 
         :return: The node index for the newly added node
         """
 
-        if not self._successors:
-            nodeIndex = 0
-        else:
-            nodeIndex = max(self.nodeIndices)+1
+        if nodeIndex is None:   
+            if not self._successors:
+                nodeIndex = 0
+            else:
+                nodeIndex = max(self.nodeIndices)+1
+        elif nodeIndex in self._successors:
+            raise SModelSError("Trying to add a node with a nodeIndex already in the tree.")
         self._successors[nodeIndex] = []
         self._nodesMapping[nodeIndex] = node
 

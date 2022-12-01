@@ -54,7 +54,7 @@ class TxTest(unittest.TestCase):
 
         self.assertTrue(len(tx.smsMap), 1)
         sms = list(tx.smsMap.keys())[0]
-        defaultSMS = '(PV > Inclusive(1),HSCP), (Inclusive(1) > *anySM,MET)'
+        defaultSMS = '(PV > Inclusive(1),HSCP), (Inclusive(1) > MET,*anySM)'
         self.assertEqual(str(sms).replace(' ',''), defaultSMS.replace(' ',''))
 
     def testBrokenFinalState(self):

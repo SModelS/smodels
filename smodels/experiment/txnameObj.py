@@ -17,7 +17,8 @@ from smodels.base.smodelsLogging import logger
 
 from smodels.experiment.expAuxiliaryFuncs import (smsInStr, removeUnits,
                                                rescaleWidth, unscaleWidth,
-                                               concatenateLines, cSim, cGtr)
+                                               concatenateLines, cSim, cGtr,
+                                               bracketToProcessStr)
 from smodels.experiment.expSMS import ExpSMS
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.txnameDataObj import TxNameData
@@ -48,7 +49,8 @@ class TxName(object):
         self.txnameData = None
         self.txnameDataExp = None  # expected Data
         self.dataMap = None
-        self.arrayMap = None
+        self._arrayMap = None
+        self._arrayToNodeDict = None
         self.smsMap = {}  # Stores the SMS and their label representaion
         self._constraintFunc = None
         self._conditionsList = []
@@ -108,9 +110,13 @@ class TxName(object):
         if not databaseParticles:
             raise SModelSError("Database particles is empty. Can not create TxName object.")
 
+        # If necessary, convert constraints and conditions
+        # from old bracket notation:
+        self.convertBracketNotation()
+
         # Process constraint, simplify it so it can be easily evaluated and
         # stores the SMS in self.smsMap
-        if hasattr(self, 'constraint'):
+        if hasattr(self, 'constraint'):            
             exprFunc, smsMap = self.processExpr(self.constraint,
                                                databaseParticles,
                                                checkUnique=True)
@@ -221,7 +227,55 @@ class TxName(object):
             raise SModelSError(msgError)
 
         return True
-        
+    
+    def convertBracketNotation(self):
+        """
+        If the old bracket notation has been found in contraints
+        or conditions, convert the strings.
+        A nestedArrayMap is also stored to keep track of matching
+        between the original nested indices and the node indices in
+        the new format. The old constraint and conditions are stored
+        in self._constraint and self._conditions.
+        """
+
+        # Check if constraint needs conversion:
+        if hasattr(self,'constraint'):
+            self._constraint = str(self.constraint)[:]
+            if '[' in self.constraint and ']' in self.constraint:                
+                # Get the SMS contained in the expression
+                # (remove single quotes to avoid ambiguity)   
+                constraint = str(self.constraint)[:].replace("'","")
+                for smsStr in smsInStr(constraint):
+                    newSMS,arrayMap = bracketToProcessStr(smsStr,
+                                                          finalState=self.finalState,
+                                                           intermediateState=self.intermediateState,
+                                                           returnNodeDict=True)
+                    
+                    constraint = constraint.replace(smsStr.replace("'",""),'{%s}' %newSMS,1)
+                    if  self._arrayToNodeDict is None:
+                        self._arrayToNodeDict = arrayMap
+                    elif self._arrayToNodeDict != arrayMap:
+                        logger.error("The SMS in the constraint do not all have the same ordering and topology.")
+                self.constraint = constraint
+            
+        # Check if conditions needs conversion:
+        if hasattr(self,'condition') and self.condition:
+            if not isinstance(self.condition, list):
+                self.condition = [self.condition]
+            self._condition = self.condition[:]
+            for icond,cond in enumerate(self.condition):
+                cond = str(cond)[:].replace("'","")
+                if not ('[' in cond and ']' in cond):
+                    continue                
+                # Get the SMS contained in the expression                
+                for smsStr in smsInStr(cond):
+                    newSMS = bracketToProcessStr(smsStr,
+                                                    finalState=self.finalState,
+                                                    intermediateState=self.intermediateState)
+                    cond = cond.replace(smsStr.replace("'",""),'{%s}' %newSMS,1)
+                self.condition[icond] = cond
+            
+
     def processExpr(self, stringExpr, databaseParticles,
                     checkUnique=False):
         """
@@ -381,7 +435,7 @@ class TxName(object):
 
     def transformData(self, data):
         """
-        Uses the information in self.dataMap (or self.arrayMap) to convert data
+        Uses the information in self.dataMap (or self._arrayMap) to convert data
         to a list of flat and unitless array. The data is split into two lists, one
         with the x-values (masses/widths) and
         another with the y-values (upper limits/efficiencies).
@@ -411,7 +465,7 @@ class TxName(object):
         the transformation will use the mapping in self.dataMap.
         However, if x is a nested array (e.g. [[mass1,mass2],[(mass3,width3)]]),
         the transformation will be done according to the mapping defined in
-        self.arrayMap.
+        self._arrayMap.
 
         :parameter x: A list (or nested list) with mass/width values.
 
@@ -423,12 +477,12 @@ class TxName(object):
         xFlat = [None]*nDim
         for arrayIndex in self.dataMap:
             # If arrayMap has not been defined, retrieve its value directly from x
-            if self.arrayMap is None:
+            if self._arrayMap is None:
                 _, attr, unit = self.dataMap[arrayIndex]
                 xval = x[arrayIndex]
             # If it is a nested bracket use the arrayMap:
             else:
-                multiIndex, attr, unit, _ = self.arrayMap[arrayIndex]
+                multiIndex, attr, unit, _ = self._arrayMap[arrayIndex]
                 i, j = multiIndex[:2]
                 xval = x[i][j]
                 if isinstance(xval, tuple):
@@ -453,7 +507,7 @@ class TxName(object):
     def inverseTransformPoint(self, xFlat):
         """
         Transforms a 1D unitless array to a list of mass/width values.
-        If self.arrayMap is defined, use it to convert to a nested
+        If self._arrayMap is defined, use it to convert to a nested
         bracket array foramt (e.g. [[mass1,(mass2,width2)],[mass3,mass4]]),
         otherwise convert it to a flat array (e.g. [mass1,mass2,mass3,mass4,width2])
         using self.dataMap.
@@ -464,9 +518,9 @@ class TxName(object):
         """
 
         mLength = max(self.dataMap.keys())+1
-        if self.arrayMap is not None:  # Convert to nested bracket
+        if self._arrayMap is not None:  # Convert to nested bracket
             # Invert array map:
-            mapInv = {v[0]: k for k, v in self.arrayMap.items()}
+            mapInv = {v[0]: k for k, v in self._arrayMap.items()}
             # Get sorted array indices
             ijk = sorted(mapInv.keys())
             massPoint = []
@@ -476,7 +530,7 @@ class TxName(object):
                 while j >= len(massPoint[i]):
                     massPoint[i].append([])
                 index = mapInv[(i, j, k)]
-                _, attr, unit, _ = self.arrayMap[index]
+                _, attr, unit, _ = self._arrayMap[index]
                 value = xFlat[index]
                 if attr == 'totalwidth':
                     value = unscaleWidth(value)
@@ -519,26 +573,17 @@ class TxName(object):
         # to define the map:
         sms = list(self.smsMap.keys())[0]
 
-        # Get a nested array of nodes corresponding to the data point:
-        nodeArray = []
 
-        for nodeIndex in sms.dfsIndexIterator(nodeIndex=sms.rootIndex,ignoreInclusiveNodes=True):
-            # Convert to node objects:
-            node = sms.indexToNode(nodeIndex)
-            if node.isSM:
-                continue
-            nodeArray.append((node,nodeIndex))
-
-        # Iterate over the array and construct a map for the nodes
-        # and the flat array:
+        # Use the predefined map between branchIndex,vertexIndex -> nodeIndex
+        # to define the dataMap
         arrayMap = {}
         massIndex = 0  # Initial index for the masses
-        widthIndex = len(nodeArray)  # Initial index for the widths
+        widthIndex = len(self._arrayToNodeDict)  # Initial index for the widths
         for i, br in enumerate(dataPoint):
             if br == '*':
                 continue  # Skip inclusive branch
             for j, m in enumerate(br):
-                node,nodeIndex = nodeArray.pop(0)
+                nodeIndex = self._arrayToNodeDict[(i,j)]
                 arrayValue = m
                 mass, massUnit, width, widthUnit = self.getDataEntry(arrayValue)
                 # Add entry for mass
@@ -551,10 +596,10 @@ class TxName(object):
                     widthIndex += 1
 
         # Store the nested bracket <-> flat array map
-        self.arrayMap = arrayMap
+        self._arrayMap = arrayMap
         # Also store graph <-> flat array map
         self.dataMap = {}
-        for key, val in self.arrayMap.items():
+        for key, val in self._arrayMap.items():
             bracketIndex, attr, unit, nodeIndex = val
             self.dataMap[key] = (nodeIndex, attr, unit)
 

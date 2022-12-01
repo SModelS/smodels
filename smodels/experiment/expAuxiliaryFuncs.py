@@ -314,7 +314,9 @@ def getValuesForObj(obj, attribute):
     return uniqueValues
 
 
-def bracketToProcessStr(stringSMS, finalState=None, intermediateState=None):
+def bracketToProcessStr(stringSMS, 
+                        finalState=None, intermediateState=None,
+                        returnNodeDict=False):
     """
     :parameter stringSMS: string describing the SMS in bracket notation
                          (e.g. [[[e+],[jet]],[[e-],[jet]]])
@@ -323,75 +325,85 @@ def bracketToProcessStr(stringSMS, finalState=None, intermediateState=None):
                          (e.g. ['MET', 'HSCP'] or ['MET','MET'])
     :parameter intermediateState: nested list containing intermediate state labels
                                      for each branch  (e.g. [['gluino'], ['gluino']])
+    :param returnNodeDict: If True, return a dictionary mapping the nested bracket
+                           indices to the particle nodes 
+                           ({(branchIndex,vertexIndex) : nodeIndex})
+                                     
+    :return: process string in new format (str) and dictionary nodes dictionary (if returnNodeDict=True) 
     """
+    
+    # Convert string to nested list:
+    smsList = eval(stringSMS.replace("*", "'*'").replace("''", "'"))
 
-    # Make sure inclusive symbols come with single quotes:
-    branches = eval(stringSMS.replace("*", "'*'").replace("''", "'"))
-    # Make replacements to take care of inclusive objects:
-    newBranches = []
-    for br in branches:
-        if br == ['*']:
-            newBranches.append('InclusiveNode')
-        else:
-            newBranches.append([[ptc.replace('*', 'anySM')
-                                 for ptc in vt] for vt in br])
-
-    branches = newBranches
-    # Get ordered list of BSM states:
+    # Collect all BSM states in each branch
+    # and convert inclusive branches
+    branches = []
     bsmStates = []
-    bsmIndices = []
-    iptc = 1
-    for ibr, br in enumerate(branches):
+    for ibr,br in enumerate(smsList):
         bsmStates.append([])
-        bsmIndices.append([])
-        if br == 'InclusiveNode':
-            bsmStates[ibr].append(br)
-            bsmIndices[ibr].append(iptc)
-            iptc += 1
+        if br == ['*']:
+            branches.append([['*anySM']])
+            bsmStates[ibr] = ['InclusiveNode']
         else:
-            for idec, dec in enumerate(br):
-                if intermediateState is None:
-                    bsmStates[ibr].append('anyBSM')
-                else:
-                    bsmStates[ibr].append(intermediateState[ibr][idec])
-                bsmIndices[ibr].append(iptc)
-                iptc += 1
+            branches.append([[ptc.replace('*', 'anySM')
+                                 for ptc in vt] for vt in br])
+            if intermediateState is None:
+                bsmStates[ibr] = ['anyBSM']*len(br)
+            else:
+                bsmStates[ibr] = intermediateState[ibr]
+
         if finalState is None:
             bsmStates[ibr].append('MET')
         else:
             bsmStates[ibr].append(finalState[ibr])
 
-    # Get PV:
-    pvStrs = []
-    for ibr, br in enumerate(branches):
-        if not bsmIndices[ibr]:
-            pvStrs.append(bsmStates[ibr][0])
-        else:
-            pvStrs.append(bsmStates[ibr][0]+'(%i)' % bsmIndices[ibr][0])
+    # Create decay string for primary vertex:
+    bsmNodesDict = {}
+    decayStrings = []
+    daughtersStr = []
+    momStr = 'PV(0)'
+    nodeIndex = 1
+    for ibr,bsmBranch in enumerate(bsmStates):
+        bsmNodesDict[(ibr,0)] = nodeIndex
+        nodeIndex += 1
+        daughtersStr.append('%s(%i)' %(bsmBranch[0],bsmNodesDict[(ibr,0)]))
+    decStr = '(%s > %s)' %(momStr,','.join(daughtersStr))
+    decayStrings.append(decStr)
 
-    pv = '(PV > '+','.join(pvStrs)+')'
-    edges = [pv]
-    for ibr, br in enumerate(branches):
-        # If there is a single BSM state do nothing
-        if len(bsmStates[ibr]) < 2:
-            continue
+    # Create decay string for all branches:
+    smNodesDict = {}
+    for ibr,bsmBranch in enumerate(bsmStates):
+        for idec,bsm in enumerate(bsmBranch[:-1]):        
+            # Define node index for BSM mom
+            if (ibr,idec) not in bsmNodesDict:
+                bsmNodesDict[(ibr,idec)] = nodeIndex
+                nodeIndex += 1
+            # Create string with node index for BSM mom
+            momStr = '%s(%i)' %(bsm,bsmNodesDict[(ibr,idec)])
+            daughtersStr = []
+            # Define node index for BSM daughter 
+            if (ibr,idec+1) not in bsmNodesDict:
+                bsmNodesDict[(ibr,idec+1)] = nodeIndex
+                nodeIndex += 1
+            # Create string with node index for mom            
+            daughtersStr.append('%s(%i)' %(bsmBranch[idec+1],bsmNodesDict[(ibr,idec+1)]))
+            # Define node indices for SM daughters:        
+            for ism,sm in enumerate(branches[ibr][idec]):
+                smNodesDict[(ibr,idec,ism)] = nodeIndex
+                nodeIndex += 1
+            # Create string with node index for mom            
+            daughtersStr += ['%s(%i)' %(sm,smNodesDict[(ibr,idec,ism)]) 
+                             for ism,sm in enumerate(branches[ibr][idec])]
+            # Create decay string:
+            decStr = '(%s > %s)' %(momStr, ','.join(daughtersStr))
+            decayStrings.append(decStr)
 
-        for ibsm, bsm in enumerate(bsmStates[ibr][:-1]):
-            iptc = bsmIndices[ibr][ibsm]
-            mom = bsm+'(%i)' % iptc
-            if bsm == 'InclusiveNode':
-                smDaughters = '*anySM'
-            else:
-                smDaughters = ','.join(br[ibsm])
-            bsmDaughter = bsmStates[ibr][ibsm+1]
-            if ibsm+1 < len(bsmIndices[ibr]):
-                bsmDaughter += '(%i)' % (bsmIndices[ibr][ibsm+1])
-
-            daughters = smDaughters+','+bsmDaughter
-            edges.append('('+mom+' > '+daughters+')')
-
-    procStr = ','.join(edges)
-    return procStr
+    processStr = ', '.join(decayStrings)
+    
+    if returnNodeDict:
+        return processStr,bsmNodesDict
+    else:
+        return processStr
 
 
 def getAttributesFrom(obj, skipIDs=[]):

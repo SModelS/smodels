@@ -163,8 +163,8 @@ class InclusiveObjectsTest(unittest.TestCase):
 
         smsMatch = tx.hasSMSas(sms)  #newEl should be equal to el, but with opposite branch ordering
         self.assertFalse(smsMatch is None)
-        nodes = [str(n) for n in smsMatch.nodes]
-        self.assertEqual(nodes,['PV','C1+','C1+','e+','N1'])
+        nodeDict = dict(zip(smsMatch.nodeIndices,[str(n) for n in smsMatch.nodes]))
+        self.assertEqual(nodeDict,{0 : 'PV', 1 : 'C1+', 2 : 'C1+', 3 : 'N1', 4 : 'e+'})
 
 
 if __name__ == "__main__":

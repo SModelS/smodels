@@ -19,7 +19,6 @@ from smodels.base.model import Model
 from collections import OrderedDict
 from smodels.base.physicsUnits import fb, GeV, TeV
 from smodels.base.crossSection import XSection,XSectionInfo,XSectionList
-from smodels.share.models import SMparticles
 from smodels.experiment.defaultFinalStates import finalStates
 from unitTestHelpers import theorySMSFromString as fromString
 

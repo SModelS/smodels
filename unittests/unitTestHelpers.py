@@ -54,7 +54,8 @@ def theorySMSFromString(stringEl,model,prodXSec = 1.0*fb,
     expSMS = ExpSMS.from_string(stringEl, model=model,finalState=finalState,
                                 intermediateState=intermediateState)
     sms = TheorySMS()
-    sms.add_nodes_from(expSMS.nodes)
+    for nodeIndex,node in zip(expSMS.nodeIndices,expSMS.nodes):
+        sms.add_node(node,nodeIndex)
     sms.add_edges_from(expSMS.edgeIndices)
     sms.prodXSec = prodXSec
     sms.maxWeight = maxWeight

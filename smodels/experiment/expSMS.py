@@ -11,7 +11,7 @@
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.particleNode import ParticleNode,InclusiveParticleNode
 from smodels.base.genericSMS import GenericSMS
-from smodels.experiment.expAuxiliaryFuncs import bracketToProcessStr, maximal_matching
+from smodels.experiment.expAuxiliaryFuncs import maximal_matching, bracketToProcessStr
 from smodels.base.physicsUnits import fb
 from itertools import product
 from collections import OrderedDict
@@ -55,7 +55,7 @@ class ExpSMS(GenericSMS):
         # First check if string is in old format:
         if '[' in stringSMS and ']' in stringSMS:
             procString = bracketToProcessStr(stringSMS, finalState=finalState,
-                                             intermediateState=intermediateState)
+                                               intermediateState=intermediateState)
         elif '>' in stringSMS and 'PV' in stringSMS:
             procString = stringSMS
         else:
@@ -68,29 +68,33 @@ class ExpSMS(GenericSMS):
 
         # Split decays into mother and daughters tuples:
         decayParticles = []
+        allParticles = []
         for dec in decays:
             momStr = dec.split('>')[0].strip()
             daughtersStr = [p.strip() for p in dec.split('>')[1].split(',')]
             decayParticles.append((momStr,daughtersStr))
+            allParticles += [momStr]+daughtersStr
 
         # Build a mapping (particle string > nodeIndex) for all unstable particles:
         nodesDict = {}
-        maxNode = 0
-        for mom,daughters in decayParticles:
-            if mom == 'PV':
+        for particle in allParticles:
+            # If the particle has a node assigned, store it
+            if '(' in particle and ')' in particle:  # Particles should always have a unique numbering
+                nodeIndex = eval(particle.split('(')[1].split(')')[0])
+            elif particle == 'PV':
                 nodeIndex = 0  # PV is always node zero
-            elif '(' in mom and ')' in mom:  # Unstable particles should always have a unique numbering
-                nodeIndex = eval(mom.split('(')[1].split(')')[0])
             else:
                 continue  # Stable particles will have their nodes defined later
-            nodesDict[mom] = nodeIndex
-            maxNode = max(maxNode,nodeIndex)  # Store highest node index
+            nodesDict[particle] = nodeIndex
+
+        # Store highest node index defined so far:
+        maxNode = max(nodesDict.values())
 
         # Make sure particles have unique nodes:
         if len(set(list(nodesDict.values()))) != len(list(nodesDict.values())):
             raise SModelSError("Input string has non unique nodes: %s" % nodesDict)
 
-        # Add the stable particles to nodesDict
+        # Add the particles with undefined nodes to nodesDict
         # and create successors dict
         successorsStr = {}
         for mom,daughters in decayParticles:
@@ -105,7 +109,6 @@ class ExpSMS(GenericSMS):
                 nodesDict[ptcLabel] = maxNode
                 successorsStr[mom].append(ptcLabel)
 
-
         # Sort successors according to the node index
         sortedMoms = sorted(successorsStr.keys(), key = lambda momStr : nodesDict[momStr])
         sortedSuccessors = OrderedDict()
@@ -115,7 +118,7 @@ class ExpSMS(GenericSMS):
 
         # Convert strings to node objects:
         nodesObjDict = {}
-        for ptcStr in nodesDict:
+        for ptcStr,nodeIndex in nodesDict.items():
             # Check for inclusive node
             label = ptcStr.split('(')[0]
             if label.lower() == 'inclusive' or label.lower() == 'inclusivenode':
@@ -134,28 +137,20 @@ class ExpSMS(GenericSMS):
                                     inclusiveList=inclusiveList)
 
             # Change key from node index to node object
-            nodesObjDict[ptcStr] = node
+            nodesObjDict[nodeIndex] = node
 
-        # Create SMS, add all unstable nodes following the sorted order
-        # and keep track of generated indices
+        # Add all nodes following the nodeIndex order
         newSMS = ExpSMS()
-        smsDict = {}
-        for momStr in sortedSuccessors:
-            nodeIndex = newSMS.add_node(nodesObjDict[momStr])
-            smsDict[momStr] = nodeIndex
-        # Add stable nodes and keep track of SMS indices
-        for ptcStr in nodesObjDict:
-            if ptcStr in smsDict:
-                continue  # Node has been added
-            nodeIndex = newSMS.add_node(nodesObjDict[ptcStr])
-            smsDict[ptcStr] = nodeIndex
+        for nodeIndex in sorted(nodesObjDict.keys()):
+            node = nodesObjDict[nodeIndex]
+            newSMS.add_node(node,nodeIndex=nodeIndex)
 
         # Finally add all edges according to successorsDict:
         for momStr, daughtersStr in sortedSuccessors.items():
             if not daughtersStr:
                 continue
-            momIndex = smsDict[momStr]
-            daughterIndices = [smsDict[d] for d in daughtersStr]
+            momIndex = nodesDict[momStr]
+            daughterIndices = [nodesDict[d] for d in daughtersStr]
             newSMS.add_edges_from(product([momIndex],daughterIndices))
 
         return newSMS
