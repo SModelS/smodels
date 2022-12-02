@@ -332,8 +332,16 @@ def bracketToProcessStr(stringSMS,
     :return: process string in new format (str) and dictionary nodes dictionary (if returnNodeDict=True) 
     """
     
+    # Make sure all particle labels are enclosed by single quotes:
+    stringSMS = stringSMS.replace("'","").replace(" ","")
+    # Add quotes
+    addQuotes = lambda match: "[%s]" %(",".join(["'%s'" %ptc for ptc in match.group(1).split(',')]))
+    # Find all strings surrounded by brackets and replace
+    # them by the string with quotes added
+    stringSMS = re.sub(r"\[([^\[\]]+)\]", addQuotes, stringSMS)
+
     # Convert string to nested list:
-    smsList = eval(stringSMS.replace("*", "'*'").replace("''", "'"))
+    smsList = eval(stringSMS)
 
     # Collect all BSM states in each branch
     # and convert inclusive branches
@@ -345,12 +353,12 @@ def bracketToProcessStr(stringSMS,
             branches.append([['*anySM']])
             bsmStates[ibr] = ['InclusiveNode']
         else:
-            branches.append([[ptc.replace('*', 'anySM')
-                                 for ptc in vt] for vt in br])
+            branches.append([sorted([ptc if ptc != '*' else  'anySM'
+                                 for ptc in vt]) for vt in br])
             if intermediateState is None:
                 bsmStates[ibr] = ['anyBSM']*len(br)
             else:
-                bsmStates[ibr] = intermediateState[ibr]
+                bsmStates[ibr] = intermediateState[ibr][:]
 
         if finalState is None:
             bsmStates[ibr].append('MET')
@@ -388,7 +396,7 @@ def bracketToProcessStr(stringSMS,
             # Create string with node index for mom            
             daughtersStr.append('%s(%i)' %(bsmBranch[idec+1],bsmNodesDict[(ibr,idec+1)]))
             # Define node indices for SM daughters:        
-            for ism,sm in enumerate(branches[ibr][idec]):
+            for ism,_ in enumerate(branches[ibr][idec]):
                 smNodesDict[(ibr,idec,ism)] = nodeIndex
                 nodeIndex += 1
             # Create string with node index for mom            
