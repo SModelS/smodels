@@ -244,14 +244,14 @@ class TxName(object):
             if '[' in self.constraint and ']' in self.constraint:                
                 # Get the SMS contained in the expression
                 # (remove single quotes to avoid ambiguity)   
-                constraint = str(self.constraint)[:].replace("'","")
+                constraint = str(self.constraint)[:].replace("'","").replace(" ","")
                 for smsStr in smsInStr(constraint):
                     newSMS,arrayMap = bracketToProcessStr(smsStr,
                                                           finalState=self.finalState,
                                                            intermediateState=self.intermediateState,
                                                            returnNodeDict=True)
-                    
-                    constraint = constraint.replace(smsStr.replace("'",""),'{%s}' %newSMS,1)
+                    smsStr = smsStr.replace("'","").replace(" ","")
+                    constraint = constraint.replace(smsStr,'{%s}' %newSMS,1)
                     if  self._arrayToNodeDict is None:
                         self._arrayToNodeDict = arrayMap
                     elif self._arrayToNodeDict != arrayMap:
@@ -264,7 +264,7 @@ class TxName(object):
                 self.condition = [self.condition]
             self._condition = self.condition[:]
             for icond,cond in enumerate(self.condition):
-                cond = str(cond)[:].replace("'","")
+                cond = str(cond)[:].replace("'","").replace(" ","")
                 if not ('[' in cond and ']' in cond):
                     continue                
                 # Get the SMS contained in the expression                
@@ -272,7 +272,8 @@ class TxName(object):
                     newSMS = bracketToProcessStr(smsStr,
                                                     finalState=self.finalState,
                                                     intermediateState=self.intermediateState)
-                    cond = cond.replace(smsStr.replace("'",""),'{%s}' %newSMS,1)
+                    smsStr = smsStr.replace("'","").replace(" ","")
+                    cond = cond.replace(smsStr, '{%s}' %newSMS,1)
                 self.condition[icond] = cond
             
     def processExpr(self, stringExpr, databaseParticles,
