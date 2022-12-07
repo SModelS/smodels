@@ -426,7 +426,7 @@ class TheorySMS(GenericSMS):
             bsmDaughter = bsmDaughter[0]
 
             # Skip if mass difference is above minimum or if the parent is long-lived
-            if massDiff > minmassgap or not mom.particle.isPrompt():
+            if massDiff >= minmassgap or not mom.particle.isPrompt():
                 continue
 
             # If making first compression, copy self:

@@ -95,8 +95,12 @@ class Database(object):
                                          progressbar, subpickle, 
                                          combinationsmatrix))
         
-        self.expSMSDict = ExpSMSDict(self.expResultList)
-        self._allExpSMSDict = self.expSMSDict
+
+        # Compute SMS dict with all results
+        self._allExpSMSDict = ExpSMSDict(self.expResultList)
+        # Filter results using the default options
+        # (i.e. remove non-validated results,...)
+        self.selectExpResults()
 
     @property
     def expResultList(self):
@@ -251,7 +255,6 @@ class Database(object):
         # Update SMS map
         expDict = self._allExpSMSDict
         self.expSMSDict = expDict.filter(self.expResultList)
-        # self.expSMSDict = ExpSMSDict(self.expResultList)
 
     @property
     def databaseParticles(self):
