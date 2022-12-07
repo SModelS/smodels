@@ -22,7 +22,7 @@ class RunBrowserTest(unittest.TestCase):
     def testBrowser(self):
 
         browser = databaseBrowser.Browser("unittest")
-        self.assertEqual(len(browser),15)
+        self.assertEqual(len(browser),14)
 
         # Check the upper limit for the HM200 signal region:
         ul = browser.getULForSR(expid='ATLAS-SUSY-2018-31', datasetID='SRA_H')
