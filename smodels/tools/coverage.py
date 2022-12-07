@@ -103,7 +103,7 @@ class Uncovered(object):
             raise SModelSError("Group filters must be callable methods")
 
         if sqrts is None:
-            sqrts = max([xsec.info.sqrts for xsec in topDict.getSMSList()[0].weightList])
+            sqrts = max([xsec.info.sqrts for xsec in topDict.getTotalWeight()])
         else:
             sqrts = sqrts
 
