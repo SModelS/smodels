@@ -275,8 +275,9 @@ class TheoryPrediction(object):
         if self.dataType() == "efficiencyMap":
             nsig = (mu * self.xsection.value * lumi).asNumber()
             llhd = self.dataset.likelihood(
-                nsig, marginalize=self.marginalize, deltas_rel=self.deltas_rel, expected=expected
-            )
+                nsig, expected = expected, marginalize = self.marginalize,
+                deltas_rel = self.deltas_rel
+                )
 
         if self.dataType() == "upperLimit":
             # these fits only work with negative signals!
@@ -382,14 +383,13 @@ class TheoryPrediction(object):
             lumi = self.dataset.getLumi()
             nsig = (self.xsection.value * lumi).asNumber()
             llhd = self.dataset.likelihood(
-                nsig, marginalize=self.marginalize, deltas_rel=self.deltas_rel, expected=expected
-            )
+                nsig, expected = expected, marginalize = self.marginalize,
+                deltas_rel = self.deltas_rel
+                )
             llhd_sm = self.dataset.likelihood(
-                nsig=0.0,
-                marginalize=self.marginalize,
-                deltas_rel=self.deltas_rel,
-                expected=expected,
-            )
+                expected = expected, nsig = 0.0, marginalize = self.marginalize,
+                deltas_rel = self.deltas_rel
+                )
             llhd_max = self.dataset.lmax(
                 marginalize=self.marginalize,
                 deltas_rel=self.deltas_rel,

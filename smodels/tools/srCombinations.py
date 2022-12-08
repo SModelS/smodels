@@ -222,7 +222,7 @@ def getCombinedSimplifiedLikelihood(
     if len(dataset._datasets) == 1:
         if isinstance(nsig, list):
             nsig = nsig[0]
-        return dataset._datasets[0].likelihood(nsig, marginalize=marginalize)
+        return dataset._datasets[0].likelihood(nsig, marginalize = marginalize)
     bg = [x.dataInfo.expectedBG for x in dataset._datasets]
     nobs = [x.dataInfo.observedN for x in dataset._datasets]
     if expected == True:

@@ -150,7 +150,7 @@ class StatisticsTest(unittest.TestCase):
 
         c = 0.0
         for muval in numpy.arange(0.0, 0.2, 0.02):
-            llhd = prediction.likelihood(mu=muval)
+            llhd = prediction.likelihood(mu = muval)
             c += llhd
         self.assertAlmostEqual(prediction.likelihood(), 1.563288e-35, 3)
         self.assertAlmostEqual(c, 0.011523436957977766, 3)
