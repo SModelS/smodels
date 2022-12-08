@@ -230,7 +230,7 @@ class TheoryPredictionsCombiner(object):
         expected: Union[bool, Text] = False,
         nll: bool = False,
         useCached: bool = True,
-    ) -> float:
+    ) -> Union[float, None]:
         """
         Compute the likelihood at a given mu
         :param mu: signal strength
@@ -238,40 +238,36 @@ class TheoryPredictionsCombiner(object):
         :param nll: if True, return negative log likelihood, else likelihood
         :param useCached: if True, will return the cached value from theoryPrediction (if available)
         """
-        try:
-            mu = mu[0]  # some of these methods use arrays with a single element
-        except:
-            pass
+        if isinstance(mu, (list, np.ndarray)):
+            mu = mu[0]
+        # For backwards compatibility
+        return_nll = nll
+
         if useCached and mu in self.cachedLlhds[expected]:
             llhd = self.cachedLlhds[expected][mu]
-            if nll:
-                if llhd == 0.0:  # cut off nll at 999
-                    return 999.0
-                return -np.log(llhd)
+            if return_nll:
+                return 999.0 if llhd == 0.0 else -np.log(llhd)
             return llhd
 
-        llhd = 1.0
-        changed = False
+        # @JACK: Instead of multiplying likelihoods, sum nlls.
+        # This allows for more numeric stability
+        nll, changed = 0.0, False
         for tp in self.theoryPredictions:
             # Set the theory marginalize attribute to the combiner value:
             tp_marginalize = tp.marginalize
             tp.marginalize = self.marginalize
-            tmp = tp.likelihood(mu, expected=expected, useCached=useCached)
-            if tmp != None:
-                llhd = llhd * tmp
+            tmp = tp.likelihood(mu, expected=expected, useCached=useCached, nll=True)
+            if tmp is not None:
+                nll += tmp
                 changed = True
             # Restore marginalize setting:
             tp.marginalize = tp_marginalize
-        if changed == False:
-            llhd = None
-            self.cachedLlhds[expected][mu] = llhd
+
+        self.cachedLlhds[expected][mu] = np.exp(-nll) if changed else None
+        if not changed:
             return None
-        self.cachedLlhds[expected][mu] = llhd
-        if nll:
-            if llhd == 0.0:  # cut off nll at 999
-                return 999.0
-            return -np.log(llhd)
-        return llhd
+
+        return nll if return_nll else np.exp(-nll)
 
     @singleDecorator
     def computeStatistics(self, expected=False, allowNegativeSignals=False):
@@ -357,8 +353,8 @@ class TheoryPredictionsCombiner(object):
         totweight = 0.0
         for tp in self.theoryPredictions:
             # FIXME should we use allowNegativeSignals?
-            muhat = tp.muhat(expected=expected, allowNegativeSignals=allowNegativeSignals )
-            sigma_mu = tp.sigma_mu(expected=expected, allowNegativeSignals=allowNegativeSignals )
+            muhat = tp.muhat(expected=expected, allowNegativeSignals=allowNegativeSignals)
+            sigma_mu = tp.sigma_mu(expected=expected, allowNegativeSignals=allowNegativeSignals)
             if sigma_mu in [None, 0.0]:
                 sigma_mu = 1.0  # unity weights if no weights
             if muhat != None:
@@ -367,11 +363,11 @@ class TheoryPredictionsCombiner(object):
                 weighted.append(w * muhat)
                 totweight += w
         # for a single theory prediction, we return just that
-        if len(muhats)==1:
-            if muhat < 0. and not allowNegativeSignals:
-                muhat = 0.
+        if len(muhats) == 1:
+            if muhat < 0.0 and not allowNegativeSignals:
+                muhat = 0.0
             if extended_output:
-                retllh = self.theoryPredictions[0].likelihood ( muhat, nll = nll, expected = expected )
+                retllh = self.theoryPredictions[0].likelihood(muhat, expected=expected, nll=nll)
                 return {"muhat": muhat, "sigma_mu": sigma_mu, "lmax": retllh}
             return muhat
 
@@ -442,7 +438,7 @@ class TheoryPredictionsCombiner(object):
                 "bailing out."
             )
             if extended_output:
-                return {"muhat": None, "sigma_mu": None, "lmax": None}
+                return {"muhat": None, "sigma_mu": None, "lmax": 999.0}
             return None
         if not allowNegativeSignals and mu_hat < 0.0:
             mu_hat = 0.0  # fixme for this case we should reevaluate the hessian!
@@ -463,15 +459,15 @@ class TheoryPredictionsCombiner(object):
         """
         # if "UL" in self.cachedObjs[expected]:
         #     return self.cachedObjs[expected]["UL"]
-        fmh = self.findMuHat(expected=expected, allowNegativeSignals=False,
-                             extended_output=True)
+        fmh = self.findMuHat(expected=expected, allowNegativeSignals=False, extended_output=True)
         mu_hat, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         mu_hat = mu_hat if mu_hat is not None else 0.0
         nll0 = self.likelihood(mu_hat, expected=expected, nll=True)
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
-        fmh = self.findMuHat(expected="posteriori", allowNegativeSignals=False,
-                             nll=True, extended_output=True)
+        fmh = self.findMuHat(
+            expected="posteriori", allowNegativeSignals=False, nll=True, extended_output=True
+        )
         mu_hatA, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
 
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
@@ -482,8 +478,8 @@ class TheoryPredictionsCombiner(object):
             # at + infinity it should -.05
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
-            nll = self.likelihood(mu, nll=True, expected=expected, useCached=False)
-            nllA = self.likelihood(mu, expected="posteriori", nll=True, useCached=False)
+            nll = self.likelihood(mu, expected=expected, useCached=False, nll=True)
+            nllA = self.likelihood(mu, expected="posteriori", useCached=False, nll=True)
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type)
 
         return mu_hat, sigma_mu, clsRoot
@@ -497,7 +493,7 @@ class TheoryPredictionsCombiner(object):
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected)
 
-        a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot, allowNegative = False )
+        a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot, allowNegative=False)
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
         self.cachedObjs[expected]["UL"] = mu_lim
         return mu_lim
@@ -516,7 +512,7 @@ class TheoryPredictionsCombiner(object):
 
         return clsRoot(1.0, return_type=return_type)
 
-    def getLlhds(self,muvals,expected=False,normalize=True):
+    def getLlhds(self, muvals, expected=False, normalize=True):
         """
         Compute the likelihoods for the individual analyses and the combined
         likelihood.
@@ -529,21 +525,21 @@ class TheoryPredictionsCombiner(object):
         """
 
         llhds = {}
-        llhds['combined'] = np.array([self.likelihood(mu,expected=expected) for mu in muvals])
+        llhds["combined"] = np.array([self.likelihood(mu, expected=expected) for mu in muvals])
         tpreds = self.theoryPredictions
         for t in tpreds:
             Id = t.analysisId()
-            t.computeStatistics( expected = expected )
-            l = np.array([t.likelihood(mu,expected=expected) for mu in muvals])
-            llhds[Id]=l
+            t.computeStatistics(expected=expected)
+            l = np.array([t.likelihood(mu, expected=expected) for mu in muvals])
+            llhds[Id] = l
 
         if normalize:
             # Compute delta mu
             dmuvals = np.diff(muvals)
-            dmuvals = np.append(dmuvals,dmuvals[-1])
-            for Id,l in llhds.items():
+            dmuvals = np.append(dmuvals, dmuvals[-1])
+            for Id, l in llhds.items():
                 # Compute norm (integral over mu)
-                norm = np.sum(l*dmuvals)
-                llhds[Id] = l/norm
+                norm = np.sum(l * dmuvals)
+                llhds[Id] = l / norm
 
         return llhds
