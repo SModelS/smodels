@@ -272,7 +272,10 @@ class UncoveredGroup(object):
             alreadyChecked += ancestor.getAncestors()
             if not hasattr(ancestor, '_totalXsec'):
                 xsec = ancestor.weightList.getXsecsFor(self.sqrts)
-                ancestor._totalXsec = xsec[0].value.asNumber(fb)
+                if not xsec:
+                    ancestor._totalXsec = 0.0
+                else:
+                    ancestor._totalXsec = xsec[0].value.asNumber(fb)
             overlapXsec += ancestor._totalXsec
 
         return missingX-overlapXsec
