@@ -467,9 +467,7 @@ class TheoryPrediction(object):
         # maxcond = 0.
         values = [0.0]
         for value in self.conditions.values():
-            if value == "N/A":
-                return value
-            if value == None:
+            if value == "N/A" or value is None:
                 continue
             # print ( "value=",value,type(value),float(value) )
             # maxcond = max(maxcond,float(value))
