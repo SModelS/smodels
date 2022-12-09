@@ -442,9 +442,7 @@ class TheoryPrediction(object):
 
         values = [0.0]
         for value in self.conditions:
-            if value == 'N/A':
-                return value
-            if value is None:
+            if value == 'N/A' or value is None:
                 continue
             values.append(float(value))
         return max(values)
