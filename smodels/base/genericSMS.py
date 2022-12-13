@@ -1018,6 +1018,35 @@ class GenericSMS(object):
         if malformedTree:
             raise SModelSError("Graph created with malformed structure (not  a tree).")
 
+    def switchBranches(self):
+        """
+        If the SMS has a two branch structure (PV > X,Y), return
+        a new SMS with its branches switched (PV > Y,X).
+        Otherwise return None.
+
+        :return: A new SMS object with the branches switched or None.
+        """
+    
+        if len(self.daughterIndices(self.rootIndex)) != 2:
+            return None
+
+        smsNew = self.copy()
+        branchIndices = smsNew.daughterIndices(smsNew.rootIndex)
+        nodes = {}
+        edges = {}
+        for bIndex in branchIndices:
+            nodes[bIndex] = smsNew.indexToNode(bIndex)
+            edges[bIndex] = [(bIndex,d) for d in smsNew.daughterIndices(bIndex)]
+            edges[bIndex].append((smsNew.rootIndex,bIndex))
+            smsNew.remove_node(bIndex)
+        
+        for bIndex in branchIndices[::-1]:
+            smsNew.add_node(nodes[bIndex],bIndex)
+            smsNew.add_edges_from(edges[bIndex])
+        smsNew.bfs_sort(numberNodes=True)
+
+        return smsNew
+
     def draw(self, particleColor='lightcoral',
                 smColor='skyblue',
                 pvColor='darkgray',

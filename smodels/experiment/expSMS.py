@@ -164,14 +164,43 @@ class ExpSMS(GenericSMS):
         :return: True if objects are equivalent.
         """
 
-        match = self.matchesTo(other)
+        match = self._matchesTo(other)
 
         return (match is not None)
 
     def __hash__(self):
         return object.__hash__(self)
 
-    def matchesTo(self, other):
+    def matchesTo(self,other):
+        """
+        Check if self matches other.
+        If other has a 2 branch structure, check
+        for both branch orderings and return the
+        matching with the highest mass.
+
+        :param other: TheorySMS or ExpSMS object to be compared to
+
+        :return: None if objects do not match or a copy of self,
+                 but with the nodes from other.
+        """
+
+        if not isinstance(other,GenericSMS):
+            raise SModelSError("Can not compare ExpSMS and %s" %str(type(other)))
+
+        matches = []
+        for sms in [other,other.switchBranches()]:
+            if sms is None: # If s = None it means we can not switch branches
+                continue
+            matchedSMS = self._matchesTo(sms)
+            if matchedSMS is None:
+                continue
+            matches.append(matchedSMS)
+        if not matches:
+            return None
+        matches = sorted(matches, key = lambda sms: sms.mass,reverse=True)            
+        return matches[0]
+
+    def _matchesTo(self, other):
         """
         Check if self matches other.
 
@@ -180,6 +209,7 @@ class ExpSMS(GenericSMS):
         :return: None if objects do not match or a copy of self,
                  but with the nodes from other.
         """
+
 
         if not isinstance(other,GenericSMS):
             raise SModelSError("Can not compare ExpSMS and %s" %str(type(other)))

@@ -576,6 +576,7 @@ def theoryPredictionsFor(database, smsTopDict, maxMassDist=0.2,
             matchedSMS = txsms.matchesTo(sms)
             if matchedSMS is None:
                 continue
+            matchedSMS.smsID = sms.smsID
             smsMatch[txsms].append((matchedSMS,sms))
 
     ret = []
