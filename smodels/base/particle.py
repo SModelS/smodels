@@ -197,7 +197,7 @@ class Particle(object):
         return str(self.__dict__)
 
     def eqProperties(self, other,
-                     properties=['isSM', 'mass', 'totalwidth', 'spin', 'colordim', 'eCharge', ]):
+                     properties=['isSM', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']):
         """
         Check if particle has the same properties (default is spin, colordim and eCharge)
         as other. Only compares the attributes which have been defined in both objects.
@@ -214,7 +214,7 @@ class Particle(object):
             return False
 
     def cmpProperties(self, other,
-                      properties=['isSM', 'mass', 'totalwidth', 'spin', 'colordim', 'eCharge']):
+                      properties=['isSM', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']):
         """
         Compare properties (default is isSM, spin, colordim, eCharge, mass and totalwidth).
         Return 0 if properties are equal, -1 if self < other and 1 if self > other.
@@ -474,7 +474,7 @@ class MultiParticle(Particle):
             raise AttributeError(e)
 
     def cmpProperties(self, other,
-                      properties=['isSM', 'mass', 'totalwidth', 'spin', 'colordim', 'eCharge']):
+                      properties=['isSM', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']):
         """
         Compares the properties in self with the ones in other.
         If other is a Particle object, checks if any of the particles in self matches
