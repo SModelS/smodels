@@ -545,7 +545,7 @@ class CombinedDataSet(object):
         Sort datasets according to globalInfo.datasetOrder.
         """
         if hasattr(self.globalInfo, "covariance"):
-            datasets = self._datasets[:]
+            datasets = self.origdatasets[:]
             if not hasattr(self.globalInfo, "datasetOrder"):
                 raise SModelSError("datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id)
             datasetOrder = self.globalInfo.datasetOrder
@@ -554,6 +554,8 @@ class CombinedDataSet(object):
 
             if len(datasetOrder) != len(datasets):
                 raise SModelSError( f"Number of datasets in the datasetOrder field {len(datasetOrder)} does not match the number of datasets {len(datasets)}/{len(self.origdatasets)} for {self.globalInfo.id}" )
+            ## need to reinitialise, we might have lost some datasets when filtering
+            self._datasets = [ None ] * len(datasets)
             for dataset in datasets:
                 idx = self.getIndex(dataset.getID(), datasetOrder)
                 if idx == -1:
