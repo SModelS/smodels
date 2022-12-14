@@ -501,6 +501,7 @@ class CombinedDataSet(object):
         self.path = expResult.path
         self.globalInfo = expResult.globalInfo
         self._datasets = expResult.datasets[:]
+        self.origdatasets = expResult.origdatasets[:]
         self._marginalize = False
         self.sortDataSets()
         self.findType()
@@ -552,8 +553,7 @@ class CombinedDataSet(object):
                 datasetOrder = [datasetOrder]
 
             if len(datasetOrder) != len(datasets):
-                raise SModelSError("Number of datasets in the datasetOrder field does not match the number of datasets for %s"
-                                   % self.globalInfo.id)
+                raise SModelSError( f"Number of datasets in the datasetOrder field {len(datasetOrder)} does not match the number of datasets {len(datasets)}/{len(self.origdatasets)} for {self.globalInfo.id}" )
             for dataset in datasets:
                 idx = self.getIndex(dataset.getID(), datasetOrder)
                 if idx == -1:

@@ -1038,6 +1038,7 @@ class SubDatabase(object):
             newExpResult.path = expResult.path
             newExpResult.globalInfo = expResult.globalInfo
             newExpResult.datasets = []
+            newExpResult.origdatasets = expResult.datasets
 
             for dataset in expResult.datasets:
                 if dataTypes != ['all']:
