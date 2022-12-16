@@ -14,7 +14,7 @@ import numpy as np
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
 from smodels.tools.statistics import CLsfromNLL, determineBrentBracket
-import scipy.optimize as optimize
+import scipy
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict
 
@@ -45,9 +45,16 @@ class TheoryPredictionsCombiner(object):
         self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
         self.cachedLlhds = {False: {}, True: {}, "posteriori": {}}
 
+    def __iter__(self):
+        # Iterate over theory predictions
+        for model in self.theoryPredictions:
+            yield model
+
+    def __repr__(self):
+        return f"{self.analysisId()} : {self.totalXsection():.3f} [fb]"
+
     def __str__(self):
-        ret = "%s:%s" % (self.analysisId(), self.totalXsection())
-        return ret
+        return self.__repr__()
 
     @classmethod
     def selectResultsFrom(cls, theoryPredictions, anaIDs):
@@ -121,7 +128,7 @@ class TheoryPredictionsCombiner(object):
         """
         Return a string with the IDs of all the datasets used in the combination.
         """
-        ids = [str(tp.dataset.getID()) for tp in self.theoryPredictions]
+        ids = [str(tp.dataset.getID()) for tp in self]
         ret = ",".join(ids)
 
         return ret
@@ -132,7 +139,7 @@ class TheoryPredictionsCombiner(object):
         Return a string with the IDs of all the experimental results used in the combination.
         """
 
-        ret = ",".join(sorted([tp.analysisId() for tp in self.theoryPredictions]))
+        ret = ",".join(sorted([tp.analysisId() for tp in self]))
 
         return ret
 
@@ -156,7 +163,7 @@ class TheoryPredictionsCombiner(object):
         """
         clmu = self.getUpperLimitOnMu(expected=expected)
         ret = []
-        for tp in self.theoryPredictions:
+        for tp in self:
             ret.append(tp.xsection.value * clmu)
         return ret
 
@@ -184,7 +191,7 @@ class TheoryPredictionsCombiner(object):
                          If "posteriori", compute posterior expected.
         """
         llhd = 1.0
-        for tp in self.theoryPredictions:
+        for tp in self:
             llhd = llhd * tp.likelihood(0.0, expected=expected)
         return llhd
 
@@ -218,9 +225,7 @@ class TheoryPredictionsCombiner(object):
 
     def describe(self):
         """returns a string containing a list of all analysisId and dataIds"""
-        ids = []
-        for tp in self.theoryPredictions:
-            ids.append(f"{tp.analysisId()}:{tp.dataId()}")
+        ids = [f"{tp.analysisId()}:{tp.dataId()}" for tp in self]
         return f"SRs: {', '.join(ids)}"
 
     @singleDecorator
@@ -229,7 +234,7 @@ class TheoryPredictionsCombiner(object):
         mu: float = 1.0,
         expected: Union[bool, Text] = False,
         nll: bool = False,
-        useCached: bool = True,
+        useCached: bool = False,
     ) -> Union[float, None]:
         """
         Compute the likelihood at a given mu
@@ -252,11 +257,12 @@ class TheoryPredictionsCombiner(object):
         # @JACK: Instead of multiplying likelihoods, sum nlls.
         # This allows for more numeric stability
         nll, changed = 0.0, False
-        for tp in self.theoryPredictions:
+        for tp in self:
             # Set the theory marginalize attribute to the combiner value:
             tp_marginalize = tp.marginalize
             tp.marginalize = self.marginalize
             tmp = tp.likelihood(mu, expected=expected, useCached=useCached, nll=True)
+            # print(type(tp), mu, tmp)
             if tmp is not None:
                 nll += tmp
                 changed = True
@@ -281,22 +287,26 @@ class TheoryPredictionsCombiner(object):
             for e in [False, True]:
                 self.computeStatistics(e, allowNegativeSignals)
             return
-        llhd, lsm = 1.0, 1.0
-        for tp in self.theoryPredictions:
+
+        # Negative log likelihood at mu=1 and nll at mu=0
+        nll1, nll0 = 0.0, 0.0
+        for tp in self:
             tp_marginalize = tp.marginalize
             tp.marginalize = self.marginalize
-            llhd = llhd * tp.likelihood(1.0, expected=expected, useCached=True)
+            tmp1 = tp.likelihood(1.0, expected=expected, useCached=True, nll=True)
+            nll1 += tmp1 if tmp1 is not None else 0.0
 
-            lsm = lsm * tp.likelihood(0.0, expected=expected, useCached=True)
+            tmp0 = tp.likelihood(0.0, expected=expected, useCached=True, nll=True)
+            nll0 += tmp0 if tmp0 is not None else 0.0
             # Restore marginalize setting:
             tp.marginalize = tp_marginalize
 
-        self.cachedObjs[expected]["llhd"] = llhd
-        self.cachedObjs[expected]["lsm"] = lsm
+        self.cachedObjs[expected]["llhd"] = nll1
+        self.cachedObjs[expected]["lsm"] = nll0
         if expected:
             if not "lmax" in self.cachedObjs[expected]:
                 self.cachedObjs[expected]["lmax"] = {}
-            self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lsm
+            self.cachedObjs[expected]["lmax"][allowNegativeSignals] = nll0
         else:
             fmh = self.findMuHat(expected=False, extended_output=True)
             self.mu_hat, self.sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
@@ -314,7 +324,7 @@ class TheoryPredictionsCombiner(object):
     def totalXsection(self):
         ret = 0.0 * fb
         if self.theoryPredictions is not None:
-            for tp in self.theoryPredictions:
+            for tp in self:
                 ret += tp.xsection.value
         return ret
 
@@ -325,7 +335,7 @@ class TheoryPredictionsCombiner(object):
 
         :returns: maximum condition xsection (float)
         """
-        conditions = [tp.getmaxCondition() for tp in self.theoryPredictions]
+        conditions = [tp.getmaxCondition() for tp in self]
         return max(conditions)
 
     def findMuHat(
@@ -335,121 +345,81 @@ class TheoryPredictionsCombiner(object):
         extended_output: bool = False,
         nll: bool = False,
     ) -> Union[Dict, float, None]:
-        """find muhat and lmax.
-        :param allowNegativeSignals: if true, then also allow for negative values
-        :param expected: if true, compute expected prior (=lsm), if "posteriori"
-                         compute posteriori expected
+        """
+        Finds the POI (signal strength; mu) that maximizes the likelihood.
+
+        :param allowNegativeSignals: (bool) if true, then also allow for negative values
+        :param expected: (Union[bool, Text]) if true, compute expected prior (=lsm),
+                         if "posteriori" compute posteriori expected.
         :param extended_output: if true, return also sigma_mu, the estimate of the
                          error of mu_hat, and lmax, the likelihood at mu_hat
-        :param nll: if true, return negative log max likelihood instead of lmax
-        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended
+        :param nll: (bool) if true, return negative log max likelihood instead of lmax
+        :return:  mu_hat, i.e. the maximum likelihood estimate of mu, if extended
                   output is requested, it returns a dictionary with mu_hat,
                   sigma_mu -- the standard deviation around mu_hat, and lmax,
                   i.e. the likelihood at mu_hat
         """
-        import scipy.optimize
 
-        muhats, weighted = [], []
-        totweight = 0.0
-        for tp in self.theoryPredictions:
-            # FIXME should we use allowNegativeSignals?
+        muhats, weighted_mu, weights, sigma_mus = [], [], [], []
+        for tp in self:
             muhat = tp.muhat(expected=expected, allowNegativeSignals=allowNegativeSignals)
             sigma_mu = tp.sigma_mu(expected=expected, allowNegativeSignals=allowNegativeSignals)
-            if sigma_mu in [None, 0.0]:
-                sigma_mu = 1.0  # unity weights if no weights
-            if muhat != None:
+            # Set sigma_mu = 1 and mu = 0. in case computation fails
+            sigma_mu = 1.0 if sigma_mu in [None, 0.0] else sigma_mu
+            muhat = 0.0 if muhat is None else muhat
+
+            # Do not allow mu=0 at this stage breaks the computation
+            if muhat > 0.0:
                 muhats.append(muhat)
-                w = 1.0 / sigma_mu**2
-                weighted.append(w * muhat)
-                totweight += w
-        # for a single theory prediction, we return just that
-        if len(muhats) == 1:
-            if muhat < 0.0 and not allowNegativeSignals:
-                muhat = 0.0
-            if extended_output:
-                retllh = self.theoryPredictions[0].likelihood(muhat, expected=expected, nll=nll)
-                return {"muhat": muhat, "sigma_mu": sigma_mu, "lmax": retllh}
-            return muhat
+                sigma_mus.append(sigma_mu)
+                weighted_mu.append(muhat / sigma_mu**2)
+                weights.append(1.0 / sigma_mu**2)
 
-        if len(muhats) == 0:
-            logger.error(f"asked to compute muhat for combination, but no individual values")
-            if extended_output:
-                # @JACK: Instead of None this should return an appropriate value in order not to
-                # break the computation.
-                return {"muhat": None, "sigma_mu": None, "lmax": None}
-            return None
-        toTry = [sum(weighted) / totweight]
-
-        def fun(mu):
-            # Make sure to always compute the correct llhd value (from theoryPrediction)
-            # and not used the cached value (which is constant for mu~=1 an mu~=0)
-            return self.likelihood(float(mu), expected=expected, nll=True, useCached=False)
-
-        if allowNegativeSignals:
-            toTry += [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1]
-        else:
-            toTry += [1.0, 0.0, 3.0, 10.0, 0.1]
-        for mu0 in toTry:
-            # Minimize with a delta_mu = 1e-3*mu0 when computing the first derivative
-            # (if delta_mu is too small, the derivative might give zero and terminate the
-            # minimization) o  = scipy.optimize.minimize(fun, mu0 ) ## the unbounded method
-            mxm = float(max(muhats))
-            upper = 3.0 * mxm
-            if upper <= 1.5:  #
-                upper = 1.5
-            bounds = [0, upper]
-            if allowNegativeSignals:
-                m = float(min(muhats))
-                if m < 0.0:
-                    bounds[0] = 3.0 * m
-            bounds = [
-                tuple(bounds),
-            ]
-            # if bounds[1] < bounds[0]:
-            #    logger.error ( f"bounds are reversed, this should not happen" )
-            o = scipy.optimize.minimize(fun, mu0, bounds=bounds, tol=1e-9)
-            if not o.success:
-                logger.debug(
-                    f"combiner.findMuHat did not terminate successfully: {o.message} "
-                    f"mu_hat={o.x} hess={o.hess_inv} slhafile={self.slhafile}"
-                )
-            # the inverted hessian is a good approximation for the variance at the
-            # minimum
-            invh = o.hess_inv
-            try:
-                invh = invh.todense()
-            except AttributeError as e:
-                pass
-            hessian = invh[0][0]
-            nll_ = o.fun
-            if hessian > 0.0 and nll_ < 998.0 and o.success:  # found a maximum. all good.
-                break
-            # the hessian is negative meaning we found a maximum, not a minimum
-            if hessian <= 0.0:
-                logger.debug(
-                    f"combiner.findMuHat the hessian {hessian} is negative at mu_hat={o.x} in "
-                    f"{self.slhafile} try again with different initialisation."
-                )
-        mu_hat = o.x[0]
-        lmax = np.exp(-o.fun)  # fun is *always* nll
-        if hessian < 0.0 or nll_ > 998.0:
-            logger.error(
-                "tried with several starting points to find maximum, always ended up in minimum. "
-                "bailing out."
+        nll_ = None
+        if len(muhats) > 1:
+            combined_muhat = (
+                sum(weighted_mu) / sum(weights)
+                if allowNegativeSignals
+                else max(sum(weighted_mu) / sum(weights), 0.0)
             )
-            if extended_output:
-                return {"muhat": None, "sigma_mu": None, "lmax": 999.0}
-            return None
-        if not allowNegativeSignals and mu_hat < 0.0:
-            mu_hat = 0.0  # fixme for this case we should reevaluate the hessian!
-        sigma_mu = np.sqrt(hessian)
-        if extended_output:
-            retllh = lmax
-            if nll:
-                retllh = nll_
-            return {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": retllh}
 
-        return mu_hat
+            # @JACK: for multi-POI analyses this function will not work,
+            # likelihood function needs to be adapted for such cases
+            negloglikelihood = lambda mu: self.likelihood(
+                mu[0], expected=expected, nll=True, useCached=False
+            )
+
+            # @JACK: It is possible to allow user to modify the optimiser properties in the future
+            opt = scipy.optimize.minimize(
+                negloglikelihood,
+                combined_muhat,
+                method="COBYLA",
+                tol=1e-6,
+                options={"maxiter": 10000},
+            )
+            if not opt.success:
+                logger.debug(
+                    f"combiner.findMuHat did not terminate successfully: {opt.message} \n"
+                    f"mu_hat={opt.x:.5e} slhafile={self.slhafile}"
+                )
+
+            nll_ = opt.fun
+            combined_muhat = opt.x[0] if allowNegativeSignals else max(opt.x[0], 0.0)
+            sigma_mu = combined_muhat * np.sqrt(
+                sum((s / m) ** 2 for s, m in zip(sigma_mus, muhats))
+            )  # add in quadrature
+        elif len(muhats) == 1:
+            combined_muhat = muhats[-1] if allowNegativeSignals else max(muhats[-1], 0.0)
+            sigma_mu = sigma_mus[-1]
+        else:
+            combined_muhat, sigma_mu = 0.0, 0.0
+
+        if extended_output:
+            if nll_ is None:
+                nll_ = self.likelihood(combined_muhat, expected=expected, nll=nll)
+            return {"muhat": combined_muhat, "sigma_mu": sigma_mu, "lmax": nll_}
+
+        return combined_muhat
 
     def getCLsRootFunc(self, expected: bool = False) -> Tuple[float, float, Callable]:
         """
@@ -457,8 +427,6 @@ class TheoryPredictionsCombiner(object):
         plus mu_hat and sigma_mu
         :param expected: if True, compute expected likelihood, else observed
         """
-        # if "UL" in self.cachedObjs[expected]:
-        #     return self.cachedObjs[expected]["UL"]
         fmh = self.findMuHat(expected=expected, allowNegativeSignals=False, extended_output=True)
         mu_hat, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         mu_hat = mu_hat if mu_hat is not None else 0.0
@@ -469,9 +437,6 @@ class TheoryPredictionsCombiner(object):
             expected="posteriori", allowNegativeSignals=False, nll=True, extended_output=True
         )
         mu_hatA, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
-
-        # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
-        # return 1.
 
         def clsRoot(mu: float, return_type: Text = "CLs-alpha") -> float:
             # at - infinity this should be .95,
@@ -494,7 +459,7 @@ class TheoryPredictionsCombiner(object):
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected)
 
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot, allowNegative=False)
-        mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
+        mu_lim = scipy.optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
         self.cachedObjs[expected]["UL"] = mu_lim
         return mu_lim
 
