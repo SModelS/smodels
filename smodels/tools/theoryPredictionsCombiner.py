@@ -262,7 +262,6 @@ class TheoryPredictionsCombiner(object):
             tp_marginalize = tp.marginalize
             tp.marginalize = self.marginalize
             tmp = tp.likelihood(mu, expected=expected, useCached=useCached, nll=True)
-            # print(type(tp), mu, tmp)
             if tmp is not None:
                 nll += tmp
                 changed = True
@@ -400,10 +399,10 @@ class TheoryPredictionsCombiner(object):
             if not opt.success:
                 logger.debug(
                     f"combiner.findMuHat did not terminate successfully: {opt.message} \n"
-                    f"mu_hat={opt.x:.5e} slhafile={self.slhafile}"
+                    f"mu_hat={opt.x[0]:.5e} slhafile={self.slhafile}"
                 )
 
-            nll_ = opt.fun
+            nll_ = opt.fun if nll else np.exp(-opt.fun)
             combined_muhat = opt.x[0] if allowNegativeSignals else max(opt.x[0], 0.0)
             sigma_mu = combined_muhat * np.sqrt(
                 sum((s / m) ** 2 for s, m in zip(sigma_mus, muhats))
