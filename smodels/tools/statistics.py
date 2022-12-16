@@ -256,8 +256,11 @@ def CLsfromNLL(
         CLsb = 1.0 - stats.multivariate_normal.cdf(sqmu)
         CLb = stats.multivariate_normal.cdf(sqA - sqmu)
     else:
-        CLsb = 1.0 - (qA != 0) * stats.multivariate_normal.cdf((qmu + qA) / (2 * sqA))
-        CLb = 1.0 - (qA != 0) * stats.multivariate_normal.cdf((qmu - qA) / (2 * sqA))
+        if qA != 0.0:
+            CLsb = 1.0 - stats.multivariate_normal.cdf((qmu + qA) / (2 * sqA))
+            CLb = 1.0 - stats.multivariate_normal.cdf((qmu - qA) / (2 * sqA))
+        else:
+            CLsb, CLb = 1.0, 1.0
 
     CLs = CLsb / CLb if CLb > 0 else 0.0
 
@@ -272,7 +275,7 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder, allowNegative=True):
     :param allowNegative: if False, then do not allow a or b to become negative
     :returns: the interval a,b
     """
-    sigma_mu = min(max(sigma_mu, 0.5), 100.)
+    sigma_mu = min(max(sigma_mu, 0.5), 100.0)
     # the root should be roughly at mu_hat + 2*sigma_mu
     a = mu_hat + 1.5 * sigma_mu
     ra = rootfinder(a)

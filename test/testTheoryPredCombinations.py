@@ -63,7 +63,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
         ulmu = combiner.getUpperLimitOnMu()
         # 16.78997035426023/4.71
-        self.assertAlmostEqual(ulmu, 3.41744, 3)
+        self.assertAlmostEqual(ulmu, 3.41744, 2)
         ulmu_exp = combiner.getUpperLimitOnMu(expected=True)
         self.assertAlmostEqual(ulmu_exp, 2.143318, 3)
 

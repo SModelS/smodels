@@ -286,7 +286,7 @@ class TheoryPrediction(object):
             )
         self.cachedLlhds[expected][mu] = llhd
         if nll:
-            if llhd == 0.0:
+            if llhd in [0.0, None]:
                 return 700.0
             return -np.log(llhd)
         return llhd
