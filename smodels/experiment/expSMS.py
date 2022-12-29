@@ -12,8 +12,7 @@ from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.particleNode import ParticleNode,InclusiveParticleNode
 from smodels.base.genericSMS import GenericSMS
 from smodels.experiment.expAuxiliaryFuncs import bracketToProcessStr
-from smodels.experiment.graphMatching import getPerfectMatchings
-from smodels.base.physicsUnits import fb
+from smodels.experiment.graphMatching import maximal_matching
 from itertools import product
 from collections import OrderedDict
 
@@ -165,19 +164,16 @@ class ExpSMS(GenericSMS):
         :return: True if objects are equivalent.
         """
 
-        match = self._matchesTo(other)
+        match = self.matchesTo(other)
 
         return (match is not None)
 
     def __hash__(self):
         return object.__hash__(self)
 
-    def matchesTo(self,other):
+    def matchesTo(self, other):
         """
         Check if self matches other.
-        If other has a 2 branch structure, check
-        for both branch orderings and return the
-        matching with the highest mass.
 
         :param other: TheorySMS or ExpSMS object to be compared to
 
@@ -185,77 +181,53 @@ class ExpSMS(GenericSMS):
                  but with the nodes from other.
         """
 
-        if not isinstance(other,GenericSMS):
-            raise SModelSError("Can not compare ExpSMS and %s" %str(type(other)))
-
-        matches = []
-        for matchedSMS in self.matchesIter(other):
-            if matchedSMS is None:
-                continue
-            matches.append(matchedSMS)
-        
-        if not matches:
-            return None
-        
-
-        # matches = sorted(matches)
-
-        return matches[0]
-
-    def matchesIter(self, other):
-        """
-        Iterate over possible matchings between self and other.
-
-        :param other: TheorySMS or ExpSMS object to be compared to
-
-        :return: Iterator over matched trees.
-        """
-
 
         if not isinstance(other,GenericSMS):
             raise SModelSError("Can not compare ExpSMS and %s" %str(type(other)))
 
-
-        mapDictIter = self.matchingDictIter(other,self.rootIndex,
+        mapDict = self.computeMatchingDict(other,self.rootIndex,
                                            other.rootIndex)
 
-        for mapDict in mapDictIter:
-            # Invert mapping dictionary {self -> other} -> {other -> self}
-            # following the ordering of self
-            invMapDict = OrderedDict()
-            for n1 in self.nodeIndices:
-                if not n1 in mapDict:  # For InclusiveNodes the match is partial
-                    continue
-                n2 = mapDict[n1]
-                # For inclusiveLists, set the firt match
-                if isinstance(n2,dict):
-                    n2 = list(n2.keys())[0]
-                invMapDict[n2] = n1
+        if mapDict is None:
+            return None
 
 
-            # Get max node number from self
-            maxNode = max(invMapDict.values())
-            # Get unmatched nodes from other (in case of InclusiveNodes or InclusiveLists)
-            missingNodes = set(other.nodeIndices).difference(set(invMapDict.keys()))
-            # Add missing nodes to invMapDict:
-            for n2 in missingNodes:
-                maxNode += 1
-                invMapDict[n2] = maxNode
+        # Invert mapping dictionary {self -> other} -> {other -> self}
+        # following the ordering of self
+        invMapDict = OrderedDict()
+        for n1 in self.nodeIndices:
+            if not n1 in mapDict:  # For InclusiveNodes the match is partial
+                continue
+            n2 = mapDict[n1]
+            # For inclusiveLists, set the firt match
+            if isinstance(n2,dict):
+                n2 = list(n2.keys())[0]
+            invMapDict[n2] = n1
 
-            # Make a new tree from other
-            matchedTree = other.copy()
-            # Relabel nodes following the numbering and ordering of self:
-            matchedTree.relabelNodeIndices(invMapDict)
-            # Sort according to node order from self:
-            nodesOrder = self.nodeIndices
-            matchedTree.sortAccordingTo(nodesOrder)
 
-            yield matchedTree
+        # Get max node number from self
+        maxNode = max(invMapDict.values())
+        # Get unmatched nodes from other (in case of InclusiveNodes or InclusiveLists)
+        missingNodes = set(other.nodeIndices).difference(set(invMapDict.keys()))
+        # Add missing nodes to invMapDict:
+        for n2 in missingNodes:
+            maxNode += 1
+            invMapDict[n2] = maxNode
 
-    def matchingDictIter(self, other, n1, n2):
+        # Make a new tree from other
+        matchedTree = other.copy()
+        # Relabel nodes following the numbering and ordering of self:
+        matchedTree.relabelNodeIndices(invMapDict)
+        # Sort according to node order from self:
+        nodesOrder = self.nodeIndices
+        matchedTree.sortAccordingTo(nodesOrder)
+
+        return matchedTree
+
+    def computeMatchingDict(self, other, n1, n2):
         """
         Compare the subtrees with n1 and n2 as roots and
-        iterates over the possible matching dictionaries with the node matchings {n1 : n2,...}.
+        return a dictionary with the node matchings {n1 : n2,...}.
         It uses the node comparison to define semantically equivalent nodes.
 
         :param other: TheorySMS or ExpSMS object to be compared to self.
@@ -353,26 +325,29 @@ class ExpSMS(GenericSMS):
         # there will be no full matching:
         if len(left_nodes) != len(right_nodes):
             return None
-        # Compute all the maximal (perfect) matchings
-        # (mapping where every node1 is connected to a single node2)
-        edgesList = {k : list(v.keys()) for k,v in edges.items()}
-        mapDictIter = getPerfectMatchings(left_nodes, right_nodes, edgesList)
-        for mapDict in mapDictIter:
-            # Check if the match was successful.
-            left_matches = len(set(mapDict.keys()))
-            right_matches = len(set(mapDict.values()))
-            if left_matches != len(left_nodes):
-                continue
-            if right_matches != len(right_nodes):
-                continue
+        # Compute the maximal matching
+        # (mapping where each node1 is connected to a single node2)
+        mapDict = maximal_matching(left_nodes, right_nodes, edges)
 
-            for d1, d2 in list(mapDict.items()):
-                daughtersMap = edges[d1][d2]
-                finalMap.update(daughtersMap)
-            finalMap[n1] = n2
+        # print('finalMap before:\n',finalMap)
+        # print('Maximal matching:\n',mapDict)
 
-            # print('   returning for %i = %i' %(n1,n2),finalMap)
-            yield finalMap
+
+        # Check if the match was successful.
+        left_matches = len(set(mapDict.keys()))
+        right_matches = len(set(mapDict.values()))
+        if left_matches != len(left_nodes):
+            return None
+        if right_matches != len(right_nodes):
+            return None
+
+        for d1, d2 in list(mapDict.items()):
+            daughtersMap = edges[d1][d2]
+            finalMap.update(daughtersMap)
+        finalMap[n1] = n2
+
+        # print('   returning for %i = %i' %(n1,n2),finalMap)
+        return finalMap
 
     def identicalTo(self,other):
         

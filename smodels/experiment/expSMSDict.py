@@ -13,6 +13,7 @@ from smodels.experiment.txnameObj import TxName
 from smodels.experiment.expSMS import ExpSMS
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from collections import OrderedDict
 
 class ExpSMSDict(dict):
     """ 
@@ -154,7 +155,6 @@ class ExpSMSDict(dict):
 
         return newDict
             
-
     def getSMS(self):
         """
         Iterate over the unique ExpSMS stored in self.
@@ -246,3 +246,48 @@ class ExpSMSDict(dict):
                         self[smsMatch].update({tx : smsLabel})
                         self[tx][smsLabel] = smsMatch
                         self._nodesDict[tx][smsLabel] = invertNodesDict
+
+        # Sort txnames by dataMap 
+        # (the one requiring the largest amount of data comes first)
+        for txsms in self.getSMS():
+            txDict = self[txsms]
+            sortedTx = sorted(txDict.keys(), key = lambda tx: len(tx.dataMap), reverse=True)
+            newDict = OrderedDict([(tx,txDict[tx]) for tx in sortedTx])
+            self[txsms] = newDict
+
+
+    def getMatchesFrom(self,smsTopDict):
+
+
+        # Create dictionary with matches
+        smsMatch = {expSMS : [] for expSMS in self.getSMS()}
+        # Group expSMS by canon names:
+        cNamesDict = {}
+        for expSMS in smsMatch:
+            if expSMS.canonName not in cNamesDict:
+                cNamesDict[expSMS.canonName] = []
+            cNamesDict[expSMS.canonName].append(expSMS)
+
+        # Loop over theory SMS (from decomposition)
+        # and compute matches:
+        for sms in smsTopDict.getSMSList():
+            canonName  = sms.canonName
+            # Select txSMS with matching canon name:
+            selectedSMSlist = []
+            for cName,expSMSList in cNamesDict.items():
+                if cName == canonName:
+                    selectedSMSlist += expSMSList
+
+            # Loop over selected SMS and check for matches
+            # Store the (correctly ordered) match in smsMatch
+            for expSMS in selectedSMSlist:
+                # Use the first txname to compute the match:
+                txname = list(self[expSMS].keys())[0]
+                smsLabel = self[expSMS][txname]
+                matchedSMS = txname.hasSMSas(sms,useLabel=smsLabel)
+                if matchedSMS is None:
+                    continue
+                matchedSMS.smsID = sms.smsID
+                smsMatch[expSMS].append((matchedSMS,sms))    
+
+        return smsMatch

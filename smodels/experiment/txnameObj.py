@@ -882,26 +882,50 @@ class TxName(object):
             except TypeError:
                 setattr(self, tag, value)
 
-    def hasSMSas(self, sms):
+    def hasSMSas(self, theorySMS, useLabel=None):
         """
         Verify if any SMS in conditions or constraint matches sms.
+        If possible, check for both branch orderings (for two-branch SMS)
+        and return the one with the largest data/reweighting factor.
 
-        :param sms: SMS object
+        :param theorySMS: SMS object
+        :param useLabel: String specifying the smsLabel to be used. If None, checks
+                         for all ExpSMS in self.smsMap.
         :return: A copy of the sms with its nodes sorted according to
                  the matching topology in the TxName. Nodes matching InclusiveNodes
                  or inclusiveLists are replaced.
         """
 
-        for txsms, smsLabel in self.smsMap.items():
+        if useLabel:
+            checkList = [(expSMS, smsLabel) for expSMS, smsLabel in self.smsMap.items() 
+                                            if smsLabel == useLabel]
+        else:
+            checkList = [(expSMS, smsLabel) for expSMS, smsLabel in self.smsMap.items()]
+        
+        for expSMS, smsLabel in checkList:
             # Compare sms:
-            matchedSMS = txsms.matchesTo(sms)
-            if matchedSMS is None:
+            matches = []
+            for sms in [theorySMS,theorySMS.switchBranches()]:
+                if sms is None: # If None it means we can not switch branches
+                    continue
+                matchedSMS = expSMS.matchesTo(sms)
+                if matchedSMS is None: # If None it means no matches are possible
+                    break
+                matchedSMS.txlabel = smsLabel
+                matches.append(matchedSMS)
+            if not matches:
                 continue
-            matchedSMS.txlabel = smsLabel
-            return matchedSMS
+            elif len(matches) == 1:
+                return matches[0]
+            else: # sort matches by point and reweigthing factor
+                matches = sorted(matches, 
+                                 key = lambda sms: (self.getDataFromSMS(sms),
+                                                    self.getReweightingFor(sms)),
+                                 reverse=True)
+                return matches[0]
 
         # If this point was reached, there were no macthes
-        return False
+        return None
 
     def hasLikelihood(self):
         """

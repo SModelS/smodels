@@ -554,37 +554,16 @@ def theoryPredictionsFor(database, smsTopDict, maxMassDist=0.2,
 
     # Compute matches between TheorySMS from decomposition and the
     # (unique) ExpSMS in the database
-    smsDict = database.expSMSDict
-    smsMatch = {sms : [] for sms in smsDict}
-    cNamesDict = {}
-    for sms in smsDict:
-        if sms.canonName not in cNamesDict:
-            cNamesDict[sms.canonName] = []
-        cNamesDict[sms.canonName].append(sms)
-
-    for sms in smsTopDict.getSMSList():
-        canonName  = sms.canonName
-        # Select txSMS with matching canon name:
-        selectedSMSlist = []
-        for cName,smsList in cNamesDict.items():
-            if cName == canonName:
-                selectedSMSlist += smsList
-
-        # Loop over selected SMS and check for matches
-        # Store the (correctly ordered) match in smsMatch
-        for txsms in selectedSMSlist:
-            matchedSMS = txsms.matchesTo(sms)
-            if matchedSMS is None:
-                continue
-            matchedSMS.smsID = sms.smsID
-            smsMatch[txsms].append((matchedSMS,sms))
-
+    expSMSDict = database.expSMSDict
+    # Compute dictionary with matches:
+    smsMatch = expSMSDict.getMatchesFrom(smsTopDict)
+    
     ret = []
     for expResult in database.expResultList:
         dataSetResults = []
         #  Compute predictions for each data set (for UL analyses there is one single set)
         for dataset in expResult.datasets:
-            predList = _getDataSetPredictions(dataset, smsMatch, smsDict, maxMassDist)
+            predList = _getDataSetPredictions(dataset, smsMatch, expSMSDict, maxMassDist)
             if predList:
                 dataSetResults.append(predList)
         if not dataSetResults:  # no results at all?
