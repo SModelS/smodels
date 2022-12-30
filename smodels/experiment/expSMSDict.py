@@ -169,7 +169,19 @@ class ExpSMSDict(dict):
 
         return iter(self._txDict)
 
-    def setTxNodeOrdering(self,sms,tx,smsLabel):
+    def setTxNodeOrdering(self,sms,tx,smsLabel,reverse=False):
+        """
+        Relabel the node indices in sms accoding to the ExpSMS represented
+        by the smsLabel in the TxName tx (unique ExpSMS indices - > tx sms indices).
+        If reverse=True, do the the reverse labeling (tx sms indices -> unique ExpSMS indices).
+
+        :param sms: SMS object to be relabeled
+        :param tx: TxName object
+        :param smsLabel: Label of the ExpSMS in the TxName object
+        :param reverse: If True, do the reverse labeling
+
+        :return: sms with indices relabeled
+        """
 
         nodesDict = self._nodesDict[tx][smsLabel]
         # If no relabeling is needed, return original sms
@@ -179,7 +191,11 @@ class ExpSMSDict(dict):
         # Restrict the nodes dict to the indices present in the sms
         # (for the case of inclusive txnames, some nodes
         # might not be present in the sms)
-        reducedNodesDict = {oldIndex : newIndex for oldIndex,newIndex in nodesDict.items()
+        if not reverse:
+            reducedNodesDict = {oldIndex : newIndex for oldIndex,newIndex in nodesDict.items()
+                            if oldIndex in sms.nodeIndices}
+        else:
+            reducedNodesDict = {oldIndex : newIndex for newIndex,oldIndex in nodesDict.items()
                             if oldIndex in sms.nodeIndices}
         # If no relabeling is needed, return original sms
         if len(reducedNodesDict) == 0:
@@ -287,6 +303,10 @@ class ExpSMSDict(dict):
                 matchedSMS = txname.hasSMSas(sms,useLabel=smsLabel)
                 if matchedSMS is None:
                     continue
+                # Now set the node indices according to the
+                # unique ExpSMS labels:
+                self.setTxNodeOrdering(matchedSMS,txname,
+                                        smsLabel,reverse=True)
                 matchedSMS.smsID = sms.smsID
                 smsMatch[expSMS].append((matchedSMS,sms))    
 
