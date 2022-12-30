@@ -273,6 +273,14 @@ class ExpSMSDict(dict):
 
 
     def getMatchesFrom(self,smsTopDict):
+        """
+        Checks for all the matches between the SMS in smsTopDict (from decomposition)
+        and the unique SMS in self. Returns a dictionary with the mapping:
+        {unique SMS : [(matched SMS, original SMS),...]}
+
+        :param smsTopDict: TopologyDict object with the TheorySMS from decomposition
+        :return: Dictionary with unique SMS as keys and lists of matched SMS as values.
+        """
 
 
         # Create dictionary with matches
