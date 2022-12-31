@@ -64,10 +64,10 @@ class InterpolationTest(unittest.TestCase):
         txname=expRes[0].datasets[0].txnameList[0] # T2bb
         result=txname.txnameData.getValueFor([300.,100.,300.,100.])
         result = result*txname.y_unit
-        self.assertAlmostEqual( result.asNumber(pb),0.162457 )
+        self.assertAlmostEqual( result.asNumber(pb),0.162457, places=4 )
         result=txname.txnameData.getValueFor([300.,125.,300.,125.])
         result = result*txname.y_unit
-        self.assertAlmostEqual( result.asNumber(pb),0.237745 )
+        self.assertAlmostEqual( result.asNumber(pb),0.237745, places=4 )
 
     def test6D(self):
         # print database
@@ -77,13 +77,13 @@ class InterpolationTest(unittest.TestCase):
         txname=expRes[0].datasets[0].txnameList[0] # T6bbWW
         result=txname.txnameData.getValueFor([ 300.,105.,100.,300.,105.,100.])
         result = result*txname.y_unit
-        self.assertAlmostEqual( result.asNumber(pb),0.176266 )
+        self.assertAlmostEqual( result.asNumber(pb),0.176266, places=4 )
         result=txname.txnameData.getValueFor([ 300.,270.,200.,300.,270.,200.])
         result = result*txname.y_unit
-        self.assertAlmostEqual( result.asNumber(pb), 87.0403 )
+        self.assertAlmostEqual( result.asNumber(pb), 87.0403, places=3 )
         result=txname.txnameData.getValueFor([300.,270.,200.,300.,271.,200.])
         result = result*txname.y_unit
-        self.assertAlmostEqual( result.asNumber(pb), 88.6505675 )
+        self.assertAlmostEqual( result.asNumber(pb), 88.6505675, places=3 )
 
 
     def testOutsidePlane(self):
@@ -93,10 +93,10 @@ class InterpolationTest(unittest.TestCase):
         txname=expRes[0].datasets[0].txnameList[0] # T6bbWW
         result=txname.txnameData.getValueFor([300.,127.,300.,127.5])
         result = result*txname.y_unit
-        self.assertAlmostEqual( result.asNumber(pb),0.24452092 )
+        self.assertAlmostEqual( result.asNumber(pb),0.24452092,places=4 )
         result=txname.txnameData.getValueFor([600.,120.,600.,130.])
         result = result*txname.y_unit
-        self.assertAlmostEqual( result.asNumber(pb),0.0197154 )
+        self.assertAlmostEqual( result.asNumber(pb),0.0197154,places=4 )
         result=txname.txnameData.getValueFor([300.,120.,300.,130.])
         self.assertTrue ( result is None )
 

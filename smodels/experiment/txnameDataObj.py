@@ -186,7 +186,10 @@ class TxNameData(object):
         if ret < minXsec:
             logger.debug('Interpolation below simplex values. Will take the smallest simplex value.')
             ret = minXsec
-        return float(ret)
+        # Round to 6 significant digits to avoid
+        # numerical instabilities
+        ret = self.round_to_n(float(ret),6)
+        return ret
 
     def _estimateExtrapolationError(self, point):
         """
