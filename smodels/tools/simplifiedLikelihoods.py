@@ -615,7 +615,7 @@ class LikelihoodComputer:
         ntot = nb + nsig
         cov = np.array(sigma2)
         # weight = cov**(-1) ## weight matrix
-        weight = linalg.inv(cov)
+        # weight = linalg.inv(cov)
         diag_cov = np.diag(cov)
         # first: no covariances:
         q = diag_cov * (ntot - nobs)
@@ -646,8 +646,8 @@ class LikelihoodComputer:
                 for j in range(ndims):
                     if i == j:
                         continue
-                    dq = thetamax[j] * ntot[i] * diag_cov[i] * weight[i, j]
-                    dp = thetamax[j] * weight[i, j] * diag_cov[i]
+                    dq = thetamax[j] * ntot[i] * diag_cov[i] * self.weight[i, j]
+                    dp = thetamax[j] * self.weight[i, j] * diag_cov[i]
                     if abs(dq / q[i]) > 0.3:
                         # logger.warning ( "too big a change in iteration." )
                         dq = np.abs(0.3 * q[i]) * np.sign(dq)
