@@ -341,12 +341,12 @@ class Model(object):
 
                 #  Convert PDGs to particle objects:
                 daughters = []
-                for pdg in newDecay.ids:
-                    daughter = self.getParticlesWith(pdg=pdg)
+                for pid in newDecay.ids:
+                    daughter = self.getParticlesWith(pdg=pid)
                     if not daughter:
-                        raise SModelSError("Particle with PDG = %i was not found in model. Check the model definitions." % pdg)
+                        raise SModelSError("Particle with PDG = %i was not found in model. Check the model definitions." % pid)
                     elif len(daughter) > 1:
-                        raise SModelSError("Multiple particles defined with PDG = %i. PDG ids must be unique." % pdg)
+                        raise SModelSError("Multiple particles defined with PDG = %i. PDG ids must be unique." % pid)
                     else:
                         daughter = daughter[0]
                     daughters.append(daughter)
