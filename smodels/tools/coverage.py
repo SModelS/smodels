@@ -438,15 +438,19 @@ class FinalStateSMS(TheorySMS):
 
     def oldStr(self):
         """
-        Generates a string using the old format (bracket notaion)
+        Generates a string using the old format (bracket notaion),
+        if possible. For non Z2-like SMS, return the process string.
 
         :returns: string representation of the SMS (in bracket notation)
         """
 
-        evenParticles, finalBSM, _ = self.treeToBrackets()
-        smsStr = str(evenParticles).replace("'","").replace(" ","")
-        smsStr += ' '+str(tuple(finalBSM)).replace("'","").replace(" ","")
-        smsStr = smsStr.replace('~','')
+        try:
+            evenParticles, finalBSM, _ = self.treeToBrackets()
+            smsStr = str(evenParticles).replace("'","").replace(" ","")
+            smsStr += ' '+str(tuple(finalBSM)).replace("'","").replace(" ","")
+            smsStr = smsStr.replace('~','')
+        except:
+            smsStr = str(self)
 
         return smsStr
 
