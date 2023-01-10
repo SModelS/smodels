@@ -320,10 +320,6 @@ class Model(object):
             if particle.totalwidth > promptWidth:
                 particle.totalwidth = float('inf')*GeV  # Treat particle as prompt
                 logger.debug("Particle %s has width above the threshold and will be assumed as prompt." % particle.pdg)
-                if erasePrompt and not particle.isSM:
-                    logger.debug("Erasing quantum numbers of (prompt) particle %s." % particle.pdg)
-                    for attr in erasePrompt:
-                        delattr(particle, attr)
             else:
                 particle.decays.append(None)  # Include possibility for particle being long-lived (non-prompt)
 
@@ -362,6 +358,15 @@ class Model(object):
                 if not p.isSM:
                     logger.warning("No valid decay found for %s. It will be considered stable." % p)
                 p.totalwidth = 0.*GeV
+
+        # Finally erase attributes of prompt particles
+        if erasePrompt:
+            for particle in self.BSMparticles:
+                 if not particle.isSM and particle.totalwidth > promptWidth:
+                    logger.debug("Erasing quantum numbers of (prompt) particle %s." % particle.pdg)
+                    for attr in erasePrompt:
+                        delattr(particle, attr)
+
 
     def updateParticles(self, inputFile, promptWidth=None, stableWidth=None,
                         roundMasses=1, erasePrompt=['spin', 'eCharge', 'colordim']):
