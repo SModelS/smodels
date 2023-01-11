@@ -235,6 +235,7 @@ class TheoryPredictionsCombiner(object):
         expected: Union[bool, Text] = False,
         nll: bool = False,
         useCached: bool = False,
+        isAsimov: bool = False,
     ) -> Union[float, None]:
         """
         Compute the likelihood at a given mu
@@ -242,6 +243,8 @@ class TheoryPredictionsCombiner(object):
         :param expected: if True, compute expected likelihood, else observed
         :param nll: if True, return negative log likelihood, else likelihood
         :param useCached: if True, will return the cached value from theoryPrediction (if available)
+        :param isAsimov: if True, will signal the backend to generate negloglikelihood
+                         based on asimov data
         """
         if isinstance(mu, (list, np.ndarray)):
             mu = mu[0]
@@ -261,7 +264,9 @@ class TheoryPredictionsCombiner(object):
             # Set the theory marginalize attribute to the combiner value:
             tp_marginalize = tp.marginalize
             tp.marginalize = self.marginalize
-            tmp = tp.likelihood(mu, expected=expected, useCached=useCached, nll=True)
+            tmp = tp.likelihood(
+                mu, expected=expected, useCached=useCached, nll=True, isAsimov=isAsimov
+            )
             if tmp is not None:
                 nll += tmp
                 changed = True
@@ -337,12 +342,14 @@ class TheoryPredictionsCombiner(object):
         conditions = [tp.getmaxCondition() for tp in self]
         return max(conditions)
 
+    @singleDecorator
     def findMuHat(
         self,
         allowNegativeSignals: bool = False,
         expected: Union[bool, Text] = False,
         extended_output: bool = False,
         nll: bool = False,
+        isAsimov: bool = False,
     ) -> Union[Dict, float, None]:
         """
         Finds the POI (signal strength; mu) that maximizes the likelihood.
@@ -368,11 +375,10 @@ class TheoryPredictionsCombiner(object):
             muhat = 0.0 if muhat is None else muhat
 
             # Do not allow mu=0 at this stage breaks the computation
-            if muhat > 0.0:
-                muhats.append(muhat)
-                sigma_mus.append(sigma_mu)
-                weighted_mu.append(muhat / sigma_mu**2)
-                weights.append(1.0 / sigma_mu**2)
+            muhats.append(muhat)
+            sigma_mus.append(sigma_mu)
+            weighted_mu.append(muhat / sigma_mu**2)
+            weights.append(1.0 / sigma_mu**2)
 
         nll_ = None
         if len(muhats) > 1:
@@ -384,8 +390,11 @@ class TheoryPredictionsCombiner(object):
 
             # @JACK: for multi-POI analyses this function will not work,
             # likelihood function needs to be adapted for such cases
+            #
+            # Each `likelihood` function should have `isAsimov`
+            # keyword argument to compute nll for asimov data
             negloglikelihood = lambda mu: self.likelihood(
-                mu[0], expected=expected, nll=True, useCached=False
+                mu[0], expected=expected, nll=True, useCached=False, isAsimov=isAsimov
             )
 
             # @JACK: It is possible to allow user to modify the optimiser properties in the future
@@ -415,11 +424,14 @@ class TheoryPredictionsCombiner(object):
 
         if extended_output:
             if nll_ is None:
-                nll_ = self.likelihood(combined_muhat, expected=expected, nll=nll)
+                nll_ = self.likelihood(
+                    combined_muhat, expected=expected, nll=nll, isAsimov=isAsimov
+                )
             return {"muhat": combined_muhat, "sigma_mu": sigma_mu, "lmax": nll_}
 
         return combined_muhat
 
+    @singleDecorator
     def getCLsRootFunc(self, expected: bool = False) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
@@ -433,7 +445,11 @@ class TheoryPredictionsCombiner(object):
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
         fmh = self.findMuHat(
-            expected="posteriori", allowNegativeSignals=False, nll=True, extended_output=True
+            expected="posteriori",
+            allowNegativeSignals=False,
+            nll=True,
+            extended_output=True,
+            isAsimov=True,
         )
         mu_hatA, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
 
@@ -443,7 +459,9 @@ class TheoryPredictionsCombiner(object):
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
             nll = self.likelihood(mu, expected=expected, useCached=False, nll=True)
-            nllA = self.likelihood(mu, expected="posteriori", useCached=False, nll=True)
+            nllA = self.likelihood(
+                mu, expected="posteriori", useCached=False, nll=True, isAsimov=True
+            )
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type)
 
         return mu_hat, sigma_mu, clsRoot
@@ -472,7 +490,9 @@ class TheoryPredictionsCombiner(object):
                         CLs: returns CLs value
         """
         assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
-        _, _, clsRoot = self.getCLsRootFunc(expected=expected)
+        _, _, clsRoot = self.getCLsRootFunc(
+            expected=expected,
+        )
 
         return clsRoot(1.0, return_type=return_type)
 
