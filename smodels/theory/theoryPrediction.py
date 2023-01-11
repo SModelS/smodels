@@ -129,7 +129,7 @@ class TheoryPrediction(object):
                     )
                     srNsigs = [
                         srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0
-                        for ds in self.dataset._datasets
+                        for ds in self.dataset.origdatasets
                     ]
                 self.cachedObjs[expected]["UL"] = getCombinedUpperLimitFor(
                     self.dataset, srNsigs, expected=expected, deltas_rel=self.deltas_rel
@@ -267,7 +267,7 @@ class TheoryPrediction(object):
             )
             srNsigs = [
                 srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0
-                for ds in self.dataset._datasets
+                for ds in self.dataset.origdatasets
             ]
             llhd = getCombinedLikelihood(
                 self.dataset, srNsigs, self.marginalize, self.deltas_rel, expected=expected, mu=mu
@@ -423,7 +423,7 @@ class TheoryPrediction(object):
             )
             srNsigs = [
                 srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0
-                for ds in self.dataset._datasets
+                for ds in self.dataset.origdatasets
             ]
             # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
             s = getCombinedStatistics(
