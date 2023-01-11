@@ -145,7 +145,8 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
     # Getting the path to the json files
     jsonFiles = [js for js in dataset.globalInfo.jsonFiles]
     jsons = dataset.globalInfo.jsons.copy()
-    datasets = [ds.getID() for ds in dataset._datasets]
+    # datasets = [ds.getID() for ds in dataset._datasets]
+    datasets = [ds.getID() for ds in dataset.origdatasets]
     total = sum(nsig)
     if total == 0.0:  # all signals zero? can divide by anything!
         total = 1.0
@@ -163,7 +164,7 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
             continue
         if not all([ds in datasets for ds in dataset.globalInfo.jsonFiles[jsName]]):
             # Some SRs are missing for this json combination
-            logger.error("Wrong json definition in globalInfo.jsonFiles for json : %s" % jsName)
+            logger.error( "Wrong json definition in globalInfo.jsonFiles for json : %s" % jsName)
     logger.debug("list of datasets: {}".format(datasets))
     logger.debug("jsonFiles after filtering: {}".format(jsonFiles))
     # Constructing the list of signals with subsignals matching each json
@@ -175,7 +176,7 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
                 index = datasets.index(srName)
             except ValueError:
                 line = (
-                    f"{srName} signal region provided in globalInfo is not in the list of datasets"
+                    f"{srName} signal region provided in globalInfo is not in the list of datasets, {jsName}:{','.join(datasets)}"
                 )
                 raise ValueError(line)
             sig = nsig[index]
@@ -219,16 +220,16 @@ def getCombinedSimplifiedLikelihood(
             "Asked for combined simplified likelihood, but no covariance given: %s" % dataset.type
         )
         return None
-    if len(dataset._datasets) == 1:
+    if len(dataset.origdatasets) == 1:
         if isinstance(nsig, list):
             nsig = nsig[0]
-        return dataset._datasets[0].likelihood(nsig, marginalize=marginalize)
-    bg = [x.dataInfo.expectedBG for x in dataset._datasets]
-    nobs = [x.dataInfo.observedN for x in dataset._datasets]
+        return dataset.origdatasets[0].likelihood(nsig, marginalize=marginalize)
+    bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
+    nobs = [x.dataInfo.observedN for x in dataset.origdatasets]
     if expected == True:
-        nobs = [x.dataInfo.expectedBG for x in dataset._datasets]
+        nobs = [x.dataInfo.expectedBG for x in dataset.origdatasets]
     if expected == False:
-        nobs = [x.dataInfo.observedN for x in dataset._datasets]
+        nobs = [x.dataInfo.observedN for x in dataset.origdatasets]
     cov = dataset.globalInfo.covariance
     computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
     if expected == "posteriori":
@@ -243,13 +244,13 @@ def getCombinedSimplifiedStatistics(
     """compute likelihood at maximum, for simplified likelihoods only"""
     if dataset.type != "simplified":
         return {"lmax": -1.0, "muhat": None, "sigma_mu": None}
-    nobs = [x.dataInfo.observedN for x in dataset._datasets]
-    bg = [x.dataInfo.expectedBG for x in dataset._datasets]
+    nobs = [x.dataInfo.observedN for x in dataset.origdatasets]
+    bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
     if expected == True:
         # nobs = [ x.dataInfo.expectedBG for x in dataset._datasets]
-        nobs = [x.dataInfo.expectedBG for x in dataset._datasets]
+        nobs = [x.dataInfo.expectedBG for x in dataset.origdatasets]
         # nobs = [int(np.round(x.dataInfo.expectedBG)) for x in dataset._datasets]
-    bg = [x.dataInfo.expectedBG for x in dataset._datasets]
+    bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
     cov = dataset.globalInfo.covariance
     if type(nsig) in [list, tuple]:
         nsig = np.array(nsig)
