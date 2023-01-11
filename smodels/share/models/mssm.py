@@ -60,9 +60,9 @@ c2 = Particle(isSM=False, label='C2+', pdg=1000037, eCharge=1, colordim=1, spin=
 
 ##### R-even  ###############
 #Higgs
-H = Particle(isSM=True, label='H+', pdg=37, eCharge=+1, colordim=1, spin=0)
-A0 = Particle(isSM=True, label='A0', pdg=36, eCharge=0, colordim=1, spin=0, _isInvisible=False)
-H0 = Particle(isSM=True, label='H0', pdg=35, eCharge=0, colordim=1, spin=0, _isInvisible=False)
+H = Particle(isSM=False, label='H+', pdg=37, eCharge=+1, colordim=1, spin=0)
+A0 = Particle(isSM=False, label='A0', pdg=36, eCharge=0, colordim=1, spin=0, _isInvisible=False)
+H0 = Particle(isSM=False, label='H0', pdg=35, eCharge=0, colordim=1, spin=0, _isInvisible=False)
 
 
 squarks = [sdl,sul,sdr,sur] + [ssl,scl,ssr,scr] + [sb1,st1,sb2,st2]
