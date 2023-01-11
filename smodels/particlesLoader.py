@@ -122,8 +122,6 @@ def getParticlesFromModule(modelFile):
     logger.debug("Trying to load model file: %s" % modelFile)
 
     fname = modelFile[:]
-    if fname.endswith(".py"):
-        fname = modelFile[:-3]
     if "/" in fname:
         import shutil
         filename = os.path.basename(fname)
@@ -131,7 +129,12 @@ def getParticlesFromModule(modelFile):
     else:
         filename = fname
 
-    pM = import_module(filename, package='smodels')
+    if filename.endswith(".py"):
+        importName = filename[:-3]
+    else:
+        importName = filename
+
+    pM=import_module(importName, package='smodels')
     logger.debug("Found model file at %s" % pM.__file__)
     if filename != fname:
         os.remove(filename)
