@@ -8,6 +8,7 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 .. moduleauthor:: Jamie Yellen <j.yellen.1@research.gla.ac.uk>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
+.. moduleauthor:: Jack Y. Araz <jack.araz@durham.ac.uk>
 """
 
 import numpy as np
@@ -19,7 +20,7 @@ from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict
 
 
-class TheoryPredictionsCombiner(object):
+class TheoryPredictionsCombiner:
     """
     Facility used to combine theory predictions from different analyes.
     """
@@ -49,6 +50,9 @@ class TheoryPredictionsCombiner(object):
         # Iterate over theory predictions
         for model in self.theoryPredictions:
             yield model
+
+    def __len__(self):
+        return len(self.theoryPredictions)
 
     def __repr__(self):
         return f"{self.analysisId()} : {self.totalXsection():.3f} [fb]"
@@ -414,7 +418,7 @@ class TheoryPredictionsCombiner(object):
             nll_ = opt.fun if nll else np.exp(-opt.fun)
             combined_muhat = opt.x[0] if allowNegativeSignals else max(opt.x[0], 0.0)
             sigma_mu = combined_muhat * np.sqrt(
-                sum((s / m) ** 2 for s, m in zip(sigma_mus, muhats))
+                sum((s / (abs(m) if abs(m) > 0 else 1e-9)) ** 2 for s, m in zip(sigma_mus, muhats))
             )  # add in quadrature
         elif len(muhats) == 1:
             combined_muhat = muhats[-1] if allowNegativeSignals else max(muhats[-1], 0.0)
