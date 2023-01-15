@@ -611,6 +611,7 @@ class PyhfUpperLimitComputer:
     def getSigmaMu(self, workspace):
         """given a workspace, compute a rough estimate of sigma_mu,
         the uncertainty of mu_hat"""
+        # TODO this function is wrong needs fixing
         obss, bgs, bgVars, nsig = {}, {}, {}, {}
         channels = workspace.channels
         for chdata in workspace["channels"]:

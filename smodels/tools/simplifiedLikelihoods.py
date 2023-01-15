@@ -542,9 +542,9 @@ class LikelihoodComputer:
         obs = self.model.observed
 
         def is_integer(x):
-            if type(x) in [int, np.int64]:
+            if isinstance(x, (int, np.int64, np.int32)):
                 return True
-            if type(x) in [float]:
+            elif isinstance(x, float):
                 return x.is_integer()
             return False
 
