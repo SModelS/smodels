@@ -7,7 +7,7 @@
 
 .. moduleauthor:: Gael Alguero <gaelalguero@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
-
+.. moduleauthor:: Jack Y. Araz <jack.araz@durham.ac.uk>
 """
 import jsonpatch
 import warnings
@@ -36,6 +36,7 @@ import time, sys, os
 
 try:
     import pyhf
+    from pyhf.infer.calculators import generate_asimov_data
 except ModuleNotFoundError:
     print("[SModelS:pyhfInterface] pyhf import failed. Is the module installed?")
     sys.exit(-1)
@@ -110,7 +111,7 @@ class PyhfData:
     :ivar nWS: number of workspaces = number of json files
     """
 
-    def __init__(self, nsignals, inputJsons, jsonFiles=None ):
+    def __init__(self, nsignals, inputJsons, jsonFiles=None):
         self.nsignals = nsignals  # fb
         self.inputJsons = inputJsons
         self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
@@ -126,9 +127,9 @@ class PyhfData:
         self.getWSInfo()
         self.checkConsistency()
 
-    def totalYield ( self ):
-        """ the total yield in all signal regions """
-        S = sum ( [ sum(x) for x in self.nsignals ] )
+    def totalYield(self):
+        """the total yield in all signal regions"""
+        S = sum([sum(x) for x in self.nsignals])
         return S
 
     def getWSInfo(self):
@@ -215,7 +216,7 @@ class PyhfUpperLimitComputer:
     Class that computes the upper limit using the jsons files and signal informations in the `data` instance of `PyhfData`
     """
 
-    def __init__(self, data, cl=0.95, includeCRs=False, lumi=None ):
+    def __init__(self, data, cl=0.95, includeCRs=False, lumi=None):
         """
         :param data: instance of `PyhfData` holding the signals information
         :param cl: confdence level at which the upper limit is desired to be computed
@@ -420,31 +421,33 @@ class PyhfUpperLimitComputer:
         :param model: the pyhf model
         :return: the list of initial parameters values that gives positive total yields
         """
-        for pos,yld in enumerate(model.expected_actualdata(init_pars)):
+        for pos, yld in enumerate(model.expected_actualdata(init_pars)):
             # If a total yield (mu*signal + background) evaluated with the initial parameters is negative, increase a parameter to turn it positive
             if yld < 0:
                 sum_bins = 0
                 # Find the SR and the bin (the position inside the SR) corresponding to the negative total yield
-                for channel,nbins in model.config.channel_nbins.items():
+                for channel, nbins in model.config.channel_nbins.items():
                     sum_bins += nbins
                     if pos < sum_bins:
                         SR = channel
                         # Bin number = the position of the bin in the SR
                         # (i.e. the position of the negative total yield in the list, starting at the corresponding SR)
-                        bin_num = pos-sum_bins+nbins
+                        bin_num = pos - sum_bins + nbins
                         break
                 # Find the name of the parameter that modifies the background yield of the negative total yield
-                for channel in workspace['channels']:
-                    if channel['name'] == SR:
-                        for sample in range(len(channel['samples'])):
-                            for modifier in channel['samples'][sample]['modifiers']:
+                for channel in workspace["channels"]:
+                    if channel["name"] == SR:
+                        for sample in range(len(channel["samples"])):
+                            for modifier in channel["samples"][sample]["modifiers"]:
                                 # The multiplicative modifier (i.e. parameter) that will be increased is a 'staterror' one (others may work as well)
                                 # In case of a simplified json, let's take the only parameter called 'totalError'
-                                if ('type' in modifier.keys() and modifier['type'] == 'staterror') or modifier['name'] == 'totalError':
-                                    name = modifier['name']
+                                if (
+                                    "type" in modifier.keys() and modifier["type"] == "staterror"
+                                ) or modifier["name"] == "totalError":
+                                    name = modifier["name"]
                                     break
                 # Find the position of the parameter within the pyhf list of parameters
-                position = self.get_position(name,model)+bin_num
+                position = self.get_position(name, model) + bin_num
                 # Find the upper bound of the parameter that will be increased
                 max_bound = model.config.suggested_bounds()[position][1]
                 # If the parameter one wants to increase is not fixed, add 0.1 to its value (it is an arbitrary step) until
@@ -458,7 +461,9 @@ class PyhfUpperLimitComputer:
                             break
         return init_pars
 
-    def likelihood(self, mu=1.0, workspace_index=None, nll=False, expected=False):
+    def likelihood(
+        self, mu=1.0, workspace_index=None, nll=False, expected=False, isAsimov: bool = False,
+    ):
         """
         Returns the value of the likelihood.
         Inspired by the `pyhf.infer.mle` module but for non-log likelihood
@@ -468,6 +473,7 @@ class PyhfUpperLimitComputer:
         :param expected: if False, compute expected values, if True,
             compute a priori expected, if "posteriori" compute posteriori
             expected
+        :param isAsimov: if true, compute neg log likelihood with asimov data.
         """
         mumin, mumax = -20.0, 40.0
         if mu > mumax:
@@ -519,6 +525,18 @@ class PyhfUpperLimitComputer:
                 model = workspace.model(modifier_settings=msettings)
                 wsData = workspace.data(model)
 
+                if isAsimov:
+                    # Compute the Asimov data with respect to the statistical model
+                    wsData = generate_asimov_data(
+                        0.0,
+                        wsData,
+                        model,
+                        model.config.suggested_init(),
+                        model.config.suggested_bounds(),
+                        model.config.suggested_fixed(),
+                        return_fitted_pars=False,
+                    )
+
                 _, nllh = pyhf.infer.mle.fixed_poi_fit(
                     1.0, wsData, model, return_fitted_val=True, maxiter=200
                 )
@@ -529,12 +547,16 @@ class PyhfUpperLimitComputer:
                     0.0, workspace.data(model), model, return_fitted_val=True, maxiter=200
                 )
                 initpars = init.tolist()
-                initpars[model.config.poi_index] = 1.
+                initpars[model.config.poi_index] = 1.0
                 # Try to turn positive all the negative total yields (mu*signal + background) evaluated with the initial parameters
                 initpars = self.rescaleBgYields(initpars, workspace, model)
                 # If the a total yield is still negative with the increased initial parameters, print a message
-                if not all([True if yld >= 0 else False for yld in model.expected_actualdata(initpars)]):
-                    logger.debug(f'Negative total yield after increasing the initial parameters for mu={mu}')
+                if not all(
+                    [True if yld >= 0 else False for yld in model.expected_actualdata(initpars)]
+                ):
+                    logger.debug(
+                        f"Negative total yield after increasing the initial parameters for mu={mu}"
+                    )
                 try:
                     bestFitParam, nllh = pyhf.infer.mle.fixed_poi_fit(
                         1.0,
@@ -545,7 +567,12 @@ class PyhfUpperLimitComputer:
                         maxiter=2000,
                     )
                     # If a total yield is negative with the best profiled parameters, return None
-                    if not all([True if yld >= 0 else False for yld in model.expected_actualdata(bestFitParam)]):
+                    if not all(
+                        [
+                            True if yld >= 0 else False
+                            for yld in model.expected_actualdata(bestFitParam)
+                        ]
+                    ):
                         self.restore()
                         return self.exponentiateNLL(None, not nll)
                 except (pyhf.exceptions.FailedMinimization, ValueError) as e:
@@ -560,9 +587,7 @@ class PyhfUpperLimitComputer:
             except:
                 ret = float(ret[0])
             # Cache the likelihood (but do we use it?)
-            self.data.cached_likelihoods[
-                workspace_index
-            ] = ret
+            self.data.cached_likelihoods[workspace_index] = ret
             ret = self.exponentiateNLL(ret, not nll)
             # print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
             self.restore()
@@ -601,9 +626,9 @@ class PyhfUpperLimitComputer:
         else return nll"""
         if twice_nll == None:
             return None
-            #if doIt:
+            # if doIt:
             #    return 0.0
-            #return 9000.0
+            # return 9000.0
         if doIt:
             return np.exp(-twice_nll / 2.0)
         return twice_nll / 2.0
@@ -639,19 +664,19 @@ class PyhfUpperLimitComputer:
         vars = []
         for c in channels:
             # poissonian error
-            if nsig[c]==0.:
-                nsig[c]=1e-5
-            poiss = abs(obss[c]-bgs[c]) / nsig[c]
-            gauss = bgVars[c] / nsig[c]**2
-            vars.append ( poiss + gauss )
-        var_mu = np.sum ( vars )
-        n = len ( obss )
+            if nsig[c] == 0.0:
+                nsig[c] = 1e-5
+            poiss = abs(obss[c] - bgs[c]) / nsig[c]
+            gauss = bgVars[c] / nsig[c] ** 2
+            vars.append(poiss + gauss)
+        var_mu = np.sum(vars)
+        n = len(obss)
         # print ( f" sigma_mu from pyhf uncorr {var_mu} {n} "  )
-        sigma_mu = float ( np.sqrt ( var_mu / (n**2) ) )
+        sigma_mu = float(np.sqrt(var_mu / (n**2)))
         self.sigma_mu = sigma_mu
-        #import IPython
-        #IPython.embed()
-        #sys.exit()
+        # import IPython
+        # IPython.embed()
+        # sys.exit()
 
     def lmax(self, workspace_index=None, nll=False, expected=False, allowNegativeSignals=False):
         """
@@ -691,19 +716,24 @@ class PyhfUpperLimitComputer:
             try:
                 bounds = model.config.suggested_bounds()
                 if allowNegativeSignals:
-                    bounds[model.config.poi_index] = (-5., 10. )
-                muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model,
-                        return_fitted_val=True, par_bounds = bounds )
-                if False: # get sigma_mu from hessian
-                    pyhf.set_backend(pyhf.tensorlib, 'minuit')
-                    muhat, maxNllh,o = pyhf.infer.mle.fit(workspace.data(model), model,
-                            return_fitted_val=True, par_bounds = bounds,
-                            return_result_obj = True )
-                    sigma_mu = float ( np.sqrt ( o.hess_inv[0][0] ) ) * self.scale
+                    bounds[model.config.poi_index] = (-5.0, 10.0)
+                muhat, maxNllh = pyhf.infer.mle.fit(
+                    workspace.data(model), model, return_fitted_val=True, par_bounds=bounds
+                )
+                if False:  # get sigma_mu from hessian
+                    pyhf.set_backend(pyhf.tensorlib, "minuit")
+                    muhat, maxNllh, o = pyhf.infer.mle.fit(
+                        workspace.data(model),
+                        model,
+                        return_fitted_val=True,
+                        par_bounds=bounds,
+                        return_result_obj=True,
+                    )
+                    sigma_mu = float(np.sqrt(o.hess_inv[0][0])) * self.scale
                     # print ( f"\n>>> sigma_mu from hessian {sigma_mu:.2f}" )
-                    pyhf.set_backend(pyhf.tensorlib, 'scipy')
+                    pyhf.set_backend(pyhf.tensorlib, "scipy")
 
-                muhat = muhat[model.config.poi_index]*self.scale
+                muhat = muhat[model.config.poi_index] * self.scale
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.error(f"pyhf mle.fit failed {e}")
@@ -757,7 +787,7 @@ class PyhfUpperLimitComputer:
         :return: the upper limit on sigma times eff at `self.cl` level (0.95 by default)
         """
 
-        ul = self.getUpperLimitOnMu( expected=expected, workspace_index=workspace_index)
+        ul = self.getUpperLimitOnMu(expected=expected, workspace_index=workspace_index)
         if ul == None:
             return ul
         if self.lumi is None:
@@ -943,6 +973,7 @@ class PyhfUpperLimitComputer:
             ul = ul / self.data.totalYield() * self.scale
             self.data.cachedULs[expected][workspace_index] = ul
             return ul  # self.scale has been updated within self.rescale() method
+
 
 if __name__ == "__main__":
     C = [
