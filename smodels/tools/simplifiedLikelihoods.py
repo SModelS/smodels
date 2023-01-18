@@ -525,7 +525,7 @@ class LikelihoodComputer:
 
     # Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     # def prob(x0, x1 )
-    def llhdOfTheta(self, theta, nll=True):
+    def llhdOfTheta(self, theta, nll=True, isAsimov: bool = False):
         """likelihood for nuicance parameters theta, given signal strength
             self.mu. notice, by default it returns nll
         :param theta: nuisance parameters
@@ -540,6 +540,12 @@ class LikelihoodComputer:
             lmbda = nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
         lmbda[lmbda <= 0.0] = 1e-30  ## turn zeroes to small values
         obs = self.model.observed
+
+        if isAsimov:
+            # set obs as asimov data
+            computer = LikelihoodComputer(self.model, self.toys)
+            theta_hat0, _ = computer.findThetaHat(0.0)
+            obs = array([x + y for x, y in zip(self.model.backgrounds, theta_hat0)])
 
         def is_integer(x):
             if isinstance(x, (int, np.int64, np.int32)):
@@ -585,32 +591,48 @@ class LikelihoodComputer:
             # raise Exception("ValueError %s, %s" % ( e, self.model.totalCovariance(self.nsig) ))
             # raise Exception("ValueError %s, %s" % ( e, self.model.V ))
 
-    def dNLLdTheta(self, theta):
+    def dNLLdTheta(self, theta, isAsimov: bool = False):
         """the derivative of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood."""
         # print ( f"nsig {self.nsig} {self.model.nsignal}" )
         nsig = self.mu * self.model.nsignal
+
+        obs = self.model.observed
+        if isAsimov:
+            # set obs as asimov data
+            computer = LikelihoodComputer(self.model, self.toys)
+            theta_hat0, _ = computer.findThetaHat(0.0)
+            obs = array([x + y for x, y in zip(self.model.backgrounds, theta_hat0)])
+
         if self.model.isLinear():
             xtot = theta + self.model.backgrounds + nsig
             xtot[xtot <= 0.0] = 1e-30  ## turn zeroes to small values
-            nllp_ = self.ones - self.model.observed / xtot + np.dot(theta, self.weight)
+            nllp_ = self.ones - obs / xtot + np.dot(theta, self.weight)
             return nllp_
         lmbda = nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
         lmbda[lmbda <= 0.0] = 1e-30  ## turn zeroes to small values
         # nllp_ = ( self.ones - self.model.observed / lmbda + np.dot( theta , self.weight ) ) * ( self.ones + 2*self.model.C * theta / self.model.B**2 )
         T = self.ones + 2 * self.model.C / self.model.B**2 * theta
-        nllp_ = T - self.model.observed / lmbda * (T) + np.dot(theta, self.weight)
+        nllp_ = T - obs / lmbda * (T) + np.dot(theta, self.weight)
         return nllp_
 
-    def d2NLLdTheta2(self, theta):
+    def d2NLLdTheta2(self, theta, isAsimov: bool = False):
         """the Hessian of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood."""
         # xtot = theta + self.ntot
         nsig = self.mu * self.model.nsignal
+
+        obs = self.model.observed
+        if isAsimov:
+            # set obs as asimov data
+            computer = LikelihoodComputer(self.model, self.toys)
+            theta_hat0, _ = computer.findThetaHat(0.0)
+            obs = array([x + y for x, y in zip(self.model.backgrounds, theta_hat0)])
+
         if self.model.isLinear():
             xtot = theta + self.model.backgrounds + nsig
             xtot[xtot <= 0.0] = 1e-30  ## turn zeroes to small values
-            nllh_ = self.weight + np.diag(self.model.observed / (xtot**2))
+            nllh_ = self.weight + np.diag(obs / (xtot**2))
             return nllh_
         lmbda = nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
         lmbda[lmbda <= 0.0] = 1e-30  ## turn zeroes to small values
@@ -618,8 +640,8 @@ class LikelihoodComputer:
         # T_i = 1_i + 2*c_i/B_i**2 * theta_i
         nllh_ = (
             self.weight
-            + np.diag(self.model.observed * T**2 / (lmbda**2))
-            - np.diag(self.model.observed / lmbda * 2 * self.model.C / self.model.B**2)
+            + np.diag(obs * T**2 / (lmbda**2))
+            - np.diag(obs / lmbda * 2 * self.model.C / self.model.B**2)
             + np.diag(2 * self.model.C / self.model.B**2)
         )
         return nllh_
@@ -853,7 +875,7 @@ class LikelihoodComputer:
 
         return like[0][0]
 
-    def marginalizedLikelihood(self, mu, nll):
+    def marginalizedLikelihood(self, mu, nll, isAsimov: bool = False):
         """compute the marginalized likelihood of observing nsig signal event"""
         if (
             self.model.isLinear() and self.model.n == 1
@@ -861,8 +883,15 @@ class LikelihoodComputer:
             return self.marginalizedLLHD1D(mu, nll)
         nsig = mu * self.model.nsignal
 
+        obs = self.model.observed
+        if isAsimov:
+            # set obs as asimov data
+            computer = LikelihoodComputer(self.model, self.toys)
+            theta_hat0, _ = computer.findThetaHat(0.0)
+            obs = array([x + y for x, y in zip(self.model.backgrounds, theta_hat0)])
+
         vals = []
-        self.gammaln = special.gammaln(self.model.observed + 1)
+        self.gammaln = special.gammaln(obs + 1)
         thetas = stats.multivariate_normal.rvs(
             mean=[0.0] * self.model.n,
             # cov=(self.model.totalCovariance(nsig)),
@@ -880,7 +909,7 @@ class LikelihoodComputer:
                 if v <= 0.0:
                     lmbda[ctr] = 1e-30
                 # print ( "lmbda=",lmbda )
-            poisson = self.model.observed * np.log(lmbda) - lmbda - self.gammaln
+            poisson = obs * np.log(lmbda) - lmbda - self.gammaln
             # poisson = np.exp(self.model.observed*np.log(lmbda) - lmbda - self.model.backgrounds - self.gammaln)
             vals.append(np.exp(sum(poisson)))
             # vals.append ( reduce(lambda x, y: x*y, poisson) )
@@ -891,7 +920,7 @@ class LikelihoodComputer:
             mean = -log(mean)
         return mean
 
-    def profileLikelihood(self, mu: float, nll: bool):
+    def profileLikelihood(self, mu: float, nll: bool, isAsimov: bool = True):
         """compute the profiled likelihood for mu.
         Warning: not normalized.
         Returns profile likelihood and error code (0=no error)
@@ -901,11 +930,13 @@ class LikelihoodComputer:
         theta_hat, _ = self.findThetaHat(mu)
         if self.debug_mode:
             self.theta_hat = theta_hat
-        ret = self.llhdOfTheta(theta_hat, nll)
+        ret = self.llhdOfTheta(theta_hat, nll, isAsimov)
 
         return ret
 
-    def likelihood(self, mu: float, marginalize: bool = False, nll: bool = False) -> float:
+    def likelihood(
+        self, mu: float, marginalize: bool = False, nll: bool = False, isAsimov: bool = True
+    ) -> float:
         """compute likelihood for mu, profiling or marginalizing the nuisances
         :param mu: float Parameter of interest, signal strength
         :param marginalize: if true, marginalize, if false, profile
@@ -913,10 +944,10 @@ class LikelihoodComputer:
         """
         if marginalize:
             # p,err = self.profileLikelihood ( nsig, deltas )
-            return self.marginalizedLikelihood(mu, nll)
+            return self.marginalizedLikelihood(mu, nll, isAsimov)
             # print ( "p,l=",p,l,p/l )
         else:
-            return self.profileLikelihood(mu, nll)
+            return self.profileLikelihood(mu, nll, isAsimov)
 
     def lmax(self, marginalize=False, nll=False, allowNegativeSignals=False):
         """convenience function, computes likelihood for nsig = nobs-nbg,
