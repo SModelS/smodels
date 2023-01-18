@@ -548,9 +548,9 @@ class LikelihoodComputer:
             obs = array([x + y for x, y in zip(self.model.backgrounds, theta_hat0)])
 
         def is_integer(x):
-            if isinstance(x, (int, np.int64, np.int32)):
+            if type(x) in [int, np.int64]:
                 return True
-            elif isinstance(x, float):
+            if type(x) in [float]:
                 return x.is_integer()
             return False
 
@@ -973,7 +973,6 @@ class LikelihoodComputer:
         return self.likelihood(marginalize=marginalize, nll=nll, mu=muhat_)
 
     def findMuHat(
-        # def findMuHatViaGradientDescent(
         self,
         allowNegativeSignals=False,
         extended_output=False,

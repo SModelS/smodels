@@ -14,8 +14,11 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statistics import TruncatedGaussians
-from smodels.tools.srCombinations import getCombinedStatistics, \
-            getCombinedUpperLimitFor, getCombinedLikelihood
+from smodels.tools.srCombinations import (
+    getCombinedStatistics,
+    getCombinedUpperLimitFor,
+    getCombinedLikelihood,
+)
 import itertools
 import numpy as np
 
@@ -155,10 +158,9 @@ class TheoryPrediction(object):
         if xsec is None or upperLimit is None:
             return None
 
-        muUL = (upperLimit/xsec).asNumber()
+        muUL = (upperLimit / xsec).asNumber()
 
         return muUL
-
 
     def getRValue(self, expected=False):
         """
@@ -230,7 +232,7 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["chi2"] = None
         return self.cachedObjs[expected]["chi2"]
 
-    def likelihood(self, mu=1.0, expected=False, nll=False, useCached=True):
+    def likelihood(self, mu=1.0, expected=False, nll=False, useCached=True, isAsimov: bool = False):
         """
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood. if "posteriori",
@@ -270,14 +272,24 @@ class TheoryPrediction(object):
                 for ds in self.dataset._datasets
             ]
             llhd = getCombinedLikelihood(
-                self.dataset, srNsigs, self.marginalize, self.deltas_rel, expected=expected, mu=mu
+                self.dataset,
+                srNsigs,
+                self.marginalize,
+                self.deltas_rel,
+                expected=expected,
+                mu=mu,
+                isAsimov=isAsimov,
             )
         if self.dataType() == "efficiencyMap":
             nsig = (mu * self.xsection.value * lumi).asNumber()
             llhd = self.dataset.likelihood(
-                nsig, expected = expected, marginalize = self.marginalize,
-                deltas_rel = self.deltas_rel
-                )
+                nsig,
+                expected=expected,
+                marginalize=self.marginalize,
+                deltas_rel=self.deltas_rel,
+                isAsimov=isAsimov,
+            )
+
 
         if self.dataType() == "upperLimit":
             # these fits only work with negative signals!
@@ -292,7 +304,13 @@ class TheoryPrediction(object):
         return llhd
 
     def likelihoodFromLimits(
-        self, mu=1.0, expected=False, chi2also=False, corr=0.6, allowNegativeSignals=False
+        self,
+        mu=1.0,
+        expected=False,
+        chi2also=False,
+        corr=0.6,
+        allowNegativeSignals=False,
+        isAsimov=False,
     ):
         """compute the likelihood from expected and observed upper limits.
         :param expected: compute expected, not observed likelihood
@@ -319,18 +337,22 @@ class TheoryPrediction(object):
             return None
 
         eul = self.dataset.getUpperLimitFor(
-            element=self.avgElement, txnames=self.txnames, expected=True
+            element=self.avgElement,
+            txnames=self.txnames,
+            expected=True,
         )
         if eul is None:
             if chi2also:
                 return (None, None)
             return None
         ul = self.dataset.getUpperLimitFor(
-            element=self.avgElement, txnames=self.txnames, expected=False
+            element=self.avgElement,
+            txnames=self.txnames,
+            expected=False,
         )
         lumi = self.dataset.getLumi()
-        computer = TruncatedGaussians ( ul, eul, self.xsection.value, lumi=lumi, corr = corr )
-        ret = computer.likelihood ( mu )
+        computer = TruncatedGaussians(ul, eul, self.xsection.value, lumi=lumi, corr=corr)
+        ret = computer.likelihood(mu)
         llhd, muhat, sigma_mu = ret["llhd"], ret["muhat"], ret["sigma_mu"]
         """
         if False: # muhat < 0.0 and allowNegativeSignals == False:
@@ -343,9 +365,9 @@ class TheoryPrediction(object):
             nllhd, nmuhat, nsigma_mu = computer.likelihood ( 0. )
         """
         self.muhat_ = muhat
-        self.sigma_mu_ = sigma_mu 
+        self.sigma_mu_ = sigma_mu
         if chi2also:
-            return (llhd, computer.chi2 ( ) )
+            return (llhd, computer.chi2())
         return llhd
 
     def computeStatistics(self, expected=False, allowNegativeSignals=False):
@@ -383,13 +405,14 @@ class TheoryPrediction(object):
             lumi = self.dataset.getLumi()
             nsig = (self.xsection.value * lumi).asNumber()
             llhd = self.dataset.likelihood(
-                nsig, expected = expected, marginalize = self.marginalize,
-                deltas_rel = self.deltas_rel
-                )
+                nsig, expected=expected, marginalize=self.marginalize, deltas_rel=self.deltas_rel
+            )
             llhd_sm = self.dataset.likelihood(
-                expected = expected, nsig = 0.0, marginalize = self.marginalize,
-                deltas_rel = self.deltas_rel
-                )
+                expected=expected,
+                nsig=0.0,
+                marginalize=self.marginalize,
+                deltas_rel=self.deltas_rel,
+            )
             llhd_max = self.dataset.lmax(
                 marginalize=self.marginalize,
                 deltas_rel=self.deltas_rel,
@@ -815,7 +838,7 @@ def _getDataSetPredictions(dataset, smsTopList, maxMassDist, marginalize=False, 
         theoryPrediction.txnames = cluster.txnames
         theoryPrediction.xsection = _evalConstraint(cluster)
         # Skip results with too small (invisible) cross-sections
-        if theoryPrediction.xsection.value < 1e-6*fb:
+        if theoryPrediction.xsection.value < 1e-6 * fb:
             continue
         theoryPrediction.conditions = _evalConditions(cluster)
         theoryPrediction.elements = cluster.elements

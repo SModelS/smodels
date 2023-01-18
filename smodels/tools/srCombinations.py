@@ -75,7 +75,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
 
 
 def getCombinedLikelihood(
-    dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0
+    dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0, isAsimov=False
 ):
     """compute only lBSM
     :param nsig: predicted signal (list)
@@ -89,20 +89,20 @@ def getCombinedLikelihood(
         # Loading the jsonFiles
         ulcomputer = _getPyhfComputer(dataset, nsig, False)
         index = ulcomputer.getBestCombinationIndex()
-        lbsm = ulcomputer.likelihood(mu=mu, workspace_index=index, expected=expected)
+        lbsm = ulcomputer.likelihood(mu=mu, workspace_index=index, expected=expected, isAsimov = isAsimov)
         return lbsm
     lbsm = getCombinedSimplifiedLikelihood(
-        dataset, nsig, marginalize, deltas_rel, expected=expected, mu=mu )
+        dataset, nsig, marginalize, deltas_rel, expected=expected, mu=mu, isAsimov = isAsimov )
     return lbsm
 
 def getCombinedPyhfStatistics(
-    dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False
+    dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False, isAsimov=False
 ):
         # Getting the path to the json files
         # Loading the jsonFiles
         ulcomputer = _getPyhfComputer(dataset, nsig, False)
         index = ulcomputer.getBestCombinationIndex()
-        lbsm = ulcomputer.likelihood(mu=1.0, workspace_index=index, expected=expected)
+        lbsm = ulcomputer.likelihood(mu=1.0, workspace_index=index, expected=expected, isAsimov = isAsimov)
         lmax = ulcomputer.lmax(
             workspace_index=index, expected=expected, allowNegativeSignals=allowNegativeSignals
         )
@@ -113,11 +113,11 @@ def getCombinedPyhfStatistics(
             pass
         sigma_mu = ulcomputer.sigma_mu
         ulcomputer = _getPyhfComputer(dataset, [0.0] * len(nsig), False)
-        lsm = ulcomputer.likelihood(mu=0.0, workspace_index=index, expected=expected)
+        lsm = ulcomputer.likelihood(mu=0.0, workspace_index=index, expected=expected, isAsimov = isAsimov)
         return {"lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat, "sigma_mu": sigma_mu}
 
 def getCombinedStatistics(
-    dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, allowNegativeSignals=False
+    dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, allowNegativeSignals=False, isAsimov=False
 ):
     """compute lBSM, lmax, and LSM in a single run
     :param nsig: predicted signal (list)
@@ -126,9 +126,9 @@ def getCombinedStatistics(
     """
     if dataset.type == "pyhf":
         return getCombinedPyhfStatistics ( dataset, nsig, marginalize, deltas_rel,
-            deltas_rel, expected=expected, allowNegativeSignals=allowNegativeSignals)
+            deltas_rel, expected=expected, allowNegativeSignals=allowNegativeSignals, isAsimov = isAsimov)
     cslm = getCombinedSimplifiedStatistics( dataset, nsig, marginalize,
-        deltas_rel, expected=expected, allowNegativeSignals=allowNegativeSignals,
+        deltas_rel, expected=expected, allowNegativeSignals=allowNegativeSignals, isAsimov = isAsimov
     )
     return cslm
 
@@ -198,7 +198,7 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
 
 
 def getCombinedSimplifiedLikelihood(
-    dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0
+    dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0, isAsimov=False
 ):
     """
     Computes the combined simplified likelihood to observe nobs events, given a
@@ -235,10 +235,10 @@ def getCombinedSimplifiedLikelihood(
         theta_hat, _ = computer.findThetaHat ( 0. )
         nobs = [float(x + y) for x, y in zip(bg, theta_hat)]
         computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-    return computer.likelihood(1., marginalize=marginalize)
+    return computer.likelihood(1., marginalize=marginalize, isAsimov = isAsimov)
 
 def getCombinedSimplifiedStatistics(
-    dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False
+    dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False, isAsimov=False
 ):
     """compute likelihood at maximum, for simplified likelihoods only"""
     if dataset.type != "simplified":
@@ -259,8 +259,8 @@ def getCombinedSimplifiedStatistics(
         nobs = [float(x + y) for x, y in zip(bg, theta_hat)]
         computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
     ret = computer.findMuHat(allowNegativeSignals=allowNegativeSignals, extended_output=True)
-    lbsm = computer.likelihood ( 1., marginalize = marginalize )
-    lsm = computer.likelihood ( 0., marginalize = marginalize )
+    lbsm = computer.likelihood ( 1., marginalize = marginalize, isAsimov = isAsimov )
+    lsm = computer.likelihood ( 0., marginalize = marginalize, isAsimov = isAsimov )
     lmax = ret["lmax"]
     if lsm > lmax:
         muhat = ret["muhat"]
