@@ -18,7 +18,7 @@ from smodels.tools.srCombinations import getCombinedStatistics, \
             getCombinedUpperLimitFor, getCombinedLikelihood
 import itertools
 import numpy as np
-
+import spey
 
 class TheoryPrediction(object):
     """
@@ -26,13 +26,14 @@ class TheoryPrediction(object):
     for an analysis.
     """
 
-    def __init__(self, marginalize=False, deltas_rel=None):
+    def __init__(self, marginalize=False, deltas_rel=None, spey=True):
         """a theory prediction. marginalize and deltas_rel are meant to be
             constants
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param deltas_rel: relative uncertainty in signal (float).
                            Default value is 20%.
         """
+        # self.statModel = getStatModel()
         self.analysis = None
         self.xsection = None
         self.conditions = None
@@ -46,6 +47,41 @@ class TheoryPrediction(object):
         self.deltas_rel = deltas_rel
         self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
         self.cachedLlhds = {False: {}, True: {}, "posteriori": {}}
+
+    # def getStatModel():
+    #     if spey==True:
+    #         if self.dataset.getType() == "combined":
+    #             if hasattr(self.dataset.globalInfo, "covariance"):
+    #                 return slef.statModel = spey.get_multi_region_statistical_model(
+    #                     analysis=self.dataset.globalInfo.id,
+    #                     signal=signal,
+    #                     background=background,
+    #                     covariance=,
+    #                     nb=,
+    #                     third_moment=,
+    #                     xsection=self.xsection.value # in pb
+    #                 )
+    #             elif hasattr(self.dataset.globalInfo, "jsonFiles"):
+    #                 return slef.statModel = spey.get_multi_region_statistical_model(
+    #                     analysis=self.dataset.globalInfo.id,
+    #                     signal=signal,
+    #                     background=background,
+    #                     xsection=self.xsection.value # in pb
+    #                 )
+    #         elif self.dataset.getType() == "efficiencyMap":
+    #
+    #             return slef.statModel = spey.get_single_region_statistical_model(
+    #                 nobs=,
+    #                 nb: float,
+    #                 deltanb: float,
+    #                 signal_eff: float,
+    #                 xsection: float,
+    #                 lumi=self.dataset.getLumi(),
+    #                 analysis=self.dataset.globalInfo.id,
+    #                 backend: AvailableBackends,
+    #                 nsig = (mu * self.xsection.value * lumi).asNumber()
+    #             )
+    #     return None
 
     def __str__(self):
         ret = "%s:%s" % (self.analysisId(), self.totalXsection())
@@ -342,7 +378,7 @@ class TheoryPrediction(object):
             nllhd, nmuhat, nsigma_mu = computer.likelihood ( 0. )
         """
         self.muhat_ = muhat
-        self.sigma_mu_ = sigma_mu 
+        self.sigma_mu_ = sigma_mu
         if chi2also:
             return (llhd, computer.chi2 ( ) )
         return llhd
