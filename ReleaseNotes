@@ -2,6 +2,7 @@ Release xxx
 =======================================================
 
   * fixed bug for an LHE input only with anti-particles
+  * fixed C++ interface to work with python 3.11
 
 
 Release v2.2.1, Tue 18 October 2022

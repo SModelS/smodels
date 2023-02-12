@@ -37,6 +37,12 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 2.2.2:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * fixed bug for an LHE input only with anti-particles
+  * fixed C++ interface to work with python 3.11
+
 New in Version 2.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
