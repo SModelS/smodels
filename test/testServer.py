@@ -50,9 +50,11 @@ class ServerTest(unittest.TestCase):
         subprocess.Popen ( cmd, env=myenv )
 
         c = .5
-        while not os.path.exists ( pclfile ):
+        while not os.path.exists ( pclfile ) and c < 10:
             time.sleep ( c )
             c += 1.
+        if not os.path.exists ( pclfile ):
+            raise AssertionError( f"no file {pclfile} created" )
 
         db = Database( pclfile )
         outputfile = runMain(filename,suppressStdout = True, overridedatabase = db )
