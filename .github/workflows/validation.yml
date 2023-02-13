@@ -33,7 +33,7 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f smodels/share/requirements.txt ]; then 
           # silly workaround for python3.7, we need to use old numpy versions
-          echo "numpy" >> modded.txt;
+          echo "numpy>=1.18.0,!=1.21.*" > modded.txt;
           cat smodels/share/requirements.txt | grep -v numpy >> modded.txt;
           python -m pip install -r modded.txt; 
         fi
