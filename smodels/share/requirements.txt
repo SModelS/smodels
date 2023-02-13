@@ -1,5 +1,5 @@
 docutils>=0.3
-numpy>=1.22
+numpy>=1.18.0,!=1.21.*
 scipy>=1.0.0
 unum>=4.0.0
 requests>=2.0.0
