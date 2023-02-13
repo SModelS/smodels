@@ -170,4 +170,7 @@ if __name__ == "__main__":
         ver = getVersion()
         print ( ver )
         sys.exit()
+    if not "TERM" in os.environ or os.environ["TERM"] in [ "", None ]:
+        # just to suppress a warning msg in github actions
+        os.environ["TERM"]="xterm"
     installPythia()
