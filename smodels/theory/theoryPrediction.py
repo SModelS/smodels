@@ -55,7 +55,7 @@ class TheoryPrediction(object):
     #                 return slef.statModel = spey.get_multi_region_statistical_model(
     #                     analysis=self.dataset.globalInfo.id,
     #                     signal=signal,
-    #                     background=background,
+    #                     observed=background,
     #                     covariance=,
     #                     nb=,
     #                     third_moment=,
@@ -65,7 +65,7 @@ class TheoryPrediction(object):
     #                 return slef.statModel = spey.get_multi_region_statistical_model(
     #                     analysis=self.dataset.globalInfo.id,
     #                     signal=signal,
-    #                     background=background,
+    #                     observed=background,
     #                     xsection=self.xsection.value # in pb
     #                 )
     #         elif self.dataset.getType() == "efficiencyMap":
@@ -751,6 +751,20 @@ def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
     theoryPrediction.mass = mass
     theoryPrediction.totalwidth = totalwidth
     theoryPrediction.PIDs = [pdg for pdg, _ in itertools.groupby(PIDList)]  # Remove duplicates
+    # #!TP
+    # if expResult.hasJsonFile():
+    #
+    #     if hasattr(dataset.globalInfo,"includeCRs") and dataset.globalInfo.includeCRs == True:
+    #         theoryPrediciton.statModel = combinedDataSet.getStatModel(signal=,observed=expResult.globalInfo.jsons[0],xsection=totalXsec)
+    #     else:
+    #         removeCRs
+    #         theoryPrediciton.statModel = combinedDataSet.getStatModel(signal=,observed=expResult.globalInfo.jsons[0],xsection=totalXsec)
+    # else:
+    #     theoryPrediciton.statModel = combinedDataSet.getStatModel(signal=,observed=,
+    #                                                             covariance=,nb=,third_moment=,
+    #                                                             delta_sys=, # systematic uncertainty on signal
+    #                                                             xsection=totalXsec
+    #                                                             )
 
     return theoryPrediction
 
@@ -858,6 +872,10 @@ def _getDataSetPredictions(dataset, smsTopList, maxMassDist, marginalize=False, 
         theoryPrediction.totalwidth = theoryPrediction.avgElement.totalwidth
         PIDs = [el.pdg for el in cluster.elements]
         theoryPrediction.PIDs = [pdg for pdg, _ in itertools.groupby(PIDs)]  # Remove duplicates
+        # theoryPrediciton.statModel = dataset.getStatModel(signal_yields=(theoryPrediction.xsection.value*dataset.getLumi()).asNumber(),
+        #                                                     xsection=theoryPrediction.xsection.value,
+        #                                                     backend="pyhf"
+        #                                                     ) #!TP
         predictionList._theoryPredictions.append(theoryPrediction)
 
     if len(predictionList) == 0:

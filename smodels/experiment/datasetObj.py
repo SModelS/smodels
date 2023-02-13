@@ -20,6 +20,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.theory.element import Element
 
+from typing import Text, Union, List, Dict, Optional
 import itertools
 
 # if on, will check for overlapping constraints
@@ -281,6 +282,7 @@ class DataSet(object):
         The values observedN, expectedBG, and bgError are part of dataInfo.
 
         :param nsig: predicted signal (float)
+
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param expected: if true, compute prior expected, if false compute observed
@@ -359,6 +361,7 @@ class DataSet(object):
         """
         Computes the chi2 for a given number of observed events "nobs",
         given number of signal events "nsig", and error on signal "deltas".
+
         nobs, expectedBG and bgError are part of dataInfo.
         :param nsig: predicted signal (float)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
@@ -489,6 +492,48 @@ class DataSet(object):
             if hasattr(self.dataInfo, "upperLimit"):
                 return self.dataInfo.upperLimit
 
+    # !TP
+    # def getStatModel(self,
+    #     signal_yields: Union[float, np.ndarray],
+    #     xsection: Union[float, np.ndarray],
+    #     backend: Text = "pyhf"
+    # ):
+    #     """
+    #     Create statistical model from a single bin or multiple uncorrelated regions
+    #
+    #     :param signal_yields: signal yields
+    #     :param xsection: cross-section
+    #     :param backend: "pyhf" or "simplified_likelihoods"
+    #
+    #     :return: spey StatisticalModel object
+    #
+    #     :raises NotImplementedError: If requested backend has not been recognised.
+    #     """
+    #
+    #     from spey import get_uncorrelated_region_statistical_model
+    #     from spey.backends import AvailableBackends
+    #
+    #     if backend == "pyhf":
+    #         return get_uncorrelated_region_statistical_model(
+    #             observations = self.dataInfo.observedN,
+    #             backgrounds = self.dataInfo.expectedBG,
+    #             background_uncertainty = self.dataInfo.bgError,
+    #             signal_yields = signal,
+    #             xsection = xsec,
+    #             analysis = self.globalInfo.id,
+    #             backend = AvailableBackends(1),
+    #         )
+    #     else:
+    #         return get_uncorrelated_region_statistical_model(
+    #             observations = self.dataInfo.observedN,
+    #             backgrounds = self.dataInfo.expectedBG,
+    #             background_uncertainty = self.dataInfo.bgError,
+    #             signal_yields = signal,
+    #             xsection = xsec,
+    #             analysis = self.globalInfo.id,
+    #             backend = AvailableBackends(2),
+    #         )
+
 
 
 class CombinedDataSet(object):
@@ -601,3 +646,49 @@ class CombinedDataSet(object):
                 return dataset
 
         return None
+
+    # !TP
+    def getStatModel(self,
+        signal: Union[np.ndarray, List[Dict[Text, List]], List[float]],
+        observed: Union[np.ndarray, Dict[Text, List], List[float]],
+        covariance: Optional[Union[np.ndarray, List[List[float]]]] = None,
+        nb: Optional[Union[np.ndarray, List[float]]] = None,
+        third_moment: Optional[Union[np.ndarray, List[float]]] = None,
+        delta_sys: float = 0.0,
+        xsection: float = np.nan,
+    ):
+        """
+        Create a statistical model from multibin data.
+
+        :param signal: number of signal events. For simplified likelihood backend this input can
+                       contain `np.array` or `List[float]` which contains signal yields per region.
+                       For `pyhf` backend this input expected to be a JSON-patch i.e. `List[Dict]`,
+                       see `pyhf` documentation for details on JSON-patch format.
+        :param observed: number of observed events. For simplified likelihood backend this input can
+                           be `np.ndarray` or `List[float]` which contains observations. For `pyhf`
+                           backend this contains **background only** JSON sterilized HistFactory
+                           i.e. `Dict[List]`.
+        :param covariance: Covariance matrix either in the form of `List` or NumPy array. Only used for
+                           simplified likelihood backend.
+        :param nb: number of expected background yields. Only used for simplified likelihood backend.
+        :param third_moment: third moment. Only used for simplified likelihood backend.
+        :param delta_sys: systematic uncertainty on signal. Only used for simplified likelihood backend.
+        :param xsection: cross-section in pb
+        :param analysis: name of the analysis
+        :return: spey StatisticalModel object
+
+        :raises NotImplementedError: if input patter does not match to any backend specific input option
+        """
+
+        from spey import get_multi_region_statistical_model
+
+        return get_multi_region_statistical_model(
+            analysis = self.globalInfo.id,
+            signal = signal,
+            observed = observed,
+            covariance = covariance,
+            nb = nb,
+            third_moment = third_moment,
+            delta_sys = delta_sys,
+            xsection = xsec,
+        )
