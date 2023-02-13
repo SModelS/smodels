@@ -57,7 +57,8 @@ class ServerTest(unittest.TestCase):
             raise AssertionError( f"no file {pclfile} created" )
 
         db = Database( pclfile )
-        outputfile = runMain(filename,suppressStdout = True, overridedatabase = db )
+        outputfile = runMain( filename, timeout = 5, suppressStdout = True, 
+                              overridedatabase = db )
         smodelsOutput = importModule ( outputfile )
         
         client = DatabaseClient ( port = port, verbose = "warn" ) 
