@@ -42,6 +42,7 @@ New in Version 2.2.2:
 
   * fixed bug for an LHE input only with anti-particles
   * fixed C++ interface to work with python 3.11
+  * bumped up pythia8 from 8.307 to 8.308
 
 New in Version 2.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
