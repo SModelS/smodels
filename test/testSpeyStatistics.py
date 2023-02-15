@@ -28,10 +28,12 @@ import math
 from spey import get_uncorrelated_region_statistical_model
 from spey.utils import ExpectationType
 from spey.backends import AvailableBackends
+from spey.hypothesis_testing.utils import find_root_limits
+import scipy
 
 class StatisticsTest(unittest.TestCase):
     def lLHDFromLimits(self):
-        for backendNumber in [1]:
+        for backendNumber in [2]:
             if backendNumber == 1:
                 print("PYHF BACKEND.")
             elif backendNumber == 2:
@@ -39,6 +41,8 @@ class StatisticsTest(unittest.TestCase):
             """to do some statistics on the chi2"""
             nsig = 1.0
             nobs, nbg = 100.0, 100.0
+            backendNumber = 1
+            print(backendNumber)
             statModel = get_uncorrelated_region_statistical_model(observations=nobs,
                                                                     backgrounds=nbg,
                                                                     background_uncertainty=0.001, ### ???
@@ -47,6 +51,29 @@ class StatisticsTest(unittest.TestCase):
                                                                     analysis="UnitTest",
                                                                     backend=AvailableBackends(backendNumber)
                                                                 )
+            def computer(poi_test: float) -> float:
+                expected=ExpectationType.observed
+                CLs = statModel.exclusion_confidence_level(
+                    expected=expected, poi_test=poi_test, allow_negative_signal=True
+                )
+                return CLs[0 if expected == ExpectationType.observed else 2] - 0.95
+
+            muhat, nllmin = statModel.maximize_likelihood(
+                expected=ExpectationType.observed, allow_negative_signal=True
+            )
+            print(muhat) # Should be 0 no?
+
+            low, hig = find_root_limits(
+                computer,
+                loc=0.0,
+                low_ini=muhat + 1.5 if muhat >= 0.0 else 1.0,
+                hig_ini=muhat + 2.5 if muhat >= 0.0 else 1.0,
+            )
+            # hig = 30.
+            print(low,computer(low))
+            print(hig,computer(hig))
+            print(scipy.optimize.brentq(computer, low, hig, xtol=low / 100.0))
+
             ulobs = statModel.poi_upper_limit(expected=ExpectationType.observed)
             ulexp = statModel.poi_upper_limit(expected=ExpectationType.apriori) ### ???
             print("ulobs", ulobs)
@@ -58,6 +85,8 @@ class StatisticsTest(unittest.TestCase):
             for nsig in np.arange(0.1, 100.0, dx):
                 print()
                 print("nsig=", nsig)
+                nsig = 0.1
+                print(backendNumber)
                 statModel = get_uncorrelated_region_statistical_model(observations=nobs,
                                                                         backgrounds=nbg,
                                                                         background_uncertainty=0.001, ### ???
@@ -66,7 +95,7 @@ class StatisticsTest(unittest.TestCase):
                                                                         analysis="UnitTest",
                                                                         backend=AvailableBackends(backendNumber)
                                                                     )
-                llhddir = np.exp(-statModel.likelihood(nsig))
+                llhddir = statModel.likelihood(nsig,return_nll=False)
                 chi2dir = statModel.chi2()
                 print("llhd direct", llhddir, chi2dir)
                 llhdmarg = None
@@ -179,12 +208,12 @@ class StatisticsTest(unittest.TestCase):
     def testUpperLimit(self):
         for backendNumber in [1,2]:
             nsig = 1.0
-            nobs, nbg = 100, 100.0
+            nobs, nbg = 100.0, 100.0
             statModel = get_uncorrelated_region_statistical_model(observations=nobs,
                                                                     backgrounds=nbg,
-                                                                    background_uncertainty=np.sqrt(0.001), ### ???
+                                                                    background_uncertainty=np.sqrt(0.001),
                                                                     signal_yields=nsig,
-                                                                    xsection=1.0, ### ???
+                                                                    xsection=None,
                                                                     analysis="UnitTest",
                                                                     backend=AvailableBackends(backendNumber)
                                                                 )
