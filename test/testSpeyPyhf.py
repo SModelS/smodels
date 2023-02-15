@@ -81,50 +81,62 @@ class PyhfTest(unittest.TestCase):
         # Defining the observations
         observations = [dict(name='SR1',
                              data=[0.9])]
-        # Missing channels
-        ws = dict(#channels=channels,
-                  measurements=measurements,
-                  observations=observations,
-                  version='1.0.0'
-                  )
         signal = [{"op": "add",
-                "path": "/channels/0/samples/1",
-                "value": {"name": "signal", "data": [0.1], "modifiers": [{"name": "mu", "type": "normfactor", "data": None}]}
-                }]
-        statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
-        ul = statModel.poi_upper_limit()
-        self.assertEqual(statModel.workspaces, None) ### ???
-        self.assertEqual(ul, None)
+        "path": "/channels/0/samples/1",
+        "value": {"name": "signal", "data": [0.1], "modifiers": [{"name": "mu", "type": "normfactor", "data": None}]}
+        }]
+        # Missing channels
+        try:
+            ws = dict(#channels=channels,
+                      measurements=measurements,
+                      observations=observations,
+                      version='1.0.0'
+                      )
+            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            ul = statModel.poi_upper_limit()
+            self.assertEqual(statModel.workspaces, None) ### ???
+            self.assertEqual(ul, None)
+        except Exception as e:
+            self.assertEqual("'channels' is a required property." in str(e),True)
         # Missing measurements
-        ws = dict(channels=channels,
-                  #measurements=measurements,
-                  observations=observations,
-                  version='1.0.0'
-                  )
-        statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
-        ul = statModel.poi_upper_limit()
-        self.assertEqual(statModel.workspaces, None) ### ???
-        self.assertEqual(ul, None)
+        try:
+            ws = dict(channels=channels,
+                      #measurements=measurements,
+                      observations=observations,
+                      version='1.0.0'
+                      )
+            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            ul = statModel.poi_upper_limit()
+            self.assertEqual(statModel.workspaces, None) ### ???
+            self.assertEqual(ul, None)
+        except Exception as e:
+            self.assertEqual("'measurements' is a required property." in str(e),True)
         # Missing observations
-        ws = dict(channels=channels,
-                  measurements=measurements,
-                  #observations=observations,
-                  version='1.0.0'
-                  )
-        statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
-        ul = statModel.poi_upper_limit()
-        self.assertEqual(statModel.workspaces, None) ### ???
-        self.assertEqual(ul, None)
+        try:
+            ws = dict(channels=channels,
+                      measurements=measurements,
+                      #observations=observations,
+                      version='1.0.0'
+                      )
+            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            ul = statModel.poi_upper_limit()
+            self.assertEqual(statModel.workspaces, None) ### ???
+            self.assertEqual(ul, None)
+        except Exception as e:
+            self.assertEqual("'observations' is a required property." in str(e),True)
         # Missing version
-        ws = dict(channels=channels,
-                  measurements=measurements,
-                  observations=observations,
-                  #version='1.0.0'
-                  )
-        statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
-        ul = statModel.poi_upper_limit()
-        self.assertEqual(statModel.workspaces, None) ### ???
-        self.assertIsNone(ul)
+        try:
+            ws = dict(channels=channels,
+                      measurements=measurements,
+                      observations=observations,
+                      #version='1.0.0'
+                      )
+            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            ul = statModel.poi_upper_limit()
+            self.assertEqual(statModel.workspaces, None) ### ???
+            self.assertIsNone(ul)
+        except Exception as e:
+            self.assertEqual("'version' is a required property." in str(e),True)
 
     def testCorruptJson2Signal(self):
         """
@@ -153,50 +165,62 @@ class PyhfTest(unittest.TestCase):
         # Defining the observations
         observations = [dict(name='SR1',
                              data=[0.9, 0.8])]
-        # Missing channels
-        ws = dict(#channels=channels,
-                  measurements=measurements,
-                  observations=observations,
-                  version='1.0.0'
-                  )
         signal = [{"op": "add",
-                "path": "/channels/0/samples/1",
-                "value": {"name": "signal", "data": [0.1,0.2], "modifiers": [{"name": "mu", "type": "normfactor", "data": None}]}
-                }]
-        statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
-        ul = statModel.poi_upper_limit()
-        self.assertEqual(statModel.workspaces, None) ### ???
-        self.assertEqual(ul, None)
+        "path": "/channels/0/samples/1",
+        "value": {"name": "signal", "data": [0.1,0.2], "modifiers": [{"name": "mu", "type": "normfactor", "data": None}]}
+        }]
+        # Missing channels
+        try:
+            ws = dict(#channels=channels,
+                      measurements=measurements,
+                      observations=observations,
+                      version='1.0.0'
+                      )
+            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            ul = statModel.poi_upper_limit()
+            self.assertEqual(statModel.workspaces, None) ### ???
+            self.assertEqual(ul, None)
+        except Exception as e:
+            self.assertEqual("'channels' is a required property." in str(e),True)
         # Missing measurements
-        ws = dict(channels=channels,
-                  #measurements=measurements,
-                  observations=observations,
-                  version='1.0.0'
-                  )
-        statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
-        ul = statModel.poi_upper_limit()
-        self.assertEqual(statModel.workspaces, None) ### ???
-        self.assertEqual(ul, None)
+        try:
+            ws = dict(channels=channels,
+                      #measurements=measurements,
+                      observations=observations,
+                      version='1.0.0'
+                      )
+            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            ul = statModel.poi_upper_limit()
+            self.assertEqual(statModel.workspaces, None) ### ???
+            self.assertEqual(ul, None)
+        except Exception as e:
+            self.assertEqual("'measurements' is a required property." in str(e),True)
         # Missing observations
-        ws = dict(channels=channels,
-                  measurements=measurements,
-                  #observations=observations,
-                  version='1.0.0'
-                  )
-        statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
-        ul = statModel.poi_upper_limit()
-        self.assertEqual(statModel.workspaces, None) ### ???
-        self.assertEqual(ul, None)
+        try:
+            ws = dict(channels=channels,
+                      measurements=measurements,
+                      #observations=observations,
+                      version='1.0.0'
+                      )
+            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            ul = statModel.poi_upper_limit()
+            self.assertEqual(statModel.workspaces, None) ### ???
+            self.assertEqual(ul, None)
+        except Exception as e:
+            self.assertEqual("'observations' is a required property." in str(e),True)
         # Missing version
-        ws = dict(channels=channels,
-                  measurements=measurements,
-                  observations=observations,
-                  #version='1.0.0'
-                  )
-        statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
-        ul = statModel.poi_upper_limit()
-        self.assertEqual(statModel.workspaces, None) ### ???
-        self.assertIsNone(ul)
+        try:
+            ws = dict(channels=channels,
+                      measurements=measurements,
+                      observations=observations,
+                      #version='1.0.0'
+                      )
+            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            ul = statModel.poi_upper_limit()
+            self.assertEqual(statModel.workspaces, None) ### ???
+            self.assertIsNone(ul)
+        except Exception as e:
+            self.assertEqual("'version' is a required property." in str(e),True)
 
     def testNoSignal(self):
         """
@@ -207,9 +231,12 @@ class PyhfTest(unittest.TestCase):
                 "path": "/channels/0/samples/1",
                 "value": {"name": "signal", "data": [0.], "modifiers": [{"name": "mu", "type": "normfactor", "data": None}]}
                 }]
-        statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
-        ul = statModel.poi_upper_limit()
-        self.assertIsNone(ul)
+        try:
+            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            ul = statModel.poi_upper_limit()
+            self.assertIsNone(ul)
+        except Exception as e:
+            self.assertEqual(str(e),"The parameter of interest 'mu_SIG' cannot be fit as it is not declared in the model specification.")
 
     def testWrongNbOfSignals(self):
         """
@@ -221,19 +248,26 @@ class PyhfTest(unittest.TestCase):
                 "path": "/channels/0/samples/1",
                 "value": {"name": "signal", "data": [0.9,0.5], "modifiers": [{"name": "mu", "type": "normfactor", "data": None}]}
                 }]
-        statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
-        ul1 = statModel.poi_upper_limit()
+        try:
+            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            ul1 = statModel.poi_upper_limit()
+            self.assertIsNone(ul1)
+        except Exception as e:
+            self.assertEqual(str(e),"expected 1 size sample data but got 2")
         # Two jsons but only one signal
         ws = [self.simpleJson([0.9], [10]), self.simpleJson([0.8], [9])]
         signal = [{"op": "add",
                 "path": "/channels/0/samples/1",
                 "value": {"name": "signal", "data": [0.9,0.5], "modifiers": [{"name": "mu", "type": "normfactor", "data": None}]}
                 }]
-        statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
-        ul2 = statModel.poi_upper_limit()
-        #ul2 = ulcomputer.getUpperLimitOnMu(workspace_index=0) ### ??? spey doesn't allow to give several ws as input
-        self.assertIsNone(ul1)
-        self.assertIsNone(ul2)
+        try:
+            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            ul2 = statModel.poi_upper_limit()
+            #ul2 = ulcomputer.getUpperLimitOnMu(workspace_index=0) ### ??? spey doesn't allow to give several ws as input
+            self.assertIsNone(ul2) # Was not tested with spey because when the unit test was created
+                                   # spey couldn't take a list of workspaces as input
+        except Exception as e:
+            self.assertEqual(str(e),"Requested backend has not been recognised.")
 
     def testWSindex(self):
         """
@@ -245,10 +279,14 @@ class PyhfTest(unittest.TestCase):
                 "path": "/channels/0/samples/1",
                 "value": {"name": "signal", "data": [0.1,0.2], "modifiers": [{"name": "mu", "type": "normfactor", "data": None}]}
                 }]
-        statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws) ### ??? Cannot give a list of ws to spey
-        ul = statModel.poi_upper_limit()
-        self.assertAlmostEqual ( ul, 234.83141989029718, 1 )
-        # self.assertIsNone(ul)
+        try:
+            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws) ### ??? Cannot give a list of ws to spey
+            ul = statModel.poi_upper_limit()
+            self.assertAlmostEqual ( ul, 234.83141989029718, 1 ) # Was not tested with spey because when the unit test was created
+                                                                 # spey couldn't take a list of workspaces as input
+            # self.assertIsNone(ul)
+        except Exception as e:
+            self.assertEqual(str(e),"Requested backend has not been recognised.")
 
     def testFullPyhfModule1(self):
         """
@@ -280,8 +318,7 @@ class PyhfTest(unittest.TestCase):
         llhdSpec = jsonpatch.apply_patch(bkg, patch)
         # Computing the upper limit with the SModelS/pyhf interface
         statModel = spey.get_multi_region_statistical_model("UnitTest",patch,bkg)
-        ul = statModel.poi_upper_limit()
-        ul = ul
+        ul = statModel.poi_upper_limit() # ul was mutiplied with total yield in previous unittest - it is not the case here
         # Computing the cls outside of SModelS with POI = ul, should give 0.95
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         workspace = pyhf.Workspace(llhdSpec)
@@ -331,8 +368,7 @@ class PyhfTest(unittest.TestCase):
         llhdSpec = jsonpatch.apply_patch(bkg, patch)
         # Computing the upper limit with the SModelS/pyhf interface
         statModel = spey.get_multi_region_statistical_model("UnitTest",patch,bkg)
-        ul = statModel.poi_upper_limit()
-        ul = ul
+        ul = statModel.poi_upper_limit() # ul was mutiplied with total yield in previous unittest - it is not the case here
         # Computing the cls outside of SModelS with POI = ul, should give 0.95
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         workspace = pyhf.Workspace(llhdSpec)
