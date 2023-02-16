@@ -173,27 +173,38 @@ class ExpResult(object):
     def hasJsonFile( self ):
         return hasattr(self.globalInfo, "jsonFiles")
 
-
-    """ this feature is not yet ready
     def isUncorrelatedWith ( self, other ):
-        can this expResult be safely assumed to be approximately uncorrelated
-        with "other"? "Other" can be another expResult, or a dataset of
-        an expResult.
+        """ can this expResult be safely assumed to be approximately uncorrelated
+        with "other"? "Other" is another expResult. Later, "other" should also be
+        allowed to be a dataset """
         if self == other: return False
-        if other.globalInfo.dirName ( 1 ) != self.globalInfo.dirName ( 1 ):
+        from smodels.tools.physicsUnits import TeV
+        if abs ( self.globalInfo.sqrts.asNumber(TeV) - other.globalInfo.sqrts.asNumber(TeV) ) > 1e-5:
+            # different runs!
             return True
-        # print ( "%s combinable with %s?" % ( self.globalInfo.id, other.globalInfo.id ) )
+        if "CMS" in self.globalInfo.id and "ATLAS" in other.globalInfo.id:
+            return True # different experiments!
+        if "CMS" in other.globalInfo.id and "ATLAS" in self.globalInfo.id:
+            return True # different experiments!
+        ## first check the combinationsmatrix
+        if hasattr ( self.globalInfo, "_combinationsmatrix" ):
+            matrix = self.globalInfo._combinationsmatrix
+            if self.globalInfo.id in matrix:
+                if other.globalInfo.id in matrix[self.globalInfo.id]:
+                    return True # found it!
+            if other.globalInfo.id in matrix:
+                if self.globalInfo.id in matrix[other.globalInfo.id]:
+                    return True # found it!
+        # now check if maybe the info is in the database itself
         if hasattr ( self.globalInfo, "combinableWith" ):
-            #print ( "check: %s, %s" % (other.globalInfo.id, self.globalInfo.combinableWith) )
+            # if we have this field in the exp result, we use it
             if other.globalInfo.id in self.globalInfo.combinableWith:
                 return True
         if hasattr ( other.globalInfo, "combinableWith" ):
             if self.globalInfo.id in other.globalInfo.combinableWith:
                 return True
-        return None ## FIXME implement
-    """
-
-
+        # nothing found? default is: False
+        return False
 
     def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
                           txname=None, mass=None, compute=False):
