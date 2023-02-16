@@ -52,15 +52,14 @@ class StatisticsTest(unittest.TestCase):
             print("ulobs", ulobs)
             print("ulexp", ulexp)
             f = open("llhds.csv", "wt")
-            # dx = 0.5
-            dx=100;
+            dx = 0.5
             totdir, totlim, totmarg = 0.0, 0.0, 0.0
             for nsig in np.arange(0.1, 100.0, dx):
                 print()
                 print("nsig=", nsig)
                 statModel = get_uncorrelated_region_statistical_model(observations=nobs,
                                                                         backgrounds=nbg,
-                                                                        background_uncertainty=0.001,
+                                                                        background_uncertainty=np.sqrt(0.001),
                                                                         signal_yields=nsig,
                                                                         xsection=None,
                                                                         analysis="UnitTest",
