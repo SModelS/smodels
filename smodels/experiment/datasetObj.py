@@ -22,6 +22,7 @@ from smodels.theory.element import Element
 
 from typing import Text, Union, List, Dict, Optional
 import itertools
+from spey import get_uncorrelated_region_statistical_model,ExpectationType,AvailableBackends
 
 # if on, will check for overlapping constraints
 _complainAboutOverlappingConstraints = True
@@ -274,7 +275,7 @@ class DataSet(object):
 
         return getValuesForObj(self, attribute)
 
-    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False):
+    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, backend="pyhf"):
         """
         Computes the likelihood to observe nobs events,
         given a predicted signal "nsig", assuming "deltas_rel"
@@ -287,35 +288,88 @@ class DataSet(object):
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param expected: if true, compute prior expected, if false compute observed
                          if "posteriori" compute posterior expected
+        :param backend: the backend used to compute the likelihood. Can be "pyhf" or "SL"
         :returns: likelihood to observe nobs events (float)
         """
-        obs = self.dataInfo.observedN
-        if expected:  # this step is done for prior and posterior expected
-            obs = self.dataInfo.expectedBG
+        if deltas_rel != 0.2:
+            logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
-        m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                 deltas_rel=deltas_rel)
-        computer = LikelihoodComputer(m)
-        if expected == "posteriori":
-            thetahat = computer.findThetaHat(0.)
-            if type(self.dataInfo.expectedBG) in [float, np.float64, int]:
-                thetahat = float(thetahat[0])
+        if backend == "pyhf":
+            backendNumber = 1
+            if marginalize == True:
+                logger.error("pyhf backend cannot marginalize.")
+            args={}
+        elif backend == "SL":
+            backendNumber = 2
+            args={"marginalize":marginalize}
+        else:
+            logger.error('%s is not a valid backend. Possible backends are "pyhf" and "SL".' %backend)
+            return None
 
-            obs = self.dataInfo.expectedBG + thetahat
-            m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                     deltas_rel=deltas_rel)
-            # if abs ( nsig[0]-1 ) < 1e-5:
-            #    print ( f"COMB ebg={self.dataInfo.expectedBG:.3f} obs={obs:.3f} nsig {nsig[0]:.3f}" )
-            computer = LikelihoodComputer(m)
-        ret = computer.likelihood(nsig, marginalize=marginalize)
-        if hasattr ( computer, "theta_hat" ):
-            ## seems like someone wants to debug them
-            self.theta_hat = computer.theta_hat
+        statModel = get_uncorrelated_region_statistical_model(observations=self.dataInfo.observedN,
+                                                                backgrounds=self.dataInfo.expectedBG,
+                                                                background_uncertainty=self.dataInfo.bgError,
+                                                                signal_yields=nsig,
+                                                                xsection=nsig/self.getLumi(),
+                                                                analysis=self.globalInfo.id,
+                                                                backend=AvailableBackends(backendNumber)
+                                                            )
+        if expected == False:
+            expected = ExpectationType.observed
+        elif expected == True:
+            expected = ExpectationType.apriori
+        elif expected == "posteriori":
+            expected = ExpectationType.aposteriori
+        else:
+            logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
+            return None
+
+        ret = statModel.likelihood(poi_test=1., expected=expected, return_nll=False, **args)
 
         return ret
 
+    # def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False):
+    #     """
+    #     Computes the likelihood to observe nobs events,
+    #     given a predicted signal "nsig", assuming "deltas_rel"
+    #     error on the signal efficiency.
+    #     The values observedN, expectedBG, and bgError are part of dataInfo.
+    #
+    #     :param nsig: predicted signal (float)
+    #
+    #     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+    #     :param marginalize: if true, marginalize nuisances. Else, profile them.
+    #     :param expected: if true, compute prior expected, if false compute observed
+    #                      if "posteriori" compute posterior expected
+    #     :returns: likelihood to observe nobs events (float)
+    #     """
+    #     obs = self.dataInfo.observedN
+    #     if expected:  # this step is done for prior and posterior expected
+    #         obs = self.dataInfo.expectedBG
+    #
+    #     m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
+    #              deltas_rel=deltas_rel)
+    #     computer = LikelihoodComputer(m)
+    #     if expected == "posteriori":
+    #         thetahat = computer.findThetaHat(0.)
+    #         if type(self.dataInfo.expectedBG) in [float, np.float64, int]:
+    #             thetahat = float(thetahat[0])
+    #
+    #         obs = self.dataInfo.expectedBG + thetahat
+    #         m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
+    #                  deltas_rel=deltas_rel)
+    #         # if abs ( nsig[0]-1 ) < 1e-5:
+    #         #    print ( f"COMB ebg={self.dataInfo.expectedBG:.3f} obs={obs:.3f} nsig {nsig[0]:.3f}" )
+    #         computer = LikelihoodComputer(m)
+    #     ret = computer.likelihood(nsig, marginalize=marginalize)
+    #     if hasattr ( computer, "theta_hat" ):
+    #         ## seems like someone wants to debug them
+    #         self.theta_hat = computer.theta_hat
+    #
+    #     return ret
+
     def lmax(self, deltas_rel=0.2, marginalize=False, expected=False,
-             allowNegativeSignals=False):
+             allowNegativeSignals=False, backend="pyhf"):
         """
         Convenience function, computes the likelihood at nsig = observedN - expectedBG,
         assuming "deltas_rel" error on the signal efficiency.
@@ -325,37 +379,88 @@ class DataSet(object):
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param expected: Compute expected instead of observed likelihood
         :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
+        :param backend: the backend used to compute the likelihood. Can be "pyhf" or "SL"
 
         :returns: likelihood to observe nobs events (float)
         """
-        obs = self.dataInfo.observedN
-        if expected:
-            obs = self.dataInfo.expectedBG
-            if expected == "posteriori":
-                m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                         deltas_rel=deltas_rel)
-                computer = LikelihoodComputer(m)
-                thetahat = computer.findThetaHat(0.)
-                if type(self.dataInfo.expectedBG) in [float, np.float64,
-                                                np.float32, int, np.int64, np.int32]:
-                    thetahat = float(thetahat[0])
-                obs = self.dataInfo.expectedBG + thetahat
+        if deltas_rel != 0.2:
+            logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
-        m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                 deltas_rel=deltas_rel)
-        computer = LikelihoodComputer(m)
-        ret = computer.lmax ( marginalize=marginalize, nll=False,
-                              allowNegativeSignals=allowNegativeSignals )
-        if hasattr ( computer, "theta_hat" ):
-            ## seems like someone wants to debug them
-            self.theta_hat = computer.theta_hat
-        if hasattr ( computer, "muhat" ):
-            ## seems like someone wants to debug them
-            self.muhat = computer.muhat
-        if hasattr ( computer, "sigma_mu" ):
-            ## seems like someone wants to debug them
-            self.sigma_mu = computer.sigma_mu
-        return ret
+        if backend == "pyhf":
+            backendNumber = 1
+            if marginalize == True:
+                logger.error("pyhf backend cannot marginalize.")
+            args={"iteration_threshold":3} #default in spey
+        elif backend == "SL":
+            backendNumber = 2
+            args={"marginalize":marginalize}
+        else:
+            logger.error('%s is not a valid backend. Possible backends are "pyhf" and "SL".' %backend)
+            return None
+
+        statModel = get_uncorrelated_region_statistical_model(observations=self.dataInfo.observedN,
+                                                                backgrounds=self.dataInfo.expectedBG,
+                                                                background_uncertainty=self.dataInfo.bgError,
+                                                                signal_yields=nsig,
+                                                                xsection=nsig/self.getLumi(),
+                                                                analysis=self.globalInfo.id,
+                                                                backend=AvailableBackends(backendNumber)
+                                                            )
+        if expected == False:
+            expected = ExpectationType.observed
+        elif expected == True:
+            expected = ExpectationType.apriori
+        elif expected == "posteriori":
+            expected = ExpectationType.aposteriori
+        else:
+            logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
+            return None
+
+        muhat, maxLL = statModel.maximize_likelihood(return_nll=False, expected=expected, allow_negative_signal=allowNegativeSignals , **args)
+
+        return maxLL
+
+    # def lmax(self, deltas_rel=0.2, marginalize=False, expected=False,allowNegativeSignals=False):
+    #     """
+    #     Convenience function, computes the likelihood at nsig = observedN - expectedBG,
+    #     assuming "deltas_rel" error on the signal efficiency.
+    #     The values observedN, expectedBG, and bgError are part of dataInfo.
+    #
+    #     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+    #     :param marginalize: if true, marginalize nuisances. Else, profile them.
+    #     :param expected: Compute expected instead of observed likelihood
+    #     :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
+    #
+    #     :returns: likelihood to observe nobs events (float)
+    #     """
+    #     obs = self.dataInfo.observedN
+    #     if expected:
+    #         obs = self.dataInfo.expectedBG
+    #         if expected == "posteriori":
+    #             m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
+    #                      deltas_rel=deltas_rel)
+    #             computer = LikelihoodComputer(m)
+    #             thetahat = computer.findThetaHat(0.)
+    #             if type(self.dataInfo.expectedBG) in [float, np.float64,
+    #                                             np.float32, int, np.int64, np.int32]:
+    #                 thetahat = float(thetahat[0])
+    #             obs = self.dataInfo.expectedBG + thetahat
+    #
+    #     m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
+    #              deltas_rel=deltas_rel)
+    #     computer = LikelihoodComputer(m)
+    #     ret = computer.lmax ( marginalize=marginalize, nll=False,
+    #                           allowNegativeSignals=allowNegativeSignals )
+    #     if hasattr ( computer, "theta_hat" ):
+    #         ## seems like someone wants to debug them
+    #         self.theta_hat = computer.theta_hat
+    #     if hasattr ( computer, "muhat" ):
+    #         ## seems like someone wants to debug them
+    #         self.muhat = computer.muhat
+    #     if hasattr ( computer, "sigma_mu" ):
+    #         ## seems like someone wants to debug them
+    #         self.sigma_mu = computer.sigma_mu
+    #     return ret
 
     def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
         """
