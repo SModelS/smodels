@@ -75,7 +75,6 @@ class ServerTest(unittest.TestCase):
                         'Total xsec for topologies outside the grid (fb)' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
-        print ( "o", outputfile )
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.08,
                            ignore=ignoreFields, fname = outputfile )
         if not equals:
