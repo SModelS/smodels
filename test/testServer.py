@@ -39,6 +39,8 @@ class ServerTest(unittest.TestCase):
         dbfile = "database/db30.pcl"
         #dbfile = "unittest"
         dbfile = "tinydb/"
+        # we might have to repickle!
+        # db = Database ( dbfile, force_load = "txt" )
 
         startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i {dbfile} -o {pclfile} -r -v error"
         cmd = startserver.split(" ")
