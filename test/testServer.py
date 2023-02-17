@@ -32,12 +32,13 @@ class ServerTest(unittest.TestCase):
         pclfile = "./proxy.pcl"
         if os.path.exists ( pclfile ):
             os.unlink ( pclfile )
-        from simplyGluino_default import smodelsOutputDefault
-        filename = "./testFiles/slha/simplyGluino.slha"
+        from servertest_default import smodelsOutput as smodelsOutputDefault
+        filename = "./testFiles/slha/T1ttttoff.slha"
         port = random.choice ( range(31700, 42000 ) )
         # port = 31744
         dbfile = "database/db30.pcl"
-        dbfile = "unittest"
+        #dbfile = "unittest"
+        dbfile = "tinydb/"
 
         startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i {dbfile} -o {pclfile} -r -v error"
         cmd = startserver.split(" ")
@@ -74,6 +75,7 @@ class ServerTest(unittest.TestCase):
                         'Total xsec for topologies outside the grid (fb)' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True)
+        print ( "o", outputfile )
         equals = equalObjs(smodelsOutput,smodelsOutputDefault,allowedDiff=0.08,
                            ignore=ignoreFields, fname = outputfile )
         if not equals:
