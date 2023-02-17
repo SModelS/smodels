@@ -275,7 +275,7 @@ class DataSet(object):
 
         return getValuesForObj(self, attribute)
 
-    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, backend="pyhf"):
+    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, backend="SL"):
         """
         Computes the likelihood to observe nobs events,
         given a predicted signal "nsig", assuming "deltas_rel"
@@ -288,7 +288,7 @@ class DataSet(object):
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param expected: if true, compute prior expected, if false compute observed
                          if "posteriori" compute posterior expected
-        :param backend: the backend used to compute the likelihood. Can be "pyhf" or "SL"
+        :param backend: the backend used to compute the likelihood. Can be "pyhf" or "SL".
         :returns: likelihood to observe nobs events (float)
         """
         if deltas_rel != 0.2:
@@ -306,26 +306,22 @@ class DataSet(object):
             logger.error('%s is not a valid backend. Possible backends are "pyhf" and "SL".' %backend)
             return None
 
-        statModel = get_uncorrelated_region_statistical_model(observations=self.dataInfo.observedN,
-                                                                backgrounds=self.dataInfo.expectedBG,
-                                                                background_uncertainty=self.dataInfo.bgError,
-                                                                signal_yields=nsig,
+        statModel = get_uncorrelated_region_statistical_model(observations=float(self.dataInfo.observedN),
+                                                                backgrounds=float(self.dataInfo.expectedBG),
+                                                                background_uncertainty=float(self.dataInfo.bgError),
+                                                                signal_yields=float(nsig),
                                                                 xsection=nsig/self.getLumi(),
                                                                 analysis=self.globalInfo.id,
                                                                 backend=AvailableBackends(backendNumber)
                                                             )
-        if expected == False:
-            expected = ExpectationType.observed
-        elif expected == True:
-            expected = ExpectationType.apriori
-        elif expected == "posteriori":
-            expected = ExpectationType.aposteriori
-        else:
+        expectedDict = {False:ExpectationType.observed,
+                        True:ExpectationType.apriori,
+                        "posteriori":ExpectationType.aposteriori}
+        if expected not in expectedDict.keys():
             logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
             return None
 
-        ret = statModel.likelihood(poi_test=1., expected=expected, return_nll=False, **args)
-
+        ret = statModel.likelihood(poi_test=1., expected=expectedDict[expected], return_nll=False, **args)
         return ret
 
     # def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False):
@@ -368,8 +364,7 @@ class DataSet(object):
     #
     #     return ret
 
-    def lmax(self, deltas_rel=0.2, marginalize=False, expected=False,
-             allowNegativeSignals=False, backend="pyhf"):
+    def lmax(self, deltas_rel=0.2, marginalize=False, expected=False, allowNegativeSignals=False, backend="SL"):
         """
         Convenience function, computes the likelihood at nsig = observedN - expectedBG,
         assuming "deltas_rel" error on the signal efficiency.
@@ -379,7 +374,7 @@ class DataSet(object):
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param expected: Compute expected instead of observed likelihood
         :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
-        :param backend: the backend used to compute the likelihood. Can be "pyhf" or "SL"
+        :param backend: the backend used to compute the likelihood. Can be "pyhf" or "SL".
 
         :returns: likelihood to observe nobs events (float)
         """
@@ -393,30 +388,31 @@ class DataSet(object):
             args={"iteration_threshold":3} #default in spey
         elif backend == "SL":
             backendNumber = 2
-            args={"marginalize":marginalize}
+            args={}
         else:
             logger.error('%s is not a valid backend. Possible backends are "pyhf" and "SL".' %backend)
             return None
 
-        statModel = get_uncorrelated_region_statistical_model(observations=self.dataInfo.observedN,
-                                                                backgrounds=self.dataInfo.expectedBG,
-                                                                background_uncertainty=self.dataInfo.bgError,
-                                                                signal_yields=nsig,
+        nsig = 1. #doesn't matter. Does it?
+
+        statModel = get_uncorrelated_region_statistical_model(observations=float(self.dataInfo.observedN),
+                                                                backgrounds=float(self.dataInfo.expectedBG),
+                                                                background_uncertainty=float(self.dataInfo.bgError),
+                                                                signal_yields=float(nsig),
                                                                 xsection=nsig/self.getLumi(),
                                                                 analysis=self.globalInfo.id,
                                                                 backend=AvailableBackends(backendNumber)
                                                             )
-        if expected == False:
-            expected = ExpectationType.observed
-        elif expected == True:
-            expected = ExpectationType.apriori
-        elif expected == "posteriori":
-            expected = ExpectationType.aposteriori
-        else:
+
+        expectedDict = {False:ExpectationType.observed,
+                        True:ExpectationType.apriori,
+                        "posteriori":ExpectationType.aposteriori}
+        if expected not in expectedDict.keys():
             logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
             return None
 
-        muhat, maxLL = statModel.maximize_likelihood(return_nll=False, expected=expected, allow_negative_signal=allowNegativeSignals , **args)
+        # Do not return muhat here, it depends on the signal, which is taken arbitrarily because it doesn't affect maxLL
+        maxLL = statModel.maximize_likelihood(return_nll=False, expected=expectedDict[expected], allow_negative_signal=allowNegativeSignals , **args)
 
         return maxLL
 
@@ -462,7 +458,7 @@ class DataSet(object):
     #         self.sigma_mu = computer.sigma_mu
     #     return ret
 
-    def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
+    def chi2(self, nsig, deltas_rel=0.2, marginalize=False, backend="SL"):
         """
         Computes the chi2 for a given number of observed events "nobs",
         given number of signal events "nsig", and error on signal "deltas".
@@ -471,15 +467,55 @@ class DataSet(object):
         :param nsig: predicted signal (float)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
+        :param backend: the backend used to compute the likelihood. Can be "pyhf" or "SL".
         :return: chi2 (float)
         """
 
-        m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG,
-                 self.dataInfo.bgError**2, deltas_rel=deltas_rel)
-        computer = LikelihoodComputer(m)
-        ret = computer.chi2(nsig, marginalize=marginalize)
+        if deltas_rel != 0.2:
+            logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
+
+        if backend == "pyhf":
+            backendNumber = 1
+            if marginalize == True:
+                logger.error("pyhf backend cannot marginalize.")
+            args={"iteration_threshold":3} #default in spey
+        elif backend == "SL":
+            backendNumber = 2
+            args={"marginalize":marginalize}
+        else:
+            logger.error('%s is not a valid backend. Possible backends are "pyhf" and "SL".' %backend)
+            return None
+
+        statModel = get_uncorrelated_region_statistical_model(observations=float(self.dataInfo.observedN),
+                                                                backgrounds=float(self.dataInfo.expectedBG),
+                                                                background_uncertainty=float(self.dataInfo.bgError),
+                                                                signal_yields=float(nsig),
+                                                                xsection=nsig/self.getLumi(),
+                                                                analysis=self.globalInfo.id,
+                                                                backend=AvailableBackends(backendNumber)
+                                                            )
+        ret = statModel.chi2(poi_test=1., expected = ExpectationType.observed, allow_negative_signal=True)
 
         return ret
+
+    # def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
+    #     """
+    #     Computes the chi2 for a given number of observed events "nobs",
+    #     given number of signal events "nsig", and error on signal "deltas".
+    #
+    #     nobs, expectedBG and bgError are part of dataInfo.
+    #     :param nsig: predicted signal (float)
+    #     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+    #     :param marginalize: if true, marginalize nuisances. Else, profile them.
+    #     :return: chi2 (float)
+    #     """
+    #
+    #     m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG,
+    #              self.dataInfo.bgError**2, deltas_rel=deltas_rel)
+    #     computer = LikelihoodComputer(m)
+    #     ret = computer.chi2(nsig, marginalize=marginalize)
+    #
+    #     return ret
 
     def folderName(self):
         """

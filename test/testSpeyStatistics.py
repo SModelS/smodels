@@ -216,14 +216,14 @@ class StatisticsTest(unittest.TestCase):
         smstoplist = decomposer.decompose(model, sigmacut=0)
         prediction = theoryPredictionsFor(expRes, smstoplist)[0]
         pred_signal_strength = prediction.xsection.value
-
-        prediction.computeStatistics()
-        ill = math.log(prediction.likelihood())
-        ichi2 = prediction.chi2()
         nsig = (pred_signal_strength * expRes.globalInfo.lumi).asNumber()
-        for backendNumber in [1,2]:
+
+        for backendNumber,backend in zip([1,2],["pyhf","SL"]):
             #backendNumber == 1: pyhf backend
             #backendNumber == 2: simplified likelihood backend
+            prediction.computeStatistics(backend=backend)
+            ill = math.log(prediction.likelihood())
+            ichi2 = prediction.chi2()
             statModel = get_uncorrelated_region_statistical_model(observations=4.,
                                                                     backgrounds=2.2,
                                                                     background_uncertainty=1.1,
