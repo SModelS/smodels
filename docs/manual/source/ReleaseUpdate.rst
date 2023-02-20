@@ -44,6 +44,14 @@ New in Version 2.2.2:
   * fixed C++ interface to work with python 3.11
   * bumped up pythia8 from 8.307 to 8.308
   * SModelS can now track inter-analyses combinability at the level of whole `analyses <experiment.html#experiment.expResultObj.DataSet.isCombinableWith>`_ as well as individual `signal regions <experiment.html#experiment.datasetObj.DataSet.isCombinableWith>`_
+  * todo: spey interface
+  * todo: SLv2
+  * Database extension -- added new results from x ATLAS and y CMS analyses:
+    - results from ATLAS:
+      ATLAS-SUSY-2018-05 (EM,UL, full likelihood), ATLAS-SUSY-2018-42 (UL), ATLAS-SUSY-2018-32 (EM), ATLAS-SUSY-2019-02 (UL)
+    - results from CMS:
+      CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL), CMS-SUS-21-002 (UL)
+    - add expected ULs to CMS-SUS-19-009
 
 New in Version 2.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
