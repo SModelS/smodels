@@ -16,18 +16,21 @@ import unittest
 # from smodels.tools import statistics
 from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
 from smodels.tools.statistics import TruncatedGaussians
-from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.theory.theoryPrediction import theoryPredictionsFor, _getCombinedResultFor, _getDataSetPredictions
+from smodels.tools.statistics import determineBrentBracket
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 from databaseLoader import database
+from smodels.experiment.databaseObj import Database
 from smodels.theory import decomposer
 from math import floor, log10
 import numpy as np
 import math
-from spey import get_uncorrelated_region_statistical_model
-from spey.utils import ExpectationType
-from spey.backends import AvailableBackends
+from spey import get_uncorrelated_region_statistical_model, get_multi_region_statistical_model, ExpectationType, AvailableBackends
+from spey.hypothesis_testing.utils import find_root_limits, compute_confidence_level
+from spey.hypothesis_testing.test_statistics import compute_teststatistics
+from scipy import optimize
 
 class StatisticsTest(unittest.TestCase):
     def lLHDFromLimits(self):
@@ -92,6 +95,115 @@ class StatisticsTest(unittest.TestCase):
             # elif backendNumber == 2:
             #     print("total marg", totmarg)
             f.close()
+
+    def testUpperLimitOnSigmaTimesEff(self):
+        """
+        Test the cross-section upper limit computation with simplified likelhood backend from SModelS and Spey packages.
+        """
+        database='/home/pascal/SModelS/smodels/tim_db/'
+        # Set the path to the database
+        database = Database(database)
+        expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2018-41"])[0]
+
+        filename = "./testFiles/slha/lightEWinos.slha"
+        filename = "/home/pascal/SModelS/smodels/test/testFiles/slha/lightEWinos.slha"
+        filename = '/home/pascal/softsusy-4.1.12/inOutFiles/spectrumGridOutputs_wino_union_nlo/wino_Spectrum_640_95'
+
+        model = Model(BSMList, SMList)
+        model.updateParticles(filename)
+        smstoplist = decomposer.decompose(model, sigmacut=0.)
+        expected = False
+        allow_negative_signal = False
+
+        #SL from SModelS
+        dataSetResults = []
+        # Compute predictions for each data set (for UL analyses there is one single set)
+        for dataset in expRes.datasets:
+            predList = _getDataSetPredictions(dataset, smstoplist, maxMassDist=0.2)
+            if predList:
+                dataSetResults.append(predList)
+        combinedRes = _getCombinedResultFor(dataSetResults, expRes, marginalize=False)
+
+        srNsigDict = dict( [ [pred.dataset.getID(),(pred.xsection.value * pred.dataset.getLumi()).asNumber()] for pred in combinedRes.datasetPredictions] )
+        nsig = [srNsigDict[dataID] if dataID in srNsigDict else 0.0for dataID in combinedRes.dataset.globalInfo.datasetOrder]
+        computer = UpperLimitComputer(ntoys=10000)
+        dataset = combinedRes.dataset
+        cov = dataset.globalInfo.covariance
+        nobs = [x.dataInfo.observedN for x in dataset._datasets]
+        bg = [x.dataInfo.expectedBG for x in dataset._datasets]
+        d = Data(
+            observed=nobs,
+            backgrounds=bg,
+            covariance=cov,
+            third_moment=None,
+            nsignal=nsig,
+            deltas_rel=0.2,
+            lumi=dataset.getLumi(),
+        )
+        xsec = sum(d.nsignal) / d.lumi
+
+        mu_hat, sigma_mu, clsRoot = computer.getCLsRootFunc(d, marginalize=dataset._marginalize, expected=expected)
+        a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot, allowNegative=allow_negative_signal )
+        mu_ul_SL = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
+        xsec_ul_SL = mu_ul_SL*xsec
+
+
+        # Spey computation
+        expectedDict = {False:ExpectationType.observed,
+                        True:ExpectationType.apriori,
+                        "posteriori":ExpectationType.aposteriori}
+        statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
+                                                        signal=nsig,
+                                                        observed=nobs,
+                                                        covariance=cov,
+                                                        nb=bg,
+                                                        third_moment=None,
+                                                        delta_sys=0.2,
+                                                        xsection=xsec
+                                                        )
+        #statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal)
+        test_stat = "q" if allow_negative_signal else "qmutilde"
+        (maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf) = statModel._prepare_for_hypotest(expected=expectedDict[expected], allow_negative_signal=allow_negative_signal, test_statistics=test_stat)
+        print("maximum_likelihood spey:",maximum_likelihood)
+        #find_poi_upper_limit(maximum_likelihood=maximum_likelihood, logpdf=logpdf, maximum_asimov_likelihood=maximum_asimov_likelihood, asimov_logpdf=asimov_logpdf, expected=expectedDict[expected], confidence_level=confidence_level, allow_negative_signal=allow_negative_signal)
+        def computer(poi_test: float) -> float:
+            """Compute 1 - CLs(POI) = `confidence_level`"""
+            _, sqrt_qmuA, delta_teststat = compute_teststatistics(
+                poi_test,
+                maximum_likelihood,
+                logpdf,
+                maximum_asimov_likelihood,
+                asimov_logpdf,
+                test_stat,
+            )
+            pvalue = list(
+                map(
+                    lambda x: 1.0 - x,
+                    compute_confidence_level(sqrt_qmuA, delta_teststat, test_stat)[
+                        0 if expected == ExpectationType.observed else 1
+                    ],
+                )
+            )
+            # always get the median
+            return pvalue[0 if expected == ExpectationType.observed else 2] - 0.95
+
+        sigma_mu = 1.0
+        low, hig = find_root_limits(
+            computer,
+            loc=0.0,
+            low_ini=maximum_likelihood[0] + 1.5 * sigma_mu if maximum_likelihood[0] >= 0.0 else 1.0,
+            hig_ini=maximum_likelihood[0] + 2.5 * sigma_mu if maximum_likelihood[0] >= 0.0 else 1.0,
+        )
+        print("computer(",low,"):",computer(low))
+        print("computer(",hig,"):",computer(hig))
+        mu_ul_spey = optimize.brentq(computer, low, hig, xtol=abs(low / 100.0))
+        xsec_ul_spey = mu_ul_spey*xsec
+        self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,3)
+
+        # Find likelihood and fitted nuisances at a given mu
+        #SModelS
+        
+
 
     def testUnderfluctuatingLlhdsFromLimits(self):
         """test the likelihoods from limits allowing for underfluctuations"""
