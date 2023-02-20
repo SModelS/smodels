@@ -51,7 +51,7 @@ New in Version 2.2.2:
       ATLAS-SUSY-2018-05 (EM,UL, full likelihood), ATLAS-SUSY-2018-42 (UL), ATLAS-SUSY-2018-32 (EM), ATLAS-SUSY-2019-02 (UL)
     - results from CMS:
       CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL), CMS-SUS-21-002 (UL)
-    - add expected ULs to CMS-SUS-19-009
+    - added expected ULs to CMS-SUS-19-009
 
 New in Version 2.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
