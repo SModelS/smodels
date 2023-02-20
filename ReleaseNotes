@@ -7,7 +7,7 @@ Release v2.2.2, March 2023
   * SModelS can now track inter-analyses combinability at the level of whole analyses as well as individual signal regions
   * todo: spey interface
   * todo: SLv2
-  * Database extension -- added new results from x ATLAS and y CMS analyses:
+  * Database extension, added new results from x ATLAS and y CMS analyses:
     - results from ATLAS:
       ATLAS-SUSY-2018-05 (EM,UL, full likelihood), ATLAS-SUSY-2018-42 (UL), ATLAS-SUSY-2018-32 (EM), ATLAS-SUSY-2019-02 (UL)
     - results from CMS:
@@ -43,7 +43,7 @@ Release v2.2.0, Wed 30 March 2022
   * updates in references.bib, installation notes
   * more small fixes in unit tests
 
-  * Database extension -- added new results from 4 ATLAS and 11 CMS analyses:
+  * Database extension, added new results from 4 ATLAS and 11 CMS analyses:
     - results from ATLAS:
       ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2018-41 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
     - results from CMS:
