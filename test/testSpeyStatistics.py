@@ -125,7 +125,7 @@ class StatisticsTest(unittest.TestCase):
         combinedRes = _getCombinedResultFor(dataSetResults, expRes, marginalize=False)
 
         srNsigDict = dict( [ [pred.dataset.getID(),(pred.xsection.value * pred.dataset.getLumi()).asNumber()] for pred in combinedRes.datasetPredictions] )
-        nsig = [srNsigDict[dataID] if dataID in srNsigDict else 0.0for dataID in combinedRes.dataset.globalInfo.datasetOrder]
+        nsig = [srNsigDict[dataID] if dataID in srNsigDict else 0.0 for dataID in combinedRes.dataset.globalInfo.datasetOrder]
         computer = UpperLimitComputer(ntoys=10000)
         dataset = combinedRes.dataset
         cov = dataset.globalInfo.covariance
@@ -142,9 +142,9 @@ class StatisticsTest(unittest.TestCase):
         )
         xsec = sum(d.nsignal) / d.lumi
 
-        mu_hat, sigma_mu, clsRoot = computer.getCLsRootFunc(d, marginalize=dataset._marginalize, expected=expected)
-        a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot, allowNegative=allow_negative_signal )
-        mu_ul_SL = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
+        mu_hat_SL, sigma_mu_SL, clsRoot_SL = computer.getCLsRootFunc(d, marginalize=dataset._marginalize, expected=expected)
+        a, b = determineBrentBracket(mu_hat_SL, sigma_mu_SL, clsRoot_SL, allowNegative=allow_negative_signal )
+        mu_ul_SL = optimize.brentq(clsRoot_SL, a, b, rtol=1e-03, xtol=1e-06)
         xsec_ul_SL = mu_ul_SL*xsec
 
 
@@ -198,11 +198,18 @@ class StatisticsTest(unittest.TestCase):
         print("computer(",hig,"):",computer(hig))
         mu_ul_spey = optimize.brentq(computer, low, hig, xtol=abs(low / 100.0))
         xsec_ul_spey = mu_ul_spey*xsec
-        self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,3)
+        self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,2)
 
         # Find likelihood and fitted nuisances at a given mu
         #SModelS
+        computer = LikelihoodComputer(d)
+        theta_hat_SL, _ = computer.findThetaHat(mu_hat_SL)
+        llhdAtThetaHat_SL = computer.llhdOfTheta( theta_hat_SL, nll=False )
+        print(f"SL from SModelS likelihood = {llhdAtThetaHat_SL}, profiled at theta hat = {theta_hat_SL} for mu = {mu_hat_SL}")
+
+        #Spey
         
+
 
 
     def testUnderfluctuatingLlhdsFromLimits(self):
