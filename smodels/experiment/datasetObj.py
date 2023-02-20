@@ -66,23 +66,30 @@ class DataSet(object):
             self.txnameList.sort()
             self.checkForRedundancy(databaseParticles)
 
+    def getCollaboration(self,ds):
+        return "CMS" if "CMS" in ds.globalInfo.id else "ATLAS"
+
     def isCombinableWith(self, other):
         """
         Function that reports if two datasets are mutually uncorrelated = combinable.
 
         :param other: datasetObj to compare self with
         """
-        id1, id2 = self.globalInfo.id, other.globalInfo.id
-        if id1 == id2:  # we are always correlated with ourselves
+        idSelf = self.globalInfo.id
+        didSelf = self.dataInfo.dataId
+        selflabel = f"{idSelf}:{didSelf}"
+        idOther = other.globalInfo.id
+        didOther = other.dataInfo.dataId
+        otherlabel = f"{idOther}:{didOther}"
+
+        if selflabel == otherlabel:  # we are always correlated with ourselves
             return False
         from smodels.tools.physicsUnits import TeV
         ds = abs(self.globalInfo.sqrts.asNumber(TeV) - other.globalInfo.sqrts.asNumber(TeV))
         if ds > 1e-5:  # not the same
             return True
 
-        def getCollaboration(ds):
-            return "CMS" if "CMS" in ds.globalInfo.id else "ATLAS"
-        coll1, coll2 = getCollaboration(self), getCollaboration(other)
+        coll1, coll2 = self.getCollaboration(self), self.getCollaboration(other)
         if coll1 != coll2:
             return True
 
@@ -111,11 +118,11 @@ class DataSet(object):
         didOther = other.dataInfo.dataId
         otherlabel = f"{idOther}:{didOther}"
         for label, combs in self.globalInfo._combinationsmatrix.items():
-            if label in [idSelf, didSelf]:
+            if label in [idSelf, selflabel ]:
                 # match! with self! is "other" in combs?
                 if idOther in combs or otherlabel in combs:
                     return True
-            if label in [idOther, didOther]:
+            if label in [idOther, otherlabel ]:
                 # match! with other! is "self" in combs?
                 if idSelf in combs or selflabel in combs:
                     return True
