@@ -43,6 +43,7 @@ New in Version 2.2.2:
   * fixed bug for an LHE input only with anti-particles
   * fixed C++ interface to work with python 3.11
   * bumped up pythia8 from 8.307 to 8.308
+  * SModelS can now track inter-analyses combinability at the level of whole `analyses <experiment.html#experiment.expResultObj.DataSet.isCombinableWith>`_ as well as individual `signal regions <experiment.html#experiment.datasetObj.DataSet.isCombinableWith>`_
 
 New in Version 2.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
