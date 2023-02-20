@@ -24,8 +24,11 @@ class ScanSummaryTest(unittest.TestCase):
         runMain(dirname, inifile="testParameters.ini")
         outSummary = os.path.join(out, 'summary.txt')
         outDefault = 'summary_scan_default.txt'
+        comp = compareScanSummary(outSummary, outDefault, allowedDiff=0.05)
+        if not comp:
+            print ( f"ERROR: {outSummary}!={outDefault}" )
 
-        self.assertTrue(compareScanSummary(outSummary, outDefault, allowedDiff=0.05))
+        self.assertTrue(comp)
 
     def testSLHASummary(self):
         out = "./unitTestOutput"
@@ -34,7 +37,10 @@ class ScanSummaryTest(unittest.TestCase):
                 development=True)
         outSummary = os.path.join(out, 'summary.txt')
         outDefault = 'summary_scan_default.txt'
-        self.assertTrue(compareScanSummary(outSummary, outDefault, allowedDiff=0.05))
+        comp = compareScanSummary(outSummary, outDefault, allowedDiff=0.05)
+        if not comp:
+            print ( f"ERROR: {outSummary}!={outDefault}" )
+        self.assertTrue(comp)
 
     def testSummarySummary(self):
         out = "./unitTestOutput"
