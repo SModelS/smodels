@@ -383,12 +383,13 @@ class TheoryPrediction(object):
             return (llhd, computer.chi2 ( ) )
         return llhd
 
-    def computeStatistics(self, expected=False, allowNegativeSignals=False):
+    def computeStatistics(self, expected=False, allowNegativeSignals=False, backend="SL"):
         """
         Compute the likelihoods, chi2 and upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, lsm and chi2
         attributes (chi2 being phased out).
         :param expected: computed expected quantities, not observed
+        :param backend: the backend used to compute the likelihood. Can be "pyhf" or "SL".
         """
         if not "lmax" in self.cachedObjs[expected]:
             self.cachedObjs[expected]["lmax"] = {}
@@ -418,19 +419,21 @@ class TheoryPrediction(object):
             lumi = self.dataset.getLumi()
             nsig = (self.xsection.value * lumi).asNumber()
             llhd = self.dataset.likelihood(
-                nsig, marginalize=self.marginalize, deltas_rel=self.deltas_rel, expected=expected
+                nsig, marginalize=self.marginalize, deltas_rel=self.deltas_rel, expected=expected,backend=backend
             )
             llhd_sm = self.dataset.likelihood(
                 nsig=0.0,
                 marginalize=self.marginalize,
                 deltas_rel=self.deltas_rel,
                 expected=expected,
+                backend=backend
             )
             llhd_max = self.dataset.lmax(
                 marginalize=self.marginalize,
                 deltas_rel=self.deltas_rel,
                 allowNegativeSignals=allowNegativeSignals,
                 expected=expected,
+                backend=backend
             )
             muhat = None
             if hasattr(self.dataset, "muhat"):
@@ -445,7 +448,6 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = llhd_max
             self.cachedObjs[expected]["muhat"][allowNegativeSignals] = muhat
             from smodels.tools.statistics import chi2FromLmax
-
             self.cachedObjs[expected]["chi2"] = chi2FromLmax(llhd, llhd_max)
 
         elif self.dataType() == "combined":

@@ -2,7 +2,7 @@
 
 """
 .. module:: srCombinations
-   :synopsis: a module to contain the logic around combinations of signal regions 
+   :synopsis: a module to contain the logic around combinations of signal regions
               within a single analysis, be they SL-based or pyhf-based.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -13,7 +13,8 @@ from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperL
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
-
+from spey import get_multi_region_statistical_model,ExpectationType,AvailableBackends
+from smodels.tools.physicsUnits import fb
 
 def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
     """
@@ -28,7 +29,6 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
 
     :returns: upper limit on sigma*eff
     """
-
     if dataset.type == "simplified":
         cov = dataset.globalInfo.covariance
         if type(cov) != list:
@@ -36,29 +36,60 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
         if len(cov) < 1:
             raise SModelSError("covariance matrix has length %d." % len(cov))
 
-        computer = UpperLimitComputer(ntoys=10000)
-
+        thirdMoment = None # Need to be implemented
+        # print(dataset.globalInfo.id,dataset.type)
         nobs = [x.dataInfo.observedN for x in dataset._datasets]
         bg = [x.dataInfo.expectedBG for x in dataset._datasets]
-        no = nobs
 
-        d = Data(
-            observed=no,
-            backgrounds=bg,
-            covariance=cov,
-            third_moment=None,
-            nsignal=nsig,
-            deltas_rel=deltas_rel,
-            lumi=dataset.getLumi(),
-        )
-        ret = computer.getUpperLimitOnSigmaTimesEff(d, marginalize=dataset._marginalize, expected=expected)
+        xsec = float((sum(nsig)/dataset.getLumi())._value*1E-6) #pb
+        statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
+                                                        signal=nsig,
+                                                        observed=nobs,
+                                                        covariance=cov,
+                                                        nb=bg,
+                                                        third_moment=thirdMoment,
+                                                        delta_sys=deltas_rel,
+                                                        xsection=xsec
+                                                        )
+
+        # computer = UpperLimitComputer(ntoys=10000)
+        # d = Data(
+        #     observed=nobs,
+        #     backgrounds=bg,
+        #     covariance=cov,
+        #     third_moment=None,
+        #     nsignal=nsig,
+        #     deltas_rel=deltas_rel,
+        #     lumi=dataset.getLumi(),
+        # )
+        # ret = computer.getUpperLimitOnSigmaTimesEff(d, marginalize=dataset._marginalize, expected=expected)
+        #
+        # print("previous:",ret)
+
+        expectedDict = {False:ExpectationType.observed,
+                        True:ExpectationType.apriori,
+                        "posteriori":ExpectationType.aposteriori}
+        if expected not in expectedDict.keys():
+            logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
+            return None
+
+        muul = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=False)
+        # print("muul spey:",muul)
+
+        ret = muul*xsec*1E6*fb
+        # print("spey:",ret)
+
+
         logger.debug("SL upper limit : {}".format(ret))
         return ret
-    elif dataset.type == "pyhf":
+    elif dataset.type == "pyhf": #! TP: Need to implement
         logger.debug("Using pyhf")
         if all([s == 0 for s in nsig]):
             logger.warning("All signals are empty")
             return None
+        if deltas_rel != 0.2:
+            logger.warning("Relative uncertainty on signal not supported by spey for pyhf backend.")
+
         ulcomputer = _getPyhfComputer(dataset, nsig)
         ret = ulcomputer.getUpperLimitOnSigmaTimesEff(expected=expected)
         logger.debug("pyhf upper limit : {}".format(ret))
@@ -72,6 +103,65 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
             "no covariance matrix or json file given in globalInfo.txt for %s"
             % dataset.globalInfo.id
         )
+
+
+# def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
+#     """
+#     Get combined upper limit. If covariances are given in globalInfo then
+#     simplified likelihood is used, else if json files are given pyhf
+#     cimbination is performed.
+#
+#     :param nsig: list of signal events in each signal region/dataset. The list
+#                     should obey the ordering in globalInfo.datasetOrder.
+#     :param expected: return expected, not observed value
+#     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+#
+#     :returns: upper limit on sigma*eff
+#     """
+#
+#     if dataset.type == "simplified":
+#         cov = dataset.globalInfo.covariance
+#         if type(cov) != list:
+#             raise SModelSError("covariance field has wrong type: %s" % type(cov))
+#         if len(cov) < 1:
+#             raise SModelSError("covariance matrix has length %d." % len(cov))
+#
+#         computer = UpperLimitComputer(ntoys=10000)
+#
+#         nobs = [x.dataInfo.observedN for x in dataset._datasets]
+#         bg = [x.dataInfo.expectedBG for x in dataset._datasets]
+#         no = nobs
+#
+#         d = Data(
+#             observed=no,
+#             backgrounds=bg,
+#             covariance=cov,
+#             third_moment=None,
+#             nsignal=nsig,
+#             deltas_rel=deltas_rel,
+#             lumi=dataset.getLumi(),
+#         )
+#         ret = computer.getUpperLimitOnSigmaTimesEff(d, marginalize=dataset._marginalize, expected=expected)
+#         logger.debug("SL upper limit : {}".format(ret))
+#         return ret
+#     elif dataset.type == "pyhf":
+#         logger.debug("Using pyhf")
+#         if all([s == 0 for s in nsig]):
+#             logger.warning("All signals are empty")
+#             return None
+#         ulcomputer = _getPyhfComputer(dataset, nsig)
+#         ret = ulcomputer.getUpperLimitOnSigmaTimesEff(expected=expected)
+#         logger.debug("pyhf upper limit : {}".format(ret))
+#         return ret
+#     else:
+#         logger.error(
+#             "no covariance matrix or json file given in globalInfo.txt for %s"
+#             % dataset.globalInfo.id
+#         )
+#         raise SModelSError(
+#             "no covariance matrix or json file given in globalInfo.txt for %s"
+#             % dataset.globalInfo.id
+#         )
 
 
 def getCombinedLikelihood(
@@ -197,10 +287,7 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
     # _pyhfcomputers[idt] = ulcomputer
     return ulcomputer
 
-
-def getCombinedSimplifiedLikelihood(
-    dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0
-):
+def getCombinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0):
     """
     Computes the combined simplified likelihood to observe nobs events, given a
     predicted signal "nsig", with nsig being a vector with one entry per
@@ -212,57 +299,110 @@ def getCombinedSimplifiedLikelihood(
     :param mu: signal strength parameter mu
     :returns: likelihood to observe nobs events (float)
     """
-    for k, v in enumerate(nsig):
-        nsig[k] = v * mu
-
     if dataset.type != "simplified":
         logger.error(
             "Asked for combined simplified likelihood, but no covariance given: %s" % dataset.type
         )
         return None
-    if len(dataset.origdatasets) == 1:
-        if isinstance(nsig, list):
-            nsig = nsig[0]
-        return dataset.origdatasets[0].likelihood(nsig, marginalize=marginalize)
+
+    args={"marginalize":marginalize}
     bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
     nobs = [x.dataInfo.observedN for x in dataset.origdatasets]
-    if expected == True:
-        nobs = [x.dataInfo.expectedBG for x in dataset.origdatasets]
-    if expected == False:
-        nobs = [x.dataInfo.observedN for x in dataset.origdatasets]
     cov = dataset.globalInfo.covariance
-    computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-    if expected == "posteriori":
-        theta_hat, _ = computer.findThetaHat ( 0. )
-        nobs = [float(x + y) for x, y in zip(bg, theta_hat)]
-        computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-    return computer.likelihood(1., marginalize=marginalize)
 
-def getCombinedSimplifiedStatistics(
-    dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False
-):
+    thirdMoment = None
+
+    statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
+                                                    signal=nsig,
+                                                    observed=nobs,
+                                                    covariance=cov,
+                                                    nb=bg,
+                                                    third_moment=thirdMoment,
+                                                    delta_sys=deltas_rel,
+                                                    xsection=xsec
+                                                    )
+    expectedDict = {False:ExpectationType.observed,
+                    True:ExpectationType.apriori,
+                    "posteriori":ExpectationType.aposteriori}
+    if expected not in expectedDict.keys():
+        logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
+        return None
+
+    ret = statModel.likelihood(poi_test=mu, expected=expectedDict[expected], return_nll=False, **args)
+
+    return ret
+
+
+# def getCombinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0):
+#     """
+#     Computes the combined simplified likelihood to observe nobs events, given a
+#     predicted signal "nsig", with nsig being a vector with one entry per
+#     dataset.  nsig has to obey the datasetOrder. Deltas is the error on
+#     the signal.
+#     :param nsig: predicted signal (list)
+#     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+#     :param expected: compute expected likelihood, not observed
+#     :param mu: signal strength parameter mu
+#     :returns: likelihood to observe nobs events (float)
+#     """
+#     for k, v in enumerate(nsig):
+#         nsig[k] = v * mu
+#
+#     if dataset.type != "simplified":
+#         logger.error(
+#             "Asked for combined simplified likelihood, but no covariance given: %s" % dataset.type
+#         )
+#         return None
+#     if len(dataset.origdatasets) == 1:
+#         if isinstance(nsig, list):
+#             nsig = nsig[0]
+#         return dataset.origdatasets[0].likelihood(nsig, marginalize=marginalize)
+#     bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
+#     nobs = [x.dataInfo.observedN for x in dataset.origdatasets]
+#     if expected == True:
+#         nobs = [x.dataInfo.expectedBG for x in dataset.origdatasets]
+#     if expected == False:
+#         nobs = [x.dataInfo.observedN for x in dataset.origdatasets]
+#     cov = dataset.globalInfo.covariance
+#     computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
+#     if expected == "posteriori":
+#         theta_hat, _ = computer.findThetaHat ( 0. )
+#         nobs = [float(x + y) for x, y in zip(bg, theta_hat)]
+#         computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
+#     return computer.likelihood(1., marginalize=marginalize)
+
+def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False):
     """compute likelihood at maximum, for simplified likelihoods only"""
     if dataset.type != "simplified":
         return {"lmax": -1.0, "muhat": None, "sigma_mu": None}
+    args={"marginalize":marginalize}
     nobs = [x.dataInfo.observedN for x in dataset.origdatasets]
     bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
-    if expected == True:
-        # nobs = [ x.dataInfo.expectedBG for x in dataset._datasets]
-        nobs = [x.dataInfo.expectedBG for x in dataset.origdatasets]
-        # nobs = [int(np.round(x.dataInfo.expectedBG)) for x in dataset._datasets]
     bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
     cov = dataset.globalInfo.covariance
-    if type(nsig) in [list, tuple]:
+    if type(nsig)==tuple:
         nsig = np.array(nsig)
-    computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-    if expected == "posteriori":
-        theta_hat, _ = computer.findThetaHat ( 0. )
-        nobs = [float(x + y) for x, y in zip(bg, theta_hat)]
-        computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-    ret = computer.findMuHat(allowNegativeSignals=allowNegativeSignals, extended_output=True)
-    lbsm = computer.likelihood ( 1., marginalize = marginalize )
-    lsm = computer.likelihood ( 0., marginalize = marginalize )
-    lmax = ret["lmax"]
+
+
+    statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
+                                                    signal=nsig,
+                                                    observed=nobs,
+                                                    covariance=cov,
+                                                    nb=bg,
+                                                    third_moment=thirdMoment,
+                                                    delta_sys=deltas_rel,
+                                                    xsection=xsec
+                                                    )
+    expectedDict = {False:ExpectationType.observed,
+                    True:ExpectationType.apriori,
+                    "posteriori":ExpectationType.aposteriori}
+    if expected not in expectedDict.keys():
+        logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
+        return None
+
+    muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll)
+    lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll, **args )
+    lsm = statModel.likelihood ( poi_test = 0., expected=expectedDict[expected], return_nll = nll, **args )
     if lsm > lmax:
         muhat = ret["muhat"]
         logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
@@ -273,6 +413,43 @@ def getCombinedSimplifiedStatistics(
         logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
         ret["lmax"] = lbsm
         ret["muhat"] = 1.0
-    ret["lbsm"] = lbsm
-    ret["lsm"] = lsm
-    return ret
+    sigma_mu = None # Need to be impelemented: statModel.sigma_mu(pars=nuisance_parameters,expected=expectedDict[expected])
+    return {"muhat": mu_hat, "sigma_mu": siagma_mu, "lmax": lmax, "lbsm": lbsm, "lsm": lsm }
+
+
+# def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False):
+#     """compute likelihood at maximum, for simplified likelihoods only"""
+#     if dataset.type != "simplified":
+#         return {"lmax": -1.0, "muhat": None, "sigma_mu": None}
+#     nobs = [x.dataInfo.observedN for x in dataset.origdatasets]
+#     bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
+#     if expected == True:
+#         # nobs = [ x.dataInfo.expectedBG for x in dataset._datasets]
+#         nobs = [x.dataInfo.expectedBG for x in dataset.origdatasets]
+#         # nobs = [int(np.round(x.dataInfo.expectedBG)) for x in dataset._datasets]
+#     bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
+#     cov = dataset.globalInfo.covariance
+#     if type(nsig) in [list, tuple]:
+#         nsig = np.array(nsig)
+#     computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
+#     if expected == "posteriori":
+#         theta_hat, _ = computer.findThetaHat ( 0. )
+#         nobs = [float(x + y) for x, y in zip(bg, theta_hat)]
+#         computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
+#     ret = computer.findMuHat(allowNegativeSignals=allowNegativeSignals, extended_output=True)
+#     lbsm = computer.likelihood ( 1., marginalize = marginalize )
+#     lsm = computer.likelihood ( 0., marginalize = marginalize )
+#     lmax = ret["lmax"]
+#     if lsm > lmax:
+#         muhat = ret["muhat"]
+#         logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+#         ret["lmax"] = lsm
+#         ret["muhat"] = 0.0
+#     if lbsm > lmax:
+#         muhat = ret["muhat"]
+#         logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+#         ret["lmax"] = lbsm
+#         ret["muhat"] = 1.0
+#     ret["lbsm"] = lbsm
+#     ret["lsm"] = lsm
+#     return ret

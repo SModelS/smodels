@@ -412,7 +412,7 @@ class DataSet(object):
             return None
 
         # Do not return muhat here, it depends on the signal, which is taken arbitrarily because it doesn't affect maxLL
-        maxLL = statModel.maximize_likelihood(return_nll=False, expected=expectedDict[expected], allow_negative_signal=allowNegativeSignals , **args)
+        maxLL = statModel.maximize_likelihood(return_nll=False, expected=expectedDict[expected], allow_negative_signal=allowNegativeSignals , **args)[-1]
 
         return maxLL
 
