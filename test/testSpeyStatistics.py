@@ -105,9 +105,7 @@ class StatisticsTest(unittest.TestCase):
         database = Database(database)
         expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2018-41"])[0]
 
-        filename = "./testFiles/slha/lightEWinos.slha"
-        filename = "/home/pascal/SModelS/smodels/test/testFiles/slha/lightEWinos.slha"
-        filename = '/home/pascal/softsusy-4.1.12/inOutFiles/spectrumGridOutputs_wino_union_nlo/wino_Spectrum_640_95'
+        filename = './testFileTim/wino_Spectrum_640_95'
 
         model = Model(BSMList, SMList)
         model.updateParticles(filename)
@@ -144,7 +142,10 @@ class StatisticsTest(unittest.TestCase):
 
         mu_hat_SL, sigma_mu_SL, clsRoot_SL = computer.getCLsRootFunc(d, marginalize=False, expected=expected)
         a, b = determineBrentBracket(mu_hat_SL, sigma_mu_SL, clsRoot_SL, allowNegative=allow_negative_signal )
+        print("SL BrentBracket lower bound:",a)
+        print("SL BrentBracket upper bound:",b)
         mu_ul_SL = optimize.brentq(clsRoot_SL, a, b, rtol=1e-03, xtol=1e-06)
+        print("SL upper limit on mu:",mu_ul_SL)
         xsec_ul_SL = mu_ul_SL*xsec
         computer = LikelihoodComputer(d)
         print("mu_hat SL:",mu_hat_SL)
@@ -165,13 +166,11 @@ class StatisticsTest(unittest.TestCase):
                                                         delta_sys=0.2,
                                                         xsection=xsec
                                                         )
-        #statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal)
+        statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal)
         test_stat = "q" if allow_negative_signal else "qmutilde"
         (maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf) = statModel._prepare_for_hypotest(expected=expectedDict[expected], allow_negative_signal=allow_negative_signal, test_statistics=test_stat)
         mu_hat_spey = maximum_likelihood[0]
         maximum_likelihood_spey = np.exp(-maximum_likelihood[1])
-        print("mu_hat spey:",mu_hat_spey)
-        print("maximum_likelihood spey:",maximum_likelihood_spey)
         #find_poi_upper_limit(maximum_likelihood=maximum_likelihood, logpdf=logpdf, maximum_asimov_likelihood=maximum_asimov_likelihood, asimov_logpdf=asimov_logpdf, expected=expectedDict[expected], confidence_level=confidence_level, allow_negative_signal=allow_negative_signal)
         def computer_CLs_spey(poi_test: float) -> float:
             """Compute 1 - CLs(POI) = `confidence_level`"""
@@ -201,10 +200,13 @@ class StatisticsTest(unittest.TestCase):
             low_ini=maximum_likelihood_spey + 1.5 * sigma_mu if maximum_likelihood_spey >= 0.0 else 1.0,
             hig_ini=maximum_likelihood_spey + 2.5 * sigma_mu if maximum_likelihood_spey >= 0.0 else 1.0,
         )
-        print("computer_CLs_spey(",low,"):",computer_CLs_spey(low))
-        print("computer_CLs_spey(",hig,"):",computer_CLs_spey(hig))
+        print("lower bound computer_CLs_spey(",low,"):",computer_CLs_spey(low))
+        print("upper bound computer_CLs_spey(",hig,"):",computer_CLs_spey(hig))
         mu_ul_spey = optimize.brentq(computer_CLs_spey, low, hig, xtol=abs(low / 100.0))
+        print("Spey upper limit on mu:",mu_ul_spey)
         xsec_ul_spey = mu_ul_spey*xsec
+        print("mu_hat spey:",mu_hat_spey)
+        print("maximum_likelihood spey:",maximum_likelihood_spey)
         print("xsec_ul_spey:",xsec_ul_spey)
         self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,2)
 
@@ -213,12 +215,12 @@ class StatisticsTest(unittest.TestCase):
         mu_test = 2.
         theta_hat_SL, _ = computer.findThetaHat(mu_test)
         llhdAtThetaHat_SL = computer.llhdOfTheta( theta_hat_SL, nll=False )
-        print(f"SL from SModelS: likelihood = {llhdAtThetaHat_SL}, profiled at theta hat = {theta_hat_SL} for mu = {mu_test}")
+        print(f"SL: likelihood = {llhdAtThetaHat_SL}, profiled at theta hat = {theta_hat_SL} for mu = {mu_test}")
 
         #Spey
         nll_spey, theta_hat_spey = statModel.backend.likelihood(poi_test=mu_test)
         theta_hat_spey = [theta for index,theta in enumerate(theta_hat_spey) if index!=statModel.backend.model.poi_index]
-        print(f"SL from Spey: likelihood = {np.exp(-nll_spey)}, profiled at theta hat = {theta_hat_spey} for mu = {mu_test}")
+        print(f"Spey: likelihood = {np.exp(-nll_spey)}, profiled at theta hat = {theta_hat_spey} for mu = {mu_test}")
         self.assertAlmostEqual(llhdAtThetaHat_SL,np.exp(-nll_spey),4)
 
         llhdAtThetaHat_SL = computer.llhdOfTheta( np.array(theta_hat_spey), nll=False )

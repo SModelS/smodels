@@ -72,14 +72,14 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for pyhf backend.")
 
-        statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
-                                                        signal=,
-                                                        observed=dataset.globalInfo.jsonFiles,
-                                                        xsection=xsec
-                                                        )
-
-        muul = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=False)
-        ret = muul*xsec*1E6*fb
+        # statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
+        #                                                 signal=,
+        #                                                 observed=dataset.globalInfo.jsonFiles,
+        #                                                 xsection=xsec
+        #                                                 )
+        #
+        # muul = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=False)
+        # ret = muul*xsec*1E6*fb
 
         ulcomputer = _getPyhfComputer(dataset, nsig)
         ret = ulcomputer.getUpperLimitOnSigmaTimesEff(expected=expected)
@@ -398,15 +398,13 @@ def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=
     lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll, **args )
     lsm = statModel.likelihood ( poi_test = 0., expected=expectedDict[expected], return_nll = nll, **args )
     if lsm > lmax:
-        muhat = ret["muhat"]
         logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-        ret["lmax"] = lsm
-        ret["muhat"] = 0.0
+        lmax = lsm
+        muhat = 0.0
     if lbsm > lmax:
-        muhat = ret["muhat"]
         logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-        ret["lmax"] = lbsm
-        ret["muhat"] = 1.0
+        lmax = lbsm
+        muhat = 1.0
     nuisance_param_at_muhat = statModel.backend.likelihood(poi_test=muhat, expected=expectedDict[expected], marginalize=marginalize)[1]
     sigma_mu = statModel.backend.sigma_mu(pars=nuisance_param_at_muhat,expected=expectedDict[expected])
     return {"muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax, "lbsm": lbsm, "lsm": lsm }

@@ -1039,7 +1039,6 @@ class UpperLimitComputer:
         ul = self.getUpperLimitOnMu(
             model, marginalize=marginalize, toys=toys, expected=expected,
             trylasttime=trylasttime)
-
         if ul == None:
             return ul
         if model.lumi is None:
