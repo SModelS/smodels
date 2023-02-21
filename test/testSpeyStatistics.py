@@ -100,10 +100,10 @@ class StatisticsTest(unittest.TestCase):
         """
         Test the cross-section upper limit computation with simplified likelhood backend from SModelS and Spey packages.
         """
-        database='./testFileTim/tim_db/'
+        database='./testFileTim/test_db/'
         # Set the path to the database
         database = Database(database)
-        expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2018-41"])[0]
+        expRes = database.getExpResults(analysisIDs=["CMS-SUS-21-002-agg"])[0]
 
         filename = './testFileTim/wino_Spectrum_640_95'
 
