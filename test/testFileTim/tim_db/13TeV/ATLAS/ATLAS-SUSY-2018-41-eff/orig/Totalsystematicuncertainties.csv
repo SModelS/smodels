@@ -1,0 +1,24 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t11
+#: name: Total systematic uncertainties
+#: description: The total post-fit uncertainty in each of the SRs and VRs. 
+
+#: data_file: total_systematic_uncertainties.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+,Systematics
+VR1L-4Q,0.15307
+VR1Y-4Q,0.19012
+VR1L-2B2Q,0.20067
+VR1Y-2B2Q,0.24282
+SR-4Q-WW,0.20724
+SR-4Q-WZ,0.20886
+SR-4Q-ZZ,0.24557
+SR-4Q-VV,0.19943
+SR-2B2Q-WZ,0.29098
+SR-2B2Q-Wh,0.2741
+SR-2B2Q-ZZ,0.34632
+SR-2B2Q-Zh,0.33049
+SR-2B2Q-VZ,0.25887
+SR-2B2Q-Vh,0.31714
+

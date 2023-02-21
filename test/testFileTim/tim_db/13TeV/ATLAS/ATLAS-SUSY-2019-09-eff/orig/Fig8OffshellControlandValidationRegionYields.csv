@@ -1,0 +1,32 @@
+#: table_doi: 10.17182/hepdata.95751.v1/t3
+#: name: Fig 8 Offshell Control and Validation Region Yields
+#: description:  Comparison of the observed data and expected SM background yields in the CRs and VRs of the offshell $W\!Z$ selection. The SM prediction is taken from the background-only fit. The "Others" category contains the single-top, WW, triboson, Higgs and rare top processes. The hatched band indicates the combined theoretical, experimental, and MC statistical uncertainties. The bottom panel shows the significance of the difference between the observed and expected yields, calculated with the profile likelihood method from [169], adding a minus sign if the yield is below the prediction.
+#: data_file: fig_8_offshell_control_and_validation_region_yields.yaml
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> CHARGINO+ NEUTRALINO2 X | P P --> CHARGINO- NEUTRALINO2 X
+#: keyword phrases: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak
+#: keyword observables: N
+#:  ,Events
+,DATA,stat +,stat -
+$CRWZ_{0j}^{offWZ}$,5237,72.4,-72.4
+$CRWZ_{nj}^{offWZ}$,3149,56.1,-56.1
+$VRWZ_{0j}^{offWZ}$,198,14.1,-14.1
+$VRWZ_{nj}^{offWZ}$,174,13.2,-13.2
+$VRWZ_{nj-lowm_{ll}}^{offWZ}$,22,5.8,-4.7
+$VRt\bar{t}^{offWZ}$,2189,46.8,-46.8
+$VRFF_{0j}^{offWZ}$,385,19.6,-19.6
+$VRFF_{nj}^{offWZ}$,388,19.7,-19.7
+$VRFF_{nj-lowp_{T}}^{offWZ}$,73,9.6,-8.5
+
+#:  ,Events
+,BACKGROUND,stat+syst +,stat+syst -
+$CRWZ_{0j}^{offWZ}$,4953.7,90.1,-90.1
+$CRWZ_{nj}^{offWZ}$,3345.2,69.0,-69.0
+$VRWZ_{0j}^{offWZ}$,157.0,7.6,-7.6
+$VRWZ_{nj}^{offWZ}$,173.3,11.8,-11.8
+$VRWZ_{nj-lowm_{ll}}^{offWZ}$,29.2,5.9,-5.9
+$VRt\bar{t}^{offWZ}$,2221.7,372.5,-372.5
+$VRFF_{0j}^{offWZ}$,369.0,25.0,-25.0
+$VRFF_{nj}^{offWZ}$,373.0,19.0,-19.0
+$VRFF_{nj-lowp_{T}}^{offWZ}$,71.0,9.0,-9.0
+

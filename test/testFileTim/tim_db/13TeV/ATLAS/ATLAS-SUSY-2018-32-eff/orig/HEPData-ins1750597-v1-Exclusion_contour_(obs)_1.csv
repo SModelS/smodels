@@ -1,0 +1,47 @@
+#: table_doi: 10.17182/hepdata.89413.v1/t19
+#: name: Exclusion contour (obs) 1
+#: description: Observed exclusion limits on SUSY simplified models for chargino-pair production with $W$ boson mediated decays. All limits are computed at 95% CL.
+#: data_file: Fig_7a_OBS_C1C1WW.yaml
+#: data_license:   
+#: keyword reactions: pp --> CHARGINO1 CHARGINO1 | CHARGINO1 --> W NEUTRALINO1
+#: keyword observables: CLS
+#: keyword phrases: Proton-Proton Scattering | SUSY | Supersymmetry | Electroweak | Chargino | Slepton
+#: keyword cmenergies: 13000.0
+#: $\sqrt{s}$ [GeV],13000.0
+#: m($\tilde{\chi}_{1}^{\pm}$) [GeV],m($\tilde{\chi}_{1}^{0}$) [GeV]
+129.2682,1
+138.4599,16.87103
+144.4378,27.92803
+147.8195,32.74205
+160.311,43.32349
+166.6896,48.61308
+176.1842,57.0938
+183.4077,64.4841
+192.0574,74.35712
+197.2063,80.35513
+207.9306,89.58186
+217.3498,96.22615
+223.8038,104.5981
+239.6771,108.7587
+249.4869,112.0972
+255.5503,113.818
+271.4235,120.5735
+287.2967,122.8142
+303.1699,120.9801
+319.0431,117.4466
+334.9163,118.0084
+350.7895,120.1343
+366.6627,116.4201
+378.4143,112.0972
+382.5359,109.4298
+398.4091,99.27489
+403.3699,96.22615
+414.2823,84.31513
+416.3251,80.35513
+415.1975,64.4841
+414.2823,56.81693
+413.658,48.61308
+414.2823,42.08774
+415.5579,32.74205
+418.6025,16.87103
+

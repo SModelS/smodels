@@ -1,0 +1,53 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t125
+#: name: Acceptance of C1N2-WZ signals by SR-4Q-VV
+#: description: Signal acceptance of $(\tilde{W},\tilde{B})$ simplified models (C1N2-WZ) by their most relevant SRs, evaluated using MC simulation. The acceptance is given by the ratio of weighted selected events by the SR to the weighted total generated events including all the $W/Z/h$ decays. The selection is based on generator-level particle information. The efficiency of lepton reconstruction/identification, $b$-tagging, as well as the $D_2$ and $n_{\textrm{trk}}$ selection in the $W_{qq}$/$Z_{qq}$-tagging are treated as 100%.
+
+#: data_file: acceptance_of_c1n2-wz-sim_in_sr-4q-vv.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+$m(\tilde{\chi}_{1}^{\pm}/\tilde{\chi}_{2}^{0})$ [GeV],$m(\tilde{\chi}_{1}^{0})$ [GeV],Acceptance [%]
+400.0,0.0,0.035937
+400.0,50.0,0.030598
+500.0,0.0,0.25232
+500.0,100.0,0.1317
+500.0,200.0,0.054636
+600.0,0.0,0.72502
+600.0,100.0,0.65334
+600.0,200.0,0.29114
+600.0,300.0,0.12261
+700.0,0.0,1.9904
+700.0,100.0,1.8382
+700.0,200.0,1.3026
+700.0,300.0,0.60669
+700.0,400.0,0.10605
+800.0,0.0,3.3872
+800.0,100.0,3.15
+800.0,200.0,2.701
+800.0,300.0,1.8251
+800.0,400.0,0.72052
+800.0,500.0,0.13427
+900.0,0.0,4.6639
+900.0,100.0,4.5937
+900.0,200.0,4.1517
+900.0,300.0,3.24
+900.0,400.0,2.1287
+900.0,500.0,0.86678
+1000.0,0.0,5.8325
+1000.0,100.0,6.0498
+1000.0,200.0,5.4571
+1000.0,300.0,4.7087
+1000.0,400.0,3.9013
+1000.0,500.0,2.5916
+1100.0,0.0,7.0037
+1100.0,100.0,6.8176
+1100.0,200.0,6.7303
+1100.0,300.0,6.0915
+1100.0,400.0,5.4385
+1100.0,500.0,4.2626
+1200.0,0.0,7.872
+1200.0,100.0,7.9162
+1200.0,200.0,7.7552
+1200.0,300.0,6.9533
+1200.0,400.0,6.8589
+

@@ -1,0 +1,76 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t104
+#: name: B(N3->W+C1) in (W~, H~), tanb=10, mu>0
+#: description: The $\tilde{\chi}_{\textrm{heavy}}$ branching ratios in the $(\tilde{W},\tilde{H})$ model ($\tan\beta=10, \mu>0$). The branching ratios of wino-like chargino ($\tilde{\chi}_{2}^{\pm}$) and wino-like neutralino ($\tilde{\chi}_{3}^{0}$) are shown as the function of the mass of $\tilde{\chi}_{2}^{\pm}$ and that of the lightest higgsino-like neutralino ($\tilde{\chi}_{1}^{0}$), representing $m(\tilde{\chi}_{\textrm{light}})$ and $m(\tilde{\chi}_{\textrm{heavy}})$ respectively. The branchings into the two neutral higgsinos are summed up in the presentation i.e. $\mathcal{B}(\dots \rightarrow \tilde{\chi}_{1,2}^{0}) := \mathcal{B}(\dots \rightarrow \tilde{\chi}_{1}^{0})+\mathcal{B}(\dots \rightarrow \tilde{\chi}_{2}^{0})$.
+
+#: data_file: branching_ratio_br(neutral_wino_->_w+charged_hino).yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+$m(\tilde{\chi}_{2}^{\pm})$ [GeV],$m(\tilde{\chi}_{1}^{0})$ [GeV],B($\tilde{\chi}_{2}^{0}\rightarrow Z\tilde{\chi}_{1}^{0}$)
+237.5,15.0,0.68751
+337.5,15.0,0.59533
+337.5,85.0,0.60672
+437.5,15.0,0.55582
+462.5,95.0,0.558
+462.5,195.0,0.57902
+562.5,15.0,0.53572
+562.5,95.0,0.53578
+562.5,195.0,0.54213
+562.5,295.0,0.56588
+662.5,15.0,0.52415
+662.5,95.0,0.5236
+662.5,195.0,0.52574
+662.5,295.0,0.53388
+662.5,395.0,0.5582
+762.5,15.0,0.51687
+762.5,95.0,0.51614
+762.5,195.0,0.51674
+762.5,305.0,0.52005
+762.5,405.0,0.52887
+762.5,495.0,0.55306
+862.5,15.0,0.51198
+862.5,95.0,0.51119
+862.5,205.0,0.51115
+862.5,305.0,0.51257
+862.5,405.0,0.51643
+862.5,505.0,0.5255
+862.5,605.0,0.54931
+962.5,15.0,0.50852
+962.5,95.0,0.50773
+962.5,205.0,0.50738
+962.5,305.0,0.50795
+962.5,405.0,0.5098
+962.5,505.0,0.51392
+962.5,605.0,0.52306
+962.5,705.0,0.5464
+1062.5,15.0,0.50598
+1062.5,95.0,0.50519
+1062.5,205.0,0.5047
+1062.5,305.0,0.50484
+1062.5,405.0,0.50574
+1062.5,505.0,0.50782
+1062.5,605.0,0.51208
+1062.5,705.0,0.52119
+1087.5,805.0,0.54405
+1162.5,205.0,0.50271
+1162.5,305.0,0.50261
+1162.5,405.0,0.50302
+1162.5,505.0,0.50411
+1187.5,15.0,0.50404
+1187.5,95.0,0.50328
+1187.5,605.0,0.50634
+1187.5,705.0,0.51067
+1187.5,805.0,0.51972
+1187.5,905.0,0.54211
+1287.5,15.0,0.50252
+1287.5,95.0,0.50178
+1287.5,205.0,0.50117
+1287.5,305.0,0.50095
+1287.5,405.0,0.50108
+1287.5,505.0,0.50165
+1287.5,615.0,0.50288
+1287.5,715.0,0.50519
+1287.5,815.0,0.50955
+1287.5,915.0,0.51852
+1287.5,1005.0,0.54047
+

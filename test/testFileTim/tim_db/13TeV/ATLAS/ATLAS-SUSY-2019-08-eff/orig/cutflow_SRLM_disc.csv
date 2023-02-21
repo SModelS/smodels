@@ -1,0 +1,26 @@
+#: table_doi: 10.17182/hepdata.90607.v2/t51
+#: name: cutflow_SRLM_disc
+#: description: Event selection cutflow for a representative signal sample for the discovery SR-LM. The masses of next-lightest-neutralinos and LSPs are reported. While the first row of the table reports the total raw MC events produced, all subsequent rows show weighted events. Only statistical uncertainties are shown. Samples are produced with generator filters which selects $h\rightarrow b\bar{b}$ and $W\rightarrow\ell\nu$ decays.
+#: data_file: cutflow_SRLM_disc.yaml
+#: keyword reactions: P P --> CHARGINO1 NEUTRALINO2 X
+#: keyword observables: N
+#: keyword phrases: SUSY | Supersymmetry | Electroweak | Proton-Proton Scattering
+#: keyword cmenergies: 13000.0
+#: SQRT(S) [GEV],13000.0
+Cut [],"m($\tilde{\chi}^{\pm}_{1}/\tilde{\chi}^{0}_{2}$,$\tilde{\chi}^{0}_{1}$)=(300,75) GeV []",stat +,stat -
+All raw MC events,22000,0,0
+All weighted events,6008,0,0
+Event cleaning,6003,0,0
+"$N_{\mathrm{jets,25}} \geq 2$",4872,0,0
+1 signal lepton,4234,0,0
+Second baseline lepton veto,4123,0,0
+$m_{\mathrm{T}} > $ 50 GeV,3362,0,0
+$E_\mathrm{T}^\mathrm{miss} > $ 180 GeV,984,0,0
+$N_{\mathrm{jets}} \leq 3$,840,20,-20
+$N_{\mathrm{b-jets}}=2$,345,13,-13
+$m_{\mathrm{bb}}$ $>$ 50 GeV,345,13,-13
+$E_\mathrm{T}^\mathrm{miss} > $ 240 GeV,137,8,-8
+"$m_{\mathrm{bb}}$ $\in$ [100,140] GeV",105,7,-7
+$m_{\mathrm{T}}$ $>$ 100 GeV,74,6,-6
+$m_{\mathrm{CT}}$ $>$ 180 GeV,58,5,-5
+

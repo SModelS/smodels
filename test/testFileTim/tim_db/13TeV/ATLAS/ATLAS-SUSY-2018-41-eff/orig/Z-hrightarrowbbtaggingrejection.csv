@@ -1,0 +1,28 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t6
+#: name: $Z/h \rightarrow bb$ tagging rejection
+#: description: The rejection factor (inverse of the efficiency) for jets that have the other origins (background jets) are shown. The background jet rejection factor is calculated using pre-selected large-$R$ jets in the sample of simulated $Z\rightarrow\nu\nu$ + jets events, dominated by initial state radiation (ISR) jets. As for the $Z_{bb}$/$h_{bb}$-tagging, the rejection is shown as the function of number of $b$- or $c$-quarks contained in the large-$R$ jet within $\Delta R<1.0$. The systematic uncertainty is represented by the hashed bands.
+
+#: data_file: z_or_h_to_bb_tag_rejection.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+#: ,rejection
+,$Z_{bb}$ tag, +, -
+"b=0,c=0",1139.5,308.84,-308.84
+"b=0,c=1",254.95,48.126,-48.126
+"b=1,c=0",83.344,13.74,-13.74
+"b=0,c=2",53.038,13.514,-13.514
+"b=2,c=0",5.5101,0.54038,-0.54038
+"b=1,c=1",14.487,2.7889,-2.7889
+b+c$\geq$3,8.4917,2.9499,-2.9499
+
+#: ,rejection
+,$h_{bb}$ tag, +, -
+"b=0,c=0",1528.9,444.65,-444.65
+"b=0,c=1",310.7,63.56,-63.56
+"b=1,c=0",83.036,14.443,-14.443
+"b=0,c=2",39.972,18.771,-18.771
+"b=2,c=0",7.3934,0.75222,-0.75222
+"b=1,c=1",19.107,6.0218,-6.0218
+b+c$\geq$3,7.0431,1.9712,-1.9712
+

@@ -1,0 +1,7 @@
+dataId: SR_MM_Med_MCT
+dataType: efficiencyMap
+observedN: 7
+expectedBG: 2.6
+bgError: 1.3
+upperLimit: 0.0827*fb
+expectedUpperLimit: 0.046*fb

@@ -1,0 +1,7 @@
+dataId: SR-2B2Q-Vh
+dataType: efficiencyMap
+observedN: 1
+expectedBG: 2.5
+bgError: 0.8
+upperLimit: 0.026*fb
+expectedUpperLimit: 0.0318*fb

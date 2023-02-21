@@ -1,0 +1,157 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t13
+#: name: Data yields and background breakdown in SR
+#: description: Number of observed data events and the SM backgrounds in the SRs and the CR0L bins. The SM backgrounds are predicted by the background-only fits. Note that the relative uncertainty on the expected yield in the CRs between the reducible backgrounds are identical, given that a common normalization factor is assigned for all of them in the fit. Yields for negligible backgrounds are indicated by "0.0000001±0.0000001" in the table.
+#: data_file: data_yields_and_background_expectation_in_the_srs_breakdown.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+ NEUTRALINO | P P --> CHARGINO- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak
+#: ,yield
+,Fitted SM total, +, -
+CR0L-4Q,129.0,11.0,-11.0
+CR0L-2B2Q,83.0,9.0,-9.0
+SR-4Q-WW,1.9,0.4,-0.4
+SR-4Q-WZ,3.4,0.7,-0.7
+SR-4Q-ZZ,1.9,0.5,-0.5
+SR-4Q-VV,3.9,0.8,-0.8
+SR-2B2Q-WZ,1.6,0.4,-0.4
+SR-2B2Q-Wh,1.9,0.7,-0.7
+SR-2B2Q-ZZ,1.7,0.5,-0.5
+SR-2B2Q-Zh,1.6,0.5,-0.5
+SR-2B2Q-VZ,2.2,0.6,-0.6
+SR-2B2Q-Vh,2.5,0.8,-0.8
+
+#: ,yield
+,Data
+CR0L-4Q,129.0
+CR0L-2B2Q,83.0
+SR-4Q-WW,2.0
+SR-4Q-WZ,3.0
+SR-4Q-ZZ,1.0
+SR-4Q-VV,3.0
+SR-2B2Q-WZ,2.0
+SR-2B2Q-Wh,0.0
+SR-2B2Q-ZZ,2.0
+SR-2B2Q-Zh,1.0
+SR-2B2Q-VZ,2.0
+SR-2B2Q-Vh,1.0
+
+#: ,yield
+,$W$+jets, +, -
+CR0L-4Q,24.2,2.2,-2.2
+CR0L-2B2Q,16.6,2.0,-2.0
+SR-4Q-WW,0.37,0.08,-0.08
+SR-4Q-WZ,0.6,0.13,-0.13
+SR-4Q-ZZ,0.26,0.07,-0.07
+SR-4Q-VV,0.69,0.15,-0.15
+SR-2B2Q-WZ,0.11,0.06,-0.06
+SR-2B2Q-Wh,0.24,0.09,-0.09
+SR-2B2Q-ZZ,0.23,0.08,-0.08
+SR-2B2Q-Zh,0.26,0.1,-0.1
+SR-2B2Q-VZ,0.26,0.09,-0.09
+SR-2B2Q-Vh,0.26,0.09,-0.09
+
+#: ,yield
+,$Z$+jets, +, -
+CR0L-4Q,78.0,7.0,-7.0
+CR0L-2B2Q,44.0,5.0,-5.0
+SR-4Q-WW,1.0,0.21,-0.21
+SR-4Q-WZ,1.8,0.4,-0.4
+SR-4Q-ZZ,1.26,0.32,-0.32
+SR-4Q-VV,2.1,0.4,-0.4
+SR-2B2Q-WZ,0.84,0.27,-0.27
+SR-2B2Q-Wh,1.3,0.5,-0.5
+SR-2B2Q-ZZ,0.78,0.23,-0.23
+SR-2B2Q-Zh,0.66,0.24,-0.24
+SR-2B2Q-VZ,1.15,0.33,-0.33
+SR-2B2Q-Vh,1.4,0.5,-0.5
+
+#: ,yield
+,$VV$, +, -
+CR0L-4Q,21.5,1.9,-1.9
+CR0L-2B2Q,7.1,0.9,-0.9
+SR-4Q-WW,0.35,0.11,-0.11
+SR-4Q-WZ,0.73,0.24,-0.24
+SR-4Q-ZZ,0.26,0.09,-0.09
+SR-4Q-VV,0.79,0.25,-0.25
+SR-2B2Q-WZ,0.33,0.11,-0.11
+SR-2B2Q-Wh,0.09,0.03,-0.03
+SR-2B2Q-ZZ,0.32,0.1,-0.1
+SR-2B2Q-Zh,0.085,0.032,-0.032
+SR-2B2Q-VZ,0.37,0.11,-0.11
+SR-2B2Q-Vh,0.085,0.03,-0.03
+
+#: ,yield
+,$VVV$, +, -
+CR0L-4Q,0.9,0.4,-0.4
+CR0L-2B2Q,0.1,0.05,-0.05
+SR-4Q-WW,0.17,0.09,-0.09
+SR-4Q-WZ,0.19,0.1,-0.1
+SR-4Q-ZZ,0.11,0.07,-0.07
+SR-4Q-VV,0.23,0.12,-0.12
+SR-2B2Q-WZ,0.047,0.027,-0.027
+SR-2B2Q-Wh,0.009,0.006,-0.006
+SR-2B2Q-ZZ,0.051,0.032,-0.032
+SR-2B2Q-Zh,0.011,0.007,-0.007
+SR-2B2Q-VZ,0.06,0.04,-0.04
+SR-2B2Q-Vh,0.011,0.007,-0.007
+
+#: ,yield
+,$t\bar{t}$, +, -
+CR0L-4Q,1.38,0.12,-0.12
+CR0L-2B2Q,7.8,0.9,-0.9
+SR-4Q-WW,0.039,0.009,-0.009
+SR-4Q-WZ,0.06,0.018,-0.018
+SR-4Q-ZZ,0.025,0.01,-0.01
+SR-4Q-VV,0.063,0.018,-0.018
+SR-2B2Q-WZ,0.016,0.006,-0.006
+SR-2B2Q-Wh,0.13,0.04,-0.04
+SR-2B2Q-ZZ,0.064,0.019,-0.019
+SR-2B2Q-Zh,0.4,0.16,-0.16
+SR-2B2Q-VZ,0.072,0.021,-0.021
+SR-2B2Q-Vh,0.46,0.18,-0.18
+
+#: ,yield
+,$t+X$, +, -
+CR0L-4Q,1.32,0.12,-0.12
+CR0L-2B2Q,2.87,0.34,-0.34
+SR-4Q-WW,0.015,0.006,-0.006
+SR-4Q-WZ,0.039,0.016,-0.016
+SR-4Q-ZZ,0.012,0.005,-0.005
+SR-4Q-VV,0.039,0.016,-0.016
+SR-2B2Q-WZ,0.11,0.05,-0.05
+SR-2B2Q-Wh,0.07,0.04,-0.04
+SR-2B2Q-ZZ,0.11,0.05,-0.05
+SR-2B2Q-Zh,0.041,0.022,-0.022
+SR-2B2Q-VZ,0.11,0.05,-0.05
+SR-2B2Q-Vh,0.1,0.05,-0.05
+
+#: ,yield
+,$t\bar{t}+X$, +, -
+CR0L-4Q,1.3,0.9,-0.9
+CR0L-2B2Q,3.7,2.6,-2.6
+SR-4Q-WW,1e-06,1e-06,-1e-06
+SR-4Q-WZ,1e-06,1e-06,-1e-06
+SR-4Q-ZZ,1e-06,1e-06,-1e-06
+SR-4Q-VV,1e-06,1e-06,-1e-06
+SR-2B2Q-WZ,0.1,0.08,-1e-06
+SR-2B2Q-Wh,0.07,0.1,-0.07
+SR-2B2Q-ZZ,0.14,0.12,-0.12
+SR-2B2Q-Zh,0.08,0.09,-0.08
+SR-2B2Q-VZ,0.18,0.14,-0.14
+SR-2B2Q-Vh,0.1,0.11,-0.1
+
+#: ,yield
+,Other, +, -
+CR0L-4Q,0.017,0.001,-0.001
+CR0L-2B2Q,0.95,0.11,-0.11
+SR-4Q-WW,1e-06,1e-06,-1e-06
+SR-4Q-WZ,1e-06,1e-06,-1e-06
+SR-4Q-ZZ,1e-06,1e-06,-1e-06
+SR-4Q-VV,1e-06,1e-06,-1e-06
+SR-2B2Q-WZ,1e-06,1e-06,-1e-06
+SR-2B2Q-Wh,0.03,0.01,-0.01
+SR-2B2Q-ZZ,1e-06,1e-06,-1e-06
+SR-2B2Q-Zh,0.024,0.008,-0.008
+SR-2B2Q-VZ,1e-06,1e-06,-1e-06
+SR-2B2Q-Vh,0.037,0.011,-0.011
+

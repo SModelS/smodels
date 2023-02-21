@@ -1,0 +1,83 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t15
+#: name: Effective mass distribution in SR-4Q-VV
+#: description: $m_{\textrm{eff}}$  distribution in SR-4Q-VV. The post-fit SM background expectation using the background-only fit is shown in a histogram stack. Distributions of a few representative signals are overlaid. The bottom panels show the ratio of the observed data to the background prediction. The selection criteria on the variable shown by each plot is removed, while the arrow indicates the cut value to define the region. A few representative signals are overlaid. For the $(\tilde{W},\tilde{B})$ simplified model models, the label $(x,y)$ indicates $(m(\tilde{\chi}_{1}^{\pm}), m(\tilde{\chi}_{1}^{0}))=(x,y)~\text{GeV}$.
+
+#: data_file: effective_mass_distribution_in_sr-4q-vv.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+#: ,,,yield
+effective mass [GeV],effective mass [GeV] LOW,effective mass [GeV] HIGH,Background, +, -
+775.0,700.0,850.0,6.2247,1.4295,-1.4295
+925.0,850.0,1000.0,11.315,2.2759,-2.2759
+1075.0,1000.0,1150.0,9.5418,2.1642,-2.1642
+1225.0,1150.0,1300.0,6.2998,1.5569,-1.5569
+1375.0,1300.0,1450.0,1.4843,0.35501,-0.35501
+1525.0,1450.0,1600.0,1.1496,0.38216,-0.38216
+1675.0,1600.0,1750.0,0.52913,0.16717,-0.16717
+1825.0,1750.0,1900.0,0.33172,0.12143,-0.12143
+1975.0,1900.0,2050.0,0.1628,0.046972,-0.046972
+2125.0,2050.0,2200.0,0.066804,0.023924,-0.023924
+2275.0,2200.0,2350.0,0.03062,0.014624,-0.014624
+2425.0,2350.0,2500.0,0.040882,0.016446,-0.016446
+
+#: ,,,yield
+effective mass [GeV],effective mass [GeV] LOW,effective mass [GeV] HIGH,Data
+775.0,700.0,850.0,5.0
+925.0,850.0,1000.0,10.0
+1075.0,1000.0,1150.0,9.0
+1225.0,1150.0,1300.0,3.0
+1375.0,1300.0,1450.0,1.0
+1525.0,1450.0,1600.0,0.0
+1675.0,1600.0,1750.0,1.0
+1825.0,1750.0,1900.0,0.0
+1975.0,1900.0,2050.0,1.0
+2125.0,2050.0,2200.0,0.0
+2275.0,2200.0,2350.0,0.0
+2425.0,2350.0,2500.0,0.0
+
+#: ,,,yield
+effective mass [GeV],effective mass [GeV] LOW,effective mass [GeV] HIGH,"SIGNAL $\tilde{\chi}_{1}^{\pm}\tilde{\chi}_{0}^{2}\rightarrow WZ\tilde{\chi}_{0}^{1}\tilde{\chi}_{0}^{1}$ (900, 100)"
+775.0,700.0,850.0,0.0
+925.0,850.0,1000.0,0.30633
+1075.0,1000.0,1150.0,0.61982
+1225.0,1150.0,1300.0,1.2668
+1375.0,1300.0,1450.0,1.4207
+1525.0,1450.0,1600.0,1.4919
+1675.0,1600.0,1750.0,1.2176
+1825.0,1750.0,1900.0,1.001
+1975.0,1900.0,2050.0,0.65906
+2125.0,2050.0,2200.0,0.35341
+2275.0,2200.0,2350.0,0.30048
+2425.0,2350.0,2500.0,0.043907
+
+#: ,,,yield
+effective mass [GeV],effective mass [GeV] LOW,effective mass [GeV] HIGH,"SIGNAL $\tilde{\chi}_{1}^{\pm}\tilde{\chi}_{1}^{\pm}\rightarrow WW\tilde{\chi}_{0}^{1}\tilde{\chi}_{0}^{1}$ (700, 100)"
+775.0,700.0,850.0,0.16002
+925.0,850.0,1000.0,1.1547
+1075.0,1000.0,1150.0,2.1931
+1225.0,1150.0,1300.0,2.3639
+1375.0,1300.0,1450.0,2.2888
+1525.0,1450.0,1600.0,1.3525
+1675.0,1600.0,1750.0,0.70928
+1825.0,1750.0,1900.0,0.39171
+1975.0,1900.0,2050.0,0.223
+2125.0,2050.0,2200.0,0.12643
+2275.0,2200.0,2350.0,0.047997
+2425.0,2350.0,2500.0,0.02953
+
+#: ,,,yield
+effective mass [GeV],effective mass [GeV] LOW,effective mass [GeV] HIGH,"GGM Higgsino SIGNAL $m(\tilde{\chi}_{1}^{0}) = 800$ GeV, B($\tilde{\chi}_{1}^{0}\rightarrow Z\tilde{G}$) = 50%"
+775.0,700.0,850.0,0.071232
+925.0,850.0,1000.0,0.1455
+1075.0,1000.0,1150.0,0.55732
+1225.0,1150.0,1300.0,0.434
+1375.0,1300.0,1450.0,0.43532
+1525.0,1450.0,1600.0,0.67218
+1675.0,1600.0,1750.0,0.40663
+1825.0,1750.0,1900.0,0.16384
+1975.0,1900.0,2050.0,0.046401
+2125.0,2050.0,2200.0,0.050231
+2275.0,2200.0,2350.0,0.013922
+2425.0,2350.0,2500.0,0.024898
+

@@ -1,0 +1,81 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t93
+#: name: Obs limit on (H~, a~) B(N1->Za~) = 100%
+#: description: 95% CL exclusion limits for the $(\tilde{H},\tilde{a})$ model as the function of axino mass ($m(\tilde{a})$) and the lightest higgsino ($m(\tilde{\chi}_{1}^{0})$). Expected (dashed lines) and observed (solid lines) limits with various $\mathcal{B}(\tilde{\chi}_{1}^{0} \to Z\tilde{a}) (=1-\mathcal{B}(\tilde{\chi}_{1}^{0} \to h\tilde{a}))$ hypotheses. No expected limit is derived for the case with $\mathcal{B}(\tilde{\chi}_{1}^{0} \to Z\tilde{a})=100$% as no mass point on the plane can be excluded.
+
+#: data_file: higgsino-nlsp_axino-lsp_br(n2->hn1)=0%_(observed).yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+$m(\tilde{\chi}_{1}^{0})$ [GeV],$m(\tilde{a})$ [GeV]
+446.11,6.25
+446.25,6.6934
+450.17,18.75
+456.05,31.25
+462.53,43.75
+468.75,55.702
+469.07,56.25
+476.73,68.75
+484.53,81.25
+491.25,91.81
+492.66,93.75
+502.95,106.25
+513.75,118.69
+513.81,118.75
+527.19,131.25
+536.25,139.85
+540.73,143.75
+554.81,156.25
+558.75,159.8
+569.18,168.75
+581.25,179.45
+583.43,181.25
+598.66,193.75
+603.75,197.84
+615.48,206.25
+626.25,213.6
+634.34,218.75
+648.75,227.86
+653.98,231.25
+671.25,243.26
+672.06,243.75
+691.82,256.25
+693.75,257.52
+716.25,265.4
+731.12,268.75
+738.75,271.07
+760.32,281.25
+761.25,281.71
+783.75,292.51
+788.95,293.75
+806.25,297.27
+828.75,295.41
+835.76,293.75
+851.25,287.76
+866.98,281.25
+873.75,277.42
+888.13,268.75
+896.25,263.58
+905.78,256.25
+918.75,245.25
+919.97,243.75
+927.62,231.25
+932.19,218.75
+934.8,206.25
+936.61,193.75
+938.54,181.25
+940.84,168.75
+941.25,166.95
+943.75,156.25
+947.13,143.75
+950.72,131.25
+954.42,118.75
+957.67,106.25
+959.61,93.75
+960.16,81.25
+960.0,68.75
+959.58,56.25
+958.94,43.75
+958.01,31.25
+956.91,18.75
+956.06,6.25
+

@@ -1,0 +1,7 @@
+dataId: SRInt_1_cuts
+dataType: efficiencyMap
+observedN: 24
+expectedBG: 22.8
+bgError: 3.5
+upperLimit: 0.107*fb
+expectedUpperLimit: 0.0923*fb

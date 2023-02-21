@@ -1,0 +1,92 @@
+#: table_doi: 10.17182/hepdata.95751.v1/t68
+#: name: Fig 17 Wh Exclusion, Exp
+#: description:  Exclusion limits obtained for the $W\!h$med in the wino/bino (+) scenario, calculated using the $W\!h$ SRs and projected onto the m(&chi;&#771;<sub>1</sub><sup>&plusmn;</sup>, &chi;&#771;<sub>2</sub><sup>0</sup>) vs m(&chi;&#771;<sub>1</sub><sup>0</sup>) plane. The expected 95 CL sensitivity (dashed black line) is shown with &plusmn;1&sigma;<sub>{exp}</sub> (yellow band) from experimental systematic uncertainties and statistical uncertainties on the data yields, the observed limit (red solid line) is shown with &plusmn;1&sigma;<sub>theory</sub> (dotted red lines) from signal cross-section uncertainties.
+#: data_file: fig_17_wh_exclusion__exp.yaml
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> CHARGINO+ NEUTRALINO2 X | P P --> CHARGINO- NEUTRALINO2 X
+#: keyword phrases: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak
+#: keyword observables: CLS
+"$m(\tilde{\chi}_{1}^{\pm},\tilde{\chi}_{2}^{0})$ [GeV]",$m(\tilde{\chi}_{1}^{0})$ [GeV]
+241.45,0.0
+240.2,3.03
+240.14,3.202
+238.95,6.06
+237.68,9.09
+237.11,10.494
+236.4,12.12
+235.14,15.15
+234.07,17.823
+233.94,18.18
+232.9,21.21
+232.03,24.24
+231.35,27.27
+231.04,29.089
+230.88,30.301
+230.59,33.331
+230.42,36.361
+230.33,39.391
+230.26,42.421
+230.17,45.451
+230.01,48.481
+229.73,51.511
+229.28,54.541
+228.58,57.571
+228.01,59.267
+227.51,60.601
+225.77,63.631
+224.98,64.564
+221.95,66.6
+221.66,66.661
+218.92,67.061
+215.89,66.698
+215.78,66.661
+212.86,65.766
+209.83,64.531
+208.02,63.631
+206.8,63.075
+203.77,61.444
+202.37,60.601
+200.74,59.683
+197.71,57.829
+197.34,57.571
+194.68,55.81
+192.89,54.541
+191.65,53.695
+188.67,51.511
+188.62,51.47
+185.59,49.073
+184.9,48.481
+182.56,46.554
+181.32,45.451
+179.53,43.918
+177.9,42.421
+176.49,41.178
+174.6,39.391
+173.46,38.354
+171.39,36.361
+170.43,35.473
+168.21,33.331
+167.4,32.586
+164.96,30.301
+164.37,29.771
+161.52,27.27
+161.34,27.122
+158.31,24.667
+157.75,24.24
+155.28,22.424
+153.46,21.21
+152.25,20.401
+149.22,18.555
+148.55,18.18
+146.19,16.794
+143.16,15.208
+143.04,15.15
+140.13,13.606
+137.1,12.16
+137.01,12.12
+134.07,10.657
+131.04,9.276
+130.6,9.09
+128.01,7.833
+124.97,6.469
+

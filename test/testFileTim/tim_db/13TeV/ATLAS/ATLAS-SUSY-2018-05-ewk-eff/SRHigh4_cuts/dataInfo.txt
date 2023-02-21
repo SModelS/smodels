@@ -1,0 +1,7 @@
+dataId: SRHigh4_cuts
+dataType: efficiencyMap
+observedN: 1
+expectedBG: 0.85
+bgError: 0.34
+upperLimit: 0.0273*fb
+expectedUpperLimit: 0.0177*fb

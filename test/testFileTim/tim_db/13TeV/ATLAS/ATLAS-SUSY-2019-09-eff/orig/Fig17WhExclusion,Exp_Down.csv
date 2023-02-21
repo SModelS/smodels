@@ -1,0 +1,62 @@
+#: table_doi: 10.17182/hepdata.95751.v1/t70
+#: name: Fig 17 Wh Exclusion, Exp_Down
+#: description:  Exclusion limits obtained for the $W\!h$med in the wino/bino (+) scenario, calculated using the $W\!h$ SRs and projected onto the m(&chi;&#771;<sub>1</sub><sup>&plusmn;</sup>, &chi;&#771;<sub>2</sub><sup>0</sup>) vs m(&chi;&#771;<sub>1</sub><sup>0</sup>) plane. The expected 95 CL sensitivity (dashed black line) is shown with &plusmn;1&sigma;<sub>{exp}</sub> (yellow band) from experimental systematic uncertainties and statistical uncertainties on the data yields, the observed limit (red solid line) is shown with &plusmn;1&sigma;<sub>theory</sub> (dotted red lines) from signal cross-section uncertainties.
+#: data_file: fig_17_wh_exclusion__exp_down.yaml
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> CHARGINO+ NEUTRALINO2 X | P P --> CHARGINO- NEUTRALINO2 X
+#: keyword phrases: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak
+#: keyword observables: CLS
+"$m(\tilde{\chi}_{1}^{\pm},\tilde{\chi}_{2}^{0})$ [GeV]",$m(\tilde{\chi}_{1}^{0})$ [GeV]
+195.47,0.0
+195.15,3.03
+195.11,6.06
+195.3,9.09
+195.66,12.12
+196.14,15.15
+196.64,18.18
+197.12,21.21
+197.53,24.24
+197.71,26.375
+197.79,27.27
+197.84,30.301
+197.71,31.798
+197.56,33.331
+196.7,36.361
+194.69,39.391
+194.68,39.4
+191.65,40.736
+188.62,40.759
+185.59,40.01
+184.2,39.391
+182.56,38.694
+179.53,36.989
+178.62,36.361
+176.49,34.949
+174.32,33.331
+173.46,32.713
+170.43,30.333
+170.4,30.301
+167.4,27.837
+166.72,27.27
+164.37,25.408
+162.85,24.24
+161.34,23.131
+158.54,21.21
+158.31,21.059
+155.28,19.078
+153.77,18.18
+152.25,17.263
+149.22,15.581
+148.39,15.15
+146.19,13.93
+143.16,12.408
+142.55,12.12
+140.13,10.848
+137.1,9.389
+136.44,9.09
+134.07,7.862
+131.04,6.405
+130.28,6.06
+128.01,4.863
+124.97,3.369
+

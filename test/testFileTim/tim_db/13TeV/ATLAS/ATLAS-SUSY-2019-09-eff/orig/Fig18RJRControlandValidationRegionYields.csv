@@ -1,0 +1,22 @@
+#: table_doi: 10.17182/hepdata.95751.v1/t71
+#: name: Fig 18 RJR Control and Validation Region Yields
+#: description:  Comparison of the observed data and expected SM background yields in the CRs and VRs of the RJR selection. The SM prediction is taken from the background-only fit. The "FNP leptons" category contains backgrounds from tt&#772;, tW, WW and Z+jets processes. The "Others" category contains backgrounds from Higgs and rare top processes. The hatched band indicates the combined theoretical, experimental, and MC statistical uncertainties. The bottom panel shows the significance of the difference between the observed and expected yields, calculated with the profile likelihood method from [169], adding a minus sign if the yield is below the prediction.
+#: data_file: fig_18_rjr_control_and_validation_region_yields.yaml
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> CHARGINO+ NEUTRALINO2 X | P P --> CHARGINO- NEUTRALINO2 X
+#: keyword phrases: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak
+#: keyword observables: N
+#:  ,Events
+,DATA,stat +,stat -
+$\mbox{CR3}\ell\!\mbox{-VV}$,629,25.1,-25.1
+$\mbox{CR3}\ell\!\mbox{-ISR-VV}$,328,18.1,-18.1
+$\mbox{VR3}\ell\!\mbox{-VV}$,331,18.2,-18.2
+$\mbox{VR3}\ell\!\mbox{-ISR-VV}$,277,16.6,-16.6
+
+#:  ,Events
+,BACKGROUND,stat+syst +,stat+syst -
+$\mbox{CR3}\ell\!\mbox{-VV}$,674.0,26.1,-26.1
+$\mbox{CR3}\ell\!\mbox{-ISR-VV}$,352.6,4.1,-4.1
+$\mbox{VR3}\ell\!\mbox{-VV}$,307.2,30.9,-30.9
+$\mbox{VR3}\ell\!\mbox{-ISR-VV}$,292.3,48.4,-48.4
+

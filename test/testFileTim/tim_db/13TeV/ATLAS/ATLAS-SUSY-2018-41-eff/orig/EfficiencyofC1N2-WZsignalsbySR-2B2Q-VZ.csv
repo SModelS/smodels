@@ -1,0 +1,53 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t137
+#: name: Efficiency of C1N2-WZ signals by SR-2B2Q-VZ
+#: description: Efficiency for $(\tilde{W},\tilde{B})$ simplified models (C1N2-WZ) in their most relevant SRs. The efficiency in a given SR is defined by the ratio of weighted events selected based on the generator-level particle information and that based on detector simulation and particle reconstruction. This mainly accounts for the efficiency of lepton reconstruction/identification, $b$-tagging, as well as the $D_2$ and $n_{\textrm{trk}}$ selection in the and $W_{qq}$/$Z_{qq}$-tagging.
+
+#: data_file: efficiency_of_c1n2-wz-sim_in_sr-2b2q-vz.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+$m(\tilde{\chi}_{1}^{\pm}/\tilde{\chi}_{2}^{0})$ [GeV],$m(\tilde{\chi}_{1}^{0})$ [GeV],Efficiency [%]
+400.0,0.0,61.158
+400.0,50.0,121.37
+500.0,0.0,76.593
+500.0,100.0,45.412
+500.0,200.0,26.741
+600.0,0.0,69.626
+600.0,100.0,82.418
+600.0,200.0,68.105
+600.0,300.0,61.512
+700.0,0.0,58.063
+700.0,100.0,54.363
+700.0,200.0,58.686
+700.0,300.0,53.446
+700.0,400.0,65.891
+800.0,0.0,59.676
+800.0,100.0,59.227
+800.0,200.0,64.74
+800.0,300.0,64.619
+800.0,400.0,58.48
+800.0,500.0,82.738
+900.0,0.0,57.585
+900.0,100.0,57.41
+900.0,200.0,53.421
+900.0,300.0,61.161
+900.0,400.0,60.026
+900.0,500.0,71.292
+1000.0,0.0,55.713
+1000.0,100.0,53.321
+1000.0,200.0,57.022
+1000.0,300.0,66.721
+1000.0,400.0,56.147
+1000.0,500.0,65.623
+1100.0,0.0,58.762
+1100.0,100.0,57.379
+1100.0,200.0,58.964
+1100.0,300.0,49.323
+1100.0,400.0,55.647
+1100.0,500.0,61.275
+1200.0,0.0,66.795
+1200.0,100.0,55.74
+1200.0,200.0,56.477
+1200.0,300.0,56.627
+1200.0,400.0,58.244
+

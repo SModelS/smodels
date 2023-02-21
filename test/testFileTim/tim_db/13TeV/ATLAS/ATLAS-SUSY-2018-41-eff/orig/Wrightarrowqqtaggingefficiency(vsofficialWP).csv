@@ -1,0 +1,24 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t7
+#: name: $W\rightarrow qq$ tagging efficiency (vs official WP)
+#: description: The signal jet efficiency and background jet rejection for the $W_{qq}$-/$Z_{qq}$-tagging working point used in the analysis in comparison with those for the nominal working points (''50% efficiency W/Z tagger'' in ATL-PHYS-PUB-2020-017). The definition of the efficiency and rejection follow the caption of Figure 4. Note that the efficiency for the nominal working point is not 50% since they are tuned using jet samples with different pre-selection.
+
+#: data_file: boson_tagging_efficiency_for_w_boson.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+#:  [%],,,efficiency
+large-$R$ jet $p_\text{T}$ [GeV],large-$R$ jet $p_\text{T}$ [GeV] LOW,large-$R$ jet $p_\text{T}$ [GeV] HIGH,Official WP [%], +, -
+250.0,200.0,300.0,0.37756,0.077271,-0.077271
+400.0,300.0,500.0,0.35616,0.040708,-0.040708
+600.0,500.0,700.0,0.34397,0.024563,-0.024563
+800.0,700.0,900.0,0.35145,0.026991,-0.026991
+1050.0,900.0,1200.0,0.37521,0.029753,-0.029753
+
+#:  [%],,,efficiency
+large-$R$ jet $p_\text{T}$ [GeV],large-$R$ jet $p_\text{T}$ [GeV] LOW,large-$R$ jet $p_\text{T}$ [GeV] HIGH,Reoptimized WP [%], +, -
+250.0,200.0,300.0,0.46924,0.067588,-0.067588
+400.0,300.0,500.0,0.47452,0.043797,-0.043797
+600.0,500.0,700.0,0.47789,0.037501,-0.037501
+800.0,700.0,900.0,0.49555,0.040804,-0.040804
+1050.0,900.0,1200.0,0.52157,0.04237,-0.04237
+

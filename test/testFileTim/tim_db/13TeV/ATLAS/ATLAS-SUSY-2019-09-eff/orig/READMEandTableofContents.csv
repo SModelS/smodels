@@ -1,0 +1,160 @@
+#: table_doi: 10.17182/hepdata.95751.v1/t1
+#: name: README and Table of Contents
+#: description: This is the HEPData space for the ATLAS SUSY EWK three-lepton search.  The full resolution figures can be found at https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2019-09/
+
+The full statistical likelihoods have been provided for this analysis. They can be downloaded by clicking on the purple 'Resources' button above and selecting the 'Common Resources' category.
+
+<b>Region yields:</b>
+<ul display="inline-block">
+<li><a href="?table=Tab%2012%20Onshell%20WZ%20Signal%20Region%20Yields%20Table">Tab 12 Onshell WZ Signal Region Yields Table</a>
+<li><a href="?table=Tab%2013%20Onshell%20Wh%20Signal%20Region%20Yields%20Table">Tab 13 Onshell Wh Signal Region Yields Table</a>
+<li><a href="?table=Tab%2014%20Offshell%20low-$E_{T}^{miss}$%20Signal%20Region%20Yields%20Table">Tab 14 Offshell low-$E_{T}^{miss}$ Signal Region Yields Table</a>
+<li><a href="?table=Tab%2015%20Offshell%20high-$E_{T}^{miss}$%20Signal%20Region%20Yields%20Table">Tab 15 Offshell high-$E_{T}^{miss}$ Signal Region Yields Table</a>
+<li><a href="?table=Tab%2020%20RJR%20Signal%20Region%20Yields%20Table">Tab 20 RJR Signal Region Yields Table</a>
+<li><a href="?table=Fig%204%20Onshell%20Control%20and%20Validation%20Region%20Yields">Fig 4 Onshell Control and Validation Region Yields</a>
+<li><a href="?table=Fig%208%20Offshell%20Control%20and%20Validation%20Region%20Yields">Fig 8 Offshell Control and Validation Region Yields</a>
+<li><a href="?table=Fig%2010%20Onshell%20WZ%20Signal%20Region%20Yields">Fig 10 Onshell WZ Signal Region Yields</a>
+<li><a href="?table=Fig%2011%20Onshell%20Wh%20Signal%20Region%20Yields">Fig 11 Onshell Wh Signal Region Yields</a>
+<li><a href="?table=Fig%2012%20Offshell%20Signal%20Region%20Yields">Fig 12 Offshell Signal Region Yields</a>
+<li><a href="?table=Fig%2018%20RJR%20Control%20and%20Validation%20Region%20Yields">Fig 18 RJR Control and Validation Region Yields</a>
+</ul>
+<b>Exclusion contours:</b>
+<ul display="inline-block">
+<li><a href="?table=Fig%2016a%20WZ%20Exclusion:%20Wino-bino(%2b),%20Obs">Fig 16a WZ Exclusion: Wino-bino(+), Obs</a>
+<li><a href="?table=Fig%2016a%20WZ%20Exclusion:%20Wino-bino(%2b),%20Obs_Up">Fig 16a WZ Exclusion: Wino-bino(+), Obs_Up</a>
+<li><a href="?table=Fig%2016a%20WZ%20Exclusion:%20Wino-bino(%2b),%20Obs_Down">Fig 16a WZ Exclusion: Wino-bino(+), Obs_Down</a>
+<li><a href="?table=Fig%2016a%20WZ%20Exclusion:%20Wino-bino(%2b),%20Exp">Fig 16a WZ Exclusion: Wino-bino(+), Exp</a>
+<li><a href="?table=Fig%2016a%20WZ%20Exclusion:%20Wino-bino(%2b),%20Exp_Up">Fig 16a WZ Exclusion: Wino-bino(+), Exp_Up</a>
+<li><a href="?table=Fig%2016a%20WZ%20Exclusion:%20Wino-bino(%2b),%20Exp_Down">Fig 16a WZ Exclusion: Wino-bino(+), Exp_Down</a>
+<li><a href="?table=Fig%2016a%20WZ%20Exclusion:%20Wino-bino(%2b),%20compressed_Obs">Fig 16a WZ Exclusion: Wino-bino(+), compressed_Obs</a>
+<li><a href="?table=Fig%2016a%20WZ%20Exclusion:%20Wino-bino(%2b),%20compressed_Exp">Fig 16a WZ Exclusion: Wino-bino(+), compressed_Exp</a>
+<li><a href="?table=Fig%2016a%20WZ%20Exclusion:%20Wino-bino(%2b),%20offshell_Obs">Fig 16a WZ Exclusion: Wino-bino(+), offshell_Obs</a>
+<li><a href="?table=Fig%2016a%20WZ%20Exclusion:%20Wino-bino(%2b),%20offshell_Exp">Fig 16a WZ Exclusion: Wino-bino(+), offshell_Exp</a>
+<li><a href="?table=Fig%2016a%20WZ%20Exclusion:%20Wino-bino(%2b),%20onshell_Obs">Fig 16a WZ Exclusion: Wino-bino(+), onshell_Obs</a>
+<li><a href="?table=Fig%2016a%20WZ%20Exclusion:%20Wino-bino(%2b),%20onshell_Exp">Fig 16a WZ Exclusion: Wino-bino(+), onshell_Exp</a>
+<li><a href="?table=Fig%2016b%20WZ%20Exclusion:%20Wino-bino(%2b)%20($\Delta%20m$),%20Obs">Fig 16b WZ Exclusion: Wino-bino(+) ($\Delta m$), Obs</a>
+<li><a href="?table=Fig%2016b%20WZ%20Exclusion:%20Wino-bino(%2b)%20($\Delta%20m$),%20Obs_Up">Fig 16b WZ Exclusion: Wino-bino(+) ($\Delta m$), Obs_Up</a>
+<li><a href="?table=Fig%2016b%20WZ%20Exclusion:%20Wino-bino(%2b)%20($\Delta%20m$),%20Obs_Down">Fig 16b WZ Exclusion: Wino-bino(+) ($\Delta m$), Obs_Down</a>
+<li><a href="?table=Fig%2016b%20WZ%20Exclusion:%20Wino-bino(%2b)%20($\Delta%20m$),%20Exp">Fig 16b WZ Exclusion: Wino-bino(+) ($\Delta m$), Exp</a>
+<li><a href="?table=Fig%2016b%20WZ%20Exclusion:%20Wino-bino(%2b)%20($\Delta%20m$),%20Exp_Up">Fig 16b WZ Exclusion: Wino-bino(+) ($\Delta m$), Exp_Up</a>
+<li><a href="?table=Fig%2016b%20WZ%20Exclusion:%20Wino-bino(%2b)%20($\Delta%20m$),%20Exp_Down">Fig 16b WZ Exclusion: Wino-bino(+) ($\Delta m$), Exp_Down</a>
+<li><a href="?table=Fig%2016b%20WZ%20Exclusion:%20Wino-bino(%2b)%20($\Delta%20m$),%20compressed_Obs">Fig 16b WZ Exclusion: Wino-bino(+) ($\Delta m$), compressed_Obs</a>
+<li><a href="?table=Fig%2016b%20WZ%20Exclusion:%20Wino-bino(%2b)%20($\Delta%20m$),%20compressed_Exp">Fig 16b WZ Exclusion: Wino-bino(+) ($\Delta m$), compressed_Exp</a>
+<li><a href="?table=Fig%2016b%20WZ%20Exclusion:%20Wino-bino(%2b)%20($\Delta%20m$),%20offshell_Obs">Fig 16b WZ Exclusion: Wino-bino(+) ($\Delta m$), offshell_Obs</a>
+<li><a href="?table=Fig%2016b%20WZ%20Exclusion:%20Wino-bino(%2b)%20($\Delta%20m$),%20offshell_Exp">Fig 16b WZ Exclusion: Wino-bino(+) ($\Delta m$), offshell_Exp</a>
+<li><a href="?table=Fig%2016b%20WZ%20Exclusion:%20Wino-bino(%2b)%20($\Delta%20m$),%20onshell_Obs">Fig 16b WZ Exclusion: Wino-bino(+) ($\Delta m$), onshell_Obs</a>
+<li><a href="?table=Fig%2016b%20WZ%20Exclusion:%20Wino-bino(%2b)%20($\Delta%20m$),%20onshell_Exp">Fig 16b WZ Exclusion: Wino-bino(+) ($\Delta m$), onshell_Exp</a>
+<li><a href="?table=Fig%2016c%20WZ%20Exclusion:%20Wino-bino(-)%20($\Delta%20m$),%20Obs">Fig 16c WZ Exclusion: Wino-bino(-) ($\Delta m$), Obs</a>
+<li><a href="?table=Fig%2016c%20WZ%20Exclusion:%20Wino-bino(-)%20($\Delta%20m$),%20Obs_Up">Fig 16c WZ Exclusion: Wino-bino(-) ($\Delta m$), Obs_Up</a>
+<li><a href="?table=Fig%2016c%20WZ%20Exclusion:%20Wino-bino(-)%20($\Delta%20m$),%20Obs_Down">Fig 16c WZ Exclusion: Wino-bino(-) ($\Delta m$), Obs_Down</a>
+<li><a href="?table=Fig%2016c%20WZ%20Exclusion:%20Wino-bino(-)%20($\Delta%20m$),%20Exp">Fig 16c WZ Exclusion: Wino-bino(-) ($\Delta m$), Exp</a>
+<li><a href="?table=Fig%2016c%20WZ%20Exclusion:%20Wino-bino(-)%20($\Delta%20m$),%20Exp_Up">Fig 16c WZ Exclusion: Wino-bino(-) ($\Delta m$), Exp_Up</a>
+<li><a href="?table=Fig%2016c%20WZ%20Exclusion:%20Wino-bino(-)%20($\Delta%20m$),%20Exp_Down">Fig 16c WZ Exclusion: Wino-bino(-) ($\Delta m$), Exp_Down</a>
+<li><a href="?table=Fig%2016c%20WZ%20Exclusion:%20Wino-bino(-)%20($\Delta%20m$),%20compressed_Obs">Fig 16c WZ Exclusion: Wino-bino(-) ($\Delta m$), compressed_Obs</a>
+<li><a href="?table=Fig%2016c%20WZ%20Exclusion:%20Wino-bino(-)%20($\Delta%20m$),%20compressed_Exp">Fig 16c WZ Exclusion: Wino-bino(-) ($\Delta m$), compressed_Exp</a>
+<li><a href="?table=Fig%2016c%20WZ%20Exclusion:%20Wino-bino(-)%20($\Delta%20m$),%20offshell_Obs">Fig 16c WZ Exclusion: Wino-bino(-) ($\Delta m$), offshell_Obs</a>
+<li><a href="?table=Fig%2016c%20WZ%20Exclusion:%20Wino-bino(-)%20($\Delta%20m$),%20offshell_Exp">Fig 16c WZ Exclusion: Wino-bino(-) ($\Delta m$), offshell_Exp</a>
+<li><a href="?table=Fig%2016d%20WZ%20Exclusion:%20Higgsino%20($\Delta%20m$),%20Obs">Fig 16d WZ Exclusion: Higgsino ($\Delta m$), Obs</a>
+<li><a href="?table=Fig%2016d%20WZ%20Exclusion:%20Higgsino%20($\Delta%20m$),%20Obs_Up">Fig 16d WZ Exclusion: Higgsino ($\Delta m$), Obs_Up</a>
+<li><a href="?table=Fig%2016d%20WZ%20Exclusion:%20Higgsino%20($\Delta%20m$),%20Obs_Down">Fig 16d WZ Exclusion: Higgsino ($\Delta m$), Obs_Down</a>
+<li><a href="?table=Fig%2016d%20WZ%20Exclusion:%20Higgsino%20($\Delta%20m$),%20Exp">Fig 16d WZ Exclusion: Higgsino ($\Delta m$), Exp</a>
+<li><a href="?table=Fig%2016d%20WZ%20Exclusion:%20Higgsino%20($\Delta%20m$),%20Exp_Up">Fig 16d WZ Exclusion: Higgsino ($\Delta m$), Exp_Up</a>
+<li><a href="?table=Fig%2016d%20WZ%20Exclusion:%20Higgsino%20($\Delta%20m$),%20Exp_Down">Fig 16d WZ Exclusion: Higgsino ($\Delta m$), Exp_Down</a>
+<li><a href="?table=Fig%2016d%20WZ%20Exclusion:%20Higgsino%20($\Delta%20m$),%20compressed_Obs">Fig 16d WZ Exclusion: Higgsino ($\Delta m$), compressed_Obs</a>
+<li><a href="?table=Fig%2016d%20WZ%20Exclusion:%20Higgsino%20($\Delta%20m$),%20compressed_Exp">Fig 16d WZ Exclusion: Higgsino ($\Delta m$), compressed_Exp</a>
+<li><a href="?table=Fig%2016d%20WZ%20Exclusion:%20Higgsino%20($\Delta%20m$),%20offshell_Obs">Fig 16d WZ Exclusion: Higgsino ($\Delta m$), offshell_Obs</a>
+<li><a href="?table=Fig%2016d%20WZ%20Exclusion:%20Higgsino%20($\Delta%20m$),%20offshell_Exp">Fig 16d WZ Exclusion: Higgsino ($\Delta m$), offshell_Exp</a>
+<li><a href="?table=Fig%2017%20Wh%20Exclusion,%20Obs">Fig 17 Wh Exclusion, Obs</a>
+<li><a href="?table=Fig%2017%20Wh%20Exclusion,%20Obs_Up">Fig 17 Wh Exclusion, Obs_Up</a>
+<li><a href="?table=Fig%2017%20Wh%20Exclusion,%20Obs_Down">Fig 17 Wh Exclusion, Obs_Down</a>
+<li><a href="?table=Fig%2017%20Wh%20Exclusion,%20Exp">Fig 17 Wh Exclusion, Exp</a>
+<li><a href="?table=Fig%2017%20Wh%20Exclusion,%20Exp_Up">Fig 17 Wh Exclusion, Exp_Up</a>
+<li><a href="?table=Fig%2017%20Wh%20Exclusion,%20Exp_Down">Fig 17 Wh Exclusion, Exp_Down</a>
+</ul>
+<b>Upper limits:</b>
+<ul display="inline-block">
+<li><a href="?table=AuxFig%208a%20WZ%20Excl.%20Upper%20Limit%20Obs.%20Wino-bino(%2b)%20($\Delta%20m$)">AuxFig 8a WZ Excl. Upper Limit Obs. Wino-bino(+) ($\Delta m$)</a>
+<li><a href="?table=AuxFig%208b%20WZ%20Excl.%20Upper%20Limit%20Exp.%20Wino-bino(%2b)%20($\Delta%20m$)">AuxFig 8b WZ Excl. Upper Limit Exp. Wino-bino(+) ($\Delta m$)</a>
+<li><a href="?table=AuxFig%208c%20WZ%20Excl.%20Upper%20Limit%20Obs.%20Wino-bino(%2b)%20($\Delta%20m$)">AuxFig 8c WZ Excl. Upper Limit Obs. Wino-bino(+) ($\Delta m$)</a>
+<li><a href="?table=AuxFig%208d%20WZ%20Excl.%20Upper%20Limit%20Exp.%20Wino-bino(%2b)%20($\Delta%20m$)">AuxFig 8d WZ Excl. Upper Limit Exp. Wino-bino(+) ($\Delta m$)</a>
+<li><a href="?table=AuxFig%208e%20WZ%20Excl.%20Upper%20Limit%20Obs.%20Wino-bino(-)%20($\Delta%20m$)">AuxFig 8e WZ Excl. Upper Limit Obs. Wino-bino(-) ($\Delta m$)</a>
+<li><a href="?table=AuxFig%208f%20WZ%20Excl.%20Upper%20Limit%20Exp.%20Wino-bino(-)%20($\Delta%20m$)">AuxFig 8f WZ Excl. Upper Limit Exp. Wino-bino(-) ($\Delta m$)</a>
+<li><a href="?table=AuxFig%208g%20WZ%20Excl.%20Upper%20Limit%20Obs.%20Higgsino%20($\Delta%20m$)">AuxFig 8g WZ Excl. Upper Limit Obs. Higgsino ($\Delta m$)</a>
+<li><a href="?table=AuxFig%208h%20WZ%20Excl.%20Upper%20Limit%20Exp.%20Higgsino%20($\Delta%20m$)">AuxFig 8h WZ Excl. Upper Limit Exp. Higgsino ($\Delta m$)</a>
+<li><a href="?table=AuxFig%209a%20Wh%20Excl.%20Upper%20Limit%20Obs.">AuxFig 9a Wh Excl. Upper Limit Obs.</a>
+<li><a href="?table=AuxFig%209b%20Wh%20Excl.%20Upper%20Limit%20Exp.">AuxFig 9b Wh Excl. Upper Limit Exp.</a>
+</ul>
+<b>Model-independent discovery fits:</b>
+<ul display="inline-block">
+<li><a href="?table=Tab%2018%20Onshell%20Discovery%20Fit%20Table">Tab 18 Onshell Discovery Fit Table</a>
+<li><a href="?table=Tab%2019%20Offshell%20Discovery%20Fit%20Table">Tab 19 Offshell Discovery Fit Table</a>
+<li><a href="?table=Tab%2021%20RJR%20Discovery%20Fit%20Table">Tab 21 RJR Discovery Fit Table</a>
+</ul>
+<b>Kinematic distributions:</b>
+<ul display="inline-block">
+<li><a href="?table=Fig%2013a%20SR$_{DFOS}^{Wh}$-1%20($\Delta%20R_{OS,%20near}$)">Fig 13a SR$_{DFOS}^{Wh}$-1 ($\Delta R_{OS, near}$)</a>
+<li><a href="?table=Fig%2013b%20SR$_{DFOS}^{Wh}$-2%20(3rd%20Lep.%20$p_{T}$)">Fig 13b SR$_{DFOS}^{Wh}$-2 (3rd Lep. $p_{T}$)</a>
+<li><a href="?table=Fig%2013c%20SR$_{0j}^{WZ}$%20($E_{T}^{miss}$)">Fig 13c SR$_{0j}^{WZ}$ ($E_{T}^{miss}$)</a>
+<li><a href="?table=Fig%2013d%20SR$_{0j}^{WZ}$%20($m_{T}$)">Fig 13d SR$_{0j}^{WZ}$ ($m_{T}$)</a>
+<li><a href="?table=Fig%2014a%20SR$^{offWZ}_{LowETmiss}$-0j%20($m_{T}^{minmll}$)">Fig 14a SR$^{offWZ}_{LowETmiss}$-0j ($m_{T}^{minmll}$)</a>
+<li><a href="?table=Fig%2014b%20SR$^{offWZ}_{LowETmiss}$-nj%20($m_{T}^{minmll}$)">Fig 14b SR$^{offWZ}_{LowETmiss}$-nj ($m_{T}^{minmll}$)</a>
+<li><a href="?table=Fig%2014c%20SR$^{offWZ}_{HighETmiss}$-0j%20($m_{T}^{minmll}$)">Fig 14c SR$^{offWZ}_{HighETmiss}$-0j ($m_{T}^{minmll}$)</a>
+<li><a href="?table=Fig%2014d%20SR$^{offWZ}_{HighETmiss}$-nj%20($p_T^l%20\div%20E_T^{miss}$)">Fig 14d SR$^{offWZ}_{HighETmiss}$-nj ($p_T^l \div E_T^{miss}$)</a>
+<li><a href="?table=Fig%2020a%20RJR%20SR3$\ell$-Low%20($p_{T}^{\ell%201}$)">Fig 20a RJR SR3$\ell$-Low ($p_{T}^{\ell 1}$)</a>
+<li><a href="?table=Fig%2020b%20RJR%20SR3$\ell$-Low%20($H_{3,1}^{PP}$)">Fig 20b RJR SR3$\ell$-Low ($H_{3,1}^{PP}$)</a>
+<li><a href="?table=Fig%2020c%20RJR%20SR3$\ell$-ISR%20($p_{T~ISR}^{CM}$)">Fig 20c RJR SR3$\ell$-ISR ($p_{T~ISR}^{CM}$)</a>
+<li><a href="?table=Fig%2020d%20RJR%20SR3$\ell$-ISR%20($R_{ISR}$)">Fig 20d RJR SR3$\ell$-ISR ($R_{ISR}$)</a>
+</ul>
+<b>Cutflows:</b>
+<ul display="inline-block">
+<li><a href="?table=AuxTab%205%20Cutflow:%20Onshell%20WZ">AuxTab 5 Cutflow: Onshell WZ</a>
+<li><a href="?table=AuxTab%206%20Cutflow:%20Onshell%20Wh">AuxTab 6 Cutflow: Onshell Wh</a>
+<li><a href="?table=AuxTab%207%20Cutflow:%20Offshell%20Wino-bino(%2b)%20(250,235)">AuxTab 7 Cutflow: Offshell Wino-bino(+) (250,235)</a>
+<li><a href="?table=AuxTab%208%20Cutflow:%20Offshell%20Wino-bino(%2b)%20(125,85)">AuxTab 8 Cutflow: Offshell Wino-bino(+) (125,85)</a>
+<li><a href="?table=AuxTab%209%20Cutflow:%20Offshell%20Wino-bino(%2b)%20(250,170)">AuxTab 9 Cutflow: Offshell Wino-bino(+) (250,170)</a>
+<li><a href="?table=AuxTab%2010%20Cutflow:%20Offshell%20Wino-bino(-)%20(250,235)">AuxTab 10 Cutflow: Offshell Wino-bino(-) (250,235)</a>
+<li><a href="?table=AuxTab%2011%20Cutflow:%20Offshell%20Wino-bino(-)%20(125,85)">AuxTab 11 Cutflow: Offshell Wino-bino(-) (125,85)</a>
+<li><a href="?table=AuxTab%2012%20Cutflow:%20Offshell%20Wino-bino(-)%20(250,170)">AuxTab 12 Cutflow: Offshell Wino-bino(-) (250,170)</a>
+<li><a href="?table=AuxTab%2013%20Cutflow:%20Offshell%20Higgsino%20(120,100)">AuxTab 13 Cutflow: Offshell Higgsino (120,100)</a>
+<li><a href="?table=AuxTab%2014%20Cutflow:%20Offshell%20Higgsino%20(100,40)">AuxTab 14 Cutflow: Offshell Higgsino (100,40)</a>
+<li><a href="?table=AuxTab%2015%20Cutflow:%20Offshell%20Higgsino%20(185,125)">AuxTab 15 Cutflow: Offshell Higgsino (185,125)</a>
+</ul>
+<b>Acceptances and Efficiencies:</b>
+<ul display="inline-block">
+<li><a href="?table=AuxFig%2010a%20Acc:%20Onshell%20SR$_{0j}^{WZ}$">AuxFig 10a Acc: Onshell SR$_{0j}^{WZ}$</a>
+<li><a href="?table=AuxFig%2010b%20Eff:%20Onshell%20SR$_{0j}^{WZ}$">AuxFig 10b Eff: Onshell SR$_{0j}^{WZ}$</a>
+<li><a href="?table=AuxFig%2010c%20Acc:%20Onshell%20SR$_{nj}^{WZ}$">AuxFig 10c Acc: Onshell SR$_{nj}^{WZ}$</a>
+<li><a href="?table=AuxFig%2010d%20Eff:%20Onshell%20SR$_{nj}^{WZ}$">AuxFig 10d Eff: Onshell SR$_{nj}^{WZ}$</a>
+<li><a href="?table=AuxFig%2011a%20Acc:%20Onshell%20SR$_{low-m_{ll}-0j}^{Wh}$">AuxFig 11a Acc: Onshell SR$_{low-m_{ll}-0j}^{Wh}$</a>
+<li><a href="?table=AuxFig%2011b%20Eff:%20Onshell%20SR$_{low-m_{ll}-0j}^{Wh}$">AuxFig 11b Eff: Onshell SR$_{low-m_{ll}-0j}^{Wh}$</a>
+<li><a href="?table=AuxFig%2011c%20Acc:%20Onshell%20SR$_{low-m_{ll}-nj}^{Wh}$">AuxFig 11c Acc: Onshell SR$_{low-m_{ll}-nj}^{Wh}$</a>
+<li><a href="?table=AuxFig%2011d%20Eff:%20Onshell%20SR$_{low-m_{ll}-nj}^{Wh}$">AuxFig 11d Eff: Onshell SR$_{low-m_{ll}-nj}^{Wh}$</a>
+<li><a href="?table=AuxFig%2011e%20Acc:%20Onshell%20SR$_{DFOS}^{Wh}$">AuxFig 11e Acc: Onshell SR$_{DFOS}^{Wh}$</a>
+<li><a href="?table=AuxFig%2011f%20Eff:%20Onshell%20SR$_{DFOS}^{Wh}$">AuxFig 11f Eff: Onshell SR$_{DFOS}^{Wh}$</a>
+<li><a href="?table=AuxFig%2012a%20Acc:%20Off.%20Wino-bino(%2b)%20SR$^{offWZ}_{lowETmiss}$-0j">AuxFig 12a Acc: Off. Wino-bino(+) SR$^{offWZ}_{lowETmiss}$-0j</a>
+<li><a href="?table=AuxFig%2012b%20Eff:%20Off.%20Wino-bino(%2b)%20SR$^{offWZ}_{lowETmiss}$-0j">AuxFig 12b Eff: Off. Wino-bino(+) SR$^{offWZ}_{lowETmiss}$-0j</a>
+<li><a href="?table=AuxFig%2012c%20Acc:%20Off.%20Wino-bino(%2b)%20SR$^{offWZ}_{highETmiss}$-0j">AuxFig 12c Acc: Off. Wino-bino(+) SR$^{offWZ}_{highETmiss}$-0j</a>
+<li><a href="?table=AuxFig%2012d%20Eff:%20Off.%20Wino-bino(%2b)%20SR$^{offWZ}_{highETmiss}$-0j">AuxFig 12d Eff: Off. Wino-bino(+) SR$^{offWZ}_{highETmiss}$-0j</a>
+<li><a href="?table=AuxFig%2012e%20Acc:%20Off.%20Wino-bino(%2b)%20SR$^{offWZ}_{lowETmiss}$-nj">AuxFig 12e Acc: Off. Wino-bino(+) SR$^{offWZ}_{lowETmiss}$-nj</a>
+<li><a href="?table=AuxFig%2012f%20Eff:%20Off.%20Wino-bino(%2b)%20SR$^{offWZ}_{lowETmiss}$-nj">AuxFig 12f Eff: Off. Wino-bino(+) SR$^{offWZ}_{lowETmiss}$-nj</a>
+<li><a href="?table=AuxFig%2012g%20Acc:%20Off.%20Wino-bino(%2b)%20SR$^{offWZ}_{highETmiss}$-nj">AuxFig 12g Acc: Off. Wino-bino(+) SR$^{offWZ}_{highETmiss}$-nj</a>
+<li><a href="?table=AuxFig%2012h%20Eff:%20Off.%20Wino-bino(%2b)%20SR$^{offWZ}_{highETmiss}$-nj">AuxFig 12h Eff: Off. Wino-bino(+) SR$^{offWZ}_{highETmiss}$-nj</a>
+<li><a href="?table=AuxFig%2013a%20Acc:%20Off.%20Wino-bino(-)%20SR$^{offWZ}_{lowETmiss}$-0j">AuxFig 13a Acc: Off. Wino-bino(-) SR$^{offWZ}_{lowETmiss}$-0j</a>
+<li><a href="?table=AuxFig%2013b%20Eff:%20Off.%20Wino-bino(-)%20SR$^{offWZ}_{lowETmiss}$-0j">AuxFig 13b Eff: Off. Wino-bino(-) SR$^{offWZ}_{lowETmiss}$-0j</a>
+<li><a href="?table=AuxFig%2013c%20Acc:%20Off.%20Wino-bino(-)%20SR$^{offWZ}_{highETmiss}$-0j">AuxFig 13c Acc: Off. Wino-bino(-) SR$^{offWZ}_{highETmiss}$-0j</a>
+<li><a href="?table=AuxFig%2013d%20Eff:%20Off.%20Wino-bino(-)%20SR$^{offWZ}_{highETmiss}$-0j">AuxFig 13d Eff: Off. Wino-bino(-) SR$^{offWZ}_{highETmiss}$-0j</a>
+<li><a href="?table=AuxFig%2013e%20Acc:%20Off.%20Wino-bino(-)%20SR$^{offWZ}_{lowETmiss}$-nj">AuxFig 13e Acc: Off. Wino-bino(-) SR$^{offWZ}_{lowETmiss}$-nj</a>
+<li><a href="?table=AuxFig%2013f%20Eff:%20Off.%20Wino-bino(-)%20SR$^{offWZ}_{lowETmiss}$-nj">AuxFig 13f Eff: Off. Wino-bino(-) SR$^{offWZ}_{lowETmiss}$-nj</a>
+<li><a href="?table=AuxFig%2013g%20Acc:%20Off.%20Wino-bino(-)%20SR$^{offWZ}_{highETmiss}$-nj">AuxFig 13g Acc: Off. Wino-bino(-) SR$^{offWZ}_{highETmiss}$-nj</a>
+<li><a href="?table=AuxFig%2013h%20Eff:%20Off.%20Wino-bino(-)%20SR$^{offWZ}_{highETmiss}$-nj">AuxFig 13h Eff: Off. Wino-bino(-) SR$^{offWZ}_{highETmiss}$-nj</a>
+<li><a href="?table=AuxFig%2014a%20Acc:%20Off.%20Higgsino%20SR$^{offWZ}_{lowETmiss}$-0j">AuxFig 14a Acc: Off. Higgsino SR$^{offWZ}_{lowETmiss}$-0j</a>
+<li><a href="?table=AuxFig%2014b%20Eff:%20Off.%20Higgsino%20SR$^{offWZ}_{lowETmiss}$-0j">AuxFig 14b Eff: Off. Higgsino SR$^{offWZ}_{lowETmiss}$-0j</a>
+<li><a href="?table=AuxFig%2014c%20Acc:%20Off.%20Higgsino%20SR$^{offWZ}_{highETmiss}$-0j">AuxFig 14c Acc: Off. Higgsino SR$^{offWZ}_{highETmiss}$-0j</a>
+<li><a href="?table=AuxFig%2014d%20Eff:%20Off.%20Higgsino%20SR$^{offWZ}_{highETmiss}$-0j">AuxFig 14d Eff: Off. Higgsino SR$^{offWZ}_{highETmiss}$-0j</a>
+<li><a href="?table=AuxFig%2014e%20Acc:%20Off.%20Higgsino%20SR$^{offWZ}_{lowETmiss}$-nj">AuxFig 14e Acc: Off. Higgsino SR$^{offWZ}_{lowETmiss}$-nj</a>
+<li><a href="?table=AuxFig%2014f%20Eff:%20Off.%20Higgsino%20SR$^{offWZ}_{lowETmiss}$-nj">AuxFig 14f Eff: Off. Higgsino SR$^{offWZ}_{lowETmiss}$-nj</a>
+<li><a href="?table=AuxFig%2014g%20Acc:%20Off.%20Higgsino%20SR$^{offWZ}_{highETmiss}$-nj">AuxFig 14g Acc: Off. Higgsino SR$^{offWZ}_{highETmiss}$-nj</a>
+<li><a href="?table=AuxFig%2014h%20Eff:%20Off.%20Higgsino%20SR$^{offWZ}_{highETmiss}$-nj">AuxFig 14h Eff: Off. Higgsino SR$^{offWZ}_{highETmiss}$-nj</a>
+</ul>
+
+#: data_file: readme_and_table_of_contents.yaml

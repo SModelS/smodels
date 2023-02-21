@@ -1,0 +1,9 @@
+id: ATLAS-SUSY-2018-23
+sqrts: 13.0*TeV
+lumi: 139./fb
+prettyName: EWK WH(2 photons)
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-23/
+publication: https://link.springer.com/article/10.1007/JHEP10(2020)005
+private: False
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2021/4/10

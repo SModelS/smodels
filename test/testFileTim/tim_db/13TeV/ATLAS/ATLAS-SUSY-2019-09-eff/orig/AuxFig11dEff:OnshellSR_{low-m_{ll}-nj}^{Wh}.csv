@@ -1,0 +1,57 @@
+#: table_doi: 10.17182/hepdata.95751.v1/t95
+#: name: AuxFig 11d Eff: Onshell SR$_{low-m_{ll}-nj}^{Wh}$
+#: description: The &chi;&#771;<sub>1</sub><sup>&plusmn;</sup>/&chi;&#771;<sub>2</sub><sup>0</sup> (a,c,e) truth-level acceptances and (b,d,f) reconstruction efficiencies for the wino/bino (+) scenario, in the inclusive (a,b) SR<sup>Wh</sup><sub>low-m<sub>ll</sub>-0j</sub>, (c,d) SR<sup>Wh</sup><sub>low-m<sub>ll</sub>-nj</sub>, and (e,f) SR<sup>Wh</sup><sub>DF</sub> regions of the $W\!h$ selection, after MC-to-data efficiency weights are applied.
+#: data_file: auxfig_11d_eff__onshell_sr_low-m_ll-njwh.yaml
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> CHARGINO+ NEUTRALINO2 X | P P --> CHARGINO- NEUTRALINO2 X
+#: keyword phrases: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak
+#: keyword observables: EFF
+#: region,SR$_{low-m_{ll}-nj}^{Wh}$
+"$m(\tilde{\chi}_{1}^{\pm},\tilde{\chi}_{2}^{0})$ [GeV]",$m(\tilde{\chi}_{1}^{0})$ [GeV],Efficiency [%]
+150.0,0.0,37.6
+152.5,22.5,39.1
+162.5,12.5,38.8
+165.0,35.0,37.7
+175.0,0.0,37.3
+175.0,25.0,40.0
+187.5,12.5,37.9
+187.5,37.5,37.3
+190.0,60.0,37.8
+200.0,0.0,37.6
+200.0,25.0,39.7
+200.0,50.0,36.9
+202.5,72.5,38.2
+212.5,37.5,39.0
+212.5,62.5,37.6
+225.0,0.0,38.9
+225.0,25.0,38.9
+225.0,50.0,38.8
+225.0,75.0,38.4
+237.5,62.5,38.5
+250.0,0.0,38.0
+250.0,100.0,38.1
+250.0,25.0,37.0
+250.0,50.0,37.7
+250.0,75.0,37.3
+275.0,0.0,38.7
+275.0,25.0,40.2
+275.0,50.0,41.7
+275.0,75.0,38.3
+300.0,0.0,40.0
+300.0,100.0,37.7
+300.0,25.0,36.2
+300.0,50.0,38.8
+300.0,75.0,38.3
+325.0,0.0,37.6
+325.0,50.0,39.3
+350.0,0.0,42.4
+350.0,100.0,39.0
+350.0,25.0,36.9
+350.0,50.0,37.2
+350.0,75.0,41.0
+375.0,0.0,39.0
+375.0,50.0,37.6
+400.0,0.0,38.9
+400.0,25.0,37.4
+425.0,0.0,43.2
+
