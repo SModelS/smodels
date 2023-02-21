@@ -37,7 +37,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
             raise SModelSError("covariance matrix has length %d." % len(cov))
 
         thirdMoment = None # Need to be implemented
-        # print(dataset.globalInfo.id,dataset.type)
+
         nobs = [x.dataInfo.observedN for x in dataset._datasets]
         bg = [x.dataInfo.expectedBG for x in dataset._datasets]
 
@@ -52,20 +52,6 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
                                                         xsection=xsec
                                                         )
 
-        # computer = UpperLimitComputer(ntoys=10000)
-        # d = Data(
-        #     observed=nobs,
-        #     backgrounds=bg,
-        #     covariance=cov,
-        #     third_moment=None,
-        #     nsignal=nsig,
-        #     deltas_rel=deltas_rel,
-        #     lumi=dataset.getLumi(),
-        # )
-        # ret = computer.getUpperLimitOnSigmaTimesEff(d, marginalize=dataset._marginalize, expected=expected)
-        #
-        # print("previous:",ret)
-
         expectedDict = {False:ExpectationType.observed,
                         True:ExpectationType.apriori,
                         "posteriori":ExpectationType.aposteriori}
@@ -74,14 +60,10 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
             return None
 
         muul = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=False)
-        # print("muul spey:",muul)
-
         ret = muul*xsec*1E6*fb
-        # print("spey:",ret)
-
-
         logger.debug("SL upper limit : {}".format(ret))
         return ret
+
     elif dataset.type == "pyhf": #! TP: Need to implement
         logger.debug("Using pyhf")
         if all([s == 0 for s in nsig]):
@@ -383,6 +365,8 @@ def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=
     if type(nsig)==tuple:
         nsig = np.array(nsig)
 
+    thirdMoment = None # Need to be implemented
+    xsec = float((sum(nsig)/dataset.getLumi())._value*1E-6) #pb
 
     statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
                                                     signal=nsig,
@@ -413,8 +397,9 @@ def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=
         logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
         ret["lmax"] = lbsm
         ret["muhat"] = 1.0
-    sigma_mu = None # Need to be impelemented: statModel.sigma_mu(pars=nuisance_parameters,expected=expectedDict[expected])
-    return {"muhat": mu_hat, "sigma_mu": siagma_mu, "lmax": lmax, "lbsm": lbsm, "lsm": lsm }
+    nuisance_param_at_muhat = statModel.backend.likelihood(poi_test=muhat, expected=expectedDict[expected], marginalize=marginaize)[1]
+    sigma_mu = statModel.sigma_mu(pars=nuisance_param_at_muhat,expected=expectedDict[expected])
+    return {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": lmax, "lbsm": lbsm, "lsm": lsm }
 
 
 # def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False):
