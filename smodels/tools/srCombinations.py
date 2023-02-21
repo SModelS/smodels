@@ -293,6 +293,7 @@ def getCombinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel
     cov = dataset.globalInfo.covariance
 
     thirdMoment = None
+    xsec = float((sum(nsig)/dataset.getLumi())._value*1E-6) #pb
 
     statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
                                                     signal=nsig,
