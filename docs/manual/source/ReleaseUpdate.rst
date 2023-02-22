@@ -46,6 +46,7 @@ New in Version 2.2.2:
   * SModelS can now track inter-analyses combinability at the level of whole `analyses <experiment.html#experiment.expResultObj.ExpResult.isCombinableWith>`_ as well as individual `signal regions <experiment.html#experiment.datasetObj.DataSet.isCombinableWith>`_
   * todo: spey interface
   * todo: SLv2
+  * "full_llhds" :ref:`Database <parameterFileDatabase>` abbreviations introduced
   * Database extension, added new results from x ATLAS and y CMS analyses:
      - results from ATLAS:
        ATLAS-SUSY-2018-05 (EM,UL, full likelihood), ATLAS-SUSY-2018-42 (UL), ATLAS-SUSY-2018-32 (EM), ATLAS-SUSY-2019-02 (UL)
