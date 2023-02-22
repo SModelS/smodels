@@ -120,6 +120,7 @@ class Database(object):
     def mergeERs ( self, o1, r2 ):
         """ merge the content of exp res r1 and r2 """
         r1 = copy.deepcopy ( o1 )
+        r1.globalInfo = r2.globalInfo
         dids = [ x.getID() for x in o1.datasets ]
         for ds in r2.datasets:
             if not ds.getID() in dids: ## completely new dataset
