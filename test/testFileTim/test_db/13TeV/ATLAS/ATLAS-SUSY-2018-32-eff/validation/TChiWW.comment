@@ -1,4 +1,0 @@
-author: Timothee Pascal
-date: November 10, 2022
-comment: The validation has been made using the efficiencies extracted from the patchset, the simplified version of the published statistical model, and by not removing the control regions when patching the SModelS patch to the background-only json file.
-An other validation is available under the label "validation_full_json" with the same characteristics but using the not-simplified version of the json file.
