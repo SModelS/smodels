@@ -1,0 +1,36 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t22
+#: name: Effective mass distribution in SR-2B2Q-VZ
+#: description: Distribution of $m_{\textrm{eff}} $ in SR-2B2Q-VZ. The post-fit SM background expectation using the background-only fit is shown in a histogram stack. Distributions of relevant signals are overlaid. The bottom panels show the ratio of the observed data to the background prediction. The selection criteria on the variable shown by each plot is removed, while the arrow indicates the cut value to define the region. A few representative signals are overlaid. For the $(\tilde{W},\tilde{B})$ simplified model models, the label $(x,y)$ indicates $(m(\tilde{\chi}_{1}^{\pm}), m(\tilde{\chi}_{1}^{0}))=(x,y)~\text{GeV}$.
+
+#: data_file: effective_mass_distribution_in_sr-2b2q-vz.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+#: ,,,yield
+effective mass [GeV],effective mass [GeV] LOW,effective mass [GeV] HIGH,Background, +, -
+775.0,550.0,1000.0,2.2817,0.65941,-0.65941
+1225.0,1000.0,1450.0,1.4519,0.41377,-0.41377
+1675.0,1450.0,1900.0,0.55212,0.20105,-0.20105
+2125.0,1900.0,2350.0,0.15226,0.10494,-0.10494
+
+#: ,,,yield
+effective mass [GeV],effective mass [GeV] LOW,effective mass [GeV] HIGH,Data
+775.0,550.0,1000.0,1.0
+1225.0,1000.0,1450.0,2.0
+1675.0,1450.0,1900.0,0.0
+2125.0,1900.0,2350.0,0.0
+
+#: ,,,yield
+effective mass [GeV],effective mass [GeV] LOW,effective mass [GeV] HIGH,"SIGNAL $\tilde{\chi}_{1}^{\pm}\tilde{\chi}_{0}^{2}\rightarrow WZ\tilde{\chi}_{0}^{1}\tilde{\chi}_{0}^{1}$ (900, 100)"
+775.0,550.0,1000.0,0.033462
+1225.0,1000.0,1450.0,0.9199
+1675.0,1450.0,1900.0,0.97528
+2125.0,1900.0,2350.0,0.37507
+
+#: ,,,yield
+effective mass [GeV],effective mass [GeV] LOW,effective mass [GeV] HIGH,"GGM Higgsino SIGNAL $m(\tilde{\chi}_{1}^{0}) = 800$ GeV, B($\tilde{\chi}_{1}^{0}\rightarrow Z\tilde{G}$) = 50%"
+775.0,550.0,1000.0,0.13672
+1225.0,1000.0,1450.0,1.3718
+1675.0,1450.0,1900.0,0.77672
+2125.0,1900.0,2350.0,0.045828
+

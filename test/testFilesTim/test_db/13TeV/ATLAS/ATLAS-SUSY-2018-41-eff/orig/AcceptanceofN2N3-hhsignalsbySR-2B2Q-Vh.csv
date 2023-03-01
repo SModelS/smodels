@@ -1,0 +1,53 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t131
+#: name: Acceptance of N2N3-hh signals by SR-2B2Q-Vh
+#: description: Signal acceptance of $(\tilde{H},\tilde{B})$ simplified models (N2N3-hh) by their most relevant SRs, evaluated using MC simulation. The acceptance is given by the ratio of weighted selected events by the SR to the weighted total generated events including all the $W/Z/h$ decays. The selection is based on generator-level particle information. The efficiency of lepton reconstruction/identification, $b$-tagging, as well as the $D_2$ and $n_{\textrm{trk}}$ selection in the $W_{qq}$/$Z_{qq}$-tagging are treated as 100%. Acceptance below 0.005\% is rounded to 0.00 in the entry.
+
+#: data_file: acceptance_of_n2n3-hh-sim_in_sr-2b2q-vh.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+$m(\tilde{\chi}_{2}^{0})$ [GeV],$m(\tilde{\chi}_{1}^{0})$ [GeV],Acceptance [%]
+400.0,0.0,0.011172
+400.0,50.0,0.00962
+500.0,0.0,0.12431
+500.0,100.0,0.086126
+500.0,200.0,0.011692
+600.0,0.0,0.27251
+600.0,100.0,0.33272
+600.0,200.0,0.14698
+600.0,300.0,0.028647
+700.0,0.0,0.66924
+700.0,100.0,0.52981
+700.0,200.0,0.43176
+700.0,300.0,0.23673
+700.0,400.0,0.053589
+800.0,0.0,0.88557
+800.0,100.0,0.75491
+800.0,200.0,0.77719
+800.0,300.0,0.59957
+800.0,400.0,0.2871
+800.0,500.0,0.040713
+900.0,0.0,1.1981
+900.0,100.0,1.2729
+900.0,200.0,1.0551
+900.0,300.0,0.9131
+900.0,400.0,0.71144
+900.0,500.0,0.32702
+1000.0,0.0,1.3049
+1000.0,100.0,1.4779
+1000.0,200.0,1.361
+1000.0,300.0,1.1918
+1000.0,400.0,0.98754
+1000.0,500.0,0.77298
+1100.0,0.0,1.5672
+1100.0,100.0,1.6037
+1100.0,200.0,1.5964
+1100.0,300.0,1.3877
+1100.0,400.0,1.3703
+1100.0,500.0,1.1455
+1200.0,0.0,1.7039
+1200.0,100.0,1.7581
+1200.0,200.0,1.5252
+1200.0,300.0,1.61
+1200.0,400.0,1.3776
+

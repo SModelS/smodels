@@ -1,0 +1,70 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t59
+#: name: Obs limit on (H~, B~) B(N2->ZN1) = 50%
+#: description: Exclusion limits for the $(\tilde{W},\tilde{B})$ and $(\tilde{H},\tilde{B})$ models shown as a function of the mass of wino/higgsino chargino ($m(\tilde{\chi}_{1}^{\pm})$) and the mass of bino LSP ($m(\tilde{\chi}_{1}^{0})$). Observed limits for various $\mathcal{B}(\tilde{\chi}_{2}^{0} \rightarrow Z \tilde{\chi}_{1}^{0})$ hypotheses overlaid. The outer and inner bundles correspond to the limits for the $(\tilde{W},\tilde{B})$ and $(\tilde{H},\tilde{B})$ models respectively. The expected limit for the 1$\sigma$ down variation is not shown as no mass points could be excluded.
+
+#: data_file: higgsino-nlsp_bino-lsp_br(n2->zn1)=50%_(observed).yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+$m(\tilde{\chi}_{2}^{0})$ [GeV],$m(\tilde{\chi}_{1}^{0})$ [GeV]
+447.74,6.25
+453.44,18.75
+461.94,31.25
+468.75,40.106
+471.88,43.75
+482.75,56.25
+491.25,66.151
+493.86,68.75
+504.86,81.25
+513.75,93.643
+513.82,93.75
+523.46,106.25
+534.91,118.75
+536.25,120.08
+547.81,131.25
+558.75,141.88
+560.78,143.75
+574.28,156.25
+581.25,162.83
+588.53,168.75
+603.63,181.25
+603.75,181.35
+622.94,193.75
+626.25,195.89
+645.35,206.25
+648.75,208.09
+667.9,218.75
+671.25,220.85
+688.39,231.25
+693.75,235.13
+716.25,242.9
+738.75,243.4
+761.25,243.51
+763.8,243.75
+783.75,246.23
+806.25,244.17
+807.01,243.75
+828.75,231.29
+828.8,231.25
+843.92,218.75
+851.25,211.71
+856.82,206.25
+865.2,193.75
+870.05,181.25
+873.38,168.75
+873.75,167.33
+876.58,156.25
+880.02,143.75
+883.72,131.25
+887.58,118.75
+891.04,106.25
+893.46,93.75
+894.87,81.25
+895.95,68.75
+896.25,65.463
+897.08,56.25
+898.24,43.75
+899.43,31.25
+900.55,18.75
+901.35,6.25
+

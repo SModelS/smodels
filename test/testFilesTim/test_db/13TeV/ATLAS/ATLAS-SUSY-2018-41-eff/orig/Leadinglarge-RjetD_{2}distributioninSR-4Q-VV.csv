@@ -1,0 +1,43 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t17
+#: name: Leading large-$R$ jet $D_{2}$ distribution in SR-4Q-VV
+#: description: Distribution of $D_2(J_{1})$ in SR-4Q-VV. For $D_2$, the cut value applied for $V_{qq}$-tagging ($D_{2,\text{cut}}$) is subtracted as the off-set so that $D_2-D_{2,\text{cut}}(J)<0$ represents $J$ passing the $D_2$ selection. The post-fit SM background expectation using the background-only fit is shown in a histogram stack. Distributions of relevant signals are overlaid. The bottom panels show the ratio of the observed data to the background prediction. The selection criteria on the variable shown by each plot is removed, while the arrow indicates the cut value to define the region. A few representative signals are overlaid. For the $(\tilde{W},\tilde{B})$ simplified model models, the label $(x,y)$ indicates $(m(\tilde{\chi}_{1}^{\pm}), m(\tilde{\chi}_{1}^{0}))=(x,y)~\text{GeV}$.
+
+#: data_file: leading_large-$r$_jet_$d_{2}$_distribution_in_sr-4q-vv.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+#: ,,,yield
+$D_{2}(J_{1})$,$D_{2}(J_{1})$ LOW,$D_{2}(J_{1})$ HIGH,Background, +, -
+-0.5,-1.0,0.0,5.9716,0.87472,-0.87472
+0.5,0.0,1.0,7.8326,1.1228,-1.1228
+1.5,1.0,2.0,2.2344,0.41888,-0.41888
+2.5,2.0,3.0,0.2878,0.079053,-0.079053
+
+#: ,,,yield
+$D_{2}(J_{1})$,$D_{2}(J_{1})$ LOW,$D_{2}(J_{1})$ HIGH,Data
+-0.5,-1.0,0.0,6.0
+0.5,0.0,1.0,7.0
+1.5,1.0,2.0,3.0
+2.5,2.0,3.0,0.0
+
+#: ,,,yield
+$D_{2}(J_{1})$,$D_{2}(J_{1})$ LOW,$D_{2}(J_{1})$ HIGH,"SIGNAL $\tilde{\chi}_{1}^{\pm}\tilde{\chi}_{0}^{2}\rightarrow WZ\tilde{\chi}_{0}^{1}\tilde{\chi}_{0}^{1}$ (900, 100)"
+-0.5,-1.0,0.0,7.9917
+0.5,0.0,1.0,1.7226
+1.5,1.0,2.0,0.15421
+2.5,2.0,3.0,0.0084814
+
+#: ,,,yield
+$D_{2}(J_{1})$,$D_{2}(J_{1})$ LOW,$D_{2}(J_{1})$ HIGH,"SIGNAL $\tilde{\chi}_{1}^{\pm}\tilde{\chi}_{1}^{\pm}\rightarrow WW\tilde{\chi}_{0}^{1}\tilde{\chi}_{0}^{1}$ (700, 100)"
+-0.5,-1.0,0.0,6.2433
+0.5,0.0,1.0,1.3484
+1.5,1.0,2.0,0.098638
+2.5,2.0,3.0,0.011708
+
+#: ,,,yield
+$D_{2}(J_{1})$,$D_{2}(J_{1})$ LOW,$D_{2}(J_{1})$ HIGH,"GGM Higgsino SIGNAL $m(\tilde{\chi}_{1}^{0}) = 800$ GeV, B($\tilde{\chi}_{1}^{0}\rightarrow Z\tilde{G}$) = 50%"
+-0.5,-1.0,0.0,2.2578
+0.5,0.0,1.0,0.60249
+1.5,1.0,2.0,0.10374
+2.5,2.0,3.0,0.0
+

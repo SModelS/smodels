@@ -1,0 +1,60 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t99
+#: name: Obs limit on (H~, a~) B(N1->Za~) = 50%
+#: description: 95% CL exclusion limits for the $(\tilde{H},\tilde{a})$ model as the function of axino mass ($m(\tilde{a})$) and the lightest higgsino ($m(\tilde{\chi}_{1}^{0})$). Expected (dashed lines) and observed (solid lines) limits with various $\mathcal{B}(\tilde{\chi}_{1}^{0} \to Z\tilde{a}) (=1-\mathcal{B}(\tilde{\chi}_{1}^{0} \to h\tilde{a}))$ hypotheses. No expected limit is derived for the case with $\mathcal{B}(\tilde{\chi}_{1}^{0} \to Z\tilde{a})=50$% as no mass point on the plane can be excluded.
+
+#: data_file: higgsino-nlsp_axino-lsp_br(n2->hn1)=50%_(observed).yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+$m(\tilde{\chi}_{1}^{0})$ [GeV],$m(\tilde{a})$ [GeV]
+474.37,6.25
+484.76,18.75
+491.25,24.1
+501.63,31.25
+513.75,38.866
+521.88,43.75
+536.25,54.434
+537.95,56.25
+546.29,68.75
+551.88,81.25
+557.14,93.75
+558.75,96.454
+564.73,106.25
+574.92,118.75
+581.25,125.75
+586.89,131.25
+599.48,143.75
+603.75,147.95
+613.92,156.25
+626.25,166.66
+629.14,168.75
+645.85,181.25
+648.75,183.38
+664.16,193.75
+671.25,198.34
+687.38,206.25
+693.75,209.29
+716.25,211.97
+738.75,207.48
+742.96,206.25
+761.25,198.53
+771.89,193.75
+783.75,184.26
+786.99,181.25
+797.05,168.75
+806.25,156.49
+806.41,156.25
+814.63,143.75
+822.73,131.25
+828.75,121.81
+830.6,118.75
+837.26,106.25
+841.69,93.75
+843.91,81.25
+845.17,68.75
+846.21,56.25
+847.14,43.75
+847.95,31.25
+848.62,18.75
+849.04,6.25
+

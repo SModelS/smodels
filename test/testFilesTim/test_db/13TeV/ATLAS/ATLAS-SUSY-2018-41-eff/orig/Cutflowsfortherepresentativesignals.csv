@@ -1,0 +1,115 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t2
+#: name: Cut flows for the representative signals
+#: description: Cut flows of some representative signals up to SR-4Q-VV, SR-2B2Q-VZ, and SR-2B2Q-Vh. One signal point from the $(\tilde{W},~\tilde{B})$ simplified models (C1C1-WW, C1N2-WZ, and C1N2-Wh) and $(\tilde{H},~\tilde{G})$ is chosen. The "preliminary event reduction" is a technical selection applied for reducing the sample size, which is fully efficient after the $n_{\textrm{Large}-R~\textrm{jets}}\geq 2$ selection.
+#: data_file: cut_flows_for_the_representative_signals.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+ NEUTRALINO | P P --> CHARGINO- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak
+,"$\tilde{\chi}_{1}^{\pm}\tilde{\chi}_{1}^{\pm}\rightarrow WW\tilde{\chi}_{1}^{0}\tilde{\chi}_{1}^{0}$,  $m(\tilde{\chi}_{1}^{\pm},\tilde{\chi}_{1}^{0})=(700,100)~\textrm{GeV}$      "
+Initial number of events (${\mathcal L}\times\sigma$) , 619.20  
+Preliminary event reduction  , 589.57 
+"Trigger, $E_{\text{T}}^{\text{miss}}>200~\textrm{GeV}$  ", 466.99 
+Event cleaning , 395.78 
+Lepton veto , 241.87 
+$n_{\textrm{Large-}R~\textrm{jets}} \geq 2$ , 85.18 
+$n_{b\textrm{-jet}}^{\textrm{unmatched}} = 0$ , 81.22 
+"$\textrm{min}\Delta\phi(E_{\text{T}}^{\text{miss}},j) > 1.0$ ", 58.13  
+SR-4Q-VV,
+ $n_{b\textrm{-jet}} \leq 1$  , 52.01 
+  $E_{\text{T}}^{\text{miss}}>300~\textrm{GeV}$  , 42.78 
+  $m_{\textrm{eff}}>1300~\textrm{GeV}$  , 20.11 
+  $n(V_{qq}) = 2$  , 6.21 
+  MC-to-data eff. weights  , 5.28 
+SR-2B2Q,
+  $n(J_{bb})=1$  , 2.06 
+  $m_{\textrm{T2}} > 250~\textrm{GeV}$  , 1.60 
+  $m_{\textrm{eff}} > 1000~\textrm{GeV}$  , 1.57 
+  $n(V_{qq}) = 1$ , 0.68 
+SR-2B2Q-VZ,
+" $m(J_{bb}) \in [70, 100]~\textrm{GeV}$ ", 0.40 
+ MC-to-data eff. weights  , 0.34 
+SR-2B2Q-Vh,
+" $m(J_{bb}) \in [100, 135]~\textrm{GeV}$ ", 0.02 
+ MC-to-data eff. weights  , 0.02 
+
+,"$\tilde{\chi}_{1}^{\pm}\tilde{\chi}_{2}^{0}\rightarrow WZ\tilde{\chi}_{1}^{0}\tilde{\chi}_{1}^{0}$,  $m(\tilde{\chi}_{1}^{\pm}/\tilde{\chi}_{2}^{0},\tilde{\chi}_{1}^{0})=(900,100)~\textrm{GeV}$ "
+Initial number of events (${\mathcal L}\times\sigma$) , 348.29  
+Preliminary event reduction  , 330.51 
+"Trigger, $E_{\text{T}}^{\text{miss}}>200~\textrm{GeV}$  ", 287.73 
+Event cleaning , 245.63 
+Lepton veto , 172.60 
+$n_{\textrm{Large-}R~\textrm{jets}} \geq 2$ , 68.52 
+$n_{b\textrm{-jet}}^{\textrm{unmatched}} = 0$ , 64.64 
+"$\textrm{min}\Delta\phi(E_{\text{T}}^{\text{miss}},j) > 1.0$ ", 44.91  
+SR-4Q-VV,
+ $n_{b\textrm{-jet}} \leq 1$  , 35.02 
+  $E_{\text{T}}^{\text{miss}}>300~\textrm{GeV}$  , 31.90 
+  $m_{\textrm{eff}}>1300~\textrm{GeV}$  , 23.74 
+  $n(V_{qq}) = 2$  , 8.00 
+  MC-to-data eff. weights  , 6.76 
+SR-2B2Q,
+  $n(J_{bb})=1$  , 7.65 
+  $m_{\textrm{T2}} > 250~\textrm{GeV}$  , 6.60 
+  $m_{\textrm{eff}} > 1000~\textrm{GeV}$  , 6.35 
+  $n(V_{qq}) = 1$ , 3.61 
+SR-2B2Q-VZ,
+" $m(J_{bb}) \in [70, 100]~\textrm{GeV}$ ", 2.65 
+ MC-to-data eff. weights  , 2.34 
+SR-2B2Q-Vh,
+" $m(J_{bb}) \in [100, 135]~\textrm{GeV}$ ", 0.39 
+ MC-to-data eff. weights  , 0.36 
+
+,"$\tilde{\chi}_{1}^{\pm}\tilde{\chi}_{2}^{0}\rightarrow Wh\tilde{\chi}_{1}^{0}\tilde{\chi}_{1}^{0}$,  $m(\tilde{\chi}_{1}^{\pm}/\tilde{\chi}_{2}^{0},\tilde{\chi}_{1}^{0})=(900,100)~\textrm{GeV}$ "
+Initial number of events (${\mathcal L}\times\sigma$) , 348.29  
+Preliminary event reduction  , 275.97 
+"Trigger, $E_{\text{T}}^{\text{miss}}>200~\textrm{GeV}$  ", 244.06 
+Event cleaning , 207.07 
+Lepton veto , 156.57 
+$n_{\textrm{Large-}R~\textrm{jets}} \geq 2$ , 67.95 
+$n_{b\textrm{-jet}}^{\textrm{unmatched}} = 0$ , 62.74 
+"$\textrm{min}\Delta\phi(E_{\text{T}}^{\text{miss}},j) > 1.0$ ", 42.83  
+SR-4Q-VV,
+ $n_{b\textrm{-jet}} \leq 1$  , 19.83 
+  $E_{\text{T}}^{\text{miss}}>300~\textrm{GeV}$  , 17.67 
+  $m_{\textrm{eff}}>1300~\textrm{GeV}$  , 12.66 
+  $n(V_{qq}) = 2$  , 0.78 
+  MC-to-data eff. weights  , 0.73 
+SR-2B2Q,
+  $n(J_{bb})=1$  , 19.23 
+  $m_{\textrm{T2}} > 250~\textrm{GeV}$  , 16.67 
+  $m_{\textrm{eff}} > 1000~\textrm{GeV}$  , 16.08 
+  $n(V_{qq}) = 1$ , 8.80 
+SR-2B2Q-VZ,
+" $m(J_{bb}) \in [70, 100]~\textrm{GeV}$ ", 1.40 
+ MC-to-data eff. weights  , 1.27 
+SR-2B2Q-Vh,
+" $m(J_{bb}) \in [100, 135]~\textrm{GeV}$ ", 6.03 
+ MC-to-data eff. weights  , 5.54 
+
+," $(\tilde{H}, \tilde{G})$  ,  $m(\tilde{\chi}_{1}^{0}) = 800~\textrm{GeV}$, $\mathcal(\tilde{\chi}_{1}^{0} \to Z\tilde{G})=50\%$  "
+Initial number of events (${\mathcal L}\times\sigma$) , 482.87  
+Preliminary event reduction  , 463.29 
+"Trigger, $E_{\text{T}}^{\text{miss}}>200~\textrm{GeV}$  ", 395.66 
+Event cleaning , 336.46 
+Lepton veto , 259.61 
+$n_{\textrm{Large-}R~\textrm{jets}} \geq 2$ , 85.00 
+$n_{b\textrm{-jet}}^{\textrm{unmatched}} = 0$ , 76.52 
+"$\textrm{min}\Delta\phi(E_{\text{T}}^{\text{miss}},j) > 1.0$ ", 53.05  
+SR-4Q-VV,
+ $n_{b\textrm{-jet}} \leq 1$  , 22.99 
+  $E_{\text{T}}^{\text{miss}}>300~\textrm{GeV}$  , 19.99 
+  $m_{\textrm{eff}}>1300~\textrm{GeV}$  , 12.20 
+  $n(V_{qq}) = 2$  , 2.08 
+  MC-to-data eff. weights  , 1.85 
+SR-2B2Q,
+  $n(J_{bb})=1$  , 26.28 
+  $m_{\textrm{T2}} > 250~\textrm{GeV}$  , 21.97 
+  $m_{\textrm{eff}} > 1000~\textrm{GeV}$  , 20.47 
+  $n(V_{qq}) = 1$ , 8.10 
+SR-2B2Q-VZ,
+" $m(J_{bb}) \in [70, 100]~\textrm{GeV}$ ", 2.55 
+ MC-to-data eff. weights  , 2.21 
+SR-2B2Q-Vh,
+" $m(J_{bb}) \in [100, 135]~\textrm{GeV}$ ", 3.75 
+ MC-to-data eff. weights  , 3.29 
+

@@ -1,0 +1,13 @@
+id: ATLAS-SUSY-2018-41
+sqrts: 13.0*TeV
+lumi: 139./fb
+prettyName: Boosted hadronic EWK searches
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-41/
+arxiv: https://arxiv.org/abs/2108.07586
+publication: https://doi.org/10.1103/PhysRevD.104.112010
+private: False
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2022/3/16
+datasetOrder: "SR-2B2Q-Vh", "SR-2B2Q-VZ", "SR-4Q-VV"
+covariance: [[ .64, 0., 0. ], [ 0., .36, 0. ], [ 0., 0., .64 ] ]
+comment: diagonal covariance added, the paper describes the signal regions as mutually orthogonal

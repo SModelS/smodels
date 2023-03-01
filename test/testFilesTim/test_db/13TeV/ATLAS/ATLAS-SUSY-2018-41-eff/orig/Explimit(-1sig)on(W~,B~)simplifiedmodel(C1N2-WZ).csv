@@ -1,0 +1,56 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t33
+#: name: Exp limit (-1sig) on (W~, B~) simplified model (C1N2-WZ)
+#: description: Exclusion limits for $(\tilde{W},\tilde{B})$ simplifiec model as a function of the produced wino mass ($m(\tilde{\chi}_{1}^{\pm}/\tilde{\chi}_{2}^{0})$) and the bino LSP mass ($m(\tilde{\chi}_{1}^{0})$). Expected (dashed) and observed (solid) 95% CL exclusion limits on $(\tilde{W},\tilde{B})$ simplified models; C1N2-WZ.
+
+#: data_file: c1n2_wz-sim_contours_(expected_down).yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+$m(\tilde{\chi}_{1}^{\pm}/\tilde{\chi}_{2}^{0})$ [GeV],$m(\tilde{\chi}_{1}^{0})$ [GeV]
+843.08,6.25
+844.03,18.75
+845.29,31.25
+846.48,43.75
+847.42,56.25
+848.1,68.75
+848.45,81.25
+847.69,93.75
+844.53,106.25
+839.07,118.75
+832.61,131.25
+828.75,138.55
+825.26,143.75
+817.01,156.25
+808.42,168.75
+806.25,171.81
+784.92,181.25
+783.75,181.62
+781.36,181.25
+761.25,177.84
+738.75,172.25
+716.25,171.08
+693.75,171.47
+671.25,169.19
+669.88,168.75
+648.75,162.81
+632.1,156.25
+626.25,154.11
+608.06,143.75
+603.75,141.43
+591.72,131.25
+581.25,122.56
+577.55,118.75
+567.05,106.25
+560.37,93.75
+558.75,86.712
+557.45,81.25
+554.94,68.75
+549.7,56.25
+537.22,43.75
+536.25,43.152
+513.75,34.928
+505.27,31.25
+491.25,23.661
+486.23,18.75
+479.86,6.25
+

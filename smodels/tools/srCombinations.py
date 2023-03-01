@@ -13,8 +13,58 @@ from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperL
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
-from spey import get_multi_region_statistical_model,ExpectationType,AvailableBackends
-from smodels.tools.physicsUnits import fb
+from spey import get_uncorrelated_region_statistical_model,get_multi_region_statistical_model,ExpectationType,AvailableBackends
+from smodels.tools.physicsUnits import fb,pb
+
+def _getBestStatModel(dataset, nsig, allow_negative_signal=False):
+    """
+    find the index of the best expected combination.
+    :param dataset: the CombinedDataSet object.
+    :param nsig: list of signal yields.
+    :param allow_negative_signal: if True, allow for the best fit to have negative parameter of interest, if False forbids it.
+    :return: the minimal apriori expected poi upper limit, and the spey StatisticalModel object that produced that result.
+    """
+    patches, listOfSignals = _getPatches(dataset, nsig)
+
+    muul_exp_min = np.inf
+    # Find best combination of signal regions
+    for index, (patch, json) in enumerate(zip(patches,dataset.globalInfo.jsons)):
+        xsec = sum(listOfSignals[index])/dataset.getLumi()
+        statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
+                                                        signal=patch,
+                                                        observed=json,
+                                                        xsection=xsec.asNumber(pb)
+                                                        )
+        muul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal)
+        if muul_exp == None:
+            continue
+        elif muul_exp < muul_exp_min:
+            muul_exp_min = muul_exp
+
+    # Check if a non-combined (uncorrelated) signal region is more contraining than the best combination obtained above
+    # Get the list of the names of the signal regions used in the json files
+    listOfSRInJson=[]
+    for SRnames in dataset.globalInfo.jsonFiles.values():
+        listOfSRInJson += SRnames
+    # Check if a signal region is not in the list of SR names used in the json files
+    for sig,ds in zip(nsig,dataset._datasets.dataInfo):
+        if ds.dataId not in listOfSRInJson:
+            xsec = sig/dataset.getLumi()
+            # Don't bother to compute eUL again (one could do it again if needed)
+            muul_exp = ds.expectedUpperLimit/xsec
+            if muul_exp < muull_exp_min:
+                logger.info("Best constraining model is a single uncorrelated model.")
+                muul_exp_min = muul_exp
+                statModel = get_uncorrelated_region_statistical_model(observations=float(ds.observedN),
+                                                                        backgrounds=float(ds.expectedBG),
+                                                                        background_uncertainty=float(ds.bgError),
+                                                                        signal_yields=float(sig),
+                                                                        xsection=xsec,
+                                                                        analysis=dataset.globalInfo.id,
+                                                                        backend=AvailableBackends(2) # simplified likelhood backend by default
+                                                                        )
+
+    return statModel, muul_exp_min
 
 def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
     """
@@ -29,7 +79,6 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
 
     :returns: upper limit on sigma*eff
     """
-    xsec = float((sum(nsig)/dataset.getLumi())._value*1E-6) #pb
     expectedDict = {False:ExpectationType.observed,
                     True:ExpectationType.apriori,
                     "posteriori":ExpectationType.aposteriori}
@@ -48,6 +97,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
 
         nobs = [x.dataInfo.observedN for x in dataset._datasets]
         bg = [x.dataInfo.expectedBG for x in dataset._datasets]
+        xsec = sum(nsig)/dataset.getLumi()
 
         statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
                                                         signal=nsig,
@@ -56,11 +106,11 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
                                                         nb=bg,
                                                         third_moment=thirdMoment,
                                                         delta_sys=deltas_rel,
-                                                        xsection=xsec
+                                                        xsection=xsec.asNumber(pb)
                                                         )
 
         muul = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=False)
-        ret = muul*xsec*1E6*fb
+        ret = muul*xsec
         logger.debug("SL upper limit : {}".format(ret))
         return ret
 
@@ -72,19 +122,19 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for pyhf backend.")
 
-        # statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
-        #                                                 signal=,
-        #                                                 observed=dataset.globalInfo.jsonFiles,
-        #                                                 xsection=xsec
-        #                                                 )
-        #
-        # muul = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=False)
-        # ret = muul*xsec*1E6*fb
+        statModel, muul_exp_min = _getBestStatModel(dataset, nsig)
 
-        ulcomputer = _getPyhfComputer(dataset, nsig)
-        ret = ulcomputer.getUpperLimitOnSigmaTimesEff(expected=expected)
-        logger.debug("pyhf upper limit : {}".format(ret))
-        return ret
+        if expected == True:
+            return muul_exp_min
+        else:
+            mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], allow_negative_signal=False)
+            ret = mu_ul*statModel.xsection
+
+            # ulcomputer = _getPyhfComputer(dataset, nsig)
+            # ret = ulcomputer.getUpperLimitOnSigmaTimesEff(expected=expected)
+
+            logger.debug("pyhf upper limit : {}".format(ret))
+            return ret
     else:
         logger.error(
             "no covariance matrix or json file given in globalInfo.txt for %s"
@@ -168,34 +218,83 @@ def getCombinedLikelihood(
     if dataset.type == "pyhf":
         # Getting the path to the json files
         # Loading the jsonFiles
-        ulcomputer = _getPyhfComputer(dataset, nsig, False)
-        index = ulcomputer.getBestCombinationIndex()
-        lbsm = ulcomputer.likelihood(mu=mu, workspace_index=index, expected=expected)
+        expectedDict = {False:ExpectationType.observed,
+                        True:ExpectationType.apriori,
+                        "posteriori":ExpectationType.aposteriori}
+        if expected not in expectedDict.keys():
+            logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
+            return None
+
+        if deltas_rel != 0.2:
+            logger.warning("Relative uncertainty on signal not supported by spey for pyhf backend.")
+        if marginalize == True:
+            logger.error('Pyhf backend cannot marginalize likelihood.')
+
+        statModel, _ = _getBestStatModel(dataset, nsig)
+
+        lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=False)
+
+        # ulcomputer = _getPyhfComputer(dataset, nsig, False)
+        # index = ulcomputer.getBestCombinationIndex()
+        # lbsm = ulcomputer.likelihood(mu=mu, workspace_index=index, expected=expected)
         return lbsm
     lbsm = getCombinedSimplifiedLikelihood(
         dataset, nsig, marginalize, deltas_rel, expected=expected, mu=mu )
     return lbsm
 
-def getCombinedPyhfStatistics(
-    dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False
-):
+def getCombinedPyhfStatistics(dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False):
         # Getting the path to the json files
         # Loading the jsonFiles
-        ulcomputer = _getPyhfComputer(dataset, nsig, False)
-        index = ulcomputer.getBestCombinationIndex()
-        lbsm = ulcomputer.likelihood(mu=1.0, workspace_index=index, expected=expected)
-        lmax = ulcomputer.lmax(
-            workspace_index=index, expected=expected, allowNegativeSignals=allowNegativeSignals
-        )
-        muhat = None
-        try:
-            muhat = float(ulcomputer.muhat)
-        except AttributeError:
-            pass
-        sigma_mu = ulcomputer.sigma_mu
-        ulcomputer = _getPyhfComputer(dataset, [0.0] * len(nsig), False)
-        lsm = ulcomputer.likelihood(mu=0.0, workspace_index=index, expected=expected)
+
+        expectedDict = {False:ExpectationType.observed,
+                        True:ExpectationType.apriori,
+                        "posteriori":ExpectationType.aposteriori}
+        if expected not in expectedDict.keys():
+            logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
+            return None
+
+        if deltas_rel != 0.2:
+            logger.warning("Relative uncertainty on signal not supported by spey for pyhf backend.")
+        if marginalize == True:
+            logger.error('Pyhf backend cannot marginalize likelihood.')
+
+        statModel, _ = _getBestStatModel(dataset, nsig, allow_negative_signal=allowNegativeSignals)
+
+        muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll)
+        lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll)
+        lsm = statModel.likelihood ( poi_test = 0., expected=expectedDict[expected], return_nll = nll)
+        if lsm > lmax:
+            logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+            lmax = lsm
+            muhat = 0.0
+        if lbsm > lmax:
+            logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+            lmax = lbsm
+            muhat = 1.0
+        nuisance_param_at_muhat = statModel.backend.likelihood(poi_test=muhat, expected=expectedDict[expected])[1]
+        sigma_mu = statModel.backend.sigma_mu(pars=nuisance_param_at_muhat,expected=expectedDict[expected])
+
         return {"lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat, "sigma_mu": sigma_mu}
+
+
+# def getCombinedPyhfStatistics(dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False):
+#         # Getting the path to the json files
+#         # Loading the jsonFiles
+#         ulcomputer = _getPyhfComputer(dataset, nsig, False)
+#         index = ulcomputer.getBestCombinationIndex()
+#         lbsm = ulcomputer.likelihood(mu=1.0, workspace_index=index, expected=expected)
+#         lmax = ulcomputer.lmax(
+#             workspace_index=index, expected=expected, allowNegativeSignals=allowNegativeSignals
+#         )
+#         muhat = None
+#         try:
+#             muhat = float(ulcomputer.muhat)
+#         except AttributeError:
+#             pass
+#         sigma_mu = ulcomputer.sigma_mu
+#         ulcomputer = _getPyhfComputer(dataset, [0.0] * len(nsig), False)
+#         lsm = ulcomputer.likelihood(mu=0.0, workspace_index=index, expected=expected)
+#         return {"lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat, "sigma_mu": sigma_mu}
 
 def getCombinedStatistics(
     dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, allowNegativeSignals=False
@@ -213,16 +312,11 @@ def getCombinedStatistics(
     )
     return cslm
 
-_pyhfcomputers = {}
-
 def _getPyhfComputer(dataset, nsig, normalize=True):
     """create the pyhf ul computer object
     :param normalize: if true, normalize nsig
     :returns: pyhf upper limit computer, and combinations of signal regions
     """
-    idt = dataset.globalInfo.id + str(nsig)
-    if idt in _pyhfcomputers:
-        return _pyhfcomputers[idt]
     # Getting the path to the json files
     jsonFiles = [js for js in dataset.globalInfo.jsonFiles]
     jsons = dataset.globalInfo.jsons.copy()
@@ -302,7 +396,7 @@ def getCombinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel
     cov = dataset.globalInfo.covariance
 
     thirdMoment = None
-    xsec = float((sum(nsig)/dataset.getLumi())._value*1E-6) #pb
+    xsec = sum(nsig)/dataset.getLumi()
 
     statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
                                                     signal=nsig,
@@ -311,7 +405,7 @@ def getCombinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel
                                                     nb=bg,
                                                     third_moment=thirdMoment,
                                                     delta_sys=deltas_rel,
-                                                    xsection=xsec
+                                                    xsection=xsec.asNumber(pb)
                                                     )
     expectedDict = {False:ExpectationType.observed,
                     True:ExpectationType.apriori,
@@ -376,7 +470,7 @@ def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=
         nsig = np.array(nsig)
 
     thirdMoment = None # Need to be implemented
-    xsec = float((sum(nsig)/dataset.getLumi())._value*1E-6) #pb
+    xsec = sum(nsig)/dataset.getLumi()
 
     statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
                                                     signal=nsig,
@@ -385,7 +479,7 @@ def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=
                                                     nb=bg,
                                                     third_moment=thirdMoment,
                                                     delta_sys=deltas_rel,
-                                                    xsection=xsec
+                                                    xsection=xsec.asNumber(pb)
                                                     )
     expectedDict = {False:ExpectationType.observed,
                     True:ExpectationType.apriori,
@@ -446,3 +540,141 @@ def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=
 #     ret["lbsm"] = lbsm
 #     ret["lsm"] = lsm
 #     return ret
+
+def getWSInfo(jsons):
+    """
+    Getting informations from the json files
+
+    :param jsons: list of json instances.
+    :return: wsInfo list of dictionaries (one dictionary for each json file) containing useful information about the json files.
+        - :key signalRegions: list of dictonaries with 'json path' and 'size' (number of bins) of the 'signal regions' channels in the json files
+        - :key otherRegions: list of strings indicating the path to the control and validation region channels
+    """
+    # Identifying the path to the SR and VR channels in the main workspace files
+    wsInfo = []  # workspace specifications
+    if not isinstance(jsons, list):
+        logger.error("The `jsons` parameter must be of type list")
+        return
+    for ws in jsons:
+        wsChannelsInfo = {}
+        wsChannelsInfo["signalRegions"] = []
+        wsChannelsInfo["otherRegions"] = []
+        if not "channels" in ws.keys():
+            logger.error(
+                "Json file number {} is corrupted (channels are missing)".format(
+                    jsons.index(ws)
+                )
+            )
+            wsInfo = None
+            return
+        for i_ch, ch in enumerate(ws["channels"]):
+            if ch["name"][:2] == "SR":  # if channel name starts with 'SR'
+                wsChannelsInfo["signalRegions"].append(
+                    {
+                        "path": "/channels/"
+                        + str(i_ch)
+                        + "/samples/0",  # Path of the new sample to add (signal prediction)
+                        "size": len(ch["samples"][0]["data"]),
+                    }
+                )  # Number of bins
+            else:
+                wsChannelsInfo["otherRegions"].append("/channels/" + str(i_ch))
+        wsChannelsInfo["otherRegions"].sort(
+            key=lambda path: path.split("/")[-1], reverse=True
+        )  # Need to sort correctly the paths to the channels to be removed
+        wsInfo.append(wsChannelsInfo)
+    return wsInfo
+
+def patchMaker(jsons, wsInfo, nsignals, includeCRs):
+    """
+    Method that creates the list of patches to be applied to the `jsons` workspaces, one for each region given the `nsignals` and the informations available in `wsInfo` and the content of the `jsons`
+
+    :param jsons: list of json instances.
+    :param wsInfo: list of dictionaries (one dictionary for each json file) containing useful information about the json files
+    :param nsignals: list of list of signal yields (one list for each json file).
+    :param includeCRs: if True leaves the pacth unchanged,
+                       if False adds to the patch an operation that removes the CRs from the json files.
+
+    NB: It seems we need to include the change of the "modifiers" in the patches as well
+
+    :return: the list of patches, one for each workspace
+    """
+    if wsInfo == None:
+        return None
+    # Constructing the patches to be applied on the main workspace files
+    patches = []
+    for ws, info, subSig in zip(jsons, wsInfo, nsignals):
+        patch = []
+        for srInfo in info["signalRegions"]:
+            nBins = srInfo["size"]
+            operator = {}
+            operator["op"] = "add"
+            operator["path"] = srInfo["path"]
+            value = {}
+            value["data"] = subSig[:nBins]
+            subSig = subSig[nBins:]
+            value["modifiers"] = []
+            value["modifiers"].append({"data": None, "type": "normfactor", "name": "mu_SIG"})
+            value["modifiers"].append({"data": None, "type": "lumi", "name": "lumi"})
+            value["name"] = "bsm"
+            operator["value"] = value
+            patch.append(operator)
+        if includeCRs:
+            logger.debug("keeping the CRs")
+        else:
+            for path in info["otherRegions"]:
+                patch.append({"op": "remove", "path": path})
+        patches.append(patch)
+    return patches
+
+def _getPatches(dataset, nsig):
+    """
+    :param nsig: list of signal yields (not relative).
+    :param normalize: if true, normalize nsig
+    :returns: the list of patches, one for each wkspace and the list of list of signals (one list for each json file).
+    """
+    # Getting the path to the json files
+    datasets = [ds.getID() for ds in dataset.origdatasets]
+    jsonFiles = [js for js in dataset.globalInfo.jsonFiles] #List of json files names (list of str)
+    jsons = dataset.globalInfo.jsons.copy() #List of json files (list of dict)
+    if not isinstance(jsons, list):
+        logger.error("The `jsons` parameter must be of type list.")
+        return None
+    # Filtering the json files by looking at the available datasets
+    listOfSRInJson = []
+    for jsName in dataset.globalInfo.jsonFiles:
+        if all([ds not in dataset.globalInfo.jsonFiles[jsName] for ds in datasets]):
+            # No datasets found for this json combination
+            jsIndex = jsonFiles.index(jsName)
+            jsonFiles.pop(jsIndex)
+            jsons.pop(jsIndex)
+            continue
+        if not all([ds in datasets for ds in dataset.globalInfo.jsonFiles[jsName]]):
+            # Some SRs are missing for this json combination
+            logger.error( "Wrong json definition in globalInfo.jsonFiles for json: %s" % jsName)
+        listOfSRInJson += dataset.globalInfo.jsonFiles[jsName]
+    logger.debug("list of datasets: {}".format(datasets))
+    logger.debug("jsonFiles after filtering: {}".format(jsonFiles))
+    # Constructing the list of signals with subsignals matching each json
+    nsignals = list()
+    for jsName in jsonFiles:
+        subSig = list()
+        for srName in dataset.globalInfo.jsonFiles[jsName]:
+            try:
+                index = datasets.index(srName)
+            except ValueError:
+                line = (
+                    f"{srName} signal region provided in globalInfo is not in the list of datasets, {jsName}:{','.join(datasets)}"
+                )
+                raise ValueError(line)
+            sig = nsig[index]
+            subSig.append(sig)
+        nsignals.append(subSig)
+
+    if hasattr(dataset.globalInfo, "includeCRs"):
+        includeCRs = dataset.globalInfo.includeCRs
+    else:
+        includeCRs = False
+
+    wsInfo = getWSInfo(jsons)
+    return patchMaker(jsons, wsInfo, nsignals, includeCRs), nsignals

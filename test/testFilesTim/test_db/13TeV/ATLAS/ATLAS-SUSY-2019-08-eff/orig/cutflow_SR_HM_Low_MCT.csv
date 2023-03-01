@@ -1,0 +1,27 @@
+#: table_doi: 10.17182/hepdata.90607.v2/t48
+#: name: cutflow_SR_HM_Low_MCT
+#: description: Event selection cutflow for a representative signal sample for the SR-HM low $m_{CT}$. The masses of next-lightest-neutralinos and LSPs are reported. While the first row of the table reports the total raw MC events produced, all subsequent rows show weighted events. Only statistical uncertainties are shown. Samples are produced with generator filters which selects $h\rightarrow b\bar{b}$ and $W\rightarrow\ell\nu$ decays.
+#: data_file: cutflow_SRHM_bin0.yaml
+#: keyword reactions: P P --> CHARGINO1 NEUTRALINO2 X
+#: keyword observables: N
+#: keyword phrases: SUSY | Supersymmetry | Electroweak | Proton-Proton Scattering
+#: keyword cmenergies: 13000.0
+#: SQRT(S) [GEV],13000.0
+Cut [],"m($\tilde{\chi}^{\pm}_{1}/\tilde{\chi}^{0}_{2}$,$\tilde{\chi}^{0}_{1}$)=(750,100) GeV []",stat +,stat -
+All raw MC events,6000,0,0
+All weighted events,121,0,0
+Event cleaning,120,0,0
+"$N_{\mathrm{jets,25}} \geq 2$",106,0,0
+1 signal lepton,95,0,0
+Second baseline lepton veto,92,0,0
+$m_{\mathrm{T}} > $ 50 GeV,85,0,0
+$E_\mathrm{T}^\mathrm{miss} > $ 180 GeV,73,0,0
+$N_{\mathrm{jets}} \leq 3$,61.1,1.4,-1.4
+$N_{\mathrm{b-jets}}=2$,27.1,0.9,-0.9
+$m_{\mathrm{bb}}$ $>$ 50 GeV,27.0,0.9,-0.9
+$E_\mathrm{T}^\mathrm{miss} > $ 240 GeV,23.0,0.9,-0.9
+"$m_{\mathrm{bb}}$ $\in$ [100,140] GeV",17.4,0.8,-0.8
+"$m_{\mathrm{\ell,b_1}}$ $>$ 120 GeV",16.2,0.7,-0.7
+$m_{\mathrm{T}}$ $>$ 240 GeV,11.6,0.6,-0.6
+"$m_{\mathrm{CT}}$ $\in$ [180,230] GeV",1.89,0.25,-0.25
+

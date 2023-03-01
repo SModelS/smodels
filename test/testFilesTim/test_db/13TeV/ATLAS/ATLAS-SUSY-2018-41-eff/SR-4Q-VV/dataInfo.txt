@@ -1,0 +1,7 @@
+dataId: SR-4Q-VV
+dataType: efficiencyMap
+observedN: 3
+expectedBG: 3.9
+bgError: 0.8
+upperLimit: 0.034*fb
+expectedUpperLimit: 0.0383*fb

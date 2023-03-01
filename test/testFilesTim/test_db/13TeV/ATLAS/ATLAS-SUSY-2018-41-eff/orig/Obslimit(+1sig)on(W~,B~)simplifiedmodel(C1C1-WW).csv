@@ -1,0 +1,41 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t29
+#: name: Obs limit (+1sig) on (W~, B~) simplified model (C1C1-WW)
+#: description: Exclusion limits for $(\tilde{W},\tilde{B})$ simplifiec model as a function of the produced wino mass ($m(\tilde{\chi}_{1}^{\pm}/\tilde{\chi}_{2}^{0})$) and the bino LSP mass ($m(\tilde{\chi}_{1}^{0})$). Expected (dashed) and observed (solid) 95% CL exclusion limits on $(\tilde{W},\tilde{B})$ simplified models; C1C1-WW. The expected limit for the 1$\sigma$ down variation is not shown as no mass points could be excluded.
+
+#: data_file: c1c1_ww-sim_contours_(observed_up).yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+$m(\tilde{\chi}_{1}^{\pm})$ [GeV],$m(\tilde{\chi}_{1}^{0})$ [GeV]
+585.99,6.25
+581.67,18.75
+581.25,19.922
+577.77,31.25
+576.54,43.75
+580.47,56.25
+581.25,57.805
+588.5,68.75
+596.62,81.25
+603.75,90.943
+606.04,93.75
+622.75,106.25
+626.25,107.73
+648.75,110.53
+671.25,109.56
+693.75,107.61
+701.88,106.25
+716.25,102.56
+738.75,94.862
+742.16,93.75
+761.25,87.551
+777.46,81.25
+783.75,78.227
+795.83,68.75
+803.15,56.25
+806.25,48.245
+807.75,43.75
+814.22,31.25
+823.13,18.75
+828.75,9.3341
+830.4,6.25
+

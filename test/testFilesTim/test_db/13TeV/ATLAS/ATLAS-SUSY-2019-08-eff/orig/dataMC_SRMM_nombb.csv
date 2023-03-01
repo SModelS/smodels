@@ -1,0 +1,48 @@
+#: table_doi: 10.17182/hepdata.90607.v2/t11
+#: name: dataMC_SRMM_nombb
+#: description: The post-fit $m_{bb}$ distribution is shown in the signal region SR-MM after all the selection requirements are applied other than the $m_{bb}$ cut. The hatched bands represent the sum in quadrature of systematic and statistical uncertainties of the total SM background. For illustration, the distribution of the SUSY reference points are also shown as dashed lines. The red line with arrow indicates the $m_{bb}$ cut used in SR selection. The overflow events, where present, are included in the last bin.
+#: data_file: dataMC_SRMM_nombb.yaml
+#: keyword reactions: P P --> CHARGINO1 NEUTRALINO2 X
+#: keyword observables: DN/Dmbb
+#: keyword phrases: SUSY | Supersymmetry | Electroweak | Proton-Proton Scattering
+#: keyword cmenergies: 13000.0
+#: SQRT(S) [GEV],,,13000.0
+#: LUMINOSITY [fb$^{-1}$],,,139
+$m_{bb}$[GEV],$m_{bb}$[GEV] LOW,$m_{bb}$[GEV] HIGH,Data [Events/Bin],error +,error -
+120,100.0,140.0,13,4.698,-3.559
+160,140.0,180.0,5,3.382,-2.16
+200,180.0,220.0,13,4.698,-3.559
+240,220.0,260.0,11,4.417,-3.266
+280,260.0,300.0,8,3.945,-2.768
+320,300.0,340.0,21,5.655,-4.546
+
+#: SQRT(S) [GEV],,,13000.0
+#: LUMINOSITY [fb$^{-1}$],,,139
+$m_{bb}$[GEV],$m_{bb}$[GEV] LOW,$m_{bb}$[GEV] HIGH,Expected Bakground [Events/Bin],sys $\otimes$ stat +,sys $\otimes$ stat -
+120,100.0,140.0,7.991,1.953,-1.953
+160,140.0,180.0,6.881,1.507,-1.507
+200,180.0,220.0,5.24,1.602,-1.602
+240,220.0,260.0,4.873,1.465,-1.465
+280,260.0,300.0,5.625,1.99,-1.99
+320,300.0,340.0,18.87,3.732,-3.732
+
+#: SQRT(S) [GEV],,,13000.0
+#: LUMINOSITY [fb$^{-1}$],,,139
+$m_{bb}$[GEV],$m_{bb}$[GEV] LOW,$m_{bb}$[GEV] HIGH,"m($\tilde{\chi}^{\pm}_{1}/\tilde{\chi}^{0}_{2}$,$\tilde{\chi}^{0}_{1}$)=(500,0) GeV [Events/Bin]"
+120,100.0,140.0,11.36
+160,140.0,180.0,0.4371
+200,180.0,220.0,0
+240,220.0,260.0,0
+280,260.0,300.0,0
+320,300.0,340.0,0
+
+#: SQRT(S) [GEV],,,13000.0
+#: LUMINOSITY [fb$^{-1}$],,,139
+$m_{bb}$[GEV],$m_{bb}$[GEV] LOW,$m_{bb}$[GEV] HIGH,"m($\tilde{\chi}^{\pm}_{1}/\tilde{\chi}^{0}_{2}$,$\tilde{\chi}^{0}_{1}$)=(500,250) GeV [Events/Bin]"
+120,100.0,140.0,5.378
+160,140.0,180.0,0.1423
+200,180.0,220.0,0.1887
+240,220.0,260.0,0
+280,260.0,300.0,0
+320,300.0,340.0,0
+

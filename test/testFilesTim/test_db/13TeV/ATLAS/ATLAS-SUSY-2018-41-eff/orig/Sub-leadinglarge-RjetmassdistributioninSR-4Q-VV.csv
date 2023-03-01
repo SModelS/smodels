@@ -1,0 +1,58 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t18
+#: name: Sub-leading large-$R$ jet mass distribution in SR-4Q-VV
+#: description: Distribution of $m(J_{2})$ in SR-4Q-VV. The post-fit SM background expectation using the background-only fit is shown in a histogram stack. Distributions of relevant signals are overlaid. The bottom panels show the ratio of the observed data to the background prediction. The selection criteria on the variable shown by each plot is removed, while the arrow indicates the cut value to define the region. A few representative signals are overlaid. For the $(\tilde{W},\tilde{B})$ simplified model models, the label $(x,y)$ indicates $(m(\tilde{\chi}_{1}^{\pm}), m(\tilde{\chi}_{1}^{0}))=(x,y)~\text{GeV}$.
+
+#: data_file: sub-leading_large-$r$_jet_mass_distribution_in_sr-4q-vv.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+#: ,,,yield
+$m(J_{2})$ [GeV],$m(J_{2})$ [GeV] LOW,$m(J_{2})$ [GeV] HIGH,Background, +, -
+45.0,30.0,60.0,1.7404,0.40484,-0.40484
+75.0,60.0,90.0,4.3876,0.86551,-0.86551
+105.0,90.0,120.0,3.4147,0.64287,-0.64287
+135.0,120.0,150.0,2.0198,0.45552,-0.45552
+165.0,150.0,180.0,0.76027,0.19817,-0.19817
+195.0,180.0,210.0,0.73867,0.26879,-0.26879
+225.0,210.0,240.0,0.26542,0.10497,-0.10497
+
+#: ,,,yield
+$m(J_{2})$ [GeV],$m(J_{2})$ [GeV] LOW,$m(J_{2})$ [GeV] HIGH,Data
+45.0,30.0,60.0,7.0
+75.0,60.0,90.0,2.0
+105.0,90.0,120.0,3.0
+135.0,120.0,150.0,3.0
+165.0,150.0,180.0,2.0
+195.0,180.0,210.0,0.0
+225.0,210.0,240.0,0.0
+
+#: ,,,yield
+$m(J_{2})$ [GeV],$m(J_{2})$ [GeV] LOW,$m(J_{2})$ [GeV] HIGH,"SIGNAL $\tilde{\chi}_{1}^{\pm}\tilde{\chi}_{0}^{2}\rightarrow WZ\tilde{\chi}_{0}^{1}\tilde{\chi}_{0}^{1}$ (900, 100)"
+45.0,30.0,60.0,0.38102
+75.0,60.0,90.0,5.7771
+105.0,90.0,120.0,2.4676
+135.0,120.0,150.0,0.22187
+165.0,150.0,180.0,0.084604
+195.0,180.0,210.0,0.051873
+225.0,210.0,240.0,0.048495
+
+#: ,,,yield
+$m(J_{2})$ [GeV],$m(J_{2})$ [GeV] LOW,$m(J_{2})$ [GeV] HIGH,"SIGNAL $\tilde{\chi}_{1}^{\pm}\tilde{\chi}_{1}^{\pm}\rightarrow WW\tilde{\chi}_{0}^{1}\tilde{\chi}_{0}^{1}$ (700, 100)"
+45.0,30.0,60.0,0.30412
+75.0,60.0,90.0,5.8007
+105.0,90.0,120.0,0.76412
+135.0,120.0,150.0,0.14318
+165.0,150.0,180.0,0.067267
+195.0,180.0,210.0,0.0094439
+225.0,210.0,240.0,0.0098198
+
+#: ,,,yield
+$m(J_{2})$ [GeV],$m(J_{2})$ [GeV] LOW,$m(J_{2})$ [GeV] HIGH,"GGM Higgsino SIGNAL $m(\tilde{\chi}_{1}^{0}) = 800$ GeV, B($\tilde{\chi}_{1}^{0}\rightarrow Z\tilde{G}$) = 50%"
+45.0,30.0,60.0,0.14831
+75.0,60.0,90.0,1.2958
+105.0,90.0,120.0,1.1542
+135.0,120.0,150.0,0.31518
+165.0,150.0,180.0,0.024826
+195.0,180.0,210.0,0.0
+225.0,210.0,240.0,0.0
+

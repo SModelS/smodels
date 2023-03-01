@@ -1,0 +1,67 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t70
+#: name: Obs limit on (H~, W~), tanb = 10, mu>0
+#: description: 95% CL exclusion limits for the $(\tilde{H},\tilde{W})$ models. The limits are projected on to a two-dimensional plane of the physical electroweakino masses $(m(\tilde{\chi}_{2}^{\pm}),m(\tilde{\chi}_{1}^{0}))$ representing $(m(\tilde{\chi}_{\textrm{heavy}}),m(\tilde{\chi}_{\textrm{light}}))$. The expected limit for the 1$\sigma$ down variation is not shown as no mass points could be excluded.
+
+#: data_file: hino-nlsp_wino-lsp_with_tanb=10_pos_mu_(obs).yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+$m(\tilde{\chi}_{2}^{0})$ [GeV],$m(\tilde{\chi}_{1}^{\pm}/\tilde{\chi}_{1}^{0})$ [GeV]
+457.41,6.25
+463.09,18.75
+468.75,26.938
+472.08,31.25
+482.96,43.75
+491.25,53.157
+494.54,56.25
+506.57,68.75
+513.75,78.039
+515.9,81.25
+523.4,93.75
+532.2,106.25
+536.25,110.72
+543.47,118.75
+556.11,131.25
+558.75,133.83
+569.33,143.75
+581.25,155.03
+582.73,156.25
+597.77,168.75
+603.75,173.76
+615.0,181.25
+626.25,188.73
+634.96,193.75
+648.75,201.53
+657.37,206.25
+671.25,214.29
+679.69,218.75
+693.75,227.59
+705.38,231.25
+716.25,235.02
+738.75,235.24
+761.25,234.34
+783.75,235.27
+806.25,232.56
+808.74,231.25
+828.75,220.23
+830.67,218.75
+844.94,206.25
+851.25,198.18
+854.58,193.75
+860.2,181.25
+864.34,168.75
+868.37,156.25
+872.53,143.75
+873.75,140.33
+876.93,131.25
+881.54,118.75
+885.61,106.25
+888.35,93.75
+889.82,81.25
+890.84,68.75
+891.85,56.25
+892.91,43.75
+894.0,31.25
+895.02,18.75
+895.74,6.25
+

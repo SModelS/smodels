@@ -1,0 +1,24 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t3
+#: name: $W/Z\rightarrow qq$ tagging efficiency
+#: description: The boson-tagging efficiency for jets arising from $W/Z$ bosons decaying into $q\bar{q}$ (signal jets) are shown. The signal jet efficiency of $W_{qq}$/$Z_{qq}$-tagging is evaluated using a sample of pre-selected large-$R$ jets ($p_{\textrm{T}}>200~\textrm{GeV}, |\eta|<2.0, m_{J} > 40~\textrm{GeV}$) in the simulated $(\tilde{W},\tilde{B})$ simplified model signal events with $\Delta m (\tilde{\chi}_{\textrm{heavy}},~\tilde{\chi}_{\textrm{light}}) \ge 400~\textrm{GeV}$. The jets are matched with generator-level $W/Z$-bosons by $\Delta R<1.0$ which decay into $q\bar{q}$. The efficiency correction factors are applied on the signal efficiency rejection for the $W_{qq}$/$Z_{qq}$-tagging. The systematic uncertainty is represented by the hashed bands.
+
+#: data_file: vqq_tag_efficiency.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+#:  [%],,,efficiency
+large-$R$ jet $p_\text{T}$ [GeV],large-$R$ jet $p_\text{T}$ [GeV] LOW,large-$R$ jet $p_\text{T}$ [GeV] HIGH,W tag [%], +, -
+250.0,200.0,300.0,0.46924,0.067588,-0.067588
+400.0,300.0,500.0,0.47452,0.043797,-0.043797
+600.0,500.0,700.0,0.47789,0.037501,-0.037501
+800.0,700.0,900.0,0.49555,0.040804,-0.040804
+1050.0,900.0,1200.0,0.52157,0.04237,-0.04237
+
+#:  [%],,,efficiency
+large-$R$ jet $p_\text{T}$ [GeV],large-$R$ jet $p_\text{T}$ [GeV] LOW,large-$R$ jet $p_\text{T}$ [GeV] HIGH,Z tag [%], +, -
+250.0,200.0,300.0,0.46842,0.070441,-0.070441
+400.0,300.0,500.0,0.4871,0.050017,-0.050017
+600.0,500.0,700.0,0.51195,0.046168,-0.046168
+800.0,700.0,900.0,0.51494,0.048207,-0.048207
+1050.0,900.0,1200.0,0.5242,0.048997,-0.048997
+

@@ -1,0 +1,28 @@
+#: table_doi: 10.17182/hepdata.90607.v2/t1
+#: name: dataMC_VR_onLM_nomct
+#: description: The post-fit $m_{CT}$ distribution is shown in the validation region VR-onLM after all the selection requirements are applied other than the $m_{CT}$ cut. The stacked histograms show the expected SM backgrounds. The hatched bands represent the sum in quadrature of systematic and statistical uncertainties of the total SM background. The red line with arrow indicates the $m_{CT}$ cut used in SR selection. The first and the last bin include the underflow and overflow events (where present), respectively.
+#: data_file: dataMC_VR_onLM_nomct.yaml
+#: keyword reactions: P P --> CHARGINO1 NEUTRALINO2 X
+#: keyword observables: DN/DmCT
+#: keyword phrases: SUSY | Supersymmetry | Electroweak | Proton-Proton Scattering
+#: keyword cmenergies: 13000.0
+#: SQRT(S) [GEV],,,13000.0
+#: LUMINOSITY [fb$^{-1}$],,,139
+$m_{CT}$[GEV],$m_{CT}$[GEV] LOW,$m_{CT}$[GEV] HIGH,Data [Events/Bin],error +,error -
+120,100.0,140.0,97,10.88,-9.832
+160,140.0,180.0,6,3.584,-2.38
+200,180.0,220.0,16,5.083,-3.958
+240,220.0,260.0,8,3.945,-2.768
+280,260.0,300.0,7,3.77,-2.581
+320,300.0,340.0,3,2.918,-1.633
+
+#: SQRT(S) [GEV],,,13000.0
+#: LUMINOSITY [fb$^{-1}$],,,139
+$m_{CT}$[GEV],$m_{CT}$[GEV] LOW,$m_{CT}$[GEV] HIGH,Expected Bakground [Events/Bin],sys $\otimes$ stat +,sys $\otimes$ stat -
+120,100.0,140.0,96.02,6.584,-6.584
+160,140.0,180.0,8.693,2.442,-2.442
+200,180.0,220.0,8.605,1.67,-1.67
+240,220.0,260.0,8.578,2.795,-2.795
+280,260.0,300.0,5.972,1.309,-1.309
+320,300.0,340.0,4.046,0.6911,-0.6911
+

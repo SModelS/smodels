@@ -1,0 +1,51 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t120
+#: name: Observed cross-section upper limit on C1C1-WW
+#: description: Expected (dashed) and observed (solid) 95% CL exclusion limits on $(\tilde{W},~\tilde{B})$-SIM model (C1C1-WW). The black numbers represents the observed cross-section upper-limits.
+
+#: data_file: c1c1_ww_observed_upper_limit_on_cross_section.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+$m(\tilde{\chi}_{1}^{\pm})$ [GeV],$m(\tilde{\chi}_{1}^{0})$ [GeV],Expected upper limit on cross section [pb]
+700.0,150.0,0.0060028
+750.0,50.0,0.0029573
+550.0,50.0,0.016644
+700.0,0.0,0.0039975
+500.0,0.0,0.047422
+400.0,50.0,0.20837
+500.0,200.0,0.50073
+1000.0,100.0,0.0013583
+900.0,0.0,0.0017595
+500.0,100.0,0.89248
+600.0,100.0,0.010894
+400.0,0.0,0.38939
+900.0,100.0,0.0018075
+650.0,50.0,0.0061141
+600.0,150.0,0.013341
+550.0,0.0,0.020568
+650.0,100.0,0.0063568
+600.0,50.0,0.0099271
+550.0,100.0,0.018842
+650.0,0.0,0.0063264
+1000.0,0.0,0.0013598
+900.0,200.0,0.0019803
+900.0,300.0,0.0023613
+1100.0,100.0,0.0012912
+1000.0,300.0,0.0018066
+1000.0,200.0,0.0015723
+1100.0,300.0,0.0013889
+1100.0,200.0,0.0013627
+1100.0,0.0,0.0011904
+800.0,100.0,0.0027425
+800.0,0.0,0.0024703
+800.0,200.0,0.0031819
+700.0,100.0,0.0047108
+700.0,200.0,0.0068967
+800.0,300.0,0.0059725
+600.0,200.0,0.024788
+750.0,100.0,0.0036011
+650.0,150.0,0.010667
+750.0,0.0,0.0031678
+700.0,50.0,0.0043246
+600.0,0.0,0.0098158
+

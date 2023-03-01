@@ -1,0 +1,53 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t142
+#: name: Efficiency of N2N3-hh signals by SR-2B2Q-Vh
+#: description: Efficiency for $(\tilde{H},\tilde{B})$ simplified models (N2N3-hh) in their most relevant SRs. The efficiency in a given SR is defined by the ratio of weighted events selected based on the generator-level particle information and that based on detector simulation and particle reconstruction. This mainly accounts for the efficiency of lepton reconstruction/identification, $b$-tagging, as well as the $D_2$ and $n_{\textrm{trk}}$ selection in the and $W_{qq}$/$Z_{qq}$-tagging. Efficiency below 0.005\% is rounded to 0.00 in the entry.
+
+#: data_file: efficiency_of_n2n3-hh-sim_in_sr-2b2q-vh.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+$m(\tilde{\chi}_{2}^{0})$ [GeV],$m(\tilde{\chi}_{1}^{0})$ [GeV],Efficiency [%]
+400.0,0.0,71.498
+400.0,50.0,0.0
+500.0,0.0,28.101
+500.0,100.0,29.048
+500.0,200.0,56.233
+600.0,0.0,43.465
+600.0,100.0,23.741
+600.0,200.0,26.222
+600.0,300.0,79.057
+700.0,0.0,30.975
+700.0,100.0,47.174
+700.0,200.0,35.06
+700.0,300.0,27.86
+700.0,400.0,26.915
+800.0,0.0,34.446
+800.0,100.0,37.817
+800.0,200.0,33.682
+800.0,300.0,38.616
+800.0,400.0,40.367
+800.0,500.0,60.432
+900.0,0.0,35.818
+900.0,100.0,34.87
+900.0,200.0,37.762
+900.0,300.0,37.436
+900.0,400.0,34.807
+900.0,500.0,53.364
+1000.0,0.0,42.896
+1000.0,100.0,38.922
+1000.0,200.0,32.874
+1000.0,300.0,39.418
+1000.0,400.0,41.246
+1000.0,500.0,29.488
+1100.0,0.0,37.685
+1100.0,100.0,39.125
+1100.0,200.0,38.344
+1100.0,300.0,44.025
+1100.0,400.0,39.35
+1100.0,500.0,36.631
+1200.0,0.0,31.507
+1200.0,100.0,40.415
+1200.0,200.0,42.729
+1200.0,300.0,38.873
+1200.0,400.0,48.768
+

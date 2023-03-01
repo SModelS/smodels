@@ -1,0 +1,32 @@
+#: table_doi: 10.17182/hepdata.95751.v1/t2
+#: name: Fig 4 Onshell Control and Validation Region Yields
+#: description:  Comparison of the observed data and expected SM background yields in the CRs (pre-fit) and VRs (post-fit) of the onshell $W\!Z$ and $W\!h$ selections. The "Others" category contains the single-top, WW, triboson, Higgs and rare top processes. The hatched band indicates the combined theoretical, experimental, and MC statistical uncertainties. The bottom panel shows the relative difference between the observed data and expected yields for the CRs and the significance of the difference for the VRs, calculated with the profile likelihood method from [169], adding a minus sign if the yield is below the prediction.
+#: data_file: fig_4_onshell_control_and_validation_region_yields.yaml
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> CHARGINO+ NEUTRALINO2 X | P P --> CHARGINO- NEUTRALINO2 X
+#: keyword phrases: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak
+#: keyword observables: N
+#:  ,Events
+,DATA,stat +,stat -
+$CRWZ^{WZ}_{0j}$,2868,53.6,-53.6
+$CRWZ^{WZ}_{LowH_{T}}$,3479,59.0,-59.0
+$CRWZ^{WZ}_{HighH_{T}}$,687,26.2,-26.2
+$VRWZ^{WZ}_{0j}$,428,20.7,-20.7
+$VRWZ^{WZ}_{LowH_{T}}$,851,29.2,-29.2
+$VRWZ^{WZ}_{HighH_{T}}$,639,25.3,-25.3
+$VRFF^{WZ}$,450,21.2,-21.2
+$VRt\bar{t}^{WZ}$,481,21.9,-21.9
+$VRt\bar{t}^{WZ}_{inc}$,599,24.5,-24.5
+
+#:  ,Events
+,BACKGROUND,stat+syst +,stat+syst -
+$CRWZ^{WZ}_{0j}$,2681.7,28.8,-28.8
+$CRWZ^{WZ}_{LowH_{T}}$,3666.0,75.1,-75.1
+$CRWZ^{WZ}_{HighH_{T}}$,802.4,18.3,-18.3
+$VRWZ^{WZ}_{0j}$,429.7,40.0,-40.0
+$VRWZ^{WZ}_{LowH_{T}}$,854.6,35.8,-35.8
+$VRWZ^{WZ}_{HighH_{T}}$,574.3,65.6,-65.6
+$VRFF^{WZ}$,509.8,58.3,-58.3
+$VRt\bar{t}^{WZ}$,508.9,146.3,-146.3
+$VRt\bar{t}^{WZ}_{inc}$,638.5,152.9,-152.9
+

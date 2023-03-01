@@ -1,0 +1,7 @@
+dataId: SROffShell_1_cuts
+dataType: efficiencyMap
+observedN: 6
+expectedBG: 9.2
+bgError: 1.7
+upperLimit: 0.0411*fb
+expectedUpperLimit: 0.0604*fb

@@ -1,0 +1,11 @@
+id: CMS-SUS-21-002
+sqrts: 13*TeV
+lumi: 137/fb
+prettyName: Hadronic EWK searches
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-21-002/
+arxiv: https://arxiv.org/abs/2205.09597
+publication: Accepted for publication in Phys. Lett. B
+contact: cms-phys-conveners-sus@cern.ch
+private: False
+implementedBy: Sahana Narasimha
+lastUpdate: 2022/10/21

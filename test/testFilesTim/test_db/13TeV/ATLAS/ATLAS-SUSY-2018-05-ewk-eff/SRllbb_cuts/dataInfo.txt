@@ -1,0 +1,7 @@
+dataId: SRllbb_cuts
+dataType: efficiencyMap
+observedN: 0
+expectedBG: 0.58
+bgError: 0.2
+upperLimit: 0.017*fb
+expectedUpperLimit: 0.017*fb

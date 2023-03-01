@@ -1,0 +1,15 @@
+#: table_doi: 10.17182/hepdata.90017.v1/t2
+#: name: Figure 9
+#: description: Expected and observed 95% CL exclusion upper limits on the production cross-section of $\tilde{\chi}^{\pm}_{1}\tilde{\chi}^{0}_{2} \to W^{\pm}\tilde{\chi}^{0}_{1} h \tilde{\chi}^{0}_{1}$ as a function of $m(\tilde{\chi}^{\pm}_{1}/\tilde{\chi}^{0}_{2})$.
+#: data_file: fig9.yaml
+#: keyword reactions: P P --> h\chi\chi | h --> \gamma\gamma
+#: keyword observables: Exclusion limits
+#: keyword phrases: Chargino | Neutralino | Electroweakino | Higgsino | Higgs boson
+#: keyword cmenergies: 13000.0
+$m(\tilde{\chi}^{\pm}_{1}/\tilde{\chi}^{0}_{2})$ [GeV],Observed
+150,1.916
+200,0.88
+300,0.347
+400,0.223
+500,0.181
+600,0.156

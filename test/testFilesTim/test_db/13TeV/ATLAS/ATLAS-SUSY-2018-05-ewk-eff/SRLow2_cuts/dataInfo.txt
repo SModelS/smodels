@@ -1,0 +1,7 @@
+dataId: SRLow2_cuts
+dataType: efficiencyMap
+observedN: 8
+expectedBG: 9.0
+bgError: 4.0
+upperLimit: 0.0756*fb
+expectedUpperLimit: 0.0842*fb

@@ -1,0 +1,58 @@
+#: table_doi: 10.17182/hepdata.116034.v1/t171
+#: name: SS_N2_ZN1 acc in SRMed
+#: description: Signal region acceptance (left) and efficiency (right) over the full \mll\ range for the SS_N2_ZN1 model in Strong search regions. Acceptance is calculated by applying the signal-region requirements to particle-level objects, which do not suffer from identification inefficiencies or mismeasurements.  The efficiency is calculated with fully reconstructed objects with the acceptance divided out.
+#: data_file: ss_n2_zn1_acc_in_srmed.yaml
+#: keyword phrases: SUSY | Supersymmetry | proton-proton scattering | Acceptance | Squark
+#: keyword observables: Acceptance
+#: keyword cmenergies: 13000
+#: keyword reactions: p-p > squark-squark > Z-Z > ll+MET+jets
+Slepton Mass [GeV],LSP Mass [GeV],acc
+600.0,100.0,0.00979
+600.0,300.0,0.00368
+600.0,400.0,0.00136
+800.0,100.0,0.0279
+800.0,300.0,0.0195
+800.0,500.0,0.00567
+800.0,600.0,0.00185
+1000.0,100.0,0.0419
+1000.0,300.0,0.0383
+1000.0,500.0,0.0247
+1000.0,700.0,0.00686
+1000.0,800.0,0.00198
+1200.0,100.0,0.052
+1200.0,300.0,0.052
+1200.0,500.0,0.0447
+1200.0,700.0,0.029
+1200.0,900.0,0.00818
+1200.0,1000.0,0.00206
+1300.0,100.0,0.055
+1300.0,300.0,0.0565
+1300.0,500.0,0.051
+1300.0,700.0,0.0397
+1300.0,900.0,0.0181
+1300.0,1100.0,0.00214
+1400.0,100.0,0.0571
+1400.0,300.0,0.0589
+1400.0,500.0,0.0575
+1400.0,700.0,0.0492
+1400.0,900.0,0.0318
+1400.0,1100.0,0.00838
+1400.0,1200.0,0.00221
+1500.0,100.0,0.059
+1500.0,300.0,0.0606
+1500.0,500.0,0.0592
+1500.0,700.0,0.0541
+1500.0,900.0,0.0429
+1500.0,1100.0,0.0191
+1500.0,1300.0,0.00227
+1600.0,100.0,0.06
+1600.0,300.0,0.063
+1600.0,500.0,0.0625
+1600.0,900.0,0.0509
+1600.0,1300.0,0.00923
+1700.0,100.0,0.0634
+1700.0,300.0,0.0631
+1700.0,500.0,0.064
+1700.0,900.0,0.0568
+1700.0,1300.0,0.0197
+

@@ -1,0 +1,79 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t79
+#: name: Exp limit on (H~, W~), tanb = 10, M2 vs mu
+#: description: 95% CL exclusion limits for the $(\tilde{H},\tilde{W})$ models. The limits are projected on to a two-dimensional plane as a function of the wino/higgsino mass parameters: $(M_2,\mu)$. For the limits shown on the $(M_2,\mu)$ plane, the excluded regions are indicated by the area inside the contours. The round excluded area in the top part corresponds to the excluded parameter space in the $(\tilde{W},~\tilde{H})$ model $(M_{2} > |\mu|)$, while the two small areas in at the bottom are that in the $(\tilde{H},~\tilde{W})$ model $(M_{2} < |\mu|)$.
+
+#: data_file: m2vsmu_exp_(tanb=10_in_hino-nlsp_wino-lsp).yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak | R-parity conservation
+$\mu$ [GeV],$M_{2}$ [GeV]
+-517.04,0.0
+-521.25,15.879
+-521.55,18.75
+-524.7,56.25
+-528.87,81.25
+-536.67,93.75
+-543.75,101.5
+-549.03,106.25
+-563.99,118.75
+-566.25,120.63
+-583.48,131.25
+-588.75,134.67
+-607.04,143.75
+-611.25,145.99
+-633.75,155.19
+-640.75,156.25
+-656.25,159.0
+-667.5,156.25
+-678.75,152.52
+-692.51,143.75
+-701.25,137.79
+-710.53,131.25
+-723.75,120.99
+-726.65,118.75
+-741.49,106.25
+-746.25,101.32
+-752.49,93.75
+-758.95,81.25
+-762.13,56.25
+-764.14,18.75
+-772.63,0.0
+-517.04,0.0
+498.75,0.0
+510.07,12.5
+517.63,37.5
+521.25,53.825
+521.99,56.25
+525.05,68.75
+529.14,81.25
+536.87,93.75
+543.75,101.33
+549.21,106.25
+564.14,118.75
+566.25,120.51
+583.79,131.25
+588.75,134.45
+607.74,143.75
+611.25,145.59
+633.75,154.48
+645.42,156.25
+656.25,158.17
+664.71,156.25
+678.75,151.95
+692.53,143.75
+701.25,138.19
+711.89,131.25
+723.75,122.68
+729.21,118.75
+744.52,106.25
+746.25,104.54
+755.38,93.75
+761.65,81.25
+764.54,68.75
+766.23,56.25
+767.84,37.5
+768.75,23.876
+769.42,12.5
+773.3,0.0
+498.75,0.0
+

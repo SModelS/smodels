@@ -1,0 +1,139 @@
+#: table_doi: 10.17182/hepdata.104458.v1/t14
+#: name: Data yields and background breakdown in CR/VR 1L(1Y)
+#: description: Number of observed data events and the post-fit SM background prediction in the VR1L(1Y) bins and the corresponding CR1L(1Y) bins. "-" indicates negligibly small contribution. Note that the relative uncertainty on the expected yield in the CRs between the reducible backgrounds are identical, given that a common normalization factor is assigned for all of them in the fit. Yields for negligible backgrounds are indicated by "0.0000001±0.0000001" in the table.
+#: data_file: data_yields_and_background_expectation_in_the_crsvrs_breakdown.yaml
+#: keyword reactions: P P --> CHARGINO+ CHARGINO- | P P --> CHARGINO+ NEUTRALINO | P P --> CHARGINO- NEUTRALINO | P P --> NEUTRALINO NEUTRALINO
+#: keyword cmenergies: 13000
+#: keyword observables: SUSY | Supersymmetry | Proton-Proton Scattering | Electroweak
+#: ,yield
+,Fitted SM total, +, -
+CR1L-4Q,439.0,21.0,-21.0
+VR1L-4Q,13.0,3.4,-3.4
+CR1L-2B2Q,96.0,10.0,-10.0
+VR1L-2B2Q,7.8,1.5,-1.5
+CR1Y-4Q,1001.0,32.0,-32.0
+VR1Y-4Q,43.0,8.0,-8.0
+CR1Y-2B2Q,127.0,11.0,-11.0
+VR1Y-2B2Q,8.6,2.0,-2.0
+
+#: ,yield
+,Data
+CR1L-4Q,439.0
+VR1L-4Q,13.0
+CR1L-2B2Q,96.0
+VR1L-2B2Q,5.0
+CR1Y-4Q,1001.0
+VR1Y-4Q,43.0
+CR1Y-2B2Q,127.0
+VR1Y-2B2Q,14.0
+
+#: ,yield
+,$W$+jets, +, -
+CR1L-4Q,325.0,16.0,-16.0
+VR1L-4Q,13.4,2.2,-2.2
+CR1L-2B2Q,48.0,5.0,-5.0
+VR1L-2B2Q,3.4,0.7,-0.7
+CR1Y-4Q,2.59,0.08,-0.08
+VR1Y-4Q,0.031,0.007,-0.007
+CR1Y-2B2Q,0.061,0.006,-0.006
+VR1Y-2B2Q,1e-06,1e-06,-1e-06
+
+#: ,yield
+,$Z$+jets, +, -
+CR1L-4Q,4.45,0.21,-0.21
+VR1L-4Q,0.198,0.035,-0.035
+CR1L-2B2Q,0.58,0.06,-0.06
+VR1L-2B2Q,0.044,0.012,-0.012
+CR1Y-4Q,0.155,0.005,-0.005
+VR1Y-4Q,1e-06,1e-06,-1e-06
+CR1Y-2B2Q,0.0038,0.0004,-0.0004
+VR1Y-2B2Q,1e-06,1e-06,-1e-06
+
+#: ,yield
+,$\gamma$+jets, +, -
+CR1L-4Q,0.47,0.02,-0.02
+VR1L-4Q,1e-06,1e-06,-1e-06
+CR1L-2B2Q,0.57,0.06,-0.06
+VR1L-2B2Q,0.22,0.1,-0.1
+CR1Y-4Q,856.0,28.0,-28.0
+VR1Y-4Q,37.0,7.0,-7.0
+CR1Y-2B2Q,107.0,11.0,-11.0
+VR1Y-2B2Q,6.4,1.6,-1.6
+
+#: ,yield
+,$VV$, +, -
+CR1L-4Q,65.4,3.1,-3.1
+VR1L-4Q,4.1,0.8,-0.8
+CR1L-2B2Q,6.9,0.7,-0.7
+VR1L-2B2Q,0.55,0.15,-0.15
+CR1Y-4Q,0.31,0.01,-0.01
+VR1Y-4Q,1e-06,1e-06,-1e-06
+CR1Y-2B2Q,1e-06,1e-06,-1e-06
+VR1Y-2B2Q,1e-06,1e-06,-1e-06
+
+#: ,yield
+,$V\gamma$, +, -
+CR1L-4Q,0.22,0.1,-0.1
+VR1L-4Q,1e-06,1e-06,-1e-06
+CR1L-2B2Q,0.009,1,-0.001
+VR1L-2B2Q,1e-06,1e-06,-1e-06
+CR1Y-4Q,131.0,4.0,-4.0
+VR1Y-4Q,5.0,0.9,-0.9
+CR1Y-2B2Q,12.6,1.3,-1.3
+VR1Y-2B2Q,1.13,0.27,-0.27
+
+#: ,yield
+,$VVV$, +, -
+CR1L-4Q,1.3,0.6,-0.6
+VR1L-4Q,0.52,0.28,-0.28
+CR1L-2B2Q,0.14,0.08,-0.08
+VR1L-2B2Q,0.09,0.05,-0.05
+CR1Y-4Q,0.04,0.02,-0.02
+VR1Y-4Q,0.008,0.004,-0.004
+CR1Y-2B2Q,1e-06,1e-06,-1e-06
+VR1Y-2B2Q,1e-06,1e-06,-1e-06
+
+#: ,yield
+,$t\bar{t}$, +, -
+CR1L-4Q,30.4,1.5,-1.5
+VR1L-4Q,2.7,0.4,-0.4
+CR1L-2B2Q,24.0,2.5,-2.5
+VR1L-2B2Q,1.8,0.4,-0.4
+CR1Y-4Q,1.28,0.04,-0.04
+VR1Y-4Q,1e-06,1e-06,-1e-06
+CR1Y-2B2Q,0.57,0.06,-0.06
+VR1Y-2B2Q,0.28,0.18,-0.18
+
+#: ,yield
+,$t+X$, +, -
+CR1L-4Q,11.0,0.5,-0.5
+VR1L-4Q,0.91,0.21,-0.21
+CR1L-2B2Q,13.2,1.4,-1.4
+VR1L-2B2Q,1.27,0.034,-0.34
+CR1Y-4Q,0.58,0.02,-0.02
+VR1Y-4Q,1e-06,1e-06,-1e-06
+CR1Y-2B2Q,0.1,0.01,-0.01
+VR1Y-2B2Q,1e-06,1e-06,-1e-06
+
+#: ,yield
+,$t\bar{t}+X$, +, -
+CR1L-4Q,1.5,1.2,-1.2
+VR1L-4Q,0.16,0.12,-0.12
+CR1L-2B2Q,1.5,1.1,-1.1
+VR1L-2B2Q,0.4,0.4,-0.4
+CR1Y-4Q,9.0,6.0,-6.0
+VR1Y-4Q,0.6,0.5,-0.5
+CR1Y-2B2Q,7.0,5.0,-5.0
+VR1Y-2B2Q,0.8,0.6,-0.6
+
+#: ,yield
+,$Vh$, +, -
+CR1L-4Q,0.011,0.001,-0.001
+VR1L-4Q,0.0003,0.0001,-0.0001
+CR1L-2B2Q,0.69,0.07,-0.07
+VR1L-2B2Q,0.046,0.009,-0.009
+CR1Y-4Q,0.00038,1e-05,-1e-05
+VR1Y-4Q,1e-06,1e-06,-1e-06
+CR1Y-2B2Q,0.0024,0.0002,-0.0002
+VR1Y-2B2Q,1e-06,1e-06,-1e-06
+

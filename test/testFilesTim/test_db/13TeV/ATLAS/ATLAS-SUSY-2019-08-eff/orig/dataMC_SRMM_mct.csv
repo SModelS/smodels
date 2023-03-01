@@ -1,0 +1,36 @@
+#: table_doi: 10.17182/hepdata.90607.v2/t8
+#: name: dataMC_SRMM_mct
+#: description: The post-fit $m_{CT}$ distribution for SR-MM. The stacked histograms show the expected SM backgrounds. The hatched bands represent the sum in quadrature of systematic and statistical uncertainties of the total SM background. For illustration, the distribution of the SUSY reference points are also shown as dashed lines. The overflow events, where present, are included in the last bin.
+#: data_file: dataMC_SRMM_mct.yaml
+#: keyword reactions: P P --> CHARGINO1 NEUTRALINO2 X
+#: keyword observables: DN/DmCT
+#: keyword phrases: SUSY | Supersymmetry | Electroweak | Proton-Proton Scattering
+#: keyword cmenergies: 13000.0
+#: SQRT(S) [GEV],,,13000.0
+#: LUMINOSITY [fb$^{-1}$],,,139
+$m_{CT}$[GEV],$m_{CT}$[GEV] LOW,$m_{CT}$[GEV] HIGH,Data [Events/Bin],error +,error -
+205,180.0,230.0,4,3.163,-1.914
+255,230.0,280.0,7,3.77,-2.581
+305,280.0,330.0,2,2.638,-1.292
+
+#: SQRT(S) [GEV],,,13000.0
+#: LUMINOSITY [fb$^{-1}$],,,139
+$m_{CT}$[GEV],$m_{CT}$[GEV] LOW,$m_{CT}$[GEV] HIGH,Expected Bakground [Events/Bin],sys $\otimes$ stat +,sys $\otimes$ stat -
+205,180.0,230.0,4.588,1.721,-1.721
+255,230.0,280.0,2.631,1.269,-1.269
+305,280.0,330.0,1.404,0.5478,-0.5478
+
+#: SQRT(S) [GEV],,,13000.0
+#: LUMINOSITY [fb$^{-1}$],,,139
+$m_{CT}$[GEV],$m_{CT}$[GEV] LOW,$m_{CT}$[GEV] HIGH,"m($\tilde{\chi}^{\pm}_{1}/\tilde{\chi}^{0}_{2}$,$\tilde{\chi}^{0}_{1}$)=(500,0)GeV [Events/Bin]"
+205,180.0,230.0,2.576
+255,230.0,280.0,3.437
+305,280.0,330.0,5.351
+
+#: SQRT(S) [GEV],,,13000.0
+#: LUMINOSITY [fb$^{-1}$],,,139
+$m_{CT}$[GEV],$m_{CT}$[GEV] LOW,$m_{CT}$[GEV] HIGH,"m($\tilde{\chi}^{\pm}_{1}/\tilde{\chi}^{0}_{2}$,$\tilde{\chi}^{0}_{1}$)=(500,250)GeV [Events/Bin]"
+205,180.0,230.0,2.066
+255,230.0,280.0,1.367
+305,280.0,330.0,1.945
+
