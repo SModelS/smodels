@@ -750,8 +750,8 @@ class StatisticsTest(unittest.TestCase):
         database = Database(database)
         expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2018-31"])[1]
 
-        # filename = '/testFilesTim/T6bbHH_1000_600_60_1000_600_60.slha'
-        filename='/home/pascal/SModelS/smodels/test/testFilesTim/T6bbHH_1000_600_60_1000_600_60.slha'
+        filename = '/testFilesTim/T6bbHH_1000_600_60_1000_600_60.slha'
+        # filename='/home/pascal/SModelS/smodels/test/testFilesTim/T6bbHH_1000_600_60_1000_600_60.slha'
         model = Model(BSMList, SMList)
         model.updateParticles(filename)
         smstoplist = decomposer.decompose(model, sigmacut=0.)
