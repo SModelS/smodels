@@ -13,10 +13,10 @@ from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperL
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
-from spey import get_uncorrelated_region_statistical_model,get_multi_region_statistical_model,ExpectationType,AvailableBackends
-from smodels.tools.physicsUnits import fb,pb
+from spey import get_uncorrelated_region_statistical_model, get_multi_region_statistical_model, ExpectationType,AvailableBackends
+from smodels.tools.physicsUnits import fb, pb
 
-def _getBestStatModel(dataset, nsig, allow_negative_signal=False):
+def _getBestStatModel(dataset, nsig, allow_negative_signal=False, return_mu_ul_exp_min=False):
     """
     find the index of the best expected combination.
     :param dataset: the CombinedDataSet object.
@@ -24,9 +24,13 @@ def _getBestStatModel(dataset, nsig, allow_negative_signal=False):
     :param allow_negative_signal: if True, allow for the best fit to have negative parameter of interest, if False forbids it.
     :return: the minimal apriori expected poi upper limit, and the spey StatisticalModel object that produced that result.
     """
-    patches, listOfSignals = _getPatches(dataset, nsig)
+    # Get the list of the names of the signal regions used in the json files
+    listOfSRInJson=[]
+    for SRnames in dataset.globalInfo.jsonFiles.values():
+        listOfSRInJson += SRnames
 
-    muul_exp_min = np.inf
+    patches, listOfSignals = _getPatches(dataset, nsig)
+    mu_ul_exp_min = np.inf
     # Find best combination of signal regions
     for index, (patch, json) in enumerate(zip(patches,dataset.globalInfo.jsons)):
         xsec = sum(listOfSignals[index])/dataset.getLumi()
@@ -35,26 +39,27 @@ def _getBestStatModel(dataset, nsig, allow_negative_signal=False):
                                                         observed=json,
                                                         xsection=xsec.asNumber(pb)
                                                         )
-        muul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal)
-        if muul_exp == None:
+        # If all the SRs are used in the json files and there is only one json files, there is only one statModel.
+        # No need to compute mu_ul_exp if not needed.
+        if all([ds.dataInfo.dataId in listOfSRInJson for ds in dataset._datasets]) and len(dataset.globalInfo.jsons) == 1 and return_mu_ul_exp_min == False:
+            return statModel
+        mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal)
+        if mu_ul_exp == None:
             continue
-        elif muul_exp < muul_exp_min:
-            muul_exp_min = muul_exp
+        elif mu_ul_exp < mu_ul_exp_min:
+            mu_ul_exp_min = mu_ul_exp
 
     # Check if a non-combined (uncorrelated) signal region is more contraining than the best combination obtained above
-    # Get the list of the names of the signal regions used in the json files
-    listOfSRInJson=[]
-    for SRnames in dataset.globalInfo.jsonFiles.values():
-        listOfSRInJson += SRnames
     # Check if a signal region is not in the list of SR names used in the json files
-    for sig,ds in zip(nsig,dataset._datasets.dataInfo):
+    for sig,ds in zip(nsig,dataset._datasets):
+        ds = ds.dataInfo
         if ds.dataId not in listOfSRInJson:
             xsec = sig/dataset.getLumi()
             # Don't bother to compute eUL again (one could do it again if needed)
-            muul_exp = ds.expectedUpperLimit/xsec
-            if muul_exp < muull_exp_min:
+            mu_ul_exp = ds.expectedUpperLimit/xsec
+            if mu_ul_exp < muull_exp_min:
                 logger.info("Best constraining model is a single uncorrelated model.")
-                muul_exp_min = muul_exp
+                mu_ul_exp_min = mu_ul_exp
                 statModel = get_uncorrelated_region_statistical_model(observations=float(ds.observedN),
                                                                         backgrounds=float(ds.expectedBG),
                                                                         background_uncertainty=float(ds.bgError),
@@ -64,9 +69,9 @@ def _getBestStatModel(dataset, nsig, allow_negative_signal=False):
                                                                         backend=AvailableBackends(2) # simplified likelhood backend by default
                                                                         )
 
-    return statModel, muul_exp_min
+    return statModel, mu_ul_exp_min
 
-def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
+def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allowNegativeSignals=False):
     """
     Get combined upper limit. If covariances are given in globalInfo then
     simplified likelihood is used, else if json files are given pyhf
@@ -122,19 +127,16 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for pyhf backend.")
 
-        statModel, muul_exp_min = _getBestStatModel(dataset, nsig)
-
         if expected == True:
-            return muul_exp_min
+            statModel, mu_ul_exp_min = _getBestStatModel(dataset=dataset, nsig=nsig, allow_negative_signal=allowNegativeSignals, return_mu_ul_exp_min=True)
+            return mu_ul_exp_min*statModel.xsection*pb
         else:
-            mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], allow_negative_signal=False)
-            ret = mu_ul*statModel.xsection
+            statModel = _getBestStatModel(dataset=dataset, nsig=nsig, allow_negative_signal=allowNegativeSignals, return_mu_ul_exp_min=False)
+            mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], allow_negative_signal=allowNegativeSignals)
+            xsec_ul = mu_ul*statModel.xsection*pb
 
-            # ulcomputer = _getPyhfComputer(dataset, nsig)
-            # ret = ulcomputer.getUpperLimitOnSigmaTimesEff(expected=expected)
-
-            logger.debug("pyhf upper limit : {}".format(ret))
-            return ret
+            logger.debug("pyhf upper limit : {}".format(xsec_ul))
+            return xsec_ul
     else:
         logger.error(
             "no covariance matrix or json file given in globalInfo.txt for %s"
@@ -230,7 +232,7 @@ def getCombinedLikelihood(
         if marginalize == True:
             logger.error('Pyhf backend cannot marginalize likelihood.')
 
-        statModel, _ = _getBestStatModel(dataset, nsig)
+        statModel = _getBestStatModel(dataset, nsig)
 
         lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=False)
 
@@ -258,7 +260,7 @@ def getCombinedPyhfStatistics(dataset, nsig, marginalize, deltas_rel, nll=False,
         if marginalize == True:
             logger.error('Pyhf backend cannot marginalize likelihood.')
 
-        statModel, _ = _getBestStatModel(dataset, nsig, allow_negative_signal=allowNegativeSignals)
+        statModel = _getBestStatModel(dataset, nsig, allow_negative_signal=allowNegativeSignals)
 
         muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll)
         lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll)
@@ -271,8 +273,9 @@ def getCombinedPyhfStatistics(dataset, nsig, marginalize, deltas_rel, nll=False,
             logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
             lmax = lbsm
             muhat = 1.0
-        nuisance_param_at_muhat = statModel.backend.likelihood(poi_test=muhat, expected=expectedDict[expected])[1]
-        sigma_mu = statModel.backend.sigma_mu(pars=nuisance_param_at_muhat,expected=expectedDict[expected])
+
+        test_statistics = "q" if allowNegativeSignals else "qmutilde"
+        sigma_mu = statModel.backend.sigma_mu(poi_test=muhat,expected=expectedDict[expected],test_statistics=test_statistics)
 
         return {"lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat, "sigma_mu": sigma_mu}
 
@@ -499,8 +502,8 @@ def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=
         logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
         lmax = lbsm
         muhat = 1.0
-    nuisance_param_at_muhat = statModel.backend.likelihood(poi_test=muhat, expected=expectedDict[expected], marginalize=marginalize)[1]
-    sigma_mu = statModel.backend.sigma_mu(pars=nuisance_param_at_muhat,expected=expectedDict[expected])
+    test_statistics = "q" if allowNegativeSignals else "qmutilde"
+    sigma_mu = statModel.backend.sigma_mu(poi_test=muhat,expected=expectedDict[expected],test_statistics=test_statistics)
     return {"muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax, "lbsm": lbsm, "lsm": lsm }
 
 

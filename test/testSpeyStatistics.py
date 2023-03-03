@@ -15,7 +15,7 @@ import unittest
 
 # from smodels.tools import statistics
 from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
-from smodels.tools.srCombinations import getCombinedUpperLimitFor, getCombinedPyhfStatistics
+from smodels.tools.srCombinations import getCombinedUpperLimitFor, getCombinedPyhfStatistics, _getPyhfComputer # _getPyhfComputer to be removed in the end
 from smodels.tools.statistics import TruncatedGaussians
 from smodels.theory.theoryPrediction import theoryPredictionsFor, _getCombinedResultFor, _getDataSetPredictions
 from smodels.tools.statistics import determineBrentBracket
@@ -29,8 +29,8 @@ from math import floor, log10
 import numpy as np
 import math
 from spey import get_uncorrelated_region_statistical_model, get_multi_region_statistical_model, ExpectationType, AvailableBackends
-from spey.hypothesis_testing.utils import find_root_limits, compute_confidence_level
-from spey.hypothesis_testing.test_statistics import compute_teststatistics
+from spey.hypothesis_testing.utils import find_root_limits, compute_confidence_level # to be removed in the end
+from spey.hypothesis_testing.test_statistics import compute_teststatistics # to be removed in the end
 from scipy import optimize
 from pyhf import Workspace
 from pyhf.infer import hypotest
@@ -154,7 +154,8 @@ class StatisticsTest(unittest.TestCase):
         xsec_ul_SL = mu_ul_SL*xsec
         computer = LikelihoodComputer(d)
         print("mu_hat SL:",mu_hat_SL)
-        print("maximum_likelihood SL:",computer.likelihood(mu=mu_hat_SL,nll=False))
+        llhdMax_SL = computer.likelihood(mu=mu_hat_SL,nll=False)
+        print("maximum_likelihood SL:",llhdMax_SL)
         print("xsec_ul_SL:",xsec_ul_SL)
 
         # import copy
@@ -185,12 +186,50 @@ class StatisticsTest(unittest.TestCase):
                                                         delta_sys=0.2,
                                                         xsection=xsec
                                                         )
-        # statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal)
-        print(statModel.exclusion_confidence_level())
+        # mu_ul_spey = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal)
+        # print("mu_ul_spey poi upper limit", mu_ul_spey)
+        # xsec_ul_spey = mu_ul_spey*statModel.xsection
+
+        (
+            a,
+            b,
+            c,
+            d,
+        ) = statModel._prepare_for_hypotest(
+            expected=ExpectationType.observed,
+            test_statistics="qmutilde",
+        )
+
+        # (
+        #     maximum_likelihood,
+        #     logpdf,
+        #     maximum_asimov_likelihood,
+        #     logpdf_asimov,
+        # ) = statModel._prepare_for_hypotest(
+        #     expected=expected,
+        #     test_statistics=test_stat
+        # )
+        # _, sqrt_qmuA, delta_teststat = compute_teststatistics(
+        #     1.,
+        #     maximum_likelihood,
+        #     logpdf,
+        #     maximum_asimov_likelihood,
+        #     logpdf_asimov,
+        #     test_stat,
+        # )
+        # pvalues, expected_pvalues = compute_confidence_level(sqrt_qmuA, delta_teststat, test_stat)
+        # list(
+        #     map(
+        #         lambda x: 1.0 - x,
+        #         pvalues if expected == ExpectationType.observed else expected_pvalues,
+        #     )
+        # )
+
         test_stat = "q" if allow_negative_signal else "qmutilde"
-        (maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf) = statModel._prepare_for_hypotest(expected=expectedDict[expected], allow_negative_signal=allow_negative_signal, test_statistics=test_stat)
+        (maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf) = statModel._prepare_for_hypotest(expected=expectedDict[expected], test_statistics=test_stat)
         mu_hat_spey = maximum_likelihood[0]
         maximum_likelihood_spey = np.exp(-maximum_likelihood[1])
+
         #find_poi_upper_limit(maximum_likelihood=maximum_likelihood, logpdf=logpdf, maximum_asimov_likelihood=maximum_asimov_likelihood, asimov_logpdf=asimov_logpdf, expected=expectedDict[expected], confidence_level=confidence_level, allow_negative_signal=allow_negative_signal)
         def computer_CLs_spey(poi_test: float) -> float:
             """Compute 1 - CLs(POI) = `confidence_level`"""
@@ -287,7 +326,12 @@ class StatisticsTest(unittest.TestCase):
         #
         #     return sqrt_qmu, sqrt_qmuA, delta_teststat
         # sqrt_qmuA
-        self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,2)
+
+        mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=ExpectationType.observed, return_nll=False)
+
+        self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,3)
+        self.assertAlmostEqual(mu_hat_SL,mu_hat_spey,4)
+        self.assertAlmostEqual(llhdMax_SL,llhdMax_spey,4)
 
         # Find likelihood and fitted nuisances at a given mu
         #SModelS
@@ -360,7 +404,6 @@ class StatisticsTest(unittest.TestCase):
         print("mu_hat SL:",mu_hat_SL)
         print("maximum_likelihood SL:",computer.likelihood(mu=mu_hat_SL,nll=False))
         print("xsec_ul_SL:",xsec_ul_SL)
-
         # import copy
         # theta_hat0, _ = computer.findThetaHat( 0. )
         # nll0 = computer.likelihood( mu_hat_SL, marginalize=False, nll=True)
@@ -432,7 +475,18 @@ class StatisticsTest(unittest.TestCase):
         print("mu_hat spey:",mu_hat_spey)
         print("maximum_likelihood spey:",maximum_likelihood_spey)
         print("xsec_ul_spey:",xsec_ul_spey)
-
+        mu=0.
+        print(f"SL likelihood at {mu}: {computer.likelihood(mu)}")
+        print(f"Spey likelihood at {mu}: {statModel.likelihood(poi_test=mu,return_nll=False)}")
+        mu=1.
+        print(f"SL likelihood at {mu}: {computer.likelihood(mu)}")
+        print(f"Spey likelihood at {mu}: {statModel.likelihood(poi_test=mu,return_nll=False)}")
+        mu=mu_hat_SL
+        print(f"SL likelihood at {mu} (mu hat SL): {computer.likelihood(mu)}")
+        print(f"Spey likelihood at {mu} (mu hat SL): {statModel.likelihood(poi_test=mu,return_nll=False)}")
+        mu=mu_hat_spey
+        print(f"SL likelihood at {mu} (mu hat spey): {computer.likelihood(mu)}")
+        print(f"Spey likelihood at {mu} (mu hat spey): {statModel.likelihood(poi_test=mu,return_nll=False)}")
         # sqrt_qmu, sqrt_qmuA, delta_teststat = compute_teststatistics(mu=1.,maximum_likelihood=maximum_likelihood,logpdf=logpdf ,maximum_asimov_likelihood=maximum_asimov_likelihood,asimov_logpdf=asimov_logpdf,teststat="qmutilde")
         # def _tmu_tilde(mu, muhat, min_logpdf, logpdf):
         #     return -2 * (logpdf(mu) - (min_logpdf if muhat >= 0.0 else logpdf(0.0)))
@@ -509,22 +563,22 @@ class StatisticsTest(unittest.TestCase):
         # llhdAtThetaHat_SL = computer.llhdOfTheta( np.array(theta_hat_spey), nll=False )
         # print(f"SL from SModelS with spey theta hat: likelihood = {llhdAtThetaHat_SL}, profiled at theta hat = {theta_hat_spey} for mu = {mu_test}")
 
-    def testUpperLimitOnSigmaTimesEff_pyhf_1(self):
+    def testUpperLimitOnSigmaTimesEff_pyhf_1(self): ### Total yield in pyhfInterface is the sum of the relative yields, so it equals 1, but it should be the sum of absolute yields, no? -> bug in pyhfInterface?
+                                                    ### Why does it work with allowNegativeSignals=True while muhat is positive? (should I keep the test like that or should I set it to False? -> How can I do that?)
         """
         Test the cross-section upper limit computation with simplified likelhood backend from SModelS and Spey packages.
         """
-        database='official'
+        database='./testFilesTim/test_db/'
         # Set the path to the database
         database = Database(database)
-        expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2018-31"])[1]
+        expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2019-08"])[0]
 
-        filename = '/testFilesTim/T6bbHH_1000_600_60_1000_600_60.slha'
-        filename = '/home/pascal/SModelS/smodels-utils/slha/T6bbHH_1000_600_60_1000_600_60.slha'
+        filename = './testFilesTim/TChiWH_400_100_400_100.slha'
         model = Model(BSMList, SMList)
         model.updateParticles(filename)
         smstoplist = decomposer.decompose(model, sigmacut=0.)
         expected = False
-        allow_negative_signal = False
+        allow_negative_signal = True
 
         # pyhf from SModelS
         dataSetResults = []
@@ -538,6 +592,25 @@ class StatisticsTest(unittest.TestCase):
 
         srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value * pred.dataset.getLumi()).asNumber(),] for pred in combinedRes.datasetPredictions])
         nsig = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0 for ds in dataset.origdatasets]
+
+        # ulcomputer = _getPyhfComputer(dataset, nsig)
+        #
+        # ret = ulcomputer.getUpperLimitOnMu(expected=expected)
+        # ret
+        # real_mu_ul_pyhf = ret/sum(nsig)
+        # real_mu_ul_pyhf
+        # combinedRes.xsection.value
+        # xsec_ul_pyhf = ret*combinedRes.xsection.value
+        # xsec_ul_pyhf
+        # real_xsec_ul_pyhf = xsec_ul_pyhf/sum(nsig)
+        # real_xsec_ul_pyhf
+        # ulcomputer.data.totalYield()/ulcomputer.lumi
+        # totsig=0
+        # for sig in ulcomputer.nsignals[0]:
+        #     totsig += sig
+        # totsig
+        # totsig/ulcomputer.lumi
+        # sum(nsig)/ulcomputer.lumi
 
         nsignals = list()
         datasets = [ds.getID() for ds in dataset.origdatasets]
@@ -580,7 +653,7 @@ class StatisticsTest(unittest.TestCase):
                 channelsInfo.append(wsChannelsInfo)
             return channelsInfo
 
-        def patchMaker(jsons, nsignals):
+        def patchMaker(jsons, nsignals, includeCRs):
             """
             Method that creates the list of patches to be applied to the `self.inputJsons` workspaces, one for each region given the `self.nsignals` and the informations available in `self.channelsInfo` and the content of the `self.inputJsons`
             NB: It seems we need to include the change of the "modifiers" in the patches as well
@@ -607,15 +680,20 @@ class StatisticsTest(unittest.TestCase):
                     operator["value"] = value
                     patch.append(operator)
 
-                    # for path in info["otherRegions"]:
-                    #     patch.append({"op": "remove", "path": path})
+                if not includeCRs:
+                    for path in info["otherRegions"]:
+                        patch.append({"op": "remove", "path": path})
                 patches.append(patch)
             return patches
 
-        patches = patchMaker(dataset.globalInfo.jsons, nsignals)
+        includeCRs = False
+        if hasattr(dataset.globalInfo, "includeCRs"):
+            includeCRs = dataset.globalInfo.includeCRs
+
+        patches = patchMaker(dataset.globalInfo.jsons, nsignals, includeCRs)
 
         def CLs_root_pyhf(mu, data, model, args):
-            return 0.95 - float(hypotest(mu, data, model, **args))
+            return 0.05 - float(hypotest(mu, data, model, **args))
 
         res_pyhf = {}
         for jsName, json, patch in zip(dataset.globalInfo.jsonFiles, dataset.globalInfo.jsons, patches):
@@ -644,24 +722,212 @@ class StatisticsTest(unittest.TestCase):
                     low *= 1/2.
                 else:
                     print(f'CLs_low > 0 and CLs_high < 0: CLs_root_pyhf({low}) = {CLs_root_pyhf(low, data, model, args)}; CLs_root_pyhf({high})={CLs_root_pyhf(high, data, model, args)} for {jsName}')
-                bounds[model.config.poi_index] = (0., high)
+                bounds[model.config.poi_index] = (0., high+0.1)
                 args["par_bounds"] = bounds
-            print(f'CLs_root_pyhf({low}) = {CLs_root_pyhf(low, data, model, args)}; CLs_root_pyhf({high})={CLs_root_pyhf(high, data, model, args)} for {jsName}')
             mu_ul = optimize.brentq(lambda mu: CLs_root_pyhf(mu, data, model, args), low, high, rtol=1e-3, xtol=1e-3)
             mu_hat, minNllh = fit(data, model, return_fitted_val=True, par_bounds = bounds)
             xsec = combinedRes.xsection.value
-            res_pyhf[jsName] = {"xsec_ul":mu_ul*xsec, "mu_hat":mu_hat, "llhdMax":np.exp(-minNllh/2.)}
+            res_pyhf[jsName] = {"mu_ul":mu_ul,"xsec_ul":mu_ul*xsec, "mu_hat":mu_hat[model.config.poi_index], "llhdMax":np.exp(-minNllh/2.)}
 
 
         # Computation of statistical quantities with Spey
-        xsec_ul_spey = getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=combinedRes.deltas_rel)
-        res = getCombinedPyhfStatistics(dataset=dataset, nsig=nsig, marginalize=False, deltas_rel=combinedRes.deltas_rel, nll=False, expected=False, allowNegativeSignals=False)
+        xsec_ul_spey = getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=combinedRes.deltas_rel, allowNegativeSignals=allow_negative_signal)
+        res = getCombinedPyhfStatistics(dataset=dataset, nsig=nsig, marginalize=False, deltas_rel=combinedRes.deltas_rel, nll=False, expected=False, allowNegativeSignals=allow_negative_signal)
         mu_hat_spey = res["muhat"]
         llhdMax_spey = res["lmax"]
 
-        self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,2)
+        self.assertAlmostEqual(res_pyhf['BkgOnly.json']['xsec_ul']._value,xsec_ul_spey._value,3)
+        self.assertAlmostEqual(res_pyhf['BkgOnly.json']['mu_hat'],mu_hat_spey,4)
+        self.assertAlmostEqual(res_pyhf['BkgOnly.json']['llhdMax'],llhdMax_spey,4)
+
+    def testUpperLimitOnSigmaTimesEff_pyhf_2(self): ### Only 1 xsec for tha whole analysis, even though there are 3 json files?
+                                                    ### Need to set allow_negative_signal = True to pass the test?
+        """
+        Test the cross-section upper limit computation with simplified likelhood backend from SModelS and Spey packages.
+        """
+        database='official'
+        # Set the path to the database
+        database = Database(database)
+        expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2018-31"])[1]
+
+        # filename = '/testFilesTim/T6bbHH_1000_600_60_1000_600_60.slha'
+        filename='/home/pascal/SModelS/smodels/test/testFilesTim/T6bbHH_1000_600_60_1000_600_60.slha'
+        model = Model(BSMList, SMList)
+        model.updateParticles(filename)
+        smstoplist = decomposer.decompose(model, sigmacut=0.)
+        expected = False
+        allow_negative_signal = True
+
+        # pyhf from SModelS
+        dataSetResults = []
+        # Compute predictions for each data set (for UL analyses there is one single set)
+        for dataset in expRes.datasets:
+            predList = _getDataSetPredictions(dataset, smstoplist, maxMassDist=0.2)
+            if predList:
+                dataSetResults.append(predList)
+        combinedRes = _getCombinedResultFor(dataSetResults, expRes, marginalize=False)
+        dataset = combinedRes.dataset
+
+        srNsigDict = dict([[pred.dataset.getID(),(pred.xsection.value * pred.dataset.getLumi()).asNumber(),] for pred in combinedRes.datasetPredictions])
+        nsig = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0 for ds in dataset.origdatasets]
+
+        ulcomputer = _getPyhfComputer(dataset, nsig)
+
+        ret = ulcomputer.getUpperLimitOnMu(expected=expected)
+        ret
+        real_mu_ul_pyhf = ret/sum(nsig)
+        real_mu_ul_pyhf
+        combinedRes.xsection.value
+        xsec_ul_pyhf = ret*combinedRes.xsection.value
+        xsec_ul_pyhf
+        real_xsec_ul_pyhf = xsec_ul_pyhf/sum(nsig)
+        real_xsec_ul_pyhf
+        ulcomputer.data.totalYield()/ulcomputer.lumi
+        totsig=0
+        for sig in ulcomputer.nsignals[0]:
+            totsig += sig
+        totsig
+        totsig/ulcomputer.lumi
+        sum(nsig)/ulcomputer.lumi
+
+        nsignals = list()
+        datasets = [ds.getID() for ds in dataset.origdatasets]
+        for jsName in dataset.globalInfo.jsonFiles:
+            subSig = list()
+            for srName in dataset.globalInfo.jsonFiles[jsName]:
+                sig = nsig[datasets.index(srName)]
+                subSig.append(sig)
+            nsignals.append(subSig)
+        nsignals
+
+        def getWSInfo(jsons):
+            """
+            Getting informations from the json files
+
+            :ivar channelsInfo: list of dictionaries (one dictionary for each json file) containing useful information about the json files
+                - :key signalRegions: list of dictonaries with 'json path' and 'size' (number of bins) of the 'signal regions' channels in the json files
+                - :key otherRegions: list of strings indicating the path to the control and validation region channels
+            """
+            # Identifying the path to the SR and VR channels in the main workspace files
+            channelsInfo = []  # workspace specifications
+            for ws in dataset.globalInfo.jsons:
+                wsChannelsInfo = {}
+                wsChannelsInfo["signalRegions"] = []
+                wsChannelsInfo["otherRegions"] = []
+                for i_ch, ch in enumerate(ws["channels"]):
+                    if ch["name"][:2] == "SR":  # if channel name starts with 'SR'
+                        wsChannelsInfo["signalRegions"].append(
+                            {
+                                "path": "/channels/"
+                                + str(i_ch)
+                                + "/samples/0",  # Path of the new sample to add (signal prediction)
+                                "size": len(ch["samples"][0]["data"]),
+                            }
+                        )  # Number of bins
+                    else:
+                        wsChannelsInfo["otherRegions"].append("/channels/" + str(i_ch))
+                wsChannelsInfo["otherRegions"].sort(
+                    key=lambda path: path.split("/")[-1], reverse=True
+                )  # Need to sort correctly the paths to the channels to be removed
+                channelsInfo.append(wsChannelsInfo)
+            return channelsInfo
+
+        def patchMaker(jsons, nsignals, includeCRs):
+            """
+            Method that creates the list of patches to be applied to the `self.inputJsons` workspaces, one for each region given the `self.nsignals` and the informations available in `self.channelsInfo` and the content of the `self.inputJsons`
+            NB: It seems we need to include the change of the "modifiers" in the patches as well
+
+            :return: the list of patches, one for each workspace
+            """
+            # Constructing the patches to be applied on the main workspace files
+            patches = []
+            channelsInfo = getWSInfo(jsons)
+            for ws, info, subSig in zip(jsons, channelsInfo, nsignals):
+                patch = []
+                for srInfo in info["signalRegions"]:
+                    nBins = srInfo["size"]
+                    operator = {}
+                    operator["op"] = "add"
+                    operator["path"] = srInfo["path"]
+                    value = {}
+                    value["data"] = subSig[:nBins]
+                    subSig = subSig[nBins:]
+                    value["modifiers"] = []
+                    value["modifiers"].append({"data": None, "type": "normfactor", "name": "mu_SIG"})
+                    value["modifiers"].append({"data": None, "type": "lumi", "name": "lumi"})
+                    value["name"] = "bsm"
+                    operator["value"] = value
+                    patch.append(operator)
+
+                if not includeCRs:
+                    for path in info["otherRegions"]:
+                        patch.append({"op": "remove", "path": path})
+                patches.append(patch)
+            return patches
+
+        includeCRs = False
+        if hasattr(dataset.globalInfo, "includeCRs"):
+            includeCRs = dataset.globalInfo.includeCRs
+
+        patches = patchMaker(dataset.globalInfo.jsons, nsignals, includeCRs)
+
+        def CLs_root_pyhf(mu, data, model, args):
+            return 0.05 - float(hypotest(mu, data, model, **args))
+
+        res_pyhf = {}
+        for jsName, json, patch in zip(dataset.globalInfo.jsonFiles, dataset.globalInfo.jsons, patches):
+            wsDict = apply_patch(json, patch)
+            ws = Workspace(wsDict)
+            msettings = {
+                "normsys": {"interpcode": "code4"},
+                "histosys": {"interpcode": "code4p"},
+            }
+            model = ws.model(modifier_settings=msettings)
+            data = ws.data(model)
+
+            low = 0.1
+            high = 1.
+            bounds = model.config.suggested_bounds()
+            args = {}
+            args["par_bounds"] = bounds
+            while True:
+                # print("low",low)
+                # print("high",high)
+                # print("bounds",bounds[model.config.poi_index])
+                CLs_low = CLs_root_pyhf(low, data, model, args)
+                CLs_high = CLs_root_pyhf(high, data, model, args)
+                if CLs_low < 0 and CLs_high > 0:
+                    break
+                elif CLs_low < 0 and CLs_high < 0:
+                    high *= 2.
+                elif CLs_low > 0 and CLs_high > 0:
+                    low *= 1/2.
+                else:
+                    print(f'CLs_low > 0 and CLs_high < 0: CLs_root_pyhf({low}) = {CLs_root_pyhf(low, data, model, args)}; CLs_root_pyhf({high})={CLs_root_pyhf(high, data, model, args)} for {jsName}')
+                bounds[model.config.poi_index] = (0., high+0.1)
+                args["par_bounds"] = bounds
+            # print(f'CLs_root_pyhf({low}) = {CLs_root_pyhf(low, data, model, args)}; CLs_root_pyhf({high})={CLs_root_pyhf(high, data, model, args)} for {jsName}')
+            mu_ul = optimize.brentq(lambda mu: CLs_root_pyhf(mu, data, model, args), low, high, rtol=1e-3, xtol=1e-3)
+            mu_hat, minNllh = fit(data, model, return_fitted_val=True, par_bounds = bounds)
+            xsec = combinedRes.xsection.value
+            res_pyhf[jsName] = {"mu_ul":mu_ul,"xsec_ul":mu_ul*xsec, "mu_hat":mu_hat[model.config.poi_index], "llhdMax":np.exp(-minNllh/2.)}
+        res_pyhf
 
 
+        # Computation of statistical quantities with Spey
+        xsec_ul_spey = getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=combinedRes.deltas_rel, allowNegativeSignals=allow_negative_signal)
+        # xsec_ul_spey
+        # mu_ul_spey = xsec_ul_spey*dataset.getLumi()/sum(nsig)
+        # mu_ul_spey
+        res = getCombinedPyhfStatistics(dataset=dataset, nsig=nsig, marginalize=False, deltas_rel=combinedRes.deltas_rel, nll=False, expected=False, allowNegativeSignals=allow_negative_signal)
+        mu_hat_spey = res["muhat"]
+        llhdMax_spey = res["lmax"]
+        # mu_hat_spey
+        # llhdMax_spey
+
+        self.assertAlmostEqual(res_pyhf['BkgOnly.json']['xsec_ul']._value,xsec_ul_spey._value,2)
+        self.assertAlmostEqual(res_pyhf['BkgOnly.json']['mu_hat'],mu_hat_spey,2)
+        self.assertAlmostEqual(res_pyhf['BkgOnly.json']['llhdMax'],llhdMax_spey,2)
 
 
     def testUnderfluctuatingLlhdsFromLimits(self):
