@@ -275,7 +275,7 @@ def getCombinedPyhfStatistics(dataset, nsig, marginalize, deltas_rel, nll=False,
             muhat = 1.0
 
         test_statistics = "q" if allowNegativeSignals else "qmutilde"
-        sigma_mu = statModel.backend.sigma_mu(poi_test=muhat,expected=expectedDict[expected],test_statistics=test_statistics)
+        sigma_mu = statModel.sigma_mu(poi_test=muhat,expected=expectedDict[expected],test_statistics=test_statistics)
 
         return {"lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat, "sigma_mu": sigma_mu}
 
@@ -503,7 +503,7 @@ def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=
         lmax = lbsm
         muhat = 1.0
     test_statistics = "q" if allowNegativeSignals else "qmutilde"
-    sigma_mu = statModel.backend.sigma_mu(poi_test=muhat,expected=expectedDict[expected],test_statistics=test_statistics)
+    sigma_mu = statModel.sigma_mu(poi_test=muhat,expected=expectedDict[expected],test_statistics=test_statistics)
     return {"muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax, "lbsm": lbsm, "lsm": lsm }
 
 

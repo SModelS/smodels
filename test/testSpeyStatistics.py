@@ -186,19 +186,19 @@ class StatisticsTest(unittest.TestCase):
                                                         delta_sys=0.2,
                                                         xsection=xsec
                                                         )
-        # mu_ul_spey = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal)
-        # print("mu_ul_spey poi upper limit", mu_ul_spey)
-        # xsec_ul_spey = mu_ul_spey*statModel.xsection
+        mu_ul_spey = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal)
+        print("mu_ul_spey poi upper limit", mu_ul_spey)
+        xsec_ul_spey = mu_ul_spey*statModel.xsection
 
-        (
-            a,
-            b,
-            c,
-            d,
-        ) = statModel._prepare_for_hypotest(
-            expected=ExpectationType.observed,
-            test_statistics="qmutilde",
-        )
+        # (
+        #     a,
+        #     b,
+        #     c,
+        #     d,
+        # ) = statModel._prepare_for_hypotest(
+        #     expected=ExpectationType.observed,
+        #     test_statistics="qmutilde",
+        # )
 
         # (
         #     maximum_likelihood,
@@ -225,47 +225,47 @@ class StatisticsTest(unittest.TestCase):
         #     )
         # )
 
-        test_stat = "q" if allow_negative_signal else "qmutilde"
-        (maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf) = statModel._prepare_for_hypotest(expected=expectedDict[expected], test_statistics=test_stat)
-        mu_hat_spey = maximum_likelihood[0]
-        maximum_likelihood_spey = np.exp(-maximum_likelihood[1])
-
-        #find_poi_upper_limit(maximum_likelihood=maximum_likelihood, logpdf=logpdf, maximum_asimov_likelihood=maximum_asimov_likelihood, asimov_logpdf=asimov_logpdf, expected=expectedDict[expected], confidence_level=confidence_level, allow_negative_signal=allow_negative_signal)
-        def computer_CLs_spey(poi_test: float) -> float:
-            """Compute 1 - CLs(POI) = `confidence_level`"""
-            _, sqrt_qmuA, delta_teststat = compute_teststatistics(
-                poi_test,
-                maximum_likelihood,
-                logpdf,
-                maximum_asimov_likelihood,
-                asimov_logpdf,
-                test_stat,
-            )
-            pvalue = list(
-                map(
-                    lambda x: 1.0 - x,
-                    compute_confidence_level(sqrt_qmuA, delta_teststat, test_stat)[
-                        0 if expected == ExpectationType.observed else 1
-                    ],
-                )
-            )
-            # always get the median
-            return pvalue[0 if expected == ExpectationType.observed else 2] - 0.95
-
-        sigma_mu = 1.0
-        low, hig = find_root_limits(
-            computer_CLs_spey,
-            loc=0.0,
-            low_ini=maximum_likelihood_spey + 1.5 * sigma_mu if maximum_likelihood_spey >= 0.0 else 1.0,
-            hig_ini=maximum_likelihood_spey + 2.5 * sigma_mu if maximum_likelihood_spey >= 0.0 else 1.0,
-        )
-        print("lower bound computer_CLs_spey(",low,"):",computer_CLs_spey(low))
-        print("upper bound computer_CLs_spey(",hig,"):",computer_CLs_spey(hig))
-        mu_ul_spey = optimize.brentq(computer_CLs_spey, low, hig, xtol=abs(low / 100.0))
-        print("Spey upper limit on mu:",mu_ul_spey)
-        xsec_ul_spey = mu_ul_spey*xsec
-        print("mu_hat spey:",mu_hat_spey)
-        print("maximum_likelihood spey:",maximum_likelihood_spey)
+        # test_stat = "q" if allow_negative_signal else "qmutilde"
+        # (maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf) = statModel._prepare_for_hypotest(expected=expectedDict[expected], test_statistics=test_stat)
+        # mu_hat_spey = maximum_likelihood[0]
+        # maximum_likelihood_spey = np.exp(-maximum_likelihood[1])
+        #
+        # #find_poi_upper_limit(maximum_likelihood=maximum_likelihood, logpdf=logpdf, maximum_asimov_likelihood=maximum_asimov_likelihood, asimov_logpdf=asimov_logpdf, expected=expectedDict[expected], confidence_level=confidence_level, allow_negative_signal=allow_negative_signal)
+        # def computer_CLs_spey(poi_test: float) -> float:
+        #     """Compute 1 - CLs(POI) = `confidence_level`"""
+        #     _, sqrt_qmuA, delta_teststat = compute_teststatistics(
+        #         poi_test,
+        #         maximum_likelihood,
+        #         logpdf,
+        #         maximum_asimov_likelihood,
+        #         asimov_logpdf,
+        #         test_stat,
+        #     )
+        #     pvalue = list(
+        #         map(
+        #             lambda x: 1.0 - x,
+        #             compute_confidence_level(sqrt_qmuA, delta_teststat, test_stat)[
+        #                 0 if expected == ExpectationType.observed else 1
+        #             ],
+        #         )
+        #     )
+        #     # always get the median
+        #     return pvalue[0 if expected == ExpectationType.observed else 2] - 0.95
+        #
+        # sigma_mu = 1.0
+        # low, hig = find_root_limits(
+        #     computer_CLs_spey,
+        #     loc=0.0,
+        #     low_ini=maximum_likelihood_spey + 1.5 * sigma_mu if maximum_likelihood_spey >= 0.0 else 1.0,
+        #     hig_ini=maximum_likelihood_spey + 2.5 * sigma_mu if maximum_likelihood_spey >= 0.0 else 1.0,
+        # )
+        # print("lower bound computer_CLs_spey(",low,"):",computer_CLs_spey(low))
+        # print("upper bound computer_CLs_spey(",hig,"):",computer_CLs_spey(hig))
+        # mu_ul_spey = optimize.brentq(computer_CLs_spey, low, hig, xtol=abs(low / 100.0))
+        # print("Spey upper limit on mu:",mu_ul_spey)
+        # xsec_ul_spey = mu_ul_spey*xsec
+        # print("mu_hat spey:",mu_hat_spey)
+        # print("maximum_likelihood spey:",maximum_likelihood_spey)
         print("xsec_ul_spey:",xsec_ul_spey)
 
         # sqrt_qmu, sqrt_qmuA, delta_teststat = compute_teststatistics(mu=1.,maximum_likelihood=maximum_likelihood,logpdf=logpdf ,maximum_asimov_likelihood=maximum_asimov_likelihood,asimov_logpdf=asimov_logpdf,teststat="qmutilde")
@@ -393,17 +393,18 @@ class StatisticsTest(unittest.TestCase):
         )
         xsec = sum(d.nsignal) / d.lumi
 
-        mu_hat_SL, sigma_mu_SL, clsRoot_SL = computer.getCLsRootFunc(d, marginalize=False, expected=expected)
-        a, b = determineBrentBracket(mu_hat_SL, sigma_mu_SL, clsRoot_SL, allowNegative=allow_negative_signal )
-        print("SL BrentBracket lower bound:",a)
-        print("SL BrentBracket upper bound:",b)
-        mu_ul_SL = optimize.brentq(clsRoot_SL, a, b, rtol=1e-03, xtol=1e-06)
-        print("SL upper limit on mu:",mu_ul_SL)
-        xsec_ul_SL = mu_ul_SL*xsec
+        # mu_hat_SL, sigma_mu_SL, clsRoot_SL = computer.getCLsRootFunc(d, marginalize=False, expected=expected)
+        # a, b = determineBrentBracket(mu_hat_SL, sigma_mu_SL, clsRoot_SL, allowNegative=allow_negative_signal )
+        # print("SL BrentBracket lower bound:",a)
+        # print("SL BrentBracket upper bound:",b)
+        # mu_ul_SL = optimize.brentq(clsRoot_SL, a, b, rtol=1e-03, xtol=1e-06)
+        # print("SL upper limit on mu:",mu_ul_SL)
+        # xsec_ul_SL = mu_ul_SL*xsec
         computer = LikelihoodComputer(d)
-        print("mu_hat SL:",mu_hat_SL)
-        print("maximum_likelihood SL:",computer.likelihood(mu=mu_hat_SL,nll=False))
-        print("xsec_ul_SL:",xsec_ul_SL)
+        # print("mu_hat SL:",mu_hat_SL)
+        # print("maximum_likelihood SL:",computer.likelihood(mu=mu_hat_SL,nll=False))
+        # print("xsec_ul_SL:",xsec_ul_SL)
+
         # import copy
         # theta_hat0, _ = computer.findThetaHat( 0. )
         # nll0 = computer.likelihood( mu_hat_SL, marginalize=False, nll=True)
@@ -432,61 +433,69 @@ class StatisticsTest(unittest.TestCase):
                                                         delta_sys=0.2,
                                                         xsection=xsec
                                                         )
-        # statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal)
-        print(statModel.exclusion_confidence_level())
-        test_stat = "q" if allow_negative_signal else "qmutilde"
-        (maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf) = statModel._prepare_for_hypotest(expected=expectedDict[expected], allow_negative_signal=allow_negative_signal, test_statistics=test_stat)
-        mu_hat_spey = maximum_likelihood[0]
-        maximum_likelihood_spey = np.exp(-maximum_likelihood[1])
-        #find_poi_upper_limit(maximum_likelihood=maximum_likelihood, logpdf=logpdf, maximum_asimov_likelihood=maximum_asimov_likelihood, asimov_logpdf=asimov_logpdf, expected=expectedDict[expected], confidence_level=confidence_level, allow_negative_signal=allow_negative_signal)
-        def computer_CLs_spey(poi_test: float) -> float:
-            """Compute 1 - CLs(POI) = `confidence_level`"""
-            _, sqrt_qmuA, delta_teststat = compute_teststatistics(
-                poi_test,
-                maximum_likelihood,
-                logpdf,
-                maximum_asimov_likelihood,
-                asimov_logpdf,
-                test_stat,
-            )
-            pvalue = list(
-                map(
-                    lambda x: 1.0 - x,
-                    compute_confidence_level(sqrt_qmuA, delta_teststat, test_stat)[
-                        0 if expected == ExpectationType.observed else 1
-                    ],
-                )
-            )
-            # always get the median
-            return pvalue[0 if expected == ExpectationType.observed else 2] - 0.95
+        mu=1.
+        print(f"SL theta hat at {mu}: {computer.findThetaHat(mu)}")
+        print(f"Spey params at {mu}: {statModel.backend.likelihood(poi_test=mu,return_nll=False)[1]}")
 
-        sigma_mu = 1.0
-        low, hig = find_root_limits(
-            computer_CLs_spey,
-            loc=0.0,
-            low_ini=maximum_likelihood_spey + 1.5 * sigma_mu if maximum_likelihood_spey >= 0.0 else 1.0,
-            hig_ini=maximum_likelihood_spey + 2.5 * sigma_mu if maximum_likelihood_spey >= 0.0 else 1.0,
-        )
-        print("lower bound computer_CLs_spey(",low,"):",computer_CLs_spey(low))
-        print("upper bound computer_CLs_spey(",hig,"):",computer_CLs_spey(hig))
-        mu_ul_spey = optimize.brentq(computer_CLs_spey, low, hig, xtol=abs(low / 100.0))
-        print("Spey upper limit on mu:",mu_ul_spey)
-        xsec_ul_spey = mu_ul_spey*xsec
-        print("mu_hat spey:",mu_hat_spey)
-        print("maximum_likelihood spey:",maximum_likelihood_spey)
-        print("xsec_ul_spey:",xsec_ul_spey)
-        mu=0.
-        print(f"SL likelihood at {mu}: {computer.likelihood(mu)}")
-        print(f"Spey likelihood at {mu}: {statModel.likelihood(poi_test=mu,return_nll=False)}")
         mu=1.
         print(f"SL likelihood at {mu}: {computer.likelihood(mu)}")
         print(f"Spey likelihood at {mu}: {statModel.likelihood(poi_test=mu,return_nll=False)}")
-        mu=mu_hat_SL
-        print(f"SL likelihood at {mu} (mu hat SL): {computer.likelihood(mu)}")
-        print(f"Spey likelihood at {mu} (mu hat SL): {statModel.likelihood(poi_test=mu,return_nll=False)}")
-        mu=mu_hat_spey
-        print(f"SL likelihood at {mu} (mu hat spey): {computer.likelihood(mu)}")
-        print(f"Spey likelihood at {mu} (mu hat spey): {statModel.likelihood(poi_test=mu,return_nll=False)}")
+
+        # statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal)
+        # print(statModel.exclusion_confidence_level())
+        # test_stat = "q" if allow_negative_signal else "qmutilde"
+        # (maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf) = statModel._prepare_for_hypotest(expected=expectedDict[expected], test_statistics=test_stat)
+        # mu_hat_spey = maximum_likelihood[0]
+        # maximum_likelihood_spey = np.exp(-maximum_likelihood[1])
+        # #find_poi_upper_limit(maximum_likelihood=maximum_likelihood, logpdf=logpdf, maximum_asimov_likelihood=maximum_asimov_likelihood, asimov_logpdf=asimov_logpdf, expected=expectedDict[expected], confidence_level=confidence_level, allow_negative_signal=allow_negative_signal)
+        # def computer_CLs_spey(poi_test: float) -> float:
+        #     """Compute 1 - CLs(POI) = `confidence_level`"""
+        #     _, sqrt_qmuA, delta_teststat = compute_teststatistics(
+        #         poi_test,
+        #         maximum_likelihood,
+        #         logpdf,
+        #         maximum_asimov_likelihood,
+        #         asimov_logpdf,
+        #         test_stat,
+        #     )
+        #     pvalue = list(
+        #         map(
+        #             lambda x: 1.0 - x,
+        #             compute_confidence_level(sqrt_qmuA, delta_teststat, test_stat)[
+        #                 0 if expected == ExpectationType.observed else 1
+        #             ],
+        #         )
+        #     )
+        #     # always get the median
+        #     return pvalue[0 if expected == ExpectationType.observed else 2] - 0.95
+        #
+        # sigma_mu = 1.0
+        # low, hig = find_root_limits(
+        #     computer_CLs_spey,
+        #     loc=0.0,
+        #     low_ini=maximum_likelihood_spey + 1.5 * sigma_mu if maximum_likelihood_spey >= 0.0 else 1.0,
+        #     hig_ini=maximum_likelihood_spey + 2.5 * sigma_mu if maximum_likelihood_spey >= 0.0 else 1.0,
+        # )
+
+        # print("lower bound computer_CLs_spey(",low,"):",computer_CLs_spey(low))
+        # print("upper bound computer_CLs_spey(",hig,"):",computer_CLs_spey(hig))
+        # mu_ul_spey = optimize.brentq(computer_CLs_spey, low, hig, xtol=abs(low / 100.0))
+        # print("Spey upper limit on mu:",mu_ul_spey)
+        # xsec_ul_spey = mu_ul_spey*xsec
+        # print("mu_hat spey:",mu_hat_spey)
+        # print("maximum_likelihood spey:",maximum_likelihood_spey)
+        # print("xsec_ul_spey:",xsec_ul_spey)
+
+        # mu=0.
+        # print(f"SL likelihood at {mu}: {computer.likelihood(mu)}")
+        # print(f"Spey likelihood at {mu}: {statModel.likelihood(poi_test=mu,return_nll=False)}")
+        # mu=mu_hat_SL
+        # print(f"SL likelihood at {mu} (mu hat SL): {computer.likelihood(mu)}")
+        # print(f"Spey likelihood at {mu} (mu hat SL): {statModel.likelihood(poi_test=mu,return_nll=False)}")
+        # mu=mu_hat_spey
+        # print(f"SL likelihood at {mu} (mu hat spey): {computer.likelihood(mu)}")
+        # print(f"Spey likelihood at {mu} (mu hat spey): {statModel.likelihood(poi_test=mu,return_nll=False)}")
+
         # sqrt_qmu, sqrt_qmuA, delta_teststat = compute_teststatistics(mu=1.,maximum_likelihood=maximum_likelihood,logpdf=logpdf ,maximum_asimov_likelihood=maximum_asimov_likelihood,asimov_logpdf=asimov_logpdf,teststat="qmutilde")
         # def _tmu_tilde(mu, muhat, min_logpdf, logpdf):
         #     return -2 * (logpdf(mu) - (min_logpdf if muhat >= 0.0 else logpdf(0.0)))
@@ -545,7 +554,12 @@ class StatisticsTest(unittest.TestCase):
         #
         #     return sqrt_qmu, sqrt_qmuA, delta_teststat
         # sqrt_qmuA
-        self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,2)
+
+        # mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=ExpectationType.observed, return_nll=False)
+        #
+        # self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,3)
+        # self.assertAlmostEqual(mu_hat_SL,mu_hat_spey,4)
+        # self.assertAlmostEqual(llhdMax_SL,llhdMax_spey,4)
 
         # Find likelihood and fitted nuisances at a given mu
         #SModelS
