@@ -80,7 +80,10 @@ def _getBestStatModel(dataset, nsig, allow_negative_signal=False, return_mu_ul_e
     if mu_ul_exp_min == np.inf:
         logger.error(f'No minimal upper limit on POI found for {dataset.globalInfo.id}')
         return None
-    return bestStatModel, mu_ul_exp_min
+    if return_mu_ul_exp_min:
+        return bestStatModel, mu_ul_exp_min
+    else:
+        return bestStatModel
 
 def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allowNegativeSignals=False):
     """
@@ -142,7 +145,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
             statModel, mu_ul_exp_min = _getBestStatModel(dataset=dataset, nsig=nsig, allow_negative_signal=allowNegativeSignals, return_mu_ul_exp_min=True)
             return mu_ul_exp_min*statModel.xsection
         else:
-            statModel, _ = _getBestStatModel(dataset=dataset, nsig=nsig, allow_negative_signal=allowNegativeSignals, return_mu_ul_exp_min=False)
+            statModel = _getBestStatModel(dataset=dataset, nsig=nsig, allow_negative_signal=allowNegativeSignals, return_mu_ul_exp_min=False)
             mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], allow_negative_signal=allowNegativeSignals)
             xsec_ul = mu_ul*statModel.xsection
 
@@ -243,7 +246,7 @@ def getCombinedLikelihood(
         if marginalize == True:
             logger.error('Pyhf backend cannot marginalize likelihood.')
 
-        statModel, _ = _getBestStatModel(dataset, nsig)
+        statModel = _getBestStatModel(dataset, nsig)
 
         lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=False)
 
@@ -271,7 +274,7 @@ def getCombinedPyhfStatistics(dataset, nsig, marginalize, deltas_rel, nll=False,
         if marginalize == True:
             logger.error('Pyhf backend cannot marginalize likelihood.')
 
-        statModel, _ = _getBestStatModel(dataset, nsig, allow_negative_signal=allowNegativeSignals)
+        statModel = _getBestStatModel(dataset, nsig, allow_negative_signal=allowNegativeSignals)
 
         muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll)
         lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll)
