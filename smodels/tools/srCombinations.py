@@ -33,11 +33,19 @@ def _getBestStatModel(dataset, nsig, allow_negative_signal=False, return_mu_ul_e
     mu_ul_exp_min = np.inf
     # Find best combination of signal regions
     for index, (patch, json) in enumerate(zip(patches,dataset.globalInfo.jsons)):
-        xsec = sum(listOfSignals[index])/dataset.getLumi()
+        # If the expected signal is 0 for each SR in the combined set of SRs, skip
+        if all([sig==0. for sig in listOfSignals[index]]):
+            continue
+        # The x-section is at the level of the TheoryPrediction
+        # if there are multiple sets of SRs, set a xsec_UL for the whole analysis, i.e. that uses all the SRs,
+        # so that the resulting R value Is for the whole analysis
+        xsec = sum(nsig)/dataset.getLumi()
+        # It is possible to do differently and to set a xsec_UL on each set of SRs but that is not how it done in SModelS so far
+        # xsec = sum(listOfSignals[index])/dataset.getLumi()
         statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
                                                         signal=patch,
                                                         observed=json,
-                                                        xsection=xsec.asNumber(pb)
+                                                        xsection=xsec
                                                         )
         # If all the SRs are used in the json files and there is only one json files, there is only one statModel.
         # No need to compute mu_ul_exp if not needed.
@@ -48,6 +56,7 @@ def _getBestStatModel(dataset, nsig, allow_negative_signal=False, return_mu_ul_e
             continue
         elif mu_ul_exp < mu_ul_exp_min:
             mu_ul_exp_min = mu_ul_exp
+            bestStatModel = statModel
 
     # Check if a non-combined (uncorrelated) signal region is more contraining than the best combination obtained above
     # Check if a signal region is not in the list of SR names used in the json files
@@ -60,7 +69,7 @@ def _getBestStatModel(dataset, nsig, allow_negative_signal=False, return_mu_ul_e
             if mu_ul_exp < muull_exp_min:
                 logger.info("Best constraining model is a single uncorrelated model.")
                 mu_ul_exp_min = mu_ul_exp
-                statModel = get_uncorrelated_region_statistical_model(observations=float(ds.observedN),
+                bestStatModel = get_uncorrelated_region_statistical_model(observations=float(ds.observedN),
                                                                         backgrounds=float(ds.expectedBG),
                                                                         background_uncertainty=float(ds.bgError),
                                                                         signal_yields=float(sig),
@@ -68,8 +77,10 @@ def _getBestStatModel(dataset, nsig, allow_negative_signal=False, return_mu_ul_e
                                                                         analysis=dataset.globalInfo.id,
                                                                         backend=AvailableBackends(2) # simplified likelhood backend by default
                                                                         )
-
-    return statModel, mu_ul_exp_min
+    if mu_ul_exp_min == np.inf:
+        logger.error(f'No minimal upper limit on POI found for {dataset.globalInfo.id}')
+        return None
+    return bestStatModel, mu_ul_exp_min
 
 def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allowNegativeSignals=False):
     """
@@ -111,7 +122,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
                                                         nb=bg,
                                                         third_moment=thirdMoment,
                                                         delta_sys=deltas_rel,
-                                                        xsection=xsec.asNumber(pb)
+                                                        xsection=xsec
                                                         )
 
         muul = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=False)
@@ -129,11 +140,11 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
 
         if expected == True:
             statModel, mu_ul_exp_min = _getBestStatModel(dataset=dataset, nsig=nsig, allow_negative_signal=allowNegativeSignals, return_mu_ul_exp_min=True)
-            return mu_ul_exp_min*statModel.xsection*pb
+            return mu_ul_exp_min*statModel.xsection
         else:
-            statModel = _getBestStatModel(dataset=dataset, nsig=nsig, allow_negative_signal=allowNegativeSignals, return_mu_ul_exp_min=False)
+            statModel, _ = _getBestStatModel(dataset=dataset, nsig=nsig, allow_negative_signal=allowNegativeSignals, return_mu_ul_exp_min=False)
             mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], allow_negative_signal=allowNegativeSignals)
-            xsec_ul = mu_ul*statModel.xsection*pb
+            xsec_ul = mu_ul*statModel.xsection
 
             logger.debug("pyhf upper limit : {}".format(xsec_ul))
             return xsec_ul
@@ -232,7 +243,7 @@ def getCombinedLikelihood(
         if marginalize == True:
             logger.error('Pyhf backend cannot marginalize likelihood.')
 
-        statModel = _getBestStatModel(dataset, nsig)
+        statModel, _ = _getBestStatModel(dataset, nsig)
 
         lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=False)
 
@@ -260,7 +271,7 @@ def getCombinedPyhfStatistics(dataset, nsig, marginalize, deltas_rel, nll=False,
         if marginalize == True:
             logger.error('Pyhf backend cannot marginalize likelihood.')
 
-        statModel = _getBestStatModel(dataset, nsig, allow_negative_signal=allowNegativeSignals)
+        statModel, _ = _getBestStatModel(dataset, nsig, allow_negative_signal=allowNegativeSignals)
 
         muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll)
         lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll)
