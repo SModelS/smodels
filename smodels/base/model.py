@@ -264,12 +264,14 @@ class Model(object):
 
         return len(self.xsections.xSections)
 
-    def setMasses(self, massDict, roundMasses):
+    def setMasses(self,massDict,roundMasses,minMass):
         """
         Define particle masses using massDict.
 
         :param roundMasses: If set, it will round the masses to this number of digits (int)
         :param massDict: dictionary with PDGs as keys and masses as values.
+        :param minMass: Minimal mass for BSM particles in the model. Any particle with mass below minMass will
+                        have its mass set to minMass.
         """
 
         for particle in self.BSMparticles:
@@ -285,6 +287,8 @@ class Model(object):
                     particle.mass = round(abs(massDict[abs(pdg)]), int(roundMasses))*GeV
                 else:
                     particle.mass = abs(massDict[abs(pdg)])*GeV
+                if minMass > 0*GeV:
+                    particle.mass = max(particle.mass,minMass)
             else:
                 raise SModelSError("No mass found for %i in input file %s." % (particle.pdg, self.inputFile))
 
@@ -368,8 +372,9 @@ class Model(object):
                         delattr(particle, attr)
 
 
-    def updateParticles(self, inputFile, promptWidth=None, stableWidth=None,
-                        roundMasses=1, erasePrompt=['spin', 'eCharge', 'colordim']):
+    def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
+                        roundMasses = 1, erasePrompt=['spin','eCharge','colordim'], 
+                        minMass=1.0*GeV):
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file.
 
@@ -381,9 +386,12 @@ class Model(object):
                             will be set 1e-25 GeV.
         :param roundMasses: If set, it will round the masses to this number of digits (int)
 
-        :param erasePromptQNs: If set, all particles with prompt decays (totalwidth > promptWidth)
+        :param erasePrompt: If set, all particles with prompt decays (totalwidth > promptWidth)
                                will have the corresponding properties (quantum numbers). So all particles with the same
                                mass and isSM=False will be considered as equal when combining elements.
+
+        :param minMass: Minimal mass for BSM particles in the model. Any particle with mass below minMass will
+                        have its mass set to minMass.
 
         """
 
@@ -417,8 +425,8 @@ class Model(object):
             logger.error(msg)
             raise SModelSError(msg)
 
-        #  Set particle masses:
-        self.setMasses(massDict, roundMasses)
+        #Set particle masses:
+        self.setMasses(massDict,roundMasses,minMass)
 
         #  Set particle decays
         self.setDecays(decaysDict, promptWidth, stableWidth, erasePrompt)
