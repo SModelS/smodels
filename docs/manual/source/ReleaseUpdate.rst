@@ -37,6 +37,13 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+
+New in Version 2.3.0:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Added minMass parameter for setting a minimum mass threshold for BSM masses
+
+
 New in Version 2.2.2:
 ^^^^^^^^^^^^^^^^^^^^^
 
