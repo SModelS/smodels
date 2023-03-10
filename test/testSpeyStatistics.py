@@ -15,7 +15,7 @@ import unittest
 
 # from smodels.tools import statistics
 from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
-from smodels.tools.srCombinations import getCombinedUpperLimitFor, getCombinedPyhfStatistics, _getPyhfComputer # _getPyhfComputer to be removed in the end
+from smodels.tools.srCombinations import getCombinedUpperLimitFor, getCombinedPyhfStatistics
 from smodels.tools.statistics import TruncatedGaussians
 from smodels.theory.theoryPrediction import theoryPredictionsFor, _getCombinedResultFor, _getDataSetPredictions
 from smodels.tools.statistics import determineBrentBracket
@@ -618,8 +618,7 @@ class StatisticsTest(unittest.TestCase):
         self.assertAlmostEqual(res_pyhf['BkgOnly.json']['mu_hat'],mu_hat_spey,4)
         self.assertAlmostEqual(res_pyhf['BkgOnly.json']['llhdMax'],llhdMax_spey,4)
 
-    def testUpperLimitOnSigmaTimesEff_pyhf_2(self): ### Only 1 xsec for tha whole analysis, even though there are 3 json files?
-                                                    ### Need to set allow_negative_signal = True to pass the test?
+    def testUpperLimitOnSigmaTimesEff_pyhf_2(self):
         """
         Test the cross-section upper limit computation with simplified likelhood backend from SModelS and Spey packages.
         """
@@ -629,7 +628,6 @@ class StatisticsTest(unittest.TestCase):
         expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2018-31"])[1]
 
         filename = './testFilesTim/T6bbHH_1000_600_60_1000_600_60.slha'
-        filename='/home/pascal/SModelS/smodels/test/testFilesTim/T6bbHH_1000_600_60_1000_600_60.slha'
         model = Model(BSMList, SMList)
         model.updateParticles(filename)
         smstoplist = decomposer.decompose(model, sigmacut=0.)
@@ -753,7 +751,6 @@ class StatisticsTest(unittest.TestCase):
                 args["par_bounds"] = bounds
             return low, high, args
 
-
         res_pyhf = {"observed":{},"apriori":{}}
         for expectationType in [ExpectationType.observed,ExpectationType.apriori]:
             expected = "observed" if expectationType==ExpectationType.observed else "apriori"
@@ -784,45 +781,48 @@ class StatisticsTest(unittest.TestCase):
                 data = ws.data(model)
                 low, high, args = findBracketBounds(model,jsName)
                 # print(f'CLs_root_pyhf({low}) = {CLs_root_pyhf(low, data, model, args)}; CLs_root_pyhf({high})={CLs_root_pyhf(high, data, model, args)} for {jsName}')
-                mu_ul = optimize.brentq(lambda mu: CLs_root_pyhf(mu, data, model, args), low, high, rtol=1e-3, xtol=1e-3)
-                mu_hat, minNllh = fit(data, model, return_fitted_val=True, par_bounds = args["par_bounds"])
+
+                mu_ul_pyhf = optimize.brentq(lambda mu: CLs_root_pyhf(mu, data, model, args), low, high, rtol=1e-3, xtol=1e-3)
                 xsec = combinedRes.xsection.value.asNumber(fb)*fb
-                res_pyhf[expected][jsName] = {"mu_ul":mu_ul,"xsec_ul":mu_ul*xsec, "mu_hat":mu_hat[model.config.poi_index], "llhdMax":np.exp(-minNllh/2.)}
+                xsec_ul_pyhf = mu_ul_pyhf*xsec
 
-                mu_ul_spey = statModel.poi_upper_limit(expected=expectationType)
+                mu_hat_pyhf, minNllh_pyhf = fit(data, model, return_fitted_val=True, par_bounds = args["par_bounds"])
+                llhdMax_pyhf = np.exp(-minNllh_pyhf/2.)
+                mu_hat_pyhf = mu_hat_pyhf[model.config.poi_index]
+
+                res_pyhf[expected][jsName] = {"mu_ul":mu_ul_pyhf,"xsec_ul":xsec_ul_pyhf, "mu_hat":mu_hat_pyhf, "llhdMax":llhdMax_pyhf}
+
+                mu_ul_spey = statModel.poi_upper_limit(expected=expectationType,allow_negative_signal=allow_negative_signal)
                 xsec_ul_spey = mu_ul_spey*statModel.xsection
-                mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=expectationType, return_nll=False)
-                # For prefit dataset, mu_hat must be 0
-                # if expected == 'apriori':
-                #     self.assertTrue(mu_hat<=1e-15)
-                #     self.assertTrue(mu_hat_spey<=1e-15)
-                print(expected, jsName, mu_ul_spey, xsec_ul_spey, mu_hat_spey, llhdMax_spey)
-                print(1-float(hypotest(1., data, model, **args)), statModel.exclusion_confidence_level(poi_test=1.,expected=expectationType))
-                # self.assertAlmostEqual(res_pyhf['BkgOnly.json']['xsec_ul']._value,xsec_ul_spey._value,2)
-                # self.assertAlmostEqual(res_pyhf['BkgOnly.json']['mu_hat'],mu_hat_spey,2)
-                # self.assertAlmostEqual(res_pyhf['BkgOnly.json']['llhdMax'],llhdMax_spey,2)
 
-        res_pyhf
+                mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=expectationType, return_nll=False)
+
+                # For prefit dataset, mu_hat must be 0
+                if expected == 'apriori':
+                    self.assertTrue(mu_hat_pyhf<=1e-15)
+                    self.assertTrue(mu_hat_spey<=1e-15)
+                self.assertAlmostEqual(mu_ul_pyhf*xsec._value,xsec_ul_spey._value,3)
+                self.assertAlmostEqual(mu_hat_pyhf,mu_hat_spey,4)
+                self.assertAlmostEqual(llhdMax_pyhf,llhdMax_spey,4)
 
         # Computation of statistical quantities with Spey
         xsec_ul_spey = getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=combinedRes.deltas_rel, allowNegativeSignals=allow_negative_signal)
-        xsec_ul_spey
-        # mu_ul_spey = xsec_ul_spey*dataset.getLumi()/sum(nsig)
-        # mu_ul_spey
+
         res = getCombinedPyhfStatistics(dataset=dataset, nsig=nsig, marginalize=False, deltas_rel=combinedRes.deltas_rel, nll=False, expected=False, allowNegativeSignals=allow_negative_signal)
         mu_hat_spey = res["muhat"]
         llhdMax_spey = res["lmax"]
-        mu_hat_spey
-        llhdMax_spey
 
-        # bestJSName = None
-        # mu_hat_exp_min = np.inf
-        # for JSName in res_pyhf:
-        #     if res_pyhf[JSName][mu_ul] < mu_hat_exp_min
-        # #################### NEED EXP FOR BEST RES
-        self.assertAlmostEqual(res_pyhf['BkgOnly.json']['xsec_ul']._value,xsec_ul_spey._value,2)
-        self.assertAlmostEqual(res_pyhf['BkgOnly.json']['mu_hat'],mu_hat_spey,2)
-        self.assertAlmostEqual(res_pyhf['BkgOnly.json']['llhdMax'],llhdMax_spey,2)
+        # Find the "best" set of SRs, i.e. the one that gives the lowest expected upper limit on mu
+        bestJSName = None
+        mu_hat_exp_min = np.inf
+        for JSName in res_pyhf['apriori']:
+            if res_pyhf['apriori'][JSName]['mu_ul'] < mu_hat_exp_min:
+                mu_hat_exp_min = res_pyhf['apriori'][JSName]['mu_ul']
+                bestJSName = JSName
+
+        self.assertAlmostEqual(res_pyhf['observed'][bestJSName]['xsec_ul']._value,xsec_ul_spey._value,3)
+        self.assertAlmostEqual(res_pyhf['observed'][bestJSName]['mu_hat'],mu_hat_spey,4)
+        self.assertAlmostEqual(res_pyhf['observed'][bestJSName]['llhdMax'],llhdMax_spey,4)
 
 
     def testUnderfluctuatingLlhdsFromLimits(self):
