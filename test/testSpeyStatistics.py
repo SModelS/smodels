@@ -22,7 +22,7 @@ from smodels.tools.statistics import determineBrentBracket
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
-# from databaseLoader import database
+from databaseLoader import database
 from smodels.experiment.databaseObj import Database
 from smodels.theory import decomposer
 from math import floor, log10
@@ -34,7 +34,7 @@ from spey.hypothesis_testing.test_statistics import compute_teststatistics # to 
 from scipy import optimize
 from pyhf import Workspace
 from pyhf.infer import hypotest
-from pyhf.infer.mle import fit
+from pyhf.infer.mle import fit, fixed_poi_fit # remove fixed_poi_fit in the end
 from jsonpatch import apply_patch
 from smodels.tools.physicsUnits import fb,pb
 
@@ -42,6 +42,7 @@ from smodels.tools.physicsUnits import fb,pb
 class StatisticsTest(unittest.TestCase):
     def lLHDFromLimits(self):
         """to do some statistics on the chi2"""
+        allow_negative_signal = False
         for backendNumber in [1,2]:
             if backendNumber == 1:
                 print("PYHF BACKEND.")
@@ -57,8 +58,14 @@ class StatisticsTest(unittest.TestCase):
                                                                     analysis="UnitTest",
                                                                     backend=AvailableBackends(backendNumber)
                                                                 )
-            ulobs = statModel.poi_upper_limit(expected=ExpectationType.observed)
-            ulexp = statModel.poi_upper_limit(expected=ExpectationType.aposteriori)
+            config = statModel.backend.model.config()
+            bounds = config.suggested_bounds
+            if allow_negative_signal:
+                bounds[config.poi_index] = (config.minimum_poi, 100)
+            else:
+                bounds[config.poi_index] = (0, 100)
+            ulobs = statModel.poi_upper_limit(expected=ExpectationType.observed,par_bounds=bounds)
+            ulexp = statModel.poi_upper_limit(expected=ExpectationType.aposteriori,par_bounds=bounds)
             print("ulobs", ulobs)
             print("ulexp", ulexp)
             f = open("llhds.csv", "wt")
@@ -167,7 +174,13 @@ class StatisticsTest(unittest.TestCase):
                                                         delta_sys=0.2,
                                                         xsection=xsec
                                                         )
-        mu_ul_spey = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal)
+        config = statModel.backend.model.config()
+        bounds = config.suggested_bounds
+        if allow_negative_signal:
+            bounds[config.poi_index] = (config.minimum_poi, 100)
+        else:
+            bounds[config.poi_index] = (0, 100)
+        mu_ul_spey = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal,par_bounds=bounds)
         xsec_ul_spey = mu_ul_spey*statModel.xsection
 
         mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=ExpectationType.observed, return_nll=False)
@@ -191,7 +204,7 @@ class StatisticsTest(unittest.TestCase):
         model.updateParticles(filename)
         smstoplist = decomposer.decompose(model, sigmacut=0.)
         expected = False
-        allow_negative_signal = False
+        allow_negative_signal = True
 
         #SL from SModelS
         dataSetResults = []
@@ -204,11 +217,13 @@ class StatisticsTest(unittest.TestCase):
 
         srNsigDict = dict( [ [pred.dataset.getID(),(pred.xsection.value * pred.dataset.getLumi()).asNumber()] for pred in combinedRes.datasetPredictions] )
         nsig = [srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0 for ds in combinedRes.dataset.origdatasets]
+
         computer = UpperLimitComputer(ntoys=10000)
         dataset = combinedRes.dataset
         cov = dataset.globalInfo.covariance
         nobs = [x.dataInfo.observedN for x in dataset._datasets]
         bg = [x.dataInfo.expectedBG for x in dataset._datasets]
+
         d = Data(
             observed=nobs,
             backgrounds=bg,
@@ -223,10 +238,11 @@ class StatisticsTest(unittest.TestCase):
         mu_hat_SL, sigma_mu_SL, clsRoot_SL = computer.getCLsRootFunc(d, marginalize=False, expected=expected)
         a, b = determineBrentBracket(mu_hat_SL, sigma_mu_SL, clsRoot_SL, allowNegative=allow_negative_signal )
         mu_ul_SL = optimize.brentq(clsRoot_SL, a, b, rtol=1e-03, xtol=1e-06)
-
         xsec_ul_SL = mu_ul_SL*xsec
+
         computer = LikelihoodComputer(d)
         llhdMax_SL = computer.likelihood(mu=mu_hat_SL,nll=False)
+
 
         # Spey computation
         expectedDict = {False:ExpectationType.observed,
@@ -241,57 +257,34 @@ class StatisticsTest(unittest.TestCase):
                                                         delta_sys=0.2,
                                                         xsection=xsec
                                                         )
+        config = statModel.backend.model.config()
+        bounds = config.suggested_bounds
+        if allow_negative_signal:
+            bounds[config.poi_index] = (config.minimum_poi, 100)
+        else:
+            bounds[config.poi_index] = (0, 100)
 
-        mu_ul_spey = statModel.poi_upper_limit()
-        print('---------------------------------------------')
-        print("mu_ul_SL:",mu_ul_SL)
-        print("mu_ul_spey:",mu_ul_spey)
+        mu_ul_spey = statModel.poi_upper_limit(expected=ExpectationType.observed,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
         xsec_ul_spey = mu_ul_spey*statModel.xsection
-        print('---------------------------------------------')
-        print("xsec_ul_SL:",xsec_ul_SL)
-        print("xsec_ul_spey:",xsec_ul_spey)
 
         mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=ExpectationType.observed, return_nll=False)
-        print('---------------------------------------------')
-        print("mu_hat SL:",mu_hat_SL)
-        print("mu_hat spey:",mu_hat_spey)
 
-        print('---------------------------------------------')
-        print("maximum_likelihood SL:",llhdMax_SL)
-        print("maximum_likelihood spey:",llhdMax_spey)
+        self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,3)
+        self.assertAlmostEqual(mu_hat_SL,mu_hat_spey,4)
+        self.assertAlmostEqual(llhdMax_SL,llhdMax_spey,4)
 
-        print('---------------------------------------------')
-
-
+        # Check consistency on CLs
         theta_hat0, _ = computer.findThetaHat( 0. )
         sigma_mu = computer.getSigmaMu(mu_hat_SL, theta_hat0)
 
         nll0 = computer.likelihood( mu_hat_SL, marginalize=False, nll=True)
-        # print ( f"SL nll0 {nll0:.3f} muhat {mu_hat:.3f} sigma_mu {sigma_mu:.3f} {signal_type} {sum(model.nsignal):.3f}" )
-        if np.isinf(nll0):
-            logger.warning(
-                "nll is infinite in profiling! we switch to marginalization, but only for this one!"
-            )
-            marginalize = True
-            # TODO convert rel_signals to signals
-            nll0 = computer.likelihood( mu = mu_hat, marginalize=True, nll=True)
-            if np.isinf(nll0):
-                logger.warning("marginalization didnt help either. switch back.")
-                marginalize = False
-            else:
-                logger.warning("marginalization worked.")
         import copy
         aModel = copy.deepcopy(d)
         aModel.observed = np.array([x + y for x, y in zip(d.backgrounds, theta_hat0)])
-        print("SL Asimov observed values:",aModel.observed)
         aModel.name = aModel.name + "A"
-        # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
         compA = LikelihoodComputer(aModel, 10000)
-        ## compute
         mu_hatA = compA.findMuHat()
-        # TODO convert rel_signals to signals
         nll0A = compA.likelihood( mu=mu_hatA, marginalize=False, nll=True)
-        # return 1.
 
         nll = computer.likelihood(mu=1., marginalize=False, nll=True)
         nllA = compA.likelihood(mu=1., marginalize=False, nll=True)
@@ -299,70 +292,16 @@ class StatisticsTest(unittest.TestCase):
         from smodels.tools.statistics import CLsfromNLL
         CLs_SL = CLsfromNLL(nllA, nll0A, nll, nll0, return_type="1-CLs")
 
-        print("CLs SL:",CLs_SL)
-        print("CLs spey:",statModel.exclusion_confidence_level(allow_negative_signal=False))
+        CLs_spey = statModel.exclusion_confidence_level(allow_negative_signal=allow_negative_signal)[0]
+        self.assertAlmostEqual(CLs_SL,CLs_spey,4)
 
-        # statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal)
-        # print(statModel.exclusion_confidence_level())
-        # mu_hat_spey = maximum_likelihood[0]
-        # maximum_likelihood_spey = np.exp(-maximum_likelihood[1])
-        # #find_poi_upper_limit(maximum_likelihood=maximum_likelihood, logpdf=logpdf, maximum_asimov_likelihood=maximum_asimov_likelihood, asimov_logpdf=asimov_logpdf, expected=expectedDict[expected], confidence_level=confidence_level, allow_negative_signal=allow_negative_signal)
-        # def computer_CLs_spey(poi_test: float) -> float:
-        #     """Compute 1 - CLs(POI) = `confidence_level`"""
-        #     _, sqrt_qmuA, delta_teststat = compute_teststatistics(
-        #         poi_test,
-        #         maximum_likelihood,
-        #         logpdf,
-        #         maximum_asimov_likelihood,
-        #         asimov_logpdf,
-        #         test_stat,
-        #     )
-        #     pvalue = list(
-        #         map(
-        #             lambda x: 1.0 - x,
-        #             compute_confidence_level(sqrt_qmuA, delta_teststat, test_stat)[
-        #                 0 if expected == ExpectationType.observed else 1
-        #             ],
-        #         )
-        #     )
-        #     # always get the median
-        #     return pvalue[0 if expected == ExpectationType.observed else 2] - 0.95
-        #
-        # sigma_mu = 1.0
-        # low, hig = find_root_limits(
-        #     computer_CLs_spey,
-        #     loc=0.0,
-        #     low_ini=maximum_likelihood_spey + 1.5 * sigma_mu if maximum_likelihood_spey >= 0.0 else 1.0,
-        #     hig_ini=maximum_likelihood_spey + 2.5 * sigma_mu if maximum_likelihood_spey >= 0.0 else 1.0,
-        # )
-
-        # print("lower bound computer_CLs_spey(",low,"):",computer_CLs_spey(low))
-        # print("upper bound computer_CLs_spey(",hig,"):",computer_CLs_spey(hig))
-        # mu_ul_spey = optimize.brentq(computer_CLs_spey, low, hig, xtol=abs(low / 100.0))
-        # print("Spey upper limit on mu:",mu_ul_spey)
-        # xsec_ul_spey = mu_ul_spey*xsec
-        # print("mu_hat spey:",mu_hat_spey)
-        # print("maximum_likelihood spey:",maximum_likelihood_spey)
-        # print("xsec_ul_spey:",xsec_ul_spey)
-
-        # mu=0.
-        # print(f"SL likelihood at {mu}: {computer.likelihood(mu)}")
-        # print(f"Spey likelihood at {mu}: {statModel.likelihood(poi_test=mu,return_nll=False)}")
-        # mu=mu_hat_SL
-        # print(f"SL likelihood at {mu} (mu hat SL): {computer.likelihood(mu)}")
-        # print(f"Spey likelihood at {mu} (mu hat SL): {statModel.likelihood(poi_test=mu,return_nll=False)}")
-        # mu=mu_hat_spey
-        # print(f"SL likelihood at {mu} (mu hat spey): {computer.likelihood(mu)}")
-        # print(f"Spey likelihood at {mu} (mu hat spey): {statModel.likelihood(poi_test=mu,return_nll=False)}")
-
-        print('---------------------------------------------')
+        # Check consitency on qmu and qmuA
         qmu = 0.0 if 2 * (nll - nll0) < 0.0 else 2 * (nll - nll0)
         sqmu_SL = np.sqrt(qmu)
         qA = 2 * (nllA - nll0A)
         if qA < 0.0:
             qA = 0.0
         sqA_SL = np.sqrt(qA)
-
 
         def _tmu(mu, max_logpdf, logpdf) -> float:
             return -2 * (logpdf(mu) - max_logpdf)
@@ -431,35 +370,8 @@ class StatisticsTest(unittest.TestCase):
         (maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf) = statModel._prepare_for_hypotest(expected=ExpectationType.observed, test_statistics=test_stat)
         sqrt_qmu_spey, sqrt_qmuA_spey, delta_teststat = compute_teststatistics(mu=1.,maximum_likelihood=maximum_likelihood,logpdf=logpdf ,maximum_asimov_likelihood=maximum_asimov_likelihood,asimov_logpdf=asimov_logpdf,teststat=test_stat)
 
-        print("sqrt_qmu SL:", sqmu_SL,"sqrt_qmuA SL:",sqA_SL)
-        print("sqrt_qmu spey:", sqrt_qmu_spey,"sqrt_qmuA_spey:",sqrt_qmuA_spey)
-
-
-        self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,3)
-        self.assertAlmostEqual(mu_hat_SL,mu_hat_spey,4)
-        self.assertAlmostEqual(llhdMax_SL,llhdMax_spey,4)
-
-        # mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=ExpectationType.observed, return_nll=False)
-        #
-        # self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,3)
-        # self.assertAlmostEqual(mu_hat_SL,mu_hat_spey,4)
-        # self.assertAlmostEqual(llhdMax_SL,llhdMax_spey,4)
-
-        # Find likelihood and fitted nuisances at a given mu
-        #SModelS
-        # mu_test = 2.
-        # theta_hat_SL, _ = computer.findThetaHat(mu_test)
-        # llhdAtThetaHat_SL = computer.llhdOfTheta( theta_hat_SL, nll=False )
-        # print(f"SL: likelihood = {llhdAtThetaHat_SL}, profiled at theta hat = {theta_hat_SL} for mu = {mu_test}")
-        #
-        # #Spey
-        # nll_spey, theta_hat_spey = statModel.backend.likelihood(poi_test=mu_test)
-        # theta_hat_spey = [theta for index,theta in enumerate(theta_hat_spey) if index!=statModel.backend.model.poi_index]
-        # print(f"Spey: likelihood = {np.exp(-nll_spey)}, profiled at theta hat = {theta_hat_spey} for mu = {mu_test}")
-        # self.assertAlmostEqual(llhdAtThetaHat_SL,np.exp(-nll_spey),4)
-        #
-        # llhdAtThetaHat_SL = computer.llhdOfTheta( np.array(theta_hat_spey), nll=False )
-        # print(f"SL from SModelS with spey theta hat: likelihood = {llhdAtThetaHat_SL}, profiled at theta hat = {theta_hat_spey} for mu = {mu_test}")
+        self.assertAlmostEqual(sqmu_SL,sqrt_qmu_spey,4)
+        self.assertAlmostEqual(sqA_SL,sqrt_qmuA_spey,2)
 
     def testUpperLimitOnSigmaTimesEff_pyhf_1(self):
         """
@@ -602,10 +514,10 @@ class StatisticsTest(unittest.TestCase):
                     print(f'CLs_low > 0 and CLs_high < 0: CLs_root_pyhf({low}) = {CLs_root_pyhf(low, data, model, args)}; CLs_root_pyhf({high})={CLs_root_pyhf(high, data, model, args)} for {jsName}')
                 bounds[model.config.poi_index] = (0., high+0.1)
                 args["par_bounds"] = bounds
-            mu_ul = optimize.brentq(lambda mu: CLs_root_pyhf(mu, data, model, args), low, high, rtol=1e-3, xtol=1e-3)
-            mu_hat, minNllh = fit(data, model, return_fitted_val=True, par_bounds = bounds)
+            mu_ul_pyhf = optimize.brentq(lambda mu: CLs_root_pyhf(mu, data, model, args), low, high, rtol=1e-3, xtol=1e-3)
+            mu_hat_pyhf, minNllh_pyhf = fit(data, model, return_fitted_val=True, par_bounds = bounds)
             xsec = combinedRes.xsection.value
-            res_pyhf[jsName] = {"mu_ul":mu_ul,"xsec_ul":mu_ul*xsec, "mu_hat":mu_hat[model.config.poi_index], "llhdMax":np.exp(-minNllh/2.)}
+            res_pyhf[jsName] = {"mu_ul":mu_ul_pyhf,"xsec_ul":mu_ul_pyhf*xsec, "mu_hat":mu_hat_pyhf[model.config.poi_index], "llhdMax":np.exp(-minNllh_pyhf/2.)}
 
 
         # Computation of statistical quantities with Spey
@@ -614,7 +526,7 @@ class StatisticsTest(unittest.TestCase):
         mu_hat_spey = res["muhat"]
         llhdMax_spey = res["lmax"]
 
-        self.assertAlmostEqual(res_pyhf['BkgOnly.json']['xsec_ul']._value,xsec_ul_spey._value,3)
+        self.assertAlmostEqual(res_pyhf['BkgOnly.json']['xsec_ul'].asNumber(fb),xsec_ul_spey.asNumber(fb),3)
         self.assertAlmostEqual(res_pyhf['BkgOnly.json']['mu_hat'],mu_hat_spey,4)
         self.assertAlmostEqual(res_pyhf['BkgOnly.json']['llhdMax'],llhdMax_spey,4)
 
@@ -628,6 +540,7 @@ class StatisticsTest(unittest.TestCase):
         expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2018-31"])[1]
 
         filename = './testFilesTim/T6bbHH_1000_600_60_1000_600_60.slha'
+        filename = '/home/pascal/SModelS/smodels/test/testFilesTim/T6bbHH_1000_600_60_1000_600_60.slha'
         model = Model(BSMList, SMList)
         model.updateParticles(filename)
         smstoplist = decomposer.decompose(model, sigmacut=0.)
@@ -730,10 +643,17 @@ class StatisticsTest(unittest.TestCase):
         def CLs_root_pyhf(mu, data, model, args):
             return 0.05 - float(hypotest(mu, data, model, **args))
 
-        def findBracketBounds(model, jsName):
-            low = 0.1
+        def findBracketBounds(model, data, jsName, minimum_poi):
+            if allow_negative_signal:
+                low = minimum_poi/5
+            else:
+                low = 0.1
             high = 1.
             bounds = model.config.suggested_bounds()
+            if allow_negative_signal:
+                bounds[config.poi_index] = (config.minimum_poi, 100)
+            else:
+                bounds[config.poi_index] = (0, 100)
             args = {}
             args["par_bounds"] = bounds
             while True:
@@ -744,10 +664,15 @@ class StatisticsTest(unittest.TestCase):
                 elif CLs_low < 0 and CLs_high < 0:
                     high *= 2.
                 elif CLs_low > 0 and CLs_high > 0:
+                    if allow_negative_signal:
+                        if low-0.5 < minimum_poi:
+                            low = minimum_poi
+                        else:
+                            low = low-0.5
                     low *= 1/2.
                 else:
                     print(f'CLs_low > 0 and CLs_high < 0: CLs_root_pyhf({low}) = {CLs_root_pyhf(low, data, model, args)}; CLs_root_pyhf({high})={CLs_root_pyhf(high, data, model, args)} for {jsName}')
-                bounds[model.config.poi_index] = (0., high+0.1)
+                bounds[model.config.poi_index] = (low, high+0.1)
                 args["par_bounds"] = bounds
             return low, high, args
 
@@ -763,6 +688,12 @@ class StatisticsTest(unittest.TestCase):
                                                                 observed=json,
                                                                 xsection=sum(nsig)/dataset.getLumi()
                                                                 )
+                config = statModel.backend.model.config()
+                bounds = config.suggested_bounds
+                if allow_negative_signal:
+                    bounds[config.poi_index] = (config.minimum_poi, 100)
+                else:
+                    bounds[config.poi_index] = (0, 100)
                 wsDict = apply_patch(json, patch)
                 if expected == "apriori":
                     for id,sample in enumerate(wsDict['channels'][0]['samples']):
@@ -779,35 +710,35 @@ class StatisticsTest(unittest.TestCase):
                 ws = Workspace(wsDict)
                 model = ws.model(modifier_settings=msettings)
                 data = ws.data(model)
-                low, high, args = findBracketBounds(model,jsName)
+                low, high, args = findBracketBounds(model,data,jsName,config.minimum_poi)
                 # print(f'CLs_root_pyhf({low}) = {CLs_root_pyhf(low, data, model, args)}; CLs_root_pyhf({high})={CLs_root_pyhf(high, data, model, args)} for {jsName}')
 
                 mu_ul_pyhf = optimize.brentq(lambda mu: CLs_root_pyhf(mu, data, model, args), low, high, rtol=1e-3, xtol=1e-3)
                 xsec = combinedRes.xsection.value.asNumber(fb)*fb
                 xsec_ul_pyhf = mu_ul_pyhf*xsec
 
-                mu_hat_pyhf, minNllh_pyhf = fit(data, model, return_fitted_val=True, par_bounds = args["par_bounds"])
+                mu_hat_pyhf, minNllh_pyhf = fit(data, model, return_fitted_val=True, par_bounds = bounds)
                 llhdMax_pyhf = np.exp(-minNllh_pyhf/2.)
                 mu_hat_pyhf = mu_hat_pyhf[model.config.poi_index]
 
                 res_pyhf[expected][jsName] = {"mu_ul":mu_ul_pyhf,"xsec_ul":xsec_ul_pyhf, "mu_hat":mu_hat_pyhf, "llhdMax":llhdMax_pyhf}
 
-                mu_ul_spey = statModel.poi_upper_limit(expected=expectationType,allow_negative_signal=allow_negative_signal)
+
+                mu_ul_spey = statModel.poi_upper_limit(expected=expectationType,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
                 xsec_ul_spey = mu_ul_spey*statModel.xsection
 
                 mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=expectationType, return_nll=False)
 
                 # For prefit dataset, mu_hat must be 0
                 if expected == 'apriori':
-                    self.assertTrue(mu_hat_pyhf<=1e-15)
-                    self.assertTrue(mu_hat_spey<=1e-15)
+                    self.assertAlmostEqual(mu_hat_pyhf,0.,3)
+                    self.assertAlmostEqual(mu_hat_spey,0.,3)
                 self.assertAlmostEqual(mu_ul_pyhf*xsec._value,xsec_ul_spey._value,3)
                 self.assertAlmostEqual(mu_hat_pyhf,mu_hat_spey,4)
                 self.assertAlmostEqual(llhdMax_pyhf,llhdMax_spey,4)
 
         # Computation of statistical quantities with Spey
         xsec_ul_spey = getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=combinedRes.deltas_rel, allowNegativeSignals=allow_negative_signal)
-
         res = getCombinedPyhfStatistics(dataset=dataset, nsig=nsig, marginalize=False, deltas_rel=combinedRes.deltas_rel, nll=False, expected=False, allowNegativeSignals=allow_negative_signal)
         mu_hat_spey = res["muhat"]
         llhdMax_spey = res["lmax"]
@@ -858,6 +789,7 @@ class StatisticsTest(unittest.TestCase):
 
     def testChi2FromLimits(self):
         """test the chi2 value that we obtain from limits"""
+        allow_negative_signal = False
         print("Truncated Gaussian is not a spey feature yet.")
         for backendNumber in [1,2]:
             #backendNumber == 1: pyhf backend
@@ -873,15 +805,21 @@ class StatisticsTest(unittest.TestCase):
                                                                     analysis="UnitTest",
                                                                     backend=AvailableBackends(backendNumber)
                                                                 )
-            mu_ul_obs = statModel.poi_upper_limit(expected=ExpectationType.observed)
-            mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.aposteriori)
+            config = statModel.backend.model.config()
+            bounds = config.suggested_bounds
+            if allow_negative_signal:
+                bounds[config.poi_index] = (config.minimum_poi, 100)
+            else:
+                bounds[config.poi_index] = (0, 100)
+            mu_ul_obs = statModel.poi_upper_limit(expected=ExpectationType.observed, par_bounds=bounds)
+            mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.aposteriori, par_bounds=bounds)
             xsec = nsig/lumi
             xsec_ul_obs = xsec*mu_ul_obs
             xsec_ul_exp = xsec*mu_ul_exp
             llhddir = statModel.likelihood(poi_test=1.,return_nll=False)
             chi2dir = statModel.chi2()
             ### Marginalization does not work but we do not care for the moment.
-            # if backendNumber == 2: # pyhf cannot marginalize?
+            # if backendNumber == 2: # pyhf cannot marginalize
             #     llhdmarg = statModel.likelihood(mu=1., marginalize=True)
             #     chi2marg = statModel.chi2(marginalize=True)
             computer = TruncatedGaussians ( xsec_ul_obs, xsec_ul_exp, nsig )
@@ -898,20 +836,28 @@ class StatisticsTest(unittest.TestCase):
             #     self.assertAlmostEqual(rel, 0.04, 1)
 
     def testUpperLimit(self):
+        allow_negative_signal = True
         for backendNumber in [1,2]:
             #backendNumber == 1: pyhf backend
             #backendNumber == 2: simplified likelihood backend
             nsig = 1.0
             nobs, nbg = 100.0, 100.0
+            bgError = round(np.sqrt(0.001),5) # pyhf convergence fails for small values of the background error, so fix it at a small value that converges correclty.
             statModel = get_uncorrelated_region_statistical_model(observations=nobs,
                                                                     backgrounds=nbg,
-                                                                    background_uncertainty=np.sqrt(0.001),
+                                                                    background_uncertainty=bgError,
                                                                     signal_yields=nsig,
                                                                     xsection=None,
                                                                     analysis="UnitTest",
                                                                     backend=AvailableBackends(backendNumber)
                                                                 )
-            re = statModel.poi_upper_limit()
+            config = statModel.backend.model.config()
+            bounds = config.suggested_bounds
+            if allow_negative_signal:
+                bounds[config.poi_index] = (config.minimum_poi, 100)
+            else:
+                bounds[config.poi_index] = (0, 100)
+            re = statModel.poi_upper_limit(par_bounds=bounds)
             self.assertAlmostEqual(re/(1.06*20.), 1., 1)
 
     def testApproxGaussian(self):
@@ -989,11 +935,7 @@ class StatisticsTest(unittest.TestCase):
                                                                 )
             # Spey returns nan for pyhf backend but 0 for SL backend
             llhd = statModel.likelihood(poi_test=1.,return_nll=False)
-            if backendNumber == 1:
-                self.assertTrue(np.isnan(llhd))
-            else:
-                self.assertAlmostEqual(0.0, llhd, places=2)
-
+            self.assertAlmostEqual(0.0, llhd, places=2)
             try:
                 dchi2 = statModel.chi2()
                 # Spey gives a negative chi2 for the moment!

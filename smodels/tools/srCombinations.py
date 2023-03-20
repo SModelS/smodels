@@ -51,7 +51,13 @@ def _getBestStatModel(dataset, nsig, allow_negative_signal=False, return_mu_ul_e
         # No need to compute mu_ul_exp if not needed.
         if all([ds.dataInfo.dataId in listOfSRInJson for ds in dataset._datasets]) and len(dataset.globalInfo.jsons) == 1 and return_mu_ul_exp_min == False:
             return statModel
-        mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal)
+        config = statModel.backend.model.config()
+        bounds = config.suggested_bounds
+        if allow_negative_signal:
+            bounds[config.poi_index] = (config.minimum_poi, 100)
+        else:
+            bounds[config.poi_index] = (0, 100)
+        mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
         if mu_ul_exp == None:
             continue
         elif mu_ul_exp < mu_ul_exp_min:
@@ -127,8 +133,13 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
                                                         delta_sys=deltas_rel,
                                                         xsection=xsec
                                                         )
-
-        muul = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=False)
+        config = statModel.backend.model.config()
+        bounds = config.suggested_bounds
+        if allowNegativeSignals:
+            bounds[config.poi_index] = (config.minimum_poi, 100)
+        else:
+            bounds[config.poi_index] = (0, 100)
+        muul = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allowNegativeSignals,par_bounds=bounds)
         ret = muul*xsec
         logger.debug("SL upper limit : {}".format(ret))
         return ret
@@ -146,7 +157,13 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
             return mu_ul_exp_min*statModel.xsection
         else:
             statModel = _getBestStatModel(dataset=dataset, nsig=nsig, allow_negative_signal=allowNegativeSignals, return_mu_ul_exp_min=False)
-            mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], allow_negative_signal=allowNegativeSignals)
+            config = statModel.backend.model.config()
+            bounds = config.suggested_bounds
+            if allowNegativeSignals:
+                bounds[config.poi_index] = (config.minimum_poi, 100)
+            else:
+                bounds[config.poi_index] = (0, 100)
+            mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], allow_negative_signal=allowNegativeSignals,par_bounds=bounds)
             xsec_ul = mu_ul*statModel.xsection
 
             logger.debug("pyhf upper limit : {}".format(xsec_ul))
@@ -276,7 +293,13 @@ def getCombinedPyhfStatistics(dataset, nsig, marginalize, deltas_rel, nll=False,
 
         statModel = _getBestStatModel(dataset, nsig, allow_negative_signal=allowNegativeSignals)
 
-        muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll)
+        config = statModel.backend.model.config()
+        bounds = config.suggested_bounds
+        if allowNegativeSignals:
+            bounds[config.poi_index] = (config.minimum_poi, 100)
+        else:
+            bounds[config.poi_index] = (0, 100)
+        muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
         lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll)
         lsm = statModel.likelihood ( poi_test = 0., expected=expectedDict[expected], return_nll = nll)
         if lsm > lmax:
@@ -505,7 +528,13 @@ def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=
         logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
         return None
 
-    muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll)
+    config = statModel.backend.model.config()
+    bounds = config.suggested_bounds
+    if allowNegativeSignals:
+        bounds[config.poi_index] = (config.minimum_poi, 100)
+    else:
+        bounds[config.poi_index] = (0, 100)
+    muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
     lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll, **args )
     lsm = statModel.likelihood ( poi_test = 0., expected=expectedDict[expected], return_nll = nll, **args )
     if lsm > lmax:

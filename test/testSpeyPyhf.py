@@ -315,13 +315,16 @@ class PyhfTest(unittest.TestCase):
                 ]
             )
         )]
-        llhdSpec = jsonpatch.apply_patch(bkg, patch)
         # Computing the upper limit with the SModelS/pyhf interface
         statModel = spey.get_multi_region_statistical_model("UnitTest",patch,bkg)
-        ul = statModel.poi_upper_limit() # ul was mutiplied with total yield in previous unittest - it is not the case here
+        config = statModel.backend.model.config()
+        bounds = config.suggested_bounds
+        bounds[config.poi_index] = (config.minimum_poi, 100)
+        ul = statModel.poi_upper_limit(expected=spey.ExpectationType.observed,allow_negative_signal=False,par_bounds=bounds) # ul was mutiplied with total yield in previous unittest - it is not the case here
         # Computing the cls outside of SModelS with POI = ul, should give 0.95
-        msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
+        llhdSpec = jsonpatch.apply_patch(bkg, patch)
         workspace = pyhf.Workspace(llhdSpec)
+        msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         model = workspace.model(modifier_settings=msettings)
         bounds = model.config.suggested_bounds()
         bounds[model.config.poi_index] = [0,100]
@@ -368,7 +371,10 @@ class PyhfTest(unittest.TestCase):
         llhdSpec = jsonpatch.apply_patch(bkg, patch)
         # Computing the upper limit with the SModelS/pyhf interface
         statModel = spey.get_multi_region_statistical_model("UnitTest",patch,bkg)
-        ul = statModel.poi_upper_limit() # ul was mutiplied with total yield in previous unittest - it is not the case here
+        config = statModel.backend.model.config()
+        bounds = config.suggested_bounds
+        bounds[config.poi_index] = (config.minimum_poi, 100)
+        ul = statModel.poi_upper_limit(par_bounds=bounds) # ul was mutiplied with total yield in previous unittest - it is not the case here
         # Computing the cls outside of SModelS with POI = ul, should give 0.95
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         workspace = pyhf.Workspace(llhdSpec)
