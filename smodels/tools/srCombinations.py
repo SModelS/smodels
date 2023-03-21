@@ -52,7 +52,7 @@ def _getBestStatModel(dataset, nsig, allow_negative_signal=False, return_mu_ul_e
         if all([ds.dataInfo.dataId in listOfSRInJson for ds in dataset._datasets]) and len(dataset.globalInfo.jsons) == 1 and return_mu_ul_exp_min == False:
             return statModel
         config = statModel.backend.model.config()
-        bounds = config.suggested_bounds
+        bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
         if allow_negative_signal:
             bounds[config.poi_index] = (config.minimum_poi, 100)
         else:
@@ -134,7 +134,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
                                                         xsection=xsec
                                                         )
         config = statModel.backend.model.config()
-        bounds = config.suggested_bounds
+        bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
         if allowNegativeSignals:
             bounds[config.poi_index] = (config.minimum_poi, 100)
         else:
@@ -529,7 +529,7 @@ def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=
         return None
 
     config = statModel.backend.model.config()
-    bounds = config.suggested_bounds
+    bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
     if allowNegativeSignals:
         bounds[config.poi_index] = (config.minimum_poi, 100)
     else:
