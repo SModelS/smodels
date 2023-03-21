@@ -29,12 +29,10 @@ from math import floor, log10
 import numpy as np
 import math
 from spey import get_uncorrelated_region_statistical_model, get_multi_region_statistical_model, ExpectationType, AvailableBackends
-from spey.hypothesis_testing.utils import find_root_limits, compute_confidence_level # to be removed in the end
-from spey.hypothesis_testing.test_statistics import compute_teststatistics # to be removed in the end
 from scipy import optimize
 from pyhf import Workspace
 from pyhf.infer import hypotest
-from pyhf.infer.mle import fit, fixed_poi_fit # remove fixed_poi_fit in the end
+from pyhf.infer.mle import fit
 from jsonpatch import apply_patch
 from smodels.tools.physicsUnits import fb,pb
 
