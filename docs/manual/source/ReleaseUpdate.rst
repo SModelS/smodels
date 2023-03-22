@@ -41,13 +41,8 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 2.3.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * Added minMass parameter for setting a minimum mass threshold for BSM masses
-
-
-New in Version 2.2.2:
-^^^^^^^^^^^^^^^^^^^^^
-
   * fixed bug for an LHE input only with anti-particles
+  * Added minMass parameter for setting a minimum mass threshold for BSM masses
   * fixed C++ interface to work with python 3.11
   * bumped up pythia8 from 8.307 to 8.308
   * SModelS can now track inter-analyses combinability at the level of whole `analyses <experiment.html#experiment.expResultObj.ExpResult.isCombinableWith>`_ as well as individual `signal regions <experiment.html#experiment.datasetObj.DataSet.isCombinableWith>`_
@@ -56,7 +51,7 @@ New in Version 2.2.2:
   * "full_llhds" :ref:`Database <parameterFileDatabase>` abbreviations introduced
   * Database extension, added new results from x ATLAS and y CMS analyses:
      - results from ATLAS:
-       ATLAS-SUSY-2018-05 (EM,UL, full likelihood), ATLAS-SUSY-2018-42 (UL), ATLAS-SUSY-2018-32 (EM), ATLAS-SUSY-2019-02 (UL)
+       ATLAS-SUSY-2018-05 (EM,UL, full likelihood), ATLAS-SUSY-2018-42 (UL), ATLAS-SUSY-2018-32 (EM), ATLAS-SUSY-2019-02 (UL), ATLAS-SUSY-2013-12 (8 TeV, EM)
      - results from CMS:
        CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL), CMS-SUS-21-002 (UL)
      - added expected ULs to CMS-SUS-19-009
