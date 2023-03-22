@@ -47,6 +47,7 @@ class TheoryPrediction(object):
         self.deltas_rel = deltas_rel
         self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
         self.cachedLlhds = {False: {}, True: {}, "posteriori": {}}
+        self.statModel = None
 
     # def getStatModel():
     #     if spey==True:
@@ -114,6 +115,16 @@ class TheoryPrediction(object):
             return "??"
 
         return self.dataset.getType()
+
+    def getStatModel(self):
+        """
+
+        """
+        if self.statModel == None:
+            self.statModel = self.dataset.getStatModel(self.)
+        if self.statModel == None:
+            logger.error(f"Couldn't build a statistical model for {self.analysis}.")
+        return statModel
 
     def getUpperLimit(self, expected=False):
         """
@@ -383,7 +394,7 @@ class TheoryPrediction(object):
             return (llhd, computer.chi2 ( ) )
         return llhd
 
-    def computeStatistics(self, expected=False, allowNegativeSignals=False, backend="SL"):
+    def computeStatistics(self, expected=False, allowNegativeSignals=False, backend="simplified_likelihoods"):
         """
         Compute the likelihoods, chi2 and upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, lsm and chi2
