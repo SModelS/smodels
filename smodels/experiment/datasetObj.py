@@ -301,7 +301,7 @@ class DataSet(object):
         elif backend == "simplified_likelihoods":
             args={"marginalize":marginalize}
         else:
-            logger.error('%s is not a valid backend. Possible backends are "pyhf" and "SL".' %backend)
+            logger.error('%s is not a valid backend. Possible backends are "pyhf" and "simplified_likelihoods".' %backend)
             return None
 
         statModel = get_uncorrelated_region_statistical_model(observations=float(self.dataInfo.observedN),
@@ -386,7 +386,7 @@ class DataSet(object):
         elif backend == "simplified_likelihoods":
             args={}
         else:
-            logger.error('%s is not a valid backend. Possible backends are "pyhf" and "SL".' %backend)
+            logger.error('%s is not a valid backend. Possible backends are "pyhf" and "simplified_likelihoods".' %backend)
             return None
 
         nsig = 1. #doesn't matter. Does it?
@@ -477,7 +477,7 @@ class DataSet(object):
         elif backend == "simplified_likelihoods":
             args={"marginalize":marginalize}
         else:
-            logger.error('%s is not a valid backend. Possible backends are "pyhf" and "SL".' %backend)
+            logger.error('%s is not a valid backend. Possible backends are "pyhf" and "simplified_likelihoods".' %backend)
             return None
 
         statModel = get_uncorrelated_region_statistical_model(observations=float(self.dataInfo.observedN),
