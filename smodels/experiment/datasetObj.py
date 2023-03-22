@@ -22,7 +22,7 @@ from smodels.theory.element import Element
 
 from typing import Text, Union, List, Dict, Optional
 import itertools
-from spey import get_uncorrelated_region_statistical_model,ExpectationType,AvailableBackends
+from spey import get_uncorrelated_region_statistical_model,ExpectationType
 
 # if on, will check for overlapping constraints
 _complainAboutOverlappingConstraints = True
@@ -275,7 +275,7 @@ class DataSet(object):
 
         return getValuesForObj(self, attribute)
 
-    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, backend="SL"):
+    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, backend="simplified_likelihoods"):
         """
         Computes the likelihood to observe nobs events,
         given a predicted signal "nsig", assuming "deltas_rel"
@@ -295,12 +295,10 @@ class DataSet(object):
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
         if backend == "pyhf":
-            backendNumber = 1
             if marginalize == True:
                 logger.error("pyhf backend cannot marginalize.")
             args={}
-        elif backend == "SL":
-            backendNumber = 2
+        elif backend == "simplified_likelihoods":
             args={"marginalize":marginalize}
         else:
             logger.error('%s is not a valid backend. Possible backends are "pyhf" and "SL".' %backend)
@@ -312,7 +310,7 @@ class DataSet(object):
                                                                 signal_yields=float(nsig),
                                                                 xsection=nsig/self.getLumi(),
                                                                 analysis=self.globalInfo.id,
-                                                                backend=AvailableBackends(backendNumber)
+                                                                backend=backend
                                                             )
         expectedDict = {False:ExpectationType.observed,
                         True:ExpectationType.apriori,
@@ -364,7 +362,7 @@ class DataSet(object):
     #
     #     return ret
 
-    def lmax(self, deltas_rel=0.2, marginalize=False, expected=False, allowNegativeSignals=False, backend="SL"):
+    def lmax(self, deltas_rel=0.2, marginalize=False, expected=False, allowNegativeSignals=False, backend="simplified_likelihoods"):
         """
         Convenience function, computes the likelihood at nsig = observedN - expectedBG,
         assuming "deltas_rel" error on the signal efficiency.
@@ -382,12 +380,10 @@ class DataSet(object):
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
         if backend == "pyhf":
-            backendNumber = 1
             if marginalize == True:
                 logger.error("pyhf backend cannot marginalize.")
             args={"iteration_threshold":3} #default in spey
-        elif backend == "SL":
-            backendNumber = 2
+        elif backend == "simplified_likelihoods":
             args={}
         else:
             logger.error('%s is not a valid backend. Possible backends are "pyhf" and "SL".' %backend)
@@ -401,7 +397,7 @@ class DataSet(object):
                                                                 signal_yields=float(nsig),
                                                                 xsection=nsig/self.getLumi(),
                                                                 analysis=self.globalInfo.id,
-                                                                backend=AvailableBackends(backendNumber)
+                                                                backend=backend
                                                             )
 
         expectedDict = {False:ExpectationType.observed,
@@ -458,7 +454,7 @@ class DataSet(object):
     #         self.sigma_mu = computer.sigma_mu
     #     return ret
 
-    def chi2(self, nsig, deltas_rel=0.2, marginalize=False, backend="SL"):
+    def chi2(self, nsig, deltas_rel=0.2, marginalize=False, backend="simplified_likelihoods"):
         """
         Computes the chi2 for a given number of observed events "nobs",
         given number of signal events "nsig", and error on signal "deltas".
@@ -475,12 +471,10 @@ class DataSet(object):
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
         if backend == "pyhf":
-            backendNumber = 1
             if marginalize == True:
                 logger.error("pyhf backend cannot marginalize.")
             args={"iteration_threshold":3} #default in spey
-        elif backend == "SL":
-            backendNumber = 2
+        elif backend == "simplified_likelihoods":
             args={"marginalize":marginalize}
         else:
             logger.error('%s is not a valid backend. Possible backends are "pyhf" and "SL".' %backend)
@@ -492,7 +486,7 @@ class DataSet(object):
                                                                 signal_yields=float(nsig),
                                                                 xsection=nsig/self.getLumi(),
                                                                 analysis=self.globalInfo.id,
-                                                                backend=AvailableBackends(backendNumber)
+                                                                backend=backend
                                                             )
         ret = statModel.chi2(poi_test=1., expected = ExpectationType.observed, allow_negative_signal=True)
 
@@ -652,7 +646,6 @@ class DataSet(object):
     #     """
     #
     #     from spey import get_uncorrelated_region_statistical_model
-    #     from spey.backends import AvailableBackends
     #
     #     if backend == "pyhf":
     #         return get_uncorrelated_region_statistical_model(
@@ -662,7 +655,7 @@ class DataSet(object):
     #             signal_yields = signal,
     #             xsection = xsec,
     #             analysis = self.globalInfo.id,
-    #             backend = AvailableBackends(1),
+    #             backend = backend,
     #         )
     #     else:
     #         return get_uncorrelated_region_statistical_model(
@@ -672,7 +665,7 @@ class DataSet(object):
     #             signal_yields = signal,
     #             xsection = xsec,
     #             analysis = self.globalInfo.id,
-    #             backend = AvailableBackends(2),
+    #             backend = backend,
     #         )
 
 

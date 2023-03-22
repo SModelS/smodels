@@ -28,7 +28,7 @@ from smodels.theory import decomposer
 from math import floor, log10
 import numpy as np
 import math
-from spey import get_uncorrelated_region_statistical_model, get_multi_region_statistical_model, ExpectationType, AvailableBackends
+from spey import get_uncorrelated_region_statistical_model, get_multi_region_statistical_model, ExpectationType
 from scipy import optimize
 from pyhf import Workspace
 from pyhf.infer import hypotest
@@ -41,11 +41,7 @@ class StatisticsTest(unittest.TestCase):
     def lLHDFromLimits(self):
         """to do some statistics on the chi2"""
         allow_negative_signal = False
-        for backendNumber in [1,2]:
-            if backendNumber == 1:
-                print("PYHF BACKEND.")
-            elif backendNumber == 2:
-                print("SIMPLIFIED LIKELIHOOD BACKEND.")
+        for backend in ["pyhf","simplified_likelihoods"]:
             nsig = 1.0
             nobs, nbg = 100.0, 100.0
             statModel = get_uncorrelated_region_statistical_model(observations=nobs,
@@ -54,10 +50,10 @@ class StatisticsTest(unittest.TestCase):
                                                                     signal_yields=nsig,
                                                                     xsection=None,
                                                                     analysis="UnitTest",
-                                                                    backend=AvailableBackends(backendNumber)
+                                                                    backend=backend
                                                                 )
             config = statModel.backend.model.config()
-            if backendNumber == 1:
+            if backend == "pyhf":
                 bounds = config.suggested_bounds
             else:
                 bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
@@ -81,7 +77,7 @@ class StatisticsTest(unittest.TestCase):
                                                                         signal_yields=nsig,
                                                                         xsection=None,
                                                                         analysis="UnitTest",
-                                                                        backend=AvailableBackends(backendNumber)
+                                                                        backend=backend
                                                                     )
                 llhddir = statModel.likelihood(nsig,return_nll=False)
                 chi2dir = statModel.chi2()
@@ -268,111 +264,111 @@ class StatisticsTest(unittest.TestCase):
         mu_ul_spey = statModel.poi_upper_limit(expected=ExpectationType.observed,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
         xsec_ul_spey = mu_ul_spey*statModel.xsection
 
-        # mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=ExpectationType.observed, return_nll=False)
-        #
-        # self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,3)
-        # self.assertAlmostEqual(mu_hat_SL,mu_hat_spey,4)
-        # self.assertAlmostEqual(llhdMax_SL,llhdMax_spey,4)
-        #
-        # # Check consistency on CLs
-        # theta_hat0, _ = computer.findThetaHat( 0. )
-        # sigma_mu = computer.getSigmaMu(mu_hat_SL, theta_hat0)
-        #
-        # nll0 = computer.likelihood( mu_hat_SL, marginalize=False, nll=True)
-        # import copy
-        # aModel = copy.deepcopy(d)
-        # aModel.observed = np.array([x + y for x, y in zip(d.backgrounds, theta_hat0)])
-        # aModel.name = aModel.name + "A"
-        # compA = LikelihoodComputer(aModel, 10000)
-        # mu_hatA = compA.findMuHat()
-        # nll0A = compA.likelihood( mu=mu_hatA, marginalize=False, nll=True)
-        #
-        # nll = computer.likelihood(mu=1., marginalize=False, nll=True)
-        # nllA = compA.likelihood(mu=1., marginalize=False, nll=True)
-        #
-        # from smodels.tools.statistics import CLsfromNLL
-        # CLs_SL = CLsfromNLL(nllA, nll0A, nll, nll0, return_type="1-CLs")
-        #
-        # CLs_spey = statModel.exclusion_confidence_level(allow_negative_signal=allow_negative_signal)[0]
-        # self.assertAlmostEqual(CLs_SL,CLs_spey,4)
-        #
-        # # Check consitency on qmu and qmuA
-        # qmu = 0.0 if 2 * (nll - nll0) < 0.0 else 2 * (nll - nll0)
-        # sqmu_SL = np.sqrt(qmu)
-        # qA = 2 * (nllA - nll0A)
-        # if qA < 0.0:
-        #     qA = 0.0
-        # sqA_SL = np.sqrt(qA)
-        #
-        # def _tmu(mu, max_logpdf, logpdf) -> float:
-        #     return -2 * (logpdf(mu) - max_logpdf)
-        # def _tmu_tilde(mu, muhat, min_logpdf, logpdf):
-        #     return -2 * (logpdf(mu) - (min_logpdf if muhat >= 0.0 else logpdf(0.0)))
-        # def qmu_tilde(mu, muhat, min_logpdf, logpdf):
-        #     return 0.0 if muhat > mu else _tmu_tilde(mu, muhat, min_logpdf, logpdf)
-        # def qmu(mu, muhat, max_logpdf, logpdf) -> float:
-        #     return 0.0 if muhat > mu else _tmu(mu, max_logpdf, logpdf)
-        #
-        # def get_test_statistic(test_stat):
-        #     """
-        #     Retrieve test statistic function
-        #
-        #     :raises UnknownTestStatistics: if input doesn't match any available function.
-        #     """
-        #     # syntax with mu is not necessary so accomodate both
-        #     if test_stat in ["qmu", "q"]:
-        #         test_stat = "q"
-        #     elif test_stat in ["qtilde", "qmutilde"]:
-        #         test_stat = "qmutilde"
-        #     options = {"qmutilde": qmu_tilde, "q": qmu}
-        #
-        #     if options.get(test_stat, False) is False:
-        #         raise UnknownTestStatistics(f"Requested test statistics {test_stat} does not exist.")
-        #
-        #     return options[test_stat]
-        #
-        # def compute_teststatistics(mu, maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf, teststat):
-        #     """
-        #     Compute the test statistic for the observed data under the studied model.
-        #
-        #     :param mu (`float`): Signal strength
-        #     :param maximum_likelihood (`Tuple[float, float]`): muhat and minimum negative log-likelihood
-        #     :param logpdf (`Callable[[float], float]`): log of the full density
-        #     :param maximum_asimov_likelihood (`Tuple[float, float]`): muhat and minimum negative
-        #                                                               log-likelihood for asimov data
-        #     :param asimov_logpdf (`Callable[[float], float]`): log of the full density for asimov data
-        #     :param teststat (`Text`): `"qmutilde"`, `"q"` or `"q0"`
-        #     :return `Tuple[float, float, float]`: sqrt(qmu), sqrt(qmuA) and distance between them
-        #     :raises `UnknownTestStatistics`: if input doesn't match any available function.
-        #     """
-        #     teststat_func = get_test_statistic(teststat)
-        #
-        #     muhat, min_nll = maximum_likelihood
-        #     muhatA, min_nllA = maximum_asimov_likelihood
-        #
-        #     # min_logpdf = -min_nll
-        #     qmu = teststat_func(mu, muhat, -min_nll, logpdf)
-        #     qmuA = teststat_func(mu, muhatA, -min_nllA, asimov_logpdf)
-        #     sqrt_qmu = np.sqrt(qmu)
-        #     sqrt_qmuA = np.sqrt(qmuA)
-        #
-        #     if teststat in ["q", "q0", "qmu"]:
-        #         delta_teststat = sqrt_qmu - sqrt_qmuA
-        #     else:
-        #         delta_teststat = (
-        #             sqrt_qmu - sqrt_qmuA
-        #             if sqrt_qmu <= sqrt_qmuA
-        #             else np.true_divide(qmu - qmuA, 2.0 * sqrt_qmuA)
-        #         )
-        #
-        #     return sqrt_qmu, sqrt_qmuA, delta_teststat
-        #
-        # test_stat = "q" if allow_negative_signal else "qmutilde"
-        # (maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf) = statModel._prepare_for_hypotest(expected=ExpectationType.observed, test_statistics=test_stat)
-        # sqrt_qmu_spey, sqrt_qmuA_spey, delta_teststat = compute_teststatistics(mu=1.,maximum_likelihood=maximum_likelihood,logpdf=logpdf ,maximum_asimov_likelihood=maximum_asimov_likelihood,asimov_logpdf=asimov_logpdf,teststat=test_stat)
-        #
-        # self.assertAlmostEqual(sqmu_SL,sqrt_qmu_spey,4)
-        # self.assertAlmostEqual(sqA_SL,sqrt_qmuA_spey,2)
+        mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=ExpectationType.observed, return_nll=False)
+
+        self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,3)
+        self.assertAlmostEqual(mu_hat_SL,mu_hat_spey,4)
+        self.assertAlmostEqual(llhdMax_SL,llhdMax_spey,4)
+
+        # Check consistency on CLs
+        theta_hat0, _ = computer.findThetaHat( 0. )
+        sigma_mu = computer.getSigmaMu(mu_hat_SL, theta_hat0)
+
+        nll0 = computer.likelihood( mu_hat_SL, marginalize=False, nll=True)
+        import copy
+        aModel = copy.deepcopy(d)
+        aModel.observed = np.array([x + y for x, y in zip(d.backgrounds, theta_hat0)])
+        aModel.name = aModel.name + "A"
+        compA = LikelihoodComputer(aModel, 10000)
+        mu_hatA = compA.findMuHat()
+        nll0A = compA.likelihood( mu=mu_hatA, marginalize=False, nll=True)
+
+        nll = computer.likelihood(mu=1., marginalize=False, nll=True)
+        nllA = compA.likelihood(mu=1., marginalize=False, nll=True)
+
+        from smodels.tools.statistics import CLsfromNLL
+        CLs_SL = CLsfromNLL(nllA, nll0A, nll, nll0, return_type="1-CLs")
+
+        CLs_spey = statModel.exclusion_confidence_level(allow_negative_signal=allow_negative_signal)[0]
+        self.assertAlmostEqual(CLs_SL,CLs_spey,4)
+
+        # Check consitency on qmu and qmuA
+        qmu = 0.0 if 2 * (nll - nll0) < 0.0 else 2 * (nll - nll0)
+        sqmu_SL = np.sqrt(qmu)
+        qA = 2 * (nllA - nll0A)
+        if qA < 0.0:
+            qA = 0.0
+        sqA_SL = np.sqrt(qA)
+
+        def _tmu(mu, max_logpdf, logpdf) -> float:
+            return -2 * (logpdf(mu) - max_logpdf)
+        def _tmu_tilde(mu, muhat, min_logpdf, logpdf):
+            return -2 * (logpdf(mu) - (min_logpdf if muhat >= 0.0 else logpdf(0.0)))
+        def qmu_tilde(mu, muhat, min_logpdf, logpdf):
+            return 0.0 if muhat > mu else _tmu_tilde(mu, muhat, min_logpdf, logpdf)
+        def qmu(mu, muhat, max_logpdf, logpdf) -> float:
+            return 0.0 if muhat > mu else _tmu(mu, max_logpdf, logpdf)
+
+        def get_test_statistic(test_stat):
+            """
+            Retrieve test statistic function
+
+            :raises UnknownTestStatistics: if input doesn't match any available function.
+            """
+            # syntax with mu is not necessary so accomodate both
+            if test_stat in ["qmu", "q"]:
+                test_stat = "q"
+            elif test_stat in ["qtilde", "qmutilde"]:
+                test_stat = "qmutilde"
+            options = {"qmutilde": qmu_tilde, "q": qmu}
+
+            if options.get(test_stat, False) is False:
+                raise UnknownTestStatistics(f"Requested test statistics {test_stat} does not exist.")
+
+            return options[test_stat]
+
+        def compute_teststatistics(mu, maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf, teststat):
+            """
+            Compute the test statistic for the observed data under the studied model.
+
+            :param mu (`float`): Signal strength
+            :param maximum_likelihood (`Tuple[float, float]`): muhat and minimum negative log-likelihood
+            :param logpdf (`Callable[[float], float]`): log of the full density
+            :param maximum_asimov_likelihood (`Tuple[float, float]`): muhat and minimum negative
+                                                                      log-likelihood for asimov data
+            :param asimov_logpdf (`Callable[[float], float]`): log of the full density for asimov data
+            :param teststat (`Text`): `"qmutilde"`, `"q"` or `"q0"`
+            :return `Tuple[float, float, float]`: sqrt(qmu), sqrt(qmuA) and distance between them
+            :raises `UnknownTestStatistics`: if input doesn't match any available function.
+            """
+            teststat_func = get_test_statistic(teststat)
+
+            muhat, min_nll = maximum_likelihood
+            muhatA, min_nllA = maximum_asimov_likelihood
+
+            # min_logpdf = -min_nll
+            qmu = teststat_func(mu, muhat, -min_nll, logpdf)
+            qmuA = teststat_func(mu, muhatA, -min_nllA, asimov_logpdf)
+            sqrt_qmu = np.sqrt(qmu)
+            sqrt_qmuA = np.sqrt(qmuA)
+
+            if teststat in ["q", "q0", "qmu"]:
+                delta_teststat = sqrt_qmu - sqrt_qmuA
+            else:
+                delta_teststat = (
+                    sqrt_qmu - sqrt_qmuA
+                    if sqrt_qmu <= sqrt_qmuA
+                    else np.true_divide(qmu - qmuA, 2.0 * sqrt_qmuA)
+                )
+
+            return sqrt_qmu, sqrt_qmuA, delta_teststat
+
+        test_stat = "q" if allow_negative_signal else "qmutilde"
+        (maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf) = statModel._prepare_for_hypotest(expected=ExpectationType.observed, test_statistics=test_stat)
+        sqrt_qmu_spey, sqrt_qmuA_spey, delta_teststat = compute_teststatistics(mu=1.,maximum_likelihood=maximum_likelihood,logpdf=logpdf ,maximum_asimov_likelihood=maximum_asimov_likelihood,asimov_logpdf=asimov_logpdf,teststat=test_stat)
+
+        self.assertAlmostEqual(sqmu_SL,sqrt_qmu_spey,4)
+        self.assertAlmostEqual(sqA_SL,sqrt_qmuA_spey,2)
 
     def testUpperLimitOnSigmaTimesEff_pyhf_1(self):
         """
@@ -791,9 +787,7 @@ class StatisticsTest(unittest.TestCase):
         """test the chi2 value that we obtain from limits"""
         allow_negative_signal = False
         print("Truncated Gaussian is not a spey feature yet.")
-        for backendNumber in [1,2]:
-            #backendNumber == 1: pyhf backend
-            #backendNumber == 2: simplified likelihood backend
+        for backend in ["pyhf","simplified_likelihoods"]:
             nsig = 35.0
             nobs, nbg = 110., 100.0
             lumi = 1.
@@ -803,10 +797,10 @@ class StatisticsTest(unittest.TestCase):
                                                                     signal_yields=nsig,
                                                                     xsection=None,
                                                                     analysis="UnitTest",
-                                                                    backend=AvailableBackends(backendNumber)
+                                                                    backend=backend
                                                                 )
             config = statModel.backend.model.config()
-            if backendNumber == 1:
+            if backend == "pyhf":
                 bounds = config.suggested_bounds
             else:
                 bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
@@ -822,7 +816,7 @@ class StatisticsTest(unittest.TestCase):
             llhddir = statModel.likelihood(poi_test=1.,return_nll=False)
             chi2dir = statModel.chi2()
             ### Marginalization does not work but we do not care for the moment.
-            # if backendNumber == 2: # pyhf cannot marginalize
+            # if backend == "simplified_likelihoods": # pyhf cannot marginalize
             #     llhdmarg = statModel.likelihood(mu=1., marginalize=True)
             #     chi2marg = statModel.chi2(marginalize=True)
             computer = TruncatedGaussians ( xsec_ul_obs, xsec_ul_exp, nsig )
@@ -832,7 +826,7 @@ class StatisticsTest(unittest.TestCase):
             self.assertAlmostEqual(muhat,0.23328649242374602,3)
             self.assertAlmostEqual(sigma_mu,0.3383372145700653,3) # Allowing differences below 4 places was a bit too restrictive, ok with only 3 (0.08% difference is ok)
             ### Marginalization does not work but we do not care for the moment.
-            # if backendNumber == 2: # pyhf cannot marginalize?
+            # if backend == "simplified_likelihoods": # pyhf cannot marginalizes
             #     chi2lim = computer.chi2 ( ) # llhdlim )
             #     ## relative error on chi2, for this example is about 4%
             #     rel = abs(chi2lim - chi2marg) / chi2marg
@@ -840,9 +834,7 @@ class StatisticsTest(unittest.TestCase):
 
     def testUpperLimit(self):
         allow_negative_signal = True
-        for backendNumber in [1,2]:
-            #backendNumber == 1: pyhf backend
-            #backendNumber == 2: simplified likelihood backend
+        for backend in ["pyhf","simplified_likelihoods"]:
             nsig = 1.0
             nobs, nbg = 100.0, 100.0
             bgError = round(np.sqrt(0.001),5) # pyhf convergence fails for small values of the background error, so fix it at a small value that converges correclty.
@@ -852,10 +844,10 @@ class StatisticsTest(unittest.TestCase):
                                                                     signal_yields=nsig,
                                                                     xsection=None,
                                                                     analysis="UnitTest",
-                                                                    backend=AvailableBackends(backendNumber)
+                                                                    backend=backend
                                                                 )
             config = statModel.backend.model.config()
-            if backendNumber == 1:
+            if backend == "pyhf":
                 bounds = config.suggested_bounds
             else:
                 bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
@@ -902,9 +894,7 @@ class StatisticsTest(unittest.TestCase):
         pred_signal_strength = prediction.xsection.value
         nsig = (pred_signal_strength * expRes.globalInfo.lumi).asNumber()
 
-        for backendNumber,backend in zip([1,2],["pyhf","SL"]):
-            #backendNumber == 1: pyhf backend
-            #backendNumber == 2: simplified likelihood backend
+        for backend in ["pyhf","simplified_likelihoods"]:
             prediction.computeStatistics(backend=backend)
             ill = math.log(prediction.likelihood())
             ichi2 = prediction.chi2()
@@ -914,7 +904,7 @@ class StatisticsTest(unittest.TestCase):
                                                                     signal_yields=nsig,
                                                                     xsection=None,
                                                                     analysis="UnitTest",
-                                                                    backend=AvailableBackends(backendNumber)
+                                                                    backend=backend
                                                                 )
             dll = math.log(statModel.likelihood(poi_test=1.,return_nll=False))
             self.assertTrue(abs((ill-dll)*100./dll) < 3) # Previous test "self.assertAlmostEqual(ill, dll, places=2)" was too restrictive.
@@ -928,16 +918,14 @@ class StatisticsTest(unittest.TestCase):
 
     def testZeroLikelihood(self):
         """A test to check if a llhd of 0 is being tolerated"""
-        for backendNumber in [1,2]:
-            #backendNumber == 1: pyhf backend
-            #backendNumber == 2: simplified likelihood backend
+        for backend in ["pyhf","simplified_likelihoods"]:
             statModel = get_uncorrelated_region_statistical_model(observations=1e20,
                                                                     backgrounds=2.2,
                                                                     background_uncertainty=1.1,
                                                                     signal_yields=2.,
                                                                     xsection=None,
                                                                     analysis="UnitTest",
-                                                                    backend=AvailableBackends(backendNumber)
+                                                                    backend=backend
                                                                 )
             # Spey returns nan for pyhf backend but 0 for SL backend
             llhd = statModel.likelihood(poi_test=1.,return_nll=False)
@@ -1482,16 +1470,14 @@ class StatisticsTest(unittest.TestCase):
             deltab = d["deltab"]
             # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
             # Chi2 as computed by statistics module:
-            for backendNumber in [1,2]:
-                #backendNumber == 1: pyhf backend
-                #backendNumber == 2: simplified likelihood backend
+            for backend in ["pyhf","simplified_likelihoods"]:
                 statModel = get_uncorrelated_region_statistical_model(observations=nobs,
                                                                         backgrounds=nb,
                                                                         background_uncertainty=deltab,
                                                                         signal_yields=2.,
                                                                         xsection=None,
                                                                         analysis="UnitTest",
-                                                                        backend=AvailableBackends(backendNumber)
+                                                                        backend=backend
                                                                     )
                 # spey doesn't allow for marginalized chi2 yet
                 # chi2_actual = statModel.chi2( marginalize=True)  # , .2*nsig )

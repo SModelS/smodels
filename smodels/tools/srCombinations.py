@@ -13,7 +13,7 @@ from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperL
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
-from spey import get_uncorrelated_region_statistical_model, get_multi_region_statistical_model, ExpectationType,AvailableBackends
+from spey import get_uncorrelated_region_statistical_model, get_multi_region_statistical_model, ExpectationType
 from smodels.tools.physicsUnits import fb, pb
 
 def _getBestStatModel(dataset, nsig, allow_negative_signal=False, return_mu_ul_exp_min=False):
@@ -81,7 +81,7 @@ def _getBestStatModel(dataset, nsig, allow_negative_signal=False, return_mu_ul_e
                                                                         signal_yields=float(sig),
                                                                         xsection=xsec,
                                                                         analysis=dataset.globalInfo.id,
-                                                                        backend=AvailableBackends(2) # simplified likelhood backend by default
+                                                                        backend="simplified_likelihoods" # simplified likelhood backend by default
                                                                         )
     if mu_ul_exp_min == np.inf:
         logger.error(f'No minimal upper limit on POI found for {dataset.globalInfo.id}')
