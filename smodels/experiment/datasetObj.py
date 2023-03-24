@@ -304,14 +304,8 @@ class DataSet(object):
             logger.error('%s is not a valid backend. Possible backends are "pyhf" and "simplified_likelihoods".' %backend)
             return None
 
-        statModel = get_uncorrelated_region_statistical_model(observations=float(self.dataInfo.observedN),
-                                                                backgrounds=float(self.dataInfo.expectedBG),
-                                                                background_uncertainty=float(self.dataInfo.bgError),
-                                                                signal_yields=float(nsig),
-                                                                xsection=nsig/self.getLumi(),
-                                                                analysis=self.globalInfo.id,
-                                                                backend=backend
-                                                            )
+        statModel = self.getStatModel(nsig,backend)
+
         expectedDict = {False:ExpectationType.observed,
                         True:ExpectationType.apriori,
                         "posteriori":ExpectationType.aposteriori}
@@ -390,15 +384,6 @@ class DataSet(object):
             logger.error('%s is not a valid backend. Possible backends are "pyhf" and "simplified_likelihoods".' %backend)
             return None
 
-        statModel = get_uncorrelated_region_statistical_model(observations=float(self.dataInfo.observedN),
-                                                                backgrounds=float(self.dataInfo.expectedBG),
-                                                                background_uncertainty=float(self.dataInfo.bgError),
-                                                                signal_yields=float(nsig),
-                                                                xsection=nsig/self.getLumi(),
-                                                                analysis=self.globalInfo.id,
-                                                                backend=backend
-                                                            )
-
         expectedDict = {False:ExpectationType.observed,
                         True:ExpectationType.apriori,
                         "posteriori":ExpectationType.aposteriori}
@@ -406,12 +391,28 @@ class DataSet(object):
             logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
             return None
 
-        muhat, maxLL = statModel.maximize_likelihood(return_nll=False, expected=expectedDict[expected], allow_negative_signal=allowNegativeSignals , **args)
+        statModel = self.getStatModel(nsig,backend)
+
+        config = statModel.backend.model.config()
+        bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
+        if allowNegativeSignals:
+            bounds[config.poi_index] = (config.minimum_poi, 100)
+        else:
+            bounds[config.poi_index] = (0, 100)
+
+        muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, **args)
+        while muhat == bounds[config.poi_index][1]:
+            logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
+            bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
+            muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
 
         self.muhat = muhat
         self.sigma_mu = np.sqrt(self.dataInfo.observedN + self.dataInfo.bgError**2) / nsig
+        # Spey computation of sigma_mu
+        # test_statistics = "q" if allowNegativeSignals else "qmutilde"
+        # sigma_mu = statModel.sigma_mu(poi_test=muhat,expected=expectedDict[expected],test_statistics=test_statistics)
 
-        return maxLL
+        return lmax
 
     # def lmax(self, deltas_rel=0.2, marginalize=False, expected=False,allowNegativeSignals=False):
     #     """
@@ -481,15 +482,9 @@ class DataSet(object):
             logger.error('%s is not a valid backend. Possible backends are "pyhf" and "simplified_likelihoods".' %backend)
             return None
 
-        statModel = get_uncorrelated_region_statistical_model(observations=float(self.dataInfo.observedN),
-                                                                backgrounds=float(self.dataInfo.expectedBG),
-                                                                background_uncertainty=float(self.dataInfo.bgError),
-                                                                signal_yields=float(nsig),
-                                                                xsection=nsig/self.getLumi(),
-                                                                analysis=self.globalInfo.id,
-                                                                backend=backend
-                                                            )
-        ret = statModel.chi2(poi_test=1., expected = ExpectationType.observed, allow_negative_signal=True)
+        statModel = self.getStatModel(nsig)
+
+        ret = statModel.chi2(poi_test=1., expected = ExpectationType.observed, allow_negative_signal=True, **args)
 
         return ret
 
@@ -644,8 +639,6 @@ class DataSet(object):
         :raises NotImplementedError: If requested backend has not been recognised.
         """
 
-        from spey import get_uncorrelated_region_statistical_model
-
         if hasattr(self, "statModel"):
             return self.statModel
         else:
@@ -773,7 +766,7 @@ class CombinedDataSet(object):
         return None
 
     # !TP
-    def getWSInfo(self, jsons):
+    def _getWSInfo(self, jsons):
         """
         Getting informations from the json files
 
@@ -819,7 +812,7 @@ class CombinedDataSet(object):
         return wsInfo
 
     # !TP
-    def patchMaker(self, jsons, wsInfo, nsignals, includeCRs):
+    def _patchMaker(self, jsons, wsInfo, nsignals, includeCRs):
         """
         Method that creates the list of patches to be applied to the `jsons` workspaces, one for each region given the `nsignals` and the informations available in `wsInfo` and the content of the `jsons`
 
@@ -865,7 +858,6 @@ class CombinedDataSet(object):
     def _getPatches(self, nsig):
         """
         :param nsig: list of signal yields (not relative).
-        :param normalize: if true, normalize nsig
 
         :returns: the list of patches, one for each wkspace and the list of list of signals (one list for each json file).
         """
@@ -912,8 +904,8 @@ class CombinedDataSet(object):
         else:
             includeCRs = False
 
-        wsInfo = getWSInfo(jsons)
-        self.patches = patchMaker(jsons, wsInfo, listOfSignals, includeCRs)
+        wsInfo = self._getWSInfo(jsons)
+        self.patches = self._patchMaker(jsons, wsInfo, listOfSignals, includeCRs)
         return self.patches, listOfSignals
 
     # !TP
@@ -921,7 +913,6 @@ class CombinedDataSet(object):
             """
             find the index of the best expected combination.
 
-            :param dataset: the CombinedDataSet object.
             :param nsig: list of signal yields.
             :param allow_negative_signal: if True, the expected upper limit on mu, used to find the best statistical model, can be negative.
 
@@ -932,7 +923,7 @@ class CombinedDataSet(object):
             for SRnames in self.globalInfo.jsonFiles.values():
                 listOfSRInJson += SRnames
 
-            patches, listOfSignals = _getPatches(self, nsig)
+            patches, listOfSignals = self._getPatches(nsig)
             mu_ul_exp_min = np.inf
             # Find best combination of signal regions
             for index, (patch, json) in enumerate(zip(patches,self.globalInfo.jsons)):
@@ -952,15 +943,24 @@ class CombinedDataSet(object):
                                                                 )
                 # If all the SRs are used in the json files and there is only one json files, there is only one statModel.
                 # No need to compute mu_ul_exp if not needed.
-                if all([ds.dataInfo.dataId in listOfSRInJson for ds in self._datasets]) and len(self.globalInfo.jsons) == 1 and return_mu_ul_exp_min == False:
+                if all([ds.dataInfo.dataId in listOfSRInJson for ds in self._datasets]) and len(self.globalInfo.jsons) == 1:
                     return statModel
+
                 config = statModel.backend.model.config()
-                bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
+                bounds = config.suggested_bounds
                 if allow_negative_signal:
                     bounds[config.poi_index] = (config.minimum_poi, 100)
                 else:
                     bounds[config.poi_index] = (0, 100)
+
                 mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
+                while mu_ul_exp == bounds[config.poi_index][1]:
+                    logger.debug('Expected upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
+                    bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
+                    mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
+
+                if mu_ul_exp == 0 and not allow_negative_signal:
+                    logger.warning(f'Expected upper limit on poi is negative when searching for the best statistical model for analysis {self.globalInfo.id}.')
                 if mu_ul_exp == None:
                     continue
                 elif mu_ul_exp < mu_ul_exp_min:
@@ -978,21 +978,12 @@ class CombinedDataSet(object):
                     if mu_ul_exp < muull_exp_min:
                         logger.info("Best constraining model is a single uncorrelated model.")
                         mu_ul_exp_min = mu_ul_exp
-                        bestStatModel = get_uncorrelated_region_statistical_model(observations=float(ds.observedN),
-                                                                                backgrounds=float(ds.expectedBG),
-                                                                                background_uncertainty=float(ds.bgError),
-                                                                                signal_yields=float(sig),
-                                                                                xsection=xsec,
-                                                                                analysis=self.globalInfo.id,
-                                                                                backend="simplified_likelihoods" # simplified likelhood backend by default
-                                                                                )
+                        bestStatModel = ds.getStatModel(sig)
+
             if mu_ul_exp_min == np.inf:
                 logger.error(f'No minimal upper limit on POI found for {self.globalInfo.id}')
                 return None
-            if return_mu_ul_exp_min:
-                return bestStatModel, mu_ul_exp_min
-            else:
-                return bestStatModel
+            return bestStatModel
 
     # !TP
     def getStatModel(self,
@@ -1021,6 +1012,10 @@ class CombinedDataSet(object):
             if self.type == "simplified":
                 nobs = [x.dataInfo.observedN for x in self.origdatasets]
                 cov = self.globalInfo.covariance
+                if type(cov) != list:
+                    raise SModelSError("covariance field has wrong type: %s" % type(cov))
+                if len(cov) < 1:
+                    raise SModelSError("covariance matrix has length %d." % len(cov))
                 bg = [x.dataInfo.expectedBG for x in self.origdatasets]
                 third_moment = self.globalInfo.third_moment if hasattr(self.globalInfo, "third_moment") else None
                 xsec = sum(nsig)/self.getLumi()
@@ -1038,3 +1033,5 @@ class CombinedDataSet(object):
                 self.statModel = self._getBestStatModel(nsig, allow_negative_signal=allow_negative_signal)
             else:
                 logger.error(f'Dataset of type "{self.type}" for analysis {self.globalInfo.id} is not of type "simplified" or "pyhf".')
+
+            return self.statModel
