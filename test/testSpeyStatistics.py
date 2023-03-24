@@ -180,7 +180,7 @@ class StatisticsTest(unittest.TestCase):
         mu_ul_spey = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal,par_bounds=bounds)
         xsec_ul_spey = mu_ul_spey*statModel.xsection
 
-        mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=ExpectationType.observed, return_nll=False)
+        mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=ExpectationType.observed, return_nll=False, par_bounds=bounds)
 
         self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,3)
         self.assertAlmostEqual(mu_hat_SL,mu_hat_spey,4)
@@ -254,6 +254,7 @@ class StatisticsTest(unittest.TestCase):
                                                         delta_sys=0.2,
                                                         xsection=xsec
                                                         )
+
         config = statModel.backend.model.config()
         bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
         if allow_negative_signal:
@@ -264,7 +265,7 @@ class StatisticsTest(unittest.TestCase):
         mu_ul_spey = statModel.poi_upper_limit(expected=ExpectationType.observed,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
         xsec_ul_spey = mu_ul_spey*statModel.xsection
 
-        mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=ExpectationType.observed, return_nll=False)
+        mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=ExpectationType.observed, return_nll=False, par_bounds=bounds)
 
         self.assertAlmostEqual(xsec_ul_SL._value,xsec_ul_spey._value,3)
         self.assertAlmostEqual(mu_hat_SL,mu_hat_spey,4)
@@ -289,7 +290,7 @@ class StatisticsTest(unittest.TestCase):
         from smodels.tools.statistics import CLsfromNLL
         CLs_SL = CLsfromNLL(nllA, nll0A, nll, nll0, return_type="1-CLs")
 
-        CLs_spey = statModel.exclusion_confidence_level(allow_negative_signal=allow_negative_signal)[0]
+        CLs_spey = statModel.exclusion_confidence_level(allow_negative_signal=allow_negative_signal,par_bounds=bounds)[0]
         self.assertAlmostEqual(CLs_SL,CLs_spey,4)
 
         # Check consitency on qmu and qmuA
@@ -364,7 +365,7 @@ class StatisticsTest(unittest.TestCase):
             return sqrt_qmu, sqrt_qmuA, delta_teststat
 
         test_stat = "q" if allow_negative_signal else "qmutilde"
-        (maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf) = statModel._prepare_for_hypotest(expected=ExpectationType.observed, test_statistics=test_stat)
+        (maximum_likelihood, logpdf, maximum_asimov_likelihood, asimov_logpdf) = statModel._prepare_for_hypotest(expected=ExpectationType.observed, test_statistics=test_stat,par_bounds=bounds)
         sqrt_qmu_spey, sqrt_qmuA_spey, delta_teststat = compute_teststatistics(mu=1.,maximum_likelihood=maximum_likelihood,logpdf=logpdf ,maximum_asimov_likelihood=maximum_asimov_likelihood,asimov_logpdf=asimov_logpdf,teststat=test_stat)
 
         self.assertAlmostEqual(sqmu_SL,sqrt_qmu_spey,4)
@@ -537,7 +538,7 @@ class StatisticsTest(unittest.TestCase):
         expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2018-31"])[1]
 
         filename = './testFilesTim/T6bbHH_1000_600_60_1000_600_60.slha'
-        
+
         model = Model(BSMList, SMList)
         model.updateParticles(filename)
         smstoplist = decomposer.decompose(model, sigmacut=0.)

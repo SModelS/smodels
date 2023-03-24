@@ -49,6 +49,7 @@ class TheoryPrediction(object):
         self.cachedLlhds = {False: {}, True: {}, "posteriori": {}}
         self.statModel = None
 
+    # !TP
     # def getStatModel():
     #     if spey==True:
     #         if self.dataset.getType() == "combined":
@@ -115,16 +116,6 @@ class TheoryPrediction(object):
             return "??"
 
         return self.dataset.getType()
-
-    def getStatModel(self):
-        """
-
-        """
-        if self.statModel == None:
-            self.statModel = self.dataset.getStatModel(self.)
-        if self.statModel == None:
-            logger.error(f"Couldn't build a statistical model for {self.analysis}.")
-        return statModel
 
     def getUpperLimit(self, expected=False):
         """
@@ -440,6 +431,7 @@ class TheoryPrediction(object):
                 backend=backend
             )
             llhd_max = self.dataset.lmax(
+                nsig=nsig,
                 marginalize=self.marginalize,
                 deltas_rel=self.deltas_rel,
                 allowNegativeSignals=allowNegativeSignals,

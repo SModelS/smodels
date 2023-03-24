@@ -44,6 +44,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
             bounds[config.poi_index] = (config.minimum_poi, 100)
         else:
             bounds[config.poi_index] = (0, 100)
+
         mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allowNegativeSignals,par_bounds=bounds)
         while mu_ul == bounds[config.poi_index][1]:
             logger.debug('Upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
@@ -178,7 +179,13 @@ def getCombinedLikelihood(
 
         statModel = dataset.getStatModel(nsig)
 
-        lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=False)
+        config = statModel.backend.model.config()
+        bounds = config.suggested_bounds
+        if allowNegativeSignals:
+            bounds[config.poi_index] = (config.minimum_poi, 100)
+        else:
+            bounds[config.poi_index] = (0, 100)
+        lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=False, par_bounds=bounds)
 
         # ulcomputer = _getPyhfComputer(dataset, nsig, False)
         # index = ulcomputer.getBestCombinationIndex()
@@ -360,7 +367,14 @@ def getCombinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel
         logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
         return None
 
-    ret = statModel.likelihood(poi_test=mu, expected=expectedDict[expected], return_nll=False, **args)
+    config = statModel.backend.model.config()
+    bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
+    if allowNegativeSignals:
+        bounds[config.poi_index] = (config.minimum_poi, 100)
+    else:
+        bounds[config.poi_index] = (0, 100)
+
+    ret = statModel.likelihood(poi_test=mu, expected=expectedDict[expected], return_nll=False, par_bounds=bounds, **args)
 
     return ret
 

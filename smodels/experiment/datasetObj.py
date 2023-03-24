@@ -282,14 +282,15 @@ class DataSet(object):
         error on the signal efficiency.
         The values observedN, expectedBG, and bgError are part of dataInfo.
 
-        :param nsig: predicted signal (float)
+        :param nsig: predicted signal (float).
 
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param expected: if true, compute prior expected, if false compute observed
                          if "posteriori" compute posterior expected
         :param backend: the backend used to compute the likelihood. Can be "pyhf" or "SL".
-        :returns: likelihood to observe nobs events (float)
+
+        :returns: likelihood to observe nobs events (float).
         """
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
@@ -313,7 +314,10 @@ class DataSet(object):
             logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
             return None
 
-        ret = statModel.likelihood(poi_test=1., expected=expectedDict[expected], return_nll=False, **args)
+        config = statModel.backend.model.config()
+        bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
+
+        ret = statModel.likelihood(poi_test=1., expected=expectedDict[expected], return_nll=False, par_bounds=bounds, **args)
         return ret
 
     # def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False):
@@ -356,20 +360,21 @@ class DataSet(object):
     #
     #     return ret
 
-    def lmax(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, allowNegativeSignals=False, backend="simplified_likelihoods"):
+    def lmax(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, allowNegativeSignals=False, nll=False, backend="simplified_likelihoods"):
         """
         Convenience function, computes the likelihood at nsig = observedN - expectedBG,
         assuming "deltas_rel" error on the signal efficiency.
         The values observedN, expectedBG, and bgError are part of dataInfo.
 
-        :param nsig: predicted signal (float)
+        :param nsig: predicted signal (float).
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
-        :param expected: Compute expected instead of observed likelihood
+        :param expected: compute expected instead of observed likelihood.
         :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
+        :param nll: if Ture, return -ln(lmax) instead of lmax.
         :param backend: the backend used to compute the likelihood. Can be "pyhf" or "SL".
 
-        :returns: likelihood to observe nobs events (float)
+        :returns: likelihood to observe nobs events (float).
         """
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
@@ -460,13 +465,14 @@ class DataSet(object):
         """
         Computes the chi2 for a given number of observed events "nobs",
         given number of signal events "nsig", and error on signal "deltas".
-
         nobs, expectedBG and bgError are part of dataInfo.
-        :param nsig: predicted signal (float)
+
+        :param nsig: predicted signal (float).
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param backend: the backend used to compute the likelihood. Can be "pyhf" or "SL".
-        :return: chi2 (float)
+
+        :return: chi2 (float).
         """
 
         if deltas_rel != 0.2:
@@ -484,7 +490,14 @@ class DataSet(object):
 
         statModel = self.getStatModel(nsig)
 
-        ret = statModel.chi2(poi_test=1., expected = ExpectationType.observed, allow_negative_signal=True, **args)
+        config = statModel.backend.model.config()
+        bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
+        if allowNegativeSignals:
+            bounds[config.poi_index] = (config.minimum_poi, 100)
+        else:
+            bounds[config.poi_index] = (0, 100)
+
+        ret = statModel.chi2(poi_test=1., expected = ExpectationType.observed, allow_negative_signal=True, par_bounds=bounds, **args)
 
         return ret
 
@@ -539,18 +552,19 @@ class DataSet(object):
         will be rescaled according to the lifetimes of the element intermediate particles.
         On the other hand, if a mass is given, no rescaling will be applied.
 
-        :param txname: TxName object or txname string (only for UL-type results)
-        :param element: Element object or mass array with units (only for UL-type results)
-        :param alpha: Can be used to change the C.L. value. The default value is 0.05
-                      (= 95% C.L.) (only for  efficiency-map results)
+        :param txname: TxName object or txname string (only for UL-type results).
+        :param element: element object or mass array with units (only for UL-type results).
+        :param alpha: can be used to change the C.L. value. The default value is 0.05
+                      (= 95% C.L.) (only for  efficiency-map results).
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-        :param expected: Compute expected limit, i.e. Nobserved = NexpectedBG
-                         (only for efficiency-map results)
-        :param compute: If True, the upper limit will be computed
+        :param expected: compute expected limit, i.e. Nobserved = NexpectedBG
+                         (only for efficiency-map results).
+        :param compute: if True, the upper limit will be computed
                         from expected and observed number of events.
-                        If False, the value listed in the database will be used
+                        if False, the value listed in the database will be used
                         instead.
-        :return: upper limit (Unum object)
+
+        :return: upper limit (Unum object).
         """
 
         if self.getType() == 'efficiencyMap':
@@ -603,9 +617,9 @@ class DataSet(object):
         Returns the 95% upper limit on the signal*efficiency for a given dataset (signal region).
         Only to be used for efficiency map type results.
 
-        :param expected: If True, return the expected limit ( i.e. Nobserved = NexpectedBG )
+        :param expected: If True, return the expected limit ( i.e. Nobserved = NexpectedBG ).
 
-        :return: upper limit value
+        :return: upper limit value.
         """
 
         if not self.getType() == 'efficiencyMap':
@@ -625,16 +639,16 @@ class DataSet(object):
 
     # !TP
     def getStatModel(self,
-        signal: Union[float, np.ndarray],
+        nsig: Union[float, np.ndarray],
         backend: Text = "simplified_likelihoods"
     ):
         """
-        Create statistical model from a single bin or multiple uncorrelated regions
+        Create statistical model from a single bin or multiple uncorrelated regions.
 
-        :param signal: signal yields
-        :param backend: "pyhf" or "simplified_likelihoods"
+        :param nsig: signal yields.
+        :param backend: "pyhf" or "simplified_likelihoods".
 
-        :return: spey StatisticalModel object
+        :return: spey StatisticalModel object.
 
         :raises NotImplementedError: If requested backend has not been recognised.
         """
@@ -645,7 +659,7 @@ class DataSet(object):
             self.statModel =  get_uncorrelated_region_statistical_model(observations = float(self.dataInfo.observedN),
                                                                         backgrounds = float(self.dataInfo.expectedBG),
                                                                         background_uncertainty = float(self.dataInfo.bgError),
-                                                                        signal_yields = signal,
+                                                                        signal_yields = nsig,
                                                                         xsection = nsig/self.getLumi(),
                                                                         analysis = self.globalInfo.id,
                                                                         backend = backend
@@ -683,10 +697,12 @@ class CombinedDataSet(object):
 
     def getIndex(self, dId, datasetOrder):
         """ get the index of dataset within the datasetOrder,
-            but allow for abbreviated names
-        :param dId: id of dataset to search for, may be abbreviated
-        :param datasetOrder: the ordered list of datasetIds, long form
-        :returns: index, or -1 if not found
+            but allow for abbreviated names.
+
+        :param dId: id of dataset to search for, may be abbreviated.
+        :param datasetOrder: the ordered list of datasetIds, long form.
+
+        :returns: index, or -1 if not found.
         """
         if dId in datasetOrder:
             # easy peasy, we found the dId
@@ -729,14 +745,14 @@ class CombinedDataSet(object):
 
     def getType(self):
         """
-        Return the dataset type (combined)
+        Return the dataset type (combined).
         """
 
         return 'combined'
 
     def getID(self):
         """
-        Return the ID for the combined dataset
+        Return the ID for the combined dataset.
         """
 
         return '(combined)'
@@ -768,13 +784,13 @@ class CombinedDataSet(object):
     # !TP
     def _getWSInfo(self, jsons):
         """
-        Getting informations from the json files
+        Getting informations from the json files.
 
         :param jsons: list of json instances.
 
         :return: wsInfo list of dictionaries (one dictionary for each json file) containing useful information about the json files.
-            - :key signalRegions: list of dictonaries with 'json path' and 'size' (number of bins) of the 'signal regions' channels in the json files
-            - :key otherRegions: list of strings indicating the path to the control and validation region channels
+            - :key signalRegions: list of dictonaries with 'json path' and 'size' (number of bins) of the 'signal regions' channels in the json files.
+            - :key otherRegions: list of strings indicating the path to the control and validation region channels.
         """
         # Identifying the path to the SR and VR channels in the main workspace files
         wsInfo = []  # workspace specifications
@@ -814,17 +830,17 @@ class CombinedDataSet(object):
     # !TP
     def _patchMaker(self, jsons, wsInfo, nsignals, includeCRs):
         """
-        Method that creates the list of patches to be applied to the `jsons` workspaces, one for each region given the `nsignals` and the informations available in `wsInfo` and the content of the `jsons`
+        Method that creates the list of patches to be applied to the `jsons` workspaces, one for each region given the `nsignals` and the informations available in `wsInfo` and the content of the `jsons`.
 
         :param jsons: list of json instances.
-        :param wsInfo: list of dictionaries (one dictionary for each json file) containing useful information about the json files
+        :param wsInfo: list of dictionaries (one dictionary for each json file) containing useful information about the json files.
         :param nsignals: list of list of signal yields (one list for each json file).
         :param includeCRs: if True leaves the pacth unchanged,
                            if False adds to the patch an operation that removes the CRs from the json files.
 
-        NB: It seems we need to include the change of the "modifiers" in the patches as well
+        NB: It seems we need to include the change of the "modifiers" in the patches as well.
 
-        :return: the list of patches, one for each workspace
+        :return: the list of patches, one for each workspace.
         """
         if wsInfo == None:
             return None
@@ -1001,9 +1017,9 @@ class CombinedDataSet(object):
         :param delta_sys: systematic uncertainty on signal. Only used for simplified likelihood backend.
         :param allow_negative_signal: if True, the expected upper limit on mu, used to find the best statistical model, can be negative.
 
-        :return: spey StatisticalModel object
+        :return: spey StatisticalModel object.
 
-        :raises NotImplementedError: if input patter does not match to any backend specific input option
+        :raises NotImplementedError: if input patter does not match to any backend specific input option.
         """
 
         if hasattr(self, "statModel"):
