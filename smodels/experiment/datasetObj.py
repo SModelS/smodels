@@ -22,7 +22,7 @@ from smodels.theory.element import Element
 
 from typing import Text, Union, List, Dict, Optional
 import itertools
-from spey import get_uncorrelated_region_statistical_model,ExpectationType
+from spey import get_uncorrelated_region_statistical_model, get_multi_region_statistical_model, ExpectationType
 
 # if on, will check for overlapping constraints
 _complainAboutOverlappingConstraints = True
@@ -362,12 +362,13 @@ class DataSet(object):
     #
     #     return ret
 
-    def lmax(self, deltas_rel=0.2, marginalize=False, expected=False, allowNegativeSignals=False, backend="simplified_likelihoods"):
+    def lmax(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, allowNegativeSignals=False, backend="simplified_likelihoods"):
         """
         Convenience function, computes the likelihood at nsig = observedN - expectedBG,
         assuming "deltas_rel" error on the signal efficiency.
         The values observedN, expectedBG, and bgError are part of dataInfo.
 
+        :param nsig: predicted signal (float)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
         :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param expected: Compute expected instead of observed likelihood
@@ -389,8 +390,6 @@ class DataSet(object):
             logger.error('%s is not a valid backend. Possible backends are "pyhf" and "simplified_likelihoods".' %backend)
             return None
 
-        nsig = 1. #doesn't matter. Does it?
-
         statModel = get_uncorrelated_region_statistical_model(observations=float(self.dataInfo.observedN),
                                                                 backgrounds=float(self.dataInfo.expectedBG),
                                                                 background_uncertainty=float(self.dataInfo.bgError),
@@ -407,8 +406,10 @@ class DataSet(object):
             logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
             return None
 
-        # Do not return muhat here, it depends on the signal, which is taken arbitrarily because it doesn't affect maxLL
-        maxLL = statModel.maximize_likelihood(return_nll=False, expected=expectedDict[expected], allow_negative_signal=allowNegativeSignals , **args)[-1]
+        muhat, maxLL = statModel.maximize_likelihood(return_nll=False, expected=expectedDict[expected], allow_negative_signal=allowNegativeSignals , **args)
+
+        self.muhat = muhat
+        self.sigma_mu = np.sqrt(self.dataInfo.observedN + self.dataInfo.bgError**2) / nsig
 
         return maxLL
 
@@ -628,45 +629,35 @@ class DataSet(object):
                 return self.dataInfo.upperLimit
 
     # !TP
-    # def getStatModel(self,
-    #     signal_yields: Union[float, np.ndarray],
-    #     xsection: Union[float, np.ndarray],
-    #     backend: Text = "pyhf"
-    # ):
-    #     """
-    #     Create statistical model from a single bin or multiple uncorrelated regions
-    #
-    #     :param signal_yields: signal yields
-    #     :param xsection: cross-section
-    #     :param backend: "pyhf" or "simplified_likelihoods"
-    #
-    #     :return: spey StatisticalModel object
-    #
-    #     :raises NotImplementedError: If requested backend has not been recognised.
-    #     """
-    #
-    #     from spey import get_uncorrelated_region_statistical_model
-    #
-    #     if backend == "pyhf":
-    #         return get_uncorrelated_region_statistical_model(
-    #             observations = self.dataInfo.observedN,
-    #             backgrounds = self.dataInfo.expectedBG,
-    #             background_uncertainty = self.dataInfo.bgError,
-    #             signal_yields = signal,
-    #             xsection = xsec,
-    #             analysis = self.globalInfo.id,
-    #             backend = backend,
-    #         )
-    #     else:
-    #         return get_uncorrelated_region_statistical_model(
-    #             observations = self.dataInfo.observedN,
-    #             backgrounds = self.dataInfo.expectedBG,
-    #             background_uncertainty = self.dataInfo.bgError,
-    #             signal_yields = signal,
-    #             xsection = xsec,
-    #             analysis = self.globalInfo.id,
-    #             backend = backend,
-    #         )
+    def getStatModel(self,
+        signal: Union[float, np.ndarray],
+        backend: Text = "simplified_likelihoods"
+    ):
+        """
+        Create statistical model from a single bin or multiple uncorrelated regions
+
+        :param signal: signal yields
+        :param backend: "pyhf" or "simplified_likelihoods"
+
+        :return: spey StatisticalModel object
+
+        :raises NotImplementedError: If requested backend has not been recognised.
+        """
+
+        from spey import get_uncorrelated_region_statistical_model
+
+        if hasattr(self, "statModel"):
+            return self.statModel
+        else:
+            self.statModel =  get_uncorrelated_region_statistical_model(observations = float(self.dataInfo.observedN),
+                                                                        backgrounds = float(self.dataInfo.expectedBG),
+                                                                        background_uncertainty = float(self.dataInfo.bgError),
+                                                                        signal_yields = signal,
+                                                                        xsection = nsig/self.getLumi(),
+                                                                        analysis = self.globalInfo.id,
+                                                                        backend = backend
+                                                                        )
+        return self.statModel
 
 
 
@@ -782,47 +773,268 @@ class CombinedDataSet(object):
         return None
 
     # !TP
+    def getWSInfo(self, jsons):
+        """
+        Getting informations from the json files
+
+        :param jsons: list of json instances.
+
+        :return: wsInfo list of dictionaries (one dictionary for each json file) containing useful information about the json files.
+            - :key signalRegions: list of dictonaries with 'json path' and 'size' (number of bins) of the 'signal regions' channels in the json files
+            - :key otherRegions: list of strings indicating the path to the control and validation region channels
+        """
+        # Identifying the path to the SR and VR channels in the main workspace files
+        wsInfo = []  # workspace specifications
+        if not isinstance(jsons, list):
+            logger.error("The `jsons` parameter must be of type list")
+            return
+        for ws in jsons:
+            wsChannelsInfo = {}
+            wsChannelsInfo["signalRegions"] = []
+            wsChannelsInfo["otherRegions"] = []
+            if not "channels" in ws.keys():
+                logger.error(
+                    "Json file number {} is corrupted (channels are missing)".format(
+                        jsons.index(ws)
+                    )
+                )
+                wsInfo = None
+                return
+            for i_ch, ch in enumerate(ws["channels"]):
+                if ch["name"][:2] == "SR":  # if channel name starts with 'SR'
+                    wsChannelsInfo["signalRegions"].append(
+                        {
+                            "path": "/channels/"
+                            + str(i_ch)
+                            + "/samples/0",  # Path of the new sample to add (signal prediction)
+                            "size": len(ch["samples"][0]["data"]),
+                        }
+                    )  # Number of bins
+                else:
+                    wsChannelsInfo["otherRegions"].append("/channels/" + str(i_ch))
+            wsChannelsInfo["otherRegions"].sort(
+                key=lambda path: path.split("/")[-1], reverse=True
+            )  # Need to sort correctly the paths to the channels to be removed
+            wsInfo.append(wsChannelsInfo)
+        return wsInfo
+
+    # !TP
+    def patchMaker(self, jsons, wsInfo, nsignals, includeCRs):
+        """
+        Method that creates the list of patches to be applied to the `jsons` workspaces, one for each region given the `nsignals` and the informations available in `wsInfo` and the content of the `jsons`
+
+        :param jsons: list of json instances.
+        :param wsInfo: list of dictionaries (one dictionary for each json file) containing useful information about the json files
+        :param nsignals: list of list of signal yields (one list for each json file).
+        :param includeCRs: if True leaves the pacth unchanged,
+                           if False adds to the patch an operation that removes the CRs from the json files.
+
+        NB: It seems we need to include the change of the "modifiers" in the patches as well
+
+        :return: the list of patches, one for each workspace
+        """
+        if wsInfo == None:
+            return None
+        # Constructing the patches to be applied on the main workspace files
+        patches = []
+        for ws, info, subSig in zip(jsons, wsInfo, nsignals):
+            patch = []
+            for srInfo in info["signalRegions"]:
+                nBins = srInfo["size"]
+                operator = {}
+                operator["op"] = "add"
+                operator["path"] = srInfo["path"]
+                value = {}
+                value["data"] = subSig[:nBins]
+                subSig = subSig[nBins:]
+                value["modifiers"] = []
+                value["modifiers"].append({"data": None, "type": "normfactor", "name": "mu_SIG"})
+                value["modifiers"].append({"data": None, "type": "lumi", "name": "lumi"})
+                value["name"] = "bsm"
+                operator["value"] = value
+                patch.append(operator)
+            if includeCRs:
+                logger.debug("keeping the CRs")
+            else:
+                for path in info["otherRegions"]:
+                    patch.append({"op": "remove", "path": path})
+            patches.append(patch)
+        return patches
+
+    # !TP
+    def _getPatches(self, nsig):
+        """
+        :param nsig: list of signal yields (not relative).
+        :param normalize: if true, normalize nsig
+
+        :returns: the list of patches, one for each wkspace and the list of list of signals (one list for each json file).
+        """
+        # Getting the path to the json files
+        datasets = [ds.getID() for ds in self.origdatasets]
+        jsonFiles = [js for js in self.globalInfo.jsonFiles] #List of json files names (list of str)
+        jsons = self.globalInfo.jsons.copy() #List of json files (list of dict)
+        if not isinstance(jsons, list):
+            logger.error("The `jsons` parameter must be of type list.")
+            return None
+        # Filtering the json files by looking at the available datasets
+        listOfSRInJson = []
+        for jsName in self.globalInfo.jsonFiles:
+            if all([ds not in self.globalInfo.jsonFiles[jsName] for ds in datasets]):
+                # No datasets found for this json combination
+                jsIndex = jsonFiles.index(jsName)
+                jsonFiles.pop(jsIndex)
+                jsons.pop(jsIndex)
+                continue
+            if not all([ds in datasets for ds in self.globalInfo.jsonFiles[jsName]]):
+                # Some SRs are missing for this json combination
+                logger.error( "Wrong json definition in globalInfo.jsonFiles for json: %s" % jsName)
+            listOfSRInJson += self.globalInfo.jsonFiles[jsName]
+        logger.debug("list of datasets: {}".format(datasets))
+        logger.debug("jsonFiles after filtering: {}".format(jsonFiles))
+        # Constructing the list of signals with subsignals matching each json
+        listOfSignals = list()
+        for jsName in jsonFiles:
+            subSig = list()
+            for srName in self.globalInfo.jsonFiles[jsName]:
+                try:
+                    index = datasets.index(srName)
+                except ValueError:
+                    line = (
+                        f"{srName} signal region provided in globalInfo is not in the list of datasets, {jsName}:{','.join(datasets)}"
+                    )
+                    raise ValueError(line)
+                sig = nsig[index]
+                subSig.append(sig)
+            listOfSignals.append(subSig)
+
+        if hasattr(self.globalInfo, "includeCRs"):
+            includeCRs = self.globalInfo.includeCRs
+        else:
+            includeCRs = False
+
+        wsInfo = getWSInfo(jsons)
+        self.patches = patchMaker(jsons, wsInfo, listOfSignals, includeCRs)
+        return self.patches, listOfSignals
+
+    # !TP
+    def _getBestStatModel(self, nsig, allow_negative_signal=False):
+            """
+            find the index of the best expected combination.
+
+            :param dataset: the CombinedDataSet object.
+            :param nsig: list of signal yields.
+            :param allow_negative_signal: if True, the expected upper limit on mu, used to find the best statistical model, can be negative.
+
+            :return: the minimal apriori expected poi upper limit, and the spey StatisticalModel object that produced that result.
+            """
+            # Get the list of the names of the signal regions used in the json files
+            listOfSRInJson=[]
+            for SRnames in self.globalInfo.jsonFiles.values():
+                listOfSRInJson += SRnames
+
+            patches, listOfSignals = _getPatches(self, nsig)
+            mu_ul_exp_min = np.inf
+            # Find best combination of signal regions
+            for index, (patch, json) in enumerate(zip(patches,self.globalInfo.jsons)):
+                # If the expected signal is 0 for each SR in the combined set of SRs, skip
+                if all([sig==0. for sig in listOfSignals[index]]):
+                    continue
+                # The x-section is at the level of the TheoryPrediction
+                # if there are multiple sets of SRs, set a xsec_UL for the whole analysis, i.e. that uses all the SRs,
+                # so that the resulting R value Is for the whole analysis
+                xsec = sum(nsig)/self.getLumi()
+                # It is possible to do differently and to set a xsec_UL on each set of SRs but that is not how it done in SModelS so far
+                # xsec = sum(listOfSignals[index])/self.getLumi()
+                statModel = get_multi_region_statistical_model(analysis=self.globalInfo.id,
+                                                                signal=patch,
+                                                                observed=json,
+                                                                xsection=xsec
+                                                                )
+                # If all the SRs are used in the json files and there is only one json files, there is only one statModel.
+                # No need to compute mu_ul_exp if not needed.
+                if all([ds.dataInfo.dataId in listOfSRInJson for ds in self._datasets]) and len(self.globalInfo.jsons) == 1 and return_mu_ul_exp_min == False:
+                    return statModel
+                config = statModel.backend.model.config()
+                bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
+                if allow_negative_signal:
+                    bounds[config.poi_index] = (config.minimum_poi, 100)
+                else:
+                    bounds[config.poi_index] = (0, 100)
+                mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
+                if mu_ul_exp == None:
+                    continue
+                elif mu_ul_exp < mu_ul_exp_min:
+                    mu_ul_exp_min = mu_ul_exp
+                    bestStatModel = statModel
+
+            # Check if a non-combined (uncorrelated) signal region is more contraining than the best combination obtained above
+            # Check if a signal region is not in the list of SR names used in the json files
+            for sig,ds in zip(nsig,self._datasets):
+                ds = ds.dataInfo
+                if ds.dataId not in listOfSRInJson:
+                    xsec = sig/self.getLumi()
+                    # Don't bother to compute eUL again (one could do it again if needed)
+                    mu_ul_exp = ds.expectedUpperLimit/xsec
+                    if mu_ul_exp < muull_exp_min:
+                        logger.info("Best constraining model is a single uncorrelated model.")
+                        mu_ul_exp_min = mu_ul_exp
+                        bestStatModel = get_uncorrelated_region_statistical_model(observations=float(ds.observedN),
+                                                                                backgrounds=float(ds.expectedBG),
+                                                                                background_uncertainty=float(ds.bgError),
+                                                                                signal_yields=float(sig),
+                                                                                xsection=xsec,
+                                                                                analysis=self.globalInfo.id,
+                                                                                backend="simplified_likelihoods" # simplified likelhood backend by default
+                                                                                )
+            if mu_ul_exp_min == np.inf:
+                logger.error(f'No minimal upper limit on POI found for {self.globalInfo.id}')
+                return None
+            if return_mu_ul_exp_min:
+                return bestStatModel, mu_ul_exp_min
+            else:
+                return bestStatModel
+
+    # !TP
     def getStatModel(self,
-        signal: Union[np.ndarray, List[Dict[Text, List]], List[float]],
-        observed: Union[np.ndarray, Dict[Text, List], List[float]],
-        covariance: Optional[Union[np.ndarray, List[List[float]]]] = None,
-        nb: Optional[Union[np.ndarray, List[float]]] = None,
-        third_moment: Optional[Union[np.ndarray, List[float]]] = None,
+        nsig: Union[np.ndarray, List[Dict[Text, List]], List[float]],
         delta_sys: float = 0.0,
-        xsection: float = np.nan,
+        allow_negative_signal = False
     ):
         """
         Create a statistical model from multibin data.
 
-        :param signal: number of signal events. For simplified likelihood backend this input can
+        :param nsig: number of signal events. For simplified likelihood backend this input can
                        contain `np.array` or `List[float]` which contains signal yields per region.
                        For `pyhf` backend this input expected to be a JSON-patch i.e. `List[Dict]`,
                        see `pyhf` documentation for details on JSON-patch format.
-        :param observed: number of observed events. For simplified likelihood backend this input can
-                           be `np.ndarray` or `List[float]` which contains observations. For `pyhf`
-                           backend this contains **background only** JSON sterilized HistFactory
-                           i.e. `Dict[List]`.
-        :param covariance: Covariance matrix either in the form of `List` or NumPy array. Only used for
-                           simplified likelihood backend.
-        :param nb: number of expected background yields. Only used for simplified likelihood backend.
-        :param third_moment: third moment. Only used for simplified likelihood backend.
         :param delta_sys: systematic uncertainty on signal. Only used for simplified likelihood backend.
-        :param xsection: cross-section in pb
-        :param analysis: name of the analysis
+        :param allow_negative_signal: if True, the expected upper limit on mu, used to find the best statistical model, can be negative.
+
         :return: spey StatisticalModel object
 
         :raises NotImplementedError: if input patter does not match to any backend specific input option
         """
 
-        from spey import get_multi_region_statistical_model
+        if hasattr(self, "statModel"):
+            return self.statModel
+        else:
+            if self.type == "simplified":
+                nobs = [x.dataInfo.observedN for x in self.origdatasets]
+                cov = self.globalInfo.covariance
+                bg = [x.dataInfo.expectedBG for x in self.origdatasets]
+                third_moment = self.globalInfo.third_moment if hasattr(self.globalInfo, "third_moment") else None
+                xsec = sum(nsig)/self.getLumi()
 
-        return get_multi_region_statistical_model(
-            analysis = self.globalInfo.id,
-            signal = signal,
-            observed = observed,
-            covariance = covariance,
-            nb = nb,
-            third_moment = third_moment,
-            delta_sys = delta_sys,
-            xsection = xsec,
-        )
+                self.statModel = get_multi_region_statistical_model(analysis = self.globalInfo.id,
+                                                                    signal = nsig,
+                                                                    observed = nobs,
+                                                                    covariance = cov,
+                                                                    nb = bg,
+                                                                    third_moment = third_moment,
+                                                                    delta_sys = delta_sys,
+                                                                    xsection = xsec
+                                                                    )
+            elif self.type == "pyhf":
+                self.statModel = self._getBestStatModel(nsig, allow_negative_signal=allow_negative_signal)
+            else:
+                logger.error(f'Dataset of type "{self.type}" for analysis {self.globalInfo.id} is not of type "simplified" or "pyhf".')
