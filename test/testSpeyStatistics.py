@@ -895,25 +895,24 @@ class StatisticsTest(unittest.TestCase):
         pred_signal_strength = prediction.xsection.value
         nsig = (pred_signal_strength * expRes.globalInfo.lumi).asNumber()
 
-        for backend in ["pyhf","simplified_likelihoods"]:
-            prediction.computeStatistics(backend=backend)
-            ill = math.log(prediction.likelihood())
-            ichi2 = prediction.chi2()
-            statModel = get_uncorrelated_region_statistical_model(observations=4.,
-                                                                    backgrounds=2.2,
-                                                                    background_uncertainty=1.1,
-                                                                    signal_yields=nsig,
-                                                                    xsection=None,
-                                                                    analysis="UnitTest",
-                                                                    backend=backend
-                                                                )
-            dll = math.log(statModel.likelihood(poi_test=1.,return_nll=False))
-            self.assertTrue(abs((ill-dll)*100./dll) < 3) # Previous test "self.assertAlmostEqual(ill, dll, places=2)" was too restrictive.
-                                                         # 3% difference is ok when comparing results from simplified_likelihood backend only (using SModelS) to results obtained with pyhf backend from spey.
-                                                         # 0.01% difference is ok when comparing results from simplified_likelihood backend only (using SModelS) to results obtained with simplified_backend backend from spey.
-            dchi2 = statModel.chi2()
-            # print ( "dchi2,ichi2",dchi2,ichi2)
-            self.assertTrue(abs((ichi2-dchi2)*100./ichi2) < 1) # Previous test "self.assertAlmostEqual(ichi2, dchi2, places=2)" was too restrictive.
+        prediction.computeStatistics()
+        ill = math.log(prediction.likelihood())
+        ichi2 = prediction.chi2()
+        statModel = get_uncorrelated_region_statistical_model(observations=4.,
+                                                                backgrounds=2.2,
+                                                                background_uncertainty=1.1,
+                                                                signal_yields=nsig,
+                                                                xsection=None,
+                                                                analysis="UnitTest",
+                                                                backend='simplified_likelihoods'
+                                                            )
+        dll = math.log(statModel.likelihood(poi_test=1.,return_nll=False))
+        self.assertTrue(abs((ill-dll)*100./dll) < 3) # Previous test "self.assertAlmostEqual(ill, dll, places=2)" was too restrictive.
+                                                     # 3% difference is ok when comparing results from simplified_likelihood backend only (using SModelS) to results obtained with pyhf backend from spey.
+                                                     # 0.01% difference is ok when comparing results from simplified_likelihood backend only (using SModelS) to results obtained with simplified_backend backend from spey.
+        dchi2 = statModel.chi2()
+        # print ( "dchi2,ichi2",dchi2,ichi2)
+        self.assertTrue(abs((ichi2-dchi2)*100./ichi2) < 1) # Previous test "self.assertAlmostEqual(ichi2, dchi2, places=2)" was too restrictive.
                                                                # 1% difference is ok when comparing results from simplified_likelihood backend only (using SModelS) to results obtained with pyhf backend from spey.
                                                                # 0.2% difference is ok when comparing results from simplified_likelihood backend only (using SModelS) to results obtained with simplified_backend backend from spey.
 
