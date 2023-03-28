@@ -15,7 +15,7 @@ import unittest
 
 # from smodels.tools import statistics
 from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
-from smodels.tools.srCombinations import getCombinedUpperLimitFor, getCombinedPyhfStatistics
+from smodels.tools.srCombinations import getCombinedUpperLimitFor, getCombinedStatistics
 from smodels.tools.statistics import TruncatedGaussians
 from smodels.theory.theoryPrediction import theoryPredictionsFor, _getCombinedResultFor, _getDataSetPredictions
 from smodels.tools.statistics import determineBrentBracket
@@ -35,7 +35,6 @@ from pyhf.infer import hypotest
 from pyhf.infer.mle import fit
 from jsonpatch import apply_patch
 from smodels.tools.physicsUnits import fb,pb
-
 
 class StatisticsTest(unittest.TestCase):
     def lLHDFromLimits(self):
@@ -520,7 +519,7 @@ class StatisticsTest(unittest.TestCase):
 
         # Computation of statistical quantities with Spey
         xsec_ul_spey = getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=combinedRes.deltas_rel, allowNegativeSignals=allow_negative_signal)
-        res = getCombinedPyhfStatistics(dataset=dataset, nsig=nsig, marginalize=False, deltas_rel=combinedRes.deltas_rel, nll=False, expected=False, allowNegativeSignals=allow_negative_signal)
+        res = getCombinedStatistics(dataset=dataset, nsig=nsig, marginalize=False, deltas_rel=combinedRes.deltas_rel, nll=False, expected=False, allowNegativeSignals=allow_negative_signal)
         mu_hat_spey = res["muhat"]
         llhdMax_spey = res["lmax"]
 
@@ -737,7 +736,7 @@ class StatisticsTest(unittest.TestCase):
 
         # Computation of statistical quantities with Spey
         xsec_ul_spey = getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=combinedRes.deltas_rel, allowNegativeSignals=allow_negative_signal)
-        res = getCombinedPyhfStatistics(dataset=dataset, nsig=nsig, marginalize=False, deltas_rel=combinedRes.deltas_rel, nll=False, expected=False, allowNegativeSignals=allow_negative_signal)
+        res = getCombinedStatistics(dataset=dataset, nsig=nsig, marginalize=False, deltas_rel=combinedRes.deltas_rel, nll=False, expected=False, allowNegativeSignals=allow_negative_signal)
         mu_hat_spey = res["muhat"]
         llhdMax_spey = res["lmax"]
 

@@ -127,7 +127,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
 
 
 def getCombinedLikelihood(
-    dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0
+    dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0, nll=False
 ):
     """compute only lBSM
     :param nsig: predicted signal (list)
@@ -159,7 +159,7 @@ def getCombinedLikelihood(
     bounds[config.poi_index] = (0, 10)
     args={"marginalize":marginalize}
 
-    lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=False, par_bounds=bounds, **args)
+    lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, **args)
 
     return lbsm
 
@@ -229,7 +229,7 @@ def getCombinedLikelihood(
 #         return {"lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat, "sigma_mu": sigma_mu}
 
 def getCombinedStatistics(
-    dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, allowNegativeSignals=False
+    dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, allowNegativeSignals=False, nll=False
 ):
     """compute lBSM, lmax, and LSM in a single run
     :param nsig: predicted signal (list)

@@ -277,7 +277,7 @@ class DataSet(object):
 
         return getValuesForObj(self, attribute)
 
-    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, mu= 1.):
+    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, mu= 1., nll=False):
         """
         Computes the likelihood to observe nobs events,
         given a predicted signal "nsig", assuming "deltas_rel"
@@ -299,7 +299,7 @@ class DataSet(object):
 
         args={"marginalize":marginalize}
 
-        statModel = self.getStatModel(nsig,backend)
+        statModel = self.getStatModel(nsig)
 
         expectedDict = {False:ExpectationType.observed,
                         True:ExpectationType.apriori,
@@ -311,7 +311,7 @@ class DataSet(object):
         config = statModel.backend.model.config()
         bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
 
-        ret = statModel.likelihood(poi_test=mu, expected=expectedDict[expected], return_nll=False, par_bounds=bounds, **args)
+        ret = statModel.likelihood(poi_test=mu, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, **args)
         return ret
 
     # def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False):
@@ -616,8 +616,7 @@ class DataSet(object):
 
     # !TP
     def getStatModel(self,
-        nsig: Union[float, np.ndarray],
-        backend: Text = "simplified_likelihoods"
+        nsig: Union[float, np.ndarray]
     ):
         """
         Create statistical model from a single bin or multiple uncorrelated regions.
