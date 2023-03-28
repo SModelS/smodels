@@ -35,11 +35,13 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
         logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
         return None
 
-    if dataset.type == "simplified":
+    if dataset.type in ["simplified","pyhf"]:
         statModel = dataset.getStatModel(nsig)
 
+        # statModel = dataset.statModel
+
         config = statModel.backend.model.config()
-        bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
+        bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds] if dataset.type=='simplified' else config.suggested_bounds
         if allowNegativeSignals:
             bounds[config.poi_index] = (config.minimum_poi, 100)
         else:
@@ -51,37 +53,9 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
             bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
             mu_ul = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
 
-        ret = mu_ul*xsec
-        logger.debug("SL upper limit : {}".format(ret))
+        ret = mu_ul*statModel.xsection
+        logger.debug("Combined upper limit : {}".format(ret))
         return ret
-
-    elif dataset.type == "pyhf":
-        logger.debug("Using pyhf")
-        if all([s == 0 for s in nsig]):
-            logger.warning("All signals are empty")
-            return None
-        if deltas_rel != 0.2:
-            logger.warning("Relative uncertainty on signal not supported by spey for pyhf backend.")
-
-        statModel = dataset.getStatModel(nsig)
-
-        config = statModel.backend.model.config()
-        bounds = config.suggested_bounds
-        if allowNegativeSignals:
-            bounds[config.poi_index] = (config.minimum_poi, 100)
-        else:
-            bounds[config.poi_index] = (0, 100)
-
-        mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], allow_negative_signal=allowNegativeSignals,par_bounds=bounds)
-        while mu_ul == bounds[config.poi_index][1]:
-            logger.debug('Upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
-            bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
-            mu_ul = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
-
-        xsec_ul = mu_ul*statModel.xsection
-
-        logger.debug("pyhf upper limit : {}".format(xsec_ul))
-        return xsec_ul
     else:
         logger.error(
             "no covariance matrix or json file given in globalInfo.txt for %s"
@@ -162,85 +136,77 @@ def getCombinedLikelihood(
                      compute expected posteriori.
     :param mu: signal strength parameter mu
     """
-    if dataset.type == "pyhf":
-        # Getting the path to the json files
-        # Loading the jsonFiles
-        expectedDict = {False:ExpectationType.observed,
-                        True:ExpectationType.apriori,
-                        "posteriori":ExpectationType.aposteriori}
-        if expected not in expectedDict.keys():
-            logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
-            return None
+    expectedDict = {False:ExpectationType.observed,
+                    True:ExpectationType.apriori,
+                    "posteriori":ExpectationType.aposteriori}
+    if expected not in expectedDict.keys():
+        logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
+        return None
 
+    if dataset.type == "pyhf":
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for pyhf backend.")
         if marginalize == True:
             logger.error('Pyhf backend cannot marginalize likelihood.')
+            return None
 
-        statModel = dataset.getStatModel(nsig)
+    statModel = dataset.getStatModel(nsig)
 
-        config = statModel.backend.model.config()
-        bounds = config.suggested_bounds
-        if allowNegativeSignals:
-            bounds[config.poi_index] = (config.minimum_poi, 100)
-        else:
-            bounds[config.poi_index] = (0, 100)
-        lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=False, par_bounds=bounds)
+    # statModel = dataset.statModel
 
-        # ulcomputer = _getPyhfComputer(dataset, nsig, False)
-        # index = ulcomputer.getBestCombinationIndex()
-        # lbsm = ulcomputer.likelihood(mu=mu, workspace_index=index, expected=expected)
-        return lbsm
-    lbsm = getCombinedSimplifiedLikelihood(
-        dataset, nsig, marginalize, deltas_rel, expected=expected, mu=mu )
+    config = statModel.backend.model.config()
+    bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds] if dataset.type=='simplified' else config.suggested_bounds
+    bounds[config.poi_index] = (0, 10)
+    args={"marginalize":marginalize}
+
+    lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=False, par_bounds=bounds, **args)
+
     return lbsm
 
-def getCombinedPyhfStatistics(dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False):
-        # Getting the path to the json files
-        # Loading the jsonFiles
-
-        expectedDict = {False:ExpectationType.observed,
-                        True:ExpectationType.apriori,
-                        "posteriori":ExpectationType.aposteriori}
-        if expected not in expectedDict.keys():
-            logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
-            return None
-
-        if deltas_rel != 0.2:
-            logger.warning("Relative uncertainty on signal not supported by spey for pyhf backend.")
-        if marginalize == True:
-            logger.error('Pyhf backend cannot marginalize likelihood.')
-
-        statModel = dataset.getStatModel(nsig)
-
-        config = statModel.backend.model.config()
-        bounds = config.suggested_bounds
-        if allowNegativeSignals:
-            bounds[config.poi_index] = (config.minimum_poi, 100)
-        else:
-            bounds[config.poi_index] = (0, 100)
-
-        muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
-        while muhat == bounds[config.poi_index][1]:
-            logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
-            bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
-            muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
-
-        lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll)
-        lsm = statModel.likelihood ( poi_test = 0., expected=expectedDict[expected], return_nll = nll)
-        if lsm > lmax:
-            logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-            lmax = lsm
-            muhat = 0.0
-        if lbsm > lmax:
-            logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-            lmax = lbsm
-            muhat = 1.0
-
-        test_statistics = "q" if allowNegativeSignals else "qmutilde"
-        sigma_mu = statModel.sigma_mu(poi_test=muhat,expected=expectedDict[expected],test_statistics=test_statistics)
-
-        return {"lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat, "sigma_mu": sigma_mu}
+# !TP not used anymore, merged into getCombinedStatistics()
+# def getCombinedPyhfStatistics(dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False):
+#     expectedDict = {False:ExpectationType.observed,
+#                     True:ExpectationType.apriori,
+#                     "posteriori":ExpectationType.aposteriori}
+#     if expected not in expectedDict.keys():
+#         logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
+#         return None
+#
+#     if deltas_rel != 0.2:
+#         logger.warning("Relative uncertainty on signal not supported by spey for pyhf backend.")
+#     if marginalize == True:
+#         logger.error('Pyhf backend cannot marginalize likelihood.')
+#
+#     statModel = dataset.getStatModel(nsig)
+#
+#     config = statModel.backend.model.config()
+#     bounds = config.suggested_bounds
+#     if allowNegativeSignals:
+#         bounds[config.poi_index] = (config.minimum_poi, 100)
+#     else:
+#         bounds[config.poi_index] = (0, 100)
+#
+#     muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
+#     while muhat == bounds[config.poi_index][1]:
+#         logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
+#         bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
+#         muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
+#
+#     lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll)
+#     lsm = statModel.likelihood ( poi_test = 0., expected=expectedDict[expected], return_nll = nll)
+#     if lsm > lmax:
+#         logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+#         lmax = lsm
+#         muhat = 0.0
+#     if lbsm > lmax:
+#         logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+#         lmax = lbsm
+#         muhat = 1.0
+#
+#     test_statistics = "q" if allowNegativeSignals else "qmutilde"
+#     sigma_mu = statModel.sigma_mu(poi_test=muhat,expected=expectedDict[expected],test_statistics=test_statistics)
+#
+#     return {"lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat, "sigma_mu": sigma_mu}
 
 
 # def getCombinedPyhfStatistics(dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False):
@@ -270,13 +236,67 @@ def getCombinedStatistics(
     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
     :param expected: compute expected values, not observed
     """
+    expectedDict = {False:ExpectationType.observed,
+                    True:ExpectationType.apriori,
+                    "posteriori":ExpectationType.aposteriori}
+    if expected not in expectedDict.keys():
+        logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
+        return None
+
     if dataset.type == "pyhf":
-        return getCombinedPyhfStatistics ( dataset, nsig, marginalize, deltas_rel,
-            deltas_rel, expected=expected, allowNegativeSignals=allowNegativeSignals)
-    cslm = getCombinedSimplifiedStatistics( dataset, nsig, marginalize,
-        deltas_rel, expected=expected, allowNegativeSignals=allowNegativeSignals,
-    )
-    return cslm
+        if deltas_rel != 0.2:
+            logger.warning("Relative uncertainty on signal not supported by spey for pyhf backend.")
+        if marginalize == True:
+            logger.error('Pyhf backend cannot marginalize likelihood.')
+            return None
+    elif dataset.type == "simplified":
+        if type(nsig)==tuple:
+            nsig = np.array(nsig)
+    else:
+        return {"lmax": -1.0, "muhat": None, "sigma_mu": None}
+
+    args={"marginalize":marginalize}
+
+    statModel = dataset.getStatModel(nsig)
+
+    # statModel = dataset.statModel
+
+    config = statModel.backend.model.config()
+    bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds] if dataset.type=='simplified' else config.suggested_bounds
+    if allowNegativeSignals:
+        bounds[config.poi_index] = (config.minimum_poi, 100)
+    else:
+        bounds[config.poi_index] = (0, 100)
+
+    muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
+    while muhat == bounds[config.poi_index][1]:
+        logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
+        bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
+        muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
+
+    lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll)
+    lsm = statModel.likelihood ( poi_test = 0., expected=expectedDict[expected], return_nll = nll)
+    if lsm > lmax:
+        logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+        lmax = lsm
+        muhat = 0.0
+    if lbsm > lmax:
+        logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+        lmax = lbsm
+        muhat = 1.0
+
+    test_statistics = "q" if allowNegativeSignals else "qmutilde"
+    sigma_mu = statModel.sigma_mu(poi_test=muhat,expected=expectedDict[expected],test_statistics=test_statistics)
+
+    return {"lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat, "sigma_mu": sigma_mu}
+
+    # if dataset.type == "pyhf":
+        # return getCombinedPyhfStatistics ( dataset, nsig, marginalize, deltas_rel,
+        #     deltas_rel, expected=expected, allowNegativeSignals=allowNegativeSignals)
+    # cslm = getCombinedSimplifiedStatistics( dataset, nsig, marginalize,
+    #     deltas_rel, expected=expected, allowNegativeSignals=allowNegativeSignals,
+    # )
+    # return cslm
 
 def _getPyhfComputer(dataset, nsig, normalize=True):
     """create the pyhf ul computer object
@@ -338,45 +358,46 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
     # _pyhfcomputers[idt] = ulcomputer
     return ulcomputer
 
-def getCombinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0):
-    """
-    Computes the combined simplified likelihood to observe nobs events, given a
-    predicted signal "nsig", with nsig being a vector with one entry per
-    dataset.  nsig has to obey the datasetOrder. Deltas is the error on
-    the signal.
-    :param nsig: predicted signal (list)
-    :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-    :param expected: compute expected likelihood, not observed
-    :param mu: signal strength parameter mu
-    :returns: likelihood to observe nobs events (float)
-    """
-    if dataset.type != "simplified":
-        logger.error(
-            "Asked for combined simplified likelihood, but no covariance given: %s" % dataset.type
-        )
-        return None
-
-    args={"marginalize":marginalize}
-
-    statModel = dataset.getStatModel(nsig)
-
-    expectedDict = {False:ExpectationType.observed,
-                    True:ExpectationType.apriori,
-                    "posteriori":ExpectationType.aposteriori}
-    if expected not in expectedDict.keys():
-        logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
-        return None
-
-    config = statModel.backend.model.config()
-    bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
-    if allowNegativeSignals:
-        bounds[config.poi_index] = (config.minimum_poi, 100)
-    else:
-        bounds[config.poi_index] = (0, 100)
-
-    ret = statModel.likelihood(poi_test=mu, expected=expectedDict[expected], return_nll=False, par_bounds=bounds, **args)
-
-    return ret
+# !TP - not used anymore, merged in to getCombinedLikelihood()
+# def getCombinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0):
+#     """
+#     Computes the combined simplified likelihood to observe nobs events, given a
+#     predicted signal "nsig", with nsig being a vector with one entry per
+#     dataset.  nsig has to obey the datasetOrder. Deltas is the error on
+#     the signal.
+#     :param nsig: predicted signal (list)
+#     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
+#     :param expected: compute expected likelihood, not observed
+#     :param mu: signal strength parameter mu
+#     :returns: likelihood to observe nobs events (float)
+#     """
+#     if dataset.type != "simplified":
+#         logger.error(
+#             "Asked for combined simplified likelihood, but no covariance given: %s" % dataset.type
+#         )
+#         return None
+#
+#     args={"marginalize":marginalize}
+#
+#     statModel = dataset.getStatModel(nsig)
+#
+#     expectedDict = {False:ExpectationType.observed,
+#                     True:ExpectationType.apriori,
+#                     "posteriori":ExpectationType.aposteriori}
+#     if expected not in expectedDict.keys():
+#         logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
+#         return None
+#
+#     config = statModel.backend.model.config()
+#     bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
+#     if allowNegativeSignals:
+#         bounds[config.poi_index] = (config.minimum_poi, 100)
+#     else:
+#         bounds[config.poi_index] = (0, 100)
+#
+#     ret = statModel.likelihood(poi_test=mu, expected=expectedDict[expected], return_nll=False, par_bounds=bounds, **args)
+#
+#     return ret
 
 
 # def getCombinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0):
@@ -417,50 +438,51 @@ def getCombinedSimplifiedLikelihood(dataset, nsig, marginalize=False, deltas_rel
 #         computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
 #     return computer.likelihood(1., marginalize=marginalize)
 
-def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False):
-    """compute likelihood at maximum, for simplified likelihoods only"""
-    if dataset.type != "simplified":
-        return {"lmax": -1.0, "muhat": None, "sigma_mu": None}
-    args={"marginalize":marginalize}
-
-    if type(nsig)==tuple:
-        nsig = np.array(nsig)
-
-    statModel = dataset.getStatModel(nsig)
-
-    expectedDict = {False:ExpectationType.observed,
-                    True:ExpectationType.apriori,
-                    "posteriori":ExpectationType.aposteriori}
-    if expected not in expectedDict.keys():
-        logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
-        return None
-
-    config = statModel.backend.model.config()
-    bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
-    if allowNegativeSignals:
-        bounds[config.poi_index] = (config.minimum_poi, 100)
-    else:
-        bounds[config.poi_index] = (0, 100)
-
-    muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, **args)
-    while muhat == bounds[config.poi_index][1]:
-        logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
-        bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
-        muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, **args)
-
-    lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll, **args )
-    lsm = statModel.likelihood ( poi_test = 0., expected=expectedDict[expected], return_nll = nll, **args )
-    if lsm > lmax:
-        logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-        lmax = lsm
-        muhat = 0.0
-    if lbsm > lmax:
-        logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-        lmax = lbsm
-        muhat = 1.0
-    test_statistics = "q" if allowNegativeSignals else "qmutilde"
-    sigma_mu = statModel.sigma_mu(poi_test=muhat,expected=expectedDict[expected],test_statistics=test_statistics)
-    return {"muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax, "lbsm": lbsm, "lsm": lsm }
+# !TP not used anymore, merged into getCombinedStatistics()
+# def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False):
+#     """compute likelihood at maximum, for simplified likelihoods only"""
+#     if dataset.type != "simplified":
+#         return {"lmax": -1.0, "muhat": None, "sigma_mu": None}
+#     args={"marginalize":marginalize}
+#
+#     if type(nsig)==tuple:
+#         nsig = np.array(nsig)
+#
+#     statModel = dataset.getStatModel(nsig)
+#
+#     expectedDict = {False:ExpectationType.observed,
+#                     True:ExpectationType.apriori,
+#                     "posteriori":ExpectationType.aposteriori}
+#     if expected not in expectedDict.keys():
+#         logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
+#         return None
+#
+#     config = statModel.backend.model.config()
+#     bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
+#     if allowNegativeSignals:
+#         bounds[config.poi_index] = (config.minimum_poi, 100)
+#     else:
+#         bounds[config.poi_index] = (0, 100)
+#
+#     muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, **args)
+#     while muhat == bounds[config.poi_index][1]:
+#         logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
+#         bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
+#         muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, **args)
+#
+#     lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll, **args )
+#     lsm = statModel.likelihood ( poi_test = 0., expected=expectedDict[expected], return_nll = nll, **args )
+#     if lsm > lmax:
+#         logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+#         lmax = lsm
+#         muhat = 0.0
+#     if lbsm > lmax:
+#         logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+#         lmax = lbsm
+#         muhat = 1.0
+#     test_statistics = "q" if allowNegativeSignals else "qmutilde"
+#     sigma_mu = statModel.sigma_mu(poi_test=muhat,expected=expectedDict[expected],test_statistics=test_statistics)
+#     return {"muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax, "lbsm": lbsm, "lsm": lsm }
 
 
 # def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False):

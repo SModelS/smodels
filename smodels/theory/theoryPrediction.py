@@ -385,7 +385,7 @@ class TheoryPrediction(object):
             return (llhd, computer.chi2 ( ) )
         return llhd
 
-    def computeStatistics(self, expected=False, allowNegativeSignals=False, backend="simplified_likelihoods"):
+    def computeStatistics(self, expected=False, allowNegativeSignals=False):
         """
         Compute the likelihoods, chi2 and upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, lsm and chi2
@@ -420,23 +420,24 @@ class TheoryPrediction(object):
         elif self.dataType() == "efficiencyMap":
             lumi = self.dataset.getLumi()
             nsig = (self.xsection.value * lumi).asNumber()
+            # !TP
+            # self.dataset.statModel.set_signal(nsig)
             llhd = self.dataset.likelihood(
-                nsig, marginalize=self.marginalize, deltas_rel=self.deltas_rel, expected=expected,backend=backend
+                nsig, marginalize=self.marginalize, deltas_rel=self.deltas_rel, expected=expected, mu=1.
             )
             llhd_sm = self.dataset.likelihood(
-                nsig=0.0,
+                nsig=nsig,
                 marginalize=self.marginalize,
                 deltas_rel=self.deltas_rel,
                 expected=expected,
-                backend=backend
+                mu=0.
             )
             llhd_max = self.dataset.lmax(
                 nsig=nsig,
                 marginalize=self.marginalize,
                 deltas_rel=self.deltas_rel,
                 allowNegativeSignals=allowNegativeSignals,
-                expected=expected,
-                backend=backend
+                expected=expected
             )
             muhat = None
             if hasattr(self.dataset, "muhat"):

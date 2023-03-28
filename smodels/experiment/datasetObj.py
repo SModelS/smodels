@@ -68,6 +68,8 @@ class DataSet(object):
             self.txnameList.sort()
             self.checkForRedundancy(databaseParticles)
 
+        # self.statModel = self.getStatModel()
+
     def isCombinableWith(self, other):
         """
         Function that reports if two datasets are mutually uncorrelated = combinable.
@@ -275,7 +277,7 @@ class DataSet(object):
 
         return getValuesForObj(self, attribute)
 
-    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, backend="simplified_likelihoods"):
+    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, mu= 1.):
         """
         Computes the likelihood to observe nobs events,
         given a predicted signal "nsig", assuming "deltas_rel"
@@ -295,15 +297,7 @@ class DataSet(object):
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
-        if backend == "pyhf":
-            if marginalize == True:
-                logger.error("pyhf backend cannot marginalize.")
-            args={}
-        elif backend == "simplified_likelihoods":
-            args={"marginalize":marginalize}
-        else:
-            logger.error('%s is not a valid backend. Possible backends are "pyhf" and "simplified_likelihoods".' %backend)
-            return None
+        args={"marginalize":marginalize}
 
         statModel = self.getStatModel(nsig,backend)
 
@@ -317,7 +311,7 @@ class DataSet(object):
         config = statModel.backend.model.config()
         bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
 
-        ret = statModel.likelihood(poi_test=1., expected=expectedDict[expected], return_nll=False, par_bounds=bounds, **args)
+        ret = statModel.likelihood(poi_test=mu, expected=expectedDict[expected], return_nll=False, par_bounds=bounds, **args)
         return ret
 
     # def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False):
@@ -360,7 +354,7 @@ class DataSet(object):
     #
     #     return ret
 
-    def lmax(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, allowNegativeSignals=False, nll=False, backend="simplified_likelihoods"):
+    def lmax(self, nsig, deltas_rel=0.2, marginalize=False, expected=False, allowNegativeSignals=False, nll=False):
         """
         Convenience function, computes the likelihood at nsig = observedN - expectedBG,
         assuming "deltas_rel" error on the signal efficiency.
@@ -379,15 +373,6 @@ class DataSet(object):
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
-        if backend == "pyhf":
-            if marginalize == True:
-                logger.error("pyhf backend cannot marginalize.")
-            args={"iteration_threshold":3} #default in spey
-        elif backend == "simplified_likelihoods":
-            args={}
-        else:
-            logger.error('%s is not a valid backend. Possible backends are "pyhf" and "simplified_likelihoods".' %backend)
-            return None
 
         expectedDict = {False:ExpectationType.observed,
                         True:ExpectationType.apriori,
@@ -396,7 +381,7 @@ class DataSet(object):
             logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
             return None
 
-        statModel = self.getStatModel(nsig,backend)
+        statModel = self.getStatModel(nsig)
 
         config = statModel.backend.model.config()
         bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
@@ -405,7 +390,7 @@ class DataSet(object):
         else:
             bounds[config.poi_index] = (0, 100)
 
-        muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, **args)
+        muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
         while muhat == bounds[config.poi_index][1]:
             logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
             bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
@@ -478,15 +463,7 @@ class DataSet(object):
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
-        if backend == "pyhf":
-            if marginalize == True:
-                logger.error("pyhf backend cannot marginalize.")
-            args={"iteration_threshold":3} #default in spey
-        elif backend == "simplified_likelihoods":
-            args={"marginalize":marginalize}
-        else:
-            logger.error('%s is not a valid backend. Possible backends are "pyhf" and "simplified_likelihoods".' %backend)
-            return None
+        args={"marginalize":marginalize}
 
         statModel = self.getStatModel(nsig)
 
@@ -653,17 +630,14 @@ class DataSet(object):
         :raises NotImplementedError: If requested backend has not been recognised.
         """
 
-        if hasattr(self, "statModel"):
-            return self.statModel
-        else:
-            self.statModel =  get_uncorrelated_region_statistical_model(observations = float(self.dataInfo.observedN),
-                                                                        backgrounds = float(self.dataInfo.expectedBG),
-                                                                        background_uncertainty = float(self.dataInfo.bgError),
-                                                                        signal_yields = nsig,
-                                                                        xsection = nsig/self.getLumi(),
-                                                                        analysis = self.globalInfo.id,
-                                                                        backend = backend
-                                                                        )
+        self.statModel = get_uncorrelated_region_statistical_model(observations = float(self.dataInfo.observedN),
+                                                                    backgrounds = float(self.dataInfo.expectedBG),
+                                                                    background_uncertainty = float(self.dataInfo.bgError),
+                                                                    signal_yields = nsig,
+                                                                    xsection = nsig/self.getLumi(),
+                                                                    analysis = self.globalInfo.id,
+                                                                    backend = 'simplified_likelihoods'
+                                                                    )
         return self.statModel
 
 
@@ -682,6 +656,7 @@ class CombinedDataSet(object):
         self._marginalize = False
         self.sortDataSets()
         self.findType()
+        # self.statModel = self.getStatModel()
 
     def findType(self):
         """ find the type of the combined dataset """
@@ -1022,32 +997,29 @@ class CombinedDataSet(object):
         :raises NotImplementedError: if input patter does not match to any backend specific input option.
         """
 
-        if hasattr(self, "statModel"):
-            return self.statModel
+        if self.type == "simplified":
+            nobs = [x.dataInfo.observedN for x in self.origdatasets]
+            cov = self.globalInfo.covariance
+            if type(cov) != list:
+                raise SModelSError("covariance field has wrong type: %s" % type(cov))
+            if len(cov) < 1:
+                raise SModelSError("covariance matrix has length %d." % len(cov))
+            bg = [x.dataInfo.expectedBG for x in self.origdatasets]
+            third_moment = self.globalInfo.third_moment if hasattr(self.globalInfo, "third_moment") else None
+            xsec = sum(nsig)/self.getLumi()
+
+            self.statModel = get_multi_region_statistical_model(analysis = self.globalInfo.id,
+                                                                signal = nsig,
+                                                                observed = nobs,
+                                                                covariance = cov,
+                                                                nb = bg,
+                                                                third_moment = third_moment,
+                                                                delta_sys = delta_sys,
+                                                                xsection = xsec
+                                                                )
+        elif self.type == "pyhf":
+            self.statModel = self._getBestStatModel(nsig, allow_negative_signal=allow_negative_signal)
         else:
-            if self.type == "simplified":
-                nobs = [x.dataInfo.observedN for x in self.origdatasets]
-                cov = self.globalInfo.covariance
-                if type(cov) != list:
-                    raise SModelSError("covariance field has wrong type: %s" % type(cov))
-                if len(cov) < 1:
-                    raise SModelSError("covariance matrix has length %d." % len(cov))
-                bg = [x.dataInfo.expectedBG for x in self.origdatasets]
-                third_moment = self.globalInfo.third_moment if hasattr(self.globalInfo, "third_moment") else None
-                xsec = sum(nsig)/self.getLumi()
+            logger.error(f'Dataset of type "{self.type}" for analysis {self.globalInfo.id} is not of type "simplified" or "pyhf".')
 
-                self.statModel = get_multi_region_statistical_model(analysis = self.globalInfo.id,
-                                                                    signal = nsig,
-                                                                    observed = nobs,
-                                                                    covariance = cov,
-                                                                    nb = bg,
-                                                                    third_moment = third_moment,
-                                                                    delta_sys = delta_sys,
-                                                                    xsection = xsec
-                                                                    )
-            elif self.type == "pyhf":
-                self.statModel = self._getBestStatModel(nsig, allow_negative_signal=allow_negative_signal)
-            else:
-                logger.error(f'Dataset of type "{self.type}" for analysis {self.globalInfo.id} is not of type "simplified" or "pyhf".')
-
-            return self.statModel
+        return self.statModel
