@@ -311,9 +311,9 @@ class TheoryPrediction(object):
                 self.dataset, srNsigs, self.marginalize, self.deltas_rel, expected=expected, mu=mu
             )
         if self.dataType() == "efficiencyMap":
-            nsig = (mu * self.xsection.value * lumi).asNumber()
+            nsig = ( self.xsection.value * lumi).asNumber() #(mu * self.xsection.value * lumi).asNumber()
             llhd = self.dataset.likelihood(
-                nsig, marginalize=self.marginalize, deltas_rel=self.deltas_rel, expected=expected
+                nsig, marginalize=self.marginalize, deltas_rel=self.deltas_rel, expected=expected, mu=mu
             )
 
         if self.dataType() == "upperLimit":
@@ -441,9 +441,9 @@ class TheoryPrediction(object):
             )
             muhat = None
             if hasattr(self.dataset, "muhat"):
-                muhat = self.dataset.muhat / nsig
+                muhat = self.dataset.muhat #/ nsig
             if hasattr(self.dataset, "sigma_mu"):
-                sigma_mu = float(self.dataset.sigma_mu / nsig)
+                sigma_mu = float(self.dataset.sigma_mu )#/ nsig)
                 if not "sigma_mu" in self.cachedObjs[expected]:
                     self.cachedObjs[expected]["sigma_mu"] = {}
                 self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = sigma_mu
