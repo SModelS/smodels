@@ -150,7 +150,7 @@ smodelsOutputDefault = {
             "r_expected": 0.00209093,
             "Width (GeV)": [["prompt", "stable"], ["prompt", "stable"]],
             "likelihood": 0.02449917,
-            "l_max": 0.02972175,
+            "l_max": 0.0245,
             "l_SM": 0.02442398,
         },
         {
