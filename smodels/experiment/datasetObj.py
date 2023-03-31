@@ -22,7 +22,7 @@ from smodels.theory.element import Element
 
 from typing import Text, Union, List, Dict, Optional
 import itertools
-from spey import get_uncorrelated_region_statistical_model, get_multi_region_statistical_model, ExpectationType
+from spey import get_uncorrelated_nbin_statistical_model, get_correlated_nbin_statistical_model, ExpectationType
 
 # if on, will check for overlapping constraints
 _complainAboutOverlappingConstraints = True
@@ -629,7 +629,7 @@ class DataSet(object):
         :raises NotImplementedError: If requested backend has not been recognised.
         """
 
-        self.statModel = get_uncorrelated_region_statistical_model(observations = float(self.dataInfo.observedN),
+        self.statModel = get_uncorrelated_nbin_statistical_model(observations = float(self.dataInfo.observedN),
                                                                     backgrounds = float(self.dataInfo.expectedBG),
                                                                     background_uncertainty = float(self.dataInfo.bgError),
                                                                     signal_yields = nsig,
@@ -926,7 +926,7 @@ class CombinedDataSet(object):
                 xsec = sum(nsig)/self.getLumi()
                 # It is possible to do differently and to set a xsec_UL on each set of SRs but that is not how it done in SModelS so far
                 # xsec = sum(listOfSignals[index])/self.getLumi()
-                statModel = get_multi_region_statistical_model(analysis=self.globalInfo.id,
+                statModel = get_correlated_nbin_statistical_model(analysis=self.globalInfo.id,
                                                                 signal=patch,
                                                                 observed=json,
                                                                 xsection=xsec
@@ -1007,11 +1007,11 @@ class CombinedDataSet(object):
             third_moment = self.globalInfo.third_moment if hasattr(self.globalInfo, "third_moment") else None
             xsec = sum(nsig)/self.getLumi()
 
-            self.statModel = get_multi_region_statistical_model(analysis = self.globalInfo.id,
-                                                                signal = nsig,
-                                                                observed = nobs,
-                                                                covariance = cov,
-                                                                nb = bg,
+            self.statModel = get_correlated_nbin_statistical_model(analysis = self.globalInfo.id,
+                                                                signal_yields = nsig,
+                                                                data = nobs,
+                                                                covariance_matrix = cov,
+                                                                backgrounds = bg,
                                                                 third_moment = third_moment,
                                                                 delta_sys = delta_sys,
                                                                 xsection = xsec
