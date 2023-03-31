@@ -633,10 +633,11 @@ class DataSet(object):
                                                                     backgrounds = float(self.dataInfo.expectedBG),
                                                                     background_uncertainty = float(self.dataInfo.bgError),
                                                                     signal_yields = nsig,
-                                                                    xsection = nsig/self.getLumi(),
+                                                                    xsection = float (nsig/self.getLumi().asNumber(1./fb)),
                                                                     analysis = self.globalInfo.id,
                                                                     backend = 'simplified_likelihoods'
                                                                     )
+        logger.error ( f"stat model is {str(self.statModel)}" )
         return self.statModel
 
 
@@ -1005,7 +1006,7 @@ class CombinedDataSet(object):
                 raise SModelSError("covariance matrix has length %d." % len(cov))
             bg = [x.dataInfo.expectedBG for x in self.origdatasets]
             third_moment = self.globalInfo.third_moment if hasattr(self.globalInfo, "third_moment") else None
-            xsec = sum(nsig)/self.getLumi()
+            xsec = float ( sum(nsig)/self.getLumi().asNumber(1./fb) )
 
             self.statModel = get_correlated_nbin_statistical_model(analysis = self.globalInfo.id,
                                                                 signal_yields = nsig,
@@ -1021,4 +1022,6 @@ class CombinedDataSet(object):
         else:
             logger.error(f'Dataset of type "{self.type}" for analysis {self.globalInfo.id} is not of type "simplified" or "pyhf".')
 
+        logger.error ( f"model is {self.statModel}" )
+        sys.exit()
         return self.statModel
