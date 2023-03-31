@@ -297,7 +297,7 @@ class DataSet(object):
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
-        args={"marginalize":marginalize}
+        args={}
 
         statModel = self.getStatModel(nsig)
 
@@ -463,7 +463,7 @@ class DataSet(object):
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
-        args={"marginalize":marginalize}
+        args={}
 
         statModel = self.getStatModel(nsig)
 
@@ -927,8 +927,8 @@ class CombinedDataSet(object):
                 # It is possible to do differently and to set a xsec_UL on each set of SRs but that is not how it done in SModelS so far
                 # xsec = sum(listOfSignals[index])/self.getLumi()
                 statModel = get_correlated_nbin_statistical_model(analysis=self.globalInfo.id,
-                                                                signal=patch,
-                                                                observed=json,
+                                                                signal_yields=patch,
+                                                                data=json,
                                                                 xsection=xsec
                                                                 )
                 # If all the SRs are used in the json files and there is only one json files, there is only one statModel.
@@ -943,7 +943,7 @@ class CombinedDataSet(object):
                 else:
                     bounds[config.poi_index] = (0, 100)
 
-                mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
+                mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,par_bounds=bounds)
                 while mu_ul_exp == bounds[config.poi_index][1]:
                     logger.debug('Expected upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
                     bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)

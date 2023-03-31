@@ -47,11 +47,11 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
         else:
             bounds[config.poi_index] = (0, 100)
 
-        mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allowNegativeSignals,par_bounds=bounds)
+        mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected],par_bounds=bounds)
         while mu_ul == bounds[config.poi_index][1]:
             logger.debug('Upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
             bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
-            mu_ul = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
+            mu_ul = statModel.poi_upper_limit(expected=ExpectationType.apriori,par_bounds=bounds)
 
         ret = mu_ul*statModel.xsection
         logger.debug("Combined upper limit : {}".format(ret))
@@ -157,7 +157,7 @@ def getCombinedLikelihood(
     config = statModel.backend.model.config()
     bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds] if dataset.type=='simplified' else config.suggested_bounds
     bounds[config.poi_index] = (0, 10)
-    args={"marginalize":marginalize}
+    args={}
 
     lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, **args)
 
@@ -255,7 +255,7 @@ def getCombinedStatistics(
     else:
         return {"lmax": -1.0, "muhat": None, "sigma_mu": None}
 
-    args={"marginalize":marginalize}
+    args={}
 
     statModel = dataset.getStatModel(nsig)
 
