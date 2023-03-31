@@ -310,8 +310,8 @@ smodelsOutputDefault = {
     "CombinedRes": [
         {
             "AnalysisID": "ATLAS-CONF-2013-037,CMS-SUS-13-012",
-            "r": 0.1332296,
-            "r_expected": 0.207,
+            "r": 0.1213635,
+            "r_expected": 0.1762426,
             "likelihood": 9.47724e-05,
             "l_max": 0.0001330265,
             "l_SM": 6.179978e-05,
