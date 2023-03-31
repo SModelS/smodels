@@ -384,13 +384,14 @@ class DataSet(object):
         statModel = self.getStatModel(nsig)
 
         config = statModel.backend.model.config()
-        bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
+        bounds = [(suggested[0]-800,suggested[1]+800) for suggested in config.suggested_bounds]
         if allowNegativeSignals:
-            bounds[config.poi_index] = (config.minimum_poi, 100)
+            bounds[config.poi_index] = (config.minimum_poi, 300)
         else:
-            bounds[config.poi_index] = (0, 100)
+            bounds[config.poi_index] = (0, 300)
 
         muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
+        print ( "lmax is at", muhat, lmax )
         while muhat == bounds[config.poi_index][1]:
             logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
             bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
