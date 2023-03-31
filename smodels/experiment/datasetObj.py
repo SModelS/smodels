@@ -629,7 +629,7 @@ class DataSet(object):
         :raises NotImplementedError: If requested backend has not been recognised.
         """
 
-        self.statModel = get_uncorrelated_nbin_statistical_model(observations = float(self.dataInfo.observedN),
+        self.statModel = get_uncorrelated_nbin_statistical_model(   data = float(self.dataInfo.observedN),
                                                                     backgrounds = float(self.dataInfo.expectedBG),
                                                                     background_uncertainty = float(self.dataInfo.bgError),
                                                                     signal_yields = nsig,
