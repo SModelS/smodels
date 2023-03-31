@@ -171,7 +171,7 @@ class TheoryPrediction(object):
                     ]
                 self.cachedObjs[expected]["UL"] = getCombinedUpperLimitFor(
                     self.dataset, srNsigs, expected=expected, deltas_rel=self.deltas_rel
-                )
+                )*fb # we supplied the xsec to spey in fb
 
         # Return the expected or observed UL:
         # if not self.cachedObjs[expected]["UL"]:
