@@ -637,7 +637,6 @@ class DataSet(object):
                                                                     analysis = self.globalInfo.id,
                                                                     backend = 'simplified_likelihoods'
                                                                     )
-        logger.error ( f"stat model is {str(self.statModel)}" )
         return self.statModel
 
 
@@ -1022,6 +1021,4 @@ class CombinedDataSet(object):
         else:
             logger.error(f'Dataset of type "{self.type}" for analysis {self.globalInfo.id} is not of type "simplified" or "pyhf".')
 
-        logger.error ( f"model is {self.statModel}" )
-        sys.exit()
         return self.statModel
