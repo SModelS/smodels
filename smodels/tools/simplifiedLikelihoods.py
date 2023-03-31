@@ -1087,9 +1087,6 @@ class UpperLimitComputer:
                 model.observed[i] = float(d)
         computer = LikelihoodComputer(model, toys)
         mu_hat = computer.findMuHat( allowNegativeSignals=False, extended_output=False)
-        theta_hat0, _ = computer.findThetaHat( 0. )
-        sigma_mu = computer.getSigmaMu(mu_hat, theta_hat0)
-
         nll0 = computer.likelihood( mu_hat, marginalize=marginalize, nll=True)
         # print ( f"SL nll0 {nll0:.3f} muhat {mu_hat:.3f} sigma_mu {sigma_mu:.3f} {signal_type} {sum(model.nsignal):.3f}" )
         if np.isinf(nll0) and not marginalize and not trylasttime:
@@ -1104,8 +1101,12 @@ class UpperLimitComputer:
                 marginalize = False
             else:
                 logger.warning("marginalization worked.")
+        theta_hat0, _ = computer.findThetaHat( 1. )
+        sigma_mu = computer.getSigmaMu(mu_hat, theta_hat0)
+
         aModel = copy.deepcopy(model)
-        aModel.observed = array([x + y for x, y in zip(model.backgrounds, theta_hat0)])
+        # aModel.observed = array([x + y for x, y in zip(model.backgrounds, theta_hat0)])
+        aModel.observed = array([x + y + z for x, y, z in zip(model.backgrounds, theta_hat0, model.nsignal )])
         aModel.name = aModel.name + "A"
         # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
         compA = LikelihoodComputer(aModel, toys)

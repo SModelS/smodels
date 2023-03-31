@@ -531,6 +531,10 @@ class TxTPrinter(BasicPrinter):
                 serv = self._formatNumber(theoryPrediction.getRValue(
                     expected=self.getTypeOfExpected()), 4)
                 output += "Expected r-value: %s\n" % serv
+                serv2 = self._formatNumber(theoryPrediction.getRValue(
+                    expected="posteriori"), 4)
+                output += "Posteriori r-value: %s\n" % serv2
+
             llhd = theoryPrediction.likelihood()
             if llhd is not None:
                 chi2, chi2sm = None, None

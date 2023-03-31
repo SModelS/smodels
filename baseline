@@ -1,0 +1,31 @@
+# https://docs.google.com/document/d/1qAqr31tS5pyTMwJWfycFeUo-9BlCVZ0Iz7hudQgJnc4/edit
+# ./runSModelS.py -p llhds.ini -f TChiWZ_600_200_600_200.slha 
+
+baseline:
+TChiWZ (600,200): robs= 0.9341, rexp= 0.9336
+TChiWH (600,300): robs= 2.0727, rexp= 1.3984
+TChiWH(1000,350): robs= 1.6071, rexp= 1.0625
+TChiWZ   (900,1): robs= 1.5835, rexp= 1.0234
+
+baseline, inverted:
+TChiWZ (600,200): robs= 1.0705, rexp= 1.0711
+TChiWH (600,300): robs= 0.4825, rexp= 0.7151
+TChiWH(1000,350): robs= 0.6222, rexp= 0.9412
+TChiWZ   (900,1): robs= 0.6315, rexp= 0.9771
+
+mine (UL):
+TChiWZ (600,200): robs= 1.05, rexp= 1.077
+TChiWH (600,300): robs= 0.469, rexp= 0.6923
+TChiWH(1000,350): robs= 0.6147, rexp= 0.9369
+
+mine (orig):
+TChiWZ (600,200): robs= 1.141, rexp= 1.517
+TChiWH (600,300): robs= 0.5075, rexp= 0.9345
+TChiWH(1000,350): robs= 0.5719, rexp= 1.251
+TChiWZ   (900,1): robs= 0.5710, rexp= 1.251
+
+mine (corr):
+TChiWZ (600,200): robs= 0.9994, rexp= 1.265
+TChiWH (600,300): robs= 0.4563, rexp= 0.7546
+TChiWH(1000,350): robs= 0.5101, rexp= 1.03
+TChiWZ   (900,1): robs= 0.7543, rexp= 0.9998
