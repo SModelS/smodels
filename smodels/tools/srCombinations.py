@@ -41,12 +41,13 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
         # statModel = dataset.statModel
 
         config = statModel.backend.model.config()
-        bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds] if dataset.type=='simplified' else config.suggested_bounds
+        bounds = [(suggested[0]-900,suggested[1]+900) for suggested in config.suggested_bounds] if dataset.type=='simplified' else config.suggested_bounds
         if allowNegativeSignals:
             bounds[config.poi_index] = (config.minimum_poi, 100)
         else:
-            bounds[config.poi_index] = (0, 100)
+            bounds[config.poi_index] = (-20, 100)
 
+        bounds[config.poi_index] = (-520, 800) # for now!
         mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected],par_bounds=bounds)
         while mu_ul == bounds[config.poi_index][1]:
             logger.debug('Upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
@@ -261,6 +262,7 @@ def getCombinedStatistics(
 
     # statModel = dataset.statModel
 
+    print ( "allowNegativeSignals", allowNegativeSignals )
     config = statModel.backend.model.config()
     bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds] if dataset.type=='simplified' else config.suggested_bounds
     if allowNegativeSignals:
