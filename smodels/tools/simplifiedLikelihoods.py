@@ -1106,12 +1106,14 @@ class UpperLimitComputer:
 
         aModel = copy.deepcopy(model)
         # aModel.observed = array([x + y for x, y in zip(model.backgrounds, theta_hat0)])
-        aModel.observed = array([x + y + z for x, y, z in zip(model.backgrounds, theta_hat0, model.nsignal )])
+        # aModel.observed = array([x + y + z for x, y, z in zip(model.backgrounds, theta_hat0, model.nsignal )])
+        aModel.observed = array([x + y for x, y in zip(model.backgrounds, model.nsignal )])
         aModel.name = aModel.name + "A"
         # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
         compA = LikelihoodComputer(aModel, toys)
         ## compute
         mu_hatA = compA.findMuHat()
+        print ( "mu_hatA", mu_hatA )
         # TODO convert rel_signals to signals
         nll0A = compA.likelihood( mu=mu_hatA, marginalize=marginalize, nll=True)
         # return 1.
