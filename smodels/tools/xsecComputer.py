@@ -58,8 +58,8 @@ class XSecComputer:
         try:
             f=pyslha.readSLHAFile(slhafile)
         except (pyslha.ParseError,ValueError) as e:
-            logger.error( f"File {slhafile} cannot be parsed as SLHA file: {e}" )
-            raise SModelSError()
+            line = f"File {slhafile} cannot be parsed as SLHA file: {e}"
+            raise SModelSError( line )
 
     def _checkSqrts ( self, sqrts ):
         if type(sqrts)==type(float) or type(sqrts)==type(int):
@@ -332,8 +332,11 @@ class XSecComputer:
         """ compute xsecs for a bunch of slha files """
         for inputFile in inputFiles:
             logger.debug ( "computing xsec for %s" % inputFile )
-            self.computeForOneFile ( sqrtses, inputFile, unlink, lOfromSLHA,
+            try:
+                self.computeForOneFile ( sqrtses, inputFile, unlink, lOfromSLHA,
                       tofile, pythiacard=pythiacard, ssmultipliers = ssmultipliers )
+            except SModelSError as e:
+                logger.warn ( f"skipping {inputFile}: {e}" )
 
     def addCommentToFile ( self, comment, slhaFile ):
         """ add the optional comment to file """
@@ -494,6 +497,8 @@ class ArgsStandardizer:
         else:
             files = os.listdir ( inputPath )
             for f in files:
+                if f.startswith("."):
+                    continue
                 inputFiles.append ( os.path.join ( inputPath, f ) )
         import random
         random.shuffle ( inputFiles )
