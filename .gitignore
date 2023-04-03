@@ -66,6 +66,7 @@ test/database/*.pcl
 test/database/**/*.pcl
 test/tinydb/*.pcl
 test/tinydb/**/*.pcl
+test/output.log
 smodels/lib/pythia8/.*.tgz
 smodels/lib/pythia8/pythia8*
 smodels/lib/pythia8/xml.doc

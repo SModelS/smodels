@@ -142,7 +142,8 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
     level = 'debug'
     if suppressStdout:
         level = 'error'
-        to = os.devnull
+        #to = os.devnull
+        to = "redirected.log"
     database = None
     if overridedatabase is not None:
         database = overridedatabase
