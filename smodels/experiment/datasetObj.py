@@ -391,7 +391,6 @@ class DataSet(object):
             bounds[config.poi_index] = (0, 300)
 
         muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
-        print ( "lmax is at", muhat, lmax )
         while muhat == bounds[config.poi_index][1]:
             logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
             bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
@@ -924,7 +923,7 @@ class CombinedDataSet(object):
                 # The x-section is at the level of the TheoryPrediction
                 # if there are multiple sets of SRs, set a xsec_UL for the whole analysis, i.e. that uses all the SRs,
                 # so that the resulting R value Is for the whole analysis
-                xsec = sum(nsig)/self.getLumi()
+                xsec = float ( sum(nsig)/self.getLumi().asNumber(1./fb ) )
                 # It is possible to do differently and to set a xsec_UL on each set of SRs but that is not how it done in SModelS so far
                 # xsec = sum(listOfSignals[index])/self.getLumi()
                 statModel = get_correlated_nbin_statistical_model(analysis=self.globalInfo.id,
