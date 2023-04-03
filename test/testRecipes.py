@@ -35,6 +35,7 @@ def listOfNotebooks(notebookDir=nbdir):
     notebooks = glob.glob(f"{notebookDir}/*.ipynb")
     notebooks = list(notebooks)
     notebooks = [os.path.basename(n) for n in notebooks]
+    notebooks.sort()
     return notebooks
 
 
