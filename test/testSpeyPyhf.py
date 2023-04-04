@@ -92,7 +92,7 @@ class PyhfTest(unittest.TestCase):
                       observations=observations,
                       version='1.0.0'
                       )
-            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=signal,data=ws)
             ul = statModel.poi_upper_limit()
             self.assertEqual(statModel.workspaces, None)
             self.assertEqual(ul, None)
@@ -105,7 +105,7 @@ class PyhfTest(unittest.TestCase):
                       observations=observations,
                       version='1.0.0'
                       )
-            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=signal,data=ws)
             ul = statModel.poi_upper_limit()
             self.assertEqual(statModel.workspaces, None)
             self.assertEqual(ul, None)
@@ -118,7 +118,7 @@ class PyhfTest(unittest.TestCase):
                       #observations=observations,
                       version='1.0.0'
                       )
-            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=signal,data=ws)
             ul = statModel.poi_upper_limit()
             self.assertEqual(statModel.workspaces, None)
             self.assertEqual(ul, None)
@@ -131,7 +131,7 @@ class PyhfTest(unittest.TestCase):
                       observations=observations,
                       #version='1.0.0'
                       )
-            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=signal,data=ws)
             ul = statModel.poi_upper_limit()
             self.assertEqual(statModel.workspaces, None)
             self.assertIsNone(ul)
@@ -176,7 +176,7 @@ class PyhfTest(unittest.TestCase):
                       observations=observations,
                       version='1.0.0'
                       )
-            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=signal,data=ws)
             ul = statModel.poi_upper_limit()
             self.assertEqual(statModel.workspaces, None)
             self.assertEqual(ul, None)
@@ -189,7 +189,7 @@ class PyhfTest(unittest.TestCase):
                       observations=observations,
                       version='1.0.0'
                       )
-            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=signal,data=ws)
             ul = statModel.poi_upper_limit()
             self.assertEqual(statModel.workspaces, None)
             self.assertEqual(ul, None)
@@ -202,7 +202,7 @@ class PyhfTest(unittest.TestCase):
                       #observations=observations,
                       version='1.0.0'
                       )
-            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=signal,data=ws)
             ul = statModel.poi_upper_limit()
             self.assertEqual(statModel.workspaces, None)
             self.assertEqual(ul, None)
@@ -215,7 +215,7 @@ class PyhfTest(unittest.TestCase):
                       observations=observations,
                       #version='1.0.0'
                       )
-            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=signal,data=ws)
             ul = statModel.poi_upper_limit()
             self.assertEqual(statModel.workspaces, None)
             self.assertIsNone(ul)
@@ -232,7 +232,7 @@ class PyhfTest(unittest.TestCase):
                 "value": {"name": "signal", "data": [0.], "modifiers": [{"name": "mu", "type": "normfactor", "data": None}]}
                 }]
         try:
-            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=signal,data=ws)
             ul = statModel.poi_upper_limit()
             self.assertIsNone(ul)
         except Exception as e:
@@ -249,7 +249,7 @@ class PyhfTest(unittest.TestCase):
                 "value": {"name": "signal", "data": [0.9,0.5], "modifiers": [{"name": "mu", "type": "normfactor", "data": None}]}
                 }]
         try:
-            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=signal,data=ws)
             ul1 = statModel.poi_upper_limit()
             self.assertIsNone(ul1)
         except Exception as e:
@@ -261,13 +261,13 @@ class PyhfTest(unittest.TestCase):
                 "value": {"name": "signal", "data": [0.9,0.5], "modifiers": [{"name": "mu", "type": "normfactor", "data": None}]}
                 }]
         try:
-            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws)
+            statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=signal,data=ws)
             ul2 = statModel.poi_upper_limit()
             #ul2 = ulcomputer.getUpperLimitOnMu(workspace_index=0) spey doesn't allow to give several ws as input
             self.assertIsNone(ul2) # Was not tested with spey because when the unit test was created
                                    # spey couldn't take a list of workspaces as input
         except Exception as e:
-            self.assertEqual(str(e),"Requested backend has not been recognised.")
+            self.assertEqual(str(e),"Requested backend has not been implemented to this helper function.")
 
     def testWSindex(self):
         """
@@ -280,13 +280,13 @@ class PyhfTest(unittest.TestCase):
                 "value": {"name": "signal", "data": [0.1,0.2], "modifiers": [{"name": "mu", "type": "normfactor", "data": None}]}
                 }]
         try:
-            statModel = spey.get_multi_region_statistical_model("UnitTest",signal,ws) # Cannot give a list of ws to spey
+            statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=signal,data=ws) # Cannot give a list of ws to spey
             ul = statModel.poi_upper_limit()
             self.assertAlmostEqual ( ul, 234.83141989029718, 1 ) # Was not tested with spey because when the unit test was created
                                                                  # spey couldn't take a list of workspaces as input
             # self.assertIsNone(ul)
         except Exception as e:
-            self.assertEqual(str(e),"Requested backend has not been recognised.")
+            self.assertEqual(str(e),"Requested backend has not been implemented to this helper function.")
 
     def testFullPyhfModule1(self):
         """
@@ -316,11 +316,11 @@ class PyhfTest(unittest.TestCase):
             )
         )]
         # Computing the upper limit with the SModelS/pyhf interface
-        statModel = spey.get_multi_region_statistical_model("UnitTest",patch,bkg)
+        statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=patch,data=bkg)
         config = statModel.backend.model.config()
         bounds = config.suggested_bounds
         bounds[config.poi_index] = (config.minimum_poi, 100)
-        ul = statModel.poi_upper_limit(expected=spey.ExpectationType.observed,allow_negative_signal=False,par_bounds=bounds) # ul was mutiplied with total yield in previous unittest - it is not the case here
+        ul = statModel.poi_upper_limit(expected=spey.ExpectationType.observed,par_bounds=bounds) # ul was mutiplied with total yield in previous unittest - it is not the case here
         # Computing the cls outside of SModelS with POI = ul, should give 0.95
         llhdSpec = jsonpatch.apply_patch(bkg, patch)
         workspace = pyhf.Workspace(llhdSpec)
@@ -370,7 +370,7 @@ class PyhfTest(unittest.TestCase):
         )]
         llhdSpec = jsonpatch.apply_patch(bkg, patch)
         # Computing the upper limit with the SModelS/pyhf interface
-        statModel = spey.get_multi_region_statistical_model("UnitTest",patch,bkg)
+        statModel = spey.get_correlated_nbin_statistical_model(analysis="UnitTest",signal_yields=patch,data=bkg)
         config = statModel.backend.model.config()
         bounds = config.suggested_bounds
         bounds[config.poi_index] = (config.minimum_poi, 100)
