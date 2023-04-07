@@ -28,7 +28,7 @@ from smodels.theory import decomposer
 from math import floor, log10
 import numpy as np
 import math
-from spey import get_uncorrelated_region_statistical_model, get_multi_region_statistical_model, ExpectationType
+from spey import get_uncorrelated_nbin_statistical_model, get_correlated_nbin_statistical_model, ExpectationType
 from scipy import optimize
 from pyhf import Workspace
 from pyhf.infer import hypotest
@@ -43,13 +43,14 @@ class StatisticsTest(unittest.TestCase):
         for backend in ["pyhf","simplified_likelihoods"]:
             nsig = 1.0
             nobs, nbg = 100.0, 100.0
-            statModel = get_uncorrelated_region_statistical_model(observations=nobs,
-                                                                    backgrounds=nbg,
-                                                                    background_uncertainty=np.sqrt(0.001),
-                                                                    signal_yields=nsig,
-                                                                    xsection=None,
-                                                                    analysis="UnitTest",
-                                                                    backend=backend
+            bgError = round(np.sqrt(0.001),5) # pyhf convergence fails for small values of the background error, so fix it at a small value that converges correclty.
+            statModel = get_uncorrelated_nbin_statistical_model(data=nobs,
+                                                                backgrounds=nbg,
+                                                                background_uncertainty=bgError,
+                                                                signal_yields=nsig,
+                                                                xsection=None,
+                                                                analysis="UnitTest",
+                                                                backend=backend
                                                                 )
             config = statModel.backend.model.config()
             if backend == "pyhf":
@@ -68,15 +69,14 @@ class StatisticsTest(unittest.TestCase):
             dx = 0.5
             totdir, totlim, totmarg = 0.0, 0.0, 0.0
             for nsig in np.arange(0.1, 100.0, dx):
-                print()
                 print("nsig=", nsig)
-                statModel = get_uncorrelated_region_statistical_model(observations=nobs,
-                                                                        backgrounds=nbg,
-                                                                        background_uncertainty=np.sqrt(0.001),
-                                                                        signal_yields=nsig,
-                                                                        xsection=None,
-                                                                        analysis="UnitTest",
-                                                                        backend=backend
+                statModel = get_uncorrelated_nbin_statistical_model(data=nobs,
+                                                                    backgrounds=nbg,
+                                                                    background_uncertainty=bgError,
+                                                                    signal_yields=nsig,
+                                                                    xsection=None,
+                                                                    analysis="UnitTest",
+                                                                    backend=backend
                                                                     )
                 llhddir = statModel.likelihood(nsig,return_nll=False)
                 chi2dir = statModel.chi2()
@@ -161,14 +161,14 @@ class StatisticsTest(unittest.TestCase):
         expectedDict = {False:ExpectationType.observed,
                         True:ExpectationType.apriori,
                         "posteriori":ExpectationType.aposteriori}
-        statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
-                                                        signal=nsig,
-                                                        observed=nobs,
-                                                        covariance=cov,
-                                                        nb=bg,
-                                                        third_moment=None,
-                                                        delta_sys=0.2,
-                                                        xsection=xsec
+        statModel = get_correlated_nbin_statistical_model(analysis=dataset.globalInfo.id,
+                                                            signal_yields=nsig,
+                                                            data=nobs,
+                                                            covariance_matrix=cov,
+                                                            backgrounds=bg,
+                                                            third_moment=None,
+                                                            delta_sys=0.2,
+                                                            xsection=xsec
                                                         )
         config = statModel.backend.model.config()
         bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
@@ -176,7 +176,7 @@ class StatisticsTest(unittest.TestCase):
             bounds[config.poi_index] = (config.minimum_poi, 100)
         else:
             bounds[config.poi_index] = (0, 100)
-        mu_ul_spey = statModel.poi_upper_limit(expected=expectedDict[expected],allow_negative_signal=allow_negative_signal,par_bounds=bounds)
+        mu_ul_spey = statModel.poi_upper_limit(expected=expectedDict[expected],par_bounds=bounds)
         xsec_ul_spey = mu_ul_spey*statModel.xsection
 
         mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=ExpectationType.observed, return_nll=False, par_bounds=bounds)
@@ -244,14 +244,14 @@ class StatisticsTest(unittest.TestCase):
         expectedDict = {False:ExpectationType.observed,
                         True:ExpectationType.apriori,
                         "posteriori":ExpectationType.aposteriori}
-        statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
-                                                        signal=nsig,
-                                                        observed=nobs,
-                                                        covariance=cov,
-                                                        nb=bg,
-                                                        third_moment=None,
-                                                        delta_sys=0.2,
-                                                        xsection=xsec
+        statModel = get_correlated_nbin_statistical_model(analysis=dataset.globalInfo.id,
+                                                            signal_yields=nsig,
+                                                            data=nobs,
+                                                            covariance_matrix=cov,
+                                                            backgrounds=bg,
+                                                            third_moment=None,
+                                                            delta_sys=0.2,
+                                                            xsection=xsec
                                                         )
 
         config = statModel.backend.model.config()
@@ -261,7 +261,7 @@ class StatisticsTest(unittest.TestCase):
         else:
             bounds[config.poi_index] = (0, 100)
 
-        mu_ul_spey = statModel.poi_upper_limit(expected=ExpectationType.observed,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
+        mu_ul_spey = statModel.poi_upper_limit(expected=ExpectationType.observed,par_bounds=bounds)
         xsec_ul_spey = mu_ul_spey*statModel.xsection
 
         mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=ExpectationType.observed, return_nll=False, par_bounds=bounds)
@@ -523,7 +523,7 @@ class StatisticsTest(unittest.TestCase):
         mu_hat_spey = res["muhat"]
         llhdMax_spey = res["lmax"]
 
-        self.assertAlmostEqual(res_pyhf['BkgOnly.json']['xsec_ul'].asNumber(fb),xsec_ul_spey.asNumber(fb),3)
+        self.assertAlmostEqual(res_pyhf['BkgOnly.json']['xsec_ul'].asNumber(fb),xsec_ul_spey,3)
         self.assertAlmostEqual(res_pyhf['BkgOnly.json']['mu_hat'],mu_hat_spey,4)
         self.assertAlmostEqual(res_pyhf['BkgOnly.json']['llhdMax'],llhdMax_spey,4)
 
@@ -680,10 +680,10 @@ class StatisticsTest(unittest.TestCase):
                 # if a patch has no signal, skip
                 if all([sig==0. for sig in patch[0]['value']['data']]):
                     continue
-                statModel = get_multi_region_statistical_model(analysis=dataset.globalInfo.id,
-                                                                signal=patch,
-                                                                observed=json,
-                                                                xsection=sum(nsig)/dataset.getLumi()
+                statModel = get_correlated_nbin_statistical_model(analysis=dataset.globalInfo.id,
+                                                                    signal_yields=patch,
+                                                                    data=json,
+                                                                    xsection=sum(nsig)/dataset.getLumi()
                                                                 )
                 config = statModel.backend.model.config()
                 bounds = config.suggested_bounds
@@ -721,7 +721,7 @@ class StatisticsTest(unittest.TestCase):
                 res_pyhf[expected][jsName] = {"mu_ul":mu_ul_pyhf,"xsec_ul":xsec_ul_pyhf, "mu_hat":mu_hat_pyhf, "llhdMax":llhdMax_pyhf}
 
 
-                mu_ul_spey = statModel.poi_upper_limit(expected=expectationType,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
+                mu_ul_spey = statModel.poi_upper_limit(expected=expectationType,par_bounds=bounds)
                 xsec_ul_spey = mu_ul_spey*statModel.xsection
 
                 mu_hat_spey, llhdMax_spey = statModel.maximize_likelihood(allow_negative_signal=allow_negative_signal, expected=expectationType, return_nll=False)
@@ -748,7 +748,7 @@ class StatisticsTest(unittest.TestCase):
                 mu_hat_exp_min = res_pyhf['apriori'][JSName]['mu_ul']
                 bestJSName = JSName
 
-        self.assertAlmostEqual(res_pyhf['observed'][bestJSName]['xsec_ul']._value,xsec_ul_spey._value,3)
+        self.assertAlmostEqual(res_pyhf['observed'][bestJSName]['xsec_ul']._value,xsec_ul_spey,3)
         self.assertAlmostEqual(res_pyhf['observed'][bestJSName]['mu_hat'],mu_hat_spey,4)
         self.assertAlmostEqual(res_pyhf['observed'][bestJSName]['llhdMax'],llhdMax_spey,4)
 
@@ -792,13 +792,14 @@ class StatisticsTest(unittest.TestCase):
             nsig = 35.0
             nobs, nbg = 110., 100.0
             lumi = 1.
-            statModel = get_uncorrelated_region_statistical_model(observations=nobs,
-                                                                    backgrounds=nbg,
-                                                                    background_uncertainty=np.sqrt(0.001),
-                                                                    signal_yields=nsig,
-                                                                    xsection=None,
-                                                                    analysis="UnitTest",
-                                                                    backend=backend
+            bgError = round(np.sqrt(0.001),5) # pyhf convergence fails for small values of the background error, so fix it at a small value that converges correclty.
+            statModel = get_uncorrelated_nbin_statistical_model(data=nobs,
+                                                                backgrounds=nbg,
+                                                                background_uncertainty=bgError,
+                                                                signal_yields=nsig,
+                                                                xsection=None,
+                                                                analysis="UnitTest",
+                                                                backend=backend
                                                                 )
             config = statModel.backend.model.config()
             if backend == "pyhf":
@@ -839,13 +840,13 @@ class StatisticsTest(unittest.TestCase):
             nsig = 1.0
             nobs, nbg = 100.0, 100.0
             bgError = round(np.sqrt(0.001),5) # pyhf convergence fails for small values of the background error, so fix it at a small value that converges correclty.
-            statModel = get_uncorrelated_region_statistical_model(observations=nobs,
-                                                                    backgrounds=nbg,
-                                                                    background_uncertainty=bgError,
-                                                                    signal_yields=nsig,
-                                                                    xsection=None,
-                                                                    analysis="UnitTest",
-                                                                    backend=backend
+            statModel = get_uncorrelated_nbin_statistical_model(data=nobs,
+                                                                backgrounds=nbg,
+                                                                background_uncertainty=bgError,
+                                                                signal_yields=nsig,
+                                                                xsection=None,
+                                                                analysis="UnitTest",
+                                                                backend=backend
                                                                 )
             config = statModel.backend.model.config()
             if backend == "pyhf":
@@ -898,13 +899,13 @@ class StatisticsTest(unittest.TestCase):
         prediction.computeStatistics()
         ill = math.log(prediction.likelihood())
         ichi2 = prediction.chi2()
-        statModel = get_uncorrelated_region_statistical_model(observations=4.,
-                                                                backgrounds=2.2,
-                                                                background_uncertainty=1.1,
-                                                                signal_yields=nsig,
-                                                                xsection=None,
-                                                                analysis="UnitTest",
-                                                                backend='simplified_likelihoods'
+        statModel = get_uncorrelated_nbin_statistical_model(data=4.,
+                                                            backgrounds=2.2,
+                                                            background_uncertainty=1.1,
+                                                            signal_yields=nsig,
+                                                            xsection=None,
+                                                            analysis="UnitTest",
+                                                            backend='simplified_likelihoods'
                                                             )
         dll = math.log(statModel.likelihood(poi_test=1.,return_nll=False))
         self.assertTrue(abs((ill-dll)*100./dll) < 3) # Previous test "self.assertAlmostEqual(ill, dll, places=2)" was too restrictive.
@@ -919,13 +920,13 @@ class StatisticsTest(unittest.TestCase):
     def testZeroLikelihood(self):
         """A test to check if a llhd of 0 is being tolerated"""
         for backend in ["pyhf","simplified_likelihoods"]:
-            statModel = get_uncorrelated_region_statistical_model(observations=1e20,
-                                                                    backgrounds=2.2,
-                                                                    background_uncertainty=1.1,
-                                                                    signal_yields=2.,
-                                                                    xsection=None,
-                                                                    analysis="UnitTest",
-                                                                    backend=backend
+            statModel = get_uncorrelated_nbin_statistical_model(data=1e20,
+                                                                backgrounds=2.2,
+                                                                background_uncertainty=1.1,
+                                                                signal_yields=2.,
+                                                                xsection=None,
+                                                                analysis="UnitTest",
+                                                                backend=backend
                                                                 )
             # Spey returns nan for pyhf backend but 0 for SL backend
             llhd = statModel.likelihood(poi_test=1.,return_nll=False)
@@ -1471,13 +1472,13 @@ class StatisticsTest(unittest.TestCase):
             # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
             # Chi2 as computed by statistics module:
             for backend in ["pyhf","simplified_likelihoods"]:
-                statModel = get_uncorrelated_region_statistical_model(observations=nobs,
-                                                                        backgrounds=nb,
-                                                                        background_uncertainty=deltab,
-                                                                        signal_yields=2.,
-                                                                        xsection=None,
-                                                                        analysis="UnitTest",
-                                                                        backend=backend
+                statModel = get_uncorrelated_nbin_statistical_model(data=nobs,
+                                                                    backgrounds=nb,
+                                                                    background_uncertainty=deltab,
+                                                                    signal_yields=2.,
+                                                                    xsection=None,
+                                                                    analysis="UnitTest",
+                                                                    backend=backend
                                                                     )
                 # spey doesn't allow for marginalized chi2 yet
                 # chi2_actual = statModel.chi2( marginalize=True)  # , .2*nsig )
