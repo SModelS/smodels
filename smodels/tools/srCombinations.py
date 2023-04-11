@@ -38,23 +38,31 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
     if dataset.type in ["simplified","pyhf"]:
         statModel = dataset.getStatModel(nsig)
 
-        # statModel = dataset.statModel
-
         config = statModel.backend.model.config()
         bounds = config.suggested_bounds
+        init = config.suggested_init
         if allowNegativeSignals:
             bounds[config.poi_index] = (config.minimum_poi, 100)
         else:
             bounds[config.poi_index] = (-20, 100)
         if dataset.type=="simplified":
             bounds = [(suggested[0]-800,suggested[1]+800) for suggested in config.suggested_bounds]
-            bounds[config.poi_index] = (-520, 800) # for now!
-        mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected],par_bounds=bounds)
+            # bounds[config.poi_index] = (-520, 800) # for now!
+            bounds[config.poi_index] = (-20, 200) # for now!
+            assert config.poi_index == 0, f"Error: I assume the poi index to be zero, not {config.poi_index}"
+            init[1:] = statModel.backend.model.observed - statModel.backend.model.background
+            for i in range ( len ( statModel.backend.model.observed ) ):
+                x = np.sqrt ( statModel.backend.model.covariance[i][i] )
+                bounds[i+1]=(-5*x,5*x)
+        ## ok so the bounds should be -5*x,5*x with x being np.sqrt(statModel.backend.model.covariance[i][i], the initial values just the diff between observation and expectation
+        # print ( "init pars in srCombinations are", init[:3] )
+        #print ( "bounds    in srCombinations are", bounds[:3] )
+        mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected],par_bounds=bounds, init_pars = init )
+        # import sys; sys.exit()
         while mu_ul == bounds[config.poi_index][1]:
             logger.debug('Upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
             bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
-            mu_ul = statModel.poi_upper_limit(expected=ExpectationType.apriori,par_bounds=bounds)
-
+            mu_ul = statModel.poi_upper_limit(expected=ExpectationType.apriori,par_bounds=bounds, init_pars = init )
         ret = mu_ul*statModel.xsection
         logger.debug("Combined upper limit : {}".format(ret))
         return ret
@@ -159,9 +167,18 @@ def getCombinedLikelihood(
     config = statModel.backend.model.config()
     bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds] if dataset.type=='simplified' else config.suggested_bounds
     bounds[config.poi_index] = (0, 10)
+    init = config.suggested_init
     args={}
+    if dataset.type=="simplified":
+        assert config.poi_index == 0, f"Error: I assume the poi index to be zero, not {config.poi_index}"
+        init[1:] = statModel.backend.model.observed - statModel.backend.model.background
+        for i in range ( len ( statModel.backend.model.observed ) ):
+            x = np.sqrt ( statModel.backend.model.covariance[i][i] )
+            bounds[i+1]=(-7*x,7*x)
 
-    lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, **args)
+    #print ( "lbsm init pars in srCombinations are", init[:3] )
+    #print ( "lbsm bounds    in srCombinations are", bounds[:3] )
+    lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, init_pars = init, **args)
 
     return lbsm
 
@@ -263,22 +280,31 @@ def getCombinedStatistics(
 
     # statModel = dataset.statModel
 
-    print ( "allowNegativeSignals", allowNegativeSignals )
     config = statModel.backend.model.config()
+    init = config.suggested_init
     bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds] if dataset.type=='simplified' else config.suggested_bounds
     if allowNegativeSignals:
         bounds[config.poi_index] = (config.minimum_poi, 100)
     else:
         bounds[config.poi_index] = (0, 100)
+    if dataset.type == "simplified":
+        init[1:] = statModel.backend.model.observed - statModel.backend.model.background
+        for i in range ( len ( statModel.backend.model.observed ) ):
+            x = np.sqrt ( statModel.backend.model.covariance[i][i] )
+            bounds[i+1]=(-7*x,7*x)
 
-    muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
+    # print ( "for muhat init pars in srCombinations are", init[:3] )
+    # print ( "for muhat bounds    in srCombinations are", bounds[:3] )
+
+    muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, init_pars = init )
     while muhat == bounds[config.poi_index][1]:
         logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
         bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
-        muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
+        muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, init_pars = init )
+    # sys.exit()
 
-    lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll)
-    lsm = statModel.likelihood ( poi_test = 0., expected=expectedDict[expected], return_nll = nll)
+    lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll, par_bounds = bounds, init_pars = init )
+    lsm = statModel.likelihood ( poi_test = 0., expected=expectedDict[expected], return_nll = nll, par_bounds = bounds, init_pars = init )
     if lsm > lmax:
         logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
         lmax = lsm
