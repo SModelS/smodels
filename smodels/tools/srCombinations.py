@@ -22,6 +22,10 @@ def getInitialisationForSL ( statModel, allowNegativeSignals : bool ):
     config = statModel.backend.model.config()
     init = config.suggested_init
     bounds = config.suggested_bounds
+    if False: ## these were the old values!
+        bounds = [(suggested[0]-800,suggested[1]+800) for suggested in config.suggested_bounds]
+        bounds[config.poi_index] = (-520, 800) # for now!
+        return bounds,init
     assert config.poi_index == 0, f"Error: I assume the poi index to be zero, not {config.poi_index}"
     init[1:] = statModel.backend.model.observed - statModel.backend.model.background
     residuals, totweight, covest = [], [], []

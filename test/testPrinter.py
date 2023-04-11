@@ -237,13 +237,13 @@ class RunPrinterTest(unittest.TestCase):
     def testSLHAPrinter(self):
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
-        outputfile = runMain(slhafile)
+        outputfile = runMain(slhafile,suppressStdout=True)
         outputfile = outputfile.replace('.py', '.smodelsslha')
 
         slhaDefaultFile = "./gluino_squarks_default.slha.smodelsslha"
+        ret = compareSLHA(slhaDefaultFile, outputfile, allowedDiff=0.05)
         try:
-            self.assertTrue(compareSLHA(slhaDefaultFile, outputfile,
-                                        allowedDiff=0.05))
+            self.assertTrue(ret)
         except AssertionError:
             msg = "%s != %s" % (slhaDefaultFile, outputfile)
             raise AssertionError(msg)
