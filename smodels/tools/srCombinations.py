@@ -15,6 +15,44 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
 from spey import ExpectationType
 
+def getInitialisationForSL ( statModel, allowNegativeSignals : bool ):
+    """ get decent initial bounds and initial values for an SL statModel 
+    :param allowNegativeSignals: currently unused
+    """
+    config = statModel.backend.model.config()
+    init = config.suggested_init
+    bounds = config.suggested_bounds
+    assert config.poi_index == 0, f"Error: I assume the poi index to be zero, not {config.poi_index}"
+    init[1:] = statModel.backend.model.observed - statModel.backend.model.background
+    residuals, totweight, covest = [], [], []
+    for i in range ( len ( statModel.backend.model.observed ) ):
+        cov = statModel.backend.model.covariance[i][i]
+        x = np.sqrt ( cov )
+        bounds[i+1]=(-7*x+init[i+1],7*x+init[i+1])
+        sig = statModel.backend.model.signal[i]
+        obs = statModel.backend.model.observed[i]
+        bg = statModel.backend.model.background[i]
+        if sig > 0.:
+            delta = ( obs - bg ) / sig
+            w = sig**2 / cov
+            # err =  w**2 * ( obs + cov ) / ( sig**2 )
+            err =  ( obs + cov ) / cov
+            residuals.append ( w * delta )
+            covest.append ( err )
+            totweight.append ( w )
+    ## ok so the bounds should be -5*x,5*x with x being np.sqrt(statModel.backend.model.covariance[i][i], the initial values just the diff between observation and expectation
+    init_muhat = np.sum ( residuals ) / np.sum ( totweight)
+    err_muhat = np.sqrt ( np.sum ( totweight )**(-2) * np.sum ( covest ) )
+
+    init[config.poi_index] = init_muhat
+    bounds [ config.poi_index ] = ( -5*err_muhat + init_muhat, 7*err_muhat + init_muhat )
+    if False:
+        print ( f"residual ({len(init)}) is", init_muhat, "+-", err_muhat )
+        print ( "init pars in srCombinations are", init[:3] )
+        print ( "signals   in srCombinations are", statModel.backend.model.signal[:3] )
+        print ( "bounds    in srCombinations are", bounds[:3] )
+    return bounds,init
+
 def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allowNegativeSignals=False):
     """
     Get combined upper limit. If covariances are given in globalInfo then
@@ -37,7 +75,6 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
 
     if dataset.type in ["simplified","pyhf"]:
         statModel = dataset.getStatModel(nsig)
-
         config = statModel.backend.model.config()
         bounds = config.suggested_bounds
         init = config.suggested_init
@@ -46,19 +83,13 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
         else:
             bounds[config.poi_index] = (-20, 100)
         if dataset.type=="simplified":
-            bounds = [(suggested[0]-800,suggested[1]+800) for suggested in config.suggested_bounds]
-            # bounds[config.poi_index] = (-520, 800) # for now!
-            bounds[config.poi_index] = (-20, 200) # for now!
-            assert config.poi_index == 0, f"Error: I assume the poi index to be zero, not {config.poi_index}"
-            init[1:] = statModel.backend.model.observed - statModel.backend.model.background
-            for i in range ( len ( statModel.backend.model.observed ) ):
-                x = np.sqrt ( statModel.backend.model.covariance[i][i] )
-                bounds[i+1]=(-5*x,5*x)
-        ## ok so the bounds should be -5*x,5*x with x being np.sqrt(statModel.backend.model.covariance[i][i], the initial values just the diff between observation and expectation
-        # print ( "init pars in srCombinations are", init[:3] )
-        #print ( "bounds    in srCombinations are", bounds[:3] )
+            bounds, init = getInitialisationForSL ( statModel, allowNegativeSignals )
         mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected],par_bounds=bounds, init_pars = init )
-        # import sys; sys.exit()
+        if False:
+            print ( "in srCombinations mu_ul is", mu_ul )
+            muhat = statModel.maximize_likelihood ( par_bounds = bounds, init_pars  = init )
+            print ( "in srCombinations muhat is", muhat )
+            # import sys; sys.exit()
         while mu_ul == bounds[config.poi_index][1]:
             logger.debug('Upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
             bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
