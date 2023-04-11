@@ -5,12 +5,12 @@
 #r(combined) = -1 means no analysis from the above combination set produced results.
 #filename            MostConstrainingAnalysis  r_max     r_exp   MostSensitive(ATLAS)  r(ATLAS)  r_exp(ATLAS)  MostSensitive(CMS)  r(CMS)   r_exp(CMS)  r(combined)  r_exp(combined)
 416126634.slha       ATLAS-SUSY-2013-12        1.29      -1      N/A                   -1        -1            N/A                 -1       -1          -1           -1             
-T1tttt.slha          CMS-PAS-SUS-15-002        30.5      -1      ATLAS-CONF-2013-037   5.92      5.47          CMS-SUS-13-012      5.82     8.24        8.87         10.4           
+T1tttt.slha          CMS-PAS-SUS-15-002        30.5      -1      ATLAS-CONF-2013-037   5.92      5.47          CMS-SUS-13-012      5.82     8.24        8.36         9.65           
 T6bbHH_pyhf.slha     N/A                       -1        -1      N/A                   -1        -1            N/A                 -1       -1          -1           -1             
 broken.slha          N/A                       -1        -1      N/A                   -1        -1            N/A                 -1       -1          -1           -1             
-complicated.slha     ATLAS-SUSY-2013-02        0.388     -1      ATLAS-CONF-2013-037   0.00183   0.00209       CMS-SUS-13-012      0.13     0.208       0.133        0.21           
-gluinoToTops.slha    CMS-PAS-SUS-15-002        5.52      -1      ATLAS-CONF-2013-037   0.479     0.443         CMS-SUS-13-012      0.844    0.703       1.12         0.884          
-gluino_squarks.slha  ATLAS-SUSY-2013-02        0.388     -1      ATLAS-CONF-2013-037   0.00183   0.00209       CMS-SUS-13-012      0.13     0.208       0.133        0.21           
+complicated.slha     ATLAS-SUSY-2013-02        0.388     -1      ATLAS-CONF-2013-037   0.00183   0.00209       CMS-SUS-13-012      0.13     0.208       0.121        0.176          
+gluinoToTops.slha    CMS-PAS-SUS-15-002        5.52      -1      ATLAS-CONF-2013-037   0.479     0.443         CMS-SUS-13-012      0.844    0.703       1.27         0.971          
+gluino_squarks.slha  ATLAS-SUSY-2013-02        0.388     -1      ATLAS-CONF-2013-037   0.00183   0.00209       CMS-SUS-13-012      0.13     0.208       0.121        0.176          
 higgsinoStop.slha    ATLAS-CONF-2013-037       22.2      25.3    ATLAS-CONF-2013-037   22.2      25.3          N/A                 -1       -1          22.2         25.3           
 hscpTest_long.slha   CMS-EXO-13-006            0.5       0.5     N/A                   -1        -1            CMS-EXO-13-006      0.5      0.5         -1           -1             
 hscpTest_mid.slha    CMS-EXO-13-006            0.0884    0.0884  N/A                   -1        -1            CMS-EXO-13-006      0.0884   0.0884      -1           -1             
