@@ -28,10 +28,8 @@ def getInitialisationForSL ( statModel, allowNegativeSignals : bool ):
         return bounds,init
     assert config.poi_index == 0, f"Error: I assume the poi index to be zero, not {config.poi_index}"
     init[1:] = statModel.backend.model.observed - statModel.backend.model.background
-    residuals, totweight, covest = [], [], []
+    numerator, denominator = [], []
     for i in range ( len ( statModel.backend.model.observed ) ):
-        # this is not yet good, the average is a weighted one
-        # but its error is the error on the unweighted average
         cov = statModel.backend.model.covariance[i][i]
         x = np.sqrt ( cov )
         bounds[i+1]=(-5*x+init[i+1],5*x+init[i+1])
@@ -39,21 +37,17 @@ def getInitialisationForSL ( statModel, allowNegativeSignals : bool ):
         obs = statModel.backend.model.observed[i]
         bg = statModel.backend.model.background[i]
         if sig > 0. and cov > 0.:
-            delta = ( obs - bg ) / sig
-            #w = 1.
-            # w = ( obs + cov ) / ( sig**2 )
-            # w = sig**2 / cov
-            err =  ( obs + cov ) / ( sig**2 )
-            w = 1. / err
-            # err =  w**2 * ( obs + cov ) / ( sig**2 )
-            # err =  ( obs + cov ) / cov**2 / sig**2
-            residuals.append ( w * delta )
-            covest.append ( err )
-            # totweight.append ( w )
-            totweight.append ( w )
+            # for the given region, mui would be the best bet for muhat
+            mui = ( obs - bg ) / sig
+            # its variance is this
+            cov_mui =  ( obs + cov ) / ( sig**2 )
+            # the inverse of which will be our weights
+            wi = 1. / cov_mui
+            numerator.append ( wi * mui )
+            denominator.append ( wi )
     ## ok so the bounds should be -5*x,5*x with x being np.sqrt(statModel.backend.model.covariance[i][i], the initial values just the diff between observation and expectation
-    init_muhat = np.sum ( residuals ) / np.sum ( totweight)
-    err_muhat = np.sqrt ( np.sum ( covest ) / (len(covest)**2) )
+    init_muhat = np.sum ( numerator ) / np.sum ( denominator)
+    err_muhat = np.sqrt ( len(denominator) / np.sum ( denominator ) )
     # err_muhat = np.sqrt ( np.sum ( totweight )**(-2) * np.sum ( covest ) )
 
     init[config.poi_index] = init_muhat
