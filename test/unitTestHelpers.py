@@ -192,7 +192,7 @@ def compareScanSummary(outA, outB, allowedDiff):
             elif isinstance(ptA[col], (float, int)):
                 diff = 2.*abs(ptA[col]-ptB[col])/abs(ptA[col]+ptB[col])
                 if diff > allowedDiff:
-                    logger.error("values for %s differ by %s in %s" % (col, diff, fname))
+                    logger.error( f"values for {col} differ by {diff} -- {ptA[col]} vs {ptB[col]} -- in {fname}" )
                     return False
             else:
                 logger.error("values for %s differ in %s" % (col, fname))
