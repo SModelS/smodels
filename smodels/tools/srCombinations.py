@@ -30,30 +30,41 @@ def getInitialisationForSL ( statModel, allowNegativeSignals : bool ):
     init[1:] = statModel.backend.model.observed - statModel.backend.model.background
     residuals, totweight, covest = [], [], []
     for i in range ( len ( statModel.backend.model.observed ) ):
+        # this is not yet good, the average is a weighted one
+        # but its error is the error on the unweighted average
         cov = statModel.backend.model.covariance[i][i]
         x = np.sqrt ( cov )
-        bounds[i+1]=(-7*x+init[i+1],7*x+init[i+1])
+        bounds[i+1]=(-5*x+init[i+1],5*x+init[i+1])
         sig = statModel.backend.model.signal[i]
         obs = statModel.backend.model.observed[i]
         bg = statModel.backend.model.background[i]
-        if sig > 0.:
+        if sig > 0. and cov > 0.:
             delta = ( obs - bg ) / sig
-            w = sig**2 / cov
+            #w = 1.
+            # w = ( obs + cov ) / ( sig**2 )
+            # w = sig**2 / cov
+            err =  ( obs + cov ) / ( sig**2 )
+            w = 1. / err
             # err =  w**2 * ( obs + cov ) / ( sig**2 )
-            err =  ( obs + cov ) / cov
+            # err =  ( obs + cov ) / cov**2 / sig**2
             residuals.append ( w * delta )
             covest.append ( err )
+            # totweight.append ( w )
             totweight.append ( w )
     ## ok so the bounds should be -5*x,5*x with x being np.sqrt(statModel.backend.model.covariance[i][i], the initial values just the diff between observation and expectation
     init_muhat = np.sum ( residuals ) / np.sum ( totweight)
-    err_muhat = np.sqrt ( np.sum ( totweight )**(-2) * np.sum ( covest ) )
+    err_muhat = np.sqrt ( np.sum ( covest ) / (len(covest)**2) )
+    # err_muhat = np.sqrt ( np.sum ( totweight )**(-2) * np.sum ( covest ) )
 
     init[config.poi_index] = init_muhat
-    bounds [ config.poi_index ] = ( -5*err_muhat + init_muhat, 7*err_muhat + init_muhat )
+    bounds [ config.poi_index ] = ( -5*err_muhat + init_muhat, 5*err_muhat + init_muhat )
     if False:
         print ( f"residual ({len(init)}) is", init_muhat, "+-", err_muhat )
+        print ( "errors are", covest )
+        print ( "residuals are", residuals )
         print ( "init pars in srCombinations are", init[:3] )
-        print ( "signals   in srCombinations are", statModel.backend.model.signal[:3] )
+        print ( "signals   in srCombinations are", statModel.backend.model.signal[:] )
+        print ( "deltas  in srCombinations are", statModel.backend.model.observed - statModel.backend.model.background )
         print ( "bounds    in srCombinations are", bounds[:3] )
     return bounds,init
 
