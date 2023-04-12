@@ -16,7 +16,7 @@ import numpy as np
 from spey import ExpectationType
 
 def getInitialisationForSL ( statModel, allowNegativeSignals : bool ):
-    """ get decent initial bounds and initial values for an SL statModel 
+    """ get decent initial bounds and initial values for an SL statModel
     :param allowNegativeSignals: currently unused
     """
     config = statModel.backend.model.config()
@@ -83,6 +83,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
         return None
 
     if dataset.type in ["simplified","pyhf"]:
+        #statModel = dataset.statModel ###For future API
         statModel = dataset.getStatModel(nsig)
         config = statModel.backend.model.config()
         bounds = config.suggested_bounds
@@ -90,16 +91,17 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
         if allowNegativeSignals:
             bounds[config.poi_index] = (config.minimum_poi, 100)
         else:
-            bounds[config.poi_index] = (-20, 100)
+            bounds[config.poi_index] = (0, 100)
         if dataset.type=="simplified":
             bounds, init = getInitialisationForSL ( statModel, allowNegativeSignals )
+
         mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected],par_bounds=bounds, init_pars = init )
         if False:
             print ( "in srCombinations mu_ul is", mu_ul )
             muhat = statModel.maximize_likelihood ( par_bounds = bounds, init_pars  = init )
             print ( "in srCombinations muhat is", muhat )
             # import sys; sys.exit()
-        while mu_ul == bounds[config.poi_index][1]:
+        while abs(mu_ul - bounds[config.poi_index][1]) <= 0.1:
             logger.debug('Upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
             bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
             mu_ul = statModel.poi_upper_limit(expected=ExpectationType.apriori,par_bounds=bounds, init_pars = init )
@@ -179,7 +181,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
 def getCombinedLikelihood(
     dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0, nll=False
 ):
-    """compute only lBSM
+    """
     :param nsig: predicted signal (list)
     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
     :param expected: compute expected, not observed likelihood. if "posteriori",
@@ -202,11 +204,14 @@ def getCombinedLikelihood(
 
     statModel = dataset.getStatModel(nsig)
 
-    # statModel = dataset.statModel
+    # statModel = dataset.statModel ###For future API
 
     config = statModel.backend.model.config()
-    bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds] if dataset.type=='simplified' else config.suggested_bounds
-    bounds[config.poi_index] = (0, 10)
+    if mu < config.minimum_poi:
+        logger.error ( f'Calling likelihood for {dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
+        return None
+    bounds = config.suggested_bounds
+    bounds[config.poi_index] = (max(mu-0.1,config.minimum_poi),mu+0.1)
     init = config.suggested_init
     args={}
     if dataset.type=="simplified":
@@ -218,7 +223,15 @@ def getCombinedLikelihood(
 
     #print ( "lbsm init pars in srCombinations are", init[:3] )
     #print ( "lbsm bounds    in srCombinations are", bounds[:3] )
-    lbsm = statModel.likelihood(poi_test = mu, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, init_pars = init, **args)
+
+    def likelihood(mu):
+        poi_test=float(mu) if isinstance(mu, (float, int)) else mu[0]
+        if expected == 'posteriori':
+            return statModel.asimov_likelihood ( poi_test = poi_test, expected=ExpectationType.apriori, return_nll = nll, par_bounds = bounds, init_pars = init, **args )
+        else:
+            return statModel.likelihood ( poi_test = poi_test, expected=expectedDict[expected], return_nll = nll, par_bounds = bounds, init_pars = init, **args )
+
+    lbsm = likelihood(mu)
 
     return lbsm
 
@@ -246,7 +259,7 @@ def getCombinedLikelihood(
 #         bounds[config.poi_index] = (0, 100)
 #
 #     muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
-#     while muhat == bounds[config.poi_index][1]:
+#     while abs(muhat - bounds[config.poi_index][1]) <= 0.1:
 #         logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
 #         bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
 #         muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
@@ -318,7 +331,7 @@ def getCombinedStatistics(
 
     statModel = dataset.getStatModel(nsig)
 
-    # statModel = dataset.statModel
+    # statModel = dataset.statModel ###For future API
 
     config = statModel.backend.model.config()
     init = config.suggested_init
@@ -336,15 +349,29 @@ def getCombinedStatistics(
     # print ( "for muhat init pars in srCombinations are", init[:3] )
     # print ( "for muhat bounds    in srCombinations are", bounds[:3] )
 
-    muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, init_pars = init )
-    while muhat == bounds[config.poi_index][1]:
+    def likelihood(mu):
+        poi_test=float(mu) if isinstance(mu, (float, int)) else mu[0]
+        if expected == 'posteriori':
+            return statModel.asimov_likelihood ( poi_test = poi_test, expected=ExpectationType.apriori, return_nll = nll, par_bounds = bounds, init_pars = init, **args )
+        else:
+            return statModel.likelihood ( poi_test = poi_test, expected=expectedDict[expected], return_nll = nll, par_bounds = bounds, init_pars = init, **args )
+
+    def max_likelihood():
+        if expected == 'posteriori':
+            return statModel.maximize_asimov_likelihood(expected=ExpectationType.apriori, test_statistics="qmutilde", return_nll=nll, par_bounds=bounds, init_pars=init)
+        else:
+            return statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, init_pars = init )
+
+
+    lbsm = likelihood(1.)
+    lsm = likelihood(0.)
+    muhat, lmax = max_likelihood()
+
+    while abs(muhat - bounds[config.poi_index][1]) <= 0.1:
         logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
         bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
-        muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, init_pars = init )
-    # sys.exit()
+        muhat, lmax = max_likelihood()
 
-    lbsm = statModel.likelihood ( poi_test = 1., expected=expectedDict[expected], return_nll = nll, par_bounds = bounds, init_pars = init )
-    lsm = statModel.likelihood ( poi_test = 0., expected=expectedDict[expected], return_nll = nll, par_bounds = bounds, init_pars = init )
     if lsm > lmax:
         logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
         lmax = lsm
@@ -354,6 +381,7 @@ def getCombinedStatistics(
         lmax = lbsm
         muhat = 1.0
 
+    # sys.exit()
     test_statistics = "q" if allowNegativeSignals else "qmutilde"
     sigma_mu = statModel.sigma_mu(poi_test=muhat,expected=expectedDict[expected],test_statistics=test_statistics)
 
@@ -507,7 +535,7 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
 #         computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
 #     return computer.likelihood(1., marginalize=marginalize)
 
-# !TP not used anymore, merged into getCombinedStatistics()
+#!TP not used anymore, merged into getCombinedStatistics()
 # def getCombinedSimplifiedStatistics(dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False):
 #     """compute likelihood at maximum, for simplified likelihoods only"""
 #     if dataset.type != "simplified":
@@ -534,7 +562,7 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
 #         bounds[config.poi_index] = (0, 100)
 #
 #     muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, **args)
-#     while muhat == bounds[config.poi_index][1]:
+#     while abs(muhat - bounds[config.poi_index][1]) <= 0.1:
 #         logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
 #         bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
 #         muhat, lmax = statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, **args)

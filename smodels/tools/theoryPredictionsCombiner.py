@@ -185,7 +185,8 @@ class TheoryPredictionsCombiner(object):
         """
         llhd = 1.0
         for tp in self.theoryPredictions:
-            llhd = llhd * tp.likelihood(0.0, expected=expected)
+            lsm = tp.likelihood(0.0, expected=expected)
+            llhd = llhd * lsm
         return llhd
 
     @singleDecorator
@@ -260,6 +261,8 @@ class TheoryPredictionsCombiner(object):
             if tmp != None:
                 llhd = llhd * tmp
                 changed = True
+            else:
+                return None
             # Restore marginalize setting:
             tp.marginalize = tp_marginalize
         if changed == False:
@@ -496,7 +499,6 @@ class TheoryPredictionsCombiner(object):
         :returns: upper limit on signal strength multiplier mu
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected)
-
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot, allowNegative = False )
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
         self.cachedObjs[expected]["UL"] = mu_lim
