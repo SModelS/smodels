@@ -964,8 +964,11 @@ class CombinedDataSet(object):
                 if ds.dataId not in listOfSRInJson:
                     xsec = sig/self.getLumi()
                     # Don't bother to compute eUL again (one could do it again if needed)
+                    if xsec.asNumber(fb) == 0.:
+                        ## we have no values
+                        continue
                     mu_ul_exp = ds.expectedUpperLimit/xsec
-                    if mu_ul_exp < muull_exp_min:
+                    if mu_ul_exp < mu_ul_exp_min:
                         logger.info("Best constraining model is a single uncorrelated model.")
                         mu_ul_exp_min = mu_ul_exp
                         bestStatModel = ds.getStatModel(sig)
