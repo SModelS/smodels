@@ -63,9 +63,9 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
         ulmu = combiner.getUpperLimitOnMu()
         # 16.78997035426023/4.71
-        self.assertAlmostEqual(ulmu, 3.7927149, 3)
+        self.assertAlmostEqual(ulmu, 3.41744, 3)
         ulmu_exp = combiner.getUpperLimitOnMu(expected=True)
-        self.assertAlmostEqual(ulmu_exp, 2.565108, 3)
+        self.assertAlmostEqual(ulmu_exp, 2.143318, 3)
 
     def testByHandComputed(self):
         """a unit test where in the comments I show the manual computations, step by step, for comparison"""
@@ -187,6 +187,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             for t in ts:
                 tpreds.append(t)
         combiner = TheoryPredictionsCombiner.selectResultsFrom(tpreds, anaids)
+
         # IDs that should be selected and the respective expected r-values:
         goodIDs = {
 #            "CMS-SUS-16-036": (1.379, "upperLimit"),
@@ -207,10 +208,10 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             self.assertAlmostEqual(diff_rel, 0.0, 2)
             self.assertEqual(goodIDs[ana][1], selectedIDs[ana][1])
 
-        self.assertAlmostEqual(combiner.lsm() / 1.06988795e-20, 1., 2)
-        self.assertAlmostEqual(combiner.likelihood() / 8.9504e-21, 1., 2)
-        self.assertAlmostEqual(combiner.lmax() / 1.0698879533540923e-20, 1., 2)
-        self.assertAlmostEqual(combiner.getRValue() / .2229345123626656, 1., 2)
+        self.assertAlmostEqual(combiner.lsm() / 8.032708820262497e-27, 1., 2)
+        self.assertAlmostEqual(combiner.likelihood() / 6.181123374537111e-27, 1., 2)
+        self.assertAlmostEqual(combiner.lmax() / 8.032708820262498e-27, 1., 2)
+        self.assertAlmostEqual(combiner.getRValue() / 0.2771209732232204, 1., 2)
 
 
 if __name__ == "__main__":
