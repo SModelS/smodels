@@ -104,7 +104,8 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
         config = statModel.backend.model.config()
         init, bounds, args = getInitialisationForSL ( dataset, False )
         #options = { "maxiter": 1000, "method": "SLSQP", "ntrials": 3 }
-        mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], **args )
+        print ( "boundsre", args )
+        mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], par_bounds=bounds, init_pars = init, **args )
         #mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected],par_bounds=bounds, init_pars = init, **options )
         if False:
             print ( "in srCombinations mu_ul is", mu_ul )
