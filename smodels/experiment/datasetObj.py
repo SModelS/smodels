@@ -948,19 +948,16 @@ class CombinedDataSet(object):
                                                             data=json,
                                                             xsection=xsec
                                                             )
+            self.statModel = statModel
             # If all the SRs are used in the json files and there is only one json files, there is only one statModel.
             # No need to compute mu_ul_exp if not needed.
             if all([ds.dataInfo.dataId in listOfSRInJson for ds in self._datasets]) and len(self.globalInfo.jsons) == 1:
                 return statModel
 
+            from smodels.tools.speyTools import getSpeyInitialisation
             config = statModel.backend.model.config()
-            bounds = config.suggested_bounds
-            if allow_negative_signal:
-                bounds[config.poi_index] = (config.minimum_poi, 100)
-            else:
-                bounds[config.poi_index] = (0, 100)
-
-            mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,par_bounds=bounds)
+            bounds, init, args = getSpeyInitialisation ( self, True )
+            mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,par_bounds=bounds, init_pars = init, **args )
             while abs(mu_ul_exp - bounds[config.poi_index][1]) <= 0.1:
                 logger.debug('Expected upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
                 bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
@@ -999,7 +996,8 @@ class CombinedDataSet(object):
     def getStatModel(self,
         nsig: Union[np.ndarray, List[Dict[Text, List]], List[float]],
         delta_sys: float = 0.0,
-        allow_negative_signal = False
+        allow_negative_signal = False,
+
     ):
         """
         Create a statistical model from multibin data.

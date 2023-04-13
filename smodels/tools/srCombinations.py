@@ -14,69 +14,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
 from spey import ExpectationType
-
-def getInitialisationForSL ( dataset, allowNegativeSignals : bool = False ):
-    """ get decent initial bounds and initial values for an SL statModel
-    :param allowNegativeSignals: if true, then bound the poi to positive values
-    """
-    statModel = dataset.statModel
-    config = statModel.backend.model.config()
-    init = config.suggested_init
-    bounds = config.suggested_bounds
-    args = {} ## extra args for the optimizers
-    if allowNegativeSignals:
-        bounds[config.poi_index] = (config.minimum_poi, 100)
-    else:
-        bounds[config.poi_index] = (0, 100)
-    if dataset.type!="simplified":
-        return init, bounds, args
-    if False: ## these were the old values!
-        bounds = [(suggested[0]-800,suggested[1]+800) for suggested in config.suggested_bounds]
-        bounds[config.poi_index] = (-520, 800) # for now!
-        return bounds,init,args
-    assert config.poi_index == 0, f"Error: I assume the poi index to be zero, not {config.poi_index}"
-    init[1:] = statModel.backend.model.observed - statModel.backend.model.background - statModel.backend.model.signal
-    numerator, denominator = [], []
-    for i in range ( len ( statModel.backend.model.observed ) ):
-        cov = statModel.backend.model.covariance[i][i]
-        x = np.sqrt ( cov )
-        bounds[i+1]=(-5*x+init[i+1],5*x+init[i+1])
-        sig = statModel.backend.model.signal[i]
-        obs = statModel.backend.model.observed[i]
-        bg = statModel.backend.model.background[i]
-        if sig > 0. and cov > 0.:
-            # for the given region, mui would be the best bet for muhat
-            mui = ( obs - bg ) / sig
-            # its variance is this
-            cov_mui =  ( obs + cov ) / ( sig**2 )
-            # the inverse of which will be our weights
-            wi = 1. / cov_mui
-            numerator.append ( wi * mui )
-            denominator.append ( wi )
-    ## ok so the bounds should be -5*x,5*x with x being np.sqrt(statModel.backend.model.covariance[i][i], the initial values just the diff between observation and expectation
-    init_muhat = np.sum ( numerator ) / np.sum ( denominator)
-    if not allowNegativeSignals and init_muhat<0.:
-        init_muhat = 0.
-    err_muhat = np.sqrt ( len(denominator) / np.sum ( denominator ) )
-    # err_muhat = np.sqrt ( np.sum ( totweight )**(-2) * np.sum ( covest ) )
-
-    init[config.poi_index] = init_muhat
-    minmu, maxmu = -5*err_muhat + init_muhat, 5*err_muhat + init_muhat
-    if not allowNegativeSignals and minmu < 0.:
-        minmu = 0.
-    bounds [ config.poi_index ] = ( minmu, maxmu )
-    if False:
-        print ( f"residual ({len(init)}) is", init_muhat, "+-", err_muhat )
-        print ( "errors are", covest )
-        print ( "residuals are", residuals )
-        print ( "init pars in srCombinations are", init[:3] )
-        print ( "signals   in srCombinations are", statModel.backend.model.signal[:] )
-        print ( "deltas  in srCombinations are", statModel.backend.model.observed - statModel.backend.model.background )
-        print ( "bounds    in srCombinations are", bounds[:3] )
-    args = { "maxiter": 500, "method": "BFGS", "ntrials": 3,
-                "xrtol": 1e-6, "low_init": bounds[0][0], 
-                "hig_init": bounds[0][1] }
-    return init,bounds,args
+from smodels.tools.speyTools import getSpeyInitialisation
 
 def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allowNegativeSignals=False):
     """
@@ -102,9 +40,8 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
         #statModel = dataset.statModel ###For future API
         statModel = dataset.getStatModel(nsig)
         config = statModel.backend.model.config()
-        init, bounds, args = getInitialisationForSL ( dataset, False )
+        init, bounds, args = getSpeyInitialisation ( dataset, False )
         #options = { "maxiter": 1000, "method": "SLSQP", "ntrials": 3 }
-        print ( "boundsre", args )
         mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], par_bounds=bounds, init_pars = init, **args )
         #mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected],par_bounds=bounds, init_pars = init, **options )
         if False:
@@ -237,7 +174,7 @@ def getCombinedLikelihood(
 
     def likelihood(mu):
         poi_test=float(mu) if isinstance(mu, (float, int)) else mu[0]
-        init, bounds, args = getInitialisationForSL ( dataset, allowNegativeSignals)
+        init, bounds, args = getSpeyInitialisation ( dataset, allowNegativeSignals)
         if expected == 'posteriori':
             return statModel.asimov_likelihood ( poi_test = poi_test, expected=ExpectationType.apriori, return_nll = nll, par_bounds = bounds, init_pars = init, **args )
         else:
@@ -363,14 +300,14 @@ def getCombinedStatistics(
 
     def likelihood(mu):
         poi_test=float(mu) if isinstance(mu, (float, int)) else mu[0]
-        init, bounds, args = getInitialisationForSL ( dataset, allowNegativeSignals)
+        init, bounds, args = getSpeyInitialisation ( dataset, allowNegativeSignals)
         if expected == 'posteriori':
             return statModel.asimov_likelihood ( poi_test = poi_test, expected=ExpectationType.apriori, return_nll = nll, par_bounds = bounds, init_pars = init, **args )
         else:
             return statModel.likelihood ( poi_test = poi_test, expected=expectedDict[expected], return_nll = nll, par_bounds = bounds, init_pars = init, **args )
 
     def max_likelihood():
-        init, bounds, args = getInitialisationForSL ( dataset, allowNegativeSignals)
+        init, bounds, args = getSpeyInitialisation ( dataset, allowNegativeSignals)
         if expected == 'posteriori':
             return statModel.maximize_asimov_likelihood(expected=ExpectationType.apriori, test_statistics="qmutilde", return_nll=nll, par_bounds=bounds, init_pars=init, **args )
         else:
