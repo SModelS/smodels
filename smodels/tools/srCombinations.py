@@ -23,18 +23,19 @@ def getInitialisationForSL ( dataset, allowNegativeSignals : bool = False ):
     config = statModel.backend.model.config()
     init = config.suggested_init
     bounds = config.suggested_bounds
+    args = {} ## extra args for the optimizers
     if allowNegativeSignals:
         bounds[config.poi_index] = (config.minimum_poi, 100)
     else:
         bounds[config.poi_index] = (0, 100)
     if dataset.type!="simplified":
-        return init, bounds
+        return init, bounds, args
     if False: ## these were the old values!
         bounds = [(suggested[0]-800,suggested[1]+800) for suggested in config.suggested_bounds]
         bounds[config.poi_index] = (-520, 800) # for now!
-        return bounds,init
+        return bounds,init,args
     assert config.poi_index == 0, f"Error: I assume the poi index to be zero, not {config.poi_index}"
-    init[1:] = statModel.backend.model.observed - statModel.backend.model.background
+    init[1:] = statModel.backend.model.observed - statModel.backend.model.background - statModel.backend.model.signal
     numerator, denominator = [], []
     for i in range ( len ( statModel.backend.model.observed ) ):
         cov = statModel.backend.model.covariance[i][i]
@@ -72,7 +73,10 @@ def getInitialisationForSL ( dataset, allowNegativeSignals : bool = False ):
         print ( "signals   in srCombinations are", statModel.backend.model.signal[:] )
         print ( "deltas  in srCombinations are", statModel.backend.model.observed - statModel.backend.model.background )
         print ( "bounds    in srCombinations are", bounds[:3] )
-    return init,bounds
+    args = { "maxiter": 500, "method": "BFGS", "ntrials": 3,
+                "xrtol": 1e-6, "low_init": bounds[0][0], 
+                "hig_init": bounds[0][1] }
+    return init,bounds,args
 
 def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allowNegativeSignals=False):
     """
@@ -98,12 +102,10 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
         #statModel = dataset.statModel ###For future API
         statModel = dataset.getStatModel(nsig)
         config = statModel.backend.model.config()
-        init, bounds = getInitialisationForSL ( dataset, allowNegativeSignals)
-        options = { "maxiter": 300, "method": "BFGS", "ntrials": 1 }
-        options["xrtol"]=1e-2
-        # options["method"]="SLSQP"
-        # options["method"]="L-BFGS-B"
-        mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected],par_bounds=bounds, init_pars = init, **options )
+        init, bounds, args = getInitialisationForSL ( dataset, False )
+        #options = { "maxiter": 1000, "method": "SLSQP", "ntrials": 3 }
+        mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], **args )
+        #mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected],par_bounds=bounds, init_pars = init, **options )
         if False:
             print ( "in srCombinations mu_ul is", mu_ul )
             muhat = statModel.maximize_likelihood ( par_bounds = bounds, init_pars  = init )
@@ -234,7 +236,7 @@ def getCombinedLikelihood(
 
     def likelihood(mu):
         poi_test=float(mu) if isinstance(mu, (float, int)) else mu[0]
-        init, bounds = getInitialisationForSL ( dataset, allowNegativeSignals)
+        init, bounds, args = getInitialisationForSL ( dataset, allowNegativeSignals)
         if expected == 'posteriori':
             return statModel.asimov_likelihood ( poi_test = poi_test, expected=ExpectationType.apriori, return_nll = nll, par_bounds = bounds, init_pars = init, **args )
         else:
@@ -360,18 +362,18 @@ def getCombinedStatistics(
 
     def likelihood(mu):
         poi_test=float(mu) if isinstance(mu, (float, int)) else mu[0]
-        init, bounds = getInitialisationForSL ( dataset, allowNegativeSignals)
+        init, bounds, args = getInitialisationForSL ( dataset, allowNegativeSignals)
         if expected == 'posteriori':
             return statModel.asimov_likelihood ( poi_test = poi_test, expected=ExpectationType.apriori, return_nll = nll, par_bounds = bounds, init_pars = init, **args )
         else:
             return statModel.likelihood ( poi_test = poi_test, expected=expectedDict[expected], return_nll = nll, par_bounds = bounds, init_pars = init, **args )
 
     def max_likelihood():
-        init, bounds = getInitialisationForSL ( dataset, allowNegativeSignals)
+        init, bounds, args = getInitialisationForSL ( dataset, allowNegativeSignals)
         if expected == 'posteriori':
-            return statModel.maximize_asimov_likelihood(expected=ExpectationType.apriori, test_statistics="qmutilde", return_nll=nll, par_bounds=bounds, init_pars=init)
+            return statModel.maximize_asimov_likelihood(expected=ExpectationType.apriori, test_statistics="qmutilde", return_nll=nll, par_bounds=bounds, init_pars=init, **args )
         else:
-            return statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, init_pars = init )
+            return statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds, init_pars = init, **args )
 
 
     lbsm = likelihood(1.)
