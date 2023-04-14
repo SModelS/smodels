@@ -961,7 +961,13 @@ class CombinedDataSet(object):
 
             config = statModel.backend.model.config()
             init, bounds, args = getSpeyInitialisation ( self, True )
-            mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,par_bounds=bounds, init_pars = init, **args )
+            try:
+                mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,par_bounds=bounds, init_pars = init, **args )
+            except ValueError as e:
+                # if we dont get an answer, might just be this super region
+                # is not a good choice
+                logger.warn ( f"when trying to find best super region: {e}. will skip this one." )
+                continue
             while abs(mu_ul_exp - bounds[config.poi_index][1]) <= 0.1:
                 logger.debug('Expected upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
                 bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
