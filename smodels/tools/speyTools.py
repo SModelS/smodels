@@ -135,8 +135,12 @@ def getInitialisationForSL ( dataset, allowNegativeSignals : bool = False ):
         print ( "signals   in srCombinations are", statModel.backend.model.signal[:] )
         print ( "deltas  in srCombinations are", statModel.backend.model.observed - statModel.backend.model.background )
         print ( "bounds    in srCombinations are", bounds[:3] )
-    args = { "maxiter": 500, "method": "BFGS", "ntrials": 3,
-                "xrtol": 1e-6, "low_init": bounds[0][0], 
+    args = { "maxiter": 500, "method": "SLSQP", "ntrials": 1,
+             "low_init": bounds[0][0], 
                 "hig_init": bounds[0][1] }
+    # args["method"]="BFGS"
+    args["tol"]=1e-3
+    # args["xrtol"]=1e-6
+    # print ( f"speyTools: initbracket is", args["low_init"], args["hig_init"] )
     return init,bounds,args
 
