@@ -13,11 +13,23 @@ def getSpeyInitialisation ( dataset, allowNegativeSignals : bool = False ):
     """ get decent initial bounds and initial values for a statModel
     :param allowNegativeSignals: if true, then bound the poi to positive values
     """
+    if dataset.getType()=="efficiencyMap":
+        return getInitialisationForSingleRegions ( dataset, allowNegativeSignals )
+        
     if dataset.type=="simplified":
         return getInitialisationForSL ( dataset, allowNegativeSignals )
     if dataset.type!="pyhf":
         raise Exception ( f"dont know that dataset type {dataset.type}" )
     return getInitialisationForPyhf ( dataset, allowNegativeSignals )
+
+def getInitialisationForSingleRegions ( dataset, allowNegativeSignals : bool = False ):
+    statModel = dataset.statModel
+    model = statModel.backend.model
+    config = model.config()
+    init = config.suggested_init
+    bounds = config.suggested_bounds
+    args = {}
+    return init,bounds,args
 
 def getInitialisationForPyhf ( dataset, allowNegativeSignals : bool = False ):
     """ get decent initial bounds and initial values for a statModel
