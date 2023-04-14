@@ -310,7 +310,7 @@ class DataSet(object):
             return None
 
         config = statModel.backend.model.config()
-        bounds, init, args = getSpeyInitialisation ( self, True )
+        init, bounds, args = getSpeyInitialisation ( self, True )
         if mu < config.minimum_poi:
             logger.error ( f'Calling likelihood for {dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
             return None
@@ -319,7 +319,7 @@ class DataSet(object):
 
         def likelihood(mu):
             poi_test=float(mu) if isinstance(mu, (float, int)) else mu[0]
-            bounds, init, args = getSpeyInitialisation ( self, True )
+            init, bounds, args = getSpeyInitialisation ( self, True )
             if expected == 'posteriori':
                 return statModel.asimov_likelihood ( poi_test = poi_test, expected=ExpectationType.apriori, return_nll = nll, par_bounds = bounds, **args )
             else:
@@ -396,7 +396,7 @@ class DataSet(object):
             return None
 
         statModel = self.getStatModel(nsig)
-        bounds, init, args = getSpeyInitialisation ( self, True )
+        init, bounds, args = getSpeyInitialisation ( self, True )
 
         config = statModel.backend.model.config()
         #bounds = [(suggested[0]-800,suggested[1]+800) for suggested in config.suggested_bounds]
@@ -487,7 +487,7 @@ class DataSet(object):
         args={}
 
         statModel = self.getStatModel(nsig)
-        bounds, init, args = getSpeyInitialisation ( self, True )
+        init, bounds, args = getSpeyInitialisation ( self, True )
 
         config = statModel.backend.model.config()
         #bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
@@ -960,7 +960,7 @@ class CombinedDataSet(object):
                 return statModel
 
             config = statModel.backend.model.config()
-            bounds, init, args = getSpeyInitialisation ( self, True )
+            init, bounds, args = getSpeyInitialisation ( self, True )
             mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,par_bounds=bounds, init_pars = init, **args )
             while abs(mu_ul_exp - bounds[config.poi_index][1]) <= 0.1:
                 logger.debug('Expected upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
