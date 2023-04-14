@@ -79,12 +79,13 @@ def getInitialisationForPyhf ( dataset, allowNegativeSignals : bool = False ):
     #         "xrtol": 1e-6 "low_init": bounds[0][0], 
 #                "hig_init": bounds[0][1] 
     #}
-    args = { "maxiter": 500, "ntrials": 1, "method": "SLSQP" }
+    # args = { "maxiter": 500, "ntrials": 1, "method": "SLSQP" }
+    args = { "maxiter": 500, "ntrials": 1, "method": None }
     return init,bounds,args
 
 def alternateMethod ( args : dict ):
     """ try a different method. i hope we wont need this in the long run """
-    if not "method" in args:
+    if not "method" in args or args["method"] is None:
         args["method"]="BFGS"
         return
     if args["method"]=="SLSQP":
@@ -148,7 +149,7 @@ def getInitialisationForSL ( dataset, allowNegativeSignals : bool = False ):
         print ( "signals   in srCombinations are", statModel.backend.model.signal[:] )
         print ( "deltas  in srCombinations are", statModel.backend.model.observed - statModel.backend.model.background )
         print ( "bounds    in srCombinations are", bounds[:3] )
-    args = { "maxiter": 500, "method": "SLSQP", "ntrials": 1,
+    args = { "maxiter": 500, "method": None, "ntrials": 1,
              "low_init": bounds[0][0], 
                 "hig_init": bounds[0][1] }
     # args["method"]="BFGS"
