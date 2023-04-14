@@ -40,7 +40,7 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
         #statModel = dataset.statModel ###For future API
         statModel = dataset.getStatModel(nsig)
         config = statModel.backend.model.config()
-        init, bounds, args = getSpeyInitialisation ( dataset, False )
+        init, bounds, args = getSpeyInitialisation ( dataset, False, False )
         try:
             mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], par_bounds=bounds, init_pars = init, **args )
         except ValueError as e: # try with SLSQP and different bracket
@@ -180,7 +180,7 @@ def getCombinedLikelihood(
 
     def likelihood(mu):
         poi_test=float(mu) if isinstance(mu, (float, int)) else mu[0]
-        init, bounds, args = getSpeyInitialisation ( dataset, allowNegativeSignals)
+        init, bounds, args = getSpeyInitialisation ( dataset, allowNegativeSignals, initial_bracket = False )
         if expected == 'posteriori':
             return statModel.asimov_likelihood ( poi_test = poi_test, expected=ExpectationType.apriori, return_nll = nll, par_bounds = bounds, init_pars = init, **args )
         else:
@@ -306,14 +306,14 @@ def getCombinedStatistics(
 
     def likelihood(mu):
         poi_test=float(mu) if isinstance(mu, (float, int)) else mu[0]
-        init, bounds, args = getSpeyInitialisation ( dataset, allowNegativeSignals)
+        init, bounds, args = getSpeyInitialisation ( dataset, allowNegativeSignals, initial_bracket = False )
         if expected == 'posteriori':
             return statModel.asimov_likelihood ( poi_test = poi_test, expected=ExpectationType.apriori, return_nll = nll, par_bounds = bounds, init_pars = init, **args )
         else:
             return statModel.likelihood ( poi_test = poi_test, expected=expectedDict[expected], return_nll = nll, par_bounds = bounds, init_pars = init, **args )
 
     def max_likelihood():
-        init, bounds, args = getSpeyInitialisation ( dataset, allowNegativeSignals)
+        init, bounds, args = getSpeyInitialisation ( dataset, allowNegativeSignals, initial_bracket = False )
         if expected == 'posteriori':
             return statModel.maximize_asimov_likelihood(expected=ExpectationType.apriori, test_statistics="qmutilde", return_nll=nll, par_bounds=bounds, init_pars=init, **args )
         else:

@@ -9,18 +9,33 @@
 
 """
 
-def getSpeyInitialisation ( dataset, allowNegativeSignals : bool = False ):
+
+def getSpeyInitialisation ( dataset, allowNegativeSignals : bool = False,
+                            initial_bracket : bool = True ):
     """ get decent initial bounds and initial values for a statModel
     :param allowNegativeSignals: if true, then bound the poi to positive values
+    :param initial_bracket: also supply an initial bracket for CLs-alpha root
+                            finding?
     """
     if dataset.getType()=="efficiencyMap":
-        return getInitialisationForSingleRegions ( dataset, allowNegativeSignals )
+        ini = getInitialisationForSingleRegions ( dataset, allowNegativeSignals )
+        return filterInitialBracket ( ini, initial_bracket )
         
     if dataset.type=="simplified":
-        return getInitialisationForSL ( dataset, allowNegativeSignals )
+        ini = getInitialisationForSL ( dataset, allowNegativeSignals )
+        return filterInitialBracket ( ini, initial_bracket )
     if dataset.type!="pyhf":
         raise Exception ( f"dont know that dataset type {dataset.type}" )
-    return getInitialisationForPyhf ( dataset, allowNegativeSignals )
+    ini = getInitialisationForPyhf ( dataset, allowNegativeSignals )
+    return filterInitialBracket ( ini, initial_bracket )
+
+def filterInitialBracket ( args : tuple, initial_bracket : bool ):
+    """ possibly filter out the suggestion for an initial bracket """
+    if initial_bracket:
+        return dictionary
+    args[2].pop ( "low_init", None )
+    args[2].pop ( "hig_init", None )
+    return args
 
 def getInitialisationForSingleRegions ( dataset, allowNegativeSignals : bool = False ):
     statModel = dataset.statModel
