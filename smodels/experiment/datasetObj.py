@@ -23,6 +23,7 @@ from smodels.theory.element import Element
 from typing import Text, Union, List, Dict, Optional
 import itertools
 from spey import get_uncorrelated_nbin_statistical_model, get_correlated_nbin_statistical_model, ExpectationType
+from smodels.tools.speyTools import getSpeyInitialisation
 
 # if on, will check for overlapping constraints
 _complainAboutOverlappingConstraints = True
@@ -309,14 +310,16 @@ class DataSet(object):
             return None
 
         config = statModel.backend.model.config()
+        bounds, init, args = getSpeyInitialisation ( self, True )
         if mu < config.minimum_poi:
             logger.error ( f'Calling likelihood for {dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
             return None
-        bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
-        bounds[config.poi_index] = (max(mu-0.1,config.minimum_poi),mu+0.1)
+        #bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
+        #bounds[config.poi_index] = (max(mu-0.1,config.minimum_poi),mu+0.1)
 
         def likelihood(mu):
             poi_test=float(mu) if isinstance(mu, (float, int)) else mu[0]
+            bounds, init, args = getSpeyInitialisation ( self, True )
             if expected == 'posteriori':
                 return statModel.asimov_likelihood ( poi_test = poi_test, expected=ExpectationType.apriori, return_nll = nll, par_bounds = bounds, **args )
             else:
@@ -393,13 +396,14 @@ class DataSet(object):
             return None
 
         statModel = self.getStatModel(nsig)
+        bounds, init, args = getSpeyInitialisation ( self, True )
 
         config = statModel.backend.model.config()
-        bounds = [(suggested[0]-800,suggested[1]+800) for suggested in config.suggested_bounds]
-        if allowNegativeSignals:
-            bounds[config.poi_index] = (config.minimum_poi, 100)
-        else:
-            bounds[config.poi_index] = (0, 100)
+        #bounds = [(suggested[0]-800,suggested[1]+800) for suggested in config.suggested_bounds]
+        #if allowNegativeSignals:
+        #    bounds[config.poi_index] = (config.minimum_poi, 100)
+        #else:
+        #    bounds[config.poi_index] = (0, 100)
 
         def max_likelihood():
             if expected == 'posteriori':
@@ -483,13 +487,14 @@ class DataSet(object):
         args={}
 
         statModel = self.getStatModel(nsig)
+        bounds, init, args = getSpeyInitialisation ( self, True )
 
         config = statModel.backend.model.config()
-        bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
-        if allowNegativeSignals:
-            bounds[config.poi_index] = (config.minimum_poi, 100)
-        else:
-            bounds[config.poi_index] = (0, 100)
+        #bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
+        #if allowNegativeSignals:
+        #    bounds[config.poi_index] = (config.minimum_poi, 100)
+        #else:
+        #    bounds[config.poi_index] = (0, 100)
 
         ret = statModel.chi2(poi_test=1., expected = ExpectationType.observed, allow_negative_signal=True, par_bounds=bounds, **args)
 
@@ -954,7 +959,6 @@ class CombinedDataSet(object):
             if all([ds.dataInfo.dataId in listOfSRInJson for ds in self._datasets]) and len(self.globalInfo.jsons) == 1:
                 return statModel
 
-            from smodels.tools.speyTools import getSpeyInitialisation
             config = statModel.backend.model.config()
             bounds, init, args = getSpeyInitialisation ( self, True )
             mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,par_bounds=bounds, init_pars = init, **args )
