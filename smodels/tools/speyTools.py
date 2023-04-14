@@ -32,7 +32,7 @@ def getSpeyInitialisation ( dataset, allowNegativeSignals : bool = False,
 def filterInitialBracket ( args : tuple, initial_bracket : bool ):
     """ possibly filter out the suggestion for an initial bracket """
     if initial_bracket:
-        return dictionary
+        return args
     args[2].pop ( "low_init", None )
     args[2].pop ( "hig_init", None )
     return args
