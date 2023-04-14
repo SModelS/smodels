@@ -14,7 +14,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
 from spey import ExpectationType
-from smodels.tools.speyTools import getSpeyInitialisation
+from smodels.tools.speyTools import getSpeyInitialisation, alternateMethod
 
 def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allowNegativeSignals=False):
     """
@@ -44,8 +44,8 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
         try:
             mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], par_bounds=bounds, init_pars = init, **args )
         except ValueError as e: # try with SLSQP or BFGS  and different bracket
-            logger.warning ( f"when computing upper limit for SL: {e}. Will try with SLSQP method" )
-            args["method"]="SLSQP"
+            logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
+            alternateMethod ( args )
             #if "xrtol" in args:
             #    args.pop ( "xrtol" )
             mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], par_bounds=bounds, init_pars = init, **args )

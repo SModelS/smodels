@@ -82,6 +82,19 @@ def getInitialisationForPyhf ( dataset, allowNegativeSignals : bool = False ):
     args = { "maxiter": 500, "ntrials": 1, "method": "SLSQP" }
     return init,bounds,args
 
+def alternateMethod ( args : dict ):
+    """ try a different method. i hope we wont need this in the long run """
+    if not "method" in args:
+        args["method"]="BFGS"
+        return
+    if args["method"]=="SLSQP":
+        args["method"]="BFGS"
+        return
+    if args["method"]=="BFGS":
+        args["method"]="SLSQP"
+        return
+    args["method"]="L-BFGS-B"
+
 def getInitialisationForSL ( dataset, allowNegativeSignals : bool = False ):
     """ get decent initial bounds and initial values for an SL statModel
     :param allowNegativeSignals: if true, then bound the poi to positive values
