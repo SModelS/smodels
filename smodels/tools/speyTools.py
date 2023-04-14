@@ -48,12 +48,13 @@ def getInitialisationForPyhf ( dataset, allowNegativeSignals : bool = False ):
     """
     # args = { "maxiter": 500, "method": "SLSQP" } ## extra args for the optimizers
     # method BFGS, SLSQP
-    args = { "maxiter": 500, "method": "BFGS", "ntrials": 1,
+    args = { "maxiter": 2000, "method": "BFGS", "ntrials": 3,
              "xrtol": 1e-6
 #                "xrtol": 1e-6, "low_init": bounds[0][0], 
 #                "hig_init": bounds[0][1] 
     }
-    return bounds,init,args
+    args = {}
+    return init,bounds,args
 
 def getInitialisationForSL ( dataset, allowNegativeSignals : bool = False ):
     """ get decent initial bounds and initial values for an SL statModel
