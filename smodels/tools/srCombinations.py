@@ -41,8 +41,14 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
         statModel = dataset.getStatModel(nsig)
         config = statModel.backend.model.config()
         init, bounds, args = getSpeyInitialisation ( dataset, False )
-        #options = { "maxiter": 1000, "method": "SLSQP", "ntrials": 3 }
-        mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], par_bounds=bounds, init_pars = init, **args )
+        try:
+            mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], par_bounds=bounds, init_pars = init, **args )
+        except ValueError as e: # try with SLSQP and different bracket
+            logger.warning ( f"when computing upper limit for SL: {e}. Will try with SLSQP method" )
+            args["method"]="SLSQP"
+            if "xrtol" in args:
+                args.pop ( "xrtol" )
+            mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected], par_bounds=bounds, init_pars = init, **args )
         #mu_ul = statModel.poi_upper_limit(expected=expectedDict[expected],par_bounds=bounds, init_pars = init, **options )
         if False:
             print ( "in srCombinations mu_ul is", mu_ul )
