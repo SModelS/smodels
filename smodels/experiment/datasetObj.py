@@ -984,14 +984,14 @@ class CombinedDataSet(object):
         # Check if a non-combined (uncorrelated) signal region is more contraining than the best combination obtained above
         # Check if a signal region is not in the list of SR names used in the json files
         for sig,ds in zip(nsig,self._datasets):
-            ds = ds.dataInfo
-            if ds.dataId not in listOfSRInJson:
+            dI = ds.dataInfo
+            if dI.dataId not in listOfSRInJson:
                 xsec = sig/self.getLumi()
                 # Don't bother to compute eUL again (one could do it again if needed)
                 if xsec.asNumber(fb) == 0.:
                     ## we have no values
                     continue
-                mu_ul_exp = ds.expectedUpperLimit/xsec
+                mu_ul_exp = dI.expectedUpperLimit/xsec
                 if mu_ul_exp < mu_ul_exp_min:
                     logger.info("Best constraining model is a single uncorrelated model.")
                     mu_ul_exp_min = mu_ul_exp
