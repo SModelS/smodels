@@ -2,7 +2,8 @@
 
 """
 .. module:: testCombined
-   :synopsis: Tests the combination code
+   :synopsis: Tests the combination of signal regions via a simplified likelihood,
+              CMS-SUS-16-050, gluino_squarks.slha
 
 .. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
@@ -51,7 +52,6 @@ class CombinedTest(unittest.TestCase):
         for i in [outputfile, outputfile.replace(".py", ".pyc")]:
             if os.path.exists(i):
                 os.remove(i)
-
 
 if __name__ == "__main__":
     setLogLevel("debug")

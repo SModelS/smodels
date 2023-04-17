@@ -260,7 +260,7 @@ class SpeyComputer:
         """ check if poi is below minimum_poi """
         config = self.statModel.backend.model.config()
         if poi_test < config.minimum_poi:
-            logger.error ( f'Calling likelihood for {dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
+            logger.error ( f'Calling likelihood for {self.dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
 
     def likelihood ( self, poi_test : float, expected : Union[bool,Text], 
                             return_nll : bool ) -> float:
@@ -467,10 +467,13 @@ class SpeyComputer:
         args = { "maxiter": 500, "method": None, "ntrials": 1,
                  "low_init": bounds[0][0], 
                     "hig_init": bounds[0][1] }
-        # args["method"]="BFGS"
-        args["tol"]=1e-3
         # args["xrtol"]=1e-6
         # print ( f"speyTools: initbracket is", args["low_init"], args["hig_init"] )
         args = { "maxiter": 500, "ntrials": 1, "method": None }
+        args["tol"]=1e-5
+        args["low_init"] = bounds[0][0]
+        args["hig_init"] = bounds[0][1]
+        # args["method"]="BFGS"
+        args["method"]="SLSQP"
         return init,bounds,args
 
