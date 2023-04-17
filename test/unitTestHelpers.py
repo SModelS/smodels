@@ -18,6 +18,13 @@ from smodels.tools.runSModelS import run
 from os.path import join, basename
 from smodels.installation import installDirectory as iDir
 from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
+from typing import Text
+
+def printTo ( filename : str, text : Text  ):
+    with open ( filename, "at" ) as f:
+        f.write ( text + "\n" )
+        # f.write ( " ".join ( map ( str ( args )  ) )+"\n" )
+        f.close()
 
 def sortExptRes ( exptRes ):
     """ the experimental results may be in different orders. 
