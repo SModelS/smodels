@@ -298,8 +298,10 @@ class DataSet(object):
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
-        args={}
         computer = SpeyComputer ( self, nsig )
+
+        """
+        args={}
 
         statModel = self.getStatModel(nsig)
 
@@ -315,16 +317,17 @@ class DataSet(object):
         if mu < config.minimum_poi:
             logger.error ( f'Calling likelihood for {dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
             return None
-        #bounds = [(suggested[0]-200,suggested[1]+200) for suggested in config.suggested_bounds]
-        #bounds[config.poi_index] = (max(mu-0.1,config.minimum_poi),mu+0.1)
+        """
 
         def likelihood(mu):
             poi_test=float(mu) if isinstance(mu, (float, int)) else mu[0]
-            init, bounds, args = getSpeyInitialisation ( self, True )
+            # init, bounds, args = getSpeyInitialisation ( self, True )
             if expected == 'posteriori':
-                return statModel.asimov_likelihood ( poi_test = poi_test, expected=ExpectationType.apriori, return_nll = nll, par_bounds = bounds, **args )
+                return computer.asimov_likelihood ( poi_test = poi_test, 
+                        expected="apriori", return_nll = nll )
             else:
-                return statModel.likelihood ( poi_test = poi_test, expected=expectedDict[expected], return_nll = nll, par_bounds = bounds, **args )
+                return computer.likelihood ( poi_test = poi_test, 
+                        expected=expected, return_nll = nll )
 
         llhd = likelihood(mu)
         return llhd
@@ -388,7 +391,6 @@ class DataSet(object):
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
-
         expectedDict = {False:ExpectationType.observed,
                         True:ExpectationType.apriori,
                         "posteriori":ExpectationType.aposteriori}
@@ -396,27 +398,25 @@ class DataSet(object):
             logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
             return None
 
-        statModel = self.getStatModel(nsig)
-        init, bounds, args = getSpeyInitialisation ( self, True )
+        computer = SpeyComputer ( self, nsig )
+        #statModel = self.getStatModel(nsig)
+        #init, bounds, args = getSpeyInitialisation ( self, True )
 
-        config = statModel.backend.model.config()
-        #bounds = [(suggested[0]-800,suggested[1]+800) for suggested in config.suggested_bounds]
-        #if allowNegativeSignals:
-        #    bounds[config.poi_index] = (config.minimum_poi, 100)
-        #else:
-        #    bounds[config.poi_index] = (0, 100)
+        #config = statModel.backend.model.config()
 
         def max_likelihood():
             if expected == 'posteriori':
-                return statModel.maximize_asimov_likelihood(expected=ExpectationType.apriori, test_statistics="qmutilde", return_nll=nll, par_bounds=bounds)
+                return computer.maximize_asimov_likelihood(expected="apriori" )
             else:
-                return statModel.maximize_likelihood(allow_negative_signal=allowNegativeSignals, expected=expectedDict[expected], return_nll=nll, par_bounds=bounds)
+                return computer.maximize_likelihood(allowNegativeSignals=allowNegativeSignals, expected=expected )
 
         muhat, lmax = max_likelihood()
+        """
         while abs(muhat - bounds[config.poi_index][1]) <= 0.1:
             logger.debug('Muhat reached the upper bound. Will try again after increasing the upper bound.')
             bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
             muhat, lmax = max_likelihood()
+        """
 
         self.muhat = muhat
         self.sigma_mu = np.sqrt(self.dataInfo.observedN + self.dataInfo.bgError**2) / nsig

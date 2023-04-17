@@ -11,6 +11,7 @@
 
 from typing import Union, Text, Tuple, Dict, List
 from spey import ExpectationType
+from smodels.tools.smodelsLogging import logger
 
 class SpeyComputer:
     def __init__ ( self, dataset, nsig ):
@@ -22,6 +23,7 @@ class SpeyComputer:
             lingo to spey convention """
         expectedDict = {False:ExpectationType.observed,
                         True:ExpectationType.apriori,
+                        "apriori": ExpectationType.apriori,
                         "posteriori":ExpectationType.aposteriori}
         if expected in expectedDict:
             return expectedDict[expected]
@@ -47,10 +49,10 @@ class SpeyComputer:
                             return_nll : bool ) -> float:
         """ simple frontend to spey functionality """
         expected = self.translateExpectationType ( expected )
-        init, bounds, args = getSpeyInitialisation ( self, True )
+        init, bounds, args = self.getSpeyInitialisation ( True )
         return self.statModel.asimov_likelihood ( poi_test = poi_test,
             expected = expected, return_nll = return_nll, par_bounds = bounds,
-            init_pars = int, **args )
+            init_pars = init, **args )
 
     def likelihood ( self, poi_test : float, expected : Union[bool,Text], 
                             return_nll : bool ) -> float:
@@ -81,10 +83,10 @@ class SpeyComputer:
     def maximize_asimov_likelihood ( self, expected : Union[bool,Text] ) -> float:
         """ simple frontend to spey functionality """
         expected = self.translateExpectationType ( expected )
-        init, bounds, args = getSpeyInitialisation ( self, True )
-        return self.statModel.maximize_asimov_likelihood ( poi_test = poi_test,
-            expected = expected, return_nll = return_nll, par_bounds = bounds,
-            init_pars = init, test_statistics="qmutilde", **args )
+        init, bounds, args = self.getSpeyInitialisation ( True )
+        return self.statModel.maximize_asimov_likelihood ( expected = expected, 
+            par_bounds = bounds, init_pars = init, 
+            test_statistics="qmutilde", **args )
 
     def getSpeyInitialisation ( self, allowNegativeSignals : bool = False,
                                 initial_bracket : bool = True ):
@@ -94,7 +96,7 @@ class SpeyComputer:
                                 finding?
         """
         if self.dataset.getType()=="efficiencyMap":
-            ini = getInitialisationForSingleRegions ( allowNegativeSignals )
+            ini = self.getInitialisationForSingleRegions ( allowNegativeSignals )
             return self.filterInitialBracket ( ini, initial_bracket )
             
         if self.dataset.type=="simplified":
@@ -114,7 +116,9 @@ class SpeyComputer:
         return args
 
     def getInitialisationForSingleRegions ( self, allowNegativeSignals : bool = False ) -> Tuple[List,List,Dict]:
-        model = statModel.backend.model
+        """ here we globally steer the initialisation for the case
+            of single region models """
+        model = self.statModel.backend.model
         config = model.config()
         init = config.suggested_init
         bounds = config.suggested_bounds
