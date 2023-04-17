@@ -270,7 +270,9 @@ class Database(object):
             for j,rj in enumerate(r[i+1:]):
                 if ri in rj:
                     r[i+j+1]=rj.replace(ri,"")
-
+        for i,v in enumerate(r):
+            if v is None:
+                r[i] = "???"
         return "+".join ( r )
 
     @property

@@ -1,0 +1,8 @@
+dataId: b_veto_SR1
+dataType: efficiencyMap
+observedN: 48
+expectedBG: 48.2
+bgError: 6.7
+comment: b_veto_SR1
+upperLimit: 0.154*fb
+expectedUpperLimit: 0.154*fb
