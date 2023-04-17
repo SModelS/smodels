@@ -391,18 +391,7 @@ class DataSet(object):
         if deltas_rel != 0.2:
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
-        expectedDict = {False:ExpectationType.observed,
-                        True:ExpectationType.apriori,
-                        "posteriori":ExpectationType.aposteriori}
-        if expected not in expectedDict.keys():
-            logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
-            return None
-
         computer = SpeyComputer ( self, nsig )
-        #statModel = self.getStatModel(nsig)
-        #init, bounds, args = getSpeyInitialisation ( self, True )
-
-        #config = statModel.backend.model.config()
 
         def max_likelihood():
             if expected == 'posteriori':

@@ -65,10 +65,11 @@ class SpeyComputer:
 
     def maximize_likelihood ( self, expected : Union[bool,Text],
            allowNegativeSignals : bool = True,
-           return_nll : bool = False  ) -> float:
+           return_nll : bool = False  ) -> Tuple[float,float]:
         """ simple frontend to spey functionality
         :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: allow also negative muhats
+        :returns: tuple of muhat,lmax
         """
         expected = self.translateExpectationType ( expected )
         init, bounds, args = self.getSpeyInitialisation ( allowNegativeSignals = allowNegativeSignals )
@@ -87,8 +88,12 @@ class SpeyComputer:
         return sigma_mu
 
     def maximize_asimov_likelihood ( self, expected : Union[bool,Text],
-           return_nll : bool = False ) -> float:
-        """ simple frontend to spey functionality """
+           return_nll : bool = False ) -> Tuple[float,float]:
+        """ simple frontend to spey functionality 
+        :param return_nll: if True, return negative log likelihood
+        :param allowNegativeSignals: allow also negative muhats
+        :returns: tuple of muhat,lmax
+        """
         expected = self.translateExpectationType ( expected )
         init, bounds, args = self.getSpeyInitialisation ( True )
         return self.statModel.maximize_asimov_likelihood ( expected = expected, 
@@ -115,7 +120,10 @@ class SpeyComputer:
         return self.filterInitialBracket ( ini, initial_bracket )
 
     def filterInitialBracket ( self, args : tuple, initial_bracket : bool ):
-        """ possibly filter out the suggestion for an initial bracket """
+        """ possibly filter out the suggestion for an initial bracket,
+            i.e. remove low_init and hig_init from args[2] "
+        :param initial_bracket: if True, then actually leave them in, do nothing
+        """
         if initial_bracket:
             return args
         args[2].pop ( "low_init", None )
@@ -141,24 +149,21 @@ class SpeyComputer:
         config = model.config()
         init = config.suggested_init
         bounds = config.suggested_bounds
-        """
-        print ( "datasets", [ x.dataInfo.dataId for x in dataset._datasets ] )
-        bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
-        signal = model.signal[0]["value"]["data"]
-        print ( "signals", model.signal[0]["value"]["data"] )
-        print ( "nobs", model.background["channels"][0]["samples"][0]["data"] )
-        print ( "suggested bounds", bounds )
-        if allowNegativeSignals:
-            bounds[config.poi_index] = (config.minimum_poi, 100)
-        else:
-            bounds[config.poi_index] = (0, 100)
-        mui = []
-        for i in range(len(nobs)):
-            mui.append ( (nobs[i]-bg[i])/signal[i] )
-        print ( "mui", mui )
-        bounds = [(suggested[0]-800,suggested[1]+800) for suggested in config.suggested_bounds]
-        bounds[config.poi_index] = (-200, 800) # for now!
-        """
+        if False: ## print it
+            print ( "datasets", [ x.dataInfo.dataId for x in dataset._datasets ] )
+            bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
+            signal = model.signal[0]["value"]["data"]
+            print ( "signals", model.signal[0]["value"]["data"] )
+            print ( "nobs", model.background["channels"][0]["samples"][0]["data"] )
+            print ( "suggested bounds", bounds )
+            if allowNegativeSignals:
+                bounds[config.poi_index] = (config.minimum_poi, 100)
+            else:
+                bounds[config.poi_index] = (0, 100)
+            mui = []
+            for i in range(len(nobs)):
+                mui.append ( (nobs[i]-bg[i])/signal[i] )
+            print ( "mui", mui )
         # args = { "maxiter": 500, "method": "SLSQP" } ## extra args for the optimizers
         # method BFGS, SLSQP
         #args = { "maxiter": 500, "method": "BFGS", "ntrials": 3,
@@ -166,7 +171,8 @@ class SpeyComputer:
     #                "hig_init": bounds[0][1] 
         #}
         # args = { "maxiter": 500, "ntrials": 1, "method": "SLSQP" }
-        args = { "maxiter": 500, "ntrials": 1, "method": None }
+        # args = { "maxiter": 500, "ntrials": 1, "method": None }
+        args = {}
         return init,bounds,args
 
     def alternateMethod ( self, args : dict ):

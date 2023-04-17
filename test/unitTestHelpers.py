@@ -64,7 +64,7 @@ def equalObjs(obj1, obj2, allowedDiff, ignore=[], where=None, fname=None,
             return True
         diff = 2.*abs(obj1-obj2)/abs(obj1+obj2)
         if diff > allowedDiff:
-            logger.error("values %s and %s differ by %s in ''%s'': %s != %s" % (obj1, obj2, diff, where, fname, fname2))
+            logger.error( f"values {obj1} [from {fname}] and {obj2} [from {fname2}] differ by {diff*100.:.1f}% in ''{where}''" )
         return diff < allowedDiff
     elif isinstance(obj1, str):
         if obj1 != obj2:

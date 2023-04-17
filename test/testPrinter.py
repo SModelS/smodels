@@ -149,13 +149,14 @@ class RunPrinterTest(unittest.TestCase):
                                                  key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutput['ExptRes'],
                                           key=lambda res: res['r'], reverse=True)
+        fname = "./unitTestOutput/printer_output.py"
+        fname2 = "gluino_squarks_default.py"
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedDiff=0.05,
-                           ignore=ignoreFields, where="top",
-                           fname="./unitTestOutput/printer_output.py")
+            ignore=ignoreFields, where="top", fname=fname, fname2=fname2 )
         try:
             self.assertTrue(equals)
         except AssertionError as e:
-            print("Error: %s, when comparing %s \nwith %s." % (e, "output.py", "gluino_squarks_default.py"))
+            print( f"Error: {e}, when comparing {fname} \nwith {fname2}." )
             raise AssertionError(e)
         self.removeOutputs(outputfile)
         self.removeOutputs('./debug.log')
