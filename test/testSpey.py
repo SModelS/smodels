@@ -17,6 +17,9 @@ from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
 from smodels.theory import decomposer
 from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.tools.smodelsLogging import logger
+
+import time
 
 class SpeyTest(unittest.TestCase):
     def test21002 ( self ):
@@ -33,6 +36,8 @@ class SpeyTest(unittest.TestCase):
         defaults [ "TChiWH_600_300_600_300" ] = { "obs": 0.5076, "exp": 0.7924 }
         defaults [ "TChiWH_1000_350_1000_350" ] = { "obs": 0.55713, "exp": 0.8857 }
         defaults [ "TChiWZ_900_1_900_1" ] = { "obs": 0.6109, "exp": 0.9915 }
+        verbose = True
+        t0 = time.time()
         for slhaname in defaults.keys():
             model = Model(BSMparticles=BSMList, SMparticles=SMList)
             fname = f"./testFiles/21002/{slhaname}.slha"
@@ -45,11 +50,16 @@ class SpeyTest(unittest.TestCase):
                 base = defaults[slhaname]
                 for exp in [ "obs", "exp" ]:
                     delta = 2. * abs ( r[exp] - base[exp] ) / ( r[exp]+base[exp] )
-                    # print ( exp,":", "r", robs, rexp, "base", base, "delta", delta )
+                    if verbose:
+                        print ( f"{exp}: r {r[exp]:.3f} r_base {base[exp]} delta {delta:.3f}" )
                     if delta > .1:
                         line = f"mismatch for {slhaname}({exp}): base={base[exp]}, computed={r[exp]}"
                         logger.error ( line )
                         self.assertTrue ( delta < .1 )
+        t = time.time() - t0
+        if verbose:
+            print ( f"took {t:.3f}s" )
+        
 
 if __name__ == "__main__":
     unittest.main()

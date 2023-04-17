@@ -29,22 +29,10 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2, allo
 
     :returns: upper limit on sigma*eff
     """
-    if dataset.type in ["simplified","pyhf"]:
-        #statModel = dataset.statModel ###For future API
-        computer = SpeyComputer ( dataset, nsig )
-        mu_ul = computer.poi_upper_limit ( expected )
-        ret = mu_ul*computer.xsection
-        logger.debug("Combined upper limit : {}".format(ret))
-        return ret
-    else:
-        logger.error(
-            "no covariance matrix or json file given in globalInfo.txt for %s"
-            % dataset.globalInfo.id
-        )
-        raise SModelSError(
-            "no covariance matrix or json file given in globalInfo.txt for %s"
-            % dataset.globalInfo.id
-        )
+    computer = SpeyComputer ( dataset, nsig )
+    ret = computer.poi_upper_limit ( expected, limit_on_xsec = True )
+    logger.debug("Combined upper limit : {}".format(ret))
+    return ret
 
 def getCombinedLikelihood(
     dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0, nll=False
@@ -57,15 +45,8 @@ def getCombinedLikelihood(
     :param mu: signal strength parameter mu
     """
 
-    if mu < config.minimum_poi:
-        logger.error ( f'Calling likelihood for {dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
-        return None
-    if dataset.type=="simplified":
-        assert config.poi_index == 0, f"Error: I assume the poi index to be zero, not {config.poi_index}"
-
     def likelihood(mu):
         poi_test=float(mu) if isinstance(mu, (float, int)) else mu[0]
-        init, bounds, args = getSpeyInitialisation ( dataset, allowNegativeSignals, initial_bracket = False )
         if expected == 'posteriori':
             return statModel.asimov_likelihood ( poi_test = poi_test, expected=ExpectationType.apriori, return_nll = nll, par_bounds = bounds, init_pars = init, **args )
         else:

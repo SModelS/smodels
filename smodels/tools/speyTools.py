@@ -9,12 +9,29 @@
 
 """
 
+__all__ = [ "SpeyComputer" ]
+
 from typing import Union, Text, Tuple, Dict, List
 from spey import ExpectationType
 from smodels.tools.smodelsLogging import logger
+from smodels.tools.physicsUnits import fb
+import numpy as np
 
 class SpeyComputer:
-    def __init__ ( self, dataset, nsig ):
+    __slots__ = [ "statModel", "dataset" ]
+
+    def __init__ ( self, dataset, nsig : Union[float,list], 
+                   deltas_rel : Union[None,float] = None ):
+        """ initialise with dataset.
+        :param dataset: a smodels (combined)dataset
+        :param nsig: signal yield, either as float or as list
+        :param deltas_rel: relative error on signal. currently unused
+        """
+        if deltas_rel != None:
+            logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
+        if dataset.getType() not in [ "efficiencyMap", "combined" ]:
+            logger.error ( f"I do not recognize the dataset type {dataset.getType()}" )
+
         self.dataset = dataset
         self.statModel = dataset.getStatModel ( nsig )
 
@@ -30,33 +47,47 @@ class SpeyComputer:
         logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
         return None
 
-    def poi_upper_limit ( self, expected : Union [ bool, Text ] ) -> float:
-        """ simple frontend, to spey::poi_upper_limit """
+    def poi_upper_limit ( self, expected : Union [ bool, Text ],
+           limit_on_xsec : bool = False ) -> float:
+        """ simple frontend, to spey::poi_upper_limit 
+        :param limit_on_xsec: if True, then return the limit on the
+                              cross section
+        """
 
         init, bounds, args = self.getSpeyInitialisation ( False, False )
         expected = self.translateExpectationType ( expected )
         try:
             ret = self.statModel.poi_upper_limit ( expected, par_bounds = bounds,
-                   init_pars = init, **args )
-            return ret
+                init_pars = init, **args )
         except ValueError as e:
             logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
             self.alternateMethod ( args )
-            ret = statModel.poi_upper_limit(expected=expectedDict[expected], par_bounds=bounds, init_pars = init, **args )
-            return ret
+            ret = statModel.poi_upper_limit ( expected=expected, par_bounds=bounds, 
+                init_pars = init, **args )
+        if limit_on_xsec and type(ret) not in [ None ]:
+            ret = ret * self.xsection * fb
+        return ret
 
     def asimov_likelihood ( self, poi_test : float, expected : Union[bool,Text], 
                             return_nll : bool ) -> float:
         """ simple frontend to spey functionality """
+        self.checkMinimumPoi( poi_test )
         expected = self.translateExpectationType ( expected )
         init, bounds, args = self.getSpeyInitialisation ( True )
         return self.statModel.asimov_likelihood ( poi_test = poi_test,
             expected = expected, return_nll = return_nll, par_bounds = bounds,
             init_pars = init, **args )
 
+    def checkMinimumPoi ( self, poi_test : float ):
+        """ check if poi is below minimum_poi """
+        config = self.statModel.backend.model.config()
+        if poi_test < config.minimum_poi:
+            logger.error ( f'Calling likelihood for {dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
+
     def likelihood ( self, poi_test : float, expected : Union[bool,Text], 
                             return_nll : bool ) -> float:
         """ simple frontend to spey functionality """
+        self.checkMinimumPoi ( poi_test )
         expected = self.translateExpectationType ( expected )
         init, bounds, args = self.getSpeyInitialisation ( True )
         return self.statModel.likelihood ( poi_test = poi_test,
@@ -75,7 +106,6 @@ class SpeyComputer:
         init, bounds, args = self.getSpeyInitialisation ( allowNegativeSignals = allowNegativeSignals )
         ret = self.statModel.maximize_likelihood ( expected = expected, 
             par_bounds = bounds, return_nll = return_nll, init_pars = init, **args )
-        print ( "ret", ret )
         return ret
 
     def sigma_mu ( self, poi_test : float, expected : Union[bool,Text], allowNegativeSignals : bool = False ):

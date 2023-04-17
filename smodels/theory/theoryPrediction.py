@@ -14,8 +14,7 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statistics import TruncatedGaussians
-from smodels.tools.srCombinations import getCombinedStatistics, \
-            getCombinedUpperLimitFor, getCombinedLikelihood
+from smodels.tools.srCombinations import getCombinedStatistics
 import itertools
 import numpy as np
 import spey
@@ -169,9 +168,14 @@ class TheoryPrediction(object):
                         srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0
                         for ds in self.dataset.origdatasets
                     ]
-                self.cachedObjs[expected]["UL"] = getCombinedUpperLimitFor(
-                    self.dataset, srNsigs, expected=expected, deltas_rel=self.deltas_rel
-                )*fb # we supplied the xsec to spey in fb
+                from smodels.tools.speyTools import SpeyComputer
+                computer = SpeyComputer ( self.dataset, srNsigs )
+                ul = computer.poi_upper_limit ( expected, limit_on_xsec = True )
+                #sold = getCombinedUpperLimitFor(
+                #     self.dataset, srNsigs, expected=expected, deltas_rel=self.deltas_rel
+                #)*fb # we supplied the xsec to spey in fb
+                self.cachedObjs[expected]["UL"] = ul
+                
 
         # Return the expected or observed UL:
         # if not self.cachedObjs[expected]["UL"]:
@@ -307,9 +311,14 @@ class TheoryPrediction(object):
                 srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0
                 for ds in self.dataset.origdatasets
             ]
-            llhd = getCombinedLikelihood(
-                self.dataset, srNsigs, self.marginalize, self.deltas_rel, expected=expected, mu=mu
-            )
+            #llhd = getCombinedLikelihood(
+            #    self.dataset, srNsigs, self.marginalize, self.deltas_rel, expected=expected, mu=mu
+            #)
+            from smodels.tools.speyTools import SpeyComputer
+            computer = SpeyComputer ( self.dataset, srNsigs )
+            llhd =  computer.likelihood ( poi_test = mu, expected= expected ) 
+
+            # print ( f"getCombinedLikelihood {llhd} {newllhd}" )
         if self.dataType() == "efficiencyMap":
             nsig = ( self.xsection.value * lumi).asNumber() #(mu * self.xsection.value * lumi).asNumber()
             llhd = self.dataset.likelihood(
@@ -476,13 +485,14 @@ class TheoryPrediction(object):
                 expected=expected,
                 allowNegativeSignals=allowNegativeSignals,
             )
-            llhd, lmax, lsm, muhat, sigma_mu = (
-                s["lbsm"],
-                s["lmax"],
-                s["lsm"],
-                s["muhat"],
-                s["sigma_mu"],
+            from smodels.tools.speyTools import SpeyComputer
+            computer = SpeyComputer ( self.dataset, srNsigs )
+            llhd = computer.likelihood ( mu = 1., expected = expected )
+             
+            ollhd, olmax, olsm, omuhat, osigma_mu = (
+                s["lbsm"], s["lmax"], s["lsm"], s["muhat"], s["sigma_mu"],
             )
+            print ( "llhd", llhd, ollhd )
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
