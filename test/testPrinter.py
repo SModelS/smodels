@@ -80,24 +80,26 @@ def compareSLHA(slhadefault, slhanew, allowedDiff):
         return False
 
     for b in defaultData.blocks:
-        if len(defaultData.blocks[b].entries) != len(newData.blocks[b].entries):
-            logger.error('Numbers of entries in block %s differ' % (defaultData.blocks[b].name))
+        defblock = defaultData.blocks[b]
+        newblock = newData.blocks[b]
+        if len(defblock.entries) != len(newblock.entries):
+            logger.error(f'Numbers of entries in block {defblock.name} differ' )
             return False
-        keys = defaultData.blocks[b].keys()
-        bkeys = newData.blocks[b].keys()
+        keys = defblock.keys()
+        bkeys = newblock.keys()
         if keys != bkeys:
-            logger.error(f"Keys of blocks {b} differ!")
+            logger.error(f"Keys of blocks {defblock.name} differ!")
             return False
         for k in keys:
-            ei = defaultData.blocks[b].entries[k]
-            ej = newData.blocks[b].entries[k]
+            ei = defblock.entries[k]
+            ej = newblock.entries[k]
             if type(ei) == float and type(ej) == float:
                 denom = ei + ej
                 if denom == 0.:
                     denom = 1e-6
                 de = 2. * abs(ei - ej) / denom
                 if de > allowedDiff:
-                    logger.error(f'Entries in block differ: {ei}!={ej} {type(ei)}')
+                    logger.error(f'Entries in block {defblock.name} differ: {ei}!={ej} {type(ei)}')
                     return False
             elif ei != ej:
                 logger.error(f'Entries in block differ: {ei}!={ej} {type(ei)}')
