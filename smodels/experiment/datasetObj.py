@@ -23,7 +23,7 @@ from smodels.theory.element import Element
 from typing import Text, Union, List, Dict, Optional
 import itertools
 from spey import get_uncorrelated_nbin_statistical_model, get_correlated_nbin_statistical_model, ExpectationType
-from smodels.tools.speyTools import getSpeyInitialisation
+from smodels.tools.speyTools import SpeyComputer
 
 # if on, will check for overlapping constraints
 _complainAboutOverlappingConstraints = True
@@ -299,6 +299,7 @@ class DataSet(object):
             logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
 
         args={}
+        computer = SpeyComputer ( self, nsig )
 
         statModel = self.getStatModel(nsig)
 
