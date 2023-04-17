@@ -64,12 +64,18 @@ class SpeyComputer:
             init_pars = init, **args )
 
     def maximize_likelihood ( self, expected : Union[bool,Text],
-           allowNegativeSignals : bool = True ) -> float:
-        """ simple frontend to spey functionality """
+           allowNegativeSignals : bool = True,
+           return_nll : bool = False  ) -> float:
+        """ simple frontend to spey functionality
+        :param return_nll: if True, return negative log likelihood
+        :param allowNegativeSignals: allow also negative muhats
+        """
         expected = self.translateExpectationType ( expected )
         init, bounds, args = self.getSpeyInitialisation ( allowNegativeSignals = allowNegativeSignals )
-        return self.statModel.maximize_likelihood ( expected = expected, 
-            par_bounds = bounds, init_pars = init, **args )
+        ret = self.statModel.maximize_likelihood ( expected = expected, 
+            par_bounds = bounds, return_nll = return_nll, init_pars = init, **args )
+        print ( "ret", ret )
+        return ret
 
     def sigma_mu ( self, poi_test : float, expected : Union[bool,Text], allowNegativeSignals : bool = False ):
         """ determine sigma at poi_test.
@@ -80,12 +86,13 @@ class SpeyComputer:
                                             test_statistics=test_statistic )
         return sigma_mu
 
-    def maximize_asimov_likelihood ( self, expected : Union[bool,Text] ) -> float:
+    def maximize_asimov_likelihood ( self, expected : Union[bool,Text],
+           return_nll : bool = False ) -> float:
         """ simple frontend to spey functionality """
         expected = self.translateExpectationType ( expected )
         init, bounds, args = self.getSpeyInitialisation ( True )
         return self.statModel.maximize_asimov_likelihood ( expected = expected, 
-            par_bounds = bounds, init_pars = init, 
+            par_bounds = bounds, init_pars = init, return_nll = return_nll,
             test_statistics="qmutilde", **args )
 
     def getSpeyInitialisation ( self, allowNegativeSignals : bool = False,
