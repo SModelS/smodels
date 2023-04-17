@@ -120,6 +120,8 @@ class SpeyComputer:
     def translateExpectationType ( self, expected : Union [ bool, Text ] ) -> ExpectationType:
         """ translate the specification for expected values from smodels
             lingo to spey convention """
+        if type(expected)==ExpectationType:
+            return expected
         expectedDict = {False:ExpectationType.observed,
                         True:ExpectationType.apriori,
                         "apriori": ExpectationType.apriori,
@@ -280,10 +282,13 @@ class SpeyComputer:
         :param allowNegativeSignals: allow also negative muhats
         :returns: tuple of muhat,lmax
         """
-        expected = self.translateExpectationType ( expected )
+        speyexpected = self.translateExpectationType ( expected )
         init, bounds, args = self.getSpeyInitialisation ( allowNegativeSignals = allowNegativeSignals )
-        ret = self.statModel.maximize_likelihood ( expected = expected, 
+        ret = self.statModel.maximize_likelihood ( expected = speyexpected, 
             par_bounds = bounds, return_nll = return_nll, init_pars = init, **args )
+        ## not clear if bounds will be hard bounds
+        if not allowNegativeSignals and ret[0]< 0.:
+            ret = ( 0., self.likelihood ( 0., expected = expected, return_nll = return_nll ) )
         return ret
 
     def likelihood_timothee ( self, poi_test : float, expected : Union[bool,Text], 
@@ -315,9 +320,13 @@ class SpeyComputer:
         """
         expected = self.translateExpectationType ( expected )
         init, bounds, args = self.getSpeyInitialisation ( True )
-        return self.statModel.maximize_asimov_likelihood ( expected = expected, 
+        ret = self.statModel.maximize_asimov_likelihood ( expected = expected, 
             par_bounds = bounds, init_pars = init, return_nll = return_nll,
             test_statistics="qmutilde", **args )
+        assert ret[0]>=0., "maximum of asimov likelihood should not be below zero"
+        #if not allowNegativeSignals and ret[0]< 0.:
+        #    ret = ( 0., self.likelihood ( 0., expected = expected, return_nll = return_nll ) )
+        return ret
 
     def getSpeyInitialisation ( self, allowNegativeSignals : bool = False,
                                 initial_bracket : bool = True ):
