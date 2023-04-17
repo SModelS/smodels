@@ -394,8 +394,6 @@ class DataSet(object):
             if hasattr(self.dataInfo, "upperLimit"):
                 return self.dataInfo.upperLimit
 
-
-
 class CombinedDataSet(object):
     """
     Holds the information for a combined dataset (used for combining multiple datasets).
@@ -652,84 +650,3 @@ class CombinedDataSet(object):
         self.patches = self._patchMaker(jsons, wsInfo, listOfSignals, includeCRs)
         return self.patches, listOfSignals
 
-    # !TP
-    def _getBestStatModel(self, nsig, allow_negative_signal=False):
-        """
-        find the index of the best expected combination.
-
-        :param nsig: list of signal yields.
-        :param allow_negative_signal: if True, the expected upper limit on mu, used to find the best statistical model, can be negative.
-
-        :return: the spey StatisticalModel object that computed the minimal apriori-expected poi upper limit.
-        """
-        # Get the list of the names of the signal regions used in the json files
-        listOfSRInJson=[]
-        for SRnames in self.globalInfo.jsonFiles.values():
-            listOfSRInJson += SRnames
-
-        patches, listOfSignals = self._getPatches(nsig)
-        mu_ul_exp_min = np.inf
-        # Find best combination of signal regions
-        for index, (patch, json) in enumerate(zip(patches,self.globalInfo.jsons)):
-            # If the expected signal is 0 for each SR in the combined set of SRs, skip
-            if all([sig==0. for sig in listOfSignals[index]]):
-                continue
-            # The x-section is at the level of the TheoryPrediction
-            # if there are multiple sets of SRs, set a xsec_UL for the whole analysis, i.e. that uses all the SRs,
-            # so that the resulting R value Is for the whole analysis
-            xsec = float ( sum(nsig)/self.getLumi().asNumber(1./fb ) )
-            # It is possible to do differently and to set a xsec_UL on each set of SRs but that is not how it done in SModelS so far
-            # xsec = sum(listOfSignals[index])/self.getLumi()
-            statModel = get_correlated_nbin_statistical_model(analysis=self.globalInfo.id,
-                                                            signal_yields=patch,
-                                                            data=json,
-                                                            xsection=xsec
-                                                            )
-            self.statModel = statModel
-            # If all the SRs are used in the json files and there is only one json files, there is only one statModel.
-            # No need to compute mu_ul_exp if not needed.
-            if all([ds.dataInfo.dataId in listOfSRInJson for ds in self._datasets]) and len(self.globalInfo.jsons) == 1:
-                return statModel
-
-            config = statModel.backend.model.config()
-            init, bounds, args = getSpeyInitialisation ( self, True )
-            try:
-                mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,par_bounds=bounds, init_pars = init, **args )
-            except ValueError as e:
-                # if we dont get an answer, might just be this super region
-                # is not a good choice
-                logger.warn ( f"when trying to find best super region: {e}. will skip this one." )
-                continue
-            while abs(mu_ul_exp - bounds[config.poi_index][1]) <= 0.1:
-                logger.debug('Expected upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
-                bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
-                mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
-
-            if mu_ul_exp == 0 and not allow_negative_signal:
-                logger.warning(f'Expected upper limit on poi is negative when searching for the best statistical model for analysis {self.globalInfo.id}.')
-            if mu_ul_exp == None:
-                continue
-            elif mu_ul_exp < mu_ul_exp_min:
-                mu_ul_exp_min = mu_ul_exp
-                bestStatModel = statModel
-
-        # Check if a non-combined (uncorrelated) signal region is more contraining than the best combination obtained above
-        # Check if a signal region is not in the list of SR names used in the json files
-        for sig,ds in zip(nsig,self._datasets):
-            dI = ds.dataInfo
-            if dI.dataId not in listOfSRInJson:
-                xsec = sig/self.getLumi()
-                # Don't bother to compute eUL again (one could do it again if needed)
-                if xsec.asNumber(fb) == 0.:
-                    ## we have no values
-                    continue
-                mu_ul_exp = dI.expectedUpperLimit/xsec
-                if mu_ul_exp < mu_ul_exp_min:
-                    logger.info("Best constraining model is a single uncorrelated model.")
-                    mu_ul_exp_min = mu_ul_exp
-                    bestStatModel = ds.getStatModel(sig)
-
-        if mu_ul_exp_min == np.inf:
-            logger.error(f'No minimal upper limit on POI found for {self.globalInfo.id}')
-            return None
-        return bestStatModel

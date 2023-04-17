@@ -433,7 +433,7 @@ class TheoryPrediction(object):
                 allowNegativeSignals=allowNegativeSignals,
             )
             computer = SpeyComputer ( self.dataset, srNsigs )
-            llhd = computer.likelihood ( mu = 1., expected = expected )
+            llhd = computer.likelihood ( poi_test = 1., expected = expected )
              
             ollhd, olmax, olsm, omuhat, osigma_mu = (
                 s["lbsm"], s["lmax"], s["lsm"], s["muhat"], s["sigma_mu"],
