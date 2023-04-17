@@ -15,6 +15,7 @@ from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statistics import TruncatedGaussians
 from smodels.tools.srCombinations import getCombinedStatistics
+from smodels.tools.speyTools import SpeyComputer
 import itertools
 import numpy as np
 import spey
@@ -47,42 +48,6 @@ class TheoryPrediction(object):
         self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
         self.cachedLlhds = {False: {}, True: {}, "posteriori": {}}
         self.statModel = None
-
-    # !TP
-    # def getStatModel():
-    #     if spey==True:
-    #         if self.dataset.getType() == "combined":
-    #             if hasattr(self.dataset.globalInfo, "covariance"):
-    #                 return slef.statModel = spey.get_multi_region_statistical_model(
-    #                     analysis=self.dataset.globalInfo.id,
-    #                     signal=signal,
-    #                     observed=background,
-    #                     covariance=,
-    #                     nb=,
-    #                     third_moment=,
-    #                     xsection=self.xsection.value # in pb
-    #                 )
-    #             elif hasattr(self.dataset.globalInfo, "jsonFiles"):
-    #                 return slef.statModel = spey.get_multi_region_statistical_model(
-    #                     analysis=self.dataset.globalInfo.id,
-    #                     signal=signal,
-    #                     observed=background,
-    #                     xsection=self.xsection.value # in pb
-    #                 )
-    #         elif self.dataset.getType() == "efficiencyMap":
-    #
-    #             return slef.statModel = spey.get_single_region_statistical_model(
-    #                 nobs=,
-    #                 nb: float,
-    #                 deltanb: float,
-    #                 signal_eff: float,
-    #                 xsection: float,
-    #                 lumi=self.dataset.getLumi(),
-    #                 analysis=self.dataset.globalInfo.id,
-    #                 backend: AvailableBackends,
-    #                 nsig = (mu * self.xsection.value * lumi).asNumber()
-    #             )
-    #     return None
 
     def __str__(self):
         ret = "%s:%s" % (self.analysisId(), self.totalXsection())
@@ -168,7 +133,6 @@ class TheoryPrediction(object):
                         srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0
                         for ds in self.dataset.origdatasets
                     ]
-                from smodels.tools.speyTools import SpeyComputer
                 computer = SpeyComputer ( self.dataset, srNsigs )
                 ul = computer.poi_upper_limit ( expected, limit_on_xsec = True )
                 #sold = getCombinedUpperLimitFor(
@@ -314,16 +278,16 @@ class TheoryPrediction(object):
             #llhd = getCombinedLikelihood(
             #    self.dataset, srNsigs, self.marginalize, self.deltas_rel, expected=expected, mu=mu
             #)
-            from smodels.tools.speyTools import SpeyComputer
             computer = SpeyComputer ( self.dataset, srNsigs )
-            llhd =  computer.likelihood ( poi_test = mu, expected= expected ) 
+            llhd =  computer.likelihood_timothee ( poi_test = mu, expected= expected,
+                   return_nll = False ) 
 
             # print ( f"getCombinedLikelihood {llhd} {newllhd}" )
         if self.dataType() == "efficiencyMap":
             nsig = ( self.xsection.value * lumi).asNumber() #(mu * self.xsection.value * lumi).asNumber()
-            llhd = self.dataset.likelihood(
-                nsig, marginalize=self.marginalize, deltas_rel=self.deltas_rel, expected=expected, mu=mu
-            )
+            computer = SpeyComputer ( self.dataset, nsig )
+            llhd =  computer.likelihood_timothee ( poi_test = mu, expected= expected,
+                   return_nll = False ) 
 
         if self.dataType() == "upperLimit":
             # these fits only work with negative signals!
@@ -429,33 +393,16 @@ class TheoryPrediction(object):
         elif self.dataType() == "efficiencyMap":
             lumi = self.dataset.getLumi()
             nsig = (self.xsection.value * lumi).asNumber()
-            # !TP
-            # self.dataset.statModel.set_signal(nsig)
-            llhd = self.dataset.likelihood(
-                nsig, marginalize=self.marginalize, deltas_rel=self.deltas_rel, expected=expected, mu=1.
-            )
-            llhd_sm = self.dataset.likelihood(
-                nsig=nsig,
-                marginalize=self.marginalize,
-                deltas_rel=self.deltas_rel,
-                expected=expected,
-                mu=0.
-            )
-            llhd_max = self.dataset.lmax(
-                nsig=nsig,
-                marginalize=self.marginalize,
-                deltas_rel=self.deltas_rel,
-                allowNegativeSignals=allowNegativeSignals,
-                expected=expected
-            )
-            muhat = None
-            if hasattr(self.dataset, "muhat"):
-                muhat = self.dataset.muhat #/ nsig
-            if hasattr(self.dataset, "sigma_mu"):
-                sigma_mu = float(self.dataset.sigma_mu )#/ nsig)
-                if not "sigma_mu" in self.cachedObjs[expected]:
-                    self.cachedObjs[expected]["sigma_mu"] = {}
-                self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = sigma_mu
+            computer = SpeyComputer ( self.dataset, nsig )
+            llhd = computer.likelihood_timothee ( poi_test = 1., expected = expected, return_nll = False )
+            llhd_sm = computer.likelihood_timothee ( poi_test = 0., expected = expected, return_nll = False )
+            muhat, llhd_max = computer.maximize_likelihood_timothee ( 
+                    expected = expected, return_nll = False, 
+                    allowNegativeSignals = allowNegativeSignals )
+            sigma_mu = computer.sigma_mu ( poi_test = muhat, expected = expected )
+            if not "sigma_mu" in self.cachedObjs[expected]:
+                self.cachedObjs[expected]["sigma_mu"] = {}
+            self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = sigma_mu
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = llhd_sm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = llhd_max
@@ -485,7 +432,6 @@ class TheoryPrediction(object):
                 expected=expected,
                 allowNegativeSignals=allowNegativeSignals,
             )
-            from smodels.tools.speyTools import SpeyComputer
             computer = SpeyComputer ( self.dataset, srNsigs )
             llhd = computer.likelihood ( mu = 1., expected = expected )
              

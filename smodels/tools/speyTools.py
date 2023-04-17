@@ -12,7 +12,7 @@
 __all__ = [ "SpeyComputer" ]
 
 from typing import Union, Text, Tuple, Dict, List
-from spey import ExpectationType
+from spey import ExpectationType, StatisticalModel
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
 import numpy as np
@@ -33,7 +33,89 @@ class SpeyComputer:
             logger.error ( f"I do not recognize the dataset type {dataset.getType()}" )
 
         self.dataset = dataset
-        self.statModel = dataset.getStatModel ( nsig )
+        self.statModel = self.getStatModel ( nsig )
+
+    def getStatModel(self, nsig ) -> StatisticalModel:
+        """ retrieve the statistical model """
+        if self.dataset.getType() == "efficiencyMap":
+            return self.getStatModelSingleBin ( nsig )
+        return self.getStatModelMultiBin ( nsig )
+
+    def getStatModelMultiBin(self,
+        nsig: Union[np.ndarray, List[Dict[Text, List]], List[float]],
+        delta_sys: float = 0.0,
+        allow_negative_signal = False,
+
+    ):
+        """
+        Create a statistical model from multibin data.
+
+        :param nsig: number of signal events. For simplified likelihood backend this input can
+                       contain `np.array` or `List[float]` which contains signal yields per region.
+                       For `pyhf` backend this input expected to be a JSON-patch i.e. `List[Dict]`,
+                       see `pyhf` documentation for details on JSON-patch format.
+        :param delta_sys: systematic uncertainty on signal. Only used for simplified likelihood backend.
+        :param allow_negative_signal: if True, the expected upper limit on mu, used to find the best statistical model, can be negative.
+
+        :return: spey StatisticalModel object.
+
+        :raises NotImplementedError: if input patter does not match to any backend specific input option.
+        """
+        dataset = self.dataset
+
+        if dataset.type == "simplified":
+            nobs = [x.dataInfo.observedN for x in dataset.origdatasets]
+            cov = dataset.globalInfo.covariance
+            if type(cov) != list:
+                raise SModelSError("covariance field has wrong type: %s" % type(cov))
+            if len(cov) < 1:
+                raise SModelSError("covariance matrix has length %d." % len(cov))
+            bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
+            third_moment = dataset.globalInfo.third_moment if hasattr(dataset.globalInfo, "third_moment") else None
+            xsec = float ( sum(nsig)/dataset.getLumi().asNumber(1./fb) )
+            from spey import get_correlated_nbin_statistical_model
+
+            self.statModel = get_correlated_nbin_statistical_model(analysis = dataset.globalInfo.id,
+                                                                signal_yields = nsig,
+                                                                data = nobs,
+                                                                covariance_matrix = cov,
+                                                                backgrounds = bg,
+                                                                third_moment = third_moment,
+                                                                delta_sys = delta_sys,
+                                                                xsection = xsec
+                                                                )
+        elif dataset.type == "pyhf":
+            self.statModel = dataset._getBestStatModel(nsig, allow_negative_signal=allow_negative_signal)
+        else:
+            logger.error(f'Dataset of type "{dataset.type}" for analysis {dataset.globalInfo.id} is not of type "simplified" or "pyhf".')
+
+        return self.statModel
+
+    def getStatModelSingleBin(self, nsig: Union[float, np.ndarray], 
+            delta_sys : Union[None,float] = None,
+            allow_negative_signal : bool = False
+    ):
+        """
+        Create statistical model from a single bin or multiple uncorrelated regions.
+
+        :param nsig: signal yields.
+        :return: spey StatisticalModel object.
+
+        :raises NotImplementedError: If requested backend has not been recognised.
+        """
+        dataset = self.dataset
+        from spey import get_uncorrelated_nbin_statistical_model
+
+        self.statModel = get_uncorrelated_nbin_statistical_model(
+                            data = float(dataset.dataInfo.observedN),
+                            backgrounds = float(dataset.dataInfo.expectedBG),
+                            background_uncertainty = float(dataset.dataInfo.bgError),
+                            signal_yields = nsig,
+                            xsection = float (nsig/dataset.getLumi().asNumber(1./fb)),
+                            analysis = dataset.globalInfo.id,
+                            backend = 'simplified_likelihoods'
+        )
+        return self.statModel
 
     def translateExpectationType ( self, expected : Union [ bool, Text ] ) -> ExpectationType:
         """ translate the specification for expected values from smodels
@@ -46,6 +128,19 @@ class SpeyComputer:
             return expectedDict[expected]
         logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
         return None
+
+    def maximize_likelihood_timothee ( self, expected : Union[bool,Text],
+            allowNegativeSignals : bool = True,
+            return_nll : bool = False  ) -> Tuple[float,float]:
+        """ maximize likelihood, timothee style. i.e. if expected is
+            posteriori then maximize asimov likelihood but with expected="apriori"
+            will worry later about the correctness of this. """
+        if expected == "posteriori":
+            return self.maximize_asimov_likelihood(expected="apriori",
+#                   allowNegativeSignals = allowNegativeSignals, # 
+                   return_nll = return_nll )
+        return self.maximize_likelihood( allowNegativeSignals = allowNegativeSignals,
+               return_nll = return_nll, expected = expected )
 
     def poi_upper_limit ( self, expected : Union [ bool, Text ],
            limit_on_xsec : bool = False ) -> float:
@@ -107,6 +202,17 @@ class SpeyComputer:
         ret = self.statModel.maximize_likelihood ( expected = expected, 
             par_bounds = bounds, return_nll = return_nll, init_pars = init, **args )
         return ret
+
+    def likelihood_timothee ( self, poi_test : float, expected : Union[bool,Text], 
+                            return_nll : bool ) -> float:
+        """ simple frontend to spey functionality
+        likelihood, timothee style. i.e. if expected is
+        posteriori then compute asimov likelihood but with expected="apriori"
+        will worry later about the correctness of this. """
+        if expected == "posteriori":
+            return self.asimov_likelihood ( poi_test = poi_test, expected="apriori",
+                return_nll = return_nll )
+        return self.likelihood ( poi_test = poi_test, expected = expected, return_nll = return_nll )
 
     def sigma_mu ( self, poi_test : float, expected : Union[bool,Text], allowNegativeSignals : bool = False ):
         """ determine sigma at poi_test.
@@ -227,7 +333,7 @@ class SpeyComputer:
         :param allowNegativeSignals: if true, then bound the poi to positive values
         """
         import numpy as np
-        statModel = self.dataset.statModel
+        statModel = self.statModel
         config = statModel.backend.model.config()
         init = config.suggested_init
         bounds = config.suggested_bounds

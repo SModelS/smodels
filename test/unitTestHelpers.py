@@ -20,10 +20,12 @@ from smodels.installation import installDirectory as iDir
 from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
 from typing import Text
 
-def printTo ( filename : str, text : Text  ):
-    with open ( filename, "at" ) as f:
-        f.write ( text + "\n" )
-        # f.write ( " ".join ( map ( str ( args )  ) )+"\n" )
+def printTo (  *args  ):
+    with open ( "check.txt", "at" ) as f:
+        # f.write ( text + "\n" )
+        line = " ".join ( map ( str,  args ) )
+        print ( line )
+        f.write ( line + "\n" )
         f.close()
 
 def sortExptRes ( exptRes ):
