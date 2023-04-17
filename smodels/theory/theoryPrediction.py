@@ -14,7 +14,6 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statistics import TruncatedGaussians
-from smodels.tools.srCombinations import getCombinedStatistics
 from smodels.tools.speyTools import SpeyComputer
 import itertools
 import numpy as np
@@ -423,23 +422,14 @@ class TheoryPrediction(object):
                 srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0
                 for ds in self.dataset.origdatasets
             ]
-            # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
-            s = getCombinedStatistics(
-                self.dataset,
-                srNsigs,
-                self.marginalize,
-                self.deltas_rel,
-                expected=expected,
-                allowNegativeSignals=allowNegativeSignals,
-            )
             computer = SpeyComputer ( self.dataset, srNsigs )
             llhd = computer.likelihood ( poi_test = 1., expected = expected,
                        return_nll = False )
-             
-            ollhd, olmax, olsm, omuhat, osigma_mu = (
-                s["lbsm"], s["lmax"], s["lsm"], s["muhat"], s["sigma_mu"],
-            )
-            print ( "llhd", llhd, ollhd )
+            lsm = computer.likelihood ( poi_test = 0., expected = expected,
+                       return_nll = False )
+            muhat,lmax = computer.maximize_likelihood ( expected = expected,
+                       return_nll = False, allowNegativeSignals = allowNegativeSignals )
+            sigma_mu = computer.sigma_mu ( poi_test = muhat, expected = expected )
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
