@@ -168,7 +168,6 @@ class SpeyComputer:
                 optimiser_arguments = init["optimiser"] )
         if limit_on_xsec and type(ret) not in [ None ]:
             ret = ret * self.xsection * fb
-        print ( "i computed", ret )
         return ret
 
     def _getBestStatModel(self, nsig, allow_negative_signal=False):
