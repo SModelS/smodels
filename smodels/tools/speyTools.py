@@ -122,10 +122,10 @@ class SpeyComputer:
             lingo to spey convention """
         if type(expected)==ExpectationType:
             return expected
-        expectedDict = {False:ExpectationType.observed,
-                        True:ExpectationType.apriori,
+        expectedDict = {False: ExpectationType.observed,
+                        True: ExpectationType.apriori,
                         "apriori": ExpectationType.apriori,
-                        "posteriori":ExpectationType.aposteriori}
+                        "posteriori": ExpectationType.aposteriori}
         if expected in expectedDict:
             return expectedDict[expected]
         logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
@@ -151,18 +151,24 @@ class SpeyComputer:
                               cross section
         """
 
-        init, bounds, args = self.getSpeyInitialisation ( False, False )
+        inits = self.getSpeyInitialisation ( False, initial_bracket = True )
         expected = self.translateExpectationType ( expected )
+        lim = inits["limits"]
         try:
-            ret = self.statModel.poi_upper_limit ( expected, par_bounds = bounds,
-                init_pars = init, **args )
+            ret = self.statModel.poi_upper_limit ( expected = expected,
+                low_init = lim["low_init"], hig_init = lim["hig_init"],
+                maxiter = lim["maxiter"],
+                optimiser_arguments = inits["optimiser"] )
         except ValueError as e:
             logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
             self.alternateMethod ( args )
-            ret = statModel.poi_upper_limit ( expected=expected, par_bounds=bounds, 
-                init_pars = init, **args )
+            ret = statModel.poi_upper_limit ( expected=expected,
+                low_init = lim["low_init"], hig_init = lim["hig_init"],
+                maxiter = lim["maxiter"],
+                optimiser_arguments = init["optimiser"] )
         if limit_on_xsec and type(ret) not in [ None ]:
             ret = ret * self.xsection * fb
+        print ( "i computed", ret )
         return ret
 
     def _getBestStatModel(self, nsig, allow_negative_signal=False):
@@ -206,18 +212,28 @@ class SpeyComputer:
                 return statModel
 
             config = statModel.backend.model.config()
-            init, bounds, args = self.getSpeyInitialisation ( True )
+            inits = self.getSpeyInitialisation ( True )
+            lim = inits["limits"]
+            bounds = config.bounds()
             try:
-                mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,par_bounds=bounds, init_pars = init, **args )
+                mu_ul_exp = statModel.poi_upper_limit(
+                        expected=ExpectationType.apriori, 
+                        low_init = lim["low_ini"], hig_init = lim["hig_init"], 
+                        maxiter = lim["maxiter"], 
+                        optimiser_arguments = inits["optimiser"] )
             except ValueError as e:
                 # if we dont get an answer, might just be this super region
                 # is not a good choice
                 logger.warn ( f"when trying to find best super region: {e}. will skip this one." )
                 continue
-            while abs(mu_ul_exp - bounds[config.poi_index][1]) <= 0.1:
+            while abs(mu_ul_exp - bounds[config.poi_index][1]) / ( mu_ul_exp + bounds[config.poi_index][1]) <= 0.1:
                 logger.debug('Expected upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
                 bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
-                mu_ul_exp = statModel.poi_upper_limit(expected=ExpectationType.apriori,allow_negative_signal=allow_negative_signal,par_bounds=bounds)
+                mu_ul_exp = statModel.poi_upper_limit(
+                        expected=ExpectationType.apriori, 
+                        low_init = lim["low_ini"], hig_init = lim["hig_init"], 
+                        maxiter = lim["maxiter"], 
+                        optimiser_arguments = inits["optimiser"] )
 
             if mu_ul_exp == 0 and not allow_negative_signal:
                 logger.warning(f'Expected upper limit on poi is negative when searching for the best statistical model for analysis {self.globalInfo.id}.')
@@ -253,10 +269,9 @@ class SpeyComputer:
         """ simple frontend to spey functionality """
         self.checkMinimumPoi( poi_test )
         expected = self.translateExpectationType ( expected )
-        init, bounds, args = self.getSpeyInitialisation ( True )
+        # init = self.getSpeyInitialisation ( True )
         return self.statModel.asimov_likelihood ( poi_test = poi_test,
-            expected = expected, return_nll = return_nll, par_bounds = bounds,
-            init_pars = init, **args )
+            expected = expected, return_nll = return_nll )
 
     def checkMinimumPoi ( self, poi_test : float ):
         """ check if poi is below minimum_poi """
@@ -269,10 +284,9 @@ class SpeyComputer:
         """ simple frontend to spey functionality """
         self.checkMinimumPoi ( poi_test )
         expected = self.translateExpectationType ( expected )
-        init, bounds, args = self.getSpeyInitialisation ( True )
+        # init = self.getSpeyInitialisation ( True )
         return self.statModel.likelihood ( poi_test = poi_test,
-            expected = expected, return_nll = return_nll, par_bounds = bounds,
-            init_pars = init, **args )
+            expected = expected, return_nll = return_nll )
 
     def maximize_likelihood ( self, expected : Union[bool,Text],
            allowNegativeSignals : bool = True,
@@ -282,10 +296,12 @@ class SpeyComputer:
         :param allowNegativeSignals: allow also negative muhats
         :returns: tuple of muhat,lmax
         """
-        speyexpected = self.translateExpectationType ( expected )
-        init, bounds, args = self.getSpeyInitialisation ( allowNegativeSignals = allowNegativeSignals )
-        ret = self.statModel.maximize_likelihood ( expected = speyexpected, 
-            par_bounds = bounds, return_nll = return_nll, init_pars = init, **args )
+        expected = self.translateExpectationType ( expected )
+        init = self.getSpeyInitialisation ( allowNegativeSignals = allowNegativeSignals )
+        opt = init["optimiser"] 
+        ret = self.statModel.maximize_likelihood ( expected = expected, 
+                allow_negative_signal = allowNegativeSignals,
+                return_nll = return_nll, **opt )
         ## not clear if bounds will be hard bounds
         if not allowNegativeSignals and ret[0]< 0.:
             ret = ( 0., self.likelihood ( 0., expected = expected, return_nll = return_nll ) )
@@ -319,10 +335,11 @@ class SpeyComputer:
         :returns: tuple of muhat,lmax
         """
         expected = self.translateExpectationType ( expected )
-        init, bounds, args = self.getSpeyInitialisation ( True )
+        init = self.getSpeyInitialisation ( True )
+        opt = init["optimiser"]
+        opt["test_statistics"]="qmutilde"
         ret = self.statModel.maximize_asimov_likelihood ( expected = expected, 
-            par_bounds = bounds, init_pars = init, return_nll = return_nll,
-            test_statistics="qmutilde", **args )
+            return_nll = return_nll, **opt )
         assert ret[0]>=0., "maximum of asimov likelihood should not be below zero"
         #if not allowNegativeSignals and ret[0]< 0.:
         #    ret = ( 0., self.likelihood ( 0., expected = expected, return_nll = return_nll ) )
@@ -354,8 +371,8 @@ class SpeyComputer:
         """
         if initial_bracket:
             return args
-        args[2].pop ( "low_init", None )
-        args[2].pop ( "hig_init", None )
+        args["limits"].pop ( "low_init", None )
+        args["limits"].pop ( "hig_init", None )
         return args
 
     def getInitialisationForSingleRegions ( self, allowNegativeSignals : bool = False ) -> Tuple[List,List,Dict]:
@@ -366,7 +383,18 @@ class SpeyComputer:
         init = config.suggested_init
         bounds = config.suggested_bounds
         args = {}
-        return init,bounds,args
+        optimiser = { }
+        optimiser = { "maxiter": 200, "ntrials": 1, "method": None }
+        optimiser["tol"]=1e-5
+        # optimiser["method"]="BFGS"
+        optimiser["method"]="SLSQP"
+        optimiser["init_pars"] = init
+        optimiser["par_bounds"] = bounds
+        limits = {}
+        limits["low_init"] = bounds[0][0]
+        limits["hig_init"] = bounds[0][1]
+        limits["maxiter"] = 50
+        return { "optimiser": optimiser, "limits": limits }
 
     def getInitialisationForPyhf ( self, allowNegativeSignals : bool = False ):
         """ get decent initial bounds and initial values for a statModel
@@ -392,7 +420,7 @@ class SpeyComputer:
             for i in range(len(nobs)):
                 mui.append ( (nobs[i]-bg[i])/signal[i] )
             print ( "mui", mui )
-        # args = { "maxiter": 500, "method": "SLSQP" } ## extra args for the optimizers
+        # args = { "maxiter": 500, "method": "SLSQP" } ## extra args for the optimisers
         # method BFGS, SLSQP
         #args = { "maxiter": 500, "method": "BFGS", "ntrials": 3,
         #         "xrtol": 1e-6 "low_init": bounds[0][0], 
@@ -401,7 +429,18 @@ class SpeyComputer:
         # args = { "maxiter": 500, "ntrials": 1, "method": "SLSQP" }
         # args = { "maxiter": 500, "ntrials": 1, "method": None }
         args = {}
-        return init,bounds,args
+        optimiser = { }
+        # optimiser = { "maxiter": 500, "ntrials": 1, "method": None }
+        optimiser["tol"]=1e-5
+        # optimiser["method"]="BFGS"
+        # optimiser["method"]="SLSQP"
+        optimiser["init_pars"] = init
+        optimiser["par_bounds"] = bounds
+        limits = {}
+        limits["low_init"] = bounds[0][0]
+        limits["hig_init"] = bounds[0][1]
+        # limits["maxiter"] = 500
+        return { "optimiser": optimiser, "limits": limits }
 
     def alternateMethod ( self, args : dict ):
         """ try a different method. i hope we wont need this in the long run """
@@ -429,7 +468,7 @@ class SpeyComputer:
         config = statModel.backend.model.config()
         init = config.suggested_init
         bounds = config.suggested_bounds
-        args = {} ## extra args for the optimizers
+        args = {} ## extra args for the optimisers
         if False: ## these were the old values!
             bounds = [(suggested[0]-800,suggested[1]+800) for suggested in config.suggested_bounds]
             bounds[config.poi_index] = (-520, 800) # for now!
@@ -473,16 +512,18 @@ class SpeyComputer:
             print ( "signals   in srCombinations are", statModel.backend.model.signal[:] )
             print ( "deltas  in srCombinations are", statModel.backend.model.observed - statModel.backend.model.background )
             print ( "bounds    in srCombinations are", bounds[:3] )
-        args = { "maxiter": 500, "method": None, "ntrials": 1,
-                 "low_init": bounds[0][0], 
-                    "hig_init": bounds[0][1] }
+        optimiser = { }
         # args["xrtol"]=1e-6
         # print ( f"speyTools: initbracket is", args["low_init"], args["hig_init"] )
-        args = { "maxiter": 500, "ntrials": 1, "method": None }
-        args["tol"]=1e-5
-        args["low_init"] = bounds[0][0]
-        args["hig_init"] = bounds[0][1]
-        # args["method"]="BFGS"
-        args["method"]="SLSQP"
-        return init,bounds,args
+        optimiser = { "maxiter": 500, "ntrials": 2, "method": None }
+        optimiser["tol"]=1e-5
+        # optimiser["method"]="BFGS"
+        optimiser["method"]="SLSQP"
+        optimiser["init_pars"] = init
+        optimiser["par_bounds"] = bounds
+        limits = {} # flags for the limits
+        limits["low_init"] = None # bounds[0][0]
+        limits["hig_init"] = None # bounds[0][1]
+        limits["maxiter"] = 50
+        return { "optimiser": optimiser,"limits": limits }
 
