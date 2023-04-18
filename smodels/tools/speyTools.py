@@ -232,7 +232,7 @@ class SpeyComputer:
         for sig,ds in zip(nsig,self.dataset._datasets):
             dI = ds.dataInfo
             if dI.dataId not in listOfSRInJson:
-                xsec = sig/self.getLumi()
+                xsec = sig/self.dataset.getLumi()
                 # Don't bother to compute eUL again (one could do it again if needed)
                 if xsec.asNumber(fb) == 0.:
                     ## we have no values
