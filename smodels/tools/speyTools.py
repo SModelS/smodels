@@ -161,10 +161,7 @@ class SpeyComputer:
                 optimiser_arguments = inits["optimiser"] )
         except ValueError as e:
             logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
-            print ( "before changing", inits )
             self.alternateMethod ( inits )
-            print ( "after changing", inits )
-            sys.exit()
             lim = inits["limits"]
             ret = self.statModel.poi_upper_limit ( expected=expected,
                 low_init = lim["low_init"], hig_init = lim["hig_init"],
@@ -451,16 +448,16 @@ class SpeyComputer:
 
     def alternateMethod ( self, args : dict ):
         """ try a different method. i hope we wont need this in the long run """
-        if not "method" in args or args["limits"]["method"] is None:
-            args["limits"]["method"]="BFGS"
+        if not "method" in args or args["optimiser"]["method"] is None:
+            args["optimiser"]["method"]="BFGS"
             return
-        if args["limits"]["method"]=="SLSQP":
-            args["limits"]["method"]="BFGS"
+        if args["optimiser"]["method"]=="SLSQP":
+            args["optimiser"]["method"]="BFGS"
             return
-        if args["limits"]["method"]=="BFGS":
-            args["limits"]["method"]="SLSQP"
+        if args["optimiser"]["method"]=="BFGS":
+            args["optimiser"]["method"]="SLSQP"
             return
-        args["limits"]["method"]="L-BFGS-B"
+        args["optimiser"]["method"]="L-BFGS-B"
 
     @property
     def xsection(self):
@@ -560,3 +557,13 @@ class SimpleSpeyDataSet:
 
     def getType ( self ):
         return "efficiencyMap"
+
+if __name__ == "__main__":
+    nobs,bg,bgerr,lumi = 3., 4.1, 0.6533758489567854, 35.9/fb
+    # nobs,bg,bgerr,lumi = 0, 0., 0.01, 35.9/fb
+    dataset = SimpleSpeyDataSet ( nobs, bg, bgerr, lumi )
+    computer = SpeyComputer ( dataset, 1. )
+    ul = computer.poi_upper_limit ( expected = False, limit_on_xsec = True )
+    print ( "ul", ul )
+    ule = computer.poi_upper_limit ( expected = True, limit_on_xsec = True )
+    print ( "ule", ule )
