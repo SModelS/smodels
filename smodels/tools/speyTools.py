@@ -396,10 +396,8 @@ class SpeyComputer:
         minmu, maxmu = -5*err_muhat + muhat, 5*err_muhat + muhat
         if not allowNegativeSignals and minmu < 0.:
             minmu = 0.
-        if maxmu < minmu:
-            maxmu = minmu + 10*err_muhat
-        if not allowNegativeSignals and maxmu < 0.:
-            maxmu = 2.
+        if maxmu <= minmu:
+            maxmu = 5*err_muhat
         bounds [ config.poi_index ] = ( minmu, maxmu )
         args = {}
         optimiser = { }
@@ -519,6 +517,8 @@ class SpeyComputer:
         minmu, maxmu = -5*err_muhat + init_muhat, 5*err_muhat + init_muhat
         if not allowNegativeSignals and minmu < 0.:
             minmu = 0.
+        if maxmu <= minmu:
+            maxmu = 5*err_muhat
         bounds [ config.poi_index ] = ( minmu, maxmu )
         if False:
             print ( f"residual ({len(init)}) is", init_muhat, "+-", err_muhat )
@@ -572,7 +572,7 @@ class SimpleSpeyDataSet:
 
 if __name__ == "__main__":
     nobs,bg,bgerr,lumi = 3., 4.1, 0.6533758489567854, 35.9/fb
-    nobs,bg,bgerr,lumi = 0, 2., 0.2, 35.9/fb
+#    nobs,bg,bgerr,lumi = 0, 2., 0.2, 35.9/fb
 # nobs,bg,bgerr,lumi = 0, 0., 0.01, 35.9/fb
     dataset = SimpleSpeyDataSet ( nobs, bg, bgerr, lumi )
     computer = SpeyComputer ( dataset, 1. )
