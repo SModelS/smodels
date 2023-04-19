@@ -384,27 +384,39 @@ class SpeyComputer:
         bounds = config.suggested_bounds
         obs, bg, sig, cov = tuple ( map ( float, 
             [ model.observed, model.background, model.signal, model.covariance[0][0] ] ) )
-        init[1] = obs - bg - sig
-        muhat = init[1] / sig
+        sigma = np.sqrt ( cov )
+
+        init[1] = ( obs - bg - sig )
+        muhat = ( obs - bg ) / sig
         init[0] = muhat
-        x = np.sqrt ( cov )
         cov_mui =  ( model.observed + cov ) / ( sig**2 )
         # the inverse of which will be our weights
         err_muhat = float ( np.sqrt ( cov_mui ) )
-        bounds[1]=(-5*x+init[1],5*x+init[1])
+        bounds[1]=(-5*sigma+init[1],5*sigma+init[1])
         minmu, maxmu = -5*err_muhat + muhat, 5*err_muhat + muhat
         if not allowNegativeSignals and minmu < 0.:
             minmu = 0.
+        if maxmu < minmu:
+            maxmu = minmu + 10*err_muhat
+        if not allowNegativeSignals and maxmu < 0.:
+            maxmu = 2.
         bounds [ config.poi_index ] = ( minmu, maxmu )
         args = {}
         optimiser = { }
-        optimiser = { "maxiter": 200, "ntrials": 1, "method": None }
+        optimiser = { "maxiter": 50, "ntrials": 1, "method": None }
         optimiser["tol"]=1e-5
-        # optimiser["method"]="BFGS"
         optimiser["method"]="SLSQP"
+        """
+        if obs == 0:
+            optimiser["maxiter"]=10
+            optimiser["tol"]=1.
+            optimiser["xrtol"]=1.
+            optimiser["method"]="SLSQP"
+        """
         optimiser["init_pars"] = init
         optimiser["par_bounds"] = bounds
         limits = {}
+        #print ( "bounds", bounds )
         limits["low_init"] = bounds[0][0]
         limits["hig_init"] = bounds[0][1]
         limits["maxiter"] = 50
@@ -560,7 +572,8 @@ class SimpleSpeyDataSet:
 
 if __name__ == "__main__":
     nobs,bg,bgerr,lumi = 3., 4.1, 0.6533758489567854, 35.9/fb
-    # nobs,bg,bgerr,lumi = 0, 0., 0.01, 35.9/fb
+    nobs,bg,bgerr,lumi = 0, 2., 0.2, 35.9/fb
+# nobs,bg,bgerr,lumi = 0, 0., 0.01, 35.9/fb
     dataset = SimpleSpeyDataSet ( nobs, bg, bgerr, lumi )
     computer = SpeyComputer ( dataset, 1. )
     ul = computer.poi_upper_limit ( expected = False, limit_on_xsec = True )
