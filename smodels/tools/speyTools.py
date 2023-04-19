@@ -151,7 +151,7 @@ class SpeyComputer:
                               cross section
         """
 
-        inits = self.getSpeyInitialisation ( False, initial_bracket = True )
+        inits = self.getSpeyInitialisation ( True, initial_bracket = True )
         expected = self.translateExpectationType ( expected )
         lim = inits["limits"]
         try:
@@ -370,25 +370,107 @@ class SpeyComputer:
         :param initial_bracket: if True, then actually leave them in, do nothing
         """
         if initial_bracket:
+            if not "low_init" in args["limits"]:
+                args["limits"]["low_init"]=None
+            if not "hig_init" in args["limits"]:
+                args["limits"]["hig_init"]=None
             return args
         args["limits"].pop ( "low_init", None )
         args["limits"].pop ( "hig_init", None )
         return args
 
-    def getInitialisationForSingleRegions ( self, allowNegativeSignals : bool = False ) -> Tuple[List,List,Dict]:
+    def getThetaHat1D(self, nobs, nb, mu, cov, max_iterations, nsig ):
+        """ Compute nuisance parameter theta that
+            maximizes our likelihood (poisson*gauss) -- by setting dNLL/dTheta
+            to zero
+        :param mu: signal strength
+        :returns: theta_hat
+        """
+        nsig = mu * nsig
+        ntot = nb + nsig
+        weight = 1. / cov
+        # first: no covariances:
+        q = cov * (ntot - nobs)
+        p = ntot + cov
+        thetamax = -p / 2.0 + np.sign(p) * np.sqrt( p**2/4 - q)
+        return thetamax
+        """
+        thetamaxes.append(thetamax)
+        ndims = len(p)
+
+        def distance(theta1, theta2):
+            for ctr, i in enumerate(theta1):
+                if i == 0.0:
+                    theta1[ctr] = 1e-20
+            for ctr, i in enumerate(theta2):
+                if i == 0.0:
+                    theta2[ctr] = 1e-20
+            return sum(np.abs(theta1 - theta2) / np.abs(theta1 + theta2))
+
+        ictr = 0
+        while ictr < max_iterations:
+            ictr += 1
+            q = diag_cov * (ntot - nobs)
+            p = ntot + diag_cov
+            for i in range(ndims):
+                # q[i] = diag_cov[i] * ( ntot[i] - nobs[i] )
+                # p[i] = ntot[i] + diag_cov[i]
+                for j in range(ndims):
+                    if i == j:
+                        continue
+                    dq = thetamax[j] * ntot[i] * diag_cov[i] * self.weight[i, j]
+                    dp = thetamax[j] * self.weight[i, j] * diag_cov[i]
+                    if abs(dq / q[i]) > 0.3:
+                        # logger.warning ( "too big a change in iteration." )
+                        dq = np.abs(0.3 * q[i]) * np.sign(dq)
+                    if abs(dp / p[i]) > 0.3:
+                        # logger.warning ( "too big a change in iteration." )
+                        dp = np.abs(0.3 * p[i]) * np.sign(dp)
+                    q[i] += dq
+                    p[i] += dp
+                # thetamax = -p / 2.0 * (1 - sign(p) * sqrt(1.0 - 4 * q / p**2))
+                thetamax = -p / 2.0 + sign(p) * sqrt( p**2/4 - q)
+            thetamaxes.append(thetamax)
+            if len(thetamaxes) > 2:
+                d1 = distance(thetamaxes[-2], thetamax)
+                d2 = distance(thetamaxes[-3], thetamaxes[-2])
+                if d1 > d2:
+                    raise Exception("diverging when computing thetamax: %f > %f" % (d1, d2))
+                if d1 < 1e-5:
+                    return thetamax
+        return thetamax
+        """
+
+    def compute1DThetaHat ( self, obs : float, sig : float, bg : float, cov : float ):
+        """ compute one-dimensional thetahat """
+        ntot = bg + sig
+        q = cov * ( ntot - obs )
+        p = ntot + cov
+        thetamax = -p / 2.0 + np.sign(p) * np.sqrt( p**2/4 - q)
+        return thetamax
+
+    def getInitialisationForSingleRegions ( self, allowNegativeSignals : bool ) -> Tuple[List,List,Dict]:
         """ here we globally steer the initialisation for the case
             of single region models """
+        
         model = self.statModel.backend.model
         config = model.config()
         init = config.suggested_init
         bounds = config.suggested_bounds
         obs, bg, sig, cov = tuple ( map ( float, 
             [ model.observed, model.background, model.signal, model.covariance[0][0] ] ) )
+        if obs == 0 or bg < 1.:
+            ## i hope we can get rid of this later
+            ret = { "optimiser": { "maxiter": 50 }, "limits": { "maxiter": 50 } }
+            return ret
         sigma = np.sqrt ( cov )
 
-        init[1] = ( obs - bg - sig )
-        muhat = ( obs - bg ) / sig
+        thetahat0 = self.compute1DThetaHat ( obs, 0., bg, cov )
+        muhat = ( obs - bg -thetahat0 ) / sig
         init[0] = muhat
+        thetahat = self.compute1DThetaHat ( obs, muhat*sig, bg, cov )
+        muhat = ( obs - bg -thetahat ) / sig
+        init[1] = thetahat
         cov_mui =  ( model.observed + cov ) / ( sig**2 )
         # the inverse of which will be our weights
         err_muhat = float ( np.sqrt ( cov_mui ) )
@@ -402,20 +484,12 @@ class SpeyComputer:
         args = {}
         optimiser = { }
         optimiser = { "maxiter": 50, "ntrials": 1, "method": None }
-        optimiser["tol"]=1e-5
+        optimiser["tol"]=1e-3
         optimiser["method"]="SLSQP"
-        """
-        if obs == 0:
-            optimiser["maxiter"]=10
-            optimiser["tol"]=1.
-            optimiser["xrtol"]=1.
-            optimiser["method"]="SLSQP"
-        """
         optimiser["init_pars"] = init
         optimiser["par_bounds"] = bounds
         limits = {}
-        #print ( "bounds", bounds )
-        limits["low_init"] = bounds[0][0]
+        limits["low_init"] = max ( bounds[0][0], 0. )
         limits["hig_init"] = bounds[0][1]
         limits["maxiter"] = 50
         ret = { "optimiser": optimiser, "limits": limits }
@@ -571,9 +645,10 @@ class SimpleSpeyDataSet:
         return "efficiencyMap"
 
 if __name__ == "__main__":
-    nobs,bg,bgerr,lumi = 3., 4.1, 0.6533758489567854, 35.9/fb
-#    nobs,bg,bgerr,lumi = 0, 2., 0.2, 35.9/fb
-# nobs,bg,bgerr,lumi = 0, 0., 0.01, 35.9/fb
+    # nobs,bg,bgerr,lumi = 3., 4.1, 0.6533758489567854, 35.9/fb
+    # nobs,bg,bgerr,lumi = 0, 1., 0.2, 35.9/fb
+    # nobs,bg,bgerr,lumi = 0, 0.001, 0.01, 35.9/fb
+    nobs,bg,bgerr,lumi = 3905,3658.3,238.767, 35.9/fb
     dataset = SimpleSpeyDataSet ( nobs, bg, bgerr, lumi )
     computer = SpeyComputer ( dataset, 1. )
     ul = computer.poi_upper_limit ( expected = False, limit_on_xsec = True )
