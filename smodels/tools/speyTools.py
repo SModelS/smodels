@@ -107,13 +107,13 @@ class SpeyComputer:
         from spey import get_uncorrelated_nbin_statistical_model
 
         self.statModel = get_uncorrelated_nbin_statistical_model(
-                            data = float(dataset.dataInfo.observedN),
-                            backgrounds = float(dataset.dataInfo.expectedBG),
-                            background_uncertainty = float(dataset.dataInfo.bgError),
-                            signal_yields = nsig,
-                            xsection = float (nsig/dataset.getLumi().asNumber(1./fb)),
-                            analysis = dataset.globalInfo.id,
-                            backend = 'simplified_likelihoods'
+                        data = float(dataset.dataInfo.observedN),
+                        backgrounds = float(dataset.dataInfo.expectedBG),
+                        background_uncertainty = float(dataset.dataInfo.bgError),
+                        signal_yields = nsig,
+                        xsection = float (nsig/dataset.getLumi().asNumber(1./fb)),
+                        analysis = dataset.globalInfo.id,
+                        backend = 'simplified_likelihoods'
         )
         return self.statModel
 
@@ -161,11 +161,15 @@ class SpeyComputer:
                 optimiser_arguments = inits["optimiser"] )
         except ValueError as e:
             logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
-            self.alternateMethod ( args )
-            ret = statModel.poi_upper_limit ( expected=expected,
+            print ( "before changing", inits )
+            self.alternateMethod ( inits )
+            print ( "after changing", inits )
+            sys.exit()
+            lim = inits["limits"]
+            ret = self.statModel.poi_upper_limit ( expected=expected,
                 low_init = lim["low_init"], hig_init = lim["hig_init"],
                 maxiter = lim["maxiter"],
-                optimiser_arguments = init["optimiser"] )
+                optimiser_arguments = inits["optimiser"] )
         if limit_on_xsec and type(ret) not in [ None ]:
             ret = ret * self.xsection * fb
         return ret
@@ -381,6 +385,20 @@ class SpeyComputer:
         config = model.config()
         init = config.suggested_init
         bounds = config.suggested_bounds
+        obs, bg, sig, cov = tuple ( map ( float, 
+            [ model.observed, model.background, model.signal, model.covariance[0][0] ] ) )
+        init[1] = obs - bg - sig
+        muhat = init[1] / sig
+        init[0] = muhat
+        x = np.sqrt ( cov )
+        cov_mui =  ( model.observed + cov ) / ( sig**2 )
+        # the inverse of which will be our weights
+        err_muhat = float ( np.sqrt ( cov_mui ) )
+        bounds[1]=(-5*x+init[1],5*x+init[1])
+        minmu, maxmu = -5*err_muhat + muhat, 5*err_muhat + muhat
+        if not allowNegativeSignals and minmu < 0.:
+            minmu = 0.
+        bounds [ config.poi_index ] = ( minmu, maxmu )
         args = {}
         optimiser = { }
         optimiser = { "maxiter": 200, "ntrials": 1, "method": None }
@@ -393,7 +411,8 @@ class SpeyComputer:
         limits["low_init"] = bounds[0][0]
         limits["hig_init"] = bounds[0][1]
         limits["maxiter"] = 50
-        return { "optimiser": optimiser, "limits": limits }
+        ret = { "optimiser": optimiser, "limits": limits }
+        return ret
 
     def getInitialisationForPyhf ( self, allowNegativeSignals : bool = False ):
         """ get decent initial bounds and initial values for a statModel
@@ -419,20 +438,9 @@ class SpeyComputer:
             for i in range(len(nobs)):
                 mui.append ( (nobs[i]-bg[i])/signal[i] )
             print ( "mui", mui )
-        # args = { "maxiter": 500, "method": "SLSQP" } ## extra args for the optimisers
-        # method BFGS, SLSQP
-        #args = { "maxiter": 500, "method": "BFGS", "ntrials": 3,
-        #         "xrtol": 1e-6 "low_init": bounds[0][0], 
-    #                "hig_init": bounds[0][1] 
-        #}
-        # args = { "maxiter": 500, "ntrials": 1, "method": "SLSQP" }
-        # args = { "maxiter": 500, "ntrials": 1, "method": None }
         args = {}
         optimiser = { }
-        # optimiser = { "maxiter": 500, "ntrials": 1, "method": None }
         optimiser["tol"]=1e-5
-        # optimiser["method"]="BFGS"
-        # optimiser["method"]="SLSQP"
         optimiser["init_pars"] = init
         optimiser["par_bounds"] = bounds
         limits = {}
@@ -443,16 +451,16 @@ class SpeyComputer:
 
     def alternateMethod ( self, args : dict ):
         """ try a different method. i hope we wont need this in the long run """
-        if not "method" in args or args["method"] is None:
-            args["method"]="BFGS"
+        if not "method" in args or args["limits"]["method"] is None:
+            args["limits"]["method"]="BFGS"
             return
-        if args["method"]=="SLSQP":
-            args["method"]="BFGS"
+        if args["limits"]["method"]=="SLSQP":
+            args["limits"]["method"]="BFGS"
             return
-        if args["method"]=="BFGS":
-            args["method"]="SLSQP"
+        if args["limits"]["method"]=="BFGS":
+            args["limits"]["method"]="SLSQP"
             return
-        args["method"]="L-BFGS-B"
+        args["limits"]["method"]="L-BFGS-B"
 
     @property
     def xsection(self):
@@ -517,12 +525,38 @@ class SpeyComputer:
         optimiser = { "maxiter": 500, "ntrials": 2, "method": None }
         optimiser["tol"]=1e-5
         # optimiser["method"]="BFGS"
-        optimiser["method"]="SLSQP"
+        # optimiser["method"]="SLSQP"
         optimiser["init_pars"] = init
         optimiser["par_bounds"] = bounds
         limits = {} # flags for the limits
-        limits["low_init"] = None # bounds[0][0]
-        limits["hig_init"] = None # bounds[0][1]
+        limits["low_init"] = bounds[0][0]
+        limits["hig_init"] = bounds[0][1]
         limits["maxiter"] = 50
         return { "optimiser": optimiser,"limits": limits }
 
+class SimpleSpeyDataSet:
+    """ a very simple data class that can replace a smodels.dataset,
+    for 1d SL data only. used for testing and in dataPreparation """
+    class SimpleInfo:
+        def __init__ ( self, observedN : float, expectedBG : float, 
+                       bgError : float ):
+            self.observedN = observedN
+            self.expectedBG = expectedBG
+            self.bgError = bgError
+
+    class GlobalInfo:
+        def __init__ ( self, lumi ):
+            self.id = "SimpleSpeyDataSet"
+            self.lumi = lumi
+
+    def __init__ ( self, observedN : float, expectedBG : float,
+                   bgError : float, lumi : fb ):
+        """ initialise the dataset with all relevant stats """
+        self.dataInfo = self.SimpleInfo ( observedN, expectedBG, bgError )
+        self.globalInfo = self.GlobalInfo( lumi )
+
+    def getLumi ( self ):
+        return self.globalInfo.lumi
+
+    def getType ( self ):
+        return "efficiencyMap"
