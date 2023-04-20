@@ -72,13 +72,18 @@ class SpeyTest(unittest.TestCase):
                     "reful": 21.5336356*fb, "refule": 13.455494*fb } ]
         cases.append ( { "nobs": 0, "bg": .001, "bgerr": .01, "lumi": 35.9/fb,
                          "reful": 0.053678853586*fb, "refule": 0.0537152307*fb } )
+        cases.append ( { "nobs": 3, "bg": 4.1, "bgerr": .6533758489, "lumi": 35.9/fb,
+                         "reful": 0.123728081503*fb, "refule": 0.1520938597094264*fb } )
         for case in cases:
             dataset = SimpleSpeyDataSet ( case["nobs"], case["bg"], case["bgerr"], 
                                           case["lumi"] )
             computer = SpeyComputer ( dataset, 1. )
             ul = computer.poi_upper_limit ( expected = False, limit_on_xsec = True )
-            self.assertAlmostEqual ( abs((ul - case["reful"]).asNumber(fb)), 0., 3 )
             ule = computer.poi_upper_limit ( expected = True, limit_on_xsec = True )
+            if False:
+                print ( "ul", ul.asNumber(fb) )
+                print ( "ule", ule.asNumber(fb) )
+            self.assertAlmostEqual ( abs((ul - case["reful"]).asNumber(fb)), 0., 3 )
             self.assertAlmostEqual ( abs((ule - case["refule"]).asNumber(fb)), 0.,3 )
         
 
