@@ -18,6 +18,7 @@ from smodels.theory.model import Model
 from smodels.theory import decomposer
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.tools.smodelsLogging import logger
+from smodels.tools.physicsUnits import fb
 import numpy as np
 
 import time
@@ -64,6 +65,23 @@ class SpeyTest(unittest.TestCase):
         if verbose:
             print ( f"took {t:.3f}s, average delta {np.mean(deltas):.4f}" )
         
+    def testSingleRegion ( self ):
+        from smodels.tools.speyTools import SpeyComputer, SimpleSpeyDataSet
+        nobs,bg,bgerr,lumi,reful,refule = 3905, 3658.3, 238.767, 35.9/fb, 21.5336356*fb, 13.455494*fb
+        cases = [ { "nobs": 3905, "bg": 3658.3, "bgerr": 238.767, "lumi": 35.9/fb,
+                    "reful": 21.5336356*fb, "refule": 13.455494*fb } ]
+        cases.append ( { "nobs": 0, "bg": .001, "bgerr": .01, "lumi": 35.9/fb,
+                         "reful": 0.053678853586*fb, "refule": 0.0537152307*fb } )
+        for case in cases:
+            dataset = SimpleSpeyDataSet ( case["nobs"], case["bg"], case["bgerr"], 
+                                          case["lumi"] )
+            computer = SpeyComputer ( dataset, 1. )
+            ul = computer.poi_upper_limit ( expected = False, limit_on_xsec = True )
+            self.assertAlmostEqual ( abs((ul - case["reful"]).asNumber(fb)), 0., 3 )
+            ule = computer.poi_upper_limit ( expected = True, limit_on_xsec = True )
+            self.assertAlmostEqual ( abs((ule - case["refule"]).asNumber(fb)), 0.,3 )
+        
+
 
 if __name__ == "__main__":
     unittest.main()
