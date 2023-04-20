@@ -64,6 +64,39 @@ class SpeyTest(unittest.TestCase):
         t = time.time() - t0
         if verbose:
             print ( f"took {t:.3f}s, average delta {np.mean(deltas):.4f}" )
+
+    def test16050 ( self ):
+        from databaseLoader import database as db
+        er = db.getExpResults ( analysisIDs = [ "CMS-SUS-16-050-agg" ] )[0]
+        defaults = {}
+        ### this is what we get
+        defaults [ "T1tttt" ] = { "obs": 223.469, "exp": 223.468 } # spey
+        # defaults [ "T1tttt" ] = { "obs": 253.00557, "exp": 240.79 } # smodels
+        verbose = True
+        t0 = time.time()
+        deltas = []
+        for slhaname in defaults.keys():
+            model = Model(BSMparticles=BSMList, SMparticles=SMList)
+            fname = f"./testFiles/slha/{slhaname}.slha"
+            model.updateParticles(inputFile=fname)
+            toplist = decomposer.decompose(model)
+            predictions = theoryPredictionsFor(er, toplist, combinedResults=True)
+            for p in predictions:
+                robs,rexp = ( p.getRValue( expected=x) for x in [ False, True ] )
+                r = { "obs": p.getRValue(), "exp": p.getRValue ( expected=True ) }
+                base = defaults[slhaname]
+                for exp in [ "obs", "exp" ]:
+                    delta = 2. * abs ( r[exp] - base[exp] ) / ( r[exp]+base[exp] )
+                    deltas.append ( delta )
+                    if verbose:
+                        print ( f"{slhaname} {exp}: r {r[exp]:.3f} r_base {base[exp]} delta {delta:.3f}" )
+                    if delta > .02:
+                        line = f"mismatch for {slhaname}({exp}): base={base[exp]}, computed={r[exp]}"
+                        logger.error ( line )
+                        self.assertTrue ( delta < .15 )
+        t = time.time() - t0
+        if verbose:
+            print ( f"took {t:.3f}s, average delta {np.mean(deltas):.4f}" )
         
     def testSingleRegion ( self ):
         from smodels.tools.speyTools import SpeyComputer, SimpleSpeyDataSet
