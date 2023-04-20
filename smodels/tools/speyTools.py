@@ -71,7 +71,9 @@ class SpeyComputer:
             if len(cov) < 1:
                 raise SModelSError("covariance matrix has length %d." % len(cov))
             bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
-            third_moment = dataset.globalInfo.third_moment if hasattr(dataset.globalInfo, "third_moment") else None
+            third_moment = None
+            if hasattr ( dataset.origdatasets[0].dataInfo, "thirdMoment" ):
+                third_moment = [x.dataInfo.thirdMoment for x in dataset.origdatasets]
             xsec = float ( sum(nsig)/dataset.getLumi().asNumber(1./fb) )
             from spey import get_correlated_nbin_statistical_model
 
