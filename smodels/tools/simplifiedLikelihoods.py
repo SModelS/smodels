@@ -1078,13 +1078,12 @@ class UpperLimitComputer:
         oldmodel = model
         if expected:
             model = copy.deepcopy(oldmodel)
+            model.observed = copy.deepcopy ( model.backgrounds )
             if expected == "posteriori":
                 tempc = LikelihoodComputer(oldmodel, toys)
                 theta_hat_, _ = tempc.findThetaHat(0 )
-            for i, d in enumerate(model.backgrounds):
-                if expected == "posteriori":
+                for i, d in enumerate(model.backgrounds):
                     d += theta_hat_[i]
-                model.observed[i] = float(d)
         computer = LikelihoodComputer(model, toys)
         mu_hat = computer.findMuHat( allowNegativeSignals=False, extended_output=False)
         theta_hat0, _ = computer.findThetaHat( 0. )
