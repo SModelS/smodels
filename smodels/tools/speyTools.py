@@ -18,7 +18,7 @@ from smodels.tools.physicsUnits import fb
 import numpy as np
 
 class SpeyComputer:
-    __slots__ = [ "statModel", "dataset" ]
+    __slots__ = [ "statModel", "dataset", "weight" ]
 
     def __init__ ( self, dataset, nsig : Union[float,list], 
                    deltas_rel : Union[None,float] = None ):
@@ -154,6 +154,10 @@ class SpeyComputer:
         """
 
         inits = self.getSpeyInitialisation ( True, initial_bracket = True )
+        if "init_pars" in inits["optimiser"]:
+            print ( "the initialisations for", expected, "are:\n", np.array ( inits["optimiser"]["init_pars"] ) )
+        if "par_bounds" in inits["optimiser"] and inits["optimiser"]["par_bounds"] != None:
+            print ( "the bounds          are:\n", np.array ( inits["optimiser"]["par_bounds"][:4] ) )
         expected = self.translateExpectationType ( expected )
         lim = inits["limits"]
         try:
@@ -161,6 +165,7 @@ class SpeyComputer:
                 low_init = lim["low_init"], hig_init = lim["hig_init"],
                 maxiter = lim["maxiter"],
                 optimiser_arguments = inits["optimiser"] )
+            print ( "the final fit_param for", expected, "are:\n", self.statModel.fit_param )
         except ValueError as e:
             logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
             self.alternateMethod ( inits )
@@ -381,22 +386,36 @@ class SpeyComputer:
         args["limits"].pop ( "hig_init", None )
         return args
 
-    def getThetaHat1D(self, nobs, nb, mu, cov, max_iterations, nsig ):
+    def getThetaHat(self, nobs, nb, mu, covb, sig, max_iterations):
         """ Compute nuisance parameter theta that
             maximizes our likelihood (poisson*gauss) -- by setting dNLL/dTheta
             to zero
         :param mu: signal strength
         :returns: theta_hat
         """
-        nsig = mu * nsig
+        from numpy import sign, sqrt
+        from scipy import linalg
+        nsig = mu * sig
         ntot = nb + nsig
-        weight = 1. / cov
+        cov = np.array(covb)
+        # weight = cov**(-1) ## weight matrix
+        # weight = linalg.inv(cov)
+        diag_cov = np.diag(cov)
         # first: no covariances:
-        q = cov * (ntot - nobs)
-        p = ntot + cov
-        thetamax = -p / 2.0 + np.sign(p) * np.sqrt( p**2/4 - q)
-        return thetamax
-        """
+        q = diag_cov * (ntot - nobs)
+        if hasattr ( self, "weight" ):
+            weight = self.weight
+        else:
+            weight = linalg.inv ( cov )
+            self.weight = weight # store it
+        p = ntot + diag_cov
+        thetamaxes = []
+        # thetamax = -p / 2.0 * (1 - sign(p) * sqrt(1.0 - 4 * q / p**2))
+        thetamax = -p / 2.0 + sign(p) * sqrt( p**2/4 - q)
+        for t in thetamax:
+            if np.isnan ( t ):
+                print ( "thetamax is nan: {t,p,q,ntot,nobs}" )
+                sys.exit()
         thetamaxes.append(thetamax)
         ndims = len(p)
 
@@ -415,22 +434,28 @@ class SpeyComputer:
             q = diag_cov * (ntot - nobs)
             p = ntot + diag_cov
             for i in range(ndims):
-                # q[i] = diag_cov[i] * ( ntot[i] - nobs[i] )
-                # p[i] = ntot[i] + diag_cov[i]
                 for j in range(ndims):
                     if i == j:
                         continue
-                    dq = thetamax[j] * ntot[i] * diag_cov[i] * self.weight[i, j]
-                    dp = thetamax[j] * self.weight[i, j] * diag_cov[i]
+                    dq = thetamax[j] * ntot[i] * diag_cov[i] * weight[i, j]
+                    dp = thetamax[j] * weight[i, j] * diag_cov[i]
+                    """
                     if abs(dq / q[i]) > 0.3:
-                        # logger.warning ( "too big a change in iteration." )
+                        logger.warning ( "too big a change in iteration." )
                         dq = np.abs(0.3 * q[i]) * np.sign(dq)
                     if abs(dp / p[i]) > 0.3:
-                        # logger.warning ( "too big a change in iteration." )
+                        logger.warning ( "too big a change in iteration." )
                         dp = np.abs(0.3 * p[i]) * np.sign(dp)
+                    """
                     q[i] += dq
                     p[i] += dp
+                """
                 # thetamax = -p / 2.0 * (1 - sign(p) * sqrt(1.0 - 4 * q / p**2))
+                for pi,qi in zip(p,q):
+                    if ( pi**2/4-qi ) < 0.:
+                        print ( f"we have an awkward case: {pi},{qi},{pi**2/4-qi}" )
+                        sys.exit()
+                """
                 thetamax = -p / 2.0 + sign(p) * sqrt( p**2/4 - q)
             thetamaxes.append(thetamax)
             if len(thetamaxes) > 2:
@@ -439,17 +464,21 @@ class SpeyComputer:
                 if d1 > d2:
                     raise Exception("diverging when computing thetamax: %f > %f" % (d1, d2))
                 if d1 < 1e-5:
+                    # i am confusesd about which parametrisation actually gets used.
                     return thetamax
+        # i am confusesd about which parametrisation actually gets used.
         return thetamax
-        """
 
-    def compute1DThetaHat ( self, obs : float, sig : float, bg : float, cov : float ):
+
+    def getThetaHat1D ( self, obs : float, sig : float, bg : float, cov : float ):
         """ compute one-dimensional thetahat """
         ntot = bg + sig
         q = cov * ( ntot - obs )
         p = ntot + cov
         thetamax = -p / 2.0 + np.sign(p) * np.sqrt( p**2/4 - q)
         return thetamax
+
+    def getInitialValuesForSL ( self, expected ):
 
     def getInitialisationForSingleRegions ( self, allowNegativeSignals : bool ) -> Tuple[List,List,Dict]:
         """ here we globally steer the initialisation for the case
@@ -467,10 +496,10 @@ class SpeyComputer:
             return ret
         sigma = np.sqrt ( cov )
 
-        thetahat0 = self.compute1DThetaHat ( obs, 0., bg, cov )
+        thetahat0 = self.getThetaHat1D ( obs, 0., bg, cov )
         muhat = ( obs - bg -thetahat0 ) / sig
         init[0] = muhat
-        thetahat = self.compute1DThetaHat ( obs, muhat*sig, bg, cov )
+        thetahat = self.getThetaHat1D ( obs, muhat*sig, bg, cov )
         muhat = ( obs - bg -thetahat ) / sig
         init[1] = thetahat
         cov_mui =  ( model.observed + cov ) / ( sig**2 )
@@ -555,7 +584,8 @@ class SpeyComputer:
         """
         import numpy as np
         statModel = self.statModel
-        config = statModel.backend.model.config()
+        model = statModel.backend.model
+        config = model.config()
         init = config.suggested_init
         bounds = config.suggested_bounds
         args = {} ## extra args for the optimisers
@@ -564,12 +594,16 @@ class SpeyComputer:
             bounds[config.poi_index] = (-520, 800) # for now!
             return bounds,init,args
         assert config.poi_index == 0, f"Error: I assume the poi index to be zero, not {config.poi_index}"
-        init[1:] = statModel.backend.model.observed - statModel.backend.model.background - statModel.backend.model.signal
         numerator, denominator = [], []
+        thetahat = self.getThetaHat ( model.observed, model.background,
+                        1., model.covariance, model.signal, 1 )
+        #print ( "first thetahat", thetahat )
+        init[1:]=thetahat
         for i in range ( len ( statModel.backend.model.observed ) ):
             cov = statModel.backend.model.covariance[i][i]
             x = np.sqrt ( cov )
-            bounds[i+1]=(-5*x+init[i+1],5*x+init[i+1])
+            # bounds[i+1]=(-5*x+init[i+1],5*x+init[i+1])
+            bounds[i+1]=(-5+init[i+1],5+init[i+1])
             sig = statModel.backend.model.signal[i]
             obs = statModel.backend.model.observed[i]
             bg = statModel.backend.model.background[i]
@@ -584,6 +618,10 @@ class SpeyComputer:
                 denominator.append ( wi )
         ## ok so the bounds should be -5*x,5*x with x being np.sqrt(statModel.backend.model.covariance[i][i], the initial values just the diff between observation and expectation
         init_muhat = np.sum ( numerator ) / np.sum ( denominator)
+        thetahat = self.getThetaHat ( model.observed, model.background,
+                         init_muhat, model.covariance, model.signal, 1 )
+        init[1:]=thetahat
+        #print ( "second thetahat", thetahat )
         if not allowNegativeSignals and init_muhat<0.:
             init_muhat = 0.
         err_muhat = np.sqrt ( len(denominator) / np.sum ( denominator ) )
@@ -607,12 +645,12 @@ class SpeyComputer:
         optimiser = { }
         # args["xrtol"]=1e-6
         # print ( f"speyTools: initbracket is", args["low_init"], args["hig_init"] )
-        optimiser = { "maxiter": 500, "ntrials": 2, "method": None }
-        optimiser["tol"]=1e-5
-        # optimiser["method"]="BFGS"
+        optimiser = { "maxiter": 2000, "ntrials": 1, "method": None }
+        optimiser["tol"]=1e-3
+        optimiser["method"]="L-BFGS-B"
         # optimiser["method"]="SLSQP"
         optimiser["init_pars"] = init
-        optimiser["par_bounds"] = bounds
+        optimiser["par_bounds"] = None # bounds
         limits = {} # flags for the limits
         limits["low_init"] = bounds[0][0]
         limits["hig_init"] = bounds[0][1]
