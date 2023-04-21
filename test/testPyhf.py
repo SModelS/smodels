@@ -86,7 +86,7 @@ class PyhfTest(unittest.TestCase):
                   observations=observations,
                   version='1.0.0'
                   )
-        data = PyhfData([[0.1]], [ws])
+        data = PyhfData([[0.1]], [ws], 0.1)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         self.assertEqual(ulcomputer.workspaces, None)
@@ -97,7 +97,7 @@ class PyhfTest(unittest.TestCase):
                   observations=observations,
                   version='1.0.0'
                   )
-        data = PyhfData([[0.1]], [ws])
+        data = PyhfData([[0.1]], [ws], 0.1)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         self.assertEqual(ulcomputer.workspaces, None)
@@ -108,7 +108,7 @@ class PyhfTest(unittest.TestCase):
                   #observations=observations,
                   version='1.0.0'
                   )
-        data = PyhfData([[0.1]], [ws])
+        data = PyhfData([[0.1]], [ws], 0.1)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         self.assertEqual(ulcomputer.workspaces, None)
@@ -119,7 +119,7 @@ class PyhfTest(unittest.TestCase):
                   observations=observations,
                   #version='1.0.0'
                   )
-        data = PyhfData([[0.1]], [ws])
+        data = PyhfData([[0.1]], [ws], 0.1)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         self.assertIsNone(ulcomputer.workspaces)
@@ -158,7 +158,7 @@ class PyhfTest(unittest.TestCase):
                   observations=observations,
                   version='1.0.0'
                   )
-        data = PyhfData([[0.1, 0.2]], [ws])
+        data = PyhfData([[0.1, 0.2]], [ws], 0.3)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         self.assertEqual(ulcomputer.workspaces, None)
@@ -169,7 +169,7 @@ class PyhfTest(unittest.TestCase):
                   observations=observations,
                   version='1.0.0'
                   )
-        data = PyhfData([[0.1, 0.2]], [ws])
+        data = PyhfData([[0.1, 0.2]], [ws], 0.3)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         self.assertEqual(ulcomputer.workspaces, None)
@@ -180,7 +180,7 @@ class PyhfTest(unittest.TestCase):
                   #observations=observations,
                   version='1.0.0'
                   )
-        data = PyhfData([[0.1, 0.2]], [ws])
+        data = PyhfData([[0.1, 0.2]], [ws], 0.3)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         self.assertEqual(ulcomputer.workspaces, None)
@@ -191,7 +191,7 @@ class PyhfTest(unittest.TestCase):
                   observations=observations,
                   #version='1.0.0'
                   )
-        data = PyhfData([[0.1, 0.2]], [ws])
+        data = PyhfData([[0.1, 0.2]], [ws], 0.3)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         self.assertIsNone(ulcomputer.workspaces)
@@ -202,7 +202,7 @@ class PyhfTest(unittest.TestCase):
         Tests the case where all SRs are empty
         """
         ws = self.simpleJson([0.9], [10])
-        data = PyhfData([[0]], [ws])
+        data = PyhfData([[0]], [ws], 0)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         self.assertIsNone(ul)
@@ -213,12 +213,12 @@ class PyhfTest(unittest.TestCase):
         """
         # One single json but too much signals
         ws = self.simpleJson([0.9], [10])
-        data = PyhfData([[0.9, 0.5]], [ws])
+        data = PyhfData([[0.9, 0.5]], [ws], 1.4)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul1 = ulcomputer.getUpperLimitOnMu()
         # Two jsons but only one signal
         ws = [self.simpleJson([0.9], [10]), self.simpleJson([0.8], [9])]
-        data = PyhfData([[0.5]], ws)
+        data = PyhfData([[0.5]], ws, 0.5)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul2 = ulcomputer.getUpperLimitOnMu(workspace_index=0)
         self.assertIsNone(ul1)
@@ -230,7 +230,7 @@ class PyhfTest(unittest.TestCase):
         which the UL should be computed
         """
         ws = [self.simpleJson([0.9], [10]), self.simpleJson([0.8], [9])]
-        data = PyhfData([[0.1], [0.2]], ws)
+        data = PyhfData([[0.1], [0.2]], ws, 0.3)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         self.assertAlmostEqual ( ul, 234.83141989029718, 1 )
@@ -265,10 +265,10 @@ class PyhfTest(unittest.TestCase):
         )]
         llhdSpec = jsonpatch.apply_patch(bkg, patch)
         # Computing the upper limit with the SModelS/pyhf interface
-        data = PyhfData([signals], [bkg])
+        data = PyhfData([signals], [bkg], sum(signals))
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
-        ul = ul * data.totalYield()
+        ul = ul * data.totalYield
         # Computing the cls outside of SModelS with POI = ul, should give 0.95
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         workspace = pyhf.Workspace(llhdSpec)
@@ -317,10 +317,10 @@ class PyhfTest(unittest.TestCase):
         )]
         llhdSpec = jsonpatch.apply_patch(bkg, patch)
         # Computing the upper limit with the SModelS/pyhf interface
-        data = PyhfData([signals], [bkg])
+        data = PyhfData([signals], [bkg], sum(signals))
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
-        ul = ul * data.totalYield()
+        ul = ul * data.totalYield
         # Computing the cls outside of SModelS with POI = ul, should give 0.95
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         workspace = pyhf.Workspace(llhdSpec)

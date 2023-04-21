@@ -207,10 +207,10 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             self.assertAlmostEqual(diff_rel, 0.0, 2)
             self.assertEqual(goodIDs[ana][1], selectedIDs[ana][1])
 
-        self.assertAlmostEqual(combiner.lsm() / 1.06988795e-20, 1., 2)
-        self.assertAlmostEqual(combiner.likelihood() / 8.9504e-21, 1., 2)
-        self.assertAlmostEqual(combiner.lmax() / 1.0698879533540923e-20, 1., 2)
-        self.assertAlmostEqual(combiner.getRValue() / .2229345123626656, 1., 2)
+        self.assertAlmostEqual(combiner.lsm() / 8.032708820262497e-27, 1., 2)
+        self.assertAlmostEqual(combiner.likelihood() / 6.181123374537111e-27, 1., 2)
+        self.assertAlmostEqual(combiner.lmax() / 8.032708820262498e-27, 1., 2)
+        self.assertAlmostEqual(combiner.getRValue() / 0.2771209732232204, 1., 2)
 
 
 if __name__ == "__main__":
