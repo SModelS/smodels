@@ -260,6 +260,8 @@ class TheoryPredictionsCombiner(object):
             if tmp != None:
                 llhd = llhd * tmp
                 changed = True
+            else:
+                return None
             # Restore marginalize setting:
             tp.marginalize = tp_marginalize
         if changed == False:
