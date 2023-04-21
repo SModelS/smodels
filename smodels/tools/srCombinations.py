@@ -2,7 +2,7 @@
 
 """
 .. module:: srCombinations
-   :synopsis: a module to contain the logic around combinations of signal regions 
+   :synopsis: a module to contain the logic around combinations of signal regions
               within a single analysis, be they SL-based or pyhf-based.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -148,9 +148,9 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
     # datasets = [ds.getID() for ds in dataset._datasets]
     datasets = [ds.getID() for ds in dataset.origdatasets]
     total = sum(nsig)
-    if total == 0.0:  # all signals zero? can divide by anything!
-        total = 1.0
-    if normalize:
+    # if total == 0.0:  # all signals zero? can divide by anything!
+    #     total = 1.0
+    if normalize and total != 0.:
         nsig = [
             s / total for s in nsig
         ]  # Normalising signals to get an upper limit on the events count
@@ -185,7 +185,7 @@ def _getPyhfComputer(dataset, nsig, normalize=True):
     # Loading the jsonFiles, unless we already have them (because we pickled)
     from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
 
-    data = PyhfData(nsignals, jsons, jsonFiles)
+    data = PyhfData(nsignals, jsons, total, jsonFiles)
     if data.errorFlag:
         return None
     if hasattr(dataset.globalInfo, "includeCRs"):

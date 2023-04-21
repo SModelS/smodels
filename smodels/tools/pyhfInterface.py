@@ -110,7 +110,8 @@ class PyhfData:
     :ivar nWS: number of workspaces = number of json files
     """
 
-    def __init__(self, nsignals, inputJsons, jsonFiles=None ):
+    def __init__(self, nsignals, inputJsons, total, jsonFiles=None ):
+        self.totalYield = total
         self.nsignals = nsignals  # fb
         self.inputJsons = inputJsons
         self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
@@ -126,10 +127,10 @@ class PyhfData:
         self.getWSInfo()
         self.checkConsistency()
 
-    def totalYield ( self ):
-        """ the total yield in all signal regions """
-        S = sum ( [ sum(x) for x in self.nsignals ] )
-        return S
+    # def totalYield ( self ):
+    #     """ the total yield in all signal regions """
+    #     S = sum ( [ sum(x) for x in self.nsignals ] )
+    #     return S
 
     def getWSInfo(self):
         """
@@ -469,22 +470,21 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori
             expected
         """
-        mumin, mumax = -20.0, 40.0
-        if mu > mumax:
-            if countWarning["llhdszero"] < 1:
-                logger.warning(
-                    f"likelihoods of signal strengths mu= {mu:.1f} > {mumax} are automatically set to 0 (will suppress similar msgs)"
-                )
-            countWarning["llhdszero"] += 1
-            return self.exponentiateNLL(None, not nll)
-        if mu < mumin:
-            if countWarning["llhdszero"] < 1:
-                logger.warning(
-                    f"likelihoods of signal strengths mu= {mu:.1f} < {mumin} are automatically set to 0 (will suppress similar msgs)"
-                )
-            countWarning["llhdszero"] += 1
-            return self.exponentiateNLL(None, not nll)
-        # print ( "pyhf likelihood for", mu )
+        # mumin, mumax = -20.0, 40.0
+        # if mu > mumax:
+        #     if countWarning["llhdszero"] < 1:
+        #         logger.warning(
+        #             f"likelihoods of signal strengths mu= {mu:.1f} > {mumax} are automatically set to 0 (will suppress similar msgs)"
+        #         )
+        #     countWarning["llhdszero"] += 1
+        #     return self.exponentiateNLL(None, not nll)
+        # if mu < mumin:
+        #     if countWarning["llhdszero"] < 1:
+        #         logger.warning(
+        #             f"likelihoods of signal strengths mu= {mu:.1f} < {mumin} are automatically set to 0 (will suppress similar msgs)"
+        #         )
+        #     countWarning["llhdszero"] += 1
+        #     return self.exponentiateNLL(None, not nll)
         logger.debug("Calling likelihood")
         if type(workspace_index) == float:
             logger.error("workspace index is float")
@@ -505,7 +505,7 @@ class PyhfUpperLimitComputer:
                     for i, ns in enumerate(self.data.nsignals):
                         for j, v in enumerate(ns):
                             self.data.nsignals[i][j] = v * mu
-                self.__init__(self.data)
+                self.__init__(self.data, self.cl, self.includeCRs, self.lumi)
                 ### allow this, for computation of l_SM
                 # if self.zeroSignalsFlag[workspace_index] == True:
                 #    logger.warning("Workspace number %d has zero signals" % workspace_index)
@@ -576,6 +576,8 @@ class PyhfUpperLimitComputer:
         ulMin = float("+inf")
         i_best = None
         for i_ws in range(self.nWS):
+            if self.data.totalYield == 0.:
+                continue
             if self.zeroSignalsFlag[i_ws] == True:
                 logger.debug("Workspace number %d has zero signals" % i_ws)
                 continue
@@ -618,17 +620,42 @@ class PyhfUpperLimitComputer:
                 continue
             bg = 0.0
             var = 0.0
+            ns = 0.0
             for sample in chdata["samples"]:
-                if sample["name"] == "Bkg":
-                    tbg = sample["data"][0]
-                    bg += tbg
-                    hi = sample["modifiers"][0]["data"]["hi_data"][0]
-                    lo = sample["modifiers"][0]["data"]["lo_data"][0]
-                    delta = max((hi - bg, bg - lo))
-                    var += delta**2
                 if sample["name"] == "bsm":
                     ns = sample["data"][0]
-                    nsig[chdata["name"]] = ns
+                else:
+                    tbg = sample["data"][0]
+                    bg += tbg
+                    mult_factor_hi = 1.
+                    mult_factor_lo = 1.
+                    add_factor_hi = 0.
+                    add_factor_lo = 0.
+                    # To be tested - Don't take aux data into account
+                    for modifier in sample["modifiers"]:
+                        if modifier["type"] in ["normfactor","shapesys","staterror","shapefactor"]:
+                            if type(modifier["data"]) == list:
+                                mult_factor_hi *= modifier["data"][0]
+                                mult_factor_lo *= modifier["data"][0]
+                        elif modifier["type"] == "normsys":
+                            if type(modifier["data"]) == dict:
+                                mult_factor_hi *= modifier["data"]["hi"]
+                                mult_factor_lo *= modifier["data"]["lo"]
+                        elif modifier["type"] == "histosys":
+                            # If many histosys modifiers, only the last one counts
+                            if type(modifier["data"]) == dict:
+                                add_factor_hi = modifier["data"]["hi_data"][0] - tbg
+                                add_factor_lo = modifier["data"]["lo_data"][0] - tbg
+                        elif modifier["type"] == "lumi":
+                            for param in workspace["measurements"][0]["config"]["parameters"]:
+                                if param["name"] == "lumi":
+                                    mult_factor_hi *= max(param["bounds"][0])
+                                    mult_factor_lo *= min(param["bounds"][0])
+                    hi = mult_factor_hi*(tbg+add_factor_hi)
+                    lo = mult_factor_lo*(tbg+add_factor_lo)
+                    delta = max((hi - tbg, tbg - lo))
+                    var += delta**2
+            nsig[chdata["name"]] = ns
             bgs[chdata["name"]] = bg
             bgVars[chdata["name"]] = var
         for chdata in workspace["observations"]:
@@ -671,7 +698,7 @@ class PyhfUpperLimitComputer:
                 "Values in x were outside bounds during a minimize step, clipping to bounds",
             )
 
-            self.__init__(self.data)
+            self.__init__(self.data, self.cl, self.includeCRs, self.lumi)
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
             if workspace_index != None:
@@ -755,15 +782,17 @@ class PyhfUpperLimitComputer:
                                 - else: choose best combo
         :return: the upper limit on sigma times eff at `self.cl` level (0.95 by default)
         """
-
-        ul = self.getUpperLimitOnMu( expected=expected, workspace_index=workspace_index)
-        if ul == None:
-            return ul
-        if self.lumi is None:
-            logger.error(f"asked for upper limit on fiducial xsec, but no lumi given with the data")
-            return ul
-        xsec = self.data.totalYield() / self.lumi
-        return ul * xsec
+        if self.data.totalYield == 0.:
+            return None
+        else:
+            ul = self.getUpperLimitOnMu( expected=expected, workspace_index=workspace_index)
+            if ul == None:
+                return ul
+            if self.lumi is None:
+                logger.error(f"asked for upper limit on fiducial xsec, but no lumi given with the data")
+                return ul
+            xsec = self.data.totalYield / self.lumi
+            return ul * xsec
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of
@@ -939,7 +968,7 @@ class PyhfUpperLimitComputer:
             endUL = time.time()
             logger.debug("getUpperLimitOnMu elpased time : %1.4f secs" % (endUL - startUL))
             # the ul is actually on yields
-            ul = ul / self.data.totalYield() * self.scale
+            ul = ul / self.data.totalYield * self.scale
             self.data.cachedULs[expected][workspace_index] = ul
             return ul  # self.scale has been updated within self.rescale() method
 
