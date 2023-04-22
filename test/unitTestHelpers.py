@@ -19,8 +19,16 @@ from os.path import join, basename
 from smodels.installation import installDirectory as iDir
 from smodels.tools.smodelsLogging import logger, setLogLevel, getLogLevel
 
+def printTo (  *args  ):
+    with open ( "check.txt", "at" ) as f:
+        # f.write ( text + "\n" )
+        line = " ".join ( map ( str,  args ) )
+        print ( line )
+        f.write ( line + "\n" )
+        f.close()
+
 def sortExptRes ( exptRes ):
-    """ the experimental results may be in different orders. 
+    """ the experimental results may be in different orders.
         sort by AnalysisId+datasetid+TxNames """
     exptRes.sort ( key = lambda x: x["AnalysisID"]+str(x["DataSetID"])+str(x["TxNames"] ) )
     return exptRes
@@ -139,7 +147,8 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
     """
     to = None
     oldlevel = getLogLevel()
-    level = 'debug'
+    # level = 'debug'
+    level = 'info'
     if suppressStdout:
         level = 'error'
         to = os.devnull
