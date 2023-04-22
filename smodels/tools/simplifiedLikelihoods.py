@@ -290,6 +290,25 @@ class LikelihoodComputer:
         self.model = data
         self.toys = toys
 
+
+    def transform ( self, expected : Union [ Text, bool ] ):
+        """ replace the actual observations with backgrounds,
+            if expected is True or "posteriori" """
+        if expected == False:
+            return
+        if expected == True:
+            self.model.dataInfo.observed == copy.deepcopy ( self.model.dataInfo.backgrounds )
+            return
+        if not expected == "posteriori":
+            logger.error ( f"dont know the expected value {expected}" )
+            sys.exit(-1)
+        thetahat = self.findThetaHat(0.)
+        if type(self.dataInfo.expectedBG) in [float, np.float64,
+                np.float32, int, np.int64, np.int32]:
+            thetahat = float(thetahat[0])
+        obs = self.model.dataInfo.expectedBG + thetahat
+        self.model.dataInfo.observed = obs
+
     def dNLLdMu(self, mu, theta_hat = None ):
         """
         d (- ln L)/d mu, if L is the likelihood. The function
