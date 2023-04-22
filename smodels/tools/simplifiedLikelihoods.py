@@ -297,17 +297,17 @@ class LikelihoodComputer:
         if expected == False:
             return
         if expected == True:
-            self.model.dataInfo.observed == copy.deepcopy ( self.model.dataInfo.backgrounds )
+            self.model.observed = self.model.backgrounds
             return
         if not expected == "posteriori":
             logger.error ( f"dont know the expected value {expected}" )
             sys.exit(-1)
-        thetahat = self.findThetaHat(0.)
-        if type(self.dataInfo.expectedBG) in [float, np.float64,
+        thetahat, _ = self.findThetaHat(0.)
+        if type(self.model.backgrounds) in [float, np.float64,
                 np.float32, int, np.int64, np.int32]:
             thetahat = float(thetahat[0])
-        obs = self.model.dataInfo.expectedBG + thetahat
-        self.model.dataInfo.observed = obs
+        obs = self.model.backgrounds + thetahat
+        self.model.observed = obs
 
     def dNLLdMu(self, mu, theta_hat = None ):
         """

@@ -301,17 +301,7 @@ class DataSet(object):
         m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
                  deltas_rel=deltas_rel)
         computer = LikelihoodComputer(m)
-        if expected == "posteriori":
-            thetahat = computer.findThetaHat(0.)
-            if type(self.dataInfo.expectedBG) in [float, np.float64, int]:
-                thetahat = float(thetahat[0])
-
-            obs = self.dataInfo.expectedBG + thetahat
-            m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                     deltas_rel=deltas_rel)
-            # if abs ( nsig[0]-1 ) < 1e-5:
-            #    print ( f"COMB ebg={self.dataInfo.expectedBG:.3f} obs={obs:.3f} nsig {nsig[0]:.3f}" )
-            computer = LikelihoodComputer(m)
+        computer.transform ( expected )
         ret = computer.likelihood(nsig, marginalize=marginalize)
         if hasattr ( computer, "theta_hat" ):
             ## seems like someone wants to debug them
