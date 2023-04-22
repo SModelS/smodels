@@ -287,17 +287,19 @@ class LikelihoodComputer:
         :param toys: number of toys when marginalizing
         """
 
+        self.origModel = copy.deepcopy ( data )
         self.model = data
         self.toys = toys
-
 
     def transform ( self, expected : Union [ Text, bool ] ):
         """ replace the actual observations with backgrounds,
             if expected is True or "posteriori" """
+        # always start from scratch
+        self.model = copy.deepcopy ( self.origModel )
         if expected == False:
             return
+        self.model.observed = self.model.backgrounds
         if expected == True:
-            self.model.observed = self.model.backgrounds
             return
         if not expected == "posteriori":
             logger.error ( f"dont know the expected value {expected}" )

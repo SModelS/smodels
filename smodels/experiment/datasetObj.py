@@ -294,15 +294,9 @@ class DataSet(object):
                          if "posteriori" compute posterior expected
         :returns: likelihood to observe nobs events (float)
         """
-        obs = self.dataInfo.observedN
-        if expected:  # this step is done for prior and posterior expected
-            obs = self.dataInfo.expectedBG
-
-        m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                 deltas_rel=deltas_rel)
-        computer = LikelihoodComputer(m)
-        computer.transform ( expected )
-        ret = computer.likelihood(nsig, marginalize=marginalize)
+        from smodels.tools.statsTools import StatsComputer
+        computer = StatsComputer ( self, nsig, deltas_rel )
+        ret = computer.likelihood ( 1., expected = expected, return_nll = False )
         if hasattr ( computer, "theta_hat" ):
             ## seems like someone wants to debug them
             self.theta_hat = computer.theta_hat
