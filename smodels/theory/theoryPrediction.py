@@ -390,20 +390,18 @@ class TheoryPrediction(object):
                 deltas_rel=self.deltas_rel,
                 expected=expected,
             )
-            llhd_max = self.dataset.lmax(
+            ret = self.dataset.lmax(
                 marginalize=self.marginalize,
                 deltas_rel=self.deltas_rel,
                 allowNegativeSignals=allowNegativeSignals,
                 expected=expected,
             )
-            muhat = None
-            if hasattr(self.dataset, "muhat"):
-                muhat = self.dataset.muhat / nsig
-            if hasattr(self.dataset, "sigma_mu"):
-                sigma_mu = float(self.dataset.sigma_mu / nsig)
-                if not "sigma_mu" in self.cachedObjs[expected]:
-                    self.cachedObjs[expected]["sigma_mu"] = {}
-                self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = sigma_mu
+            llhd_max = ret["llhd"]
+            muhat = ret["muhat"] / nsig
+            sigma_mu = float ( ret["sigma_mu"] / nsig )
+            if not "sigma_mu" in self.cachedObjs[expected]:
+                self.cachedObjs[expected]["sigma_mu"] = {}
+            self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = sigma_mu
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = llhd_sm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = llhd_max

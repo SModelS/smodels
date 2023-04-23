@@ -19,6 +19,7 @@ from smodels.theory.auxiliaryFunctions import getAttributesFrom, getValuesForObj
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.theory.element import Element
+from typing import Union, Text
 
 import itertools
 
@@ -303,8 +304,9 @@ class DataSet(object):
 
         return ret
 
-    def lmax(self, deltas_rel=0.2, marginalize=False, expected=False,
-             allowNegativeSignals=False):
+    def lmax(self, deltas_rel : float = 0.2, marginalize : bool = False,
+             expected : Union[bool,Text] = False,
+             allowNegativeSignals : bool= False ) -> dict:
         """
         Convenience function, computes the likelihood at nsig = observedN - expectedBG,
         assuming "deltas_rel" error on the signal efficiency.
@@ -315,41 +317,19 @@ class DataSet(object):
         :param expected: Compute expected instead of observed likelihood
         :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
 
-        :returns: likelihood to observe nobs events (float)
-        """
-        """
-        obs = self.dataInfo.observedN
-        if expected:
-            obs = self.dataInfo.expectedBG
-            if expected == "posteriori":
-                m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                         deltas_rel=deltas_rel)
-                computer = LikelihoodComputer(m)
-                thetahat = computer.findThetaHat(0.)
-                if type(self.dataInfo.expectedBG) in [float, np.float64,
-                                                np.float32, int, np.int64, np.int32]:
-                    thetahat = float(thetahat[0])
-                obs = self.dataInfo.expectedBG + thetahat
-
-        m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                 deltas_rel=deltas_rel)
-        computer = LikelihoodComputer(m)
-        ret = computer.lmax ( marginalize=marginalize, nll=False,
-                              allowNegativeSignals=allowNegativeSignals )
+        :returns: dictionary of likelihood to observe nobs events (llhd),
+                  muhat and its error (sigma_mu), possible also
+                  the profile theta, theta_hat
         """
         from smodels.tools.statsTools import StatsComputer
         computer = StatsComputer ( self, 1., deltas_rel )
-        ret = computer.maximize_likelihood ( expected = expected, 
+        llhd = computer.maximize_likelihood ( expected = expected,
                 allowNegativeSignals = allowNegativeSignals, return_nll = False )
+        ret = { "llhd": llhd, "muhat": computer.muhat,
+                "sigma_mu": computer.sigma_mu }
         if hasattr ( computer, "theta_hat" ):
             ## seems like someone wants to debug them
-            self.theta_hat = computer.theta_hat
-        if hasattr ( computer, "muhat" ):
-            ## seems like someone wants to debug them
-            self.muhat = computer.muhat
-        if hasattr ( computer, "sigma_mu" ):
-            ## seems like someone wants to debug them
-            self.sigma_mu = computer.sigma_mu
+            ret [ "theta_hat" ] = computer.theta_hat
         return ret
 
     def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
