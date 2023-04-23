@@ -323,13 +323,8 @@ class DataSet(object):
         """
         from smodels.tools.statsTools import StatsComputer
         computer = StatsComputer ( self, 1., deltas_rel )
-        llhd = computer.maximize_likelihood ( expected = expected,
+        ret = computer.maximize_likelihood ( expected = expected,
                 allowNegativeSignals = allowNegativeSignals, return_nll = False )
-        ret = { "llhd": llhd, "muhat": computer.muhat,
-                "sigma_mu": computer.sigma_mu }
-        if hasattr ( computer, "theta_hat" ):
-            ## seems like someone wants to debug them
-            ret [ "theta_hat" ] = computer.theta_hat
         return ret
 
     def folderName(self):

@@ -3,7 +3,7 @@
 """
 .. module:: statsTools
    :synopsis: a module that contains the class responsible for
-              all statistical computations. Designed to 
+              all statistical computations. Designed to
               eventually become simply a frontend for spey
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -18,7 +18,7 @@ from smodels.tools.physicsUnits import fb
 import numpy as np
 
 class StatsComputer:
-    def __init__ ( self, dataset, nsig : Union[float,list], 
+    def __init__ ( self, dataset, nsig : Union[float,list],
                    deltas_rel : Union[None,float] = None,
                    marginalize : bool = False ):
         """ initialise with dataset.
@@ -35,7 +35,7 @@ class StatsComputer:
         self.nsig = nsig
         self.getComputer ( nsig, deltas_rel, marginalize )
 
-    def getComputer( self, nsig : Union [ float, np.ndarray ], 
+    def getComputer( self, nsig : Union [ float, np.ndarray ],
                      deltas_rel : Union [ float, None ],
                      marginalize : bool = False ):
         """ retrieve the statistical model """
@@ -43,7 +43,7 @@ class StatsComputer:
             self.getComputerSingleBin ( nsig, deltas_rel, marginalize )
         # return self.getStatModelMultiBin ( nsig )
 
-    def getComputerSingleBin(self, nsig: Union[float, np.ndarray], 
+    def getComputerSingleBin(self, nsig: Union[float, np.ndarray],
             delta_sys : Union[None,float] = None,
             marginalize : bool = False
 #            allow_negative_signal : bool = False
@@ -56,14 +56,14 @@ class StatsComputer:
             delta_sys = 0.
         dataset = self.dataset
         from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
-        data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG, 
+        data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = delta_sys )
         self.data = data
         self.marginalize = marginalize
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( )
 
-    def likelihood ( self, poi_test : float, expected : Union[bool,Text], 
+    def likelihood ( self, poi_test : float, expected : Union[bool,Text],
                             return_nll : bool ) -> float:
         """ simple frontend to individual computers """
         self.likelihoodComputer.transform ( expected )
@@ -71,24 +71,30 @@ class StatsComputer:
 
     def maximize_likelihood ( self, expected : Union[bool,Text],
            allowNegativeSignals : bool = True,
-           return_nll : bool = False  ) -> Tuple[float,float]:
+           return_nll : bool = False  ) -> dict:
         """ simple frontend to the individual computers, later spey
         :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: allow also negative muhats
-        :returns: tuple of muhat,lmax
+        :returns: Dictionary of llhd (llhd at mu_hat),
+                  muhat, sigma_mu (sigma of mu_hat),
+                  optionally also theta_hat
         """
         self.likelihoodComputer.transform ( expected )
-        ret = self.likelihoodComputer.lmax ( nll = return_nll, 
+        lmax = self.likelihoodComputer.lmax ( nll = return_nll,
                allowNegativeSignals = allowNegativeSignals,
                marginalize = self.marginalize )
         self.sigma_mu = self.likelihoodComputer.sigma_mu
         self.muhat = self.likelihoodComputer.muhat
+        ret = { "llhd": lmax, "muhat": self.likelihoodComputer.muhat,
+                "sigma_mu": self.likelihoodComputer.sigma_mu }
+        if hasattr ( self.likelihoodComputer, "theta_hat" ):
+            ret["theta_hat"] = self.likelihoodComputer.theta_hat
         return ret
 
     def poi_upper_limit ( self, expected : Union [ bool, Text ],
            limit_on_xsec : bool = False ) -> float:
-        """ simple frontend to the upperlimit computers, later 
-            to spey::poi_upper_limit 
+        """ simple frontend to the upperlimit computers, later
+            to spey::poi_upper_limit
         :param limit_on_xsec: if True, then return the limit on the
                               cross section
         """
@@ -102,7 +108,7 @@ class SimpleStatsDataSet:
     """ a very simple data class that can replace a smodels.dataset,
     for 1d SL data only. used for testing and in dataPreparation """
     class SimpleInfo:
-        def __init__ ( self, observedN : float, expectedBG : float, 
+        def __init__ ( self, observedN : float, expectedBG : float,
                        bgError : float ):
             self.observedN = observedN
             self.expectedBG = expectedBG

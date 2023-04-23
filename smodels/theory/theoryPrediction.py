@@ -381,21 +381,11 @@ class TheoryPrediction(object):
         elif self.dataType() == "efficiencyMap":
             lumi = self.dataset.getLumi()
             nsig = (self.xsection.value * lumi).asNumber()
-            llhd = self.dataset.likelihood(
-                nsig, marginalize=self.marginalize, deltas_rel=self.deltas_rel, expected=expected
-            )
-            llhd_sm = self.dataset.likelihood(
-                nsig=0.0,
-                marginalize=self.marginalize,
-                deltas_rel=self.deltas_rel,
-                expected=expected,
-            )
-            ret = self.dataset.lmax(
-                marginalize=self.marginalize,
-                deltas_rel=self.deltas_rel,
-                allowNegativeSignals=allowNegativeSignals,
-                expected=expected,
-            )
+            from smodels.tools.statsTools import StatsComputer
+            computer = StatsComputer ( self.dataset, nsig, self.deltas_rel )
+            llhd = computer.likelihood ( 1., expected = expected, return_nll = False )
+            llhd_sm = computer.likelihood ( 0., expected = expected, return_nll = False )
+            ret = computer.maximize_likelihood ( expected = expected, allowNegativeSignals = allowNegativeSignals )
             llhd_max = ret["llhd"]
             muhat = ret["muhat"] / nsig
             sigma_mu = float ( ret["sigma_mu"] / nsig )
