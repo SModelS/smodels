@@ -274,9 +274,9 @@ class TheoryPrediction(object):
             )
         if self.dataType() == "efficiencyMap":
             nsig = (mu * self.xsection.value * lumi).asNumber()
-            llhd = self.dataset.likelihood(
-                nsig, marginalize=self.marginalize, deltas_rel=self.deltas_rel, expected=expected
-            )
+            from smodels.tools.statsTools import StatsComputer
+            computer = StatsComputer ( self.dataset, nsig, self.deltas_rel )
+            llhd = computer.likelihood ( 1., expected = expected, return_nll = False )
 
         if self.dataType() == "upperLimit":
             # these fits only work with negative signals!
