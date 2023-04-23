@@ -52,7 +52,7 @@ class ServerTest(unittest.TestCase):
         myenv["PYTHONPATH"]="../" + pp
         subprocess.Popen ( cmd, env=myenv )
 
-        c = .5
+        c = 1.2
         while not os.path.exists ( pclfile ) and c < 10:
             time.sleep ( c )
             c += 1.
@@ -60,16 +60,16 @@ class ServerTest(unittest.TestCase):
             raise AssertionError( f"no file {pclfile} created" )
 
         db = Database( pclfile )
-        outputfile = runMain( filename, timeout = 5, suppressStdout = True, 
+        outputfile = runMain( filename, timeout = 2, suppressStdout = True,
                               overridedatabase = db )
         smodelsOutput = importModule ( outputfile )
-        
-        client = DatabaseClient ( port = port, verbose = "warn" ) 
+
+        client = DatabaseClient ( port = port, verbose = "warn" )
         client.send_shutdown()
 
-        ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 
+        ignoreFields = ['input file','smodels version', 'ncpus', 'Element',
                         'database version', 'Total missed xsec',
-                        'Missed xsec long-lived', 'Missed xsec displaced', 
+                        'Missed xsec long-lived', 'Missed xsec displaced',
                         'Missed xsec MET', 'Total outside grid xsec',
                         'Total xsec for missing topologies (fb)',
                         'Total xsec for missing topologies with displaced decays (fb)',
