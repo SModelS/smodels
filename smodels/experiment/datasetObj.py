@@ -332,24 +332,6 @@ class DataSet(object):
             ret [ "theta_hat" ] = computer.theta_hat
         return ret
 
-    def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
-        """
-        Computes the chi2 for a given number of observed events "nobs",
-        given number of signal events "nsig", and error on signal "deltas".
-        nobs, expectedBG and bgError are part of dataInfo.
-        :param nsig: predicted signal (float)
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
-        :return: chi2 (float)
-        """
-
-        m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG,
-                 self.dataInfo.bgError**2, deltas_rel=deltas_rel)
-        computer = LikelihoodComputer(m)
-        ret = computer.chi2(nsig, marginalize=marginalize)
-
-        return ret
-
     def folderName(self):
         """
         Name of the folder in text database.
