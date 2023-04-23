@@ -78,9 +78,12 @@ class StatsComputer:
         :returns: tuple of muhat,lmax
         """
         self.likelihoodComputer.transform ( expected )
-        return self.likelihoodComputer.lmax ( nll = return_nll, 
+        ret = self.likelihoodComputer.lmax ( nll = return_nll, 
                allowNegativeSignals = allowNegativeSignals,
                marginalize = self.marginalize )
+        self.sigma_mu = self.likelihoodComputer.sigma_mu
+        self.muhat = self.likelihoodComputer.muhat
+        return ret
 
     def poi_upper_limit ( self, expected : Union [ bool, Text ],
            limit_on_xsec : bool = False ) -> float:

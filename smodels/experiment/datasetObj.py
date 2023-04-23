@@ -317,6 +317,7 @@ class DataSet(object):
 
         :returns: likelihood to observe nobs events (float)
         """
+        """
         obs = self.dataInfo.observedN
         if expected:
             obs = self.dataInfo.expectedBG
@@ -335,6 +336,11 @@ class DataSet(object):
         computer = LikelihoodComputer(m)
         ret = computer.lmax ( marginalize=marginalize, nll=False,
                               allowNegativeSignals=allowNegativeSignals )
+        """
+        from smodels.tools.statsTools import StatsComputer
+        computer = StatsComputer ( self, 1., deltas_rel )
+        ret = computer.maximize_likelihood ( expected = expected, 
+                allowNegativeSignals = allowNegativeSignals, return_nll = False )
         if hasattr ( computer, "theta_hat" ):
             ## seems like someone wants to debug them
             self.theta_hat = computer.theta_hat
