@@ -99,7 +99,7 @@ class StatsComputer:
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( ntoys = 10000 )
 
-    def get_five_values ( self, expected : Union [ bool, Text ], 
+    def get_five_values ( self, expected : Union [ bool, Text ],
                       return_nll : bool = False, allowNegativeSignals : bool =False )-> Dict:
         """ return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat) """
         ret = self.maximize_likelihood ( expected = expected, allowNegativeSignals =allowNegativeSignals, return_nll = return_nll  )
@@ -181,10 +181,10 @@ class StatsComputer:
             if not "workspace_index" in kwargs:
                 index = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
-            return self.likelihoodComputer.likelihood ( 
-                    poi_test, nll = return_nll, 
+            return self.likelihoodComputer.likelihood (
+                    poi_test, nll = return_nll,
                     expected = expected, **kwargs )
-        return self.likelihoodComputer.likelihood ( poi_test * np.array (self.nsig), 
+        return self.likelihoodComputer.likelihood ( poi_test * np.array (self.nsig),
                 nll = return_nll, marginalize = self.marginalize, **kwargs )
 
     def transform ( self, expected ):
@@ -221,12 +221,21 @@ class StatsComputer:
         :param limit_on_xsec: if True, then return the limit on the
                               cross section
         """
-        if limit_on_xsec:
-            ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff( self.data,
-                   expected = expected )
+        if self.type == "pyhf":
+            index = self.likelihoodComputer.getBestCombinationIndex()
+            if limit_on_xsec:
+                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+                       expected = expected, workspace_index = index )
+            else:
+                ret = self.upperLimitComputer.getUpperLimitOnMu(
+                       expected = expected, workspace_index = index )
         else:
-            ret = self.upperLimitComputer.getUpperLimitOnMu( self.data,
-                   expected = expected )
+            if limit_on_xsec:
+                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff( self.data,
+                       expected = expected )
+            else:
+                ret = self.upperLimitComputer.getUpperLimitOnMu( self.data,
+                       expected = expected )
         return ret
 
 class SimpleStatsDataSet:

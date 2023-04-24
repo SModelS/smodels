@@ -46,8 +46,9 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
         if all([s == 0 for s in nsig]):
             logger.warning("All signals are empty")
             return None
-        ulcomputer = _getPyhfComputer(dataset, nsig)
-        ret = ulcomputer.getUpperLimitOnSigmaTimesEff(expected=expected)
+        computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
+               marginalize = dataset._marginalize, normalize = True )
+        ret = computer.poi_upper_limit ( expected = expected, limit_on_xsec = True )
         logger.debug("pyhf upper limit : {}".format(ret))
         return ret
     else:
