@@ -281,50 +281,6 @@ class DataSet(object):
 
         return getValuesForObj(self, attribute)
 
-    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False):
-        """
-        Computes the likelihood to observe nobs events,
-        given a predicted signal "nsig", assuming "deltas_rel"
-        error on the signal efficiency.
-        The values observedN, expectedBG, and bgError are part of dataInfo.
-
-        :param nsig: predicted signal (float)
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
-        :param expected: if true, compute prior expected, if false compute observed
-                         if "posteriori" compute posterior expected
-        :returns: likelihood to observe nobs events (float)
-        """
-        computer = StatsComputer ( self, nsig, deltas_rel )
-        ret = computer.likelihood ( 1., expected = expected, return_nll = False )
-        if hasattr ( computer, "theta_hat" ):
-            ## seems like someone wants to debug them
-            self.theta_hat = computer.theta_hat
-
-        return ret
-
-    def lmax(self, deltas_rel : float = 0.2, marginalize : bool = False,
-             expected : Union[bool,Text] = False,
-             allowNegativeSignals : bool= False ) -> dict:
-        """
-        Convenience function, computes the likelihood at nsig = observedN - expectedBG,
-        assuming "deltas_rel" error on the signal efficiency.
-        The values observedN, expectedBG, and bgError are part of dataInfo.
-
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
-        :param expected: Compute expected instead of observed likelihood
-        :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
-
-        :returns: dictionary of likelihood to observe nobs events (llhd),
-                  muhat and its error (sigma_mu), possible also
-                  the profile theta, theta_hat
-        """
-        computer = StatsComputer ( self, 1., deltas_rel )
-        ret = computer.maximize_likelihood ( expected = expected,
-                allowNegativeSignals = allowNegativeSignals, return_nll = False )
-        return ret
-
     def folderName(self):
         """
         Name of the folder in text database.
