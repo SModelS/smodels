@@ -28,39 +28,14 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
 
     :returns: upper limit on sigma*eff
     """
-
-    if dataset.type == "simplified":
-        cov = dataset.globalInfo.covariance
-        if type(cov) != list:
-            raise SModelSError("covariance field has wrong type: %s" % type(cov))
-        if len(cov) < 1:
-            raise SModelSError("covariance matrix has length %d." % len(cov))
-
-        computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
-               marginalize = dataset._marginalize )
-        ret = computer.poi_upper_limit ( expected = expected, limit_on_xsec = True )
-        logger.debug("SL upper limit : {}".format(ret))
-        return ret
-    elif dataset.type == "pyhf":
-        logger.debug("Using pyhf")
-        if all([s == 0 for s in nsig]):
-            logger.warning("All signals are empty")
-            return None
-        computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
-               marginalize = dataset._marginalize, normalize = True )
-        ret = computer.poi_upper_limit ( expected = expected, limit_on_xsec = True )
-        logger.debug("pyhf upper limit : {}".format(ret))
-        return ret
-    else:
-        logger.error(
-            "no covariance matrix or json file given in globalInfo.txt for %s"
-            % dataset.globalInfo.id
-        )
-        raise SModelSError(
-            "no covariance matrix or json file given in globalInfo.txt for %s"
-            % dataset.globalInfo.id
-        )
-
+    kwargs = {}
+    if dataset.type == "pyhf":
+        kwargs["normalize"] = True
+    computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
+           marginalize = dataset._marginalize, **kwargs )
+    ret = computer.poi_upper_limit ( expected = expected, limit_on_xsec = True )
+    logger.debug("pyhf upper limit : {}".format(ret))
+    return ret
 
 def getCombinedLikelihood(
     dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0
@@ -109,72 +84,6 @@ def getCombinedStatistics(
         deltas_rel, expected=expected, allowNegativeSignals=allowNegativeSignals,
     )
     return cslm
-
-_pyhfcomputers = {}
-
-def _getPyhfComputer(dataset, nsig, normalize=True):
-    """create the pyhf ul computer object
-    :param normalize: if true, normalize nsig
-    :returns: pyhf upper limit computer, and combinations of signal regions
-    """
-    idt = dataset.globalInfo.id + str(nsig)
-    if idt in _pyhfcomputers:
-        return _pyhfcomputers[idt]
-    # Getting the path to the json files
-    jsonFiles = [js for js in dataset.globalInfo.jsonFiles]
-    jsons = dataset.globalInfo.jsons.copy()
-    # datasets = [ds.getID() for ds in dataset._datasets]
-    datasets = [ds.getID() for ds in dataset.origdatasets]
-    total = sum(nsig)
-    # if total == 0.0:  # all signals zero? can divide by anything!
-    #     total = 1.0
-    if normalize and total != 0.:
-        nsig = [
-            s / total for s in nsig
-        ]  # Normalising signals to get an upper limit on the events count
-    # Filtering the json files by looking at the available datasets
-    for jsName in dataset.globalInfo.jsonFiles:
-        if all([ds not in dataset.globalInfo.jsonFiles[jsName] for ds in datasets]):
-            # No datasets found for this json combination
-            jsIndex = jsonFiles.index(jsName)
-            jsonFiles.pop(jsIndex)
-            jsons.pop(jsIndex)
-            continue
-        if not all([ds in datasets for ds in dataset.globalInfo.jsonFiles[jsName]]):
-            # Some SRs are missing for this json combination
-            logger.error( "Wrong json definition in globalInfo.jsonFiles for json : %s" % jsName)
-    logger.debug("list of datasets: {}".format(datasets))
-    logger.debug("jsonFiles after filtering: {}".format(jsonFiles))
-    # Constructing the list of signals with subsignals matching each json
-    nsignals = list()
-    for jsName in jsonFiles:
-        subSig = list()
-        for srName in dataset.globalInfo.jsonFiles[jsName]:
-            try:
-                index = datasets.index(srName)
-            except ValueError:
-                line = (
-                    f"{srName} signal region provided in globalInfo is not in the list of datasets, {jsName}:{','.join(datasets)}"
-                )
-                raise ValueError(line)
-            sig = nsig[index]
-            subSig.append(sig)
-        nsignals.append(subSig)
-    # Loading the jsonFiles, unless we already have them (because we pickled)
-    from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
-
-    data = PyhfData(nsignals, jsons, total, jsonFiles)
-    if data.errorFlag:
-        return None
-    if hasattr(dataset.globalInfo, "includeCRs"):
-        includeCRs = dataset.globalInfo.includeCRs
-    else:
-        includeCRs = False
-    ulcomputer = PyhfUpperLimitComputer(data, includeCRs=includeCRs,
-                                        lumi=dataset.getLumi() )
-    # _pyhfcomputers[idt] = ulcomputer
-    return ulcomputer
-
 
 def getCombinedSimplifiedLikelihood(
     dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0
