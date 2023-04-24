@@ -86,8 +86,14 @@ class StatsComputer:
         cov = dataset.globalInfo.covariance
         nobs = [ x.dataInfo.observedN for x in dataset._datasets ]
         bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
+        third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets ]
+        c = third_momenta.count ( None )
+        if c > 0:
+            if c < len(third_momenta):
+                logger.warning ( f"third momenta given for some but not all signal regions in {dataset.globalInfo.id}" )
+            third_momenta = None
         from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
-        data = Data( nobs, bg, cov, third_moment=None, nsignal = nsig,
+        data = Data( nobs, bg, cov, third_moment=third_momenta, nsignal = nsig,
                      deltas_rel = delta_sys, lumi=dataset.getLumi() )
         self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
