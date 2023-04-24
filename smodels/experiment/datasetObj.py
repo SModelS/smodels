@@ -13,12 +13,12 @@ import glob
 import numpy as np
 from smodels.experiment import txnameObj, infoObj
 from smodels.tools.physicsUnits import fb
-from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.theory.auxiliaryFunctions import getAttributesFrom, getValuesForObj
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.theory.element import Element
+from smodels.tools.statsTools import StatsComputer
 from typing import Union, Text
 
 import itertools
@@ -295,7 +295,6 @@ class DataSet(object):
                          if "posteriori" compute posterior expected
         :returns: likelihood to observe nobs events (float)
         """
-        from smodels.tools.statsTools import StatsComputer
         computer = StatsComputer ( self, nsig, deltas_rel )
         ret = computer.likelihood ( 1., expected = expected, return_nll = False )
         if hasattr ( computer, "theta_hat" ):
@@ -321,7 +320,6 @@ class DataSet(object):
                   muhat and its error (sigma_mu), possible also
                   the profile theta, theta_hat
         """
-        from smodels.tools.statsTools import StatsComputer
         computer = StatsComputer ( self, 1., deltas_rel )
         ret = computer.maximize_likelihood ( expected = expected,
                 allowNegativeSignals = allowNegativeSignals, return_nll = False )
