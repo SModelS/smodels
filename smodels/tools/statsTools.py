@@ -40,8 +40,13 @@ class StatsComputer:
                      marginalize : bool = False ):
         """ retrieve the statistical model """
         if self.dataset.getType() == "efficiencyMap":
-            self.getComputerSingleBin ( nsig, deltas_rel, marginalize )
-        # return self.getStatModelMultiBin ( nsig )
+            return self.getComputerSingleBin ( nsig, deltas_rel, marginalize )
+        # dataset.getType() is "combined"
+        assert self.dataset.type in ("simplified", "pyhf" ), \
+            f"I do not recognize the datatype {self.dataset.type}. it is not one of simplified, pyhf"
+        if self.dataset.type == "simplified":
+            return self.getComputerMultiBinSL ( nsig, deltas_rel, marginalize )
+        # self.getComputerPyhf ( nsig, deltas_rel, marginalize )
 
     def getComputerSingleBin(self, nsig: Union[float, np.ndarray],
             delta_sys : Union[None,float] = None,
@@ -62,6 +67,28 @@ class StatsComputer:
         self.marginalize = marginalize
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( )
+
+    def getComputerMultiBinSL(self, nsig: Union[float, np.ndarray],
+            delta_sys : Union[None,float] = None,
+            marginalize : bool = False
+    ):
+        """
+        Create computer from a multi bin SL result
+        :param nsig: signal yields.
+        """
+        if delta_sys == None:
+            delta_sys = 0.
+        dataset = self.dataset
+        cov = dataset.globalInfo.covariance
+        nobs = [ x.dataInfo.observedN for x in dataset._datasets ]
+        bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
+        from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
+        data = Data( nobs, bg, cov, third_moment=None, nsignal = nsig,
+                     deltas_rel = delta_sys, lumi=dataset.getLumi() )
+        self.data = data
+        self.marginalize = marginalize
+        self.likelihoodComputer = LikelihoodComputer ( data )
+        self.upperLimitComputer = UpperLimitComputer ( ntoys = 10000 )
 
     def likelihood ( self, poi_test : float, expected : Union[bool,Text],
                             return_nll : bool ) -> float:
@@ -99,10 +126,12 @@ class StatsComputer:
                               cross section
         """
         if limit_on_xsec:
-            return self.upperLimitComputer.getUpperLimitOnSigmaTimesEff( self.data,
+            ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff( self.data,
                    expected = expected )
-        return self.upperLimitComputer.getUpperLimitOnMu( self.data,
-               expected = expected )
+        else:
+            ret = self.upperLimitComputer.getUpperLimitOnMu( self.data,
+                   expected = expected )
+        return ret
 
 class SimpleStatsDataSet:
     """ a very simple data class that can replace a smodels.dataset,

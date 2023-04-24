@@ -13,7 +13,7 @@ from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperL
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
-
+from smodels.tools.statsTools import StatsComputer
 
 def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
     """
@@ -36,22 +36,9 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
         if len(cov) < 1:
             raise SModelSError("covariance matrix has length %d." % len(cov))
 
-        computer = UpperLimitComputer(ntoys=10000)
-
-        nobs = [x.dataInfo.observedN for x in dataset._datasets]
-        bg = [x.dataInfo.expectedBG for x in dataset._datasets]
-        no = nobs
-
-        d = Data(
-            observed=no,
-            backgrounds=bg,
-            covariance=cov,
-            third_moment=None,
-            nsignal=nsig,
-            deltas_rel=deltas_rel,
-            lumi=dataset.getLumi(),
-        )
-        ret = computer.getUpperLimitOnSigmaTimesEff(d, marginalize=dataset._marginalize, expected=expected)
+        computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
+               marginalize = dataset._marginalize )
+        ret = computer.poi_upper_limit ( expected = expected, limit_on_xsec = True )
         logger.debug("SL upper limit : {}".format(ret))
         return ret
     elif dataset.type == "pyhf":
