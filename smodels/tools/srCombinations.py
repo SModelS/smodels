@@ -74,9 +74,9 @@ def getCombinedLikelihood(
     if dataset.type == "pyhf":
         # Getting the path to the json files
         # Loading the jsonFiles
-        ulcomputer = _getPyhfComputer(dataset, nsig, False)
-        index = ulcomputer.getBestCombinationIndex()
-        lbsm = ulcomputer.likelihood(mu=mu, workspace_index=index, expected=expected)
+        computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
+               marginalize = dataset._marginalize, normalize = False )
+        lbsm = computer.likelihood ( poi_test = mu, expected = expected, return_nll = False )
         return lbsm
     lbsm = getCombinedSimplifiedLikelihood(
         dataset, nsig, marginalize, deltas_rel, expected=expected, mu=mu )
