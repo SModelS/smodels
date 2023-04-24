@@ -90,15 +90,8 @@ def getCombinedPyhfStatistics(
         # Loading the jsonFiles
         computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
                marginalize = dataset._marginalize, normalize = False )
-        ulcomputer = _getPyhfComputer(dataset, nsig, False)
-        lbsm = computer.likelihood(poi_test=1.0, expected=expected, return_nll = False )
-        ret = computer.maximize_likelihood ( expected = expected, allowNegativeSignals =allowNegativeSignals )
-        lmax = ret["llhd"]
-        muhat = ret["muhat"]
-        sigma_mu = ret["sigma_mu"]
-        lsm = computer.likelihood(poi_test=0.0, expected=expected, return_nll=False )
-        return { "lbsm": lbsm, "lmax": ret["llhd"], "lsm": lsm, "muhat": ret["muhat"],
-                 "sigma_mu": ret["sigma_mu"] }
+        ret = computer.get_five_values ( expected = expected, allowNegativeSignals =allowNegativeSignals, return_nll = False )
+        return ret
 
 def getCombinedStatistics(
     dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, allowNegativeSignals=False

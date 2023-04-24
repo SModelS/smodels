@@ -93,6 +93,17 @@ class StatsComputer:
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( ntoys = 10000 )
 
+    def get_five_values ( self, expected : Union [ bool, Text ], 
+                      return_nll : bool = False, allowNegativeSignals : bool =False )-> Dict:
+        """ return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat) """
+        ret = self.maximize_likelihood ( expected = expected, allowNegativeSignals =allowNegativeSignals, return_nll = return_nll  )
+        ret["lmax"] = ret.pop("llhd")
+        lbsm = self.likelihood ( poi_test = 1., expected=expected, return_nll = return_nll )
+        ret["lbsm"] = lbsm
+        lsm = self.likelihood ( poi_test = 0., expected=expected, return_nll = return_nll )
+        ret["lsm"] = lsm
+        return ret
+
     def getComputerPyhf(self, nsig: Union[float, np.ndarray],
             delta_sys : Union[None,float] = None, **kwargs
     ):
