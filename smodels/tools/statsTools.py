@@ -46,7 +46,7 @@ class StatsComputer:
             f"I do not recognize the datatype {self.dataset.type}. it is not one of simplified, pyhf"
         if self.dataset.type == "simplified":
             return self.getComputerMultiBinSL ( nsig, deltas_rel, marginalize )
-        # self.getComputerPyhf ( nsig, deltas_rel, marginalize )
+        self.getComputerPyhf ( nsig, deltas_rel, marginalize )
 
     def getComputerSingleBin(self, nsig: Union[float, np.ndarray],
             delta_sys : Union[None,float] = None,
@@ -89,6 +89,68 @@ class StatsComputer:
         self.marginalize = marginalize
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( ntoys = 10000 )
+
+    def getComputerPyhf(self, nsig: Union[float, np.ndarray],
+            delta_sys : Union[None,float] = None,
+            marginalize : bool = False
+    ):
+        """
+        Create computer for a pyhf result
+        :param nsig: signal yields.
+        """
+        normalize = True
+        jsonFiles = [js for js in dataset.globalInfo.jsonFiles]
+        jsons = dataset.globalInfo.jsons.copy()
+        # datasets = [ds.getID() for ds in dataset._datasets]
+        datasets = [ds.getID() for ds in dataset.origdatasets]
+        total = sum(nsig)
+        # if total == 0.0:  # all signals zero? can divide by anything!
+        #     total = 1.0
+        if normalize and total != 0.:
+            nsig = [
+                s / total for s in nsig
+            ]  # Normalising signals to get an upper limit on the events count
+        # Filtering the json files by looking at the available datasets
+        for jsName in dataset.globalInfo.jsonFiles:
+            if all([ds not in dataset.globalInfo.jsonFiles[jsName] for ds in datasets]):
+                # No datasets found for this json combination
+                jsIndex = jsonFiles.index(jsName)
+                jsonFiles.pop(jsIndex)
+                jsons.pop(jsIndex)
+                continue
+            if not all([ds in datasets for ds in dataset.globalInfo.jsonFiles[jsName]]):
+                # Some SRs are missing for this json combination
+                logger.error( "Wrong json definition in globalInfo.jsonFiles for json : %s" % jsName)
+        logger.debug("list of datasets: {}".format(datasets))
+        logger.debug("jsonFiles after filtering: {}".format(jsonFiles))
+        # Constructing the list of signals with subsignals matching each json
+        nsignals = list()
+        for jsName in jsonFiles:
+            subSig = list()
+            for srName in dataset.globalInfo.jsonFiles[jsName]:
+                try:
+                    index = datasets.index(srName)
+                except ValueError:
+                    line = (
+                        f"{srName} signal region provided in globalInfo is not in the list of datasets, {jsName}:{','.join(datasets)}"
+                    )
+                    raise ValueError(line)
+                sig = nsig[index]
+                subSig.append(sig)
+            nsignals.append(subSig)
+        # Loading the jsonFiles, unless we already have them (because we pickled)
+        from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
+
+        data = PyhfData(nsignals, jsons, total, jsonFiles)
+        if data.errorFlag:
+            return None
+        if hasattr(dataset.globalInfo, "includeCRs"):
+            includeCRs = dataset.globalInfo.includeCRs
+        else:
+            includeCRs = False
+        self.upperLimitComputer = PyhfUpperLimitComputer(data, includeCRs=includeCRs,
+                                            lumi=dataset.getLumi() )
+        self.likelihoodComputer = self.upperLimitComputer # for pyhf its the same
 
     def likelihood ( self, poi_test : float, expected : Union[bool,Text],
                             return_nll : bool ) -> float:

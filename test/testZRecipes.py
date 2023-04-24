@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 """
-.. module:: testNotebooks
-   :synopsis: Tests that the recipes runs
+.. module:: testZRecipes
+   :synopsis: Tests that the recipes runs (the Z in the name is,
+              so it gets tested last)
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -34,6 +35,7 @@ def listOfNotebooks(notebookDir=nbdir):
     import glob
     notebooks = glob.glob(f"{notebookDir}/*.ipynb")
     notebooks = list(notebooks)
+    notebooks.sort()
     notebooks = [os.path.basename(n) for n in notebooks]
     return notebooks
 
