@@ -13,6 +13,7 @@
 __all__ = [ "StatsComputer" ]
 
 from typing import Union, Text, Tuple, Dict, List
+from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
 import numpy as np
@@ -84,6 +85,11 @@ class StatsComputer:
             delta_sys = 0.
         dataset = self.dataset
         cov = dataset.globalInfo.covariance
+        if type(cov) != list:
+            raise SModelSError( f"covariance field has wrong type: {type(cov)}" )
+        if len(cov) < 1:
+            raise SModelSError( f"covariance matrix has length {len(cov)}." )
+
         nobs = [ x.dataInfo.observedN for x in dataset._datasets ]
         bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
         third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets ]
@@ -222,6 +228,9 @@ class StatsComputer:
                               cross section
         """
         if self.type == "pyhf":
+            if all([s == 0 for s in self.nsig]):
+                logger.warning("All signals are empty")
+                return None
             index = self.likelihoodComputer.getBestCombinationIndex()
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
