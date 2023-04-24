@@ -83,25 +83,22 @@ def getCombinedLikelihood(
     return lbsm
 
 def getCombinedPyhfStatistics(
-    dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False
+    dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, 
+    allowNegativeSignals=False
 ):
         # Getting the path to the json files
         # Loading the jsonFiles
+        computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
+               marginalize = dataset._marginalize, normalize = False )
         ulcomputer = _getPyhfComputer(dataset, nsig, False)
-        index = ulcomputer.getBestCombinationIndex()
-        lbsm = ulcomputer.likelihood(mu=1.0, workspace_index=index, expected=expected)
-        lmax = ulcomputer.lmax(
-            workspace_index=index, expected=expected, allowNegativeSignals=allowNegativeSignals
-        )
-        muhat = None
-        try:
-            muhat = float(ulcomputer.muhat)
-        except AttributeError:
-            pass
-        sigma_mu = ulcomputer.sigma_mu
-        ulcomputer = _getPyhfComputer(dataset, [0.0] * len(nsig), False)
-        lsm = ulcomputer.likelihood(mu=0.0, workspace_index=index, expected=expected)
-        return {"lbsm": lbsm, "lmax": lmax, "lsm": lsm, "muhat": muhat, "sigma_mu": sigma_mu}
+        lbsm = computer.likelihood(poi_test=1.0, expected=expected, return_nll = False )
+        ret = computer.maximize_likelihood ( expected = expected, allowNegativeSignals =allowNegativeSignals )
+        lmax = ret["llhd"]
+        muhat = ret["muhat"]
+        sigma_mu = ret["sigma_mu"]
+        lsm = computer.likelihood(poi_test=0.0, expected=expected, return_nll=False )
+        return { "lbsm": lbsm, "lmax": ret["llhd"], "lsm": lsm, "muhat": ret["muhat"],
+                 "sigma_mu": ret["sigma_mu"] }
 
 def getCombinedStatistics(
     dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, allowNegativeSignals=False

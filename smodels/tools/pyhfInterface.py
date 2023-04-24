@@ -526,7 +526,7 @@ class PyhfUpperLimitComputer:
                     1.0, wsData, model, return_fitted_val=True, maxiter=200
                 )
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                logger.debug(f"pyhf fixed_poi_fit failed for mu={mu}: {e}")
+                logger.error(f"pyhf fixed_poi_fit failed for mu={mu}: {e}")
                 # lets try with different initialisation
                 init, n_ = pyhf.infer.mle.fixed_poi_fit(
                     0.0, workspace.data(model), model, return_fitted_val=True, maxiter=200
@@ -677,7 +677,8 @@ class PyhfUpperLimitComputer:
         n = len ( obss )
         # print ( f" sigma_mu from pyhf uncorr {var_mu} {n} "  )
         sigma_mu = float ( np.sqrt ( var_mu / (n**2) ) )
-        self.sigma_mu = sigma_mu
+        # self.sigma_mu = sigma_mu
+        return sigma_mu
         #import IPython
         #IPython.embed()
         #sys.exit()
@@ -716,7 +717,6 @@ class PyhfUpperLimitComputer:
             msettings = {"normsys": {"interpcode": "code4"}, "histosys": {"interpcode": "code4p"}}
             model = workspace.model(modifier_settings=msettings)
             # obs = workspace.data(model)
-            self.getSigmaMu(workspace)
             try:
                 bounds = model.config.suggested_bounds()
                 if allowNegativeSignals:
@@ -737,17 +737,18 @@ class PyhfUpperLimitComputer:
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.error(f"pyhf mle.fit failed {e}")
                 muhat, maxNllh = float("nan"), float("nan")
-            self.muhat = muhat
             try:
-                ret = maxNllh.tolist()
+                lmax = maxNllh.tolist()
             except:
-                ret = maxNllh
+                lmax= maxNllh
             try:
-                ret = float(ret)
+                lmax = float(lmax)
             except:
-                ret = float(ret[0])
+                lmax = float(lmax[0])
+            sigma_mu = self.getSigmaMu ( workspace )
+            lmax = self.exponentiateNLL(lmax, not nll)
+            ret = { "llhd": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
             self.data.cached_lmaxes[workspace_index] = ret
-            ret = self.exponentiateNLL(ret, not nll)
             return ret
 
     def updateWorkspace(self, workspace_index=None, expected=False):

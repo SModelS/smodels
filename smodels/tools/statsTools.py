@@ -18,13 +18,16 @@ from smodels.tools.physicsUnits import fb
 import numpy as np
 
 class StatsComputer:
+    __slots__ = [ "nsig", "dataset", "data", "marginalize", "likelihoodComputer",
+                  "upperLimitComputer", "type" ]
     def __init__ ( self, dataset, nsig : Union[float,list],
                    deltas_rel : Union[None,float] = None,
-                   marginalize : bool = False ):
+                   marginalize : bool = False, **kwargs ):
         """ initialise with dataset.
         :param dataset: a smodels (combined)dataset
         :param nsig: signal yield, either as float or as list
         :param deltas_rel: relative error on signal. currently unused
+        :param marginalize: profile (False) or marginalize (True)
         """
         #if deltas_rel != None:
         #    logger.warning("Relative uncertainty on signal not supported for a single region.")
@@ -33,30 +36,32 @@ class StatsComputer:
 
         self.dataset = dataset
         self.nsig = nsig
-        self.getComputer ( nsig, deltas_rel, marginalize )
+        self.getComputer ( nsig, deltas_rel, marginalize, **kwargs )
 
     def getComputer( self, nsig : Union [ float, np.ndarray ],
                      deltas_rel : Union [ float, None ],
-                     marginalize : bool = False ):
+                     marginalize : bool = False,
+                     **kwargs ):
         """ retrieve the statistical model """
+        self.marginalize = marginalize
         if self.dataset.getType() == "efficiencyMap":
-            return self.getComputerSingleBin ( nsig, deltas_rel, marginalize )
+            return self.getComputerSingleBin ( nsig, deltas_rel )
         # dataset.getType() is "combined"
         assert self.dataset.type in ("simplified", "pyhf" ), \
             f"I do not recognize the datatype {self.dataset.type}. it is not one of simplified, pyhf"
         if self.dataset.type == "simplified":
-            return self.getComputerMultiBinSL ( nsig, deltas_rel, marginalize )
-        self.getComputerPyhf ( nsig, deltas_rel, marginalize )
+            return self.getComputerMultiBinSL ( nsig, deltas_rel )
+        self.getComputerPyhf ( nsig, deltas_rel, **kwargs )
 
     def getComputerSingleBin(self, nsig: Union[float, np.ndarray],
             delta_sys : Union[None,float] = None,
-            marginalize : bool = False
 #            allow_negative_signal : bool = False
     ):
         """
         Create computer from a single bin
         :param nsig: signal yields.
         """
+        self.type = "1bin"
         if delta_sys == None:
             delta_sys = 0.
         dataset = self.dataset
@@ -64,18 +69,17 @@ class StatsComputer:
         data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = delta_sys )
         self.data = data
-        self.marginalize = marginalize
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( )
 
     def getComputerMultiBinSL(self, nsig: Union[float, np.ndarray],
-            delta_sys : Union[None,float] = None,
-            marginalize : bool = False
+            delta_sys : Union[None,float] = None
     ):
         """
         Create computer from a multi bin SL result
         :param nsig: signal yields.
         """
+        self.type = "SL"
         if delta_sys == None:
             delta_sys = 0.
         dataset = self.dataset
@@ -86,23 +90,23 @@ class StatsComputer:
         data = Data( nobs, bg, cov, third_moment=None, nsignal = nsig,
                      deltas_rel = delta_sys, lumi=dataset.getLumi() )
         self.data = data
-        self.marginalize = marginalize
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( ntoys = 10000 )
 
     def getComputerPyhf(self, nsig: Union[float, np.ndarray],
-            delta_sys : Union[None,float] = None,
-            marginalize : bool = False
+            delta_sys : Union[None,float] = None, **kwargs
     ):
         """
         Create computer for a pyhf result
         :param nsig: signal yields.
         """
-        normalize = True
-        jsonFiles = [js for js in dataset.globalInfo.jsonFiles]
-        jsons = dataset.globalInfo.jsons.copy()
+        self.type = "pyhf"
+        normalize = kwargs["normalize"] if "normalize" in kwargs else False
+        globalInfo = self.dataset.globalInfo
+        jsonFiles = [js for js in globalInfo.jsonFiles]
+        jsons = globalInfo.jsons.copy()
         # datasets = [ds.getID() for ds in dataset._datasets]
-        datasets = [ds.getID() for ds in dataset.origdatasets]
+        datasets = [ds.getID() for ds in self.dataset.origdatasets]
         total = sum(nsig)
         # if total == 0.0:  # all signals zero? can divide by anything!
         #     total = 1.0
@@ -111,14 +115,14 @@ class StatsComputer:
                 s / total for s in nsig
             ]  # Normalising signals to get an upper limit on the events count
         # Filtering the json files by looking at the available datasets
-        for jsName in dataset.globalInfo.jsonFiles:
-            if all([ds not in dataset.globalInfo.jsonFiles[jsName] for ds in datasets]):
+        for jsName in globalInfo.jsonFiles:
+            if all([ds not in globalInfo.jsonFiles[jsName] for ds in datasets]):
                 # No datasets found for this json combination
                 jsIndex = jsonFiles.index(jsName)
                 jsonFiles.pop(jsIndex)
                 jsons.pop(jsIndex)
                 continue
-            if not all([ds in datasets for ds in dataset.globalInfo.jsonFiles[jsName]]):
+            if not all([ds in datasets for ds in globalInfo.jsonFiles[jsName]]):
                 # Some SRs are missing for this json combination
                 logger.error( "Wrong json definition in globalInfo.jsonFiles for json : %s" % jsName)
         logger.debug("list of datasets: {}".format(datasets))
@@ -127,7 +131,7 @@ class StatsComputer:
         nsignals = list()
         for jsName in jsonFiles:
             subSig = list()
-            for srName in dataset.globalInfo.jsonFiles[jsName]:
+            for srName in globalInfo.jsonFiles[jsName]:
                 try:
                     index = datasets.index(srName)
                 except ValueError:
@@ -144,23 +148,37 @@ class StatsComputer:
         data = PyhfData(nsignals, jsons, total, jsonFiles)
         if data.errorFlag:
             return None
-        if hasattr(dataset.globalInfo, "includeCRs"):
-            includeCRs = dataset.globalInfo.includeCRs
+        if hasattr(globalInfo, "includeCRs"):
+            includeCRs = globalInfo.includeCRs
         else:
             includeCRs = False
         self.upperLimitComputer = PyhfUpperLimitComputer(data, includeCRs=includeCRs,
-                                            lumi=dataset.getLumi() )
+                                            lumi=self.dataset.getLumi() )
         self.likelihoodComputer = self.upperLimitComputer # for pyhf its the same
 
     def likelihood ( self, poi_test : float, expected : Union[bool,Text],
-                            return_nll : bool ) -> float:
+                            return_nll : bool, **kwargs ) -> float:
         """ simple frontend to individual computers """
+        self.transform ( expected )
+        if self.type == "pyhf":
+            if not "workspace_index" in kwargs:
+                index = self.likelihoodComputer.getBestCombinationIndex()
+                kwargs["workspace_index"] = index
+            return self.likelihoodComputer.likelihood ( 
+                    poi_test, nll = return_nll, 
+                    expected = expected, **kwargs )
+        return self.likelihoodComputer.likelihood ( poi_test * np.array (self.nsig), 
+                nll = return_nll, marginalize = self.marginalize, **kwargs )
+
+    def transform ( self, expected ):
+        """ SL only. transform the data to expected or observed """
+        if self.type == "pyhf":
+            return
         self.likelihoodComputer.transform ( expected )
-        return self.likelihoodComputer.likelihood ( poi_test * self.nsig, nll = return_nll, marginalize = self.marginalize )
 
     def maximize_likelihood ( self, expected : Union[bool,Text],
            allowNegativeSignals : bool = True,
-           return_nll : bool = False  ) -> dict:
+           return_nll : bool = False, **kwargs  ) -> dict:
         """ simple frontend to the individual computers, later spey
         :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: allow also negative muhats
@@ -168,16 +186,15 @@ class StatsComputer:
                   muhat, sigma_mu (sigma of mu_hat),
                   optionally also theta_hat
         """
-        self.likelihoodComputer.transform ( expected )
-        lmax = self.likelihoodComputer.lmax ( nll = return_nll,
-               allowNegativeSignals = allowNegativeSignals,
-               marginalize = self.marginalize )
-        self.sigma_mu = self.likelihoodComputer.sigma_mu
-        self.muhat = self.likelihoodComputer.muhat
-        ret = { "llhd": lmax, "muhat": self.likelihoodComputer.muhat,
-                "sigma_mu": self.likelihoodComputer.sigma_mu }
-        if hasattr ( self.likelihoodComputer, "theta_hat" ):
-            ret["theta_hat"] = self.likelihoodComputer.theta_hat
+        self.transform ( expected )
+        ret = self.likelihoodComputer.lmax ( nll = return_nll,
+               allowNegativeSignals = allowNegativeSignals, **kwargs )
+        #self.sigma_mu = self.likelihoodComputer.sigma_mu
+        #self.muhat = self.likelihoodComputer.muhat
+        #ret = { "llhd": lmax, "muhat": self.likelihoodComputer.muhat,
+        #        "sigma_mu": self.likelihoodComputer.sigma_mu }
+        #if hasattr ( self.likelihoodComputer, "theta_hat" ):
+        #    ret["theta_hat"] = self.likelihoodComputer.theta_hat
         return ret
 
     def poi_upper_limit ( self, expected : Union [ bool, Text ],

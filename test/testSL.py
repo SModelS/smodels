@@ -107,17 +107,23 @@ class SLTest(unittest.TestCase):
         ul = ulComp.getUpperLimitOnMu( m, marginalize=True )
         ## Nick's profiling code gets for n=3 ul=2135.66
         self.assertAlmostEqual(ul / 2195.3529619253704, 1.0, 1)
-        lmax = lComp.lmax ( )
+        ret = lComp.lmax ( )
+        lmax = ret["llhd"]
+        muhat = ret["muhat"]
+        sigma_mu = ret["sigma_mu"]
         self.assertAlmostEqual( lmax, 2.1722054152e-09, 7 )
-        self.assertAlmostEqual( lComp.muhat, 0. )
+        self.assertAlmostEqual( muhat, 0. )
         # self.assertAlmostEqual( lComp.sigma_mu, 798.9887891147, 2 )
-        self.assertAlmostEqual( lComp.sigma_mu, 800.1380826235132, 2 )
-        lmax = lComp.lmax ( allowNegativeSignals=True )
+        self.assertAlmostEqual( sigma_mu, 800.1380826235132, 2 )
+        ret = lComp.lmax ( allowNegativeSignals=True )
+        lmax = ret["llhd"]
+        muhat = ret["muhat"]
+        sigma_mu = ret["sigma_mu"]
         self.assertAlmostEqual( lmax, 2.1708552631256182e-09, 8 )
         #self.assertAlmostEqual( lComp.muhat, -71.523083468, 7 )
-        self.assertAlmostEqual( lComp.muhat, -72.63852360245156, 7 )
+        self.assertAlmostEqual( muhat, -72.63852360245156, 7 )
         #self.assertAlmostEqual( lComp.sigma_mu, 795.0121298843319 )
-        self.assertAlmostEqual( lComp.sigma_mu, 796.122901385052, 4 )
+        self.assertAlmostEqual( sigma_mu, 796.122901385052, 4 )
 
     def xestModel1(self):
         """ take first SR of model-90 """
@@ -180,10 +186,11 @@ class SLTest(unittest.TestCase):
         lComp = LikelihoodComputer( m )
         theta_hat = lComp.findThetaHat( 1. )
         pprint ( "theta_hat", theta_hat )
-        lmax = lComp.lmax()
+        ret = lComp.lmax()
+        lmax = ret["llhd"]
         lm = lComp.likelihood ( 1. )
-        muhat = lComp.muhat
-        sigma_mu = lComp.sigma_mu
+        muhat = ret["muhat"]
+        sigma_mu = ret["sigma_mu"]
         pprint ( "muhat", muhat, "sigma_mu", sigma_mu )
         theta_hat = lComp.findThetaHat( muhat )
         pprint ( "theta_hat", theta_hat )
@@ -194,8 +201,8 @@ class SLTest(unittest.TestCase):
         ulProf = ulComp.getUpperLimitOnMu ( m, marginalize=False )
         pprint ( "ulProf", ulProf )
         self.assertAlmostEqual ( lmax, lm, 3 )
-        self.assertAlmostEqual ( lComp.muhat, 1., 5 )
-        self.assertAlmostEqual ( lComp.sigma_mu, 0.655333438756686, 5 )
+        self.assertAlmostEqual ( muhat, 1., 5 )
+        self.assertAlmostEqual ( sigma_mu, 0.655333438756686, 5 )
         # self.assertAlmostEqual ( lComp.sigma_mu, 0.6123724356957945 )
         self.assertAlmostEqual ( ulProf, 2.4412989438119546, 5 )
         # self.assertAlmostEqual ( ulProf, 2.537934980801342, 5 )

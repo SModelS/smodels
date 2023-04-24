@@ -917,18 +917,19 @@ class LikelihoodComputer:
             dn = self.model.observed - self.model.backgrounds
             if not allowNegativeSignals and dn[0] < 0.0:
                 dn = [0.0]
-            self.muhat = float(dn[0])
+            muhat = float(dn[0])
             if abs(self.model.nsignal) > 1e-100:
                 self.muhat = float(dn[0] / self.model.nsignal[0])
-            self.sigma_mu = np.sqrt(self.model.observed[0] + self.model.covariance[0][0])
-            return self.likelihood(marginalize=marginalize, nll=nll, mu = self.muhat )
+            sigma_mu = np.sqrt(self.model.observed[0] + self.model.covariance[0][0])
+            ret= self.likelihood(marginalize=marginalize, nll=nll, mu = self.muhat )
+            return { "llhd": ret, "muhat": muhat, "sigma_mu": sigma_mu }
         fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
                               extended_output=True, nll=nll
         )
         muhat_, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
-        self.muhat = muhat_
-        self.sigma_mu = sigma_mu
-        return self.likelihood ( marginalize=marginalize, nll=nll, mu=muhat_ )
+        lmax = self.likelihood ( marginalize=marginalize, nll=nll, mu=muhat_ )
+        ret = { "llhd": lmax, "muhat": muhat_, "sigma_mu": sigma_mu }
+        return ret
 
     def findMuHat(
     #def findMuHatViaGradientDescent(
