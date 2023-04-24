@@ -14,6 +14,9 @@ import warnings
 import jsonschema
 import copy
 
+import warnings
+warnings.filterwarnings("ignore")
+
 jsonver = ""
 try:
     import importlib.metadata
