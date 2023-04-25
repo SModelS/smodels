@@ -14,11 +14,12 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statistics import TruncatedGaussians
+from smodels.tools.statsTools import StatsComputer
 from smodels.tools.srCombinations import getCombinedStatistics, \
             getCombinedUpperLimitFor, getCombinedLikelihood
 import itertools
 import numpy as np
-
+# from test.debug import printTo
 
 class TheoryPrediction(object):
     """
@@ -269,12 +270,13 @@ class TheoryPrediction(object):
                 srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0
                 for ds in self.dataset.origdatasets
             ]
-            llhd = getCombinedLikelihood(
-                self.dataset, srNsigs, self.marginalize, self.deltas_rel, expected=expected, mu=mu
-            )
+            computer = StatsComputer ( self.dataset, srNsigs, 
+                    deltas_rel = self.deltas_rel, marginalize = self.marginalize, 
+                    normalize_sig = False )
+            llhd = computer.likelihood ( poi_test = mu, expected = expected,
+                                        return_nll = False )
         if self.dataType() == "efficiencyMap":
             nsig = (mu * self.xsection.value * lumi).asNumber()
-            from smodels.tools.statsTools import StatsComputer
             computer = StatsComputer ( self.dataset, nsig, self.deltas_rel )
             llhd = computer.likelihood ( 1., expected = expected, return_nll = False )
 
@@ -381,7 +383,6 @@ class TheoryPrediction(object):
         elif self.dataType() == "efficiencyMap":
             lumi = self.dataset.getLumi()
             nsig = (self.xsection.value * lumi).asNumber()
-            from smodels.tools.statsTools import StatsComputer
             computer = StatsComputer ( self.dataset, nsig, self.deltas_rel )
             llhd = computer.likelihood ( 1., expected = expected, return_nll = False )
             llhd_sm = computer.likelihood ( 0., expected = expected, return_nll = False )
