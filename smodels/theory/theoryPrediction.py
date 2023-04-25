@@ -15,7 +15,7 @@ from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statistics import TruncatedGaussians
 from smodels.tools.statsTools import StatsComputer
-from smodels.tools.srCombinations import getCombinedUpperLimitFor
+# from smodels.tools.srCombinations import getCombinedUpperLimitFor
 import itertools
 import numpy as np
 # from test.debug import printTo
@@ -131,9 +131,17 @@ class TheoryPrediction(object):
                         srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0
                         for ds in self.dataset.origdatasets
                     ]
-                self.cachedObjs[expected]["UL"] = getCombinedUpperLimitFor(
+                """
+                ul2 = getCombinedUpperLimitFor(
                     self.dataset, srNsigs, expected=expected, deltas_rel=self.deltas_rel
                 )
+                """
+                computer = StatsComputer ( self.dataset, srNsigs,
+                    deltas_rel = self.deltas_rel, marginalize = self.marginalize,
+                    normalize_sig = False )
+                ul = computer.poi_upper_limit ( expected = expected,
+                    limit_on_xsec = True )
+                self.cachedObjs[expected]["UL"] = ul
 
         # Return the expected or observed UL:
         # if not self.cachedObjs[expected]["UL"]:
@@ -269,8 +277,8 @@ class TheoryPrediction(object):
                 srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0
                 for ds in self.dataset.origdatasets
             ]
-            computer = StatsComputer ( self.dataset, srNsigs, 
-                    deltas_rel = self.deltas_rel, marginalize = self.marginalize, 
+            computer = StatsComputer ( self.dataset, srNsigs,
+                    deltas_rel = self.deltas_rel, marginalize = self.marginalize,
                     normalize_sig = False )
             llhd = computer.likelihood ( poi_test = mu, expected = expected,
                                         return_nll = False )
@@ -343,7 +351,7 @@ class TheoryPrediction(object):
             nllhd, nmuhat, nsigma_mu = computer.likelihood ( 0. )
         """
         self.muhat_ = muhat
-        self.sigma_mu_ = sigma_mu 
+        self.sigma_mu_ = sigma_mu
         if chi2also:
             return (llhd, computer.chi2 ( ) )
         return llhd
@@ -423,8 +431,8 @@ class TheoryPrediction(object):
                 allowNegativeSignals=allowNegativeSignals,
             )
             """
-            computer = StatsComputer ( self.dataset, srNsigs, 
-                    deltas_rel = self.deltas_rel, marginalize = self.marginalize, 
+            computer = StatsComputer ( self.dataset, srNsigs,
+                    deltas_rel = self.deltas_rel, marginalize = self.marginalize,
                     normalize_sig = False )
             s = computer.get_five_values ( expected = expected,
                     return_nll = False, allowNegativeSignals = allowNegativeSignals )
@@ -437,7 +445,7 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = s["sigma_mu"]
             from smodels.tools.statistics import chi2FromLmax
 
-            self.cachedObjs[expected]["chi2"] = chi2FromLmax(llhd, lmax)
+            self.cachedObjs[expected]["chi2"] = chi2FromLmax(s["lbsm"], s["lmax"] )
 
     def totalXsection(self):
         return self.xsection.value
