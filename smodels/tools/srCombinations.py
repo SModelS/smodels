@@ -97,27 +97,10 @@ def getCombinedSimplifiedLikelihood(
     :param mu: signal strength parameter mu
     :returns: likelihood to observe nobs events (float)
     """
-    # computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
-    #       marginalize = dataset._marginalize, normalize_sig = True )
-    # ret = computer.likelihood ( poi_test = mu, expected = expected )
-    for k, v in enumerate(nsig):
-        nsig[k] = v * mu
-
-    if dataset.type != "simplified":
-        logger.error(
-            "Asked for combined simplified likelihood, but no covariance given: %s" % dataset.type
-        )
-        return None
-    if len(dataset.origdatasets) == 1:
-        if isinstance(nsig, list):
-            nsig = nsig[0]
-        return dataset.origdatasets[0].likelihood(nsig, marginalize=marginalize)
-    bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
-    nobs = [x.dataInfo.observedN for x in dataset.origdatasets]
-    cov = dataset.globalInfo.covariance
-    computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-    computer.transform ( expected )
-    ret = computer.likelihood(1., marginalize=marginalize)
+    computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
+           marginalize = dataset._marginalize, normalize_sig = False )
+    ret = computer.likelihood ( poi_test = mu, expected = expected,
+                                return_nll = False )
     return ret
 
 def getCombinedSimplifiedStatistics(
