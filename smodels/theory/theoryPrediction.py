@@ -387,8 +387,8 @@ class TheoryPrediction(object):
             llhd_sm = computer.likelihood ( 0., expected = expected, return_nll = False )
             ret = computer.maximize_likelihood ( expected = expected, allowNegativeSignals = allowNegativeSignals )
             llhd_max = ret["llhd"]
-            muhat = ret["muhat"] / nsig
-            sigma_mu = float ( ret["sigma_mu"] / nsig )
+            muhat = ret["muhat"]
+            sigma_mu = float ( ret["sigma_mu"] )
             if not "sigma_mu" in self.cachedObjs[expected]:
                 self.cachedObjs[expected]["sigma_mu"] = {}
             self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = sigma_mu

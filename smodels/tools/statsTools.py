@@ -73,7 +73,8 @@ class StatsComputer:
         dataset = self.dataset
         from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
         data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
-                     dataset.dataInfo.bgError**2, deltas_rel = self.deltas_sys )
+                     dataset.dataInfo.bgError**2, deltas_rel = self.deltas_sys,
+                     nsignal = self.nsig )
         self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( )
@@ -182,10 +183,7 @@ class StatsComputer:
             return self.likelihoodComputer.likelihood (
                     poi_test, nll = return_nll,
                     expected = expected, **kwargs )
-        #from test.debug import printTo
-        #printTo ( f"likelihood {self.nsig} {poi_test}" )
-        #print ( f"likelihood {self.nsig} {poi_test}" )
-        return self.likelihoodComputer.likelihood ( poi_test * self.nsig,
+        return self.likelihoodComputer.likelihood ( poi_test,
                 nll = return_nll, marginalize = self.marginalize, **kwargs )
 
     def transform ( self, expected ):
