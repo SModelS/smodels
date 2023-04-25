@@ -928,7 +928,7 @@ class LikelihoodComputer:
         )
         muhat_, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         lmax = self.likelihood ( marginalize=marginalize, nll=nll, mu=muhat_ )
-        ret = { "llhd": lmax, "muhat": muhat_, "sigma_mu": sigma_mu }
+        ret = { "llhd": lmax, "muhat": float ( muhat_ ), "sigma_mu": sigma_mu }
         return ret
 
     def findMuHat(

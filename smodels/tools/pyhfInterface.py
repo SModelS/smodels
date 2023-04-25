@@ -732,7 +732,7 @@ class PyhfUpperLimitComputer:
                     # print ( f"\n>>> sigma_mu from hessian {sigma_mu:.2f}" )
                     pyhf.set_backend(pyhf.tensorlib, 'scipy')
 
-                muhat = muhat[model.config.poi_index]*self.scale
+                muhat = float ( muhat[model.config.poi_index]*self.scale )
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.error(f"pyhf mle.fit failed {e}")

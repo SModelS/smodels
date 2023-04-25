@@ -231,12 +231,6 @@ class StatsComputer:
                 kwargs["workspace_index"] = index
         ret = self.likelihoodComputer.lmax ( nll = return_nll,
                allowNegativeSignals = allowNegativeSignals, **kwargs )
-        #self.sigma_mu = self.likelihoodComputer.sigma_mu
-        #self.muhat = self.likelihoodComputer.muhat
-        #ret = { "llhd": lmax, "muhat": self.likelihoodComputer.muhat,
-        #        "sigma_mu": self.likelihoodComputer.sigma_mu }
-        #if hasattr ( self.likelihoodComputer, "theta_hat" ):
-        #    ret["theta_hat"] = self.likelihoodComputer.theta_hat
         return ret
 
     def poi_upper_limit ( self, expected : Union [ bool, Text ],

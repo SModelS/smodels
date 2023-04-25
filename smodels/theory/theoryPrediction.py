@@ -15,8 +15,7 @@ from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statistics import TruncatedGaussians
 from smodels.tools.statsTools import StatsComputer
-from smodels.tools.srCombinations import getCombinedStatistics, \
-            getCombinedUpperLimitFor, getCombinedLikelihood
+from smodels.tools.srCombinations import getCombinedUpperLimitFor
 import itertools
 import numpy as np
 # from test.debug import printTo
@@ -414,7 +413,7 @@ class TheoryPrediction(object):
                 srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0
                 for ds in self.dataset.origdatasets
             ]
-            # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0. for dataID in self.dataset.globalInfo.datasetOrder]
+            """
             s = getCombinedStatistics(
                 self.dataset,
                 srNsigs,
@@ -423,20 +422,19 @@ class TheoryPrediction(object):
                 expected=expected,
                 allowNegativeSignals=allowNegativeSignals,
             )
-            llhd, lmax, lsm, muhat, sigma_mu = (
-                s["lbsm"],
-                s["lmax"],
-                s["lsm"],
-                s["muhat"],
-                s["sigma_mu"],
-            )
-            self.cachedObjs[expected]["llhd"] = llhd
-            self.cachedObjs[expected]["lsm"] = lsm
-            self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
-            self.cachedObjs[expected]["muhat"][allowNegativeSignals] = muhat
+            """
+            computer = StatsComputer ( self.dataset, srNsigs, 
+                    deltas_rel = self.deltas_rel, marginalize = self.marginalize, 
+                    normalize_sig = False )
+            s = computer.get_five_values ( expected = expected,
+                    return_nll = False, allowNegativeSignals = allowNegativeSignals )
+            self.cachedObjs[expected]["llhd"] = s["lbsm"]
+            self.cachedObjs[expected]["lsm"] = s["lsm"]
+            self.cachedObjs[expected]["lmax"][allowNegativeSignals] = s["lmax"]
+            self.cachedObjs[expected]["muhat"][allowNegativeSignals] = s["muhat"]
             if not "sigma_mu" in self.cachedObjs[expected]:
                 self.cachedObjs[expected]["sigma_mu"] = {}
-            self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = sigma_mu
+            self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = s["sigma_mu"]
             from smodels.tools.statistics import chi2FromLmax
 
             self.cachedObjs[expected]["chi2"] = chi2FromLmax(llhd, lmax)
