@@ -92,9 +92,13 @@ class StatsComputer:
         if len(cov) < 1:
             raise SModelSError( f"covariance matrix has length {len(cov)}." )
 
-        nobs = [ x.dataInfo.observedN for x in dataset._datasets ]
-        bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
-        third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets ]
+        nobs = [ x.dataInfo.observedN for x in dataset.origdatasets ]
+        bg = [ x.dataInfo.expectedBG for x in dataset.origdatasets ]
+        third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset.origdatasets ]
+        # FIXME are we sure thats right, its not the one below?
+        # nobs = [ x.dataInfo.observedN for x in dataset._datasets ]
+        # bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
+        # third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets ]
         c = third_momenta.count ( None )
         if c > 0:
             if c < len(third_momenta):
@@ -108,14 +112,31 @@ class StatsComputer:
         self.upperLimitComputer = UpperLimitComputer ( ntoys = 10000 )
 
     def get_five_values ( self, expected : Union [ bool, Text ],
-                      return_nll : bool = False, allowNegativeSignals : bool =False )-> Dict:
-        """ return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat) """
+                      return_nll : bool = False, allowNegativeSignals : bool =False,
+                      check_for_maxima : bool = False )-> Dict:
+        """ return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat) 
+        :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
+             correct, if necessary
+        """
         ret = self.maximize_likelihood ( expected = expected, allowNegativeSignals =allowNegativeSignals, return_nll = return_nll  )
-        ret["lmax"] = ret.pop("llhd")
+        lmax = ret.pop("llhd")
+        ret["lmax"] = lmax
+        
         lbsm = self.likelihood ( poi_test = 1., expected=expected, return_nll = return_nll )
         ret["lbsm"] = lbsm
         lsm = self.likelihood ( poi_test = 0., expected=expected, return_nll = return_nll )
         ret["lsm"] = lsm
+        if check_for_maxima:
+            if lsm > lmax:
+                muhat = ret["muhat"]
+                logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+                ret["lmax"] = lsm
+                ret["muhat"] = 0.0
+            if lbsm > lmax:
+                muhat = ret["muhat"]
+                logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+                ret["lmax"] = lbsm
+                ret["muhat"] = 1.0
         return ret
 
     def getComputerPyhf(self ):

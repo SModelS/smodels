@@ -14,6 +14,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
 from smodels.tools.statsTools import StatsComputer
+# from test.debug import printTo
 
 def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
     """
@@ -56,7 +57,7 @@ def getCombinedLikelihood(
     return lbsm
 
 def getCombinedPyhfStatistics(
-    dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, 
+    dataset, nsig, marginalize, deltas_rel, nll=False, expected=False,
     allowNegativeSignals=False
 ):
         # Getting the path to the json files
@@ -96,6 +97,9 @@ def getCombinedSimplifiedLikelihood(
     :param mu: signal strength parameter mu
     :returns: likelihood to observe nobs events (float)
     """
+    # computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
+    #       marginalize = dataset._marginalize, normalize_sig = True )
+    # ret = computer.likelihood ( poi_test = mu, expected = expected )
     for k, v in enumerate(nsig):
         nsig[k] = v * mu
 
@@ -113,7 +117,8 @@ def getCombinedSimplifiedLikelihood(
     cov = dataset.globalInfo.covariance
     computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
     computer.transform ( expected )
-    return computer.likelihood(1., marginalize=marginalize)
+    ret = computer.likelihood(1., marginalize=marginalize)
+    return ret
 
 def getCombinedSimplifiedStatistics(
     dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False
@@ -121,28 +126,8 @@ def getCombinedSimplifiedStatistics(
     """compute likelihood at maximum, for simplified likelihoods only"""
     if dataset.type != "simplified":
         return {"lmax": -1.0, "muhat": None, "sigma_mu": None}
-    nobs = [x.dataInfo.observedN for x in dataset.origdatasets]
-    bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
-    bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
-    cov = dataset.globalInfo.covariance
-    if type(nsig) in [list, tuple]:
-        nsig = np.array(nsig)
-    computer = LikelihoodComputer(Data(nobs, bg, cov, None, nsig, deltas_rel=deltas_rel))
-    computer.transform ( expected )
-    ret = computer.findMuHat(allowNegativeSignals=allowNegativeSignals, extended_output=True)
-    lbsm = computer.likelihood ( 1., marginalize = marginalize )
-    lsm = computer.likelihood ( 0., marginalize = marginalize )
-    lmax = ret["lmax"]
-    if lsm > lmax:
-        muhat = ret["muhat"]
-        logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-        ret["lmax"] = lsm
-        ret["muhat"] = 0.0
-    if lbsm > lmax:
-        muhat = ret["muhat"]
-        logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-        ret["lmax"] = lbsm
-        ret["muhat"] = 1.0
-    ret["lbsm"] = lbsm
-    ret["lsm"] = lsm
+    computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
+           marginalize = dataset._marginalize, normalize_sig = False )
+    ret = computer.get_five_values ( expected = expected,
+            allowNegativeSignals = allowNegativeSignals, check_for_maxima = True )
     return ret

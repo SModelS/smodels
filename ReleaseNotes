@@ -7,8 +7,7 @@ Release v2.3.0, March 2023
   * bumped up pythia8 from 8.307 to 8.308
   * SModelS can now track inter-analyses combinability at the level of whole
     analyses as well as individual signal regions via a combinations matrix
-  * todo: spey interface
-  * todo: SLv2 (via spey)
+  * added support for SLv2, todo: validate SLv2
   * "full_llhds" Database abbreviations introduced
   * Database extension, added new results from x ATLAS and y CMS analyses:
     - results from ATLAS:
