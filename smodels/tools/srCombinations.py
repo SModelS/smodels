@@ -58,13 +58,11 @@ def getCombinedStatistics(
     :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
     :param expected: compute expected values, not observed
     """
-    if dataset.type == "pyhf":
-        return getCombinedPyhfStatistics ( dataset, nsig, marginalize, deltas_rel,
-            deltas_rel, expected=expected, allowNegativeSignals=allowNegativeSignals)
-    cslm = getCombinedSimplifiedStatistics( dataset, nsig, marginalize,
-        deltas_rel, expected=expected, allowNegativeSignals=allowNegativeSignals,
-    )
-    return cslm
+    computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
+           marginalize = dataset._marginalize, normalize_sig = False )
+    ret = computer.get_five_values ( expected = expected,
+            allowNegativeSignals = allowNegativeSignals, check_for_maxima = True )
+    return ret
 
 def getCombinedSimplifiedLikelihood(
     dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, mu=1.0
@@ -84,16 +82,4 @@ def getCombinedSimplifiedLikelihood(
            marginalize = dataset._marginalize, normalize_sig = False )
     ret = computer.likelihood ( poi_test = mu, expected = expected,
                                 return_nll = False )
-    return ret
-
-def getCombinedSimplifiedStatistics(
-    dataset, nsig, marginalize, deltas_rel, nll=False, expected=False, allowNegativeSignals=False
-):
-    """compute likelihood at maximum, for simplified likelihoods only"""
-    if dataset.type != "simplified":
-        return {"lmax": -1.0, "muhat": None, "sigma_mu": None}
-    computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
-           marginalize = dataset._marginalize, normalize_sig = False )
-    ret = computer.get_five_values ( expected = expected,
-            allowNegativeSignals = allowNegativeSignals, check_for_maxima = True )
     return ret

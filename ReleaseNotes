@@ -2,6 +2,7 @@ Release v2.3.0, March 2023
 =======================================================
 
   * fixed bug for an LHE input only with anti-particles
+  * fixed error that truncated signal yields when computing expected upper limits
   * Added minMass parameter for setting a minimum mass threshold for BSM masses
   * fixed C++ interface to work with python 3.11
   * bumped up pythia8 from 8.307 to 8.308
@@ -11,9 +12,9 @@ Release v2.3.0, March 2023
   * "full_llhds" Database abbreviations introduced
   * Database extension, added new results from x ATLAS and y CMS analyses:
     - results from ATLAS:
-      ATLAS-SUSY-2018-05 (EM,UL, full likelihood), ATLAS-SUSY-2018-42 (UL), ATLAS-SUSY-2018-32 (EM), ATLAS-SUSY-2019-02 (UL), ATLAS-SUSY-2013-12 (8 TeV, EM)
+      ATLAS-SUSY-2018-05 (EM,UL, full likelihood), ATLAS-SUSY-2018-41 (todo: EM), ATLAS-SUSY-2018-42 (UL), ATLAS-SUSY-2018-32 (EM), ATLAS-SUSY-2019-02 (UL, todo: EM), ATLAS-SUSY-2013-12 (8 TeV, EM)
     - results from CMS:
-      CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL), CMS-SUS-21-002 (UL)
+      CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL, todo: EM), CMS-SUS-21-002 (UL, todo: EM)
     - added expected ULs to CMS-SUS-19-009
 
 
