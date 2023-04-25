@@ -20,7 +20,7 @@ import numpy as np
 
 class StatsComputer:
     __slots__ = [ "nsig", "dataset", "data", "marginalize", "likelihoodComputer",
-                  "upperLimitComputer", "type" ]
+                  "upperLimitComputer", "type", "deltas_sys" ]
     def __init__ ( self, dataset, nsig : Union[float,list],
                    deltas_rel : Union[None,float] = None,
                    marginalize : bool = False, **kwargs ):
@@ -37,52 +37,43 @@ class StatsComputer:
 
         self.dataset = dataset
         self.nsig = nsig
-        self.getComputer ( nsig, deltas_rel, marginalize, **kwargs )
-
-    def getComputer( self, nsig : Union [ float, np.ndarray ],
-                     deltas_rel : Union [ float, None ],
-                     marginalize : bool = False,
-                     **kwargs ):
-        """ retrieve the statistical model """
+        self.deltas_sys = deltas_rel
+        if self.deltas_sys == None:
+            self.deltas_sys = 0.
         self.marginalize = marginalize
+        self.getComputer ( **kwargs )
+
+    def getComputer( self, **kwargs ):
+        """ retrieve the statistical model """
         if self.dataset.getType() == "efficiencyMap":
-            return self.getComputerSingleBin ( nsig, deltas_rel )
+            return self.getComputerSingleBin ( )
         # dataset.getType() is "combined"
         assert self.dataset.type in ("simplified", "pyhf" ), \
             f"I do not recognize the datatype {self.dataset.type}. it is not one of simplified, pyhf"
         if self.dataset.type == "simplified":
-            return self.getComputerMultiBinSL ( nsig, deltas_rel )
-        self.getComputerPyhf ( nsig, deltas_rel, **kwargs )
+            return self.getComputerMultiBinSL ( )
+        self.getComputerPyhf ( **kwargs )
 
-    def getComputerSingleBin(self, nsig: Union[float, np.ndarray],
-            delta_sys : Union[None,float] = None,
-#            allow_negative_signal : bool = False
-    ):
+    def getComputerSingleBin(self ):
         """
         Create computer from a single bin
         :param nsig: signal yields.
         """
         self.type = "1bin"
-        if delta_sys == None:
-            delta_sys = 0.
         dataset = self.dataset
         from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
         data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
-                     dataset.dataInfo.bgError**2, deltas_rel = delta_sys )
+                     dataset.dataInfo.bgError**2, deltas_rel = self.deltas_sys )
         self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( )
 
-    def getComputerMultiBinSL(self, nsig: Union[float, np.ndarray],
-            delta_sys : Union[None,float] = None
-    ):
+    def getComputerMultiBinSL(self):
         """
         Create computer from a multi bin SL result
         :param nsig: signal yields.
         """
         self.type = "SL"
-        if delta_sys == None:
-            delta_sys = 0.
         dataset = self.dataset
         cov = dataset.globalInfo.covariance
         if type(cov) != list:
@@ -99,8 +90,8 @@ class StatsComputer:
                 logger.warning ( f"third momenta given for some but not all signal regions in {dataset.globalInfo.id}" )
             third_momenta = None
         from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
-        data = Data( nobs, bg, cov, third_moment=third_momenta, nsignal = nsig,
-                     deltas_rel = delta_sys, lumi=dataset.getLumi() )
+        data = Data( nobs, bg, cov, third_moment=third_momenta, nsignal = self.nsig,
+                     deltas_rel = self.deltas_sys, lumi=dataset.getLumi() )
         self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( ntoys = 10000 )
@@ -116,9 +107,7 @@ class StatsComputer:
         ret["lsm"] = lsm
         return ret
 
-    def getComputerPyhf(self, nsig: Union[float, np.ndarray],
-            delta_sys : Union[None,float] = None, **kwargs
-    ):
+    def getComputerPyhf(self, ** kwargs ):
         """
         Create computer for a pyhf result
         :param nsig: signal yields.
@@ -130,12 +119,12 @@ class StatsComputer:
         jsons = globalInfo.jsons.copy()
         # datasets = [ds.getID() for ds in dataset._datasets]
         datasets = [ds.getID() for ds in self.dataset.origdatasets]
-        total = sum(nsig)
+        total = sum(self.nsig)
         # if total == 0.0:  # all signals zero? can divide by anything!
         #     total = 1.0
         if normalize and total != 0.:
-            nsig = [
-                s / total for s in nsig
+            self.nsig = [
+                s / total for s in self.nsig
             ]  # Normalising signals to get an upper limit on the events count
         # Filtering the json files by looking at the available datasets
         for jsName in globalInfo.jsonFiles:
@@ -162,7 +151,7 @@ class StatsComputer:
                         f"{srName} signal region provided in globalInfo is not in the list of datasets, {jsName}:{','.join(datasets)}"
                     )
                     raise ValueError(line)
-                sig = nsig[index]
+                sig = self.nsig[index]
                 subSig.append(sig)
             nsignals.append(subSig)
         # Loading the jsonFiles, unless we already have them (because we pickled)
@@ -190,7 +179,10 @@ class StatsComputer:
             return self.likelihoodComputer.likelihood (
                     poi_test, nll = return_nll,
                     expected = expected, **kwargs )
-        return self.likelihoodComputer.likelihood ( poi_test * np.array (self.nsig),
+        #from test.debug import printTo
+        #printTo ( f"likelihood {self.nsig} {poi_test}" )
+        #print ( f"likelihood {self.nsig} {poi_test}" )
+        return self.likelihoodComputer.likelihood ( poi_test * self.nsig,
                 nll = return_nll, marginalize = self.marginalize, **kwargs )
 
     def transform ( self, expected ):

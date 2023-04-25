@@ -8,7 +8,7 @@
 
 def printTo (  *args  ):
     import time
-    with open ( "debug.txt", "at" ) as f:
+    with open ( "debug.log", "at" ) as f:
         # f.write ( text + "\n" )
         line = " ".join ( map ( str,  args ) )
         print ( line )
