@@ -28,11 +28,8 @@ def getCombinedUpperLimitFor(dataset, nsig, expected=False, deltas_rel=0.2):
 
     :returns: upper limit on sigma*eff
     """
-    kwargs = {}
-    if dataset.type == "pyhf":
-        kwargs["normalize"] = True
     computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
-           marginalize = dataset._marginalize, **kwargs )
+           marginalize = dataset._marginalize, normalize_sig = True )
     ret = computer.poi_upper_limit ( expected = expected, limit_on_xsec = True )
     logger.debug("pyhf upper limit : {}".format(ret))
     return ret
@@ -51,7 +48,7 @@ def getCombinedLikelihood(
         # Getting the path to the json files
         # Loading the jsonFiles
         computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
-               marginalize = dataset._marginalize, normalize = False )
+               marginalize = dataset._marginalize, normalize_sig = False )
         lbsm = computer.likelihood ( poi_test = mu, expected = expected, return_nll = False )
         return lbsm
     lbsm = getCombinedSimplifiedLikelihood(
@@ -65,7 +62,7 @@ def getCombinedPyhfStatistics(
         # Getting the path to the json files
         # Loading the jsonFiles
         computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
-               marginalize = dataset._marginalize, normalize = False )
+               marginalize = dataset._marginalize, normalize_sig = False )
         ret = computer.get_five_values ( expected = expected, allowNegativeSignals =allowNegativeSignals, return_nll = False )
         return ret
 
