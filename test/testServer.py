@@ -52,7 +52,7 @@ class ServerTest(unittest.TestCase):
         myenv["PYTHONPATH"]="../" + pp
         subprocess.Popen ( cmd, env=myenv )
 
-        c = 1.2
+        c = 1.7
         while not os.path.exists ( pclfile ) and c < 10:
             time.sleep ( c )
             c += 1.
