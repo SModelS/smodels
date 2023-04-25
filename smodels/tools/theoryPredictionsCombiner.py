@@ -13,7 +13,7 @@
 import numpy as np
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
-from smodels.tools.statistics import CLsfromNLL, determineBrentBracket
+from smodels.tools.basicStats import CLsfromNLL, determineBrentBracket
 import scipy.optimize as optimize
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict
