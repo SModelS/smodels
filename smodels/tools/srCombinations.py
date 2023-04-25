@@ -9,7 +9,6 @@
 
 """
 
-from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import numpy as np
@@ -45,27 +44,11 @@ def getCombinedLikelihood(
                      compute expected posteriori.
     :param mu: signal strength parameter mu
     """
-    if dataset.type == "pyhf":
-        # Getting the path to the json files
-        # Loading the jsonFiles
-        computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
-               marginalize = dataset._marginalize, normalize_sig = False )
-        lbsm = computer.likelihood ( poi_test = mu, expected = expected, return_nll = False )
-        return lbsm
-    lbsm = getCombinedSimplifiedLikelihood(
-        dataset, nsig, marginalize, deltas_rel, expected=expected, mu=mu )
-    return lbsm
-
-def getCombinedPyhfStatistics(
-    dataset, nsig, marginalize, deltas_rel, nll=False, expected=False,
-    allowNegativeSignals=False
-):
-        # Getting the path to the json files
-        # Loading the jsonFiles
-        computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
-               marginalize = dataset._marginalize, normalize_sig = False )
-        ret = computer.get_five_values ( expected = expected, allowNegativeSignals =allowNegativeSignals, return_nll = False )
-        return ret
+    computer = StatsComputer ( dataset, nsig, deltas_rel = deltas_rel,
+           marginalize = dataset._marginalize, normalize_sig = False )
+    ret = computer.likelihood ( poi_test = mu, expected = expected,
+                                return_nll = False )
+    return ret
 
 def getCombinedStatistics(
     dataset, nsig, marginalize=False, deltas_rel=0.2, expected=False, allowNegativeSignals=False
