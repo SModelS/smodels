@@ -19,7 +19,6 @@ import numpy as np
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from typing import Text, Optional, Union, Dict
 from smodels.tools.basicStats import deltaChi2FromLlhd
-from smodels.tools.runtime import experimentalFeatures
 
 class TruncatedGaussians:
     """ likelihood computer based on the trunacated Gaussian approximation, see
@@ -71,8 +70,6 @@ class TruncatedGaussians:
 
         :returns: likelihood (float)
         """
-        if not experimentalFeatures():
-            return None
         sllhd = "llhd"
         if nll:
             sllhd = "nll"
@@ -104,8 +101,6 @@ class TruncatedGaussians:
         :returns: dictionary with likelihood (float), muhat, and sigma_mu
         """
         default = { "muhat": None, "sigma_mu": None, "lmax": None }
-        if not experimentalFeatures():
-            return default
         sllhd = "llhd"
         if nll:
             sllhd = "nll"
@@ -221,8 +216,6 @@ class TruncatedGaussians:
         """compute the chi2 value from a likelihood (convenience function).
         :param likelihood: supply likelihood, if None, use just calculcated llhd
         """
-        if not experimentalFeatures():
-            return None
         if likelihood == None:
             if not hasattr ( self, "llhd_" ):
                 raise SModelSError ( "asking for chi2 but no likelihood given" )

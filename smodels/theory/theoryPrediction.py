@@ -18,6 +18,71 @@ from smodels.tools.statsTools import StatsComputer
 import itertools
 import numpy as np
 from test.debug import printTo
+from typing import Union
+
+__all__ = [ "TheoryPrediction" ]
+
+def getComputerForTruncGaussians(
+    theorypred, corr : float =0.6, allowNegativeSignals : bool = False
+) -> Union [ StatsComputer, None ]:
+    """ get a statscomputer for truncated gaussians
+    :param corr: correction factor:
+             ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
+             a factor of corr = 0.6 is proposed.
+    :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
+    :returns: a StatsComputer
+    """
+    # marked as experimental feature
+    from smodels.tools.runtime import experimentalFeatures
+    if not experimentalFeatures():
+        return None
+    if not hasattr(theorypred, "avgElement"):
+        logger.error("theory prediction %s has no average element! why??" % theorypred.analysisId())
+        return None
+
+    eul = theorypred.dataset.getUpperLimitFor(
+        element=theorypred.avgElement, txnames=theorypred.txnames, expected=True
+    )
+    if eul is None:
+        return ret
+    ul = theorypred.dataset.getUpperLimitFor(
+        element=theorypred.avgElement, txnames=theorypred.txnames, expected=False
+    )
+    kwargs = { "upperLimit": ul, "expectedUpperLimit": eul,
+               "predicted_yield": theorypred.xsection.value, "corr": corr }
+    computer = StatsComputer ( theorypred.dataset, 0., **kwargs )
+    return computer
+
+def likelihoodFromLimits(
+    theorypred, mu=1.0, expected=False, chi2also=False, corr=0.6,
+    allowNegativeSignals=False
+):
+    """compute the likelihood from expected and observed upper limits.
+    :param expected: compute expected, not observed likelihood
+    :param mu: signal strength multiplier, applied to theory prediction. If None,
+               then find muhat
+    :param chi2also: if true, return also chi2
+    :param corr: correction factor:
+             ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
+             a factor of corr = 0.6 is proposed.
+    :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
+    :returns: likelihood; none if no expected upper limit is defined.
+    """
+    computer = getComputerForTruncGaussians ( theorypred, corr, allowNegativeSignals )
+
+    ret = { "llhd": None }
+    if chi2also:
+        ret["chi2"]=None
+    if computer is None:
+        return ret
+
+    llhd = computer.likelihood ( mu, expected = False, return_nll = False )
+    ret = computer.maximize_likelihood ( expected = False, return_nll = False )
+    ret [ "llhd" ] = llhd
+    if chi2also:
+        chi2 = computer.chi2( llhd )
+        ret [ "chi2" ] = chi2
+    return ret
 
 class TheoryPrediction(object):
     """
@@ -278,7 +343,7 @@ class TheoryPrediction(object):
 
         if self.dataType() == "upperLimit":
             # these fits only work with negative signals!
-            ret = self.likelihoodFromLimits(
+            ret = likelihoodFromLimits( self,
                 mu, chi2also=True, expected=expected, allowNegativeSignals=True
             )
             llhd = ret["llhd"]
@@ -289,51 +354,6 @@ class TheoryPrediction(object):
                 return 700.0
             return -np.log(llhd)
         return llhd
-
-    def likelihoodFromLimits(
-        self, mu=1.0, expected=False, chi2also=False, corr=0.6, allowNegativeSignals=False
-    ):
-        """compute the likelihood from expected and observed upper limits.
-        :param expected: compute expected, not observed likelihood
-        :param mu: signal strength multiplier, applied to theory prediction. If None,
-                   then find muhat
-        :param chi2also: if true, return also chi2
-        :param corr: correction factor:
-                 ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
-                 a factor of corr = 0.6 is proposed.
-        :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
-        :returns: likelihood; none if no expected upper limit is defined.
-        """
-        # marked as experimental feature
-        from smodels.tools.runtime import experimentalFeatures
-
-        ret = { "llhd": None }
-        if chi2also:
-            ret["chi2"]=None
-        if not experimentalFeatures():
-            return ret
-        if not hasattr(self, "avgElement"):
-            logger.error("theory prediction %s has no average element! why??" % self.analysisId())
-            return ret
-
-        eul = self.dataset.getUpperLimitFor(
-            element=self.avgElement, txnames=self.txnames, expected=True
-        )
-        if eul is None:
-            return ret
-        ul = self.dataset.getUpperLimitFor(
-            element=self.avgElement, txnames=self.txnames, expected=False
-        )
-        kwargs = { "upperLimit": ul, "expectedUpperLimit": eul,
-                   "predicted_yield": self.xsection.value, "corr": corr }
-        computer = StatsComputer ( self.dataset, 0., **kwargs )
-        llhd = computer.likelihood ( mu, expected = False, return_nll = False )
-        ret = computer.maximize_likelihood ( expected = False, return_nll = False )
-        ret [ "llhd" ] = llhd
-        if chi2also:
-            chi2 = computer.chi2( llhd )
-            ret [ "chi2" ] = chi2
-        return ret
 
     def computeStatistics(self, expected=False, allowNegativeSignals=False):
         """
@@ -347,12 +367,12 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["muhat"] = {}
 
         if self.dataType() == "upperLimit":
-            ret = self.likelihoodFromLimits(1.0, expected=expected, chi2also=True)
+            ret = likelihoodFromLimits( self, 1.0, expected=expected, chi2also=True)
             llhd = ret["llhd"]
             chi2 = ret["chi2"]
-            ret = self.likelihoodFromLimits(0.0, expected=expected, chi2also=False)
+            ret = likelihoodFromLimits( self, 0.0, expected=expected, chi2also=False)
             lsm = ret["llhd"]
-            ret = self.likelihoodFromLimits(
+            ret = likelihoodFromLimits( self,
                 None, expected=expected, chi2also=False, allowNegativeSignals=True
             )
             lmax = ret["llhd"]
