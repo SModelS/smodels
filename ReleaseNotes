@@ -9,6 +9,7 @@ Release v2.3.0, April 2023
   * SModelS can now track inter-analyses combinability at the level of whole
     analyses as well as individual signal regions via a combinations matrix
   * added support for SLv2, todo: validate SLv2
+  * refactored the statistical subsystem
   * "full_llhds" Database abbreviations introduced
   * Database extension, added new results from x ATLAS and y CMS analyses:
     - results from ATLAS:
