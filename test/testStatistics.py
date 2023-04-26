@@ -127,6 +127,29 @@ class StatisticsTest(unittest.TestCase):
         re = comp.getUpperLimitOnMu(m)
         self.assertAlmostEqual(re/(1.06*20.), 1., 1)
 
+    def testExperimentalFeatureOff(self):
+        ## check that this all gives none if experimental is turned off
+        from smodels.tools import runtime
+
+        runtime._experimental = False
+        expRes = database.getExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
+        self.assertTrue(len(expRes), 1)
+        filename = "./testFiles/slha/T1tttt.slha"
+        model = Model(BSMList, SMList)
+        model.updateParticles(filename)
+        smstoplist = decomposer.decompose(model, sigmacut=0)
+        prediction = theoryPredictionsFor(expRes[0], smstoplist)[0]
+        prediction.computeStatistics()
+        import numpy
+
+        llhds = []
+        for muval in numpy.arange(0.0, 0.2, 0.02):
+            llhd = prediction.likelihood(mu=muval)
+            llhds.append ( llhd )
+        self.assertEqual(prediction.likelihood(), None )
+        self.assertEqual(llhds, [ None ] * len(llhds) )
+
+
     def testApproxGaussian(self):
         ## turn experimental features on
         from smodels.tools import runtime
