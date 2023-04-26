@@ -25,7 +25,7 @@ from smodels.theory import decomposer
 from math import floor, log10
 import numpy as np
 import math
-
+from smodels.tools import runtime
 
 class StatisticsTest(unittest.TestCase):
     def lLHDFromLimits(self):
@@ -63,6 +63,7 @@ class StatisticsTest(unittest.TestCase):
 
     def testUnderfluctuatingLlhdsFromLimits(self):
         """test the likelihoods from limits allowing for underfluctuations"""
+        runtime._experimental = True
         comparisons = {
             False: {0: 0.2869456402153424, 5: 0.05697393370613237},
             True: {0: 0.43038397431221154, 5: 0.030362667100323704},
@@ -81,6 +82,7 @@ class StatisticsTest(unittest.TestCase):
 
     def testCorrectedLlhdsFromLimits(self):
         """test the likelihoods from limits allowing for underfluctuations"""
+        runtime._experimental = True
         comparisons = {
             0.0: {0: 0.094661, 3: 0.151640, 5: 0.12555219},
             0.6: {0: 0.1233638, 3: 0.1504459, 5: 0.11380},
@@ -97,6 +99,7 @@ class StatisticsTest(unittest.TestCase):
 
     def testChi2FromLimits(self):
         """test the chi2 value that we obtain from limits"""
+        runtime._experimental = True
         nsig = 35.0
         nobs, nbg = 110, 100.0
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0, lumi = 1.)
@@ -122,6 +125,7 @@ class StatisticsTest(unittest.TestCase):
         chi2lim = computer.chi2 ( ) # llhdlim )
 
     def testUpperLimit(self):
+        runtime._experimental = True
         m = Data(100.0, 100.0, 0.001, None, 1.0, deltas_rel=0.0)
         comp = UpperLimitComputer()
         re = comp.getUpperLimitOnMu(m)
@@ -129,7 +133,6 @@ class StatisticsTest(unittest.TestCase):
 
     def testExperimentalFeatureOff(self):
         ## check that this all gives none if experimental is turned off
-        from smodels.tools import runtime
 
         runtime._experimental = False
         expRes = database.getExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
@@ -152,8 +155,6 @@ class StatisticsTest(unittest.TestCase):
 
     def testApproxGaussian(self):
         ## turn experimental features on
-        from smodels.tools import runtime
-
         runtime._experimental = True
         expRes = database.getExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
         self.assertTrue(len(expRes), 1)
@@ -176,6 +177,8 @@ class StatisticsTest(unittest.TestCase):
         """A simple test to see that the interface in datasetObj
         and TheoryPrediction to the statistics tools is working correctly
         """
+        runtime._experimental = True
+
         expRes = database.getExpResults(analysisIDs=["CMS-SUS-13-012"])[0]
 
         filename = "./testFiles/slha/simplyGluino.slha"
@@ -198,6 +201,7 @@ class StatisticsTest(unittest.TestCase):
 
     def testZeroLikelihood(self):
         """A test to check if a llhd of 0 is being tolerated"""
+        runtime._experimental = True
         nsig = 2
         m = Data(1e20, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
         computer = LikelihoodComputer(m)
@@ -237,6 +241,7 @@ class StatisticsTest(unittest.TestCase):
         ATLAS-CONF-2013-054
 
         """
+        runtime._experimental = True
 
         expected_values = [
             # mgluino          mlsp          nsig               nobs              nb             deltab           llhd                 chi2
