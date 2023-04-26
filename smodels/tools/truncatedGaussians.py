@@ -17,8 +17,9 @@ from smodels.tools.physicsUnits import fb
 from scipy.special import erf
 import numpy as np
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from typing import Text, Optional, Union
+from typing import Text, Optional, Union, Dict
 from smodels.tools.basicStats import deltaChi2FromLlhd
+from smodels.tools.runtime import experimentalFeatures
 
 class TruncatedGaussians:
     """ likelihood computer based on the trunacated Gaussian approximation, see
@@ -53,13 +54,13 @@ class TruncatedGaussians:
         self.expectedUpperLimit = expectedUpperLimit
         self.predicted_yield = predicted_yield
         self.corr = corr
-        self.sigma_y = self.getSigmaY()  # the expected scale, eq 3.24 in arXiv:1202.3415
+        self.sigma_y = self._getSigmaY()  # the expected scale, eq 3.24 in arXiv:1202.3415
         self.denominator = np.sqrt(2.0) * self.sigma_y
         self.cl = cl
 
     def likelihood ( self, mu : Union[float,None], nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
-            corr : Optional[float] = 0.6 ) -> float:
+            corr : Optional[float] = 0.6 ) -> Union[None,float]:
         """ return the likelihood, as a function of mu
         :param mu: number of signal events, if None then mu = muhat
         :param nll: if True, return negative log likelihood
@@ -68,8 +69,10 @@ class TruncatedGaussians:
                in the data, setting this to True results in more realistic
                approximate likelihoods.
 
-        :returns: likelihood (float), muhat, and sigma_mu
+        :returns: likelihood (float)
         """
+        if not experimentalFeatures():
+            return None
         sllhd = "llhd"
         if nll:
             sllhd = "nll"
@@ -77,7 +80,7 @@ class TruncatedGaussians:
         muhat, sigma_mu = float("inf"), float("inf")
         if mu != None:
             nsig = mu * self.predicted_yield
-        dsig = self.likelihoodOfNSig ( nsig, nll=nll,
+        dsig = self._likelihoodOfNSig ( nsig, nll=nll,
                 allowNegativeSignals = allowNegativeSignals, corr = corr )
         if self.predicted_yield > 0.:
              muhat, sigma_mu =  dsig["yhat"]/self.predicted_yield,\
@@ -89,7 +92,7 @@ class TruncatedGaussians:
 
     def lmax ( self, nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
-            corr : Optional[float] = 0.6 ) -> float:
+            corr : Optional[float] = 0.6 ) -> Dict:
         """ return the likelihood, as a function of mu
         :param mu: number of signal events, if None then mu = muhat
         :param nll: if True, return negative log likelihood
@@ -98,23 +101,29 @@ class TruncatedGaussians:
                in the data, setting this to True results in more realistic
                approximate likelihoods.
 
-        :returns: likelihood (float), muhat, and sigma_mu
+        :returns: dictionary with likelihood (float), muhat, and sigma_mu
         """
+        default = { "muhat": None, "sigma_mu": None, "lmax": None }
+        if not experimentalFeatures():
+            return default
         sllhd = "llhd"
         if nll:
             sllhd = "nll"
         muhat, sigma_mu = float("inf"), float("inf")
         nsig = self.predicted_yield
-        dsig = self.likelihoodOfNSig ( nsig, nll=nll,
+        dsig = self._likelihoodOfNSig ( nsig, nll=nll,
                 allowNegativeSignals = allowNegativeSignals, corr = corr )
-        if self.predicted_yield > 0.:
-             muhat, sigma_mu =  dsig["yhat"]/self.predicted_yield,\
-                dsig["sigma_y"] / self.predicted_yield
+        if self.predicted_yield <= 0:
+            return default
+        muhat, sigma_mu =  dsig["yhat"]/self.predicted_yield,\
+            dsig["sigma_y"] / self.predicted_yield
+        # llhd evaluated at mu_hat 
+        lmax = 1. / ( sigma_mu * np.sqrt ( 2*np.pi ) )
 
-        ret = { "muhat": muhat, "sigma_mu": sigma_mu }
+        ret = { "muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax }
         return ret
 
-    def likelihoodOfNSig ( self, nsig : Union[float,None], nll : Optional[bool]=False,
+    def _likelihoodOfNSig ( self, nsig : Union[float,None], nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6 ) -> float:
         """ return the likelihood, as a function of nsig
@@ -140,52 +149,52 @@ class TruncatedGaussians:
             if allowNegativeSignals:
                 xa = -self.expectedUpperLimit
                 xb = 1
-                yhat = self.find_neg_yhat( xa, xb )
-                self.llhd_ = self.llhd(nsig, yhat, nll = False )
+                yhat = self._find_neg_yhat( xa, xb )
+                self.llhd_ = self._computeLlhd(nsig, yhat, nll = False )
                 ret = self.llhd_
                 if nll:
                     ret = -np.log(ret)
                 return { sllhd: ret, "yhat": yhat, "sigma_y": self.sigma_y }
             else:
-                self.llhd_ = self.llhd(nsig, 0.0, nll = False )
+                self.llhd_ = self._computeLlhd(nsig, 0.0, nll = False )
                 ret = self.llhd_
                 if nll:
                     ret = -math.log(ret)
                 return { sllhd: ret, "yhat": 0.0, "sigma_y": self.sigma_y }
 
-        yhat = self.findYhat()
-        self.llhd_ = self.llhd(nsig, yhat, nll = False )
+        yhat = self._findYhat()
+        self.llhd_ = self._computeLlhd(nsig, yhat, nll = False )
         ret = self.llhd_
         if nll:
             ret = -math.log(ret)
         return { sllhd: ret, "yhat": yhat, "sigma_y": self.sigma_y }
 
-    def findYhat ( self ):
+    def _findYhat ( self ):
         """ find the signal yields that maximize the likelihood """
-        fA = self.root_func(0.0)
-        fB = self.root_func(max(self.upperLimit, self.expectedUpperLimit))
+        fA = self._root_func(0.0)
+        fB = self._root_func(max(self.upperLimit, self.expectedUpperLimit))
         if np.sign(fA * fB) > 0.0:
             ## the have the same sign
             logger.error("when computing likelihood: fA and fB have same sign")
             return None, None, None
         yhat = optimize.brentq(
-            self.root_func, 0.0, max(self.upperLimit, self.expectedUpperLimit),
+            self._root_func, 0.0, max(self.upperLimit, self.expectedUpperLimit),
             rtol=1e-03, xtol=1e-06)
         return yhat
 
-    def getSigmaY(self, yhat=0.0 ):
+    def _getSigmaY(self, yhat=0.0 ):
         """get the standard deviation sigma, given
         an upper limit and a central value. assumes a truncated Gaussian likelihood"""
         # the expected scale, eq 3.24 in arXiv:1202.3415
         return ( self.expectedUpperLimit - yhat) / 1.96
 
-    def root_func(self,x):  # we want the root of this one
+    def _root_func(self,x):  # we want the root of this one
         return (erf((self.upperLimit - x) / self.denominator) + erf(x / self.denominator)) / (
             1.0 + erf(x / self.denominator)) - self.cl
 
-    def find_neg_yhat(self, xa, xb):
+    def _find_neg_yhat(self, xa, xb):
         c = 0
-        while self.root_func(xa) * self.root_func(xb) > 0:
+        while self._root_func(xa) * self._root_func(xb) > 0:
             xa = 2 * xa
             c += 1
             if c > 10:
@@ -193,10 +202,10 @@ class TruncatedGaussians:
                     f"cannot find bracket for brent bracketing ul={upperLimit}, eul={expectedUpperLimit},xa={xa}, xb={xb}"
                 )
 
-        muhat = optimize.brentq(self.root_func, xa, xb, rtol=1e-03, xtol=1e-06)
+        muhat = optimize.brentq(self._root_func, xa, xb, rtol=1e-03, xtol=1e-06)
         return muhat
 
-    def llhd( self, nsig, muhat, nll):
+    def _computeLlhd( self, nsig, muhat, nll):
         if nsig is None:
             nsig = muhat
         # need to account for the truncation!
@@ -212,6 +221,8 @@ class TruncatedGaussians:
         """compute the chi2 value from a likelihood (convenience function).
         :param likelihood: supply likelihood, if None, use just calculcated llhd
         """
+        if not experimentalFeatures():
+            return None
         if likelihood == None:
             if not hasattr ( self, "llhd_" ):
                 raise SModelSError ( "asking for chi2 but no likelihood given" )
@@ -223,14 +234,13 @@ class TruncatedGaussians:
 
         return l + l0
 
+    """
     def rvsFromLimits( self, n=1 ):
-        """
         Generates a sample of random variates, given expected and observed
         likelihoods.  The likelihood is modelled as a truncated Gaussian.
 
         :param n: sample size
         :returns: sample of random variates
-        """
         muhat = self.findMuhat()
         ret = []
         while len(ret) < n:
@@ -238,3 +248,4 @@ class TruncatedGaussians:
             if tmp > 0.0:
                 ret.append(tmp)
         return ret
+    """
