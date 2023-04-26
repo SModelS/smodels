@@ -24,11 +24,10 @@ class TheoryPredictionsCombiner(object):
     Facility used to combine theory predictions from different analyes.
     """
 
-    def __init__(self, theoryPredictions: list, slhafile=None, marginalize=False, deltas_rel=None):
+    def __init__(self, theoryPredictions: list, slhafile=None, deltas_rel=None):
         """constructor.
         :param theoryPredictions: the List of theory predictions
         :param slhafile: optionally, the slhafile can be given, for debugging
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
         :param deltas_rel: relative uncertainty in signal (float).
                            Default value is 20%.
         """
@@ -36,7 +35,6 @@ class TheoryPredictionsCombiner(object):
             raise SModelSError("asking to combine zero theory predictions")
         self.theoryPredictions = theoryPredictions
         self.slhafile = slhafile
-        self.marginalize = marginalize
         if deltas_rel is None:
             from smodels.tools.runtime import _deltas_rel_default
 
@@ -253,17 +251,12 @@ class TheoryPredictionsCombiner(object):
         llhd = 1.0
         changed = False
         for tp in self.theoryPredictions:
-            # Set the theory marginalize attribute to the combiner value:
-            tp_marginalize = tp.marginalize
-            tp.marginalize = self.marginalize
             tmp = tp.likelihood(mu, expected=expected, useCached=useCached)
             if tmp != None:
                 llhd = llhd * tmp
                 changed = True
             else:
                 return None
-            # Restore marginalize setting:
-            tp.marginalize = tp_marginalize
         if changed == False:
             llhd = None
             self.cachedLlhds[expected][mu] = llhd
@@ -289,13 +282,9 @@ class TheoryPredictionsCombiner(object):
             return
         llhd, lsm = 1.0, 1.0
         for tp in self.theoryPredictions:
-            tp_marginalize = tp.marginalize
-            tp.marginalize = self.marginalize
             llhd = llhd * tp.likelihood(1.0, expected=expected, useCached=True)
 
             lsm = lsm * tp.likelihood(0.0, expected=expected, useCached=True)
-            # Restore marginalize setting:
-            tp.marginalize = tp_marginalize
 
         self.cachedObjs[expected]["llhd"] = llhd
         self.cachedObjs[expected]["lsm"] = lsm

@@ -59,8 +59,7 @@ class TruncatedGaussians:
 
     def likelihood ( self, mu : Union[float,None], nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
-            corr : Optional[float] = 0.6,
-            marginalize : bool = False ) -> float:
+            corr : Optional[float] = 0.6 ) -> float:
         """ return the likelihood, as a function of mu
         :param mu: number of signal events, if None then mu = muhat
         :param nll: if True, return negative log likelihood
@@ -68,7 +67,6 @@ class TruncatedGaussians:
                else demand that muhat >= 0. In the presence of underfluctuations
                in the data, setting this to True results in more realistic
                approximate likelihoods.
-        :param marginalize: gets ignored
 
         :returns: likelihood (float), muhat, and sigma_mu
         """
@@ -91,8 +89,7 @@ class TruncatedGaussians:
 
     def lmax ( self, nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
-            corr : Optional[float] = 0.6,
-            marginalize : bool = False ) -> float:
+            corr : Optional[float] = 0.6 ) -> float:
         """ return the likelihood, as a function of mu
         :param mu: number of signal events, if None then mu = muhat
         :param nll: if True, return negative log likelihood
@@ -100,7 +97,6 @@ class TruncatedGaussians:
                else demand that muhat >= 0. In the presence of underfluctuations
                in the data, setting this to True results in more realistic
                approximate likelihoods.
-        :param marginalize: gets ignored
 
         :returns: likelihood (float), muhat, and sigma_mu
         """

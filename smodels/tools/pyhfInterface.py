@@ -1061,6 +1061,4 @@ if __name__ == "__main__":
     )  # With respect to the older refernece value one must normalize the xsec
     print("old ul=", ul_old)
     ul = ulComp.getUpperLimitOnMu(m)
-    print("ul (marginalized)", ul)
-    ul = ulComp.getUpperLimitOnMu(m, marginalize=False)
-    print("ul (profiled)", ul)
+    print("ul", ul)

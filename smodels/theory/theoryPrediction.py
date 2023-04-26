@@ -25,10 +25,8 @@ class TheoryPrediction(object):
     for an analysis.
     """
 
-    def __init__(self, marginalize=False, deltas_rel=None):
-        """a theory prediction. marginalize and deltas_rel are meant to be
-            constants
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
+    def __init__(self, deltas_rel=None):
+        """a theory prediction. deltas_rel is meant to be a constant
         :param deltas_rel: relative uncertainty in signal (float).
                            Default value is 20%.
         """
@@ -37,7 +35,6 @@ class TheoryPrediction(object):
         self.conditions = None
         self.mass = None
         self.totalwidth = None
-        self.marginalize = marginalize
         if deltas_rel is None:
             from smodels.tools.runtime import _deltas_rel_default
 
@@ -131,8 +128,7 @@ class TheoryPrediction(object):
                         for ds in self.dataset.origdatasets
                     ]
                 computer = StatsComputer ( self.dataset, srNsigs,
-                    deltas_rel = self.deltas_rel, marginalize = self.marginalize,
-                    normalize_sig = True )
+                    deltas_rel = self.deltas_rel, normalize_sig = True )
                 ul = computer.poi_upper_limit ( expected = expected,
                     limit_on_xsec = True )
                 self.cachedObjs[expected]["UL"] = ul
@@ -272,8 +268,7 @@ class TheoryPrediction(object):
                 for ds in self.dataset.origdatasets
             ]
             computer = StatsComputer ( self.dataset, srNsigs,
-                    deltas_rel = self.deltas_rel, marginalize = self.marginalize,
-                    normalize_sig = False )
+                    deltas_rel = self.deltas_rel, normalize_sig = False )
             llhd = computer.likelihood ( poi_test = mu, expected = expected,
                                         return_nll = False )
         if self.dataType() == "efficiencyMap":
@@ -409,19 +404,8 @@ class TheoryPrediction(object):
                 srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0
                 for ds in self.dataset.origdatasets
             ]
-            """
-            s = getCombinedStatistics(
-                self.dataset,
-                srNsigs,
-                self.marginalize,
-                self.deltas_rel,
-                expected=expected,
-                allowNegativeSignals=allowNegativeSignals,
-            )
-            """
             computer = StatsComputer ( self.dataset, srNsigs,
-                    deltas_rel = self.deltas_rel, marginalize = self.marginalize,
-                    normalize_sig = False )
+                    deltas_rel = self.deltas_rel, normalize_sig = False )
             s = computer.get_five_values ( expected = expected,
                     return_nll = False, allowNegativeSignals = allowNegativeSignals )
             self.cachedObjs[expected]["llhd"] = s["lbsm"]
@@ -541,7 +525,6 @@ def theoryPredictionsFor(
     maxMassDist=0.2,
     useBestDataset=True,
     combinedResults=True,
-    marginalize=False,
     deltas_rel=None,
 ):
     """
@@ -560,7 +543,6 @@ def theoryPredictionsFor(
                or only the combinedResults (if combinedResults is True).
     :parameter combinedResults: add theory predictions that result from
                combining datasets.
-    :parameter marginalize: If true, marginalize nuisances. If false, profile them.
     :parameter deltas_rel: relative uncertainty in signal (float). Default value is 20%.
 
     :returns:  a TheoryPredictionList object containing a list of TheoryPrediction
@@ -580,7 +562,6 @@ def theoryPredictionsFor(
                 maxMassDist,
                 useBestDataset,
                 combinedResults,
-                marginalize,
                 deltas_rel,
             )
             if tpreds:
@@ -615,7 +596,7 @@ def theoryPredictionsFor(
         return allResults
     elif combinedResults:  # Try to combine results
         bestResults = TheoryPredictionList()
-        combinedRes = _getCombinedResultFor(dataSetResults, expResult, marginalize)
+        combinedRes = _getCombinedResultFor(dataSetResults, expResult )
         if combinedRes is None:  # Can not combine, use best dataset:
             combinedRes = _getBestResult(dataSetResults)
         bestResults.append(combinedRes)
@@ -631,7 +612,7 @@ def theoryPredictionsFor(
     return bestResults
 
 
-def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
+def _getCombinedResultFor(dataSetResults, expResult ):
     """
     Compute the combined result for all datasets, if covariance
     matrices are available. Return a TheoryPrediction object
@@ -640,7 +621,6 @@ def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
 
     :param datasetPredictions: List of TheoryPrediction objects for each signal region
     :param expResult: ExpResult object corresponding to the experimental result
-    :parameter marginalize: If true, marginalize nuisances. If false, profile them.
 
     :return: TheoryPrediction object
     """
@@ -686,9 +666,8 @@ def _getCombinedResultFor(dataSetResults, expResult, marginalize=False):
 
     # Create a combinedDataSet object:
     combinedDataset = CombinedDataSet(expResult)
-    combinedDataset._marginalize = marginalize
     # Create a theory preidction object for the combined datasets:
-    theoryPrediction = TheoryPrediction(marginalize)
+    theoryPrediction = TheoryPrediction()
     theoryPrediction.dataset = combinedDataset
     theoryPrediction.txnames = txnameList
     theoryPrediction.xsection = totalXsec
@@ -742,7 +721,7 @@ def _getBestResult(dataSetResults):
     return bestPred
 
 
-def _getDataSetPredictions(dataset, smsTopList, maxMassDist, marginalize=False, deltas_rel=None):
+def _getDataSetPredictions(dataset, smsTopList, maxMassDist, deltas_rel=None):
     """
     Compute theory predictions for a given data set.
     For upper-limit results returns the list of theory predictions for the
@@ -791,7 +770,7 @@ def _getDataSetPredictions(dataset, smsTopList, maxMassDist, marginalize=False, 
 
     # Collect results and evaluate conditions
     for cluster in clusters:
-        theoryPrediction = TheoryPrediction(marginalize, deltas_rel)
+        theoryPrediction = TheoryPrediction( deltas_rel)
         theoryPrediction.dataset = dataset
         theoryPrediction.txnames = cluster.txnames
         theoryPrediction.xsection = _evalConstraint(cluster)

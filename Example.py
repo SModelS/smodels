@@ -89,7 +89,7 @@ def main(inputFile='inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb, databa
     bestResult = None
     allPredictions = []
     for expResult in listOfExpRes:
-        predictions = theoryPredictionsFor(expResult, toplist, combinedResults=False, marginalize=False)
+        predictions = theoryPredictionsFor(expResult, toplist, combinedResults=False )
         if not predictions:
             continue  # Skip if there are no constraints from this result
         print('\n %s ' % expResult.globalInfo.id)

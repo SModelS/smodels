@@ -19,17 +19,15 @@ from smodels.tools.physicsUnits import fb
 import numpy as np
 
 class StatsComputer:
-    __slots__ = [ "nsig", "dataset", "data", "marginalize", "likelihoodComputer",
+    __slots__ = [ "nsig", "dataset", "data", "likelihoodComputer",
                   "upperLimitComputer", "type", "deltas_sys", "total" ]
     def __init__ ( self, dataset, nsig : Union[float,list],
                    deltas_rel : Union[None,float] = None,
-                   marginalize : bool = False, normalize_sig = False,
-                   **kwargs ):
+                   normalize_sig = False, **kwargs ):
         """ initialise with dataset.
         :param dataset: a smodels (combined)dataset
         :param nsig: signal yield, either as float or as list
         :param deltas_rel: relative error on signal. currently unused
-        :param marginalize: profile (False) or marginalize (True)
         :param normalize_sig: if true, then normalize the signal yields to 1
                               before doing anything else
         """
@@ -51,7 +49,6 @@ class StatsComputer:
         self.deltas_sys = deltas_rel
         if self.deltas_sys == None:
             self.deltas_sys = 0.
-        self.marginalize = marginalize
         self.getComputer ( **kwargs )
 
     def getComputer( self, **kwargs ):
@@ -134,7 +131,7 @@ class StatsComputer:
                      deltas_rel = self.deltas_sys, lumi=dataset.getLumi() )
         self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
-        self.upperLimitComputer = UpperLimitComputer ( ntoys = 10000 )
+        self.upperLimitComputer = UpperLimitComputer ( )
 
     def get_five_values ( self, expected : Union [ bool, Text ],
                       return_nll : bool = False, allowNegativeSignals : bool =False,
@@ -230,7 +227,7 @@ class StatsComputer:
                     poi_test, nll = return_nll,
                     expected = expected, **kwargs )
         return self.likelihoodComputer.likelihood ( poi_test,
-                nll = return_nll, marginalize = self.marginalize, **kwargs )
+                nll = return_nll, **kwargs )
 
     def transform ( self, expected ):
         """ SL only. transform the data to expected or observed """

@@ -410,7 +410,6 @@ class CombinedDataSet(object):
         self.globalInfo = expResult.globalInfo
         self._datasets = expResult.datasets[:]
         self.origdatasets = expResult.origdatasets[:]
-        self._marginalize = False
         self.sortDataSets()
         self.findType()
 

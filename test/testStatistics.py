@@ -730,7 +730,7 @@ class StatisticsTest(unittest.TestCase):
                 likelihood_actual = self.round_to_sign(likelihood_actual, 4)
 
             # The previously computed likelihood:
-            # (using: ntoys=100000)
+            # (using: marginalization with ntoys=100000)
             likelihood_expected = d["llhd"]
             # print('llhdexp', likelihood_expected)
             if not likelihood_expected == None and not np.isnan(likelihood_expected):
