@@ -15,7 +15,7 @@ import unittest
 
 # from smodels.tools import statistics
 from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
-from smodels.tools.statistics import TruncatedGaussians
+from smodels.tools.truncatedGaussians import TruncatedGaussians
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList

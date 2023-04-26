@@ -14,11 +14,9 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.truncatedGaussians import TruncatedGaussians
-from smodels.tools.srCombinations import getCombinedUpperLimitFor
 from smodels.tools.statsTools import StatsComputer
 import itertools
 import numpy as np
-from test.debug import printTo
 
 class TheoryPrediction(object):
     """
@@ -131,16 +129,12 @@ class TheoryPrediction(object):
                         srNsigDict[ds.getID()] if ds.getID() in srNsigDict else 0.0
                         for ds in self.dataset.origdatasets
                     ]
-                ul2 = getCombinedUpperLimitFor(
-                    self.dataset, srNsigs, expected=expected, deltas_rel=self.deltas_rel
-                )
                 computer = StatsComputer ( self.dataset, srNsigs,
                     deltas_rel = self.deltas_rel, marginalize = self.marginalize,
-                    normalize_sig = False )
-                #ul = computer.poi_upper_limit ( expected = expected,
-                #    limit_on_xsec = True )
-                self.cachedObjs[expected]["UL"] = ul2
-                # printTo ( f"ul {expected} {ul} {ul2}" )
+                    normalize_sig = True )
+                ul = computer.poi_upper_limit ( expected = expected,
+                    limit_on_xsec = True )
+                self.cachedObjs[expected]["UL"] = ul
 
         # Return the expected or observed UL:
         # if not self.cachedObjs[expected]["UL"]:
