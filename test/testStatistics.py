@@ -76,9 +76,11 @@ class StatisticsTest(unittest.TestCase):
         for nsig in [0, 5]:
             for allowNegatives in [False, True]:
                 computer = TruncatedGaussians ( 4.5, 5.45, nsig )
-                ret = computer.likelihood ( mu=1.,
-                       nll = False, allowNegativeMuhat = allowNegatives )
-                llhdlim, muhat, sigma_mu = ret["llhd"], ret["muhat"], ret["sigma_mu"]
+                llhdlim = computer.likelihood ( mu=1.,
+                       nll = False, allowNegativeSignals = allowNegatives )
+                ret = computer.lmax ( nll = False,
+                        allowNegativeSignals = allowNegatives )
+                muhat, sigma_mu = ret["muhat"], ret["sigma_mu"]
                 c = comparisons[allowNegatives][nsig]
                 self.assertAlmostEqual(llhdlim, c, 2)
 
@@ -92,8 +94,9 @@ class StatisticsTest(unittest.TestCase):
         for nsig in [0, 3, 5]:
             for x in [0.0, 0.6]:
                 computer = TruncatedGaussians ( 8.52, 6.18, nsig, corr = x )
-                ret = computer.likelihood ( 1., False, False )
-                llhdlim, muhat, sigma_mu = ret["llhd"], ret["muhat"], ret["sigma_mu"]
+                llhdlim = computer.likelihood ( 1., False, False )
+                ret = computer.lmax ( False, False )
+                muhat, sigma_mu = ret["muhat"], ret["sigma_mu"]
                 c = comparisons[x][nsig]
                 self.assertAlmostEqual(llhdlim, c, 2)
 
@@ -115,8 +118,9 @@ class StatisticsTest(unittest.TestCase):
         llhdmarg = llhdcomp.likelihood(mu=1., marginalize=True)
         chi2marg = llhdcomp.chi2( marginalize=True)
         computer = TruncatedGaussians ( ulobs, ulexp, nsig )
-        ret = computer.likelihood ( mu=1. )
-        llhdlim, muhat, sigma_mu = ret["llhd"], ret["muhat"], ret["sigma_mu"]
+        llhdlim = computer.likelihood ( mu=1. )
+        ret = computer.lmax ( )
+        muhat, sigma_mu = ret["muhat"], ret["sigma_mu"]
         # self.assertAlmostEqual(llhdlim,0.003427964159300251,5)
         self.assertAlmostEqual(llhdlim,0.0034205732477661462,5)
         self.assertAlmostEqual(muhat,0.23328649242374602,3)

@@ -283,9 +283,11 @@ class TheoryPrediction(object):
 
         if self.dataType() == "upperLimit":
             # these fits only work with negative signals!
-            llhd, chi2 = self.likelihoodFromLimits(
+            ret = self.likelihoodFromLimits(
                 mu, chi2also=True, expected=expected, allowNegativeSignals=True
             )
+            llhd = ret["llhd"]
+            chi2 = ret["chi2"]
         self.cachedLlhds[expected][mu] = llhd
         if nll:
             if llhd == 0.0:
@@ -310,15 +312,14 @@ class TheoryPrediction(object):
         # marked as experimental feature
         from smodels.tools.runtime import experimentalFeatures
 
+        ret = { "llhd": None }
+        if chi2also:
+            ret["chi2"]=None
         if not experimentalFeatures():
-            if chi2also:
-                return (None, None)
-            return None
+            return ret
         if not hasattr(self, "avgElement"):
             logger.error("theory prediction %s has no average element! why??" % self.analysisId())
-            if chi2also:
-                return (None, None)
-            return None
+            return ret
 
         eul = self.dataset.getUpperLimitFor(
             element=self.avgElement, txnames=self.txnames, expected=True
@@ -330,19 +331,16 @@ class TheoryPrediction(object):
         ul = self.dataset.getUpperLimitFor(
             element=self.avgElement, txnames=self.txnames, expected=False
         )
-        lumi = self.dataset.getLumi()
         kwargs = { "upperLimit": ul, "expectedUpperLimit": eul,
                    "predicted_yield": self.xsection.value, "corr": corr }
         computer = StatsComputer ( self.dataset, 0., **kwargs )
-        # oldcomputer = TruncatedGaussians ( ul, eul, self.xsection.value, lumi=lumi, corr = corr )
-        ret = computer.likelihood ( mu, expected = False, return_nll = False )
-        llhd, muhat, sigma_mu = ret["llhd"], ret["muhat"], ret["sigma_mu"]
-        self.muhat_ = muhat
-        self.sigma_mu_ = sigma_mu
+        llhd = computer.likelihood ( mu, expected = False, return_nll = False )
+        ret = computer.maximize_likelihood ( expected = False, return_nll = False )
+        ret [ "llhd" ] = llhd
         if chi2also:
             chi2 = computer.chi2( llhd )
-            return (llhd, chi2 )
-        return llhd
+            ret [ "chi2" ] = chi2
+        return ret
 
     def computeStatistics(self, expected=False, allowNegativeSignals=False):
         """
@@ -356,11 +354,15 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["muhat"] = {}
 
         if self.dataType() == "upperLimit":
-            llhd, chi2 = self.likelihoodFromLimits(1.0, expected=expected, chi2also=True)
-            lsm = self.likelihoodFromLimits(0.0, expected=expected, chi2also=False)
-            lmax = self.likelihoodFromLimits(
+            ret = self.likelihoodFromLimits(1.0, expected=expected, chi2also=True)
+            llhd = ret["llhd"]
+            chi2 = ret["chi2"]
+            ret = self.likelihoodFromLimits(0.0, expected=expected, chi2also=False)
+            lsm = ret["llhd"]
+            ret = self.likelihoodFromLimits(
                 None, expected=expected, chi2also=False, allowNegativeSignals=True
             )
+            lmax = ret["llhd"]
             if allowNegativeSignals == False and hasattr(self, "muhat_") and self.muhat_ < 0.0:
                 self.muhat_ = 0.0
                 lmax = lsm

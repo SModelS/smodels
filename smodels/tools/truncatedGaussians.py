@@ -23,8 +23,10 @@ from smodels.tools.basicStats import deltaChi2FromLlhd
 class TruncatedGaussians:
     """ likelihood computer based on the trunacated Gaussian approximation, see
          arXiv:1202.3415 """
+    __slots__ = [ "upperLimit", "expectedUpperLimit", "predicted_yield", "corr",
+                  "sigma_y", "denominator", "cl", "llhd_" ]
 
-    def __init__  ( self, upperLimit, expectedUpperLimit, predicted_yield, 
+    def __init__  ( self, upperLimit, expectedUpperLimit, predicted_yield,
                     corr : Optional[float] = 0.6, cl=.95, lumi = None ):
         """
         :param upperLimit: observed upper limit, as a yield or on xsec
@@ -36,7 +38,7 @@ class TruncatedGaussians:
            a factor of corr = 0.6 has been found to result in the best approximations.
         :param cl: confidence level
         :param lumi: if not None, and if the limits are in [fb], then use
-                     it to translate limits on xsecs into limits on yields 
+                     it to translate limits on xsecs into limits on yields
                      internally
         """
         if type(lumi) != type(None) and type(upperLimit) == type(fb):
@@ -55,14 +57,14 @@ class TruncatedGaussians:
         self.denominator = np.sqrt(2.0) * self.sigma_y
         self.cl = cl
 
-    def likelihood ( self, mu : Union[float,None], nll : Optional[bool]=False, 
-            allowNegativeMuhat : Optional[bool] = True,
+    def likelihood ( self, mu : Union[float,None], nll : Optional[bool]=False,
+            allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
             marginalize : bool = False ) -> float:
         """ return the likelihood, as a function of mu
         :param mu: number of signal events, if None then mu = muhat
         :param nll: if True, return negative log likelihood
-        :param allowNegativeMuhat: if True, then allow muhat to become negative,
+        :param allowNegativeSignals: if True, then allow muhat to become negative,
                else demand that muhat >= 0. In the presence of underfluctuations
                in the data, setting this to True results in more realistic
                approximate likelihoods.
@@ -78,21 +80,51 @@ class TruncatedGaussians:
         if mu != None:
             nsig = mu * self.predicted_yield
         dsig = self.likelihoodOfNSig ( nsig, nll=nll,
-                allowNegativeMuhat = allowNegativeMuhat, corr = corr )
+                allowNegativeSignals = allowNegativeSignals, corr = corr )
         if self.predicted_yield > 0.:
              muhat, sigma_mu =  dsig["yhat"]/self.predicted_yield,\
                 dsig["sigma_y"] / self.predicted_yield
 
-        ret = { sllhd: dsig[sllhd], "muhat": muhat, "sigma_mu": sigma_mu }
+        # ret = { sllhd: dsig[sllhd], "muhat": muhat, "sigma_mu": sigma_mu }
+        ret = dsig[sllhd]
         return ret
 
-    def likelihoodOfNSig ( self, nsig : Union[float,None], nll : Optional[bool]=False, 
-            allowNegativeMuhat : Optional[bool] = True,
+    def lmax ( self, nll : Optional[bool]=False,
+            allowNegativeSignals : Optional[bool] = True,
+            corr : Optional[float] = 0.6,
+            marginalize : bool = False ) -> float:
+        """ return the likelihood, as a function of mu
+        :param mu: number of signal events, if None then mu = muhat
+        :param nll: if True, return negative log likelihood
+        :param allowNegativeSignals: if True, then allow muhat to become negative,
+               else demand that muhat >= 0. In the presence of underfluctuations
+               in the data, setting this to True results in more realistic
+               approximate likelihoods.
+        :param marginalize: gets ignored
+
+        :returns: likelihood (float), muhat, and sigma_mu
+        """
+        sllhd = "llhd"
+        if nll:
+            sllhd = "nll"
+        muhat, sigma_mu = float("inf"), float("inf")
+        nsig = self.predicted_yield
+        dsig = self.likelihoodOfNSig ( nsig, nll=nll,
+                allowNegativeSignals = allowNegativeSignals, corr = corr )
+        if self.predicted_yield > 0.:
+             muhat, sigma_mu =  dsig["yhat"]/self.predicted_yield,\
+                dsig["sigma_y"] / self.predicted_yield
+
+        ret = { "muhat": muhat, "sigma_mu": sigma_mu }
+        return ret
+
+    def likelihoodOfNSig ( self, nsig : Union[float,None], nll : Optional[bool]=False,
+            allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6 ) -> float:
         """ return the likelihood, as a function of nsig
         :param nsig: number of signal events, if None then nsig = muhat * predicted_yioelds
         :param nll: if True, return negative log likelihood
-        :param allowNegativeMuhat: if True, then allow muhat to become negative,
+        :param allowNegativeSignals: if True, then allow muhat to become negative,
                else demand that muhat >= 0. In the presence of underfluctuations
                in the data, setting this to True results in more realistic
                approximate likelihoods.
@@ -106,10 +138,10 @@ class TruncatedGaussians:
         sllhd = "llhd"
         if nll:
             sllhd = "nll"
-    
+
         if self.upperLimit < self.expectedUpperLimit:
             ## underfluctuation. muhat = 0.
-            if allowNegativeMuhat:
+            if allowNegativeSignals:
                 xa = -self.expectedUpperLimit
                 xb = 1
                 yhat = self.find_neg_yhat( xa, xb )
@@ -141,7 +173,7 @@ class TruncatedGaussians:
             logger.error("when computing likelihood: fA and fB have same sign")
             return None, None, None
         yhat = optimize.brentq(
-            self.root_func, 0.0, max(self.upperLimit, self.expectedUpperLimit), 
+            self.root_func, 0.0, max(self.upperLimit, self.expectedUpperLimit),
             rtol=1e-03, xtol=1e-06)
         return yhat
 
@@ -197,11 +229,10 @@ class TruncatedGaussians:
 
     def rvsFromLimits( self, n=1 ):
         """
-        Generates a sample of random variates, given expected and observed likelihoods.
-        The likelihood is modelled as a truncated Gaussian.
+        Generates a sample of random variates, given expected and observed
+        likelihoods.  The likelihood is modelled as a truncated Gaussian.
 
         :param n: sample size
-
         :returns: sample of random variates
         """
         muhat = self.findMuhat()
