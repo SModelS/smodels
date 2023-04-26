@@ -254,8 +254,8 @@ class StatsComputer:
             if not "workspace_index" in kwargs:
                 index = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
-                if False: # expected != False:
-                    kargs["expected"] = expected
+                if expected != False:
+                    kwargs["expected"] = expected
         ret = self.likelihoodComputer.lmax ( nll = return_nll,
                allowNegativeSignals = allowNegativeSignals, **kwargs )
         return ret
