@@ -49,8 +49,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         tpreds = []
         for er in exp_results:
             ts = theoryPredictionsFor(
-                er, smstopos, combinedResults=False, useBestDataset=False, marginalize=False
-            )
+                er, smstopos, combinedResults=False, useBestDataset=False )
             for t in ts:
                 t.computeStatistics()
                 # print("er", str(er), "lsm", t.lsm, "lmax", t.lmax)
@@ -113,8 +112,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         defaultLmax["CMS-SUS-16-050-agg:ar8"] = 0.01880727876784458
         for er in exp_results:
             ts = theoryPredictionsFor(
-                er, smstopos, combinedResults=False, useBestDataset=False, marginalize=False
-            )
+                er, smstopos, combinedResults=False, useBestDataset=False )
             for t in ts:
                 tpreds.append(t)
         for t in tpreds:
@@ -180,8 +178,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         tpreds = []
         for er in exp_results:
             ts = theoryPredictionsFor(
-                er, smstopos, combinedResults=True, useBestDataset=False, marginalize=False
-            )
+                er, smstopos, combinedResults=True, useBestDataset=False )
             if not ts:
                 continue
             for t in ts:

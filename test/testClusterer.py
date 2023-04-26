@@ -302,7 +302,7 @@ class ClustererTest(unittest.TestCase):
 
         #Test clustering for UL results
         expResult = database.getExpResults(analysisIDs='CMS-SUS-16-039',dataTypes='upperLimit')[0]
-        predictions = theoryPredictionsFor(expResult, toplist, combinedResults=False, marginalize=False)
+        predictions = theoryPredictionsFor(expResult, toplist, combinedResults=False )
         clusterSizes = sorted([len(p.elements) for p in predictions])
         self.assertEqual(clusterSizes, [1,16,24])
 
