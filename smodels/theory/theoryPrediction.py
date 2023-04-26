@@ -325,9 +325,7 @@ class TheoryPrediction(object):
             element=self.avgElement, txnames=self.txnames, expected=True
         )
         if eul is None:
-            if chi2also:
-                return (None, None)
-            return None
+            return ret
         ul = self.dataset.getUpperLimitFor(
             element=self.avgElement, txnames=self.txnames, expected=False
         )
