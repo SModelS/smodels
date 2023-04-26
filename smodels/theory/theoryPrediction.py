@@ -17,6 +17,7 @@ from smodels.tools.truncatedGaussians import TruncatedGaussians
 from smodels.tools.statsTools import StatsComputer
 import itertools
 import numpy as np
+from test.debug import printTo
 
 class TheoryPrediction(object):
     """
@@ -330,23 +331,17 @@ class TheoryPrediction(object):
             element=self.avgElement, txnames=self.txnames, expected=False
         )
         lumi = self.dataset.getLumi()
-        computer = TruncatedGaussians ( ul, eul, self.xsection.value, lumi=lumi, corr = corr )
-        ret = computer.likelihood ( mu )
+        kwargs = { "upperLimit": ul, "expectedUpperLimit": eul,
+                   "predicted_yield": self.xsection.value, "corr": corr }
+        computer = StatsComputer ( self.dataset, 0., **kwargs )
+        # oldcomputer = TruncatedGaussians ( ul, eul, self.xsection.value, lumi=lumi, corr = corr )
+        ret = computer.likelihood ( mu, expected = False, return_nll = False )
         llhd, muhat, sigma_mu = ret["llhd"], ret["muhat"], ret["sigma_mu"]
-        """
-        if False: # muhat < 0.0 and allowNegativeSignals == False:
-            oldmuhat = muhat
-            oldl = llhd
-            muhat = 0.0
-            llhd, muhat, sigma_mu = likelihoodFromLimits(
-                ulN, eulN, nsig, 0.0, allowNegativeMuhat=True, corr=corr
-            )
-            nllhd, nmuhat, nsigma_mu = computer.likelihood ( 0. )
-        """
         self.muhat_ = muhat
         self.sigma_mu_ = sigma_mu
         if chi2also:
-            return (llhd, computer.chi2 ( ) )
+            chi2 = computer.chi2( llhd )
+            return (llhd, chi2 )
         return llhd
 
     def computeStatistics(self, expected=False, allowNegativeSignals=False):

@@ -23,7 +23,8 @@ class StatsComputer:
                   "upperLimitComputer", "type", "deltas_sys", "total" ]
     def __init__ ( self, dataset, nsig : Union[float,list],
                    deltas_rel : Union[None,float] = None,
-                   marginalize : bool = False, normalize_sig = False ):
+                   marginalize : bool = False, normalize_sig = False,
+                   **kwargs ):
         """ initialise with dataset.
         :param dataset: a smodels (combined)dataset
         :param nsig: signal yield, either as float or as list
@@ -34,7 +35,7 @@ class StatsComputer:
         """
         #if deltas_rel != None:
         #    logger.warning("Relative uncertainty on signal not supported for a single region.")
-        if dataset.getType() not in [ "efficiencyMap", "combined" ]:
+        if dataset.getType() not in [ "efficiencyMap", "combined", "upperLimit" ]:
             logger.error ( f"I do not recognize the dataset type {dataset.getType()}" )
 
         self.dataset = dataset
@@ -51,18 +52,42 @@ class StatsComputer:
         if self.deltas_sys == None:
             self.deltas_sys = 0.
         self.marginalize = marginalize
-        self.getComputer ( )
+        self.getComputer ( **kwargs )
 
-    def getComputer( self ):
+    def getComputer( self, **kwargs ):
         """ retrieve the statistical model """
         if self.dataset.getType() == "efficiencyMap":
             return self.getComputerSingleBin ( )
+        if self.dataset.getType() == "upperLimit":
+            return self.getComputerTruncGaussian ( **kwargs )
         # dataset.getType() is "combined"
         assert self.dataset.type in ("simplified", "pyhf" ), \
             f"I do not recognize the datatype {self.dataset.type}. it is not one of simplified, pyhf"
         if self.dataset.type == "simplified":
             return self.getComputerMultiBinSL ( )
         self.getComputerPyhf ( )
+
+    def getComputerTruncGaussian ( self, **kwargs ):
+        """
+        Create computer from a single bin
+        :param nsig: signal yields.
+        """
+        self.type = "truncgaussian"
+        dataset = self.dataset
+        from smodels.tools.truncatedGaussians import TruncatedGaussians
+        if not "lumi" in kwargs:
+            kwargs["lumi"] = self.dataset.getLumi()
+        computer = TruncatedGaussians ( **kwargs )
+        self.data = None
+        self.likelihoodComputer = computer
+        self.upperLimitComputer = computer
+
+    def chi2 ( self, likelihood = None ):
+        """ -2 ln L(bsm) / L(sm). treat with care. to be made obsolete! """
+        if self.type not in [ "truncgaussian" ]:
+            logger.error ( "chi2 method is not implemented. it should anyhow be avoided!" )
+            return None
+        return self.upperLimitComputer.chi2 ( likelihood )
 
     def getComputerSingleBin(self ):
         """
@@ -209,7 +234,7 @@ class StatsComputer:
 
     def transform ( self, expected ):
         """ SL only. transform the data to expected or observed """
-        if self.type == "pyhf":
+        if self.type in [ "pyhf", "truncgaussian" ]:
             return
         self.likelihoodComputer.transform ( expected )
 
