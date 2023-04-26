@@ -44,7 +44,7 @@ def getComputerForTruncGaussians(
         element=theorypred.avgElement, txnames=theorypred.txnames, expected=True
     )
     if eul is None:
-        return ret
+        return None
     ul = theorypred.dataset.getUpperLimitFor(
         element=theorypred.avgElement, txnames=theorypred.txnames, expected=False
     )
