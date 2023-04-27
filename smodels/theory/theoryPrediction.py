@@ -67,13 +67,16 @@ def likelihoodFromLimits(
     """
     computer = getComputerForTruncGaussians ( theorypred, corr, allowNegativeSignals )
 
-    ret = { "llhd": None, "chi2": None }
+    ret = { "llhd": None, "chi2": None, "lsm": None, "muhat": None,
+            "sigma_mu": None, "lmax": None }
     if computer is None:
         return ret
 
     llhd = computer.likelihood ( mu, expected = False, return_nll = False )
+    lsm = computer.likelihood ( 0., expected = False, return_nll = False )
     ret = computer.maximize_likelihood ( expected = False, return_nll = False )
     ret [ "llhd" ] = llhd
+    ret [ "lsm" ] = lsm
     chi2 = computer.chi2( llhd )
     ret [ "chi2" ] = chi2
     return ret
@@ -363,30 +366,19 @@ class TheoryPrediction(object):
             ret = likelihoodFromLimits( self, 1.0, expected=expected )
             llhd = ret["llhd"]
             chi2 = ret["chi2"]
-            ret = likelihoodFromLimits( self, 0.0, expected=expected )
-            lsm = ret["llhd"]
+            lsm = ret["lsm"]
             ret = likelihoodFromLimits( self,
                 None, expected=expected, allowNegativeSignals=True )
             lmax = ret["llhd"]
-            """
-            if allowNegativeSignals == False and hasattr(self, "muhat_") and self.muhat_ < 0.0:
-                self.muhat_ = 0.0
-                lmax = lsm
-            from test.debug import printTo
-            printTo ( f"we have {llhd} {lsm} {lmax} {chi2}" )
-            """
+            #from test.debug import printTo
+            #printTo ( f"we have lbsm={llhd} lsm={lsm} lmax={lmax} chi2={chi2}" )
+            #printTo ( f"ret is {ret}" )
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
+            self.cachedObjs[expected]["muhat"] = ret["muhat"]
+            self.cachedObjs[expected]["sigma_mu"] = ret["sigma_mu"]
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
             self.cachedObjs[expected]["chi2"] = chi2
-            """
-            if hasattr(self, "muhat_"):
-                self.cachedObjs[expected]["muhat"][allowNegativeSignals] = self.muhat_
-            if hasattr(self, "sigma_mu_"):
-                if not "sigma_mu" in self.cachedObjs[expected]:
-                    self.cachedObjs[expected]["sigma_mu"] = {}
-                self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = self.sigma_mu_
-            """
 
         elif self.dataType() == "efficiencyMap":
             lumi = self.dataset.getLumi()
