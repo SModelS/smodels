@@ -79,11 +79,11 @@ class TruncatedGaussians:
         if mu != None:
             nsig = mu * self.predicted_yield
         dsig = self._likelihoodOfNSig ( nsig, nll=nll,
-                allowNegativeSignals = allowNegativeSignals, corr = corr )
+                allowNegativeSignals = allowNegativeSignals, corr = corr,
+                expected = expected )
         if self.predicted_yield > 0.:
              muhat, sigma_mu =  dsig["yhat"]/self.predicted_yield,\
                 dsig["sigma_y"] / self.predicted_yield
-
         # ret = { sllhd: dsig[sllhd], "muhat": muhat, "sigma_mu": sigma_mu }
         ret = dsig[sllhd]
         return ret
@@ -124,7 +124,8 @@ class TruncatedGaussians:
 
     def _likelihoodOfNSig ( self, nsig : Union[float,None], nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
-            corr : Optional[float] = 0.6 ) -> float:
+            corr : Optional[float] = 0.6, 
+            expected : Union[bool,Text] = False ) -> float:
         """ return the likelihood, as a function of nsig
         :param nsig: number of signal events, if None then nsig = muhat * predicted_yioelds
         :param nll: if True, return negative log likelihood
@@ -148,7 +149,9 @@ class TruncatedGaussians:
             if allowNegativeSignals:
                 xa = -self.expectedUpperLimit
                 xb = 1
-                yhat = self._find_neg_yhat( xa, xb )
+                yhat = 0.
+                if expected == False:
+                    yhat = self._find_neg_yhat( xa, xb )
                 self.llhd_ = self._computeLlhd(nsig, yhat, nll = False )
                 ret = self.llhd_
                 if nll:
@@ -161,7 +164,9 @@ class TruncatedGaussians:
                     ret = -math.log(ret)
                 return { sllhd: ret, "yhat": 0.0, "sigma_y": self.sigma_y }
 
-        yhat = self._findYhat()
+        yhat = 0.
+        if expected == False:
+            yhat = self._findYhat()
         self.llhd_ = self._computeLlhd(nsig, yhat, nll = False )
         ret = self.llhd_
         if nll:
