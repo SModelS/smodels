@@ -67,7 +67,7 @@ def likelihoodFromLimits(
     """
     computer = getComputerForTruncGaussians ( theorypred, corr, allowNegativeSignals )
 
-    ret = { "llhd": None, "chi2": None, "lsm": None, "muhat": None,
+    ret = { "llhd": None, "lsm": None, "muhat": None,
             "sigma_mu": None, "lmax": None }
     if computer is None:
         return ret
@@ -77,8 +77,6 @@ def likelihoodFromLimits(
     ret = computer.maximize_likelihood ( expected = False, return_nll = False )
     ret [ "llhd" ] = llhd
     ret [ "lsm" ] = lsm
-    chi2 = computer.chi2( llhd )
-    ret [ "chi2" ] = chi2
     return ret
 
 class TheoryPrediction(object):
@@ -343,7 +341,6 @@ class TheoryPrediction(object):
             ret = likelihoodFromLimits( self, mu, expected=expected, 
                     allowNegativeSignals=True)
             llhd = ret["llhd"]
-            chi2 = ret["chi2"]
         self.cachedLlhds[expected][mu] = llhd
         if nll:
             if llhd == 0.0:
@@ -365,7 +362,6 @@ class TheoryPrediction(object):
         if self.dataType() == "upperLimit":
             ret = likelihoodFromLimits( self, 1.0, expected=expected )
             llhd = ret["llhd"]
-            chi2 = ret["chi2"]
             lsm = ret["lsm"]
             ret = likelihoodFromLimits( self,
                 None, expected=expected, allowNegativeSignals=True )
@@ -378,7 +374,6 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["muhat"] = ret["muhat"]
             self.cachedObjs[expected]["sigma_mu"] = ret["sigma_mu"]
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
-            self.cachedObjs[expected]["chi2"] = chi2
 
         elif self.dataType() == "efficiencyMap":
             lumi = self.dataset.getLumi()
