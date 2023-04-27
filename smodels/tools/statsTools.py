@@ -79,13 +79,6 @@ class StatsComputer:
         self.likelihoodComputer = computer
         self.upperLimitComputer = computer
 
-    def chi2 ( self, likelihood = None ):
-        """ -2 ln L(bsm) / L(sm). treat with care. to be made obsolete! """
-        if self.type not in [ "truncgaussian" ]:
-            logger.error ( "chi2 method is not implemented. it should anyhow be avoided!" )
-            return None
-        return self.upperLimitComputer.chi2 ( likelihood )
-
     def getComputerSingleBin(self ):
         """
         Create computer from a single bin

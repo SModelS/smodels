@@ -52,10 +52,11 @@ def getComputerForTruncGaussians(
     computer = StatsComputer ( theorypred.dataset, 0., **kwargs )
     return computer
 
-def likelihoodFromLimits(
+def fiveValuesFromLimits(
     theorypred, mu=1.0, expected=False, corr=0.6, allowNegativeSignals=False
 ):
-    """compute the likelihood from expected and observed upper limits.
+    """ compute the five values lsm, lbsm, lmax, mu_hat, sigma_mu
+        from expected and observed upper limits.
     :param expected: compute expected, not observed likelihood
     :param mu: signal strength multiplier, applied to theory prediction. If None,
                then find muhat
@@ -71,10 +72,12 @@ def likelihoodFromLimits(
             "sigma_mu": None, "lmax": None }
     if computer is None:
         return ret
+    nll = False
+    expected = False
 
-    lbsm = computer.likelihood ( mu, expected = False, return_nll = False )
-    lsm = computer.likelihood ( 0., expected = False, return_nll = False )
-    ret = computer.maximize_likelihood ( expected = False, return_nll = False )
+    lbsm = computer.likelihood ( mu, expected = expected, return_nll = nll )
+    lsm = computer.likelihood ( 0., expected = expected, return_nll = nll )
+    ret = computer.maximize_likelihood ( expected = expected, return_nll = nll )
     ret [ "lbsm" ] = lbsm
     ret [ "lsm" ] = lsm
     return ret
@@ -338,7 +341,7 @@ class TheoryPrediction(object):
 
         if self.dataType() == "upperLimit":
             # these fits only work with negative signals!
-            ret = likelihoodFromLimits( self, mu, expected=expected, 
+            ret = fiveValuesFromLimits( self, mu, expected=expected,
                     allowNegativeSignals=True)
             llhd = ret["lbsm"]
         self.cachedLlhds[expected][mu] = llhd
@@ -360,17 +363,16 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["muhat"] = {}
 
         if self.dataType() == "upperLimit":
-            ret = likelihoodFromLimits( self, 1.0, expected=expected )
+            ret = fiveValuesFromLimits( self, 1.0, expected=expected )
             lbsm = ret["lbsm"]
             lsm = ret["lsm"]
-            ret = likelihoodFromLimits( self,
+            #from test.debug import printTo
+            #print ( f"in the first call with mu=1 we have {ret}" )
+            ret = fiveValuesFromLimits( self,
                 None, expected=expected, allowNegativeSignals=True )
             lmax = ret["lbsm"]
-            """
-            from test.debug import printTo
-            printTo ( f"we have lbsm={lbsm} lsm={lsm} lmax={lmax}" )
-            printTo ( f"ret is {ret}" )
-            """
+            #printTo ( f"we have lbsm={lbsm} lsm={lsm} lmax={lmax}" )
+            #printTo ( f"ret is {ret}" )
             self.cachedObjs[expected]["llhd"] = lbsm
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["muhat"] = ret["muhat"]
