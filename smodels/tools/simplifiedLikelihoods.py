@@ -775,9 +775,9 @@ class LikelihoodComputer:
                 dn = [0.0]
             muhat = float(dn[0])
             if abs(self.model.nsignal) > 1e-100:
-                self.muhat = float(dn[0] / self.model.nsignal[0])
+                muhat = float(dn[0] / self.model.nsignal[0])
             sigma_mu = np.sqrt(self.model.observed[0] + self.model.covariance[0][0])
-            ret= self.likelihood( nll=nll, mu = self.muhat )
+            ret= self.likelihood( nll=nll, mu = muhat )
             return { "llhd": ret, "muhat": muhat, "sigma_mu": sigma_mu }
         fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
                               extended_output=True, nll=nll
