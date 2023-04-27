@@ -22,13 +22,11 @@ from typing import Union
 __all__ = [ "TheoryPrediction", "fiveValuesFromLimits", "theoryPredictionsFor" ]
 
 def getComputerForTruncGaussians(
-    theorypred, corr : float =0.6, allowNegativeSignals : bool = False
-) -> Union [ StatsComputer, None ]:
+    theorypred, corr : float =0.6 ) -> Union [ StatsComputer, None ]:
     """ get a statscomputer for truncated gaussians
     :param corr: correction factor:
              ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
              a factor of corr = 0.6 is proposed.
-    :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
     :returns: a StatsComputer
     """
     # marked as experimental feature
@@ -53,7 +51,7 @@ def getComputerForTruncGaussians(
     return computer
 
 def fiveValuesFromLimits(
-    theorypred, mu=1.0, expected=False, corr=0.6, allowNegativeSignals=False
+    theorypred, mu=1.0, expected=False, corr=0.6, allowNegativeSignals=True
 ):
     """ compute the five values lsm, lbsm, lmax, mu_hat, sigma_mu
         from expected and observed upper limits.
@@ -66,18 +64,21 @@ def fiveValuesFromLimits(
     :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
     :returns: likelihood; none if no expected upper limit is defined.
     """
-    computer = getComputerForTruncGaussians ( theorypred, corr, allowNegativeSignals )
+    computer = getComputerForTruncGaussians ( theorypred, corr )
 
     ret = { "lbsm": None, "lsm": None, "muhat": None,
             "sigma_mu": None, "lmax": None }
     if computer is None:
         return ret
     nll = False
-    # expected = False
+    if not allowNegativeSignals and type(mu) is not type(None) and  mu < 0.:
+        logger.error ( f"asked to compute llhd for mu={mu:.3f}, but no negative signals allowed" )
+        mu = 0.
 
     lbsm = computer.likelihood ( mu, expected = expected, return_nll = nll )
     lsm = computer.likelihood ( 0., expected = expected, return_nll = nll )
-    ret = computer.maximize_likelihood ( expected = expected, return_nll = nll )
+    ret = computer.maximize_likelihood ( expected = expected, return_nll = nll,
+           allowNegativeSignals = allowNegativeSignals )
     ret [ "lbsm" ] = lbsm
     ret [ "lsm" ] = lsm
     return ret
@@ -363,16 +364,11 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["muhat"] = {}
 
         if self.dataType() == "upperLimit":
-            ret = fiveValuesFromLimits( self, 1.0, expected=expected )
+            ans = True # for upper limits we always allow negative fake signals
+            ret = fiveValuesFromLimits( self, 1.0, expected=expected, allowNegativeSignals = ans )
             lbsm = ret["lbsm"]
             lsm = ret["lsm"]
-            #from test.debug import printTo
-            #print ( f"in the first call with mu=1 we have {ret}" )
-            ret = fiveValuesFromLimits( self,
-                None, expected=expected, allowNegativeSignals=True )
             lmax = ret["lbsm"]
-            #printTo ( f"we have lbsm={lbsm} lsm={lsm} lmax={lmax}" )
-            #printTo ( f"ret is {ret}" )
             self.cachedObjs[expected]["llhd"] = lbsm
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["muhat"] = ret["muhat"]
