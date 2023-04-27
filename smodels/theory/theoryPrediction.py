@@ -34,7 +34,7 @@ def getComputerForTruncGaussians(
     if not experimentalFeatures():
         return None
     if not hasattr(theorypred, "avgElement"):
-        logger.error("theory prediction %s has no average element! why??" % theorypred.analysisId())
+        logger.error("theory prediction {theorypred.analysisId()} has no average element! why??" )
         return None
 
     eul = theorypred.dataset.getUpperLimitFor(
@@ -51,8 +51,9 @@ def getComputerForTruncGaussians(
     return computer
 
 def fiveValuesFromLimits(
-    theorypred, mu=1.0, expected=False, corr=0.6, allowNegativeSignals=True
-):
+    theorypred, mu : float = 1.0, expected : bool = False,
+    corr : float = 0.6, allowNegativeSignals : bool = True
+) -> dict:
     """ compute the five values lsm, lbsm, lmax, mu_hat, sigma_mu
         from expected and observed upper limits.
     :param expected: compute expected, not observed likelihood
@@ -62,7 +63,7 @@ def fiveValuesFromLimits(
              ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
              a factor of corr = 0.6 is proposed.
     :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
-    :returns: likelihood; none if no expected upper limit is defined.
+    :returns: dictionary of five values (lbsm, lsm, muhat, sigma_mu, lmax)
     """
     computer = getComputerForTruncGaussians ( theorypred, corr )
 
