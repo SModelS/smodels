@@ -17,7 +17,6 @@ from smodels.tools.truncatedGaussians import TruncatedGaussians
 from smodels.tools.statsTools import StatsComputer
 import itertools
 import numpy as np
-from test.debug import printTo
 from typing import Union
 
 __all__ = [ "TheoryPrediction" ]
@@ -54,14 +53,12 @@ def getComputerForTruncGaussians(
     return computer
 
 def likelihoodFromLimits(
-    theorypred, mu=1.0, expected=False, chi2also=False, corr=0.6,
-    allowNegativeSignals=False
+    theorypred, mu=1.0, expected=False, corr=0.6, allowNegativeSignals=False
 ):
     """compute the likelihood from expected and observed upper limits.
     :param expected: compute expected, not observed likelihood
     :param mu: signal strength multiplier, applied to theory prediction. If None,
                then find muhat
-    :param chi2also: if true, return also chi2
     :param corr: correction factor:
              ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
              a factor of corr = 0.6 is proposed.
@@ -70,18 +67,15 @@ def likelihoodFromLimits(
     """
     computer = getComputerForTruncGaussians ( theorypred, corr, allowNegativeSignals )
 
-    ret = { "llhd": None }
-    if chi2also:
-        ret["chi2"]=None
+    ret = { "llhd": None, "chi2": None }
     if computer is None:
         return ret
 
     llhd = computer.likelihood ( mu, expected = False, return_nll = False )
     ret = computer.maximize_likelihood ( expected = False, return_nll = False )
     ret [ "llhd" ] = llhd
-    if chi2also:
-        chi2 = computer.chi2( llhd )
-        ret [ "chi2" ] = chi2
+    chi2 = computer.chi2( llhd )
+    ret [ "chi2" ] = chi2
     return ret
 
 class TheoryPrediction(object):
@@ -343,9 +337,8 @@ class TheoryPrediction(object):
 
         if self.dataType() == "upperLimit":
             # these fits only work with negative signals!
-            ret = likelihoodFromLimits( self,
-                mu, chi2also=True, expected=expected, allowNegativeSignals=True
-            )
+            ret = likelihoodFromLimits( self, mu, expected=expected, 
+                    allowNegativeSignals=True)
             llhd = ret["llhd"]
             chi2 = ret["chi2"]
         self.cachedLlhds[expected][mu] = llhd
@@ -367,28 +360,33 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["muhat"] = {}
 
         if self.dataType() == "upperLimit":
-            ret = likelihoodFromLimits( self, 1.0, expected=expected, chi2also=True)
+            ret = likelihoodFromLimits( self, 1.0, expected=expected )
             llhd = ret["llhd"]
             chi2 = ret["chi2"]
-            ret = likelihoodFromLimits( self, 0.0, expected=expected, chi2also=False)
+            ret = likelihoodFromLimits( self, 0.0, expected=expected )
             lsm = ret["llhd"]
             ret = likelihoodFromLimits( self,
-                None, expected=expected, chi2also=False, allowNegativeSignals=True
-            )
+                None, expected=expected, allowNegativeSignals=True )
             lmax = ret["llhd"]
+            """
             if allowNegativeSignals == False and hasattr(self, "muhat_") and self.muhat_ < 0.0:
                 self.muhat_ = 0.0
                 lmax = lsm
+            from test.debug import printTo
+            printTo ( f"we have {llhd} {lsm} {lmax} {chi2}" )
+            """
             self.cachedObjs[expected]["llhd"] = llhd
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["lmax"][allowNegativeSignals] = lmax
             self.cachedObjs[expected]["chi2"] = chi2
+            """
             if hasattr(self, "muhat_"):
                 self.cachedObjs[expected]["muhat"][allowNegativeSignals] = self.muhat_
             if hasattr(self, "sigma_mu_"):
                 if not "sigma_mu" in self.cachedObjs[expected]:
                     self.cachedObjs[expected]["sigma_mu"] = {}
                 self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = self.sigma_mu_
+            """
 
         elif self.dataType() == "efficiencyMap":
             lumi = self.dataset.getLumi()
