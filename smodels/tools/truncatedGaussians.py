@@ -84,6 +84,7 @@ class TruncatedGaussians:
         if self.predicted_yield > 0.:
              muhat, sigma_mu =  dsig["yhat"]/self.predicted_yield,\
                 dsig["sigma_y"] / self.predicted_yield
+        # import sys; sys.exit()
         # ret = { sllhd: dsig[sllhd], "muhat": muhat, "sigma_mu": sigma_mu }
         ret = dsig[sllhd]
         return ret
@@ -187,7 +188,7 @@ class TruncatedGaussians:
         return yhat
 
     def _getSigmaY(self, yhat=0.0 ):
-        """get the standard deviation sigma, given
+        """get the standard deviation sigma on the event yields, given
         an upper limit and a central value. assumes a truncated Gaussian likelihood"""
         # the expected scale, eq 3.24 in arXiv:1202.3415
         return ( self.expectedUpperLimit - yhat) / 1.96
@@ -220,34 +221,3 @@ class TruncatedGaussians:
         if nll:
             return np.log(A) - stats.norm.logpdf(nsig, muhat, self.sigma_y)
         return float(stats.norm.pdf(nsig, muhat, self.sigma_y) / A)
-
-    def chi2( self, likelihood = None ):
-        """compute the chi2 value from a likelihood (convenience function).
-        :param likelihood: supply likelihood, if None, use just calculcated llhd
-        """
-        if likelihood == None:
-            if not hasattr ( self, "llhd_" ):
-                raise SModelSError ( "asking for chi2 but no likelihood given" )
-            likelihood = self.llhd_
-        l0 = 2.0 * stats.norm.logpdf(0.0, 0.0, self.sigma_y)
-        l = deltaChi2FromLlhd(likelihood)
-        if l is None:
-            return None
-
-        return l + l0
-
-    """
-    def rvsFromLimits( self, n=1 ):
-        Generates a sample of random variates, given expected and observed
-        likelihoods.  The likelihood is modelled as a truncated Gaussian.
-
-        :param n: sample size
-        :returns: sample of random variates
-        muhat = self.findMuhat()
-        ret = []
-        while len(ret) < n:
-            tmp = stats.norm.rvs(muhat, self.sigma_y)
-            if tmp > 0.0:
-                ret.append(tmp)
-        return ret
-    """

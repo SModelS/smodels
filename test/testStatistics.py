@@ -61,6 +61,22 @@ class StatisticsTest(unittest.TestCase):
         print("total limit", totlim)
         f.close()
 
+    def testPaperExample(self):
+        """test the likelihoods from limits allowing for underfluctuations"""
+        nsig = 3.0
+        nobs, nbg = 35, 30
+        m = Data(nobs, nbg, 0.001, None, nsig )
+        ulcomp = UpperLimitComputer()
+        ulobs = ulcomp.getUpperLimitOnMu(m)
+        ulexp = ulcomp.getUpperLimitOnMu(m, expected=True)
+        computer = TruncatedGaussians ( ulobs, ulexp, nsig )
+        sy = computer.sigma_y 
+        llhdlim = computer.likelihood ( mu=1.,
+               nll = False, allowNegativeSignals = True )
+        ret = computer.lmax ( nll = False,
+                allowNegativeSignals = True )
+        ## muhat is said to be 5/3
+
     def testUnderfluctuatingLlhdsFromLimits(self):
         """test the likelihoods from limits allowing for underfluctuations"""
         comparisons = {
@@ -109,7 +125,6 @@ class StatisticsTest(unittest.TestCase):
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0. )
         llhdcomp = LikelihoodComputer(m)
         llhddir = llhdcomp.likelihood(mu=1.)
-        chi2dir = llhdcomp.chi2()
         computer = TruncatedGaussians ( ulobs, ulexp, nsig )
         llhdlim = computer.likelihood ( mu=1. )
         ret = computer.lmax ( )
@@ -119,7 +134,6 @@ class StatisticsTest(unittest.TestCase):
         self.assertAlmostEqual(muhat,0.23328649242374602,3)
         # self.assertAlmostEqual(sigma_mu,0.338419104966444,4)
         self.assertAlmostEqual(sigma_mu,0.3383372145700653,4)
-        chi2lim = computer.chi2 ( ) # llhdlim )
 
     def testUpperLimit(self):
         m = Data(100.0, 100.0, 0.001, None, 1.0, deltas_rel=0.0)
