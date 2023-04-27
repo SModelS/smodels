@@ -19,7 +19,7 @@ import itertools
 import numpy as np
 from typing import Union
 
-__all__ = [ "TheoryPrediction" ]
+__all__ = [ "TheoryPrediction", "fiveValuesFromLimits", "theoryPredictionsFor" ]
 
 def getComputerForTruncGaussians(
     theorypred, corr : float =0.6, allowNegativeSignals : bool = False
@@ -73,7 +73,7 @@ def fiveValuesFromLimits(
     if computer is None:
         return ret
     nll = False
-    expected = False
+    # expected = False
 
     lbsm = computer.likelihood ( mu, expected = expected, return_nll = nll )
     lsm = computer.likelihood ( 0., expected = expected, return_nll = nll )
