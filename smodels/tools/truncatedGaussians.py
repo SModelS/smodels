@@ -59,7 +59,8 @@ class TruncatedGaussians:
 
     def likelihood ( self, mu : Union[float,None], nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
-            corr : Optional[float] = 0.6 ) -> Union[None,float]:
+            corr : Optional[float] = 0.6,
+            expected : Union[Text,bool] = False ) -> Union[None,float]:
         """ return the likelihood, as a function of mu
         :param mu: number of signal events, if None then mu = muhat
         :param nll: if True, return negative log likelihood
@@ -89,7 +90,8 @@ class TruncatedGaussians:
 
     def lmax ( self, nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
-            corr : Optional[float] = 0.6 ) -> Dict:
+            corr : Optional[float] = 0.6,
+            expected : Union[bool,Text] = False ) -> Dict:
         """ return the likelihood, as a function of mu
         :param mu: number of signal events, if None then mu = muhat
         :param nll: if True, return negative log likelihood
@@ -113,6 +115,8 @@ class TruncatedGaussians:
         muhat, sigma_mu =  dsig["yhat"]/self.predicted_yield,\
             dsig["sigma_y"] / self.predicted_yield
         # llhd evaluated at mu_hat 
+        if expected:
+            muhat = 0.
         lmax = self.likelihood ( muhat )
 
         ret = { "muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax }

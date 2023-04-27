@@ -219,6 +219,8 @@ class StatsComputer:
             return self.likelihoodComputer.likelihood (
                     poi_test, nll = return_nll,
                     expected = expected, **kwargs )
+        if self.type == "truncgaussian":
+            kwargs["expected"]=expected
         return self.likelihoodComputer.likelihood ( poi_test,
                 nll = return_nll, **kwargs )
 
@@ -246,6 +248,8 @@ class StatsComputer:
                 kwargs["workspace_index"] = index
                 if expected != False:
                     kwargs["expected"] = expected
+        if self.type == "truncgaussian":
+            kwargs["expected"]=expected
         ret = self.likelihoodComputer.lmax ( nll = return_nll,
                allowNegativeSignals = allowNegativeSignals, **kwargs )
         return ret
