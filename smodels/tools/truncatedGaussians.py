@@ -113,7 +113,7 @@ class TruncatedGaussians:
         muhat, sigma_mu =  dsig["yhat"]/self.predicted_yield,\
             dsig["sigma_y"] / self.predicted_yield
         # llhd evaluated at mu_hat 
-        lmax = 1. / ( sigma_mu * np.sqrt ( 2*np.pi ) )
+        lmax = self.likelihood ( muhat )
 
         ret = { "muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax }
         return ret
