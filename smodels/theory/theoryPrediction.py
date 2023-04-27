@@ -67,15 +67,15 @@ def likelihoodFromLimits(
     """
     computer = getComputerForTruncGaussians ( theorypred, corr, allowNegativeSignals )
 
-    ret = { "llhd": None, "lsm": None, "muhat": None,
+    ret = { "lbsm": None, "lsm": None, "muhat": None,
             "sigma_mu": None, "lmax": None }
     if computer is None:
         return ret
 
-    llhd = computer.likelihood ( mu, expected = False, return_nll = False )
+    lbsm = computer.likelihood ( mu, expected = False, return_nll = False )
     lsm = computer.likelihood ( 0., expected = False, return_nll = False )
     ret = computer.maximize_likelihood ( expected = False, return_nll = False )
-    ret [ "llhd" ] = llhd
+    ret [ "lbsm" ] = lbsm
     ret [ "lsm" ] = lsm
     return ret
 
@@ -340,7 +340,7 @@ class TheoryPrediction(object):
             # these fits only work with negative signals!
             ret = likelihoodFromLimits( self, mu, expected=expected, 
                     allowNegativeSignals=True)
-            llhd = ret["llhd"]
+            llhd = ret["lbsm"]
         self.cachedLlhds[expected][mu] = llhd
         if nll:
             if llhd == 0.0:
@@ -361,15 +361,17 @@ class TheoryPrediction(object):
 
         if self.dataType() == "upperLimit":
             ret = likelihoodFromLimits( self, 1.0, expected=expected )
-            llhd = ret["llhd"]
+            lbsm = ret["lbsm"]
             lsm = ret["lsm"]
             ret = likelihoodFromLimits( self,
                 None, expected=expected, allowNegativeSignals=True )
-            lmax = ret["llhd"]
-            #from test.debug import printTo
-            #printTo ( f"we have lbsm={llhd} lsm={lsm} lmax={lmax} chi2={chi2}" )
-            #printTo ( f"ret is {ret}" )
-            self.cachedObjs[expected]["llhd"] = llhd
+            lmax = ret["lbsm"]
+            """
+            from test.debug import printTo
+            printTo ( f"we have lbsm={lbsm} lsm={lsm} lmax={lmax}" )
+            printTo ( f"ret is {ret}" )
+            """
+            self.cachedObjs[expected]["llhd"] = lbsm
             self.cachedObjs[expected]["lsm"] = lsm
             self.cachedObjs[expected]["muhat"] = ret["muhat"]
             self.cachedObjs[expected]["sigma_mu"] = ret["sigma_mu"]
