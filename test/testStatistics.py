@@ -69,12 +69,18 @@ class StatisticsTest(unittest.TestCase):
         ulcomp = UpperLimitComputer()
         ulobs = ulcomp.getUpperLimitOnMu(m)
         ulexp = ulcomp.getUpperLimitOnMu(m, expected=True)
-        computer = TruncatedGaussians ( ulobs, ulexp, nsig )
-        sy = computer.sigma_y 
+        doPrint = False
+        computer = TruncatedGaussians ( ulobs, ulexp, nsig, corr = 0. )
         llhdlim = computer.likelihood ( mu=1.,
                nll = False, allowNegativeSignals = True )
         ret = computer.lmax ( nll = False,
                 allowNegativeSignals = True )
+        if doPrint:
+            sy = computer.sigma_y
+            print ( "ulobs,exp=",ulobs,ulexp )
+            print ( "sigma_y=", sy ) ## paper says it is approx sqrt(35)/3
+            print ( "denominator=", computer.denominator )
+            print ( "ret is", ret )
         ## muhat is said to be 5/3
 
     def testUnderfluctuatingLlhdsFromLimits(self):
