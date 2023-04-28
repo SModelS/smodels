@@ -43,7 +43,7 @@ class TheoryPrediction(object):
         self.deltas_rel = deltas_rel
         self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
         self.cachedLlhds = {False: {}, True: {}, "posteriori": {}}
-        self.statsComputer = None
+        self._statsComputer = None
 
     def __str__(self):
         ret = "%s:%s" % (self.analysisId(), self.totalXsection())
@@ -100,10 +100,13 @@ class TheoryPrediction(object):
         return max(values)
         # return maxcond
 
-    def setStatsComputer(self):
+    @property
+    def statsComputer(self):
+        if self._statsComputer is None:
+            self.setStatsComputer()
+        return self._statsComputer
 
-        if self.statsComputer is not None:
-            return
+    def setStatsComputer(self):
 
         if self.dataType() == "upperLimit":
             from smodels.tools.runtime import experimentalFeatures
@@ -135,7 +138,7 @@ class TheoryPrediction(object):
             computer = StatsComputer ( self.dataset, srNsigs,
                 deltas_rel = self.deltas_rel, normalize_sig = True )
             
-        self.statsComputer = computer
+        self._statsComputer = computer
 
     def getUpperLimit(self, expected=False):
         """
