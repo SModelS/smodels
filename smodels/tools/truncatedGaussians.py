@@ -80,11 +80,6 @@ class TruncatedGaussians:
         dsig = self._likelihoodOfNSig ( nsig, nll=nll,
                 allowNegativeSignals = allowNegativeSignals, corr = corr,
                 expected = expected )
-        if self.predicted_yield > 0.:
-             muhat, sigma_mu =  dsig["yhat"]/self.predicted_yield,\
-                dsig["sigma_y"] / self.predicted_yield
-        # import sys; sys.exit()
-        # ret = { sllhd: dsig[sllhd], "muhat": muhat, "sigma_mu": sigma_mu }
         ret = dsig[sllhd]
         return ret
 
@@ -114,6 +109,7 @@ class TruncatedGaussians:
             return default
         muhat, sigma_mu =  dsig["yhat"]/self.predicted_yield,\
             dsig["sigma_y"] / self.predicted_yield
+        # muhat, sigma_mu =  dsig["yhat"], dsig["sigma_y"]
         # llhd evaluated at mu_hat 
         if expected:
             muhat = 0.
