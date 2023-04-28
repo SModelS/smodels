@@ -12,24 +12,25 @@
 
 __all__ = [ "StatsComputer" ]
 
-from typing import Union, Text, Tuple, Dict, List
+from typing import Union, Text, Dict, List
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
-import numpy as np
 
 class StatsComputer:
     __slots__ = [ "nsig", "dataset", "data", "likelihoodComputer",
                   "upperLimitComputer", "type", "deltas_sys", "total" ]
-    def __init__ ( self, dataset, nsig : Union[float,list],
+    
+    def __init__ ( self, dataset, nsig : Union[float,List],
                    deltas_rel : Union[None,float] = None,
-                   normalize_sig = False, **kwargs ):
+                   normalize_sig = False, allowNegativeSignals=False, **kwargs ):
         """ initialise with dataset.
         :param dataset: a smodels (combined)dataset
         :param nsig: signal yield, either as float or as list
         :param deltas_rel: relative error on signal. currently unused
         :param normalize_sig: if true, then normalize the signal yields to 1
                               before doing anything else
+        :allowNegativeSignals: if True, negative values for the signal (mu) are allowed.
         """
         #if deltas_rel != None:
         #    logger.warning("Relative uncertainty on signal not supported for a single region.")
@@ -49,7 +50,36 @@ class StatsComputer:
         self.deltas_sys = deltas_rel
         if self.deltas_sys == None:
             self.deltas_sys = 0.
+        self.allowNegativeSignals = allowNegativeSignals
         self.getComputer ( **kwargs )
+
+    @classmethod
+    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> Union['StatsComputer', None]:
+        """ get a statscomputer for truncated gaussians
+        :param theorypred: TheoryPrediction object
+        :param corr: correction factor:
+                ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
+                a factor of corr = 0.6 is proposed.
+        :returns: a StatsComputer
+        """
+        # marked as experimental feature
+        if not hasattr(theorypred, "avgElement"):
+            logger.error("theory prediction {theorypred.analysisId()} has no average element! why??" )
+            return None
+
+        eul = theorypred.dataset.getUpperLimitFor(
+            element=theorypred.avgElement, txnames=theorypred.txnames, expected=True
+        )
+        if eul is None:
+            return None
+        ul = theorypred.dataset.getUpperLimitFor(
+            element=theorypred.avgElement, txnames=theorypred.txnames, expected=False
+        )
+        kwargs = { "upperLimit": ul, "expectedUpperLimit": eul,
+                "predicted_yield": theorypred.xsection.value, "corr": corr }
+        computer = StatsComputer( theorypred.dataset, nsig=0.,
+                                  allowNegativeSignals=True, **kwargs )
+        return computer
 
     def getComputer( self, **kwargs ):
         """ retrieve the statistical model """
@@ -70,7 +100,6 @@ class StatsComputer:
         :param nsig: signal yields.
         """
         self.type = "truncgaussian"
-        dataset = self.dataset
         from smodels.tools.truncatedGaussians import TruncatedGaussians
         if not "lumi" in kwargs:
             kwargs["lumi"] = self.dataset.getLumi()
@@ -127,13 +156,13 @@ class StatsComputer:
         self.upperLimitComputer = UpperLimitComputer ( )
 
     def get_five_values ( self, expected : Union [ bool, Text ],
-                      return_nll : bool = False, allowNegativeSignals : bool =False,
+                      return_nll : bool = False,
                       check_for_maxima : bool = False )-> Dict:
         """ return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat) 
         :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
              correct, if necessary
         """
-        ret = self.maximize_likelihood ( expected = expected, allowNegativeSignals =allowNegativeSignals, return_nll = return_nll  )
+        ret = self.maximize_likelihood ( expected = expected, return_nll = return_nll  )
         lmax = ret.pop("llhd")
         ret["lmax"] = lmax
         
@@ -222,7 +251,8 @@ class StatsComputer:
         if self.type == "truncgaussian":
             kwargs["expected"]=expected
         return self.likelihoodComputer.likelihood ( poi_test,
-                nll = return_nll, **kwargs )
+                nll = return_nll, allowNegativeSignals=self.allowNegativeSignals, 
+                **kwargs )
 
     def transform ( self, expected ):
         """ SL only. transform the data to expected or observed """
@@ -231,11 +261,9 @@ class StatsComputer:
         self.likelihoodComputer.transform ( expected )
 
     def maximize_likelihood ( self, expected : Union[bool,Text],
-           allowNegativeSignals : bool = True,
            return_nll : bool = False ) -> dict:
         """ simple frontend to the individual computers, later spey
         :param return_nll: if True, return negative log likelihood
-        :param allowNegativeSignals: allow also negative muhats
         :returns: Dictionary of llhd (llhd at mu_hat),
                   muhat, sigma_mu (sigma of mu_hat),
                   optionally also theta_hat
@@ -251,7 +279,8 @@ class StatsComputer:
         if self.type == "truncgaussian":
             kwargs["expected"]=expected
         ret = self.likelihoodComputer.lmax ( nll = return_nll,
-               allowNegativeSignals = allowNegativeSignals, **kwargs )
+                                            allowNegativeSignals = self.allowNegativeSignals, 
+                                            **kwargs )
         return ret
 
     def poi_upper_limit ( self, expected : Union [ bool, Text ],

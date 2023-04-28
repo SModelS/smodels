@@ -18,9 +18,6 @@ from smodels.theory.auxiliaryFunctions import getAttributesFrom, getValuesForObj
 from smodels.tools.smodelsLogging import logger
 from smodels.theory.auxiliaryFunctions import elementsInStr
 from smodels.theory.element import Element
-from smodels.tools.statsTools import StatsComputer
-from typing import Union, Text
-
 import itertools
 
 # if on, will check for overlapping constraints
