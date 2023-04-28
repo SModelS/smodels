@@ -46,9 +46,8 @@ class TruncatedGaussians:
             expectedUpperLimit = float ( expectedUpperLimit * lumi )
             predicted_yield = float ( predicted_yield * lumi ) # the xsec
         if corr > 0.0 and upperLimit > expectedUpperLimit:
-            expectedUpperLimit = expectedUpperLimit / (
-                1.0 - corr * ((upperLimit - expectedUpperLimit) / (upperLimit + expectedUpperLimit))
-            )
+            f = 1.0 - corr * ((upperLimit - expectedUpperLimit) / (upperLimit + expectedUpperLimit))
+            expectedUpperLimit = expectedUpperLimit / f
         self.upperLimit = upperLimit
         self.expectedUpperLimit = expectedUpperLimit
         self.predicted_yield = predicted_yield
@@ -123,7 +122,8 @@ class TruncatedGaussians:
         ret = { "muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax }
         return ret
 
-    def _likelihoodOfNSig ( self, nsig : Union[float,None], nll : Optional[bool]=False,
+    def _likelihoodOfNSig ( self, nsig : Union[float,None], 
+            nll : Optional[bool] = False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6, 
             expected : Union[bool,Text] = False ) -> float:
@@ -138,7 +138,6 @@ class TruncatedGaussians:
                      ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
                      When comparing with likelihoods constructed from efficiency maps,
                      a factor of corr = 0.6 has been found to result in the best approximations.
-
         :returns: likelihood (float), yhat, and sigma_y
         """
         sllhd = "llhd"
@@ -152,7 +151,7 @@ class TruncatedGaussians:
                 xb = 1
                 yhat = 0.
                 if expected == False:
-                    yhat = self._find_neg_yhat( xa, xb )
+                    yhat = self._findYhat( xa, xb )
                 self.llhd_ = self._computeLlhd(nsig, yhat, nll = False )
                 ret = self.llhd_
                 if nll:
@@ -174,30 +173,31 @@ class TruncatedGaussians:
             ret = -math.log(ret)
         return { sllhd: ret, "yhat": yhat, "sigma_y": self.sigma_y }
 
-    def _findYhat ( self ):
-        """ find the signal yields that maximize the likelihood """
-        fA = self._root_func(0.0)
-        fB = self._root_func(max(self.upperLimit, self.expectedUpperLimit))
-        if np.sign(fA * fB) > 0.0:
-            ## the have the same sign
-            logger.error("when computing likelihood: fA and fB have same sign")
-            return None, None, None
-        yhat = optimize.brentq(
-            self._root_func, 0.0, max(self.upperLimit, self.expectedUpperLimit),
-            rtol=1e-03, xtol=1e-06)
-        return yhat
-
-    def _getSigmaY(self, yhat=0.0 ):
-        """get the standard deviation sigma on the event yields, given
-        an upper limit and a central value. assumes a truncated Gaussian likelihood"""
+    def _getSigmaY( self ):
+        """ get the standard deviation sigma on the event yields, given
+        an upper limit and a central value. assumes a truncated Gaussian likelihood
+        """
         # the expected scale, eq 3.24 in arXiv:1202.3415
-        return ( self.expectedUpperLimit - yhat) / 1.96
+        return self.expectedUpperLimit / 1.96
 
-    def _root_func(self,x):  # we want the root of this one
-        return (erf((self.upperLimit - x) / self.denominator) + erf(x / self.denominator)) / (
-            1.0 + erf(x / self.denominator)) - self.cl
+    def _root_func( self, mu : float ):
+        """ the root of this one should determine muhat """
+        numerator = erf((self.upperLimit - mu) / self.denominator) + \
+                    erf( mu / self.denominator)
+        denominator = 1.0 + erf(mu / self.denominator)
+        ret = numerator / denominator - self.cl
+        return ret
 
-    def _find_neg_yhat(self, xa, xb):
+    def _findYhat( self, xa : float = 0., 
+                        xb : Union[float,None] = None ):
+        """ find yhat, in [xa,xb] 
+        :param xa: lower limit of initial bracket
+        :param xb: upper limit of initial bracket. if none, then max(ul,eul)
+        """
+        if xa == None:
+            xa = 0.
+        if xb == None:
+            xb = max(self.upperLimit, self.expectedUpperLimit)
         c = 0
         while self._root_func(xa) * self._root_func(xb) > 0:
             xa = 2 * xa
@@ -207,7 +207,7 @@ class TruncatedGaussians:
                     f"cannot find bracket for brent bracketing ul={upperLimit}, eul={expectedUpperLimit},xa={xa}, xb={xb}"
                 )
 
-        muhat = optimize.brentq(self._root_func, xa, xb, rtol=1e-03, xtol=1e-06)
+        muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-07, xtol=1e-07)
         return muhat
 
     def _computeLlhd( self, nsig, muhat, nll):
