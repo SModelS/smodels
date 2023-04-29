@@ -130,7 +130,7 @@ class TheoryPrediction(object):
                 datasetList = self.dataset.globalInfo.datasetOrder[:]
             
             elif hasattr(self.dataset.globalInfo, "jsonFiles"):
-                datasetList = self.dataset.origdatasets[:]
+                datasetList = [ds.getID() for ds in self.dataset.origdatasets]
 
             # Get list of signal yields corresponding to the dataset order:
             srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
@@ -166,6 +166,9 @@ class TheoryPrediction(object):
             if self.dataType() == "combined":
                 ul = self.statsComputer.poi_upper_limit(expected = expected,
                                                         limit_on_xsec = True)
+                nsig = self.statsComputer.nsig
+                ntotal = nsig if type(nsig) in [int, float] else sum(nsig)
+                ul = ul*ntotal
             self.cachedObjs[expected]["UL"] = ul
 
         return self.cachedObjs[expected]["UL"]

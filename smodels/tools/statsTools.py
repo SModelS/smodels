@@ -270,6 +270,7 @@ class StatsComputer:
                     kwargs["expected"] = expected
         if self.type == "truncgaussian":
             kwargs["expected"]=expected
+
         ret = self.likelihoodComputer.lmax ( nll = return_nll,
                                             allowNegativeSignals = self.allowNegativeSignals, 
                                             **kwargs )
