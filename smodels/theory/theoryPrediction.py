@@ -111,7 +111,7 @@ class TheoryPrediction(object):
         if self.dataType() == "upperLimit":
             from smodels.tools.runtime import experimentalFeatures
             if not experimentalFeatures():
-                computer = None
+                computer = 'N/A'
             else:
                 computer = StatsComputer.forTruncatedGaussian(self)     
    
@@ -121,8 +121,9 @@ class TheoryPrediction(object):
 
         elif self.dataType() == "combined":
             # Get dictionary with dataset IDs and signal yields
-            srNsigDict = {pred.dataset.getID() : (pred.xsection.value * pred.dataset.getLumi()).asNumber() 
-                        for pred in self.datasetPredictions}
+            srNsigDict = {pred.dataset.getID() : 
+                          (pred.xsection.value*pred.dataset.getLumi()).asNumber() 
+                          for pred in self.datasetPredictions}
 
             # Get ordered list of datasets:            
             if hasattr(self.dataset.globalInfo, "covariance"):
@@ -136,7 +137,7 @@ class TheoryPrediction(object):
                        for dataID in datasetList]
 
             computer = StatsComputer ( self.dataset, srNsigs,
-                deltas_rel = self.deltas_rel, normalize_sig = True )
+                                      deltas_rel = self.deltas_rel)
             
         self._statsComputer = computer
 
@@ -155,20 +156,18 @@ class TheoryPrediction(object):
         # First check if the upper-limit and expected upper-limit have already been computed.
         # If not, compute it and store them.
         if "UL" not in self.cachedObjs[expected]:
+            ul = None
             if self.dataType() == "efficiencyMap":
-                self.cachedObjs[expected]["UL"] = self.dataset.getSRUpperLimit(expected=expected)
+                ul = self.dataset.getSRUpperLimit(expected=expected)
             if self.dataType() == "upperLimit":
-                self.cachedObjs[expected]["UL"] = self.dataset.getUpperLimitFor(
+                ul = self.dataset.getUpperLimitFor(
                     element=self.avgElement, txnames=self.txnames, expected=expected
                 )
             if self.dataType() == "combined":
-                ul = self.statsComputer.poi_upper_limit( expected = expected,
+                ul = self.statsComputer.poi_upper_limit(expected = expected,
                                                         limit_on_xsec = True)
-                self.cachedObjs[expected]["UL"] = ul
+            self.cachedObjs[expected]["UL"] = ul
 
-        # Return the expected or observed UL:
-        # if not self.cachedObjs[expected]["UL"]:
-        #    self.cachedObjs[expected]["UL"]=None
         return self.cachedObjs[expected]["UL"]
 
     def getUpperLimitOnMu(self, expected=False):
@@ -206,6 +205,22 @@ class TheoryPrediction(object):
                 return r
         return self.cachedObjs[expected]["r"]
 
+    def whenDefined(function):
+        """
+        Returns the function whenever the statistical
+        calculation is possible (i.e. when it is possible to define
+        self.StatsComputer)
+        """
+
+        def wrapper(self, *args, **kwargs):
+            if self.statsComputer == 'N/A':
+                return None
+            else:
+                return function(self, *args, **kwargs)
+        
+        return wrapper
+
+    @whenDefined
     def lsm(self, expected=False):
         """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
         if "lsm" not in self.cachedObjs[expected]:
@@ -214,6 +229,7 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["lsm"] = None
         return self.cachedObjs[expected]["lsm"]
 
+    @whenDefined
     def lmax(self, expected=False):
         """likelihood at mu_hat"""
 
@@ -229,6 +245,7 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["lmax"] = {allowNegativeSignals: None}
         return self.cachedObjs[expected]["lmax"][allowNegativeSignals]
 
+    @whenDefined
     def sigma_mu(self, expected=False):
         """sigma_mu of mu_hat"""
 
@@ -241,6 +258,7 @@ class TheoryPrediction(object):
             self.computeStatistics(expected)
         return self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals]
 
+    @whenDefined
     def muhat(self, expected=False):
         """position of maximum likelihood"""
 
@@ -259,6 +277,7 @@ class TheoryPrediction(object):
         ret = self.cachedObjs[expected]["muhat"][allowNegativeSignals]
         return ret
 
+    @whenDefined
     def chi2(self, expected=False):
         if not "chi2" in self.cachedObjs[expected]:
             self.computeStatistics(expected)
@@ -266,6 +285,7 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["chi2"] = None
         return self.cachedObjs[expected]["chi2"]
 
+    @whenDefined
     def likelihood(self, mu=1.0, expected=False, nll=False, useCached=True):
         """
         get the likelihood for a signal strength modifier mu
@@ -305,6 +325,7 @@ class TheoryPrediction(object):
             return -np.log(llhd)
         return llhd
 
+    @whenDefined
     def computeStatistics(self, expected=False):
         """
         Compute the likelihoods, chi2 and upper limit for this theory prediction.
@@ -316,6 +337,7 @@ class TheoryPrediction(object):
         if not "lmax" in self.cachedObjs[expected]:
             self.cachedObjs[expected]["lmax"] = {}
             self.cachedObjs[expected]["muhat"] = {}
+            self.cachedObjs[expected]["sigma_mu"] = {}
 
         # Compute likelihoods and related parameters:
         allowNegativeSignals = self.statsComputer.allowNegativeSignals
@@ -324,7 +346,7 @@ class TheoryPrediction(object):
         self.cachedObjs[expected]["lsm"] = llhdDict["lsm"]
         self.cachedObjs[expected]["lmax"][allowNegativeSignals] = llhdDict["lmax"]
         self.cachedObjs[expected]["muhat"][allowNegativeSignals] = llhdDict["muhat"]
-        self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = llhdDict['sigma_mu']
+        self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = llhdDict["sigma_mu"]
 
         from smodels.tools.basicStats import chi2FromLmax
         self.cachedObjs[expected]["chi2"] = chi2FromLmax(llhdDict["lbsm"], llhdDict["lmax"])

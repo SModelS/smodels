@@ -71,10 +71,8 @@ class StatisticsTest(unittest.TestCase):
         ulexp = ulcomp.getUpperLimitOnMu(m, expected=True)
         doPrint = False
         computer = TruncatedGaussians ( ulobs, ulexp, nsig, corr = 0. )
-        llhdlim = computer.likelihood ( mu=1.,
-               nll = False, allowNegativeSignals = True )
-        ret = computer.lmax ( nll = False,
-                allowNegativeSignals = True )
+        llhdlim = computer.likelihood ( mu=1., nll = False )
+        ret = computer.lmax ( nll = False)
         if doPrint:
             sy = computer.sigma_y
             print ( "ulobs,exp=",ulobs,ulexp )

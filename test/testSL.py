@@ -100,7 +100,7 @@ class SLTest(unittest.TestCase):
         self.assertAlmostEqual( ulProf / 2168.8056715301045, 1.0, 3 )
         ## Nick's profiling code gets for n=3 ul=2135.66
         ret = lComp.lmax ( )
-        lmax = ret["llhd"]
+        lmax = ret["lmax"]
         muhat = ret["muhat"]
         sigma_mu = ret["sigma_mu"]
         self.assertAlmostEqual( lmax, 2.1722054152e-09, 7 )
@@ -108,7 +108,7 @@ class SLTest(unittest.TestCase):
         # self.assertAlmostEqual( lComp.sigma_mu, 798.9887891147, 2 )
         self.assertAlmostEqual( sigma_mu, 800.1380826235132, 2 )
         ret = lComp.lmax ( allowNegativeSignals=True )
-        lmax = ret["llhd"]
+        lmax = ret["lmax"]
         muhat = ret["muhat"]
         sigma_mu = ret["sigma_mu"]
         self.assertAlmostEqual( lmax, 2.1708552631256182e-09, 8 )
@@ -173,7 +173,7 @@ class SLTest(unittest.TestCase):
         theta_hat = lComp.findThetaHat( 1. )
         pprint ( "theta_hat", theta_hat )
         ret = lComp.lmax()
-        lmax = ret["llhd"]
+        lmax = ret["lmax"]
         lm = lComp.likelihood ( 1. )
         muhat = ret["muhat"]
         sigma_mu = ret["sigma_mu"]
