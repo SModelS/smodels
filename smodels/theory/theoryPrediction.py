@@ -107,6 +107,12 @@ class TheoryPrediction(object):
         return self._statsComputer
 
     def setStatsComputer(self):
+        """
+        Creates and instance of StatsComputer depending on the
+        type of TheoryPrediction/dataset. In case it is not possible
+        to define a statistical computer (upper limit result or no expected
+        upper limits), set the computer to 'N/A'.
+        """
 
         if self.dataType() == "upperLimit":
             from smodels.tools.runtime import experimentalFeatures
@@ -114,6 +120,8 @@ class TheoryPrediction(object):
                 computer = 'N/A'
             else:
                 computer = StatsComputer.forTruncatedGaussian(self)     
+                if computer is None: # No expected UL available
+                    computer = 'N/A'
    
         elif self.dataType() == "efficiencyMap":
             nsig = (self.xsection.value * self.dataset.getLumi()).asNumber()
@@ -168,7 +176,7 @@ class TheoryPrediction(object):
                                                         limit_on_xsec = True)
                 nsig = self.statsComputer.nsig
                 ntotal = nsig if type(nsig) in [int, float] else sum(nsig)
-                ul = ul*ntotal
+                # ul = ul*ntotal
             self.cachedObjs[expected]["UL"] = ul
 
         return self.cachedObjs[expected]["UL"]
