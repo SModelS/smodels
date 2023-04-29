@@ -19,7 +19,6 @@ from smodels.tools.physicsUnits import fb
 from smodels.tools.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
 from smodels.tools.truncatedGaussians import TruncatedGaussians
 from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
-from smodels.tools.analysesCombinations import AnaCombLikelihoodComputer, UpperLimitComputer
 
 class StatsComputer:
     __slots__ = [ "nsig", "dataset", "data", "likelihoodComputer",
