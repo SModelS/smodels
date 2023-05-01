@@ -125,7 +125,9 @@ class TheoryPrediction(object):
    
         elif self.dataType() == "efficiencyMap":
             nsig = (self.xsection.value * self.dataset.getLumi()).asNumber()
-            computer = StatsComputer(self.dataset, nsig, self.deltas_rel )
+            computer = StatsComputer.forSingleBin(dataset=self.dataset, 
+                                                  nsig=nsig, 
+                                                  deltas_rel=self.deltas_rel )
 
         elif self.dataType() == "combined":
             # Get dictionary with dataset IDs and signal yields
@@ -136,16 +138,26 @@ class TheoryPrediction(object):
             # Get ordered list of datasets:            
             if hasattr(self.dataset.globalInfo, "covariance"):
                 datasetList = self.dataset.globalInfo.datasetOrder[:]
-            
+                # Get list of signal yields corresponding to the dataset order:
+                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
+                       for dataID in datasetList]
+                # Get computer
+                computer = StatsComputer.forMultiBinSL(dataset=self.dataset,
+                                                       nsig=srNsigs, 
+                                                       deltas_rel = self.deltas_rel)
+                
             elif hasattr(self.dataset.globalInfo, "jsonFiles"):
                 datasetList = [ds.getID() for ds in self.dataset.origdatasets]
-
-            # Get list of signal yields corresponding to the dataset order:
-            srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
+                # Get list of signal yields corresponding to the dataset order:
+                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
                        for dataID in datasetList]
+                # Get computer
+                computer = StatsComputer.forPyhf(dataset=self.dataset, 
+                                                       nsig=srNsigs, 
+                                                       deltas_rel = self.deltas_rel)                
 
-            computer = StatsComputer ( self.dataset, srNsigs,
-                                      deltas_rel = self.deltas_rel)
+
+            
             
         self._statsComputer = computer
 
@@ -175,7 +187,7 @@ class TheoryPrediction(object):
                 ul = self.statsComputer.poi_upper_limit(expected = expected,
                                                         limit_on_xsec = True)
                 
-                compType = self.statsComputer.type
+                compType = self.statsComputer.dataType
                 # Rescale upper limits for pyhf
                 if compType == 'pyhf' and ul is not None:
                     nsig = self.statsComputer.nsig
@@ -196,7 +208,7 @@ class TheoryPrediction(object):
         """
 
         upperLimit = self.getUpperLimit(expected=expected)
-        xsec = self.xsection.value
+        xsec = self.totalXsection()
         if xsec is None or upperLimit is None:
             return None
 
@@ -215,7 +227,7 @@ class TheoryPrediction(object):
                 self.cachedObjs[expected]["r"] = r
                 return r
             else:
-                r = (self.xsection.value / upperLimit).asNumber()
+                r = (self.totalXsection() / upperLimit).asNumber()
                 self.cachedObjs[expected]["r"] = r
                 return r
         return self.cachedObjs[expected]["r"]

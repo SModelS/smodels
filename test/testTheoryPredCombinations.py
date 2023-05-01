@@ -56,7 +56,6 @@ class CombinedTheoryPredsTest(unittest.TestCase):
                 tpreds.append(t)
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
-        mu_hat, sigma_mu, lmax = combiner.findMuHat(allowNegativeSignals=True, extended_output=True)
         self.assertAlmostEqual(combiner.lsm(), 2.756169857697467e-06, 4)
         self.assertAlmostEqual(combiner.likelihood(), 5.001298746531528e-06, 4)
         self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
@@ -133,9 +132,9 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # combination:
         # mu_hat 0.035 lmax 0.00011 ul_mu 0.27
         combiner = TheoryPredictionsCombiner(tpreds)
-        combiner.computeStatistics()
-        fmh = combiner.findMuHat(allowNegativeSignals=True, extended_output=True)
-        mu_hat, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+        combiner.computeStatistics()        
+        fmh = combiner.statsComputer.get_five_values(expected=False)
+        mu_hat, lmax = fmh["muhat"], fmh["lmax"]
         lsm = combiner.lsm()
         # print ( "muhat", mu_hat, "lmax", lmax )
         # multiply the previous lsms, 0.013786096355236995 * 0.007423073728232388
