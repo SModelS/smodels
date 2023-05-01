@@ -177,7 +177,7 @@ class TheoryPrediction(object):
                 
                 compType = self.statsComputer.type
                 # Rescale upper limits for pyhf
-                if compType == 'pyhf' and type(ul) != type(None):
+                if compType == 'pyhf' and ul is not None:
                     nsig = self.statsComputer.nsig
                     ntotal = nsig if type(nsig) in [int, float] else sum(nsig)
                     ul = ul*ntotal
@@ -248,49 +248,27 @@ class TheoryPrediction(object):
     def lmax(self, expected=False):
         """likelihood at mu_hat"""
 
-        allowNegativeSignals = self.statsComputer.allowNegativeSignals        
         if not "lmax" in self.cachedObjs[expected]:
             self.computeStatistics(expected)
-        if (
-            "lmax" in self.cachedObjs[expected]
-            and not allowNegativeSignals in self.cachedObjs[expected]["lmax"]
-        ):
-            self.computeStatistics(expected)
-        if not "lmax" in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["lmax"] = {allowNegativeSignals: None}
-        return self.cachedObjs[expected]["lmax"][allowNegativeSignals]
+        return self.cachedObjs[expected]["lmax"]
 
     @whenDefined
     def sigma_mu(self, expected=False):
         """sigma_mu of mu_hat"""
 
-        allowNegativeSignals = self.statsComputer.allowNegativeSignals
         if not "sigma_mu" in self.cachedObjs[expected]:
             self.computeStatistics(expected)
-        if not "sigma_mu" in self.cachedObjs[expected]:
-            return None
-        if not allowNegativeSignals in self.cachedObjs[expected]["sigma_mu"]:
-            self.computeStatistics(expected)
-        return self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals]
+        
+        return self.cachedObjs[expected]["sigma_mu"]
 
     @whenDefined
     def muhat(self, expected=False):
         """position of maximum likelihood"""
 
-        allowNegativeSignals = self.statsComputer.allowNegativeSignals
         if not "muhat" in self.cachedObjs[expected]:
             self.computeStatistics(expected)
-        if not allowNegativeSignals in self.cachedObjs[expected]["muhat"]:
-            self.computeStatistics(expected)
-        if (
-            "muhat" in self.cachedObjs[expected]
-            and not allowNegativeSignals in self.cachedObjs[expected]["muhat"]
-        ):
-            self.computeStatistics(expected)
-        if not "muhat" in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["muhat"] = {allowNegativeSignals: None}
-        ret = self.cachedObjs[expected]["muhat"][allowNegativeSignals]
-        return ret
+
+        return self.cachedObjs[expected]["muhat"]
 
     @whenDefined
     def chi2(self, expected=False):
@@ -355,13 +333,12 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["sigma_mu"] = {}
 
         # Compute likelihoods and related parameters:
-        allowNegativeSignals = self.statsComputer.allowNegativeSignals
         llhdDict = self.statsComputer.get_five_values(expected = expected)
         self.cachedObjs[expected]["llhd"] = llhdDict["lbsm"]
         self.cachedObjs[expected]["lsm"] = llhdDict["lsm"]
-        self.cachedObjs[expected]["lmax"][allowNegativeSignals] = llhdDict["lmax"]
-        self.cachedObjs[expected]["muhat"][allowNegativeSignals] = llhdDict["muhat"]
-        self.cachedObjs[expected]["sigma_mu"][allowNegativeSignals] = llhdDict["sigma_mu"]
+        self.cachedObjs[expected]["lmax"] = llhdDict["lmax"]
+        self.cachedObjs[expected]["muhat"] = llhdDict["muhat"]
+        self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
 
         from smodels.tools.basicStats import chi2FromLmax
         self.cachedObjs[expected]["chi2"] = chi2FromLmax(llhdDict["lbsm"], llhdDict["lmax"])
