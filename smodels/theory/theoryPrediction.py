@@ -177,7 +177,7 @@ class TheoryPrediction(object):
                 
                 compType = self.statsComputer.type
                 # Rescale upper limits for pyhf
-                if compType == 'pyhf':
+                if compType == 'pyhf' and type(ul) != type(None):
                     nsig = self.statsComputer.nsig
                     ntotal = nsig if type(nsig) in [int, float] else sum(nsig)
                     ul = ul*ntotal
