@@ -107,6 +107,10 @@ class TheoryPredictionsCombiner(object):
                     # Check if the attribute is callable:
                     if callable(newF):
                         # Return value from theoryPrediction.function call
+                        # (For a single TheoryPrediction this argument should not be
+                        # passed, since it is automatically defined)
+                        if 'allowNegativeSignals' in kwargs:
+                            kwargs.pop('allowNegativeSignals')
                         return newF(*args, **kwargs)
 
             # If anything failed, call method from combiner:
@@ -144,6 +148,14 @@ class TheoryPredictionsCombiner(object):
             return "comb"
         else:
             return "combined"
+
+    @singleDecorator
+    def getType(self):
+        """
+        Return analysesComb
+        """
+
+        return "analysesComb"
 
     @singleDecorator
     def getUpperLimit(self, expected=False, trylasttime=False):
@@ -347,9 +359,8 @@ class TheoryPredictionsCombiner(object):
         muhats, weighted = [], []
         totweight = 0.0
         for tp in self.theoryPredictions:
-            # FIXME should we use allowNegativeSignals?
-            muhat = tp.muhat(expected=expected, allowNegativeSignals=allowNegativeSignals )
-            sigma_mu = tp.sigma_mu(expected=expected, allowNegativeSignals=allowNegativeSignals )
+            muhat = tp.muhat(expected=expected)
+            sigma_mu = tp.sigma_mu(expected=expected)
             if sigma_mu in [None, 0.0]:
                 sigma_mu = 1.0  # unity weights if no weights
             if muhat != None:

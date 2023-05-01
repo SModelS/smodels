@@ -747,7 +747,7 @@ class PyhfUpperLimitComputer:
                 lmax = float(lmax[0])
             sigma_mu = self.getSigmaMu ( workspace )
             lmax = self.exponentiateNLL(lmax, not nll)
-            ret = { "llhd": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
+            ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
             self.data.cached_lmaxes[workspace_index] = ret
             return ret
 

@@ -778,13 +778,13 @@ class LikelihoodComputer:
                 muhat = float(dn[0] / self.model.nsignal[0])
             sigma_mu = np.sqrt(self.model.observed[0] + self.model.covariance[0][0])
             ret= self.likelihood( nll=nll, mu = muhat )
-            return { "llhd": ret, "muhat": muhat, "sigma_mu": sigma_mu }
+            return { "lmax": ret, "muhat": muhat, "sigma_mu": sigma_mu }
         fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
                               extended_output=True, nll=nll
         )
         muhat_, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         lmax = self.likelihood ( nll=nll, mu=muhat_ )
-        ret = { "llhd": lmax, "muhat": float ( muhat_ ), "sigma_mu": sigma_mu }
+        ret = { "lmax": lmax, "muhat": float ( muhat_ ), "sigma_mu": sigma_mu }
         return ret
 
     def findMuHat(
@@ -899,7 +899,7 @@ class UpperLimitComputer:
         """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
             obtained from the defined Data (using the signal prediction
-            for each signal regio/dataset), by using
+            for each signal region/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
         :params expected: if false, compute observed,
