@@ -24,7 +24,7 @@ class TruncatedGaussians:
     """ likelihood computer based on the trunacated Gaussian approximation, see
          arXiv:1202.3415 """
     __slots__ = [ "upperLimitOnMu", "expectedUpperLimitOnMu", "corr",
-                  "sigma_mu", "denominator", "cl", "llhd_" ]
+                  "sigma_mu", "denominator", "cl" ]
 
     def __init__  ( self, upperLimitOnMu : float, expectedUpperLimitOnMu : float,
                     corr : Optional[float] = 0.6, cl=.95 ):
@@ -132,14 +132,12 @@ class TruncatedGaussians:
                 muhat = 0.
                 if expected == False:
                     muhat = self._findMuhat( xa, xb )
-                self.llhd_ = self._computeLlhd(mu, muhat, return_nll = False )
-                ret = self.llhd_
+                ret = self._computeLlhd(mu, muhat, return_nll = False )
                 if return_nll:
                     ret = -np.log(ret)
                 return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
             else:
-                self.llhd_ = self._computeLlhd(mu, 0.0, return_nll = False )
-                ret = self.llhd_
+                ret = self._computeLlhd(mu, 0.0, return_nll = False )
                 if return_nll:
                     ret = -math.log(ret)
                 return { sllhd: ret, "muhat": 0.0, "sigma_mu": self.sigma_mu }
@@ -147,8 +145,7 @@ class TruncatedGaussians:
         muhat = 0.
         if expected == False:
             muhat = self._findMuhat()
-        self.llhd_ = self._computeLlhd(mu, muhat, return_nll = False )
-        ret = self.llhd_
+        ret = self._computeLlhd(mu, muhat, return_nll = False )
         if return_nll:
             ret = -math.log(ret)
         return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
