@@ -126,11 +126,12 @@ class StatsComputer:
         )
         if eul is None:
             return None
+        eul = eul / theorypred.xsection.value
         ul = theorypred.dataset.getUpperLimitFor(
             element=theorypred.avgElement, txnames=theorypred.txnames, expected=False
-        )
-        kwargs = { "upperLimit": ul, "expectedUpperLimit": eul,
-                "predicted_yield": theorypred.xsection.value, "corr": corr }
+        ) / theorypred.xsection.value
+        kwargs = { "upperLimitOnMu": float(ul), "expectedUpperLimitOnMu": float(eul),
+                   "corr": corr }
         computer = StatsComputer(dataObject=theorypred.dataset,
                                  dataType="truncGaussian", 
                                  nsig=0.,
@@ -263,9 +264,6 @@ class StatsComputer:
         """
         Create computer for truncated gaussians
         """
-
-        if not "lumi" in kwargs:
-            kwargs["lumi"] = self.dataObject.getLumi()
         computer = TruncatedGaussians ( **kwargs )
         self.data = None
         self.likelihoodComputer = computer

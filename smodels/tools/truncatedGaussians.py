@@ -23,37 +23,29 @@ from smodels.tools.basicStats import deltaChi2FromLlhd
 class TruncatedGaussians:
     """ likelihood computer based on the trunacated Gaussian approximation, see
          arXiv:1202.3415 """
-    __slots__ = [ "upperLimit", "expectedUpperLimit", "predicted_yield", "corr",
-                  "sigma_y", "denominator", "cl", "llhd_" ]
+    __slots__ = [ "upperLimitOnMu", "expectedUpperLimitOnMu", "corr",
+                  "sigma_mu", "denominator", "cl", "llhd_" ]
 
-    def __init__  ( self, upperLimit, expectedUpperLimit, predicted_yield,
-                    corr : Optional[float] = 0.6, cl=.95, lumi = None ):
+    def __init__  ( self, upperLimitOnMu : float, expectedUpperLimitOnMu : float,
+                    corr : Optional[float] = 0.6, cl=.95 ):
         """
-        :param upperLimit: observed upper limit, as a yield or on xsec
-        :param expectedUpperLimit: expected upper limit, also as a yield or on xsec
-        :param predicted_yield: the predicted signal yield, unitless or [fb]
+        :param upperLimitOnMu: observed upper limit on signal strength mu
+        :param expectedUpperLimitOnMu: expected upper limit on signal strength mu
         :param corr: correction factor:
            ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
            When comparing with likelihoods constructed from efficiency maps,
            a factor of corr = 0.6 has been found to result in the best approximations.
         :param cl: confidence level
-        :param lumi: if not None, and if the limits are in [fb], then use
-                     it to translate limits on xsecs into limits on yields
-                     internally
         """
-        if type(lumi) != type(None) and type(upperLimit) == type(fb):
-            upperLimit = float ( upperLimit * lumi )
-            expectedUpperLimit = float ( expectedUpperLimit * lumi )
-            predicted_yield = float ( predicted_yield * lumi ) # the xsec
-        if corr > 0.0 and upperLimit > expectedUpperLimit:
-            f = 1.0 - corr * ((upperLimit - expectedUpperLimit) / (upperLimit + expectedUpperLimit))
-            expectedUpperLimit = expectedUpperLimit / f
-        self.upperLimit = upperLimit
-        self.expectedUpperLimit = expectedUpperLimit
-        self.predicted_yield = predicted_yield
+        assert type(upperLimitOnMu) in [ float, np.float64, np.float32 ], f"the upper limits must be given as floats not {type(upperLimitOnMu)}, are you providing upper limits on xsecs?"
+        if corr > 0.0 and upperLimitOnMu > expectedUpperLimitOnMu:
+            f = 1.0 - corr * ((upperLimitOnMu - expectedUpperLimitOnMu) / (upperLimitOnMu + expectedUpperLimitOnMu))
+            expectedUpperLimitOnMu = expectedUpperLimitOnMu / f
+        self.upperLimitOnMu = upperLimitOnMu
+        self.expectedUpperLimitOnMu = expectedUpperLimitOnMu
         self.corr = corr
-        self.sigma_y = self._getSigmaY()  # the expected scale, eq 3.24 in arXiv:1202.3415
-        self.denominator = np.sqrt(2.0) * self.sigma_y
+        self.sigma_mu = self._getSigmaMu()  # the expected scale, eq 3.24 in arXiv:1202.3415
+        self.denominator = np.sqrt(2.0) * self.sigma_mu
         self.cl = cl
 
     def likelihood ( self, mu : Union[float,None], nll : Optional[bool]=False,
@@ -73,11 +65,8 @@ class TruncatedGaussians:
         sllhd = "llhd"
         if nll:
             sllhd = "nll"
-        nsig = mu
         muhat, sigma_mu = float("inf"), float("inf")
-        if mu != None:
-            nsig = mu * self.predicted_yield
-        dsig = self._likelihoodOfNSig ( nsig, nll=nll,
+        dsig = self._likelihoodOfMu ( mu, nll=nll,
                 allowNegativeSignals = allowNegativeSignals, corr = corr,
                 expected = expected )
         ret = dsig[sllhd]
@@ -102,29 +91,24 @@ class TruncatedGaussians:
         if nll:
             sllhd = "nll"
         muhat, sigma_mu = float("inf"), float("inf")
-        nsig = self.predicted_yield
-        dsig = self._likelihoodOfNSig ( nsig, nll=nll,
+        dsig = self._likelihoodOfMu ( 1., nll=nll,
                 allowNegativeSignals = allowNegativeSignals, corr = corr )
-        if self.predicted_yield <= 0:
-            return default
-        muhat, sigma_mu =  dsig["yhat"]/self.predicted_yield,\
-            dsig["sigma_y"] / self.predicted_yield
-        # muhat, sigma_mu =  dsig["yhat"], dsig["sigma_y"]
+        muhat, sigma_mu =  dsig["muhat"], dsig["sigma_mu"]
         # llhd evaluated at mu_hat 
         if expected:
             muhat = 0.
-        lmax = self.likelihood ( muhat )
+        lmax = self.likelihood ( muhat, nll=nll )
 
         ret = { "muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax }
         return ret
 
-    def _likelihoodOfNSig ( self, nsig : Union[float,None], 
+    def _likelihoodOfMu ( self, mu : Union[float,None], 
             nll : Optional[bool] = False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6, 
             expected : Union[bool,Text] = False ) -> float:
         """ return the likelihood, as a function of nsig
-        :param nsig: number of signal events, if None then nsig = muhat * predicted_yioelds
+        :param mu: signal strength
         :param nll: if True, return negative log likelihood
         :param allowNegativeSignals: if True, then allow muhat to become negative,
                else demand that muhat >= 0. In the presence of underfluctuations
@@ -134,86 +118,86 @@ class TruncatedGaussians:
                      ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
                      When comparing with likelihoods constructed from efficiency maps,
                      a factor of corr = 0.6 has been found to result in the best approximations.
-        :returns: likelihood (float), yhat, and sigma_y
+        :returns: likelihood (float), muhat, and sigma_mu
         """
         sllhd = "llhd"
         if nll:
             sllhd = "nll"
 
-        if self.upperLimit < self.expectedUpperLimit:
+        if self.upperLimitOnMu < self.expectedUpperLimitOnMu:
             ## underfluctuation. muhat = 0.
             if allowNegativeSignals:
-                xa = -self.expectedUpperLimit
+                xa = -self.expectedUpperLimitOnMu
                 xb = 1
-                yhat = 0.
+                muhat = 0.
                 if expected == False:
-                    yhat = self._findYhat( xa, xb )
-                self.llhd_ = self._computeLlhd(nsig, yhat, nll = False )
+                    muhat = self._findMuhat( xa, xb )
+                self.llhd_ = self._computeLlhd(mu, muhat, nll = False )
                 ret = self.llhd_
                 if nll:
                     ret = -np.log(ret)
-                return { sllhd: ret, "yhat": yhat, "sigma_y": self.sigma_y }
+                return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
             else:
-                self.llhd_ = self._computeLlhd(nsig, 0.0, nll = False )
+                self.llhd_ = self._computeLlhd(mu, 0.0, nll = False )
                 ret = self.llhd_
                 if nll:
                     ret = -math.log(ret)
-                return { sllhd: ret, "yhat": 0.0, "sigma_y": self.sigma_y }
+                return { sllhd: ret, "muhat": 0.0, "sigma_mu": self.sigma_mu }
 
-        yhat = 0.
+        muhat = 0.
         if expected == False:
-            yhat = self._findYhat()
-        self.llhd_ = self._computeLlhd(nsig, yhat, nll = False )
+            muhat = self._findMuhat()
+        self.llhd_ = self._computeLlhd(mu, muhat, nll = False )
         ret = self.llhd_
         if nll:
             ret = -math.log(ret)
-        return { sllhd: ret, "yhat": yhat, "sigma_y": self.sigma_y }
+        return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
 
-    def _getSigmaY( self ):
-        """ get the standard deviation sigma on the event yields, given
+    def _getSigmaMu( self ):
+        """ get the standard deviation sigma on the signal strength mu, given
         an upper limit and a central value. assumes a truncated Gaussian likelihood
         """
         # the expected scale, eq 3.24 in arXiv:1202.3415
-        return self.expectedUpperLimit / 1.96
+        return self.expectedUpperLimitOnMu / 1.96
 
     def _root_func( self, mu : float ):
         """ the root of this one should determine muhat """
-        numerator = erf((self.upperLimit - mu) / self.denominator) + \
+        numerator = erf((self.upperLimitOnMu - mu) / self.denominator) + \
                     erf( mu / self.denominator)
         denominator = 1.0 + erf(mu / self.denominator)
         ret = numerator / denominator - self.cl
         return ret
 
-    def _findYhat( self, xa : float = 0., 
+    def _findMuhat( self, xa : float = 0., 
                         xb : Union[float,None] = None ):
-        """ find yhat, in [xa,xb] 
+        """ find muhat, in [xa,xb] 
         :param xa: lower limit of initial bracket
         :param xb: upper limit of initial bracket. if none, then max(ul,eul)
         """
         if xa == None:
             xa = 0.
         if xb == None:
-            xb = max(self.upperLimit, self.expectedUpperLimit)
+            xb = max(self.upperLimitOnMu, self.expectedUpperLimitOnMu)
         c = 0
         while self._root_func(xa) * self._root_func(xb) > 0:
             xa = 2 * xa
             c += 1
             if c > 10:
                 logger.error(
-                    f"cannot find bracket for brent bracketing ul={upperLimit}, eul={expectedUpperLimit},xa={xa}, xb={xb}"
+                    f"cannot find bracket for brent bracketing ul={upperLimitOnMu}, eul={expectedUpperLimitOnMu},xa={xa}, xb={xb}"
                 )
 
         muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-07, xtol=1e-07)
         return muhat
 
-    def _computeLlhd( self, nsig, muhat, nll):
-        if nsig is None:
-            nsig = muhat
+    def _computeLlhd( self, mu, muhat, nll):
+        if mu is None:
+            mu = muhat
         # need to account for the truncation!
         # first compute how many sigmas left of center is 0.
-        Zprime = muhat / self.sigma_y
+        Zprime = muhat / self.sigma_mu
         # now compute the area of the truncated gaussian
         A = stats.norm.cdf(Zprime)
         if nll:
-            return np.log(A) - stats.norm.logpdf(nsig, muhat, self.sigma_y)
-        return float(stats.norm.pdf(nsig, muhat, self.sigma_y) / A)
+            return np.log(A) - stats.norm.logpdf(mu, muhat, self.sigma_mu)
+        return float(stats.norm.pdf(mu, muhat, self.sigma_mu) / A)
