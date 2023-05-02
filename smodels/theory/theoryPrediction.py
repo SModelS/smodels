@@ -283,17 +283,17 @@ class TheoryPrediction(object):
         return self.cachedObjs[expected]["muhat"]
 
     @whenDefined
-    def likelihood(self, mu=1.0, expected=False, nll=False, useCached=True):
+    def likelihood(self, mu=1.0, expected=False, return_nll=False, useCached=True):
         """
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood. if "posteriori",
                          compute expected posteriori.
-        :param nll: if True, return negative log likelihood, else likelihood
+        :param return_nll: if True, return negative log likelihood, else likelihood
         :param useCached: if True, will return the cached value, if available
         """
         if useCached and mu in self.cachedLlhds[expected]:
             llhd = self.cachedLlhds[expected][mu]
-            if nll:
+            if return_nll:
                 if llhd == 0.0:
                     return 700.0
                 return -np.log(llhd)
@@ -316,7 +316,7 @@ class TheoryPrediction(object):
                                              expected = expected,
                                              return_nll = False)
         self.cachedLlhds[expected][mu] = llhd
-        if nll:
+        if return_nll:
             if llhd == 0.0:
                 return 700.0
             return -np.log(llhd)
