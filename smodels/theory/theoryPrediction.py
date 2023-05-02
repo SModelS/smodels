@@ -14,6 +14,7 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statsTools import StatsComputer
+from typing import Union
 import itertools
 import numpy as np
 
@@ -42,7 +43,7 @@ class TheoryPrediction(object):
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
         self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
-        self.cachedLlhds = {False: {}, True: {}, "posteriori": {}}
+        self.cachedNlls = {False: {}, True: {}, "posteriori": {}}
         self._statsComputer = None
 
     def __str__(self):
@@ -119,23 +120,23 @@ class TheoryPrediction(object):
             if not experimentalFeatures():
                 computer = 'N/A'
             else:
-                computer = StatsComputer.forTruncatedGaussian(self)     
+                computer = StatsComputer.forTruncatedGaussian(self)
                 if computer is None: # No expected UL available
                     computer = 'N/A'
-   
+
         elif self.dataType() == "efficiencyMap":
             nsig = (self.xsection.value * self.dataset.getLumi()).asNumber()
-            computer = StatsComputer.forSingleBin(dataset=self.dataset, 
-                                                  nsig=nsig, 
+            computer = StatsComputer.forSingleBin(dataset=self.dataset,
+                                                  nsig=nsig,
                                                   deltas_rel=self.deltas_rel )
 
         elif self.dataType() == "combined":
             # Get dictionary with dataset IDs and signal yields
-            srNsigDict = {pred.dataset.getID() : 
-                          (pred.xsection.value*pred.dataset.getLumi()).asNumber() 
+            srNsigDict = {pred.dataset.getID() :
+                          (pred.xsection.value*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions}
 
-            # Get ordered list of datasets:            
+            # Get ordered list of datasets:
             if hasattr(self.dataset.globalInfo, "covariance"):
                 datasetList = self.dataset.globalInfo.datasetOrder[:]
                 # Get list of signal yields corresponding to the dataset order:
@@ -143,22 +144,22 @@ class TheoryPrediction(object):
                        for dataID in datasetList]
                 # Get computer
                 computer = StatsComputer.forMultiBinSL(dataset=self.dataset,
-                                                       nsig=srNsigs, 
+                                                       nsig=srNsigs,
                                                        deltas_rel = self.deltas_rel)
-                
+
             elif hasattr(self.dataset.globalInfo, "jsonFiles"):
                 datasetList = [ds.getID() for ds in self.dataset.origdatasets]
                 # Get list of signal yields corresponding to the dataset order:
                 srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
                        for dataID in datasetList]
                 # Get computer
-                computer = StatsComputer.forPyhf(dataset=self.dataset, 
-                                                       nsig=srNsigs, 
-                                                       deltas_rel = self.deltas_rel)                
+                computer = StatsComputer.forPyhf(dataset=self.dataset,
+                                                       nsig=srNsigs,
+                                                       deltas_rel = self.deltas_rel)
 
 
-            
-            
+
+
         self._statsComputer = computer
 
     def getUpperLimit(self, expected=False):
@@ -186,7 +187,7 @@ class TheoryPrediction(object):
             if self.dataType() == "combined":
                 ul = self.statsComputer.poi_upper_limit(expected = expected,
                                                         limit_on_xsec = True)
-                
+
                 compType = self.statsComputer.dataType
                 # Rescale upper limits for pyhf
                 if compType == 'pyhf' and ul is not None:
@@ -244,7 +245,7 @@ class TheoryPrediction(object):
                 return None
             else:
                 return function(self, *args, **kwargs)
-        
+
         return wrapper
 
     @whenDefined
@@ -270,7 +271,7 @@ class TheoryPrediction(object):
 
         if not "sigma_mu" in self.cachedObjs[expected]:
             self.computeStatistics(expected)
-        
+
         return self.cachedObjs[expected]["sigma_mu"]
 
     @whenDefined
@@ -291,36 +292,34 @@ class TheoryPrediction(object):
         :param return_nll: if True, return negative log likelihood, else likelihood
         :param useCached: if True, will return the cached value, if available
         """
-        if useCached and mu in self.cachedLlhds[expected]:
-            llhd = self.cachedLlhds[expected][mu]
-            if return_nll:
-                if llhd == 0.0:
-                    return 700.0
-                return -np.log(llhd)
-            return llhd
+        if useCached and mu in self.cachedNlls[expected]:
+            nll = self.cachedNlls[expected][mu]
+            return self.nllToLikelihood ( nll, return_nll )
 
         if useCached:
             if "llhd" in self.cachedObjs[expected] and abs(mu - 1.0) < 1e-5:
                 llhd = self.cachedObjs[expected]["llhd"]
-                if nll:
+                if return_nll:
                     return -np.log(llhd)
                 return llhd
             if "lsm" in self.cachedObjs[expected] and abs(mu) < 1e-5:
                 lsm = self.cachedObjs[expected]["lsm"]
-                if nll:
+                if return_nll:
                     return -np.log(lsm)
                 return lsm
 
         # for truncated gaussians the fits only work with negative signals!
-        llhd = self.statsComputer.likelihood(poi_test = mu, 
+        nll = self.statsComputer.likelihood(poi_test = mu,
                                              expected = expected,
-                                             return_nll = False)
-        self.cachedLlhds[expected][mu] = llhd
+                                             return_nll = True )
+        self.cachedNlls[expected][mu] = nll
+        return self.nllToLikelihood ( nll, return_nll )
+
+    def nllToLikelihood ( self, nll : Union[None,float], return_nll : bool ):
+        """ if not return_nll, then compute likelihood from nll """
         if return_nll:
-            if llhd == 0.0:
-                return 700.0
-            return -np.log(llhd)
-        return llhd
+            return nll
+        return np.exp ( - nll )
 
     @whenDefined
     def computeStatistics(self, expected=False):

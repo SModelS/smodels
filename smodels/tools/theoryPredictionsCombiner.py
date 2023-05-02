@@ -56,7 +56,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
         self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
-        self.cachedLlhds = {False: {}, True: {}, "posteriori": {}}
+        self.cachedNlls = {False: {}, True: {}, "posteriori": {}}
         self._statsComputer = None
 
     @classmethod
