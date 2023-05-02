@@ -317,14 +317,14 @@ class StatsComputer:
                 index = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
             return self.likelihoodComputer.likelihood (
-                    poi_test, nll = return_nll,
+                    poi_test, return_nll = return_nll,
                     expected = expected, **kwargs )
         elif self.dataType == "truncGaussian":
             kwargs["expected"]=expected
         elif self.dataType == "analysesComb":
             kwargs["expected"]=expected
         return self.likelihoodComputer.likelihood ( poi_test,
-                                                    nll = return_nll, **kwargs)
+                                                return_nll = return_nll, **kwargs)
 
     def transform ( self, expected ):
         """ SL only. transform the data to expected or observed """
@@ -353,9 +353,9 @@ class StatsComputer:
         elif self.dataType == "analysesComb":
             kwargs["expected"]=expected
 
-        ret = self.likelihoodComputer.lmax ( nll = return_nll,
-                                            allowNegativeSignals = self.allowNegativeSignals, 
-                                            **kwargs )
+        ret = self.likelihoodComputer.lmax ( return_nll = return_nll,
+                                   allowNegativeSignals = self.allowNegativeSignals, 
+                                   **kwargs )
         return ret
 
     def poi_upper_limit ( self, expected : Union [ bool, Text ],

@@ -48,13 +48,13 @@ class TruncatedGaussians:
         self.denominator = np.sqrt(2.0) * self.sigma_mu
         self.cl = cl
 
-    def likelihood ( self, mu : Union[float,None], nll : Optional[bool]=False,
+    def likelihood ( self, mu : Union[float,None], return_nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
             expected : Union[Text,bool] = False ) -> Union[None,float]:
         """ return the likelihood, as a function of mu
         :param mu: number of signal events, if None then mu = muhat
-        :param nll: if True, return negative log likelihood
+        :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: if True, then allow muhat to become negative,
                else demand that muhat >= 0. In the presence of underfluctuations
                in the data, setting this to True results in more realistic
@@ -63,22 +63,22 @@ class TruncatedGaussians:
         :returns: likelihood (float)
         """
         sllhd = "llhd"
-        if nll:
+        if return_nll:
             sllhd = "nll"
         muhat, sigma_mu = float("inf"), float("inf")
-        dsig = self._likelihoodOfMu ( mu, nll=nll,
+        dsig = self._likelihoodOfMu ( mu, return_nll=return_nll,
                 allowNegativeSignals = allowNegativeSignals, corr = corr,
                 expected = expected )
         ret = dsig[sllhd]
         return ret
 
-    def lmax ( self, nll : Optional[bool]=False,
+    def lmax ( self, return_nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
             expected : Union[bool,Text] = False ) -> Dict:
         """ return the likelihood, as a function of mu
         :param mu: number of signal events, if None then mu = muhat
-        :param nll: if True, return negative log likelihood
+        :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: if True, then allow muhat to become negative,
                else demand that muhat >= 0. In the presence of underfluctuations
                in the data, setting this to True results in more realistic
@@ -88,28 +88,28 @@ class TruncatedGaussians:
         """
         default = { "muhat": None, "sigma_mu": None, "lmax": None }
         sllhd = "llhd"
-        if nll:
+        if return_nll:
             sllhd = "nll"
         muhat, sigma_mu = float("inf"), float("inf")
-        dsig = self._likelihoodOfMu ( 1., nll=nll,
+        dsig = self._likelihoodOfMu ( 1., return_nll=return_nll,
                 allowNegativeSignals = allowNegativeSignals, corr = corr )
         muhat, sigma_mu =  dsig["muhat"], dsig["sigma_mu"]
         # llhd evaluated at mu_hat 
         if expected:
             muhat = 0.
-        lmax = self.likelihood ( muhat, nll=nll )
+        lmax = self.likelihood ( muhat, return_nll=return_nll )
 
         ret = { "muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax }
         return ret
 
     def _likelihoodOfMu ( self, mu : Union[float,None], 
-            nll : Optional[bool] = False,
+            return_nll : Optional[bool] = False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6, 
             expected : Union[bool,Text] = False ) -> float:
         """ return the likelihood, as a function of nsig
         :param mu: signal strength
-        :param nll: if True, return negative log likelihood
+        :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: if True, then allow muhat to become negative,
                else demand that muhat >= 0. In the presence of underfluctuations
                in the data, setting this to True results in more realistic
@@ -121,7 +121,7 @@ class TruncatedGaussians:
         :returns: likelihood (float), muhat, and sigma_mu
         """
         sllhd = "llhd"
-        if nll:
+        if return_nll:
             sllhd = "nll"
 
         if self.upperLimitOnMu < self.expectedUpperLimitOnMu:
@@ -132,24 +132,24 @@ class TruncatedGaussians:
                 muhat = 0.
                 if expected == False:
                     muhat = self._findMuhat( xa, xb )
-                self.llhd_ = self._computeLlhd(mu, muhat, nll = False )
+                self.llhd_ = self._computeLlhd(mu, muhat, return_nll = False )
                 ret = self.llhd_
-                if nll:
+                if return_nll:
                     ret = -np.log(ret)
                 return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
             else:
-                self.llhd_ = self._computeLlhd(mu, 0.0, nll = False )
+                self.llhd_ = self._computeLlhd(mu, 0.0, return_nll = False )
                 ret = self.llhd_
-                if nll:
+                if return_nll:
                     ret = -math.log(ret)
                 return { sllhd: ret, "muhat": 0.0, "sigma_mu": self.sigma_mu }
 
         muhat = 0.
         if expected == False:
             muhat = self._findMuhat()
-        self.llhd_ = self._computeLlhd(mu, muhat, nll = False )
+        self.llhd_ = self._computeLlhd(mu, muhat, return_nll = False )
         ret = self.llhd_
-        if nll:
+        if return_nll:
             ret = -math.log(ret)
         return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
 
@@ -190,7 +190,7 @@ class TruncatedGaussians:
         muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-07, xtol=1e-07)
         return muhat
 
-    def _computeLlhd( self, mu, muhat, nll):
+    def _computeLlhd( self, mu, muhat, return_nll):
         if mu is None:
             mu = muhat
         # need to account for the truncation!
@@ -198,6 +198,6 @@ class TruncatedGaussians:
         Zprime = muhat / self.sigma_mu
         # now compute the area of the truncated gaussian
         A = stats.norm.cdf(Zprime)
-        if nll:
+        if return_nll:
             return np.log(A) - stats.norm.logpdf(mu, muhat, self.sigma_mu)
         return float(stats.norm.pdf(mu, muhat, self.sigma_mu) / A)

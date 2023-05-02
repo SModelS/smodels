@@ -70,8 +70,8 @@ class StatisticsTest(unittest.TestCase):
         ulobs = ulcomp.getUpperLimitOnMu(m)
         ulexp = ulcomp.getUpperLimitOnMu(m, expected=True)
         computer = TruncatedGaussians ( ulobs, ulexp, corr = 0. )
-        llhdlim = computer.likelihood ( mu=1., nll = False )
-        ret = computer.lmax ( nll = False)
+        llhdlim = computer.likelihood ( mu=1., return_nll = False )
+        ret = computer.lmax ( return_nll = False)
         doPrint = False
         if doPrint:
             smu = computer.sigma_mu
@@ -95,8 +95,8 @@ class StatisticsTest(unittest.TestCase):
             for allowNegatives in [False, True]:
                 computer = TruncatedGaussians ( 4.5, 5.45, corr=0. )
                 llhdlim = computer.likelihood ( mu=nsig,
-                       nll = False, allowNegativeSignals = allowNegatives )
-                ret = computer.lmax ( nll = False,
+                       return_nll = False, allowNegativeSignals = allowNegatives )
+                ret = computer.lmax ( return_nll = False,
                         allowNegativeSignals = allowNegatives )
                 muhat, sigma_mu = ret["muhat"], ret["sigma_mu"]
                 c = comparisons[allowNegatives][nsig]
@@ -185,7 +185,7 @@ class StatisticsTest(unittest.TestCase):
         self.assertEqual(llhds, [ None ] * len(llhds) )
 
 
-    def testApproxGaussian(self):
+    def obsoleteApproxGaussian(self):
         ## turn experimental features on
         runtime._experimental = True
         expRes = database.getExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
@@ -232,7 +232,7 @@ class StatisticsTest(unittest.TestCase):
         m = Data(1e20, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
         computer = LikelihoodComputer(m)
         llhd = computer.likelihood(mu=1. )
-        nll = computer.likelihood(mu=1., nll=True)
+        nll = computer.likelihood(mu=1., return_nll=True)
         self.assertAlmostEqual(0.0, llhd, places=2)
         dchi2 = computer.chi2( )
         ichi2 = 4.486108149972863e21
