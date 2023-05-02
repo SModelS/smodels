@@ -132,14 +132,10 @@ class TruncatedGaussians:
                 muhat = 0.
                 if expected == False:
                     muhat = self._findMuhat( xa, xb )
-                ret = self._computeLlhd(mu, muhat, return_nll = False )
-                if return_nll:
-                    ret = -np.log(ret)
+                ret = self._computeLlhd(mu, muhat, return_nll = return_nll )
                 return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
             else:
-                ret = self._computeLlhd(mu, 0.0, return_nll = False )
-                if return_nll:
-                    ret = -math.log(ret)
+                ret = self._computeLlhd(mu, 0.0, return_nll = return_nll )
                 return { sllhd: ret, "muhat": 0.0, "sigma_mu": self.sigma_mu }
 
         muhat = 0.
@@ -147,7 +143,7 @@ class TruncatedGaussians:
             muhat = self._findMuhat()
         ret = self._computeLlhd(mu, muhat, return_nll = False )
         if return_nll:
-            ret = -math.log(ret)
+            ret = -np.log(ret)
         return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
 
     def _getSigmaMu( self ):

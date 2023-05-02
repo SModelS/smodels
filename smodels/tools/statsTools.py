@@ -294,16 +294,28 @@ class StatsComputer:
         lsm = self.likelihood ( poi_test = 0., expected=expected, return_nll = return_nll )
         ret["lsm"] = lsm
         if check_for_maxima:
-            if lsm > lmax:
-                muhat = ret["muhat"]
-                logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                ret["lmax"] = lsm
-                ret["muhat"] = 0.0
-            if lbsm > lmax:
-                muhat = ret["muhat"]
-                logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                ret["lmax"] = lbsm
-                ret["muhat"] = 1.0
+            if return_nll:
+                if lsm < lmax: ## fixme if return_nll is on, its the other way
+                    muhat = ret["muhat"]
+                    logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+                    ret["lmax"] = lsm
+                    ret["muhat"] = 0.0
+                if lbsm < lmax:
+                    muhat = ret["muhat"]
+                    logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+                    ret["lmax"] = lbsm
+                    ret["muhat"] = 1.0
+            else:
+                if lsm > lmax: ## fixme if return_nll is on, its the other way
+                    muhat = ret["muhat"]
+                    logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+                    ret["lmax"] = lsm
+                    ret["muhat"] = 0.0
+                if lbsm > lmax:
+                    muhat = ret["muhat"]
+                    logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+                    ret["lmax"] = lbsm
+                    ret["muhat"] = 1.0
 
         return ret
 
