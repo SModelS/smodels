@@ -108,7 +108,7 @@ class StatsComputer:
         return computer
 
     @classmethod
-    def forTruncatedGaussian(cls,theorypred, corr =0.6 ):
+    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ):
         """ get a statscomputer for truncated gaussians
         :param theorypred: TheoryPrediction object
         :param corr: correction factor:
@@ -118,7 +118,7 @@ class StatsComputer:
         """
         # marked as experimental feature
         if not hasattr(theorypred, "avgElement"):
-            logger.error("theory prediction {theorypred.analysisId()} has no average element! why??" )
+            logger.error( f"theory prediction {theorypred.analysisId()} has no average element! why??" )
             return None
 
         eul = theorypred.dataset.getUpperLimitFor(
