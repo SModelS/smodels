@@ -283,14 +283,6 @@ class TheoryPrediction(object):
         return self.cachedObjs[expected]["muhat"]
 
     @whenDefined
-    def chi2(self, expected=False):
-        if not "chi2" in self.cachedObjs[expected]:
-            self.computeStatistics(expected)
-        if not "chi2" in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["chi2"] = None
-        return self.cachedObjs[expected]["chi2"]
-
-    @whenDefined
     def likelihood(self, mu=1.0, expected=False, nll=False, useCached=True):
         """
         get the likelihood for a signal strength modifier mu
@@ -333,9 +325,9 @@ class TheoryPrediction(object):
     @whenDefined
     def computeStatistics(self, expected=False):
         """
-        Compute the likelihoods, chi2 and upper limit for this theory prediction.
-        The resulting values are stored as the likelihood, lmax, lsm and chi2
-        attributes (chi2 being phased out).
+        Compute the likelihoods, and upper limit for this theory prediction.
+        The resulting values are stored as the likelihood, lmax, and lsm
+        attributes.
         :param expected: computed expected quantities, not observed
         """
 
@@ -351,9 +343,6 @@ class TheoryPrediction(object):
         self.cachedObjs[expected]["lmax"] = llhdDict["lmax"]
         self.cachedObjs[expected]["muhat"] = llhdDict["muhat"]
         self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
-
-        from smodels.tools.basicStats import chi2FromLmax
-        self.cachedObjs[expected]["chi2"] = chi2FromLmax(llhdDict["lbsm"], llhdDict["lmax"])
 
 
 class TheoryPredictionList(object):
