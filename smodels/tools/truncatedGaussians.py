@@ -38,7 +38,7 @@ class TruncatedGaussians:
         :param cl: confidence level
         """
         assert type(upperLimitOnMu) in [ float, np.float64, np.float32 ], f"the upper limits must be given as floats not {type(upperLimitOnMu)}, are you providing upper limits on xsecs?"
-        if corr > 0.0: # and upperLimitOnMu > expectedUpperLimitOnMu:
+        if corr > 0.0 and upperLimitOnMu > expectedUpperLimitOnMu:
             f = 1.0 - corr * ((upperLimitOnMu - expectedUpperLimitOnMu) / (upperLimitOnMu + expectedUpperLimitOnMu))
             expectedUpperLimitOnMu = expectedUpperLimitOnMu / f
         self.upperLimitOnMu = upperLimitOnMu

@@ -249,21 +249,23 @@ class TheoryPrediction(object):
         return wrapper
 
     @whenDefined
-    def lsm(self, expected=False):
+    def lsm(self, expected=False, return_nll : bool = False ):
         """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
-        if "lsm" not in self.cachedObjs[expected]:
+        if "nll_sm" not in self.cachedObjs[expected]:
             self.computeStatistics(expected)
-        if "lsm" not in self.cachedObjs[expected]:
+        if "nll_sm" not in self.cachedObjs[expected]:
             self.cachedObjs[expected]["lsm"] = None
-        return self.cachedObjs[expected]["lsm"]
+        return self.nllToLikelihood ( self.cachedObjs[expected]["nll_sm"],
+               return_nll )
 
     @whenDefined
-    def lmax(self, expected=False):
+    def lmax(self, expected=False, return_nll : bool = False ):
         """likelihood at mu_hat"""
 
-        if not "lmax" in self.cachedObjs[expected]:
+        if not "nllmax" in self.cachedObjs[expected]:
             self.computeStatistics(expected)
-        return self.cachedObjs[expected]["lmax"]
+        return self.nllToLikelihood ( self.cachedObjs[expected]["nllmax"],
+                return_nll )
 
     @whenDefined
     def sigma_mu(self, expected=False):
@@ -297,16 +299,12 @@ class TheoryPrediction(object):
             return self.nllToLikelihood ( nll, return_nll )
 
         if useCached:
-            if "llhd" in self.cachedObjs[expected] and abs(mu - 1.0) < 1e-5:
-                llhd = self.cachedObjs[expected]["llhd"]
-                if return_nll:
-                    return -np.log(llhd)
-                return llhd
-            if "lsm" in self.cachedObjs[expected] and abs(mu) < 1e-5:
-                lsm = self.cachedObjs[expected]["lsm"]
-                if return_nll:
-                    return -np.log(lsm)
-                return lsm
+            if "nll" in self.cachedObjs[expected] and abs(mu - 1.0) < 1e-5:
+                nll = self.cachedObjs[expected]["nll"]
+                return self.nllToLikelihood ( nll, return_nll )
+            if "nll_sm" in self.cachedObjs[expected] and abs(mu) < 1e-5:
+                nllsm = self.cachedObjs[expected]["nll_sm"]
+                return self.nllToLikelihood ( nllsm, return_nll )
 
         # for truncated gaussians the fits only work with negative signals!
         nll = self.statsComputer.likelihood(poi_test = mu,
@@ -336,10 +334,11 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["sigma_mu"] = {}
 
         # Compute likelihoods and related parameters:
-        llhdDict = self.statsComputer.get_five_values(expected = expected)
-        self.cachedObjs[expected]["llhd"] = llhdDict["lbsm"]
-        self.cachedObjs[expected]["lsm"] = llhdDict["lsm"]
-        self.cachedObjs[expected]["lmax"] = llhdDict["lmax"]
+        llhdDict = self.statsComputer.get_five_values(expected = expected,
+                     return_nll = True )
+        self.cachedObjs[expected]["nll"] = llhdDict["lbsm"]
+        self.cachedObjs[expected]["nll_sm"] = llhdDict["lsm"]
+        self.cachedObjs[expected]["nllmax"] = llhdDict["lmax"]
         self.cachedObjs[expected]["muhat"] = llhdDict["muhat"]
         self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
 
