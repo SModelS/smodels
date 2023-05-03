@@ -124,14 +124,17 @@ class Pythia8Wrapper(WrapperBase):
         super().checkInstallation(compile)
         exists = os.path.exists ( self.includeFile )
         xmldoc = self.getXmldoc()
-        print ( "checkInstallation", compile, "xmldoc", xmldoc, self.srcPath )
-        if xmldoc == None:
+        if not os.path.exists ( xmldoc ): # if this disappears, start from scratch
             import shutil
-            # shutil.rmtree ( self.srcPath )
+            p = xmldoc.find ( "share" )
+            rm = xmldoc[:p-1]
+            shutil.rmtree ( rm )
+            exists = False
+
+        if xmldoc == None:
             exists = False
         if exists:
             return True
-        print ( "so we compile?", compile )
         if compile:
             self.compile()
         exists = os.path.exists ( self.includeFile )
@@ -148,8 +151,8 @@ class Pythia8Wrapper(WrapperBase):
             with open(xmldoc) as f:
                 xmlDir = f.read()
                 toadd = os.path.join(os.path.dirname(xmldoc), xmlDir.strip())
-        if not os.path.exists ( toadd ):
-            return None
+        #if not os.path.exists ( toadd ):
+        #    return None
         return toadd
 
     def run(self, slhaFile, lhefile=None, unlink=True):
@@ -185,7 +188,7 @@ class Pythia8Wrapper(WrapperBase):
             lhefile,
         )
         toadd = self.getXmldoc()
-        if toadd != None:
+        if toadd != None and os.path.exists ( toadd ):
             logger.debug("adding -x %s" % toadd)
             cmd += " -x %s" % toadd
         logger.debug("Now running ''%s''" % str(cmd))

@@ -135,7 +135,7 @@ def checkPythiaHeaderFile():
 def compilePythia():
     """ finally, compile pythia """
     ver = getVersion()
-    ncpus = getNCPUs()
+    ncpus = max ( 1, getNCPUs()-2 )
     cmd = f"cd pythia{ver}; ./configure ; make -j {ncpus}"
     print ( f"[installer.py] {cmd}" )
     import subprocess
