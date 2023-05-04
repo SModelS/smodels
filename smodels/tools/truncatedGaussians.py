@@ -26,6 +26,10 @@ class TruncatedGaussians:
     __slots__ = [ "upperLimitOnMu", "expectedUpperLimitOnMu", "corr",
                   "sigma_mu", "denominator", "cl" ]
 
+    # the correction we introduced a long time ago was have exclusions
+    # in mind only. for discovery mode we need to correct differently
+    newCorrectionType = False
+
     def __init__  ( self, upperLimitOnMu : float, expectedUpperLimitOnMu : float,
                     corr : Optional[float] = 0.6, cl=.95 ):
         """
@@ -38,7 +42,8 @@ class TruncatedGaussians:
         :param cl: confidence level
         """
         assert type(upperLimitOnMu) in [ float, np.float64, np.float32 ], f"the upper limits must be given as floats not {type(upperLimitOnMu)}, are you providing upper limits on xsecs?"
-        if corr > 0.0 and upperLimitOnMu > expectedUpperLimitOnMu:
+        # the old type of correction
+        if not self.newCorrectionType and corr > 0.0 and upperLimitOnMu > expectedUpperLimitOnMu:
             f = 1.0 - corr * ((upperLimitOnMu - expectedUpperLimitOnMu) / (upperLimitOnMu + expectedUpperLimitOnMu))
             expectedUpperLimitOnMu = expectedUpperLimitOnMu / f
         self.upperLimitOnMu = upperLimitOnMu
@@ -140,7 +145,9 @@ class TruncatedGaussians:
 
         muhat = 0.
         if expected == False:
-            muhat = self._findMuhat()
+            xa = -self.expectedUpperLimitOnMu
+            xb = self.expectedUpperLimitOnMu
+            muhat = self._findMuhat(xa,xb)
         ret = self._computeLlhd(mu, muhat, return_nll = False )
         if return_nll:
             ret = -np.log(ret)
@@ -151,7 +158,10 @@ class TruncatedGaussians:
         an upper limit and a central value. assumes a truncated Gaussian likelihood
         """
         # the expected scale, eq 3.24 in arXiv:1202.3415
-        return self.expectedUpperLimitOnMu / 1.96
+        sigma_mu = self.expectedUpperLimitOnMu / 1.96
+        #if self.newCorrectionType: # we could correct here
+        #    sigma_mu = sigma_mu / ( 1. - self.corr/2.)
+        return sigma_mu
 
     def _root_func( self, mu : float ):
         """ the root of this one should determine muhat """
@@ -177,7 +187,7 @@ class TruncatedGaussians:
             c += 1
             if c > 10:
                 logger.error(
-                    f"cannot find bracket for brent bracketing ul={upperLimitOnMu}, eul={expectedUpperLimitOnMu},xa={xa}, xb={xb}"
+                    f"cannot find bracket for brent bracketing ul={self.upperLimitOnMu:.2f}, eul={self.expectedUpperLimitOnMu:.2f},r({xa:.2f})={self._root_func(xa):.2f}, r({xb:.2f})={self._root_func(xb):.2f}"
                 )
 
         muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-07, xtol=1e-07)
@@ -186,11 +196,16 @@ class TruncatedGaussians:
     def _computeLlhd( self, mu, muhat, return_nll):
         if mu is None:
             mu = muhat
+        sigma_mu = self.sigma_mu
+        ## we could also correct here
+        if self.newCorrectionType:
+            sigma_mu = self.sigma_mu / ( 1. - self.corr / 2. )
+
         # need to account for the truncation!
         # first compute how many sigmas left of center is 0.
-        Zprime = muhat / self.sigma_mu
+        Zprime = muhat / sigma_mu
         # now compute the area of the truncated gaussian
         A = stats.norm.cdf(Zprime)
         if return_nll:
-            return np.log(A) - stats.norm.logpdf(mu, muhat, self.sigma_mu)
-        return float(stats.norm.pdf(mu, muhat, self.sigma_mu) / A)
+            return np.log(A) - stats.norm.logpdf(mu, muhat, sigma_mu)
+        return float(stats.norm.pdf(mu, muhat, sigma_mu) / A)
