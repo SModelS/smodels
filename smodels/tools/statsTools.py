@@ -248,8 +248,7 @@ class StatsComputer:
             nsignals.append(subSig)
         # Loading the jsonFiles, unless we already have them (because we pickled)
         nsig = self.nsig
-        ntotal = nsig if type(nsig) in [int, float] else sum(nsig)
-        data = PyhfData(nsignals, jsons, ntotal, jsonFiles)
+        data = PyhfData(nsignals, jsons, jsonFiles)
         if data.errorFlag:
             return None
         if hasattr(globalInfo, "includeCRs"):

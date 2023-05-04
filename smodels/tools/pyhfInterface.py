@@ -113,9 +113,9 @@ class PyhfData:
     :ivar nWS: number of workspaces = number of json files
     """
 
-    def __init__(self, nsignals, inputJsons, total, jsonFiles=None ):
-        self.totalYield = total
+    def __init__(self, nsignals, inputJsons, jsonFiles=None ):
         self.nsignals = nsignals  # fb
+        self.totalYield = self.totalYield()
         self.inputJsons = inputJsons
         self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
         self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
@@ -130,10 +130,10 @@ class PyhfData:
         self.getWSInfo()
         self.checkConsistency()
 
-    # def totalYield ( self ):
-    #     """ the total yield in all signal regions """
-    #     S = sum ( [ sum(x) for x in self.nsignals ] )
-    #     return S
+    def totalYield ( self ):
+        """ the total yield in all signal regions """
+        S = sum ( [ sum(x) for x in self.nsignals ] )
+        return S
 
     def getWSInfo(self):
         """
