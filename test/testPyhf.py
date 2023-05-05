@@ -238,7 +238,12 @@ class PyhfTest(unittest.TestCase):
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         self.assertAlmostEqual ( ul, 70.44942696708914, 1 )
-        # self.assertAlmostEqual ( ul, 234.83141989029718, 1 )
+        """ compare with:
+        m = Data( observed=[10,9], backgrounds=[.9,.8],
+        covariance=[[1e-6,0],[0,1e-6]], nsignal=[.1,.2])
+        ulComp = UpperLimitComputer()
+        ul = ulComp.getUpperLimitOnMu(m )
+        """
 
     def testFullPyhfModule1(self):
         """
