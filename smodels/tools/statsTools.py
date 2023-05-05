@@ -384,6 +384,8 @@ class StatsComputer:
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
                        expected = expected, workspace_index = index )
+                ntotal = nsig if type(nsig) in [int, float] else sum(nsig)
+                ret = ret * ntotal ## FIXME why??
             else:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
                        expected = expected, workspace_index = index )

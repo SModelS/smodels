@@ -187,13 +187,6 @@ class TheoryPrediction(object):
             if self.dataType() == "combined":
                 ul = self.statsComputer.poi_upper_limit(expected = expected,
                                                         limit_on_xsec = True)
-
-                compType = self.statsComputer.dataType
-                # Rescale upper limits for pyhf
-                if compType == 'pyhf' and ul is not None:
-                    nsig = self.statsComputer.nsig
-                    ntotal = nsig if type(nsig) in [int, float] else sum(nsig)
-                    ul = ul*ntotal
             self.cachedObjs[expected]["UL"] = ul
 
         return self.cachedObjs[expected]["UL"]
