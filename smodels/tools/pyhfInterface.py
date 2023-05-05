@@ -798,6 +798,7 @@ class PyhfUpperLimitComputer:
                 logger.error(f"asked for upper limit on fiducial xsec, but no lumi given with the data")
                 return ul
             xsec = self.data.totalYield / self.lumi
+            xsec = xsec * self.data.totalYield # why on earth??
             return ul * xsec
 
     # Trying a new method for upper limit computation :
