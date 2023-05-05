@@ -790,7 +790,6 @@ class PyhfUpperLimitComputer:
                 logger.error(f"asked for upper limit on fiducial xsec, but no lumi given with the data")
                 return ul
             xsec = self.data.totalYield / self.lumi
-            xsec = xsec * self.data.totalYield # why on earth??
             return ul * xsec
 
     # Trying a new method for upper limit computation :
@@ -966,8 +965,7 @@ class PyhfUpperLimitComputer:
             ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
             endUL = time.time()
             logger.debug("getUpperLimitOnMu elpased time : %1.4f secs" % (endUL - startUL))
-            # the ul is actually on yields
-            ul = ul / self.data.totalYield * self.scale
+            ul = ul * self.scale
             self.data.cachedULs[expected][workspace_index] = ul
             return ul  # self.scale has been updated within self.rescale() method
 

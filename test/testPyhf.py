@@ -229,12 +229,16 @@ class PyhfTest(unittest.TestCase):
 	      Tests how the module reacts when giving several jsons but not specifying for
         which the UL should be computed
         """
-        ws = [self.simpleJson([0.9], [10]), self.simpleJson([0.8], [9])]
-        data = PyhfData([[0.1], [0.2]], ws)
+        bg = [ .9, .8 ]
+	      obs = [ 10, 9 ]
+        nsig = [ .1, .2 ]
+        ws = [ self.simpleJson([x], [y]) for x,y in zip (bg,obs) ]
+        nsignals = [ [x] for x in nsig ]
+        data = PyhfData( nsignals, ws)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
-        self.assertAlmostEqual ( ul, 234.83141989029718, 1 )
-        # self.assertIsNone(ul)
+        self.assertAlmostEqual ( ul, 70.44942696708914, 1 )
+        # self.assertAlmostEqual ( ul, 234.83141989029718, 1 )
 
     def testFullPyhfModule1(self):
         """
@@ -268,7 +272,7 @@ class PyhfTest(unittest.TestCase):
         data = PyhfData([signals], [bkg])
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
-        ul = ul * data.totalYield
+        # ul = ul * data.totalYield
         # Computing the cls outside of SModelS with POI = ul, should give 0.95
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         workspace = pyhf.Workspace(llhdSpec)
@@ -320,7 +324,6 @@ class PyhfTest(unittest.TestCase):
         data = PyhfData([signals], [bkg] )
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
-        ul = ul * data.totalYield
         # Computing the cls outside of SModelS with POI = ul, should give 0.95
         msettings = {'normsys': {'interpcode': 'code4'}, 'histosys': {'interpcode': 'code4p'}}
         workspace = pyhf.Workspace(llhdSpec)
