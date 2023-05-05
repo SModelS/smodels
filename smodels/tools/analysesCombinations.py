@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 """
-.. module:: theoryPredictionsCombiner
-   :synopsis: a module that deals with combining signal regions from
-              different analyses, offering the same API as simplified likelihoods.
+.. module:: analysesCombinations
+   :synopsis: a module with the methods required for computing the likelihood and
+              upper limits for a combination of theory predictions (analyses combination).
+              Mostly used by the TheoryPredictionsCombiner class.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 .. moduleauthor:: Jamie Yellen <j.yellen.1@research.gla.ac.uk>

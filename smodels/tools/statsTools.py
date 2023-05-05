@@ -294,7 +294,7 @@ class StatsComputer:
         ret["lsm"] = lsm
         if check_for_maxima:
             if return_nll:
-                if lsm < lmax: ## fixme if return_nll is on, its the other way
+                if lsm < lmax: ## if return_nll is off, its the other way
                     muhat = ret["muhat"]
                     logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
                     ret["lmax"] = lsm
@@ -305,7 +305,7 @@ class StatsComputer:
                     ret["lmax"] = lbsm
                     ret["muhat"] = 1.0
             else:
-                if lsm > lmax: ## fixme if return_nll is on, its the other way
+                if lsm > lmax:
                     muhat = ret["muhat"]
                     logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
                     ret["lmax"] = lsm

@@ -464,7 +464,7 @@ class MultiParticle(Particle):
                 if all(x == values[0] for x in values):
                     return values[0]
             return values
-        except (AttributeError,IndexError,TypeError) as e: ## FIXME redundant?
+        except (AttributeError,IndexError,TypeError) as e:
             raise AttributeError(e)
 
     def cmpProperties(self,other,

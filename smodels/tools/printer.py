@@ -17,8 +17,7 @@ import os
 import copy
 import itertools
 from smodels.theory.topology import TopologyList
-from smodels.theory.theoryPrediction import TheoryPredictionList, TheoryPrediction
-from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
+from smodels.theory.theoryPrediction import TheoryPredictionList, TheoryPrediction, TheoryPredictionsCombiner
 from smodels.experiment.databaseObj import ExpResultList
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
