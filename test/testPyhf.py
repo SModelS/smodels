@@ -226,11 +226,11 @@ class PyhfTest(unittest.TestCase):
 
     def testWSindex(self):
         """
-	      Tests how the module reacts when giving several jsons but not specifying for
+        Tests how the module reacts when giving several jsons but not specifying for
         which the UL should be computed
         """
         bg = [ .9, .8 ]
-	      obs = [ 10, 9 ]
+        obs = [ 10, 9 ]
         nsig = [ .1, .2 ]
         ws = [ self.simpleJson([x], [y]) for x,y in zip (bg,obs) ]
         nsignals = [ [x] for x in nsig ]
