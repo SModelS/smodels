@@ -115,7 +115,7 @@ class PyhfData:
 
     def __init__(self, nsignals, inputJsons, jsonFiles=None ):
         self.nsignals = nsignals  # fb
-        self.totalYield = self.totalYield()
+        self.getTotalYield()
         self.inputJsons = inputJsons
         self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
         self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
@@ -130,10 +130,10 @@ class PyhfData:
         self.getWSInfo()
         self.checkConsistency()
 
-    def totalYield ( self ):
+    def getTotalYield ( self ):
         """ the total yield in all signal regions """
         S = sum ( [ sum(x) for x in self.nsignals ] )
-        return S
+        self.totalYield = S
 
     def getWSInfo(self):
         """
@@ -593,14 +593,6 @@ class PyhfUpperLimitComputer:
                 ulMin = ul
                 i_best = i_ws
         return i_best
-
-    def chi2(self, workspace_index=None):
-        """
-        Returns the chi square
-        """
-        return 2 * (
-            self.lmax(workspace_index, return_nll=True) - self.likelihood(workspace_index, return_nll=True)
-        )
 
     def exponentiateNLL(self, twice_nll, doIt):
         """if doIt, then compute likelihood from nll,
