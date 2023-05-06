@@ -126,11 +126,12 @@ class StatsComputer:
         )
         if eul is None:
             return None
+        eul = eul / theorypred.xsection.value
         ul = theorypred.dataset.getUpperLimitFor(
             element=theorypred.avgElement, txnames=theorypred.txnames, expected=False
-        )
-        kwargs = { "upperLimit": ul, "expectedUpperLimit": eul,
-                "predicted_yield": theorypred.xsection.value, "corr": corr }
+        ) / theorypred.xsection.value
+        kwargs = { "upperLimitOnMu": float(ul), "expectedUpperLimitOnMu": float(eul),
+                   "corr": corr }
         computer = StatsComputer(dataObject=theorypred.dataset,
                                  dataType="truncGaussian", 
                                  nsig=0.,
@@ -247,8 +248,7 @@ class StatsComputer:
             nsignals.append(subSig)
         # Loading the jsonFiles, unless we already have them (because we pickled)
         nsig = self.nsig
-        ntotal = nsig if type(nsig) in [int, float] else sum(nsig)
-        data = PyhfData(nsignals, jsons, ntotal, jsonFiles)
+        data = PyhfData(nsignals, jsons, jsonFiles)
         if data.errorFlag:
             return None
         if hasattr(globalInfo, "includeCRs"):
@@ -263,9 +263,6 @@ class StatsComputer:
         """
         Create computer for truncated gaussians
         """
-
-        if not "lumi" in kwargs:
-            kwargs["lumi"] = self.dataObject.getLumi()
         computer = TruncatedGaussians ( **kwargs )
         self.data = None
         self.likelihoodComputer = computer
@@ -296,16 +293,28 @@ class StatsComputer:
         lsm = self.likelihood ( poi_test = 0., expected=expected, return_nll = return_nll )
         ret["lsm"] = lsm
         if check_for_maxima:
-            if lsm > lmax:
-                muhat = ret["muhat"]
-                logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                ret["lmax"] = lsm
-                ret["muhat"] = 0.0
-            if lbsm > lmax:
-                muhat = ret["muhat"]
-                logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                ret["lmax"] = lbsm
-                ret["muhat"] = 1.0
+            if return_nll:
+                if lsm < lmax: ## if return_nll is off, its the other way
+                    muhat = ret["muhat"]
+                    logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+                    ret["lmax"] = lsm
+                    ret["muhat"] = 0.0
+                if lbsm < lmax:
+                    muhat = ret["muhat"]
+                    logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+                    ret["lmax"] = lbsm
+                    ret["muhat"] = 1.0
+            else:
+                if lsm > lmax:
+                    muhat = ret["muhat"]
+                    logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+                    ret["lmax"] = lsm
+                    ret["muhat"] = 0.0
+                if lbsm > lmax:
+                    muhat = ret["muhat"]
+                    logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
+                    ret["lmax"] = lbsm
+                    ret["muhat"] = 1.0
 
         return ret
 
@@ -319,14 +328,14 @@ class StatsComputer:
                 index = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
             return self.likelihoodComputer.likelihood (
-                    poi_test, nll = return_nll,
+                    poi_test, return_nll = return_nll,
                     expected = expected, **kwargs )
         elif self.dataType == "truncGaussian":
             kwargs["expected"]=expected
         elif self.dataType == "analysesComb":
             kwargs["expected"]=expected
         return self.likelihoodComputer.likelihood ( poi_test,
-                                                    nll = return_nll, **kwargs)
+                                                return_nll = return_nll, **kwargs)
 
     def transform ( self, expected ):
         """ SL only. transform the data to expected or observed """
@@ -355,9 +364,9 @@ class StatsComputer:
         elif self.dataType == "analysesComb":
             kwargs["expected"]=expected
 
-        ret = self.likelihoodComputer.lmax ( nll = return_nll,
-                                            allowNegativeSignals = self.allowNegativeSignals, 
-                                            **kwargs )
+        ret = self.likelihoodComputer.lmax ( return_nll = return_nll,
+                                   allowNegativeSignals = self.allowNegativeSignals, 
+                                   **kwargs )
         return ret
 
     def poi_upper_limit ( self, expected : Union [ bool, Text ],

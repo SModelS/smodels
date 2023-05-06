@@ -14,9 +14,8 @@ sys.path.insert(0, "../")
 from smodels.tools.simplifiedLikelihoods import LikelihoodComputer
 
 LikelihoodComputer.debug_mode = True
-from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.theory.theoryPrediction import theoryPredictionsFor,TheoryPredictionsCombiner
 from smodels.theory import decomposer
-from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.theory.model import Model
 from smodels.share.models.SMparticles import SMList
 from smodels.share.models.mssm import BSMList

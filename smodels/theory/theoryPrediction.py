@@ -14,10 +14,11 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statsTools import StatsComputer
+from typing import Union
 import itertools
 import numpy as np
 
-__all__ = [ "TheoryPrediction", "theoryPredictionsFor" ]
+__all__ = [ "TheoryPrediction", "theoryPredictionsFor", "TheoryPredictionsCombiner" ]
 
 
 class TheoryPrediction(object):
@@ -42,7 +43,7 @@ class TheoryPrediction(object):
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
         self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
-        self.cachedLlhds = {False: {}, True: {}, "posteriori": {}}
+        self.cachedNlls = {False: {}, True: {}, "posteriori": {}}
         self._statsComputer = None
 
     def __str__(self):
@@ -119,23 +120,23 @@ class TheoryPrediction(object):
             if not experimentalFeatures():
                 computer = 'N/A'
             else:
-                computer = StatsComputer.forTruncatedGaussian(self)     
+                computer = StatsComputer.forTruncatedGaussian(self)
                 if computer is None: # No expected UL available
                     computer = 'N/A'
-   
+
         elif self.dataType() == "efficiencyMap":
             nsig = (self.xsection.value * self.dataset.getLumi()).asNumber()
-            computer = StatsComputer.forSingleBin(dataset=self.dataset, 
-                                                  nsig=nsig, 
+            computer = StatsComputer.forSingleBin(dataset=self.dataset,
+                                                  nsig=nsig,
                                                   deltas_rel=self.deltas_rel )
 
         elif self.dataType() == "combined":
             # Get dictionary with dataset IDs and signal yields
-            srNsigDict = {pred.dataset.getID() : 
-                          (pred.xsection.value*pred.dataset.getLumi()).asNumber() 
+            srNsigDict = {pred.dataset.getID() :
+                          (pred.xsection.value*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions}
 
-            # Get ordered list of datasets:            
+            # Get ordered list of datasets:
             if hasattr(self.dataset.globalInfo, "covariance"):
                 datasetList = self.dataset.globalInfo.datasetOrder[:]
                 # Get list of signal yields corresponding to the dataset order:
@@ -143,22 +144,22 @@ class TheoryPrediction(object):
                        for dataID in datasetList]
                 # Get computer
                 computer = StatsComputer.forMultiBinSL(dataset=self.dataset,
-                                                       nsig=srNsigs, 
+                                                       nsig=srNsigs,
                                                        deltas_rel = self.deltas_rel)
-                
+
             elif hasattr(self.dataset.globalInfo, "jsonFiles"):
                 datasetList = [ds.getID() for ds in self.dataset.origdatasets]
                 # Get list of signal yields corresponding to the dataset order:
                 srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
                        for dataID in datasetList]
                 # Get computer
-                computer = StatsComputer.forPyhf(dataset=self.dataset, 
-                                                       nsig=srNsigs, 
-                                                       deltas_rel = self.deltas_rel)                
+                computer = StatsComputer.forPyhf(dataset=self.dataset,
+                                                       nsig=srNsigs,
+                                                       deltas_rel = self.deltas_rel)
 
 
-            
-            
+
+
         self._statsComputer = computer
 
     def getUpperLimit(self, expected=False):
@@ -186,13 +187,6 @@ class TheoryPrediction(object):
             if self.dataType() == "combined":
                 ul = self.statsComputer.poi_upper_limit(expected = expected,
                                                         limit_on_xsec = True)
-                
-                compType = self.statsComputer.dataType
-                # Rescale upper limits for pyhf
-                if compType == 'pyhf' and ul is not None:
-                    nsig = self.statsComputer.nsig
-                    ntotal = nsig if type(nsig) in [int, float] else sum(nsig)
-                    ul = ul*ntotal
             self.cachedObjs[expected]["UL"] = ul
 
         return self.cachedObjs[expected]["UL"]
@@ -244,25 +238,27 @@ class TheoryPrediction(object):
                 return None
             else:
                 return function(self, *args, **kwargs)
-        
+
         return wrapper
 
     @whenDefined
-    def lsm(self, expected=False):
+    def lsm(self, expected=False, return_nll : bool = False ):
         """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
-        if "lsm" not in self.cachedObjs[expected]:
+        if "nll_sm" not in self.cachedObjs[expected]:
             self.computeStatistics(expected)
-        if "lsm" not in self.cachedObjs[expected]:
+        if "nll_sm" not in self.cachedObjs[expected]:
             self.cachedObjs[expected]["lsm"] = None
-        return self.cachedObjs[expected]["lsm"]
+        return self.nllToLikelihood ( self.cachedObjs[expected]["nll_sm"],
+               return_nll )
 
     @whenDefined
-    def lmax(self, expected=False):
+    def lmax(self, expected=False, return_nll : bool = False ):
         """likelihood at mu_hat"""
 
-        if not "lmax" in self.cachedObjs[expected]:
+        if not "nllmax" in self.cachedObjs[expected]:
             self.computeStatistics(expected)
-        return self.cachedObjs[expected]["lmax"]
+        return self.nllToLikelihood ( self.cachedObjs[expected]["nllmax"],
+                return_nll )
 
     @whenDefined
     def sigma_mu(self, expected=False):
@@ -270,7 +266,7 @@ class TheoryPrediction(object):
 
         if not "sigma_mu" in self.cachedObjs[expected]:
             self.computeStatistics(expected)
-        
+
         return self.cachedObjs[expected]["sigma_mu"]
 
     @whenDefined
@@ -283,59 +279,45 @@ class TheoryPrediction(object):
         return self.cachedObjs[expected]["muhat"]
 
     @whenDefined
-    def chi2(self, expected=False):
-        if not "chi2" in self.cachedObjs[expected]:
-            self.computeStatistics(expected)
-        if not "chi2" in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["chi2"] = None
-        return self.cachedObjs[expected]["chi2"]
-
-    @whenDefined
-    def likelihood(self, mu=1.0, expected=False, nll=False, useCached=True):
+    def likelihood(self, mu=1.0, expected=False, return_nll=False, useCached=True):
         """
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood. if "posteriori",
                          compute expected posteriori.
-        :param nll: if True, return negative log likelihood, else likelihood
+        :param return_nll: if True, return negative log likelihood, else likelihood
         :param useCached: if True, will return the cached value, if available
         """
-        if useCached and mu in self.cachedLlhds[expected]:
-            llhd = self.cachedLlhds[expected][mu]
-            if nll:
-                if llhd == 0.0:
-                    return 700.0
-                return -np.log(llhd)
-            return llhd
+        if useCached and mu in self.cachedNlls[expected]:
+            nll = self.cachedNlls[expected][mu]
+            return self.nllToLikelihood ( nll, return_nll )
 
         if useCached:
-            if "llhd" in self.cachedObjs[expected] and abs(mu - 1.0) < 1e-5:
-                llhd = self.cachedObjs[expected]["llhd"]
-                if nll:
-                    return -np.log(llhd)
-                return llhd
-            if "lsm" in self.cachedObjs[expected] and abs(mu) < 1e-5:
-                lsm = self.cachedObjs[expected]["lsm"]
-                if nll:
-                    return -np.log(lsm)
-                return lsm
+            if "nll" in self.cachedObjs[expected] and abs(mu - 1.0) < 1e-5:
+                nll = self.cachedObjs[expected]["nll"]
+                return self.nllToLikelihood ( nll, return_nll )
+            if "nll_sm" in self.cachedObjs[expected] and abs(mu) < 1e-5:
+                nllsm = self.cachedObjs[expected]["nll_sm"]
+                return self.nllToLikelihood ( nllsm, return_nll )
 
         # for truncated gaussians the fits only work with negative signals!
-        llhd = self.statsComputer.likelihood(poi_test = mu, 
+        nll = self.statsComputer.likelihood(poi_test = mu,
                                              expected = expected,
-                                             return_nll = False)
-        self.cachedLlhds[expected][mu] = llhd
-        if nll:
-            if llhd == 0.0:
-                return 700.0
-            return -np.log(llhd)
-        return llhd
+                                             return_nll = True )
+        self.cachedNlls[expected][mu] = nll
+        return self.nllToLikelihood ( nll, return_nll )
+
+    def nllToLikelihood ( self, nll : Union[None,float], return_nll : bool ):
+        """ if not return_nll, then compute likelihood from nll """
+        if return_nll:
+            return nll
+        return np.exp ( - nll )
 
     @whenDefined
     def computeStatistics(self, expected=False):
         """
-        Compute the likelihoods, chi2 and upper limit for this theory prediction.
-        The resulting values are stored as the likelihood, lmax, lsm and chi2
-        attributes (chi2 being phased out).
+        Compute the likelihoods, and upper limit for this theory prediction.
+        The resulting values are stored as the likelihood, lmax, and lsm
+        attributes.
         :param expected: computed expected quantities, not observed
         """
 
@@ -345,15 +327,183 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["sigma_mu"] = {}
 
         # Compute likelihoods and related parameters:
-        llhdDict = self.statsComputer.get_five_values(expected = expected)
-        self.cachedObjs[expected]["llhd"] = llhdDict["lbsm"]
-        self.cachedObjs[expected]["lsm"] = llhdDict["lsm"]
-        self.cachedObjs[expected]["lmax"] = llhdDict["lmax"]
+        llhdDict = self.statsComputer.get_five_values(expected = expected,
+                     return_nll = True )
+        self.cachedObjs[expected]["nll"] = llhdDict["lbsm"]
+        self.cachedObjs[expected]["nll_sm"] = llhdDict["lsm"]
+        self.cachedObjs[expected]["nllmax"] = llhdDict["lmax"]
         self.cachedObjs[expected]["muhat"] = llhdDict["muhat"]
         self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
 
-        from smodels.tools.basicStats import chi2FromLmax
-        self.cachedObjs[expected]["chi2"] = chi2FromLmax(llhdDict["lbsm"], llhdDict["lmax"])
+
+class TheoryPredictionsCombiner(TheoryPrediction):
+    """
+    Facility used to combine theory predictions from different analyes.
+    If a list with a single TheoryPrediction is given, return the TheoryPrediction
+    object.
+    """
+
+    def __new__(cls,theoryPredictions: list, slhafile=None, deltas_rel=None):
+        """
+        If called with a list containing a single TheoryPrediction, return the TheoryPrediction object.
+        Otherwise, create a TheoryPredictionsCombiner object.
+        """
+
+        if len(theoryPredictions) == 1:
+            return theoryPredictions[0]
+        else:
+            tpCombiner = super(TheoryPredictionsCombiner, cls).__new__(cls)
+            return tpCombiner
+
+    def __init__(self, theoryPredictions: list, slhafile=None, deltas_rel=None):
+        """
+        Constructor.
+        :param theoryPredictions: the List of theory predictions
+        :param slhafile: optionally, the slhafile can be given, for debugging
+        :param deltas_rel: relative uncertainty in signal (float).
+                           Default value is 20%.
+        """
+
+        if len(theoryPredictions) == 0:
+            raise SModelSError("asking to combine zero theory predictions")
+        
+        self.theoryPredictions = theoryPredictions
+        self.slhafile = slhafile
+        if deltas_rel is None:
+            from smodels.tools.runtime import _deltas_rel_default
+
+            deltas_rel = _deltas_rel_default
+        self.deltas_rel = deltas_rel
+        self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
+        self.cachedNlls = {False: {}, True: {}, "posteriori": {}}
+        self._statsComputer = None
+
+    @classmethod
+    def selectResultsFrom(cls, theoryPredictions, anaIDs):
+        """
+        Select the results from theoryPrediction list which match one
+        of the IDs in anaIDs. If there are multiple predictions for the
+        same ID for which a likelihood is available, it gives priority
+        to the ones with largest expected r-values.
+
+        :param theoryPredictions: list of TheoryPrediction objects
+        :param anaIDs: list with the analyses IDs (in string format) to be combined
+        :return: a TheoryPredictionsCombiner object for the selected predictions.
+                 If no theory prediction was selected, return None.
+        """
+
+        # First select the theory predictions which correspond to the analyses to be combined
+        filteredTPs = [tp for tp in theoryPredictions if tp.analysisId() in anaIDs]
+        filteredIDs = set([tp.analysisId() for tp in filteredTPs])
+        # Now remove results with no likelihood available
+        selectedTPs = [tp for tp in filteredTPs if tp.likelihood() is not None]
+        selectedIDs = set([tp.analysisId() for tp in selectedTPs])
+        # Warn the user concerning results with no likelihoods:
+        for anaID in filteredIDs.difference(selectedIDs):
+            logger.info(
+                "No likelihood available for %s. This analysis will not be used in analysis combination."
+                % anaID
+            )
+        # If no results are available, return None
+        if len(selectedTPs) == 0:
+            return None
+
+        # Define a hierarchy for the results:
+        priority = {"combined": 2, "efficiencyMap": 1, "upperLimit": 0}
+        # Now sort by highest priority and then by highest expected r-value:
+        selectedTPs = sorted(
+            selectedTPs, key=lambda tp: (priority[tp.dataType()], tp.getRValue(expected=True))
+        )
+        # Now get a single TP for each result
+        # (the highest ranking analyses come last and are kept in the dict)
+        uniqueTPs = {tp.analysisId(): tp for tp in selectedTPs}
+        uniqueTPs = list(uniqueTPs.values())
+
+        combiner = cls(uniqueTPs)
+        return combiner
+
+    def dataId(self):
+        """
+        Return a string with the IDs of all the datasets used in the combination.
+        """
+        ids = [str(tp.dataset.getID()) for tp in self.theoryPredictions]
+        ret = ",".join(ids)
+
+        return ret
+
+    def analysisId(self):
+        """
+        Return a string with the IDs of all the experimental results used in the combination.
+        """
+
+        ret = ",".join(sorted([tp.analysisId() for tp in self.theoryPredictions]))
+
+        return ret
+
+    def dataType(self, short=False):
+        """
+        Return its type (combined)
+        :param: short, if True, return abbreviation (anacomb)
+        """
+        if short:
+            return "comb"
+        else:
+            return "combined"
+
+    def totalXsection(self):
+        ret = 0.0 * fb
+        if self.theoryPredictions is not None:
+            for tp in self.theoryPredictions:
+                ret += tp.xsection.value
+        return ret
+
+    def getmaxCondition(self):
+        """
+        Returns the maximum xsection from the list conditions
+
+        :returns: maximum condition xsection (float)
+        """
+        conditions = [tp.getmaxCondition() for tp in self.theoryPredictions]
+        return max(conditions)
+
+    def setStatsComputer(self):
+        """
+        Creates and instance of StatsComputer depending on the
+        type of TheoryPrediction/dataset. In case it is not possible
+        to define a statistical computer (upper limit result or no expected
+        upper limits), set the computer to 'N/A'.
+        """
+
+        # First make sure all theory predictions in the combiner
+        # have well-defined stats models
+        if any(tp.statsComputer == 'N/A' for tp in self.theoryPredictions):
+            computer = 'N/A'
+        else:
+            computer = StatsComputer.forAnalysesComb(self.theoryPredictions, self.deltas_rel)     
+            
+        self._statsComputer = computer
+
+    def getLlhds(self,muvals,expected=False,normalize=True):
+        """
+        Facility to access the likelihoods for the individual analyses and the combined
+        likelihood.
+        Returns a dictionary with the analysis IDs as keys and the likelihood values as values.
+        Mostly used for plotting the likelihoods.
+
+        :param muvals: List with values for the signal strenth for which the likelihoods must
+                       be evaluated.
+        :param expected: If True returns the expected likelihood values.
+        :param normalize: If True normalizes the likelihood by its integral over muvals.
+        """
+
+        return self.statsComputer.likelihoodComputer.getLlhds(muvals,expected,normalize)
+
+    def describe(self):
+        """returns a string containing a list of all analysisId and dataIds"""
+        ids = []
+        for tp in self.theoryPredictions:
+            ids.append(f"{tp.analysisId()}:{tp.dataId()}")
+        return f"SRs: {', '.join(ids)}"
 
 
 class TheoryPredictionList(object):

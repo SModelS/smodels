@@ -16,8 +16,7 @@ from smodels.theory import decomposer
 from smodels.theory import theoryPrediction
 from smodels.share.models.SMparticles import SMList
 from smodels.theory.model import Model
-from smodels.theory.theoryPrediction import theoryPredictionsFor
-from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
+from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionsCombiner
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.tools import crashReport, timeOut
 from smodels.tools.printer import MPrinter, printScanSummary

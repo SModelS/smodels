@@ -131,7 +131,7 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
     :param filename: slha file
     :param timeout: timeout for the operation, given in seconds
     :param suppressStdout: if True, then redirect stdout and stderr to /dev/null
-    :param development: development run (FIXME what does that entail?)
+    :param development: turn on development mode (e.g. no crash report)
     :param inifile: the config file to be used
     :param overridedatabase: if not None, then use the provided database,
            else use databaseLoader.database

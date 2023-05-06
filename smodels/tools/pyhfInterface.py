@@ -113,9 +113,9 @@ class PyhfData:
     :ivar nWS: number of workspaces = number of json files
     """
 
-    def __init__(self, nsignals, inputJsons, total, jsonFiles=None ):
-        self.totalYield = total
+    def __init__(self, nsignals, inputJsons, jsonFiles=None ):
         self.nsignals = nsignals  # fb
+        self.getTotalYield()
         self.inputJsons = inputJsons
         self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
         self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
@@ -130,10 +130,10 @@ class PyhfData:
         self.getWSInfo()
         self.checkConsistency()
 
-    # def totalYield ( self ):
-    #     """ the total yield in all signal regions """
-    #     S = sum ( [ sum(x) for x in self.nsignals ] )
-    #     return S
+    def getTotalYield ( self ):
+        """ the total yield in all signal regions """
+        S = sum ( [ sum(x) for x in self.nsignals ] )
+        self.totalYield = S
 
     def getWSInfo(self):
         """
@@ -462,13 +462,14 @@ class PyhfUpperLimitComputer:
                             break
         return init_pars
 
-    def likelihood(self, mu=1.0, workspace_index=None, nll=False, expected=False):
+    def likelihood( self, mu=1.0, workspace_index=None, return_nll=False,
+                    expected=False):
         """
         Returns the value of the likelihood.
         Inspired by the `pyhf.infer.mle` module but for non-log likelihood
         :param workspace_index: supply index of workspace to use. If None,
                                 choose index of best combo
-        :param nll: if true, return nll, not llhd
+        :param return_nll: if true, return nll, not llhd
         :param expected: if False, compute expected values, if True,
             compute a priori expected, if "posteriori" compute posteriori
             expected
@@ -550,12 +551,12 @@ class PyhfUpperLimitComputer:
                     # If a total yield is negative with the best profiled parameters, return None
                     if not all([True if yld >= 0 else False for yld in model.expected_actualdata(bestFitParam)]):
                         self.restore()
-                        return self.exponentiateNLL(None, not nll)
+                        return self.exponentiateNLL(None, not return_nll)
                 except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                     logger.info(f"pyhf fixed_poi_fit failed twice for mu={mu}: {e}")
 
                     self.restore()
-                    return self.exponentiateNLL(None, not nll)
+                    return self.exponentiateNLL(None, not return_nll)
 
             ret = nllh.tolist()
             try:
@@ -566,7 +567,7 @@ class PyhfUpperLimitComputer:
             self.data.cached_likelihoods[
                 workspace_index
             ] = ret
-            ret = self.exponentiateNLL(ret, not nll)
+            ret = self.exponentiateNLL(ret, not return_nll)
             # print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
             self.restore()
             return ret
@@ -592,14 +593,6 @@ class PyhfUpperLimitComputer:
                 ulMin = ul
                 i_best = i_ws
         return i_best
-
-    def chi2(self, workspace_index=None):
-        """
-        Returns the chi square
-        """
-        return 2 * (
-            self.lmax(workspace_index, nll=True) - self.likelihood(workspace_index, nll=True)
-        )
 
     def exponentiateNLL(self, twice_nll, doIt):
         """if doIt, then compute likelihood from nll,
@@ -683,10 +676,11 @@ class PyhfUpperLimitComputer:
         #IPython.embed()
         #sys.exit()
 
-    def lmax(self, workspace_index=None, nll=False, expected=False, allowNegativeSignals=False):
+    def lmax( self, workspace_index=None, return_nll=False, expected=False,
+              allowNegativeSignals=False):
         """
         Returns the negative log max likelihood
-        :param nll: if true, return nll, not llhd
+        :param return_nll: if true, return nll, not llhd
         :param workspace_index: supply index of workspace to use. If None,
             choose index of best combo
         :param expected: if False, compute expected values, if True,
@@ -746,7 +740,7 @@ class PyhfUpperLimitComputer:
             except:
                 lmax = float(lmax[0])
             sigma_mu = self.getSigmaMu ( workspace )
-            lmax = self.exponentiateNLL(lmax, not nll)
+            lmax = self.exponentiateNLL(lmax, not return_nll)
             ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
             self.data.cached_lmaxes[workspace_index] = ret
             return ret
@@ -971,8 +965,7 @@ class PyhfUpperLimitComputer:
             ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
             endUL = time.time()
             logger.debug("getUpperLimitOnMu elpased time : %1.4f secs" % (endUL - startUL))
-            # the ul is actually on yields
-            ul = ul / self.data.totalYield * self.scale
+            ul = ul * self.scale
             self.data.cachedULs[expected][workspace_index] = ul
             return ul  # self.scale has been updated within self.rescale() method
 
