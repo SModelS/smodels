@@ -51,8 +51,7 @@ New in Version 2.3.0:
   * refactored the statistics modules, code ready for interfacing Spey
   * introduced "full_llhds" :ref:`Database <parameterFileDatabase>` database add-on (see parameter.ini file) (see :ref:`parameter.ini file <parameterFile>`)
 
-  * Database extension, added new results from 6 ATLAS and 4 CMS analyses
-    (hfm=HistFactory model, cov=covariance matrix for SR combination):
+  * Database extension, added new results from 6 ATLAS and 4 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
      - results from ATLAS:
        ATLAS-SUSY-2018-05 (UL,EM+hfm), ATLAS-SUSY-2018-32 (EM+hfm), ATLAS-SUSY-2018-41 (EM+cov, updated), ATLAS-SUSY-2018-42 (UL,EM), ATLAS-SUSY-2019-02 (UL,EM+cov), ATLAS-SUSY-2013-12 (8TeV, EM)
      - results from CMS:
