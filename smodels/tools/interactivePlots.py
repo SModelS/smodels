@@ -432,6 +432,7 @@ class Plotter(object):
         mainFile = open( self.outFolder + self.indexfile,'r')
         display(HTML(mainFile.read()))
         mainFile.close()
+        self.cleanUp()
 
     def plot(self, outFolder, indexfile = "plots.html" ):
         """
@@ -448,9 +449,13 @@ class Plotter(object):
         self.indexfile = indexfile
         logger.info('Making plots...')
 
-        plotter=helpers.PlotlyBackend(self, outFolder )
-        plotter.makePlots( indexfile )
+        self.plotter=helpers.PlotlyBackend(self, outFolder )
+        self.plotter.makePlots( indexfile )
         logger.info('Generation of interactive plots finished. Go to: \n %s/%s \n to see the plots.' % ( outFolder, indexfile ) )
+
+    def cleanUp ( self ):
+        if hasattr ( self, "plotter" ):
+            self.plotter.cleanUp()
 
 
 def main(args,indexfile= "index.html" ):
@@ -524,3 +529,5 @@ def main(args,indexfile= "index.html" ):
                             (smodelsFolder,slhaFolder))
     plotter.plot(outputFolder, indexfile )
     return outputFolder
+
+
