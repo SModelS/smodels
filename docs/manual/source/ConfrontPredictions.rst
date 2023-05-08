@@ -170,7 +170,7 @@ for each given input model (or each :ref:`theory prediction <theoryPredictions>`
 In the :ref:`figure below <combinedSRfig>` we show the constraints on the simplified model
 `T2bbWWoff <http://smodels.github.io/docs/SmsDictionary#T2bbWWoff>`_ when using
 the best signal region (left), all the 44 signal regions considered in `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ (center) and the aggregated signal regions included in the SModelS database (right).
-As we can see, while the curve obtained from the combination of all 44 signal regions is much closer to the official exclusion than the one obtained using only the best SR. Finally, the aggregated result included in the SModelS database (total of 17 aggregate regions) comes with little loss in constraining power, but considerably reduces the run time.
+As we can see, while the curve obtained from the combination of all 44 signal regions is much closer to the official exclusion than the one obtained using only the best SR. Finally, the aggregated result included in the SModelS database (total of 17 aggregate regions) similarly matches the official result, but considerably reduces the run time.
 
 .. _combinedSRfig:
 
