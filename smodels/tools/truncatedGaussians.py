@@ -60,9 +60,9 @@ class TruncatedGaussians:
         """ return the likelihood, as a function of mu
         :param mu: number of signal events, if None then mu = muhat
         :param return_nll: if True, return negative log likelihood
-        :param allowNegativeSignals: if True, then allow muhat to become negative,
-               else demand that muhat >= 0. In the presence of underfluctuations
-               in the data, setting this to True results in more realistic
+        :param allowNegativeSignals: if True, then allow muhat to become negative,\
+               else demand that muhat >= 0. In the presence of underfluctuations\
+               in the data, setting this to True results in more realistic\
                approximate likelihoods.
 
         :returns: likelihood (float)

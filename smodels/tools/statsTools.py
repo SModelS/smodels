@@ -111,8 +111,8 @@ class StatsComputer:
     def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ):
         """ get a statscomputer for truncated gaussians
         :param theorypred: TheoryPrediction object
-        :param corr: correction factor:
-                ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
+        :param corr: correction factor: \
+                ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp))) \
                 a factor of corr = 0.6 is proposed.
         :returns: a StatsComputer
         """
@@ -346,9 +346,9 @@ class StatsComputer:
     def maximize_likelihood ( self, expected : Union[bool,Text],
            return_nll : bool = False ) -> dict:
         """ simple frontend to the individual computers, later spey
-        :param return_nll: if True, return negative log likelihood
-        :returns: Dictionary of llhd (llhd at mu_hat),
-                  muhat, sigma_mu (sigma of mu_hat),
+        :param return_nll: if True, return negative log likelihood 
+        :returns: Dictionary of llhd (llhd at mu_hat), \
+                  muhat, sigma_mu (sigma of mu_hat), \
                   optionally also theta_hat
         """
         self.transform ( expected )

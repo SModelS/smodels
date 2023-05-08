@@ -335,7 +335,7 @@ class PyhfUpperLimitComputer:
     def wsMaker(self, apriori=False):
         """
         Apply each region patch (self.patches) to his associated json (self.inputJsons) to obtain the complete workspaces
-        :param apriori: - If set to `True`: Replace the observation data entries of each workspace by the corresponding sum of the expected yields
+        :param apriori: - If set to `True`: Replace the observation data entries of each workspace by the corresponding sum of the expected yields \
                         - Else: The observed yields put in the workspace are the ones written in the corresponfing json dictionary
 
         :returns: the list of patched workspaces
@@ -465,13 +465,13 @@ class PyhfUpperLimitComputer:
     def likelihood( self, mu=1.0, workspace_index=None, return_nll=False,
                     expected=False):
         """
-        Returns the value of the likelihood.
+        Returns the value of the likelihood. \
         Inspired by the `pyhf.infer.mle` module but for non-log likelihood
-        :param workspace_index: supply index of workspace to use. If None,
+        :param workspace_index: supply index of workspace to use. If None, \
                                 choose index of best combo
         :param return_nll: if true, return nll, not llhd
-        :param expected: if False, compute expected values, if True,
-            compute a priori expected, if "posteriori" compute posteriori
+        :param expected: if False, compute expected values, if True, \
+            compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
         # mumin, mumax = -20.0, 40.0
@@ -681,12 +681,13 @@ class PyhfUpperLimitComputer:
         """
         Returns the negative log max likelihood
         :param return_nll: if true, return nll, not llhd
-        :param workspace_index: supply index of workspace to use. If None,
+        :param workspace_index: supply index of workspace to use. If None, \
             choose index of best combo
-        :param expected: if False, compute expected values, if True,
-            compute a priori expected, if "posteriori" compute posteriori
+        :param expected: if False, compute expected values, if True, \
+            compute a priori expected, if "posteriori" compute posteriori \
             expected
-        :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
+        :param allowNegativeSignals: if False, then negative nsigs are replaced \
+            with 0.
         """
         # logger.error("expected flag needs to be heeded!!!")
         logger.debug("Calling lmax")

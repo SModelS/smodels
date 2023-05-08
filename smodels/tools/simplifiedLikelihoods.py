@@ -381,7 +381,7 @@ class LikelihoodComputer:
         """ the hessian of the likelihood of mu, at mu,
         which is the Fisher information
         which is approximately the inverse of the covariance
-        :param allowZeroHessian: if false and sum(observed)==0, then replace
+        :param allowZeroHessian: if false and sum(observed)==0, then replace \
                                  observed with expected
         """
         # nll=-nobs*ln(mu*s + b + theta) + ( mu*s + b + theta)
@@ -413,12 +413,14 @@ class LikelihoodComputer:
         given the relative signal strengths in each dataset (signal region).
 
         :param allowNegativeSignals: if true, then also allow for negative values
-        :param extended_output: if true, return also sigma_mu, the estimate of the error of mu_hat,
-         and lmax, the likelihood at mu_hat
+        :param extended_output: if true, return also sigma_mu, the estimate \
+        of the error of mu_hat, and lmax, the likelihood at mu_hat
         :param nll: if true, return nll instead of lmax in the extended output
 
-        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended output is
-        requested, it returns a dictionary with mu_hat, sigma_mu -- the standard deviation around mu_hat, and lmax, i.e. the likelihood at mu_hat
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if \
+        extended output is requested, it returns a dictionary with mu_hat, \
+        sigma_mu -- the standard deviation around mu_hat, and lmax, \
+        i.e. the likelihood at mu_hat
         """
         if (self.model.backgrounds == self.model.observed).all():
             return self.extendedOutput(extended_output, 0.0)
@@ -517,7 +519,7 @@ class LikelihoodComputer:
     # Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     # def prob(x0, x1 )
     def llhdOfTheta(self, theta, nll = True ):
-        """ likelihood for nuicance parameters theta, given signal strength
+        """ likelihood for nuicance parameters theta, given signal strength \
             self.mu. notice, by default it returns nll
         :param theta: nuisance parameters
         :params nll: if True, compute negative log likelihood
@@ -616,9 +618,8 @@ class LikelihoodComputer:
         return nllh_
 
     def getThetaHat(self, nobs, nb, mu, covb, max_iterations):
-        """ Compute nuisance parameter theta that
-            maximizes our likelihood (poisson*gauss) -- by setting dNLL/dTheta
-            to zero
+        """ Compute nuisance parameter theta that maximizes our likelihood \
+            (poisson*gauss) -- by setting dNLL/dTheta to zero
         :param mu: signal strength
         :returns: theta_hat
         """
@@ -803,9 +804,9 @@ class LikelihoodComputer:
          and lmax, the likelihood at mu_hat
         :param return_nll: if true, return nll instead of lmax in the extended output
 
-        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended output is
-        requested, it returns mu_hat, sigma_mu -- the standard deviation around mu_hat, and llhd,
-        the likelihood at mu_hat
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
+        output is requested, it returns mu_hat, sigma_mu \
+        -- the standard deviation around mu_hat, and llhd, the likelihood at mu_hat
         """
         theta_hat, _ = self.findThetaHat( 0. )
         minr, avgr, maxr = self.findAvgr( theta_hat )
@@ -929,9 +930,8 @@ class UpperLimitComputer:
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
         :param model: statistical model
-        :param expected: if false, compute observed,
-                          true: compute a priori expected, "posteriori":
-                          compute a posteriori expected
+        :param expected: false: compute observed, true: compute a priori expected, \
+            "posteriori": compute a posteriori expected
         :param trylasttime: if True, then dont try extra
         :return: mu_hat, sigma_mu, CLs-alpha
         """

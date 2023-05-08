@@ -26,7 +26,7 @@ class AnaCombLikelihoodComputer(object):
     def __init__(self, theoryPredictions: list, deltas_rel=None):
         """constructor.
         :param theoryPredictions: the List of theory predictions
-        :param deltas_rel: relative uncertainty in signal (float).
+        :param deltas_rel: relative uncertainty in signal (float). \
                            Default value is 20%.
         """
         if len(theoryPredictions) == 0:
@@ -82,12 +82,12 @@ class AnaCombLikelihoodComputer(object):
     ) -> Union[Dict, None]:
         """find muhat and lmax.
         :param allowNegativeSignals: if true, then also allow for negative values
-        :param expected: if true, compute expected prior (=lsm), if "posteriori"
+        :param expected: if true, compute expected prior (=lsm), if "posteriori" \
                          compute posteriori expected
         :param return_nll: if true, return negative log max likelihood instead of lmax
-        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended
-                  output is requested, it returns a dictionary with mu_hat,
-                  sigma_mu -- the standard deviation around mu_hat, and lmax,
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
+                  output is requested, it returns a dictionary with mu_hat, \
+                  sigma_mu -- the standard deviation around mu_hat, and lmax, \
                   i.e. the likelihood at mu_hat
         """
 
@@ -189,8 +189,8 @@ class AnaCombLikelihoodComputer(object):
         return ret
 
     def getUpperLimitOnMu(self, expected=False, allowNegativeSignals = False ):
-        """get upper limit on signal strength multiplier, i.e. value for mu for
-            which CLs = 0.95
+        """get upper limit on signal strength multiplier, i.e. value for mu for \
+           which CLs = 0.95
         :param expected: if True, compute expected likelihood, else observed
         :returns: upper limit on signal strength multiplier mu
         """
@@ -259,9 +259,9 @@ class AnaCombLikelihoodComputer(object):
         """
         Compute the exclusion confidence level of the model (1-CLs)
         :param expected: if false, compute observed, true: compute a priori expected
-        :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
-                        CLs-alpha: returns CLs - 0.05
-                        1-CLs: returns 1-CLs value
+        :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
+                        CLs-alpha: returns CLs - 0.05 \
+                        1-CLs: returns 1-CLs value \
                         CLs: returns CLs value
         """
         assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."

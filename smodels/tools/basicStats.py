@@ -2,7 +2,7 @@
 
 """
 .. module:: basicStats
-   :synopsis: a module thats collects various statistical codes, that
+   :synopsis: a module thats collects various statistical codes, that \
    are shared among other submodules.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -28,11 +28,11 @@ def CLsfromNLL(
     :param nll0A:
     :param nll:
     :param nll0:
-    :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
-                        CLs-alpha: returns CLs - 0.05
-                        1-CLs: returns 1-CLs value
-                        CLs: returns CLs value
-    :return:
+    :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
+                        CLs-alpha: returns CLs - 0.05 \
+                        1-CLs: returns 1-CLs value \
+                        CLs: returns CLs value 
+    :return: Cls-type value, see above
     """
     assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
     qmu = 0.0 if 2 * (nll - nll0) < 0.0 else 2 * (nll - nll0)
