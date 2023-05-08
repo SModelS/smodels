@@ -193,7 +193,21 @@ in the nuisances:
 .. math::
    \mathcal{L}(\mu,\theta|D) = \prod_{i=1}^{N} \mathrm{Pois}(n_{obs}^i|\mu s_i^r + a_i + b_i \theta_i + c_i \theta_i^2) \cdot \frac{e^{-\frac{1}{2}\vec{\theta}^{\mathrm{T}}{\rho}^{-1}\vec{\theta}}}{\sqrt{(2\pi)^{N}}}
 
-Here, :math:`\rho` denotes the correlation matrix, and :math:`a_i`, :math:`b_i`, and :math:`c_i` correspond to the background expectations, and their second and third statistical momenta, respectively. These parameters must be provided by the experiments.
+Here, :math:`\rho` denotes the correlation matrix, and :math:`a_i`, :math:`b_i`, and :math:`c_i` are functions of the background expectations, and their second and third statistical momenta. These parameters must be provided by the experiments.
+
+The :ref:`figure below <combinedSRfigV2>` shows a comparison for `TChiHH <http://smodels.github.io/docs/SmsDictionary#TChiHH>`_  of `CMS-SUS-20-004 <http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-20-004/>`_, using the offical result (left), a simplified likelihood but ignoring the third momenta, i.e. SLv1 (center), and a simplified likelihood result v2 (right).
+The improvement due to including the skewness term is clearly visible.
+
+.. _combinedSRfigV2:
+
+   +---------------------------------+------------------------------------+------------------------------------+
+   | .. image:: images/SLv2_off.png  | .. image:: images/SLv2_v1.png      | .. image:: images/SLv2_v2.png      |
+   |            :width: 300px        |            :width: 300px           |            :width: 300px           |
+   |                                 |                                    |                                    |
+   | Official upper limits           | SLv1                               | SLv2                               |
+   +---------------------------------+------------------------------------+------------------------------------+
+
+   Figure: Comparison of `CMS-SUS-20-004 <http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-20-004/>`_ using the official upper limits (left), SLv1 (center), and SLv2 (right).
 
 
 .. pyhfllhd:
