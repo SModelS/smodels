@@ -195,19 +195,19 @@ in the nuisances:
 
 Here, :math:`\rho` denotes the correlation matrix, and :math:`a_i`, :math:`b_i`, and :math:`c_i` are functions of the background expectations, and their second and third statistical momenta. In order for a result to be declared SLv2 in SModelS, third statistical momenta must be provided in addition to background expectations and their errors.
 
-The :ref:`figure below <combinedSRfigV2>` shows a comparison for `TChiHH <http://smodels.github.io/docs/SmsDictionary#TChiHH>`_  of `CMS-SUS-20-004 <http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-20-004/>`_, using the offical result (left), a simplified likelihood but ignoring the third momenta, i.e. SLv1 (center), and a simplified likelihood result v2 (right).
+The :ref:`figure below <combinedSRfigV2>` shows a comparison for `TChiHH <http://smodels.github.io/docs/SmsDictionary#TChiHH>`_  of `CMS-SUS-20-004 <http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-20-004/>`_, using a simplified likelihood but ignoring the third momenta, i.e. SLv1 (left), and a simplified likelihood result v2 (right).
 The improvement due to including the skewness term is clearly visible.
 
 .. _combinedSRfigV2:
 
-   +---------------------------------+------------------------------------+------------------------------------+
-   | .. image:: images/SLv2_off.png  | .. image:: images/SLv2_v1.png      | .. image:: images/SLv2_v2.png      |
-   |            :width: 300px        |            :width: 300px           |            :width: 300px           |
-   |                                 |                                    |                                    |
-   | Official upper limits           | SLv1                               | SLv2                               |
-   +---------------------------------+------------------------------------+------------------------------------+
+   +------------------------------------+------------------------------------+
+   | .. image:: images/SLv2_v1.png      | .. image:: images/SLv2_v2.png      |
+   |            :width: 300px           |            :width: 300px           |
+   |                                    |                                    |
+   | SLv1                               | SLv2                               |
+   +------------------------------------+------------------------------------+
 
-   Figure: Comparison of `CMS-SUS-20-004 <http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-20-004/>`_ using the official upper limits (left), SLv1 (center), and SLv2 (right).
+   Figure: Comparison of `CMS-SUS-20-004 <http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-20-004/>`_ using SLv1 (left), and SLv2 (right).
 
 
 .. pyhfllhd:
