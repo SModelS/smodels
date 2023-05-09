@@ -186,8 +186,8 @@ As we can see, while the curve obtained from the combination of all 44 signal re
 Simplified Likelihood v2
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Starting with v2.3, simplified likelihoods version two, as described in `The Simplified Likelihood Framework <https://inspirehep.net/literature/1694152>`_ paper, are
-supported. The simplified likelihood above is extended to account for a skewness
+From SModelS v2.3 on, simplified likelihoods with a skew (a.k.a. SLv2), as described in `The Simplified Likelihood Framework <https://inspirehep.net/literature/1694152>`_ paper, are
+supported. The simplified likelihood above (which we now call SLv1) is extended to account for a skewness
 in the nuisances:
 
 .. math::
@@ -196,7 +196,7 @@ in the nuisances:
 Here, :math:`\rho` denotes the correlation matrix, and :math:`a_i`, :math:`b_i`, and :math:`c_i` are functions of the background expectations, and their second and third statistical momenta. In order for a result to be declared SLv2 in SModelS, third statistical momenta must be provided in addition to background expectations and their errors.
 
 The :ref:`figure below <combinedSRfigV2>` shows a comparison for `TChiHH <http://smodels.github.io/docs/SmsDictionary#TChiHH>`_  of `CMS-SUS-20-004 <http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-20-004/>`_, using a simplified likelihood but ignoring the third momenta, i.e. SLv1 (left), and a simplified likelihood result v2 (right).
-The improvement due to including the skewness term is clearly visible.
+The improvement due to including the skewness term is apparent in both the expected and the observed limit.
 
 .. _combinedSRfigV2:
 
