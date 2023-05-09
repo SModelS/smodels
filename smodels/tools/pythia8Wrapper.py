@@ -128,7 +128,7 @@ class Pythia8Wrapper(WrapperBase):
             import shutil
             p = xmldoc.find ( "share" )
             rm = xmldoc[:p-1]
-            shutil.rmtree ( rm )
+            shutil.rmtree ( rm, ignore_errors = True )
             exists = False
 
         if xmldoc == None:
