@@ -474,21 +474,7 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
-        # mumin, mumax = -20.0, 40.0
-        # if mu > mumax:
-        #     if countWarning["llhdszero"] < 1:
-        #         logger.warning(
-        #             f"likelihoods of signal strengths mu= {mu:.1f} > {mumax} are automatically set to 0 (will suppress similar msgs)"
-        #         )
-        #     countWarning["llhdszero"] += 1
-        #     return self.exponentiateNLL(None, not nll)
-        # if mu < mumin:
-        #     if countWarning["llhdszero"] < 1:
-        #         logger.warning(
-        #             f"likelihoods of signal strengths mu= {mu:.1f} < {mumin} are automatically set to 0 (will suppress similar msgs)"
-        #         )
-        #     countWarning["llhdszero"] += 1
-        #     return self.exponentiateNLL(None, not nll)
+
         logger.debug("Calling likelihood")
         if type(workspace_index) == float:
             logger.error("workspace index is float")

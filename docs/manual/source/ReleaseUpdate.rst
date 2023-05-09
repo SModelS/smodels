@@ -47,9 +47,9 @@ New in Version 2.3.0:
   * fixed C++ interface to work with python 3.11
   * bumped up pythia8 from 8.307 to 8.308
   * SModelS can now track inter-analyses combinability at the level of whole `analyses <experiment.html#experiment.expResultObj.ExpResult.isCombinableWith>`_ as well as individual `signal regions <experiment.html#experiment.datasetObj.DataSet.isCombinableWith>`_
-  * added support for SLv2 (Gaussian with a skew), arXiv:1809.05548
-  * refactored the statistics modules, code ready for interfacing `spey <https://github.com/speysideHEP/spey/>`_
-  * introduced "full_llhds" :ref:`Database <parameterFileDatabase>` database add-on (see parameter.ini file) (see :ref:`parameter.ini file <parameterFile>`)
+  * added support for :ref:`SLv2 <SLV2>` (Gaussian with a skew), arXiv:1809.05548
+  * refactored the statistics modules
+  * introduced "full_llhds" database add-on (see :ref:`parameter.ini file <parameterFileDatabase>`)
 
   * |database| extension, added new results from 6 ATLAS and 4 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
      - results from ATLAS:
