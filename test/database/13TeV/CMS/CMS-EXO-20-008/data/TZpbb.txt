@@ -6,7 +6,6 @@ susyProcess: P P --> ZPRIME --> BQ BQBAR
 figureUrl: https://cms-results.web.cern.ch/cms-results/public-results/publications/EXO-20-008/CMS-EXO-20-008_Figure_004-a.png
 source: ATLAS
 validated: True
-intermediateState: [['Z1']]
 axes: [[x], [x]]
 finalState: ['b', 'b']
 upperLimits: [[[[1.8E+03*GeV],[1.8E+03*GeV]],40.678*fb],
