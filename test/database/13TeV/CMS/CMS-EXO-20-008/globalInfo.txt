@@ -1,0 +1,1 @@
+sqrts: 13.0*TeVlumi: 138/fbid: CMS-EXO-20-008 url: https://cms-results.web.cern.ch/cms-results/public-results/publications/EXO-20-008/index.htmlarxiv: https://arxiv.org/abs/2205.01835publication: http://cds.cern.ch/record/2808451contact: CMS collaborationprivate: FalseimplementedBy: Yoxara Sanchez VillamizarlastUpdate: 2023/05/07
