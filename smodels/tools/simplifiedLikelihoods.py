@@ -12,7 +12,7 @@
 from scipy import stats, optimize, integrate, special, linalg
 from numpy import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
-from smodels.tools.statistics import CLsfromNLL, determineBrentBracket
+from smodels.tools.basicStats import CLsfromNLL, determineBrentBracket
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from typing import Text, Optional, Union, Tuple
 
@@ -281,14 +281,32 @@ class LikelihoodComputer:
 
     debug_mode = False
 
-    def __init__(self, data, toys=30000):
+    def __init__(self, data ):
         """
         :param data: a Data object.
-        :param toys: number of toys when marginalizing
         """
-
+        self.origModel = copy.deepcopy ( data )
         self.model = data
-        self.toys = toys
+
+    def transform ( self, expected : Union [ Text, bool ] ):
+        """ replace the actual observations with backgrounds,
+            if expected is True or "posteriori" """
+        # always start from scratch
+        self.model = copy.deepcopy ( self.origModel )
+        if expected == False:
+            return
+        self.model.observed = self.model.backgrounds
+        if expected == True:
+            return
+        if not expected == "posteriori":
+            logger.error ( f"dont know the expected value {expected}" )
+            sys.exit(-1)
+        thetahat, _ = self.findThetaHat(0.)
+        if type(self.model.backgrounds) in [float, np.float64,
+                np.float32, int, np.int64, np.int32]:
+            thetahat = float(thetahat[0])
+        obs = self.model.backgrounds + thetahat
+        self.model.observed = obs
 
     def dNLLdMu(self, mu, theta_hat = None ):
         """
@@ -363,7 +381,7 @@ class LikelihoodComputer:
         """ the hessian of the likelihood of mu, at mu,
         which is the Fisher information
         which is approximately the inverse of the covariance
-        :param allowZeroHessian: if false and sum(observed)==0, then replace
+        :param allowZeroHessian: if false and sum(observed)==0, then replace \
                                  observed with expected
         """
         # nll=-nobs*ln(mu*s + b + theta) + ( mu*s + b + theta)
@@ -389,18 +407,20 @@ class LikelihoodComputer:
 
     #def findMuHat(
     def findMuHatViaBracketing( self, allowNegativeSignals=False,
-        extended_output=False, nll=False, marginalize=False):
+        extended_output=False, nll=False ):
         """
         Find the most likely signal strength mu via a brent bracketing technique
         given the relative signal strengths in each dataset (signal region).
 
         :param allowNegativeSignals: if true, then also allow for negative values
-        :param extended_output: if true, return also sigma_mu, the estimate of the error of mu_hat,
-         and lmax, the likelihood at mu_hat
+        :param extended_output: if true, return also sigma_mu, the estimate \
+        of the error of mu_hat, and lmax, the likelihood at mu_hat
         :param nll: if true, return nll instead of lmax in the extended output
 
-        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended output is
-        requested, it returns a dictionary with mu_hat, sigma_mu -- the standard deviation around mu_hat, and lmax, i.e. the likelihood at mu_hat
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if \
+        extended output is requested, it returns a dictionary with mu_hat, \
+        sigma_mu -- the standard deviation around mu_hat, and lmax, \
+        i.e. the likelihood at mu_hat
         """
         if (self.model.backgrounds == self.model.observed).all():
             return self.extendedOutput(extended_output, 0.0)
@@ -470,7 +490,7 @@ class LikelihoodComputer:
 
         if extended_output:
             sigma_mu = self.getSigmaMu(mu_hat, theta_hat)
-            llhd = self.likelihood( mu_hat, marginalize=marginalize, nll=nll)
+            llhd = self.likelihood( mu_hat, nll=nll)
             # print ( f"returning {allowNegativeSignals}: mu_hat {mu_hat}+-{sigma_mu} llhd {llhd}" )
             ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": llhd}
             return ret
@@ -499,7 +519,7 @@ class LikelihoodComputer:
     # Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     # def prob(x0, x1 )
     def llhdOfTheta(self, theta, nll = True ):
-        """ likelihood for nuicance parameters theta, given signal strength
+        """ likelihood for nuicance parameters theta, given signal strength \
             self.mu. notice, by default it returns nll
         :param theta: nuisance parameters
         :params nll: if True, compute negative log likelihood
@@ -598,9 +618,8 @@ class LikelihoodComputer:
         return nllh_
 
     def getThetaHat(self, nobs, nb, mu, covb, max_iterations):
-        """ Compute nuisance parameter theta that
-            maximizes our likelihood (poisson*gauss) -- by setting dNLL/dTheta
-            to zero
+        """ Compute nuisance parameter theta that maximizes our likelihood \
+            (poisson*gauss) -- by setting dNLL/dTheta to zero
         :param mu: signal strength
         :returns: theta_hat
         """
@@ -615,7 +634,7 @@ class LikelihoodComputer:
         ntot = nb + nsig
         cov = np.array(sigma2)
         # weight = cov**(-1) ## weight matrix
-        weight = linalg.inv(cov)
+        # weight = linalg.inv(cov)
         diag_cov = np.diag(cov)
         # first: no covariances:
         q = diag_cov * (ntot - nobs)
@@ -646,8 +665,8 @@ class LikelihoodComputer:
                 for j in range(ndims):
                     if i == j:
                         continue
-                    dq = thetamax[j] * ntot[i] * diag_cov[i] * weight[i, j]
-                    dp = thetamax[j] * weight[i, j] * diag_cov[i]
+                    dq = thetamax[j] * ntot[i] * diag_cov[i] * self.weight[i, j]
+                    dp = thetamax[j] * self.weight[i, j] * diag_cov[i]
                     if abs(dq / q[i]) > 0.3:
                         # logger.warning ( "too big a change in iteration." )
                         dq = np.abs(0.3 * q[i]) * np.sign(dq)
@@ -731,137 +750,10 @@ class LikelihoodComputer:
             raise Exception("cov-1=%s" % (self.model.covariance + self.model.var_s(nsig)) ** (-1))
         return ini, -1
 
-    def marginalizedLLHD1D(self, mu, nll):
-        """
-        Return the likelihood (of 1 signal region) to observe nobs events given the
-        predicted background nb, error on this background (deltab),
-        signal strength of mu and the relative error on the signal (deltas_rel).
-
-        :param mu: predicted signal strength (float)
-        :param nobs: number of observed events (float)
-        :param nb: predicted background (float)
-        :param deltab: uncertainty on background (float)
-
-        :return: likelihood to observe nobs events (float)
-
-        """
-        nsig = self.model.nsignal * mu
-        self.sigma2 = self.model.covariance + self.model.var_s(nsig)  ## (self.model.deltas)**2
-        self.sigma_tot = sqrt(self.sigma2)
-        self.lngamma = math.lgamma(self.model.observed[0] + 1)
-        #     Why not a simple gamma function for the factorial:
-        #     -----------------------------------------------------
-        #     The scipy.stats.poisson.pmf probability mass function
-        #     for the Poisson distribution only works for discrete
-        #     numbers. The gamma distribution is used to create a
-        #     continuous Poisson distribution.
-        #
-        #     Why not a simple gamma function for the factorial:
-        #     -----------------------------------------------------
-        #     The gamma function does not yield results for integers
-        #     larger than 170. Since the expression for the Poisson
-        #     probability mass function as a whole should not be huge,
-        #     the exponent of the log of this expression is calculated
-        #     instead to avoid using large numbers.
-
-        # Define integrand (gaussian_(bg+signal)*poisson(nobs)):
-        def prob(x, nsig):
-            poisson = exp(self.model.observed * log(x) - x - self.lngamma)
-            gaussian = stats.norm.pdf(x, loc=self.model.backgrounds + nsig, scale=self.sigma_tot)
-
-            return poisson * gaussian
-
-        # Compute maximum value for the integrand:
-        xm = self.model.backgrounds + nsig - self.sigma2
-        # If nb + nsig = sigma2, shift the values slightly:
-        if xm == 0.0:
-            xm = 0.001
-        xmax = (
-            xm
-            * (1.0 + sign(xm) * sqrt(1.0 + 4.0 * self.model.observed * self.sigma2 / xm**2))
-            / 2.0
-        )
-
-        # Define initial integration range:
-        nrange = 5.0
-        a = max(0.0, xmax - nrange * sqrt(self.sigma2))
-        b = xmax + nrange * self.sigma_tot
-        like = integrate.quad(prob, a, b, (nsig), epsabs=0.0, epsrel=1e-3)[0]
-        if like == 0.0:
-            return 0.0
-
-        # Increase integration range until integral converges
-        err = 1.0
-        ctr = 0
-        while err > 0.01:
-            ctr += 1
-            if ctr > 10.0:
-                raise Exception("Could not compute likelihood within required precision")
-
-            like_old = like
-            nrange = nrange * 2
-            a = max(0.0, (xmax - nrange * self.sigma_tot)[0][0])
-            b = (xmax + nrange * self.sigma_tot)[0][0]
-            like = integrate.quad(prob, a, b, (nsig), epsabs=0.0, epsrel=1e-3)[0]
-            if like == 0.0:
-                continue
-            err = abs(like_old - like) / like
-
-        # Renormalize the likelihood to account for the cut at x = 0.
-        # The integral of the gaussian from 0 to infinity gives:
-        # (1/2)*(1 + Erf(mu/sqrt(2*sigma2))), so we need to divide by it
-        # (for mu - sigma >> 0, the normalization gives 1.)
-        norm = (1.0 / 2.0) * (
-            1.0 + special.erf((self.model.backgrounds + nsig) / sqrt(2.0 * self.sigma2))
-        )
-        like = like / norm
-
-        if nll:
-            like = -log(like)
-
-        return like[0][0]
-
-    def marginalizedLikelihood(self, mu, nll):
-        """compute the marginalized likelihood of observing nsig signal event"""
-        if (
-            self.model.isLinear() and self.model.n == 1
-        ):  ## 1-dimensional non-skewed llhds we can integrate analytically
-            return self.marginalizedLLHD1D(mu, nll)
-        nsig = mu * self.model.nsignal
-
-        vals = []
-        self.gammaln = special.gammaln(self.model.observed + 1)
-        thetas = stats.multivariate_normal.rvs(
-            mean=[0.0] * self.model.n,
-            # cov=(self.model.totalCovariance(nsig)),
-            cov=self.model.V,
-            size=self.toys,
-        )  ## get ntoys values
-        for theta in thetas:
-            if self.model.isLinear():
-                lmbda = nsig + self.model.backgrounds + theta
-            else:
-                lmbda = nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
-            if self.model.isScalar(lmbda):
-                lmbda = array([lmbda])
-            for ctr, v in enumerate(lmbda):
-                if v <= 0.0:
-                    lmbda[ctr] = 1e-30
-                # print ( "lmbda=",lmbda )
-            poisson = self.model.observed * np.log(lmbda) - lmbda - self.gammaln
-            # poisson = np.exp(self.model.observed*np.log(lmbda) - lmbda - self.model.backgrounds - self.gammaln)
-            vals.append(np.exp(sum(poisson)))
-            # vals.append ( reduce(lambda x, y: x*y, poisson) )
-        mean = np.mean(vals)
-        if nll:
-            if mean == 0.0:
-                mean = 1e-100
-            mean = -log(mean)
-        return mean
-
-    def profileLikelihood(self, mu : float, nll : bool ):
+    def likelihood(self, mu : float, return_nll : bool = False ):
         """compute the profiled likelihood for mu.
-        Warning: not normalized.
+        :param mu: float Parameter of interest, signal strength
+        :param return_nll: if true, return nll instead of likelihood
         Returns profile likelihood and error code (0=no error)
         """
         # compute the profiled (not normalized) likelihood of observing
@@ -869,53 +761,39 @@ class LikelihoodComputer:
         theta_hat, _ = self.findThetaHat(mu)
         if self.debug_mode:
             self.theta_hat = theta_hat
-        ret = self.llhdOfTheta( theta_hat, nll )
+        ret = self.llhdOfTheta( theta_hat, return_nll )
 
         return ret
 
-    def likelihood(self, mu: float, marginalize: bool = False, nll: bool = False) -> float:
-        """compute likelihood for mu, profiling or marginalizing the nuisances
-        :param mu: float Parameter of interest, signal strength
-        :param marginalize: if true, marginalize, if false, profile
-        :param nll: return nll instead of likelihood
-        """
-        if marginalize:
-            # p,err = self.profileLikelihood ( nsig, deltas )
-            return self.marginalizedLikelihood(mu, nll)
-            # print ( "p,l=",p,l,p/l )
-        else:
-            return self.profileLikelihood(mu, nll)
-
-    def lmax(self, marginalize=False, nll=False, allowNegativeSignals=False):
+    def lmax(self, return_nll=False, allowNegativeSignals=False):
         """convenience function, computes likelihood for nsig = nobs-nbg,
-        :param marginalize: if true, marginalize, if false, profile nuisances.
-        :param nll: return nll instead of likelihood
+        :param return_nll: return nll instead of likelihood
         :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
         """
         if len(self.model.observed) == 1:
             dn = self.model.observed - self.model.backgrounds
             if not allowNegativeSignals and dn[0] < 0.0:
                 dn = [0.0]
-            self.muhat = float(dn[0])
+            muhat = float(dn[0])
             if abs(self.model.nsignal) > 1e-100:
-                self.muhat = float(dn[0] / self.model.nsignal[0])
-            self.sigma_mu = np.sqrt(self.model.observed[0] + self.model.covariance[0][0])
-            return self.likelihood(marginalize=marginalize, nll=nll, mu = self.muhat )
+                muhat = float(dn[0] / self.model.nsignal[0])
+            sigma_mu = np.sqrt(self.model.observed[0] + self.model.covariance[0][0])
+            ret= self.likelihood( return_nll=return_nll, mu = muhat )
+            return { "lmax": ret, "muhat": muhat, "sigma_mu": sigma_mu }
         fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
-                              extended_output=True, nll=nll
+                              extended_output=True, return_nll=return_nll
         )
         muhat_, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
-        self.muhat = muhat_
-        self.sigma_mu = sigma_mu
-        return self.likelihood ( marginalize=marginalize, nll=nll, mu=muhat_ )
+        lmax = self.likelihood ( return_nll=return_nll, mu=muhat_ )
+        ret = { "lmax": lmax, "muhat": float ( muhat_ ), "sigma_mu": sigma_mu }
+        return ret
 
     def findMuHat(
     #def findMuHatViaGradientDescent(
         self,
         allowNegativeSignals=False,
         extended_output=False,
-        nll=False,
-        marginalize=False,
+        return_nll=False,
     ):
         """
         Find the most likely signal strength mu via gradient descent
@@ -924,11 +802,11 @@ class LikelihoodComputer:
         :param allowNegativeSignals: if true, then also allow for negative values
         :param extended_output: if true, return also sigma_mu, the estimate of the error of mu_hat,
          and lmax, the likelihood at mu_hat
-        :param nll: if true, return nll instead of lmax in the extended output
+        :param return_nll: if true, return nll instead of lmax in the extended output
 
-        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended output is
-        requested, it returns mu_hat, sigma_mu -- the standard deviation around mu_hat, and llhd,
-        the likelihood at mu_hat
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
+        output is requested, it returns mu_hat, sigma_mu \
+        -- the standard deviation around mu_hat, and llhd, the likelihood at mu_hat
         """
         theta_hat, _ = self.findThetaHat( 0. )
         minr, avgr, maxr = self.findAvgr( theta_hat )
@@ -937,7 +815,7 @@ class LikelihoodComputer:
 
         def myllhd( mu : float ):
             theta = self.findThetaHat ( mu=float(mu) )
-            ret = self.likelihood(nll=True, marginalize=marginalize, mu = mu )
+            ret = self.likelihood(return_nll=True, mu = mu )
             return ret
 
         import scipy.optimize
@@ -957,7 +835,7 @@ class LikelihoodComputer:
         assert bounds[0][1] > bounds[0][0], f"bounds are in wrong order: {bounds}"
         o = scipy.optimize.minimize( myllhd, x0=avgr, bounds=bounds, jac = self.dNLLdMu )
         llhd = o.fun
-        if not nll:
+        if not return_nll:
             llhd = np.exp(-o.fun)
         """
         hess = o.hess_inv
@@ -969,26 +847,25 @@ class LikelihoodComputer:
         mu_hat = float(o.x[0])
         if extended_output:
             sigma_mu = self.getSigmaMu ( mu_hat, theta_hat )
-            llhd = self.likelihood( mu_hat, marginalize=marginalize, nll=nll)
+            llhd = self.likelihood( mu_hat, return_nll=return_nll)
             # sigma_mu = float(np.sqrt(hess[0][0]))
             ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": llhd }
             return ret
         return mu_hat
 
-    def chi2(self, marginalize=False):
+    def chi2(self ):
         """
         Computes the chi2 for a given number of observed events nobs given
         the predicted background nb, error on this background deltab,
         expected number of signal events nsig and the relative error on
         signal (deltas_rel).
-        :param marginalize: if true, marginalize, if false, profile
         :param nsig: number of signal events
         :return: chi2 (float)
 
         """
 
         # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
-        llhd = self.likelihood(1., marginalize=marginalize, nll=True)
+        llhd = self.likelihood(1., return_nll=True)
 
         # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
         # (keeping the same % error on signal):
@@ -996,9 +873,9 @@ class LikelihoodComputer:
             # TODO this nsig initiation seems wrong and changing maxllhd to likelihood
             # fails ./testStatistics.py : zero division error in L115
             mu_hat = ( self.model.observed - self.model.backgrounds ) / self.model.nsignal
-            maxllhd = self.likelihood (mu_hat, marginalize=marginalize, nll=True )
+            maxllhd = self.likelihood (mu_hat, return_nll=True )
         else:
-            maxllhd = self.lmax( marginalize=marginalize, nll=True, allowNegativeSignals=False)
+            maxllhd = self.lmax( return_nll=True, allowNegativeSignals=False)
         chi2 = 2 * (llhd - maxllhd)
 
         if not np.isfinite(chi2):
@@ -1010,35 +887,30 @@ class LikelihoodComputer:
 class UpperLimitComputer:
     debug_mode = False
 
-    def __init__(self, ntoys: float = 30000, cl: float = 0.95):
+    def __init__(self, cl: float = 0.95):
 
         """
-        :param ntoys: number of toys when marginalizing
         :param cl: desired quantile for limits
         """
-        self.toys = ntoys
         self.cl = cl
 
     def getUpperLimitOnSigmaTimesEff(
-        self, model, marginalize=False, toys=None, expected=False, trylasttime=False
+        self, model, expected=False, trylasttime=False
     ):
         """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
             obtained from the defined Data (using the signal prediction
-            for each signal regio/dataset), by using
+            for each signal region/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :params marginalize: if true, marginalize nuisances, else profile them
-        :params toys: specify number of toys. Use default is none
         :params expected: if false, compute observed,
                           true: compute a priori expected, "posteriori":
                           compute a posteriori expected
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on fiducial cross section
         """
-        ul = self.getUpperLimitOnMu(
-            model, marginalize=marginalize, toys=toys, expected=expected,
-            trylasttime=trylasttime)
+        ul = self.getUpperLimitOnMu( model, expected=expected, 
+                                     trylasttime=trylasttime)
 
         if ul == None:
             return ul
@@ -1051,8 +923,6 @@ class UpperLimitComputer:
     def getCLsRootFunc(
         self,
         model: Data,
-        marginalize: Optional[bool] = False,
-        toys: Optional[float] = None,
         expected: Optional[Union[bool, Text]] = False,
         trylasttime: Optional[bool] = False,
     ) -> Tuple:
@@ -1060,59 +930,38 @@ class UpperLimitComputer:
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
         :param model: statistical model
-        :param marginalize: if true, marginalize nuisances, else profile them
-        :param toys: specify number of toys. Use default is none
-        :param expected: if false, compute observed,
-                          true: compute a priori expected, "posteriori":
-                          compute a posteriori expected
+        :param expected: false: compute observed, true: compute a priori expected, \
+            "posteriori": compute a posteriori expected
         :param trylasttime: if True, then dont try extra
         :return: mu_hat, sigma_mu, CLs-alpha
         """
-        # if expected:
-        #    marginalize = True
         if model.zeroSignal():
             """only zeroes in efficiencies? cannot give a limit!"""
             return None, None, None
-        if toys == None:
-            toys = self.toys
         oldmodel = model
         if expected:
             model = copy.deepcopy(oldmodel)
+            model.observed = copy.deepcopy ( model.backgrounds )
             if expected == "posteriori":
-                tempc = LikelihoodComputer(oldmodel, toys)
+                tempc = LikelihoodComputer(oldmodel )
                 theta_hat_, _ = tempc.findThetaHat(0 )
-            for i, d in enumerate(model.backgrounds):
-                if expected == "posteriori":
+                for i, d in enumerate(model.backgrounds):
                     d += theta_hat_[i]
-                model.observed[i] = float(d)
-        computer = LikelihoodComputer(model, toys)
+        computer = LikelihoodComputer(model )
         mu_hat = computer.findMuHat( allowNegativeSignals=False, extended_output=False)
         theta_hat0, _ = computer.findThetaHat( 0. )
         sigma_mu = computer.getSigmaMu(mu_hat, theta_hat0)
 
-        nll0 = computer.likelihood( mu_hat, marginalize=marginalize, nll=True)
-        # print ( f"SL nll0 {nll0:.3f} muhat {mu_hat:.3f} sigma_mu {sigma_mu:.3f} {signal_type} {sum(model.nsignal):.3f}" )
-        if np.isinf(nll0) and not marginalize and not trylasttime:
-            logger.warning(
-                "nll is infinite in profiling! we switch to marginalization, but only for this one!"
-            )
-            marginalize = True
-            # TODO convert rel_signals to signals
-            nll0 = computer.likelihood( mu = mu_hat, marginalize=True, nll=True)
-            if np.isinf(nll0):
-                logger.warning("marginalization didnt help either. switch back.")
-                marginalize = False
-            else:
-                logger.warning("marginalization worked.")
+        nll0 = computer.likelihood( mu_hat, return_nll=True)
         aModel = copy.deepcopy(model)
         aModel.observed = array([x + y for x, y in zip(model.backgrounds, theta_hat0)])
         aModel.name = aModel.name + "A"
         # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
-        compA = LikelihoodComputer(aModel, toys)
+        compA = LikelihoodComputer(aModel )
         ## compute
         mu_hatA = compA.findMuHat()
         # TODO convert rel_signals to signals
-        nll0A = compA.likelihood( mu=mu_hatA, marginalize=marginalize, nll=True)
+        nll0A = compA.likelihood( mu=mu_hatA, return_nll=True)
         # return 1.
 
         def clsRoot(mu: float, return_type: Text = "CLs-alpha") -> float:
@@ -1124,14 +973,14 @@ class UpperLimitComputer:
                         1-CLs: returns 1-CLs value
                         CLs: returns CLs value
             """
-            nll = computer.likelihood(mu, marginalize=marginalize, nll=True)
-            nllA = compA.likelihood(mu, marginalize=marginalize, nll=True)
+            nll = computer.likelihood(mu, return_nll=True)
+            nllA = compA.likelihood(mu, return_nll=True)
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type)
 
         return mu_hat, sigma_mu, clsRoot
 
     def getUpperLimitOnMu(
-        self, model, marginalize=False, toys=None, expected=False, trylasttime=False
+        self, model, expected=False, trylasttime=False
     ):
         """upper limit on the signal strength multiplier mu
             obtained from the defined Data (using the signal prediction
@@ -1139,8 +988,6 @@ class UpperLimitComputer:
             for each signal regio/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :params marginalize: if true, marginalize nuisances, else profile them
-        :params toys: specify number of toys. Use default is none
         :params expected: if false, compute observed,
                           true: compute a priori expected, "posteriori":
                           compute a posteriori expected
@@ -1148,7 +995,7 @@ class UpperLimitComputer:
         :returns: upper limit on the signal strength multiplier mu
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(
-            model, marginalize, toys, expected, trylasttime
+            model, expected, trylasttime
         )
         if mu_hat == None:
             return None
@@ -1157,13 +1004,12 @@ class UpperLimitComputer:
         except SModelSError as e:
             return None
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
+        logger.debug ( f"muhat={mu_hat}+-{sigma_mu} a,b={a,b} mu_lim={mu_lim}" )
         return mu_lim
 
     def computeCLs(
         self,
         model: Data,
-        marginalize: bool = False,
-        toys: float = None,
         expected: Union[bool, Text] = False,
         trylasttime: bool = False,
         return_type: Text = "1-CLs",
@@ -1171,8 +1017,6 @@ class UpperLimitComputer:
         """
         Compute the exclusion confidence level of the model (1-CLs)
         :param model: statistical model
-        :param marginalize: if true, marginalize nuisances, else profile them
-        :param toys: specify number of toys. Use default is none
         :param expected: if false, compute observed,
                           true: compute a priori expected, "posteriori":
                           compute a posteriori expected
@@ -1182,7 +1026,7 @@ class UpperLimitComputer:
                         1-CLs: returns 1-CLs value
                         CLs: returns CLs value
         """
-        _, _, clsRoot = self.getCLsRootFunc(model, marginalize, toys, expected, trylasttime )
+        _, _, clsRoot = self.getCLsRootFunc(model, expected, trylasttime )
         ret = clsRoot(1.0, return_type=return_type)
         # its not an uppser limit on mu, its on nsig
         return ret
@@ -1265,29 +1109,16 @@ if __name__ == "__main__":
         nsignal=nsignal,
         name="CMS-NOTE-2017-001 model",
     )
-    ulComp = UpperLimitComputer(ntoys=500, cl=0.95)
-    # uls = ulComp.ulSigma ( Data ( 15,17.5,3.2,0.00454755 ) )
-    # print ( "uls=", uls )
-    ul_old = 131.828 * sum(
-        nsignal
-    )  # With respect to the older refernece value one must normalize the xsec
-    print("old ul=", ul_old)
-    ul = ulComp.getUpperLimitOnMu(m, marginalize=True)
+    ulComp = UpperLimitComputer( cl=0.95)
 
-    cls = ulComp.computeCLs(m, marginalize=True)
-    print("ul (marginalized)", ul)
-    print("CLs (marginalized)", cls)
-
-    ul = ulComp.getUpperLimitOnMu(m, marginalize=False)
-    cls = ulComp.computeCLs(m, marginalize=False)
+    ul = ulComp.getUpperLimitOnMu(m )
+    cls = ulComp.computeCLs(m )
     print("ul (profiled)", ul)
     print("CLs (profiled)", cls)
 
     """
     results:
     old ul= 180.999844
-    ul (marginalized) 184.8081186162269
-    CLs (marginalized) 1.0
     ul (profiled) 180.68039063387553
     CLs (profiled) 0.75
     """

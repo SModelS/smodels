@@ -1,7 +1,25 @@
-Release xxx
+Release v2.3.0, Wed 10 May 2023
 =======================================================
 
   * fixed bug for an LHE input only with anti-particles
+  * fixed error that truncated signal yields when computing expected upper limits
+  * added minMass parameter for setting a minimum mass threshold for BSM masses
+  * fixed C++ interface to work with python 3.11
+  * bumped up pythia8 from 8.307 to 8.308
+  * SModelS can now track inter-analyses combinability at the level of whole
+    analyses as well as individual signal regions via a combinations matrix
+  * added support for SLv2 (Gaussian with a skew), arXiv:1809.05548
+  * refactored the statistics modules, code ready for interfacing Spey 
+  * introduced "full_llhds" database add-on (see parameters.ini file)
+
+  * Database extension: added/updated results from 6 ATLAS and 4 CMS analyses
+    (hfm=HistFactory model, cov=covariance matrix for SR combination):
+    - results from ATLAS:
+      ATLAS-SUSY-2018-05 (UL,EM+hfm), ATLAS-SUSY-2018-32 (EM+hfm), ATLAS-SUSY-2018-41 (EM+cov, updated), ATLAS-SUSY-2018-42 (UL,EM),  
+      ATLAS-SUSY-2019-02 (UL,EM+cov), ATLAS-SUSY-2013-12 (8TeV, EM)
+    - results from CMS:
+      CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL, todo: EM), CMS-SUS-21-002 (UL,EM+cov)
+    - added expected ULs to CMS-SUS-19-009
 
 
 Release v2.2.1, Tue 18 October 2022
@@ -32,7 +50,7 @@ Release v2.2.0, Wed 30 March 2022
   * updates in references.bib, installation notes
   * more small fixes in unit tests
 
-  * Database extension -- added new results from 4 ATLAS and 11 CMS analyses:
+  * Database extension, added new results from 4 ATLAS and 11 CMS analyses:
     - results from ATLAS:
       ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2018-41 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
     - results from CMS:

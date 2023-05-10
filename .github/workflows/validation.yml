@@ -25,13 +25,19 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ -f smodels/share/requirements.txt ]; then python -m pip install -r smodels/share/requirements.txt; fi
+        if [ -f smodels/share/requirements.txt ]; then 
+          python -m pip install -r smodels/share/requirements.txt; 
+          # silly workaround for python3.7, we need to use old numpy versions
+          # echo "numpy>=1.18.0,!=1.21.*" > modded.txt;
+          # cat smodels/share/requirements.txt | grep -v numpy >> modded.txt;
+          # python -m pip install -r modded.txt; 
+        fi
         if [ -f test/test_requirements.txt ]; then python -m pip install -r test/test_requirements.txt; fi
         python -m pip install -e .
     - name: Test with unittest

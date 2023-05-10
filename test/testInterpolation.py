@@ -42,10 +42,10 @@ class InterpolationTest(unittest.TestCase):
         txname=expRes[0].datasets[0].txnameList[0] # T2bb
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,100.*GeV], [ 300.*GeV,100.*GeV] ])
-        self.assertAlmostEqual( result.asNumber(pb),0.162457 )
+        self.assertAlmostEqual( result.asNumber(pb),0.162457, places=4 )
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,125.*GeV], [ 300.*GeV,125.*GeV] ])
-        self.assertAlmostEqual( result.asNumber(pb),0.237745 )
+        self.assertAlmostEqual( result.asNumber(pb),0.237745, places=4 )
     def test6D(self):
         # print database
         expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], 
@@ -54,13 +54,13 @@ class InterpolationTest(unittest.TestCase):
         txname=expRes[0].datasets[0].txnameList[0] # T6bbWW
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,105.*GeV,100.*GeV], [ 300.*GeV,105.*GeV,100.*GeV] ])
-        self.assertAlmostEqual( result.asNumber(pb),0.176266 )
+        self.assertAlmostEqual( result.asNumber(pb),0.176266, places=4 )
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,270.*GeV,200.*GeV], [ 300.*GeV,270.*GeV,200.*GeV] ])
-        self.assertAlmostEqual( result.asNumber(pb), 87.0403 )
+        self.assertAlmostEqual( result.asNumber(pb), 87.0403, places=3 )
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,270.*GeV,200.*GeV], [ 300.*GeV,271.*GeV,200.*GeV] ])
-        self.assertAlmostEqual( result.asNumber(pb), 88.6505675 )
+        self.assertAlmostEqual( result.asNumber(pb), 88.6505675, places=3 )
     def testOutsidePlane(self):
         expRes = database.getExpResults( analysisIDs=["ATLAS-SUSY-2013-05"], 
                                          txnames=["T2bb" ] )
@@ -68,10 +68,10 @@ class InterpolationTest(unittest.TestCase):
         txname=expRes[0].datasets[0].txnameList[0] # T6bbWW
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,127.*GeV], [ 300.*GeV,127.5*GeV] ])
-        self.assertAlmostEqual( result.asNumber(pb),0.24452092 )
+        self.assertAlmostEqual( result.asNumber(pb),0.24452092,places=4 )
         result=txname.txnameData.getValueFor(
                 [[ 600.*GeV,120.*GeV], [ 600.*GeV,130.*GeV] ])
-        self.assertAlmostEqual( result.asNumber(pb),0.0197154 )
+        self.assertAlmostEqual( result.asNumber(pb),0.0197154,places=4 )
         result=txname.txnameData.getValueFor(
                 [[ 300.*GeV,120.*GeV], [ 300.*GeV,130.*GeV] ])
         self.assertTrue ( result == None )

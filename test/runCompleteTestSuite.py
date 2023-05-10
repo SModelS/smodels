@@ -38,6 +38,8 @@ def isInReducedSet ( t ):
         return False
     if "xsec" in t:
         return False
+    if "server" in t:
+        return False
     return True
 
 def run(skiprecipes=False, reduced=False ):

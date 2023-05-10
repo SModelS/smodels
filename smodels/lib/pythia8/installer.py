@@ -135,7 +135,7 @@ def checkPythiaHeaderFile():
 def compilePythia():
     """ finally, compile pythia """
     ver = getVersion()
-    ncpus = getNCPUs()
+    ncpus = max ( 1, getNCPUs()-2 )
     cmd = f"cd pythia{ver}; ./configure ; make -j {ncpus}"
     print ( f"[installer.py] {cmd}" )
     import subprocess
@@ -170,4 +170,7 @@ if __name__ == "__main__":
         ver = getVersion()
         print ( ver )
         sys.exit()
+    if not "TERM" in os.environ or os.environ["TERM"] in [ "", None ]:
+        # just to suppress a warning msg in github actions
+        os.environ["TERM"]="xterm"
     installPythia()

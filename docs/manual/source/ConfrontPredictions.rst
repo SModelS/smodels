@@ -170,7 +170,7 @@ for each given input model (or each :ref:`theory prediction <theoryPredictions>`
 In the :ref:`figure below <combinedSRfig>` we show the constraints on the simplified model
 `T2bbWWoff <http://smodels.github.io/docs/SmsDictionary#T2bbWWoff>`_ when using
 the best signal region (left), all the 44 signal regions considered in `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ (center) and the aggregated signal regions included in the SModelS database (right).
-As we can see, while the curve obtained from the combination of all 44 signal regions is much closer to the official exclusion than the one obtained using only the best SR. Finally, the aggregated result included in the SModelS database (total of 17 aggregate regions) comes with little loss in constraining power, although it considerable reduces the running time.
+As we can see, while the curve obtained from the combination of all 44 signal regions is much closer to the official exclusion than the one obtained using only the best SR. Finally, the aggregated result included in the SModelS database (total of 17 aggregate regions) similarly matches the official result, but considerably reduces the run time.
 
 .. _combinedSRfig:
 
@@ -181,8 +181,35 @@ As we can see, while the curve obtained from the combination of all 44 signal re
    | Best signal region                      | 44 signal regions                       | 17 aggregate regions                    |
    +-----------------------------------------+-----------------------------------------+-----------------------------------------+
 
-   Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of 17 aggregate signal regions (center), and the combination of all 44 signal regions (right).
+   Figure: Comparison of exclusion curves for `CMS-PAS-SUS-16-052 <http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-052/>`_ using only the best signal region (left), the combination of all 44 signal regions (center), and the combination of 17 aggregate signal regions (right).
 
+.. _SLv2:
+
+Simplified Likelihood v2
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+From SModelS v2.3 on, simplified likelihoods with a skew (a.k.a. SLv2), as described in `The Simplified Likelihood Framework <https://inspirehep.net/literature/1694152>`_ paper, are
+supported. The simplified likelihood above (which we now call SLv1) is extended to account for a skewness
+in the nuisances:
+
+.. math::
+   \mathcal{L}(\mu,\theta|D) = \prod_{i=1}^{N} \mathrm{Pois}(n_{obs}^i|\mu s_i^r + a_i + b_i \theta_i + c_i \theta_i^2) \cdot \frac{e^{-\frac{1}{2}\vec{\theta}^{\mathrm{T}}{\rho}^{-1}\vec{\theta}}}{\sqrt{(2\pi)^{N}}}
+
+Here, :math:`\rho` denotes the correlation matrix, and :math:`a_i`, :math:`b_i`, and :math:`c_i` are functions of the background expectations, and their second and third statistical momenta. In order for a result to be declared SLv2 in SModelS, third statistical momenta must be provided in addition to background expectations and their errors.
+
+The :ref:`figure below <combinedSRfigV2>` shows a comparison for `TChiHH <http://smodels.github.io/docs/SmsDictionary#TChiHH>`_  of `CMS-SUS-20-004 <http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-20-004/>`_, using a simplified likelihood but ignoring the third momenta, i.e. SLv1 (left), and a simplified likelihood result v2 (right).
+The improvement due to including the skewness term is apparent in both the expected and the observed limit.
+
+.. _combinedSRfigV2:
+
+   +------------------------------------+------------------------------------+
+   | .. image:: images/SLv2_v1.png      | .. image:: images/SLv2_v2.png      |
+   |            :width: 300px           |            :width: 300px           |
+   |                                    |                                    |
+   | SLv1                               | SLv2                               |
+   +------------------------------------+------------------------------------+
+
+   Figure: Comparison of `CMS-SUS-20-004 <http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-20-004/>`_ using SLv1 (left), and SLv2 (right).
 
 
 .. pyhfllhd:

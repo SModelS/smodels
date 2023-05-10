@@ -32,12 +32,15 @@ class ServerTest(unittest.TestCase):
         pclfile = "./proxy.pcl"
         if os.path.exists ( pclfile ):
             os.unlink ( pclfile )
-        from simplyGluino_default import smodelsOutputDefault
-        filename = "./testFiles/slha/simplyGluino.slha"
+        from servertest_default import smodelsOutput as smodelsOutputDefault
+        filename = "./testFiles/slha/T1ttttoff.slha"
         port = random.choice ( range(31700, 42000 ) )
         # port = 31744
         dbfile = "database/db30.pcl"
-        dbfile = "unittest"
+        #dbfile = "unittest"
+        dbfile = "tinydb/"
+        # we might have to repickle!
+        # db = Database ( dbfile, force_load = "txt" )
 
         startserver = f"../smodels/tools/smodelsTools.py proxydb -p {port} -i {dbfile} -o {pclfile} -r -v error"
         cmd = startserver.split(" ")
@@ -49,21 +52,24 @@ class ServerTest(unittest.TestCase):
         myenv["PYTHONPATH"]="../" + pp
         subprocess.Popen ( cmd, env=myenv )
 
-        c = .5
-        while not os.path.exists ( pclfile ):
+        c = 1.7
+        while not os.path.exists ( pclfile ) and c < 10:
             time.sleep ( c )
             c += 1.
+        if not os.path.exists ( pclfile ):
+            raise AssertionError( f"no file {pclfile} created" )
 
         db = Database( pclfile )
-        outputfile = runMain(filename,suppressStdout = True, overridedatabase = db )
+        outputfile = runMain( filename, timeout = 2, suppressStdout = True,
+                              overridedatabase = db )
         smodelsOutput = importModule ( outputfile )
-        
-        client = DatabaseClient ( port = port, verbose = "warn" ) 
+
+        client = DatabaseClient ( port = port, verbose = "warn" )
         client.send_shutdown()
 
-        ignoreFields = ['input file','smodels version', 'ncpus', 'Element', 
+        ignoreFields = ['input file','smodels version', 'ncpus', 'Element',
                         'database version', 'Total missed xsec',
-                        'Missed xsec long-lived', 'Missed xsec displaced', 
+                        'Missed xsec long-lived', 'Missed xsec displaced',
                         'Missed xsec MET', 'Total outside grid xsec',
                         'Total xsec for missing topologies (fb)',
                         'Total xsec for missing topologies with displaced decays (fb)',

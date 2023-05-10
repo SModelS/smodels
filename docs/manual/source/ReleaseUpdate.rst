@@ -37,6 +37,27 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+
+New in Version 2.3.0:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * fixed bug for an LHE input only with anti-particles
+  * fixed error that truncated signal yields when computing expected upper limits
+  * added minMass parameter for setting a minimum mass threshold for BSM masses
+  * fixed C++ interface to work with python 3.11
+  * bumped up pythia8 from 8.307 to 8.308
+  * SModelS can now track inter-analyses combinability at the level of whole `analyses <experiment.html#experiment.expResultObj.ExpResult.isCombinableWith>`_ as well as individual `signal regions <experiment.html#experiment.datasetObj.DataSet.isCombinableWith>`_
+  * added support for :ref:`SLv2 <SLV2>` (Gaussian with a skew), arXiv:1809.05548
+  * refactored the statistics modules
+  * introduced "full_llhds" database add-on (see :ref:`parameter.ini file <parameterFileDatabase>`)
+
+  * |database| extension, added new results from 6 ATLAS and 4 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
+     - results from ATLAS:
+       ATLAS-SUSY-2018-05 (UL,EM+hfm), ATLAS-SUSY-2018-32 (EM+hfm), ATLAS-SUSY-2018-41 (EM+cov, updated), ATLAS-SUSY-2018-42 (UL,EM), ATLAS-SUSY-2019-02 (UL,EM+cov), ATLAS-SUSY-2013-12 (8TeV, EM)
+     - results from CMS:
+       CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL, todo: EM), CMS-SUS-21-002 (UL,EM+cov)
+     - added expected ULs to CMS-SUS-19-009
+
 New in Version 2.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -64,7 +85,7 @@ New in Version 2.2.0:
   * small fixes in the :ref:`Howto's <Examples>`
   * updates in references.bib, installation notes
   * more small fixes in unit tests
-  * Database extension, added new results from 4 ATLAS and 11 CMS analyses:
+  * |database| extension, added new results from 4 ATLAS and 11 CMS analyses:
      - results from ATLAS:
        ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2018-41 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
      - results from CMS:

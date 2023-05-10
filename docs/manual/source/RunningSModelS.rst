@@ -149,7 +149,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileCombineAnas:
 
-    * **combineAnas** (list of results): list of analysis IDs to be combined. *All the analyses are assumed to be fully uncorrelated*, so use with caution! Available from v2.2.0 onwards. NB, due to issues with pyhf, for the time being it is *advisable to use this feature only with combineSRs=False*. 
+    * **combineAnas** (list of results): list of analysis IDs to be combined. *All the analyses are assumed to be fully uncorrelated*, so use with caution! Available from v2.2.0 onwards. NB, due to issues with pyhf, for the time being it is *advisable to use this feature only with combineSRs=False*.
 
 .. _parameterExperimentalFeatures:
 
@@ -205,7 +205,18 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFilePath:
 
-  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Also http addresses may be given, e.g. https://smodels.github.io/database/official210. Multiple databases may be specified using '+' as a delimiter. Order matters: results will be overwritten according to the sequence specified. The path "official" refers to the official database of your SModelS version -- without fastlim; "official+fastlim" includes fastlim results. In addition, the paths "latest+fastlim" and "latest" refer to the latest databases, with and without fastlim results, respectively. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions. Finally, "debug" refers to a version of the database with extra information that is however not intended for usage by a regular user and only mentioned here for completeness.
+  * **path**: the absolute (or relative) path to the :ref:`database <databaseStruct>`. The user can supply either the directory name of the database, or the path to the :ref:`pickle file <databasePickle>`. Also http addresses may be given, e.g. https://smodels.github.io/database/official230. See the `github database release page <https://github.com/SModelS/smodels-database-release/releases>`_ for a list of public database versions. Shorthand notations are available: `path=official` refers to the official database of your SModelS version, while `path=latest` refers to the latest availabe database release. The '+' operator allows for extending the "official" or "latest" database with add-ons:
+
+    + +fastlim: adds fastlim results (from early 8 TeV ATLAS analyses); from v2.1.0 onward
+
+    + +superseded: adds results which were previously available but were superseded by newer ones; from v2.1.0 onward
+
+    + +nonaggregated: replaces aggregated by non-aggregated SRs in CMS analyses; from v2.2.0 onward
+
+    + +full_llhds: replaces simplified HistFactory statistical models by full ones in ATLAS analyses; from v2.3.0 onward (careful, this increases a lot the runtime!)
+
+  Examples are `path=official+fastlim`, `path=official+nonaggregated`, `path=official+nonaggregated+full_llhds`. Note that order matters: results are replaced in the specified sequence, so `path=nonaggregated+official` will fall back onto the official database with aggregated results. In principle, the add-ons can also be used alone, e.g. `path=nonaggregated`, though this is of little practical use. Finally, `debug` refers to a version of the database with extra information that is however not intended for usage by a regular user and only mentioned here for completeness.
+
 
 .. _parameterFileAnalyses:
 

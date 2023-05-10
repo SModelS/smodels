@@ -15,10 +15,9 @@ runtime.modelFile = 'smodels.share.models.mssm'
 
 from smodels.theory import decomposer
 from smodels.tools.physicsUnits import fb, GeV, TeV
-from smodels.theory.theoryPrediction import theoryPredictionsFor
+from smodels.theory.theoryPrediction import theoryPredictionsFor, TheoryPredictionsCombiner
 from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
-from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.tools.smodelsLogging import setLogLevel
 from smodels.particlesLoader import BSMList
 from smodels.share.models.SMparticles import SMList
@@ -89,7 +88,7 @@ def main(inputFile='inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb, databa
     bestResult = None
     allPredictions = []
     for expResult in listOfExpRes:
-        predictions = theoryPredictionsFor(expResult, toplist, combinedResults=False, marginalize=False)
+        predictions = theoryPredictionsFor(expResult, toplist, combinedResults=False )
         if not predictions:
             continue  # Skip if there are no constraints from this result
         print('\n %s ' % expResult.globalInfo.id)

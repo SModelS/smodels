@@ -381,8 +381,8 @@ def clusterElements(elements, maxDist, dataset):
         raise SModelSError("A dataset object must be defined for clustering")
 
     #Make sure only unique elements are clustered together (avoids double counting weights)
-    #Sort element, so the ones with highest contribution (weight*eff) come first:
-    elementList = sorted(elements, key = lambda el: el.weight.getMaxXsec()*el.eff, reverse=True)
+    #Sort element, so the ones with highest contribution (weight) come first:
+    elementList = sorted(elements, key = lambda el: el.weight.getMaxXsec(), reverse=True)
     #Remove duplicated elements:
     elementsUnique = []
     for el in elementList:

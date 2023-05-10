@@ -15,7 +15,7 @@ import unittest
 
 # from smodels.tools import statistics
 from smodels.tools.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
-from smodels.tools.statistics import TruncatedGaussians
+from smodels.tools.truncatedGaussians import TruncatedGaussians
 from smodels.theory.theoryPrediction import theoryPredictionsFor
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
@@ -25,7 +25,7 @@ from smodels.theory import decomposer
 from math import floor, log10
 import numpy as np
 import math
-
+from smodels.tools import runtime
 
 class StatisticsTest(unittest.TestCase):
     def lLHDFromLimits(self):
@@ -40,7 +40,7 @@ class StatisticsTest(unittest.TestCase):
         print("ulexp", ulexp)
         f = open("llhds.csv", "wt")
         dx = 0.5
-        totdir, totlim, totmarg = 0.0, 0.0, 0.0
+        totdir, totlim = 0.0, 0.0
         for nsig in np.arange(0.1, 100.0, dx):
             print()
             print("nsig=", nsig)
@@ -48,10 +48,7 @@ class StatisticsTest(unittest.TestCase):
             llhdcomp = LikelihoodComputer(m)
             llhddir = llhdcomp.likelihood(nsig)
             chi2dir = llhdcomp.chi2()
-            llhdmarg = llhdcomp.likelihood(nsig, marginalize=True)
-            chi2marg = llhdcomp.chi2( marginalize=True)
             print("llhd direct", llhddir, chi2dir)
-            print("llhd marg", llhdmarg, chi2marg)
             computer = TruncatedGaussians ( ulobs, ulexp, nsig )
             ret = computer.likelihood ( mu=1.)
             llhdlim, muhat, sigma_mu = ret["llhd"], ret["muhat"], ret["sigma_mu"]
@@ -59,12 +56,33 @@ class StatisticsTest(unittest.TestCase):
             print("llhd from limits", llhdlim, chi2lim)
             totdir += llhddir * dx
             totlim += llhdlim * dx
-            totmarg += llhdmarg * dx
-            f.write("%s,%s,%s,%s\n" % (nsig, llhddir, llhdlim, llhdmarg))
+            f.write("%s,%s,%s\n" % (nsig, llhddir, llhdlim ))
         print("total direct", totdir)
         print("total limit", totlim)
-        print("total marg", totmarg)
         f.close()
+
+    def testPaperExample(self):
+        """test the likelihoods from limits allowing for underfluctuations"""
+        nsig = 3.0
+        nobs, nbg = 35, 30
+        m = Data(nobs, nbg, 0.001, None, nsig )
+        ulcomp = UpperLimitComputer()
+        ulobs = ulcomp.getUpperLimitOnMu(m)
+        ulexp = ulcomp.getUpperLimitOnMu(m, expected=True)
+        computer = TruncatedGaussians ( ulobs, ulexp, corr = 0. )
+        llhdlim = computer.likelihood ( mu=1., return_nll = False )
+        ret = computer.lmax ( return_nll = False)
+        doPrint = False
+        if doPrint:
+            smu = computer.sigma_mu
+            print ( "ulobs,exp=",ulobs,ulexp )
+            print ( "sigma_mu=", smu ) ## paper says it is approx sqrt(35)/3
+            print ( "denominator=", computer.denominator )
+            print ( "ret is", ret )
+        ## muhat is said to be 5/3 (see 1202.3415:Fig_2)
+        self.assertAlmostEqual ( ret["muhat"], 1.915, 2 )
+        ## sigma_mu is at sqrt(35)/3 (see also 1202.3415:Fig_2)
+        self.assertAlmostEqual ( ret["sigma_mu"], 2.04975, 2 )
 
     def testUnderfluctuatingLlhdsFromLimits(self):
         """test the likelihoods from limits allowing for underfluctuations"""
@@ -75,10 +93,12 @@ class StatisticsTest(unittest.TestCase):
 
         for nsig in [0, 5]:
             for allowNegatives in [False, True]:
-                computer = TruncatedGaussians ( 4.5, 5.45, nsig )
-                ret = computer.likelihood ( mu=1.,
-                       nll = False, allowNegativeMuhat = allowNegatives )
-                llhdlim, muhat, sigma_mu = ret["llhd"], ret["muhat"], ret["sigma_mu"]
+                computer = TruncatedGaussians ( 4.5, 5.45, corr=0. )
+                llhdlim = computer.likelihood ( mu=nsig,
+                       return_nll = False, allowNegativeSignals = allowNegatives )
+                ret = computer.lmax ( return_nll = False,
+                        allowNegativeSignals = allowNegatives )
+                muhat, sigma_mu = ret["muhat"], ret["sigma_mu"]
                 c = comparisons[allowNegatives][nsig]
                 self.assertAlmostEqual(llhdlim, c, 2)
 
@@ -91,41 +111,51 @@ class StatisticsTest(unittest.TestCase):
 
         for nsig in [0, 3, 5]:
             for x in [0.0, 0.6]:
-                computer = TruncatedGaussians ( 8.52, 6.18, nsig, corr = x )
-                ret = computer.likelihood ( 1., False, False )
-                llhdlim, muhat, sigma_mu = ret["llhd"], ret["muhat"], ret["sigma_mu"]
+                computer = TruncatedGaussians ( 8.52, 6.18, corr = x )
+                llhdlim = computer.likelihood ( nsig, False, False )
+                ret = computer.lmax ( False, False )
+                muhat, sigma_mu = ret["muhat"], ret["sigma_mu"]
                 c = comparisons[x][nsig]
                 self.assertAlmostEqual(llhdlim, c, 2)
 
-    def testChi2FromLimits(self):
+    def testOneMoreExample(self):
         """test the chi2 value that we obtain from limits"""
         nsig = 35.0
         nobs, nbg = 110, 100.0
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0, lumi = 1.)
         ulcomp = UpperLimitComputer()
-        #ulobs = ulcomp.getUpperLimitOnMu(m)
-        #ulexp = ulcomp.getUpperLimitOnMu(m, expected=True)
-        ulobs = ulcomp.getUpperLimitOnSigmaTimesEff(m)
-        ulexp = ulcomp.getUpperLimitOnSigmaTimesEff(m, expected=True)
-        dx = .5
-        m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0. )
+        ulexpmu = ulcomp.getUpperLimitOnMu(m, expected=True)
+        # ulexpmu should roughly equal sqrt(100)*2 / 35. = 0.57
+        self.assertAlmostEqual ( ulexpmu, 0.59716846, 3 )
+        ulobsmu = ulcomp.getUpperLimitOnMu(m)
+        # ulobsmu should roughly equal sqrt(100*2 / 35. + ( 110 -100 ) / 35. = 85
+        self.assertAlmostEqual ( ulobsmu, 0.834560746, 3 )
         llhdcomp = LikelihoodComputer(m)
         llhddir = llhdcomp.likelihood(mu=1.)
-        chi2dir = llhdcomp.chi2()
-        llhdmarg = llhdcomp.likelihood(mu=1., marginalize=True)
-        chi2marg = llhdcomp.chi2( marginalize=True)
-        computer = TruncatedGaussians ( ulobs, ulexp, nsig )
-        ret = computer.likelihood ( mu=1. )
-        llhdlim, muhat, sigma_mu = ret["llhd"], ret["muhat"], ret["sigma_mu"]
-        # self.assertAlmostEqual(llhdlim,0.003427964159300251,5)
-        self.assertAlmostEqual(llhdlim,0.0034205732477661462,5)
-        self.assertAlmostEqual(muhat,0.23328649242374602,3)
-        # self.assertAlmostEqual(sigma_mu,0.338419104966444,4)
-        self.assertAlmostEqual(sigma_mu,0.3383372145700653,4)
-        chi2lim = computer.chi2 ( ) # llhdlim )
-        ## relative error on chi2, for this example is about 4%
-        rel = abs(chi2lim - chi2marg) / chi2marg
-        self.assertAlmostEqual(rel, 0.04, 1)
+        computer = TruncatedGaussians ( ulobsmu, ulexpmu )
+        llhdlim = computer.likelihood ( mu=1. )
+        ret = computer.lmax ( )
+        # muhat should roughly sit at ulobsmu - ulexpmu = 0.237
+        self.assertAlmostEqual ( ret["muhat"], 0.23311, 3 )
+        # sigma_mu should be approximately sqrt(nobs)/nsig = 0.29966
+        self.assertAlmostEqual ( ret["sigma_mu"], 0.338337, 3 )
+        # lmax is the truncated gaussian evaulated at muhat
+        # norm.pdf ( muhat, muhat, sigma_mu ) / (1. - norm.cdf ( 0., muhat, sigma_mu ))
+        # = 1.5626
+        self.assertAlmostEqual ( ret["lmax"], 1.56261789, 3 )
+
+
+        doPrint = False
+        if doPrint:
+            print ( "upper limits on mu are at", ulobsmu, ulexpmu )
+            print ( "upper limits on sigma*eff", ulobs, ulexp )
+            print ( "llhdir is", llhddir )
+            print ( "llhdlim is", llhdlim )
+            print ( "ret is", ret )
+        # llhd at mu = 1.
+        # norm.pdf ( 1., muhat, sigma_mu ) / (1. - norm.cdf ( 0., muhat, sigma_mu ))
+
+        # self.assertAlmostEqual(llhdlim,0.119734,5)
 
     def testUpperLimit(self):
         m = Data(100.0, 100.0, 0.001, None, 1.0, deltas_rel=0.0)
@@ -133,10 +163,30 @@ class StatisticsTest(unittest.TestCase):
         re = comp.getUpperLimitOnMu(m)
         self.assertAlmostEqual(re/(1.06*20.), 1., 1)
 
-    def testApproxGaussian(self):
-        ## turn experimental features on
-        from smodels.tools import runtime
+    def testExperimentalFeatureOff(self):
+        ## check that this all gives none if experimental is turned off
 
+        runtime._experimental = False
+        expRes = database.getExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
+        self.assertTrue(len(expRes), 1)
+        filename = "./testFiles/slha/T1tttt.slha"
+        model = Model(BSMList, SMList)
+        model.updateParticles(filename)
+        smstoplist = decomposer.decompose(model, sigmacut=0)
+        prediction = theoryPredictionsFor(expRes[0], smstoplist)[0]
+        prediction.computeStatistics()
+        import numpy
+
+        llhds = []
+        for muval in numpy.arange(0.0, 0.2, 0.02):
+            llhd = prediction.likelihood(mu=muval)
+            llhds.append ( llhd )
+        self.assertEqual(prediction.likelihood(), None )
+        self.assertEqual(llhds, [ None ] * len(llhds) )
+
+
+    def obsoleteApproxGaussian(self):
+        ## turn experimental features on
         runtime._experimental = True
         expRes = database.getExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
         self.assertTrue(len(expRes), 1)
@@ -169,25 +219,21 @@ class StatisticsTest(unittest.TestCase):
         pred_signal_strength = prediction.xsection.value
         prediction.computeStatistics()
         ill = math.log(prediction.likelihood())
-        ichi2 = prediction.chi2()
         nsig = (pred_signal_strength * expRes.globalInfo.lumi).asNumber()
         m = Data(4, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
         computer = LikelihoodComputer(m)
-        dll = math.log(computer.likelihood(mu=1., marginalize=False))
+        dll = math.log(computer.likelihood(mu=1.))
         self.assertAlmostEqual(ill, dll, places=2)
-        dchi2 = computer.chi2( marginalize=False)
-        # print ( "dchi2,ichi2",dchi2,ichi2)
-        self.assertAlmostEqual(ichi2, dchi2, places=2)
 
     def testZeroLikelihood(self):
         """A test to check if a llhd of 0 is being tolerated"""
         nsig = 2
         m = Data(1e20, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
         computer = LikelihoodComputer(m)
-        llhd = computer.likelihood(mu=1., marginalize=False)
-        nll = computer.likelihood(mu=1., marginalize=False, nll=True)
+        llhd = computer.likelihood(mu=1. )
+        nll = computer.likelihood(mu=1., return_nll=True)
         self.assertAlmostEqual(0.0, llhd, places=2)
-        dchi2 = computer.chi2( marginalize=False)
+        dchi2 = computer.chi2( )
         ichi2 = 4.486108149972863e21
         self.assertAlmostEqual(dchi2 / ichi2, 1.0, places=4)
 
@@ -721,27 +767,14 @@ class StatisticsTest(unittest.TestCase):
             nsig = d["nsig"]
             nb = d["nb"]
             deltab = d["deltab"]
-            # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
-            # Chi2 as computed by statistics module:
             m = Data(nobs, nb, deltab**2, deltas_rel=0.2, nsignal = nsig )
             computer = LikelihoodComputer(m)
-            chi2_actual = computer.chi2( marginalize=True)  # , .2*nsig )
-            chi2_expected = d["chi2"]
-            # print('chi2exp', chi2_expected)
-            if not chi2_expected == None and not np.isnan(chi2_expected):
-                #                 chi2_expected = self.round_to_sign(chi2_expected, 2)
-                # Check that chi2 values agree:
-                self.assertAlmostEqual(
-                    abs(chi2_actual - chi2_expected) / chi2_expected, 0.0, places=2
-                )
-            else:
-                self.assertTrue(chi2_actual == None or np.isnan(chi2_actual))
+            # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
 
             # likelihood as computed by statistics module:
-            # computer = LikelihoodComputer( nobs, nb, deltab**2 )
             # likelihood_actual = statistics.likelihood( nsig,
             #    nobs, nb, deltab, deltas)
-            likelihood_actual = computer.likelihood(mu=1., marginalize=False)
+            likelihood_actual = computer.likelihood(mu=1. )
             # likelihood_actual = statistics.likelihood()
             #             logger.error("llk= "+str(likelihood_actual)+" nsig="+str(nsig)+" nobs = "+str(nobs)+" nb="+str(nb)+"+-"+str(deltab))
             # print('llhdactual', likelihood_actual)
@@ -749,7 +782,7 @@ class StatisticsTest(unittest.TestCase):
                 likelihood_actual = self.round_to_sign(likelihood_actual, 4)
 
             # The previously computed likelihood:
-            # (using: ntoys=100000)
+            # (using: marginalization with ntoys=100000)
             likelihood_expected = d["llhd"]
             # print('llhdexp', likelihood_expected)
             if not likelihood_expected == None and not np.isnan(likelihood_expected):

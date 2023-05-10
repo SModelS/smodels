@@ -123,6 +123,26 @@ class ModelsTest(unittest.TestCase):
         self.assertTrue(smodelsOutput['OutputStatus']['decomposition status'] < 0)
         self.removeOutputs(outputfile)
 
+
+    def testUpdateParameters(self):
+        runtime.modelFile = 'mssm'
+        reload(particlesLoader)
+        from smodels.particlesLoader import BSMList
+        from smodels.share.models.SMparticles import SMList
+        from smodels.theory.model import Model
+        from smodels.tools.physicsUnits import GeV
+
+        slhafile = "./testFiles/slha/hscpTest_short.slha"
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(inputFile=slhafile,minMass=1.0*GeV)
+        p = model.getParticlesWith(pdg=1000012)[0]
+        self.assertEqual(p.mass,1.0*GeV)
+
+        model.updateParticles(inputFile=slhafile,minMass=5.0*GeV)
+        p = model.getParticlesWith(pdg=1000012)[0]
+        self.assertEqual(p.mass,5.0*GeV)
+
+
     def removeOutputs(self, f):
         """ remove cruft outputfiles """
         for i in [ f, f.replace(".py",".pyc" ), f.replace(".py",".smodels") ]:

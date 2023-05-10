@@ -497,7 +497,8 @@ class PlotlyBackend:
         Transform the main dictionary in a data frame.
         """
         self.data_frame_all = pd.DataFrame(data=self.data_dict)
-        self.data_frame_all.to_csv(self.path_to_plots+'/data_frame.txt', sep=' ', index=False,header=True)
+        self.data_frame_filename = self.path_to_plots+'/data_frame.txt'
+        self.data_frame_all.to_csv(self.data_frame_filename, sep=' ', index=False,header=True)
 
         return self.data_frame_all
 
@@ -963,3 +964,7 @@ class PlotlyBackend:
                 PlotlyBackend.makeDiscretePlots(self,data_frame_nonexcluded,'non-excluded')
         PlotlyBackend.createIndexHtml(self)
         return True
+
+    def cleanUp ( self ):
+        if os.path.exists ( self.data_frame_filename ):
+            os.unlink ( self.data_frame_filename )

@@ -115,25 +115,29 @@ def getParticlesFromModule(modelFile):
 
     from smodels.installation import installDirectory
     from importlib import import_module
-    fulldir = os.path.join(installDirectory(),"smodels","share","models")
-    sys.path.insert(0,installDirectory())
-    sys.path.insert(0,os.path.join(installDirectory(),"smodels") )
-    sys.path.insert(0,fulldir)
-    sys.path.insert(0,".")
+    fulldir = os.path.join(installDirectory(), "smodels", "share", "models")
+    sys.path.insert(0, installDirectory())
+    sys.path.insert(0, os.path.join(installDirectory(), "smodels"))
+    sys.path.insert(0, fulldir)
+    sys.path.insert(0, ".")
 
     logger.debug("Trying to load model file: %s" % modelFile)
 
     fname = modelFile[:]
-    if fname.endswith(".py"):
-        fname=modelFile[:-3]
     if "/" in fname:
         import shutil
-        filename=os.path.basename(fname)
+        filename = os.path.basename(fname)
         shutil.copy(fname, filename)
     else:
-        filename=fname
+        filename = fname
 
-    pM=import_module(filename, package='smodels')
+    
+    if filename.endswith(".py"):
+        importName = filename[:-3]
+    else:
+        importName = filename
+
+    pM=import_module(importName, package='smodels')
     logger.debug("Found model file at %s" % pM.__file__)
     if filename != fname:
         os.remove(filename)

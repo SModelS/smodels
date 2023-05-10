@@ -17,8 +17,7 @@ import os
 import copy
 import itertools
 from smodels.theory.topology import TopologyList
-from smodels.theory.theoryPrediction import TheoryPredictionList
-from smodels.tools.theoryPredictionsCombiner import TheoryPredictionsCombiner
+from smodels.theory.theoryPrediction import TheoryPredictionList, TheoryPrediction, TheoryPredictionsCombiner
 from smodels.experiment.databaseObj import ExpResultList
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
@@ -283,6 +282,7 @@ class TxTPrinter(BasicPrinter):
         self.printtimespent = False
         self.printingOrder = [OutputStatus, ExpResultList, TopologyList,
                               TheoryPredictionList, TheoryPredictionsCombiner,
+                              TheoryPrediction,
                               Uncovered]
         self.toPrint = [None] * len(self.printingOrder)
 
@@ -606,6 +606,10 @@ class TxTPrinter(BasicPrinter):
             output += "================================================================================\n"
         return output
 
+
+    def _formatTheoryPrediction(self,obj):
+        return self._formatTheoryPredictionsCombiner(obj)
+
     def _formatTheoryPredictionsCombiner(self, obj):
         """
         Format data of the TheoryPredictionsCombiner object.
@@ -645,7 +649,8 @@ class SummaryPrinter(TxTPrinter):
         TxTPrinter.__init__(self, output, filename)
         self.name = "summary"
         self.printingOrder = [
-            OutputStatus, TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
+            OutputStatus, TheoryPredictionList, TheoryPredictionsCombiner, 
+            TheoryPrediction, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -773,6 +778,9 @@ class SummaryPrinter(TxTPrinter):
 
         return output
 
+    def _formatTheoryPrediction(self,obj):
+        return self._formatTheoryPredictionsCombiner(obj)
+
     def _formatTheoryPredictionsCombiner(self, obj):
         """
         Format data of the TheoryPredictionsCombiner object.
@@ -812,7 +820,8 @@ class PyPrinter(BasicPrinter):
         self.name = "py"
         self.printtimespent = False
         self.printingOrder = [OutputStatus, TopologyList,
-                              TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
+                              TheoryPredictionList, TheoryPredictionsCombiner, 
+                              TheoryPrediction, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -1095,6 +1104,9 @@ class PyPrinter(BasicPrinter):
 
         return uncoveredDict
 
+    def _formatTheoryPrediction(self,obj):
+        return self._formatTheoryPredictionsCombiner(obj)
+
     def _formatTheoryPredictionsCombiner(self, obj):
         """
         Format data of the TheoryPredictionsCombiner object.
@@ -1140,7 +1152,8 @@ class XmlPrinter(PyPrinter):
         PyPrinter.__init__(self, output, filename)
         self.name = "xml"
         self.printingOrder = [OutputStatus, TopologyList,
-                              TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
+                              TheoryPredictionList, TheoryPredictionsCombiner, 
+                              TheoryPrediction, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -1233,7 +1246,7 @@ class SLHAPrinter(TxTPrinter):
         self.combinesr = 0
         self.combineanas = 0
         self.printingOrder = [OutputStatus, TheoryPredictionList,
-                              TheoryPredictionsCombiner, Uncovered]
+                              TheoryPredictionsCombiner, TheoryPrediction, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -1296,10 +1309,9 @@ class SLHAPrinter(TxTPrinter):
             obj.sortTheoryPredictions()
             firstResult = obj._theoryPredictions[0]
             r = firstResult.getRValue()
-            if r > 1:
+            excluded = 0
+            if r!= None and r > 1:
                 excluded = 1
-            else:
-                excluded = 0
         output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n" % (
             excluded)
         if excluded == -1:
@@ -1376,6 +1388,9 @@ class SLHAPrinter(TxTPrinter):
                 i, group.getTotalXSec(), "Total cross-section (fb)")
         output += "\n"
         return output
+
+    def _formatTheoryPrediction(self,obj):
+        return self._formatTheoryPredictionsCombiner(obj)
 
     def _formatTheoryPredictionsCombiner(self, obj):
         """
