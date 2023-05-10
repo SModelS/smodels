@@ -6,7 +6,6 @@ susyProcess: P P --> X --> b j | P P --> X --> b b
 figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/EXOT-2019-03/figaux_12.png
 source: ATLAS
 validated: True
-intermediateState: [['Z1']]
 axes: [[x], [x]]
 finalState: ['b', 'b']
 upperLimits: [[[[1.2E+03*GeV],[1.2E+03*GeV]],0.070853*pb],
