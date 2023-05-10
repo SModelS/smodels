@@ -1,0 +1,1 @@
+sqrts: 13.0*TeVlumi: 136/fbid: ATLAS-EXOT-2019-03url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/EXOT-2019-03/arxiv: https://arxiv.org/abs/1910.08447publication: https://link.springer.com/article/10.1007/JHEP03(2020)145contact: ATLAS collaboration, ATLAS Exotics convenersprivate: FalseimplementedBy: Yoxara Sanchez VillamizarlastUpdate: 2023/05/07
