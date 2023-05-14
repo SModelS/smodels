@@ -198,7 +198,6 @@ in the nuisances:
 Here, :math:`\rho` denotes the correlation matrix, and :math:`a_i`, :math:`b_i`, and :math:`c_i` are functions of the background expectations, and their second and third statistical momenta. In order for a result to be declared SLv2 in SModelS, third statistical momenta must be provided in addition to background expectations and their errors.
 
 The :ref:`figure below <combinedSRfigV2>` shows a comparison for `TChiHH <http://smodels.github.io/docs/SmsDictionary#TChiHH>`_  of `CMS-SUS-20-004 <http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-20-004/>`_, using a simplified likelihood but ignoring the third momenta, i.e. SLv1 (left), and a simplified likelihood result v2 (right).
-The improvement due to including the skewness term is apparent in both the expected and the observed limit.
 
 .. _combinedSRfigV2:
 
