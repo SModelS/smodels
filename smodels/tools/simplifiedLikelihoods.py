@@ -950,7 +950,7 @@ class UpperLimitComputer:
                 tempc = LikelihoodComputer(oldmodel )
                 theta_hat_, _ = tempc.findThetaHat(0 )
                 if model.isLinear():
-                    model.observed = model.A + theta_hat_
+                    model.observed = model.backgrounds + theta_hat_
                 else:
                     model.observed = model.A + theta_hat_ + model.C * theta_hat_**2 / model.B**2
                 #for i, d in enumerate(model.backgrounds):
