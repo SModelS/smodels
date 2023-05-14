@@ -949,7 +949,10 @@ class UpperLimitComputer:
             if expected == "posteriori":
                 tempc = LikelihoodComputer(oldmodel )
                 theta_hat_, _ = tempc.findThetaHat(0 )
-                model.observed = model.A + theta_hat_ + model.C * theta_hat_**2 / model.B**2
+                if model.isLinear():
+                    model.observed = model.A + theta_hat_
+                else:
+                    model.observed = model.A + theta_hat_ + model.C * theta_hat_**2 / model.B**2
                 #for i, d in enumerate(model.backgrounds):
                 #    d += theta_hat_[i]
                 ### FIXME!
