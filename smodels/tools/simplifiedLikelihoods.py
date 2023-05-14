@@ -305,7 +305,11 @@ class LikelihoodComputer:
         if type(self.model.backgrounds) in [float, np.float64,
                 np.float32, int, np.int64, np.int32]:
             thetahat = float(thetahat[0])
-        obs = self.model.backgrounds + thetahat
+        # obs = self.model.backgrounds + thetahat
+        if self.model.isLinear():
+            obs = self.model.backgrounds + thetahat
+        else:
+            obs = self.model.A + thetahat + self.model.C * thetahat**2 / self.model.B**2
         self.model.observed = obs
 
     def dNLLdMu(self, mu, theta_hat = None ):
@@ -945,8 +949,10 @@ class UpperLimitComputer:
             if expected == "posteriori":
                 tempc = LikelihoodComputer(oldmodel )
                 theta_hat_, _ = tempc.findThetaHat(0 )
-                for i, d in enumerate(model.backgrounds):
-                    d += theta_hat_[i]
+                model.observed = model.A + theta_hat_ + model.C * theta_hat_**2 / model.B**2
+                #for i, d in enumerate(model.backgrounds):
+                #    d += theta_hat_[i]
+                ### FIXME!
         computer = LikelihoodComputer(model )
         mu_hat = computer.findMuHat( allowNegativeSignals=False, extended_output=False)
         theta_hat0, _ = computer.findThetaHat( 0. )
