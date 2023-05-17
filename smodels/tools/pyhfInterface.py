@@ -239,7 +239,7 @@ class PyhfUpperLimitComputer:
         """
         self.data = data
         self.lumi = lumi
-        self.nsignals = self.data.nsignals
+        self.nsignals = copy.deepcopy ( self.data.nsignals )
         logger.debug("Signals : {}".format(self.nsignals))
         self.inputJsons = self.data.inputJsons
         self.channelsInfo = self.data.channelsInfo
@@ -797,6 +797,7 @@ class PyhfUpperLimitComputer:
                                 - else: choose best combo
         :return: the upper limit at `self.cl` level (0.95 by default)
         """
+        self.__init__(self.data, self.cl, self.includeCRs, self.lumi)
         if workspace_index in self.data.cachedULs[expected]:
             ret = self.data.cachedULs[expected][workspace_index]
             return ret
