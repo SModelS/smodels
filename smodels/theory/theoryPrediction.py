@@ -411,11 +411,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         # Define a hierarchy for the results:
         priority = {"combined": 2, "efficiencyMap": 1, "upperLimit": 0}
         # Now sort by highest priority and then by highest expected r-value:
-        #selectedTPs = sorted(
-        #    selectedTPs, key=lambda tp: (priority[tp.dataType()], tp.getRValue(expected=True))
-        #)
         selectedTPs = sorted(
-            selectedTPs, key=lambda tp: (priority[tp.dataType()], tp.getRValue(expected=True) if tp.getRValue(expected=True) is not None else -1. )
+            selectedTPs, key=lambda tp: (priority[tp.dataType()], tp.getRValue(expected=True))
         )
         # Now get a single TP for each result
         # (the highest ranking analyses come last and are kept in the dict)
