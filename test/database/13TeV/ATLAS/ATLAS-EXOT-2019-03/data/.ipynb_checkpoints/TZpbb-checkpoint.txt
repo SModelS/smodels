@@ -1,0 +1,23 @@
+txName: TZpbb
+constraint: [[['b']],[['b']]]
+condition: None
+conditionDescription: None
+susyProcess: P P --> X --> b j | P P --> X --> b b
+figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/EXOT-2019-03/figaux_12.png
+source: ATLAS
+validated: True
+intermediateState: [['X']]
+axes: [[x, y], [x, y]]
+upperLimits: [[[[4.18*GeV,4.18*GeV],1.2E+03*GeV],0.070853*pb],
+[[[4.18*GeV,4.18*GeV],1.5E+03*GeV],0.066995*pb],
+[[[4.18*GeV,4.18*GeV],1.7E+03*GeV],0.056154*pb],
+[[[4.18*GeV,4.18*GeV],2.0E+03*GeV],0.022815*pb],
+[[[4.18*GeV,4.18*GeV],2.5E+03*GeV],0.026881*pb],
+[[[4.18*GeV,4.18*GeV],3.0E+03*GeV],0.011951*pb],
+[[[4.18*GeV,4.18*GeV],3.5E+03*GeV],0.004697*pb],
+[[[4.18*GeV,4.18*GeV],4.0E+03*GeV],0.005191*pb],
+[[[4.18*GeV,4.18*GeV],4.5E+03*GeV],0.003456*pb],
+[[[4.18*GeV,4.18*GeV],5.0E+03*GeV],0.002488*pb],
+[[[4.18*GeV,4.18*GeV],5.5E+03*GeV],0.002467*pb],
+[[[4.18*GeV,4.18*GeV],6.0E+03*GeV],0.001954*pb],
+[[[4.18*GeV,4.18*GeV],6.5E+03*GeV],0.001877*pb]]
