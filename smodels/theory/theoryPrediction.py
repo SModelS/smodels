@@ -310,7 +310,7 @@ class TheoryPrediction(object):
         """ if not return_nll, then compute likelihood from nll """
         if return_nll:
             return nll
-        return np.exp ( - nll )
+        return np.exp ( - nll ) if nll is not None else None
 
     @whenDefined
     def computeStatistics(self, expected=False):
@@ -366,7 +366,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         if len(theoryPredictions) == 0:
             raise SModelSError("asking to combine zero theory predictions")
-        
+
         self.theoryPredictions = theoryPredictions
         self.slhafile = slhafile
         if deltas_rel is None:
@@ -479,8 +479,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         if any(tp.statsComputer == 'N/A' for tp in self.theoryPredictions):
             computer = 'N/A'
         else:
-            computer = StatsComputer.forAnalysesComb(self.theoryPredictions, self.deltas_rel)     
-            
+            computer = StatsComputer.forAnalysesComb(self.theoryPredictions, self.deltas_rel)
+
         self._statsComputer = computer
 
     def getLlhds(self,muvals,expected=False,normalize=True):
