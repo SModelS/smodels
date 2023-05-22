@@ -31,7 +31,7 @@ def CLsfromNLL(
     :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
                         1-CLs: returns 1-CLs value \
-                        CLs: returns CLs value 
+                        CLs: returns CLs value
     :return: Cls-type value, see above
     """
     assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
@@ -79,12 +79,14 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
         i += 1
         a -= (i**2.0) * sigma_mu
         ra = rootfinder(a)
-        if i > ntrials or a < -10000.0 or ( a < 0 and not allowNegative ):
+        if i > ntrials or a < -10000.0 or ra is None or ( a < 0 and not allowNegative ):
             avalues = [0.0, 1.0, -1.0, 3.0, -3.0, 10.0, -10.0, 0.1, -0.1, 0.01, -0.01, .001, -.001, 100., -100., .0001, -.0001 ]
             if not allowNegative:
                 avalues = [0.0, 1.0, 3.0, 10.0, 0.1, 0.01, .001, 100., .0001 ]
             for a in avalues:
                 ra = rootfinder(a)
+                if ra is None: # if cls computation failed, try with next a value
+                    continue
                 if ra > 0.0:
                     foundExtra = True
                     break
@@ -105,6 +107,8 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
         i += 1
         b += (i**2.0) * sigma_mu
         rb = rootfinder(b)
+        if rb is None: # if cls computation failed, try with a bigger b value
+            continue
         closestr, closest = float("inf"), None
         if i > ntrials or ( b < 0 and not allowNegative ):
             bvalues = [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1, -10.0, 100.0, -100.0, 1000.0, .01, -.01, .001, -.001 ]
@@ -112,6 +116,8 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
                 bvalues = [1.0, 0.0, 3.0, 10.0, 0.1, 100.0, 1000.0, .01, .001 ]
             for b in bvalues:
                 rb = rootfinder(b)
+                if rb is None: # if cls computation failed, try with next b value
+                    continue
                 if rb < 0.0:
                     foundExtra = True
                     break
