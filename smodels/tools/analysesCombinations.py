@@ -22,7 +22,7 @@ from typing import Text, Tuple, Callable, Union, Dict
 
 
 class AnaCombLikelihoodComputer(object):
-    
+
     def __init__(self, theoryPredictions: list, deltas_rel=None):
         """constructor.
         :param theoryPredictions: the List of theory predictions
@@ -73,7 +73,7 @@ class AnaCombLikelihoodComputer(object):
                 return 999.0
             return -np.log(llhd)
         return llhd
-        
+
     def lmax(
         self,
         allowNegativeSignals: bool = False,
@@ -116,7 +116,7 @@ class AnaCombLikelihoodComputer(object):
             logger.error(f"asked to compute muhat for combination, but no individual values")
             ret = {"muhat": None, "sigma_mu": None, "lmax": None}
             return  ret
-        
+
 
         toTry = [sum(weighted) / totweight]
 
@@ -178,7 +178,7 @@ class AnaCombLikelihoodComputer(object):
                 "bailing out."
             )
             return None
-        
+
         if not allowNegativeSignals and mu_hat < 0.0:
             mu_hat = 0.0  # fixme for this case we should reevaluate the hessian!
         sigma_mu = np.sqrt(hessian)
@@ -197,7 +197,7 @@ class AnaCombLikelihoodComputer(object):
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected,
                                                         allowNegativeSignals=allowNegativeSignals)
 
-        a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot, 
+        a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                                      allowNegative = allowNegativeSignals )
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
         return mu_lim
@@ -222,7 +222,6 @@ class AnaCombLikelihoodComputer(object):
         xsec = 0.0*fb
         for tp in self.theoryPredictions:
             xsec += tp.xsection.value
-        
         return ul * xsec
 
     def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = False) -> Tuple[float, float, Callable]:
@@ -251,7 +250,7 @@ class AnaCombLikelihoodComputer(object):
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
             nll = self.likelihood(mu, return_nll=True, expected=expected, useCached=False)
             nllA = self.likelihood(mu, expected="posteriori", return_nll=True, useCached=False)
-            return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type)
+            return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll is not None else None
 
         return mu_hat, sigma_mu, clsRoot
 
