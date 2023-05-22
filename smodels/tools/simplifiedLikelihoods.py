@@ -963,7 +963,10 @@ class UpperLimitComputer:
 
         nll0 = computer.likelihood( mu_hat, return_nll=True)
         aModel = copy.deepcopy(model)
-        aModel.observed = array([x + y for x, y in zip(model.backgrounds, theta_hat0)])
+        if model.isLinear():
+            aModel.observed = array([x + y for x, y in zip(model.backgrounds, theta_hat0)]) # old
+        else:
+            aModel.observed = model.A + theta_hat0 + model.C * theta_hat0**2 / model.B**2
         aModel.name = aModel.name + "A"
         # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
         compA = LikelihoodComputer(aModel )
