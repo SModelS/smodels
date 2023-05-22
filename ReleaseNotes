@@ -1,4 +1,4 @@
-Release v2.3.0, Wed 10 May 2023
+Release v2.3.0, Tue 23 May 2023
 =======================================================
 
   * fixed bug for an LHE input only with anti-particles
@@ -20,6 +20,7 @@ Release v2.3.0, Wed 10 May 2023
     - results from CMS:
       CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL,EM), CMS-SUS-21-002 (UL,EM+cov)
     - added expected ULs to CMS-SUS-19-009
+	  - added non-aggregated results for CMS-SUS-16-039, CMS-SUS-16-050, CMS-PAS-SUS-16-052, and CMS-SUS-19-006
 
 
 Release v2.2.1, Tue 18 October 2022
