@@ -211,7 +211,7 @@ Below we give more detailed information about each entry in the parameters file.
 
     + +superseded: adds results which were previously available but were superseded by newer ones; from v2.1.0 onward
 
-    + +nonaggregated: replaces aggregated by non-aggregated SRs in CMS analyses; from v2.2.0 onward
+    + +nonaggregated: adds analyses with non-aggregated SRs in addition to the aggregated results in CMS analyses; from v2.2.0 onward
 
     + +full_llhds: replaces simplified HistFactory statistical models by full ones in ATLAS analyses; from v2.3.0 onward (careful, this increases a lot the runtime!)
 
