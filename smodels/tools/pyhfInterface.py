@@ -513,7 +513,7 @@ class PyhfUpperLimitComputer:
                     1.0, wsData, model, return_fitted_val=True, maxiter=200
                 )
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                logger.error(f"pyhf fixed_poi_fit failed for mu={mu}: {e}")
+                logger.error(f"pyhf fixed_poi_fit failed for {list(self.data.jsonFiles)[workspace_index]} for mu={mu}: {e}")
                 # lets try with different initialisation
                 init, n_ = pyhf.infer.mle.fixed_poi_fit(
                     0.0, workspace.data(model), model, return_fitted_val=True, maxiter=200
@@ -539,7 +539,7 @@ class PyhfUpperLimitComputer:
                         self.restore()
                         return self.exponentiateNLL(None, not return_nll)
                 except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                    logger.info(f"pyhf fixed_poi_fit failed twice for mu={mu}: {e}")
+                    logger.info(f"pyhf fixed_poi_fit failed twice for {list(self.data.jsonFiles)[workspace_index]} for mu={mu}: {e}")
 
                     self.restore()
                     return self.exponentiateNLL(None, not return_nll)
