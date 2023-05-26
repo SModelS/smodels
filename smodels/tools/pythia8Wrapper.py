@@ -124,12 +124,18 @@ class Pythia8Wrapper(WrapperBase):
         super().checkInstallation(compile)
         exists = os.path.exists ( self.includeFile )
         xmldoc = self.getXmldoc()
-        if not os.path.exists ( xmldoc ): # if this disappears, start from scratch
-            import shutil
-            p = xmldoc.find ( "share" )
-            rm = xmldoc[:p-1]
-            shutil.rmtree ( rm, ignore_errors = True )
-            exists = False
+        sleep = 0.
+        while os.path.exists ( xmldoc ): # if this disappears, start from scratch
+            import time
+            sleep += 1.
+            time.sleep ( 1. )
+            if sleep > 2. and not os.path.exists ( xmldoc ): 
+                # after 6 seconds, delete
+                import shutil
+                p = xmldoc.find ( "share" )
+                rm = xmldoc[:p-1]
+                shutil.rmtree ( rm, ignore_errors = True )
+                exists = False
 
         if xmldoc == None:
             exists = False
