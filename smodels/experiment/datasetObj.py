@@ -210,7 +210,7 @@ class DataSet(object):
         if self.dataInfo.dataId:
             return self.dataInfo.dataId
         else:
-            return 'Dataset'
+            return 'Dataset (UL)'
 
     def __eq__(self, other):
         if type(other) != type(self):
@@ -419,7 +419,11 @@ class CombinedDataSet(object):
             self.type = "pyhf"
 
     def __str__(self):
-        ret = "Combined Dataset (%i datasets)" % len(self._datasets)
+        ret = f"Combined Dataset ({len(self._datasets)} datasets)"
+        return ret
+
+    def __repr__(self):
+        ret = f"Combined Dataset ({len(self._datasets)} datasets)"
         return ret
 
     def getIndex(self, dId, datasetOrder):
