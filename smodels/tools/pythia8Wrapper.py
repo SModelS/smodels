@@ -125,11 +125,11 @@ class Pythia8Wrapper(WrapperBase):
         exists = os.path.exists ( self.includeFile )
         xmldoc = self.getXmldoc()
         sleep = 0.
-        while os.path.exists ( xmldoc ): # if this disappears, start from scratch
+        while not os.path.exists ( xmldoc ): # if this disappears, start from scratch
             import time
-            sleep += 1.
+            sleep += .5
             time.sleep ( sleep )
-            if sleep > 6 and not os.path.exists ( xmldoc ): 
+            if sleep > 2 and not os.path.exists ( xmldoc ): 
                 if compile:
                     # after a few seconds, delete, if compile is true
                     import shutil
