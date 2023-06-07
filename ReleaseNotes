@@ -1,3 +1,9 @@
+Release xxxx
+=======================================================
+
+  * fixed bug for reading QNUMBERS from SLHA files
+
+
 Release v2.3.0, Tue 23 May 2023
 =======================================================
 
