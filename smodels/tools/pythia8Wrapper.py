@@ -129,7 +129,7 @@ class Pythia8Wrapper(WrapperBase):
             import time
             sleep += .5
             time.sleep ( sleep )
-            if sleep > 1 and not os.path.exists ( xmldoc ): 
+            if sleep > .5 and not os.path.exists ( xmldoc ): 
                 if compile:
                     # after a few seconds, delete, if compile is true
                     import shutil
@@ -138,6 +138,7 @@ class Pythia8Wrapper(WrapperBase):
                     if False:
                         shutil.rmtree ( rm, ignore_errors = True )
                 exists = False
+                break
 
         if xmldoc == None:
             exists = False
