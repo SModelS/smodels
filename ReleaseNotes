@@ -1,7 +1,8 @@
-Release xxxx
+Release v2.x.x, xxx 2023
 =======================================================
 
   * fixed bug for reading QNUMBERS from SLHA files
+  * small fixes in how pythia6 and pythia8 are built
 
 
 Release v2.3.0, Tue 23 May 2023
