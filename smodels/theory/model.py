@@ -303,7 +303,8 @@ class Model(object):
                 if erasePrompt and particle.Z2parity == -1:
                     logger.debug("Erasing quantum numbers of (prompt) particle %s." %particle.pdg)
                     for attr in erasePrompt:
-                        delattr(particle,attr)
+                        if hasattr ( particle, attr ):
+                            delattr(particle,attr)
             else:
                 particle.decays.append(None) #Include possibility for particle being long-lived (non-prompt)
 

@@ -121,15 +121,24 @@ class Pythia8Wrapper(WrapperBase):
                 self.tempdir = None
 
     def checkInstallation ( self, compile : bool = True ):
-        super().checkInstallation(compile)
+        # super().checkInstallation(compile)
         exists = os.path.exists ( self.includeFile )
         xmldoc = self.getXmldoc()
-        if not os.path.exists ( xmldoc ): # if this disappears, start from scratch
-            import shutil
-            p = xmldoc.find ( "share" )
-            rm = xmldoc[:p-1]
-            shutil.rmtree ( rm, ignore_errors = True )
-            exists = False
+        sleep = 0.
+        while not os.path.exists ( xmldoc ): # if this disappears, start from scratch
+            import time
+            sleep += .5
+            time.sleep ( sleep )
+            if sleep > .5 and not os.path.exists ( xmldoc ): 
+                if compile:
+                    # after a few seconds, delete, if compile is true
+                    import shutil
+                    p = xmldoc.find ( "share" )
+                    rm = xmldoc[:p-1]
+                    if False:
+                        shutil.rmtree ( rm, ignore_errors = True )
+                exists = False
+                break
 
         if xmldoc == None:
             exists = False
