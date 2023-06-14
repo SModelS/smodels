@@ -264,7 +264,7 @@ simply the product of the individual analysis likelihoods,
 The individual likelihoods can correspond to the best signal region, if the combination of signal regions is turned off, or to the combined signal region likelihood otherwise.
 For the determination of the maximum likelihood, `scipy.optimize.minimize <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html>`_ is used
 with the method `BFGS
-<https://docs.scipy.org/doc/scipy/reference/optimize.minimize-bfgs.html#optimize-minimize-bfgs>`_ in order to compute :math:`\mu_{max}` and :math:`\mathcal{L}_{max} = \mathcal{L}_{C}(\mu_{max})`.
+<https://docs.scipy.org/doc/scipy/reference/optimize.minimize-bfgs.html#optimize-minimize-bfgs>`_ in order to compute :math:`\hat{\mu}` and :math:`\mathcal{L}_{max} = \mathcal{L}_{C}(\hat{\mu})`.
 
 The resulting likelihood and :math:`r`-values for the combination are displayed in the :ref:`output <outputDescription>` along with the individual results for each analysis.
 
