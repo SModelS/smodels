@@ -43,6 +43,7 @@ New in Version 2.3.1:
   * fixed bug for reading QNUMBERS from SLHA files
   * small fixes in how pythia6 and pythia8 are built
   * small fix with experimental truncated Gaussian feature
+  * small fix: combinationmatrices are now forced to be symmetric
   * added a recipe for how to use a `combinations matrix <combinationsmatrix.html>`_
 
 New in Version 2.3.0:
