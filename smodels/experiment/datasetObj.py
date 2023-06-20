@@ -101,6 +101,8 @@ class DataSet(object):
             return True
         if self.isCombMatrixCombinableWith_(other):
             return True
+        if other.isCombMatrixCombinableWith_(self):
+            return True
         return False
 
     def isCombMatrixCombinableWith_(self, other):
