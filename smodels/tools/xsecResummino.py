@@ -9,7 +9,14 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
+
 from __future__ import print_function
+import sys
+import os, copy
+current = os.getcwd()
+sys.path.append(current)
+
+
 from smodels import installation
 from smodels.tools import toolBox, runtime
 from smodels.tools.physicsUnits import pb, TeV, GeV
@@ -19,14 +26,13 @@ from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import subprocess
 from concurrent.futures import ProcessPoolExecutor
-import os, copy
+
 import pyslha
 import math
 try:
     import cStringIO as io
 except ImportError as e:
     import io
-import sys
 
 class XSecResummino:
     """ cross section computer class, what else? """
@@ -40,8 +46,8 @@ class XSecResummino:
         :param pythiaVersion: pythia6 or pythia8 (integer)
         :param maycompile: if True, then tools can get compiled on-the-fly
         """
-        self.resummino_bin = "./smodels/tools/resummino-3.1.2/bin/resummino"
-        self.input_file_original = "smodels/tools/ff1a240db6c1719fe9f299b3390d49d32050c4f1003286d2428411eca45bd50c.in"
+        self.resummino_bin = "./smodels/lib/resummino-3.1.2/bin/resummino"
+        self.input_file_original = "smodels/etc/ff1a240db6c1719fe9f299b3390d49d32050c4f1003286d2428411eca45bd50c.in"
         self.slha_folder_name = slha_folder_name
         self.maxOrder = maxOrder
         self.countNoXSecs = 0
@@ -580,64 +586,34 @@ class ArgsStandardizer:
             toFile="all"
         return toFile
 
-def main():
+def main(args):
     
+    
+    canonizer = ArgsStandardizer()
+    setLogLevel ( args.verbosity )
+    if not hasattr ( args, "noautocompile" ):
+        args.noautocompile = False
+        
+    sqrtses = canonizer.getSqrtses ( args )
+    order = canonizer.getOrder ( args )
+    canonizer.checkAllowedSqrtses ( order, sqrtses )
+    inputFiles = canonizer.getInputFiles ( args )
+    ncpus = canonizer.checkNCPUs ( args.ncpus, inputFiles )
+
+    ssmultipliers = None
+    if hasattr ( args, "ssmultipliers" ):
+        ssmultipliers = canonizer.getSSMultipliers ( args.ssmultipliers )
+        if ssmultipliers != None:
+            for pids,multiplier in ssmultipliers.items():
+                if type(pids) != tuple:
+                    logger.error ( "keys of ssmultipliers need to be supplied as tuples" )
+                    sys.exit()
+                if type(multiplier) not in [ int, float ]:
+                    logger.error ( "values of ssmultipliers need to be supplied as ints or floats" )
+                    sys.exit()
+
+
     test = XSecResummino(1, 'smodels/tools/exemple')
     test.routine_resummino()
-    # canonizer = ArgsStandardizer()
-    # setLogLevel ( args.verbosity )
-    # if not hasattr ( args, "noautocompile" ):
-    #     args.noautocompile = False
-    # if args.query:
-    #     return canonizer.queryCrossSections ( args.filename )
-    # if args.colors:
-    #     from smodels.tools.colors import colors
-    #     colors.on = True
-    # sqrtses = canonizer.getSqrtses ( args )
-    # order = canonizer.getOrder ( args )
-    # canonizer.checkAllowedSqrtses ( order, sqrtses )
-    # inputFiles = canonizer.getInputFiles ( args )
-    # ncpus = canonizer.checkNCPUs ( args.ncpus, inputFiles )
-    # pythiaVersion = canonizer.getPythiaVersion ( args )
-    # ssmultipliers = None
-    # if hasattr ( args, "ssmultipliers" ):
-    #     ssmultipliers = canonizer.getSSMultipliers ( args.ssmultipliers )
-    #     if ssmultipliers != None:
-    #         for pids,multiplier in ssmultipliers.items():
-    #             if type(pids) != tuple:
-    #                 logger.error ( "keys of ssmultipliers need to be supplied as tuples" )
-    #                 sys.exit()
-    #             if type(multiplier) not in [ int, float ]:
-    #                 logger.error ( "values of ssmultipliers need to be supplied as ints or floats" )
-    #                 sys.exit()
-
-    # pythiacard = None
-    # if hasattr(args, 'pythiacard'):
-    #     pythiacard = args.pythiacard
-
-    # children = []
-    # for i in range(ncpus):
-    #     pid = os.fork()
-    #     chunk = inputFiles [ i::ncpus ]
-    #     if pid < 0:
-    #         logger.error ( "fork did not succeed! Pid=%d" % pid )
-    #         sys.exit()
-    #     if pid == 0:
-    #         logger.debug ( "chunk #%d: pid %d (parent %d)." %
-    #                    ( i, os.getpid(), os.getppid() ) )
-    #         logger.debug ( " `-> %s" % " ".join ( chunk ) )
-    #         computer = XSecResummino( order, args.nevents, pythiaVersion, \
-    #                                  not args.noautocompile )
-    #         toFile = canonizer.writeToFile ( args )
-    #         computer.computeForBunch (  sqrtses, chunk, not args.keep,
-    #                       args.LOfromSLHA, toFile, pythiacard=pythiacard, \
-    #                     ssmultipliers = ssmultipliers )
-    #         os._exit ( 0 )
-    #     if pid > 0:
-    #         children.append ( pid )
-    # for child in children:
-    #     r = os.waitpid ( child, 0 )
-    #     logger.debug ( "child %d terminated: %s" % (child,r) )
-    # logger.debug ( "all children terminated." )
-
+    
 main()
