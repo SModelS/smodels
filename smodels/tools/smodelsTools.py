@@ -59,6 +59,33 @@ def main():
             help="SLHA file to compute cross sections for. "
             "If a directory is given, compute cross sections for all files in directory." )
 
+    
+    xsecresummino = subparsers.add_parser('xsecresummino', description="Compute Gauginos and Sleptons cross sections for a SLHA file.")
+    xsecresummino.add_argument('-s', '--sqrts', nargs='+', action='append',
+        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). Default is both 8 and 13.",
+        type=float, default=[])
+    xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
+        help="Verbosity (debug, info, warning, error)")
+    xsecresummino.add_argument('-c', '--ncpus', type=int, default=-1,
+        help="number of cores to be used simultaneously. -1 means 'all'. ")
+    xsecresummino.add_argument('-p', '--tofile', action='store_true',
+        help="write cross sections to file (only highest order)")
+    xsecresummino.add_argument('-P', '--alltofile', action='store_true',
+        help="write all cross sections to file, including lower orders")
+    xsecresummino.add_argument( '--noautocompile', action='store_true',
+        help="turn off automatic compilation" )
+    xsecresummino.add_argument('-k', '--keep', action='store_true',
+        help="do not unlink temporary directory")
+    xsecresummino.add_argument('-n', '--NLO', action='store_true',
+        help="compute at the NLO level (default is LO)")
+    xsecresummino.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
+    xsecresummino.add_argument('-S', '--ssmultipliers', type=str, default=None,
+        help="Signal strength multipliers, provided as dictionary of pids")
+    xsecresummino.add_argument('-f', '--filename', required=True,
+            help="SLHA file to compute cross sections for. "
+            "If a directory is given, compute cross sections for all files in directory." )
+    
+    
     slhachecker = subparsers.add_parser('slhachecker', description="Perform several checks on a SLHA file.")
     slhachecker.add_argument('-xS', '--xsec', help='turn off the check for xsection blocks', action='store_false')
     slhachecker.add_argument('-illegal', '--illegal', help='turn on check for kinematically forbidden decays', action='store_true')
@@ -151,6 +178,9 @@ def main():
     if args.subparser_name == 'xseccomputer':
         from smodels.tools import xsecComputer
         xsecComputer.main(args)
+    if args.subparser_name == 'xsecresummino':
+        from smodels.tools import xsecResummino
+        xsecComputer.main(args)
     if args.subparser_name == 'slhachecker':
         from smodels.tools import slhaChecks
         slhaChecks.main(args)
@@ -166,4 +196,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
