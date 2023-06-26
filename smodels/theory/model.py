@@ -353,7 +353,7 @@ class Model(object):
                 p.totalwidth = 0.*GeV
 
     def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
-                        roundMasses = 1, erasePrompt=['spin','eCharge','colordim'], 
+                        roundMasses = 1, erasePrompt=['spin','eCharge','colordim'],
                         minMass=1.0*GeV):
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file.
@@ -377,7 +377,7 @@ class Model(object):
 
         self.inputFile = inputFile
         if promptWidth is None:
-            promptWidth = 1e-8*GeV
+            promptWidth = 1e-11*GeV
         if stableWidth is None:
             stableWidth = 1e-25*GeV
 
