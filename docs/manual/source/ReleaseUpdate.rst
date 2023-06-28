@@ -44,6 +44,7 @@ New in Version 2.3.1:
   * small fixes in how pythia6 and pythia8 are built
   * small fix with experimental truncated Gaussian feature
   * small fix: combinationmatrices are now forced to be symmetric
+  * add isCombinableWith method also for CombinedDataSets
   * added a recipe for how to use a `combinations matrix <combinationsmatrix.html>`_
 
 New in Version 2.3.0:
