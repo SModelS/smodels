@@ -115,7 +115,6 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
             if not allowNegative:
                 bvalues = [1.0, 0.0, 3.0, 10.0, 0.1, 100.0, 1000.0, .01, .001, 10000.0, 100000.0 ]
             for b in bvalues:
-                print(f'Tested {b} with root {rootfinder(b)}')
                 rb = rootfinder(b)
                 if rb is None: # if cls computation failed, try with next b value
                     continue
