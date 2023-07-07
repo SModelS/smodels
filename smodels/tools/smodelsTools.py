@@ -180,7 +180,7 @@ def main():
         xsecComputer.main(args)
     if args.subparser_name == 'xsecresummino':
         from smodels.tools import xsecResummino
-        xsecComputer.main(args)
+        xsecResummino.main(args)
     if args.subparser_name == 'slhachecker':
         from smodels.tools import slhaChecks
         slhaChecks.main(args)

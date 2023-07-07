@@ -46,7 +46,7 @@ class XSecResummino:
         :param pythiaVersion: pythia6 or pythia8 (integer)
         :param maycompile: if True, then tools can get compiled on-the-fly
         """
-        self.resummino_bin = "./smodels/lib/resummino-3.1.2/bin/resummino"
+        self.resummino_bin = "./smodels/lib/resummino/resummino-3.1.2/bin/resummino"
         self.input_file_original = "smodels/etc/ff1a240db6c1719fe9f299b3390d49d32050c4f1003286d2428411eca45bd50c.in"
         self.slha_folder_name = slha_folder_name
         self.maxOrder = maxOrder
@@ -233,7 +233,7 @@ class XSecResummino:
     def create_xsection(self, result, particle_1, particle_2, order, Xsections):
         
         if type(result) == list:
-            for i in range(len(result)):
+            for i in range(self.maxOrder+1):
                 Xsection = crossSection.XSection()
         
                 Xsection.value = float(result[i]) * pb
@@ -612,8 +612,11 @@ def main(args):
                     logger.error ( "values of ssmultipliers need to be supplied as ints or floats" )
                     sys.exit()
 
-
-    test = XSecResummino(1, 'smodels/tools/exemple')
+    print("sqrt :" +str(sqrtses))
+    print("order" + str(order))
+    print("ncpu" + str(ncpus))
+    
+    test = XSecResummino(1, 'exemple')
     test.routine_resummino()
     
-main()
+
