@@ -34,7 +34,7 @@ except ImportError as e:
 
 class XSecResummino(XSecBasis):
     """ cross section computer class, what else? """
-    def __init__ ( self, maxOrder,slha_folder_name, maycompile=True):
+    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
                     if maxOrder == LO, compute only LO pythia xsecs
@@ -51,7 +51,8 @@ class XSecResummino(XSecBasis):
         self.countNoXSecs = 0
         self.countNoNLOXSecs = 0
         self.maycompile = maycompile
-
+        self.ncpu = ncpu
+        self.sqrts = sqrt
     
     def one_slha_calculation(self, particles,input_file, slha_file, output_file, num_try, order):
         """
@@ -311,8 +312,10 @@ class XSecResummino(XSecBasis):
             os.mkdir('resummino_out')
 
         #On créer la liste des fichiers d'entrée
-        liste_slha = os.listdir(slha_folder_name)
-
+        if not slha_folder_name.endswith(".slha"):
+            liste_slha = os.listdir(slha_folder_name)
+        else:
+            liste_slha = [slha_folder_name]
         #ancre
         pwd = os.getcwd()
 
@@ -392,7 +395,7 @@ class XSecResummino(XSecBasis):
         tasks = self.routine_creation(self.maxOrder, self.slha_folder_name)
 
         #On lance le programme avec les performances maximales, à changer si besoin
-        with ProcessPoolExecutor() as executor:
+        with ProcessPoolExecutor(max_workers=self.ncpu) as executor:
             futures = [executor.submit(self.one_slha_calculation, *task) for task in tasks]
             for future in futures:
                 future.result()
@@ -410,7 +413,7 @@ def main(args):
     sqrtses = canonizer.getSqrtses ( args )
     order = canonizer.getOrder ( args )
     canonizer.checkAllowedSqrtses ( order, sqrtses )
-    inputFiles = canonizer.getInputFiles ( args )
+    inputFiles = args.filename.strip()
     ncpus = canonizer.checkNCPUs ( args.ncpus, inputFiles )
 
     ssmultipliers = None
@@ -429,7 +432,7 @@ def main(args):
     print("order" + str(order))
     print("ncpu" + str(ncpus))
     
-    test = XSecResummino(1, 'exemple')
+    test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus)
     test.routine_resummino()
     
 
