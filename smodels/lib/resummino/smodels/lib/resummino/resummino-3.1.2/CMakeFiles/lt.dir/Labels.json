@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/CMakeFiles/lt"
+		},
+		{
+			"file" : "/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/CMakeFiles/lt.rule"
+		},
+		{
+			"file" : "/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/CMakeFiles/lt-complete.rule"
+		},
+		{
+			"file" : "/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-build.rule"
+		},
+		{
+			"file" : "/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-configure.rule"
+		},
+		{
+			"file" : "/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-download.rule"
+		},
+		{
+			"file" : "/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-install.rule"
+		},
+		{
+			"file" : "/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-mkdir.rule"
+		},
+		{
+			"file" : "/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-patch.rule"
+		},
+		{
+			"file" : "/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"lt"
+		],
+		"name" : "lt"
+	}
+}

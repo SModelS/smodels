@@ -1,0 +1,485 @@
+#! /bin/sh
+# configure script for LoopTools
+# note: has nothing to do with GNU autoconf
+# last modified 28 Sep 16 th
+
+
+exec 2> ${LOGFILE:-/dev/null} 3>&1
+eval ${LOGFILE:+set -x}
+
+
+LC_ALL=C
+export LC_ALL
+
+test=test$$
+trap "rm -fr $test*" 0 1 2 3 15
+
+if (echo "test\c"; echo 1,2,3) | grep c > /dev/null ; then
+  if (echo -n test; echo 1,2,3) | grep n > /dev/null ; then
+    echo_n=
+    echo_c='
+'
+  else
+    echo_n=-n
+    echo_c=
+  fi
+else
+  echo_n=
+  echo_c='\c'
+fi
+
+
+findprog() {
+  echo $echo_n "looking for $1... $echo_c" 1>&3
+  shift
+  test -n "$CONF_TARGET" && for prog in "$@" ; do
+    full="`which \"$CONF_TARGET-$prog\" 2> /dev/null`"
+    test -x "$full" && {
+      echo $full 1>&3
+      echo $CONF_TARGET-$prog
+      return 0
+    }
+  done
+  for prog in "$@" ; do
+    full="`which \"$prog\" 2> /dev/null`"
+    test -x "$full" && {
+      echo $full 1>&3
+      echo $prog
+      return 0
+    }
+  done
+  echo "no $@ in your path" 1>&3
+  return 1
+}
+
+
+getldflags() {
+  ldflags="$LDFLAGS $CONF_LDFLAGS"
+
+  while read line ; do
+    set -- `echo $line | tr ':,()' '    '`
+    case $1 in
+    */collect2$CONF_EXE | */ld$CONF_EXE | ld$CONF_EXE) ;;
+    *) continue ;;
+    esac
+    while test $# -gt 1 ; do
+      shift
+      case $1 in
+#      *.o | -lc | -lgcc*)
+      *.o | -lc*)
+        ;;
+      -l* | -L* | *.a)
+        ldflags="$ldflags $1" ;;
+      -Bstatic | -Bdynamic | *.ld)
+        ldflags="$ldflags -Wl,$1" ;;
+      /*)
+        ldflags="$ldflags -L$1" ;;
+      -rpath*)
+        ldflags="$ldflags -Wl,$1,$2"
+        shift ;;
+      -dynamic-linker)
+        shift ;;
+      esac
+    done
+  done
+
+  echo $ldflags
+}
+
+
+CONF_SRC=`dirname $0`/src
+CONF_OS=`uname -s`
+CONF_MACH=`uname -m`
+CONF_DEFPREFIX="$CONF_MACH-$CONF_OS"
+CONF_PREFIX="$CONF_DEFPREFIX"
+CONF_TARGET=
+CONF_STATIC=
+CONF_STATIC_EXT=
+CONF_DEBUG=
+CONF_BITS=
+  # Mma 5.1's mcc needs -lpthread for static linking
+CONF_MCLIBS=-lpthread
+CONF_ARCH_F="-march=native"
+CONF_LDFLAGS=
+CONF_EXE=
+case "$CONF_OS" in
+Darwin)	CONF_LDFLAGS=-Wl,-no_compact_unwind ;;
+CYG*)	CONF_EXE=.exe ;;
+esac
+
+for arg in "$@" ; do
+  case "$arg" in
+  --prefix=*)
+	CONF_PREFIX=`expr "$arg" : ".*--prefix=\(.*\)"` ;;
+  --host=*)
+	CONF_TARGET=`expr "$arg" : ".*--host=\(.*\)"` ;;
+  --static)
+	CONF_STATIC="-static"
+	case "$CONF_OS" in
+# Apple discourages static linking, see
+# http://developer.apple.com/qa/qa2001/qa1118.html,
+# so we make only libgcc static.  For a static libg2c do:
+# sudo chmod 000 /usr/local/lib/libg2c.dylib
+	Darwin | CYG*)
+		CONF_STATIC_EXT=$CONF_STATIC
+		CONF_STATIC= ;;
+	esac ;;
+  --debug)
+	CONF_DEBUG="-O0 -g" ;;
+  --32)
+	CONF_BITS=32 ;;
+  --64)
+	CONF_BITS=64 ;;
+  --generic)
+	CONF_ARCH_F=
+	CONF_AS= ;;
+  --help)
+	cat << _EOF_ 1>&3
+$0 configures LoopTools, i.e. determines or guesses the
+compiler and flags and writes out a makefile.
+
+$0 understands the following options:
+
+--prefix=DIR        use DIR as installation directory,
+
+--host=HOST         target host triplet, e.g. i386-pc-linux,
+
+--static            link the executables statically,
+
+--debug             compile without optimization,
+
+--32                force 32-bit compilation,
+
+--64                force 64-bit compilation.
+
+_EOF_
+	exit 1 ;;
+  -*)
+	echo "Warning: $arg is not a valid option." 1>&3 ;;
+  *=*)
+	eval `echo $arg\" | sed 's/=/="/'` ;;
+  *)
+	echo "Warning: $arg is not a valid argument." 1>&3 ;;
+  esac
+done
+
+test "$CONF_OS" = Linux -a "$CONF_BITS" \!= 32 && CONF_LIBDIRSUFFIX=
+
+CONF_M=${CONF_BITS:+-m$CONF_BITS}
+
+
+## look for some programs
+
+CONF_MAKE=`findprog make $MAKE gmake Make make` || exit 1
+
+CONF_CC=`findprog gcc $CC clang gcc` || exit 1
+
+CONF_CXX=`findprog g++ $CXX  g++` || exit 1
+
+CONF_FC=`findprog fortran $FC gfortran g95 f90` || exit 1
+
+CONF_AR=`findprog ar $AR ar`
+
+CONF_RANLIB=`findprog ranlib $RANLIB ranlib`
+
+CONF_NM=`findprog nm $NM nm`
+
+CONF_DLLTOOL=`findprog dlltool $DLLTOOL dlltool`
+
+CONF_DEF="-D"
+
+set -- `$CONF_FC --version -c | sed '/^$/d;s/(.*)//;q' 2>&1`
+case "$1,$2,$3" in
+GNU,Fortran,[123].*)
+  CONF_SIMD=0
+  CONF_FFLAGS="\
+${FFLAGS-${CONF_DEBUG:--O1} ${CONF_DEBUG:+-Wall}} \
+$CONF_ARCH_F $CONF_M -g -ffixed-line-length-none -fno-range-check \
+$CONF_STATIC"
+  ;;
+GNU,Fortran,4.*)
+  CONF_SIMD=0
+  CONF_FFLAGS="\
+${FFLAGS-${CONF_DEBUG:--O3} ${CONF_DEBUG:+-Wall -Wno-unused-dummy-argument -Wtabs -ffpe-trap=invalid,overflow,zero} $CONF_ARCH} \
+$CONF_ARCH_F $CONF_M -g -ffixed-line-length-none -fno-range-check ${CONF_QUAD:+-fdefault-real-8} $CONF_AS \
+$CONF_STATIC ${CONF_STATIC_EXT:+-static-libgfortran -static-libgcc}"
+  ;;
+GNU,Fortran,*)
+  CONF_SIMD=0
+  CONF_FFLAGS="\
+${FFLAGS-${CONF_DEBUG:--O3} ${CONF_DEBUG:+-Wall -Wno-unused-dummy-argument -Wno-tabs -ffpe-trap=invalid,overflow,zero} $CONF_ARCH} \
+$CONF_ARCH_F $CONF_M -g -ffixed-line-length-none -fno-range-check ${CONF_QUAD:+-fdefault-real-8} $CONF_AS \
+$CONF_STATIC ${CONF_STATIC_EXT:+-static-libgfortran -static-libgcc}"
+  ;;
+pgf*)
+  CONF_ARCH_F=${CONF_ARCH_F:+-Mvect=simd}
+  CONF_CPPLIBS=-pgc++libs
+  CONF_FFLAGS="\
+${FFLAGS-${CONF_DEBUG:--O3} ${CONF_DEBUG:+-Minform=inform -Ktrap=fp} ${CONF_ARCH:+-Mvect=simd}} \
+$CONF_ARCH_F $CONF_M -g -Mextend -g77libs \
+${CONF_STATIC:+-Bstatic}"
+  ;;
+ifort*)
+  CONF_FFLAGS="\
+${FFLAGS-${CONF_DEBUG:--O3} $CONF_ARCH} \
+$CONF_ARCH_F $CONF_M -debug -extend_source -warn truncated_source -warn nouncalled -assume bscc \
+${CONF_QUAD:+-r16 -DDBLE=QEXT -DDIMAG=QIMAG -DDCONJG=QCONJG -DDCMPLX=QCMPLX} \
+$CONF_STATIC ${CONF_STATIC_EXT:+-static-intel}"
+  ;;
+*)
+  CONF_FFLAGS="${CONF_DEBUG:--O} -g"
+  ;;
+esac
+
+
+## find the Fortran libraries
+
+echo $echo_n "extracting the Fortran libraries... $echo_c" 1>&3
+
+rm -fr $test*
+
+cat > $test.f << _EOF_
+	program dontpanic
+	print *, "Hi"
+	end
+_EOF_
+eval ${LOGFILE:+cat $test.f 1>&2}
+
+CONF_LDFLAGS=`$CONF_FC $CONF_FFLAGS -v -o $test $test.f 2>&1 | getldflags`
+
+echo $CONF_LDFLAGS 1>&3
+
+
+test -z "$CONF_BITS" && case "$CONF_MACH" in
+*86*)	CONF_BITS=32
+	case "`file $test`" in
+	*x86?64*) CONF_BITS=64 ;;
+	esac
+	CONF_M="-m$CONF_BITS" ;;
+esac
+
+case "`$CONF_CC --version -c 2>&1`" in
+*gcc*) CONF_STATIC_GCC="$CONF_STATIC_EXT" ;;
+esac
+
+CONF_CFLAGS="${CFLAGS-${CONF_DEBUG:--O3 -g} -fomit-frame-pointer -ffast-math -Wall} $CONF_M $CONF_STATIC ${CONF_STATIC_GCC:+-static-libgcc}"
+
+CONF_CXXFLAGS="${CXXFLAGS-${CONF_DEBUG:--O3 -g} -fomit-frame-pointer -ffast-math -Wall} $CONF_M $CONF_STATIC ${CONF_STATIC_GCC:+-static-libstdc++ -static-libgcc}"
+
+
+## does f77 support REAL*16?
+
+echo $echo_n "does $CONF_FC support REAL*16... $echo_c" 1>&3
+
+rm -fr $test*
+
+cat > $test.f << _EOF_
+	program test
+	real*16 a, b
+	a = 2D0**(52/2+2)
+	b = a + 1/a
+	if( a .eq. b ) call exit(1)
+	end
+_EOF_
+eval ${LOGFILE:+cat $test.f 1>&2}
+
+$CONF_FC $CONF_FFLAGS $test.f -o $test$CONF_EXE 1>&2
+
+if ./$test$CONF_EXE 1>&2 ; then
+  echo "yes" 1>&3
+  CONF_QUAD=1
+else
+  echo "no" 1>&3
+  CONF_QUAD=0
+fi
+
+
+## does Fortran need externals for U77 routines?
+
+echo $echo_n "does $CONF_FC need externals for U77 routines... $echo_c" 1>&3
+
+rm -fr $test*
+
+cat > $test.f << _EOF_
+	program test
+	implicit none
+	print *, iargc(), len_trim("Hi")
+	end
+_EOF_
+eval ${LOGFILE:+cat $test.f 1>&2}
+
+if $CONF_FC $CONF_FFLAGS -c $test.f 1>&2 ; then
+  echo "no" 1>&3
+  CONF_U77EXT=0
+else
+  echo "yes" 1>&3
+  CONF_U77EXT=1
+fi
+
+
+## does Fortran append underscores to symbols?
+
+echo $echo_n "does $CONF_FC append underscores... $echo_c" 1>&3
+
+rm -fr $test*
+
+echo "void uscore$$_() {}" > $test-c.c
+eval ${LOGFILE:+cat $test-c.c 1>&2}
+
+cat > $test.f << _EOF_
+	program test_uscore
+	call uscore$$
+	end
+_EOF_
+eval ${LOGFILE:+cat $test.f 1>&2}
+
+$CONF_CC $CONF_CFLAGS -c $test-c.c 1>&2
+
+if $CONF_FC $CONF_FFLAGS -o $test $test.f $test-c.o 1>&2 ; then
+  echo "yes" 1>&3
+  CONF_NOUNDERSCORE=0
+else
+  echo "no" 1>&3
+  CONF_NOUNDERSCORE=1
+fi
+
+
+## are we on a big-endian machine?
+
+echo $echo_n "are we big-endian... $echo_c" 1>&3
+
+rm -fr $test*
+
+cat > $test.c << _EOF_
+#include <stdio.h>
+int main() {
+  union { int i; char c; } u;
+  u.i = 1;
+  u.c = 0;
+  printf("%d\n", u.i != 0);
+}
+_EOF_
+eval ${LOGFILE:+cat $test.c 1>&2}
+
+$CONF_CC $CONF_CFLAGS -o $test$CONF_EXE $test.c 1>&2
+
+if test "`./$test$CONF_EXE`" = 1 ; then
+  echo "yes" 1>&3
+  CONF_BIGENDIAN=1
+else
+  echo "no" 1>&3
+  CONF_BIGENDIAN=0
+fi
+
+
+## can we do MathLink compilations
+
+echo $echo_n "do we have MathLink... $echo_c" 1>&3
+
+rm -fr $test*
+
+cat > $test.tm << _EOF_
+:Begin:
+:Function: test
+:Pattern: Test[i_Integer]
+:Arguments: {i}
+:ArgumentTypes: {Integer}
+:ReturnType: Integer
+:End:
+
+#include "mathlink.h"
+
+static int test(const int i) {
+  return i + 1;
+}
+
+int main(int argc, char **argv) {
+  return MLMain(argc, argv);
+}
+_EOF_
+eval ${LOGFILE:+cat $test.tm 1>&2}
+
+CONF_MCC=${MCC:-mcc}
+CONF_MCFLAGS="-st ${CONF_BITS:+-b$CONF_BITS}"
+
+# this is a workaround for a bug in mcc 11.0:
+ln -s `dirname $0` =.
+
+for CONF_STDCPP in "" -stdlib=libstdc++ ; do
+  NM="$CONF_NM" DLLTOOL="$CONF_DLLTOOL" \
+  CC="$CONF_SRC/tools/fcc.in" REALCC="$CONF_CC $CONF_CFLAGS" \
+  CXX="$CONF_SRC/tools/f++.in" REALCXX="$CONF_CXX $CONF_CXXFLAGS $CONF_STDCPP" \
+  PATH="$PATH:$CONF_SRC/tools" \
+    "$CONF_MCC" $CONF_MCFLAGS -o $test$CONF_EXE $test.tm $CONF_MCLIBS 1>&2
+  test -x $test$CONF_EXE && break
+done
+
+rm -f =.
+
+if test -x $test$CONF_EXE ; then
+  echo "yes" 1>&3
+  CONF_ML=1
+else
+  echo "no" 1>&3
+  CONF_ML=0
+fi
+
+
+case "$CONF_OS" in
+Linux*)	cpus=`grep -c processor /proc/cpuinfo` ;;
+Darwin)	cpus=`system_profiler SPHardwareDataType | \
+	  awk '/Total Number .f Cores:/ { print $5 }'` ;;
+esac
+test "${cpus:-1}" -gt 1 && CONF_PARALLEL="-j $cpus"
+
+
+echo "creating makefile" 1>&3
+
+(sed 's/  */ /g' ; cat `dirname $0`/makefile.in) > makefile << _EOF_
+# --- variables defined by configure ---
+
+SRC = $CONF_SRC
+PREFIX = $CONF_PREFIX
+LIBDIRSUFFIX = $CONF_LIBDIRSUFFIX
+
+EXE = $CONF_EXE
+DEF = $CONF_DEF
+NOUNDERSCORE = $CONF_NOUNDERSCORE
+
+FC = $CONF_FC
+FFLAGS = $CONF_FFLAGS \$(DEF)QUAD=$CONF_QUAD \$(DEF)U77EXT=$CONF_U77EXT
+
+CC = $CONF_CC
+CFLAGS = $CONF_CFLAGS -DNOUNDERSCORE=\$(NOUNDERSCORE) -DBIGENDIAN=$CONF_BIGENDIAN
+
+CXX = $CONF_CXX
+CXXFLAGS = $CONF_CXXFLAGS $CONF_STDCPP
+
+ML = $CONF_ML
+MCC = $CONF_MCC
+MCFLAGS = $CONF_MCFLAGS
+MCLIBS = $CONF_MCLIBS
+
+LDFLAGS = $CONF_LDFLAGS $CONF_M
+
+AR = $CONF_AR
+RANLIB = $CONF_RANLIB
+NM = $CONF_NM
+DLLTOOL = $CONF_DLLTOOL
+
+PARALLEL = $CONF_PARALLEL
+
+# --- end defs by configure ---
+
+
+_EOF_
+
+
+cat << _EOF_ 1>&3
+
+now you must run $CONF_MAKE
+
+_EOF_
+
+exit 0
+

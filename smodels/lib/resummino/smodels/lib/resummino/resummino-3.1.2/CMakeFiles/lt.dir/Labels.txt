@@ -1,0 +1,13 @@
+# Target labels
+ lt
+# Source files and their labels
+/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/CMakeFiles/lt
+/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/CMakeFiles/lt.rule
+/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/CMakeFiles/lt-complete.rule
+/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-build.rule
+/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-configure.rule
+/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-download.rule
+/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-install.rule
+/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-mkdir.rule
+/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-patch.rule
+/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino-3.1.2/lt-prefix/src/lt-stamp/lt-update.rule

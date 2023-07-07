@@ -1,0 +1,1 @@
+cmd='/usr/bin/cmake;-E;env;FFLAGS=-std=legacy;CCFLAGS=-fPIC;CPPFLAGS=-fPIC;/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/resummino-3.1.2/external/lib/LoopTools-2.13/configure;--prefix=<INSTALL_DIR>'

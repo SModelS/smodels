@@ -1,0 +1,2 @@
+/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino_install/bin/resummino
+/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/smodels/lib/resummino/resummino_install/lib/liblibresummino.a

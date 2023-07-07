@@ -1,0 +1,10 @@
+QUADSUFFIX = -quad
+F90 = f90
+FC-quad = ./q77
+FFLAGS-quad = -DQUAD=1 -DKIND=2
+CFLAGS-quad = -DKIND=2
+OBJS-quad = qcomplex.o
+INCLUDE-quad = $(BLD)/looptools.h90 $(BLD)/qcomplex.mod
+
+include makefile
+

@@ -1,0 +1,117 @@
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21150mu0.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu450.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu800.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu850.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu1000.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu750.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu950.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu550.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu500.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21150mu0.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu450.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu800.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu850.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu1000.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu750.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu550.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu500.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu950.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21150mu0.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu450.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu850.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu800.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu1000.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu500.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu750.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu950.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu550.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21150mu0.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu450.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu800.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu1000.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu500.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu950.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu550.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu750.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu850.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21150mu0.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu450.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu800.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu850.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu1000.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu750.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu500.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu950.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu550.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21150mu0.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu450.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu800.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu850.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu1000.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu500.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu750.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu550.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu950.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21150mu0.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu450.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu850.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu750.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu500.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu800.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu550.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu950.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu1000.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21150mu0.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu450.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu800.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu1000.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu850.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu750.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu950.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu550.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu500.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21150mu0.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu450.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu850.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu800.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu1000.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu750.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu500.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu950.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu550.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21150mu0.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu450.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu800.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu850.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu1000.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu750.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu500.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu950.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu550.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu450.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu800.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21150mu0.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu750.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu950.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu550.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu850.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu1000.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu500.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21150mu0.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu450.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu800.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu850.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu1000.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu750.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu500.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu950.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu550.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21150mu0.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu450.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu800.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu850.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu1000.slha
+[(1000023, 1000037), (1000023, -1000037), (1000025, 1000037), (1000025, -1000037), (-1000037, 1000037), (1000023, 1000025)] cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_2350mu750.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu500.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21350mu550.slha
+None cross-sections written in /home/supersymmetry/Documents/lpsc/test/smodels/exemple/outputM_12000M_21100mu950.slha

@@ -1,0 +1,78 @@
+BLOCK SMINPUTS  # Standard Model inputs
+         1     1.28000000E+02   # alpha_em^-1(M_Z)^MSbar
+         3     1.18000000E-01   # alpha_S(M_Z)^MSbar
+         4     9.11900000E+01   # M_Z pole mass
+         5     4.25000000E+00   # mb(mb)^MSbar
+         6     1.73100000E+02   # mt pole mass
+         7     1.77700000E+00   # mtau pole mass
+#
+BLOCK MASS  # Mass Spectrum
+# PDG code           mass       particle
+         5     4.87884433E+00   # b pole mass calculated from mb(mb)_MSbar
+        24     8.04902344E+01   # W+
+        32     4.00000000E+03   # Z'
+        34     4.00000000E+03   # W'
+#
+BLOCK ZpddL # Z' couplings to a left-handed d dbar pair
+  1 1 -0.313717E+00  # ZpddL(1,1)
+  2 2 -0.313717E+00  # ZpddL(2,2)
+  3 3 -0.313717E+00  # ZpddL(3,3)
+#
+BLOCK ZpddR # Z' couplings to a right-handed d dbar pair
+  1 1 0.0574096E+00  # ZpddR(1,1)
+  2 2 0.0574096E+00  # ZpddR(2,2)
+  3 3 0.0574096E+00  # ZpddR(3,3)
+#
+BLOCK ZpuuL # Z' couplings to a left-handed u ubar pair
+  1 1 0.256308E+00  # ZpuuL(1,1)
+  2 2 0.256308E+00  # ZpuuL(2,2)
+  3 3 0.256308E+00  # ZpuuL(3,3)
+#
+BLOCK ZpuuR # Z' couplings to a right-handed u ubar pair
+  1 1 -0.114819E+00  # ZpuuR(1,1)
+  2 2 -0.114819E+00  # ZpuuR(2,2)
+  3 3 -0.114819E+00  # ZpuuR(3,3)
+#
+BLOCK ZpvvL # Z' couplings to a neutrino pair
+  1 1 0.371127E+00  # ZpvvL(1,1)
+  2 2 0.371127E+00  # ZpvvL(2,2)
+  3 3 0.371127E+00  # ZpvvL(3,3)
+#
+BLOCK ZpllL # Z' couplings to a left-handed lepton pair
+  1 1 -0.198898E+00  # ZpllL(1,1)
+  2 2 -0.198898E+00  # ZpllL(2,2)
+  3 3 -0.198898E+00  # ZpllL(3,3)
+#
+BLOCK ZpllR # Z' couplings to a right-handed l lbar pair
+  1 1 0.172229E+00  # ZpllR(1,1)
+  2 2 0.172229E+00  # ZpllR(2,2)
+  3 3 0.172229E+00  # ZpllR(3,3)
+#
+BLOCK WpudL # W' couplings to a left-handed u dbar pair (real part)
+  1 1  4.572930E-01  # WpudL(1,1)
+  1 2  1.059110E-01  # WpudL(1,2)
+  1 3  5.966960E-04  # WpudL(1,3)
+  2 1 -1.058440E-01  # WpudL(2,1)
+  2 2  4.568950E-01  # WpudL(2,2)
+  2 3  1.949260E-02  # WpudL(2,3)
+  3 1  3.817360E-03  # WpudL(3,1)
+  3 2 -1.912460E-02  # WpudL(3,2)
+  3 3  4.689920E-01  # WpudL(3,3)
+#
+BLOCK IMWpudL # W' couplings to a left-handed u dbar pair (im. part)
+  1 3 -1.534790E-03  # WpudL(1,3)
+  2 1 -6.209160E-05  # WpudL(2,1)
+  2 2 -1.438060E-05  # WpudL(2,2)
+  3 1 -1.493920E-03  # WpudL(3,1)
+  3 2 -3.459980E-04  # WpudL(3,2)
+#
+BLOCK WpvlL # W' couplings to a left-handed l vl ubar pair
+  1 1  4.694000E-01  # WpvlL(1,1)
+  2 2  4.694000E-01  # WpvlL(2,2)
+  3 3  4.694000E-01  # WpvlL(3,3)
+#
+#         PDG            Width
+DECAY        23     2.41143316E+00   # Z width
+DECAY        24     2.00282196E+00   # W width
+DECAY        32     1.19165000E+02   # Z' width
+DECAY        34     1.42850000E+02   # W' width
