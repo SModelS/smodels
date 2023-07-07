@@ -21,7 +21,6 @@ cd $install_dir
 
 wget https://resummino.hepforge.org/downloads/?f=resummino-3.1.2.zip -O resummino-3.1.2.zip
 
-sudo apt-get install libboost-dev libgsl-dev
 
 unzip resummino-3.1.2.zip
 mkdir -p resummino_install
