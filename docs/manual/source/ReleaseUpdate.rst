@@ -46,6 +46,7 @@ New in Version 2.3.1:
   * small fix: combinationmatrices are now forced to be symmetric
   * add isCombinableWith method also for CombinedDataSets
   * added a recipe for how to use a `combinations matrix <combinationsmatrix.html>`_
+  * `runtime.nCPUs() <tools.html#tools.runtime.nCPUs>`_ now returns number of available CPUs, not all CPUs
 
 New in Version 2.3.0:
 ^^^^^^^^^^^^^^^^^^^^^
