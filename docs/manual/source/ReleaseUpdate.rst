@@ -45,6 +45,7 @@ New in Version 2.3.1:
   * small fix with experimental truncated Gaussian feature
   * small fix: combinationmatrices are now forced to be symmetric
   * added a recipe for how to use a `combinations matrix <combinationsmatrix.html>`_
+  * :ref:`xsecComputer <xsecCalc>` now has --tempdir option
 
 New in Version 2.3.0:
 ^^^^^^^^^^^^^^^^^^^^^

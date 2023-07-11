@@ -6,6 +6,7 @@ Release v2.3.1, xxx 2023
   * small fix with experimental truncated Gaussian feature
   * small fix: combinationmatrices are now forced to be symmetric
   * added a recipe for how to use a combinations matrix
+  * xseccomputer now has --tempdir option
 
 
 Release v2.3.0, Tue 23 May 2023
