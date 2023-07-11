@@ -574,6 +574,12 @@ class ArgsStandardizer:
             toFile="all"
         return toFile
 
+    def tempDir ( self, args ):
+        ret = "/tmp/"
+        if hasattr ( args, "tempdir" ):
+            ret = args.tempdir
+        return ret
+
 def main(args):
     canonizer = ArgsStandardizer()
     setLogLevel ( args.verbosity )
@@ -618,7 +624,7 @@ def main(args):
                        ( i, os.getpid(), os.getppid() ) )
             logger.debug ( " `-> %s" % " ".join ( chunk ) )
             computer = XSecComputer( order, args.nevents, pythiaVersion, \
-                                     not args.noautocompile, args.tempdir )
+                                   not args.noautocompile, canonizer.tempDir(args) )
             toFile = canonizer.writeToFile ( args )
             computer.computeForBunch (  sqrtses, chunk, not args.keep,
                           args.LOfromSLHA, toFile, pythiacard=pythiacard, \
