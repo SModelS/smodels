@@ -254,9 +254,11 @@ class AnaCombLikelihoodComputer(object):
 
         return mu_hat, sigma_mu, clsRoot
 
-    def computeCLs(self, expected: bool = False, return_type: Text = "1-CLs"):
+    def CLs( self, mu : float = 1., expected: Union[Text,bool] = False,
+             return_type: Text = "CLs" ):
         """
-        Compute the exclusion confidence level of the model (1-CLs)
+        Compute the exclusion confidence level of the model
+        :param mu: compute for the parameter of interest mu
         :param expected: if false, compute observed, true: compute a priori expected
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
@@ -266,7 +268,7 @@ class AnaCombLikelihoodComputer(object):
         assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
         _, _, clsRoot = self.getCLsRootFunc(expected=expected)
 
-        return clsRoot(1.0, return_type=return_type)
+        return clsRoot(mu, return_type=return_type)
 
     def getLlhds(self,muvals,expected=False,normalize=True):
         """

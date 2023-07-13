@@ -48,6 +48,7 @@ New in Version 2.3.1:
   * added a recipe for how to use a `combinations matrix <combinationsmatrix.html>`_
   * `runtime.nCPUs() <tools.html#tools.runtime.nCPUs>`_ now returns number of available CPUs, not all CPUs
   * :ref:`xsecComputer <xsecCalc>` now has --tempdir option
+  * the StatsComputer now has `CLs <tools.html#tools.statsTools.StatsComputer.CLs>`_ method
 
 New in Version 2.3.0:
 ^^^^^^^^^^^^^^^^^^^^^

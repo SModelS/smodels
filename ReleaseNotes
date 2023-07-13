@@ -9,6 +9,7 @@ Release v2.3.1, xxx 2023
   * added a recipe for how to use a combinations matrix
   * runtime.nCPUs() now returns number of available CPUs, not all CPUs
   * xseccomputer now has --tempdir option
+  * statsComputer now has CLs method
 
 
 Release v2.3.0, Tue 23 May 2023
