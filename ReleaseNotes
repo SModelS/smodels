@@ -3,15 +3,15 @@ Release v2.3.1, xxx 2023
 
   * fixed bug for reading QNUMBERS from SLHA files
   * small fixes in how pythia6 and pythia8 are built
-  * small fix with experimental truncated Gaussian feature
-  * small fix: combinationmatrices are now forced to be symmetric
+  * small fix in truncated Gaussian llhd experimental feature
   * small fix in computation of combined upper limits
-  * add isCombinableWith method also for CombinedDataSets
+  * combinationmatrices are now forced to be symmetric
+  * added isCombinableWith method also for CombinedDataSets
   * added a recipe for how to use a combinations matrix
   * runtime.nCPUs() now returns number of available CPUs, not all CPUs
   * xseccomputer now has --tempdir option
   * StatsComputer now has CLs method
-  * changed default prompt width from 1e-8 gev to 1e-11 in code
+  * changed default prompt width from 1e-8 to 1e-11 GeV in code
 
 
 Release v2.3.0, Tue 23 May 2023

@@ -42,15 +42,15 @@ New in Version 2.3.1:
 
   * fixed bug for reading QNUMBERS from SLHA files
   * small fixes in how pythia6 and pythia8 are built
-  * small fix with experimental truncated Gaussian feature
-  * small fix: combinationmatrices are now forced to be symmetric
+  * small fix in truncated Gaussian llhd experimental feature
   * small fix in computation of combined upper limits
-  * add isCombinableWith method also for CombinedDataSets
+  * combinationmatrices are now forced to be symmetric
+  * added isCombinableWith method also for CombinedDataSets
   * added a recipe for how to use a `combinations matrix <combinationsmatrix.html>`_
   * `runtime.nCPUs() <tools.html#tools.runtime.nCPUs>`_ now returns number of available CPUs, not all CPUs
   * :ref:`xsecComputer <xsecCalc>` now has --tempdir option
   * StatsComputer now has `CLs <tools.html#tools.statsTools.StatsComputer.CLs>`_ method
-  * changed default prompt width from 1e-8 gev to 1e-11 in code
+  * changed default prompt width from 1e-8 to 1e-11 GeV in code
 
 New in Version 2.3.0:
 ^^^^^^^^^^^^^^^^^^^^^
