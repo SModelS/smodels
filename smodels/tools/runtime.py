@@ -63,8 +63,8 @@ def nCPUs():
         # next few lines taken from
         # https://stackoverflow.comhttps//stackoverflow.com/questions/1006289/how-to-find-out-the-number-of-cpus-using-python/questions/1006289/how-to-find-out-the-number-of-cpus-using-python
         import re
-        m = re.search(r'(?m)^Cpus_allowed:\s*(.*)$',
-                      open('/proc/self/status').read())
+        with open('/proc/self/status') as f:
+            m = re.search(r'(?m)^Cpus_allowed:\s*(.*)$', f.read())
         if m:
             res = bin(int(m.group(1).replace(',', ''), 16)).count('1')
             if res > 0:
