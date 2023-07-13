@@ -10,6 +10,7 @@ Release v2.3.1, xxx 2023
   * runtime.nCPUs() now returns number of available CPUs, not all CPUs
   * xseccomputer now has --tempdir option
   * statsComputer now has CLs method
+  * changed default prompt width from 1e-8 gev to 1e-11 in code
 
 
 Release v2.3.0, Tue 23 May 2023

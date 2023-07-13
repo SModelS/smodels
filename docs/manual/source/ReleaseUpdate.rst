@@ -49,6 +49,7 @@ New in Version 2.3.1:
   * `runtime.nCPUs() <tools.html#tools.runtime.nCPUs>`_ now returns number of available CPUs, not all CPUs
   * :ref:`xsecComputer <xsecCalc>` now has --tempdir option
   * the StatsComputer now has `CLs <tools.html#tools.statsTools.StatsComputer.CLs>`_ method
+  * changed default prompt width from 1e-8 gev to 1e-11 in code
 
 New in Version 2.3.0:
 ^^^^^^^^^^^^^^^^^^^^^
