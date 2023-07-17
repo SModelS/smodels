@@ -44,16 +44,38 @@ def getParticlesFromSLHA(slhafile):
 
     logger.debug("Trying to define BSM particles from SLHA input file %s" %filename)
 
-    #Read file and extract blocks:
+    #Read file and extract blocks 
+    # (can not use pyslha, since it only allows for a single block per block name):
     with open(filename,'r') as f:
         data = f.read()
     data = data.lower()
-    data = data[:data.find('\ndecay')]
-    data = data[:data.find('\nxsection')]
-    blocks = [b.splitlines() for b in data.split('\nblock')]
+    qnumberBlocks = []
+    qBlock = False
+    for l in data.splitlines():
+        l = l.strip()
+        # Ignore empty lines and comments
+        if not l or l.startswith('#'):
+            continue
+        # Beginning of QNUMBERS block
+        if l.startswith('block qnumbers'):
+            qBlock = True
+            qnumberBlocks.append([l])
+            continue
+        # If any other block is starting set qBlock to False
+        elif l.startswith('block'):
+            qBlock = False
+            continue
+        # If a cross-section or decay block is starting set qBlock to False
+        elif l.startswith('xsection') or l.startswith('decay'):
+            qBlock = False
+            continue                   
+        
+        # If current block is not a qnumbers block, skip
+        if not qBlock:
+            continue
+        # Add line to qnumbers block
+        qnumberBlocks[-1].append(l)
 
-    #Extract qnumber blocks
-    qnumberBlocks = [b for b in blocks if 'qnumbers' in b[0]]
     if not qnumberBlocks:
         logger.error("No QNUMBERS blocks were found in %s" %slhafile)
         raise SModelSError()
@@ -61,7 +83,8 @@ def getParticlesFromSLHA(slhafile):
     #Build list of BSM particles:
     BSMList = []
     for b in qnumberBlocks:
-        headerInfo = [x for x in b[0].replace('qnumbers','').split() if x != '#']
+        headerInfo = [x for x in b[0].replace('block','').replace('qnumbers','').split() 
+                      if x != '#']
         if headerInfo[0].replace('-','').replace('+','').isdigit():
             pdg = eval(headerInfo[0])
         else:

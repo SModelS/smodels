@@ -27,7 +27,8 @@ import sys
 
 class XSecComputer:
     """ cross section computer class, what else? """
-    def __init__ ( self, maxOrder, nevents, pythiaVersion, maycompile=True ):
+    def __init__ ( self, maxOrder, nevents, pythiaVersion, maycompile=True,
+                   defaulttempdir : str = "/tmp/" ):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
                     if maxOrder == LO, compute only LO pythia xsecs
@@ -36,6 +37,7 @@ class XSecComputer:
         :param nevents: number of events for pythia run
         :param pythiaVersion: pythia6 or pythia8 (integer)
         :param maycompile: if True, then tools can get compiled on-the-fly
+        :param defaulttempdir: the default temp directory
         """
         self.maxOrder = self._checkMaxOrder ( maxOrder )
         self.countNoXSecs = 0
@@ -50,6 +52,7 @@ class XSecComputer:
                             ( pythiaVersion ) )
             sys.exit()
         self.pythiaVersion = pythiaVersion
+        self.defaulttempdir = defaulttempdir
 
     def _checkSLHA ( self, slhafile ):
         if not os.path.isfile(slhafile):
@@ -206,6 +209,7 @@ class XSecComputer:
         """ returns the pythia tool that is configured to be used """
         ret= toolBox.ToolBox().get("pythia%d" % self.pythiaVersion )
         ret.maycompile = self.maycompile
+        ret.defaulttempdir = self.defaulttempdir
         return ret
 
     def compute ( self, sqrts, slhafile,  lhefile=None, unlink=True, loFromSlha=None,
@@ -570,6 +574,12 @@ class ArgsStandardizer:
             toFile="all"
         return toFile
 
+    def tempDir ( self, args ):
+        ret = "/tmp/"
+        if hasattr ( args, "tempdir" ):
+            ret = args.tempdir
+        return ret
+
 def main(args):
     canonizer = ArgsStandardizer()
     setLogLevel ( args.verbosity )
@@ -614,7 +624,7 @@ def main(args):
                        ( i, os.getpid(), os.getppid() ) )
             logger.debug ( " `-> %s" % " ".join ( chunk ) )
             computer = XSecComputer( order, args.nevents, pythiaVersion, \
-                                     not args.noautocompile )
+                                   not args.noautocompile, canonizer.tempDir(args) )
             toFile = canonizer.writeToFile ( args )
             computer.computeForBunch (  sqrtses, chunk, not args.keep,
                           args.LOfromSLHA, toFile, pythiacard=pythiacard, \

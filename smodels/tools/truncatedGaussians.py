@@ -168,6 +168,9 @@ class TruncatedGaussians:
         numerator = erf((self.upperLimitOnMu - mu) / self.denominator) + \
                     erf( mu / self.denominator)
         denominator = 1.0 + erf(mu / self.denominator)
+        if denominator == 0. and np.isclose ( numerator, denominator ):
+            ## 0 / 0 = 1 (in this case)
+            return 1. - self.cl
         ret = numerator / denominator - self.cl
         return ret
 
@@ -182,15 +185,27 @@ class TruncatedGaussians:
         if xb == None:
             xb = max(self.upperLimitOnMu, self.expectedUpperLimitOnMu)
         c = 0
-        while self._root_func(xa) * self._root_func(xb) > 0:
-            xa = 2 * xa
+        ra, rb = self._root_func(xa), self._root_func(xb)
+        while ra * rb > 0:
             c += 1
             if c > 10:
-                logger.error(
-                    f"cannot find bracket for brent bracketing ul={self.upperLimitOnMu:.2f}, eul={self.expectedUpperLimitOnMu:.2f},r({xa:.2f})={self._root_func(xa):.2f}, r({xb:.2f})={self._root_func(xb):.2f}"
-                )
+                line = f"cannot find bracket for brent bracketing ul={self.upperLimitOnMu:.2f}, eul={self.expectedUpperLimitOnMu:.2f},r({xa:.2f})={self._root_func(xa):.2f}, r({xb:.2f})={self._root_func(xb):.2f}"
+                logger.error( line )
+                raise ValueError ( line )
+            while ra < 0.:
+                xa = xa - 1.5 * abs(xa)-.3
+                ra = self._root_func ( xa )
+            while rb > 0.:
+                xb = xb + 1.5 * abs(xb)+.3
+                rb = self._root_func ( xb )
 
-        muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-07, xtol=1e-07)
+        try:
+            muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-07, xtol=1e-07)
+        except ValueError as e:
+            logger.error ( f"truncated gaussian got ValueError {e}: rf({xa:.2f})={self._root_func(xa):.2f}, rf({xb:.2f})={self._root_func(xb):.2f}" )
+            logger.error ( f"ul={self.upperLimitOnMu:.2f}, eul={self.expectedUpperLimitOnMu:.2f}" )
+            muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02)
+            logger.error ( f"retry with tol=1e-2 seemed to have worked" )
         return muhat
 
     def _computeLlhd( self, mu, muhat, return_nll):

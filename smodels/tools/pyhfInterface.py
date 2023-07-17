@@ -513,7 +513,7 @@ class PyhfUpperLimitComputer:
                     1.0, wsData, model, return_fitted_val=True, maxiter=200
                 )
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                logger.error(f"pyhf fixed_poi_fit failed for mu={mu}: {e}")
+                logger.error(f"pyhf fixed_poi_fit failed for {list(self.data.jsonFiles)[workspace_index]} for mu={mu}: {e}")
                 # lets try with different initialisation
                 init, n_ = pyhf.infer.mle.fixed_poi_fit(
                     0.0, workspace.data(model), model, return_fitted_val=True, maxiter=200
@@ -539,7 +539,7 @@ class PyhfUpperLimitComputer:
                         self.restore()
                         return self.exponentiateNLL(None, not return_nll)
                 except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                    logger.info(f"pyhf fixed_poi_fit failed twice for mu={mu}: {e}")
+                    logger.info(f"pyhf fixed_poi_fit failed twice for {list(self.data.jsonFiles)[workspace_index]} for mu={mu}: {e}")
 
                     self.restore()
                     return self.exponentiateNLL(None, not return_nll)
@@ -836,46 +836,48 @@ class PyhfUpperLimitComputer:
                     "normsys": {"interpcode": "code4"},
                     "histosys": {"interpcode": "code4p"},
                 }
-                model = workspace.model(modifier_settings=msettings)
-                bounds = model.config.suggested_bounds()
-                bounds[model.config.poi_index] = (0, 10)
-                start = time.time()
-                args = {}
-                args["return_expected"] = expected == "posteriori"
-                args["par_bounds"] = bounds
-                # args["maxiter"]=100000
-                pver = float(pyhf.__version__[:3])
-                stat = "qtilde"
-                if pver < 0.6:
-                    args["qtilde"] = True
-                else:
-                    args["test_stat"] = stat
-                with np.testing.suppress_warnings() as sup:
-                    if pyhfinfo["backend"] == "numpy":
-                        sup.filter(RuntimeWarning, r"invalid value encountered in log")
-                    # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
-                    try:
-                        result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
-                    except Exception as e:
-                        logger.info(f"when testing hypothesis {mu}, caught exception: {e}")
-                        result = float("nan")
-                        if expected == "posteriori":
-                            result = [float("nan")] * 2
-                end = time.time()
-                logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
-                logger.debug(f"result for {mu} {result}")
-                if expected == "posteriori":
-                    logger.debug("computing a-posteriori expected limit")
-                    logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                    try:
-                        CLs = float(result[1].tolist())
-                    except TypeError:
-                        CLs = float(result[1][0])
-                else:
-                    logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                    CLs = float(result)
-                # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
-                return 1.0 - self.cl - CLs
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
+                    model = workspace.model(modifier_settings=msettings)
+                    bounds = model.config.suggested_bounds()
+                    bounds[model.config.poi_index] = (0, 10)
+                    start = time.time()
+                    args = {}
+                    args["return_expected"] = expected == "posteriori"
+                    args["par_bounds"] = bounds
+                    # args["maxiter"]=100000
+                    pver = float(pyhf.__version__[:3])
+                    stat = "qtilde"
+                    if pver < 0.6:
+                        args["qtilde"] = True
+                    else:
+                        args["test_stat"] = stat
+                    with np.testing.suppress_warnings() as sup:
+                        if pyhfinfo["backend"] == "numpy":
+                            sup.filter(RuntimeWarning, r"invalid value encountered in log")
+                        # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
+                        try:
+                            result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
+                        except Exception as e:
+                            logger.info(f"when testing hypothesis {mu}, caught exception: {e}")
+                            result = float("nan")
+                            if expected == "posteriori":
+                                result = [float("nan")] * 2
+                    end = time.time()
+                    logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
+                    logger.debug(f"result for {mu} {result}")
+                    if expected == "posteriori":
+                        logger.debug("computing a-posteriori expected limit")
+                        logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                        try:
+                            CLs = float(result[1].tolist())
+                        except TypeError:
+                            CLs = float(result[1][0])
+                    else:
+                        logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                        CLs = float(result)
+                    # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
+                    return 1.0 - self.cl - CLs
 
             # Rescaling signals so that mu is in [0, 10]
             factor = 3.0

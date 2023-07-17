@@ -21,6 +21,7 @@ from smodels.tools.pyhfInterface import PyhfData, PyhfUpperLimitComputer
 from smodels.tools.truncatedGaussians import TruncatedGaussians
 from smodels.tools.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
+from typing import Union, Text
 
 class StatsComputer:
     __slots__ = [ "nsig", "dataObject", "dataType", "likelihoodComputer", "data",
@@ -336,6 +337,13 @@ class StatsComputer:
             kwargs["expected"]=expected
         return self.likelihoodComputer.likelihood ( poi_test,
                                                 return_nll = return_nll, **kwargs)
+
+    def CLs ( self, poi_test : float = 1., expected : Union[bool,Text] = False ) -> Union[float,None]:
+        """ compute CLs value for a given value of the poi """
+        # self.transform ( expected )
+        if hasattr ( self.likelihoodComputer, "CLs" ):
+            return self.likelihoodComputer.CLs ( poi_test, expected )
+        return None
 
     def transform ( self, expected ):
         """ SL only. transform the data to expected or observed """

@@ -197,15 +197,15 @@ class Pythia6Wrapper(WrapperBase):
         self.setParameter("MSTP(163)", "6")
         lhedata = self._run(slhafile, unlink=unlink )
         if not "<LesHouchesEvents" in lhedata:
-            pythiadir = "%s/log" % self.tempDirectory()
-            logger.error("No LHE events found in pythia output %s" % pythiadir )
+            pythiadir = f"{self.tempDirectory()}/log"
+            logger.error( f"No LHE events found in pythia output {pythiadir}" )
             if not os.path.exists ( pythiadir ):
-                logger.error ("Will dump pythia output to %s" % pythiadir )
+                logger.error ( f"Will dump pythia output to {pythiadir}" )
                 f=open ( pythiadir, "w" )
                 for line in lhedata:
                     f.write ( line )
                 f.close()
-            raise SModelSError( "No LHE events found in %s" % pythiadir )
+            raise SModelSError( f"No LHE events found in {pythiadir}" )
 
         #Reset pythia card to its default value
         if self.pythiacard:
