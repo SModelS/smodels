@@ -40,7 +40,7 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 2.3.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * fixed bug for reading QNUMBERS from SLHA files
+  * fixed bug for reading :ref:`QNUMBERS blocks <qnumberSLHA>` from SLHA files
   * small fixes in how pythia6 and pythia8 are built
   * small fix in truncated Gaussian llhd experimental feature
   * small fix in computation of combined upper limits
