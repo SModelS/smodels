@@ -1,0 +1,8 @@
+dataId: H_SR8
+dataType: efficiencyMap
+observedN: 8
+expectedBG: 7.5
+bgError: 2.5
+comment: H_SR8
+upperLimit: 0.0705*fb
+expectedUpperLimit: 0.062*fb
