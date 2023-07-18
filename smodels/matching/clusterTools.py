@@ -427,7 +427,7 @@ def clusterSMS(smsList, maxDist, dataset):
         raise SModelSError("A dataset object must be defined for clustering")
 
     # Make sure only unique SMS are clustered together (avoids double counting weights)
-    # Sort SMS, so the ones with highest contribution (weight*eff) come first:
+    # Sort SMS, so the ones with highest contribution (weight) come first:
     smsList = sorted(smsList, key=lambda sms: sms.weight, reverse=True)
 
     # Remove duplicated SMS:

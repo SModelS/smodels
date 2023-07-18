@@ -30,7 +30,7 @@ void SModelS::initialize ( const string & parameterfile, const string & smodelsd
   cout << "[smodels.cpp] initialising!" << endl;
   /// initialise python, import modules
   // Py_SetProgramName( (char *) (const char *) "SModelS" ); // huh?! python 2.x
-  Py_SetProgramName( (wchar_t *) (const wchar_t *) "SModelS" ); // huh?? python 3.x
+  // Py_SetProgramName( (wchar_t *) (const wchar_t *) "SModelS" ); // huh?? python 3.x deprecated in 3.11
   Py_Initialize();
   PyRun_SimpleString("import sys");
   PyRun_SimpleString("import os");

@@ -281,5 +281,7 @@ autoclass_content = 'both'
 
 nitpicky = True
 
+nitpick_ignore = [('py:class', 'type')]
+
 #Run make whenever sphinx is built:
 os.system("cd .. && make update_code copy_files recipes RstFilesFromHelp")
