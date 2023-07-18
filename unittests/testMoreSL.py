@@ -26,7 +26,7 @@ import time
 class MoreSLTest(unittest.TestCase):
     def test21002 ( self ):
         db = Database ( "./dbSUS21002/" )
-        er = db.getExpResults ()[0]
+        db.selectExpResults ( analysisIDs = [ "CMS-SUS-21-002" ] )
         defaults = {}
         ### this is what we get
         defaults [ "TChiWZ_600_200_600_200" ] = { "obs": 1.141, "exp": 1.163 }
@@ -47,9 +47,8 @@ class MoreSLTest(unittest.TestCase):
             fname = f"./testFiles/21002/{slhaname}.slha"
             model.updateParticles(inputFile=fname)
             toplist = decomposer.decompose(model)
-            predictions = theoryPredictionsFor(er, toplist, combinedResults=True)
+            predictions = theoryPredictionsFor(db, toplist, combinedResults=True)
             for p in predictions:
-                robs,rexp = ( p.getRValue( expected=x) for x in [ False, True ] )
                 r = { "obs": p.getRValue(), "exp": p.getRValue ( expected=True ) }
                 base = defaults[slhaname]
                 for exp in [ "obs", "exp" ]:
@@ -67,7 +66,7 @@ class MoreSLTest(unittest.TestCase):
 
     def test16050 ( self ):
         from databaseLoader import database as db
-        er = db.getExpResults ( analysisIDs = [ "CMS-SUS-16-050-agg" ] )[0]
+        db.selectExpResults ( analysisIDs = [ "CMS-SUS-16-050-agg" ] )
         defaults = {}
         ### this is what spey gets
         defaults [ "T1tttt" ] = { "obs": 223.469, "exp": 223.468 }
@@ -81,9 +80,8 @@ class MoreSLTest(unittest.TestCase):
             fname = f"./testFiles/slha/{slhaname}.slha"
             model.updateParticles(inputFile=fname)
             toplist = decomposer.decompose(model)
-            predictions = theoryPredictionsFor(er, toplist, combinedResults=True)
+            predictions = theoryPredictionsFor(db, toplist, combinedResults=True)
             for p in predictions:
-                robs,rexp = ( p.getRValue( expected=x) for x in [ False, True ] )
                 r = { "obs": p.getRValue(), "exp": p.getRValue ( expected=True ) }
                 base = defaults[slhaname]
                 for exp in [ "obs", "exp" ]:

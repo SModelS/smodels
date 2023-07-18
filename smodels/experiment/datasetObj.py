@@ -79,7 +79,7 @@ class DataSet(object):
 
         :param other: datasetObj to compare self with
         """
-        if type(other)==CombinedDataSet:
+        if isinstance(other,CombinedDataSet):
             # if other is a combined dataset, self is combinable if it is
             # combinable with all datasets in other
             other_ds = other._datasets

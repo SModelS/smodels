@@ -187,7 +187,7 @@ class ExpResult(object):
         with "other"? "Other" is another expResult. Later, "other" should also be
         allowed to be a dataset """
         if self == other: return False
-        from smodels.tools.physicsUnits import TeV
+        from smodels.base.physicsUnits import TeV
         if abs ( self.globalInfo.sqrts.asNumber(TeV) - other.globalInfo.sqrts.asNumber(TeV) ) > 1e-5:
             # different runs!
             return True

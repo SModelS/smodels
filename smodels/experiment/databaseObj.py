@@ -475,12 +475,12 @@ class SubDatabase(object):
         """ in all globalInfo objects, create links to self.combinationsmatrix  """
         if not hasattr(self, "combinationsmatrix"):
             return
-        if type(self.combinationsmatrix) == type(None):
+        if self.combinationsmatrix is None:
             return
         for er in self.expResultList:
             if not hasattr(er.globalInfo, "_combinationsmatrix"):
                 er.globalInfo._combinationsmatrix = self.combinationsmatrix
-            elif type(er.globalInfo._combinationsmatrix) == type(None):
+            elif er.globalInfo._combinationsmatrix is None:
                 er.globalInfo._combinationsmatrix = self.combinationsmatrix
 
     def clearLinksToCombinationsMatrix(self):
@@ -1092,7 +1092,6 @@ class SubDatabase(object):
             newExpResult.globalInfo = expResult.globalInfo
             newExpResult.datasets = []
             newExpResult.origdatasets = expResult.datasets
-            origdatasets = []
 
             for dataset in expResult.datasets:
                 if dataTypes != ['all']:

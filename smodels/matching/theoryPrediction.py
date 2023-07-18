@@ -8,6 +8,7 @@
 
 from smodels.base.physicsUnits import TeV, fb
 from smodels.experiment.datasetObj import CombinedDataSet
+from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
@@ -646,6 +647,11 @@ def theoryPredictionsFor(database, smsTopDict, maxMassDist=0.2,
         from smodels.base.runtime import _deltas_rel_default
         deltas_rel = _deltas_rel_default
 
+    if not isinstance(database,Database):
+        errorMsg = "The argument for theoryPredictionsFor should be a"
+        errorMsg += " database with the selected experimental results and not %s" %type(database)
+        logger.error(errorMsg)
+        raise SModelSError(errorMsg)
 
     # Compute matches between TheorySMS from decomposition and the
     # (unique) ExpSMS in the database

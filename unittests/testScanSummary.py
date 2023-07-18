@@ -19,6 +19,10 @@ setLogLevel("error")
 
 class ScanSummaryTest(unittest.TestCase):
 
+    # Note that in v3 in get results for the idm_example.slha file, because
+    # the heavy higgses are part of the MSSM model file and we no longer
+    # have the Z2odd requirement.
+
     def removeOutputs(self,f):
         extList = ['py','pyc','smodels','smodelsslha','xml']
         for ext in extList:

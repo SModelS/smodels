@@ -15,7 +15,7 @@ import unittest
 
 # from smodels.tools import statistics
 from smodels.statistics.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
-from smodels.statistics.statisticalTools import TruncatedGaussians
+from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.matching.theoryPrediction import theoryPredictionsFor
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
@@ -51,7 +51,7 @@ class StatisticsTest(unittest.TestCase):
             print("llhd direct", llhddir, chi2dir)
             computer = TruncatedGaussians ( ulobs, ulexp, nsig )
             ret = computer.likelihood ( mu=1.)
-            llhdlim, muhat, sigma_mu = ret["llhd"], ret["muhat"], ret["sigma_mu"]
+            llhdlim,_,_ = ret["llhd"], ret["muhat"], ret["sigma_mu"]
             chi2lim = computer.chi2 ( llhdlim )
             print("llhd from limits", llhdlim, chi2lim)
             totdir += llhddir * dx
@@ -70,7 +70,6 @@ class StatisticsTest(unittest.TestCase):
         ulobs = ulcomp.getUpperLimitOnMu(m)
         ulexp = ulcomp.getUpperLimitOnMu(m, expected=True)
         computer = TruncatedGaussians ( ulobs, ulexp, corr = 0. )
-        llhdlim = computer.likelihood ( mu=1., return_nll = False )
         ret = computer.lmax ( return_nll = False)
         doPrint = False
         if doPrint:
@@ -167,13 +166,13 @@ class StatisticsTest(unittest.TestCase):
         ## check that this all gives none if experimental is turned off
 
         runtime._experimental = False
-        expRes = database.getExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
-        self.assertTrue(len(expRes), 1)
+        database.selectExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
+        self.assertTrue(len(database.expResultList), 1)
         filename = "./testFiles/slha/T1tttt.slha"
         model = Model(BSMList, SMList)
         model.updateParticles(filename)
         smstoplist = decomposer.decompose(model, sigmacut=0)
-        prediction = theoryPredictionsFor(expRes[0], smstoplist)[0]
+        prediction = theoryPredictionsFor(database, smstoplist)[0]
         prediction.computeStatistics()
         import numpy
 
@@ -188,13 +187,13 @@ class StatisticsTest(unittest.TestCase):
     def obsoleteApproxGaussian(self):
         ## turn experimental features on
         runtime._experimental = True
-        expRes = database.getExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
-        self.assertTrue(len(expRes), 1)
+        database.selectExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
+        self.assertTrue(len(database.expResultList), 1)
         filename = "./testFiles/slha/T1tttt.slha"
         model = Model(BSMList, SMList)
         model.updateParticles(filename)
         smstoplist = decomposer.decompose(model, sigmacut=0)
-        prediction = theoryPredictionsFor(expRes[0], smstoplist)[0]
+        prediction = theoryPredictionsFor(database, smstoplist)[0]
         prediction.computeStatistics()
         import numpy
 
@@ -209,14 +208,14 @@ class StatisticsTest(unittest.TestCase):
         """A simple test to see that the interface in datasetObj
         and TheoryPrediction to the statistics tools is working correctly
         """
-        expRes = database.getExpResults(analysisIDs=["CMS-SUS-13-012"])[0]
-
+        database.selectExpResults(analysisIDs=["CMS-SUS-13-012"])
+        expRes = database.expResultList[0]
         filename = "./testFiles/slha/simplyGluino.slha"
         model = Model(BSMList, SMList)
         model.updateParticles(filename)
         smstoplist = decomposer.decompose(model, sigmacut=0)
-        prediction = theoryPredictionsFor(expRes, smstoplist)[0]
-        pred_signal_strength = prediction.xsection.value
+        prediction = theoryPredictionsFor(database, smstoplist)[0]
+        pred_signal_strength = prediction.xsection
         prediction.computeStatistics()
         ill = math.log(prediction.likelihood())
         nsig = (pred_signal_strength * expRes.globalInfo.lumi).asNumber()

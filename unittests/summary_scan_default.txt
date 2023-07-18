@@ -16,7 +16,7 @@ higgsinoStop.slha    ATLAS-SUSY-2013-05        196       -1      ATLAS-CONF-2013
 hscpTest_long.slha   CMS-EXO-13-006            0.5       0.5     N/A                   -1        -1            CMS-EXO-13-006      0.5      0.5         -1           -1             
 hscpTest_mid.slha    CMS-EXO-13-006            0.0884    0.0884  N/A                   -1        -1            CMS-EXO-13-006      0.0884   0.0884      -1           -1             
 hscpTest_short.slha  CMS-EXO-13-006            0.0406    0.0406  N/A                   -1        -1            CMS-EXO-13-006      0.0406   0.0406      -1           -1             
-idm_example.slha     N/A                       -1        -1      N/A                   -1        -1            N/A                 -1       -1          -1           -1             
+idm_example.slha     ATLAS-SUSY-2013-12        0.0136    -1      N/A                   -1        -1            N/A                 -1       -1          -1           -1             
 lifetime.slha        CMS-PAS-SUS-15-002        0.000451  -1      N/A                   -1        -1            N/A                 -1       -1          -1           -1             
 lightEWinos.slha     ATLAS-SUSY-2013-12        0.646     -1      ATLAS-CONF-2013-037   0.119     0.11          CMS-SUS-13-012      0.00556  0.00786     0.125        0.115          
 longLived.slha       CMS-EXO-13-006            0.835     0.835   ATLAS-CONF-2013-037   0.00801   0.00916       CMS-EXO-13-006      0.835    0.835       0.00801      0.00916        
