@@ -117,13 +117,49 @@ class Pythia8Wrapper(WrapperBase):
                 os.rmdir(self.tempdir)
                 self.tempdir = None
 
-    def checkInstallInSubclass ( self ):
+    def checkInstallation ( self, compile : bool = True ):
+        # super().checkInstallation(compile)
         exists = os.path.exists ( self.includeFile )
+        xmldoc = self.getXmldoc()
+        sleep = 0.
+        while not os.path.exists ( xmldoc ): # if this disappears, start from scratch
+            import time
+            sleep += .5
+            time.sleep ( sleep )
+            if sleep > .5 and not os.path.exists ( xmldoc ): 
+                if compile:
+                    # after a few seconds, delete, if compile is true
+                    import shutil
+                    p = xmldoc.find ( "share" )
+                    rm = xmldoc[:p-1]
+                    if False:
+                        shutil.rmtree ( rm, ignore_errors = True )
+                exists = False
+                break
+
+        if xmldoc == None:
+            exists = False
         if exists:
             return True
-        self.compile()
+        if compile:
+            self.compile()
         exists = os.path.exists ( self.includeFile )
         return exists
+
+    def getXmldoc ( self ):
+        """ get the content of xml.doc """
+        xmldoc = self.executablePath.replace("pythia8.exe", "xml.doc")
+        logger.debug("exe path=%s" % self.executablePath)
+        if not os.path.exists ( xmldoc ):
+            return None
+        if os.path.exists(xmldoc):
+            logger.debug("xml.doc found at %s." % xmldoc)
+            with open(xmldoc) as f:
+                xmlDir = f.read()
+                toadd = os.path.join(os.path.dirname(xmldoc), xmlDir.strip())
+        #if not os.path.exists ( toadd ):
+        #    return None
+        return toadd
 
     def run(self, slhaFile, lhefile=None, unlink=True):
         """
@@ -157,16 +193,10 @@ class Pythia8Wrapper(WrapperBase):
             cfg,
             lhefile,
         )
-        xmldoc = self.executablePath.replace("pythia8.exe", "xml.doc")
-        logger.debug("exe path=%s" % self.executablePath)
-        self.checkInstallation(compile=True)
-        if os.path.exists(xmldoc):
-            logger.debug("xml.doc found at %s." % xmldoc)
-            with open(xmldoc) as f:
-                xmlDir = f.read()
-                toadd = os.path.join(os.path.dirname(xmldoc), xmlDir.strip())
-                logger.debug("adding -x %s" % toadd)
-                cmd += " -x %s" % toadd
+        toadd = self.getXmldoc()
+        if toadd != None and os.path.exists ( toadd ):
+            logger.debug("adding -x %s" % toadd)
+            cmd += " -x %s" % toadd
         logger.debug("Now running ''%s''" % str(cmd))
         out = executor.getoutput(cmd)
         logger.debug("out=%s" % out)

@@ -12,8 +12,7 @@ import sys
 import os
 import copy
 from smodels.decomposition.topologyDict import TopologyDict
-from smodels.matching.theoryPrediction import TheoryPredictionList
-from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner
+from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV
@@ -38,7 +37,8 @@ class PyPrinter(BasicPrinter):
         self.name = "py"
         self.printtimespent = False
         self.printingOrder = [OutputStatus, TopologyDict,
-                              TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
+                              TheoryPredictionList, TheoryPredictionsCombiner,
+                              TheoryPrediction, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -377,6 +377,9 @@ class PyPrinter(BasicPrinter):
 
         return uncoveredDict
 
+    def _formatTheoryPrediction(self,obj):
+        return self._formatTheoryPredictionsCombiner(obj)
+    
     def _formatTheoryPredictionsCombiner(self, obj):
         """
         Format data of the TheoryPredictionsCombiner object.

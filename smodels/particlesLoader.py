@@ -51,24 +51,46 @@ def getParticlesFromSLHA(slhafile):
     with open(filename, 'r') as f:
         data = f.read()
     data = data.lower()
-    data = data[:data.find('\ndecay')]
-    data = data[:data.find('\nxsection')]
-    blocks = [b.splitlines() for b in data.split('\nblock')]
+    qnumberBlocks = []
+    qBlock = False
+    for l in data.splitlines():
+        l = l.strip()
+        # Ignore empty lines and comments
+        if not l or l.startswith('#'):
+            continue
+        # Beginning of QNUMBERS block
+        if l.startswith('block qnumbers'):
+            qBlock = True
+            qnumberBlocks.append([l])
+            continue
+        # If any other block is starting set qBlock to False
+        elif l.startswith('block'):
+            qBlock = False
+            continue
+        # If a cross-section or decay block is starting set qBlock to False
+        elif l.startswith('xsection') or l.startswith('decay'):
+            qBlock = False
+            continue                   
+        
+        # If current block is not a qnumbers block, skip
+        if not qBlock:
+            continue
+        # Add line to qnumbers block
+        qnumberBlocks[-1].append(l)
 
-    #Extract qnumber blocks
-    qnumberBlocks = [b for b in blocks if 'qnumbers' in b[0]]
     if not qnumberBlocks:
-        logger.error("No QNUMBERS blocks were found in %s" % slhafile)
+        logger.error("No QNUMBERS blocks were found in %s" %slhafile)
         raise SModelSError()
 
     #Build list of BSM particles:
     BSMList = []
     for b in qnumberBlocks:
-        headerInfo = [x for x in b[0].replace('qnumbers', '').split() if x != '#']
-        if headerInfo[0].replace('-', '').replace('+', '').isdigit():
+        headerInfo = [x for x in b[0].replace('block','').replace('qnumbers','').split() 
+                      if x != '#']
+        if headerInfo[0].replace('-','').replace('+','').isdigit():
             pdg = eval(headerInfo[0])
         else:
-            logger.error("Error obtaining PDG number from QNUMBERS block:\n %s \n" % b)
+            logger.error("Error obtaining PDG number from QNUMBERS block:\n %s \n" %b)
 
         if any(p.pdg == pdg for p in BSMList):
             logger.warning("Particle with pdg %i appears multiple times in QNUMBERS blocks")
@@ -78,16 +100,16 @@ def getParticlesFromSLHA(slhafile):
             label = headerInfo[1].strip()
         else:
             label = str(pdg)
-            logger.debug("Could not find label for particle %i, will use its PDG number" % pdg)
+            logger.debug("Could not find label for particle %i, will use its PDG number" %pdg)
         try:
             numbers = [l[:l.find('#')].lstrip().split() for l in b[1:]]
             numbers = dict([x for x in numbers if x])
-            numbers = dict([[eval(x), eval(y)] for x, y in numbers.items()])
+            numbers = dict([[eval(x),eval(y)] for x,y in numbers.items()])
         except:
-            logger.error("Error reading quantum numbers from block: \n %s \n" % b)
+            logger.error("Error reading quantum numbers from block: \n %s \n" %b)
             continue
-        if any(not x in numbers for x in [1, 2, 3]):
-            logger.error("Missing quantum numbers in block:\n %s\n" % b)
+        if any(not x in numbers for x in [1,2,3]):
+            logger.error("Missing quantum numbers in block:\n %s\n" %b)
             continue
         # Assume all particles are BSM particles
         newParticle = Particle(isSM=False, label=label, pdg=pdg,

@@ -8,12 +8,9 @@
 """
 
 from __future__ import print_function
-import sys
 import os
-import copy
 from smodels.decomposition.topologyDict import TopologyDict
-from smodels.matching.theoryPrediction import TheoryPredictionList
-from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner
+from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV
@@ -21,10 +18,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.txtPrinter import TxTPrinter
 import numpy as np
 from collections import OrderedDict
-from xml.dom import minidom
-from xml.etree import ElementTree
 import unum
-import time
 
 
 class SummaryPrinter(TxTPrinter):
@@ -37,7 +31,9 @@ class SummaryPrinter(TxTPrinter):
         TxTPrinter.__init__(self, output, filename, outputFormat)
         self.name = "summary"
         self.printingOrder = [
-            OutputStatus, TheoryPredictionList, TheoryPredictionsCombiner, Uncovered]
+            OutputStatus, TheoryPredictionList, 
+            TheoryPredictionsCombiner, 
+            TheoryPrediction, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -163,6 +159,9 @@ class SummaryPrinter(TxTPrinter):
                       (coll, values["anaid"], values["exp"], values["obs"])
 
         return output
+
+    def _formatTheoryPrediction(self,obj):
+        return self._formatTheoryPredictionsCombiner(obj)
 
     def _formatTheoryPredictionsCombiner(self, obj):
         """

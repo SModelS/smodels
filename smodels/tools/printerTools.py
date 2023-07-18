@@ -12,24 +12,10 @@
 """
 
 from __future__ import print_function
-import sys
-import os
 import copy
-from smodels.decomposition.topologyDict import TopologyDict
-from smodels.matching.theoryPrediction import TheoryPredictionList
-from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner
-from smodels.experiment.databaseObj import Database
-from smodels.tools.ioObjects import OutputStatus
-from smodels.tools.coverage import Uncovered
-from smodels.base.physicsUnits import GeV, fb, TeV
-from smodels.base.smodelsLogging import logger
 import numpy as np
 import itertools
 from collections import OrderedDict
-from xml.dom import minidom
-from xml.etree import ElementTree
-import unum
-import time
 
 
 def printScanSummary(outputDict, outputFile):
@@ -299,7 +285,6 @@ def getSummaryFrom(output, ptype):
 
     return summaryDict
 
-
 def getInfoFromPython(output):
     """
     Retrieves information from the python output
@@ -331,7 +316,6 @@ def getInfoFromPython(output):
                 anaID_comb = res['AnalysisID']
 
     return rvals, rexp, anaIDs, r_comb, rexp_comb, anaID_comb
-
 
 def getInfoFromSLHA(output):
     """
@@ -386,7 +370,6 @@ def getInfoFromSLHA(output):
         anaID_comb = anaID_comb[np.argmax(rvals_comb)]
 
     return rvals, rexp, anaIDs, r_comb, rexp_comb, anaID_comb
-
 
 def getInfoFromSummary(output):
     """

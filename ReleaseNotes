@@ -4,30 +4,45 @@ Release v3.0.0, xxx
   * Changes in missing topologies (coverage): the missing topos are grouped by final states (irrespective of the topology structure).
     So the FinalStateSMS objects do not exactly match the GeneralElements from v2 (several GeneralElements can be mapped to a single FinalStateSMS)
 
-
-Release v2.3, xxxx
+Release v2.3.1, Mon 17 Jul 2023
 =======================================================
 
-  * Added minMass parameter for setting a minimum mass threshold for BSM masses
+  * fixed bug for reading QNUMBERS from SLHA files
+  * small fixes in how pythia6 and pythia8 are built
+  * small fix in truncated Gaussian llhd experimental feature
+  * small fix in computation of combined upper limits
+  * combinationmatrices are now forced to be symmetric
+  * added isCombinableWith method also for CombinedDataSets
+  * added a recipe for how to use a combinations matrix
+  * runtime.nCPUs() now returns number of available CPUs, not all CPUs
+  * xseccomputer now has --tempdir option
+  * StatsComputer now has CLs method
+  * changed default prompt width from 1e-8 to 1e-11 GeV in code
 
 
-Release v2.2.2, March 2023
+Release v2.3.0, Tue 23 May 2023
 =======================================================
 
   * fixed bug for an LHE input only with anti-particles
+  * fixed error that truncated signal yields when computing expected upper limits
+  * added minMass parameter for setting a minimum mass threshold for BSM masses
   * fixed C++ interface to work with python 3.11
   * bumped up pythia8 from 8.307 to 8.308
   * SModelS can now track inter-analyses combinability at the level of whole
     analyses as well as individual signal regions via a combinations matrix
-  * todo: spey interface
-  * todo: SLv2 (via spey)
-  * "full_llhds" Database abbreviations introduced
-  * Database extension, added new results from x ATLAS and y CMS analyses:
+  * added support for SLv2 (Gaussian with a skew), arXiv:1809.05548
+  * refactored the statistics modules, code ready for interfacing Spey
+  * introduced "full_llhds" database add-on (see parameters.ini file)
+
+  * Database extension: added/updated results from 6 ATLAS and 4 CMS analyses
+    (hfm=HistFactory model, cov=covariance matrix for SR combination):
     - results from ATLAS:
-      ATLAS-SUSY-2018-05 (EM,UL, full likelihood), ATLAS-SUSY-2018-42 (UL), ATLAS-SUSY-2018-32 (EM), ATLAS-SUSY-2019-02 (UL)
+      ATLAS-SUSY-2018-05 (UL,EM+hfm), ATLAS-SUSY-2018-32 (EM+hfm), ATLAS-SUSY-2018-41 (EM+cov, updated), ATLAS-SUSY-2018-42 (UL,EM),
+      ATLAS-SUSY-2019-02 (UL,EM+cov), ATLAS-SUSY-2013-12 (8TeV, EM)
     - results from CMS:
-      CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL), CMS-SUS-21-002 (UL)
+      CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL,EM), CMS-SUS-21-002 (UL,EM+cov)
     - added expected ULs to CMS-SUS-19-009
+	  - added non-aggregated results for CMS-SUS-16-039, CMS-SUS-16-050, CMS-PAS-SUS-16-052, and CMS-SUS-19-006
 
 
 Release v2.2.1, Tue 18 October 2022

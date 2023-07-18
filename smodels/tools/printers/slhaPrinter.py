@@ -8,23 +8,15 @@
 """
 
 from __future__ import print_function
-import sys
 import os
-import copy
-from smodels.decomposition.topologyDict import TopologyDict
-from smodels.matching.theoryPrediction import TheoryPredictionList
-from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner
+from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.txtPrinter import TxTPrinter
 import numpy as np
-from collections import OrderedDict
-from xml.dom import minidom
-from xml.etree import ElementTree
 import unum
-import time
 
 
 class SLHAPrinter(TxTPrinter):
@@ -40,7 +32,8 @@ class SLHAPrinter(TxTPrinter):
         self.combinesr = 0
         self.combineanas = 0
         self.printingOrder = [OutputStatus, TheoryPredictionList,
-                              TheoryPredictionsCombiner, Uncovered]
+                              TheoryPredictionsCombiner, 
+                              TheoryPrediction, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -103,10 +96,9 @@ class SLHAPrinter(TxTPrinter):
             obj.sortTheoryPredictions()
             firstResult = obj._theoryPredictions[0]
             r = firstResult.getRValue()
-            if r > 1:
+            excluded = 0
+            if r is not None and r > 1:
                 excluded = 1
-            else:
-                excluded = 0
         output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n" % (
             excluded)
         if excluded == -1:
@@ -183,6 +175,9 @@ class SLHAPrinter(TxTPrinter):
                 i, group.getTotalXSec(), "Total cross-section (fb)")
         output += "\n"
         return output
+
+    def _formatTheoryPrediction(self,obj):
+        return self._formatTheoryPredictionsCombiner(obj)
 
     def _formatTheoryPredictionsCombiner(self, obj):
         """

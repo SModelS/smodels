@@ -18,8 +18,7 @@ from smodels.decomposition import decomposer
 from smodels.experiment.exceptions import DatabaseNotFoundException
 from smodels.experiment.databaseObj import Database
 from smodels.matching import theoryPrediction
-from smodels.matching.theoryPrediction import theoryPredictionsFor
-from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner
+from smodels.matching.theoryPrediction import theoryPredictionsFor,TheoryPredictionsCombiner
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.share.models.SMparticles import SMList
 from smodels.particlesLoader import load
@@ -179,8 +178,7 @@ def testPoint(inputFile, outputDir, parser, database):
 
     allPredictions = theoryPredictionsFor(database, smstoplist,
                                           useBestDataset=useBest, 
-                                          combinedResults=combineResults,
-                                          marginalize=False)
+                                          combinedResults=combineResults)
 
     """Compute chi-square and likelihood"""
     if parser.getboolean("options", "computeStatistics"):

@@ -14,6 +14,9 @@ import warnings
 import jsonschema
 import copy
 
+import warnings
+warnings.filterwarnings("ignore")
+
 jsonver = ""
 try:
     import importlib.metadata
@@ -72,7 +75,7 @@ except pyhf.exceptions.ImportBackendError as e:
 
 from scipy import optimize
 import numpy as np
-from smodels.base.smodelsLogging import logger
+from smodels.tools.smodelsLogging import logger
 import logging
 import math
 
@@ -112,6 +115,7 @@ class PyhfData:
 
     def __init__(self, nsignals, inputJsons, jsonFiles=None ):
         self.nsignals = nsignals  # fb
+        self.getTotalYield()
         self.inputJsons = inputJsons
         self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
         self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
@@ -126,10 +130,10 @@ class PyhfData:
         self.getWSInfo()
         self.checkConsistency()
 
-    def totalYield ( self ):
+    def getTotalYield ( self ):
         """ the total yield in all signal regions """
         S = sum ( [ sum(x) for x in self.nsignals ] )
-        return S
+        self.totalYield = S
 
     def getWSInfo(self):
         """
@@ -235,7 +239,7 @@ class PyhfUpperLimitComputer:
         """
         self.data = data
         self.lumi = lumi
-        self.nsignals = self.data.nsignals
+        self.nsignals = copy.deepcopy ( self.data.nsignals )
         logger.debug("Signals : {}".format(self.nsignals))
         self.inputJsons = self.data.inputJsons
         self.channelsInfo = self.data.channelsInfo
@@ -331,7 +335,7 @@ class PyhfUpperLimitComputer:
     def wsMaker(self, apriori=False):
         """
         Apply each region patch (self.patches) to his associated json (self.inputJsons) to obtain the complete workspaces
-        :param apriori: - If set to `True`: Replace the observation data entries of each workspace by the corresponding sum of the expected yields
+        :param apriori: - If set to `True`: Replace the observation data entries of each workspace by the corresponding sum of the expected yields \
                         - Else: The observed yields put in the workspace are the ones written in the corresponfing json dictionary
 
         :returns: the list of patched workspaces
@@ -458,33 +462,19 @@ class PyhfUpperLimitComputer:
                             break
         return init_pars
 
-    def likelihood(self, mu=1.0, workspace_index=None, nll=False, expected=False):
+    def likelihood( self, mu=1.0, workspace_index=None, return_nll=False,
+                    expected=False):
         """
-        Returns the value of the likelihood.
+        Returns the value of the likelihood. \
         Inspired by the `pyhf.infer.mle` module but for non-log likelihood
-        :param workspace_index: supply index of workspace to use. If None,
+        :param workspace_index: supply index of workspace to use. If None, \
                                 choose index of best combo
-        :param nll: if true, return nll, not llhd
-        :param expected: if False, compute expected values, if True,
-            compute a priori expected, if "posteriori" compute posteriori
+        :param return_nll: if true, return nll, not llhd
+        :param expected: if False, compute expected values, if True, \
+            compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
-        mumin, mumax = -20.0, 40.0
-        if mu > mumax:
-            if countWarning["llhdszero"] < 1:
-                logger.warning(
-                    f"likelihoods of signal strengths mu= {mu:.1f} > {mumax} are automatically set to 0 (will suppress similar msgs)"
-                )
-            countWarning["llhdszero"] += 1
-            return self.exponentiateNLL(None, not nll)
-        if mu < mumin:
-            if countWarning["llhdszero"] < 1:
-                logger.warning(
-                    f"likelihoods of signal strengths mu= {mu:.1f} < {mumin} are automatically set to 0 (will suppress similar msgs)"
-                )
-            countWarning["llhdszero"] += 1
-            return self.exponentiateNLL(None, not nll)
-        # print ( "pyhf likelihood for", mu )
+
         logger.debug("Calling likelihood")
         if type(workspace_index) == float:
             logger.error("workspace index is float")
@@ -505,7 +495,7 @@ class PyhfUpperLimitComputer:
                     for i, ns in enumerate(self.data.nsignals):
                         for j, v in enumerate(ns):
                             self.data.nsignals[i][j] = v * mu
-                self.__init__(self.data)
+                self.__init__(self.data, self.cl, self.includeCRs, self.lumi)
                 ### allow this, for computation of l_SM
                 # if self.zeroSignalsFlag[workspace_index] == True:
                 #    logger.warning("Workspace number %d has zero signals" % workspace_index)
@@ -523,7 +513,7 @@ class PyhfUpperLimitComputer:
                     1.0, wsData, model, return_fitted_val=True, maxiter=200
                 )
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                logger.debug(f"pyhf fixed_poi_fit failed for mu={mu}: {e}")
+                logger.error(f"pyhf fixed_poi_fit failed for {list(self.data.jsonFiles)[workspace_index]} for mu={mu}: {e}")
                 # lets try with different initialisation
                 init, n_ = pyhf.infer.mle.fixed_poi_fit(
                     0.0, workspace.data(model), model, return_fitted_val=True, maxiter=200
@@ -547,12 +537,12 @@ class PyhfUpperLimitComputer:
                     # If a total yield is negative with the best profiled parameters, return None
                     if not all([True if yld >= 0 else False for yld in model.expected_actualdata(bestFitParam)]):
                         self.restore()
-                        return self.exponentiateNLL(None, not nll)
+                        return self.exponentiateNLL(None, not return_nll)
                 except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                    logger.info(f"pyhf fixed_poi_fit failed twice for mu={mu}: {e}")
+                    logger.info(f"pyhf fixed_poi_fit failed twice for {list(self.data.jsonFiles)[workspace_index]} for mu={mu}: {e}")
 
                     self.restore()
-                    return self.exponentiateNLL(None, not nll)
+                    return self.exponentiateNLL(None, not return_nll)
 
             ret = nllh.tolist()
             try:
@@ -563,7 +553,7 @@ class PyhfUpperLimitComputer:
             self.data.cached_likelihoods[
                 workspace_index
             ] = ret
-            ret = self.exponentiateNLL(ret, not nll)
+            ret = self.exponentiateNLL(ret, not return_nll)
             # print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
             self.restore()
             return ret
@@ -576,6 +566,8 @@ class PyhfUpperLimitComputer:
         ulMin = float("+inf")
         i_best = None
         for i_ws in range(self.nWS):
+            if self.data.totalYield == 0.:
+                continue
             if self.zeroSignalsFlag[i_ws] == True:
                 logger.debug("Workspace number %d has zero signals" % i_ws)
                 continue
@@ -587,14 +579,6 @@ class PyhfUpperLimitComputer:
                 ulMin = ul
                 i_best = i_ws
         return i_best
-
-    def chi2(self, workspace_index=None):
-        """
-        Returns the chi square
-        """
-        return 2 * (
-            self.lmax(workspace_index, nll=True) - self.likelihood(workspace_index, nll=True)
-        )
 
     def exponentiateNLL(self, twice_nll, doIt):
         """if doIt, then compute likelihood from nll,
@@ -618,17 +602,42 @@ class PyhfUpperLimitComputer:
                 continue
             bg = 0.0
             var = 0.0
+            ns = 0.0
             for sample in chdata["samples"]:
-                if sample["name"] == "Bkg":
-                    tbg = sample["data"][0]
-                    bg += tbg
-                    hi = sample["modifiers"][0]["data"]["hi_data"][0]
-                    lo = sample["modifiers"][0]["data"]["lo_data"][0]
-                    delta = max((hi - bg, bg - lo))
-                    var += delta**2
                 if sample["name"] == "bsm":
                     ns = sample["data"][0]
-                    nsig[chdata["name"]] = ns
+                else:
+                    tbg = sample["data"][0]
+                    bg += tbg
+                    mult_factor_hi = 1.
+                    mult_factor_lo = 1.
+                    add_factor_hi = 0.
+                    add_factor_lo = 0.
+                    # To be tested - Don't take aux data into account
+                    for modifier in sample["modifiers"]:
+                        if modifier["type"] in ["normfactor","shapesys","staterror","shapefactor"]:
+                            if type(modifier["data"]) == list:
+                                mult_factor_hi *= modifier["data"][0]
+                                mult_factor_lo *= modifier["data"][0]
+                        elif modifier["type"] == "normsys":
+                            if type(modifier["data"]) == dict:
+                                mult_factor_hi *= modifier["data"]["hi"]
+                                mult_factor_lo *= modifier["data"]["lo"]
+                        elif modifier["type"] == "histosys":
+                            # If many histosys modifiers, only the last one counts
+                            if type(modifier["data"]) == dict:
+                                add_factor_hi = modifier["data"]["hi_data"][0] - tbg
+                                add_factor_lo = modifier["data"]["lo_data"][0] - tbg
+                        elif modifier["type"] == "lumi":
+                            for param in workspace["measurements"][0]["config"]["parameters"]:
+                                if param["name"] == "lumi":
+                                    mult_factor_hi *= max(param["bounds"][0])
+                                    mult_factor_lo *= min(param["bounds"][0])
+                    hi = mult_factor_hi*(tbg+add_factor_hi)
+                    lo = mult_factor_lo*(tbg+add_factor_lo)
+                    delta = max((hi - tbg, tbg - lo))
+                    var += delta**2
+            nsig[chdata["name"]] = ns
             bgs[chdata["name"]] = bg
             bgVars[chdata["name"]] = var
         for chdata in workspace["observations"]:
@@ -647,21 +656,24 @@ class PyhfUpperLimitComputer:
         n = len ( obss )
         # print ( f" sigma_mu from pyhf uncorr {var_mu} {n} "  )
         sigma_mu = float ( np.sqrt ( var_mu / (n**2) ) )
-        self.sigma_mu = sigma_mu
+        # self.sigma_mu = sigma_mu
+        return sigma_mu
         #import IPython
         #IPython.embed()
         #sys.exit()
 
-    def lmax(self, workspace_index=None, nll=False, expected=False, allowNegativeSignals=False):
+    def lmax( self, workspace_index=None, return_nll=False, expected=False,
+              allowNegativeSignals=False):
         """
         Returns the negative log max likelihood
-        :param nll: if true, return nll, not llhd
-        :param workspace_index: supply index of workspace to use. If None,
+        :param return_nll: if true, return nll, not llhd
+        :param workspace_index: supply index of workspace to use. If None, \
             choose index of best combo
-        :param expected: if False, compute expected values, if True,
-            compute a priori expected, if "posteriori" compute posteriori
+        :param expected: if False, compute expected values, if True, \
+            compute a priori expected, if "posteriori" compute posteriori \
             expected
-        :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
+        :param allowNegativeSignals: if False, then negative nsigs are replaced \
+            with 0.
         """
         # logger.error("expected flag needs to be heeded!!!")
         logger.debug("Calling lmax")
@@ -671,7 +683,7 @@ class PyhfUpperLimitComputer:
                 "Values in x were outside bounds during a minimize step, clipping to bounds",
             )
 
-            self.__init__(self.data)
+            self.__init__(self.data, self.cl, self.includeCRs, self.lumi)
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
             if workspace_index != None:
@@ -686,7 +698,6 @@ class PyhfUpperLimitComputer:
             msettings = {"normsys": {"interpcode": "code4"}, "histosys": {"interpcode": "code4p"}}
             model = workspace.model(modifier_settings=msettings)
             # obs = workspace.data(model)
-            self.getSigmaMu(workspace)
             try:
                 bounds = model.config.suggested_bounds()
                 if allowNegativeSignals:
@@ -702,22 +713,23 @@ class PyhfUpperLimitComputer:
                     # print ( f"\n>>> sigma_mu from hessian {sigma_mu:.2f}" )
                     pyhf.set_backend(pyhf.tensorlib, 'scipy')
 
-                muhat = muhat[model.config.poi_index]*self.scale
+                muhat = float ( muhat[model.config.poi_index]*self.scale )
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.error(f"pyhf mle.fit failed {e}")
                 muhat, maxNllh = float("nan"), float("nan")
-            self.muhat = muhat
             try:
-                ret = maxNllh.tolist()
+                lmax = maxNllh.tolist()
             except:
-                ret = maxNllh
+                lmax= maxNllh
             try:
-                ret = float(ret)
+                lmax = float(lmax)
             except:
-                ret = float(ret[0])
+                lmax = float(lmax[0])
+            sigma_mu = self.getSigmaMu ( workspace )
+            lmax = self.exponentiateNLL(lmax, not return_nll)
+            ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
             self.data.cached_lmaxes[workspace_index] = ret
-            ret = self.exponentiateNLL(ret, not nll)
             return ret
 
     def updateWorkspace(self, workspace_index=None, expected=False):
@@ -755,15 +767,17 @@ class PyhfUpperLimitComputer:
                                 - else: choose best combo
         :return: the upper limit on sigma times eff at `self.cl` level (0.95 by default)
         """
-
-        ul = self.getUpperLimitOnMu( expected=expected, workspace_index=workspace_index)
-        if ul == None:
-            return ul
-        if self.lumi is None:
-            logger.error(f"asked for upper limit on fiducial xsec, but no lumi given with the data")
-            return ul
-        xsec = self.data.totalYield() / self.lumi
-        return ul * xsec
+        if self.data.totalYield == 0.:
+            return None
+        else:
+            ul = self.getUpperLimitOnMu( expected=expected, workspace_index=workspace_index)
+            if ul == None:
+                return ul
+            if self.lumi is None:
+                logger.error(f"asked for upper limit on fiducial xsec, but no lumi given with the data")
+                return ul
+            xsec = self.data.totalYield / self.lumi
+            return ul * xsec
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of
@@ -783,6 +797,7 @@ class PyhfUpperLimitComputer:
                                 - else: choose best combo
         :return: the upper limit at `self.cl` level (0.95 by default)
         """
+        self.__init__(self.data, self.cl, self.includeCRs, self.lumi)
         if workspace_index in self.data.cachedULs[expected]:
             ret = self.data.cachedULs[expected][workspace_index]
             return ret
@@ -821,46 +836,48 @@ class PyhfUpperLimitComputer:
                     "normsys": {"interpcode": "code4"},
                     "histosys": {"interpcode": "code4p"},
                 }
-                model = workspace.model(modifier_settings=msettings)
-                bounds = model.config.suggested_bounds()
-                bounds[model.config.poi_index] = (0, 10)
-                start = time.time()
-                args = {}
-                args["return_expected"] = expected == "posteriori"
-                args["par_bounds"] = bounds
-                # args["maxiter"]=100000
-                pver = float(pyhf.__version__[:3])
-                stat = "qtilde"
-                if pver < 0.6:
-                    args["qtilde"] = True
-                else:
-                    args["test_stat"] = stat
-                with np.testing.suppress_warnings() as sup:
-                    if pyhfinfo["backend"] == "numpy":
-                        sup.filter(RuntimeWarning, r"invalid value encountered in log")
-                    # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
-                    try:
-                        result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
-                    except Exception as e:
-                        logger.info(f"when testing hypothesis {mu}, caught exception: {e}")
-                        result = float("nan")
-                        if expected == "posteriori":
-                            result = [float("nan")] * 2
-                end = time.time()
-                logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
-                logger.debug(f"result for {mu} {result}")
-                if expected == "posteriori":
-                    logger.debug("computing a-posteriori expected limit")
-                    logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                    try:
-                        CLs = float(result[1].tolist())
-                    except TypeError:
-                        CLs = float(result[1][0])
-                else:
-                    logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                    CLs = float(result)
-                # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
-                return 1.0 - self.cl - CLs
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
+                    model = workspace.model(modifier_settings=msettings)
+                    bounds = model.config.suggested_bounds()
+                    bounds[model.config.poi_index] = (0, 10)
+                    start = time.time()
+                    args = {}
+                    args["return_expected"] = expected == "posteriori"
+                    args["par_bounds"] = bounds
+                    # args["maxiter"]=100000
+                    pver = float(pyhf.__version__[:3])
+                    stat = "qtilde"
+                    if pver < 0.6:
+                        args["qtilde"] = True
+                    else:
+                        args["test_stat"] = stat
+                    with np.testing.suppress_warnings() as sup:
+                        if pyhfinfo["backend"] == "numpy":
+                            sup.filter(RuntimeWarning, r"invalid value encountered in log")
+                        # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
+                        try:
+                            result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
+                        except Exception as e:
+                            logger.info(f"when testing hypothesis {mu}, caught exception: {e}")
+                            result = float("nan")
+                            if expected == "posteriori":
+                                result = [float("nan")] * 2
+                    end = time.time()
+                    logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
+                    logger.debug(f"result for {mu} {result}")
+                    if expected == "posteriori":
+                        logger.debug("computing a-posteriori expected limit")
+                        logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                        try:
+                            CLs = float(result[1].tolist())
+                        except TypeError:
+                            CLs = float(result[1][0])
+                    else:
+                        logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                        CLs = float(result)
+                    # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
+                    return 1.0 - self.cl - CLs
 
             # Rescaling signals so that mu is in [0, 10]
             factor = 3.0
@@ -938,8 +955,7 @@ class PyhfUpperLimitComputer:
             ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
             endUL = time.time()
             logger.debug("getUpperLimitOnMu elpased time : %1.4f secs" % (endUL - startUL))
-            # the ul is actually on yields
-            ul = ul / self.data.totalYield() * self.scale
+            ul = ul * self.scale
             self.data.cachedULs[expected][workspace_index] = ul
             return ul  # self.scale has been updated within self.rescale() method
 
@@ -1028,6 +1044,4 @@ if __name__ == "__main__":
     )  # With respect to the older refernece value one must normalize the xsec
     print("old ul=", ul_old)
     ul = ulComp.getUpperLimitOnMu(m)
-    print("ul (marginalized)", ul)
-    ul = ulComp.getUpperLimitOnMu(m, marginalize=False)
-    print("ul (profiled)", ul)
+    print("ul", ul)

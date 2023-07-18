@@ -9,8 +9,7 @@
 import os
 from smodels.tools.printers.basicPrinter import BasicPrinter
 from smodels.decomposition.topologyDict import TopologyDict
-from smodels.matching.theoryPrediction import TheoryPredictionList
-from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner
+from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
 from smodels.experiment.databaseObj import Database
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
@@ -30,7 +29,7 @@ class TxTPrinter(BasicPrinter):
         self.printtimespent = False
         self.printingOrder = [OutputStatus, Database, TopologyDict,
                               TheoryPredictionList, TheoryPredictionsCombiner,
-                              Uncovered]
+                              TheoryPrediction, Uncovered]
         self.toPrint = [None] * len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -430,6 +429,9 @@ class TxTPrinter(BasicPrinter):
                     output += "Contributing %s %s\n" %(baseLabel,str(contributing))
             output += "================================================================================\n"
         return output
+
+    def _formatTheoryPrediction(self,obj):
+        return self._formatTheoryPredictionsCombiner(obj)
 
     def _formatTheoryPredictionsCombiner(self, obj):
         """

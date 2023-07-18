@@ -12,7 +12,7 @@ from __future__ import print_function
 
 from smodels.base.smodelsLogging import logger, setLogLevel
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
-import os,glob,pathlib
+import os,glob
 import importlib.util
 from smodels.tools import interactivePlotsHelpers as helpers
 import smodels
@@ -139,7 +139,6 @@ class Plotter(object):
         else:
             self.plot_title = parameters.plot_title
 
-
     def loadModelFile(self):
         """
         Reads the parameters from the plotting parameter file.
@@ -160,7 +159,6 @@ class Plotter(object):
             except:
                 logger.warning("Error loading model.py file %s , will use pdgs instead.",  self.modelFile)
                 self.particle_names=None
-
 
     def getParticleName(self,pdg):
         """ looks for the particle label in the model.py file """
@@ -291,7 +289,6 @@ class Plotter(object):
 
         self.data_dict['file'] = []
 
-
     def fillWith(self,smodelsOutput,slhaData):
         """
         Fill the dictionary (data_dict) with the desired data from
@@ -309,7 +306,6 @@ class Plotter(object):
             self.data_dict=filler.getSmodelSData()
 
         self.data_dict=filler.getSlhaData(self.variable_x,self.variable_y)
-
 
     def rmFiles ( self, flist ):
         """ remove files in flist """
@@ -432,6 +428,7 @@ class Plotter(object):
         mainFile = open( self.outFolder + self.indexfile,'r')
         display(HTML(mainFile.read()))
         mainFile.close()
+        self.cleanUp()
 
     def plot(self, outFolder, indexfile = "plots.html" ):
         """
@@ -448,10 +445,13 @@ class Plotter(object):
         self.indexfile = indexfile
         logger.info('Making plots...')
 
-        plotter=helpers.PlotlyBackend(self, outFolder )
-        plotter.makePlots( indexfile )
+        self.plotter=helpers.PlotlyBackend(self, outFolder )
+        self.plotter.makePlots( indexfile )
         logger.info('Generation of interactive plots finished. Go to: \n %s/%s \n to see the plots.' % ( outFolder, indexfile ) )
-
+    
+    def cleanUp ( self ):
+        if hasattr ( self, "plotter" ):
+            self.plotter.cleanUp()
 
 def main(args,indexfile= "index.html" ):
     """
