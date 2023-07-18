@@ -13,13 +13,11 @@ import glob
 import numpy as np
 from smodels.experiment import txnameObj, infoObj
 from smodels.base.physicsUnits import fb
-from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, Data, UpperLimitComputer
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, smsInStr
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expSMS import ExpSMS
 from smodels.decomposition.theorySMS import TheorySMS
-
 import itertools
 
 # if on, will check for overlapping constraints
@@ -72,6 +70,8 @@ class DataSet(object):
             self.txnameList.sort()
             self.checkForRedundancy(databaseParticles)
 
+    def getCollaboration(self,ds):
+        return "CMS" if "CMS" in ds.globalInfo.id else "ATLAS"
 
     def isCombinableWith(self, other):
         """
@@ -79,17 +79,29 @@ class DataSet(object):
 
         :param other: datasetObj to compare self with
         """
-        id1, id2 = self.globalInfo.id, other.globalInfo.id
-        if id1 == id2:  # we are always correlated with ourselves
+        if type(other)==CombinedDataSet:
+            # if other is a combined dataset, self is combinable if it is
+            # combinable with all datasets in other
+            other_ds = other._datasets
+            for ods in other_ds:
+                if not self.isCombinableWith ( ods ):
+                    return False
+            return True
+        idSelf = self.globalInfo.id
+        didSelf = self.dataInfo.dataId
+        selflabel = f"{idSelf}:{didSelf}"
+        idOther = other.globalInfo.id
+        didOther = other.dataInfo.dataId
+        otherlabel = f"{idOther}:{didOther}"
+
+        if selflabel == otherlabel:  # we are always correlated with ourselves
             return False
         from smodels.base.physicsUnits import TeV
         ds = abs(self.globalInfo.sqrts.asNumber(TeV) - other.globalInfo.sqrts.asNumber(TeV))
         if ds > 1e-5:  # not the same
             return True
 
-        def getCollaboration(ds):
-            return "CMS" if "CMS" in ds.globalInfo.id else "ATLAS"
-        coll1, coll2 = getCollaboration(self), getCollaboration(other)
+        coll1, coll2 = self.getCollaboration(self), self.getCollaboration(other)
         if coll1 != coll2:
             return True
 
@@ -102,6 +114,8 @@ class DataSet(object):
         if other.isLocalFieldCombinableWith_(self):
             return True
         if self.isCombMatrixCombinableWith_(other):
+            return True
+        if other.isCombMatrixCombinableWith_(self):
             return True
         return False
 
@@ -118,11 +132,11 @@ class DataSet(object):
         didOther = other.dataInfo.dataId
         otherlabel = f"{idOther}:{didOther}"
         for label, combs in self.globalInfo._combinationsmatrix.items():
-            if label in [idSelf, didSelf]:
+            if label in [idSelf, selflabel ]:
                 # match! with self! is "other" in combs?
                 if idOther in combs or otherlabel in combs:
                     return True
-            if label in [idOther, didOther]:
+            if label in [idOther, otherlabel ]:
                 # match! with other! is "self" in combs?
                 if idSelf in combs or selflabel in combs:
                     return True
@@ -216,7 +230,7 @@ class DataSet(object):
         if self.dataInfo.dataId:
             return self.dataInfo.dataId
         else:
-            return 'Dataset'
+            return 'Dataset (UL)'
 
     def __eq__(self, other):
         if type(other) != type(self):
@@ -299,107 +313,6 @@ class DataSet(object):
         """
 
         return getValuesForObj(self, attribute)
-
-    def likelihood(self, nsig, deltas_rel=0.2, marginalize=False, expected=False):
-        """
-        Computes the likelihood to observe nobs events,
-        given a predicted signal "nsig", assuming "deltas_rel"
-        error on the signal efficiency.
-        The values observedN, expectedBG, and bgError are part of dataInfo.
-
-        :param nsig: predicted signal (float)
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
-        :param expected: if true, compute prior expected, if false compute observed
-                         if "posteriori" compute posterior expected
-        :returns: likelihood to observe nobs events (float)
-        """
-        obs = self.dataInfo.observedN
-        if expected:  # this step is done for prior and posterior expected
-            obs = self.dataInfo.expectedBG
-
-        m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                 deltas_rel=deltas_rel)
-        computer = LikelihoodComputer(m)
-        if expected == "posteriori":
-            thetahat = computer.findThetaHat(0.)
-            if type(self.dataInfo.expectedBG) in [float, np.float64, int]:
-                thetahat = float(thetahat[0])
-
-            obs = self.dataInfo.expectedBG + thetahat
-            m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                     deltas_rel=deltas_rel)
-            # if abs ( nsig[0]-1 ) < 1e-5:
-            #    print ( f"COMB ebg={self.dataInfo.expectedBG:.3f} obs={obs:.3f} nsig {nsig[0]:.3f}" )
-            computer = LikelihoodComputer(m)
-        ret = computer.likelihood(nsig, marginalize=marginalize)
-        if hasattr(computer, "theta_hat"):
-            # seems like someone wants to debug them
-            self.theta_hat = computer.theta_hat
-
-        return ret
-
-    def lmax(self, deltas_rel=0.2, marginalize=False, expected=False,
-             allowNegativeSignals=False):
-        """
-        Convenience function, computes the likelihood at nsig = observedN - expectedBG,
-        assuming "deltas_rel" error on the signal efficiency.
-        The values observedN, expectedBG, and bgError are part of dataInfo.
-
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
-        :param expected: Compute expected instead of observed likelihood
-        :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
-
-        :returns: likelihood to observe nobs events (float)
-        """
-        obs = self.dataInfo.observedN
-        if expected:
-            obs = self.dataInfo.expectedBG
-            if expected == "posteriori":
-                m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                         deltas_rel=deltas_rel)
-                computer = LikelihoodComputer(m)
-                thetahat = computer.findThetaHat(0.)
-                if isinstance(self.dataInfo.expectedBG, (float, np.float64,
-                                                         np.float32, int,
-                                                         np.int64, np.int32)):
-                    thetahat = float(thetahat[0])
-                obs = self.dataInfo.expectedBG + thetahat
-
-        m = Data(obs, self.dataInfo.expectedBG, self.dataInfo.bgError**2,
-                 deltas_rel=deltas_rel)
-        computer = LikelihoodComputer(m)
-        ret = computer.lmax(marginalize=marginalize, nll=False,
-                            allowNegativeSignals=allowNegativeSignals)
-        if hasattr(computer, "theta_hat"):
-            # seems like someone wants to debug them
-            self.theta_hat = computer.theta_hat
-        if hasattr(computer, "muhat"):
-            # seems like someone wants to debug them
-            self.muhat = computer.muhat
-        if hasattr ( computer, "sigma_mu" ):
-            # seems like someone wants to debug them
-            self.sigma_mu = computer.sigma_mu
-        return ret
-
-    def chi2(self, nsig, deltas_rel=0.2, marginalize=False):
-        """
-        Computes the chi2 for a given number of observed events "nobs",
-        given number of signal events "nsig", and error on signal "deltas".
-        nobs, expectedBG and bgError are part of dataInfo.
-        :param nsig: predicted signal (float)
-        :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-        :param marginalize: if true, marginalize nuisances. Else, profile them.
-        :return: chi2 (float)
-        """
-
-        m = Data(self.dataInfo.observedN, self.dataInfo.expectedBG,
-                 self.dataInfo.bgError**2, deltas_rel=deltas_rel)
-        computer = LikelihoodComputer(m)
-        ret = computer.chi2(nsig, marginalize=marginalize)
-
-        return ret
 
     def folderName(self):
         """
@@ -535,9 +448,21 @@ class CombinedDataSet(object):
         self.path = expResult.path
         self.globalInfo = expResult.globalInfo
         self._datasets = expResult.datasets[:]
-        self._marginalize = False
+        self.origdatasets = expResult.origdatasets[:]
         self.sortDataSets()
         self.findType()
+
+    def isCombinableWith ( self, other ):
+        """ 
+        Function that reports if two datasets are mutually uncorrelated = combinable.
+        A combined dataset is combinable with "other", if all consistituents are.
+
+        :param other: datasetObj to compare self with
+        """
+        for ds in self._datasets:
+            if not ds.isCombinableWith ( other ):
+                return False
+        return True
 
     def findType(self):
         """ find the type of the combined dataset """
@@ -548,7 +473,11 @@ class CombinedDataSet(object):
             self.type = "pyhf"
 
     def __str__(self):
-        ret = "Combined Dataset (%i datasets)" % len(self._datasets)
+        ret = f"Combined Dataset ({len(self._datasets)} datasets)"
+        return ret
+
+    def __repr__(self):
+        ret = f"Combined Dataset ({len(self._datasets)} datasets)"
         return ret
 
     def getIndex(self, dId, datasetOrder):
@@ -578,7 +507,7 @@ class CombinedDataSet(object):
         Sort datasets according to globalInfo.datasetOrder.
         """
         if hasattr(self.globalInfo, "covariance"):
-            datasets = self._datasets[:]
+            datasets = self.origdatasets[:]
             if not hasattr(self.globalInfo, "datasetOrder"):
                 raise SModelSError("datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id)
             datasetOrder = self.globalInfo.datasetOrder
@@ -586,8 +515,9 @@ class CombinedDataSet(object):
                 datasetOrder = [datasetOrder]
 
             if len(datasetOrder) != len(datasets):
-                raise SModelSError("Number of datasets in the datasetOrder field does not match the number of datasets for %s"
-                                   % self.globalInfo.id)
+                raise SModelSError( f"Number of datasets in the datasetOrder field {len(datasetOrder)} does not match the number of datasets {len(datasets)}/{len(self.origdatasets)} for {self.globalInfo.id}" )
+            ## need to reinitialise, we might have lost some datasets when filtering
+            self._datasets = [ None ] * len(datasets)
             for dataset in datasets:
                 idx = self.getIndex(dataset.getID(), datasetOrder)
                 if idx == -1:

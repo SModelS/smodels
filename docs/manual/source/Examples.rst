@@ -2,7 +2,7 @@
 
 .. |binder| image::
       images/mybinder.png
-      :target: https://mybinder.org/v2/gh/SModelS/smodels/master?filepath=docs%2Fmanual%2Fsource%2Frecipes%2F
+      :target: https://mybinder.org/v2/gh/SModelS/smodels/main?filepath=docs%2Fmanual%2Fsource%2Frecipes%2F
 
 
 .. _Examples:
@@ -50,6 +50,7 @@ Examples displaying several functionalities:
 
 * `How to plot likelihoods from analysis combinations <plotCombinedLikelihood.html>`_ (download the Python code :download:`here <recipes/plotCombinedLikelihood.py>`, IPython notebook :download:`here <recipes/plotCombinedLikelihood.ipynb>`)
 
+* `How to use a combinations matrix <combinationsmatrix.html>`_ (download the Python code :download:`here <recipes/combinationsmatrix.py>`, IPython notebook :download:`here <recipes/combinationsmatrix.ipynb>`)
 
 Examples using the cross-section computer:
 ------------------------------------------

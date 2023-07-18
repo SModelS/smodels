@@ -188,7 +188,7 @@ the `SModelS Database releases page <https://github.com/SModelS/smodels-database
 
 For using this with the text database, 
 a tarball with the properly converted fastlim-1.0 efficiency maps (*smodels-v1.1-fastlim-1.0.tgz*) is located in the top level directory of the database   
-( it can also be downloaded separately from `Github <https://github.com/SModelS/smodels-database-release/blob/master/smodels-v1.1-fastlim-1.0.tgz>`_.)
+( it can also be downloaded separately from `Github <https://github.com/SModelS/smodels-database-release/blob/main/smodels-v1.1-fastlim-1.0.tgz>`_.)
 As for adding non-aggregated results (see above), this tarball simply needs to be exploded to be added to the database: ::
 
  cd <smodels-database folder>

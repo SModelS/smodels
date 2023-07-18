@@ -9,7 +9,7 @@
    (such as masses, width and BRs) are automatically added later.
 """
 
-from smodels.base.particle import Particle
+from smodels.theory.particle import Particle
 
 ####  R-odd   ##########
 #1st generation squarks and its conjugates:

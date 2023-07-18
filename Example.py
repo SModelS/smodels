@@ -60,19 +60,19 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb,
     print("\n Decomposition done in %1.2fm" %((time.time()-t0)/60.))
     print("\n Decomposition Results: ")
     print("\t  Total number of topologies: %i " % len(topDict))
-    nel = len(topDict.getSMSList())
-    print("\t  Total number of elements = %i " % nel)
+    nSMS = len(topDict.getSMSList())
+    print("\t  Total number of SMS = %i " % nSMS)
     # Print information about the m-th topology:
     m = 2
     if len(topDict) > m:
         cName = sorted(topDict.keys())[m]
-        elementList = topDict[cName]
+        smsList = topDict[cName]
         print("\t\t %i topology  = " % cName)
         # Print information about the n-th element in the m-th topology:
         n = 0
-        el = elementList[n]
-        print("\t\t %i-th element  = " % (n), el, end="")
-        print("\n\t\t\twith final states =", el.getFinalStates(), "\n\t\t\twith cross section =", el.weightList, "\n\t\t\tand masses = ", el.mass)
+        sms = smsList[n]
+        print("\t\t %i-th SMS  = " % (n), sms, end="")
+        print("\n\t\t\twith final states =", sms.getFinalStates(), "\n\t\t\twith cross section =", sms.weightList, "\n\t\t\tand masses = ", sms.mass)
 
     # Load the experimental results to be used.
     # In this case, all results are employed.

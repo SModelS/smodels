@@ -122,7 +122,7 @@ class Meta(object):
         #ret = lastm
         #ctr=0
         for f in os.listdir ( subdir ):
-            if f in [ "orig", "sms.root", "validation", ".git" ]:
+            if f in [ "orig", "sms.root", "validation", ".git", "exclusion_lines.json" ]:
                 continue
             if f[-1:]=="~":
                 continue
