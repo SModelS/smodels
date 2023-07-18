@@ -9,9 +9,9 @@
 """
 
 from scipy import stats
-from smodels.tools.smodelsLogging import logger
+from smodels.base.smodelsLogging import logger
 import numpy as np
-from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text
 
 __all__ = [ "CLsfromNLL", "determineBrentBracket", "chi2FromLmax" ]

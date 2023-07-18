@@ -10,11 +10,9 @@ from smodels.base.physicsUnits import TeV, fb
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.matching import clusterTools
-from smodels.matching.matcherAuxiliaryFuncs import average
 from smodels.base.smodelsLogging import logger
-from smodels.tools.statsTools import StatsComputer
+from smodels.statistics.statsTools import StatsComputer
 from typing import Union, Text
-import itertools
 import numpy as np
 
 __all__ = [ "TheoryPrediction", "theoryPredictionsFor", "TheoryPredictionsCombiner" ]
@@ -145,7 +143,7 @@ class TheoryPrediction(object):
         """
 
         if self.dataType() == "upperLimit":
-            from smodels.tools.runtime import experimentalFeatures
+            from smodels.base.runtime import experimentalFeatures
             if not experimentalFeatures():
                 computer = 'N/A'
             else:
@@ -154,7 +152,7 @@ class TheoryPrediction(object):
                     computer = 'N/A'
 
         elif self.dataType() == "efficiencyMap":
-            nsig = (self.xsection.value * self.dataset.getLumi()).asNumber()
+            nsig = (self.xsection * self.dataset.getLumi()).asNumber()
             computer = StatsComputer.forSingleBin(dataset=self.dataset,
                                                   nsig=nsig,
                                                   deltas_rel=self.deltas_rel )
@@ -162,7 +160,7 @@ class TheoryPrediction(object):
         elif self.dataType() == "combined":
             # Get dictionary with dataset IDs and signal yields
             srNsigDict = {pred.dataset.getID() :
-                          (pred.xsection.value*pred.dataset.getLumi()).asNumber()
+                          (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions}
 
             # Get ordered list of datasets:
@@ -208,7 +206,7 @@ class TheoryPrediction(object):
                 ul = self.dataset.getSRUpperLimit(expected=expected)
             if self.dataType() == "upperLimit":
                 ul = self.dataset.getUpperLimitFor(
-                    element=self.avgElement, txnames=self.txnames, expected=expected
+                    sms=self.avgSMS, txnames=self.txnames, expected=expected
                 )
             if self.dataType() == "combined":
                 ul = self.statsComputer.poi_upper_limit(expected = expected,

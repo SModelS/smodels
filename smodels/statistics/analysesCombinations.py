@@ -16,7 +16,7 @@ from smodels.base.physicsUnits import fb
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket
 import scipy.optimize as optimize
-from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict
 
 
@@ -221,7 +221,7 @@ class AnaCombLikelihoodComputer(object):
             return ul
         xsec = 0.0*fb
         for tp in self.theoryPredictions:
-            xsec += tp.xsection.value
+            xsec += tp.xsection
         return ul * xsec
 
     def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = False) -> Tuple[float, float, Callable]:

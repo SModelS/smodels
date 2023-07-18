@@ -16,7 +16,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb
 from scipy.special import erf
 import numpy as np
-from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Optional, Union, Dict
 from smodels.statistics.basicStats import deltaChi2FromLlhd
 

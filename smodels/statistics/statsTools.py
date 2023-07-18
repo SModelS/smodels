@@ -13,7 +13,7 @@
 __all__ = [ "StatsComputer" ]
 
 from typing import Union, Text, Dict, List
-from smodels.theory.exceptions import SModelSTheoryError as SModelSError
+from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb
 from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
@@ -127,10 +127,10 @@ class StatsComputer:
         )
         if eul is None:
             return None
-        eul = eul / theorypred.xsection.value
+        eul = eul / theorypred.xsection
         ul = theorypred.dataset.getUpperLimitFor(
             element=theorypred.avgElement, txnames=theorypred.txnames, expected=False
-        ) / theorypred.xsection.value
+        ) / theorypred.xsection
         kwargs = { "upperLimitOnMu": float(ul), "expectedUpperLimitOnMu": float(eul),
                    "corr": corr }
         computer = StatsComputer(dataObject=theorypred.dataset,

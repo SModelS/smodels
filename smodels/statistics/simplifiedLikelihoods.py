@@ -13,7 +13,7 @@ from scipy import stats, optimize, integrate, special, linalg
 from numpy import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket
-from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
+from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Optional, Union, Tuple
 
 import numpy as np

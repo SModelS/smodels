@@ -29,7 +29,7 @@ setLogLevel("info")
 import os
 
 
-def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.005*fb,
+def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
          database = 'official'):
     """
     Main program. Displays basic use case.
