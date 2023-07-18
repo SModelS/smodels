@@ -32,8 +32,11 @@ class ScanSummaryTest(unittest.TestCase):
         runMain(dirname, inifile="testParameters.ini")
         outSummary = os.path.join(out, 'summary.txt')
         outDefault = 'summary_scan_default.txt'
+        comp = compareScanSummary(outSummary, outDefault, allowedRelDiff=0.05)
+        if not comp:
+            print ( f"ERROR: {outSummary}!={outDefault}" )
 
-        self.assertTrue(compareScanSummary(outSummary, outDefault, allowedRelDiff=0.05))
+        self.assertTrue(comp)
 
         for f in os.listdir(dirname):
             self.removeOutputs(os.path.join(out,os.path.basename(f)))
@@ -48,7 +51,10 @@ class ScanSummaryTest(unittest.TestCase):
                 development=True)
         outSummary = os.path.join(out, 'summary.txt')
         outDefault = 'summary_scan_default.txt'
-        self.assertTrue(compareScanSummary(outSummary, outDefault, allowedRelDiff=0.05))
+        comp = compareScanSummary(outSummary, outDefault, allowedRelDiff=0.05)
+        if not comp:
+            print ( f"ERROR: {outSummary}!={outDefault}" )
+        self.assertTrue(comp)
 
         for f in os.listdir(dirname):
             self.removeOutputs(os.path.join(out,os.path.basename(f)))

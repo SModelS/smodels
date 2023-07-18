@@ -57,11 +57,9 @@ def compareXSections(dictA,dictB,nevts,relError = 0.1):
 class XSecTest(unittest.TestCase):
     # use different logging config for the unit tests.
 
-    toolBox.ToolBox().compile() ## make sure the tools are compiled
-
     def testLOGlu(self):
         """ test the computation of LO cross section and compare with pythia6 """
-
+        toolBox.ToolBox().compile() ## make sure the tools are compiled
         slhafile  = "./testFiles/slha/gluino_squarks.slha"
         computer6 = xsecComputer.XSecComputer(LO, Nevents, 6)
         computer8 = xsecComputer.XSecComputer(LO, Nevents, 8)

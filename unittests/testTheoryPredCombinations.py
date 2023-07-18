@@ -12,14 +12,12 @@ sys.path.insert(0, "../")
 
 from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer
 LikelihoodComputer.debug_mode = True
-from smodels.matching.theoryPrediction import theoryPredictionsFor
+from smodels.matching.theoryPrediction import theoryPredictionsFor,TheoryPredictionsCombiner
 from smodels.decomposition import decomposer
-from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.base.model import Model
 from smodels.share.models.SMparticles import SMList
 from smodels.share.models.mssm import BSMList
 from smodels.experiment.databaseObj import Database
-from unitTestHelpers import equalObjs, runMain, importModule
 from smodels.base.physicsUnits import fb, GeV, TeV
 from smodels.matching.modelTester import getCombiner
 import numpy as np
@@ -49,13 +47,11 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         smstopos = decomposer.decompose(model)
         tpreds = []
         tpreds = theoryPredictionsFor(database, smstopos,
-                combinedResults=False, useBestDataset=False, marginalize=False)
+                combinedResults=False, useBestDataset=False)
         for t in tpreds:
             t.computeStatistics()
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
-        mu_hat, sigma_mu, lmax = combiner.findMuHat(allowNegativeSignals=True,
-                                                    extended_output=True)
         self.assertAlmostEqual(combiner.lsm(), 2.756169857697467e-06, 4)
         self.assertAlmostEqual(combiner.likelihood(), 5.001298746531528e-06, 4)
         self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
@@ -111,8 +107,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # = 0.01880727876784458
         defaultLmax["CMS-SUS-16-050-agg:ar8"] = 0.01880727876784458
         tpreds = theoryPredictionsFor(database, smstopos, 
-                                      combinedResults=False, useBestDataset=False, 
-                                      marginalize=False)
+                                      combinedResults=False, useBestDataset=False)
         for t in tpreds:
             t.computeStatistics()
             dId = t.dataset.dataInfo.dataId
@@ -131,9 +126,9 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # combination:
         # mu_hat 0.035 lmax 0.00011 ul_mu 0.27
         combiner = TheoryPredictionsCombiner(tpreds)
-        combiner.computeStatistics()
-        fmh = combiner.findMuHat(allowNegativeSignals=True, extended_output=True)
-        mu_hat, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+        combiner.computeStatistics()        
+        fmh = combiner.statsComputer.get_five_values(expected=False)
+        mu_hat, lmax = fmh["muhat"], fmh["lmax"]
         lsm = combiner.lsm()
         # print ( "muhat", mu_hat, "lmax", lmax )
         # multiply the previous lsms, 0.013786096355236995 * 0.007423073728232388
@@ -148,6 +143,9 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(lmax, 0.00010754284992636553, 4)
 
     def testFilter(self):
+        import warnings
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+        warnings.filterwarnings("ignore", category=UserWarning)        
         from smodels.base import runtime
         runtime._experimental = True
 
@@ -167,8 +165,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
                                         sigmacut, massCompress=True, invisibleCompress=True,
                                         minmassgap=mingap)
         tpreds =  theoryPredictionsFor(db, smstopos, 
-                                       combinedResults=True, useBestDataset=False, 
-                                       marginalize=False)
+                                       combinedResults=True, useBestDataset=False)
         combiner = TheoryPredictionsCombiner.selectResultsFrom(tpreds, anaids)
         # IDs that should be selected and the respective expected r-values:
         goodIDs = {
@@ -187,10 +184,13 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             self.assertAlmostEqual(diff_rel,0.0,2)
             self.assertEqual(goodIDs[ana][1], selectedIDs[ana][1])
 
-        self.assertAlmostEqual(combiner.lsm() / 1.06988795e-20, 1., 2)
-        self.assertAlmostEqual(combiner.likelihood() / 8.9504e-21, 1., 2)
-        self.assertAlmostEqual(combiner.lmax() / 1.0698879533540923e-20, 1., 2)
-        self.assertAlmostEqual(combiner.getRValue() / .2229345123626656, 1., 2)
+        self.assertAlmostEqual(combiner.lsm() / 8.032708820262497e-27, 1., 2)
+        self.assertAlmostEqual(combiner.likelihood() / 6.181123374537111e-27, 1., 2)
+        self.assertAlmostEqual(combiner.lmax() / 8.032708820262498e-27, 1., 2)
+        self.assertAlmostEqual(combiner.getRValue() / 0.2771209732232204, 1., 2)
+        self.assertAlmostEqual(combiner.CLs(), 0.4672132966218591, 2 )
+        self.assertAlmostEqual(combiner.CLs( expected = True ), 0.5295734, 2 )
+        self.assertAlmostEqual(combiner.CLs( mu=.5 ), 0.64744, 2 )
 
 
     def testGetCombiner(self):

@@ -30,14 +30,11 @@ setLogLevel ( "error" )
 def isInReducedSet ( t ):
     """ is t in the reduced set of unit tests? """
     t = str(t).lower()
-    if "cpp" in t:
-        return False
-    if "nllfast" in t:
-        return False
-    if "pythia" in t:
-        return False
-    if "xsec" in t:
-        return False
+    keywords = [ "cpp", "nllfast", "pythia", "xsec", 
+                "server", "loadlatest" ]
+    for keyword in keywords:
+        if keyword in t:
+            return False
     return True
 
 def run(filter=None, testNotebooks=False, reduced=False ):

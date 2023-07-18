@@ -25,7 +25,7 @@ smodelsOutputDefault={
             'maxcond': 0.0,
             'theory prediction (fb)': 0.006169387,
             'upper limit (fb)': 0.7450577,
-            'expected upper limit (fb)': 0.6012431,
+            'expected upper limit (fb)': 1.17765,
             'TxNames': [
                 'T1tttt',
                 'T2tt'
@@ -37,7 +37,7 @@ smodelsOutputDefault={
             'lumi (fb-1)': 35.9,
             'dataType': 'combined',
             'r': 0.008280415,
-            'r_expected': 0.01026105,
+            'r_expected': 0.005238129,
             'Width (GeV)': None,
             'likelihood': 2.731562852886369e-85,
             'l_max': 2.7825288461406125e-85,

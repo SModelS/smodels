@@ -2,7 +2,9 @@ pandas
 torch
 ipynb
 plotly
-parameterized
 nbmake
 jupyter
 pytest
+parameterized
+matplotlib
+redirector

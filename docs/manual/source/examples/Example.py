@@ -15,58 +15,69 @@ runtime.modelFile = 'smodels.share.models.mssm'
 
 from smodels.decomposition import decomposer
 from smodels.base.physicsUnits import fb, GeV, TeV
-from smodels.decomposition.theoryPrediction import theoryPredictionsFor
+from smodels.matching.theoryPrediction import theoryPredictionsFor,TheoryPredictionsCombiner
 from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
-from smodels.matching.theoryPredictionsCombiner import TheoryPredictionsCombiner
 from smodels.base.smodelsLogging import setLogLevel
-from smodels.particlesLoader import BSMList
+from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
+import time
 setLogLevel("info")
 
 # Set the path to the database
-database = Database("official")
+import os
 
 
-def main():
+def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
+         database = 'official'):
     """
     Main program. Displays basic use case.
     """
+
+    # Set the path to the database
+    database = Database(database)
+
     model = Model(BSMparticles=BSMList, SMparticles=SMList)
     # Path to input file (either a SLHA or LHE file)
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
-    slhafile = 'inputFiles/slha/lightEWinos.slha'
+    slhafile = os.path.abspath(inputFile)
 #     model.updateParticles(inputFile=lhefile)
     model.updateParticles(inputFile=slhafile)
 
     # Set main options for decomposition
-    sigmacut = 0.005*fb
+    sigmacut = sigmacut
     mingap = 5.*GeV
 
+    t0 = time.time()
     # Decompose model
-    toplist = decomposer.decompose(model, sigmacut, doCompress=True, doInvisible=True, minmassgap=mingap)
+    topDict = decomposer.decompose(model, sigmacut,
+                                   massCompress=True, invisibleCompress=True,
+                                   minmassgap=mingap)
 
     # Access basic information from decomposition, using the topology list and topology objects:
+    print("\n Decomposition done in %1.2fm" %((time.time()-t0)/60.))
     print("\n Decomposition Results: ")
-    print("\t  Total number of topologies: %i " % len(toplist))
-    nel = sum([len(top.elementList) for top in toplist])
-    print("\t  Total number of elements = %i " % nel)
+    print("\t  Total number of topologies: %i " % len(topDict))
+    nSMS = len(topDict.getSMSList())
+    print("\t  Total number of SMS = %i " % nSMS)
     # Print information about the m-th topology:
     m = 2
-    if len(toplist) > m:
-        top = toplist[m]
-        print("\t\t %i-th topology  = " % m, top, "with total cross section =", top.getTotalWeight())
+    if len(topDict) > m:
+        cName = sorted(topDict.keys())[m]
+        smsList = topDict[cName]
+        print("\t\t %i topology  = " % cName)
         # Print information about the n-th element in the m-th topology:
         n = 0
-        el = top.elementList[n]
-        print("\t\t %i-th element from %i-th topology  = " % (n, m), el, end="")
-        print("\n\t\t\twith final states =", el.getFinalStates(), "\n\t\t\twith cross section =", el.weight, "\n\t\t\tand masses = ", el.mass)
+        sms = smsList[n]
+        print("\t\t %i-th SMS  = " % (n), sms, end="")
+        print("\n\t\t\twith final states =", sms.getFinalStates(), "\n\t\t\twith cross section =", sms.weightList, "\n\t\t\tand masses = ", sms.mass)
 
     # Load the experimental results to be used.
     # In this case, all results are employed.
-    listOfExpRes = database.getExpResults()
+    listOfExpRes = database.expResultList
 
+    t0 = time.time()
     # Print basic information about the results loaded.
     # Count the number of loaded UL and EM experimental results:
     nUL, nEM = 0, 0
@@ -82,41 +93,32 @@ def main():
     print("\n Theory Predictions and Constraints:")
     rmax = 0.
     bestResult = None
-    allPredictions = []
-    for expResult in listOfExpRes:
-        predictions = theoryPredictionsFor(expResult, toplist, combinedResults=False, marginalize=False)
-        if not predictions:
-            continue  # Skip if there are no constraints from this result
-        print('\n %s ' % expResult.globalInfo.id)
-        for theoryPrediction in predictions:
-            dataset = theoryPrediction.dataset
-            datasetID = theoryPrediction.dataId()
-            mass = theoryPrediction.mass
-            txnames = [str(txname) for txname in theoryPrediction.txnames]
-            PIDs = theoryPrediction.PIDs
-            print("------------------------")
-            print("Dataset = ", datasetID)  # Analysis name
-            print("TxNames = ", txnames)
-            print("Prediction Mass = ", mass)  # Value for average cluster mass (average mass of the elements in cluster)
-            print("Prediction PIDs = ", PIDs)  # Value for average cluster mass (average mass of the elements in cluster)
-            print("Theory Prediction = ", theoryPrediction.xsection)  # Signal cross section
-            print("Condition Violation = ", theoryPrediction.conditions)  # Condition violation values
+    allPredictions = theoryPredictionsFor(database, topDict, combinedResults=False)
+    for theoryPrediction in allPredictions:
+        print('\n %s ' % theoryPrediction.analysisId())
+        dataset = theoryPrediction.dataset
+        datasetID = theoryPrediction.dataId()
+        txnames = sorted([str(txname) for txname in theoryPrediction.txnames])
+        print("------------------------")
+        print("Dataset = ", datasetID)  # Analysis name
+        print("TxNames = ", txnames)
+        print("Theory Prediction = ", theoryPrediction.xsection)  # Signal cross section
+        print("Condition Violation = ", theoryPrediction.conditions)  # Condition violation values
 
-            # Get the corresponding upper limit:
-            print("UL for theory prediction = ", theoryPrediction.upperLimit)
+        # Get the corresponding upper limit:
+        print("UL for theory prediction = ", theoryPrediction.upperLimit)
 
-            # Compute the r-value
-            r = theoryPrediction.getRValue()
-            print("r = %1.3E" % r)
-            # Compute likelihoods for EM-type results:
-            if dataset.getType() == 'efficiencyMap':
-                theoryPrediction.computeStatistics()
-                print('L_BSM, L_SM, L_max = %1.3E, %1.3E, %1.3E' % (theoryPrediction.likelihood(),
-                      theoryPrediction.lsm(), theoryPrediction.lmax()))
-            if r > rmax:
-                rmax = r
-                bestResult = expResult.globalInfo.id
-            allPredictions.append(theoryPrediction)
+        # Compute the r-value
+        r = theoryPrediction.getRValue()
+        print("r = %1.3E" % r)
+        # Compute likelihoods for EM-type results:
+        if dataset.getType() == 'efficiencyMap':
+            theoryPrediction.computeStatistics()
+            print('L_BSM, L_SM, L_max = %1.3E, %1.3E, %1.3E' % (theoryPrediction.likelihood(),
+                    theoryPrediction.lsm(), theoryPrediction.lmax()))
+        if r > rmax:
+            rmax = r
+            bestResult = theoryPrediction.analysisId()
 
     # Print the most constraining experimental result
     print("\nThe largest r-value (theory/upper limit ratio) is %1.3E" % rmax)
@@ -125,6 +127,8 @@ def main():
     else:
         print("(The input model is not excluded by the simplified model results)")
 
+    print("\n Theory Predictions done in %1.2fm" %((time.time()-t0)/60.))
+    t0 = time.time()
     # Select a few results results for combination:
     combineAnas = ['ATLAS-SUSY-2013-11', 'CMS-SUS-13-013']
     selectedTheoryPreds = []
@@ -151,8 +155,11 @@ def main():
         print("Combined r value (expected): %1.3E" % combiner.getRValue(expected=True))
         print("Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (llhd, lmax, lsm))
 
+    print("\n Combination of analyses done in %1.2fm" %((time.time()-t0)/60.))
+    t0 = time.time()
     # Find out missing topologies for sqrts=13*TeV:
-    uncovered = coverage.Uncovered(toplist, sqrts=13.*TeV)
+    uncovered = coverage.Uncovered(topDict, sqrts=13.*TeV)
+    print("\n Coverage done in %1.2fm" %((time.time()-t0)/60.))
     # First sort coverage groups by label
     groups = sorted(uncovered.groups[:], key=lambda g: g.label)
     # Print uncovered cross-sections:
@@ -161,9 +168,9 @@ def main():
 
     missingTopos = uncovered.getGroup('missing (prompt)')
     # Print some of the missing topologies:
-    if missingTopos.generalElements:
+    if missingTopos.finalStateSMS:
         print('Missing topologies (up to 3):')
-        for genEl in missingTopos.generalElements[:3]:
+        for genEl in missingTopos.finalStateSMS[:3]:
             print('Element:', genEl)
             print('\tcross-section (fb):', genEl.missingX)
     else:
@@ -171,14 +178,16 @@ def main():
 
     missingDisplaced = uncovered.getGroup('missing (displaced)')
     # Print elements with displaced decays:
-    if missingDisplaced.generalElements:
+    if missingDisplaced.finalStateSMS:
         print('\nElements with displaced vertices (up to 2):')
-        for genEl in missingDisplaced.generalElements[:2]:
+        for genEl in missingDisplaced.finalStateSMS[:2]:
             print('Element:', genEl)
             print('\tcross-section (fb):', genEl.missingX)
     else:
         print("\nNo displaced decays")
 
+    return topDict,allPredictions,uncovered
 
 if __name__ == '__main__':
-    main()
+
+    topDict,allPredictions,uncovered = main()

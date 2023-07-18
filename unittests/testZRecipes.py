@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 """
-.. module:: testNotebooks
-   :synopsis: Tests that the recipes runs
+.. module:: testZRecipes
+   :synopsis: Tests that the recipes runs (the Z in the name is,
+              so it gets tested last)
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
@@ -34,17 +35,29 @@ def listOfNotebooks(notebookDir=nbdir):
     import glob
     notebooks = glob.glob(f"{notebookDir}/*.ipynb")
     notebooks = list(notebooks)
+    notebooks.sort()
     notebooks = [os.path.basename(n) for n in notebooks]
     return notebooks
 
+def checkArgParser ():
+    import argparse
+    try:
+        parser = argparse.ArgumentParser ( allow_abbrev=True )
+    except TypeError as e:
+        print ( "argparser does not take allow_abbrev as argument." )
+        print ( "this might be a problem. If it is, consider DOWNgrading argparser!" )
 
-class NotebookTest(unittest.TestCase):
+checkArgParser()
+
+class RecipeTest(unittest.TestCase):
 
     @parameterized.expand(listOfNotebooks())
-    def testRunNotebook(self,notebookFile):
+    def testRunRecipe(self,notebookFile):
 
         filename = os.path.join(nbdir,notebookFile)
-        p = subprocess.Popen(["pytest --nbmake --nbmake-timeout=900 %s" %filename], shell=True,
+        cmd = f"pytest --nbmake --nbmake-timeout=900 {filename}"
+        # print ( "cmd", cmd )
+        p = subprocess.Popen([cmd], shell=True,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         t0 = time.time()
         output, error = p.communicate()

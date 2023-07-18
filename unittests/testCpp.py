@@ -52,7 +52,7 @@ class CppTest(unittest.TestCase):
     def writeDebug ( self, txt ):
         """ write debugging file """
         print ( "test failed. writing output to debug.txt" )
-        f=open("debug.txt","w")
+        f=open("testCpp.dbg","w")
         for i in txt:
             f.write ( i+ "\n" )
         f.close()
@@ -63,6 +63,9 @@ class CppTest(unittest.TestCase):
         self.writeIni ( dbpath )
         cmd = "cd ../cpp; ./run"
         l = CMD.getoutput(cmd)
+        verbose = False
+        if verbose:
+            print ( l )
         l = l[l.find('Input status'):]
         la = l.split("\n")
         a = [ x.strip() for x in la  if x.strip() and x.strip()[0] != '#' 

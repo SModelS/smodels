@@ -26,9 +26,6 @@ action= "store_true" )
 argparser.add_argument('-v', '--verbose',
 help='specifying the level of verbosity (error, warning, info, debug)',
 default = 'warning', type = str)
-argparser.add_argument('-n', '--ntoys',
-help='number of Monte Carlo toys',
-default = 50000, type = int)
 
 args = argparser.parse_args()
 
@@ -50,7 +47,6 @@ from smodels_utils.dataPreparation.databaseCreation import databaseCreator
 from smodels_utils.dataPreparation.datasetCreation import DatasetsFromLatex,createAggregationList
 from smodels_utils.dataPreparation.massPlaneObjects import x, y, z
 
-# DataSetInput.ntoys = 50
 
 #+++++++ global info block ++++++++++++++
 info = MetaInfoInput('CMS-SUS-16-050-agg')
