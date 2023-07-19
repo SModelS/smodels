@@ -55,7 +55,7 @@ class IntegrationTest(unittest.TestCase):
 
     def testIntegration(self):
 
-        slhafile = '../inputFiles/slha/simplyGluino.slha'
+        slhafile = './testFiles/slha/simplyGluino.slha'
         model = Model(BSMList,SMList)
         model.updateParticles(slhafile)
 

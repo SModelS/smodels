@@ -78,7 +78,7 @@ class InclusiveNodeTest(unittest.TestCase):
     def testComparison(self):
 
 
-        slhafile="../inputFiles/slha/lightEWinos.slha"
+        slhafile="./testFiles/slha/lightEWinos.slha"
         model = Model(BSMList,SMList)
         model.updateParticles(inputFile=slhafile,promptWidth = 1e-12*GeV)
 

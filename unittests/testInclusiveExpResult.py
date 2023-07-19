@@ -2,7 +2,7 @@
 
 """
 .. module:: testInclusiveExpResult
-   :synopsis: Testing methods used for decomposition
+   :synopsis: Testing creation and comparison of Inclusive SMS
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
@@ -48,7 +48,7 @@ def getEdges(sms):
 class TestInclusiveExpRes(unittest.TestCase):
 
     
-    # Tests that the function can handle a simple bracket notation
+    
     def test_expsms_inclusive(self):
 
         exp = db.getExpResults(analysisIDs='CMS-PAS-EXO-16-036', txnames='THSCPM2')[0]
