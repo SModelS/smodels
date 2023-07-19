@@ -24,26 +24,9 @@ from smodels.base.model import Model
 from smodels.base.physicsUnits import fb, GeV
 from databaseLoader import database as db
 from smodels.base.inclusiveObjects import InclusiveValue
+from unitTestHelpers import getNodesIndices, getEdges
 db_extra = Database('unittestextra')
 
-def getNodesIndices(sms):
-    '''
-    Convenience function to convert the nodes and indices to strings.
-    '''
-    nodes_and_indices = list(zip(sms.nodes,sms.nodeIndices))
-    nodes_and_indices = [(str(node),inode) for node,inode in nodes_and_indices[:]]
-    nodes_and_indices = sorted(nodes_and_indices,key = lambda pt: pt[1])
-
-    return nodes_and_indices
-
-def getEdges(sms):
-    '''
-    Convenience function to convert the edges to strings.
-    '''
-    edges = sorted([(str(mom),str(daughter)) 
-             for mom,daughter in sms.edges])
-
-    return edges
 
 class TestInclusiveExpRes(unittest.TestCase):
 

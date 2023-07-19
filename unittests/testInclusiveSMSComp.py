@@ -12,37 +12,18 @@ from __future__ import print_function
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.experiment.defaultFinalStates import finalStates
 from smodels.base.model import Model
-from collections import OrderedDict
 from smodels.base.physicsUnits import fb, GeV
+from unitTestHelpers import getNodesIndices, getEdges
 
 slhafile="./testFiles/slha/lightEWinos.slha"
 model = Model(BSMList,SMList)
 model.updateParticles(inputFile=slhafile,promptWidth = 1e-12*GeV)
 
-def getNodesIndices(sms):
-    '''
-    Convenience function to convert the nodes and indices to strings.
-    '''
-    nodes_and_indices = list(zip(sms.nodes,sms.nodeIndices))
-    nodes_and_indices = [(str(node),inode) for node,inode in nodes_and_indices[:]]
-    nodes_and_indices = sorted(nodes_and_indices,key = lambda pt: pt[1])
-
-    return nodes_and_indices
-
-def getEdges(sms):
-    '''
-    Convenience function to convert the edges to strings.
-    '''
-    edges = sorted([(str(mom),str(daughter)) 
-             for mom,daughter in sms.edges])
-
-    return edges
 
 class TestInclusiveSMSComp(unittest.TestCase):
 

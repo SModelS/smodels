@@ -305,6 +305,24 @@ def compareObjs(obj1, obj2, allowedRelDiff=0.05):
                 return False
     return True
 
+def getNodesIndices(sms):
+    '''
+    Convenience function to convert the nodes and indices to strings.
+    '''
+    nodes_and_indices = list(zip(sms.nodes,sms.nodeIndices))
+    nodes_and_indices = [(str(node),inode) for node,inode in nodes_and_indices[:]]
+    nodes_and_indices = sorted(nodes_and_indices,key = lambda pt: pt[1])
+
+    return nodes_and_indices
+
+def getEdges(sms):
+    '''
+    Convenience function to convert the edges to strings.
+    '''
+    edges = sorted([(str(mom),str(daughter)) 
+             for mom,daughter in sms.edges])
+
+    return edges
 
 class Summary():
     """
