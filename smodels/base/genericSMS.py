@@ -1131,6 +1131,10 @@ class GenericSMS(object):
                 display(dot) # for notebooks
             except NameError:
                 try:
+                    import os
+                    fname = filename
+                    if fname != None:
+                        fname, extension = os.path.splitext(filename)
                     dot.view(filename=fname) # for terminals
                 except (RuntimeError, graphviz.ExecutableNotFound,\
                         graphviz.CalledProcessError) as e:
