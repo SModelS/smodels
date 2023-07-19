@@ -27,6 +27,7 @@ from concurrent.futures import ProcessPoolExecutor
 from smodels.tools.xsecBasis import XSecBasis, ArgsStandardizer
 import pyslha
 import math
+import json
 try:
     import cStringIO as io
 except ImportError as e:
@@ -54,7 +55,7 @@ class XSecResummino(XSecBasis):
         self.ncpu = ncpu
         self.sqrts = sqrt
     
-    def one_slha_calculation(self, particles,input_file, slha_file, output_file, num_try, order):
+    def one_slha_calculation(self, particles,input_file, slha_file, output_file, num_try, order, mode):
         """
         Gestion du fichier log et lancement de la commande lancant Resummino
         """
@@ -71,7 +72,7 @@ class XSecResummino(XSecBasis):
         Xsections = crossSection.XSectionList()
         
         for particle_pair in particles:
-            self.launcher(input_file, slha_file, output_file, particle_pair[0], particle_pair[1], num_try, order, Xsections)
+            self.launcher(input_file, slha_file, output_file, particle_pair[0], particle_pair[1], num_try, order, Xsections, mode)
             
         nxsecs = self.addXSecToFile(Xsections, slha_file)
         
@@ -93,18 +94,36 @@ class XSecResummino(XSecBasis):
 
 
 
-    def launcher(self, input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections):
+    def launcher(self, input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, mode):
         #modifie_slha_file(input_file, input_file, slha_file)
         self.modifie_outgoing_particles(input_file, input_file, particle_1, particle_2)
         #on lance si c'est le premier essai par défaut
         
-        hist = 0
         already_written_canal = self.canaux_finding(slha_file)
-        
-        if (particle_1, particle_2) in already_written_canal:
+        sqrts = [x for x in self.sqrts]
+        print(((particle_1, particle_2), sqrts[0], order) in already_written_canal)
+        if ((particle_1, particle_2), sqrts[0], order) in already_written_canal:
+            print('wow')
             return
+        if mode == "check":
+            self.launch_command(self.resummino_bin, input_file, output_file, 0)
+            infos = self.search_in_output(output_file)
+            infos = infos[0].split(" ")[2][1:]
+            print(infos)
+            print(float(infos[0])>10**(-5))
+            if float(infos[0])>10**(-5):
+                self.launch_command(self.resummino_bin, input_file, output_file, order)
+                if num_try == 0:
+                    hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, 'all', Xsections)
+            else:
+                hist = self.write_in_slha(output_file, slha_file, 0, particle_1, particle_2, 'all', Xsections)
+            return
+            
+            
+        hist = 0
+
         
-        if num_try == 0:
+        if num_try == 0 and mode != "check":
             self.launch_command(self.resummino_bin, input_file, output_file, order)
 
         #Ici on écrit dans le fichier slha, la variable hist permet de voir s'il y a eu une erreur
@@ -265,13 +284,14 @@ class XSecResummino(XSecBasis):
             data = f.readlines()
             
         canaux = []
-
         for i in range(len(data)):
             line = data[i]
             if line.startswith("XSECTION"):
-                if line.split(" ")[2] == '1.30E+04':
-                    canal = (int(line.split(" ")[7]), int(line.split(" ")[8]))
-                    canaux.append(canal)
+                sqrt = line.split(" ")[2]
+                canal = (int(line.split(" ")[7]), int(line.split(" ")[8]))
+                order = data[i+1].split(" ")[4]
+                order = int(order)
+                canaux.append((canal, sqrt, order))
         return canaux
 
     #Choisi ici les canaux que tu souhaites utiliser
@@ -335,7 +355,7 @@ class XSecResummino(XSecBasis):
                 data = f.readlines()
                 a+=1
                 
-            if data[-1].endswith("Resumminov3.1.2\n"):
+            if data[-1].endswith("SModelSv2.3.0\n"):
                 b+=1
                 #On augmente cette variable de 1, comme ca si elle est > 0 on ne refait pas le calcul
                 num_try+=1
@@ -348,20 +368,21 @@ class XSecResummino(XSecBasis):
             slha_file_name = slha[6:-5]
 
             #On prend le fichier de référence, et on créer une copie dans resummino_in avec le bon fichier slha
-            self.modifie_slha_file(self.input_file_original, f"resummino_in/resummino_{slha_file_name}.in",slha_path)
+            self.modifie_slha_file(self.input_file_original, f"smodels/lib/resummino/resummino_in/resummino_{slha_file_name}.in",slha_path)
 
             #On ajoute les noms à la liste (in, out et slha)
-            Liste_resummino_in.append(f"resummino_in/resummino_{slha_file_name}.in")
-            Liste_output_file.append(f"resummino_out/resummino_out_{slha_file_name}.txt")
+            Liste_resummino_in.append(f"smodels/lib/resummino/resummino_in/resummino_{slha_file_name}.in")
+            Liste_output_file.append(f"smodels/lib/resummino/resummino_out/resummino_out_{slha_file_name}.txt")
             Liste_slha.append(slha_path)
 
             #On liste ici les canaux à utiliser, si scénario exclu alors renvoi None
-            particles = self.discrimination_particles(slha_path)
+            #particles = self.discrimination_particles(slha_path)
+            mode, particles = self.json_extraction()
             Liste_particles.append(particles)
 
             #On pourrait optimiser en enlevant les variables qui ne changent pas d'une itération à l'autre
             #Mais ce n'est pas très important (négligeable niveau temps de compilation comparé à Resummino)
-            Liste.append((particles, f"resummino_in/resummino_{slha_file_name}.in", slha_path, f"resummino_out/resummino_out_{slha_file_name}.txt", num_try, order))
+            Liste.append((particles, f"smodels/lib/resummino/resummino_in/resummino_{slha_file_name}.in", slha_path, f"resummino_out/resummino_out_{slha_file_name}.txt", num_try, order, mode))
         print(f" Number of files created : {a-b-c}")
         return Liste
 
@@ -375,6 +396,19 @@ class XSecResummino(XSecBasis):
                 if line.startswith("slha ="):
                     line = f"slha = {slha_file}\n"
                 f.write(line)
+
+    def json_extraction(self, file = "resummino.json"):
+        with open(file, "r") as f:
+            data = json.load(f)
+        
+        mode = data["mode"]
+        
+        canaux = data["canaux"]
+        particles = []
+        for clef, valeurs in canaux.items():
+            particles.append((valeurs[0], valeurs[1]))
+            
+        return mode, particles
 
     def modifie_outgoing_particles(self, input_file, output_file, new_particle1, new_particle2):
         with open(input_file, 'r') as f:
@@ -393,7 +427,6 @@ class XSecResummino(XSecBasis):
     
         #On créer la liste
         tasks = self.routine_creation(self.maxOrder, self.slha_folder_name)
-
         #On lance le programme avec les performances maximales, à changer si besoin
         with ProcessPoolExecutor(max_workers=self.ncpu) as executor:
             futures = [executor.submit(self.one_slha_calculation, *task) for task in tasks]
