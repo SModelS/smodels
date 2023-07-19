@@ -1118,12 +1118,8 @@ class GenericSMS(object):
         if filename is not None:
             import os
             filename = os.path.abspath(filename)
-            fname, extension = os.path.splitext(filename)
-            dot.format = extension[1:]
-            dot.render(outfile=filename, view=view)
-            gvfile = fname+".gv"
-            if os.path.exists ( gvfile ):
-                os.unlink ( gvfile )
+            # dot.format = extension[1:]
+            dot.render(outfile=filename, view=view, cleanup=True)
 
         # Try to display (for various circumstances)
         if view:
