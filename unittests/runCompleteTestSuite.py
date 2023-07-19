@@ -31,7 +31,7 @@ def isInReducedSet ( t ):
     """ is t in the reduced set of unit tests? """
     t = str(t).lower()
     keywords = [ "cpp", "nllfast", "pythia", "xsec", 
-                "server", "loadlatest" ]
+                "server", "loadlatest", "notebook", "recipes" ]
     for keyword in keywords:
         if keyword in t:
             return False
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     ap.add_argument('-f','--filter', help='run only tests that have <FILTER> in name. Works only with verbose and not parallel. case sensitive.',type=str,default=None)
     ap.add_argument('-p','--parallel', help='run in parallel',action='store_true')
     ap.add_argument('-n','--notebooks', help='also test notebooks',action='store_true',default=False)
-    ap.add_argument('-r','--reduced', help='run reduced set of tests (no C++ interface, no xsec computation)',
+    ap.add_argument('-r','--reduced', help='run reduced set of tests (no C++ interface, no xsec computation or notebook tests)',
                     action='store_true', default = False)
     args = ap.parse_args()
 

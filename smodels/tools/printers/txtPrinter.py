@@ -16,6 +16,7 @@ from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 import numpy as np
+from itertools import groupby
 import time
 
 class TxTPrinter(BasicPrinter):
@@ -149,7 +150,7 @@ class TxTPrinter(BasicPrinter):
 
         if self.outputFormat == 'version2':
             output += "\t\t Element: \n"
-            branchList, finalState, intermediateState = obj.treeToBrackets()
+            branchList, finalState, _ = obj.treeToBrackets()
             masses = []
             pidlist = []
             for bIndex in obj.daughterIndices(obj.rootIndex):
@@ -166,6 +167,8 @@ class TxTPrinter(BasicPrinter):
                     pids.append(node.pdg)
                 masses.append(bMasses)
                 pidlist.append(pids)
+            # Sort pidlist for consistent output
+            pidlist = sorted(pidlist, key = lambda x: str(x))
 
             output += "\t\t Element ID: " + str(obj.smsID)
             output += "\n"
@@ -178,6 +181,7 @@ class TxTPrinter(BasicPrinter):
                 output += "\t\t Branch %i: " % i + str(mass) + "\n"
             output += "\n"
             output += "\t\t The element PIDs are \n"
+            pidstr = sorted([str(p) for p in pidlist])
             output += "\t\t PIDs: " + str(pidlist) + "\n"
             output += "\t\t The element weights are: \n \t\t " + \
                 obj.weightList.niceStr().replace("\n", "\n \t\t ")
@@ -372,6 +376,8 @@ class TxTPrinter(BasicPrinter):
                         if pidList not in smsPIDs:
                             smsPIDs.append(pidList)
                     for pidList in smsPIDs:
+                        # Sort pidlist for consistent output
+                        pidList = sorted(pidList, key = lambda x: str(x))
                         output += "PIDs:" + str(pidList) + "\n"
 
         return output

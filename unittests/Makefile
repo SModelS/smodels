@@ -1,13 +1,13 @@
 all: test
 
 test:
-	./runCompleteTestSuite.py -v
+	./runCompleteTestSuite.py -v -n
 
 test_norecipes:
-	./runCompleteTestSuite.py -S -v
+	./runCompleteTestSuite.py -v
 
 reduced:
-	./runCompleteTestSuite.py -S -r -v
+	./runCompleteTestSuite.py -r -v
 
 obs:
 	py.test -v

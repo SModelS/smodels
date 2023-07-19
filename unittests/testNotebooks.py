@@ -94,17 +94,30 @@ class TestNotebook(unittest.TestCase):
 
 
         cells = sorted(default_cells)
+        passed = True
         for icell in cells:
             if isinstance(defaultOutputDict[icell], list):
                 for iout, out in enumerate(defaultOutputDict[icell]):
                     errorMsg = 'Error in cell %i and entry %i' %(icell,iout)
-                    self.assertEqual(out,outputDict[icell][iout], 
+                    try:
+                        self.assertEqual(out,outputDict[icell][iout], 
                                      msg=errorMsg)
+                    except AssertionError as e:
+                        passed = False
+                        errorMsg += "\n  Error: %s\n" %(e)
+                        print(errorMsg)
             else:
                 errorMsg = 'Error in cell %i' %icell
-                self.assertEqual(defaultOutputDict[icell],outputDict[icell], 
+                try:
+                    self.assertEqual(defaultOutputDict[icell],outputDict[icell], 
                                  msg=errorMsg)
+                except AssertionError as e:
+                    passed = False
+                    errorMsg += "\n  Error: %s\n" %(e)
+                    print(errorMsg)
 
+        self.assertTrue(passed,msg="The notebook output does not match the one found in %s" 
+                        %(notebookFile.replace('.ipynb', '_output.pcl')))
 
 
 

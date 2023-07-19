@@ -42,6 +42,5 @@ jobs:
         python -m pip install -e .
     - name: Test with unittest
       run: |
-        make pythia8
-        cd test
+        cd unittests
         make reduced
