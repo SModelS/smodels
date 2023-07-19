@@ -59,7 +59,7 @@ class ExpSMS(GenericSMS):
         elif '>' in stringSMS and 'PV' in stringSMS:
             procString = stringSMS
         else:
-            raise SModelSError("Could not recognize string format for element (%s)" % stringSMS)
+            raise SModelSError("Could not recognize string format for SMS (%s)" % stringSMS)
 
 
         decays = procString.replace(" ", "").split("),(")
