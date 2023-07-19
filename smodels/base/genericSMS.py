@@ -1052,7 +1052,7 @@ class GenericSMS(object):
                 pvColor='darkgray',
                 fontsize=10,
                 labelAttr=None,
-                attrUnit=None, filename=None):
+                attrUnit=None, filename=None, view=True ):
         """
         Draws Tree using matplotlib.
 
@@ -1064,8 +1064,9 @@ class GenericSMS(object):
                           of the node object.
         :param attrUnit: Unum object with the unit to be removed from label attribute(if applicable)
         :param filename: Filename to save drawing to.
+        :param view: open a viewer after plotting
 
-        :return: Display a GraphViz Digraph object (and save it to file if filename is defined)
+        :return: Display a GraphViz Digraph object, if view is true (and save it to file if filename is defined)
         """
 
         try:
@@ -1113,16 +1114,24 @@ class GenericSMS(object):
         for edgeIndex in self.edgeIndices:
             dot.edge(str(edgeIndex[0]),str(edgeIndex[1]))
 
-        # Try to display (if within a notebook)
-        try:
-            display(dot)
-        except NameError:
-            pass
-
         # If filename is defined, save image
         if filename is not None:
             import os
             filename = os.path.abspath(filename)
             fname, extension = os.path.splitext(filename)
             dot.format = extension[1:]
-            dot.view(filename=fname)
+            dot.render(outfile=filename, view=view)
+            gvfile = fname+".gv"
+            if os.path.exists ( gvfile ):
+                os.unlink ( gvfile )
+
+        # Try to display (for various circumstances)
+        if view:
+            try:
+                display(dot) # for notebooks
+            except NameError:
+                try:
+                    dot.view(filename=fname) # for terminals
+                except (RuntimeError, graphviz.ExecutableNotFound,\
+                        graphviz.CalledProcessError) as e:
+                    pass
