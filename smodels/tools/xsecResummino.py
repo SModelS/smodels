@@ -306,10 +306,10 @@ class XSecResummino(XSecBasis):
         Liste = []
 
         #Vérification des dossiers d'entrée et sortie de Resummino
-        if not os.path.exists('resummino_in'):
-            os.mkdir('resummino_in')
-        if not os.path.exists('resummino_out'):
-            os.mkdir('resummino_out')
+        if not os.path.exists('smodels/lib/resummino/resummino_in'):
+            os.mkdir('smodels/lib/resummino/resummino_in')
+        if not os.path.exists('smodels/lib/resummino/resummino_out'):
+            os.mkdir('smodels/lib/resummino/resummino_out')
 
         #On créer la liste des fichiers d'entrée
         if not slha_folder_name.endswith(".slha"):
