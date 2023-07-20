@@ -20,6 +20,8 @@ try:
 except (ImportError, ModuleNotFoundError):
     from collections import Iterable
 
+minWidth = 1e-30  # Any width below this can be safely considered to be zero
+maxWidth = 1e50  # Any width above this can be safely considered to be infinity
 
 
 def cSim(*weights):
@@ -467,8 +469,6 @@ def rescaleWidth(width):
     else:
         w = width
 
-    minWidth = 1e-30  # Any width below this can be safely considered to be zero
-    maxWidth = 1e50  # Any width above this can be safely considered to be infinity
     w = (min(w, maxWidth)/minWidth)  # Normalize the width and convert it to some finite number (if not finite)
     if w < 1e-10:  # The log function misbehaves for very small values of w (step behavior), so we use log(1+x) = x for x << 1
         return w
@@ -478,23 +478,21 @@ def rescaleWidth(width):
 
 def unscaleWidth(x):
     """
-    Maps a coordinate value back to width (with GeV unit).
+    Maps a coordinate value back to width.
     The mapping is such that x=0->width=0 and x=very large -> width = inf.
 
     :param x: Coordinate value (float)
 
-    :return width: Width value (in GeV) with unit
+    :return width: Width value without units
     """
 
-    minWidth = 1e-30  # Any width below this can be safely considered to be zero
-    maxWidth = 1e50  # Any width above this can be safely considered to be infinity
     with np.errstate(over='ignore'):  # Temporarily disable overflow error message
         # The small increase in x is required to
         # enforce unscaleWidth(widthToCoordinae(np.inf)) = np.inf
         width = minWidth*(np.exp(x)-1)
         if width > maxWidth:
             width = np.inf
-    return width*GeV
+    return width
 
 
 def removeInclusives(massArray, shapeArray):

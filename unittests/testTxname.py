@@ -30,19 +30,19 @@ n1 = mssm.n1
 class TxTest(unittest.TestCase):
     def testWidthTransformation(self):
         a = 1e-10*GeV
-        b = unscaleWidth(rescaleWidth(a))
+        b = unscaleWidth(rescaleWidth(a))*GeV
         self.assertAlmostEqual(b.asNumber(GeV), a.asNumber(GeV))
         a = 1e-50*GeV
-        b = unscaleWidth(rescaleWidth(a))
+        b = unscaleWidth(rescaleWidth(a))*GeV
         self.assertAlmostEqual(b.asNumber(GeV), a.asNumber(GeV))
         a = float('inf')*GeV
-        b = unscaleWidth(rescaleWidth(a))
+        b = unscaleWidth(rescaleWidth(a))*GeV
         self.assertAlmostEqual(b.asNumber(GeV), a.asNumber(GeV))
         a = 1e-25*GeV
-        b = unscaleWidth(rescaleWidth(a))
+        b = unscaleWidth(rescaleWidth(a))*GeV
         self.assertAlmostEqual(b.asNumber(GeV), a.asNumber(GeV))
         a = 0.*GeV
-        b = unscaleWidth(rescaleWidth(a))
+        b = unscaleWidth(rescaleWidth(a))*GeV
         self.assertAlmostEqual(b.asNumber(GeV), a.asNumber(GeV))
 
     def testTxnameSMS(self):
