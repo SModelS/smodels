@@ -4,7 +4,7 @@ condition: None
 constraint: [[['W']],[['Z']]]
 figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-12/fig_07b.png
 validated: True
-axes: 2*Eq(mother,x)_Eq(lsp,y)
+axes: [[x, y], [x, y]]
 publishedData: False
 upperLimits: [[[[200.0*GeV, 25.0*GeV], [200.0*GeV, 25.0*GeV]], 0.282901108*pb],
 [[[400.0*GeV, 100.0*GeV], [400.0*GeV, 100.0*GeV]], 0.0679043904*pb],

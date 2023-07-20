@@ -4,7 +4,7 @@ condition: Csim ( 2.23 * [[['jet','jet'],['jet','jet']],[['jet','jet'],['jet','j
 constraint: 2.23 * [[['jet','jet'],['jet','jet']],[['jet','jet'],['jet','jet']]]
 figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-02/figaux_10a.png;https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-02/figaux_11b.png
 validated: True
-axes: 2*Eq(mother,x)_Eq(inter0,y)_Eq(lsp,60.0);2*Eq(mother,x)_Eq(inter0,0.5*x+0.5*y)_Eq(lsp,y)
+axes: [[x, y*(x - 60.0) + 60.0, 60.0], [x, y*(x - 60.0) + 60.0, 60.0]];[[x, 0.5*x + 0.5*y, y], [x, 0.5*x + 0.5*y, y]]
 publishedData: False
 upperLimits: [[[[200.0*GeV, 69.94*GeV, 60.0*GeV], [200.0*GeV, 69.94*GeV, 60.0*GeV]], 105.896*pb],
 [[[200.0*GeV, 85.06*GeV, 60.0*GeV], [200.0*GeV, 85.06*GeV, 60.0*GeV]], 782.421*pb],

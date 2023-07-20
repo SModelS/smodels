@@ -49,6 +49,7 @@ class TxName(object):
         self.txnameData = None
         self.txnameDataExp = None  # expected Data
         self.dataMap = None
+        self.axesMap = None
         self._arrayMap = None
         self._arrayToNodeDict = None
         self.smsMap = {}  # Stores the SMS and their label representaion
@@ -146,12 +147,16 @@ class TxName(object):
         self.Leff_inner = self.fetchAttribute('Leff_inner', fillvalue=None)
         self.Leff_outer = self.fetchAttribute('Leff_outer', fillvalue=None)
 
+        # Convert data to flat unitless arrays and create TxNameData instances
+        # to handle this data
         x_values, y_values = self.preProcessData(data)
         self.txnameData = TxNameData(x=x_values, y=y_values, txdataId=ident)
         if expectedData:
             x_values, y_values = self.preProcessData(expectedData)
             self.txnameDataExp = TxNameData(x=x_values, y=y_values, txdataId=ident)
 
+        # Finally convert axes fields used for validation
+        self.convertAxes()
 
     def __str__(self):
         return self.txName
@@ -275,7 +280,56 @@ class TxName(object):
                     smsStr = smsStr.replace("'","").replace(" ","")
                     cond = cond.replace(smsStr, '{%s}' %newSMS,1)
                 self.condition[icond] = cond
-            
+
+    def convertAxes(self):
+        """
+        If the axes field attribute has been defined (v2 format)
+        convert it to a list of dictionaries with the format:
+        {arrayIndex : axesStr},
+        where arrayIndex refer to the index in the flat grid array
+        (v3 format) and axesStr defines how this index should be mapped to the
+        validation axes (e.g. {0 : 'x', 1 : '(x+y)/2', 2 : 'y', ...}).
+        The axes attribute is replaced by ._axes.        
+        """
+
+        # Do nothing is axesMap has already been defined
+        if hasattr(self,'axesMap') and self.axesMap is not None:
+            return
+        
+        # Check if axes needs conversion:
+        if hasattr(self,'axes') and self.axes:            
+            # In case only one axis has been define, convert it to a list
+            if not isinstance(self.axes, list):
+                self.axes = [self.axes]
+            # Replace axes by _axes
+            self._axes = self.axes[:]
+            delattr(self,'axes')
+            # Convert axes in bracket notation to a dictionary
+            self.axesMap = []
+            for ax in self._axes:
+                ax = str(ax)[:].replace("'","").replace(" ","")
+                # In case tuples appear (mass,width), convert to
+                # a list, so it can be converted by smsInStr
+                ax = str(ax)[:].replace("(","[").replace(")","]")
+                if not ('[' in ax and ']' in ax):
+                    continue                
+                # Convert string to nested list (bracket notation)
+                smsList = smsInStr(ax)
+                if len(smsList) != 1:
+                    logger.error("Error converting axes for txname: %s (%s)" %(self,ax))
+                sms = eval(smsList[0])
+                axMap = {}
+                for flatArrayIndex,indexMap in self._arrayMap.items():
+                    # Get the (i,j,k) coordinates for the nested bracket
+                    # which corresponds to the new flat array format
+                    # (k is only used if there are widths)
+                    oldCoords = indexMap[0]
+                    oldArrayValue = sms[oldCoords[0]][oldCoords[1]]
+                    if isinstance(oldArrayValue,(tuple,list)):
+                        oldArrayValue = oldArrayValue[oldCoords[2]]
+                    axMap[flatArrayIndex] = oldArrayValue
+                self.axesMap.append(axMap)   
+
     def processExpr(self, stringExpr, databaseParticles,
                     checkUnique=False):
         """

@@ -4,7 +4,7 @@ condition: None
 constraint: [[['b','W','b','W']],[['b','W','b','W']]]
 figureUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13012/Fig_7c.pdf
 validated: True
-axes: 2*Eq(mother,x)_Eq(lsp,y)
+axes: [[x, y], [x, y]]
 publishedData: False
 efficiencyMap: [[[[462.5*GeV, 37.5*GeV], [462.5*GeV, 37.5*GeV]], 1.61566911815e-05],
 [[[512.5*GeV, 37.5*GeV], [512.5*GeV, 37.5*GeV]], 9.13410093273e-06],

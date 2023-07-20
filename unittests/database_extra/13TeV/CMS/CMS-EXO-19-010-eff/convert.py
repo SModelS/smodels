@@ -77,7 +77,7 @@ for ds in datasets:
     TDTM1F.validationTarball = "TDTM1M2F.tar.gz"
     TDTM1F.setParticlesFromFile(particlesFile)
     TDTM1F.checked = ''
-    TDTM1F.constraint = "{(PV > C1+(1),C1-(2)), (C1+(1) > *anySM,MET), (C1-(2) > *anySM,MET)}"
+    TDTM1F.constraint ="{(PV > C1+(1),C1-(2)), (C1+(1) > *anySM,MET), (C1-(2) > *anySM,MET)}"
     TDTM1F.conditionDescription = None
     TDTM1F.condition = None
     TDTM1F.source = 'CMS'

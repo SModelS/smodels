@@ -4,7 +4,7 @@ condition: Csim([[['L'],['L']],[['L'],['nu']]],[[['L'],['L']],[['nu'],['L']]]); 
 constraint: 2.*([[['L'],['L']],[['L'],['nu']]] + [[['L'],['L']],[['nu'],['L']]])
 figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-12/fig_07a.png
 validated: True
-axes: 2*Eq(mother,x)_Eq(inter0,0.5*x+0.5*y)_Eq(lsp,y)
+axes: [[x, 0.5*x + 0.5*y, y], [x, 0.5*x + 0.5*y, y]]
 publishedData: False
 upperLimits: [[[[325.0*GeV, 250.0*GeV, 175.0*GeV], [325.0*GeV, 250.0*GeV, 175.0*GeV]], 0.0123242378*pb],
 [[[500.0*GeV, 250.0*GeV, 0.0*GeV], [500.0*GeV, 250.0*GeV, 0.0*GeV]], 0.0020880847*pb],

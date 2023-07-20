@@ -1,5 +1,7 @@
 txName: TDTM2F
-constraint: {(PV > C1(1),MET), (C1(1) > *anySM,MET)}
+constraint: [[[*anySM]],[]]
+finalState: ['MET','MET']
+intermediateState:  [['C1'],[]]
 condition: None
 conditionDescription: None
 susyProcess: pp --> chargino^pm_1 neutralino_1, chargino^pm_1 neutralino_1 --> pion^pm lsp lsp

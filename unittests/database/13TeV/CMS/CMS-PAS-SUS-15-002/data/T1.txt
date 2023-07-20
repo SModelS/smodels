@@ -5,7 +5,7 @@ constraint: [[['jet','jet']],[['jet','jet']]]
 figureUrl: http://cms-results.web.cern.ch/cms-results/public-results/superseded/SUS-15-002/CMS-PAS-SUS-15-002_Figure_008-c.png
 dataUrl: http://cms-results.web.cern.ch/cms-results/public-results/superseded/SUS-15-002/MassScanT1Smooth.root;http://cms-results.web.cern.ch/cms-results/public-results/superseded/SUS-15-002/index.html
 validated: True
-axes: 2*Eq(mother,x)_Eq(lsp,y)
+axes: [[x, y], [x, y]]
 publishedData: True
 upperLimits: [[[[605.47*GeV, 3.9844*GeV], [605.47*GeV, 3.9844*GeV]], 0.19802*pb],
 [[[605.47*GeV, 11.953*GeV], [605.47*GeV, 11.953*GeV]], 0.19874*pb],

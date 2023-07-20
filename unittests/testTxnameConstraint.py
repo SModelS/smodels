@@ -178,5 +178,31 @@ class TestTxnameConstraint(unittest.TestCase):
         for ic,c in enumerate(tx.evalConditionsFor(allSMS)):
             self.assertAlmostEqual(c,conds[ic],places=3)
 
+    def test_axes_conversion(self):
+
+
+        # Test a trivial example
+        axesMap = [{0: 'x', 1: '0.5*x+0.5*y', 2: 'y', 3: 'x', 4 : '0.5*x+0.5*y', 5 : 'y'}]
+        self.assertTrue(isinstance(tx.axesMap,list))
+        self.assertEqual(len(tx.axesMap),1)
+        for iax, ax in enumerate(sorted(tx.axesMap, key = lambda x: str(x))):
+            self.assertEqual(ax,axesMap[iax])
+
+        # Test an example with widths
+        filePath = './database_extra/13TeV/CMS/CMS-EXO-19-010-eff/SR_nlay5/TDTM1F.txt'
+        globalInfo = Info('./database_extra/13TeV/CMS/CMS-EXO-19-010-eff/globalInfo.txt')
+        infoObj = Info('./database_extra/13TeV/CMS/CMS-EXO-19-010-eff/SR_nlay5/dataInfo.txt')
+        databaseParticles = finalStates
+        txB = TxName(filePath,globalInfo,infoObj,databaseParticles)
+
+        axesMap = sorted([{0: 'x', 1: 'x-1.5', 2: 'x', 3: 'x-1.5', 4: 'y', 5: 'y'}, 
+                   {0: 'x', 1: 'x', 2: 'x', 3: 'x', 4: 'y', 5: 'y'}], key = lambda x: str(x))
+        self.assertTrue(isinstance(txB.axesMap,list))
+        self.assertEqual(len(txB.axesMap),2)
+        for iax, ax in enumerate(sorted(txB.axesMap, key = lambda x: str(x))):
+            self.assertEqual(ax,axesMap[iax])
+
+        
+
 if __name__ == "__main__":
     unittest.main()                         

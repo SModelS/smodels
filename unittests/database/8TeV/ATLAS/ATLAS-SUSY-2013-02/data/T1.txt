@@ -4,7 +4,7 @@ condition: None
 constraint: [[['jet','jet']],[['jet','jet']]]
 figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-02/figaux_09a.png
 validated: True
-axes: 2*Eq(mother,x)_Eq(lsp,y)
+axes: [[x, y], [x, y]]
 publishedData: False
 upperLimits: [[[[112.0*GeV, 37.0*GeV], [112.0*GeV, 37.0*GeV]], 36142.88*pb],
 [[[150.0*GeV, 0.0*GeV], [150.0*GeV, 0.0*GeV]], 59847.83*pb],

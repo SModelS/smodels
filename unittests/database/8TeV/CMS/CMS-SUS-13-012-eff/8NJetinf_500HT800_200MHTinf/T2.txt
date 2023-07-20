@@ -4,7 +4,7 @@ condition: None
 constraint: [[['jet']],[['jet']]]
 figureUrl: https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsSUS13012/Fig_7a.pdf
 validated: True
-axes: 2*Eq(mother,x)_Eq(lsp,y)
+axes: [[x, y], [x, y]]
 publishedData: False
 efficiencyMap: [[[[362.5*GeV, 262.5*GeV], [362.5*GeV, 262.5*GeV]], 2.80141253445e-05],
 [[[412.5*GeV, 212.5*GeV], [412.5*GeV, 212.5*GeV]], 2.59762609445e-05],

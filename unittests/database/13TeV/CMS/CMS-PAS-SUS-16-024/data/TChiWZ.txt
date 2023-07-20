@@ -5,7 +5,7 @@ constraint: [[['W']],[['Z']]]
 figureUrl: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-024/CMS-PAS-SUS-16-024_Figure_010-a.png
 dataUrl: http://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/SUS-16-024/CMS-PAS-SUS-16-024_Figure_010-a.root
 validated: False
-axes: 2*Eq(mother,x)_Eq(lsp,y)
+axes: [[x, y], [x, y]]
 publishedData: True
 upperLimits: [[[[100.0*GeV, 0.0*GeV], [100.0*GeV, 0.0*GeV]], 0.72057*pb],
 [[[100.0*GeV, 10.0*GeV], [100.0*GeV, 10.0*GeV]], 0.51905*pb],
