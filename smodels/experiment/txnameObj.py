@@ -300,7 +300,7 @@ class TxName(object):
         if hasattr(self,'axes') and self.axes:
             # Define variables so the expressions can be evaluated:
             from sympy import symbols
-            x,y,z = symbols('x y z')
+            x,y,z,w = symbols('x y z w')
             # In case only one axis has been define, convert it to a list
             if not isinstance(self.axes, list):
                 self.axes = [self.axes]
@@ -311,7 +311,7 @@ class TxName(object):
             self.axesMap = []
             for ax in self._axes:
                 try:
-                    axList = eval(ax, {'x' : x, 'y' : y, 'z' : z})
+                    axList = eval(ax, {'x' : x, 'y' : y, 'z' : z, 'w' : w})
                 except NameError:
                     logger.error("Error evaluating axis for txname: %s (%s)" %(self,ax))
                     raise SModelSError()

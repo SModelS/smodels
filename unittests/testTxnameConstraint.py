@@ -202,7 +202,19 @@ class TestTxnameConstraint(unittest.TestCase):
         for iax, ax in enumerate(sorted(txB.axesMap, key = lambda x: str(x))):
             self.assertEqual(ax,axesMap[iax])
 
-        
+        # Test a non-trivial case
+        filePath = './database_extra/13TeV/ATLAS/ATLAS-SUSY-2016-32-eff-trim/SR1FULL_175/THSCPM4.txt'
+        globalInfo = Info('./database_extra/13TeV/ATLAS/ATLAS-SUSY-2016-32-eff-trim/globalInfo.txt')
+        infoObj = Info('./database_extra/13TeV/ATLAS/ATLAS-SUSY-2016-32-eff-trim/SR1FULL_175/dataInfo.txt')
+        databaseParticles = finalStates
+        txC = TxName(filePath,globalInfo,infoObj,databaseParticles)
+
+        axesMap = [{0: 'x', 1: 'y', 2: 'w'}]
+        self.assertTrue(isinstance(txC.axesMap,list))
+        self.assertEqual(len(txC.axesMap),1)
+        for iax, ax in enumerate(sorted(txC.axesMap, key = lambda x: str(x))):
+            self.assertEqual(ax,axesMap[iax])
+
 
 if __name__ == "__main__":
     unittest.main()                         
