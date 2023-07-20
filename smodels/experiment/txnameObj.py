@@ -297,7 +297,10 @@ class TxName(object):
             return
         
         # Check if axes needs conversion:
-        if hasattr(self,'axes') and self.axes:            
+        if hasattr(self,'axes') and self.axes:
+            # Define variables so the expressions can be evaluated:
+            from sympy import symbols
+            x,y,z = symbols('x y z')
             # In case only one axis has been define, convert it to a list
             if not isinstance(self.axes, list):
                 self.axes = [self.axes]
@@ -307,27 +310,21 @@ class TxName(object):
             # Convert axes in bracket notation to a dictionary
             self.axesMap = []
             for ax in self._axes:
-                ax = str(ax)[:].replace("'","").replace(" ","")
-                # In case tuples appear (mass,width), convert to
-                # a list, so it can be converted by smsInStr
-                ax = str(ax)[:].replace("(","[").replace(")","]")
-                if not ('[' in ax and ']' in ax):
-                    continue                
-                # Convert string to nested list (bracket notation)
-                smsList = smsInStr(ax)
-                if len(smsList) != 1:
-                    logger.error("Error converting axes for txname: %s (%s)" %(self,ax))
-                sms = eval(smsList[0])
+                try:
+                    axList = eval(ax, {'x' : x, 'y' : y, 'z' : z})
+                except NameError:
+                    logger.error("Error evaluating axis for txname: %s (%s)" %(self,ax))
+                    raise SModelSError()
                 axMap = {}
                 for flatArrayIndex,indexMap in self._arrayMap.items():
                     # Get the (i,j,k) coordinates for the nested bracket
                     # which corresponds to the new flat array format
                     # (k is only used if there are widths)
                     oldCoords = indexMap[0]
-                    oldArrayValue = sms[oldCoords[0]][oldCoords[1]]
-                    if isinstance(oldArrayValue,(tuple,list)):
+                    oldArrayValue = axList[oldCoords[0]][oldCoords[1]]
+                    if isinstance(oldArrayValue,tuple):
                         oldArrayValue = oldArrayValue[oldCoords[2]]
-                    axMap[flatArrayIndex] = oldArrayValue
+                    axMap[flatArrayIndex] = str(oldArrayValue).replace(' ','')
                 self.axesMap.append(axMap)   
 
     def processExpr(self, stringExpr, databaseParticles,
