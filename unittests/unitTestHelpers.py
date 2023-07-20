@@ -194,6 +194,8 @@ def importModule(filename):
     import importlib
     spec = importlib.util.spec_from_file_location("output", filename)
     output_module = importlib.util.module_from_spec(spec)
+    # In case the module contains infs
+    output_module.inf = float('inf')
     spec.loader.exec_module(output_module)
     try:
         output = output_module.smodelsOutput
@@ -203,7 +205,7 @@ def importModule(filename):
     return output
 
 def runMain(filename, timeout=0, suppressStdout=True, development=False,
-            inifile="testParameters.ini", overridedatabase=None):
+            inifile="testParameters_v2.ini", overridedatabase=None):
     """ run SModelS proper
     :param filename: slha file
     :param timeout: timeout for the operation, given in seconds

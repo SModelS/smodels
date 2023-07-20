@@ -33,7 +33,7 @@ class ScanSummaryTest(unittest.TestCase):
     def testPythonSummary(self):
         out = "./unitTestOutput"
         dirname = "./testFiles/slha/"
-        runMain(dirname, inifile="testParameters.ini")
+        runMain(dirname, inifile="testParameters_v2.ini")
         outSummary = os.path.join(out, 'summary.txt')
         outDefault = 'summary_scan_default.txt'
         comp = compareScanSummary(outSummary, outDefault, allowedRelDiff=0.05)
