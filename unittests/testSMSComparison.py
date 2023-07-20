@@ -2,7 +2,7 @@
 
 """
 .. module:: testSMSComb
-   :synopsis: Testing comparison of thoery SMS
+   :synopsis: Testing comparison of SMS
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
