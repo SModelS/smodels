@@ -115,11 +115,11 @@ class RunPrinterTest(unittest.TestCase):
             if os.path.exists(i):
                 os.remove(i)
 
-    def testTextPrinterV2(self):
+    def testPrintersV2(self):
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
-        outputfile = runMain(slhafile)
-        outputfile = outputfile.replace('.py', '.smodels')
+        out = runMain(slhafile)
+        outputfile = out.replace('.py', '.smodels')
 
         defaultfile = "gluino_squarks_default.smodels"
         # Test summary output
@@ -129,11 +129,7 @@ class RunPrinterTest(unittest.TestCase):
         self.assertEqual(default, output)
         self.removeOutputs(outputfile)
 
-    def testPythonPrinterV2(self):
-
-        slhafile = "./testFiles/slha/gluino_squarks.slha"
-        outputfile = runMain(slhafile)
-        smodelsOutput = importModule(outputfile)
+        smodelsOutput = importModule(out)
         # Test python output
         from gluino_squarks_default import smodelsOutputDefault
         ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version']
@@ -146,8 +142,30 @@ class RunPrinterTest(unittest.TestCase):
                            fname="./unitTestOutput/printer_output.py")
 
         self.assertTrue(equals)
+        self.removeOutputs(out)
+        self.removeOutputs('./debug.log')  
+
+        
+        outputfile = out.replace('.py', '.xml')
+        defFile = "default_output.xml"
+        # Test xml output
+        xmlDefault = ElementTree.parse(defFile).getroot()
+        xmlNew = ElementTree.parse(outputfile).getroot()
+        sortXML(xmlDefault)
+        sortXML(xmlNew)
+        self.assertTrue(compareXML(xmlDefault, xmlNew,
+                                   allowedRelDiff=0.05,
+                                   ignore=['input_file', 'smodels_version', 'ncpus']))
+        # self.removeOutputs(outputfile)
+        # self.removeOutputs('./debug.log')
+
+        outputfile = out.replace('.py', '.smodelsslha')
+
+        slhaDefaultFile = "./gluino_squarks_default.slha.smodelsslha"
+        self.assertTrue(compareSLHA(slhaDefaultFile, outputfile,
+                                    allowedRelDiff=0.05))
         self.removeOutputs(outputfile)
-        self.removeOutputs('./debug.log')     
+
 
     def testPythonPrinterSimpleV2(self):
 
@@ -176,29 +194,6 @@ class RunPrinterTest(unittest.TestCase):
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
 
-    def testXmlPrinterV2(self):
-
-        slhafile = "./testFiles/slha/gluino_squarks.slha"
-        outputfile = runMain(slhafile)
-        outputfile = outputfile.replace('.py', '.xml')
-
-        defFile = "default_output.xml"
-
-        # Test xml output
-        xmlDefault = ElementTree.parse(defFile).getroot()
-        xmlNew = ElementTree.parse(outputfile).getroot()
-        sortXML(xmlDefault)
-        sortXML(xmlNew)
-        self.assertTrue(compareXML(xmlDefault, xmlNew,
-                                   allowedRelDiff=0.05,
-                                   ignore=['input_file', 'smodels_version', 'ncpus']))
-        # self.removeOutputs(outputfile)
-        # self.removeOutputs('./debug.log')
-
-    def testXmlPrinterSimpleV2(self):
-
-        slhafile = "./testFiles/slha/simplyGluino.slha"
-        outputfile = runMain(slhafile, inifile='testParameters_exp.ini')
         outputfile = outputfile.replace('.py', '.xml')
 
         defFile = "default_outputSimplyGluino.xml"
@@ -214,17 +209,6 @@ class RunPrinterTest(unittest.TestCase):
 
         self.removeOutputs(outputfile)
         self.removeOutputs('./debug.log')
-
-    def testSLHAPrinterV2(self):
-
-        slhafile = "./testFiles/slha/gluino_squarks.slha"
-        outputfile = runMain(slhafile, suppressStdout = True)
-        outputfile = outputfile.replace('.py', '.smodelsslha')
-
-        slhaDefaultFile = "./gluino_squarks_default.slha.smodelsslha"
-        self.assertTrue(compareSLHA(slhaDefaultFile, outputfile,
-                                    allowedRelDiff=0.05))
-        self.removeOutputs(outputfile)
 
 
     def testPrinters(self):
