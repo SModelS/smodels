@@ -129,20 +129,6 @@ class RunPrinterTest(unittest.TestCase):
         self.assertEqual(default, output)
         self.removeOutputs(outputfile)
 
-    def testTextPrinter(self):
-
-        slhafile = "./testFiles/slha/lightEWinos.slha"
-        outputfile = runMain(slhafile,inifile="testPrinters_parameters.ini")
-        outputfile = outputfile.replace('.py', '.smodels')
-
-        defaultfile = "lightEWinos_default.smodels"
-        # Test summary output
-        output = Summary(outputfile, allowedRelDiff=0.05)
-        default = Summary(defaultfile, allowedRelDiff=0.05)
-
-        self.assertEqual(default, output)
-        self.removeOutputs(outputfile)
-
     def testPythonPrinterV2(self):
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
@@ -161,29 +147,7 @@ class RunPrinterTest(unittest.TestCase):
 
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
-        self.removeOutputs('./debug.log')
-
-    def testPythonPrinter(self):
-
-        slhafile = "./testFiles/slha/lightEWinos.slha"
-        outputfile = runMain(slhafile,inifile="testPrinters_parameters.ini",
-                             suppressStdout=True)
-        
-        smodelsOutput = importModule(outputfile)
-
-        # Test python output
-        from lightEWinos_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version']
-        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
-        smodelsOutput['ExptRes'] = sorted(smodelsOutput['ExptRes'],
-                                          key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
-                           ignore=ignoreFields, where="top")
-
-        self.assertTrue(equals)
-        self.removeOutputs(outputfile)
-        self.removeOutputs('./debug.log')       
+        self.removeOutputs('./debug.log')     
 
     def testPythonPrinterSimpleV2(self):
 
@@ -231,25 +195,6 @@ class RunPrinterTest(unittest.TestCase):
         # self.removeOutputs(outputfile)
         # self.removeOutputs('./debug.log')
 
-    def testXmlPrinter(self):
-
-        slhafile = "./testFiles/slha/lightEWinos.slha"
-        outputfile = runMain(slhafile,inifile="testPrinters_parameters.ini")
-        outputfile = outputfile.replace('.py', '.xml')
-
-        defaultfile = "lightEWinos_default.xml"
-
-        # Test xml output
-        xmlDefault = ElementTree.parse(defaultfile).getroot()
-        xmlNew = ElementTree.parse(outputfile).getroot()
-        sortXML(xmlDefault)
-        sortXML(xmlNew)
-        self.assertTrue(compareXML(xmlDefault, xmlNew,
-                                   allowedRelDiff=0.05,
-                                   ignore=['input_file', 'smodels_version', 'ncpus']))
-        self.removeOutputs(outputfile)
-        self.removeOutputs('./debug.log')
-
     def testXmlPrinterSimpleV2(self):
 
         slhafile = "./testFiles/slha/simplyGluino.slha"
@@ -282,16 +227,57 @@ class RunPrinterTest(unittest.TestCase):
         self.removeOutputs(outputfile)
 
 
-    def testSLHAPrinter(self):
+    def testPrinters(self):
 
         slhafile = "./testFiles/slha/lightEWinos.slha"
-        outputfile = runMain(slhafile,inifile="testPrinters_parameters.ini")
-        outputfile = outputfile.replace('.py', '.smodelsslha')
+        out = runMain(slhafile,inifile="testPrinters_parameters.ini")
 
+        # Check Summary output
+        outputfile = out.replace('.py', '.smodels')
+        defaultfile = "lightEWinos_default.smodels"
+        output = Summary(outputfile, allowedRelDiff=0.05)
+        default = Summary(defaultfile, allowedRelDiff=0.05)
+        self.assertEqual(default, output)
+        self.removeOutputs(outputfile)
+
+
+        # Check Python output
+        smodelsOutput = importModule(out)
+        from lightEWinos_default import smodelsOutputDefault
+        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version']
+        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
+                                                 key=lambda res: res['r'], reverse=True)
+        smodelsOutput['ExptRes'] = sorted(smodelsOutput['ExptRes'],
+                                          key=lambda res: res['r'], reverse=True)
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
+                           ignore=ignoreFields, where="top")
+        self.assertTrue(equals)
+        self.removeOutputs(out)
+        self.removeOutputs('./debug.log')         
+
+
+        # Check XML output:
+        outputfile = out.replace('.py', '.xml')
+        defaultfile = "lightEWinos_default.xml"
+        xmlDefault = ElementTree.parse(defaultfile).getroot()
+        xmlNew = ElementTree.parse(outputfile).getroot()
+        sortXML(xmlDefault)
+        sortXML(xmlNew)
+        self.assertTrue(compareXML(xmlDefault, xmlNew,
+                                   allowedRelDiff=0.05,
+                                   ignore=['input_file', 'smodels_version', 'ncpus']))
+        self.removeOutputs(outputfile)
+        self.removeOutputs('./debug.log')
+        
+
+        # Check SLHA output:
+        outputfile = out.replace('.py', '.smodelsslha')
         slhaDefaultFile = "./lightEWinos_default.smodelsslha"
         self.assertTrue(compareSLHA(slhaDefaultFile, outputfile,
                                     allowedRelDiff=0.05))
         self.removeOutputs(outputfile)
+
+    
 
 
 if __name__ == "__main__":

@@ -88,6 +88,7 @@
         <model>share.models.mssm</model>
         <ncpus>1</ncpus>
         <promptwidth>1e-11</promptwidth>
+        <eraseprompt>spin,eCharge,colordim</eraseprompt>
         <reportallsrs>False</reportallsrs>
         <sigmacut>10.0</sigmacut>
         <smodels_version>3.0.0-beta</smodels_version>

@@ -24,7 +24,7 @@ class CompressionTest(unittest.TestCase):
         """ test the invisible compression, a positive example """
         slhafile="./testFiles/slha/higgsinoStop.slha"
         model = Model(BSMList,SMList)
-        model.updateParticles(slhafile)
+        model.updateParticles(slhafile,erasePrompt=['spin','eCharge','colordim'])
         topos = decomposer.decompose ( model, .1*fb, False, True, 5.*GeV )
         for topo in topos:
             vertnumb = canonNameToVertNumb(topos,topo)
@@ -49,7 +49,7 @@ class CompressionTest(unittest.TestCase):
         """ test the invisible compression, a negative example """
         slhafile="./testFiles/slha/higgsinoStop.slha"
         model = Model(BSMList,SMList)
-        model.updateParticles(slhafile)
+        model.updateParticles(slhafile,erasePrompt=['spin','eCharge','colordim'])
         topos = decomposer.decompose(model, .1*fb, False, True, 5.*GeV)
         tested = False
         for topo in topos:
@@ -71,7 +71,8 @@ class CompressionTest(unittest.TestCase):
         tested = False
         slhafile="./testFiles/slha/higgsinoStop.slha"
         model = Model(BSMList,SMList)
-        model.updateParticles(slhafile,promptWidth = 1e-12*GeV)
+        model.updateParticles(slhafile,promptWidth = 1e-12*GeV,
+                              erasePrompt=['spin','eCharge','colordim'])
         topos = decomposer.decompose(model, .1*fb, True, False, 5.*GeV)
         for topo in topos:
             vertnumb = canonNameToVertNumb(topos,topo)

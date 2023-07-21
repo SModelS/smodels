@@ -108,12 +108,19 @@ def testPoint(inputFile, outputDir, parser, database):
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         promptWidth = None
         stableWidth = None
+        erasePrompt = []
         if parser.has_option("particles", "promptWidth"):
             promptWidth = parser.getfloat("particles", "promptWidth")*GeV
         if parser.has_option("particles", "stableWidth"):
             stableWidth = parser.getfloat("particles", "stableWidth")*GeV
+        if parser.has_option("particles", "erasePrompt"):
+            erasePrompt = parser.get("particles", "erasePrompt")
+            erasePrompt = erasePrompt.replace(" ","")
+            erasePrompt = erasePrompt.split(",")
         model.updateParticles(inputFile=inputFile,
-                              promptWidth=promptWidth, stableWidth=stableWidth)
+                              promptWidth=promptWidth, 
+                              stableWidth=stableWidth,
+                              erasePrompt=erasePrompt)
     except SModelSError as e:
         print("Exception %s %s" % (e, type(e)))
         """ Update status to fail, print error message and exit """

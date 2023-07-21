@@ -6,6 +6,7 @@ smodelsOutputDefault={
    'model': 'share.models.mssm',
    'promptwidth': 1e-11,
    'stablewidth': 1e-25,
+   'eraseprompt' : 'spin,eCharge,colordim',
    'checkinput': True,
    'doinvisible': True,
    'docompress': True,
