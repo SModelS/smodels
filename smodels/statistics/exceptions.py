@@ -1,5 +1,5 @@
 """
-.. module:: exceptions
+.. module:: statsExceptions
    :synopsis: Contains exceptions for SModelS's statistics package.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>

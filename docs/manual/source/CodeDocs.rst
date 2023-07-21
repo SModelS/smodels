@@ -14,9 +14,12 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   theory
+   base
+   decomposition
+   matching
    experiment
    tools
+   statistics
    share
 
 

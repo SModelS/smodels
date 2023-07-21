@@ -1027,16 +1027,17 @@ class UpperLimitComputer:
         return_type: Text = "1-CLs",
     ) -> float:
         """
-        Compute the exclusion confidence level of the model (1-CLs)
+        Compute the exclusion confidence level of the model (1-CLs).
+
         :param model: statistical model
         :param expected: if false, compute observed,
-                          true: compute a priori expected, "posteriori":
-                          compute a posteriori expected
+                         true: compute a priori expected, "posteriori":
+                         compute a posteriori expected
         :param trylasttime: if True, then dont try extra
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
-                        CLs-alpha: returns CLs - 0.05 (alpha)
-                        1-CLs: returns 1-CLs value
-                        CLs: returns CLs value
+                            CLs-alpha: returns CLs - 0.05 (alpha)
+                            1-CLs: returns 1-CLs value
+                            CLs: returns CLs value
         """
         _, _, clsRoot = self.getCLsRootFunc(model, expected, trylasttime )
         ret = clsRoot(1.0, return_type=return_type)

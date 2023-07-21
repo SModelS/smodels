@@ -25,9 +25,12 @@ warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../../../'))
 sys.path.insert(0, os.path.abspath('../../../smodels/'))
-sys.path.insert(0, os.path.abspath('../../../smodels/theory/'))
+sys.path.insert(0, os.path.abspath('../../../smodels/base/'))
+sys.path.insert(0, os.path.abspath('../../../smodels/decomposition/'))
+sys.path.insert(0, os.path.abspath('../../../smodels/matching/'))
 sys.path.insert(0, os.path.abspath('../../../smodels/experiment/'))
 sys.path.insert(0, os.path.abspath('../smodels/tools/'))
+sys.path.insert(0, os.path.abspath('../smodels/statistics/'))
 
 
 from smodels.installation import authors
@@ -279,9 +282,10 @@ autoclass_content = 'both'
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
 
+
 nitpicky = True
 
 nitpick_ignore = [('py:class', 'type')]
-
+nitpick_ignore_regex = [('py:class', 'logging.StreamHandler'),('py:class', 'collections.OrderedDict')]
 #Run make whenever sphinx is built:
 os.system("cd .. && make update_code copy_files recipes RstFilesFromHelp")

@@ -25,7 +25,9 @@ class TheoryPrediction(object):
     """
 
     def __init__(self, deltas_rel=None):
-        """a theory prediction. deltas_rel is meant to be a constant
+        """
+        Initialize the theory prediction object. deltas_rel is meant to be a constant.
+
         :param deltas_rel: relative uncertainty in signal (float).
                            Default value is 20%.
         """
@@ -395,6 +397,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
     def __init__(self, theoryPredictions: list, slhafile=None, deltas_rel=None):
         """
         Constructor.
+        
         :param theoryPredictions: the List of theory predictions
         :param slhafile: optionally, the slhafile can be given, for debugging
         :param deltas_rel: relative uncertainty in signal (float).

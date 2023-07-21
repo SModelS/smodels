@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-.. module:: base.physicsUnits
+.. module:: physicsUnits
    :synopsis: This introduces physical units (GeV, fb) to the framework.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>

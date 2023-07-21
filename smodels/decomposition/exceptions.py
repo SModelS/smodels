@@ -1,5 +1,5 @@
 """
-.. module:: theoryExceptions
+.. module:: decompositionExceptions
    :synopsis: Contains exceptions for SModelS's theory package.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>

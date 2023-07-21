@@ -3,10 +3,11 @@
 """
 .. module:: truncatedGaussian
    :synopsis: a module that contains the code that computes an approximate
-   Gaussian likelihood from an expected an observer upper limit. See
-   https://arxiv.org/abs/1202.3415.
+              Gaussian likelihood from an expected an observer upper limit. See
+              https://arxiv.org/abs/1202.3415.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+
 """
 
 __all__ = [ "TruncatedGaussians" ]
@@ -81,13 +82,15 @@ class TruncatedGaussians:
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
             expected : Union[bool,Text] = False ) -> Dict:
-        """ return the likelihood, as a function of mu
+        """
+        Return the likelihood, as a function of mu
+
         :param mu: number of signal events, if None then mu = muhat
         :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: if True, then allow muhat to become negative,
-               else demand that muhat >= 0. In the presence of underfluctuations
-               in the data, setting this to True results in more realistic
-               approximate likelihoods.
+                                     else demand that muhat >= 0. In the presence of underfluctuations
+                                     in the data, setting this to True results in more realistic
+                                     approximate likelihoods.
 
         :returns: dictionary with likelihood (float), muhat, and sigma_mu
         """

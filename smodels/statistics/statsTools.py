@@ -33,6 +33,7 @@ class StatsComputer:
                    allowNegativeSignals : bool = False):
         """
          Initialise.
+
         :param dataObject: a smodels (combined)dataset or a list of theory predictions (for combination of analyses)
         :param nsig: signal yield, either as float or as list
         :param deltas_rel: relative error on signal. currently unused
@@ -282,9 +283,11 @@ class StatsComputer:
     def get_five_values ( self, expected : Union [ bool, Text ],
                       return_nll : bool = False,
                       check_for_maxima : bool = False )-> Dict:
-        """ return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat) 
+        """
+        Return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat) 
+        
         :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
-             correct, if necessary
+                                 correct, if necessary
         """
         ret = self.maximize_likelihood ( expected = expected, return_nll = return_nll  )
         lmax = ret['lmax']
@@ -379,8 +382,9 @@ class StatsComputer:
 
     def poi_upper_limit ( self, expected : Union [ bool, Text ],
            limit_on_xsec : bool = False ) -> float:
-        """ simple frontend to the upperlimit computers, later
-            to spey::poi_upper_limit
+        """
+        Simple frontend to the upperlimit computers, later to spey.poi_upper_limit
+        
         :param limit_on_xsec: if True, then return the limit on the
                               cross section
         """

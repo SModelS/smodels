@@ -1,10 +1,9 @@
 """
-.. module:: tree
+.. module:: theorySMS
    :synopsis: This is a class for describing Simplified Model Topologies
               used for decomposing BSM models.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-
 """
 
 
@@ -288,8 +287,7 @@ class TheorySMS(GenericSMS):
     def isRelatedTo(self, other):
         """
         Checks if self has other as an ancestor or they share
-        ancestors. Returns True if self and other have at least one ancestor in common,
-                   otherwise returns False.
+        ancestors. Returns True if self and other have at least one ancestor in common, otherwise returns False.
 
         :return: True/False
         """

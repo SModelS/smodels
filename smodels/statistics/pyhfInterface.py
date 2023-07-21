@@ -123,7 +123,7 @@ class PyhfData:
         # Identifying the path to the SR and VR channels in the main workspace files
         self.channelsInfo = []  # workspace specifications
         if not isinstance(self.inputJsons, list):
-            logger.error("The `inputJsons` parameter must be of type list")
+            logger.error("The 'inputJsons' parameter must be of type list")
             self.errorFlag = True
             return
         for ws in self.inputJsons:
@@ -162,7 +162,7 @@ class PyhfData:
         :param zeroSignalsFlag: boolean identifying if all SRs of a single json are empty
         """
         if not isinstance(self.nsignals, list):
-            logger.error("The `nsignals` parameter must be of type list")
+            logger.error("The 'nsignals' parameter must be of type list")
             self.errorFlag = True
         if self.nWS != len(self.nsignals):
             logger.error(
@@ -174,7 +174,7 @@ class PyhfData:
             return
         for wsInfo, subSig in zip(self.channelsInfo, self.nsignals):
             if not isinstance(subSig, list):
-                logger.error("The `nsignals` parameter must be a two dimensional list")
+                logger.error("The 'nsignals' parameter must be a two dimensional list")
                 self.errorFlag = True
             nBinsJson = 0
             for sr in wsInfo["signalRegions"]:
@@ -193,15 +193,15 @@ class PyhfData:
 
 class PyhfUpperLimitComputer:
     """
-    Class that computes the upper limit using the jsons files and signal informations in the `data` instance of `PyhfData`
+    Class that computes the upper limit using the jsons files and signal informations in the 'data' instance of 'PyhfData'
     """
 
     def __init__(self, data, cl=0.95, includeCRs=False, lumi=None ):
         """
-        :param data: instance of `PyhfData` holding the signals information
-        :param cl: confdence level at which the upper limit is desired to be computed
 
-        :ivar data: created from :param data:
+        :param data: instance of 'PyhfData' holding the signals information
+        :param cl: confdence level at which the upper limit is desired to be computed
+        :ivar data: created from data
         :ivar nsignals: signal predictions list divided into sublists, one for each json file
         :ivar inputJsons: list of input json files as python json instances
         :ivar channelsInfo: list of channels information for the json files
@@ -209,11 +209,12 @@ class PyhfUpperLimitComputer:
         :ivar nWS: number of workspaces = number of json files
         :ivar patches: list of patches to be applied to the inputJsons as python dictionary instances
         :ivar workspaces: list of workspaces resulting from the patched inputJsons
-        ;ivar workspaces_expected: list of patched workspaces with observation yields replaced by the expected ones
-        :ivar cl: created from :param cl:
+        :ivar workspaces_expected: list of patched workspaces with observation yields replaced by the expected ones
+        :ivar cl: created from cl
         :ivar scale: scale that is applied to the signal predictions, dynamically changes throughout the upper limit calculation
-        :ivar alreadyBeenThere: boolean flag that identifies when the :ivar nsignals: accidentally passes twice at two identical values
+        :ivar alreadyBeenThere: boolean flag that identifies when nsignals accidentally passes twice at two identical values
         """
+
         self.data = data
         self.lumi = lumi
         self.nsignals = copy.deepcopy ( self.data.nsignals )
@@ -236,7 +237,10 @@ class PyhfUpperLimitComputer:
         self.welcome()
 
     def welcome(self):
-        """greet the world"""
+        """
+        greet the world
+        """
+
         if pyhfinfo["hasgreeted"]:
             return
         logger.info(
@@ -245,7 +249,10 @@ class PyhfUpperLimitComputer:
         pyhfinfo["hasgreeted"] = True
 
     def checkPyhfVersion(self):
-        """check the pyhf version, currently we need 0.6.1+"""
+        """
+        check the pyhf version, currently we need 0.6.1+
+        """
+
         if pyhfinfo["ver"] < pyhfinfo["required"]:
             logger.warning(
                 f"pyhf version is {'.'.join(pyhfinfo['ver'])}. SModelS currently requires pyhf>={'.'.join(pyhfinfo['required'])}. You have been warned."
@@ -257,6 +264,7 @@ class PyhfUpperLimitComputer:
 
         :return: updated list of patches and workspaces (self.patches, self.workspaces and self.workspaces_expected)
         """
+
         self.nsignals = [[sig * factor for sig in ws] for ws in self.nsignals]
         try:
             self.alreadyBeenThere = self.nsignals == self.nsignals_2
@@ -275,11 +283,12 @@ class PyhfUpperLimitComputer:
 
     def patchMaker(self):
         """
-        Method that creates the list of patches to be applied to the `self.inputJsons` workspaces, one for each region given the `self.nsignals` and the informations available in `self.channelsInfo` and the content of the `self.inputJsons`
+        Method that creates the list of patches to be applied to the self.inputJsons workspaces, one for each region given the 'self.nsignals and the informations available in self.channelsInfo and the content of the self.inputJsons
         NB: It seems we need to include the change of the "modifiers" in the patches as well
 
         :return: the list of patches, one for each workspace
         """
+
         if self.channelsInfo == None:
             return None
         nsignals = self.nsignals
@@ -312,7 +321,7 @@ class PyhfUpperLimitComputer:
     def wsMaker(self, apriori=False):
         """
         Apply each region patch (self.patches) to his associated json (self.inputJsons) to obtain the complete workspaces
-        :param apriori: - If set to `True`: Replace the observation data entries of each workspace by the corresponding sum of the expected yields \
+        :param apriori: - If set to 'True': Replace the observation data entries of each workspace by the corresponding sum of the expected yields \
                         - Else: The observed yields put in the workspace are the ones written in the corresponfing json dictionary
 
         :returns: the list of patched workspaces
@@ -443,7 +452,7 @@ class PyhfUpperLimitComputer:
                     expected=False):
         """
         Returns the value of the likelihood. \
-        Inspired by the `pyhf.infer.mle` module but for non-log likelihood
+        Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
         :param workspace_index: supply index of workspace to use. If None, \
                                 choose index of best combo
         :param return_nll: if true, return nll, not llhd
@@ -737,12 +746,12 @@ class PyhfUpperLimitComputer:
             - if workspace_index is specified, self.workspace[workspace_index]
               (useful for computation of the best upper limit)
 
-        :param expected:  - if set to `True`: uses expected SM backgrounds as signals
-                          - else: uses `self.nsignals`
-        :param workspace_index: - if different from `None`: index of the workspace to use
+        :param expected:  - if set to 'True': uses expected SM backgrounds as signals
+                          - else: uses 'self.nsignals'
+        :param workspace_index: - if different from 'None': index of the workspace to use
                                   for upper limit
                                 - else: choose best combo
-        :return: the upper limit on sigma times eff at `self.cl` level (0.95 by default)
+        :return: the upper limit on sigma times eff at 'self.cl' level (0.95 by default)
         """
         if self.data.totalYield == 0.:
             return None
@@ -767,12 +776,12 @@ class PyhfUpperLimitComputer:
             - if workspace_index is specified, self.workspace[workspace_index]
               (useful for computation of the best upper limit)
 
-        :param expected:  - if set to `True`: uses expected SM backgrounds as signals
-                          - else: uses `self.nsignals`
-        :param workspace_index: - if different from `None`: index of the workspace to use
+        :param expected:  - if set to 'True': uses expected SM backgrounds as signals
+                          - else: uses 'self.nsignals'
+        :param workspace_index: - if different from 'None': index of the workspace to use
                                   for upper limit
                                 - else: choose best combo
-        :return: the upper limit at `self.cl` level (0.95 by default)
+        :return: the upper limit at 'self.cl' level (0.95 by default)
         """
         self.__init__(self.data, self.cl, self.includeCRs, self.lumi)
         if workspace_index in self.data.cachedULs[expected]:

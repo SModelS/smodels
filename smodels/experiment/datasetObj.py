@@ -79,6 +79,7 @@ class DataSet(object):
 
         :param other: datasetObj to compare self with
         """
+
         if isinstance(other,CombinedDataSet):
             # if other is a combined dataset, self is combinable if it is
             # combinable with all datasets in other
@@ -481,12 +482,14 @@ class CombinedDataSet(object):
         return ret
 
     def getIndex(self, dId, datasetOrder):
-        """ get the index of dataset within the datasetOrder,
-            but allow for abbreviated names
+        """ 
+        Get the index of dataset within the datasetOrder, but allow for abbreviated names.
+
         :param dId: id of dataset to search for, may be abbreviated
         :param datasetOrder: the ordered list of datasetIds, long form
         :returns: index, or -1 if not found
         """
+        
         if dId in datasetOrder:
             # easy peasy, we found the dId
             return datasetOrder.index(dId)

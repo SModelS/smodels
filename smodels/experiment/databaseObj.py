@@ -8,7 +8,6 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 .. moduleauthor:: Matthias Wolf <matthias.wolf@wot.at>
-
 """
 
 from __future__ import print_function
@@ -72,7 +71,7 @@ class Database(object):
                      use the official database for your code version
                      (including fastlim results, if specified).
                      If "latest", or "latest_fastlim", check for the latest database.
-                     Multiple databases may be specified using `+' as a delimiter.
+                     Multiple databases may be specified using '+' as a delimiter.
         :param force_load: force loading the text database ("txt"),
                            or binary database ("pcl"), dont force anything if None
         :param progressbar: show a progressbar when building pickle file

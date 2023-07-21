@@ -60,8 +60,11 @@ copy_files:
 	cp ../../Example.py source/examples/
 
 update_code:
+	sphinx-apidoc -f -T -o source/ ../../smodels/base/
 	sphinx-apidoc -f -T -o source/ ../../smodels/experiment/
-	sphinx-apidoc -f -T -o source/ ../../smodels/theory/
+	sphinx-apidoc -f -T -o source/ ../../smodels/decomposition/
+	sphinx-apidoc -f -T -o source/ ../../smodels/matching/	
+	sphinx-apidoc -f -T -o source/ ../../smodels/statistics/
 	sphinx-apidoc -f -T -o source/ ../../smodels/tools/
 	sphinx-apidoc -f -T -o source/ ../../smodels/share/
 

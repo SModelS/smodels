@@ -1,5 +1,5 @@
 """
-.. module:: theoryExceptions
+.. module:: matchingExceptions
    :synopsis: Contains exceptions for SModelS's theory package.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>

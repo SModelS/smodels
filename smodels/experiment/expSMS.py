@@ -1,5 +1,5 @@
 """
-.. module:: tree
+.. module:: expSMS
    :synopsis: This is a class for describing Simplified Model Topologies
               used for describing experimental results BSM models.
 
@@ -40,16 +40,16 @@ class ExpSMS(GenericSMS):
         Particle objects from the model. Otherwise the nodes will hold the particle strings.
 
         :param stringSMS: The process in string format
-                              (e.g. '(PV > gluino(1),squark(2)), (gluino(1) >
-                               MET,jet,jet), (squark(2) > HSCP,u)' or [[['jet','jet']],[['u']]]).
-                               The particle labels should match the particles in the Model
-                               (if Model != None).
+                          (e.g. '(PV > gluino(1),squark(2)), (gluino(1) >
+                          MET,jet,jet), (squark(2) > HSCP,u)' or [[['jet','jet']],[['u']]]).
+                          The particle labels should match the particles in the Model
+                          (if Model != None).
         :parameter model: The model (Model object) to be used when converting particle labels to
                           particle objects. If None, the nodes will only store the particle labels.
         :parameter finalState: (optional) list containing the final state labels for each branch
                                (e.g. ['MET', 'HSCP'] or ['MET','MET'])
         :parameter intermediateState: (optional) nested list containing intermediate state labels
-                                         for each branch  (e.g. [['gluino'], ['gluino']])
+                                      for each branch  (e.g. [['gluino'], ['gluino']])
         """
 
         # First check if string is in old format:
@@ -236,7 +236,7 @@ class ExpSMS(GenericSMS):
 
         :return: None (subtrees differ) or a dictionary
                  with the mapping of the nodes and their daughters
-                ({n1 : n2, d1 : d2, ...}).
+                 ({n1 : n2, d1 : d2, ...}).
         """
 
         if n1 is None:
