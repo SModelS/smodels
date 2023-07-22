@@ -190,5 +190,110 @@ class DecomposerTest(unittest.TestCase):
                 self.assertEqual(smsIDs[sms.smsID],sms)
 
 
+    def test_extra1(self):
+
+        slhafile = './testFiles/slha/lightEWinos.slha'
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(inputFile=slhafile,
+                                    erasePrompt=['spin','eCharge','colordim'])
+        
+        sigmacut = 10*fb
+        topDict = decomposer.decompose(model, sigmacut= sigmacut, 
+                                       massCompress=False, 
+                                       invisibleCompress=False)
+        nUnique = 103 # uncompressed
+        self.assertEqual(nUnique,len(topDict.getSMSList()))
+
+        topSummary = []
+        for c in sorted(topDict.keys()):
+            total = 0.0*fb
+            for sms in topDict[c]:
+                total += sms.weightList.getMaxXsec()
+            topSummary.append([len(topDict[c]),round(total.asNumber(fb),3)])
+
+        expectedSummary = [[2, 107.528], [58, 6126.453], [1, 31.861], [7, 490.94], [4, 81.12], [27, 1237.813], [4, 85.382]]
+        self.assertEqual(sorted(topSummary),sorted(expectedSummary))
+
+        # Smaller sigmacut:
+        sigmacut = 0.1*fb
+        topDict = decomposer.decompose(model, sigmacut= sigmacut, 
+                                       massCompress=False, 
+                                       invisibleCompress=False)
+        nUnique = 5435
+        self.assertEqual(nUnique,len(topDict.getSMSList()))
+
+        topSummary = []
+        for c in sorted(topDict.keys()):
+            total = 0.0*fb
+            for sms in topDict[c]:
+                total += sms.weightList.getMaxXsec()
+        #     print(c,len(topDict[c]),total)
+            topSummary.append([len(topDict[c]),round(total.asNumber(fb),3)])
+        expectedSummary = [[1, 3.883], [2, 1.003], [3, 1.094], [4, 0.892], [4, 2.616], [6, 2.853], [8, 3.643], [10, 3.376], [10, 14.988], [11, 10.526], [13, 13.994], [14, 11.171], [15, 164.364], [16, 78.045], [17, 30.516], [25, 12.91], [28, 19.106], [49, 42.873], [56, 25.215], [62, 48.534], [78, 51.703], [87, 150.926], [90, 6350.441], [102, 154.363], [104, 94.307], [104, 153.527], [107, 404.754], [113, 403.824], [126, 47.333], [132, 1078.776], [144, 267.975], [183, 106.275], [295, 166.074], [304, 377.261], [411, 157.421], [504, 2817.347], [648, 455.245], [747, 2086.069], [802, 1330.765]]
+        self.assertEqual(sorted(topSummary),sorted(expectedSummary))
+
+        # Invisible compression
+        sigmacut = 1*fb
+        topDict = decomposer.decompose(model, sigmacut= sigmacut, 
+                                       massCompress=False, 
+                                       invisibleCompress=True)
+
+        nUnique = 917
+        self.assertEqual(nUnique,len(topDict.getSMSList()))
+
+        # Mass compression
+        topDict = decomposer.decompose(model, sigmacut= sigmacut, 
+                                       massCompress=True, 
+                                       invisibleCompress=False)
+        nUnique = 899
+        self.assertEqual(nUnique,len(topDict.getSMSList()))
+
+
+    def test_extra2(self):
+
+        slhafile="./testFiles/slha/higgsinoStop.slha"
+        model = Model(BSMList,SMList)
+        model.updateParticles(inputFile=slhafile,promptWidth = 1e-12*GeV,
+                              
+                              erasePrompt=['spin','eCharge','colordim'])
+        
+        sigmacut = 1*fb
+        topDict = decomposer.decompose(model, sigmacut= sigmacut, 
+                                       massCompress=True, invisibleCompress=False, minmassgap=5*GeV)
+        nUnique = 489
+        self.assertEqual(nUnique,len(topDict.getSMSList()))
+
+
+        topSummary = []
+        for c in sorted(topDict.keys()):
+            total = 0.0*fb
+            for sms in topDict[c]:
+                total += sms.weightList.getMaxXsec()
+            topSummary.append([len(topDict[c]),round(total.asNumber(fb),3)])
+
+        expectedSummary = [[1, 46932.601], [1, 1043.828], [14, 68354.626], [4, 8885.261], [8, 694.931], [72, 42401.477], [36, 438.84], [4, 119.091], [34, 8107.982], [116, 792.104], [16, 111.128], [111, 8119.626], [8, 23.764], [16, 47.891], [16, 41.485], [8, 11.09], [8, 11.09], [16, 19.359]]
+        self.assertEqual(sorted(topSummary),sorted(expectedSummary))
+
+        # Mass and invisible compression
+        sigmacut = 0.1*fb
+        topDict = decomposer.decompose(model, sigmacut= sigmacut, 
+                            massCompress=True, 
+                            invisibleCompress=True, minmassgap=5*GeV)
+        nUnique = 1452
+        self.assertEqual(nUnique,len(topDict.getSMSList()))
+        topSummary = []
+        for c in sorted(topDict.keys()):
+            total = 0.0*fb
+            for sms in topDict[c]:
+                total += sms.weightList.getMaxXsec()
+        #     print(c,len(topDict[c]),total)
+            topSummary.append([len(topDict[c]),round(total.asNumber(fb),3)])
+
+
+        expectedSummary = [[2, 56785.133], [9, 1055.527], [22, 74853.168], [9, 10118.398], [29, 702.603], [72, 42401.477], [2, 0.923], [44, 443.058], [6, 126.609], [54, 9124.952], [48, 10.39], [284, 879.227], [17, 5.406], [22, 114.309], [120, 8125.92], [4, 1.076], [72, 48.575], [56, 99.821], [16, 2.469], [240, 119.334], [64, 31.64], [16, 1.667], [4, 0.684], [64, 31.64], [176, 59.448]]
+        self.assertEqual(sorted(topSummary),sorted(expectedSummary))
+
+
+
 if __name__ == "__main__":
     unittest.main()
