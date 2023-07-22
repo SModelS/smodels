@@ -101,8 +101,11 @@ class XSecResummino(XSecBasis):
         
         already_written_canal = self.canaux_finding(slha_file)
         sqrts = [x for x in self.sqrts]
-        print(((particle_1, particle_2), sqrts[0], order) in already_written_canal)
-        if ((particle_1, particle_2), sqrts[0], order) in already_written_canal:
+        _ = str(sqrts[0]*10**(-1))+'0E+04'
+        print(((particle_1, particle_2), _, order) in already_written_canal)
+        print(particle_1,particle_2, order, _)
+        print(already_written_canal)
+        if (((particle_1, particle_2), _, order)) in already_written_canal:
             print('wow')
             return
         if mode == "check":
@@ -110,8 +113,9 @@ class XSecResummino(XSecBasis):
             infos = self.search_in_output(output_file)
             infos = infos[0].split(" ")[2][1:]
             print(infos)
-            print(float(infos[0])>10**(-5))
-            if float(infos[0])>10**(-5):
+            print(float(infos)>10**(-5))
+            if (float(infos))>(10**(-5)):
+                print(num_try)
                 self.launch_command(self.resummino_bin, input_file, output_file, order)
                 if num_try == 0:
                     hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, 'all', Xsections)
@@ -358,7 +362,7 @@ class XSecResummino(XSecBasis):
             if data[-1].endswith("SModelSv2.3.0\n"):
                 b+=1
                 #On augmente cette variable de 1, comme ca si elle est > 0 on ne refait pas le calcul
-                num_try+=1
+                #num_try+=1
             elif data[-1].endswith(" #no_cross-section\n"):
                 c+=1
                 #On augmente cette variable de 1, comme ca si elle est > 0 on ne refait pas le calcul
