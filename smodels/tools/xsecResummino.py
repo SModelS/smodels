@@ -398,6 +398,14 @@ class XSecResummino(XSecBasis):
         with open(file_before, 'r') as f:
             lines = f.readlines()
 
+        try:        
+            with open("resummino.json", "r") as fi:
+                 data = json.load(fi)
+                        
+            pdf = data["pdf"]
+        except KeyError:
+                print("choosing PDF4LHC21_40 by default")
+           
         with open(file_after, 'w') as f:
             for line in lines:
                 if line.startswith("slha ="):
@@ -406,13 +414,7 @@ class XSecResummino(XSecBasis):
                 if self.sqrt == '8.0':
                     if line.startswith("center_of_mass_energy ="):
                         line = f"center_of_mass_energy = 8000"
-                try:        
-                    with open("resummino.json", "r") as fi:
-                        data = json.load(fi)
-                        
-                    pdf = data["pdf"]
-                except KeyError:
-                    print("choosing PDF4LHC21_40 by default")
+
 
     def json_extraction(self, file = "resummino.json"):
         with open(file, "r") as f:
