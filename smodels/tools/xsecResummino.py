@@ -389,7 +389,7 @@ class XSecResummino(XSecBasis):
 
             #On pourrait optimiser en enlevant les variables qui ne changent pas d'une itération à l'autre
             #Mais ce n'est pas très important (négligeable niveau temps de compilation comparé à Resummino)
-            Liste.append((particles, f"smodels/lib/resummino/resummino_in/resummino_{slha_file_name}.in", slha_path, f"resummino_out/resummino_out_{slha_file_name}.txt", num_try, order, mode))
+            Liste.append((particles, f"smodels/lib/resummino/resummino_in/resummino_{slha_file_name}.in", slha_path, f"smodels/lib/resummino/resummino_out/resummino_out_{slha_file_name}.txt", num_try, order, mode))
         print(f" Number of files created : {a-b-c}")
         return Liste
 
