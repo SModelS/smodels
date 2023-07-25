@@ -269,7 +269,7 @@ class XSecResummino(XSecBasis):
         for i in range(len(data)):
             line = data[i]
             if line.startswith("XSECTION"):
-                canal = (int(line.split(" ")[7]), int(line.split(" ")[8]),line.split(" ")[2])
+                canal = (int(line.split(" ")[7]), int(line.split(" ")[8]),line.split(" ")[2], data[i+1].split(" ")[4])
                 
                 if canal in canaux:
                     start = canaux[canal]
