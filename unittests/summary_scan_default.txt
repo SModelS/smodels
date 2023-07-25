@@ -1,4 +1,4 @@
-#Global results summary (19 files)
+#Global results summary (20 files)
 #The most constraining analysis corresponds to the one with largest observed r.
 #The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.
 #Analyses used for combination = ATLAS-CONF-2013-037,CMS-SUS-13-012.
@@ -23,3 +23,4 @@ lightEWinos_simple.slha  ATLAS-CONF-2013-037       0.119    0.11    ATLAS-CONF-2
 longLived.slha       CMS-EXO-13-006            0.835     0.835   ATLAS-CONF-2013-037   0.00801   0.00916       CMS-EXO-13-006      0.835    0.835       0.00801      0.00916        
 nobdecay.slha        ATLAS-SUSY-2013-02        0.803     -1      N/A                   -1        -1            N/A                 -1       -1          -1           -1             
 simplyGluino.slha    CMS-PAS-SUS-15-002        25.7      -1      N/A                   -1        -1            CMS-SUS-13-012      4.45     6.51        4.45         6.51           
+squarks_degenerate.slha  ATLAS-SUSY-2013-02    0.58      -1      N/A                   -1        -1            CMS-SUS-13-012      0.256    0.304       0.256        0.304          
