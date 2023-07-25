@@ -10,10 +10,6 @@
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 from smodels.base.genericSMS import GenericSMS
 from smodels.base.particle import Particle
-from smodels.base import crossSection
-from smodels.base.physicsUnits import fb
-from itertools import product
-import unum
 
 class TheorySMS(GenericSMS):
     """

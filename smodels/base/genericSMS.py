@@ -1051,7 +1051,8 @@ class GenericSMS(object):
                 pvColor='darkgray',
                 fontsize=10,
                 labelAttr=None,
-                attrUnit=None, filename=None, view=True ):
+                attrUnit=None, filename=None, view=True,
+                maxLabelSize=10 ):
         """
         Draws Tree using matplotlib.
 
@@ -1063,6 +1064,8 @@ class GenericSMS(object):
         :param attrUnit: Unum object with the unit to be removed from label attribute(if applicable)
         :param filename: Filename to save drawing to.
         :param view: open a viewer after plotting
+        :param maxLabelSize: Maximum size for the label string for the node. If the label is larger, it will be truncated.
+                             If None/False/0, it will keep the full label.
 
         :return: Display a GraphViz Digraph object, if view is true (and save it to file if filename is defined)
         """
@@ -1103,6 +1106,11 @@ class GenericSMS(object):
             else:
                 node_color[n] = particleColor
 
+        # Truncate labels if needed:
+        if maxLabelSize:
+            for key,val in labels.items():
+                if len(val) > maxLabelSize:
+                    labels[key] = val[:maxLabelSize]+'...'
 
         dot = graphviz.Digraph()
         for nodeIndex in self.nodeIndices:

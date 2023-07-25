@@ -933,6 +933,17 @@ class TxName(object):
             except TypeError:
                 setattr(self, tag, value)
 
+    def getInfo(self, infoLabel):
+        """
+        Returns the value of info field.
+
+        :param infoLabel: label of the info field (string). It must be an attribute of
+                          the TxNameInfo object
+        """
+
+        if hasattr(self,infoLabel): return getattr(self,infoLabel)
+        else: return False
+
     def hasSMSas(self, theorySMS, useLabel=None):
         """
         Verify if any SMS in conditions or constraint matches sms.
