@@ -35,7 +35,7 @@ except ImportError as e:
 
 class XSecResummino(XSecBasis):
     """ cross section computer class, what else? """
-    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True):
+    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type = 'all'):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
                     if maxOrder == LO, compute only LO pythia xsecs
@@ -54,6 +54,9 @@ class XSecResummino(XSecBasis):
         self.maycompile = maycompile
         self.ncpu = ncpu
         self.sqrts = sqrt
+        self.type = type
+        sqrts = [float(x) for x in self.sqrts]
+        self.sqrt = sqrts[0]
     
     def one_slha_calculation(self, particles,input_file, slha_file, output_file, num_try, order, mode):
         """
@@ -100,8 +103,8 @@ class XSecResummino(XSecBasis):
         #on lance si c'est le premier essai par défaut
         
         already_written_canal = self.canaux_finding(slha_file)
-        sqrts = [x for x in self.sqrts]
-        _ = str(sqrts[0]*10**(-1))+'0E+04'
+
+        _ = str(self.sqrt*10**(-1))+'0E+04'
         print(((particle_1, particle_2), _, order) in already_written_canal)
         print(particle_1,particle_2, order, _)
         print(already_written_canal)
@@ -118,9 +121,9 @@ class XSecResummino(XSecBasis):
                 print(num_try)
                 self.launch_command(self.resummino_bin, input_file, output_file, order)
                 if num_try == 0:
-                    hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, 'all', Xsections)
+                    hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections)
             else:
-                hist = self.write_in_slha(output_file, slha_file, 0, particle_1, particle_2, 'all', Xsections)
+                hist = self.write_in_slha(output_file, slha_file, 0, particle_1, particle_2, self.type, Xsections)
             return
             
             
@@ -132,7 +135,7 @@ class XSecResummino(XSecBasis):
 
         #Ici on écrit dans le fichier slha, la variable hist permet de voir s'il y a eu une erreur
         #Dans le calcul des section efficaces Lo et NLO
-            hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, 'all', Xsections)
+            hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections)
 
         #On vérifie si jamais on a écrit trop de choses
         self.are_crosssection(slha_file, order)
@@ -170,12 +173,12 @@ class XSecResummino(XSecBasis):
     def create_xsection(self, result, particle_1, particle_2, order, Xsections):
         
         if type(result) == list:
-            for i in range(self.maxOrder+1):
+            for i in range(order+1):
                 Xsection = crossSection.XSection()
         
                 Xsection.value = float(result[i]) * pb
                 Xsection.info.order = i
-                Xsection.info.sqrts = 13. * TeV
+                Xsection.info.sqrts = float(self.sqrt) * TeV
                 Xsection.info.label = "WAOUW"
                 Xsection.pid = (particle_1, particle_2)
                 Xsections.add(Xsection)
@@ -193,7 +196,7 @@ class XSecResummino(XSecBasis):
             
     def write_in_slha(self, output_file, slha_file, order, particle_1, particle_2, type_writing, Xsections):
         results = self.search_in_output(output_file)
-        if type_writing == 'max':
+        if type_writing == 'highest':
             if order == 0:
                 result = results[0].split(" ")[2][1:]
             elif order == 1:
@@ -400,6 +403,16 @@ class XSecResummino(XSecBasis):
                 if line.startswith("slha ="):
                     line = f"slha = {slha_file}\n"
                 f.write(line)
+                if self.sqrt == '8.0':
+                    if line.startswith("center_of_mass_energy ="):
+                        line = f"center_of_mass_energy = 8000"
+                try:        
+                    with open("resummino.json", "r") as fi:
+                        data = json.load(fi)
+                        
+                    pdf = data["pdf"]
+                except KeyError:
+                    print("choosing PDF4LHC21_40 by default")
 
     def json_extraction(self, file = "resummino.json"):
         with open(file, "r") as f:
@@ -452,7 +465,8 @@ def main(args):
     canonizer.checkAllowedSqrtses ( order, sqrtses )
     inputFiles = args.filename.strip()
     ncpus = canonizer.checkNCPUs ( args.ncpus, inputFiles )
-
+    type_writting = canonizer.writeToFile(args)
+    
     ssmultipliers = None
     if hasattr ( args, "ssmultipliers" ):
         ssmultipliers = canonizer.getSSMultipliers ( args.ssmultipliers )
@@ -468,8 +482,8 @@ def main(args):
     print("sqrt :" +str(sqrtses))
     print("order" + str(order))
     print("ncpu" + str(ncpus))
-    
-    test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus)
+    print([float(x) for x in sqrtses])
+    test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus, type = type_writting)
     test.routine_resummino()
     
 
