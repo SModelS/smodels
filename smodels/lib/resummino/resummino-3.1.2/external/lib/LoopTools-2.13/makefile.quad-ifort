@@ -1,8 +1,0 @@
-QUADSUFFIX = -quad
-FC-quad = $(FC)
-FFLAGS-quad = -r16 -DQUAD=1 -DKIND=2 -DDBLE=QEXT -DDIMAG=QIMAG -DDCONJG=QCONJG -DDCMPLX=QCMPLX
-CFLAGS-quad = -DQUAD=1 -DKIND=2 -O0
-INCLUDE-quad = $(BLD)/looptools.h
-
-include makefile
-

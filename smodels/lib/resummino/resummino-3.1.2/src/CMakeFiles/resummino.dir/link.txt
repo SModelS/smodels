@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG -rdynamic CMakeFiles/resummino.dir/main.cc.o -o ../bin/resummino  -Wl,-rpath,/home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/lhapdf/lib: liblibresummino.a -lgsl -lgslcblas /home/supersymmetry/Documents/lpsc/test/smodels/smodels/lib/resummino/lhapdf/lib/libLHAPDF.so ../lt-prefix/lib/libooptools.a -lgfortran 
