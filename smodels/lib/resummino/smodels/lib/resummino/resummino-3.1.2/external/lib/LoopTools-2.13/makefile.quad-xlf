@@ -1,8 +1,0 @@
-QUADSUFFIX = -quad
-FC-quad = xlf
-FFLAGS-quad = -qautodbl=dbl -WF,-DKIND=2
-CFLAGS-quad = -DKIND=2
-INCLUDE-quad = $(BLD)/looptools.h
-
-include makefile
-
