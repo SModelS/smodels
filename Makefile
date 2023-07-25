@@ -47,6 +47,9 @@ pythia6:
 pythia8:
 	cd smodels/lib && make pythia8
 
+resummino:
+	cd smodels/lib && make resummino
+
 cpp: .PHONY
 	cd cpp && make
 
