@@ -43,7 +43,8 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
 #     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
     slhafile = os.path.abspath(inputFile)
 #     model.updateParticles(inputFile=lhefile)
-    model.updateParticles(inputFile=slhafile)
+    model.updateParticles(inputFile=slhafile,
+                          erasePrompt = ['eCharge','colordim','spin'])
 
     # Set main options for decomposition
     sigmacut = sigmacut
