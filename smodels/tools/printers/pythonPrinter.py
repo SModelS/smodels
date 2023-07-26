@@ -264,6 +264,8 @@ class PyPrinter(BasicPrinter):
                 mass = [(k,v) for k,v in massDict.items()]
                 widths = [(k,v) for k,v in widthDict.items()]
 
+            nodesDict = {nodeIndex : str(node) for nodeIndex,node 
+                         in theoryPrediction.avgSMS._nodesMapping.items()}
             sqrts = expResult.globalInfo.sqrts
 
             r = self._round(theoryPrediction.getRValue(expected=False))
@@ -285,6 +287,9 @@ class PyPrinter(BasicPrinter):
 
             if hasattr(self, "addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] = txnamesDict
+            if hasattr(self, "addnodesmap") and self.addnodesmap:
+                resDict['Nodes Map'] = nodesDict
+
             llhd = theoryPrediction.likelihood()
             if llhd is not None:
                 # resDict['chi2'] = self._round ( theoryPrediction.chi2 )

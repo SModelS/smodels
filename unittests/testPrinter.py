@@ -262,6 +262,24 @@ class RunPrinterTest(unittest.TestCase):
         self.removeOutputs(outputfile)
 
     
+    def testPythonPrinterNodesMap(self):
+
+        slhafile = "./testFiles/slha/simplyGluino.slha"
+        outputfile = runMain(slhafile, inifile='testPrinters_parameters_nodeMap.ini')
+        smodelsOutput = importModule(outputfile)
+        from simplyGluino_default_nodesMap import smodelsOutputDefault
+
+        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version', 'model', 'checkinput',
+                        'doinvisible', 'docompress', 'computestatistics', 'testcoverage']
+        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
+                                                 key=lambda res: res['r'], reverse=True)
+        smodelsOutput['ExptRes'] = sorted(smodelsOutput['ExptRes'],
+                                          key=lambda res: res['r'], reverse=True)
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
+                           ignore=ignoreFields)
+
+        self.assertTrue(equals)
+        self.removeOutputs(outputfile)
 
 
 if __name__ == "__main__":
