@@ -239,9 +239,11 @@ class PyPrinter(BasicPrinter):
             if avgSMS is None:  # There is no commong topology
                 mass = None
                 widths = None
+                nodesDict = None
             elif self.outputFormat == "version2":
                 mass = []
                 widths = []
+                nodesDict = {}
                 for dIndex in avgSMS.daughterIndices(avgSMS.rootIndex):
                     daughter = avgSMS.indexToNode(dIndex)
                     mass.append([daughter.mass.asNumber(GeV)])
@@ -256,16 +258,17 @@ class PyPrinter(BasicPrinter):
             else:
                 widthDict = {}
                 massDict = {}
-                for n in theoryPrediction.avgSMS.nodes:
-                    if n.isSM or n is theoryPrediction.avgSMS.root:
+                for n in avgSMS.nodes:
+                    if n.isSM or n is avgSMS.root:
                         continue
                     massDict[str(n)] = n.mass.asNumber(GeV)
                     widthDict[str(n)] = n.totalwidth.asNumber(GeV)
                 mass = [(k,v) for k,v in massDict.items()]
                 widths = [(k,v) for k,v in widthDict.items()]
 
-            nodesDict = {nodeIndex : str(node) for nodeIndex,node 
-                         in theoryPrediction.avgSMS._nodesMapping.items()}
+                nodesDict = {nodeIndex : str(node) for nodeIndex,node
+                             in avgSMS._nodesMapping.items()}
+
             sqrts = expResult.globalInfo.sqrts
 
             r = self._round(theoryPrediction.getRValue(expected=False))
