@@ -37,6 +37,15 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+
+New in Version 3.0.0:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Extension to general SMS topologies (no longer restricted to Z\ :sub:`2` symmetric topologies)
+  * Added option for selecting which quantum numbers to be erased
+  * Inclusion of analyses with searches for resonant production
+  * ...
+
 New in Version 2.3.1:
 ^^^^^^^^^^^^^^^^^^^^^
 

@@ -1049,10 +1049,14 @@ class GenericSMS(object):
     def draw(self, particleColor='lightcoral',
                 smColor='skyblue',
                 pvColor='darkgray',
-                fontsize=10,
                 labelAttr=None,
                 attrUnit=None, filename=None, view=True,
-                maxLabelSize=10 ):
+                maxLabelSize=10,
+                usePVimage=False,
+                graph_kwargs = {'layout' : 'dot', 'ranksep' : '0.5', 'rankdir' : "LR"},
+                nodes_kwargs = {'style' : 'filled', 'fontsize' : '10', 
+                                'shape' : 'circle','margin' : '0'},
+                edges_kwargs={}):
         """
         Draws Tree using matplotlib.
 
@@ -1066,13 +1070,17 @@ class GenericSMS(object):
         :param view: open a viewer after plotting
         :param maxLabelSize: Maximum size for the label string for the node. If the label is larger, it will be truncated.
                              If None/False/0, it will keep the full label.
+        :param usePVimage: Path to a image file (png, bmp or jpeg) to be used instead of the primary vertex (PV) node.
+        :param graph_kwargs: Dictionary with graph attributes to be used.
+        :param nodes_kwargs: Dictionary with nodes attributes to be used.
+        :param edges_kwargs: Dictionary with nodes attributes to be used.
 
         :return: Display a GraphViz Digraph object, if view is true (and save it to file if filename is defined)
         """
 
         try:
             import graphviz
-        except ImportError as err:
+        except ImportError:
             raise SModelSError("For drawing SMS objects, please install graphviz")
 
         nodesAndIndices = zip(self.nodes,self.nodeIndices)
@@ -1084,10 +1092,10 @@ class GenericSMS(object):
                       if (hasattr(n, labelAttr) and getattr(n, labelAttr) is not None)
                       else str(n) for n,nodeIndex in nodesAndIndices}
         elif labelAttr == 'node':
-            labels = {nodeIndex: str(nodeIndex) for n,nodeIndex in nodesAndIndices}
+            labels = {nodeIndex: str(nodeIndex) for _,nodeIndex in nodesAndIndices}
         elif labelAttr == 'canonName':
             labels = {nodeIndex: str(self.nodeCanonName(nodeIndex))
-                        for n,nodeIndex in nodesAndIndices}
+                        for _,nodeIndex in nodesAndIndices}
         else:
             labels = {nodeIndex: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
                       else str(n) for n,nodeIndex in nodesAndIndices}
@@ -1113,12 +1121,24 @@ class GenericSMS(object):
                     labels[key] = val[:maxLabelSize]+'...'
 
         dot = graphviz.Digraph()
-        for nodeIndex in self.nodeIndices:
-            dot.node(str(nodeIndex),labels[nodeIndex], style='filled', fontsize=str(fontsize),
-                     color = node_color[nodeIndex], fillcolor = node_color[nodeIndex],
-                     shape='circle',margin='0')
+        for key,val in graph_kwargs.items():
+            dot.attr(**{key : str(val)})
+        for nodeIndex in self.nodeIndices:            
+            if labels[nodeIndex] == 'PV' and usePVimage:
+                dot.node(str(nodeIndex),shape='plaintext', 
+                         fontsize='16', label="",color='white',
+                         width='0.6', height='1.2', fixedsize='true',
+                         shapefile=usePVimage)
+            else:
+                nodeAttrs = {k : v for k,v in nodes_kwargs.items()}
+                if 'label' not in nodeAttrs:
+                    nodeAttrs['label'] = labels[nodeIndex]
+                if 'fillcolor' not in nodeAttrs:
+                    nodeAttrs['fillcolor'] = node_color[nodeIndex]
+                dot.node(str(nodeIndex), **nodeAttrs)
         for edgeIndex in self.edgeIndices:
-            dot.edge(str(edgeIndex[0]),str(edgeIndex[1]))
+            dot.edge(str(edgeIndex[0]),str(edgeIndex[1]),
+                     **edges_kwargs)
 
         # If filename is defined, save image
         if filename is not None:
@@ -1136,7 +1156,7 @@ class GenericSMS(object):
                     import os
                     fname = filename
                     if fname != None:
-                        fname, extension = os.path.splitext(filename)
+                        fname, _ = os.path.splitext(filename)
                     dot.view(filename=fname) # for terminals
                 except (RuntimeError, graphviz.ExecutableNotFound,\
                         graphviz.CalledProcessError) as e:
