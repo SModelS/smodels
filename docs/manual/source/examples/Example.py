@@ -19,7 +19,7 @@ from smodels.matching.theoryPrediction import theoryPredictionsFor,TheoryPredict
 from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
 from smodels.base.smodelsLogging import setLogLevel
-from smodels.share.models.mssm import BSMList
+from smodels.particlesLoader import load
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
 import time
@@ -37,6 +37,10 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
 
     # Set the path to the database
     database = Database(database)
+
+    # Load the BSM model
+    runtime.modelFile = "smodels.share.models.mssm"
+    BSMList = load()
 
     model = Model(BSMparticles=BSMList, SMparticles=SMList)
     # Path to input file (either a SLHA or LHE file)
@@ -62,21 +66,19 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
     print("\t  Total number of topologies: %i " % len(topDict))
     nSMS = len(topDict.getSMSList())
     print("\t  Total number of SMS = %i " % nSMS)
-    # Print information about the m-th topology:
-    m = 2
-    if len(topDict) > m:
-        cName = sorted(topDict.keys())[m]
-        smsList = topDict[cName]
-        print("\t\t %i topology  = " % cName)
-        # Print information about the n-th element in the m-th topology:
-        n = 0
-        sms = smsList[n]
-        print("\t\t %i-th SMS  = " % (n), sms, end="")
-        print("\n\t\t\twith final states =", sms.getFinalStates(), "\n\t\t\twith cross section =", sms.weightList, "\n\t\t\tand masses = ", sms.mass)
+
+    # Get SMS topologies sorted by largest cross-section*BR:
+    smsList = sorted(topDict.getSMSList(), 
+                     key = lambda sms: sms.weightList, reverse=True)
+    
+    # Print information about the first few SMS topologies:
+    for sms in smsList[:3]:
+        print(f"\t\t SMS  = {sms}")
+        print(f"\t\t cross section*BR = {sms.weightList.getMaxXsec()}\n")
 
     # Load the experimental results to be used.
     # In this case, all results are employed.
-    listOfExpRes = database.expResultList
+    listOfExpRes = database.getExpResults()
 
     t0 = time.time()
     # Print basic information about the results loaded.

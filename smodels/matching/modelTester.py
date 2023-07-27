@@ -548,7 +548,6 @@ def getAllInputFiles(inFile):
         return fileList, inFile
     fileList = [os.path.basename(inFile)]
     return fileList, os.path.dirname(inFile)
-    return fileList, os.path.dirname(inFile)
 
 
 def getCombiner(inputFile,parameterFile):

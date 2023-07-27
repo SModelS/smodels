@@ -1,704 +1,247 @@
 
- Decomposition Results: 
-	  Total number of topologies: 57 
-	  Total number of elements = 18544 
-		 2-th topology  =  [][2] with total cross section = ['8.00E+00 [TeV]:3.05E-01 [pb] (None, None)', '1.30E+01 [TeV]:5.21E-01 [pb] (None, None)']
-		 0-th element from 2-th topology  =  [[],[[e-,nu]]]
-			with final states = [N1, N1~] 
-			with cross section = ['8.00E+00 [TeV]:4.03E-03 [pb] (-1000024, 1000022)', '1.30E+01 [TeV]:7.03E-03 [pb] (-1000024, 1000022)'] 
-			and masses =  [[6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
+ Decomposition done in 0.20m
 
- Loaded Database with 86 UL results and 40 EM results 
+ Decomposition Results: 
+	  Total number of topologies: 44 
+	  Total number of SMS = 7882 
+		 SMS  = (PV > C1+/C1-(1),N2(2)), (C1+/C1-(1) > N1/N1~,q,q), (N2(2) > N1,q,q)
+		 cross section*BR = 7.33E-01 [pb]
+
+		 SMS  = (PV > C1+/C1-(1),N2(2)), (C1+/C1-(1) > N1/N1~,q,c), (N2(2) > N1,q,q)
+		 cross section*BR = 7.33E-01 [pb]
+
+		 SMS  = (PV > C1+/C1-(1),C1+/C1-(2)), (C1+/C1-(1) > N1/N1~,q,q), (C1+/C1-(2) > N1/N1~,q,c)
+		 cross section*BR = 4.94E-01 [pb]
+
+
+ Loaded Database with 102 UL results and 56 EM results 
 
  Theory Predictions and Constraints:
 
- ATLAS-SUSY-2015-06 
-------------------------
-Dataset =  SR5j
-TxNames =  ['T1', 'T2']
-Prediction Mass =  [[5.77E+02 [GeV], 6.99E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000023], [1000021, 1000022]], [[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:5.43E-06 [pb] (1000021, 1000021)
-Condition Violation =  None
-UL for theory prediction =  1.79E+00 [fb]
-r = 3.031E-03
-L_BSM, L_SM, L_max = 7.167E-03, 7.215E-03, 7.215E-03
-
- ATLAS-SUSY-2016-07 
-------------------------
-Dataset =  None
-TxNames =  ['T2']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:2.54E-05 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  3.83E+02 [fb]
-r = 6.621E-05
-
- ATLAS-SUSY-2016-07 
-------------------------
-Dataset =  5j_Meff_1600
-TxNames =  ['TGQ', 'T1', 'T2', 'T5WWoff']
-Prediction Mass =  None
-Prediction PIDs =  [[[1000021, 1000023, 1000022], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, [1000024, -1000024], [1000022, -1000022]], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, [1000024, -1000024], [1000022, -1000022]], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000023, 1000022], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000023, 1000022], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000023, 1000022], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000023], [1000021, 1000022]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000023], [1000021, 1000022]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:2.77E-04 [pb] (1000021, 1000021)
-Condition Violation =  None
-UL for theory prediction =  1.27E+00 [fb]
-r = 2.178E-01
-L_BSM, L_SM, L_max = 9.648E-04, 9.077E-04, 9.778E-04
-
- ATLAS-SUSY-2016-24 
-------------------------
-Dataset =  None
-TxNames =  ['TChiWZ']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.71E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]], [[1000037, 1000022], [1000025, 1000022]], [[-1000037, -1000022], [1000025, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:1.61E-03 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  2.48E+02 [fb]
-r = 6.493E-03
-------------------------
-Dataset =  None
-TxNames =  ['TSlepSlep']
-Prediction Mass =  [[3.23E+02 [GeV], 6.81E+01 [GeV]], [3.23E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[-1000013, -1000022], [1000013, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:2.24E-05 [pb] (None, None)
-Condition Violation =  {'Cgtr([[[mu+]],[[mu-]]], [[[e+]],[[e-]]])': 0.00E+00 }
-UL for theory prediction =  2.25E+00 [fb]
-r = 9.985E-03
-
- ATLAS-SUSY-2016-24 
-------------------------
-Dataset =  SR2-SF-tight
-TxNames =  ['TSmuSmu']
-Prediction Mass =  [[3.23E+02 [GeV], 6.81E+01 [GeV]], [3.23E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[-1000013, -1000022], [1000013, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:1.77E-06 [pb] (-1000013, 1000013)
-Condition Violation =  None
-UL for theory prediction =  2.90E-01 [fb]
-r = 6.093E-03
-L_BSM, L_SM, L_max = 1.775E-02, 1.780E-02, 1.780E-02
-
- ATLAS-SUSY-2017-03 
-------------------------
-Dataset =  None
-TxNames =  ['TChiWZ']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:2.79E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  1.81E+02 [fb]
-r = 1.545E-03
-
- ATLAS-SUSY-2017-03 
-------------------------
-Dataset =  SR3l_Int
-TxNames =  ['TChiWZ']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:1.73E-07 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  9.00E-02 [fb]
-r = 1.923E-03
-L_BSM, L_SM, L_max = 1.905E-01, 1.911E-01, 1.911E-01
-
- ATLAS-SUSY-2018-04 
-------------------------
-Dataset =  None
-TxNames =  ['TStauStau']
-Prediction Mass =  [[3.22E+02 [GeV], 6.81E+01 [GeV]], [3.22E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[-1000015, -1000022], [1000015, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:1.52E-05 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  2.94E+00 [fb]
-r = 5.176E-03
-
- ATLAS-SUSY-2018-04 
-------------------------
-Dataset =  SRhigh
-TxNames =  ['TStauStau']
-Prediction Mass =  [[3.22E+02 [GeV], 6.81E+01 [GeV]], [3.22E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[-1000015, -1000022], [1000015, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:3.17E-07 [pb] (-1000015, 1000015)
-Condition Violation =  None
-UL for theory prediction =  5.00E-02 [fb]
-r = 6.343E-03
-L_BSM, L_SM, L_max = 1.362E-02, 1.372E-02, 1.372E-02
-
- ATLAS-SUSY-2018-06 
-------------------------
-Dataset =  None
-TxNames =  ['TChiWZ']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:2.79E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  3.32E+02 [fb]
-r = 8.420E-04
+ ATLAS-SUSY-2019-09 
 ------------------------
 Dataset =  None
 TxNames =  ['TChiWZoff']
-Prediction Mass =  [[1.35E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000023, 1000022], [1000024, 1000022]], [[1000023, 1000022], [-1000024, -1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:2.63E+00 [pb] (None, None)
-Condition Violation =  {'cGtr([[[mu+,mu-]],[[l,nu]]],[[[e+,e-]],[[l,nu]]])': 0.00E+00 }
-UL for theory prediction =  3.80E+04 [fb]
-r = 6.917E-02
+Theory Prediction =  2.63E+00 [pb]
+Condition Violation =  [0.0]
+UL for theory prediction =  5.49E+02 [fb]
+r = 4.783E+00
 
- ATLAS-SUSY-2018-06 
+ ATLAS-SUSY-2019-09 
 ------------------------
-Dataset =  SR_low
-TxNames =  ['TChiWZ']
-Prediction Mass =  [[2.93E+02 [GeV], 8.44E+01 [GeV]], [2.70E+02 [GeV], 7.13E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000025, 1000022]], [[-1000037, -1000022], [1000025, 1000022]], [[1000037, 1000023], [1000025, 1000022]], [[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000023], [1000025, 1000022]], [[-1000037, -1000022], [1000035, 1000022]], [[1000037, 1000022], [1000025, 1000023]], [[-1000037, -1000022], [1000025, 1000023]]]
-Theory Prediction =  1.30E+01 [TeV]:1.32E-06 [pb] (None, None)
+Dataset =  SRhigh_0Jf1
+TxNames =  ['TChiWZoff']
+Theory Prediction =  3.47E-04 [pb]
 Condition Violation =  None
-UL for theory prediction =  1.72E-01 [fb]
-r = 7.656E-03
-L_BSM, L_SM, L_max = 3.803E-03, 3.757E-03, 4.450E-03
+UL for theory prediction =  1.20E-01 [fb]
+r = 2.888E+00
+L_BSM, L_SM, L_max = 2.298E-09, 8.011E-03, 8.158E-03
 
- ATLAS-SUSY-2018-22 
+ CMS-SUS-19-006-agg 
+------------------------
+Dataset =  AR13
+TxNames =  ['T1bbbb', 'T1tttt']
+Theory Prediction =  1.00E-03 [pb]
+Condition Violation =  None
+UL for theory prediction =  3.74E-01 [fb]
+r = 2.680E+00
+L_BSM, L_SM, L_max = 1.390E-11, 6.777E-04, 8.392E-04
+
+ CMS-SUS-13-006 
 ------------------------
 Dataset =  None
-TxNames =  ['T2']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:2.54E-05 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  8.90E+01 [fb]
-r = 2.851E-04
+TxNames =  ['TChiWZoff']
+Theory Prediction =  1.40E+00 [pb]
+Condition Violation =  [0.0]
+UL for theory prediction =  1.17E+03 [fb]
+r = 1.204E+00
 
- ATLAS-SUSY-2018-22 
-------------------------
-Dataset =  SR2j_1600
-TxNames =  ['T2']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:5.33E-07 [pb] (1000021, 1000021)
-Condition Violation =  None
-UL for theory prediction =  1.55E+00 [fb]
-r = 3.439E-04
-L_BSM, L_SM, L_max = 2.261E-05, 2.261E-05, 2.261E-05
-
- ATLAS-SUSY-2018-23 
+ CMS-SUS-13-019 
 ------------------------
 Dataset =  None
-TxNames =  ['TChiWH']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:6.10E-04 [pb] (None, None)
+TxNames =  ['T1bbbb']
+Theory Prediction =  7.63E-03 [pb]
 Condition Violation =  None
-UL for theory prediction =  4.20E+02 [fb]
-r = 1.453E-03
-
- ATLAS-SUSY-2018-32 
-------------------------
-Dataset =  None
-TxNames =  ['TSlepSlep']
-Prediction Mass =  [[3.23E+02 [GeV], 6.81E+01 [GeV]], [3.23E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[-1000013, -1000022], [1000013, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:1.49E-05 [pb] (None, None)
-Condition Violation =  {'Cgtr([[[mu+]],[[mu-]]], [[[e+]],[[e-]]])': 0.00E+00 }
-UL for theory prediction =  3.96E+00 [fb]
-r = 3.777E-03
-------------------------
-Dataset =  None
-TxNames =  ['TChiWW']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.93E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[-1000037, -1000022], [1000037, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:4.31E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  1.41E+02 [fb]
-r = 3.057E-03
-------------------------
-Dataset =  None
-TxNames =  ['TChiWW']
-Prediction Mass =  [[2.93E+02 [GeV], 1.35E+02 [GeV]], [2.93E+02 [GeV], 1.35E+02 [GeV]]]
-Prediction PIDs =  [[[-1000037, -1000023], [1000037, 1000023]]]
-Theory Prediction =  1.30E+01 [TeV]:9.27E-05 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  2.60E+02 [fb]
-r = 3.569E-04
-
- ATLAS-SUSY-2019-08 
-------------------------
-Dataset =  None
-TxNames =  ['TChiWH']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:6.10E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  2.19E+02 [fb]
-r = 2.785E-03
-
- ATLAS-SUSY-2019-08 
-------------------------
-Dataset =  SR_MM_High_MCT
-TxNames =  ['TChiWH']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:9.94E-08 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  3.85E-02 [fb]
-r = 2.583E-03
-L_BSM, L_SM, L_max = 1.654E-01, 1.647E-01, 1.800E-01
-
- CMS-SUS-16-033 
-------------------------
-Dataset =  None
-TxNames =  ['T2']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:2.54E-05 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  3.60E+01 [fb]
-r = 7.052E-04
+UL for theory prediction =  9.31E+00 [fb]
+r = 8.192E-01
 
  CMS-SUS-16-033 
 ------------------------
 Dataset =  SR8_Njet5_Nb3_HT500_MHT500
-TxNames =  ['T1tttt', 'TGQ', 'T1bbbb', 'T1', 'T2']
-Prediction Mass =  [[5.77E+02 [GeV], 7.25E+01 [GeV]], [5.77E+02 [GeV], 7.25E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000023], [1000021, 1000023]], [[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:3.95E-04 [pb] (1000021, 1000021)
+TxNames =  ['T1', 'T1bbbb', 'T1tttt', 'TGQ']
+Theory Prediction =  3.94E-04 [pb]
 Condition Violation =  None
 UL for theory prediction =  5.00E-01 [fb]
 r = 7.890E-01
-L_BSM, L_SM, L_max = 9.776E-04, 4.413E-03, 4.413E-03
-
- CMS-SUS-16-034 
-------------------------
-Dataset =  None
-TxNames =  ['TChiWZ']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:2.79E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  2.32E+02 [fb]
-r = 1.203E-03
-
- CMS-SUS-16-036 
-------------------------
-Dataset =  None
-TxNames =  ['T2']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:2.54E-05 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  4.72E+01 [fb]
-r = 5.373E-04
-
- CMS-SUS-16-039 
-------------------------
-Dataset =  None
-TxNames =  ['TChiWZ']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:2.79E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  2.04E+02 [fb]
-r = 1.368E-03
-------------------------
-Dataset =  None
-TxNames =  ['TChiWH']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:6.10E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  9.96E+02 [fb]
-r = 6.124E-04
-
- CMS-SUS-16-043 
-------------------------
-Dataset =  None
-TxNames =  ['TChiWH']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:6.10E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  4.71E+02 [fb]
-r = 1.295E-03
-
- CMS-SUS-16-045 
-------------------------
-Dataset =  None
-TxNames =  ['TChiWH']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:6.10E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  1.36E+03 [fb]
-r = 4.482E-04
-
- CMS-SUS-17-004 
-------------------------
-Dataset =  None
-TxNames =  ['TChiWH']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:6.10E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  3.82E+02 [fb]
-r = 1.595E-03
-------------------------
-Dataset =  None
-TxNames =  ['TChiWZ']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:2.79E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  1.18E+02 [fb]
-r = 2.362E-03
-
- CMS-SUS-17-009 
-------------------------
-Dataset =  None
-TxNames =  ['TSmuSmu']
-Prediction Mass =  [[3.23E+02 [GeV], 6.81E+01 [GeV]], [3.23E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[-1000013, -1000022], [1000013, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:1.49E-05 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  5.15E+00 [fb]
-r = 2.904E-03
-------------------------
-Dataset =  None
-TxNames =  ['TSlepSlep']
-Prediction Mass =  [[3.23E+02 [GeV], 6.81E+01 [GeV]], [3.23E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[-1000013, -1000022], [1000013, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:1.49E-05 [pb] (None, None)
-Condition Violation =  {'Cgtr([[[mu+]],[[mu-]]],[[[e+]],[[e-]]])': 0.00E+00 }
-UL for theory prediction =  3.56E+00 [fb]
-r = 4.195E-03
-
- CMS-SUS-19-006 
-------------------------
-Dataset =  None
-TxNames =  ['T2']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  1.30E+01 [TeV]:2.54E-05 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  3.93E+01 [fb]
-r = 6.453E-04
-
- ATLAS-SUSY-2013-02 
-------------------------
-Dataset =  None
-TxNames =  ['T1']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:2.03E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  6.82E+01 [fb]
-r = 2.969E-03
-------------------------
-Dataset =  None
-TxNames =  ['T1']
-Prediction Mass =  [[1.35E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000023, 1000022], [[1000024, -1000024], [1000022, -1000022]]], [[[-1000024, 1000024], [-1000022, 1000022]], [[1000024, -1000024], [1000022, -1000022]]], [[-1000024, -1000022], [1000024, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:1.53E+00 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  2.33E+07 [fb]
-r = 6.559E-05
-------------------------
-Dataset =  None
-TxNames =  ['T2']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:3.82E-06 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  4.16E+01 [fb]
-r = 9.197E-05
-
- ATLAS-SUSY-2013-02 
-------------------------
-Dataset =  SR4jlm
-TxNames =  ['T1', 'T2']
-Prediction Mass =  [[1.56E+02 [GeV], 6.82E+01 [GeV]], [1.56E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]], [[1000023, 1000022], [[1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000023], [1000021, 1000022]], [[[-1000024, 1000024], [-1000022, 1000022]], [[1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000022], [1000021, 1000022]], [[-1000024, -1000022], [1000024, 1000022]], [[1000023, 1000022], [[1000024, -1000024], [1000022, -1000022]]]]
-Theory Prediction =  8.00E+00 [TeV]:6.62E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  1.33E+01 [fb]
-r = 4.983E-02
-L_BSM, L_SM, L_max = 2.972E-05, 2.856E-05, 3.107E-05
-
- ATLAS-SUSY-2013-04 
-------------------------
-Dataset =  GtGrid_SR_8ij80_0bjet
-TxNames =  ['T1bbbb', 'T1tttt', 'T5WWoff']
-Prediction Mass =  None
-Prediction PIDs =  [[[1000021, 1000023, 1000022], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, [1000024, -1000024], [1000022, -1000022]], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, [1000024, -1000024], [1000022, -1000022]], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000023, 1000022], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000023, 1000022], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000023, 1000022], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000023], [1000021, 1000023]]]
-Theory Prediction =  8.00E+00 [TeV]:2.03E-05 [pb] (1000021, 1000021)
-Condition Violation =  None
-UL for theory prediction =  2.72E-01 [fb]
-r = 7.465E-02
-L_BSM, L_SM, L_max = 1.597E-01, 1.277E-01, 1.800E-01
-
- ATLAS-SUSY-2013-09 
-------------------------
-Dataset =  None
-TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  2.90E+01 [fb]
-r = 2.314E-02
-
- ATLAS-SUSY-2013-09 
-------------------------
-Dataset =  SR3B
-TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:7.66E-06 [pb] (1000021, 1000021)
-Condition Violation =  None
-UL for theory prediction =  1.76E-01 [fb]
-r = 4.353E-02
-L_BSM, L_SM, L_max = 1.224E-01, 1.321E-01, 1.321E-01
-
- ATLAS-SUSY-2013-11 
-------------------------
-Dataset =  None
-TxNames =  ['TSlepSlep']
-Prediction Mass =  [[3.23E+02 [GeV], 6.81E+01 [GeV]], [3.23E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[-1000011, -1000022], [1000011, 1000022]], [[-1000013, -1000022], [1000013, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:1.04E-05 [pb] (None, None)
-Condition Violation =  {'Cgtr([[[mu+]],[[mu-]]],[[[e+]],[[e-]]])': 0.00E+00 }
-UL for theory prediction =  2.72E+00 [fb]
-r = 3.822E-03
-------------------------
-Dataset =  None
-TxNames =  ['TChiWZ']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:1.64E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  1.39E+02 [fb]
-r = 1.181E-03
-
- ATLAS-SUSY-2013-11 
-------------------------
-Dataset =  mT2-150-SF
-TxNames =  ['TSlepSlep', 'TChiWW']
-Prediction Mass =  [[3.21E+02 [GeV], 6.86E+01 [GeV]], [3.21E+02 [GeV], 6.86E+01 [GeV]]]
-Prediction PIDs =  [[[-1000011, -1000022], [1000011, 1000022]], [[-1000013, -1000022], [1000013, 1000022]], [[1000037, 1000022], [-1000037, -1000022]], [[1000037, 1000023], [-1000037, -1000023]]]
-Theory Prediction =  8.00E+00 [TeV]:7.26E-07 [pb] (None, None)
-Condition Violation =  {'Cgtr([[[mu+]],[[mu-]]],[[[e+]],[[e-]]])': 0.00E+00 }
-UL for theory prediction =  2.68E-01 [fb]
-r = 2.709E-03
-L_BSM, L_SM, L_max = 1.269E-01, 1.270E-01, 1.270E-01
+L_BSM, L_SM, L_max = 9.777E-04, 4.413E-03, 4.413E-03
 
  ATLAS-SUSY-2013-12 
 ------------------------
 Dataset =  None
 TxNames =  ['TChiWZoff']
-Prediction Mass =  [[1.35E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000023, 1000022], [1000024, 1000022]], [[1000023, 1000022], [-1000024, -1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:1.40E+00 [pb] (None, None)
-Condition Violation =  {'Cgtr([[[mu+,mu-]],[[l,nu]]],[[[e+,e-]],[[l,nu]]])': 0.00E+00 }
+Theory Prediction =  1.40E+00 [pb]
+Condition Violation =  [0.0]
 UL for theory prediction =  1.83E+03 [fb]
 r = 7.657E-01
-------------------------
-Dataset =  None
-TxNames =  ['TChiWZ']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:1.64E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  1.12E+02 [fb]
-r = 1.465E-03
-
- ATLAS-SUSY-2013-18 
-------------------------
-Dataset =  None
-TxNames =  ['T1bbbb']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:7.11E-03 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  3.82E+01 [fb]
-r = 1.859E-01
-------------------------
-Dataset =  None
-TxNames =  ['T1bbbb']
-Prediction Mass =  [[5.77E+02 [GeV], 1.35E+02 [GeV]], [5.77E+02 [GeV], 1.35E+02 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000023], [1000021, 1000023]]]
-Theory Prediction =  8.00E+00 [TeV]:5.20E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  4.82E+01 [fb]
-r = 1.078E-02
-
- ATLAS-SUSY-2013-18 
-------------------------
-Dataset =  SR-0l-4j-B
-TxNames =  ['T1bbbb']
-Prediction Mass =  [[5.77E+02 [GeV], 7.23E+01 [GeV]], [5.77E+02 [GeV], 7.23E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000023], [1000021, 1000023]]]
-Theory Prediction =  8.00E+00 [TeV]:1.03E-04 [pb] (1000021, 1000021)
-Condition Violation =  None
-UL for theory prediction =  3.20E-01 [fb]
-r = 3.232E-01
-L_BSM, L_SM, L_max = 9.755E-02, 6.107E-02, 9.931E-02
-
- CMS-PAS-SUS-13-016 
-------------------------
-Dataset =  None
-TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  9.85E+01 [fb]
-r = 6.802E-03
-
- CMS-PAS-SUS-13-016 
-------------------------
-Dataset =  sr0
-TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:2.55E-06 [pb] (1000021, 1000021)
-Condition Violation =  None
-UL for theory prediction =  2.11E-01 [fb]
-r = 1.209E-02
-L_BSM, L_SM, L_max = 1.380E-01, 1.387E-01, 1.387E-01
-
- CMS-SUS-12-024 
-------------------------
-Dataset =  None
-TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  2.02E+02 [fb]
-r = 3.313E-03
 
  CMS-SUS-12-024 
 ------------------------
 Dataset =  MET4_HT2_nb3
 TxNames =  ['T1bbbb']
-Prediction Mass =  [[5.77E+02 [GeV], 7.23E+01 [GeV]], [5.77E+02 [GeV], 7.23E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000023], [1000021, 1000023]]]
-Theory Prediction =  8.00E+00 [TeV]:1.65E-04 [pb] (1000021, 1000021)
+Theory Prediction =  1.65E-04 [pb]
 Condition Violation =  None
 UL for theory prediction =  4.25E-01 [fb]
 r = 3.871E-01
 L_BSM, L_SM, L_max = 1.674E-02, 2.635E-02, 2.635E-02
 
- CMS-SUS-12-028 
-------------------------
-Dataset =  None
-TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  5.11E+02 [fb]
-r = 1.311E-03
-------------------------
-Dataset =  None
-TxNames =  ['T2']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:3.82E-06 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  5.83E+01 [fb]
-r = 6.561E-05
-------------------------
-Dataset =  None
-TxNames =  ['T1bbbb']
-Prediction Mass =  [[5.77E+02 [GeV], 7.27E+01 [GeV]], [5.77E+02 [GeV], 7.27E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000023], [1000021, 1000023]], [[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:7.63E-03 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  2.73E+01 [fb]
-r = 2.796E-01
-------------------------
-Dataset =  None
-TxNames =  ['T1']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:2.03E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  1.29E+02 [fb]
-r = 1.575E-03
-
  CMS-SUS-13-004 
 ------------------------
 Dataset =  None
 TxNames =  ['T1bbbb']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:7.11E-03 [pb] (None, None)
+Theory Prediction =  7.11E-03 [pb]
 Condition Violation =  None
 UL for theory prediction =  2.16E+01 [fb]
-r = 3.293E-01
+r = 3.286E-01
+
+ ATLAS-SUSY-2013-18 
+------------------------
+Dataset =  SR-0l-4j-B
+TxNames =  ['T1bbbb']
+Theory Prediction =  1.03E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  3.20E-01 [fb]
+r = 3.219E-01
+L_BSM, L_SM, L_max = 9.762E-02, 6.107E-02, 9.931E-02
+
+ CMS-SUS-12-028 
 ------------------------
 Dataset =  None
 TxNames =  ['T1bbbb']
-Prediction Mass =  [[5.77E+02 [GeV], 1.35E+02 [GeV]], [5.77E+02 [GeV], 1.35E+02 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000023], [1000021, 1000023]]]
-Theory Prediction =  8.00E+00 [TeV]:5.20E-04 [pb] (None, None)
+Theory Prediction =  7.63E-03 [pb]
 Condition Violation =  None
-UL for theory prediction =  2.90E+01 [fb]
-r = 1.790E-02
-------------------------
-Dataset =  None
-TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  1.40E+02 [fb]
-r = 4.803E-03
+UL for theory prediction =  2.68E+01 [fb]
+r = 2.845E-01
 
- CMS-SUS-13-006 
+ ATLAS-SUSY-2013-18 
 ------------------------
 Dataset =  None
-TxNames =  ['TChiWZ']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:1.64E-04 [pb] (None, None)
+TxNames =  ['T1bbbb']
+Theory Prediction =  7.11E-03 [pb]
 Condition Violation =  None
-UL for theory prediction =  1.96E+02 [fb]
-r = 8.390E-04
+UL for theory prediction =  3.82E+01 [fb]
+r = 1.859E-01
+
+ CMS-SUS-13-012 
 ------------------------
-Dataset =  None
-TxNames =  ['TChiWH']
-Prediction Mass =  [[2.93E+02 [GeV], 6.81E+01 [GeV]], [2.92E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:3.59E-04 [pb] (None, None)
+Dataset =  6NJet8_1500HTinf_300MHTinf
+TxNames =  ['T1', 'T1bbbb', 'T1tttt', 'T5WWoff', 'TChiWZ']
+Theory Prediction =  4.98E-05 [pb]
 Condition Violation =  None
-UL for theory prediction =  2.81E+02 [fb]
-r = 1.277E-03
+UL for theory prediction =  2.93E-01 [fb]
+r = 1.701E-01
+L_BSM, L_SM, L_max = 8.945E-03, 1.210E-02, 1.210E-02
+
+ ATLAS-SUSY-2016-07 
 ------------------------
-Dataset =  None
-TxNames =  ['TSlepSlep']
-Prediction Mass =  [[3.23E+02 [GeV], 6.81E+01 [GeV]], [3.23E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[-1000011, -1000022], [1000011, 1000022]], [[-1000013, -1000022], [1000013, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:1.04E-05 [pb] (None, None)
-Condition Violation =  {'Cgtr([[[mu+]],[[mu-]]],[[[e+]],[[e-]]])': 0.00E+00 }
-UL for theory prediction =  2.79E+00 [fb]
-r = 3.736E-03
+Dataset =  5j_Meff_1600
+TxNames =  ['T1', 'T5WWoff', 'TGQ']
+Theory Prediction =  1.31E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.27E+00 [fb]
+r = 1.034E-01
+L_BSM, L_SM, L_max = 9.703E-04, 9.077E-04, 9.778E-04
+
+ ATLAS-SUSY-2018-06 
 ------------------------
 Dataset =  None
 TxNames =  ['TChiWZoff']
-Prediction Mass =  [[1.35E+02 [GeV], 6.81E+01 [GeV]], [1.34E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000023, 1000022], [1000024, 1000022]], [[1000023, 1000022], [-1000024, -1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:1.40E+00 [pb] (None, None)
-Condition Violation =  {'cGtr([[[mu+,mu-]],[[l,nu]]],[[[e+,e-]],[[l,nu]]])': 0.00E+00 }
-UL for theory prediction =  1.17E+03 [fb]
-r = 1.204E+00
+Theory Prediction =  2.63E+00 [pb]
+Condition Violation =  [0.0]
+UL for theory prediction =  3.80E+04 [fb]
+r = 6.917E-02
+
+ ATLAS-SUSY-2013-02 
+------------------------
+Dataset =  SR4jlm
+TxNames =  ['T1']
+Theory Prediction =  6.59E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.33E+01 [fb]
+r = 4.959E-02
+L_BSM, L_SM, L_max = 2.971E-05, 2.856E-05, 3.107E-05
+
+ ATLAS-SUSY-2013-09 
+------------------------
+Dataset =  SR3B
+TxNames =  ['T1tttt']
+Theory Prediction =  7.66E-06 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.76E-01 [fb]
+r = 4.353E-02
+L_BSM, L_SM, L_max = 1.224E-01, 1.321E-01, 1.321E-01
+
+ CMS-SUS-14-010 
+------------------------
+Dataset =  None
+TxNames =  ['T1tttt']
+Theory Prediction =  6.70E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.75E+01 [fb]
+r = 3.835E-02
+
+ ATLAS-SUSY-2013-04 
+------------------------
+Dataset =  GtGrid_SR_8ij80_0bjet
+TxNames =  ['T1bbbb', 'T1tttt', 'T5WWoff']
+Theory Prediction =  9.30E-06 [pb]
+Condition Violation =  None
+UL for theory prediction =  2.72E-01 [fb]
+r = 3.418E-02
+L_BSM, L_SM, L_max = 1.440E-01, 1.277E-01, 1.800E-01
+
+ CMS-SUS-16-048 
+------------------------
+Dataset =  stop_lowMET_PT_12to20
+TxNames =  ['TChiWZoff']
+Theory Prediction =  2.50E-05 [pb]
+Condition Violation =  None
+UL for theory prediction =  9.96E-01 [fb]
+r = 2.512E-02
+L_BSM, L_SM, L_max = 1.298E-03, 1.135E-03, 3.272E-03
+
+ ATLAS-SUSY-2013-09 
+------------------------
+Dataset =  None
+TxNames =  ['T1tttt']
+Theory Prediction =  6.70E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  2.90E+01 [fb]
+r = 2.314E-02
+
+ ATLAS-SUSY-2013-12 
+------------------------
+Dataset =  SR0tau_a_Bin16
+TxNames =  ['TChiWZ', 'TChiWZoff']
+Theory Prediction =  5.87E-06 [pb]
+Condition Violation =  None
+UL for theory prediction =  2.56E-01 [fb]
+r = 2.292E-02
+L_BSM, L_SM, L_max = 4.192E-02, 4.315E-02, 4.315E-02
+
+ CMS-SUS-13-013 
+------------------------
+Dataset =  None
+TxNames =  ['T1tttt']
+Theory Prediction =  6.70E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  3.36E+01 [fb]
+r = 1.997E-02
 
  CMS-SUS-13-007 
 ------------------------
 Dataset =  None
 TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
+Theory Prediction =  6.70E-04 [pb]
 Condition Violation =  None
 UL for theory prediction =  3.45E+01 [fb]
 r = 1.941E-02
@@ -707,154 +250,516 @@ r = 1.941E-02
 ------------------------
 Dataset =  mu250Nb3
 TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:2.89E-06 [pb] (1000021, 1000021)
+Theory Prediction =  2.92E-06 [pb]
 Condition Violation =  None
 UL for theory prediction =  1.56E-01 [fb]
-r = 1.859E-02
-L_BSM, L_SM, L_max = 6.340E-02, 6.704E-02, 6.704E-02
-
- CMS-SUS-13-012 
-------------------------
-Dataset =  None
-TxNames =  ['T1']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:2.03E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  5.62E+01 [fb]
-r = 3.607E-03
-------------------------
-Dataset =  None
-TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  9.85E+01 [fb]
-r = 6.806E-03
-------------------------
-Dataset =  None
-TxNames =  ['T2']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:3.82E-06 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  7.58E+01 [fb]
-r = 5.044E-05
-
- CMS-SUS-13-012 
-------------------------
-Dataset =  8NJetinf_1500HTinf_200MHTinf
-TxNames =  ['T1bbbb', 'T2', 'T5WWoff', 'T1', 'TChiWZ', 'T1tttt']
-Prediction Mass =  None
-Prediction PIDs =  [[[1000021, 1000023, 1000022], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, [1000024, -1000024], [1000022, -1000022]], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, [1000024, -1000024], [1000022, -1000022]], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000023, 1000022], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000023, 1000022], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000023, 1000022], [1000021, [1000024, -1000024], [1000022, -1000022]]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000023], [1000021, 1000023]], [[1000021, 1000023, 1000022], [1000021, 1000023, 1000022]], [[1000021, 1000022], [1000021, 1000022]], [[1000037, 1000022], [1000035, 1000022]], [[-1000037, -1000022], [1000035, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:6.06E-05 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  4.72E-01 [fb]
-r = 1.283E-01
-L_BSM, L_SM, L_max = 2.024E-02, 2.219E-02, 2.219E-02
-
- CMS-SUS-13-013 
-------------------------
-Dataset =  None
-TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
-Condition Violation =  None
-UL for theory prediction =  3.35E+01 [fb]
-r = 2.000E-02
+r = 1.874E-02
+L_BSM, L_SM, L_max = 6.338E-02, 6.704E-02, 6.704E-02
 
  CMS-SUS-13-013 
 ------------------------
 Dataset =  SR28_HighPt
 TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:4.71E-06 [pb] (1000021, 1000021)
+Theory Prediction =  4.71E-06 [pb]
 Condition Violation =  None
 UL for theory prediction =  2.58E-01 [fb]
 r = 1.829E-02
 L_BSM, L_SM, L_max = 1.091E-01, 1.098E-01, 1.098E-01
 
- CMS-SUS-13-019 
+ CMS-SUS-13-004 
 ------------------------
 Dataset =  None
 TxNames =  ['T1bbbb']
-Prediction Mass =  [[5.77E+02 [GeV], 7.27E+01 [GeV]], [5.77E+02 [GeV], 7.27E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]], [[1000021, 1000023], [1000021, 1000023]]]
-Theory Prediction =  8.00E+00 [TeV]:7.63E-03 [pb] (None, None)
+Theory Prediction =  5.20E-04 [pb]
 Condition Violation =  None
-UL for theory prediction =  9.31E+00 [fb]
-r = 8.192E-01
+UL for theory prediction =  2.90E+01 [fb]
+r = 1.796E-02
+
+ CMS-PAS-SUS-13-016 
+------------------------
+Dataset =  sr0
+TxNames =  ['T1tttt']
+Theory Prediction =  2.47E-06 [pb]
+Condition Violation =  None
+UL for theory prediction =  2.11E-01 [fb]
+r = 1.170E-02
+L_BSM, L_SM, L_max = 1.380E-01, 1.387E-01, 1.387E-01
+
+ ATLAS-SUSY-2013-18 
 ------------------------
 Dataset =  None
-TxNames =  ['T2']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:3.82E-06 [pb] (None, None)
+TxNames =  ['T1bbbb']
+Theory Prediction =  5.20E-04 [pb]
 Condition Violation =  None
-UL for theory prediction =  2.84E+01 [fb]
-r = 1.347E-04
+UL for theory prediction =  4.82E+01 [fb]
+r = 1.078E-02
+
+ CMS-SUS-16-039-agg 
+------------------------
+Dataset =  AR9
+TxNames =  ['TChiWZ', 'TChiWZoff']
+Theory Prediction =  1.32E-05 [pb]
+Condition Violation =  [0.0]
+UL for theory prediction =  1.38E+00 [fb]
+r = 9.575E-03
+L_BSM, L_SM, L_max = 5.692E-04, 5.476E-04, 1.261E-03
+
+ CMS-SUS-13-019 
 ------------------------
 Dataset =  None
 TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
+Theory Prediction =  6.70E-04 [pb]
 Condition Violation =  None
-UL for theory prediction =  7.57E+01 [fb]
-r = 8.852E-03
+UL for theory prediction =  7.62E+01 [fb]
+r = 8.796E-03
+
+ CMS-PAS-SUS-13-016 
+------------------------
+Dataset =  None
+TxNames =  ['T1tttt']
+Theory Prediction =  6.70E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  9.10E+01 [fb]
+r = 7.369E-03
+
+ CMS-SUS-13-012 
+------------------------
+Dataset =  None
+TxNames =  ['T1tttt']
+Theory Prediction =  6.70E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  9.85E+01 [fb]
+r = 6.806E-03
+
+ ATLAS-SUSY-2016-24 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWZ']
+Theory Prediction =  1.61E-03 [pb]
+Condition Violation =  None
+UL for theory prediction =  2.48E+02 [fb]
+r = 6.493E-03
+
+ ATLAS-SUSY-2018-05-ewk 
+------------------------
+Dataset =  SRLow_2_cuts
+TxNames =  ['TChiWZ']
+Theory Prediction =  2.60E-07 [pb]
+Condition Violation =  None
+UL for theory prediction =  5.30E-02 [fb]
+r = 4.898E-03
+L_BSM, L_SM, L_max = 1.804E-02, 1.814E-02, 1.814E-02
+
+ CMS-SUS-13-004 
+------------------------
+Dataset =  None
+TxNames =  ['T1tttt']
+Theory Prediction =  6.70E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.40E+02 [fb]
+r = 4.803E-03
+
+ ATLAS-SUSY-2019-09 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWZ']
+Theory Prediction =  2.79E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  6.49E+01 [fb]
+r = 4.302E-03
+
+ ATLAS-SUSY-2016-24 
+------------------------
+Dataset =  WZ-0Jb
+TxNames =  ['TChiWZ']
+Theory Prediction =  3.87E-07 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.00E-01 [fb]
+r = 3.872E-03
+L_BSM, L_SM, L_max = 1.506E-01, 1.519E-01, 1.519E-01
+
+ CMS-SUS-13-012 
 ------------------------
 Dataset =  None
 TxNames =  ['T1']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:2.03E-04 [pb] (None, None)
+Theory Prediction =  1.88E-04 [pb]
 Condition Violation =  None
-UL for theory prediction =  7.45E+01 [fb]
-r = 2.718E-03
+UL for theory prediction =  5.62E+01 [fb]
+r = 3.344E-03
 
- CMS-SUS-14-010 
+ CMS-SUS-12-024 
 ------------------------
 Dataset =  None
 TxNames =  ['T1tttt']
-Prediction Mass =  [[5.77E+02 [GeV], 6.81E+01 [GeV]], [5.77E+02 [GeV], 6.81E+01 [GeV]]]
-Prediction PIDs =  [[[1000021, 1000022], [1000021, 1000022]]]
-Theory Prediction =  8.00E+00 [TeV]:6.70E-04 [pb] (None, None)
+Theory Prediction =  6.70E-04 [pb]
 Condition Violation =  None
-UL for theory prediction =  1.75E+01 [fb]
-r = 3.823E-02
+UL for theory prediction =  2.02E+02 [fb]
+r = 3.313E-03
 
-The largest r-value (theory/upper limit ratio) is  1.204E+00
-(The input model is likely excluded by CMS-SUS-13-006)
+ ATLAS-SUSY-2018-32 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWW']
+Theory Prediction =  4.31E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.41E+02 [fb]
+r = 3.044E-03
+
+ ATLAS-SUSY-2019-08 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWH']
+Theory Prediction =  6.10E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  2.19E+02 [fb]
+r = 2.785E-03
+
+ ATLAS-SUSY-2019-08-grp 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWH']
+Theory Prediction =  6.10E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  2.19E+02 [fb]
+r = 2.785E-03
+
+ ATLAS-SUSY-2013-02 
+------------------------
+Dataset =  None
+TxNames =  ['T1']
+Theory Prediction =  1.88E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  6.82E+01 [fb]
+r = 2.752E-03
+
+ ATLAS-SUSY-2015-06 
+------------------------
+Dataset =  SR5j
+TxNames =  ['T1']
+Theory Prediction =  4.81E-06 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.79E+00 [fb]
+r = 2.689E-03
+L_BSM, L_SM, L_max = 7.173E-03, 7.215E-03, 7.215E-03
+
+ ATLAS-SUSY-2019-08 
+------------------------
+Dataset =  SR_MM_High_MCT
+TxNames =  ['TChiWH']
+Theory Prediction =  9.94E-08 [pb]
+Condition Violation =  None
+UL for theory prediction =  3.85E-02 [fb]
+r = 2.583E-03
+L_BSM, L_SM, L_max = 1.654E-01, 1.647E-01, 1.800E-01
+
+ CMS-SUS-13-019 
+------------------------
+Dataset =  None
+TxNames =  ['T1']
+Theory Prediction =  1.88E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  7.46E+01 [fb]
+r = 2.516E-03
+
+ CMS-SUS-17-004 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWZ']
+Theory Prediction =  2.79E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.18E+02 [fb]
+r = 2.362E-03
+
+ CMS-SUS-21-002 
+------------------------
+Dataset =  b_veto_SR0
+TxNames =  ['TChiWH', 'TChiWW', 'TChiWZ']
+Theory Prediction =  3.69E-07 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.57E-01 [fb]
+r = 2.349E-03
+L_BSM, L_SM, L_max = 1.698E-03, 1.701E-03, 1.701E-03
+
+ ATLAS-SUSY-2017-03 
+------------------------
+Dataset =  SR3l_Int
+TxNames =  ['TChiWZ']
+Theory Prediction =  1.73E-07 [pb]
+Condition Violation =  None
+UL for theory prediction =  9.00E-02 [fb]
+r = 1.923E-03
+L_BSM, L_SM, L_max = 1.905E-01, 1.911E-01, 1.911E-01
+
+ CMS-SUS-20-001 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWZ']
+Theory Prediction =  2.79E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.46E+02 [fb]
+r = 1.913E-03
+
+ ATLAS-SUSY-2018-32 
+------------------------
+Dataset =  SRDF_0d_cuts
+TxNames =  ['TChiWW']
+Theory Prediction =  1.06E-07 [pb]
+Condition Violation =  None
+UL for theory prediction =  5.89E-02 [fb]
+r = 1.807E-03
+L_BSM, L_SM, L_max = 7.294E-03, 7.315E-03, 7.315E-03
+
+ ATLAS-SUSY-2018-05 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWZ']
+Theory Prediction =  2.79E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.74E+02 [fb]
+r = 1.607E-03
+
+ CMS-SUS-17-004 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWH']
+Theory Prediction =  6.10E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  3.82E+02 [fb]
+r = 1.595E-03
+
+ ATLAS-SUSY-2017-03 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWZ']
+Theory Prediction =  2.79E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.81E+02 [fb]
+r = 1.545E-03
+
+ ATLAS-SUSY-2013-12 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWZ']
+Theory Prediction =  1.64E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.12E+02 [fb]
+r = 1.465E-03
+
+ CMS-SUS-12-028 
+------------------------
+Dataset =  None
+TxNames =  ['T1']
+Theory Prediction =  1.88E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.29E+02 [fb]
+r = 1.460E-03
+
+ ATLAS-SUSY-2018-23 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWH']
+Theory Prediction =  6.10E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  4.20E+02 [fb]
+r = 1.453E-03
+
+ CMS-SUS-16-039 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWZ']
+Theory Prediction =  2.79E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  2.04E+02 [fb]
+r = 1.368E-03
+
+ CMS-SUS-21-002 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWW']
+Theory Prediction =  4.31E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  3.17E+02 [fb]
+r = 1.360E-03
+
+ CMS-SUS-21-002 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWH']
+Theory Prediction =  6.10E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  4.49E+02 [fb]
+r = 1.359E-03
+
+ CMS-SUS-12-028 
+------------------------
+Dataset =  None
+TxNames =  ['T1tttt']
+Theory Prediction =  6.70E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  5.11E+02 [fb]
+r = 1.311E-03
+
+ CMS-SUS-16-043 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWH']
+Theory Prediction =  6.10E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  4.71E+02 [fb]
+r = 1.295E-03
+
+ CMS-SUS-13-006 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWH']
+Theory Prediction =  3.59E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  2.81E+02 [fb]
+r = 1.277E-03
+
+ CMS-SUS-16-034 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWZ']
+Theory Prediction =  2.79E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  2.32E+02 [fb]
+r = 1.203E-03
+
+ ATLAS-SUSY-2013-11 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWZ']
+Theory Prediction =  1.64E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.39E+02 [fb]
+r = 1.181E-03
+
+ ATLAS-SUSY-2018-06 
+------------------------
+Dataset =  SR_ISR
+TxNames =  ['TChiWZ']
+Theory Prediction =  1.41E-07 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.28E-01 [fb]
+r = 1.103E-03
+L_BSM, L_SM, L_max = 6.802E-03, 6.772E-03, 1.380E-02
+
+ CMS-SUS-18-007 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWH']
+Theory Prediction =  6.10E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  7.19E+02 [fb]
+r = 8.489E-04
+
+ CMS-SUS-13-006 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWZ']
+Theory Prediction =  1.64E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.95E+02 [fb]
+r = 8.447E-04
+
+ ATLAS-SUSY-2018-06 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWZ']
+Theory Prediction =  2.79E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  3.32E+02 [fb]
+r = 8.420E-04
+
+ ATLAS-SUSY-2019-09 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWH']
+Theory Prediction =  8.07E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.21E+03 [fb]
+r = 6.680E-04
+
+ ATLAS-SUSY-2013-11 
+------------------------
+Dataset =  WWc-DF
+TxNames =  ['TChiWW']
+Theory Prediction =  3.41E-07 [pb]
+Condition Violation =  None
+UL for theory prediction =  5.31E-01 [fb]
+r = 6.413E-04
+L_BSM, L_SM, L_max = 1.895E-02, 1.893E-02, 2.165E-02
+
+ CMS-SUS-16-039 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWH']
+Theory Prediction =  6.10E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  9.96E+02 [fb]
+r = 6.124E-04
+
+ CMS-SUS-21-002 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWZ']
+Theory Prediction =  2.79E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  4.73E+02 [fb]
+r = 5.902E-04
+
+ CMS-SUS-16-045 
+------------------------
+Dataset =  None
+TxNames =  ['TChiWH']
+Theory Prediction =  6.10E-04 [pb]
+Condition Violation =  None
+UL for theory prediction =  1.36E+03 [fb]
+r = 4.482E-04
+
+ ATLAS-SUSY-2013-02 
+------------------------
+Dataset =  None
+TxNames =  ['T1']
+Theory Prediction =  1.53E+00 [pb]
+Condition Violation =  None
+UL for theory prediction =  2.33E+07 [fb]
+r = 6.559E-05
+
+The largest r-value (theory/upper limit ratio) is 4.783E+00
+(The input model is likely excluded by ATLAS-SUSY-2019-09)
+
+ Theory Predictions done in 0.41m
 
 
 Combined analyses: ATLAS-SUSY-2013-11,CMS-SUS-13-013
-Combined r value: 2.183E-02
-Combined r value (expected): 2.183E-02
-Likelihoods: L, L_max, L_SM =  1.385E-02,  1.401E-02,  1.394E-02
+Combined r value: 2.053E-02
+Combined r value (expected): 2.004E-02
+Likelihoods: L, L_max, L_SM =  2.069E-03,  2.079E-03,  2.079E-03
 
 
-Total cross-section for missing topologies (fb):  1.120E+04
+ Combination of analyses done in 0.00m
+
+ Coverage done in 0.21m
+
+Total cross-section for missing topologies (fb):  1.062E+04
 
 
 Total cross-section for missing topologies with displaced decays (fb):  0.000E+00
 
 
-Total cross-section for missing topologies with prompt decays (fb):  1.474E+04
+Total cross-section for missing topologies with prompt decays (fb):  1.402E+04
 
 
-Total cross-section for topologies outside the grid (fb):  3.976E+03
+Total cross-section for topologies outside the grid (fb):  3.823E+03
 
 Missing topologies (up to 3):
-Element: [[[jet,jet]],[[l,nu]]]  (MET,MET)
+Element: PV > (jet,jet,MET), (nu,l,MET)
 	cross-section (fb): 1203.688445123887
-Element: [[[jet,jet]],[[nu,ta]]]  (MET,MET)
+Element: PV > (jet,jet,MET), (nu,ta,MET)
 	cross-section (fb): 600.2542979266833
-Element: [[[jet,jet]],[[b,b]]]  (MET,MET)
-	cross-section (fb): 531.534863034501
+Element: PV > (jet,jet,MET), (b,b,MET)
+	cross-section (fb): 530.8223808539246
 
 No displaced decays

@@ -22,7 +22,7 @@ with the relevant experimental constraints. The main SModelS ingredients are
 as illustrated in the scheme below. 
 
 .. image:: images/smodelsSchemeV3.png
-   :width: 75%
+   :width: 60%
 
 
 Contents
