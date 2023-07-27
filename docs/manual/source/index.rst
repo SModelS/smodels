@@ -15,14 +15,14 @@ Spectrum (SMS) topologies. Our method provides a way to cast BSM predictions
 for the LHC in a model independent framework, which can be directly confronted
 with the relevant experimental constraints. The main SModelS ingredients are
 
-* the decomposition of the BSM spectrum into SMS topologies
-* a database of experimental SMS results
-* matching between the decomposition and results database, including the tools to perform various kinds of statistical inference 
+  * the decomposition of the BSM spectrum into SMS topologies
+  * a database of experimental SMS results
+  * matching between the decomposition and results database, including the tools to perform various kinds of statistical inference 
 
-as illustrated in the graphics below. 
+as illustrated in the scheme below. 
 
 .. image:: images/smodelsSchemeV3.png
-   :width: 90%
+   :width: 75%
 
 
 Contents
