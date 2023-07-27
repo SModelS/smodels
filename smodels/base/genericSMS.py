@@ -1046,17 +1046,16 @@ class GenericSMS(object):
 
         return smsNew
 
-    def draw(self, particleColor='lightcoral',
-                smColor='skyblue',
+    def draw(self, particleColor='steelblue2',
+                smColor='lightpink2',
                 pvColor='darkgray',
                 labelAttr=None,
                 attrUnit=None, filename=None, view=True,
                 maxLabelSize=10,
                 usePVimage=False,
-                graph_kwargs = {'layout' : 'dot', 'ranksep' : '0.5', 'rankdir' : "LR"},
-                nodes_kwargs = {'style' : 'filled', 'fontsize' : '10', 
-                                'shape' : 'circle','margin' : '0'},
-                edges_kwargs={}):
+                graph_kwargs={'layout' : 'dot', 'ranksep' : '0.3', 'rankdir' : "LR"},
+                nodes_kwargs={'style' : 'filled', 'fontsize' : '10', 'color' : 'black','shape' : 'circle','margin' : '0'},
+                edges_kwargs={'arrowhead' : 'vee', 'arrowsize' : '0.7',  'color' : 'grey53'}):
         """
         Draws Tree using matplotlib.
 

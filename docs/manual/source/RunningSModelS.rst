@@ -423,7 +423,7 @@ Below we go step-by-step through this example code:
    :lines: 59-61
 
 * *Access basic information* from decomposition, using the
-  `dictionary of SMS <decomposition.html#decomposition.topologyDict.TopologyDict>`_ (the dictionary has as keys the :ref:`canonical name <canonical_name>` for the topology and as values the list of |SMS topologies| for the corresponding canonical name):
+  `dictionary of SMS <decomposition.html#decomposition.topologyDict.TopologyDict>`_ (the dictionary has as keys the :ref:`canonical name <canonicalName>` for the topology and as values the list of |SMS topologies| for the corresponding canonical name):
 
 .. literalinclude:: /examples/Example.py
    :lines: 64-68
