@@ -78,17 +78,25 @@ and they can have a flexible number of properties, such as mass, spin, electric 
 Two particles are considered equal if all their shared properties
 are equal.
 
-*Inclusive* or *generic* particles are introduced by leaving one or more of their properties undefined. For instance, a particle with electric charge -1, spin 1/2 but undefined mass will be matched to electrons, muons, charginos, etc. This is useful when defining simplified models used for describing experimental results in the :ref:`Database <databaseDefs>`. All *inclusive* particles
-used by the :ref:`Database <databaseDefs>` are separately defined in
-`databaseParticles.py <experiment.html#experiment.databaseParticles>`_ .
-Examples are:
+*Generic* particles are introduced by leaving one or more of their properties undefined. For instance, a particle with electric charge = -1,  isSM = False, but undefined spin and mass can represent charged BSM fermions and scalars (such as charginos and charged higgses). 
+This is useful when defining simplified models used for describing experimental results in the :ref:`Database <databaseDefs>` which are not sensitive to the particle's spin. Some examples of *generic* particles are:
+
+ - 'anyBSM': which can represent any BSM state (only has isSM=False defined)
+ - 'anyBSM': which can represent any SM state (only has isSM=True defined)
+ - 'MET': which can represent any neutral BSM state (has isSM=False, eletric charge = 0 and is a color singlet)
+
+
+In addition, *inclusive* particles can also be created, which holds 
+a list of particles. These can be used to described results which are inclusive over some specific set of particles. Examples are:
 
  - 'l' for electrons, and muons,
  - 'L' for electrons, muons, and taus,
  - 'q' for u-, d-, and s-quarks,
  - 'jet' for u-, d-, s-, c-quarks and gluons
- - 'anyBSM' for any BSM particle
- - 'anySM' for any SM particle
+ 
+All *generic* and *inclusive* particles used by the :ref:`Database <databaseDefs>` are separately defined in the databaseParticles.py file stored in the database folder or, if not found, are loaded from
+`defaultFinalStates.py <experiment.html#experiment.defaultFinalStates>`_ .
+
 
 
 * **Particles are described by the** `Particle Class <base.html#base.particle.Particle>`_

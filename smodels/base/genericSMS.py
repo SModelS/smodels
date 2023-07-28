@@ -807,10 +807,15 @@ class GenericSMS(object):
         self._finalStates = {nodeIndex : pList[:] for nodeIndex,pList
                              in self._finalStates.items()}
 
-    def treeToString(self):
+    def treeToString(self, removeSMIndices=False):
         """
-        Convert the tree to a process string (e.g. '(PV > gluino(1),squark(2)), (gluino(1) >
-                           MET,jet,jet), (squark(2) > HSCP,u)')
+        Convert the tree to a process string (e.g. '(PV(0) > gluino(1),squark(2)), (gluino(1) >
+                           MET(3),jet(4),jet(5)), (squark(2) > HSCP(6),u(7))')
+        If removeSMIndices=True, do not add indices to the SM particles
+        (e.g.  '(PV(0) > gluino(1),squark(2)), (gluino(1) >
+                           MET(3),jet,jet), (squark(2) > HSCP(6),u)')
+
+        :param removeSMIndices: If True, the SM particles do not get indices.
 
         :return: String describing the process
         """
@@ -822,12 +827,18 @@ class GenericSMS(object):
             # Convert from indices to node objects
             mom = self.indexToNode(momIndex)
             daughters = self.indexToNode(daughterIndices)
-            smsStr += '(%s(%i) > ' % (mom, momIndex)
+            if removeSMIndices and mom.isSM:
+                smsStr += '(%s > ' % (mom)
+            else:
+                smsStr += '(%s(%i) > ' % (mom, momIndex)
 
             # Add daughters
             for iD, d in enumerate(daughters):
                 dIndex = daughterIndices[iD]
-                smsStr += '%s(%i),' % (d, dIndex)
+                if removeSMIndices and d.isSM:
+                    smsStr += '%s,' % (d)
+                else:
+                    smsStr += '%s(%i),' % (d, dIndex)
             smsStr = smsStr[:-1] + '), '
         smsStr = smsStr[:-2]
 
