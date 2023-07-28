@@ -815,42 +815,23 @@ class GenericSMS(object):
         :return: String describing the process
         """
 
-        elStr = ""
+        smsStr = ""
         rootIndex = self.rootIndex
-        nodesDict = {rootIndex: 0}
-        counter = 1
         for momIndex, daughterIndices in self.genIndexIterator(rootIndex):
 
             # Convert from indices to node objects
             mom = self.indexToNode(momIndex)
             daughters = self.indexToNode(daughterIndices)
-            # Add mom (if mom = 0 does not include index)
-            if momIndex == 0:
-                elStr += '(%s > ' % mom
-            else:
-                if momIndex not in nodesDict:
-                    nodesDict[momIndex] = counter
-                    counter += 1
-                elStr += '(%s(%i) > ' % (mom, nodesDict[momIndex])
+            smsStr += '(%s(%i) > ' % (mom, momIndex)
 
-            # Add daughters for the decay, if daughter is unstable, add index
+            # Add daughters
             for iD, d in enumerate(daughters):
                 dIndex = daughterIndices[iD]
-                if self.out_degree(dIndex) == 0:
-                    stable = True
-                else:
-                    stable = False
-                if stable:
-                    elStr += '%s,' % d  # stable
-                else:
-                    if dIndex not in nodesDict:
-                        nodesDict[dIndex] = counter
-                        counter += 1
-                    elStr += '%s(%i),' % (d, nodesDict[dIndex])
-            elStr = elStr[:-1] + '), '
-        elStr = elStr[:-2]
+                smsStr += '%s(%i),' % (d, dIndex)
+            smsStr = smsStr[:-1] + '), '
+        smsStr = smsStr[:-2]
 
-        return elStr
+        return smsStr
 
     def treeToBrackets(self):
         """

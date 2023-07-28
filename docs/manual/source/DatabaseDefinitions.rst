@@ -12,10 +12,8 @@
 .. |Datasets| replace:: :ref:`DataSets<DataSet>`
 .. |dataset| replace:: :ref:`data set<DataSet>`
 .. |datasets| replace:: :ref:`data sets<DataSet>`
-.. |element| replace:: :ref:`element <element>`
-.. |elements| replace:: :ref:`elements <element>`
-.. |topology| replace:: :ref:`topology <topology>`
-.. |topologies| replace:: :ref:`topologies <topology>`
+.. |SMS topology| replace:: :ref:`SMS topology <SMS>`
+.. |SMS topologies| replace:: :ref:`SMS topologies <SMS>`
 .. |particle| replace:: :ref:`particle <particleClass>`
 .. |particles| replace:: :ref:`particles <particleClass>`
 
