@@ -807,19 +807,29 @@ class GenericSMS(object):
         self._finalStates = {nodeIndex : pList[:] for nodeIndex,pList
                              in self._finalStates.items()}
 
-    def treeToString(self, removeSMIndices=False):
+    def treeToString(self, 
+                     removeIndicesFrom='stable'):
         """
         Convert the tree to a process string (e.g. '(PV(0) > gluino(1),squark(2)), (gluino(1) >
                            MET(3),jet(4),jet(5)), (squark(2) > HSCP(6),u(7))')
-        If removeSMIndices=True, do not add indices to the SM particles
-        (e.g.  '(PV(0) > gluino(1),squark(2)), (gluino(1) >
-                           MET(3),jet,jet), (squark(2) > HSCP(6),u)')
-
-        :param removeSMIndices: If True, the SM particles do not get indices.
+        
+        Node indices can be removed from specific particles using the removeIndicesFrom option. Allowed values are: 
+        None -> keep all indices
+        'SM' -> remove indices from SM particles
+        'stable' -> remove indices from stable (undecayed) particles
+        'all' -> remove indices from all particles
+        
+        The default is to remove indices from stable particles.
+                           
+        :param removeIndicesFrom: If defined, will remove indices from particles according to their properties.
 
         :return: String describing the process
         """
 
+        if removeIndicesFrom not in [None, 'SM', 'stable', 'all']:
+            raise SModelSError("removeIndicesFrom = %s value not accepted for treeToString" %removeIndicesFrom)
+        rmFrom = removeIndicesFrom
+        
         smsStr = ""
         rootIndex = self.rootIndex
         for momIndex, daughterIndices in self.genIndexIterator(rootIndex):
@@ -827,17 +837,33 @@ class GenericSMS(object):
             # Convert from indices to node objects
             mom = self.indexToNode(momIndex)
             daughters = self.indexToNode(daughterIndices)
-            if removeSMIndices and mom.isSM:
+            if momIndex == rootIndex: # Always remove from PV
                 smsStr += '(%s > ' % (mom)
-            else:
+            elif rmFrom is not None:
+                if rmFrom == 'all':
+                    smsStr += '(%s > ' % (mom)
+                elif rmFrom == 'SM' and mom.isSM:
+                    smsStr += '(%s > ' % (mom)
+                elif rmFrom == 'stable' and self.out_degree(momIndex) == 0:
+                    smsStr += '(%s > ' % (mom)
+                else: # Add index
+                    smsStr += '(%s(%i) > ' % (mom, momIndex)
+            else: # If None, always add index
                 smsStr += '(%s(%i) > ' % (mom, momIndex)
 
             # Add daughters
             for iD, d in enumerate(daughters):
                 dIndex = daughterIndices[iD]
-                if removeSMIndices and d.isSM:
-                    smsStr += '%s,' % (d)
-                else:
+                if rmFrom is not None:
+                    if rmFrom == 'all':
+                        smsStr += '%s,' % (d)
+                    elif rmFrom == 'SM' and d.isSM:
+                        smsStr += '%s,' % (d)
+                    elif rmFrom == 'stable' and self.out_degree(dIndex) == 0:
+                        smsStr += '%s,' % (d)
+                    else: # Add index
+                        smsStr += '%s(%i),' % (d, dIndex)
+                else: # If None, always add index
                     smsStr += '%s(%i),' % (d, dIndex)
             smsStr = smsStr[:-1] + '), '
         smsStr = smsStr[:-2]
