@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="22 140 1241 510" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="picture" id="id1674153685">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/tslepslep1.png" x="734.0" y="160.0" height="277.0" width="227.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id1543958789">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/TSlepSlep_figaux_04.png" x="42.0" y="191.0" height="439.0" width="611.0"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1269317693">
+            <polyline points="257.0,209.0 713.0,256.0 " stroke="#4d4d4d" stroke-width="3.2" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1269317693)"/>
+        </g>
+        <g latexdraw:type="picture" id="id1735258756">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/tslepslep2.png" x="1016.0" y="160.0" height="277.0" width="227.0"/>
+        </g>
+        <g latexdraw:type="text" id="id1058134237" fill="black" latexdraw:position="bl">
+            <text x="970.0" y="312.0">\Huge $+$</text>
+        </g>
+        <g latexdraw:type="text" id="id1619751796" fill="black" latexdraw:position="bl">
+            <text x="1008.0" y="537.0">\begin{tabular}{l} (PV $&gt;$ anyBSM(1),anyBSM(2)), \\ (anyBSM(1) $&gt;$ mu+,MET), \\ (anyBSM(2) $&gt;$ mu-,MET) \end{tabular}
+</text>
+        </g>
+        <g latexdraw:type="text" id="id1029767948" fill="black" latexdraw:position="bl">
+            <text x="718.0" y="537.0">\begin{tabular}{l} (PV $&gt;$ anyBSM(1),anyBSM(2)), \\ (anyBSM(1) $&gt;$ e+,MET), \\ (anyBSM(2) $&gt;$ e-,MET) \end{tabular}
+</text>
+        </g>
+    </g>
+    <defs>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="5.885" id="arrow1-1269317693">
+            <path d="M 0.0 0.0 L -12.664166666666667 -4.522916666666667 L -12.664166666666667 0.0 L -12.664166666666667 4.522916666666667 z" fill="#4d4d4d" stroke="#4d4d4d" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+    </defs>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
+            <latexdraw:positionVert/>
+            <latexdraw:zoom>1.0</latexdraw:zoom>
+            <latexdraw:vpx>0.493</latexdraw:vpx>
+            <latexdraw:vpy>0.4</latexdraw:vpy>
+        </latexdraw:metadata>
+    </metadata>
+</svg>

@@ -236,7 +236,7 @@ class RunPrinterTest(unittest.TestCase):
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
                            ignore=ignoreFields, where="top")
         self.assertTrue(equals)
-        self.removeOutputs(out)
+        # self.removeOutputs(out)
         self.removeOutputs('./debug.log')         
 
 

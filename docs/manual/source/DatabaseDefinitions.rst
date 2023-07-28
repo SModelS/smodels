@@ -115,8 +115,11 @@ or more UL maps. An example of a UL map is shown below:
 
 .. _ULplot:
 
-.. image:: images/ULexample.png
-   :width: 60%
+.. figure:: images/ULexample.png
+   :width: 40%
+   :align: center
+
+   Example of an upper limit result and the information stored in the database.
 
 Within SModelS, the above UL map is used to constrain the
 simplified model :math:`\tilde{t} + \tilde{t} \to \left(t+\tilde{\chi}_1^0\right) + \left(t+\tilde{\chi}_1^0\right)`.
@@ -124,7 +127,7 @@ Using the SModelS :ref:`string representation <notation>` for simplified models,
 
     (PV > anyBSM(1), anyBSM(2)) , (anyBSM(1) > MET(3),t(4)), (anyBSM(2) > MET(5),t(6))
 
-where the integers refer to the node indices and are used internally to uniquely define the particles. Note that it is assumed that the analysis is insensitive to the spin of the BSM particles and to the quantum numbers of the stop (as long as it decays to a top quark and MET), so the stops are mapped into *generic* BSM |particles| (anyBSM).
+where the integers refer to the node indices and are used internally to uniquely define the particles. Note that in the example in :numref:`Fig. %s <ULplot>` it is assumed that the analysis is insensitive to the spin of the BSM particles and to the quantum numbers of the stop (as long as it decays to a top quark and MET), so the stops are mapped into *generic* BSM |particles| (anyBSM).
 A list of the database BSM |particles| can be found in the databaseParticles.py file in the database folder.
 Usually a single preliminary result/publication contains several UL maps, hence
 each UL-type experimental result contains several UL maps, each one constraining
@@ -139,37 +142,40 @@ models (|SMS topology| or sum of |SMS topologies|).
 Upper Limit Constraint
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The upper limit constraint specifies which simplified model
-(represented by an |element| or sum of |elements|) is being constrained by the respective UL map.
-For simple constraints as the one shown in the :ref:`UL map <ULplot>` above, 
-there is a single |element| being constrained (:math:`[[[jet]],[[jet]]]`).
-In some cases, however, the constraint corresponds to a sum of :ref:`elements <element>`.
-As an example, consider the `ATLAS analysis <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-049/>`_ shown below:
+The upper limit constraint specifies which simplified models
+(represented by a single |SMS| or a sum of |SMS topologies|) are being constrained by the respective UL map.
+For simple constraints as the one shown in :numref:`Fig. %s <ULplot>`, 
+there is a single |SMS| being constrained.
+In some cases, however, the constraint corresponds to a sum of |SMS topologies|.
+As an example, consider the result from the `ATLAS analysis <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2019-02/>`_ in :numref:`Fig. %s <constraintPlot>` :
 
 .. _constraintPlot:
 
-.. image:: images/constraintExample.png
-   :width: 80%
+.. figure:: images/ULconstraint.png
+   :width: 60%
+   :align: center
+
+   Example of upper limits for a sum of simplified model topologies.
 
 As we can see, the upper limits apply to the sum of the cross sections:
 
 .. math::
-    \sigma = \sigma([[[e^+]],[[e^-]]]) + \sigma([[[\mu^+]],[[\mu^-]]])
+    \sigma = \sigma_{e^+ e^-} + \sigma_{\mu^+ \mu^-}
     
-In this case the UL constraint is simply:
+In this case the UL constraint is simply: ::
 
-.. math::
-    [[[e^+]],[[e^-]]] + [[[\mu^+]],[[\mu^-]]]
+      {(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > e+(3),MET(4)), (anyBSM(2) > e-(5),MET(6))} 
     
-where it is understood that the sum runs over the weights of the respective |elements|
-and not over the |elements| themselves.    
+    + {(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > mu+(3),MET(4)), (anyBSM(2) > mu-(5),MET(6))}
+    
+where it is understood that the sum runs over the weights of the respective |SMS|. Note that curly brackets were introduced in order delimit individual |SMS topologies|.
 
-Note that the sum can be over particle charges, flavors or more complex combinations of elements.
-However, almost all experimental results sum only over elements sharing a common |topology|.
+Note that the sum can be over particle charges, flavors or more complex combinations of simplified models.
+However, almost all experimental results sum only over |SMS| sharing a common structure (or common :ref:`canonical name <canonicalName>`).
 
-Finally, in some cases the UL constraint assumes specific contributions from each |element|.
-For instance, in the :ref:`example above <constraintPlot>` it is implicitly assumed that
-both the electron and muon |elements| contribute equally to the total cross section.
+Finally, in some cases the UL constraint assumes specific contributions from each individual simplified model.
+For instance, in :numref:`Fig. %s <constraintPlot>` it is implicitly assumed that
+both the electron and muon |SMS| contribute equally to the total cross section.
 Hence these conditions must also be specified along with the constraint, as described in :ref:`UL conditions<ULconditions>`.
 
 .. _ULconditions:
@@ -177,31 +183,30 @@ Hence these conditions must also be specified along with the constraint, as desc
 Upper Limit Conditions
 ~~~~~~~~~~~~~~~~~~~~~~
 
-When the analysis :ref:`constraints <ULconstraint>` are non-trivial (refer to a sum of elements), it is often the case
-that there are implicit (or explicit) assumptions about the contribution of each element. For instance,
-in the :ref:`figure above <constraintPlot>`, it is implicitly assumed that each lepton flavor contributes equally
+When the analysis :ref:`constraints <ULconstraint>` are non-trivial (refer to a sum of |SMS|), it is often the case
+that there are implicit (or explicit) assumptions about the contribution of each simplified model. For instance,
+in :numref:`Fig. %s <constraintPlot>`, it is implicitly assumed that each lepton flavor contributes equally
 to the summed cross section:
 
 .. math::    
-    \sigma([[[e^+]],[[e^-]]]) = \sigma([[[\mu^+]],[[\mu^-]]])           \;\;\; \mbox{(condition)}
+    \sigma_{e^+ e^-} = \sigma_{\mu^+ \mu^-}          \;\;\; \mbox{(condition)}
     
 
 Therefore, when applying these constraints to general models, one must also verify if
-these conditions are satisfied. Once again we can express these conditions in 
-:ref:`bracket notation <notation>`:
+these conditions are satisfied. Once again we can express these conditions 
+using the :ref:`string representation <notation>` of simplified models: ::
 
-.. math::    
-    [[[e^+]],[[e^-]]] = [[[\mu^+]],[[\mu^-]]]           \;\;\; \mbox{(condition)}
+    {(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > e+(3),MET(4)), (anyBSM(2) > e-(5),MET(6))} 
+    = {(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > mu+(3),MET(4)), (anyBSM(2) > mu-(5),MET(6))}
 
-where it is understood that the condition refers to the weights of the respective elements
-and not to the elements themselves.
+where it is understood that the condition refers to the weights of the respective simplified models.
 
 In several cases it is desirable to relax the analysis conditions, so the analysis
 upper limits can be applied to a broader spectrum of models. Once again, for the example mentioned
-above, it might be reasonable to impose instead:
+above, it might be reasonable to impose instead: ::
 
-.. math::
-    [[[e^+]],[[e^-]]] \simeq [[[\mu^+]],[[\mu^-]]]           \;\;\; \mbox{(fuzzy condition)}
+    {(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > e+(3),MET(4)), (anyBSM(2) > e-(5),MET(6))} 
+    <= {(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > mu+(3),MET(4)), (anyBSM(2) > mu-(5),MET(6))}
 
 The *departure* from the exact condition can then be properly quantified and one can decide whether the analysis 
 upper limits are applicable or not to the model being considered.
@@ -220,7 +225,7 @@ Experimental Result: Efficiency Map Type
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Unlike |ULrs|, the main information held by Efficiency Map (EM) results are the efficiencies for simplified
-models (represented by an |element| or sum of |elements|).
+models.
 These may be provided by the experimental collaborations or independently computed by theory groups.
 Efficiency maps correspond to a grid of simulated acceptance times efficiency 
 ( :math:`A \times \epsilon` ) values for a specific signal region. In the following we will refer to 
@@ -231,33 +236,23 @@ stored in an EM-type result.
 Another important difference between |ULrs| and |EMrs| is the existence of several signal regions, which in SModelS
 are mapped to |Datasets|.  While |ULrs| contain a single |Dataset| (''signal region''), EM results hold several |Datasets|,
 one for each signal region (see the :ref:`database scheme<databaseScheme>` above).
-Each |Dataset| contains one or more efficiency maps, one for each |element| or sum of |elements|. 
-The efficiency map is usually a function of the BSM masses (or masses and widths) appearing in the element, as shown by the example below:
+Each |Dataset| contains one or more efficiency maps, one for each |SMS|. 
+The efficiency map is usually a function of the BSM masses (or masses and widths) appearing in the element, as shown in :numref:`Fig. %s <EMplot>`:
 
 .. _EMplot:
 
-.. image:: images/EMexample.png
-   :width: 60%
+.. figure:: images/EMexample.png
+   :width: 70%
 
-Within SModelS the above EM map is used to compute the efficiency for the
-:ref:`element<element>` :math:`[[[jet]],[[jet]]]`, where we are using the
-notation defined in :ref:`Bracket Notation <notation>`.
-As in the case of |ULrs|, the specific BSM states appearing in the simplified model are replaced by
-generic Z\ :sub:`2`-even |particles| which have no attributes, except for its
-Z\ :sub:`2` parity. The only exception are the last BSM states appearing in the cascade
-decay, which signature can be specified through the final state property.
-If no final state is defined, the :ref:`element<element>`
-is assumed to have a :math:`(MET,MET)` final state signature.
-However, other signatures are also possible, such as *HSCP* (heavy stable charged particle),
-*R-hadrons*, etc. A list of all possible database BSM states (or |particles|) can be found in smodels/experiment/databaseParticles.py.
-Usually there are several EM maps for a single |dataset|: one for each |element|
-or sum of  |elements|. In order to use a language similar to the one used in |ULrs|, the |element| (or |elements|)
-for which the efficiencies correspond to are still called *constraint*.
+   Example of an |EM| result. Note that only the product :math:`\mathcal{A} \times \epsilon` is used by SModelS.
+
+In order to use a language similar to the one used in |ULrs|, the description of |SMS| for which the efficiencies correspond still is called *constraint*.
 
 
-Although efficiencis are most useful for |EMrs|, their concept can also be extended to
-|ULrs|. For the latter, the efficiencies for a given element are either 1, if the element
-appears in the :ref:`UL constraint <ULconstraint>`, or 0, otherwise. Atlhough trivial, this extension
+Although efficiencies are most useful for |EMrs|, their concept can also be extended to
+|ULrs|. For the latter, the efficiency for a given |SMS| is either 1, 
+if the simplified model appears in the :ref:`UL constraint <ULconstraint>`, 
+or 0, otherwise. Although trivial, this extension
 allows for a unified treatment of |EMrs| and |ULrs|
 (see :ref:`Theory Predictions <theoryPredictions>` for more details).
 
@@ -278,7 +273,7 @@ On the other hand, for |EMrs|, each data set contains the EM maps for the corres
 as well as some additional information: the observed and expected number of events in the signal region, the signal upper
 limit, etc.
 In the folder structure shown in :ref:`database scheme <databaseScheme>`, the upper limit maps and efficiency maps
-for each |element| (or sum of |elements|) are stored in files labeled accoring to the :ref:`TxName convention <TxName>`.
+for each |SMS| (or sum of |SMS|) are stored in files labeled according to the :ref:`TxName convention <TxName>`.
 
 * **Data Sets are described by the** `DataSet Class <experiment.html#experiment.datasetObj.DataSet>`_
 
@@ -290,13 +285,13 @@ TxName Convention
 -----------------
 
 
-Since using the :ref:`bracket notation<notation>` 
+Since using the :ref:`string notation<notation>` 
 to describe the simplified models appearing in the
 upper limit or efficiency maps can be rather lengthy, it is useful to define a shorthand notation for
 the :ref:`constraints <ULconstraint>`. SModelS adopts a notation based on 
 the CMS SMS conventions, where each specific :ref:`constraint <ULconstraint>` is
 labeled as *T<constraint name>*, which we refer as *TxName*. For instance, the TxName corresponding to 
-the constraint in the :ref:`example above <constraintPlot>` is *TSlepSlep*.
+the constraint in :numref:`Fig. %s <EMplot>` is *T2*.
 A complete list of TxNames can be found `here <http://smodels.github.io/docs/SmsDictionary>`_.
 
 

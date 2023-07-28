@@ -62,6 +62,9 @@ From v3.0 onwards these topologies are described by the graph structure above, w
 
 
 * **SMS are described by the** `GenericSMS Class <base.html#base.genericSMS.GenericSMS>`_ 
+* **Particle node are described by the** `ParticleNode Class <base.html#base.particleNode.ParticleNode>`_ 
+
+
 
 .. _particleClass:
 

@@ -40,24 +40,24 @@ class TestTxnameConstraint(unittest.TestCase):
         self.assertEqual(tx._constraintFunc,"2.*(sms_1+sms_2)")
         self.assertEqual(len(tx._conditionsList),9)
 
-        smsDicts = [{'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),L), (anyBSM(3) > MET,L), (anyBSM(4) > MET,nu)': 'sms_1', 
-                      '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),nu), (anyBSM(3) > MET,L), (anyBSM(4) > MET,L)': 'sms_2'},                       
-                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),nu), (anyBSM(3) > MET,L), (anyBSM(4) > MET,L)': 'sms_1', 
-                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),ta), (anyBSM(2) > anyBSM(4),nu), (anyBSM(3) > MET,ta), (anyBSM(4) > MET,L)': 'sms_2'}, 
-                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),L), (anyBSM(3) > MET,L), (anyBSM(4) > MET,nu)': 'sms_1', 
-                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),ta), (anyBSM(2) > anyBSM(4),L), (anyBSM(3) > MET,ta), (anyBSM(4) > MET,nu)': 'sms_2'}, 
-                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),nu), (anyBSM(3) > MET,L), (anyBSM(4) > MET,L)': 'sms_1', 
-                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),nu), (anyBSM(3) > MET,L), (anyBSM(4) > MET,ta)': 'sms_2'}, 
-                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),L), (anyBSM(3) > MET,L), (anyBSM(4) > MET,nu)': 'sms_1', 
-                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),ta), (anyBSM(3) > MET,L), (anyBSM(4) > MET,nu)': 'sms_2'}, 
-                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),nu), (anyBSM(3) > MET,L), (anyBSM(4) > MET,L)': 'sms_1', 
-                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),e), (anyBSM(2) > anyBSM(4),nu), (anyBSM(3) > MET,e), (anyBSM(4) > MET,L)': 'sms_2'}, 
-                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),L), (anyBSM(3) > MET,L), (anyBSM(4) > MET,nu)': 'sms_1', 
-                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),e), (anyBSM(2) > anyBSM(4),L), (anyBSM(3) > MET,e), (anyBSM(4) > MET,nu)': 'sms_2'}, 
-                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),nu), (anyBSM(3) > MET,L), (anyBSM(4) > MET,L)': 'sms_1', 
-                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),nu), (anyBSM(3) > MET,L), (anyBSM(4) > MET,e)': 'sms_2'}, 
-                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),L), (anyBSM(3) > MET,L), (anyBSM(4) > MET,nu)': 'sms_1', 
-                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(4),e), (anyBSM(3) > MET,L), (anyBSM(4) > MET,nu)': 'sms_2'}]
+        smsDicts = [{'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),L), (anyBSM(3) > MET,L), (anyBSM(7) > MET,nu)': 'sms_1', 
+                      '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,L), (anyBSM(7) > MET,L)': 'sms_2'},                       
+                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,L), (anyBSM(7) > MET,L)': 'sms_1', 
+                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),ta), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,ta), (anyBSM(7) > MET,L)': 'sms_2'}, 
+                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),L), (anyBSM(3) > MET,L), (anyBSM(7) > MET,nu)': 'sms_1', 
+                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),ta), (anyBSM(2) > anyBSM(7),L), (anyBSM(3) > MET,ta), (anyBSM(7) > MET,nu)': 'sms_2'}, 
+                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,L), (anyBSM(7) > MET,L)': 'sms_1', 
+                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,L), (anyBSM(7) > MET,ta)': 'sms_2'}, 
+                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),L), (anyBSM(3) > MET,L), (anyBSM(7) > MET,nu)': 'sms_1', 
+                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),ta), (anyBSM(3) > MET,L), (anyBSM(7) > MET,nu)': 'sms_2'}, 
+                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,L), (anyBSM(7) > MET,L)': 'sms_1', 
+                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),e), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,e), (anyBSM(7) > MET,L)': 'sms_2'}, 
+                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),L), (anyBSM(3) > MET,L), (anyBSM(7) > MET,nu)': 'sms_1', 
+                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),e), (anyBSM(2) > anyBSM(7),L), (anyBSM(3) > MET,e), (anyBSM(7) > MET,nu)': 'sms_2'}, 
+                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,L), (anyBSM(7) > MET,L)': 'sms_1', 
+                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,L), (anyBSM(7) > MET,e)': 'sms_2'}, 
+                    {'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),L), (anyBSM(3) > MET,L), (anyBSM(7) > MET,nu)': 'sms_1', 
+                     '(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),e), (anyBSM(3) > MET,L), (anyBSM(7) > MET,nu)': 'sms_2'}]
         condList = ['Csim(sms_1,sms_2)','Cgtr(sms_1,3.*sms_2)','Cgtr(sms_1,3.*sms_2)','Cgtr(sms_1,3.*sms_2)','Cgtr(sms_1,3.*sms_2)','Cgtr(sms_1,3.*sms_2)','Cgtr(sms_1,3.*sms_2)','Cgtr(sms_1,3.*sms_2)','Cgtr(sms_1,3.*sms_2)']
         for ic,cond in enumerate(tx._conditionsList):
             self.assertEqual(len(cond),1)

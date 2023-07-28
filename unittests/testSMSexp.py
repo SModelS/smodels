@@ -32,7 +32,7 @@ class TestSMSExp(unittest.TestCase):
       sms = ExpSMS.from_string(sms,model=finalStates)
       sms.bfs_sort(numberNodes=True)
       self.assertEqual(sms.canonName,1110101101000110101101010000)
-      self.assertEqual(str(sms),'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),e+,e-), (anyBSM(2) > anyBSM(4),mu-,nu), (anyBSM(3) > MET,jet,jet), (anyBSM(4) > MET,ta+)')
+      self.assertEqual(str(sms),'(PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),e+,e-), (anyBSM(2) > anyBSM(6),mu-,nu), (anyBSM(3) > MET,jet,jet), (anyBSM(6) > MET,ta+)')
 
       nodes_and_indices = getNodesIndices(sms)
       edges = getEdges(sms)

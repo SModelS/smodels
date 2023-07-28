@@ -109,7 +109,7 @@
                 <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
                 <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; N1,C1+/C1-(1)), (C1+/C1-(1) &gt; N1/N1~,q,q)</SMS>
+            <SMS>(PV &gt; N1,C1+/C1-(2)), (C1+/C1-(2) &gt; N1/N1~,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>53.8</xsec_13.0_TeV>
                 <xsec_8.0_TeV>38.5</xsec_8.0_TeV>
@@ -127,7 +127,7 @@
                 <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
                 <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; N1,C1+/C1-(1)), (C1+/C1-(1) &gt; N1/N1~,q,c)</SMS>
+            <SMS>(PV &gt; N1,C1+/C1-(2)), (C1+/C1-(2) &gt; N1/N1~,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>53.8</xsec_13.0_TeV>
                 <xsec_8.0_TeV>38.5</xsec_8.0_TeV>
@@ -145,7 +145,7 @@
                 <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
                 <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; inv,C1+/C1-(1)), (C1+/C1-(1) &gt; N1/N1~,q,q)</SMS>
+            <SMS>(PV &gt; inv,C1+/C1-(2)), (C1+/C1-(2) &gt; N1/N1~,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>121.0</xsec_13.0_TeV>
                 <xsec_8.0_TeV>64.7</xsec_8.0_TeV>
@@ -163,7 +163,7 @@
                 <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
                 <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; inv,C1+/C1-(1)), (C1+/C1-(1) &gt; N1/N1~,q,c)</SMS>
+            <SMS>(PV &gt; inv,C1+/C1-(2)), (C1+/C1-(2) &gt; N1/N1~,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>121.0</xsec_13.0_TeV>
                 <xsec_8.0_TeV>64.7</xsec_8.0_TeV>
@@ -1345,7 +1345,7 @@
                 <PIDs>('N3', 1000025)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(3)), (N3(3) &gt; N1,Z)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(7)), (N3(7) &gt; N1,Z)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>31.9</xsec_13.0_TeV>
                 <xsec_8.0_TeV>4.8</xsec_8.0_TeV>
@@ -1367,7 +1367,7 @@
                 <PIDs>('C1+', 1000024)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; t-,b,C1+(3)), (C1+(3) &gt; N1,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; t-,b,C1+(8)), (C1+(8) &gt; N1,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>60.1</xsec_13.0_TeV>
                 <xsec_8.0_TeV>9.05</xsec_8.0_TeV>
@@ -1389,7 +1389,7 @@
                 <PIDs>('C1+', 1000024)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; t-,b,C1+(3)), (C1+(3) &gt; N1,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; t-,b,C1+(8)), (C1+(8) &gt; N1,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>60.1</xsec_13.0_TeV>
                 <xsec_8.0_TeV>9.05</xsec_8.0_TeV>
@@ -1411,7 +1411,7 @@
                 <PIDs>('N2', 1000023)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,b,N2(3)), (N2(3) &gt; N1,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,b,N2(8)), (N2(8) &gt; N1,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>154.0</xsec_13.0_TeV>
                 <xsec_8.0_TeV>23.2</xsec_8.0_TeV>
@@ -1433,7 +1433,7 @@
                 <PIDs>('N2', 1000023)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,b,N2(3)), (N2(3) &gt; N1,c,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,b,N2(8)), (N2(8) &gt; N1,c,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>42.9</xsec_13.0_TeV>
                 <xsec_8.0_TeV>6.47</xsec_8.0_TeV>
@@ -1455,7 +1455,7 @@
                 <PIDs>('N2', 1000023)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,b,N2(3)), (N2(3) &gt; N1,b,b)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,b,N2(8)), (N2(8) &gt; N1,b,b)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>53.4</xsec_13.0_TeV>
                 <xsec_8.0_TeV>8.05</xsec_8.0_TeV>
@@ -1477,7 +1477,7 @@
                 <PIDs>('C1-', -1000024)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,t+,C1-(3)), (C1-(3) &gt; N1~,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,t+,C1-(8)), (C1-(8) &gt; N1~,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>60.1</xsec_13.0_TeV>
                 <xsec_8.0_TeV>9.05</xsec_8.0_TeV>
@@ -1499,7 +1499,7 @@
                 <PIDs>('C1-', -1000024)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,t+,C1-(3)), (C1-(3) &gt; N1~,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,t+,C1-(8)), (C1-(8) &gt; N1~,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>60.1</xsec_13.0_TeV>
                 <xsec_8.0_TeV>9.05</xsec_8.0_TeV>
@@ -1523,7 +1523,7 @@
                 <PIDs>('C1+', 1000024)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(3)), (N3(3) &gt; W-,C1+(4)), (C1+(4) &gt; N1,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(7)), (N3(7) &gt; W-,C1+(9)), (C1+(9) &gt; N1,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>21.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>3.22</xsec_8.0_TeV>
@@ -1547,7 +1547,7 @@
                 <PIDs>('C1+', 1000024)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(3)), (N3(3) &gt; W-,C1+(4)), (C1+(4) &gt; N1,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(7)), (N3(7) &gt; W-,C1+(9)), (C1+(9) &gt; N1,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>21.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>3.22</xsec_8.0_TeV>
@@ -1571,7 +1571,7 @@
                 <PIDs>('C1-', -1000024)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(3)), (N3(3) &gt; W+,C1-(4)), (C1-(4) &gt; N1~,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(7)), (N3(7) &gt; W+,C1-(9)), (C1-(9) &gt; N1~,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>21.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>3.22</xsec_8.0_TeV>
@@ -1595,7 +1595,7 @@
                 <PIDs>('C1-', -1000024)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(3)), (N3(3) &gt; W+,C1-(4)), (C1-(4) &gt; N1~,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(7)), (N3(7) &gt; W+,C1-(9)), (C1-(9) &gt; N1~,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>21.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>3.22</xsec_8.0_TeV>
@@ -1619,7 +1619,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; g,N3(3)), (gluino(2) &gt; t-,b,C1+(4)), (N3(3) &gt; N1,Z), (C1+(4) &gt; N1,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; g,N3(4)), (gluino(2) &gt; t-,b,C1+(7)), (N3(4) &gt; N1,Z), (C1+(7) &gt; N1,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>20.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>3.06</xsec_8.0_TeV>
@@ -1643,7 +1643,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; g,N3(3)), (gluino(2) &gt; t-,b,C1+(4)), (N3(3) &gt; N1,Z), (C1+(4) &gt; N1,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; g,N3(4)), (gluino(2) &gt; t-,b,C1+(7)), (N3(4) &gt; N1,Z), (C1+(7) &gt; N1,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>20.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>3.06</xsec_8.0_TeV>
@@ -1667,7 +1667,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; g,N3(3)), (gluino(2) &gt; b,t+,C1-(4)), (N3(3) &gt; N1,Z), (C1-(4) &gt; N1~,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; g,N3(4)), (gluino(2) &gt; b,t+,C1-(7)), (N3(4) &gt; N1,Z), (C1-(7) &gt; N1~,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>20.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>3.06</xsec_8.0_TeV>
@@ -1691,7 +1691,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; g,N3(3)), (gluino(2) &gt; b,t+,C1-(4)), (N3(3) &gt; N1,Z), (C1-(4) &gt; N1~,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; g,N3(4)), (gluino(2) &gt; b,t+,C1-(7)), (N3(4) &gt; N1,Z), (C1-(7) &gt; N1~,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>20.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>3.06</xsec_8.0_TeV>
@@ -1715,7 +1715,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(3)), (gluino(2) &gt; t-,b,C1+(4)), (C1+(3) &gt; N1,q,q), (C1+(4) &gt; N1,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; t-,b,C1+(8)), (C1+(5) &gt; N1,q,q), (C1+(8) &gt; N1,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>19.1</xsec_13.0_TeV>
                 <xsec_8.0_TeV>2.88</xsec_8.0_TeV>
@@ -1739,7 +1739,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(3)), (gluino(2) &gt; t-,b,C1+(4)), (C1+(3) &gt; N1,q,q), (C1+(4) &gt; N1,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; t-,b,C1+(8)), (C1+(5) &gt; N1,q,q), (C1+(8) &gt; N1,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>38.2</xsec_13.0_TeV>
                 <xsec_8.0_TeV>5.76</xsec_8.0_TeV>
@@ -1763,7 +1763,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(3)), (gluino(2) &gt; b,b,N2(4)), (C1+(3) &gt; N1,q,q), (N2(4) &gt; N1,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,b,N2(8)), (C1+(5) &gt; N1,q,q), (N2(8) &gt; N1,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>98.2</xsec_13.0_TeV>
                 <xsec_8.0_TeV>14.8</xsec_8.0_TeV>
@@ -1787,7 +1787,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(3)), (gluino(2) &gt; b,b,N2(4)), (C1+(3) &gt; N1,q,q), (N2(4) &gt; N1,c,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,b,N2(8)), (C1+(5) &gt; N1,q,q), (N2(8) &gt; N1,c,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>27.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>4.12</xsec_8.0_TeV>
@@ -1811,7 +1811,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(3)), (gluino(2) &gt; b,b,N2(4)), (C1+(3) &gt; N1,q,q), (N2(4) &gt; N1,b,b)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,b,N2(8)), (C1+(5) &gt; N1,q,q), (N2(8) &gt; N1,b,b)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>34.0</xsec_13.0_TeV>
                 <xsec_8.0_TeV>5.12</xsec_8.0_TeV>
@@ -1835,7 +1835,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(3)), (gluino(2) &gt; b,t+,C1-(4)), (C1+(3) &gt; N1,q,q), (C1-(4) &gt; N1~,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1+(5) &gt; N1,q,q), (C1-(8) &gt; N1~,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>38.2</xsec_13.0_TeV>
                 <xsec_8.0_TeV>5.76</xsec_8.0_TeV>
@@ -1859,7 +1859,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(3)), (gluino(2) &gt; b,t+,C1-(4)), (C1+(3) &gt; N1,q,q), (C1-(4) &gt; N1~,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1+(5) &gt; N1,q,q), (C1-(8) &gt; N1~,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>38.2</xsec_13.0_TeV>
                 <xsec_8.0_TeV>5.76</xsec_8.0_TeV>
@@ -1883,7 +1883,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(3)), (gluino(2) &gt; t-,b,C1+(4)), (C1+(3) &gt; N1,q,c), (C1+(4) &gt; N1,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; t-,b,C1+(8)), (C1+(5) &gt; N1,q,c), (C1+(8) &gt; N1,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>19.1</xsec_13.0_TeV>
                 <xsec_8.0_TeV>2.88</xsec_8.0_TeV>
@@ -1907,7 +1907,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(3)), (gluino(2) &gt; b,b,N2(4)), (C1+(3) &gt; N1,q,c), (N2(4) &gt; N1,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,b,N2(8)), (C1+(5) &gt; N1,q,c), (N2(8) &gt; N1,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>98.2</xsec_13.0_TeV>
                 <xsec_8.0_TeV>14.8</xsec_8.0_TeV>
@@ -1931,7 +1931,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(3)), (gluino(2) &gt; b,b,N2(4)), (C1+(3) &gt; N1,q,c), (N2(4) &gt; N1,c,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,b,N2(8)), (C1+(5) &gt; N1,q,c), (N2(8) &gt; N1,c,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>27.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>4.12</xsec_8.0_TeV>
@@ -1955,7 +1955,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(3)), (gluino(2) &gt; b,b,N2(4)), (C1+(3) &gt; N1,q,c), (N2(4) &gt; N1,b,b)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,b,N2(8)), (C1+(5) &gt; N1,q,c), (N2(8) &gt; N1,b,b)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>34.0</xsec_13.0_TeV>
                 <xsec_8.0_TeV>5.12</xsec_8.0_TeV>
@@ -1979,7 +1979,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(3)), (gluino(2) &gt; b,t+,C1-(4)), (C1+(3) &gt; N1,q,c), (C1-(4) &gt; N1~,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1+(5) &gt; N1,q,c), (C1-(8) &gt; N1~,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>38.2</xsec_13.0_TeV>
                 <xsec_8.0_TeV>5.76</xsec_8.0_TeV>
@@ -2003,7 +2003,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(3)), (gluino(2) &gt; b,t+,C1-(4)), (C1+(3) &gt; N1,q,c), (C1-(4) &gt; N1~,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1+(5) &gt; N1,q,c), (C1-(8) &gt; N1~,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>38.2</xsec_13.0_TeV>
                 <xsec_8.0_TeV>5.76</xsec_8.0_TeV>
@@ -2027,7 +2027,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(3)), (gluino(2) &gt; b,b,N2(4)), (N2(3) &gt; N1,q,q), (N2(4) &gt; N1,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,b,N2(8)), (N2(5) &gt; N1,q,q), (N2(8) &gt; N1,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>116.0</xsec_13.0_TeV>
                 <xsec_8.0_TeV>17.5</xsec_8.0_TeV>
@@ -2051,7 +2051,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(3)), (gluino(2) &gt; b,b,N2(4)), (N2(3) &gt; N1,q,q), (N2(4) &gt; N1,c,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,b,N2(8)), (N2(5) &gt; N1,q,q), (N2(8) &gt; N1,c,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>50.7</xsec_13.0_TeV>
                 <xsec_8.0_TeV>7.63</xsec_8.0_TeV>
@@ -2075,7 +2075,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(3)), (gluino(2) &gt; b,b,N2(4)), (N2(3) &gt; N1,q,q), (N2(4) &gt; N1,b,b)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,b,N2(8)), (N2(5) &gt; N1,q,q), (N2(8) &gt; N1,b,b)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>87.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>13.2</xsec_8.0_TeV>
@@ -2099,7 +2099,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(3)), (gluino(2) &gt; b,t+,C1-(4)), (N2(3) &gt; N1,q,q), (C1-(4) &gt; N1~,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,t+,C1-(8)), (N2(5) &gt; N1,q,q), (C1-(8) &gt; N1~,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>98.2</xsec_13.0_TeV>
                 <xsec_8.0_TeV>14.8</xsec_8.0_TeV>
@@ -2123,7 +2123,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(3)), (gluino(2) &gt; b,t+,C1-(4)), (N2(3) &gt; N1,q,q), (C1-(4) &gt; N1~,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,t+,C1-(8)), (N2(5) &gt; N1,q,q), (C1-(8) &gt; N1~,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>98.2</xsec_13.0_TeV>
                 <xsec_8.0_TeV>14.8</xsec_8.0_TeV>
@@ -2147,7 +2147,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(3)), (gluino(2) &gt; b,b,N2(4)), (N2(3) &gt; N1,c,c), (N2(4) &gt; N1,b,b)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,b,N2(8)), (N2(5) &gt; N1,c,c), (N2(8) &gt; N1,b,b)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>24.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>3.66</xsec_8.0_TeV>
@@ -2171,7 +2171,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(3)), (gluino(2) &gt; b,t+,C1-(4)), (N2(3) &gt; N1,c,c), (C1-(4) &gt; N1~,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,t+,C1-(8)), (N2(5) &gt; N1,c,c), (C1-(8) &gt; N1~,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>27.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>4.12</xsec_8.0_TeV>
@@ -2195,7 +2195,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(3)), (gluino(2) &gt; b,t+,C1-(4)), (N2(3) &gt; N1,c,c), (C1-(4) &gt; N1~,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,t+,C1-(8)), (N2(5) &gt; N1,c,c), (C1-(8) &gt; N1~,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>27.3</xsec_13.0_TeV>
                 <xsec_8.0_TeV>4.12</xsec_8.0_TeV>
@@ -2219,7 +2219,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(3)), (gluino(2) &gt; b,b,N2(4)), (N2(3) &gt; N1,b,b), (N2(4) &gt; N1,b,b)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,b,N2(8)), (N2(5) &gt; N1,b,b), (N2(8) &gt; N1,b,b)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>15.1</xsec_13.0_TeV>
                 <xsec_8.0_TeV>2.28</xsec_8.0_TeV>
@@ -2243,7 +2243,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(3)), (gluino(2) &gt; b,t+,C1-(4)), (N2(3) &gt; N1,b,b), (C1-(4) &gt; N1~,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,t+,C1-(8)), (N2(5) &gt; N1,b,b), (C1-(8) &gt; N1~,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>34.0</xsec_13.0_TeV>
                 <xsec_8.0_TeV>5.12</xsec_8.0_TeV>
@@ -2267,7 +2267,7 @@
                 <PIDs>('N1', 1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(3)), (gluino(2) &gt; b,t+,C1-(4)), (N2(3) &gt; N1,b,b), (C1-(4) &gt; N1~,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,t+,C1-(8)), (N2(5) &gt; N1,b,b), (C1-(8) &gt; N1~,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>34.0</xsec_13.0_TeV>
                 <xsec_8.0_TeV>5.12</xsec_8.0_TeV>
@@ -2291,7 +2291,7 @@
                 <PIDs>('N1~', -1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,t+,C1-(3)), (gluino(2) &gt; b,t+,C1-(4)), (C1-(3) &gt; N1~,q,q), (C1-(4) &gt; N1~,q,q)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,t+,C1-(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1-(5) &gt; N1~,q,q), (C1-(8) &gt; N1~,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>19.1</xsec_13.0_TeV>
                 <xsec_8.0_TeV>2.88</xsec_8.0_TeV>
@@ -2315,7 +2315,7 @@
                 <PIDs>('N1~', -1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,t+,C1-(3)), (gluino(2) &gt; b,t+,C1-(4)), (C1-(3) &gt; N1~,q,q), (C1-(4) &gt; N1~,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,t+,C1-(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1-(5) &gt; N1~,q,q), (C1-(8) &gt; N1~,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>38.2</xsec_13.0_TeV>
                 <xsec_8.0_TeV>5.76</xsec_8.0_TeV>
@@ -2339,7 +2339,7 @@
                 <PIDs>('N1~', -1000022)</PIDs>
                 <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,t+,C1-(3)), (gluino(2) &gt; b,t+,C1-(4)), (C1-(3) &gt; N1~,q,c), (C1-(4) &gt; N1~,q,c)</SMS>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,t+,C1-(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1-(5) &gt; N1~,q,c), (C1-(8) &gt; N1~,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>19.1</xsec_13.0_TeV>
                 <xsec_8.0_TeV>2.88</xsec_8.0_TeV>
