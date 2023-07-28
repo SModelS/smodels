@@ -12,6 +12,7 @@
 .. |Datasets| replace:: :ref:`DataSets<DataSet>`
 .. |dataset| replace:: :ref:`data set<DataSet>`
 .. |datasets| replace:: :ref:`data sets<DataSet>`
+.. |SMS| replace:: :ref:`SMS <SMS>`
 .. |SMS topology| replace:: :ref:`SMS topology <SMS>`
 .. |SMS topologies| replace:: :ref:`SMS topologies <SMS>`
 .. |particle| replace:: :ref:`particle <particleClass>`
@@ -39,7 +40,7 @@ Starting with version 1.1, the SModelS database includes two types of experiment
 
 Although the two types of constraints above are very distinct,
 both the folder structure and the object structure of SModelS are sufficiently flexible to
-simutaneously handle both |UL| and |EM| results.
+simultaneously handle both |UL| and |EM| results.
 Therefore, for both |UL| and |EM| constraints, the database obeys the following structure:
 
 * :ref:`Database <Database>`: collects a list of |ExpRess|.
@@ -54,11 +55,11 @@ Therefore, for both |UL| and |EM| constraints, the database obeys the following 
 
             * Upper Limit map: contains the upper limit constraints for |ULrs|. Each map contains
               upper limits for the signal cross-section for a single simplified model 
-              (or more precisely to a single |element| or sum of |elements|)
+              (or more precisely to a single |SMS topologies| or sum of |SMS topologies|)
               as a function of the simplified model parameters.
             * Efficiency map: contains the efficiencies for |EMrs|. Each map contains efficiencies
-              for the signal for a single simplified model (or more precisely to a single |element| or sum of |elements|)
-              as a function of the simplified model paramters.
+              for the signal for a single simplified model (or more precisely to a single |SMS topologies| or sum of |SMS topologies|)
+              as a function of the simplified model parameters.
 
 A schematic summary of the above structure can be seen below:
 
@@ -69,7 +70,7 @@ A schematic summary of the above structure can be seen below:
 
 
 In the following sections we describe the main concepts and elements which constitute the SModelS database.
-More details about the database folder structure and object struture can be found in :ref:`Database of Experimental Results<databaseStruct>`.
+More details about the database folder structure and object structure can be found in :ref:`Database of Experimental Results<databaseStruct>`.
 
 .. _Database:
 
@@ -118,22 +119,17 @@ or more UL maps. An example of a UL map is shown below:
    :width: 60%
 
 Within SModelS, the above UL map is used to constrain the
-simplified model :math:`\tilde{q} + \tilde{q} \to \left(jet+\tilde{\chi}_1^0\right) + \left(jet+\tilde{\chi}_1^0\right)`.
-Using the SModelS notation this simplified model is mapped to the
-:ref:`element<element>` :math:`[[[jet]],[[jet]]]`, using the notation defined in
-:ref:`Bracket Notation <notation>`.
-The specific BSM states appearing in the simplified model are replaced by
-generic Z\ :sub:`2`-even |particles| which have no attributes, except for its
-Z\ :sub:`2` parity. The only exception are the last BSM states appearing in the cascade
-decay, which signature can be specified through the final state property.
-If no final state is defined, the :ref:`element<element>`
-is assumed to have a :math:`(MET,MET)` final state signature.
-However, other signatures are also possible, such as *HSCP* (heavy stable charged particle),
-*R-hadrons*, etc. A list of all possible database BSM states (or |particles|) can be found in smodels/experiment/databaseParticles.py.
+simplified model :math:`\tilde{t} + \tilde{t} \to \left(t+\tilde{\chi}_1^0\right) + \left(t+\tilde{\chi}_1^0\right)`.
+Using the SModelS :ref:`string representation <notation>` for simplified models, this |SMS| is decribed by: ::
+
+    (PV > anyBSM(1), anyBSM(2)) , (anyBSM(1) > MET(3),t(4)), (anyBSM(2) > MET(5),t(6))
+
+where the integers refer to the node indices and are used internally to uniquely define the particles. Note that it is assumed that the analysis is insensitive to the spin of the BSM particles and to the quantum numbers of the stop (as long as it decays to a top quark and MET), so the stops are mapped into *generic* BSM |particles| (anyBSM).
+A list of the database BSM |particles| can be found in the databaseParticles.py file in the database folder.
 Usually a single preliminary result/publication contains several UL maps, hence
 each UL-type experimental result contains several UL maps, each one constraining
 different simplified
-models (|elements| or sum of  |elements|).
+models (|SMS topology| or sum of |SMS topologies|).
 *We also point out that the exclusion curve shown in the UL map above is never used by SModelS*.
 
 
@@ -150,7 +146,7 @@ there is a single |element| being constrained (:math:`[[[jet]],[[jet]]]`).
 In some cases, however, the constraint corresponds to a sum of :ref:`elements <element>`.
 As an example, consider the `ATLAS analysis <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/CONFNOTES/ATLAS-CONF-2013-049/>`_ shown below:
 
-.. _constraintplot:
+.. _constraintPlot:
 
 .. image:: images/constraintExample.png
    :width: 80%
@@ -172,7 +168,7 @@ Note that the sum can be over particle charges, flavors or more complex combinat
 However, almost all experimental results sum only over elements sharing a common |topology|.
 
 Finally, in some cases the UL constraint assumes specific contributions from each |element|.
-For instance, in the :ref:`example above <constraintplot>` it is implicitly assumed that
+For instance, in the :ref:`example above <constraintPlot>` it is implicitly assumed that
 both the electron and muon |elements| contribute equally to the total cross section.
 Hence these conditions must also be specified along with the constraint, as described in :ref:`UL conditions<ULconditions>`.
 
@@ -183,7 +179,7 @@ Upper Limit Conditions
 
 When the analysis :ref:`constraints <ULconstraint>` are non-trivial (refer to a sum of elements), it is often the case
 that there are implicit (or explicit) assumptions about the contribution of each element. For instance,
-in the :ref:`figure above <constraintplot>`, it is implicitly assumed that each lepton flavor contributes equally
+in the :ref:`figure above <constraintPlot>`, it is implicitly assumed that each lepton flavor contributes equally
 to the summed cross section:
 
 .. math::    
@@ -296,11 +292,11 @@ TxName Convention
 
 Since using the :ref:`bracket notation<notation>` 
 to describe the simplified models appearing in the
-upper limit or efficiency maps can be rather lenghty, it is useful to define a shorthand notation for
+upper limit or efficiency maps can be rather lengthy, it is useful to define a shorthand notation for
 the :ref:`constraints <ULconstraint>`. SModelS adopts a notation based on 
 the CMS SMS conventions, where each specific :ref:`constraint <ULconstraint>` is
 labeled as *T<constraint name>*, which we refer as *TxName*. For instance, the TxName corresponding to 
-the constraint in the :ref:`example above <constraintplot>` is *TSlepSlep*.
+the constraint in the :ref:`example above <constraintPlot>` is *TSlepSlep*.
 A complete list of TxNames can be found `here <http://smodels.github.io/docs/SmsDictionary>`_.
 
 

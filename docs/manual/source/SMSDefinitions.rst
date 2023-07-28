@@ -98,8 +98,8 @@ All *generic* and *inclusive* particles used by the :ref:`Database <databaseDefs
 `defaultFinalStates.py <experiment.html#experiment.defaultFinalStates>`_ .
 
 
-
 * **Particles are described by the** `Particle Class <base.html#base.particle.Particle>`_
+* **Inclusive Particles are described by the** `MultiParticle Class <base.html#base.particle.MultiParticle>`_
 
 
 .. _notation:
@@ -111,9 +111,9 @@ A given |SMS| can be represented in string format using a sequence of decay patt
 
    X(i) > A(j),B(k),C(l)
 
-where :math:`X` represents a BSM particle, which decays to :math:`A,B` and :math:`C`. The indices :math:`i,j,k,l` refer to the node indices (see :numref:`Fig. %s <smsScheme>`) in the |SMS| graph and are needed in order to avoid ambiguities. For instance, the SMS from :numref:`Fig. %s <smsScheme>` is represented by the string: ::
+where :math:`X` represents a BSM particle, which decays to :math:`A,B` and :math:`C`. The indices :math:`i,j,k,l` refer to the node indices for the unstable particles in the |SMS| graph (see :numref:`Fig. %s <smsScheme>`)  and are needed in order to avoid ambiguities. For instance, the SMS from :numref:`Fig. %s <smsScheme>` is represented by the string: ::
 
-   (PV(0) > gluino(1),su_L(2)), (gluino(1) > N1(3),q(4),q(5)), (su_L(2) > q(6),N1(7))
+   (PV > gluino(1),su_L(2)), (gluino(1) > N1,q,q), (su_L(2) > q,N1)
 
 
 
