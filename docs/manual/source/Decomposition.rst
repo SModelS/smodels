@@ -235,6 +235,21 @@ regarding their ordering.
 
 
 
+
+Within SModelS, |SMS| are grouped according to their
+canonical name. A topology dictionary is constructed mapping the canonical names to a list of |SMS| sharing a common graph structure, as represented below:
+
+.. _topoDict:
+
+.. figure:: images/topologyDict.png
+   :width: 90%
+   :align: center
+   
+   Example of how the |SMS topologies| are grouped in the topology dictionary after decomposition.
+
+* **Topology dictionaries are described by the** `TopologyDict Class <decomposition.html#decomposition.topologyDict.TopologyDict>`_
+
+
 .. [#] Decays of meta-stable particles should not be compressed, even if soft, since they might result in
        distinct signatures depending on the quantum numbers of the decaying particle. Particles are assumed
        to be meta-stable if their width is below the value set by the :ref:`promptWidth parameter <parameterFileModel>`.

@@ -45,7 +45,7 @@ Each node (circle) represents a particle and the edges (connecting arrows) repre
 
 A SMS may also hold information about its corresponding
 weight (cross section times branching ratio times efficiency).\ [#f1]_
-The overall properties of a SMS are illustrated in the Fig. :numref:`smsScheme` :
+The overall properties of a SMS are illustrated in the :numref:`Fig. %s <smsScheme>`:
 
 .. _smsScheme:
 
@@ -53,7 +53,7 @@ The overall properties of a SMS are illustrated in the Fig. :numref:`smsScheme` 
    :width: 40%
    :align: center
    
-   Basic elements of a SMS graph.
+   Illustration of the basic elements of a SMS graph: root node, SM and BSM nodes, edges and node indices.
 
 
 SModelS works under the inherent assumption that, for collider purposes,
@@ -107,7 +107,7 @@ A given |SMS| can be represented in string format using a sequence of decay patt
 
    X(i) > A(j),B(k),C(l)
 
-where :math:`X` represents a BSM particle, which decays to :math:`A,B` and :math:`C`. The indices :math:`i,j,k,l` refer to the nodes of unstable |particles| in the |SMS| graph and are needed in order to avoid ambiguities. For instance, the SMS from :numref:`Fig. %s <smsScheme>` is represented by the string: ::
+where :math:`X` represents a BSM particle, which decays to :math:`A,B` and :math:`C`. The indices :math:`i,j,k,l` refer to the node indices (see :numref:`Fig. %s <smsScheme>`) of unstable |particles| in the |SMS| graph and are needed in order to avoid ambiguities. For instance, the SMS from :numref:`Fig. %s <smsScheme>` is represented by the string: ::
 
    (PV > gluino(1),su_L(2)), (gluino(1) > N1,q,q), (su_L(2) > q,N1)
 
@@ -124,23 +124,18 @@ This can be achieved using the canonial name (or canonical labeling) convention 
  * each undecayed (final node) receives the label "10" 
  * each decayed node receives the label "1<sorted labels of daughter nodes>0"
 
-where "<sorted labels of daughter nodes>" is the joint string of the daughter nodes labels, sorted by their size. An example is shown in :numref:`Fig. %s <canonicalNameFig>`.
+where "<sorted labels of daughter nodes>" is the joint string of the daughter nodes labels, sorted by their size. Finally the label associated to the 'PV' node (root node) uniquely describes the graph structure. An example is shown in :numref:`Fig. %s <canonfig>` .
 
-.. _canonicalNameFig:
-  
+.. _canonfig:
+
 .. figure:: images/smsCanonName.png
-   :width: 50%
+   :width: 40%
    :align: center
-
+   
    Example of how the canonical name is defined for each node. The |SMS| canonical name corresponds to the label of the primary vertex node.
 
 
 
-Within SModelS, |SMS| are grouped according to their
-canonical name. A topology dictionary is construct mapping the canonical names to a list of |SMS| sharing a common graph structure.
-
-* **Topology dictionaries are described by the** `TopologyDict Class <decomposition.html#decomposition.topologyDict.TopologyDict>`_
-
 .. [#f1] In order to treat the UL and EM map results on the same footing,
-   SModelS applies a trivial binary efficiency to elements for UL-type
+   SModelS applies a trivial binary efficiency to |SMS| for UL-type
    results as will be explained in detail later.

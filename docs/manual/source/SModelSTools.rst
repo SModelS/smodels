@@ -1,24 +1,17 @@
 .. index:: SModelS Tools
 
-.. |element| replace:: :ref:`element <element>`
-.. |elements| replace:: :ref:`elements <element>`
-.. |topology| replace:: :ref:`topology <topology>`
-.. |topologies| replace:: :ref:`topologies <topology>`
 .. |decomposition| replace:: :doc:`decomposition <Decomposition>`
 .. |theory predictions| replace:: :doc:`theory predictions <TheoryPredictions>`
 .. |theory prediction| replace:: :doc:`theory prediction <TheoryPredictions>`
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
 .. |database| replace:: :ref:`database <Database>`
-.. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
 .. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
 .. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
 .. |Database| replace:: :ref:`Database <Database>`
 .. |Dataset| replace:: :ref:`DataSet<DataSet>`
 .. |Datasets| replace:: :ref:`DataSets<DataSet>`
 .. |results| replace:: :ref:`experimental results <ExpResult>`
-.. |branches| replace:: :ref:`branches <branch>`
-.. |branch| replace:: :ref:`branch <branch>`
 .. |EMrs| replace:: :ref:`EM-type results <EMtype>`
 .. |ULrs| replace:: :ref:`UL-type results <ULtype>`
 

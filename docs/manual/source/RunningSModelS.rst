@@ -228,11 +228,11 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileTxnames:
 
-  * **txnames** (list of topologies): set to ['all'] to use all available simplified model |topologies|. The |topologies| are labeled according to the :ref:`txname convention <TxName>`.
-    If a list of |txnames| are given, only the corresponding |topologies| will be considered. For instance, setting txnames = T2 will
+  * **txnames** (list of topologies): set to ['all'] to use all available simplified model topologies. The |SMS topologies| are labeled according to the :ref:`txname convention <TxName>`.
+    If a list of |txnames| are given, only the corresponding topologies will be considered. For instance, setting txnames = T2 will
     only consider |results| for :math:`pp \to \tilde{q} + \tilde{q} \to  (jet+\tilde{\chi}_1^0) + (jet+\tilde{\chi}_1^0)`
     and the |output| will only contain constraints for this topology.
-    *A list of all* |topologies| *and their corresponding* |txnames| *can be found* `here <https://smodels.github.io/wiki/SmsDictionary>`_
+    *A list of all* |SMS topologies| *and their corresponding* |txnames| *can be found* `here <https://smodels.github.io/wiki/SmsDictionary>`_
     Wildcards (\*, ?, [<list-of-or'ed-letters>]) are expanded in the same way the shell does wildcard expansion for file names.
     So, for example, txnames = T[12]*bb* picks all txnames beginning with T1 or T2 and containg bb as of the time of writing were: T1bbbb, T1bbbt, T1bbqq, T1bbtt, T2bb, T2bbWW, T2bbWWoff
 
@@ -270,7 +270,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFilePrintDecomp:
 
-  * **printDecomp** (True/False): set to True to print basic information from the |decomposition| (|topologies|, total weights, ...).
+  * **printDecomp** (True/False): set to True to print basic information from the |decomposition| (|SMS topologies|, total weights, ...).
 
 .. _parameterFileAddSMSInfo:
 

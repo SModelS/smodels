@@ -1,58 +1,73 @@
-<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="103.478 311 510.435 411.658" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="103.478 311 734.739 411.658" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
     <g>
-        <g latexdraw:type="picture" id="id1751473560">
-            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_theory_example2.png" x="291.99999999999994" y="331.00000000000017" height="347.0" width="213.0"/>
+        <g latexdraw:type="picture" id="id806501445">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_nodeIndices.png" x="605.2173913043482" y="333.96195652173964" height="347.0" width="213.0"/>
         </g>
-        <g latexdraw:type="joinedLines" id="id1165480430">
-            <polyline points="506.95652173913163,356.57065217391306 591.3043478260879,376.5706521739128 " stroke="#666666" stroke-width="2.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1165480430)"/>
+        <g latexdraw:type="picture" id="id1625929183">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_theory_example2.png" x="291.9999999999999" y="331.00000000000017" height="347.0" width="213.0"/>
         </g>
-        <g latexdraw:type="joinedLines" id="id209467460">
-            <polyline points="375.8828819525849,439.216110232215 315.4214658735036,406.09910715908984 " stroke="#666666" stroke-width="2.0" fill="none" latexdraw:rotationAngle="3.9558273469270753" marker-end="url(#arrow1-209467460)"/>
+        <g latexdraw:type="joinedLines" id="id1561332175">
+            <polyline points="375.8828819525849,439.216110232215 315.4214658735036,406.09910715908984 " stroke="#666666" stroke-width="2.0" fill="none" latexdraw:rotationAngle="3.9558273469270753" marker-end="url(#arrow1-1561332175)"/>
         </g>
-        <g latexdraw:type="joinedLines" id="id1394926085">
-            <polyline points="509.5652173913056,432.2228260869566 593.9130434782617,452.22282608695633 " stroke="#666666" stroke-width="2.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1394926085)"/>
+        <g latexdraw:type="joinedLines" id="id1665138333">
+            <polyline points="451.45446356669265,419.8661436539291 398.1107538246135,351.53603025911394 " stroke="#666666" stroke-width="2.0" fill="none" latexdraw:rotationAngle="3.816728443708289" marker-end="url(#arrow1-1665138333)"/>
         </g>
-        <g latexdraw:type="joinedLines" id="id1825562550">
-            <polyline points="288.01473337794914,523.4571207975073 231.11570140466114,480.98853137640657 " stroke="#666666" stroke-width="2.0" fill="none" latexdraw:rotationAngle="3.9558273469270753" marker-end="url(#arrow1-1825562550)"/>
+        <g latexdraw:type="joinedLines" id="id1744651998">
+            <polyline points="288.01473337794914,523.4571207975073 231.11570140466114,480.98853137640657 " stroke="#666666" stroke-width="2.0" fill="none" latexdraw:rotationAngle="3.9558273469270753" marker-end="url(#arrow1-1744651998)"/>
         </g>
-        <g latexdraw:type="joinedLines" id="id10868662">
-            <polyline points="428.03071407533156,614.618464395842 370.23015548988724,655.9141442998116 " stroke="#666666" stroke-width="2.0" fill="none" latexdraw:rotationAngle="3.9558273469270753" marker-end="url(#arrow1-10868662)"/>
+        <g latexdraw:type="joinedLines" id="id635819267">
+            <polyline points="428.03071407533156,614.618464395842 370.23015548988724,655.9141442998116 " stroke="#666666" stroke-width="2.0" fill="none" latexdraw:rotationAngle="3.9558273469270753" marker-end="url(#arrow1-635819267)"/>
         </g>
-        <g latexdraw:type="text" id="id2042908712" fill="black" latexdraw:position="bl">
-            <text x="123.47826086956542" y="477.44021739130466">\begin{tabular}{c} {\Large Node} \\ \large (Primary Vertex) \end{tabular}
+        <g latexdraw:type="text" id="id848454696" fill="black" latexdraw:position="bl">
+            <text x="123.47826086956542" y="477.44021739130466">\begin{tabular}{c} {\Large Root Node} \\ \large (Primary Vertex) \end{tabular}
 </text>
         </g>
-        <g latexdraw:type="text" id="id61768516" fill="black" latexdraw:position="bl">
+        <g latexdraw:type="text" id="id519688250" fill="black" latexdraw:position="bl">
             <text x="266.0869565217394" y="406.13586956521766">\begin{tabular}{c} {\Large Node} \\ \large (BSM) \end{tabular}
 </text>
         </g>
-        <g latexdraw:type="text" id="id1304946350" fill="black" latexdraw:position="bl">
-            <text x="581.7391304347836" y="406.13586956521743">\begin{tabular}{c} {\Large Node} \\ \large (BSM) \end{tabular}
+        <g latexdraw:type="text" id="id1155504612" fill="black" latexdraw:position="bl">
+            <text x="340.0000000000012" y="348.74456521739137">\begin{tabular}{c} {\Large Node} \\ \large (SM) \end{tabular}
 </text>
         </g>
-        <g latexdraw:type="text" id="id765806103" fill="black" latexdraw:position="bl">
-            <text x="592.1739130434794" y="478.3097826086958">\begin{tabular}{c} {\Large Node} \\ \large (SM) \end{tabular}
-</text>
-        </g>
-        <g latexdraw:type="text" id="id1494835988" fill="black" latexdraw:position="bl">
+        <g latexdraw:type="text" id="id990492732" fill="black" latexdraw:position="bl">
             <text x="282.6086956521749" y="702.657608695652">\begin{tabular}{c} {\Large Edge} \\ \large (BSM decay) \end{tabular}
+</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id5697133">
+            <polyline points="687.1611488579402,450.2706383088859 631.9692859246695,403.74023125633335 " stroke="#666666" stroke-width="2.0" fill="none" latexdraw:rotationAngle="3.9558273469270753" marker-end="url(#arrow1-5697133)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1724546535">
+            <polyline points="633.0089051936404,509.7361917881644 608.7302252411439,429.4920690814025 " stroke="#666666" stroke-width="2.0" fill="none" latexdraw:rotationAngle="3.9558273469270753" marker-end="url(#arrow1-1724546535)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id686763190">
+            <polyline points="748.6610791066831,367.99706135338187 663.5128339367951,381.6659821248807 " stroke="#666666" stroke-width="2.0" fill="none" latexdraw:rotationAngle="3.9558273469270753" marker-end="url(#arrow1-686763190)"/>
+        </g>
+        <g latexdraw:type="text" id="id1942512224" fill="black" latexdraw:position="bl">
+            <text x="556.5217391304352" y="401.78804347826116">\begin{tabular}{c} {\Large Node} \\ \Large Indices \end{tabular}
 </text>
         </g>
     </g>
     <defs>
-        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="13.339" id="arrow1-1165480430">
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="208.711" id="arrow1-1561332175">
             <path d="M 0.0 0.0 L -9.304166666666667 -3.322916666666667 L -9.304166666666667 0.0 L -9.304166666666667 3.322916666666667 z" fill="#666666" stroke="#666666" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
-        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="208.711" id="arrow1-209467460">
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="232.022" id="arrow1-1665138333">
             <path d="M 0.0 0.0 L -9.304166666666667 -3.322916666666667 L -9.304166666666667 0.0 L -9.304166666666667 3.322916666666667 z" fill="#666666" stroke="#666666" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
-        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="13.339" id="arrow1-1394926085">
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="216.737" id="arrow1-1744651998">
             <path d="M 0.0 0.0 L -9.304166666666667 -3.322916666666667 L -9.304166666666667 0.0 L -9.304166666666667 3.322916666666667 z" fill="#666666" stroke="#666666" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
-        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="216.737" id="arrow1-1825562550">
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="144.456" id="arrow1-635819267">
             <path d="M 0.0 0.0 L -9.304166666666667 -3.322916666666667 L -9.304166666666667 0.0 L -9.304166666666667 3.322916666666667 z" fill="#666666" stroke="#666666" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
-        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="144.456" id="arrow1-10868662">
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="220.133" id="arrow1-5697133">
+            <path d="M 0.0 0.0 L -9.304166666666667 -3.322916666666667 L -9.304166666666667 0.0 L -9.304166666666667 3.322916666666667 z" fill="#666666" stroke="#666666" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="253.166" id="arrow1-1724546535">
+            <path d="M 0.0 0.0 L -9.304166666666667 -3.322916666666667 L -9.304166666666667 0.0 L -9.304166666666667 3.322916666666667 z" fill="#666666" stroke="#666666" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="170.88" id="arrow1-686763190">
             <path d="M 0.0 0.0 L -9.304166666666667 -3.322916666666667 L -9.304166666666667 0.0 L -9.304166666666667 3.322916666666667 z" fill="#666666" stroke="#666666" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
     </defs>
@@ -61,8 +76,8 @@
             <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
             <latexdraw:positionVert/>
             <latexdraw:zoom>1.15</latexdraw:zoom>
-            <latexdraw:vpx>0.428</latexdraw:vpx>
-            <latexdraw:vpy>0.427</latexdraw:vpy>
+            <latexdraw:vpx>0.576</latexdraw:vpx>
+            <latexdraw:vpy>0.458</latexdraw:vpy>
         </latexdraw:metadata>
     </metadata>
 </svg>

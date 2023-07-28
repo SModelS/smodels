@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="89 327.44 848.692 171" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="picture" id="id1555083669">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_canon1b.png" x="686.1538461538453" y="347.44" height="131.0" width="213.0"/>
+        </g>
+        <g latexdraw:type="text" id="id333272072" fill="black" latexdraw:position="bl">
+            <text x="109.0" y="427.0">\Large topologyDict = $\left\{ 11101000 : \right.$</text>
+        </g>
+        <g latexdraw:type="picture" id="id28521542">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_canon1a.png" x="436.1538461538461" y="347.44" height="131.0" width="213.0"/>
+        </g>
+        <g latexdraw:type="text" id="id1516133849" fill="black" latexdraw:position="bl">
+            <text x="661.5384615384614" y="427.7499999999999">\Huge ,</text>
+        </g>
+        <g latexdraw:type="text" id="id270234645" fill="black" latexdraw:position="bl">
+            <text x="917.6923076923076" y="427.9">\Huge , ...</text>
+        </g>
+    </g>
+    <defs/>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
+            <latexdraw:positionVert/>
+            <latexdraw:zoom>1.3</latexdraw:zoom>
+            <latexdraw:vpx>0.67</latexdraw:vpx>
+            <latexdraw:vpy>0.373</latexdraw:vpy>
+        </latexdraw:metadata>
+    </metadata>
+</svg>
