@@ -1067,7 +1067,7 @@ class GenericSMS(object):
     def draw(self, particleColor='steelblue2',
                 smColor='lightpink2',
                 pvColor='darkgray',
-                labelAttr=None,
+                labelAttr='label',
                 attrUnit=None, filename=None, view=True,
                 maxLabelSize=10,
                 usePVimage=False,
@@ -1103,6 +1103,8 @@ class GenericSMS(object):
         nodesAndIndices = zip(self.nodes,self.nodeIndices)
 
         if labelAttr is None:
+            labels = {nodeIndex: "" for _,nodeIndex in nodesAndIndices}
+        elif labelAttr is 'label':
             labels = {nodeIndex: str(n) for n,nodeIndex in nodesAndIndices}
         elif attrUnit is not None:
             labels = {nodeIndex: str(getattr(n, labelAttr).asNumber(attrUnit))

@@ -2,10 +2,9 @@
 
 .. |invisible compression| replace:: :ref:`invisible compression <invComp>`
 .. |mass compression| replace:: :ref:`mass compression <massComp>`
-.. |element| replace:: :ref:`element <element>`
-.. |elements| replace:: :ref:`elements <element>`
-.. |topology| replace:: :ref:`topology <topology>`
-.. |topologies| replace:: :ref:`topologies <topology>`
+.. |SMS| replace:: :ref:`SMS <SMS>`
+.. |SMS topology| replace:: :ref:`SMS topology <SMS>`
+.. |SMS topologies| replace:: :ref:`SMS topologies <SMS>`
 .. |decomposition| replace:: :doc:`decomposition <Decomposition>`
 .. |theory predictions| replace:: :doc:`theory predictions <TheoryPredictions>`
 .. |theory prediction| replace:: :doc:`theory prediction <TheoryPredictions>`
@@ -20,7 +19,7 @@ Decomposition into Simplified Models
 ====================================
 
 Given an input model (see :doc:`Basic Input <BasicInput>`), the first task of SModelS is to decompose
-the full model into a sum of Simplified Models (or :ref:`elements <element>` in SModelS language).
+the full model into a sum of Simplified Models (|SMS|).
 
 .. _decomp:
 
@@ -29,15 +28,17 @@ Decomposition
 
 The input model stores information about  the masses of all
 the BSM states as well as their production cross sections, decay branching ratios and total widths.
-All the cross sections for *production of two* Z\ :sub:`2`-odd *states* serve as the initial step for the decomposition.
-(All the other cross sections with a different number of Z\ :sub:`2`-odd states are ignored.)
+All the cross sections for the *BSM particles* serve as the initial step for the decomposition.
 Starting from these primary mothers, all the possible decays are generated
 according to the decay information for each particle. This procedure is represented in the figure below:
 
 .. _decomp1:
 
-.. image:: images/decomp1B.png
+.. figure:: images/decomp1B.png
    :width: 45%
+   :align: center
+
+   First step of decomposition. The 
 
 
 Each of the possible cascade decays for each mother corresponds to a :ref:`branch <branch>`.
