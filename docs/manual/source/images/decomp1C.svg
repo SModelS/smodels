@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 29 1410 478.5" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="picture" id="id1975162904">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_decomp1.png" x="63.0" y="188.0" height="131.0" width="136.0"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1575707284">
+            <polyline points="223.0,191.0 293.0,171.0 " stroke="#c72b2b" stroke-width="3.0" fill="black" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1575707284)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1836217468">
+            <polyline points="225.84075596299277,308.18241484562304 288.1592440370072,345.81758515437696 " stroke="#3a85e2" stroke-width="3.0" fill="black" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1836217468)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1400790708">
+            <polyline points="154.0,317.0 82.0,386.0 " stroke="black" stroke-width="2.0" fill="black" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-1400790708)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id613148183">
+            <polyline points="149.0,239.0 82.0,386.0 " stroke="black" stroke-width="2.0" fill="black" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-613148183)"/>
+        </g>
+        <g latexdraw:type="text" id="id1264767957" fill="black" latexdraw:position="bl">
+            <text x="19.0" y="429.0">\LARGE {Primary Mothers}</text>
+        </g>
+        <g latexdraw:type="picture" id="id1298693123">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_decomp1d.png" x="447.0" y="327.0" height="93.0" width="99.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id2006750711">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_decomp1c.png" x="440.0" y="122.0" height="93.0" width="99.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id786374362">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_decomp1b.png" x="310.0" y="327.0" height="93.0" width="99.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id1309640139">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_decomp1a.png" x="310.0" y="95.0" height="147.0" width="99.0"/>
+        </g>
+        <g latexdraw:type="ellipse" id="id1831103481">
+            <ellipse cx="169.25" cy="289.0" rx="50.75" ry="31.0" latexdraw:borderPos="outer" stroke="#3a85e2" stroke-width="3.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="ellipse" id="id704978076">
+            <ellipse cx="169.25" cy="216.0" rx="50.75" ry="31.0" latexdraw:borderPos="outer" stroke="#c72b2b" stroke-width="3.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="text" id="id1247787694" fill="black" latexdraw:position="bl">
+            <text x="564.0" y="171.0">\Huge ...</text>
+        </g>
+        <g latexdraw:type="text" id="id1751827986" fill="black" latexdraw:position="bl">
+            <text x="564.0" y="374.0">\Huge ...</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id532223335">
+            <polyline points="665.0,280.0 734.0,281.0 " stroke="#666666" stroke-width="5.0" fill="black" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-532223335)"/>
+        </g>
+        <g latexdraw:type="text" id="id963044008" fill="black" latexdraw:position="bl">
+            <text x="317.0" y="86.0">\LARGE {Decays of  mother $A$}</text>
+        </g>
+        <g latexdraw:type="text" id="id751500882" fill="black" latexdraw:position="bl">
+            <text x="317.0" y="466.0">\LARGE {Decays of  mother $B$}</text>
+        </g>
+        <g latexdraw:type="text" id="id618381312" fill="black" latexdraw:position="bl">
+            <text x="417.0" y="179.0">\Huge ,</text>
+        </g>
+        <g latexdraw:type="text" id="id963963249" fill="black" latexdraw:position="bl">
+            <text x="420.0" y="387.0">\Huge ,</text>
+        </g>
+        <g latexdraw:type="rectangle" id="id1861698761">
+            <rect x="301.5" y="50.5" width="342.0" height="201.0" latexdraw:borderPos="outer" stroke="#cc3333" stroke-width="3.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="text" id="id354265724" fill="black" latexdraw:position="bl">
+            <text x="442.0" y="291.0">\Huge $\times$</text>
+        </g>
+        <g latexdraw:type="picture" id="id624868330">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_decomp2a.png" x="748.0" y="131.0" height="253.0" width="157.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id1358055680">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_decomp2b.png" x="982.0" y="131.0" height="253.0" width="157.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id1227813466">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_decomp2c.png" x="1207.0" y="174.0" height="200.0" width="157.0"/>
+        </g>
+        <g latexdraw:type="text" id="id1275008982" fill="black" latexdraw:position="bl">
+            <text x="930.0" y="284.0">\Huge ,</text>
+        </g>
+        <g latexdraw:type="text" id="id2041783738" fill="black" latexdraw:position="bl">
+            <text x="1167.0" y="284.0">\Huge ,</text>
+        </g>
+        <g latexdraw:type="rectangle" id="id1041163051">
+            <rect x="795.5" y="288.5" width="119.5" height="99.5" latexdraw:borderPos="outer" stroke="#3a85e2" stroke-width="3.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id477550814">
+            <rect x="301.5" y="317.5" width="342.0" height="168.5" latexdraw:borderPos="outer" stroke="#3a85e2" stroke-width="3.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id1550524907">
+            <rect x="1022.5" y="284.5" width="119.5" height="99.5" latexdraw:borderPos="outer" stroke="#3a85e2" stroke-width="3.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id168482370">
+            <rect x="1248.5" y="278.5" width="119.5" height="99.5" latexdraw:borderPos="outer" stroke="#3a85e2" stroke-width="3.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id325503801">
+            <rect x="796.0" y="132.0" width="111.0" height="146.0" latexdraw:borderPos="outer" stroke="#cc3333" stroke-width="3.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id2075372739">
+            <rect x="1027.0" y="129.0" width="111.0" height="146.0" latexdraw:borderPos="outer" stroke="#cc3333" stroke-width="3.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id1057299405">
+            <rect x="1254.0" y="172.0" width="111.0" height="95.0" latexdraw:borderPos="outer" stroke="#cc3333" stroke-width="3.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="text" id="id799560068" fill="black" latexdraw:position="bl">
+            <text x="805.0" y="109.0">\LARGE SMS 1</text>
+        </g>
+        <g latexdraw:type="text" id="id2144901551" fill="black" latexdraw:position="bl">
+            <text x="1035.0" y="111.0">\LARGE SMS 2</text>
+        </g>
+        <g latexdraw:type="text" id="id1864143327" fill="black" latexdraw:position="bl">
+            <text x="1259.0" y="156.0">\LARGE SMS 3</text>
+        </g>
+        <g latexdraw:type="text" id="id1795121184" fill="black" latexdraw:position="bl">
+            <text x="1389.0" y="284.0">\Huge ...</text>
+        </g>
+        <g latexdraw:type="text" id="id823507390" fill="black" latexdraw:position="bl">
+            <text x="157.0" y="226.0">\Large $A$</text>
+        </g>
+        <g latexdraw:type="text" id="id49212812" fill="black" latexdraw:position="bl">
+            <text x="157.0" y="298.0">\Large $B$</text>
+        </g>
+        <g latexdraw:type="text" id="id1909954552" fill="black" latexdraw:position="bl">
+            <text x="320.0" y="174.0">\large $A$</text>
+        </g>
+        <g latexdraw:type="text" id="id1742203140" fill="black" latexdraw:position="bl">
+            <text x="817.0" y="237.0">\large $A$</text>
+        </g>
+        <g latexdraw:type="text" id="id977601291" fill="black" latexdraw:position="bl">
+            <text x="1051.0" y="238.0">\large $A$</text>
+        </g>
+        <g latexdraw:type="text" id="id281223350" fill="black" latexdraw:position="bl">
+            <text x="1276.0" y="254.0">\large $A$</text>
+        </g>
+        <g latexdraw:type="text" id="id1477539355" fill="black" latexdraw:position="bl">
+            <text x="449.0" y="176.0">\large $A$</text>
+        </g>
+        <g latexdraw:type="text" id="id1892395897" fill="black" latexdraw:position="bl">
+            <text x="1275.0" y="308.0">\large $B$</text>
+        </g>
+        <g latexdraw:type="text" id="id799353528" fill="black" latexdraw:position="bl">
+            <text x="321.0" y="382.0">\large $B$</text>
+        </g>
+        <g latexdraw:type="text" id="id65652493" fill="black" latexdraw:position="bl">
+            <text x="457.0" y="382.0">\large $B$</text>
+        </g>
+        <g latexdraw:type="text" id="id1441102171" fill="black" latexdraw:position="bl">
+            <text x="816.0" y="317.0">\large $B$</text>
+        </g>
+        <g latexdraw:type="text" id="id720646794" fill="black" latexdraw:position="bl">
+            <text x="1050.0" y="319.0">\large $B$</text>
+        </g>
+    </g>
+    <defs>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="344.055" id="arrow1-1575707284">
+            <path d="M 0.0 0.0 L -4.034722222222222 -4.322916666666667 L -4.034722222222222 0.0 L -4.034722222222222 4.322916666666667 z" fill="#c72b2b" stroke="#c72b2b" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="31.128" id="arrow1-1836217468">
+            <path d="M 0.0 0.0 L -4.034722222222222 -4.322916666666667 L -4.034722222222222 0.0 L -4.034722222222222 4.322916666666667 z" fill="#3a85e2" stroke="#3a85e2" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="316.219" id="arrow0-1400790708">
+            <path d="M 0.0 0.0 L -9.304166666666667 -3.322916666666667 L -9.304166666666667 0.0 L -9.304166666666667 3.322916666666667 z" fill="black" stroke="black" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="294.503" id="arrow0-613148183">
+            <path d="M 0.0 0.0 L -9.304166666666667 -3.322916666666667 L -9.304166666666667 0.0 L -9.304166666666667 3.322916666666667 z" fill="black" stroke="black" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="0.83" id="arrow1-532223335">
+            <path d="M 0.0 0.0 L -5.901388888888889 -6.322916666666667 L -5.901388888888889 0.0 L -5.901388888888889 6.322916666666667 z" fill="#666666" stroke="#666666" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+    </defs>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
+            <latexdraw:positionVert/>
+            <latexdraw:zoom>1.0</latexdraw:zoom>
+            <latexdraw:vpx>0.5</latexdraw:vpx>
+            <latexdraw:vpy>0.393</latexdraw:vpy>
+        </latexdraw:metadata>
+    </metadata>
+</svg>
