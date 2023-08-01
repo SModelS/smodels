@@ -1104,7 +1104,7 @@ class GenericSMS(object):
 
         if labelAttr is None:
             labels = {nodeIndex: "" for _,nodeIndex in nodesAndIndices}
-        elif labelAttr is 'label':
+        elif labelAttr == 'label':
             labels = {nodeIndex: str(n) for n,nodeIndex in nodesAndIndices}
         elif attrUnit is not None:
             labels = {nodeIndex: str(getattr(n, labelAttr).asNumber(attrUnit))

@@ -30,7 +30,7 @@ The input model stores information about  the masses of all
 the BSM states as well as their production cross sections, decay branching ratios and total widths.
 All the cross sections for the *BSM particles* serve as the initial step for the decomposition.
 Starting from these primary mothers, all the possible decays are generated
-according to the decay information for each particle. This procedure is represented in the figure below:
+according to the decay information for each particle. This procedure is represented in :numref:`Fig. %s <decomp1>`.
 
 .. _decomp1:
 
@@ -38,7 +38,7 @@ according to the decay information for each particle. This procedure is represen
    :width: 45%
    :align: center
 
-   First step of decomposition. The 
+   First step of decomposition. The BSM particles produced in the hard scattering (primary vertex) are used as the initial step for constructing the |SMS topologies|.
 
 
 Each of the possible cascade decays for each mother corresponds to a :ref:`branch <branch>`.
@@ -47,8 +47,11 @@ as shown below:
 
 .. _decomp2:
 
-.. image:: images/decomp2B.png
+.. figure:: images/decomp2B.png
    :width: 65%
+   :align: center
+
+   Schematic representation of the decomposition procedure.
 
 
 For instance, assume [b1,b2,b3] and [B1,B2] represent all possible branches (or cascade decays)
