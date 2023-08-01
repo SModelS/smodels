@@ -9,9 +9,7 @@
 from __future__ import print_function
 import os
 from smodels.installation import installDirectory, version
-from smodels.particlesLoader import load
 from smodels.base import smodelsLogging
-from smodels.base import runtime
 from smodels.matching import modelTester
 from smodels.tools import crashReport
 

@@ -2,10 +2,9 @@
 
 """
 .. module:: particlesLoader
-   :synopsis: Loads the file Defining the list of Z2-even and Z2-odd particles to be used.
+   :synopsis: Loads the file defining the list of BSM particles to be used.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
-.. moduleauthor:: Matthias Wolf <matthias.wolf@wot.at>
 
 """
 
@@ -15,6 +14,7 @@ from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.base.smodelsLogging import logger
 from smodels.base.particle import Particle
 from smodels.installation import installDirectory
+from smodels.share.models.SMparticles import SMList
 from importlib import import_module
 
 
@@ -22,8 +22,6 @@ from importlib import import_module
 def getParticlesFromSLHA(slhafile):
     """
     Defines BSM particles from the QNUMBERS blocks in the slhafile.
-    OBS: If the QNUMBERS block does not include a 5-th entry, the particle
-    will be assumed to be Z2-odd
 
     :param slhafile: Path to the SLHA file
 
@@ -32,7 +30,18 @@ def getParticlesFromSLHA(slhafile):
 
     checkDirs = [os.path.join(installDirectory(), "smodels", "share", "models"), installDirectory(),
                 os.path.join(installDirectory(), "smodels")]
-
+    
+    # Create a list of SM PDGs, so if a QNUMBERS block for a SM particle
+    # is present, it will be ignored.
+    SMpdgs = set()
+    for ptc in SMList:
+        if isinstance(ptc.pdg,(int,float)):
+            SMpdgs.add(int(abs(ptc.pdg)))
+        else:
+            for pdg in ptc.pdg:
+                SMpdgs.add(int(abs(pdg)))
+    SMpdgs = list(SMpdgs)
+    
     filename = slhafile
     #If file does not exist, check if it is in any of the default folders:
     if not os.path.isfile(slhafile):
@@ -111,7 +120,12 @@ def getParticlesFromSLHA(slhafile):
         if any(not x in numbers for x in [1,2,3]):
             logger.error("Missing quantum numbers in block:\n %s\n" %b)
             continue
-        # Assume all particles are BSM particles
+
+        # Ignore SM blocks:
+        if abs(pdg) in SMpdgs:
+            continue
+
+        # If it is not a SM particle, assume it is a BSM particle
         newParticle = Particle(isSM=False, label=label, pdg=pdg,
                                eCharge=numbers[1]/3.,
                                colordim=numbers[3],

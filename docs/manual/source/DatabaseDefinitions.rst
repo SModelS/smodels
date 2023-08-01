@@ -55,7 +55,7 @@ Therefore, for both |UL| and |EM| constraints, the database obeys the following 
 
             * Upper Limit map: contains the upper limit constraints for |ULrs|. Each map contains
               upper limits for the signal cross-section for a single simplified model 
-              (or more precisely to a single |SMS topologies| or sum of |SMS topologies|)
+              (or more precisely to a single |SMS topology| or sum of |SMS topologies|)
               as a function of the simplified model parameters.
             * Efficiency map: contains the efficiencies for |EMrs|. Each map contains efficiencies
               for the signal for a single simplified model (or more precisely to a single |SMS topologies| or sum of |SMS topologies|)
@@ -301,6 +301,5 @@ A complete list of TxNames can be found `here <http://smodels.github.io/docs/Sms
 *More details about the database folder structure and object
 structure can be found in* :ref:`Database of Experimental Results<databaseStruct>`. 
 
-.. [#f1] The name *Data Set* is used instead of signal region because its concept is slightly more general. For instance,
-   in the case of |ULrs|, a |Dataset| may not correspond to a single signal region, but to a combination of signal regions.
+.. [#f1] The name *Data Set* is used instead of signal region because its concept is slightly more general. For instance, in some |EMrs| a |Dataset| may not correspond to an aggregated signal region, while for |ULrs| it may correspond to a combination of all signal regions.
  

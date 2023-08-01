@@ -18,7 +18,10 @@ from smodels.base import runtime
 from smodels.particlesLoader import load
 import subprocess
 from smodels.base.smodelsLogging import logger
-setLogLevel('debug')
+from smodels.base.model import Model
+from smodels.share.models.SMparticles import SMList
+
+setLogLevel('error')
 
 
 class ModelsTest(unittest.TestCase):
@@ -109,6 +112,8 @@ class ModelsTest(unittest.TestCase):
         hp = Particle(isSM=False,label='h+',pdg=37,eCharge=1.0,colordim=1,spin=0.0)
         hm = Particle(isSM=False,label='h-',pdg=-37,eCharge=-1.0,colordim=1,spin=0.0)
         BSMListDefault = [hm,h2,h3,hp]
+
+        self.assertEqual(len(BSMList),len(BSMListDefault))
         for i,p in enumerate(BSMListDefault):
             pDict = p.__dict__
             pDict.pop('_comp')
@@ -127,8 +132,6 @@ class ModelsTest(unittest.TestCase):
 
     def testUpdateParameters(self):
         from smodels.share.models.mssm import BSMList
-        from smodels.share.models.SMparticles import SMList
-        from smodels.base.model import Model
         from smodels.base.physicsUnits import GeV
 
         slhafile = "./testFiles/slha/hscpTest_short.slha"
@@ -141,6 +144,34 @@ class ModelsTest(unittest.TestCase):
         p = model.getParticlesWith(pdg=1000012)[0]
         self.assertEqual(p.mass,5.0*GeV)
 
+    # Check if models loaded through python module or through SLHA QNUMBERS give the same model
+    def testRuntimeImport(self):
+
+        filename = "./testFiles/slha/gluino_squarks.slha"
+        runtime.modelFile = 'mssm'
+        BSMList = load()
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(filename)
+
+        runtime.modelFile = 'mssmQNumbers.slha'
+        BSMList = load()
+        modelB = Model(BSMparticles=BSMList, SMparticles=SMList)
+        modelB.updateParticles(filename)
+
+        for ptc in model.BSMparticles:
+            ptcB = modelB.getParticlesWith(pdg = ptc.pdg)
+            if not ptcB: #If particule is its own anti-particle, it should not appear in modelB
+                ptcB = modelB.getParticlesWith(pdg = -ptc.pdg)
+            self.assertEqual(len(ptcB),1)
+            ptcB = ptcB[0]
+            for attr,val in ptc.__dict__.items():
+                if attr in ['_id','label','_comp','pdg','_isInvisible']:
+                    continue
+                valB = getattr(ptcB,attr)
+                if attr == 'decays':
+                    self.assertEqual(len(val),len(valB))
+                    continue
+                self.assertEqual(val,valB)
 
 
     def removeOutputs(self, f):
