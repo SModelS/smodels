@@ -113,9 +113,9 @@ class CoverageTest(unittest.TestCase):
 
     def testUncoveredTree(self):
 
-        p1 = Particle(Z2parity=-1, label='p1', pdg=10001, mass=100.*GeV,
+        p1 = Particle(isSM=False, label='p1', pdg=10001, mass=100.*GeV,
               eCharge=0., colordim=1, totalwidth=0*GeV)
-        p2 = Particle(Z2parity=-1, label='p2', pdg=10002, mass=200.*GeV,
+        p2 = Particle(isSM=False, label='p2', pdg=10002, mass=200.*GeV,
               eCharge=0., colordim=1, totalwidth=1e-15*GeV)
         pv = Particle(isSM=True, label='PV', pdg=0)
 
