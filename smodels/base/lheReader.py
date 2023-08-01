@@ -182,18 +182,13 @@ class SmsEvent(object):
         Return the pdgs of the mothers, None if a problem occurs.
 
         """
+        
         momspdg = []
-        imom = 0
         for p in self.particles:
             if len(p.moms) > 1 and p.moms[0] == 1 or p.moms[1] == 1:
                 momspdg.append(p.pdg)
-                imom += 1
-        if imom != 2:
-            logger.error("Number of mother particles %d != 2", imom)
-            raise SModelSError()
-        if momspdg[0] > momspdg[1]:
-            momspdg[0], momspdg[1] = momspdg[1], momspdg[0]
-        return momspdg
+
+        return sorted(momspdg)
 
 
     def __str__(self):
