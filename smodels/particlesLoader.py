@@ -161,7 +161,8 @@ def getParticlesFromModule(modelFile):
     if "/" in fname:
         import shutil
         filename = os.path.basename(fname)
-        shutil.copy(fname, filename)
+        if not os.path.samefile ( fname, filename ):
+            shutil.copy(fname, filename)
     else:
         filename = fname
 
