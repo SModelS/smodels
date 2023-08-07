@@ -47,6 +47,7 @@ class XSecResummino(XSecBasis):
         """
         self.resummino_bin = "./smodels/lib/resummino/resummino-3.1.2/bin/resummino"
         self.input_file_original = "smodels/etc/ff1a240db6c1719fe9f299b3390d49d32050c4f1003286d2428411eca45bd50c.in"
+        self.json_resummino = "smodels/etc/resummino.json"
         self.slha_folder_name = slha_folder_name
         self.maxOrder = maxOrder
         self.countNoXSecs = 0
@@ -55,12 +56,18 @@ class XSecResummino(XSecBasis):
         self.ncpu = ncpu
         self.sqrts = sqrt
         self.type = type
-        sqrts = [float(x) for x in self.sqrts]
-        self.sqrt = sqrts[0]
+        # sqrts = [float(x) for x in self.sqrts]
+        # self.sqrt = sqrts[0]
+        self.sqrt = sqrt
     
+        with open(self.json_resummino, "r") as f:
+            data = json.load(f)
+                             
+        self.mode_limit = data["mode_limit"]
+        
     def one_slha_calculation(self, particles,input_file, slha_file, output_file, num_try, order, mode):
         """
-        Gestion du fichier log et lancement de la commande lancant Resummino
+        log file management and launch resummino command
         """
         with open('log.txt', 'a') as f:
             f.write(f'{particles} cross-sections written in {slha_file}\n')
@@ -82,8 +89,7 @@ class XSecResummino(XSecBasis):
            
     def launch_command(self,resummino_bin,input_file, output_file, order):
         """
-        Lance la commande pour resummino, pour modifier l'emplacement de resummino
-        il faut préciser le resummino_bin.
+        use resummino at the order asked by the user (order variable)
         """
         if order == 0:
             commande = f"{resummino_bin} {input_file} --lo"
@@ -98,25 +104,28 @@ class XSecResummino(XSecBasis):
 
 
     def launcher(self, input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, mode):
+        """
+        Check everything before launching resummino
+        """
+        
         #modifie_slha_file(input_file, input_file, slha_file)
         self.modifie_outgoing_particles(input_file, input_file, particle_1, particle_2)
-        #on lance si c'est le premier essai par défaut
         
         already_written_canal = self.canaux_finding(slha_file)
 
         _ = str(self.sqrt*10**(-1))+'0E+04'
-        print(((particle_1, particle_2), _, order) in already_written_canal)
-        print(particle_1,particle_2, order, _)
+        print("channel, order and cross section",particle_1,particle_2, order, _)
         print(already_written_canal)
         if (((particle_1, particle_2), _, order)) in already_written_canal:
             print('wow')
             return
+        
         if mode == "check":
             self.launch_command(self.resummino_bin, input_file, output_file, 0)
             infos = self.search_in_output(output_file)
             infos = infos[0].split(" ")[2][1:]
-            print(infos)
-            print(float(infos)>10**(-5))
+            print("cross section is ", infos, "at LO order")
+            print("Is cross section above the limit ?", float(infos)>10**(-5))
             if (float(infos))>(10**(-5)):
                 print(num_try)
                 self.launch_command(self.resummino_bin, input_file, output_file, order)
@@ -125,22 +134,28 @@ class XSecResummino(XSecBasis):
             else:
                 hist = self.write_in_slha(output_file, slha_file, 0, particle_1, particle_2, self.type, Xsections)
             return
-            
-            
+        
+        if mode == "all":
+            self.launch_command(self.resummino_bin, input_file, output_file, order)
+            if num_try == 0:
+                hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections)
+            return
+        
+        #:hist: variable to check if there is a problem in the cross section (strange value or no value)
         hist = 0
 
         
         if num_try == 0 and mode != "check":
             self.launch_command(self.resummino_bin, input_file, output_file, order)
 
-        #Ici on écrit dans le fichier slha, la variable hist permet de voir s'il y a eu une erreur
-        #Dans le calcul des section efficaces Lo et NLO
+
+        #here we write in the slha file.
             hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections)
 
-        #On vérifie si jamais on a écrit trop de choses
+        #we check if we have written too much cross section
         self.are_crosssection(slha_file, order)
 
-        #Si jamais il y a effectivement une erreur, on l'indique et on relance avec cette fois num_try = 0
+        #if there is an error, we inform the user and launch again resummino
         if hist == 1:
             print("error")
             num_try = 0
@@ -151,11 +166,11 @@ class XSecResummino(XSecBasis):
 
     def search_in_output(self, output_file):
         Infos = []
-        with open(output_file, 'r') as f: #Chemin a modifier si dossier différent pour les fichiers .txt
+        with open(output_file, 'r') as f:
             data = f.readlines()
         for i in range(len(data)):
             if "Results:" in data[i]:
-                LO = data[i+1][:-1] #[:-1] pour enlever le \n
+                LO = data[i+1][:-1] #[:-1] to get rid of the \n
                 NLO = data[i+2][:-1]
                 NLL = data[i+3][:-1]
                 Infos.append((LO,NLO,NLL))
@@ -219,7 +234,19 @@ class XSecResummino(XSecBasis):
         return 0
 
     def extract_m1_m2_mu(self, file_path):
+        """_summary_
         
+        function to extract the breaking term of the electrowikino part (SUSY) in
+        an slha file.
+        Args:
+            file_path (_string_): _path of the slha file_
+
+        Returns:
+            _type_: _description_
+            _int_: _M1 breaking term in SUSY models_
+            _int_: _M2 braking term in SUSY models_
+            _int_: _mu breaking term in SUSY models_
+        """
         data = pyslha.read(file_path)
 
         m1 = data.blocks['EXTPAR'][1]
@@ -246,8 +273,8 @@ class XSecResummino(XSecBasis):
 
     def are_crosssection(self, slha_file, order):
         """
-        Vérifie si les sections efficaces sont déjà écrites, et supprime
-        également les doublons (smodels s'en charge mais c'est toujours mieux)
+        check if the cross sections are already written, and remove the
+        cross section written twice.
         """
         with open(slha_file, 'r') as f:
             data = f.readlines()
@@ -301,11 +328,11 @@ class XSecResummino(XSecBasis):
                 canaux.append((canal, sqrt, order))
         return canaux
 
-    #Choisi ici les canaux que tu souhaites utiliser
+
     def discrimination_particles(self, slha_file):
         """
-        Choix des différents canaux et conditions sur les calculs de sections efficaces
-        pour l'instant C1<92 or N1>600 or C2>1200
+        Choice of the differents channel and condtions on the cross section calculation.
+        C1<92 or N1>600 or C2>1200 by default.
         """
         m1,m2,mu = self.extract_m1_m2_mu(slha_file)
         N1,N2,C1,C2 = self.extract_N1_N2_C1(slha_file)
@@ -320,43 +347,47 @@ class XSecResummino(XSecBasis):
       
     def routine_creation(self, order, slha_folder_name):
     #slha_file = "outputM_12000M_20mu100.slha"
-        #Fichier d'input de resummino de référence
 
-        #Ne fait rien
+        #You haven't seen anything.
         output_file = "output_file.txt"
 
-        #Listes des differents fichiers sur lesquels faire tourner le logiciel
+        #List of the differents files on which resummino will be launch
         Liste_slha = []
         Liste_resummino_in = []
         Liste_output_file = []
         Liste_particles = []
         Liste = []
 
-        #Vérification des dossiers d'entrée et sortie de Resummino
+        #Check if the folder already exists
         if not os.path.exists('smodels/lib/resummino/resummino_in'):
             os.mkdir('smodels/lib/resummino/resummino_in')
         if not os.path.exists('smodels/lib/resummino/resummino_out'):
             os.mkdir('smodels/lib/resummino/resummino_out')
 
-        #On créer la liste des fichiers d'entrée
+        #Check if the input is a file or a directory
         if not slha_folder_name.endswith(".slha"):
             liste_slha = os.listdir(slha_folder_name)
         else:
             liste_slha = [slha_folder_name]
-        #ancre
+            
+        #current directory
         pwd = os.getcwd()
 
-        #Utilisation chemin absolu (à privilégier)
+        #always use absolute path
         slha_folder = os.path.join(pwd, slha_folder_name)
 
-        #a = nombre fichiers, b = nombre fichiers déjà écris, c = nombre fichiers déjà ignorés
+        '''
+        a = number of files
+        b = number of files with already a cross section
+        c = number of files ignored
+        '''
         a,b,c = 0,0,0
 
-        #Boucle sur tous les fichiers, dans l'ordre de listdir (ordre +/- aléatoire)
+        #Loop on all the slha file, in a random order (os.listdir)
         for slha in liste_slha:
 
             slha_path = os.path.join(slha_folder,slha)
-            #Variable utilisée pour éviter les abérations (grosse différence LO/NLO)
+            #Variable used to avoid strange result (huge difference between LO and NLO result)
             num_try = 0
             with open(slha_path, 'r') as f:
                 data = f.readlines()
@@ -371,7 +402,7 @@ class XSecResummino(XSecBasis):
                 #On augmente cette variable de 1, comme ca si elle est > 0 on ne refait pas le calcul
                 num_try+=1
 
-            #on enlève le .slha
+            #remove the .slha
             slha_file_name = slha[6:-5]
 
             #On prend le fichier de référence, et on créer une copie dans resummino_in avec le bon fichier slha
@@ -399,7 +430,7 @@ class XSecResummino(XSecBasis):
             lines = f.readlines()
 
         try:        
-            with open("resummino.json", "r") as fi:
+            with open(self.json_resummino, "r") as fi:
                  data = json.load(fi)
                         
             pdf = data["pdf"]
@@ -416,15 +447,15 @@ class XSecResummino(XSecBasis):
                         line = f"center_of_mass_energy = 8000"
 
 
-    def json_extraction(self, file = "resummino.json"):
-        with open(file, "r") as f:
+    def json_extraction(self):
+        with open(self.json_resummino, "r") as f:
             data = json.load(f)
         
         mode = data["mode"]
         
-        canaux = data["canaux"]
+        channels = data["channels"]
         particles = []
-        for clef, valeurs in canaux.items():
+        for clef, valeurs in channels.items():
             particles.append((valeurs[0], valeurs[1]))
             
         return mode, particles
@@ -485,7 +516,13 @@ def main(args):
     print("order" + str(order))
     print("ncpu" + str(ncpus))
     print([float(x) for x in sqrtses])
-    test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus, type = type_writting)
-    test.routine_resummino()
+    
+    for sqrt in sqrtses:
+        test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting)
+        test.routine_resummino()
+    return
+    
+    # test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus, type = type_writting)
+    # test.routine_resummino()
     
 
