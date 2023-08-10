@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="83 104 702 419" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="picture" id="id1008798129">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_massCompA.png" x="103.0" y="168.0" height="333.0" width="275.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id1102174696">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_massCompB.png" x="549.0" y="196.0" height="307.0" width="216.0"/>
+        </g>
+        <g latexdraw:type="text" id="id2123749950" fill="black" latexdraw:position="bl">
+            <text x="225.0" y="252.0">$M_B$</text>
+        </g>
+        <g latexdraw:type="text" id="id55726674" fill="black" latexdraw:position="bl">
+            <text x="265.0" y="225.0">$M_C$</text>
+        </g>
+        <g latexdraw:type="text" id="id642084664" fill="black" latexdraw:position="bl">
+            <text x="151.0" y="331.0">$M_{A}$</text>
+        </g>
+        <g latexdraw:type="text" id="id1075798254" fill="black" latexdraw:position="bl">
+            <text x="347.0" y="175.0">$M_D$</text>
+        </g>
+        <g latexdraw:type="ellipse" id="id325513218" transform="rotate(-0.8547052422450959 0.0 0.0) translate(-4.433576510200567 4.404945555175402)">
+            <ellipse cx="297.49999999999994" cy="294.99999999999994" rx="31.0" ry="23.5" latexdraw:borderPos="outer" stroke="#b31a1a" stroke-width="3.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1884555279">
+            <polyline points="345.0,340.0 325.0,315.0 " stroke="red" stroke-width="2.0" fill="none" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-1884555279)"/>
+        </g>
+        <g latexdraw:type="text" id="id726853111" fill="#666666" latexdraw:position="bl">
+            <text x="296.0" y="389.0">\textcolor{red}{\begin{tabular}{c} soft final \\ state\end{tabular}}</text>
+        </g>
+        <g latexdraw:type="text" id="id499904092" fill="black" latexdraw:position="bl">
+            <text x="605.0" y="333.0">$M_{A}$</text>
+        </g>
+        <g latexdraw:type="text" id="id2019978297" fill="black" latexdraw:position="bl">
+            <text x="654.0" y="253.0">$M_C$</text>
+        </g>
+        <g latexdraw:type="text" id="id672423920" fill="black" latexdraw:position="bl">
+            <text x="733.0" y="200.0">$M_D$</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id238748412">
+            <polyline points="410.0,347.0 505.0,347.0 " stroke="#666666" stroke-width="5.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-238748412)"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id124956230">
+            <rect x="201.0" y="196.0" width="123.0" height="93.0" latexdraw:borderPos="outer" stroke="#666666" stroke-width="2.0" fill="none" stroke-linecap="round" stroke-dasharray="1, 7.291666666666667"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id1584441112">
+            <rect x="636.0" y="227.0" width="88.0" height="66.0" latexdraw:borderPos="outer" stroke="#666666" stroke-width="2.0" fill="none" stroke-linecap="round" stroke-dasharray="1, 7.291666666666667"/>
+        </g>
+        <g latexdraw:type="bezierCurve" id="id159309330">
+            <path d="M 660.0 220.0 C 532.4499124298253 89.84063496785726 400.0 120.0 285.0 185.0" stroke="#666666" stroke-width="2.0" fill="none" latexdraw:rotationAngle="3.1679975975602632" marker-start="url(#arrow0-159309330)"/>
+        </g>
+        <g latexdraw:type="text" id="id792487866" fill="black" latexdraw:position="bl">
+            <text x="369.0" y="124.0">\Large Mass Compression</text>
+        </g>
+        <g latexdraw:type="text" id="id1358614583" fill="black" latexdraw:position="bl">
+            <text x="404.0" y="159.0">$M_B - M_C &lt; \delta m$</text>
+        </g>
+        <g latexdraw:type="text" id="id1320681788" fill="black" latexdraw:position="bl">
+            <text x="618.0" y="355.0">$A$</text>
+        </g>
+        <g latexdraw:type="text" id="id380021771" fill="black" latexdraw:position="bl">
+            <text x="232.0" y="273.0">$B$</text>
+        </g>
+        <g latexdraw:type="text" id="id1723881591" fill="black" latexdraw:position="bl">
+            <text x="679.0" y="275.0">$C$</text>
+        </g>
+        <g latexdraw:type="text" id="id260726435" fill="black" latexdraw:position="bl">
+            <text x="291.0" y="247.0">$C$</text>
+        </g>
+        <g latexdraw:type="text" id="id2024599592" fill="black" latexdraw:position="bl">
+            <text x="737.0" y="223.0">$D$</text>
+        </g>
+        <g latexdraw:type="text" id="id267462633" fill="black" latexdraw:position="bl">
+            <text x="349.0" y="194.0">$D$</text>
+        </g>
+        <g latexdraw:type="text" id="id1461948329" fill="black" latexdraw:position="bl">
+            <text x="172.0" y="353.0">$A$</text>
+        </g>
+    </g>
+    <defs>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="51.34" id="arrow0-1884555279">
+            <path d="M 0.0 0.0 L -9.304166666666667 -3.322916666666667 L -9.304166666666667 0.0 L -9.304166666666667 3.322916666666667 z" fill="red" stroke="red" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="auto" id="arrow1-238748412">
+            <path d="M 0.0 0.0 L -17.704166666666666 -6.322916666666667 L -17.704166666666666 0.0 L -17.704166666666666 6.322916666666667 z" fill="#666666" stroke="#666666" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="45.58" id="arrow0-159309330">
+            <path d="M 0.0 0.0 L -9.304166666666667 -3.322916666666667 L -9.304166666666667 0.0 L -9.304166666666667 3.322916666666667 z" fill="#666666" stroke="#666666" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+    </defs>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
+            <latexdraw:positionVert/>
+            <latexdraw:zoom>1.25</latexdraw:zoom>
+            <latexdraw:vpx>0.482</latexdraw:vpx>
+            <latexdraw:vpy>0.39</latexdraw:vpy>
+        </latexdraw:metadata>
+    </metadata>
+</svg>

@@ -1,11 +1,4 @@
 ###### pythonic requirements for readthedocs.io ######
 jupyter
 nbconvert
-unum
-pyslha
-numpy
-scipy
 sphinx_rtd_theme
-plotly
-pyhf
-torch
