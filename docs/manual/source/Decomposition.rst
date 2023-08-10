@@ -79,7 +79,7 @@ A topology dictionary is constructed mapping the canonical names to a list of |S
 .. _topoDict:
 
 .. figure:: images/topologyDict.png
-   :width: 90%
+   :width: 50%
    :align: center
    
    Example of how the |SMS topologies| are grouped in the topology dictionary after decomposition.
@@ -168,7 +168,7 @@ A simple example is
 
 as the last step of the decay chain, where :math:`\nu` is a SM neutrino and :math:`A` is a *neutral particle*.
 Since the neutrinos are invisible, for all experimental purposes, the effective MET object is :math:`A = \nu + \nu`.
-Hence it is possible to omit the last step in the cascade decay, resulting in a compressed |topology|. This compression is illustrated in :numref:`Fig. % <massInvfig>`.
+Hence it is possible to omit the last step in the cascade decay, resulting in a compressed |topology|. This compression is illustrated in :numref:`Fig. %s <massInvfig>`.
 In order for a decay to be invisibly compressed, it must satisfy the following conditions:
 
   1. The decay must be of the type :math:`A \to B + C ...`, where :math:`B,C,...` are all invisible final states.
@@ -200,7 +200,7 @@ In order to improve the code performance, |SMS topologies| created during |decom
 Since the |topologies| correspond to a rooted tree graph (see :ref:`SMS Definitions <SMSDefs>`), the |particles| (nodes) appearing in the tree can be sorted to a standard ordering. Two |particles| belonging to the same mother can be compared according to their :ref:`canonical names <canonicalname>` and their |particle| properties.
 
 
-In :numref:`Fig. % <sortfig>` we illustrate the sorting procedure according for a given |SMS|. First the nodes are sorted according to their :ref:`canonical names <canonicalname>` (nodes at the top have smaller canonical names), so the order of the two primary particles generated in the hard scattering is reversed. Second, nodes (|particles|) with the same :ref:`canonical names <canonicalname>` are compared according to their properties:
+In :numref:`Fig. %s <sortfig>` we illustrate the sorting procedure according for a given |SMS|. First the nodes are sorted according to their :ref:`canonical names <canonicalname>` (nodes at the top have smaller canonical names), so the order of the two primary particles generated in the hard scattering is reversed. Second, nodes (|particles|) with the same :ref:`canonical names <canonicalname>` are compared according to their properties:
    
    1. BSM particle or SM particle
    2. Spin 
@@ -209,12 +209,12 @@ In :numref:`Fig. % <sortfig>` we illustrate the sorting procedure according for 
    5. Mass
    6. Total width
 
-In the example shown in :numref:`Fig. % <sortfig>` particle :math:`A` is assumed to be "larger" than :math:`B`, so their order is reversed (:math:`B` appears at the top and :math:`A` at the bottom).
+In the example shown in :numref:`Fig. %s <sortfig>` particle :math:`A` is assumed to be "larger" than :math:`B`, so their order is reversed (:math:`B` appears at the top and :math:`A` at the bottom).
 
 .. _sortfig:
 
 .. figure:: images/smsSort.png
-   :width: 60%
+   :width: 50%
    :align: center
 
    Example of sorting of the nodes of a given |SMS topology|. In this example particle :math:`A` is assumed to be "larger" than particle :math:`B` (according to their properties).
@@ -223,7 +223,7 @@ Finally, after being sorted, two distinct |SMS| can be directly compared accordi
  
  
 
-* **SMS sorting is implemented by the** `sort <decomposition.html#decomposition.theorySMS.TheorySMS.sort>`_ **method**.
+* **SMS sorting is implemented by the** `sort <base.html#base.genericSMS.GenericSMS.sort>`_ **method**.
 
 
 

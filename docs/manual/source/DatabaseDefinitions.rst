@@ -111,7 +111,7 @@ as a function of the respective parameter space (usually BSM masses
 or slices over mass planes). The UL values typically refer to the best signal region
 (for a given point in parameter space) or a combination of signal regions.
 Hence, for UL results there is a single |Dataset|, containing one
-or more UL maps. An example of a UL map is shown below:
+or more UL maps. An example of a UL map is shown in :numref:`Fig.%s <ULplot>` .
 
 .. _ULplot:
 
