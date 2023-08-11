@@ -729,6 +729,7 @@ def _getCombinedResultFor(dataSetResults, expResult):
     smsList = []
     totalXsec = None
     datasetPredictions = []
+    avgSMSlist = []
     for predList in dataSetResults:
         if len(predList) != 1:
             raise SModelSError("Results with multiple datasets should have a single theory prediction (EM-type)!")
@@ -736,6 +737,7 @@ def _getCombinedResultFor(dataSetResults, expResult):
         datasetPredictions.append(pred)
         txnameList += pred.txnames
         smsList += pred.smsList
+        avgSMSlist.append(pred.avgSMS)
         if totalXsec is None:
             totalXsec = pred.xsection
         else:
@@ -743,13 +745,21 @@ def _getCombinedResultFor(dataSetResults, expResult):
 
     txnameList = list(set(txnameList))
 
+    # Check if all avgSMS are the same:
+    uniqueSMS = all(avgSMSlist[0] == avgSMS for avgSMS in avgSMSlist[1:])
+    # If so, keep it in the theoryPrediction, otherwise set to None
+    if uniqueSMS:
+        avgSMS = avgSMSlist[0]
+    else:
+        avgSMS = None
+
     # Create a combinedDataSet object:
     combinedDataset = CombinedDataSet(expResult)
     # Create a theory preidction object for the combined datasets:
     theoryPrediction = TheoryPrediction()
     theoryPrediction.dataset = combinedDataset
     theoryPrediction.txnames = txnameList
-    theoryPrediction.avgSMS = None
+    theoryPrediction.avgSMS = avgSMS
     theoryPrediction.xsection = totalXsec
     theoryPrediction.datasetPredictions = datasetPredictions
     theoryPrediction.conditions = None

@@ -114,28 +114,30 @@ The procedure just described can be applied to any pair of |SMS topologies|\ [#f
 Computing Theory Predictions
 ----------------------------
 
-As discussed in :doc:`Database Definitions <DatabaseDefinitions>`, the SModelS  database allows
-for two types of experimental constraints: 
-Upper Limit constraints   (see |ULrs|) and Efficiency Map constraints (see |EMrs|). 
-Each of them requires different theoretical predictions to be compared against experimental data.
+Once the |SMS topologies| coming out of the |decomposition| have been matched to the database topologies,
+the relevant (effective) cross-sections need to be computed and compared to their respective upper limits
+for a given :ref:`experimental result <ExpResult>` (see :numref:`Fig. %s <tpA>`).
+As discussed in |database|, the SModelS allows
+for two types of :ref:`experimental results <ExpResult>`: 
+|ULrs| and |EMrs|. 
+Each of them requires slightly different theoretical predictions to be compared against experimental data.
 
-|ULrs| constrains the weight (|sigBR|) of one |element| or sum of |elements|.
-Therefore SModelS must compute the theoretical value of |sigBR| summing only over the |elements|
+|ULrs| constrains the weight (|sigBR|) of a given |SMS| (or sum of |SMS|). Therefore SModelS must compute the theoretical value of |sigBR| including all the |topologies|
 appearing in the respective :ref:`constraint <ULconstraint>`.
 This is done by assigning an efficiency equal to 1 (0) to each element,
 if the element appears (does not appear) in the :ref:`constraint <ULconstraint>`.
 Then the final theoretical prediction is the sum over all
-|elements| with a non-zero value of |ssigBRe|. This value can then be compared with the
+|topologies| with a non-zero value of |ssigBRe|. This value can then be compared with the
 respective 95% C.L. upper limit extracted from the UL map (see |ULrs|).
 
 On the other hand, |EMrs| constrain the total signal (|ssigBRe|) in a given signal region (|Dataset|).
-Consequently, in this case SModelS must compute |sigBRe| for each |element|, using the efficiency maps for
-the corresponding |Dataset|. The final theoretical prediction is the sum over all |elements|
+In this case SModelS must compute |sigBRe| for each |SMS|, using the efficiency maps for
+the corresponding |Dataset|. The final theoretical prediction is the sum over all |topologies|
 with a non-zero value of |sigBRe|.
 This value can then be compared with the signal upper limit for the respective 
-signal region (|dataset|). 
+signal region (|Dataset|). 
 
-For experimental results for which the covariance matrix is provided, it
+For |EMrs| for which a covariance matrix or statistical model is provided, it
 is possible to combine all the signal regions (see :ref:`Combination of Signal Regions <combineSRs>`).
 In this case the final theory prediction corresponds to the sum of |sigBRe| over all signal regions (and all elements)
 and the upper limit is computed for this sum.
