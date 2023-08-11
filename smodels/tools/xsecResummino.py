@@ -426,6 +426,13 @@ class XSecResummino(XSecBasis):
 
 
     def modifie_slha_file(self, file_before, file_after, slha_file):
+        """_summary_
+
+        Change all the informations in the .in files before launching calculations
+        Args:
+            file_before (input file for resummino): template
+            file_after (input file for resummino): input file ready for resu;;ino 
+        """
         with open(file_before, 'r') as f:
             lines = f.readlines()
 
@@ -448,6 +455,15 @@ class XSecResummino(XSecBasis):
 
 
     def json_extraction(self):
+        """_summary_
+        
+        function to extract all the informations in the resummino.json
+        file
+
+        Returns:
+            string: Mode of writting for the slha cross section
+            list: liste of the daugther particle to consider in the calculation of the cross section
+        """
         with open(self.json_resummino, "r") as f:
             data = json.load(f)
         
