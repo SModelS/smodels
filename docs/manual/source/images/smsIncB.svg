@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="157.609 158.478 891.304 405.435" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="picture" id="id397672002">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_incB.png" x="177.60869565217396" y="247.8260869565218" height="296.0" width="224.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id1443574829">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_incB2.png" x="495.43478260869574" y="251.95652173913058" height="289.0" width="224.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id221598811">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_incB3.png" x="785.0000000000002" y="178.91304347826073" height="365.0" width="224.0"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id573733573">
+            <rect x="316.25" y="226.25" width="97.5" height="102.5" latexdraw:borderPos="outer" stroke="#4d4d4d" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="1, 7.791666666666667"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id460802588">
+            <rect x="630.5978260869564" y="223.20652173913047" width="97.5" height="102.49999999999991" latexdraw:borderPos="outer" stroke="#4d4d4d" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="1, 7.791666666666667"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id641140107">
+            <rect x="926.2500000000001" y="179.72826086956513" width="97.50000000000011" height="144.02173913043487" latexdraw:borderPos="outer" stroke="#4d4d4d" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="1, 7.791666666666667"/>
+        </g>
+        <g latexdraw:type="text" id="id231289407" fill="black" latexdraw:position="bl">
+            <text x="439.3478260869565" y="405.4347826086955">\LARGE $=$</text>
+        </g>
+        <g latexdraw:type="text" id="id730770040" fill="black" latexdraw:position="bl">
+            <text x="736.3043478260869" y="402.39130434782584">\LARGE $,$</text>
+        </g>
+        <g latexdraw:type="text" id="id1529089238" fill="black" latexdraw:position="bl">
+            <text x="1028.9130434782608" y="403.6956521739128">\LARGE $,...$</text>
+        </g>
+    </g>
+    <defs/>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
+            <latexdraw:positionVert/>
+            <latexdraw:zoom>1.15</latexdraw:zoom>
+            <latexdraw:vpx>0.515</latexdraw:vpx>
+            <latexdraw:vpy>0.408</latexdraw:vpy>
+        </latexdraw:metadata>
+    </metadata>
+</svg>

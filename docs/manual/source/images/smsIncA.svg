@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="308.696 245 369.565 323.087" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="picture" id="id74242655">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_incA.png" x="328.6956521739131" y="271.0869565217391" height="277.0" width="227.0"/>
+        </g>
+        <g latexdraw:type="ellipse" id="id1211459363">
+            <ellipse cx="525.0" cy="302.5" rx="49.0" ry="36.5" latexdraw:borderPos="outer" stroke="#800000" stroke-width="2.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1438857388">
+            <polyline points="575.0,310.43478260869557 650.0,345.0 " stroke="#800000" stroke-width="2.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1438857388)"/>
+        </g>
+        <g latexdraw:type="text" id="id695127686" fill="black" latexdraw:position="bl">
+            <text x="656.9565217391305" y="361.73913043478245">\large $l = e^\pm,\, \mu^\pm$</text>
+        </g>
+        <g latexdraw:type="ellipse" id="id563710819">
+            <ellipse cx="526.304347826087" cy="447.28260869565213" rx="49.0" ry="36.5" latexdraw:borderPos="outer" stroke="#800000" stroke-width="2.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id562251570">
+            <polyline points="580.6521739130435,450.8695652173911 650.0,430.0 " stroke="#800000" stroke-width="2.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-562251570)"/>
+        </g>
+        <g latexdraw:type="text" id="id1445139252" fill="black" latexdraw:position="bl">
+            <text x="658.2608695652175" y="441.3043478260866">\large $jet = u,d,s,c,g,\pi$</text>
+        </g>
+    </g>
+    <defs>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="24.744" id="arrow1-1438857388">
+            <path d="M 0.0 0.0 L -9.304166666666667 -3.322916666666667 L -9.304166666666667 0.0 L -9.304166666666667 3.322916666666667 z" fill="#800000" stroke="#800000" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="343.251" id="arrow1-562251570">
+            <path d="M 0.0 0.0 L -9.304166666666667 -3.322916666666667 L -9.304166666666667 0.0 L -9.304166666666667 3.322916666666667 z" fill="#800000" stroke="#800000" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+    </defs>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
+            <latexdraw:positionVert/>
+            <latexdraw:zoom>1.15</latexdraw:zoom>
+            <latexdraw:vpx>0.515</latexdraw:vpx>
+            <latexdraw:vpy>0.408</latexdraw:vpy>
+        </latexdraw:metadata>
+    </metadata>
+</svg>

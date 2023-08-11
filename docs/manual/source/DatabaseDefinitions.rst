@@ -301,5 +301,52 @@ A complete list of TxNames can be found `here <http://smodels.github.io/docs/Sms
 *More details about the database folder structure and object
 structure can be found in* :ref:`Database of Experimental Results<databaseStruct>`. 
 
+.. _inclusiveSMS:
+
+Inclusive SMS
+-------------
+
+The experimental searches are often inclusive over the final states considered, as illustrated by the sum over light lepton flavors in :numref:`Fig. %s <constraintPlot>`. Also, many searches are not strongly sensitive to the quantum numbers of the promptly decaying BSM particles. Finally, some searches are very inclusive over the final states as long as the required target object/particle is present in the signal.
+All these different levels of inclusiveness need to be represented by the |SMS topologies| appearing in the constraints and the following objects can be used when describing inclusive :ref:`constraints <ULconstraint>`:
+
+ * *Inclusive particles/labels*: these can be used to describe several particles which are considered equivalent for the experimental search. For instance, jets can be represented by an inclusive particle, which equals any light quark flavor or a gluon (:math:`jet = u,d,s,c,g`). A fully inclusive label can also be used to describe any BSM state (:math:`anyBSM`) or any SM state (:math:`anySM`). Finally any BSM or SM particle is represented by :math:`*`. An example of the use of inclusive labels is shown in :numref:`Fig. %s <incLabel>`.
+
+
+ * *Inclusive number of SM particles*: some inclusive searches allow for an arbitrary number of SM particles in the final once they satisfy some requirements. The arbitrary number of SM particles is represented by :math:`*anySM`. One example is the search for disappearing tracks, which is insensitive to the
+ the decay of the long-lived particle, as long as the SM states from the decay are soft and the BSM state is invisible, as represented in :numref:`Fig. %s <incSM>`.
+
+ 
+ * *Inclusive topologies*: in highly inclusive searches even the topology of the |SMS| is arbitrary, as long as the final states satisfy some loose requirements. This case is described by an "inclusive" particle (node), which represents any arbitrary cascade decay. For example, any cascade decay may be allowed as long as there are only SM particles appearing as final states or invisible BSM states. One example is the search for heavy stable charged particles, which is fairly insensitive to the extra activity in the event as long as a heavy particle charged particle is also present, as illustrated in :numref:`Fig. %s <incTopo>`.
+
+
+
+.. _incLabel:
+
+.. figure:: images/smsIncA.png
+   :width: 30%
+   :align: center
+
+   Example of how inclusive labels can be used in |SMS topologies| describing inclusive final states. In the example above :math:`l` represents any light charged lepton (electrons, muons) and :math:`jet` represents any light quark, gluon or pions.
+
+
+.. _incSM:
+
+.. figure:: images/smsIncB.png
+   :width: 60%
+   :align: center
+
+   Example of how |SMS topologies| with an arbitrary number of SM final states is represented within SModelS. The particle (node) :math:`*anySM` describes any number of SM final states appearing in the :math:`C1` decay.
+
+
+.. _incTopo:
+
+.. figure:: images/smsIncC.png
+   :width: 90%
+   :align: center
+
+   Example of how inclusive topologies are represented within SModelS. The particle (node) :math:`Inclusive` describes arbitrary cascade decays which lead to one BSM invisible final state (:math:`MET`) and an arbitrary number of SM final states (:math:`*anySM`).
+
+
+
 .. [#f1] The name *Data Set* is used instead of signal region because its concept is slightly more general. For instance, in some |EMrs| a |Dataset| may not correspond to an aggregated signal region, while for |ULrs| it may correspond to a combination of all signal regions.
  
