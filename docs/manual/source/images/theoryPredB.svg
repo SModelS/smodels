@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="230 70 620 468" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="picture" id="id447126130">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_tpA2.png" x="250.0" y="350.0" height="168.0" width="255.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id878493032">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_tpB2.png" x="575.0" y="350.0" height="168.0" width="255.0"/>
+        </g>
+        <g latexdraw:type="text" id="id414744208" fill="black" latexdraw:position="bl">
+            <text x="610.0" y="90.0">\Large Database SMS</text>
+        </g>
+        <g latexdraw:type="text" id="id1720676757" fill="#3a8adc" latexdraw:position="bl">
+            <text x="300.0" y="95.0">\Large Model SMS</text>
+        </g>
+        <g latexdraw:type="picture" id="id1563298720">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_tpC1.png" x="260.0" y="105.0" height="179.0" width="238.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id1104681983">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_tpC2.png" x="555.0" y="100.0" height="200.0" width="270.0"/>
+        </g>
+        <g latexdraw:type="text" id="id887157675" fill="#4d4d4d" latexdraw:position="bl">
+            <text x="280.0" y="340.0">\Large Canonical Name:</text>
+        </g>
+        <g latexdraw:type="text" id="id671655142" fill="#4d4d4d" latexdraw:position="bl">
+            <text x="600.0" y="340.0">\Large Canonical Name:</text>
+        </g>
+    </g>
+    <defs/>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
+            <latexdraw:positionVert/>
+            <latexdraw:zoom>1.0</latexdraw:zoom>
+            <latexdraw:vpx>0.546</latexdraw:vpx>
+            <latexdraw:vpy>0.396</latexdraw:vpy>
+        </latexdraw:metadata>
+    </metadata>
+</svg>
