@@ -1,8 +1,14 @@
 {
-    "canaux" : {"1" : [1000023,1000025],
+    "channels" : {"1" : [1000023,1000025],
                 "2" : [1000024,-1000024],
                 "3" : [1000023,1000023]
     },
     "mode" : "check",
-    "mode_limit" : 0.00001
+    "mode_limit" : 0.00001,
+    "pdfs" : {
+        "pdf_lo" : "cteq66",
+        "pdfset_lo" : 0,
+        "pdf_nlo" : "cteq66",
+        "pdfset_nlo" : 0
+    }
 }
