@@ -65,11 +65,11 @@ class XSecResummino(XSecBasis):
                              
         self.mode_limit = data["mode_limit"]
         
-    def one_slha_calculation(self, particles,input_file, slha_file, output_file, num_try, order, mode):
+    def one_slha_calculation(self, particles,input_file, slha_file, output_file, num_try, order, log):
         """
         log file management and launch resummino command
         """
-        with open('log.txt', 'a') as f:
+        with open(log, 'a') as f:
             f.write(f'{particles} cross-sections written in {slha_file}\n')
         if particles == None:
             with open(slha_file, 'a') as f:
@@ -82,7 +82,7 @@ class XSecResummino(XSecBasis):
         Xsections = crossSection.XSectionList()
         
         for particle_pair in particles:
-            self.launcher(input_file, slha_file, output_file, particle_pair[0], particle_pair[1], num_try, order, Xsections, mode)
+            self.launcher(input_file, slha_file, output_file, particle_pair[0], particle_pair[1], num_try, order, Xsections, log)
             
         nxsecs = self.addXSecToFile(Xsections, slha_file)
         
@@ -103,7 +103,7 @@ class XSecResummino(XSecBasis):
 
 
 
-    def launcher(self, input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, mode):
+    def launcher(self, input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, log):
         """
         Check everything before launching resummino
         """
@@ -120,7 +120,7 @@ class XSecResummino(XSecBasis):
             print('wow')
             return
         
-        if mode == "check":
+        if self.mode == "check":
             self.launch_command(self.resummino_bin, input_file, output_file, 0)
             infos = self.search_in_output(output_file)
             infos = infos[0].split(" ")[2][1:]
@@ -132,25 +132,25 @@ class XSecResummino(XSecBasis):
                 if num_try == 0:
                     hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections)
             else:
-                hist = self.write_in_slha(output_file, slha_file, 0, particle_1, particle_2, self.type, Xsections)
+                hist = self.write_in_slha(output_file, slha_file, 0, particle_1, particle_2, self.type, Xsections, log)
             return
         
-        if mode == "all":
+        if self.mode == "all":
             self.launch_command(self.resummino_bin, input_file, output_file, order)
             if num_try == 0:
-                hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections)
+                hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections, log)
             return
         
         #:hist: variable to check if there is a problem in the cross section (strange value or no value)
         hist = 0
 
         
-        if num_try == 0 and mode != "check":
+        if num_try == 0 and self.mode != "check":
             self.launch_command(self.resummino_bin, input_file, output_file, order)
 
 
         #here we write in the slha file.
-            hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections)
+            hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections, log)
 
         #we check if we have written too much cross section
         self.are_crosssection(slha_file, order)
@@ -160,7 +160,7 @@ class XSecResummino(XSecBasis):
             print("error")
             num_try = 0
             self.modifie_outgoing_particles(input_file, input_file, particle_1, particle_2)
-            self.launcher(input_file, slha_file, output_file, particle_1, particle_2, num_try, order)
+            self.launcher(input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, log)
     #launcher(input_file, slha_file, output_file, particle_1, particle_2)
 
 
@@ -209,7 +209,7 @@ class XSecResummino(XSecBasis):
         Xsections.add(Xsection)
         return
             
-    def write_in_slha(self, output_file, slha_file, order, particle_1, particle_2, type_writing, Xsections):
+    def write_in_slha(self, output_file, slha_file, order, particle_1, particle_2, type_writing, Xsections, log):
         results = self.search_in_output(output_file)
         if type_writing == 'highest':
             if order == 0:
@@ -234,13 +234,13 @@ class XSecResummino(XSecBasis):
         if order == 1:
             #_ = math.fabs(results[0].split(" ")[2][1:]-results[1].split(" ")[2][1:])
             if float(results[1].split(" ")[2][1:])>2*float(results[0].split(" ")[2][1:]) or float(results[0].split(" ")[2][1:])> 2* float(results[1].split(" ")[2][1:]):
-                with open('log.txt', 'a') as f:
+                with open(log, 'a') as f:
                     f.write(f"to much change between LO and NLO for {particle_1} and {particle_2} with {slha_file}")
                 return 1
         if order == 2:
             #_ = math.fabs(results[0].split(" ")[2][1:]-results[1].split(" ")[2][1:])
             if float(results[2].split(" ")[2][1:])>2*float(results[0].split(" ")[2][1:]) or float(results[0].split(" ")[2][1:])> 2* float(results[1].split(" ")[2][1:]):
-                with open('log.txt', 'a') as f:
+                with open(log, 'a') as f:
                     f.write(f"to much change between LO and NLL+NLO for {particle_1} and {particle_2} with {slha_file}")
                 return 1
             
@@ -379,7 +379,9 @@ class XSecResummino(XSecBasis):
             os.mkdir('smodels/lib/resummino/resummino_in')
         if not os.path.exists('smodels/lib/resummino/resummino_out'):
             os.mkdir('smodels/lib/resummino/resummino_out')
-
+        if not os.path.exists('smodels/lib/resummino/resummino_log'):
+            os.mkdir('smodels/lib/resummino/resummino_log')
+            
         #Check if the input is a file or a directory
         if not slha_folder_name.endswith(".slha"):
             liste_slha = os.listdir(slha_folder_name)
@@ -431,12 +433,12 @@ class XSecResummino(XSecBasis):
 
             #On liste ici les canaux à utiliser, si scénario exclu alors renvoi None
             #particles = self.discrimination_particles(slha_path)
-            mode, particles = self.json_extraction()
+            self.mode, particles = self.json_extraction()
             Liste_particles.append(particles)
 
             #On pourrait optimiser en enlevant les variables qui ne changent pas d'une itération à l'autre
             #Mais ce n'est pas très important (négligeable niveau temps de compilation comparé à Resummino)
-            Liste.append((particles, f"smodels/lib/resummino/resummino_in/resummino_{slha_file_name}.in", slha_path, f"smodels/lib/resummino/resummino_out/resummino_out_{slha_file_name}.txt", num_try, order, mode))
+            Liste.append((particles, f"smodels/lib/resummino/resummino_in/resummino_{slha_file_name}.in", slha_path, f"smodels/lib/resummino/resummino_out/resummino_out_{slha_file_name}.txt", num_try, order, f'smodels/lib/resummino/resummino_log/resummino_log_{slha_file_name}.txt'))
         print(f" Number of files created : {a-b-c}")
         return Liste
 
