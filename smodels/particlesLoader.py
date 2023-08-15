@@ -102,7 +102,7 @@ def getParticlesFromSLHA(slhafile):
             logger.error("Error obtaining PDG number from QNUMBERS block:\n %s \n" %b)
 
         if any(p.pdg == pdg for p in BSMList):
-            logger.warning("Particle with pdg %i appears multiple times in QNUMBERS blocks")
+            logger.warning("Particle with pdg %i appears multiple times in QNUMBERS blocks" %pdg)
             continue
 
         if len(headerInfo) > 1:

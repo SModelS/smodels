@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="50 20 1293 810" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="picture" id="id624717255">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/CMS-SUS-20-001_Figure_010.png" x="70.0" y="165.0" height="510.0" width="532.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id128896024">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_tpD1.png" x="750.0" y="40.0" height="360.0" width="216.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id311911181">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_tpD2.png" x="750.0" y="450.0" height="360.0" width="216.0"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1188147313">
+            <polyline points="285.0,375.0 730.0,245.0 " stroke="#666666" stroke-width="2.5" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1188147313)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1589109730">
+            <polyline points="410.0,575.0 730.0,595.0 " stroke="#666666" stroke-width="2.5" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1589109730)"/>
+        </g>
+        <g latexdraw:type="text" id="id1534030600" fill="black" latexdraw:position="bl">
+            <text x="755.0" y="150.0">\Large SMS $a$</text>
+        </g>
+        <g latexdraw:type="text" id="id842563066" fill="black" latexdraw:position="bl">
+            <text x="770.0" y="535.0">\Large SMS $b$</text>
+        </g>
+        <g latexdraw:type="text" id="id1247347565" fill="black" latexdraw:position="bl">
+            <text x="625.0" y="590.0">\Large $\sigma_{\rm UL,b}$</text>
+        </g>
+        <g latexdraw:type="text" id="id1062351254" fill="black" latexdraw:position="bl">
+            <text x="630.0" y="255.0">\Large $\sigma_{\rm UL,a}$</text>
+        </g>
+        <g latexdraw:type="picture" id="id628192445">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_tpD3.png" x="1070.0" y="180.0" height="424.0" width="253.0"/>
+        </g>
+        <g latexdraw:type="text" id="id546681215" fill="black" latexdraw:position="bl">
+            <text x="1080.0" y="210.0">\Large "Average" SMS</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id548457519">
+            <polyline points="340.0,475.0 1065.0,410.0 " stroke="#666666" stroke-width="2.5" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-548457519)"/>
+        </g>
+        <g latexdraw:type="text" id="id1206964221" fill="black" latexdraw:position="bl">
+            <text x="640.0" y="440.0">\Large $\sigma_{\rm UL,avg}$</text>
+        </g>
+    </g>
+    <defs>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="343.715" id="arrow1-1188147313">
+            <path d="M 0.0 0.0 L -10.704166666666667 -3.822916666666667 L -10.704166666666667 0.0 L -10.704166666666667 3.822916666666667 z" fill="#666666" stroke="#666666" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="3.576" id="arrow1-1589109730">
+            <path d="M 0.0 0.0 L -10.704166666666667 -3.822916666666667 L -10.704166666666667 0.0 L -10.704166666666667 3.822916666666667 z" fill="#666666" stroke="#666666" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="354.877" id="arrow1-548457519">
+            <path d="M 0.0 0.0 L -10.704166666666667 -3.822916666666667 L -10.704166666666667 0.0 L -10.704166666666667 3.822916666666667 z" fill="#666666" stroke="#666666" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+    </defs>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
+            <latexdraw:positionVert/>
+            <latexdraw:zoom>1.0</latexdraw:zoom>
+            <latexdraw:vpx>0.5</latexdraw:vpx>
+            <latexdraw:vpy>0.425</latexdraw:vpy>
+        </latexdraw:metadata>
+    </metadata>
+</svg>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="78.804 145.652 834.234 458.696" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="picture" id="id26765027">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example4a.png" x="140.6521739130434" y="455.2173913043479" height="112.0" width="117.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id1457633386">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example4a.png" x="140.70000000000002" y="319.13043478260886" height="112.0" width="117.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id1526861941">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example4a.png" x="140.78" y="186.30434782608697" height="112.0" width="117.0"/>
+        </g>
+        <g latexdraw:type="text" id="id1570850977" fill="black" latexdraw:position="bl">
+            <text x="98.80434782608694" y="177.4021739130435">\begin{tabular}{c} \Large Matched SMS \\ (from Decomposition) \end{tabular}</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1999110649">
+            <polyline points="281.304347826087,238.69565217391306 416.304347826087,238.69565217391306 " stroke="#808080" stroke-width="3.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1999110649)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1648668089">
+            <polyline points="272.91173913043485,387.8260869565216 430.0,290.0 " stroke="#808080" stroke-width="3.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1648668089)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id963659515">
+            <polyline points="280.0,510.0 490.0,510.0 " stroke="#808080" stroke-width="3.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-963659515)"/>
+        </g>
+        <g latexdraw:type="text" id="id507464423" fill="black" latexdraw:position="bl">
+            <text x="181.78434782608693" y="429.13043478260863">\Large $w_b$</text>
+        </g>
+        <g latexdraw:type="text" id="id1942512224" fill="black" latexdraw:position="bl">
+            <text x="181.73434782608695" y="295.6521739130434">\Large $w_a$</text>
+        </g>
+        <g latexdraw:type="text" id="id1880838160" fill="black" latexdraw:position="bl">
+            <text x="186.08695652173907" y="566.5217391304348">\Large $w_c$</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1572955679">
+            <polyline points="734.7826086956519,253.04347826086953 885.0,255.0 " stroke="#808080" stroke-width="3.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1572955679)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id330026249">
+            <polyline points="695.9552173913042,510.869565217391 819.782608695652,511.7391304347824 " stroke="#808080" stroke-width="3.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-330026249)"/>
+        </g>
+        <g latexdraw:type="text" id="id1234687153" fill="#666666" latexdraw:position="bl">
+            <text x="302.6086956521737" y="223.69565217391312">\begin{tabular}{c} {\Large Cluster}\\{\Large  SMS} \end{tabular}</text>
+        </g>
+        <g latexdraw:type="text" id="id98952530" fill="#666666" latexdraw:position="bl">
+            <text x="760.4347826086953" y="220.65217391304347">\begin{tabular}{c} {\Large Add}\\{\Large  Weights} \end{tabular}</text>
+        </g>
+        <g latexdraw:type="text" id="id1768997304" fill="black" latexdraw:position="bl">
+            <text x="893.0386956521735" y="264.83">\Large $\sigma_{\rm eff}(C_1) = w_a + w_b$</text>
+        </g>
+        <g latexdraw:type="rectangle" id="id211711210">
+            <rect x="441.0" y="181.0" width="278.0" height="143.0" latexdraw:borderPos="outer" stroke="#808080" stroke-width="2.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id898943444">
+            <rect x="520.5652173913039" y="447.52173913043464" width="149.73913043478274" height="135.82608695652186" latexdraw:borderPos="outer" stroke="#808080" stroke-width="2.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667"/>
+        </g>
+        <g latexdraw:type="text" id="id175542290" fill="black" latexdraw:position="bl">
+            <text x="833.473478260869" y="521.3043478260865">\Large $\sigma_{\rm eff}(C_2) =w_c$</text>
+        </g>
+        <g latexdraw:type="text" id="id899669090" fill="black" latexdraw:position="bl">
+            <text x="223.22" y="549.17">\large $e^+$</text>
+        </g>
+        <g latexdraw:type="text" id="id1747248068" fill="black" latexdraw:position="bl">
+            <text x="224.52" y="279.57">\large $e^+$</text>
+        </g>
+        <g latexdraw:type="text" id="id354077274" fill="black" latexdraw:position="bl">
+            <text x="221.52" y="417.35">\large $\mu^-$</text>
+        </g>
+        <g latexdraw:type="text" id="id222712389" fill="black" latexdraw:position="bl">
+            <text x="311.95652173913044" y="266.5217391304348">\Large $\sigma_{UL,a}$</text>
+        </g>
+        <g latexdraw:type="text" id="id1645551544" fill="black" latexdraw:position="bl">
+            <text x="311.9565217391305" y="383.9130434782607">\Large $\sigma_{UL,b} \simeq \sigma_{UL,a}$</text>
+        </g>
+        <g latexdraw:type="text" id="id1568461813" fill="black" latexdraw:position="bl">
+            <text x="304.5652173913044" y="541.7391304347824">\Large $\sigma_{UL,c} \neq \sigma_{UL,a}$</text>
+        </g>
+        <g latexdraw:type="text" id="id1180971638" fill="black" latexdraw:position="bl">
+            <text x="221.5217391304347" y="218.6956521739132">\Large $A$</text>
+        </g>
+        <g latexdraw:type="text" id="id1549976198" fill="black" latexdraw:position="bl">
+            <text x="222.82608695652178" y="350.43478260869574">\Large $B$</text>
+        </g>
+        <g latexdraw:type="text" id="id636725552" fill="black" latexdraw:position="bl">
+            <text x="222.78" y="488.87">\Large $C$</text>
+        </g>
+        <g latexdraw:type="picture" id="id26289301">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example4a.png" x="446.4321739130434" y="191.95652173913044" height="112.0" width="117.0"/>
+        </g>
+        <g latexdraw:type="text" id="id135200777" fill="black" latexdraw:position="bl">
+            <text x="487.38652173913033" y="301.3043478260869">\Large $w_a$</text>
+        </g>
+        <g latexdraw:type="text" id="id970042163" fill="black" latexdraw:position="bl">
+            <text x="530.1721739130435" y="285.2221739130435">\large $e^+$</text>
+        </g>
+        <g latexdraw:type="text" id="id1109619874" fill="black" latexdraw:position="bl">
+            <text x="527.1739130434781" y="224.34782608695667">\Large $A$</text>
+        </g>
+        <g latexdraw:type="picture" id="id1026175174">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example4a.png" x="585.4826086956523" y="190.0000000000002" height="112.0" width="117.0"/>
+        </g>
+        <g latexdraw:type="text" id="id1504528001" fill="black" latexdraw:position="bl">
+            <text x="626.5669565217393" y="300.00000000000006">\Large $w_b$</text>
+        </g>
+        <g latexdraw:type="text" id="id1811203219" fill="black" latexdraw:position="bl">
+            <text x="666.3026086956525" y="288.21956521739145">\large $\mu^-$</text>
+        </g>
+        <g latexdraw:type="text" id="id31688860" fill="black" latexdraw:position="bl">
+            <text x="667.6086956521742" y="221.30434782608708">\Large $B$</text>
+        </g>
+        <g latexdraw:type="picture" id="id125560652">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example4a.png" x="537.6086956521741" y="456.521739130435" height="112.0" width="117.0"/>
+        </g>
+        <g latexdraw:type="text" id="id970189104" fill="black" latexdraw:position="bl">
+            <text x="583.0434782608697" y="567.8260869565217">\Large $w_c$</text>
+        </g>
+        <g latexdraw:type="text" id="id390685773" fill="black" latexdraw:position="bl">
+            <text x="620.1765217391306" y="550.474347826087">\large $e^+$</text>
+        </g>
+        <g latexdraw:type="text" id="id1972669050" fill="black" latexdraw:position="bl">
+            <text x="619.7365217391307" y="490.17434782608706">\Large $C$</text>
+        </g>
+        <g latexdraw:type="text" id="id186953745" fill="#4d4d4d" latexdraw:position="bl">
+            <text x="522.8260869565217" y="165.65217391304355">\large Cluster 1 ($C_1$)</text>
+        </g>
+        <g latexdraw:type="text" id="id276371924" fill="#4d4d4d" latexdraw:position="bl">
+            <text x="532.8260869565217" y="436.5217391304347">\large Cluster 2 ($C_2$)</text>
+        </g>
+    </g>
+    <defs>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="auto" id="arrow1-1999110649">
+            <path d="M 0.0 0.0 L -12.104166666666666 -4.322916666666667 L -12.104166666666666 0.0 L -12.104166666666666 4.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="328.088" id="arrow1-1648668089">
+            <path d="M 0.0 0.0 L -12.104166666666666 -4.322916666666667 L -12.104166666666666 0.0 L -12.104166666666666 4.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="auto" id="arrow1-963659515">
+            <path d="M 0.0 0.0 L -12.104166666666666 -4.322916666666667 L -12.104166666666666 0.0 L -12.104166666666666 4.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="0.746" id="arrow1-1572955679">
+            <path d="M 0.0 0.0 L -12.104166666666666 -4.322916666666667 L -12.104166666666666 0.0 L -12.104166666666666 4.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="0.402" id="arrow1-330026249">
+            <path d="M 0.0 0.0 L -12.104166666666666 -4.322916666666667 L -12.104166666666666 0.0 L -12.104166666666666 4.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+    </defs>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
+            <latexdraw:positionVert/>
+            <latexdraw:zoom>1.15</latexdraw:zoom>
+            <latexdraw:vpx>0.401</latexdraw:vpx>
+            <latexdraw:vpy>0.399</latexdraw:vpy>
+        </latexdraw:metadata>
+    </metadata>
+</svg>

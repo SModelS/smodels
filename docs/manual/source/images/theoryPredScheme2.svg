@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="78.804 157.402 927.588 550.859" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="78.804 157.402 729.887 550.859" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
     <g>
         <g latexdraw:type="picture" id="id1027860965">
             <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example1b.png" x="456.30434782608694" y="185.6521739130436" height="112.0" width="185.0"/>
@@ -36,9 +36,6 @@
         <g latexdraw:type="text" id="id1476973742" fill="black" latexdraw:position="bl">
             <text x="190.4347826086956" y="688.2608695652169">\Large $w_c$</text>
         </g>
-        <g latexdraw:type="text" id="id1028248417" fill="black" latexdraw:position="bl">
-            <text x="430.4347826086958" y="177.6086956521739">\begin{tabular}{c} {\Large Apply Efficiencies} \\ {\large ($\epsilon=1$ for UL results)} \end{tabular}</text>
-        </g>
         <g latexdraw:type="text" id="id565345230" fill="black" latexdraw:position="bl">
             <text x="461.2995652173912" y="318.6956521739129">\Large $\sigma_{\rm eff,a} = w_a \times \epsilon_a$</text>
         </g>
@@ -51,35 +48,23 @@
         <g latexdraw:type="picture" id="id2013179245">
             <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example4b.png" x="456.304347826087" y="485.8695652173908" height="175.0" width="185.0"/>
         </g>
-        <g latexdraw:type="picture" id="id607051988">
-            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example1b.png" x="801.0869565217391" y="186.95652173913055" height="112.0" width="185.0"/>
-        </g>
-        <g latexdraw:type="picture" id="id949115559">
-            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example1b.png" x="801.3926086956523" y="336.08695652173935" height="112.0" width="185.0"/>
-        </g>
         <g latexdraw:type="joinedLines" id="id177806985">
-            <polyline points="660.8695652173914,240.0 795.8695652173914,240.0 " stroke="#808080" stroke-width="3.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-177806985)"/>
+            <polyline points="660.8695652173914,240.0 785.0,365.0 " stroke="#808080" stroke-width="3.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-177806985)"/>
         </g>
         <g latexdraw:type="joinedLines" id="id1303140559">
-            <polyline points="661.1726086956522,389.1304347826086 796.1726086956522,389.1304347826086 " stroke="#808080" stroke-width="3.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1303140559)"/>
+            <polyline points="661.1726086956522,389.13043478260863 785.0,390.0 " stroke="#808080" stroke-width="3.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1303140559)"/>
         </g>
         <g latexdraw:type="joinedLines" id="id509032942">
-            <polyline points="660.8726086956523,580.4347826086954 795.8726086956523,580.4347826086954 " stroke="#808080" stroke-width="3.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-509032942)"/>
+            <polyline points="647.8291304347828,580.4347826086953 785.0,410.0 " stroke="#808080" stroke-width="3.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-509032942)"/>
         </g>
-        <g latexdraw:type="text" id="id44243222" fill="black" latexdraw:position="bl">
-            <text x="775.2173913043481" y="178.91304347826085">\begin{tabular}{c} {\Large Apply Efficiencies} \\ {\large ($\epsilon=1$ for UL results)} \end{tabular}</text>
+        <g latexdraw:type="text" id="id957762594" fill="#666666" latexdraw:position="bl">
+            <text x="302.6086956521738" y="223.69565217391312">\begin{tabular}{c} {\Large Apply}\\{\Large  Efficiencies} \end{tabular}</text>
         </g>
-        <g latexdraw:type="text" id="id106122872" fill="black" latexdraw:position="bl">
-            <text x="806.0821739130434" y="319.9999999999999">\Large $\sigma_{\rm eff,a} = w_a \times \epsilon_a$</text>
+        <g latexdraw:type="text" id="id470645961" fill="#666666" latexdraw:position="bl">
+            <text x="673.4782608695652" y="277.17391304347825">\begin{tabular}{c} {\Large Add}\\{\Large  Weights} \end{tabular}</text>
         </g>
-        <g latexdraw:type="text" id="id1290783430" fill="black" latexdraw:position="bl">
-            <text x="806.3826086956523" y="468.784347826087">\Large $\sigma_{\rm eff,b} = w_b \times \epsilon_b$</text>
-        </g>
-        <g latexdraw:type="text" id="id1054811568" fill="black" latexdraw:position="bl">
-            <text x="806.3447826086957" y="683.4782608695648">\Large $\sigma_{\rm eff,c} = w_c \times \epsilon_c$</text>
-        </g>
-        <g latexdraw:type="picture" id="id884608993">
-            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example4b.png" x="801.0869565217394" y="487.1739130434778" height="175.0" width="185.0"/>
+        <g latexdraw:type="text" id="id404392822" fill="black" latexdraw:position="bl">
+            <text x="788.6908695652174" y="402.6086956521737">\Large $\sigma_{\rm eff} = \sigma_{\rm eff,a} + \sigma_{\rm eff,b} + ...$</text>
         </g>
     </g>
     <defs>
@@ -92,13 +77,13 @@
         <marker overflow="visible" markerUnits="userSpaceOnUse" orient="auto" id="arrow1-1431434220">
             <path d="M 0.0 0.0 L -12.104166666666666 -4.322916666666667 L -12.104166666666666 0.0 L -12.104166666666666 4.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
-        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="auto" id="arrow1-177806985">
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="45.2" id="arrow1-177806985">
             <path d="M 0.0 0.0 L -12.104166666666666 -4.322916666666667 L -12.104166666666666 0.0 L -12.104166666666666 4.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
-        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="auto" id="arrow1-1303140559">
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="0.402" id="arrow1-1303140559">
             <path d="M 0.0 0.0 L -12.104166666666666 -4.322916666666667 L -12.104166666666666 0.0 L -12.104166666666666 4.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
-        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="auto" id="arrow1-509032942">
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="308.828" id="arrow1-509032942">
             <path d="M 0.0 0.0 L -12.104166666666666 -4.322916666666667 L -12.104166666666666 0.0 L -12.104166666666666 4.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
     </defs>
@@ -107,7 +92,7 @@
             <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
             <latexdraw:positionVert/>
             <latexdraw:zoom>1.15</latexdraw:zoom>
-            <latexdraw:vpx>0.475</latexdraw:vpx>
+            <latexdraw:vpx>0.445</latexdraw:vpx>
             <latexdraw:vpy>0.418</latexdraw:vpy>
         </latexdraw:metadata>
     </metadata>

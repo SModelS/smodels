@@ -31,7 +31,7 @@
 .. _theoryPredictions:
 
 SMS Matching and Theory Predictions
-================================
+***********************************
 
 The |decomposition| of the input model as a sum of |SMS|
 (simplified models) is the
@@ -50,9 +50,10 @@ The next step consists of *matching* the |SMS| from the decomposition to the |to
 Below we describe in detail the procedure
 for matching the |SMS topologies| and for computing the theory predictions.
 
+.. _matching:
 
 Matching SMS Topologies
------------------------
+=======================
 
 Once the |SMS topologies| (here called *model topologies*) representing the input BSM model are created by the |decomposition|, they have to be matched to the |topologies| constrained by the |Database| (*database topologies*).
 Two topologies will match if they have the same structure and the corresponding particles appearing in each topology have matching properties (electric charge, color representation, spin,...).\ [#f3]_
@@ -112,7 +113,7 @@ The procedure just described can be applied to any pair of |SMS topologies|\ [#f
 
 
 Computing Theory Predictions
-----------------------------
+============================
 
 Once the |SMS topologies| coming out of the |decomposition| have been matched to the database topologies,
 the relevant (effective) cross-sections need to be computed and compared to their respective upper limits
@@ -122,237 +123,142 @@ for two types of :ref:`experimental results <ExpResult>`:
 |ULrs| and |EMrs|. 
 Each of them requires slightly different theoretical predictions to be compared against experimental data.
 
-|ULrs| constrains the weight (|sigBR|) of a given |SMS| (or sum of |SMS|). Therefore SModelS must compute the theoretical value of |sigBR| including all the |topologies|
-appearing in the respective :ref:`constraint <ULconstraint>`.
-This is done by assigning an efficiency equal to 1 (0) to each element,
-if the element appears (does not appear) in the :ref:`constraint <ULconstraint>`.
-Then the final theoretical prediction is the sum over all
-|topologies| with a non-zero value of |ssigBRe|. This value can then be compared with the
-respective 95% C.L. upper limit extracted from the UL map (see |ULrs|).
+.. _thePredUL:
 
-On the other hand, |EMrs| constrain the total signal (|ssigBRe|) in a given signal region (|Dataset|).
-In this case SModelS must compute |sigBRe| for each |SMS|, using the efficiency maps for
-the corresponding |Dataset|. The final theoretical prediction is the sum over all |topologies|
-with a non-zero value of |sigBRe|.
-This value can then be compared with the signal upper limit for the respective 
-signal region (|Dataset|). 
+Theory Predictions for Efficiency Map Results
+---------------------------------------------
 
-For |EMrs| for which a covariance matrix or statistical model is provided, it
-is possible to combine all the signal regions (see :ref:`Combination of Signal Regions <combineSRs>`).
-In this case the final theory prediction corresponds to the sum of |sigBRe| over all signal regions (and all elements)
-and the upper limit is computed for this sum.
-
-Although the details of the theoretical prediction computation differ depending on the type
-of |ExpRes| (|ULrs| or |EMrs|), the overall procedure is common for both types of results. Below we schematically
-show the main steps of the theory prediction calculation:
-
-.. _theoPredScheme:
-
-.. image:: images/theoryPredScheme.png
-   :width: 90% 
+|EMrs| constrain the number of signal events (:math:`N_s^{\rm SR}`) in a given signal region  (|Dataset|). Equivalently SModelS considers the limit on the effective cross section :math:`\sigma_{\rm eff}^{\rm SR} = N_s^{\rm SR}/\mathcal{L}`, where :math:`\mathcal{L}` is the search luminosity.  
+In this case the theory prediction to be computed corresponds to the effective cross section given the |decomposition| output. 
+Note that a single |EMr| usually contains several signal regions (|Datasets|) and there will be a set of efficiencies
+(or efficiency maps) for each |dataset|. As a result, several theory predictions (one for each |dataset|) need to be computed.
 
 
-As shown above the procedure can always be divided in two main steps:
-*Element Selection* and *Element Clustering*.
-Once the |elements| have been selected and clustered, the theory prediction for each |Dataset| is given by
-the sum of all the |element| weights (|sigBRe|) belonging to the same cluster:
+
+After the model |topologies| obtained by the |decomposition| have been :ref:`matched <matching>` to the database topologies, the effective cross section is simply given by the sum over the effective cross sections for each |SMS|, which corresponds to their weights multiplied by the corresponding efficiencies (see  :numref:`Fig. %s <tpEM>`). 
+
+.. _tpEM:
+
+.. figure:: images/theoryPredSchemeEM.png
+   :width: 60%
+   :align: center
+
+   Schematic representation of how the theory prediction value (effective cross section) is computed for the case of |EMrs|.
+
+Note that the efficiencies are computed using the efficiency maps for the corresponding |Dataset|.
+Finally, :math:`\sigma_{\rm eff}^{\rm SR}` can be compared to the signal upper limit for the respective signal region (|Dataset|). Therefore it is convenient to define:
 
 .. math::
-   \mbox{theory prediction } = \sum_{cluster} (\mbox{element weight}) =  \sum_{cluster} (\sigma \times BR \times \epsilon)
+   r \equiv \sigma_{\rm eff}^{\rm SR}/\sigma_{\rm eff,UL}^{\rm SR} = \frac{1}{\sigma_{\rm eff,UL}^{\rm SR}} \sum_a w_a \epsilon_{a}^{\rm SR} = \frac{1}{\sigma_{\rm eff,UL}^{\rm SR}} \sum_a \left(\sigma \times BR\right)_a \; \epsilon_{a}^{\rm SR}
 
-Below we describe in detail the *element selection* and *element clustering* 
-methods for computing the theory predictions for each type
-of |ExpRes| separately.
+where :math:`\sigma_{\rm eff,UL}^{\rm SR} = N_{s,{\rm UL}}^{\rm SR}/\mathcal{L}` is the 95% C.L. upper limit on the effective cross section. Hence, values of :math:`r` larger than one can mean the input model violates the 95% C.L. limit set by the corresponding |EMr|.
 
-* **Theory predictions are computed using the** `theoryPredictionsFor <theory.html#theory.theoryPrediction.theoryPredictionsFor>`_ **method** 
+For |EMrs| where a covariance matrix or statistical model is available, it
+is possible to combine all the signal regions (see :ref:`Combination of Signal Regions <combineSRs>`).
+In this case the final theory prediction corresponds to the sum of effective cross sections over all signal regions (:math:`\sum_{\rm SR} \sigma_{\rm eff}^{\rm SR}`)
+and the upper limit is computed for this sum.
+
 
 .. _thePredUL:
 
 Theory Predictions for Upper Limit Results
 ------------------------------------------
 
-Computation of the signal cross sections for a given
-|ULr| takes place in two steps. First selection of the
-|elements| generated by the model :doc:`decomposition <Decomposition>` and then clustering
-of the selected elements according to their properties. These two steps are described below.
+|ULrs| constrains the weight (|sigBR|) of a given |SMS|. Therefore the theory prediction in this case simply corresponds to the weight of the matched |topologies|.
+However, a few details have to be taken into account when comparing the weights to the corresponding upper limits.
 
-.. _ULselection:
-
-Element Selection
-^^^^^^^^^^^^^^^^^
-
-An |ULr| holds upper limits for the cross sections of an |element|
-or sum of |elements|. Consequently, the first step for computing the theory predictions for the corresponding
-experimental result is to select the |elements| that appear in the :ref:`UL result constraint <ULconstraint>`.
-This is conveniently done attributing to each |element| an efficiency equal to 1 (0) 
-if the |element| appears (does not appear) in the :ref:`constraint <ULconstraint>`.
-After all the |elements| weights (:math:`\sigma \times BR`) have been rescaled
-by these ''trivial'' efficiencies, only the ones with non-zero weights are relevant for the signal
-cross section.
-The |element| selection is then trivially achieved by selecting all the |elements| with non-zero weights.
-
-The procedure described above is illustrated graphically in the figure below for the simple example where the 
-:ref:`constraint <ULconstraint>` is :math:`[[[e^+]],[[e^-]]]\,+\,[[[\mu^+]],[[\mu^-]]]`.
-
-.. image:: images/ULselection.png
-   :width: 85% 
-
-
-
-* **The element selection is implemented by the** `getElementsFrom <theory.html#theoryPrediction._getElementsFrom>`_ **method**
-
-.. _ULcluster:
-
-Element Clustering
-^^^^^^^^^^^^^^^^^^
-
-Naively one would expect that after all the |elements| appearing in the :ref:`constraint <ULconstraint>`
-have been selected, it is trivial to compute the theory prediction: one must simply 
-sum up the weights (|sigBR|) of all the selected |elements|.
-However, the selected |elements| usually differ in their masses and/or widths\ [#f1]_ and the
-experimental limit (see :ref:`Upper Limit constraint <ULconstraint>`) assumes that all the |elements| appearing
+First, a given |ULr| constraint can be :ref:`inclusive <inclusiveSMS>` over final states (i.e. both electrons and muons may be allowed as final states). In this case the weights of all :ref:`matched SMS <matching>` corresponding to these final states must be included.
+However, the selected |SMS| may differ in their BSM properties (such as masses and/or widths) and the
+experimental limit (see :ref:`Upper Limit constraint <ULconstraint>`) assumes that all the |topologies| appearing
 in the :ref:`constraint <ULconstraint>` have the same efficiency, which typically
-implies that the distinct elements have the same mass arrays and widths.
-As a result, the selected |elements| must be grouped into *clusters* of equal masses and widths.
-When grouping the |elements|, however, one must allow for small differences,
-since the experimental efficiencies should not be strongly sensitive to tiny changes in
-mass or width values. For instance, assume two |elements| contain identical mass arrays, except
-for the parent masses which differ by 1 MeV. In this case it is obvious that for all experimental
-purposes the two |elements| have the same mass and should contribute
-to the same theory prediction (e.g. their weights should be
-added when computing the signal cross section). 
-Unfortunately there is no way to unambiguously define ''similar efficiencies''
-or ''similar masses and widths'' and the definition should depend on the |ExpRes|.
-In the simplest case where the upper limit result corresponds to a single signal region
-(which is not always the case), one could assume that each element efficiency is inversely
-proportional to its upper limit.
-Hence the distance between two |elements| can be defined as the relative
-difference between their upper limits, as described in :ref:`element distance <distance>`.
-Then, if the :ref:`distance <distance>` between two selected |elements| is smaller
-than a maximum value (defined by `maxDist <theory.html#theory.clusterTools.clusterElements>`_),
-they are gouped in the same cluster and their cross-sections
-will be combined, as illustrated by the example below:
+implies that the distinct topologies have the same mass arrays and widths.
+As a result, the selected |SMS| must be grouped into *clusters*
+of similar efficiencies.
+In the simplest case, where the upper limit result corresponds to a single signal region, one could assume that the |SMS| efficiency is inversely proportional to its upper limit: :math:`\epsilon_a \sim 1/\sigma_{UL,a}`. Hence |SMS| with similar upper limits have similar efficiencies and can be *clustered* together, as illustrated in :numref:`Fig. %s <tpUL>`.
+Mode details about the clustering procedure can be found in :ref:`Clustering Topologies <cluster>`.
 
 
 
-.. image:: images/ULcluster.png
-   :width: 80%
+.. _tpUL:
+
+.. figure:: images/theoryPredSchemeUL.png
+   :width: 60%
+   :align: center
+
+   Example of how the theory prediction values (effective cross sections) are computed for the case of |ULrs|.
+
+Once the :ref:`matched SMS <matching>` have been grouped into cluster the effective cross section can finally computed as the sum of the weights over the |topologies| within each cluster (see :numref:`Fig. %s <tpUL>`). In this case the following :math:`r`-value is defined:
+
+.. math::
+   r \equiv \sigma_{\rm eff}/\sigma_{\rm UL} = \frac{1}{\sigma_{\rm UL}} \sum_{\rm cluster} w_a  = \frac{1}{\sigma_{\rm UL}} \sum_{\rm cluster} \left(\sigma \times BR\right)_a
+
+where :math:`\sigma_{\rm UL}` is the 95% C.L. upper limit on the effective cross section obtained from the :ref:`upper limit maps <ULtype>` and the sum is over all |SMS| belonging to the same cluster. Hence, values of :math:`r` larger than one can mean the input model violates the 95% C.L. limit set by the corresponding |ULr|.
 
 
-
-Notice that the above definition of distance quantifies the experimental analysis
-sensitivity to changes in the |element| properties (masses and widths),
-which should correspond to changes in the upper limit value for the |element|.
-However, most  |ExpRess| combine distinct signal regions or use a more complex
-analysis in order to derive upper limits. In such cases,
-two |elements| can have (by chance) the same upper limit value,
-but still have very distinct efficiencies and should not be considered similar and combined.
-In order to deal with such cases an additional requirement is imposed when clustering two |elements|:
-the distance between both elements to the *average element* must also be smaller than
-`maxDist <theory.html#theory.clusterTools.clusterElements>`_ .
-The *average element* of a list of |elements| corresponds to
-the |element| with the same common topology and final states, but with the
-mass array and widths replaced by the average mass and width over all the elements in the list.
-If this *average element* has an upper limit similar to all the |elements| in the list,
-we assume that all the elements have similar efficiencies and can be considered as similar
-to the given |ExpRes|.
+* **Theory predictions are computed using the** `theoryPredictionsFor <matching.html#matching.theoryPrediction.theoryPredictionsFor>`_ **method** 
 
 
-Once all the |elements| have been clustered, their weights can finally be added together
-and compared against the experimental upper limit.
+.. _cluster:  
 
+Clustering Topologies
+^^^^^^^^^^^^^^^^^^^^^
 
+As discussed in :ref:`Theory Predictions for UL <thePredUL>`, in order to cluster the |topologies| it is necessary
+to determine whether two |SMS| are similar for a given |ExpRes|, which usually means similar efficiencies.
+Although the efficiencies are related to the cross section upper limit (:math:`\sigma_{\rm UL}`), the assumption they are inversely proportional is only valid for searches with a single signal region, which is rarely the case.
+However, if two |SMS| have similar properties (i.e. BSM masses and widths) and their upper limits are nearly equal, 
+it is reasonable to assume that they have similar efficiencies.
+Hence the distance between two |SMS| can be defined as the relative difference between their upper limits and if this distance is smaller
+than a maximum value (defined by `maxDist <matching.html#matching.clusterTools.clusterSMS>`_),
+the |SMS| can be grouped together in the same cluster.
 
-* **The clustering of elements is implemented by the** `clusterElements <theory.html#theory.clusterTools.clusterElements>`_  **method**.
+Hence, in order to compute the clusters, the following "upper limit distance" distance between two |SMS| is defined:
 
-.. _distance:  
-
-Distance Between Elements
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-As mentioned :ref:`above <ULcluster>`, in order to cluster the |elements| it is necessary
-to determine whether two |elements| are similar for a given |ExpRes|.
-This usually means that both |elements| have similar efficiencies for the |ExpRes|.
-Since an absolute definition of ''similar elements'' is not possible and the sensitivity to changes in
-the mass or width of a given |element| depends on the experimental result, SModelS uses
-an ''upper limit map-dependent'' definition.
-Each |element| is mapped to its corresponding upper limit for a given |ExpRes| and the distance between
-two elements is simply given by the relative distance between the upper limits:
 
 .. math::
 
-   & \mbox{ Upper Limit}(\mbox{Element } A) = x, \; \mbox{ Upper Limit}(\mbox{Element } B) = y\\
-   & \Rightarrow \mbox{distance}(A,B) = \frac{|x-y|}{(x+y)/2}
+
+   \mbox{distance}(a,b) = d(a,b) = 2 \frac{|\sigma_{UL,a}-\sigma_{UL,b}|}{\sigma_{UL,a}+\sigma_{UL,b}}
    
+where :math:`\sigma_{UL,a}` (:math:`\sigma_{UL,b}`) is the cross section upper limit for the |SMS| "a" ("b"). These upper limits are extracted from the :ref:`upper limit maps <ULtype>` and typically depend on the masses and widths of the BSM particles appearing in the |SMS|.
 
 
-Theory Predictions for Efficiency Map Results
----------------------------------------------
+.. _avgSMSFig:
 
-In order to compute the signal cross sections for a given |EMr|, so it can be compared
-to the signal region limits, it is first necessary to apply the efficiencies (see |EMr|) to all the |elements| generated
-by the model :doc:`decomposition <Decomposition>`.
-Notice that typically a single |EMr| contains several signal regions (|Datasets|) and there will be a set of efficiencies
-(or efficiency maps) for each |dataset|. As a result, several theory predictions (one for each |dataset|) will be computed.
-This procedure is similar (in nature) to 
-the :ref:`Element Selection<ULselection>` applied in the case of a |ULr|, except that now it must be repeated 
-for several |datasets| (signal regions).
+.. figure:: images/avgSMS.png
+   :width: 60%
+   :align: center
 
+   Example of two |SMS| with similar upper limit, but very distinct masses. The "average" |SMS| is also shown.
 
-After the |element|'s weights have being rescaled by the corresponding efficiencies for the given |dataset| (signal region),
-all of them can be grouped together in a single cluster, which will provide a single theory prediction (signal
-cross section) for each |Dataset|. Hence the :ref:`element clustering <EMcluster>` discussed below is completely trivial.
-On the other hand the :ref:`element selection <EMselection>` is slightly more involved than in the |ULr|
-case and will be discussed in more detail.
+Notice that the above definition of distance quantifies the experimental analysis
+sensitivity to changes in the |SMS| properties (masses and widths). 
+However, since most |ExpRess| combine distinct signal regions, it is possible that two |SMS| have (by chance) the same upper limit value, but still have very distinct efficiencies and should not be clustered together.
+One example is shown in :numref:`Fig. %s <avgSMSFig>`, where the |SMS| "a" and "b" have similar upper limits (:math:`\sigma_{\rm UL,a} \simeq \sigma_{\rm UL,b}`), but they clearly have very distinct masses and most likely different efficiencies.
+In order to deal with such cases an "average" |SMS| is constructed using the average of the |SMS| properties (average masses and widths). If the average masses are very distinct from the masses of the original |SMS|, it is likely that the upper limit for the average |SMS| will fall into another region of the upper limit map and will differ considerably from the original upper limits. In :numref:`Fig. %s <avgSMSFig>` this is illustrated by:
 
-.. _EMselection:
-
-Element Selection
-^^^^^^^^^^^^^^^^^
-
-The element selection for the case of an |EMr| consists of rescaling all the |elements|
-weights by their efficiencies, according to the efficiency map of the corresponding |Dataset|.
-The efficiency for a given |Dataset| depends both on the |element| topology and its |particle| content. 
-In practice the efficiencies for most of the |elements| will be extremely small (or zero), hence only a subset effectively
-contributes after the element selection\ [#f2]_.
-In the figure below we illustrate the element selection for the case of an |EMr|/|Dataset|:
-
-.. _EMselectionfig:
-
-.. image:: images/EMselection.png
-   :width: 85% 
-
-If, for instance, the analysis being considered vetoes :math:`jets` and :math:`\tau`'s in the final state, 
-we will have :math:`\epsilon_2,\, \epsilon_4 \simeq 0` for the example in the :ref:`figure above <EMselectionfig>`.
-Also, if the experimental result applies only to prompt decays and the |element| contains intermediate
-meta-stable BSM particles, its efficiency will be very small (although not necessarily zero). 
+.. math:: 
+   \sigma_{\rm UL,avg} \ll \sigma_{\rm UL,a} \simeq \sigma_{\rm UL,b}
 
 
-* **The element selection is implemented by the** `getElementsFrom <theory.html#theoryPrediction._getElementsFrom>`_ **method**
+Therefore an additional requirement is imposed when clustering |topologies|: the distance between any |SMS| belonging to a cluster and the average |SMS| for the cluster must also be smaller than `maxDist <matching.html#matching.clusterTools.clusterSMS>`_. Hence the conditions for clustering two or more |SMS| reads:
 
-.. _EMcluster:
 
-Element Clustering
-^^^^^^^^^^^^^^^^^^
 
-After the efficiencies have been
-applied to the element's weights, all the |elements| can be combined together when computing
-the theory prediction for the given |Dataset| (signal region). Since a given signal region
-correspond to the same signal upper limit for any |element|,
-the :ref:`distance <distance>` between any two |elements| for an |EMr| is always zero and
-the clustering procedure described :ref:`above <ULcluster>`
-will trivially group together all the selected |elements| into a single cluster:
+   1. :math:`d(a,b) < d_{\rm max}`, for any "a" and "b" in the cluster
+   2. :math:`d(a,avg) < d_{\rm max}`, for any "a" in the cluster
 
-.. image:: images/EMcluster.png
-   :width: 80%
+.. math::
 
-* **The clustering of elements is implemented by the** `clusterElements <theory.html#theory.clusterTools.clusterElements>`_  **method**.
+where *average* SMS of a cluster corresponds to
+the |SMS| with the same common structure and final states, but with the
+mass array and widths replaced by the average mass and width over all the |topologies| in the cluster.
 
-.. [#f1] When refering to an |element| mass or width, we mean all the masses
-   and widths of the Z\ :sub:`2`-odd |particles| appearing in the |element|. Two |elements| are considered to have identical
-   masses and widths if their mass arrays and width arrays are identical.
-.. [#f2] The number of |elements| passing the selection also depends on the availability of efficiency maps
-   for the |elements| generated by the decomposition. Whenever there are no efficiencies available for an
-   element, the efficiency is taken to be zero.
+
+
+* **The clustering of SMS is implemented by the** `clusterSMS <matching.html#matching.clusterTools.clusterSMS>`_  **method**.
+
+
+
 .. [#f3] The comparison of the |particle| properties is done only for the properties which have been defined for both |particles|. For instance, it is often the case that the spin property is not defined for particles appearing in the database topologies, so this property will be ignored when comparing particles from the model topology and to the ones from the database topology.
 .. [#f4] In order to comparing two sets of daughters (mapped to a bipartite graph) irrespective of their ordering, a `maximal matching algorithm <https://en.wikipedia.org/wiki/Hopcroft%E2%80%93Karp_algorithm>`_ is used. Note that it is possible that the matching is not unique (i.e. :math:`A \leftrightarrow a, B \leftrightarrow b` and :math:`A \leftrightarrow b, B \leftrightarrow a`) and in this case the matching procedure is not deterministic.

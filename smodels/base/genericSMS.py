@@ -1081,7 +1081,7 @@ class GenericSMS(object):
         :param smColor: color used for particles which have the isSM attribute set to True
         :param pvColor: color for primary vertex
         :param fontsize: Font size for labels
-        :param labelAttr: attribute to be used as label. If None, will use the string representation of the node object.
+        :param labelAttr: attribute to be used as label. If None, will use the string representation of the node object. It can also be a dictionary with node indices as keys and the label strings as values.
         :param attrUnit: Unum object with the unit to be removed from label attribute(if applicable)
         :param filename: Filename to save drawing to.
         :param view: open a viewer after plotting
@@ -1104,6 +1104,8 @@ class GenericSMS(object):
 
         if labelAttr is None:
             labels = {nodeIndex: "" for _,nodeIndex in nodesAndIndices}
+        elif isinstance(labelAttr,dict):
+            labels = {k : v for k,v in labelAttr.items()}
         elif labelAttr == 'label':
             labels = {nodeIndex: str(n) for n,nodeIndex in nodesAndIndices}
         elif attrUnit is not None:
