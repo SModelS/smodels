@@ -130,7 +130,7 @@ class XSecResummino(XSecBasis):
                 print(num_try)
                 self.launch_command(self.resummino_bin, input_file, output_file, order)
                 if num_try == 0:
-                    hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections)
+                    hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections, log)
             else:
                 hist = self.write_in_slha(output_file, slha_file, 0, particle_1, particle_2, self.type, Xsections, log)
             return
