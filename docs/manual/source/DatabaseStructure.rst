@@ -199,7 +199,7 @@ In this case, the :ref:`lifetime reweigthing factor <dbReweighting>`
 is applied only for the mother decay.
 
 
-.. _inclusiveSMS:
+.. _inclusiveSMSdesc:
 
 Inclusive Simplified Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

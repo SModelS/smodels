@@ -123,7 +123,7 @@ for two types of :ref:`experimental results <ExpResult>`:
 |ULrs| and |EMrs|. 
 Each of them requires slightly different theoretical predictions to be compared against experimental data.
 
-.. _thePredUL:
+.. _thePredEM:
 
 Theory Predictions for Efficiency Map Results
 ---------------------------------------------
