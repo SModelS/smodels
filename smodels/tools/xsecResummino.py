@@ -218,14 +218,30 @@ class XSecResummino(XSecBasis):
                 result = results[1].split(" ")[2][1:]
             elif order == 2:
                 result = results[2].split(" ")[2][1:]
-        if type_writing == "all":
+            print('the highest result is', result)
+        elif type_writing == "all":
             result = [results[0].split(" ")[2][1:], results[1].split(" ")[2][1:], results[2].split(" ")[2][1:]]
+        else :
+            result_list = [results[0].split(" ")[2][1:], results[1].split(" ")[2][1:], results[2].split(" ")[2][1:]]
+            result = 0
+            for i in results:
+                _ = i.split(" ")[2][1:]
+                _ = float(_)
+                if _ != 0:
+                    result = i.split(" ")[2][1:]     
+            return result
         
         if order == 1:
             #_ = math.fabs(results[0].split(" ")[2][1:]-results[1].split(" ")[2][1:])
             if float(results[1].split(" ")[2][1:])>2*float(results[0].split(" ")[2][1:]) or float(results[0].split(" ")[2][1:])> 2* float(results[1].split(" ")[2][1:]):
                 with open('log.txt', 'a') as f:
                     f.write(f"to much change between LO and NLO for {particle_1} and {particle_2} with {slha_file}")
+                return 1
+        if order == 2:
+            #_ = math.fabs(results[0].split(" ")[2][1:]-results[1].split(" ")[2][1:])
+            if float(results[2].split(" ")[2][1:])>2*float(results[0].split(" ")[2][1:]) or float(results[0].split(" ")[2][1:])> 2* float(results[1].split(" ")[2][1:]):
+                with open('log.txt', 'a') as f:
+                    f.write(f"to much change between LO and NLL+NLO for {particle_1} and {particle_2} with {slha_file}")
                 return 1
             
         self.create_xsection(result, particle_1, particle_2, order, Xsections)
@@ -440,7 +456,36 @@ class XSecResummino(XSecBasis):
             with open(self.json_resummino, "r") as fi:
                  data = json.load(fi)
                         
-            pdf = data["pdf"]
+            pdfs = data["pdfs"]
+            
+            pdf_lo = pdfs['pdf_lo']
+            pdfset_lo = pdfs['pdfset_lo']
+            pdf_nlo = pdfs['pdf_nlo']
+            pdfset_nlo = pdfs['pdfset_nlo']
+            
+            pwd = os.getcwd()
+            lhapdf_folder = os.path.join(pwd, 'smodels', 'lib', 'resummino', 'lhapdf', 'share', 'LHAPDF')
+            
+            if not os.path.exists(os.path.join(lhapdf_folder, pdf_lo)):
+                comand = f"wget http://lhapdfsets.web.cern.ch/lhapdfsets/current/{pdf_lo}.tar.gz -O- | tar xz -C {lhapdf_folder}"
+                subprocess.run(comand, shell=True)
+                
+            if not os.path.exists(os.path.join(lhapdf_folder, pdf_nlo)):
+                comand = f"wget http://lhapdfsets.web.cern.ch/lhapdfsets/current/{pdf_nlo}.tar.gz -O- | tar xz -C {lhapdf_folder}"
+                subprocess.run(comand, shell=True)
+                
+            with open(file_after, 'w') as f:
+                for line in lines:
+                    if line.startswith("pdf_lo"):
+                        line = f"pdf_lo = {pdf_lo}\n"
+                    if line.startswith("pdfset_lo"):
+                        line = f"pdfset_lo = {pdfset_lo}\n"
+                    if line.startswith("pdf_nlo"):
+                        line = f"pdf_nlo = {pdf_nlo}\n"
+                    if line.startswith("pdfset_nlo"):
+                        line = f"pdfset_nlo = {pdfset_nlo}\n" 
+                    f.write(line)
+                
         except KeyError:
                 print("choosing PDF4LHC21_40 by default")
            
@@ -448,10 +493,13 @@ class XSecResummino(XSecBasis):
             for line in lines:
                 if line.startswith("slha ="):
                     line = f"slha = {slha_file}\n"
-                f.write(line)
                 if self.sqrt == '8.0':
                     if line.startswith("center_of_mass_energy ="):
                         line = f"center_of_mass_energy = 8000"
+                if self.sqrt == '13.6':
+                    if line.startswith("center_of_mass_energy ="):
+                        line = f"center_of_mass_energy = 13600"
+                f.write(line)
 
 
     def json_extraction(self):
