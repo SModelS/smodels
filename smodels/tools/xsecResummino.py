@@ -381,18 +381,21 @@ class XSecResummino(XSecBasis):
             os.mkdir('smodels/lib/resummino/resummino_out')
         if not os.path.exists('smodels/lib/resummino/resummino_log'):
             os.mkdir('smodels/lib/resummino/resummino_log')
-            
+        
+        #current directory
+        pwd = os.getcwd()
+        
+        #always use absolute path
+        slha_folder = os.path.join(pwd, slha_folder_name)  
         #Check if the input is a file or a directory
-        if not os.path.isfile(slha_folder_name):
+        if not os.path.isfile(slha_folder):
             liste_slha = os.listdir(slha_folder_name)
         else:
             liste_slha = [slha_folder_name]
             
-        #current directory
-        pwd = os.getcwd()
+    
 
-        #always use absolute path
-        slha_folder = os.path.join(pwd, slha_folder_name)
+        
 
         '''
         a = number of files
@@ -404,11 +407,11 @@ class XSecResummino(XSecBasis):
         #Loop on all the slha file, in a random order (os.listdir)
         for slha in liste_slha:
             
-            
-            if not os.path.isfile(slha_folder_name):
+            print(slha, slha_folder)
+            if not os.path.isfile(slha_folder):
                 slha_path = os.path.join(slha_folder,slha)
             else:
-                slha_path = slha
+                slha_path = os.path.join(pwd, slha)
             #Variable used to avoid strange result (huge difference between LO and NLO result)
             num_try = 0
             with open(slha_path, 'r') as f:
