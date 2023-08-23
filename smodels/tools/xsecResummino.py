@@ -203,7 +203,7 @@ class XSecResummino(XSecBasis):
         
         Xsection.value = float(result) * pb
         Xsection.info.order = order
-        Xsection.info.sqrts = 13. * TeV
+        Xsection.info.sqrts = float(self.sqrt) * TeV
         Xsection.info.label = "WAOUW"
         Xsection.pid = (particle_1, particle_2)
         Xsections.add(Xsection)
@@ -584,6 +584,7 @@ def main(args):
     print([float(x) for x in sqrtses])
     
     for sqrt in sqrtses:
+        print('WAOUW', sqrt)
         test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting)
         test.routine_resummino()
     return
