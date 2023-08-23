@@ -35,7 +35,7 @@ except ImportError as e:
 
 class XSecResummino(XSecBasis):
     """ cross section computer class, what else? """
-    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type = 'all'):
+    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type = 'all', verbosity = ''):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
                     if maxOrder == LO, compute only LO pythia xsecs
@@ -56,8 +56,7 @@ class XSecResummino(XSecBasis):
         self.ncpu = ncpu
         self.sqrts = sqrt
         self.type = type
-        # sqrts = [float(x) for x in self.sqrts]
-        # self.sqrt = sqrts[0]
+        self.verbosity = verbosity
         self.sqrt = sqrt
     
         with open(self.json_resummino, "r") as f:
@@ -75,7 +74,7 @@ class XSecResummino(XSecBasis):
             with open(slha_file, 'a') as f:
                 f.write(' #no_cross-section\n')
 
-        #Utilisé ici pour vérifier si on a pas écrit 2 fois le #no_cross-section    
+        #Use to check the #no_cross_section stuff 
         self.are_crosssection(slha_file, order)
         if particles == None:
             return
@@ -114,20 +113,23 @@ class XSecResummino(XSecBasis):
         already_written_canal = self.canaux_finding(slha_file)
 
         _ = str(self.sqrt*10**(-1))+'0E+04'
-        print("channel, order and cross section",particle_1,particle_2, order, _)
-        print(already_written_canal)
+        
+        if self.verbosity == 'debug':
+            print("channel, order and cross section",particle_1,particle_2, order, _)
+            print(already_written_canal)
         if (((particle_1, particle_2), _, order)) in already_written_canal:
-            print('wow')
             return
         
         if self.mode == "check":
             self.launch_command(self.resummino_bin, input_file, output_file, 0)
             infos = self.search_in_output(output_file)
             infos = infos[0].split(" ")[2][1:]
-            print("cross section is ", infos, "at LO order")
-            print("Is cross section above the limit ?", float(infos)>10**(-5))
+            if self.verbosity == 'info' or self.verbosity == 'debug':
+                print("cross section is ", infos, "at LO order")
+                print("Is cross section above the limit ?", float(infos)>10**(-5))
             if (float(infos))>(10**(-5)):
-                print(num_try)
+                if self.verbosity == 'debug':
+                    print('num try is', num_try)
                 self.launch_command(self.resummino_bin, input_file, output_file, order)
                 if num_try == 0:
                     hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections, log)
@@ -157,7 +159,8 @@ class XSecResummino(XSecBasis):
 
         #if there is an error, we inform the user and launch again resummino
         if hist == 1:
-            print("error")
+            if self.verbosity == 'warning':
+                print("error")
             num_try = 0
             self.modifie_outgoing_particles(input_file, input_file, particle_1, particle_2)
             self.launcher(input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, log)
@@ -232,13 +235,11 @@ class XSecResummino(XSecBasis):
             return result
         
         if order == 1:
-            #_ = math.fabs(results[0].split(" ")[2][1:]-results[1].split(" ")[2][1:])
             if float(results[1].split(" ")[2][1:])>2*float(results[0].split(" ")[2][1:]) or float(results[0].split(" ")[2][1:])> 2* float(results[1].split(" ")[2][1:]):
                 with open(log, 'a') as f:
                     f.write(f"to much change between LO and NLO for {particle_1} and {particle_2} with {slha_file}")
                 return 1
         if order == 2:
-            #_ = math.fabs(results[0].split(" ")[2][1:]-results[1].split(" ")[2][1:])
             if float(results[2].split(" ")[2][1:])>2*float(results[0].split(" ")[2][1:]) or float(results[0].split(" ")[2][1:])> 2* float(results[1].split(" ")[2][1:]):
                 with open(log, 'a') as f:
                     f.write(f"to much change between LO and NLL+NLO for {particle_1} and {particle_2} with {slha_file}")
@@ -246,7 +247,6 @@ class XSecResummino(XSecBasis):
             
         self.create_xsection(result, particle_1, particle_2, order, Xsections)
             
-        #self.writing_result(result, particle_1, particle_2, slha_file, order, type_writing)
         return 0
 
     def extract_m1_m2_mu(self, file_path):
@@ -566,6 +566,12 @@ def main(args):
     ncpus = canonizer.checkNCPUs ( args.ncpus, inputFiles )
     type_writting = canonizer.writeToFile(args)
     
+    #We choose to select highest by default
+    if type_writting == None :
+        type_writting == 'highest'
+        
+    verbosity = args.verbosity
+
     ssmultipliers = None
     if hasattr ( args, "ssmultipliers" ):
         ssmultipliers = canonizer.getSSMultipliers ( args.ssmultipliers )
@@ -577,15 +583,18 @@ def main(args):
                 if type(multiplier) not in [ int, float ]:
                     logger.error ( "values of ssmultipliers need to be supplied as ints or floats" )
                     sys.exit()
-
-    print("sqrt :" +str(sqrtses))
-    print("order" + str(order))
-    print("ncpu" + str(ncpus))
-    print([float(x) for x in sqrtses])
+                    
+    print('verbosity is', verbosity)
+    if verbosity == 'info':
+        print("sqrt :" +str(sqrtses))
+        print("order" + str(order))
+        print("ncpu" + str(ncpus))
+        print([float(x) for x in sqrtses])
     
     for sqrt in sqrtses:
-        print('WAOUW', sqrt)
-        test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting)
+        if verbosity == 'info':
+            print('Current energy considered is ', sqrt)
+        test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting, verbosity = verbosity)
         test.routine_resummino()
     return
     
