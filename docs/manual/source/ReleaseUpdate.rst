@@ -46,6 +46,12 @@ New in Version 3.0.0:
   * Inclusion of analyses with searches for resonant production
   * ...
 
+New in Version 2.3.2:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * fixed bug in initialisation of :ref:`analyses combination <analysesCombination>`
+  * added smodels version to output of "txt" printer
+
 New in Version 2.3.1:
 ^^^^^^^^^^^^^^^^^^^^^
 

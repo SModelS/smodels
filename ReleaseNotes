@@ -5,6 +5,14 @@ Release v3.0.0, xxx
     So the FinalStateSMS objects do not exactly match the GeneralElements from v2 (several GeneralElements can be mapped to a single FinalStateSMS)
   * Added option for setting the erased quantum numbers for prompt particles in the parameters file. If not defined, it will not erase the attributes
 
+
+Release v2.3.2, Wed 30 Aug 2023
+=======================================================
+
+  * fixed bug in initialisation of analysis combination
+  * added smodels version to output of "txt" printer
+
+
 Release v2.3.1, Mon 17 Jul 2023
 =======================================================
 
