@@ -333,8 +333,10 @@ class TxTPrinter(BasicPrinter):
         for label in labels:
             par = obj.parameters[label]
             output += "# " + label + " = " + str(par) + '\n'
+        if obj.smodelsVersion:
+            output += f"# SModelS version: {obj.smodelsVersion}\n"
         if obj.databaseVersion:
-            output += "# Database version: %s\n" % obj.databaseVersion
+            output += f"# Database version: {obj.databaseVersion}\n"
         output += "=" * 80 + "\n"
         return output
 
