@@ -1,3 +1,9 @@
+Release v2.3.2, Wed 30 Aug 2023
+=======================================================
+
+  * fixed bug in initialisation of analysis combination
+  * added smodels version to output of "txt" printer
+
 Release v2.3.1, Mon 17 Jul 2023
 =======================================================
 

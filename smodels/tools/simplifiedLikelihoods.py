@@ -781,8 +781,11 @@ class LikelihoodComputer:
             muhat = float(dn[0])
             if abs(self.model.nsignal) > 1e-100:
                 muhat = float(dn[0] / self.model.nsignal[0])
-            sigma_mu = np.sqrt(self.model.observed[0] + self.model.covariance[0][0])
+            #sigma_mu2 = np.sqrt(self.model.observed[0] / self.model.nsignal[0] + self.model.covariance[0][0] )
+            theta_hat = self.findThetaHat( muhat )
+            sigma_mu = self.getSigmaMu ( muhat, theta_hat[0] )
             ret= self.likelihood( return_nll=return_nll, mu = muhat )
+            # print ( "sigma_mu", sigma_mu, "old", sigma_mu2 )
             return { "lmax": ret, "muhat": muhat, "sigma_mu": sigma_mu }
         fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
                               extended_output=True, return_nll=return_nll
