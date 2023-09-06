@@ -41,7 +41,7 @@ New in Version 2.3.2:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * fixed bug in initialisation of :ref:`analyses combination <analysesCombination>`
-  * added smodels version to output of "txt" printer
+  * smodels version now printed in all output formats
 
 New in Version 2.3.1:
 ^^^^^^^^^^^^^^^^^^^^^
