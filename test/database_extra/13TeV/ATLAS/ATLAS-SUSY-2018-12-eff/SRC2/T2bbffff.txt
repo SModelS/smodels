@@ -1,0 +1,33 @@
+txName: T2bbffff
+constraint: [[['b', 'jet','jet']],[['b', 'jet','jet']]]
+condition: None
+conditionDescription: None
+susyProcess: pp --> stop stop, stop  --> bottom f f lsp
+figureUrl: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-12/figaux_10a.png;https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-12/figaux_10b.png
+dataUrl: https://www.hepdata.net/record/ins1793461?version=2
+source: ATLAS
+validated: True
+axes: [[x, y], [x, y]]
+finalState: ['MET', 'MET']
+intermediateState: None
+efficiencyMap: [[[[4.5000E+02*GeV,4.4300E+02*GeV],[4.5000E+02*GeV,4.4300E+02*GeV]],0.0],
+[[[4.0000E+02*GeV,3.5000E+02*GeV],[4.0000E+02*GeV,3.5000E+02*GeV]],0.0],
+[[[6.5000E+02*GeV,6.0000E+02*GeV],[6.5000E+02*GeV,6.0000E+02*GeV]],0.0],
+[[[5.5000E+02*GeV,5.4300E+02*GeV],[5.5000E+02*GeV,5.4300E+02*GeV]],0.0],
+[[[5.0000E+02*GeV,4.5000E+02*GeV],[5.0000E+02*GeV,4.5000E+02*GeV]],0.0],
+[[[4.0000E+02*GeV,3.9300E+02*GeV],[4.0000E+02*GeV,3.9300E+02*GeV]],2.736e-06],
+[[[5.0000E+02*GeV,4.8000E+02*GeV],[5.0000E+02*GeV,4.8000E+02*GeV]],0.0],
+[[[3.5000E+02*GeV,3.0000E+02*GeV],[3.5000E+02*GeV,3.0000E+02*GeV]],0.0],
+[[[6.5000E+02*GeV,6.4300E+02*GeV],[6.5000E+02*GeV,6.4300E+02*GeV]],0.0],
+[[[3.5000E+02*GeV,3.3000E+02*GeV],[3.5000E+02*GeV,3.3000E+02*GeV]],0.0],
+[[[5.0000E+02*GeV,4.9300E+02*GeV],[5.0000E+02*GeV,4.9300E+02*GeV]],0.0],
+[[[3.5000E+02*GeV,3.4300E+02*GeV],[3.5000E+02*GeV,3.4300E+02*GeV]],0.0],
+[[[4.5000E+02*GeV,4.3000E+02*GeV],[4.5000E+02*GeV,4.3000E+02*GeV]],0.0],
+[[[3.0000E+02*GeV,2.8000E+02*GeV],[3.0000E+02*GeV,2.8000E+02*GeV]],0.0],
+[[[6.0000E+02*GeV,5.5000E+02*GeV],[6.0000E+02*GeV,5.5000E+02*GeV]],0.0],
+[[[4.5000E+02*GeV,4.0000E+02*GeV],[4.5000E+02*GeV,4.0000E+02*GeV]],0.0],
+[[[3.0000E+02*GeV,2.9300E+02*GeV],[3.0000E+02*GeV,2.9300E+02*GeV]],0.0],
+[[[4.0000E+02*GeV,3.8000E+02*GeV],[4.0000E+02*GeV,3.8000E+02*GeV]],0.0],
+[[[3.0000E+02*GeV,2.5000E+02*GeV],[3.0000E+02*GeV,2.5000E+02*GeV]],0.0],
+[[[6.0000E+02*GeV,5.9300E+02*GeV],[6.0000E+02*GeV,5.9300E+02*GeV]],0.0],
+[[[5.5000E+02*GeV,5.0000E+02*GeV],[5.5000E+02*GeV,5.0000E+02*GeV]],0.0]]
