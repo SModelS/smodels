@@ -30,7 +30,7 @@ SModelS Tools
 Inside SModelS there is a number of tools that may be convenient for the user:
 
 * a :ref:`cross section calculator <xsecCalc>` based on `Pythia8 <http://pythia.org>`_ (or `Pythia6 <http://pythia6.hepforge.org>`_),
-  `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ and `Resummino <https://resummino.hepforge.org>`,
+  `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ and `Resummino <https://resummino.hepforge.org>`_,
 * :ref:`SLHA and LHE file checkers <fileChecks>` to check your input files for completeness and sanity,
 * a :ref:`database browser <databaseBrowser>` to provide easy access to the |database| of experimental results,
 * a plotting tool to make :ref:`interactive plots <interactivePlots>` based on `plotly <https://plot.ly/python/>`_ (v1.1.3 onwards),
