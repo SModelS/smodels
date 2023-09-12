@@ -4,6 +4,7 @@ channels:
 dependencies:
   - python
   - pip
+  - setuptools
   - pip:
     - matplotlib
     - pandas
