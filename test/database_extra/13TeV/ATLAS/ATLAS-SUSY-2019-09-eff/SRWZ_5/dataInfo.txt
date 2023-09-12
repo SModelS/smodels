@@ -1,0 +1,7 @@
+dataId: SRWZ_5
+dataType: efficiencyMap
+observedN: 42.0
+expectedBG: 58.0
+bgError: 5.0
+upperLimit: 0.0713*fb
+expectedUpperLimit: 0.146*fb

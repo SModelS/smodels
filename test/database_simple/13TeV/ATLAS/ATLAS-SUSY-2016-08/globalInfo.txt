@@ -1,0 +1,11 @@
+id: ATLAS-SUSY-2016-08
+sqrts: 13*TeV
+lumi: 32.8/fb
+prettyName: displaced vertices
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2016-08/
+arxiv: https://arxiv.org/abs/1710.04901
+publication: Phys. Rev. D 97 (2018) 052012
+contact: ATLAS collaboration
+private: False
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2019/3/28
