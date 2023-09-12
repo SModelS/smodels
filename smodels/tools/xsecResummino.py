@@ -39,12 +39,19 @@ class XSecResummino(XSecBasis):
     def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type = 'all', verbosity = '', json = None):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
-                    if maxOrder == LO, compute only LO pythia xsecs
-                    if maxOrder == NLO, apply NLO K-factors from NLLfast (if available)
-                    if maxOrder == NLL, apply NLO+NLL K-factors from NLLfast (if available)
+                    if maxOrder == LO, compute only LO resummino xsecs
+                    if maxOrder == NLO, compute NLO resummino xsecs
+                    if maxOrder == NLL, compute NLO+NLL resummino xsecs
         :param nevents: number of events for pythia run
         :param pythiaVersion: pythia6 or pythia8 (integer)
-        :param maycompile: if True, then tools can get compiled on-the-fly
+        :param sqrt: Center of mass energy to consider for the cross section calculation
+        :param mode_limit: Value below which if mode == "check", cross section at NLO order are not calculated
+        :param type: If all, put all the order in the slha file, if highest, only the hightest order.
+        :param json: Path to the json file with all the relevant informations concerning the resummino calculation
+        :param resummino_bin: Path to resummino executable
+        :param input_file_original: Path to the template input file of resummino
+        :param ncpu: Number of cpu used in parallel for the calculation
+        :param verbosity: Type of informations given in the logger file
         """
         self.pwd = installation.installDirectory()
         self.resummino_bin = os.path.join(self.pwd,"./smodels/lib/resummino/resummino-3.1.2/bin/resummino")
