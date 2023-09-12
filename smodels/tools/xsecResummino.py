@@ -35,7 +35,7 @@ except ImportError as e:
 
 
 class XSecResummino(XSecBasis):
-    """ cross section computer class, what else? """
+    """ cross section computer class (for resummino), what else? """
     def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type = 'all', verbosity = '', json = None):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
@@ -85,7 +85,7 @@ class XSecResummino(XSecBasis):
                              
         self.mode_limit = data["mode_limit"]
         
-    def one_slha_calculation(self, particles,input_file, slha_file, output_file, num_try, order, log):
+    def calculate_one_slha(self, particles,input_file, slha_file, output_file, num_try, order, log):
         """
         log file management and launch resummino command
         """
@@ -102,7 +102,7 @@ class XSecResummino(XSecBasis):
         Xsections = crossSection.XSectionList()
         
         for particle_pair in particles:
-            self.launcher(input_file, slha_file, output_file, particle_pair[0], particle_pair[1], num_try, order, Xsections, log)
+            self.launch_resummino(input_file, slha_file, output_file, particle_pair[0], particle_pair[1], num_try, order, Xsections, log)
             
         nxsecs = self.addXSecToFile(Xsections, slha_file, comment = "[pb], Resumminov3.1.2")
         
@@ -123,7 +123,7 @@ class XSecResummino(XSecBasis):
 
 
 
-    def launcher(self, input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, log):
+    def launch_resummino(self, input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, log):
         """
         Check everything before launching resummino
         """
@@ -184,8 +184,7 @@ class XSecResummino(XSecBasis):
                 self.info("error in resummino, trying again")
             num_try = 0
             self.modifie_outgoing_particles(input_file, input_file, particle_1, particle_2)
-            self.launcher(input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, log)
-    #launcher(input_file, slha_file, output_file, particle_1, particle_2)
+            self.launch_resummino(input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, log)
 
 
     def search_in_output(self, output_file):
@@ -478,7 +477,7 @@ class XSecResummino(XSecBasis):
 
             #On liste ici les canaux à utiliser, si scénario exclu alors renvoi None
             #particles = self.discrimination_particles(slha_path)
-            self.mode, particles = self.json_extraction()
+            self.mode, particles = self.extract_json()
             Liste_particles.append(particles)
 
             #On pourrait optimiser en enlevant les variables qui ne changent pas d'une itération à l'autre
@@ -548,7 +547,7 @@ class XSecResummino(XSecBasis):
                 f.write(line)
 
 
-    def json_extraction(self):
+    def extract_json(self):
         """_summary_
         
         function to extract all the informations in the resummino.json
@@ -584,12 +583,14 @@ class XSecResummino(XSecBasis):
             
             
     def routine_resummino(self):
-    
+        """
+        Launch all the calculations of the slha files in parallel (limited by ncpu), with first the creation of every path needed for the calculations.
+        """
         #On créer la liste
         tasks = self.routine_creation(self.maxOrder, self.slha_folder_name)
         #On lance le programme avec les performances maximales, à changer si besoin
         with ProcessPoolExecutor(max_workers=self.ncpu) as executor:
-            futures = [executor.submit(self.one_slha_calculation, *task) for task in tasks]
+            futures = [executor.submit(self.calculate_one_slha, *task) for task in tasks]
             for future in futures:
                 future.result()
 
