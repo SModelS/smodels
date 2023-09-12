@@ -29,8 +29,8 @@ SModelS Tools
 
 Inside SModelS there is a number of tools that may be convenient for the user:
 
-* a :ref:`cross section calculator <xsecCalc>` based on `Pythia8 <http://pythia.org>`_ (or `Pythia6 <http://pythia6.hepforge.org>`_) and
-  `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_,
+* a :ref:`cross section calculator <xsecCalc>` based on `Pythia8 <http://pythia.org>`_ (or `Pythia6 <http://pythia6.hepforge.org>`_),
+  `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ and `Resummino <https://resummino.hepforge.org>`,
 * :ref:`SLHA and LHE file checkers <fileChecks>` to check your input files for completeness and sanity,
 * a :ref:`database browser <databaseBrowser>` to provide easy access to the |database| of experimental results,
 * a plotting tool to make :ref:`interactive plots <interactivePlots>` based on `plotly <https://plot.ly/python/>`_ (v1.1.3 onwards),
@@ -85,6 +85,26 @@ Note that signal strength multipliers get applied only to LO cross sections. Thi
 
 * **The cross section calculation is implemented by the** `xsecComputer function <tools.html#tools.xsecComputer.XSecComputer>`_
 
+For the electrowikino sector, another tool is available to get the cross-section at NLL+NLO order (in this sector). This tools is based on `Resummino <https://resummino.hepforge.org>` and can
+calculate cross-section at LO, NLO and NLL+NLO orders. No K-factors are used, each orders are calculated independantly.
+
+** The usage of the Resummino cross section calculator is:**
+
+.. include:: XSeCResummino.rst
+
+A typical
+usage example is: ::
+
+   smodelsTools.py xsecresummino -s 13 -p -f inputFiles/slha/resummino_example.slha
+
+which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes with daugthers particles indicated in the resummino.json file. As for the xseccomputer tool,
+SModelS will then use only the highest order cross sections available for each process.
+
+Concerning the resummino.json file, the default file is present in the smodels/etc folder. This file need to be filled by all the daugthers particle to consider in the "channels" dictionnary.
+Other informations can be passed throught this file, like the "mode" parameters, which decided if we want to consider only the relevants process (superior or equal at the "mode_limit" value),
+or every process present in the file, even if the cross sections are very low.
+
+* **The cross section calculation is implemented by the** `XSeCResummino function <tools.html#tools.xsecResummino.XSecResummino>`_
 
 .. _fileChecks:
 

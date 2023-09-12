@@ -195,6 +195,18 @@ class ArgsStandardizer:
             return NLO
         return LO
 
+    def getjson ( self, args ):
+        """ retrieve the path to the json file from argument list """
+        json = args.json
+
+        if json == 'default':
+            return None
+        else:
+            if os.path.exists(json):
+                return json
+            else:
+                return logger.error("Path does not exist.")
+
     def queryCrossSections ( self, filename ):
         if os.path.isdir ( filename ):
             logger.error ( "Cannot query cross sections for a directory." )
