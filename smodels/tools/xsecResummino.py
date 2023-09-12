@@ -36,7 +36,7 @@ except ImportError as e:
 
 class XSecResummino(XSecBasis):
     """ cross section computer class, what else? """
-    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type = 'all', verbosity = ''):
+    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type = 'all', verbosity = '', json = None):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
                     if maxOrder == LO, compute only LO pythia xsecs
@@ -49,7 +49,15 @@ class XSecResummino(XSecBasis):
         self.pwd = installation.installDirectory()
         self.resummino_bin = os.path.join(self.pwd,"./smodels/lib/resummino/resummino-3.1.2/bin/resummino")
         self.input_file_original = os.path.join(self.pwd,"smodels/etc/ff1a240db6c1719fe9f299b3390d49d32050c4f1003286d2428411eca45bd50c.in")
-        self.json_resummino = os.path.join(self.pwd,"smodels/etc/resummino.json")
+        if json == None:
+            self.json_resummino = os.path.join(self.pwd,"smodels/etc/resummino.json")
+        else:
+            if os.path.isabs(json):
+                self.json_resummino = json
+            else:
+                self.json_resummino = os.path.join(self.pwd, json)
+
+        
         self.slha_folder_name = slha_folder_name
         self.maxOrder = maxOrder
         self.countNoXSecs = 0
@@ -479,7 +487,7 @@ class XSecResummino(XSecBasis):
         Change all the informations in the .in files before launching calculations
         Args:
             file_before (input file for resummino): template
-            file_after (input file for resummino): input file ready for resu;;ino 
+            file_after (input file for resummino): input file ready for resummino 
         """
         with open(file_before, 'r') as f:
             lines = f.readlines()
@@ -594,7 +602,7 @@ def main(args):
     inputFiles = args.filename.strip()
     ncpus = canonizer.checkNCPUs ( args.ncpus, inputFiles )
     type_writting = canonizer.writeToFile(args)
-    
+    json = canonizer.getjson(args)
     #We choose to select highest by default
     if type_writting == None :
         type_writting = 'highest'
@@ -623,7 +631,7 @@ def main(args):
     for sqrt in sqrtses:
         if verbosity == 'info':
             print('Current energy considered is '+ str(sqrt)+ ' TeV')
-        test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting, verbosity = verbosity)
+        test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting, verbosity = verbosity, json = json)
         test.routine_resummino()
     return
     
