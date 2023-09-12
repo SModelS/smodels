@@ -85,12 +85,12 @@ Note that signal strength multipliers get applied only to LO cross sections. Thi
 
 * **The cross section calculation is implemented by the** `xsecComputer function <tools.html#tools.xsecComputer.XSecComputer>`_
 
-For the electrowikino sector, another tool is available to get the cross-section at NLL+NLO order (in this sector). This tools is based on `Resummino <https://resummino.hepforge.org>` and can
+For the electrowikino sector, another tool is available to get the cross-section at NLL+NLO order (in this sector). This tools is based on `Resummino <https://resummino.hepforge.org>`_ and can
 calculate cross-section at LO, NLO and NLL+NLO orders. No K-factors are used, each orders are calculated independantly.
 
-** The usage of the Resummino cross section calculator is:**
+**The usage of the Resummino cross section calculator is:**
 
-.. include:: XSeCResummino.rst
+.. include:: XSecResummino.rst
 
 A typical
 usage example is: ::
