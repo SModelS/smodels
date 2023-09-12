@@ -5,6 +5,7 @@ dependencies:
   - python
   - pip
   - pip:
+    - setuptools
     - matplotlib
     - pandas
     - plotly
