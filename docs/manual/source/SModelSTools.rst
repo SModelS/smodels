@@ -83,10 +83,13 @@ This will compute 8 TeV and 13 TeV LO cross sections as above, but the cross sec
 Note that signal strength multipliers get applied only to LO cross sections. This means they are propagated to NLO and NLL level only if the LO cross sections are computed first and the NLO/NLL corrections added afterwards. In other words, if the xseccomputer is called with -n or -N argument but without -O (--LOfromSLHA), the --ssmultipliers argument will be ignored.
 
 
-* **The cross section calculation is implemented by the** `xsecComputer function <tools.html#tools.xsecComputer.XSecComputer>`_
+* **The cross section calculation is implemented by the** `XSecComputer class <tools.html#tools.xsecComputer.XSecComputer>`_
 
-For the electrowikino sector, another tool is available to get the cross-section at NLL+NLO order (in this sector). This tools is based on `Resummino <https://resummino.hepforge.org>`_ and can
-calculate cross-section at LO, NLO and NLL+NLO orders. No K-factors are used, each orders are calculated independantly.
+
+Resummino Cross Sections
+------------------------
+
+For the electroweakino sector, another tool is available to get the according cross-sections at NLL+NLO order. This tool is based on `Resummino <https://resummino.hepforge.org>`_ and can calculate cross-sections at LO, NLO, and NLL+NLO orders. No K-factors are used, all orders are calculated independently.
 
 **The usage of the Resummino cross section calculator is:**
 
@@ -97,14 +100,12 @@ usage example is: ::
 
    smodelsTools.py xsecresummino -s 13 -p -f inputFiles/slha/resummino_example.slha
 
-which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes with daugthers particles indicated in the resummino.json file. As for the xseccomputer tool,
-SModelS will then use only the highest order cross sections available for each process.
+which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes with daughter particles indicated in the resummino.json file. As with the xseccomputer tool, SModelS will then write ouzt only the highest order cross sections available for each process.
 
-Concerning the resummino.json file, the default file is present in the smodels/etc folder. This file need to be filled by all the daugthers particle to consider in the "channels" dictionnary.
-Other informations can be passed throught this file, like the "mode" parameters, which decided if we want to consider only the relevants process (superior or equal at the "mode_limit" value),
-or every process present in the file, even if the cross sections are very low.
+Concerning the resummino.json file, the default file is present in the smodels/etc folder. This file needs to list all the daughter particles to consider in the "channels" dictionary.
+Other information can be passed throught this file, like the "mode" parameters, which decided if we want to consider only the relevant process (equal to or above the "mode_limit" value), or every process present in the file, even if the cross sections are very low.
 
-* **The cross section calculation is implemented by the** `XSeCResummino function <tools.html#tools.xsecResummino.XSecResummino>`_
+* **The resummino cross section calculation is implemented by the** `XSeCResummino class <tools.html#tools.xsecResummino.XSecResummino>`_
 
 .. _fileChecks:
 
