@@ -133,7 +133,12 @@ class XSecResummino(XSecBasis):
         
         already_written_canal = self.find_channels(slha_file)
 
-        _ = str(self.sqrt*10**(-1))+'0E+04'
+        if self.sqrt > 10:
+            _ = str(self.sqrt*10**(-1))+'0E+04'
+        else:
+            _ = str(self.sqrt)+'.00E+03'
+        
+        already_written_canal_set = [({x,y},z,w) for (x,y), z,w in already_written_canal]
         
         if self.verbosity == 'debug':
             logger.info("channel, order and cross section" + str(particle_1)+str(particle_2)+ str(order)+ str(_))
