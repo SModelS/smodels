@@ -100,9 +100,9 @@ usage example is: ::
 
    smodelsTools.py xsecresummino -s 13 -p -f inputFiles/slha/resummino_example.slha
 
-which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes with daughter particles indicated in the resummino.json file. As with the xseccomputer tool, SModelS will then write ouzt only the highest order cross sections available for each process.
+which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes with mother particles indicated in the resummino.json file. As with the xseccomputer tool, SModelS will then write ouzt only the highest order cross sections available for each process.
 
-Concerning the resummino.json file, the default file is present in the smodels/etc folder. This file needs to list all the daughter particles to consider in the "channels" dictionary.
+Concerning the resummino.json file, the default file is present in the smodels/etc folder. This file needs to list all the mother particles to consider in the "channels" dictionary.
 Other information can be passed throught this file, like the "mode" parameters, which decided if we want to consider only the relevant process (equal to or above the "mode_limit" value), or every process present in the file, even if the cross sections are very low.
 
 * **The resummino cross section calculation is implemented by the** `XSecResummino class <tools.html#tools.xsecResummino.XSecResummino>`_
