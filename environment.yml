@@ -4,6 +4,8 @@ channels:
 dependencies:
   - python
   - pip
+  - setuptools
+  - wheel
   - pip:
     - matplotlib
     - pandas
@@ -14,3 +16,6 @@ dependencies:
     - unum
     - requests
     - pyslha
+    - pyhf
+    - jsonpatch
+    - jsonschema
