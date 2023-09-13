@@ -2,7 +2,7 @@ name: environment-smodels
 channels:
   - conda-forge
 dependencies:
-  - python == 3.10
+  - python
   - pip
   - setuptools
   - wheel
