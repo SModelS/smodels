@@ -55,7 +55,7 @@ class XSecResummino(XSecBasis):
         """
         self.pwd = installation.installDirectory()
         self.resummino_bin = os.path.join(self.pwd,"./smodels/lib/resummino/resummino-3.1.2/bin/resummino")
-        self.input_file_original = os.path.join(self.pwd,"smodels/etc/ff1a240db6c1719fe9f299b3390d49d32050c4f1003286d2428411eca45bd50c.in")
+        self.input_file_original = os.path.join(self.pwd,"smodels/etc/input_resummino.in")
         if json == None:
             self.json_resummino = os.path.join(self.pwd,"smodels/etc/resummino.py")
         else:

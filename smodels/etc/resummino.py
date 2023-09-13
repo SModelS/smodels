@@ -7,7 +7,7 @@
 
 #pdfs: You can use the pdfs part to change the parton distribution function used for the cross-section calculation.
 #We used PDFLHC2021 by default, but any pdf can be used. Be sure to check the name on the lhapdf website before putting
-#any value here.
+#any value here.s
 
 {
     "channels" : {"1" : [1000023,1000025],
