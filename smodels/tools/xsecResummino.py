@@ -27,7 +27,7 @@ from concurrent.futures import ProcessPoolExecutor
 from smodels.tools.xsecBasis import XSecBasis, ArgsStandardizer
 import pyslha
 import math
-import json
+import shutil
 try:
     import cStringIO as io
 except ImportError as e:
@@ -45,7 +45,7 @@ class XSecResummino(XSecBasis):
         :param nevents: number of events for pythia run
         :param pythiaVersion: pythia6 or pythia8 (integer)
         :param sqrt: Center of mass energy to consider for the cross section calculation
-        :param mode_limit: Value below which if mode == "check", cross section at NLO order are not calculated
+        :param xsec_limit: Value below which if mode == "check", cross section at NLO order are not calculated
         :param type: If all, put all the order in the slha file, if highest, only the hightest order.
         :param json: Path to the json file with all the relevant informations concerning the resummino calculation
         :param resummino_bin: Path to resummino executable
@@ -83,7 +83,7 @@ class XSecResummino(XSecBasis):
         with open(self.json_resummino, "r") as f:
             data = eval(f.read())
                              
-        self.mode_limit = data["mode_limit"]
+        self.xsec_limit = data["xsec_limit"]
         
     def calculate_one_slha(self, particles,input_file, slha_file, output_file, num_try, order, log):
         """
@@ -152,8 +152,8 @@ class XSecResummino(XSecBasis):
             infos = infos[0].split(" ")[2][1:]
             if self.verbosity == 'info' or self.verbosity == 'debug':
                 logger.info("cross section is "+str(infos)+ " pb at LO order")
-                logger.info("Is cross section above the limit ? "+str( float(infos)>10**(-5)))
-            if (float(infos))>(10**(-5)):
+                logger.info("Is cross section above the limit ? "+str( float(infos)>self.xsec_limit))
+            if (float(infos))>(self.xsec_limit):
                 if self.verbosity == 'debug':
                     logger.info('num try is '+ str(num_try)+ ' for the moment')
                 self.launch_command(self.resummino_bin, input_file, output_file, order)
@@ -410,9 +410,9 @@ class XSecResummino(XSecBasis):
         Liste_particles = []
         Liste = []
 
-        resummino_in = os.path.join(self.pwd, 'smodels/lib/resummino/resummino_in')
-        resummino_out = os.path.join(self.pwd, 'smodels/lib/resummino/resummino_out')
-        resummino_log = os.path.join(self.pwd, 'smodels/lib/resummino/resummino_log')
+        resummino_in = '/tmp/resummino/resummino_in'
+        resummino_out = '/tmp/resummino/resummino_out'
+        resummino_log = '/tmp/resummino/resummino_log'
         #Check if the folder already exists
         if not os.path.exists(resummino_in):
             os.mkdir(resummino_in)
@@ -599,7 +599,13 @@ class XSecResummino(XSecBasis):
             for future in futures:
                 future.result()
 
+        resummino_in = '/tmp/resummino/resummino_in'
+        resummino_out = '/tmp/resummino/resummino_out'
+        resummino_log = '/tmp/resummino/resummino_log'
 
+        shutil.rmtree(resummino_in)
+        shutil.rmtree(resummino_out)
+        shutil.rmtree(resummino_log)
 
 def main(args):
     
