@@ -65,9 +65,9 @@ def main():
         help="sqrt(s) TeV. Can supply more than one value (as a space separated list). Default is both 8 and 13.",
         type=float, default=[])
     xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
-        help="Verbosity (debug, info, warning, error)")
+        help="verbosity (debug, info, warning, error)")
     xsecresummino.add_argument('-j', '--json', type=str, default='default',
-        help="Path to resummino.json file")
+        help="path to resummino.json configuration file")
     xsecresummino.add_argument('-c', '--ncpus', type=int, default=-1,
         help="number of cores to be used simultaneously. -1 means 'all'. ")
     xsecresummino.add_argument('-p', '--tofile', action='store_true',
