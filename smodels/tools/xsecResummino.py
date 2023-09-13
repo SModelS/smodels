@@ -643,7 +643,9 @@ def main(args):
     logger.info('verbosity is '+ verbosity)
     if verbosity == 'info' or verbosity == 'debug':
         logger.info("The calculation will be done using :" +str(sqrtses)+ ' TeV as center of mass energy')
-        logger.info("The max order considered for the calculation is  " + str(order)+ ' (0 = LO, 1 = NLO, 2 = NLL+NLO)')
+        orders_dic = {0:'LO', 1:'NLO', 2:'NLL+NLO'}
+
+        logger.info("The max order considered for the calculation is  " + orders_dic[order]+ ' (0 = LO, 1 = NLO, 2 = NLL+NLO)')
         logger.info("we are currently running on " + str(ncpus)+ ' cpu')
         logger.info(f"In this calculation, we'll use "+ str(type_writting) +" type of writting for the cross-section")
     
