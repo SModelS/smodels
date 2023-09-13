@@ -37,7 +37,7 @@ except ImportError as e:
 
 
 
-class XSecBasis:
+class XSecBase:
     """ cross section computer class, what else? """
     def __init__ ( self, maxOrder,slha_folder_name, maycompile=True):
         """
@@ -197,7 +197,7 @@ class ArgsStandardizer:
 
     def getjson ( self, args ):
         """ retrieve the path to the json file from argument list """
-        json = args.json
+        json = args.conf
 
         if json == 'default':
             return None
