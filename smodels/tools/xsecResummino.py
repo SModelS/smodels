@@ -24,7 +24,8 @@ from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 import subprocess
 from concurrent.futures import ProcessPoolExecutor
-from smodels.tools.xsecBasis import XSecBasis, ArgsStandardizer
+from smodels.tools.xsecBase import XSecBase, ArgsStandardizer
+import tempfile
 import pyslha
 import math
 import shutil
@@ -34,7 +35,7 @@ except ImportError as e:
     import io
 
 
-class XSecResummino(XSecBasis):
+class XSecResummino(XSecBase):
     """ cross section computer class (for resummino), what else? """
     def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type = 'all', verbosity = '', json = None):
         """
@@ -381,23 +382,23 @@ class XSecResummino(XSecBasis):
         return channels
 
 
-    def discrimination_particles(self, slha_file):
-        """
-        Choice of the differents channel and condtions on the cross section calculation.
-        C1<92 or N1>600 or C2>1200 by default.
-        """
-        m1,m2,mu = self.extract_m1_m2_mu(slha_file)
-        N1,N2,C1,C2 = self.extract_N1_N2_C1(slha_file)
-        abs_mu = math.fabs(mu)
-        if C1<92 or N1>600 or C2>1200:
-            return None
-        if m2>=abs_mu:
-            return [(1000025,1000037),(1000025,-1000037), (-1000037, 1000037)]
-        elif m2<abs_mu:
-            return [(1000023,1000037), (1000023,-1000037), (1000025, 1000037), (1000025, -1000037), (-1000037,1000037), (1000023,1000025)]
+    # def discrimination_particles(self, slha_file):
+    #     """
+    #     Choice of the differents channel and condtions on the cross section calculation.
+    #     C1<92 or N1>600 or C2>1200 by default.
+    #     """
+    #     m1,m2,mu = self.extract_m1_m2_mu(slha_file)
+    #     N1,N2,C1,C2 = self.extract_N1_N2_C1(slha_file)
+    #     abs_mu = math.fabs(mu)
+    #     if C1<92 or N1>600 or C2>1200:
+    #         return None
+    #     if m2>=abs_mu:
+    #         return [(1000025,1000037),(1000025,-1000037), (-1000037, 1000037)]
+    #     elif m2<abs_mu:
+    #         return [(1000023,1000037), (1000023,-1000037), (1000025, 1000037), (1000025, -1000037), (-1000037,1000037), (1000023,1000025)]
     
       
-    def routine_creation(self, order, slha_folder_name):
+    def create_routine_files(self, order, slha_folder_name):
     #slha_file = "outputM_12000M_20mu100.slha"
 
         #You haven't seen anything.
@@ -409,17 +410,19 @@ class XSecResummino(XSecBasis):
         Liste_output_file = []
         Liste_particles = []
         Liste = []
-
+        self.resummino_in = tempfile.mkdtemp()
+        self.resummino_out = tempfile.mkdtemp()
+        self.resummino_log = tempfile.mkdtemp()
         resummino_in = '/tmp/resummino/resummino_in'
         resummino_out = '/tmp/resummino/resummino_out'
         resummino_log = '/tmp/resummino/resummino_log'
         #Check if the folder already exists
-        if not os.path.exists(resummino_in):
-            os.mkdir(resummino_in)
-        if not os.path.exists(resummino_out):
-            os.mkdir(resummino_out)
-        if not os.path.exists(resummino_log):
-            os.mkdir(resummino_log)
+        if not os.path.exists(self.resummino_in):
+            os.mkdir(self.resummino_in)
+        if not os.path.exists(self.resummino_out):
+            os.mkdir(self.resummino_out)
+        if not os.path.exists(self.resummino_log):
+            os.mkdir(self.resummino_log)
         
         #always use absolute path
         slha_folder = os.path.join(self.pwd, slha_folder_name)  
@@ -427,6 +430,7 @@ class XSecResummino(XSecBasis):
         if not os.path.isfile(slha_folder):
             liste_slha = os.listdir(slha_folder_name)
         else:
+            name = os.path.normpath(slha_folder_name).split(os.path.sep)[-1]
             liste_slha = [slha_folder_name]
             
     
@@ -464,13 +468,15 @@ class XSecResummino(XSecBasis):
                 num_try+=1
 
             #remove the .slha
-            slha_file_name = slha[6:-5]
-
+            if not os.path.isfile(slha_folder):
+                slha_file_name = slha[6:-5]
+            else:
+                slha_file_name = name[6:-5]
             
 
-            resummino_in_file = os.path.join(resummino_in,f"resummino_{slha_file_name}.in")
-            resummino_out_file = os.path.join(resummino_out,f"resummino_{slha_file_name}.txt")
-            resummino_log_file = os.path.join(resummino_log,f"resummino_log_{slha_file_name}.txt")
+            resummino_in_file = os.path.join(self.resummino_in,f"resummino_{slha_file_name}.in")
+            resummino_out_file = os.path.join(self.resummino_out,f"resummino_{slha_file_name}.txt")
+            resummino_log_file = os.path.join(self.resummino_log,f"resummino_log_{slha_file_name}.txt")
             
             #On prend le fichier de référence, et on créer une copie dans resummino_in avec le bon fichier slha
             self.modifie_slha_file(self.input_file_original, resummino_in_file,slha_path)
@@ -592,7 +598,7 @@ class XSecResummino(XSecBasis):
         Launch all the calculations of the slha files in parallel (limited by ncpu), with first the creation of every path needed for the calculations.
         """
         #On créer la liste
-        tasks = self.routine_creation(self.maxOrder, self.slha_folder_name)
+        tasks = self.create_routine_files(self.maxOrder, self.slha_folder_name)
         #On lance le programme avec les performances maximales, à changer si besoin
         with ProcessPoolExecutor(max_workers=self.ncpu) as executor:
             futures = [executor.submit(self.calculate_one_slha, *task) for task in tasks]
@@ -603,9 +609,9 @@ class XSecResummino(XSecBasis):
         resummino_out = '/tmp/resummino/resummino_out'
         resummino_log = '/tmp/resummino/resummino_log'
 
-        shutil.rmtree(resummino_in)
-        shutil.rmtree(resummino_out)
-        shutil.rmtree(resummino_log)
+        shutil.rmtree(self.resummino_in)
+        shutil.rmtree(self.resummino_out)
+        shutil.rmtree(self.resummino_log)
 
 def main(args):
     
