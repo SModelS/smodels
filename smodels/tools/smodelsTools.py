@@ -60,7 +60,7 @@ def main():
             "If a directory is given, compute cross sections for all files in directory." )
 
     
-    xsecresummino = subparsers.add_parser('xsecresummino', description="Compute Gauginos and Sleptons cross sections for a SLHA file.")
+    xsecresummino = subparsers.add_parser('xsecresummino', description="Compute gaugino and slepton cross sections for a gven SLHA file.")
     xsecresummino.add_argument('-s', '--sqrts', nargs='+', action='append',
         help="sqrt(s) TeV. Can supply more than one value (as a space separated list). Default is both 8 and 13.",
         type=float, default=[])
@@ -82,9 +82,9 @@ def main():
         help="compute at the NLO level (default is LO)")
     xsecresummino.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
     xsecresummino.add_argument('-S', '--ssmultipliers', type=str, default=None,
-        help="Signal strength multipliers, provided as dictionary of pids")
+        help="signal strength multipliers, provided as dictionary of pids")
     xsecresummino.add_argument('-f', '--filename', required=True,
-            help="SLHA file to compute cross sections for. "
+            help="SLHA file to compute cross sections for."
             "If a directory is given, compute cross sections for all files in directory." )
     
     
