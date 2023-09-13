@@ -66,7 +66,7 @@ def main():
         type=float, default=[])
     xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
         help="verbosity (debug, info, warning, error)")
-    xsecresummino.add_argument('-j', '--json', type=str, default='default',
+    xsecresummino.add_argument('-C', '--conf', type=str, default='default',
         help="path to resummino.json configuration file")
     xsecresummino.add_argument('-c', '--ncpus', type=int, default=-1,
         help="number of cores to be used simultaneously. -1 means 'all'. ")
