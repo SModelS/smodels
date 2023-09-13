@@ -32,7 +32,7 @@ class XSecTest(unittest.TestCase):
     def testXSecMain(self):
         """ test the main routine for computation of LO and NLL cross section for several sqrts"""
         
-        slhafile="./testFiles/slha/resummino_example.slha"
+        slhafile="./testFiles/resummino/resummino_example.slha"
         f = open(slhafile,'r')
         fdata = f.read()
         fdata = fdata[:fdata.find('XSECTION')]
