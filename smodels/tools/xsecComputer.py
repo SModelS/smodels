@@ -26,7 +26,7 @@ except ImportError as e:
     import io
 import sys
 
-class XSecComputer(XSecBasis):
+class XSecComputer(XSecBase):
     """ cross section computer class, what else? """
     def __init__ ( self, maxOrder, nevents, pythiaVersion, maycompile=True ):
         """
