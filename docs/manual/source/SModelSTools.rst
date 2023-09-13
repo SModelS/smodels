@@ -105,7 +105,7 @@ which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes
 Concerning the resummino.json file, the default file is present in the smodels/etc folder. This file needs to list all the daughter particles to consider in the "channels" dictionary.
 Other information can be passed throught this file, like the "mode" parameters, which decided if we want to consider only the relevant process (equal to or above the "mode_limit" value), or every process present in the file, even if the cross sections are very low.
 
-* **The resummino cross section calculation is implemented by the** `XSeCResummino class <tools.html#tools.xsecResummino.XSecResummino>`_
+* **The resummino cross section calculation is implemented by the** `XSecResummino class <tools.html#tools.xsecResummino.XSecResummino>`_
 
 .. _fileChecks:
 
