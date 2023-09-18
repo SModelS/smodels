@@ -16,7 +16,6 @@ sys.path.append(current)
 
 
 from smodels import installation
-from smodels.tools import toolBox, runtime
 from smodels.tools.physicsUnits import pb, TeV, GeV
 from smodels.theory import crossSection
 from smodels.theory.crossSection import LO, NLO, NLL
@@ -124,8 +123,8 @@ class XSecResummino(XSecBase):
         Check everything before launching resummino.
         """
         
-        #modifie_slha_file(input_file, input_file, slha_file)
-        self.modifie_outgoing_particles(input_file, input_file, particle_1, particle_2)
+        #modify_slha_file(input_file, input_file, slha_file)
+        self.modify_outgoing_particles(input_file, input_file, particle_1, particle_2)
         
         already_written_canal = self.find_channels(slha_file)
 
@@ -183,7 +182,7 @@ class XSecResummino(XSecBase):
         if hist == 1:
             self.warning("error in resummino, trying again")
             num_try = 0
-            self.modifie_outgoing_particles(input_file, input_file, particle_1, particle_2)
+            self.modify_outgoing_particles(input_file, input_file, particle_1, particle_2)
             self.launch_resummino(input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, log)
 
 
@@ -487,7 +486,7 @@ class XSecResummino(XSecBase):
             resummino_log_file = os.path.join(self.resummino_log,f"resummino_log_{slha_file_name}.txt")
             
             #On prend le fichier de référence, et on créer une copie dans resummino_in avec le bon fichier slha
-            self.modifie_slha_file(self.input_file_original, resummino_in_file,slha_path)
+            self.modify_slha_file(self.input_file_original, resummino_in_file,slha_path)
             
             #On ajoute les noms à la liste (in, out et slha)
             Liste_resummino_in.append(resummino_in_file)
@@ -506,7 +505,7 @@ class XSecResummino(XSecBase):
         return Liste
 
 
-    def modifie_slha_file(self, file_before, file_after, slha_file):
+    def modify_slha_file(self, file_before, file_after, slha_file):
         """_summary_
 
         Change all the informations in the .in files before launching calculations
@@ -592,9 +591,9 @@ class XSecResummino(XSecBase):
             
         return mode, particles
 
-    def modifie_outgoing_particles(self, input_file, output_file, new_particle1, new_particle2):
+    def modify_outgoing_particles(self, input_file, output_file, new_particle1, new_particle2):
         """
-        Modifie the output particles (mother particles) in the resummino .in file. First call the template (input_file),
+        modify the output particles (mother particles) in the resummino .in file. First call the template (input_file),
         then write into the resummino .in file (output_file). 
         Can also write directly onto the output_file.
         """

@@ -1,7 +1,8 @@
 #!/bin/bash
 
 
-install_dir=$PWD/smodels/lib/resummino
+install_dir=$PWD
 
 cd $install_dir
-rm -r -v !("install.sh" | "clean.sh")
+
+ls | grep -b '\.sh$' | grep -v Makefile | xargs rm -r
