@@ -668,7 +668,7 @@ def main(args):
 
     logger.info("The max order considered for the calculation is  " + orders_dic[order])
     logger.info("we are currently running on " + str(ncpus)+ ' cpu')
-    logger.info(f"In this calculation, we'll use "+ str(type_writting) +" order in perturbation theory type of writting for the cross-section")
+    logger.info(f"In this calculation, we'll write out the cross section at "+ str(type_writting) +" order of perturbation theory")
     
     for sqrt in sqrtses:
         logger.info('Current energy considered is '+ str(sqrt)+ ' TeV')
