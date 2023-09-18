@@ -78,8 +78,7 @@ class XSecResummino(XSecBase):
         self.sqrt = sqrt
         
         
-        if verbosity == 'debug':
-            logger.info('installation directory is '+self.pwd)
+        logger.debug('installation directory is '+self.pwd)
             
         with open(self.json_resummino, "r") as f:
             data = eval(f.read())
@@ -142,9 +141,8 @@ class XSecResummino(XSecBase):
         
         already_written_canal_set = [({x,y},z,w) for (x,y), z,w in already_written_canal]
         
-        if self.verbosity == 'debug':
-            logger.info("channel, order and cross section" + str(particle_1)+str(particle_2)+ str(order)+ str(_))
-            logger.info('the already writtent channels are'+ str(already_written_canal))
+        logger.debug("channel, order and cross section" + str(particle_1)+str(particle_2)+ str(order)+ str(_))
+        logger.debug('the already writtent channels are'+ str(already_written_canal))
         if (((particle_1, particle_2), _, order)) in already_written_canal:
             return
         
@@ -152,12 +150,13 @@ class XSecResummino(XSecBase):
             self.launch_command(self.resummino_bin, input_file, output_file, 0)
             infos = self.search_in_output(output_file)
             infos = infos[0].split(" ")[2][1:]
-            if self.verbosity == 'info' or self.verbosity == 'debug':
-                logger.info("cross section is "+str(infos)+ " pb at LO order")
-                logger.info("Is cross section above the limit ? "+str( float(infos)>self.xsec_limit))
+
+            logger.info("cross section is "+str(infos)+ " pb at LO order")
+            logger.info("Is cross section above the limit ? "+str( float(infos)>self.xsec_limit))
+            logger.debug("cross section is "+str(infos)+ " pb at LO order")
+            logger.debug("Is cross section above the limit ? "+str( float(infos)>self.xsec_limit))
             if (float(infos))>(self.xsec_limit):
-                if self.verbosity == 'debug':
-                    logger.info('num try is '+ str(num_try)+ ' for the moment')
+                logger.debug('num try is '+ str(num_try)+ ' for the moment')
                 self.launch_command(self.resummino_bin, input_file, output_file, order)
                 if num_try == 0:
                     hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections, log)
@@ -187,8 +186,7 @@ class XSecResummino(XSecBase):
 
         #if there is an error, we inform the user and launch again resummino
         if hist == 1:
-            if self.verbosity == 'warning':
-                self.info("error in resummino, trying again")
+            self.warning("error in resummino, trying again")
             num_try = 0
             self.modifie_outgoing_particles(input_file, input_file, particle_1, particle_2)
             self.launch_resummino(input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, log)
@@ -586,7 +584,11 @@ class XSecResummino(XSecBase):
         with open(self.json_resummino, "r") as f:
             data = eval(f.read())
         
-        mode = data["mode"]
+        try:
+            mode = data["mode"]
+        except KeyError:
+            mode = "check"
+
         
         channels = data["channels"]
         particles = []
@@ -667,17 +669,17 @@ def main(args):
                     sys.exit()
 
     logger.info('verbosity is '+ verbosity)
-    if verbosity == 'info' or verbosity == 'debug':
-        logger.info("The calculation will be done using :" +str(sqrtses)+ ' TeV as center of mass energy')
-        orders_dic = {0:'LO', 1:'NLO', 2:'NLL+NLO'}
+    
+    logger.info("The calculation will be done using :" +str(sqrtses)+ ' TeV as center of mass energy')
+    logger.debug("The calculation will be done using :" +str(sqrtses)+ ' TeV as center of mass energy')
+    orders_dic = {0:'LO', 1:'NLO', 2:'NLL+NLO'}
 
-        logger.info("The max order considered for the calculation is  " + orders_dic[order]+ ' (0 = LO, 1 = NLO, 2 = NLL+NLO)')
-        logger.info("we are currently running on " + str(ncpus)+ ' cpu')
-        logger.info(f"In this calculation, we'll use "+ str(type_writting) +" type of writting for the cross-section")
+    logger.info("The max order considered for the calculation is  " + orders_dic[order])
+    logger.info("we are currently running on " + str(ncpus)+ ' cpu')
+    logger.info(f"In this calculation, we'll use "+ str(type_writting) +" type of writting for the cross-section")
     
     for sqrt in sqrtses:
-        if verbosity == 'info':
-            logger.info('Current energy considered is '+ str(sqrt)+ ' TeV')
+        logger.info('Current energy considered is '+ str(sqrt)+ ' TeV')
         test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting, verbosity = verbosity, json = json)
         test.launch_routine_resummino()
     return
