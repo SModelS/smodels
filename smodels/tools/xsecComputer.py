@@ -17,7 +17,7 @@ from smodels.theory import crossSection
 from smodels.theory.crossSection import LO, NLO, NLL
 from smodels.tools.smodelsLogging import logger, setLogLevel
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
-from smodels.tools.xsecBasis import XSecBasis, ArgsStandardizer
+from smodels.tools.xsecBase import XSecBase, ArgsStandardizer
 import os, copy
 import pyslha
 try:
