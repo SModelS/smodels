@@ -541,7 +541,7 @@ class XSecResummino(XSecBase):
                         subprocess.run(comand, shell=True,check = True, stderr=errorhandle)
                     except subprocess.CalledProcessError as e:
                         logger.error("pdf name is wrong for LO, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
-                        raise RuntimeError(f"Échec lors de la requête HTTP pour {pdf_lo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
+                        raise RuntimeError(f"Échec lors de la requête HTTP pour {pdf_lo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check. You may also check if resummino is install.")
             if not os.path.exists(os.path.join(lhapdf_folder, pdf_nlo)):
                 comand = f"wget http://lhapdfsets.web.cern.ch/lhapdfsets/current/{pdf_nlo}.tar.gz -O- | tar xz -C {lhapdf_folder}"
                 with open("/dev/null", "w") as errorhandle:
