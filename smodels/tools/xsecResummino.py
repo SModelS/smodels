@@ -27,12 +27,7 @@ from concurrent.futures import ProcessPoolExecutor
 from smodels.tools.xsecBase import XSecBase, ArgsStandardizer
 import tempfile
 import pyslha
-import math
 import shutil
-try:
-    import cStringIO as io
-except ImportError as e:
-    import io
 
 
 class XSecResummino(XSecBase):
@@ -574,7 +569,7 @@ class XSecResummino(XSecBase):
     def extract_json(self):
         """_summary_
         
-        function to extract all the informations in the resummino.json
+        function to extract all the informations in the resummino.py
         file
 
         Returns:
