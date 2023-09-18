@@ -8,7 +8,8 @@
     # mode: If you want to calculate all the channels you choose at every order,
     # use 'all', if you want to check at LO before calculating NLO, use 'check'
     # instead. 
-    "mode" : "check",
+    ### For now, we choose to check by default, if you want to calculate all, put xsec_limit to 0.
+    #"mode" : "check", 
     # The limit for the NLO calculation is determined by the 'mode_limit' variable, 
     # below this value (in pb), no NLO cross-section are
     # calculated.
