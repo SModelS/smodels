@@ -146,8 +146,8 @@ class XSecResummino(XSecBase):
             infos = self.search_in_output(output_file)
             infos = infos[0].split(" ")[2][1:]
 
-            logger.info("cross section is "+str(infos)+ " pb at LO order")
-            logger.info("Is cross section above the limit ? "+str( float(infos)>self.xsec_limit))
+            logger.info(str((particle_1,particle_2))+"cross section is "+str(infos)+ " pb at LO order")
+            logger.info("Is "+str((particle_1,particle_2))+ " cross section above the limit ? "+str( float(infos)>self.xsec_limit))
             logger.debug("cross section is "+str(infos)+ " pb at LO order")
             logger.debug("Is cross section above the limit ? "+str( float(infos)>self.xsec_limit))
             if (float(infos))>(self.xsec_limit):
