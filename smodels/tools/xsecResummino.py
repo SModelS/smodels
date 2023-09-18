@@ -622,9 +622,6 @@ class XSecResummino(XSecBase):
             for future in futures:
                 future.result()
 
-        resummino_in = '/tmp/resummino/resummino_in'
-        resummino_out = '/tmp/resummino/resummino_out'
-        resummino_log = '/tmp/resummino/resummino_log'
 
         shutil.rmtree(self.resummino_in)
         shutil.rmtree(self.resummino_out)
