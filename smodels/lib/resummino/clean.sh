@@ -5,4 +5,4 @@ install_dir=$PWD
 
 cd $install_dir
 
-ls | grep -b '\.sh$' | grep -v Makefile | xargs rm -r
+ls | grep -v '\.sh$' | grep -v Makefile | xargs rm -r

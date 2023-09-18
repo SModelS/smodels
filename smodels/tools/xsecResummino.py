@@ -136,8 +136,8 @@ class XSecResummino(XSecBase):
         
         already_written_canal_set = [({x,y},z,w) for (x,y), z,w in already_written_canal]
         
-        logger.debug("channel, order and cross section" + str(particle_1)+str(particle_2)+ str(order)+ str(_))
-        logger.debug('the already writtent channels are'+ str(already_written_canal))
+        logger.debug("channel, order and cross section " + str(particle_1)+str(particle_2)+ str(order)+ str(_))
+        logger.debug('the already writtent channels are '+ str(already_written_canal))
         if (((particle_1, particle_2), _, order)) in already_written_canal:
             return
         
@@ -146,7 +146,7 @@ class XSecResummino(XSecBase):
             infos = self.search_in_output(output_file)
             infos = infos[0].split(" ")[2][1:]
 
-            logger.info(str((particle_1,particle_2))+"cross section is "+str(infos)+ " pb at LO order")
+            logger.info(str((particle_1,particle_2))+" cross section is "+str(infos)+ " pb at LO order")
             logger.info("Is "+str((particle_1,particle_2))+ " cross section above the limit ? "+str( float(infos)>self.xsec_limit))
             logger.debug("cross section is "+str(infos)+ " pb at LO order")
             logger.debug("Is cross section above the limit ? "+str( float(infos)>self.xsec_limit))
@@ -202,6 +202,8 @@ class XSecResummino(XSecBase):
                 NLO = data[i+2][:-1]
                 NLL = data[i+3][:-1]
                 Infos.append((LO,NLO,NLL))
+        if len(Infos) == 0:
+            raise RuntimeError("Please check your slha file or if you have resummino correctly install with the install.sh executable")
         return Infos[0]
 
     # def writing_result(self, value, particle_1, particle_2, slha_file, order, type_writing):
@@ -354,7 +356,8 @@ class XSecResummino(XSecBase):
         for i in range(len(data)):
             line = data[i]
             if line.startswith("XSECTION"):
-                channel = (int(line.split(" ")[7]), int(line.split(" ")[8]),line.split(" ")[2], data[i+1].split(" ")[4])
+                _ = [x for x in line.split(" ") if x != '']
+                channel = (int(_[5]), int(_[6]),_[1], data[i+1].split(" ")[4])
                 
                 if channel in channels:
                     start = channels[channel]
@@ -379,8 +382,9 @@ class XSecResummino(XSecBase):
         for i in range(len(data)):
             line = data[i]
             if line.startswith("XSECTION"):
-                sqrt = line.split(" ")[2]
-                channel = (int(line.split(" ")[7]), int(line.split(" ")[8]))
+                _ = [x for x in line.split(" ") if x != '']
+                sqrt = _[2]
+                channel = (int(_[5]), int(_[6]))
                 order = data[i+1].split(" ")[4]
                 order = int(order)
                 channels.append((channel, sqrt, order))
@@ -532,12 +536,20 @@ class XSecResummino(XSecBase):
             
             if not os.path.exists(os.path.join(lhapdf_folder, pdf_lo)):
                 comand = f"wget http://lhapdfsets.web.cern.ch/lhapdfsets/current/{pdf_lo}.tar.gz -O- | tar xz -C {lhapdf_folder}"
-                subprocess.run(comand, shell=True)
-                
+                with open("/dev/null", "w") as errorhandle:
+                    try:
+                        subprocess.run(comand, shell=True,check = True, stderr=errorhandle)
+                    except subprocess.CalledProcessError as e:
+                        logger.error("pdf name is wrong for LO, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
+                        raise RuntimeError(f"Échec lors de la requête HTTP pour {pdf_lo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
             if not os.path.exists(os.path.join(lhapdf_folder, pdf_nlo)):
                 comand = f"wget http://lhapdfsets.web.cern.ch/lhapdfsets/current/{pdf_nlo}.tar.gz -O- | tar xz -C {lhapdf_folder}"
-                subprocess.run(comand, shell=True)
-                
+                with open("/dev/null", "w") as errorhandle:
+                    try:
+                        subprocess.run(comand, shell=True, check=True, stderr=errorhandle)
+                    except subprocess.CalledProcessError as e:
+                        logger.error("pdf name is wrong for LO, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
+                        raise RuntimeError(f"Échec lors de la requête HTTP pour {pdf_nlo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
             with open(file_after, 'w') as f:
                 for line in lines:
                     if line.startswith("pdf_lo"):
@@ -662,8 +674,8 @@ def main(args):
 
     logger.info('verbosity is '+ verbosity)
     
-    logger.info("The calculation will be done using :" +str(sqrtses)+ ' TeV as center of mass energy')
-    logger.debug("The calculation will be done using :" +str(sqrtses)+ ' TeV as center of mass energy')
+    logger.info("The calculation will be done using : " +str(sqrtses)+ ' TeV as center of mass energy')
+    logger.debug("The calculation will be done using : " +str(sqrtses)+ ' TeV as center of mass energy')
     orders_dic = {0:'LO', 1:'NLO', 2:'NLL+NLO'}
 
     logger.info("The max order considered for the calculation is  " + orders_dic[order])
