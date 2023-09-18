@@ -114,7 +114,8 @@ class XSecResummino(XSecBase):
             commande = f"{resummino_bin} {input_file}"
 
         with open(output_file, 'w') as f:
-            subprocess.run(commande, shell=True, stdout=f, text=True)
+            with open("/dev/null", "w") as errorhandle:
+                subprocess.run(commande, shell=True, stdout=f,stderr=errorhandle, text=True)
 
 
 
