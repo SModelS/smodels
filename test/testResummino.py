@@ -52,7 +52,7 @@ class XSecTest(unittest.TestCase):
         xargs.noautocompile = True
         #Compute LO xsecs:
         xargs.query = False
-        xargs.json = 'default'
+        xargs.conf = 'default'
         xargs.NLL = False
         xargs.NLO = True
         xargs.LOfromSLHA = False
