@@ -12,7 +12,7 @@
     # The limit for the NLO calculation is determined by the 'mode_limit' variable, 
     # below this value (in pb), no NLO cross-section are
     # calculated.
-    "mode_limit" : 0.00001,
+    "xsec_limit" : 0.00001,
     # pdfs (case-sensitive): use this to change the parton distribution
     # function used for the cross-section calculation.
     # PDFLHC2021 is default, but any pdf can be used. Be sure to check

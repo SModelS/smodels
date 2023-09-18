@@ -88,7 +88,8 @@ class XSecResummino(XSecBase):
         
     def calculate_one_slha(self, particles,input_file, slha_file, output_file, num_try, order, log):
         """
-        log file management and launch resummino command
+        log file management and launch resummino command. Prepare also the cross section list to write the cross section
+        onto the slha file.
         """
         with open(log, 'a') as f:
             f.write(f'{particles} cross-sections written in {slha_file}\n')
@@ -110,7 +111,7 @@ class XSecResummino(XSecBase):
            
     def launch_command(self,resummino_bin,input_file, output_file, order):
         """
-        use resummino at the order asked by the user (order variable)
+        use resummino at the order asked by the user (order variable).
         """
         if order == 0:
             commande = f"{resummino_bin} {input_file} --lo"
@@ -126,7 +127,7 @@ class XSecResummino(XSecBase):
 
     def launch_resummino(self, input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, log):
         """
-        Check everything before launching resummino
+        Check everything before launching resummino.
         """
         
         #modifie_slha_file(input_file, input_file, slha_file)
@@ -194,6 +195,11 @@ class XSecResummino(XSecBase):
 
 
     def search_in_output(self, output_file):
+        """
+        Search in the .out files of resummino (in tempfiles) to get the cross section asked by the users, 
+        then extract the LO,NLO and NLL+NLO.
+        If you want to get the incertitude given by resummino, you have everything here in LO, NLO and NLL.
+        """
         Infos = []
         with open(output_file, 'r') as f:
             data = f.readlines()
@@ -215,7 +221,9 @@ class XSecResummino(XSecBase):
     #             f.write(f"\nXSECTION  1.30E+04  2212 2212 2 {particle_1} {particle_2} # [pb] \n 0  0  {order}  0  0  0    {value} Resumminov3.1.2\n")
             
     def create_xsection(self, result, particle_1, particle_2, order, Xsections):
-        
+        """
+        Create cross section list filled with cross section objects, corresponding to all the channels calculated.
+        """
         if type(result) == list:
             for i in range(order+1):
                 Xsection = crossSection.XSection()
@@ -239,6 +247,10 @@ class XSecResummino(XSecBase):
         return
             
     def write_in_slha(self, output_file, slha_file, order, particle_1, particle_2, type_writing, Xsections, log):
+        """
+        Organize here the way cross section are written onto the file (highest, all) and then create cross_section object
+        to let smodels take care of the writting itself with the create_xsection method.
+        """
         results = self.search_in_output(output_file)
         if type_writing == 'highest':
             if order == 0:
@@ -399,7 +411,11 @@ class XSecResummino(XSecBase):
     
       
     def create_routine_files(self, order, slha_folder_name):
-    #slha_file = "outputM_12000M_20mu100.slha"
+        """
+        Prepare all the paths and everything before turning into parallel task.
+        resumino.py is called here to avoid multi-tasking on one file. Create also tempfile to stock all data needed
+        by resummino.  
+        """
 
         #You haven't seen anything.
         output_file = "output_file.txt"
@@ -447,7 +463,6 @@ class XSecResummino(XSecBase):
         #Loop on all the slha file, in a random order (os.listdir)
         for slha in liste_slha:
             
-            print(slha, slha_folder)
             if not os.path.isfile(slha_folder):
                 slha_path = os.path.join(slha_folder,slha)
             else:
@@ -494,7 +509,7 @@ class XSecResummino(XSecBase):
             #On pourrait optimiser en enlevant les variables qui ne changent pas d'une itération à l'autre
             #Mais ce n'est pas très important (négligeable niveau temps de compilation comparé à Resummino)
             Liste.append((particles, resummino_in_file, slha_path, resummino_out_file, num_try, order, resummino_log_file))
-        print(f" Number of files created : {a-b-c}")
+        logger.info(f" Number of files created : {a-b-c}")
         return Liste
 
 
@@ -581,6 +596,11 @@ class XSecResummino(XSecBase):
         return mode, particles
 
     def modifie_outgoing_particles(self, input_file, output_file, new_particle1, new_particle2):
+        """
+        Modifie the output particles (mother particles) in the resummino .in file. First call the template (input_file),
+        then write into the resummino .in file (output_file). 
+        Can also write directly onto the output_file.
+        """
         with open(input_file, 'r') as f:
             lines = f.readlines()
 
@@ -593,7 +613,7 @@ class XSecResummino(XSecBase):
                 f.write(line)
             
             
-    def routine_resummino(self):
+    def launch_routine_resummino(self):
         """
         Launch all the calculations of the slha files in parallel (limited by ncpu), with first the creation of every path needed for the calculations.
         """
@@ -657,9 +677,9 @@ def main(args):
     
     for sqrt in sqrtses:
         if verbosity == 'info':
-            print('Current energy considered is '+ str(sqrt)+ ' TeV')
+            logger.info('Current energy considered is '+ str(sqrt)+ ' TeV')
         test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting, verbosity = verbosity, json = json)
-        test.routine_resummino()
+        test.launch_routine_resummino()
     return
     
     # test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus, type = type_writting)
