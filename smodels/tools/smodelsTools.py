@@ -67,7 +67,7 @@ def main():
     xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
         help="verbosity (debug, info, warning, error)")
     xsecresummino.add_argument('-C', '--conf', type=str, default='default',
-        help="path to resummino.json configuration file")
+        help="path to resummino.py configuration file")
     xsecresummino.add_argument('-c', '--ncpus', type=int, default=-1,
         help="number of cores to be used simultaneously. -1 means 'all'. ")
     xsecresummino.add_argument('-p', '--tofile', action='store_true',
