@@ -15,10 +15,10 @@
 .. |Docs| image:: https://img.shields.io/badge/docs-main-blue.svg                    
    :target: https://smodels.readthedocs.io
 
-.. |Binder| image:: https://mybinder.org/badge_logo.svg
-   :target: https://mybinder.org/v2/gh/SModelS/tutorials/main?filepath=index.ipynb
+.. |Colab| image:: https://colab.research.google.com/assets/colab-badge.svg
+   :target: https://colab.research.google.com/github/SModelS/tutorials/blob/main/index.ipynb
 
-|GitHub Project| |PyPI version| |CodeFactor| |Binder| |Docs|
+|GitHub Project| |PyPI version| |CodeFactor| |Colab| |Docs|
 
 ==============
 SModelS v2
