@@ -107,6 +107,27 @@ class StatsComputer:
         computer.getComputerPyhf( )
 
         return computer
+        
+
+    @classmethod
+    def forMLL(cls, dataset, nsig, deltas_rel):
+        """ get a statscomputer for pyhf combination.
+
+        :param dataset: CombinedDataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a StatsComputer
+        """
+        computer = StatsComputer(dataObject=dataset,
+                                 dataType="ML-L",
+                                 nsig=nsig, deltas_rel=deltas_rel)
+        
+        #computer.getComputerPyhf( )
+        computer.getComputerMLL()
+
+        return computer
+
 
     @classmethod
     def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ):
@@ -259,6 +280,18 @@ class StatsComputer:
         self.upperLimitComputer = PyhfUpperLimitComputer(data, includeCRs=includeCRs,
                                             lumi=self.dataObject.getLumi() )
         self.likelihoodComputer = self.upperLimitComputer # for pyhf its the same
+        
+
+
+######for ML-L
+
+    def getComputerMLL(self ):
+    
+    
+    
+        return
+
+
 
     def getComputerTruncGaussian ( self, **kwargs ):
         """
