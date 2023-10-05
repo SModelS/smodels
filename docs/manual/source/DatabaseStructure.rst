@@ -15,11 +15,11 @@
 .. |Dataset| replace:: :ref:`DataSet<DataSet>`
 .. |Datasets| replace:: :ref:`DataSets<DataSet>`
 .. |Database| replace:: :ref:`Database <Database>`
-.. |element| replace:: :ref:`element <element>`
-.. |elements| replace:: :ref:`elements <element>`
 .. |particles| replace:: :ref:`particles <particleClass>`
 .. |particle| replace:: :ref:`particle <particleClass>`
-.. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
+.. |SMS| replace:: :ref:`SMS <SMS>`
+.. |SMS topology| replace:: :ref:`SMS topology <SMS>`
+.. |SMS topologies| replace:: :ref:`SMS topologies <SMS>`
 
 
 .. _databaseStruct:
@@ -131,72 +131,72 @@ TxName Files
 Each |DataSet| contains one or more ``TxName.txt`` file storing
 the bulk of the experimental result data.
 For |ULrs|, the TxName file contains the UL maps for a given simplified model
-(|element| or sum of |elements|), while for |EMrs| the file contains
-the simplified model efficiencies.
+(|SMS topology| or sum of |SMS topologies|), while for |EMrs| the file contains the simplified model efficiencies.
 In addition, the TxName files also store some meta information, such
 as the source of the data and the *type* of result (*prompt* or *displaced*).
 If not specified, the type will be assumed to be prompt.\ [#f1]_
-For instance, the first few lines of CMS-SUS-12-024/data/T1tttt.txt read:
+For instance, the first few lines of ATLAS-SUSY-2019-08/data/TChiWH.txt read [#f2]_:
 
-.. literalinclude:: /literals/T1tttt.txt
-   :lines: 1-8
+.. literalinclude:: /literals/TChiWH.txt
+   :lines: 1-2,4-11
 
 As seen above, the first block of data in the
-file contains information about the |element|
-or simplified model ([[['t','t']],[['t','t']]])
-in |bracket notation| for which the data refers to as well as
-reference to the original data source and some additional information.
-The simplified model is assumed to contain neutral BSM final states (MET signature)
-and arbitrary ( Z\ :sub:`2`-odd |particles|) intermediate BSM states.
-If the experimental result refers to non-MET final states,
-the finalState field must list the type of
-BSM :ref:`particles <particleClass>` (see |UL| for more details).
-An example from the CMS-EXO-12-026/data/THSCPM1b.txt file is shown below:
-
-.. literalinclude:: /literals/THSCPM1b.txt
-   :lines: 1,2,7,9,10
-
-In addition, if specific BSM intermediate states are required,
-the intermediateState field must include a nested list (one for each branch)
-specifying the labels of the intermediate BSM states.\ [#f3]_
-If the intermediateState field is specified, the corresponding result will only
-be applied to simplified models containing intermediate BSM particles
-with the same quantum numbers. One example is shown below:
-
-.. literalinclude:: /literals/TxIntermediate.txt
-   :lines: 1,2,10,11
+file contains information about the simplified model
+topology for which the data refers to and some additional information.
+The constraint field describes the |SMS topology| in string format 
+(see :ref:`SMS Representation <notation>`).
 
 
 The second block of data in the  ``TxName.txt`` file contains the upper limits or efficiencies
 as a function of the relevant simplified model parameters:
 
-.. literalinclude:: /literals/T1tttt.txt
-   :lines: 9-19
+.. literalinclude:: /literals/TChiWH.txt
+   :lines: 13-15
 
-.. _widthGrid:
-
-As we can see, the data grid is given as a Python array with the structure:
-:math:`[[\mbox{masses},\mbox{upper limit}], [\mbox{masses},\mbox{upper limit}],...]`.
-For prompt analyses, the relevant parameters are usually the BSM masses, since
-all decays are assumed to be prompt. On the other hand, results for long-lived
-or meta-stable particles may depend on the BSM widths as well.
-The width dependence can be easily included through the
-following generalization:
+As seen in the example above the data is stored as arrays of masses versus upper limits:
 
 .. math::
-   [[M_1,M_2...],[M_A,M_B,...]] \to [[(M_1,\Gamma_1),(M_2,\Gamma_2)...],[(M_A,\Gamma_A),(M_B,\Gamma_B),...]]
+   [[M_1,M_2,M_3,M_4],\sigma_{U}],...
+
+The mapping between the values in the list of data points and
+the properties of the BSM particles appearing in the |SMS topology|
+is done through the dataMap field:
+
+.. literalinclude:: /literals/TChiWH.txt
+   :lines: 3
+
+In :numref:`Fig. %s <dataMap>` we illustrate how the entries in the data grid are identified
+to properties of the |SMS topology|. The mapping is determined by the dataMap dictionary, where the
+keys are the indices of the data array (in the example above, the index goes from 1-4 referring to the four mass values)
+and the values are tuples containing the node index of the BSM particle (defined in the constraint string),
+the BSM property ('mass' or 'totalwidth') and the value unit.
+
+.. _dataMap:
+
+.. figure:: images/dataMap.png
+   :width: 50%
+   :align: center
+
+   Schematic representation of how the values in the data are identified to properties of the |SMS topology|
+   through the information stored in the dataMap field.
+
+
+Results for long-lived or meta-stable particles may depend on the BSM widths as well.
+In this case the structure above is the same, but widths are included in the data array
+and are specified by the dataMap. We show one example below:
+
+.. math::
+   [[M_1,M_2,\Gamma_1,\Gamma_2],\sigma_{U}],...
+
+where :math:`\Gamma_i` are the relevant BSM widths. The dataMap could then take the form:
+
+.. math::
+   dataMap = \{0:(1,{\rm mass},GeV),\;\; 1:(2,{\rm mass},GeV),\;\; 2:(1,{\rm totalwidth},GeV),\;\; 3:(2,{\rm totalwidth},GeV)\}
+
 
 In order to make the notation more compact, whenever the width dependence is not included,
 the corresponding decay will be assumed to be prompt and an effective :ref:`lifetime reweigthing factor <dbReweighting>`
-will be applied to the upper limits. For instance, a *mixed type* data grid is also allowed:
-
-.. math::
-   [\; [[M_1,(M_2,\Gamma_2)],[M_1,(M_2,\Gamma_2)]],\mbox{UL}\; ],\;\; [\; [[M_1',(M_2',\Gamma_2')],[M_1',(M_2',\Gamma_2')]],\mbox{UL'}\; ], \;\; ...
-
-The example above represents a simplified model where the decay of the mother is prompt,
-while the daughter does not have to be stable, hence the dependence on :math:`\Gamma_2`.
-In this case, the :ref:`lifetime reweigthing factor <dbReweighting>`
-is applied only for the mother decay.
+will be applied to the upper limits.
 
 
 .. _inclusiveSMSdesc:
@@ -372,7 +372,7 @@ Lifetime Reweighting
 From v2.0 onwards SModelS allows to include width dependent efficiencies and upper limits.
 However most experimental results do not provide upper limits (or efficiencies) as a function
 of the BSM particles' widths, since usually all the decays are assumed to be prompt
-and the last BSM particle appearing in the cascade decay is assumed to be stable.\ [#f2]_
+and the last BSM particle appearing in the cascade decay is assumed to be stable.\ [#f3]_
 In order to apply these results to models which may contain meta-stable
 particles, it is possible to approximate the dependence on the widths for the case in which
 the experimental result requires all BSM decays to be prompt and the last BSM particle to be stable or decay *outside* the dector.
@@ -444,6 +444,8 @@ in the grid.
        Searches for heavy stable charged particles (HSCPs), for instance, are classified as *prompt*, since the HSCP is assumed to decay
        outside the detector. Displaced results on the other hand require at least one decay to take place inside the detector.
 
-.. [#f2] An obvious exception are searches for long-lived particles with displaced decays.
+.. [#f2] In this example we show the metadata used for v3 onwards. For the v2 format, refer to the v2 version of this manual.
 
-.. [#f3] Although the finalState and intermediateState fields could be combined into a single entry, they are kept separate for backward compatibility.
+.. [#f3] An obvious exception are searches for long-lived particles with displaced decays.
+
+.. [#f4] Although the finalState and intermediateState fields could be combined into a single entry, they are kept separate for backward compatibility.
