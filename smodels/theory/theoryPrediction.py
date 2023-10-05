@@ -13,7 +13,8 @@ from smodels.tools.physicsUnits import TeV, fb
 from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
-from smodels.tools.statsTools import StatsComputer
+# from smodels.tools.statsTools import StatsComputer
+from smodels.tools.speyTools import SpeyComputer as StatsComputer
 from typing import Union, Text
 import itertools
 import numpy as np
