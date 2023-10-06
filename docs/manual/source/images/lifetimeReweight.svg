@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="184 98 610 243" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="picture" id="id1755932730">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_Reweight.png" x="204.0" y="162.0" height="131.0" width="213.0"/>
+        </g>
+        <g latexdraw:type="text" id="id64154943" fill="black" latexdraw:position="bl">
+            <text x="286.0" y="276.0">\Large $\Gamma_A$</text>
+        </g>
+        <g latexdraw:type="text" id="id152580827" fill="black" latexdraw:position="bl">
+            <text x="389.0" y="166.0">\Large $\Gamma_B$</text>
+        </g>
+        <g latexdraw:type="text" id="id270114117" fill="black" latexdraw:position="bl">
+            <text x="376.0" y="317.0">\Large $\Gamma_C$</text>
+        </g>
+        <g latexdraw:type="picture" id="id1950448697">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_ReweightDB.png" x="561.0" y="162.0" height="131.0" width="213.0"/>
+        </g>
+        <g latexdraw:type="text" id="id73643788" fill="black" latexdraw:position="bl">
+            <text x="249.0" y="118.0">\Large Model SMS</text>
+        </g>
+        <g latexdraw:type="text" id="id1283037003" fill="black" latexdraw:position="bl">
+            <text x="605.0" y="118.0">\Large Database SMS</text>
+        </g>
+        <g latexdraw:type="text" id="id703772830" fill="black" latexdraw:position="bl">
+            <text x="575.0" y="158.0">\Large $\Gamma_B = 0$</text>
+        </g>
+        <g latexdraw:type="text" id="id28400011" fill="black" latexdraw:position="bl">
+            <text x="579.0" y="321.0">\Large $\Gamma_C = 0$</text>
+        </g>
+        <g latexdraw:type="text" id="id145825521" fill="black" latexdraw:position="bl">
+            <text x="657.0" y="278.0">\Large $\Gamma_A \to \infty$</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id229607952">
+            <polyline points="447.0,216.0 546.0,215.0 " stroke="red" stroke-width="3.2" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-229607952)"/>
+        </g>
+        <g latexdraw:type="text" id="id112466303" fill="black" latexdraw:position="bl">
+            <text x="428.0" y="206.0">\large \begin{tabular}{c} Lifetime\\ reweighting \end{tabular}
+
+</text>
+        </g>
+    </g>
+    <defs>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="359.421" id="arrow1-229607952">
+            <path d="M 0.0 0.0 L -12.664166666666667 -4.522916666666667 L -12.664166666666667 0.0 L -12.664166666666667 4.522916666666667 z" fill="red" stroke="red" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+    </defs>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
+            <latexdraw:positionVert/>
+            <latexdraw:zoom>1.0</latexdraw:zoom>
+            <latexdraw:vpx>0.5</latexdraw:vpx>
+            <latexdraw:vpy>0.386</latexdraw:vpy>
+        </latexdraw:metadata>
+    </metadata>
+</svg>

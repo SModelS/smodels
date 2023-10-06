@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="38 125 854 626" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
     <g>
         <g latexdraw:type="text" id="id256400367" fill="black" latexdraw:position="bl">
-            <text x="179.0" y="663.0">\Large upperLimits = $[[M_1,M_2,M_3,M_4],\sigma_{U}],...$</text>
+            <text x="179.0" y="663.0">\Large upperLimits = $[[M_1,M_2,M_3,M_4],\sigma_{UL}],...$</text>
         </g>
         <g latexdraw:type="picture" id="id1123580841">
             <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/TChiWH.png" x="325.0" y="145.0" height="277.0" width="227.0"/>

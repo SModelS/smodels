@@ -128,7 +128,7 @@ CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/dataInfo.txt as an example:
 TxName Files
 ^^^^^^^^^^^^
 
-Each |DataSet| contains one or more ``TxName.txt`` file storing
+Each |DataSet| contains one or more ``TxName.txt`` files storing
 the bulk of the experimental result data.
 For |ULrs|, the TxName file contains the UL maps for a given simplified model
 (|SMS topology| or sum of |SMS topologies|), while for |EMrs| the file contains the simplified model efficiencies.
@@ -153,23 +153,22 @@ as a function of the relevant simplified model parameters:
 .. literalinclude:: /literals/TChiWH.txt
    :lines: 13-15
 
-As seen in the example above the data is stored as arrays of masses versus upper limits:
+As seen in the example above the data is stored as arrays of BSM parameters (masses) versus upper limits:
 
 .. math::
-   [[M_1,M_2,M_3,M_4],\sigma_{U}],...
+   [[M_1,M_2,M_3,M_4],\sigma_{UL}],...
 
 The mapping between the values in the list of data points and
 the properties of the BSM particles appearing in the |SMS topology|
-is done through the dataMap field:
+is determined by the dataMap field stored in the ``TxName.txt`` file:
 
 .. literalinclude:: /literals/TChiWH.txt
    :lines: 3
 
-In :numref:`Fig. %s <dataMap>` we illustrate how the entries in the data grid are identified
-to properties of the |SMS topology|. The mapping is determined by the dataMap dictionary, where the
-keys are the indices of the data array (in the example above, the index goes from 1-4 referring to the four mass values)
-and the values are tuples containing the node index of the BSM particle (defined in the constraint string),
-the BSM property ('mass' or 'totalwidth') and the value unit.
+The keys in dataMap are the indices of the data array (in the example above, the index goes from 0-3 referring to the four mass values),
+while the values are tuples containing the node index of the BSM particle (defined in the constraint string),
+the BSM property ('mass' or 'totalwidth') and its unit.
+In :numref:`Fig. %s <dataMap>` we illustrate how the mapping works for the example above.
 
 .. _dataMap:
 
@@ -188,7 +187,7 @@ and are specified by the dataMap. We show one example below:
 .. math::
    [[M_1,M_2,\Gamma_1,\Gamma_2],\sigma_{U}],...
 
-where :math:`\Gamma_i` are the relevant BSM widths. The dataMap could then take the form:
+where :math:`\Gamma_i` are the relevant BSM widths. The dataMap would then take the form:
 
 .. math::
    dataMap = \{0:(1,{\rm mass},GeV),\;\; 1:(2,{\rm mass},GeV),\;\; 2:(1,{\rm totalwidth},GeV),\;\; 3:(2,{\rm totalwidth},GeV)\}
@@ -199,56 +198,9 @@ the corresponding decay will be assumed to be prompt and an effective :ref:`life
 will be applied to the upper limits.
 
 
-.. _inclusiveSMSdesc:
-
-Inclusive Simplified Models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-If the analysis signal efficiencies or upper limits are insensitive to
-some of the simplified model final states, it might be convenient to define
-*inclusive* simplified models. A typical case are some of the heavy stable charged
-particle searches, which only rely on the presence of a non-relativistic charged
-particle, which leads to  an anomalous charged track signature.
-In this case the signal efficiencies are highly insensitive to the remaining event
-activity and the corresponding simplified models can be very inclusive.
-In order to handle this inclusive cases in the database we allow for wildcards
-when specifying the constraints.
-For instance, the constraint for the CMS-EXO-13-006 eff/c000/THSCPM3.txt
-reads:
-
-.. literalinclude:: /literals/THSCPM3.txt
-   :lines: 1-2
-
-and represents the (inclusive) simplified model:
-
-.. image:: images/elementInclusive.png
-   :width: 35%
-
-Note that although the final state represented by "\*" is any Z\ :sub:`2`-even |particle|,
-it must still correspond to a single particle, since the topology specifies a 2-body
-decay for the initially produced BSM particle.
-Finally, it might be useful to define even more inclusive simplified models, such
-as the one in  CMS-EXO-13-006 eff/c000/THSCPM4.txt:
-
-.. literalinclude:: /literals/THSCPM4.txt
-   :lines: 1-2,11
-
-In the above case the simplified model corresponds to an HSCP being initially produced
-in association with any BSM particle which leads to a MET signature.
-Note that "[\*]" corresponds to *any branch*, while ["\*"] means *any particle*:
-
-
-.. image:: images/elementInclusive2.png
-   :width: 35%
-
-In such cases the mass array for the arbitrary branch must also be specified as
-using wildcards:
-
-.. literalinclude:: /literals/THSCPM4.txt
-   :lines: 12-14
-
-
+As discussed before (see :ref:`Inclusive SMS <inclusiveSMS>`), some analysis can be insensitive to
+some of the simplified model final states. In this case :ref:`inclusive <inclusiveSMS>` topologies
+can be described through the use of the *Inclusive*, *anySM*, *\*anySM* strings.
 
 .. _objStruct:
 
@@ -312,55 +264,55 @@ All the information contained in the :ref:`database files <folderStruct>`
 is stored in the :ref:`database objects <objStruct>`.
 Within SModelS the information in the |Database| is mostly used for constraining
 the simplified models generated by the :ref:`decomposition <decomposition>` of the input model.
-Each simplified model (or :ref:`element <element>`) generated is compared to the
-simplified models contrained by the database and specified by the *constraint* and *finalStates* entries
+Each |SMS topology| generated is compared to the
+simplified models constrained by the database and specified by the *constraint* entry
 in the  :ref:`TxName files <txnameFile>`.
 The comparison allows to identify which results can be used to test the input model.
 Once a matching result is found the upper limit or efficiency must be computed
-for the given input |element|. As :ref:`described above <txnameFile>`, the
+for the given input |SMS topology|. As :ref:`described above <txnameFile>`, the
 upper limits or efficiencies are provided as function of masses and widths in the form
 of a discrete grid.
-In order to compute values for any given input |element|, the data has to be
-processed as decribed below.
-
+In order to compute values for any given input |SMS topology|, the data has to be
+processed as described below.
 
 
 The efficiency and upper limit maps are subjected to a few
 standard preprocessing steps.
-First all the units are removed, the shape of the grid is stored and
-the relevant width dependence is identified (see :ref:`discussion above <txnameFile>`).
-Then the masses and widths are transformed into a flat array:
+First, in the case of upper limits, the cross-section units are removed. 
+Since the widths can vary over a wide range of values, they are rescaled logarithmically
+according to the expression:
 
 .. _dataTransf:
 
 .. math::
-   [[M_1,(M_2,\Gamma_2)],[M_A,(M_B,\Gamma_B)]] \to [M_1,M_2,M_A,M_B,\log(1+\Gamma_2/\Gamma_0),\log(1+\Gamma_B/\Gamma_0)]
+   \Gamma_i \to \log(1+\Gamma_i/\Gamma_0)
 
 where :math:`\Gamma_{0} = 10^{-30}` GeV is a rescaling factor to ensure the log is mapped to large
 values for the relevant width range.
 
-Finally a principal component analysis and Delaunay triangulation (see :ref:`figure below <delaunay>`)
-is applied over the new coordinates.
+Finally a principal component analysis and Delaunay triangulation (see :numref:`Fig. %s <delaunay>`)
+is applied over the new coordinates (unitless masses and rescaled widths)
 The simplices defined during triangulation are then used for linearly interpolating
 the transformed data grid, thus allowing SModelS to compute efficiencies or upper limits
 for arbitrary mass and width values (as long as they fall inside the data grid).
 As seen above,
 the width parameters are taken logarithmically before interpolation, which
 effectively corresponds to an exponential interpolation.
-If the data grid does not explicitly provide a dependence on all the widths
-(as in the :ref:`example above <dataTransf>`), the computed upper limit or efficiency
-is then reweighted imposing the requirement of prompt
+If the data grid does not explicitly provide a dependence on all the widths, 
+the computed upper limit or efficiency is then reweighted imposing the requirement of prompt
 decays (see :ref:`lifetime reweighting <dbReweighting>` for more details).
 This procedure provides an efficient and numerically robust way of dealing with
 generic data grids, including arbitrary parametrizations of the mass parameter
-space, irregular data grids and asymmetric branches.
+space.
 
 .. _delaunay:
 
-.. image:: images/delaunay.png
+.. figure:: images/delaunay.png
+   :width: 50%
+   :align: center
 
-..
- %\caption{Delaunay triangulation of an upper limit map with three mass                                                                        %parameters. The colors show the upper limit values.}
+   Illustration of the Delaunay triangulation performed over the transformed data grid for
+   an upper limit map with three mass parameters. The colors show the upper limit values.
 
 
 
@@ -375,25 +327,30 @@ of the BSM particles' widths, since usually all the decays are assumed to be pro
 and the last BSM particle appearing in the cascade decay is assumed to be stable.\ [#f3]_
 In order to apply these results to models which may contain meta-stable
 particles, it is possible to approximate the dependence on the widths for the case in which
-the experimental result requires all BSM decays to be prompt and the last BSM particle to be stable or decay *outside* the dector.
+the experimental result requires all BSM decays to be prompt and the last BSM particle to be stable or decay *outside* the detector.
 In SModelS this is done through a reweighting factor which corresponds to the fraction
 of prompt decays (for intermediate states) and decays *outside* the detector (for final BSM states)
 for a given set of widths.
-For instance, asumme an |EMr| only provides efficiencies (:math:`\epsilon_{prompt}`)
-for prompt decays:
 
-.. _widthExample:
+.. _lifetimereweight:
 
-.. image:: images/elementC.png
-   :width: 45%
+.. figure:: images/lifetimeReweight.png
+   :width: 40%
+   :align: center
 
+   Representation of the lifetime reweighting applied when the experimental result assumes
+   prompt decays of intermediate particles (e.g. :math:`\Gamma_A \to \infty`) and stable 
+   final states (e.g. :math:`\Gamma_{B,C} = 0`). 
 
-Then, for other values of the widths, an effective efficiency (:math:`\epsilon_{eff}`) can be
+For instance, if an |EMr| only provides efficiencies (:math:`\epsilon_{prompt}`)
+for prompt decays, as illustrated in :numref:`Fig. %s <lifetimereweight>`, 
+then, for non-zero and finite widths, an effective efficiency (:math:`\epsilon_{eff}`) can be
 approximated by:
 
 .. math::
 
-    \epsilon_{eff} = \xi \times \epsilon_{prompt} \mbox{ , where }\xi = \mathcal{F}_{prompt} \left( \Gamma_{X_1} \right) \times \mathcal{F}_{prompt} \left( \Gamma_{X_2} \right) \times \mathcal{F}_{long} \left( \Gamma_{Y_1} \right) \times \mathcal{F}_{long} \left( \Gamma_{Y_2} \right)
+    \epsilon_{eff} = \xi \times \epsilon_{prompt} \mbox{ , where }\xi = \mathcal{F}_{prompt} \left( \Gamma_{A} \right)  \times \mathcal{F}_{long} \left( \Gamma_{B} \right) \times \mathcal{F}_{long} \left( \Gamma_{C} \right)
+
 
 In the expression above :math:`\mathcal{F}_{prompt}(\Gamma)` is the probability for the decay to be prompt
 given a width :math:`\Gamma` and :math:`\mathcal{F}_{long}(\Gamma)` is the probability for the decay to
@@ -418,7 +375,7 @@ and :math:`\mathcal{F}_{long} \simeq 0`) or close to zero (:math:`\mathcal{F}_{p
 and :math:`\mathcal{F}_{long} \simeq 1`). Only elements containing particles which have a considerable fraction of displaced
 decays will be sensitive to the values chosen above.
 Also, a precise treatment of lifetimes is possible if the experimental result
-(or a theory group) explicitly provides the efficiencies as a function of the widths, as :ref:`discussed above <widthGrid>`.
+(or a theory group) explicitly provides the efficiencies as a function of the widths, as :ref:`discussed above <txnameFile>`.
 
 
 
@@ -435,7 +392,7 @@ are roughly inversely proportional to signal efficiencies. Therefore, for |ULrs|
 
 Finally, we point out that for the experimental results which provide
 efficiencies or upper limits as a function of some (but not all) BSM widths appearing
-in the simplified model (see the :ref:`discussion above <widthGrid>`),
+in the simplified model (see the :ref:`discussion above <txnameFile>`),
 the reweighting factor :math:`\xi` is computed using only the widths not present
 in the grid.
 
@@ -447,5 +404,3 @@ in the grid.
 .. [#f2] In this example we show the metadata used for v3 onwards. For the v2 format, refer to the v2 version of this manual.
 
 .. [#f3] An obvious exception are searches for long-lived particles with displaced decays.
-
-.. [#f4] Although the finalState and intermediateState fields could be combined into a single entry, they are kept separate for backward compatibility.
