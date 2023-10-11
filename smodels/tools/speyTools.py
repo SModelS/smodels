@@ -165,9 +165,7 @@ class SpeyComputer:
         :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
              correct, if necessary
         """
-        ret = {}
-        ml = self.maximize_likelihood ( expected = expected, return_nll = return_nll  )
-        print ( "ret", ret )
+        ret = self.maximize_likelihood ( expected = expected, return_nll = return_nll  )
         lmax = ret['lmax']
 
         lbsm = self.likelihood ( poi_test = 1., expected=expected, return_nll = return_nll )
@@ -277,7 +275,7 @@ class SpeyComputer:
             if all([ds.dataInfo.dataId in listOfSRInJson for ds in dataset._datasets]) and len(dataset.globalInfo.jsons) == 1:
                 return statModel
 
-            config = statModel.backend.model.config()
+            config = statModel.backend.config()
             inits = self.getSpeyInitialisation ( True )
             lim = inits["limits"]
             bounds = config.bounds()
@@ -341,7 +339,7 @@ class SpeyComputer:
 
     def checkMinimumPoi ( self, poi_test : float ):
         """ check if poi is below minimum_poi """
-        config = self.statModel.backend.model.config()
+        config = self.statModel.backend.config()
         if poi_test < config.minimum_poi:
             logger.error ( f'Calling likelihood for {self.dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
 
@@ -363,12 +361,13 @@ class SpeyComputer:
         :returns: tuple of muhat,lmax
         """
         expected = self.translateExpectationType ( expected )
-        ret = self.statModel.maximize_likelihood ( expected = expected, 
+        speyret = self.statModel.maximize_likelihood ( expected = expected, 
                 allow_negative_signal = allowNegativeSignals,
                 return_nll = return_nll )
+        ret = { "muhat": speyret[0], "lmax": speyret[1] }
         ## not clear if bounds will be hard bounds
-        if not allowNegativeSignals and ret[0]< 0.:
-            ret = ( 0., self.likelihood ( 0., expected = expected, return_nll = return_nll ) )
+        if not allowNegativeSignals and speyret[0]< 0.:
+            ret = { "muhat": 0., "lmax": self.likelihood ( 0., expected = expected, return_nll = return_nll ) }
         return ret
 
     def sigma_mu ( self, poi_test : float, expected : Union[bool,Text], allowNegativeSignals : bool = False ):

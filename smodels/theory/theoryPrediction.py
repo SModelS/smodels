@@ -346,7 +346,8 @@ class TheoryPrediction(object):
         self.cachedObjs[expected]["nll_sm"] = llhdDict["lsm"]
         self.cachedObjs[expected]["nllmax"] = llhdDict["lmax"]
         self.cachedObjs[expected]["muhat"] = llhdDict["muhat"]
-        self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
+        if "sigma_mu" in llhdDict:
+            self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
 
 
 class TheoryPredictionsCombiner(TheoryPrediction):
