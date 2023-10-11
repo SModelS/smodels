@@ -315,7 +315,7 @@ class UncoveredGroup(object):
 
 class FinalStateSMS(TheorySMS):
     """
-    This class represents a simplified SMS which does
+    This class represents a simplified SMS which
     only holds information about the final states. It holds a simple
     tree with one root (PV), having the final state nodes as its
     daughters.

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="-28.889 25.222 1450.889 890.556" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="text" id="id72175060" fill="black" latexdraw:position="bl">
+            <text x="161.88888888888886" y="757.7777777777785">\Huge ...</text>
+        </g>
+        <g latexdraw:type="text" id="id1734232097" fill="black" latexdraw:position="bl">
+            <text x="-8.888888888888877" y="57.11111111111111">\Huge Decomposition SMS</text>
+        </g>
+        <g latexdraw:type="text" id="id450076916" fill="black" latexdraw:position="bl">
+            <text x="611.1111111111112" y="46.0">\Huge Unique SMS</text>
+        </g>
+        <g latexdraw:type="picture" id="id1098710220" transform="rotate(180.0 0.0 0.0) translate(-1469.2222222222222 -1276.0)">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example_db_3.png" x="642.1111111111112" y="488.0" height="300.0" width="185.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id914613279" transform="rotate(180.0 0.0 0.0) translate(-1469.2222222222224 -238.0000000000003)">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example_db_1.png" x="642.1111111111112" y="63.000000000000114" height="112.0" width="185.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id1493132244" transform="rotate(180.0 0.0 0.0) translate(-1469.2222222222224 -639.0000000000003)">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example_db_2.png" x="642.1111111111112" y="201.0000000000001" height="237.0" width="185.0"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id857910368">
+            <polyline points="285.3333333333336,464.7777777777778 640.5555555555559,334.2222222222221 " stroke="red" stroke-width="4.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-857910368)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1331274559">
+            <polyline points="284.555555555556,258.88888888888846 621.9999999999999,128.0 " stroke="red" stroke-width="4.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1331274559)"/>
+        </g>
+        <g latexdraw:type="picture" id="id405703439">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example2a.png" x="105.55555555555581" y="75.52777777777773" height="112.0" width="117.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id1992079478">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example2b.png" x="86.66666666666666" y="346.63888888888937" height="237.0" width="185.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id259141355">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example1b.png" x="85.55555555555569" y="208.86111111111094" height="112.0" width="185.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id357654928">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example1b.png" x="91.11111111111126" y="621.083333333334" height="112.0" width="185.0"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id653621200">
+            <polyline points="279.00000000000045,666.6666666666665 623.1111111111112,137.99999999999997 " stroke="red" stroke-width="4.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-653621200)"/>
+        </g>
+        <g latexdraw:type="text" id="id134012106" fill="black" latexdraw:position="bl">
+            <text x="1092.222222222221" y="46.0">\Huge TxName SMS</text>
+        </g>
+        <g latexdraw:type="picture" id="id1798009828" transform="rotate(180.0 0.0 0.0) translate(-2422.777777777774 -202.44444444444483)">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example_db_1.png" x="1118.888888888887" y="45.222222222222335" height="112.0" width="185.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id318442596" transform="rotate(180.0 0.0 0.0) translate(-2422.777777777774 -649.3333333333335)">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example_db_3.png" x="1118.888888888887" y="174.66666666666663" height="300.0" width="185.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id386841247" transform="rotate(180.0 0.0 0.0) translate(-2422.777777777774 -1189.1111111111104)">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example_db_1.png" x="1118.888888888887" y="538.5555555555551" height="112.0" width="185.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id1934734403" transform="rotate(180.0 0.0 0.0) translate(-2422.777777777774 -1554.5555555555566)">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_example_db_2.png" x="1118.888888888887" y="658.7777777777783" height="237.0" width="185.0"/>
+        </g>
+        <g latexdraw:type="text" id="id1036162031" fill="red" latexdraw:position="bl">
+            <text x="353.3333333333338" y="169.9722222222222">\huge Matching</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1480455030">
+            <polyline points="841.9999999999998,124.77777777777766 1109.4444444444441,594.2222222222215 " stroke="#808080" stroke-width="4.0" fill="none" stroke-linecap="round" stroke-dasharray="1, 9.291666666666668" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-1480455030)" marker-end="url(#arrow1-1480455030)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id2146188262">
+            <polyline points="836.7777777777778,101.11111111111046 1084.2222222222222,104.6666666666668 " stroke="#808080" stroke-width="4.0" fill="none" stroke-linecap="round" stroke-dasharray="1, 9.291666666666668" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-2146188262)" marker-end="url(#arrow1-2146188262)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1888014183">
+            <polyline points="846.7777777777785,631.1111111111115 1118.666666666666,292.44444444444457 " stroke="#808080" stroke-width="4.0" fill="none" stroke-linecap="round" stroke-dasharray="1, 9.291666666666668" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-1888014183)" marker-end="url(#arrow1-1888014183)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id445442388">
+            <polyline points="833.444444444445,322.2222222222226 1112.0,771.3333333333337 " stroke="#808080" stroke-width="4.0" fill="none" stroke-linecap="round" stroke-dasharray="1, 9.291666666666668" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-445442388)" marker-end="url(#arrow1-445442388)"/>
+        </g>
+        <g latexdraw:type="text" id="id1945098880" fill="black" latexdraw:position="bl">
+            <text x="1385.5555555555534" y="264.4166666666671">\Large TxName A</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id160257618">
+            <polyline points="1318.9999999999975,121.11111111111042 1387.5555555555536,224.66666666666674 " stroke="#808080" stroke-width="4.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-160257618)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1667706806">
+            <polyline points="1311.22222222222,321.1111111111108 1379.777777777777,272.44444444444474 " stroke="#808080" stroke-width="4.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1667706806)"/>
+        </g>
+        <g latexdraw:type="text" id="id725783744" fill="black" latexdraw:position="bl">
+            <text x="1399.999999999998" y="772.1944444444446">\Large TxName B</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1219845375">
+            <polyline points="1333.444444444442,628.888888888888 1401.9999999999982,732.4444444444443 " stroke="#808080" stroke-width="4.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1219845375)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1441965033">
+            <polyline points="1325.6666666666645,828.8888888888882 1394.2222222222215,780.2222222222222 " stroke="#808080" stroke-width="4.0" fill="none" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-1441965033)"/>
+        </g>
+        <g latexdraw:type="text" id="id1639446225" fill="#1a3399" latexdraw:position="bl">
+            <text x="8.888888888889142" y="262.19444444444457">\large SMS 2</text>
+        </g>
+        <g latexdraw:type="text" id="id419652645" fill="#1a3399" latexdraw:position="bl">
+            <text x="24.444444444444695" y="138.86111111111117">\large SMS 1</text>
+        </g>
+        <g latexdraw:type="text" id="id1749148052" fill="#1a3399" latexdraw:position="bl">
+            <text x="6.666666666666915" y="474.41666666666686">\large SMS 3</text>
+        </g>
+        <g latexdraw:type="text" id="id597508528" fill="#1a3399" latexdraw:position="bl">
+            <text x="16.666666666666917" y="683.3055555555557">\large SMS 4</text>
+        </g>
+        <g latexdraw:type="text" id="id888808248" fill="#1a3399" latexdraw:position="bl">
+            <text x="1352.2222222222206" y="163.30555555555563">\large SMS 2, SMS 4</text>
+        </g>
+        <g latexdraw:type="text" id="id1535500342" fill="#1a3399" latexdraw:position="bl">
+            <text x="1366.6666666666654" y="683.305555555556">\large SMS 2, SMS 4</text>
+        </g>
+        <g latexdraw:type="text" id="id529302877" fill="#1a3399" latexdraw:position="bl">
+            <text x="1356.6666666666642" y="825.5277777777786">\large SMS 3</text>
+        </g>
+        <g latexdraw:type="text" id="id593352869" fill="#4d4d4d" latexdraw:position="bl">
+            <text x="843.3333333333343" y="91.08333333333331">\huge SMS Dictionary</text>
+        </g>
+    </g>
+    <defs>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="339.82" id="arrow1-857910368">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="red" stroke="red" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="338.8" id="arrow1-1331274559">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="red" stroke="red" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="303.06" id="arrow1-653621200">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="red" stroke="red" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="240.33" id="arrow0-1480455030">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="60.33" id="arrow1-1480455030">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="180.823" id="arrow0-2146188262">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="0.823" id="arrow1-2146188262">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="128.758" id="arrow0-1888014183">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="308.758" id="arrow1-1888014183">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="238.191" id="arrow0-445442388">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="58.191" id="arrow1-445442388">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="56.495" id="arrow1-160257618">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="324.63" id="arrow1-1667706806">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="56.495" id="arrow1-1219845375">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="324.63" id="arrow1-1441965033">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="#808080" stroke="#808080" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+    </defs>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
+            <latexdraw:positionVert/>
+            <latexdraw:zoom>0.8999999999999999</latexdraw:zoom>
+            <latexdraw:vpx>0.555</latexdraw:vpx>
+            <latexdraw:vpy>0.419</latexdraw:vpy>
+        </latexdraw:metadata>
+    </metadata>
+</svg>
