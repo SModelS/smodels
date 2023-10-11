@@ -18,7 +18,7 @@ from smodels.tools.physicsUnits import fb
 import numpy as np
 
 class SpeyComputer:
-    __slots__ = [ "statModel", "dataset", "weight", "backendType" ]
+    __slots__ = [ "statModel", "dataset", "weight", "backendType", "nsig" ]
 
     def __init__ ( self, dataset, backendType : str, nsig : Union[float,list], 
                    deltas_rel : Union[None,float] = None ):
@@ -28,13 +28,14 @@ class SpeyComputer:
         :param nsig: signal yield, either as float or as list
         :param deltas_rel: relative error on signal. currently unused
         """
-        if deltas_rel != None:
-            logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
+        #if deltas_rel != None:
+        #    logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
         if dataset.getType() not in [ "efficiencyMap", "combined" ]:
             logger.error ( f"I do not recognize the dataset type {dataset.getType()}" )
 
         self.backendType = backendType
         self.dataset = dataset
+        self.nsig = nsig
         self.statModel = self.getStatModel ( nsig )
 
     def getStatModel(self, nsig ) -> StatisticalModel:
@@ -58,6 +59,22 @@ class SpeyComputer:
         computer = SpeyComputer(dataset=dataset, backendType="1bin", 
                                 nsig=nsig, deltas_rel=deltas_rel)
         
+        return computer
+
+    @classmethod
+    def forMultiBinSL(cls,dataset, nsig, deltas_rel):
+        """ get a statscomputer for simplified likelihood combination.
+
+        :param dataset: CombinedDataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a StatsComputer
+        """
+        
+        computer = SpeyComputer(dataset=dataset,  
+                                backendType="SL", 
+                                 nsig=nsig, deltas_rel=deltas_rel)
         return computer
 
     def getNNModel ( self, nsig ):
@@ -86,35 +103,19 @@ class SpeyComputer:
         :raises NotImplementedError: if input patter does not match to any backend specific input option.
         """
         dataset = self.dataset
-
-        if dataset.type == "simplified":
-            nobs = [x.dataInfo.observedN for x in dataset.origdatasets]
-            cov = dataset.globalInfo.covariance
-            if type(cov) != list:
-                raise SModelSError("covariance field has wrong type: %s" % type(cov))
-            if len(cov) < 1:
-                raise SModelSError("covariance matrix has length %d." % len(cov))
-            bg = [x.dataInfo.expectedBG for x in dataset.origdatasets]
-            third_moment = None
-            if hasattr ( dataset.origdatasets[0].dataInfo, "thirdMoment" ):
-                third_moment = [x.dataInfo.thirdMoment for x in dataset.origdatasets]
-            xsec = float ( sum(nsig)/dataset.getLumi().asNumber(1./fb) )
-            from spey import get_correlated_nbin_statistical_model
-
-            self.statModel = get_correlated_nbin_statistical_model(analysis = dataset.globalInfo.id,
-                                                                signal_yields = nsig,
-                                                                data = nobs,
-                                                                covariance_matrix = cov,
-                                                                backgrounds = bg,
-                                                                third_moment = third_moment,
-                                                                delta_sys = delta_sys,
-                                                                xsection = xsec
-                                                                )
-        elif dataset.type == "pyhf":
-            self.statModel = self._getBestStatModel(nsig, allow_negative_signal=allow_negative_signal)
-        else:
-            logger.error(f'Dataset of type "{dataset.type}" for analysis {dataset.globalInfo.id} is not of type "simplified" or "pyhf".')
-
+        stat_wrapper = get_backend("default_pdf.correlated_background")
+        obsN = [ x.dataInfo.observedN for x in dataset._datasets ]
+        bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
+        cov = dataset.globalInfo.covariance
+        lumi = float ( dataset.getLumi().asNumber(1./fb) )
+        # print ( "input", len(obsN), len(bg), len(cov), len(nsig) )
+        self.statModel = stat_wrapper( data = obsN,
+                        background_yields = bg, covariance_matrix = cov,
+                        signal_yields = nsig,
+                        xsection = [ x / lumi for x in nsig ],
+                        analysis = dataset.globalInfo.id,
+#                        backend = 'simplified_likelihoods'
+        )
         return self.statModel
 
     def getStatModelSingleBin(self, nsig: Union[float, np.ndarray], 
@@ -219,12 +220,21 @@ class SpeyComputer:
         :param limit_on_xsec: if True, then return the limit on the
                               cross section
         """
+        from spey import ExpectationType
+        exp = ExpectationType.aposteriori
+        if expected == False:
+            exp = ExpectationType.observed
+        if expected in [ True, "prior" ]:
+            exp = ExpectationType.apriori
 
         try:
-            ret = self.statModel.poi_upper_limit ( expected = expected )
+            ret = self.statModel.poi_upper_limit ( expected = exp )
         except ValueError as e:
             logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
             sys.exit(-1)
+        if limit_on_xsec:
+            xsec = sum ( self.nsig ) / self.dataset.globalInfo.lumi    
+            ret = ret * xsec
         return ret
 
     def _getBestStatModel(self, nsig, allow_negative_signal=False):
