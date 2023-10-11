@@ -30,7 +30,7 @@ class SpeyComputer:
         """
         #if deltas_rel != None:
         #    logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
-        if dataset.getType() not in [ "efficiencyMap", "combined" ]:
+        if type(dataset) not in [ list] and dataset.getType() not in [ "efficiencyMap", "combined" ]:
             logger.error ( f"I do not recognize the dataset type {dataset.getType()}" )
 
         self.backendType = backendType
@@ -42,6 +42,8 @@ class SpeyComputer:
         """ retrieve the statistical model """
         if False: # mlModelIsAvailable:
             self.getNNModel ( nsig ) 
+        if self.backendType == "pyhf":
+            return self.getStatModelPyhf ( nsig )
         if self.dataset.getType() == "efficiencyMap":
             return self.getStatModelSingleBin ( nsig )
         return self.getStatModelMultiBin ( nsig )
@@ -116,6 +118,26 @@ class SpeyComputer:
                         analysis = dataset.globalInfo.id,
 #                        backend = 'simplified_likelihoods'
         )
+        return self.statModel
+
+    def getStatModelPyhf(self, nsig: Union[float, np.ndarray] ):
+        """
+        Create statistical model from a single bin or multiple uncorrelated regions.
+
+        :param nsig: signal yields.
+        :return: spey StatisticalModel object.
+
+        :raises NotImplementedError: If requested backend has not been recognised.
+        """
+        dataset = self.dataset
+        stat_wrapper = get_backend("pyhf")
+        jsonFiles = dataset.globalInfo.jsonFiles
+        analysis = dataset.globalInfo.id
+        # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
+
+        self.statModel = stat_wrapper( analysis = analysis,
+                        signal_patch = None,
+                        background_only_model = None )
         return self.statModel
 
     def getStatModelSingleBin(self, nsig: Union[float, np.ndarray], 
@@ -200,16 +222,16 @@ class SpeyComputer:
 
 
     def maximize_likelihood_timothee ( self, expected : Union[bool,Text],
-            allowNegativeSignals : bool = True,
+            allow_negative_signal : bool = True,
             return_nll : bool = False  ) -> Tuple[float,float]:
         """ maximize likelihood, timothee style. i.e. if expected is
             posteriori then maximize asimov likelihood but with expected="apriori"
             will worry later about the correctness of this. """
         if expected == "posteriori":
             return self.maximize_asimov_likelihood(expected="apriori",
-#                   allowNegativeSignals = allowNegativeSignals, # 
+#                   allow_negative_signal = allow_negative_signal, # 
                    return_nll = return_nll )
-        return self.maximize_likelihood( allowNegativeSignals = allowNegativeSignals,
+        return self.maximize_likelihood( allow_negative_signal = allow_negative_signal,
                return_nll = return_nll, expected = expected )
 
     def poi_upper_limit ( self, expected : Union [ bool, Text ],
@@ -337,6 +359,38 @@ class SpeyComputer:
         return self.statModel.asimov_likelihood ( poi_test = poi_test,
             expected = expected, return_nll = return_nll )
 
+    @classmethod
+    def forPyhf(cls, dataset, nsig, deltas_rel):
+        """ get a statscomputer for pyhf combination.
+
+        :param dataset: CombinedDataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a StatsComputer
+        """
+        computer = SpeyComputer(dataset=dataset, backendType="pyhf", 
+                                nsig=nsig, deltas_rel=deltas_rel)
+        return computer
+
+    @classmethod
+    def forAnalysesComb(cls,theoryPredictions, deltas_rel):
+        """ get a statscomputer for combination of analyses
+        :param theoryPredictions: list of TheoryPrediction objects
+        :param deltas_rel: relative error for the signal
+        :returns: a StatsComputer
+        """
+        
+        # Only allow negative signal if all theory predictions allow for it
+        #allow_negative_signal = all([tp.statsComputer.allow_negative_signal
+        #                            for tp in theoryPredictions])
+
+        computer = SpeyComputer(dataset=theoryPredictions,  
+                                backendType="analysesComb", 
+                                nsig=None, deltas_rel=deltas_rel)
+        
+        return computer
+
     def checkMinimumPoi ( self, poi_test : float ):
         """ check if poi is below minimum_poi """
         config = self.statModel.backend.config()
@@ -353,28 +407,28 @@ class SpeyComputer:
             expected = expected, return_nll = return_nll )
 
     def maximize_likelihood ( self, expected : Union[bool,Text],
-           allowNegativeSignals : bool = True,
+           allow_negative_signal : bool = True,
            return_nll : bool = False  ) -> Tuple[float,float]:
         """ simple frontend to spey functionality
         :param return_nll: if True, return negative log likelihood
-        :param allowNegativeSignals: allow also negative muhats
+        :param allow_negative_signal: allow also negative muhats
         :returns: tuple of muhat,lmax
         """
         expected = self.translateExpectationType ( expected )
         speyret = self.statModel.maximize_likelihood ( expected = expected, 
-                allow_negative_signal = allowNegativeSignals,
+                allow_negative_signal = allow_negative_signal,
                 return_nll = return_nll )
         ret = { "muhat": speyret[0], "lmax": speyret[1] }
         ## not clear if bounds will be hard bounds
-        if not allowNegativeSignals and speyret[0]< 0.:
+        if not allow_negative_signal and speyret[0]< 0.:
             ret = { "muhat": 0., "lmax": self.likelihood ( 0., expected = expected, return_nll = return_nll ) }
         return ret
 
-    def sigma_mu ( self, poi_test : float, expected : Union[bool,Text], allowNegativeSignals : bool = False ):
+    def sigma_mu ( self, poi_test : float, expected : Union[bool,Text], allow_negative_signal : bool = False ):
         """ determine sigma at poi_test.
-        :param: FIXME allowNegativeSignals should not be needed!
+        :param: FIXME allow_negative_signal should not be needed!
         """
-        test_statistic = "q" if allowNegativeSignals else "qmutilde"
+        test_statistic = "q" if allow_negative_signal else "qmutilde"
         sigma_mu = self.statModel.sigma_mu( poi_test=poi_test,expected=expected,
                                             test_statistics=test_statistic )
         return sigma_mu
@@ -383,7 +437,7 @@ class SpeyComputer:
            return_nll : bool = False ) -> Tuple[float,float]:
         """ simple frontend to spey functionality 
         :param return_nll: if True, return negative log likelihood
-        :param allowNegativeSignals: allow also negative muhats
+        :param allow_negative_signal: allow also negative muhats
         :returns: tuple of muhat,lmax
         """
         expected = self.translateExpectationType ( expected )
@@ -393,7 +447,7 @@ class SpeyComputer:
         ret = self.statModel.maximize_asimov_likelihood ( expected = expected, 
             return_nll = return_nll ) # , **opt )
         assert ret[0]>=0., "maximum of asimov likelihood should not be below zero"
-        #if not allowNegativeSignals and ret[0]< 0.:
+        #if not allow_negative_signal and ret[0]< 0.:
         #    ret = ( 0., self.likelihood ( 0., expected = expected, return_nll = return_nll ) )
         return ret
 
