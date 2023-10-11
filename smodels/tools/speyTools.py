@@ -83,13 +83,11 @@ class SpeyComputer:
         """ here is the code for how we create a spey statModel that uses an NN 
             as its backend """
         from spey import get_ml_model # import the spey method for it
+        self.statModel = get_ml_model ( ... )
+        return self.statModel
 
     def getStatModelMultiBin(self,
-        nsig: Union[np.ndarray, List[Dict[Text, List]], List[float]],
-        delta_sys: float = 0.0,
-        allow_negative_signal = False,
-
-    ):
+        nsig: Union[np.ndarray, List[Dict[Text, List]], List[float]] ):
         """
         Create a statistical model from multibin data.
 
@@ -131,13 +129,14 @@ class SpeyComputer:
         """
         dataset = self.dataset
         stat_wrapper = get_backend("pyhf")
-        jsonFiles = dataset.globalInfo.jsonFiles
-        analysis = dataset.globalInfo.id
+        from smodels.tools.speyPyhf import SpeyPyhfData
+        data = SpeyPyhfData.createDataObject ( dataset, self.nsig )
         # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
+        analysis = dataset.globalInfo.id
 
         self.statModel = stat_wrapper( analysis = analysis,
-                        signal_patch = None,
-                        background_only_model = None )
+                        signal_patch = data.patchMaker(),
+                        background_only_model = data.inputJsons )
         return self.statModel
 
     def getStatModelSingleBin(self, nsig: Union[float, np.ndarray], 
