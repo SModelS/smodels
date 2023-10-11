@@ -695,6 +695,9 @@ class LikelihoodComputer:
         """Compute nuisance parameters theta that maximize our likelihood
         (poisson*gauss).
         """
+        if type(mu) == np.ndarray:
+            assert len(mu)==1, f"Signal strength {mu} should be a scalar"
+            mu=mu[0]
         mu = float(mu)
         if np.isinf ( mu ):
             return None
@@ -821,7 +824,7 @@ class LikelihoodComputer:
         minr, avgr, maxr = self.findAvgr( theta_hat )
 
         def myllhd( mu : float ):
-            theta = self.findThetaHat ( mu=float(mu) )
+            theta = self.findThetaHat ( mu=float(mu[0]) )
             ret = self.likelihood(return_nll=True, mu = mu )
             return ret
 
