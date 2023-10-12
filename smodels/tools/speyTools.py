@@ -82,8 +82,31 @@ class SpeyComputer:
     def getNNModel ( self, nsig ):
         """ here is the code for how we create a spey statModel that uses an NN 
             as its backend """
-        from spey import get_ml_model # import the spey method for it
-        self.statModel = get_ml_model ( ... )
+        #from spey import get_ml_model # import the spey method for it
+               
+        #For the moment, the ml-likelihood backned has to be dowanloaded and installed manually. In the future, the backend could be directly embedded and installed in SmodelS.
+        import sys
+        MLlikePath='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods'
+        sys.path.append(MLlikePath)
+        
+        
+    
+        stat_wrapper = spey.get_backend('ml.likelihoods')
+        
+        #The current ML-likelihood backend takes a local path. This has to be updated, I think the idea is that the backend takes 'dataset' as input, where 'dataset' is a loaded onnx model. Thus, the onnx has to be loaded by SmodelS beforehand. It seems to be the more consistent wrt the other backends.
+        
+        #self.statModel = stat_wrapper(nsig,dataset)
+        
+        
+        
+        network_path='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods/ML_models/ATLAS-SUSY-2018-04/ensemble_model.onnx'
+        self.statModel = stat_wrapper(nsig,network_path)
+        
+        
+        
+        
+        
+        #self.statModel = get_ml_model ( ... )
         return self.statModel
 
     def getStatModelMultiBin(self,
