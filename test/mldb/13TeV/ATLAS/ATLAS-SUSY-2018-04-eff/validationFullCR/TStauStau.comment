@@ -1,3 +1,0 @@
-comment_by: Wolfgang Waltenberger
-date: Mon 23 Mar 2020 02:13:54 PM CET
-comment: "It seems like a poor person's combination genuinely leads to an overexclusion. Since the efficiency map result carries no advantage over the upper limit result, we set validation to false, and only introduce this result once we can handle pyhf likelihoods."
