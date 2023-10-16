@@ -148,23 +148,25 @@ class SpeyComputer:
 
     def getStatModelPyhf(self, nsig: Union[float, np.ndarray] ):
         """
-        Create statistical model from a single bin or multiple uncorrelated regions.
+        Create statistical model from a pyhf json file
 
         :param nsig: signal yields.
         :return: spey StatisticalModel object.
-
-        :raises NotImplementedError: If requested backend has not been recognised.
         """
         dataset = self.dataset
         stat_wrapper = get_backend("pyhf")
         from smodels.tools.speyPyhf import SpeyPyhfData
         data = SpeyPyhfData.createDataObject ( dataset, self.nsig )
+        idx = self.getBestCombinationIndex( data )
+        inputJson = data.inputJsons[idx]
+        signal_patch = data.patchMaker()[idx]
+        #print ( "inputJsons", inputJson )
         # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
         analysis = dataset.globalInfo.id
 
         self.statModel = stat_wrapper( analysis = analysis,
-                        signal_patch = data.patchMaker(),
-                        background_only_model = data.inputJsons )
+                        signal_patch = signal_patch, 
+                        background_only_model = inputJson )
         return self.statModel
 
     def getStatModelSingleBin(self, nsig: Union[float, np.ndarray], 
@@ -284,7 +286,7 @@ class SpeyComputer:
             ret = ret * xsec
         return ret
 
-    def _getBestStatModel(self, nsig, allow_negative_signal=False):
+    def _getBestStatModel(self, nsig, allow_negative_signal=False ):
         """
         find the index of the best expected combination.
 
@@ -376,6 +378,30 @@ class SpeyComputer:
             logger.error(f'No minimal upper limit on POI found for {self.globalInfo.id}')
             return None
         return bestStatModel
+
+    def getBestCombinationIndex(self, data ):
+        """find the index of the best expected combination"""
+        print ( "FIXME obsolete!!", len(data.inputJsons) )
+        if len(data.inputJsons) == 1:
+            return 0
+        logger.debug( f"Finding best expected combination among {len(data)} workspace(s)" )
+        ulMin = float("+inf")
+        i_best = None
+        for i_ws in range(len(data.inputJsons)):
+            if data.totalYield == 0.:
+                continue
+            if data.zeroSignalsFlag[i_ws] == True:
+                logger.debug( f"Workspace number {i_ws} has zero signals" )
+                continue
+            else:
+                ul = self.poi_upper_limit(expected=True, workspace_index=i_ws)
+            if ul == None:
+                continue
+            if ul < ulMin:
+                ulMin = ul
+                i_best = i_ws
+        return i_best
+
 
     def asimov_likelihood ( self, poi_test : float, expected : Union[bool,Text], 
                             return_nll : bool ) -> float:

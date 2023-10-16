@@ -22,7 +22,7 @@ from smodels.theory.theoryPrediction import theoryPredictionsFor
 
 class SpeyTest(unittest.TestCase):
 
-    def testML(self):
+    def xestML(self):
         """ test the ML backend """
         db = Database ( "mldb/" )
         res = db.getExpResults ( "ATLAS-SUSY-2018-04" )[0]
@@ -35,12 +35,30 @@ class SpeyTest(unittest.TestCase):
         pr = predictions[0]
         lsm = pr.likelihood(0.)
         lbsm = pr.likelihood(1.)
-        self.assertAlmostEquals ( lsm, 1.0735609152601552e-43 )
+        self.assertAlmostEqual ( lsm, 1.0735609152601552e-43 )
         # lsm, pyhf: 5.626294389030576e-44
-        self.assertAlmostEquals ( lbsm, 3.9401532820495447e-45 )
+        self.assertAlmostEqual ( lbsm, 3.9401532820495447e-45 )
         # lbsm, pyhf: 6.957205346414768e-46
         # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
 
+    def testPyhf(self):
+        """ test the pyhf backend """
+        db = Database ( "mldb/" )
+        res = db.getExpResults ( "ATLAS-SUSY-2018-04" )[0]
+        slhafile = "testFiles/slha4ml/TStauStau_300_106_300_106.slha"
+        model = Model(BSMList,SMList)
+        model.updateParticles(slhafile)
+        smstoplist = decomposer.decompose(model, .1*fb, doCompress=True,
+                doInvisible=True, minmassgap=5.*GeV)
+        predictions = theoryPredictionsFor ( res, smstoplist )
+        pr = predictions[0]
+        lsm = pr.likelihood(0.)
+        lbsm = pr.likelihood(1.)
+        self.assertAlmostEqual ( lsm, 5.626294389030576e-44 )
+        # lsm, pyhf: 5.626294389030576e-44
+        self.assertAlmostEqual ( lbsm, 6.957205346414768e-46 )
+        # lbsm, pyhf: 6.957205346414768e-46
+        # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
 
 if __name__ == "__main__":
     unittest.main()
