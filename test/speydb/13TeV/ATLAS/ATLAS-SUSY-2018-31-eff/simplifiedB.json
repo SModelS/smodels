@@ -1,0 +1,129 @@
+{
+    "channels": [
+        {
+            "name": "CRtt_cuts",
+            "samples": [
+                {
+                    "data": [
+                        42.135027866560634
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    47.06831190940452
+                                ],
+                                "lo_data": [
+                                    37.20174382371675
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "VRtt_cuts",
+            "samples": [
+                {
+                    "data": [
+                        92.60726466776131
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    101.07195872591711
+                                ],
+                                "lo_data": [
+                                    84.14257060960551
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR_cuts",
+            "samples": [
+                {
+                    "data": [
+                        3.2422835988775116
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    4.063864376606414
+                                ],
+                                "lo_data": [
+                                    2.4207028211486086
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        }
+    ],
+    "measurements": [
+        {
+            "config": {
+                "parameters": [
+                    {
+                        "auxdata": [
+                            1.0
+                        ],
+                        "bounds": [
+                            [
+                                0.915,
+                                1.085
+                            ]
+                        ],
+                        "fixed": true,
+                        "inits": [
+                            1.0
+                        ],
+                        "name": "lumi",
+                        "sigmas": [
+                            0.017
+                        ]
+                    }
+                ],
+                "poi": "mu_SIG"
+            },
+            "name": "NormalMeasurement"
+        }
+    ],
+    "observations": [
+        {
+            "data": [
+                42.0
+            ],
+            "name": "CRtt_cuts"
+        },
+        {
+            "data": [
+                93.0
+            ],
+            "name": "VRtt_cuts"
+        },
+        {
+            "data": [
+                3.0
+            ],
+            "name": "SR_cuts"
+        }
+    ],
+    "version": "1.0.0"
+}

@@ -18,7 +18,8 @@ from smodels.tools.physicsUnits import fb
 import numpy as np
 
 class SpeyComputer:
-    __slots__ = [ "statModel", "dataset", "weight", "backendType", "nsig" ]
+    __slots__ = [ "speyModels", "dataset", "weight", "backendType", "nsig",
+                  "model_index" ]
 
     def __init__ ( self, dataset, backendType : str, nsig : Union[float,list], 
                    deltas_rel : Union[None,float] = None ):
@@ -34,9 +35,10 @@ class SpeyComputer:
         self.backendType = backendType
         self.dataset = dataset
         self.nsig = nsig
-        self.statModel = self.getStatModel ( nsig )
+        self.speyModels = self.getStatModels ( nsig )
+        self.model_index = 0 # we might have several models and need to choose
 
-    def getStatModel(self, nsig ) -> StatisticalModel:
+    def getStatModels(self, nsig ) -> StatisticalModel:
         """ retrieve the statistical model """
         if type(self.dataset)==list: # ok, we have a combined dataset!
             return self.getAnalysisCombinationModel ( nsig )
@@ -52,7 +54,7 @@ class SpeyComputer:
     def getAnalysisCombinationModel ( self, nsig ):
         computer = SpeyComputer(dataset=dataset, backendType="combo", 
                                 nsig=nsig, deltas_rel=deltas_rel)
-        return computer
+        return [ computer ]
 
     @classmethod
     def forSingleBin(cls, dataset, nsig, deltas_rel):
@@ -86,7 +88,7 @@ class SpeyComputer:
         return computer
 
     def getNNModel ( self, nsig ):
-        """ here is the code for how we create a spey statModel that uses an NN 
+        """ here is the code for how we create a spey speyModel that uses an NN 
             as its backend """
         #from spey import get_ml_model # import the spey method for it
                
@@ -103,16 +105,16 @@ class SpeyComputer:
         
 #network_path='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods/ML_models/ATLAS-SUSY-2018-04/ensemble_model.onnx'
         onnxBlob=self.dataset.globalInfo.onnx
-        # self.statModel = stat_wrapper(nsig,onnxBlob) # this is how i want it long run
+        # self.speyModel = stat_wrapper(nsig,onnxBlob) # this is how i want it long run
         ## the following code is just for now to see if it works in principle
         f = open ( "/tmp/my.onnx", "wb" )
         import onnx
         onnx.save ( onnxBlob, f )
         f.close()
-        self.statModel = stat_wrapper(nsig,"/tmp/my.onnx")
+        speyModel = stat_wrapper(nsig,"/tmp/my.onnx")
         
-        #self.statModel = get_ml_model ( ... )
-        return self.statModel
+        #self.speyModel = get_ml_model ( ... )
+        return [ speyModel ]
 
     def getStatModelMultiBin(self,
         nsig: Union[np.ndarray, List[Dict[Text, List]], List[float]] ):
@@ -137,14 +139,14 @@ class SpeyComputer:
         cov = dataset.globalInfo.covariance
         lumi = float ( dataset.getLumi().asNumber(1./fb) )
         # print ( "input", len(obsN), len(bg), len(cov), len(nsig) )
-        self.statModel = stat_wrapper( data = obsN,
+        speyModel = stat_wrapper( data = obsN,
                         background_yields = bg, covariance_matrix = cov,
                         signal_yields = nsig,
                         xsection = [ x / lumi for x in nsig ],
                         analysis = dataset.globalInfo.id,
 #                        backend = 'simplified_likelihoods'
         )
-        return self.statModel
+        return [ speyModel ]
 
     def getStatModelPyhf(self, nsig: Union[float, np.ndarray] ):
         """
@@ -157,17 +159,21 @@ class SpeyComputer:
         stat_wrapper = get_backend("pyhf")
         from smodels.tools.speyPyhf import SpeyPyhfData
         data = SpeyPyhfData.createDataObject ( dataset, self.nsig )
-        idx = self.getBestCombinationIndex( data )
-        inputJson = data.inputJsons[idx]
-        signal_patch = data.patchMaker()[idx]
-        #print ( "inputJsons", inputJson )
-        # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
-        analysis = dataset.globalInfo.id
+        models = []
+        patches = data.patchMaker()
+        for i in range( len(data.inputJsons ) ):
+            # idx = self.getBestCombinationIndex( data )
+            inputJson = data.inputJsons[i]
+            signal_patch = patches[i]
+            #print ( "inputJsons", inputJson )
+            # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
+            analysis = dataset.globalInfo.id
 
-        self.statModel = stat_wrapper( analysis = analysis,
-                        signal_patch = signal_patch, 
-                        background_only_model = inputJson )
-        return self.statModel
+            speyModel = stat_wrapper( analysis = analysis,
+                            signal_patch = signal_patch, 
+                            background_only_model = inputJson )
+            models.append ( speyModel )
+        return models
 
     def getStatModelSingleBin(self, nsig: Union[float, np.ndarray], 
             delta_sys : Union[None,float] = None,
@@ -184,7 +190,7 @@ class SpeyComputer:
         dataset = self.dataset
         stat_wrapper = get_backend("default_pdf.uncorrelated_background")
 
-        self.statModel = stat_wrapper(
+        speyModel = stat_wrapper(
                         data = [float(dataset.dataInfo.observedN)],
                         background_yields = [float(dataset.dataInfo.expectedBG)],
                         absolute_uncertainties = [float(dataset.dataInfo.bgError)],
@@ -193,7 +199,7 @@ class SpeyComputer:
                         analysis = dataset.globalInfo.id,
 #                        backend = 'simplified_likelihoods'
         )
-        return self.statModel
+        return [ speyModel ]
 
     def translateExpectationType ( self, expected : Union [ bool, Text ] ) -> ExpectationType:
         """ translate the specification for expected values from smodels
@@ -264,11 +270,15 @@ class SpeyComputer:
                return_nll = return_nll, expected = expected )
 
     def poi_upper_limit ( self, expected : Union [ bool, Text ],
-           limit_on_xsec : bool = False ) -> float:
+           limit_on_xsec : bool = False, model_index : Union [int,None] = None ) -> float:
         """ simple frontend, to spey::poi_upper_limit 
         :param limit_on_xsec: if True, then return the limit on the
                               cross section
+        :param model_index: if None, then get upper limit for most sensitive model,
+                           if integer, get UL for that model
         """
+        if model_index == None:
+            model_index = self.model_index
         from spey import ExpectationType
         exp = ExpectationType.aposteriori
         if expected == False:
@@ -277,7 +287,7 @@ class SpeyComputer:
             exp = ExpectationType.apriori
 
         try:
-            ret = self.statModel.poi_upper_limit ( expected = exp )
+            ret = self.speyModels[model_index].poi_upper_limit ( expected = exp )
         except ValueError as e:
             logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
             sys.exit(-1)
@@ -286,105 +296,12 @@ class SpeyComputer:
             ret = ret * xsec
         return ret
 
-    def _getBestStatModel(self, nsig, allow_negative_signal=False ):
-        """
-        find the index of the best expected combination.
-
-        :param nsig: list of signal yields.
-        :param allow_negative_signal: if True, the expected upper limit on mu, used to find the best statistical model, can be negative.
-
-        :return: the spey StatisticalModel object that computed the minimal apriori-expected poi upper limit.
-        """
-        dataset = self.dataset
-        # Get the list of the names of the signal regions used in the json files
-        listOfSRInJson=[]
-        for SRnames in dataset.globalInfo.jsonFiles.values():
-            listOfSRInJson += SRnames
-
-        patches, listOfSignals = dataset._getPatches(nsig)
-        mu_ul_exp_min = np.inf
-        # Find best combination of signal regions
-        for index, (patch, json) in enumerate(zip(patches,dataset.globalInfo.jsons)):
-            # If the expected signal is 0 for each SR in the combined set of SRs, skip
-            if all([sig==0. for sig in listOfSignals[index]]):
-                continue
-            # The x-section is at the level of the TheoryPrediction
-            # if there are multiple sets of SRs, set a xsec_UL for the whole analysis, i.e. that uses all the SRs,
-            # so that the resulting R value Is for the whole analysis
-            xsec = float ( sum(nsig)/dataset.getLumi().asNumber(1./fb ) )
-            from spey import get_correlated_nbin_statistical_model
-            # It is possible to do differently and to set a xsec_UL on each set of SRs but that is not how it done in SModelS so far
-            # xsec = sum(listOfSignals[index])/self.getLumi()
-            statModel = get_correlated_nbin_statistical_model(analysis=dataset.globalInfo.id,
-                                                            signal_yields=patch,
-                                                            data=json,
-                                                            xsection=xsec
-                                                            )
-            self.statModel = statModel
-            # If all the SRs are used in the json files and there is only one json files, there is only one statModel.
-            # No need to compute mu_ul_exp if not needed.
-            if all([ds.dataInfo.dataId in listOfSRInJson for ds in dataset._datasets]) and len(dataset.globalInfo.jsons) == 1:
-                return statModel
-
-            config = statModel.backend.config()
-            inits = self.getSpeyInitialisation ( True )
-            lim = inits["limits"]
-            bounds = config.bounds()
-            try:
-                mu_ul_exp = statModel.poi_upper_limit(
-                        expected=ExpectationType.apriori, 
-                        low_init = lim["low_ini"], hig_init = lim["hig_init"], 
-                        maxiter = lim["maxiter"], 
-                        optimiser_arguments = inits["optimiser"] )
-            except ValueError as e:
-                # if we dont get an answer, might just be this super region
-                # is not a good choice
-                logger.warn ( f"when trying to find best super region: {e}. will skip this one." )
-                continue
-            while abs(mu_ul_exp - bounds[config.poi_index][1]) / ( mu_ul_exp + bounds[config.poi_index][1]) <= 0.1:
-                logger.debug('Expected upper limit on poi reached the upper bound. Will try again after increasing the upper bound.')
-                bounds[config.poi_index] = (bounds[config.poi_index][1], bounds[config.poi_index][1]*10)
-                mu_ul_exp = statModel.poi_upper_limit(
-                        expected=ExpectationType.apriori, 
-                        low_init = lim["low_ini"], hig_init = lim["hig_init"], 
-                        maxiter = lim["maxiter"], 
-                        optimiser_arguments = inits["optimiser"] )
-
-            if mu_ul_exp == 0 and not allow_negative_signal:
-                logger.warning(f'Expected upper limit on poi is negative when searching for the best statistical model for analysis {self.globalInfo.id}.')
-            if mu_ul_exp == None:
-                continue
-            elif mu_ul_exp < mu_ul_exp_min:
-                mu_ul_exp_min = mu_ul_exp
-                bestStatModel = statModel
-
-        # Check if a non-combined (uncorrelated) signal region is more contraining than the best combination obtained above
-        # Check if a signal region is not in the list of SR names used in the json files
-        for sig,ds in zip(nsig,self.dataset._datasets):
-            dI = ds.dataInfo
-            if dI.dataId not in listOfSRInJson:
-                xsec = sig/self.dataset.getLumi()
-                # Don't bother to compute eUL again (one could do it again if needed)
-                if xsec.asNumber(fb) == 0.:
-                    ## we have no values
-                    continue
-                mu_ul_exp = dI.expectedUpperLimit/xsec
-                if mu_ul_exp < mu_ul_exp_min:
-                    logger.info("Best constraining model is a single uncorrelated model.")
-                    mu_ul_exp_min = mu_ul_exp
-                    bestStatModel = ds.getStatModel(sig)
-
-        if mu_ul_exp_min == np.inf:
-            logger.error(f'No minimal upper limit on POI found for {self.globalInfo.id}')
-            return None
-        return bestStatModel
-
     def getBestCombinationIndex(self, data ):
         """find the index of the best expected combination"""
         print ( "FIXME obsolete!!", len(data.inputJsons) )
         if len(data.inputJsons) == 1:
             return 0
-        logger.debug( f"Finding best expected combination among {len(data)} workspace(s)" )
+        logger.debug( f"Finding best expected combination among {len(data.inputJsons)} workspace(s)" )
         ulMin = float("+inf")
         i_best = None
         for i_ws in range(len(data.inputJsons)):
@@ -394,7 +311,7 @@ class SpeyComputer:
                 logger.debug( f"Workspace number {i_ws} has zero signals" )
                 continue
             else:
-                ul = self.poi_upper_limit(expected=True, workspace_index=i_ws)
+                ul = self.poi_upper_limit(expected=True, model_index=i_ws)
             if ul == None:
                 continue
             if ul < ulMin:
@@ -408,7 +325,7 @@ class SpeyComputer:
         """ simple frontend to spey functionality """
         self.checkMinimumPoi( poi_test )
         expected = self.translateExpectationType ( expected )
-        return self.statModel.asimov_likelihood ( poi_test = poi_test,
+        return self.speyModel[self.model_index].asimov_likelihood ( poi_test = poi_test,
             expected = expected, return_nll = return_nll )
 
     @classmethod
@@ -445,7 +362,7 @@ class SpeyComputer:
 
     def checkMinimumPoi ( self, poi_test : float ):
         """ check if poi is below minimum_poi """
-        config = self.statModel.backend.config()
+        config = self.speyModels[self.model_index].backend.config()
         if poi_test < config.minimum_poi:
             logger.error ( f'Calling likelihood for {self.dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
 
@@ -455,7 +372,7 @@ class SpeyComputer:
         self.checkMinimumPoi ( poi_test )
         expected = self.translateExpectationType ( expected )
         # init = self.getSpeyInitialisation ( True )
-        return self.statModel.likelihood ( poi_test = poi_test,
+        return self.speyModels[self.model_index].likelihood ( poi_test = poi_test,
             expected = expected, return_nll = return_nll )
 
     def maximize_likelihood ( self, expected : Union[bool,Text],
@@ -467,7 +384,7 @@ class SpeyComputer:
         :returns: tuple of muhat,lmax
         """
         expected = self.translateExpectationType ( expected )
-        speyret = self.statModel.maximize_likelihood ( expected = expected, 
+        speyret = self.speyModels[self.model_index].maximize_likelihood ( expected = expected, 
                 allow_negative_signal = allow_negative_signal,
                 return_nll = return_nll )
         ret = { "muhat": speyret[0], "lmax": speyret[1] }
@@ -481,7 +398,7 @@ class SpeyComputer:
         :param: FIXME allow_negative_signal should not be needed!
         """
         test_statistic = "q" if allow_negative_signal else "qmutilde"
-        sigma_mu = self.statModel.sigma_mu( poi_test=poi_test,expected=expected,
+        sigma_mu = self.speyModels[self.model_index].sigma_mu( poi_test=poi_test,expected=expected,
                                             test_statistics=test_statistic )
         return sigma_mu
 
@@ -496,7 +413,7 @@ class SpeyComputer:
         # init = self.getSpeyInitialisation ( True )
         # opt = init["optimiser"]
         # opt["test_statistics"]="qmutilde"
-        ret = self.statModel.maximize_asimov_likelihood ( expected = expected, 
+        ret = self.speyModels[self.model_index].maximize_asimov_likelihood ( expected = expected, 
             return_nll = return_nll ) # , **opt )
         assert ret[0]>=0., "maximum of asimov likelihood should not be below zero"
         #if not allow_negative_signal and ret[0]< 0.:
@@ -505,7 +422,7 @@ class SpeyComputer:
 
     @property
     def xsection(self):
-        return self.statModel.xsection
+        return self.speyModels[self.model_index].xsection
 
 class SimpleSpeyDataSet:
     """ a very simple data class that can replace a smodels.dataset,
