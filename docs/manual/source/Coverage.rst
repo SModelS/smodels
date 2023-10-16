@@ -130,11 +130,11 @@ SModelS deals with the above issues through the following steps:
    corresponds to the |SMS| weight subtracted of the weight of its ancestors
    which do not belong to the same coverage group. The effective cross section
    also includes the reweighting :ref:`discussed above <coverReweight>`.
- * All |SMS topologies| belonging to the same group which have a common ancestor
-   are removed (only the |SMS| with largest missing cross section is kept).
+ * All |SMS topologies| belonging to the same group which have a common ancestor are removed (only the |SMS| with largest missing cross section is kept).
 
 * **Coverage groups are implemented by the** `UncoveredGroup class <tools.html#tools.coverage.UncoveredGroup>`_
 
+.. _finalStateSMS:
 
 Final State SMS
 ---------------
