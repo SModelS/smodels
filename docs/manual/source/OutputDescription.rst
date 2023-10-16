@@ -4,11 +4,12 @@
 .. |mass compression| replace:: :ref:`mass compression <massComp>`
 .. |particle| replace:: :ref:`particle <particleClass>`
 .. |particles| replace:: :ref:`particles <particleClass>`
-.. |element| replace:: :ref:`element <element>`
-.. |elements| replace:: :ref:`elements <element>`
-.. |topology| replace:: :ref:`topology <topology>`
-.. |topologies| replace:: :ref:`topologies <topology>`
-.. |decomposition| replace:: :doc:`decomposition <Decomposition>`
+.. |SMS| replace:: :ref:`SMS <SMS>`
+.. |SMS topology| replace:: :ref:`SMS topology <SMS>`
+.. |SMS topologies| replace:: :ref:`SMS topologies <SMS>`
+.. |topology| replace:: :ref:`topology <SMS>`   
+.. |topologies| replace:: :ref:`topologies <SMS>`
+.. |decomposition| replace:: :ref:`decomposition <decomposition>`
 .. |theory predictions| replace:: :doc:`theory predictions <TheoryPredictions>`
 .. |theory prediction| replace:: :doc:`theory prediction <TheoryPredictions>`
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
@@ -35,6 +36,7 @@
 .. |datasets| replace:: :ref:`data sets<DataSet>`
 .. |parameters| replace:: :ref:`parameters file <parameterFile>`
 .. |ssigBRe| replace:: :math:`\sum \sigma \times BR \times \epsilon`
+.. |canonical names| replace:: :ref:`canonical names <canonicalName>`   
 
 .. _outputDescription:
 
@@ -365,13 +367,14 @@ the respective expected r-value (if available) and the most sensitive ATLAS and 
 If **combineAnas** is defined, the summary will also include the :math:`r`-value and expected  :math:`r`-value
 for the combination of analyses.
 
-.. [#f1] Some of the output may change depending on the code and database versions used.
+.. [#f1] Some of the output may change depending on the code and database versions used. In particular, for a description of the version 2 output
+         format, check the v2 manual.
 
-.. [#f2] The mass shown corresponds to an average mass over all the |elements| contributing
-       to the theory prediction. In the case where the |elements| have distinct |topologies|
+.. [#f2] The mass shown corresponds to an average mass over all the |SMS topologies| contributing
+       to the theory prediction. In the case where the |SMS| have distinct structures (i.e. |canonical names|)
        no mass is shown.
 
 .. [#f3] For particles considered with prompt decays (see :ref:`promptWidth parameter <parameterFileModel>`), the width is replaced by 'prompt',
        while for particles considered stable (see see :ref:`stableWidth parameter <parameterFileModel>`), the width is replaced by 'stable'.
-       If more than one |element| contributes to the theory prediction, the average widths and masses of the BSM states
+       If more than one |SMS| contributes to the theory prediction, the average widths and masses of the BSM states
        are shown.
