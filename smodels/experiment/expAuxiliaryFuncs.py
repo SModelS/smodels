@@ -578,7 +578,7 @@ def cleanWalk ( topdir ):
 
 def concatenateLines ( oldcontent ):
     """ of all lines in the list "oldcontent", concatenate the ones
-        that end with \  or , """
+        that end with '\'  or ',' """
     content=[] ## concatenate lines that end with "," or "\"
     tmp=""
     for line in oldcontent:
