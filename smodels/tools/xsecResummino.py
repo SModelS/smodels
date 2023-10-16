@@ -27,11 +27,11 @@ from smodels.tools.xsecBase import XSecBase, ArgsStandardizer
 import tempfile
 import pyslha
 import shutil
-
+from itertools import combinations
 
 class XSecResummino(XSecBase):
     """ cross section computer class (for resummino), what else? """
-    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type = 'all', verbosity = '', json = None):
+    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type = 'all', verbosity = '', json = None, particles = None):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
                     if maxOrder == LO, compute only LO resummino xsecs
@@ -58,8 +58,7 @@ class XSecResummino(XSecBase):
                 self.json_resummino = json
             else:
                 self.json_resummino = os.path.join(self.pwd, json)
-
-        
+        self.particles = particles
         self.slha_folder_name = slha_folder_name
         self.maxOrder = maxOrder
         self.countNoXSecs = 0
@@ -500,7 +499,11 @@ class XSecResummino(XSecBase):
 
             #On liste ici les canaux à utiliser, si scénario exclu alors renvoi None
             #particles = self.discrimination_particles(slha_path)
-            self.mode, particles = self.extract_json()
+            if self.particles == None:
+                self.mode, particles = self.extract_json()
+            else:
+                self.mode, particles = self.determine_channels()
+                
             Liste_particles.append(particles)
 
             #On pourrait optimiser en enlevant les variables qui ne changent pas d'une itération à l'autre
@@ -603,6 +606,22 @@ class XSecResummino(XSecBase):
             particles.append((valeurs[0], valeurs[1]))
             
         return mode, particles
+    
+    def determine_channels(self):
+        """_summary_
+        
+        function to find channels using a set of particles
+
+        Returns:
+            string: Mode of writting for the slha cross section
+            list: liste of the daugther particle to consider in the calculation of the cross section
+        """
+        
+        channels = list(combinations(self.particles, 2))
+        
+        mode = 'check'
+            
+        return mode, channels
 
     def modify_outgoing_particles(self, input_file, output_file, new_particle1, new_particle2):
         """
@@ -654,6 +673,7 @@ def main(args):
     ncpus = canonizer.checkNCPUs ( args.ncpus, inputFiles )
     type_writting = canonizer.writeToFile(args)
     json = canonizer.getjson(args)
+    particles = canonizer.getParticles( args ) 
     #We choose to select highest by default
     if type_writting == None :
         type_writting = 'highest'
@@ -684,7 +704,7 @@ def main(args):
     
     for sqrt in sqrtses:
         logger.info('Current energy considered is '+ str(sqrt)+ ' TeV')
-        test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting, verbosity = verbosity, json = json)
+        test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting, verbosity = verbosity, json = json, particles=particles)
         test.launch_routine_resummino()
     return
     
