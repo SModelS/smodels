@@ -33,7 +33,15 @@ class SpeyTest(unittest.TestCase):
                 doInvisible=True, minmassgap=5.*GeV)
         print ( "smstoplist", smstoplist )
         predictions = theoryPredictionsFor ( res, smstoplist )
+        pr = predictions[0]
         print ( "predictions", predictions )
+        lsm = pr.likelihood(0.)
+        lbsm = pr.likelihood(1.)
+        self.assertAlmostEquals ( lsm, 1.0735609152601552e-43 )
+        # lsm, pyhf: 5.626294389030576e-44
+        self.assertAlmostEquals ( lbsm, 3.9401532820495447e-45 )
+        # lbsm, pyhf: 6.957205346414768e-46
+        # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
 
 
 if __name__ == "__main__":
