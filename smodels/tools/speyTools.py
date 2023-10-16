@@ -28,8 +28,6 @@ class SpeyComputer:
         :param nsig: signal yield, either as float or as list
         :param deltas_rel: relative error on signal. currently unused
         """
-        #if deltas_rel != None:
-        #    logger.warning("Relative uncertainty on signal not supported by spey for a single region.")
         if type(dataset) not in [ list] and dataset.getType() not in [ "efficiencyMap", "combined" ]:
             logger.error ( f"I do not recognize the dataset type {dataset.getType()}" )
 
@@ -40,13 +38,21 @@ class SpeyComputer:
 
     def getStatModel(self, nsig ) -> StatisticalModel:
         """ retrieve the statistical model """
-        if False: # mlModelIsAvailable:
-            self.getNNModel ( nsig ) 
+        if type(self.dataset)==list: # ok, we have a combined dataset!
+            return self.getAnalysisCombinationModel ( nsig )
+        if hasattr ( self.dataset.globalInfo, "onnxFile" ):
+            # an onnxfile is defined, we use it!  
+            return self.getNNModel ( nsig ) 
         if self.backendType == "pyhf":
             return self.getStatModelPyhf ( nsig )
         if self.dataset.getType() == "efficiencyMap":
             return self.getStatModelSingleBin ( nsig )
         return self.getStatModelMultiBin ( nsig )
+
+    def getAnalysisCombinationModel ( self, nsig ):
+        computer = SpeyComputer(dataset=dataset, backendType="combo", 
+                                nsig=nsig, deltas_rel=deltas_rel)
+        return computer
 
     @classmethod
     def forSingleBin(cls, dataset, nsig, deltas_rel):
@@ -88,23 +94,14 @@ class SpeyComputer:
         import sys
         MLlikePath='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods'
         sys.path.append(MLlikePath)
-        
-        
-    
+        import spey
         stat_wrapper = spey.get_backend('ml.likelihoods')
         
         #The current ML-likelihood backend takes a local path. This has to be updated, I think the idea is that the backend takes 'dataset' as input, where 'dataset' is a loaded onnx model. Thus, the onnx has to be loaded by SmodelS beforehand. It seems to be the more consistent wrt the other backends.
         
-        #self.statModel = stat_wrapper(nsig,dataset)
-        
-        
-        
-        network_path='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods/ML_models/ATLAS-SUSY-2018-04/ensemble_model.onnx'
+#network_path='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods/ML_models/ATLAS-SUSY-2018-04/ensemble_model.onnx'
+        network_path=self.dataset.globalInfo.onnxFile
         self.statModel = stat_wrapper(nsig,network_path)
-        
-        
-        
-        
         
         #self.statModel = get_ml_model ( ... )
         return self.statModel
@@ -377,7 +374,6 @@ class SpeyComputer:
         """ simple frontend to spey functionality """
         self.checkMinimumPoi( poi_test )
         expected = self.translateExpectationType ( expected )
-        # init = self.getSpeyInitialisation ( True )
         return self.statModel.asimov_likelihood ( poi_test = poi_test,
             expected = expected, return_nll = return_nll )
 

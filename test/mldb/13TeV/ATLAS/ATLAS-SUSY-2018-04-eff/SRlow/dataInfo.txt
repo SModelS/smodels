@@ -1,0 +1,7 @@
+dataId: SRlow
+dataType: efficiencyMap
+observedN: 10
+expectedBG: 6.0
+bgError: 1.7
+upperLimit: 0.08*fb
+expectedUpperLimit: 0.055*fb
