@@ -31,10 +31,8 @@ class SpeyTest(unittest.TestCase):
         model.updateParticles(slhafile)
         smstoplist = decomposer.decompose(model, .1*fb, doCompress=True,
                 doInvisible=True, minmassgap=5.*GeV)
-        print ( "smstoplist", smstoplist )
         predictions = theoryPredictionsFor ( res, smstoplist )
         pr = predictions[0]
-        print ( "predictions", predictions )
         lsm = pr.likelihood(0.)
         lbsm = pr.likelihood(1.)
         self.assertAlmostEquals ( lsm, 1.0735609152601552e-43 )
