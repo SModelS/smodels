@@ -92,8 +92,10 @@ class SpeyComputer:
                
         #For the moment, the ml-likelihood backned has to be dowanloaded and installed manually. In the future, the backend could be directly embedded and installed in SmodelS.
         import sys
-        MLlikePath='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods'
-        sys.path.append(MLlikePath)
+#        MLlikePath='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods'
+#        MLlikePath='/home/walten/git/ML_LHClikelihoods/'
+
+#        sys.path.append(MLlikePath)
         import spey
         stat_wrapper = spey.get_backend('ml.likelihoods')
         
@@ -101,6 +103,7 @@ class SpeyComputer:
         
 #network_path='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods/ML_models/ATLAS-SUSY-2018-04/ensemble_model.onnx'
         network_path=self.dataset.globalInfo.onnxFile
+        print ( "network path is", network_path )
         self.statModel = stat_wrapper(nsig,network_path)
         
         #self.statModel = get_ml_model ( ... )

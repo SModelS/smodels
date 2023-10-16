@@ -55,6 +55,7 @@ class Info(object):
                     continue
 
             self.cacheJsons()
+            self.cacheOnnx()
 
     def __eq__ ( self, other ):
         if self.__dict__ != other.__dict__:
@@ -79,6 +80,24 @@ class Info(object):
                 except Exception as e:
                     logger.error ( f"cannot load {js}: {e}" )
                     raise(e)
+
+    def cacheOnnx ( self ):
+        """ if we have the "onnxFile" attribute defined,
+            we cache the corresponding onnx file. Needed when pickling """
+        if not hasattr ( self, "onnxFile" ):
+            return
+        if hasattr ( self, "onnx" ): ## seems like we already have them
+            return
+        import onnx
+        dirp = os.path.dirname ( self.path )
+        pathName = os.path.join( dirp, self.onnxFile )
+        with open(pathName, "r") as f:
+            try:
+                self.onnx = onnx.load(f)
+            except Exception as e:
+                logger.error ( f"cannot load {pathName}: {e}" )
+                raise(e)
+
 
 
     def dirName ( self, up=0 ):
