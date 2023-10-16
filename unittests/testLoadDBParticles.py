@@ -17,7 +17,7 @@ from databaseLoader import database
 
 class LoadDBParticlesTest(unittest.TestCase):
 
-    def testLoadDBPaticles(self):
+    def testLoadDBParticles(self):
         modelA = database.databaseParticles
         self.assertEqual(modelA.label,'databaseParticles.py') #Simple test to see if databaseParticles.py is being used
 
