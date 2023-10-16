@@ -91,7 +91,7 @@ class Info(object):
         import onnx
         dirp = os.path.dirname ( self.path )
         pathName = os.path.join( dirp, self.onnxFile )
-        with open(pathName, "r") as f:
+        with open(pathName, "rb") as f:
             try:
                 self.onnx = onnx.load(f)
             except Exception as e:

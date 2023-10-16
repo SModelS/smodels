@@ -102,8 +102,7 @@ class SpeyComputer:
         #The current ML-likelihood backend takes a local path. This has to be updated, I think the idea is that the backend takes 'dataset' as input, where 'dataset' is a loaded onnx model. Thus, the onnx has to be loaded by SmodelS beforehand. It seems to be the more consistent wrt the other backends.
         
 #network_path='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods/ML_models/ATLAS-SUSY-2018-04/ensemble_model.onnx'
-        network_path=self.dataset.globalInfo.onnxFile
-        print ( "network path is", network_path )
+        network_path=self.dataset.globalInfo.onnx
         self.statModel = stat_wrapper(nsig,network_path)
         
         #self.statModel = get_ml_model ( ... )
