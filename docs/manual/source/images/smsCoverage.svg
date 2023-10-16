@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="-2.857 30 864.143 859.206" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="text" id="id735187636" fill="black" latexdraw:position="bl">
+            <text x="127.6031746031746" y="869.20634920635">\Huge $\;$</text>
+        </g>
+        <g latexdraw:type="text" id="id1752891076" fill="black" latexdraw:position="bl">
+            <text x="42.53968253968256" y="50.0">\LARGE Decomposition SMS</text>
+        </g>
+        <g latexdraw:type="text" id="id543316390" fill="black" latexdraw:position="bl">
+            <text x="621.111111111111" y="50.0">\LARGE Final State SMS</text>
+        </g>
+        <g latexdraw:type="joinedLines" id="id2136350228">
+            <polyline points="272.47619047619054,526.2063492063497 596.2698412698414,635.6507936507942 " stroke="red" stroke-width="4.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-2136350228)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id2121546995">
+            <polyline points="324.555555555556,236.03174603174557 599.1428571428573,235.1428571428571 " stroke="red" stroke-width="4.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-2121546995)"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id2078668028">
+            <polyline points="279.0000000000004,745.2380952380952 600.2539682539682,649.4285714285716 " stroke="red" stroke-width="4.0" fill="none" stroke-dasharray="8.819444444444445, 5.291666666666667" latexdraw:rotationAngle="0.0" marker-end="url(#arrow1-2078668028)"/>
+        </g>
+        <g latexdraw:type="text" id="id354875060" fill="red" latexdraw:position="bl">
+            <text x="364.7619047619053" y="145.68650793650804">\Large Simplifications</text>
+        </g>
+        <g latexdraw:type="picture" id="id397384258">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_coverage_sms1.png" x="17.142857142857228" y="65.60714285714268" height="347.0" width="291.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id274713965">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_coverage_sms2.png" x="50.000000000000036" y="422.7499999999999" height="203.0" width="213.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id46427363">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_coverage_sms3.png" x="50.0" y="639.8928571428575" height="203.0" width="213.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id404846908">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_coverage_sms1_simp.png" x="614.2857142857139" y="71.3214285714286" height="419.0" width="227.0"/>
+        </g>
+        <g latexdraw:type="picture" id="id1555551615">
+            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_coverage_sms2_simp.png" x="614.2857142857143" y="537.0357142857143" height="203.0" width="227.0"/>
+        </g>
+    </g>
+    <defs>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="18.676" id="arrow1-2136350228">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="red" stroke="red" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="359.815" id="arrow1-2121546995">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="red" stroke="red" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="343.394" id="arrow1-2078668028">
+            <path d="M 0.0 0.0 L -14.904166666666667 -5.322916666666667 L -14.904166666666667 0.0 L -14.904166666666667 5.322916666666667 z" fill="red" stroke="red" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
+        </marker>
+    </defs>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
+            <latexdraw:positionVert/>
+            <latexdraw:zoom>0.7</latexdraw:zoom>
+            <latexdraw:vpx>0.566</latexdraw:vpx>
+            <latexdraw:vpy>0.42</latexdraw:vpy>
+        </latexdraw:metadata>
+    </metadata>
+</svg>

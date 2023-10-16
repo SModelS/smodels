@@ -133,47 +133,49 @@ SModelS deals with the above issues through the following steps:
  * All |SMS topologies| belonging to the same group which have a common ancestor
    are removed (only the |SMS| with largest missing cross section is kept).
 
+* **Coverage groups are implemented by the** `UncoveredGroup class <tools.html#tools.coverage.UncoveredGroup>`_
 
+
+Final State SMS
+---------------
 
 Usually the list of |SMS| in each group can be considerably long, due
 to distinct intermediate BSM states and final SM states.
 In order to make the list more compact, all |SMS topologies|
-are simplified to their final states and |topologies| with the same final
-states are combined, as illustrated in ...
-
-
-
-
-
-are further combined according to their |topology| and final state |particles|
-(i.e. all properties of intermediate BSM states are ignored).
-By default, the SM |particles| are grouped according to the definitions below:
+are simplified to |topologies| where only the primary mothers and the final
+state particles are kept (see :numref:`Fig. %s <coverB>`).
+In addition, the following SM final states particles are further combined into
+inclusive particles:
 
 * :math:`W^+,W^- \to \mbox{W}`
 * :math:`\tau^+,\tau^- \to \mbox{ta}`
 * :math:`e^+,e^-,\mu^+,\mu^- \to \mbox{l}`
 * :math:`t,\bar{t} \to \mbox{t}`
-* :math:`u,d,s,c,\bar{u},\bar{d},\bar{s},\bar{c},g,pions \to \mbox{jet}`
+* :math:`u,d,s,c,\bar{u},\bar{d},\bar{s},\bar{c},g,\pi^{+,-,0} \to \mbox{jet}`
 * :math:`\nu_{e},\nu_{\mu},\nu_{\tau},\bar{\nu}_{e},\bar{\nu}_{\mu},\bar{\nu}_{\tau} \to \mbox{nu}`
 
-while the final ( Z\ :sub:`2`-odd) BSM |particles| are grouped by their signature:
+while the BSM particles are grouped by their signature:
 
+* *primary mothers (BSM particles produced at the PV)* :math:`\to \mbox{anyBSM}`
 * *color and electrically neutral states* :math:`\to \mbox{MET}`
 * *color neutral states with electric charge +-1* :math:`\to \mbox{HSCP}`
 * *color triplet states with electric charge +-2/3 or +-1/3* :math:`\to \mbox{RHadronQ}`
-* *color octates states with zero electric charge* :math:`\to \mbox{RHadronG}`
+* *color octet states with zero electric charge* :math:`\to \mbox{RHadronG}`
 
+After the above simplification steps, identical simplified |SMS| (called *Final State SMS*) are combined.
+This procedure is illustrated in :numref:`Fig. %s <coverB>`.
 
-The :ref:`figure below <coverB>` schematically represents the combination of elements
-according to the grouping of similar final states:
 
 .. _coverB:
 
-.. image:: images/coverageD.png
-   :width: 80%
+.. figure:: images/smsCoverage.png
+   :width: 40%
+   :align: center
 
+   Schematic representation of how the |SMS topologies| are simplified into Final State SMS and 
+   how identical Final State SMS are combined.
 
-* **Coverage groups are implemented by the** `UncoveredGroup class <tools.html#tools.coverage.UncoveredGroup>`_
+* **Final State SMS are implemented by the** `FinalStateSMS class <tools.html#tools.coverage.FinalStateSMS>`_
 
 
 .. [#f1] Prompt results are all those which assumes all decays to be prompt and the last BSM particle to be stable (or decay outside the detector).
