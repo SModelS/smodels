@@ -15,7 +15,6 @@ from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 # from smodels.tools.statsTools import StatsComputer
 from smodels.tools.speyTools import SpeyComputer as StatsComputer
-from smodels.tools.speyTools import SpeyAnalysesCombosComputer
 from typing import Union, Text
 import itertools
 import numpy as np
@@ -508,7 +507,11 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         if any(tp.statsComputer == 'N/A' for tp in self.theoryPredictions):
             computer = 'N/A'
         else:
-            computer = SpeyAnalysesCombosComputer(self.theoryPredictions, self.deltas_rel)
+            if "spey" in str(StatsComputer): #use the new creator for spey
+                from smodels.tools.speyTools import SpeyAnalysesCombosComputer
+                computer = SpeyAnalysesCombosComputer(self.theoryPredictions, self.deltas_rel)
+            else:
+                computer = StatsComputer.forAnalysesComb(self.theoryPredictions, self.deltas_rel)
 
         self._statsComputer = computer
 

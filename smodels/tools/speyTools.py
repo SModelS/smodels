@@ -491,7 +491,7 @@ class SpeyAnalysesCombosComputer:
     def __init__  ( self, theorypreds, deltas_rel : float ):
         self.theorypreds = theorypreds
         self.deltas_rel = deltas_rel
-        self.pprint()
+        # self.pprint()
         from spey import UnCorrStatisticsCombiner
         models = []
         self.xsecs = []
