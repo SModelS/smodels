@@ -15,6 +15,7 @@ from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 # from smodels.tools.statsTools import StatsComputer
 from smodels.tools.speyTools import SpeyComputer as StatsComputer
+from smodels.tools.speyTools import SpeyAnalysesCombosComputer
 from typing import Union, Text
 import itertools
 import numpy as np
@@ -115,6 +116,20 @@ class TheoryPrediction(object):
         to define a statistical computer (upper limit result or no expected
         upper limits), set the computer to 'N/A'.
         """
+        if "spey" in str(StatsComputer): #use the new creator for spey
+            from smodels.tools.speyTools import SpeyComputer
+            predictions = None
+            # the combination of analyses we treat here
+            deltas_rel = 0.
+            if self.dataType() == "combined":
+                predictions = self.datasetPredictions
+            #    print ( "need to create combined now" )
+            #    self._statsComputer = CombinedSpeyComputer ( self.datasetPredictions, deltas_rel )
+            #    return
+            computer = SpeyComputer.create ( self.dataset, self.xsection, 
+                    predictions, self.deltas_rel )
+            self._statsComputer = computer
+            return
 
         if self.dataType() == "upperLimit":
             from smodels.tools.runtime import experimentalFeatures
@@ -493,7 +508,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         if any(tp.statsComputer == 'N/A' for tp in self.theoryPredictions):
             computer = 'N/A'
         else:
-            computer = StatsComputer.forAnalysesComb(self.theoryPredictions, self.deltas_rel)
+            computer = SpeyAnalysesCombosComputer(self.theoryPredictions, self.deltas_rel)
 
         self._statsComputer = computer
 

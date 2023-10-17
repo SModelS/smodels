@@ -2,16 +2,17 @@
 
 """
 .. module:: speyPyhf
-   :synopsis: Code that prepares the input for spey-pyhf, that is
-              too big and too specific for speyTools
+   :synopsis: Code that prepares the input for spey-pyhf, stuff that is
+              too big and too pyhf specific for speyTools
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
 
+__all__ = [ "SpeyPyhfData" ]
+
 from smodels.tools.smodelsLogging import logger
 import os
-
 
 class SpeyPyhfData:
     """
@@ -22,23 +23,19 @@ class SpeyPyhfData:
     :ivar jsonFiles: optional list of json files
     :ivar nWS: number of workspaces = number of json files
     """
+    __slots__ = [ "includeCRs", "nsignals", "inputJsons", "jsonFiles", "nWS",
+                  "errorFlag", "totalYield", "channelsInfo", "zeroSignalsFlag" ]
 
     def __init__(self, nsignals : list, inputJsons, jsonFiles=None,
                  includeCRs : bool = False ):
         # we dont want to be warned about deprecations within the pyhf code
         import warnings
-        warnings.filterwarnings("ignore", category=DeprecationWarning) 
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
         self.includeCRs = includeCRs
         self.nsignals = nsignals  # fb
         self.getTotalYield()
         self.inputJsons = inputJsons
-        self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
-        self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
-        self.cachedULs = {False: {}, True: {}, "posteriori": {}}
         self.jsonFiles = jsonFiles
-        self.combinations = None
-        if jsonFiles != None:
-            self.combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
 
         self.nWS = len(inputJsons)
         self.errorFlag = False
@@ -270,4 +267,3 @@ class SpeyPyhfData:
                     return None
                 workspaces.append(ws)
             return workspaces
-
