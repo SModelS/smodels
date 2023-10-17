@@ -17,6 +17,7 @@ from smodels.tools.smodelsLogging import logger
 from smodels.tools.physicsUnits import fb
 import numpy as np
 
+
 class SpeyComputer:
     __slots__ = [ "speyModels", "dataset", "weight", "backendType", "nsig",
                   "model_index" ]
@@ -42,19 +43,26 @@ class SpeyComputer:
         """ retrieve the statistical model """
         if type(self.dataset)==list: # ok, we have a combined dataset!
             return self.getAnalysisCombinationModel ( nsig )
+        assert self.backendType in [ "1bin", "SL", "ML", "pyhf", "combo" ], f"unknown backend type {self.backendType}"
         if hasattr ( self.dataset.globalInfo, "onnxFile" ):
             # an onnxfile is defined, we use it!  
             return self.getNNModel ( nsig ) 
         if self.backendType == "pyhf":
-            return self.getStatModelPyhf ( nsig )
+            return self.getStatModelsPyhf ( nsig )
         if self.dataset.getType() == "efficiencyMap":
             return self.getStatModelSingleBin ( nsig )
         return self.getStatModelMultiBin ( nsig )
 
-    def getAnalysisCombinationModel ( self, nsig ):
-        computer = SpeyComputer(dataset=dataset, backendType="combo", 
-                                nsig=nsig, deltas_rel=deltas_rel)
-        return [ computer ]
+    def getAnalysisCombinationModel ( self, nsig : Union[float,list] ):
+        """ obtain the spey stats models for the case of combining 
+        analyses """
+        return []
+        print ( "trying to construct the model for analysis combination" )
+        print ( "dataset", self.dataset  )
+        for ds in self.dataset: # in this case, dataset is actually a list
+            # use a spey computer for each dataset to create the spey models
+            computer = SpeyComputer ( ds )
+        return [ ]
 
     @classmethod
     def forSingleBin(cls, dataset, nsig, deltas_rel):
@@ -90,10 +98,8 @@ class SpeyComputer:
     def getNNModel ( self, nsig ):
         """ here is the code for how we create a spey speyModel that uses an NN 
             as its backend """
-        #from spey import get_ml_model # import the spey method for it
-               
         #For the moment, the ml-likelihood backned has to be dowanloaded and installed manually. In the future, the backend could be directly embedded and installed in SmodelS.
-        import sys
+#        import sys
 #        MLlikePath='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods'
 #        MLlikePath='/home/walten/git/ML_LHClikelihoods/'
 
@@ -101,9 +107,13 @@ class SpeyComputer:
         import spey
         stat_wrapper = spey.get_backend('ml.likelihoods')
         
-        #The current ML-likelihood backend takes a local path. This has to be updated, I think the idea is that the backend takes 'dataset' as input, where 'dataset' is a loaded onnx model. Thus, the onnx has to be loaded by SmodelS beforehand. It seems to be the more consistent wrt the other backends.
+        #The current ML-likelihood backend takes a local path. This has to be
+        #updated, I think the idea is that the backend takes 'dataset' as input,
+#        where 'dataset' is a loaded onnx model. Thus, the onnx has to be loaded
+#        by SmodelS beforehand. It seems to be the more consistent wrt the other
+#        backends.
         
-#network_path='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods/ML_models/ATLAS-SUSY-2018-04/ensemble_model.onnx'
+        #network_path='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods/ML_models/ATLAS-SUSY-2018-04/ensemble_model.onnx'
         onnxBlob=self.dataset.globalInfo.onnx
         # self.speyModel = stat_wrapper(nsig,onnxBlob) # this is how i want it long run
         ## the following code is just for now to see if it works in principle
@@ -122,15 +132,15 @@ class SpeyComputer:
         Create a statistical model from multibin data.
 
         :param nsig: number of signal events. For simplified likelihood backend this input can
-                       contain `np.array` or `List[float]` which contains signal yields per region.
-                       For `pyhf` backend this input expected to be a JSON-patch i.e. `List[Dict]`,
-                       see `pyhf` documentation for details on JSON-patch format.
-        :param delta_sys: systematic uncertainty on signal. Only used for simplified likelihood backend.
-        :param allow_negative_signal: if True, the expected upper limit on mu, used to find the best statistical model, can be negative.
+        contain `np.array` or `List[float]` which contains signal yields per region.
+        For `pyhf` backend this input expected to be a JSON-patch i.e. `List[Dict]`,
+        see `pyhf` documentation for details on JSON-patch format.
+        :param delta_sys: systematic uncertainty on signal. Currently unused.
+        :param allow_negative_signal: if True, the expected upper limit on mu, 
+        used to find the best statistical model, can be negative.
 
-        :return: spey StatisticalModel object.
+        :returns: spey StatisticalModel object.
 
-        :raises NotImplementedError: if input patter does not match to any backend specific input option.
         """
         dataset = self.dataset
         stat_wrapper = get_backend("default_pdf.correlated_background")
@@ -148,7 +158,7 @@ class SpeyComputer:
         )
         return [ speyModel ]
 
-    def getStatModelPyhf(self, nsig: Union[float, np.ndarray] ):
+    def getStatModelsPyhf(self, nsig: Union[float, np.ndarray] ):
         """
         Create statistical model from a pyhf json file
 
@@ -173,6 +183,8 @@ class SpeyComputer:
                             signal_patch = signal_patch, 
                             background_only_model = inputJson )
             models.append ( speyModel )
+        self.speyModels = models
+        self.model_index = self.getBestCombinationIndex( data )
         return models
 
     def getStatModelSingleBin(self, nsig: Union[float, np.ndarray], 
@@ -298,7 +310,6 @@ class SpeyComputer:
 
     def getBestCombinationIndex(self, data ):
         """find the index of the best expected combination"""
-        print ( "FIXME obsolete!!", len(data.inputJsons) )
         if len(data.inputJsons) == 1:
             return 0
         logger.debug( f"Finding best expected combination among {len(data.inputJsons)} workspace(s)" )
@@ -371,7 +382,6 @@ class SpeyComputer:
         """ simple frontend to spey functionality """
         self.checkMinimumPoi ( poi_test )
         expected = self.translateExpectationType ( expected )
-        # init = self.getSpeyInitialisation ( True )
         return self.speyModels[self.model_index].likelihood ( poi_test = poi_test,
             expected = expected, return_nll = return_nll )
 
@@ -393,7 +403,7 @@ class SpeyComputer:
             ret = { "muhat": 0., "lmax": self.likelihood ( 0., expected = expected, return_nll = return_nll ) }
         return ret
 
-    def sigma_mu ( self, poi_test : float, expected : Union[bool,Text], allow_negative_signal : bool = False ):
+    def sigma_mu ( self, poi_test : float, expected : Union[bool,Text], allow_negative_signal : bool = False ) -> float:
         """ determine sigma at poi_test.
         :param: FIXME allow_negative_signal should not be needed!
         """
@@ -457,7 +467,7 @@ if __name__ == "__main__":
     # nobs,bg,bgerr,lumi = 0, 0.001, 0.01, 35.9/fb
     nobs,bg,bgerr,lumi = 3905,3658.3,238.767, 35.9/fb
     dataset = SimpleSpeyDataSet ( nobs, bg, bgerr, lumi )
-    computer = SpeyComputer ( dataset, 1. )
+    computer = SpeyComputer ( dataset, "1bin", 1. )
     ul = computer.poi_upper_limit ( expected = False, limit_on_xsec = True )
     print ( "ul", ul )
     ule = computer.poi_upper_limit ( expected = True, limit_on_xsec = True )

@@ -12,6 +12,7 @@
 from smodels.tools.smodelsLogging import logger
 import os
 
+
 class SpeyPyhfData:
     """
     Holds data for use in pyhf
@@ -24,6 +25,9 @@ class SpeyPyhfData:
 
     def __init__(self, nsignals : list, inputJsons, jsonFiles=None,
                  includeCRs : bool = False ):
+        # we dont want to be warned about deprecations within the pyhf code
+        import warnings
+        warnings.filterwarnings("ignore", category=DeprecationWarning) 
         self.includeCRs = includeCRs
         self.nsignals = nsignals  # fb
         self.getTotalYield()
