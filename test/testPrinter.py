@@ -185,7 +185,7 @@ class RunPrinterTest(unittest.TestCase):
             self.assertTrue(equals)
             self.removeOutputs(outputfile)
         except AssertionError as e:
-            print("Error: %s, when comparing %s \nwith %s." % (e, outputfile, "simplyGluino_default.py"))
+            print( f"Error: {e}, when comparing {outputfile} \nwith simplyGluino_default_extended.py." )
             raise AssertionError(e)
 
     def testXmlPrinter(self):

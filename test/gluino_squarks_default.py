@@ -82,9 +82,9 @@ smodelsOutputDefault = {
             "r": 0.1296155,
             "r_expected": 0.2078609,
             "Width (GeV)": [["prompt", "stable"], ["prompt", "stable"]],
-            "likelihood": 0.003868392,
-            "l_max": 0.005396484,
-            "l_SM": 0.002530291,
+            "likelihood": 0.02011563,
+            "l_max": 0.02806171,
+            "l_SM": 0.01315751,
         },
         {
             "maxcond": 0.0,
@@ -149,9 +149,9 @@ smodelsOutputDefault = {
             "r": 0.001829564,
             "r_expected": 0.00209093,
             "Width (GeV)": [["prompt", "stable"], ["prompt", "stable"]],
-            "likelihood": 0.02449917,
-            "l_max": 0.02972175,
-            "l_SM": 0.02442398,
+            "likelihood": 0.04899835,
+            "l_max": 0.05031426,
+            "l_SM": 0.04884797,
         },
         {
             "maxcond": 0.0,
@@ -312,9 +312,9 @@ smodelsOutputDefault = {
             "AnalysisID": "ATLAS-CONF-2013-037,CMS-SUS-13-012",
             "r": 0.1332296,
             "r_expected": 0.207,
-            "likelihood": 9.47724e-05,
-            "l_max": 0.0001330265,
-            "l_SM": 6.179978e-05,
+            "likelihood": 0.0009856327,
+            "l_max": 0.001383475,
+            "l_SM": 0.0006427175,
         }
     ],
 }

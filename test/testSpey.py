@@ -89,10 +89,11 @@ class SpeyTest(unittest.TestCase):
         pr = predictions[0]
         lsm = pr.likelihood(0.)
         lbsm = pr.likelihood(1.)
-        self.assertAlmostEqual ( lsm, 0.002530290884739633, 4 )
+        # the 5.2 == bgErr is due to the different parametrizations
+        self.assertAlmostEqual ( lsm, 0.002530290884739633 * 5.2, 4 )
         # lsm, spey: 0.013157507015802185
         # lsm, SL: 0.002530290884739633
-        self.assertAlmostEqual ( lbsm, 0.0038277234526390034, 4 )
+        self.assertAlmostEqual ( lbsm, 0.0038277234526390034 * 5.2, 4 )
         # lbsm, spey: 0.01990416119128329
         # lbsm, SL: 0.0038277234526390034
         # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
