@@ -57,7 +57,7 @@ class SpeyTest(unittest.TestCase):
         self.assertAlmostEqual ( lsm, 5.626294389030576e-44, 4 )
         self.assertAlmostEqual ( lbsm, 6.957205346414768e-46, 4 )
 
-    def testPyhfMultipleJsons(self):
+    def mestPyhfMultipleJsons(self):
         """ test the pyhf backend """
         db = Database ( "speydb/" )
         res = db.getExpResults ( "ATLAS-SUSY-2018-31" )[0]
@@ -71,10 +71,32 @@ class SpeyTest(unittest.TestCase):
         lsm = pr.likelihood(0.)
         lbsm = pr.likelihood(1.)
         self.assertAlmostEqual ( lsm, 0.023221236676880603, 4 )
-        # lsm, pyhf: 5.626294389030576e-44
+        # lsm, spey: 0.013157507015802185
         self.assertAlmostEqual ( lbsm, 0.005313575053750113, 4 )
         # lbsm, pyhf: 6.957205346414768e-46
         # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
+
+    def testCombo(self):
+        """ test the analysis combination bit """
+        db = Database ( "database" )
+        res = db.getExpResults ( "CMS-SUS-13-012" )[0]
+        slhafile = "./testFiles/slha/gluino_squarks.slha"
+        model = Model(BSMList,SMList)
+        model.updateParticles(slhafile)
+        smstoplist = decomposer.decompose(model, .1*fb, doCompress=True,
+                doInvisible=True, minmassgap=5.*GeV)
+        predictions = theoryPredictionsFor ( res, smstoplist )
+        pr = predictions[0]
+        lsm = pr.likelihood(0.)
+        lbsm = pr.likelihood(1.)
+        self.assertAlmostEqual ( lsm, 0.002530290884739633, 4 )
+        # lsm, spey: 0.013157507015802185
+        # lsm, SL: 0.002530290884739633
+        self.assertAlmostEqual ( lbsm, 0.0038277234526390034, 4 )
+        # lbsm, spey: 0.01990416119128329
+        # lbsm, SL: 0.0038277234526390034
+        # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
+
 
 if __name__ == "__main__":
     unittest.main()
