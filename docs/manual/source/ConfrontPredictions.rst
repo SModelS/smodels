@@ -12,10 +12,6 @@
 .. |Datasets| replace:: :ref:`DataSets<DataSet>`
 .. |dataset| replace:: :ref:`data set<DataSet>`
 .. |datasets| replace:: :ref:`data sets<DataSet>`
-.. |element| replace:: :ref:`element <element>`
-.. |elements| replace:: :ref:`elements <element>`
-.. |topology| replace:: :ref:`topology <topology>`
-.. |topologies| replace:: :ref:`topologies <topology>`
 .. |sigBR| replace:: :math:`\sigma \times BR`
 .. |sigBRe| replace:: :math:`\sigma \times BR \times \epsilon`
 .. |ssigBRe| replace:: :math:`\sum \sigma \times BR \times \epsilon`

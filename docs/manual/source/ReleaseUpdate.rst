@@ -1,14 +1,10 @@
 .. index:: What's New
 
-.. |element| replace:: :ref:`element <element>`
-.. |elements| replace:: :ref:`elements <element>`
-.. |topology| replace:: :ref:`topology <topology>`
-.. |topologies| replace:: :ref:`topologies <topology>`
 .. |decomposition| replace:: :doc:`decomposition <Decomposition>`
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
 .. |runSModelS| replace:: :ref:`runSModelS.py <runSModelS>`
-.. |database| replace:: :ref:`database <Database>`
+.. |database| replace:: :ref:`database<databaseDefs>`
 .. |Fastlim| replace:: :ref:`Fastlim <addingFastlim>`
 .. |output| replace:: :ref:`output <smodelsOutput>`
 .. |results| replace:: :ref:`experimental results <ExpResult>`
@@ -79,13 +75,11 @@ New in Version 2.3.0:
   * added support for :ref:`SLv2 <SLV2>` (Gaussian with a skew), arXiv:1809.05548
   * refactored the statistics modules
   * introduced "full_llhds" database add-on (see :ref:`parameter.ini file <parameterFileDatabase>`)
-
   * |database| extension, added new results from 6 ATLAS and 4 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
-     - results from ATLAS:
-       ATLAS-SUSY-2018-05 (UL,EM+hfm), ATLAS-SUSY-2018-32 (EM+hfm), ATLAS-SUSY-2018-41 (EM+cov, updated), ATLAS-SUSY-2018-42 (UL,EM), ATLAS-SUSY-2019-02 (UL,EM+cov), ATLAS-SUSY-2013-12 (8TeV, EM)
-     - results from CMS:
-       CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL,EM), CMS-SUS-21-002 (UL,EM+cov)
-     - added expected ULs to CMS-SUS-19-009
+  
+     * results from ATLAS: ATLAS-SUSY-2018-05 (UL,EM+hfm), ATLAS-SUSY-2018-32 (EM+hfm), ATLAS-SUSY-2018-41 (EM+cov, updated), ATLAS-SUSY-2018-42 (UL,EM), ATLAS-SUSY-2019-02 (UL,EM+cov), ATLAS-SUSY-2013-12 (8TeV, EM)
+     * results from CMS: CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL,EM), CMS-SUS-21-002 (UL,EM+cov)
+     * added expected ULs to CMS-SUS-19-009
 
 New in Version 2.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
@@ -115,12 +109,10 @@ New in Version 2.2.0:
   * updates in references.bib, installation notes
   * more small fixes in unit tests
   * |database| extension, added new results from 4 ATLAS and 11 CMS analyses:
-     - results from ATLAS:
-       ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2018-41 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
-     - results from CMS:
-       CMS-SUS-16-050 (EM), CMS-SUS-18-004 (UL), CMS-SUS-18-007 (UL), CMS-SUS-19-008 (UL), CMS-SUS-19-011 (UL), CMS-SUS-19-013 (UL), CMS-SUS-20-001 (UL), CMS-SUS-20-002 (UL)
-     - recast with MadAnalysis5:
-       CMS-SUS-16-039 (EM), CMS-SUS-16-048 (EM), CMS-SUS-19-006 (EM); all incl. covariance matrices
+     
+     * results from ATLAS: ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2018-41 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
+     * results from CMS: CMS-SUS-16-050 (EM), CMS-SUS-18-004 (UL), CMS-SUS-18-007 (UL), CMS-SUS-19-008 (UL), CMS-SUS-19-011 (UL), CMS-SUS-19-013 (UL), CMS-SUS-20-001 (UL), CMS-SUS-20-002 (UL)
+     * recast with MadAnalysis5: CMS-SUS-16-039 (EM), CMS-SUS-16-048 (EM), CMS-SUS-19-006 (EM); all incl. covariance matrices
 
 New in Version 2.1.1:
 ^^^^^^^^^^^^^^^^^^^^^
@@ -147,22 +139,10 @@ New in Version 2.1.0:
     in the computation of L_max
   * Pythia8 version in :ref:`xsecComputer <xsecCalc>` updated from 8226 to 8306
   * Improved :ref:`interactive plots <interactivePlots>`
-  * |database| updated with results from 5 new ATLAS and 1 new CMS analyses:
-      CMS-EXO-19-010 (disappearing tracks) UL,
-      ATLAS-SUSY-2016-08 (displaced leptons) EM,
-      ATLAS-SUSY-2018-10 (1l+jets) UL+EM,
-      ATLAS-SUSY-2018-12 (0l+jets) UL+EM,
-      ATLAS-SUSY-2018-22 (0l+jets) UL+EM,
-      ATLAS-SUSY-2018-23 (EWino, WH) UL
-  * added EM results for
-      ATLAS-SUSY-2017-03 (EWino, WZ),
-      ATLAS-SUSY-2018-06 (EWino, WZ),
-      ATLAS-SUSY-2018-14 (sleptons),
-      CMS-SUSY-14-021 (stops)
+  * |database| updated with results from 5 new ATLAS and 1 new CMS analyses: CMS-EXO-19-010 (disappearing tracks) UL,  ATLAS-SUSY-2016-08 (displaced leptons) EM,      ATLAS-SUSY-2018-10 (1l+jets) UL+EM, ATLAS-SUSY-2018-12 (0l+jets) UL+EM, ATLAS-SUSY-2018-22 (0l+jets) UL+EM, ATLAS-SUSY-2018-23 (EWino, WH) UL
+  * added EM results for  ATLAS-SUSY-2017-03 (EWino, WZ), ATLAS-SUSY-2018-06 (EWino, WZ),  ATLAS-SUSY-2018-14 (sleptons),  CMS-SUSY-14-021 (stops)
   * created and added THSCPM10 and THSCPM11 EMs for ATLAS-SUSY-2016-32;
-  * replaced some 8 TeV ATLAS conf notes with the published results
-      (ATLAS-CONF-2013-007 -> ATLAS-SUSY-2013-09, ATLAS-CONF-2013-061 ->
-      ATLAS-SUSY-2013-18, ATLAS-CONF-2013-089  -> ATLAS-SUSY-2013-20)
+  * replaced some 8 TeV ATLAS conf notes with the published results:   (ATLAS-CONF-2013-007 -> ATLAS-SUSY-2013-09, ATLAS-CONF-2013-061 -> ATLAS-SUSY-2013-18, ATLAS-CONF-2013-089  -> ATLAS-SUSY-2013-20)
   * corrected off-shell regions of some existing |EMrs| (in three 13 TeV and eigth 8 TeV analyses).
 
 
@@ -173,7 +153,7 @@ New in Version 2.0.0:
   * Introduction of model class (see :ref:`Basic Input <basicInput>`)
   * Input model can now be defined by an SLHA file with :ref:`QNUMBERS blocks <qnumberSLHA>`
   * Unified treatment of SLHA and LHE input files (see :ref:`decomposer <decomp>` and :ref:`LHE-reader <lhereader>`)
-  * :ref:`Decomposition <decomposition>`  and |ExpRess| can now handle :ref:`lifetime dependent results <widthGrid>`
+  * :ref:`Decomposition <decomposition>`  and |ExpRess| can now handle lifetime dependent results
   * Added :ref:`field "type" <txnameFile>` to the experimental results in the database
   * Added (optional) :ref:`field "intermediateState" <txnameFile>` to the experimental results in the database
   * Inclusive branches can now describe inclusive vertices
@@ -213,7 +193,7 @@ New in Version 1.2.2:
   * Database "official" now refers to a database without fastlim results, "official_fastlim", to the official database *with* fastlim
   * List displaced signatures in :ref:`missing topologies <topCoverage>`
   * Improved description about lifetime reweighting in doc
-  * Fix in :ref:`cluster<ULcluster>` for asymmetric masses
+  * Fix in cluster for asymmetric masses
   * Small improvements in the :ref:`interactive plots tool <interactivePlots>`
 
 New in Version 1.2.1:

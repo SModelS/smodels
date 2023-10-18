@@ -26,8 +26,8 @@
                 <T1bbtt>0.04371409082770728</T1bbtt>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('gluino', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('gluino', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.433</expected_upper_limit_fb>
@@ -57,9 +57,9 @@
                 <T1>1530.0117493459818</T1>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-/N2', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-/N2', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>

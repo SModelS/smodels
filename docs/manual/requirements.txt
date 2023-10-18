@@ -3,3 +3,4 @@ jupyter
 nbconvert
 sphinx_rtd_theme
 docutils==0.16
+unum

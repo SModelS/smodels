@@ -291,4 +291,4 @@ nitpicky = True
 nitpick_ignore = [('py:class', 'type')]
 nitpick_ignore_regex = [('py:class', 'logging.StreamHandler'),('py:class', 'collections.OrderedDict')]
 #Run make whenever sphinx is built:
-# os.system("cd .. && make update_code copy_files recipes RstFilesFromHelp")
+os.system("cd .. && make update_code copy_files recipes RstFilesFromHelp")
