@@ -226,6 +226,15 @@ class ArgsStandardizer:
         sqrtses = set(sqrtses)
         return sqrtses
 
+    def getParticles ( self, args ):
+        """ extract the particles from argument list, default to None, then channels are chosen by the json file """
+        particles = [int(item) for sublist in args.particles for item in sublist]
+        if len(particles) == 0:
+            particles= None
+        particles.sort()
+        particles = set(particles)
+        return particles
+    
     def checkNCPUs ( self, ncpus, inputFiles ):
         if ncpus < -1 or ncpus == 0:
             logger.error ( "Weird number of CPUs given: %d" % ncpus )
