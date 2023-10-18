@@ -58,7 +58,7 @@ class XSecResummino(XSecBase):
                 self.json_resummino = json
             else:
                 self.json_resummino = os.path.join(self.pwd, json)
-        self.particles = particles
+        self.particles = list(particles)
         self.slha_folder_name = slha_folder_name
         self.maxOrder = maxOrder
         self.countNoXSecs = 0
@@ -145,8 +145,8 @@ class XSecResummino(XSecBase):
             infos = self.search_in_output(output_file)
             infos = infos[0].split(" ")[2][1:]
 
-            logger.info(str((particle_1,particle_2))+" cross section is "+str(infos)+ " pb at LO order")
-            logger.info("Is "+str((particle_1,particle_2))+ " cross section above the limit ? "+str( float(infos)>self.xsec_limit))
+            logger.debug(str((particle_1,particle_2))+" cross section is "+str(infos)+ " pb at LO order")
+            logger.debug("Is "+str((particle_1,particle_2))+ " cross section above the limit ? "+str( float(infos)>self.xsec_limit))
             logger.debug("cross section is "+str(infos)+ " pb at LO order")
             logger.debug("Is cross section above the limit ? "+str( float(infos)>self.xsec_limit))
             if (float(infos))>(self.xsec_limit):
@@ -253,7 +253,7 @@ class XSecResummino(XSecBase):
                 result = results[1].split(" ")[2][1:]
             elif order == 2:
                 result = results[2].split(" ")[2][1:]
-            logger.info('the highest result is'+ str(result) +' pb')
+            logger.debug('the highest result is'+ str(result) +' pb')
         elif type_writing == "all":
             result = [results[0].split(" ")[2][1:], results[1].split(" ")[2][1:], results[2].split(" ")[2][1:]]
         else :
@@ -674,6 +674,7 @@ def main(args):
     type_writting = canonizer.writeToFile(args)
     json = canonizer.getjson(args)
     particles = canonizer.getParticles( args ) 
+    print("PARTICULES ", type(list(particles)[0]))
     #We choose to select highest by default
     if type_writting == None :
         type_writting = 'highest'
@@ -692,7 +693,7 @@ def main(args):
                     logger.error ( "values of ssmultipliers need to be supplied as ints or floats" )
                     sys.exit()
 
-    logger.info('verbosity is '+ verbosity)
+    logger.debug('verbosity is '+ verbosity)
     
     logger.info("The calculation will be done using : " +str(sqrtses)+ ' TeV as center of mass energy')
     logger.debug("The calculation will be done using : " +str(sqrtses)+ ' TeV as center of mass energy')
@@ -700,14 +701,19 @@ def main(args):
 
     logger.info("The max order considered for the calculation is  " + orders_dic[order])
     logger.info("we are currently running on " + str(ncpus)+ ' cpu')
-    logger.info(f"In this calculation, we'll write out the cross section at "+ str(type_writting) +" order of perturbation theory below "+ orders_dic[order])
+    logger.debug(f"In this calculation, we'll write out the cross section at "+ str(type_writting) +" order of perturbation theory below "+ orders_dic[order])
     
     for sqrt in sqrtses:
-        logger.info('Current energy considered is '+ str(sqrt)+ ' TeV')
+        logger.debug('Current energy considered is '+ str(sqrt)+ ' TeV')
         test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting, verbosity = verbosity, json = json, particles=particles)
         test.launch_routine_resummino()
     return
     
+    # test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus, type = type_writting)
+    # test.routine_resummino()
+    
+
+ 
     # test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus, type = type_writting)
     # test.routine_resummino()
     
