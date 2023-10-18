@@ -681,12 +681,12 @@ smodelsOutput = {
         'r' : 3.088661,
         'r_expected' : 3.088661,
         'Width (GeV)' : [
-            ('sd_L/su_L', inf),
-            ('su_L', inf),
-            ('C1+/C1-', inf),
-            ('C1+', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('sd_L/su_L', 'prompt'),
+            ('su_L', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('C1+', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'T6WW': 0.17976008654165604},
         'likelihood' : 1.870578e-07,
@@ -715,12 +715,12 @@ smodelsOutput = {
         'r' : 1.720142,
         'r_expected' : 2.041664,
         'Width (GeV)' : [
-            ('sd_L/su_L', inf),
-            ('su_L', inf),
-            ('C1+/C1-', inf),
-            ('C1+', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('sd_L/su_L', 'prompt'),
+            ('su_L', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('C1+', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'T6WW': 2.184580974615298},
         'likelihood' : 6.411921e-07,
@@ -749,12 +749,12 @@ smodelsOutput = {
         'r' : 0.6658436,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('sd_L/su_L', inf),
-            ('su_L', inf),
-            ('C1+/C1-', inf),
-            ('C1+', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('sd_L/su_L', 'prompt'),
+            ('su_L', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('C1+', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'T6WW': 35.78982375338465}
     },
@@ -780,12 +780,12 @@ smodelsOutput = {
         'r' : 0.4753812,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('sd_L/su_L', inf),
-            ('su_L', inf),
-            ('C1+/C1-', inf),
-            ('C1+', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('sd_L/su_L', 'prompt'),
+            ('su_L', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('C1+', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'T6WW': 5.500065906194978}
     },
@@ -811,12 +811,12 @@ smodelsOutput = {
         'r' : 0.3199666,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('sd_L/su_L', inf),
-            ('su_L', inf),
-            ('C1+/C1-', inf),
-            ('C1+', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('sd_L/su_L', 'prompt'),
+            ('su_L', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('C1+', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'T6WW': 5.500065906194978}
     },
@@ -840,10 +840,10 @@ smodelsOutput = {
         'r' : 0.2605149,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1-', inf),
-            ('C1+', inf),
-            ('N1~', 0.0),
-            ('N1', 0.0)
+            ('C1-', 'prompt'),
+            ('C1+', 'prompt'),
+            ('N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWW': 144.584475}
     },
@@ -867,10 +867,10 @@ smodelsOutput = {
         'r' : 0.2482631,
         'r_expected' : 0.1580832,
         'Width (GeV)' : [
-            ('C1-', inf),
-            ('C1+', inf),
-            ('N1~', 0.0),
-            ('N1', 0.0)
+            ('C1-', 'prompt'),
+            ('C1+', 'prompt'),
+            ('N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWW': 0.0146226954636},
         'likelihood' : 0.004620449,
@@ -897,10 +897,10 @@ smodelsOutput = {
         'r' : 0.2111855,
         'r_expected' : 0.2551154,
         'Width (GeV)' : [
-            ('N2', inf),
-            ('C1+/C1-', inf),
-            ('N1', 0.0),
-            ('N1/N1~', 0.0)
+            ('N2', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('N1', 'stable'),
+            ('N1/N1~', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -924,10 +924,10 @@ smodelsOutput = {
         'r' : 0.2050081,
         'r_expected' : 0.1641704,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
     },
@@ -951,10 +951,10 @@ smodelsOutput = {
         'r' : 0.18994,
         'r_expected' : 0.09275837,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 0.013542722171439512},
         'likelihood' : 0.0005794582,
@@ -1005,10 +1005,10 @@ smodelsOutput = {
         'r' : 0.1803736,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', inf),
-            ('C1+/C1-', inf),
-            ('N1', 0.0),
-            ('N1/N1~', 0.0)
+            ('N2', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('N1', 'stable'),
+            ('N1/N1~', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1032,10 +1032,10 @@ smodelsOutput = {
         'r' : 0.1803736,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', inf),
-            ('C1+/C1-', inf),
-            ('N1', 0.0),
-            ('N1/N1~', 0.0)
+            ('N2', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('N1', 'stable'),
+            ('N1/N1~', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1059,10 +1059,10 @@ smodelsOutput = {
         'r' : 0.1707104,
         'r_expected' : 0.1707104,
         'Width (GeV)' : [
-            ('N2', inf),
-            ('C1+/C1-', inf),
-            ('N1', 0.0),
-            ('N1/N1~', 0.0)
+            ('N2', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('N1', 'stable'),
+            ('N1/N1~', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 0.009064724873000252},
         'likelihood' : 0.03511049,
@@ -1089,10 +1089,10 @@ smodelsOutput = {
         'r' : 0.1317421,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', inf),
-            ('C1+/C1-', inf),
-            ('N1', 0.0),
-            ('N1/N1~', 0.0)
+            ('N2', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('N1', 'stable'),
+            ('N1/N1~', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1116,10 +1116,10 @@ smodelsOutput = {
         'r' : 0.1317421,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', inf),
-            ('C1+/C1-', inf),
-            ('N1', 0.0),
-            ('N1/N1~', 0.0)
+            ('N2', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('N1', 'stable'),
+            ('N1/N1~', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1143,10 +1143,10 @@ smodelsOutput = {
         'r' : 0.1273558,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', inf),
-            ('C1+/C1-', inf),
-            ('N1', 0.0),
-            ('N1/N1~', 0.0)
+            ('N2', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('N1', 'stable'),
+            ('N1/N1~', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1170,10 +1170,10 @@ smodelsOutput = {
         'r' : 0.1085004,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
     },
@@ -1197,10 +1197,10 @@ smodelsOutput = {
         'r' : 0.1085004,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
     },
@@ -1224,10 +1224,10 @@ smodelsOutput = {
         'r' : 0.09792791,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', inf),
-            ('C1+/C1-', inf),
-            ('N1', 0.0),
-            ('N1/N1~', 0.0)
+            ('N2', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('N1', 'stable'),
+            ('N1/N1~', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1275,10 +1275,10 @@ smodelsOutput = {
         'r' : 0.09109373,
         'r_expected' : 0.1011594,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 0.014482992254171961},
         'likelihood' : 0.004191917,
@@ -1305,10 +1305,10 @@ smodelsOutput = {
         'r' : 0.08526483,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
     },
@@ -1332,10 +1332,10 @@ smodelsOutput = {
         'r' : 0.08486302,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', inf),
-            ('C1+/C1-', inf),
-            ('N1', 0.0),
-            ('N1/N1~', 0.0)
+            ('N2', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('N1', 'stable'),
+            ('N1/N1~', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1359,10 +1359,10 @@ smodelsOutput = {
         'r' : 0.08440365,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', inf),
-            ('C1+/C1-', inf),
-            ('N1', 0.0),
-            ('N1/N1~', 0.0)
+            ('N2', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('N1', 'stable'),
+            ('N1/N1~', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 95.88423927189842}
     },
@@ -1386,10 +1386,10 @@ smodelsOutput = {
         'r' : 0.08326176,
         'r_expected' : 0.06135902,
         'Width (GeV)' : [
-            ('N2', inf),
-            ('C1+/C1-', inf),
-            ('N1', 0.0),
-            ('N1/N1~', 0.0)
+            ('N2', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('N1', 'stable'),
+            ('N1/N1~', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1413,10 +1413,10 @@ smodelsOutput = {
         'r' : 0.08266684,
         'r_expected' : 0.1002194,
         'Width (GeV)' : [
-            ('C1-', inf),
-            ('C1+', inf),
-            ('N1~', 0.0),
-            ('N1', 0.0)
+            ('C1-', 'prompt'),
+            ('C1+', 'prompt'),
+            ('N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWW': 0.043896094537829604},
         'likelihood' : 0.02079683,
@@ -1437,7 +1437,11 @@ smodelsOutput = {
         'dataType' : 'upperLimit',
         'r' : 0.07713592,
         'r_expected' : None,
-        'Width (GeV)' : [('su_L', inf), ('C1+', inf), ('N1', 0.0)],
+        'Width (GeV)' : [
+            ('su_L', 'prompt'),
+            ('C1+', 'prompt'),
+            ('N1', 'stable')
+        ],
         'TxNames weights (fb)' : {'T6WW': 15.245528607859374}
     },
     {
@@ -1460,10 +1464,10 @@ smodelsOutput = {
         'r' : 0.07638752,
         'r_expected' : 0.06160284,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 0.007638751758050727},
         'likelihood' : 0.127771,
@@ -1490,10 +1494,10 @@ smodelsOutput = {
         'r' : 0.06823447,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
     },
@@ -1517,10 +1521,10 @@ smodelsOutput = {
         'r' : 0.06708621,
         'r_expected' : 0.05901742,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 0.01717407016330772},
         'likelihood' : 0.03946467,
@@ -1547,10 +1551,10 @@ smodelsOutput = {
         'r' : 0.06554881,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 18.47093282810156}
     },
@@ -1574,10 +1578,10 @@ smodelsOutput = {
         'r' : 0.06303483,
         'r_expected' : 0.07307397,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 0.006744727082739748},
         'likelihood' : 0.009241119,
@@ -1604,10 +1608,10 @@ smodelsOutput = {
         'r' : 0.05586334,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 18.47093282810156}
     },
@@ -1631,10 +1635,10 @@ smodelsOutput = {
         'r' : 0.05331895,
         'r_expected' : 0.05462722,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 0.050912243359359},
         'likelihood' : 0.0005299372,
@@ -1661,10 +1665,10 @@ smodelsOutput = {
         'r' : 0.05210257,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 18.47093282810156}
     },
@@ -1688,10 +1692,10 @@ smodelsOutput = {
         'r' : 0.04834391,
         'r_expected' : 0.0767477,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
     },
@@ -1715,10 +1719,10 @@ smodelsOutput = {
         'r' : 0.04586285,
         'r_expected' : 0.04926385,
         'Width (GeV)' : [
-            ('C1-', inf),
-            ('C1+', inf),
-            ('N1~', 0.0),
-            ('N1', 0.0)
+            ('C1-', 'prompt'),
+            ('C1+', 'prompt'),
+            ('N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWW': 144.584475}
     },
@@ -1742,10 +1746,10 @@ smodelsOutput = {
         'r' : 0.04525348,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
     },
@@ -1769,10 +1773,10 @@ smodelsOutput = {
         'r' : 0.03977144,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 18.47093282810156}
     },
@@ -1796,10 +1800,10 @@ smodelsOutput = {
         'r' : 0.03496357,
         'r_expected' : 0.04606324,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
     },
@@ -1823,10 +1827,10 @@ smodelsOutput = {
         'r' : 0.03224369,
         'r_expected' : 0.03287592,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 0.05030016005491955},
         'likelihood' : 0.0005299514,
@@ -1847,7 +1851,11 @@ smodelsOutput = {
         'dataType' : 'upperLimit',
         'r' : 0.0293021,
         'r_expected' : None,
-        'Width (GeV)' : [('su_L', inf), ('C1+', inf), ('N1', 0.0)],
+        'Width (GeV)' : [
+            ('su_L', 'prompt'),
+            ('C1+', 'prompt'),
+            ('N1', 'stable')
+        ],
         'TxNames weights (fb)' : {'T6WW': 15.245528607859374}
     },
     {
@@ -1870,10 +1878,10 @@ smodelsOutput = {
         'r' : 0.02538514,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
     },
@@ -1897,10 +1905,10 @@ smodelsOutput = {
         'r' : 0.0244935,
         'r_expected' : 0.04992905,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 0.01298155270640454},
         'likelihood' : 0.00160016,
@@ -1927,10 +1935,10 @@ smodelsOutput = {
         'r' : 0.01996963,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 18.47093282810156}
     },
@@ -1954,10 +1962,10 @@ smodelsOutput = {
         'r' : 0.01629369,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', inf),
-            ('C1+/C1-', inf),
-            ('N1', 0.0),
-            ('N1/N1~', 0.0)
+            ('N2', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('N1', 'stable'),
+            ('N1/N1~', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1981,10 +1989,10 @@ smodelsOutput = {
         'r' : 0.01470359,
         'r_expected' : 0.0158868,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
     },
@@ -2008,10 +2016,10 @@ smodelsOutput = {
         'r' : 0.00955114,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', inf),
-            ('N2', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('C1+/C1-', 'prompt'),
+            ('N2', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
     },
@@ -2037,12 +2045,12 @@ smodelsOutput = {
         'r' : 0.0001359011,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('sd_L/su_L', inf),
-            ('su_L', inf),
-            ('C1+/C1-', inf),
-            ('C1+', inf),
-            ('N1/N1~', 0.0),
-            ('N1', 0.0)
+            ('sd_L/su_L', 'prompt'),
+            ('su_L', 'prompt'),
+            ('C1+/C1-', 'prompt'),
+            ('C1+', 'prompt'),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'T6WW': 5.500065906194978}
     }

@@ -1,8 +1,18 @@
-#Global results summary (4 files)
+#Global results summary (12 files)
 #The most constraining analysis corresponds to the one with largest observed r.
 #The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.
-#filename            MostConstrainingAnalysis  r_max  r_exp  MostSensitive(ATLAS)  r(ATLAS)  r_exp(ATLAS)  MostSensitive(CMS)  r(CMS)  r_exp(CMS)
-complicated.slha     ATLAS-SUSY-2016-07        7.42   8.8    ATLAS-SUSY-2016-07    7.42      8.8           CMS-SUS-19-006      2.15    1.79      
-gluinoToTops.slha    CMS-SUS-19-006            58.1   68.1   ATLAS-SUSY-2013-18    1.93      2.73          CMS-SUS-19-006      58.1    68.1      
-gluino_squarks.slha  ATLAS-SUSY-2016-07        7.42   8.8    ATLAS-SUSY-2016-07    7.42      8.8           CMS-SUS-19-006      2.15    1.79      
-higgsinoStop.slha    CMS-PAS-SUS-13-023        50.1   -1     ATLAS-SUSY-2013-15    42.9      39.5          CMS-PAS-SUS-13-015  25.5    29.6      
+#Analyses used for combination = ATLAS-SUSY-2018-10,CMS-SUS-13-012.
+#r(combined) = -1 means no analysis from the above combination set produced results.
+#filename                             MostConstrainingAnalysis  r_max  r_exp  MostSensitive(ATLAS)  r(ATLAS)  r_exp(ATLAS)  MostSensitive(CMS)  r(CMS)  r_exp(CMS)  r(combined)  r_exp(combined)
+complicated.slha                      ATLAS-SUSY-2018-10        3.09   3.09   ATLAS-SUSY-2018-10    3.09      3.09          CMS-SUS-13-012      0.185   0.283       3.13         3.17           
+ew_ymi2l51r.slha                      N/A                       -1     -1     N/A                   -1        -1            N/A                 -1      -1          -1           -1             
+gluinoToTops.slha                     CMS-SUS-19-010            151    96.1   ATLAS-CONF-2013-061   2.05      2.6           CMS-SUS-19-010      151     96.1        0.451        0.397          
+gluino_squarks.slha                   ATLAS-SUSY-2018-10        3.09   3.09   ATLAS-SUSY-2018-10    3.09      3.09          CMS-SUS-13-012      0.185   0.283       3.13         3.17           
+higgsinoStop.slha                     CMS-PAS-SUS-13-018        283    -1     ATLAS-SUSY-2013-05    180       238           CMS-SUS-12-028      149     201         41.5         59.4           
+higgsino_spectrum_520_125_dm_10.slha  N/A                       -1     -1     N/A                   -1        -1            N/A                 -1      -1          -1           -1             
+higgsino_spectrum_520_125_dm_4.slha   CMS-SUS-18-004            0.825  0.577  N/A                   -1        -1            CMS-SUS-18-004      0.825   0.577       -1           -1             
+idm_example.slha                      N/A                       -1     -1     N/A                   -1        -1            N/A                 -1      -1          -1           -1             
+lightEWinos.slha                      CMS-SUS-19-006-agg        2.5    3.3    ATLAS-SUSY-2013-18    0.301     0.438         CMS-SUS-19-006-agg  2.5     3.3         0.0547       0.0724         
+lightEWinos_simple.slha               CMS-SUS-19-006-agg        2.5    3.3    ATLAS-SUSY-2013-18    0.301     0.438         CMS-SUS-19-006-agg  2.5     3.3         0.0556       0.0736         
+longLived.slha                        N/A                       -1     -1     N/A                   -1        -1            N/A                 -1      -1          -1           -1             
+simplyGluino.slha                     CMS-SUS-16-033            217    109    ATLAS-SUSY-2016-07    57.5      80.3          CMS-SUS-19-006      122     112         3.5          4.63           

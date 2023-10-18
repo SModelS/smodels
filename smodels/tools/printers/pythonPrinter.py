@@ -10,7 +10,6 @@
 from __future__ import print_function
 import sys
 import os
-import copy
 from smodels.decomposition.topologyDict import TopologyDict
 from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
@@ -19,10 +18,7 @@ from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.basicPrinter import BasicPrinter
 from smodels.tools.printerTools import formatNestedDict
-import numpy as np
 from collections import OrderedDict
-from xml.dom import minidom
-from xml.etree import ElementTree
 import unum
 import time
 
@@ -264,7 +260,7 @@ class PyPrinter(BasicPrinter):
                     massDict[str(n)] = n.mass.asNumber(GeV)
                     widthDict[str(n)] = n.totalwidth.asNumber(GeV)
                 mass = [(k,v) for k,v in massDict.items()]
-                widths = [(k,v) for k,v in widthDict.items()]
+                widths = [(k,_convWidth(v)) for k,v in widthDict.items()]
 
                 nodesDict = {nodeIndex : str(node) for nodeIndex,node
                              in avgSMS._nodesMapping.items()}

@@ -30,12 +30,12 @@
                 <T6WW>0.17976008654165604</T6WW>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('sd_L/su_L', inf)</Width_GeV>
-                <Width_GeV>('su_L', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('C1+', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('sd_L/su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.0582</expected_upper_limit_fb>
@@ -68,12 +68,12 @@
                 <T6WW>2.184580974615298</T6WW>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('sd_L/su_L', inf)</Width_GeV>
-                <Width_GeV>('su_L', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('C1+', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('sd_L/su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>1.07</expected_upper_limit_fb>
@@ -106,12 +106,12 @@
                 <T6WW>35.78982375338465</T6WW>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('sd_L/su_L', inf)</Width_GeV>
-                <Width_GeV>('su_L', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('C1+', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('sd_L/su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -141,12 +141,12 @@
                 <T6WW>5.500065906194978</T6WW>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('sd_L/su_L', inf)</Width_GeV>
-                <Width_GeV>('su_L', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('C1+', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('sd_L/su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -176,12 +176,12 @@
                 <T6WW>5.500065906194978</T6WW>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('sd_L/su_L', inf)</Width_GeV>
-                <Width_GeV>('su_L', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('C1+', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('sd_L/su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -209,10 +209,10 @@
                 <TChiWW>144.584475</TChiWW>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1-', inf)</Width_GeV>
-                <Width_GeV>('C1+', inf)</Width_GeV>
-                <Width_GeV>('N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+', 'prompt')</Width_GeV>
+                <Width_GeV>('N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -240,10 +240,10 @@
                 <TChiWW>0.0146226954636</TChiWW>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1-', inf)</Width_GeV>
-                <Width_GeV>('C1+', inf)</Width_GeV>
-                <Width_GeV>('N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+', 'prompt')</Width_GeV>
+                <Width_GeV>('N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.0925</expected_upper_limit_fb>
@@ -274,10 +274,10 @@
                 <TChiWH>207.13027034006157</TChiWH>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>811.908</expected_upper_limit_fb>
@@ -305,10 +305,10 @@
                 <TChiWZ>39.9011280599384</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>243.047</expected_upper_limit_fb>
@@ -336,10 +336,10 @@
                 <TChiWZ>0.013542722171439512</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.146</expected_upper_limit_fb>
@@ -398,10 +398,10 @@
                 <TChiWH>207.13027034006157</TChiWH>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -429,10 +429,10 @@
                 <TChiWH>207.13027034006157</TChiWH>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -460,10 +460,10 @@
                 <TChiWH>0.009064724873000252</TChiWH>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.0531</expected_upper_limit_fb>
@@ -494,10 +494,10 @@
                 <TChiWH>207.13027034006157</TChiWH>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -525,10 +525,10 @@
                 <TChiWH>207.13027034006157</TChiWH>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -556,10 +556,10 @@
                 <TChiWH>207.13027034006157</TChiWH>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -587,10 +587,10 @@
                 <TChiWZ>39.9011280599384</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -618,10 +618,10 @@
                 <TChiWZ>39.9011280599384</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -649,10 +649,10 @@
                 <TChiWH>207.13027034006157</TChiWH>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -708,10 +708,10 @@
                 <TChiWZ>0.014482992254171961</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.14317</expected_upper_limit_fb>
@@ -742,10 +742,10 @@
                 <TChiWZ>39.9011280599384</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -773,10 +773,10 @@
                 <TChiWH>207.13027034006157</TChiWH>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -804,10 +804,10 @@
                 <TChiWH>95.88423927189842</TChiWH>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -835,10 +835,10 @@
                 <TChiWH>207.13027034006157</TChiWH>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>3375.71</expected_upper_limit_fb>
@@ -866,10 +866,10 @@
                 <TChiWW>0.043896094537829604</TChiWW>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1-', inf)</Width_GeV>
-                <Width_GeV>('C1+', inf)</Width_GeV>
-                <Width_GeV>('N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+', 'prompt')</Width_GeV>
+                <Width_GeV>('N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.438</expected_upper_limit_fb>
@@ -899,9 +899,9 @@
                 <T6WW>15.245528607859374</T6WW>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('su_L', inf)</Width_GeV>
-                <Width_GeV>('C1+', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -929,10 +929,10 @@
                 <TChiWZ>0.007638751758050727</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.124</expected_upper_limit_fb>
@@ -963,10 +963,10 @@
                 <TChiWZ>39.9011280599384</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -994,10 +994,10 @@
                 <TChiWZ>0.01717407016330772</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.291</expected_upper_limit_fb>
@@ -1028,10 +1028,10 @@
                 <TChiWZ>18.47093282810156</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -1059,10 +1059,10 @@
                 <TChiWZ>0.006744727082739748</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.0923</expected_upper_limit_fb>
@@ -1093,10 +1093,10 @@
                 <TChiWZ>18.47093282810156</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -1124,10 +1124,10 @@
                 <TChiWZ>0.050912243359359</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.931994</expected_upper_limit_fb>
@@ -1158,10 +1158,10 @@
                 <TChiWZ>18.47093282810156</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -1189,10 +1189,10 @@
                 <TChiWZ>39.9011280599384</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>519.9</expected_upper_limit_fb>
@@ -1220,10 +1220,10 @@
                 <TChiWW>144.584475</TChiWW>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1-', inf)</Width_GeV>
-                <Width_GeV>('C1+', inf)</Width_GeV>
-                <Width_GeV>('N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+', 'prompt')</Width_GeV>
+                <Width_GeV>('N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>2934.9</expected_upper_limit_fb>
@@ -1251,10 +1251,10 @@
                 <TChiWZ>39.9011280599384</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -1282,10 +1282,10 @@
                 <TChiWZ>18.47093282810156</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -1313,10 +1313,10 @@
                 <TChiWZ>39.9011280599384</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>866.225</expected_upper_limit_fb>
@@ -1344,10 +1344,10 @@
                 <TChiWZ>0.05030016005491955</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>1.53</expected_upper_limit_fb>
@@ -1377,9 +1377,9 @@
                 <T6WW>15.245528607859374</T6WW>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('su_L', inf)</Width_GeV>
-                <Width_GeV>('C1+', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -1407,10 +1407,10 @@
                 <TChiWZ>39.9011280599384</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -1438,10 +1438,10 @@
                 <TChiWZ>0.01298155270640454</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.26</expected_upper_limit_fb>
@@ -1472,10 +1472,10 @@
                 <TChiWZ>18.47093282810156</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -1503,10 +1503,10 @@
                 <TChiWH>207.13027034006157</TChiWH>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -1534,10 +1534,10 @@
                 <TChiWZ>39.9011280599384</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>2511.59</expected_upper_limit_fb>
@@ -1565,10 +1565,10 @@
                 <TChiWZ>39.9011280599384</TChiWZ>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('N2', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('N2', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
@@ -1598,12 +1598,12 @@
                 <T6WW>5.500065906194978</T6WW>
             </TxNames_weights_fb>
             <Width_GeV_List>
-                <Width_GeV>('sd_L/su_L', inf)</Width_GeV>
-                <Width_GeV>('su_L', inf)</Width_GeV>
-                <Width_GeV>('C1+/C1-', inf)</Width_GeV>
-                <Width_GeV>('C1+', inf)</Width_GeV>
-                <Width_GeV>('N1/N1~', 0.0)</Width_GeV>
-                <Width_GeV>('N1', 0.0)</Width_GeV>
+                <Width_GeV>('sd_L/su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('su_L', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+/C1-', 'prompt')</Width_GeV>
+                <Width_GeV>('C1+', 'prompt')</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
