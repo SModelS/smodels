@@ -66,7 +66,7 @@ def main():
         type=float, default=[])
     xsecresummino.add_argument('-part', '--particles', nargs='+', action='append',
         help="Daughter particles to consider in the cross section calculation, if no particles are given, Resummino use the resummino.py file in etc/ folder.",
-        type=float, default=[])
+        type=int, default=[])
     xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
         help="verbosity (debug, info, warning, error)")
     xsecresummino.add_argument('-C', '--conf', type=str, default='default',
