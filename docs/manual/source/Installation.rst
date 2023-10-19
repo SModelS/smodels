@@ -47,15 +47,15 @@ Installation Methods
 
      make smodels
 
-   in the top-level directory. The installation will remove redundant folders, install the required 
-   dependencies (using pip install) and compile Pythia and NLL-fast. 
-   If the MSSM cross section computer is not needed, one can install SModelS without Pythia and NLL-fast. To this end, run::
+   in the top-level directory. The installation will remove redundant folders and install the required 
+   dependencies (using pip install). 
+   If the MSSM cross section computers are needed, one can install SModelS with Pythia, NLL-fast and Resummino. To this end, run::
 
-     make smodels_noexternaltools
+     make smodels_externaltools
  
    instead of *make smodels*. 
    In case the Python libraries can not be successfully
-   installed, the user can install them separately using his/her preferred method. Pythia and NLL-fast can also be compiled separately
+   installed, the user can install them separately using his/her preferred method. Pythia, NLL-fast and Resummino can also be compiled separately
    running **make externaltools**. In case the Fortran comiler isn't found, 
    try *make FCC=<path-to-gfortran> smodels* or *make FCC=<path-to-gfortran> externaltools*. 
 

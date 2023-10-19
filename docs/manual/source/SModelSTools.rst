@@ -42,6 +42,9 @@ Inside SModelS there is a number of tools that may be convenient for the user:
 Cross Section Calculator
 ------------------------
 
+Pythia and NLLfast Cross Sections
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 This tool computes LHC production cross sections for *MSSM particles*
 and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be
 convenient for adding cross sections to SLHA input files, see :doc:`Basic Input <BasicInput>`.
@@ -87,7 +90,7 @@ Note that signal strength multipliers get applied only to LO cross sections. Thi
 
 
 Resummino Cross Sections
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 For the electroweakino sector, another tool is available to get the according cross-sections at NLL+NLO order. This tool is based on `Resummino <https://resummino.hepforge.org>`_ and can calculate cross-sections at LO, NLO, and NLL+NLO orders. No K-factors are used, all orders are calculated independently.
 
@@ -100,10 +103,10 @@ usage example is: ::
 
    smodelsTools.py xsecresummino -s 13 -p -f inputFiles/slha/resummino_example.slha
 
-which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes with mother particles indicated in the resummino.json file. As with the xseccomputer tool, SModelS will then write ouzt only the highest order cross sections available for each process.
+which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes with daugther particles (in the pp collision) indicated by the user. If no particles are specified, the channels in the resummino.py file will be used. As with the xseccomputer tool, SModelS will then write ouzt only the highest order cross sections available for each process.
 
-Concerning the resummino.json file, the default file is present in the smodels/etc folder. This file needs to list all the mother particles to consider in the "channels" dictionary.
-Other information can be passed throught this file, like the "mode" parameters, which decided if we want to consider only the relevant process (equal to or above the "mode_limit" value), or every process present in the file, even if the cross sections are very low.
+Concerning the resummino.py file, the default file is present in the smodels/etc folder. This file needs to list all the mother particles to consider in the "channels" dictionary.
+Other information can be passed throught this file if we want to consider only the relevant process (equal to or above the "mode_limit" value), or every process present in the file, even if the cross sections are very low.
 
 * **The resummino cross section calculation is implemented by the** `XSecResummino class <tools.html#tools.xsecResummino.XSecResummino>`_
 
