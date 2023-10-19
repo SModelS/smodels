@@ -101,7 +101,7 @@ For the electroweakino sector, another tool is available to get the according cr
 A typical
 usage example is: ::
 
-   smodelsTools.py xsecresummino -s 13 -p -f inputFiles/slha/resummino_example.slha
+   smodelsTools.py xsecresummino -s 13 -p -f inputFiles/slha/resummino_example.slha -part 1000035 1000037 -1000037
 
 which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes with daugther particles (in the pp collision) indicated by the user. If no particles are specified, the channels in the resummino.py file will be used. As with the xseccomputer tool, SModelS will then write ouzt only the highest order cross sections available for each process.
 
