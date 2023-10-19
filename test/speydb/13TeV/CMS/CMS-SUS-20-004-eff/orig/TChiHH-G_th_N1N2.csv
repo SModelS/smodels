@@ -1,0 +1,33 @@
+#: table_doi: 10.17182/hepdata.114414.v2/t4
+#: name: TChiHH-G_th_N1N2
+#: description: Theory cross sections vs m($\widetilde{\chi}^0_1$) for SMS model TChiHH-G, $\widetilde{\chi}^0_1, \widetilde{\chi}^0_2$ NLSPs only.
+#: data_file: tchihh-g_th_n1n2.yaml
+#: keyword observables: SIG
+#: keyword phrases: SUSY | Supersymmetry
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> NEUTRALINO1 NEUTRALINO1 | NEUTRALINO1 --> H GOLDSTINO
+#: LUMINOSITY [fb$^{-1}$],137
+M(NEUTRALINO1) [GeV],"$\sigma_{\mathrm{Theory}, \widetilde{\chi}^0_1\widetilde{\chi}^0_2}$ [fb]"
+150.0,715.14
+200.0,244.21
+250.0,104.25
+300.0,50.999
+350.0,27.329
+400.0,15.669
+450.0,9.4402
+500.0,5.9076
+550.0,3.8167
+600.0,2.5301
+650.0,1.7142
+700.0,1.1811
+750.0,0.82637
+800.0,0.58621
+850.0,0.42056
+900.0,0.30594
+950.0,0.22285
+1000.0,0.16428
+1100.0,0.091247
+1200.0,0.051626
+1300.0,0.029935
+1400.0,0.017503
+

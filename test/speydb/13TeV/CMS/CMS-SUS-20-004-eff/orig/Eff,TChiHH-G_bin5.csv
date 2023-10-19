@@ -1,0 +1,48 @@
+#: table_doi: 10.17182/hepdata.114414.v2/t17
+#: name: Efficiency, TChiHH-G
+#: description: Efficiency vs $m(\widetilde{\chi}^0_1)$ for SMS model TChiHH-G.  The denominator includes all 22 signal regions, and assumes $\mathcal{B}(\mathrm{H}$-->$\mathrm{b}\overline{\mathrm{b}})=100\%$.
+#: data_file: efficiency,_tchihh-g.yaml
+#: keyword observables: EFF
+#: keyword phrases: SUSY | Supersymmetry
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> NEUTRALINO1 NEUTRALINO1 | NEUTRALINO1 --> H GOLDSTINO
+M(NEUTRALINO1) [GeV],"Efficiency, bin 5"
+150.0,4.8e-06
+175.0,0.0001143
+200.0,0.0005853
+225.0,0.0011902
+250.0,0.0020608
+275.0,0.0028269
+300.0,0.0030445
+325.0,0.0028977
+350.0,0.0026736
+375.0,0.0025202
+400.0,0.0023013
+425.0,0.0020616
+450.0,0.0019542
+475.0,0.0018892
+500.0,0.0015884
+525.0,0.0013938
+550.0,0.0013307
+575.0,0.0012418
+600.0,0.0010438
+625.0,0.0010083
+650.0,0.000847
+675.0,0.0008767
+700.0,0.0006412
+725.0,0.0006653
+750.0,0.0005542
+775.0,0.0005189
+800.0,0.0004804
+825.0,0.0003832
+850.0,0.0003737
+875.0,0.0003624
+900.0,0.0003049
+925.0,0.0002573
+950.0,0.0002528
+975.0,0.000226
+1000.0,0.0002279
+1050.0,0.0001485
+1100.0,0.0001334
+1150.0,0.0001362
+1200.0,0.0001099

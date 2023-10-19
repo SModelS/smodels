@@ -1,0 +1,9 @@
+dataId: SR15
+dataType: efficiencyMap
+observedN: 1.0
+expectedBG: 0.41911
+bgError: 0.61
+comment: SR15
+upperLimit: 0.02847*fb
+expectedUpperLimit: 0.0214*fb
+thirdMoment: 0.24212

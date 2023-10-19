@@ -1,0 +1,9 @@
+dataId: SR18
+dataType: efficiencyMap
+observedN: 6.0
+expectedBG: 7.3285
+bgError: 2.0
+comment: SR18
+upperLimit: 0.04593*fb
+expectedUpperLimit: 0.05528*fb
+thirdMoment: 3.88287

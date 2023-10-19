@@ -1,0 +1,96 @@
+#: table_doi: 10.17182/hepdata.114414.v2/t20
+#: name: Signal and control region yields for resolved signature
+#: description: Signal and control region populations for the resolved signature. 
+#: data_file: signal_and_control_region_yields_for_resolved_signature.yaml
+#: keyword observables: N
+#: keyword phrases: SUSY | Supersymmetry
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> H H INVISIBLE
+#: LUMINOSITY [fb$^{-1}$],137
+Plane,$\Delta R_{\mathrm{max}}$
+1.0,'1.1--2.2
+2.0,'1.1--2.2
+3.0,'1.1--2.2
+4.0,'1.1--2.2
+5.0,'<1.1
+6.0,'<1.1
+7.0,'<1.1
+8.0,'<1.1
+
+#: LUMINOSITY [fb$^{-1}$],137
+Plane,$p_{\mathrm{T}}^{\mathrm{miss}}$ [GeV]
+1.0,'150--200
+2.0,'200--300
+3.0,'300--400
+4.0,'>400
+5.0,'150--200
+6.0,'200--300
+7.0,'300--400
+8.0,'>400
+
+#: LUMINOSITY [fb$^{-1}$],137
+Plane,$N_{\mathrm{b}}=2$ CSB [Events]
+1.0,2997.0
+2.0,1687.0
+3.0,200.0
+4.0,35.0
+5.0,601.0
+6.0,388.0
+7.0,45.0
+8.0,14.0
+
+#: LUMINOSITY [fb$^{-1}$],137
+Plane,$N_{\mathrm{b}}=2$ CSR [Events]
+1.0,1703.0
+2.0,1110.0
+3.0,116.0
+4.0,33.0
+5.0,51.0
+6.0,31.0
+7.0,2.0
+8.0,5.0
+
+#: LUMINOSITY [fb$^{-1}$],137
+Plane,$N_{\mathrm{b}}=3$ SB [Events]
+1.0,260.0
+2.0,149.0
+3.0,21.0
+4.0,3.0
+5.0,57.0
+6.0,26.0
+7.0,2.0
+8.0,2.0
+
+#: LUMINOSITY [fb$^{-1}$],137
+Plane,$N_{\mathrm{b}}=3$ SR [Events]
+1.0,138.0
+2.0,91.0
+3.0,14.0
+4.0,3.0
+5.0,8.0
+6.0,2.0
+7.0,4.0
+8.0,0.0
+
+#: LUMINOSITY [fb$^{-1}$],137
+Plane,$N_{\mathrm{b}}=4$ SB [Events]
+1.0,83.0
+2.0,45.0
+3.0,5.0
+4.0,3.0
+5.0,25.0
+6.0,13.0
+7.0,4.0
+8.0,2.0
+
+#: LUMINOSITY [fb$^{-1}$],137
+Plane,$N_{\mathrm{b}}=4$ SR [Events]
+1.0,54.0
+2.0,38.0
+3.0,4.0
+4.0,0.0
+5.0,1.0
+6.0,3.0
+7.0,1.0
+8.0,1.0
+

@@ -1,0 +1,9 @@
+dataId: SR13
+dataType: efficiencyMap
+observedN: 1.0
+expectedBG: 2.6812
+bgError: 1.06
+comment: SR13
+upperLimit: 0.02327*fb
+expectedUpperLimit: 0.03613*fb
+thirdMoment: 0.772409

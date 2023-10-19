@@ -1,0 +1,9 @@
+dataId: SR22
+dataType: efficiencyMap
+observedN: 0.0
+expectedBG: 0.19966
+bgError: 0.21
+comment: SR22
+upperLimit: 0.01528*fb
+expectedUpperLimit: 0.01793*fb
+thirdMoment: 0.00956027

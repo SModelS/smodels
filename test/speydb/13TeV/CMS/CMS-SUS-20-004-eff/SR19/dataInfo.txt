@@ -1,0 +1,9 @@
+dataId: SR19
+dataType: efficiencyMap
+observedN: 1.0
+expectedBG: 1.6546
+bgError: 1.04
+comment: SR19
+upperLimit: 0.02527*fb
+expectedUpperLimit: 0.03146*fb
+thirdMoment: 0.900496

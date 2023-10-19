@@ -1,0 +1,9 @@
+dataId: SR3
+dataType: efficiencyMap
+observedN: 14.0
+expectedBG: 11.512
+bgError: 3.4
+comment: SR3
+upperLimit: 0.09276*fb
+expectedUpperLimit: 0.07421*fb
+thirdMoment: 20.4459

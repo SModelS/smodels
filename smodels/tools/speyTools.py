@@ -192,18 +192,31 @@ class SpeyComputer:
 
         """
         dataset = self.dataset
-        stat_wrapper = get_backend("default_pdf.correlated_background")
         obsN = [ x.dataInfo.observedN for x in dataset._datasets ]
         bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
         cov = dataset.globalInfo.covariance
         lumi = float ( dataset.getLumi().asNumber(1./fb) )
-        # print ( "input", len(obsN), len(bg), len(cov), len(nsig) )
+        thirdmomenta=[]
+        for ds in dataset._datasets:
+            if hasattr ( ds.dataInfo, "thirdMoment" ):
+                thirdmomenta.append ( ds.dataInfo.thirdMoment )
+        if len(thirdmomenta)==0: # SLv1
+            stat_wrapper = get_backend("default_pdf.correlated_background")
+            speyModel = stat_wrapper( data = obsN,
+                            background_yields = bg, covariance_matrix = cov,
+                            signal_yields = nsig,
+                            xsection = [ x / lumi for x in nsig ],
+                            analysis = dataset.globalInfo.id,
+            )
+            return [ speyModel ]
+        # SLv2
+        stat_wrapper = get_backend("default_pdf.third_moment_expansion")
         speyModel = stat_wrapper( data = obsN,
                         background_yields = bg, covariance_matrix = cov,
                         signal_yields = nsig,
                         xsection = [ x / lumi for x in nsig ],
+                        third_moment = thirdmomenta,
                         analysis = dataset.globalInfo.id,
-#                        backend = 'simplified_likelihoods'
         )
         return [ speyModel ]
 

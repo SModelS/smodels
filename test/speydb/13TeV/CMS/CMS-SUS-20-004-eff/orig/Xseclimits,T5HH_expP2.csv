@@ -1,0 +1,26 @@
+#: table_doi: 10.17182/hepdata.114414.v2/t12
+#: name: Xsec limits, T5HH
+#: description: Cross section, 95% CL upper limit plus theory vs m($\widetilde{g}$) for SMS model T5HH.
+#: data_file: xsec_limits,_t5hh.yaml
+#: keyword observables: SIG | CLS
+#: keyword phrases: SUSY | Supersymmetry
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> GLUINO GLUINO | GLUINO --> Q QBAR NEUTRALINO2 | NEUTRALINO2 --> H NEUTRALINO1
+#: LUMINOSITY [fb$^{-1}$],137
+M(GLUINO) [GeV],$\sigma_{\mathrm{Exp+2 s.d.}}$ [fb]
+1000.0,2.8943
+1100.0,2.1067
+1200.0,1.6711
+1300.0,1.3732
+1400.0,1.159
+1500.0,1.0302
+1600.0,0.90924
+1700.0,0.84614
+1800.0,0.805
+1900.0,0.74954
+2000.0,0.71889
+2100.0,0.69571
+2200.0,0.68294
+2300.0,0.67032
+2400.0,0.66386
+2500.0,0.65299

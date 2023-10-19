@@ -1,0 +1,49 @@
+#: table_doi: 10.17182/hepdata.114414.v2/t2
+#: name: Xsec limits, TChiHH-G
+#: description: Cross section 95% CL upper limit vs m($\widetilde{\chi}^0_1$) for SMS model TChiHH-G.
+#: data_file: xsec_limits,_tchihh-g.yaml
+#: keyword observables: SIG | CLS
+#: keyword phrases: SUSY | Supersymmetry
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> NEUTRALINO1 NEUTRALINO1 | NEUTRALINO1 --> H GOLDSTINO
+#: LUMINOSITY [fb$^{-1}$],137
+M(NEUTRALINO1) [GeV],$\sigma_{\mathrm{Exp+1 s.d.}}$ [fb]
+150.0,0.0
+175.0,2144.1
+200.0,687.66
+225.0,276.15
+250.0,128.31
+275.0,71.914
+300.0,50.028
+325.0,32.806
+350.0,24.497
+375.0,19.124
+400.0,15.184
+425.0,12.1
+450.0,10.491
+475.0,9.0124
+500.0,7.8126
+525.0,6.9507
+550.0,6.1676
+575.0,5.6105
+600.0,5.104
+625.0,4.607
+650.0,4.1684
+675.0,3.8486
+700.0,3.5748
+725.0,3.3927
+750.0,3.0966
+775.0,2.9085
+800.0,2.7476
+825.0,2.5689
+850.0,2.4234
+875.0,2.3154
+900.0,2.1931
+925.0,2.1176
+950.0,1.9811
+975.0,1.9392
+1000.0,1.8323
+1100.0,1.5917
+1200.0,1.4193
+1300.0,1.3007
+1400.0,1.1954

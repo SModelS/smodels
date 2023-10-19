@@ -1,0 +1,27 @@
+#: table_doi: 10.17182/hepdata.114414.v2/t16
+#: name: Significance, T5HH
+#: description: Significance vs $m(\widetilde{g})$ for SMS model T5HH.
+#: data_file: significance,_t5hh.yaml
+#: keyword observables: SIGNIF
+#: keyword phrases: SUSY | Supersymmetry
+#: keyword cmenergies: 13000
+#: keyword reactions: P P --> GLUINO GLUINO | GLUINO --> Q QBAR NEUTRALINO2 | NEUTRALINO2 --> H NEUTRALINO1
+#: LUMINOSITY [fb$^{-1}$],137
+M(GLUINO) [GeV],Significance [s.d.]
+1000.0,-0.87642
+1100.0,-0.80653
+1200.0,-0.75654
+1300.0,-0.7311
+1400.0,-0.65974
+1500.0,-0.67591
+1600.0,-0.6714
+1700.0,-0.65182
+1800.0,-0.61225
+1900.0,-0.6861
+2000.0,-0.47119
+2100.0,-0.65918
+2200.0,-0.51695
+2300.0,-0.38213
+2400.0,-0.45684
+2500.0,-0.657
+
