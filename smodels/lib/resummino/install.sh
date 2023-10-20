@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-install_dir=$PWD
+install_dir=$PWD/smodels/lib/resummino
 
 mkdir -p $install_dir
 
