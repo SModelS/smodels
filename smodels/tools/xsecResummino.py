@@ -674,7 +674,7 @@ def main(args):
     type_writting = canonizer.writeToFile(args)
     json = canonizer.getjson(args)
     particles = canonizer.getParticles( args ) 
-    print("PARTICULES ", type(list(particles)[0]))
+    # print("PARTICULES ", type(list(particles)[0]))
     #We choose to select highest by default
     if type_writting == None :
         type_writting = 'highest'
