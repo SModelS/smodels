@@ -25,6 +25,7 @@ import subprocess
 from concurrent.futures import ProcessPoolExecutor
 from smodels.tools.xsecBase import XSecBase, ArgsStandardizer
 import tempfile
+import argparse
 import pyslha
 import shutil
 from itertools import combinations
@@ -78,10 +79,11 @@ class XSecResummino(XSecBase):
                              
         self.xsec_limit = data["xsec_limit"]
         
-    def calculate_one_slha(self, particles,input_file, slha_file, output_file, num_try, order, log):
+    def calculate_one_slha(self, particles,input_file, slha_file, output_file, 
+            num_try, order, log):
         """
-        log file management and launch resummino command. Prepare also the cross section list to write the cross section
-        onto the slha file.
+        log file management and launch resummino command. Prepare also the
+        cross section list to write the cross section onto the slha file.
         """
         with open(log, 'a') as f:
             f.write(f'{particles} cross-sections written in {slha_file}\n')
@@ -167,10 +169,8 @@ class XSecResummino(XSecBase):
         #:hist: variable to check if there is a problem in the cross section (strange value or no value)
         hist = 0
 
-        
         if num_try == 0 and self.mode != "check":
             self.launch_command(self.resummino_bin, input_file, output_file, order)
-
 
         #here we write in the slha file.
             hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections, log)
@@ -205,15 +205,6 @@ class XSecResummino(XSecBase):
             raise RuntimeError("Please check your slha file or if you have resummino correctly install with the install.sh executable")
         return Infos[0]
 
-    # def writing_result(self, value, particle_1, particle_2, slha_file, order, type_writing):
-    #     with open(slha_file, 'a') as f:
-    #         if type_writing == 'all':
-    #             f.write(f"\nXSECTION  1.30E+04  2212 2212 2 {particle_1} {particle_2} # [pb] \n")
-    #             for i in range(order+1):
-    #                 f.write(f" 0  0  {i}  0  0  0    {value[i]} Resumminov3.1.2\n")
-    #         if type_writing == 'max':
-    #             f.write(f"\nXSECTION  1.30E+04  2212 2212 2 {particle_1} {particle_2} # [pb] \n 0  0  {order}  0  0  0    {value} Resumminov3.1.2\n")
-            
     def create_xsection(self, result, particle_1, particle_2, order, Xsections):
         """
         Create cross section list filled with cross section objects, corresponding to all the channels calculated.
@@ -242,8 +233,9 @@ class XSecResummino(XSecBase):
             
     def write_in_slha(self, output_file, slha_file, order, particle_1, particle_2, type_writing, Xsections, log):
         """
-        Organize here the way cross section are written onto the file (highest, all) and then create cross_section object
-        to let smodels take care of the writting itself with the create_xsection method.
+        Organize here the way cross section are written onto the file (highest,
+        all) and then create cross_section object to let smodels take
+        care of the writting itself with the create_xsection method.
         """
         results = self.search_in_output(output_file)
         if type_writing == 'highest':
@@ -281,7 +273,7 @@ class XSecResummino(XSecBase):
             
         return 0
 
-    def extract_m1_m2_mu(self, file_path):
+    def extract_m1_m2_mu(self, file_path : os.PathLike ) -> dict:
         """_summary_
         
         function to extract the breaking term of the electrowikino part (SUSY) in
@@ -289,7 +281,7 @@ class XSecResummino(XSecBase):
         Args:
             file_path (_string_): _path of the slha file_
 
-        Returns:
+        Returns: dictionary of:
             _int_: _M1 breaking term in SUSY models_
             _int_: _M2 braking term in SUSY models_
             _int_: _mu breaking term in SUSY models_
@@ -509,12 +501,12 @@ class XSecResummino(XSecBase):
             #On pourrait optimiser en enlevant les variables qui ne changent pas d'une itération à l'autre
             #Mais ce n'est pas très important (négligeable niveau temps de compilation comparé à Resummino)
             Liste.append((particles, resummino_in_file, slha_path, resummino_out_file, num_try, order, resummino_log_file))
-        logger.info(f" Number of files created : {a-b-c}")
+        logger.info(f"{a-b-c} files created")
         return Liste
 
 
     def modify_slha_file(self, file_before, file_after, slha_file):
-        """_summary_
+        """ _summary_
 
         Change all the informations in the .in files before launching calculations
         Args:
@@ -538,21 +530,21 @@ class XSecResummino(XSecBase):
             lhapdf_folder = os.path.join(self.pwd, 'smodels', 'lib', 'resummino', 'lhapdf', 'share', 'LHAPDF')
             
             if not os.path.exists(os.path.join(lhapdf_folder, pdf_lo)):
-                comand = f"wget http://lhapdfsets.web.cern.ch/lhapdfsets/current/{pdf_lo}.tar.gz -O- | tar xz -C {lhapdf_folder}"
+                command = f"wget http://lhapdfsets.web.cern.ch/lhapdfsets/current/{pdf_lo}.tar.gz -O- | tar xz -C {lhapdf_folder}"
                 with open("/dev/null", "w") as errorhandle:
                     try:
-                        subprocess.run(comand, shell=True,check = True, stderr=errorhandle)
+                        subprocess.run(command, shell=True,check = True, stderr=errorhandle)
                     except subprocess.CalledProcessError as e:
                         logger.error("pdf name is wrong for LO, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
-                        raise RuntimeError(f"Échec lors de la requête HTTP pour {pdf_lo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check. You may also check if resummino is install.")
+                        raise RuntimeError(f"Failed during HTTP request for {pdf_lo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check. You may also check if resummino is installed.")
             if not os.path.exists(os.path.join(lhapdf_folder, pdf_nlo)):
-                comand = f"wget http://lhapdfsets.web.cern.ch/lhapdfsets/current/{pdf_nlo}.tar.gz -O- | tar xz -C {lhapdf_folder}"
+                command = f"wget http://lhapdfsets.web.cern.ch/lhapdfsets/current/{pdf_nlo}.tar.gz -O- | tar xz -C {lhapdf_folder}"
                 with open("/dev/null", "w") as errorhandle:
                     try:
-                        subprocess.run(comand, shell=True, check=True, stderr=errorhandle)
+                        subprocess.run(command, shell=True, check=True, stderr=errorhandle)
                     except subprocess.CalledProcessError as e:
                         logger.error("pdf name is wrong for LO, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
-                        raise RuntimeError(f"Échec lors de la requête HTTP pour {pdf_nlo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
+                        raise RuntimeError(f"Failed during HTTP request for {pdf_nlo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
             with open(file_after, 'w') as f:
                 for line in lines:
                     if line.startswith("pdf_lo"):
@@ -587,9 +579,10 @@ class XSecResummino(XSecBase):
         function to extract all the informations in the resummino.py
         file
 
-        Returns:
+        Returns: tuple of:
             string: Mode of writting for the slha cross section
-            list: liste of the daugther particle to consider in the calculation of the cross section
+            list: list of the daugther particle to consider in the calculation
+            of the cross section
         """
         with open(self.json_resummino, "r") as f:
             data = eval(f.read())
@@ -602,8 +595,8 @@ class XSecResummino(XSecBase):
         
         channels = data["channels"]
         particles = []
-        for clef, valeurs in channels.items():
-            particles.append((valeurs[0], valeurs[1]))
+        for key, values in channels.items():
+            particles.append((values[0], values[1]))
             
         return mode, particles
     
@@ -612,9 +605,10 @@ class XSecResummino(XSecBase):
         
         function to find channels using a set of particles
 
-        Returns:
+        Returns: tuple of:
             string: Mode of writting for the slha cross section
-            list: liste of the daugther particle to consider in the calculation of the cross section
+            list: list of the daugther particle to consider in the calculation
+            of the cross section
         """
         
         channels = list(combinations(self.particles, 2))
@@ -623,9 +617,11 @@ class XSecResummino(XSecBase):
             
         return mode, channels
 
-    def modify_outgoing_particles(self, input_file, output_file, new_particle1, new_particle2):
+    def modify_outgoing_particles( self, input_file, output_file, new_particle1, 
+                                   new_particle2 ):
         """
-        modify the output particles (mother particles) in the resummino .in file. First call the template (input_file),
+        modify the output particles (mother particles) in the resummino .in
+        file. First call the template (input_file),
         then write into the resummino .in file (output_file). 
         Can also write directly onto the output_file.
         """
@@ -643,24 +639,23 @@ class XSecResummino(XSecBase):
             
     def launch_routine_resummino(self):
         """
-        Launch all the calculations of the slha files in parallel (limited by ncpu), with first the creation of every path needed for the calculations.
+        Launch all the calculations of the slha files in parallel (limited by
+        ncpu), with first the creation of every path needed for the calculations.
         """
-        #On créer la liste
+        # We create the list
         tasks = self.create_routine_files(self.maxOrder, self.slha_folder_name)
-        #On lance le programme avec les performances maximales, à changer si besoin
+        # We launch the program with maximum performance, change if necessary
         with ProcessPoolExecutor(max_workers=self.ncpu) as executor:
             futures = [executor.submit(self.calculate_one_slha, *task) for task in tasks]
             for future in futures:
                 future.result()
 
-
         shutil.rmtree(self.resummino_in)
         shutil.rmtree(self.resummino_out)
         shutil.rmtree(self.resummino_log)
 
-def main(args):
-    
-    
+def main ( args : argparse.Namespace ):
+    """ the central entry point """
     canonizer = ArgsStandardizer()
     setLogLevel ( args.verbosity )
     if not hasattr ( args, "noautocompile" ):
@@ -674,8 +669,7 @@ def main(args):
     type_writting = canonizer.writeToFile(args)
     json = canonizer.getjson(args)
     particles = canonizer.getParticles( args ) 
-    # print("PARTICULES ", type(list(particles)[0]))
-    #We choose to select highest by default
+    # We choose to select highest by default
     if type_writting == None :
         type_writting = 'highest'
         
@@ -694,13 +688,17 @@ def main(args):
                     sys.exit()
 
     logger.debug('verbosity is '+ verbosity)
+    ssqrtses = ",".join(map(str,sqrtses))
     
-    logger.info("The calculation will be done using : " +str(sqrtses)+ ' TeV as center of mass energy')
-    logger.debug("The calculation will be done using : " +str(sqrtses)+ ' TeV as center of mass energy')
+    logger.info(f"the calculation will be performed using {ssqrtses} TeV as center of mass energy")
+    # logger.debug("The calculation will be performed using : " +str(sqrtses)+ ' TeV as center of mass energy')
     orders_dic = {0:'LO', 1:'NLO', 2:'NLL+NLO'}
 
-    logger.info("The max order considered for the calculation is  " + orders_dic[order])
-    logger.info("we are currently running on " + str(ncpus)+ ' cpu')
+    logger.info("the highest pertubation order considered is " + orders_dic[order])
+    scpu = "cpus"
+    if ncpus == 1:
+        scpu = "cpu"
+    logger.info(f"we are currently running on {ncpus} {scpu}" )
     logger.debug(f"In this calculation, we'll write out the cross section at "+ str(type_writting) +" order of perturbation theory below "+ orders_dic[order])
     
     for sqrt in sqrtses:
@@ -711,10 +709,6 @@ def main(args):
     
     # test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus, type = type_writting)
     # test.routine_resummino()
-    
-
  
     # test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus, type = type_writting)
     # test.routine_resummino()
-    
-

@@ -59,12 +59,12 @@ def main():
             help="SLHA file to compute cross sections for. "
             "If a directory is given, compute cross sections for all files in directory." )
 
-    xsecresummino = subparsers.add_parser('xsecresummino', description="Compute gaugino and slepton cross sections for a given SLHA file.")
+    xsecresummino = subparsers.add_parser('xsecresummino', description="Compute gaugino and slepton cross sections via resummino for a given SLHA file.")
     xsecresummino.add_argument('-s', '--sqrts', nargs='+', action='append',
-        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). Default is both 8 and 13.",
+        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). [8,13].",
         type=float, default=[])
     xsecresummino.add_argument('-part', '--particles', nargs='+', action='append',
-        help="daughter particles to consider in the cross section calculation, if no particles are given, Resumminos uses the channels info from the resummino.py configuration file [1000023,1000024,1000025,1000035,1000037].",
+        help="daughter particles to consider in the cross section calculation, if no particles are given, resummino uses the channels info from the resummino.py configuration file [1000023,1000024,1000025,1000035,1000037].",
         type=int, default=[])
     xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
         help="verbosity (debug, info, warning, error)")
