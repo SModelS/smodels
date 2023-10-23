@@ -59,18 +59,17 @@ def main():
             help="SLHA file to compute cross sections for. "
             "If a directory is given, compute cross sections for all files in directory." )
 
-    
-    xsecresummino = subparsers.add_parser('xsecresummino', description="Compute gaugino and slepton cross sections for a gven SLHA file.")
+    xsecresummino = subparsers.add_parser('xsecresummino', description="Compute gaugino and slepton cross sections for a given SLHA file.")
     xsecresummino.add_argument('-s', '--sqrts', nargs='+', action='append',
         help="sqrt(s) TeV. Can supply more than one value (as a space separated list). Default is both 8 and 13.",
         type=float, default=[])
     xsecresummino.add_argument('-part', '--particles', nargs='+', action='append',
-        help="Daughter particles to consider in the cross section calculation, if no particles are given, Resummino use the resummino.py file in etc/ folder.",
+        help="daughter particles to consider in the cross section calculation, if no particles are given, Resumminos uses the channels info from the resummino.py configuration file [1000023,1000024,1000025,1000035,1000037].",
         type=int, default=[])
     xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
         help="verbosity (debug, info, warning, error)")
     xsecresummino.add_argument('-C', '--conf', type=str, default='default',
-        help="path to resummino.py configuration file")
+        help="path to resummino.py configuration file [smodels/etc/resummino.py]")
     xsecresummino.add_argument('-c', '--ncpus', type=int, default=-1,
         help="number of cores to be used simultaneously. -1 means 'all'. ")
     xsecresummino.add_argument('-p', '--tofile', action='store_true',
@@ -89,7 +88,6 @@ def main():
     xsecresummino.add_argument('-f', '--filename', required=True,
             help="SLHA file to compute cross sections for."
             "If a directory is given, compute cross sections for all files in directory." )
-    
     
     slhachecker = subparsers.add_parser('slhachecker', description="Perform several checks on a SLHA file.")
     slhachecker.add_argument('-xS', '--xsec', help='turn off the check for xsection blocks', action='store_false')

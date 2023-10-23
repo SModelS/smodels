@@ -219,15 +219,17 @@ class ArgsStandardizer:
 
     def getSqrtses ( self, args ):
         """ extract the sqrtses from argument list """
+        if args.sqrts is None or len(args.sqrts) == 0:
+            return {8,13}
         sqrtses = [item for sublist in args.sqrts for item in sublist]
-        if len(sqrtses) == 0:
-            sqrtses = [8,13]
         sqrtses.sort()
         sqrtses = set(sqrtses)
         return sqrtses
 
     def getParticles ( self, args ):
         """ extract the particles from argument list, default to None, then channels are chosen by the json file """
+        if not hasattr ( args, "particles" ) or len(args.particles) == 0:
+            return {1000023,1000024,1000025,1000035,1000037}
         particles = [int(item) for sublist in args.particles for item in sublist]
         if len(particles) == 0:
             particles= None

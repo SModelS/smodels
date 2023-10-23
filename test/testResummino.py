@@ -47,8 +47,9 @@ class XSecTest(unittest.TestCase):
         #Set overall options:
         #Options for cross section calculation:
         xargs = argparse.Namespace()
-        xargs.sqrts = [[8.,13.]]
-        xargs.ncpus = 1
+        xargs.sqrts = [[8,13]]
+        from smodels.tools.runtime import nCPUs
+        xargs.ncpus = nCPUs()-1
         xargs.noautocompile = True
         #Compute LO xsecs:
         xargs.query = False
@@ -59,9 +60,11 @@ class XSecTest(unittest.TestCase):
         xargs.keep = False
         xargs.tofile = True
         xargs.alltofile = False
-        xargs.pythia6 = True
+        xargs.pythia6 = False
         xargs.filename = tmpfile
         xargs.colors = False
+        xargs.colors = False
+        xargs.particles = [ [ 1000023, 1000024, 1000025 ] ]
         xargs.ssmultipliers = None
         xargs.verbosity = "warning"
         #Compute LO cross sections
@@ -70,7 +73,6 @@ class XSecTest(unittest.TestCase):
         xsecResummino.main(xargs)
         #Read xsecs:
         xsecsInfile = crossSection.getXsecFromSLHAFile(tmpfile)
-        os.remove(tmpfile)
         
         #Check 8 TeV xsecs:
         lo = xsecsInfile.getXsecsFor('8 TeV (LO)')[0].value.asNumber(fb)
@@ -82,9 +84,13 @@ class XSecTest(unittest.TestCase):
         lo = xsecsInfile.getXsecsFor('13 TeV (LO)')[0].value.asNumber(fb)
         nlo = xsecsInfile.getXsecsFor('13 TeV (NLO)')[0].value.asNumber(fb)
         print('13 TeV is', lo, nlo)
-        self.assertAlmostEqual(lo / 0.3186, 1., 1 )
-        self.assertAlmostEqual(nlo / 0.3691, 1., 1 )
-
+        try:
+            self.assertAlmostEqual(lo / 0.3186, 1., 1 )
+            self.assertAlmostEqual(nlo / 0.3691, 1., 1 )
+        except Exception as e:
+            logger.error ( f"check {tmpfile}" )
+            raise e
+        os.remove(tmpfile)
 
 if __name__ == "__main__":
     unittest.main()
