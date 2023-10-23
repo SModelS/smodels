@@ -59,7 +59,10 @@ class XSecResummino(XSecBase):
                 self.json_resummino = json
             else:
                 self.json_resummino = os.path.join(self.pwd, json)
-        self.particles = list(particles)
+        if particles != None :
+            self.particles = list(particles)
+        else:
+            self.particles = None
         self.slha_folder_name = slha_folder_name
         self.maxOrder = maxOrder
         self.countNoXSecs = 0
@@ -644,11 +647,31 @@ class XSecResummino(XSecBase):
         """
         # We create the list
         tasks = self.create_routine_files(self.maxOrder, self.slha_folder_name)
-        # We launch the program with maximum performance, change if necessary
-        with ProcessPoolExecutor(max_workers=self.ncpu) as executor:
-            futures = [executor.submit(self.calculate_one_slha, *task) for task in tasks]
-            for future in futures:
-                future.result()
+        
+        if not os.path.exists(os.path.join(self.pwd, 'smodels', 'lib', 'resummino', 'lhapdf', 'bin', 'lhapdf')):
+            logger.error("Warning, lhapdf is not installed, please make resummino, or use ./install.sh in the smodels/lib/resummino folder.")
+            return
+            
+        if not os.path.exists(os.path.join(self.pwd, 'smodels', 'lib', 'resummino', 'resummino_install', 'bin', 'resummino')):
+            logger.error("Warning, resummino is not installed, please make resummino, or use ./install.Sh in the smodels/lib/resummino folder.")
+            return
+        try:
+            if len(tasks)==0:
+                logger.error("Warning, check your inputfile (.slha), no calculation are available.")
+                return
+        except TypeError:
+            logger.error("Warning, check your inputfile (.slha), no calculation are available.")
+            return
+        
+        if self.ncpu == 1:
+            for task in tasks:
+                self.calculate_one_slha(task)
+        else:   
+            # We launch the program with maximum performance, change if necessary
+            with ProcessPoolExecutor(max_workers=self.ncpu) as executor:
+                futures = [executor.submit(self.calculate_one_slha, *task) for task in tasks]
+                for future in futures:
+                    future.result()
 
         shutil.rmtree(self.resummino_in)
         shutil.rmtree(self.resummino_out)

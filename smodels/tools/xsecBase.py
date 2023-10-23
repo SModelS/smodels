@@ -229,10 +229,11 @@ class ArgsStandardizer:
     def getParticles ( self, args ):
         """ extract the particles from argument list, default to None, then channels are chosen by the json file """
         if not hasattr ( args, "particles" ) or len(args.particles) == 0:
-            return {1000023,1000024,1000025,1000035,1000037}
+            return None
         particles = [int(item) for sublist in args.particles for item in sublist]
         if len(particles) == 0:
             particles= None
+            return particles
         particles.sort()
         particles = set(particles)
         return particles

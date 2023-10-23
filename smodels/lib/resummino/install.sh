@@ -2,6 +2,9 @@
 
 
 install_dir=$PWD
+LHAPDF_VERSION="6.5.4"
+RESUMMINO_VERSION="3.1.2"
+
 
 mkdir -p $install_dir
 
@@ -21,7 +24,7 @@ num_cores_to_use=$(get_cpu_cores)
 
 
 
-wget https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.3.0.tar.gz -O LHAPDF-6.3.0.tar.gz
+wget https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz -O "LHAPDF-$LHAPDF_VERSION.tar.gz
 tar xf LHAPDF-6.3.0.tar.gz
 cd LHAPDF-6.3.0
 ./configure --prefix=$install_dir/lhapdf --disable-python
@@ -33,13 +36,13 @@ cd ..
 wget http://lhapdfsets.web.cern.ch/lhapdfsets/current/PDF4LHC21_40.tar.gz -O- | tar xz -C $install_dir/lhapdf/share/LHAPDF
 cd $install_dir
 
-wget https://resummino.hepforge.org/downloads/?f=resummino-3.1.2.zip -O resummino-3.1.2.zip
+wget https://resummino.hepforge.org/downloads/?f=resummino-$RESUMMINO_VERSION.zip -O resummino-$RESUMMINO_VERSION.zip
 
 
-unzip resummino-3.1.2.zip
+unzip resummino-$RESUMMINO_VERSION.zip
 mkdir -p resummino_install
 
-cd resummino-3.1.2
+cd resummino-$RESUMMINO_VERSION
 cmake . -DLHAPDF=$install_dir/lhapdf -DCMAKE_INSTALL_PREFIX=$install_dir/resummino_install
 make -j"$num_cores_to_use"
 make install
