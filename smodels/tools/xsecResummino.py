@@ -102,8 +102,15 @@ class XSecResummino(XSecBase):
         
         for particle_pair in particles:
             self.launch_resummino(input_file, slha_file, output_file, particle_pair[0], particle_pair[1], num_try, order, Xsections, log)
-            
-        nxsecs = self.addXSecToFile(Xsections, slha_file, comment = "[pb], Resumminov3.1.2")
+        
+        version_path = os.path.join(self.pwd, 'smodels', 'lib', 'resummino', 'versions.txt')
+        if os.path.exists(version_path):
+            with open(version_path, "r") as f:
+                lines = f.readlines()
+            resummino_version = f"Resumminov{lines[1].split(sep ="=")[1].strip()}"
+        else:
+            resummino_version = "Resumminov3.1.2"    
+        nxsecs = self.addXSecToFile(Xsections, slha_file, comment = f"[pb], {resummino_version}")
         
            
     def launch_command(self,resummino_bin,input_file, output_file, order):

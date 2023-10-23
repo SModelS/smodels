@@ -24,9 +24,9 @@ num_cores_to_use=$(get_cpu_cores)
 
 
 
-wget https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz -O "LHAPDF-$LHAPDF_VERSION.tar.gz
-tar xf LHAPDF-6.3.0.tar.gz
-cd LHAPDF-6.3.0
+wget https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz -O "LHAPDF-$LHAPDF_VERSION.tar.gz"
+tar xf LHAPDF-$LHAPDF_VERSION.tar.gz
+cd LHAPDF-$LHAPDF_VERSION
 ./configure --prefix=$install_dir/lhapdf --disable-python
 make -j"$num_cores_to_use"
 make install
@@ -47,3 +47,6 @@ cmake . -DLHAPDF=$install_dir/lhapdf -DCMAKE_INSTALL_PREFIX=$install_dir/resummi
 make -j"$num_cores_to_use"
 make install
 cd ..
+
+echo "LHAPDF_version = $LHAPDF_VERSION" > versions.txt
+echo "Resummino-version = $RESUMMINO_VERSION" > versions.txt
