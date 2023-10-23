@@ -82,6 +82,7 @@ class Database(object):
                      optionally specifying signal regions, e.g. { "anaid1:SR1":
                      ( "anaid2:SR2", "anaid3" ) }
         """
+        import shutil
         self.subs = []
         if "_fastlim" in base: ## for backwards compatibility
             base = base.replace("_fastlim","+fastlim")
