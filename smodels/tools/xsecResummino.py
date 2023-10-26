@@ -107,7 +107,8 @@ class XSecResummino(XSecBase):
         if os.path.exists(version_path):
             with open(version_path, "r") as f:
                 lines = f.readlines()
-            resummino_version = f"Resumminov{lines[1].split(sep ="=")[1].strip()}"
+            version = lines[1].split(sep ="=")[1].strip()
+            resummino_version = f"Resumminov{version}"
         else:
             resummino_version = "Resumminov3.1.2"    
         nxsecs = self.addXSecToFile(Xsections, slha_file, comment = f"[pb], {resummino_version}")
