@@ -83,8 +83,8 @@ def main():
     xsecresummino.add_argument('-n', '--NLO', action='store_true',
         help="compute at the NLO level (default is LO)")
     xsecresummino.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
-    xsecresummino.add_argument('-S', '--ssmultipliers', type=str, default=None,
-        help="signal strength multipliers, provided as dictionary of pids")
+    # xsecresummino.add_argument('-S', '--ssmultipliers', type=str, default=None,
+    #     help="signal strength multipliers, provided as dictionary of pids")
     xsecresummino.add_argument('-f', '--filename', required=True,
             help="SLHA file to compute cross sections for."
             "If a directory is given, compute cross sections for all files in directory." )
