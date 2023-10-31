@@ -103,10 +103,13 @@ usage example is: ::
 
    smodelsTools.py xsecresummino -s 13 -p -f inputFiles/slha/resummino_example.slha -part 1000035 1000037 -1000037
 
-which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes with daugther particles (in the pp collision) indicated by the user. If no particles are specified, the channels in the resummino.py file will be used. As with the xseccomputer tool, SModelS will then write ouzt only the highest order cross sections available for each process.
+which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes with daugther particles (in the pp collision) indicated by the user. 
 
-Concerning the resummino.py file, the default file is present in the smodels/etc folder. This file needs to list all the mother particles to consider in the "channels" dictionary.
-Other information can be passed throught this file if we want to consider only the relevant process (equal to or above the "mode_limit" value), or every process present in the file, even if the cross sections are very low.
+Two operating mode are available for xsecresummino. You can choose (with the --part argument), like in the example, all the particles you want and resummino will generate the corresponding channels (for the example above, we get : [(1000035, 1000037), (1000037, -1000037), (1000035, -1000037)]) automatically.
+The second mode of operation is by using the resummino.py file in the smodels/etc folder (you can use your own file with the -C or --conf argument). In this file, you can choose directly the channels you want to consider in the "channels" dictionary.
+You can also use this file to choose the xsec_limit value you want. This parameters tell resummino to consider only relevant process (equal to or above the value of xsec_limit) at NLO or NLL-NLO.
+
+If no particles are specified, the channels in the resummino.py file will be used. As with the xseccomputer tool, SModelS will then write out only the highest order cross sections available for each process.
 
 * **The resummino cross section calculation is implemented by the** `XSecResummino class <tools.html#tools.xsecResummino.XSecResummino>`_
 
