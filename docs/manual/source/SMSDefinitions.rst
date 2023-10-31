@@ -3,8 +3,8 @@
 .. |particle| replace:: :ref:`particle <particleClass>`
 .. |particles| replace:: :ref:`particles <particleClass>`
 .. |SMS| replace:: :ref:`SMS <SMS>`
-.. |SMS topologies| replace:: :ref:`SMS topologies <SMS>`
 .. |SMS topology| replace:: :ref:`SMS topology <SMS>`
+.. |SMS topologies| replace:: :ref:`SMS topologies <SMS>`
 .. |parameters| replace:: :ref:`parameters file <parameterFile>`
 
 
@@ -15,16 +15,16 @@ Simplified Model Definitions
 
 The so-called `base module <base.html#base>`_ contains the basic tools necessary for creating and describing simplified model topologies (|SMS|).
 Below we describe the basic concepts and language used in SModelS
-to describe |SMS topologies|.
+to describe |SMS|.
 
 .. _SMS:
 
 
-Simplified Model Topology (SMS)
+Simplified Model Spectrum (SMS)
 -------------------------------
 
-A simplified model topology representing the production and decay of BSM states is called a SMS in the SModelS language.
-The SMS are represented by a graph structure containing nodes and edges as shown below:
+The specific sequence of production and decays of BSM states is called an SMS (or SMS topology) in the SModelS language.
+A graph representation of an SMS is shown in :numref:`Fig. %s <smsExample>`:
 
 
 .. _smsExample:
@@ -33,7 +33,7 @@ The SMS are represented by a graph structure containing nodes and edges as shown
    :width: 20%
    :align: center
    
-   Example of a graph representation of a Simplified Model topology.
+   Graph representation of an SMS.
 
 Each node (circle) represents a particle and the edges (connecting arrows) represents the particle decays. The first node ('PV') represents the primary vertex and its "daughters" are the BSM states produced in the hard scattering process. Note that the decays of SM states are not specified within the SMS, since these are assumed to be given by the SM values.
 
@@ -41,7 +41,7 @@ Each node (circle) represents a particle and the edges (connecting arrows) repre
 
 A SMS may also hold information about its corresponding
 weight (cross section times branching ratio times efficiency).\ [#f1]_
-The overall properties of a SMS are illustrated in the :numref:`Fig. %s <smsScheme>`:
+The overall properties of an SMS are illustrated in :numref:`Fig. %s <smsScheme>`:
 
 .. _smsScheme:
 
@@ -49,7 +49,7 @@ The overall properties of a SMS are illustrated in the :numref:`Fig. %s <smsSche
    :width: 40%
    :align: center
    
-   Illustration of the basic elements of a SMS graph: root node, SM and BSM nodes, edges and node indices.
+   Illustration of the basic elements of an SMS graph: root node, SM and BSM nodes, edges and node indices.
 
 
 SModelS works under the inherent assumption that, for collider purposes,
@@ -86,7 +86,7 @@ This is useful when defining simplified models used for describing experimental 
 
  - 'anyBSM': which can represent any BSM state (only has isSM=False defined)
  - 'anyBSM': which can represent any SM state (only has isSM=True defined)
- - 'MET': which can represent any neutral BSM state (has isSM=False, eletric charge = 0 and is a color singlet)
+ - 'MET': which can represent any neutral BSM state (has isSM=False, electric charge = 0 and is a color singlet)
 
 
 In addition, *inclusive* particles can also be created, which holds 

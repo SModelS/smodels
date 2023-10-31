@@ -33,7 +33,7 @@ class ExpSMS(GenericSMS):
     def from_string(cls, stringSMS, model=None, finalState=None,
                      intermediateState=None):
         """
-        Converts a string describing an SMS to a SMS object. It accepts
+        Converts a string describing an SMS to an SMS object. It accepts
         the (old) bracket notation or the process notation. For the old notation the
         optional arguments finalState and intermediateState can also be defined.
         If the argument model is defined, the particle labels will be converted to

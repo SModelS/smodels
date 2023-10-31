@@ -42,7 +42,7 @@ according to the decay information for each mother particle. This procedure is r
 
    First step of decomposition. The BSM particles produced in the hard scattering (primary vertex) and their decays are used as the initial step for constructing the |SMS topologies|.
 
-After the first step shown in :numref:`Fig. %s <decomp1>`, the *unstable* BSM particles appearing at the end of the cascade decays are defined as the "new mothers" and new |SMS topologies| are generated using their decays, as illustrated in :numref:`Fig. %s <decomp2>`. 
+If the final states appearing at the end of the decays are stable, the decomposition stops and the graphs shown in :numref:`Fig. %s <decomp1>` represent the final  |SMS| topologies. On the other hand, if the BSM particles appearing at the end of the cascade decays are *unstable*, they are defined as the "new mothers" and new |SMSs| are generated using their decays, as illustrated in :numref:`Fig. %s <decomp2>`. 
 
 
 .. _decomp2:

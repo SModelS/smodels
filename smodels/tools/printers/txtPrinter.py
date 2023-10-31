@@ -143,9 +143,9 @@ class TxTPrinter(BasicPrinter):
 
     def _formatSMS(self, obj):
         """
-        Format data for a SMS object.
+        Format data for an SMS object.
 
-        :param obj: A SMS object to be printed.
+        :param obj: SMS object to be printed.
         """
 
         output = ""
