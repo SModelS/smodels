@@ -32,7 +32,7 @@ from itertools import combinations
 
 class XSecResummino(XSecBase):
     """ cross section computer class (for resummino), what else? """
-    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type = 'all', verbosity = '', json = None, particles = None):
+    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type = 'all', verbosity = '', json = None, particles = None, xsec_limit = None):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
                     if maxOrder == LO, compute only LO resummino xsecs
@@ -76,11 +76,17 @@ class XSecResummino(XSecBase):
         
         
         logger.debug('installation directory is '+self.pwd)
-            
-        with open(self.json_resummino, "r") as f:
-            data = eval(f.read())
-                             
-        self.xsec_limit = data["xsec_limit"]
+
+        if xsec_limit == None:
+            try:    
+                with open(self.json_resummino, "r") as f:
+                    data = eval(f.read())
+                                    
+                self.xsec_limit = data["xsec_limit"]
+            except KeyError:
+                self.xsec_limit = 0.00001
+        else:
+            self.xsec_limit = xsec_limit
         
     def calculate_one_slha(self, particles,input_file, slha_file, output_file, 
             num_try, order, log):
@@ -699,7 +705,8 @@ def main ( args : argparse.Namespace ):
     ncpus = canonizer.checkNCPUs ( args.ncpus, inputFiles )
     type_writting = canonizer.writeToFile(args)
     json = canonizer.getjson(args)
-    particles = canonizer.getParticles( args ) 
+    particles = canonizer.getParticles( args )
+    xsec_limit = canonizer.checkXsec_limit(args)
     # We choose to select highest by default
     if type_writting == None :
         type_writting = 'highest'
@@ -734,7 +741,7 @@ def main ( args : argparse.Namespace ):
     
     for sqrt in sqrtses:
         logger.debug('Current energy considered is '+ str(sqrt)+ ' TeV')
-        test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting, verbosity = verbosity, json = json, particles=particles)
+        test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting, verbosity = verbosity, json = json, particles=particles, xsec_limit = xsec_limit)
         test.launch_routine_resummino()
     return
     

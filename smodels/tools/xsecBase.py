@@ -251,6 +251,16 @@ class ArgsStandardizer:
             logger.info ( "We run on %d cpus" % ncpus )
         return ncpus
 
+    def checkXsec_limit (self,args ):
+        if args.xsec == None:
+            return None
+        if args.xsec < 0:
+            logger.error("Xsec_limit cannot be negative. Set to 0 if you want no limitation.")
+            sys.exit()
+        if args.xsec > 1000:
+            logger.warn("Are you sure to use a limit that high ? you might get errors.")
+        return args.xsec
+
     def getPythiaVersion ( self, args ):
         pythiaVersion = 8
 
