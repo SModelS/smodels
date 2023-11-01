@@ -1,24 +1,22 @@
 {
-    # channels: values (as python lists) are the pdg codes of the mother
-    # particles to consider for productions
+    # channels: values (as python lists) are the pdg codes of the particles X,Y 
+    # to be produced in the 2->2 processes p,p -> X,Y
     # names of keys are used for debugging only
-    #Defaut channels here are for one of the Bino-like scenarios, with M_1 < M_2, mu
-    "channels" : {"1" : [1000023,1000024],"2" : [1000023, -1000024], "3" : [1000024,-1000024]
+    "channels" : {"1" : [1000023,1000024], "2" : [1000023, -1000024], 
+                  "3" : [1000024,-1000024]
     },
-    # ------------------------------------ MODE PARAMETERS IS NOT USED IN THE CURRENT RESUMMINO-INTERFACE VERSION
-    # mode: If you want to calculate all the channels you choose at every order,
-    # use 'all', if you want to check at LO before calculating NLO, use 'check'
-    # instead. 
-    ### For now, we choose to check by default, if you want to calculate all, put xsec_limit to 0.
+    # ------ MODE PARAMETER IS NOT USED IN THE CURRENT RESUMMINO INTERFACE VERSION ------ 
+    # mode: if you want to calculate all channels at all orders, use 'all', 
+    # if you want to check the cross section at LO before calculating NLO, use 'check'.
+    ### Currently not used; if you want to always calculate the higher orders, put xsec_limit to 0.
     #"mode" : "check", 
     # -------------------------------------
-    # The limit for the NLO calculation is determined by the 'xsec_limit' variable, 
-    # below this value (in pb), no NLO cross-section are
+    # The limit for the NLO calculation is determined by the 'xsec_limit' variable.
+    # If the LO cross secion is below this value (in pb), no NLO (or NLO+NLL) cross-sections are
     # calculated.
     "xsec_limit" : 0.00001,
-    # pdfs (case-sensitive): use this to change the parton distribution
-    # function used for the cross-section calculation.
-    # PDFLHC2021 is default, but any pdf can be used. Be sure to check
+    # pdfs (case-sensitive): our default is cteq66, which gives results close 
+    # to the PDFLHC2021_40 set. Any pdf can be used, but be sure to check
     # the name on the lhapdf website before putting any value here.
     "pdfs" : {
         "pdf_lo" : "cteq66",
