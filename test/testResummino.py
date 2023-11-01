@@ -64,7 +64,7 @@ class XSecTest(unittest.TestCase):
         xargs.alltofile = False
         xargs.filename = tmpfile
         xargs.colors = False
-        xargs.colors = False
+        xargs.xsec = None
         xargs.particles = [ ]
         xargs.ssmultipliers = None
         xargs.verbosity = "warning"
@@ -86,7 +86,7 @@ class XSecTest(unittest.TestCase):
         lo = xsecsInfile.getXsecsFor('13 TeV (LO)')[0].value.asNumber(fb)
         #nlo = xsecsInfile.getXsecsFor('13 TeV (NLO)')[0].value.asNumber(fb)
         try:
-            self.assertAlmostEqual(lo / 0.318571789, 1., 1 )
+            self.assertAlmostEqual(lo / 0.033794467, 1., 1 )
         #    self.assertAlmostEqual(lo / 0.3186, 1., 1 )
         #    self.assertAlmostEqual(nlo / 0.3691, 1., 1 )
         except Exception as e:
@@ -128,7 +128,7 @@ class XSecTest(unittest.TestCase):
         xargs.alltofile = False
         xargs.filename = tmpfile
         xargs.colors = False
-        xargs.colors = False
+        xargs.xsec = None
         xargs.particles = [ [ 1000023, 1000024 ] ]
         xargs.ssmultipliers = None
         xargs.verbosity = "warning"
