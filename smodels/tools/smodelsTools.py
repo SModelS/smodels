@@ -66,7 +66,7 @@ def main():
     xsecresummino.add_argument('-part', '--particles', nargs='+', action='append',
         help="daughter particles to consider in the cross section calculation, if no particles are given, resummino uses the channels info from the resummino.py configuration file [1000023,1000024,1000025,1000035,1000037].",
         type=int, default=[])
-    xsecresummino.add_argument('-x', '--xsec', type=float, default=None,
+    xsecresummino.add_argument('-x', '--xsec_limit', type=float, default=None,
         help="Cross section limit. Below this cross section, calculation will stop at LO order automatically. Default is 0.00001, and setup in the etc/resummino.py file")
     xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
         help="verbosity (debug, info, warning, error)")
