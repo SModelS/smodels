@@ -1,0 +1,2 @@
+LHAPDF_version = 6.5.4
+resummino_version = 3.1.2
