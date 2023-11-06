@@ -65,6 +65,7 @@ class XSecTest(unittest.TestCase):
         xargs.filename = tmpfile
         xargs.colors = False
         xargs.xsec = None
+        xargs.xsec_limit = None
         xargs.particles = [ ]
         xargs.ssmultipliers = None
         xargs.verbosity = "warning"
@@ -129,6 +130,7 @@ class XSecTest(unittest.TestCase):
         xargs.filename = tmpfile
         xargs.colors = False
         xargs.xsec = None
+        xargs.xsec_limit = None
         xargs.particles = [ [ 1000023, 1000024 ] ]
         xargs.ssmultipliers = None
         xargs.verbosity = "warning"
