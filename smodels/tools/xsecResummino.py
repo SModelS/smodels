@@ -627,7 +627,10 @@ class XSecResummino(XSecBase):
             list: list of the daugther particle to consider in the calculation
             of the cross section
         """
-        
+        if 1000024 in self.particles:
+            self.particles.append(-1000024)
+        if 1000037 in self.particles:
+            self.particles.append(-1000037)
         channels = list(combinations(self.particles, 2))
         
         mode = 'check'
