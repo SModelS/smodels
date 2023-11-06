@@ -58,7 +58,7 @@ Installation Methods
    running **make externaltools**. In case the Fortran comiler isn't found, 
    try *make FCC=<path-to-gfortran> smodels* or *make FCC=<path-to-gfortran> externaltools*. 
 
- * Every external tool also be compiled separately, run e.g.::
+ * Every external tool can also be compiled individually, run e.g.::
 
      make pythia6 pythia8 nllfast resummino
 
