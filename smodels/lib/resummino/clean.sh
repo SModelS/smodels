@@ -4,4 +4,8 @@
 install_dir=$PWD
 cd $install_dir
 
-ls | grep -v '\.sh$' | grep -v Makefile | xargs rm -r
+LINES=$(ls | grep -v '\.sh$' | grep -v Makefile)
+echo "lines x${LINES}x"
+[ -z "$LINES" ] || {
+    echo $LINES | xargs rm -r;
+}
