@@ -64,16 +64,16 @@ def main():
         help="sqrt(s) TeV. Can supply more than one value (as a space separated list). [8 13].",
         type=float, default=[])
     xsecresummino.add_argument('-part', '--particles', nargs='+', action='append',
-        help="daughter particles to consider in the cross section calculation, if no particles are given, resummino uses the channels info from the resummino.py configuration file. Typical values: 1000023 1000024 1000025 1000035 1000037.",
+        help="list of daughter particles (in form of PDG codes) to compute cross sections for. All valid combinations from the list will be considered. If no list of particles is given, the channels info from the \code{resummino.py} configuration file is used instead. Typical values: 1000023 1000024 1000025 1000035 1000037.",
         type=int, default=[])
     xsecresummino.add_argument('-x', '--xsec_limit', type=float, default=None,
-        help="Cross section limit, in pb. Below this value, calculation will stop at LO order automatically. Default is defined in etc/resummino.py to be 0.00001.")
+        help="Cross section limit, in pb. If the LO cross section is below this value, no higher orders will be calculated. Its default is defined in etc/resummino.py to be 0.00001 pb.")
     xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
         help="verbosity (debug, info, warning, error)")
     xsecresummino.add_argument('-C', '--conf', type=str, default='default',
         help="path to resummino.py configuration file [smodels/etc/resummino.py]")
     xsecresummino.add_argument('-c', '--ncpus', type=int, default=-1,
-        help="number of cores to be used simultaneously. -1 means 'all'. ")
+        help="number of cores to be used simultaneously. -1 means 'all'. Used only when cross sections are computed for multiple SLHA files.")
     xsecresummino.add_argument('-p', '--tofile', action='store_true',
         help="write cross sections to file (only highest order)")
     xsecresummino.add_argument('-P', '--alltofile', action='store_true',
