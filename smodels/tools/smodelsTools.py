@@ -25,9 +25,9 @@ def main():
     subparsers.add_parser('fixpermissions', description="Fix file permissions for xseccomputer.")
     xseccomputer = subparsers.add_parser('xseccomputer', description="Compute MSSM cross sections for a SLHA file.")
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
-        help="LHC center-of-mass energy in TeV for computing the
-        cross sections. Can be more than one value, e.g., -s 8 13 for both
-        8 TeV and 13 TeV cross sections. [8 13].",
+        help="LHC center-of-mass energy in TeV for computing the "
+        "cross sections. Can be more than one value, e.g., -s 8 13 for both "
+        "8 TeV and 13 TeV cross sections. [8 13].",
         type=float, default=[])
     xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
         help="number of events to be simulated [10000].")
