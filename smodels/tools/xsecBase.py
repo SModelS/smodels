@@ -220,7 +220,7 @@ class ArgsStandardizer:
     def getSqrtses ( self, args ):
         """ extract the sqrtses from argument list """
         if args.sqrts is None or len(args.sqrts) == 0:
-            return {8,13}
+            return {13}
         sqrtses = [item for sublist in args.sqrts for item in sublist]
         sqrtses.sort()
         sqrtses = set(sqrtses)

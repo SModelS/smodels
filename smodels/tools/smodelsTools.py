@@ -66,7 +66,7 @@ def main():
             help="SLHA file to compute cross sections for. "
             "If a directory is given, compute cross sections for all files in the directory." )
     xsecresummino.add_argument('-s', '--sqrts', nargs='+', action='append',
-        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). [8 13].",
+        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). [13].",
         type=float, default=[])
     xsecresummino.add_argument('-part', '--particles', nargs='+', action='append',
         help="list of daughter particles (in form of PDG codes) to compute cross sections for. All valid combinations from the list will be considered. If no list of particles is given, the channels info from the resummino.py configuration file is used instead. Typical values: 1000023 1000024 1000025 1000035 1000037.",
