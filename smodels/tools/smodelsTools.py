@@ -27,7 +27,7 @@ def main():
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
         help="LHC center-of-mass energy in TeV for computing the "
         "cross sections. Can be more than one value, e.g., -s 8 13 for both "
-        "8 TeV and 13 TeV cross sections. [8 13].",
+        "8 TeV and 13 TeV cross sections. [13].",
         type=float, default=[])
     xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
         help="number of events to be simulated [10000].")
@@ -62,36 +62,36 @@ def main():
             "If a directory is given, compute cross sections for all files in directory." )
 
     xsecresummino = subparsers.add_parser('xsecresummino', description="Compute gaugino and slepton cross sections via resummino for a given SLHA file.")
+    xsecresummino.add_argument('-f', '--filename', required=True,
+            help="SLHA file to compute cross sections for. "
+            "If a directory is given, compute cross sections for all files in the directory." )
     xsecresummino.add_argument('-s', '--sqrts', nargs='+', action='append',
         help="sqrt(s) TeV. Can supply more than one value (as a space separated list). [8 13].",
         type=float, default=[])
     xsecresummino.add_argument('-part', '--particles', nargs='+', action='append',
         help="list of daughter particles (in form of PDG codes) to compute cross sections for. All valid combinations from the list will be considered. If no list of particles is given, the channels info from the resummino.py configuration file is used instead. Typical values: 1000023 1000024 1000025 1000035 1000037.",
         type=int, default=[])
-    xsecresummino.add_argument('-x', '--xsec_limit', type=float, default=None,
-        help="Cross section limit, in pb. If the LO cross section is below this value, no higher orders will be calculated. Its default is defined in etc/resummino.py to be 0.00001 pb.")
     xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
         help="verbosity (debug, info, warning, error)")
-    xsecresummino.add_argument('-C', '--conf', type=str, default='default',
-        help="path to resummino.py configuration file [smodels/etc/resummino.py]")
     xsecresummino.add_argument('-c', '--ncpus', type=int, default=-1,
         help="number of cores to be used simultaneously. -1 means 'all'. Used only when cross sections are computed for multiple SLHA files.")
+    xsecresummino.add_argument('-C', '--conf', type=str, default='default',
+        help="path to resummino.py configuration file [smodels/etc/resummino.py]")
+    xsecresummino.add_argument('-x', '--xsec_limit', type=float, default=None,
+        help="Cross section limit, in pb. If the LO cross section is below this value, no higher orders will be calculated. Its default is defined in etc/resummino.py to be 0.00001 pb.")
     xsecresummino.add_argument('-p', '--tofile', action='store_true',
         help="write cross sections to file (only highest order)")
     xsecresummino.add_argument('-P', '--alltofile', action='store_true',
         help="write all cross sections to file, including lower orders")
-    xsecresummino.add_argument( '--noautocompile', action='store_true',
-        help="turn off automatic compilation" )
-    xsecresummino.add_argument('-k', '--keep', action='store_true',
-        help="do not unlink temporary directory")
     xsecresummino.add_argument('-n', '--NLO', action='store_true',
         help="compute at the NLO level (default is LO)")
     xsecresummino.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
     # xsecresummino.add_argument('-S', '--ssmultipliers', type=str, default=None,
     #     help="signal strength multipliers, provided as dictionary of pids")
-    xsecresummino.add_argument('-f', '--filename', required=True,
-            help="SLHA file to compute cross sections for. "
-            "If a directory is given, compute cross sections for all files in the directory." )
+    xsecresummino.add_argument('-k', '--keep', action='store_true',
+        help="do not unlink temporary directory")
+    xsecresummino.add_argument( '--noautocompile', action='store_true',
+        help="turn off automatic compilation" )
     
     slhachecker = subparsers.add_parser('slhachecker', description="Perform several checks on a SLHA file.")
     slhachecker.add_argument('-xS', '--xsec', help='turn off the check for xsection blocks', action='store_false')
