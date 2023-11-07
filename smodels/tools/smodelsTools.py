@@ -25,7 +25,9 @@ def main():
     subparsers.add_parser('fixpermissions', description="Fix file permissions for xseccomputer.")
     xseccomputer = subparsers.add_parser('xseccomputer', description="Compute MSSM cross sections for a SLHA file.")
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
-        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). Default is both 8 and 13.",
+        help="LHC center-of-mass energy in TeV for computing the
+        cross sections. Can be more than one value, e.g., -s 8 13 for both
+        8 TeV and 13 TeV cross sections. [8 13].",
         type=float, default=[])
     xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
         help="number of events to be simulated [10000].")
@@ -64,7 +66,7 @@ def main():
         help="sqrt(s) TeV. Can supply more than one value (as a space separated list). [8 13].",
         type=float, default=[])
     xsecresummino.add_argument('-part', '--particles', nargs='+', action='append',
-        help="list of daughter particles (in form of PDG codes) to compute cross sections for. All valid combinations from the list will be considered. If no list of particles is given, the channels info from the \code{resummino.py} configuration file is used instead. Typical values: 1000023 1000024 1000025 1000035 1000037.",
+        help="list of daughter particles (in form of PDG codes) to compute cross sections for. All valid combinations from the list will be considered. If no list of particles is given, the channels info from the resummino.py configuration file is used instead. Typical values: 1000023 1000024 1000025 1000035 1000037.",
         type=int, default=[])
     xsecresummino.add_argument('-x', '--xsec_limit', type=float, default=None,
         help="Cross section limit, in pb. If the LO cross section is below this value, no higher orders will be calculated. Its default is defined in etc/resummino.py to be 0.00001 pb.")
@@ -89,7 +91,7 @@ def main():
     #     help="signal strength multipliers, provided as dictionary of pids")
     xsecresummino.add_argument('-f', '--filename', required=True,
             help="SLHA file to compute cross sections for. "
-            "If a directory is given, compute cross sections for all files in directory." )
+            "If a directory is given, compute cross sections for all files in the directory." )
     
     slhachecker = subparsers.add_parser('slhachecker', description="Perform several checks on a SLHA file.")
     slhachecker.add_argument('-xS', '--xsec', help='turn off the check for xsection blocks', action='store_false')
