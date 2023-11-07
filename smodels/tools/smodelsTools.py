@@ -69,10 +69,10 @@ def main():
         help="sqrt(s) TeV. Can supply more than one value (as a space separated list). [13]",
         type=float, default=[])
     xsecresummino.add_argument('-part', '--particles', nargs='+', action='append',
-        help="list of daughter particles (in form of PDG codes) to compute cross sections for. All valid combinations from the list will be considered. If no list of particles is given, the channels info from the resummino.py configuration file is used instead. Typical values: 1000023 1000024 1000025 1000035 1000037.",
+        help="list of daughter particles (given as PDG codes) to compute cross sections for. All valid combinations from the list will be considered. If no list of particles is given, the channels info from the resummino.py configuration file is used instead. Typical values: 1000023 1000024 1000025 1000035 1000037.",
         type=int, default=[])
     xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
-        help="verbosity (debug, info, warning, error)")
+        help="verbosity (debug, info, warning, error). [info]")
     xsecresummino.add_argument('-c', '--ncpus', type=int, default=-1,
         help="number of cores to be used simultaneously. -1 means 'all'. Used only when cross sections are computed for multiple SLHA files. [-1]")
     xsecresummino.add_argument('-C', '--conf', type=str, default='default',
