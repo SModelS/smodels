@@ -32,7 +32,7 @@ def main():
     xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
         help="number of events to be simulated [10000].")
     xseccomputer.add_argument('-v', '--verbosity', type=str, default="info",
-        help="Verbosity (debug, info, warning, error)")
+        help="Verbosity (debug, info, warning, error) [info]")
     xseccomputer.add_argument('-c', '--ncpus', type=int, default=-1,
         help="number of cores to be used simultaneously. -1 means 'all'. ")
     xseccomputer.add_argument('-p', '--tofile', action='store_true',
