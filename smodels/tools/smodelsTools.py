@@ -16,7 +16,7 @@ def main():
     parser = argparse.ArgumentParser(description="SModelS-tools command line tool.")
 
     parser.add_argument('-v','--verbose', help='verbosity level. '
-                        'accepted values are: debug, info, warning, error.',
+                        'accepted values are: debug, info, warning, error. [info]',
                                     default = "info", type = str )
 
     subparsers = parser.add_subparsers(dest='subparser_name')
@@ -27,14 +27,14 @@ def main():
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
         help="LHC center-of-mass energy in TeV for computing the "
         "cross sections. Can be more than one value, e.g., -s 8 13 for both "
-        "8 TeV and 13 TeV cross sections. [13].",
+        "8 TeV and 13 TeV cross sections. [13]",
         type=float, default=[])
     xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
         help="number of events to be simulated [10000].")
     xseccomputer.add_argument('-v', '--verbosity', type=str, default="info",
         help="Verbosity (debug, info, warning, error) [info]")
     xseccomputer.add_argument('-c', '--ncpus', type=int, default=-1,
-        help="number of cores to be used simultaneously. -1 means 'all'. ")
+        help="number of cores to be used simultaneously. -1 means 'all'. [-1]")
     xseccomputer.add_argument('-p', '--tofile', action='store_true',
         help="write cross sections to file (only highest order)")
     xseccomputer.add_argument('-P', '--alltofile', action='store_true',
@@ -66,7 +66,7 @@ def main():
             help="SLHA file to compute cross sections for. "
             "If a directory is given, compute cross sections for all files in the directory." )
     xsecresummino.add_argument('-s', '--sqrts', nargs='+', action='append',
-        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). [13].",
+        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). [13]",
         type=float, default=[])
     xsecresummino.add_argument('-part', '--particles', nargs='+', action='append',
         help="list of daughter particles (in form of PDG codes) to compute cross sections for. All valid combinations from the list will be considered. If no list of particles is given, the channels info from the resummino.py configuration file is used instead. Typical values: 1000023 1000024 1000025 1000035 1000037.",
@@ -74,7 +74,7 @@ def main():
     xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
         help="verbosity (debug, info, warning, error)")
     xsecresummino.add_argument('-c', '--ncpus', type=int, default=-1,
-        help="number of cores to be used simultaneously. -1 means 'all'. Used only when cross sections are computed for multiple SLHA files.")
+        help="number of cores to be used simultaneously. -1 means 'all'. Used only when cross sections are computed for multiple SLHA files. [-1]")
     xsecresummino.add_argument('-C', '--conf', type=str, default='default',
         help="path to resummino.py configuration file [smodels/etc/resummino.py]")
     xsecresummino.add_argument('-x', '--xsec_limit', type=float, default=None,
@@ -123,7 +123,7 @@ def main():
         help="How many (randomly selected) points will be included in the plot. If -1 all points will be read and included (default = -1).")
 
     iPlots.add_argument('-v', '--verbosity', type=str, default="info",
-        help="Verbosity (debug, info, warning, error)")
+        help="Verbosity (debug, info, warning, error) [info]")
 
     proxydb = subparsers.add_parser( 'proxydb', description=
 								                     "create proxy databases for network use")
