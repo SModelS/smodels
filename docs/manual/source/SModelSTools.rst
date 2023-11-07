@@ -30,7 +30,7 @@ SModelS Tools
 Inside SModelS there is a number of tools that may be convenient for the user:
 
 * a :ref:`cross section calculator <xsecCalc>` based on `Pythia8 <http://pythia.org>`_ (or `Pythia6 <http://pythia6.hepforge.org>`_),
-  `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ and `Resummino <https://resummino.hepforge.org>`_,
+  `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_, and one based on `Resummino <https://resummino.hepforge.org>`_,
 * :ref:`SLHA and LHE file checkers <fileChecks>` to check your input files for completeness and sanity,
 * a :ref:`database browser <databaseBrowser>` to provide easy access to the |database| of experimental results,
 * a plotting tool to make :ref:`interactive plots <interactivePlots>` based on `plotly <https://plot.ly/python/>`_ (v1.1.3 onwards),
@@ -39,8 +39,8 @@ Inside SModelS there is a number of tools that may be convenient for the user:
 
 .. _xsecCalc:
 
-Cross Section Calculator
-------------------------
+Cross Section Calculators
+-------------------------
 
 Pythia and NLLfast Cross Sections
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -103,13 +103,12 @@ usage example is: ::
 
    smodelsTools.py xsecresummino -s 13 -p -f inputFiles/slha/resummino_example.slha -part 1000035 1000037
 
-which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes with daugther particles (in the pp collision) indicated by the user. 
+which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes with daughter particles (in the pp collision) indicated by the user. 
 
-Two operating mode are available for xsecresummino. You can choose (with the --part argument), like in the example, all the particles you want and resummino will generate the corresponding channels (for the example above, we get : [(1000035, 1000037), (1000037, -1000037), (1000035, -1000037)]) automatically.
-The second mode of operation is by using the resummino.py file in the smodels/etc folder (you can use your own file with the -C or --conf argument). In this file, you can choose directly the channels you want to consider in the "channels" dictionary.
-You can also use this file to choose the xsec_limit value you want. This parameters tell resummino to consider only relevant process (equal to or above the value of xsec_limit) at NLO or NLL-NLO.
-
-If no particles are specified, the channels in the resummino.py file will be used. As with the xseccomputer tool, SModelS will then write out only the highest order cross sections available for each process.
+Two operating modes are available for xsecresummino. You can either provide a list of particles to be considered via the --part argument, and the tool will compute cross sections for all according production modes. In the example given above, resummino will consider the channels (:math:`\pm` 1000035,:math:`\pm` 1000035), (:math:`\pm` 1000035, :math:`\pm` 1000037), and (:math:`\pm` 1000037, :math:`\pm` 1000037).
+Alternatively, instead of using the --part argument, you may directly provide a list of channels in the resummino.py configuration file, via the "channels" dictionary in that file. Note that you can either adapt the resummino.py file in the smodels/etc folder, or provide your own configuration file via the --conf argument.
+Finally, the xsec_limit argument allows one to specify a lower threshold on the LO cross sections to be considered for computations of higher perturbation orders. This
+feature is merely meant to speed up cross section computation.
 
 * **The resummino cross section calculation is implemented by the** `XSecResummino class <tools.html#tools.xsecResummino.XSecResummino>`_
 

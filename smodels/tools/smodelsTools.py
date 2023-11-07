@@ -61,10 +61,10 @@ def main():
 
     xsecresummino = subparsers.add_parser('xsecresummino', description="Compute gaugino and slepton cross sections via resummino for a given SLHA file.")
     xsecresummino.add_argument('-s', '--sqrts', nargs='+', action='append',
-        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). [8,13].",
+        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). [8 13].",
         type=float, default=[])
     xsecresummino.add_argument('-part', '--particles', nargs='+', action='append',
-        help="daughter particles to consider in the cross section calculation, if no particles are given, resummino uses the channels info from the resummino.py configuration file [1000023,1000024,1000025,1000035,1000037].",
+        help="daughter particles to consider in the cross section calculation, if no particles are given, resummino uses the channels info from the resummino.py configuration file. Typical values: 1000023 1000024 1000025 1000035 1000037.",
         type=int, default=[])
     xsecresummino.add_argument('-x', '--xsec_limit', type=float, default=None,
         help="Cross section limit, in pb. Below this value, calculation will stop at LO order automatically. Default is defined in etc/resummino.py to be 0.00001.")
@@ -88,7 +88,7 @@ def main():
     # xsecresummino.add_argument('-S', '--ssmultipliers', type=str, default=None,
     #     help="signal strength multipliers, provided as dictionary of pids")
     xsecresummino.add_argument('-f', '--filename', required=True,
-            help="SLHA file to compute cross sections for."
+            help="SLHA file to compute cross sections for. "
             "If a directory is given, compute cross sections for all files in directory." )
     
     slhachecker = subparsers.add_parser('slhachecker', description="Perform several checks on a SLHA file.")
