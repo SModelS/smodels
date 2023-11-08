@@ -42,15 +42,16 @@ Inside SModelS there is a number of tools that may be convenient for the user:
 Cross Section Calculators
 -------------------------
 
+These tools compute LHC production cross sections for *MSSM particles*
+and write them out in :ref:`SLHA convention <xsecblock>`. This is particularly 
+convenient for adding cross sections to SLHA input files, see :doc:`Basic Input <BasicInput>`.
+
+
 Pythia and NLLfast Cross Sections
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This tool computes LHC production cross sections for *MSSM particles*
-and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be
-convenient for adding cross sections to SLHA input files, see :doc:`Basic Input <BasicInput>`.
-The calculation is done at LO with `Pythia8 <http://pythia.org>`_ or `Pythia6.4 <http://pythia6.hepforge.org>`_ ; K-factors
-for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_. Signal strength multipliers can optionally be supplied for each "mother" particle. However, use at your own risk! Make sure the
-output is sensible and contains all cross sections for all production mechanisms
+In the basic "xseccomputer", the calculation is done at LO with `Pythia8 <http://pythia.org>`_ or `Pythia6.4 <http://pythia6.hepforge.org>`_ ; K-factors
+for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_. Signal strength multipliers can optionally be supplied for each "mother" particle. However, use at your own risk! Make sure the output is sensible and contains all cross sections for all production mechanisms
 you are interested in! 
 
 **The usage of the cross section calculator is:**
@@ -92,7 +93,7 @@ Note that signal strength multipliers get applied only to LO cross sections. Thi
 Resummino Cross Sections
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-For the electroweakino sector, another tool is available to get the according cross-sections at NLL+NLO order. This tool is based on `Resummino <https://resummino.hepforge.org>`_ and can calculate cross-sections at LO, NLO, and NLL+NLO orders. No K-factors are used, all orders are calculated independently.
+For electroweak-ino and/or slepton production cross sections, another tool based on `Resummino <https://resummino.hepforge.org>`_ is available. This can calculate EW cross sections at LO, NLO, and NLL+NLO orders. No K-factors are used, all orders are calculated independently.
 
 **The usage of the Resummino cross section calculator is:**
 
@@ -101,14 +102,15 @@ For the electroweakino sector, another tool is available to get the according cr
 A typical
 usage example is: ::
 
-   smodelsTools.py xsecresummino -s 13 -p -f inputFiles/slha/resummino_example.slha -part 1000035 1000037
+   smodelsTools.py xsecresummino -s 13 -p -n -f test/testFiles/resummino/resummino_example.slha -part 1000023 1000024 
 
-which will compute 13 TeV  LO cross sections (at the LHC) for all MSSM processes with daughter particles (in the pp collision) indicated by the user. 
+This will compute the (1000023,-1000024), (1000023, 1000024) and (-1000024,1000024) cross sections for sqrt(s)=13 TeV at NLO for the spectrum given in resummino_example.slha and append them to that SLHA file. 
+Additional settings, like the PDF sets to use, are taken from the Resummino configuration file, smodels/etc/resummino.py. There, also the default threshold for the minimum cross section is set.  
 
-Two operating modes are available for xsecresummino. You can either provide a list of particles to be considered via the --part argument, and the tool will compute cross sections for all according production modes. In the example given above, resummino will consider the channels (:math:`\pm` 1000035,:math:`\pm` 1000035), (:math:`\pm` 1000035, :math:`\pm` 1000037), and (:math:`\pm` 1000037, :math:`\pm` 1000037).
-Alternatively, instead of using the --part argument, you may directly provide a list of channels in the resummino.py configuration file, via the "channels" dictionary in that file. Note that you can either adapt the resummino.py file in the smodels/etc folder, or provide your own configuration file via the --conf argument.
-Finally, the xsec_limit argument allows one to specify a lower threshold on the LO cross sections to be considered for computations of higher perturbation orders. This
-feature is merely meant to speed up cross section computation.
+Instead of providing a list of particles via the --part argument, one can also directly specify in the resummino.py  configuration file which production channels shall be considered. To this end one can either adapt the resummino.py file in the smodels/etc folder, or provide their own configuration file via the --conf argument. 
+Note that options set directly on the command line always take precedence over the settings in the 
+configuration file. 
+
 
 * **The resummino cross section calculation is implemented by the** `XSecResummino class <tools.html#tools.xsecResummino.XSecResummino>`_
 
