@@ -30,10 +30,10 @@ Simplified Model Coverage
 
 
 The constraints provided by SModelS are obviously limited
-by its |database| and the available set of simplified model interpretations
-provided by the experimental collaborations or computed by theory groups.
-Therefore it is interesting to identify classes of missing simplified models
-(or missing topologies) which are relevant for a given input model, but are
+by the variety of |SMS| interpretations i) provided by the experimental collaborations (or derived through recasting) 
+and ii) implemented and validated in the |database|.
+Therefore it is interesting to identify classes of "missing topologies", 
+which are relevant for a given input model, but are
 not constrained by the SModelS |database|. This task is performed
 as a last step in SModelS, once the |decomposition| and the |theory predictions|
 have been computed.
@@ -45,10 +45,10 @@ of |ExpRes|. Currently the |ExpRess| are either of type *prompt*
 or *displaced*.\ [#f1]_ If the same |SMS| is *covered* by both types of |ExpRess|,
 it will be marked as covered by displaced *and* prompt results.
 If, in addition to being covered, the |SMS topology| also has a non-zero efficiency
-or upper limit (i.e. its properties fall inside the data grid for any result),
+or upper limit (i.e. its properties fall inside the data grid of any result),
 it will be marked as "tested by" the corresponding type of result (*prompt* or *displaced*).
 Hence, after the |theory predictions| have been computed, the |SMS topologies| store information
-about their experimental coverage and can be classified and grouped into :ref:`coverage groups <coverageGroups>`.
+about their experimental coverage and can be classified into :ref:`coverage groups <coverageGroups>`.
 
 
 * **The coverage tool is implemented by the** `Uncovered class <tools.html#tools.coverage.Uncovered>`_
@@ -140,7 +140,7 @@ Final State SMS
 ---------------
 
 Usually the list of |SMS| in each group can be considerably long, due
-to distinct intermediate BSM states and final SM states.
+to distinct intermediate BSM and final SM states. 
 In order to make the list more compact, all |SMS topologies|
 are simplified to |topologies| where only the primary mothers and the final
 state particles are kept (see :numref:`Fig. %s <coverB>`).
@@ -162,7 +162,7 @@ while the BSM particles are grouped by their signature:
 * *color triplet states with electric charge +-2/3 or +-1/3* :math:`\to \mbox{RHadronQ}`
 * *color octet states with zero electric charge* :math:`\to \mbox{RHadronG}`
 
-After the above simplification steps, identical simplified |SMS| (called *Final State SMS*) are combined.
+After the above simplification, identical simplified |SMS| (called *Final State SMS*) are combined.
 This procedure is illustrated in :numref:`Fig. %s <coverB>`.
 
 
@@ -172,7 +172,7 @@ This procedure is illustrated in :numref:`Fig. %s <coverB>`.
    :width: 40%
    :align: center
 
-   Schematic representation of how the |SMS topologies| are simplified into Final State SMS and 
+   Schematic representation of how |SMS topologies| are simplified into Final State SMS and 
    how identical Final State SMS are combined.
 
 * **Final State SMS are implemented by the** `FinalStateSMS class <tools.html#tools.coverage.FinalStateSMS>`_
