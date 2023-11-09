@@ -35,8 +35,7 @@ Starting with version 1.1, the SModelS database includes two types of experiment
    by the experimental collaborations (see |ULrs|);
 *  Efficiency Map (EM) constraints: constrains the total signal (:math:`\sum \sigma \times BR \times \epsilon`) in
    a specific signal region. Here :math:`\epsilon` denotes the acceptance times efficiency.  
-   These are either provided by the experimental collaborations or computed by
-   theory groups (see |EMrs|); 
+   These are either provided by the experimental collaborations or computed through recasting, e.g. with MA5 or Checkmate (see |EMrs|).
 
 Although the two types of constraints above are very distinct,
 both the folder structure and the object structure of SModelS are sufficiently flexible to
@@ -224,9 +223,6 @@ maximum acceptable values (see :ref:`maxcond <parameterFileMaxcond>` in the para
 Experimental Result: Efficiency Map Type
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Unlike |ULrs|, the main information held by Efficiency Map (EM) results are the efficiencies for simplified
-models.
-These may be provided by the experimental collaborations or independently computed by theory groups.
 Efficiency maps correspond to a grid of simulated acceptance times efficiency 
 ( :math:`A \times \epsilon` ) values for a specific signal region. In the following we will refer to 
 :math:`A \times \epsilon` simply as *efficiency* and denote it by :math:`\epsilon`. 

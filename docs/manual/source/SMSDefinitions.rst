@@ -84,9 +84,9 @@ are equal.
 *Generic* particles are introduced by leaving one or more of their properties undefined. For instance, a particle with electric charge = -1,  isSM = False, but undefined spin and mass can represent charged BSM fermions and scalars (such as charginos and charged higgses). 
 This is useful when defining simplified models used for describing experimental results in the :ref:`Database <databaseDefs>` which are not sensitive to the particle's spin. Some examples of *generic* particles are:
 
- - 'anyBSM': which can represent any BSM state (only has isSM=False defined)
- - 'anyBSM': which can represent any SM state (only has isSM=True defined)
- - 'MET': which can represent any neutral BSM state (has isSM=False, electric charge = 0 and is a color singlet)
+ - 'anyBSM': represents any BSM state (only has isSM=False defined)
+ - 'anySM': represents any SM state (only has isSM=True defined)
+ - 'MET': represents any neutral BSM state (has isSM=False, electric charge = 0 and is a color singlet)
 
 
 In addition, *inclusive* particles can also be created, which holds 
