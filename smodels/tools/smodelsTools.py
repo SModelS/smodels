@@ -28,9 +28,9 @@ def main():
             help="SLHA file to compute cross sections for. "
             "If a directory is given, cross sections for all files in the directory are computed." )
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
-        help="LHC center-of-mass energy in TeV for computing the
-        cross sections. Can be more than one value, e.g., -s 8 13 for both
-        8 TeV and 13 TeV cross sections; default is 13.",
+        help="LHC center-of-mass energy in TeV for computing the "
+        "cross sections. Can be more than one value, e.g., -s 8 13 for both "
+        "8 TeV and 13 TeV cross sections; default is 13.",
         type=float, default=[])
     xseccomputer.add_argument('-6', '--pythia6', action='store_true',
         help="use pythia6 for LO cross sections")
@@ -41,9 +41,9 @@ def main():
     xseccomputer.add_argument('-v', '--verbosity', type=str, default="info",
         help="Verbosity (debug, info, warning, error) [info]")
     xseccomputer.add_argument('-c', '--ncpus', type=int, default=1,
-        help="number of CPU cores to be used simultaneously. −1
-        means ‘all’. Used only when cross sections are computed for mul-
-        tiple SLHA files. [1]")
+        help="number of CPU cores to be used simultaneously. −1 "
+        "means ‘all’. Used only when cross sections are computed for multiple "
+        "SLHA files. [1]")
     xseccomputer.add_argument('-p', '--tofile', action='store_true',
         help="write cross sections to file (only highest order)")
     xseccomputer.add_argument('-P', '--alltofile', action='store_true',
@@ -68,16 +68,15 @@ def main():
             help="SLHA file to compute cross sections for. "
             "If a directory is given, cross sections for all files in the directory are computed." )
     xsecresummino.add_argument('-s', '--sqrts', nargs='+', action='append',
-        help="LHC center-of-mass energy in TeV for computing the
-        cross sections. Can be more than one value, e.g., -s 8 13 for both
-        8 TeV and 13 TeV cross sections. [13]",
+        help="LHC center-of-mass energy in TeV for computing the "
+        "cross sections. Can be more than one value, e.g., -s 8 13 for both "
+        "8 TeV and 13 TeV cross sections. [13]",
         type=float, default=[])
     xsecresummino.add_argument('-part', '--particles', nargs='+', action='append',
-        help="list of daughter particles (given as PDG
-        codes) to compute cross sections for. All valid combinations from
-        the list will be considered. If no list of particles is given, the chan-
-        nels info from the resummino.py configuration file is used in-
-        stead.",
+        help="list of daughter particles (given as PDG "
+        "codes) to compute cross sections for. All valid combinations from "
+        "the list will be considered. If no list of particles is given, the channels "
+        "info from the resummino.py configuration file is used instead.",
         type=int, default=[])
     xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
         help="verbosity (debug, info, warning, error). [info]")
@@ -86,9 +85,9 @@ def main():
     xsecresummino.add_argument('-C', '--conf', type=str, default='default',
         help="path to resummino.py configuration file. [smodels/etc/resummino.py]")
     xsecresummino.add_argument('-x', '--xseclimit', type=float, default=None,
-        help="cross section limit in pb. If the LO cross section is
-        below this value, no higher orders will be calculated. The default
-        is 0.00001, set in the smodels/etc/resummino.py file.",
+        help="cross section limit in pb. If the LO cross section is "
+        "below this value, no higher orders will be calculated. The default "
+        "is 0.00001, set in the smodels/etc/resummino.py file." )
     xsecresummino.add_argument('-p', '--tofile', action='store_true',
         help="write cross sections to file (only highest order)")
     xsecresummino.add_argument('-P', '--alltofile', action='store_true',
