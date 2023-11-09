@@ -30,7 +30,7 @@ def main():
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
         help="LHC center-of-mass energy in TeV for computing the "
         "cross sections. Can be more than one value, e.g., -s 8 13 for both "
-        "8 TeV and 13 TeV cross sections; default is 13.",
+        "8 TeV and 13 TeV cross sections. [13]",
         type=float, default=[])
     xseccomputer.add_argument('-6', '--pythia6', action='store_true',
         help="use pythia6 for LO cross sections")
