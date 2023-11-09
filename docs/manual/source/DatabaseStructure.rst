@@ -28,10 +28,9 @@
 Database of Experimental Results
 ================================
 
-SModelS stores all the information about the experimental results in the
-|Database|.
-Below we describe both the :ref:`directory <folderStruct>`, :ref:`object <objStruct>` structure of the  |Database|
-and :ref:`how the information in stored in the database is used within SModelS <interpolationDB>`.
+The information about the experimental results is stored in the SModelS |Database|.
+Below we describe both the :ref:`directory <folderStruct>` and :ref:`object <objStruct>` structure of the |Database|
+and :ref:`how the stored information is used <interpolationDB>` within SModelS. 
 
 .. _folderStruct:
 
@@ -39,21 +38,20 @@ Database: Directory Structure
 -----------------------------
 
 The :ref:`Database <Database>` is organized as files in an ordinary (UNIX)
-directory hierarchy, with a thin Python layer serving as the access to the
-database.  The overall structure of the directory hierarchy and its contents is
+directory hierarchy, with a thin Python layer serving for the access.  
+The overall structure of the directory hierarchy and its contents is
 depicted in the scheme below (click to enlarge):
 
 .. image:: images/DatabaseFolders.png
    :width: 80%
 
-As seen above, the top level of the SModelS database categorizes the analyses
+The top level directory contains a file called ``version`` with the
+version string of the database. At this first level, the database is organised 
 by LHC center-of-mass energies, |sqrts|:
 
 * 8 TeV
 * 13 TeV
 
-Also, the top level directory contains a file called ``version`` with the
-version string of the database.
 The second level splits the results up between the different experiments:
 
 * 8TeV/CMS/
@@ -117,8 +115,8 @@ Data Set Folder: Efficiency Map Type
 
 For |EMrs| the ``dataInfo.txt`` contains relevant information, such as an id to
 identify the |dataset| (signal region), the number of observed and expected
-background events for the corresponding signal region and the respective signal
-upper limits.  Here is the content of
+background events for the corresponding signal region and the respective 
+upper limits on the fiducial cross sections.  We take 
 CMS-SUS-13-012-eff/3NJet6_1000HT1250_200MHT300/dataInfo.txt as an example:
 
 .. literalinclude:: /literals/dataInfo-eff.txt
