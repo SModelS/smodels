@@ -682,7 +682,7 @@ class XSecResummino(XSecBase):
         
         if self.ncpu == 1:
             for task in tasks:
-                self.calculate_one_slha(task)
+                self.calculate_one_slha(*task)
         else:   
             # We launch the program with maximum performance, change if necessary
             with ProcessPoolExecutor(max_workers=self.ncpu) as executor:
