@@ -19,6 +19,8 @@ from smodels.experiment.datasetObj import DataSet
 from smodels.theory.crossSection import XSection
 import numpy as np
 
+_debug = { "writePoint": False } # for debugging only
+
 class SpeyComputer:
     """ the facade that delegates all statistical computations to spey.
     takes care of all interactions with spey except for analysis combinations. """
@@ -202,6 +204,17 @@ class SpeyComputer:
                 thirdmomenta.append ( ds.dataInfo.thirdMoment )
         if len(thirdmomenta)==0: # SLv1
             stat_wrapper = get_backend("default_pdf.correlated_background")
+            if _debug["writePoint"]:
+                f=open ( "data.txt","wt" )
+                f.write ( f"obsN={obsN}\n" )
+                f.write ( f"bg={bg}\n" )
+                f.write ( f"cov={cov}\n" )
+                f.write ( f"nsig={nsig}\n" )
+                f.write ( f"analysis='{dataset.globalInfo.id}'\n" )
+                f.write ( f"lumi={lumi}\n" )
+                f.close()
+# import sys; sys.exit()
+
             speyModel = stat_wrapper( data = obsN,
                             background_yields = bg, covariance_matrix = cov,
                             signal_yields = nsig,
@@ -218,6 +231,15 @@ class SpeyComputer:
                         third_moment = thirdmomenta,
                         analysis = dataset.globalInfo.id,
         )
+        if _debug["writePoint"]:
+            f=open ( "data.txt","wt" )
+            f.write ( f"obsN={obsN}\n" )
+            f.write ( f"bg={bg}\n" )
+            f.write ( f"cov={cov}\n" )
+            f.write ( f"nsig={nsig}\n" )
+            f.write ( f"analysis='{dataset.globalInfo.id}'\n" )
+            f.write ( f"lumi={lumi}\n" )
+            f.close()
         return [ speyModel ]
 
     def getStatModelsPyhf(self, nsig: Union[float, np.ndarray] ):
