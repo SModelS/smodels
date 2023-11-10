@@ -53,10 +53,9 @@ If the final states appearing at the end of the decays are stable, the decomposi
 
    Schematic representation of the subsequent decomposition steps used to build the final |SMS topologies|.
 
-This procedure is repeated until all unstable/meta-stable BSM particles appearing in the |SMS| have decayed. 
+This procedure is repeated until all unstable (promptly decaying and meta-stable) BSM particles appearing in the |SMS| have decayed. 
 
-
-The definition of unstable particles (decays promptly), meta-stable particles (displaced decays) and stable particles (do not decay) is relevant for the decomposition procedure. In particular, |SMS topologies| describing long-lived final states (such as in searches for heavy stable charged particles) must also include meta-stable BSM particles as final states.
+The definition of promptly decaying, meta-stable (displaced decays) and stable particles is relevant in particular for |SMS topologies| describing long-lived final states (such as in searches for heavy stable charged particles), since they must include meta-stable BSM particles as final states. 
 The distinct decay regimes are controlled by the user and defined by the stableWidth (:math:`\Gamma_{\mbox{stable}}`) and promptWidth (:math:`\Gamma_{\mbox{prompt}}`) parameters in the :ref:`parameters file <parameterFileModel>`. According to the values for these parameters we have:
  
  * prompt decays: :math:`\Gamma_{\mbox{prompt}} < \Gamma_{\mbox{BSM}}`. In this case the BSM particle width is set to infinity and we assume its decays can always be considered as prompt for all experimental purposes. These particles will *never* appear as final states.
