@@ -19,6 +19,8 @@ get_cpu_cores() {
 cat <<EOF > boost_check.cpp
 #include <iostream>
 #include <boost/version.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/lexical_cast.hpp>
 
 int main() {
     #ifdef BOOST_VERSION
