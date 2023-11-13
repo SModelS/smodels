@@ -18,9 +18,7 @@ get_cpu_cores() {
 
 cat <<EOF > boost_check.cpp
 #include <iostream>
-#ifdef BOOST_VERSION
 #include <boost/version.hpp>
-#endif
 
 int main() {
     #ifdef BOOST_VERSION
