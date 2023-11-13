@@ -16,6 +16,46 @@ get_cpu_cores() {
   fi
 }
 
+cat <<EOF > boost_check.cpp
+#include <iostream>
+#ifdef BOOST_VERSION
+#include <boost/version.hpp>
+#endif
+
+int main() {
+    #ifdef BOOST_VERSION
+    std::cout << "installed" << std::endl;
+    #else
+    std::cout << "not_installed" << std::endl;
+    #endif
+    return 0;
+}
+EOF
+
+g++ boost_check.cpp -o boost_check
+
+output=$(./boost_check)
+
+if [ "$output" = "installed" ]; then
+    echo "Boost is installed. Continuing script execution."
+else
+    echo "Boost is not installed. Stopping script execution."
+    rm boost_check.cpp boost_check
+    exit 1
+fi
+
+# Nettoyer les fichiers temporaires si Boost est installé
+rm boost_check.cpp boost_check
+
+if command -v gsl-config &>/dev/null; then
+    echo "GSL is installed."
+    GSL_VERSION=$(gsl-config --version)
+    echo "GSL version: $GSL_VERSION"
+else
+    echo "GSL is not installed. Stopping script execution."
+    exit 1
+fi
+
 num_cores_to_use=$(get_cpu_cores)
 
 # Vérification de l'existence de LHAPDF
