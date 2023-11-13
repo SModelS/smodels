@@ -1002,8 +1002,16 @@ class TxNameData(object):
             if nz > self.dimensionality:
                 self.dimensionality = nz
         MpCut=[]
-        for i in Mp:
-            MpCut.append(i[:self.dimensionality].tolist() )
+        epsilon = 1 - 2 * np.finfo(np.float64).eps # we go by 2 units
+        for ctr,i in enumerate(Mp):
+            # add the tiniest displacements to make things
+            # deterministic
+            expo = ctr - int(floor(len(Mp)/2.))
+            vals = i[:self.dimensionality].tolist()
+            for ctr2,v in enumerate(vals):
+                vals[ctr2]=v*epsilon**expo
+            MpCut.append( vals )
+
 
         if self.dimensionality > 1:
             try:
