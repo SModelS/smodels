@@ -1,44 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="-1156 -1193 1050 827" xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw" version="1.1" baseProfile="full">
     <g>
-        <g latexdraw:type="picture" id="id452265836">
+        <g latexdraw:type="picture" id="id1690248115">
             <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/CMS-SUS-20-002_Figure_009-a.png" x="-875.0" y="-1151.0" height="719.0" width="749.0"/>
         </g>
-        <g latexdraw:type="joinedLines" id="id198525056">
-            <polyline points="-526.0,-1172.0 -620.0,-1084.0 " stroke="#4d4d4d" stroke-width="3.3" fill="none" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-198525056)"/>
+        <g latexdraw:type="joinedLines" id="id1055392516">
+            <polyline points="-526.0,-1172.0 -620.0,-1084.0 " stroke="#4d4d4d" stroke-width="3.3" fill="none" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-1055392516)"/>
         </g>
-        <g latexdraw:type="text" id="id292689319" fill="black" latexdraw:position="bl">
-            <text x="-918.0" y="-1173.0">\Large \begin{tabular}{c} {\Huge Constraint:} \\ (PV $&gt;$ anyBSM(1),anyBSM(2)), (anyBSM(1) $&gt;$ t, MET(3)),  (anyBSM(2) $&gt;$ t, MET(4)) \end{tabular}</text>
+        <g latexdraw:type="text" id="id1974227248" fill="black" latexdraw:position="bl">
+            <text x="-918.0" y="-1173.0">\Large \begin{tabular}{c} {\Huge Constraint:} \\ (PV $&gt;$ anyBSM(1),anyBSM(2)), (anyBSM(1) $&gt;$ MET(3),t(4)),  (anyBSM(2) $&gt;$ MET(5), t(6)) \end{tabular}</text>
         </g>
-        <g latexdraw:type="joinedLines" id="id1771252850">
-            <polyline points="-884.0,-722.0 -602.0,-597.0 " stroke="#4d4d4d" stroke-width="3.3" fill="none" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-1771252850)"/>
+        <g latexdraw:type="joinedLines" id="id1275650031">
+            <polyline points="-884.0,-722.0 -602.0,-597.0 " stroke="#4d4d4d" stroke-width="3.3" fill="none" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-1275650031)"/>
         </g>
-        <g latexdraw:type="text" id="id1781224904" fill="black" latexdraw:position="bl">
+        <g latexdraw:type="text" id="id1129888812" fill="black" latexdraw:position="bl">
             <text x="-1136.0" y="-672.0">\Huge \begin{tabular}{c} Cross-Section \\ Upper Limits \end{tabular}</text>
         </g>
-        <g latexdraw:type="joinedLines" id="id470324201">
-            <polyline points="-961.0,-1054.0 -872.0,-991.0 " stroke="#4d4d4d" stroke-width="3.3" fill="none" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-470324201)"/>
+        <g latexdraw:type="joinedLines" id="id320703847">
+            <polyline points="-961.0,-1054.0 -872.0,-991.0 " stroke="#4d4d4d" stroke-width="3.3" fill="none" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-320703847)"/>
         </g>
-        <g latexdraw:type="text" id="id182451392" fill="black" latexdraw:position="bl">
+        <g latexdraw:type="text" id="id1944184559" fill="black" latexdraw:position="bl">
             <text x="-1073.0" y="-1068.0">\Huge Mass axis</text>
         </g>
-        <g latexdraw:type="text" id="id249062262" fill="black" latexdraw:position="bl">
+        <g latexdraw:type="text" id="id590601881" fill="black" latexdraw:position="bl">
             <text x="-244.0" y="-386.0">\Huge Mass axis</text>
         </g>
-        <g latexdraw:type="joinedLines" id="id751500882">
-            <polyline points="-249.0,-405.0 -330.0,-448.0 " stroke="#4d4d4d" stroke-width="3.3" fill="none" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-751500882)"/>
+        <g latexdraw:type="joinedLines" id="id573178210">
+            <polyline points="-249.0,-405.0 -330.0,-448.0 " stroke="#4d4d4d" stroke-width="3.3" fill="none" latexdraw:rotationAngle="0.0" marker-start="url(#arrow0-573178210)"/>
         </g>
     </g>
     <defs>
-        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="316.888" id="arrow0-198525056">
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="316.888" id="arrow0-1055392516">
             <path d="M 0.0 0.0 L -12.944166666666666 -4.622916666666667 L -12.944166666666666 0.0 L -12.944166666666666 4.622916666666667 z" fill="#4d4d4d" stroke="#4d4d4d" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
-        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="203.906" id="arrow0-1771252850">
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="203.906" id="arrow0-1275650031">
             <path d="M 0.0 0.0 L -12.944166666666666 -4.622916666666667 L -12.944166666666666 0.0 L -12.944166666666666 4.622916666666667 z" fill="#4d4d4d" stroke="#4d4d4d" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
-        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="215.293" id="arrow0-470324201">
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="215.293" id="arrow0-320703847">
             <path d="M 0.0 0.0 L -12.944166666666666 -4.622916666666667 L -12.944166666666666 0.0 L -12.944166666666666 4.622916666666667 z" fill="#4d4d4d" stroke="#4d4d4d" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
-        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="27.962" id="arrow0-751500882">
+        <marker overflow="visible" markerUnits="userSpaceOnUse" orient="27.962" id="arrow0-573178210">
             <path d="M 0.0 0.0 L -12.944166666666666 -4.622916666666667 L -12.944166666666666 0.0 L -12.944166666666666 4.622916666666667 z" fill="#4d4d4d" stroke="#4d4d4d" latexdraw:arrSizeNum="2" latexdraw:tbarSizeNum="5"/>
         </marker>
     </defs>
@@ -47,7 +47,7 @@
             <latexdraw:centreHoriz>false</latexdraw:centreHoriz>
             <latexdraw:positionVert/>
             <latexdraw:zoom>1.0</latexdraw:zoom>
-            <latexdraw:vpx>0</latexdraw:vpx>
+            <latexdraw:vpx>0.158</latexdraw:vpx>
             <latexdraw:vpy>0.06</latexdraw:vpy>
         </latexdraw:metadata>
     </metadata>

@@ -124,15 +124,15 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **doCompress** (True/False): turns |mass compression| on or off during the |decomposition|. (Note that the compression is only applied to prompt particles, with widths larger than the :ref:`promptWidth <promptWidth>` parameter.)
 
+.. _parameterFileTestCoverage:
+
+  * **testCoverage** (True/False): set to True to run the :ref:`coverage <topCoverage>` tool.
+
 .. _parameterFileComputeStatistics:
 
   * **computeStatistics** (True/False): turns the likelihood computation on or off
     (see :ref:`likelihood calculation <likelihoodCalc>`).
     If True, the likelihoods L_BSM, L_SM and L_max are computed for the |EMrs|.
-
-.. _parameterFileTestCoverage:
-
-  * **testCoverage** (True/False): set to True to run the :ref:`coverage <topCoverage>` tool.
 
 .. _parameterFileCombineSRs:
 
@@ -168,7 +168,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _erasePrompt:
 
-  * **erasePrompt**: since many experimental searches are not sensitive to the quantum numbers of promptly decaying particles (particles with width larger than :ref:`promptWidth <promptWidth>`), SModelS has the option to erase the quantum numbers of these particles. This can greatly reduce the running time (must be used with caution). Available v3.0.0 onwards.
+  * **ignorePromptQNumbers**: since many experimental searches are not sensitive to the quantum numbers of promptly decaying particles (particles with width larger than :ref:`promptWidth <promptWidth>`), SModelS has the option to erase the quantum numbers of these particles. This can greatly reduce the running time (must be used with caution). Available v3.0.0 onwards.
 
 .. _parameterFileParameters:
 

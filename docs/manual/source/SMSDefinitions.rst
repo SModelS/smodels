@@ -49,7 +49,7 @@ The overall properties of an SMS are illustrated in :numref:`Fig. %s <smsScheme>
    :width: 40%
    :align: center
    
-   Illustration of the basic elements of an SMS graph: root node, SM and BSM nodes, edges and node indices.
+   Illustration of the elements of an SMS graph: root node, SM and BSM nodes, edges and node indices.
 
 
 SModelS works under the inherent assumption that, for collider purposes,
@@ -73,7 +73,8 @@ Particles
 
 The basic building block of a |SMS| are particles,
 which can be both SM (e.g. :math:`W^+,higgs`  in :numref:`Fig. %s <smsScheme>`)
-or BSM states (e.g. :math:`H^0,H^+,H^-` in :numref:`Fig. %s <smsScheme>`).
+or BSM states (e.g. :math:`H^0,H^+,H^-` in :numref:`Fig. %s <smsScheme>`). The particles
+are mapped to nodes, which make up the SMS graph structure.
 The BSM particles are defined by the input model (see :ref:`model <parameterFileModel>` in |parameters|),
 while the SM particles are defined in `SMparticles.py <share.html#share.models.SMparticles>`_ .
 The BSM particles are identified by their attribute ``isSM = False``
@@ -116,9 +117,13 @@ A given |SMS| can be represented in string format using a sequence of decay patt
 
 where :math:`X` represents a BSM particle, which decays to :math:`A,B` and :math:`C`. The indices :math:`i,j,k,l` refer to the node indices for the unstable particles in the |SMS| graph (see :numref:`Fig. %s <smsScheme>`)  and are needed in order to avoid ambiguities. For instance, the SMS from :numref:`Fig. %s <smsScheme>` is represented by the string: ::
 
+   (PV > gluino(1),su_L(2)), (gluino(1) > N1(3),q(4),q(5)), (su_L(2) > q(6),N1(7))
+
+In order to make the output simpler, by default only the indices of decayed BSM are shown: ::
+
    (PV > gluino(1),su_L(2)), (gluino(1) > N1,q,q), (su_L(2) > q,N1)
 
-
+* **The string representation is implemented by the** `treeToString Method <base.html#base.genericSMS.GenericSMS.treeToString>`_
 
 .. _canonicalName:
 
