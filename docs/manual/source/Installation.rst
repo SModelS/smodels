@@ -31,7 +31,7 @@ The resummino-based cross section computer depends on:
 
  * `Resummino <https://resummino.hepforge.org>`_ (requires a C++ compiler and gfortran). In rpm-based linux distributions this tool needs boost, boost-devel, gsl and gsl-devel. For deb-based distros, libboost-dev and libgsl-dev are required.
 
-These tools need not be installed separately, as the SModelS build system takes care of that. Currently, none of these tools are installed by default.
+The tools themselves, i.e. Pythia6|8, NLL-fast, and Resummino need not be installed separately, as the SModelS build system takes care of that. SModelS however expects the tools' dependencies (boost, gsl for resummino, as well as the compilers) to be installed. Currently, none of the tools are installed by default.
 Finally, the :ref:`database browser <databaseBrowser>` provided by :ref:`smodelsTools.py <smodelsTools>`
 requires `IPython <https://ipython.org/>`_, while the :ref:`interactive plotter <interactivePlots>` requires `plotly <https://plot.ly/python/>`_ and `pandas <https://pandas.pydata.org/>`_. 
 
@@ -47,7 +47,7 @@ Installation Methods
 
      make smodels
 
-   in the top-level directory. SModelS will install the required dependencies (using pip install). 
+   in the top-level directory. SModelS will install the required dependencies (using pip install), but none of the SModelS tools (Pythia6|8, NLL-fast, Resummino).
    If the MSSM cross section computers are needed, one can install SModelS with Pythia, NLL-fast, and Resummino. To this end, run::
 
      make smodels_externaltools
@@ -61,6 +61,8 @@ Installation Methods
  * Every external tool can also be compiled individually, run e.g.::
 
      make pythia6 pythia8 nllfast resummino
+
+   Remember, though, that the compilers as well as Resummino's dependencies (boost, gsl, see above) need to be installed already.
 
  * If Python's *setuptools* is installed in your machine, SModelS and its dependencies
    can also be installed without the use of pip.
