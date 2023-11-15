@@ -62,7 +62,7 @@ Installation Methods
    Remember, though, that the compilers as well as Resummino's dependencies (boost, gsl, see above) need to be installed already.
 
  * If Python's *setuptools* is installed in your machine, SModelS and its dependencies
-   can also be installed without the use of pip.
+   can also be installed.
    After downloading the source from the `SModelS releases page <https://github.com/SModelS/smodels/releases>`_
    and extracting it, run::
 
