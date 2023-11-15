@@ -76,7 +76,7 @@ class XSecTest(unittest.TestCase):
         xargs.alltofile = False
         xargs.filename = tmpfile
         xargs.xsec = None
-        xargs.xsec_limit = None
+        xargs.xseclimit = None
         xargs.particles = []
         xargs.verbosity = "warning"
         #Compute LO cross sections
@@ -140,7 +140,7 @@ class XSecTest(unittest.TestCase):
         xargs.alltofile = False
         xargs.filename = tmpfile
         xargs.xsec = 0.00001
-        xargs.xsec_limit = None
+        xargs.xseclimit = None
         xargs.particles = [ [1000024 ] ]
         xargs.verbosity = "warning"
         #Compute LO cross sections

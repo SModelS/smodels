@@ -32,7 +32,7 @@ from itertools import combinations
 
 class XSecResummino(XSecBase):
     """ cross section computer class (for resummino), what else? """
-    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type = 'all', verbosity = '', json = None, particles = None, xsec_limit = None):
+    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type_writting = None, verbosity = '', json = None, particles = None, xsec_limit = None):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
                     if maxOrder == LO, compute only LO resummino xsecs
@@ -72,7 +72,7 @@ class XSecResummino(XSecBase):
         self.maycompile = maycompile
         self.ncpu = ncpu
         self.sqrts = sqrt
-        self.type = type
+        self.type_writting = type_writting
         self.verbosity = verbosity
         self.sqrt = sqrt
         
@@ -196,15 +196,15 @@ class XSecResummino(XSecBase):
                 logger.debug('num try is '+ str(num_try)+ ' for the moment')
                 self.launch_command(self.resummino_bin, input_file, output_file, order)
                 if num_try == 0:
-                    hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections, log)
+                    hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type_writting, Xsections, log)
             else:
-                hist = self.write_in_slha(output_file, slha_file, 0, particle_1, particle_2, self.type, Xsections, log)
+                hist = self.write_in_slha(output_file, slha_file, 0, particle_1, particle_2, self.type_writting, Xsections, log)
             return
         
         if self.mode == "all":
             self.launch_command(self.resummino_bin, input_file, output_file, order)
             if num_try == 0:
-                hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections, log)
+                hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type_writting, Xsections, log)
             return
         
         #:hist: variable to check if there is a problem in the cross section (strange value or no value)
@@ -214,7 +214,7 @@ class XSecResummino(XSecBase):
             self.launch_command(self.resummino_bin, input_file, output_file, order)
 
         #here we write in the slha file.
-            hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type, Xsections, log)
+            hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type_writting, Xsections, log)
 
         #we check if we have written too much cross section
         self.are_crosssection(slha_file, order)
@@ -289,6 +289,12 @@ class XSecResummino(XSecBase):
             logger.debug('the highest result is'+ str(result) +' pb')
         elif type_writing == "all":
             result = [results[0].split(" ")[2][1:], results[1].split(" ")[2][1:], results[2].split(" ")[2][1:]]
+        elif type_writing == None:
+            result = [results[0].split(" ")[2][1:], results[1].split(" ")[2][1:], results[2].split(" ")[2][1:]]
+            
+            _ = ['LO', 'NLO', 'NLO+NLL']
+            for i in range(self.maxOrder+1):
+                logger.info(f"Cross section is {result[i]} pb for ({particle_1},{particle_2}) channel at {_[i]} in perturbation theory")
         else :
             result_list = [results[0].split(" ")[2][1:], results[1].split(" ")[2][1:], results[2].split(" ")[2][1:]]
             result = 0
@@ -309,8 +315,9 @@ class XSecResummino(XSecBase):
                 with open(log, 'a') as f:
                     f.write(f"to much change between LO and NLL+NLO for {particle_1} and {particle_2} with {slha_file}")
                 return 1
-            
-        self.create_xsection(result, particle_1, particle_2, order, Xsections)
+        
+        if type_writing is not None:
+            self.create_xsection(result, particle_1, particle_2, order, Xsections)
             
         return 0
 
@@ -665,7 +672,7 @@ class XSecResummino(XSecBase):
                 f.write(line)
             
             
-    def launch_routine_resummino(self):
+    def launch_all(self):
         """
         Launch all the calculations of the slha files in parallel (limited by
         ncpu), with first the creation of every path needed for the calculations.
@@ -718,9 +725,9 @@ def main ( args : argparse.Namespace ):
     json = canonizer.getjson(args)
     particles = canonizer.getParticles( args )
     xsec_limit = canonizer.checkXsec_limit(args)
-    # We choose to select highest by default
+    #If we get no type_writing then we only print the result 
     if type_writting == None :
-        type_writting = 'highest'
+        type_writting = None
         
     verbosity = args.verbosity
 
@@ -752,9 +759,9 @@ def main ( args : argparse.Namespace ):
     
     for sqrt in sqrtses:
         logger.debug('Current energy considered is '+ str(sqrt)+ ' TeV')
-        test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting, verbosity = verbosity, json = json, particles=particles, xsec_limit = xsec_limit)
+        test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type_writting = type_writting, verbosity = verbosity, json = json, particles=particles, xsec_limit = xsec_limit)
         test.checkInstallation ( compile = not args.noautocompile )
-        test.launch_routine_resummino()
+        test.launch_all()
     return
     
     # test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus, type = type_writting)

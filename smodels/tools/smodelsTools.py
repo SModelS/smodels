@@ -84,7 +84,7 @@ def main():
         help="number of CPU cores to be used simultaneously. -1 means 'all'. Used only when cross sections are computed for multiple SLHA files. [1]")
     xsecresummino.add_argument('-C', '--conf', type=str, default='default',
         help="path to resummino.py configuration file. [smodels/etc/resummino.py]")
-    xsecresummino.add_argument('-x', '--xsec_limit', type=float, default=None,
+    xsecresummino.add_argument('-x', '--xseclimit', type=float, default=None,
         help="cross section limit in pb. If the LO cross section is "
         "below this value, no higher orders will be calculated. The default "
         "is 0.00001, set in the smodels/etc/resummino.py file." )

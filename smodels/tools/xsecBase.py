@@ -252,14 +252,14 @@ class ArgsStandardizer:
         return ncpus
 
     def checkXsec_limit (self,args ):
-        if args.xsec_limit == None:
+        if args.xseclimit == None:
             return None
-        if args.xsec_limit < 0:
+        if args.xseclimit < 0:
             logger.error("Xsec_limit cannot be negative. Set to 0 if you want no limitation.")
             sys.exit()
-        if args.xsec_limit > 1000:
+        if args.xseclimit > 1000:
             logger.warn("Are you sure to use a limit that high ? you might get errors.")
-        return args.xsec_limit
+        return args.xseclimit
 
     def getPythiaVersion ( self, args ):
         pythiaVersion = 8
