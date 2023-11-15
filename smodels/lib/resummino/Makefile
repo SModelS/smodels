@@ -1,4 +1,6 @@
-all:
+all: install
+
+install:
 	./clean.sh
 	./install.sh
 
