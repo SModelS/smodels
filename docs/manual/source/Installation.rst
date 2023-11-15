@@ -21,17 +21,14 @@ SModelS is a Python library that requires Python version 3.6 or later. It depend
 
 For performance reasons, we moreover recommend pytorch>=1.8.0 as backend for pyhf. This is, however, optional: if pytorch is not available, SModelS will use the default backend. 
 
-In addition, the :ref:`cross section computer <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>`
-requires:
+In addition, the :ref:`cross section computers <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>`
+require:
 
- * `Pythia 8.3 <https://arxiv.org/abs/1410.3012>`_ (requires a C++ compiler) or `Pythia 6.4.27 <http://arxiv.org/abs/hep-ph/0603175>`_ (requires gfortran)
- * `NLL-fast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV) (requires a fortran compiler)
+ * `Pythia 8.3 <https://arxiv.org/abs/1410.3012>`_ (needs a C++ compiler) or `Pythia 6.4.27 <http://arxiv.org/abs/hep-ph/0603175>`_ (needs gfortran)
+ * `NLL-fast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV) (needs a Fortran compiler)
+ * `Resummino <https://resummino.hepforge.org>`_ (needs a C++ compiler and gfortran). Moreover, in rpm-based Linux distributions, this tool needs boost, boost-devel, gsl and gsl-devel. For deb-based distributions, libboost-dev and libgsl-dev are required.
 
-The resummino-based cross section computer depends on:
-
- * `Resummino <https://resummino.hepforge.org>`_ (requires a C++ compiler and gfortran). In rpm-based linux distributions this tool needs boost, boost-devel, gsl and gsl-devel. For deb-based distros, libboost-dev and libgsl-dev are required.
-
-The tools themselves, i.e. Pythia6|8, NLL-fast, and Resummino need not be installed separately, as the SModelS build system takes care of that. SModelS however expects the tools' dependencies (boost, gsl for resummino, as well as the compilers) to be installed. Currently, none of the tools are installed by default.
+The tools themselves, i.e. Pythia6|8, NLL-fast, and/or Resummino need not be installed separately, as the SModelS build system takes care of that (see below). SModelS however expects the tools' dependencies (boost, gsl for Resummino, as well as the compilers) to be installed by the user. 
 Finally, the :ref:`database browser <databaseBrowser>` provided by :ref:`smodelsTools.py <smodelsTools>`
 requires `IPython <https://ipython.org/>`_, while the :ref:`interactive plotter <interactivePlots>` requires `plotly <https://plot.ly/python/>`_ and `pandas <https://pandas.pydata.org/>`_. 
 
@@ -47,13 +44,13 @@ Installation Methods
 
      make smodels
 
-   in the top-level directory. SModelS will install the required dependencies (using pip install), but none of the SModelS tools (Pythia6|8, NLL-fast, Resummino).
-   If the MSSM cross section computers are needed, one can install SModelS with Pythia, NLL-fast, and Resummino. To this end, run::
+   in the top-level directory. SModelS will install the required dependencies (using pip install), but none of the external  tools (Pythia6|8, NLL-fast, Resummino). 
+   If the MSSM :ref:`cross section computers <xsecCalc>` are needed, one can directly install SModelS together with its external tools. To this end, run::
 
      make smodels_externaltools
  
    instead of *make smodels*. 
-   In case the Python libraries can not be successfully
+   In case the Python libraries cannot be successfully
    installed, the user can install them separately using his/her preferred method. Pythia, NLL-fast and Resummino can also be compiled separately
    running **make externaltools**. In case the Fortran comiler isn't found, 
    try *make FCC=<path-to-gfortran> smodels* or *make FCC=<path-to-gfortran> externaltools*. 
