@@ -78,6 +78,8 @@ Installation Methods
    If *setuptools* is not installed, you can try to install the external libraries
    manually and then rerun setup.py.
    For Ubuntu, SL6 machines and other platforms, a recipe is given below.
+   setup.py will *not* attempt at compiling the SModelS tools (Pythia6|8, NLL-fast, Resummino). However, when trying to compute cross sections, an attempt will be made at 
+   compiling the respective tools on the fly.
 
 
    Note that this installation method will install smodels into the default system or user directory (e.g. ~/.local/lib/python3/site-packages/).
@@ -105,6 +107,8 @@ Installation Methods
    Be aware that the example files and the |parameters| discussed in the manual 
    will also be located in your default system or user directory. Furthermore the database
    folder is not included (see :ref:`database installation <installingDB>` below).
+   pip will *not* attempt at compiling the SModelS tools (Pythia6|8, NLL-fast, Resummino). However, when trying to compute cross sections, an attempt will be made at 
+   compiling the respective tools on the fly.
    This installation method is best suited for experienced python users.   
 
 

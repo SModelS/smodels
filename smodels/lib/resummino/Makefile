@@ -1,4 +1,5 @@
 all:
+	./clean.sh
 	./install.sh
 
 clean: 

@@ -99,12 +99,12 @@ class XSecResummino(XSecBase):
             return True
         if not compile:
             return False
-        logger.debug ( "trying to compile resummino" )
+        logger.info ( "Resummino not compiled; trying to build now" )
         cmd = f"cd {self.tooldir}; make"
         o = subprocess.getoutput ( cmd )
         ret = os.path.exists ( self.resummino_bin )
         if not ret:
-            logger.error ( "attempt at compiling resummino failed:\n{o}" )
+            logger.error ( f"attempt at compiling resummino failed:\n{o}" )
         return ret
 
     def getVersion( self ):
@@ -487,11 +487,11 @@ class XSecResummino(XSecBase):
                 
             if data[-1].endswith("SModelSv2.3.0\n"):
                 b+=1
-                #On augmente cette variable de 1, comme ca si elle est > 0 on ne refait pas le calcul
+                # We increase this variable by 1, so if it is > 0 we do not redo the calculation 
                 #num_try+=1
             elif data[-1].endswith(" #no_cross-section\n"):
                 c+=1
-                #On augmente cette variable de 1, comme ca si elle est > 0 on ne refait pas le calcul
+                # We increase this variable by 1, so if it is > 0 we do not redo the calculation 
                 num_try+=1
 
             #remove the .slha
@@ -513,7 +513,7 @@ class XSecResummino(XSecBase):
             Liste_output_file.append(resummino_out_file)
             Liste_slha.append(slha_path)
 
-            #On liste ici les canaux à utiliser, si scénario exclu alors renvoi None
+            # Here we list the channels to use, if scenario excluded then return None
             #particles = self.discrimination_particles(slha_path)
             if self.particles == None:
                 self.mode, particles = self.extract_json()
@@ -522,8 +522,9 @@ class XSecResummino(XSecBase):
                 
             Liste_particles.append(particles)
 
-            #On pourrait optimiser en enlevant les variables qui ne changent pas d'une itération à l'autre
-            #Mais ce n'est pas très important (négligeable niveau temps de compilation comparé à Resummino)
+            # We could optimize by removing variables that do not change from one iteration to another
+            # But it is not very important (negligible in terms of compilation time
+            # compared to Resummino)
             Liste.append((particles, resummino_in_file, slha_path, resummino_out_file, num_try, order, resummino_log_file))
         logger.info(f"{a-b-c} files created")
         return Liste

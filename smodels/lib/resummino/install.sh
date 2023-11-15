@@ -44,7 +44,7 @@ else
     exit 1
 fi
 
-# Nettoyer les fichiers temporaires si Boost est installé
+# Clean temporary files if Boost is installed
 rm boost_check.cpp boost_check
 
 if command -v gsl-config &>/dev/null; then
@@ -58,7 +58,7 @@ fi
 
 num_cores_to_use=$(get_cpu_cores)
 
-# Vérification de l'existence de LHAPDF
+# Checking for the existence of LHAPDF
 if [ ! -d "$install_dir/lhapdf" ]; then
     wget https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz -O "LHAPDF-$LHAPDF_VERSION.tar.gz"
     tar xf LHAPDF-$LHAPDF_VERSION.tar.gz
@@ -72,7 +72,7 @@ if [ ! -d "$install_dir/lhapdf" ]; then
     cd $install_dir
 fi
 
-# Vérification de l'existence de RESUMMINO
+# Checking for the existence of RESUMMINO
 if [ ! -d "$install_dir/resummino_install" ]; then
     wget https://resummino.hepforge.org/downloads/?f=resummino-$RESUMMINO_VERSION.zip -O resummino-$RESUMMINO_VERSION.zip
     unzip resummino-$RESUMMINO_VERSION.zip
