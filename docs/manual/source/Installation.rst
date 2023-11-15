@@ -78,11 +78,10 @@ Installation Methods
    If *setuptools* is not installed, you can try to install the external libraries
    manually and then rerun setup.py.
    For Ubuntu, SL6 machines and other platforms, a recipe is given below.
-   setup.py will *not* attempt at compiling the SModelS tools (Pythia6|8, NLL-fast, Resummino). However, when trying to compute cross sections, an attempt will be made at 
-   compiling the respective tools on the fly.
+   setup.py will *not* attempt at compiling the SModelS tools (Pythia6|8, NLL-fast, Resummino) at install time. However, when trying to compute cross sections, an attempt will be made at compiling the respective tools on the fly, at runtime.
 
 
-   Note that this installation method will install smodels into the default system or user directory (e.g. ~/.local/lib/python3/site-packages/).
+   Note that this installation method will install smodels into the default system or user directory (e.g. ~/.local/lib/python3.10/site-packages/).
    Depending on your platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
    (or $DYLD_LIBRARY_PATH) might have to be set appropriately.
 
@@ -101,14 +100,14 @@ Installation Methods
    for user-specific installations.
 
 
-   Note that this installation method will install smodels into the default system or user directory (e.g. ~/.local/lib/python3/site-packages/).
+   Note that this installation method will install smodels into the default system or user directory (e.g. ~/.local/lib/python3.10/site-packages/).
    Depending on your platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
    (or $DYLD_LIBRARY_PATH) might have to be set appropriately.
    Be aware that the example files and the |parameters| discussed in the manual 
    will also be located in your default system or user directory. Furthermore the database
    folder is not included (see :ref:`database installation <installingDB>` below).
-   pip will *not* attempt at compiling the SModelS tools (Pythia6|8, NLL-fast, Resummino). However, when trying to compute cross sections, an attempt will be made at 
-   compiling the respective tools on the fly.
+   pip will *not* attempt at compiling the SModelS tools (Pythia6|8, NLL-fast, Resummino) at install time. However, when trying to compute cross sections, an attempt will be made at 
+   compiling the respective tools on the fly, at runtime.
    This installation method is best suited for experienced python users.   
 
 
