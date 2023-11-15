@@ -50,10 +50,12 @@ class XSecResummino(XSecBase):
         :param verbosity: Type of informations given in the logger file
         """
         self.pwd = installation.installDirectory()
-        self.resummino_bin = os.path.join(self.pwd,"./smodels/lib/resummino/resummino-3.1.2/bin/resummino")
-        self.input_file_original = os.path.join(self.pwd,"smodels/etc/input_resummino.in")
+        self.tooldir = os.path.join(self.pwd,"smodels","lib","resummino")
+        self.getVersion()
+        self.resummino_bin = os.path.join(self.tooldir,f"resummino-{self.version}","bin","resummino")
+        self.input_file_original = os.path.join(self.pwd,"smodels","etc","input_resummino.in")
         if json == None:
-            self.json_resummino = os.path.join(self.pwd,"smodels/etc/resummino.py")
+            self.json_resummino = os.path.join(self.pwd,"smodels","etc","resummino.py")
         else:
             if os.path.isabs(json):
                 self.json_resummino = json
@@ -87,6 +89,35 @@ class XSecResummino(XSecBase):
                 self.xsec_limit = 0.00001
         else:
             self.xsec_limit = xsec_limit
+            
+    def checkInstallation(self, compile : bool = True ) -> bool:
+        """ check if resummino is already compiled.
+        :param compile: if true, then attempt a compilation if not installed
+        :returns: true if we have a compiled executable
+        """
+        if os.path.exists ( self.resummino_bin ):
+            return True
+        if not compile:
+            return False
+        logger.debug ( "trying to compile resummino" )
+        cmd = f"cd {self.tooldir}; make"
+        o = subprocess.getoutput ( cmd )
+        ret = os.path.exists ( self.resummino_bin )
+        if not ret:
+            logger.error ( "attempt at compiling resummino failed:\n{o}" )
+        return ret
+
+    def getVersion( self ):
+        """ retrieve the version from version_path,
+            set self.version
+            if it doesnt exist, set to default of 3.1.2 """
+        version_path = os.path.join(self.tooldir, 'versions.txt')
+        version = "?.?.?"
+        if os.path.exists(version_path):
+            with open(version_path, "r") as f:
+                lines = f.readlines()
+            version = lines[1].split(sep ="=")[1].strip()
+        self.version = version
         
     def calculate_one_slha(self, particles,input_file, slha_file, output_file, 
             num_try, order, log):
@@ -109,14 +140,7 @@ class XSecResummino(XSecBase):
         for particle_pair in particles:
             self.launch_resummino(input_file, slha_file, output_file, particle_pair[0], particle_pair[1], num_try, order, Xsections, log)
         
-        version_path = os.path.join(self.pwd, 'smodels', 'lib', 'resummino', 'versions.txt')
-        if os.path.exists(version_path):
-            with open(version_path, "r") as f:
-                lines = f.readlines()
-            version = lines[1].split(sep ="=")[1].strip()
-            resummino_version = f"Resumminov{version}"
-        else:
-            resummino_version = "Resumminov3.1.2"    
+        resummino_version = f"Resumminov{self.version}"
         nxsecs = self.addXSecToFile(Xsections, slha_file, comment = f"[pb], {resummino_version}")
         
            
@@ -398,23 +422,6 @@ class XSecResummino(XSecBase):
                 channels.append((channel, sqrt, order))
         return channels
 
-
-    # def discrimination_particles(self, slha_file):
-    #     """
-    #     Choice of the differents channel and condtions on the cross section calculation.
-    #     C1<92 or N1>600 or C2>1200 by default.
-    #     """
-    #     m1,m2,mu = self.extract_m1_m2_mu(slha_file)
-    #     N1,N2,C1,C2 = self.extract_N1_N2_C1(slha_file)
-    #     abs_mu = math.fabs(mu)
-    #     if C1<92 or N1>600 or C2>1200:
-    #         return None
-    #     if m2>=abs_mu:
-    #         return [(1000025,1000037),(1000025,-1000037), (-1000037, 1000037)]
-    #     elif m2<abs_mu:
-    #         return [(1000023,1000037), (1000023,-1000037), (1000025, 1000037), (1000025, -1000037), (-1000037,1000037), (1000023,1000025)]
-    
-      
     def create_routine_files(self, order, slha_folder_name):
         """
         Prepare all the paths and everything before turning into parallel task.
@@ -745,6 +752,7 @@ def main ( args : argparse.Namespace ):
     for sqrt in sqrtses:
         logger.debug('Current energy considered is '+ str(sqrt)+ ' TeV')
         test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type = type_writting, verbosity = verbosity, json = json, particles=particles, xsec_limit = xsec_limit)
+        test.checkInstallation ( compile = not args.noautocompile )
         test.launch_routine_resummino()
     return
     
