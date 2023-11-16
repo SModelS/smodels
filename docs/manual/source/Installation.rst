@@ -61,15 +61,13 @@ Installation Methods
 
    Remember, though, that the compilers as well as Resummino's dependencies (boost, gsl, see above) need to be installed already.
 
- * If Python's *setuptools* is installed in your machine, SModelS and its dependencies
-   can also be installed.
+ * Python's *setuptools*, if installed in your machine, can also be used for installing SModelS and its dependencies.
    After downloading the source from the `SModelS releases page <https://github.com/SModelS/smodels/releases>`_
    and extracting it, run::
 
-
      setup.py install
 
-   within the main smodels directory. If the python libraries are installed in a system folder (as is the default behavior),
+   within the main SModelS directory. If the python libraries are installed in a system folder (as is the default behavior),
    it will be necessary to run the install command with superuser privilege.
    Alternatively, one can run setup.py with the "--user" flag: ::
 
@@ -78,18 +76,17 @@ Installation Methods
    If *setuptools* is not installed, you can try to install the external libraries
    manually and then rerun setup.py.
    For Ubuntu, SL6 machines and other platforms, a recipe is given below.
-   setup.py will *not* attempt at compiling the SModelS tools (Pythia6|8, NLL-fast, Resummino) at install time. However, when trying to compute cross sections, an attempt will be made at compiling the respective tools on the fly, at runtime.
 
-
-   Note that this installation method will install smodels into the default system or user directory (e.g. ~/.local/lib/python3.10/site-packages/).
+   Note that this installation method will install SModelS into the default system or user directory (e.g. ~/.local/lib/python3.10/site-packages/).
    Depending on your platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
    (or $DYLD_LIBRARY_PATH) might have to be set appropriately.
 
+   Note also, that setup.py will *not* attempt at downloading and compiling the external tools (Pythia6|8, NLL-fast, Resummino) at install time. 
+   Instead, this will be done on the fly, at runtime, upon call of the :ref:`cross section computer(s) <xsecCalc>`. 
+   The external tools will also be located in the above smodels installation directory (<installdir>/lib/...).  
 
 
-
- * Finally, SModelS is `indexed on pypi <https://pypi.org/project/smodels/>`_. Thus, if *pip3* (or *pip*) is installed in your machine, it is also possible to install SModelS directly without the need for
-   downloading the source code: ::
+ * Finally, SModelS is `indexed on pypi <https://pypi.org/project/smodels/>`_. Thus, if *pip3* (or *pip*) is installed in your machine, it is possible to install SModelS  without downloading the source code: ::
 
      pip3 install smodels
 
@@ -99,16 +96,17 @@ Installation Methods
    
    for user-specific installations.
 
-
-   Note that this installation method will install smodels into the default system or user directory (e.g. ~/.local/lib/python3.10/site-packages/).
+   This installation method will install SModelS into the default system or user directory (e.g. ~/.local/lib/python3.10/site-packages/).
    Depending on your platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
    (or $DYLD_LIBRARY_PATH) might have to be set appropriately.
    Be aware that the example files and the |parameters| discussed in the manual 
    will also be located in your default system or user directory. Furthermore the database
-   folder is not included (see :ref:`database installation <installingDB>` below).
-   pip will *not* attempt at compiling the SModelS tools (Pythia6|8, NLL-fast, Resummino) at install time. However, when trying to compute cross sections, an attempt will be made at 
-   compiling the respective tools on the fly, at runtime.
-   This installation method is best suited for experienced python users.   
+   folder is not included (see :ref:`database installation <installingDB>` below). 
+
+   Moreover, pip will *not* attempt at downloading and compiling the external tools (Pythia6|8, NLL-fast, Resummino) at install time. Instead, this will be done on the fly, at runtime, upon call of the :ref:`cross section computer(s) <xsecCalc>`. 
+   The external tools will also be located in the above smodels installation directory (<installdir>/lib/...).  
+
+   Generally, this installation method is best suited for experienced python users.   
 
 
 There is also a diagnostic tool available: ::
