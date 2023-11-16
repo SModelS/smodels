@@ -26,7 +26,7 @@ import random
 slhafile = './testFiles/slha/lightEWinos.slha'
 
 model = Model( BSMparticles=BSMList, SMparticles=SMList)
-model.updateParticles(inputFile=slhafile,erasePrompt=['spin'])
+model.updateParticles(inputFile=slhafile,ignorePromptQNumbers=['spin'])
 
 
 n1 = model.getParticle(label='N1')

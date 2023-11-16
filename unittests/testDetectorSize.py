@@ -65,7 +65,7 @@ class DetectorSizeTest(unittest.TestCase):
         slhafile = './testFiles/slha/lightEWinos.slha'
 
         model = Model( BSMparticles=BSMList, SMparticles=SMList)
-        model.updateParticles(inputFile=slhafile,erasePrompt=['spin'])
+        model.updateParticles(inputFile=slhafile,ignorePromptQNumbers=['spin'])
 
         n1 = model.getParticle(label='N1')
         n1.totalwidth = 1e-18*GeV
@@ -93,7 +93,7 @@ class DetectorSizeTest(unittest.TestCase):
         slhafile = './testFiles/slha/lightEWinos.slha'
 
         model = Model( BSMparticles=BSMList, SMparticles=SMList)
-        model.updateParticles(inputFile=slhafile,erasePrompt=['spin'])
+        model.updateParticles(inputFile=slhafile,ignorePromptQNumbers=['spin'])
 
         c1 = model.getParticle(label='C1-')
         gluino = model.getParticle(label='gluino')

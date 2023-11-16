@@ -83,7 +83,7 @@ class TxTest(unittest.TestCase):
 
         slhafile = './testFiles/slha/lightEWinos.slha'
         model = Model( BSMparticles=BSMList, SMparticles=SMList)
-        model.updateParticles(inputFile=slhafile,erasePrompt=['spin'])
+        model.updateParticles(inputFile=slhafile,ignorePromptQNumbers=['spin'])
         sms = fromString("[[],[]]",finalState = ['C1+','N1'],  model=model)
 
         n1 = model.getParticle(label='N1')
@@ -114,7 +114,7 @@ class TxTest(unittest.TestCase):
 
         slhafile = './testFiles/slha/lightEWinos.slha'
         model = Model( BSMparticles=BSMList, SMparticles=SMList)
-        model.updateParticles(inputFile=slhafile,erasePrompt=['spin'])
+        model.updateParticles(inputFile=slhafile,ignorePromptQNumbers=['spin'])
         sms = fromString("[[],[]]",finalState = ['C1+','C1-'],  model=model)
         c1m = model.getParticle(label='C1-')
         c1p = model.getParticle(label='C1+')

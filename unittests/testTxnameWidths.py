@@ -91,7 +91,7 @@ class TestTxnameWidths(unittest.TestCase):
         slhafile="./testFiles/slha/lightEWinos.slha"
         model = Model(BSMList,SMList)
         model.updateParticles(inputFile=slhafile,promptWidth = 1e-12*GeV,
-                              erasePrompt=['spin','eCharge','colordim'])
+                              ignorePromptQNumbers=['spin','eCharge','colordim'])
         # Hack to create a theory element from a string:
         expSMS = ExpSMS.from_string("[[['u','u~']],[['d','d~']]]",model=model,
                     intermediateState=[['C1+'],['C1-']],finalState=['N1','N1'])

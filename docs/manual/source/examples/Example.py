@@ -48,7 +48,7 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
     slhafile = os.path.abspath(inputFile)
 #     model.updateParticles(inputFile=lhefile)
     model.updateParticles(inputFile=slhafile,
-                          erasePrompt = ['eCharge','colordim','spin'])
+                          ignorePromptQNumbers = ['eCharge','colordim','spin'])
 
     # Set main options for decomposition
     sigmacut = sigmacut

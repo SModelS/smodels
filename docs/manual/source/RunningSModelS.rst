@@ -168,7 +168,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _erasePrompt:
 
-  * **ignorePromptQNumbers**: since many experimental searches are not sensitive to the quantum numbers of promptly decaying particles (particles with width larger than :ref:`promptWidth <promptWidth>`), SModelS has the option to erase the quantum numbers of these particles. This can greatly reduce the running time (must be used with caution). Available v3.0.0 onwards.
+  * **ignorePromptQNumbers**: list with quantum numbers to be ignored for promptly decaying particles (particles with width larger than :ref:`promptWidth <promptWidth>`), e.g. "spin,eCharge,colordim". Since many experimental searches are not sensitive to the quantum numbers decaying particles, SModelS has the option to erase the quantum numbers of these particles. This can greatly reduce the running time (must be used with caution). If not defined, all quantum numbers will be kept. Available v3.0.0 onwards.
 
 .. _parameterFileParameters:
 

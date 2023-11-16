@@ -24,7 +24,7 @@ from unitTestHelpers import getNodesIndices, getEdges
 
 slhafile="./testFiles/slha/lightEWinos.slha"
 model = Model(BSMList,SMList)
-model.updateParticles(inputFile=slhafile, erasePrompt=['spin'])
+model.updateParticles(inputFile=slhafile, ignorePromptQNumbers=['spin'])
 
 
 class TestSMSComparison(unittest.TestCase):

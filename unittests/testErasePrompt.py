@@ -28,7 +28,7 @@ class ErasePromptTest(unittest.TestCase):
         # (prompt decaying particles with the same mass will be considered equal)
         filename = "./testFiles/slha/squarks_degenerate.slha"
         model = Model(BSMList,SMList)
-        model.updateParticles(filename,erasePrompt=['spin','eCharge','colordim'])
+        model.updateParticles(filename,ignorePromptQNumbers=['spin','eCharge','colordim'])
         topList = decomposer.decompose(model, sigmacut=3*fb)
         self.assertEqual(len(topList.getSMSList()),1)
 
@@ -101,7 +101,7 @@ class ErasePromptTest(unittest.TestCase):
         # (prompt decaying particles with the same mass will be considered equal)
         filename = "./testFiles/slha/squarks_degenerate.slha"
         model = Model(BSMList,SMList)
-        model.updateParticles(filename,erasePrompt=['spin','eCharge','colordim'])
+        model.updateParticles(filename,ignorePromptQNumbers=['spin','eCharge','colordim'])
         topListA = decomposer.decompose(model, sigmacut=3*fb)
         allPredictionsA = theoryPredictionsFor(db, topListA, combinedResults=False)
         self.assertEqual(len(allPredictionsA),2)

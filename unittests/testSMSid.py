@@ -26,7 +26,7 @@ class SMSIdTest(unittest.TestCase):
         filename = "./testFiles/slha/higgsinoStop.slha"
         model = Model(BSMList,SMList)
         model.updateParticles(filename,promptWidth = 1e-12*GeV,
-                              erasePrompt=['spin','eCharge','colordim']) #Make sure C1 and N2 are treated as prompt
+                              ignorePromptQNumbers=['spin','eCharge','colordim']) #Make sure C1 and N2 are treated as prompt
         ## model.describe()
 
         topDict = decomposer.decompose(model, sigmacut= 0.1*fb, massCompress=True, invisibleCompress=True, minmassgap= 5*GeV)

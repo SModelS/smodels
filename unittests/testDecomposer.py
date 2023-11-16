@@ -28,7 +28,7 @@ class DecomposerTest(unittest.TestCase):
 
         filename = "./testFiles/lhe/simplyGluino.lhe"
         model = Model(BSMList,SMList)
-        model.updateParticles(filename,erasePrompt=['spin','eCharge','colordim'])
+        model.updateParticles(filename,ignorePromptQNumbers=['spin','eCharge','colordim'])
 
         topList = decomposer.decompose(model, sigmacut=0*fb)
         self.assertTrue(len(topList.getSMSList()) == 1)
@@ -47,7 +47,7 @@ class DecomposerTest(unittest.TestCase):
 
         filename = "./testFiles/slha/simplyGluino.slha"
         model = Model(BSMList,SMList)
-        model.updateParticles(filename,erasePrompt=['spin','eCharge','colordim'])
+        model.updateParticles(filename,ignorePromptQNumbers=['spin','eCharge','colordim'])
 
         topList = decomposer.decompose(model, sigmacut=0*fb)
         self.assertTrue(len(topList.getSMSList()) == 1)
@@ -70,7 +70,7 @@ class DecomposerTest(unittest.TestCase):
         #Consider a simpler model
         newModel = [ptc for ptc in BSMList if not isinstance(ptc.pdg,list) and abs(ptc.pdg) in [1000015,1000022]]
         model = Model(newModel,SMList)
-        model.updateParticles(filename,erasePrompt=['spin','eCharge','colordim'])
+        model.updateParticles(filename,ignorePromptQNumbers=['spin','eCharge','colordim'])
 
         topList = decomposer.decompose(model, sigmacut=0*fb)
         self.assertTrue(len(topList.getSMSList()) == 10)
@@ -91,7 +91,7 @@ class DecomposerTest(unittest.TestCase):
         filename = "./testFiles/slha/higgsinoStop.slha"
         model = Model(BSMList,SMList)
         model.updateParticles(filename,promptWidth=1e-12*GeV,
-                            erasePrompt=['spin','eCharge','colordim']) #Force charginos/neutralinos to be considered as prompt
+                            ignorePromptQNumbers=['spin','eCharge','colordim']) #Force charginos/neutralinos to be considered as prompt
 
 
         tested = False
@@ -195,7 +195,7 @@ class DecomposerTest(unittest.TestCase):
         slhafile = './testFiles/slha/lightEWinos.slha'
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles(inputFile=slhafile,
-                                    erasePrompt=['spin','eCharge','colordim'])
+                                    ignorePromptQNumbers=['spin','eCharge','colordim'])
         
         sigmacut = 10*fb
         topDict = decomposer.decompose(model, sigmacut= sigmacut, 
@@ -255,7 +255,7 @@ class DecomposerTest(unittest.TestCase):
         model = Model(BSMList,SMList)
         model.updateParticles(inputFile=slhafile,promptWidth = 1e-12*GeV,
                               
-                              erasePrompt=['spin','eCharge','colordim'])
+                              ignorePromptQNumbers=['spin','eCharge','colordim'])
         
         sigmacut = 1*fb
         topDict = decomposer.decompose(model, sigmacut= sigmacut, 

@@ -292,7 +292,7 @@ class Model(object):
             else:
                 raise SModelSError("No mass found for %i in input file %s." % (particle.pdg, self.inputFile))
 
-    def setDecays(self, decaysDict, promptWidth, stableWidth, erasePrompt):
+    def setDecays(self, decaysDict, promptWidth, stableWidth, ignorePromptQNumbers):
 
         allPDGs = list(set(self.getValuesFor('pdg')))
 
@@ -364,17 +364,17 @@ class Model(object):
                 p.totalwidth = 0.*GeV
 
         # Finally erase attributes of prompt particles
-        if erasePrompt:
+        if ignorePromptQNumbers:
             for particle in self.BSMparticles:
                  if not particle.isSM and particle.totalwidth > promptWidth:
                     logger.debug("Erasing quantum numbers of (prompt) particle %s." % particle.pdg)
-                    for attr in erasePrompt:
+                    for attr in ignorePromptQNumbers:
                         if hasattr ( particle, attr ):
                             delattr(particle, attr)
 
 
     def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
-                        roundMasses = 1, erasePrompt=[], 
+                        roundMasses = 1, ignorePromptQNumbers=[], 
                         minMass=1.0*GeV):
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file.
@@ -387,7 +387,7 @@ class Model(object):
                             will be set 1e-25 GeV.
         :param roundMasses: If set, it will round the masses to this number of digits (int)
 
-        :param erasePrompt: If set, all particles with prompt decays (totalwidth > promptWidth)
+        :param ignorePromptQNumbers: If set, all particles with prompt decays (totalwidth > promptWidth)
                                will have the corresponding properties (quantum numbers). So all particles with the same
                                mass and isSM=False will be considered as equal when combining elements.
 
@@ -430,7 +430,7 @@ class Model(object):
         self.setMasses(massDict,roundMasses,minMass)
 
         #  Set particle decays
-        self.setDecays(decaysDict, promptWidth, stableWidth, erasePrompt)
+        self.setDecays(decaysDict, promptWidth, stableWidth, ignorePromptQNumbers)
 
         #  Reset particle equality from all particles:
         for p in Particle.getinstances():

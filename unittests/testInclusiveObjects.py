@@ -25,7 +25,7 @@ from smodels.base.model import Model
 slhafile = './testFiles/slha/lightEWinos.slha'
 
 model = Model( BSMparticles=BSMList, SMparticles=SMList)
-model.updateParticles(inputFile=slhafile,erasePrompt=['spin'])
+model.updateParticles(inputFile=slhafile,ignorePromptQNumbers=['spin'])
 
 class InclusiveObjectsTest(unittest.TestCase):
 
