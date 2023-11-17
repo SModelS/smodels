@@ -101,3 +101,4 @@ fi
 
 echo "LHAPDF_version = $LHAPDF_VERSION" > versions.txt
 echo "resummino_version = $RESUMMINO_VERSION" >> versions.txt
+echo "resummino_version = #Note that this file gets overwritten when calling install.sh, so do not define the version here!" >> versions.txt
