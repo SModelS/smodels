@@ -28,6 +28,8 @@ import tempfile
 import argparse
 import pyslha
 import shutil
+import requests
+import tarfile
 from itertools import combinations
 
 class XSecResummino(XSecBase):
@@ -562,21 +564,46 @@ class XSecResummino(XSecBase):
             lhapdf_folder = os.path.join(self.pwd, 'smodels', 'lib', 'resummino', 'lhapdf', 'share', 'LHAPDF')
             
             if not os.path.exists(os.path.join(lhapdf_folder, pdf_lo)):
-                command = f"wget http://lhapdfsets.web.cern.ch/lhapdfsets/current/{pdf_lo}.tar.gz -O- | tar xz -C {lhapdf_folder}"
-                with open("/dev/null", "w") as errorhandle:
-                    try:
-                        subprocess.run(command, shell=True,check = True, stderr=errorhandle)
-                    except subprocess.CalledProcessError as e:
-                        logger.error("pdf name is wrong for LO, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
-                        raise RuntimeError(f"Failed during HTTP request for {pdf_lo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check. You may also check if resummino is installed.")
+                url = f"http://lhapdfsets.web.cern.ch/lhapdfsets/current/{pdf_lo}.tar.gz"
+                try:
+                    response = requests.get(url, stream=True)
+                    response.raise_for_status() 
+
+                    with open(f"{pdf_lo}.tar.gz", 'wb') as file:
+                        for chunk in response.iter_content(chunk_size=8192): 
+                            file.write(chunk)
+
+                    with tarfile.open(f"{pdf_lo}.tar.gz", "r:gz") as tar:
+                        tar.extractall(path=lhapdf_folder)
+
+                except requests.exceptions.HTTPError as e:
+                    logger.error("pdf name is wrong for LO, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
+                    raise RuntimeError(f"Failed during HTTP request for {pdf_lo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check. You may also check if resummino is installed.")
+                finally:
+                    if os.path.exists(f"{pdf_lo}.tar.gz"):
+                        os.remove(f"{pdf_lo}.tar.gz")
             if not os.path.exists(os.path.join(lhapdf_folder, pdf_nlo)):
-                command = f"wget http://lhapdfsets.web.cern.ch/lhapdfsets/current/{pdf_nlo}.tar.gz -O- | tar xz -C {lhapdf_folder}"
-                with open("/dev/null", "w") as errorhandle:
-                    try:
-                        subprocess.run(command, shell=True, check=True, stderr=errorhandle)
-                    except subprocess.CalledProcessError as e:
-                        logger.error("pdf name is wrong for LO, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
-                        raise RuntimeError(f"Failed during HTTP request for {pdf_nlo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
+                url = f"http://lhapdfsets.web.cern.ch/lhapdfsets/current/{pdf_nlo}.tar.gz"
+                try:
+                    response = requests.get(url, stream=True)
+                    response.raise_for_status()  # Vérifie si la requête a réussi
+
+                    # Ouvre un fichier temporaire pour enregistrer le fichier téléchargé
+                    with open(f"{pdf_nlo}.tar.gz", 'wb') as file:
+                        for chunk in response.iter_content(chunk_size=8192): 
+                            file.write(chunk)
+
+                    # Décompression du fichier
+                    with tarfile.open(f"{pdf_nlo}.tar.gz", "r:gz") as tar:
+                        tar.extractall(path=lhapdf_folder)
+
+                except requests.exceptions.HTTPError as e:
+                    logger.error("pdf name is wrong for NLO, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
+                    raise RuntimeError(f"Failed during HTTP request for {pdf_nlo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check.")
+                finally:
+                    # Supprimer le fichier tar.gz temporaire si nécessaire
+                    if os.path.exists(f"{pdf_nlo}.tar.gz"):
+                        os.remove(f"{pdf_nlo}.tar.gz")
             with open(file_after, 'w') as f:
                 for line in lines:
                     if line.startswith("pdf_lo"):
@@ -588,7 +615,7 @@ class XSecResummino(XSecBase):
                     if line.startswith("pdfset_nlo"):
                         line = f"pdfset_nlo = {pdfset_nlo}\n" 
                     f.write(line)
-                
+                        
         except KeyError:
                 logger.info("choosing PDF4LHC21_40 by default")
            

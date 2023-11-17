@@ -58,26 +58,41 @@ fi
 
 num_cores_to_use=$(get_cpu_cores)
 
+download_file() {
+    url="$1"
+    output="$2"
+
+    if command -v curl > /dev/null; then
+        echo "Using curl to download $url"
+        curl -L "$url" -o "$output"
+    elif command -v wget > /dev/null; then
+        echo "Using wget to download $url"
+        wget "$url" -O "$output"
+    else
+        echo "Error: Neither curl nor wget is available for downloading files."
+        exit 1
+    fi
+}
+
 # Checking for the existence of LHAPDF
 if [ ! -d "$install_dir/lhapdf" ]; then
-    wget https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz -O "LHAPDF-$LHAPDF_VERSION.tar.gz"
-    tar xf LHAPDF-$LHAPDF_VERSION.tar.gz
-    cd LHAPDF-$LHAPDF_VERSION
+    download_file "https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz" "LHAPDF-$LHAPDF_VERSION.tar.gz"
+    tar xf "LHAPDF-$LHAPDF_VERSION.tar.gz"
+    cd "LHAPDF-$LHAPDF_VERSION"
     ./configure --prefix=$install_dir/lhapdf --disable-python
     make -j"$num_cores_to_use"
     make install
     cd ..
-    cd ..
-    wget http://lhapdfsets.web.cern.ch/lhapdfsets/current/PDF4LHC21_40.tar.gz -O- | tar xz -C $install_dir/lhapdf/share/LHAPDF
+    download_file "http://lhapdfsets.web.cern.ch/lhapdfsets/current/PDF4LHC21_40.tar.gz" | tar xz -C $install_dir/lhapdf/share/LHAPDF
     cd $install_dir
 fi
 
 # Checking for the existence of RESUMMINO
 if [ ! -d "$install_dir/resummino_install" ]; then
-    wget https://resummino.hepforge.org/downloads/?f=resummino-$RESUMMINO_VERSION.zip -O resummino-$RESUMMINO_VERSION.zip
-    unzip resummino-$RESUMMINO_VERSION.zip
+    download_file "https://resummino.hepforge.org/downloads/?f=resummino-$RESUMMINO_VERSION.zip" "resummino-$RESUMMINO_VERSION.zip"
+    unzip "resummino-$RESUMMINO_VERSION.zip"
     mkdir -p resummino_install
-    cd resummino-$RESUMMINO_VERSION
+    cd "resummino-$RESUMMINO_VERSION"
     cmake . -DLHAPDF=$install_dir/lhapdf -DCMAKE_INSTALL_PREFIX=$install_dir/resummino_install
     make -j"$num_cores_to_use"
     make install
