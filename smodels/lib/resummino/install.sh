@@ -110,8 +110,8 @@ if [ ! -d "$install_dir/resummino_install" ]; then
     fi
 fi
 
-echo "LHAPDF_version = $LHAPDF_VERSION" > versions.txt
-echo "resummino_version = $RESUMMINO_VERSION" >> versions.txt
-echo "# Note that this file gets overwritten when calling install.sh" >> versions.txt 
+echo "# Note that this file gets overwritten when calling install.sh" > versions.txt 
 echo "# so do not define the versions here!" >> versions.txt
 echo "# Instead, look at install.sh." >> versions.txt
+echo "LHAPDF_version = $LHAPDF_VERSION" >> versions.txt
+echo "resummino_version = $RESUMMINO_VERSION" >> versions.txt
