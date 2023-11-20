@@ -104,7 +104,7 @@ download_and_install_resummino() {
 }
 
 if [ ! -d "$install_dir/resummino_install" ]; then
-    if ! download_and_install_resummino "https://smodels.github.io/resummino/tarballs/resummino-$RESUMMINO_VERSION.zip"; then
+    if ! download_and_install_resummino "https://smodels.github.io/resummino/resummino-$RESUMMINO_VERSION.zip"; then
         echo "Failed to download from smodels.github.io, trying hepforge.org..."
         download_and_install_resummino "https://resummino.hepforge.org/downloads/?f=resummino-$RESUMMINO_VERSION.zip"
     fi
@@ -112,4 +112,6 @@ fi
 
 echo "LHAPDF_version = $LHAPDF_VERSION" > versions.txt
 echo "resummino_version = $RESUMMINO_VERSION" >> versions.txt
-echo "resummino_version = #Note that this file gets overwritten when calling install.sh, so do not define the version here!" >> versions.txt
+echo "# Note that this file gets overwritten when calling install.sh" >> versions.txt 
+echo "# so do not define the versions here!" >> versions.txt
+echo "# Instead, look at install.sh." >> versions.txt
