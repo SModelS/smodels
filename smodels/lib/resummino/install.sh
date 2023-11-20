@@ -92,7 +92,7 @@ download_and_install_resummino() {
     if [ -f "resummino-$RESUMMINO_VERSION.zip" ]; then
         unzip "resummino-$RESUMMINO_VERSION.zip"
         mkdir -p resummino_install
-        cd "resummino-$RESUMMINO_VERSION"
+        cd "resummino-$RESUMMINO_VERSION" || { echo "Erreur : Impossible de changer de répertoire vers resummino-$RESUMMINO_VERSION"; return 1; }
         cmake . -DLHAPDF=$install_dir/lhapdf -DCMAKE_INSTALL_PREFIX=$install_dir/resummino_install
         make -j"$num_cores_to_use"
         make install
