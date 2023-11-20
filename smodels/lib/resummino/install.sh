@@ -74,7 +74,6 @@ download_file() {
     fi
 }
 
-# Checking for the existence of LHAPDF
 if [ ! -d "$install_dir/lhapdf" ]; then
     download_file "https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz" "LHAPDF-$LHAPDF_VERSION.tar.gz"
     tar xf "LHAPDF-$LHAPDF_VERSION.tar.gz"
@@ -88,15 +87,27 @@ if [ ! -d "$install_dir/lhapdf" ]; then
 fi
 
 # Checking for the existence of RESUMMINO
+download_and_install_resummino() {
+    download_file "$1" "resummino-$RESUMMINO_VERSION.zip"
+    if [ -f "resummino-$RESUMMINO_VERSION.zip" ]; then
+        unzip "resummino-$RESUMMINO_VERSION.zip"
+        mkdir -p resummino_install
+        cd "resummino-$RESUMMINO_VERSION"
+        cmake . -DLHAPDF=$install_dir/lhapdf -DCMAKE_INSTALL_PREFIX=$install_dir/resummino_install
+        make -j"$num_cores_to_use"
+        make install
+        cd ..
+        return 0
+    else
+        return 1
+    fi
+}
+
 if [ ! -d "$install_dir/resummino_install" ]; then
-    download_file "https://resummino.hepforge.org/downloads/?f=resummino-$RESUMMINO_VERSION.zip" "resummino-$RESUMMINO_VERSION.zip"
-    unzip "resummino-$RESUMMINO_VERSION.zip"
-    mkdir -p resummino_install
-    cd "resummino-$RESUMMINO_VERSION"
-    cmake . -DLHAPDF=$install_dir/lhapdf -DCMAKE_INSTALL_PREFIX=$install_dir/resummino_install
-    make -j"$num_cores_to_use"
-    make install
-    cd ..
+    if ! download_and_install_resummino "https://smodels.github.io/resummino/tarballs/resummino-$RESUMMINO_VERSION.zip"; then
+        echo "Failed to download from smodels.github.io, trying hepforge.org..."
+        download_and_install_resummino "https://resummino.hepforge.org/downloads/?f=resummino-$RESUMMINO_VERSION.zip"
+    fi
 fi
 
 echo "LHAPDF_version = $LHAPDF_VERSION" > versions.txt
