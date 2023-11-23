@@ -62,12 +62,12 @@ download_file() {
     url="$1"
     output="$2"
 
-    if command -v curl > /dev/null; then
-        echo "Using curl to download $url"
-        curl -L "$url" -o "$output"
-    elif command -v wget > /dev/null; then
+    if command -v wget > /dev/null; then
         echo "Using wget to download $url"
         wget "$url" -O "$output"
+    elif command -v curl > /dev/null; then
+        echo "Using curl to download $url"
+        curl -L "$url" -o "$output"
     else
         echo "Error: Neither curl nor wget is available for downloading files."
         exit 1
@@ -82,7 +82,8 @@ if [ ! -d "$install_dir/lhapdf" ]; then
     make -j"$num_cores_to_use"
     make install
     cd ..
-    download_file "http://lhapdfsets.web.cern.ch/lhapdfsets/current/PDF4LHC21_40.tar.gz" | tar xz -C $install_dir/lhapdf/share/LHAPDF
+    download_file "http://lhapdfsets.web.cern.ch/lhapdfsets/current/PDF4LHC21_40.tar.gz" "PDF4LHC21_40.tar.gz"
+	  tar xz -C $install_dir/lhapdf/share/LHAPDF -f PDF4LHC21_40.tar.gz
     cd $install_dir
 fi
 
