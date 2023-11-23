@@ -65,7 +65,7 @@ class XSecTest(unittest.TestCase):
         xargs.sqrts = [[13]]
         from smodels.tools.runtime import nCPUs
         xargs.ncpus = nCPUs()-1
-        xargs.noautocompile = True
+        xargs.noautocompile = False
         #Compute LO xsecs:
         xargs.query = False
         xargs.conf = 'default'

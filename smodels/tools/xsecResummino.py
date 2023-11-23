@@ -114,12 +114,15 @@ class XSecResummino(XSecBase):
             set self.version
             if it doesnt exist, set to default of 3.1.2 """
         version_path = os.path.join(self.tooldir, 'versions.txt')
-        version = "?.?.?"
+        self.version = "?.?.?"
         if os.path.exists(version_path):
             with open(version_path, "r") as f:
                 lines = f.readlines()
-            version = lines[1].split(sep ="=")[1].strip()
-        self.version = version
+            for line in lines:
+                if line.startswith("#"):
+                    continue
+                if "resummino_version" in line:
+                    self.version = line.split(sep ="=")[1].strip()
         
     def calculate_one_slha(self, particles,input_file, slha_file, output_file, 
             num_try, order, log):
@@ -151,16 +154,15 @@ class XSecResummino(XSecBase):
         use resummino at the order asked by the user (order variable).
         """
         if order == 0:
-            commande = f"{resummino_bin} {input_file} --lo"
+            command = f"{resummino_bin} {input_file} --lo"
         if order == 1:
-            commande = f"{resummino_bin} {input_file} --nlo"
+            command = f"{resummino_bin} {input_file} --nlo"
         if order == 2:
-            commande = f"{resummino_bin} {input_file}"
+            command = f"{resummino_bin} {input_file}"
 
         with open(output_file, 'w') as f:
             with open("/dev/null", "w") as errorhandle:
-                subprocess.run(commande, shell=True, stdout=f,stderr=errorhandle, text=True)
-
+                subprocess.run(command, shell=True, stdout=f,stderr=errorhandle, text=True)
 
 
     def launch_resummino(self, input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, log):
@@ -171,18 +173,18 @@ class XSecResummino(XSecBase):
         #modify_slha_file(input_file, input_file, slha_file)
         self.modify_outgoing_particles(input_file, input_file, particle_1, particle_2)
         
-        already_written_canal = self.find_channels(slha_file)
+        already_written_channel = self.find_channels(slha_file)
 
         if self.sqrt > 10:
             _ = str(self.sqrt*10**(-1))+'0E+04'
         else:
             _ = str(self.sqrt)+'.00E+03'
         
-        already_written_canal_set = [({x,y},z,w) for (x,y), z,w in already_written_canal]
+        already_written_channel_set = [({x,y},z,w) for (x,y), z,w in already_written_channel]
         
         logger.debug("channel, order and cross section " + str(particle_1)+str(particle_2)+ str(order)+ str(_))
-        logger.debug('the already writtent channels are '+ str(already_written_canal))
-        if (((particle_1, particle_2), _, order)) in already_written_canal:
+        logger.debug('the already written channels are '+ str(already_written_channel))
+        if (((particle_1, particle_2), _, order)) in already_written_channel:
             return
         
         if self.mode == "check":
@@ -245,7 +247,7 @@ class XSecResummino(XSecBase):
                 NLL = data[i+3][:-1]
                 Infos.append((LO,NLO,NLL))
         if len(Infos) == 0:
-            raise RuntimeError("Please check your slha file or if you have resummino correctly install with the install.sh executable")
+            raise RuntimeError("Please check your slha file and that you have resummino correctly installed with the install.sh script in the lib/resummino folder")
         return Infos[0]
 
     def create_xsection(self, result, particle_1, particle_2, order, Xsections):
