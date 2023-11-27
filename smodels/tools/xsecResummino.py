@@ -496,7 +496,7 @@ class XSecResummino(XSecBase):
                 data = f.readlines()
                 a+=1
                 
-            if data[-1].endswith("SModelSv2.3.0\n"):
+            if "SModelSv" in data[-1]:
                 b+=1
                 # We increase this variable by 1, so if it is > 0 we do not redo the calculation 
                 #num_try+=1
