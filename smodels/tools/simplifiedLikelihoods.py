@@ -946,43 +946,37 @@ class UpperLimitComputer:
             """only zeroes in efficiencies? cannot give a limit!"""
             return None, None, None
         oldmodel = model
-        # print ( "expected", expected, "model", model.isLinear() )
+        oldc = LikelihoodComputer( oldmodel )
+        theta_hat_old, _ = oldc.findThetaHat(0. )
         if expected:
             model = copy.deepcopy(oldmodel)
             model.observed = copy.deepcopy ( model.backgrounds )
             if expected == "posteriori":
-                tempc = LikelihoodComputer( model )
-                theta_hat_, _ = tempc.findThetaHat(0 )
                 if model.isLinear():
-                    model.observed = model.backgrounds + theta_hat_
+                    model.observed = model.backgrounds + theta_hat_old
                 else:
-                    model.observed = model.A + theta_hat_ + model.C * theta_hat_**2 / model.B**2
+                    model.observed = model.A + theta_hat_old + model.C * theta_hat_old**2 / model.B**2
         computer = LikelihoodComputer(model )
         mu_hat = computer.findMuHat( allowNegativeSignals=False, extended_output=False)
-        theta_hat0, _ = computer.findThetaHat( mu_hat )
-        sigma_mu = computer.getSigmaMu(mu_hat, theta_hat0)
+        theta_hat_mu, _ = computer.findThetaHat( mu_hat )
+        sigma_mu = computer.getSigmaMu(mu_hat, theta_hat_mu )
 
         nll0 = computer.likelihood( mu_hat, return_nll=True)
         aModel = copy.deepcopy(oldmodel)
-        if False: # expected == "posteriori":
-            nll0A = nll0
-            mu_hatA = mu_hat
+        compA = LikelihoodComputer ( aModel )
+        if model.isLinear():
+            aModel.observed = array([x + y for x, y in zip(model.backgrounds, theta_hat_old)]) # old
         else:
-            compA = LikelihoodComputer ( aModel )
-            theta_hat_, _ = compA.findThetaHat(0 )
-            if model.isLinear():
-                aModel.observed = array([x + y for x, y in zip(model.backgrounds, theta_hat_)]) # old
-            else:
-                aModel.observed = model.A + theta_hat_ + model.C * theta_hat0**2 / model.B**2
-            aModel.name = aModel.name + "A"
-            # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
-            compA = LikelihoodComputer(aModel )
-            ## compute
-            # mu_hatA = compA.findMuHat( allowNegativeSignals = False, extended_output = False )
-            mu_hatA = 0. # by definition!
-            # TODO convert rel_signals to signals
-            nll0A = compA.likelihood( mu=mu_hatA, return_nll=True)
-            # return 1.
+            aModel.observed = model.A + theta_hat_old + model.C * theta_hat_old**2 / model.B**2
+        aModel.name = aModel.name + "A"
+        # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
+        compA = LikelihoodComputer(aModel )
+        ## compute
+        # mu_hatA = compA.findMuHat( allowNegativeSignals = False, extended_output = False )
+        mu_hatA = 0. # by definition!
+        # TODO convert rel_signals to signals
+        nll0A = compA.likelihood( mu=mu_hatA, return_nll=True)
+        # return 1.
 
         def clsRoot(mu: float, return_type: Text = "CLs-alpha") -> float:
             """
