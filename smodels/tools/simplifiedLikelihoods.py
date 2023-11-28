@@ -934,6 +934,14 @@ class UpperLimitComputer:
         xsec = sum(model.nsignal) / model.lumi
         return ul * xsec
 
+    def updateModelWithPosterior ( self, model, theta_hat ):
+        """ given a model, replace observations with 
+            posterior expectations """
+        if model.isLinear():
+            model.observed = model.backgrounds + theta_hat
+        else:
+            model.observed = model.A + theta_hat + model.C * theta_hat**2 / model.B**2
+
     def getCLsRootFunc(
         self,
         model: Data,
@@ -959,10 +967,7 @@ class UpperLimitComputer:
             model = copy.deepcopy(oldmodel)
             model.observed = copy.deepcopy ( model.backgrounds )
             if expected == "posteriori":
-                if model.isLinear():
-                    model.observed = model.backgrounds + theta_hat_old
-                else:
-                    model.observed = model.A + theta_hat_old + model.C * theta_hat_old**2 / model.B**2
+                self.updateModelWithPosterior ( model, theta_hat_old )
         computer = LikelihoodComputer(model )
         mu_hat = computer.findMuHat( allowNegativeSignals=False, extended_output=False)
         theta_hat_mu, _ = computer.findThetaHat( mu_hat )
@@ -971,16 +976,16 @@ class UpperLimitComputer:
         nll0 = computer.likelihood( mu_hat, return_nll=True)
         aModel = copy.deepcopy(oldmodel)
         compA = LikelihoodComputer ( aModel )
-        if model.isLinear():
-            aModel.observed = array([x + y for x, y in zip(model.backgrounds, theta_hat_old)]) # old
-        else:
-            aModel.observed = model.A + theta_hat_old + model.C * theta_hat_old**2 / model.B**2
+        self.updateModelWithPosterior ( aModel, theta_hat_old )
+        
         aModel.name = aModel.name + "A"
         # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
         compA = LikelihoodComputer(aModel )
         ## compute
-        # mu_hatA = compA.findMuHat( allowNegativeSignals = False, extended_output = False )
-        mu_hatA = 0. # by definition!
+        mu_hatA = compA.findMuHat( allowNegativeSignals = False, extended_output = False )
+        ## FIXME we should be able to simply demand that mu_hatA is zero,
+        ## but computing it again seems to be more accurate
+        # mu_hatA = 0.
         # TODO convert rel_signals to signals
         nll0A = compA.likelihood( mu=mu_hatA, return_nll=True)
         # return 1.
