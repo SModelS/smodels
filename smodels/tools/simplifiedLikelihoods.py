@@ -695,7 +695,10 @@ class LikelihoodComputer:
         """Compute nuisance parameters theta that maximize our likelihood
         (poisson*gauss).
         """
-        mu = float(mu)
+        try:
+            mu = float(mu[0])
+        except ( TypeError, IndexError ):
+            mu = float(mu)
         if np.isinf ( mu ):
             return None
         nsig = mu * self.model.nsignal
@@ -821,7 +824,11 @@ class LikelihoodComputer:
         minr, avgr, maxr = self.findAvgr( theta_hat )
 
         def myllhd( mu : float ):
-            theta = self.findThetaHat ( mu=float(mu) )
+            try:
+                mu = float(mu[0])
+            except ( TypeError, IndexError ):
+                mu = float(mu)
+            theta = self.findThetaHat ( mu= mu )
             ret = self.likelihood(return_nll=True, mu = mu )
             return ret
 
