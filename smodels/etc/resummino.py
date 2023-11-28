@@ -5,11 +5,6 @@
     "channels" : {"1" : [1000023,1000024], "2" : [1000023, -1000024], 
                   "3" : [1000024,-1000024]
     },
-    # ------ MODE PARAMETER IS NOT USED IN THE CURRENT RESUMMINO INTERFACE VERSION ------ 
-    # mode: if you want to calculate all channels at all orders, use 'all', 
-    # if you want to check the cross section at LO before calculating NLO, use 'check'.
-    ### Currently not used; if you want to always calculate the higher orders, put xsec_limit to 0.
-    #"mode" : "check", 
     # -------------------------------------
     # The limit for the NLO calculation is determined by the 'xsec_limit' variable.
     # If the LO cross secion is below this value (in pb), no NLO (or NLO+NLL) cross-sections are
