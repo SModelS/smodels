@@ -980,7 +980,7 @@ class UpperLimitComputer:
         aModel = copy.deepcopy(oldmodel)
         self.updateModelWithPosterior ( aModel, theta_hat_old )
         compA = LikelihoodComputer(aModel )
-        if True: # create asimov data
+        if False: # create asimov data
             theta_hat2_ , _ = compA.findThetaHat( 0. )
             self.updateModelWithPosterior ( aModel, theta_hat2_ )
             compA = LikelihoodComputer(aModel )
@@ -993,8 +993,8 @@ class UpperLimitComputer:
         
         aModel.name = aModel.name + "A"
         ## computation of mu_hatA is not needed
-        # mu_hatA = compA.findMuHat( allowNegativeSignals = False, extended_output = False )
-        mu_hatA = 0. # by definition
+        mu_hatA = compA.findMuHat( allowNegativeSignals = False, extended_output = False )
+        # mu_hatA = 0. # by definition
         ## but computing it again seems to be more accurate
         # nll0A = compA.likelihood( mu=mu_hatA, return_nll=True)
         # nll00 = compA.likelihood( mu=0., return_nll=True)
