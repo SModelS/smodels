@@ -592,76 +592,6 @@ class PyhfUpperLimitComputer:
             return np.exp(-twice_nll / 2.0)
         return twice_nll / 2.0
 
-    def getSigmaMu(self, workspace):
-        """given a workspace, compute a rough estimate of sigma_mu,
-        the uncertainty of mu_hat"""
-        obss, bgs, bgVars, nsig = {}, {}, {}, {}
-        channels = workspace.channels
-        for chdata in workspace["channels"]:
-            if not chdata["name"] in channels:
-                continue
-            bg = 0.0
-            var = 0.0
-            ns = 0.0
-            for sample in chdata["samples"]:
-                if sample["name"] == "bsm":
-                    ns = sample["data"][0]
-                else:
-                    tbg = sample["data"][0]
-                    bg += tbg
-                    mult_factor_hi = 1.
-                    mult_factor_lo = 1.
-                    add_factor_hi = 0.
-                    add_factor_lo = 0.
-                    # To be tested - Don't take aux data into account
-                    for modifier in sample["modifiers"]:
-                        if modifier["type"] in ["normfactor","shapesys","staterror","shapefactor"]:
-                            if type(modifier["data"]) == list:
-                                mult_factor_hi *= modifier["data"][0]
-                                mult_factor_lo *= modifier["data"][0]
-                        elif modifier["type"] == "normsys":
-                            if type(modifier["data"]) == dict:
-                                mult_factor_hi *= modifier["data"]["hi"]
-                                mult_factor_lo *= modifier["data"]["lo"]
-                        elif modifier["type"] == "histosys":
-                            # If many histosys modifiers, only the last one counts
-                            if type(modifier["data"]) == dict:
-                                add_factor_hi = modifier["data"]["hi_data"][0] - tbg
-                                add_factor_lo = modifier["data"]["lo_data"][0] - tbg
-                        elif modifier["type"] == "lumi":
-                            for param in workspace["measurements"][0]["config"]["parameters"]:
-                                if param["name"] == "lumi":
-                                    mult_factor_hi *= max(param["bounds"][0])
-                                    mult_factor_lo *= min(param["bounds"][0])
-                    hi = mult_factor_hi*(tbg+add_factor_hi)
-                    lo = mult_factor_lo*(tbg+add_factor_lo)
-                    delta = max((hi - tbg, tbg - lo))
-                    var += delta**2
-            nsig[chdata["name"]] = ns
-            bgs[chdata["name"]] = bg
-            bgVars[chdata["name"]] = var
-        for chdata in workspace["observations"]:
-            if not chdata["name"] in channels:
-                continue
-            obss[chdata["name"]] = chdata["data"][0]
-        vars = []
-        for c in channels:
-            # poissonian error
-            if nsig[c]==0.:
-                nsig[c]=1e-5
-            poiss = abs(obss[c]-bgs[c]) / nsig[c]
-            gauss = bgVars[c] / nsig[c]**2
-            vars.append ( poiss + gauss )
-        var_mu = np.sum ( vars )
-        n = len ( obss )
-        # print ( f" sigma_mu from pyhf uncorr {var_mu} {n} "  )
-        sigma_mu = float ( np.sqrt ( var_mu / (n**2) ) )
-        # self.sigma_mu = sigma_mu
-        return sigma_mu
-        #import IPython
-        #IPython.embed()
-        #sys.exit()
-
     def lmax( self, workspace_index=None, return_nll=False, expected=False,
               allowNegativeSignals=False):
         """
@@ -697,27 +627,46 @@ class PyhfUpperLimitComputer:
             # Same modifiers_settings as those used when running the 'pyhf cls' command line
             msettings = {"normsys": {"interpcode": "code4"}, "histosys": {"interpcode": "code4p"}}
             model = workspace.model(modifier_settings=msettings)
+            muhat, maxNllh = model.config.suggested_init(), float("nan")
+            sigma_mu = float("nan")
             # obs = workspace.data(model)
             try:
                 bounds = model.config.suggested_bounds()
                 if allowNegativeSignals:
                     bounds[model.config.poi_index] = (-5., 10. )
-                muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model,
-                        return_fitted_val=True, par_bounds = bounds )
-                if False: # get sigma_mu from hessian
-                    pyhf.set_backend(pyhf.tensorlib, 'minuit')
-                    muhat, maxNllh,o = pyhf.infer.mle.fit(workspace.data(model), model,
-                            return_fitted_val=True, par_bounds = bounds,
-                            return_result_obj = True )
-                    sigma_mu = float ( np.sqrt ( o.hess_inv[0][0] ) ) * self.scale
-                    # print ( f"\n>>> sigma_mu from hessian {sigma_mu:.2f}" )
-                    pyhf.set_backend(pyhf.tensorlib, 'scipy')
-
-                muhat = float ( muhat[model.config.poi_index]*self.scale )
+                #import time
+                #t0 = time.time()
+                try:
+                    muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
+                            return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
+                    sigma_mu = self.scale / float ( abs ( o.jac[model.config.poi_index] ) ) ## why did this not work?
+                except (pyhf.exceptions.FailedMinimization,ValueError) as e:
+                    pass
+                #t1 = time.time()
+                #print ( f"first fit {t1-t0:.2f}s sigma_mu {sigma_mu:.3f}" )
+                if hasattr ( o, "hess_inv" ): # maybe the backend gets changed
+                    sigma_mu = float ( np.sqrt ( o.hess_inv[model.config.poi_index][model.config.poi_index] ) ) * self.scale
+                else:
+                    sigma_mu_temp = 1.
+                    try:
+                        _1, _2, o = pyhf.infer.mle.fit(workspace.data(model), model,
+                                return_fitted_val=True, return_result_obj = True, init_pars = list(muhat), method="BFGS" )
+                        sigma_mu_temp = float ( np.sqrt ( o.hess_inv[model.config.poi_index][model.config.poi_index] ) )
+                    except (pyhf.exceptions.FailedMinimization,ValueError) as e:
+                        pass
+                    if abs ( sigma_mu_temp - 1.0 ) > 1e-5:
+                        sigma_mu = sigma_mu_temp * self.scale
+                    else:
+                        _, _, o = pyhf.infer.mle.fit(workspace.data(model), model,
+                            return_fitted_val=True, return_result_obj = True, method="L-BFGS-B" )
+                        sigma_mu_temp = float ( np.sqrt ( o.hess_inv.todense()[model.config.poi_index][model.config.poi_index] ) )
+                        if abs ( sigma_mu_temp - 1.0 ) > 1e-8:
+                            sigma_mu = sigma_mu_temp * self.scale
+#                    sigma_mu = float ( o.unc[model.config.poi_index] ) * self.scale
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.error(f"pyhf mle.fit failed {e}")
-                muhat, maxNllh = float("nan"), float("nan")
+            muhat = float ( muhat[model.config.poi_index]*self.scale )
             try:
                 lmax = maxNllh.tolist()
             except:
@@ -726,8 +675,9 @@ class PyhfUpperLimitComputer:
                 lmax = float(lmax)
             except:
                 lmax = float(lmax[0])
-            sigma_mu = self.getSigmaMu ( workspace )
             lmax = self.exponentiateNLL(lmax, not return_nll)
+            #t2 = time.time()
+            #print ( f"second fit {t2-t1:.2f}s sigma_mu {sigma_mu:.3f}" )
             ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
             self.data.cached_lmaxes[workspace_index] = ret
             return ret
@@ -836,46 +786,48 @@ class PyhfUpperLimitComputer:
                     "normsys": {"interpcode": "code4"},
                     "histosys": {"interpcode": "code4p"},
                 }
-                model = workspace.model(modifier_settings=msettings)
-                bounds = model.config.suggested_bounds()
-                bounds[model.config.poi_index] = (0, 10)
-                start = time.time()
-                args = {}
-                args["return_expected"] = expected == "posteriori"
-                args["par_bounds"] = bounds
-                # args["maxiter"]=100000
-                pver = float(pyhf.__version__[:3])
-                stat = "qtilde"
-                if pver < 0.6:
-                    args["qtilde"] = True
-                else:
-                    args["test_stat"] = stat
-                with np.testing.suppress_warnings() as sup:
-                    if pyhfinfo["backend"] == "numpy":
-                        sup.filter(RuntimeWarning, r"invalid value encountered in log")
-                    # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
-                    try:
-                        result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
-                    except Exception as e:
-                        logger.info(f"when testing hypothesis {mu}, caught exception: {e}")
-                        result = float("nan")
-                        if expected == "posteriori":
-                            result = [float("nan")] * 2
-                end = time.time()
-                logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
-                logger.debug(f"result for {mu} {result}")
-                if expected == "posteriori":
-                    logger.debug("computing a-posteriori expected limit")
-                    logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                    try:
-                        CLs = float(result[1].tolist())
-                    except TypeError:
-                        CLs = float(result[1][0])
-                else:
-                    logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                    CLs = float(result)
-                # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
-                return 1.0 - self.cl - CLs
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
+                    model = workspace.model(modifier_settings=msettings)
+                    bounds = model.config.suggested_bounds()
+                    bounds[model.config.poi_index] = (0, 10)
+                    start = time.time()
+                    args = {}
+                    args["return_expected"] = expected == "posteriori"
+                    args["par_bounds"] = bounds
+                    # args["maxiter"]=100000
+                    pver = float(pyhf.__version__[:3])
+                    stat = "qtilde"
+                    if pver < 0.6:
+                        args["qtilde"] = True
+                    else:
+                        args["test_stat"] = stat
+                    with np.testing.suppress_warnings() as sup:
+                        if pyhfinfo["backend"] == "numpy":
+                            sup.filter(RuntimeWarning, r"invalid value encountered in log")
+                        # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
+                        try:
+                            result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
+                        except Exception as e:
+                            logger.info(f"when testing hypothesis {mu}, caught exception: {e}")
+                            result = float("nan")
+                            if expected == "posteriori":
+                                result = [float("nan")] * 2
+                    end = time.time()
+                    logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
+                    logger.debug(f"result for {mu} {result}")
+                    if expected == "posteriori":
+                        logger.debug("computing a-posteriori expected limit")
+                        logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                        try:
+                            CLs = float(result[1].tolist())
+                        except TypeError:
+                            CLs = float(result[1][0])
+                    else:
+                        logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                        CLs = float(result)
+                    # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
+                    return 1.0 - self.cl - CLs
 
             # Rescaling signals so that mu is in [0, 10]
             factor = 3.0

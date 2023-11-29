@@ -14,7 +14,7 @@ from smodels.theory.exceptions import SModelSTheoryError as SModelSError
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.tools.smodelsLogging import logger
 from smodels.tools.statsTools import StatsComputer
-from typing import Union
+from typing import Union, Text
 import itertools
 import numpy as np
 
@@ -259,6 +259,18 @@ class TheoryPrediction(object):
             self.computeStatistics(expected)
         return self.nllToLikelihood ( self.cachedObjs[expected]["nllmax"],
                 return_nll )
+
+    @whenDefined
+    def CLs(self, mu : float = 1., expected : Union[Text,bool] = False ) -> \
+                    Union[float,None]:
+        """ obtain the CLs value of the combination for a given poi value "mu" """
+        if not "CLs" in self.cachedObjs[expected]:
+            self.cachedObjs[expected]["CLs"] = {}
+        if mu in self.cachedObjs[expected]["CLs"]:
+            return self.cachedObjs[expected]["CLs"][mu]
+        cls = self.statsComputer.CLs ( poi_test = mu, expected = expected )
+        self.cachedObjs[expected]["CLs"][mu] = cls
+        return cls
 
     @whenDefined
     def sigma_mu(self, expected=False):

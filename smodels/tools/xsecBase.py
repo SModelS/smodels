@@ -251,6 +251,13 @@ class ArgsStandardizer:
             logger.info ( "We run on %d cpus" % ncpus )
         return ncpus
 
+    def tempDir ( self, args ):
+        ret = "/tmp/"
+        if hasattr ( args, "tempdir" ):
+            ret = args.tempdir
+        return ret
+
+
     def checkXsec_limit (self,args ):
         if args.xseclimit == None:
             return None

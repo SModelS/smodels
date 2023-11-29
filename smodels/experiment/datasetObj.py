@@ -73,6 +73,14 @@ class DataSet(object):
 
         :param other: datasetObj to compare self with
         """
+        if type(other)==CombinedDataSet:
+            # if other is a combined dataset, self is combinable if it is
+            # combinable with all datasets in other
+            other_ds = other._datasets
+            for ods in other_ds:
+                if not self.isCombinableWith ( ods ):
+                    return False
+            return True
         idSelf = self.globalInfo.id
         didSelf = self.dataInfo.dataId
         selflabel = f"{idSelf}:{didSelf}"
@@ -100,6 +108,8 @@ class DataSet(object):
         if other.isLocalFieldCombinableWith_(self):
             return True
         if self.isCombMatrixCombinableWith_(other):
+            return True
+        if other.isCombMatrixCombinableWith_(self):
             return True
         return False
 
@@ -409,6 +419,18 @@ class CombinedDataSet(object):
         self.origdatasets = expResult.origdatasets[:]
         self.sortDataSets()
         self.findType()
+
+    def isCombinableWith ( self, other ):
+        """ 
+        Function that reports if two datasets are mutually uncorrelated = combinable.
+        A combined dataset is combinable with "other", if all consistituents are.
+
+        :param other: datasetObj to compare self with
+        """
+        for ds in self._datasets:
+            if not ds.isCombinableWith ( other ):
+                return False
+        return True
 
     def findType(self):
         """ find the type of the combined dataset """

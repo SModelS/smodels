@@ -361,7 +361,7 @@ class Model(object):
         :param inputFile: input file (SLHA or LHE)
 
         :param promptWidth: Maximum width for considering particles as decaying prompt. If None, it
-                            will be set 1e-8 GeV.
+                            will be set 1e-11 GeV.
         :param stableWidth: Minimum width for considering particles as stable. If None, it
                             will be set 1e-25 GeV.
         :param roundMasses: If set, it will round the masses to this number of digits (int)
@@ -377,7 +377,7 @@ class Model(object):
 
         self.inputFile = inputFile
         if promptWidth is None:
-            promptWidth = 1e-8*GeV
+            promptWidth = 1e-11*GeV
         if stableWidth is None:
             stableWidth = 1e-25*GeV
 

@@ -2,7 +2,10 @@ name: environment-smodels
 channels:
   - conda-forge
 dependencies:
-  - python
+  - python==3.10.0
+  - pip
+  - setuptools
+  - wheel
   - pip:
     - matplotlib
     - pandas
@@ -13,3 +16,6 @@ dependencies:
     - unum
     - requests
     - pyslha
+    - pyhf
+    - jsonpatch
+    - jsonschema

@@ -37,6 +37,26 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 2.3.2:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * fixed bug in initialisation of :ref:`analyses combination <analysesCombination>`
+  * smodels version now printed in all output formats
+
+New in Version 2.3.1:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * fixed bug for reading :ref:`QNUMBERS blocks <qnumberSLHA>` from SLHA files
+  * small fixes in how pythia6 and pythia8 are built
+  * small fix in truncated Gaussian llhd experimental feature
+  * small fix in computation of combined upper limits
+  * combinationmatrices are now forced to be symmetric
+  * added isCombinableWith method also for CombinedDataSets
+  * added a recipe for how to use a `combinations matrix <combinationsmatrix.html>`_
+  * `runtime.nCPUs() <tools.html#tools.runtime.nCPUs>`_ now returns number of available CPUs, not all CPUs
+  * :ref:`xsecComputer <xsecCalc>` now has --tempdir option
+  * StatsComputer now has `CLs <tools.html#tools.statsTools.StatsComputer.CLs>`_ method
+  * changed default prompt width from 1e-8 to 1e-11 GeV in code
 
 New in Version 2.3.0:
 ^^^^^^^^^^^^^^^^^^^^^
