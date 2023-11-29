@@ -960,7 +960,9 @@ class UpperLimitComputer:
         if model.zeroSignal():
             """only zeroes in efficiencies? cannot give a limit!"""
             return None, None, None
-        oldmodel = model
+        oldmodel = copy.deepcopy ( model )
+        #print ( "original obs", oldmodel.observed[:3] )
+        #print ( "original bg", oldmodel.backgrounds[:3] )
         oldc = LikelihoodComputer( oldmodel )
         theta_hat_old, _ = oldc.findThetaHat(0. )
         if expected:
@@ -974,21 +976,37 @@ class UpperLimitComputer:
         sigma_mu = computer.getSigmaMu(mu_hat, theta_hat_mu )
 
         nll0 = computer.likelihood( mu_hat, return_nll=True)
+        # print ( f"mu_hat {mu_hat} obs {model.observed[:3]}" )
         aModel = copy.deepcopy(oldmodel)
-        compA = LikelihoodComputer ( aModel )
         self.updateModelWithPosterior ( aModel, theta_hat_old )
+        compA = LikelihoodComputer(aModel )
+        if True: # create asimov data
+            theta_hat2_ , _ = compA.findThetaHat( 0. )
+            self.updateModelWithPosterior ( aModel, theta_hat2_ )
+            compA = LikelihoodComputer(aModel )
+            #theta_hat3_ , _ = compA.findThetaHat( 0. )
+            # print ( f"theta_hat_old", theta_hat_old )
+            # print ( f"theta_hat2", theta_hat2_ )
+            # print ( f"theta_hat3", theta_hat3_ )
+            #self.updateModelWithPosterior ( aModel, theta_hat3_ )
+            #compA = LikelihoodComputer(aModel )
         
         aModel.name = aModel.name + "A"
-        # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
-        compA = LikelihoodComputer(aModel )
-        ## compute
-        mu_hatA = compA.findMuHat( allowNegativeSignals = False, extended_output = False )
-        ## FIXME we should be able to simply demand that mu_hatA is zero,
+        ## computation of mu_hatA is not needed
+        # mu_hatA = compA.findMuHat( allowNegativeSignals = False, extended_output = False )
+        mu_hatA = 0. # by definition
         ## but computing it again seems to be more accurate
+        # nll0A = compA.likelihood( mu=mu_hatA, return_nll=True)
+        # nll00 = compA.likelihood( mu=0., return_nll=True)
         # mu_hatA = 0.
         # TODO convert rel_signals to signals
         nll0A = compA.likelihood( mu=mu_hatA, return_nll=True)
+        #print ( f"expected {expected} mu_hatA {mu_hatA} nll0A {nll0A} nll0 {nll0}" )
         # return 1.
+        #if expected:
+        #    mu_hat = 0
+        #    nll0 = nll0A
+        #   computer = compA
 
         def clsRoot(mu: float, return_type: Text = "CLs-alpha") -> float:
             """
