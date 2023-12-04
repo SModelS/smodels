@@ -55,13 +55,14 @@ pyhfinfo = {
     "ver": ver,
     "required": "0.6.1".split("."),
 }
-
+'''
 try:
     pyhf.set_backend(b"pytorch")
     import torch
 
     pyhfinfo["backend"] = "pytorch"
     pyhfinfo["backendver"] = torch.__version__
+
 except pyhf.exceptions.ImportBackendError as e:
     print(
         "[SModelS:pyhfInterface] WARNING could not set pytorch as the pyhf backend, falling back to the default."
@@ -72,6 +73,10 @@ except pyhf.exceptions.ImportBackendError as e:
     pyhfinfo["backendver"] = numpy.version.full_version
 
     warnings.filterwarnings("ignore", r"invalid value encountered in log")
+'''
+import numpy
+pyhfinfo["backendver"] = numpy.version.full_version
+warnings.filterwarnings("ignore", r"invalid value encountered in log")
 
 from scipy import optimize
 import numpy as np
@@ -592,76 +597,54 @@ class PyhfUpperLimitComputer:
             return np.exp(-twice_nll / 2.0)
         return twice_nll / 2.0
 
-    def getSigmaMu(self, workspace):
-        """given a workspace, compute a rough estimate of sigma_mu,
-        the uncertainty of mu_hat"""
-        obss, bgs, bgVars, nsig = {}, {}, {}, {}
-        channels = workspace.channels
-        for chdata in workspace["channels"]:
-            if not chdata["name"] in channels:
-                continue
-            bg = 0.0
-            var = 0.0
-            ns = 0.0
-            for sample in chdata["samples"]:
-                if sample["name"] == "bsm":
-                    ns = sample["data"][0]
-                else:
-                    tbg = sample["data"][0]
-                    bg += tbg
-                    mult_factor_hi = 1.
-                    mult_factor_lo = 1.
-                    add_factor_hi = 0.
-                    add_factor_lo = 0.
-                    # To be tested - Don't take aux data into account
-                    for modifier in sample["modifiers"]:
-                        if modifier["type"] in ["normfactor","shapesys","staterror","shapefactor"]:
-                            if type(modifier["data"]) == list:
-                                mult_factor_hi *= modifier["data"][0]
-                                mult_factor_lo *= modifier["data"][0]
-                        elif modifier["type"] == "normsys":
-                            if type(modifier["data"]) == dict:
-                                mult_factor_hi *= modifier["data"]["hi"]
-                                mult_factor_lo *= modifier["data"]["lo"]
-                        elif modifier["type"] == "histosys":
-                            # If many histosys modifiers, only the last one counts
-                            if type(modifier["data"]) == dict:
-                                add_factor_hi = modifier["data"]["hi_data"][0] - tbg
-                                add_factor_lo = modifier["data"]["lo_data"][0] - tbg
-                        elif modifier["type"] == "lumi":
-                            for param in workspace["measurements"][0]["config"]["parameters"]:
-                                if param["name"] == "lumi":
-                                    mult_factor_hi *= max(param["bounds"][0])
-                                    mult_factor_lo *= min(param["bounds"][0])
-                    hi = mult_factor_hi*(tbg+add_factor_hi)
-                    lo = mult_factor_lo*(tbg+add_factor_lo)
-                    delta = max((hi - tbg, tbg - lo))
-                    var += delta**2
-            nsig[chdata["name"]] = ns
-            bgs[chdata["name"]] = bg
-            bgVars[chdata["name"]] = var
-        for chdata in workspace["observations"]:
-            if not chdata["name"] in channels:
-                continue
-            obss[chdata["name"]] = chdata["data"][0]
-        vars = []
-        for c in channels:
-            # poissonian error
-            if nsig[c]==0.:
-                nsig[c]=1e-5
-            poiss = abs(obss[c]-bgs[c]) / nsig[c]
-            gauss = bgVars[c] / nsig[c]**2
-            vars.append ( poiss + gauss )
-        var_mu = np.sum ( vars )
-        n = len ( obss )
-        # print ( f" sigma_mu from pyhf uncorr {var_mu} {n} "  )
-        sigma_mu = float ( np.sqrt ( var_mu / (n**2) ) )
-        # self.sigma_mu = sigma_mu
-        return sigma_mu
-        #import IPython
-        #IPython.embed()
-        #sys.exit()
-
+    def compute_invhess(self, x, data, model, index, epsilon=1e-05,compute_all=False):
+        '''
+        if inv_hess is not given by the optimiser, calculate numerically by evaluating second order partial derivatives using 2 point central finite differences method
+        :param x: parameter values given to pyhf.infer.mle.twice_nll taken from pyhf.infer.mle.fit-optimizer.x
+        :param data: workspace.data(model) passed to pyhf.infer.mle.fit
+        :param model: model passed to pyhf.infer.mle.fit
+        :param index: index of the POI
+        :param compute_all: If True, compute all the entries in the hessian matrix. Else, only calculate the hessian value of the POI
+        returns the inverse hessian at the index of the poi if compute_all is False, else returns the inverse Hessian matrix
+        '''
+        
+        n = len(x)
+        if compute_all:
+            
+            hessian = np.zeros((n,n))
+            for i in range(n):
+                for j in range(n):
+                    eps_i = epsilon*np.eye(n)[:,i]
+                    eps_j = epsilon*np.eye(n)[:,j]
+                    par_11 = pyhf.infer.mle.twice_nll(x + eps_i + eps_j, data, model)
+                    par_12 = pyhf.infer.mle.twice_nll(x - eps_i + eps_j, data, model)
+                    par_21 = pyhf.infer.mle.twice_nll(x + eps_i - eps_j, data, model)
+                    par_22 = pyhf.infer.mle.twice_nll(x - eps_i - eps_j, data, model)
+                    partial_xi_xj = (par_11 - par_12 - par_21 +par_22)/(4*epsilon**2)
+                    hessian[i,j] = partial_xi_xj
+        
+            def is_positive_definite(matrix):
+                eigenvalues = np.linalg.eigvals(matrix)
+                return all(eig > 0 for eig in eigenvalues)
+            
+            if not is_positive_definite(hessian): raise ValueError("Hessian Matrix is not positive definite")
+        
+            inverse_hessian = np.linalg.inv(hessian)
+            
+            #return the inverse hessian matrix!
+            return inverse_hessian
+        
+        eps_i = epsilon*np.eye(n)[:,index]
+        par_11 = pyhf.infer.mle.twice_nll(x + 2*eps_i, data, model)
+        par_12 = pyhf.infer.mle.twice_nll(x, data, model)
+        par_22 = pyhf.infer.mle.twice_nll(x - 2*eps_i, data, model)
+        hessian = (par_11 - 2*par_12 + par_22)/(4*epsilon**2)
+        
+        #return the inverse hessian at the poi
+        return 1.0/hessian
+        
+        
+        
     def lmax( self, workspace_index=None, return_nll=False, expected=False,
               allowNegativeSignals=False):
         """
@@ -697,27 +680,67 @@ class PyhfUpperLimitComputer:
             # Same modifiers_settings as those used when running the 'pyhf cls' command line
             msettings = {"normsys": {"interpcode": "code4"}, "histosys": {"interpcode": "code4p"}}
             model = workspace.model(modifier_settings=msettings)
+            muhat, maxNllh = model.config.suggested_init(), float("nan")
+            sigma_mu = float("nan")
             # obs = workspace.data(model)
             try:
                 bounds = model.config.suggested_bounds()
                 if allowNegativeSignals:
                     bounds[model.config.poi_index] = (-5., 10. )
-                muhat, maxNllh = pyhf.infer.mle.fit(workspace.data(model), model,
-                        return_fitted_val=True, par_bounds = bounds )
-                if False: # get sigma_mu from hessian
-                    pyhf.set_backend(pyhf.tensorlib, 'minuit')
-                    muhat, maxNllh,o = pyhf.infer.mle.fit(workspace.data(model), model,
-                            return_fitted_val=True, par_bounds = bounds,
-                            return_result_obj = True )
-                    sigma_mu = float ( np.sqrt ( o.hess_inv[0][0] ) ) * self.scale
-                    # print ( f"\n>>> sigma_mu from hessian {sigma_mu:.2f}" )
-                    pyhf.set_backend(pyhf.tensorlib, 'scipy')
-
-                muhat = float ( muhat[model.config.poi_index]*self.scale )
+                #import time
+                #t0 = time.time()
+                try:
+                    muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
+                            return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
+                    sigma_mu = self.scale / float ( abs ( o.jac[model.config.poi_index] ) ) ## why did this not work?
+                    print("yes, jac worked")
+                    print("index =", model.config.poi_index)
+                    print("jac = ", o.jac[model.config.poi_index], "scale =", self.scale)
+                    print(o)
+                    print("sigma_mu = ",sigma_mu)
+                except (pyhf.exceptions.FailedMinimization,ValueError) as e:
+                    pass
+                #t1 = time.time()
+                #print ( f"first fit {t1-t0:.2f}s sigma_mu {sigma_mu:.3f}" )
+                if hasattr ( o, "hess_inv" ): # maybe the backend gets changed
+                    print("hess_inv")
+                    sigma_mu = float ( np.sqrt ( o.hess_inv[model.config.poi_index][model.config.poi_index] ) ) * self.scale
+                    print(o.hess_inv[model.config.poi_index][model.config.poi_index] )
+                else:
+                    sigma_mu_temp = 1.
+                    try:
+                        _1, _2, o = pyhf.infer.mle.fit(workspace.data(model), model,
+                                return_fitted_val=True, return_result_obj = True, init_pars = list(muhat), method="BFGS" )
+                        sigma_mu_temp = float ( np.sqrt ( o.hess_inv[model.config.poi_index][model.config.poi_index] ) )
+                        print("temp")
+                        print("index = ",model.config.poi_index)
+                        print("hess = ", o.hess_inv[model.config.poi_index][model.config.poi_index])
+                        print("sigma_mu_temp ", sigma_mu_temp)
+                        print(o)
+                    except (pyhf.exceptions.FailedMinimization,ValueError) as e:
+                        pass
+                    if abs ( sigma_mu_temp - 1.0 ) > 1e-5:
+                        print("if at 665")
+                        sigma_mu = sigma_mu_temp * self.scale
+                    else:
+                        print("else at 668")
+                        _, _, o = pyhf.infer.mle.fit(workspace.data(model), model,
+                            return_fitted_val=True, return_result_obj = True, method="L-BFGS-B" )
+                        print(o)
+                        sigma_mu_temp = float ( np.sqrt ( o.hess_inv.todense()[model.config.poi_index][model.config.poi_index] ) )
+                        print("sigma_at668= ",sigma_mu_temp)
+                        if abs ( sigma_mu_temp - 1.0 ) > 1e-8:
+                            sigma_mu = sigma_mu_temp * self.scale
+                        print("sigma_at668",sigma_mu)
+#                    sigma_mu = float ( o.unc[model.config.poi_index] ) * self.scale
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                logger.error(f"pyhf mle.fit failed {e}")
-                muhat, maxNllh = float("nan"), float("nan")
+                logger.warning(f"pyhf mle.fit failed {e}. Calculating inv_hess numerically.")
+                inv_hess = self.compute_invhess(o.x, workspace.data(model), model, model.config.poi_index)
+                sigma_mu = float ( np.sqrt ( inv_hess)) * self.scale
+                print("computed sigma_mu = ", sigma_mu)
+            
+            muhat = float ( muhat[model.config.poi_index]*self.scale )
             try:
                 lmax = maxNllh.tolist()
             except:
@@ -726,9 +749,11 @@ class PyhfUpperLimitComputer:
                 lmax = float(lmax)
             except:
                 lmax = float(lmax[0])
-            sigma_mu = self.getSigmaMu ( workspace )
             lmax = self.exponentiateNLL(lmax, not return_nll)
+            #t2 = time.time()
+            #print ( f"second fit {t2-t1:.2f}s sigma_mu {sigma_mu:.3f}" )
             ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
+            print(ret)
             self.data.cached_lmaxes[workspace_index] = ret
             return ret
 
