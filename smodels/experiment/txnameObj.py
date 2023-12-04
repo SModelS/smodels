@@ -1002,7 +1002,7 @@ class TxNameData(object):
             if nz > self.dimensionality:
                 self.dimensionality = nz
         MpCut=[]
-        epsilon = 1 - 10 * np.finfo(np.float64).eps # we go by 10 units
+        epsilon = 1 - 100 * np.finfo(np.float64).eps # we go by 100 units
         for ctr,i in enumerate(Mp):
             # add the tiniest displacements to make things
             # deterministic
