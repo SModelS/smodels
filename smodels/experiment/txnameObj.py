@@ -25,7 +25,11 @@ from smodels.tools.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.tools.caching import _memoize
 from smodels.tools.reweighting import defaultEffReweight,defaultULReweight
-from scipy.linalg import svd, LinAlgError
+try:
+    from torch.linalg import svd
+except ImportError as e: # we use the scipy version only as the fallback
+    logger.info ( f"did not find torch, using scipy svd as fallback!" )
+    from scipy.linalg import svd
 import numpy as np
 import unum
 import math,itertools
@@ -984,7 +988,7 @@ class TxNameData(object):
             ## we dont need thousands of points for SVD
             n = int(math.ceil(len(M)/2000.))
             Vt=svd(M[::n])[2]
-        except LinAlgError as e:
+        except Exception as e:
             raise SModelSError("exception caught when performing singular value decomposition: %s, %s" %(type(e), e))
 
         V=Vt.T
