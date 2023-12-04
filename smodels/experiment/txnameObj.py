@@ -987,7 +987,8 @@ class TxNameData(object):
         try:
             ## we dont need thousands of points for SVD
             n = int(math.ceil(len(M)/2000.))
-            Vt=svd(M[::n])[2]
+            Mn = np.array ( M[::n] )
+            Vt=svd(Mn)[2]
         except Exception as e:
             raise SModelSError("exception caught when performing singular value decomposition: %s, %s" %(type(e), e))
 
