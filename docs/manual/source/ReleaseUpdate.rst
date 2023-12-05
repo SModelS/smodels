@@ -37,6 +37,11 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 2.3.3:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * added :ref:`resummino cross section <xsecResummino>` computer
+
 New in Version 2.3.2:
 ^^^^^^^^^^^^^^^^^^^^^
 

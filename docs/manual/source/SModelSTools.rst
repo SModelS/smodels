@@ -89,6 +89,7 @@ Note that signal strength multipliers get applied only to LO cross sections. Thi
 
 * **The cross section calculation is implemented by the** `XSecComputer class <tools.html#tools.xsecComputer.XSecComputer>`_
 
+.. _xsecResummino:
 
 Resummino Cross Sections
 ^^^^^^^^^^^^^^^^^^^^^^^^
