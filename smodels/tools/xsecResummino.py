@@ -101,7 +101,7 @@ class XSecResummino(XSecBase):
             return True
         if not compile:
             return False
-        logger.info ( "Resummino not compiled; trying to build now" )
+        logger.info ( "Resummino not compiled; trying to build now (this might take a while)" )
         cmd = f"cd {self.tooldir}; make"
         o = subprocess.getoutput ( cmd )
         ret = os.path.exists ( self.resummino_bin )
