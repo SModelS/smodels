@@ -464,7 +464,8 @@ class XSecResummino(XSecBase):
             os.mkdir(self.resummino_log)
         
         #always use absolute path
-        slha_folder = os.path.join(self.pwd, slha_folder_name)  
+        slha_folder = os.path.join( os.getcwd(), slha_folder_name)  
+        # slha_folder = slha_folder_name
         #Check if the input is a file or a directory
         if not os.path.isfile(slha_folder):
             liste_slha = os.listdir(slha_folder_name)
