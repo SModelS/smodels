@@ -19,18 +19,18 @@ SModelS is a Python library that requires Python version 3.6 or later. It depend
 
 .. include:: dependencies.rst
 
-For speed reasons, we moreover recommend pytorch>=1.8.0 as backend for pyhf. This is, however, optional: if pytorch is not available, SModelS will use the default backend. 
+For performance reasons, we moreover recommend pytorch>=1.8.0 as backend for pyhf. This is, however, optional: if pytorch is not available, SModelS will use the default backend.
 
-In addition, the :ref:`cross section computer <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>`
-requires:
+In addition, the :ref:`cross section computers <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>`
+require:
 
- * `Pythia 8.3 <https://arxiv.org/abs/1410.3012>`_ (requires a C++ compiler) or `Pythia 6.4.27 <http://arxiv.org/abs/hep-ph/0603175>`_ (requires gfortran)
- * `NLL-fast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV) (requires a fortran compiler)
+ * `Pythia 8.3 <https://arxiv.org/abs/1410.3012>`_ (needs a C++ compiler) or `Pythia 6.4.27 <http://arxiv.org/abs/hep-ph/0603175>`_ (needs gfortran)
+ * `NLL-fast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV) (needs a Fortran compiler)
+ * `Resummino <https://resummino.hepforge.org>`_ (needs a C++ compiler and gfortran). Moreover, in rpm-based Linux distributions, this tool needs boost, boost-devel, gsl and gsl-devel. For deb-based distributions, libboost-dev and libgsl-dev are required.
 
-These tools need not be installed separately, as the SModelS build system takes care of that. The current default is that both Pythia6 and Pythia8 are installed together with NLLfast.
-
+The tools themselves, i.e. Pythia6|8, NLL-fast, and/or Resummino need not be installed separately, as the SModelS build system takes care of that (see below). SModelS however expects the tools' dependencies (boost, gsl for Resummino, as well as the compilers) to be installed by the user.
 Finally, the :ref:`database browser <databaseBrowser>` provided by :ref:`smodelsTools.py <smodelsTools>`
-requires `IPython <https://ipython.org/>`_, the :ref:`interactive plotter <interactivePlots>` requires `plotly <https://plot.ly/python/>`_ and `pandas <https://pandas.pydata.org/>`_, while for drawing SMS graphs (within a Jupyter notebook) `graphviz <https://graphviz.org/>`_ is needed.
+requires `IPython <https://ipython.org/>`_, while the :ref:`interactive plotter <interactivePlots>` requires `plotly <https://plot.ly/python/>`_ and `pandas <https://pandas.pydata.org/>`_.
 
 
 Installation Methods
@@ -44,27 +44,30 @@ Installation Methods
 
      make smodels
 
-   in the top-level directory. The installation will remove redundant folders, install the required 
-   dependencies (using pip install) and compile Pythia and NLL-fast. 
-   If the MSSM cross section computer is not needed, one can install SModelS without Pythia and NLL-fast. To this end, run::
+   in the top-level directory. SModelS will install the required dependencies (using pip install), but none of the external  tools (Pythia6|8, NLL-fast, Resummino).
+   If the MSSM :ref:`cross section computers <xsecCalc>` are needed, one can directly install SModelS together with its external tools. To this end, run::
 
-     make smodels_noexternaltools
- 
-   instead of *make smodels*. 
-   In case the Python libraries can not be successfully
-   installed, the user can install them separately using his/her preferred method. Pythia and NLL-fast can also be compiled separately
-   running **make externaltools**. In case the Fortran comiler isn't found, 
-   try *make FCC=<path-to-gfortran> smodels* or *make FCC=<path-to-gfortran> externaltools*. 
+     make smodels_externaltools
 
- * If Python's *setuptools* is installed in your machine, SModelS and its dependencies
-   can also be installed without the use of pip.
+   instead of *make smodels*.
+   In case the Python libraries cannot be successfully
+   installed, the user can install them separately using his/her preferred method. Pythia, NLL-fast and Resummino can also be compiled separately
+   running **make externaltools**. In case the Fortran comiler isn't found,
+   try *make FCC=<path-to-gfortran> smodels* or *make FCC=<path-to-gfortran> externaltools*.
+
+ * Every external tool can also be compiled individually, run e.g.::
+
+     make pythia6 pythia8 nllfast resummino
+
+   Remember, though, that the compilers as well as Resummino's dependencies (boost, gsl, see above) need to be installed already.
+
+ * Python's *setuptools*, if installed in your machine, can also be used for installing SModelS and its dependencies.
    After downloading the source from the `SModelS releases page <https://github.com/SModelS/smodels/releases>`_
    and extracting it, run::
 
-
      setup.py install
 
-   within the main smodels directory. If the python libraries are installed in a system folder (as is the default behavior),
+   within the main SModelS directory. If the python libraries are installed in a system folder (as is the default behavior),
    it will be necessary to run the install command with superuser privilege.
    Alternatively, one can run setup.py with the "--user" flag: ::
 
@@ -74,33 +77,36 @@ Installation Methods
    manually and then rerun setup.py.
    For Ubuntu, SL6 machines and other platforms, a recipe is given below.
 
-
-   Note that this installation method will install smodels into the default system or user directory (e.g. ~/.local/lib/python3/site-packages/).
+   Note that this installation method will install SModelS into the default system or user directory (e.g. ~/.local/lib/python3.10/site-packages/).
    Depending on your platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
    (or $DYLD_LIBRARY_PATH) might have to be set appropriately.
 
+   Note also, that setup.py will *not* attempt at downloading and compiling the external tools (Pythia6|8, NLL-fast, Resummino) at install time.
+   Instead, this will be done on the fly, at runtime, upon call of the :ref:`cross section computer(s) <xsecCalc>`.
+   The external tools will also be located in the above smodels installation directory (<installdir>/lib/...).
 
 
-
- * Finally, SModelS is `indexed on pypi <https://pypi.org/project/smodels/>`_. Thus, if *pip3* (or *pip*) is installed in your machine, it is also possible to install SModelS directly without the need for
-   downloading the source code: ::
+ * Finally, SModelS is `indexed on pypi <https://pypi.org/project/smodels/>`_. Thus, if *pip3* (or *pip*) is installed in your machine, it is possible to install SModelS  without downloading the source code: ::
 
      pip3 install smodels
 
    in case of system-wide installs or : ::
 
      pip3 install --user smodels
-   
+
    for user-specific installations.
 
-
-   Note that this installation method will install smodels into the default system or user directory (e.g. ~/.local/lib/python3/site-packages/).
+   This installation method will install SModelS into the default system or user directory (e.g. ~/.local/lib/python3.10/site-packages/).
    Depending on your platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
    (or $DYLD_LIBRARY_PATH) might have to be set appropriately.
-   Be aware that the example files and the |parameters| discussed in the manual 
+   Be aware that the example files and the |parameters| discussed in the manual
    will also be located in your default system or user directory. Furthermore the database
    folder is not included (see :ref:`database installation <installingDB>` below).
-   This installation method is best suited for experienced python users.   
+
+   Moreover, pip will *not* attempt at downloading and compiling the external tools (Pythia6|8, NLL-fast, Resummino) at install time. Instead, this will be done on the fly, at runtime, upon call of the :ref:`cross section computer(s) <xsecCalc>`.
+   The external tools will also be located in the above smodels installation directory (<installdir>/lib/...).
+
+   Generally, this installation method is best suited for experienced python users.
 
 
 There is also a diagnostic tool available: ::
@@ -121,43 +127,43 @@ Installing the SModelS Database
 The simplest way is to **provide the URL** of the official :ref:`database <databaseStruct>` as the
 database path when running SModelS (see :ref:`path <parameterFilePath>` in |parameters|).
 In this case the corresponding database version binary file will be automatically downloaded
-and used.  The available database URLs can be found on 
+and used.  The available database URLs can be found on
 the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_ .
-For using the latest official database, which is compatible with the code version used, 
-one can also simply set:: 
+For using the latest official database, which is compatible with the code version used,
+one can also simply set::
 
      path = official
 
-in the |parameters|. Per default, the database pickle file will be located in the users' .cache/smodels/ directory. 
-If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR 
-accordingly, e.g. to '/tmp'. 
+in the |parameters|. Per default, the database pickle file will be located in the users' .cache/smodels/ directory.
+If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR
+accordingly, e.g. to '/tmp'.
 
-For performance reasons, from v2.2.0 onwards, the signal regions (SRs) of some of the |EMrs| are aggregated in the official database. 
-(For example for CMS-SUS-19-006, the original 174 SRs have been aggregated to 40; this speeds up the calculation 
+For performance reasons, from v2.2.0 onwards, the signal regions (SRs) of some of the |EMrs| are aggregated in the official database.
+(For example for CMS-SUS-19-006, the original 174 SRs have been aggregated to 40; this speeds up the calculation
 without too much loss in precision when combining SRs). In order to use the original, non-aggregated |EMrs|, set::
 
      path = official+nonaggregated
 
 
-**Alternatively, one can download the text version** of the :ref:`database <databaseStruct>` and pickle it locally. 
-This can be convenient if one wants to add or edit experimental results. 
-The source code of the available databases can again be found on 
-the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_. 
-After download, unpack it to a convenient location (e.g., to a 'smodels-database' folder in the SModelS source directory),  
-and then specify the local path to this folder in the |parameters|, e.g.:: 
+**Alternatively, one can download the text version** of the :ref:`database <databaseStruct>` and pickle it locally.
+This can be convenient if one wants to add or edit experimental results.
+The source code of the available databases can again be found on
+the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_.
+After download, unpack it to a convenient location (e.g., to a 'smodels-database' folder in the SModelS source directory),
+and then specify the local path to this folder in the |parameters|, e.g.::
 
      path = ./smodels-database/
 
 The first time SModelS is run, a :ref:`binary file <databasePickle>` will be built
-using this text database folder, which can then be used in all subsequent runs. 
-As above, by default this contains some |EMrs| with aggregated SRs. The non-aggregated versions 
-are stored as a tarball on the top level of the database folder; for v2.2.0 this is the file *nonaggregated220.tar.gz*. 
+using this text database folder, which can then be used in all subsequent runs.
+As above, by default this contains some |EMrs| with aggregated SRs. The non-aggregated versions
+are stored as a tarball on the top level of the database folder; for v2.2.0 this is the file *nonaggregated220.tar.gz*.
 To use this, simply expand this tarball in the directory::
 
  cd <smodels-database folder>
  tar -xzvf nonaggregated220.tar.gz
 
-The database  :ref:`binary file <databasePickle>` will then be re-built accordingly upon first usage. 
+The database  :ref:`binary file <databasePickle>` will then be re-built accordingly upon first usage.
 
 The complete list of analyses and results included in the database can be
 consulted at `https://smodels.github.io/wiki/ListOfAnalyses <https://smodels.github.io/wiki/ListOfAnalyses>`_.
@@ -167,7 +173,7 @@ found at `https://smodels.github.io/wiki/Validation <https://smodels.github.io/w
 
 The database can conveniently be updated independently from SModelS code
 updates. It suffices to unpack any new database tarball and replace the database
-directory or provide the :ref:`path <parameterFilePath>` 
+directory or provide the :ref:`path <parameterFilePath>`
 to the new folder, binary or URL address.
 In the same fashion, one can easily add additional results as
 explained below.
@@ -179,16 +185,16 @@ Adding FastLim data
 ^^^^^^^^^^^^^^^^^^^
 
 The official SModelS database can be augmented with data from the
-`fastlim <http://cern.ch/fastlim>`_ results. The simplest way is to set:  :: 
+`fastlim <http://cern.ch/fastlim>`_ results. The simplest way is to set:  ::
 
      path = official+fastlim
 
 in the |parameters|. It is also possible to
-directly download a database binary file including the fastlim maps; dedicated URLs are provied on 
+directly download a database binary file including the fastlim maps; dedicated URLs are provied on
 the `SModelS Database releases page <https://github.com/SModelS/smodels-database-release/releases>`_ for this purpose.
 
-For using this with the text database, 
-a tarball with the properly converted fastlim-1.0 efficiency maps (*smodels-v1.1-fastlim-1.0.tgz*) is located in the top level directory of the database   
+For using this with the text database,
+a tarball with the properly converted fastlim-1.0 efficiency maps (*smodels-v1.1-fastlim-1.0.tgz*) is located in the top level directory of the database
 ( it can also be downloaded separately from `Github <https://github.com/SModelS/smodels-database-release/blob/main/smodels-v1.1-fastlim-1.0.tgz>`_.)
 As for adding non-aggregated results (see above), this tarball simply needs to be exploded to be added to the database: ::
 

@@ -1,0 +1,5 @@
+# Note that this file gets overwritten when calling install.sh
+# so do not define the versions here!
+# Instead, look at install.sh.
+LHAPDF_version = 6.5.4
+resummino_version = 3.1.2

@@ -1,17 +1,24 @@
 .. index:: SModelS Tools
 
+.. |element| replace:: :ref:`element <element>`
+.. |elements| replace:: :ref:`elements <element>`
+.. |topology| replace:: :ref:`topology <topology>`
+.. |topologies| replace:: :ref:`topologies <topology>`
 .. |decomposition| replace:: :doc:`decomposition <Decomposition>`
 .. |theory predictions| replace:: :doc:`theory predictions <TheoryPredictions>`
 .. |theory prediction| replace:: :doc:`theory prediction <TheoryPredictions>`
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
 .. |database| replace:: :ref:`database <Database>`
+.. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
 .. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
 .. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
 .. |Database| replace:: :ref:`Database <Database>`
 .. |Dataset| replace:: :ref:`DataSet<DataSet>`
 .. |Datasets| replace:: :ref:`DataSets<DataSet>`
 .. |results| replace:: :ref:`experimental results <ExpResult>`
+.. |branches| replace:: :ref:`branches <branch>`
+.. |branch| replace:: :ref:`branch <branch>`
 .. |EMrs| replace:: :ref:`EM-type results <EMtype>`
 .. |ULrs| replace:: :ref:`UL-type results <ULtype>`
 
@@ -22,8 +29,8 @@ SModelS Tools
 
 Inside SModelS there is a number of tools that may be convenient for the user:
 
-* a :ref:`cross section calculator <xsecCalc>` based on `Pythia8 <http://pythia.org>`_ (or `Pythia6 <http://pythia6.hepforge.org>`_) and
-  `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_,
+* a :ref:`cross section calculator <xsecCalc>` based on `Pythia8 <http://pythia.org>`_ (or `Pythia6 <http://pythia6.hepforge.org>`_),
+  `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_, and one based on `Resummino <https://resummino.hepforge.org>`_,
 * :ref:`SLHA and LHE file checkers <fileChecks>` to check your input files for completeness and sanity,
 * a :ref:`database browser <databaseBrowser>` to provide easy access to the |database| of experimental results,
 * a plotting tool to make :ref:`interactive plots <interactivePlots>` based on `plotly <https://plot.ly/python/>`_ (v1.1.3 onwards),
@@ -32,16 +39,20 @@ Inside SModelS there is a number of tools that may be convenient for the user:
 
 .. _xsecCalc:
 
-Cross Section Calculator
-------------------------
+Cross Section Calculators
+-------------------------
 
-This tool computes LHC production cross sections for *MSSM particles*
-and writes them out in :ref:`SLHA convention <xsecblock>`. This can in particular be
+These tools compute LHC production cross sections for *MSSM particles*
+and write them out in :ref:`SLHA convention <xsecblock>`. This is particularly
 convenient for adding cross sections to SLHA input files, see :doc:`Basic Input <BasicInput>`.
-The calculation is done at LO with `Pythia8 <http://pythia.org>`_ or `Pythia6.4 <http://pythia6.hepforge.org>`_ ; K-factors
-for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_. Signal strength multipliers can optionally be supplied for each "mother" particle. However, use at your own risk! Make sure the
-output is sensible and contains all cross sections for all production mechanisms
-you are interested in! 
+
+
+Pythia and NLLfast Cross Sections
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In the basic "xseccomputer", the calculation is done at LO with `Pythia8 <http://pythia.org>`_ or `Pythia6.4 <http://pythia6.hepforge.org>`_ ; K-factors
+for colored particles are computed with `NLLfast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_. Signal strength multipliers can optionally be supplied for each "mother" particle. However, use at your own risk! Make sure the output is sensible and contains all cross sections for all production mechanisms
+you are interested in!
 
 **The usage of the cross section calculator is:**
 
@@ -76,8 +87,33 @@ This will compute 8 TeV and 13 TeV LO cross sections as above, but the cross sec
 Note that signal strength multipliers get applied only to LO cross sections. This means they are propagated to NLO and NLL level only if the LO cross sections are computed first and the NLO/NLL corrections added afterwards. In other words, if the xseccomputer is called with -n or -N argument but without -O (--LOfromSLHA), the --ssmultipliers argument will be ignored.
 
 
-* **The cross section calculation is implemented by the** `xsecComputer function <tools.html#tools.xsecComputer.XSecComputer>`_
+* **The cross section calculation is implemented by the** `XSecComputer class <tools.html#tools.xsecComputer.XSecComputer>`_
 
+.. _xsecResummino:
+
+Resummino Cross Sections
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+For electroweak-ino and/or slepton production cross sections, another tool based on `Resummino <https://resummino.hepforge.org>`_ is available. This can calculate EW cross sections at LO, NLO, and NLL+NLO orders. No K-factors are used, all orders are calculated independently.
+
+**The usage of the Resummino cross section calculator is:**
+
+.. include:: XSecResummino.rst
+
+A typical
+usage example is: ::
+
+   smodelsTools.py xsecresummino -s 13 -p -n -f test/testFiles/resummino/resummino_example.slha -part 1000023 1000024
+
+This will compute the (1000023,-1000024), (1000023, 1000024) and (-1000024,1000024) cross sections for sqrt(s)=13 TeV at NLO for the spectrum given in resummino_example.slha and append them to that SLHA file.
+Additional settings, like the PDF sets to use, are taken from the Resummino configuration file, smodels/etc/resummino.py. There, also the default threshold for the minimum cross section is set.
+
+Instead of providing a list of particles via the --part argument, one can also directly specify in the resummino.py  configuration file which production channels shall be considered. To this end one can either adapt the resummino.py file in the smodels/etc folder, or provide their own configuration file via the --conf argument.
+Note that options set directly on the command line always take precedence over the settings in the
+configuration file.
+
+
+* **The resummino cross section calculation is implemented by the** `XSecResummino class <tools.html#tools.xsecResummino.XSecResummino>`_
 
 .. _fileChecks:
 
@@ -258,7 +294,7 @@ Below we give more detailed information about each entry in this file.
   * **variable_x**: In a list form, give the the block and PDG code number of the x-axis variable, to find it in the SLHA file. Example: variable_x = ['MASS', 1000021]. Alternatively, you can provide custom names (instead of extracting them from a model.py file) to your x-axis variable in a dictionary form, e.g. {'m_gluino': ['MASS', 1000021]}.
   * **variable_y**: same for the y-axis. Example: variable_y = ['MASS', 1000022] or variable_y ={'m_neutralino1': ['MASS', 1000022]}
 
-* *spectrum hover information*: defines which information from the input SLHA file will appear in the hover box. The syntax is again either a list or a dictionary. 
+* *spectrum hover information*: defines which information from the input SLHA file will appear in the hover box. The syntax is again either a list or a dictionary.
 
   * **slha_hover_information**: information from the input SLHA file, e.g. model parameters or masses. Example: slha_hover_information = [ ['MASS', 1000021], ['MASS', 2000002], ['MASS', 1000022]]. Alternatively, slha_hover_information = {'m_gluino': ['MASS', 1000021], 'm_suR': ['MASS', 2000002], 'm_LSP': ['MASS', 1000022]}
 
@@ -286,7 +322,7 @@ Below we give more detailed information about each entry in this file.
   * **MT_total_xsec**: shows the total missing cross section (i.e. the sum of all missing topologies cross sections)
 
   * **MT_prompt_xsec**: Shows the total cross section from prompt missing topologies
-  
+
   * **MT_displaced_xsec**: Shows the total cross section from displaced missing topologies
 
   * **MT_outgrid_xsec**: shows the total missing cross section outside the mass grids of the experimental results

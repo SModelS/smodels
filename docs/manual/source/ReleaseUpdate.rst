@@ -42,6 +42,11 @@ New in Version 3.0.0:
   * Inclusion of analyses with searches for resonant production
   * ...
 
+New in Version 2.3.3:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * added :ref:`resummino cross section <xsecResummino>` computer
+
 New in Version 2.3.2:
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -76,7 +81,7 @@ New in Version 2.3.0:
   * refactored the statistics modules
   * introduced "full_llhds" database add-on (see :ref:`parameter.ini file <parameterFileDatabase>`)
   * |database| extension, added new results from 6 ATLAS and 4 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
-  
+
      * results from ATLAS: ATLAS-SUSY-2018-05 (UL,EM+hfm), ATLAS-SUSY-2018-32 (EM+hfm), ATLAS-SUSY-2018-41 (EM+cov, updated), ATLAS-SUSY-2018-42 (UL,EM), ATLAS-SUSY-2019-02 (UL,EM+cov), ATLAS-SUSY-2013-12 (8TeV, EM)
      * results from CMS: CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL,EM), CMS-SUS-21-002 (UL,EM+cov)
      * added expected ULs to CMS-SUS-19-009
@@ -109,7 +114,7 @@ New in Version 2.2.0:
   * updates in references.bib, installation notes
   * more small fixes in unit tests
   * |database| extension, added new results from 4 ATLAS and 11 CMS analyses:
-     
+
      * results from ATLAS: ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2018-41 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
      * results from CMS: CMS-SUS-16-050 (EM), CMS-SUS-18-004 (UL), CMS-SUS-18-007 (UL), CMS-SUS-19-008 (UL), CMS-SUS-19-011 (UL), CMS-SUS-19-013 (UL), CMS-SUS-20-001 (UL), CMS-SUS-20-002 (UL)
      * recast with MadAnalysis5: CMS-SUS-16-039 (EM), CMS-SUS-16-048 (EM), CMS-SUS-19-006 (EM); all incl. covariance matrices
