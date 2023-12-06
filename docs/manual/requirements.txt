@@ -1,11 +1,13 @@
 ###### pythonic requirements for readthedocs.io ######
 jupyter
 nbconvert
-unum
-pyslha
-numpy
-scipy
 sphinx_rtd_theme
-plotly
-pyhf
-torch
+docutils==0.16
+numpy>=1.22.0
+scipy>=1.0.0
+unum>=4.0.0
+requests>=2.0.0
+pyslha>=3.1.0
+pyhf>=0.6.1
+jsonpatch>=1.25
+jsonschema>=3.2.0
