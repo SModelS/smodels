@@ -783,7 +783,7 @@ def main ( args : argparse.Namespace ):
     # logger.debug("The calculation will be performed using : " +str(sqrtses)+ ' TeV as center of mass energy')
     orders_dic = {0:'LO', 1:'NLO', 2:'NLL+NLO'}
 
-    logger.info("the highest pertubation order considered is " + orders_dic[order])
+    logger.info("the highest perturbation order considered is " + orders_dic[order])
     scpu = "cpus"
     if ncpus == 1:
         scpu = "cpu"
