@@ -692,12 +692,8 @@ class PyhfUpperLimitComputer:
                 try:
                     muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
                             return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
-                    sigma_mu = self.scale / float ( abs ( o.jac[model.config.poi_index] ) ) ## why did this not work?
-                    print("yes, jac worked")
-                    print("index =", model.config.poi_index)
-                    print("jac = ", o.jac[model.config.poi_index], "scale =", self.scale)
-                    print(o)
-                    print("sigma_mu = ",sigma_mu)
+                    #sigma_mu = self.scale / float ( abs ( o.jac[model.config.poi_index] ) ) ## why did this not work?
+
                 except (pyhf.exceptions.FailedMinimization,ValueError) as e:
                     pass
                 #t1 = time.time()
@@ -712,33 +708,24 @@ class PyhfUpperLimitComputer:
                         _1, _2, o = pyhf.infer.mle.fit(workspace.data(model), model,
                                 return_fitted_val=True, return_result_obj = True, init_pars = list(muhat), method="BFGS" )
                         sigma_mu_temp = float ( np.sqrt ( o.hess_inv[model.config.poi_index][model.config.poi_index] ) )
-                        print("temp")
-                        print("index = ",model.config.poi_index)
-                        print("hess = ", o.hess_inv[model.config.poi_index][model.config.poi_index])
-                        print("sigma_mu_temp ", sigma_mu_temp)
-                        print(o)
+
                     except (pyhf.exceptions.FailedMinimization,ValueError) as e:
                         pass
                     if abs ( sigma_mu_temp - 1.0 ) > 1e-5:
-                        print("if at 665")
                         sigma_mu = sigma_mu_temp * self.scale
                     else:
-                        print("else at 668")
                         _, _, o = pyhf.infer.mle.fit(workspace.data(model), model,
                             return_fitted_val=True, return_result_obj = True, method="L-BFGS-B" )
                         print(o)
                         sigma_mu_temp = float ( np.sqrt ( o.hess_inv.todense()[model.config.poi_index][model.config.poi_index] ) )
-                        print("sigma_at668= ",sigma_mu_temp)
                         if abs ( sigma_mu_temp - 1.0 ) > 1e-8:
                             sigma_mu = sigma_mu_temp * self.scale
-                        print("sigma_at668",sigma_mu)
 #                    sigma_mu = float ( o.unc[model.config.poi_index] ) * self.scale
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.warning(f"pyhf mle.fit failed {e}. Calculating inv_hess numerically.")
                 inv_hess = self.compute_invhess(o.x, workspace.data(model), model, model.config.poi_index)
                 sigma_mu = float ( np.sqrt ( inv_hess)) * self.scale
-                print("computed sigma_mu = ", sigma_mu)
             
             muhat = float ( muhat[model.config.poi_index]*self.scale )
             try:
@@ -753,7 +740,6 @@ class PyhfUpperLimitComputer:
             #t2 = time.time()
             #print ( f"second fit {t2-t1:.2f}s sigma_mu {sigma_mu:.3f}" )
             ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
-            print(ret)
             self.data.cached_lmaxes[workspace_index] = ret
             return ret
 
