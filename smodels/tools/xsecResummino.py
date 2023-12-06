@@ -493,7 +493,7 @@ class XSecResummino(XSecBase):
             if not os.path.isfile(slha_folder):
                 slha_path = os.path.join(slha_folder,slha)
             else:
-                slha_path = os.path.join(self.pwd, slha)
+                slha_path = os.path.join(current, slha)
             #Variable used to avoid strange result (huge difference between LO and NLO result)
             num_try = 0
             with open(slha_path, 'r') as f:
