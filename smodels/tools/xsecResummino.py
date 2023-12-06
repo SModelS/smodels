@@ -161,8 +161,11 @@ class XSecResummino(XSecBase):
             command = f"{resummino_bin} {input_file}"
 
         with open(output_file, 'w') as f:
-            with open("/dev/null", "w") as errorhandle:
-                subprocess.run(command, shell=True, stdout=f,stderr=errorhandle, text=True)
+            if self.verbosity == "debug":
+                subprocess.run(command, shell=True, stdout=f,stderr=os.sys.stderr, text=True)
+            else:
+                with open("/dev/null", "w") as errorhandle:
+                    subprocess.run(command, shell=True, stdout=f,stderr=errorhandle, text=True)
 
 
     def launch_resummino(self, input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, log):
@@ -182,7 +185,7 @@ class XSecResummino(XSecBase):
         
         already_written_channel_set = [({x,y},z,w) for (x,y), z,w in already_written_channel]
         
-        logger.debug("channel, order and cross section " + str(particle_1)+str(particle_2)+ str(order)+ str(_))
+        logger.debug(f"channel, order and cross section {str(particle_1)} {str(particle_2)} {str(order)} {str(_)}" )
         logger.debug('the already written channels are '+ str(already_written_channel))
         if (((particle_1, particle_2), _, order)) in already_written_channel:
             return
@@ -235,7 +238,7 @@ class XSecResummino(XSecBase):
         """
         Search in the .out files of resummino (in tempfiles) to get the cross section asked by the users, 
         then extract the LO,NLO and NLL+NLO.
-        If you want to get the incertitude given by resummino, you have everything here in LO, NLO and NLL.
+        If you want to get the incertainties given by resummino, you have everything here in LO, NLO and NLL.
         """
         Infos = []
         with open(output_file, 'r') as f:
@@ -278,9 +281,9 @@ class XSecResummino(XSecBase):
             
     def write_in_slha(self, output_file, slha_file, order, particle_1, particle_2, type_writing, Xsections, log):
         """
-        Organize here the way cross section are written onto the file (highest,
+        Organize here the way cross sections are written into the file (highest,
         all) and then create cross_section object to let smodels take
-        care of the writting itself with the create_xsection method.
+        care of the writing itself with the create_xsection method.
         """
         results = self.search_in_output(output_file)
         if type_writing == 'highest':
