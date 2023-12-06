@@ -15,7 +15,7 @@ old/
 smodels.log
 summary.txt
 pythia_lhe
-smodels/lib/pythia8/pythia8.exe
+smodels/lib/pythia8/pythia8*
 recipes/*.py
 recipes/*.html
 recipes/.ipynb_checkpoints
@@ -91,3 +91,8 @@ docs/manual/source/images/parameters.ini
 docs/manual/source/images/parameters_default.ini
 docs/manual/source/recipes/.ipynb_checkpoints/
 docs/manual/source/recipes/iplots/
+smodels/lib/resummino/resummino-*/
+smodels/lib/resummino/resummino-*.zip
+smodels/lib/resummino/lhapdf/
+smodels/lib/resummino/LHAPDF-*/
+smodels/lib/resummino/resummino_install/
