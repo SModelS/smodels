@@ -55,7 +55,7 @@ pyhfinfo = {
     "ver": ver,
     "required": "0.6.1".split("."),
 }
-'''
+
 try:
     pyhf.set_backend(b"pytorch")
     import torch
@@ -77,7 +77,7 @@ except pyhf.exceptions.ImportBackendError as e:
 import numpy
 pyhfinfo["backendver"] = numpy.version.full_version
 warnings.filterwarnings("ignore", r"invalid value encountered in log")
-
+'''
 from scipy import optimize
 import numpy as np
 from smodels.tools.smodelsLogging import logger
@@ -660,6 +660,7 @@ class PyhfUpperLimitComputer:
         """
         # logger.error("expected flag needs to be heeded!!!")
         logger.debug("Calling lmax")
+        self.welcome()
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 "ignore",
@@ -699,9 +700,9 @@ class PyhfUpperLimitComputer:
                 #t1 = time.time()
                 #print ( f"first fit {t1-t0:.2f}s sigma_mu {sigma_mu:.3f}" )
                 if hasattr ( o, "hess_inv" ): # maybe the backend gets changed
-                    print("hess_inv")
+                    #print("hess_inv")
                     sigma_mu = float ( np.sqrt ( o.hess_inv[model.config.poi_index][model.config.poi_index] ) ) * self.scale
-                    print(o.hess_inv[model.config.poi_index][model.config.poi_index] )
+                    #print(o.hess_inv[model.config.poi_index][model.config.poi_index] )
                 else:
                     sigma_mu_temp = 1.
                     try:
@@ -716,14 +717,20 @@ class PyhfUpperLimitComputer:
                     else:
                         _, _, o = pyhf.infer.mle.fit(workspace.data(model), model,
                             return_fitted_val=True, return_result_obj = True, method="L-BFGS-B" )
-                        print(o)
+                        #print(o)
                         sigma_mu_temp = float ( np.sqrt ( o.hess_inv.todense()[model.config.poi_index][model.config.poi_index] ) )
                         if abs ( sigma_mu_temp - 1.0 ) > 1e-8:
                             sigma_mu = sigma_mu_temp * self.scale
 #                    sigma_mu = float ( o.unc[model.config.poi_index] ) * self.scale
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                logger.warning(f"pyhf mle.fit failed {e}. Calculating inv_hess numerically.")
+                if pyhfinfo["backend"] == "pytorch":
+                    logger.warning(f"pyhf mle.fit failed {e} with {pyhfinfo['backend']} v{pyhfinfo['backendver']}. Calculating inv_hess numerically.")
+                if pyhfinfo["backend"] == "numpy":
+                    logger.debug(f"pyhf mle.fit failed {e} with {pyhfinfo['backend']} v{pyhfinfo['backendver']}. Calculating inv_hess numerically.")
+                
+		        #self.welcome() 
+                #Calculate inv_hess numerically
                 inv_hess = self.compute_invhess(o.x, workspace.data(model), model, model.config.poi_index)
                 sigma_mu = float ( np.sqrt ( inv_hess)) * self.scale
             

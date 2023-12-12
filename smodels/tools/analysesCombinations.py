@@ -90,8 +90,8 @@ class AnaCombLikelihoodComputer(object):
                   sigma_mu -- the standard deviation around mu_hat, and lmax, \
                   i.e. the likelihood at mu_hat
         """
-
-
+        
+        
         muhats, weighted = [], []
         totweight = 0.0
         for tp in self.theoryPredictions:
@@ -119,6 +119,10 @@ class AnaCombLikelihoodComputer(object):
 
 
         toTry = [sum(weighted) / totweight]
+        
+        #Add additional initialization points near the first one to make sure that minima is not lost due to small differences in the initialization values
+        fluc = max(1e-6, 1e-5*toTry[0])  #incase toTry[0] = 0.0, take 1e-06
+        toTry += [toTry[0] - fluc, toTry[0] + fluc]
 
         def fun(mu):
             # Make sure to always compute the correct llhd value (from theoryPrediction)
