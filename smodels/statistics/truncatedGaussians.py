@@ -59,6 +59,7 @@ class TruncatedGaussians:
             corr : Optional[float] = 0.6,
             expected : Union[Text,bool] = False ) -> Union[None,float]:
         """ return the likelihood, as a function of mu
+
         :param mu: number of signal events, if None then mu = muhat
         :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: if True, then allow muhat to become negative,\
@@ -116,6 +117,7 @@ class TruncatedGaussians:
             corr : Optional[float] = 0.6, 
             expected : Union[bool,Text] = False ) -> float:
         """ return the likelihood, as a function of nsig
+
         :param mu: signal strength
         :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: if True, then allow muhat to become negative,
@@ -180,6 +182,7 @@ class TruncatedGaussians:
     def _findMuhat( self, xa : float = 0., 
                         xb : Union[float,None] = None ):
         """ find muhat, in [xa,xb] 
+
         :param xa: lower limit of initial bracket
         :param xb: upper limit of initial bracket. if none, then max(ul,eul)
         """

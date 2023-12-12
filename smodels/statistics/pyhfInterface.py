@@ -321,6 +321,7 @@ class PyhfUpperLimitComputer:
     def wsMaker(self, apriori=False):
         """
         Apply each region patch (self.patches) to his associated json (self.inputJsons) to obtain the complete workspaces
+
         :param apriori: - If set to 'True': Replace the observation data entries of each workspace by the corresponding sum of the expected yields \
                         - Else: The observed yields put in the workspace are the ones written in the corresponfing json dictionary
 
@@ -453,6 +454,7 @@ class PyhfUpperLimitComputer:
         """
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
+
         :param workspace_index: supply index of workspace to use. If None, \
                                 choose index of best combo
         :param return_nll: if true, return nll, not llhd
@@ -582,6 +584,7 @@ class PyhfUpperLimitComputer:
               allowNegativeSignals=False):
         """
         Returns the negative log max likelihood
+
         :param return_nll: if true, return nll, not llhd
         :param workspace_index: supply index of workspace to use. If None, \
             choose index of best combo

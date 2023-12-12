@@ -25,6 +25,7 @@ class AnaCombLikelihoodComputer(object):
 
     def __init__(self, theoryPredictions: list, deltas_rel=None):
         """constructor.
+
         :param theoryPredictions: the List of theory predictions
         :param deltas_rel: relative uncertainty in signal (float). \
                            Default value is 20%.
@@ -47,6 +48,7 @@ class AnaCombLikelihoodComputer(object):
     ) -> float:
         """
         Compute the likelihood at a given mu
+
         :param mu: signal strength
         :param expected: if True, compute expected likelihood, else observed
         :param return_nll: if True, return negative log likelihood, else likelihood
@@ -81,6 +83,7 @@ class AnaCombLikelihoodComputer(object):
         return_nll: bool = False,
     ) -> Union[Dict, None]:
         """find muhat and lmax.
+
         :param allowNegativeSignals: if true, then also allow for negative values
         :param expected: if true, compute expected prior (=lsm), if "posteriori" \
                          compute posteriori expected
@@ -191,6 +194,7 @@ class AnaCombLikelihoodComputer(object):
     def getUpperLimitOnMu(self, expected=False, allowNegativeSignals = False ):
         """get upper limit on signal strength multiplier, i.e. value for mu for \
            which CLs = 0.95
+
         :param expected: if True, compute expected likelihood, else observed
         :returns: upper limit on signal strength multiplier mu
         """
@@ -228,6 +232,7 @@ class AnaCombLikelihoodComputer(object):
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
+
         :param expected: if True, compute expected likelihood, else observed
         """
         fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals)
@@ -258,6 +263,7 @@ class AnaCombLikelihoodComputer(object):
              return_type: Text = "CLs" ):
         """
         Compute the exclusion confidence level of the model
+
         :param mu: compute for the parameter of interest mu
         :param expected: if false, compute observed, true: compute a priori expected
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \

@@ -385,6 +385,7 @@ class LikelihoodComputer:
         """ the hessian of the likelihood of mu, at mu,
         which is the Fisher information
         which is approximately the inverse of the covariance
+
         :param allowZeroHessian: if false and sum(observed)==0, then replace \
                                  observed with expected
         """
@@ -525,6 +526,7 @@ class LikelihoodComputer:
     def llhdOfTheta(self, theta, nll = True ):
         """ likelihood for nuicance parameters theta, given signal strength \
             self.mu. notice, by default it returns nll
+
         :param theta: nuisance parameters
         :params nll: if True, compute negative log likelihood
         """
@@ -624,6 +626,7 @@ class LikelihoodComputer:
     def getThetaHat(self, nobs, nb, mu, covb, max_iterations):
         """ Compute nuisance parameter theta that maximizes our likelihood \
             (poisson*gauss) -- by setting dNLL/dTheta to zero
+
         :param mu: signal strength
         :returns: theta_hat
         """
@@ -756,9 +759,10 @@ class LikelihoodComputer:
 
     def likelihood(self, mu : float, return_nll : bool = False ):
         """compute the profiled likelihood for mu.
+
         :param mu: float Parameter of interest, signal strength
         :param return_nll: if true, return nll instead of likelihood
-        Returns profile likelihood and error code (0=no error)
+        :returns: profile likelihood and error code (0=no error)
         """
         # compute the profiled (not normalized) likelihood of observing
         # nsig signal events
@@ -771,6 +775,7 @@ class LikelihoodComputer:
 
     def lmax(self, return_nll=False, allowNegativeSignals=False):
         """convenience function, computes likelihood for nsig = nobs-nbg,
+
         :param return_nll: return nll instead of likelihood
         :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
         """
@@ -866,6 +871,7 @@ class LikelihoodComputer:
         the predicted background nb, error on this background deltab,
         expected number of signal events nsig and the relative error on
         signal (deltas_rel).
+
         :param nsig: number of signal events
         :return: chi2 (float)
 
@@ -936,6 +942,7 @@ class UpperLimitComputer:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
+
         :param model: statistical model
         :param expected: false: compute observed, true: compute a priori expected, \
             "posteriori": compute a posteriori expected
@@ -982,6 +989,7 @@ class UpperLimitComputer:
         def clsRoot(mu: float, return_type: Text = "CLs-alpha") -> float:
             """
             Calculate the root
+
             :param mu: float POI
             :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
                         CLs-alpha: returns CLs - 0.05
@@ -998,10 +1006,9 @@ class UpperLimitComputer:
         self, model, expected=False, trylasttime=False
     ):
         """upper limit on the signal strength multiplier mu
-            obtained from the defined Data (using the signal prediction
-
-            for each signal regio/dataset), by using
-            the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
+        obtained from the defined Data (using the signal prediction
+        for each signal regio/dataset), by using
+        the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
         :params expected: if false, compute observed,
                           true: compute a priori expected, "posteriori":
