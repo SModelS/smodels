@@ -24,6 +24,7 @@ def CLsfromNLL(
     """
     compute the CLs - alpha from the NLLs
     TODO: following needs explanation
+
     :param nllA:
     :param nll0A:
     :param nll:
@@ -60,6 +61,7 @@ def CLsfromNLL(
 def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
          allowNegative = True ):
     """find a, b for brent bracketing
+
     :param mu_hat: mu that maximizes likelihood
     :param sigm_mu: error on mu_hat (not too reliable)
     :param rootfinder: function that finds the root (usually root_func)
