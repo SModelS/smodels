@@ -37,6 +37,11 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+  * fixed bug in computation of error on muhat, for `pyhf likelihoods <tools.html#tools.pyhfInterface.PyhfUpperLimitComputer.lmax>`_
+    (affects mostly only numpy backend)
+  * small change in initialisation of gradient descent method for computation of
+    `combined mu_hat <tools.html#tools.analysesCombinations.AnaCombLikelihoodComputer.lmax>`_, to increate robustness of method
+
 New in Version 2.3.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
