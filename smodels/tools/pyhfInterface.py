@@ -693,14 +693,13 @@ class PyhfUpperLimitComputer:
                     bounds[model.config.poi_index] = (-5., 10. )
 
                 try:
-                    print("\n parameters: ", workspace.data(model))
                     muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
                             return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
                     #removed jacobain way of computing sigma_mu
 
                 except (pyhf.exceptions.FailedMinimization,ValueError) as e:
                     pass
-)
+
                 if hasattr ( o, "hess_inv" ): # maybe the backend gets changed
                     sigma_mu = float ( np.sqrt ( o.hess_inv[model.config.poi_index][model.config.poi_index] ) ) * self.scale
                 else:
