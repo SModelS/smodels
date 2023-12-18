@@ -62,6 +62,7 @@ try:
 
     pyhfinfo["backend"] = "pytorch"
     pyhfinfo["backendver"] = torch.__version__
+
 except pyhf.exceptions.ImportBackendError as e:
     print(
         "[SModelS:pyhfInterface] WARNING could not set pytorch as the pyhf backend, falling back to the default."
@@ -592,6 +593,62 @@ class PyhfUpperLimitComputer:
             return np.exp(-twice_nll / 2.0)
         return twice_nll / 2.0
 
+    def compute_invhess(self, x, data, model, index, epsilon=1e-05):
+        '''
+        if inv_hess is not given by the optimiser, calculate numerically by evaluating second order partial derivatives using 2 point central finite differences method
+        :param x: parameter values given to pyhf.infer.mle.twice_nll taken from pyhf.infer.mle.fit - optimizer.x (best_fit parameter values)
+        :param data: workspace.data(model) passed to pyhf.infer.mle.fit
+        :param model: model passed to pyhf.infer.mle.fit
+        :param index: index of the POI
+        Note : If len(x) <=5, compute the entire hessian matrix and ind its inverse. Else, compute the hessian at the index of the POI and return its inverse (diagonal approximation)
+        returns the inverse hessian at the index of the poi
+        '''
+
+        n = len(x)
+
+        if n<=5:
+
+            hessian = np.zeros((n,n))
+            for i in range(n):
+                for j in range(i+1):
+                    eps_i = epsilon*np.eye(n)[:,i] #identity along ith column
+                    eps_j = epsilon*np.eye(n)[:,j]
+
+                    #twice_nll is the objective function, hence need to find its hessian
+                    par_11 = pyhf.infer.mle.twice_nll(x + eps_i + eps_j, data, model)
+                    par_12 = pyhf.infer.mle.twice_nll(x - eps_i + eps_j, data, model)
+                    par_21 = pyhf.infer.mle.twice_nll(x + eps_i - eps_j, data, model)
+                    par_22 = pyhf.infer.mle.twice_nll(x - eps_i - eps_j, data, model)
+
+                    partial_xi_xj = (par_11 - par_12 - par_21 +par_22)/(4*epsilon**2)
+                    hessian[i,j] = partial_xi_xj
+                    if i!=j: hessian[j,i] = partial_xi_xj
+
+            def is_positive_definite(matrix):
+                eigenvalues = np.linalg.eigvals(matrix)
+                return all(eig > 0 for eig in eigenvalues)
+
+            if not is_positive_definite(hessian):
+                #raise ValueError("Hessian Matrix is not positive definite")
+                logger.warning("Hessian Matrix is not positive definite")
+
+            inverse_hessian = np.linalg.inv(hessian)
+
+            #return the inverse hessian at the poi
+            return inverse_hessian[index][index]
+
+        #calculate only the hessian at the poi and return its inverse (an approximation!)
+        eps_i = epsilon*np.eye(n)[:,index]
+        par_11 = pyhf.infer.mle.twice_nll(x + 2*eps_i, data, model)
+        par_12 = pyhf.infer.mle.twice_nll(x, data, model)
+        par_22 = pyhf.infer.mle.twice_nll(x - 2*eps_i, data, model)
+        hessian = (par_11 - 2*par_12 + par_22)/(4*epsilon**2)
+
+        #return the inverse hessian at the poi
+        return 1.0/hessian
+
+
+
     def lmax( self, workspace_index=None, return_nll=False, expected=False,
               allowNegativeSignals=False):
         """
@@ -634,16 +691,15 @@ class PyhfUpperLimitComputer:
                 bounds = model.config.suggested_bounds()
                 if allowNegativeSignals:
                     bounds[model.config.poi_index] = (-5., 10. )
-                #import time
-                #t0 = time.time()
+
                 try:
                     muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
                             return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
-                    sigma_mu = self.scale / float ( abs ( o.jac[model.config.poi_index] ) ) ## why did this not work?
+                    #removed jacobain way of computing sigma_mu
+
                 except (pyhf.exceptions.FailedMinimization,ValueError) as e:
                     pass
-                #t1 = time.time()
-                #print ( f"first fit {t1-t0:.2f}s sigma_mu {sigma_mu:.3f}" )
+
                 if hasattr ( o, "hess_inv" ): # maybe the backend gets changed
                     sigma_mu = float ( np.sqrt ( o.hess_inv[model.config.poi_index][model.config.poi_index] ) ) * self.scale
                 else:
@@ -652,6 +708,7 @@ class PyhfUpperLimitComputer:
                         _1, _2, o = pyhf.infer.mle.fit(workspace.data(model), model,
                                 return_fitted_val=True, return_result_obj = True, init_pars = list(muhat), method="BFGS" )
                         sigma_mu_temp = float ( np.sqrt ( o.hess_inv[model.config.poi_index][model.config.poi_index] ) )
+
                     except (pyhf.exceptions.FailedMinimization,ValueError) as e:
                         pass
                     if abs ( sigma_mu_temp - 1.0 ) > 1e-5:
@@ -659,13 +716,22 @@ class PyhfUpperLimitComputer:
                     else:
                         _, _, o = pyhf.infer.mle.fit(workspace.data(model), model,
                             return_fitted_val=True, return_result_obj = True, method="L-BFGS-B" )
+
                         sigma_mu_temp = float ( np.sqrt ( o.hess_inv.todense()[model.config.poi_index][model.config.poi_index] ) )
                         if abs ( sigma_mu_temp - 1.0 ) > 1e-8:
                             sigma_mu = sigma_mu_temp * self.scale
 #                    sigma_mu = float ( o.unc[model.config.poi_index] ) * self.scale
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                logger.error(f"pyhf mle.fit failed {e}")
+                if pyhfinfo["backend"] == "pytorch":
+                    logger.warning(f"pyhf mle.fit failed {e} with {pyhfinfo['backend']} v{pyhfinfo['backendver']}. Calculating inv_hess numerically.")
+                if pyhfinfo["backend"] == "numpy":
+                    logger.debug(f"pyhf mle.fit failed {e} with {pyhfinfo['backend']} v{pyhfinfo['backendver']}. Calculating inv_hess numerically.")
+
+                #Calculate inv_hess numerically
+                inv_hess = self.compute_invhess(o.x, workspace.data(model), model, model.config.poi_index)
+                sigma_mu = float ( np.sqrt ( inv_hess)) * self.scale
+
             muhat = float ( muhat[model.config.poi_index]*self.scale )
             try:
                 lmax = maxNllh.tolist()
@@ -676,8 +742,7 @@ class PyhfUpperLimitComputer:
             except:
                 lmax = float(lmax[0])
             lmax = self.exponentiateNLL(lmax, not return_nll)
-            #t2 = time.time()
-            #print ( f"second fit {t2-t1:.2f}s sigma_mu {sigma_mu:.3f}" )
+
             ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
             self.data.cached_lmaxes[workspace_index] = ret
             return ret
