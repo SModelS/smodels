@@ -19,15 +19,16 @@ SModelS is a Python library that requires Python version 3.6 or later. It depend
 
 .. include:: dependencies.rst
 
-For speed reasons, we moreover recommend pytorch>=1.8.0 as backend for pyhf. This is, however, optional: if pytorch is not available, SModelS will use the default backend. 
+For performance reasons, we moreover recommend pytorch>=1.8.0 as backend for pyhf. This is, however, optional: if pytorch is not available, SModelS will use the default backend. 
 
-In addition, the :ref:`cross section computer <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>`
-requires:
+In addition, the :ref:`cross section computers <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>`
+require:
 
- * `Pythia 8.3 <https://arxiv.org/abs/1410.3012>`_ (requires a C++ compiler) or `Pythia 6.4.27 <http://arxiv.org/abs/hep-ph/0603175>`_ (requires gfortran)
- * `NLL-fast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV) (requires a fortran compiler)
+ * `Pythia 8.3 <https://arxiv.org/abs/1410.3012>`_ (needs a C++ compiler) or `Pythia 6.4.27 <http://arxiv.org/abs/hep-ph/0603175>`_ (needs gfortran)
+ * `NLL-fast <http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast>`_ 1.2 (7 TeV), 2.1 (8 TeV), and 3.1 (13 TeV) (needs a Fortran compiler)
+ * `Resummino <https://resummino.hepforge.org>`_ (needs a C++ compiler and gfortran). Moreover, in rpm-based Linux distributions, this tool needs boost, boost-devel, gsl and gsl-devel. For deb-based distributions, libboost-dev and libgsl-dev are required.
 
-These tools need not be installed separately, as the SModelS build system takes care of that. The current default is that both Pythia6 and Pythia8 are installed together with NLLfast.
+The tools themselves, i.e. Pythia6|8, NLL-fast, and/or Resummino need not be installed separately, as the SModelS build system takes care of that (see below). SModelS however expects the tools' dependencies (boost, gsl for Resummino, as well as the compilers) to be installed by the user. 
 Finally, the :ref:`database browser <databaseBrowser>` provided by :ref:`smodelsTools.py <smodelsTools>`
 requires `IPython <https://ipython.org/>`_, while the :ref:`interactive plotter <interactivePlots>` requires `plotly <https://plot.ly/python/>`_ and `pandas <https://pandas.pydata.org/>`_. 
 
@@ -43,27 +44,30 @@ Installation Methods
 
      make smodels
 
-   in the top-level directory. The installation will remove redundant folders, install the required 
-   dependencies (using pip install) and compile Pythia and NLL-fast. 
-   If the MSSM cross section computer is not needed, one can install SModelS without Pythia and NLL-fast. To this end, run::
+   in the top-level directory. SModelS will install the required dependencies (using pip install), but none of the external  tools (Pythia6|8, NLL-fast, Resummino). 
+   If the MSSM :ref:`cross section computers <xsecCalc>` are needed, one can directly install SModelS together with its external tools. To this end, run::
 
-     make smodels_noexternaltools
+     make smodels_externaltools
  
    instead of *make smodels*. 
-   In case the Python libraries can not be successfully
-   installed, the user can install them separately using his/her preferred method. Pythia and NLL-fast can also be compiled separately
+   In case the Python libraries cannot be successfully
+   installed, the user can install them separately using his/her preferred method. Pythia, NLL-fast and Resummino can also be compiled separately
    running **make externaltools**. In case the Fortran comiler isn't found, 
    try *make FCC=<path-to-gfortran> smodels* or *make FCC=<path-to-gfortran> externaltools*. 
 
- * If Python's *setuptools* is installed in your machine, SModelS and its dependencies
-   can also be installed without the use of pip.
+ * Every external tool can also be compiled individually, run e.g.::
+
+     make pythia6 pythia8 nllfast resummino
+
+   Remember, though, that the compilers as well as Resummino's dependencies (boost, gsl, see above) need to be installed already.
+
+ * Python's *setuptools*, if installed in your machine, can also be used for installing SModelS and its dependencies.
    After downloading the source from the `SModelS releases page <https://github.com/SModelS/smodels/releases>`_
    and extracting it, run::
 
-
      setup.py install
 
-   within the main smodels directory. If the python libraries are installed in a system folder (as is the default behavior),
+   within the main SModelS directory. If the python libraries are installed in a system folder (as is the default behavior),
    it will be necessary to run the install command with superuser privilege.
    Alternatively, one can run setup.py with the "--user" flag: ::
 
@@ -73,16 +77,16 @@ Installation Methods
    manually and then rerun setup.py.
    For Ubuntu, SL6 machines and other platforms, a recipe is given below.
 
-
-   Note that this installation method will install smodels into the default system or user directory (e.g. ~/.local/lib/python3/site-packages/).
+   Note that this installation method will install SModelS into the default system or user directory (e.g. ~/.local/lib/python3.10/site-packages/).
    Depending on your platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
    (or $DYLD_LIBRARY_PATH) might have to be set appropriately.
 
+   Note also, that setup.py will *not* attempt at downloading and compiling the external tools (Pythia6|8, NLL-fast, Resummino) at install time. 
+   Instead, this will be done on the fly, at runtime, upon call of the :ref:`cross section computer(s) <xsecCalc>`. 
+   The external tools will also be located in the above smodels installation directory (<installdir>/lib/...).  
 
 
-
- * Finally, SModelS is `indexed on pypi <https://pypi.org/project/smodels/>`_. Thus, if *pip3* (or *pip*) is installed in your machine, it is also possible to install SModelS directly without the need for
-   downloading the source code: ::
+ * Finally, SModelS is `indexed on pypi <https://pypi.org/project/smodels/>`_. Thus, if *pip3* (or *pip*) is installed in your machine, it is possible to install SModelS  without downloading the source code: ::
 
      pip3 install smodels
 
@@ -92,14 +96,17 @@ Installation Methods
    
    for user-specific installations.
 
-
-   Note that this installation method will install smodels into the default system or user directory (e.g. ~/.local/lib/python3/site-packages/).
+   This installation method will install SModelS into the default system or user directory (e.g. ~/.local/lib/python3.10/site-packages/).
    Depending on your platform, the environment variables $PATH, $PYTHONPATH, $LD_LIBRARY_PATH
    (or $DYLD_LIBRARY_PATH) might have to be set appropriately.
    Be aware that the example files and the |parameters| discussed in the manual 
    will also be located in your default system or user directory. Furthermore the database
-   folder is not included (see :ref:`database installation <installingDB>` below).
-   This installation method is best suited for experienced python users.   
+   folder is not included (see :ref:`database installation <installingDB>` below). 
+
+   Moreover, pip will *not* attempt at downloading and compiling the external tools (Pythia6|8, NLL-fast, Resummino) at install time. Instead, this will be done on the fly, at runtime, upon call of the :ref:`cross section computer(s) <xsecCalc>`. 
+   The external tools will also be located in the above smodels installation directory (<installdir>/lib/...).  
+
+   Generally, this installation method is best suited for experienced python users.   
 
 
 There is also a diagnostic tool available: ::

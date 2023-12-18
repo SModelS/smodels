@@ -1,3 +1,12 @@
+Release v2.3.3, Tue 19 Dec 2023
+=======================================================
+
+  * added resummino cross section computer
+  * fixed bug in computation of error on muhat, for pyhf likelihoods
+    (affects mostly only numpy backend)
+  * small change in initialisation of gradient descent method for computation of
+    combined mu_hat, to increate robustness of method
+
 Release v2.3.2, Wed 30 Aug 2023
 =======================================================
 

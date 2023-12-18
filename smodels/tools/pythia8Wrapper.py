@@ -121,7 +121,7 @@ class Pythia8Wrapper(WrapperBase):
                 self.tempdir = None
 
     def checkInstallation ( self, compile : bool = True ):
-        # super().checkInstallation(compile)
+        super().checkInstallation(compile)
         exists = os.path.exists ( self.includeFile )
         xmldoc = self.getXmldoc()
         sleep = 0.
@@ -176,6 +176,10 @@ class Pythia8Wrapper(WrapperBase):
         :returns: List of cross sections
 
         """
+        r = self.checkInstallation()
+        if r == False:
+            logger.info ( "Installation check failed." )
+            sys.exit()
         # Change pythia configuration file, if defined:
         if self.pythiacard:
             pythiacard_default = self.cfgfile

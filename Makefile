@@ -3,7 +3,7 @@ VER=$(shell cat smodels/version)
 HAS_FC := $(shell smodels/lib/check_fortran_compiler.sh 2> /dev/null)
 HAS_CXX := $(shell command -v $(CXX) 2> /dev/null)
 
-all: resolve_deps externaltools
+all: resolve_deps # make all just resolves dependencies
 
 check_compilers: .PHONY
 ifndef HAS_FC
@@ -17,14 +17,16 @@ resolve_deps: ## resolve the deps via pip
 	@echo "try to resolve the python dependencies via pip"
 	smodels/installation.py -R
 
-smodels: all tidy
+smodels_externaltools: resolve_deps externaltools
 	@echo
 	@echo "done. you can now run the software directly from this source directory.\n"
 	@echo "Try e.g. \n\n ./runSModelS.py --help\n"
 	@echo "The latest SModelS documentation can be found at: http://smodels.readthedocs.io/en/latest/"
 	@echo "For this version documentation go to: https://smodels.readthedocs.io/en/v$(VER)"
 
-smodels_noexternaltools: resolve_deps tidy
+smodels: resolve_deps
+
+smodels_noexternaltools: resolve_deps
 	@echo
 	@echo "done. you can now run the software directly from this source directory.\n"
 	@echo "Try e.g. \n\n ./runSModelS.py --help\n"
@@ -47,6 +49,12 @@ pythia6:
 pythia8:
 	cd smodels/lib && make pythia8
 
+resummino:
+	cd smodels/lib && make resummino
+
+nllfast:
+	cd smodels/lib && make nllfast
+
 cpp: .PHONY
 	cd cpp && make
 
@@ -60,13 +68,13 @@ buildrpm:
 builddeb: buildrpm
 	cd dist && fakeroot alien smodels-$(VER)-1.x86_64.rpm
 
-pypi:
+pypi: clean
 	## pypi user is walten, repository is https://upload.pypi.org/legacy/
 	rm -rf dist
 	python3 setup.py sdist bdist_wheel
 	twine upload dist/smodels-*.tar.gz
 
-testpypi: 
+testpypi: clean
 	## testpypi user is smodels, repository is https://test.pypi.org/legacy/
 	# to install from testpypi: 
 	# pip3 install --user --upgrade --index-url https://test.pypi.org/simple/ smodels

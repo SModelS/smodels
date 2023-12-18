@@ -16,7 +16,7 @@ def main():
     parser = argparse.ArgumentParser(description="SModelS-tools command line tool.")
 
     parser.add_argument('-v','--verbose', help='verbosity level. '
-                        'accepted values are: debug, info, warning, error.',
+                        'accepted values are: debug, info, warning, error. [info]',
                                     default = "info", type = str )
 
     subparsers = parser.add_subparsers(dest='subparser_name')
@@ -24,43 +24,84 @@ def main():
     subparsers.add_parser('installation', description="Print installation setup and exit.")
     subparsers.add_parser('fixpermissions', description="Fix file permissions for xseccomputer.")
     xseccomputer = subparsers.add_parser('xseccomputer', description="Compute MSSM cross sections for a SLHA file.")
+    xseccomputer.add_argument('-f', '--filename', required=True,
+            help="SLHA file to compute cross sections for. "
+            "If a directory is given, cross sections for all files in the directory are computed." )
     xseccomputer.add_argument('-s', '--sqrts', nargs='+', action='append',
-        help="sqrt(s) TeV. Can supply more than one value (as a space separated list). Default is both 8 and 13.",
+        help="LHC center-of-mass energy in TeV for computing the "
+        "cross sections. Can be more than one value, e.g., -s 8 13 for both "
+        "8 TeV and 13 TeV cross sections. [13]",
         type=float, default=[])
-    xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
-        help="number of events to be simulated [10000].")
-    xseccomputer.add_argument('-v', '--verbosity', type=str, default="info",
-        help="Verbosity (debug, info, warning, error)")
-    xseccomputer.add_argument('-c', '--ncpus', type=int, default=-1,
-        help="number of cores to be used simultaneously. -1 means 'all'. ")
-    xseccomputer.add_argument('-p', '--tofile', action='store_true',
-        help="write cross sections to file (only highest order)")
-    xseccomputer.add_argument('-P', '--alltofile', action='store_true',
-        help="write all cross sections to file, including lower orders")
-    xseccomputer.add_argument('-q', '--query', action='store_true',
-        help="only query if there are cross sections in the file")
-    xseccomputer.add_argument('-C', '--colors', action='store_true',
-        help="colored terminal output" )
-    xseccomputer.add_argument('--tempdir', type=str, default="/tmp/",
-        help="specify a temporary directory (default is /tmp/)" )
-    xseccomputer.add_argument( '--noautocompile', action='store_true',
-        help="turn off automatic compilation" )
-    xseccomputer.add_argument('-k', '--keep', action='store_true',
-        help="do not unlink temporary directory")
     xseccomputer.add_argument('-6', '--pythia6', action='store_true',
         help="use pythia6 for LO cross sections")
     xseccomputer.add_argument('-8', '--pythia8', action='store_true',
         help="use pythia8 for LO cross sections (default)")
+    xseccomputer.add_argument('-e', '--nevents', type=int, default=10000,
+        help="number of events to be simulated [10000].")
+    xseccomputer.add_argument('-v', '--verbosity', type=str, default="info",
+        help="Verbosity (debug, info, warning, error) [info]")
+    xseccomputer.add_argument('-c', '--ncpus', type=int, default=1,
+        help="number of CPU cores to be used simultaneously. −1 "
+        "means ‘all’. Used only when cross sections are computed for multiple "
+        "SLHA files. [1]")
+    xseccomputer.add_argument('-p', '--tofile', action='store_true',
+        help="write cross sections to file (only highest order)")
+    xseccomputer.add_argument('-P', '--alltofile', action='store_true',
+        help="write all cross sections to file, including lower orders")
     xseccomputer.add_argument('-n', '--NLO', action='store_true',
         help="compute at the NLO level (default is LO)")
     xseccomputer.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
     xseccomputer.add_argument('-O', '--LOfromSLHA', help="use LO cross sections from file to compute the NLO or NLL cross sections", action='store_true')
     xseccomputer.add_argument('-S', '--ssmultipliers', type=str, default=None,
         help="Signal strength multipliers, provided as dictionary of pids")
-    xseccomputer.add_argument('-f', '--filename', required=True,
-            help="SLHA file to compute cross sections for. "
-            "If a directory is given, compute cross sections for all files in directory." )
+    xseccomputer.add_argument('-q', '--query', action='store_true',
+        help="only query if there are cross sections in the file")
+    xseccomputer.add_argument('-C', '--colors', action='store_true',
+        help="colored terminal output" )
+    xseccomputer.add_argument('-k', '--keep', action='store_true',
+        help="do not unlink temporary directory")
+    xseccomputer.add_argument( '--noautocompile', action='store_true',
+        help="turn off automatic compilation" )
 
+    xsecresummino = subparsers.add_parser('xsecresummino', description="Compute gaugino and slepton cross sections via resummino for a given SLHA file.")
+    xsecresummino.add_argument('-f', '--filename', required=True,
+            help="SLHA file to compute cross sections for. "
+            "If a directory is given, cross sections for all files in the directory are computed." )
+    xsecresummino.add_argument('-s', '--sqrts', nargs='+', action='append',
+        help="LHC center-of-mass energy in TeV for computing the "
+        "cross sections. Can be more than one value, e.g., -s 8 13 for both "
+        "8 TeV and 13 TeV cross sections. [13]",
+        type=float, default=[])
+    xsecresummino.add_argument('-part', '--particles', nargs='+', action='append',
+        help="list of daughter particles (given as PDG "
+        "codes) to compute cross sections for. All valid combinations from "
+        "the list will be considered. If no list of particles is given, the channels "
+        "info from the resummino.py configuration file is used instead.",
+        type=int, default=[])
+    xsecresummino.add_argument('-v', '--verbosity', type=str, default="info",
+        help="verbosity (debug, info, warning, error). [info]")
+    xsecresummino.add_argument('-c', '--ncpus', type=int, default=1,
+        help="number of CPU cores to be used simultaneously. -1 means 'all'. Used only when cross sections are computed for multiple SLHA files. [1]")
+    xsecresummino.add_argument('-C', '--conf', type=str, default='default',
+        help="path to resummino.py configuration file. [smodels/etc/resummino.py]")
+    xsecresummino.add_argument('-x', '--xseclimit', type=float, default=None,
+        help="cross section limit in pb. If the LO cross section is "
+        "below this value, no higher orders will be calculated. The default "
+        "is 0.00001, set in the smodels/etc/resummino.py file." )
+    xsecresummino.add_argument('-p', '--tofile', action='store_true',
+        help="write cross sections to file (only highest order)")
+    xsecresummino.add_argument('-P', '--alltofile', action='store_true',
+        help="write all cross sections to file, including lower orders")
+    xsecresummino.add_argument('-n', '--NLO', action='store_true',
+        help="compute at the NLO level (default is LO)")
+    xsecresummino.add_argument('-N', '--NLL', help="compute at the NLO+NLL level (takes precedence over NLO, default is LO)", action='store_true')
+    # xsecresummino.add_argument('-S', '--ssmultipliers', type=str, default=None,
+    #     help="signal strength multipliers, provided as dictionary of pids")
+    xsecresummino.add_argument('-k', '--keep', action='store_true',
+        help="do not unlink temporary directory")
+    xsecresummino.add_argument( '--noautocompile', action='store_true',
+        help="turn off automatic compilation" )
+    
     slhachecker = subparsers.add_parser('slhachecker', description="Perform several checks on a SLHA file.")
     slhachecker.add_argument('-xS', '--xsec', help='turn off the check for xsection blocks', action='store_false')
     slhachecker.add_argument('-illegal', '--illegal', help='turn on check for kinematically forbidden decays', action='store_true')
@@ -91,7 +132,7 @@ def main():
         help="How many (randomly selected) points will be included in the plot. If -1 all points will be read and included (default = -1).")
 
     iPlots.add_argument('-v', '--verbosity', type=str, default="info",
-        help="Verbosity (debug, info, warning, error)")
+        help="Verbosity (debug, info, warning, error) [info]")
 
     proxydb = subparsers.add_parser( 'proxydb', description=
 								                     "create proxy databases for network use")
@@ -153,6 +194,9 @@ def main():
     if args.subparser_name == 'xseccomputer':
         from smodels.tools import xsecComputer
         xsecComputer.main(args)
+    if args.subparser_name == 'xsecresummino':
+        from smodels.tools import xsecResummino
+        xsecResummino.main(args)
     if args.subparser_name == 'slhachecker':
         from smodels.tools import slhaChecks
         slhaChecks.main(args)
@@ -168,4 +212,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 

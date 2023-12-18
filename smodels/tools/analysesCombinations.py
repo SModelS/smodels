@@ -47,6 +47,7 @@ class AnaCombLikelihoodComputer(object):
     ) -> float:
         """
         Compute the likelihood at a given mu
+
         :param mu: signal strength
         :param expected: if True, compute expected likelihood, else observed
         :param return_nll: if True, return negative log likelihood, else likelihood
@@ -81,6 +82,7 @@ class AnaCombLikelihoodComputer(object):
         return_nll: bool = False,
     ) -> Union[Dict, None]:
         """find muhat and lmax.
+
         :param allowNegativeSignals: if true, then also allow for negative values
         :param expected: if true, compute expected prior (=lsm), if "posteriori" \
                          compute posteriori expected
@@ -119,6 +121,10 @@ class AnaCombLikelihoodComputer(object):
 
 
         toTry = [sum(weighted) / totweight]
+
+        #Add additional initialization points near the first one to make sure that minima is not lost due to small differences in the initialization values
+        fluc = max(1e-6, 1e-5*toTry[0])  #incase toTry[0] = 0.0, take 1e-06
+        toTry += [toTry[0] - fluc, toTry[0] + fluc]
 
         def fun(mu):
             # Make sure to always compute the correct llhd value (from theoryPrediction)

@@ -90,7 +90,7 @@ def dataFiles ():
     for directory in [ "smodels/share/", "smodels/share/models/",
           "smodels/etc/", "smodels/lib/nllfast/nllfast-1.2/", 
           "smodels/lib/nllfast/nllfast-2.1/", "smodels/lib/nllfast/nllfast-3.1/", 
-          "smodels/lib/pythia6/", "smodels/lib/pythia8/" ]:
+          "smodels/lib/pythia6/", "smodels/lib/pythia8/", "smodels/lib/resummino/" ]:
         ret.append ((directory, listDirectory (directory)))
     for directory in ["inputFiles/slha/", "inputFiles/lhe/" ]:
         ret.append (( "smodels/"+directory, listDirectory (directory)))
