@@ -5,10 +5,14 @@ Release v3.0.0, xxx
     So the FinalStateSMS objects do not exactly match the GeneralElements from v2 (several GeneralElements can be mapped to a single FinalStateSMS)
   * Added option for setting the erased quantum numbers for prompt particles in the parameters file. If not defined, it will not erase the attributes
 
-Release v2.3.3, xxx
+Release v2.3.3, Tue 19 Dec 2023
 =======================================================
 
   * added resummino cross section computer
+  * fixed bug in computation of error on muhat, for pyhf likelihoods
+    (affects mostly only numpy backend)
+  * small change in initialisation of gradient descent method for computation of
+    combined mu_hat, to increate robustness of method
 
 Release v2.3.2, Wed 30 Aug 2023
 =======================================================
