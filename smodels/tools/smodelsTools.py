@@ -157,7 +157,7 @@ def main():
         print("SModelS version:", installation.version())
         print("Installation directory:",installation.installDirectory())
         path = os.path.abspath(os.path.realpath(__file__))
-        print("This binary:",path )
+        print("This executable:",path )
         sys.exit()
     if args.subparser_name == 'toolbox':
         from smodels.tools import toolBox
