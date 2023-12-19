@@ -47,7 +47,7 @@ New in Version 2.3.3:
 
   * added :ref:`resummino cross section <xsecResummino>` computer
   * fixed bug in computation of error on muhat, for `pyhf likelihoods <tools.html#tools.pyhfInterface.PyhfUpperLimitComputer.lmax>`_
-    (affects mostly only numpy backend)
+    (affects mostly the numpy backend)
   * small change in initialisation of gradient descent method for computation of
     `combined mu_hat <tools.html#tools.analysesCombinations.AnaCombLikelihoodComputer.lmax>`_, to increate robustness of method
 
