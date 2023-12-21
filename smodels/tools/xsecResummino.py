@@ -34,22 +34,19 @@ from itertools import combinations
 
 class XSecResummino(XSecBase):
     """ cross section computer class (for resummino), what else? """
-    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type_writting = None, verbosity = '', json = None, particles = None, xsec_limit = None):
+    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type_writing = None, verbosity = '', json = None, particles = None, xsec_limit = None):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
                     if maxOrder == LO, compute only LO resummino xsecs
                     if maxOrder == NLO, compute NLO resummino xsecs
                     if maxOrder == NLL, compute NLO+NLL resummino xsecs
-        :param nevents: number of events for pythia run
-        :param pythiaVersion: pythia6 or pythia8 (integer)
+        :param slha_folder_name: name of slha file or folder containing slha files to compute cross sections for
         :param sqrt: Center of mass energy to consider for the cross section calculation
-        :param xsec_limit: Value below which if mode == "check", cross section at NLO order are not calculated
-        :param type: If all, put all the order in the slha file, if highest, only the hightest order.
-        :param json: Path to the json file with all the relevant informations concerning the resummino calculation
-        :param resummino_bin: Path to resummino executable
-        :param input_file_original: Path to the template input file of resummino
         :param ncpu: Number of cpu used in parallel for the calculation
-        :param verbosity: Type of informations given in the logger file
+        :param maycompile: if True, then tools can get compiled on-the-fly
+        :param type_writing: If 'all', write all the perturbation orders into the slha file, if 'highest', only the highest order.
+        :param json: Path to the json file with all the relevant informations concerning the resummino calculation
+        :param xsec_limit: Value below which cross sections at NLO order are not calculated
         """
         self.pwd = installation.installDirectory()
         self.tooldir = os.path.join(self.pwd,"smodels","lib","resummino")
@@ -74,7 +71,7 @@ class XSecResummino(XSecBase):
         self.maycompile = maycompile
         self.ncpu = ncpu
         self.sqrts = sqrt
-        self.type_writting = type_writting
+        self.type_writing = type_writing
         self.verbosity = verbosity
         self.sqrt = sqrt
         
@@ -203,15 +200,15 @@ class XSecResummino(XSecBase):
                 logger.debug('num try is '+ str(num_try)+ ' for the moment')
                 self.launch_command(self.resummino_bin, input_file, output_file, order)
                 if num_try == 0:
-                    hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type_writting, Xsections, log)
+                    hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type_writing, Xsections, log)
             else:
-                hist = self.write_in_slha(output_file, slha_file, 0, particle_1, particle_2, self.type_writting, Xsections, log)
+                hist = self.write_in_slha(output_file, slha_file, 0, particle_1, particle_2, self.type_writing, Xsections, log)
             return
         
         if self.mode == "all":
             self.launch_command(self.resummino_bin, input_file, output_file, order)
             if num_try == 0:
-                hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type_writting, Xsections, log)
+                hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type_writing, Xsections, log)
             return
         
         #:hist: variable to check if there is a problem in the cross section (strange value or no value)
@@ -221,7 +218,7 @@ class XSecResummino(XSecBase):
             self.launch_command(self.resummino_bin, input_file, output_file, order)
 
         #here we write in the slha file.
-            hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type_writting, Xsections, log)
+            hist = self.write_in_slha(output_file, slha_file, order, particle_1, particle_2, self.type_writing, Xsections, log)
 
         #we check if we have written too much cross section
         self.are_crosssection(slha_file, order)
@@ -754,13 +751,13 @@ def main ( args : argparse.Namespace ):
     canonizer.checkAllowedSqrtses ( order, sqrtses )
     inputFiles = args.filename.strip()
     ncpus = canonizer.checkNCPUs ( args.ncpus, inputFiles )
-    type_writting = canonizer.writeToFile(args)
+    type_writing = canonizer.writeToFile(args)
     json = canonizer.getjson(args)
     particles = canonizer.getParticles( args )
     xsec_limit = canonizer.checkXsec_limit(args)
     #If we get no type_writing then we only print the result 
-    if type_writting == None :
-        type_writting = None
+    if type_writing == None :
+        type_writing = None
         
     verbosity = args.verbosity
 
@@ -788,17 +785,17 @@ def main ( args : argparse.Namespace ):
     if ncpus == 1:
         scpu = "cpu"
     logger.info(f"we are currently running on {ncpus} {scpu}" )
-    logger.debug(f"In this calculation, we'll write out the cross section at "+ str(type_writting) +" order of perturbation theory below "+ orders_dic[order])
+    logger.debug(f"In this calculation, we'll write out the cross section at "+ str(type_writing) +" order of perturbation theory below "+ orders_dic[order])
     
     for sqrt in sqrtses:
         logger.debug('Current energy considered is '+ str(sqrt)+ ' TeV')
-        test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type_writting = type_writting, verbosity = verbosity, json = json, particles=particles, xsec_limit = xsec_limit)
+        test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrt, ncpu=ncpus, type_writing = type_writing, verbosity = verbosity, json = json, particles=particles, xsec_limit = xsec_limit)
         test.checkInstallation ( compile = not args.noautocompile )
         test.launch_all()
     return
     
-    # test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus, type = type_writting)
+    # test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus, type = type_writing)
     # test.routine_resummino()
  
-    # test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus, type = type_writting)
+    # test = XSecResummino(maxOrder=order, slha_folder_name=inputFiles, sqrt = sqrtses, ncpu=ncpus, type = type_writing)
     # test.routine_resummino()
