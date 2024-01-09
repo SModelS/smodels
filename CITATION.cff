@@ -1,0 +1,95 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  SModelS -- A tool for interpreting simplified-model
+  results from the LHC
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Mohammad Mahdi
+    family-names: Altakach
+    orcid: 'https://orcid.org/0000-0003-0193-0368'
+    email: altakach@lpsc.in2p3.fr
+    affiliation: >-
+      Laboratoire de Physique Subatomique et de Cosmologie
+      (LPSC), Université Grenoble-Alpes, CNRS/IN2P3, 53
+      Avenue des Martyrs, F-38026 Grenoble, France
+  - given-names: Sabine
+    family-names: Kraml
+    email: sabine.kraml@gmail.com
+    orcid: 'https://orcid.org/0000-0002-2613-7000'
+    affiliation: >-
+      Laboratoire de Physique Subatomique et de Cosmologie
+      (LPSC), Université Grenoble-Alpes, CNRS/IN2P3, 53
+      Avenue des Martyrs, F-38026 Grenoble, France
+  - given-names: Andre
+    family-names: Lessa
+    email: andre.lessa@gmail.com
+    affiliation: >-
+      Centro de Ciências Naturais e Humanas, Universidade
+      Federal do ABC, Santo André, 09210-580 SP, Brazil
+    orcid: 'https://orcid.org/0000-0002-5251-7891'
+  - given-names: Sahana
+    family-names: Narasimha
+    email: sahana.narasimha@oeaw.ac.at
+    affiliation: >-
+      Institut für Hochenergiephysik, Österreichische
+      Akademie der Wissenschaften, Nikolsdorfer Gasse 18,
+      A-1050 Wien, Austria
+    orcid: 'https://orcid.org/0009-0003-0179-2548'
+  - given-names: Timothée
+    family-names: Pascal
+    orcid: 'https://orcid.org/0009-0009-7637-2197'
+    affiliation: >-
+      Laboratoire de Physique Subatomique et de Cosmologie
+      (LPSC), Université Grenoble-Alpes, CNRS/IN2P3, 53
+      Avenue des Martyrs, F-38026 Grenoble, France
+    email: pascal@lpsc.in2p3.fr
+  - given-names: Théo
+    family-names: Reymermier
+    affiliation: >-
+      Université de Lyon, Université Claude Bernard Lyon 1,
+      CNRS/IN2P3, Institut de Physique des 2 Infinis de
+      Lyon, UMR 5822, F-69622, Villeurbanne, France
+    orcid: 'https://orcid.org/0009-0007-5699-180X'
+    email: theo.reymermier@ens-lyon.fr
+  - affiliation: >-
+      Institut für Hochenergiephysik, Österreichische
+      Akademie der Wissenschaften, Nikolsdorfer Gasse 18,
+      A-1050 Wien, Austria
+    given-names: Wolfgang
+    family-names: Waltenberger
+    email: wolfgang.waltenberger@gmail.com
+    orcid: 'https://orcid.org/0000-0002-6215-7228'
+  - family-names: Reyes-González
+    given-names: Humberto
+    email: humberto.reyes@rwth-aachen.de
+    orcid: 'https://orcid.org/0000-0003-3283-5208'
+    affiliation: ' Institut für Theoretische Teilchenphysik und Kosmologie, RWTH Aachen, 52074 Aachen, Germany'
+identifiers:
+  - type: url
+    value: 'https://arxiv.org/abs/arXiv:1312.4175'
+    description: Initial publication
+repository-code: 'https://github.com/SModelS'
+url: 'https://smodels.github.io'
+abstract: >-
+  SModelS is an automatic, public tool for interpreting
+  simplified-model results from the LHC. It is based on a
+  general procedure to decompose Beyond the Standard Model
+  (BSM) collider signatures presenting a Z2 symmetry into
+  Simplified Model Spectrum (SMS) topologies. Our method
+  provides a way to cast BSM predictions for the LHC in a
+  model independent framework, which can be directly
+  confronted with the relevant experimental constraints.
+keywords:
+  - simplified models
+  - ' LHC'
+  - ' BSM theories'
+  - particle phenomenology
+  - supersymmetry
+  - UEDs
+license: GPL-3.0
