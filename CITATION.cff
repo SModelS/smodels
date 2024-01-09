@@ -76,6 +76,7 @@ identifiers:
     description: Initial publication
 repository-code: 'https://github.com/SModelS'
 url: 'https://smodels.github.io'
+repository-artifact: 'https://zenodo.org/communities/smodels'
 abstract: >-
   SModelS is an automatic, public tool for interpreting
   simplified-model results from the LHC. It is based on a
