@@ -17,6 +17,7 @@ import pathlib
 import sys
 import time
 import copy
+import io
 from smodels.experiment import datasetObj
 from smodels.installation import cacheDirectory
 from smodels.experiment.metaObj import Meta
@@ -55,6 +56,21 @@ except ImportError as e:
 def _getSHA1(filename):
     return hashlib.sha1(pathlib.Path(filename).read_bytes()).hexdigest()
 
+# some mechanism to remove lock files if the download got interrupted
+import atexit
+lockfiles = set() 
+
+def removeLockFiles( lockfiles ):
+    """ remove cruft lockfiles """
+    for l in lockfiles:
+        if os.path.exists ( l ):
+            try:
+                os.unlink ( l )
+            except FileNotFoundError as e:
+                pass
+    lockfiles = set()
+
+atexit.register ( removeLockFiles, lockfiles )
 
 class Database(object):
     """ 
@@ -641,6 +657,52 @@ class SubDatabase(object):
         """
         return self.txt_meta.pathname
 
+    def lockFile ( self, filename : os.PathLike ):
+        """ lock the file <filename>
+        """
+        lockfile = os.path.join ( os.path.dirname ( filename ), 
+                                  ".lock_"+ os.path.basename ( filename ) )
+        ctr = 0
+        while ( ctr < 5 ):
+            ctr+=1
+            if not os.path.exists ( lockfile ):
+                f=open ( lockfile, "wt" )
+                f.write ( f"# this is a temporary lockfile created {time.asctime()}\n" )
+                f.write ( f"# meant to prevent multiple, parallel downloads of\n" )
+                f.write ( f"# {filename}\n" )
+                f.close()
+                lockfiles.add ( lockfile )
+                return True
+            # we have a lockfile. lets see how old
+            s = os.stat ( lockfile )
+            t = ( time.time() - s.st_mtime ) / 60. # time in minutes
+            # if older than 3 hours, then disregard lockfile
+            if t > 180:
+                lockfiles.add ( lockfile )
+                return True
+            time.sleep ( ctr )
+        logger.error ( f"File {filename} is locked, probably because another process is already downloading. Remove {lockfile} if you feel it is safe to retry." )
+        sys.exit()
+        """
+        import fcntl # does not work on all file systems
+        fcntl.lockf( handle, fcntl.LOCK_EX)
+        """
+
+    def unlockFile ( self, filename : os.PathLike ):
+        """ unlock the file <filename>
+        """
+        lockfile = os.path.join ( os.path.dirname ( filename ), 
+                                  ".lock_"+ os.path.basename ( filename ) )
+        if lockfile in lockfiles:
+            lockfiles.remove( lockfile )
+        if os.path.exists ( lockfile ):
+            try:
+                os.unlink ( lockfile )
+            except FileNotFoundError as e:
+                pass
+        #import fcntl # does not work on all filesystems
+        #fcntl.lockf(handle, fcntl.LOCK_UN)
+
     def fetchFromScratch(self, path, store):
         """ fetch database from scratch, together with
             description.
@@ -691,9 +753,8 @@ class SubDatabase(object):
         logger.warning(msg)
         logger.info("need to fetch %s and store in %s. size is %s." %
                     (r.json()["url"], filename, sizeof_fmt(size)))
+        self.lockFile ( filename )
         with open(filename, "wb") as dump:
-            import fcntl
-            fcntl.lockf(dump, fcntl.LOCK_EX)
             if not self.inNotebook():  # \r doesnt work in notebook
                 print("         " + " "*51 + "<", end="\r")
             print("loading >", end="")
@@ -706,8 +767,8 @@ class SubDatabase(object):
                 print("done.")
             else:
                 print("")
-            fcntl.lockf(dump, fcntl.LOCK_UN)
             dump.close()
+            self.unlockFile ( filename )
             sha = _getSHA1(filename)
             testsha = r.json()["sha1"]
             if sha != testsha:
