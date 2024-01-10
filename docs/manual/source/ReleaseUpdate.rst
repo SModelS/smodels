@@ -40,8 +40,7 @@ New in Version 3.0.0:
   * **Extension to general SMS topologies** (no longer restricted to Z\ :sub:`2` symmetric topologies)
   * Added option for selecting which quantum numbers to be erased
   * Inclusion of analyses with searches for resonant production
-  * Changed the lock file mechanism for downloading the database to work with all file
-   systems, fixes `#37 <https://github.com/SModelS/smodels/issues/37>`_
+  * Changed the lock file mechanism for downloading the database to work with all file systems, fixes `#37 <https://github.com/SModelS/smodels/issues/37>`_
   * Added CITATION.cff file, closes `#38 <https://github.com/SModelS/smodels/issues/38>`_
 
 New in Version 2.3.3:
