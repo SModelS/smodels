@@ -91,6 +91,7 @@ class XSecResummino(XSecBase):
             
     def checkInstallation(self, compile : bool = True ) -> bool:
         """ check if resummino is already compiled.
+
         :param compile: if true, then attempt a compilation if not installed
         :returns: true if we have a compiled executable
         """
@@ -107,9 +108,8 @@ class XSecResummino(XSecBase):
         return ret
 
     def getVersion( self ):
-        """ retrieve the version from version_path,
-            set self.version
-            if it doesnt exist, set to default of 3.1.2 """
+        """ retrieve the version from version_path, set self.version
+        if it doesnt exist, set to default of 3.1.2 """
         version_path = os.path.join(self.tooldir, 'versions.txt')
         self.version = "?.?.?"
         if os.path.exists(version_path):
@@ -233,9 +233,10 @@ class XSecResummino(XSecBase):
 
     def search_in_output(self, output_file):
         """
-        Search in the .out files of resummino (in tempfiles) to get the cross section asked by the users, 
-        then extract the LO,NLO and NLL+NLO.
-        If you want to get the incertainties given by resummino, you have everything here in LO, NLO and NLL.
+        Search in the .out files of resummino (in tempfiles) to get the cross section
+        asked by the users, then extract the LO,NLO and NLL+NLO.
+        If you want to get the incertainties given by resummino, 
+        you have everything here in LO, NLO and NLL.
         """
         Infos = []
         with open(output_file, 'r') as f:
@@ -252,7 +253,8 @@ class XSecResummino(XSecBase):
 
     def create_xsection(self, result, particle_1, particle_2, order, Xsections):
         """
-        Create cross section list filled with cross section objects, corresponding to all the channels calculated.
+        Create cross section list filled with cross section objects, 
+        corresponding to all the channels calculated.
         """
         if type(result) == list:
             for i in range(order+1):
@@ -326,17 +328,16 @@ class XSecResummino(XSecBase):
         return 0
 
     def extract_m1_m2_mu(self, file_path : os.PathLike ) -> dict:
-        """_summary_
-        
+        """
         function to extract the breaking term of the electrowikino part (SUSY) in
         an slha file.
-        Args:
-            file_path (_string_): _path of the slha file_
 
-        Returns: dictionary of:
-            _int_: _M1 breaking term in SUSY models_
-            _int_: _M2 braking term in SUSY models_
-            _int_: _mu breaking term in SUSY models_
+        :param file_path (string): path of the slha file
+
+        :returns: dictionary of:
+            int: M1 breaking term in SUSY models
+            int: M2 braking term in SUSY models
+            int: mu breaking term in SUSY models
         """
         data = pyslha.read(file_path)
 
@@ -353,18 +354,17 @@ class XSecResummino(XSecBase):
         return m1,m2,mu
 
     def extract_N1_N2_C1(self, file_path):
-        """_summary_
-        
+        """
         function to extract the breaking term of the electrowikino part (SUSY) in
         an slha file.
-        Args:
-            file_path (_string_): _path of the slha file_
 
-        Returns:
-            _float_: _N1 Mass of the neutralino 1
-            _float_: _N2 Mass of the neutralino 2
-            _float_: _C1 Mass of the chargino 1
-            _float_: _C2 Mass of the chargnino 2
+        :param file_path (string): path of the slha file
+
+        :returns:
+            float: N1 Mass of the neutralino 1
+            float: N2 Mass of the neutralino 2
+            float: C1 Mass of the chargino 1
+            float: C2 Mass of the chargnino 2
         """
         data = pyslha.read(file_path)
 
@@ -543,12 +543,11 @@ class XSecResummino(XSecBase):
 
 
     def modify_slha_file(self, file_before, file_after, slha_file):
-        """ _summary_
-
+        """
         Change all the informations in the .in files before launching calculations
-        Args:
-            file_before (input file for resummino): template
-            file_after (input file for resummino): input file ready for resummino 
+
+        :param file_before: (input file for resummino): template
+        :param file_after: (input file for resummino): input file ready for resummino 
         """
         with open(file_before, 'r') as f:
             lines = f.readlines()
@@ -636,12 +635,11 @@ class XSecResummino(XSecBase):
 
 
     def extract_json(self):
-        """_summary_
-        
+        """
         function to extract all the informations in the resummino.py
         file
 
-        Returns: tuple of:
+        :returns: tuple of:
             string: Mode of writting for the slha cross section
             list: list of the daugther particle to consider in the calculation
             of the cross section
@@ -663,11 +661,10 @@ class XSecResummino(XSecBase):
         return mode, particles
     
     def determine_channels(self):
-        """_summary_
-        
+        """
         function to find channels using a set of particles
 
-        Returns: tuple of:
+        :returns: tuple of:
             string: Mode of writting for the slha cross section
             list: list of the daugther particle to consider in the calculation
             of the cross section
