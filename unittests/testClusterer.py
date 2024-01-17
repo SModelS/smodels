@@ -18,7 +18,6 @@ from smodels.experiment.txnameObj import TxName
 from smodels.experiment.txnameDataObj import TxNameData
 from smodels.experiment.datasetObj import DataSet
 from smodels.experiment.infoObj import Info
-from smodels.share.models import SMparticles, mssm
 from smodels.base.crossSection import XSection,XSectionInfo,XSectionList
 from smodels.base.physicsUnits import GeV, TeV, fb
 from smodels.share.models.mssm import BSMList
@@ -233,15 +232,28 @@ class ClustererTest(unittest.TestCase):
         avgMass2 = [node.mass for node in sms3.nodes if not node.isSM]
         avgMass2 = [roundValue(m.asNumber(GeV),5) for m in avgMass2]
         averageMasses = [avgMass1, avgMass2]
+
+        totalwidth1 = (n2.totalwidth*weights[0]+n3.totalwidth*weights[1])/(weights[0]+weights[1])
+        totalwidth1 = [totalwidth1,totalwidth1,0*GeV,0*GeV]
+        totalwidth1 = [roundValue(m.asNumber(GeV),5)for m in totalwidth1]
+        totalwidth2 = [node.totalwidth for node in sms3.nodes if not node.isSM]
+        totalwidth2 = [roundValue(m.asNumber(GeV),5) for m in totalwidth2]
+        averageWidths = [totalwidth1, totalwidth2]
+
+
         smsClusters = [smsList[:2], [smsList[2]]]
         for ic,cluster in enumerate(clusters):
             avgSMS = cluster.averageSMS
             self.assertEqual(sorted(cluster.smsList),sorted(smsClusters[ic]))
             avgMass = [node.mass for node in avgSMS.nodes if not node.isSM]
+            avgWidth = [node.totalwidth for node in avgSMS.nodes if not node.isSM]
             for im,m in enumerate(avgMass):
                 m = roundValue(m.asNumber(GeV),5)
                 self.assertAlmostEqual(m,averageMasses[ic][im],2)
-            self.assertEqual(avgSMS.totalwidth,smsClusters[ic][0].totalwidth)
+            for iw,w in enumerate(avgWidth):
+                    w = roundValue(w.asNumber(GeV),5)
+                    self.assertAlmostEqual(w,averageWidths[ic][iw],2)
+            
 
         #Check clustering with distinct elements but no maxDist limit
         clusters = clusterTools.clusterSMS(smsList,maxDist=10.,dataset=dataset)
@@ -250,14 +262,21 @@ class ClustererTest(unittest.TestCase):
         self.assertEqual(sorted(cluster.smsList),sorted(smsList))
         avgSMS = cluster.averageSMS
         avgMass = [node.mass for node in avgSMS.nodes if not node.isSM]
+        avgWidth = [node.totalwidth for node in avgSMS.nodes if not node.isSM]
+
         averageMass = (1000.*GeV*weights[0]+1020.*GeV*weights[1] + 500.*GeV*weights[2])/sum(weights)
         averageMass = [averageMass,averageMass,100.*GeV,100.*GeV]
         averageMass = [roundValue(m,5) for m in averageMass]
+
+        averageWidths = (n2.totalwidth*weights[0]+n3.totalwidth*weights[1] + n4.totalwidth*weights[2])/sum(weights)
+        averageWidths = [averageWidths,averageWidths,0*GeV,0*GeV]
+        averageWidths = [roundValue(m,5)for m in averageWidths]
         for im,m in enumerate(avgMass):
             m = roundValue(m,5)
             self.assertAlmostEqual(m.asNumber(GeV),averageMass[im].asNumber(GeV),2)
-
-        self.assertEqual(avgSMS.totalwidth,smsList[0].totalwidth)
+        for iw,w in enumerate(avgWidth):
+            w = roundValue(w,5)
+            self.assertAlmostEqual(w.asNumber(GeV),averageWidths[iw].asNumber(GeV),2)
 
 
         #Check clustering where elements have same upper limits, but not the average element:
@@ -352,7 +371,7 @@ class ClustererTest(unittest.TestCase):
         database.selectExpResults(analysisIDs='CMS-SUS-16-039',dataTypes='upperLimit')
         predictions = theoryPredictionsFor(database, topDict, combinedResults=False)
         clusterSizes = sorted([len(p.smsList) for p in predictions])
-        self.assertEqual(clusterSizes, [1,16,24])
+        self.assertEqual(clusterSizes, [1,16,16])
 
 if __name__ == "__main__":
     unittest.main()

@@ -156,8 +156,8 @@ class RunPrinterTest(unittest.TestCase):
         self.assertTrue(compareXML(xmlDefault, xmlNew,
                                    allowedRelDiff=0.05,
                                    ignore=['input_file', 'smodels_version', 'ncpus']))
-        # self.removeOutputs(outputfile)
-        # self.removeOutputs('./debug.log')
+        self.removeOutputs(outputfile)
+        self.removeOutputs('./debug.log')
 
         outputfile = out.replace('.py', '.smodelsslha')
 
@@ -236,8 +236,8 @@ class RunPrinterTest(unittest.TestCase):
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
                            ignore=ignoreFields, where="top")
         self.assertTrue(equals)
-        # self.removeOutputs(out)
-        self.removeOutputs('./debug.log')         
+        self.removeOutputs(out)
+        self.removeOutputs('./debug.log')       
 
 
         # Check XML output:

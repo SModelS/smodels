@@ -54,11 +54,11 @@
             </TxNames_List>
             <Width_GeV_List>
                 <Width_GeV_List>
-                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>1.0</Width_GeV>
                     <Width_GeV>stable</Width_GeV>
                 </Width_GeV_List>
                 <Width_GeV_List>
-                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>1.0</Width_GeV>
                     <Width_GeV>stable</Width_GeV>
                 </Width_GeV_List>
             </Width_GeV_List>
@@ -90,11 +90,11 @@
             </TxNames_List>
             <Width_GeV_List>
                 <Width_GeV_List>
-                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>1.0</Width_GeV>
                     <Width_GeV>stable</Width_GeV>
                 </Width_GeV_List>
                 <Width_GeV_List>
-                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>1.0</Width_GeV>
                     <Width_GeV>stable</Width_GeV>
                 </Width_GeV_List>
             </Width_GeV_List>
@@ -126,11 +126,11 @@
             </TxNames_List>
             <Width_GeV_List>
                 <Width_GeV_List>
-                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>1.0</Width_GeV>
                     <Width_GeV>stable</Width_GeV>
                 </Width_GeV_List>
                 <Width_GeV_List>
-                    <Width_GeV>prompt</Width_GeV>
+                    <Width_GeV>1.0</Width_GeV>
                     <Width_GeV>stable</Width_GeV>
                 </Width_GeV_List>
             </Width_GeV_List>

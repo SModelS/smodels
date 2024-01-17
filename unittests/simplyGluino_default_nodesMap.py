@@ -58,7 +58,7 @@ smodelsOutputDefault = {
         'dataType' : 'upperLimit',
         'r' : 25.70394,
         'r_expected' : None,
-        'Width (GeV)' : [('gluino', 'prompt'), ('N1', 'stable')],
+        'Width (GeV)' : [('gluino', 1.0), ('N1', 'stable')],
         'TxNames weights (fb)' : {'T1': 4309.03465},
         'Nodes Map' : {
             0 : 'PV',
@@ -86,7 +86,7 @@ smodelsOutputDefault = {
         'dataType' : 'upperLimit',
         'r' : 15.00267,
         'r_expected' : None,
-        'Width (GeV)' : [('gluino', 'prompt'), ('N1', 'stable')],
+        'Width (GeV)' : [('gluino', 1.0), ('N1', 'stable')],
         'TxNames weights (fb)' : {'T1': 572.168935},
         'Nodes Map' : {
             0 : 'PV',
@@ -114,7 +114,7 @@ smodelsOutputDefault = {
         'dataType' : 'efficiencyMap',
         'r' : 4.450234,
         'r_expected' : 6.507382,
-        'Width (GeV)' : [('gluino', 'prompt'), ('N1', 'stable')],
+        'Width (GeV)' : [('gluino', 1.0), ('N1', 'stable')],
         'TxNames weights (fb)' : {'T1': 1.716506805},
         'Nodes Map' : {
             0 : 'PV',
