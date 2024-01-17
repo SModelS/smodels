@@ -47,17 +47,9 @@ smodelsOutputDefault={
             'r': 0.3875959,
             'r_expected': None,
             'Width (GeV)': [
-                [
-                    'prompt',
-                    'prompt',
-                    'stable'
-                ],
-                [
-                    'prompt',
-                    'prompt',
-                    'stable'
-                ]
-            ]
+            [14.81, 0.0013847, 'stable'],
+            [14.778, 0.0013847, 'stable']
+        ]
         },
         {
             'maxcond': 0.0,
@@ -84,16 +76,7 @@ smodelsOutputDefault={
             'dataType': 'upperLimit',
             'r': 0.3209495,
             'r_expected': None,
-            'Width (GeV)': [
-                [
-                    'prompt',
-                    'stable'
-                ],
-                [
-                    'prompt',
-                    'stable'
-                ]
-            ]
+            'Width (GeV)': [[6.6463, 'stable'], [6.8054, 'stable']]
         },
         {
             'maxcond': 0.0,
@@ -123,17 +106,9 @@ smodelsOutputDefault={
             'r': 0.2800218,
             'r_expected': None,
             'Width (GeV)': [
-                [
-                    'prompt',
-                    'prompt',
-                    'stable'
-                ],
-                [
-                    'prompt',
-                    'prompt',
-                    'stable'
-                ]
-            ]
+            [0.045654, 0.0013847, 'stable'],
+            [0.045654, 0.0013847, 'stable']
+        ]
         },
         {
             'maxcond': 0.0,
@@ -206,16 +181,7 @@ smodelsOutputDefault={
             'dataType': 'upperLimit',
             'r': 0.1106242,
             'r_expected': None,
-            'Width (GeV)': [
-                [
-                    'prompt',
-                    'stable'
-                ],
-                [
-                    'prompt',
-                    'stable'
-                ]
-            ]
+            'Width (GeV)': [[0.045654, 'stable'], [0.045654, 'stable']]
         },
         {
             'maxcond': 0.0,
@@ -310,16 +276,7 @@ smodelsOutputDefault={
             'dataType': 'upperLimit',
             'r': 0.0611803,
             'r_expected': None,
-            'Width (GeV)': [
-                [
-                    'prompt',
-                    'stable'
-                ],
-                [
-                    'prompt',
-                    'stable'
-                ]
-            ]
+            'Width (GeV)': [[0.045654, 'stable'], [0.045654, 'stable']]
         },
         {
             'maxcond': 0.0,
@@ -394,16 +351,7 @@ smodelsOutputDefault={
             'dataType': 'upperLimit',
             'r': 0.03839162,
             'r_expected': None,
-            'Width (GeV)': [
-                [
-                    'prompt',
-                    'stable'
-                ],
-                [
-                    'prompt',
-                    'stable'
-                ]
-            ]
+            'Width (GeV)': [[0.0013847, 'stable'], [0.0011236, 'stable']]
         },
         {
             'maxcond': 0.0,
@@ -1116,15 +1064,9 @@ smodelsOutputDefault={
             'r': 0.0008312426,
             'r_expected': None,
             'Width (GeV)': [
-                [
-                    'prompt',
-                    'stable'
-                ],
-                [
-                    'prompt',
-                    'stable'
-                ]
-            ]
+            [0.0456539663, 'stable'],
+            [0.0456539663, 'stable']
+        ]
         },
         {
             'maxcond': 0.0,
@@ -1243,15 +1185,9 @@ smodelsOutputDefault={
             'r': 7.135788e-05,
             'r_expected': 5.496207e-05,
             'Width (GeV)': [
-                [
-                    'prompt',
-                    'stable'
-                ],
-                [
-                    'prompt',
-                    'stable'
-                ]
-            ]
+            [0.0456539663, 'stable'],
+            [0.0456539663, 'stable']
+        ]
         }
     ],
     'Total xsec for missing topologies (fb)': 3065.78,
