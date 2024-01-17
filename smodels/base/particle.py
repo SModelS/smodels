@@ -63,6 +63,7 @@ class Particle(object):
         newParticle._id = Particle.getID()
         newParticle._comp = {newParticle._id: 0}
         newParticle._isStable = None
+        newParticle._isPrompt = None
         Particle._instances.add(weakref.ref(newParticle))
         return newParticle
 
@@ -325,16 +326,22 @@ class Particle(object):
 
     def isPrompt(self):
         """
-        Checks if the particle decays promptly (e.g. totalwidth = inf).
+        Checks if the particle decays promptly.
+        If _isPrompt has been set, return its value,
+        otherwise set to True if self.totalwidth == inf.
 
         :return: True/False
         """
+        if self._isPrompt is None:
+            self._isPrompt = (self.totalwidth.asNumber() == float('inf'))
 
-        return self.totalwidth.asNumber() == float('inf')
+        return self._isPrompt
 
     def isStable(self):
         """
-        Checks if the particle is stable (e.g. totalwidth = 0).
+        Checks if the particle is stable.
+        If _isStable has been set, return its value,
+        otherwise set to True if self.totalwidth == 0.
 
         :return: True/False
         """

@@ -44,11 +44,11 @@ smodelsOutputDefault={
             'r_expected': None,
             'Width (GeV)': [
                 [
-                    'prompt',
+                    3.3963,
                     'stable'
                 ],
                 [
-                    'prompt',
+                    1.959,
                     'stable'
                 ]
             ]
@@ -80,11 +80,11 @@ smodelsOutputDefault={
             'r_expected': None,
             'Width (GeV)': [
                 [
-                    'prompt',
+                    3.3963,
                     'stable'
                 ],
                 [
-                    'prompt',
+                    1.959,
                     'stable'
                 ]
             ]

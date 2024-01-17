@@ -130,7 +130,11 @@ class AnaCombLikelihoodComputer(object):
         def fun(mu):
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
-            return self.likelihood(float(mu), expected=expected, return_nll=True, useCached=False)
+            if isinstance(mu,np.ndarray):
+                x = float(mu[0])
+            else:
+                x = float(mu)
+            return self.likelihood(x, expected=expected, return_nll=True, useCached=False)
 
         if allowNegativeSignals:
             toTry += [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1]

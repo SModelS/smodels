@@ -317,12 +317,12 @@ class Model(object):
 
             particle.totalwidth = abs(particleData.totalwidth)*GeV
             if particle.totalwidth < stableWidth:
-                particle.totalwidth = 0.*GeV  # Treat particle as stable
+                particle._isStable = True  # Treat particle as stable
                 logger.debug("Particle %s has width below the threshold and will be assumed as stable" % particle.pdg)
                 continue
 
             if particle.totalwidth > promptWidth:
-                particle.totalwidth = float('inf')*GeV  # Treat particle as prompt
+                particle._isPrompt = True  # Treat particle as prompt
                 logger.debug("Particle %s has width above the threshold and will be assumed as prompt." % particle.pdg)
             else:
                 particle.decays.append(None)  # Include possibility for particle being long-lived (non-prompt)
