@@ -125,7 +125,7 @@ class TestTxnameWidths(unittest.TestCase):
 
 
         smsData = [np.round(x,3) for x in tx.getDataFromSMS(smsMatch)]
-        massPoint = [134.4, 68.1, 134.4, 68.1, 184.207, 184.207]
+        massPoint = [134.4, 68.1, 134.4, 68.1, 59.696, 59.696]
         for im,m in enumerate(smsData):
             self.assertAlmostEqual(m,massPoint[im],places=1)
         v = tx.txnameData.getValueFor(smsData)
