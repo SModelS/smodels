@@ -104,10 +104,11 @@ LmList = MultiParticle('L-', [e, mu, ta])
 LList = MultiParticle('L', [e, mu, ta, eC, muC, taC])
 jetList = MultiParticle('jet', [q, c, g, pion])
 nuList = nu
+jetbList = MultiParticle('jetb', [q, c, g, b])
 
 # Used to construct generic z2-odd and z2-even particles:
-anyOdd = Particle(label='anyBSM', isSM=False)
-anyEven = Particle(label='anySM', isSM=True)
+anyBSM = Particle(label='anyBSM', isSM=False)
+anySM = Particle(label='anySM', isSM=True)
 anyParticle = Particle(label='*')
 
 # Used to construct BSM final states:
@@ -132,15 +133,19 @@ Hp = Particle(label='H+', isSM=False, eCharge = 1, colordim = 1, spin = 0.)
 Hm = Particle(label='H-', isSM=False, eCharge = -1, colordim = 1, spin = 0.)
 Hpm = MultiParticle(label='Hpm', particles = [Hp,Hm])
 
+Zprime = Particle(label='Zprime', isSM=False, eCharge = 0, colordim = 1, spin = 1)
+Vprime = Particle(label='Vprime', isSM=False, colordim = 1, spin = 1)
+H0 = Particle(label='H0', isSM=False, eCharge = 0, colordim = 1, spin = 0)
 
 #Define list of inclusive final states:
 SMfinalStates = [eList,muList,taList,lpList,lmList,lList,WList,
-               tList,LpList,LmList,LList,jetList,anyEven]
+               tList,LpList,LmList,LList,jetList,jetbList,anySM]
 #Include list of exclusive final states:
 SMfinalStates +=  SMList
 #Define list of BSM final states:
-BSMfinalStates = [MET,HSCP,RHadronU,RHadronD,RHadronG,RHadronQ,anyOdd,
-                  gluino,chargino,charginoBar,C1,Hp,Hm,Hpm]
+BSMfinalStates = [MET,HSCP,RHadronU,RHadronD,RHadronG,RHadronQ,anyBSM,
+                  gluino,chargino,charginoBar,C1,Hp,Hm,Hpm,Zprime,H0]
+
 
 # Avoid double counting:
 for i, ptc in enumerate(SMfinalStates):
@@ -151,15 +156,9 @@ for i, ptc in enumerate(BSMfinalStates):
     if any((ptc is p and i != j) for j, p in enumerate(BSMfinalStates)):
         BSMfinalStates.remove(ptc)
 
+# Protect all final state properties:
+for ptc in SMfinalStates+BSMfinalStates:
+    ptc._static = True
 
-#Define a dummy model just to use the facilities for filtering particles
-finalStates = Model(SMparticles = SMfinalStates,
-                    BSMparticles = BSMfinalStates, label = 'databaseParticles.py')
-
-#Check consistency:
-for label in finalStates.getValuesFor('label'):
-    particles = finalStates.getParticlesWith(label=label)
-    if len(particles) != 1:
-        raise SModelSError("%i particles defined with label %s. Particles defined in databaseParticles must have unique labels."
-                           %(len(particles),label))
-                           
+finalStates = Model(SMparticles=SMfinalStates,
+                    BSMparticles=BSMfinalStates)

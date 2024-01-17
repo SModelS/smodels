@@ -9,10 +9,6 @@ from __future__ import print_function
 """ Import basic functions (this file must be executed in the installation folder) """
 
 from smodels.base import runtime
-# Define your model (list of BSM particles)
-runtime.modelFile = 'smodels.share.models.mssm'
-# runtime.modelFile = 'mssmQNumbers.slha'
-
 from smodels.decomposition import decomposer
 from smodels.base.physicsUnits import fb, GeV, TeV
 from smodels.matching.theoryPrediction import theoryPredictionsFor,TheoryPredictionsCombiner
