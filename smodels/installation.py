@@ -11,8 +11,7 @@
 from __future__ import print_function
 import sys
 import os
-from typing import Union
-from semver import VersionInfo
+from typing import Union, Tuple
 
 def installDirectory():
     """
@@ -137,22 +136,28 @@ def requirements():
     f.close()
     return ret
 
-def version( return_object : bool = False ) -> Union[str,VersionInfo]:
+def version( return_tuple : bool = False ) -> Union[str,Tuple]:
     """
     Returns version number of the SModelS framework.
 
-    :param return_object: Return a semver VersionInfo object instead of string
-    :returns: version, either as string or as semver VersionInfo object
+    :param return_tuple: Return a tuple of (major,minor,patch,...) instead of string
+    :returns: version, either as string or tuple
     """
     f = open( f"{installDirectory()}/smodels/version" )
     l = f.readline()
     f.close()
     l = l.replace("\n", "")
     l.strip()
-    if not return_object:
+    if not return_tuple:
         return l
-    import semver
-    return semver.parse ( l )
+    import re
+    ret = re.split("\.|-",l)
+    for i,r in enumerate(ret):
+        try:
+            ret[i]=int(r)
+        except ValueError as e:
+            pass
+    return tuple(ret)
 
 def license():
     """
