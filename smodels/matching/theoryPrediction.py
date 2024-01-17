@@ -13,7 +13,7 @@ from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.statsTools import StatsComputer
-from typing import Union, Text
+from typing import Union, Text, Dict
 import numpy as np
 
 __all__ = [ "TheoryPrediction", "theoryPredictionsFor", "TheoryPredictionsCombiner" ]
@@ -397,7 +397,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
     def __init__(self, theoryPredictions: list, slhafile=None, deltas_rel=None):
         """
         Constructor.
-        
+
         :param theoryPredictions: the List of theory predictions
         :param slhafile: optionally, the slhafile can be given, for debugging
         :param deltas_rel: relative uncertainty in signal (float).
@@ -562,7 +562,7 @@ class TheoryPredictionList(object):
         condition violation < maxCond.
         """
         self._theoryPredictions = []
-        if theoryPredictions and isinstance(theoryPredictions, 
+        if theoryPredictions and isinstance(theoryPredictions,
                                             (TheoryPredictionList,list)):
 
             if not maxCond:
@@ -623,16 +623,16 @@ class TheoryPredictionList(object):
         )
 
 
-def theoryPredictionsFor(database, smsTopDict, maxMassDist=0.2,
-                         useBestDataset=True, combinedResults=True,
-                         deltas_rel=None):
+def theoryPredictionsFor(database : Database, smsTopDict : Dict,
+        maxMassDist : float = 0.2, useBestDataset : bool = True,
+        combinedResults : bool = True, deltas_rel : Union[None,float] = None):
     """
     Compute theory predictions for the given experimental result, using the list of
     SMS in smsTopDict.
     For each Txname appearing in expResult, it collects the SMS and
     efficiencies, combine the SMS and compute the conditions  (if exist).
 
-    :parameter expResult: expResult to be considered (ExpResult object), if list of ExpResults is given, produce theory predictions for all
+    :parameter database: the database with the selected experimental results
     :parameter smsTopDict: dictionary of SMS, where the canonical names are keys and the TheorySMS objects are values.
                            (TopologyDict object)
     :parameter maxMassDist: maximum mass distance for clustering SMS (float)
@@ -661,7 +661,7 @@ def theoryPredictionsFor(database, smsTopDict, maxMassDist=0.2,
     expSMSDict = database.expSMSDict
     # Compute dictionary with matches:
     smsMatch = expSMSDict.getMatchesFrom(smsTopDict)
-    
+
     ret = []
     for expResult in database.expResultList:
         dataSetResults = []
@@ -672,11 +672,11 @@ def theoryPredictionsFor(database, smsTopDict, maxMassDist=0.2,
                 dataSetResults.append(predList)
         if not dataSetResults:  # no results at all?
             continue
-        
+
         #  For results with more than one dataset keep all dataset predictions
         if len(dataSetResults) == 1:  # only a single dataset? Easy case.
             expResults = dataSetResults[0]
-        
+
         #  if useBestDataSet=False and combinedResults=False:
         elif not useBestDataset and not combinedResults:
             expResults = sum(dataSetResults)
@@ -912,7 +912,7 @@ def _getSMSFor(dataset,smsMatch,smsDict):
                 sms_orig.setTestedBy(dataset.globalInfo.type)
                 newSMS.eff = eff
                 newSMS.txname = txname
-                newSMS.txlabel = smsLabel             
+                newSMS.txlabel = smsLabel
                 smsList.append(newSMS)
 
     return smsList

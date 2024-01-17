@@ -11,6 +11,8 @@
 from __future__ import print_function
 import sys
 import os
+from typing import Union
+from semver import VersionInfo
 
 def installDirectory():
     """
@@ -127,32 +129,6 @@ def authors():
         authors += to_add
     return authors
 
-def _toTuple_ ( ver ):
-    """ convert version string to tuple """
-    a = ver.replace(" ",".",1).split(".")
-    for ctr,el in enumerate(a):
-        try:
-            a[ctr]=int(el)
-        except ValueError:
-            a[ctr]=el
-    b=[]
-    for i in a:
-        found=False
-        for pf in [ "rc", "post", "pre" ]:
-            if type(i)==str and pf in i:
-                found=True
-                minor = i[:i.find(pf)]
-                try:
-                    minor = int(minor)
-                except (ValueError,TypeError):
-                    pass
-                b.append ( minor )
-                b.append ( i[i.find(pf):] )
-                continue
-        if not found:
-            b.append ( i )
-    return tuple(b)
-
 def requirements():
     ret=[]
     f = open("%s/smodels/share/requirements.txt" % installDirectory())
@@ -161,20 +137,22 @@ def requirements():
     f.close()
     return ret
 
-def version(astuple=False):
+def version( return_object : bool = False ) -> Union[str,VersionInfo]:
     """
-    Print version number of the SModelS framework.
+    Returns version number of the SModelS framework.
 
+    :param return_object: Return a semver VersionInfo object instead of string
+    :returns: version, either as string or as semver VersionInfo object
     """
-    f = open("%s/smodels/version" % installDirectory())
+    f = open( f"{installDirectory()}/smodels/version" )
     l = f.readline()
     f.close()
     l = l.replace("\n", "")
     l.strip()
-    if not astuple:
+    if not return_object:
         return l
-    return _toTuple_ ( l )
-
+    import semver
+    return semver.parse ( l )
 
 def license():
     """
