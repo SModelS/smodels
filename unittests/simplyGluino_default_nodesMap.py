@@ -64,12 +64,12 @@ smodelsOutputDefault = {
             0 : 'PV',
             1 : 'gluino',
             2 : 'gluino',
-            5 : 'N1',
-            3 : 'q',
+            3 : 'N1',
             4 : 'q',
-            8 : 'N1',
-            6 : 'q',
-            7 : 'q'
+            5 : 'q',
+            6 : 'N1',
+            7 : 'q',
+            8 : 'q'
         }
     },
     {
@@ -92,12 +92,12 @@ smodelsOutputDefault = {
             0 : 'PV',
             1 : 'gluino',
             2 : 'gluino',
-            5 : 'N1',
-            3 : 'q',
+            3 : 'N1',
             4 : 'q',
-            8 : 'N1',
-            6 : 'q',
-            7 : 'q'
+            5 : 'q',
+            6 : 'N1',
+            7 : 'q',
+            8 : 'q'
         }
     },
     {
@@ -120,12 +120,12 @@ smodelsOutputDefault = {
             0 : 'PV',
             1 : 'gluino',
             2 : 'gluino',
-            5 : 'N1',
-            3 : 'q',
+            3 : 'N1',
             4 : 'q',
-            8 : 'N1',
-            6 : 'q',
-            7 : 'q'
+            5 : 'q',
+            6 : 'N1',
+            7 : 'q',
+            8 : 'q'
         },
         'likelihood' : 1.267167e-11,
         'l_max' : 0.07085462,

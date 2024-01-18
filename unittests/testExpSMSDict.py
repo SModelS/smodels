@@ -25,22 +25,22 @@ class ExpSMSDictTest(unittest.TestCase):
         
         database.selectExpResults(useNonValidated=True)
         expDict = database.expSMSDict
-        self.assertEqual(len(list(expDict.getSMS())),71)
-        self.assertEqual(len(list(expDict.getTx())),550)
+        self.assertEqual(len(list(expDict.getSMS())),72)
+        self.assertEqual(len(list(expDict.getTx())),551)
 
     def testFilter(self):
 
         database.selectExpResults(analysisIDs='CMS*',useNonValidated=True)
         expDict = database.expSMSDict
 
-        self.assertEqual(len(list(expDict.getSMS())),35)
-        self.assertEqual(len(list(expDict.getTx())),438)
+        self.assertEqual(len(list(expDict.getSMS())),36)
+        self.assertEqual(len(list(expDict.getTx())),439)
 
         # Reset database:
         database.selectExpResults(useNonValidated=True)
         expDict = database.expSMSDict
-        self.assertEqual(len(list(expDict.getSMS())),71)
-        self.assertEqual(len(list(expDict.getTx())),550)
+        self.assertEqual(len(list(expDict.getSMS())),72)
+        self.assertEqual(len(list(expDict.getTx())),551)
 
     def testNodeDict(self):
 

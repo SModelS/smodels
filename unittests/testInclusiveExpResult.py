@@ -41,7 +41,7 @@ class TestInclusiveExpRes(unittest.TestCase):
         nodes_and_indices = getNodesIndices(expsms)
         self.assertEqual(nodes_and_indices,
                          [('PV', 0), ('Inclusive', 1), ('HSCP', 2), 
-                          ('*anySM', 3), ('MET', 4)])
+                           ('MET', 3), ('*anySM', 4)])
         self.assertTrue(isinstance(expsms.canonName,InclusiveValue))
   
 
@@ -56,8 +56,8 @@ class TestInclusiveExpRes(unittest.TestCase):
         matched = tx.hasSMSas(smsA)
         nodes_and_indices = getNodesIndices(matched)
         self.assertEqual(nodes_and_indices,[('PV', 0), ('gluino', 1), 
-                                            ('sta_1', 2), ('W+', 3), 
-                                            ('N1', 4), ('N2', 5), ('sta_1~', 6), ('q', 7), 
+                                            ('sta_1', 2), ('N1', 3), 
+                                            ('W+', 4), ('N2', 5), ('sta_1~', 6), ('q', 7), 
                                             ('q', 8), ('W-', 9)])
         
 
@@ -66,8 +66,8 @@ class TestInclusiveExpRes(unittest.TestCase):
         matched = tx.hasSMSas(smsB)
         nodes_and_indices = getNodesIndices(matched)
         self.assertEqual(nodes_and_indices,[('PV', 0), ('gluino', 1), 
-                                            ('sta_1', 2), ('q', 3), 
-                                            ('N1', 4), ('q', 5)])
+                                            ('sta_1', 2), ('N1', 3), 
+                                            ('q', 4), ('q', 5)])
         
         edges = getEdges(matched)
         self.assertEqual(edges,sorted([('PV', 'gluino'), ('PV', 'sta_1'), 
@@ -80,8 +80,8 @@ class TestInclusiveExpRes(unittest.TestCase):
         matched = tx.hasSMSas(smsC)
         nodes_and_indices = getNodesIndices(matched)
         self.assertEqual(nodes_and_indices,[('PV', 0), ('gluino', 1), 
-                                            ('sta_1', 2), ('Z', 3), 
-                                            ('N1', 4), ('N2', 5), 
+                                            ('sta_1', 2), ('N1', 3), 
+                                            ('Z', 4), ('N2', 5), 
                                             ('q', 6), ('q', 7)])
         
         smsD = '(PV > sta_1,gluino(1)), (gluino(1) > u,u~,N2(2)), (N2(2) > W-, sta_1)'
@@ -100,10 +100,10 @@ class TestInclusiveExpRes(unittest.TestCase):
         expsms = list(tx.smsMap.keys())[0]
         self.assertTrue(isinstance(expsms.canonName,InclusiveValue))
         nodes_and_indices = getNodesIndices(expsms)
-        self.assertEqual(nodes_and_indices,[('PV', 0), ('C1+', 1), 
-                                            ('C1-', 2), ('*anySM', 3), 
-                                            ('MET', 4), ('*anySM', 5), 
-                                            ('MET', 6)])
+        self.assertEqual(nodes_and_indices,[('PV', 0), ('C1', 1), 
+                                            ('C1', 2), ('MET', 3), 
+                                            ('*anySM', 4), ('MET', 5), 
+                                            ('*anySM', 6)])
         
         smsA = '(PV > C1-(1),C1+(2)), (C1+(2) > u,N1), (C1-(1) > W-,N1)'
         slhafile="./testFiles/slha/longLived.slha"
@@ -112,10 +112,10 @@ class TestInclusiveExpRes(unittest.TestCase):
         smsA = ExpSMS.from_string(smsA,model=model)
         matched = tx.hasSMSas(smsA)
         nodes_and_indices = getNodesIndices(matched)
-        self.assertEqual(nodes_and_indices,[('PV', 0), ('C1+', 1), 
-                                            ('C1-', 2), ('q', 3), 
-                                            ('N1', 4), ('W-', 5), 
-                                            ('N1', 6)])
+        self.assertEqual(nodes_and_indices,[('PV', 0), ('C1-', 1), 
+                                            ('C1+', 2), ('N1', 3), 
+                                            ('W-', 4), ('N1', 5), 
+                                            ('q', 6)])
         edges = getEdges(matched)
         self.assertEqual(edges,sorted([('PV', 'C1+'), ('PV', 'C1-'), 
                                        ('C1+', 'q'), ('C1+', 'N1'), 
@@ -126,10 +126,10 @@ class TestInclusiveExpRes(unittest.TestCase):
         smsA = ExpSMS.from_string(smsA,model=model)
         matched = tx.hasSMSas(smsA)
         nodes_and_indices = getNodesIndices(matched)
-        self.assertEqual(nodes_and_indices,[('PV', 0), ('C1+', 1), 
-                                            ('C1-', 2), ('q', 3), 
-                                            ('N1', 4), ('q', 5), 
-                                            ('N1', 6), ('nu', 7), 
+        self.assertEqual(nodes_and_indices,[('PV', 0), ('C1-', 1), 
+                                            ('C1+', 2), ('N1', 3), 
+                                            ('q', 4), ('N1', 5), 
+                                            ('q', 6), ('nu', 7), 
                                             ('e-', 8)])
         edges = getEdges(matched)
         self.assertEqual(edges,sorted([('C1+', 'N1'), ('C1+', 'q'), 
