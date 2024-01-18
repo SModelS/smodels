@@ -140,7 +140,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileReportAllSRs:
 
-  * **reportAllSRs** (True/False): set to True to report all signal regions, instead of best signal region only. If True no signal region combination is performed. Available from v2.1.1 onwards. Beware, the output can be long.
+  * **reportAllSRs** (True/False): set to True to report all signal regions, instead of the best signal region only. From v3.0.0 onwards it will also include the combined SRs if combineSRs=True. Beware, the output can be long.
 
 .. _parameterFileCombineAnas:
 
