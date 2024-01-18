@@ -676,21 +676,17 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
         #  For results with more than one dataset keep all dataset predictions
         if len(dataSetResults) == 1:  # only a single dataset? Easy case.
             expResults = dataSetResults[0]
-
-        #  if useBestDataSet=False and combinedResults=False:
-        elif not useBestDataset and not combinedResults:
-            expResults = sum(dataSetResults)
-
-        elif combinedResults:  # Try to combine results
-            expResults = TheoryPredictionList()
-            combinedRes = _getCombinedResultFor(dataSetResults,
+        else:
+            if combinedResults: # Include combination
+                combinedRes = _getCombinedResultFor(dataSetResults,
                                                 expResult)
-            if combinedRes is None:  # Can not combine, use best dataset:
-                combinedRes = _getBestResult(dataSetResults)
-            expResults.append(combinedRes)
-        else:  # Use best dataset:
-            expResults = TheoryPredictionList()
-            expResults.append(_getBestResult(dataSetResults))
+                if combinedRes is not None:
+                    dataSetResults.append(TheoryPredictionList([combinedRes]))
+            if not useBestDataset: #  Report all datasets
+                expResults = sum(dataSetResults) 
+            else:
+                expResults = TheoryPredictionList()
+                expResults.append(_getBestResult(dataSetResults)) # Best result = combination if available
 
         for theoPred in expResults:
             theoPred.expResult = expResult
@@ -770,7 +766,8 @@ def _getCombinedResultFor(dataSetResults, expResult):
 
 def _getBestResult(dataSetResults):
     """
-    Returns the best result according to the expected upper limit
+    Returns the best result according to the expected upper limit.
+    If a combined result is included in the list, always return it.
 
     :param datasetPredictions: list of TheoryPredictionList objects
     :return: best result (TheoryPrediction object)
@@ -780,6 +777,12 @@ def _getBestResult(dataSetResults):
     # return the single result:
     if len(dataSetResults) == 1:
         return dataSetResults[0]
+    
+    # If combination is included, always return it
+    for predList in dataSetResults:
+        for tp in predList:
+            if isinstance(tp.dataset,CombinedDataSet):
+                return tp
 
     # For efficiency-map analyses with multipler signal regions,
     # select the best one according to the expected upper limit:

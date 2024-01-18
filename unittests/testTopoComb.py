@@ -63,7 +63,7 @@ XSECTION  1.30E+04  2212 2212 2 1000021 1000021 # 10000 events, [pb], pythia8 fo
 
             database.selectExpResults( analysisIDs = [ "CMS-SUS-16-050-agg" ] )
             # print ( "Experimental result: %s" % expRes )
-            tp = theoryPredictionsFor(database, deco, useBestDataset=False, combinedResults=True)
+            tp = theoryPredictionsFor(database, deco, useBestDataset=True, combinedResults=True)
             for t in tp:
                 predXSecs[case]=t.xsection
                 rvalues[case]=t.getRValue(expected=True)

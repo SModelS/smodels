@@ -698,6 +698,8 @@ class LikelihoodComputer:
         """Compute nuisance parameters theta that maximize our likelihood
         (poisson*gauss).
         """
+        if isinstance(mu,(np.ndarray,list)):
+            mu = mu[0]
         mu = float(mu)
         if np.isinf ( mu ):
             return None
@@ -825,7 +827,9 @@ class LikelihoodComputer:
         theta_hat, _ = self.findThetaHat( avgr )
         minr, avgr, maxr = self.findAvgr( theta_hat )
 
-        def myllhd( mu : float ):
+        def myllhd( mu ):
+            if isinstance(mu,(np.ndarray,list)):
+                mu = mu[0]
             theta = self.findThetaHat ( mu=float(mu) )
             ret = self.likelihood(return_nll=True, mu = mu )
             return ret

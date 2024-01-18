@@ -174,7 +174,6 @@ def testPoint(inputFile, outputDir, parser, database):
         allSRs = parser.getboolean("options", "reportAllSRs")
         if allSRs:  # If set print out all SRs and skip combination
             useBest = False
-            combineResults = False
     except (NoSectionError, NoOptionError):
         pass
     try:
