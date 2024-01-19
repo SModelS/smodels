@@ -133,7 +133,7 @@ def checkPythiaHeaderFile():
     return True
 
 def compilePythia():
-    """ finally, compile pythia """
+    """ compile pythia """
     ver = getVersion()
     ncpus = max ( 1, getNCPUs()-2 )
     cmd = f"cd pythia{ver}; ./configure ; make -j {ncpus}"
@@ -144,6 +144,15 @@ def compilePythia():
     for c in iter(lambda: ps.stdout.read(1), b''): 
         sys.stdout.buffer.write(c)
         sys.stdout.buffer.flush()
+
+def fixACLs():
+    """ finally, remove all writable flags from install. when running 
+    many pythia8 instances in parallel, for some reason they sometimes deleted
+    files from the install, making the install unusable """
+    # print ( f"fixACLs: {os.getcwd()}" )
+    cmd = "chmod -R a-w pythia8308"
+    import subprocess
+    subprocess.getoutput ( cmd )
 
 def installPythia():
     """ fetch tarball, unzip it, compile pythia """
@@ -156,6 +165,7 @@ def installPythia():
     fetch()
     unzip()
     compilePythia()
+    fixACLs()
     rmTarball()
 
 if __name__ == "__main__":

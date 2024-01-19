@@ -20,6 +20,7 @@ install_pythia8:
 	./installer.py
 
 clean:
+	chmod -R u+w pythia$(PYTHIAVER)
 	rm -rf $(EXES) test.slha pythia$(PYTHIAVER) .pythia*.tgz* pythia*.tgz*  pythia8.exe events.lhe
 
 pythia8.exe: pythia8.cc .PHONY
