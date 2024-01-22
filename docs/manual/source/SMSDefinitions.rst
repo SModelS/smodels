@@ -132,7 +132,7 @@ Canonical Name
 
 It is often desirable to be able to describe the structure of a |SMS topology|
 without having to specify its particle contents. This can be extremely useful when checking if distinct |SMS| are equal, since if their structure differs is not needed to compare their particle nodes.
-This can be achieved using the canonial name (or canonical labeling) convention for rooted graphs, which assigns to each node a label according to the following rules:
+This can be achieved using the canonical name (or canonical labeling) convention for rooted graphs, which assigns to each node a label according to the following rules:
 
  * each undecayed (final node) receives the label "10" 
  * each decayed node receives the label "1<sorted labels of daughter nodes>0"
