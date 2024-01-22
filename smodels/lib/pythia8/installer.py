@@ -133,7 +133,7 @@ def checkPythiaHeaderFile():
     return True
 
 def compilePythia():
-    """ finally, compile pythia """
+    """ compile pythia """
     ver = getVersion()
     ncpus = max ( 1, getNCPUs()-2 )
     cmd = f"cd pythia{ver}; ./configure ; make -j {ncpus}"
@@ -144,6 +144,15 @@ def compilePythia():
     for c in iter(lambda: ps.stdout.read(1), b''): 
         sys.stdout.buffer.write(c)
         sys.stdout.buffer.flush()
+
+def protectInstall():
+    """ finally, remove all writable flags from install. when running 
+    many pythia8 instances in parallel, for some reason they sometimes deleted
+    files from the install, making the install unusable """
+    # print ( f"fixACLs: {os.getcwd()}" )
+    cmd = "chmod -R a-w pythia8308"
+    import subprocess
+    subprocess.getoutput ( cmd )
 
 def installPythia():
     """ fetch tarball, unzip it, compile pythia """
@@ -156,12 +165,15 @@ def installPythia():
     fetch()
     unzip()
     compilePythia()
+    # protectInstall() # dont do this by default
     rmTarball()
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="pythia8 install script" )
     parser.add_argument( '-i', '--install', help='install pythia8',
+                         action='store_true') 
+    parser.add_argument( '-p', '--protect', help='protect pythia8 install',
                          action='store_true') 
     parser.add_argument( '-v', '--version', help='report pythiaversion',
                          action='store_true') 
@@ -174,3 +186,5 @@ if __name__ == "__main__":
         # just to suppress a warning msg in github actions
         os.environ["TERM"]="xterm"
     installPythia()
+    if args.protect:
+        protectInstall()
