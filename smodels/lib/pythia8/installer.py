@@ -146,13 +146,29 @@ def compilePythia():
         sys.stdout.buffer.flush()
 
 def protectInstall():
-    """ finally, remove all writable flags from install. when running 
+    """ remove all writable flags from install. when running 
     many pythia8 instances in parallel, for some reason they sometimes deleted
     files from the install, making the install unusable """
     # print ( f"fixACLs: {os.getcwd()}" )
-    cmd = "chmod -R a-w pythia8308"
+    with open("pythiaversion","rt" ) as f:
+        pythiaversion = f.read().strip()
+        f.close()
+    cmd = f"chmod -R a-w pythia{pythiaversion}"
     import subprocess
     subprocess.getoutput ( cmd )
+    print ( f"made pythia{pythiaversion} readonly" )
+
+def removeInstallProtection():
+    """ make install writable and removable again """
+    # print ( f"fixACLs: {os.getcwd()}" )
+    with open("pythiaversion","rt" ) as f:
+        pythiaversion = f.read().strip()
+        f.close()
+    cmd = f"chmod -R u+w pythia{pythiaversion}"
+    import subprocess
+    subprocess.getoutput ( cmd )
+    print ( f"made pythia{pythiaversion} writable" )
+
 
 def installPythia():
     """ fetch tarball, unzip it, compile pythia """
@@ -175,6 +191,8 @@ if __name__ == "__main__":
                          action='store_true') 
     parser.add_argument( '-p', '--protect', help='protect pythia8 install',
                          action='store_true') 
+    parser.add_argument( '-r', '--remove_protection', help='remove pythia8 install protection',
+                         action='store_true') 
     parser.add_argument( '-v', '--version', help='report pythiaversion',
                          action='store_true') 
     args = parser.parse_args()
@@ -188,3 +206,5 @@ if __name__ == "__main__":
     installPythia()
     if args.protect:
         protectInstall()
+    if args.remove_protection:
+        removeInstallProtection()

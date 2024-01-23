@@ -42,6 +42,11 @@ upload_particles: particles
 	## only needed if the particle names have changed
 	cp pythia8particles.py ../../smodels/tools/
 	
+protect:
+	./installer.py -p
+
+remove_protection:
+	./installer.py -r
 
 test: all run
 
