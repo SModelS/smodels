@@ -1,11 +1,17 @@
 Release v3.0.0, xxx
 =======================================================
 
-  * Changes in missing topologies (coverage): the missing topos are grouped by final states (irrespective of the topology structure).
-    So the FinalStateSMS objects do not exactly match the GeneralElements from v2 (several GeneralElements can be mapped to a single FinalStateSMS)
-  * Added option for setting the erased quantum numbers for prompt particles in the parameters file. If not defined, it will not erase the attributes
+  * Extension to general SMS topologies using graphs
+  * Large code refactoring
+  * Added option for selecting which quantum numbers to be erased (see  the ignorePromptQNumbers option in parameters.ini)
+  * Changes in missing topologies (coverage): the grouping of topologies is now done only by final states and ignores the topology structure.  
+  * Added outputFormat option to parameters.ini to allow for writing the output using the old format
+  * Z2parity attribute of particles is not longer needed.
+  * Introduced centralized database dictionary to decrease redundancies in SMS matching (SMS Dictionary)
+  * Clustering of SMS for UL results replaced by a (simple) K-means clustering algorithm (see Clustering)
   * Changed the lock file mechanism for downloading the database to work with all file systems, fixes #37
   * Added CITATION.cff file, closes #38
+
 
 Release v2.3.3, Tue 19 Dec 2023
 =======================================================

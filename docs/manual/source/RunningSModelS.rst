@@ -256,6 +256,10 @@ Below we give more detailed information about each entry in the parameters file.
   * **outputType** (list of outputs): use to list all the output formats to be generated.
     Available output formats are: summary, stdout, log, python, xml, slha.
 
+.. _parameterFileOutputFormat:
+
+  * **outputFormat**: use to select in which format the output should be written.  Available formats are: current (latest format) or version2 (SModelS 2.x format using bracket notation)
+
 .. _parameterFileStdoutprinter:
 
 * *stdout-printer*: options for the stdout or log printer

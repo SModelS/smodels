@@ -395,6 +395,7 @@ in the simplified model (see the :ref:`discussion above <txnameFile>`),
 the reweighting factor :math:`\xi` is computed using only the widths not present
 in the grid.
 
+.. _smsDictionary:
 
 SMS Dictionary
 ^^^^^^^^^^^^^^

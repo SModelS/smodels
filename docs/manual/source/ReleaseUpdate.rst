@@ -38,8 +38,13 @@ New in Version 3.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * **Extension to general SMS topologies** (no longer restricted to Z\ :sub:`2` symmetric topologies)
-  * Added option for selecting which quantum numbers to be erased
-  * Inclusion of analyses with searches for resonant production
+  * Large code refactoring
+  * Added option for selecting which quantum numbers to be erased (see  the :ref:`ignorePromptQNumbers<erasePrompt>`_ option in parameters.ini)
+  * Added :ref:`outputFormat <parameterFileOutputFormat>`_ option to parameters.ini to allow for writing the output using the old format 
+  * Changes in missing topologies (coverage): the grouping of topologies is now done only by final states and ignores the topology structure (see :ref:`missing topologies <finalStateSMS>`_)
+  * Z2parity attribute of particles is not longer needed
+  * Introduced centralized database dictionary to decrease redundancies in SMS matching (see :ref:`SMS Dictionary <smsDictionary>`_)
+  * Clustering of SMS for UL results replaced by a (simple) K-means clustering algorithm (see :ref:`Clustering <cluster>`_)
   * Changed the lock file mechanism for downloading the database to work with all file systems, fixes `#37 <https://github.com/SModelS/smodels/issues/37>`_
   * Added CITATION.cff file, closes `#38 <https://github.com/SModelS/smodels/issues/38>`_
 

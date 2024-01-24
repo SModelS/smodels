@@ -82,9 +82,9 @@ Note that although the particle properties of N1 and anyBSM match, their canonic
  * gluino :math:`\leftrightarrow` anyBSM
  * N1 :math:`\leftrightarrow` MET
 
-In order to fully match the gluino and anyBSM nodes their daughters must also be compared (*Step 2*). Since their daughters (q,N1) and (MET,jet) are final state nodes (undecayed) the comparison procedure stops at this level and results in the following matches:
+In order to fully match the gluino and anyBSM nodes their daughters must also be compared (*Step 2*). Since their daughters (g,N1) and (MET,jet) are final state nodes (undecayed) the comparison procedure stops at this level and results in the following matches:
 
- * q :math:`\leftrightarrow` jet
+ * g :math:`\leftrightarrow` jet
  * N1 :math:`\leftrightarrow` MET
 
 .. _matchB:
@@ -242,4 +242,4 @@ The number of clusters is chosen as the smallest possible so all the |SMS| belon
 
 
 .. [#f3] The comparison of the |particle| properties is done only for the properties which have been defined for both |particles|. For instance, it is often the case that the spin property is not defined for particles appearing in the database topologies, so this property will be ignored when comparing particles from the model topology and to the ones from the database topology.
-.. [#f4] In order to comparing two sets of daughters (mapped to a bipartite graph) irrespective of their ordering, a `maximal matching algorithm <https://en.wikipedia.org/wiki/Hopcroft%E2%80%93Karp_algorithm>`_ is used. Note that it is possible that the matching is not unique (i.e. :math:`A \leftrightarrow a, B \leftrightarrow b` and :math:`A \leftrightarrow b, B \leftrightarrow a`) and in this case the matching procedure is not deterministic.
+.. [#f4] In order to compare two sets of daughters (mapped to a bipartite graph) irrespective of their ordering, a `maximal matching algorithm <https://en.wikipedia.org/wiki/Hopcroft%E2%80%93Karp_algorithm>`_ is used. Note that it is possible that the matching is not unique (i.e. :math:`A \leftrightarrow a, B \leftrightarrow b` and :math:`A \leftrightarrow b, B \leftrightarrow a`) and in this case the matching procedure is not deterministic.
