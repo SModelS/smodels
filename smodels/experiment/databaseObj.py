@@ -272,6 +272,13 @@ class Database(object):
         expDict = self._allExpSMSDict
         self.expSMSDict = expDict.filter(self.expResultList)
 
+    def getExpSMS(self):
+        """
+        Returns all the SMS present in the selected experimental results
+        """
+
+        return list(self.expSMSDict._smsDict.keys())
+
     @property
     def databaseParticles(self):
         """

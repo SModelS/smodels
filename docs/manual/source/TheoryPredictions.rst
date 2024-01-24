@@ -76,13 +76,13 @@ The procedure compares the root nodes, which in this example have the same canon
 Hence criteria 1. and 2. for matching two nodes are satisfied. 
 
 
-The next step consists in comparing the root nodes daughters *irrespective of their order*. In this example these are (gluino, N1) from the model topology and (MET,anyBSM) from the database topology, as shown by. Once again we compare their canonical names and particle properties (*Step B* in :numref:`Fig. %s <matchB>`).
+The next step consists in comparing the root nodes daughters *irrespective of their order*. In this example these are (gluino, N1) from the model topology and (MET,anyBSM) from the database topology, as shown by. Once again we compare their canonical names and particle properties (*Step 1* in :numref:`Fig. %s <matchB>`).
 Note that although the particle properties of N1 and anyBSM match, their canonical names are different, hence we only have the following partial matches:
 
  * gluino :math:`\leftrightarrow` anyBSM
  * N1 :math:`\leftrightarrow` MET
 
-In order to fully match the gluino and anyBSM nodes their daughters must also be compared (*Step C*). Since their daughters (q,N1) and (MET,jet) are final state nodes (undecayed) the comparison procedure stops at this level and results in the following matches:
+In order to fully match the gluino and anyBSM nodes their daughters must also be compared (*Step 2*). Since their daughters (q,N1) and (MET,jet) are final state nodes (undecayed) the comparison procedure stops at this level and results in the following matches:
 
  * q :math:`\leftrightarrow` jet
  * N1 :math:`\leftrightarrow` MET
