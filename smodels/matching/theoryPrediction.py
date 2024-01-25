@@ -691,7 +691,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
         for theoPred in expResults:
             theoPred.expResult = expResult
             theoPred.deltas_rel = deltas_rel
-            if "CR" in theoPred.dataset.dataInfo.dataId: # No result from individual CR
+            if not isinstance(theoPred.dataset,CombinedDataSet) and "CR" in theoPred.dataset.dataInfo.dataId: # Individual CRs shouldn't give results
                 theoPred.upperLimit = None
             else:
                 theoPred.upperLimit = theoPred.getUpperLimit()
