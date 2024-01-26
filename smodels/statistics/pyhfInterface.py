@@ -17,7 +17,7 @@ from scipy import optimize
 import numpy as np
 from smodels.base.smodelsLogging import logger
 import logging
-import warnings
+logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 warnings.filterwarnings("ignore")
 
 jsonver = ""
@@ -76,7 +76,6 @@ except pyhf.exceptions.ImportBackendError as e:
     pyhfinfo["backendver"] = numpy.version.full_version
 
     warnings.filterwarnings("ignore", r"invalid value encountered in log")
-
 
 countWarning = {"llhdszero": 0}
 
@@ -711,7 +710,6 @@ class PyhfUpperLimitComputer:
                         _1, _2, o = pyhf.infer.mle.fit(workspace.data(model), model,
                                 return_fitted_val=True, return_result_obj = True, init_pars = list(muhat), method="BFGS" )
                         sigma_mu_temp = float ( np.sqrt ( o.hess_inv[model.config.poi_index][model.config.poi_index] ) )
-
                     except (pyhf.exceptions.FailedMinimization,ValueError) as e:
                         pass
                     if abs ( sigma_mu_temp - 1.0 ) > 1e-5:
@@ -719,11 +717,16 @@ class PyhfUpperLimitComputer:
                     else:
                         _, _, o = pyhf.infer.mle.fit(workspace.data(model), model,
                             return_fitted_val=True, return_result_obj = True, method="L-BFGS-B" )
-
                         sigma_mu_temp = float ( np.sqrt ( o.hess_inv.todense()[model.config.poi_index][model.config.poi_index] ) )
+                        if abs ( sigma_mu_temp - 1.0 ) < 1e-8: # Fischer information is nonsense
+                            #Calculate inv_hess numerically
+                            inv_hess = self.compute_invhess(o.x, workspace.data(model), model, model.config.poi_index)
+                            sigma_mu_temp = float ( np.sqrt ( inv_hess))
                         if abs ( sigma_mu_temp - 1.0 ) > 1e-8:
                             sigma_mu = sigma_mu_temp * self.scale
-#                    sigma_mu = float ( o.unc[model.config.poi_index] ) * self.scale
+                        else: # sigma_mu is still nonsense
+                            logger.warning("sigma_mu computation failed, even with inv_hess numercially computed. sigma_mu will be set to 1.")
+                            sigma_mu = 1.
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 if pyhfinfo["backend"] == "pytorch":
