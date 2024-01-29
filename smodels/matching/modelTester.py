@@ -199,7 +199,7 @@ def testPoint(inputFile, outputDir, parser, database):
     if len(theoryPredictions) != 0:
         outputStatus.updateStatus(1)
         for i,tp in enumerate(theoryPredictions):
-            if tp.upperLimit is None and "CR" in tp.dataset.dataInfo.dataId:
+            if hasattr(tp.dataset,"dataInfo") and "CR" in tp.dataset.dataInfo.dataId:
                 theoryPredictions._theoryPredictions.pop(i)
         masterPrinter.addObj(theoryPredictions)
     else:

@@ -89,7 +89,7 @@ class PyhfData:
     :ivar nWS: number of workspaces = number of json files
     """
 
-    def __init__(self, nsignals, inputJsons, jsonFiles=None, includeCRs=False):
+    def __init__(self, nsignals, inputJsons, jsonFiles=None, includeCRs=False, signalUncertainty=None):
         self.nsignals = nsignals  # fb
         self.getTotalYield()
         self.inputJsons = inputJsons
@@ -98,6 +98,7 @@ class PyhfData:
         self.cachedULs = {False: {}, True: {}, "posteriori": {}}
         self.jsonFiles = jsonFiles
         self.includeCRs = includeCRs
+        self.signalUncertainty = signalUncertainty
         self.combinations = None
         if jsonFiles != None:
             self.combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
@@ -319,8 +320,14 @@ class PyhfUpperLimitComputer:
                 value["modifiers"].append({"data": None, "type": "normfactor", "name": "mu_SIG"})
                 value["modifiers"].append({"data": None, "type": "lumi", "name": "lumi"})
                 #if not all(sigBin == 0 for sigBin in value["data"]):
-                #value["modifiers"].append({"data": [sigBin*0.3 for sigBin in value["data"]], "type": "staterror", "name": "MCError"})
-                value["modifiers"].append({"data": {"hi_data": [sigBin*1.25 for sigBin in value["data"]], "lo_data": [sigBin*0.75 for sigBin in value["data"]]}, "type": "histosys", "name": "SigTheory"})
+                if self.data.signalUncertainty is not None:
+                    # value["modifiers"].append({"data": [sigBin*self.data.signalUncertainty for sigBin in value["data"]], "type": "staterror", "name": "MCError"})
+                    value["modifiers"].append({"data": {"hi_data": [sigBin*(1+self.data.signalUncertainty) for sigBin in value["data"]],
+                                                         "lo_data": [sigBin*(1-self.data.signalUncertainty) for sigBin in value["data"]]
+                                                       },
+                                               "type": "histosys",
+                                               "name": "signalUncertainty"
+                                              })
                 value["name"] = "bsm"
                 operator["value"] = value
                 patch.append(operator)

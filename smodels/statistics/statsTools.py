@@ -236,6 +236,9 @@ class StatsComputer:
         includeCRs = False
         if hasattr(globalInfo,'includeCRs'):
             includeCRs = globalInfo.includeCRs
+        signalUncertainty = None
+        if hasattr(globalInfo,"signalUncertainty"):
+            signalUncertainty = globalInfo.signalUncertainty
         # Constructing the list of signals with subsignals matching each json
         nsignals = list()
         for jsName in jsonFiles:
@@ -255,7 +258,7 @@ class StatsComputer:
             nsignals.append(subSig)
         # Loading the jsonFiles, unless we already have them (because we pickled)
         nsig = self.nsig
-        data = PyhfData(nsignals, jsons, globalInfo.jsonFiles, includeCRs)
+        data = PyhfData(nsignals, jsons, globalInfo.jsonFiles, includeCRs, signalUncertainty)
         if data.errorFlag:
             return None
         self.upperLimitComputer = PyhfUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
