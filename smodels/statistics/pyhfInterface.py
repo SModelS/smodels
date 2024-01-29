@@ -321,6 +321,7 @@ class PyhfUpperLimitComputer:
                 value["modifiers"].append({"data": None, "type": "lumi", "name": "lumi"})
                 #if not all(sigBin == 0 for sigBin in value["data"]):
                 if self.data.signalUncertainty is not None:
+                    # Uncomment the line below to add a MC statistical uncertainty.
                     # value["modifiers"].append({"data": [sigBin*self.data.signalUncertainty for sigBin in value["data"]], "type": "staterror", "name": "MCError"})
                     value["modifiers"].append({"data": {"hi_data": [sigBin*(1+self.data.signalUncertainty) for sigBin in value["data"]],
                                                         "lo_data": [sigBin*(1-self.data.signalUncertainty) for sigBin in value["data"]]
@@ -332,7 +333,7 @@ class PyhfUpperLimitComputer:
                 operator["value"] = value
                 patch.append(operator)
             for region in info["otherRegions"]:
-                if region['name'].startswith('CR') and self.includeCRs:
+                if 'CR' in region['name'] and self.includeCRs:
                     continue
                 else:
                     patch.append({"op": "remove", "path": region['path']})

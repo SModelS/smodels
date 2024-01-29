@@ -198,7 +198,7 @@ def testPoint(inputFile, outputDir, parser, database):
 
     if len(theoryPredictions) != 0:
         outputStatus.updateStatus(1)
-        theoryPredictions._theoryPredictions = [tp for tp in theoryPredictions._theoryPredictions if not os.path.basename(tp.dataset.path).startswith("CR")]
+        theoryPredictions._theoryPredictions = [tp for tp in theoryPredictions._theoryPredictions if not "CR" in os.path.basename(tp.dataset.path)] # Do not print CRs "results"
         masterPrinter.addObj(theoryPredictions)
     else:
         outputStatus.updateStatus(0)  # no results after enforcing maxcond
