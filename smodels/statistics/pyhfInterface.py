@@ -152,7 +152,7 @@ class PyhfData:
             if nbCRwithEM != 0 and not self.includeCRs:
                 logger.warning("EM in CRs but includeCRs == False. Signal in CRs will not be patched.")
             for i_ch, ch in enumerate(ws["channels"]):
-                if ch["name"][:2] == "SR" or ("CR" in ch["name"] and self.includeCRs and nbCRwithEM == nbCRinWS):  # if channel name starts with 'SR' or 'CR' if includeCRs
+                if "SR" in ch["name"] or ("CR" in ch["name"] and self.includeCRs and nbCRwithEM == nbCRinWS):  # if channel name starts with 'SR' or 'CR' if includeCRs
                     wsChannelsInfo["signalRegions"].append(
                         {
                             "path": "/channels/"
