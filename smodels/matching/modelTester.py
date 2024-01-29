@@ -198,9 +198,7 @@ def testPoint(inputFile, outputDir, parser, database):
 
     if len(theoryPredictions) != 0:
         outputStatus.updateStatus(1)
-        for i,tp in enumerate(theoryPredictions):
-            if hasattr(tp.dataset,"dataInfo") and "CR" in tp.dataset.dataInfo.dataId:
-                theoryPredictions._theoryPredictions.pop(i)
+        theoryPredictions._theoryPredictions = [tp for tp in theoryPredictions._theoryPredictions if not os.path.basename(tp.dataset.path).startswith("CR")]
         masterPrinter.addObj(theoryPredictions)
     else:
         outputStatus.updateStatus(0)  # no results after enforcing maxcond
