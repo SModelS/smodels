@@ -323,7 +323,7 @@ class PyhfUpperLimitComputer:
                 if self.data.signalUncertainty is not None:
                     # value["modifiers"].append({"data": [sigBin*self.data.signalUncertainty for sigBin in value["data"]], "type": "staterror", "name": "MCError"})
                     value["modifiers"].append({"data": {"hi_data": [sigBin*(1+self.data.signalUncertainty) for sigBin in value["data"]],
-                                                         "lo_data": [sigBin*(1-self.data.signalUncertainty) for sigBin in value["data"]]
+                                                        "lo_data": [sigBin*(1-self.data.signalUncertainty) for sigBin in value["data"]]
                                                        },
                                                "type": "histosys",
                                                "name": "signalUncertainty"
