@@ -22,19 +22,19 @@
             <text x="364.7619047619053" y="145.68650793650804">\Large Simplifications</text>
         </g>
         <g latexdraw:type="picture" id="id397384258">
-            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_coverage_sms1.png" x="17.142857142857228" y="65.60714285714268" height="347.0" width="291.0"/>
+            <image xlink:href="/home/lessa/smodels/docs/manual/source/images/sms_coverage_sms1.png" x="17.142857142857228" y="65.60714285714268" height="347.0" width="291.0"/>
         </g>
         <g latexdraw:type="picture" id="id274713965">
-            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_coverage_sms2.png" x="50.000000000000036" y="422.7499999999999" height="203.0" width="213.0"/>
+            <image xlink:href="/home/lessa/smodels/docs/manual/source/images/sms_coverage_sms2.png" x="50.000000000000036" y="422.7499999999999" height="203.0" width="213.0"/>
         </g>
         <g latexdraw:type="picture" id="id46427363">
-            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_coverage_sms3.png" x="50.0" y="639.8928571428575" height="203.0" width="213.0"/>
+            <image xlink:href="/home/lessa/smodels/docs/manual/source/images/sms_coverage_sms3.png" x="50.0" y="639.8928571428575" height="203.0" width="213.0"/>
         </g>
         <g latexdraw:type="picture" id="id404846908">
-            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_coverage_sms1_simp.png" x="614.2857142857139" y="71.3214285714286" height="419.0" width="227.0"/>
+            <image xlink:href="/home/lessa/smodels/docs/manual/source/images/sms_coverage_sms1_simp.png" x="614.2857142857139" y="71.3214285714286" height="419.0" width="227.0"/>
         </g>
         <g latexdraw:type="picture" id="id1555551615">
-            <image xlink:href="/home/lessa/smodels-graphs/docs/manual/source/images/sms_coverage_sms2_simp.png" x="614.2857142857143" y="537.0357142857143" height="203.0" width="227.0"/>
+            <image xlink:href="/home/lessa/smodels/docs/manual/source/images/sms_coverage_sms2_simp.png" x="614.2857142857143" y="537.0357142857143" height="203.0" width="227.0"/>
         </g>
     </g>
     <defs>
