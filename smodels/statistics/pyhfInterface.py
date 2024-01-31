@@ -319,8 +319,7 @@ class PyhfUpperLimitComputer:
                 value["modifiers"] = []
                 value["modifiers"].append({"data": None, "type": "normfactor", "name": "mu_SIG"})
                 value["modifiers"].append({"data": None, "type": "lumi", "name": "lumi"})
-                #if not all(sigBin == 0 for sigBin in value["data"]):
-                if self.data.signalUncertainty is not None:
+                if self.data.signalUncertainty is not None and self.data.signalUncertainty != 0:
                     # Uncomment the line below to add a MC statistical uncertainty.
                     # value["modifiers"].append({"data": [sigBin*self.data.signalUncertainty for sigBin in value["data"]], "type": "staterror", "name": "MCError"})
                     value["modifiers"].append({"data": {"hi_data": [sigBin*(1+self.data.signalUncertainty) for sigBin in value["data"]],
