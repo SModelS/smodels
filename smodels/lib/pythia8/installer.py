@@ -150,24 +150,20 @@ def protectInstall():
     many pythia8 instances in parallel, for some reason they sometimes deleted
     files from the install, making the install unusable """
     # print ( f"fixACLs: {os.getcwd()}" )
-    with open("pythiaversion","rt" ) as f:
-        pythiaversion = f.read().strip()
-        f.close()
-    cmd = f"chmod -R a-w pythia{pythiaversion}"
+    # pythiaversion = getVersion()
+    #cmd = f"chmod -R a-w pythia{pythiaversion}"
+    cmd = f"chmod -R a-w ."
     import subprocess
     subprocess.getoutput ( cmd )
-    print ( f"made pythia{pythiaversion} readonly" )
+    print ( f"made pythia8 readonly" )
 
 def removeInstallProtection():
     """ make install writable and removable again """
-    # print ( f"fixACLs: {os.getcwd()}" )
-    with open("pythiaversion","rt" ) as f:
-        pythiaversion = f.read().strip()
-        f.close()
-    cmd = f"chmod -R u+w pythia{pythiaversion}"
+    # pythiaversion = getVersion()
+    cmd = f"chmod -R u+w ."
     import subprocess
     subprocess.getoutput ( cmd )
-    print ( f"made pythia{pythiaversion} writable" )
+    print ( f"made pythia8 writable" )
 
 
 def installPythia():
