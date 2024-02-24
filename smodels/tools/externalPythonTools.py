@@ -36,15 +36,20 @@ class ExternalPythonTool(object):
                 logger.error("could not find %s: %s" % (importname, e))
 
     def compile ( self ):
+        import sys
+        cmd = ["install",self.name]
+        if sys.prefix == sys.base_prefix:
+            # we are *not* in a virtual env, so add '--user'
+            cmd = ["install","--user",self.name]
         try:
             import pip
-            pip.main(["install","--user",self.name] )
+            pip.main( cmd )
             return
         except (ImportError,AttributeError):
             pass
         try:
             import pip._internal
-            pip._internal.main(["install","--user",self.name] )
+            pip._internal.main( cmd )
             return
         except (ImportError,AttributeError):
             pass

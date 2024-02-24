@@ -102,7 +102,7 @@ def parallel_run ( verbose, testNotebooks=False, reduced=False ):
         from concurrencytest import ConcurrentTestSuite, fork_for_tests
     except ImportError as e:
         print ( "Need to install the module concurrencytest." )
-        print ( "pip install --user concurrencytest" )
+        print ( "pip install concurrencytest" )
         return
     from smodels.base import runtime
 
