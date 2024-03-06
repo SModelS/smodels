@@ -253,7 +253,6 @@ class Model(object):
 
         smPDGs, bsmPDGs = self.getSMandBSMList()
         allPDGs = smPDGs+bsmPDGs
-        modelPDGs = [particle.pdg for particle in self.BSMparticles if isinstance(particle.pdg, int)]
         for xsec in self.xsections.xSections[:]:
             if any(pid not in allPDGs for pid in xsec.pid):
                 logger.debug("Cross-section for %s includes particles not belonging to model and will be ignored" % str(xsec.pid))
@@ -316,6 +315,9 @@ class Model(object):
                 raise SModelSError()
 
             particle.totalwidth = abs(particleData.totalwidth)*GeV
+            broadWidth = 0.01
+            if particle.totalwidth > broadWidth*particle.mass:
+                logger.warning("Particle %s has a total width/mass = %1.2f. Some results may not be valid for broad resonances!" %(str(particle),float(particle.totalwidth/particle.mass)))
             if particle.totalwidth < stableWidth:
                 particle._isStable = True  # Treat particle as stable
                 logger.debug("Particle %s has width below the threshold and will be assumed as stable" % particle.pdg)

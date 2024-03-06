@@ -196,8 +196,12 @@ class SlhaStatus(object):
             self.status = -3, "Could not read input SLHA file"
             return
         try:
+            # Temporarily disable logger to avoid duplicated
+            # messages
+            logger.disabled = True
             model = Model(BSMList,SMList)
             model.updateParticles(filename)
+            logger.disabled = False
             self.model = model
             self.illegalDecays = self.findIllegalDecay(findIllegalDecays)
             self.xsec = self.hasXsec(checkXsec)
