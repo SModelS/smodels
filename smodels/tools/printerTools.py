@@ -164,7 +164,7 @@ def formatNestedDict(outputDict,ident=0,maxLength=50):
         if isinstance(key,str):
             keyStr = "'"+key+"'"
         else:
-            keyStr = str(key)
+            keyStr = str(key)        
         if ik == 0:
             output += ' '*ident+"%s : %s" %(keyStr,valStr)
         else:
@@ -174,11 +174,11 @@ def formatNestedDict(outputDict,ident=0,maxLength=50):
             output += ",\n"
         else:
             output += "\n"
-
+            
     output += ' '*(ident-4)+'}'
     return output
 
-def formatNestedList(outputList,ident=0,maxLength=50):
+def formatNestedList(outputList,ident=0,maxLength=50):    
     """
     Convert a nested list to a string
     with identation.
@@ -242,23 +242,17 @@ def getSummaryFrom(output, ptype):
         rvals, rexp, anaIDs, r_comb, rexp_comb, anaID_comb = info
 
     # Sort results by r_obs:
-    for i,r in enumerate(rvals):
-        if r is None or r == 'float("nan")':
-            rvals[i] = -1
-    rvals = rvals.astype(float)
     rvalswo = copy.deepcopy(rvals)
+    rvalswo[rvalswo is None] = -1
     asort = rvalswo.argsort()[::-1]
     rvals = rvals[asort]
     anaIDs = anaIDs[asort]
     rexp = rexp[asort]
-    for i,r in enumerate(rexp):
-        if r == 'float("nan")':
-            rexp[i] = -1
-    rexp = rexp.astype(float)
     summaryDict['r_max'] = rvals[0]
     summaryDict['r_exp'] = rexp[0]
     summaryDict['MostConstrainingAnalysis'] = anaIDs[0]
 
+    # Sort results by r_obs:
     rvalswo = copy.deepcopy(rexp)
     rvalswo[rvalswo is None] = -1
     # Sort results by r_exp:
@@ -450,3 +444,4 @@ def getInfoFromSummary(output):
     anaIDs = np.array(anaIDs)
 
     return rvals, rexp, anaIDs, r_comb, rexp_comb, anaID_comb
+
