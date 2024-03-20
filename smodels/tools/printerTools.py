@@ -254,7 +254,7 @@ def getSummaryFrom(output, ptype):
     for i,r in enumerate(rexp):
         if r == 'float("nan")':
             rexp[i] = -1
-    rexp = rvals.astype(float)
+    rexp = rexp.astype(float)
     summaryDict['r_max'] = rvals[0]
     summaryDict['r_exp'] = rexp[0]
     summaryDict['MostConstrainingAnalysis'] = anaIDs[0]
