@@ -49,25 +49,25 @@ def printScanSummary(outputDict, outputFile):
         # default values (in case of empty results):
         summaryDict = OrderedDict({'filename': fname,
                                  'MostConstrainingAnalysis': 'N/A',
-                                 'r_max': -1,
-                                 'r_exp': -1,
+                                 'r_max': np.nan,
+                                 'r_exp': np.nan,
                                  'MostSensitive(ATLAS)': 'N/A',
-                                 'r(ATLAS)': -1,
-                                 'r_exp(ATLAS)': -1,
+                                 'r(ATLAS)': np.nan,
+                                 'r_exp(ATLAS)': np.nan,
                                  'MostSensitive(CMS)': 'N/A',
-                                 'r(CMS)': -1,
-                                 'r_exp(CMS)': -1,
-                                 'r(combined)' : -1,
-                                 'r_exp(combined)' : -1,
+                                 'r(CMS)': np.nan,
+                                 'r_exp(CMS)': np.nan,
+                                 'r(combined)' : np.nan,
+                                 'r_exp(combined)' : np.nan,
                                  'CombinedAnalyses' : 'N/A'
                                    })
 
         if 'python' in output:
-            sDict = getSummaryFrom(output['python'], 'python')
+            sDict = getScanSummaryFrom(output['python'], 'python')
         elif 'slha' in output:
-            sDict = getSummaryFrom(output['slha'], 'slha')
+            sDict = getScanSummaryFrom(output['slha'], 'slha')
         elif 'summary' in output:
-            sDict = getSummaryFrom(output['summary'], 'summary')
+            sDict = getScanSummaryFrom(output['summary'], 'summary')
         else:
             sDict = {}
 
@@ -79,7 +79,7 @@ def printScanSummary(outputDict, outputFile):
 
     # If there are no combined results, remove its (dummy) entries
     anaList = set([])
-    if all(summary['r(combined)'] == -1 for summary in summaryList):
+    if all(np.isnan(summary['r(combined)']) for summary in summaryList):
         for summary in summaryList:
             summary.pop('r(combined)')
             summary.pop('r_exp(combined)')
@@ -101,7 +101,7 @@ def printScanSummary(outputDict, outputFile):
     header += "#The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.\n"
     if anaList:
         header += "#Analyses used for combination = %s.\n" %(','.join(anaList))
-        header += "#r(combined) = -1 means no analysis from the above combination set produced results.\n"
+        header += "#r(combined) = nan means no analysis from the above combination set produced results.\n"
 
 
     # Get column labels and widths:
@@ -164,7 +164,7 @@ def formatNestedDict(outputDict,ident=0,maxLength=50):
         if isinstance(key,str):
             keyStr = "'"+key+"'"
         else:
-            keyStr = str(key)        
+            keyStr = str(key)
         if ik == 0:
             output += ' '*ident+"%s : %s" %(keyStr,valStr)
         else:
@@ -174,11 +174,11 @@ def formatNestedDict(outputDict,ident=0,maxLength=50):
             output += ",\n"
         else:
             output += "\n"
-            
+
     output += ' '*(ident-4)+'}'
     return output
 
-def formatNestedList(outputList,ident=0,maxLength=50):    
+def formatNestedList(outputList,ident=0,maxLength=50):
     """
     Convert a nested list to a string
     with identation.
@@ -216,7 +216,7 @@ def formatNestedList(outputList,ident=0,maxLength=50):
     output += ' '*(ident-4)+']'
     return output
 
-def getSummaryFrom(output, ptype):
+def getScanSummaryFrom(output, ptype):
     """
     Retrieves information about the output according to the printer type (slha,python or summary)
 
@@ -241,43 +241,34 @@ def getSummaryFrom(output, ptype):
     else:
         rvals, rexp, anaIDs, r_comb, rexp_comb, anaID_comb = info
 
-    # Sort results by r_obs:
-    rvalswo = copy.deepcopy(rvals)
-    rvalswo[rvalswo is None] = -1
-    asort = rvalswo.argsort()[::-1]
-    rvals = rvals[asort]
-    anaIDs = anaIDs[asort]
-    rexp = rexp[asort]
-    summaryDict['r_max'] = rvals[0]
-    summaryDict['r_exp'] = rexp[0]
-    summaryDict['MostConstrainingAnalysis'] = anaIDs[0]
+    # Sort results by r_obs
+    # (replace nan by -1 for sorting only)
+    rvals_c = np.nan_to_num(rvals,nan=-1.0)
+    imax = rvals_c.argsort()[::-1][0]
+    summaryDict['r_max'] = rvals[imax]
+    summaryDict['r_exp'] = rexp[imax]
+    summaryDict['MostConstrainingAnalysis'] = anaIDs[imax]
 
-    # Sort results by r_obs:
-    rvalswo = copy.deepcopy(rexp)
-    rvalswo[rvalswo is None] = -1
-    # Sort results by r_exp:
-    asort = rvalswo.argsort()[::-1]
-    rvals = rvals[asort]
-    anaIDs = anaIDs[asort]
-    rexp = rexp[asort]
-    iATLAS, iCMS = -1, -1
-    for i, anaID in enumerate(anaIDs):
-        if rexp[i] < 0:
-            continue
-        if 'ATLAS' in anaID and iATLAS < 0:
-            iATLAS = i
-        elif 'CMS' in anaID and iCMS < 0:
-            iCMS = i
-
-    if iATLAS >= 0:
-        summaryDict['r(ATLAS)'] = rvals[iATLAS]
-        summaryDict['r_exp(ATLAS)'] = rexp[iATLAS]
-        summaryDict['MostSensitive(ATLAS)'] = anaIDs[iATLAS]
-
-    if iCMS >= 0:
-        summaryDict['r(CMS)'] = rvals[iCMS]
-        summaryDict['r_exp(CMS)'] = rexp[iCMS]
-        summaryDict['MostSensitive(CMS)'] = anaIDs[iCMS]
+    # Now keep only results with r_exp != nan:
+    rexp_good = rexp[~np.isnan(rexp)]
+    rvals_good = rvals[~np.isnan(rexp)]
+    anaIDs_good = anaIDs[~np.isnan(rexp)]
+    asort = rexp_good.argsort()[::-1]
+    rvals_good = rvals_good[asort]
+    anaIDs_good = anaIDs_good[asort]
+    rexp_good = rexp_good[asort]
+    iATLAS = [i for i,ana in enumerate(anaIDs_good) if 'ATLAS' in ana]
+    iCMS = [i for i,ana in enumerate(anaIDs_good) if 'CMS' in ana]
+    if len(iATLAS) > 0:
+        iATLAS = iATLAS[0]
+        summaryDict['r(ATLAS)'] = rvals_good[iATLAS]
+        summaryDict['r_exp(ATLAS)'] = rexp_good[iATLAS]
+        summaryDict['MostSensitive(ATLAS)'] = anaIDs_good[iATLAS]
+    if len(iCMS) > 0:
+        iCMS = iCMS[0]
+        summaryDict['r(CMS)'] = rvals_good[iCMS]
+        summaryDict['r_exp(CMS)'] = rexp_good[iCMS]
+        summaryDict['MostSensitive(CMS)'] = anaIDs_good[iCMS]
 
     summaryDict['r(combined)'] = r_comb
     summaryDict['r_exp(combined)'] = rexp_comb
@@ -301,16 +292,16 @@ def getInfoFromPython(output):
         return None
     rvals = np.array([res['r'] for res in output['ExptRes']])
     rexp = np.array([res['r_expected'] if res['r_expected']
-                   else -1 for res in output['ExptRes']])
+                   else np.nan for res in output['ExptRes']])
     anaIDs = np.array([res['AnalysisID'] for res in output['ExptRes']])
 
-    r_comb = -1
-    rexp_comb = -1
+    r_comb = np.nan
+    rexp_comb = np.nan
     anaID_comb = 'N/A'
 
     if 'CombinedRes' in output:
         for res in output['CombinedRes']:
-            if r_comb is None or r_comb < res['r']:
+            if np.isnan(r_comb) or r_comb < res['r']:
                 r_comb = res['r']
                 rexp_comb = res['r_expected']
                 anaID_comb = res['AnalysisID']
@@ -347,13 +338,13 @@ def getInfoFromSLHA(output):
         resDict = {i : dict(block) for i,block in groups if  i != 0}
         # Get r values:
         rvals = np.array([resDict[i][(i,1)] for i in resDict])
-        rexp = np.array([resDict[i][(i,2)] if resDict[i][(i,2)] != 'N/A' else -1
+        rexp = np.array([resDict[i][(i,2)] if resDict[i][(i,2)] != 'N/A' else np.nan
                         for i in resDict])
         anaIDs = np.array([resDict[i][(i,4)] for i in resDict])
 
     if bcombName is None or len(results.blocks[bcombName]) < 1:
-        r_comb = -1
-        rexp_comb = -1
+        r_comb = np.nan
+        rexp_comb = np.nan
         anaID_comb = 'N/A'
     else:
         # Group combined results by block index:
@@ -361,11 +352,11 @@ def getInfoFromSLHA(output):
                                   key = lambda k: k[0][0])
         resDict = {i : dict(block) for i,block in groups if  i != 0}
         rvals_comb = np.array([resDict[i][(i,1)] for i in resDict  if  i != 0])
-        rexp_comb = np.array([resDict[i][(i,2)] if resDict[i][(i,2)] != 'N/A' else -1
+        rexp_comb = np.array([resDict[i][(i,2)] if resDict[i][(i,2)] != 'N/A' else np.nan
                         for i in resDict if i != 0])
         anaID_comb = np.array([resDict[i][(i,6)] for i in resDict if i != 0])
 
-        r_comb = max(rvals_comb)
+        r_comb = max(rvals_comb[~np.isnan(rvals_comb)])
         rexp_comb = rexp_comb[np.argmax(rvals_comb)]
         anaID_comb = anaID_comb[np.argmax(rvals_comb)]
 
@@ -387,8 +378,8 @@ def getInfoFromSummary(output):
     rvals = []
     rexp = []
     anaIDs = []
-    r_comb = -1
-    rexp_comb = -1
+    r_comb = np.nan
+    rexp_comb = np.nan
     anaID_comb = 'N/A'
 
     for line in lines:
@@ -398,7 +389,7 @@ def getInfoFromSummary(output):
                          for x in rmax])[0][0]  # Get when the value ends
             rmax = eval(rmax[:ff])
             anaMax = line.split('from')[1].split()[0].replace(',', '')
-            rexpMax = -1
+            rexpMax = np.nan
             if 'r_expected' in line and "r_expected not available" not in line:
                 rexpMax = line.split('r_expected')[-1]
                 rexpMax = rexpMax.split('=')[1]
@@ -414,7 +405,7 @@ def getInfoFromSummary(output):
             ff = np.where([((not x.isdigit()) and (x not in ['.', '+', '-']))
                          for x in rAna])[0][0]  # Get when the value ends
             rAna = eval(rAna[:ff])
-            rexpAna = -1
+            rexpAna = np.nan
             if 'r_expected' in line:
                 rexpAna = line.split('r_expected')[-1]
                 rexpAna = rexpAna.split('=')[1]

@@ -409,10 +409,10 @@ def testPoints(fileList, inDir, outputDir, parser, database,
                 outputDict.update(p.get())
 
         # Collect output to build global summary:
-        summaryFile = os.path.join(outputDir, 'summary.txt')
-        logger.info("A summary of the results can be found in %s" %
-                    summaryFile)
-        printScanSummary(outputDict, summaryFile)
+        scanSummaryFile = os.path.join(outputDir, 'summary.txt')
+        logger.info("A summary of the scan results can be found in %s" %
+                    scanSummaryFile)
+        printScanSummary(outputDict, scanSummaryFile)
         # Remove summary log from logger
         logger.removeHandler(fileLog)
         fileLog.close()

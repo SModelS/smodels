@@ -81,7 +81,7 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
                    or directory name (path to directory containing input files)
     :param parameterFile: File containing the input parameters (default =
                           smodels/etc/parameters_default.ini)
-    :param outputDir: Output directory to write a summary of results to
+    :param outputDir: Output directory to write the results to
     :param db: supply a smodels.experiment.databaseObj.Database object, so
             the database doesn't have to be loaded anymore. Will
             render a few parameters in the parameter file irrelevant.
