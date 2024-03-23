@@ -290,6 +290,8 @@ class StatsComputer:
                                  correct, if necessary
         """
         ret = self.maximize_likelihood ( expected = expected, return_nll = return_nll  )
+        if ret is None:
+            return {}
         lmax = ret['lmax']
 
         lbsm = self.likelihood ( poi_test = 1., expected=expected, return_nll = return_nll )

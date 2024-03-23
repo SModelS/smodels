@@ -368,11 +368,12 @@ class TheoryPrediction(object):
         # Compute likelihoods and related parameters:
         llhdDict = self.statsComputer.get_five_values(expected = expected,
                      return_nll = True )
-        self.cachedObjs[expected]["nll"] = llhdDict["lbsm"]
-        self.cachedObjs[expected]["nll_sm"] = llhdDict["lsm"]
-        self.cachedObjs[expected]["nllmax"] = llhdDict["lmax"]
-        self.cachedObjs[expected]["muhat"] = llhdDict["muhat"]
-        self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
+        if llhdDict not in [ None, {} ]:
+            self.cachedObjs[expected]["nll"] = llhdDict["lbsm"]
+            self.cachedObjs[expected]["nll_sm"] = llhdDict["lsm"]
+            self.cachedObjs[expected]["nllmax"] = llhdDict["lmax"]
+            self.cachedObjs[expected]["muhat"] = llhdDict["muhat"]
+            self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
 
 
 class TheoryPredictionsCombiner(TheoryPrediction):
