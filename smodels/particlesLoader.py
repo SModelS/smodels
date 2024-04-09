@@ -191,7 +191,6 @@ def load():
         try:
             BSMList = getParticlesFromSLHA(modelFile)
         except SModelSError:
-            logger.error("Could not load input model from %s. The file should be either a python module with particle definitions\
-            or a SLHA file with QNUMBERS blocks." % modelFile)
+            logger.error("Could not load input model from %s. The file should be either a python module with particle definitions or a SLHA file with QNUMBERS blocks." % modelFile)
             raise SModelSError()
     return BSMList
