@@ -25,7 +25,7 @@ if v[0]==2 and v[1] < 7 and v[1] > 3:
         print ( "Error: python v",sys.version,"needs unittest2. Please install." )
         sys.exit()
 from smodels.base.smodelsLogging import setLogLevel
-setLogLevel ( "error" )
+setLogLevel ( "fatal" )
 
 def isInReducedSet ( t ):
     """ is t in the reduced set of unit tests? """

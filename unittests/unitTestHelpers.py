@@ -124,7 +124,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
         # For numbers with units, do not check for absolute difference
         ret = (rel_diff.asNumber() < allowedRelDiff)
         if not ret:
-            logger.error("values %s and %s differ by %s" % (obj1, obj2, rel_diff))        
+            logger.error( f"values {obj1} and {obj2} differ by {rel_diff}" )
         return ret
     elif isinstance(obj1, float):
         if obj1 == obj2:
@@ -221,7 +221,7 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
     # level = 'debug'
     level = 'info'
     if suppressStdout:
-        level = 'error'
+        level = 'fatal'
         to = os.devnull
     database = None
     from smodels.base import runtime
@@ -321,7 +321,7 @@ def getEdges(sms):
     '''
     Convenience function to convert the edges to strings.
     '''
-    edges = sorted([(str(mom),str(daughter)) 
+    edges = sorted([(str(mom),str(daughter))
              for mom,daughter in sms.edges])
 
     return edges

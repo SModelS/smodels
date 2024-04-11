@@ -14,13 +14,13 @@ import os
 sys.path.insert(0, "../")
 import unittest
 from unitTestHelpers import equalObjs, runMain, importModule
-from smodels.base.smodelsLogging import logger, setLogLevel
-setLogLevel('debug')
 
 class CombinedTest(unittest.TestCase):
 
     def testCombinedResult(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
+        from smodels.base.smodelsLogging import logger, setLogLevel
+        setLogLevel ( "fatal" )
         outputfile = runMain(filename, inifile="testParameters_agg.ini", suppressStdout=True)
         smodelsOutput = importModule(outputfile)
         from gluino_squarks_default_agg import smodelsOutputDefault

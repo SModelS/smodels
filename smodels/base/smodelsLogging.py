@@ -122,7 +122,7 @@ def getLogger ():
 logger = getLogger()
 
 def getLogLevel( asString=False ):
-    """ obtain the current log level. 
+    """ obtain the current log level.
     :params asString: return string, not number.
     """
     # return logger.level
@@ -131,7 +131,7 @@ def getLogLevel( asString=False ):
         return ret
     lvlNames= { logging.DEBUG: "debug", logging.INFO: "info",
                 logging.WARNING: "warning", logging.ERROR: "error",
-                logging.CRITICAL: "critical", logging.FATAL: "FATAL" }
+                logging.CRITICAL: "critical", logging.FATAL: "fatal" }
     lvl = list ( lvlNames.keys() )
     lvl.sort( reverse = True)
     for l in lvl:
@@ -151,8 +151,9 @@ def setLogLevel ( level ):
         return
     level = level.lower()
     levels = { "debug": logging.DEBUG, "info": logging.INFO,
-               "warn": logging.WARNING,
-               "warning": logging.WARNING, "error": logging.ERROR }
+               "warn": logging.WARNING, "warning": logging.WARNING,
+               "error": logging.ERROR, "critical": logging.CRITICAL,
+               "fatal": logging.FATAL }
     if not level in levels:
         logger.error ( "Unknown log level ``%s'' supplied!" % level )
         return
