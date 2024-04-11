@@ -58,6 +58,8 @@ class PyhfTest(unittest.TestCase):
         Tests how the module handles corrupted json files
         Maybe it is needed to test different types of corruptions
         """
+        from smodels.base.smodelsLogging import setLogLevel
+        setLogLevel("fatal")
         #Defining the channels
         modifiers = []
         modifiers.append(dict(data=None,
