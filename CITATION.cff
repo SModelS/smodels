@@ -69,7 +69,9 @@ authors:
     given-names: Humberto
     email: humberto.reyes@rwth-aachen.de
     orcid: 'https://orcid.org/0000-0003-3283-5208'
-    affiliation: ' Institut für Theoretische Teilchenphysik und Kosmologie, RWTH Aachen, 52074 Aachen, Germany'
+    affiliation: >-
+	    Institut für Theoretische Teilchenphysik und Kosmologie, RWTH Aachen, 
+		  52074 Aachen, Germany
 identifiers:
   - type: url
     value: 'https://arxiv.org/abs/arXiv:1312.4175'
